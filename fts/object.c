@@ -640,6 +640,7 @@ fts_object_recompute(fts_object_t *old)
 	fts_object_send_kernel_properties(obj);
 
       fts_client_upload_object(obj, -1);
+      fts_object_upload_connections(obj);
     }
 
   return obj;

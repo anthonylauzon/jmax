@@ -70,6 +70,7 @@ FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
+LEX = @LEX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
@@ -82,6 +83,7 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
+YACC = @YACC@
 
 lib_LTLIBRARIES = libfts.la
 
@@ -138,13 +140,17 @@ time.c \
 tuple.c \
 variable.c \
 version.c \
-vm.c 
+vm.c \
+parser.y \
+scanner.l
 
 
 bin_PROGRAMS = fts
 fts_SOURCES = main.c
 fts_LDADD = @DOT_LIBS@ -lfts @FTS_SYS_LIBS@ -lm
 libfts_la_LDFLAGS = -no-undefined
+AM_YFLAGS = -d
+AM_LFLAGS = -Pfts_string_ -olex.yy.c
 
 EXTRA_DIST = linux.c sgi.c macosx.c win32.c
 
@@ -168,19 +174,21 @@ hashtable.lo label.lo list.lo loader.lo mem.lo message.lo midi.lo \
 midifile.lo object.lo objectlist.lo objectset.lo package.lo param.lo \
 patcher.lo patparser.lo post.lo project.lo property.lo saver.lo \
 sched.lo selection.lo sigconn.lo stack.lo symbol.lo template.lo time.lo \
-tuple.lo variable.lo version.lo vm.lo
+tuple.lo variable.lo version.lo vm.lo parser.lo scanner.lo
 bin_PROGRAMS =  fts$(EXEEXT)
 PROGRAMS =  $(bin_PROGRAMS)
 
 fts_OBJECTS =  main.$(OBJEXT)
 fts_DEPENDENCIES = 
 fts_LDFLAGS = 
+LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
+LEXLIB = @LEXLIB@
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-DIST_COMMON =  Makefile.am Makefile.in version.c.in
+DIST_COMMON =  Makefile.am Makefile.in parser.c scanner.c version.c.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -196,16 +204,17 @@ DEP_FILES =  .deps/@PLATFORM@.P .deps/abstraction.P .deps/array.P \
 .deps/label.P .deps/list.P .deps/loader.P .deps/main.P .deps/mem.P \
 .deps/message.P .deps/midi.P .deps/midifile.P .deps/object.P \
 .deps/objectlist.P .deps/objectset.P .deps/package.P .deps/param.P \
-.deps/patcher.P .deps/patparser.P .deps/post.P .deps/project.P \
-.deps/property.P .deps/saver.P .deps/sched.P .deps/selection.P \
-.deps/sigconn.P .deps/stack.P .deps/symbol.P .deps/template.P \
-.deps/time.P .deps/tuple.P .deps/variable.P .deps/version.P .deps/vm.P
+.deps/parser.P .deps/patcher.P .deps/patparser.P .deps/post.P \
+.deps/project.P .deps/property.P .deps/saver.P .deps/scanner.P \
+.deps/sched.P .deps/selection.P .deps/sigconn.P .deps/stack.P \
+.deps/symbol.P .deps/template.P .deps/time.P .deps/tuple.P \
+.deps/variable.P .deps/version.P .deps/vm.P
 SOURCES = $(libfts_la_SOURCES) $(fts_SOURCES)
 OBJECTS = $(libfts_la_OBJECTS) $(fts_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .obj .s
+.SUFFIXES: .S .c .l .lo .o .obj .s .y
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --foreign fts/Makefile
 
@@ -310,6 +319,15 @@ uninstall-binPROGRAMS:
 fts$(EXEEXT): $(fts_OBJECTS) $(fts_DEPENDENCIES)
 	@rm -f fts$(EXEEXT)
 	$(LINK) $(fts_LDFLAGS) $(fts_OBJECTS) $(fts_LDADD) $(LIBS)
+.l.c:
+	$(LEX) $(AM_LFLAGS) $(LFLAGS) $< && mv $(LEX_OUTPUT_ROOT).c $@
+.y.c:
+	$(YACC) $(AM_YFLAGS) $(YFLAGS) $< && mv y.tab.c $*.c
+	if test -f y.tab.h; then \
+	if cmp -s y.tab.h $*.h; then rm -f y.tab.h; else mv y.tab.h $*.h; fi; \
+	else :; fi
+parser.h: parser.c
+
 
 tags: TAGS
 
@@ -428,6 +446,7 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
+	-test -z "scannerlparserhparserc" || rm -f scannerl parserh parserc
 mostlyclean-am:  mostlyclean-libLTLIBRARIES mostlyclean-compile \
 		mostlyclean-libtool mostlyclean-binPROGRAMS \
 		mostlyclean-tags mostlyclean-depend mostlyclean-generic
