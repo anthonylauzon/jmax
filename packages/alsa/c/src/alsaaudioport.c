@@ -442,7 +442,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   snd_pcm_hw_params_t *hwparams;
   snd_pcm_sw_params_t *swparams;
 
-  int err;
+  int err = 0;
   int open_mode = 0;
   int dir;
 
@@ -1083,7 +1083,8 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   if (err != 0)
   {
     fts_object_error(o, "Error when trying to open alsastream \n");
-    post("[alsaaudioport_open_input] err: %d \n", err);
+    post("[alsaaudioport_open_input] err: %s \n", snd_strerror(err));
+    fts_log("[alsaaudioport_open_input] err: %s \n", snd_strerror(err));
     return;
   }
   /* 
@@ -1113,11 +1114,18 @@ alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 			SND_PCM_STREAM_PLAYBACK, &format, self->playback.channels, 
 			sampling_rate, fifo_size, &access);
 
+  if (err != 0)
+  {
+    fts_object_error(o, "Error when trying to open alsastream \n");
+    post("[alsaaudioport_open_output] err: %s \n", snd_strerror(err));
+    fts_log("[alsaaudioport_open_output] err: %s \n", snd_strerror(err));
+    return;
+  }
   /* set fts_audioport io_fun and copy fun */
   alsaaudioport_update_audioport_output_functions(self, &self->playback);
-
+  
   fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
-
+  
   fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
 }
 
@@ -1126,6 +1134,9 @@ static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t 
   alsaaudioport_t* self = (alsaaudioport_t*)o;
 
   post("[alsaaudioport_close_input]\n");
+
+  fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+
   if (self->capture.handle != 0)
     snd_pcm_close(self->capture.handle);
 
@@ -1160,7 +1171,7 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   int in_max_channels;
   int out_max_channels;
 
-  fts_audioport_init( &self->head);
+  fts_audioport_init((fts_audioport_t*)self);
 
   self->capture.handle = NULL;
   self->playback.handle = NULL;
@@ -1196,7 +1207,7 @@ static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   alsaaudioport_t *self = (alsaaudioport_t *)o;
 
-  fts_audioport_delete( &self->head);
+  fts_audioport_delete((fts_audioport_t*)self);
 
 
   if (self->input_buffer)
