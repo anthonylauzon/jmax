@@ -56,10 +56,8 @@ public class Tabler extends MaxEditor {
    * Personalize the menubar */
   public void SetupMenu(){
 
-    getCopyMenu().setEnabled(false);
-    getPasteMenu().setEnabled(false);
-    getCutMenu().setEnabled(false);
     getDuplicateMenu().setEnabled(false);
+    getCutMenu().setEnabled(false);
 
     getEditMenu().add(new MenuItem("-"));
 
@@ -106,7 +104,6 @@ public class Tabler extends MaxEditor {
     try 
       {
 	itsData.undo();
-	itsPanel.repaint(); //should not repaint from here
       } catch (CannotUndoException e1) {
 	System.out.println("can't undo");
 	
@@ -119,10 +116,19 @@ public class Tabler extends MaxEditor {
     try 
       {
 	itsData.redo();
-	itsPanel.repaint(); //should not repaint from here
       } catch (CannotRedoException e1) {
 	System.out.println("can't redo");
       }
+  }
+
+  protected void Copy()
+  {
+    itsData.copy();
+  }
+
+  protected void Paste()
+  {
+    itsData.paste();
   }
 
   //--- Fields 

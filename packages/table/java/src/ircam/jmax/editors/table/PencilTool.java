@@ -39,6 +39,14 @@ public class PencilTool extends TableTool implements DynamicDragListener {
 
 
   /**
+   * Redefined to deselect all at activation time */
+  public void reActivate(GraphicContext gc) 
+  {
+    super.reActivate(gc);
+    getGc().getSelection().deselectAll();
+  }
+
+  /**
    * the default interaction module for this tool
    */
   public InteractionModule getDefaultIM() 
@@ -51,12 +59,10 @@ public class PencilTool extends TableTool implements DynamicDragListener {
    * DynamicDragListener interface */
   public void dragStart(int x, int y)
   {
-    Graphics g = getGc().getGraphicDestination().getGraphics();
     getGc().getDataModel().beginUpdate();
     previousX = x;
     previousY = y;
     setPoint(x, y);
-    g.dispose();
   }
 
   /**

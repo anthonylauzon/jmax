@@ -34,12 +34,22 @@ public class TableGraphicContext extends GraphicContext{
     //itsWriter = new CoordinateWriter(this);
   }
 
+
+  /**
+   * Redefined to switch the selection ownership */
+  public void activate()
+  {
+    if (TableSelection.getCurrent() != itsSelection)
+      TableSelection.setCurrent(itsSelection);
+  }
+
   //--- Fields & accessors ---//
 
   TableDataModel itsModel;
   TableAdapter itsAdapter;
   CoordinateWriter itsWriter;
   EditorToolbar toolbar;
+  TableSelection itsSelection;
 
   public TableDataModel getDataModel()
   {
@@ -79,6 +89,16 @@ public class TableGraphicContext extends GraphicContext{
   public EditorToolbar getToolbar()
   {
     return toolbar;
+  }
+
+  public void setSelection(TableSelection t)
+  {
+    itsSelection = t;
+  }
+
+  public TableSelection getSelection()
+  {
+    return itsSelection;
   }
 }
 

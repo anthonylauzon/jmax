@@ -16,6 +16,7 @@ SOURCES = \
 	  TableFactory.java \
 	  TableDataEditor.java \
 	  TableDisplay.java \
+	  DefaultTableDataModel.java \
 	  TableDataModel.java \
 	  TableRemoteData.java \
 	  TableSelection.java \

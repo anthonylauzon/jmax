@@ -29,6 +29,18 @@ public interface TableDataModel extends UndoableData{
    */
   public abstract int getSize();
   
+  /**
+   * Returns the vertical range of this table, that is, 
+   * the abs(max-min)  */
+  public abstract int getVerticalSize();
+
+  /**
+   * Returns the maximum (signed) value in the table */
+  public abstract int max();
+
+  /**
+   * Returns the minimum (signed) value in the table */
+  public abstract int min();
 
   /**
    * returns a vector of all the values

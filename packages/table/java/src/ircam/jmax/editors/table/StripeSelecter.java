@@ -21,8 +21,8 @@ import ircam.jmax.toolkit.*;
 
 /**
  * A specific shape of selection for the Table: the vertical stripe.
- * This class uses the functionalities of the Selecter IM just
- * redefining the XORDraw method (that is, the way the selection is shown.
+ * This class uses the functionalities of the Selecter Interactio Module, just
+ * redefining the XORDraw method (that is, the way the selection is shown).
  * @see Selecter
  */ 
 public class StripeSelecter extends Selecter {
@@ -39,8 +39,14 @@ public class StripeSelecter extends Selecter {
    */
   public void XORDraw(int dx, int dy) 
   {
+    TableAdapter ta = ((TableGraphicContext)gc).getAdapter();
+    //take care of the "quantization" introduced by the zoom:
+    int x1 = ta.getX(ta.getInvX(movingPoint.x));
+    int x2 = ta.getX(ta.getInvX(movingPoint.x+dx));
 
-    tempRect.setBounds(movingPoint.x, 0, dx, gc.getGraphicDestination().getSize().height);
+    if (x1 <0) x1=0; 
+
+    tempRect.setBounds(x1, 0, x2-x1,gc.getGraphicDestination().getSize().height );
     normalizeRectangle(tempRect);
 
     Graphics g = gc.getGraphicDestination().getGraphics();
@@ -50,9 +56,10 @@ public class StripeSelecter extends Selecter {
     movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy); 
   }
 
+
   /**
    * draws the selection */
-  public static void drawGrayRect(Graphics g, Rectangle r)
+  private static void drawGrayRect(Graphics g, Rectangle r)
   {
 
     g.setColor(Color.gray);

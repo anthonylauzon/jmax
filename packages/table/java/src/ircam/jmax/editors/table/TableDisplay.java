@@ -24,17 +24,23 @@ import javax.swing.*;
 public class TableDisplay extends JPanel
 {
 
+  /**
+   * Constructor. */
   public TableDisplay()
   {
     super();
   }
 
+  /**
+   * Constructor with a table render */
   public TableDisplay(TableRenderer tr)
   {
     super();
     this.tr = tr;
   }
 
+  /**
+   * Specify which render to use for this TableDisplay */
   public void setRenderer(TableRenderer tr)
   {
     this.tr = tr;
@@ -74,3 +80,4 @@ public class TableDisplay extends JPanel
   //--- Fields
   TableRenderer tr;
 }
+

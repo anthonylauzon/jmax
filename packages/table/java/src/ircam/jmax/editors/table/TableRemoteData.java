@@ -14,15 +14,20 @@
 
 package ircam.jmax.editors.table;
 
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.toolkit.*;
 import ircam.jmax.utils.*;
+
+import java.awt.datatransfer.*;
+import java.io.*;
 import java.util.*;
 import javax.swing.undo.*;
 
 /**
- * A TableDataModel linked to an FtsIntegerVector.
+ * A TableDataModel associated to an FtsIntegerVector.
  * @see FtsIntegerVector */
-public class TableRemoteData implements TableDataModel {
+public class TableRemoteData implements TableDataModel, ClipableData, ClipboardOwner {
   
   /**
    * Constructor */
@@ -41,6 +46,41 @@ public class TableRemoteData implements TableDataModel {
     return itsData.getSize();
   }
 
+
+  /**
+   * returns the maximum vertical range of the table */
+  public int getVerticalSize()
+  {
+    return Math.abs(max()-min());
+  }
+
+  /**
+   * Utility to find the maximum (signed) value in the table */
+  public int max()
+  {
+    int max = itsData.getValues()[0];
+
+    for (int i = 0; i < getSize(); i++)
+      {
+	if (itsData.getValues()[i] > max) max = itsData.getValues()[i];
+      }
+    
+    return max;
+  }
+
+  /**
+   * Returns the minimum (signed) value in the table */
+  public int min()
+  {
+    int min = itsData.getValues()[0];
+
+    for (int i = 0; i < getSize(); i++)
+      {
+	if (itsData.getValues()[i] < min) min = itsData.getValues()[i];
+      }
+    
+    return min;
+  }
 
   /**
    * returns the value at the given position
@@ -218,11 +258,92 @@ public class TableRemoteData implements TableDataModel {
       }
   }
 
+  /**
+   * ClipableData interface */
+  public void cut()
+  {
+  }
+  
+  /**
+   * ClipableData interface */
+  public void copy()
+  {
+    if (TableSelection.getCurrent().getModel() != this) return;
+
+    TableSelection.getCurrent().prepareACopy();
+    MaxApplication.systemClipboard.setContents(TableSelection.getCurrent(), this);
+  }
+  
+  /**
+   * ClipableData interface */
+  public void paste()
+  {
+    int toPaste[] = null;
+    TableSelection.TableClip tc = null;
+
+    // check if we can paste:
+    if (TableSelection.getCurrent().getModel() != this )
+      return;
+
+    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+
+    if (clipboardContent != null && clipboardContent.isDataFlavorSupported(TableSelection.tableSelection))
+      {
+	try {
+	  tc = (TableSelection.TableClip) clipboardContent.getTransferData(TableSelection.tableSelection);
+	  toPaste = tc.content;
+	} catch (UnsupportedFlavorException ufe)
+	  {
+	    // this should never happen...
+	    System.err.println("Clipboard error in paste: content does not support "+TableSelection.tableSelection.getHumanPresentableName());
+	  } 
+	catch (IOException ioe)
+	  {
+	    System.err.println("Clipboard error in paste: content is no more an "+TableSelection.tableSelection.getHumanPresentableName());
+	  }
+
+      }
+
+    if (toPaste != null)
+      {
+	
+	beginUpdate();  //the paste is undoable
+
+	int pointOfInsertion = NOWHERE;
+	int numberOfPoints = 0;
+
+	if (!TableSelection.getCurrent().isSelectionEmpty())
+	  {
+	    pointOfInsertion = TableSelection.getCurrent().getFirstSelected();
+	    numberOfPoints = TableSelection.getCurrent().getLastSelected()-pointOfInsertion+1;
+	  }
+	else if (TableSelection.getCurrent().getCaretPosition() != TableSelection.NO_CARET)
+	  {
+	    pointOfInsertion = TableSelection.getCurrent().getCaretPosition();
+	    numberOfPoints = tc.lenght;
+	  }
+	
+	if (pointOfInsertion != NOWHERE && numberOfPoints > 0)
+	  {
+	    setValues(toPaste, pointOfInsertion, numberOfPoints);
+	    TableSelection.getCurrent().deselectAll();
+	  }
+	endUpdate();
+      }
+  }
+  
+  /** ClipboardOwner interface */
+
+  public void lostOwnership(Clipboard clipboard,
+			    Transferable contents)
+  {
+  }
+
   //--- Fields
   FtsIntegerVector itsData;
   MaxVector listeners;
   static int buffer[];
-
+  static final int NOWHERE = -1;
 }
 
 

@@ -23,11 +23,13 @@ import java.util.*;
 import javax.swing.*;
 
 /**
- * The table selecter. It uses the StripeSelecter Interaction Module.
+ * The table selecter tool. It uses the StripeSelecter Interaction Module.
  * @see StripeSelecter.
  */
 public class TableSelecter extends TableTool implements GraphicSelectionListener{
   
+  /**
+   * Constructor */
   public TableSelecter(ImageIcon theImageIcon)
   {
     super("selecter", theImageIcon);
@@ -36,7 +38,7 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
   }
 
   /**
-   * the default InteractionModule for this kind of tools
+   * the default InteractionModule is a StripeSelecter
    */
   public InteractionModule getDefaultIM() 
   {
@@ -51,9 +53,8 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
 
     if ((modifiers & InputEvent.SHIFT_MASK) == 0)
       {
-	TableSelection.getSelection().deselectAll();
-	
-	gc.getFrame().repaint();
+	getGc().getSelection().deselectAll();
+	getGc().getSelection().setCaretPosition(getGc().getAdapter().getInvX(x));
       }
   }
 
@@ -63,7 +64,11 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
   public void selectionChoosen(int x, int y, int w, int h) 
   {
     TableAdapter a = getGc().getAdapter();
-    TableSelection.getSelection().select(a.getInvX(x), a.getInvX(x+w));
+
+    if (w==0) return;
+
+    getGc().getSelection().setCaretPosition(TableSelection.NO_CARET);
+    getGc().getSelection().select(a.getInvX(x), a.getInvX(x+w));
   }
 
   /**

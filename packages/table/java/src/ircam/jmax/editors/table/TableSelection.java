@@ -26,7 +26,7 @@ import ircam.jmax.utils.*;
  * @see TableTablePanel */
 public class TableSelection extends DefaultListSelectionModel implements Transferable, Cloneable{
 
-  private TableSelection(TableDataModel model) 
+  public TableSelection(TableDataModel model) 
   {
     this.model = model;
     setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION) ;
@@ -35,8 +35,61 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
     if (flavors == null)
       flavors = new DataFlavor[1];
     flavors[0] = tableSelection;
+
+    // the last created selection becomes the current one
+    setCurrent(this);
   }
    
+
+  /**
+   * Ownership handling
+   */
+  public void setOwner(SelectionOwner so)
+  {
+    itsOwner = so;
+  }
+
+  /**
+   * Ownership handling
+   */
+  public SelectionOwner getOwner()
+  {
+    return itsOwner;
+  }
+
+  /**
+   * Returns the TableDataModel this selection refers to */
+  public TableDataModel getModel()
+  {
+    return model;
+  }
+
+  /**
+   * Sets the TableDataModel this selection refers to */
+  public void setModel(TableDataModel m)
+  {
+    model = m;
+  }
+
+
+  /**
+   * Sets the current active selection. This will send a 
+   * selectionActivated message to that selection's owner, and a 
+   * selectionDisactivated to the old selection's owner */
+  public static void setCurrent(TableSelection s)
+  {
+    TableSelection temp = current;
+    current = s;
+
+    if (temp != null && temp.itsOwner != null)
+      temp.itsOwner.selectionDisactivated();
+
+    if (s != null && s.itsOwner != null)
+      s.itsOwner.selectionActivated();
+
+  }
+
+
   /** select the given object 
    */
   public void select(int index)
@@ -118,35 +171,17 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
   public  void deselectAll()
   {
     clearSelection();
+    setCaretPosition(NO_CARET);
   }
 
-  /**
-   * static constructor
-   */
-  static public TableSelection createSelection(TableDataModel ep) 
-  {
-    if (itsSelection == null) 
-      {
-	itsSelection = new TableSelection(ep);
-      }
-
-    return itsSelection;
-  }
 
   /**
    * returns the (unique) selection
    */
-  public static TableSelection getSelection()
+  public static TableSelection getCurrent()
   {
-    return itsSelection;
+    return current;
   }  
-
-
-  /** Transferable interface */
-  public Object getTransferData(DataFlavor flavor) 
-  {
-    return itsCopy; 
-  }
 
 
   /**
@@ -155,40 +190,91 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
    */ 
   void prepareACopy()
   {
-    if (isSelectionEmpty()) return;
+    if (isSelectionEmpty()) 
+      {
+	base = EMPTY_CLIP;
+	return;
+      }
 
-    int base = getFirstSelected();
+    base = getFirstSelected();
+    lenght = getLastSelected()-base+1;
 
     for (int i = base; i<=getLastSelected(); i++)
       {
 	itsCopy[i-base] =model.getValue(i); 
       }
+
   }
 
+  public class TableClip {
+    public TableClip(int content[], int base, int lenght)
+    {
+      this.content = content;
+      this.base = base;
+      this.lenght = lenght;
+    }
+    //---
+    int content[];
+    int base;
+    int lenght;
+  } 
+
+  public void setCaretPosition(int index)
+  {
+    if (caretPosition != index)
+      {
+	caretPosition = index;
+	fireValueChanged(index, index);
+	// NOTE: sort of trick (well, not too dirty by the way...)
+      }
+  }  
+
+  public int getCaretPosition()
+  {
+    return caretPosition;
+  }
+
+  /** Transferable interface */
+  public Object getTransferData(DataFlavor flavor) 
+  {
+    if (base != EMPTY_CLIP)
+      return new TableClip(itsCopy, base, lenght); 
+    else return null;
+  }
 
   /**
    * Transferable interface */
   public DataFlavor[]  getTransferDataFlavors() 
   {
-    return flavors;
+    if (base == EMPTY_CLIP) return null;
+    else return flavors;
   }
 
   /**
    * Transferable interface */
   public boolean isDataFlavorSupported(DataFlavor flavor) 
   {
-    return flavor.equals(tableSelection);
+    return (base != EMPTY_CLIP && flavor.equals(tableSelection));
   } 
 
   //--- Fields
   TableDataModel model;
-  private static TableSelection itsSelection;
+  private static TableSelection current;
   private static int itsCopy[];
+  private static int EMPTY_CLIP = -1;
+  private static int base = EMPTY_CLIP;
+  private static int lenght = 0;
+
+  static int NO_CARET = -1;
+  int caretPosition = NO_CARET;
+
   protected MaxVector dataFlavors;
   private MaxVector temp = new MaxVector();
 
   public static DataFlavor tableSelection = new DataFlavor(ircam.jmax.editors.table.TableSelection.class, "TableSelection");
   public static DataFlavor flavors[];
+
+  private SelectionOwner itsOwner;
 }
 
 

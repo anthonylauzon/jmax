@@ -16,6 +16,7 @@ package ircam.jmax.editors.table;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.utils.*;
+import java.awt.*;
 
 /**
  * A simple coordinates converter in a Table window. 
@@ -23,9 +24,52 @@ import ircam.jmax.utils.*;
  */
 public class TableAdapter {
 
-
+  /**
+   * Constructor */
   public TableAdapter()
   {
+  }
+
+
+  /**
+   * Constructor with the data model and the dimension of the componenet 
+   * that will contain the model. This constructor takes care of setting
+   * the right zoom parameters for a graphic representation in the given
+   * dimension. 
+   * The computed horizontal zoom ensures that all the points will be 
+   * contained in the given horizontal dimension.
+   * The computed vertical zoom ensures that the table values range,
+   * at least minVisibleValue points, will be contained
+   * in the given vertical dimension, */
+  public TableAdapter(TableDataModel tm, Dimension d, int minVisibleValue)
+  {
+    float fx = findZoomRatioClosestTo(((float)(d.width))/tm.getSize());
+    setXZoom(fx);
+    
+    int maxY = Math.abs(tm.max());
+    int minY = Math.abs(tm.min());
+    if (minY > maxY)
+      maxY = minY;
+
+    //maxY now contains the max absolute value in the table
+    if(maxY < minVisibleValue) maxY = minVisibleValue;
+
+    float fy = findZoomRatioClosestTo(((float)(d.height))/(2*maxY));
+    setYZoom(fy);
+    
+    setOY(maxY);
+  } 
+
+  /**
+   * Utility routine to find a float number under the form n/1 or 1/n closest
+   * to the given float. This kind of ratios are usefull to avoid graphical
+   * interpolation problems */
+  private float findZoomRatioClosestTo(float f)
+  {
+    if (f >1) 
+	return Math.round(f);
+    else
+	return (float)(((float)1)/Math.ceil(1/f));
   }
 
   /**
@@ -98,7 +142,7 @@ public class TableAdapter {
 
   /**
    * A method that allows setting the Y zoom factor under the form
-   * of a rational number. Use this to avoid graphical undersampling. */
+   * of a rational number. Use this to avoid pixel interpolation. */
   public void setYZoomFraction(int numerator, int denominator)
   {
     setYZoom(((float)numerator)/denominator);

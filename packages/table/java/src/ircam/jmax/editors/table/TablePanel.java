@@ -25,6 +25,7 @@ import java.io.*;
 import tcl.lang.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.*;
 
 /**
  * The panel in the Table editor's window, containing the toolbar, the CenterPanel 
@@ -53,16 +54,18 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //... the panel that will contain the toolbar
     prepareToolbarPanel();
 
-
-    gc = new TableGraphicContext(tm);
-    itsTableRenderer = new TableRenderer(gc);
-
-    //... the center panel (the sensible area)
+    //... the center panel
     prepareCenterPanel();
 
-    //... the Graphic context 
+    //... the Graphic context (and the selection)
+    gc = new TableGraphicContext(tm);
     prepareGraphicContext();
+
+    itsTableRenderer = new TableRenderer(gc);
+    itsCenterPanel.setRenderer(itsTableRenderer);
+    gc.setRenderManager(itsTableRenderer);
     
+
     //... the vertical position controller
     prepareVerticalScrollbar();
 
@@ -70,38 +73,28 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //... the widgets in the statusBar
     addWidgets();
 
+    // Add listeners for data model changes
     tm.addListener(this);
 
+    // Add a listener for selection content changes
+    // (should this be in the SelectionLayer?)
+    gc.getSelection().addListSelectionListener( new ListSelectionListener() {
+      public void valueChanged(ListSelectionEvent e)
+	{
+	  if (e.getValueIsAdjusting())
+	      return;
+
+	  itsCenterPanel.repaint();
+	}
+    });
+
+    //the repaints due to selection's state change are
+    //handled in the SelectionLayer level of the RenderManager
+ 
     initTools();
   }
 
 
-
-  /** 
-   * Set the initial parameters of the Adapter */
-  private void setOriginAndZoom(TableAdapter ta, TableDataModel tm)
-  {
-
-    float fx = findZoomRatioClosestTo(((float)itsCenterPanel.getSize().width)/tm.getSize());
-    ta.setYZoom(INITIAL_Y_ZOOM);
-    ta.setXZoom(fx);
-    
-    ta.setOY(INITIAL_Y_ORIGIN);
-
-  }
-
-  /**
-   * utility routine to find a float number under the form n/1 or 1/n closest
-   * to the given float. This kind of ratios are usefull to avoid graphical
-   * undersampling problems */
-  private float findZoomRatioClosestTo(float f)
-  {
-    if (f >1) 
-	return Math.round(f)-1;
-    else
-	return (float)(((float)1)/Math.ceil(1/f));
-
-  }
 
   private void prepareToolbarPanel()
   {
@@ -312,7 +305,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   private void prepareCenterPanel()
   {
-    itsCenterPanel = new TableDisplay(itsTableRenderer) {
+    itsCenterPanel = new TableDisplay() {
       /**
        * Filters out the mouse events that trigger the popup menu.
        * Let all the other event pass undisturbed */
@@ -337,7 +330,10 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       
     };
  
-    itsCenterPanel.setBounds(toolbarPanel.getSize().width, InfoPanel.INFO_WIDTH, getSize().width-toolbarPanel.getSize().width/*PANEL_WIDTH*/, getSize().height-InfoPanel.INFO_HEIGHT/*PANEL_HEIGHT*/);
+    itsCenterPanel.setBounds(toolbarPanel.getSize().width, 
+			     InfoPanel.INFO_WIDTH, 
+			     getSize().width-toolbarPanel.getSize().width-SCROLLBAR_SIZE, 
+			     getSize().height-InfoPanel.INFO_HEIGHT);
 
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setDoubleBuffered(true);
@@ -353,10 +349,9 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       gc.setGraphicDestination(itsCenterPanel);
       gc.setCoordWriter(new CoordinateWriter(gc));
 
-      TableSelection.createSelection(tm);
-      gc.setRenderManager(itsTableRenderer);
+      gc.setSelection(new TableSelection(tm));
       gc.setStatusBar(itsStatusBar);
-      TableAdapter ta = new TableAdapter();
+      TableAdapter ta = new TableAdapter(tm, itsCenterPanel.getSize(), 128);
       
       //do a repaint() when zoom changes 
       ta.addXZoomListener(new ZoomListener() {
@@ -372,7 +367,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	  }
       });
 
-      setOriginAndZoom(ta, tm);
+      //setOriginAndZoom(ta, tm);
       gc.setAdapter(ta);
       gc.setStatusBar(itsStatusBar);
     }
@@ -546,10 +541,8 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   static TablePanel instance;
 
-  public static int INITIAL_X_ZOOM = 2;
-  public static int INITIAL_Y_ZOOM = 1;
-  public static int INITIAL_Y_ORIGIN = 128;
-
+  private static int SCROLLBAR_SIZE = 30;
+ 
   JLabel currentXZoom;
   JLabel currentYZoom;
 }

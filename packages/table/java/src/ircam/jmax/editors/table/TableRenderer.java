@@ -36,6 +36,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     setMode(HOLLOW);//the default
     addLayer(this);
     addLayer( new TopLayer( theGc));
+    addLayer( new SelectionLayer( theGc));
   }
 
 
