@@ -458,6 +458,9 @@ packages/alsa/c/src/Makefile
 packages/aflib/Makefile
 packages/aflib/c/Makefile
 packages/aflib/c/src/Makefile
+packages/asio/Makefile
+packages/asio/c/Makefile
+packages/asio/c/src/Makefile
 packages/control/Makefile
 packages/control/c/Makefile
 packages/control/c/src/Makefile
