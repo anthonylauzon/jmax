@@ -118,28 +118,28 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     table.addMouseListener(new MouseListener(){
-	    public void mouseEntered(MouseEvent e) {} 
-	    public void mouseExited(MouseEvent e) {}
-	    public void mousePressed(MouseEvent e) {}
-	    public void mouseReleased(MouseEvent e) {}
-	    public void mouseClicked(MouseEvent e)
+	public void mouseEntered(MouseEvent e) {} 
+	public void mouseExited(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e)
+	{
+	  if (e.getClickCount() == 2)
 	    {
-		if (e.getClickCount() == 2)
+	      int index = table.rowAtPoint(e.getPoint());
+	      
+	      if ((index >= 0) && (index < set.getSize()))
+		{
+		  if (objectSelectedListener != null)
 		    {
-			int index = table.rowAtPoint(e.getPoint());
-			
-			if ((index >= 0) && (index < set.getSize()))
-			    {
-				if (objectSelectedListener != null)
-				    {
-					FtsGraphicObject object = (FtsGraphicObject) set.getElementAt(index);
-					
-					objectSelectedListener.objectSelected(object);
-				    }
-			    }
+		      FtsGraphicObject object = (FtsGraphicObject) set.getElementAt(index);
+		      
+		      objectSelectedListener.objectSelected(object);
 		    }
+		}
 	    }
-	});
+	}
+      });
     
     JScrollPane scrollPane = new JScrollPane(table);
 
@@ -147,15 +147,35 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
     add( scrollPane);
 
     set.addListDataListener(new ListDataListener(){
-	    public void contentsChanged(ListDataEvent evt)
-	    {
-		table.revalidate();
-		table.repaint();
-		table.getSelectionModel().clearSelection();
-	    };
-	    public void intervalRemoved(ListDataEvent e){};
-	    public void intervalAdded(ListDataEvent e){};
-	}); 
+	public void contentsChanged(ListDataEvent evt)
+	{
+	  table.revalidate();
+	  table.repaint();
+	  table.getSelectionModel().clearSelection();
+	};
+	public void intervalRemoved(ListDataEvent e){};
+	public void intervalAdded(ListDataEvent e){};
+      }); 
+
+     FtsPatcherObject.addGlobalEditListener(new FtsEditListener(){	    
+	 public void objectAdded(FtsObject object){};
+	 public void objectRemoved(FtsObject object)
+	 {
+	   if(!atomic) 
+	     SwingUtilities.invokeLater(new Runnable() {
+		 public void run()
+		 { 
+		   find();
+		 }});
+	 };
+	 public void connectionAdded(FtsConnection connection){};
+	 public void connectionRemoved(FtsConnection connection){};
+	 public void atomicAction(boolean active)
+	 {
+	   atomic = active;
+	   if(!atomic) find();
+	 };
+       });
   }
 
  public void find()
