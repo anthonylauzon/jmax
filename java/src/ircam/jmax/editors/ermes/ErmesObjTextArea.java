@@ -27,6 +27,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     focused = true;
 
     addKeyListener(this);
+    //addKeyListener(((ErmesSketchWindow)itsOwner.itsSketchPad.itsSketchWindow).itsKeyAdapter);
     addFocusListener(this);
   }
 	
@@ -94,14 +95,15 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     int aWidth;
     
     if (isEditable()) {
-      if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
+      //if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
 	//Dimension d2 = itsOwner.size();
 	//d2.height += fm.getHeight();
 	// itsOwner.ResizeTo(d2);
 	//itsOwner.validate();
-	return;
-      }
-      else if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
+      //return;
+      //}
+      //else 
+      if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
 	if(start==end){
 	  if(start>0){
 	    if(e.isShiftDown())
@@ -184,14 +186,14 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
 	else//inserisce testo in coda
 	  s = s+k;
 	
-	/*lenght = fm.stringWidth(s);
-	  aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
-	  if (lenght >= size().width-5) {
-	  Dimension d = itsOwner.Size();
-	  if(aWidth>20) d.width += aWidth;
-	  else d.width += 30;
-	  itsOwner.resize(d.width, d.height);
-	  }*/
+	//lenght = fm.stringWidth(s);
+	  //aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
+	  //if (lenght >= size().width-5) {
+	 // Dimension d = itsOwner.Size();
+	 // if(aWidth>20) d.width += aWidth;
+	 // else d.width += 30;
+	 // itsOwner.resize(d.width, d.height);
+	 // }
 	
 	setText(s);
 	select(start+1,start+1);
@@ -337,6 +339,16 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     }
 
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

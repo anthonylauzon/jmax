@@ -3,6 +3,7 @@ package ircam.jmax.dialogs;
 
 import ircam.jmax.*;
 import java.awt.*;
+import java.awt.event.*;
 import ircam.jmax.utils.*;
 
 //	 _____________________________________________
@@ -37,7 +38,7 @@ import ircam.jmax.utils.*;
 /**
  * The dialog popped up at startup to establish the connection with FTS.
  */
-public class ConnectionDialog extends Dialog {
+public class ConnectionDialog extends Dialog implements KeyListener, ActionListener, ItemListener{
   Frame parent;
   Button okButton;
   Button cancelButton;
@@ -75,7 +76,8 @@ public class ConnectionDialog extends Dialog {
     connectionType.addItem("none");
     connectionType.addItem("local");
     connectionType.addItem("remote");
-    p11.add( connectionType);
+    connectionType.addItemListener(this);
+    p11.add(connectionType);
     p1.add("North", p11);
 			
     //	host and port CONTROLS //
@@ -87,6 +89,7 @@ public class ConnectionDialog extends Dialog {
 					
     p121.add(new Label("Host name"));
     host = new TextField("", 20);
+    host.addActionListener(this);
     p121.add(host);
     p12.add("North",p121);
 				
@@ -94,6 +97,7 @@ public class ConnectionDialog extends Dialog {
     p122.setLayout(new FlowLayout(FlowLayout.LEFT));
     p122.add(new Label("Port num."));
     port = new TextField("2000");
+    port.addActionListener(this);
     p122.add(port);
 		        
     p12.add("West", p122);        
@@ -112,53 +116,92 @@ public class ConnectionDialog extends Dialog {
 	        
     okButton = new Button("OK");
     okButton.setBackground(Color.white);
+    okButton.addActionListener(this);
     p2.add("East", okButton);
     cancelButton = new Button("Cancel");
     cancelButton.setBackground(Color.white);
+    cancelButton.addActionListener(this);
     p2.add("West", cancelButton);
     add("South", p2);
 
+    addKeyListener(this);
+
     //Initialize this dialog to its preferred size.
     pack();
-
   }
 
-  public boolean action(Event event, Object arg) {
-
+  /*public boolean action(Event event, Object arg) {
     if ( event.target == okButton) {
-      //	Ok action
-      hostName = host.getText();
-      portNo = port.getText();
-      MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
-      hide();
+    hostName = host.getText();
+    portNo = port.getText();
+    MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
+    setVisible(false);
     }
     else if ( event.target == cancelButton) {
-      //	Cancel action
-      hide();
+    setVisible(false);
     }
     else if ( event.target == connectionType) {
-      //	Connection choose action
-      connectionLine = connectionType.getSelectedIndex();
+    connectionLine = connectionType.getSelectedIndex();
     }
     else if ( event.target == host) {
-      hostName = host.getText();
-      //	Connection choose action
+    hostName = host.getText();
+    //	Connection choose action
     }
     else if ( event.target == port) {
-      portNo = port.getText();
-      //	Connection choose action
+    portNo = port.getText();
+    //	Connection choose action
     }
     return true;
-  }
-    
-  public boolean keyDown(Event evt,int key) {
-    if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
+    }*/
+
+  ////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////actionListener--inizio
+
+  public void actionPerformed(ActionEvent e){    
+    if (e.getSource() == okButton){
       hostName = host.getText();
       portNo = port.getText();
       MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
-      hide();
-      return true;
+      setVisible(false);
     }
-    return false;
+    else if (e.getSource() == cancelButton) setVisible(false);
+    //else if(e.getSource() == connectionType) connectionLine = connectionType.getSelectedIndex();
+    else if(e.getSource() == host) hostName = host.getText();
+    else if(e.getSource() == port) portNo = port.getText();
   }
+
+  public void itemStateChanged(ItemEvent e){
+    if(e.getItem() == connectionType) connectionLine = connectionType.getSelectedIndex();
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////actionListener--fine
+
+  /* public boolean keyDown(Event evt,int key) {
+     if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
+     hostName = host.getText();
+     portNo = port.getText();
+     MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
+     setVisible(false);
+     return true;
+     }
+     return false;
+     }*/
+
+
+  /////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////keyListener--inizio
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+
+  public void keyPressed(KeyEvent e){
+    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){	
+      hostName = host.getText();
+      portNo = port.getText();
+      MaxApplication.getApplication().ObeyCommand(MaxApplication.CONNECTION_CHOOSEN);
+      setVisible(false);
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////keyListener--fine
 }

@@ -279,7 +279,9 @@ class ErmesObjComment extends ErmesObject {
     }
   }
 	
-
+  public static ErmesObjTextArea GetTextArea(){
+    return itsTextArea;
+  }
     //--------------------------------------------------------
 	// minimumSize()
     //--------------------------------------------------------

@@ -93,7 +93,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
     gridbag.setConstraints(itsScrollerView, c);
     add(itsScrollerView);
 
-    //addKeyListener(this);
+    addKeyListener(this);
     addWindowListener(this);
   }
     

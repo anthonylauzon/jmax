@@ -1,6 +1,7 @@
 package ircam.jmax.editors.project;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 import ircam.jmax.*;
@@ -10,7 +11,7 @@ import ircam.jmax.editors.ermes.*;
  * The single entry in a project. It handles the interaction with the 
  * user (click, souble click, open a document...).
  */
-public class ProjectEntry extends Canvas /*Panel*/ {
+public class ProjectEntry extends Panel implements MouseListener/*, KeyListener*/ {
   int itsFontStyle;	
   MaxDocument itsDocument;
   public Project itsProject;
@@ -40,6 +41,9 @@ public class ProjectEntry extends Canvas /*Panel*/ {
     String aFontName = (Toolkit.getDefaultToolkit().getFontList())[0];
     Font newFont = new Font(aFontName, fontStyle, 10);
     setFont(newFont);
+
+    //addKeyListener(this);
+    addMouseListener(this);
   }
 	
   //--------------------------------------------------------
@@ -59,6 +63,9 @@ public class ProjectEntry extends Canvas /*Panel*/ {
     String aFontName = (Toolkit.getDefaultToolkit().getFontList())[0];
     Font newFont = new Font(aFontName, fontStyle, 10);
     setFont(newFont);
+
+    // addKeyListener(this);
+    addMouseListener(this);
   }
 
   public void SetFileName(String theFileName, String thePathName){
@@ -115,17 +122,38 @@ public class ProjectEntry extends Canvas /*Panel*/ {
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public boolean mouseDown(Event evt,int x, int y) {
-    if(evt.clickCount>1){
+  /* public boolean mouseDown(Event evt,int x, int y) {
+     if(evt.clickCount>1){
+     if(itsDocument!=null) {
+     if(itsDocument.GetWindow()!=null)
+     itsDocument.GetWindow().ToFront();
+     }
+     else if(OpenEntryDocument()) return true;
+     }
+     else{
+     if(itsDocument!=null){
+     if(itsDocument.GetWindow()!=null){
+     itsDocument.GetWindow().ToFront();
+     MaxApplication.getApplication().SetCurrentWindow(itsDocument.GetWindow());
+     }
+     }
+     else
+     itsProject.SetCurrentEntry(this);
+     }
+     return true;
+     }*/
+
+  public void mousePressed(MouseEvent e){
+    if(e.getClickCount()>1){
       if(itsDocument!=null) {
-	if(itsDocument.GetWindow()!=null)//?????????????????????
+	if(itsDocument.GetWindow()!=null)
 	  itsDocument.GetWindow().ToFront();
       }
-      else if(OpenEntryDocument()) return true;
+      else if(OpenEntryDocument()) return;
     }
     else{
       if(itsDocument!=null){
-	if(itsDocument.GetWindow()!=null){//????????????????????????????????????????
+	if(itsDocument.GetWindow()!=null){
 	  itsDocument.GetWindow().ToFront();
 	  MaxApplication.getApplication().SetCurrentWindow(itsDocument.GetWindow());
 	}
@@ -133,9 +161,12 @@ public class ProjectEntry extends Canvas /*Panel*/ {
       else
 	itsProject.SetCurrentEntry(this);
     }
-    return true;
   }
-  
+  public void mouseClicked(MouseEvent e){}
+  public void mouseReleased(MouseEvent e){}
+  public void mouseEntered(MouseEvent e){}
+  public void mouseExited(MouseEvent e){}
+
   boolean OpenEntryDocument(){
     if(itsProject.itsProjectWindow.OpenFile(itsfName, itsPath)){
       itsDocument = MaxApplication.getApplication().itsWindow.GetDocument();
@@ -168,18 +199,18 @@ public class ProjectEntry extends Canvas /*Panel*/ {
     FontMetrics fm = getFontMetrics(getFont());
     g.setColor(Color.black);
     if(!itsOpen) {
-      g.drawLine(5,size().height/4,14,size().height/2);
-      g.drawLine(14,size().height/2,5,size().height/4*3);
-      g.drawLine(5,size().height/4*3,5,size().height/4);
+      g.drawLine(5,getSize().height/4,14,getSize().height/2);
+      g.drawLine(14,getSize().height/2,5,getSize().height/4*3);
+      g.drawLine(5,getSize().height/4*3,5,getSize().height/4);
     }
     else {
       g.drawLine(6,5,14,5);
       g.drawLine(14,5,10,14);
       g.drawLine(10,14,6,5);
     }
-    g.drawString(itsfName, 20, size().height/3*2);
-    g.drawString(itsrType, 40+fm.stringWidth(itsfName), size().height/3*2);
-    g.drawString(itsfSize, 60+fm.stringWidth(itsfName)+fm.stringWidth(itsrType),size().height/3*2);
+    g.drawString(itsfName, 20, getSize().height/3*2);
+    g.drawString(itsrType, 40+fm.stringWidth(itsfName), getSize().height/3*2);
+    g.drawString(itsfSize, 60+fm.stringWidth(itsfName)+fm.stringWidth(itsrType),getSize().height/3*2);
   }
 			
   public void Reset(){
@@ -190,15 +221,15 @@ public class ProjectEntry extends Canvas /*Panel*/ {
   //--------------------------------------------------------
   //	minimumSize
   //--------------------------------------------------------
-  public Dimension minimumSize() {
+  public Dimension getMinimumSize() {
     return new Dimension(200, /*20*//*15*/5);
   }
 	
   //--------------------------------------------------------
   //	preferredSize
   //--------------------------------------------------------
-  public Dimension preferredSize() {
-    return minimumSize();
+  public Dimension getPreferredSize() {
+    return getMinimumSize();
   }
 }
 

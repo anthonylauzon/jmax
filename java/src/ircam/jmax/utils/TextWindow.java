@@ -1,12 +1,13 @@
 package ircam.jmax.utils;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 
 /**
  * The base class for all the Text window - related components.
  * Ex: TextEditor, Ermes Console.
  */
-public class TextWindow extends Frame {
+public class TextWindow extends Frame implements KeyListener, WindowListener{
   int NUM_ROWS = 50;
   int NUM_COLS = 70;
   public TextArea itsTextArea;
@@ -16,6 +17,8 @@ public class TextWindow extends Frame {
   String buffer = new String();
 
   public TextWindow() {
+    addKeyListener(this);
+    addWindowListener(this);
   }
   
   public TextWindow(String title) {
@@ -32,57 +35,98 @@ public class TextWindow extends Frame {
     itsOutputStream = new TWOutputStream(this);
     itsPrintStream = new PrintStream(itsOutputStream);
     buffer = "";
-    Init();//???
+    Init();
   }
-  
-  public boolean handleEvent(Event event) {
-    if (event.id == Event.WINDOW_DESTROY) {
-      dispose();
-    }
-    return super.handleEvent(event);
-  }
- 
-  public boolean keyDown(Event e, int k){
 
-    if(k == Platform.DELETE_KEY || k == Platform.BACKSPACE_KEY) {
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////keyListener --inizio
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+  
+  public void keyPressed(KeyEvent e){
+    if(e.getKeyCode() == Platform.DELETE_KEY || e.getKeyCode() == Platform.BACKSPACE_KEY) {
       if (buffer.length() != 0) buffer = buffer.substring(0,buffer.length()-1);
     }
-    else if (k == Platform.NEWLINECHAR) {
+    else if (e.getKeyCode() == Platform.NEWLINECHAR) {
       if (buffer != "") {
 	buffer = "";
       }
     }
+    else buffer += e.getKeyChar();
+  }
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////keyListener --fine
+
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////WindowListener --inizio
+  public void windowClosing(WindowEvent e){
+    setVisible(false);
+    dispose();
+  }
+  public void windowOpened(WindowEvent e){}
+  public void windowClosed(WindowEvent e){}
+  public void windowIconified(WindowEvent e){}       
+  public void windowDeiconified(WindowEvent e){}
+  public void windowActivated(WindowEvent e){}
+  public void windowDeactivated(WindowEvent e){}  
+
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////WindowListener --fine
+
+
+  /*public boolean handleEvent(Event event) {
+    if (event.id == Event.WINDOW_DESTROY) {
+    dispose();
+    }
+    return super.handleEvent(event);
+    }*/
+ 
+  /*public boolean keyDown(Event e, int k){
+
+    if(k == Platform.DELETE_KEY || k == Platform.BACKSPACE_KEY) {
+    if (buffer.length() != 0) buffer = buffer.substring(0,buffer.length()-1);
+    }
+    else if (k == Platform.NEWLINECHAR) {
+    if (buffer != "") {
+    buffer = "";
+    }
+    }
     else buffer += (char) k;
     return false;
-  }
+    }*/
   
   public PrintStream getPrintStream() {
     return itsPrintStream;
   }
   
   public void Init() {
-    Rectangle r = bounds();
+    Rectangle r = getBounds();
     
     itsTextArea = new TextArea(NUM_ROWS, NUM_COLS);
     itsTextArea.setEditable(true);
     itsTextArea.setBackground(Color.white);
     add("Center", itsTextArea);
     validate();
-    itsTextArea.show();
+    itsTextArea.setVisible(true);
     itsTextArea.requestFocus();
+    addKeyListener(this);
+    addWindowListener(this);
   }
   
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     Dimension d = new Dimension();
     d.width = itsTextArea.getFontMetrics(itsTextArea.getFont()).stringWidth(filler);
     d.height = itsTextArea.getFontMetrics(itsTextArea.getFont()).getHeight() * NUM_ROWS;
     return d;
   }
   
-  public Dimension minimumSize() {
-    return preferredSize();
+  public Dimension getMinimumSize() {
+    return getPreferredSize();
   }
 }
+
+
+
 
 
 

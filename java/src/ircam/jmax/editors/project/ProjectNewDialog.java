@@ -1,14 +1,14 @@
 package ircam.jmax.editors.project;
 
 import java.awt.*;
-import java.awt.event.*;//???????
+import java.awt.event.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
 /**
  * The dialog used during a menu-new operation.
  */
-class ProjectNewDialog extends Dialog implements ItemListener,  ActionListener{
+class ProjectNewDialog extends Dialog implements ItemListener, ActionListener, KeyListener{
   Frame itsParent;
   Button okButton;
   Button cancelButton;
@@ -50,48 +50,75 @@ class ProjectNewDialog extends Dialog implements ItemListener,  ActionListener{
     
     okButton = new Button("OK");
     okButton.setBackground(Color.white);
+    okButton.addActionListener(this);
     p2.add("East", okButton);
     cancelButton = new Button("Cancel");
     cancelButton.setBackground(Color.white);
+    cancelButton.addActionListener(this);
     p2.add("West", cancelButton);
     
     add("South", p2);
     //Initialize this dialog to its preferred size.
     pack();
+
+    addKeyListener(this);
   }
   
   public void itemStateChanged(ItemEvent e){
     if(e.getStateChange() == ItemEvent.SELECTED) itsCurrentItem = (itsList.getSelectedItems())[0];
   }
-  
-  public void actionPerformed(ActionEvent e){
-    hide();
-  }
 
-  public boolean action(Event event, Object arg) {
+  /*public boolean action(Event event, Object arg) {
     if ( event.target == okButton) {
-      //	Ok action
-      hide();
+    //	Ok action
+    setVisible(false);
     }
     else if ( event.target == cancelButton) {
-      //	Cancel action
-      itsCurrentItem = "";
-      hide();
+    //	Cancel action
+    itsCurrentItem = "";
+    setVisible(false);
     }
     return true;
+    }*/
+  
+
+  //////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////keyListener--inizio
+  public void actionPerformed(ActionEvent e){    
+    if (e.getSource() == okButton) setVisible(false);
+    else if (e.getSource() == cancelButton) {
+      itsCurrentItem = "";
+      setVisible(false);
+    }
+    else if(e.getSource() == itsList) setVisible(false);
   }
+  ///////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////keyListener--fine
 
   public String GetNewFileType(){
     return itsCurrentItem;
   }
     
-  public boolean keyDown(Event evt,int key) {
+  /*public boolean keyDown(Event evt,int key) {
     Float aFloat = null;
     if (key == ircam.jmax.utils.Platform.RETURN_KEY){
-      hide();
-      return true;
+    hide();
+    return true;
     }
     return false;
+    }*/
+  //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////keyListener--inizio
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+
+  public void keyPressed(KeyEvent e){
+    Float aFloat = null;
+    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY)
+      setVisible(false);
   }
+  /////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////keyListener--fine
+
 }
 

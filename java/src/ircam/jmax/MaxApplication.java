@@ -379,6 +379,7 @@ public class MaxApplication extends Object {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow);
+    //itsSketchWindow.addKeyListener(itsSketchWindow);
     theFtsPatcher.open();
     itsSketchWindow.repaint();
     itsWindow = itsSketchWindow;
@@ -388,10 +389,10 @@ public class MaxApplication extends Object {
     itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetName());
     aPatcherDoc.SetWindow(itsSketchWindow);
     if(itsProjectWindow.itsProject.GetItems().size()==0)
-      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).disable();
+      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
     if(itsSketchWindowList.size() == 1)
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).enable();
-    itsSketchWindow.show();
+      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
+    itsSketchWindow.setVisible(true);
     return itsSketchWindow;
   }
 
@@ -401,6 +402,7 @@ public class MaxApplication extends Object {
     aPatcherDoc.alreadySaved = true;
     boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
     itsSketchWindow = new ErmesSketchWindow(true, itsSketchWindow);
+    //itsSketchWindow.addKeyListener(itsSketchWindow);
     itsSketchWindow.itsSketchPad.doAutorouting = temp;
     theFtsPatcher.open();
     itsSketchWindow.repaint();
@@ -414,11 +416,11 @@ public class MaxApplication extends Object {
     CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
     aEditMenuItem.setState(temp);
     if(itsProjectWindow.itsProject.GetItems().size()==0)
-      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).disable();
+      itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
     if(itsSketchWindowList.size() == 1)
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).enable();
+      itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
     itsSketchWindow.pack();
-    itsSketchWindow.show();
+    itsSketchWindow.setVisible(true);
     return itsSketchWindow;
   }
   
@@ -436,6 +438,7 @@ public class MaxApplication extends Object {
 
       itsSketchWindow = new ErmesSketchWindow(false, null);
       itsWindow = itsSketchWindow;//???????
+      //itsSketchWindow.addKeyListener(itsSketchWindow);
 
       itsSketchWindowList.addElement(itsSketchWindow);
       itsSketchWindow.inAnApplet = false;
@@ -443,13 +446,13 @@ public class MaxApplication extends Object {
       
       itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetName());
       itsSketchWindow.pack();
-      itsSketchWindow.move(40,40);
+      itsSketchWindow.setLocation(40,40);
       if(itsProjectWindow.itsProject.GetItems().size()==0)
-	itsSketchWindow.itsProjectMenu.getItem(2).disable();
+	itsSketchWindow.itsProjectMenu.getItem(2).setEnabled(false);
       if(itsSketchWindowList.size() == 1)
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).enable();
+	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
       AddThisWindowToMenus(itsSketchWindow);
-      itsSketchWindow.show();
+      itsSketchWindow.setVisible(true);
       break;	
     case OPEN_COMMAND:
       // create a new document from skratch
@@ -459,14 +462,15 @@ public class MaxApplication extends Object {
       // create the new SketchWindow based on the Document created....
       itsSketchWindow = new ErmesSketchWindow(false, null);
       itsWindow = itsSketchWindow;
+      //itsSketchWindow.addKeyListener(itsSketchWindow);
       itsSketchWindow.itsSketchPad.GetOffGraphics();
       try {
 	itsSketchWindow.InitFromDocument(aPatcherDoc);
       }
       catch (Exception e) {
 	ErrorDialog aErr = new ErrorDialog(itsProjectWindow, "Error while importing "+pathForLoading+fileToLoad);
-	aErr.move(100, 100);
-	aErr.show();
+	aErr.setLocation(100, 100);
+	aErr.setVisible(true);
 	e.printStackTrace(); // temporary, MDC
 	return false;
       }
@@ -478,26 +482,26 @@ public class MaxApplication extends Object {
       CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(9);
       aEditMenuItem.setState(doAutorouting);
       if(itsProjectWindow.itsProject.GetItems().size()==0)
-	itsSketchWindow.getMenuBar().getMenu(2).getItem(2).disable();
+	itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
       if(itsSketchWindowList.size() == 1)
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).enable();
+	itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(true);
       AddThisWindowToMenus(itsSketchWindow);
-      itsSketchWindow.show();
+      itsSketchWindow.setVisible(true);
       break;
       
     case NEW_PROJECT:
       itsProjectWindow = new ProjectWindow();
       itsProjectWindow.setTitle("Project manager");
-      itsProjectWindow.move(0, 0);//start in the upper left position
+      itsProjectWindow.setLocation(0, 0);//start in the upper left position
       itsProjectWindow.pack();
-      itsProjectWindow.show();
-      itsProjectWindow.addKeyListener(itsProjectWindow);
+      itsProjectWindow.setVisible(true);
+      //itsProjectWindow.addKeyListener(itsProjectWindow);
       break;
       
     case REQUIRE_CONNECTION:
       itsConnDialog = new ConnectionDialog(itsProjectWindow);
-      itsConnDialog.move(200,200);
-      itsConnDialog.show();
+      itsConnDialog.setLocation(200,200);
+      itsConnDialog.setVisible(true);
       
       // hard-coded for now....
       
@@ -572,13 +576,13 @@ public class MaxApplication extends Object {
     case CLOSE_WINDOW:
       if(itsWindow!=null) {
 	itsWindow.Close();
-	itsWindow.GetFrame().hide();
+	itsWindow.GetFrame().setVisible(false);
       }
       if(itsSketchWindowList.isEmpty()){
 	itsSketchWindow = null;
 	if(itsEditorsFrameList.isEmpty()){
 	  itsWindow = null;	
-	  itsProjectWindow.getMenuBar().getMenu(2).getItem(0).disable();
+	  itsProjectWindow.getMenuBar().getMenu(2).getItem(0).setEnabled(false);
 	}
       } 
       //if (itsSketchWindow == null)
@@ -606,7 +610,7 @@ public class MaxApplication extends Object {
       if (itsConsoleWindow != null)
 	{
 	  itsConsoleWindow.setVisible(false);
-	  itsProjectWindow.hide();
+	  itsProjectWindow.setVisible(false);
 	  itsConsoleWindow.dispose();
 	  itsProjectWindow.dispose();
 	}
@@ -655,10 +659,10 @@ public class MaxApplication extends Object {
     case REMOVE_FILES:
       itsProjectWindow.itsProject.RemoveFromProject();
       if(itsProjectWindow.itsProject.GetItems().size()==0){
-	itsProjectWindow.getMenuBar().getMenu(2).getItem(2).disable();
+	itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
 	for(int m=0; m<itsSketchWindowList.size(); m++){
 	  aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
-	  aSketchWindow.getMenuBar().getMenu(2).getItem(2).disable();
+	  aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
 	}
       }
       break;
@@ -682,7 +686,7 @@ public class MaxApplication extends Object {
 	else aWindow = (Frame)itsEditorsFrameList.elementAt(k-itsSketchWindowList.size());
 	if(k>0)
 	  aRect.x+=(d.width+7);
-	aWindow.reshape(aRect.x, aRect.y, aRect.width, aRect.height);
+	aWindow.setBounds(aRect.x, aRect.y, aRect.width, aRect.height);
       }
     }
   }
@@ -736,7 +740,7 @@ public class MaxApplication extends Object {
 	  if(k>0)
 	    aRect2.y += d2.height + 25;
 	
-	aWindow.reshape(aRect2.x, aRect2.y, aRect2.width, aRect2.height);
+	aWindow.setBounds(aRect2.x, aRect2.y, aRect2.width, aRect2.height);
       }
     } 
   }
@@ -747,8 +751,8 @@ public class MaxApplication extends Object {
     ErmesSketchWindow aSketchWindow;
     Frame aWindow;
     Rectangle aRect = new Rectangle();
-    if(itsSketchWindow!=null) d = itsSketchWindow.preferredSize();
-    else d = ((Frame)itsWindow).preferredSize();
+    if(itsSketchWindow!=null) d = itsSketchWindow.getPreferredSize();
+    else d = ((Frame)itsWindow).getPreferredSize();
     aRect.x = 50; aRect.y = 50;
     aRect.width = d.width;
     aRect.height = d.height;
@@ -756,14 +760,14 @@ public class MaxApplication extends Object {
       aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(i);
       //if(aSketchWindow!=itsSketchWindow){
       aRect.x+=20;aRect.y+=20;
-      aSketchWindow.reshape(aRect.x, aRect.y, aRect.width, aRect.height);
+      aSketchWindow.setBounds(aRect.x, aRect.y, aRect.width, aRect.height);
       //}
     }
     for (int j=0; j< itsEditorsFrameList.size(); j++) {
       aWindow = (Frame) itsEditorsFrameList.elementAt(j);
       aRect.x+=20;aRect.y+=20;
       //aWindow.reshape(aRect.x, aRect.y, aRect.width, aRect.height);
-      aWindow.move(aRect.x, aRect.y);
+      aWindow.setLocation(aRect.x, aRect.y);
     }
     //aRect.x+=20;aRect.y+=20;
     //if(itsSketchWindow!=null)itsSketchWindow.reshape(aRect.x, aRect.y, aRect.width, aRect.height);
@@ -802,10 +806,10 @@ public class MaxApplication extends Object {
   public void UpdateProjectMenu(){
     ErmesSketchWindow aSketchWindow;
     if(itsProjectWindow.itsProject.GetItems().size()==1){
-      itsProjectWindow.getMenuBar().getMenu(2).getItem(2).enable();
+      itsProjectWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);
       for(int m=0; m<itsSketchWindowList.size(); m++){
 	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(m);
-	aSketchWindow.getMenuBar().getMenu(2).getItem(2).enable();
+	aSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(true);
       }
     }
   }

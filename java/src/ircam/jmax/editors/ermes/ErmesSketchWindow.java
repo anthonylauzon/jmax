@@ -15,7 +15,7 @@ import ircam.jmax.editors.project.*;
  * it is showing, and the fospatcher to which it is associated.
  * It handles all the sketch menus, it knows how to load from a fospatcher.
  */
-public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,FocusListener,WindowListener,ActionListener, ItemListener {
+public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,FocusListener,WindowListener,ActionListener, ItemListener {
   public boolean inAnApplet = false;
   public boolean isSubPatcher = false;
   final String FILEDIALOGMENUITEM = "File dialog...";
@@ -29,6 +29,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,Fo
   ErmesSketchWindow itsTopWindow = null;
   ProjectEntry itsProjectEntry = null;
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
+
+  //public ErmesKeyAdapter itsKeyAdapter;
 
   // Menus are public beacause enabled/disabled from MaxApplication !!!
   // should be done locally
@@ -69,7 +71,10 @@ public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,Fo
       //if(itsTopWindow!=null)itsSketchPad.doAutorouting = itsTopWindow.itsSketchPad.doAutorouting;
       //}
 
-      //addKeyListener(this);
+      addKeyListener(this);
+
+      //itsKeyAdapter = new ErmesKeyAdapter(this);
+      //addKeyListener(itsKeyAdapter);
       addFocusListener(this);
       addWindowListener(this);
 
@@ -171,6 +176,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,Fo
     c.fill = GridBagConstraints.BOTH;
     gridbag.setConstraints(itsScrollerView, c);
     add(itsScrollerView);
+    //itsScrollerView.addKeyListener(this);
+    //itsSketchPad.addKeyListener(this);
   }
 	
   private Menu CreateFileMenu() {
@@ -666,11 +673,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,Fo
 
 
   /////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////keyListener --inizio
-  protected void processKeyEvent(KeyEvent e){
-    
-  }
-  
+  ////////////////////////////////////////////////////////////////keyListener --inizio  
   public void keyTyped(KeyEvent e){}
   public void keyReleased(KeyEvent e){}
 
@@ -736,10 +739,10 @@ public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,Fo
 	    // Better, it should provide an "OpenDocumentation" command
 	    // that can be implemented in different ways
 	    // ErmesBrowser.browseLocation(urlToOpen, itsMaxApplication);
-	  }
-	}
+	   }
+	}   
       }
-    }
+    } 
     else if((e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY)||(e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
       if(itsSketchPad.GetEditField()!=null){
 	if(!itsSketchPad.GetEditField().HasFocus())
@@ -758,7 +761,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow,KeyListener,Fo
 	if (fileToOpen != null)
 	  MaxApplication.getApplication().Load(fileToOpen, "");
       }
-    }
+    } 
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine

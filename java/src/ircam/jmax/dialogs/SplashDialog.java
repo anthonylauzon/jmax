@@ -1,6 +1,7 @@
 package ircam.jmax.dialogs;
 
 import java.awt.*;
+import java.awt.event.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
@@ -9,8 +10,7 @@ import ircam.jmax.utils.*;
  * The initial dialog.
  */
 
-public class SplashDialog extends Dialog
-{
+public class SplashDialog extends Dialog implements KeyListener, MouseListener{
   static final int SPLASH_WIDTH = 500;
   static final int SPLASH_HEIGHT = 280;
 
@@ -40,7 +40,7 @@ public class SplashDialog extends Dialog
 	{
 	}
 
-      SplashDialog.this.hide();
+      SplashDialog.this.setVisible(false);
       SplashDialog.this.dispose();
     }
   }
@@ -56,48 +56,82 @@ public class SplashDialog extends Dialog
 										Image.SCALE_DEFAULT);
 
     //Initialize this dialog to its preferred size.
-
-    move(200,200);
+    addKeyListener(this);
+    addMouseListener(this);
+    
+    setLocation(200,200);
     pack();
-    show();
+    setVisible(true);
 
     to = new SplashDialogTimeout(2000);
   }
 	
-  public boolean mouseDown(Event evt, int x, int y) {
+  /*public boolean mouseDown(Event evt, int x, int y) {
     hide();
     return true;
-  }
+    }*/
   
-  public boolean keyDown(Event evt,int key) {
+  /////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////mouseListener--inizio
+  public void mouseClicked(MouseEvent e){}
+  
+  public void mousePressed(MouseEvent e){
+    setVisible(false);
+  }
+  public void mouseReleased(MouseEvent e){}
+  public void mouseEntered(MouseEvent e){}
+  public void mouseExited(MouseEvent e){}
+  /////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////mouseListener--fine
+
+  /*public boolean keyDown(Event evt,int key) {
     if (key == ircam.jmax.utils.Platform.RETURN_KEY){	
-      hide();
-      return true;
+    hide();
+    return true;
     }
     return false;
+    }*/
+  
+  //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////keyListener--inizio
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}
+  
+  public void keyPressed(KeyEvent e){
+    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY) setVisible(false);
   }
+  /////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////keyListener--fine
 
-  public Dimension minimumSize() {
+  public Dimension getMinimumSize() {
     Dimension d = new Dimension(SPLASH_WIDTH, SPLASH_HEIGHT);
     return d;
   }    
   
-  public Dimension preferredSize() {
-    return minimumSize();	
+  public Dimension getPreferredSize() {
+    return getMinimumSize();	
   }
-	
-  
   
   //--------------------------------------------------------
   //	paint
   //--------------------------------------------------------
   public void paint(Graphics g) {
-    Dimension d = size();
+    Dimension d = getSize();
     g.setColor(Color.white);
     g.fillRect(0, 0, d.width, d.height);        
     g.drawImage(itsImage, /*4*/12, /*4*/20,this);
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -22,6 +22,8 @@ public class ErmesScrollerView extends ScrollPane {
     getVAdjustable().setUnitIncrement(10);
     getHAdjustable().addAdjustmentListener((AdjustmentListener)theView);
     getVAdjustable().addAdjustmentListener((AdjustmentListener)theView);
+
+    //addKeyListener((KeyListener)theSketchWindow);
   }
 }
 

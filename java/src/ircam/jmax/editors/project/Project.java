@@ -262,7 +262,7 @@ public class Project extends Panel implements AdjustmentListener{
     add(aPanel);
     itsPanelList.addElement(aPanel);
     /////
-    layout();
+    doLayout();
     validate();
     repaint();
   }
@@ -276,7 +276,7 @@ public class Project extends Panel implements AdjustmentListener{
     add(aPanel);
     itsPanelList.addElement(aPanel);
     /////
-    layout();//???
+    doLayout();//???
     validate();
     repaint();
   }
@@ -290,7 +290,7 @@ public class Project extends Panel implements AdjustmentListener{
     add(aPanel);
     itsPanelList.addElement(aPanel);
     /////
-    layout();//???
+    doLayout();//???
     validate();
     repaint();
   }
@@ -302,14 +302,14 @@ public class Project extends Panel implements AdjustmentListener{
   //--------------------------------------------------------
   //	minimumSize
   //--------------------------------------------------------
-  public Dimension minimumSize() {
+  public Dimension getMinimumSize() {
     return new Dimension(30, 20);
   }
 	
   //--------------------------------------------------------
   //	preferredSize
   //--------------------------------------------------------
-  public Dimension preferredSize() {
+  public Dimension getPreferredSize() {
     return preferredSize;
   }
 

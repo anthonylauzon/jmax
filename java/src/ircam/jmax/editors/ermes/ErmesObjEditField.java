@@ -24,6 +24,7 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     setEditable(true); 
     selectAll();
     itsSketchPad = theSketchPad;
+    //addKeyListener(((ErmesSketchWindow)itsSketchPad.itsSketchWindow).itsKeyAdapter);
     addKeyListener(this);
     addFocusListener(this);
   }
@@ -150,14 +151,15 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     int aWidth;
     
     if (isEditable()) {
-      if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
+      //if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
 	//Dimension d2 = itsOwner.size();
 	//d2.height += fm.getHeight();
 	// itsOwner.ResizeTo(d2);
 	//itsOwner.validate();
-	return;
-      }
-      else if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
+      //return;
+      //}
+      //else 
+      if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
 	if(start==end){
 	  if(start>0){
 	    if(e.isShiftDown())
@@ -189,8 +191,8 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
 	    select(end,end);
 	}
       }
-      else if((e.getKeyCode()==Event.UP)||(e.getKeyCode()== Event.DOWN))
-	return;
+      //else if((e.getKeyCode()==Event.UP)||(e.getKeyCode()== Event.DOWN))
+      //return;
       else if (e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY || e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
 	if(start==end){//se non c' testo selezionato
 	  if(start>0){
@@ -400,6 +402,7 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
   }
   
 }
+
 
 
 

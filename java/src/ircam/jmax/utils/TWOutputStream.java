@@ -23,16 +23,15 @@ public class TWOutputStream extends OutputStream
     buffer.append((char)b);
     count++;
 
-    if ((b == '\n') || (count > 1024))
-      {
-	itsTextWindow.itsTextArea.appendText(buffer.toString());
-	buffer.setLength(0);
-	count = 0;
-      }
+    if ((b == '\n') || (count > 1024)){
+      itsTextWindow.itsTextArea.append(buffer.toString());
+      buffer.setLength(0);
+      count = 0;
+    }
   }
 
   public void write(String s)
   {
-    itsTextWindow.itsTextArea.appendText(s);
+    itsTextWindow.itsTextArea.append(s);
   }
 }
