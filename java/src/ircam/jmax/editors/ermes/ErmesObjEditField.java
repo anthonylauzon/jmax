@@ -83,11 +83,14 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	AbortEdit();
 	return true;
       }
-      itsOwner.itsArgs = aTextString;
-      
-      itsOwner.ParseText(aTextString);
+      else {
+	itsOwner.itsArgs = aTextString;
+	
+	itsOwner.ParseText(aTextString);
+	
+	itsOwner.redefineFtsObject();
 
-      itsOwner.redefineFtsObject();
+      }
     }
     else {
 

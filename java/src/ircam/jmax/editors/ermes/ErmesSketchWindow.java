@@ -32,25 +32,24 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else if (name.equals("newConnection"))
       ftsConnectionsPasted.addElement(value);
     else if (name.equals("deletedObject")) {
-      // just an hack: remove the watch temporarly, add it just after.
-      //we should avoid the propagations of changing-property to the originator
-      //of the change itself
-      itsPatcher.removeWatch(this);
+      // just an hack: remove the watch temporarly, add it just after
+      // to avoid recursion
+      itsPatcher.removeWatch(this, "deletedObject");
       itsSketchPad.itsHelper.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()));
       itsPatcher.watch("deletedObject", this);
-      //another problem: allow the watch removing for single properties!
-      itsPatcher.watch("deletedConnection", this);
     }
-    else if (name.equals("deletedConnection")) {
-      //see previous comment..
-      System.err.println(value.getClass().getName());
-      /*itsPatcher.removeWatch(this);
-	itsSketchPad.itsHelper.DeleteConnectionByInOut(ErmesObject)(((FtsObject)value).getRepresentation()));
-	itsPatcher.watch("deletedObject", this);
-	itsPatcher.watch("deletedConnection", this);*/
+    else if (name.equals("deleteConnection")) {
+      itsPatcher.removeWatch(this,"deleteConnection" );
+      ErmesObject objFrom = (ErmesObject) (((FtsConnection)value).getFrom()).getRepresentation();
+      int outletFrom = ((FtsConnection)value).getFromOutlet();
+      ErmesObject objTo = (ErmesObject) (((FtsConnection)value).getTo()).getRepresentation();
+      int inletTo = ((FtsConnection)value).getToInlet();
+      itsSketchPad.itsHelper.DeleteConnectionByInOut(objFrom, outletFrom, objTo, inletTo);
+      itsPatcher.watch("deleteConnection", this);
     }
   }
 
+  
   FtsSelection itsSelection;
   Vector ftsObjectsPasted = new Vector();
   Vector ftsConnectionsPasted = new Vector();
@@ -788,8 +787,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   ///////////////////////////////////////////////////////////////// keyListener --fine
   public void Close(){
     if (isSubPatcher){
-      setVisible(false);
       itsTopWindow.RemoveFromSubWindowList(this);
+      setVisible(false);
     }
     else {
       Close(true);

@@ -91,6 +91,11 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public void redefineFtsObject()
   {
+    if((iAmPatcher)&&(itsSubWindow != null)){
+      // brutal force, close the window now, destroy from FTS
+      itsSubWindow.Close(true);
+      GetSketchWindow().itsPatcher.watch("deleteConnection", GetSketchWindow());
+    }
     try
       {
 	itsFtsObject = FtsObject.redefineFtsObject(itsFtsObject, itsArgs);
@@ -99,8 +104,13 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       {
 	// Here pop up error box or something ..
       }
+    if (itsFtsObject instanceof FtsContainerObject) {
+      this.YouArePatcher(true);
+    }
+    else this.YouArePatcher(false);
+    GetSketchWindow().itsPatcher.removeWatch(GetSketchWindow());
   }
-
+  
   //--------------------------------------------------------
   // ConnectionRequested
   //--------------------------------------------------------
@@ -146,8 +156,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   public void RestartEditing() {
     if((iAmPatcher)&&(itsSubWindow != null)){
       GetSketchWindow().CreateFtsGraphics(itsSubWindow);
-      itsSubWindow.dispose();
-      itsSubWindow = null;
+      //itsSubWindow.dispose();
+      //itsSubWindow = null;
     }
     super.RestartEditing();
   }
