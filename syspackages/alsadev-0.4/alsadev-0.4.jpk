@@ -35,6 +35,5 @@ ucs load module alsadev $dir/lib/$jmaxArch/$jmaxMode/libalsadev-0.4.so
 defineDevice alsaStereoIn     { alsa_adc } "ALSA audio in"
 
 defineDevice alsaStereoOut    { alsa_dac } "ALSA audio out"
-defineDevice alsaQuadOut      { alsa_dac channels 4 } "ALSA quad audio out"
 
 post "package: alsadev-0.4 (ALSA devices version 0.4)"
