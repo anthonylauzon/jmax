@@ -8,7 +8,7 @@ MatPanel.java \
 MatRowIndex.java \
 MatTableModel.java \
 MatWindow.java \
-RowIndexPopuMenu.java
+RowIndexPopupMenu.java
 
 JAVAC = @JAVACX@
 JAVACFLAGS=@JAVACFLAGSX@
