@@ -328,3 +328,58 @@ fts_get_system_project( void)
   return NULL;
 }
 
+
+fts_symbol_t 
+fts_get_user_configuration( void)
+{
+  char cwd[_MAX_PATH];
+  char path[_MAX_PATH];
+
+  /* check for a config file in the current directory */
+  if (GetCurrentDirectory(_MAX_PATH, cwd) == 0) {
+    return NULL;
+  }
+
+  /* @@@@@ Change default configuration file name here @@@@@ */
+  fts_make_absolute_path(cwd, "config.jcfg", path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol(path);
+  }
+
+  return NULL;
+}
+
+fts_symbol_t 
+fts_get_system_configuration( void)
+{
+  fts_symbol_t root;
+  char win[_MAX_PATH];
+  char path[_MAX_PATH];
+
+  /* check the config file in the root directory */
+  root = fts_get_default_root_directory();
+
+  fts_make_absolute_path(root, fts_s_default_config, path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol(path);
+  }
+
+  /* check the config file in the windows directory */
+  if (GetWindowsDirectory(win, _MAX_PATH) == 0) {
+    return NULL;
+  }
+
+  fts_make_absolute_path(win, fts_s_default_config, path, _MAX_PATH);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol(path);
+  }
+
+  return NULL;
+}
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */

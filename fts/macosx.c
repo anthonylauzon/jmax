@@ -80,6 +80,34 @@ fts_get_system_project( void)
   return NULL;  
 }
 
+fts_symbol_t 
+fts_get_user_configuration(void)
+{
+  char* home;
+  char path[MAXPATHLEN];
+
+  home = getenv("HOME");
+  /* @@@@@ Change default configuration file name here @@@@@ */
+  fts_make_absolute_path(home, ".jmax.jcfg", path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol(path);
+  }
+
+  return NULL;  
+}
+
+fts_symbol_t 
+fts_get_system_configuration(void)
+{
+  char path[MAXPATHLEN];
+  fts_make_absolute_path(fts_get_root_directory(), fts_s_default_config, path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol(path);
+  }
+
+  return NULL;  
+}
+
 /* *************************************************************************** */
 /*                                                                             */
 /* Dynamic loader                                                              */
@@ -382,3 +410,10 @@ void* thread_manager_main(void* arg)
     
     return NULL;
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
