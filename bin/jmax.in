@@ -402,6 +402,124 @@ check_java ()
 }
 
 # ---------------------------------------------------------------------------
+# FTS suid root checking
+# ---------------------------------------------------------------------------
+
+display_fts_message_in_msg_box ()
+{
+    local session_type=$1
+    local path_to_fts=$2
+    
+    msg_title="jMax: FTS is not suid root"
+    msg_content="\
+Your fts binary is not suid root \
+\n\n\
+You should consider to make fts suid root in order to allow fts to run in SCHED_FIFO mode\
+\n\
+If you want to disable this test, create a file named $HOME/.jmax/no_fts_check\
+\n"
+    dialog_box="--msgbox"
+    dialog_xtra_arg="120 120"
+    case "$session_type" in
+	gnome )	    
+	    dialog="gdialog";;
+	kde )
+	    dialog="kdialog";;
+	xterm )
+	    dialog="xterm -e dialog";;
+    esac
+    
+    $dialog --title "$msg_title" \
+	$dialog_box "$msg_content" $dialog_xtra_arg
+}
+
+
+display_fts_message_in_term ()
+{
+    cat > /tmp/$$ << EOF 
+Your fts binary is not suid root 
+
+You should consider to make fts suid root in order to allow fts to run in SCHED_FIFO mode
+
+If you want to disable this test, create a file named $HOME/.jmax/no_fts_check
+EOF
+    cat /tmp/$$
+    rm -f /tmp/$$
+    return 0
+
+}
+
+display_fts_message ()
+{
+    local fts_binary=$1
+    # check for term
+    `which tty` -s 
+    if  test $? -eq 0; then
+	# we are in a terminal => use dialog if found 
+	display_fts_message_in_term $fts_binary
+    fi
+    
+    # check for KDE
+    local kde_var=`set | grep KDE`
+    if test ! -z "$kde_var"; then
+	# check for kdialog
+	local dd=`which kdialog`
+	if test $? -eq 0; then
+	    display_fts_message_in_msg_box kde
+	    return 0;
+	fi
+    fi
+    # check for gnome
+    local gnome_var=`set | grep GNOME`
+    if test ! -z "$gnome_var"; then
+	# check for gdialog
+	dd=`which gdialog`
+	if test $? -eq 0; then
+	    display_fts_message_in_msg_box gnome
+	    return 0;
+	fi
+    fi
+
+    # else use the xterm call
+    dd=`which dialog`
+    if test $? -eq 0; then
+	display_fts_message_in_msg_box xterm
+	return 0;
+    fi
+
+}
+
+# Check if file given as argument is suid root
+# Return 0 if true
+# Return 1 if false
+check_suid_root ()
+{
+    local file_to_check=$1
+    local file_owner=`stat --format="%u" $file_to_check`
+    local root_id="0"
+
+    if test -u $file_to_check && test "x$file_owner" = "x$root_id"; then
+	return 0
+    else
+	return 1
+    fi
+}
+
+# Check if fts binary id suid root
+# Display a warning message if this is not the case
+check_fts_suid_root ()
+{
+    local not_check_file=$HOME/.jmax/no_fts_check
+    local fts_binary=$ftsdir/fts
+    # Check if user doesn't want to do the check
+    if ! test -f $not_check_file; then
+	if ! check_suid_root $fts_binary; then
+	    display_fts_message $fts_binary
+	fi
+    fi
+}
+
+# ---------------------------------------------------------------------------
 check_installation ()
 {
     if [ ! -f ${real_rootdir}/java/jmax.jar ]
@@ -478,6 +596,8 @@ decrypt_options $@
 check_java
 
 check_installation
+
+check_fts_suid_root
 
 build_classpath
 
