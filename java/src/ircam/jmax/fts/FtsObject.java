@@ -524,6 +524,12 @@ public class FtsObject
     setDirty();
   }
 
+  public final void setIntegerProperty(String name, int value)
+  {
+    fts.getServer().putObjectProperty(this, name, value);
+    setDirty();
+  }
+
   /** Get the data property of this object.*/
 
   public MaxData getData()

@@ -44,9 +44,11 @@ import ircam.jmax.editors.patcher.menus.*;
 public class Bang extends GraphicObject implements FtsIntValueListener
 {
   private Color itsFlashColor = Settings.sharedInstance().getUIColor();
+  private int flashDuration = DEFAULT_FLASH_DURATION;
   private static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 15;
   private static final int CIRCLE_ORIGIN = 3;
+  private static final int DEFAULT_FLASH_DURATION = 125;
 
   public Bang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
@@ -67,6 +69,15 @@ public class Bang extends GraphicObject implements FtsIntValueListener
 
     super.setWidth( theWidth);
     super.setHeight( theWidth);
+  }
+
+  public void setFlashDuration(int fd)
+  {
+      flashDuration = fd;
+  }
+  public int getFlashDuration()
+  {
+      return flashDuration;
   }
 
   // redefined from base class
@@ -138,12 +149,13 @@ public class Bang extends GraphicObject implements FtsIntValueListener
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addMenu(ColorPopUpMenu.getInstance());
+    BangPopUpMenu.update(this);
+    ObjectPopUp.addMenu(BangPopUpMenu.getInstance());
   }
   public void popUpReset()
   {
     super.popUpReset();
-    ObjectPopUp.removeMenu(ColorPopUpMenu.getInstance());
+    ObjectPopUp.removeMenu(BangPopUpMenu.getInstance());
   }
 }
 
