@@ -26,6 +26,7 @@
 package ircam.jmax.editors.console;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.script.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -36,18 +37,17 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
-import tcl.lang.*;
 
 public class Console extends JPanel {
   StringBuffer itsSbuf = new StringBuffer();
   ConsoleTextArea itsTextArea;
-  Interp itsInterp;
+  Interpreter itsInterp;
   PrintStream itsPrintStream; 
   ConsoleThread itsConsoleThread;
   ConsoleKeyListener itsKeyListener;
   KeyListener itsContainer;
 
-  public Console(Interp i) {
+  public Console(Interpreter i) {
     StringBuffer itsSbuf = new StringBuffer();
     itsTextArea = new ConsoleTextArea(40, 40);
 
@@ -134,25 +134,29 @@ public class Console extends JPanel {
     if (itsInterp.commandComplete(s)) {
       
       try {
-	itsInterp.eval(s);
+	Object obj = itsInterp.eval(s);
 
 	// Ask FTS to recompute the error objects if needed
 
-	String result = itsInterp.getResult().toString();
+	String result = obj.toString();
 	if (result.length() > 0) {
 	  PutLine(result);
 	}
-      } catch (TclException e) {
+      } catch (ScriptException e) {
 
+	  /*
 	if (e.getCompletionCode() == TCL.RETURN) {
 	  PutLine(itsInterp.getResult().toString());
 	}
 	else if (e.getCompletionCode() == TCL.ERROR) {
 	  PutLine(itsInterp.getResult().toString());
 	} else {
-	  PutLine("command returned bad code: " 
-+ e.getCompletionCode());
+	  PutLine("command returned bad code: " + e.getCompletionCode());
 	}
+	  */
+
+	  PutLine("Command returned bad error: " + e.getMessage());
+
       }
       itsSbuf.setLength(0);
       Put("% ");

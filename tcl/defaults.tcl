@@ -39,7 +39,7 @@ set jmaxConnection "udp"
 
 ## set binary execution mode for jMax server executable
 
-set jmaxMode "opt"
+set jmaxMode "debug"
 
 ## set name for jMax server executable
 

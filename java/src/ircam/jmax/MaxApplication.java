@@ -39,7 +39,8 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
-import tcl.lang.*;
+import ircam.jmax.script.*;
+import ircam.jmax.script.pkg.*;
 
 // MaxApplication.getProperty should disappear, and properties stored in the system
 // properties, that can *also* be loaded from a file.
@@ -123,23 +124,31 @@ public class MaxApplication extends Object
     return jmaxProperties;
   }
 
-  /** Get the unique active TCL interpreter */
+    /* The name of the class that implements the interpreter
+     * interface. By default we load the Silk interpreter. This value
+     * can be overriden with the -jmaxInterp <fullClassName> option */
 
-  static private Interp itsInterp = null;
+    static private Interpreter itsInterp = null;
 
-  public static Interp getTclInterp()
-  {
-    if (itsInterp == null)
-      makeTclInterp();
+    public static Interpreter getInterpreter()
+    {
+	return itsInterp;
+    }
 
-    return itsInterp;
-  }
+    /** The package handler that keeps trace of the loaded package. */
+  
+    static private PackageHandler itsPackageHandler = null;
+
+    public static PackageHandler getPackageHandler()
+    {
+	return itsPackageHandler;
+    }
 
   static MaxWhenHookTable  itsHookTable = null;
 
   /** Functions to add application hooks */
 
-  public static void addHook(String name, String code)
+  public static void addHook(String name, Script code)
   {
     if (itsHookTable == null)
       itsHookTable = new MaxWhenHookTable(); 
@@ -197,7 +206,7 @@ public class MaxApplication extends Object
 
   /** His majesty the main method */
 
-  public static void main(String args[])
+  public static void main(String args[]) 
   {
     MaxVector toOpen = new MaxVector();
 
@@ -279,8 +288,14 @@ public class MaxApplication extends Object
     if (jmaxProperties.get("jmaxRoot") == null)
       {
 	//user didn't specify the root. Take the default directory.
-
 	jmaxProperties.put("jmaxRoot", "/usr/lib/jmax");
+      }
+
+    if (jmaxProperties.get("jmaxInterp") == null)
+      {
+	//user didn't specify the interp. Take ircam.jmax.script.tcl.TclInterpreter as default.
+	jmaxProperties.put("jmaxInterp", "jacl");
+	//jmaxProperties.put("jmaxInterp", "silk");
       }
 
     //the version number as a system property
@@ -299,9 +314,22 @@ public class MaxApplication extends Object
 
     ircam.jmax.utils.Platform.setValues();
 
+    // Create the package handler
+
+    itsPackageHandler = new PackageHandler();
+
     // Create and initialize the tcl interpreter
 
-    makeTclInterp(); 
+    try
+	{
+	    bootstrapInterp(); 
+	}
+    catch (Exception e)
+	{
+	    e.printStackTrace(); // FIXME
+	    System.out.println("Couldn't create the interpreter: " + e.getMessage());
+	    return;
+	}
 
     // Initialize all the submodules; first the kernel modules
 
@@ -327,19 +355,13 @@ public class MaxApplication extends Object
     // and if yes, inform the application layer
     
     try
-      {
-	// Load the "jmaxboot.tcl" file that will do whatever is needed to
-	// create the startup configuration, included reading user files
-	// installing editors, data types and data handlers
-	
-	itsInterp.evalFile(getProperty("jmaxRoot") +
-			   getProperty("file.separator") + "tcl" +
-			   getProperty("file.separator") +  "jmaxboot.tcl");
-      }
-    catch (TclException e)
-      {
-	System.out.println("TCL error in initialization: " + itsInterp.getResult());
-      }
+	{
+	    itsInterp.boot(MaxApplication.getProperty("jmaxRoot"));
+	}
+    catch (ScriptException e)
+	{
+	    System.out.println("Interpreter error in initialization: " + e.getMessage());
+	}
     
     // Splash screen moved to a tcl command
     
@@ -419,17 +441,25 @@ public class MaxApplication extends Object
       }
   }
   
-  /** This private method build the tcl interpreter, 
-    and do all the required initialization relative
-      to the jmax package *only*; each module load its
-      own tcl commands.
-      */
 
-  static private void makeTclInterp()
+  /** This private method build the interpreter. */
+
+  static private void bootstrapInterp() throws Exception
   {
-    itsInterp = new tcl.lang.Interp(); 
+      String interpName = (String) jmaxProperties.get("jmaxInterp");
+      String interpClassName = interpName;
+      
+      if (interpName.equalsIgnoreCase("jacl")) {
+	  interpClassName = "ircam.jmax.script.tcl.TclInterpreter";
+      } else if (interpName.equalsIgnoreCase("silk")) {
+	  interpClassName = "ircam.jmax.script.scm.SilkInterpreter";
+      } else if (interpName.equalsIgnoreCase("kawa")) {
+	  interpClassName = "ircam.jmax.script.scm.KawaInterpreter";
+      }
 
-    ircam.jmax.tcl.TclMaxPackage.installPackage();
+      System.out.println("Booting the interpreter " + interpName + " (" + interpClassName + ')');
+
+      itsInterp = (Interpreter) Class.forName(interpClassName).newInstance();
   }
 
   /**
@@ -554,6 +584,66 @@ public class MaxApplication extends Object
 
     Runtime.getRuntime().exit(0);
   }
+
+    // Scripting interface
+
+    // The theMaxApplication is an empty object since everything in
+    // the MaxApplication class is static. It is only intended to
+    // provide a Scriptable interface for the interpreter.
+
+    static MaxApplication itsMaxApplication = new MaxApplication();
+
+    /** Returns the script menu for a given document type, or null if
+     *  non is avaible. */
+    public static Menu getScriptMenu(String type)
+    {
+	return itsInterp.getScriptMenu(type);	
+    }
+
+    /** Retreive application property */
+
+    public String getSystemProperty(String name) 
+    {
+	return MaxApplication.getProperty(name);
+    }
+
+    /** Set application property */
+
+    public String setSystemProperty(String name, String value)
+    {
+	return MaxApplication.setProperty(name, value);
+    }
+
+    /* Application "when" hooks */
+
+    public void addSystemHook(String when, Script script) 
+    {
+	//MaxApplication.addHook(name, code);
+    }
+
+    // Methods to install new data editors, document handlers, and
+    // types.
+
+    /** Install an editor factory in Mda */
+
+    public void installEditorFactory(MaxDataEditorFactory factory)
+    {
+	Mda.installEditorFactory(factory);
+    }
+
+    /** Install a document handler in Mda */
+
+    public void installDocumentHandler(MaxDocumentHandler handler)
+    {
+	Mda.installDocumentHandler(handler);
+    }
+
+    /** Install a document type in Mda */
+
+    public void installDocumentType(MaxDocumentType type)
+    {
+	Mda.installDocumentType(type);
+    }
 }
 
 

@@ -34,7 +34,6 @@ all: local_all
 	(cd interactions ; $(MAKE) all)
 	(cd menus ; $(MAKE) all)
 	(cd objects ; $(MAKE) all)
-	(cd tcl ; $(MAKE) all)
 .PHONY: all
 
 local_all: $(CLASSES)

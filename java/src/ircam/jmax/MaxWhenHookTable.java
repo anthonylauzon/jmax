@@ -25,11 +25,11 @@
 
 package ircam.jmax;
 
-import tcl.lang.*;
 import java.util.*;
 
 import ircam.jmax.utils.*;
 import ircam.jmax.*;
+import ircam.jmax.script.*;
 
 /**
   */
@@ -39,23 +39,23 @@ class MaxWhenHookTable
   class HookEntry
   {
     String name;
-    String code;
+    Script code;
 
-    HookEntry(String name, String code)
+    HookEntry(String name, Script code)
     {
       this.name = name;
       this.code = code;
     }
 
-    void runHook(String name, Interp interp)
+    void runHook(String name, Interpreter interp)
     {
       if (this.name.equals(name))
 	try
 	{
-	  interp.eval(code);
+	    Object result = code.eval();
 	}
-      catch (TclException e) {
-	System.out.println("TCL error running hook " + name + " : " + interp.getResult());
+      catch (ScriptException e) {
+	System.out.println("Interpreter error running hook " + name + " : " + e.getMessage());
       }
     }
   }
@@ -66,7 +66,7 @@ class MaxWhenHookTable
   {
   }
 
-  void addHook(String name, String code)
+  void addHook(String name, Script code)
   {
     hookList.addElement(new HookEntry(name, code));
   }
@@ -79,7 +79,7 @@ class MaxWhenHookTable
       {
 	HookEntry e = (HookEntry) hookList.elementAt(i);
 
-	e.runHook(name, MaxApplication.getTclInterp());
+	e.runHook(name, MaxApplication.getInterpreter());
       }
   }
 }

@@ -57,6 +57,7 @@ public class MaxFileChooser
 
   }
 
+    /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
   private static void configure()
   {
     if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
@@ -65,7 +66,7 @@ public class MaxFileChooser
 
 	Enumeration e = Mda.getDocumentFileFilters();
 	while (e.hasMoreElements())
-	  fd.addChoosableFileFilter((FileFilter) e.nextElement());
+	  fd.addChoosableFileFilter((javax.swing.filechooser.FileFilter) e.nextElement());
 
 	fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
 

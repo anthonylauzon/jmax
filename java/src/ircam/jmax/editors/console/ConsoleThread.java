@@ -25,6 +25,7 @@
 
 package ircam.jmax.editors.console;
 import ircam.jmax.*;
+import ircam.jmax.script.*;
 import java.io.*;
 import java.util.*;
 /**
@@ -33,7 +34,6 @@ import java.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import tcl.lang.*;
 
 class ConsoleThread extends Thread {
   Console itsConsole;

@@ -197,6 +197,12 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     itsWindowsMenu = new ircam.jmax.toolkit.MaxWindowMenu("Windows", this); 
     mb.add(itsWindowsMenu);
+
+    // The script menu
+    Menu scriptMenu = MaxApplication.getScriptMenu("all");
+    if (scriptMenu != null) {
+	mb.add(scriptMenu);
+    }
   }
 
   public void Destroy()

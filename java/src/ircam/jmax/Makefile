@@ -32,10 +32,10 @@ all: local_all
 	(cd editors ; $(MAKE) all)
 	(cd fts ; $(MAKE) all)
 	(cd mda ; $(MAKE) all)
-	(cd tcl ; $(MAKE) all)
 	(cd toolkit ; $(MAKE) all)
 	(cd utils ; $(MAKE) all)
 	(cd widgets ; $(MAKE) all)
+	(cd script ; $(MAKE) all)
 .PHONY: all
 
 local_all: MaxVersion.java $(CLASSES) 

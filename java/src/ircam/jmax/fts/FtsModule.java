@@ -46,7 +46,7 @@ public class FtsModule
     Mda.installDocumentType(Fts.getPatcherDocumentType());
 
     // Install the FTS tcl commands
-    ircam.jmax.fts.tcl.TclFtsPackage.installPackage();
+    /* ircam.jmax.fts.tcl.TclFtsPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */
 
     // Install the Integer vector class
     Fts.registerRemoteDataClass("ivec", ircam.jmax.fts.FtsIntegerVector.class);
@@ -62,3 +62,4 @@ public class FtsModule
     Fts.registerRemoteDataClass("patcher_data", ircam.jmax.fts.FtsPatcherData.class);
   }
 }
+

@@ -32,7 +32,7 @@ import java.awt.event.*;
 import java.awt.datatransfer.*;
 import javax.swing.*;
 
-import tcl.lang.*;
+import ircam.jmax.script.*;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
@@ -65,7 +65,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
 
     MaxWindowManager.setTopFrame(this);
 
-    itsConsole = new Console(MaxApplication.getTclInterp());
+    itsConsole = new Console(MaxApplication.getInterpreter());
     itsConsole.Start();
 
     if ( (MaxApplication.getProperty("jmaxNoConsole") == null) || 

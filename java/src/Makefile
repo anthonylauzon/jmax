@@ -39,6 +39,8 @@ DOC_PACKAGES = \
 	ircam.jmax.editors.console \
 	ircam.jmax.editors.console.tcl \
 	ircam.jmax.editors.patcher \
+	ircam.jmax.script \
+	ircam.jmax.script.pkg \
 	to.be.completed
 
 all: $(JAVA_CLASSES_ROOT)

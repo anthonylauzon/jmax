@@ -66,7 +66,7 @@ public class ErmesModule
 
     // Install the tcl commands
 
-    TclErmesPackage.installPackage();
+    /* TclErmesPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */
   }
 }
 

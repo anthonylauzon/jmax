@@ -30,7 +30,6 @@ PACKAGE_DIR = ircam/jmax/fts
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all: local_all
-	(cd tcl ; $(MAKE) all)
 .PHONY: all
 
 local_all: $(CLASSES)
