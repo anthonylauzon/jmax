@@ -236,6 +236,10 @@ public class FtsObject
       {
 	fontSize = value;
       }
+    else if (name == "fst")
+      {
+	fontStyle = value;
+      }
     else if (name == "layer")
       {
 	layer = value;
@@ -353,6 +357,7 @@ public class FtsObject
   protected String  errorDescription;
   protected String font = null;
   protected int fontSize = -1;
+  protected int fontStyle = -1;
   protected int layer = -1;
   protected MaxData data;
   protected String comment;
@@ -493,6 +498,24 @@ public class FtsObject
       }
   }
 
+ /** Get the font style property */
+
+  public final int getFontStyle()
+  {
+    return fontStyle;
+  }
+
+  /** Set the font size property. Tell it to the server, too. */
+
+  public final void setFontStyle(int fontStyle)
+  {
+    if (this.fontStyle != fontStyle)
+      {
+	fts.getServer().putObjectProperty(this, "fst", fontStyle);
+	this.fontStyle = fontStyle;
+	setDirty();
+      }
+  }
   /** Get the layer  property */
 
   public final int getLayer()
@@ -973,7 +996,7 @@ public class FtsObject
   String dialogText;
   String callbackMethod;
   
-  public void dialogFileSave(int nArgs, FtsAtom args[])
+  public void openFileDialog(int nArgs, FtsAtom args[])
   {
       parentFrame = null;
       callbackMethod = args[0].getString();
@@ -1026,3 +1049,12 @@ public class FtsObject
 	sendArgs[i]= new FtsAtom();
   }
 }
+
+
+
+
+
+
+
+
+

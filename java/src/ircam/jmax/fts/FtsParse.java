@@ -1135,13 +1135,16 @@ public class FtsParse
 
 	    switch (value1.type)
 	      {
-	      case value1.INT:
+		  //case value1.INT:
+	      case FtsAtom.INT:
 		descr.append(value1.intValue);
 		break;
-	      case value1.FLOAT:
+		//case value1.FLOAT:
+	      case FtsAtom.FLOAT:
 		descr.append(formatter.format(value1.floatValue));
 		break;
-	      case value1.STRING:
+		//case value1.STRING:
+	      case FtsAtom.STRING:
 		/* Lexical quoting check */
 		String s = value1.stringValue;
 		

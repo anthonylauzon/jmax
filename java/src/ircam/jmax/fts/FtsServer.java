@@ -533,7 +533,8 @@ public class FtsServer implements Runnable
       return;
 
     if (FtsServer.debug)
-      System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
+	System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", "+ args + ")");
+
 
     try
       {
