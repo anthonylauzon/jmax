@@ -28,6 +28,7 @@ package ircam.jmax.editors.console;
 import java.io.*;
 import java.util.*;
 import java.awt.*;
+import java.awt.print.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import javax.swing.*;
@@ -47,7 +48,7 @@ import ircam.jmax.widgets.ConsoleArea;
  * Window containing a console
  */
  
-public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
+public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Printable{
 
   static private ConsoleWindow consoleWindowSingleInstance = null;
 
@@ -218,5 +219,20 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
   {
     return getContentPane().getBounds();
   }
+
+  public int print(Graphics g, PageFormat pf, int pi) throws PrinterException 
+  {
+      Point consolePos = SwingUtilities.convertPoint(consoleArea, getLocation(), this);
+      double onsetX = pf.getImageableX()+consolePos.x;
+      double onsetY = pf.getImageableY()+consolePos.y;
+      
+      ((Graphics2D)g).translate(onsetX, onsetY);
+
+	if (pi >= 1) {
+	    return Printable.NO_SUCH_PAGE;
+	}
+	consoleArea.print((Graphics2D) g);
+	return Printable.PAGE_EXISTS;
+    }
 }
 

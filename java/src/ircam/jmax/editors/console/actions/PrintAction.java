@@ -27,12 +27,13 @@ package ircam.jmax.editors.console.actions;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.console.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
@@ -41,18 +42,17 @@ public class PrintAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Console", MaxApplication.getProperties());
-
-    if( aPrintjob != null )
-      {
-	Graphics aPrintGraphics = aPrintjob.getGraphics();
-
-	if ( aPrintGraphics != null )
-	  {
-	    container.getFrame().printAll( aPrintGraphics );
-	    aPrintGraphics.dispose();
+      PrinterJob printJob = PrinterJob.getPrinterJob();
+      PageFormat format = printJob.pageDialog(printJob.defaultPage());    
+      printJob.setPrintable((ConsoleWindow)container, format);
+      
+      if (printJob.printDialog()) {
+	  try {
+	      printJob.print();
+	  } catch (Exception ex) {
+	      ex.printStackTrace();
 	  }
-	aPrintjob.end();
       }
   }
 }
+

@@ -396,4 +396,40 @@ public class ConsoleArea extends JComponent implements Scrollable {
 	lineToPaint++;
       }
   }
+  
+  public void print( Graphics g)
+  {
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+    Rectangle clip = g.getClipBounds();
+    int clipWidth = clip.width;
+    int clipHeight = clip.height;
+    int clipX = clip.x;
+    int clipY = clip.y;
+
+    g.setColor( getBackground());
+
+    g.fillRect( clipX, clipY, clipWidth, clipHeight);
+
+    g.setColor( getForeground());
+
+    int lineToPaint = 0;
+
+    if (lineToPaint >= nLines)
+      return;
+
+    int lastLineToPaint = nLines;
+
+    int y = maxAscent + lineToPaint * lineHeight;
+
+    while( lineToPaint < lastLineToPaint)
+      {
+	g.drawString( buffer[lineToPaint], 2, y);
+
+	y += lineHeight;
+
+	lineToPaint++;
+      }
+  }
 }
+
