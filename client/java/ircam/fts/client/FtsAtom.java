@@ -232,7 +232,7 @@ public class FtsAtom implements java.io.Serializable
     else if ( isDouble())
       return Double.toString( doubleValue);
     else if ( isSymbol())
-      return symbolValue.toString();
+      return (symbolValue != null) ? symbolValue.toString(): "null";
     else if ( isString() || isRawString())
       return stringValue;
     else if ( isObject())

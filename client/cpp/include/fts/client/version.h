@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-#define FTSCLIENT_LIB_VERSION_STR "4.0.3_latest_cvs"
+#define FTSCLIENT_LIB_VERSION_STR "4.1.0_latest_cvs"
 
 
 
