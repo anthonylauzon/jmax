@@ -49,7 +49,7 @@ public class Data implements JMaxPackage {
 	}
       }; 
 
-    JMaxClassMap.put( "bpf", bpfCreator, null, null, this);
-    JMaxClassMap.put( "ivec", tableCreator, null, null, this);
+    JMaxClassMap.put( "bpf", bpfCreator, null, null, "bpf", this);
+    JMaxClassMap.put( "ivec", tableCreator, null, null, "ivec", this);
   }
 }

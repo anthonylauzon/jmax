@@ -67,7 +67,12 @@ class ToolButton extends JToggleButton
 
     setDoubleBuffered( false);
     setMargin( new Insets(0,0,0,0));
-    setToolTipText( name + " object");
+        
+    String toolTip = JMaxClassMap.getDescription(name);
+    if( toolTip == null)
+      setToolTipText( name + " object");
+    else
+      setToolTipText( toolTip);
 
     addMouseListener(ToolButton.mListener);
   }

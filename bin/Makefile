@@ -11,10 +11,6 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# fts.wrapper is only use on Mac OS X which doesn't use anymore
-# automake stuff
-# bin_SCRIPTS=jmax fts.wrapper
-
 
 SHELL = /bin/sh
 

@@ -145,23 +145,23 @@ public class Guiobj implements JMaxPackage {
 	}
       };
 
-    JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", this);
-    JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", this);
-    JMaxClassMap.put( "inlet", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", this);
-    JMaxClassMap.put( "outlet", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", this);
-    JMaxClassMap.put( "fork", forkCreator, "/icons/fork.gif", "/icons/fork_cursor.gif", this);
-    JMaxClassMap.put( "jcomment", jcommentCreator, "/icons/jcomment.gif", "/icons/jcomment_cursor.gif", this);
-    JMaxClassMap.put( "messconst", messconstCreator, "/icons/messconst.gif", "/icons/messconst_cursor.gif", this);
-    JMaxClassMap.put( "button", buttonCreator, "/icons/button.gif", "/icons/button_cursor.gif", this);
-    JMaxClassMap.put( "toggle", toggleCreator, "/icons/toggle.gif", "/icons/toggle_cursor.gif", this);
-    JMaxClassMap.put( "slider", sliderCreator, "/icons/slider.gif", "/icons/slider_cursor.gif", this);
-    JMaxClassMap.put( "xypad", xyPadCreator, "/icons/xypad.gif", "/icons/xypad_cursor.gif", this);
-    JMaxClassMap.put( "intbox", intboxCreator, "/icons/intbox.gif", "/icons/intbox_cursor.gif", this);
-    JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", this);
-    JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", this);
-    JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", this);
-    JMaxClassMap.put( "matdisplay", matdisplayCreator, "/icons/matdisplay.gif", "/icons/matdisplay_cursor.gif", this);
-    JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", this);
-    JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monitor_cursor.gif", this);
+    JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", "standard", this);
+    JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", "patcher", this);
+    JMaxClassMap.put( "inlet", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", "inlet", this);
+    JMaxClassMap.put( "outlet", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", "outlet", this);
+    JMaxClassMap.put( "fork", forkCreator, "/icons/fork.gif", "/icons/fork_cursor.gif", "fork", this);
+    JMaxClassMap.put( "jcomment", jcommentCreator, "/icons/jcomment.gif", "/icons/jcomment_cursor.gif", "comment", this);
+    JMaxClassMap.put( "messconst", messconstCreator, "/icons/messconst.gif", "/icons/messconst_cursor.gif", "message",this);
+    JMaxClassMap.put( "button", buttonCreator, "/icons/button.gif", "/icons/button_cursor.gif", "bang", this);
+    JMaxClassMap.put( "toggle", toggleCreator, "/icons/toggle.gif", "/icons/toggle_cursor.gif", "toggle", this);
+    JMaxClassMap.put( "slider", sliderCreator, "/icons/slider.gif", "/icons/slider_cursor.gif", "slider", this);
+    JMaxClassMap.put( "xypad", xyPadCreator, "/icons/xypad.gif", "/icons/xypad_cursor.gif", "2D controller", this);
+    JMaxClassMap.put( "intbox", intboxCreator, "/icons/intbox.gif", "/icons/intbox_cursor.gif", "integer", this);
+    JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", "float", this);
+    JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", "generic display", this);
+    JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", "vector display", this);
+    JMaxClassMap.put( "matdisplay", matdisplayCreator, "/icons/matdisplay.gif", "/icons/matdisplay_cursor.gif", "matrix display", this);
+    JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", "oscilloscope", this);
+    JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monitor_cursor.gif", "monitor", this);
   }
 }

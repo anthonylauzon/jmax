@@ -36,7 +36,7 @@ public class Sequence implements JMaxPackage {
 	}
       }; 
 
-    JMaxClassMap.put( "sequence", sequenceCreator, null, null, this);
+    JMaxClassMap.put( "sequence", sequenceCreator, null, null, "sequence", this);
   }
 }
 
