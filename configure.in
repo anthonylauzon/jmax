@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.100 2002/11/21 11:38:19 p_tisserand Exp $
+dnl $Id: configure.in,v 1.101 2002/11/21 13:55:19 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.101  2002/11/21 13:55:19  p_tisserand
+dnl Add config-ac.h for system dependant configuration of packages.
+dnl
 dnl Revision 1.100  2002/11/21 11:38:19  p_tisserand
 dnl add a configure flag to disable jMax java compilation (--disable-java-part or --enable-java-part=no)
 dnl
@@ -127,12 +130,12 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_BIGENDIAN
 
+dnl map result or include/fts/config-ac.h
 if test $ac_cv_c_bigendian = yes; then
 FTS_CONFIG_BYTE_ORDER=FTS_CONFIG_BIGENDIAN
 else
 FTS_CONFIG_BYTE_ORDER=FTS_CONFIG_LITTLEENDIAN
 fi
- 
 AC_SUBST(FTS_CONFIG_BYTE_ORDER)
 
 dnl Check for lex/flex and yacc/bison
@@ -278,6 +281,14 @@ AC_DEFINE(restrict,)
 ;;
 
 esac
+
+FTS_DEFINE_RESTRICT=""
+if test "$acx_cv_restrict" != "restrict"; then
+   acx_kw="$acx_cv_c_restrict"
+   if test "$acx_kw" = unsupported; then acx_kw=""; fi
+   FTS_DEFINE_RESTRICT="#define restrict $acx_kw"
+fi
+AC_SUBST(FTS_DEFINE_RESTRICT)
 
 AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORM_PACKAGES)
