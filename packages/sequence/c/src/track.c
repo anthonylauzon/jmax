@@ -571,7 +571,8 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  /* create event at client */
 	  int ac;
 	  fts_atom_t *at;
-	  
+
+	  fts_array_clear(&array);
 	  event_get_array(event, &array);
 	  
 	  ac = fts_array_get_size(&array);
@@ -632,7 +633,7 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       atoms = fts_array_get_atoms(&array);
 
       post("  @%lf: ", fts_get_float(atoms + 0));
-      post("<%s> ", fts_get_symbol(atoms + 1));
+      post("<%s> ", fts_symbol_name(fts_get_symbol(atoms + 1)));
       post_atoms(size - 2, atoms + 2);
       post("\n");
 
