@@ -111,6 +111,14 @@ send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_channel_find_friends(fts_label_get_channel(this->label), ac, at);
 }
 
+static void
+send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  send_t *this = (send_t *)o;
+
+  fts_channel_propagate_input(fts_label_get_channel(this->label), winlet, s, ac, at);
+}
+
 static fts_status_t
 send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -121,6 +129,7 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, send_find_friends);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, send_anything);
+  fts_class_define_thru(cl, send_propagate_input);
 
   return fts_Success;
 }

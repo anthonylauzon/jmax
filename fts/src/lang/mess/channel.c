@@ -111,3 +111,14 @@ fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at)
   for(a=channel->origins; a; a=a->next)
     fts_object_set_add(set, (fts_object_t *)a);
 }
+
+void
+fts_channel_propagate_input(fts_channel_t *channel, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
+  void *propagate_context = fts_get_ptr(at + 1);
+  fts_access_t *a; 
+
+  for(a=channel->targets; a; a=a->next)
+    propagate_fun(propagate_context, (fts_object_t *)a, 0);
+}
