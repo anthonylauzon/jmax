@@ -477,9 +477,7 @@ scomark_array_function(fts_object_t *o, fts_array_t *array)
 
 static void 
 scomark_description_function(fts_object_t *o, fts_array_t *array)
-{
-  scomark_t *self = (scomark_t *)o;
-  
+{  
   fts_array_append_symbol(array, seqsym_scomark);
   scomark_array_function(o, array);
 }
@@ -696,7 +694,6 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
 {  
   if(new_meter != NULL && old_meter != NULL)
   {
-    track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
     event_t *marker_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
     scomark_t *next_bar = marker_track_get_next_bar(marker_track, scomark);
     
@@ -856,7 +853,6 @@ marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double ol
     event_t *first = NULL;
     event_t *after = NULL;
     double stretch = old_tempo/new_tempo;
-    scomark_t *marker = NULL;
     
     mark_evt = event_get_next(mark_evt);
     if(mark_evt != NULL)
@@ -970,7 +966,6 @@ marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, doubl
 void
 marker_track_unset_tempo_on_selection(track_t *marker_track, int ac, const fts_atom_t *at)
 {
-  int i;
   event_t *first = NULL;
   event_t *last = NULL;
   double last_time, first_time;
@@ -1129,7 +1124,6 @@ marker_track_collapse_markers( track_t *marker_track, int ac, const fts_atom_t *
 		scomark_t *last_scomark = NULL;
 		scomark_t *first_scomark = NULL;
 		double last_tempo = -1.0;
-		double old_tempo = -1.0;
 		fts_symbol_t last_meter = NULL;
 		fts_symbol_t old_meter = NULL;
 		double shift = 0.0;
@@ -1161,7 +1155,6 @@ marker_track_collapse_markers( track_t *marker_track, int ac, const fts_atom_t *
 		else
 		{
 			scomark_t *prev_bar = NULL;
-			fts_symbol_t prev_meter = NULL;
 			event_t *prev_evt = NULL;
 			marker_track_change_tempo( marker_track, first_scomark, last_tempo);
 			
@@ -1387,7 +1380,6 @@ marker_track_append_last_bar(track_t *marker_track, event_t *last_bar, fts_symbo
 	
 	if(event_at_same_time != NULL) /* a marker is at the same time of new bar: transform the marker in bar*/
   {
-    fts_atom_t a;
     new_bar = (scomark_t *)fts_get_object(event_get_value(event_at_same_time));
     scomark_set_type( new_bar, seqsym_bar);
     new_event = event_at_same_time; 
@@ -1421,12 +1413,9 @@ marker_track_append_bar(track_t *marker_track, event_t *start_evt)
     fts_symbol_t meter = NULL;
     fts_symbol_t old_meter = NULL;
     int last_number = 0;
-    int numerator = 0;
-    int denominator = 0;
     double last_tempo = 0.0;
     double tempo = 0.0;
     double time = 0.0;
-    double bar_duration = 0.0;
     double next_bar_time = 0.0;
 
 		if(start_evt != NULL) /****** append bar to selected bar ******************/

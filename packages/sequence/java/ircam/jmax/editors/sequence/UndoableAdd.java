@@ -33,7 +33,8 @@ import javax.swing.undo.*;
 class UndoableAdd extends AbstractUndoableEdit {
   Event itsEvent;
   FtsTrackObject trkObj;
-
+	boolean isMarker = false;
+	
   public UndoableAdd(TrackEvent theAddedEvent)
   {
     try {
@@ -43,6 +44,7 @@ class UndoableAdd extends AbstractUndoableEdit {
       Thread.dumpStack();
     }
       
+		isMarker = ( itsEvent.getValue() instanceof MarkerValue);
     trkObj = ((FtsTrackObject)theAddedEvent.getDataModel());
   }
   
@@ -59,7 +61,10 @@ class UndoableAdd extends AbstractUndoableEdit {
   public void redo()
   {
     SequenceSelection.getCurrent().deselectAll();
-    trkObj.requestEventCreation((float)itsEvent.getTime(), 
+    if(isMarker)
+			trkObj.appendBar(null);
+		else
+			trkObj.requestEventCreation((float)itsEvent.getTime(), 
 																itsEvent.getValue().getValueInfo().getName(), 
 																itsEvent.getValue().getDefinedPropertyCount()*2,
 																itsEvent.getValue().getDefinedPropertyNamesAndValues());

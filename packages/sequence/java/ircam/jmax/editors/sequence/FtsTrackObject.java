@@ -264,6 +264,52 @@ public Vector getEventTypes()
 {
   return eventTypesEnum;
 }
+
+/* redefined from FtsUndoableObject */
+public void beginUpdate(String type)
+{
+	if( isMarkersTrack())
+		((FtsUndoableObject)getParent()).beginUpdate(type);
+	else
+		super.beginUpdate(type);
+}
+
+public void beginUpdate()
+{
+	if( isMarkersTrack())
+		((FtsUndoableObject)getParent()).beginUpdate();
+	else
+		super.beginUpdate();
+}
+public void endUpdate(String type)
+{
+	if( isMarkersTrack())
+		((FtsUndoableObject)getParent()).endUpdate(type);
+	else
+		super.endUpdate(type);
+}
+public void endUpdate()
+{
+	if( isMarkersTrack())
+		((FtsUndoableObject)getParent()).endUpdate();
+	else
+		super.endUpdate();
+}
+public boolean isInGroup()
+{
+	if( isMarkersTrack())
+		return ((FtsUndoableObject)getParent()).isInGroup();
+	else
+		return super.isInGroup();
+}
+
+public void postEdit(UndoableEdit e)
+{
+	if( isMarkersTrack())
+		((FtsUndoableObject)getParent()).postEdit(e);
+	else 
+		super.postEdit(e);
+}
 //////////////////////////////////////////////////////////////////////////////////////
 //// MESSAGES called from fts.
 //////////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +332,8 @@ public void addEvents(int nArgs , FtsAtom args[])
   addEvent( new TrackEvent(getServer(), this, args[0].intValue, "event", args, 1, nArgs));
 	
   // ends the undoable transition
-  endUpdate("addEvent");
+	if(!isMarkersTrack() || (isMarkersTrack() && length() > 1)) /*first bar comes coupled with second one */
+		endUpdate("addEvent");
 }
 
 public void removeEvents(int nArgs , FtsAtom args[])
@@ -301,7 +348,7 @@ public void removeEvents(int nArgs , FtsAtom args[])
     deleteEventAt(removeIndex);
   }
   // ends the undoable transition
-  endUpdate("removeEvents");
+	endUpdate("removeEvents");
 }
 
 public void clear()
@@ -672,6 +719,8 @@ public void makeTrillFromSelection( Enumeration events)
 
 public void appendBar(TrackEvent evt)
 { 	
+	beginUpdate("addEvent");
+	
   try{
 		args.clear();
 		if(evt != null)
@@ -921,10 +970,8 @@ public void addEvent(TrackEvent event)
 
   notifyObjectAdded(event, index);
 
-  if (isInGroup())
-  {
-    postEdit(new UndoableAdd(event));
-  }
+	if( isInGroup())
+		postEdit(new UndoableAdd(event));
 }
 
 /**
@@ -1610,6 +1657,7 @@ public void setFtsTrackEditorObject(int id)
 public void setMarkersTrack(int nArgs , FtsAtom args[])
 {	
 	markersTrack = new FtsTrackObject( JMaxApplication.getFtsServer(), this, args[0].intValue, "track", args, 1, nArgs);	
+	markersTrack.setAsMarkersTrack();
 	markersSelection = new SequenceSelection(markersTrack);
 	
 	if(!isInSequence() || 
@@ -1620,6 +1668,16 @@ public void setMarkersTrack(int nArgs , FtsAtom args[])
 public FtsTrackObject getMarkersTrack()
 {	
   return markersTrack;	
+}
+
+boolean iAmMarkersTrack = false;
+public boolean isMarkersTrack()
+{
+	return iAmMarkersTrack;
+}
+public void setAsMarkersTrack()
+{
+	iAmMarkersTrack = true;
 }
 
 public SequenceSelection getMarkersSelection()
