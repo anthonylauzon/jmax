@@ -401,7 +401,6 @@ static void audioportin_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 static fts_status_t audioportin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int outlets, i;
-  fts_audioport_t *port;
 
   ac--;
   at++;

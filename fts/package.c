@@ -249,44 +249,8 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   fts_dirname(filename, dir, MAXPATHLEN);
   pkg->dir = fts_new_symbol_copy(dir);
 
-  fts_package_pop();
+  fts_package_pop(fts_system_package);
   return pkg;
-}
-
-void
-fts_package_load_default_files(fts_package_t* pkg)
-{
-  fts_list_t* list;
-  char filename[MAXPATHLEN];
-  char function[256];
-  fts_status_t ret;
-
-  /* load all required packages before loading anything else. This
-     package may depend on the libraries and other data loaded by the
-     required packages. */
-  list = pkg->packages;
-  while (list) {
-    fts_package_get(fts_get_symbol(fts_list_get(list)));
-    list = fts_list_next(list);
-  }
-
-  /* load the shared library */
-  sprintf(filename, "%s%c%s%c%s%s%s", 
-	  fts_symbol_name(pkg->dir), fts_file_separator, 
-	  "c", fts_file_separator, 
-	  fts_lib_prefix, fts_symbol_name(pkg->name), fts_lib_postfix);
-
-  if (fts_file_exists(filename)) {
-    snprintf(function, 256, "%s_config", fts_symbol_name(pkg->name));
-    ret = fts_load_library(filename, function);
-    if (ret != fts_Success) {
-      fprintf(stderr, "Error loading library of package %s: %s\n", fts_symbol_name(pkg->name), ret->description);
-    } else {
-      fprintf(stderr, "debug: loaded library %s\n", fts_symbol_name(pkg->name));
-    }
-  } else {
-    fprintf(stderr, "debug: no found no library for %s (tried %s)\n", fts_symbol_name(pkg->name), filename);
-  }
 }
 
 static void
@@ -346,8 +310,12 @@ fts_package_push(fts_package_t* pkg)
 }
 
 void 
-fts_package_pop(void)
+fts_package_pop(fts_package_t* pkg)
 {
+  if (fts_get_current_package() != pkg) {
+    post("Warning: fts_package_pop: interleaved push-pop pairs\n");
+  }
+
   if (fts_package_stack_top > 0) {
     fts_package_stack[--fts_package_stack_top] = NULL;
   }
@@ -767,6 +735,51 @@ char*
 fts_package_get_error(fts_package_t* pkg)
 {
   return pkg->error;
+}
+
+/********************************************************************
+ *
+ *   - load 
+ */
+
+void
+fts_package_load_default_files(fts_package_t* pkg)
+{
+  fts_list_t* list;
+  char filename[MAXPATHLEN];
+  char function[256];
+  fts_status_t ret;
+
+  /* load all required packages before loading anything else. This
+     package may depend on the libraries and other data loaded by the
+     required packages. */
+  list = pkg->packages;
+  while (list) {
+    fts_package_get(fts_get_symbol(fts_list_get(list)));
+    list = fts_list_next(list);
+  }
+
+  fts_package_push(pkg);
+
+  /* load the shared library */
+  sprintf(filename, "%s%c%s%c%s%s%s", 
+	  fts_symbol_name(pkg->dir), fts_file_separator, 
+	  "c", fts_file_separator, 
+	  fts_lib_prefix, fts_symbol_name(pkg->name), fts_lib_postfix);
+
+  if (fts_file_exists(filename)) {
+    snprintf(function, 256, "%s_config", fts_symbol_name(pkg->name));
+    ret = fts_load_library(filename, function);
+    if (ret != fts_Success) {
+      fprintf(stderr, "Error loading library of package %s: %s\n", fts_symbol_name(pkg->name), ret->description);
+    } else {
+      fprintf(stderr, "debug: loaded library %s\n", fts_symbol_name(pkg->name));
+    }
+  } else {
+    fprintf(stderr, "debug: no found no library for %s (tried %s)\n", fts_symbol_name(pkg->name), filename);
+  }
+
+  fts_package_pop(pkg);
 }
 
 /********************************************************************

@@ -212,7 +212,6 @@ fts_bmax_find_objidx_in_selection(fts_object_t *obj, fts_selection_t *sel)
      */
 
   int i, idx;
-  fts_object_t  *p;
 
   idx = 0;
 
@@ -406,8 +405,6 @@ static void fts_bmax_code_return(fts_bmax_file_t *f)
 {
   /* RETURN */
 
-  fts_word_t w;
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tRETURN\n");
 #endif
@@ -432,9 +429,6 @@ void fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
 void fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 {
   /* PUSH_FLOAT <float> */
-
-  fts_word_t w;
-  fts_word_t fw;
 
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPUSH_FLOAT %f\n", value);
@@ -479,9 +473,6 @@ void fts_bmax_code_set_int(fts_bmax_file_t *f, int value)
 void fts_bmax_code_set_float(fts_bmax_file_t *f, float value)
 {
   /* SET_FLOAT <float> */
-
-  fts_word_t w;
-  fts_word_t fw;
 
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tSET_FLOAT %f\n", value);

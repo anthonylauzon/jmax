@@ -118,6 +118,8 @@ extern "C" {
 #include <fts/audio.h>
 #include <fts/bytestream.h>
 
+#include <fts/project.h>
+
 #include <fts/client.h>
 #include <fts/OLDclient.h>
 

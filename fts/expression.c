@@ -434,8 +434,6 @@ void fts_expression_state_free(fts_expression_state_t *e)
 
 static int fts_expression_eval_one(fts_expression_state_t *e)
 {
-  int ret;
-  int i;
   int op_stack_tos;
   int value_stack_tos;
   enum {waiting_arg, waiting_op, expression_end} status; 
@@ -707,8 +705,6 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 static int fts_expression_eval_simple(fts_expression_state_t *e)
 {
-  int ret;
-  int i;
   int op_stack_tos;
   int value_stack_tos;
   enum {waiting_arg, waiting_op, expression_end} status; 

@@ -55,7 +55,6 @@ static int unique_count = 3333; /* the unique number generation */
 fts_patlex_t *
 fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
 {
-  fts_patlex_t *this;
   FILE *file;
 
   file  = fopen(filename, "rb");
@@ -809,7 +808,6 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 	  if (token_sym_equals(in, fts_s_vpatcher))
 	    {
-	      fts_atom_t a;
 	      fts_atom_t description[1];
 
 	      fts_patlex_push_back(in);

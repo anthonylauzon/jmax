@@ -55,11 +55,12 @@ fts_package_t* fts_get_current_package(void);
 void fts_package_push(fts_package_t* pkg);
 
 /**
- * Removes the current package from the stack.
+ * Removes the current package from the stack. 
  *
  * @fn void fts_package_pop(void);
+ * @param pkg the package
  * @ingroup package */
-void fts_package_pop(void);
+void fts_package_pop(fts_package_t* pkg);
 
 /**
  * Loads a jmax file as a package

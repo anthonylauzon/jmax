@@ -602,7 +602,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       fts_set_symbol(a, sym_load);
       fts_set_symbol(a + 1, sym_open_file);
-      fts_set_symbol(a + 2, fts_get_project_dir());
+      fts_set_symbol(a + 2, fts_project_get_dir());
       fts_set_symbol(a + 3, fts_new_symbol(" "));
       fts_client_send_message(o, fts_s_openFileDialog, 4, a);
     }

@@ -100,10 +100,11 @@ fts_dirname(const char *name, char* buf, int size)
 {
   int len = strlen(name);
   
-  snprintf(buf, len, "%s", name);
+  snprintf(buf, size, "%s", name);
   while (--len >= 0) {
     if (buf[len] == fts_file_separator) {
       buf[len] = 0;
+      break;
     }
   }
 }
@@ -239,9 +240,6 @@ fts_find_file(fts_list_t* paths, const char* filename, char* buf, int len)
 /* global search path */
 static fts_symbol_t fts_search_path = 0;
 
-/* global project path */
-static fts_symbol_t fts_project_dir = 0;
-
 static const char *
 splitpath( const char *path, char *result, char sep)
 {
@@ -272,19 +270,6 @@ fts_symbol_t
 fts_get_search_path()
 {
   return fts_search_path;
-}
-
-fts_symbol_t
-fts_get_project_dir(void)
-{
-  if (fts_project_dir)
-    return fts_project_dir;
-  else
-    {
-      char buf[1024];
-
-      return fts_new_symbol(getcwd(buf, 1024));
-    }
 }
 
 int 
@@ -342,8 +327,8 @@ fts_file_get_read_path(const char *path, char *full_path)
 	  
 	  if (fts_path_is_absolute(begin)) /* absolute default path */
 	    buf[0] = '\0';
-	  else if (fts_get_project_dir())
-	    strcpy(buf, fts_symbol_name(fts_get_project_dir()));
+	  else if (fts_project_get_dir())
+	    strcpy(buf, fts_symbol_name(fts_project_get_dir()));
 	  else
 	    begin = 0; /* invalid directory */
 
@@ -367,11 +352,11 @@ fts_file_get_read_path(const char *path, char *full_path)
       
       /* look in project directory itself */
       
-      if (fts_get_project_dir())
+      if (fts_project_get_dir())
 	{
 	  char buf[1024];
 
-	  strcpy(buf, fts_symbol_name(fts_get_project_dir()));
+	  strcpy(buf, fts_symbol_name(fts_project_get_dir()));
 	  strcat(buf, "/");
 	  strcat(buf, path);
 	  
@@ -396,9 +381,9 @@ void fts_file_get_write_path(const char *path, char *full_path)
 	strcpy(full_path, path); /* path is absolute (just copied) */
       else
 	{
-	  if (fts_get_project_dir())
+	  if (fts_project_get_dir())
 	    {
-	      strcpy(full_path, fts_symbol_name(fts_get_project_dir()));
+	      strcpy(full_path, fts_symbol_name(fts_project_get_dir()));
 	      strcat(full_path, "/");
 	    }
 	  else

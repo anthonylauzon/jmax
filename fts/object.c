@@ -99,7 +99,6 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   fts_status_t status;
   fts_class_t *cl;
   fts_object_t *obj;
-  int i;
 
   if (fts_get_symbol(at) == fts_s_patcher)
     {
@@ -192,7 +191,6 @@ fts_object_t *
 fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 {
   fts_object_t  *obj = 0;
-  fts_metaclass_t *mcl;
   fts_symbol_t  var;
   fts_expression_state_t *e = 0;
   fts_atom_t state;
@@ -487,8 +485,6 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 static void 
 fts_object_unbind(fts_object_t *obj)
 {
-  int outlet, inlet;
-
   /* Unbind it from its variable if any */
   if (fts_object_get_variable(obj))
     fts_variable_undefine(obj->patcher, fts_object_get_variable(obj), obj);
@@ -844,8 +840,6 @@ fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name,
 void 
 fts_object_reset_description(fts_object_t *obj)
 {
-  int i;
-
   if (obj->argv)
     {
       fts_free( obj->argv);
@@ -1103,7 +1097,6 @@ fts_object_move_properties(fts_object_t *old, fts_object_t *new)
 void 
 fts_object_blip(fts_object_t *obj, const char *format , ...)
 {
-  fts_atom_t a;
   va_list ap;
   char buf[512];
 

@@ -318,7 +318,7 @@ sequence_import_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_t s
       
   fts_set_symbol(a, seqsym_import_midi);
   fts_set_symbol(a + 1, fts_new_symbol("Import standard MIDI file"));
-  fts_set_symbol(a + 2, fts_get_project_dir());
+  fts_set_symbol(a + 2, fts_project_get_dir());
   fts_set_symbol(a + 3, default_name);
   fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
 }

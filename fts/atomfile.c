@@ -403,7 +403,6 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
 {
   char buf[1024];
   int offset = 0;
-  int i;
 
   if (!IS_SEPARATOR(separator))
     separator = ' ';

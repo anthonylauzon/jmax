@@ -143,9 +143,7 @@ static void
 oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   oldclient_t *this = (oldclient_t *)o;
-  fts_atom_t a;
   struct sockaddr_in my_addr;
-  char *address;
   unsigned short port = 2023;
   const char *host = "127.0.0.1";
   struct hostent *hostptr;
@@ -1165,8 +1163,6 @@ static void update_group_end(void)
 
 static void fts_client_updates_sched(fts_alarm_t *alarm, void *arg)
 {
-  fts_object_t *obj;
-  fts_symbol_t property;
   int update_count;
 
   if (changes_queue_head)
@@ -1199,9 +1195,6 @@ static void fts_client_updates_sched(fts_alarm_t *alarm, void *arg)
 
 void fts_client_updates_sync(void)
 {
-  fts_object_t *obj;
-  fts_symbol_t property;
-
   if (changes_queue_head)
     {
       update_group_start();
@@ -1576,7 +1569,6 @@ fts_mess_client_download_object(int ac, const fts_atom_t *av)
   if (ac == 1 && fts_is_object(&av[0]))
     {
       fts_object_t *object;
-      fts_object_t *p;
 
       object = (fts_object_t *) fts_get_object(&av[0]);
 
@@ -1607,7 +1599,6 @@ fts_mess_client_download_connection(int ac, const fts_atom_t *av)
   if (ac == 1 && fts_is_connection(&av[0]))
     {
       fts_connection_t *connection;
-      fts_object_t *p;
 
       connection = (fts_connection_t *) fts_get_connection(&av[0]);
 
@@ -1795,7 +1786,6 @@ fts_mess_client_new_connection(int ac, const fts_atom_t *av)
       int inlet, outlet;
       int id;
       fts_object_t *from, *to;
-      fts_status_t ret;
 
       id     = fts_get_int(&av[0]);
       from   = fts_get_object(&av[1]);

@@ -70,7 +70,6 @@ void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *
 {
   fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_objectlist_cell_t *p;
-  fts_atom_t a[1];
 
   for ( p = fts_objectlist_get_head( &channel->targets); p; p = fts_objectlist_get_next(p) )
     {

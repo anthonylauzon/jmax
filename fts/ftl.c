@@ -735,7 +735,6 @@ static int ftl_program_compile_portable( ftl_program_t *prog)
   ftl_subroutine_t *subr;
   fts_status_t ret;
   struct compile_info_portable info;
-  int pc;
 
   if ( !ftl_program_allocate_signals( prog))
     return 0;
@@ -1074,7 +1073,6 @@ void ftl_program_run( ftl_program_t *prog )
 fts_object_t *ftl_program_get_current_object( ftl_program_t *prog)
 {
   ftl_subroutine_t *subr;
-  int pc;
 
   subr = prog->subroutine_tos;
   if (subr && subr->pc >= 0)

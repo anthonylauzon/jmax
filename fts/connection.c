@@ -254,9 +254,6 @@ void
 fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
 {
   int inlet, outlet;
-  fts_atom_t at[1];
-  fts_patcher_t *patcher;
-  int id;
 
   /* reproduce in new, and delete in old,  
      all the old outgoing connections */
@@ -368,8 +365,6 @@ void
 fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
 {
   int outlet;
-  fts_patcher_t *patcher;
-
 
   for (outlet = outlets; outlet < obj->head.cl->noutlets; outlet++)
     {

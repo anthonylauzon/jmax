@@ -55,14 +55,16 @@ typedef struct {
 static void
 clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+#if WIN32  
+  fts_clipboard_t *this  = (fts_clipboard_t *) o;
+
+  this->file = tmpfile();
+#else
   const char *tmp;
   const char *name;
   char buf[1024];
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
-#if WIN32  
-  this->file = tmpfile();
-#else
   if (ac == 1)
     name = "clipboard";
   else

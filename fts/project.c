@@ -23,6 +23,11 @@
 #include <fts/fts.h>
 #include <fts/project.h>
 #include <ftsprivate/package.h>
+#include <ftsconfig.h>
+
+#if HAVE_DIRECT_H
+#include <direct.h>
+#endif
 
 static fts_package_t* fts_project = NULL;
 static fts_symbol_t sym_project = NULL;
@@ -40,7 +45,7 @@ fts_project_open(const char* filename)
 
   fprintf(stderr, "opening project %s\n", filename);
   
-  fts_package_load_from_file(sym_project, filename);
+  fts_project = fts_package_load_from_file(sym_project, filename);
 
   /* make the project the current package context */
   fts_package_push(fts_project);
@@ -64,7 +69,7 @@ fts_project_close(void)
   }
 
   /* pop the project of the package context stack */
-  fts_package_pop();
+  fts_package_pop(fts_project);
   
   fts_package_delete(fts_project);
   fts_project = NULL; 
@@ -79,6 +84,8 @@ fts_project_set(fts_package_t* p)
     fts_project_close();
   }
 
+  fts_project = p;
+
   /* make the project the current package context */
   fts_package_push(fts_project);  
 }
@@ -87,4 +94,16 @@ fts_package_t*
 fts_project_get(void)
 {
   return fts_project;
+}
+
+fts_symbol_t
+fts_project_get_dir(void)
+{
+  if ((fts_project != NULL ) && (fts_package_get_dir(fts_project) != NULL)) {
+    return fts_package_get_dir(fts_project);
+  } else {
+    char buf[1024];
+    
+    return fts_new_symbol_copy(getcwd(buf, 1024));
+  }
 }
