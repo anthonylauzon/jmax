@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.image.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -54,6 +55,9 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   public final static int INCR_MODE   = 3;
   private int editMode = NOEDIT_MODE;
 
+  private BufferedImage buff;
+  private Graphics2D buffG;
+
   public NumberBox(FtsGraphicObject theFtsObject, String filter) 
   {
     super(theFtsObject);
@@ -61,6 +65,21 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     currentText = new StringBuffer();
 
     this.filter = filter;
+
+    updateOffScreenBuffer();
+  }
+
+  void updateOffScreenBuffer()
+  {
+    int h = getHeight() - 2;
+    if( h <= 0) h = DEFAULT_HEIGHT - 2;
+    
+    int w = getWidth() - h/2 - 3;
+    if( w <= 0) w = DEFAULT_WIDTH - h/2 - 3;
+
+    buff = new BufferedImage( w, h, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
+    buffG.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
   }
 
   public void setDefaults()
@@ -91,12 +110,15 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
       theWidth = minWidth;
 
     super.setWidth( theWidth);
+
+    updateOffScreenBuffer();
   }
 
   // redefined from base class
   // This way, changing the height from outside is forbidden
   public void setHeight( int theHeight)
   {
+    updateOffScreenBuffer();
   }
 
   // redefined from base class
@@ -109,6 +131,14 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
       super.setWidth( minWidth);
 
     super.setHeight(getMinHeight());
+
+    updateOffScreenBuffer();
+  }
+
+  public void setCurrentFont( Font theFont)
+  {
+    super.setCurrentFont( theFont);
+    updateOffScreenBuffer();
   }
 
   public void fitToText()
@@ -120,6 +150,8 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     else  super.setWidth(full);
 
     super.setHeight(getMinHeight());
+
+    updateOffScreenBuffer();
   }
 
   public void redefined()
@@ -200,26 +232,28 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
   public void updatePaint(Graphics g) 
   {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
+    g.drawImage( buff, getX() + getHeight()/2 + 2, getY() + 1, itsSketchPad);  
+  }
+
+  public void drawContent( Graphics g, int x, int y, int w, int h) 
+  {
     int hd2 = h / 2;
     String aString;
-    
+  
     if( editMode != TEXT_MODE)
       {
 	// Fill the background
 	g.setColor( Color.white);
-	
+      
 	if(getIntZoneWidth() > 0)
 	  {
-	    g.fillRect( x+hd2+2, y+1, getIntZoneWidth()-(hd2+2), h-2);
+	    int iw = getIntZoneWidth()-(hd2+2);
+	    g.fillRect( 0, 0, iw, h);
 	    g.setColor( floatColor);
-	    g.fillRect( x+getIntZoneWidth(), y+1, w-getIntZoneWidth()-2, h-2);
+	    g.fillRect( iw, 0, w - iw, h);
 	  }
 	else
-	  g.fillRect( x+hd2+2, y+1, w-(hd2+2)-2, h-2);
+	  g.fillRect( 0, 0, w, h);
       
 	// Get the value
 	aString = getVisibleString(getValueAsText());
@@ -227,22 +261,26 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     else
       {
 	g.setColor( Color.white);
-	g.fillRect( x+hd2+2, y+1, w-(hd2+2), h-2);
+	g.fillRect( 0, 0, w, h);
       
 	aString = getVisibleString(currentText.toString());
       }
-
+      
     // Draw the value
     if( editMode == INCR_MODE)
       g.setColor( Color.gray);
     else
       g.setColor( Color.black);
     g.setFont( getFont());
-    g.drawString( aString, 
-		  x + hd2 + 5, 
-		  y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2 + 1);
+    g.drawString( aString, 3, getFontMetrics().getAscent() + (h + 2 - getFontMetrics().getHeight())/2);
   }
-
+  
+  public void updateRedraw()
+  {
+    int h = getHeight();
+    drawContent( buffG, 0, 0, getWidth()- h/2 - 3, h - 2);
+    super.updateRedraw();
+  }
 
   String getVisibleString(String theString) 
   {
