@@ -38,21 +38,67 @@ typedef struct _fmat_
 
 } fmat_t;
 
+
+/**
+ * @ingroup fmat
+ */
 DATA_API fts_symbol_t fmat_symbol;
+
+/**
+ * @ingroup fmat
+ */
 DATA_API fts_class_t *fmat_type;
 
+
+
+/** Get number of rows of matrix x.
+ *
+ * @fn int fmat_get_m(fmat_t *x)
+ * @ingroup fmat
+ */
 #define fmat_get_m(x) ((x)->m)
+
+/** Get number of columns of matrix x.
+ *
+ * @fn int fmat_get_n(fmat_t *x)
+ * @ingroup fmat
+ */
 #define fmat_get_n(x) ((x)->n)
 
+
+/**
+ * @ingroup fmat
+ */
 DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 
+/**
+ * @fn float *fmat_get_ptr(fmat_t *x)
+ * @ingroup fmat
+ */
 #define fmat_get_ptr(m) ((m)->values)
 
+
+/**
+ * @fn float *fmat_get_element(fmat_t *x, int i, int j)
+ * @ingroup fmat
+ */
 #define fmat_get_element(m, i, j) ((m)->values[(i) * (m)->n + (j)])
+
+/**
+ * @fn float *fmat_set_element(fmat_t *x, int i, int j, float val)
+ * @ingroup fmat
+ */
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
 
+
+/**
+ * @ingroup fmat
+ */
 DATA_API void fmat_set_const(fmat_t *mat, float c);
 
+/**
+ * @ingroup fmat
+ */
 DATA_API void fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
 
 #endif
