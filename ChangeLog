@@ -1,3 +1,7 @@
+2002-12-10  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* (re)added templates. Changed expression.c for object evaluation.
+
 2002-12-09  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* Split audio.h into audio.h, audioconfig.h and audiolabel.h

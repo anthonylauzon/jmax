@@ -20,27 +20,6 @@
  * 
  */
 
-
-/*
- * Handling of looking up for new templates.
- * 
- * We handle a table of direct declarations (name --> file)
- * and a table of search directory.
- *
- * The table of direct declarations actually contains a template
- * declaration object, including the file name, and possibly 
- * a cache of the declaration text.
- *
- * There is only one group of search path (at least, for the moment)
- * and when an template is found, a new declaration is dynamically
- * created, this to avoid searching again; also, in the short future,
- * the template text can be cached under some condition (size of the
- * text, global cache size limits, ...)
- *
- * Later, the fts_template will also include a table of pointers
- * to all the instances, to allow dynamic redefinition
- */
-
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
@@ -62,21 +41,9 @@
 #include <ftsprivate/package.h>
 #include <ftsprivate/template.h>
 
-/*  #define TEMPLATE_DEBUG  */
-
-/*
- * globals variable
- */
 static fts_heap_t *template_heap;
 
 static void fts_template_recompute_instances(fts_template_t *template);
-static fts_object_t *fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
-
-/***********************************************************************
- *
- *  Template object functions
- *
- */
 
 fts_template_t *fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
 {
@@ -90,13 +57,6 @@ fts_template_t *fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_s
   template->instances = 0;
   template->package = 0;
 
-#ifdef TEMPLATE_DEBUG 
-  {
-    const char* file = (filename)? filename : (original_filename)? original_filename : "unknown"; 
-    fts_log( "[template]: New template %s, file %s\n", name, file); /* @@@ */
-  }
-#endif
-
   return template;
 }
 
@@ -107,13 +67,8 @@ fts_template_redefine(fts_template_t *template, fts_symbol_t filename)
   fts_template_recompute_instances(template);
 }
 
-/*
- * The real template loader: load the template, looking in the
- * declaration and path table
- *
- */
-static fts_object_t*
-fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+fts_object_t *
+fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
 
@@ -123,10 +78,15 @@ fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int
 
   fts_package_pop(template->package);
     
-  /* flag the patcher as template, and set the template */
-  if (obj) 
-    fts_patcher_set_template((fts_patcher_t *)obj, template);
-  
+  if (obj)
+    {
+      fts_patcher_set_template((fts_patcher_t *)obj, template);
+
+      fts_object_set_description(obj, ac, at);
+
+      fts_template_add_instance( template, obj);
+    }
+
   return obj;
 }
 
@@ -135,10 +95,6 @@ static void
 fts_template_recompute_instances(fts_template_t *template)
 {
   fts_list_t* list;
-
-#ifdef TEMPLATE_DEBUG 
-  fts_log("Recomputing instances of template %s\n", template->name); /* @@@ */
-#endif
 
   list = template->instances;
   template->instances = NULL;
@@ -150,10 +106,6 @@ fts_template_recompute_instances(fts_template_t *template)
     
     list = fts_list_next(list);
   }
-
-#ifdef TEMPLATE_DEBUG 
-  fts_log("Done.\n");
-#endif
 }
 
 
@@ -164,10 +116,6 @@ fts_template_add_instance(fts_template_t *template, fts_object_t *object)
 
   fts_set_object(a, object);
   template->instances = fts_list_prepend(template->instances, a);
-       
-#ifdef TEMPLATE_DEBUG 
-  fts_log("Adding instance to template %s : \n", template->filename); /* @@@ */
-#endif
 }
 
 void 
@@ -177,85 +125,7 @@ fts_template_remove_instance(fts_template_t *template, fts_object_t *object)
 
   fts_set_object(a, object);
   template->instances = fts_list_remove(template->instances, a);
-
-#ifdef TEMPLATE_DEBUG 
-  fts_log("Removing instance from template %s : \n", template->filename); 
-#endif
 }
-
-/***********************************************************************
- *
- *  Global template functions
- *
- */
-
-fts_object_t *fts_template_new_declared( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  fts_template_t *template;
-  fts_package_t *pkg;
-  fts_iterator_t pkg_iter;
-  fts_atom_t pkg_name;
-
-  pkg = fts_get_current_package();
-  template = fts_package_get_declared_template(pkg, fts_get_symbol(&at[0]));
-
-  if (template)
-    return fts_make_template_instance(template, patcher, ac, at);
-  
-  /* ask the required packages of the current package */
-  fts_package_get_required_packages(pkg, &pkg_iter);
-
-  while ( fts_iterator_has_more( &pkg_iter)) 
-    {
-      fts_iterator_next( &pkg_iter, &pkg_name);
-      pkg = fts_package_get(fts_get_symbol(&pkg_name));
-      
-      if (pkg == NULL)
-	continue;
-      
-      template = fts_package_get_declared_template(pkg, fts_get_symbol(&at[0]));
-
-      if (template)
-	return fts_make_template_instance(template, patcher, ac, at);
-    }
-  
-  return 0;
-}
-
-fts_object_t*
-fts_template_new_search(fts_patcher_t *patcher,	int ac, const fts_atom_t *at)
-{
-  fts_template_t *template;
-  fts_package_t *pkg;
-  fts_iterator_t pkg_iter;
-  fts_atom_t pkg_name;
-
-  pkg = fts_get_current_package();
-  template = fts_package_get_template_in_path(pkg, fts_get_symbol(&at[0]));
-
-  if (template)
-    return fts_make_template_instance(template, patcher, ac, at);
-  
-  /* ask the required packages of the current package */
-  fts_package_get_required_packages(pkg, &pkg_iter);
-
-  while ( fts_iterator_has_more( &pkg_iter)) 
-    {
-      fts_iterator_next( &pkg_iter, &pkg_name);
-      pkg = fts_package_get(fts_get_symbol(&pkg_name));
-      
-      if (pkg == NULL)
-	continue;
-      
-      template = fts_package_get_template_in_path(pkg, fts_get_symbol(&at[0]));
-
-      if (template)
-	return fts_make_template_instance(template, patcher, ac, at);
-    }
-  
-  return 0;
-}
-
 
 /* redefine the template corresponding to a given file */
 void 
@@ -272,10 +142,6 @@ fts_template_file_modified(fts_symbol_t filename)
   realpath( filename, buf);
   filename = fts_new_symbol(buf);
 
-#ifdef TEMPLATE_DEBUG 
-  fts_log("File %s modified.\n", filename);
-#endif
-
   fts_get_packages( &pkg_iter);
   
   while ( fts_iterator_has_more( &pkg_iter)) {
@@ -285,12 +151,8 @@ fts_template_file_modified(fts_symbol_t filename)
 
     template = fts_package_get_template_from_file(pkg, filename);
 
-    if (template) {
-#ifdef TEMPLATE_DEBUG 
-      fts_log("Then Redefining Instances.\n");
-#endif
+    if (template)
       fts_template_recompute_instances(template);
-    }
   }
 }
 

@@ -28,6 +28,8 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/parser.h>
 #include <ftsprivate/message.h>
+#include <ftsprivate/package.h>
+#include <ftsprivate/template.h>
 #include "parser.h"
 
 static fts_heap_t *expression_heap;
@@ -347,13 +349,85 @@ static void expression_stack_init( fts_expression_t *exp)
     return operand_type_mismatch_error;								  \
   expression_stack_pop( exp, 1);
 
+/*
+ * Utility functions for creating objects
+ */
+static fts_object_t *create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, int skip)
+{
+  fts_template_t *template;
+  fts_class_t *cl;
+
+  if ((template = fts_package_get_declared_template( package, class_name)) != NULL)
+    return fts_template_make_instance( template, patcher, ac, at);
+
+  if ((cl = fts_package_get_class( package, class_name)) != NULL)
+    return fts_object_create( cl, patcher, ac-skip, at+skip);
+
+  if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
+    return fts_template_make_instance( template, patcher, ac, at);
+
+  return NULL;
+}
+
+static fts_object_t *
+object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_package_t *pkg;
+  fts_object_t *obj;
+  fts_iterator_t iter;
+  fts_symbol_t package_name = NULL;
+  fts_symbol_t class_name;
+
+  /* is there a package name in front of the : ? */
+  if ( fts_get_symbol( at) != fts_s_colon)
+    {
+      package_name = fts_get_symbol( at);
+      class_name = fts_get_symbol( at + 2);
+
+      pkg = fts_package_get( package_name);
+      if (pkg != NULL)
+	return create_instance_in_package( pkg, patcher, class_name, ac, at, 3);
+
+      return NULL;
+    }
+
+  class_name = fts_get_symbol( at + 1);
+
+  /* 1) ask kernel package */
+  pkg = fts_get_system_package();
+  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2)) != NULL)
+    return obj;
+
+  /* 2) ask the current package */
+  pkg = fts_get_current_package();
+  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2)) != NULL)
+    return obj;
+
+  /* 3) ask the required packages of the current package */
+  fts_package_get_required_packages( pkg, &iter);
+
+  while ( fts_iterator_has_more( &iter)) 
+    {
+      fts_atom_t a;
+
+      fts_iterator_next( &iter, &a);
+
+      pkg = fts_package_get( fts_get_symbol( &a));
+      if (pkg == NULL)
+	continue;
+
+      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2)) != NULL)
+	return obj;
+  }
+
+  return NULL;
+}
 
 fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_patcher_t *scope, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data, int toplevel)
 {
   int ac;
   fts_atom_t *at, *top, ret[1];
   fts_status_t status;
-  fts_class_t *cl;
   fts_object_t *obj;
 
   if (!tree)
@@ -455,40 +529,41 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     break;
 
   case TK_COLON:
-    /* is class cached ? */
-    if (fts_is_object( &tree->value))
-      cl = (fts_class_t *)fts_get_object( &tree->value);
-    else
-      {
-	fts_symbol_t package_name = (tree->left) ? fts_get_symbol( &tree->left->value) : NULL;
-	fts_symbol_t class_name = fts_get_symbol( &tree->value);
+    {
+      fts_atom_t a[1];
 
-	cl = fts_class_get_by_name( package_name, class_name);
+      expression_stack_push_frame( exp);
 
-	if ( !cl)
-	  return undefined_class_error;
+      /* package name */
+      if (tree->left)
+	expression_stack_push( exp, &tree->left->value);
 
-	fts_set_object( &tree->value, cl);
-      }
+      /* colon */
+      fts_set_symbol( a, fts_s_colon);
+      expression_stack_push( exp, a);
 
-    expression_stack_push_frame( exp);
-    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
-      return status;
+      /* class name */
+      expression_stack_push( exp, &tree->value);
 
-    ac = expression_stack_frame_count( exp);
-    at = expression_stack_frame( exp);
+      if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
+	return status;
 
-    obj = fts_object_create( cl, scope, ac, at);
-    if (obj)
-      {
-	fts_object_refer( obj);
-	fts_set_object( ret, obj);
-      }
-    else
-      fts_set_void( ret);
+      ac = expression_stack_frame_count( exp);
+      at = expression_stack_frame( exp);
 
-    expression_stack_pop_frame( exp);
-    expression_stack_push( exp, ret);
+      obj = object_or_template_create( scope, ac, at);
+
+      if (obj)
+	{
+	  fts_object_refer( obj);
+	  fts_set_object( ret, obj);
+	}
+      else
+	fts_set_void( ret);
+
+      expression_stack_pop_frame( exp);
+      expression_stack_push( exp, ret);
+    }
 
     break;
 

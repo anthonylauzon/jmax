@@ -995,7 +995,7 @@ static void client_load_summary( fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   client_t *this = (client_t *)o;  
   fts_symbol_t file_name = fts_get_symbol( at);
-  fts_patcher_t *summary = get_patcher_by_file_name(file_name);
+  fts_patcher_t *summary = fts_patcher_get_by_file_name(file_name);
   
   if( summary)
     fts_client_send_message((fts_object_t *)summary, fts_s_openEditor, 0, 0);

@@ -198,6 +198,10 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   data.obj = NULL;
   data.patcher = patcher;
 
+  /* 
+     FIXME ??? should it be removed ? the .jmax loader adds the :, so this is usefull only for
+     the GUI evaluation ?
+  */
   if ( (fts_is_symbol( at) && fts_get_symbol( at) == fts_s_colon) 
        || (ac >= 2 && fts_is_symbol( at+1) && fts_get_symbol( at+1) == fts_s_colon))
     {
