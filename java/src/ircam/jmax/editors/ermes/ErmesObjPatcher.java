@@ -21,12 +21,13 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
   String pathForLoading;
-	
+ 
   //--------------------------------------------------------
   // Constructor
   //--------------------------------------------------------
   public ErmesObjPatcher(){
     super();
+    HEIGHT_DIFF = 10;
   }
 	
   //--------------------------------------------------------

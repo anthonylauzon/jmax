@@ -13,7 +13,7 @@ import ircam.jmax.fts.*;
 	
 	
   final int WIDTH_DIFF = 14;
-  final int HEIGHT_DIFF = 2;
+  int HEIGHT_DIFF = 2;
 	
   protected int FIELD_HEIGHT;
   Dimension preferredSize = null;

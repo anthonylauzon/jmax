@@ -802,7 +802,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
     }
 
-      System.err.println("Paste end ");
   }
   
   
