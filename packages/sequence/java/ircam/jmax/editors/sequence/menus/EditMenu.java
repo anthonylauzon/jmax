@@ -78,14 +78,14 @@ public class EditMenu extends EditorMenu
     Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
 
-    if(SequenceSelection.getCurrent().isSelectionEmpty())
+    if((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()))
       {
 	//Empty selection	
 	cutItem.setEnabled(false);
 	copyItem.setEnabled(false);
 	duplicateItem.setEnabled(false);
       }
-    else /*if(ErmesSelection.patcherSelection.getOwner() == container)*/
+    else
       {
 	// Object selection
 	cutItem.setEnabled(true);
