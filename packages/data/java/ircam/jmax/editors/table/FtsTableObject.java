@@ -233,22 +233,25 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 
   public void setPixels(int nArgs , FtsAtom args[])
   {
-    int i = 0;      
+    int i = 0;
+    int j = 0;
     pixelsSize = args[0].intValue;    
     t_pixels = new double[pixelsSize + 10];
     b_pixels = new double[pixelsSize + 10];
 
     if( isIvec())
-      for(i = 0; i<nArgs-2; i+=2)
+      for(i = 0; i < nArgs-2; i+=2)
 	{	
-	  t_pixels[i] = (double)args[i+1].intValue;
-	  b_pixels[i] = (double)args[i+2].intValue;
+	  t_pixels[j] = (double)args[i+1].intValue;
+	  b_pixels[j] = (double)args[i+2].intValue;
+	  j++;
 	}
     else
       for(i = 0; i<nArgs-2; i+=2)
 	{
-	  t_pixels[i] = args[i+1].doubleValue;
-	  b_pixels[i] = args[i+2].doubleValue;
+	  t_pixels[j] = args[i+1].doubleValue;
+	  b_pixels[j] = args[i+2].doubleValue;
+	  j++;
 	}
     if(pixelsSize <= nArgs-1)
       notifySet();
