@@ -21,11 +21,9 @@ helpPatch sinh~ $dir/trigon~.help.jmax
 helpPatch cosh~ $dir/trigon~.help.jmax
 helpPatch tanh~ $dir/trigon~.help.jmax
 
-## io (5)
+## io (3)
 helpPatch adc~ $dir/adc~.help.jmax
 helpPatch dac~ $dir/adc~.help.jmax
-helpPatch readsf~ $dir/sf~.help.jmax
-helpPatch writesf~ $dir/sf~.help.jmax
 helpPatch print~ $dir/print~.help.jmax
 
 ## misc math (7)

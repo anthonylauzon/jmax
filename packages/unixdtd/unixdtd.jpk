@@ -30,4 +30,6 @@ package provide unixdtd
 global jmaxArch jmaxMode
 ucs load module unixdtd $dir/lib/$jmaxArch/$jmaxMode/libunixdtd.so
 
-post "package: unixdtd (Direct-To-Disk devices, Unix version)"
+sourceFile $dir/help/unixdtd.help.index.tcl
+
+post "package: unixdtd (direct-to-disk classes for unix)"
