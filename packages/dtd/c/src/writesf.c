@@ -82,7 +82,7 @@ static void create_writer_thread(writesf_t* self)
     if (0 == thread_job->method)
     {
 	fts_log("[readsf~] no such method \n");
-	fts_object_set_error((fts_object_t*)self, "no such method, init failed \n");
+	fts_object_error((fts_object_t*)self, "no such method, init failed \n");
 	fts_free(thread_job);
 	return;
     }
@@ -357,9 +357,9 @@ writesf_instantiate(fts_class_t* cl)
     fts_class_message_varargs(cl, fts_s_stop, writesf_stop);
     fts_class_message_varargs(cl, s_pause, writesf_pause);
 
+    fts_class_inlet_thru(cl, 0);
 
-   fts_dsp_declare_inlet(cl, 0);
-
+    fts_dsp_declare_inlet(cl, 0);
     fts_dsp_declare_function(writesf_symbol, writesf_dsp);
 }
 

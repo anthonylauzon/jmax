@@ -248,7 +248,7 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   if(!this->server)
     {
-      fts_object_set_error( o, "error starting direct-to-disk server");
+      fts_object_error( o, "error starting direct-to-disk server");
       return;
     }
 
@@ -603,7 +603,7 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if (!this->server)
     {
-      fts_object_set_error( o, "error starting direct-to-disk server");
+      fts_object_error( o, "error starting direct-to-disk server");
       return;
     }
 

@@ -32,8 +32,6 @@ extern void row_config(void);
 extern void bpf_config(void);
 extern void dict_config(void);
 
-extern void getinter_config(void);
-extern void getsize_config(void);
 extern void getrange_config(void);
 
 extern void dumpfile_config(void);
@@ -93,6 +91,12 @@ data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 void
+data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_outlet_object(o, 0, o);
+}
+
+void
 data_config(void)
 {
   vec_config();
@@ -106,8 +110,6 @@ data_config(void)
   bpf_config();
   dict_config();
 
-  getinter_config();
-  getsize_config();  
   getrange_config();  
 
   dumpfile_config();

@@ -133,7 +133,7 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     post("[jackaudioport] cannot create jack client\n"
 	 "[jackaudioport] Are you sure than jackd is running ? \n");
     fts_log("[jackaudioport] cannot create jack client \n");
-    fts_object_set_error(o, "[jackaudioport] cannot create jack client \n");
+    fts_object_error(o, "[jackaudioport] cannot create jack client \n");
     return;
   }
     
@@ -143,7 +143,7 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (NULL == self->input_buffer)
   {
     fts_log("[jackaudioport] cannot allocate memory for input buffer \n");
-    fts_object_set_error(o, "[jackaudioport] cannot allocate memory for input buffer \n");
+    fts_object_error(o, "[jackaudioport] cannot allocate memory for input buffer \n");
     return;
   }
 
@@ -151,7 +151,7 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (NULL == self->output_buffer)
   {
     fts_log("[jackaudioport] cannot allocate memory for output buffer \n");
-    fts_object_set_error(o, "[jackaudioport] cannot allocate memory for output buffer \n");
+    fts_object_error(o, "[jackaudioport] cannot allocate memory for output buffer \n");
     return;
   }
 

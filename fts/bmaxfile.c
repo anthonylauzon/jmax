@@ -398,22 +398,6 @@ static float GET_F(unsigned char *p)
   return f;
 }
 
-static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, void *data)
-{
-  fts_atom_t a;
-
-  eval_tos--;
-  eval_stack[eval_tos] = *value;
-
-  fts_set_symbol(&a, fts_s_equal);
-  eval_tos--;
-  eval_stack[eval_tos] = a;
-
-  fts_set_symbol(&a, name);
-  eval_tos--;
-  eval_stack[eval_tos] = a;
-}
-
 static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   if (version == 1 && fts_is_symbol(at))
@@ -1255,7 +1239,7 @@ fts_bmax_find_objidx(fts_object_t *obj)
   fts_object_t *p;
 
   i = 0;
-  for (p = patcher->objects; p ; p = p->next_in_patcher)
+  for (p = patcher->objects; p ; p = fts_object_get_next_in_patcher(p))
     {
       if (obj == p)
 	return i;
@@ -1629,8 +1613,8 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * the top of the stack for properties (use set instead of push)
    */
 
-  fts_bmax_code_push_atoms(f, obj->argc, obj->argv);
-  fts_bmax_code_make_obj(f, obj->argc);
+  fts_bmax_code_push_atoms(f, fts_object_get_description_size(obj), fts_object_get_description_atoms(obj));
+  fts_bmax_code_make_obj(f, fts_object_get_description_size(obj));
 
   if (objidx >= 0)
     fts_bmax_code_mv_obj(f, objidx);
@@ -1641,7 +1625,7 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
      an object with zero argument is an empty "error" object, left there by mistake
      during editing.
      */
-  if (obj->argc == 0)
+  if (fts_object_get_description_size(obj) == 0)
     fts_bmax_code_push_int(f, 0);
 
   /* Write persistent properties to the file.
@@ -1668,10 +1652,10 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
     }
 
   /* if argc is zero, we pop the 0 value pushed above */
-  if (obj->argc == 0)
+  if (fts_object_get_description_size(obj) == 0)
     fts_bmax_code_pop_args(f, 1);
   else
-    fts_bmax_code_pop_args(f, obj->argc);
+    fts_bmax_code_pop_args(f, fts_object_get_description_size(obj));
 
   /* send a dump message to the object to give it the opportunity to save its data */
   fts_set_object(&a, (fts_object_t *)saver_dumper);
@@ -1792,7 +1776,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 
   /* Code all the objects */
   i = 0;
-  for (p = patcher->objects; p ; p = p->next_in_patcher)
+  for (p = patcher->objects; p ; p = fts_object_get_next_in_patcher(p))
     {
       if (fts_object_is_patcher(p) &&
 	  (! fts_object_is_abstraction(p)) &&
@@ -1814,7 +1798,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 
   /* For each object, for each outlet, code all the connections */
   i = 0;
-  for (p = patcher->objects; p ; p = p->next_in_patcher)
+  for (p = patcher->objects; p ; p = fts_object_get_next_in_patcher(p))
     {
       int outlet;
 
@@ -1822,7 +1806,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 	{
 	  fts_connection_t *c;
 
-	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
+	  for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
 	    fts_bmax_code_new_connection(f, c, i);
 	}
 

@@ -28,18 +28,27 @@
 #define fts_object_set_definition(o, d) ((o)->definition = (d))
 #define fts_object_get_definition(o) ((o)->definition)
 
-#define fts_object_is_abstraction(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_abstraction((fts_patcher_t *) (o)))
-
-#define fts_object_is_standard_patcher(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_standard((fts_patcher_t *) (o)))
-
 #define fts_object_is_error(o) (fts_object_get_class(o) == fts_error_object_class)
 
-#define fts_object_is_template(o) (fts_object_is_patcher((o)) &&  \
-				      fts_patcher_is_template((fts_patcher_t *) (o)))
+#define fts_object_is_abstraction(o) (fts_object_is_patcher((o)) && fts_patcher_is_abstraction((fts_patcher_t *) (o)))
+#define fts_object_is_standard_patcher(o) (fts_object_is_patcher((o)) && fts_patcher_is_standard((fts_patcher_t *) (o)))
+#define fts_object_is_template(o) (fts_object_is_patcher((o)) && fts_patcher_is_template((fts_patcher_t *) (o)))
+
+#define fts_object_has_patcher_data(o) ((o)->patcher_data != NULL)
+
+#define fts_object_get_next_in_patcher(o) ((o)->patcher_data->next_in_patcher)
+#define fts_object_set_next_in_patcher(o, x) ((o)->patcher_data->next_in_patcher = (x))
+
+#define fts_object_get_inlet_connections(o, i) ((o)->patcher_data->in_conn[(i)])
+#define fts_object_get_outlet_connections(o, i) ((o)->patcher_data->out_conn[(i)])
+
+
+extern fts_object_patcher_data_t *fts_object_get_patcher_data(fts_object_t *obj);
+extern void fts_object_remove_patcher_data(fts_object_t *obj);
 
 extern void fts_object_unpatch(fts_object_t *obj);
+
+extern void fts_object_add_binding(fts_object_t *obj, fts_definition_t *def);
 
 /* support for redefinition */
 extern fts_object_t *fts_object_recompute(fts_object_t *old);

@@ -68,7 +68,7 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   
   if(delay_table_get_delbuf(name))
     {
-      fts_object_set_error(o, "name multiply defined: %s\n", name);
+      fts_object_error(o, "name multiply defined: %s\n", name);
       return;
     }
 
@@ -112,13 +112,13 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   float sr = fts_dsp_get_input_srate(dsp, 0);
   
   if(!this->name)
-    fts_object_signal_runtime_error(o, "unnamed delwrite~\n");
+    fts_object_error(o, "unnamed delwrite~\n");
 
   if(delbuf_is_init(this->buf))
     {
       if(delbuf_get_tick_size(this->buf) != n_tick)
 	{
-	  fts_object_signal_runtime_error(o, "write sample rate does not match with delay line %s\n", this->name);
+	  fts_object_error(o, "write sample rate does not match with delay line %s\n", this->name);
 	  return;
 	}
     }

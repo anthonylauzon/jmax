@@ -47,7 +47,8 @@ enum data_object_persistence {data_object_persistence_args = -1, data_object_per
 
 DATA_API void data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 DATA_API void data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
+DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+  
 DATA_API void data_object_set_dirty(fts_object_t *o);
 
 DATA_API void data_object_init(fts_object_t *o);

@@ -106,6 +106,8 @@ fts_symbol_t fts_get_root_directory( void)
 {
   fts_symbol_t r;
 
+  return fts_new_symbol("/Users/schnell/Projects/jmax/macosxbuild/jMaxProject/build/jMax.app/Contents/Resources/share/jmax"); /* @@@@@ */
+  
   /* get it from command line */
   r = fts_cmd_args_get( fts_new_symbol( "root"));
   
@@ -124,6 +126,8 @@ void fts_load_project( void)
 
   project_symbol = fts_new_symbol( "project");
 
+  project_file = fts_new_symbol("/Users/schnell/Projects/jmax/macosxbuild/jMaxProject/build/jMax.app/Contents/Resources/share/jmax/config.jprj"); /* @@@@@ */
+  
   /* check if the user specified a project file on the command line  */
   project_file = fts_cmd_args_get( project_symbol);
 

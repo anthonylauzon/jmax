@@ -62,33 +62,42 @@ vec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-vec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vec_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
+  fts_atom_t a;
 
-  if(ac > 0 && fts_is_number(at))
-    {
-      int size = fts_get_number_int(at);
-      
-      if(size >= 0)
-	{
-	  int old_size = vec_get_size(this);
-	  int i;
-	  
-	  vec_set_size(this, size);
+  fts_set_int(&a, vec_get_size(this));
+  fts_return(&a);
+}
 
-	  /* set newly allocated region to void */
-	  for(i=old_size; i<size; i++)
-	    fts_set_void(this->data + i);
-	}
-    }
-  else
-    {
-      fts_atom_t a;
+static void
+vec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+  int size = fts_get_number_int(at);
 
-      fts_set_int(&a, vec_get_size(this));
-      fts_return(&a);
-    }
+  if(size >= 0)
+  {
+    int old_size = vec_get_size(this);
+    int i;
+
+    vec_set_size(this, size);
+
+    /* set newly allocated region to void */
+    for(i=old_size; i<size; i++)
+      fts_set_void(this->data + i);
+  }
+}
+
+static void
+vec_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+  int index = fts_get_int_arg(ac, at, 0, -1);
+
+  if (index >= 0 && index < vec_get_size(this))
+    fts_return(vec_get_element(this, index));
 }
 
 static void
@@ -403,7 +412,7 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       data_object_persistence_args(o);
     }
   else
-    fts_object_set_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 static void
@@ -437,10 +446,18 @@ vec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_fill, vec_fill);      
   fts_class_message_varargs(cl, fts_s_set, vec_set_elements);
   
-  fts_class_message_varargs(cl, fts_s_size, vec_size);
-  
   fts_class_message_varargs(cl, fts_s_import, vec_import); 
-  fts_class_message_varargs(cl, fts_s_export, vec_export); 
+  fts_class_message_varargs(cl, fts_s_export, vec_export);
+
+  fts_class_message_void(cl, fts_s_size, vec_return_size);
+  fts_class_message_number(cl, fts_s_size, vec_change_size);
+
+  fts_class_message_number(cl, fts_s_get_element, vec_return_element);
+  
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

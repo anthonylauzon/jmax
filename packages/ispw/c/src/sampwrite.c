@@ -64,7 +64,7 @@ sampwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_dsp_object_init((fts_dsp_object_t *)o);
     }
   else
-    fts_object_set_error(o, "name argument required");
+    fts_object_error(o, "name argument required");
 }
 
 static void
@@ -72,8 +72,10 @@ sampwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   sampwrite_t *this = (sampwrite_t *)o;
 
-  ftl_data_free(this->sampwrite_data);
-  fts_dsp_object_delete((fts_dsp_object_t *)o);
+  if(this->sampwrite_data != NULL)
+    ftl_data_free(this->sampwrite_data);
+ 
+ fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 /******************************************************************

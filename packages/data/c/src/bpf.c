@@ -453,6 +453,68 @@ bpf_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
+static void
+bpf_return_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+  int size = bpf_get_size(this);
+  double ret = 0.0;
+
+  if(size > 0)
+  {
+    double time = fts_get_number_float(at);
+
+    if(time < bpf_get_time(this, 0))
+    {
+      this->index = 0;
+      ret = bpf_get_value(this, 0);
+    }
+    else if(time >= bpf_get_duration(this))
+    {
+      this->index = size - 1;
+      ret = bpf_get_target(this);
+    }
+    else
+    {
+      int index = this->index;
+
+      if(index > size - 2)
+        index = size - 2;
+
+      /* search index */
+      if(time >= bpf_get_time(this, index + 1))
+      {
+        index++;
+
+        while(time >= bpf_get_time(this, index + 1))
+          index++;
+      }
+      else if(time < bpf_get_time(this, index))
+      {
+        index--;
+
+        while(time < bpf_get_time(this, index))
+          index--;
+      }
+      else if(bpf_get_slope(this, index) == DBL_MAX)
+      {
+        index++;
+
+        while(bpf_get_slope(this, index) == DBL_MAX)
+          index++;
+      }
+
+      /* remember new index */
+      this->index = index;
+
+      /* return interpolated value */
+      ret = bpf_get_value(this, index) + (time - bpf_get_time(this, index)) * bpf_get_slope(this, index);
+    }
+  }
+
+  fts_return_float(ret);
+}
+
 /************************************************************
  *
  *  client methods
@@ -670,6 +732,13 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_clear, bpf_set_clear);
   fts_class_message_varargs(cl, fts_s_set, bpf_set);
   fts_class_message_varargs(cl, fts_s_append, bpf_append);
+
+  fts_class_message_number(cl, fts_s_get_element, bpf_return_interpolated);
+  
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

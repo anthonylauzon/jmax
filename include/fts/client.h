@@ -135,18 +135,6 @@ FTS_API void fts_client_done_message( fts_object_t *obj);
   the following functions must not be in the client public API
 */
 
-
-/**
- * Upload the object: assign an id to the object and send upload_child message to the parent
- *
- * @fn void fts_client_upload_object( fts_object_t *obj, int client_id);
- * @param obj the object to upload
- * @param client_id the client id 
- *
- * @ingroup client
- */
-FTS_API void fts_client_upload_object( fts_object_t *obj, int client_id);
-
 FTS_API void fts_client_register_object( fts_object_t *obj, int client_id);
 FTS_API void fts_client_release_object( fts_object_t *obj);
 

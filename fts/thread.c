@@ -164,7 +164,7 @@ fts_thread_manager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
     {
 	post("[thread_manager] error while creating thread manager \n");
 	fts_log("[thread_manager] error while creating thread manager \n");
-	fts_object_set_error(o,"cannot create thread manager \n");
+	fts_object_error(o,"cannot create thread manager \n");
 	return;
     }
 }

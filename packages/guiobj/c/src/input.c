@@ -53,7 +53,7 @@ input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 /*   this->port = fts_audioport_get_default(o); */
   if ( !this->port)
     {
-      fts_object_set_error( o, "default audio port is not defined");
+      fts_object_error( o, "default audio port is not defined");
       return;    
     }
 

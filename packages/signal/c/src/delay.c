@@ -336,7 +336,7 @@ delay_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  fts_object_refer((fts_object_t *)line);
 	}
       else
-	fts_object_signal_runtime_error(o, "delay line doesn't belong to the same DSP edge");
+	fts_object_error(o, "delay line doesn't belong to the same DSP edge");
     }
 }
 
@@ -514,7 +514,7 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "first argument must be a delay line");
+      fts_object_error(o, "first argument must be a delay line");
       return;
     }
 
@@ -540,7 +540,7 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "first argument must be a delay line");
+      fts_object_error(o, "first argument must be a delay line");
       return;
     }
 
@@ -619,66 +619,6 @@ retap_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-retap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  delay_t *this = (delay_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  int n_tick = fts_dsp_get_input_size(dsp, 0);
-  int *samples = ftl_data_get_ptr(this->samples);
-  fts_atom_t a[4];
-  
-  if(*samples < n_tick)
-    *samples = n_tick;
-
-  fts_set_pointer(a + 0, this->line);
-  fts_set_ftl_data(a + 1, this->samples);
-  fts_set_symbol(a + 2, fts_dsp_get_input_name(dsp, 0));
-  fts_set_int(a + 3, n_tick);
-  fts_dsp_add_function(sym_tapin, 4, a);
-}
-
-static void 
-retap_ftl(fts_word_t *argv)
-{
-  delayline_t *delayline = (delayline_t *)fts_word_get_pointer(argv);
-  int delay = *((int *)fts_word_get_pointer(argv + 1));
-  float * restrict in = (float *) fts_word_get_pointer(argv + 2);
-  int n_tick = fts_word_get_int(argv + 3);
-  float * restrict buffer = delayline->buffer;
-  int phase = delayline->phase;
-  int size = delayline->drain_size;
-  int ring_size = delayline->ring_size;
-  int onset, tail;
-  int i;
-
-  if(delay > size)
-    delay = size;
-  
-  onset = phase + delay;
-  if(onset >= ring_size)
-    onset -= ring_size;
-
-  tail = ring_size - onset;
-
-  /* add input to current tick */
-  if(tail > n_tick)
-    {
-      for(i=0; i<n_tick; i++)
-	buffer[onset + i] += in[i];
-    }
-  else
-    {
-      int k;
-
-      for(i=0; i<tail; i++)
-	buffer[onset + i] += in[i];
-
-      for(k=0; i<n_tick; k++, i++)
-	buffer[k] += in[i];
-    }
-}
-
-static void
 retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   delay_t *this = (delay_t *)o;
@@ -694,7 +634,7 @@ retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "first argument must be a delay line");
+      fts_object_error(o, "first argument must be a delay line");
       return;
     }
 
@@ -709,7 +649,7 @@ retap_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delay_t), retap_init, tap_delete);
 
-  fts_class_message_varargs(cl, fts_s_put, retap_put);
+  fts_class_message_varargs(cl, fts_s_put, tapin_put);
 
   fts_class_inlet_int(cl, 1, retap_set_time);
   fts_class_inlet_float(cl, 1, retap_set_time);
@@ -824,7 +764,7 @@ vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     delay_set_line(o, 0, 0, 1, at);
   else
     {
-      fts_object_set_error(o, "first argument must be a delay line");
+      fts_object_error(o, "first argument must be a delay line");
       return;
     }
 

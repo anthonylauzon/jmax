@@ -134,7 +134,7 @@ seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	      track_append_event(this->recording, here, event);
 	    }
 	  else
-	    fts_object_signal_runtime_error(o, "Cannot record event of type %s", fts_get_class_name(at));
+	    fts_object_error(o, "Cannot record event of type %s", fts_get_class_name(at));
 	}
     }
 }
@@ -196,7 +196,7 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->recording = (track_t *)fts_object_create(track_type, NULL, 0, 0);
     }
   else
-    fts_object_set_error(o, "argument of track required");
+    fts_object_error(o, "argument of track required");
 }
 
 static void 

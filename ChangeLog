@@ -1,3 +1,8 @@
+2002-12-20  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* encapsulated all patcher related fields of fts_object_t to patcher_data structure only allocated when needed
+	* introduced new API call fts_object_error() (replacing fts_object_signal_runtime_error and fts_object_set_error)
+
 2002-12-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* commited an intermediate version of audio. It currently does not compile, but

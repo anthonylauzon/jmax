@@ -444,49 +444,63 @@ mat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t *this = (mat_t *)o;
+  fts_atom_t a[2];
+  fts_atom_t t;
+
+  fts_set_int(a + 0, mat_get_m(this));
+  fts_set_int(a + 1, mat_get_n(this));
+  fts_set_object(&t, fts_object_create(fts_tuple_class, NULL, 2, a));
+
+  fts_return(&t);
+}
+
+static void
+mat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t *this = (mat_t *)o;
+  int old_size = mat_get_m(this)* mat_get_n(this);
+  int m = 0;
+  int n = 0;
+  int i;
+
+  if(ac == 1 && fts_is_number(at))
+  {
+    m = fts_get_number_int(at);
+    n = mat_get_n(this);
+
+    if(m >= 0 && n >= 0)
+      mat_set_size(this, m, n);
+  }
+  else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+  {
+    m = fts_get_number_int(at);
+    n = fts_get_number_int(at + 1);
+
+    if(m >= 0 && n >= 0)
+      mat_set_size(this, m, n);
+  }
+
+  /* set newly allocated region to void */
+  for(i=old_size; i<m*n; i++)
+    fts_set_int(this->data + i, 0);
+}
+
+static void
+mat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
 
-  if(ac == 0)
-    {
-      fts_atom_t a[2];
-      fts_atom_t t;
+  if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+  {
+    int i = fts_get_number_int(at);
+    int j = fts_get_number_int(at + 1);
 
-      fts_set_int(a + 0, mat_get_m(this));
-      fts_set_int(a + 1, mat_get_n(this));
-      fts_set_object(&t, fts_object_create(fts_tuple_class, NULL, 2, a));
-
-      fts_return(&t);
-    }
-  else
-    {
-      int old_size = mat_get_m(this)* mat_get_n(this);
-      int m = 0;
-      int n = 0;
-      int i;
-      
-      if(ac == 1 && fts_is_number(at))
-	{
-	  m = fts_get_number_int(at);
-	  n = mat_get_n(this);
-	  
-	  if(m >= 0 && n >= 0)
-	    mat_set_size(this, m, n);
-	}  
-      else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
-	{
-	  m = fts_get_number_int(at);
-	  n = fts_get_number_int(at + 1);
-	  
-	  if(m >= 0 && n >= 0)
-	    mat_set_size(this, m, n);
-	}
-      
-      /* set newly allocated region to void */
-      for(i=old_size; i<m*n; i++)
-	fts_set_int(this->data + i, 0);
-    }
+    if(i >= 0 && i < mat_get_m(this) && j >= 0 && j < mat_get_n(this))
+      fts_return(mat_get_element(this, i, j));
+  }
 }
 
 static void
@@ -706,7 +720,7 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       data_object_persistence_args(o);
     }
   else
-    fts_object_set_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 static void
@@ -738,10 +752,18 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
   fts_class_message_varargs(cl, fts_s_row, mat_set_row_elements);
 
-  fts_class_message_varargs(cl, fts_s_size, mat_size);
-            
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
-  fts_class_message_varargs(cl, fts_s_export, mat_export); 
+  fts_class_message_varargs(cl, fts_s_export, mat_export);
+
+  fts_class_message_void(cl, fts_s_size, mat_return_size);
+  fts_class_message_varargs(cl, fts_s_size, mat_change_size);
+
+  fts_class_message_varargs(cl, fts_s_get_element, mat_return_element);
+  
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

@@ -55,8 +55,6 @@ typedef struct _client_t client_t;
 extern fts_patcher_t *fts_client_load_patcher( fts_symbol_t file_name, int client_id);
 extern client_t *object_get_client( fts_object_t *obj);
 
-extern void fts_client_upload_object_connections(fts_object_t *obj);
-
 #endif
 
 

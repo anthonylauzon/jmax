@@ -23,13 +23,7 @@
 #ifndef _FTS_PRIVATE_CONNECTION_H_
 #define _FTS_PRIVATE_CONNECTION_H_
 
-/* init function */
-
 extern void fts_connections_init(void);
-
-/* Connections */
-
-extern void fts_object_move_connections(fts_object_t *old, fts_object_t *new);
 
 #define fts_connection_get_id(c) ((c)->id)
 #define fts_connection_get_source(c) ((c)->src)

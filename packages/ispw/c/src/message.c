@@ -140,15 +140,27 @@ static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
    
  */
 
-/* LOCAL MACRO for the evaluation engine */
-#define SEND_MESSAGE \
-  if (ev_dest_is_object) \
-    { if(target) ispw_target_send((fts_object_t *)target, ev_sym, ev_argc, ev_fp); } \
-  else \
-    fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
+static void
+messbox_send(fts_object_t *o, int outlet, fts_object_t *target, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if(s == fts_s_bang)
+  {
+    if(target)
+      ispw_target_send(target, NULL, 0, NULL);
+    else
+      fts_outlet_bang(o, outlet);
+  }
+  else
+  {
+    if(target)
+      ispw_target_send(target, s, ac, at);
+    else
+      fts_outlet_send(o, outlet, s, ac, at);
+  }
+}
 
-static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
-		   fts_object_t *default_dst, int outlet)
+static void
+fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at, fts_object_t *default_dst, int outlet)
 {
   /* reader command and status */
 
@@ -171,7 +183,6 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 
   enum {ev_get_dst, ev_get_first_arg, ev_get_args, ev_got_first, ev_end} ev_status; /* the ev machine  */
 
-  int ev_dest_is_object = 0;
   fts_atom_t *ev_fp;		/* frame pointer */
   int ev_argc;
   fts_symbol_t ev_sym = 0;	/* the message symbol */
@@ -296,7 +307,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		}
 	      else
 		{
-		  lex_out_value = fts_name_get_value(((fts_object_t *)this)->patcher, fts_get_symbol(rd_out));
+		  lex_out_value = fts_name_get_value(fts_object_get_patcher((fts_object_t *)this), fts_get_symbol(rd_out));
 		  
 		  if(lex_out_value)
 		    {
@@ -378,7 +389,6 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		    {
 		      fts_symbol_t target_name = fts_get_symbol(lex_out_value);
 
-		      ev_dest_is_object = 1;
 		      ev_status = ev_get_first_arg;
 
 		      target = ispw_get_target(fts_object_get_patcher((fts_object_t *)this), target_name);
@@ -453,19 +463,19 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		  ev_argc++;
 		  break;
 		case lex_type_comma:
-		  SEND_MESSAGE;
+		  messbox_send(default_dst, outlet, (fts_object_t *)target, ev_sym, ev_argc, ev_fp);
 		  RESTORE_ATOM_STACK_FRAME(ev_fp);
 		  ev_argc = 0;
 		  ev_status = ev_get_first_arg;
 		  break;
 		case lex_type_semi:
-		  SEND_MESSAGE;
+		  messbox_send(default_dst, outlet, (fts_object_t *)target, ev_sym, ev_argc, ev_fp);
 		  RESTORE_ATOM_STACK_FRAME(ev_fp);
 		  ev_argc = 0;
 		  ev_status = ev_get_dst;
 		  break;
 		case lex_type_end:
-		  SEND_MESSAGE;
+		  messbox_send(default_dst, outlet, (fts_object_t *)target, ev_sym, ev_argc, ev_fp);
 		  ev_status = ev_end;
 		  break;
 		default:
@@ -483,19 +493,19 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		  ev_status = ev_get_args;
 		  break;
 		case lex_type_comma:
-		  SEND_MESSAGE;
+		  messbox_send(default_dst, outlet, (fts_object_t *)target, ev_sym, ev_argc, ev_fp);
 		  RESTORE_ATOM_STACK_FRAME(ev_fp);
 		  ev_argc = 0;
 		  ev_status = ev_get_first_arg;
 		  break;
 		case lex_type_semi:
-		  SEND_MESSAGE;
+		  messbox_send(default_dst, outlet, (fts_object_t *)target, ev_sym, ev_argc, ev_fp);
 		  RESTORE_ATOM_STACK_FRAME(ev_fp);
 		  ev_argc = 0;
 		  ev_status = ev_get_dst;
 		  break;
 		case lex_type_end:
-		  SEND_MESSAGE;
+		  messbox_send(default_dst, outlet, (fts_object_t *)target, ev_sym, ev_argc, ev_fp);
 		  ev_status = ev_end;
 		  break;
 		default:
@@ -782,7 +792,10 @@ static void messbox_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s
 static void
 messbox_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+  int descr_ac = fts_object_get_description_size(o);
+  fts_atom_t *descr_at = fts_object_get_description_atoms(o);
+  
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), descr_ac - 1, descr_at + 1);
 }
 
 /************************************************************
@@ -827,7 +840,7 @@ static void messbox_instantiate(fts_class_t *cl)
   fts_class_inlet_symbol(cl, 0, messbox_eval);
   fts_class_inlet_varargs(cl, 0, messbox_eval);
 
-  fts_class_outlet_message(cl, 0);
+  fts_class_outlet_thru(cl, 0);
   fts_class_outlet_varargs(cl, 0);
 }
 

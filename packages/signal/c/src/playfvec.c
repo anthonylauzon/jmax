@@ -502,11 +502,11 @@ play_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       this->position = this->segment->begin;
 
       segment_set(this->segment, ac, at);
-
-      fts_dsp_object_init((fts_dsp_object_t *)(fts_object_t *)this);
     }
   else
-    fts_object_set_error((fts_object_t *)this, "fvec required as first argument");
+    fts_object_error((fts_object_t *)this, "fvec required as first argument");
+
+  fts_dsp_object_init((fts_dsp_object_t *)(fts_object_t *)this);
 }
 
 static void

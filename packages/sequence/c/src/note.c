@@ -259,7 +259,6 @@ note_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 note_get_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  note_t *this = (note_t *)o;
   fts_array_t *array = fts_get_pointer(at);
   int i;
 

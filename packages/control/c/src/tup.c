@@ -262,7 +262,7 @@ tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	}
       else
 	{
-	  fts_object_set_error(o, "bad argument");
+	  fts_object_error(o, "bad argument");
 	  return;
 	}
 
@@ -571,7 +571,7 @@ getup_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  cotup_output(o);
 	}
       else
-	fts_object_signal_runtime_error(o, "cannot get tuple from %s object", fts_object_get_class_name(input));
+	fts_object_error(o, "cannot get tuple from %s object", fts_object_get_class_name(input));
     }
   else
     fts_outlet_atom(o, 0, at);
@@ -596,7 +596,7 @@ messtup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(fts_is_symbol(at))
 	fts_outlet_message(o, 0, fts_get_symbol(at), ac - 1, at + 1);
       else
-	fts_object_signal_runtime_error(o, "tuple doesn't start with a symbol");
+	fts_object_error(o, "tuple doesn't start with a symbol");
     }
   else
     {
@@ -613,9 +613,9 @@ messtup_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(cotup_t), cotup_init, cotup_delete);
   
-  fts_class_input_handler(cl, messtup_input); 
-
-  fts_class_outlet_message(cl, 0);
+  fts_class_input_handler(cl, messtup_input);
+  
+  fts_class_outlet_thru(cl, 0);
 }
 
 /************************************************

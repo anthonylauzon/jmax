@@ -385,13 +385,13 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       
       if(this->fd < 0)
 	{
-	  fts_object_set_error(o, "can't open serial port \"%s\" (%s)", name, strerror( errno));
+	  fts_object_error(o, "can't open serial port \"%s\" (%s)", name, strerror( errno));
 	  return;
 	}
       
       if(tcsetattr(this->fd, TCSANOW, &this->termios) < 0)
 	{
-	  fts_object_set_error(o, "can't set termios configuration (%s)", strerror(errno));
+	  fts_object_error(o, "can't set termios configuration (%s)", strerror(errno));
 	  
 	  close(this->fd);
 	  return;
@@ -422,7 +422,7 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_bytestream_set_output(&this->head, serial_output, serial_output_char, serial_flush);
     }
   else
-    fts_object_set_error(o, "first argument of serial device name required");
+    fts_object_error(o, "first argument of serial device name required");
 }
 
 static void 

@@ -277,7 +277,7 @@ explay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->current = 0;
     }
   else
-    fts_object_set_error(o, "argument of explode name required");
+    fts_object_error(o, "argument of explode name required");
 }
 
 

@@ -452,49 +452,63 @@ fmat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-fmat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+  fts_atom_t a[2];
+  fts_atom_t t;
+
+  fts_set_int(a + 0, fmat_get_m(this));
+  fts_set_int(a + 1, fmat_get_n(this));
+  fts_set_object(&t, fts_object_create(fts_tuple_class, NULL, 2, a));
+
+  fts_return(&t);
+}
+
+static void
+fmat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+  int old_size = fmat_get_m(this) * fmat_get_n(this);
+  int m = 0;
+  int n = 0;
+  int i;
+
+  if(ac == 1 && fts_is_number(at))
+  {
+    m = fts_get_number_int(at);
+    n = fmat_get_n(this);
+
+      if(m >= 0 && n >= 0)
+        fmat_set_size(this, m, n);
+  }
+  else if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
+  {
+    m = fts_get_number_int(at);
+    n = fts_get_number_int(at + 1);
+
+    if(m >= 0 && n >= 0)
+      fmat_set_size(this, m, n);
+  }
+
+  /* set newly allocated region to void */
+  for(i=old_size; i<m*n; i++)
+    this->values[i] = 0.0;
+}
+
+static void
+fmat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
 
-  if(ac == 0)
-    {
-      fts_atom_t a[2];
-      fts_atom_t t;
+  if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+  {
+    int i = fts_get_number_int(at);
+    int j = fts_get_number_int(at + 1);
 
-      fts_set_int(a + 0, fmat_get_m(this));
-      fts_set_int(a + 1, fmat_get_n(this));
-      fts_set_object(&t, fts_object_create(fts_tuple_class, NULL, 2, a));
-
-      fts_return(&t);
-    }
-  else
-    {
-      int old_size = fmat_get_m(this) * fmat_get_n(this);
-      int m = 0;
-      int n = 0;
-      int i;
-
-      if(ac == 1 && fts_is_number(at))
-	{
-	  m = fts_get_number_int(at);
-	  n = fmat_get_n(this);
-	  
-	  if(m >= 0 && n >= 0)
-	    fmat_set_size(this, m, n);
-	}  
-      else if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
-	{
-	  m = fts_get_number_int(at);
-	  n = fts_get_number_int(at + 1);
-	  
-	  if(m >= 0 && n >= 0)
-	    fmat_set_size(this, m, n);
-	}
-      
-      /* set newly allocated region to void */
-      for(i=old_size; i<m*n; i++)
-	this->values[i] = 0.0;
-    }
+    if(i >= 0 && i < fmat_get_m(this) && j >= 0 && j < fmat_get_n(this))
+      fts_return_float(fmat_get_element(this, i, j));
+  }
 }
 
 /**************************************************************************************
@@ -1303,7 +1317,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       data_object_persistence_args(o);
     }
   else
-    fts_object_set_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 static void
@@ -1348,10 +1362,19 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("le"), fmat_le);
   fts_class_message_varargs(cl, fts_new_symbol("min"), fmat_min);
   fts_class_message_varargs(cl, fts_new_symbol("max"), fmat_max);
-  fts_class_message_varargs(cl, fts_s_size, fmat_size);
+
+  fts_class_message_void(cl, fts_s_size, fmat_return_size);
+  fts_class_message_varargs(cl, fts_s_size, fmat_change_size);
   
   fts_class_message_varargs(cl, fts_s_import, fmat_import);
   fts_class_message_varargs(cl, fts_s_export, fmat_export);
+
+  fts_class_message_varargs(cl, fts_s_get_element, fmat_return_element);
+  
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void 

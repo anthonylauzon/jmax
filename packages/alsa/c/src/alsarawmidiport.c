@@ -144,14 +144,14 @@ alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   if( (err = snd_rawmidi_open( &this->handle_in, &this->handle_out, this->hw_name, O_RDWR | SND_RAWMIDI_NONBLOCK)) < 0)
     {
-      fts_object_set_error(o, "error opening ALSA raw MIDI port (%s)", snd_strerror( err));
+      fts_object_error(o, "error opening ALSA raw MIDI port (%s)", snd_strerror( err));
       fts_log("alsarawmidiport: cannot open ALSA raw MIDI port %s (%s)\n", this->name, snd_strerror( err));
       return;
     }
 
   if ( snd_rawmidi_poll_descriptors( this->handle_in, &fds, 1) == 0)
     {
-      fts_object_set_error(o, "cannot get file descriptor");
+      fts_object_error(o, "cannot get file descriptor");
       return;
     }
 

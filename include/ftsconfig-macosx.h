@@ -36,7 +36,8 @@
 /* Define if lex declares yytext as a char * by default, not a char[].  */
 /* #undef YYTEXT_POINTER */
 
-#define DEFAULT_ROOT "/Users/borghesi/projects/jmax-install/share/jmax"
+#define DEFAULT_ROOT ""
+
 /* Define to equivalent of C99 restrict keyword, or to nothing if this is not supported.  Do not define if restrict is supported directly. */
 #define restrict 
 

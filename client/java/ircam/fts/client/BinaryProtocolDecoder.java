@@ -105,7 +105,7 @@ class BinaryProtocolDecoder {
       args.addDouble( Double.longBitsToDouble( lval) );
 
     argsCount++;
-  }
+}
 
   private final void endSymbolIndexAction( int input)
   {
@@ -159,6 +159,7 @@ class BinaryProtocolDecoder {
   private final void endMessageAction( int input)
   {
     FtsObject.invokeMessageHandler( target, selector, args);
+
     args.clear();
     argsCount = 0;
   }

@@ -72,7 +72,7 @@ messconst_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_status_t status = fts_expression_reduce( this->expression, patcher, this->ac, this->at, messconst_expression_callback, this);
 
   if (status != fts_ok)
-    fts_object_signal_runtime_error( (fts_object_t *)this, "%s", fts_status_get_description( status));
+    fts_object_error( (fts_object_t *)this, "%s", fts_status_get_description( status));
 }
 
 
@@ -121,7 +121,7 @@ messconst_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   status = fts_expression_set( this->expression, ac, at);
   if (status != fts_ok)
     {
-      fts_object_signal_runtime_error( o, "%s", fts_status_get_description( status));
+      fts_object_error( o, "%s", fts_status_get_description( status));
       return;
     }
 
@@ -220,7 +220,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   status = fts_expression_new( 0, 0, &this->expression);
   if (status != fts_ok)
     {
-      fts_object_set_error( o, "%s", fts_status_get_description( status));
+      fts_object_error( o, "%s", fts_status_get_description( status));
       return;
     }
 
@@ -265,8 +265,7 @@ messconst_instantiate(fts_class_t *cl)
 
   fts_class_inlet_atom(cl, 1, messconst_set_argument);
 
-  fts_class_outlet_message(cl, 0);
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

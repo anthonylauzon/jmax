@@ -49,28 +49,88 @@ static fts_status_description_t class_instantiation_error_description = {
 
 static fts_status_t class_instantiation_error = &class_instantiation_error_description;
 
+static void fts_object_remove_description(fts_object_t *obj);
+static void fts_object_remove_connections(fts_object_t *obj);
+static void fts_object_remove_inoutlets(fts_object_t *obj);
+static void fts_object_remove_bindings(fts_object_t *obj);
+static void fts_object_remove_name(fts_object_t *obj);
+static void fts_object_reset_client(fts_object_t *obj);
+
+/******************************************************************************
+ *
+ * patcher data
+ *
+ */
+fts_heap_t *patcher_data_heap = NULL;
+
+fts_object_patcher_data_t *
+fts_object_get_patcher_data(fts_object_t *obj)
+{
+  fts_class_t *cl = obj->cl;
+  
+  if(obj->patcher_data == NULL)
+  {
+    fts_object_patcher_data_t *data;
+    
+    if(patcher_data_heap == NULL)
+      patcher_data_heap = fts_heap_new(sizeof(fts_object_patcher_data_t));
+
+    data = fts_heap_zalloc(patcher_data_heap);
+
+    /* allocate inlet connections */
+    data->n_inlets = cl->ninlets;
+    if(cl->ninlets > 0)
+      data->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
+
+    /* allocate outlet connections */
+    data->n_outlets = cl->noutlets;
+    if(cl->noutlets > 0)
+      data->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+
+    obj->patcher_data = data;
+  }
+
+  return obj->patcher_data;
+}
+
+void
+fts_object_remove_patcher_data(fts_object_t *obj)
+{
+  fts_object_patcher_data_t *data = obj->patcher_data;
+  
+  if(data != NULL)
+  {
+    fts_object_remove_description(obj);
+    fts_object_remove_inoutlets(obj);
+
+    /* remove binding to variables */
+    fts_object_remove_bindings(obj);
+    
+    fts_heap_free(patcher_data_heap, (void *)data);
+    obj->patcher_data = NULL;
+  }
+}
+
+void
+fts_object_set_patcher(fts_object_t *o, fts_patcher_t *patcher)
+{
+  fts_object_patcher_data_t *data = fts_object_get_patcher_data(o);
+
+  data->patcher = patcher;
+}
 
 /******************************************************************************
  *
  * create an object from a class and arguments
  *
  */
-
 static fts_object_t *
 fts_object_new( fts_class_t *cl)
 {
   fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
 
   obj->cl = cl;
-  obj->client_id = FTS_NO_ID;
-
-  obj->n_inlets = cl->ninlets;
-  if (cl->ninlets)
-    obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
-    
-  obj->n_outlets = cl->noutlets;
-  if (cl->noutlets)
-    obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+  obj->client_id = FTS_CREATE;
 
   return obj;
 }
@@ -80,42 +140,56 @@ fts_object_free(fts_object_t *obj)
 {
   fts_properties_free(obj);
 
-  if (obj->argv)
-    fts_free( obj->argv);
-
-  if (obj->out_conn)
-    fts_free( obj->out_conn);
-  if (obj->in_conn)
-    fts_free( obj->in_conn);
-
   fts_heap_free(obj, fts_object_get_class( obj)->heap);
 }
 
 fts_object_t *
-fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+fts_object_create(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj;
-
-  /* Is class instantiated ? We can test that with the 'size' member 
-     because it is set by the instantiate function and cannot be set to 0 */
+  fts_object_t *obj = NULL;
+  
   if (!cl->size)
     fts_class_instantiate(cl);
 
-  obj = fts_object_new( cl);
+  obj = fts_object_new(cl);
 
-  fts_object_set_patcher(obj, patcher);
+  if(patcher != NULL)
+    fts_object_set_patcher(obj, patcher);
 
-  fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
+  /* call constructor */
+  fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
 
-  if(fts_object_get_error(obj) != NULL)
-    {
-      fts_class_get_deconstructor(cl)(obj, fts_system_inlet, fts_s_delete, 0, 0); 
-      fts_object_free(obj);
-      
-      return NULL;
-    }
- 
+  if(obj->client_id == FTS_INVALID)
+  {
+    /* destroy invalid object */
+    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
+    fts_object_free(obj);
+
+    return NULL;
+  }
+
+  if(obj->client_id < FTS_NO_ID)
+    obj->client_id = FTS_NO_ID;
+
   return obj;
+}
+
+/* delete the unbound, unconnected object already removed from the patcher */
+void
+fts_object_destroy(fts_object_t *obj)
+{
+  /* unregister name */
+  fts_object_remove_name(obj);
+
+  /* call deconstructor */
+  if(fts_class_get_deconstructor(fts_object_get_class(obj)))
+    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
+
+  /* release all client components */
+  fts_object_reset_client(obj);
+
+  /* free memory */
+  fts_object_free(obj);
 }
 
 /***********************************************************************
@@ -134,39 +208,33 @@ static fts_status_t
 eval_object_description_expression_callback( int ac, const fts_atom_t *at, void *data)
 {
   struct eval_data *eval_data = (struct eval_data *)data;
-
+  
   if (eval_data->obj == NULL)
+  {
+    if (ac == 1 && fts_is_object( at))
     {
-      if (ac == 1 && fts_is_object( at))
-      {
-        eval_data->obj = fts_get_object( at);
+      eval_data->obj = fts_get_object( at);
 
-        /* all objects in patcher should have at least one inlet */
-        if(fts_object_get_inlets_number(eval_data->obj) == 0)
-          fts_object_set_inlets_number(eval_data->obj, 1);
-        
-        fts_patcher_add_object( eval_data->patcher, eval_data->obj);
-        return fts_ok;
-	}
-
-      return class_instantiation_error;
+      fts_patcher_add_object( eval_data->patcher, eval_data->obj);
+      return fts_ok;
     }
+
+    return class_instantiation_error;
+  }
   else
+  {
+    if(ac > 0 && fts_is_symbol(at))
     {
-      if(ac > 0 && fts_is_symbol(at))
-	{
-	  if(fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1))
-	    {
-	      if(fts_object_get_error(eval_data->obj) == NULL)
-		return fts_ok;
-	    }
-	}
-
-      fts_patcher_remove_object(eval_data->patcher, eval_data->obj);
-      eval_data->obj = NULL;
-
-      return class_instantiation_error;
+      /* send message to fresh object */
+      if(fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1))
+        return fts_ok;
     }
+
+    fts_patcher_remove_object(eval_data->patcher, eval_data->obj);
+    eval_data->obj = NULL;
+
+    return class_instantiation_error;
+  }
 
   return fts_ok;
 }
@@ -233,7 +301,7 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
     {
       fts_atom_t a;
 
-      fts_set_symbol(&a, fts_status_get_description( status));
+      fts_set_symbol(&a, fts_get_error());
       obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
       fts_object_set_description(obj, ac, at);
 
@@ -253,95 +321,245 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   return obj;
 }
 
-
 /***********************************************************************
  *
- * Object inlets/outlets
+ * object inlets/outlets
  *
  */
+
+static void
+fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
+{
+  fts_object_patcher_data_t *data = obj->patcher_data;
+
+  if(data != NULL)
+  {
+    int inlet;
+
+    for (inlet = inlets; inlet < data->n_inlets; inlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons
+      and methods  can fire correctly */
+
+      for (p = data->in_conn[inlet]; p; p = data->in_conn[inlet])
+        fts_connection_delete(p);
+
+      data->in_conn[inlet] = NULL;
+    }
+  }
+}
+
+
+static void
+fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
+{
+  fts_object_patcher_data_t *data = obj->patcher_data;
+
+  if(data != NULL)
+  {
+    int outlet;
+
+    for (outlet = outlets; outlet < data->n_outlets; outlet++)
+    {
+      fts_connection_t *p;
+
+      /* The loop work by iterating on the first connection;
+      this work because the loop destroy one connection at a time.
+      */
+
+      for (p = data->out_conn[outlet]; p ;  p = data->out_conn[outlet])
+        fts_connection_delete(p);
+
+      
+    data->out_conn[outlet] = NULL;
+    }
+  }
+}
 
 void
 fts_object_set_inlets_number(fts_object_t *o, int n)
 {
-  if(o->n_inlets != n)
+  fts_object_patcher_data_t *data = fts_object_get_patcher_data(o);
+  
+  if(data->n_inlets != n)
     {
       int i;
 
       fts_object_trim_inlets_connections(o, n);
 
-      o->in_conn = fts_realloc(o->in_conn, n * sizeof(fts_connection_t *));
+      data->in_conn = fts_realloc(data->in_conn, n * sizeof(fts_connection_t *));
       
-      for(i=o->n_inlets; i<n; i++)
-	o->in_conn[i] = NULL;
+      for(i=data->n_inlets; i<n; i++)
+	data->in_conn[i] = NULL;
 
-      o->n_inlets = n;
+      data->n_inlets = n;
     }
 }
 
 void
 fts_object_set_outlets_number(fts_object_t *o, int n)
 {
-  if(o->n_outlets != n)
+  fts_object_patcher_data_t *data = fts_object_get_patcher_data(o);
+
+  if(data->n_outlets != n)
     {
       int i;
 
       fts_object_trim_outlets_connections(o, n);
 
-      o->out_conn = fts_realloc(o->out_conn, n * sizeof(fts_connection_t *));
+      data->out_conn = fts_realloc(data->out_conn, n * sizeof(fts_connection_t *));
 
-      for(i=o->n_outlets; i<n; i++)
-	o->out_conn[i] = NULL;
+      for(i=data->n_outlets; i<n; i++)
+	data->out_conn[i] = NULL;
 
-      o->n_outlets = n;
+      data->n_outlets = n;
     }
 }
 
-/*********************************************************************************
- * 
- *  set name
- *
- */
+static void
+fts_object_remove_inoutlets(fts_object_t *obj)
+{
+  fts_object_patcher_data_t *data = obj->patcher_data;
+  
+  if(data != NULL)
+  {
+    fts_object_remove_connections(obj);
+    
+    if(data->in_conn)
+      fts_free(data->in_conn);
 
+    if(data->out_conn)
+      fts_free(data->out_conn);
+
+    data->in_conn = NULL;
+    data->out_conn = NULL;
+
+    data->n_inlets = 0;
+    data->n_outlets = 0;
+  }
+}
+
+/*****************************************************************************
+*
+*  connection handling
+*
+*/
+
+static void
+fts_object_move_connections(fts_object_t *old, fts_object_t *new)
+{
+  fts_object_patcher_data_t *data = old->patcher_data;
+
+  if(data != NULL)
+  {
+    fts_connection_t *p;
+    int i;
+
+    for (i=0; i<fts_object_get_outlets_number(old); i++)
+    {
+      fts_connection_t *p;
+
+      for (p=data->out_conn[i]; p;  p=data->out_conn[i])
+      {
+        if(i < fts_object_get_outlets_number(new) && p->type > fts_c_hidden)
+          fts_connection_new(new, p->woutlet, p->dst, p->winlet, p->type);
+
+        fts_connection_delete(p);
+      }
+    }
+
+    for (i=0; i<fts_object_get_inlets_number(old); i++)
+    {
+      for (p=data->in_conn[i]; p; p=data->in_conn[i])
+      {
+        if(i < fts_object_get_inlets_number(new) && p->type > fts_c_hidden)
+          fts_connection_new(p->src, p->woutlet, new, p->winlet, p->type);
+
+        fts_connection_delete(p);
+      }
+    }
+  }
+}
+
+/* remove all connections from the object (done when unplugged from the patcher) */
+static void
+fts_object_remove_connections(fts_object_t *obj)
+{
+  fts_object_patcher_data_t *data = obj->patcher_data;
+
+  if(data != NULL)
+  {
+    int outlet, inlet;
+
+    /* delete all the survived connections starting in the object */
+    for (outlet=0; outlet<data->n_outlets; outlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons and methods can fire correctly */
+      while (p = data->out_conn[outlet])
+        fts_connection_delete(p);
+    }
+
+    /* Delete all the survived connections ending in the object */
+    for (inlet=0; inlet<data->n_inlets; inlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons and methods  can fire correctly */
+      while (p = data->in_conn[inlet])
+        fts_connection_delete(p);
+    }
+  }
+}
+
+/*********************************************************************************
+*
+*  object naming and bindings
+*
+*/
 void
 fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
 {
   fts_patcher_t *patcher = fts_object_get_patcher(obj);
 
   if(patcher != NULL)
-    {
-      /* reset current definition */
-      if(fts_object_get_definition(obj) != NULL)
-	fts_definition_update(fts_object_get_definition(obj), fts_null);
-      
-      if(sym != fts_s_empty_string)
-	{
-	  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
-	  fts_symbol_t name = fts_name_get_unused(scope, sym);
-	  fts_definition_t *def = fts_definition_get(scope, name);
-	  fts_atom_t a;
-	  
-	  /* set new definiton */
-	  fts_set_object(&a, obj);
-	  fts_definition_update(def, &a);
-	  
-	  /* store definition in object */
-	  fts_object_set_definition(obj, def);
-	  
-	  /* set name of object */
-	  if(fts_object_has_id(obj))
-	    {
-	      fts_set_symbol(&a, name);
-	      fts_client_send_message(obj, fts_s_name, 1, &a);
-	    }
-	}
-      else if(fts_object_has_id(obj))
-	{
-	  fts_atom_t a;
+  {
+    /* reset current definition */
+    if(fts_object_get_definition(obj) != NULL)
+      fts_definition_update(fts_object_get_definition(obj), fts_null);
 
-	  fts_set_symbol(&a, fts_s_empty_string);
-	  fts_client_send_message(obj, fts_s_name, 1, &a);	  
-	}
+    if(sym != fts_s_empty_string)
+    {
+      fts_patcher_t *scope = fts_patcher_get_scope(patcher);
+      fts_symbol_t name = fts_name_get_unused(scope, sym);
+      fts_definition_t *def = fts_definition_get(scope, name);
+      fts_atom_t a;
+
+      /* set new definiton */
+      fts_set_object(&a, obj);
+      fts_definition_update(def, &a);
+
+      /* store definition in object */
+      fts_object_set_definition(obj, def);
+
+      /* set name of object */
+      if(fts_object_has_id(obj))
+      {
+        fts_set_symbol(&a, name);
+        fts_client_send_message(obj, fts_s_name, 1, &a);
+      }
     }
+    else if(fts_object_has_id(obj))
+    {
+      fts_atom_t a;
+
+      fts_set_symbol(&a, fts_s_empty_string);
+      fts_client_send_message(obj, fts_s_name, 1, &a);
+    }
+  }
 }
 
 void
@@ -353,7 +571,7 @@ fts_object_update_name(fts_object_t *obj)
     fts_definition_update(def, &def->value);
 }
 
-fts_symbol_t 
+fts_symbol_t
 fts_object_get_name(fts_object_t *obj)
 {
   fts_definition_t *def = fts_object_get_definition(obj);
@@ -364,206 +582,126 @@ fts_object_get_name(fts_object_t *obj)
   return fts_s_empty_string;
 }
 
-/****************************************************************
- *
- *  delete object
- *
- *    fts_object_unconnect()
- *    fts_object_unbind()
- *    fts_object_unname()
- *    fts_object_unclient()
- *    fts_object_free()
- *
- *    fts_object_destroy()
- *    fts_object_release() ... macro!
- *
- */
-
-/* remove all connections from the object (done when unplugged from the patcher) */
-static void 
-fts_object_unconnect(fts_object_t *obj)
-{
-  int outlet, inlet;
-
-  /* delete all the survived connections starting in the object */
-  for (outlet=0; outlet<obj->n_outlets; outlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons and methods can fire correctly */
-      while ((p = obj->out_conn[outlet]))
-	fts_connection_delete(p);
-    }
-
-  /* Delete all the survived connections ending in the object */
-  for (inlet=0; inlet<obj->n_inlets; inlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons and methods  can fire correctly */
-      while ((p = obj->in_conn[inlet]))
-	fts_connection_delete(p);
-    }
-}
-
-static void 
-fts_object_unname(fts_object_t *obj)
+static void
+fts_object_remove_name(fts_object_t *obj)
 {
   /* remove definition of named object */
   if(obj->definition != NULL)
-    {
-      fts_definition_update(obj->definition, fts_null);
-      obj->definition = NULL;
-    }
+  {
+    fts_definition_update(obj->definition, fts_null);
+    obj->definition = NULL;
+  }
 }
 
-static void 
-fts_object_unbind(fts_object_t *obj)
+void
+fts_object_add_binding(fts_object_t *obj, fts_definition_t *def)
 {
-  fts_list_t *list = obj->name_refs;
+  fts_object_patcher_data_t *data = fts_object_get_patcher_data(obj);
+  fts_atom_t a;
 
-  /* remove object as listener from the variables */
-  while(list != NULL) 
+  fts_set_pointer(&a, def);
+  data->name_refs = fts_list_prepend(data->name_refs, &a);
+}
+
+static void
+fts_object_remove_bindings(fts_object_t *obj)
+{
+  if(obj->patcher_data != NULL)
+  {
+    fts_list_t *list = obj->patcher_data->name_refs;
+
+    /* remove object as listener from the variables */
+    while(list != NULL)
     {
       fts_definition_t *def = (fts_definition_t *)fts_get_pointer(fts_list_get(list));
-      
+
       fts_definition_remove_listener(def, obj);
-      
+
       list = fts_list_next(list);
     }
+  }
 }
 
-static void 
-fts_object_unclient(fts_object_t *obj)
+/*****************************************************************************
+*
+*  object access
+*
+*/
+
+fts_symbol_t
+fts_object_get_class_name(fts_object_t *obj)
 {
-  if ( fts_object_get_id( obj) > FTS_NO_ID)
-    {
-      fts_send_message_varargs(obj, fts_s_closeEditor, 0, 0);
-      fts_client_release_object(obj);
-    }
+  return fts_class_get_name( fts_object_get_class( obj));
 }
 
-void 
-fts_object_unpatch(fts_object_t *obj)
+/* test recursively if an object is inside a patcher (or its subpatchers) */
+int
+fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
 {
-  fts_object_unconnect(obj);
-  fts_object_unbind(obj);
-  fts_object_unname(obj);
-}
-
-/* delete the unbound, unconnected object already removed from the patcher */
-void 
-fts_object_destroy(fts_object_t *obj)
-{
-  /* unregister name */
-  fts_object_unname(obj);
-
-  /* call deconstructor */
-  if(fts_class_get_deconstructor(fts_object_get_class(obj)))
-    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
-
-  /* release all client components */
-  fts_object_unclient(obj);
-
-  /* free memory */
-  fts_object_free(obj);
-}
-
-/*********************************************************************************
- * 
- * redefine object
- *
- * fts_object_redefine replace an object with a new
- * one whose definition is passed as argument, leaving the same
- * connections, properties and id.
- *
- * For the moment *no* mechanism for transferring
- * the old state to the new object is defined.
- * Waiting for a better property system, persistent/clint properties are anyway 
- * transferred to the new object before deleting the old one.
- * 
- * If the object is a patcher (either standard patcher or abstraction/template)
- * the patcher redefine function is called instead, look in the patcher.c file.
- */
-
-
-fts_object_t *
-fts_object_recompute(fts_object_t *old)
-{
-  return fts_object_redefine(old, old->argc, old->argv);
-}
-
-fts_object_t *
-fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
-{
-  int old_id = fts_object_get_id( old);
-
-  /* redefine object if not scheduled for removal */
-  if(old_id != FTS_DELETE)
-    {
-      fts_patcher_t *patcher = fts_object_get_patcher(old);
-      fts_symbol_t name = fts_object_get_name(old);
-      fts_object_t *new;
-      fts_atom_t a;
-
-      /* unbind variables from old object */
-      fts_object_unname(old);
-      fts_object_unbind(old);
-
-      /* create new object */
-      new = fts_eval_object_description(patcher, ac, at);
-      
-      /* update the loading vm */
-      fts_vm_substitute_object(old, new);
-      
-      /* remove old from client and update list */
-      fts_object_unclient(old);
-      fts_update_reset(old);
-
-      /* if new is an error object, assure that there are enough inlets and outlets for the connections */
-      if (fts_object_is_error(new))
-	{
-	  fts_error_object_fit_inlet(new, old->n_inlets - 1);
-	  fts_error_object_fit_outlet(new, old->n_outlets - 1);
-	}
-      
-      /* move graphic properties and connections from old to new object */
-      fts_object_move_properties(old, new);
-      fts_object_move_connections(old, new);
-      
-      /* set name of new object */
-      if(name != fts_s_empty_string)
-	{
-	  fts_atom_t a;
-
-	  fts_set_symbol(&a, name);
-	  fts_send_message_varargs(new, fts_s_name, 1, &a);
-	}
-
-      /* try to rescue the old object state to the new one */
-      fts_set_object(&a, old);
-      fts_send_message_varargs(new, fts_s_redefine, 1, &a);
-
-      /* remove the old object from the patcher */
-      fts_patcher_remove_object(old->patcher, old);
-      
-      /* upload new object if old object was uploaded */
-      if(old_id != FTS_NO_ID)
-	{
-	  fts_client_upload_object(new, -1);
-	  fts_client_upload_object_connections(new);
-	}
-      
-      return new;
-    }
+  if (! obj)
+    return 0;
+  else if (obj == (fts_object_t *) patcher)
+    return 1;
   else
-    {
-      /* unbind variables */
-      fts_object_unname(old);
-      fts_object_unbind(old);
-    }      
+    return fts_object_is_in_patcher((fts_object_t *) fts_object_get_patcher(obj), patcher);
+}
 
-  return NULL;
+/*****************************************************************************
+*
+*  client
+*
+*/
+
+void
+fts_object_upload(fts_object_t *obj)
+{
+  fts_object_t *parent = (fts_object_t *)fts_object_get_patcher(obj);
+
+  if(parent != NULL)
+  {
+    fts_atom_t a;
+
+    fts_client_register_object(obj, -1);
+
+    fts_set_object(&a, obj);
+    fts_send_message(parent, fts_s_upload_child, 1, &a);
+  }
+}
+
+static void
+fts_object_reset_client(fts_object_t *obj)
+{
+  if(fts_object_get_id( obj) > FTS_NO_ID)
+  {
+    fts_send_message(obj, fts_s_closeEditor, 0, 0);
+    fts_client_release_object(obj);
+  }
+}
+
+static void
+fts_object_upload_connections(fts_object_t *obj)
+{
+  fts_object_patcher_data_t *data = obj->patcher_data;
+
+  if(data != NULL)
+  {
+    fts_connection_t *p;
+    int i;
+
+    for(i=0; i<fts_object_get_outlets_number(obj); i++)
+    {
+      for (p = data->out_conn[i]; p ; p = p->next_same_src)
+        if(p->type > fts_c_hidden)
+          fts_object_upload((fts_object_t *)p);
+    }
+
+    for (i=0; i<fts_object_get_inlets_number(obj); i++)
+    {
+      for (p=data->in_conn[i]; p; p=p->next_same_dst)
+        if(p->type > fts_c_hidden)
+          fts_object_upload((fts_object_t *)p);
+    }
+  }
 }
 
 /*********************************************************************************
@@ -582,58 +720,51 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 void 
 fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
 {
+  fts_object_patcher_data_t *data = fts_object_get_patcher_data(obj);
   int i;
 
-  if (obj->argc == argc)
+  if (data->argc == argc)
     {
       /* Just copy the values, the size is correct */
       for (i = 0; i < argc; i++)
-	obj->argv[i] = argv[i];
+	data->argv[i] = argv[i];
     }
   else
     {
       /* Free the old object description, if any */
-      if (obj->argv)
-	fts_free( obj->argv);
+      if (data->argv)
+	fts_free( data->argv);
 
       /* reallocate the description if argc > -0 and copy the arguments */
-      obj->argc = argc;
+      data->argc = argc;
 
       if (argc > 0)
 	{
-	  obj->argv = (fts_atom_t *) fts_zalloc(argc * sizeof(fts_atom_t));
+	  data->argv = (fts_atom_t *) fts_zalloc(argc * sizeof(fts_atom_t));
 
 	  for (i = 0; i < argc; i++)
-	    obj->argv[i] = argv[i];
+	    data->argv[i] = argv[i];
 	}
       else
-	obj->argv = 0;
+	data->argv = 0;
     }
 }
 
 
-/*****************************************************************************
- *
- *  object access
- *
- */
-
-fts_symbol_t 
-fts_object_get_class_name(fts_object_t *obj)
+static void
+fts_object_remove_description(fts_object_t *obj)
 {
-  return fts_class_get_name( fts_object_get_class( obj));
-}
+  fts_object_patcher_data_t *data = obj->patcher_data;
 
-/* test recursively if an object is inside a patcher (or its subpatchers) */
-int 
-fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
-{
-  if (! obj)
-    return 0;
-  else if (obj == (fts_object_t *) patcher)
-    return 1;
-  else
-    return fts_object_is_in_patcher((fts_object_t *) fts_object_get_patcher(obj), patcher);
+  if(data != NULL)
+  {
+    /* free object description */
+    if(data->argv != NULL)
+      fts_free(data->argv);
+
+    data->argc = 0;
+    data->argv = NULL;
+  }
 }
 
 /*****************************************************************************
@@ -686,4 +817,95 @@ fts_object_get_package(fts_object_t *obj)
     return fts_template_get_package(fts_patcher_get_template((fts_patcher_t *)obj));
   else
     return fts_class_get_package(fts_object_get_class(obj));
+}
+
+/*********************************************************************************
+*
+* object redefinition
+*
+* fts_object_redefine replace an object with a new
+* one whose definition is passed as argument, leaving the same
+* connections, properties and id.
+*
+* If the object is a patcher (either standard patcher or abstraction/template)
+* the patcher redefine function is called instead, look in the patcher.c file.
+*/
+
+fts_object_t *
+fts_object_recompute(fts_object_t *old)
+{
+  return fts_object_redefine(old, fts_object_get_description_size(old), fts_object_get_description_atoms(old));
+}
+
+fts_object_t *
+fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
+{
+  int old_id = fts_object_get_id( old);
+
+  /* redefine object if not scheduled for removal */
+  if(old_id != FTS_DELETE)
+  {
+    fts_patcher_t *patcher = fts_object_get_patcher(old);
+    fts_symbol_t name = fts_object_get_name(old);
+    fts_object_t *new;
+    fts_atom_t a;
+
+    /* unbind variables from old object */
+    fts_object_remove_name(old);
+    fts_object_remove_bindings(old);
+
+    /* create new object */
+    new = fts_eval_object_description(patcher, ac, at);
+
+    /* update the loading vm */
+    fts_vm_substitute_object(old, new);
+
+    /* remove old from client and update list */
+    fts_object_reset_client(old);
+    fts_update_reset(old);
+
+    /* if new is an error object, assure that there are enough inlets and outlets for the connections */
+    if (fts_object_is_error(new))
+    {
+      fts_error_object_fit_inlet(new, fts_object_get_inlets_number(old) - 1);
+      fts_error_object_fit_outlet(new, fts_object_get_outlets_number(old) - 1);
+    }
+
+    /* move graphic properties and connections from old to new object */
+    fts_object_move_properties(old, new);
+    fts_object_move_connections(old, new);
+
+    /* set name of new object */
+    if(name != fts_s_empty_string)
+    {
+      fts_atom_t a;
+
+      fts_set_symbol(&a, name);
+      fts_send_message_varargs(new, fts_s_name, 1, &a);
+    }
+
+    /* try to rescue the old object state to the new one */
+    fts_set_object(&a, old);
+    fts_send_message_varargs(new, fts_s_redefine, 1, &a);
+
+    /* remove the old object from the patcher */
+    fts_patcher_remove_object(fts_object_get_patcher(old), old);
+
+    /* upload new object if old object was uploaded */
+    if(old_id != FTS_NO_ID)
+    {
+      fts_object_upload(new);
+      fts_object_upload_connections(new);
+    }
+
+    return new;
+  }
+  else
+  {
+    /* unbind variables */
+    fts_object_remove_name(old);
+    fts_object_remove_bindings(old);
+  }
+
+  return NULL;
 }

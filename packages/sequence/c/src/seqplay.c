@@ -513,7 +513,7 @@ seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(ac > 0)
     seqplay_set(o, 0, 0, ac, at);
   else
-    fts_object_set_error(o, "argument of track required");
+    fts_object_error(o, "argument of track required");
 }
 
 static void 

@@ -629,7 +629,7 @@ public class JMaxApplication {
   private void openConnection()
   {
     if (properties.get("jmaxConnection") == null)
-      properties.put("jmaxConnection", "pipe");
+      properties.put("jmaxConnection", "socket");
 
     try
       {
@@ -660,6 +660,7 @@ public class JMaxApplication {
 
 	FtsProcess fts = null;
 
+        /* if(true) @tt@ch */
         if (o != null && ((String)o).equals( "true"))
 	  {
 	    System.out.println( "Attaching to FTS on host " + hostName);

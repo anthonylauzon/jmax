@@ -50,8 +50,7 @@
 
 fts_symbol_t fts_get_default_root_directory( void)
 {
-  return fts_new_symbol("/Users/schnell/Projects/jmax/macosxbuild/jMaxProject/build/jMax.app/Contents/Resources/share/jmax");
-  /* @@@@@ return fts_new_symbol( DEFAULT_ROOT);*/
+  return fts_new_symbol( DEFAULT_ROOT);
 }
 
 fts_symbol_t fts_get_user_config( void)

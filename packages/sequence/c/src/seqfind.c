@@ -108,10 +108,10 @@ seqfind_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       else if(mode == sym_all)
 	this->mode = sym_all;
       else
-	fts_object_signal_runtime_error(o, "doesn't understand mode %s", mode);
+	fts_object_error(o, "doesn't understand mode %s", mode);
     }
   else
-    fts_object_signal_runtime_error(o, "symbol argument required for message mode");
+    fts_object_error(o, "symbol argument required for message mode");
 }
 
 static void
@@ -134,13 +134,13 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->track = 0;
   this->mode = sym_first;
 
-  if(fts_is_a(at, track_type))
+  if(ac > 0 && fts_is_a(at, track_type))
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
     }
   else
-    fts_object_set_error(o, "argument of event track required");
+    fts_object_error(o, "argument of event track required");
 }
 
 static void 

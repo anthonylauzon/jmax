@@ -20,10 +20,31 @@
  * 
  */
 
-
-
 #define FTS_NO_ID -1
 #define FTS_DELETE -2
+#define FTS_CREATE -3
+#define FTS_INVALID -4
+
+typedef struct fts_object_patcher_data
+{
+  /* the object description */
+  int argc;
+  fts_atom_t *argv;
+
+  /* names refered by the object */
+  fts_list_t *name_refs;
+
+  /* patcher housekeeping */
+  fts_patcher_t *patcher;
+  fts_object_t *next_in_patcher;
+
+  /* connections */
+  int n_inlets;
+  int n_outlets;
+  fts_connection_t **in_conn;
+  fts_connection_t **out_conn;
+
+} fts_object_patcher_data_t;
 
 struct fts_object 
 {
@@ -32,25 +53,8 @@ struct fts_object
   /* id for the client communication */
   int client_id;
   
-  /* name definition */
-  fts_definition_t *definition;
-  
-  /* the object description */
-  int argc;
-  fts_atom_t *argv;
-
-  /* patcher housekeeping */
-  fts_patcher_t *patcher;
-  fts_object_t *next_in_patcher;
-
-  /* names refered by the object */
-  fts_list_t *name_refs;
-
-  /* connections */
-  int n_inlets;
-  int n_outlets;
-  fts_connection_t **in_conn;
-  fts_connection_t **out_conn;
+  /* reference counter */
+  int refcnt;
 
   /* message cache */
   fts_symbol_t cache_selector;
@@ -58,11 +62,14 @@ struct fts_object
   int cache_varargs;
   fts_method_t cache_method;
 
+  /* name definition */
+  fts_definition_t *definition;
+  
+  /* patcher data */
+  fts_object_patcher_data_t *patcher_data;
+
   /* object dynamic properties */
   fts_plist_t *properties;
-
-  /* reference counter */
-  int refcnt;
 };
 
 /**
@@ -81,40 +88,27 @@ struct fts_object
 FTS_API fts_object_t *fts_object_create(fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 FTS_API void fts_object_destroy(fts_object_t *obj);
 
+FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+
+/* garbage collector handling */
+#define fts_object_refer(o) (((fts_object_t *)(o))->refcnt++)
+#define fts_object_release(o) ((--(((fts_object_t *)(o))->refcnt) > 0)? 0: (fts_object_destroy((fts_object_t *)(o)), 0))
+#define fts_object_has_only_one_reference(o) (((fts_object_t *)(o))->refcnt == 1)
+
+/* client id */
+#define fts_object_get_id(o) ((o)->client_id)
+#define fts_object_has_id(o) (fts_object_get_id(o) > FTS_NO_ID)
+
+/* class */
+#define fts_object_get_class(o) ((o)->cl)
+FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
+
+/* named objects handling */
 FTS_API void fts_object_set_name(fts_object_t *obj, fts_symbol_t sym);
 FTS_API fts_symbol_t fts_object_get_name(fts_object_t *obj);
 FTS_API void fts_object_update_name(fts_object_t *obj);
 
-FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
-
-/* Garbage collector handling */
-#define fts_object_refer(o) (((fts_object_t *)(o))->refcnt++)
-#define fts_object_release(o) ((--(((fts_object_t *)(o))->refcnt) > 0)? 0: (fts_object_destroy((fts_object_t *)(o)), 0))
-
-#define fts_object_has_only_one_reference(o) (((fts_object_t *)(o))->refcnt == 1)
-
-/* object description (system functions) */
-FTS_API void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
-
-#define fts_object_get_description_size(o) ((o)->argc)
-#define fts_object_get_description_atoms(o) ((o)->argv)
-
-#define fts_object_get_outlets_number(o) (((fts_object_t *)(o))->n_outlets)
-#define fts_object_get_inlets_number(o) (((fts_object_t *)(o))->n_inlets)
-FTS_API void fts_object_set_outlets_number(fts_object_t *o, int n);
-FTS_API void fts_object_set_inlets_number(fts_object_t *o, int n);
-
-#define fts_object_get_patcher(o) (((fts_object_t *)(o))->patcher)
-#define fts_object_set_patcher(o, patcher) (((fts_object_t *)(o))->patcher = (patcher))
-
-FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
-
-#define fts_object_get_id(o) ((o)->client_id)
-#define fts_object_has_id(o) (fts_object_get_id(o) > FTS_NO_ID)
-#define fts_object_get_class(o) ((o)->cl)
-
-#define fts_object_get_outlet_connection(o, i) ((o)->out_conn[i])
-
+/* message cache */
 #define fts_object_message_cache_get_selector(o) ((o)->cache_selector)
 #define fts_object_message_cache_get_type(o) ((o)->cache_type)
 #define fts_object_message_cache_get_varargs(o) ((o)->cache_varargs)
@@ -125,10 +119,29 @@ FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_message_cache_set_varargs(o, v) ((o)->cache_varargs = (v))
 #define fts_object_message_cache_set_method(o, m) ((o)->cache_method = (m))
 
+/* object description (system functions) */
+#define fts_object_get_description_size(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->argc): 0)
+#define fts_object_get_description_atoms(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->argv): NULL)
+FTS_API void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
+
+/* inlets and outlets */
+#define fts_object_get_outlets_number(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->n_outlets): 0)
+#define fts_object_get_inlets_number(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->n_inlets): 0)
+FTS_API void fts_object_set_outlets_number(fts_object_t *o, int n);
+FTS_API void fts_object_set_inlets_number(fts_object_t *o, int n);
+
+/* object in patcher */
+#define fts_object_get_patcher(o) (((o)->patcher_data != NULL)? ((o)->patcher_data->patcher): NULL)
+FTS_API void fts_object_set_patcher(fts_object_t *o, fts_patcher_t *patcher);
+
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 
-#define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
-#define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)
+/* inlets and outlets */
+#define fts_object_inlet_is_connected(o, i) (((o)->patcher_data != NULL)? ((o)->patcher_data->in_conn[(i)] != 0): 0)
+#define fts_object_outlet_is_connected(o, i) (((o)->patcher_data != NULL)? ((o)->patcher_data->out_conn[(i)] != 0): 0)
 
+FTS_API void fts_object_upload(fts_object_t *obj);
+
+/* package */
 FTS_API fts_package_t *fts_object_get_package(fts_object_t *obj);

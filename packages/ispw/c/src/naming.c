@@ -87,7 +87,7 @@ ispw_target_send(fts_object_t *target, fts_symbol_t s, int ac, const fts_atom_t 
   else if(s != NULL)
     {
       if(!fts_send_message(target, s, ac, at))
-	fts_object_signal_runtime_error(target, "don't understand message %s (from ispw message box)", s);
+	fts_object_error(target, "don't understand message %s (from ispw message box)", s);
     }
 }
 

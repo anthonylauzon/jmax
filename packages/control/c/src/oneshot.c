@@ -52,7 +52,7 @@ oneshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       this->open = (n != 0);
     }
   else
-    fts_object_set_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 /************************************************************
@@ -81,7 +81,7 @@ oneshot_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       else if(ac > 0 && fts_is_number(at))
 	this->open = fts_get_number_int(at);    
       else
-	fts_object_signal_runtime_error(o, "bad input for inlet 1");
+	fts_object_error(o, "bad input for inlet 1");
     }
 }
 

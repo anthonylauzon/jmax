@@ -272,7 +272,6 @@ FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *type);
 #define fts_class_outlet_atom(c, i) fts_class_outlet((c), (i), NULL)
 
 #define fts_class_outlet_varargs(c, i) fts_class_outlet((c), (i), NULL)
-#define fts_class_outlet_message(c, i) fts_class_outlet((c), (i), NULL)
 #define fts_class_outlet_thru(c, i) fts_class_outlet((c), (i), NULL)
 
 /*****************************************************************************

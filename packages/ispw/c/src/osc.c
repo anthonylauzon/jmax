@@ -77,7 +77,7 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 	}
     }
   else
-    fts_object_set_error(o, "name argument required");
+    fts_object_error(o, "name argument required");
 }
 
 static void

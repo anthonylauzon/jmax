@@ -46,7 +46,7 @@ static int in_out_check( fts_object_t *o, int ac, const fts_atom_t *at, fts_audi
 
 /*       if ( !*port) */
 /* 	{ */
-/* 	  fts_object_set_error( o, "default audio port is not defined"); */
+/* 	  fts_object_error( o, "default audio port is not defined"); */
 /* 	  return 0; */
 /* 	} */
     }
@@ -54,7 +54,7 @@ static int in_out_check( fts_object_t *o, int ac, const fts_atom_t *at, fts_audi
 #warning (OLD API) fts_object_is_audioport (OLD API)
 /*   if ( !fts_object_is_audioport( (fts_object_t *)*port) ) */
 /*     { */
-/*       fts_object_set_error( o, "argument must be an audio port"); */
+/*       fts_object_error( o, "argument must be an audio port"); */
 /*       return 0; */
 /*     } */
 

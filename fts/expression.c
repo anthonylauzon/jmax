@@ -75,10 +75,10 @@ static fts_status_description_t object_creation_failed_error_description = {
 };
 static fts_status_t object_creation_failed_error = &object_creation_failed_error_description;
 
-static fts_status_description_t invalid_selector_error_description = {
-  "invalid selector"
+static fts_status_description_t invalid_message_error_description = {
+  "invalid message"
 };
-static fts_status_t invalid_selector_error = &invalid_selector_error_description;
+static fts_status_t invalid_message_error = &invalid_message_error_description;
 
 #undef EXPRESSION_DEBUG
 
@@ -486,6 +486,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
     if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
+
     if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
 
@@ -495,19 +496,9 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     if (!fts_is_object( at))
       return operand_type_mismatch_error;
 
-    {
-      fts_method_t mth = fts_class_get_method_varargs( fts_get_class( at), fts_s_get_element);
-      if (mth)
-	{
-	  fts_set_void( fts_get_return_value());
-	  (*mth)( fts_get_object( at), fts_system_inlet, fts_s_get_element, ac-1, at+1);
-
-	  if (fts_is_void( fts_get_return_value()))
-	    return array_access_error;
-	}
-      else
-	return array_access_error;
-    }
+    if(!fts_send_message(fts_get_object( at), fts_s_get_element, ac-1, at+1) ||
+       fts_is_void( fts_get_return_value()))
+      return array_access_error;
 
     fts_atom_refer(fts_get_return_value());
 
@@ -588,7 +579,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       fts_set_void( fts_get_return_value());
 
       if (!fts_send_message(fts_get_object( at), selector, ac - 1, at + 1))
-	return invalid_selector_error;
+	return invalid_message_error;
     }
 
     fts_atom_refer(fts_get_return_value());

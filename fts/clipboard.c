@@ -63,7 +63,7 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   char buf[1024];
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
-  if (ac == 1)
+  if (ac == 0)
     name = "clipboard";
   else
     name = fts_get_symbol(at);

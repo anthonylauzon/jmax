@@ -85,7 +85,7 @@ filestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
   int n_wrote = write(this->fd, c, n);
 
   if(n_wrote != n)
-    fts_object_signal_runtime_error((fts_object_t *)stream, "write error for file %s", this->name);
+    fts_object_error((fts_object_t *)stream, "write error for file %s", this->name);
 }
 
 static void
@@ -96,7 +96,7 @@ filestream_output_char(fts_bytestream_t *stream, unsigned char c)
   int n_wrote = write(this->fd, &c, 1);
   
   if(n_wrote != 1)
-    fts_object_signal_runtime_error((fts_object_t *)stream, "write error for file %s", this->name);
+    fts_object_error((fts_object_t *)stream, "write error for file %s", this->name);
 }
 
 static void
@@ -132,7 +132,7 @@ filestream_output_buffered(fts_bytestream_t *stream, int n, const unsigned char 
     }
   
   if(n_wrote != n)
-    fts_object_signal_runtime_error((fts_object_t *)stream, "write error for file %s", this->name);
+    fts_object_error((fts_object_t *)stream, "write error for file %s", this->name);
 }
 
 static void
@@ -149,7 +149,7 @@ filestream_output_char_buffered(fts_bytestream_t *stream, unsigned char c)
       n_wrote = write(this->fd, this->out_buf, this->out_size);
       
       if(n_wrote != out_size)
-	fts_object_signal_runtime_error((fts_object_t *)stream, "write error for file %s", this->name);
+	fts_object_error((fts_object_t *)stream, "write error for file %s", this->name);
 
       this->out_fill = 0;
     }
@@ -167,7 +167,7 @@ filestream_flush(fts_bytestream_t *stream)
       int n_wrote = write(this->fd, this->out_buf, n);
       
       if(n_wrote != n)
-	fts_object_signal_runtime_error((fts_object_t *)stream, "write error for file %s", this->name);
+	fts_object_error((fts_object_t *)stream, "write error for file %s", this->name);
     }
 
   this->out_fill = 0;
@@ -250,7 +250,7 @@ filestream_start(filestream_t *this)
 	}
     }
   else
-    fts_object_signal_runtime_error((fts_object_t *)this, "cannot open file \"%s\" (%s)", this->name, strerror(errno));
+    fts_object_error((fts_object_t *)this, "cannot open file \"%s\" (%s)", this->name, strerror(errno));
 }
   
 static void

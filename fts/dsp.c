@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/sigconn.h>
 #include <ftsprivate/dspgraph.h>
@@ -232,8 +233,12 @@ void
 fts_dsp_object_init(fts_dsp_object_t *obj)
 {
   fts_class_t *cl = fts_object_get_class((fts_object_t *)obj);
-  int ninputs = dsp_object_get_n_inlets(obj);
-  int noutputs = dsp_object_get_n_outlets(obj);
+  int ninputs, noutputs;
+
+  fts_object_get_patcher_data((fts_object_t *)obj);
+
+  ninputs = dsp_object_get_n_inlets(obj);
+  noutputs = dsp_object_get_n_outlets(obj);
 
   /* make sure that class has a put method */
   if(fts_class_get_method_varargs(cl, fts_s_put) == NULL)

@@ -48,7 +48,7 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 #define fts_patcher_get_env(p)           (&((p)->env))
 
-#define fts_patcher_set_save_id(p, i) ((p)->save_id == (i))
+#define fts_patcher_set_save_id(p, i) ((p)->save_id = (i))
 #define fts_patcher_get_save_id(p, i) ((p)->save_id)
 
 extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);

@@ -30,6 +30,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/patcher.h>
+#include <ftsprivate/object.h>
 
 /* Implement autosave functions; autosave is implemented
    only for catastrophic situations, but can be easily implemented 
@@ -56,7 +57,7 @@ static void fts_autosave(const char *postfix)
   fts_object_t *p;
 
   /* First, look if the objects in the patchers are to be found */
-  for (p = root->objects; p ; p = p->next_in_patcher)
+  for (p = root->objects; p ; p = fts_object_get_next_in_patcher(p))
     {
       if (fts_object_is_patcher(p))
 	{

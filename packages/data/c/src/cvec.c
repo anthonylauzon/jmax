@@ -138,7 +138,17 @@ cvec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-cvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cvec_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  fts_atom_t a;
+
+  fts_set_int(&a, cvec_get_size(this));
+  fts_return(&a);
+}
+
+static void
+cvec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
 
@@ -158,13 +168,6 @@ cvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  for(i=old_size; i<size; i++)
 	    values[i] = CZERO;
 	}
-    }
-  else
-    {
-      fts_atom_t a;
-
-      fts_set_int(&a, cvec_get_size(this));
-      fts_return(&a);
     }
 }
 
@@ -198,7 +201,7 @@ cvec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    }
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -226,7 +229,7 @@ cvec_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    }
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -304,7 +307,7 @@ cvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    }
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -429,7 +432,7 @@ cvec_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       fts_cfft_inplc(fft_ptr, fft_size);
     }
   else
-    fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+    fts_object_error(o, "method not implemented for given arguments");
 }
 
 static void
@@ -475,7 +478,7 @@ cvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_cifft_inplc(fft_ptr, fft_size);
     }
   else
-    fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+    fts_object_error(o, "method not implemented for given arguments");
 }
 
 /********************************************************************
@@ -653,7 +656,7 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       data_object_persistence_args(o);
     }
   else
-    fts_object_set_error(o, "bad arguments for cvec constructor");
+    fts_object_error(o, "bad arguments for cvec constructor");
 }
 
 static void
@@ -696,7 +699,13 @@ cvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("fft"), cvec_fft);
   fts_class_message_varargs(cl, fts_new_symbol("ifft"), cvec_ifft);
 
-  fts_class_message_varargs(cl, fts_s_size, cvec_size);
+  fts_class_message_void(cl, fts_s_size, cvec_return_size);
+  fts_class_message_number(cl, fts_s_size, cvec_change_size);
+  
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 /********************************************************************

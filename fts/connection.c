@@ -84,9 +84,14 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
 fts_connection_t *
 fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet, fts_connection_type_t type)
 {
-  int valid = 1;
+  fts_patcher_t *patcher = fts_object_get_patcher(src);
   fts_connection_t *conn;
-  fts_connection_t *p;
+  fts_connection_t **p;
+  int valid = 1;
+
+  /* make sure that patcher data is allocated */
+  fts_object_get_patcher_data(src);
+  fts_object_get_patcher_data(dst);
 
   /* first of all, if one of the two object is an error object, add the required inlets/outlets to it */
   if (fts_object_is_error(src))
@@ -109,37 +114,40 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
       valid = 0;
     }
 
-  /* check the inlet range (should never happen, a part from loading) */
-  if (winlet >= fts_object_get_inlets_number(dst) || winlet < 0)
-    {
-      fts_object_signal_runtime_error(dst, "inlet out of range");
-      return NULL;
-    }
-
-  /* check the outlet range (should never happen, a part from loading) */
-  if (winlet >= fts_object_get_inlets_number(dst) || winlet < 0)
-    {
-      fts_object_signal_runtime_error(dst, "inlet out of range");
-      return NULL;
-    }
-
-  /* check the outlet range (should never happen, a part from loading) */
+  /* check the outlet range of source (should never happen, apart from loading) */
   if (woutlet >= fts_object_get_outlets_number(src) || woutlet < 0)
+  {
+    fts_object_error(dst, "outlet out of range");
+    return NULL;
+  }
+
+  /* check the inlet range of destination (should never happen, apart from loading) */
+  if (winlet >= fts_object_get_inlets_number(dst) || winlet < 0)
     {
-      fts_object_signal_runtime_error(src, "outlet out of range");
+      fts_object_error(dst, "inlet out of range");
       return NULL;
     }
 
-  /* check for double connections */
-  for (p = src->out_conn[woutlet]; p ; p = p->next_same_src)
+  /* check source for double connections */
+  for (conn = fts_object_get_outlet_connections(src, woutlet); conn ; conn = conn->next_same_src)
+  {
+    if ((conn->dst == dst) && (conn->winlet == winlet))
     {
-      if ((p->dst == dst) && (p->winlet == winlet))
-	{
-	  fts_object_signal_runtime_error(dst, "double connection ignored");
-	  return NULL;
-	}
+      fts_object_error(dst, "double connection ignored");
+      return NULL;
     }
-  
+  }
+
+  /* check destination for double connections */
+  for (conn = fts_object_get_inlet_connections(dst, winlet); conn ; conn = conn->next_same_dst)
+  {
+    if ((conn->src == src) && (conn->woutlet == woutlet))
+    {
+      fts_object_error(src, "double connection ignored");
+      return NULL;
+    }
+  }
+
   /* connections are at least anything between valid objects */
   if(valid && type == fts_c_null) 
     type = fts_c_anything;
@@ -147,47 +155,37 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
   /* check connection */
   if(connection_check(src, woutlet, dst, winlet) == 0)
     {
-      fts_object_signal_runtime_error(dst, "type mismatch (cannot connect)");
+      fts_object_error(dst, "type mismatch (cannot connect)");
       return NULL;
     }
 
+  /* set patcher */
+  if(patcher != fts_object_get_patcher(dst))
+    patcher = NULL;
+
   /* init connection */
-  conn = (fts_connection_t *)fts_object_create(fts_connection_class, NULL, 0, 0);
+  conn = (fts_connection_t *)fts_object_create(fts_connection_class, patcher, 0, 0);
   conn->src = src;
   conn->woutlet = woutlet;
   conn->dst = dst;
   conn->winlet = winlet;
   conn->type = type;
-
-  /* set patcher */
-  ((fts_object_t *)conn)->patcher = conn->src->patcher;
+  conn->next_same_src = NULL;
+  conn->next_same_dst = NULL;
 
   /* init cache */
   conn->cache_type = NULL;
   conn->cache_method = NULL;
 
-  /* add the connection to the outlet list and to the inlet list  */
-  if (src->out_conn[woutlet] == NULL)
-    {
-      conn->next_same_src = NULL;
-      src->out_conn[woutlet] = conn;
-    }
-  else
-    {
-      conn->next_same_src = src->out_conn[woutlet];
-      src->out_conn[woutlet] = conn;
-    }
+  /* add connection to source outlet */
+  p = &fts_object_get_outlet_connections(src, woutlet);
+  conn->next_same_src = *p;
+  *p = conn;
 
-  if (dst->in_conn[winlet] == NULL)
-    {
-      conn->next_same_dst = NULL;
-      dst->in_conn[winlet] = conn;
-    }
-  else
-    {
-      conn->next_same_dst = dst->in_conn[winlet];
-      dst->in_conn[winlet] = conn;
-    }
+  /* add connection to destination inlet */
+  p = &fts_object_get_inlet_connections(dst, winlet);
+  conn->next_same_dst = *p;
+  *p = conn;
 
   return conn;
 }
@@ -195,19 +193,18 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
 void 
 fts_connection_delete(fts_connection_t *conn)
 {
-  fts_object_t *src;
-  fts_object_t *dst;
-  fts_connection_t **p; /* indirect precursor */
+  fts_object_t *src = conn->src;
+  fts_object_t *dst = conn->dst;
+  int woutlet = conn->woutlet;
+  int winlet = conn->winlet;
+  fts_connection_t **p;
 
   /* release the client representation of the connection */
   if (fts_object_has_id( (fts_object_t *)conn) && conn->type > fts_c_hidden)
     fts_client_release_object((fts_object_t *)conn);
 
-  src = conn->src;
-  dst = conn->dst;
-
   /* look for the connection in the output list of src, and remove it */
-  for (p = &src->out_conn[conn->woutlet]; *p ; p = &((*p)->next_same_src))
+  for (p = &fts_object_get_outlet_connections(src, woutlet); *p ; p = &((*p)->next_same_src))
     {
       if ((*p) == conn)
 	{
@@ -217,7 +214,7 @@ fts_connection_delete(fts_connection_t *conn)
     }
 
   /* look for it  in the input list of in, and remove it*/
-  for (p = &dst->in_conn[conn->winlet]; *p ; p = &((*p)->next_same_dst))
+  for (p = &fts_object_get_inlet_connections(dst, winlet); *p ; p = &((*p)->next_same_dst))
     if ((*p) == conn)
       {
 	*p = (*p)->next_same_dst;
@@ -230,98 +227,16 @@ fts_connection_get(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
 {
   fts_connection_t *c;
 
-  for(c=src->out_conn[woutlet]; c; c=c->next_same_src)
+  if(fts_object_has_patcher_data(src))
+  {
+    for(c=fts_object_get_outlet_connections(src, woutlet); c; c=c->next_same_src)
     {
       if(c->dst == dst && c->winlet == winlet)
-	return c;
+        return c;
     }
-
+  }
+  
   return NULL;
-}
-
-/*   
- * This function move the connection of the object old to
- * the object new; it delete the connections that are
- * no more pertinent; if the connection have an ID, it
- * is kept.
- */
-void 
-fts_object_move_connections(fts_object_t *old, fts_object_t *new)
-{
-  fts_connection_t *p;
-  int i;
-
-  for (i=0; i<fts_object_get_outlets_number(old); i++)
-    {
-      fts_connection_t *p;
-
-      for (p=old->out_conn[i]; p;  p=old->out_conn[i])
-	{
-	  if(i < fts_object_get_outlets_number(new) && p->type > fts_c_hidden)
-	    fts_connection_new(new, p->woutlet, p->dst, p->winlet, p->type);
-	  
-	  fts_connection_delete(p);
-	}
-    }
-
-  for (i=0; i<fts_object_get_inlets_number(old); i++)
-    {
-      for (p=old->in_conn[i]; p; p=old->in_conn[i])
-	{
-	  if(i < fts_object_get_inlets_number(new) && p->type > fts_c_hidden)
-	    fts_connection_new(p->src, p->woutlet, new, p->winlet, p->type);
-	  
-	  fts_connection_delete(p);
-	}
-    }
-}
-
-/*   
- * Assuming that the number of inlets or outlets
- * of the object will become as specified by the arguments,
- * delete all the connections that will be not pertinent
- * anymore; tell the client also !!
- */
-void 
-fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
-{
-  int inlet;
-
-
-  for (inlet = inlets; inlet < fts_object_get_inlets_number(obj); inlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons
-	 and methods  can fire correctly */
-
-      for (p = obj->in_conn[inlet]; p; p = obj->in_conn[inlet])
-	fts_connection_delete(p);
-
-      obj->in_conn[inlet] = NULL; 
-    }
-}
-
-
-void 
-fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
-{
-  int outlet;
-
-  for (outlet = outlets; outlet < fts_object_get_outlets_number(obj); outlet++)
-    {
-      fts_connection_t *p;
-
-      /* The loop work by iterating on the first connection;
-	 this work because the loop destroy one connection at a time.
-	 */
-
-      for (p = obj->out_conn[outlet]; p ;  p = obj->out_conn[outlet])
-	fts_connection_delete(p);
-
-
-      obj->out_conn[outlet] = NULL; 
-    }
 }
 
 void 

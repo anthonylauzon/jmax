@@ -361,7 +361,7 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       fts_object_set_inlets_number(o, n_order + 1);
     }
   else
-    fts_object_set_error(o, "max 4th order");
+    fts_object_error(o, "max 4th order");
 }
 
 

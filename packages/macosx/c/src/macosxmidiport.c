@@ -78,7 +78,7 @@ macosxmidiport_parse_input(const MIDIPacketList *pktlist, void *o, void *src)
         }
       }
     } else
-      fts_object_signal_runtime_error((fts_object_t *)o, "MIDI buffer overflow");
+      fts_object_error((fts_object_t *)o, "MIDI buffer overflow");
     
     packet = MIDIPacketNext(packet);
   }
@@ -204,11 +204,11 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
         fts_set_object(&a, o);
         fts_hashtable_put(&manager->inputs, &k, &a);
       } else {
-        fts_object_set_error(o, "cannot create port");
+        fts_object_error(o, "cannot create port");
         return;
       }
     } else {
-      fts_object_set_error(o, "invalid Mac OS MIDI object id");
+      fts_object_error(o, "invalid Mac OS MIDI object id");
       return;
     }
   } else {    
@@ -221,7 +221,7 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
       fts_set_object(&a, o);
       fts_hashtable_put(&manager->destinations, &k, &a);
     } else {
-      fts_object_set_error(o, "cannot create Mac OS virtual MIDI destination");
+      fts_object_error(o, "cannot create Mac OS virtual MIDI destination");
       return;
     }
   }
@@ -271,11 +271,11 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
         fts_set_object(&a, o);
         fts_hashtable_put(&manager->outputs, &k, &a);
       } else {
-        fts_object_set_error(o, "cannot create Mac OS MIDI port");
+        fts_object_error(o, "cannot create Mac OS MIDI port");
         return;
       }
     } else {
-      fts_object_set_error(o, "invalid Mac OS MIDI object id");
+      fts_object_error(o, "invalid Mac OS MIDI object id");
       return;
     }
   } else {
@@ -291,7 +291,7 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
       fts_set_object(&a, o);
       fts_hashtable_put(&manager->sources, &k, &a);
     } else {
-      fts_object_set_error(o, "cannot create Mac OS virtual MIDI source");
+      fts_object_error(o, "cannot create Mac OS virtual MIDI source");
       return;
     }    
   }
@@ -372,11 +372,11 @@ macosxmidi_output_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof( macosxmidiport_t), macosxmidi_output_init, macosxmidiport_delete);
 
   fts_midiport_class_init(cl);
-    }
+}
 
 void 
 macosxmidiport_config( void)
 {
-  macosxmidi_input_type = fts_class_install( fts_new_symbol("macosxmidi_input"), macosxmidi_input_instantiate);
-  macosxmidi_output_type = fts_class_install( fts_new_symbol("macosxmidi_output"), macosxmidi_output_instantiate);
+  macosxmidi_input_type = fts_class_install(NULL, macosxmidi_input_instantiate);
+  macosxmidi_output_type = fts_class_install(NULL, macosxmidi_output_instantiate);
 }

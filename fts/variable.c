@@ -60,7 +60,10 @@ fts_definition_new(fts_symbol_t name)
 static void
 define_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-2, o->argv+2);
+  int descr_ac = fts_object_get_description_size(o);
+  fts_atom_t *descr_at = fts_object_get_description_atoms(o);
+  
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), descr_ac - 2, descr_at + 2);
 }
 
 fts_definition_t *
@@ -184,12 +187,9 @@ fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *o
 {
   fts_patcher_t *scope = fts_patcher_get_scope(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
-  fts_atom_t a;
 
   fts_definition_add_listener(def, obj);
-
-  fts_set_pointer(&a, def);
-  obj->name_refs = fts_list_prepend(obj->name_refs, &a);
+  fts_object_add_binding(obj, def);
 }
 
 void
@@ -330,7 +330,7 @@ define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_atom_refer(&this->value);
     }
   else
-    fts_object_set_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 static void 
@@ -383,14 +383,14 @@ args_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
       else
 	{
-	  fts_object_set_error(o, "argument %d is not defined for this patcher", index);
+	  fts_object_error(o, "argument %d is not defined for this patcher", index);
 	  return;
 	}
 
       fts_name_add_listener(fts_object_get_patcher(o), fts_s_args, o);
     }
   else
-    fts_object_set_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 static void

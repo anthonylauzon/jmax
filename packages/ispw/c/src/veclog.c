@@ -180,6 +180,8 @@ siglog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     siglog_set_base(o, 0, 0, 1, at);
   else
     obj->scl = 1.0;
+
+  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
@@ -200,8 +202,7 @@ sigexp_instantiate(fts_class_t *cl)
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  }
-
+}
 
 static void
 siglog_instantiate(fts_class_t *cl)
@@ -215,7 +216,7 @@ siglog_instantiate(fts_class_t *cl)
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  }
+}
 
 static void
 siglog10_instantiate(fts_class_t *cl)
@@ -226,7 +227,7 @@ siglog10_instantiate(fts_class_t *cl)
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-  }
+}
 
 void 
 veclog_config(void)

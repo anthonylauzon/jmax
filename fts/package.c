@@ -1178,9 +1178,6 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->windows = NULL;
 
   pkg->config = NULL;
-
-  fts_set_symbol(&a, fts_s_package);
-  fts_object_set_description(o, 1, &a);
 }
 
 void 
@@ -1238,6 +1235,9 @@ fts_package_upload_requires( fts_package_t *this)
   fts_package_t *pkg;
   fts_atom_t a[1]; 
   fts_iterator_t i;
+
+  fts_log("[package]: upload requires (id %d)\n", fts_object_get_id((fts_object_t *)this));
+  
   fts_list_get_values( this->packages, &i);
   fts_client_start_message( (fts_object_t *)this, fts_s_require);
   while (fts_iterator_has_more( &i))
@@ -1323,8 +1323,9 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   fts_package_t *this = (fts_package_t *)o;
   fts_atom_t a[3]; 
-  fts_iterator_t h;
   char summary[256];
+
+  fts_log("[package]: upload\n");
 
   if( this->state == fts_package_corrupt)
     return;
@@ -1435,13 +1436,7 @@ fts_package_delete(fts_package_t* pkg)
 {
   fts_client_send_message( (fts_object_t *)pkg, fts_s_destroyEditor, 0, 0);
 
-  if( ((fts_object_t *)pkg)->patcher)
-    {
-      fts_patcher_remove_object( ((fts_object_t *)pkg)->patcher, (fts_object_t *)pkg);
-      ((fts_object_t *)pkg)->patcher = 0;
-    }
-  else
-    fts_object_destroy( (fts_object_t*) pkg);
+  fts_object_destroy( (fts_object_t*) pkg);
 }
 
 
@@ -1547,8 +1542,6 @@ fts_kernel_package_init(void)
   fts_system_package->object.client_id = FTS_NO_ID;
   fts_system_package->object.properties = 0;
   fts_system_package->object.refcnt = 0;
-  fts_system_package->object.out_conn = 0;
-  fts_system_package->object.in_conn = (fts_connection_t **) fts_zalloc(sizeof(fts_connection_t *));
   
   __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 0, 0); 
   fts_package_set_state(fts_system_package, fts_package_loaded); 

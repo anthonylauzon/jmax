@@ -27,6 +27,7 @@
 #include <fcntl.h>
 
 #include <fts/fts.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/patfile.h>
@@ -1019,7 +1020,7 @@ fts_get_child(fts_object_t *obj, int idx)
   
   idx = fts_patcher_get_objects_count( (fts_patcher_t *)obj ) - idx - 1;
 
-  for (p = patcher->objects; p ; p = p->next_in_patcher)
+  for (p = patcher->objects; p ; p = fts_object_get_next_in_patcher(p))
     {
       if (idx == 0)
 	return p;

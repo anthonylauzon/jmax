@@ -154,10 +154,10 @@ locate_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       else if(mode == seqsym_segment)
 	this->mode = seqsym_segment;
       else
-	fts_object_signal_runtime_error(o, "doesn't understand mode %s", mode);
+	fts_object_error(o, "doesn't understand mode %s", mode);
     }
   else
-    fts_object_signal_runtime_error(o, "symbol argument required for message mode");
+    fts_object_error(o, "symbol argument required for message mode");
 }
 
 static void
@@ -184,7 +184,7 @@ locate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(ac > 0 && fts_is_a(at, track_type))
     locate_set_track(o, 0, 0, ac, at);
   else
-    fts_object_set_error(o, "argument of track required");
+    fts_object_error(o, "argument of track required");
 }
 
 static void 

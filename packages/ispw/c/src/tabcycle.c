@@ -75,7 +75,7 @@ tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_dsp_object_init((fts_dsp_object_t *)o);
     }
   else
-    fts_object_set_error(o, "bad arguments");
+    fts_object_error(o, "bad arguments");
 }
 
 
@@ -84,7 +84,9 @@ tabcycle_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   tabcycle_t *this = (tabcycle_t *)o;
 
-  ftl_data_free(this->tabcycle_data);
+  if(this->tabcycle_data != NULL)
+    ftl_data_free(this->tabcycle_data);
+  
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 

@@ -29,6 +29,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/sigconn.h>
 #include <ftsprivate/dspgraph.h>
@@ -94,7 +95,6 @@ graph_iterator_push(void *ptr, fts_object_t *object, int outlet)
 {
   graph_iterator_t *iter = (graph_iterator_t *)ptr;
   stack_element_t *new, *elem;
-  fts_connection_t* connection;
 
   if (!inited)
     {
@@ -110,16 +110,10 @@ graph_iterator_push(void *ptr, fts_object_t *object, int outlet)
   new = (stack_element_t *)fts_heap_zalloc(stack_element_heap);
   
   new->object = object;
-
-  if (object->out_conn)
-    connection = object->out_conn[outlet];
-  else
-    connection = 0;
-
-  new->connection = connection;
+  new->connection = fts_object_get_outlet_connections(object, outlet);
   new->connection_to_thru = 0;
-
   new->next = iter->top;
+  
   iter->top = new;
 }
 
@@ -426,7 +420,7 @@ gen_outputs(fts_dsp_object_t *obj, int vector_size, double sample_rate)
 	  in_size = descr->in[i]->length;
 	else if (in_size != descr->in[i]->length)
 	  {
-	    fts_object_signal_runtime_error((fts_object_t *)obj, "DSP: inputs don't match");
+	    fts_object_error((fts_object_t *)obj, "DSP: inputs don't match");
 	    return 0;
 	  }
       }
@@ -738,7 +732,7 @@ dsp_graph_check_loop( fts_dsp_graph_t *graph)
     {
       if (!IS_SCHEDULED(obj))
 	{
-	  fts_object_signal_runtime_error((fts_object_t *)obj, "loop in dsp graph (object not activated)");
+	  fts_object_error((fts_object_t *)obj, "loop in dsp graph (object not activated)");
 	  ok = 0;
 	}
     }

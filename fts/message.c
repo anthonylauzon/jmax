@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/object.h>
 #include <ftsconfig.h>
 
 #if HAVE_ALLOCA_H
@@ -86,7 +87,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_message_set(this, selector, ac - 1, at + 1);
 	}
       else
-	fts_object_set_error(o, "first argument must be symbol");
+	fts_object_error(o, "first argument must be symbol");
     }
 }
 
@@ -180,7 +181,7 @@ check_outlet(fts_object_t *o, int woutlet)
 {
   if (woutlet >= fts_object_get_outlets_number(o) || woutlet < 0)
     {
-      fts_object_signal_runtime_error(o, "outlet (%d) out of range", woutlet);
+      fts_object_error(o, "outlet (%d) out of range", woutlet);
       return 0;
     }
   else
@@ -209,7 +210,7 @@ outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t *at)
 {
   if(check_outlet(o, woutlet))
   {
-    fts_connection_t *conn = fts_object_get_outlet_connection(o, woutlet);
+    fts_connection_t *conn = fts_object_get_outlet_connections(o, woutlet);
 
     if (!FTS_REACHED_MAX_CALL_DEPTH())
     {
@@ -242,20 +243,20 @@ outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t *at)
 		}
 	      else
 		{
-		  fts_object_signal_runtime_error(dst, "no %s method for inlet %d", fts_class_get_name(type), winlet);
+		  fts_object_error(dst, "no %s method for inlet %d", fts_class_get_name(type), winlet);
 		  conn = fts_connection_get_next_of_same_source(conn);
 		  continue;
 		}
 	    }
-	  else
-	    INVOKE(method, dst, winlet, NULL, !fts_is_void(at), at);
+
+          INVOKE(method, dst, winlet, NULL, !fts_is_void(at), at);
         }
 
         conn = fts_connection_get_next_of_same_source(conn);
       }
     }
     else
-      fts_object_signal_runtime_error(o, "message stack overflow at outlet %d", woutlet);
+      fts_object_error(o, "message stack overflow at outlet %d", woutlet);
   }
 }
 
@@ -265,7 +266,7 @@ outlet_tuple(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at, fts_ato
 {
   if(check_outlet(o, woutlet))
   {
-    fts_connection_t *conn = fts_object_get_outlet_connection(o, woutlet);
+    fts_connection_t *conn = fts_object_get_outlet_connections(o, woutlet);
 
     if(!FTS_REACHED_MAX_CALL_DEPTH())
     {
@@ -302,7 +303,7 @@ outlet_tuple(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at, fts_ato
             }
             else
             {
-              fts_object_signal_runtime_error(dst, "no tuple method at inlet %d", winlet); 
+              fts_object_error(dst, "no tuple method at inlet %d", winlet); 
 	      conn = fts_connection_get_next_of_same_source(conn);
 	      continue;
             }
@@ -321,7 +322,7 @@ outlet_tuple(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at, fts_ato
       }
     }
     else
-      fts_object_signal_runtime_error(o, "message stack overflow at outlet %d", woutlet);
+      fts_object_error(o, "message stack overflow at outlet %d", woutlet);
   }
 }
 
@@ -580,7 +581,7 @@ fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const f
 {
   if(check_outlet(o, woutlet))
   {
-    fts_connection_t *conn = fts_object_get_outlet_connection(o, woutlet);
+    fts_connection_t *conn = fts_object_get_outlet_connections(o, woutlet);
 
     if (!FTS_REACHED_MAX_CALL_DEPTH())
     {
@@ -596,7 +597,7 @@ fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const f
         if(handler != NULL)
           (*handler)(dst, fts_connection_get_inlet(conn), s, ac, at);
         else if(dispatch_message_varargs(dst, s, ac, at, &atup) == NULL)
-	  fts_object_signal_runtime_error(dst, "no method for message %s with given argument(s)", s);
+	  fts_object_error(dst, "no method for message %s with given argument(s)", s);
         
         conn = fts_connection_get_next_of_same_source(conn);
       }
@@ -606,7 +607,7 @@ fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const f
         fts_object_release(fts_get_object(&atup));
     }
     else
-      fts_object_signal_runtime_error(o, "message stack overflow at outlet %d", woutlet);
+      fts_object_error(o, "message stack overflow at outlet %d", woutlet);
   }
 }
 

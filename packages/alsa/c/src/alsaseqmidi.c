@@ -348,7 +348,7 @@ alsaseqmidi_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_DUPLEX, 0);
   if (err < 0)
   {
-    fts_object_set_error(o, "cannot create ALSA sequencer client ...");
+    fts_object_error(o, "cannot create ALSA sequencer client ...");
     fts_log("[alsaseqmidi] cannot create ALSA sequencer handle\n");
     return;
   }

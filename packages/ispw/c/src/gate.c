@@ -47,7 +47,7 @@ gate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   else if(s == NULL && ac > 1 && fts_is_number(at))
     this->opened = fts_get_number_int(at);
   else
-    fts_object_signal_runtime_error(o, "bad input at inlet 0");
+    fts_object_error(o, "bad input at inlet 0");
 }
 
 static void

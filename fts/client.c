@@ -225,7 +225,7 @@ static void client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, in
 
   if ( ++objects_count > 1)
     {
-      fts_object_set_error( o, "object client_manager already exists");
+      fts_object_error( o, "object client_manager already exists");
       return;
     }
 
@@ -836,7 +836,7 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
 
       fts_object_put_prop(obj, name, &at[2]);
 
-      fts_patcher_set_dirty( obj->patcher, 1);
+      fts_patcher_set_dirty(fts_object_get_patcher(obj), 1);
     }
   else
     fts_log("[client]: System Error set_object_property: bad args\n");
@@ -1018,7 +1018,7 @@ static void client_predefine_objects( client_t *this)
 
   if ( !this->root_patcher)
     {
-      fts_object_set_error( (fts_object_t *)this, "cannot create client root patcher");
+      fts_object_error( (fts_object_t *)this, "cannot create client root patcher");
       return;
     }
 
@@ -1042,7 +1042,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
        || !fts_bytestream_is_input( this->stream) 
        || !fts_bytestream_is_output( this->stream))
     {
-      fts_object_set_error( (fts_object_t *)this, "invalid stream");
+      fts_object_error( (fts_object_t *)this, "invalid stream");
       return;
     }
 
@@ -1076,8 +1076,12 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_atom_t a[1];
   fts_object_t *project = (fts_object_t *)fts_project_get();
 
+  fts_log("[client]: get project: id %d, parent 0x%x\n", fts_object_get_id(project), fts_object_get_patcher(project));
+  
   if (!fts_object_has_id( project))
     client_register_object( (client_t *)o, project, FTS_NO_ID);
+
+  fts_log("[client]: send project: id %d\n", fts_object_get_id(project));
 
   fts_set_int(a, fts_get_object_id( project));
   fts_client_send_message(o, fts_s_project, 1, a);
@@ -1377,37 +1381,6 @@ void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, 
   fts_client_done_message( obj);
 }
 
-void fts_client_upload_object(fts_object_t *obj, int client_id)
-{
-  fts_atom_t a[1];
-
-  fts_client_register_object(obj, client_id);
-
-  fts_set_object( a, obj);
-  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_s_upload_child, 1, a);  
-}
-
-void 
-fts_client_upload_object_connections(fts_object_t *obj)
-{
-  fts_connection_t *p;
-  int i;
-
-  for(i=0; i<fts_object_get_outlets_number(obj); i++)
-    {
-      for (p = obj->out_conn[i]; p ; p = p->next_same_src)
-	if(p->type > fts_c_hidden)
-	  fts_client_upload_object((fts_object_t *)p, -1);
-    }
-
-  for (i=0; i<fts_object_get_inlets_number(obj); i++)
-    {
-      for (p=obj->in_conn[i]; p; p=p->next_same_dst)
-	if(p->type > fts_c_hidden)
-	  fts_client_upload_object((fts_object_t *)p, -1);
-    }
-}
-
 void fts_client_register_object(fts_object_t *obj, int client_id)
 {
   client_t *client;
@@ -1417,9 +1390,9 @@ void fts_client_register_object(fts_object_t *obj, int client_id)
   
   client = client_table_get(client_id);
 
-  if ( !client)
+  if(!client)
     {
-      fts_log("[client] fts_client_upload_object: Cannot upload object\n");      
+      fts_log("[client] fts_client_register_object: cannot get id\n");      
       return;
     }
 
@@ -1441,10 +1414,10 @@ void fts_client_release_object(fts_object_t *obj)
       return;
     }
 
-  if( obj->patcher)
+  if(fts_object_get_patcher(obj) != NULL)
     {
       fts_set_object(a, obj);
-      fts_client_send_message( (fts_object_t *)obj->patcher, s_remove_object, 1, a);
+      fts_client_send_message( (fts_object_t *)fts_object_get_patcher(obj), s_remove_object, 1, a);
     }
 
   client_release_object( client, obj);

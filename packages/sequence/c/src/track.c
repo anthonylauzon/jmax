@@ -233,7 +233,6 @@ track_remove_event(track_t *track, event_t *event)
 
   event->next = event->prev = 0;
   
-  ((fts_object_t *)event)->patcher = 0;
   fts_object_release(event);
 }
 
@@ -265,7 +264,6 @@ track_clear(track_t *track)
       event_t *next = event_get_next(event);
       
       event->next = event->prev = 0;
-      ((fts_object_t *)event)->patcher = 0;
       fts_object_release((fts_object_t *)event);
       
       event = next;
@@ -492,10 +490,7 @@ static void
 track_add_event_at_client(track_t *this, event_t *event, int ac, const fts_atom_t *at)
 {
   if(!fts_object_has_id((fts_object_t *)event))
-    {
-      ((fts_object_t *)event)->patcher = fts_object_get_patcher( (fts_object_t *)this);
-      fts_client_register_object((fts_object_t *)event, FTS_NO_ID);
-    }
+    fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));
 
   fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
   fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
@@ -511,9 +506,7 @@ track_event_upload(track_t *this, event_t *event)
 
   if(!fts_object_has_id((fts_object_t *)event))
     {
-      ((fts_object_t *)event)->patcher = fts_object_get_patcher( (fts_object_t *)this);
-      fts_client_register_object((fts_object_t *)event, FTS_NO_ID);
-    
+      fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));    
 
       fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
       fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
@@ -695,7 +688,7 @@ track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  track_add_event(this, time, event);
 	}
       else
-	fts_object_signal_runtime_error(o, "insert: event type missmatch\n");
+	fts_object_error(o, "insert: event type missmatch\n");
     }
 }
   
@@ -892,9 +885,9 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       error = fts_midifile_get_error(file);
       
       if(error)
-	fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", name, error);
+	fts_object_error(o, "import: read error in \"%s\" (%s)\n", name, error);
       else if(size <= 0)
-	fts_object_signal_runtime_error(o, "import: couldn't get any data from \"%s\"\n", name);
+	fts_object_error(o, "import: couldn't get any data from \"%s\"\n", name);
       
       fts_midifile_close(file);
       
@@ -902,7 +895,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	track_upload(o, 0, 0, 0, 0);
     }
   else
-    fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", name);
+    fts_object_error(o, "import: cannot open \"%s\"\n", name);
 }
       
 static void
@@ -938,10 +931,10 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       else if(ac == 1 && fts_is_symbol(at))
 	track_import_midifile(o, 0, 0, 1, at);
       else
-	fts_object_signal_runtime_error(o, "import: wrong arguments");  
+	fts_object_error(o, "import: wrong arguments");  
     }
   else
-    fts_object_signal_runtime_error(o, "import: cannot import MIDI file to track of type %s", type);
+    fts_object_error(o, "import: cannot import MIDI file to track of type %s", type);
 }
 
 static void 
@@ -957,14 +950,14 @@ track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       char *error = fts_midifile_get_error(file);
 
       if(error)
-	fts_object_signal_runtime_error(o, "export: write error in \"%s\" (%s)\n", error, name);
+	fts_object_error(o, "export: write error in \"%s\" (%s)\n", error, name);
       else if(size <= 0)
-	fts_object_signal_runtime_error(o, "export: couldn't write any data to \"%s\"\n", name);
+	fts_object_error(o, "export: couldn't write any data to \"%s\"\n", name);
       
       fts_midifile_close(file);
     }
   else
-    fts_object_signal_runtime_error(o, "export: cannot open \"%s\"\n", name);
+    fts_object_error(o, "export: cannot open \"%s\"\n", name);
 }
 
 static void 
@@ -995,7 +988,7 @@ track_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   else if(ac == 1 && fts_is_symbol(at))
     track_export_midifile(o, 0, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "export: wrong arguments");  
+    fts_object_error(o, "export: wrong arguments");  
 }
 
 static void
@@ -1144,7 +1137,7 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       if(fts_is_symbol(at))
 	this->type = fts_get_symbol(at);
       else
-	fts_object_set_error(o, "bad argument");
+	fts_object_error(o, "bad argument");
     }
 }
 

@@ -66,7 +66,7 @@ tabpeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_dsp_object_init((fts_dsp_object_t *)o); /* just put object in list */
     }
   else
-    fts_object_set_error(o, "argument (name of table~) required");
+    fts_object_error(o, "argument (name of table~) required");
 }
 
 

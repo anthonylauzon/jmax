@@ -432,7 +432,7 @@ fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t method)
     post("warning: redefinition of tuple method for message %s of class %s by varargs declaration\n", s, fts_class_get_name(cl));
 
   /* register method void if void method not already defined */
-  if(method_check(cl, s, fts_tuple_class) != found_method)
+  if(method_check(cl, s, fts_void_class) != found_method)
     method_put(cl, s, fts_void_class, method, 1);
 
   /* register method for NULL and tuple */
@@ -514,6 +514,9 @@ void
 fts_class_input_handler(fts_class_t *cl, fts_method_t method)
 {
   cl->input_handler = method;
+
+  if(cl->ninlets == 0)
+    class_set_inlets_number(cl, 1);
 }
 
 /**************************************************

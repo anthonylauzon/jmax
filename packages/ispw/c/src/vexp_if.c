@@ -40,7 +40,7 @@ expr_atom_realize(struct expr *x, const fts_atom_t *at, int in)
 {
   if (in > MAX_VARS) 
     {
-      fts_object_signal_runtime_error((fts_object_t *)x, "inlet out of range %d\n", in + 1);
+      fts_object_error((fts_object_t *)x, "inlet out of range %d\n", in + 1);
       return;
     }
 
@@ -51,14 +51,14 @@ expr_atom_realize(struct expr *x, const fts_atom_t *at, int in)
       else if (x->exp_var[in].ex_type == ET_FI)
 	x->exp_var[in].ex_flt = fts_get_number_float(at);
       else if(in)
-	fts_object_signal_runtime_error((fts_object_t *)x, "bad type for inlet %d\n", in + 1);
+	fts_object_error((fts_object_t *)x, "bad type for inlet %d\n", in + 1);
     }
   else if(fts_is_symbol(at))
     {
       if (x->exp_var[in].ex_type == ET_SI)
 	x->exp_var[in].ex_ptr = (char *)fts_get_symbol(at);
       else if(in)
-	fts_object_signal_runtime_error((fts_object_t *)x, "bad type for inlet %d\n", in + 1);
+	fts_object_error((fts_object_t *)x, "bad type for inlet %d\n", in + 1);
     }
 }
 
@@ -168,7 +168,7 @@ expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
     }
 
-  fts_object_set_error(o, "bad arguments");
+  fts_object_error(o, "bad arguments");
 }
 
 static void

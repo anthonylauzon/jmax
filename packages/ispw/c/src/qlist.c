@@ -89,7 +89,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
       if (!target)
 	{
-	  if (fts_is_float(av) || fts_is_int(av))
+	  if (fts_is_number(av))
 	    {
 	      fts_atom_t waka[11];
 	      fts_atom_t *wp = waka+1;
@@ -104,25 +104,25 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		    break;
 
 		  fts_atom_list_iterator_next(this->iterator);
-		  if (count < 11) {count++; wp++;}
+                  
+		  if (count < 11)
+                  {
+                    count++;
+                    wp++;
+                  }
 		}
 
-	      if (count == 1)
-		fts_outlet_atom(o, 0, av);
-	      else 
-		{
-		  if (count > 10)
-		    count = 10;
+              if (count > 10)
+                count = 10;
 
-		  fts_outlet_varargs(o, 0, count, waka);
-		}
-	      break;
+              fts_outlet_varargs(o, 0, count, waka);
+
+              break;
 	    }
 	}
 
 
-
-      for (ac = 0, ap = av; ! fts_atom_list_iterator_end(this->iterator);ac++)
+      for (ac = 0, ap = av; !fts_atom_list_iterator_end(this->iterator); ac++)
 	{
 	  if (fts_is_symbol(ap))
 	    {
@@ -169,12 +169,19 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 	    continue;
 	}
 
-      if (! drop)
+      if (!drop)
 	{
 	  if (fts_is_number(ap))
 	    ispw_target_send(target, NULL, ac, ap);
 	  else if (fts_is_symbol(ap) && (fts_get_symbol(ap) != fts_s_semi) && (fts_get_symbol(ap) != fts_s_comma))
-	    ispw_target_send(target, fts_get_symbol(ap), ac - 1, ap + 1);
+          {
+            fts_symbol_t selector = fts_get_symbol(ap);
+            
+            if(selector == fts_s_bang)
+              ispw_target_send(target, NULL, 0, NULL);
+            else
+              ispw_target_send(target, selector, ac - 1, ap + 1);              
+          }
 	}
 
       if (!is_comma)
@@ -196,7 +203,7 @@ qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_send_message_varargs((fts_object_t *)this->atom_list, sym_atomlist_update, 0, 0);
 
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
+  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
 }
 
 /* Method for message "set" [<arg>*] inlet 0 */
@@ -211,7 +218,7 @@ qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   fts_send_message_varargs((fts_object_t *)this->atom_list, sym_atomlist_update, 0, 0);
 
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
+  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
 }
 
 /* Method for message "clear" inlet 0 */
@@ -226,7 +233,7 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_send_message_varargs((fts_object_t *)this->atom_list, sym_atomlist_update, 0, 0);
 
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
+  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
 }
 
 /* Method for message "flush" inlet 0 */
@@ -288,10 +295,7 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_atom_t a[1];
 
   if(!fts_object_has_id((fts_object_t *)this->atom_list))
-  {
-    ((fts_object_t *)this->atom_list)->patcher = o->patcher;
-    fts_client_register_object((fts_object_t *)this->atom_list, FTS_NO_ID);
-  }
+    fts_client_register_object((fts_object_t *)this->atom_list, fts_get_client_id((fts_object_t *)this));
   
   fts_set_int(a, fts_get_object_id((fts_object_t *)this->atom_list));
   fts_client_send_message((fts_object_t *)this, sym_setAtomList, 1, a);
@@ -321,8 +325,8 @@ static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   file = (FILE *)fts_get_pointer( at);
 
-  if ( o->argc > 1)
-    fprintf( file, "#N qlist %s;\n", fts_get_symbol( o->argv + 1));
+  if (fts_object_get_description_size(o) > 1)
+    fprintf( file, "#N qlist %s;\n", fts_get_symbol( fts_object_get_description_atoms(o) + 1));
   else
     fprintf( file, "#N qlist;\n");
 
@@ -430,7 +434,9 @@ qlist_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_append, qlist_append);
 
-  fts_class_outlet_message(cl, 0);
+  fts_class_inlet_thru(cl, 0);
+
+  fts_class_outlet_thru(cl, 0);
   fts_class_outlet_varargs(cl, 0);
 }
 

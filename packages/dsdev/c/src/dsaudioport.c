@@ -295,16 +295,16 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /* make sure that the module was initialized correctly */
   if (fts_direct_sound == NULL) {
-    fts_object_set_error(o, "error opening DirectSound device (failed to create the DirectSound object)");
+    fts_object_error(o, "error opening DirectSound device (failed to create the DirectSound object)");
     return;
   }
   if (fts_primary_buffer == NULL) {
-    fts_object_set_error(o, "error opening DirectSound device (failed to create the primary buffer object)");
+    fts_object_error(o, "error opening DirectSound device (failed to create the primary buffer object)");
     return;
   }
 #if CAPTURE
   if (fts_direct_sound_capture == NULL) {
-    fts_object_set_error(o, "error opening DirectSound device (failed to create the DirectSoundCapture object)");
+    fts_object_error(o, "error opening DirectSound device (failed to create the DirectSoundCapture object)");
     return;
   }
 #endif
@@ -360,7 +360,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   /* create the sound output buffer */
   hr = IDirectSound_CreateSoundBuffer(fts_direct_sound, &desc, &dev->dsBuffer, NULL);
   if (hr != DS_OK) {
-    fts_object_set_error(o, "error opening DirectSound device (failed to create the secondary buffer)");
+    fts_object_error(o, "error opening DirectSound device (failed to create the secondary buffer)");
     goto error_recovery;
   }
 
@@ -376,7 +376,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   for (i = 0; i < dev->num_buffers; i++) {
     dev->event[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
     if (dev->event[i] == NULL) {
-      fts_object_set_error(o, "error opening DirectSound device (failed to create the notifications events)");
+      fts_object_error(o, "error opening DirectSound device (failed to create the notifications events)");
       goto error_recovery;
     }
     dev->position[i].dwOffset = i * dev->buffer_byte_size;
@@ -387,12 +387,12 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   hr = IDirectSoundBuffer_QueryInterface(dev->dsBuffer, &IID_IDirectSoundNotify, (LPVOID*) &dev->notify);
   if (hr != S_OK) {
     dev->notify = NULL;
-    fts_object_set_error(o, "error opening DirectSound device (failed to create notify interface: %s)", fts_win32_error(hr));
+    fts_object_error(o, "error opening DirectSound device (failed to create notify interface: %s)", fts_win32_error(hr));
     goto error_recovery;
   }
   hr = IDirectSoundNotify_SetNotificationPositions(dev->notify, dev->num_buffers, dev->position);
   if (hr != S_OK) {
-    fts_object_set_error(o, "error opening DirectSound device (failed to set notify positions: %s)", fts_win32_error(hr));
+    fts_object_error(o, "error opening DirectSound device (failed to set notify positions: %s)", fts_win32_error(hr));
     goto error_recovery;
   }
 
@@ -413,7 +413,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   /* create the sound input buffer */
   hr = IDirectSoundCapture_CreateCaptureBuffer(fts_direct_sound_capture, &cdesc, &dev->dscBuffer, NULL);
   if (hr != DS_OK) {
-    fts_object_set_error(o, "error opening DirectSound device (failed to create the capture buffer)");
+    fts_object_error(o, "error opening DirectSound device (failed to create the capture buffer)");
     goto error_recovery;
   }
 
@@ -429,7 +429,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   for (i = 0; i < dev->num_buffers; i++) {
     dev->cevent[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
     if (dev->cevent[i] == NULL) {
-      fts_object_set_error(o, "error opening DirectSound device (failed to create the notifications events)");
+      fts_object_error(o, "error opening DirectSound device (failed to create the notifications events)");
       goto error_recovery;
     }
     dev->cposition[i].dwOffset = i * dev->buffer_byte_size;
@@ -440,12 +440,12 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   hr = IDirectSoundBuffer_QueryInterface(dev->dscBuffer, &IID_IDirectSoundNotify, (LPVOID*) &dev->cnotify);
   if (hr != S_OK) {
     dev->cnotify = NULL;
-    fts_object_set_error(o, "error opening DirectSound device (failed to create notify interface: %s)", fts_win32_error(hr));
+    fts_object_error(o, "error opening DirectSound device (failed to create notify interface: %s)", fts_win32_error(hr));
     goto error_recovery;
   }
   hr = IDirectSoundNotify_SetNotificationPositions(dev->cnotify, dev->num_buffers, dev->cposition);
   if (hr != S_OK) {
-    fts_object_set_error(o, "error opening DirectSound device (failed to set notify positions: %s)", fts_win32_error(hr));
+    fts_object_error(o, "error opening DirectSound device (failed to set notify positions: %s)", fts_win32_error(hr));
     goto error_recovery;
   }
 

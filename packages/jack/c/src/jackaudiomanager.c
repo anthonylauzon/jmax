@@ -434,7 +434,7 @@ create_connect_thread(jackaudiomanager_t* self)
   }
   else
   {
-    fts_object_set_error((fts_object_t*)self, "Cannot create connect thread \n");
+    fts_object_error((fts_object_t*)self, "Cannot create connect thread \n");
   }
 }
 
@@ -455,7 +455,7 @@ create_disconnect_thread(jackaudiomanager_t* self)
   }
   else
   {
-    fts_object_set_error((fts_object_t*)self, "Cannot create connect thread \n");
+    fts_object_error((fts_object_t*)self, "Cannot create connect thread \n");
   }
 }
 
@@ -476,7 +476,7 @@ create_register_thread(jackaudiomanager_t* self)
   }
   else
   {
-    fts_object_set_error((fts_object_t*)self, "Cannot create connect thread \n");
+    fts_object_error((fts_object_t*)self, "Cannot create connect thread \n");
   }
 }
 
@@ -497,7 +497,7 @@ create_unregister_thread(jackaudiomanager_t* self)
   }
   else
   {
-    fts_object_set_error((fts_object_t*)self, "Cannot create connect thread \n");
+    fts_object_error((fts_object_t*)self, "Cannot create connect thread \n");
   }
 }
 
@@ -720,7 +720,7 @@ jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   if (jack_activate(client) == -1)
   {
     fts_log("[jackaudiomanager] cannot activate JACK client \n");
-    fts_object_set_error(o, "cannot activate JACK client \n");
+    fts_object_error(o, "cannot activate JACK client \n");
     return;
   }
 

@@ -185,8 +185,9 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       this->at = fts_heap_alloc(this->heap);
 
       fts_set_int(this->at, 0);
-
-      pipe_atom_delay(o, 0, 0, 1, at);
+      
+      if(ac > 0)
+	pipe_atom_delay(o, 0, 0, 1, at);
     }
 }
 

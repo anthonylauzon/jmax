@@ -29,92 +29,67 @@ typedef struct
   fts_object_t _o;
 } sysinfo_t;
 
+extern fts_class_t *fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
+extern void fts_class_instantiate(fts_class_t *cl);
+
 static void
 sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *pkg;
   fts_iterator_t pkg_iter;
-  fts_iterator_t cl_iter;
   fts_atom_t pkg_name;
-  fts_atom_t cl_name;
 
   /* post html header */
-  post("<html>\n");
-  post("<head>\n");
-  post("  <title>jMax classes</title\n");
-  post("</head>\n");
-  post("<body>\n");
+  fprintf(stderr, "<html>\n");
+  fprintf(stderr, "<head>\n");
+  fprintf(stderr, "  <title>jMax classes</title\n");
+  fprintf(stderr, "</head>\n");
+  fprintf(stderr, "<body>\n");
   
   /* head line */
-  post("<h1>jMax classes</h1>\n", fts_get_symbol(&pkg_name));
+  fprintf(stderr, "<h1>jMax classes</h1>\n");
 
   /* table header */
-  post("<table width=100% border=1 cellpadding=3 cellspacing=0>\n");
+  fprintf(stderr, "<table width=100%% border=1 cellpadding=3 cellspacing=0>\n");
+  fprintf(stderr, "<tr><td width=10%%>name</td><td width=2%%>ins</td><td width=2%%>outs</td><td>&nbsp;</td></tr>\n");
 
   fts_get_package_names(&pkg_iter);
   while (fts_iterator_has_more(&pkg_iter))
+  {
+    fts_iterator_next(&pkg_iter, &pkg_name);
+    pkg = fts_package_get(fts_get_symbol(&pkg_name));
+
+    if(pkg != NULL && fts_package_get_state(pkg) != fts_package_corrupt)
     {
-      fts_iterator_next(&pkg_iter, &pkg_name);
-      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+      fts_iterator_t cl_iter;
 
-      if(pkg != NULL && fts_package_get_state(pkg) != fts_package_corrupt)
-	{
-	  post("  <tr><td colspan=2><h2>%s</h2></td></tr>\n", fts_get_symbol(&pkg_name));
-	  
-	  fts_package_get_class_names(pkg, &cl_iter);
-	  while(fts_iterator_has_more(&cl_iter)) 
-	    {
-	      fts_iterator_next(&cl_iter, &cl_name);	      
-	      post("    <tr><td width=10%>%s</td><td>&nbsp;</td></tr>\n", fts_get_symbol(&cl_name));
-	    }
+      fprintf(stderr, "  <tr><td colspan=4><h2>%s</h2></td></tr>\n", fts_get_symbol(&pkg_name));
 
-	}
+      fts_package_get_class_names(pkg, &cl_iter);
+      while(fts_iterator_has_more(&cl_iter))
+      {
+        fts_atom_t a;
+        fts_symbol_t name;
+        fts_class_t *cl;
+
+        fts_iterator_next(&cl_iter, &a);
+        name = fts_get_symbol(&a);
+        cl = fts_package_get_class(pkg, name);
+        
+        if (!cl->size)
+          fts_class_instantiate(cl);
+        
+        fprintf(stderr, "    <tr><td>%s</td><td>%d</td><td>%d</td><td>&nbsp;</td></tr>\n", name, cl->ninlets, cl->noutlets);
+      }
     }
+  }
 
   /* table footer */
-  post("</table>\n");
+  fprintf(stderr, "</table>\n");
 
   /* post html footer */
-  post("</body>\n");
-  post("</html>\n");
-}
-
-extern fts_class_t *fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
-
-static void
-sysinfo_noouts(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t *pkg;
-  fts_iterator_t pkg_iter;
-  fts_iterator_t cl_iter;
-  fts_atom_t pkg_name;
-  fts_atom_t cl_name;
-
-  fts_get_package_names(&pkg_iter);
-  while (fts_iterator_has_more(&pkg_iter))
-    {
-      fts_iterator_next(&pkg_iter, &pkg_name);
-      pkg = fts_package_get(fts_get_symbol(&pkg_name));
-
-      if(pkg != NULL && fts_package_get_state(pkg) != fts_package_corrupt)
-	{
-	  fts_package_get_class_names(pkg, &cl_iter);
-
-	  while(fts_iterator_has_more(&cl_iter)) 
-	    {
-	      fts_class_t *cl;
-	      fts_symbol_t name;
-
-	      fts_iterator_next(&cl_iter, &cl_name);	      
-	      name = fts_get_symbol(&cl_name);		      
-
-	      cl = fts_package_get_class(pkg, name);
-
-	      if(cl && cl->noutlets == 0)
-		post("class %s has no outputs\n", name);
-	    }
-	}
-    }
+  fprintf(stderr, "</body>\n");
+  fprintf(stderr, "</html>\n");
 }
 
 static void
@@ -143,7 +118,7 @@ sysinfo_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("audio"), sysinfo_audio);
   fts_class_message_varargs(cl, fts_new_symbol("midi"), sysinfo_midi);
 
-  fts_class_message_varargs(cl, fts_new_symbol("noouts"), sysinfo_noouts);  
+  fts_class_inlet_thru(cl, 0);
 }
 
 void

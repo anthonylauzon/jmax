@@ -88,7 +88,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       
       if(sampbuf_name_already_registered(name))
 	{
-	  fts_object_set_error(o, "table %s multiply defined\n", name);
+	  fts_object_error(o, "table %s multiply defined\n", name);
 	  return;
 	}
       
@@ -107,7 +107,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     }
   else
     {
-      fts_object_set_error(o, "name required\n");
+      fts_object_error(o, "name required\n");
       return;
     }
 }
@@ -408,6 +408,7 @@ sigtable_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("realloc"), sigtable_realloc);
 
+  fts_class_inlet_thru(cl, 0);
   fts_class_outlet_int(cl, 0);
 }
 

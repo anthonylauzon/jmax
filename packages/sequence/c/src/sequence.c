@@ -110,7 +110,6 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
       sequence->tracks = track_get_next(track);
       sequence->size--;
 
-      ((fts_object_t *)track)->patcher = 0;
       fts_object_release((fts_object_t *)track);
     }
   else
@@ -129,7 +128,6 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
 	  prev->next = this->next;
 	  sequence->size--;	  
 
-	  ((fts_object_t *)track)->patcher = 0;
 	  fts_object_release((fts_object_t *)track);
 	}
     }
@@ -154,7 +152,6 @@ sequence_move_track(sequence_t *sequence, track_t *track, int index)
       sequence_remove_track(sequence, track);
       sequence_insert_track(sequence, 0, track);
 
-      ((fts_object_t *)track)->patcher = 0;
       fts_object_release((fts_object_t *)track);
     }
 }
@@ -173,9 +170,7 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
 
   if( !fts_object_has_id((fts_object_t *)track))
     {
-      ((fts_object_t *)track)->patcher = fts_object_get_patcher((fts_object_t *)this);
-      fts_client_register_object((fts_object_t *)track, FTS_NO_ID);
-    
+      fts_client_register_object((fts_object_t *)track, fts_get_client_id((fts_object_t *)this));
 
       fts_client_start_message( (fts_object_t *)this, seqsym_addTracks);
       fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)track));
@@ -268,9 +263,9 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	  char *error = fts_midifile_get_error(file);
 
 	  if(error)
-	    fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", name, error);
+	    fts_object_error(o, "import: read error in \"%s\" (%s)\n", name, error);
 	  else if(size <= 0)
-	    fts_object_signal_runtime_error(o, "import: couldn't get any data from \"%s\"\n", fts_midifile_get_name(file));
+	    fts_object_error(o, "import: couldn't get any data from \"%s\"\n", fts_midifile_get_name(file));
 	  
 	  fts_midifile_close(file);
 	  
@@ -280,7 +275,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	  fts_object_update_name(o);
 	}
       else
-	fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", name);
+	fts_object_error(o, "import: cannot open \"%s\"\n", name);
     }
 }
       
@@ -321,13 +316,13 @@ sequence_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	    fts_send_message((fts_object_t *)track, fts_s_import, ac - 1, at + 1);
 	  else
 	    /* for now this is not allowed */
-	    fts_object_signal_runtime_error(o, "import: file name required");
+	    fts_object_error(o, "import: file name required");
 	}
       else	
-	fts_object_signal_runtime_error(o, "import: no track #%d", index);
+	fts_object_error(o, "import: no track #%d", index);
     }
   else
-    fts_object_signal_runtime_error(o, "import: wrong arguments");  
+    fts_object_error(o, "import: wrong arguments");  
 }
 
 static void
@@ -346,13 +341,13 @@ sequence_export_track_by_index(fts_object_t *o, int winlet, fts_symbol_t s, int 
 	    fts_send_message((fts_object_t *)track, fts_s_export, ac - 1, at + 1);
 	  else
 	    /* for now this is not allowed */
-	    fts_object_signal_runtime_error(o, "export: file name required");
+	    fts_object_error(o, "export: file name required");
 	}
       else	
-	fts_object_signal_runtime_error(o, "export: no track #%d", index);
+	fts_object_error(o, "export: no track #%d", index);
     }
   else
-    fts_object_signal_runtime_error(o, "export: track number required");  
+    fts_object_error(o, "export: track number required");  
 }
 
 static void
@@ -368,10 +363,10 @@ sequence_insert_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       if(track)
 	fts_send_message((fts_object_t *)track, seqsym_insert, ac - 1, at + 1);
       else	
-	fts_object_signal_runtime_error(o, "insert: no track #%d", index);
+	fts_object_error(o, "insert: no track #%d", index);
     }
   else
-    fts_object_signal_runtime_error(o, "insert: track number required");  
+    fts_object_error(o, "insert: track number required");  
 }
 
 static void
@@ -387,10 +382,10 @@ sequence_remove_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       if(track)
 	fts_send_message((fts_object_t *)track, seqsym_remove, ac - 1, at + 1);
       else	
-	fts_object_signal_runtime_error(o, "remove: no track #%d", index);
+	fts_object_error(o, "remove: no track #%d", index);
     }
   else
-    fts_object_signal_runtime_error(o, "remove: track number required");  
+    fts_object_error(o, "remove: track number required");  
 }
 
 static void
@@ -752,10 +747,10 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 		  sequence_add_track(this, track);
 		}
 	      else
-		fts_object_set_error(o, "cannot create track of type %s", type);
+		fts_object_error(o, "cannot create track of type %s", type);
 	    }
 	  else
-	    fts_object_set_error(o, "bad arguments");
+	    fts_object_error(o, "bad arguments");
 	}
       
       this->persistence = -1;

@@ -295,7 +295,7 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(ac > 0 && fts_is_a(at, fvec_type))
     rec_fvec_set(o, 0, 0, ac, at);
   else
-    fts_object_set_error(o, "first argument of fvec required");
+    fts_object_error(o, "first argument of fvec required");
 }
 
 static void

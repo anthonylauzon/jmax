@@ -105,7 +105,6 @@ static void fts_atom_list_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
   fts_atom_list_t *this = (fts_atom_list_t *)o;
 
   fts_atom_list_clear(this);
-  fts_free((void *)this);
 }
 
 static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -122,7 +121,7 @@ static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, in
 #endif
 
   if(!fts_object_has_id((fts_object_t *)this))
-    fts_client_upload_object((fts_object_t *)this, -1);
+    fts_object_upload((fts_object_t *)this);
 
   if (this->name)
     {

@@ -139,7 +139,7 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	}
       else
 	{
-	  fts_object_signal_runtime_error(o, "unknown mode for open: %s", mode);
+	  fts_object_error(o, "unknown mode for open: %s", mode);
 	  return;
 	}
 
@@ -147,12 +147,12 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	{
 	  char *str = (mode == fts_s_read)? "reading": "writing";
 
-	  fts_object_signal_runtime_error(o, "cannot open file %s for %s", name, str);
+	  fts_object_error(o, "cannot open file %s for %s", name, str);
 	  this->status = dumpfile_closed;
 	}
     }
   else
-    fts_object_signal_runtime_error(o, "bad arguments for message open");
+    fts_object_error(o, "bad arguments for message open");
 }
 
 static void
@@ -192,13 +192,13 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	      this->block = 0;
 	    }
 	  else
-	    fts_object_signal_runtime_error(o, "cannot dump object of class %s", class_name);
+	    fts_object_error(o, "cannot dump object of class %s", class_name);
 	}
       else
-	fts_object_signal_runtime_error(o, "object argument required for message dump");
+	fts_object_error(o, "object argument required for message dump");
     }
   else
-    fts_object_signal_runtime_error(o, "file not opened in write mode (cannot dump)");
+    fts_object_error(o, "file not opened in write mode (cannot dump)");
 }
 
 static void
@@ -218,7 +218,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	  if(this->class != fts_class_get_name(fts_object_get_class(object)))
 	    {
 	      /* wrong class */
-	      fts_object_signal_runtime_error(o, "%s object exspected for restore", this->class);
+	      fts_object_error(o, "%s object exspected for restore", this->class);
 	      return;
 	    }
 
@@ -240,7 +240,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 		      if(fts_message_get_selector(mess) == 0)
 			{
 			  /* empty message */
-			  fts_object_signal_runtime_error(o, "file format error in restore (empty message)");
+			  fts_object_error(o, "file format error in restore (empty message)");
 			  dumpfile_close((fts_object_t *)this, 0, 0, 0, 0);
 			  return;
 			}
@@ -274,7 +274,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	      else if(fts_message_get_selector(mess) == 0)
 		{
 		  /* argument without selector */
-		  fts_object_signal_runtime_error((fts_object_t *)this, "file format error in restore (missing selector)");
+		  fts_object_error((fts_object_t *)this, "file format error in restore (missing selector)");
 		  dumpfile_close((fts_object_t *)this, 0, 0, 0, 0);
 		  return;
 		}
@@ -301,10 +301,10 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	    dumpfile_close(o, 0, 0, 0, 0);
 	}
       else
-	fts_object_signal_runtime_error(o, "object argument required for restore");
+	fts_object_error(o, "object argument required for restore");
     }
   else
-    fts_object_signal_runtime_error(o, "file not opened in read mode (cannot restore)");
+    fts_object_error(o, "file not opened in read mode (cannot restore)");
 }
 
 /******************************************************

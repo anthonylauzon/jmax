@@ -225,7 +225,7 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
     {
       if ( !sgiaudioport_open( &this->input_alport, input_device_name, "jMax audioport input", "r", input_channels, this->fifo_size, &err))
 	{
-	  fts_object_set_error( o, sgiaudioport_get_error_message( err));
+	  fts_object_error( o, sgiaudioport_get_error_message( err));
 	  return;
 	}
 
@@ -238,7 +238,7 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
     {
       if ( !sgiaudioport_open( &this->output_alport, output_device_name, "jMax audioport output", "w", output_channels, this->fifo_size, &err))
 	{
-	  fts_object_set_error( o, sgiaudioport_get_error_message( err));
+	  fts_object_error( o, sgiaudioport_get_error_message( err));
 	  return;
 	}
 

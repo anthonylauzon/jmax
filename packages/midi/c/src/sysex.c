@@ -56,10 +56,10 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_symbol_t label = fts_get_symbol(at);
 
       if(label != fts_s_minus)
-	this->port = fts_midiconfig_get_output(label);      
+	this->port = fts_midiconfig_get_input(label);      
     }
   else
-    this->port = fts_midiconfig_get_output(fts_s_default);
+    this->port = fts_midiconfig_get_input(fts_s_default);
 
   /* add call back to midi port or set error */
   if(this->port != NULL)

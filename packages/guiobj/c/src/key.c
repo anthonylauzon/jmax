@@ -170,11 +170,11 @@ key_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       else
 	{
 	  if(fts_is_int(at))
-	    fts_object_set_error(o, "unknown key specifier: %d", fts_get_int(at));
+	    fts_object_error(o, "unknown key specifier: %d", fts_get_int(at));
 	  else if(fts_is_symbol(at))
-	    fts_object_set_error(o, "unknown key specifier: %s", fts_get_symbol(at));
+	    fts_object_error(o, "unknown key specifier: %s", fts_get_symbol(at));
 	  else
-	    fts_object_set_error(o, "unknown key specifier");
+	    fts_object_error(o, "unknown key specifier");
 	}
     }
 }
@@ -246,11 +246,11 @@ keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       else
 	{
 	  if(fts_is_int(at))
-	    fts_object_set_error(o, "unknown key specifier: %d", fts_get_int(at));
+	    fts_object_error(o, "unknown key specifier: %d", fts_get_int(at));
 	  else if(fts_is_symbol(at))
-	    fts_object_set_error(o, "unknown key specifier: %s", fts_get_symbol(at));
+	    fts_object_error(o, "unknown key specifier: %s", fts_get_symbol(at));
 	  else
-	    fts_object_set_error(o, "unknown key specifier");
+	    fts_object_error(o, "unknown key specifier");
 	}
     }
 }

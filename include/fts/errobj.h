@@ -20,15 +20,12 @@
  * 
  */
 
-FTS_API void fts_object_set_error(fts_object_t *obj, const char *format, ...);
-FTS_API fts_symbol_t fts_object_get_error(fts_object_t *obj);
+FTS_API fts_class_t *fts_error_object_class;
 
+FTS_API void fts_runtime_error_proxy_set(fts_object_t *obj);
+FTS_API void fts_runtime_error_proxy_remove(fts_object_t *obj);
 
-FTS_API fts_object_t *runtime_error_handler;
+FTS_API void fts_set_error(fts_symbol_t error);
+FTS_API fts_symbol_t fts_get_error(void);
 
-FTS_API void fts_runtime_error_handler_set(fts_object_t *obj);
-FTS_API void fts_runtime_error_handler_remove(fts_object_t *obj);
-
-FTS_API void fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...);
-
-
+FTS_API void fts_object_error(fts_object_t *obj, const char *format, ...);

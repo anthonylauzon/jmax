@@ -48,23 +48,23 @@ bus_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
   fts_atom_t *value = fts_name_get_value(patcher, name);
 
   if(fts_is_object(value))
-    {
-      fts_object_t *obj = fts_get_object(value);
-      
-      if(fts_object_get_class(obj) == bus_class)
-	return (bus_t *)obj;
-    }
-  else if(fts_is_void(value))
-    {
-      /* create new bus */
-      bus_t *bus = (bus_t *)fts_object_create(bus_class, NULL, 0, 0);
-      
-      fts_object_set_patcher((fts_object_t *)bus, patcher);
-      fts_object_set_name((fts_object_t *)bus, name);
-      
-      return bus;
-    }
+  {
+    fts_object_t *obj = fts_get_object(value);
 
+    if(fts_object_get_class(obj) == bus_class)
+      return (bus_t *)obj;
+  }
+  else if(fts_is_void(value))
+  {
+    /* create new bus */
+    bus_t *bus = (bus_t *)fts_object_create(bus_class, patcher, 0, 0);
+
+    /* name the bus */
+    fts_object_set_name((fts_object_t *)bus, name);
+
+    return bus;
+  }
+  
   return NULL;
 }
 
@@ -227,7 +227,7 @@ access_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_object_refer((fts_object_t *)bus);
     }
   else
-    fts_object_signal_runtime_error(o, "bus~ doesn't belong to the same DSP edge");
+    fts_object_error(o, "bus~ doesn't belong to the same DSP edge");
 }
 
 static void
@@ -282,7 +282,7 @@ access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 	  
 	  if(*bus == NULL)
 	    {
-	      fts_object_set_error(o, "%s is not a bus~", name);
+	      fts_object_error(o, "%s is not a bus~", name);
 	      return;
 	    }
 
@@ -292,14 +292,14 @@ access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 	*bus = (bus_t *)fts_get_object(at);
       else
 	{
-	  fts_object_set_error(o, "bad argument");
+	  fts_object_error(o, "bad argument");
 	  return;
 	}
       
       fts_object_refer((fts_object_t *)*bus);
     }
   else
-    fts_object_set_error(o, "bus~ required");
+    fts_object_error(o, "bus~ required");
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }	

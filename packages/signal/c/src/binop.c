@@ -700,7 +700,7 @@ binop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   else if(ac == 1 && fts_is_number(at))
     binop_set_scalar(o, 0, 0, 1, at);
   else
-    fts_object_set_error(o, "bad Arguments");
+    fts_object_error(o, "bad Arguments");
 
   
   fts_dsp_object_init((fts_dsp_object_t *)o);

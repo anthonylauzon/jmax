@@ -156,17 +156,21 @@ dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-dict_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dict_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
   
   if(ac > 0 && (fts_is_symbol(at) || fts_is_int(at)))
-    {
-      fts_atom_t a;
-      
-      fts_hashtable_get(&this->hash, at, &a);
-      fts_outlet_atom(o, 0, &a);
-    }
+  {
+    fts_atom_t a;
+
+    if(fts_hashtable_get(&this->hash, at, &a))
+      fts_return(&a);
+    else if(fts_is_symbol(at))
+      fts_object_error(o, "no entry for %s", fts_get_symbol(at));
+    else if(fts_is_int(at))
+      fts_object_error(o, "no entry for %d", fts_get_int(at));
+  }
 }
 
 static void
@@ -597,7 +601,7 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       else
 	{
 	  dict_clear(o, 0, 0, 0, 0);
-	  fts_object_set_error(o, "wrong key type in initialization");
+	  fts_object_error(o, "wrong key type in initialization");
 	}
 
       data_object_persistence_args(o);
@@ -631,10 +635,15 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_export, dict_export);
   
   fts_class_message_varargs(cl, fts_s_set, dict_set);
-  fts_class_message_varargs(cl, fts_s_get, dict_get);
   fts_class_message_varargs(cl, fts_s_clear, dict_clear);
 
-  fts_class_outlet_atom(cl, 0);
+  fts_class_message_number(cl, fts_s_get_element, dict_return_element);
+  fts_class_message_symbol(cl, fts_s_get_element, dict_return_element);
+  
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

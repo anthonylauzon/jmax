@@ -111,9 +111,9 @@ throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       /*fts_channel_add_origin(bus_get_channel(this->bus, this->index), o);*/
     }
   else if(winlet > 0)
-    fts_object_signal_runtime_error(o, "bad value at inlet %d (bus required)", winlet);
+    fts_object_error(o, "bad value at inlet %d (bus required)", winlet);
   else
-    fts_object_set_error(o, "bus required");
+    fts_object_error(o, "bus required");
 }
 
 static void
@@ -188,9 +188,9 @@ catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       fts_channel_add_target(bus_get_channel(this->bus, this->index), o);
     }
   else if(winlet > 0)
-    fts_object_signal_runtime_error(o, "bad value at inlet %d (bus required)", winlet);
+    fts_object_error(o, "bad value at inlet %d (bus required)", winlet);
   else
-    fts_object_set_error(o, "bus required");
+    fts_object_error(o, "bus required");
 }
 
 static void

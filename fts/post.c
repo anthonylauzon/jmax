@@ -715,7 +715,7 @@ void fts_set_default_console_stream( fts_bytestream_t *stream)
     fts_object_refer( (fts_object_t *)stream);
 
   /* Post accumulated messages */
-  if (post_stack != NULL)
+  if (stream != NULL && post_stack != NULL)
     {
       fts_bytestream_output( stream, fts_stack_size( post_stack), fts_stack_base( post_stack));
       fts_bytestream_flush( stream);

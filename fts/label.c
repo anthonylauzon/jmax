@@ -124,9 +124,9 @@ fts_label_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
     }
 
   /* create new label */
-  label = (fts_label_t *)fts_object_create(fts_label_class, NULL, 0, 0);
+  label = (fts_label_t *)fts_object_create(fts_label_class, patcher, 0, 0);
   
-  fts_object_set_patcher((fts_object_t *)label, patcher);
+  /* name the label */
   fts_object_set_name((fts_object_t *)label, name);
   
   return label;
@@ -168,7 +168,7 @@ label_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(ac > 0 && fts_is_symbol(at))
     fts_label_send(this, fts_get_symbol(at), ac - 1, at + 1);
   else
-    fts_object_signal_runtime_error(o, "invalid message selector");
+    fts_object_error(o, "invalid message selector");
 }
 
 static void

@@ -321,14 +321,14 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 count = sizeof( this->device);
   if ((err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&this->device)) != noErr)
     {
-      fts_object_set_error( o, "cannot get default device");
+      fts_object_error( o, "cannot get default device");
       return;
     }
 
   /* Get the number of channels and the buffer size */
 if ((err = AudioDeviceGetPropertyInfo( this->device, 0, false, kAudioDevicePropertyStreamConfiguration, &count, &writable)) != noErr)
     {
-      fts_object_set_error( o, "cannot get device configuration");
+      fts_object_error( o, "cannot get device configuration");
       post( "cannot get device configuration\n");
       return;
     }
@@ -336,7 +336,7 @@ if ((err = AudioDeviceGetPropertyInfo( this->device, 0, false, kAudioDevicePrope
   buffer_list = (AudioBufferList *)alloca( count);
   if ((err = AudioDeviceGetProperty( this->device, 0, false, kAudioDevicePropertyStreamConfiguration, &count, buffer_list)) != noErr)
     {
-      fts_object_set_error( o, "cannot get device configuration");
+      fts_object_error( o, "cannot get device configuration");
       post( "cannot get device configuration\n");
       return;
     }
@@ -345,7 +345,7 @@ if ((err = AudioDeviceGetPropertyInfo( this->device, 0, false, kAudioDevicePrope
 if ( buffer_list->mNumberBuffers != 1)
     {
       fts_log( "buffer_list->mNumberBuffers != 1\n");
-      fts_object_set_error( o, "buffer_list->mNumberBuffers != 1");
+      fts_object_error( o, "buffer_list->mNumberBuffers != 1");
       return;
     }
 
@@ -358,7 +358,7 @@ if ( buffer_list->mNumberBuffers != 1)
   
     if ((err = AudioDeviceSetProperty( this->device, NULL, 0, false, kAudioDevicePropertyBufferSize, count, &bufferSizeProperty)) != noErr)
       {
-	fts_object_set_error( o, "cannot set buffer size");
+	fts_object_error( o, "cannot set buffer size");
 	return;
       }
   }
@@ -379,13 +379,13 @@ this->fifo = halaudioport_fifo_new( (2 * buffer_size) / sizeof( float));
 
   if ((err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this)) != noErr)
     {
-      fts_object_set_error( o, "cannot set IO proc");
+      fts_object_error( o, "cannot set IO proc");
       return;
     }
   
   if ((err = AudioDeviceStart( this->device, halaudioport_ioproc)) != noErr)
     {
-      fts_object_set_error( o, "cannot start device");
+      fts_object_error( o, "cannot start device");
       return;
     }
 }

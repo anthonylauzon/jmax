@@ -388,10 +388,10 @@ env_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  this->duration = 0.0;
 	}
       else
-	fts_object_signal_runtime_error(o, "speed must be > 0.0");
+	fts_object_error(o, "speed must be > 0.0");
     }
   else
-    fts_object_signal_runtime_error(o, "cannot set speed from non number value");
+    fts_object_error(o, "cannot set speed from non number value");
 }
 
 static void
@@ -402,7 +402,7 @@ env_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if(fts_is_number(at))
     this->duration = fts_get_number_float(at);
   else
-    fts_object_signal_runtime_error(o, "cannot set duration from non number value");
+    fts_object_error(o, "cannot set duration from non number value");
 }
 
 /************************************************************
@@ -563,10 +563,10 @@ env_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       else if(mode == sym_continue)
 	this->mode = mode_continue;
       else
-	fts_object_signal_runtime_error(o, "cannot understand mode %s", mode);
+	fts_object_error(o, "cannot understand mode %s", mode);
     }
   else
-    fts_object_signal_runtime_error(o, "bad argument for message mode");    
+    fts_object_error(o, "bad argument for message mode");    
 }
 
 static void

@@ -206,12 +206,12 @@ fvec_read_atom_file(fvec_t *vec, fts_symbol_t file_name)
       if(n > 0)
 	fvec_set_size(vec, n);
       else
-	fts_object_signal_runtime_error((fts_object_t *)vec, "cannot load from file \"%s\"\n", file_name);
+	fts_object_error((fts_object_t *)vec, "cannot load from file \"%s\"\n", file_name);
       
       fts_atom_file_close(file);
     }
   else
-    fts_object_signal_runtime_error((fts_object_t *)vec, "cannot open file \"%s\"\n", file_name);
+    fts_object_error((fts_object_t *)vec, "cannot open file \"%s\"\n", file_name);
   
   return n;
 }
@@ -285,7 +285,7 @@ fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
       
       if(onset > 0 && fts_audiofile_seek(sf, onset) != 0) 
 	{
-	  fts_object_signal_runtime_error((fts_object_t *)vec, "cannot seek position in file \"%s\"\n", file_name);
+	  fts_object_error((fts_object_t *)vec, "cannot seek position in file \"%s\"\n", file_name);
 	  fts_audiofile_close(sf);
 	  return 0;
 	}
@@ -302,13 +302,13 @@ fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
       
       if(size <= 0)
 	{
-	  fts_object_signal_runtime_error((fts_object_t *)vec, "cannot load from soundfile \"%s\"\n", file_name);
+	  fts_object_error((fts_object_t *)vec, "cannot load from soundfile \"%s\"\n", file_name);
 	  size = 0;
 	}
     }
   else
     {
-      fts_object_signal_runtime_error((fts_object_t *)vec, "cannot open file \"%s\"\n", file_name);
+      fts_object_error((fts_object_t *)vec, "cannot open file \"%s\"\n", file_name);
       fts_audiofile_close(sf);
     }
 
@@ -519,33 +519,32 @@ fvec_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
+  fts_atom_t a;
 
-  if(ac > 0 && fts_is_number(at))
-    {
-      int size = fts_get_number_int(at);
-      
-      if(size >= 0)
-	{
-	  int old_size = this->m;
-	  int i;
+  fts_set_int(&a, fvec_get_size(this));
+  fts_return(&a);
+}
 
-	  fvec_set_size(this, size);
+static void
+fvec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  int size = fts_get_number_int(at);
 
-	  /* when extending: zero new values */
-	  for(i=old_size; i<size; i++)
-	    this->values[i] = 0.0;	  
-	}
-    }
-  else
-    {
-      fts_atom_t a;
+  if(size >= 0)
+  {
+    int old_size = this->m;
+    int i;
 
-      fts_set_int(&a, fvec_get_size(this));
-      fts_return(&a);
-    }
+    fvec_set_size(this, size);
+
+    /* when extending: zero new values */
+    for(i=old_size; i<size; i++)
+      this->values[i] = 0.0;
+  }
 }
 
 /**************************************************************************************
@@ -598,7 +597,7 @@ fvec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    p[i] += r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -646,7 +645,7 @@ fvec_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    p[i] -= r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -694,7 +693,7 @@ fvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    p[i] *= r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -798,7 +797,7 @@ fvec_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    p[i] = r - p[i];
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -867,7 +866,7 @@ fvec_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    }
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -908,7 +907,7 @@ fvec_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	    p[i] = p[i] == r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -976,7 +975,7 @@ fvec_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	    p[i] = p[i] > r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -1011,7 +1010,7 @@ fvec_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	    p[i] = p[i] >= r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -1046,7 +1045,7 @@ fvec_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	    p[i] = p[i] < r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -1081,7 +1080,7 @@ fvec_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	    p[i] = p[i] <= r;
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -1149,7 +1148,7 @@ fvec_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    p[i] = (r >= p[i])? r: p[i];
 	}
       else
-	fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+	fts_object_error(o, "method not implemented for given arguments");
     }
 }
 
@@ -1229,7 +1228,7 @@ fvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_rifft_inplc(fft_ptr, fft_size);
     }
   else
-    fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+    fts_object_error(o, "method not implemented for given arguments");
 }
 
 static void
@@ -1319,10 +1318,10 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fvec_read_atom_file(this, file_name);
       
       if(size <= 0)
-	fts_object_signal_runtime_error(o, "cannot import from text file \"%s\"\n", file_name);
+	fts_object_error(o, "cannot import from text file \"%s\"\n", file_name);
     }
   else
-    fts_object_signal_runtime_error(o, "unknown import file format \"%s\"\n", file_format);
+    fts_object_error(o, "unknown import file format \"%s\"\n", file_format);
 }
 
 static void
@@ -1341,10 +1340,10 @@ fvec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fvec_write_atom_file(this, file_name);
       
       if(size < 0)
-	fts_object_signal_runtime_error(o, "cannot export to text file \"%s\"\n", file_name);
+	fts_object_error(o, "cannot export to text file \"%s\"\n", file_name);
     }
   else
-    fts_object_signal_runtime_error(o, "export file format \"%s\"\n", file_format);
+    fts_object_error(o, "export file format \"%s\"\n", file_format);
 }
 
 static void
@@ -1412,11 +1411,11 @@ fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
 	  fts_audiofile_close(sf);
     
 	  if(size <= 0)
-	    fts_object_signal_runtime_error(o, "cannot save to soundfile \"%s\"\n", file_name);
+	    fts_object_error(o, "cannot save to soundfile \"%s\"\n", file_name);
 	}
       else
 	{
-	  fts_object_signal_runtime_error(o, "cannot open soundfile to write \"%s\"\n", file_name);
+	  fts_object_error(o, "cannot open soundfile to write \"%s\"\n", file_name);
 	  fts_audiofile_close(sf);
 	}
     }
@@ -1435,18 +1434,16 @@ fvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = fvec_get_size(this);
 
-  if(size == 0)
-    fts_spost(stream, "(:fvec)");
-  else if(size <= FTS_POST_MAX_ELEMENTS)
+  if(size != 1 && size <= FTS_POST_MAX_ELEMENTS)
     {
       int i;
       
-      fts_spost(stream, "(:fvec", size);
+      fts_spost(stream, "(:fvec");
       
-      for(i=0; i<size-1; i++)
-	fts_spost(stream, "%.7g ", fvec_get_element(this, i));
-      
-      fts_spost(stream, "%.7g)", fvec_get_element(this, i));
+      for(i=0; i<size; i++)
+	fts_spost(stream, " %.7g", fvec_get_element(this, i));
+
+      fts_spost(stream, ")");      
     }
   else
     fts_spost(stream, "(:fvec %d)", size);
@@ -1614,17 +1611,37 @@ fvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-fvec_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
-  int index = fts_get_int_arg( ac, at, 0, -1);
-  fts_atom_t a;
+  int index = fts_get_int_arg(ac, at, 0, -1);
 
   if (index >= 0 && index < fvec_get_size(this))
-    {
-      fts_set_float( &a, fvec_get_element(this, index));
-      fts_return( &a);
-    }
+    fts_return_float(fvec_get_element(this, index));
+}
+
+static void
+fvec_return_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  int size = fvec_get_size(this);
+  double f = fts_get_number_float(at);
+  double ret = 0.0;
+
+  if(size < 2 || f <= 0.0)
+    ret = fvec_get_element(this, 0);
+  else if(f >= size - 1)
+    ret = fvec_get_element(this, size - 1);
+  else
+  {
+    int i = (int)f;
+    double y0 = fvec_get_element(this, i);
+    double y1 = fvec_get_element(this, i + 1);
+
+    ret = y0 + (f - i) * (y1 - y0);
+  }
+
+  fts_return_float(ret);
 }
 
 /*********************************************************
@@ -1672,7 +1689,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	size = fvec_load_audiofile(this, file_name, 0, 0);
 
       if(size == 0)
-	fts_object_set_error(o, "cannot load fvec from file \"%s\"", file_name);
+	fts_object_error(o, "cannot load fvec from file \"%s\"", file_name);
 
       data_object_persistence_args(o);
     }
@@ -1684,7 +1701,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       data_object_persistence_args(o);
     }
   else
-    fts_object_set_error(o, "bad arguments for fvec constructor");
+    fts_object_error(o, "bad arguments for fvec constructor");
 }
 
 static void
@@ -1749,15 +1766,22 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("pick"), fvec_pick);
   fts_class_message_varargs(cl, fts_new_symbol("fade"), fvec_fade);
 
-  fts_class_message_varargs(cl, fts_s_size, fvec_size);
-  
   fts_class_message_varargs(cl, fts_s_import, fvec_import);
   fts_class_message_varargs(cl, fts_s_export, fvec_export);
   
   fts_class_message_varargs(cl, fts_s_load, fvec_load);
   fts_class_message_varargs(cl, fts_s_save, fvec_save_soundfile);
 
-  fts_class_message_varargs(cl, fts_s_get_element, fvec_element);
+  fts_class_message_void(cl, fts_s_size, fvec_return_size);
+  fts_class_message_number(cl, fts_s_size, fvec_change_size);
+  
+  fts_class_message_int(cl, fts_s_get_element, fvec_return_element);
+  fts_class_message_float(cl, fts_s_get_element, fvec_return_interpolated);
+
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 /********************************************************************

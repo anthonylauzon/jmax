@@ -128,7 +128,7 @@ row_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   row_t *this = (row_t *)o;
 
-  if(fts_is_a(at, mat_type))
+  if(ac > 0 && fts_is_a(at, mat_type))
     {
       mat_t *mat = (mat_t *)fts_get_object(at);
 
@@ -142,13 +142,13 @@ row_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	  if(row_index >= 0)
 	    this->i = row_index;
 	  else
-	    fts_object_set_error(o, "index must be positive");
+	    fts_object_error(o, "index must be positive");
 	}
       else
 	this->i = 0;
     }
   else
-    fts_object_set_error(o, "first argument of mat required");
+    fts_object_error(o, "first argument of mat required");
 }
 
 static void
@@ -156,7 +156,8 @@ row_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   row_t *this = (row_t *)o;
   
-  fts_object_release((fts_object_t *)this->mat);
+  if(this->mat != NULL)
+    fts_object_release((fts_object_t *)this->mat);
 }
 
 static void
@@ -166,6 +167,11 @@ row_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_fill, row_fill);      
   fts_class_message_varargs(cl, fts_s_set, row_set);
+
+  fts_class_inlet_bang(cl, 0, data_object_output);
+
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

@@ -212,7 +212,7 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       protoencode_init( &this->encoder);
     }
   else
-    fts_object_set_error(o, "hostname argument required");
+    fts_object_error(o, "hostname argument required");
 }
 
 static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -77,7 +77,3 @@ FTS_API fts_connection_t *fts_connection_get(fts_object_t *src, int out, fts_obj
 
 #define fts_is_connection(p) (fts_object_get_class(p) == fts_connection_class)
 
-FTS_API void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets);
-FTS_API void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets);
-
-

@@ -227,7 +227,7 @@ sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else
     {
-      fts_object_set_error(o, "bad arguments");
+      fts_object_error(o, "bad arguments");
       return;
     }
   

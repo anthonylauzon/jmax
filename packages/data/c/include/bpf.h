@@ -50,6 +50,7 @@ typedef struct _bpf_
   bp_t *points; /* break points */
   int alloc;
   int size;
+  int index; /* index cache for get_interpolated method */
   int opened; /* non zero if editor open */
 } bpf_t;
 

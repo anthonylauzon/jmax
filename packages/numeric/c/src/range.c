@@ -149,7 +149,7 @@ static void
 range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   range_t *this = (range_t *)o;
-  int i, n;
+  int n;
 
   if(ac == 0)
     n = 1;
@@ -183,7 +183,8 @@ range_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set, range_set_points);
 
-  fts_class_inlet_number(cl, 0, range_int);
+  fts_class_inlet_int(cl, 0, range_int);
+  fts_class_inlet_float(cl, 0, range_float);
   fts_class_inlet_number(cl, 1, range_set_point);
 
   fts_class_outlet_number(cl, 0);

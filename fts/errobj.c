@@ -28,10 +28,12 @@
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/errobj.h>
 
-fts_class_t *fts_error_object_class;
-
-fts_object_t *runtime_error_handler = 0;
-fts_symbol_t sym_runtime_error_post = 0;
+/*******************************************************************
+*
+*  error object
+*
+*/
+fts_class_t *fts_error_object_class = NULL;
 
 static void
 error_object_input_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -70,17 +72,19 @@ fts_error_object_get_class(fts_error_object_t *obj)
   fts_symbol_t package_name = NULL;
   fts_symbol_t class_name = NULL;
   fts_class_t *class = NULL;
+  int argc = fts_object_get_description_size(o);
+  fts_atom_t *argv = fts_object_get_description_atoms(o);
   
-  if(o->argc > 1 && fts_is_symbol(o->argv) && fts_get_symbol(o->argv) == fts_s_colon && fts_is_symbol(o->argv + 1))
-    class_name = fts_get_symbol(o->argv + 1);
-  else if(o->argc > 2 && 
-	  fts_is_symbol(o->argv) &&
-	  fts_is_symbol(o->argv + 1) && 
-	  fts_is_symbol(o->argv + 2) && 
-	  fts_get_symbol(o->argv + 1) == fts_s_colon)
+  if(argc > 1 && fts_is_symbol(argv) && fts_get_symbol(argv) == fts_s_colon && fts_is_symbol(argv + 1))
+    class_name = fts_get_symbol(argv + 1);
+  else if(argc > 2 && 
+	  fts_is_symbol(argv) &&
+	  fts_is_symbol(argv + 1) && 
+	  fts_is_symbol(argv + 2) && 
+	  fts_get_symbol(argv + 1) == fts_s_colon)
     {
-      package_name = fts_get_symbol(o->argv);
-      class_name = fts_get_symbol(o->argv + 2);
+      package_name = fts_get_symbol(argv);
+      class_name = fts_get_symbol(argv + 2);
     }
 
   if(class_name != NULL)
@@ -106,117 +110,102 @@ fts_error_object_fit_outlet(fts_object_t *obj, int noutlet)
     fts_object_set_outlets_number(obj, noutlet + 1);
 }
 
-/************************************************************
+void fts_error_object_config(void)
+{
+  fts_error_object_class = fts_class_install(NULL, error_object_instantiate);
+}
+
+/*******************************************************************
  *
- *  convenience function to set the error state of an object, providing 
- *  also a textual description of the error as a printf like set of arguments
+ *  unique global error symbol
  *
  */
-void 
-fts_object_set_error(fts_object_t *obj, const char *format, ...)
+static fts_symbol_t the_error = NULL;
+
+void
+fts_set_error(fts_symbol_t error)
 {
-  va_list ap;
-  char buf[1024];
-  fts_atom_t a;
+  the_error = error;
+}
 
-  /* make up the errdesc property  */
-  va_start(ap, format);
-  vsprintf(buf, format, ap);
-  va_end(ap);
-
-  fts_set_symbol(&a, fts_new_symbol(buf));
-  fts_object_put_prop(obj, fts_s_error_description, &a);
+fts_symbol_t
+fts_get_error(void)
+{
+  return the_error;
 }
 
 /************************************************************
  *
- *  runtime errors
+ *  runtime error proxy
  *
  */
+static fts_object_t *runtime_error_proxy = NULL;
+static fts_symbol_t sym_runtime_error_post = NULL;
+
 void 
-fts_runtime_error_handler_set(fts_object_t *obj)
+fts_runtime_error_proxy_set(fts_object_t *obj)
 {
-  runtime_error_handler = obj;
+  runtime_error_proxy = obj;
   
   if(!sym_runtime_error_post) 
     sym_runtime_error_post = fts_new_symbol("postError");
 }
 
 void 
-fts_runtime_error_handler_remove(fts_object_t *obj)
+fts_runtime_error_proxy_remove(fts_object_t *obj)
 {
-  runtime_error_handler = 0;
+  runtime_error_proxy = 0;
 }
 
-void 
-fts_error(fts_object_t *obj, const char *format, ...)
+static void
+fts_object_runtime_error(fts_object_t *obj, fts_symbol_t error)
 {
-  va_list ap;
-  char buf[1024];
-  fts_atom_t a[2];
-
-  va_start(ap, format);
-  vsnprintf( buf, sizeof(buf), format, ap);
-  va_end(ap);
-
-  if(runtime_error_handler)
+  if(fts_object_get_patcher(obj) != NULL)
+  {
+    if(runtime_error_proxy)
     {
+      fts_atom_t a[2];
+
       fts_set_object(a + 0, obj);
-      fts_set_symbol(a + 1, fts_new_symbol(buf));
-      /* fts_set_string(a + 1, buf); ??? */
-      
-      fts_client_send_message(runtime_error_handler, sym_runtime_error_post, 2, a);
+      fts_set_symbol(a + 1, error);
+
+      fts_client_send_message(runtime_error_proxy, sym_runtime_error_post, 2, a);
     }
-  else
+    else
     {
       fts_symbol_t class = fts_class_get_name(fts_object_get_class(obj));
 
-      post("error in %s: %s\n", class, buf);	
+      post("error in %s: %s\n", class, error);
     }
+  }
 }
 
-void 
-fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...)
+/************************************************************
+*
+*  object error (creation or runtime)
+*
+*/
+void
+fts_object_error(fts_object_t *obj, const char *format, ...)
 {
   va_list ap;
   char buf[1024];
-  fts_atom_t a[2];
+  fts_symbol_t error;
 
+  /* make up the errdesc property  */
   va_start(ap, format);
-  vsnprintf( buf, sizeof(buf), format, ap);
+  vsprintf(buf, format, ap);
   va_end(ap);
 
-  if(runtime_error_handler)
-    {
-      fts_set_object(a + 0, obj);
-      fts_set_symbol(a + 1, fts_new_symbol(buf));
-      /* fts_set_string(a + 1, buf); ??? */
-      
-      fts_client_send_message(runtime_error_handler, sym_runtime_error_post, 2, a);
-    }
+  error = fts_new_symbol(buf);
+
+  if(fts_object_get_id(obj) == FTS_CREATE || fts_object_get_id(obj) == FTS_INVALID)
+  {
+    fts_object_set_id(obj, FTS_INVALID);
+    fts_set_error(error);
+  }
   else
-    {
-      fts_symbol_t class = fts_class_get_name(fts_object_get_class(obj));
-
-      post("error in %s: %s\n", class, buf);	
-    }
+    fts_object_runtime_error(obj, error);
 }
 
-fts_symbol_t
-fts_object_get_error(fts_object_t *obj)
-{
-  fts_atom_t error_description_prop;
-  
-  fts_object_get_prop(obj, fts_s_error_description, &error_description_prop);
-  
-  if(fts_is_symbol(&error_description_prop))
-    return fts_get_symbol(&error_description_prop);
-
-  return 0;
-}
-
-void fts_error_object_config(void)
-{
-  fts_error_object_class = fts_class_install(NULL, error_object_instantiate);
-}
 

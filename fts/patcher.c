@@ -95,8 +95,8 @@ patcher_get_last_object(fts_patcher_t *this)
 {
   fts_object_t *last = this->objects;
 
-  while(last && last->next_in_patcher)
-    last = last->next_in_patcher;
+  while(last && fts_object_get_next_in_patcher(last))
+    last = fts_object_get_next_in_patcher(last);
 
   return last;
 }
@@ -104,6 +104,9 @@ patcher_get_last_object(fts_patcher_t *this)
 void
 fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 {
+  /* create patcher data */
+  fts_object_get_patcher_data(obj);
+  
   /* add object to list of objects in patcher */
   if(this->last_object == NULL)
   {
@@ -114,8 +117,9 @@ fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
   else
   {
     /* add object to end of the list */
-    obj->next_in_patcher = NULL;
-    this->last_object->next_in_patcher = obj;
+    fts_object_set_next_in_patcher(obj, NULL);
+    fts_object_set_next_in_patcher(this->last_object, obj);
+    
     this->last_object = obj;
   }
 
@@ -128,16 +132,17 @@ fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 {
   fts_object_t **p;
 
-  for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
+  for (p = &(this->objects); *p; p = &(fts_object_get_next_in_patcher(*p)))
     if (*p == obj)
     {
       /* remove object from list */
-      *p = obj->next_in_patcher;
+      *p = fts_object_get_next_in_patcher(obj);
 
       /* update last object pointer */
       if(obj == this->last_object)
         this->last_object = patcher_get_last_object(this);
 
+      fts_object_remove_patcher_data(obj);
       fts_object_release(obj);
 
       return;
@@ -150,7 +155,7 @@ fts_patcher_get_objects_count(fts_patcher_t *this)
   int i = 0;
   fts_object_t *p;
 
-  for (p = this->objects; p; p = p->next_in_patcher)
+  for (p = this->objects; p; p = fts_object_get_next_in_patcher(p))
     i++;
 
   return i;
@@ -564,7 +569,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_object_refer(obj);
   }
   else
-    fts_object_set_error(o, "bad argument");
+    fts_object_error(o, "bad argument");
 }
 
 static void
@@ -588,7 +593,10 @@ receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 receive_spost_description(fts_object_t *o, int wreceive, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), o->argc - 2, o->argv + 2);
+  int descr_ac = fts_object_get_description_size(o);
+  fts_atom_t *descr_at = fts_object_get_description_atoms(o);
+  
+  fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), descr_ac - 2, descr_at + 2);
 }
 
 static void
@@ -698,7 +706,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       /* if there is no input handler try to get at least an atom method for "send"  */
       if(fts_class_get_method(cl, fts_s_send, NULL, &varargs) == NULL)
       {
-        fts_object_set_error(o, "cannot connect to %s object", fts_class_get_name(cl));
+        fts_object_error(o, "cannot connect to %s object", fts_class_get_name(cl));
         return;
       }
     }
@@ -711,7 +719,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_object_refer(obj);
   }
   else
-    fts_object_set_error(o, "bad argument");
+    fts_object_error(o, "bad argument");
 }
 
 static void
@@ -832,12 +840,12 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   this->load_init_fired = 1;
 
   /* send load_init to patcher objects */
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
     if (fts_object_is_patcher(p))
       fts_send_message_varargs(p, s, ac, at);
 
   /* send load_init to all simple objects */
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
     if (!fts_object_is_patcher(p))
       fts_send_message_varargs(p, s, ac, at);
 
@@ -874,7 +882,7 @@ patcher_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   while (p)
   {
     fts_send_message_varargs(p, fts_s_closeEditor, 0, 0);
-    p = p->next_in_patcher;
+    p = fts_object_get_next_in_patcher(p);
   }
 }
 
@@ -907,7 +915,7 @@ fts_patcher_get_by_file_name( fts_symbol_t file_name)
   fts_patcher_t *root = fts_get_root_patcher();
   fts_object_t *p = 0;
 
-  for (p = root->objects; p ; p = p->next_in_patcher)
+  for (p = root->objects; p ; p = fts_object_get_next_in_patcher(p))
   {
     if (fts_object_is_patcher(p))
     {
@@ -989,14 +997,14 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_object_t *p;
 
   /* see if this should be added */
-  if (fts_atom_is_subsequence(ac - 1, at + 1, o->argc, o->argv))
+  if (fts_atom_is_subsequence(ac - 1, at + 1, fts_object_get_description_size(o), fts_object_get_description_atoms(o)))
   {
     /* add only if the patcher is not the root patcher or a patcher in the root patcher */
-    if((this != fts_get_root_patcher())&&(o->patcher != fts_get_root_patcher()))
+    if((this != fts_get_root_patcher())&&(fts_object_get_patcher(o) != fts_get_root_patcher()))
       fts_objectset_add(set, o);
   }
   /* look if the objects in the patchers are to be found */
-  for(p = this->objects; p; p = p->next_in_patcher)
+  for(p = this->objects; p; p = fts_object_get_next_in_patcher(p))
   {
     if(!fts_object_is_patcher(p))
     {
@@ -1007,16 +1015,16 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
         /* send the find message to the object; if the object do not implement it, do the standard check */
         if(find_method != NULL)
           (*find_method)(p, fts_system_inlet, fts_s_find, ac, at);
-        else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
+        else if (fts_atom_is_subsequence(ac - 1, at + 1, fts_object_get_description_size(p), fts_object_get_description_atoms(p)))
           fts_objectset_add(set, p);
       }
-      else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
+      else if (fts_atom_is_subsequence(ac - 1, at + 1, fts_object_get_description_size(p), fts_object_get_description_atoms(p)))
         fts_objectset_add(set, p);
     }
   }
 
   /* do the recursive calls  */
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
   {
     if (fts_object_is_standard_patcher(p) ||
         fts_object_is_template(p) ||
@@ -1034,14 +1042,14 @@ patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_object_t *p;
 
   /* look if the objects in the patchers are to be found */
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
   {
     if(fts_object_is_error(p))
       fts_objectset_add(set, p);
   }
 
   /* do the recursive calls  */
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
   {
     if (fts_object_is_standard_patcher(p) ||
         fts_object_is_template(p) ||
@@ -1072,10 +1080,10 @@ patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     if( fts_get_int( a) && fts_get_int( a+1) && fts_get_int( a+2) && fts_get_int( a+3))
       fts_client_send_message((fts_object_t *)this, sym_setPatcherBounds, 4, a);
 
-    for (p = this->objects; p ; p = p->next_in_patcher)
-      fts_client_upload_object( p, -1);
+    for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
+      fts_object_upload( p);
 
-    for (p = this->objects; p ; p = p->next_in_patcher)
+    for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
     {
       int outlet;
 
@@ -1083,11 +1091,8 @@ patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       {
         fts_connection_t *c;
 
-        for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-        {
-          ((fts_object_t *)c)->patcher = this;
-          fts_client_upload_object( (fts_object_t *)c, -1);
-        }
+        for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
+          fts_object_upload( (fts_object_t *)c);
       }
     }
 
@@ -1103,7 +1108,7 @@ patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   this->open = 1;
 
-  for(p = this->objects; p ; p = p->next_in_patcher)
+  for(p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
   {
     if(fts_class_get_method_varargs(fts_object_get_class(p), fts_s_update_real_time) != NULL)
       fts_update_request(p);
@@ -1129,12 +1134,12 @@ patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_object_t *p;
 
   /* upload all the not uploaded objects */
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
     if (!fts_object_has_id(p))
-      fts_client_upload_object( p, -1);
+      fts_object_upload( p);
 
   /* for each object, for each outlet, upload all the not uploaded connections */
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
   {
     int outlet;
 
@@ -1142,12 +1147,9 @@ patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       fts_connection_t *c;
 
-      for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
+      for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
         if (!fts_object_has_id((fts_object_t *)c))
-        {
-          ((fts_object_t *)c)->patcher = this;
-          fts_client_upload_object((fts_object_t *)c, -1);
-        }
+          fts_object_upload((fts_object_t *)c);
     }
   }
 }
@@ -1221,8 +1223,8 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     fts_client_add_int( o, fts_get_int(&a_y));
     fts_client_add_int( o, fts_get_int(&a_w));
     fts_client_add_int( o, fts_get_int(&a_h));
-    fts_client_add_int( o, obj->n_inlets);
-    fts_client_add_int( o, obj->n_outlets);
+    fts_client_add_int( o, fts_object_get_inlets_number(obj));
+    fts_client_add_int( o, fts_object_get_outlets_number(obj));
     fts_client_add_int( o, fts_get_int(&a_layer));
 
     if(fts_object_is_error(obj))
@@ -1244,8 +1246,8 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       fts_client_add_symbol( o, fts_class_get_name(class));
     else
       {
-	if( obj->argc > 0)	  
-	  fts_client_add_symbol( o, fts_get_symbol( obj->argv));
+	if( fts_object_get_description_size(obj) > 0)	  
+	  fts_client_add_symbol( o, fts_get_symbol(fts_object_get_description_atoms(obj)));
 	else
 	  fts_client_add_symbol( o, fts_s_error);
       }
@@ -1303,7 +1305,7 @@ patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_set_int(a, -1);
   fts_object_put_prop(obj, fts_s_layer, a);
 
-  fts_client_upload_object(obj, -1);
+  fts_object_upload(obj);
 
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
@@ -1377,9 +1379,6 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
           dsp_restart = 1;
         }
 
-        /* remove connections and unbind the object from used and defined names */
-        fts_object_unpatch(obj);
-
         /* release object */
         fts_patcher_remove_object(this, obj);
       }
@@ -1395,8 +1394,6 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
 static void
 patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_patcher_t *this = (fts_patcher_t *)o;
-
   if((ac == 4) &&
      fts_is_object(&at[0]) &&
      fts_is_int(&at[1]) &&
@@ -1415,13 +1412,11 @@ patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
     if (to && from)
     {
       connection = fts_connection_new(from, outlet, to, inlet, fts_c_anything);
-      if (! connection)
-      {
+      
+      if(!connection)
         return;
-      }
 
-      ((fts_object_t *)connection)->patcher = this;
-      fts_client_upload_object((fts_object_t *)connection, -1);
+      fts_object_upload((fts_object_t *)connection);
     }
 
     fts_patcher_set_dirty((fts_patcher_t *)o, 1);
@@ -1468,7 +1463,7 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   /* upload all the not uploaded objects */
   fts_client_send_message((fts_object_t *)this, sym_startPaste, 0, 0);
 
-  for (p = this->objects; p ; p = p->next_in_patcher)
+  for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
     if (!fts_object_has_id(p))
     {
       /* shift object during paste */
@@ -1481,12 +1476,12 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_object_put_prop(p, fts_s_x, a);
       fts_object_put_prop(p, fts_s_y, a+1);
 
-      fts_client_upload_object( p, -1);
+      fts_object_upload( p);
       uploaded = 1;
     }
 
       /* For each object, for each outlet, upload all the not uploaded connections */
-      for (p = this->objects; p ; p = p->next_in_patcher)
+      for (p = this->objects; p ; p = fts_object_get_next_in_patcher(p))
       {
         int outlet;
 
@@ -1494,12 +1489,11 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
         {
           fts_connection_t *c;
 
-          for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
+          for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
           {
-            if( !fts_object_has_id( (fts_object_t *)c))
+            if(!fts_object_has_id( (fts_object_t *)c))
             {
-              ((fts_object_t *)c)->patcher = this;
-              fts_client_upload_object((fts_object_t *)c, -1);
+              fts_object_upload((fts_object_t *)c);
               uploaded = 1;
             }
           }
@@ -1508,7 +1502,7 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       fts_client_send_message((fts_object_t *)this, sym_endPaste, 0, 0);
 
-  if( uploaded)
+  if(uploaded)
     fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
@@ -1559,7 +1553,7 @@ find_object_index_in_patcher( fts_object_t *object)
   fts_patcher_t *patcher = fts_object_get_patcher(object);
   int index = 0;
 
-  for(o=patcher->objects; o; o=o->next_in_patcher)
+  for(o=patcher->objects; o; o = fts_object_get_next_in_patcher(o))
   {
     if (object == o)
       return index;
@@ -1598,7 +1592,7 @@ patcher_save_objects( FILE *file, fts_object_t *object)
       fprintf( file, "#P newobj ");
       patcher_save_dotpat_object_geometry( file, object);
       fprintf( file, " patcher ");
-      patcher_save_dotpat_atoms( file, object->argc - 1, object->argv + 1);
+      patcher_save_dotpat_atoms( file, fts_object_get_description_size(object) - 1, fts_object_get_description_atoms(object) + 1);
       fprintf( file, ";\n");
     }
     else if ( ! fts_object_is_patcher( object)
@@ -1613,11 +1607,11 @@ patcher_save_objects( FILE *file, fts_object_t *object)
     {
       fprintf( file, "#P newex ");
       patcher_save_dotpat_object_geometry( file, object);
-      patcher_save_dotpat_atoms( file, object->argc, object->argv);
+      patcher_save_dotpat_atoms( file, fts_object_get_description_size(object), fts_object_get_description_atoms(object));
       fprintf( file, ";\n");
     }
 
-    object = object->next_in_patcher;
+    object = fts_object_get_next_in_patcher(object);
   }
 }
 
@@ -1641,7 +1635,7 @@ patcher_save_connections( FILE *file, fts_object_t *object, int patcher_object_c
     {
       fts_connection_t *c;
 
-      for ( c = object->out_conn[outlet]; c ; c = c->next_same_src)
+      for ( c = fts_object_get_outlet_connections(object, outlet); c ; c = c->next_same_src)
       {
         if(fts_connection_get_type(c) > fts_c_hidden) /* don't save hidden connections */
         {
@@ -1656,7 +1650,7 @@ patcher_save_connections( FILE *file, fts_object_t *object, int patcher_object_c
 
     object_index++;
 
-    object = object->next_in_patcher;
+    object = fts_object_get_next_in_patcher(object);
   }
 }
 
@@ -1740,7 +1734,7 @@ fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this)
   int i;
 
   /* put all inlet receives in an array */
-  for (p=this->objects; p; p=p->next_in_patcher)
+  for (p=this->objects; p; p=fts_object_get_next_in_patcher(p))
   {
     if(fts_object_get_class(p) == receive_class)
     {
@@ -1894,9 +1888,6 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     if(fts_dsp_is_active() && fts_is_dsp_object(remove))
       fts_dsp_desactivate();
 
-    /* remove connections and unbind the object from used and defined variables */
-    fts_object_unpatch(remove);
-
     /* remove object from list */
     fts_patcher_remove_object(this, remove);
   }
@@ -1905,7 +1896,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(this->args != NULL)
     fts_object_release( this->args);
 
-  /* delete the inlets and inlets tables */
+  /* delete the inlet and outles tables */
   if (this->inlets)
     fts_free( this->inlets);
 

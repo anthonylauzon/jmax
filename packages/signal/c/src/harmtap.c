@@ -427,7 +427,7 @@ harmtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   harmtap_set(o, 0, 0, ac, at);
 
   if(params->delayline == NULL)
-    fts_object_set_error(o, "first argument of delay~ required");
+    fts_object_error(o, "first argument of delay~ required");
 }
 
 
