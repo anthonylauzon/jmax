@@ -39,11 +39,9 @@ extern void seqfind_config(void);
 extern void seqstep_config(void);
 extern void seqplay_config(void);
 extern void seqrec_config(void);
+extern void locate_config(void);
 
 extern void getdur_config(void);
-
-extern void segment_config(void);
-extern void segplay_config(void);
 
 void
 sequence_config(void)
@@ -61,9 +59,7 @@ sequence_config(void)
   seqstep_config();
   seqplay_config();
   seqrec_config();
+  locate_config();
 
   getdur_config();
-
-  segment_config();
-  seqplay_config();
 }

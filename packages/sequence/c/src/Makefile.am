@@ -3,10 +3,9 @@ package_LTLIBRARIES=libsequence.la
 libsequence_la_SOURCES= \
 event.c \
 getdur.c \
+locate.c \
 module.c \
 note.c \
-segment.c \
-segplay.c \
 seqmess.c \
 seqfind.c \
 seqmidi.c \
@@ -20,7 +19,6 @@ track.c
 noinst_HEADERS= \
 event.h \
 note.h \
-segment.h \
 seqmess.h \
 seqmidi.h \
 seqsym.h \

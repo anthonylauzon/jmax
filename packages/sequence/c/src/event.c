@@ -26,7 +26,6 @@
 #include <fts/fts.h>
 #include "seqsym.h"
 #include "event.h"
-#include "segment.h"
 #include "note.h"
 #include "seqmess.h"
 
@@ -44,17 +43,11 @@ event_get_duration(event_t *event)
   fts_atom_t *value = &event->value;
   double duration = 0.0;
 
-  if(segment_atom_is(value))
+  if(note_atom_is(value))
     {
-      segment_t *segment = segment_atom_get(value);
+      note_t *note = note_atom_get(value);
 
-      duration = segment_get_duration(segment);
-    }
-  else if(note_atom_is(value))
-    {
-      segment_t *segment = segment_atom_get(value);
-
-      duration = segment_get_duration(segment);
+      duration = note_get_duration(note);
     }
   else if(fts_is_object(value))
     {

@@ -38,6 +38,38 @@ fts_class_t *note_class = 0;
  */
 
 static void
+note_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  note_t *this = (note_t *)o;
+
+  if(fts_is_number(at))
+    {
+      int pitch = fts_get_number_int(at);
+      
+      if(pitch < 0)
+	pitch = 0;
+
+      this->pitch = pitch;
+    }
+}
+  
+static void
+note_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  note_t *this = (note_t *)o;
+
+  if(fts_is_number(at))
+    {
+      double duration = fts_get_number_float(at);
+
+      if(duration < 0.0)
+	duration = 0.0;
+      
+      this->duration = duration;
+    }
+}
+
+static void
 note_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   note_t *this = (note_t *)o;
@@ -46,11 +78,9 @@ note_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     {
     default:
     case 2:
-      if(fts_is_number(at + 1))
-	this->duration = fts_get_number_float(at + 1);
+      note_duration(o, 0, 0, 1, at + 1);
     case 1:
-      if(fts_is_number(at + 1))
-	this->pitch = fts_get_number_int(at + 0);
+      note_pitch(o, 0, 0, 1, at);
     case 0:
       break;
     }
@@ -91,7 +121,7 @@ note_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static fts_status_t
 note_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(note_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(note_t), 1, 0, 0); 
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, note_init);
 
@@ -99,6 +129,9 @@ note_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, note_set_from_array);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, note_print);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("duration"), note_duration);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("pitch"), note_pitch);
 
   return fts_Success;
 }

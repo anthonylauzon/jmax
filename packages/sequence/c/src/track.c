@@ -372,24 +372,6 @@ track_get_next_by_time_after(track_t *track, double time, event_t *here)
     return 0;
 }
 
-event_t *
-track_get_event_with_duration_by_time(track_t *track, double time)
-{
-  double duration = 0.0;
-
-  if(track_get_size(track) > 0 && time <= event_get_time(track->last) + event_get_duration(track->last))
-    {
-      event_t *event = track->first;
-      
-      while(time > event_get_time(event) + event_get_duration(event))
-	event = event_get_next(event);
-      
-      return event;  
-    }
-  else
-    return 0;
-}
-
 /******************************************************
  *
  *  client calls

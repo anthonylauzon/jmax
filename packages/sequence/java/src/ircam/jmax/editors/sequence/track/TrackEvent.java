@@ -158,6 +158,24 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	((FtsTrackObject)itsTrackDataModel).setDirty();
     }
 
+    /**
+     * Set the named property */
+    public void setValueProperty(int nArgs , FtsAtom args[])
+    {
+        if (value != null)
+	  {
+	    String name = args[0].getString();
+	    Object propVal = args[1].getValue();
+
+	    value.setProperty(name, propVal);
+	
+	    if (itsTrackDataModel != null)
+	      itsTrackDataModel.changeEvent(this, name, theValue);
+
+	    ((FtsTrackObject)itsTrackDataModel).setDirty();
+	  }
+    }
+
     void sendSetMessage(String type, int nArgs, Object args[])
     {
 	for(int i=0; i<nArgs; i++)
