@@ -677,7 +677,8 @@ public class FtsDotPatParser
 	  in.pushBack();
 
 	obj = new FtsInletObject(parent);
-	graphicDescr.setTextGraphicProperties(obj);
+	//graphicDescr.setTextGraphicProperties(obj);
+	graphicDescr.setSquareGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("outlet"))
@@ -690,7 +691,8 @@ public class FtsDotPatParser
 	  in.pushBack();
 
 	obj = new FtsOutletObject(parent);
-	graphicDescr.setTextGraphicProperties(obj);
+	//graphicDescr.setTextGraphicProperties(obj);
+	graphicDescr.setSquareGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("number"))
