@@ -11,29 +11,29 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-/* This file include the device specific to the OSS/LINUX architecture.
-   Initially only audio
 
-   These audio driver work for any number of channels channels, allow access to all
+/* This file include the device specific to the OSS/LINUX architecture.
+
+   These audio driver work for any number of channels, allow access to all
    the OSS/LINUX audio parameters from the FTS UCS system.
 
    A Device class is defined for DACs and ADCs.
 
-   A central structure keep track of the consistency of the whole business.
-
    In the Future, a io_ctrl operations at the UCS level will allow access
    to the oss audio paramters from UCS programs, accessing to the linux device
    directly.
-
-   The device *only* support stereo devices.
-
-   All the post should generate an error.
 */
+
+#define DEF_DEVICE_NAME "/dev/audio"
+#define DEF_SAMPLING_RATE ((float)44100.0f)
+#define DEF_FIFO_SIZE 256
+#define DEF_CHANNELS 2
 
 #undef OSSDEV_DEBUG
 
 /* Include files */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -41,6 +41,7 @@
 #include <linux/soundcard.h>
 #include <errno.h>
 #include <string.h>
+#include <assert.h>
 
 #include "sys.h"
 #include "lang.h"
@@ -48,6 +49,7 @@
 #include "runtime/devices/unixdev.h"
 #include "runtime/files.h"
 
+extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
 
 /* forward declarations */
 
@@ -57,72 +59,117 @@ static void oss_midi_init(void);
 
 /******************************************************************************/
 /*                                                                            */
-/*           Shared audio control structure                                   */
+/* Audio descriptor: keeps file descriptor and parameters                     */
 /*                                                                            */
 /******************************************************************************/
 
-/* The control structure is shared because we share the same
-   file descriptor for input and output
-   */
-
-
-static struct oss_audio_data_struct
+typedef struct _audio_desc
 {
-  const char *device_name;
-
+  fts_symbol_t device_name;
   /* status */
-
-  int device_opened;
-  int dac_opened;
-  int adc_opened;
-
-  /* device */
-
+  int dac_open;
+  int adc_open;
+  /* file descriptor */
   int fd;
-
+  /* parameters */
   int sampling_rate;
-
   int fifo_size;
-
-  /* buffers  */
-
-  short *dac_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device open */
-  short *adc_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device_open */
-
+  int nchannels;
+  /* formating buffers */
+  short *dac_fmtbuf;
+  short *adc_fmtbuf;
   /* output bytes count, for dac slip detection */
   long bytes_count;
+} audio_desc_t;
 
-} oss_audio_data;
+static fts_hash_table_t *audio_desc_table;
 
-
-static void oss_audio_set_parameters(void)
+static void audio_desc_init( audio_desc_t *aud, fts_symbol_t device_name)
 {
-  int format, stereo, sr, fragparam, fragment_size, max_fragments, i;
+  aud->device_name = device_name;
+
+  aud->dac_open = 0;
+  aud->adc_open = 0;
+
+  aud->fd = -1;
+
+  aud->sampling_rate = 0;
+  aud->fifo_size = 0;
+  aud->nchannels = 0;
+
+  aud->dac_fmtbuf = 0;
+  aud->adc_fmtbuf = 0;
+
+  aud->bytes_count = 0;
+}
+
+static audio_desc_t *audio_desc_new( fts_symbol_t device_name)
+{
+  audio_desc_t *p;
+
+  p = (audio_desc_t *)fts_malloc( sizeof( audio_desc_t));
+
+  assert( p != 0);
+
+  audio_desc_init( p, device_name);
+
+  return p;
+}
+
+static void audio_desc_destroy( audio_desc_t *aud)
+{
+  if ( aud->fd >= 0)
+    {
+      close( aud->fd);
+      aud->fd = -1;
+    }
+
+  if (aud->dac_fmtbuf)
+    {
+      fts_free( aud->dac_fmtbuf);
+      aud->dac_fmtbuf = 0;
+    }
+
+  if (aud->adc_fmtbuf)
+    {
+      fts_free( aud->adc_fmtbuf);
+      aud->adc_fmtbuf = 0;
+    }
+}
+
+static void audio_desc_free( audio_desc_t *aud)
+{
+  audio_desc_destroy( aud);
+  fts_free( aud);
+}
+
+static int audio_desc_set_parameters( audio_desc_t *aud)
+{
+  int format, sampling_rate, fragparam, fragment_size, max_fragments, nchannels, i;
 
   /* Set fragment size */
-  /* HACK !!! */
-  fragment_size = 2 /* channels */ * sizeof( short) * 64;
+  /* HACK !!! Vector size is not known when this function is called */
+  fragment_size = 2 * sizeof( short) * 64;
 
   for( i = 0; i < 16; i++)
     if (fragment_size & (1<<i))
       break;
 
-  max_fragments = oss_audio_data.fifo_size / 64;
+  max_fragments = aud->fifo_size / 64;
 
   fragparam = (max_fragments<<16) | (i);
 
-  if (ioctl( oss_audio_data.fd, SNDCTL_DSP_SETFRAGMENT, &fragparam))
+  if (ioctl( aud->fd, SNDCTL_DSP_SETFRAGMENT, &fragparam))
     {
-      post( "Error in ioctl(SNDCTL_DSP_SETFRAGMENT)\n");
-      perror( "oss");
-      return;
+      post( "Error in ioctl(SNDCTL_DSP_SETFRAGMENT): %s\n", strerror( errno));
+      return -1;
     }
 
 #ifdef OSSDEV_DEBUG
   {
     audio_buf_info info;
 
-    if ( ioctl( oss_audio_data.fd, SNDCTL_DSP_GETOSPACE, &info) == -1)
+    if ( ioctl( aud->fd, SNDCTL_DSP_GETOSPACE, &info) == -1)
       post( "SNDCTL_DSP_GETOSPACE\n");
     post( "fragments: %d\n", info.fragments);
     post( "total number of fragments: %d\n", info.fragstotal);
@@ -132,74 +179,194 @@ static void oss_audio_set_parameters(void)
 #endif
 
   /* Set 16 bit format */
-
   format = AFMT_S16_LE;
-  if (ioctl(oss_audio_data.fd, SNDCTL_DSP_SETFMT, &format) == -1)
-    post("Error in ioctl(SNDCTL_DSP_SETFMT)\n");
+  if (ioctl( aud->fd, SNDCTL_DSP_SETFMT, &format) == -1)
+    {
+      post("Error in ioctl(SNDCTL_DSP_SETFMT)\n");
+      return -1;
+    }
 
   if (format != AFMT_S16_LE)
-    post("Audio device doesn't support 16 bit mode\n");
+    {
+      post("Audio device doesn't support 16 bit mode\n");
+      return -1;
+    }
 
-  /* Set stereo mode */
+  /* Set number of channels */
+  nchannels = aud->nchannels;
+  if (ioctl( aud->fd, SNDCTL_DSP_CHANNELS, &nchannels) == -1)
+    {
+      post( "Error in ioctl(SNDCTL_DSP_CHANNELS)\n");
+      return -1;
+    }
 
-  stereo = 1;
-  if (ioctl(oss_audio_data.fd, SNDCTL_DSP_STEREO, &stereo) == -1)
-    post("error in ioctl(SNDCTL_DSP_STEREO)\n");
-
-  if (! stereo)
-    post("Audio device doesn't support stereo mode\n");
+  if ( nchannels != aud->nchannels)
+    {
+      post("Audio device doesn't support %d channels\n", aud->nchannels);
+      return -1;
+    }
 
   /* Set sampling rate */
+  sampling_rate = aud->sampling_rate;
+  if (ioctl( aud->fd, SNDCTL_DSP_SPEED, &sampling_rate) == -1)
+    {
+      post("error in ioctl(SNDCTL_DSP_SPEED)\n");
+      return -1;
+    }
 
-  sr = oss_audio_data.sampling_rate;
-  if (ioctl(oss_audio_data.fd, SNDCTL_DSP_SPEED, &sr) == -1)
-    post("error in ioctl(SNDCTL_DSP_SPEED)\n");
+  if (sampling_rate != aud->sampling_rate)
+    {
+      post("Audio device doesn't support requested sampling rate\n");
+      return -1;
+    }
 
-  if (sr != oss_audio_data.sampling_rate)
-    post("Audio device doesn't support requested sampling rate\n");
+  return 0;
 }
 
-/* to put the audio device in the right configuration,
-   set the dac_opened/adc_opened fields in the right
+/* 
+   To put the audio device in the right configuration,
+   set the dac_open/adc_open fields in the right
    status and call the following function; work also
    to close the unix device.
 
    Return 0 in case of success, -1 in case of errors in opening.
   */
 
-
-static int oss_audiodev_update_device(void)
+static int audio_desc_check_full_duplex_caps( audio_desc_t *aud)
 {
-  int fd;
-  int flags = 0;
+  int caps;
 
-  if (oss_audio_data.device_opened)
+  if ( ioctl( aud->fd, SNDCTL_DSP_GETCAPS, &caps) < 0)
     {
-      close(oss_audio_data.fd);
-      oss_audio_data.device_opened = 0;
+      post( "Error in ioctl(SNDCTL_DSP_GETCAPS): %s\n", strerror( errno));
+      return -1;
     }
 
-  if (oss_audio_data.dac_opened && oss_audio_data.adc_opened)
-    flags = O_RDWR;
-  else if (oss_audio_data.dac_opened)
-    flags = O_WRONLY;
-  else if (oss_audio_data.adc_opened)
-    flags = O_RDONLY;
-
-  fd = open( oss_audio_data.device_name, flags, 0);
-
-  if ( fd >= 0 )
+  if ( (caps & DSP_CAP_DUPLEX) == 0)
     {
-      oss_audio_data.fd = fd;
-      oss_audio_set_parameters();
-      oss_audio_data.device_opened = 1;
+      post( "Audio device does not support full duplex\n");
+      return -1;
+    }
+
+  return 0;
+}
+
+#define CMD_OPEN_DAC    1
+#define CMD_OPEN_ADC    2
+#define CMD_CLOSE_DAC   3
+#define CMD_CLOSE_ADC   4
+
+static int audio_desc_update( audio_desc_t *aud, int cmd)
+{
+  int fd, flags;
+
+
+  /* 
+     First, test if we want to reopen the device with read and write, and
+     if this is true, if the device supports full duplex.
+     If it does not support full duplex, then return error 
+  */
+  if ( aud->fd >= 0) 
+    {    
+      if ( (aud->dac_open && cmd == CMD_OPEN_ADC) 
+	   || (aud->adc_open && cmd == CMD_OPEN_DAC) )
+	{
+	  if (audio_desc_check_full_duplex_caps( aud) < 0)
+	    return -1;
+	}
+    }
+
+  flags = -1;
+
+  switch (cmd) {
+  case CMD_OPEN_DAC:
+    flags = ( aud->adc_open ) ? O_RDWR : O_WRONLY;
+    aud->dac_open = 1;
+    break;
+  case CMD_OPEN_ADC:
+    flags = ( aud->dac_open ) ? O_RDWR : O_RDONLY;
+    aud->adc_open = 1;
+    break;
+  case CMD_CLOSE_DAC:
+    if ( aud->adc_open )
+      flags = O_RDONLY;
+    aud->dac_open = 0;
+    break;
+  case CMD_CLOSE_ADC:
+    if ( aud->dac_open )
+      flags = O_WRONLY;
+    aud->adc_open = 0;
+    break;
+  }
+
+  if (flags < 0)
+    {
+      fts_symbol_t device_name;
+
+      device_name = aud->device_name;
+
+      audio_desc_free( aud);
+
+      assert( fts_hash_table_remove( audio_desc_table, device_name) != 0);
+
       return 0;
+    }
+
+  audio_desc_destroy( aud);
+
+  fd = open( fts_symbol_name( aud->device_name), flags, 0);
+
+  if ( fd < 0 )
+    {
+      post( "Error opening OSS device: %s\n", strerror(errno));
+
+      audio_desc_free( aud);
+
+      assert( fts_hash_table_remove( audio_desc_table, aud->device_name) != 0);
+
+      return -1;
+    }
+
+  aud->fd = fd;
+
+  if ( audio_desc_set_parameters( aud) )
+    {
+      close( aud->fd);
+
+      aud->fd = -1;
+
+      return -1;
+    }
+
+  /* Allocate the formatting buffers */
+  if (aud->dac_open)
+    aud->dac_fmtbuf = (short *) fts_malloc( MAXVS * aud->nchannels * sizeof(short));
+  if (aud->adc_open)
+    aud->adc_fmtbuf = (short *) fts_malloc( MAXVS * aud->nchannels * sizeof(short));
+
+  return 0;
+}
+
+static audio_desc_t *audio_desc_get( fts_symbol_t s)
+{
+  fts_atom_t a;
+  audio_desc_t *aud;
+
+  if ( fts_hash_table_lookup( audio_desc_table, s, &a))
+    {
+      aud = (audio_desc_t *)fts_get_ptr( &a);
     }
   else
     {
-      fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
-      return -1;
+      aud = audio_desc_new( s);
+
+      assert( aud != 0);
+
+      fts_set_ptr( &a, aud);
+      assert( fts_hash_table_insert( audio_desc_table, s, &a) != 0);
     }
+
+  return aud;
 }
 
 
@@ -218,11 +385,6 @@ static void         oss_dac_put(fts_word_t *args);
 
 static int          oss_dac_get_nchans(fts_dev_t *dev);
 static int oss_dac_get_nerrors(fts_dev_t *dev);
-
-/*
- * Channels housekeeping structure
- */
-
 
 /* Init and shutdown functions */
 
@@ -272,38 +434,26 @@ static void oss_dac_init(void)
  
 */
 
-
 /* OSS DAC dev class functions */
-
-static fts_status_t
-oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
+static fts_status_t oss_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
   fts_symbol_t s;
+  audio_desc_t *aud;
 
-  if (oss_audio_data.dac_opened)
-    return &fts_dev_open_error; /*Error: a device was already opened for the ch */
+  s = fts_get_symbol_by_name( nargs, args, fts_new_symbol("device"), fts_new_symbol(DEF_DEVICE_NAME));
+
+  aud = audio_desc_get( s);
 
   /* Parameter parsing  */
-  
-  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f);
-  oss_audio_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
+  aud->sampling_rate = (int) fts_param_get_float( fts_s_sampling_rate, DEF_SAMPLING_RATE);
+  aud->fifo_size = fts_param_get_int(fts_s_fifo_size, DEF_FIFO_SIZE);
+  aud->nchannels = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), DEF_CHANNELS);
 
-  s = fts_get_symbol_by_name(nargs, args, fts_new_symbol("device"), fts_new_symbol("/dev/audio"));
-  oss_audio_data.device_name = fts_symbol_name(s);
+  /* Open the device */
+  if ( audio_desc_update( aud, CMD_OPEN_DAC) < 0)
+    return &fts_dev_open_error;
 
-  /* open the device */
-
-  oss_audio_data.dac_opened = 1;
-
-  if (oss_audiodev_update_device())
-    {
-      oss_audio_data.dac_opened = 0;
-      return &fts_dev_open_error;
-    }
-
-  /* Allocate the DAC  formatting buffer */
-
-  oss_audio_data.dac_fmtbuf = (short *) fts_malloc(MAXVS * 2 * sizeof(short));
+  fts_dev_set_device_data(dev, aud);
 
   fts_dsp_set_dac_slip_dev( dev);
 
@@ -311,72 +461,95 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 }
 
 
-static fts_status_t
-oss_dac_close(fts_dev_t *dev)
+static fts_status_t oss_dac_close(fts_dev_t *dev)
 {
-  oss_audio_data.dac_opened = 0;
+  audio_desc_t *aud = (audio_desc_t *)fts_dev_get_device_data( dev);
 
-  oss_audiodev_update_device();
-
-  /* free the audio formatting buffer */
-
-  fts_free(oss_audio_data.dac_fmtbuf);
+  audio_desc_update( aud, CMD_CLOSE_DAC);
 
   return fts_Success;
 }
 
-static int
-oss_dac_get_nchans(fts_dev_t *dev)
+static int oss_dac_get_nchans(fts_dev_t *dev)
 {
-  return 2;
-}
+  audio_desc_t *aud = (audio_desc_t *)fts_dev_get_device_data( dev);
 
+  return aud->nchannels;
+}
 
 static int oss_dac_get_nerrors(fts_dev_t *dev)
 {
-  count_info info;
+  count_info count;
   int size;
+  audio_desc_t *aud = (audio_desc_t *)fts_dev_get_device_data( dev);
   
-  if (ioctl( oss_audio_data.fd, SNDCTL_DSP_GETOPTR, &info) < 0)
+  if (ioctl( aud->fd, SNDCTL_DSP_GETOPTR, &count) < 0)
     {
       post("Error in ioctl(SNDCTL_DSP_GETOPTR)\n");
       return 0;
     }
 
-  size = 2 * sizeof( short) * oss_audio_data.fifo_size;
-  if (info.bytes > (oss_audio_data.bytes_count + size))
+  size = aud->nchannels * sizeof( short) * aud->fifo_size;
+  if (count.bytes > (aud->bytes_count + size))
     {
-      oss_audio_data.bytes_count = info.bytes;
+      aud->bytes_count = count.bytes;
       return 1;
     }
   else
     return 0;
 }
 
-/* 
-   fts_dev_t *dev, int n, float *buf1 ... bufm 
-   the device is ignored (only one device for the moment allowed)
-*/
 
+/* 
+   Arguments: fts_dev_t *dev, int n, float *buf1 ... bufm 
+*/
 static void oss_dac_put(fts_word_t *argv)
 {
-  long n = fts_word_get_long(argv + 1);
-  int i,j, ch;
-  float *in1;
-  float *in2;
+  int n, i, nchannels, channel, j;
+  audio_desc_t *aud;
 
-  oss_audio_data.bytes_count += (2*sizeof(short)*n);
+  aud = (audio_desc_t *)fts_dev_get_device_data( (fts_dev_t *)fts_word_get_ptr( argv) );
 
-  in1 = (float *) fts_word_get_ptr(argv + 2);
-  in2 = (float *) fts_word_get_ptr(argv + 3);
+  if (aud->fd < 0)
+    return;
 
-  for (i = 0, j = 0; i < n; i++, j += 2)
+  n = fts_word_get_long(argv + 1);
+
+  nchannels = aud->nchannels;
+  aud->bytes_count += (nchannels * n * sizeof(short));
+
+  if ( nchannels == 2)
     {
-      oss_audio_data.dac_fmtbuf[j + 0] = (short) ( 32767.0f * in1[i]);
-      oss_audio_data.dac_fmtbuf[j + 1] = (short) ( 32767.0f * in2[i]);
+      float *in0, *in1;
+
+      in0 = (float *) fts_word_get_ptr(argv + 2);
+      in1 = (float *) fts_word_get_ptr(argv + 3);
+
+      j = 0;
+      for ( i = 0; i < n; i++)
+	{
+	  aud->dac_fmtbuf[j++] = (short) ( 32767.0f * in0[i]);
+	  aud->dac_fmtbuf[j++] = (short) ( 32767.0f * in1[i]);
+	}
+    }
+  else
+    {
+      for ( channel = 0; channel < nchannels; channel++)
+	{
+	  float *in;
+
+	  in = (float *) fts_word_get_ptr( argv + 2 + channel);
+
+	  j = 0;
+	  for ( i = 0; i < n; i++)
+	    {
+	      aud->dac_fmtbuf[j] = (short) ( 32767.0f * in[i]);
+	      j += nchannels;
+	    }
+	}
     }
 
-  write(oss_audio_data.fd, oss_audio_data.dac_fmtbuf, 2 * n * sizeof(short));
+  write( aud->fd, aud->dac_fmtbuf, nchannels * n * sizeof(short));
 }
 
 
@@ -420,95 +593,95 @@ static void oss_adc_init(void)
 
 /* OSS ADC dev class functions */
 
-static fts_status_t
-oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
+static fts_status_t oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  if (oss_audio_data.adc_opened)
-    return &fts_dev_open_error; /*Error: a device was already opened for the ch */
+  fts_symbol_t s;
+  audio_desc_t *aud;
+
+  s = fts_get_symbol_by_name( nargs, args, fts_new_symbol("device"), fts_new_symbol(DEF_DEVICE_NAME));
+
+  aud = audio_desc_get( s);
 
   /* Parameter parsing  */
+  aud->sampling_rate = (int) fts_param_get_float( fts_s_sampling_rate, DEF_SAMPLING_RATE);
+  aud->fifo_size = fts_param_get_int(fts_s_fifo_size, DEF_FIFO_SIZE);
+  aud->nchannels = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), DEF_CHANNELS);
 
-  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.0f);  
-  oss_audio_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
+  /* Open the device */
+  aud->adc_open = 1;
+  if ( audio_desc_update( aud, CMD_OPEN_ADC) < 0)
+    return &fts_dev_open_error;
 
-  /* open the device */
-
-  oss_audio_data.adc_opened = 1;
-
-  if (oss_audiodev_update_device())
-    {
-      oss_audio_data.adc_opened = 0;
-      return &fts_dev_open_error;
-    }
-
-  /* Allocate the ADC  formatting buffer */
-
-  oss_audio_data.adc_fmtbuf = (short *) fts_malloc(MAXVS * 2 * sizeof(short));
+  fts_dev_set_device_data(dev, aud);
 
   return fts_Success;
 }
 
 
-static fts_status_t
-oss_adc_close(fts_dev_t *dev)
+static fts_status_t oss_adc_close(fts_dev_t *dev)
 {
-  oss_audio_data.adc_opened = 0;
+  audio_desc_t *aud = (audio_desc_t *)fts_dev_get_device_data( dev);
 
-  oss_audiodev_update_device();
-
-  /* free the audio formatting buffer */
-
-  fts_free(oss_audio_data.adc_fmtbuf);
+  aud->adc_open = 0;
+  audio_desc_update( aud, CMD_CLOSE_ADC);
 
   return fts_Success;
 }
 
-
-static int
-oss_adc_get_nchans(fts_dev_t *dev)
+static int oss_adc_get_nchans(fts_dev_t *dev)
 {
-  return 2;
+  audio_desc_t *aud = (audio_desc_t *)fts_dev_get_device_data( dev);
+
+  return aud->nchannels;
 }
 
-
-/* fts_dev_t *dev, int n, float *buf1 ... bufm 
-   the device is ignored (only one device for the moment allowed)
-
+/* 
+   Arguments: fts_dev_t *dev, int n, float *buf1 ... bufm 
 */
-
-static void
-oss_adc_get(fts_word_t *argv)
+static void oss_adc_get( fts_word_t *argv)
 {
-  long n = fts_word_get_long(argv + 1);
-  int i,j;
-  int ch;
+  int n, i, nchannels, channel, j;
+  audio_desc_t *aud;
 
-  /* if it is the first device of the tick, read the frame in the 
-     buffer */
+  aud = (audio_desc_t *)fts_dev_get_device_data( (fts_dev_t *)fts_word_get_ptr( argv) );
 
-  read(oss_audio_data.fd, oss_audio_data.adc_fmtbuf, n * 2);
+  if (aud->fd < 0)
+    return;
 
-  /* do the data transfer: unrolled pipelined loop */
+  n = fts_word_get_long(argv + 1);
 
-  for (ch = 0; ch < 2; ch++)
+  nchannels = aud->nchannels;
+
+  read( aud->fd, aud->adc_fmtbuf, nchannels * n * sizeof( short));
+
+  if ( nchannels == 2)
     {
-      float *out;
-      
-      out = (float *) fts_word_get_ptr(argv + 2 + ch);
+      float *out0, *out1;
 
-      for (i = ch, j = 0; j < n; i = i + 8, j += 4)
+      out0 = (float *) fts_word_get_ptr(argv + 2);
+      out1 = (float *) fts_word_get_ptr(argv + 3);
+
+      j = 0;
+      for ( i = 0; i < n; i++)
 	{
-	  short f1, f2, f3, f4;
+	  out0[i] = (float)aud->adc_fmtbuf[j++] / 32767.0f;
+	  out1[i] = (float)aud->adc_fmtbuf[j++] / 32767.0f;
+	}
+    }
+  else
+    {
+      for ( channel = 0; channel < nchannels; channel++)
+	{
+	  float *out;
 
-	  f1 = oss_audio_data.adc_fmtbuf[i + 0];
-	  f2 = oss_audio_data.adc_fmtbuf[i + 2];
-	  f3 = oss_audio_data.adc_fmtbuf[i + 4];
-	  f4 = oss_audio_data.adc_fmtbuf[i + 6];
+	  out = (float *) fts_word_get_ptr( argv + 2 + channel);
 
-	  out[j + 0] = 32767.0f * f1;
-	  out[j + 1] = 32767.0f * f2;
-	  out[j + 2] = 32767.0f * f3;
-	  out[j + 3] = 32767.0f * f4;
+	  j = 0;
+	  for ( i = 0; i < n; i++)
+	    {
+	      out[i] = (float)aud->adc_fmtbuf[j] / 32767.0f;
+	      j += nchannels;
+	    }
 	}
     }
 }
@@ -590,11 +763,7 @@ static void oss_midi_init( void)
 
 void ossdev_init(void)
 {
-  /* defaults and init for the shared data */
-
-  oss_audio_data.device_opened = 0;
-  oss_audio_data.dac_opened = 0;
-  oss_audio_data.adc_opened = 0;
+  audio_desc_table = fts_hash_table_new();
 
   oss_dac_init();
   oss_adc_init();
