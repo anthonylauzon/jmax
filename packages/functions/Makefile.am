@@ -1,5 +1,4 @@
-#SUBDIRS=c help winbuild
-SUBDIRS=c
+SUBDIRS=c help winbuild
 
 packagedir=$(pkglibdir)/packages/functions
 #package_DATA=functions.jpkg
