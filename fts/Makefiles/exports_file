@@ -267,7 +267,7 @@ ftl_program_start_profiler
 ftl_program_stop_profiler
 ftl_program_clear_profile_data
 ftl_program_show_profile_by_class
-_ftl_data_new
+ftl_data_alloc
 ftl_data_free
 ftl_mem_start_memory_relocation
 ftl_mem_end_memory_relocation
