@@ -371,7 +371,7 @@ cvec_fft_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int in_size = fvec_get_size(in);
   unsigned int fft_size = fts_get_fft_size(in_size);
   float *fft_ptr;
-  int i = 0;
+  unsigned int i = 0;
 
   cvec_set_size(this, fft_size >> 1);
   fft_ptr = (float *)cvec_get_ptr(this);
@@ -404,7 +404,7 @@ cvec_fft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(in != this)
   {
     complex *in_ptr = cvec_get_ptr(in);
-    int i;
+    unsigned int i;
 
     for(i=0; i<in_size; i++)
       fft_ptr[i] = in_ptr[i];
@@ -447,7 +447,7 @@ cvec_ifft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(in != this)
   {
     complex *in_ptr = cvec_get_ptr(in);
-    int i;
+    unsigned int i;
 
     for(i=0; i<in_size; i++)
       fft_ptr[i] = in_ptr[i];
