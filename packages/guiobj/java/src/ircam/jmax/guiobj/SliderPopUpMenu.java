@@ -32,6 +32,7 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 /** Implement the patcher editor File Menu */
 
@@ -44,11 +45,23 @@ public class SliderPopUpMenu extends JMenu
     super("Slider");
 
     JMenuItem item;
+
     item = new JMenuItem("Set Range");
-    item.addActionListener(new InspectObjectAction());
+    item.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e)
+	    {
+		ObjectPopUp.getPopUpTarget().inspect();
+	    }
+	});
     add(item);    
+
     item = new JMenuItem("Change Orientation");
-    item.addActionListener(new ChangeSliderOrientationAction());
+    item.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e)
+	    {
+		((Slider)ObjectPopUp.getPopUpTarget()).changeOrientation();
+	    }
+	});
     add(item);
   }
 
