@@ -6,6 +6,9 @@
 	
 2003-07-10  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* fts/package.c (__fts_package_save): closed bug "[ 754572 ] can't load project file".
+	save package if only the package is dirty.
+	
 	* packages/io/c/src/udpreceive.c, packages/io/c/src/udpsend.c, packages/io/c/src/jmax25_protocol.h:
 	closed bug "[ 766887 ] [udpsend],[udpreceive] incompatible".
 	changed protocol used by udpsend/udpreceive to protocol used in jMax 2.5.x
