@@ -97,15 +97,11 @@ extern "C" {
 #include <fts/param.h>
 #include <fts/package.h>
 #include <fts/preset.h>
-
 #include <fts/time.h>
-
 #include <fts/ftl.h>
 #include <fts/ftlmem.h>
 #include <fts/dsp.h>
-
 #include <fts/fpe.h>
-
 #include <fts/file.h>
 #include <fts/atomfile.h>
 #include <fts/midi.h>
@@ -115,17 +111,10 @@ extern "C" {
 #include <fts/sched.h>
 #include <fts/audio.h>
 #include <fts/audiofile.h>
-
 #include <fts/project.h>
-
 #include <fts/client.h>
 #include <fts/update.h>
-
 #include <fts/binaryprotocol.h>
-
-#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
-#include <unixfunc.h>
-#endif
 
 /*
  * FTS version 
