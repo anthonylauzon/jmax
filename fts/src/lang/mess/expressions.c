@@ -17,7 +17,8 @@
  * The FTS '$' get variable operator (on a symbol only, for the moment)
  * 
  * The FTS '.' get property or nested variable of an object operator.
- * The '.' operator is temporarly blocked, waiting for a more precise definition.
+ * 
+ * A syntax for constant arrays definition { foo, bar, zoo }
  *
  * Warning: in the current implementation, "? :", and logical "&&" and "||"
  * eval all the arguments before giving the result; this prevent the use

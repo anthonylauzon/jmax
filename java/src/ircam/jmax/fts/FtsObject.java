@@ -2,7 +2,7 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
-import java.text.*;
+
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
@@ -17,8 +17,6 @@ import ircam.jmax.mda.*;
 
 abstract public class FtsObject 
 {
-  static private NumberFormat numberFormat;
-
   /* code to set generic properties meta-properties */
 
   static
@@ -26,14 +24,6 @@ abstract public class FtsObject
     // Ins and outs
 
     FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
-
-    // Number format for messages coming from FTS (to be cleaned up:
-    // the text should be sent by FTS as text alread).
-    
-    numberFormat = NumberFormat.getInstance(Locale.US);
-    numberFormat.setMaximumFractionDigits(6);
-    numberFormat.setMinimumFractionDigits(1);
-    numberFormat.setGroupingUsed(false);
   }
 
   /******************************************************************************/
@@ -46,57 +36,6 @@ abstract public class FtsObject
    *  object in FTS; take directly the FtsMessage as argument.
    *  Used also in the message box.
    */
-
-  static String makeDescription(int offset, FtsMessage msg)
-  {
-    boolean noNewLine = false;
-    boolean addBlank = false;
-    StringBuffer descr = new StringBuffer();
-
-    for (int i = offset; i < msg.getNumberOfArguments(); i++)
-      {
-	Object value;
-
-	if (addBlank)
-	  descr.append(" ");
-	else
-	  addBlank = true;
-
-	value = msg.getArgument(i);
-
-	if (value instanceof Float)
-	  {
-	    descr.append(numberFormat.format(value));
-	  }
-	else
-	  {
-	    descr.append(value);
-
-	    if (value.equals("$"))
-	      addBlank = false;
-	    else if (value.equals("'"))
-	      {
-		noNewLine = true;
-		addBlank = false;
-	      }
-	    else if (value.equals(";"))
-	      {
-		if (noNewLine)
-		  noNewLine = false;
-		else
-		  {
-		    descr.append("\n");
-		    addBlank = false;
-		  }
-	      }
-	    else
-	      noNewLine = false;
-	  }
-      }
-
-    return descr.toString();
-  }
-
 
   static FtsObject makeFtsObjectFromMessage(FtsMessage msg) throws FtsException
   {
@@ -116,35 +55,35 @@ abstract public class FtsObject
     className = (String) msg.getArgument(2);
 
     if (className.equals("table"))
-      return new FtsTableObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsTableObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("qlist"))
-      return new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsQlistObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("jpatcher"))
-      return new FtsPatcherObject(parent, makeDescription(3, msg), objId);
+      return new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
     else if (className.equals("inlet"))
       return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
     else if (className.equals("outlet"))
       return new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
     else if (className.equals("messbox"))
-      return new FtsMessageObject(parent, makeDescription(3, msg), objId);
+      return new FtsMessageObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
     else if (className.equals("comment"))
-      return new FtsCommentObject(parent, makeDescription(3, msg), objId);
+      return new FtsCommentObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
     else if (className.equals("slider"))
-      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("intbox"))
-      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("floatbox"))
-      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("toggle"))
-      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("param"))
-      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
     else if (className.equals("__selection"))
       return new FtsSelection(parent, className, "__selection", objId);
     else if (className.equals("__clipboard"))
       return new FtsClipboard(parent, className, "__clipboard", objId);
     else
-      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
   }
 
 
@@ -161,7 +100,7 @@ abstract public class FtsObject
 
     /* if the object has been succesfully created, set the parent dirty */
 
-    return new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
+    return new FtsAbstractionObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
   }
 
   /******************************************************************************/

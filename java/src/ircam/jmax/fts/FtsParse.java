@@ -1,6 +1,7 @@
-
 package ircam.jmax.fts;
+
 import java.util.*;
+import java.text.*;
 
 /**
  * This class implement a lexical analizer for object and message box
@@ -39,8 +40,26 @@ public class FtsParse
   final static int lex_string_qchar = 2;
   final static int lex_string_end = 3;
 
+  /* To unparse floating point numbers */
 
+  static private NumberFormat numberFormat;
+
+  static
+  {
+    // Number format for messages coming from FTS (to be cleaned up:
+    // the text should be sent by FTS as text alread).
+    
+    numberFormat = NumberFormat.getInstance(Locale.US);
+    numberFormat.setMaximumFractionDigits(6);
+    numberFormat.setMinimumFractionDigits(1);
+    numberFormat.setGroupingUsed(false);
+  }
+
+  /* Operating variables */
+
+  boolean toPort;
   Object parsedToken;
+  FtsPort port;
   String str;
   StringBuffer token;
   int pos = 0; // counter for the string scan
@@ -50,6 +69,14 @@ public class FtsParse
   FtsParse(String str)
   {
     this.str = str;
+    toPort = false;
+  }
+
+  FtsParse(String str, FtsPort port)
+  {
+    this.str = str;
+    this.port = port;
+    toPort = true;
   }
 
   /** try/backtrack handling */
@@ -72,9 +99,19 @@ public class FtsParse
     return str.charAt(pos);
   }
 
+  final private boolean currentStringIs(String keyword)
+  {
+    return str.startsWith(keyword, pos);
+  }
+
   final private void nextChar()
   {
     pos++;
+  }
+
+  final private void nextChar(int i)
+  {
+    pos += i;
   }
 
   final private void ungetChar()
@@ -85,6 +122,11 @@ public class FtsParse
   final private void storeChar()
   {
     token.append(str.charAt(pos));
+  }
+
+  final private void storeString(String s)
+  {
+    token.append(s);
   }
 
   final private int charValue()
@@ -108,8 +150,21 @@ public class FtsParse
 
   final private boolean isStartToken()
   {
-    return ((str.charAt(pos) == '$') || (str.charAt(pos) == ',') ||
-	    (str.charAt(pos) == ';') || (str.charAt(pos) == '\''));
+    int c = str.charAt(pos);
+
+    return ((c == '$') || (c == ',') ||
+	    (c == '(') || (c == ')') ||
+	    (c == '[') || (c == ']') ||
+	    (c == '{') || (c == '}') ||
+	    (c == '+') || (c == '-') ||
+	    (c == '*') || (c == '/') ||
+	    (c == '%') || (c == '~') ||
+	    (c == '&') || (c == '|') ||
+	    (c == '^') || (c == '.') ||
+	    (c == '<') || (c == '>') ||
+	    (c == '!') || (c == '=') ||
+	    (c == '?') || (c == ':') ||
+	    (c == ';') || (c == '\''));
   }
 
   /** Identify the lexical char quote character */
@@ -166,19 +221,28 @@ public class FtsParse
      and put it in the parsedToken variable.
      */
 
-  final private void ParseLong()
+  final private void ParseLong() throws java.io.IOException
   {
-    parsedToken = new Integer(token.toString());
+    if (toPort)
+      port.sendInt(token);
+    else
+      parsedToken = new Integer(token.toString());
   }
 
-  final private void ParseFloat()
+  final private void ParseFloat() throws java.io.IOException
   {
-    parsedToken = new Float(token.toString());
+    if (toPort)
+      port.sendFloat(token);
+    else
+      parsedToken = new Float(token.toString());
   }
 
-  final private void ParseString()
+  final private void ParseString() throws java.io.IOException
   {
-    parsedToken = token.toString();
+    if (toPort)
+      port.sendString(token);
+    else
+      parsedToken = token.toString();
   }
 
   /* The keyword parser is not an automata
@@ -189,38 +253,41 @@ public class FtsParse
 
      */
 
-  private boolean tryKeywords()
+  private boolean tryKeywords() throws java.io.IOException
   {
+    String keywords[] = { "+", "-", "*", "/", "%", "(", ")",
+			  "[", "]", "{", "}", ",", "~", "^", "&&",
+			  "&", "||", "|", "==", "=", "!=", "!", ">=",
+			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
+			  ".", ";", "'" };
+
     tryParse();
-    
-    /* For now, work only with "$" */
 
     if (isEndOfString())
       {
 	backtrack();
 	return false;
       }
-    else if (currentChar() == '$')
+    
+    for (int i = 0 ; i < keywords.length; i++)
       {
-	nextChar();
-	parsedToken = "$";
-	return true;
+	if (currentStringIs(keywords[i]))
+	  {
+	    nextChar(keywords[i].length());
+	    storeString(keywords[i]);
+	    ParseString();
+	    return true;
+	  }
       }
-    else if (currentChar() == '\'')
-      {
-	nextChar();
-	parsedToken = "'";
-	return true;
-      }
-    else
-      {
-	backtrack();
-	return false;
-      }
+
+    // It is not a keyword.
+
+    backtrack();
+    return false;
   }
 
 
-  private boolean tryLong()
+  private boolean tryLong() throws java.io.IOException
   {
     int status;
 
@@ -273,7 +340,7 @@ public class FtsParse
   }
 
 
-  private boolean tryFloat()
+  private boolean tryFloat() throws java.io.IOException
   {
     int status;
 
@@ -352,7 +419,7 @@ public class FtsParse
    * quote-end pairs (usually, double quotes)
    */
 
-  private boolean tryQString()
+  private boolean tryQString() throws java.io.IOException
   {
     int  status;
 
@@ -401,7 +468,7 @@ public class FtsParse
   }
 
 
-  private boolean tryString()
+  private boolean tryString() throws java.io.IOException
   {
     int  status;
 
@@ -449,12 +516,14 @@ public class FtsParse
     return true;
   }
 
+  /** Parse an object argument description (without the class Name),
+   * and send it to an FtsPort (optimization to reduce object allocation
+   * during editing).
+   */
 
-  /** Parse an list of atoms in a Vector */
-
-  public static void parseAtoms(String str, Vector values)
+  public static void parseAndSendObject(String str, FtsPort port) throws java.io.IOException
   {
-    FtsParse parser = new FtsParse(str);
+    FtsParse parser = new FtsParse(str, port);
 
     while (! parser.isEndOfString())
       {
@@ -487,13 +556,259 @@ public class FtsParse
 	    if (! parser.tryFloat())
 	      if (! parser.tryQString())
 		parser.tryString();
-
-	values.addElement(parser.parsedToken);
       }
+  }
+
+  /** Parse an list of atoms in a Vector */
+
+  public static void parseAtoms(String str, Vector values)
+  {
+    FtsParse parser = new FtsParse(str);
+
+    /* Dummy try/catch pair: IOException never thrown in this
+       case, and in this way we avoid to have the throws declaration
+       in the method */
+
+    try
+      {
+	while (! parser.isEndOfString())
+	  {
+	    /* First, a multiple separator skip loop,
+	       just to allow ignoring separators in the
+	       single automata.
+
+	       Should be cleaner and nicer :-< ...
+	       */
+
+	    while ((! parser.isEndOfString()) && parser.isSeparator())
+	      parser.nextChar();
+
+	    if (parser.isEndOfString())
+	      break;
+
+	    /* The order is important, beacause the 
+	       last parser get accept everything as a symbol,
+	       for easiness of implementation; also, the float parser
+	       accept also ints, so the int parser must be called
+	       before the float parser.
+	   
+	       Every parser return 1 and advance the pointer to the
+	       char after the end of the reconized token only
+	       if the parsing has been succesfull.
+	       */
+
+	    if (! parser.tryKeywords())
+	      if (! parser.tryLong())
+		if (! parser.tryFloat())
+		  if (! parser.tryQString())
+		    parser.tryString();
+
+	    values.addElement(parser.parsedToken);
+	  }
+      }
+    catch (java.io.IOException e)
+      {
+	// Ignore
+      }
+  }
+
+  /* Unparse an object description from a FTS message, starting
+     from the given offset;
+     */
+
+  static private final boolean wantASpaceBefore(Object value)
+  {
+    if (value instanceof String)
+      {
+	String keywords[] = {"+", "-", "*", "/", "%", 
+			     "&&", "&", "||", "|", "==", "=", "!=", "!", ">=",
+			     ">>", ">", "<<", "<=", "<", "?", ":" };
+
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals((String) value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+      
+
+  static private final boolean dontWantASpaceBefore(Object value)
+  {
+    if (value instanceof String)
+      {
+	String keywords[] = {")", "[", "]", "}", ",", ".", ";"};
+
+
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals((String) value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+      
+  static private final boolean wantASpaceAfter(Object value)
+  {
+    if (value instanceof String)
+      {
+	String keywords[] = { "+", "-", "*", "/", "%", 
+			      ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=",
+			      ">>", ">", "<<", "<=", "<", "?", ":", 
+			      ";" };
+
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals((String) value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+
+  static private final boolean dontWantASpaceAfter(Object value)
+  {
+    if (value instanceof String)
+      {
+	String keywords[] = { "(", "[", "{", "~", "^", 
+			      "$", ".", "'" };
+
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals((String) value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+      
+
+  static private final boolean isAKeyword(String value)
+  {
+    String keywords[] = { "+", "-", "*", "/", "%", "(", ")",
+			  "[", "]", "{", "}", ",", "~", "^", "&&",
+			  "&", "||", "|", "==", "=", "!=", "!", ">=",
+			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
+			  ".", ";", "'" };
+
+    for (int i = 0 ; i < keywords.length; i++)
+      if (keywords[i].equals((String) value))
+	return true;
+
+    return false;
+  }
+      
+
+
+  static final private boolean includeStartToken(String s)
+  {
+    char chars[] = { '$', ',', '(', ')', '[', ']',
+		     '{', '}', '+', '-', '*', '/',
+		     '%', '~', '&', '|', '^', '.',
+		     '<', '>', '!', '=', '?', ':',
+		     ';', '\'' };
+
+    for (int i = 0 ; i < chars.length; i++)
+      if (s.indexOf(chars[i]) != -1)
+	return true;
+    
+    return false;
+  }
+
+
+  static String unparseObjectDescription(int offset, FtsMessage msg)
+  {
+    boolean doNewLine = true;
+    boolean addBlank = false;
+    boolean noNewLine = false;
+    Object value1 = null;
+    Object value2 = null;
+
+    StringBuffer descr = new StringBuffer();
+
+    if (msg.getNumberOfArguments() == offset)
+      return "";
+
+    value2 = msg.getArgument(offset);
+
+    for (int i = offset + 1; i < (msg.getNumberOfArguments() + 1); i++)
+      {
+	if (doNewLine)
+	  descr.append("\n");
+	else if (addBlank)
+	  descr.append(" ");
+
+	doNewLine = false;
+
+	value1 = value2;
+
+	if (i < msg.getNumberOfArguments())
+	  value2 = msg.getArgument(i);
+	else
+	  value2 = null;
+
+	if (value1 instanceof Float)
+	  descr.append(numberFormat.format(value1));
+	else if (value1 instanceof Integer)
+	  descr.append(value1);
+	else if (value1 instanceof String)
+	  {
+	    /* Lexical quoting check */
+
+	    if ((! isAKeyword((String) value1)) &&
+		includeStartToken((String) value1))
+	      {
+		descr.append("\"");
+		descr.append(value1);
+		descr.append("\"");
+	      }
+	    else
+	      descr.append(value1);
+
+	    if (value1.equals("'"))
+	      noNewLine = true;
+	    else if (value1.equals(";"))
+	      {
+		if (noNewLine)
+		  noNewLine = false;
+		else
+		  doNewLine = true;
+	      }
+	    else
+	      noNewLine = false;
+	  }
+	else
+	  descr.append(value1);
+
+	/* decide to put or not a blank between the two */
+
+	if (wantASpaceAfter(value1))
+	  addBlank = true;
+	else if (dontWantASpaceAfter(value1))
+	  addBlank = false;
+	else if (value2 != null)
+	  {
+	    if (wantASpaceBefore(value2))
+	      addBlank = true;
+	    else if (dontWantASpaceBefore(value2))
+	      addBlank = false;
+	    else
+	      addBlank = true;	// if no body care, do a blank
+	  }
+      }
+
+    return descr.toString();
   }
 }
 
 
 
 	
+
 

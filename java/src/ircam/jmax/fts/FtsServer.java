@@ -356,7 +356,7 @@ public class FtsServer
 	port.sendObject(patcher);
 	port.sendInt(id);
 	port.sendString(className);
-	FtsParseToPort.parseAndSendObject(description, port);
+	FtsParse.parseAndSendObject(description, port);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -380,7 +380,7 @@ public class FtsServer
 	port.sendObject(patcher);
 	port.sendInt(id);// cannot send the object, do not exists (yet) on the FTS Side !!
 
-	FtsParseToPort.parseAndSendObject(description, port);
+	FtsParse.parseAndSendObject(description, port);
 
 	port.sendEom();
       }
@@ -421,7 +421,7 @@ public class FtsServer
       {
 	port.sendCmd(FtsClientProtocol.fts_redefine_patcher_cmd);
 	port.sendObject(obj);
-	FtsParseToPort.parseAndSendObject(description, port);
+	FtsParse.parseAndSendObject(description, port);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -441,7 +441,7 @@ public class FtsServer
       {
 	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
 	port.sendObject(obj);
-	FtsParseToPort.parseAndSendObject(description, port);
+	FtsParse.parseAndSendObject(description, port);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -648,7 +648,7 @@ public class FtsServer
 	port.sendInt(-1);
 	port.sendString("set");
 
-	FtsParseToPort.parseAndSendObject(description, port);
+	FtsParse.parseAndSendObject(description, port);
 
 	port.sendEom();
       }
