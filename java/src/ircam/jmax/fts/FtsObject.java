@@ -47,7 +47,7 @@ public class FtsObject
 {
   static final public int systemInlet = -1;
   
-  private static Hashtable creators = new Hashtable();
+    //private static Hashtable creators = new Hashtable();
   
   static private Class parameterTypes[] = new Class[2];
   static Object[] methodArgs = new Object[2];
@@ -68,10 +68,10 @@ public class FtsObject
     methodArgs3[0] = new Integer(3);    
   }
 
-  static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
-  {
-    creators.put(nameclass, creator);
-  }
+    /*static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
+      {
+      creators.put(nameclass, creator);
+      }*/
 
   /******************************************************************************/
   /*                                                                            */
@@ -114,10 +114,12 @@ public class FtsObject
     
     if (className != null)
       {
-	Object ctr = creators.get(className);
+	//Object ctr = creators.get(className);
+	FtsObjectCreator ctr = ObjectCreatorManager.getFtsObjectCreator(className);
 	
 	if(ctr != null)
-	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, variableName, className, nArgs, args);
+	    obj = ctr.createInstance(fts, parent, variableName, className, nArgs, args);
+	    //obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, variableName, className, nArgs, args);
 	else if (className == "jpatcher")
 	  obj =  new FtsPatcherObject(fts, parent, variableName, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "inlet")
@@ -128,8 +130,8 @@ public class FtsObject
 	  obj =  new FtsForkObject(fts, parent, args[0].intValue);
 	else if (className == "jcomment")
 	  obj =  new FtsCommentObject(fts, parent);
-	else if (className == "messbox")
-	  obj =  new FtsMessageObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
+	/*else if (className == "messbox")
+	  obj =  new FtsMessageObject(fts, parent, FtsParse.unparseArguments(nArgs, args));*/
 	else if (className == "messconst")
 	  obj =  new FtsMessConstObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "display")
@@ -347,11 +349,11 @@ public class FtsObject
 
   /** The number of inlets of this object. */
 
-  int ninlets;		    
+  public int ninlets;		    
 
   /** The number of outlets of this object */
 
-  int noutlets;
+  public int noutlets;
 
   /**
    * The object string description. Always set at object creation.

@@ -646,12 +646,16 @@ public class DisplayList
       {
       case DRAG_RECTANGLE:
 	g.setColor( Color.black);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	g.drawRect( dragRectangle.x, dragRectangle.y, dragRectangle.width, dragRectangle.height);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	break;
 
       case DRAG_LINE:
 	g.setColor( Color.black);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	g.drawLine( lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	break;
 
       case NO_DRAG:

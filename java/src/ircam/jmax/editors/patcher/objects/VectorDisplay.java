@@ -166,6 +166,8 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
     Color zeroColor = new Color((float)0.9, (float)0.88, (float)0.8);
     int i;
 
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+
     if (isSelected())
       g.setColor(backgroundColor.darker());
     else
@@ -193,6 +195,8 @@ class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     if(n > 1)
       paintVector(g, orgX, orgY, values, n);
+
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   }
 
   public void updatePaint(Graphics g) 

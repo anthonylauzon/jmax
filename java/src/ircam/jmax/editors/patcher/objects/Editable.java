@@ -49,7 +49,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   boolean editing = false;
   ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
-  Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 

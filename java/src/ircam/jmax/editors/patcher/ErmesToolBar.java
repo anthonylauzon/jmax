@@ -40,6 +40,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 
@@ -201,6 +202,15 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     bGroup.add( button);
   }
 
+    /*private void addButton(GraphicObjectCreator crt)
+      {
+      JToggleButton button = new ErmesToolButton(this, crt.getClassName(),  crt.getIcon(), crt.getCursorName(), crt.getMessage());
+      toolBar.add( button);
+      if(!AddPopUp.initDone)
+      AddPopUp.addAbbreviation(crt, true);
+      
+      bGroup.add( button);
+      }*/
   private void insertButtons()
   {
     String path = MaxApplication.getProperty("jmaxRoot")+File.separator+"images"+File.separator;
@@ -220,6 +230,10 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     addButton( "floatbox", "_floatbox_", path+"cursor_float.gif", "Adding New Float Box");
     addButton( "display", "_display_", path+"cursor_display.gif", "Adding New Display Object");
     addButton( "vecdisplay", "_vecdisplay_", path+"cursor_vecdisplay.gif", "Adding New Vector Display Object");
+
+    /*for(Enumeration en = ObjectCreatorManager.getGraphicCreators(); en.hasMoreElements();)
+      addButton(((GraphicObjectCreator)en.nextElement()));*/
+
     AddPopUp.initDone();//????
   }
 

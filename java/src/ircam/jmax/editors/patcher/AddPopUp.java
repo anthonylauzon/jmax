@@ -32,6 +32,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 //
 // The graphic pop-up menu used to change the number of an inlet or an outlet in a subpatcher.
@@ -124,6 +125,14 @@ public class AddPopUp extends JPopupMenu
     popup.pack();
   }
 
+  static public void addAbbreviation(GraphicObjectCreator crt, boolean edit)
+  {
+    JMenuItem item = new JMenuItem(crt.getIcon());
+
+    item.addActionListener(new AddPopUpListener(crt.getClassName(), crt.getMessage(), edit));
+    popup.add(item);
+    popup.pack();
+  }
 
   static JMenu addAbbreviationMenu(String name)
   {

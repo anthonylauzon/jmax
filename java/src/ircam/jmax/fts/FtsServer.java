@@ -584,7 +584,7 @@ public class FtsServer implements Runnable
   /** Send an "set" messages to the system inletof an FTS object with as arguments elements
     from a Vector; the vector should only contains String, Floats and Integers, of course.
     */
-  final void sendSetMessage(FtsObject dst, MaxVector values)
+  public final void sendSetMessage(FtsObject dst, MaxVector values)
   {
     if (! connected)
       return;
@@ -612,7 +612,7 @@ public class FtsServer implements Runnable
   /** Send an "set" messages to the system inletof an FTS object with as arguments elements
     from a string description.
     */
-  final void sendSetMessage(FtsObject obj, String description)
+  public final void sendSetMessage(FtsObject obj, String description)
   {
     if (! connected)
       return;

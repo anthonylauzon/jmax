@@ -198,6 +198,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     int w = getWidth();
     int h = getHeight();
     
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+
     /* Paint the box */
 
     if( !isSelected()) 
@@ -225,6 +227,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
     }
     super.paint(g);
+
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   }
 
   public void updatePaint(Graphics g) 
@@ -233,6 +237,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     int y = getY();
     int w = getWidth();
     int h = getHeight();
+
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
     /* Paint the box */
     g.setColor( Settings.sharedInstance().getUIColor());
@@ -253,6 +259,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
       g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
     }
+
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   }
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)

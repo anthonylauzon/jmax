@@ -158,6 +158,12 @@ abstract public class GraphicObject implements DisplayObject
   public static final int ON_OUTLET = 1;
   public static final int ON_OBJECT = 2;
 
+    /*private static Hashtable creators = new Hashtable();
+      static public void registerGraphicObjectCreator(String nameclass, GraphicObjectCreator creator)
+      {
+      creators.put(nameclass, creator);
+      }*/
+
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
 
@@ -166,8 +172,12 @@ abstract public class GraphicObject implements DisplayObject
     GraphicObject gobj;
     String theName = object.getClassName();
 
-    if (theName.equals( "messbox"))
-      gobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);
+    GraphicObjectCreator ctr = ObjectCreatorManager.getGraphicObjectCreator(theName);
+	
+    if(ctr != null)
+	gobj = ctr.createInstance(sketch, object);
+    /*else if (theName.equals( "messbox"))
+      gobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);*/
     else if (theName.equals( "messconst"))
       gobj = new ircam.jmax.editors.patcher.objects.MessConst( sketch, object);
     else if (theName.equals( "display"))
@@ -312,7 +322,6 @@ abstract public class GraphicObject implements DisplayObject
   {
     return false;
   }
-
 
   public void scale(float scaleX, float scaleY)
   {
@@ -1059,7 +1068,6 @@ abstract public class GraphicObject implements DisplayObject
 		      ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 1)));
   }
 
-
   public final boolean coreIntersects(Rectangle r)
   {
       return !((r.x + r.width <= getX()) ||
@@ -1072,7 +1080,7 @@ abstract public class GraphicObject implements DisplayObject
   {
       int x = getX();
       int y = getY();
-    return ((px>=x)&&(px<=x+getWidth())&&(py>=y)&&(py<=y+getHeight()));
+      return ((px>=x)&&(px<=x+getWidth())&&(py>=y)&&(py<=y+getHeight()));
   }
 
   public void rectangleUnion(Rectangle r)
