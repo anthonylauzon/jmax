@@ -225,7 +225,7 @@ midishareport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
       this->name = name;
     }
-
+  
   if(this->refnum >= 0)
     fts_sched_add(fts_sched_get_current(), midishareport_dispatch, o);
 }

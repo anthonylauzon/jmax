@@ -1003,7 +1003,7 @@ public class FtsObject
       dialogText = args[1].getString();
       String defaultPath = args[2].getString();
       String defaultName = args[3].getString();
-      
+
       fd = new JFileChooser(defaultPath);
       fd.setDialogTitle(dialogText);
       fd.setSelectedFile(new File(defaultPath, defaultName));

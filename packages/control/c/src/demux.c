@@ -74,7 +74,7 @@ demux_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   demux_t *this = (demux_t *)o;
 
-  fts_outlet_send(o, this->out, s, 1, at);
+  fts_outlet_send(o, this->out, s, ac, at);
 }
 
 static void

@@ -105,6 +105,7 @@ struct _fts_midiport_
 };
 
 extern void fts_midiport_init(fts_midiport_t *port, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out);
+extern void fts_midiport_delete(fts_midiport_t *port);
 extern void fts_midiport_class_init(fts_class_t *cl);
 
 extern void fts_midiport_add_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener, fts_midiport_callback_t fun);
@@ -118,10 +119,12 @@ extern int fts_midiport_has_superclass(fts_object_t *obj);
  *
  */
 
+/* midiport functions called on input (call all listeners) */
 extern void fts_midiport_channel_message(fts_midiport_t *port, fts_midi_status_t status, int channel, int x, int y, double time);
 extern void fts_midiport_system_exclusive(fts_midiport_t *port, double time);
 extern void fts_midiport_system_exclusive_add_byte(fts_midiport_t *port, int value);
 
+/* functions called by midi output objects */
 #define fts_midiport_output_channel_message(p, s, c, x, y, t) ((p)->channel_message_output((p), (s), (c), (x), (y), (t)))
 #define fts_midiport_output_system_exclusive(p, n, a, t) ((p)->system_exclusive_output((p), (n), (a), (t)))
 

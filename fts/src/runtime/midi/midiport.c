@@ -73,7 +73,7 @@ fts_midiport_init(fts_midiport_t *port, fts_midiport_channel_message_output_t ch
 }
 
 void
-fts_midiport_delete(fts_midiport_t *port, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out)
+fts_midiport_delete(fts_midiport_t *port)
 {
   if(port->sysex_alloc)
     fts_block_alloc(port->sysex_alloc * sizeof(fts_atom_t));
@@ -146,8 +146,8 @@ fts_midiport_remove_listener(struct _fts_midiport_ *port, fts_midi_status_t stat
 
   if(l && l->listener == listener)
     {
-      *root = l->next;
       freeme = l;
+      *root = l->next;
     }
   else
     {
@@ -155,8 +155,8 @@ fts_midiport_remove_listener(struct _fts_midiport_ *port, fts_midi_status_t stat
 	{
 	  if(l->next->listener == listener)
 	    {
-	      l->next = l->next->next;
 	      freeme = l->next;
+	      l->next = l->next->next;
 
 	      break;
 	    }
@@ -166,7 +166,8 @@ fts_midiport_remove_listener(struct _fts_midiport_ *port, fts_midi_status_t stat
     }
 
   /* free removed listener */
-  fts_free(freeme);
+  if(freeme)
+    fts_free(freeme);
 }
 
 void

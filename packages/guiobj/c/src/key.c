@@ -28,38 +28,23 @@
 #include "keyserver.h"
 
 static fts_symbol_t sym_f1 = 0;
-static fts_symbol_t sym_F1 = 0;
 static fts_symbol_t sym_f2 = 0;
-static fts_symbol_t sym_F2 = 0;
 static fts_symbol_t sym_f3 = 0;
-static fts_symbol_t sym_F3 = 0;
 static fts_symbol_t sym_f4 = 0;
-static fts_symbol_t sym_F4 = 0;
 static fts_symbol_t sym_f5 = 0;
-static fts_symbol_t sym_F5 = 0;
 static fts_symbol_t sym_f6 = 0;
-static fts_symbol_t sym_F6 = 0;
 static fts_symbol_t sym_f7 = 0;
-static fts_symbol_t sym_F7 = 0;
 static fts_symbol_t sym_f8 = 0;
-static fts_symbol_t sym_F8 = 0;
 static fts_symbol_t sym_f9 = 0;
-static fts_symbol_t sym_F9 = 0;
 static fts_symbol_t sym_f10 = 0;
-static fts_symbol_t sym_F10 = 0;
 static fts_symbol_t sym_f11 = 0;
-static fts_symbol_t sym_F11 = 0;
 static fts_symbol_t sym_f12 = 0;
-static fts_symbol_t sym_F12 = 0;
 
 static fts_symbol_t sym_enter = 0;
-static fts_symbol_t sym_return = 0;
 static fts_symbol_t sym_esc = 0;
-static fts_symbol_t sym_escape = 0;
 
 static fts_symbol_t sym_shift = 0;
 static fts_symbol_t sym_alt = 0;
-static fts_symbol_t sym_ctrl = 0;
 
 static fts_symbol_t sym_space = 0;
 
@@ -77,40 +62,38 @@ get_code(const fts_atom_t *a)
     {
       fts_symbol_t sym = fts_get_symbol(a);
 
-      if(sym == sym_f1 || sym == sym_F1)
+      if(sym == sym_f1)
 	return code_f1;
-      else if(sym == sym_f2 || sym == sym_F2)
+      else if(sym == sym_f2)
 	return code_f2;
-      else if(sym == sym_f3 || sym == sym_F3)
+      else if(sym == sym_f3)
 	return code_f3;
-      else if(sym == sym_f4 || sym == sym_F4)
+      else if(sym == sym_f4)
 	return code_f4;
-      else if(sym == sym_f5 || sym == sym_F5)
+      else if(sym == sym_f5)
 	return code_f5;
-      else if(sym == sym_f6 || sym == sym_F6)
+      else if(sym == sym_f6)
 	return code_f6;
-      else if(sym == sym_f7 || sym == sym_F7)
+      else if(sym == sym_f7)
 	return code_f7;
-      else if(sym == sym_f8 || sym == sym_F8)
+      else if(sym == sym_f8)
 	return code_f8;
-      else if(sym == sym_f9 || sym == sym_F9)
+      else if(sym == sym_f9)
 	return code_f9;
-      else if(sym == sym_f10 || sym == sym_F10)
+      else if(sym == sym_f10)
 	return code_f10;
-      else if(sym == sym_f11 || sym == sym_F11)
+      else if(sym == sym_f11)
 	return code_f11;
-      else if(sym == sym_f12 || sym == sym_F12)
+      else if(sym == sym_f12)
 	return code_f12;
       else if(sym == sym_enter)
 	return code_enter;
-      else if(sym == sym_esc || sym == sym_escape)
+      else if(sym == sym_esc)
 	return code_esc;
       else if(sym == sym_shift)
 	return code_shift;
       else if(sym == sym_alt)
 	return code_alt;
-      else if(sym == sym_ctrl)
-	return code_ctrl;
       else if(sym == sym_space)
 	return 32;
       else
@@ -121,7 +104,7 @@ get_code(const fts_atom_t *a)
 	    {
 	      int code = (int)str[0];
 	      
-	      if(code > 0 && code < 128)
+	      if(code >= 32 && code < 127)
 		return code;
 	    }
 	}
@@ -313,38 +296,23 @@ void
 key_config(void)
 {
   sym_f1 = fts_new_symbol("f1");
-  sym_F1 = fts_new_symbol("F1");
   sym_f2 = fts_new_symbol("f2");
-  sym_F2 = fts_new_symbol("F2");
   sym_f3 = fts_new_symbol("f3");
-  sym_F3 = fts_new_symbol("F3");
   sym_f4 = fts_new_symbol("f4");
-  sym_F4 = fts_new_symbol("F4");
   sym_f5 = fts_new_symbol("f5");
-  sym_F5 = fts_new_symbol("F5");
   sym_f6 = fts_new_symbol("f6");
-  sym_F6 = fts_new_symbol("F6");
   sym_f7 = fts_new_symbol("f7");
-  sym_F7 = fts_new_symbol("F7");
   sym_f8 = fts_new_symbol("f8");
-  sym_F8 = fts_new_symbol("F8");
   sym_f9 = fts_new_symbol("f9");
-  sym_F9 = fts_new_symbol("F9");
   sym_f10 = fts_new_symbol("f10");
-  sym_F10 = fts_new_symbol("F10");
   sym_f11 = fts_new_symbol("f11");
-  sym_F11 = fts_new_symbol("F11");
   sym_f12 = fts_new_symbol("f12");
-  sym_F12 = fts_new_symbol("F12");
 
   sym_enter = fts_new_symbol("enter");
-  sym_return = fts_new_symbol("return");
   sym_esc = fts_new_symbol("esc");
-  sym_escape = fts_new_symbol("escape");
 
   sym_shift = fts_new_symbol("shift");
   sym_alt = fts_new_symbol("alt");
-  sym_ctrl = fts_new_symbol("ctrl");
 
   sym_space = fts_new_symbol("space");
 
