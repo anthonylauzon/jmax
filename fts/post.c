@@ -226,6 +226,12 @@ void fts_init_log(void)
   fclose(log);
 }
 
+/*
+ * It may seem strange that in the following functions,
+ * we reopen the file at each call, but it is *not*.
+ * This way, you are guaranteed that the file's content
+ * is updated after each log, even in case of FTS crash !!!
+ */
 void fts_log(char* fmt, ...)
 {
   FILE* log;
@@ -243,6 +249,25 @@ void fts_log(char* fmt, ...)
   va_start (args, fmt); 
   vfprintf(log, fmt, args); 
   va_end (args); 
+
+  fflush(log);
+  fclose(log);
+}
+
+void fts_log_atoms( int ac, const fts_atom_t *at)
+{
+  FILE* log;
+
+  if (log_file == NULL) {
+    fts_init_log();
+  }
+
+  log = fopen(log_file, "a");
+  if (log == NULL) {
+    return;
+  }
+
+  fprintf_atoms( log, ac, at);
 
   fflush(log);
   fclose(log);

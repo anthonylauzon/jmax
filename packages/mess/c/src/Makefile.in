@@ -76,12 +76,10 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-packagedir = $(pkgdatadir)/packages/data/c
-package_LTLIBRARIES = libdata.la
-libdata_la_SOURCES =  bpf.c col.c copy.c data.c fill.c fmat.c fvec.c getinter.c getlist.c getrange.c getsize.c getval.c ivec.c mat.c message.c messtab.c preset.c row.c value.c vec.c 
+packagedir = $(pkgdatadir)/packages/mess/c
+package_LTLIBRARIES = libmess.la
+libmess_la_SOURCES =  mess.c message.c messtab.c 
 
-
-INCLUDES = -I@top_srcdir@/packages/utils/c/src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -92,11 +90,9 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libdata_la_LDFLAGS = 
-libdata_la_LIBADD = 
-libdata_la_OBJECTS =  bpf.lo col.lo copy.lo data.lo fill.lo fmat.lo \
-fvec.lo getinter.lo getlist.lo getrange.lo getsize.lo getval.lo ivec.lo \
-mat.lo message.lo messtab.lo preset.lo row.lo value.lo vec.lo
+libmess_la_LDFLAGS = 
+libmess_la_LIBADD = 
+libmess_la_OBJECTS =  mess.lo message.lo messtab.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -109,19 +105,15 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/bpf.P .deps/col.P .deps/copy.P .deps/data.P \
-.deps/fill.P .deps/fmat.P .deps/fvec.P .deps/getinter.P .deps/getlist.P \
-.deps/getrange.P .deps/getsize.P .deps/getval.P .deps/ivec.P \
-.deps/mat.P .deps/message.P .deps/messtab.P .deps/preset.P .deps/row.P \
-.deps/value.P .deps/vec.P
-SOURCES = $(libdata_la_SOURCES)
-OBJECTS = $(libdata_la_OBJECTS)
+DEP_FILES =  .deps/mess.P .deps/message.P .deps/messtab.P
+SOURCES = $(libmess_la_SOURCES)
+OBJECTS = $(libmess_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign packages/data/c/src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign packages/mess/c/src/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -185,8 +177,8 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-libdata.la: $(libdata_la_OBJECTS) $(libdata_la_DEPENDENCIES)
-	$(LINK) -rpath $(packagedir) $(libdata_la_LDFLAGS) $(libdata_la_OBJECTS) $(libdata_la_LIBADD) $(LIBS)
+libmess.la: $(libmess_la_OBJECTS) $(libmess_la_DEPENDENCIES)
+	$(LINK) -rpath $(packagedir) $(libmess_la_LDFLAGS) $(libmess_la_OBJECTS) $(libmess_la_LIBADD) $(LIBS)
 
 tags: TAGS
 
@@ -219,14 +211,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = packages/data/c/src
+subdir = packages/mess/c/src
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign packages/data/c/src/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign packages/mess/c/src/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

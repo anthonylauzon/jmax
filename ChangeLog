@@ -1,3 +1,10 @@
+2001-10-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed fts/client.c. The FTS object that is created by the client
+	is now "client_controler", needs a symbol as argument (and thus no longer
+	the "$" on the client side) and can be connected either to a bus or to 
+	a label.
+
 2001-10-22  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* bug fixed in class mat method function set_size
