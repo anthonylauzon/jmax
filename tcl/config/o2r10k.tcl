@@ -1,22 +1,23 @@
 set jmaxArch irix65r10k
 
-defineDevice analogIn   { SgiALIn ALdevice AnalogIn channels 2 }  "Builtin Analog In"
-defineDevice analogOut  { SgiALOut ALdevice AnalogOut channels 2 } "Builtin Analog Out"
-defineDevice analogOut2  { SgiALOut ALdevice AnalogOut2 channels 2 } "Builtin Analog Out 2"
+defineDevice analogIn   { SgiALIn ALdevice AnalogIn channels 2 }  "Analog In"
+defineDevice analogOut  { SgiALOut ALdevice AnalogOut channels 2 } "Analog Out"
+defineDevice analogOut1 { SgiALOut ALdevice AnalogOut channels 2 } "Analog Out"
+defineDevice analogOut2  { SgiALOut ALdevice AnalogOut2 channels 2 } "Analog Out 2"
 
-defineDevice stereoIn  { SgiALIn ALdevice RAD1.AESIn channels 2 } "Stereo AES card 1"
-defineDevice stereoIn0 { SgiALIn ALdevice RAD1.AESIn channels 2 } "Stereo AES card 1"
+defineDevice stereoIn  { SgiALIn ALdevice RAD1.AESIn channels 2 } "AES In"
+defineDevice stereoIn1 { SgiALIn ALdevice RAD1.AESIn channels 2 } "AES In"
 
-defineDevice stereoOut  { SgiALOut ALdevice RAD1.AESOut channels 2 } "Stereo AES card 1"
-defineDevice stereoOut0 { SgiALOut ALdevice RAD1.AESOut channels 2 } "Stereo AES card 1"
+defineDevice stereoOut  { SgiALOut ALdevice RAD1.AESOut channels 2 } "AES Out"
+defineDevice stereoOut1 { SgiALOut ALdevice RAD1.AESOut channels 2 } "AES Out"
 
-defineDevice adatIn   { SgiALIn ALdevice RAD1.ADATIn channels 8 } "8 channel ADAT card 1"
-defineDevice adatIn1  { SgiALIn ALdevice RAD1.ADATIn channels 8 } "8 channel ADAT card 1"
+defineDevice adatIn  { SgiALIn ALdevice ADATIn channels 8 }      "ADAT In"
+defineDevice adatIn1 { SgiALIn ALdevice RAD1.ADATIn channels 8 } "ADAT In"
 
-defineDevice adatOut   { SgiALOut ALdevice RAD1.ADATOut channels 8 } "8 channel ADAT card 1"
-defineDevice adatOut1  { SgiALOut ALdevice RAD1.ADATOut channels 8 } "8 channel ADAT card 1"
+defineDevice adatOut  { SgiALOut ALdevice ADATOut channels 8 }      "ADAT Out"
+defineDevice adatOut1 { SgiALOut ALdevice RAD1.ADATOut channels 8 } "ADAT Out"
 
-defineDevice midi      { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
-defineDevice midi0     { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
-defineDevice midi1     { sgi_midi port SerialPort2 } "MIDI on startmidi port SerialPort2"
+defineDevice midi  { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
+defineDevice midi1 { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
+defineDevice midi2 { sgi_midi port SerialPort2 } "MIDI on startmidi port SerialPort2"
 
