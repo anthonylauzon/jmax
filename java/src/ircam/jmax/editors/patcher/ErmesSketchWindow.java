@@ -36,6 +36,8 @@ import ircam.jmax.editors.patcher.menus.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+
+import ircam.jmax.script.ScriptMenu;
 //
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
@@ -49,6 +51,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   private FileMenu itsFileMenu;
   private EditMenu itsEditMenu;	
+  private ScriptMenu itsScriptMenu;	
   private JMenu itsWindowsMenu;
   private JMenu itsToolsMenu;
   private TextMenu itsTextMenu;
@@ -173,6 +176,10 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     // Build the text menu
     itsTextMenu = new TextMenu(itsSketchPad);
     mb.add( itsTextMenu);
+
+    // Build the script menu
+    itsScriptMenu = new ScriptMenu();
+    mb.add( itsScriptMenu);
 
     // New Tool menu 
     itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
