@@ -41,8 +41,10 @@ static fts_symbol_t sym_comma = 0;
  */
 
 static void
-mat_realloc(mat_t *mat, int size)
+set_size(mat_t *mat, int m, int n)
 {
+  int size = m * n;
+  
   if(size > mat->alloc)
     {
       int i;
@@ -52,18 +54,17 @@ mat_realloc(mat_t *mat, int size)
       else
 	mat->data = fts_malloc(size * sizeof(fts_atom_t));
 
-      /* set newly allocated region to void */
-      for(i=mat->alloc; i<size; i++)
-	fts_set_void(mat->data + i);
-      
-      mat->m = size;
-      mat->n = 1;
+      mat->m = m;
+      mat->n = n;
       mat->alloc = size;
     }
   else
     {
       int old_size = mat->m * mat->n;
       int i;
+
+      if(size <= 0)
+	m = n = size = 0;
 
       /* void region cut off */
       for(i=size; i<old_size; i++)
@@ -275,7 +276,7 @@ mat_grow(mat_t *mat, int size)
   while(size > alloc)
     alloc += MAT_BLOCK_SIZE;
 
-  mat_realloc(mat, alloc);
+  set_size(mat, alloc, 1);
 }
 
 int 
@@ -575,6 +576,7 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   mat_t *this = (mat_t *)o;
   int m = 0;
   int n = 0;
+  int i;
 
   if(ac == 1 && fts_is_number(at))
     {
@@ -582,7 +584,7 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       n = mat_get_n(this);
       
       if(m >= 0 && n >= 0)
-	mat_set_size(this, m, n);
+	set_size(this, m, n);
     }  
   else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
     {
@@ -590,8 +592,12 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       n = fts_get_number_int(at + 1);
       
       if(m >= 0 && n >= 0)
-	mat_set_size(this, m, n);
+	set_size(this, m, n);
     }
+
+  /* set newly allocated region to void */
+  for(i=this->alloc; i<m*n; i++)
+    fts_set_void(this->data + i);
 }
 
 static void
@@ -682,13 +688,13 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   int n = mat_get_n(this);
   int i;
   
-  post("{");
+  post("{\n");
 
   for(i=0; i<m; i++)
     {
-      post("{");
+      post("  {");
       post_atoms(n, mat_get_row(this, i));
-      post("}");
+      post("}\n");
     }
 
   post("}");

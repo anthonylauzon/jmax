@@ -525,65 +525,37 @@ fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     post("}");
 }
 
-void 
-fvec_save_bmax(fvec_t *vec, fts_bmax_file_t *f)
-{
-  fts_atom_t av[256];
-  int ac = 0;
-  int i;
-  int offset = 0;
-
-  for(i=0; i<vec->size; i++)
-    {
-      fts_set_float(&av[ac], vec->values[i]);
-
-      ac++;
-
-      if (ac == 256)
-	{
-	  /* Code a push of all the values */
-	  fts_bmax_code_push_atoms(f, ac, av);
-
-	  /* Code a push of the offset */
-	  fts_bmax_code_push_int(f, offset);
-
-	  /* Code a "set" message for 256 values plus offset */
-	  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
-	  offset = offset + ac;
-
-	  /* Code a pop of all the values  */
-	  fts_bmax_code_pop_args(f, ac);
-
-	  ac = 0;
-	}
-    }
-
-  if (ac != 0)
-    {
-      /* Code a push of all the values */
-      fts_bmax_code_push_atoms(f, ac, av);
-
-      /* Code a push of the offset */
-      fts_bmax_code_push_int(f, offset);
-
-      /* Code an "append" message for the values left */
-      fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
-
-      /* Code a pop of all the values  */
-      fts_bmax_code_pop_args(f, ac);
-    }
-}
-
 static void
-fvec_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
 
   if(this->persistent)
     {
-      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
+      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);      
+      int size = fvec_get_size(this);
+      fts_atom_t av[257];
+      int ac = 1;
+      int i;
       
-      fvec_save_bmax(this, f);
+      fts_set_int(av, 0); /* set offset to 0 */
+      
+      for(i=0; i<size; i++)
+	{
+	  fts_set_float(av + ac, this->values[i]);
+	  
+	  if(ac == 256)
+	    {
+	      fts_bmax_save_message(f, fts_s_set, ac, av);
+	      fts_set_int(av , i + 1); /* set next offset */
+	      ac = 1;
+	    }
+	  
+	  ac++;
+	}
+      
+      if(ac > 1) 
+	fts_bmax_save_message(f, fts_s_set, ac, av);
     }
 }
 
@@ -763,6 +735,10 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fvec_print); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fvec_assist); 
+
+  /* save and restore to/from bmax file */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, fvec_save_bmax); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, fvec_set);
 
   fts_method_define_varargs(cl, fts_SystemInlet, sym_load, fvec_load);
 

@@ -23,44 +23,12 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR=../..
+JMAXDISTDIR=../../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
-all:
-	(cd java ; $(MAKE) all)	
-	(cd c ; $(MAKE) all)
-.PHONY: all
-
-clean:
-	(cd java ; $(MAKE) clean)	
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
-
-all_c:
-	(cd c ; $(MAKE) all)
-.PHONY: all_c
-
-clean_c:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean_c
-
-all_java:
-	(cd java ; $(MAKE) all)
-.PHONY: all
-
-clean_java:
-	(cd java ; $(MAKE) clean)
-.PHONY: clean
-
 install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/data
-	$(INSTALL_DATA) data.jpk $(lib_install_dir)/packages/data/data.jpk
-	$(INSTALL_DATA) data.scm $(lib_install_dir)/packages/data/data.scm
-	( cd help; $(MAKE) $@)
-	( cd c; $(MAKE) $@)
-	( cd java; $(MAKE) $@)
-	( cd images; $(MAKE) $@)
+	$(INSTALL_DIR) $(lib_install_dir)/packages/data/images
+	for f in *.gif ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/data/images/$$f ; done
 .PHONY: install
-
 
 

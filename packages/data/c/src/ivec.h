@@ -68,8 +68,6 @@ extern int ivec_get_sub_sum(ivec_t *vector, int from, int to);
 extern int ivec_get_min_value(ivec_t *vector);
 extern int ivec_get_max_value(ivec_t *vector);
 
-extern void  ivec_save_bmax(ivec_t *vec, fts_bmax_file_t *f);
-
 /* ivec atoms */
 #define ivec_atom_set(ap, x) fts_set_object_with_type((ap), (x), ivec_type)
 #define ivec_atom_get(ap) ((ivec_t *)fts_get_object(ap))

@@ -29,18 +29,29 @@
 
 #include <fts/fts.h>
 
+/*************************************************
+ *
+ *  single break point
+ *
+ */
 typedef struct _bp_
 {
   double time; /* absolute break point time */
   double value; /* break point value */
 } bp_t;
 
+/*************************************************
+ *
+ *  break point function (array of break points)
+ *
+ */
 typedef struct _bpf_
 {
   fts_object_t o;
   bp_t *points; /* break points */
   int alloc;
   int size;
+  int persistent;
   int opened; /* non zero if editor open */
 } bpf_t;
 
@@ -48,14 +59,17 @@ extern fts_data_class_t *bpf_data_class;
 extern fts_symbol_t bpf_symbol;
 extern fts_type_t bpf_type;
 
-extern void bpf_set_size(bpf_t *bpf, int size);
 #define bpf_get_size(b) ((b)->size)
-
-#define bpf_clear(b) (bpf_set_size(b, 0))
 
 #define bpf_get_time(b, i) ((b)->points[i].time)
 #define bpf_get_value(b, i) ((b)->points[i].value)
 #define bpf_set_point(b, i, t, v) ((b)->points[i].time = (t), (b)->points[i].value = (v))
+
+#define bpf_get_duration(b) ((b)->points[(b)->size - 1].time)
+#define bpf_get_target(b) ((b)->points[(b)->size - 1].value)
+
+/* search index by time */
+extern int bpf_get_index(bpf_t *bpf, double time);
 
 /* bpf atoms */
 #define bpf_atom_set(ap, x) fts_set_object_with_type((ap), (x), bpf_type)
