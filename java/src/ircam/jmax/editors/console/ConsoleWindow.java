@@ -56,19 +56,15 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     itsConsole = new Console(MaxApplication.getTclInterp());
     itsConsole.Start();
 
-    // Should depend on a flag.
-
-    if ((MaxApplication.getProperty("jmaxNoConsole") == null) || 
+    if ( (MaxApplication.getProperty("jmaxNoConsole") == null) || 
 	(MaxApplication.getProperty("jmaxNoConsole").equals("false")))
       {
-	System.setOut(itsConsole.getPrintStream());
+	  System.setOut(itsConsole.getPrintStream());
       }
     else
-      {
-	itsConsole.getPrintStream().println( "Output redirected to Java standard output");
-	itsConsole.getTextArea().setRows( 10);
-      }
-
+	{
+	    itsConsole.getTextArea().setRows( 10);
+	}
 
     getContentPane().setLayout(new BorderLayout());
 
@@ -88,6 +84,13 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     setLocation(0,0);
     pack();
     setVisible(true);
+
+    if ((MaxApplication.getProperty("jmaxNoConsole") != null) &&
+	(MaxApplication.getProperty("jmaxNoConsole").equals("true")))
+	{
+	    itsConsole.getPrintStream().println( "Output redirected to Java standard output");
+	}
+
     itsConsole.getTextArea().setCaretPosition(itsConsole.getTextArea().getText().length());
   }
   
