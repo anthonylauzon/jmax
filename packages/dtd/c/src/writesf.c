@@ -48,6 +48,7 @@ typedef struct
     int buffer_index;
     int write_index;
     int is_open;
+    int is_started;
 
     fts_thread_worker_t* thread_worker;
 } writesf_t;
@@ -72,6 +73,11 @@ static void writesf_dsp( fts_word_t *argv)
 
   com_buffer = &self->com_buffer[self->buffer_index];
   buffer = com_buffer->buffer;
+
+  if (0 == self->is_started)
+  {
+      return;
+  }
 
   /* channels loop */
   for (channels = 0; channels < self->n_channels; ++channels)
@@ -198,24 +204,35 @@ static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 	    self->com_buffer[i].end_index = 0;
 	}
 	self->is_open = 0;
+	self->is_started = 0;
 	self->write_index = 0;
     }
 }
 
 static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+    writesf_t* self = (writesf_t*)o;
     /* not yet implemented */
+    post("[writesf~] want to start \n");
+    self->is_started = 1;
 }
 
 
 static void writesf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+    writesf_t* self = (writesf_t*)o;
     /* not yet implemented */
+    post("[writesf~] want to stop \n");
+    self->is_started = 0;
 }
 
 static void writesf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+    writesf_t* self = (writesf_t*)o;
     /* not yet implemented */
+    post("[writesf~] want to pause \n");
+    self->is_started += 1;
+    self->is_started = self->is_started % 2;
 }
 
 static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -254,6 +271,8 @@ static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   self->write_index = 0;
   self->buffer_index = 0;
   self->is_open = 0;
+  self->is_started = 0;
+
   /* start the fts_thread_manager */
   fts_thread_manager_start();
 
@@ -300,11 +319,10 @@ writesf_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
     fts_class_message_varargs(cl, fts_s_stop, writesf_stop);
     fts_class_message_varargs(cl, s_pause, writesf_pause);
 
-    fts_dsp_declare_inlet(cl, 0);
+
+   fts_dsp_declare_inlet(cl, 0);
 
     fts_dsp_declare_function(writesf_symbol, writesf_dsp);
-
-    return fts_ok;
 }
 
 

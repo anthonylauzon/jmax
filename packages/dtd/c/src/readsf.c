@@ -49,6 +49,8 @@ typedef struct
     int buffer_index;
     int read_index;
     int is_open;
+    int is_started;
+
 
     fts_thread_worker_t* thread_worker;
 } readsf_t;
@@ -72,6 +74,11 @@ static void readsf_dsp( fts_word_t *argv)
   int buffer_index;
 
   buffer_index = self->buffer_index;
+
+  if (0 == self->is_started)
+  {
+      return;
+  }
 
   /* check if there is enough data available in com_buffer */
   if (!(self->com_buffer[buffer_index].end_index >= (self->read_index + n_tick)))
@@ -138,7 +145,7 @@ static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   {
       fts_set_symbol( argv + 2 + i, fts_dsp_get_output_name( dsp, i));
   }
-
+  
   fts_dsp_add_function( readsf_symbol, 2 + self->n_channels, argv);
 }
 
@@ -233,23 +240,39 @@ static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	    com_buffer->full = 0;
 	}
 	self->is_open = 0;
+	self->is_started = 0;
     }
 }
 
 static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+    readsf_t* self = (readsf_t*)o;
+
     /* not yet implemented */
+    post("[readsf~] want to start \n");
+    self->is_started = 1;
 }
 
 
 static void readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+    readsf_t* self = (readsf_t*)o;
+
     /* not yet implemented */
+    post("[readsf~] want to stop \n");
+    self->is_started = 0;
+    /* need to reset file pointer here */
+
 }
 
 static void readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+    readsf_t* self = (readsf_t*)o;
+
     /* not yet implemented */
+    self->is_started += 1;
+    self->is_started = self->is_started % 2;
+
 }
 
 static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -288,6 +311,7 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   self->read_index = 0;
   self->buffer_index = 0;
   self->is_open = 0;
+  self->is_started = 0;
   /* start the fts_thread_manager */
   fts_thread_manager_start();
 
@@ -333,11 +357,16 @@ readsf_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
   fts_class_message_varargs(cl, fts_s_start, readsf_start);
   fts_class_message_varargs(cl, fts_s_stop, readsf_stop);
   fts_class_message_varargs(cl, s_pause, readsf_pause);
-  
+
+  /* Create an inlet at index 0 */
+  fts_class_inlet_anything(cl, 0);
+
   fts_dsp_declare_outlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 1);
+  fts_dsp_declare_outlet(cl, 2);
 
   fts_dsp_declare_function(readsf_symbol, readsf_dsp);
-  }
+}
 
 
 
