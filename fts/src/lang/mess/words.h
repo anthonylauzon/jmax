@@ -31,3 +31,4 @@
 #define fts_word_get_object(ap)         ((ap)->fts_obj)
 
 #endif
+

@@ -170,6 +170,8 @@ fts_assign_boot_devices(int argc, char **argv)
 
 	  for (i = 1; i < argc; i++)
 	    fts_atom_parse(argv[i], &pd_argv[i - 1]);
+
+	  pd_argc = argc - 1;
 	}
     }
   else
@@ -181,6 +183,9 @@ fts_assign_boot_devices(int argc, char **argv)
   /* Set the client dev from the command line arguments.
      */
 
+  fprintf(stderr, "opening logical device %s with arguments: ", fts_symbol_name(class_name));
+  fprintf_atoms(stderr, pd_argc, pd_argv);
+  fprintf(stderr, "\n");
   fts_open_logical_device(fts_new_symbol("client"), 0, 0,
 			  class_name, pd_argc, pd_argv);
 }

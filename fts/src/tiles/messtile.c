@@ -2,8 +2,9 @@
    Support for FOS client/server messages
 */
 
-/*#define MESS_DEBUG*/
-
+#ifdef DEBUG
+/*#define MESS_DEBUG */
+#endif
 
 #include <string.h>
 #include <stdio.h>

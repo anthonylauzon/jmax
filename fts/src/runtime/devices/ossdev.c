@@ -13,6 +13,8 @@
    directly.
 
    The device *only* support stereo devices.
+
+   All the post should generate an error.
 */
 
 /* Include files */
@@ -28,6 +30,7 @@
 #include "sys.h"
 #include "lang.h"
 #include "runtime/devices/devices.h"
+#include "runtime/files.h"
 
 /* Check this is right */
 
@@ -37,19 +40,6 @@
 
 static fts_status_t oss_dac_init(void);
 static fts_status_t oss_adc_init(void);
-
-/******************************************************************************/
-/*                                                                            */
-/*                              Init function                                 */
-/*                                                                            */
-/******************************************************************************/
-
-void
-ossdev_init(void)
-{
-  oss_dac_init();
-  oss_adc_init();
-}
 
 /******************************************************************************/
 /*                                                                            */
@@ -92,7 +82,7 @@ static void oss_audio_set_parameters()
   /* Set 16 bit format */
 
   format = AFMT_S16_LE;
-  if (ioctl(info.audio_fd, SNDCTL_DSP_SETFMT, &format) == -1)
+  if (ioctl(oss_audio_data.fd, SNDCTL_DSP_SETFMT, &format) == -1)
     post("Error setting SNDCTL_DSP_SETFMT\n");
 
   if (format != AFMT_S16_LE)
@@ -101,7 +91,7 @@ static void oss_audio_set_parameters()
   /* Set stereo mode */
 
   stereo = 1;
-  if (ioctl(info.audio_fd, SNDCTL_DSP_STEREO, &stereo) == -1)
+  if (ioctl(oss_audio_data.fd, SNDCTL_DSP_STEREO, &stereo) == -1)
     post("SNDCTL_DSP_STEREO\n");
 
   if (! stereo)
@@ -110,7 +100,7 @@ static void oss_audio_set_parameters()
   /* Set sampling rate */
 
   sr = oss_audio_data.sampling_rate;
-  if (ioctl(info.audio_fd, SNDCTL_DSP_SPEED, &sr) == -1)
+  if (ioctl(oss_audio_data.fd, SNDCTL_DSP_SPEED, &sr) == -1)
     post("SNDCTL_DSP_SPEED\n");
 
   if (sr != oss_audio_data.sampling_rate)
@@ -129,7 +119,7 @@ oss_audiodev_update_device()
 {
   if (oss_audio_data.device_opened)
     {
-      close(oss_audio_data.fr);
+      close(oss_audio_data.fd);
       oss_audio_data.device_opened = 0;
     }
 
@@ -154,12 +144,6 @@ oss_audiodev_update_device()
 	  oss_audio_data.device_opened = 1;
 	}
     }
-}
-
-
-static void
-oss_audiodev_close()
-{
 }
 
 
@@ -190,9 +174,9 @@ oss_dac_init(void)
 {
   fts_dev_class_t *oss_dac_class;
 
-  /* defaults and init for the shared data */
 
-  oss_audio_data.dac_dev = 0;
+
+
     
   /* OSS DAC class  */
 
@@ -239,18 +223,12 @@ oss_dac_init(void)
 static fts_status_t
 oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  fts_atom_t local_args[10];
-  int local_nargs;			/* X/Motif style arg counter */
-  struct parser_status oss_dac_parser_status; 
-
-  if (oss_audio_data.dac_dev)
+  if (oss_audio_data.dac_opened)
     return &fts_dev_open_error; /*Error: a device was already opened for the ch */
-
-  oss_audio_data.dac_dev = dev;
 
   /* Parameter parsing  */
   
-  oss_audio_data.sampling_rate = fts_get_int_by_name(nargs, args, fts_new_symbol"sample_rate"), 44100);
+  oss_audio_data.sampling_rate = fts_get_int_by_name(nargs, args, fts_new_symbol("sample_rate"), 44100);
 
   /* open the device */
 
@@ -260,7 +238,7 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Allocate the DAC  formatting buffer */
 
-  sgi_dac_data.dac_fmtbuf = (float *) fts_malloc(MAXVS * 2 * sizeof(short));
+  oss_audio_data.dac_fmtbuf = (short *) fts_malloc(MAXVS * 2 * sizeof(short));
 
   return fts_Success;
 }
@@ -305,7 +283,7 @@ oss_dac_put(fts_word_t *argv)
     {
       float *in;
       
-      in = (float *) fts_word_get_obj(argv + 2 + ch);
+      in = (float *) fts_word_get_ptr(argv + 2 + ch);
 
       for (i = ch, j = 0; j < n; i = i + 8, j += 4)
 	{
@@ -349,10 +327,6 @@ oss_adc_init(void)
 {
   fts_dev_class_t *oss_adc_class;
 
-  /* defaults and init for the shared data */
-
-  oss_audio_data.adc_dev = 0;
-    
   /* OSS ADC class  */
 
   oss_adc_class = fts_dev_class_new(fts_sig_dev);
@@ -375,16 +349,12 @@ oss_adc_init(void)
 static fts_status_t
 oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  fts_atom_t local_args[10];
-  int local_nargs;			/* X/Motif style arg counter */
-  struct parser_status oss_adc_parser_status; 
-
-  if (oss_audio_data.adc_dev)
+  if (oss_audio_data.adc_opened)
     return &fts_dev_open_error; /*Error: a device was already opened for the ch */
 
   /* Parameter parsing  */
   
-  oss_audio_data.sampling_rate = fts_get_int_by_name(nargs, args, fts_new_symbol"sample_rate"), 44100);
+  oss_audio_data.sampling_rate = fts_get_int_by_name(nargs, args, fts_new_symbol("sample_rate"), 44100);
 
   /* open the device */
 
@@ -394,7 +364,7 @@ oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Allocate the ADC  formatting buffer */
 
-  oss_audio_data.adc_fmtbuf = (float *) fts_malloc(MAXVS * 2 * sizeof(short));
+  oss_audio_data.adc_fmtbuf = (short *) fts_malloc(MAXVS * 2 * sizeof(short));
 
   return fts_Success;
 }
@@ -441,13 +411,13 @@ oss_adc_get(fts_word_t *argv)
 
   /* do the data transfer: unrolled pipelined loop */
 
-  for (ch = 0; ch < nchans; ch++)
+  for (ch = 0; ch < 2; ch++)
     {
       float *out;
       
-      out = (float *) fts_word_get_obj(argv + 2 + ch);
+      out = (float *) fts_word_get_ptr(argv + 2 + ch);
 
-      for (i = ch, j = 0; j < n; i = i + inc, j += 4)
+      for (i = ch, j = 0; j < n; i = i + 8, j += 4)
 	{
 	  short f1, f2, f3, f4;
 
@@ -464,4 +434,23 @@ oss_adc_get(fts_word_t *argv)
     }
 }
 
+
+/******************************************************************************/
+/*                                                                            */
+/*                              Init function                                 */
+/*                                                                            */
+/******************************************************************************/
+
+void
+ossdev_init(void)
+{
+  /* defaults and init for the shared data */
+
+  oss_audio_data.device_opened = 0;
+  oss_audio_data.dac_opened = 0;
+  oss_audio_data.adc_opened = 0;
+
+  oss_dac_init();
+  oss_adc_init();
+}
 
