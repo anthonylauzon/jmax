@@ -188,7 +188,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 
       if(pixelsSize <= nArgs-1)
 	  notifySet();
-      //System.err.println("setpix pixelsize "+pixelsSize);
   }
     
   public void appendPixels(int nArgs , FtsAtom args[])
@@ -197,11 +196,10 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     int i=0;
 
     for(i = 0; i<nArgs-1; i++)
-      pixels[startIndex+i] = args[i+1].getInt();
-    
+	pixels[startIndex+i] = args[i+1].getInt();
+
     if(pixelsSize <= startIndex+nArgs-1)
 	notifySet();
-    //System.err.println("appendpix pixelsize "+pixelsSize);
   }
 
   public void addPixels(int nArgs , FtsAtom args[])
@@ -226,7 +224,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	    temp[pixelsSize-newp-1+i] = args[i].getInt();
     }
     pixels = temp;
-
     notifySet();
   }
 

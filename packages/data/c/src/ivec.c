@@ -340,7 +340,7 @@ ivec_send_pixels(ivec_t *ivec)
 	  fts_set_int(&a[0], count);
 
       send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? (IVEC_CLIENT_BLOCK_SIZE-1): n;
-      
+
       for(i = 0; ((i < send)&&((int)(current+i*k)<vecsize)); i++)
 	  fts_set_int(&a[i+1], ivec->values[(int)(current+k*i)]);
       
@@ -352,7 +352,7 @@ ivec_send_pixels(ivec_t *ivec)
       else
 	  fts_client_send_message((fts_object_t *)ivec, sym_append_pixels, send+1, a);
 
-      current+=send;
+      current+=k*send;
       count+=send;
       n -= send;
     }
@@ -715,7 +715,7 @@ ivec_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int a
 {
   ivec_t *this = (ivec_t *)o;
 
-  post("insert copy_size\n");
+  /*post("insert copy_size\n");*/
 
   if(this->copy)
     {
@@ -727,12 +727,12 @@ ivec_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int a
       int *src, *dst;
       int i;
 
-      post("v_size %d pix_size %d start %d copy_size %d \n", v_size, pix_size, start, copy_size);
+      /*post("v_size %d pix_size %d start %d copy_size %d \n", v_size, pix_size, start, copy_size);*/
 
       ivec_set_size(this, ivec_get_size(this) + copy_size);
       this_size = ivec_get_size(this);
 
-      post("this_size %d\n", this_size);
+      /*post("this_size %d\n", this_size);*/
 
       src = ivec_get_ptr(this->copy);
       dst = ivec_get_ptr(this);
@@ -999,8 +999,8 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
       /* save and restore to/from bmax file */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set); 
+      /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); 
+	fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set); */
 
       /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
