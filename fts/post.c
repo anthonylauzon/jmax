@@ -393,6 +393,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
     if(cl == fts_tuple_class)
     {
       fts_spost(stream, "{");
+      ac--;
       at++; /* skip class name */
     }
     else
