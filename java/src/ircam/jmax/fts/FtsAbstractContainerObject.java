@@ -73,18 +73,11 @@ abstract public class FtsAbstractContainerObject extends FtsObject
     objects.removeElement(obj);
   }
 
-  /** Replace an object with an other one; 
-   * Cannot be called for inlets and outlets, only
-   * for real standard object
+  /** Replace an object with an other one in all the connections
    */
 
-  void replace(FtsObject oldObject, FtsObject newObject)
+  void replaceInConnections(FtsObject oldObject, FtsObject newObject)
   {
-    // replace it in the object list
-
-    removeObjectFromContainer(oldObject);
-    addObjectToContainer(newObject);
-
     // replace it in all the connections
 
     for (int i = 0; i < connections.size(); i++)

@@ -77,7 +77,7 @@ public class FtsSelection extends FtsAbstractContainerObject
 
   protected boolean isPersistent()
   {
-    return true;
+    return false;
   }
 
 

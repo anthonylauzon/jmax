@@ -379,16 +379,16 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   public boolean SaveAs(){return true;}//override this function if you want to save your content
   public boolean ShouldSave(){return false;}//override this function if your data changed
   public boolean Close(){
-    if(ShouldSave()){
-      FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
-      aDialog.setLocation(300, 300);
-      aDialog.setVisible(true);
-      if(aDialog.GetNothingToDoFlag()) return false;
-      if(aDialog.GetToSaveFlag()){
-	Save();
-      }
-      aDialog.dispose();
-    }
+    // Removed the code that save the file, because at the 
+    // MaxEditor level we *don't* know if we are editing 
+    // a file or other stuff; the correct thing to do 
+    // is to overwrite the method in the subclass and
+    // inside the redefined close do something like:
+    //  
+    //    < ask to save the file if we have a file ...>
+    //    super.Close()
+    //
+    
     MaxApplication.RemoveThisWindowFromMenus(this);
     MaxApplication.itsEditorsFrameList.removeElement(this);
     setVisible(false);

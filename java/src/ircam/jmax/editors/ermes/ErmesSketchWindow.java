@@ -738,7 +738,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     if (deleteOnFts) itsPatcher.close();
     if(!alreadySaved){
-      FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
+      FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsData);
       aDialog.setLocation(300, 300);
       aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return false;

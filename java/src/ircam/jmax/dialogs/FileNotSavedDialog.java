@@ -3,22 +3,22 @@ package ircam.jmax.dialogs;
 import java.awt.*;
 import java.awt.event.*;
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
 /**
  * A generic "file not saved" dialog
  */
 public class FileNotSavedDialog extends Dialog implements ActionListener, KeyListener{
-  MaxWindow itsParent;
   String itsMessage;
   Button itsSaveButton, itsCancelButton, itsNoButton;
   boolean itsToSave = true;
   boolean itsNothingToDo;
 
-  public FileNotSavedDialog(Frame theFrame) {
+  public FileNotSavedDialog(Frame theFrame, MaxData theData) {
     super(theFrame, "File Not Saved Message", true);
-    itsParent = (MaxWindow)theFrame;
-    itsMessage = "File " + itsParent.GetTitle() + " is not saved."+'\n'+" Do you want to save it now?";
+    itsMessage = ("File " + (((MaxFileDataSource)theData.getDataSource()).getFile().getName()) +
+		  " is not saved.\n Do you want to save it now?");
     
     setLayout(new BorderLayout());
     

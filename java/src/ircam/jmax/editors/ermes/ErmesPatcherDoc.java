@@ -23,7 +23,6 @@ public class ErmesPatcherDoc  {
   private static int itsSubpatcherCounter = 1;
   public ErmesSketchWindow itsSketchWindow;
   public FtsContainerObject itsPatcher;
-  static final ExtensionFilter itsTpaFilter = new ExtensionFilter(".tpa");
 
   protected String itsTitle = ""; // !!! should be handled in the editor
 
