@@ -65,6 +65,10 @@ public class TrackSimpleMenu extends EditorMenu
 
     addSeparator();
     
+    add(Actions.selectAllAction);
+    
+    addSeparator();
+    
     add( new EditorAction("Close", "close", KeyEvent.VK_C, KeyEvent.VK_W, true){
       public void doAction(EditorContainer container)
     {

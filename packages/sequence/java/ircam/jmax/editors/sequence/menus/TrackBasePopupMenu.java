@@ -72,16 +72,12 @@ public class TrackBasePopupMenu extends JPopupMenu
 		  }
 		});
     add(item);
-		
-    addSeparator();
-		
+				
     if( addRangeMenu())
       addSeparator();
 		
     if(isInSequence)
-		{
-			addSeparator();
-    
+		{    
 			moveToAction = new MoveTrackToAction(target);
 			moveMenu = new JMenu("Move to Position");
 			item = new JMenuItem(""+trackCount);
@@ -103,9 +99,10 @@ public class TrackBasePopupMenu extends JPopupMenu
 	    }
 			});
 			add(removeItem);
+     
+      addSeparator();
 		}
-		
-    addSeparator();
+    
     item = new JMenuItem("Export Track");
     item.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
