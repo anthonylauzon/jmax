@@ -369,7 +369,16 @@ static void start_watchdog( void)
 
 void fts_platform_init( int argc, char **argv)
 {
-  start_watchdog();
+  int i, no_watchdog = 0;
+
+  for ( i = 0; i < argc; i++)
+    {
+      if ( !strcmp( argv[i], "--no-watchdog"))
+	no_watchdog = 1;
+    }
+    
+  if ( !no_watchdog)
+    start_watchdog();
 
   set_priority( -2);
 

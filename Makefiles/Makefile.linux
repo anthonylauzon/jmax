@@ -34,7 +34,11 @@ SOLIBS=-lc
 CC_ALL_FLAG := -Xlinker --whole-archive
 CC_NONE_FLAG := -Xlinker --no-whole-archive
 
+ifeq ($(ENABLE_EFENCE),yes)
+FTS_SYS_LIBS = -lefence -ldl -laudiofile -lm -lpthread
+else
 FTS_SYS_LIBS = -ldl -laudiofile -lm -lpthread
+endif
 
 INSTALL=install
 INSTALL_DATA=$(INSTALL) --mode=0644

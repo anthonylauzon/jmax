@@ -42,7 +42,7 @@
 #include <sys/mman.h>
 #include <sched.h>
 
-#include <fts/sys/hw.h>
+#include <fts/sys.h>
 
 
 /* *************************************************************************** */
