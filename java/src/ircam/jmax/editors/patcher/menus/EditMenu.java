@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -18,7 +19,23 @@ import ircam.jmax.editors.patcher.actions.*;
 
 public class EditMenu extends PatcherMenu
 {
-  boolean locked;
+  class EditMenuListener implements MenuListener
+  {
+    public void menuSelected(MenuEvent e)
+    {
+      updateMenu();
+    }
+
+    public void menuDeselected(MenuEvent e)
+    {
+    }
+
+    public void menuCanceled(MenuEvent e)
+    {
+    }
+  }
+
+  ErmesSketchWindow window;
 
   JMenuItem cutItem;
   JMenuItem copyItem;
@@ -28,9 +45,12 @@ public class EditMenu extends PatcherMenu
   JMenuItem inspectItem;
   JMenuItem lockItem;
   
-  public EditMenu()
+  public EditMenu(ErmesSketchWindow window)
   {
     super("Edit");
+
+    this.window = window;
+
     setHorizontalTextPosition(AbstractButton.LEFT);
 
     cutItem       = add(Actions.cutAction, "Cut", Event.CTRL_MASK, KeyEvent.VK_X);
@@ -59,71 +79,19 @@ public class EditMenu extends PatcherMenu
 
     lockItem = add(Actions.lockAction, "Lock", Event.CTRL_MASK, KeyEvent.VK_E);
 
-    enableCut(true);
-    enableCopy(true);
-    enablePaste(true);
-    enableDuplicate(true);
+    addMenuListener(new EditMenuListener());
   }
 
-
-  // @@@ ALL THIS stuff should be done using actions.
-
-  void enableCut(boolean v)
+  private void updateMenu()
   {
-    cutItem.setEnabled(v);
-  }
-
-  void enableCopy(boolean v)
-  {
-    copyItem.setEnabled(v);
-  }
-
-  void enablePaste(boolean v)
-  {
-    pasteItem.setEnabled(v);
-  }
-
-  void enableDuplicate(boolean v)
-  {
-    duplicateItem.setEnabled(v);
-  }
-
-  void enableSelectAll(boolean v)
-  {
-    selectAllItem.setEnabled(v);
-  }
-
-  void enableInspect(boolean v)
-  {
-    inspectItem.setEnabled(v);
-  }
-
-  public void setLocked(boolean v)
-  {
-    locked = v;
-    updateMenus();
-  }
-
-  public void selectionChanged()
-  {
-    updateMenus();
-  }
-
-  public void clipboardChanged()
-  {
-    updateMenus();
-  }
-
-  private void updateMenus()
-  {
-    if (locked)
+    if (window.isLocked())
       {
 	lockItem.setText("Unlock");
-	enableSelectAll(false);
-	enableCut(false);
-	enableCopy(false);
-	enableDuplicate(false);
-	enableInspect(false);
+	selectAllItem.setEnabled(false);
+	cutItem.setEnabled(false);
+	copyItem.setEnabled(false);
+	duplicateItem.setEnabled(false);
+	inspectItem.setEnabled(false);
       }
     else
       {
@@ -131,21 +99,21 @@ public class EditMenu extends PatcherMenu
 
 	if (ErmesSelection.patcherSelection.isEmpty())
 	  {
-	    enableCut(false);
-	    enableCopy(false);
-	    enableDuplicate(false);
+	    cutItem.setEnabled(false);
+	    copyItem.setEnabled(false);
+	    duplicateItem.setEnabled(false);
 	  }
-	else
+	else if (ErmesSelection.patcherSelection.getOwner() == window.itsSketchPad)
 	  {
-	    enableCut(true);
-	    enableCopy(true);
-	    enableDuplicate(true);
+	    cutItem.setEnabled(true);
+	    copyItem.setEnabled(true);
+	    duplicateItem.setEnabled(true);
 	  }
 
-	enableInspect(true);
-	enableSelectAll(true);
+	inspectItem.setEnabled(true);
+	selectAllItem.setEnabled(true);
       }
 
-    enablePaste(! ErmesSketchWindow.ftsClipboardIsEmpty());
+    pasteItem.setEnabled(! ErmesSketchWindow.ftsClipboardIsEmpty());
   }
 }

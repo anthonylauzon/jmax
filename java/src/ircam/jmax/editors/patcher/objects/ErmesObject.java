@@ -515,7 +515,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     itsFtsObject.setObjectListener(null);
   }
 
-  // Experimental MDC
 
   public void showErrorDescription()
   {
@@ -544,6 +543,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
 	    g.setColor( Color.black);
 	    g.drawRect( ax - 1, ay - ah - 1, aw + 2, ah + 2);
+	    g.setFont(itsFont);
 	    g.drawString( annotation, ax, ay);
 	    g.dispose();
 	  }

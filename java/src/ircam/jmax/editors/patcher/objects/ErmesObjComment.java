@@ -90,7 +90,7 @@ public class ErmesObjComment extends ErmesObjEditableObject {
       }
 
     //text
-    DrawParsedString( g);
+   drawContent( g);
   }
 
   //--------------------------------------------------------

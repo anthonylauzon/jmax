@@ -66,6 +66,7 @@ class DragConnectInteraction extends Interaction
 						 fc);
 		
 		editor.getDisplayList().add(connection);
+		editor.getDisplayList().sortDisplayList();
 		connection.updateDimensions();
 		connection.redraw();
 	      }

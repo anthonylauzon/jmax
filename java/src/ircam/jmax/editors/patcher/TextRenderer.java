@@ -11,12 +11,21 @@ import javax.swing.event.*;
 
 //
 // The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
-// Must subclass JTextArea instead of just using it, because the getColumnWidth is
+// Must subclass JTextArea in order to  use it, because the getColumnWidth is
 // protected in JTextArea, and we *need* to know.
 
-public class TextRenderer extends JTextArea implements ObjectRenderer
+public class TextRenderer implements ObjectRenderer
 {
+  class RenderTextArea extends JTextArea
+  {
+    public boolean canResizeWidthTo(int width)
+    {
+      return width > getColumnWidth();
+    }
+  }
+
   private ErmesObjEditableObject owner;
+  private RenderTextArea area;
 
   //--------------------------------------------------------
   // CONSTRUCTOR
@@ -27,48 +36,49 @@ public class TextRenderer extends JTextArea implements ObjectRenderer
     super();
 
     owner = object;
+    area = new RenderTextArea();
 
-    setEditable(false);
-    setLineWrap(true);
-    setWrapStyleWord(true);
+    area.setEditable(false);
+    area.setLineWrap(true);
+    area.setWrapStyleWord(true);
   }
 
   public void update()
   {
-    setBounds(owner.getX() + owner.getTextXOffset(),
+    area.setBounds(owner.getX() + owner.getTextXOffset(),
 	      owner.getY() + owner.getTextYOffset(),
 	      owner.getWidth() - owner.getTextWidthOffset(),
 	      owner.getHeight() - owner.getTextHeightOffset());
 
-    setFont(owner.getFont());
-    setText(owner.getArgs());
+    area.setFont(owner.getFont());
+    area.setText(owner.getArgs());
   }
 
   public boolean canResizeWidthTo(int width)
   {
-    return width > getColumnWidth();
+    return area.canResizeWidthTo(width);
   }
 
   public int getHeight()
   {
-    return getPreferredSize().height;
+    return area.getPreferredSize().height;
   }
 
   public int getWidth()
   {
-    return getPreferredSize().width;
+    return area.getPreferredSize().width;
   }
 
   public void setBackground(Color color)
   {
-    super.setBackground(color);
+    area.setBackground(color);
   }
 
   static Container ic = new Panel();
 
   public void render(Graphics g, int x, int y, int w, int h)
   {
-    SwingUtilities.paintComponent(g, this, ic, x, y, w, h);
+    SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
 

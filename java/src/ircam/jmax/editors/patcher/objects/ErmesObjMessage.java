@@ -134,7 +134,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
     g.setColor(getTextBackground());
     g.fillRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2);
     
-    DrawParsedString( g);
+    drawContent( g);
 
     super.paint( g);
   }

@@ -18,7 +18,6 @@ import javax.swing.event.*;
 
 public class EditField extends JTextArea
 {
-
   private ErmesObjEditableObject owner = null;
   private ErmesSketchPad sketch = null;
 
@@ -210,6 +209,7 @@ public class EditField extends JTextArea
 
     setVisible(false);
 
+    sketch.requestFocus();
     owner = null;
   }
 

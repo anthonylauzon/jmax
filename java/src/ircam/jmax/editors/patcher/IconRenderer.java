@@ -54,6 +54,9 @@ public class IconRenderer implements ObjectRenderer
   {
   }
 
+  public void prepareToRender()
+  {
+  }
 
   public void render(Graphics g, int x, int y, int w, int h)
   {

@@ -144,7 +144,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
 
     g.fill3DRect( x+1, y+1, w-2, h-2, true);
 
-    DrawParsedString( g);
+    drawContent( g);
 
     super.paint( g);
   }

@@ -29,6 +29,22 @@ public class TextMenu extends JMenu
 
   ErmesSketchWindow editor;
 
+  class TextMenuListener implements MenuListener
+  {
+    public void menuSelected(MenuEvent e)
+    {
+      updateMenu();
+    }
+
+    public void menuDeselected(MenuEvent e)
+    {
+    }
+
+    public void menuCanceled(MenuEvent e)
+    {
+    }
+  }
+
   public TextMenu(ErmesSketchWindow window)
   {
     super("Text");
@@ -44,8 +60,6 @@ public class TextMenu extends JMenu
     itsFontsMenu =  new JMenu( "Fonts");
     FillFontMenu( itsFontsMenu);
     add( itsFontsMenu);
-
-    selectionChanged();
   }
 
   class SizesMenuAdapter implements ActionListener
@@ -159,7 +173,7 @@ public class TextMenu extends JMenu
     For the moment, still compare the font names.
     */
 
-  public void selectionChanged()
+  private void updateMenu()
   {
     JRadioButtonMenuItem item;
     String fontName;

@@ -114,7 +114,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     // Build the edit menu
 
-    itsEditMenu = new EditMenu(); 
+    itsEditMenu = new EditMenu(this); 
     mb.add(itsEditMenu); 
 
     // Build the text menu
@@ -244,23 +244,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   /****************************************************************************/
   /*                                                                          */
-  /*           SELECTION CHANGED UPDATER                                      */
-  /*                                                                          */
-  /****************************************************************************/
-
-  /**
-   * Called when the selection change; the method have to find up 
-   * what is the proper action to do for each Menu 
-   */
-
-  void selectionChanged()
-  {
-    itsEditMenu.selectionChanged();
-    itsTextMenu.selectionChanged();
-  }
-
-  /****************************************************************************/
-  /*                                                                          */
   /*           MENU ACTIONS                                                   */
   /*                                                                          */
   /****************************************************************************/
@@ -284,8 +267,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
 	setCursor( temp);
       }
-
-    itsEditMenu.clipboardChanged();
   }
 
   private int lastCopyCount;
@@ -309,8 +290,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
 	setCursor( temp);
       }
-
-    itsEditMenu.clipboardChanged();
   }
 
   private boolean pasting = false;
@@ -626,8 +605,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsSketchPad.setLocked( locked);
 
     itsToolBar.setLocked( locked);
-
-    itsEditMenu.setLocked(locked);
 
     itsSketchPad.setKeyEventClient( null); //when changing mode, always remove key listeners
 

@@ -204,6 +204,8 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	connection.updateDimensions();
 	connection.redraw();
       }
+
+    displayList.sortDisplayList();
   }
   
   void InitFromFtsContainer( FtsPatcherData theContainerObject)
@@ -237,10 +239,11 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 					  displayList.getErmesObjectFor(fc.getTo()),
 					  fc.getToInlet(),
 					  fc);
-
 	displayList.add(connection);
 	connection.updateDimensions();
       }
+
+    displayList.sortDisplayList();
   }
 
   //--------------------------------------------------------
@@ -772,18 +775,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
       }
   }
 
-
-  // Selection change handling
-
-  void selectionChanged()
-  {
-    // BUG ?? 
-
-    if (itsSketchWindow == null)
-      System.err.println("window null in sketch " + this);
-
-    itsSketchWindow.selectionChanged();
-  }
 
   // Support for the new Interaction Model
 

@@ -118,7 +118,6 @@ public class DisplayList
   final public void add(ErmesConnection connection)
   {
     displayObjects.addElement(connection);
-    sortDisplayList();
   }
 
   void remove( ErmesConnection connection)
@@ -191,8 +190,11 @@ public class DisplayList
   // Magic sorting for objects and connections
   // essentially, keep objects are they are
   // and move the connections
+  // Must be called by hand in the proper case, beacause calling
+  // it automatically will call it just too many time in situations
+  // like creating a patch and pasting ...
 
-  private void sortDisplayList()
+  public void sortDisplayList()
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
@@ -345,7 +347,7 @@ public class DisplayList
 
 	    if (object instanceof ErmesObjEditableObject)
 	      {
-		((ErmesObjEditableObject)object).DrawParsedString(g);
+		((ErmesObjEditableObject)object).drawContent(g);
 		((ErmesObjEditableObject)object).updateDimensionsNoConnections(); // HACK ? Yes !
 	      }
 
@@ -380,23 +382,19 @@ public class DisplayList
       }
 
     // Finally, draw the Drag/effermeral thingies
+    // Leave the clipping do the clip work; if the drag thingies are
+    // active are probabily always repaint.
 
     switch (dragMode)
       {
       case DRAG_RECTANGLE:
-	if (clip.intersects(dragRectangle))
-	  {
-	    g.setColor( Color.black);
-	    g.drawRect( dragRectangle.x, dragRectangle.y, dragRectangle.width, dragRectangle.height);
-	  }
+	g.setColor( Color.black);
+	g.drawRect( dragRectangle.x, dragRectangle.y, dragRectangle.width, dragRectangle.height);
 	break;
 
       case DRAG_LINE:
-	if (clip.intersects(dragRectangle))
-	  {
-	    g.setColor( Color.black);
-	    g.drawLine( lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
-	  }
+	g.setColor( Color.black);
+	g.drawLine( lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
 	break;
 
       case NO_DRAG:
@@ -427,11 +425,10 @@ public class DisplayList
   {
     public void processConnection(ErmesConnection connection)
       {
-	if ( (connection.getSourceObject().isSelected())
-	     && (connection.getDestObject().isSelected()))
-	  {
-	    ErmesSelection.patcherSelection.select( connection);
-	  }
+	if ((connection.getSourceObject().isSelected()) && (connection.getDestObject().isSelected()))
+	  ErmesSelection.patcherSelection.select( connection);
+	else
+	  ErmesSelection.patcherSelection.deselect( connection);
       }
   };
 
@@ -698,7 +695,20 @@ public class DisplayList
 
   public void redrawDragRectangle()
   {
-    sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, dragRectangle.height + 1);
+    /* If the rectangle is 'big', we issue four repaint,
+       corresponding to the four side of the rectangle
+       */
+
+    
+    if ((dragRectangle.width > 50) && (dragRectangle.height > 50))
+      {
+	sketch.repaint(dragRectangle.x, dragRectangle.y, 1, dragRectangle.height + 1);
+	sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, 1);
+	sketch.repaint(dragRectangle.x, dragRectangle.y + dragRectangle.height, dragRectangle.width + 1, 1);
+	sketch.repaint(dragRectangle.x + dragRectangle.width, dragRectangle.y, 1, dragRectangle.height + 1);
+      }
+    else
+      sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, dragRectangle.height + 1);
   }
 
   public void redrawDragLine()

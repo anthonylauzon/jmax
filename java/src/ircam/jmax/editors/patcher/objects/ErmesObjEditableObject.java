@@ -20,7 +20,7 @@ import ircam.jmax.editors.patcher.*;
 abstract public class ErmesObjEditableObject extends ErmesObject implements FtsInletsListener, FtsOutletsListener
 {
   boolean editing = false;
-  ircam.jmax.editors.patcher.ObjectRenderer renderer;
+  ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
   ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
@@ -158,8 +158,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   }
 
 
-
-  public void DrawParsedString(Graphics g) 
+  public void drawContent(Graphics g) 
   {
     if (editing)
       return;

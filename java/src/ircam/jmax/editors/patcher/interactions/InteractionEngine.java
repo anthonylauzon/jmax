@@ -158,6 +158,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     ErmesSketchPad editor = (ErmesSketchPad) e.getSource();
     DisplayObject object = null;
 
+    editor.cleanAnnotations();
+
     updateMouseHistory(e);
     
     squeack |= getModifiersBits(e);

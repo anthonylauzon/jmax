@@ -64,8 +64,6 @@ public class ErmesSelection implements Transferable
 	Fts.getSelection().addObject( object.getFtsObject());
 	object.setSelected(true);
       }
-
-    owner.selectionChanged();
   }
 
   public void select( ErmesConnection connection) 
@@ -79,8 +77,6 @@ public class ErmesSelection implements Transferable
 	Fts.getSelection().addConnection( connection.getFtsConnection());
 	connection.setSelected(true);
       }
-
-    owner.selectionChanged();
   }
 
   public void deselect( ErmesObject object) 
@@ -90,7 +86,6 @@ public class ErmesSelection implements Transferable
 	object.setSelected(false);
 	objects.removeElement( object);
 	Fts.getSelection().removeObject( object.getFtsObject());
-	owner.selectionChanged();
       }
   }
 
@@ -101,7 +96,6 @@ public class ErmesSelection implements Transferable
 	connection.setSelected(false);
 	connections.removeElement( connection);
 	Fts.getSelection().removeConnection( connection.getFtsConnection());
-	owner.selectionChanged();
       }
   }
 
@@ -147,9 +141,6 @@ public class ErmesSelection implements Transferable
     objects.removeAllElements();
     connections.removeAllElements();
     Fts.getSelection().clean();
-
-    if (owner != null)
-      owner.selectionChanged();
   }
 
   public void redraw() 
@@ -195,14 +186,12 @@ public class ErmesSelection implements Transferable
 	    deselectAll();
 	    owner.redraw();
 	  }
-
-	owner.selectionChanged();
       }
 
     this.owner = owner;
   }
 
-  ErmesSketchPad getOwner()
+  public ErmesSketchPad getOwner()
   {
     return owner;
   }
@@ -221,8 +210,6 @@ public class ErmesSelection implements Transferable
     
     while (! objects.isEmpty())
       ((ErmesObject) objects.elementAt( 0)).delete();
-
-    owner.selectionChanged();
   }
 
 
