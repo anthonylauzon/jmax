@@ -99,7 +99,7 @@ getrange_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   if(ac == 1)
     {
       /* initialize the class */
-      fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
+      fts_class_init(cl, sizeof(fts_object_t), 1, 2, 0); 
       
       fts_method_define_varargs(cl, 0, ivec_symbol, getrange_ivec);
       fts_method_define_varargs(cl, 0, fvec_symbol, getrange_fvec);
