@@ -35,7 +35,6 @@ import ircam.jmax.mda.*;
 
 // ^^^^ As all the other tcl commands, not work with multiserver.
 
-
 /**
 
  * The generic "Open <filename>" TCL command.

@@ -196,9 +196,9 @@ seqobj_export_track_by_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   if(track)
     {
       if(ac > 1 && fts_is_symbol(at + 1))
-	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_export_midi, 1, at + 1);
+	  fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_export_midi, 1, at + 1);
       else
-	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_export_midi_dialog, 0, 0);
+	  fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_export_midi_dialog, 0, 0);
     }
 }
 
@@ -215,7 +215,8 @@ seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       track_t *track = sequence_get_track_by_name(this, track_name);
 
-      fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
+      if(track)
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
     }
   else
     {  
@@ -274,3 +275,4 @@ seqobj_config(void)
 {
   fts_class_install(seqsym_sequence, seqobj_instantiate);
 }
+

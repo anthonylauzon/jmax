@@ -103,17 +103,18 @@ public class TextPopUpMenu extends JMenu
 
   private void FillFontMenu( JMenu theFontMenu)
   {
-    String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
-    JRadioButtonMenuItem item;
-    itsFontMenuGroup = new ButtonGroup();
+      String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
+      //String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+      JRadioButtonMenuItem item;
+      itsFontMenuGroup = new ButtonGroup();
 
-    for ( int i = 0; i < itsFontList.length; i++)
-      {
-	item = new JRadioButtonMenuItem(itsFontList[i]);
-	theFontMenu.add(item);
-	itsFontMenuGroup.add(item);
-	item.addActionListener(Actions.fontPopUpAction);
-      }
+      for ( int i = 0; i < itsFontList.length; i++)
+	  {
+	      item = new JRadioButtonMenuItem(itsFontList[i]);
+	      theFontMenu.add(item);
+	      itsFontMenuGroup.add(item);
+	      item.addActionListener(Actions.fontPopUpAction);
+	  }
   }
 
   public static TextPopUpMenu getInstance()

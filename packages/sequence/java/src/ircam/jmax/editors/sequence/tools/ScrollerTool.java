@@ -93,7 +93,7 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
 		if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
 		    {
 			//vertical scroll
-			((VerticalScrollable)egc.getAdapter()).incrYTransp(-deltaY);
+			((VerticalScrollable)egc.getAdapter()).incrYTransp(deltaY);
 			egc.getGraphicDestination().repaint();
 		    }
 	}

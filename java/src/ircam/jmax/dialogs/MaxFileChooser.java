@@ -304,3 +304,4 @@ public class MaxFileChooser
     return chooseFileToSave( frame, oldFile, title);
   }
 }
+

@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence.menus;
+package ircam.jmax.editors.sequence.actions;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,23 +31,20 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.sequence.*;
-import ircam.jmax.editors.sequence.actions.*;
+import ircam.jmax.editors.sequence.track.*;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
 
-/** Implement the patcher editor File Menu */
-
-public class FileMenu extends DefaultFileMenu
+public class ExportAction extends EditorAction
 {
-  public FileMenu()
+  public void doAction(EditorContainer container)
   {
-     insertSeparator(2);
-     insert(Actions.exportAction, "Export", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-
-     insertSeparator(8/*6*/);
-     insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 9/*7*/);
+      SequencePanel panel = (SequencePanel)container.getEditor();
+      Track track = ((SequencePanel)container.getEditor()).getCurrentTrack();
+      if(track!=null)
+	  track.getFtsTrack().export();
   }
 }
-

@@ -62,7 +62,8 @@ public class PackageClassLoader extends ClassLoader {
 		FileInputStream in = new  FileInputStream(classfile);
 		byte[] data = new byte[in.available()];
 		in.read(data);
-		claz = defineClass(data, 0, data.length);
+		//claz = defineClass(data, 0, data.length);
+		claz = defineClass(name, data, 0, data.length);
 		loadedClasses.put(name, claz);
 	    } catch (FileNotFoundException e) {
 		claz = findSystemClass(name);

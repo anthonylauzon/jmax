@@ -177,6 +177,7 @@ public class Platform
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
     FONT_NAME = Toolkit.getDefaultToolkit().getFontList()[1];
+    //FONT_NAME = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[1];
     FONT_SIZE   = 10;
 
     //FONT_NAME   = new String("helvetica");

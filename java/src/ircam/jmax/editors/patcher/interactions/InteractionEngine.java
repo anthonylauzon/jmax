@@ -240,6 +240,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     
     squeack |= getModifiersBits(e);
 
+
     if (followingLocations || followingInOutletLocations)
       {
 	
@@ -254,7 +255,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 	
 	squeack |= getLocationBits(area);
       }
-    
+
     autoScrollIfNeeded(editor, squeack, mouse, oldMouse);
 
     if (! scrollTimer.isRunning())

@@ -93,7 +93,8 @@ class JMaxCmd implements Command
 
 	    // Finally, return the document to the tcl interpreter
     
-	    interp.setResult(ReflectObject.newInstance(interp, document));
+	    //interp.setResult(ReflectObject.newInstance(interp, document));
+	    interp.setResult(ReflectObject.newInstance(interp, document.getClass(), document));
 	  }
 	else
 	  new TclException(interp, docType + " is not a tcl based jMax Document");

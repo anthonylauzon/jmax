@@ -44,7 +44,7 @@ import java.util.*;
  * A concrete implementation of the SequenceDataModel,
  * this class represents a model of a set of tracks.
  */
-public class FtsSequenceObject extends FtsObject implements SequenceDataModel
+public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDataModel
 {
 
   /**
@@ -80,9 +80,10 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
    */
   public void openEditor(int nArgs, FtsAtom args[])
   {
-    if(sequence == null)
-      sequence = new Sequence(this);
-
+      if(sequence == null){
+	  sequence = new Sequence(this);
+	  setEditorFrame(sequence);
+      }
     if (! sequence.isVisible())
       sequence.setVisible(true);
     sequence.toFront();
@@ -97,6 +98,7 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     {
       sequence.dispose();
       sequence = null;
+      setEditorFrame(null);
     }
   }
 
@@ -123,6 +125,8 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
       for(int i=0; i<nArgs; i++)
 	  {
 	      trackObj = (FtsTrackObject)(args[i].getObject());
+	      trackObj.setParent(this);//!!!!!!!!!!!
+
 	      track = new TrackBase(trackObj);
 	      tracks.addElement(track);
 	      notifyTrackAdded(track);

@@ -130,20 +130,22 @@ public class TextMenu extends EditorMenu
 
   private void FillFontMenu( JMenu theFontMenu)
   {
-    String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
-    JRadioButtonMenuItem item;
-    itsFontMenuGroup = new ButtonGroup();
+      String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
+      //String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+      
+      JRadioButtonMenuItem item;
+      itsFontMenuGroup = new ButtonGroup();
 
-    fakeFontButton = new JRadioButtonMenuItem( "fake");
-    itsFontMenuGroup.add(fakeFontButton);
+      fakeFontButton = new JRadioButtonMenuItem( "fake");
+      itsFontMenuGroup.add(fakeFontButton);
 
-    for ( int i = 0; i < itsFontList.length; i++)
-      {
-	item = new JRadioButtonMenuItem(itsFontList[i]);
-	theFontMenu.add(item);
-	itsFontMenuGroup.add(item);
-	item.addActionListener(Actions.fontAction);
-      }
+      for ( int i = 0; i < itsFontList.length; i++)
+	  {
+	      item = new JRadioButtonMenuItem(itsFontList[i]);
+	      theFontMenu.add(item);
+	      itsFontMenuGroup.add(item);
+	      item.addActionListener(Actions.fontAction);
+	  }
   }
 
   /** Set the font and size menu settings like this:

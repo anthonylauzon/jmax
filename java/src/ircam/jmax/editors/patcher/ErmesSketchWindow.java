@@ -158,6 +158,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     // Finally, activate the updates
     patcherData.startUpdates();
 
+    ((FtsPatcherObject)itsSketchPad.getFtsPatcher()).setEditorFrame(this);
+
     // Make it visible, at the end
     setVisible( true);
   }
@@ -248,6 +250,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     removeComponentListener( this);
     removeWindowListener(this);
+
+    ((FtsPatcherObject)itsSketchPad.getFtsPatcher()).setEditorFrame(null);
     itsSketchPad.cleanAll();
 
     itsSketchPad = null;

@@ -167,6 +167,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
   }
     
+    public void export()
+    {
+	sendMessage(FtsObject.systemInlet, "export_midi_dialog", 0, null);
+    }
+
     /**
      * how many events in the database?
      */

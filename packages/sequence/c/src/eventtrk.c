@@ -396,11 +396,11 @@ eventtrk_export_to_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_
   snprintf(str, 1024, "%s.mid", fts_symbol_name(track_name));
   default_name = fts_new_symbol_copy(str);
       
-  fts_set_symbol(a, seqsym_dialogFileSave);
+  fts_set_symbol(a, seqsym_export_midi);
   fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
   fts_set_symbol(a + 2, fts_get_project_dir());
   fts_set_symbol(a + 3, default_name);
-  fts_client_send_message(o, seqsym_dialogFileSave, 4, a);
+  fts_client_send_message((fts_object_t *)this, seqsym_dialogFileSave, 4, a);
 }
 
 static fts_status_t

@@ -159,7 +159,6 @@ public class TextRenderer implements ObjectRenderer
 
   public int getHeight()
   {
-    //return area.getPreferredSize().height;
     if(isTextLonger()||isMultiLine())
       return area.getPreferredSize().height;
     else

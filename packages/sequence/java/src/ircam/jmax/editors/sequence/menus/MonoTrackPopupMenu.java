@@ -130,6 +130,16 @@ public class MonoTrackPopupMenu extends JPopupMenu
     });
     add(item);
 
+    addSeparator();
+    item = new JMenuItem("Export Track");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    MonoTrackPopupMenu.getPopupTarget().getTrack().getFtsTrack().export();
+	}
+    });
+    add(item);
+
     pack();
   }
 
