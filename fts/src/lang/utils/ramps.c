@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
  *
  */
 
@@ -149,35 +149,6 @@ fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip)
   
   fts_ramp_value_set_incr(&ramp->value, incr, n_steps);
   ramp->n_steps = n_steps;
-}
-
-void 
-fts_ramp_jump(fts_ramp_t *ramp)
-{
-  fts_ramp_value_jump(&ramp->value);
-  ramp->n_steps = 0;
-}
-
-void 
-fts_ramp_freeze(fts_ramp_t *ramp)
-{
-  fts_ramp_value_freeze(&ramp->value);
-  ramp->n_steps = 0;
-}
-
-void
-fts_ramp_incr(fts_ramp_t *ramp)
-{
-  if(ramp->n_steps > 1)
-    {
-      fts_ramp_value_incr(&ramp->value);
-      ramp->n_steps--;
-    }
-  else if(ramp->n_steps > 0)
-    {
-      fts_ramp_value_jump(&ramp->value);
-      ramp->n_steps = 0;
-    }
 }
 
 void

@@ -122,18 +122,35 @@ extern void fts_ramp_set_interval(fts_ramp_t *ramp, float interval, float time, 
 extern void fts_ramp_set_slope(fts_ramp_t *ramp, float slope, float time, float rate);
 extern void fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip);
 
+#define fts_ramp_end(r) ((r)->n_steps <= 0)
+
+#define fts_ramp_get_value(r) ((r)->value.current)
+#define fts_ramp_get_incr(r) ((r)->value.incr)
+
 extern void fts_ramp_jump(fts_ramp_t *ramp);
 extern void fts_ramp_freeze(fts_ramp_t *ramp);
-
 extern void fts_ramp_incr(fts_ramp_t *ramp);
 
-#define fts_ramp_end(ramp) ((ramp)->n_steps <= 0)
+extern void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size);
+extern void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size);
+extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size);
 
-#define fts_ramp_get_value(ramp) ((ramp)->value.current)
+#define fts_ramp_jump(r) (fts_ramp_value_jump(&(r)->value), (r)->n_steps = 0)
 
-void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size);
-void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size);
-/* void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size); */
+#define fts_ramp_freeze(r) (fts_ramp_value_freeze(&(r)->value), (r)->n_steps = 0)
+
+#define fts_ramp_incr(r) \
+  if((r)->n_steps > 1) \
+    { \
+      fts_ramp_value_incr(&(r)->value); \
+      (r)->n_steps--; \
+    } \
+  else if((r)->n_steps > 0) \
+    { \
+      fts_ramp_value_jump(&(r)->value); \
+      (r)->n_steps = 0; \
+    } \
+
 
 #define fts_ramp_vec_mul_add(r, x, y, n) \
   if((r)->n_steps <= 0) \
@@ -158,6 +175,3 @@ void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long si
     }
 
 #endif
-
-
-

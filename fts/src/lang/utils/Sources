@@ -30,4 +30,5 @@ SOURCES = \
   hashtab.c \
   ramps.c \
   ramp_vectors.c \
-  srconv.c
+  srconv.c \
+  random.c
