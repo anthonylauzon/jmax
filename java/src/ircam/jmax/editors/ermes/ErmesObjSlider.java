@@ -16,7 +16,7 @@ class ErmesObjSlider extends ErmesObject {
   int itsInteger = 0;
   final static int BOTTOM_OFFSET = 10;
   final static int UP_OFFSET = 10;
-  final static int PREFERRED_RANGE_MAX = 128;
+  final static int PREFERRED_RANGE_MAX = 127;
   final static int PREFERRED_RANGE_MIN = 0;
   int itsRangeMax = PREFERRED_RANGE_MAX;
   int itsRangeMin = PREFERRED_RANGE_MIN;
