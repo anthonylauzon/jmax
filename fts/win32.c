@@ -26,7 +26,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <ftsprivate/platform.h>
+#include <ftsprivate/package.h>
 #include <fts/thread.h>
+
 #include <shlobj.h> /* SHGetFolderPath */
 
 HINSTANCE fts_hinstance = NULL;
