@@ -171,7 +171,7 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 
   public void restartEditing()  // (fd) public, because public in ErmesEditable...
   {
-    doEdit( 0);
+    doEdit( 0); 
   }
 
   public void startEditing()  // (fd) public, because public in ErmesEditable...
