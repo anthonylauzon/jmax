@@ -169,9 +169,10 @@ public class Platform
 
     FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
-    FONT_NAME   = new String("Arial");
+    //FONT_NAME   = new String("Arial");
+    FONT_NAME   = new String("Palatino");
 
-    PatcherFontManager.getInstance().setRecoveringFont("Arial");
+    PatcherFontManager.getInstance().setRecoveringFont(FONT_NAME);
     String[] fonts = {"SansSerif", "default", "Lucida Sans"};
     PatcherFontManager.getInstance().setToRecoverFonts(fonts);
 
