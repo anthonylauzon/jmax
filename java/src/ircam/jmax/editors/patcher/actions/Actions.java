@@ -60,6 +60,8 @@ public class Actions
 
   public static EditorAction resizeToMaxWidthAction  = new ResizeToMaxWidthAction();
   public static EditorAction resizeToMaxHeightAction = new ResizeToMaxHeightAction();
+  public static EditorAction resizeToMinWidthAction  = new ResizeToMinWidthAction();
+  public static EditorAction resizeToMinHeightAction = new ResizeToMinHeightAction();
 
   public static EditorAction deleteSelectionAction = new DeleteSelectionAction();
   public static EditorAction showErrorAction       = new ShowErrorAction();

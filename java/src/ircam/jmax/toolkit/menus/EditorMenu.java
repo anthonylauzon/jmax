@@ -52,19 +52,19 @@ public abstract class EditorMenu extends JMenu
     setDelay(0); // ?? Usefull ?
 
     addMenuListener(new MenuListener(){
-	    public void menuSelected(MenuEvent e)
-	    {
-		updateMenu();
-	    }
+	public void menuSelected(MenuEvent e)
+	{
+	  updateMenu();
+	}
 	
-	    public void menuDeselected(MenuEvent e)
-	    {
-	    }
-
-	    public void menuCanceled(MenuEvent e)
-	    {
-	    }
-	});
+	public void menuDeselected(MenuEvent e)
+	{
+	}
+	
+	public void menuCanceled(MenuEvent e)
+	{
+	}
+      });
   }
 
   public int DEFAULT_NUM_ENTRIES;

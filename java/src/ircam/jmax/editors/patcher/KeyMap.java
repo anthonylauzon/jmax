@@ -79,8 +79,10 @@ class KeyMap
 
     // Resize Align operations
 
-    add(Actions.resizeToMaxWidthAction, Event.CTRL_MASK | Event.META_MASK, KeyEvent.VK_RIGHT);
-    add(Actions.resizeToMaxHeightAction, Event.CTRL_MASK | Event.META_MASK, KeyEvent.VK_UP);
+    add(Actions.resizeToMaxWidthAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.resizeToMaxHeightAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_UP);
+    add(Actions.resizeToMinWidthAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_LEFT);
+    add(Actions.resizeToMinHeightAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
 
     // Delete selection
 

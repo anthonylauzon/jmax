@@ -111,8 +111,10 @@ public class EditMenu extends EditorMenu
 
   public void updateMenu()
   {
+    DataFlavor[] flavors = null;
     Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
-    DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
+    if( clipboardContent != null)
+      flavors = clipboardContent.getTransferDataFlavors();
 
     if (sketch.isLocked())
       {
@@ -122,9 +124,12 @@ public class EditMenu extends EditorMenu
 	copyItem.setEnabled(false);
 	duplicateItem.setEnabled(false);
 	
-	pasteItem.setEnabled((flavors != null) &&
-			     clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
-      
+	if( clipboardContent != null)
+	  pasteItem.setEnabled((flavors != null) && 
+			       clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
+	else
+	  pasteItem.setEnabled( false);
+
 	inspectItem.setEnabled(false);
       }
     else
@@ -148,8 +153,11 @@ public class EditMenu extends EditorMenu
 
 	    duplicateItem.setEnabled(false);
 
-	    pasteItem.setEnabled((flavors != null) &&
-				 clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
+	    if( clipboardContent != null)
+	      pasteItem.setEnabled((flavors != null) &&
+				   clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
+	    else
+	      pasteItem.setEnabled( false);
 	  }
 	else
 	  {
@@ -178,8 +186,11 @@ public class EditMenu extends EditorMenu
 		toBackMenuItem.setEnabled(true);
 	      }
 
-	    pasteItem.setEnabled((flavors != null) &&
-				 clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
+	    if( clipboardContent != null)
+	      pasteItem.setEnabled((flavors != null) &&
+				   clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
+	    else
+	      pasteItem.setEnabled( false);
 	  }
 
 	selectAllItem.setEnabled(true);	

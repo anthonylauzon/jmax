@@ -397,6 +397,56 @@ public class ErmesSelection implements Transferable
       }
   }
 
+  public void resizeToMinWidth()
+  {
+    getOwner().setUndo( "Resize", false, false);
+
+    int min = -1;
+
+    for ( Enumeration e = objects.elements(); e.hasMoreElements(); )
+      {
+	GraphicObject object = (GraphicObject) e.nextElement();
+	
+	if ( (min == -1) || object.getWidth() < min) 
+	  min = object.getWidth();
+      }
+
+    for ( Enumeration e = objects.elements(); e.hasMoreElements();) 
+      {
+	GraphicObject object = (GraphicObject) e.nextElement();
+	object.redraw();
+	object.redrawConnections();
+	object.setWidth( min);
+	object.redraw();
+	object.redrawConnections();
+      }
+  }
+
+  public void resizeToMinHeight()
+  {
+    getOwner().setUndo( "Resize", false, false);
+
+    int min = -1;
+
+    for ( Enumeration e = objects.elements(); e.hasMoreElements(); )
+      {
+	GraphicObject object = (GraphicObject) e.nextElement();
+
+	if ((min == -1) || object.getHeight() < min)
+	  min = object.getHeight();
+      }
+
+    for ( Enumeration e = objects.elements(); e.hasMoreElements(); ) 
+      {
+	GraphicObject object = (GraphicObject) e.nextElement();
+	object.redraw();
+	object.redrawConnections();
+	object.setHeight(min);
+	object.redraw();
+	object.redrawConnections();
+      }
+  }
+
   public void alignTop()
   {
     getOwner().setUndo( "Align", false, false);

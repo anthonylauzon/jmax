@@ -37,6 +37,8 @@ RemoveInOutletConnection.java\
 ResizeAction.java\
 ResizeToMaxHeightAction.java\
 ResizeToMaxWidthAction.java\
+ResizeToMinHeightAction.java\
+ResizeToMinWidthAction.java\
 SaveToAction.java\
 ScalePatcherAction.java\
 SelectAllAction.java\
