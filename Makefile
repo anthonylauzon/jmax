@@ -148,7 +148,7 @@ cvs-tag: spec-files
 #
 spec-files:
 	$(MAKE) -C utils/rpm $@
-#	$(MAKE) -C utils/sgi $@
+	$(MAKE) -C utils/sgi $@
 .PHONY: spec-files
 
 #
