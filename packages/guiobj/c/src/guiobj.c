@@ -26,46 +26,48 @@
 
 #include "guiobj.h"
 
-extern void toggle_config(void);
-extern void messconst_config(void);
-extern void panel_config(void);
-extern void gint_config(void);
-extern void slider_config(void);
-extern void gfloat_config(void);
+extern void button_config(void);
 extern void comment_config(void);
 extern void comment_doctor_init(void);
-extern void button_config(void);
-extern void fork_config(void);
-extern void keyserver_config(void);
-extern void key_config(void);
+extern void console_config( void);
 extern void display_config(void);
-extern void vecdisplay_config(void);
-extern void scope_config(void);
 extern void dspcontrol_config(void);
-extern void finder_config(void);
 extern void error_finder_config(void);
+extern void finder_config(void);
+extern void fork_config(void);
+extern void gfloat_config(void);
+extern void gint_config(void);
+extern void key_config(void);
+extern void keyserver_config(void);
+extern void messconst_config(void);
+extern void panel_config(void);
 extern void runtime_errors_config(void);
+extern void scope_config(void);
+extern void slider_config(void);
+extern void toggle_config(void);
+extern void vecdisplay_config(void);
 
 void
 guiobj_config(void)
 {
-  toggle_config();
-  messconst_config();
-  panel_config();
-  gint_config();
-  slider_config();
-  gfloat_config();
+  button_config();
   comment_config();
   comment_doctor_init();
-  button_config();
-  fork_config();
-  keyserver_config();
-  key_config();
+  console_config();
   display_config();
-  vecdisplay_config();
-  scope_config();
   dspcontrol_config();
-  finder_config();
   error_finder_config();
+  finder_config();
+  fork_config();
+  gfloat_config();
+  gint_config();
+  key_config();
+  keyserver_config();
+  messconst_config();
+  panel_config();
   runtime_errors_config();
+  scope_config();
+  slider_config();
+  toggle_config();
+/*    vecdisplay_config(); */
 }
