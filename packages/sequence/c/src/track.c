@@ -404,7 +404,7 @@ track_highlight_cluster(track_t *track, event_t *event, event_t *next)
       fts_atom_t at[64];
       int ac = 0;
 
-      while(event && event != next)
+      while(event && ( event != next) && ( ac < 64))
 	{
 	  fts_set_object(at + ac, (fts_object_t *)event);
 	  ac++;
@@ -430,7 +430,7 @@ track_highlight_and_next(track_t *track, event_t *event)
       ac++;
       event = event_get_next(event);
 
-      while(event && event_get_time(event) == time)
+      while(event && ( event_get_time(event) == time) && (ac < 64))
 	{
 	  fts_set_object(at + ac, (fts_object_t *)event);
 	  ac++;
