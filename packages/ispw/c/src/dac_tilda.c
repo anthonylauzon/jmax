@@ -37,7 +37,7 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     inlets = 2;
   else
     inlets = ac;
-#warning (OLD API) fts_audioport_get_default (OLD API)
+/* #warning (OLD API) fts_audioport_get_default (OLD API) */
 /*   this->port = fts_audioport_get_default( o); */
   if ( !this->port)
     {
@@ -86,11 +86,11 @@ static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
   int i;
   fts_object_t *outdispatcher;
 
-#warning (OLD API) fts_audioport_get_output_dispatcher (OLD API)
+/* #warning (OLD API) fts_audioport_get_output_dispatcher (OLD API) */
 /*   outdispatcher = fts_audioport_get_output_dispatcher( this->port); */
 /*   i = this->indexes[ inlet]; */
 
-#warning (OLD API) fts_audioport_get_output_channels (OLD API)
+/* #warning (OLD API) fts_audioport_get_output_channels (OLD API) */
 /*   if ( outdispatcher && i >= 0 && i < fts_audioport_get_output_channels( this->port)) */
 /*     (*propagate_fun)( propagate_context, outdispatcher, i); */
 }
