@@ -45,9 +45,9 @@ listsum_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       const fts_atom_t *atom = at + i;
 
-      if(fts_is_a(atom, fts_s_int))
+      if(fts_is_int(atom))
 	i_sum += fts_get_int(atom);
-      else if(fts_is_a(atom, fts_s_float))
+      else if(fts_is_float(atom))
 	f_sum += fts_get_float(atom);
     }
 

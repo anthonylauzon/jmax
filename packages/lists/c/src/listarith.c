@@ -328,7 +328,7 @@ atom_ne(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 	fts_set_int(result, 1);
     }
   else
-    fts_set_int(result, (fts_get_type(left) != fts_get_type(right)) || (fts_get_int(left) != fts_get_int(right)));
+    fts_set_int(result, (!fts_atom_same_type(left, right)) || (fts_get_int(left) != fts_get_int(right)));
 }
 
 static void
@@ -357,7 +357,7 @@ atom_ee(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 	fts_set_int(result, 0);
     }
   else
-    fts_set_int(result, (fts_get_type(left) == fts_get_type(right)) && (fts_get_int(left) == fts_get_int(right)));
+    fts_set_int(result, (fts_atom_same_type(left, right)) && (fts_get_int(left) == fts_get_int(right)));
 }
 
 /*********************************************
@@ -381,7 +381,7 @@ listarith_set_right_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   listarith_t *this = (listarith_t *)o;
   
   this->right_atom = at[0];
-  this->right_type = fts_get_type(at);
+  this->right_type = fts_get_selector(at);
 } 
 
 

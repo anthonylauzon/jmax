@@ -56,7 +56,7 @@ binop_ivec_init_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
       this->res = ivec_atom_get(at + 2);
       fts_object_refer((fts_object_t *)this->res);
       
-      ivec_atom_set(&this->out, this->res);
+      fts_set_object(&this->out, this->res);
     }
 }
 
@@ -73,7 +73,7 @@ binop_ivec_init_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
       this->res = ivec_atom_get(at + 2);
       fts_object_refer((fts_object_t *)this->res);
 
-      ivec_atom_set(&this->out, this->res);
+      fts_set_object(&this->out, this->res);
     }
 }
 
@@ -130,7 +130,7 @@ binop_ivec_set_result(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   this->res = res;
   fts_object_refer((fts_object_t *)res);
 
-  ivec_atom_set(&this->out, res);
+  fts_set_object(&this->out, res);
 }
 
 /**************************************************************************************
