@@ -31,9 +31,12 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/syspackages/ossdev
 	$(INSTALL_DATA) ossdev.jpk $(lib_install_dir)/syspackages/ossdev
-	( cd c ; $(MAKE) $@)
-.PHONY: install
+	$(INSTALL_DATA) ossdev.scm $(lib_install_dir)/syspackages/ossdev
+.PHONY: install-noarch
 
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch

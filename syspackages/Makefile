@@ -36,10 +36,15 @@ clean:
 	for i in $(SYS_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
 .PHONY: clean
 
-install:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/syspackages
 	for i in $(SYS_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
-.PHONY: install
+.PHONY: install-noarch
+
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/syspackages
+	for i in $(SYS_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
+.PHONY: install-arch
 
 
 

@@ -31,10 +31,10 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install:
-	$(INSTALL_DIR) $(lib_install_dir)/syspackages/sgidev/c
-	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)/syspackages/sgidev/c/lib/$$d/opt ; done
-	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_LIB) libsgidev.so $(lib_install_dir)/syspackages/sgidev/c/lib/$$d/opt ) ; done
-.PHONY: install
+install-arch:
+	$(INSTALL_DIR) $(lib_install_dir)/syspackages/sgidev/c/lib/$(ARCH)/opt
+	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libsgidev.so $(lib_install_dir)/syspackages/sgidev/c/lib/$(ARCH)/opt )
+.PHONY: install-arch
+
 
 

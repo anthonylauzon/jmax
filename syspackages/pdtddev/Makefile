@@ -31,9 +31,12 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/syspackages/pdtddev
 	$(INSTALL_DATA) pdtddev.jpk $(lib_install_dir)/syspackages/pdtddev
-	( cd c ; $(MAKE) $@)
-.PHONY: install
+	$(INSTALL_DATA) pdtddev.scm $(lib_install_dir)/syspackages/pdtddev
+.PHONY: install-noarch
 
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch

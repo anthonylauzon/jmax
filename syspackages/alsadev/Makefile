@@ -31,9 +31,14 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/syspackages/alsadev
 	$(INSTALL_DATA) alsadev.jpk $(lib_install_dir)/syspackages/alsadev
-	( cd c ; $(MAKE) $@)
-.PHONY: install
+	$(INSTALL_DATA) alsadev.scm $(lib_install_dir)/syspackages/alsadev
+.PHONY: install-noarch
+
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch
+
 

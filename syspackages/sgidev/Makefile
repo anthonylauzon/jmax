@@ -31,9 +31,12 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/syspackages/sgidev
 	$(INSTALL_DATA) sgidev.jpk $(lib_install_dir)/syspackages/sgidev
-	( cd c ; $(MAKE) $@)
-.PHONY: install
+	$(INSTALL_DATA) sgidev.scm $(lib_install_dir)/syspackages/sgidev
+.PHONY: install-noarch
 
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch
