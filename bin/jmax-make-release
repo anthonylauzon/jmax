@@ -12,22 +12,6 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 #
-# $Log: jmax-make-release,v $
-# Revision 1.11  1999/06/03  10:17:03  dechelle
-# *** empty log message ***
-#
-# Revision 1.10  1999/06/02  12:09:22  dechelle
-# *** empty log message ***
-#
-# Revision 1.9  1999/06/01  15:15:47  dechelle
-# Trying $Log: jmax-make-release,v $
-# Revision 1.11  1999/06/03  10:17:03  dechelle
-# *** empty log message ***
-#
-# Revision 1.10  1999/06/02  12:09:22  dechelle
-# *** empty log message ***
-#
-#
 
 # ***************************************************************************
 # Constants
@@ -198,7 +182,7 @@ compute_version_number ()
 # ---------------------------------------------------------------------------
 create_dest_dir()
 {
-    DEST_DIR=${TMP}/$$/max-${VERSION}
+    DEST_DIR=${TMP}/$$/max-${VERSION_NUMBER}
     if [ -d ${DEST_DIR} ]
     then
 	/bin/rm -rf ${DEST_DIR}
@@ -294,7 +278,7 @@ select_files ()
 # args: TYPE ARCH 
 create_tar ()
 {
-    TARDIR=${RELEASES_DIR}/${VERSION}
+    TARDIR=${RELEASES_DIR}/${VERSION_NUMBER}
     if [ ! -d ${TARDIR} ]
     then
 	mkdir -p ${TARDIR}
@@ -304,7 +288,7 @@ create_tar ()
 	chmod u+w ${TARDIR}
     fi
 
-    TARFILE=${TARDIR}/jmax.$1.$2.${VERSION}.tar.gz
+    TARFILE=${TARDIR}/jmax.$1.$2.${VERSION_NUMBER}.tar.gz
 
     if [ ! -w ${TARFILE} ]
     then
@@ -312,7 +296,7 @@ create_tar ()
     fi
 
     inform "creating tar file $TARFILE"
-    (cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
+    (cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION_NUMBER} ) | gzip -9 > $TARFILE
 
     chmod 444 ${TARFILE}
     chmod 555 ${TARDIR}
