@@ -80,7 +80,7 @@ $(OBJDIR)/%.o : %.c
 .PRECIOUS: $(OBJDIR)/%.o
 
 $(LIBDIR)/%.so: $(OBJECTS)
-	$(LDSO) $(LDSOFLAGS) -o $@ $^ $(SOLIBS) $(MORESOLIBS)
+	$(LDSO) $(LDSOFLAGS) $(FTS_SOFLAGS) -o $@ $^ $(SOLIBS) $(MORESOLIBS)
 
 $(LIBDIR):
 	mkdir -p $(LIBDIR)
