@@ -31,10 +31,10 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)packages/explode/java/classes
 	( cd classes ; $(INSTALL_DATA) explode.jar $(lib_install_dir)packages/explode/java/classes )
-.PHONY: install
+.PHONY: install-exec
 
 uninstall:
 .PHONY: uninstall

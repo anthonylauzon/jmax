@@ -27,7 +27,7 @@ include VERSION
 
 ifdef SNAPSHOT
 version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)$(SNAPSHOT)
-disttag=substV_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
+disttag=V_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
 else
 version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)
 disttag=V_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)
@@ -39,22 +39,26 @@ ifeq ($(ARCH),sgi)
 INSTALL=install
 INSTALL_DATA=$(INSTALL) -m 644
 INSTALL_PROGRAM=$(INSTALL) -m 755
+INSTALL_SETUID=$(INSTALL) -m 4755
 INSTALL_DIR=$(INSTALL) -d -m 755
 prefix=/usr
 doc_install_dir=$(prefix)/webdocs/jmax/$(version)/
 lib_install_dir=$(prefix)/lib/jmax/$(version)/
 include_install_dir=$(prefix)/include/
+bin_install_dir=$(prefix)/bin
 SUB_ARCHS=irix65r10k irix65r5k
 else
 ifeq ($(ARCH),linuxpc)
 INSTALL=install
 INSTALL_DATA=$(INSTALL) --mode=0644
 INSTALL_PROGRAM=$(INSTALL) --mode=0755
+INSTALL_SETUID=$(INSTALL) --mode=4755
 INSTALL_DIR=$(INSTALL) -d --mode=0755
 prefix=/usr
 doc_install_dir=$(prefix)/doc/jmax/$(version)/
 lib_install_dir=$(prefix)/lib/jmax/$(version)/
 include_install_dir=$(prefix)/include/
+bin_install_dir=$(prefix)/bin
 SUB_ARCHS=linuxpc
 else
 endif
@@ -98,15 +102,26 @@ clean_java:
 	(cd packages; $(MAKE) clean_java)
 .PHONY: clean_java
 
+#
+# TAGS
+# do the TAGS file
+#
 TAGS:
 	find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.tcl" -o -name "*.html" \) -print | etags -t -
 .PHONY: TAGS
 
-cvstag:
+#
+# cvs-tag
+#
+cvs-tag:
 	cvs tag -F $(disttag)
-.PHONY: cvstag
+.PHONY: cvs-tag
 
-dist: cvstag
+#
+# dist
+# does a cvs export and a .tar.gz of the sources
+#
+dist: cvs-tag
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	cvs export -r $(disttag) -d $(distdir) max
@@ -114,25 +129,79 @@ dist: cvstag
 	rm -rf $(distdir)
 .PHONY: dist
 
-# copies the files to $(prefix)/...
-install:
+#
+# install
+# copies the files to the right directories
+#
+install: install-exec install-doc install-includes
+.PHONY: install
+
+install-doc:
 	$(INSTALL_DIR) $(doc_install_dir)
-	$(INSTALL_DIR) $(lib_install_dir)
 	$(INSTALL_DATA) LICENCE.fr $(doc_install_dir)
 	$(INSTALL_DATA) LICENSE $(doc_install_dir)
 	$(INSTALL_DATA) README $(doc_install_dir)
 	$(INSTALL_DATA) VERSION $(doc_install_dir)
-	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) install )
-	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) doc_install_dir=$(doc_install_dir) install )
-	( cd config ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) lib_install_dir=$(lib_install_dir) install )
-	( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) lib_install_dir=$(lib_install_dir) include_install_dir=$(include_install_dir) install )
-	( cd images ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) lib_install_dir=$(lib_install_dir) install )
-	( cd java ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) lib_install_dir=$(lib_install_dir) install )
-	( cd tcl ; $(MAKE) install INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) lib_install_dir=$(lib_install_dir) install )
-	( cd packages ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) lib_install_dir=$(lib_install_dir) SUB_ARCHS="$(SUB_ARCHS)" install )
-.PHONY: install
+	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" prefix=$(prefix) doc_install_dir=$(doc_install_dir) $@ )
+.PHONY: install-doc
 
-# remove the files copied by make install ?
+install-exec:
+	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) $@ )
+	$(INSTALL_DIR) $(lib_install_dir)
+	( cd config ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd images ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd java ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd tcl ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) $@ )
+	( cd packages ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) SUB_ARCHS="$(SUB_ARCHS)" $@ )
+.PHONY: install-exec
+
+install-includes:
+	( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" include_install_dir=$(include_install_dir) $@ )
+.PHONY: install-includes
+
+
+#
+# idb
+# creates the SGI idb file
+#
+idb:
+	( RAWIDB=/tmp/idb ; export RAWIDB ; $(MAKE) install )
+#	( SRC=$$HOME; export SRC ; RAWIDB=/tmp/idb ; export RAWIDB ; $(MAKE) install )
+
+#
+# uninstall
+# remove the files copied by make install
+# (to be completed)
 uninstall:
 .PHONY: uninstall
 
+
+#
+# new-snapshot, new-patch, new-minor, new-major
+# version number manipulation
+# 'make new-snapshot' and 'make new-patch' are the most frequent
+#
+new-snapshot:
+	echo "MAJOR=$(MAJOR)" > VERSION
+	echo "MINOR=$(MINOR)" >> VERSION
+	echo "PATCH_LEVEL=$(PATCH_LEVEL)" >> VERSION
+	echo "SNAPSHOT="`echo $(SNAPSHOT) | tr a-yz b-za` >> VERSION
+
+new-patch:
+	echo "MAJOR=$(MAJOR)" > VERSION
+	echo "MINOR=$(MINOR)" >> VERSION
+	echo "PATCH_LEVEL="`expr $(PATCH_LEVEL) + 1` >> VERSION
+	echo "SNAPSHOT=a" >> VERSION
+
+new-minor:
+	echo "MAJOR=$(MAJOR)" > VERSION
+	echo "MINOR="`expr $(MINOR) + 1` >> VERSION
+	echo "PATCH_LEVEL=0" >> VERSION
+	echo "SNAPSHOT=a" >> VERSION
+
+new-major:
+	echo "MAJOR="`expr $(MAJOR) + 1` > VERSION
+	echo "MINOR=0" >> VERSION
+	echo "PATCH_LEVEL=0" >> VERSION
+	echo "SNAPSHOT=a" >> VERSION

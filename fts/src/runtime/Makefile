@@ -44,11 +44,11 @@ clean:
 	(cd thread; $(MAKE) clean)
 .PHONY: all
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts/runtime
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime ; done
-	for d in audio client devices files midi sched thread time ; do ( cd $$d ; $(MAKE) install ) ; done
-.PHONY: install
+	for d in audio client devices files midi sched thread time ; do ( cd $$d ; $(MAKE) $@ ) ; done
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:

@@ -34,10 +34,10 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDevices.a
 $(LIBDIR)/libDevices.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDevices.a $(OBJECTS)
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts/runtime/devices
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/devices ; done
-.PHONY: install
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:

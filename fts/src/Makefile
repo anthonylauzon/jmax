@@ -39,11 +39,11 @@ clean:
 	(cd tiles; $(MAKE) clean)
 .PHONY: all
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts ; done
-	for d in lang runtime sys ; do (cd $$d ; $(MAKE) install ) ; done
-.PHONY: install
+	for d in lang runtime sys ; do (cd $$d ; $(MAKE) $@ ) ; done
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:

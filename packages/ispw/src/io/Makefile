@@ -35,8 +35,6 @@ endif
 
 PACKAGELIB=$(LIBDIR)/libio.so
 
-MORESOLIBS=$(JMAXROOTDIR)/lib/protocol/c/lib/$(ARCH)/libProtocol.a
-
 all: $(PACKAGELIB)
 
 TOCLEAN = $(PACKAGELIB)

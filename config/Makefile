@@ -23,10 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/config
 	for f in *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/config ; done
-.PHONY: install
+.PHONY: install-exec
 
 # remove the files copied by make install ?
 uninstall:

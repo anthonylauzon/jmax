@@ -31,8 +31,8 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install:
-.PHONY: install
+install-exec:
+.PHONY: install-exec
 
 uninstall:
 .PHONY: uninstall

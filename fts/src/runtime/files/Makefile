@@ -33,10 +33,10 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libFiles.a
 $(LIBDIR)/libFiles.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libFiles.a $(OBJECTS)
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts/runtime/files
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/files ; done
-.PHONY: install
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:

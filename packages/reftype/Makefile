@@ -39,3 +39,5 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
+install-exec:
+.PHONY: install-exec

@@ -23,10 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/java/classes
 	$(INSTALL_DATA) jmax.jar $(lib_install_dir)/java/classes
-.PHONY: install
+.PHONY: install-exec
 
 # remove the files copied by make install ?
 uninstall:

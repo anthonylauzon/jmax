@@ -45,10 +45,10 @@ $$1=="SNAPSHOT"  {sn=$$2;} \
 END { printf("#define FTS_VERSION_STRING \"jMax server version %d.%d.%d%s\"\n",ma,mi,pa,sn); } \
 ' < $(ROOTDIR)/../VERSION >> version.h
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts/sys
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/sys ; done
-.PHONY: install
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:

@@ -32,10 +32,10 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libClient.a
 $(LIBDIR)/libClient.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libClient.a $(OBJECTS)
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts/runtime/client
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/client ; done
-.PHONY: install
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:

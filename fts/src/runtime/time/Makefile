@@ -32,10 +32,10 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libTime.a
 $(LIBDIR)/libTime.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libTime.a $(OBJECTS)
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts/runtime/time
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/time ; done
-.PHONY: install
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:

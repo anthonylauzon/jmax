@@ -22,7 +22,8 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
-C_TARGETS=control generic guiobj io ispw lists mess numeric sources system reftypes
+
+C_TARGETS=control generic guiobj io ispw lists mess numeric sources system reftype
 
 JAVA_TARGETS=table
 MIXED_TARGETS=explode qlist
@@ -53,12 +54,12 @@ clean_java:
 	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_java ; fi ) ; done
 .PHONY: clean_java
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)packages
-	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) install) ; done
-	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) install ) ; done
-	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) install ) ; done
-.PHONY: install
+	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) $@) ; done
+	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done
+	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) $@ ) ; done
+.PHONY: install-exec
 
 uninstall:
 .PHONY: uninstall

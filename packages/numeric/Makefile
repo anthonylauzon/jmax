@@ -39,12 +39,12 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/numeric
 	$(INSTALL_DATA) numeric.jpk $(lib_install_dir)/packages/numeric
-	( cd c ; $(MAKE) install)
-	( cd help; $(MAKE) install)
-.PHONY: install
+	( cd c ; $(MAKE) $@)
+	( cd help; $(MAKE) $@)
+.PHONY: install-exec
 
 uninstall:
 .PHONY: uninstall

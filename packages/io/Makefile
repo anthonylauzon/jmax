@@ -31,11 +31,11 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/io
 	$(INSTALL_DATA) io.jpk $(lib_install_dir)/packages/io
-	( cd c ; $(MAKE) install)
-.PHONY: install
+	( cd c ; $(MAKE) $@)
+.PHONY: install-exec
 
 uninstall:
 .PHONY: uninstall

@@ -49,13 +49,13 @@ clean_java:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist
 	$(INSTALL_DATA) qlist.jpk $(lib_install_dir)/packages/qlist
-	( cd c ; $(MAKE) install)
-	( cd help; $(MAKE) install)
-	( cd java; $(MAKE) install)
-.PHONY: install
+	( cd c ; $(MAKE) $@)
+	( cd help; $(MAKE) $@)
+	( cd java; $(MAKE) $@)
+.PHONY: install-exec
 
 uninstall:
 .PHONY: uninstall

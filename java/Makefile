@@ -32,8 +32,8 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)java
-	( cd classes ; $(MAKE) install )
-	( cd lib ; $(MAKE) install )
-.PHONY: install
+	( cd classes ; $(MAKE) $@ )
+	( cd lib ; $(MAKE) $@ )
+.PHONY: install-exec

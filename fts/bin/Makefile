@@ -25,21 +25,21 @@
 
 ifeq ($(ARCH),sgi)
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/irix65r5k/opt
 	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/irix65r10k/opt
-	( cd irix65r5k/opt ; $(INSTALL_PROGRAM) fts $(lib_install_dir)/fts/bin/irix65r5k/opt )
-	( cd irix65r10k/opt ; $(INSTALL_PROGRAM) fts $(lib_install_dir)/fts/bin/irix65r10k/opt )
-	( cd irix65r10k/opt ; $(INSTALL_PROGRAM) fts.on1 $(lib_install_dir)/fts/bin/irix65r10k/opt )
-.PHONY: install
+	( cd irix65r5k/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/irix65r5k/opt )
+	( cd irix65r10k/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)/fts/bin/irix65r10k/opt )
+	( cd irix65r10k/opt ; $(INSTALL_SETUID) fts.on1 $(lib_install_dir)/fts/bin/irix65r10k/opt )
+.PHONY: install-exec
 
 else
 ifeq ($(ARCH),linuxpc)
 
-install:
+install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)fts/bin/linuxpc/opt
-	( cd linuxpc/opt ; $(INSTALL_PROGRAM) fts $(lib_install_dir)fts/bin/linuxpc/opt )
-.PHONY: install
+	( cd linuxpc/opt ; $(INSTALL_SETUID) fts $(lib_install_dir)fts/bin/linuxpc/opt )
+.PHONY: install-exec
 
 endif
 endif

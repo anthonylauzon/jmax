@@ -32,10 +32,10 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libMidi.a
 $(LIBDIR)/libMidi.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libMidi.a $(OBJECTS)
 
-install:
+install-includes:
 	$(INSTALL_DIR) $(include_install_dir)fts/runtime/midi
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/midi ; done
-.PHONY: install
+.PHONY: install-includes
 
 # remove the files copied by make install ?
 uninstall:
