@@ -747,6 +747,12 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_explode) &&
 	       (lastNObjectType == fts_s_explode))
 	{
+	  /* First, look if we have a name there */
+
+
+	  if (argc >= 2)
+	    fts_object_put_prop(lastNObject, fts_s_name, &args[1]);
+
 	  fts_patparse_set_text_graphic_properties(graphicDescr, lastNObject);
 	}
       else

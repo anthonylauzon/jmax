@@ -674,3 +674,4 @@ fts_binary_file_load
 fts_get_object_by_name
 fts_register_named_object
 fts_unregister_named_object
+fts_object_change_description

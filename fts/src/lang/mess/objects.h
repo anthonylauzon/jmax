@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/04/21 12:05:45 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/04/23 16:07:21 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -38,6 +38,10 @@ extern void fts_objects_init(void);
 extern fts_object_t *fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at);
 extern void          fts_object_delete(fts_object_t *);
 extern void          fts_object_send_properties(fts_object_t *obj);
+
+/* .pat support *only*, don't use for new stuff */
+
+extern void fts_object_change_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
 
 /* Connections */
 

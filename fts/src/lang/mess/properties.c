@@ -249,7 +249,7 @@ fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *
   fts_property_daemon_t d;
 
   d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_put, property);
-
+  
   if (d)
     (* d)(obj_property_put, obj, 0, property, (fts_atom_t *)value);
   else

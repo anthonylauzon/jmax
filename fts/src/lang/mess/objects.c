@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.14 $ IRCAM $Date: 1998/04/22 20:27:46 $
+ *      $Revision: 1.15 $ IRCAM $Date: 1998/04/23 16:07:20 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -169,6 +169,39 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   return obj;
 }
+
+/* This is to support "changing" objects; usefull during 
+   .pat loading, where not all the information is available 
+   at the right place; used currently explode in the fts1.5 package.
+   */
+
+void fts_object_change_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
+{
+  int i;
+
+  if (obj->argc == argc)
+    {
+      /* Just copy the values, the size is correct */
+      
+      for (i = 0; i < argc; i++)
+	obj->argv[i] = argv[i];
+    }
+  else
+    {
+      /* Free the old object description */
+
+      fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+
+      /* reallocate the description and copy the arguments */
+
+      obj->argc = argc;
+      obj->argv = (fts_atom_t *) fts_block_zalloc(argc * sizeof(fts_atom_t));
+
+      for (i = 0; i < argc; i++)
+	obj->argv[i] = argv[i];
+    }
+}
+
 
 
 void
