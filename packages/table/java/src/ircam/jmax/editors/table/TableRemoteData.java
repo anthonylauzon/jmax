@@ -27,6 +27,7 @@ package ircam.jmax.editors.table;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.utils.*;
 
@@ -47,6 +48,10 @@ public class TableRemoteData implements TableDataModel, ClipableData, ClipboardO
     itsData = theData;
 
     listeners = new MaxVector();
+  }
+
+  public MaxDocument getDocument(){
+    return itsData.getDocument();
   }
 
   /**

@@ -113,7 +113,7 @@ public class EditMenu extends EditorMenu
 	duplicateItem.setEnabled(true);
       }
     pasteItem.setEnabled((flavors != null) &&
-			  clipboardContent.isDataFlavorSupported(ExplodeDataFlavor.getInstance()));
+    		  clipboardContent.isDataFlavorSupported(ExplodeDataFlavor.getInstance()));
   }
 }
 

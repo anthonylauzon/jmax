@@ -36,6 +36,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 
   /**
@@ -177,6 +178,11 @@ public class ExplodePanel extends JPanel implements Editor{
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
+
+  public MaxDocument getDocument(){
+    return explodeRemoteData.getDocument();
+  }
+
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
   }

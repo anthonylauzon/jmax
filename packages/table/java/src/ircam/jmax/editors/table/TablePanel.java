@@ -27,6 +27,7 @@ package ircam.jmax.editors.table;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
@@ -231,13 +232,21 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	    step = 25;
       else if (range <1000)
 	step = 50; 
-      else if (range <10000)
+      else if (range <2000)
 	step = 100;
-	  else 
-	    {
-	      startValue = (ta.getInvY(0)/1000)*1000; 
-	      step = 500;
-	    }
+      else if (range <4000)
+	step = 200;
+      else if (range <12000)
+	step = 500;
+       else if (range <20000)
+	step = 1000;
+      else if (range <50000)
+	step = 2000;
+      else 
+	{
+	  startValue = (ta.getInvY(0)/5000)*5000; 
+	  step = 5000;
+	}
       
       startValue = (ta.getInvY(0)/step)*step;
       
@@ -714,6 +723,11 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   public EditorContainer getEditorContainer(){
     return itsEditorContainer;
   }
+
+  public MaxDocument getDocument(){
+    return getData().getDocument();
+  }
+  
   public void Close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
   }

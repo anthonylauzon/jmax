@@ -25,10 +25,12 @@
 
 package ircam.jmax.editors.qlist;
 
-import java.lang.*;
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
+
+import java.lang.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
@@ -286,6 +288,11 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner, Docume
   public EditorContainer getEditorContainer(){
     return itsEditorContainer;
   }
+
+  public MaxDocument getDocument(){
+    return itsData.getDocument() ;
+  }
+
   public void Close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
   }
