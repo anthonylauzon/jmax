@@ -23,10 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ROOTDIR=.
+JMAXDISTDIR=.
 
 ifdef ARCH
-include $(ROOTDIR)/Makefiles/Makefile.$(ARCH)
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
 all:
