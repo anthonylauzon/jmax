@@ -73,7 +73,20 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     item.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 		  {
-				//((MidiTrackEditor)target).getTrack().getFtsTrack().appendBar();
+				((MidiTrackEditor)target).getTrack().getFtsTrack().appendBar( null);
+		  }
+		});	
+    add(item);
+		
+		item = new JMenuItem("Collapse markers");
+    item.addActionListener( new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				FtsTrackObject track = ((MidiTrackEditor)target).getTrack().getFtsTrack();
+				SequenceSelection sel = ((SequenceEditor)target).getMarkerSelection();
+				TrackEvent bar = null;
+				if(sel != null && sel.size() > 1)
+					track.collapseMarkers( sel.getSelected());
 		  }
 		});	
     add(item);
