@@ -260,8 +260,8 @@ dsaudioport_xrun(fts_audioport_t *port)
   
   if (!dev->no_xrun_message_already_posted) 
   {
-    post( "Warning: the audio device does not yet support out-of-sync detection\n");
-    post( "         Synchronisation errors (\"dac slip\") will not be reported\n");
+    fts_post( "Warning: the audio device does not yet support out-of-sync detection\n");
+    fts_post( "         Synchronisation errors (\"dac slip\") will not be reported\n");
     dev->no_xrun_message_already_posted = 1;
   }
   
@@ -643,7 +643,7 @@ dsaudioport_output_init(dsaudioport_t* dev, fts_symbol_t device_name, LPGUID gui
   hr = IDirectSoundBuffer_SetFormat(dev->primary_buffer, dev->format);
   if (hr != DS_OK) {
     /* just print a warning. this error is not fatal. */
-    post("Warning: dsaudioport: can't set format of primary sound buffer: %s\n", fts_win32_error(hr));
+    fts_post("Warning: dsaudioport: can't set format of primary sound buffer: %s\n", fts_win32_error(hr));
   }
   
 
@@ -870,14 +870,14 @@ fts_open_direct_sound(char *device)
 
   hr = DirectSoundCreate(NULL, &fts_direct_sound, NULL);
   if (hr != DS_OK) {
-    post( "Warning: dsaudioport: failed to create direct sound\n");
+    fts_post( "Warning: dsaudioport: failed to create direct sound\n");
     fts_direct_sound = NULL;
     return -2;
   }
 
   hr = IDirectSound_SetCooperativeLevel(fts_direct_sound, fts_wnd, DSSCL_PRIORITY);
   if (hr != DS_OK) {
-    post( "Warning: dsaudioport: failed to create set the cooperative level\n");
+    fts_post( "Warning: dsaudioport: failed to create set the cooperative level\n");
     IDirectSound_Release(fts_direct_sound); 
     fts_direct_sound = NULL;
     return -3;
@@ -889,7 +889,7 @@ fts_open_direct_sound(char *device)
 
   hr = IDirectSound_CreateSoundBuffer(fts_direct_sound, &desc, &fts_primary_buffer, NULL);
   if (hr != DS_OK) {
-    post( "Warning: dsaudioport: failed to create set the primary sound buffer\n");
+    fts_post( "Warning: dsaudioport: failed to create set the primary sound buffer\n");
     IDirectSound_Release(fts_direct_sound); 
     fts_direct_sound = NULL;
     fts_primary_buffer = NULL;
@@ -927,7 +927,7 @@ fts_open_direct_sound_capture(char *device)
 
   hr = DirectSoundCaptureCreate(NULL, &fts_direct_sound_capture, NULL);
   if (hr != DS_OK) {
-    post( "Warning: dsaudioport: failed to create direct sound capture\n");
+    fts_post( "Warning: dsaudioport: failed to create direct sound capture\n");
     fts_direct_sound_capture = NULL;
     return -1;
   }
@@ -979,7 +979,7 @@ fts_win32_create_window()
   myClass.cbWndExtra = 0;
   if (!RegisterClass(&myClass)) 
   {
-    post( "Warning: dsaudioport: failed to register the window class\n");
+    fts_post( "Warning: dsaudioport: failed to register the window class\n");
     return -100;
   }
   fts_wnd = CreateWindow((LPSTR) "FtsDsDev", (LPSTR) "FtsDsDev", WS_OVERLAPPEDWINDOW,
@@ -987,7 +987,7 @@ fts_win32_create_window()
 			 dsdev_instance, (LPSTR) NULL);  
   if (fts_wnd == NULL) 
   {
-    post( "Warning: dsaudioport: failed to create the window\n");
+    fts_post( "Warning: dsaudioport: failed to create the window\n");
     return -101;
   }
   return 0;
@@ -1033,7 +1033,7 @@ dsaudioport_config(void)
   /* make sure we have a valid instance handle */
   if (dsdev_instance == NULL) 
   {
-    post("Warning: dsaudioport: invalid DLL instance handle\n");
+    fts_post("Warning: dsaudioport: invalid DLL instance handle\n");
     fts_log("[dsaudioport] Warning: dsaudioport: invalid DLL instance handle\n");
     return;
   }
