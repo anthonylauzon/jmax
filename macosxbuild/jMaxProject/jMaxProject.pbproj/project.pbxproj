@@ -2309,6 +2309,30 @@
 			settings = {
 			};
 		};
+		F756D672040D3B8401664058 = {
+			isa = PBXFileReference;
+			name = define.help.jmax;
+			path = ../../help/define.help.jmax;
+			refType = 2;
+		};
+		F756D674040D3B9E01664058 = {
+			fileRef = F756D672040D3B8401664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F756D688040D5DF901664058 = {
+			isa = PBXFileReference;
+			name = "record~.help.jmax";
+			path = "../../packages/signal/help/record~.help.jmax";
+			refType = 2;
+		};
+		F756D68B040D5E3201664058 = {
+			fileRef = F756D688040D5DF901664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F75BA0A4040AAC4F01664058 = {
 			isa = PBXFileReference;
 			name = resizer.gif;
@@ -2377,6 +2401,30 @@
 		};
 		F7EE74220406AEFD01664058 = {
 			fileRef = F7EE74200406AEDB01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F7F6153B04164DA001664058 = {
+			isa = PBXFileReference;
+			name = ResizeToMinHeightAction.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/actions/ResizeToMinHeightAction.java;
+			refType = 2;
+		};
+		F7F6153C04164DA001664058 = {
+			isa = PBXFileReference;
+			name = ResizeToMinWidthAction.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/actions/ResizeToMinWidthAction.java;
+			refType = 2;
+		};
+		F7F6153D04164DA001664058 = {
+			fileRef = F7F6153B04164DA001664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F7F6153E04164DA001664058 = {
+			fileRef = F7F6153C04164DA001664058;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -2753,6 +2801,7 @@
 				F5FB89ED035E0D75016640F1,
 				F5A0A8A503CB342F01664092,
 				F5A0A8A603CB342F01664092,
+				F756D688040D5DF901664058,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -6961,6 +7010,7 @@
 				F8EE4B4D031CE66401664092,
 				F8EE4B4E031CE66801664092,
 				F8EE4B4F031CE66B01664092,
+				F756D68B040D5E3201664058,
 				F8EE4B50031CE66E01664092,
 				F8EE4B51031CE67001664092,
 				F8EE4B52031CE67301664092,
@@ -7473,13 +7523,10 @@
 		};
 		F85122CB028BE16601664092 = {
 			children = (
-				F85122E1028BE2AA01664092,
 				F85122E2028BE2AA01664092,
 				F85122E3028BE2AA01664092,
 				F85122E4028BE2AA01664092,
-				F85122E5028BE2AA01664092,
 				F85122E6028BE2AA01664092,
-				F85122E7028BE2AA01664092,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -7628,12 +7675,6 @@
 			isa = PBXRezBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F85122E1028BE2AA01664092 = {
-			isa = PBXFileReference;
-			name = bytestream.help.jmax;
-			path = ../../packages/io/help/bytestream.help.jmax;
-			refType = 2;
-		};
 		F85122E2028BE2AA01664092 = {
 			isa = PBXFileReference;
 			name = filestream.help.jmax;
@@ -7652,22 +7693,10 @@
 			path = ../../packages/io/help/io.summary.jmax;
 			refType = 2;
 		};
-		F85122E5028BE2AA01664092 = {
-			isa = PBXFileReference;
-			name = serial.help.jmax;
-			path = ../../packages/io/help/serial.help.jmax;
-			refType = 2;
-		};
 		F85122E6028BE2AA01664092 = {
 			isa = PBXFileReference;
 			name = udpmessage.help.jmax;
 			path = ../../packages/io/help/udpmessage.help.jmax;
-			refType = 2;
-		};
-		F85122E7028BE2AA01664092 = {
-			isa = PBXFileReference;
-			name = wacom.help.jmax;
-			path = ../../packages/io/help/wacom.help.jmax;
 			refType = 2;
 		};
 		F85122E9028BE2AB01664092 = {
@@ -7685,22 +7714,13 @@
 			dstPath = share/jmax/packages/io/help;
 			dstSubfolderSpec = 7;
 			files = (
-				F85122EC028BE2AB01664092,
 				F85122ED028BE2AB01664092,
 				F85122EE028BE2AB01664092,
 				F85122EF028BE2AB01664092,
-				F85122F0028BE2AB01664092,
 				F85122F1028BE2AB01664092,
-				F85122F2028BE2AB01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F85122EC028BE2AB01664092 = {
-			fileRef = F85122E1028BE2AA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F85122ED028BE2AB01664092 = {
 			fileRef = F85122E2028BE2AA01664092;
@@ -7720,20 +7740,8 @@
 			settings = {
 			};
 		};
-		F85122F0028BE2AB01664092 = {
-			fileRef = F85122E5028BE2AA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85122F1028BE2AB01664092 = {
 			fileRef = F85122E6028BE2AA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F85122F2028BE2AB01664092 = {
-			fileRef = F85122E7028BE2AA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -13845,6 +13853,8 @@
 				F880FDF70283013E01664092,
 				F880FDF80283013E01664092,
 				F880FDF90283013E01664092,
+				F7F6153B04164DA001664058,
+				F7F6153C04164DA001664058,
 				F880FDFC0283013E01664092,
 				F880FDFD0283013E01664092,
 				F880FDFE0283013E01664092,
@@ -15848,6 +15858,8 @@
 				F52946E8039E6B2001664092,
 				F52946E9039E6B2001664092,
 				F774414303F0114C01664058,
+				F7F6153D04164DA001664058,
+				F7F6153E04164DA001664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17493,7 +17505,7 @@
 			);
 			buildSettings = {
 				DEBUGGING_SYMBOLS = NO;
-				FRAMEWORK_SEARCH_PATHS = /Users/schnell/Projects/jmax/macosxbuild/jMaxProject/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				JAVA_ARCHIVE_CLASSES = NO;
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
@@ -17660,6 +17672,7 @@
 		};
 		F8A9635302D36AC001664092 = {
 			children = (
+				F756D672040D3B8401664058,
 				F5FC0200035EA76E01664092,
 				F5FC0201035EA76E01664092,
 				F5FC0202035EA76E01664092,
@@ -17675,6 +17688,7 @@
 			dstPath = share/jmax/help;
 			dstSubfolderSpec = 7;
 			files = (
+				F756D674040D3B9E01664058,
 				F5FC0206035EA79B01664092,
 				F5FC0207035EA79B01664092,
 				F5FC0208035EA79B01664092,
