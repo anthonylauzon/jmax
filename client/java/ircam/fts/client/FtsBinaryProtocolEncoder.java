@@ -23,7 +23,8 @@ package ircam.fts.client;
 
 import java.io.*;
 
-class FtsBinaryProtocolEncoder extends FtsProtocolEncoder {
+class FtsBinaryProtocolEncoder extends FtsProtocolEncoder
+{
 
   // We don't use java.io.BufferedOutputStream here because it does not resize
   // the buffer, and in case of an UDP connection, we want to be sure that the

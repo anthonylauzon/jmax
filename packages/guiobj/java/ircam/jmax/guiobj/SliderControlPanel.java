@@ -47,6 +47,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
   JTextField maxValueField, minValueField;
   JRadioButton horizontalItem, verticalItem; 
   JLabel maxLabel, minLabel;
+  JPanel minPanel, maxPanel;
 
   public SliderControlPanel()
   {
@@ -68,8 +69,9 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     maxValueField.setPreferredSize(new Dimension(100, 20));
     maxValueField.setMaximumSize(new Dimension(100, 20));
     maxValueField.addActionListener(this);
-    
-    JPanel maxPanel = new JPanel();
+    maxValueField.requestDefaultFocus();
+
+    maxPanel = new JPanel();
     maxPanel.setPreferredSize(new Dimension(150, 20));
     maxPanel.setLayout(new BoxLayout(maxPanel, BoxLayout.X_AXIS));    
     maxPanel.add(Box.createRigidArea(new Dimension(5, 0)));    
@@ -77,6 +79,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     maxPanel.add(Box.createHorizontalGlue());    
     maxPanel.add( maxValueField);
     maxPanel.add(Box.createRigidArea(new Dimension(3, 0)));    
+    maxPanel.validate();    
 
     add(maxPanel);
 
@@ -86,7 +89,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minValueField.setMaximumSize(new Dimension(100, 20));
     minValueField.addActionListener(this);
     
-    JPanel minPanel = new JPanel();
+    minPanel = new JPanel();
     minPanel.setPreferredSize(new Dimension(150, 20));
     minPanel.setLayout(new BoxLayout(minPanel, BoxLayout.X_AXIS));
     minPanel.add(Box.createRigidArea(new Dimension(5, 0)));    
@@ -94,8 +97,10 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minPanel.add(Box.createHorizontalGlue());    
     minPanel.add( minValueField);
     minPanel.add(Box.createRigidArea(new Dimension(3, 0)));    
+    minPanel.validate();
 
     add(minPanel);
+    add( minValueField);
 
     add(new JSeparator());
 
@@ -138,7 +143,6 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     orientationPanel.add(Box.createHorizontalGlue());    
 
     add(orientationPanel);
-
     validate();
   }
 
@@ -165,7 +169,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minValueField.setText(""+min);    
     int max = ((Slider)obj).getMaxValue();
     maxValueField.setText(""+max);    
-    
+
     if(((Slider)obj).getOrientation() == Slider.HORIZONTAL_OR)
       {
 	horizontalItem.setSelected(true);

@@ -21,9 +21,10 @@
 
 package ircam.fts.client;
 
+import java.io.*;
 import java.util.*;
 
-public class FtsSymbol {
+public class FtsSymbol implements Serializable{
 
   public static FtsSymbol get( String s)
   {

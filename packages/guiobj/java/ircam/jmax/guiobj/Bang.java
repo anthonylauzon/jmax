@@ -47,20 +47,20 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public class Bang extends GraphicObject implements FtsIntValueListener, ImageObserver
 {
-  private Color itsFlashColor = Settings.sharedInstance().getUIColor();
-  static final int DEFAULT_WIDTH = 20;
-  private static final int MINIMUM_WIDTH = 15;
-  private static final int CIRCLE_ORIGIN = 3;
-  private static final int DEFAULT_FLASH_DURATION = 125;
+  private transient Color itsFlashColor = Settings.sharedInstance().getUIColor();
+  static transient final int DEFAULT_WIDTH = 20;
+  private transient static final int MINIMUM_WIDTH = 15;
+  private transient  static final int CIRCLE_ORIGIN = 3;
+  private transient static final int DEFAULT_FLASH_DURATION = 125;
 
-  private static Hashtable imageTable = new Hashtable();
+  private transient static Hashtable imageTable = new Hashtable();
   
   boolean flashing = false;
   boolean isResizing = false;
   int flashColorIndex = 1;  
-  Color itsColor = Color.yellow;
+  transient Color itsColor = Color.yellow;
   
-  private static JMenuItem colorItem = new JMenuItem("Change color");
+  private transient static JMenuItem colorItem = new JMenuItem("Change color");
   static
   {
     colorItem.addActionListener(new ActionListener(){
@@ -73,7 +73,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	}
       });
   }
-  public static BangControlPanel controlPanel = new BangControlPanel();
+  public transient static BangControlPanel controlPanel = new BangControlPanel();
   
   public Bang(FtsGraphicObject theFtsObject) 
   {

@@ -42,12 +42,12 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class Toggle extends GraphicObject implements FtsIntValueListener
 {
-  static final int DEFAULT_WIDTH = 20;
-  private static final int MINIMUM_WIDTH = 15;
+  static transient final int DEFAULT_WIDTH = 20;
+  private transient static final int MINIMUM_WIDTH = 15;
 
-  private static final Color itsCrossColor = new Color(0, 0, 128);
+  private transient static final Color itsCrossColor = new Color(0, 0, 128);
 
-  private boolean isToggled = false;
+  private transient boolean isToggled = false;
 
   public Toggle(FtsGraphicObject theFtsObject) 
   {

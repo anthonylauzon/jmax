@@ -51,7 +51,7 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 
   private int         type;
 
-  private ErmesSketchPad sketch;
+  private transient ErmesSketchPad sketch;
   private FtsConnection ftsConnection;
   private boolean selected;
 
@@ -206,11 +206,10 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
   }
 
     
-    //final static float dash1[] = {10.0f, 3.0f, 2.0f, 3.0f};
-  final static float unity = 2.0f;
-  final static float dash1[] = {unity, 3*unity};
-  final static float dash2[] = {unity, unity};
-  final static BasicStroke dashed1 = new BasicStroke(1.0f, 
+  final transient static float unity = 2.0f;
+  final transient static float dash1[] = {unity, 3*unity};
+  final transient static float dash2[] = {unity, unity};
+  final transient static BasicStroke dashed1 = new BasicStroke(1.0f, 
 						     BasicStroke.CAP_BUTT, 
 						     BasicStroke.JOIN_MITER, 
 						     10.0f, dash1, unity);
@@ -218,11 +217,11 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 						     BasicStroke.CAP_BUTT, 
 						     BasicStroke.JOIN_MITER, 
 						     10.0f, dash2, 0);
-  final static BasicStroke dashed3 = new BasicStroke(1.0f, 
+  final transient static BasicStroke dashed3 = new BasicStroke(1.0f, 
 						     BasicStroke.CAP_BUTT, 
 						     BasicStroke.JOIN_MITER, 
 						     10.0f, dash1, 3*unity);
-  final static BasicStroke normal = new BasicStroke(1.0f, 
+  final transient static BasicStroke normal = new BasicStroke(1.0f, 
 						    BasicStroke.CAP_BUTT, 
 						    BasicStroke.JOIN_MITER, 
 						    10.0f);

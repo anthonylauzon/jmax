@@ -68,7 +68,7 @@ public class FtsSliderObject extends FtsIntValueObject
   int minValue;
   int maxValue;
   int orientation;
-  protected FtsArgs args = new FtsArgs();
+  protected transient FtsArgs args = new FtsArgs();
     
   /**
    * Create a FtsObject object;

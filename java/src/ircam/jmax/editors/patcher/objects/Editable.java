@@ -48,7 +48,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 {
   boolean editing = false;
   int defaultWidth = -1;
-  public ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
+  public transient ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
   public Editable(FtsGraphicObject theFtsObject) 
   {

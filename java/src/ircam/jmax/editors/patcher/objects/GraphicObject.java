@@ -126,7 +126,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   private static boolean followingOutletLocations = false;
 
   static final int ERROR_MESSAGE_DISPLAY_PAD = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.INOUTLET_WIDTH + 1;
-  private static Font errorFont = new Font(ircam.jmax.Platform.FONT_NAME, Font.BOLD, ircam.jmax.Platform.FONT_SIZE);
+  private transient static Font errorFont = new Font(ircam.jmax.Platform.FONT_NAME, Font.BOLD, ircam.jmax.Platform.FONT_SIZE);
 
   final public static void setFollowingInOutletLocations(boolean v)
   {
@@ -649,7 +649,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   }
 
 
-
   SensibilityArea getMouseMovingSensibilityAreaAt( int mouseX, int mouseY)
   {
     SensibilityArea area = null;
@@ -1149,8 +1148,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
     //private static FtsAtom assistArgs[] = null;
 
-  static FtsObject lastAssistedObject;
-  static int lastPosition;
+  static transient FtsObject lastAssistedObject;
+  static transient int lastPosition;
 
   static final int ASSIST_OBJECT = 1;
   static final int ASSIST_INLET = 2;

@@ -58,7 +58,7 @@ public class FtsIntValueObject extends FtsGraphicObject
   /*****************************************************************************/
 
   int value; 
-  protected FtsArgs args = new FtsArgs();
+  protected transient FtsArgs args = new FtsArgs();
 
   public FtsIntValueObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
@@ -132,3 +132,8 @@ public class FtsIntValueObject extends FtsGraphicObject
       ((FtsIntValueListener) listener).valueChanged(newValue);
   }
 }
+
+
+
+
+

@@ -48,7 +48,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   int windowHeight = 0;
   int windowWidth  = 0;
 
-  protected FtsArgs args = new FtsArgs();
+  protected transient FtsArgs args = new FtsArgs();
 
   /*
     Patcher content: the edit mode;
@@ -268,7 +268,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   /*                                 Global Edit Listening                                 */
   /*****************************************************************************************/
 
-  static MaxVector editListeners = new MaxVector();
+  static transient MaxVector editListeners = new MaxVector();
 
   static public void addGlobalEditListener(FtsEditListener listener)
   {
@@ -642,7 +642,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       }
   }
     
-  FtsActionListener waitingListener;
+  transient FtsActionListener waitingListener;
   public void requestStopWaiting(FtsActionListener l)
   {
     waitingListener = l;
@@ -1059,7 +1059,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   // Edit And Change Listener
   //
 
-  private FtsPatcherListener listener;
+  private transient FtsPatcherListener listener;
 
   // Set the patcher data listener 
 

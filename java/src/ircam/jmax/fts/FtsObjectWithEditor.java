@@ -149,5 +149,5 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
   public abstract void openEditor(int argc, FtsAtom[] argv);
   public abstract void destroyEditor();
 
-  private Frame editorFrame = null;
+  private transient Frame editorFrame = null;
 }

@@ -48,7 +48,8 @@ class MessageHandlerEntry {
   FtsSymbol selector;
 }
 
-public class FtsObject {
+public class FtsObject implements Serializable
+{
 
   public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
   {
@@ -237,21 +238,21 @@ public class FtsObject {
   }
 
   private int id;
-  private FtsServer server;
-  private FtsProtocolEncoder encoder;
+  private transient FtsServer server;
+  private transient FtsProtocolEncoder encoder;
 
   private FtsObject parent;
 
-  private FtsSymbol selectorCache;
-  private FtsMessageHandler messageHandlerCache;
+  private transient FtsSymbol selectorCache;
+  private transient FtsMessageHandler messageHandlerCache;
 
-  private static HashMap messageHandlersTable = new HashMap();
-  private static MessageHandlerEntry lookupEntry = new MessageHandlerEntry( null, null);
+  private transient static HashMap messageHandlersTable = new HashMap();
+  private transient static MessageHandlerEntry lookupEntry = new MessageHandlerEntry( null, null);
 
-  private static FtsSymbol sNewObject = FtsSymbol.get( "new_object");
-  private static FtsSymbol sDelObject = FtsSymbol.get( "delete_object");
-  private static FtsSymbol sInt = FtsSymbol.get( "int");
-  private static FtsSymbol sFloat = FtsSymbol.get( "float");
-  private static FtsSymbol sList = FtsSymbol.get( "list");
+  private transient static FtsSymbol sNewObject = FtsSymbol.get( "new_object");
+  private transient static FtsSymbol sDelObject = FtsSymbol.get( "delete_object");
+  private transient static FtsSymbol sInt = FtsSymbol.get( "int");
+  private transient static FtsSymbol sFloat = FtsSymbol.get( "float");
+  private transient static FtsSymbol sList = FtsSymbol.get( "list");
 }
 

@@ -134,7 +134,7 @@ public class FtsGraphicObject extends FtsObject {
       });
   }
   
-  protected FtsArgs args = new FtsArgs();
+  protected transient FtsArgs args = new FtsArgs();
   
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
@@ -564,7 +564,7 @@ public class FtsGraphicObject extends FtsObject {
     return listener;
   }
 
-  protected FtsGraphicListener graphicListener = null;
+  protected transient FtsGraphicListener graphicListener = null;
   public void setGraphicListener(FtsGraphicListener l)
   {
     graphicListener = l;

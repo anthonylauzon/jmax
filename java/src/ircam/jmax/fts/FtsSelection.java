@@ -51,7 +51,7 @@ public class FtsSelection extends FtsObject
 
   private MaxVector connections = new MaxVector();
 
-  protected FtsArgs args = new FtsArgs();
+  protected transient FtsArgs args = new FtsArgs();
 
   /**
    * Create a Fts selection;

@@ -228,7 +228,7 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 
     paintInlets(g);
     paintOutlets(g);
-
+    
     drawContent(g);
   }
 

@@ -112,10 +112,10 @@ public class FtsUndoableObject extends FtsGraphicObject implements UndoableData{
 
   //----- Fields
 
-  private UndoableEditSupport undo;
-  UndoManager undoM;
+  private transient UndoableEditSupport undo;
+  transient UndoManager undoM;
 
-  boolean inGroup = false;
+  transient   boolean inGroup = false;
 }
 
 
