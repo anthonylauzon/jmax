@@ -4261,11 +4261,11 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_size, _fmat_get_size);
   fts_class_message_varargs(cl, fts_s_size, _fmat_set_size);
   
-  fts_class_message_void(cl, fts_new_symbol("rows"), _fmat_get_m);
-  fts_class_message_number(cl, fts_new_symbol("rows"), _fmat_set_m);
+  fts_class_message_void(cl, fts_s_rows, _fmat_get_m);
+  fts_class_message_number(cl, fts_s_rows, _fmat_set_m);
 
-  fts_class_message_void(cl, fts_new_symbol("cols"), _fmat_get_n);
-  fts_class_message_number(cl, fts_new_symbol("cols"), _fmat_set_n);  
+  fts_class_message_void(cl, fts_s_cols, _fmat_get_n);
+  fts_class_message_number(cl, fts_s_cols, _fmat_set_n);  
 
   fts_class_message_void(cl, fts_new_symbol("min"), fmat_get_min);
   fts_class_message_void(cl, fts_new_symbol("max"), fmat_get_max);
@@ -4303,13 +4303,13 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_message_void(cl, fts_new_symbol("normalize"), fmat_normalize);
   
-  fts_class_message_void(cl, fts_new_symbol("sort"), fmat_sort);
-  fts_class_message_number(cl, fts_new_symbol("sort"), fmat_sort);
-  fts_class_message_void(cl, fts_new_symbol("tros"), fmat_tros);
-  fts_class_message_number(cl, fts_new_symbol("tros"), fmat_tros);
+  fts_class_message_void  (cl, fts_s_sort,    fmat_sort);
+  fts_class_message_number(cl, fts_s_sort,    fmat_sort);
+  fts_class_message_void  (cl, fts_s_sortrev, fmat_tros);
+  fts_class_message_number(cl, fts_s_sortrev, fmat_tros);
   fts_class_message_void(cl, fts_new_symbol("rotate"), fmat_rotate);
   fts_class_message_number(cl, fts_new_symbol("rotate"), fmat_rotate);
-  fts_class_message_void(cl, fts_new_symbol("reverse"), fmat_reverse);
+  fts_class_message_void  (cl, fts_s_reverse, fmat_reverse);
   fts_class_message_void(cl, fts_new_symbol("scramble"), fmat_scramble);
 
   fts_class_message(cl, fts_new_symbol("lookup"), cl, fmat_lookup_fmat_or_slice);
@@ -4365,8 +4365,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row and $col)");
   fts_class_doc(cl, fts_new_symbol("zero"), "[<num: row index> <num: column index> [<num: # of elements>]]", "zero given number of elements starting from indicated element (row by row)");
   fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (def 1)>]]", "get/set dimensions");
-  fts_class_doc(cl, fts_new_symbol("rows"), "[<num: # of rows>]", "get/set # of rows");
-  fts_class_doc(cl, fts_new_symbol("columns"), "[<num: # of rows>]", "get/set # of columns");
+  fts_class_doc(cl, fts_s_rows, "[<num: # of rows>]", "get/set # of rows");
+  fts_class_doc(cl, fts_s_cols, "[<num: # of columns>]", "get/set # of columns");
   
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
@@ -4405,10 +4405,10 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real IFFT of complex vector (rect format)");
 
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
-  fts_class_doc(cl, fts_new_symbol("reverse"), NULL, "reverse order of rows");
+  fts_class_doc(cl, fts_s_reverse, NULL, "reverse order of rows");
   fts_class_doc(cl, fts_new_symbol("rotate"), "[<num: # of elements (def 1)>]", "rotate by given number of rows");
-  fts_class_doc(cl, fts_new_symbol("sort"), "[<num: index of column>]", "sort rows by ascending values of given column");
-  fts_class_doc(cl, fts_new_symbol("tros"), "[<num: index of column>]", "sort rows by descending values of given column");
+  fts_class_doc(cl, fts_s_sort,    "[<num: index of column>]", "sort rows by ascending values of given column");
+  fts_class_doc(cl, fts_s_sortrev, "[<num: index of column>]", "sort rows by descending values of given column");
   fts_class_doc(cl, fts_new_symbol("scramble"), NULL, "scramble rows randomly");
 
   fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fcol|frow|bpf: function>", "apply given function to each value (by linear interpolation)");
