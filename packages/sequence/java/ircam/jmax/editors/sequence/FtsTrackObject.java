@@ -1613,11 +1613,11 @@ public void setSaveEditor(boolean save)
 public void createMarkers()
 {
   try{
-    send( FtsSymbol.get("make-bars"));
+    send( FtsSymbol.get("make_bars"));
   }
   catch(IOException e)
  {
-    System.err.println("FtsTrackObject: I/O Error sending make-bars Message!");
+    System.err.println("FtsTrackObject: I/O Error sending make_bars Message!");
     e.printStackTrace();
  }
 }
