@@ -7,7 +7,6 @@ count.c \
 delay.c \
 demux.c \
 dispatch.c \
-drunk.c \
 fifo.c \
 for.c \
 invoke.c \
