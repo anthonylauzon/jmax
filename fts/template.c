@@ -46,6 +46,8 @@
 
 static fts_heap_t *template_heap;
 
+static fts_hashtable_t template_file_to_load;
+
 static void fts_template_recompute_instances(fts_template_t *template);
 
 fts_template_t *fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original_filename)
@@ -74,10 +76,24 @@ fts_object_t *
 fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *instance = 0;
+  fts_atom_t key;
+  fts_atom_t value;
 
   fts_package_push(template->package);
 
-  fts_file_load( template->filename, (fts_object_t *)patcher, ac, at, (fts_object_t **)&instance);
+  /* add filename in file to load hashtable */
+  fts_set_symbol(&key, template->filename);
+  fts_set_symbol(&value, template->filename);
+  if (1 == fts_hashtable_put(&template_file_to_load, &key, &value))
+  {
+      /* cyclic dependency in template definition */
+      fts_log("[template] cyclic definition for template %s \n", template->name);
+      fts_post("[template] cyclic definition for template %s \n", template->name);
+  }
+  else
+  {
+      fts_file_load( template->filename, (fts_object_t *)patcher, ac, at, (fts_object_t **)&instance);
+  }
 
   fts_package_pop(template->package);
     
@@ -161,5 +177,6 @@ fts_template_file_modified(fts_symbol_t filename)
 void fts_kernel_template_init()
 {
   template_heap = fts_heap_new(sizeof(fts_template_t));
+  fts_hashtable_init(&template_file_to_load, FTS_HASHTABLE_MEDIUM);
 }
 
