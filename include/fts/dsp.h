@@ -163,6 +163,24 @@ FTS_API void fts_dsp_timebase_configure(void);
 FTS_API double fts_dsp_get_sample_rate(void);
 
 /**
+ * Set the global sample rate of the DSP subsystem
+ *
+ * Note that the actual values for sample rate and tick size can be different from
+ * the parameter values returned by fts_dsp_get_sample_rate() and fts_get_tick_size().
+ * Use the functions fts_dsp_get_input_size(), fts_dsp_get_output_size(), 
+ * fts_dsp_get_input_srate() or fts_dsp_get_output_srate() in order 
+ * to get the correct local values for a particular object inside the put method.
+ *
+ * @fn double fts_dsp_set_sample_rate(void)
+ * @return the sample rate
+ *
+ * @see fts_get_sample_rate()
+ *
+ * @ingroup dsp
+ */
+FTS_API double fts_dsp_set_sample_rate(double sample_rate);
+
+/**
  * Get the global tick size of the DSP subsystem
  *
  * The \e tick \e size is the size block size of the DSP calculations performed by the
@@ -171,7 +189,7 @@ FTS_API double fts_dsp_get_sample_rate(void);
  * @fn double fts_dsp_get_tick_size(void)
  * @return the sample rate
  *
- * @see fts_get_sample_rate()
+ * @see fts_dsp_get_sample_rate()
  *
  * @ingroup dsp
  */
@@ -273,6 +291,10 @@ FTS_API void fts_dsp_desactivate(void);
 FTS_API int fts_dsp_is_active(void);
 FTS_API void fts_dsp_active_add_listener(fts_object_t *object, fts_method_t method);
 FTS_API void fts_dsp_active_remove_listener(fts_object_t *object);
+
+/* DSP sample rate listener */
+FTS_API void fts_dsp_sample_rate_add_listener(fts_object_t *object, fts_method_t method);
+FTS_API void fts_dsp_sample_rate_remove_listener(fts_object_t *object);
 
 /* DSP edge */
 typedef struct fts_dsp_edge

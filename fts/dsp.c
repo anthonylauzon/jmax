@@ -49,6 +49,7 @@ static fts_symbol_t dsp_copy_fun_symbol = 0;
 static fts_class_t *dsp_timebase_class = 0;
 static fts_timebase_t *dsp_timebase = 0;
 static fts_param_t *dsp_active_param = 0;
+static fts_param_t* dsp_sample_rate_param = 0;
 
 fts_class_t *fts_dsp_edge_class = 0;
 fts_class_t *fts_dsp_signal_class = 0;
@@ -136,12 +137,39 @@ fts_dsp_get_tick_size(void)
   return fts_dsp_graph_get_tick_size(&main_dsp_graph);
 }
 
+/***************************************************
+ *
+ */
+double
+fts_dsp_set_sample_rate(double dsp_sample_rate)
+{
+  fts_param_set_float(dsp_sample_rate_param, dsp_sample_rate);
+  return fts_dsp_graph_set_sample_rate(&main_dsp_graph, dsp_sample_rate);
+}
+
 double
 fts_dsp_get_sample_rate()
 {
+  fts_atom_t* value = fts_param_get_value(dsp_sample_rate_param);
+  
   return fts_dsp_graph_get_sample_rate(&main_dsp_graph);
 }
 
+void
+fts_dsp_sample_rate_add_listener(fts_object_t* object, fts_method_t method)
+{
+  fts_param_add_listener(dsp_sample_rate_param, object, method);
+}
+
+void
+fts_dsp_sample_rate_remove_listener(fts_object_t* object)
+{
+  fts_param_remove_listener(dsp_sample_rate_param, object);
+}
+
+/***************************************************
+ *
+ */
 double
 fts_dsp_get_time()
 {
@@ -520,16 +548,24 @@ dsp_set_tick_size(void *listener, fts_symbol_t name, const fts_atom_t *value)
     }
 }
 
-static void 
-dsp_set_sample_rate(void *listener, fts_symbol_t name, const fts_atom_t *value)
+/* OLD PROTOTYPE */
+/* static void  */
+/* dsp_set_sample_rate(void *listener, fts_symbol_t name, const fts_atom_t *value) */
+static void
+dsp_set_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  if (fts_is_number(value))
-    {
-      float sr = fts_get_number_float(value);
+  if (fts_is_number(at))
+  {
+    float sr = fts_get_number_float(at);
+    
+    dsp_sample_rate = sr;
+    dsp_reset();
+  }
+  if(fts_dsp_is_active())
+    fts_dsp_graph_compile(&main_dsp_graph);
+  else if(fts_dsp_graph_is_compiled(&main_dsp_graph))
+    fts_dsp_graph_reset(&main_dsp_graph);
 
-      dsp_sample_rate = sr;
-      dsp_reset();
-    }
 }
 
 static void 
@@ -573,6 +609,9 @@ void fts_kernel_dsp_init(void)
   dsp_active_param = (fts_param_t *)fts_object_create(fts_param_class, NULL, 0, 0);
   fts_param_add_listener(dsp_active_param, NULL, dsp_active);
 
+  dsp_sample_rate_param = (fts_param_t*)fts_object_create(fts_param_class, NULL, 0, 0);
+  fts_param_add_listener(dsp_sample_rate_param, NULL, dsp_set_sample_rate);
+
   /* create main DSP graph */
   fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
 
@@ -582,3 +621,10 @@ void fts_kernel_dsp_init(void)
   dsp_copy_fun_symbol = fts_new_symbol("dsp_copy_fun_symbol");
   fts_dsp_declare_function( dsp_copy_fun_symbol, dsp_copy_fun);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
