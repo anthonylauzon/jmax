@@ -19,14 +19,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
-
 #ifndef _SEQUENCE_TRACK_H_
 #define _SEQUENCE_TRACK_H_
 
 #include <fts/fts.h>
 #include <fts/packages/sequence/marker.h>
 #include <fts/packages/sequence/sequence.h>
-
 
 extern fts_class_t *track_class;
 
@@ -61,9 +59,9 @@ struct _track_
 #define track_get_first(t) ((t)->first)
 #define track_get_last(t) ((t)->last)
 #define track_get_size(t) ((t)->size)
-#define track_get_duration(t) (((t)->last)? (t)->last->time: 0.0)
-#define track_get_total_duration(t) \
-  ((track_get_markers(t))? (fmax(track_get_duration(track_get_markers(t)), track_get_duration(t))): (track_get_duration(t)))
+#define track_get_last_time(t) (((t)->last)? (t)->last->time: 0.0)
+#define track_get_duration(t) \
+  ((track_get_markers(t))? (fmax(track_get_last_time(track_get_markers(t)), track_get_last_time(t))): (track_get_last_time(t)))
 
 #define track_is_active(t) ((t)->active != 0)
 #define track_do_save_editor(t) ((t)->save_editor != 0)
@@ -79,24 +77,29 @@ struct _track_
 #define track_get_markers(t) ((t)->markers)
 
 extern void track_add_event(track_t *track, double time, event_t *event);
-extern void track_add_event_and_upload(track_t *track, double time, event_t *event);
-extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *here);
+extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *after);
 extern void track_append_event(track_t *track, double time, event_t *event);
-extern void track_remove_event(track_t *track, event_t *event);
-extern void track_remove_event_and_upload(track_t *track, event_t *event);
 extern void track_move_event(track_t *track, event_t *event, double time);
-extern void track_update_editor (track_t *self);
-
-extern void track_upload_event(track_t *self, event_t *event);
-
+extern void track_remove_event(track_t *track, event_t *event);
 extern void track_merge(track_t *track, track_t *merge);
 extern void track_clear(track_t *track);
+
+extern void track_add_event_and_upload(track_t *track, double time, event_t *event);
+extern void track_add_event_after_and_upload(track_t *track, double time, event_t *event, event_t *after);
+extern void track_move_event_and_upload(track_t *track, event_t *event, double time);
+extern void track_remove_event_and_upload(track_t *track, event_t *event);
+extern void track_merge_and_upload(track_t *track, track_t *merge);
+extern void track_clear_and_upload(track_t *track);
+
+extern void track_update_editor (track_t *self);
+extern void track_upload_event(track_t *self, event_t *event);
 
 extern void track_set_dirty(track_t *track);
 
 extern event_t *track_get_event_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time_after(track_t *track, double time, event_t *here);
+extern event_t *track_get_left_by_time_from(track_t *track, double time, event_t *here);
 
 extern track_t *track_get_or_make_markers(track_t *track);
 extern scomark_t *track_insert_marker(track_t *track, double time, fts_symbol_t type);

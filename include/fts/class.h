@@ -39,10 +39,10 @@ FTS_API void fts_class_instantiate(fts_class_t *cl);
 #define FTS_FIRST_OBJECT_TYPEID   16
 
 /**************************************************
- *
- *  class documentation
- *
- */
+*
+*  class documentation
+*
+*/
 typedef struct fts_class_doc_line
 {
   fts_symbol_t name;
@@ -64,18 +64,18 @@ FTS_API int  fts_class_doc_get (fts_class_t *cl, fts_array_t *output);
 
 
 /**************************************************
- *
- *  the class structure
- *
- */
+*
+*  the class structure
+*
+*/
 struct fts_class {
   fts_object_t head;
-
+  
   fts_symbol_t name; /* name of the class, i.e. the first name used to register it */
-
+  
   /* A type id that separates primitive types from objects: lower values are primitive types */
   int type_id;
-
+  
   /* The hash function and equality function for this class */
   fts_class_hash_function_t hash_function;
   fts_class_equals_function_t equals_function;
@@ -85,23 +85,23 @@ struct fts_class {
   fts_class_interpolation_select_t interpolation_select;
   fts_list_t *import_handlers;	  /* list of import handlers */
   fts_list_t *export_handlers;	  /* list of export handlers */
-
+  
   fts_instantiate_fun_t instantiate_fun;
-
+  
   fts_method_t constructor;
   fts_method_t deconstructor;
-
+  
   fts_package_t *package;
-
+  
   fts_hashtable_t *methods;
-
+  
   int ninlets;
   fts_method_t input_handler;
-
+  
   int noutlets;
   int out_alloc;
   fts_class_outlet_t *outlets;
-
+  
   int size;
   fts_heap_t *heap;
   
@@ -133,7 +133,7 @@ struct fts_class {
 #define fts_class_get_doc(C) ((C)->doc)
 
 /**
- * Get a method of a class by its message symbol and argument type
+* Get a method of a class by its message symbol and argument type
  *
  * @fn void fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type)
  * @param cl the class
@@ -144,9 +144,19 @@ struct fts_class {
 FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type);
 
 /**
- * Get the varargs method of a class by its message symbol
+* Get the a non-varargs method of a class by its message symbol
  *
- * @fn void fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type)
+ * @fn void fts_class_get_method_novarargs(fts_class_t *cl, fts_symbol_t s, fts_class_t *type)
+ * @param cl the class
+ * @return the method or NULL if failed
+ * @param s message symbol
+ */
+FTS_API fts_method_t fts_class_get_method_novarargs(fts_class_t *cl, fts_symbol_t s, fts_class_t *type);
+
+/**
+* Get the varargs method of a class by its message symbol
+ *
+ * @fn void fts_class_get_method_varargs(fts_class_t *cl, fts_symbol_t s, fts_class_t *type)
  * @param cl the class
  * @return the method or NULL if failed
  * @param s message symbol
@@ -159,13 +169,13 @@ static const int fts_system_inlet = -1;
 FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
 
 /**
- * Class API
+* Class API
  *
  * @defgroup class_api class API
  */
 
 /**
- * Install a class
+* Install a class
  * Create a class (without initializing) and register it by name in the current package.
  *
  * @fn fts_class_t *fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
@@ -177,7 +187,7 @@ FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
 FTS_API fts_class_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 
 /**
- * Create an alias for a class
+* Create an alias for a class
  *
  * @fn void fts_class_alias(fts_class_t *cl, fts_symbol_t alias)
  * @param cl the class
@@ -187,7 +197,7 @@ FTS_API fts_class_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t
 FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
 
 /**
- * Initialize a class
+* Initialize a class
  *
  * @fn void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor)
  * @param cl the class
@@ -199,7 +209,7 @@ FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
 FTS_API void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor);
 
 /**
- * Set input handler
+* Set input handler
  * If set the input handler is called for any input of an object comming into an inlet.
  *
  * @fn void fts_class_input_handler(fts_class_t *cl, fts_method_t method)
@@ -211,29 +221,29 @@ FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
 
 
 /** prepend import handler to list of handlers to try 
- *
- *  An import handler is called with the object to import into, and
- *  the list of filename and arguments.  It should examine the object
- *  type (or subtype), and the file, to see if it can be imported.  If
- *  not, just return false (a void atom with fts_return) and don't
- *  make any fuss (don't print error messages).
- */
+*
+*  An import handler is called with the object to import into, and
+*  the list of filename and arguments.  It should examine the object
+*  type (or subtype), and the file, to see if it can be imported.  If
+*  not, just return false (a void atom with fts_return) and don't
+*  make any fuss (don't print error messages).
+*/
 FTS_API void fts_class_add_import_handler (fts_class_t *cl, fts_method_t func);
 
 
 /** prepend export handler to list of handlers to try 
- *
- *  An export handler is called with the object to export from, and
- *  the list of filename and arguments.  It should examine the object
- *  type (or subtype), and the filename extension, to see if it can
- *  export to that type of file.  If not, just return a void atom and don't
- *  make any fuss (don't print error messages).
- */
+*
+*  An export handler is called with the object to export from, and
+*  the list of filename and arguments.  It should examine the object
+*  type (or subtype), and the filename extension, to see if it can
+*  export to that type of file.  If not, just return a void atom and don't
+*  make any fuss (don't print error messages).
+*/
 FTS_API void fts_class_add_export_handler (fts_class_t *cl, fts_method_t func);
 
 
 /**
- * Register a method for a given message and argument type (of a single argument or void).
+* Register a method for a given message and argument type (of a single argument or void).
  *
  * @fn void fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t mth)
  * @param cl the class
@@ -258,7 +268,7 @@ FTS_API void fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *typ
 #define fts_class_message_atom(c, s,  m) fts_class_message((c), (s), NULL, (m))
 
 /**
- * Declare an inlet and register a method for a given argument type (of a single argument or void).
+* Declare an inlet and register a method for a given argument type (of a single argument or void).
  *
  * @fn void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t mth)
  * @param cl the class
@@ -284,7 +294,7 @@ FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts
 #define fts_class_inlet_atom(c, i, m) fts_class_inlet((c), (i), NULL, (m))
 
 /**
- * Declare an empty inlet.
+* Declare an empty inlet.
  *
  * @fn void fts_class_inlet_thru(fts_class_t *cl, int winlet)
  * @param cl the class
@@ -294,7 +304,7 @@ FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts
 FTS_API void fts_class_inlet_thru(fts_class_t *cl, int winlet);
 
 /**
- * Declare an outlet of the given type.
+* Declare an outlet of the given type.
  *
  * @fn void fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *type)
  * @param cl the class
@@ -321,24 +331,24 @@ FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *type);
 #define fts_class_outlet_atom(c, i) fts_class_outlet((c), (i), NULL)
 
 /*****************************************************************************
- *
- *  "thru" classes
- *
- *  Thru classes propagate their input directly to the output or the output of another object.
- *
- *  Thru classes must implement a method fts_s_propagate_input.
- *  This message is send to each object while traversing the graph in order 
- *  propagate there input to their outputs (e.g. fork) or directly to the output 
- *  of other objects connected by index, name or variable (e.g. inlet/outlet, send/receive).
- *
- *  The called method will declare one by one the outlets to which the input 
- *  is propagated using the received function and context (structure).
- *    
- *     fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
- *     void *propagate_context = (fts_dspgraph_t *)fts_get_pointer(at + 1);
- *
- *     propagate_fun(propagate_context, <object>, <outlet>);
- *
- */
+*
+*  "thru" classes
+*
+*  Thru classes propagate their input directly to the output or the output of another object.
+*
+*  Thru classes must implement a method fts_s_propagate_input.
+*  This message is send to each object while traversing the graph in order 
+*  propagate there input to their outputs (e.g. fork) or directly to the output 
+*  of other objects connected by index, name or variable (e.g. inlet/outlet, send/receive).
+*
+*  The called method will declare one by one the outlets to which the input 
+*  is propagated using the received function and context (structure).
+*    
+*     fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+*     void *propagate_context = (fts_dspgraph_t *)fts_get_pointer(at + 1);
+*
+*     propagate_fun(propagate_context, <object>, <outlet>);
+*
+*/
 
 typedef void (*fts_propagate_fun_t)(void *ptr, fts_object_t *object, int outlet);

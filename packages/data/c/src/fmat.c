@@ -905,6 +905,52 @@ fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
+fmat_set_from_fcol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+  int vec_size, vec_stride;
+  float *vec;
+  float *ptr;
+  int i, j;
+  
+  fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride);
+  fmat_reshape(self, vec_size, 1);
+  ptr = fmat_get_ptr(self);
+  
+  for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
+    ptr[i] = vec[j];
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
+  fts_return_object(o);
+}
+
+static void
+fmat_set_from_frow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+  int vec_size, vec_stride;
+  float *vec;
+  float *ptr;
+  int i, j;
+  
+  fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride);
+  fmat_reshape(self, 1, vec_size);
+  ptr = fmat_get_ptr(self);
+  
+  for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
+    ptr[i] = vec[j];
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
+  fts_return_object(o);
+}
+
+static void
 fmat_set_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
@@ -4235,6 +4281,8 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_set, fmat_set_from_list);
   fts_class_message(cl, fts_s_set, cl, fmat_set_from_fmat);
+  fts_class_message(cl, fts_s_set, fcol_class, fmat_set_from_fcol);
+  fts_class_message(cl, fts_s_set, frow_class, fmat_set_from_frow);
   fts_class_message(cl, fts_s_set, bpf_type, fmat_set_from_bpf);
   fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
 

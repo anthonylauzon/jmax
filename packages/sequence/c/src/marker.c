@@ -778,7 +778,7 @@ marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double ol
     event_t *first_mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
     event_t *mark_evt = first_mark_evt;
     double begin = event_get_time(mark_evt);
-    double end = 2.0 * track_get_total_duration(track);
+    double end = 2.0 * track_get_duration(track);
     double t = -1.0;
     event_t *first = NULL;
     event_t *after = NULL;

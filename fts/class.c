@@ -462,6 +462,14 @@ fts_class_get_method(fts_class_t * cl, fts_symbol_t s, fts_class_t * type)
 }
 
 fts_method_t
+fts_class_get_method_novarargs(fts_class_t * cl, fts_symbol_t s, fts_class_t * type)
+{
+  fts_method_t method = method_get (cl, (const void *) s, type);
+
+  return method;
+}
+
+fts_method_t
 fts_class_get_method_varargs (fts_class_t * cl, fts_symbol_t s)
 {
   return method_get (cl, (const void *) s, NULL);
