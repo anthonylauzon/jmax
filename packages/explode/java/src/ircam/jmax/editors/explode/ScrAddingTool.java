@@ -52,6 +52,7 @@ public class ScrAddingTool extends Tool implements PositionListener {
     ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
     ScrEvent aEvent = new ScrEvent();
 
+    ExplodeSelection.getSelection().deselectAll();
     egc.getAdapter().setX(aEvent, x);
     egc.getAdapter().setY(aEvent, y);
 

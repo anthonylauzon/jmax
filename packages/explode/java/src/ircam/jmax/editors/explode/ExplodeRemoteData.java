@@ -74,8 +74,13 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	  max = med;
       }
     
-    if (events[min].getTime() > time)
+    /*if (time < events[min].getTime())
       return min;
+    else return max;*/
+    if (time < events[min].getTime())
+      return min;
+    else if (time > events[max].getTime())
+      return max+1;
     else return max;
   
   }
@@ -198,14 +203,12 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
       endTime = end;
       startTime = start;
       
-      index = getIndexAfter(endTime) ;
-      if (index == NO_SUCH_EVENT) index = events_fill_p -1;
-
+      index = 0;
     } 
 
     public boolean hasMoreElements()
     {
-      nextObject = findNext();
+      nextObject = findNext(); 
 
       return nextObject != null;
     }
@@ -218,12 +221,14 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
     private Object findNext()
     {
+      if (length() == 0) return null;
       ScrEvent e;
 
-      while(index >=0)
+      while (index < length() && events[index].getTime() <= endTime)
 	{
-	  e = events[index--];
-	  if (e.getTime()+e.getDuration() >= startTime)
+	  e = events[index++];
+	  if (e.getTime() >= startTime ||
+	      e.getTime()+e.getDuration() >= startTime )
 	    {
 	      return e;
 	    }
@@ -696,14 +701,17 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     if (objectsToPaste != null)
       {
 	ScrEvent event;
+	ScrEvent event1;
 	
 	beginUpdate();  //the paste is undoable
-
+	ExplodeSelection.getSelection().deselectAll();
 	try {
 	  while (objectsToPaste.hasMoreElements())
 	    {
 	      event = (ScrEvent) objectsToPaste.nextElement();
-	      addEvent(event.duplicate());
+	      event1 = event.duplicate();
+	      addEvent(event1);
+	      ExplodeSelection.getSelection().select(event1);
 	    }
 	  endUpdate();
 	

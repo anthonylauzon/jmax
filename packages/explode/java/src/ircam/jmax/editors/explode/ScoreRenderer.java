@@ -93,10 +93,13 @@ public class ScoreRenderer extends AbstractRenderer{
   }
 
   /**
-   * returns the first event containg the given point */
+   * Returns the first event containg the given point.
+   * If there are more then two objects, it returns the
+   * the topmost in the visual hyerarchy*/
   public Object firstObjectContaining(int x, int y)
   {
     ScrEvent aScrEvent;
+    ScrEvent last = null;
 
     int time = gc.getAdapter().getInvX(x);
 
@@ -106,10 +109,10 @@ public class ScoreRenderer extends AbstractRenderer{
 	aScrEvent = (ScrEvent) e.nextElement();
 
 	if (getObjectRenderer().contains(aScrEvent, x, y))
-	  return aScrEvent;
+	  last = aScrEvent;
       }
 
-    return null;
+    return last;
   }
 
   /**

@@ -35,7 +35,6 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   public void select(Object obj)
   {
     int index = model.indexOf((ScrEvent) obj);
-
     addSelectionInterval(index, index);
   }
   
@@ -56,7 +55,6 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   public void deSelect(Object obj)
   {
     int index = model.indexOf((ScrEvent) obj);
-
     removeSelectionInterval(index, index);
   }
 
@@ -98,6 +96,13 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
   }
   
 
+  private void debug(String s)
+  {
+    System.err.println("**** "+s+" MIN="+getMinSelectionIndex()+" MAX="+getMaxSelectionIndex()+" current:");
+    for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++)
+      if (isSelectedIndex(i)) System.err.println("-- "+i);
+  }
+
   /** returns the number of objects in the selection
    */
   public  int size()
@@ -126,6 +131,7 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
    */
   public  void deselectAll()
   {
+
     clearSelection();
   }
 
@@ -159,7 +165,16 @@ public class ExplodeSelection extends DefaultListSelectionModel implements Explo
 
   public void objectAdded(Object spec, int index) 
   {
-    insertIndexInterval(1, index, true); 
+    int i;
+
+    if (index > getMaxSelectionIndex()) return;
+    for (i = index+1; i >  getMinSelectionIndex(); i--)
+      {
+	if (isSelectedIndex(i-1))
+	  addSelectionInterval(i, i);
+	else removeSelectionInterval(i, i);
+      }
+  
   }
 
   /**

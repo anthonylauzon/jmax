@@ -107,7 +107,7 @@ public class Explode extends MaxEditor implements AAAReadme {
 
   }
 
-  //6 jan.
+
   protected void Copy()
   {
     ((ClipableData) explodeData).copy();
@@ -121,6 +121,12 @@ public class Explode extends MaxEditor implements AAAReadme {
   protected void Paste()
   {
     ((ClipableData) explodeData).paste();
+  }
+
+  protected void Duplicate()
+  {
+    Copy();
+    Paste();
   }
 
   protected void Undo()

@@ -41,13 +41,12 @@ class ExplodeTablePanel extends JPanel {
 	}
       public void objectAdded(Object whichObject, int index)
 	{
-	  table.removeRowSelectionInterval(0, tmodel.getExplodeDataModel().length()-1);
 	  repaint(); 
 	}
 
       public void objectDeleted(Object whichObject, int oldIndex)
 	{
-	  table.removeRowSelectionInterval(oldIndex, oldIndex);
+	  //table.removeRowSelectionInterval(oldIndex, oldIndex);
 	  repaint(); //test
 	}
     });
