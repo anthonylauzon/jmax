@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -28,51 +28,52 @@ import ircam.jmax.editors.patcher.objects.*;
 
 
 /** 
-  The Master interaction for the run mode.
-  Mostly, each method install a slave interaction,
-  preallocated in the constructor, and dispatch the event
-  to it.
-  */
+The Master interaction for the run mode.
+Mostly, each method install a slave interaction,
+preallocated in the constructor, and dispatch the event
+to it.
+*/
 
 
 class RunModeInteraction extends Interaction
 {
   // Standard interaction in run mode.
   // To add a new one, just
-
+	
   void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingLocations(true);
   }
-
-  Interaction delegateSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
+	
+	Interaction delegateSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    switch (squeack)
-      {
-	/*case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
-	  case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):*/
-      case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.TEXT):
-      case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.OBJECT):
-	// Help
-	return Interactions.helpInteraction;
-      case (Squeack.POP_UP | Squeack.OBJECT):
-	return Interactions.runPopUpInteraction;
-      case (Squeack.DOWN | Squeack.OBJECT):
-      case (Squeack.SHIFT | Squeack.DOWN | Squeack.OBJECT):
-	// Normal controller operations
-	return Interactions.runCtrlInteraction;
-      case (Squeack.DOWN | Squeack.TEXT):
-	// Normal controller operations
-	return Interactions.runCtrlInteraction;
-      case (Squeack.DOUBLE_CLICK | Squeack.OBJECT):
-	// Edit Content
-	return Interactions.doubleClickEdit;
-      case (Squeack.DOUBLE_CLICK | Squeack.TEXT):
-	// Edit Content
-	return Interactions.doubleClickEdit;
+		switch (squeack)
+		{
+			case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.TEXT):
+			case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.OBJECT):
+				// Help
+				return Interactions.helpInteraction;
+			case (Squeack.POP_UP | Squeack.OBJECT):
+				return Interactions.runPopUpInteraction;
+			case (Squeack.DOWN | Squeack.OBJECT):
+			case (Squeack.SHIFT | Squeack.DOWN | Squeack.OBJECT):
+				// Normal controller operations
+				return Interactions.runCtrlInteraction;
+			case (Squeack.DOWN | Squeack.TEXT):
+				// Normal controller operations
+				return Interactions.runCtrlInteraction;
+			case (Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+				// Edit Content
+				return Interactions.doubleClickEdit;
+			case (Squeack.DOUBLE_CLICK | Squeack.TEXT):
+				// Edit Content
+				return Interactions.doubleClickEdit;
+			case (Squeack.SHORTCUT | Squeack.DOWN | Squeack.BACKGROUND):
+			case (Squeack.SHORTCUT | Squeack.DOUBLE_CLICK | Squeack.BACKGROUND):
+				editor.setLocked(false);
       default :
-	return null;
-      }
-  }
+				return null;
+		}
+	}
 }
 
