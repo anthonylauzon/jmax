@@ -1,3 +1,8 @@
+2003-02-11  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
+
+	* add "Package Path" tab in Project Editor. User can now defines new package paths
+	in addition to the defaults.
+
 2003-02-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* 4.0.1 released
