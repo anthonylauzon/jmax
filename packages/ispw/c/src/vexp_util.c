@@ -143,7 +143,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
   
   if (size <= 0)
     {
-      post("argstostr: bad size\n");
+      fts_post("argstostr: bad size\n");
       return;
     }
   
@@ -160,7 +160,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 	      if (++i >= size)
 		{
 		  *p = 0;
-		  post("argstostr: args truncated\n");
+		  fts_post("argstostr: args truncated\n");
 		  return;
 		}
 	      p++;
@@ -174,7 +174,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 	      if (++i >= size)
 		{
 		  *p = 0;
-		  post("argstostr: args truncated\n");
+		  fts_post("argstostr: args truncated\n");
 		  return;
 		}
 	      p++;
@@ -199,7 +199,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 		  if (++i >= size - 1)
 		    {
 		      *p = 0;
-		      post("argstostr: args truncated\n");
+		      fts_post("argstostr: args truncated\n");
 		      return;
 		    }
 
@@ -218,7 +218,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 	{
 	}
       else
-	post("argstostr: wrong type %ld\n", fts_get_class_name(argv));
+	fts_post("argstostr: wrong type %ld\n", fts_get_class_name(argv));
 
       argv++;
     }

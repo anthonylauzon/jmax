@@ -43,7 +43,7 @@ wavetable_load(wavetab_t *wavetab)
 
       if(!fts_audiofile_is_valid(sf))
 	{
-	  post("tab1~: %s: can't open wave table file\n", file_name);
+	  fts_post("tab1~: %s: can't open wave table file\n", file_name);
 	  fts_audiofile_close(sf);
 	  return;
 	}
@@ -53,7 +53,7 @@ wavetable_load(wavetab_t *wavetab)
 
       if(n_samples < WAVE_TAB_SIZE)
 	{
-	  post("tab1~: %s: can't read wave table\n", file_name);
+	  fts_post("tab1~: %s: can't read wave table\n", file_name);
 	  return;
 	}
       

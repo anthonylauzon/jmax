@@ -177,7 +177,7 @@ fts_load_project( void)
       project = fts_package_new( fts_s_project);
 
       fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
-      post( "Warning: no project found\n");
+      fts_post( "Warning: no project found\n");
     }
   else
     {
@@ -229,7 +229,7 @@ fts_load_config( void)
       fts_audioconfig_set_defaults(config->audio_config);
 
       fts_log("[boot]: Starting fts with an empty AUDIO/MIDI configuration. This is probably not what you want. Make sure you have a valid AUDIO/MIDI configuration file.\n");
-      post( "Warning: no configuration found\n");
+      fts_post( "Warning: no configuration found\n");
     }
   else
     {

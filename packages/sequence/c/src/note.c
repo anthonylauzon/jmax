@@ -499,7 +499,7 @@ scoob_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_spost(stream, "(:scoob rest %g", this->duration);
       break;
     case scoob_trill:
-      fts_spost(stream, "(:scoob trill %g %g", this->pitch, this->interval, this->duration);
+      fts_spost(stream, "(:scoob trill %g %g %g", this->pitch, this->interval, this->duration);
       break;
     default:
       break;
@@ -599,9 +599,17 @@ scoob_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
+scoob_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scoob_t *this = (scoob_t *)o;
+
+  fts_array_destroy(&this->properties);
+}
+
+static void
 scoob_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(scoob_t), scoob_init, 0);
+  fts_class_init(cl, sizeof(scoob_t), scoob_init, scoob_delete);
 
   fts_class_message_varargs(cl, fts_s_dump_state, scoob_dump_state);
 
@@ -630,8 +638,10 @@ scoob_instantiate(fts_class_t *cl)
 
   fts_hashtable_init(&scoob_property_indices, FTS_HASHTABLE_SMALL);
   
+  /* builtin properties */
   scoob_declare_property(seqsym_velocity, fts_s_int); /* property 0 */
   scoob_declare_property(seqsym_channel, fts_s_int); /* property 1 */
+  scoob_declare_property(seqsym_cue, fts_s_int); /* property 2 */
 }
 
 void
@@ -657,7 +667,6 @@ scoob_config(void)
     fts_set_int(&a, i);
     fts_hashtable_put(&scoob_type_indices, &k, &a);
   }
-
 }
 
 /** EMACS **

@@ -555,7 +555,7 @@ void track_highlight_events(track_t *track, int n, event_t *event[])
 
     if (n > MAX_CLIENT_MSG_ATOMS)
     {
-      post("too many events for client message in track_highlight_events, ignored %d\n", n - MAX_CLIENT_MSG_ATOMS);
+      fts_post("too many events for client message in track_highlight_events, ignored %d\n", n - MAX_CLIENT_MSG_ATOMS);
       n = MAX_CLIENT_MSG_ATOMS;
     }
 
@@ -577,7 +577,7 @@ void track_highlight_events_and_time(track_t *track, double time, int n, event_t
 
     if (n > MAX_CLIENT_MSG_ATOMS)
     {
-      post("too many events for client message in track_highlight_events_and_time, ignored %d\n", n - MAX_CLIENT_MSG_ATOMS);
+      fts_post("too many events for client message in track_highlight_events_and_time, ignored %d\n", n - MAX_CLIENT_MSG_ATOMS);
       n = MAX_CLIENT_MSG_ATOMS;
     }
 

@@ -230,7 +230,7 @@ fts_object_runtime_error(fts_object_t *obj, fts_symbol_t error)
     {
       fts_symbol_t class = fts_class_get_name(fts_object_get_class(obj));
 
-      post("error in %s: %s\n", class, error);
+      fts_post("error in %s: %s\n", class, error);
     }
   }
 }

@@ -279,7 +279,7 @@ int fts_unlock_memory( void)
 
 void fts_platform_init( void)
 {
-  post( "Mac OS X BETA version\n");
+  fts_post( "Mac OS X BETA version\n");
 
   /*  if we want to have audio,
    we load audio packages */
@@ -381,7 +381,7 @@ void* thread_manager_main(void* arg)
 				     (void*)worker->thread_function);
 	    if (0 != success)
 	    {
-		post("[thread_manager] cannot start a new thread \n");
+		fts_post("[thread_manager] cannot start a new thread \n");
 	    }
 	    else
 	    {
@@ -389,7 +389,7 @@ void* thread_manager_main(void* arg)
 		success = pthread_detach((pthread_t)worker->id);
 		if (0 != success)
 		{
-		    post("[thread manager] cannot detach thread %d \n", worker->id);
+		    fts_post("[thread manager] cannot detach thread %d \n", worker->id);
 		}
 		work_done++;
 
@@ -411,9 +411,9 @@ void* thread_manager_main(void* arg)
 	    {
 		if (ESRCH == success)
 		{
-		    post("[thread manager] no such thread \n");
+		    fts_post("[thread manager] no such thread \n");
 		}
-		post("[thread manager] error while cancelling thread \n");
+		fts_post("[thread manager] error while cancelling thread \n");
 	    }
 	    work_done++;
 	}
@@ -425,7 +425,7 @@ void* thread_manager_main(void* arg)
 	    time_req.tv_sec = 0;
 	    time_req.tv_nsec = delay_ms * 1000 * 1000;
 	    
-	    /* post("[thread_manager] thread is running \n"); */
+	    /* fts_post("[thread_manager] thread is running \n"); */
 	    nanosleep(&time_req, &time_rem);
 	}
     }

@@ -91,12 +91,12 @@ static void analysis(fts_object_t *o)
     {
       new_pitch = pt_common_candidate_midi_pitch(&x->pt, candidate);
       new_freq = pt_common_candidate_frequency(&x->pt, candidate);
-      if(x->ctl.print_me) post("  found candidate: bin %f, note %f (%fHz)\n", candidate, new_pitch, new_freq);
+      if(x->ctl.print_me) fts_post("  found candidate: bin %f, note %f (%fHz)\n", candidate, new_pitch, new_freq);
     }
   else
     {
       new_pitch = new_freq = 0.0f;
-      if(x->ctl.print_me) post("  sorry, no pitch!\n");
+      if(x->ctl.print_me) fts_post("  sorry, no pitch!\n");
     }
 
   x->out.freq = new_freq;
@@ -148,7 +148,7 @@ static void analysis(fts_object_t *o)
     {
       int int_pitch = new_pitch + 0.5f;
       float error = new_pitch - int_pitch;
-      if(x->ctl.print_me) post("  error %f\n", error);
+      if(x->ctl.print_me) fts_post("  error %f\n", error);
       
       if(error < 0.4f && error > -0.4f)
 	{
@@ -168,7 +168,7 @@ static void analysis(fts_object_t *o)
 	  x->out.pitch = int_pitch;
 	}
       else if(x->ctl.print_me)
-	post("  out of tune!\n");
+	fts_post("  out of tune!\n");
     }
 
   x->ctl.print_me = 0;
@@ -225,9 +225,9 @@ static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	
   x->ctl.print_me = (n > 0)? n: 0;
 	
-  post("pt~:\n");
-  post("  gliss-time %d\n", (int)x->ctl.gliss_time);
-  post("  reattack %f %d\n", x->ctl.reattack_slope_thresh, (int)x->ctl.reattack_time);
+  fts_post("pt~:\n");
+  fts_post("  gliss-time %d\n", (int)x->ctl.gliss_time);
+  fts_post("  reattack %f %d\n", x->ctl.reattack_slope_thresh, (int)x->ctl.reattack_time);
 	
   pt_common_print_ctl(&x->pt);
 }

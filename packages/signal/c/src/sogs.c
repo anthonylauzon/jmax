@@ -255,8 +255,6 @@ ftl_sogs(fts_word_t *a)
           fts_cubic_idefix_interpolate(samples, index, &f);
           out[j] += f * sogs_window[fts_intphase_get_index(phi, WINDOW_BITS)] * scale;
         }
-        else
-          out[j] = 0.0;
 
         fts_idefix_incr(&index, incr);
 

@@ -1068,10 +1068,10 @@ fmat_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fmat_read_atom_file_newline(this, file_name);
 
     if(size <= 0)
-      post("fmat: can't import from text file \"%s\"\n", file_name);
+      fts_post("fmat: can't import from text file \"%s\"\n", file_name);
   }
   else
-    post("fmat: unknown import file format \"%s\"\n", file_format);
+    fts_post("fmat: unknown import file format \"%s\"\n", file_format);
 }
 
 static void
@@ -1095,10 +1095,10 @@ fmat_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fmat_write_atom_file_newline(this, file_name);
 
     if(size < 0)
-      post("fmat: can't export to text file \"%s\"\n", file_name);
+      fts_post("fmat: can't export to text file \"%s\"\n", file_name);
   }
   else
-    post("fmat: unknown export file format \"%s\"\n", file_format);
+    fts_post("fmat: unknown export file format \"%s\"\n", file_format);
 }
 
 /********************************************************************

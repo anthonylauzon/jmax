@@ -61,7 +61,7 @@ exscale_compute_params(exscale_t *this)
 
   if(this->base <= 0.)
     {
-      post("error: exscale: base must be > 0.\n");
+      fts_post("error: exscale: base must be > 0.\n");
       return;
     }
 

@@ -240,7 +240,7 @@ fts_package_load(fts_symbol_t name)
 
   if(pkg != NULL)
     {
-      post("load package: %s\n", name);
+      fts_post("load package: %s\n", name);
 
       /* load the default files */
       fts_package_load_default_files(pkg);
@@ -295,14 +295,14 @@ fts_package_push(fts_package_t* pkg)
   if (fts_package_stack_top < PACKAGE_STACK_SIZE)
     fts_package_stack[fts_package_stack_top++] = pkg;
   else
-    post("Package stack overflow\n");
+    fts_post("Package stack overflow\n");
 }
 
 void 
 fts_package_pop(fts_package_t* pkg)
 {
   if (fts_get_current_package() != pkg)
-    post("Warning: fts_package_pop: interleaved push-pop pairs\n");
+    fts_post("Warning: fts_package_pop: interleaved push-pop pairs\n");
 
   if (fts_package_stack_top > 0)
     fts_package_stack[--fts_package_stack_top] = NULL;
@@ -748,7 +748,7 @@ fts_package_print_list_aux( fts_list_t *list)
   if (!list)
     return;
 
-  post( " %s", fts_get_symbol( fts_list_get( list)));
+  fts_post( " %s", fts_get_symbol( fts_list_get( list)));
 
   fts_package_print_list_aux( fts_list_next( list));
 }
@@ -756,11 +756,11 @@ fts_package_print_list_aux( fts_list_t *list)
 static void 
 fts_package_print_list( fts_list_t *list, fts_symbol_t selector)
 {
-  post( "  %s", selector);
+  fts_post( "  %s", selector);
 
   fts_package_print_list_aux( list);
 
-  post( "\n");
+  fts_post( "\n");
 }
 
 static void 
@@ -782,7 +782,7 @@ fts_package_print_hashtable( fts_hashtable_t *ht, fts_symbol_t selector, void (*
       if (fun != NULL)
 	(*fun)(a+1);
 
-      post( "  %s %s %s\n", msg, fts_get_symbol( a), fts_get_symbol( a+1));
+      fts_post( "  %s %s %s\n", msg, fts_get_symbol( a), fts_get_symbol( a+1));
     }
 }
 
@@ -1034,7 +1034,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   }
   if (ac == 0)
     {
-      post( "No filename specified\n");    
+      fts_post( "No filename specified\n");    
       return;
     }
 
@@ -1042,7 +1042,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   if (fts_bmax_file_open( &f, filename, 0, 0, 0) < 0)
     {
-      post( "Cannot open file %s\n", filename);
+      fts_post( "Cannot open file %s\n", filename);
       return;
     }
 
@@ -1129,7 +1129,7 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   fts_package_t *this = (fts_package_t *)o;
 
-  post( "package %s:\n", fts_package_get_name( this));
+  fts_post( "package %s:\n", fts_package_get_name( this));
 
   if ( this->packages)
     fts_package_print_list( this->packages, fts_s_require);
@@ -1568,7 +1568,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   if (!obj)
     {
-      post( "Load failed\n");
+      fts_post( "Load failed\n");
       return;
     }
 
@@ -1576,7 +1576,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_send_message( obj, fts_s_print, 0, 0);
 
   if (fts_object_get_class(obj) == fts_package_type)
-    post( "Loaded package\n");
+    fts_post( "Loaded package\n");
 }
 
 static void loader_instantiate(fts_class_t *cl)

@@ -46,7 +46,7 @@ loopback_output(fts_bytestream_t *stream, int n, const unsigned char *c)
       this->lock = 0;
     }
   else
-    post("loopback: loop detected!\n");
+    fts_post("loopback: loop detected!\n");
 
   for(i=0; i<n; i++)
     fts_outlet_int((fts_object_t *)stream, 0, (int)c[i]);
@@ -64,7 +64,7 @@ loopback_output_char(fts_bytestream_t *stream, unsigned char c)
       this->lock = 0;
     }
   else
-    post("loopback locked!\n");
+    fts_post("loopback locked!\n");
 
   fts_outlet_int((fts_object_t *)stream, 0, (int)c);
 }

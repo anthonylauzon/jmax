@@ -123,7 +123,7 @@ sampread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_dsp_add_function(dsp_symbol, 4, argv);
     }
   else
-    post("sampread~: %s: can't find table~\n", this->tab_name);
+    fts_post("sampread~: %s: can't find table~\n", this->tab_name);
 }
 
 /******************************************************************
@@ -145,7 +145,7 @@ sampread_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
       ftl_data_set(sampread_ctl_t, this->sampread_data, buf, &buf);
     }
   else
-    post("sampread~: %s: can't find table~\n", tab_name);
+    fts_post("sampread~: %s: can't find table~\n", tab_name);
 }
 
 static void
@@ -166,7 +166,7 @@ sampread_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
       ftl_data_set(sampread_ctl_t, this->sampread_data, buf, &buf);
     }
   else
-    post("sampread~: %s: can't find table~\n", tab_name);
+    fts_post("sampread~: %s: can't find table~\n", tab_name);
 }
 
 static void

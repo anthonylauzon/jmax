@@ -187,7 +187,7 @@ serial_set_flag(serial_t *this, fts_symbol_t sym)
   else if(name[0] == 'b')
     serial_set_speed(this, sym);
   else
-    post("serial: invalid control flag: %s (ignored)\n", sym);
+    fts_post("serial: invalid control flag: %s (ignored)\n", sym);
 }
   
 /*********************************************************************
@@ -260,7 +260,7 @@ serial_output(fts_bytestream_t *stream, int n, const unsigned char *c)
   }
   
   if(n_wrote != n)
-    post("serial %s: write error (%s)\n", this->name, strerror(errno));
+    fts_post("serial %s: write error (%s)\n", this->name, strerror(errno));
 }
 
 static void
@@ -277,7 +277,7 @@ serial_output_char(fts_bytestream_t *stream, unsigned char c)
     n_wrote = write(this->fd, this->out_buf, this->size);
       
     if(n_wrote != size)
-      post("serial %s: write error (%s)\n", this->name, strerror(errno));
+      fts_post("serial %s: write error (%s)\n", this->name, strerror(errno));
 
     this->out_fill = 0;
   }
@@ -295,7 +295,7 @@ serial_flush(fts_bytestream_t *stream)
     int n_wrote = write(this->fd, this->out_buf, n);
       
     if(n_wrote != n)
-      post("serial %s: write error (%s)\n", this->name, strerror(errno));
+      fts_post("serial %s: write error (%s)\n", this->name, strerror(errno));
   }
 
   this->out_fill = 0;
@@ -374,9 +374,9 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	serial_set_flag(this, fts_get_symbol(at + i));
       else
       {
-	post("serial: wrong argument: ");
-	post_atoms(1, at + i);
-	post(" (ignored)\n");
+	fts_post("serial: wrong argument: ");
+	fts_post_atoms(1, at + i);
+	fts_post(" (ignored)\n");
       }
     }
       

@@ -36,23 +36,23 @@
   for (i = 0; i < 10; i++) {
     fts_set_int(&a, i);
     list = fts_list_append(list, &a);
-    post("appending %d\n", i);
+    fts_post("appending %d\n", i);
   }
 
   p = list;
   while (p) {
     ap = fts_list_get( p);
     p = fts_list_next( p);
-    post("reading %d\n", fts_get_int(ap));
+    fts_post("reading %d\n", fts_get_int(ap));
   }
 
   p = fts_list_get_nth(list, 5);
-  post("5th element = %d\n", fts_get_int(fts_list_get(p)));
+  fts_post("5th element = %d\n", fts_get_int(fts_list_get(p)));
 
   for (i = 0; i < 5; i++) {
     fts_set_int(&a, i);
     list = fts_list_remove(list, &a);
-    post("removing %d\n", i);
+    fts_post("removing %d\n", i);
   }
   
   fts_list_delete(list);

@@ -284,7 +284,7 @@ fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts
 		}
 	      else
 		{
-		  post("messbox: invalid $ argument\n");
+		  fts_post("messbox: invalid $ argument\n");
 		  lex_out_type = lex_type_error;
 		  lex_status = lex_list_read;
 		}
@@ -312,14 +312,14 @@ fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts
 		    }
 		  else
 		    {
-		      post("messbox: undefined variable %s\n", fts_get_symbol(rd_out));
+		      fts_post("messbox: undefined variable %s\n", fts_get_symbol(rd_out));
 		      lex_out_type = lex_type_error;		  
 		    }
 		}
 	    }
 	  else
 	    {
-	      post("messbox: syntax error after $\n");
+	      fts_post("messbox: syntax error after $\n");
 	      lex_out_type = lex_type_error;
 	    }
 	  break;
@@ -378,7 +378,7 @@ fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts
 	      switch (lex_out_type)
 		{
 		case lex_type_void:
-		  post("messbox: invalid void message destination after a ;\n");
+		  fts_post("messbox: invalid void message destination after a ;\n");
 		  break;
 		case lex_type_value:
 		  if (fts_is_symbol(lex_out_value))
@@ -390,22 +390,22 @@ fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts
 		      target = ispw_get_target(fts_object_get_patcher((fts_object_t *)this), target_name);
 
 		      if (!target)
-			post("messbox: invalid message destination \"%s\"\n", target_name);
+			fts_post("messbox: invalid message destination \"%s\"\n", target_name);
 		    }
 		  else
 		    {
-		      post("messbox: invalid message destination\n");
+		      fts_post("messbox: invalid message destination\n");
 		      ev_status = ev_end;
 		    }
 		  break;
 
 		case lex_type_comma:
-		  post("messbox: invalid message destination \",\"\n");
+		  fts_post("messbox: invalid message destination \",\"\n");
 		  ev_status = ev_end;
 		  break;
 
 		case lex_type_semi:
-		  post("messbox: invalid message destination  \";\"\n");
+		  fts_post("messbox: invalid message destination  \";\"\n");
 		  ev_status = ev_end;
 		  break;
 		case lex_type_end:
@@ -526,7 +526,7 @@ static int messbox_list_is_primitive(int ac, const fts_atom_t *at)
     {
       if(fts_is_object(at + i))
 	{
-	  post("messbox: can't set value of type <%s>\n", fts_get_class_name(at + i));
+	  fts_post("messbox: can't set value of type <%s>\n", fts_get_class_name(at + i));
 	  return 0;
 	}
     }

@@ -316,7 +316,7 @@ macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   if ((err = AudioDeviceSetProperty( self->device, NULL, 0, false, kAudioDevicePropertyBufferSize, count, &buffer_size)) != noErr)
     {
-      post( "cannot set buffer size");
+      fts_post( "cannot set buffer size");
     }
 
   /* if port is not opened either in input or output */
@@ -343,13 +343,13 @@ macosxaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 
   if ((err = AudioDeviceStop( self->device, macosxaudioport_ioproc)) != noErr)
   {
-    post( "cannot stop device\n");
+    fts_post( "cannot stop device\n");
     return;
   }
 
   if ((err = AudioDeviceRemoveIOProc( self->device, macosxaudioport_ioproc)) != noErr)
   {
-    post( "cannot remove IOProc\n");
+    fts_post( "cannot remove IOProc\n");
     return;
   }
 
@@ -554,13 +554,13 @@ macosxaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   if ((err = AudioDeviceStop( self->device, macosxaudioport_ioproc)) != noErr)
     {
-      post( "cannot stop device\n");
+      fts_post( "cannot stop device\n");
       return;
     }
 
   if ((err = AudioDeviceRemoveIOProc( self->device, macosxaudioport_ioproc)) != noErr)
     {
-      post( "cannot remove IOProc\n");
+      fts_post( "cannot remove IOProc\n");
       return;
     }
 
@@ -587,7 +587,7 @@ macosxaudioport_instantiate(fts_class_t *cl)
   fts_class_message_varargs( cl, fts_s_sched_ready, macosxaudioport_halt);
 }
 
-#define print_error( err, fun) post( "[macosxaudioport] error %d in function %s\n", err, #fun);
+#define print_error( err, fun) fts_post( "[macosxaudioport] error %d in function %s\n", err, #fun);
 
 #ifndef ONLY_DEFAULT_OUTPUT_DEVICE
 static void
@@ -729,7 +729,7 @@ macosxaudiomanager_scan_devices( void)
   macosxaudiomanager_new_device( default_output_device, fts_s_default);
   macosxaudiomanager_new_device( default_output_device, name);
 
-  post( "Using default audio output: %s\n", name);
+  fts_post( "Using default audio output: %s\n", name);
 }
 #endif
 

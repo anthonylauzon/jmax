@@ -61,7 +61,7 @@ logscale_compute_params(logscale_t *this)
 
   if(this->base <= 0.)
     {
-      post("error: logscale: base must be > 0.\n");
+      fts_post("error: logscale: base must be > 0.\n");
       return;
     }
 

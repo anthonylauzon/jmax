@@ -76,7 +76,7 @@ static void pt_common_meth_ref_pitch(fts_object_t *o, int winlet, fts_symbol_t s
    float p = fts_get_float_arg(ac, at, 0, 69.0f);
    
    if(p >= 57.0f && p <= 81) x->ctl.freq_ref = 440.0f * FREQ(p - 69.0f);
-   else post("%s: reference-pitch out of range of +/- one octave around note 69\n", CLASS_NAME);
+   else fts_post("%s: reference-pitch out of range of +/- one octave around note 69\n", CLASS_NAME);
    fix_pitch_base(x);
 }
 
@@ -86,7 +86,7 @@ static void pt_common_meth_ref_freq(fts_object_t *o, int winlet, fts_symbol_t s,
    float f = fts_get_float_arg(ac, at, 0, 440.0f);
    
    if(f >= 220.0f && f <= 880.0f) x->ctl.freq_ref = f;
-   else post("%s: reference-freq out of range of +/- one octave around 440Hz\n", CLASS_NAME);
+   else fts_post("%s: reference-freq out of range of +/- one octave around 440Hz\n", CLASS_NAME);
    fix_pitch_base(x);
 }
 
@@ -179,17 +179,17 @@ static void pt_common_meth_coefs(fts_object_t *o, int winlet, fts_symbol_t s, in
          x->ctl.coeffs[i] = coef;
       }
    }else{
-      post("%s: need %d coefficients\n", CLASS_NAME, pt_common_N_AMP_COEFFS);
+      fts_post("%s: need %d coefficients\n", CLASS_NAME, pt_common_N_AMP_COEFFS);
    }
 }
 
 static void pt_common_meth_obsolete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-   post("%s:\n", CLASS_NAME);
-   post("   The messages:\n");
-   post("   'pt_common_tune', 'ampl_threshold' and 'quality_threshold'\n");
-   post("   are obsolete since a long long time...\n");
-   post("   Use 'reference-pitch', 'amp-range' and 'quality-range' instead!\n");
+   fts_post("%s:\n", CLASS_NAME);
+   fts_post("   The messages:\n");
+   fts_post("   'pt_common_tune', 'ampl_threshold' and 'quality_threshold'\n");
+   fts_post("   are obsolete since a long long time...\n");
+   fts_post("   Use 'reference-pitch', 'amp-range' and 'quality-range' instead!\n");
 }
 
 static void pt_common_meth_print_kernel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -213,13 +213,13 @@ int pt_common_init(pt_common_obj_t *x, long n_points, long n_period)
       n_points > pt_common_MAX_n_points ||
       !fts_fft_declaresize(n_points)
    ){
-      post("%s: frame size must be a power of 2 between %d and %d\n", CLASS_NAME, FTS_FFT_MIN_SIZE, pt_common_MAX_n_points);
+      fts_post("%s: frame size must be a power of 2 between %d and %d\n", CLASS_NAME, FTS_FFT_MIN_SIZE, pt_common_MAX_n_points);
       return(0);
    }      
    
    if(n_period <= 0) n_period = n_points;
    if(n_period > n_points){
-      post("%s: period can't exceed period\n", CLASS_NAME);
+      fts_post("%s: period can't exceed period\n", CLASS_NAME);
       return(0);
    }
    
@@ -234,14 +234,14 @@ int pt_common_init(pt_common_obj_t *x, long n_points, long n_period)
    x->buf.main = (float *)fts_zalloc(n_points * sizeof(float));
    if( !x->buf.main)
      {
-       post("%s: can't allocate buffers\n", CLASS_NAME);
+       fts_post("%s: can't allocate buffers\n", CLASS_NAME);
        return(0);
      }
 
    x->buf.for_fft = (complex *)fts_zalloc(n_points * sizeof(complex));
    if( !x->buf.for_fft)
      {
-       post("%s: can't allocate buffers\n", CLASS_NAME);
+       fts_post("%s: can't allocate buffers\n", CLASS_NAME);
        return(0);
      }
    
@@ -299,7 +299,7 @@ void pt_common_dsp_fun_put(pt_common_obj_t *x, fts_dsp_descr_t *dsp) /* to set p
   int i;
 
   if(x->n_overlap & (fts_dsp_get_input_size(dsp, 0)-1))
-    post("%s: period must be multiple of vector size: %d\n", CLASS_NAME, fts_dsp_get_input_size(dsp, 0));
+    fts_post("%s: period must be multiple of vector size: %d\n", CLASS_NAME, fts_dsp_get_input_size(dsp, 0));
 		
   x->srate = fts_dsp_get_input_srate(dsp, 0);
   fix_pitch_base(x);
@@ -340,37 +340,37 @@ void pt_common_dsp_function(fts_word_t *a)
  
 void pt_common_print_obj(pt_common_obj_t *x)
 {
-   post("  fft points: %d\n", x->n_points);
-   post("  frame overlap: %d\n", x->n_overlap);
-   post("  filter bands: %d\n", x->n_channels);
-   post("  sample rate: %f\n", x->srate);
+   fts_post("  fft points: %d\n", x->n_points);
+   fts_post("  frame overlap: %d\n", x->n_overlap);
+   fts_post("  filter bands: %d\n", x->n_channels);
+   fts_post("  sample rate: %f\n", x->srate);
 }
 
 void pt_common_print_ctl(pt_common_obj_t *x)
 {
-   post("  reference pitch: %f\n", (69.0f + HALF_TONES(x->ctl.freq_ref / 440)));
-   post("  reference freq: %f\n", x->ctl.freq_ref);
-   post("  rough pitch: %s\n", (x->ctl.pitch_rough)? ("rough"): ("fine"));
-   post("  pitch range: %d...%d\n", x->ctl.pitch_low, x->ctl.pitch_high);
-   post("    reported min pitch: %f\n", pt_common_candidate_midi_pitch(x, x->stat.index_low));
-   post("    reported max pitch: %f\n", pt_common_candidate_midi_pitch(x, x->stat.index_high));
-   post("    reported min freq: %f\n", pt_common_candidate_frequency(x, x->stat.index_low));
-   post("    reported max freq: %f\n", pt_common_candidate_frequency(x, x->stat.index_high));
-   post("  stick: %f\n", x->ctl.pitch_stick);
-   post("  stretch: %f\n", x->ctl.pitch_stretch);
-   post("  amplitude range:\n");
-   post("    min: %f\n", sqrt(x->ctl.power_off)/x->n_points);
-   post("    max: %f\n", sqrt(x->ctl.power_on)/x->n_points);
-   post("  quality range: \n");
-   post("    min: %f\n", sqrt(x->ctl.quality_off));
-   post("    max: %f\n", sqrt(x->ctl.quality_on));
-   post("  coefs:\n");
+   fts_post("  reference pitch: %f\n", (69.0f + HALF_TONES(x->ctl.freq_ref / 440)));
+   fts_post("  reference freq: %f\n", x->ctl.freq_ref);
+   fts_post("  rough pitch: %s\n", (x->ctl.pitch_rough)? ("rough"): ("fine"));
+   fts_post("  pitch range: %d...%d\n", x->ctl.pitch_low, x->ctl.pitch_high);
+   fts_post("    reported min pitch: %f\n", pt_common_candidate_midi_pitch(x, x->stat.index_low));
+   fts_post("    reported max pitch: %f\n", pt_common_candidate_midi_pitch(x, x->stat.index_high));
+   fts_post("    reported min freq: %f\n", pt_common_candidate_frequency(x, x->stat.index_low));
+   fts_post("    reported max freq: %f\n", pt_common_candidate_frequency(x, x->stat.index_high));
+   fts_post("  stick: %f\n", x->ctl.pitch_stick);
+   fts_post("  stretch: %f\n", x->ctl.pitch_stretch);
+   fts_post("  amplitude range:\n");
+   fts_post("    min: %f\n", sqrt(x->ctl.power_off)/x->n_points);
+   fts_post("    max: %f\n", sqrt(x->ctl.power_on)/x->n_points);
+   fts_post("  quality range: \n");
+   fts_post("    min: %f\n", sqrt(x->ctl.quality_off));
+   fts_post("    max: %f\n", sqrt(x->ctl.quality_on));
+   fts_post("  coefs:\n");
    {
      int i; 
      for(i=0; i<pt_common_N_AMP_COEFFS; i++) 
-       post("    #%d: %f\n", i, x->ctl.coeffs[i]);
+       fts_post("    #%d: %f\n", i, x->ctl.coeffs[i]);
    }
-   post("  debounce time: %d\n", x->ctl.debounce_time);
+   fts_post("  debounce time: %d\n", x->ctl.debounce_time);
 }
 
 /*************************************************

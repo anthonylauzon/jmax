@@ -249,8 +249,8 @@ unfold_varargs(int ac, const fts_atom_t* at, fts_atom_t *atup, const fts_atom_t*
 void
 fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
 {
-  int meth_ac;
-  const fts_atom_t *meth_at;
+  int meth_ac = 0;
+  const fts_atom_t *meth_at = NULL;
   fts_atom_t atup;
 
   meth_ac = unfold_varargs(ac, at, &atup, &meth_at);
@@ -260,8 +260,8 @@ fts_invoke_varargs(fts_method_t method, fts_object_t *o, int ac, const fts_atom_
 void
 fts_invoke_atom(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
 {
-  int meth_ac;
-  const fts_atom_t *meth_at;
+  int meth_ac = 0;
+  const fts_atom_t *meth_at = NULL;
   fts_atom_t atup;
 
   fts_set_void(&atup);

@@ -220,23 +220,23 @@ fts_get_root_from_registry(char *buf, int bufsize)
   char version[256];
 
   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
-    post("Error opening registry key '%s'\n", JMAX_KEY);
+    fts_post("Error opening registry key '%s'\n", JMAX_KEY);
     return 0;
   }
 
   if (!fts_get_string_from_registry(key, "FtsVersion", version, 256)) {
-    post("Failed to read the value of registry key: '%s\\FtsVersion'\n", JMAX_KEY);
+    fts_post("Failed to read the value of registry key: '%s\\FtsVersion'\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }
 
   if (RegOpenKeyEx(key, version, 0, KEY_READ, &version_key) != 0) {
-    post("Error opening registry key '%s\\%s'\n", JMAX_KEY, version);
+    fts_post("Error opening registry key '%s\\%s'\n", JMAX_KEY, version);
     return 0;
   }
 
   if (!fts_get_string_from_registry(version_key, "ftsRoot", buf, bufsize)) {
-    post("Failed to read the value of registry key: '%s\\%s\\ftsRoot'\n", JMAX_KEY, version);
+    fts_post("Failed to read the value of registry key: '%s\\%s\\ftsRoot'\n", JMAX_KEY, version);
     RegCloseKey(key);
     RegCloseKey(version_key);
     return 0;
@@ -507,7 +507,7 @@ thread_manager_main(void* arg)
 			worker->threadHandle = success;
 			if (NULL == success)
 			{
-				post("[thread_manager] cannot start a new thread \n");
+				fts_post("[thread_manager] cannot start a new thread \n");
 			}
 			else
 			{
@@ -533,10 +533,10 @@ thread_manager_main(void* arg)
 			{
 				if (NULL == success)
 				{
-					post("[thread manager] no such thread \n");
+					fts_post("[thread manager] no such thread \n");
 				}
 				else{ CloseHandle(success);}
-				post("[thread manager] error while cancelling thread \n");
+				fts_post("[thread manager] error while cancelling thread \n");
 			}
 			work_done++;
 		}

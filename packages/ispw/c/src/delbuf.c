@@ -120,7 +120,7 @@ delbuf_init(del_buf_t *buf, float sr, int n_tick)
 	buf->size = 0;
 	buf->malloc_size = 0;
 	buf->n_tick = 0;
-	post("error: delay line: out of memory\n");
+	fts_post("error: delay line: out of memory\n");
 	return(0);
       }
       else{

@@ -116,7 +116,7 @@ sigcoef_hlshelf1_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   if (f1 >= f2)
     {
-      post("sigcoef_hlshelf1_new: low shelf Fq. >=  high shelf Fq. - can't continue\n");
+      fts_post("sigcoef_hlshelf1_new: low shelf Fq. >=  high shelf Fq. - can't continue\n");
       return;
     }
  

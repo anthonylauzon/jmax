@@ -629,7 +629,7 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   if (!parent || id < 0)
   {
-    post( "client: invalid arguments\n");
+    fts_post( "client: invalid arguments\n");
     return;
   }
 
@@ -637,9 +637,9 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   if (!newobj || fts_object_is_error( newobj))
   {
-    post( "error in object instantiation (");
-    post_atoms( ac-2, at+2);
-    post( ")\n");
+    fts_post( "error in object instantiation (");
+    fts_post_atoms( ac-2, at+2);
+    fts_post( ")\n");
     return;
   }
 

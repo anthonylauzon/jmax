@@ -1705,7 +1705,7 @@ fts_patcher_save_as_dotpat(fts_symbol_t filename, fts_patcher_t *patcher)
   else
   {
     /* this should be a dialog opened in the user interface */
-    post( "Error: cannot open %s for saving\n", filename );
+    fts_post( "Error: cannot open %s for saving\n", filename );
   }
 }
 

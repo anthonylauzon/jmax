@@ -39,7 +39,7 @@
       fts_atom_t a;
 
       fts_iterator_next( &i, &a);
-      post( "%d\n", fts_get_int( a));
+      fts_post( "%d\n", fts_get_int( a));
     }
 }
  * @endcode

@@ -103,7 +103,7 @@ samppeek_float(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 	}
     }
   else
-    post("samppeek: can't find table~: %s\n", obj->tab_name);
+    fts_post("samppeek: can't find table~: %s\n", obj->tab_name);
 }
 
 static void
@@ -123,7 +123,7 @@ samppeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if (sampbuf_get(tab_name))
     obj->tab_name = tab_name;
   else
-    post("samppeek: can't find table~: %s\n", tab_name);
+    fts_post("samppeek: can't find table~: %s\n", tab_name);
 }
 
 static void

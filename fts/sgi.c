@@ -318,7 +318,7 @@ static int run_on_cpu( int cpu)
 {
   if (sysmp( MP_MUSTRUN, cpu) < 0)
     {
-      post( "sysmp( MP_MUSTRUN, %d) failed [%d, \"%s\"]\n", cpu, strerror( errno));
+      fts_post( "sysmp( MP_MUSTRUN, %d) failed [%d, \"%s\"]\n", cpu, strerror( errno));
       return -1;
     }
 
@@ -333,14 +333,14 @@ static int find_isolated_cpu( void)
   n_processors = sysmp( MP_NPROCS);
   if ( n_processors < 0)
     {
-      post( "sysmp( MP_NPROCS) failed [%d, \"%s\"]\n", strerror( errno));
+      fts_post( "sysmp( MP_NPROCS) failed [%d, \"%s\"]\n", strerror( errno));
       return -1;
     }
 
   p = (struct pda_stat *)malloc( n_processors * sizeof( struct pda_stat));
   if ( sysmp( MP_STAT, p) < 0)
     {
-      post( "sysmp( MP_STAT) failed [%d, \"%s\"]\n", strerror( errno));
+      fts_post( "sysmp( MP_STAT) failed [%d, \"%s\"]\n", strerror( errno));
       return -1;
     }
 
@@ -366,14 +366,14 @@ void fts_platform_init( void )
   if ( cpu >=0 )
     {
       if ( run_on_cpu( cpu) >= 0)
-	post( "Running on CPU %d\n", cpu);
+	fts_post( "Running on CPU %d\n", cpu);
     }
   else
     {
       cpu = find_isolated_cpu();
 
       if (cpu > 0 && run_on_cpu( cpu) >= 0)
-	post( "Running on isolated CPU %d\n", cpu);
+	fts_post( "Running on isolated CPU %d\n", cpu);
     }
 
   /* raise priority to a high value */
@@ -381,9 +381,9 @@ void fts_platform_init( void )
 
   if (sched_setscheduler( 0, SCHED_FIFO, &param) < 0)
     {
-      post( "Warning: cannot switch to real-time scheduling mode.\n");
-      post( "         Real-time performance will be degraded resulting in audio clicks.\n");
-      post( "         This warning result from installation problems (jMax server not owned by root).\n");
+      fts_post( "Warning: cannot switch to real-time scheduling mode.\n");
+      fts_post( "         Real-time performance will be degraded resulting in audio clicks.\n");
+      fts_post( "         This warning result from installation problems (jMax server not owned by root).\n");
     }
 
   /* Iff we are running real time, lock to physical memory, if we can */
@@ -393,7 +393,7 @@ void fts_platform_init( void )
     }
   else
     {
-      post("Warning: cannot lock memory (error \"%s\")\n", strerror (errno));
+      fts_post("Warning: cannot lock memory (error \"%s\")\n", strerror (errno));
     }
 
   /* Get rid of root privilege if we have them */

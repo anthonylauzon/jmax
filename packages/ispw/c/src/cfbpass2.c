@@ -144,7 +144,7 @@ sigcoef_bpass2_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       /* just in case there is a bug */ /* Shadock ^ 2 */
 
       f = log((double)this->cfradians*PIOVER2I)*LOG2I;
-      post("coef_bpass2~_float: bug found:  f= %f\n", f);
+      fts_post("coef_bpass2~_float: bug found:  f= %f\n", f);
 
       w = PIOVER2 - TINY;
     }
@@ -241,7 +241,7 @@ sigcoef_bpass2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   if (!InRange(f,0, MAXSRATE/2) || !InRange(w,0, MAXOCTAVE))
     {
-      post("coef_bpass2_new: Fq and/or BW argument - out of range, put in the range\n");
+      fts_post("coef_bpass2_new: Fq and/or BW argument - out of range, put in the range\n");
     }
  
   this->srate = MAXSRATE;	/* srate default  */

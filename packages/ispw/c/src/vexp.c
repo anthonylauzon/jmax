@@ -120,7 +120,7 @@ struct ex_ex *
   
   list_arr = (struct ex_ex *)fts_malloc(sizeof (struct ex_ex) * MINODES);
   if (! list_arr) {
-    post("ex_lex: no mem\n");
+    fts_post("ex_lex: no mem\n");
     return ((struct ex_ex *)0);
   }
   exptr = list_arr;
@@ -135,7 +135,7 @@ struct ex_ex *
 	  list_arr = fts_realloc((void *)list_arr, sizeof (struct ex_ex) * maxnode);
 	  if (! list_arr)
 	    {
-	      post("ex_lex: no mem\n");
+	      fts_post("ex_lex: no mem\n");
 	      return ((struct ex_ex *)0);
 	    }
 	  exptr = &(list_arr)[non];
@@ -178,7 +178,7 @@ struct ex_ex *
    case 0:
       if (!op)
 	return (eptr);
-      post("expr syntax error: an open %s not matched\n",
+      fts_post("expr syntax error: an open %s not matched\n",
 	      op == OP_RP ? "parenthesis" : "bracket");
       return (exNULL);
    case ET_INT:
@@ -199,7 +199,7 @@ struct ex_ex *
       /* CHANGE
 	 case ET_RB:
 	 */
-      post("ex_match: unexpected type, %ld\n", eptr->ex_type);
+      fts_post("ex_match: unexpected type, %ld\n", eptr->ex_type);
       return (exNULL);
    case ET_OP:
       if (op == eptr->ex_op)
@@ -211,7 +211,7 @@ struct ex_ex *
        */
       if ((eptr->ex_op == OP_RP && op == OP_RB) ||
 	  (eptr->ex_op == OP_RB && op == OP_RP)) {
-	post("expr syntax error: prenthesis or brackets not matched\n");
+	fts_post("expr syntax error: prenthesis or brackets not matched\n");
 	return (exNULL);
       }
       /*
@@ -243,7 +243,7 @@ struct ex_ex *
       continue;
    case ET_STR:
       if (eptr[1].ex_type != ET_OP) {
-	post("expr: syntax error: bad string '%s'\n", eptr->ex_ptr);
+	fts_post("expr: syntax error: bad string '%s'\n", eptr->ex_ptr);
 	return (exNULL);
       }
       if (eptr[1].ex_op == OP_LB) {
@@ -252,7 +252,7 @@ struct ex_ex *
 	eptr->ex_type = ET_TBL;
 	tmp = eptr->ex_ptr;
 	if (ex_getsym(tmp, (fts_symbol_t *)&(eptr->ex_ptr))) {
-	  post("expr: syntax error: problms with ex_getsym\n");
+	  fts_post("expr: syntax error: problms with ex_getsym\n");
 	  return (exNULL);
 	}
 	fts_free((void *)tmp);
@@ -261,18 +261,18 @@ struct ex_ex *
 	  fun = find_func(eptr->ex_ptr);
 	  if (!fun)
 	    {
-	      post("expr: syntax error: function %s not found\n", eptr->ex_ptr);
+	      fts_post("expr: syntax error: function %s not found\n", eptr->ex_ptr);
 	      return (exNULL);
 	    }
 	  eptr->ex_type = ET_FUNC;
 	  eptr->ex_ptr = (char *) fun;
       } else {
-	post("expr: syntax error: bad string '%s'\n", eptr->ex_ptr);
+	fts_post("expr: syntax error: bad string '%s'\n", eptr->ex_ptr);
 	return (exNULL);
       }
       continue;
    default:
-      post("ex_match: bad type\n");
+      fts_post("ex_match: bad type\n");
       return (exNULL);
     }
   }
@@ -307,7 +307,7 @@ struct ex_ex *
   long count;
   
   if (!iptr) {
-    post("ex_parse: input is null, iptr = 0x%lx\n", iptr);
+    fts_post("ex_parse: input is null, iptr = 0x%lx\n", iptr);
     return (exNULL);
   }
   if (!iptr->ex_type)
@@ -323,7 +323,7 @@ struct ex_ex *
    case ET_SYM:
    case ET_VSYM:
       if (!argc) {
-	post("expr: syntax error: symbols allowed for functions only\n");
+	fts_post("expr: syntax error: symbols allowed for functions only\n");
 	ex_print(eptr);
 	return (exNULL);
       }
@@ -339,13 +339,13 @@ struct ex_ex *
    case ET_OP:
       if (eptr->ex_op == OP_COMMA) {
 	if (!argc || !count || !eptr[1].ex_type) {
-	  post("expr: syntax error: illegal comma\n");
+	  fts_post("expr: syntax error: illegal comma\n");
 	  ex_print(eptr[1].ex_type ? eptr : iptr);
 	  return (exNULL);
 	}
       }
       if (!eptr[1].ex_type) {
-	post("expr: syntax error: missing operand\n");
+	fts_post("expr: syntax error: missing operand\n");
 	ex_print(iptr);
 	return (exNULL);
       }
@@ -357,7 +357,7 @@ struct ex_ex *
    case ET_SI:
    case ET_TBL:
       if (eptr[1].ex_type != ET_LB) {
-	post("expr: syntax error: tables need left bracket\n");
+	fts_post("expr: syntax error: tables need left bracket\n");
 	ex_print(eptr);
 	return (exNULL);
       }
@@ -375,7 +375,7 @@ struct ex_ex *
       break;
    case ET_FUNC:
       if (eptr[1].ex_type != ET_LP) {
-	post("expr: ex_parse: no parenthesis\n");
+	fts_post("expr: ex_parse: no parenthesis\n");
 	return (exNULL);
       }
       /* if this function is the only token, parse it */
@@ -384,7 +384,7 @@ struct ex_ex *
 	long ac; 
 	
 	if (eptr[1].ex_ptr == (char *) &eptr[2]) {
-	  post("expr: syntax error: missing argument\n");
+	  fts_post("expr: syntax error: missing argument\n");
 	  ex_print(eptr);
 	  return (exNULL);
 	}
@@ -398,7 +398,7 @@ struct ex_ex *
 	ac++;
 	if (ac !=
 	    ((t_ex_func *)eptr->ex_ptr)->f_argc){
-	  post("expr: syntax error: function '%s' needs %ld arguments\n",
+	  fts_post("expr: syntax error: function '%s' needs %ld arguments\n",
 		  ((t_ex_func *)eptr->ex_ptr)->f_name,
 		  ((t_ex_func *)eptr->ex_ptr)->f_argc);
 	  return (exNULL);
@@ -413,7 +413,7 @@ struct ex_ex *
       if (!count &&
 	  !((struct ex_ex *) eptr->ex_ptr)[1].ex_type) {
 	if (eptr->ex_ptr == (char *)(&eptr[1])) {
-	  post("expr: syntax error: empty '%s'\n",
+	  fts_post("expr: syntax error: empty '%s'\n",
 		  eptr->ex_type==ET_LP?"()":"[]");
 	  ex_print(eptr);
 	  return (exNULL);
@@ -429,27 +429,27 @@ struct ex_ex *
    case ET_STR:
    default:
       ex_print(eptr);
-      post("expr: ex_parse: type = 0x%lx\n", eptr->ex_type);
+      fts_post("expr: ex_parse: type = 0x%lx\n", eptr->ex_type);
       return (exNULL);
     }
   
   if (pre == HI_PRE) {
-    post("expr: syntax error: missing operation\n");
+    fts_post("expr: syntax error: missing operation\n");
     ex_print(iptr);
     return (exNULL);
   }
   if (count < 2) {
-    post("expr: syntax error: mission operand\n");
+    fts_post("expr: syntax error: mission operand\n");
     ex_print(iptr);
     return (exNULL);
   }
   if (count == 2) {
     if (lowpre != iptr) {
-      post("expr: ex_parse: unary operator should be first\n");
+      fts_post("expr: ex_parse: unary operator should be first\n");
       return (exNULL);
     }
     if (!unary_op(lowpre->ex_op)) {
-      post("expr: syntax error: not a uniary operator\n");
+      fts_post("expr: syntax error: not a uniary operator\n");
       ex_print(iptr);
       return (exNULL);
     }
@@ -458,7 +458,7 @@ struct ex_ex *
     return (eptr);
   }
   if (lowpre == iptr) {
-    post("expr: syntax error: mission operand\n");
+    fts_post("expr: syntax error: mission operand\n");
     ex_print(iptr);
     return (exNULL);
   }
@@ -649,7 +649,7 @@ struct ex_ex *
       } else if (right.ex_type == ET_FLT) {
 	optr->ex_type = ET_FLT;
 	if (!right.ex_flt) {
-	  /* post("expr: divide by zero detected\n"); */
+	  /* fts_post("expr: divide by zero detected\n"); */
 	  right.ex_flt = 1;
 	}
 	optr->ex_flt = (float)left.ex_int/right.ex_flt;
@@ -662,14 +662,14 @@ struct ex_ex *
       if (right.ex_type==ET_INT || right.ex_type==ET_SYM) {
 	optr->ex_type = ET_FLT;
 	if (!right.ex_int) {
-	  /* post("expr: divide by zero detected\n"); */
+	  /* fts_post("expr: divide by zero detected\n"); */
 	  right.ex_int = 1;
 	}
 	optr->ex_flt=left.ex_flt / (float)right.ex_int;
       } else if (right.ex_type == ET_FLT) {
 	optr->ex_type = ET_FLT;
 	if (!right.ex_flt) {
-	  /* post("expr: divide by zero detected\n"); */
+	  /* fts_post("expr: divide by zero detected\n"); */
 	  right.ex_flt = 1;
 	}
 	optr->ex_flt = left.ex_flt / right.ex_flt;
@@ -691,7 +691,7 @@ struct ex_ex *
     if (left.ex_type == ET_INT || left.ex_type == ET_SYM) {
       if (right.ex_type==ET_INT || right.ex_type==ET_SYM) {
 	if (!right.ex_int) {
-	  /* post("expr: divide by zero detected\n"); */
+	  /* fts_post("expr: divide by zero detected\n"); */
 	  right.ex_int = 1;
 	}
 	optr->ex_type = ET_INT;	
@@ -699,7 +699,7 @@ struct ex_ex *
       } else if (right.ex_type == ET_FLT) {
 	optr->ex_type = ET_INT;	
 	if (!right.ex_flt) {
-	  /* post("expr: divide by zero detected\n"); */
+	  /* fts_post("expr: divide by zero detected\n"); */
 	  right.ex_flt = 1;
 	}
 	optr->ex_int=left.ex_int % (long)right.ex_flt;
@@ -712,14 +712,14 @@ struct ex_ex *
       if (right.ex_type==ET_INT || right.ex_type==ET_SYM) { 
 	optr->ex_type = ET_INT;	
 	if (!right.ex_int) {
-	  /* post("expr: divide by zero detected\n"); */
+	  /* fts_post("expr: divide by zero detected\n"); */
 	  right.ex_int = 1;
 	}
 	optr->ex_int=(long)left.ex_flt % right.ex_int;
       } else if (right.ex_type == ET_FLT) {
 	optr->ex_type = ET_INT;	
 	if (!right.ex_flt) {
-	  /* post("expr: divide by zero detected\n"); */
+	  /* fts_post("expr: divide by zero detected\n"); */
 	  right.ex_flt = 1;
 	}
 	optr->ex_int =
@@ -862,7 +862,7 @@ getoken(struct expr *exp, struct ex_ex *eptr)
   long i;
   
   if (!exp_str) {
-    post("expr: getoken: expression string not set\n");
+    fts_post("expr: getoken: expression string not set\n");
     return (0);
   }
  retry:
@@ -877,7 +877,7 @@ getoken(struct expr *exp, struct ex_ex *eptr)
  case '\t':
     goto retry;
  case ';':
-   post("expr: syntax error: ';' not implemented\n");
+   fts_post("expr: syntax error: ';' not implemented\n");
    return (1);
  case ',':
     eptr->ex_op = OP_COMMA;
@@ -955,7 +955,7 @@ getoken(struct expr *exp, struct ex_ex *eptr)
     break;
  case '=':
     if (*exp_str++ != '=') {
-      post("expr: syntax error: =\n");
+      fts_post("expr: syntax error: =\n");
       return (1);
     }
     eptr->ex_op = OP_EQ;
@@ -991,30 +991,30 @@ getoken(struct expr *exp, struct ex_ex *eptr)
       eptr->ex_type = ET_SI;
       break;
    default:
-      post("expr: syntax error: %s\n", &exp_str[-2]);
+      fts_post("expr: syntax error: %s\n", &exp_str[-2]);
       return (1);
     }
     p = atoif(exp_str, &eptr->ex_op, &i);
     if (!p) {
-      post("expr: syntax error: %s\n", &exp_str[-2]);
+      fts_post("expr: syntax error: %s\n", &exp_str[-2]);
       return (1);
     }
     if (i != ET_INT) {
-      post("expr: syntax error: %s\n", exp_str);
+      fts_post("expr: syntax error: %s\n", exp_str);
       return (1);
     }
     /*
      * make the inlets one based rather than zero based
      */
     if (!eptr->ex_op || (eptr->ex_op)-- > MAX_VARS) {
-      post("expr: syntax error: inlet out of range: %s\n", exp_str);
+      fts_post("expr: syntax error: inlet out of range: %s\n", exp_str);
       return (1);
     }
     /* record the inlet type and check for consistency */
     if (!exp->exp_var[eptr->ex_op].ex_type)
       exp->exp_var[eptr->ex_op].ex_type = eptr->ex_type;
     else if (exp->exp_var[eptr->ex_op].ex_type != eptr->ex_type) {
-      post("expr: syntax error: inlets can only have one type: %s\n", exp_str);
+      fts_post("expr: syntax error: inlets can only have one type: %s\n", exp_str);
       return (1);
     }
     exp_str = p;
@@ -1025,7 +1025,7 @@ getoken(struct expr *exp, struct ex_ex *eptr)
       
       p = exp_str;
       if (!*exp_str || *exp_str == '"') {
-	post("expr: syntax error: empty symbol: %s\n", --exp_str);
+	fts_post("expr: syntax error: empty symbol: %s\n", --exp_str);
 	return (1);
       }
       if (getoken(exp, &ex))
@@ -1033,7 +1033,7 @@ getoken(struct expr *exp, struct ex_ex *eptr)
       switch (ex.ex_type) {
      case ET_STR:
 	if (ex_getsym(ex.ex_ptr, (fts_symbol_t *)&(eptr->ex_ptr))) {
-	  post("expr: syntax error: getoken: problms with ex_getsym\n");
+	  fts_post("expr: syntax error: getoken: problms with ex_getsym\n");
 	  return (1);
 	}
 	eptr->ex_type = ET_SYM;
@@ -1043,11 +1043,11 @@ getoken(struct expr *exp, struct ex_ex *eptr)
 	eptr->ex_type = ET_VSYM;
 	break;
      default:
-	post("expr: syntax error: bad symbol name: %s\n", p);
+	fts_post("expr: syntax error: bad symbol name: %s\n", p);
 	return (1);
       }
       if (*exp_str++ != '"') {
-	post("expr: syntax error: missing '\"'\n");
+	fts_post("expr: syntax error: missing '\"'\n");
 	return (1);
       }
       break;
@@ -1078,7 +1078,7 @@ getoken(struct expr *exp, struct ex_ex *eptr)
     for (i = 0; name_ok(*p); i++)
       p++;
     if (!i) {
-      post("expr: syntax error: %s\n", exp_str);
+      fts_post("expr: syntax error: %s\n", exp_str);
       return (1);
     }
     eptr->ex_ptr = (char *)fts_malloc(i + 1);
@@ -1117,7 +1117,7 @@ char *
     switch (*p) {
    case '.':
       if (flt || base != 10) {
-	post("expr: syntax error: %s\n", s);
+	fts_post("expr: syntax error: %s\n", s);
 	return ((char *) 0);
       }
       flt++;
@@ -1149,7 +1149,7 @@ char *
    case 'e':
    case 'f':
       if (base != 16 || flt) {
-	post("expr: syntax error: %s\n", s);
+	fts_post("expr: syntax error: %s\n", s);
 	return ((char *) 0);
       }
       int_val *= base;
@@ -1162,7 +1162,7 @@ char *
    case 'E':
    case 'F':
       if (base != 16 || flt) {
-	post("expr: syntax error: %s\n", s);
+	fts_post("expr: syntax error: %s\n", s);
 	return ((char *) 0);
       }
       int_val *= base;
@@ -1209,143 +1209,143 @@ ex_print(struct ex_ex *eptr)
   while (eptr->ex_type) {
     switch (eptr->ex_type) {
    case ET_INT:
-      post("%ld ", eptr->ex_int);
+      fts_post("%ld ", eptr->ex_int);
       break;
    case ET_FLT:
-      post("%f ", eptr->ex_flt);
+      fts_post("%f ", eptr->ex_flt);
       break;
    case ET_STR:
-      post("%s ", eptr->ex_ptr);
+      fts_post("%s ", eptr->ex_ptr);
       break;
    case ET_TBL:
-      post("%s ", ex_symname((fts_symbol_t )eptr->ex_ptr));
+      fts_post("%s ", ex_symname((fts_symbol_t )eptr->ex_ptr));
    case ET_SYM:
-      post("\"%s\" ", ex_symname((fts_symbol_t )eptr->ex_ptr));
+      fts_post("\"%s\" ", ex_symname((fts_symbol_t )eptr->ex_ptr));
       break;
    case ET_VSYM:
-      post("\"$s%ld\" ", eptr->ex_int);
+      fts_post("\"$s%ld\" ", eptr->ex_int);
       break;
    case ET_FUNC:
-      post("%s ",
+      fts_post("%s ",
 	     ((t_ex_func *)eptr->ex_ptr)->f_name);
       break;
    case ET_LP:
-      post("%c", '(');
+      fts_post("%c", '(');
       break;
       /* CHANGE
 	 case ET_RP:
-	 post("%c ", ')');
+	 fts_post("%c ", ')');
 	 break;
 	 */
    case ET_LB:
-      post("%c", '[');
+      fts_post("%c", '[');
       break;
       /* CHANGE
 	 case ET_RB:
-	 post("%c ", ']');
+	 fts_post("%c ", ']');
 	 break;
 	 */
    case ET_II:
-      post("$i%ld ", eptr->ex_int);
+      fts_post("$i%ld ", eptr->ex_int);
       break;
    case ET_FI:
-      post("$f%ld ", eptr->ex_int);
+      fts_post("$f%ld ", eptr->ex_int);
       break;
    case ET_SI:
-      post("$s%ld ", eptr->ex_int);
+      fts_post("$s%ld ", eptr->ex_int);
       break;
       
    case ET_OP:
       switch (eptr->ex_op) {
      case OP_LP:
-	post("%c", '(');
+	fts_post("%c", '(');
 	break;
      case OP_RP:
-	post("%c ", ')');
+	fts_post("%c ", ')');
 	break;
      case OP_LB:
-	post("%c", '[');
+	fts_post("%c", '[');
 	break;
      case OP_RB:
-	post("%c ", ']');
+	fts_post("%c ", ']');
 	break;
      case OP_NOT:
-	post("%c", '!');
+	fts_post("%c", '!');
 	break;
      case OP_NEG:
-	post("%c", '~');
+	fts_post("%c", '~');
 	break;
      case OP_UMINUS:
-	post("%c", '-');
+	fts_post("%c", '-');
 	break;
      case OP_MUL:
-	post("%c", '*');
+	fts_post("%c", '*');
 	break;
      case OP_DIV:
-	post("%c", '/');
+	fts_post("%c", '/');
 	break;
      case OP_MOD:
-	post("%c", '%');
+	fts_post("%c", '%');
 	break;
      case OP_ADD:
-	post("%c", '+');
+	fts_post("%c", '+');
 	break;
      case OP_SUB:
-	post("%c", '-');
+	fts_post("%c", '-');
 	break;
      case OP_SL:
-	post("%s", "<<");
+	fts_post("%s", "<<");
 	break;
      case OP_SR:
-	post("%s", ">>");
+	fts_post("%s", ">>");
 	break;
      case OP_LT:
-	post("%c", '<');
+	fts_post("%c", '<');
 	break;
      case OP_LE:
-	post("%s", "<=");
+	fts_post("%s", "<=");
 	break;
      case OP_GT:
-	post("%c", '>');
+	fts_post("%c", '>');
 	break;
      case OP_GE:
-	post("%s", ">=");
+	fts_post("%s", ">=");
 	break;
      case OP_EQ:
-	post("%s", "==");
+	fts_post("%s", "==");
 	break;
      case OP_NE:
-	post("%s", "!=");
+	fts_post("%s", "!=");
 	break;
      case OP_AND:
-	post("%c", '&');
+	fts_post("%c", '&');
 	break;
      case OP_XOR:
-	post("%c", '^');
+	fts_post("%c", '^');
 	break;
      case OP_OR:
-	post("%c", '|');
+	fts_post("%c", '|');
 	break;
      case OP_LAND:
-	post("%s", "&&");
+	fts_post("%s", "&&");
 	break;
      case OP_LOR:
-	post("%s", "||");
+	fts_post("%s", "||");
 	break;
      case OP_COMMA:
-	post("%c", ',');
+	fts_post("%c", ',');
 	break;
      case OP_SEMI:
-	post("%c", ';');
+	fts_post("%c", ';');
 	break;
      default:
-	post("expr: ex_print: bad op 0x%lx\n", eptr->ex_op);
+	fts_post("expr: ex_print: bad op 0x%lx\n", eptr->ex_op);
       }
       break;
    default:
-      post("expr: ex_print: bad type 0x%lx\n", eptr->ex_type);
+      fts_post("expr: ex_print: bad type 0x%lx\n", eptr->ex_type);
     }
     eptr++;
   }
-  post("\n");
+  fts_post("\n");
 }

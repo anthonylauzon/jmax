@@ -65,14 +65,14 @@ int
 fts_project_close(void)
 {
   if (fts_project == NULL) {
-    post("Error: can't close non-existing project");
+    fts_post("Error: can't close non-existing project");
     return -1;
   }
   
   /* the current package must be the project. it's an error
      otherwise. */
   if (fts_get_current_package() != fts_project) {
-    post("Error: can't close project when the project is not the current context");
+    fts_post("Error: can't close project when the project is not the current context");
     return -1;
   }
 

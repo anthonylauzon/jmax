@@ -146,7 +146,7 @@ static void readsf_dsp( fts_word_t *argv)
       && (self->com_buffer[1].full == 0)
     )
   {
-    post ("[readsf~] end of file\n");
+    fts_post ("[readsf~] end of file\n");
     self->is_started = 0;
     /* call eof file method */
     readsf_eof_alarm((fts_object_t*)self);
@@ -263,7 +263,7 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
     else
     {
-      post("[readsf~] audiofile (%s) is not valid \n", self->filename);
+      fts_post("[readsf~] audiofile (%s) is not valid \n", self->filename);
       fts_log("[readsf~] audiofile (%s) is not valid \n", self->filename);
     }
   }
@@ -314,7 +314,7 @@ static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   readsf_t* self = (readsf_t*)o;
 
-  post("[readsf~] start \n");
+  fts_post("[readsf~] start \n");
   self->is_started = 1;
 }
 
@@ -323,7 +323,7 @@ static void readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   readsf_t* self = (readsf_t*)o;
 
-  post("[readsf~] stop \n");
+  fts_post("[readsf~] stop \n");
   self->is_started = 0;
   self->read_index = 0;
 
@@ -333,7 +333,7 @@ static void readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   readsf_t* self = (readsf_t*)o;
 
-  post("[readsf~] pause \n");
+  fts_post("[readsf~] pause \n");
   self->is_started += 1;
   self->is_started = self->is_started % 2;
 

@@ -538,7 +538,7 @@ midievent_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     break;
       
   case midi_system_exclusive:
-    post_atoms(fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
+    fts_post_atoms(fts_midievent_system_exclusive_get_size(this), fts_midievent_system_exclusive_get_atoms(this));
     break;
       
   case midi_time_code:

@@ -337,7 +337,7 @@ dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
 		    state = read_key;
 		  }
 		else
-		  post("dict: empty message found in coll file %s (ignored)\n", file_name);
+		  fts_post("dict: empty message found in coll file %s (ignored)\n", file_name);
 	      }
 	    else
 	      {
@@ -358,7 +358,7 @@ dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
     }
   
   if(error != 0)
-    post("dict: error reading coll file %s (%s)\n", file_name, error);
+    fts_post("dict: error reading coll file %s (%s)\n", file_name, error);
   else if(state != read_key)
     {
       if(n > 0)
@@ -367,7 +367,7 @@ dict_import_from_coll(dict_t *this, fts_symbol_t file_name)
 	  i++;
 	}
       
-      post("dict: found unexpected ending in coll file %s\n", file_name);
+      fts_post("dict: found unexpected ending in coll file %s\n", file_name);
     }
   
   dict_atom_buf_free(atoms, atoms_alloc);
@@ -468,12 +468,12 @@ dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     size = dict_import_from_coll(this, file_name);    
   else
     {
-      post("dict: unknown import file format \"%s\"\n", file_format);
+      fts_post("dict: unknown import file format \"%s\"\n", file_format);
       return;
     }
 
   if(size <= 0)
-    post("dict: can't import from file \"%s\"\n", file_name);  
+    fts_post("dict: can't import from file \"%s\"\n", file_name);  
 }
 
 static void
@@ -491,12 +491,12 @@ dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     size = dict_export_to_coll(this, file_name);    
   else
     {
-      post("dict: unknown export file format \"%s\"\n", file_format);
+      fts_post("dict: unknown export file format \"%s\"\n", file_format);
       return;
     }
 
   if(size <= 0)
-    post("dict: can't export to file \"%s\"\n", file_name);  
+    fts_post("dict: can't export to file \"%s\"\n", file_name);  
 }
 
 static void

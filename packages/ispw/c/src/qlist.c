@@ -156,7 +156,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
 	      if (!target)
 		{
-		  post("qlist: %s: no such object\n", fts_get_symbol(av));
+		  fts_post("qlist: %s: no such object\n", fts_get_symbol(av));
 		  continue;
 		}
 
@@ -251,7 +251,7 @@ qlist_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 qlist_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  post("qlist_read not implemented (yet)\n");
+  fts_post("qlist_read not implemented (yet)\n");
 }
 
 

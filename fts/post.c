@@ -546,7 +546,7 @@ static void post_output_chars( char *buffer, int n)
     }    
 }
 
-void post( const char *format, ...)
+void fts_post( const char *format, ...)
 {
   va_list ap;
   int n;
@@ -558,7 +558,7 @@ void post( const char *format, ...)
   post_output_chars( post_buffer, n);
 }
 
-void post_atoms( int ac, const fts_atom_t *at)
+void fts_post_atoms( int ac, const fts_atom_t *at)
 {
   int n;
 

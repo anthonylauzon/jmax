@@ -398,18 +398,18 @@ macosxmidi_scan_hashtable(fts_hashtable_t *ht)
     if(fts_is_int(&a)) {
       int id = fts_get_int(&a);
       if(macosxmidi_get_reference_by_id(id, macosxmidi_any) != NULL)
-        post("  %s inactive (%d)\n", name, id);
+        fts_post("  %s inactive (%d)\n", name, id);
       else
-        post("  %s invalid id: %d!!\n", name, id);
+        fts_post("  %s invalid id: %d!!\n", name, id);
     } else if(fts_is_object(&a)) {
       macosxmidiport_t *port = (macosxmidiport_t *)fts_get_object(&a);
       int id = macosxmidiport_get_id(port);
       if(macosxmidi_get_reference_by_id(id, macosxmidi_any) != NULL)
-        post("  %s active (%d)\n", name, id);
+        fts_post("  %s active (%d)\n", name, id);
       else
-        post("  %s invalid midiport!! (%d)\n", name, id);
+        fts_post("  %s invalid midiport!! (%d)\n", name, id);
     } else 
-      post("  %s ivalid atom in hashtable\n", name);
+      fts_post("  %s ivalid atom in hashtable\n", name);
   }
 }
 

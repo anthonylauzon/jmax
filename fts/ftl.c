@@ -38,7 +38,7 @@
 typedef enum {
   FTL_OPCODE_NOP = 123,      /* no operation */
   FTL_OPCODE_RETURN,         /* return from FTL interpreter */
-  FTL_OPCODE_CALL,           /* call a wrapper function */
+  FTL_OPCODE_CALL           /* call a wrapper function */
 } ftl_opcode_t;
 
 struct buffer_info {
@@ -630,7 +630,7 @@ static int ftl_program_allocate_signals( ftl_program_t *prog)
 
   if (! p)
     {
-      post("ftl_program_allocate_signals (size = %d): not enough memory\n", total_size);
+      fts_post("ftl_program_allocate_signals (size = %d): not enough memory\n", total_size);
       return 0;
     }
 
@@ -750,7 +750,7 @@ static int ftl_program_compile_portable( ftl_program_t *prog)
       subr->bytecode = (fts_word_t *)fts_malloc( size*sizeof( fts_word_t));
       if ( !subr->bytecode)
 	{
-	  post( "ftl_program_generate_bytecode : not enough memory\n");
+	  fts_post( "ftl_program_generate_bytecode : not enough memory\n");
 	  return 0;
 	}
 
@@ -772,7 +772,7 @@ int ftl_program_compile( ftl_program_t *prog)
 
 
 /* ********************************************************************** */
-/* Print and post functions                                               */
+/* Print and fts_post functions                                               */
 /* ********************************************************************** */
 
 static void ftl_print_atom( char *s, const fts_atom_t *a)
@@ -793,7 +793,7 @@ void ftl_program_post_signals( const ftl_program_t *prog)
 {
   fts_iterator_t keys, values;
 
-  post( "/* %d signals declarations */\n", prog->signals_count);
+  fts_post( "/* %d signals declarations */\n", prog->signals_count);
 
   fts_hashtable_get_keys( &(prog->symbol_table), &keys);
   fts_hashtable_get_values( &(prog->symbol_table), &values);
@@ -809,9 +809,9 @@ void ftl_program_post_signals( const ftl_program_t *prog)
 
       m = (ftl_memory_declaration *)fts_get_pointer( &v);
       s = fts_get_symbol( &k);
-      post( "float %s[%d];  /* adress 0x%x */\n", s, m->size, m->address);
+      fts_post( "float %s[%d];  /* adress 0x%x */\n", s, m->size, m->address);
     }
-  post( "\n");
+  fts_post( "\n");
 }
 
 void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog)
@@ -842,7 +842,7 @@ void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog)
 
 void ftl_program_post_signals_count( const ftl_program_t *prog)
 {
-  post( "ftl_program : signals %d\n", prog->signals_count);
+  fts_post( "ftl_program : signals %d\n", prog->signals_count);
 }
 
 
@@ -868,7 +868,7 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
   case ST_OPCODE:
     switch( fts_get_int( a)) {
     case FTL_OPCODE_RETURN:
-      post( "/* %5d */   return;\n", info->pc);
+      fts_post( "/* %5d */   return;\n", info->pc);
       break;
     case FTL_OPCODE_CALL:
       pc = info->pc;
@@ -894,29 +894,29 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
 	instr_info = info->instr_info;
 	object = instr_info->object;
 	if (object)
-	  post( "%s /* object %s", info->line, fts_object_get_class_name(object));
+	  fts_post( "%s /* object %s", info->line, fts_object_get_class_name(object));
 	else
-	  post( "%s /* object unknown", info->line);
+	  fts_post( "%s /* object unknown", info->line);
 
 	{
 	  int i;
 
-	  post( ", %d inputs {", instr_info->ninputs);
+	  fts_post( ", %d inputs {", instr_info->ninputs);
 	  for ( i = 0; i < instr_info->ninputs; i++)
-	    post( " %s[%d]", instr_info->input_infos[i].name, instr_info->input_infos[i].size);
-	  post( "} ");
+	    fts_post( " %s[%d]", instr_info->input_infos[i].name, instr_info->input_infos[i].size);
+	  fts_post( "} ");
 	}
 
 	{
 	  int i;
 
-	  post( ", %d outputs {", instr_info->noutputs);
+	  fts_post( ", %d outputs {", instr_info->noutputs);
 	  for ( i = 0; i < instr_info->noutputs; i++)
-	    post( " %s[%d]", instr_info->output_infos[i].name, instr_info->output_infos[i].size);
-	  post( "}");
+	    fts_post( " %s[%d]", instr_info->output_infos[i].name, instr_info->output_infos[i].size);
+	  fts_post( "}");
 	}
 
-	post( "*/ \n");
+	fts_post( "*/ \n");
 	  
 	info->instr_info++;
       }
@@ -995,13 +995,13 @@ void ftl_program_post( const ftl_program_t *prog )
 
   for( subr = prog->subroutines; subr; subr = subr->next)
     {
-      post( "%s()\n", subr->name);
-      post( "{\n");
+      fts_post( "%s()\n", subr->name);
+      fts_post( "{\n");
       info.line[0] = 0;
       info.pc = 0;
       info.instr_info = subr->info_table.info;
       ftl_state_machine( &subr->instructions, post_state_fun, &info);
-      post( "}\n\n");
+      fts_post( "}\n\n");
     }
 }
 

@@ -84,13 +84,13 @@ buffers_init(fft_t *x, fts_symbol_t type, fts_symbol_t real_spec, int ac, const 
   
   if(!fts_fft_declaresize(size))
     {
-      post("error: %s: no fft size: %d\n", x->name, size);
+      fts_post("error: %s: no fft size: %d\n", x->name, size);
       return;
     }
 
   if(hop % size || hop <= 0)
     {
-      post("error: %s: hop must be a multiple of the FFT size\n", x->name);
+      fts_post("error: %s: hop must be a multiple of the FFT size\n", x->name);
       return;
     }
 
@@ -106,7 +106,7 @@ buffers_init(fft_t *x, fts_symbol_t type, fts_symbol_t real_spec, int ac, const 
 
   if(!buf)
     {
-      post("error: %s: can't allocate buffers\n", x->name);
+      fts_post("error: %s: can't allocate buffers\n", x->name);
       return;
     }
   
@@ -116,7 +116,7 @@ buffers_init(fft_t *x, fts_symbol_t type, fts_symbol_t real_spec, int ac, const 
     spec = (complex *)fts_malloc(sizeof(complex) * spec_size);
   if (!spec)
     {
-      post("error: %s: can't allocate buffers\n", x->name);
+      fts_post("error: %s: can't allocate buffers\n", x->name);
       return;
     }
 
@@ -265,11 +265,11 @@ fft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     }
 
   if(sig_tick > size){
-    post("%s: FFT size to small (< tick size)\n", x->name);
+    fts_post("%s: FFT size to small (< tick size)\n", x->name);
     return;
   }
   if(phase % sig_tick){
-    post("%s: phase must be multiple of tick size: %d\n", x->name, sig_tick);
+    fts_post("%s: phase must be multiple of tick size: %d\n", x->name, sig_tick);
     return;
   }
 
@@ -373,11 +373,11 @@ ifft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     }
 
   if(sig_tick > size){
-    post("%s: FFT size to small (< tick size)\n", x->name);
+    fts_post("%s: FFT size to small (< tick size)\n", x->name);
     return;
   }
   if(phase % sig_tick){
-    post("%s: phase must be multiple of tick size: %d\n", x->name, sig_tick);
+    fts_post("%s: phase must be multiple of tick size: %d\n", x->name, sig_tick);
     return;
   }
 

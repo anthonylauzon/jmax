@@ -545,7 +545,7 @@ ex_size(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   if (argv->ex_type != ET_SYM)
     {
-      post("expr: size: need a table name\n");
+      fts_post("expr: size: need a table name\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
     }
@@ -563,7 +563,7 @@ ex_size(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: size: no such table %s\n", s);
+      fts_post("expr: size: no such table %s\n", s);
     }
 }
 
@@ -581,7 +581,7 @@ ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   if (argv->ex_type != ET_SYM)
     {
-      post("expr: sum: need a table name\n");
+      fts_post("expr: sum: need a table name\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
     }
@@ -598,7 +598,7 @@ ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: sum: no such table %s\n", s);
+      fts_post("expr: sum: no such table %s\n", s);
     }
 }
 
@@ -615,7 +615,7 @@ ex_Sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   if (argv->ex_type != ET_SYM)
     {
-      post("expr: Sum: need a table name\n");
+      fts_post("expr: Sum: need a table name\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
     }
@@ -628,14 +628,14 @@ ex_Sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: Sum: no such table %s\n", s);
+      fts_post("expr: Sum: no such table %s\n", s);
       return;
     }
 
 
   if (argv->ex_type != ET_INT || argv[1].ex_type != ET_INT)
     {
-      post("expr: Sum: boundries have to be fix values\n");
+      fts_post("expr: Sum: boundries have to be fix values\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
       return;
@@ -657,7 +657,7 @@ ex_avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   if (argv->ex_type != ET_SYM)
     {
-      post("expr: avg: need a table name\n");
+      fts_post("expr: avg: need a table name\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
     }
@@ -679,7 +679,7 @@ ex_avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: avg: no such table %s\n", s);
+      fts_post("expr: avg: no such table %s\n", s);
     }
 }
 
@@ -696,7 +696,7 @@ ex_Avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   if (argv->ex_type != ET_SYM)
     {
-      post("expr: Avg: need a table name\n");
+      fts_post("expr: Avg: need a table name\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
     }
@@ -709,13 +709,13 @@ ex_Avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: Avg: no such table %s\n", s);
+      fts_post("expr: Avg: no such table %s\n", s);
       return;
     }
 
   if (argv->ex_type != ET_INT || argv[1].ex_type != ET_INT)
     {
-      post("expr: Avg: boundries have to be fix values\n");
+      fts_post("expr: Avg: boundries have to be fix values\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
       return;
@@ -744,7 +744,7 @@ ex_store(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   if (argv->ex_type != ET_SYM)
     {
-      post("expr: store: need a table name\n");
+      fts_post("expr: store: need a table name\n");
     }
 
   s = (fts_symbol_t ) (argv++)->ex_ptr;
@@ -755,13 +755,13 @@ ex_store(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post("expr: store: no such table %s\n", s);
+      fts_post("expr: store: no such table %s\n", s);
       return;
     }
 
   if (argv->ex_type != ET_INT || argv[1].ex_type != ET_INT)
     {
-      post("expr: store: arguments have to be integer\n");
+      fts_post("expr: store: arguments have to be integer\n");
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
     }

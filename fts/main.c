@@ -129,10 +129,10 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 int
 main( int argc, char **argv)
 {
-  post( "FTS version %s\n", fts_get_version());
-  /*  post( "Copyright (C) 1994, 1995, 1998, 1999, 2002 by IRCAM - Centre Pompidou, Paris, France.\n");
-  post( "jMax comes with ABSOLUTELY NO WARRANTY.\n");
-  post( "This is free software, and you are welcome to redistribute it\nunder the conditions of the GNU GENERAL PUBLIC LICENSE.\nSee accompanying LICENSE for further informations\n");*/
+  fts_post( "FTS version %s\n", fts_get_version());
+  /*  fts_post( "Copyright (C) 1994, 1995, 1998, 1999, 2002 by IRCAM - Centre Pompidou, Paris, France.\n");
+  fts_post( "jMax comes with ABSOLUTELY NO WARRANTY.\n");
+  fts_post( "This is free software, and you are welcome to redistribute it\nunder the conditions of the GNU GENERAL PUBLIC LICENSE.\nSee accompanying LICENSE for further informations\n");*/
 
   fts_init( argc, argv);
 

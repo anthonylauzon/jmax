@@ -121,8 +121,8 @@ FTS_API void fts_log_atoms( int ac, const fts_atom_t *at);
 #define FTS_POST_MAX_ELEMENTS 8
 
 FTS_API fts_bytestream_t *fts_post_get_stream( int ac, const fts_atom_t *at);
-FTS_API void post( const char *format, ...);
-FTS_API void post_atoms( int ac, const fts_atom_t *at);
+FTS_API void fts_post( const char *format, ...);
+FTS_API void fts_post_atoms( int ac, const fts_atom_t *at);
 
 /**
  * Get the default console stream (the bytestream onto which post()

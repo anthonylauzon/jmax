@@ -87,8 +87,8 @@ void *fts_malloc(unsigned int size)
 	    fts_log( "Out of virtual memory");
 	  else
 	    {
-	      post("Cannot allocate more physical memory, switching to non real-time mode\n");
-	      post("See your maxlkmem parameter (man systune)");
+	      fts_post("Cannot allocate more physical memory, switching to non real-time mode\n");
+	      fts_post("See your maxlkmem parameter (man systune)");
 	    }
 	}
       else
@@ -115,8 +115,8 @@ void *fts_realloc( void *p, unsigned int size)
 	    fts_log( "Out of virtual memory");
 	  else
 	    {
-	      post("Cannot allocate more physical memory, switching to non real-time mode\n");
-	      post("See your maxlkmem parameter (man systune)");
+	      fts_post("Cannot allocate more physical memory, switching to non real-time mode\n");
+	      fts_post("See your maxlkmem parameter (man systune)");
 	    }
 	}
       else

@@ -69,25 +69,25 @@ pt_common_print_millers_kernels(int channel)
 {
   if(channel < 0 || channel >= filter_bank_max->n_channels)
     {
-      post("filter bank:\n");
-      post("# of filters: %d\n", filter_bank_max->n_channels);
-      post("coeffs in total: %d\n", filter_bank_max->n_all_coeffs);
-      post("channels per octave: %d\n", filter_bank_max->channels_per_octave);
-      post("q-factor: %f\n", filter_bank_max->q_factor);
-      post("coefficient cutoff: %f\n", filter_bank_max->coeff_cut);
+      fts_post("filter bank:\n");
+      fts_post("# of filters: %d\n", filter_bank_max->n_channels);
+      fts_post("coeffs in total: %d\n", filter_bank_max->n_all_coeffs);
+      fts_post("channels per octave: %d\n", filter_bank_max->channels_per_octave);
+      fts_post("q-factor: %f\n", filter_bank_max->q_factor);
+      fts_post("coefficient cutoff: %f\n", filter_bank_max->coeff_cut);
     }
   else
     {
       int j;
 
-      post("___________________\n");
-      post("kernel #%d\n", channel);
-      post("  onset: %d\n",filter_bank_max->kernels[channel].onset);
-      post("  correct: %f\n", filter_bank_max->kernels[channel].pow_corr);
-      post("  %d coeffs:\n", filter_bank_max->kernels[channel].n_filter_coeffs);
+      fts_post("___________________\n");
+      fts_post("kernel #%d\n", channel);
+      fts_post("  onset: %d\n",filter_bank_max->kernels[channel].onset);
+      fts_post("  correct: %f\n", filter_bank_max->kernels[channel].pow_corr);
+      fts_post("  %d coeffs:\n", filter_bank_max->kernels[channel].n_filter_coeffs);
 
       for(j=0; j<filter_bank_max->kernels[channel].n_filter_coeffs; j++)
-	post("\t%f\n", filter_bank_max->kernels[channel].filter_coeffs[j]);
+	fts_post("\t%f\n", filter_bank_max->kernels[channel].filter_coeffs[j]);
     }
 }
 
@@ -208,9 +208,9 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
   fts_cfft_inplc(fft_buf, n_points); 
 /*     
   if(print_out >= 2){
-    post("  raw fft output:\n");
+    fts_post("  raw fft output:\n");
     for(i=0; i<n_points; i+=2)
-      post("    #%d: %f %f, %f %f\n", i, fft_buf[i].re, fft_buf[i].im, fft_buf[i+1].re, fft_buf[i+1].im);
+      fts_post("    #%d: %f %f, %f %f\n", i, fft_buf[i].re, fft_buf[i].im, fft_buf[i+1].re, fft_buf[i+1].im);
   }
 */
   pt_common_millers_bounded_q((complex *)fft_buf, filter_bank_max->kernels, q_pow_spec, n_channels);
@@ -219,9 +219,9 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
     q_pow_spec[i] = 0; /* zero end of buffer */
 /*
   if(print_out >= 2){
-    post("  raw filter output:\n");
+    fts_post("  raw filter output:\n");
     for(i=0; i<n_channels; i+=4)
-      post("    #%d: %f %f %f %f\n", i, q_pow_spec[i], q_pow_spec[i+1], q_pow_spec[i+2], q_pow_spec[i+3]);
+      fts_post("    #%d: %f %f %f %f\n", i, q_pow_spec[i], q_pow_spec[i+1], q_pow_spec[i+2], q_pow_spec[i+3]);
   }
 */
   /* compute amplitudes (????... ask Miller why and why like this!) */
@@ -233,9 +233,9 @@ pt_common_find_pitch_candidate(pt_common_obj_t *x, float *candidate, float *pitc
   
 /*
   if(print_out >= 2){
-    post("  filter bands:\n");
+    fts_post("  filter bands:\n");
     for(i=0; i<n_channels; i+=4)
-      post("    #%d: %f %f %f %f\n", i, q_amp_spec[i], q_amp_spec[i+1], q_amp_spec[i+2], q_amp_spec[i+3]);
+      fts_post("    #%d: %f %f %f %f\n", i, q_amp_spec[i], q_amp_spec[i+1], q_amp_spec[i+2], q_amp_spec[i+3]);
   }
 */
 
@@ -399,7 +399,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   fft_buf = (complex *)fts_malloc(n_points * sizeof(complex));
   if ( !fft_buf)
     { 
-      post("pt: filter bank init: can't allocate FFT buffer!\n");
+      fts_post("pt: filter bank init: can't allocate FFT buffer!\n");
       return(0);
     }
 
@@ -407,7 +407,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   if ( !filter_bank)
     {
       fts_free(fft_buf);
-      post("pt: filter bank init: can't allocate structure!\n");
+      fts_post("pt: filter bank init: can't allocate structure!\n");
       return(0);
     }
 
@@ -416,7 +416,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
     {
       fts_free(fft_buf);
       fts_free(filter_bank);
-      post("pt: filter bank init: can't allocate kernels!\n");
+      fts_post("pt: filter bank init: can't allocate kernels!\n");
       return(0);
     }
 
@@ -426,7 +426,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
       fts_free(fft_buf);
       fts_free(filter_bank);
       fts_free(kernels);
-      post("pt: filter bank init: can't allocate coefficients!\n");
+      fts_post("pt: filter bank init: can't allocate coefficients!\n");
       return(0);
     }
 
@@ -478,7 +478,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
 	  static int bugged = 0;
 	  if(!bugged)
 	    {
-	      post("filter bank initialisation failed\n");
+	      fts_post("filter bank initialisation failed\n");
 	      bugged = 1;
 	    }
 	  up = down;

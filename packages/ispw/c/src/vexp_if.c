@@ -84,7 +84,7 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  /* CHANGE this will have to be taken care of */
 	  
 	default:
-	  post("expr: bang: unrecognized result %ld\n", x->exp_res.ex_type);
+	  fts_post("expr: bang: unrecognized result %ld\n", x->exp_res.ex_type);
 	}
     }
 }
@@ -109,7 +109,7 @@ expr_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       
       if (ac > MAX_VARS)
 	{
-	  post("expr: too many values\n");
+	  fts_post("expr: too many values\n");
 	  return;
 	}
       

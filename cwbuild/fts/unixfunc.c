@@ -100,7 +100,7 @@ void fts_kernel_socketstream_init(void)
 }
 
 /***************************************/
-/* from sched.c                 */
+/* from sched.c                        */
 /***************************************/
 void fts_sched_run(void){}
 void fts_sched_halt(void){}
@@ -121,3 +121,86 @@ void fts_kernel_sched_init(void){}
 void fts_client_manager_pipe_start(void){}
 void fts_client_manager_tcp_start(void){}
 void fts_kernel_client_manager_init(void){}
+
+/***************************************/
+/* from file.c                         */
+/***************************************/
+typedef char *(*absolute_path_fun_t)(const char* parent, const char* file, char* buf, int len);
+typedef char *(*file_find_fun_t)(const char *filename, char *buf, int len);
+
+static absolute_path_fun_t absolute_path_fun = NULL;
+static file_find_fun_t find_file_fun = NULL;
+
+char fts_path_separator = ';';
+char fts_file_separator = ':';
+
+void 
+fts_set_absolute_path_fun(void *fun)
+{
+  absolute_path_fun = (absolute_path_fun_t)fun;
+}
+
+void 
+fts_set_find_file_fun(void *fun)
+{
+  find_file_fun = (file_find_fun_t)fun;
+}
+
+int
+fts_file_exists( const char *filename)
+{
+  return 0;
+}
+
+int
+fts_is_file(const char *name)
+{
+  return 0;
+}
+
+int 
+fts_is_directory(const char *name)
+{
+  return 0;
+}
+
+char *
+fts_dirname( char *name)
+{
+  char *end;
+
+  if ((end = strrchr( name, fts_file_separator)) != NULL)
+    *end = '\0';
+
+  return name;
+}
+
+char *
+fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
+{
+  if(absolute_path_fun != NULL)
+    return absolute_path_fun(parent, file, buf, len);
+
+  return NULL;
+}
+
+int
+fts_file_find_in_path(const char* root, fts_list_t* paths, const char* filename, char* buf, int len)
+{
+  return 0;
+}
+
+int
+fts_file_find_in_env( const char *root, fts_symbol_t env, const char *filename, char *buf, int len)
+{
+  return 0;
+}
+
+char *
+fts_file_find(const char *filename, char *buf, int len)
+{
+  if(find_file_fun != NULL)
+    return find_file_fun(filename, buf, len);
+    
+	return NULL;
+}

@@ -58,7 +58,7 @@ int fts_thread_manager_create_thread(fts_thread_worker_t* thread_worker)
     /* make sure that there is enough space */
     if (fts_fifo_write_level(&self->create_fifo) < sizeof(fts_atom_t))
     {
-	post("[thread_manager] not enough space in create FIFO \n");
+	fts_post("[thread_manager] not enough space in create FIFO \n");
 	return -1;
     }
 
@@ -93,7 +93,7 @@ int fts_thread_manager_cancel_thread(fts_thread_worker_t* thread_worker)
     /* make sure that there is enough space */
     if (fts_fifo_write_level(&self->cancel_fifo) < sizeof(fts_atom_t))
     {
-	post("[thread_manager] not enough space in cancel FIFO \n");
+	fts_post("[thread_manager] not enough space in cancel FIFO \n");
 	return -1;
     }
 
@@ -113,7 +113,7 @@ int fts_thread_manager_cancel_thread(fts_thread_worker_t* thread_worker)
 static void
 thread_manager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-    post("[thread_manager] debug info \n");
+    fts_post("[thread_manager] debug info \n");
 }
 
 
@@ -166,7 +166,7 @@ fts_thread_manager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 
     if (0 != success)
     {
-	post("[thread_manager] error while creating thread manager \n");
+	fts_post("[thread_manager] error while creating thread manager \n");
 	fts_log("[thread_manager] error while creating thread manager \n");
 	fts_object_error(o,"cannot create thread manager \n");
 	return;

@@ -89,7 +89,7 @@ zll_copy(struct zll *list, long int x1, long int w)
 
   if (!list || list->x > x2)
     {
-      post("zll_copy: no data to copy\n");
+      fts_post("zll_copy: no data to copy\n");
       return 0;
     }
 
@@ -180,13 +180,13 @@ zll_vecToZll(int ac, const fts_atom_t *av)
   
   if (ac & 1)
     {
-      post("zll_vecToZll: bad input - odd arg count= %d\n", ac);
+      fts_post("zll_vecToZll: bad input - odd arg count= %d\n", ac);
       return(0);
     }
 
   if (! ac)
     {
-      post("zll_vecToZllf: bad input - that is,  no input\n");
+      fts_post("zll_vecToZllf: bad input - that is,  no input\n");
       return(0);
     }
 
@@ -200,7 +200,7 @@ zll_vecToZll(int ac, const fts_atom_t *av)
 	current->x = fts_get_int(av);
       else
 	{
-	  post("zll_vecToZll: bad input for X\n");
+	  fts_post("zll_vecToZll: bad input for X\n");
 	  current->x = 0;
 	}
 
@@ -211,7 +211,7 @@ zll_vecToZll(int ac, const fts_atom_t *av)
 	current->y = fts_get_int(av);
       else
 	{
-	  post("zll_vecToZll: bad input for Y\n");
+	  fts_post("zll_vecToZll: bad input for Y\n");
 	  current->y = 0;
 	}
     }
@@ -227,7 +227,7 @@ zll_vecToZll(int ac, const fts_atom_t *av)
 	current->x = fts_get_int(av);
       else
 	{
-	  post("zll_vecToZll: bad input for X\n");
+	  fts_post("zll_vecToZll: bad input for X\n");
 	  current->x = 0;
 	}
 
@@ -238,7 +238,7 @@ zll_vecToZll(int ac, const fts_atom_t *av)
 	current->y = fts_get_int(av);
       else
 	{
-	  post("zll_vecToZll: bad input for Y\n");
+	  fts_post("zll_vecToZll: bad input for Y\n");
 	  current->y = 0;
 	}
     }
@@ -306,7 +306,7 @@ zll_getslope(struct zll *function)
   
   if (!function)
     {
-      post(" zll_getslope: no data \n");
+      fts_post(" zll_getslope: no data \n");
       return 0;
     }
   
@@ -434,13 +434,13 @@ zll_reduce(struct zll *zllist, float tolerance)
   
   if (!zllist) 
     {
-      post("no data, quoi\n");
+      fts_post("no data, quoi\n");
       return 0;
     }
   
   if (!zllist->next)
     {
-      post("too short to reduce, quoi\n");
+      fts_post("too short to reduce, quoi\n");
       return 0;
     }
 
@@ -471,7 +471,7 @@ funbuff_select(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if (sel_width < 0)
     {
       /* don't change the selection if there is an error */
-      post("funbuff select:  arg2 (width)  must be non-negative\n");
+      fts_post("funbuff select:  arg2 (width)  must be non-negative\n");
     }
   
   this->selectX = sel_x;
@@ -590,7 +590,7 @@ funbuff_write(funbuff_t *this, struct zll *list)
   
   if (!list)
     { 
-      post("funbuff_write: no data to write\n");
+      fts_post("funbuff_write: no data to write\n");
       return(0);
     }
   
@@ -751,7 +751,7 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       
       if (! tab)
 	{
-	  post("funbuff interptab: %s is not a known table\n", sym);
+	  fts_post("funbuff interptab: %s is not a known table\n", sym);
 	  return;
 	}
       
@@ -777,7 +777,7 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       
       if (tab_range == 0)
 	{
-	  post("funbuff_interptab: Table must be non zero\n");
+	  fts_post("funbuff_interptab: Table must be non zero\n");
 	  return;
 	}
       
@@ -804,7 +804,7 @@ funbuff_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if (! list)
     {
-      post("funbuff_set:  no data to set\n");
+      fts_post("funbuff_set:  no data to set\n");
       return;
     }
 
@@ -831,7 +831,7 @@ funbuff_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   if (! funbuff_first(this))
     {
-      post("funbuff_find: nothing to find\n");
+      fts_post("funbuff_find: nothing to find\n");
       return;
     }
   
@@ -873,7 +873,7 @@ funbuff_cut(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if (!head)
     {
-      post("funbuff_cut:  no data in selected region\n");
+      fts_post("funbuff_cut:  no data in selected region\n");
       return;
     }
 
@@ -910,7 +910,7 @@ funbuff_reduce(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   if (! funbuff_first(this))
     {
-      post("funbuff_reduce: buffer empty\n");
+      fts_post("funbuff_reduce: buffer empty\n");
       return;
     }
 
@@ -918,7 +918,7 @@ funbuff_reduce(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if (! oldlist)
     {
-      post("funbuff_reduce: no data to reduce in selected region\n");
+      fts_post("funbuff_reduce: no data to reduce in selected region\n");
       return;
     }
   
@@ -958,7 +958,7 @@ funbuff_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   
   if (! funbuff_global_clip)
     {
-      post("funbuff: clipboard empty\n");
+      fts_post("funbuff: clipboard empty\n");
       return;
     }
       
@@ -978,7 +978,7 @@ funbuff_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   funbuff_t *this = (funbuff_t *)o;
 
-  post("funbuff info:    %ld elements long\n", zll_length(funbuff_first(this)));
+  fts_post("funbuff info:    %ld elements long\n", zll_length(funbuff_first(this)));
 
   if (! funbuff_first(this))
     return;
@@ -1000,9 +1000,9 @@ funbuff_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    highY = list->y;
 	  }
 
-      post("	->	minX= %ld maxX= %ld\n", lowX, highX);
-      post("	->  minY = %ld maxY = %ld\n", lowY, highY);
-      post("	->	domain= %ld range = %ld\n", highX - lowX, highY - lowY  );
+      fts_post("	->	minX= %ld maxX= %ld\n", lowX, highX);
+      fts_post("	->  minY = %ld maxY = %ld\n", lowY, highY);
+      fts_post("	->	domain= %ld range = %ld\n", highX - lowX, highY - lowY  );
     }
 }
 

@@ -573,4 +573,4 @@ typedef union _fts_wrap_fudge
 
 UTILS_API void utils_config(void);
 
-#endif /* _UTILS_H */
+#endif

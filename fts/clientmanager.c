@@ -87,7 +87,7 @@ typedef int socket_t;
 
 #endif /* #ifdef WIN32 */
 
-#define client_error(mess)  post("%s (error %d)\n", mess, SOCKET_ERROR_MESSAGE)
+#define client_error(mess)  fts_post("%s (error %d)\n", mess, SOCKET_ERROR_MESSAGE)
 
 typedef struct {
   fts_object_t base;

@@ -209,7 +209,7 @@ static void decrypt_format( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       for( i = 0; i < ac; i++)
 	if ( !fts_is_int( &at[i]))
 	  {
-	    post( "%s: arguments du message <format> non valides", NOM);
+	    fts_post( "%s: arguments du message <format> non valides", NOM);
 	    return;
 	  }
 
@@ -281,7 +281,7 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 	{
 	  if (!fts_is_int(at + i))
 	    {
-	      post("%s: argument %d non valide (%s)\n", NOM, i, fts_get_class_name( &at[i]));
+	      fts_post("%s: argument %d non valide (%s)\n", NOM, i, fts_get_class_name( &at[i]));
 	      return;
 	    }
 	}

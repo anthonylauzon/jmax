@@ -318,7 +318,7 @@ void fts_dsp_signal_reference(fts_dsp_signal_t *sig)
 
 void fts_dsp_signal_print( fts_dsp_signal_t *s)
 {
-  post( "dsp_signal *%p{ name=\"%s\" refcnt=%p vs=%d}\n", s, s->name, s->refcnt, s->length);
+  fts_post( "dsp_signal *%p{ name=\"%s\" refcnt=%p vs=%d}\n", s, s->name, s->refcnt, s->length);
 }
 
 void fts_dsp_signal_init( void)
@@ -353,13 +353,13 @@ post_signals( fts_dsp_signal_t **sig, int n)
     {
       for ( i = 0; i < n; i++)
 	{
-	  post( "%s[%d]", sig[i]->name, sig[i]->length);
+	  fts_post( "%s[%d]", sig[i]->name, sig[i]->length);
 	  if ( i != n-1)
-	    post( ", ");
+	    fts_post( ", ");
 	}
     }
   else
-    post("NONE");
+    fts_post("NONE");
 }
 
 static void 
@@ -370,12 +370,12 @@ post_object( fts_object_t *obj)
 
   if(ac > 0)
     {
-      post("(:");
-      post_atoms(ac, at);
-      post(") ");
+      fts_post("(:");
+      fts_post_atoms(ac, at);
+      fts_post(") ");
     }
   else
-    post("(:\?\?\?) ");
+    fts_post("(:\?\?\?) ");
 }
 #endif
 
@@ -472,12 +472,12 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_object_t *obj)
   if (gen_outputs(obj, graph->tick_size, graph->sample_rate))
     {
 #ifdef DSP_COMPILER_VERBOSE
-      post( "DSP: scheduling ");
+      fts_post( "DSP: scheduling ");
       post_object((fts_object_t *)obj);
       post_signals( obj->descr.in, obj->descr.ninputs);
-      post( " --> ");
+      fts_post( " --> ");
       post_signals( obj->descr.out, obj->descr.noutputs);
-      post( "\n");
+      fts_post( "\n");
 #endif
 
       /*
@@ -587,9 +587,9 @@ dsp_graph_inc(fts_dsp_graph_t *graph, fts_dsp_object_t *src, int woutlet, fts_ds
   dest->pred_cnt++;
 
 #ifdef DSP_COMPILER_VERBOSE_DETAILS
-  post("  increment ");
+  fts_post("  increment ");
   post_object((fts_object_t *)dest);
-  post("(%d)\n", dest->pred_cnt);
+  fts_post("(%d)\n", dest->pred_cnt);
 #endif
 }
 
@@ -602,9 +602,9 @@ dsp_graph_dec_pred_inc_refcnt(fts_dsp_graph_t *graph, fts_dsp_object_t *src, int
   dest->pred_cnt--;
 
 #ifdef DSP_COMPILER_VERBOSE_DETAILS
-  post("  decrement ");
+  fts_post("  decrement ");
   post_object((fts_object_t *)dest);
-  post("(%d)\n", dest->pred_cnt);
+  fts_post("(%d)\n", dest->pred_cnt);
 #endif
 
   if (dest->descr.ninputs)

@@ -70,7 +70,7 @@ pbank_data_read_file(pbank_data_t *data, fts_symbol_t file_name)
 
   if(!f)
     {
-      post("pbank: can't open file to read: %s\n", file_name);
+      fts_post("pbank: can't open file to read: %s\n", file_name);
       return(0);
     }
 
@@ -80,7 +80,7 @@ pbank_data_read_file(pbank_data_t *data, fts_symbol_t file_name)
 
   if ((! ret) || (! fts_is_symbol(&a)) || (fts_get_symbol(&a) != fts_new_symbol("pbank")))
     {
-      post("pbank: file hasn't pbank format: %s\n", file_name);
+      fts_post("pbank: file hasn't pbank format: %s\n", file_name);
       return(0);
     }
 
@@ -130,7 +130,7 @@ pbank_data_write_file(pbank_data_t *data, fts_symbol_t file_name)
   f = fts_atom_file_open(file_name, "w");
   if(!f)
     {
-      post("pbank: can't open file to write: %s\n", file_name);
+      fts_post("pbank: can't open file to write: %s\n", file_name);
       return(0);
     }
 
@@ -175,7 +175,7 @@ pbank_data_export_ascii(pbank_data_t *data, fts_symbol_t file_name)
   f = fts_atom_file_open(file_name, "w");
   if(!f)
     {
-      post("pbank: can't open file to write: %s\n", file_name);
+      fts_post("pbank: can't open file to write: %s\n", file_name);
       return(0);
     }
 
@@ -217,7 +217,7 @@ pbank_data_get(fts_symbol_t name, int n, int m)
 
       if(data->n != n || data->m != m)
 	{
-	  post("pbank: %s %d %d: dimensions don't match\n", name, data->n, data->m);
+	  fts_post("pbank: %s %d %d: dimensions don't match\n", name, data->n, data->m);
 	  return 0;
 	}
       else
@@ -345,13 +345,13 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (n <= 0)
     {
       n = DEFAULT_N_COLS;
-      post("pbank: # of columns argument out of range, setting to %d\n", n);
+      fts_post("pbank: # of columns argument out of range, setting to %d\n", n);
     }
        
   if (m <= 0)
     {
       m = DEFAULT_N_ROWS;
-      post("pbank: # of rows argument out of range, setting to %d\n",m);
+      fts_post("pbank: # of rows argument out of range, setting to %d\n",m);
     }
 
   /* name skip arg is "" */

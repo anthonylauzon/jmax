@@ -205,7 +205,7 @@ poly_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   if ((which > x->nvoice) || (which < 1))
     {
-      post("poly: 'set' voice %ld is out of range\n", which);
+      fts_post("poly: 'set' voice %ld is out of range\n", which);
       return;
     }
 

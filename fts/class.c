@@ -412,11 +412,11 @@ fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method
   enum method_check_e check = method_check(cl, s, type);
   
   if(check == found_varargs_method && type != fts_void_class)
-    post("warning: redefinition of varargs method for message %s of class %s\n", s, fts_class_get_name(cl));
+    fts_post("warning: redefinition of varargs method for message %s of class %s\n", s, fts_class_get_name(cl));
   else if(check != found_no_method && type != NULL)
-    post("warning: redefinition of %s method for message %s of class %s\n", fts_class_get_name(type), s, fts_class_get_name(cl));
+    fts_post("warning: redefinition of %s method for message %s of class %s\n", fts_class_get_name(type), s, fts_class_get_name(cl));
   else if(check != found_no_method && type == NULL)
-    post("warning: redefinition of generic atom method for message %s of class %s\n", s, fts_class_get_name(cl));      
+    fts_post("warning: redefinition of generic atom method for message %s of class %s\n", s, fts_class_get_name(cl));      
 
   method_put(cl, s, type, method, 0);
 }
@@ -427,12 +427,12 @@ fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t method)
   enum method_check_e check = method_check(cl, s, NULL);  
 
   if(check == found_method)
-    post("warning: redefinition of generic atom method for message %s of class %s by varargs declaration\n", s, fts_class_get_name(cl));
+    fts_post("warning: redefinition of generic atom method for message %s of class %s by varargs declaration\n", s, fts_class_get_name(cl));
   else if(check == found_varargs_method)
-    post("warning: redefinition of varargs method for message %s of class %s\n", s, fts_class_get_name(cl));    
+    fts_post("warning: redefinition of varargs method for message %s of class %s\n", s, fts_class_get_name(cl));    
   
   if(method_check(cl, s, fts_tuple_class) != found_no_method)
-    post("warning: redefinition of tuple method for message %s of class %s by varargs declaration\n", s, fts_class_get_name(cl));
+    fts_post("warning: redefinition of tuple method for message %s of class %s by varargs declaration\n", s, fts_class_get_name(cl));
 
   /* register method void if void method not already defined */
   if(method_check(cl, s, fts_void_class) != found_method)
@@ -475,11 +475,11 @@ fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t met
   enum method_check_e check = method_check(cl, (const void *)n, type);
 
   if(check == found_varargs_method && type != fts_void_class)
-    post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_class_get_name(cl));
+    fts_post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_class_get_name(cl));
   else if(check != found_no_method && type != NULL)
-    post("warning: redefinition of %s method for inlet %d of class %s\n", fts_class_get_name(type), n, fts_class_get_name(cl));
+    fts_post("warning: redefinition of %s method for inlet %d of class %s\n", fts_class_get_name(type), n, fts_class_get_name(cl));
   else if(check != found_no_method && type == NULL)
-    post("warning: redefinition of generic atom method for inlet %d of class %s\n", fts_class_get_name(type), n, fts_class_get_name(cl));
+    fts_post("warning: redefinition of generic atom method for inlet %d of class %s\n", fts_class_get_name(type), n, fts_class_get_name(cl));
 
   method_put(cl, (const void *)n, type, method, 0);
 }
@@ -491,12 +491,12 @@ fts_class_inlet_varargs(fts_class_t *cl, int winlet, fts_method_t method)
   enum method_check_e check = method_check(cl, (const void *)n, NULL);
 
   if(check == found_method)
-    post("warning: redefinition of generic atom method for inlet %d of class %s by varargs declaration\n", n, fts_class_get_name(cl));
+    fts_post("warning: redefinition of generic atom method for inlet %d of class %s by varargs declaration\n", n, fts_class_get_name(cl));
   else if(check == found_varargs_method)
-    post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_class_get_name(cl));
+    fts_post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_class_get_name(cl));
 
   if(method_check(cl, (const void *)n, fts_tuple_class) != found_no_method)
-    post("warning: redefinition of tuple method for inlet %d of class %s by varargs declaration\n", n, fts_class_get_name(cl));
+    fts_post("warning: redefinition of tuple method for inlet %d of class %s by varargs declaration\n", n, fts_class_get_name(cl));
 
   /* register method void if void method not already defined */
   if(method_check(cl, (const void *)n, fts_void_class) != found_method)

@@ -214,7 +214,7 @@ fts_bmax_file_load( const char *name, fts_object_t *parent, int ac, const fts_at
   if ((status = fts_binary_file_map(f, &descr)) != fts_ok)
     {
       fclose(f);
-      post("fts_bmax_file_load: Cannot load jMax max file %s\n", name);
+      fts_post("fts_bmax_file_load: Cannot load jMax max file %s\n", name);
       return status;
     }
 
@@ -362,17 +362,17 @@ static fts_object_t **object_table = 0;
 #define CHECK_OBJ_STACK   \
       { \
 	if (object_tos < 0) \
-	 post("While loading: Object Stack overflow\n"); \
+	 fts_post("While loading: Object Stack overflow\n"); \
       else if (object_tos > OBJECT_STACK_DEPTH) \
-         post("While Loading: Object Stack underflow\n"); \
+         fts_post("While Loading: Object Stack underflow\n"); \
       }
 
 #define CHECK_EVAL_STACK   \
       { \
 	if (eval_tos <  0) \
-         post("While loading: Eval Stack overflow\n"); \
+         fts_post("While loading: Eval Stack overflow\n"); \
       else if (eval_tos > OBJECT_STACK_DEPTH) \
-         post("While loading: Eval Stack underflow\n"); \
+         fts_post("While loading: Eval Stack underflow\n"); \
       }
 
 #else
@@ -1182,7 +1182,7 @@ fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symb
   file = fopen(name, "wb");
   if (file == 0)
     {
-      post("Cannot save to: %s\n", name);
+      fts_post("Cannot save to: %s\n", name);
       return -1;
     }
 
@@ -1330,7 +1330,7 @@ fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 
   f->symbol_table[f->header.n_symbols] = sym;
 
-  return f->header.n_symbols ++ ; /* !!! POST increment here !!! */
+  return f->header.n_symbols ++ ; /* !!! fts_post increment here !!! */
 }
 				 
 

@@ -328,14 +328,14 @@ dsp_add_signal( fts_symbol_t name, int size)
 void 
 dsp_chain_post( void)
 {
-  post( "printing dsp chain:\n");
+  fts_post( "printing dsp chain:\n");
   ftl_program_post( main_dsp_graph.chain);
 }
 
 void 
 dsp_chain_post_signals( void)
 {
-  post( "printing signals:\n");
+  fts_post( "printing signals:\n");
   ftl_program_post_signals_count( main_dsp_graph.chain);
 }
 

@@ -128,7 +128,7 @@ analysis(pitch_t *x)
   x->out.power = (new_power > 0.0f)? (DB_POW(new_power)): (-120);
 
   if(x->ctl.print_me)
-    post("  power measure (in dB) %f\n", x->out.power); 
+    fts_post("  power measure (in dB) %f\n", x->out.power); 
   
   found_candidate = pt_common_find_pitch_candidate(&x->pt, &candidate, &pitch_power, &total_power, x->ctl.print_me);
 
@@ -138,15 +138,15 @@ analysis(pitch_t *x)
 
       if(x->ctl.print_me)
 	{
-	  post("  found candidate:\n");
-	  post("    bin %f\n", candidate);
-	  post("    note %f\n", new_pitch);
+	  fts_post("  found candidate:\n");
+	  fts_post("    bin %f\n", candidate);
+	  fts_post("    note %f\n", new_pitch);
 	}
     }
   else
     {
       if(x->ctl.print_me) 
-	post("  sorry, no pitch!\n");
+	fts_post("  sorry, no pitch!\n");
 
       new_pitch = 0.0f;
     }
@@ -202,7 +202,7 @@ analysis(pitch_t *x)
 	  x->stat.pitch = 0.0f;
 	  
 	  if(x->ctl.loud)
-	    post("%s: reattack: power %f\n", CLASS_NAME, sqrt(pitch_power)/x->pt.n_points);
+	    fts_post("%s: reattack: power %f\n", CLASS_NAME, sqrt(pitch_power)/x->pt.n_points);
 	  
 	  /* here's the good part:
 	   * there's a reattack and we haven't reported a note yet since the last one,
@@ -276,12 +276,12 @@ analysis(pitch_t *x)
 	  for(i=0; i<x->hist.n_pitch; i++){
 	    float deviation = x->hist.ory[(x->hist.idx-i) & HISTORY_MASK].pitch - pitch_average;
 	    if(x->ctl.print_me){
-	      post("  deviation %f\n", deviation);
+	      fts_post("  deviation %f\n", deviation);
 	    }
 	    if(deviation < -x->ctl.vib_depth || deviation > x->ctl.vib_depth)
 	      {
 		if(x->ctl.print_me) 
-		  post("  pitch deviated! -> called off\n");
+		  fts_post("  pitch deviated! -> called off\n");
 		deviated = 1;
 	      }
 	  }
@@ -302,14 +302,14 @@ analysis(pitch_t *x)
 	    {
 	      if(x->ctl.loud)
 		{
-		  post("%s: ongoing note: %f\n", CLASS_NAME, pitch_average);
-		  post("  power: %f\n", new_power);
-		  post("  relative power (in %): %f\n", pitch_power / total_power);
+		  fts_post("%s: ongoing note: %f\n", CLASS_NAME, pitch_average);
+		  fts_post("  power: %f\n", new_power);
+		  fts_post("  relative power (in %): %f\n", pitch_power / total_power);
 		  
 		  if(x->hist.n_pitch) 
-		    post("  stable over %d points!\n", x->hist.n_pitch);
+		    fts_post("  stable over %d points!\n", x->hist.n_pitch);
 		  else 
-		    post("  no stability criterion!\n");
+		    fts_post("  no stability criterion!\n");
 		}
 
 	      x->stat.last_int_pitch = int_pitch;
@@ -319,7 +319,7 @@ analysis(pitch_t *x)
 	    }
 	}
       else if(x->ctl.print_me) 
-	post("  out of tune!\n");
+	fts_post("  out of tune!\n");
     }
 
   x->out.micro_pitch = new_pitch;
@@ -385,15 +385,15 @@ pitch_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   x->ctl.print_me = (n > 0)? n: 0;
   
-  post("%s:\n", CLASS_NAME);
+  fts_post("%s:\n", CLASS_NAME);
   
   pt_common_print_obj(&x->pt);
   
-  post("  vibrato: %d %f\n", (int)x->ctl.vib_time, x->ctl.vib_depth);
-  post("  max-error: %f\n", x->ctl.max_error);
-  post("  reattack threshold: %f\n", x->ctl.reattack_thresh);
-  post("  reattack time: %ld\n", x->ctl.reattack_time);
-  post("  loud: %d\n", (int)x->ctl.loud);
+  fts_post("  vibrato: %d %f\n", (int)x->ctl.vib_time, x->ctl.vib_depth);
+  fts_post("  max-error: %f\n", x->ctl.max_error);
+  fts_post("  reattack threshold: %f\n", x->ctl.reattack_thresh);
+  fts_post("  reattack time: %ld\n", x->ctl.reattack_time);
+  fts_post("  loud: %d\n", (int)x->ctl.loud);
   
   pt_common_print_ctl(&x->pt);
 }
@@ -463,7 +463,7 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(!x->wind)
     {
-      post("%s: can't allocate window: init failed\n", CLASS_NAME);
+      fts_post("%s: can't allocate window: init failed\n", CLASS_NAME);
       return;
     } 
   else

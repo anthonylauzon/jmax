@@ -637,7 +637,7 @@ void* thread_manager_main(void* arg)
 				   (void*)worker->thread_function);
 	  if (0 != success)
 	    {
-	      post("[thread_manager] cannot start a new thread \n");
+	      fts_post("[thread_manager] cannot start a new thread \n");
 	    }
 	  else
 	    {

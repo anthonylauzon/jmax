@@ -982,9 +982,9 @@ static fts_status_t fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_
       else
 	{
 	  if ( in->ttype != FTS_LEX_SYMBOL)
-	    post( "[%d] Expecting symbol, got %d\n", in->line_number, in->ttype);
+	    fts_post( "[%d] Expecting symbol, got %d\n", in->line_number, in->ttype);
 	  else
-	    post("[%d] Format not supported (%s)\n", in->line_number, fts_get_symbol( &in->val));
+	    fts_post("[%d] Format not supported (%s)\n", in->line_number, fts_get_symbol( &in->val));
 	  
 	  /* skip until the next ';' */
 
@@ -1222,7 +1222,7 @@ static fts_status_t fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t
       else
 	{
 	  if (fts_is_symbol(&args[0]))
-	    post("Object %s not yet Supported in .pat files",
+	    fts_post("Object %s not yet Supported in .pat files",
 		 fts_get_symbol(&(args[0])));
 	}
     }
@@ -1446,7 +1446,7 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
 
 static void pat_warning(const char *description) 
 {
-  post("Warning loading .pat file: %s\n", description);
+  fts_post("Warning loading .pat file: %s\n", description);
 }
 
 

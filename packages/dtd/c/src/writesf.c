@@ -198,7 +198,7 @@ static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     }
     else
     {
-      post("[writesf~] audiofile (%s) is not valid \n", self->filename);
+      fts_post("[writesf~] audiofile (%s) is not valid \n", self->filename);
       fts_log("[writesf~] audiofile (%s) is not valid \n", self->filename);
     }
   }    
@@ -241,7 +241,7 @@ static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t* self = (writesf_t*)o;
-  post("[writesf~] start \n");
+  fts_post("[writesf~] start \n");
   self->is_started = 1;
 }
 
@@ -264,13 +264,13 @@ static void writesf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   self->is_started = 0;
   /* reset write index */
   self->write_index = 0;
-  post("[writesf~] stop\n");
+  fts_post("[writesf~] stop\n");
 }
 
 static void writesf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t* self = (writesf_t*)o;
-  post("[writesf~] pause \n");
+  fts_post("[writesf~] pause \n");
   self->is_started += 1;
   self->is_started = self->is_started % 2;
 }

@@ -134,7 +134,7 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	}
       else
 	{
-	  post("osc1~: %s: can't find tab1~\n", this->sym);
+	  fts_post("osc1~: %s: can't find tab1~\n", this->sym);
 	  fts_dsp_add_function_zero(fts_dsp_get_output_name(dsp, 0), fts_dsp_get_output_size(dsp, 0));
 	  return;
 	}
@@ -177,7 +177,7 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
 	  osc_ftl_data_set_table(this->ftl_data, (void *)wavetab->table);
 	}
       else
-	post("osc1~: set %s: can't find table\n", s);
+	fts_post("osc1~: set %s: can't find table\n", s);
     }
   else
     osc_ftl_data_set_table(this->ftl_data, (void *)cos_table);
@@ -321,7 +321,7 @@ osc_config(void)
 
   if (!wavetable_make_cos())
     {
-      post("osc~: out of memory\n");
+      fts_post("osc~: out of memory\n");
       return;
     }
 

@@ -110,7 +110,7 @@ explode_doappend(explode_t *this, long int time, long int pit, long int vel, lon
   evt_t *cur = this->current;
 
   if (this->data.evt && (!cur || cur->next))
-    post("oops! lost my marbles\n");
+    fts_post("oops! lost my marbles\n");
   else
     {
       evt_t *e = (evt_t *) fts_heap_alloc(explode_evt_heap);
@@ -146,7 +146,7 @@ explode_at(explode_t *this, long int n1, long int n2, long int n3)
   this->current = e;
 
   if (! e)
-    post("explode: note not found\n");
+    fts_post("explode: note not found\n");
 }
 
 
@@ -394,7 +394,7 @@ explode_export_midifile(explode_t *this, fts_symbol_t file_name)
       fts_midifile_close(file);
     }
   else
-    post("explode export: cannot open file %s\n", file_name);
+    fts_post("explode export: cannot open file %s\n", file_name);
 }
 
 /****************************************************************************/
@@ -644,7 +644,7 @@ explode_start_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       this->mode = MPLAY;
     }
   else
-    post("explode: no sequence\n");
+    fts_post("explode: no sequence\n");
 }
 
 
@@ -677,7 +677,7 @@ explode_follow_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (this->current)
     this->mode = MFOLLOW;
   else
-    post("explode: follow: out of range\n");
+    fts_post("explode: follow: out of range\n");
 }
 
 
@@ -826,7 +826,7 @@ explode_next_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	explode_stop(this);
     }
   else
-    post("explode: next: not playing\n");
+    fts_post("explode: next: not playing\n");
 }
 
 
@@ -1012,7 +1012,7 @@ explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       this->data.name = name;
     else
       {
-	post("explode: %s: named already exists\n", name);
+	fts_post("explode: %s: named already exists\n", name);
 	this->data.name = 0;
       }
   else
@@ -1045,7 +1045,7 @@ explode_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       this->data.name = name;
     else
     {
-      post("explode: %s: named already exists\n", name);
+      fts_post("explode: %s: named already exists\n", name);
       this->data.name = 0;
 
       return;
@@ -1066,7 +1066,7 @@ explode_append_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   evt_t *cur = this->current;
 
   if (this->data.evt && (!cur || cur->next))
-    post("oops! lost my marbles\n");
+    fts_post("oops! lost my marbles\n");
   else
     {
       evt_t *e = (evt_t *) fts_heap_alloc(explode_evt_heap);
