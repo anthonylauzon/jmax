@@ -1110,8 +1110,8 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
     findDefaultPath();
   }
 
-  ftsclient_log("[ftsxtra]: debug \n", _path);
-  ftsclient_log("[ftsxtra]: path %s\n", _path);
+  ftsclient_log("[ftsclient]: debug \n", _path);
+  ftsclient_log("[ftsclient]: path %s\n", _path);
 
   cmdLine[0] = 0;
   strcat(cmdLine, _path);
@@ -1134,7 +1134,7 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
   attr.lpSecurityDescriptor = NULL; 
 
   /* keep a handle to the old stdout */
-  pipe_t old_stdout = GetStdHandle(STD_OUTPUT_HANDLE); 
+  pipe_t old_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
 
   /* create a pipe for the new stdout */
   if (!CreatePipe(&tmp_in, &new_stdout, &attr, 0)) {
@@ -1179,7 +1179,6 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
    CloseHandle(tmp_out); 
 
 
-
   /* 
      start FTS
   */
@@ -1187,9 +1186,11 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
   ZeroMemory(&startup_info, sizeof(STARTUPINFO));
   startup_info.cb = sizeof(STARTUPINFO); 
 
-  result = CreateProcess(_path, cmdLine, NULL, NULL, TRUE, REALTIME_PRIORITY_CLASS, 
+  // [RS] Create process with default priority class
+  result = CreateProcess(_path, cmdLine, NULL, NULL, TRUE, 0, 
 			 NULL, NULL, &startup_info, &process_info);
   if (result == 0) {
+    ftsclient_log("[ftsclient]: CreateProcess() failed\n");
     throw FtsClientException("Failed to start the fts application\n");    
   }
 
