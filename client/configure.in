@@ -59,10 +59,12 @@ AC_CHECK_FUNCS(socket)
 dnl Check for Java compiler
 AC_ARG_WITH(javac,
   [  --with-javac=JAVAC       give java compiler (optional)],
-  [JAVAC="$withval"])
+  [JAVAC="$withval"],
+  [JAVAC=javac])
 AC_ARG_WITH(java,
   [  --with-java=JAVA         give java virtual machine (optional)],
-  [JAVA="$withval"])
+  [JAVA="$withval"],
+  [JAVA=java])
 
 AC_SUBST(JAVAC)
 
