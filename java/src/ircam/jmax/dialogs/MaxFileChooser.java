@@ -68,6 +68,7 @@ public class MaxFileChooser
     
     //get filters comboBox
     filtersCombo = ((Container)((Container)fd.getComponent(5)).getComponent(3)).getComponent(3);
+
     // get label
     label = (JLabel)((Container)((Container)fd.getComponent(5)).getComponent(1)).getComponent(2);
     //get file textfield 

@@ -34,7 +34,6 @@ import java.io.*;
 import javax.swing.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;

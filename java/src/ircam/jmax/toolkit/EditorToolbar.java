@@ -64,6 +64,7 @@ public class EditorToolbar extends JToolBar implements ActionListener{
 
     /** prepare the popup */
     itsPopupMenu = new JPopupMenu();
+    itsMenu = new JMenu("Tools");
 
     //install the Tools in the Toolbar
     Tool aTool;
@@ -87,20 +88,22 @@ public class EditorToolbar extends JToolBar implements ActionListener{
 	
 	aButton.setToolTipText(theTool.getName());
 	aButton.setMargin(new Insets(0,0,0,0));
-	
+	aButton.addActionListener(this);
+	itsTools.put(aButton, theTool);
 	add(aButton);
 	itsButtonGroup.add(aButton);
 	
 	aMenuItem = new JMenuItem (theTool.getIcon());
-	itsPopupMenu.add (aMenuItem);
-	
-	validate();
-	
-	itsTools.put(aButton, theTool);
-	itsTools.put(aMenuItem, theTool);
-	
-	aButton.addActionListener(this);
 	aMenuItem.addActionListener(this);
+	itsTools.put(aMenuItem, theTool);
+	itsPopupMenu.add (aMenuItem);
+
+	aMenuItem = new JMenuItem (theTool.getIcon());
+	aMenuItem.addActionListener(this);
+	itsTools.put(aMenuItem, theTool);
+	itsMenu.add (aMenuItem);
+
+	validate();
     }  
     
     
@@ -121,7 +124,8 @@ public class EditorToolbar extends JToolBar implements ActionListener{
     //---- Fields and accessors
     
     public JPopupMenu itsPopupMenu;
-    
+    public JMenu itsMenu;
+
     Hashtable itsTools = new Hashtable();
     
     private ButtonGroup itsButtonGroup = new ButtonGroup();

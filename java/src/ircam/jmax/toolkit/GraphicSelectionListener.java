@@ -36,7 +36,6 @@ public interface GraphicSelectionListener {
 
   /** a point have been choosen */
   public abstract void selectionPointChoosen(int x, int y, int modifiers);
-
   /** a point have been choosen */
   public abstract void selectionPointDoubleClicked(int x, int y, int modifiers);
 }
