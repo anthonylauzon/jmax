@@ -97,6 +97,16 @@ typedef struct {
 extern void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity);
 
 /**
+ * Clears hashtable's content.<BR>
+ * After calling <CODE>fts_hashtable_clear</CODE>, hashtable will contain no keys, but
+ * will keep its allocation state (i.e. its capacity will be its capacity before call).
+ *
+ * @fn void fts_hashtable_clear( fts_hashtable_t *h)
+ * @param h the hashtable
+ */
+extern void fts_hashtable_clear( fts_hashtable_t *h);
+
+/**
  * Deinitializes a hashtable.
  *
  * @fn void fts_hashtable_destroy( fts_hashtable_t *h)

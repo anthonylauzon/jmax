@@ -134,7 +134,7 @@ void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_ca
 
   if (key_type == fts_s_symbol)
     h->key_type = 0;
-  else if (key_type && (key_type == fts_s_int || key_type == fts_s_ptr || key_type == fts_string))
+  else if (key_type && (key_type == fts_s_int || key_type == fts_s_ptr || key_type == fts_s_string))
     h->key_type = key_type;
   else
     {
@@ -151,7 +151,7 @@ void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_ca
   hashtable_get_functions( h);
 }
 
-void fts_hashtable_destroy( fts_hashtable_t *h)
+void fts_hashtable_clear( fts_hashtable_t *h)
 {
   unsigned int i;
 
@@ -164,8 +164,16 @@ void fts_hashtable_destroy( fts_hashtable_t *h)
 	  next = c->next;
 	  fts_heap_free( c, cell_heap);
 	}
+
+      h->table[i] = 0;
     }
 
+  h->count = 0;
+}
+
+void fts_hashtable_destroy( fts_hashtable_t *h)
+{
+  fts_hashtable_clear( h);
   fts_free( h->table);
 }
 
