@@ -43,9 +43,7 @@ public class SilkInterpreter extends SchemeInterpreter
 { 
     /** The current environment used for the evaluation. */
     Environment currEnvironment;
-    Environment jmaxEnvironment;
-    //SettingsEnvironment jmaxSettings;
-    Environment jmaxSettings;
+    SilkSettingsEnvironment globalEnvironment;
     Environment schemeEnvironment;
 
     /** The Silk object ued for the evaluation. */
@@ -83,9 +81,8 @@ public class SilkInterpreter extends SchemeInterpreter
 	itsInterp = new Scheme(null);
 
 	schemeEnvironment = new Environment();
-	//schemeEnvironment = new SettingsEnvironment();
 	setCurrentEnvironment(schemeEnvironment);
-	//define("these-settings", schemeEnvironment);
+	define("these-settings", schemeEnvironment);
 
 	Primitive.installPrimitives(schemeEnvironment); 
 	load(new InputPort(new StringReader(SchemePrimitives.CODE)));
@@ -98,59 +95,16 @@ public class SilkInterpreter extends SchemeInterpreter
 	 * with our own. The "method" converts strings as
 	 * expected. The constructor accepts an argument list. The
 	 * function uses the current environment. */
-	/* FIXME should disappear as soon as Silk is more complete. */
 	define("constructor", SilkJavaConstructor.getFactory());
 	define("method", SilkJavaMethod.getFactory());
 	define("invoke", new SilkJavaInvoke(SilkJavaInvoke.VIRTUAL));
 	define("invoke-static", new SilkJavaInvoke(SilkJavaInvoke.STATIC));
 	define("load", new loadProcedure());
 	define("interpreter", this);
-	define("class", null);
-    }
 
-    public void boot(String root) throws ScriptException 
-    {
-	try
-	    {
-		//jmaxSettings = new SettingsEnvironment();
-		jmaxSettings = new Environment();
-		jmaxSettings.parent = schemeEnvironment;
-		setCurrentEnvironment(jmaxSettings);
-
-		/* Define jmaxInterp so all Scheme file have acces to
-                 * this object. The root property is also exported to
-                 * Scheme for succesful living in the interpreter
-                 * world. */
-		define("jmax-interp", this);
-		define("jmax-interp-name", "silk");
-		define("jmax-root", root);
-		define("slash", File.separator);
-
-		/* Silk prints out an error message and stops the
-		 * evaluation if you try to lookup a variable name
-		 * that is not defined. To avoid this I define "dir"
-		 * and "this-package" manually */
-		define("dir", root);
-		define("this-package", "");
-
-		jmaxEnvironment = new Environment();
-		jmaxEnvironment.parent = jmaxSettings;
-		setCurrentEnvironment(jmaxEnvironment);
-		
-		/* Load the "jmaxboot.scm" file that will do whatever is needed to
-		 * create the startup configuration, included reading user files
-		 * installing editors, data types and data handlers. */
-		load(root + File.separator + "scm" + File.separator +  "jmaxboot.scm");
-
-		Environment usrEnvironment = new Environment();
-		usrEnvironment.parent = jmaxEnvironment;
-		setCurrentEnvironment(usrEnvironment);
-
-	    }
-	catch (Exception e)
-	    {
-		throw new ScriptException("Scheme error in initialization: " + e.getMessage());
-	    }	
+	globalEnvironment = new SilkSettingsEnvironment();
+	globalEnvironment.parent = schemeEnvironment;
+	setCurrentEnvironment(globalEnvironment);
     }
 
     /** Sets input port. */
@@ -266,30 +220,6 @@ public class SilkInterpreter extends SchemeInterpreter
 	}
     }
 
-    /* Quick & Dirty, that is FIXME */
-    public boolean commandComplete(String s) 
-    {
-	try  
-	    {
-		Object x = new InputPort(new StringReader(s)).read();
-		return true;
-	    }
-	catch (Exception e) 
-	    {
-		return false;
-	    }
-    }
-
-    public Project loadProject(Package context, File proj) throws ScriptException
-    {
-	throw new ScriptException("Not yet implemented");
-    }
-
-    public MaxDocument loadScriptedDocument(Package context, File script) throws ScriptException
-    {
-	throw new ScriptException("Not yet implemented");
-    }
-
     public String getScriptLanguage()
     {
 	return "scheme";
@@ -318,27 +248,31 @@ public class SilkInterpreter extends SchemeInterpreter
     }
 
 
-    public SettingsTable makeSettings(Package pkg) {
-	SettingsEnvironment env = new SettingsEnvironment();
-	env.parent = getCurrentEnvironment();
+  public SettingsTable getGlobalSettings() {
+    return globalEnvironment;
+  }
+
+    public SettingsTable makeSettings(MaxPackage pkg) {
+	SilkSettingsEnvironment env = new SilkSettingsEnvironment();
+	env.parent = globalEnvironment;
 	return env;
     }
 
-    public Object makeWorkSpace(Package pkg) {
+    public Object makeWorkSpace(MaxPackage pkg) {
 	Environment env = new Environment();
 	env.parent = (Environment) pkg.getSettings();
 	env.define("these-settings", pkg.getSettings());
 	return env;
     }
 
-    Package context;
+    MaxPackage context;
 
-    public void setContext(Package pkg) {
+    public void setContext(MaxPackage pkg) {
 	context = pkg;
 	setCurrentEnvironment((Environment) pkg.getWorkSpace());
     }
 
-    public void removeContext(Package pkg) {
+    public void removeContext(MaxPackage pkg) {
 	if (context == pkg) {
 	    setCurrentEnvironment(((Environment) pkg.getSettings()).parent);
 	}
