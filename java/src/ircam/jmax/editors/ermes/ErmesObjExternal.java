@@ -7,6 +7,7 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.ermes.*;
+import ircam.jmax.mda.*;
 
 /**
  * The generic "extern" object in ermes. (example: adc1~) 
@@ -147,6 +148,13 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	   GetSketchWindow().AddToSubWindowList(itsSubWindow);
 	   itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
 	 }
+       }
+       else if(itsFtsObject instanceof FtsDataObject){
+	 System.out.println("eccolo!");
+	 try{
+	   MaxData aData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(new FtsLocation(itsFtsObject)));
+	   aData.edit();
+	 }catch (Exception e){}
        }
      }
      else if (!itsSketchPad.itsRunMode) itsSketchPad.ClickOnObject(this, evt, x, y);

@@ -20,7 +20,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
   int values[];
  
   TextField itsFormula = new TextField("", 40);
-  Panel itsCoordinates;
+  Label itsCoordinates;
   //Graphics holdGraph;
   //Graphics offGraphics = null;
   //Dimension offDimension;	   
@@ -48,11 +48,20 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     values = new int[N_POINTS];
     itsFormula.resize(300, 20);
     getContentPane().add("South", itsFormula);
-
-    itsCoordinates = new Panel();
-    itsCoordinates.resize(300, 20);
-    getContentPane().add("North", itsFormula);
     
+    //Panel aPanel = new Panel();
+    //aPanel.resize(300, 20);
+    //Label aLabel = new Label("Coordinates: ");
+    //aPanel.add(aLabel);
+    itsCoordinates = new Label();
+    //aPanel.add(itsCoordinates);
+    //aPanel.validate();
+    itsCoordinates.resize(100,20);
+    itsCoordinates.setBackground(Color.white);
+    getContentPane().add("North", itsCoordinates);
+    
+    Init();
+
     validate();
     //holdGraph = getGraphics();
     addMouseMotionListener(this);
@@ -104,7 +113,8 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
   public void mouseMoved(MouseEvent e){
     int x = e.getX();
     int y = e.getY();
-    itsFormula.setText("("+x+","+y+")");
+    //itsFormula.setText("("+x+","+y+")");
+    itsCoordinates.setText("x: "+x+"\t\t y: "+y);
   }
   
   public void mouseDragged(MouseEvent e){
