@@ -105,13 +105,13 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 
     /* #############    listeners    ######################################## */
     objSelListener = new ObjectSelectedListener(){
-	    public void objectSelected(FtsGraphicObject object)
-	    {
-		ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-		((FtsPatcherObject)object.getParent()).requestShowObject(object);
-		((FtsPatcherObject)object.getParent()).requestStopWaiting(ToolsPanel.toolsPanel);
-	    }
-	};
+	public void objectSelected(FtsGraphicObject object)
+	{
+	  ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	  ((FtsPatcherObject)object.getParent()).requestShowObject(object);
+	  ((FtsPatcherObject)object.getParent()).requestStopWaiting(ToolsPanel.toolsPanel);
+	}
+      };
 
     listSelListener = new ListSelectionListener(){
 	    public void valueChanged(ListSelectionEvent e) {
@@ -147,14 +147,14 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 
     tabbedPane.setSelectedIndex(0);
     tabbedPane.addChangeListener(new ChangeListener(){
-	    public void stateChanged(ChangeEvent e)
-	    {		
-		//set current table model
-		currentTableModel = ((JMaxToolPanel)tabbedPane.getSelectedComponent()).getToolTableModel();	    
-		//updates JTree model
-		createTreeModelFromSelection(((JMaxToolPanel)tabbedPane.getSelectedComponent()).getListSelectionModel());
-	    }
-	});
+	public void stateChanged(ChangeEvent e)
+	{		
+	  //set current table model
+	  currentTableModel = ((JMaxToolPanel)tabbedPane.getSelectedComponent()).getToolTableModel();	    
+	  //updates JTree model
+	  createTreeModelFromSelection(((JMaxToolPanel)tabbedPane.getSelectedComponent()).getListSelectionModel());
+	}
+      });
 
     ////////////////////////////////////////////////////////////////
 
@@ -249,8 +249,8 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	    if(top==null)
 	      {
 		top = new FtsMutableTreeNode(ftsObj, (((FtsPatcherObject)ftsObj).getName()!=null) ? 
-						      ((FtsPatcherObject)ftsObj).getName() : ftsObj.getDescription());
-		//top = new FtsMutableTreeNode(ftsObj, ftsObj.getDescription());  
+					     ((FtsPatcherObject)ftsObj).getName() : 
+					     ((FtsPatcherObject)ftsObj).getEditorFrame().getTitle());
 		start = top;
 	      }				
 	    else
