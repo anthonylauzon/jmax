@@ -189,18 +189,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "mess"=..\mess\winbuild\mess.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "midi"=..\midi\winbuild\midi.dsp - Package Owner=<4>
 
 Package=<5>

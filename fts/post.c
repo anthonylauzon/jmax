@@ -28,9 +28,11 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <fts/fts.h>
 #include <ftsprivate/OLDclient.h>
+#include <ftsconfig.h>
 
 
 /******************************************************************************/
@@ -203,16 +205,30 @@ void post_error(fts_object_t *obj, const char *format , ...)
 
 static char* log_file = NULL;
 
-void fts_init_log(void)
+char* fts_log_date(char* buf, int len)
+{
+#ifdef WIN32
+  char t[9];
+  char d[9];
+  _strdate(d);
+  _strtime(t);
+  snprintf(buf, len, "%s %s", d, t);
+#else
+  snprintf(buf, len, "%s", ctime(time(NULL)));
+#endif
+  return buf;
+}
+
+void fts_log_init(void)
 {
   FILE* log;
+  char buf[1024];
 
 #ifdef WIN32
   log_file = "C:\\fts_log.txt";
 #else
   char* home = getenv("HOME");
   if (home) {
-    char buf[1024];
     snprintf(buf, 1024, "%s/.fts_log", home);
     log_file = strdup(buf);
   } else {
@@ -222,7 +238,7 @@ void fts_init_log(void)
 
   /* truncate the file */
   log = fopen(log_file, "w");
-  fprintf(log, "[log]: started new log file\n");
+  fprintf(log, "\n[log]: started logging at %s\n", fts_log_date(buf, 1024));
   fclose(log);
 }
 
@@ -238,7 +254,7 @@ void fts_log(char* fmt, ...)
   va_list args; 
 
   if (log_file == NULL) {
-    fts_init_log();
+    fts_log_init();
   }
 
   log = fopen(log_file, "a");
@@ -259,7 +275,7 @@ void fts_log_atoms( int ac, const fts_atom_t *at)
   FILE* log;
 
   if (log_file == NULL) {
-    fts_init_log();
+    fts_log_init();
   }
 
   log = fopen(log_file, "a");

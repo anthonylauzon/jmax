@@ -52,7 +52,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib utils.lib /nologo /dll /machine:I386 /libpath:"..\..\..\fts\lib" /libpath:"..\..\utils\c\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib utils.lib /nologo /dll /machine:I386 /libpath:"..\..\..\fts\lib" /libpath:"..\..\utils\c\\"
 
 !ELSEIF  "$(CFG)" == "data - Win32 Debug"
 
@@ -97,6 +97,10 @@ SOURCE=..\c\src\bpf.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\col.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\col.h
 # End Source File
 # Begin Source File
@@ -133,6 +137,10 @@ SOURCE=..\c\src\fvec.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\getinter.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\getlist.c
 # End Source File
 # Begin Source File
@@ -162,6 +170,34 @@ SOURCE=..\c\src\mat.c
 # Begin Source File
 
 SOURCE=..\c\src\mat.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\message.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\message.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\messtab.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\messtab.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\preset.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\row.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\row.h
 # End Source File
 # Begin Source File
 

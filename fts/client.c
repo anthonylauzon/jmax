@@ -152,7 +152,6 @@ static client_t *client_table[MAX_CLIENTS];
 static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_manager_t *this = (client_manager_t *)o;
-  struct sockaddr_in client_addr;
   socket_t new_socket;
   int new_client_id;
   fts_atom_t argv[3];
@@ -586,7 +585,6 @@ static void client_delete_object( fts_object_t *o, int winlet, fts_symbol_t s, i
 {
   client_t *this = (client_t *)o;
   fts_object_t *obj;
-  int i;
 
   obj = fts_get_object( at);
 
@@ -678,7 +676,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 
 /***********************************************************************
  *
- *  client controler object
+ *  client controller object
  *
  */
 
@@ -688,11 +686,11 @@ typedef struct {
   fts_object_t *to;
   int gate;
   int echo;
-} client_controler_t;
+} client_controller_t;
 
-static void client_controler_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  client_controler_t *this = (client_controler_t *)o;
+  client_controller_t *this = (client_controller_t *)o;
   fts_object_t *target;
   fts_atom_t *v;
   fts_symbol_t target_class_name;
@@ -771,20 +769,20 @@ static void client_controler_init(fts_object_t *o, int winlet, fts_symbol_t s, i
   fts_connection_new( FTS_NO_ID, this->from, 0, (fts_object_t *)this, 0);
   fts_connection_new( FTS_NO_ID, (fts_object_t *)this, 0, this->to, 0);
 
-  fts_log( "client: created controler on %s %s channel %d\n", fts_symbol_name( target_class_name), fts_symbol_name( fts_object_get_variable( target)), channel_number);
+  fts_log( "client: created controller on %s %s channel %d\n", fts_symbol_name( target_class_name), fts_symbol_name( fts_object_get_variable( target)), channel_number);
 }
 
-static void client_controler_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_controller_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  client_controler_t *this = (client_controler_t *)o;
+  client_controller_t *this = (client_controller_t *)o;
 
   fts_object_delete_from_patcher( this->from);
   fts_object_delete_from_patcher( this->to);
 }
   
-static void client_controler_anything_fts(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_controller_anything_fts(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  client_controler_t *this = (client_controler_t *)o;
+  client_controller_t *this = (client_controller_t *)o;
   client_t *client;
 
   /* If we don't echo and the gate is set, do nothing */
@@ -795,7 +793,7 @@ static void client_controler_anything_fts(fts_object_t *o, int winlet, fts_symbo
 
   if (client != NULL)
     {
-      fts_log( "client: sending to client \"");
+      fts_log( "client: sending to client \"%s ", fts_symbol_name(s));
       fts_log_atoms( ac, at);
       fts_log( "\"\n");
 
@@ -807,9 +805,9 @@ static void client_controler_anything_fts(fts_object_t *o, int winlet, fts_symbo
     }
 }
 
-static void client_controler_anything_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_controller_anything_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  client_controler_t *this = (client_controler_t *)o;
+  client_controller_t *this = (client_controller_t *)o;
 
   this->gate = 1;
 
@@ -822,24 +820,24 @@ static void client_controler_anything_client(fts_object_t *o, int winlet, fts_sy
   this->gate = 0;
 }
 
-static void client_controler_set_echo(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+static void client_controller_set_echo(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  client_controler_t *this = (client_controler_t *)obj;
+  client_controller_t *this = (client_controller_t *)obj;
 
   if ( fts_is_symbol(value) )
     this->echo = (fts_get_symbol(value) == fts_s_yes);
 }
 
-static fts_status_t client_controler_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(client_controler_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(client_controller_t), 1, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_controler_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_controler_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_anything, client_controler_anything_client);
-  fts_method_define_varargs(cl, 0, fts_s_anything, client_controler_anything_fts);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_controller_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_controller_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_anything, client_controller_anything_client);
+  fts_method_define_varargs(cl, 0, fts_s_anything, client_controller_anything_fts);
 
-  fts_class_add_daemon( cl, obj_property_put, fts_new_symbol("echo"), client_controler_set_echo);
+  fts_class_add_daemon( cl, obj_property_put, fts_new_symbol("echo"), client_controller_set_echo);
 
   return fts_Success;
 }
@@ -861,7 +859,7 @@ void fts_client_config( void)
 
   fts_class_install( s_client_manager, client_manager_instantiate);
   fts_class_install( fts_new_symbol("client"), client_instantiate);
-  fts_class_install( fts_new_symbol("client_controler"), client_controler_instantiate);
+  fts_class_install( fts_new_symbol("client_controller"), client_controller_instantiate);
 
   fts_set_symbol( at, s_client_manager);
   ac++;

@@ -246,17 +246,27 @@ static void fts_kernel_classes_config( void)
 
 void fts_init( int argc, char **argv)
 {
+  fts_log("[init]: kernel initialization\n");
+
   /* Initialization */
   fts_kernel_init();
+
+  fts_log("[init]: parsing command line arguements\n");
 
   /* Must be here, since it can be used by further modules */
   fts_cmd_args_parse( argc, argv);
 
+  fts_log("[init]: platform initialization\n");
+
   /* Platform dependant initialization */
   fts_platform_init();
 
+  fts_log("[init]: initializing kernel classes\n");
+
   /* Installation of kernel classes */
   fts_kernel_classes_config();
+
+  fts_log("[init]: loading project\n");
 
   /* Load the initial project */
   fts_load_project();

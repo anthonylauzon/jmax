@@ -177,7 +177,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if ( !hostptr)
     {
-      fprintf( stderr, "Unknown host: %s\n", host);
+      fts_log("[oldclient]: Unknown host: %s\n", host);
       return;
     }
 
@@ -185,9 +185,12 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if (this->stream) 
     {
+
+      fts_log("[oldclient]: Opening tcp connection to host %s on port %d\n", host, port);
+
       if ( (this->socket = socket( AF_INET, SOCK_STREAM, 0) ) == -1)
 	{
-	  fprintf( stderr, "[oldclient] error opening socket (%s)\n", strerror( errno));
+	  fts_log( "[oldclient] error opening socket (%s)\n", strerror( errno));
 	  return;
 	}
       
@@ -199,7 +202,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
 	{
-	  fprintf( stderr, "[oldclient] cannot bind socket (%s)\n", strerror( errno));
+	  fts_log( "[oldclient] cannot bind socket (%s)\n", strerror( errno));
 	  return;
 	}
       
@@ -211,15 +214,19 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       /* Connect the socket to the client */
       if ( connect(this->socket, &this->client_addr, sizeof(this->client_addr)) < 0) 
 	{
-	  fprintf( stderr, "[oldclient] cannot connect (%s)\n", strerror( errno));
+	  fts_log( "[oldclient] cannot connect (%s)\n", strerror( errno));
 	  return;
 	}
+
+      fts_log("[oldclient]: Connected\n");
     } 
   else 
     {
+      fts_log("[oldclient]: Opening udp connection to host %s on port %d\n", host, port);
+
       if ( (this->socket = socket( AF_INET, SOCK_DGRAM, 0) ) == -1)
 	{
-	  fprintf( stderr, "[oldclient] error opening socket (%s)\n", strerror( errno));
+	  fts_log( "[oldclient] error opening socket (%s)\n", strerror( errno));
 	  return;
 	}
       
@@ -231,7 +238,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
 	{
-	  fprintf( stderr, "[oldclient] cannot bind socket (%s)\n", strerror( errno));
+	  fts_log( "[oldclient] cannot bind socket (%s)\n", strerror( errno));
 	  return;
 	}
       
@@ -243,13 +250,15 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       /* Send an init packet: empty content, just the packet */
       if ( sendto( this->socket, "init", 4, 0, &this->client_addr, sizeof( this->client_addr)) < 0)
 	{
-	  fprintf( stderr, "[oldclient] cannot send init packet (%s)\n", strerror( errno));
+	  fts_log( "[oldclient] cannot send init packet (%s)\n", strerror( errno));
 	  return;
 	}
 
       fts_stack_push( &this->output_buffer, unsigned char, 0);
       fts_stack_push( &this->output_buffer, unsigned char, 0);
       fts_stack_push( &this->output_buffer, unsigned char, 0);
+
+      fts_log("[oldclient]: Connected\n");
     }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
@@ -331,7 +340,7 @@ static void oldclient_flush( oldclient_t *this)
       if ( write( this->socket, p, len) < 0)
 #endif
 	{
-	  fprintf( stderr, "[oldclient] cannot send init packet (%s)\n", strerror( errno));
+	  fts_log( "[oldclient] cannot send init packet (%s)\n", strerror( errno));
 	  return;
 	}
       
@@ -355,32 +364,32 @@ static void oldclient_flush( oldclient_t *this)
       {
 	int i;
 	
-	fprintf( stderr, "Sending %d bytes\n", len);
+	fts_log( "Sending %d bytes\n", len);
 	
 #define NN 32
 	for ( i = 0; i < len; i++)
 	  {
 	    if ( i % NN == 0)
-	      fprintf( stderr, "[%03d]", i);
+	      fts_log( "[%03d]", i);
 	    
 	    if (p[i] >= ' ')
-	      fprintf( stderr, " %2c", p[i]);
+	      fts_log( " %2c", p[i]);
 	    else
-	      fprintf( stderr, " %02x", (int)p[i]);
+	      fts_log( " %02x", (int)p[i]);
 	    
 	    if ( i % NN == (NN-1))
-	      fprintf( stderr, "\n");
+	      fts_log( "\n");
 	  }
 	
 	if ( i % NN != (NN-1))
-	  fprintf( stderr, "\n");
+	  fts_log( "\n");
       }
 #endif
       
       r = sendto( this->socket, p, len, 0, &this->client_addr, sizeof( this->client_addr));
 
       if ( r != len)
-	fprintf( stderr, "[oldclient] error sending (%s)\n", strerror( errno));
+	fts_log( "[oldclient] error sending (%s)\n", strerror( errno));
 
       fts_stack_clear( &this->output_buffer);
       fts_stack_push( &this->output_buffer, unsigned char, 0);
@@ -467,7 +476,7 @@ static void reallocate_symbol_cache( int index)
 
 static void protocol_error( char c, int state)
 {
-  fprintf( stderr, "Error in protocol : got %d ('%c') in state %d\n", c, (c < 32) ? '?' : c, state);
+  fts_log( "Error in protocol : got %d ('%c') in state %d\n", c, (c < 32) ? '?' : c, state);
 }
 
 static void fts_client_parse_char( char c)
@@ -493,9 +502,9 @@ static void fts_client_parse_char( char c)
 	if (mess_dispatch_table[ cmd ])
 	  {
 #ifdef INCOMING_DEBUG_TRACE
-	    fprintf( stderr, "Dispatching '%c' ", cmd);
+	    fts_log( "Dispatching '%c' ", cmd);
 	    fprintf_atoms( stderr, ac, at);
-	    fprintf( stderr, "\n");
+	    fts_log( "\n");
 #endif
 
 	    (*mess_dispatch_table[ cmd ])( ac, at);
@@ -688,7 +697,7 @@ void fts_client_start_clientmess(void)
 void fts_client_add_int(int value)
 {
 #ifdef OUTGOING_DEBUG_TRACE      
-  fprintf( stderr, "%d ", value);
+  fts_log( "%d ", value);
 #endif
 
   oldclient_put_char( oldclient, INT_CODE);
@@ -768,7 +777,7 @@ static int cache_symbol( fts_symbol_t s)
 void fts_client_add_symbol(fts_symbol_t s)
 {
 #ifdef OUTGOING_DEBUG_TRACE      
-  fprintf( stderr, "%s ", fts_symbol_name(s) );
+  fts_log( "%s ", fts_symbol_name(s) );
 #endif
 
   if ( fts_symbol_get_cache_index(s) >= 0 )   /* Is symbol cached ? */
@@ -794,7 +803,7 @@ void fts_client_add_symbol(fts_symbol_t s)
 void fts_client_add_string(const char *s)
 {
 #ifdef OUTGOING_DEBUG_TRACE      
-  fprintf( stderr, "%s ", s);
+  fts_log( "%s ", s);
 #endif
 
   oldclient_put_char( oldclient, STRING_CODE);

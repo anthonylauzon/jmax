@@ -47,6 +47,45 @@ static char winmidiport_error_buffer[256];
 #define msg_p2(_m)    ((_m >> 16) & 0x7f)
 
 
+DWORD winmidi_in = 0;
+DWORD winmidi_out = 0;
+
+char*
+winmidi_tostring(DWORD midi, char* buf, int len)
+{
+  switch (msg_type(midi)) {
+  case 0:
+    _snprintf(buf, len, "none");
+    break;
+  case NOTEOFF:
+    _snprintf(buf, len, "noteoff: %3d %3d", msg_chan(midi), msg_p1(midi));
+    break;
+  case NOTEON:
+    _snprintf(buf, len, "noteon: %3d %3d %3d", msg_chan(midi), msg_p1(midi), msg_p2(midi));
+    break;
+  case KEYPRESSURE:
+    _snprintf(buf, len, "poly: %3d %3d %3d", msg_chan(midi), msg_p1(midi), msg_p2(midi));
+    break;
+  case CONTROLCHANGE:
+    _snprintf(buf, len, "cc: %3d %3d %3d", msg_chan(midi), msg_p1(midi), msg_p2(midi));
+    break;
+  case PROGRAMCHANGE:
+    _snprintf(buf, len, "prog: %3d %3d", msg_chan(midi), msg_p1(midi));
+    break;
+  case CHANNELPRESSURE:
+    _snprintf(buf, len, "press: %3d %3d", msg_chan(midi), msg_p1(midi));
+    break;
+  case PITCHBEND:
+    _snprintf(buf, len, "bend: %3d %3d", msg_chan(midi), msg_p1(midi) + (msg_p2(midi) << 7));
+    break;
+  case SYSEX:
+    _snprintf(buf, len, "sysex");
+    break;
+  }
+  return buf;
+}
+
+
 /*************************************************
  *
  *  Win midi port
@@ -218,6 +257,7 @@ winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1
     break;
     
   case MIM_DATA:
+    winmidi_in = dwParam1;
     if (!winmidiport_buffer_full(this)) {
       this->incoming[this->head++] = dwParam1;
       if (this->head == BUFFER_SIZE) {
@@ -341,8 +381,9 @@ static void
 winmidiport_send_note(fts_object_t *o, int channel, int number, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
+  winmidi_out = msg_pack(NOTEON, channel, number, value);
   if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(NOTEON, channel, number, value));  
+    MMRESULT res = midiOutShortMsg(this->hmidiout, winmidi_out);  
   }
 }
 
@@ -350,6 +391,7 @@ static void
 winmidiport_send_poly_pressure(fts_object_t *o, int channel, int number, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
+  winmidi_out = msg_pack(KEYPRESSURE, channel, number, value);
   if (this->hmidiout) {
     MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(KEYPRESSURE, channel, number, value));  
   }
@@ -359,6 +401,7 @@ static void
 winmidiport_send_control_change(fts_object_t *o, int channel, int number, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
+  winmidi_out = msg_pack(CONTROLCHANGE, channel, number, value);
   if (this->hmidiout) {
     MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CONTROLCHANGE, channel, number, value));  
   }
@@ -368,6 +411,7 @@ static void
 winmidiport_send_program_change(fts_object_t *o, int channel, int value, double time)
 {	
   winmidiport_t *this = (winmidiport_t *)o;
+  winmidi_out = msg_pack(PROGRAMCHANGE, channel, value, 0);
   if (this->hmidiout) {
     MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PROGRAMCHANGE, channel, value, 0));  
   }
@@ -377,6 +421,7 @@ static void
 winmidiport_send_channel_pressure(fts_object_t *o, int channel, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
+  winmidi_out = msg_pack(CHANNELPRESSURE, channel, value, 0);
   if (this->hmidiout) {
     MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CHANNELPRESSURE, channel, value, 0));  
   }
@@ -386,6 +431,7 @@ static void
 winmidiport_send_pitch_bend(fts_object_t *o, int channel, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
+  winmidi_out = msg_pack(PITCHBEND, channel, (value & 0x7f), ((value >> 7) & 0x7f));
   if (this->hmidiout) {
     MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PITCHBEND, channel, (value & 0x7f), ((value >> 7) & 0x7f)));  
   }

@@ -48,6 +48,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   /* Tokenize the command line and append them to the command line arguments */
   s = lpszCmdLine;
+  fts_log("[winmain]: command line: %s\n", lpszCmdLine);
 
   /* Basic state machine:
        state 0 = in white, 
@@ -88,11 +89,21 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   }
   argv[argc] = NULL;
 
+  fts_log("[winmain]: command line: ");
+  for (state = 0; state < argc; state++) {
+    fts_log("%s ", argv[state]);
+  }
+  fts_log("\n");
+
   /* Initialize FTS */
   fts_init( argc, argv);
 
+  fts_log("[winmain]: starting fts\n");
+
   /* Run the scheduler */
   fts_sched_run();
+
+  fts_log("[winmain]: stopping fts\n");
 
   /* When and if the scheduler exit, run the shutdown functions and return */
 /*    fts_modules_shutdown(); */
