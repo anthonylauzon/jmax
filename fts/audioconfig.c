@@ -793,6 +793,8 @@ audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 
   fts_set_int(&arg, self->buffer_size);
   fts_client_send_message( o, audioconfig_s_buffer_size, 1, &arg);
+
+  fts_config_set_dirty((config_t*)fts_config_get(), 1);
 }
 
 static void
@@ -807,6 +809,8 @@ audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
  
   fts_set_int(&arg, self->sample_rate);
   fts_client_send_message( o, audioconfig_s_sampling_rate, 1, &arg); 
+
+  fts_config_set_dirty((config_t*)fts_config_get(), 1);
 }
 
 static void
