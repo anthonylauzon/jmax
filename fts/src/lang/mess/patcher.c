@@ -771,7 +771,10 @@ static void patcher_get_data(fts_daemon_action_t action, fts_object_t *obj,
 {
   fts_patcher_t *this = (fts_patcher_t *) obj;
 
-  fts_set_data(value, (fts_data_t *) (this->data));
+  if (! fts_patcher_is_error(this))
+    fts_set_data(value, (fts_data_t *) (this->data));
+  else
+    fts_set_void(value);
 }
 
 
