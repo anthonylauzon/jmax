@@ -576,7 +576,7 @@ private void guessDirectories()
   if (properties.get( "jmaxRoot") == null)
   {
     URL url = ClassLoader.getSystemResource( "jmax.jar.root");
-    
+
     String root, u;
     u = url.toString();
     
@@ -651,6 +651,7 @@ private void openConnection()
     
     String ftsDir = (String)properties.get( "jmaxServerDir");
     String ftsName = (String)properties.get( "jmaxServerName");
+    String ftsOpt  = (String)properties.get( "jmaxServerArg");
     
     if (ftsName == null)
       ftsName = "fts";
@@ -663,6 +664,9 @@ private void openConnection()
     if (connectionType.equals("pipe"))
       argv[argc++] = "--stdio";
     
+    if(ftsOpt != null)
+	argv[argc++] = ftsOpt;
+
     // Support for project and configuration file given in command line
     if ((String)properties.get("jmaxProject") != null)
       argv[argc++] = "--project="+((String)properties.get("jmaxProject"));
