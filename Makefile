@@ -38,7 +38,7 @@ clean_java:
 	(cd packages; $(MAKE) clean_java)
 
 tags:
-	(find . \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.tcl" \) -print | etags -t - )
+	(find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.tcl" \) -print | etags -t - )
 .PHONY: tags
 
 .PHONY: all
