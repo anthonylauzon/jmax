@@ -1,9 +1,0 @@
-SOURCES = ConsoleModule.java \
-	  Console.java \
-	  ConsoleKeyListener.java \
-	  ConsoleWriter.java \
-          ConsoleWindow.java \
-	  ConsoleThread.java \
-	  ConsoleTextArea.java \
-	  ConsoleMouseListener.java
-
