@@ -1,3 +1,7 @@
+2003-01-30  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* add load of AUDIO/MIDI configuration file at startup
+
 2003-01-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* make adc~/dac~ aliases to input~/monitor~
