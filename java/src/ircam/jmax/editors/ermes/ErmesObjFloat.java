@@ -104,36 +104,6 @@ class ErmesObjFloat extends ErmesObject {
     return String.valueOf(itsFloat);
   }
 	
-  /*public boolean ChangeRectFloat(){
-    String aString; 
-    boolean aChange = false;
-    if (itsFloat != 0) aString = String.valueOf(itsFloat);
-    else aString = "0.0";
-    int lenght = itsFontMetrics.stringWidth(aString);
-    itsSketchPad.RemoveElementRgn(this);
-    // if (lenght >= currentRect.width*2/3-2-5){
-    //while(lenght >= currentRect.width*2/3-2-5){
-    if (lenght+currentRect.height/2+20+itsFontMetrics.stringWidth("0")-8 > currentRect.width){
-    while(lenght+currentRect.height/2+20+itsFontMetrics.stringWidth("0")-8 > currentRect.width){
-    Resize1(currentRect.width+15, currentRect.height);
-    aChange = true;
-    }
-    }
-    else {
-    // while(lenght < currentRect.width*2/3-2-20){
-    while(lenght+currentRect.height/2+20+itsFontMetrics.stringWidth("0")< currentRect.width-30){
-    Resize1(currentRect.width-15, currentRect.height);
-    aChange = true;
-    }
-    }
-    itsSketchPad.SaveOneElementRgn(this);
-    if(aChange) {
-    aChange = false;
-    return true;
-    }
-    else return false;
-    }*/
-	
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
       int tempWidth = itsFontMetrics.stringWidth("0")*8+20;
@@ -174,6 +144,13 @@ class ErmesObjFloat extends ErmesObject {
   //  mouseDown
   //--------------------------------------------------------
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+    if(evt.getClickCount()>1) {
+      Point aPoint = GetSketchWindow().getLocation();
+      itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsFloatDialog.ReInit(String.valueOf(itsFloat), this, GetSketchWindow());
+      itsFloatDialog.setVisible(true);
+      return true;
+    }
     if (itsSketchPad.itsRunMode) {
       itsFirstY = y;
       if (firstClick) {
@@ -184,14 +161,8 @@ class ErmesObjFloat extends ErmesObject {
       itsFtsObject.put("value", itsFloat);
 
       DoublePaint();
-      if(evt.getClickCount()>1) fastMode = true;
-      else fastMode = false;	//ENZOOOOOO!
-    }
-    else if(evt.getClickCount()>1) {
-      Point aPoint = GetSketchWindow().getLocation();
-      itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsFloatDialog.ReInit(String.valueOf(itsFloat), this, GetSketchWindow());
-      itsFloatDialog.setVisible(true);
+      if(x<itsX+currentRect.width/2) fastMode = true;
+      else fastMode = false;
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;

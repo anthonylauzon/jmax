@@ -9,7 +9,8 @@ import ircam.jmax.fts.*;
  * The "integer box" graphic object.
  */
 class ErmesObjInt extends ErmesObject {
-
+  
+  static ErmesObjIntegerDialog itsIntegerDialog = null;
   ErmesObjInlet itsInlet;
   ErmesObjOutlet itsOutlet;
   int itsInteger = 0;
@@ -43,13 +44,16 @@ class ErmesObjInt extends ErmesObject {
     DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*6;
     preferredSize.height = DEFAULT_HEIGHT+4;
     preferredSize.width = DEFAULT_WIDTH+DEFAULT_HEIGHT/2+20;
+    if(itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(theSketchPad.GetSketchWindow(), this);
     super.Init(theSketchPad, x, y, theString);
     return true;
   }
 
    public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
      super.Init(theSketchPad,  theFtsObject);
-    //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
+     if(itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(theSketchPad.GetSketchWindow(), this);
+
+     //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
     //le valeur affiche risque de sortir de la boite
      DEFAULT_HEIGHT = itsFontMetrics.getHeight();
      DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*6;
@@ -111,35 +115,13 @@ class ErmesObjInt extends ErmesObject {
       DoublePaint();
     }		
   }
-  
-  /*public boolean ChangeRectInt(){
-    String aString; 
-    boolean aChange = false;
-    aString = String.valueOf(itsInteger);
-    int lenght = itsFontMetrics.stringWidth(aString);
-    itsSketchPad.RemoveElementRgn(this);
-    //if (lenght >= currentRect.width*2/3-2-5){
-    if (lenght+currentRect.height/2+20+itsFontMetrics.stringWidth("0")-8 > currentRect.width){
-    //while(lenght >= currentRect.width*2/3-2-5){
-    while(lenght+currentRect.height/2+20+itsFontMetrics.stringWidth("0")-8 > currentRect.width){
-    Resize1(currentRect.width+15, currentRect.height);
-    aChange = true;
-    }
-    }
-    else {
-    //while(lenght < currentRect.width*2/3-2-20){
-    while(lenght+currentRect.height/2+20+itsFontMetrics.stringWidth("0")< currentRect.width-30){
-    Resize1(currentRect.width-15, currentRect.height);
-    aChange = true;
-    }
-    }
-    itsSketchPad.SaveOneElementRgn(this);
-    if(aChange) {
-    aChange = false;
-    return true;
-    }
-    else return false;
-    }*/
+
+  public void FromDialogValueChanged(Integer theInt){
+    itsInteger = theInt.intValue();
+
+    itsFtsObject.put("value", theInt);
+    DoublePaint();
+  }
   
   void ResizeToNewFont(Font theFont){
     if(!itsResized){
@@ -180,6 +162,14 @@ class ErmesObjInt extends ErmesObject {
   //  mouseDown
   //--------------------------------------------------------
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+    
+    if(evt.getClickCount()>1) {
+      Point aPoint = GetSketchWindow().getLocation();
+      itsIntegerDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, GetSketchWindow());
+      itsIntegerDialog.setVisible(true);
+      return true;
+    }
     if (itsSketchPad.itsRunMode) {
       itsFirstY = y;
       if (firstClick) {

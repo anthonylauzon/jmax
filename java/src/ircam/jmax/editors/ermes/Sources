@@ -29,6 +29,7 @@ SSOURCES = \
           ErmesObjInlet.java \
           ErmesObjInletOutlet.java \
           ErmesObjInt.java \
+          ErmesObjIntegerDialog.java \
           ErmesObjMessThread.java \
           ErmesObjMessage.java \
           ErmesObjOut.java \
