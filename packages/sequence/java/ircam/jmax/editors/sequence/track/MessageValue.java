@@ -101,7 +101,6 @@ public class MessageValue extends AbstractEventValue
 	    
 	    width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
 	  }
-	//setProperty("duration", new Integer(width));
 	setProperty("duration", new Double(width));
 	setProperty("height", new Integer(height));
       }
@@ -140,12 +139,14 @@ public class MessageValue extends AbstractEventValue
     
     if(evt != null)
       {
-	//for the undo/redo
-	evt.setProperty("message", text);
-	evt.setProperty("duration", new Double(width));
-	evt.setProperty("height", new Integer(height));
+	propertyValuesArray[0] = "message";
+	propertyValuesArray[1] = text;
+	propertyValuesArray[2] = "duration";
+	propertyValuesArray[3] = new Double(width);
+	propertyValuesArray[4] = "height";
+	propertyValuesArray[5] = new Integer(height);
 	
-	evt.sendSetMessage(MESSAGE_NAME, model.getPropertyCount(), getPropertyValues());
+	evt.sendSetProperties( 6, propertyValuesArray);
       }
     else
       {
@@ -190,7 +191,6 @@ public class MessageValue extends AbstractEventValue
     
     width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
     
-    //setProperty("duration", new Integer(width));
     setProperty("duration", new Double(width));
   }
 
@@ -222,31 +222,10 @@ public class MessageValue extends AbstractEventValue
       return new MessageValue();
     }
     
-    /*public Enumeration getPropertyNames()
-      {
-      return new ArrayEnumeration(defNamesArray);
-      }
-      public int getPropertyCount()
-      {
-      return defPropertyCount;
-      }*/
-    
     public DataFlavor getDataFlavor()
     {
       return MessageValueDataFlavor.getInstance();
     }
-
-    /*public Class getPropertyType(int index)
-      {
-      if(index==0)
-      return String.class;
-      else
-      return Integer.class;
-      }
-	
-    
-      String defNamesArray[] = {"message", "integer"};
-      int defPropertyCount = 2;*/
   }
 
   /**
@@ -255,23 +234,6 @@ public class MessageValue extends AbstractEventValue
   {
     return MessageEventRenderer.getRenderer();
   }
-  
-  /*public Enumeration getPropertyNames()
-    {
-    return new ArrayEnumeration(nameArray);
-    }
-    
-    public int getPropertyCount()
-    {
-    return propertyCount;
-    }
-  
-    public int getPropertyType(int index)
-    {
-    if(index < propertyCount)
-    return propertyTypes[index];
-    else return UNKNOWN_TYPE;
-    }*/
   
   public String[] getLocalPropertyNames()
   {
@@ -283,20 +245,6 @@ public class MessageValue extends AbstractEventValue
     return localPropertyCount;
   }
   
-  /*public Object[] getPropertyValues()
-    {
-    for(int i = 0; i<propertyCount; i++)
-    propertyValuesArray[i] = getProperty(nameArray[i]);
-    
-    return propertyValuesArray;
-    }
-
-    public void setPropertyValues(int nArgs, Object args[])
-    {
-    for(int i = 0; i<nArgs; i++)
-    setProperty(nameArray[i], args[i]);
-    }*/
-
   public Object[] getLocalPropertyValues()
   {
     for(int i = 0; i<localPropertyCount; i++)
@@ -326,10 +274,7 @@ public class MessageValue extends AbstractEventValue
   public static final int DEFAULT_HEIGHT = 13;
   static String path;
   public static ImageIcon MESSAGE_ICON;
-  /*static String nameArray[] = {"message", "integer"};
-    static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};*/
   static String localNameArray[] = {"duration", "open", "height"};
-  //static int propertyCount = 2;
   static int localPropertyCount = 3;
   
   static 

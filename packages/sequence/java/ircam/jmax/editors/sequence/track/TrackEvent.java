@@ -38,6 +38,16 @@ import javax.swing.undo.*;
 
 public class TrackEvent extends FtsObject implements Event, Drawable, UndoableData, Cloneable
 {
+  static
+  {
+    FtsObject.registerMessageHandler( TrackEvent.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((TrackEvent)obj).setCurrentProperties( args.getLength(), args.getAtoms());
+	}
+      });
+  }
+
   public TrackEvent(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)
   {
     super(server, parent, objId);
@@ -119,41 +129,67 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   {
     highlighted = hh;
   }
+
+  public void setCurrentProperties( int nArgs, FtsAtom[] args)
+  {
+    String name;
+    Object newVal;
+    double doubleVal;
+    
+    for(int i = 0; i < nArgs-1; i+=2)
+      {
+	name = args[i].symbolValue.toString();
+	newVal = args[i].getValue();
+
+	if (itsTrackDataModel != null)
+	  {
+	    if (((UndoableData) itsTrackDataModel).isInGroup()&&( !name.equals("time")))
+	      ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, name, newVal));
+	  }
+      
+	if (newVal instanceof Double) 
+	  {
+	    doubleVal = ((Double)newVal).doubleValue();
+	    if ( name.equals("time"))
+	      setTime( doubleVal);
+	    else  {
+	      if ( value != null) value.setProperty(name, newVal); //unknown Double property
+	    }
+	  }
+	else if (value != null)
+	  value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object
+	
+	itsTrackDataModel.changeEvent(this, name, newVal);
+      }    
+  }
+
   /**
    * Set the named property */
   public void setProperty(String name, Object theValue)
   {    
-    //int intVal;
-    double doubleVal;
-    
-    if (itsTrackDataModel != null)
-      {
-	if (((UndoableData) itsTrackDataModel).isInGroup()&&(!name.equals("time")))
-	  ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransf(this, name, theValue));
-      }
-	
-    if (theValue instanceof Double) 
-      {
-	doubleVal = ((Double)theValue).doubleValue();
-	if (name.equals("time"))
-	  setTime(doubleVal);
-	else  {
-	  if (value != null) value.setProperty(name, theValue); //unknown Double property
-	}
-      }
-    else if (value != null)
-      value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
-    
-    itsTrackDataModel.changeEvent(this, name, theValue);
-
-    //send the set message to the fts event object
-    sendSetMessage( value.getValueInfo().getName(), itsTrackDataModel.getPropertyCount(), value.getPropertyValues());
+    sendSetProperty( name, theValue);
   }
 
-  void sendSetMessage(String type, int nArgs, Object arguments[])
+  void sendSetProperty( String propName, Object propValue)
   {
     args.clear();
-    for(int i=0; i<nArgs; i++)
+    args.addString( propName);
+    args.add( propValue);
+
+    try{
+      send( FtsSymbol.get("set"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("TrackEvent: I/O Error sending setProperty Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  void sendSetProperties( int nArgs, Object arguments[])
+  {
+    args.clear();
+    for(int i = 0; i < nArgs; i++)
       args.add(arguments[i]);
 
     try{
@@ -161,7 +197,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     }
     catch(IOException e)
       {
-	System.err.println("TrackEvent: I/O Error sending set Message!");
+	System.err.println("TrackEvent: I/O Error sending setProperties Message!");
 	e.printStackTrace(); 
       }
   }
