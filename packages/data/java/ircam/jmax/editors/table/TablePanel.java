@@ -190,7 +190,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 		  int lvi = gc.getLastVisibleIndex()+10;
 		  int lastId =  gc.getFtsObject().getLastUpdatedIndex();
 		  if(lvi > lastId)
-		    gc.getFtsObject().requestGetValues(lastId, lvi);
+		    gc.getFtsObject().requestGetValues(lastId, lvi, false);
 		  else repaint();
 		}		
 	      else 
@@ -288,7 +288,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	      {
 		int lvi = gc.getLastVisibleIndex()+10;
 		if(lvi > gc.getFtsObject().getLastUpdatedIndex())
-		  gc.getFtsObject().requestGetValues(last+1, lvi);
+		  gc.getFtsObject().requestGetValues(last+1, lvi, true);
 		else repaint();
 	      }	    
 	    else
@@ -366,17 +366,22 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
   /**
    * TableDataListener interface */
-  public void valueChanged(int index1, int index2)
+  public void valueChanged(int index1, int index2, boolean fromScroll)
   {    
-    int x = gc.getAdapter().getX((index1 > 2) ? index1-2 : index1);
-    int w = gc.getAdapter().getX( (index2 < gc.getDataModel().getSize()-2) ? index2+2 : index2+1) - x;        
-    if( gc.getAdapter().getXZoom() < 0.5)
+    if( fromScroll)
+        itsCenterPanel.repaint();
+    else
+    {
+        int x = gc.getAdapter().getX((index1 > 2) ? index1-2 : index1);
+        int w = gc.getAdapter().getX( (index2 < gc.getDataModel().getSize()-2) ? index2+2 : index2+1) - x;        
+        if( gc.getAdapter().getXZoom() < 0.5)
         if( w < 20)
         {		
             w = 20;
             x = (x > 10) ? x-10 : x;
         }
-    itsCenterPanel.repaint( new Rectangle( x, 0, w, itsCenterPanel.getSize().height));
+        itsCenterPanel.repaint( new Rectangle( x, 0, w, itsCenterPanel.getSize().height));
+    }
   }	
   public void pixelsChanged(int index1, int index2)
   {    

@@ -206,7 +206,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     if(startIndex+i > lastIndex)
       lastIndex = startIndex+i;
     
-    notifyValueChanged( startIndex, startIndex+i-1);
+    notifyValueChanged( startIndex, startIndex+i-1, fromScroll);
   }  
   
   public void startEdit()
@@ -424,8 +424,10 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 
     firstTime = true;
   } 
-  public void requestGetValues(int first, int last)
+  private boolean fromScroll = false;
+  public void requestGetValues(int first, int last, boolean fromScroll)
   { 
+    this.fromScroll = fromScroll;
     if(!firstTime) requestGetValues();
     else
       {
@@ -705,10 +707,10 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       ((TableDataListener) e.nextElement()).tableSetted();
   }
 
-  private void notifyValueChanged( int start, int end)
+  private void notifyValueChanged( int start, int end, boolean fromScroll)
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((TableDataListener) e.nextElement()).valueChanged( start, end);
+      ((TableDataListener) e.nextElement()).valueChanged( start, end, fromScroll);
   }
 
   private void notifyPixelsChanged( int start, int end)

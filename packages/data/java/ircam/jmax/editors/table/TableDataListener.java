@@ -29,7 +29,7 @@ public interface TableDataListener {
 
   /**
    * The data between the two indexes (included) have changed. */
-  abstract public void valueChanged(int index1, int index2);
+  abstract public void valueChanged(int index1, int index2, boolean fromScroll);
   abstract public void pixelsChanged(int index1, int index2);
 
   abstract public void tableSetted();
