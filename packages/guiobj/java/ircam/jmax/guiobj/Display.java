@@ -56,9 +56,9 @@ public class Display extends GraphicObject implements FtsMessageListener
     int h = getFontMetrics().getHeight() + 4;
 
     if(w < minWidth)
-      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(minWidth));
+      ftsObject.setCurrentWidth(ScaleTransform.getInstance( itsSketchPad).invScaleX(minWidth));
     else
-      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(w));
+      ftsObject.setCurrentWidth(ScaleTransform.getInstance( itsSketchPad).invScaleX(w));
 
     if(w < underWidthMax)
       underWidth = w;
@@ -110,9 +110,9 @@ public class Display extends GraphicObject implements FtsMessageListener
     if( !itsSketchPad.isLocked() || (itsSketchPad.isLocked() && ( getWidth() < w)))
       {
 	if(w < minWidth)
-	  ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(minWidth));
+	  ftsObject.setCurrentWidth(ScaleTransform.getInstance( itsSketchPad).invScaleX(minWidth));
 	else
-	  ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(w));
+	  ftsObject.setCurrentWidth(ScaleTransform.getInstance( itsSketchPad).invScaleX(w));
 	
 	updateOffScreenBuffer();
       }

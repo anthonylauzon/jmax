@@ -35,45 +35,33 @@ public class ScaleTransform {
   private float invScaleY;
   
   private static ScaleTransform instance;
-  public static ScaleTransform getInstance()
+  Component comp;
+  public static ScaleTransform getInstance( Component c)
   {
-    if(instance == null) instance = new ScaleTransform();
+    if(instance == null) instance = new ScaleTransform( c);
+    else
+      instance.setComponent(c);
+    
     return instance;
   }
 
-  public ScaleTransform()
+  public ScaleTransform( Component c)
   {
     fontName = defaultFontName;
     baseSize = defaultBaseSize;
       
-    initFontMetrics();
-    
+    comp = c;
+    initFontMetrics();    
+
     scaleX = (float)1.0;   
     invScaleX = 1/scaleX;	
     scaleY = (float)1.0;
     invScaleY = 1/scaleY;
   }
 
-  public static void createScaleTransform(float xfactor, float yfactor)
+  void setComponent(Component c)
   {
-    instance = new ScaleTransform(xfactor, yfactor);
-  }
-  public static void createScaleTransform()
-  {
-    instance = new ScaleTransform();
-  }
-
-  public ScaleTransform(float xfactor, float yfactor)
-  {
-    fontName = defaultFontName;
-    baseSize = defaultBaseSize;
-    scaleX = xfactor;   
-
-    initFontMetrics();
-    
-    invScaleX = 1/xfactor;	
-    scaleY = yfactor;
-    invScaleY = 1/yfactor;
+    comp = c;
   }
 
   public void recomputeScaleFactors(String fName, int bSize)
@@ -167,8 +155,7 @@ public class ScaleTransform {
   {
     int start = getBaseSizeIndex();
     for(int i=0; i<numSizes; i++)
-      standardFontMetrics[i] = Toolkit.getDefaultToolkit().
-	getFontMetrics(new Font(fontName, Font.PLAIN, standardSizes[start+i]));
+      standardFontMetrics[i] = comp.getFontMetrics(new Font(fontName, Font.PLAIN, standardSizes[start+i]));
   }
 
   int getBaseSizeIndex()

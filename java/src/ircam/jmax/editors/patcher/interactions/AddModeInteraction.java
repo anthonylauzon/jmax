@@ -49,13 +49,13 @@ class AddModeInteraction extends Interaction
     switch (squeack)
       {
       case (Squeack.DOWN | Squeack.SHIFT):
-	  editor.makeAddModeObject((int)ScaleTransform.getInstance().invScaleX(mouse.x),
-				   (int)ScaleTransform.getInstance().invScaleY(mouse.y), false);
+	  editor.makeAddModeObject((int)ScaleTransform.getInstance( editor).invScaleX(mouse.x),
+				   (int)ScaleTransform.getInstance( editor).invScaleY(mouse.y), false);
 	break;
 
       case Squeack.DOWN:
-	  editor.makeAddModeObject((int)ScaleTransform.getInstance().invScaleX(mouse.x),
-				   (int)ScaleTransform.getInstance().invScaleY(mouse.y), true);
+	  editor.makeAddModeObject((int)ScaleTransform.getInstance( editor).invScaleX(mouse.x),
+				   (int)ScaleTransform.getInstance( editor).invScaleY(mouse.y), true);
 	editor.resetAdding();
 	break;
 

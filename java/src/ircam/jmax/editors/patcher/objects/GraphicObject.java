@@ -213,36 +213,36 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   
   public final int getX() 
   {
-    return ScaleTransform.getInstance().scaleX(ftsObject.getX());
+    return ScaleTransform.getInstance( itsSketchPad).scaleX(ftsObject.getX());
   }
 
   public void setX( int x) 
   {
-    ftsObject.setX(ScaleTransform.getInstance().invScaleX(x));
+    ftsObject.setX(ScaleTransform.getInstance( itsSketchPad).invScaleX(x));
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getY() 
   {
-    return ScaleTransform.getInstance().scaleY(ftsObject.getY());
+    return ScaleTransform.getInstance( itsSketchPad).scaleY(ftsObject.getY());
   }
 
   public void setY( int y) 
   {
-    ftsObject.setY(ScaleTransform.getInstance().invScaleY(y));
+    ftsObject.setY(ScaleTransform.getInstance( itsSketchPad).invScaleY(y));
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getWidth() 
   {
-    return ScaleTransform.getInstance().scaleX(ftsObject.getWidth() + getVariableWidth());
+    return ScaleTransform.getInstance( itsSketchPad).scaleX(ftsObject.getWidth() + getVariableWidth());
   }
 
   public void setWidth( int w) 
   {
     if (w > 0)
       {
-	ftsObject.setWidth(ScaleTransform.getInstance().invScaleX( w - getVariableWidth()));
+	ftsObject.setWidth(ScaleTransform.getInstance( itsSketchPad).invScaleX( w - getVariableWidth()));
 	updateInOutlets();
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
@@ -261,9 +261,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   public final int getHeight() 
   {
     if(isSquare())
-      return ScaleTransform.getInstance().scaleX(ftsObject.getHeight());
+      return ScaleTransform.getInstance( itsSketchPad).scaleX(ftsObject.getHeight());
     else
-      return ScaleTransform.getInstance().scaleY(ftsObject.getHeight());
+      return ScaleTransform.getInstance( itsSketchPad).scaleY(ftsObject.getHeight());
   }
 
   public void setHeight( int h) 
@@ -271,9 +271,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     if (h > 0)
       {
 	if(isSquare())
-	  ftsObject.setHeight(ScaleTransform.getInstance().invScaleX(h));
+	  ftsObject.setHeight(ScaleTransform.getInstance( itsSketchPad).invScaleX(h));
 	else
-	  ftsObject.setHeight(ScaleTransform.getInstance().invScaleY(h));
+	  ftsObject.setHeight(ScaleTransform.getInstance( itsSketchPad).invScaleY(h));
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
   }
@@ -282,16 +282,16 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if(( w <= 0)||( h <= 0))
       {
-	ftsObject.setCurrentX( ScaleTransform.getInstance().invScaleX(x));
-	ftsObject.setCurrentY( ScaleTransform.getInstance().invScaleY(y));
+	ftsObject.setCurrentX( ScaleTransform.getInstance( itsSketchPad).invScaleX(x));
+	ftsObject.setCurrentY( ScaleTransform.getInstance( itsSketchPad).invScaleY(y));
 	setDefaults();
       }
     else
-      ftsObject.setCurrentBounds( ScaleTransform.getInstance().invScaleX(x),
-				  ScaleTransform.getInstance().invScaleY(y),
-				  ScaleTransform.getInstance().invScaleX(w - getVariableWidth()),
-				  isSquare() ? ScaleTransform.getInstance().invScaleX(h) 
-				  : ScaleTransform.getInstance().invScaleY(h ));
+      ftsObject.setCurrentBounds( ScaleTransform.getInstance( itsSketchPad).invScaleX(x),
+				  ScaleTransform.getInstance( itsSketchPad).invScaleY(y),
+				  ScaleTransform.getInstance( itsSketchPad).invScaleX(w - getVariableWidth()),
+				  isSquare() ? ScaleTransform.getInstance( itsSketchPad).invScaleX(h) 
+				  : ScaleTransform.getInstance( itsSketchPad).invScaleY(h ));
     
   }
 

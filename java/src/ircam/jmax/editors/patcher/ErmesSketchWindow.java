@@ -254,14 +254,14 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     //Double check the existence of the window properties. If there aren't, use defaults
     x = patcherObj.getWindowX();
     y = patcherObj.getWindowY();
-    width = ScaleTransform.getInstance().scaleX(patcherObj.getWindowWidth());
-    height = ScaleTransform.getInstance().scaleY(patcherObj.getWindowHeight());
+    width = ScaleTransform.getInstance( itsSketchPad).scaleX(patcherObj.getWindowWidth());
+    height = ScaleTransform.getInstance( itsSketchPad).scaleY(patcherObj.getWindowHeight());
 
     if (width <= 0)
-      width = ScaleTransform.getInstance().scaleX(480);
+      width = ScaleTransform.getInstance( itsSketchPad).scaleX(480);
 
     if (height <= 0)
-      height =  ScaleTransform.getInstance().scaleY(500);
+      height =  ScaleTransform.getInstance( itsSketchPad).scaleY(500);
 
     setBounds( x, y, width + horizontalOffset(), height + verticalOffset());
   }
@@ -273,8 +273,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
       int width;
       int height;
 
-      width = ScaleTransform.getInstance().scaleX(itsPatcher.getWindowWidth());
-      height = ScaleTransform.getInstance().scaleY(itsPatcher.getWindowHeight());
+      width = ScaleTransform.getInstance( itsSketchPad).scaleX(itsPatcher.getWindowWidth());
+      height = ScaleTransform.getInstance( itsSketchPad).scaleY(itsPatcher.getWindowHeight());
   
       setSize( width + horizontalOffset(), height + verticalOffset());
   }

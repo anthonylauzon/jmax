@@ -1289,16 +1289,16 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public void resizeToWindow(int width, int height)
   {
     if (itsPatcher != null) {
-      itsPatcher.setWindowWidth(Math.round(ScaleTransform.getInstance().invScaleX(width)));
-      itsPatcher.setWindowHeight(Math.round(ScaleTransform.getInstance().invScaleY(height)));
+      itsPatcher.setWindowWidth(Math.round(ScaleTransform.getInstance( this).invScaleX(width)));
+      itsPatcher.setWindowHeight(Math.round(ScaleTransform.getInstance( this).invScaleY(height)));
       fixSize();
     }
   }
   public void setCurrentWindowSize(int width, int height)
   {
     if (itsPatcher != null) {
-      itsPatcher.setWW(Math.round(ScaleTransform.getInstance().invScaleX(width)));
-      itsPatcher.setWH(Math.round(ScaleTransform.getInstance().invScaleY(height)));
+      itsPatcher.setWW(Math.round(ScaleTransform.getInstance( this).invScaleX(width)));
+      itsPatcher.setWH(Math.round(ScaleTransform.getInstance( this).invScaleY(height)));
       fixSize();
     }
   }
