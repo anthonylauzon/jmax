@@ -570,7 +570,7 @@ static void
 track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-  double time = fts_get_float(at + 0); 
+  double time = fts_get_float(at + 0);
   event_t *event;
   
   /* make new event object */
