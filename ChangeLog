@@ -1,5 +1,9 @@
 2003-07-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/ispw/c/src/pipe.c: fixed several crashes.
+
+	* fixed bug "[ 772299 ] pipe object"
+
 	* fts/message.c (unfold_atom, unfold_varargs): fixed atom assignment.
 
 	* fixed bug "[ 772302 ] messtup doesn't work"
