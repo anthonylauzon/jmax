@@ -195,7 +195,7 @@ public abstract class SchemeInterpreter implements Interpreter
     }
 
 
-    public String getProjectExtension();
+    public String getProjectExtension()
     {
 	return ".env";
     }

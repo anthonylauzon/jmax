@@ -181,7 +181,7 @@ public class TclInterpreter implements ircam.jmax.script.Interpreter
 	return "Not yet implemented";
     }
 
-    public String getProjectExtension();
+    public String getProjectExtension()
     {
 	return ".env";
     }
