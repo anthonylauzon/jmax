@@ -108,7 +108,16 @@ public class FloatValue extends AbstractEventValue
 	    return FloatValueDataFlavor.getInstance();
 	}
  
+	public Class getPropertyType(int index)
+	{
+	    if(index < defPropertyCount)
+		return propertyTypesArray[index];
+	    else
+		return Integer.class;
+	}
+
 	String defNamesArray[] = {"float"};
+	Class propertyTypesArray[] = {Float.class};
 	int defPropertyCount = 1;
     }
 

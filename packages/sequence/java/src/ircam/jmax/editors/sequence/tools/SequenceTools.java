@@ -60,6 +60,8 @@ public class SequenceTools implements ToolProvider{
     tools[4] = new VResizerTool(new ImageIcon(path+"vresize.gif"));
     tools[5] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
     tools[6] = new ScrollerTool(new ImageIcon(path+"scroller.gif"));
+    tools[7] = new LinerTool(new ImageIcon(path+"liner.gif"));
+    tools[8] = new CombTool(new ImageIcon(path+"comber.gif"));
   }
 
   public Enumeration getTools()
@@ -89,7 +91,7 @@ public class SequenceTools implements ToolProvider{
   }
 
   //---
-  Tool tools[] = new Tool[7];
+  Tool tools[] = new Tool[9];
   public static SequenceTools instance = new SequenceTools();
 }
 

@@ -75,7 +75,8 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 	applyButton.setPreferredSize(new Dimension(60, 20));
 	applyButton.setMaximumSize(new Dimension(60, 20));
 	applyButton.setMargin(new Insets(0, 0, 0, 0));
-	applyButton.setVisible(false);
+	//applyButton.setVisible(false);
+	applyButton.setEnabled(false);
 	applyButton.addActionListener(new ActionListener(){
 	    public void actionPerformed(ActionEvent e)
 		{
@@ -151,8 +152,8 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
     }
     public void setEdit(boolean isEdit)
     {
-	//applyButton.setEnabled(isEdit);
-	applyButton.setVisible(isEdit);
+	applyButton.setEnabled(isEdit);
+	//applyButton.setVisible(isEdit);
     }
 
     Track track;

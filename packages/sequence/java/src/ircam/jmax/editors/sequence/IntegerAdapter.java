@@ -155,6 +155,10 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
 	    return false;
     }
 
+    public boolean isDrawable()
+    {
+	return true;
+    }
     ////////////////// PropertyChangeListener interface
     public void propertyChange(PropertyChangeEvent e)
     {

@@ -106,9 +106,18 @@ public class AmbitusValue extends AbstractEventValue
       {
 	  return AmbitusValueDataFlavor.getInstance();
       }
+
+      public Class getPropertyType(int index)
+      {
+	  if(index < defPropertyCount)
+	      return propertyTypesArray[index];
+	  else
+	      return Integer.class;
+      }
  
-    String defNamesArray[] = {"pitch", "duration"};
-    int defPropertyCount = 2;
+      String defNamesArray[] = {"pitch", "duration"};
+      Class propertyTypesArray[] = {Integer.class, Double.class};
+      int defPropertyCount = 2;
   }
 
   public JPopupMenu getPopupMenu()

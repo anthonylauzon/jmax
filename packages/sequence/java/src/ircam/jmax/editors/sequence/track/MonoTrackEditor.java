@@ -197,7 +197,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     private void createListDialog()
     {
+	/*****************/
+	//list-->table//
 	listDialog = new ListDialog(track, gc.getFrame(), gc);
+	//listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+	/*****************/
     }
 
     public void updateNewObject(Object obj){};
@@ -274,7 +278,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     Track track;
 
+    /*****************/
+    //list-->table//
     ListDialog listDialog = null;
+    //SequenceTableDialog listDialog = null;
+    /*****************/
 
     int viewMode = PEAKS_VIEW;
     static public final int PEAKS_VIEW = 2;

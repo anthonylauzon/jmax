@@ -134,6 +134,40 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	endUpdate();
     }
 
+  public void deleteEvents(int nArgs , FtsAtom args[])
+  {
+    int removeIndex;
+    TrackEvent event = null;
+
+    for(int i=0; i<nArgs; i++)
+      {
+	event = (TrackEvent)(args[i].getObject());
+	removeIndex = indexOf(event);
+	removeEventAt(removeIndex);
+      }
+    // ends the undoable transition
+    endUpdate();
+  }
+    
+  public void highlightEvents(int nArgs , FtsAtom args[])
+  {
+    int selIndex;
+    TrackEvent event = null;
+    Vector events = new Vector();;
+
+    SequenceSelection.getCurrent().deselectAll();
+    if(nArgs == 1) SequenceSelection.getCurrent().select(args[0].getObject());
+    else
+	{
+	    for(int i=0; i<nArgs; i++)
+		{
+		    event = (TrackEvent)(args[i].getObject());
+		    selIndex = indexOf(event);
+		    events.addElement(event);
+		}
+	    SequenceSelection.getCurrent().select(events.elements());
+	}
+  }
   public void requestEventCreation(float time, String type, int nArgs, Object args[])
   {
     sendArgs[0].setFloat(time); 
@@ -146,7 +180,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	else
 	  sendArgs[2+i].setValue(args[i]);
       }
-    sendMessage(FtsObject.systemInlet, "event_add", 2+nArgs, sendArgs);
+    sendMessage(FtsObject.systemInlet, "add_event", 2+nArgs, sendArgs);
   }
   
   public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object args[])
@@ -164,7 +198,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	  sendArgs[2+i].setValue(args[i]);
       }
 
-    sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
+    sendMessage(FtsObject.systemInlet, "make_event", 2+nArgs, sendArgs);
   }
     
     public void export()
@@ -461,13 +495,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
      */
     public void removeEvent(TrackEvent event)
     {
-	int removeIndex;
-
-	removeIndex = indexOf(event);
-	removeEventAt(removeIndex);
-
 	sendArgs[0].setObject(event);
-	sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
+	sendMessage(FtsObject.systemInlet, "remove_event", 1, sendArgs);
     }
     
 

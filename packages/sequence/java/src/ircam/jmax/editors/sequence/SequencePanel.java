@@ -101,8 +101,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     manager = new ToolManager(SequenceTools.instance);
     toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize(/*156*/180, 25);    
-    toolbar.setPreferredSize(new Dimension(/*156*/180, 25));    
+    toolbar.setSize(/*156*//*180*//*204*/228, 25);    
+    toolbar.setPreferredSize(new Dimension(/*156*//*180*//*204*/228, 25));    
     Tool arrow = manager.getToolByName("arrow");     
     manager.activate(arrow, null); //we do not have a gc yet...
     //------------------- prepare the track panel:
@@ -140,8 +140,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     statusBar.setSize(300, 30);
 
     JPanel toolbarPanel = new JPanel();
-    toolbarPanel.setSize(/*156*/180, 25);
-    toolbarPanel.setPreferredSize(new Dimension(/*156*/180, 25));
+    toolbarPanel.setSize(/*156*//*180*//*204*/228, 25);
+    toolbarPanel.setPreferredSize(new Dimension(/*156*//*180*//*204*/228, 25));
     toolbarPanel.setLayout(new BorderLayout());
     toolbarPanel.add(toolbar, BorderLayout.CENTER);
     toolbarPanel.validate();
@@ -445,6 +445,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   }
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
+    ftsSequenceObject.closeEditor();
   }
     
     /**
@@ -511,10 +512,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	int startTime = -geometry.getXTransposition(); 
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	
-	if(time<startTime)
+	/*if(time<startTime)
+	  itsTimeScrollbar.setValue(time);
+	  else if(time>endTime)
+	  itsTimeScrollbar.setValue(time-endTime+startTime+duration+10);*/
+	
+	if((time<startTime)||(time+duration>endTime))
 	    itsTimeScrollbar.setValue(time);
-	else if(time>endTime)
-	    itsTimeScrollbar.setValue(time-endTime+startTime+duration+10);
     }
 
     public int getMaximumVisibleTime()

@@ -40,6 +40,7 @@ public interface ValueInfo {
 
     abstract public Enumeration getPropertyNames();
     abstract public int getPropertyCount();
+    abstract public Class getPropertyType(int i);    
 }
 
 

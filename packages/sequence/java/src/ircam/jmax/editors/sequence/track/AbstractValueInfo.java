@@ -61,6 +61,11 @@ public class AbstractValueInfo implements ValueInfo {
 	return 0; 
     }
 
+    public Class getPropertyType(int index)
+    {
+	return Integer.class; 
+    }
+
     public DataFlavor getDataFlavor()
     {
 	return AbstractValueDataFlavor.getInstance();

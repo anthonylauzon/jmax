@@ -104,8 +104,16 @@ public class IntegerValue extends AbstractEventValue
 	{
 	    return IntegerValueDataFlavor.getInstance();
 	}
- 
+	public Class getPropertyType(int index)
+	{
+	    if(index < defPropertyCount)
+		return propertyTypesArray[index];
+	    else
+		return Integer.class;
+	}
+
 	String defNamesArray[] = {"integer"};
+	Class propertyTypesArray[] = {Integer.class};
 	int defPropertyCount = 1;
     }
 

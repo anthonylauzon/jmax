@@ -95,7 +95,7 @@ public class AdderTool extends Tool implements PositionListener {
 	  }
 	else
 	    {
-		//whit Shift add to selection
+		//with Shift add to selection
 		if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
 	       
 		ValueInfo info = (ValueInfo) egc.getTrack().getTrackDataModel().getTypes().nextElement();

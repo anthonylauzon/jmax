@@ -112,7 +112,7 @@ public class ScoreBackground implements Layer{
       
       // the track name
       g.setFont(ToggleBar.toggleBarFont);
-      g.drawString(gc.getTrack().getName(), 10, 10);
+      g.drawString(gc.getTrack().getName(), /*10*/2, 10);
 
       // the piano keys...
       for (int i = 0; i <= 127; i++)

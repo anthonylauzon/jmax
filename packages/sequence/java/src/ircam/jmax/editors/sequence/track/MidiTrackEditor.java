@@ -287,7 +287,11 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     private void createListDialog()
     {
+	/*****************/
+	//list-->table//
 	listDialog = new ListDialog(track, gc.getFrame(), gc);
+	//listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+	/*****************/
     }
 
     public boolean isDisplayLabels()
@@ -379,7 +383,11 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     
     ScorePanel itsScore;
 
+    /*****************/
+    //list-->table//
     ListDialog listDialog = null;
+    //SequenceTableDialog listDialog = null;
+    /*****************/
 
     int viewMode = PIANOROLL_VIEW;
     public static int DEFAULT_HEIGHT = 430;

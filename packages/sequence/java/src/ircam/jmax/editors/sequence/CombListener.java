@@ -26,15 +26,12 @@
 package ircam.jmax.editors.sequence;
 
 /**
- * interface of the objects that want to be informed when a
- * graphic mapping changes. Used by the score and its setting panel
+ * The interface used to communicate between the CombTool and its
+ * CombDrawer interface module.
  */
-public interface VerticalZoomable 
-{
-    abstract public void setYZoom(int factor);
-    abstract public int getYZoom();
-    abstract public void incrYZoom(int delta);
+public interface CombListener {
+  public abstract void combStart(int x, int y, int modifiers);
+  public abstract void comb(int x, int y, int modifiers);
+  public abstract void combEnd(int x, int y, int modifiers);
+  public abstract boolean isCombDrawable();
 }
-
-
-

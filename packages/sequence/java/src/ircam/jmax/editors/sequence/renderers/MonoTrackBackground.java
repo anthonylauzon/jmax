@@ -38,6 +38,7 @@ import java.util.*;
 import javax.swing.*;
 import java.beans.*;
 
+import java.text.NumberFormat;
 /**
  * The background layer of a monodimensionalTrackeditor. It builds the background Image */
 public class MonoTrackBackground implements Layer, ImageObserver{
@@ -52,12 +53,18 @@ public class MonoTrackBackground implements Layer, ImageObserver{
 	public void propertyChange(PropertyChangeEvent e)
 	    {		
 		if (e.getPropertyName().equals("maximumValue") || e.getPropertyName().equals("minimumValue"))
-		{
-		    toRepaintBack = true;
-		    gc.getGraphicDestination().repaint();
-		}
+		    {
+			toRepaintBack = true;
+			gc.getGraphicDestination().repaint();
+		    }
+		else if(e.getPropertyName().equals("repaint"))
+		    {
+			toRepaintBack = true;
+			gc.getGraphicDestination().repaint();
+		    }
 	    }
     });
+    fm = gc.getGraphicDestination().getFontMetrics(ToggleBar.toggleBarFont);
   }
 
   /**
@@ -92,30 +99,43 @@ public class MonoTrackBackground implements Layer, ImageObserver{
 
   private void drawHorizontalLine(Graphics g, int w, int h)
   {
+      //FontMetrics fm = gc.getGraphicDestination().getFontMetrics(ToggleBar.toggleBarFont);
     g.setColor(Color.white);
     g.fillRect(0, 0, w, h);
 
     // the track name
     g.setColor(Color.gray);
     g.setFont(ToggleBar.toggleBarFont);
-    g.drawString(gc.getTrack().getName(), 10, 10);
+
+    //String maxString = ""+((MonoDimensionalAdapter)gc.getAdapter()).getInvY(0);
+    //String minString = ""+((MonoDimensionalAdapter)gc.getAdapter()).getInvY(gc.getGraphicDestination().getSize().height);  
+
+    g.drawString(gc.getTrack().getName(), 2, h-17);
+    //g.drawString(maxString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, maxString)-2, 10);
+    //g.drawString(minString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, minString)-2, h-2);   
+
     Image image;
+    int i=0;
     for(Enumeration en = ((FtsTrackObject)gc.getTrack().getTrackDataModel()).getTypes(); en.hasMoreElements();)
 	{
 	    image = ((ValueInfo)en.nextElement()).getIcon().getImage();
-	    g.drawImage(image , 10, 12, this);
+	    g.drawImage(image , 2, h-15+i*10, this);
+	    i++;
 	}
 
-    g.setColor(Color.black);
+    g.setColor(Color.lightGray);
 
     int y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
     g.drawLine(0, y0, w, y0);
+
     //vertical line at time 0
+    g.setColor(Color.black);
     g.drawLine(PartitionBackground.KEYEND, 0, PartitionBackground.KEYEND, h);
   }
 
   private void drawVerticalGrid(Graphics g, int w, int h)
   {
+      //FontMetrics fm = gc.getGraphicDestination().getFontMetrics(ToggleBar.toggleBarFont);
     UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
     int windowTime = (int)(gc.getAdapter().getInvX(w) - gc.getAdapter().getInvX(KEYEND)) - 1 ;
     int timeStep;
@@ -135,6 +155,28 @@ public class MonoTrackBackground implements Layer, ImageObserver{
       
       g.drawLine(xPosition, 0, xPosition, h);
     }
+
+    int y0;
+    String maxString, minString;
+    if(gc.getAdapter() instanceof FloatAdapter)
+	{	
+	    y0 = ((FloatAdapter)gc.getAdapter()).getY((float)0.0); 
+	    maxString = ""+numberFormat.format(((FloatAdapter)gc.getAdapter()).getFloatInvY(0));
+	    minString = ""+numberFormat.format(((FloatAdapter)gc.getAdapter()).getFloatInvY(gc.getGraphicDestination().getSize().height));  
+	}
+    else
+	{
+	    y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
+	    maxString = ""+numberFormat.format(((MonoDimensionalAdapter)gc.getAdapter()).getInvY(0));
+	    minString = ""+numberFormat.format(((MonoDimensionalAdapter)gc.getAdapter()).getInvY(gc.getGraphicDestination().getSize().height));  
+	}
+    g.setColor(Color.gray);
+    g.setFont(ToggleBar.toggleBarFont);
+    g.drawString(maxString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, maxString)-2, 10);
+    g.drawString(minString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, minString)-2, h-2);   
+    
+    g.setColor(Color.black);
+    g.drawLine(0, y0, w, y0);
   }
       
   /**
@@ -184,10 +226,19 @@ public class MonoTrackBackground implements Layer, ImageObserver{
   SequenceGraphicContext gc;
   Image itsImage;
   boolean toRepaintBack = false;
-
+  FontMetrics fm;
+  
   public static final int KEYX = 31;
   public static final int KEYWIDTH = 24;
   public static final int KEYEND = KEYX + KEYWIDTH;
+
+  static public NumberFormat numberFormat;
+  static 
+  {
+      numberFormat = NumberFormat.getInstance();
+      numberFormat.setMaximumFractionDigits(2);
+      numberFormat.setGroupingUsed(false);
+  }
 }
 
 

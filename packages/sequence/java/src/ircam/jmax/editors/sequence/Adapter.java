@@ -199,7 +199,10 @@ abstract public class Adapter implements MappingListener{
   {
       return false;
   }
-
+  public boolean isDrawable()
+  {
+      return false;
+  }
   /**
    * MappingListener interface
    */

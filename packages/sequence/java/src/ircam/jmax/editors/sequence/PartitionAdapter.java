@@ -82,6 +82,10 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
     return (int) ((x+geometry.getXTransposition())*geometry.getXZoom()) + ScoreBackground.KEYEND;
   }
 
+  public int getWidth(double w)
+  {
+      return (getX(w)-getX(0.0));
+  }
   /**
    * inherited from Adapter.
    * Returns the time associated with the value of an X coordinate after
@@ -155,6 +159,10 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
 	return temp/*-getVerticalTransp()*/;//@@@@@@@@@@@@@@@@@@@@@@@@@
     }
 
+  public void setInvY(Event e, int y)
+  {
+      super.setY(e, y);
+  }
 
   /**
    * inherited from Adapter.
@@ -415,6 +423,7 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
     public static final int ALTERATION_NOTHING = 0;
     SequenceGraphicContext gc;
 }
+
 
 
 

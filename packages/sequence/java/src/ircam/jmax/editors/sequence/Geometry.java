@@ -35,7 +35,10 @@ public class Geometry
     
     public void incrXZoom(int delta) 
     {
-	xZoomFactor = (xZoomFactor*100+delta)/(float)100;
+	float dlt = (float)delta;
+	if(xZoomFactor < 1) dlt = delta*xZoomFactor;
+
+	xZoomFactor = (xZoomFactor*100+dlt)/(float)100;
 	if(xZoomFactor<0.01) xZoomFactor = (float)0.01;
 	if(xZoomFactor>10) xZoomFactor = (float)10.0;
 	notifyZoom(xZoomFactor);

@@ -26,15 +26,14 @@
 package ircam.jmax.editors.sequence;
 
 /**
- * interface of the objects that want to be informed when a
- * graphic mapping changes. Used by the score and its setting panel
+ * The interface used to communicate between the LinerTool and its
+ * LineDrawer interface module.
  */
-public interface VerticalZoomable 
-{
-    abstract public void setYZoom(int factor);
-    abstract public int getYZoom();
-    abstract public void incrYZoom(int delta);
-}
+public interface LineListener {
 
+  public abstract void lineStart(int x, int y, int modifiers);
+  public abstract void lineEnd(int x, int y);
+  public abstract boolean isLineDrawable();
+}
 
 

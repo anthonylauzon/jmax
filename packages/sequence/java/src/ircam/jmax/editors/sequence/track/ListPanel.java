@@ -51,7 +51,6 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
       super(provider);
 
       setOpaque(true);
-
       setLayout(null);
 
       this.track = track;

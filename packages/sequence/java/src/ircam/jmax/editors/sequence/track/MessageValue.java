@@ -245,9 +245,19 @@ public class MessageValue extends AbstractEventValue
 	{
 	    return MessageValueDataFlavor.getInstance();
 	}
- 
-      String defNamesArray[] = {"integer", "message"};
-      int defPropertyCount = 2;
+
+	public Class getPropertyType(int index)
+	{
+	    if(index < defPropertyCount)
+		return propertyTypesArray[index];
+	    else
+		return Integer.class;
+	}
+	
+	
+	String defNamesArray[] = {"integer", "message"};
+	Class propertyTypesArray[] = {Integer.class, String.class};
+	int defPropertyCount = 2;
     }
 
     /**

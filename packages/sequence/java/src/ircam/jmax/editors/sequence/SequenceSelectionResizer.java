@@ -51,13 +51,13 @@ public class SequenceSelectionResizer extends SelectionResizer {
   
    /******************* autoscrolling *******************/
 
-    Timer scrollTimer;
+    javax.swing.Timer scrollTimer;
     SequenceScrollDragAction scroller;
 
     private void initAutoScroll()
     {
 	scroller    = new SequenceScrollDragAction();
-	scrollTimer = new Timer(8, scroller);
+	scrollTimer = new javax.swing.Timer(8, scroller);
 	scrollTimer.setCoalesce(true);
 	scrollTimer.setRepeats(true);
     }

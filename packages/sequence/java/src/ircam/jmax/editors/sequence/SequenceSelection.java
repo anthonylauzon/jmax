@@ -172,12 +172,13 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   public void select(Enumeration e)
   {
       TrackEvent event;
+      setValueIsAdjusting(true);
       while(e.hasMoreElements())
 	  {
 	      event = (TrackEvent)e.nextElement();
 	      select(event);
 	  }
-
+      setValueIsAdjusting(false);
   }
 
   /** remove the given object from the selection

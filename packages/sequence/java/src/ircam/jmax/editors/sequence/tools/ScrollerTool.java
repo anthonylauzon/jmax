@@ -77,6 +77,7 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
 	tempX = x;
 	tempY = y;
     }
+    private boolean rep = false;
     public void dynamicDrag(int deltaX, int deltaY)
     {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
@@ -94,6 +95,8 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
 		    {
 			//vertical scroll
 			((VerticalScrollable)egc.getAdapter()).incrYTransp(deltaY);
+			rep = (!rep);
+			//egc.getTrack().setProperty("repaint", new Boolean(rep));
 			egc.getGraphicDestination().repaint();
 		    }
 	}

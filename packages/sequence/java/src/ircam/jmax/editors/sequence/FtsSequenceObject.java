@@ -78,7 +78,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    * Fts callback: open the editor associated with this FtsSequenceObject.
    * If not exist create them else show them.
    */
-  public void openEditor(int nArgs, FtsAtom args[])
+  public void createEditor(int nArgs, FtsAtom args[])
   {
       if(sequence == null){
 	  sequence = new Sequence(this);
@@ -137,7 +137,23 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       
     notifyTracksAdded(trackTime);
   }
-    
+   
+  public void deleteTracks(int nArgs , FtsAtom args[])
+  {
+      FtsTrackObject trackObj;
+      Track track;
+      int time;
+      int trackTime = 0;
+      
+      for(int i=0; i<nArgs; i++)
+	  {
+	      trackObj = (FtsTrackObject)(args[i].getObject());
+	      track = getTrackByName(trackObj.getName());
+	      tracks.removeElement(track);
+	      notifyTrackRemoved(track);
+	  }    
+  }
+ 
   /**
    * return how many tracks in the sequence
    */
@@ -182,12 +198,9 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   public void removeTrack(Track track)
   {
     if(track==null) return;
-    tracks.removeElement(track);
 
     sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
-    sendMessage(FtsObject.systemInlet, "track_remove", 1, sendArgs);
-
-    notifyTrackRemoved(track);
+    sendMessage(FtsObject.systemInlet, "remove_track", 1, sendArgs);
   }
 
   public void changeTrack(Track track)
@@ -215,12 +228,17 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     public void requestTrackCreation(String type)
     {
 	sendArgs[0].setString(type); 
-	sendMessage(FtsObject.systemInlet, "track_add", 1, sendArgs);
+	sendMessage(FtsObject.systemInlet, "add_track", 1, sendArgs);
     }
 
     public void importMidiFile()
     {
 	sendMessage(FtsObject.systemInlet, "import_midi_dialog", 0, null);
+    }
+
+    public void closeEditor()
+    {
+	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
     }
 
   /**
