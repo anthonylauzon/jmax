@@ -165,6 +165,21 @@ class ErmesObjIn extends ErmesObject {
         return preferredSize;
     }
 
+  public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
+    if((currentRect.width+theDeltaX < getMinimumSize().width)||
+       (currentRect.height+theDeltaY < getMinimumSize().height))
+      return false;
+    else return true;
+  }
+
+  public void ResizeToText(int theDeltaX, int theDeltaY){
+    int aWidth = currentRect.width+theDeltaX;
+    int aHeight = currentRect.height+theDeltaY;
+    if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
+    if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
+    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+  }
+  
 }
 
 
