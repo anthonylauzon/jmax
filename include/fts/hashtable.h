@@ -99,7 +99,7 @@ FTS_API void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int in
  * @param h the hashtable
  * @ingroup hashtable
  */
-extern void fts_hashtable_clear( fts_hashtable_t *h);
+FTS_API void fts_hashtable_clear( fts_hashtable_t *h);
 
 /**
  * Deinitializes a hashtable.
