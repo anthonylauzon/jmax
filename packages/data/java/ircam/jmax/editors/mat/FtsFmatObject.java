@@ -266,7 +266,7 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   
   public String getType()
   {
-    return "FMat";
+    return "fmat";
   }  
   
   public String getName()

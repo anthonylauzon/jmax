@@ -107,7 +107,11 @@ public class BpfWindow extends JFrame implements EditorContainer{
   
   public void setWindowName(String name)
   {
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf " + name));
+    if(name != null && !name.equals(""))
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("bpf " + name));
+    else
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("bpf #"+((FtsGraphicObject)bpfData).getObjectID()));
+
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
   

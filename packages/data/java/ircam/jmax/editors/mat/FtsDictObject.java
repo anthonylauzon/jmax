@@ -175,9 +175,13 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
       int id = argums[0].intValue;
       String className = argums[1].symbolValue.toString();
       
-      args.clear();
-      args.addString(className);
-      JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
+      FtsObject obj = JMaxApplication.getFtsServer().getObject(id);
+      if(obj == null)
+      {
+        args.clear();
+        args.addString(className);
+        JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
+      }
     }
   }
   //////////////////////////////////////////////////////////////////////////////////////
@@ -293,7 +297,7 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   
   public String getType()
   {
-    return "Dict";
+    return "dict";
   }
  
   public String getName()

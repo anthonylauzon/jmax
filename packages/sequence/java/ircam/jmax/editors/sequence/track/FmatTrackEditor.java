@@ -48,6 +48,13 @@ public class FmatTrackEditor extends MonoTrackEditor
     viewMode = FMAT_VIEW;
     
     super.setAdapter(new FmatAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
+    
+    g.addZoomListener( new ZoomListener() {
+			public void zoomChanged(float zoom, float oldZoom)
+		  {
+				updateEventsLength();
+			}
+		});
   }
 
   void createPopupMenu()
@@ -64,6 +71,31 @@ public class FmatTrackEditor extends MonoTrackEditor
   public int getViewMode(){return FMAT_VIEW;}
   
   void doEdit(Event evt, int x, int y){}
+  
+  //update "duration" in order to have the same graphic length with the new zoom value
+  //for all events in track  (called at zoom change). Called also at object instantiation
+  //to avoid the problem of the gc==null and so setting the good duration
+
+  void updateEventsLength()
+  {
+    TrackEvent aTrackEvent;
+    for (Enumeration e = gc.getDataModel().getEvents(); e.hasMoreElements();) 
+	  {      
+      aTrackEvent = (TrackEvent) e.nextElement();
+      ((FmatValue)aTrackEvent.getValue()).updateLength(aTrackEvent, gc); 
+	  }
+  }
+  
+  public void updateNewObject(Object obj)
+  {
+    TrackEvent evt = (TrackEvent)obj;
+    ((FmatValue)(evt.getValue())).updateLength(evt, gc); 
+  }
+  
+  void uploadEnd()
+  {
+    updateEventsLength();
+  }
   
   static public final int FMAT_VIEW = 5;
   static public int FMAT_DEFAULT_HEIGHT = 90;

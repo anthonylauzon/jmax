@@ -132,7 +132,13 @@ public class TrackWindow extends JFrame implements EditorContainer{
   
   public void setWindowName(String name)
   {
-    setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Track " + name));
+    String text = "track "+trackData.getType().getName();
+        
+    if(name != null && !name.equals(""))
+      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(text+" "+ name));
+    else
+      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(text+" #"+((FtsGraphicObject)trackData).getObjectID()));
+    
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
 	

@@ -117,7 +117,7 @@ public class FtsServer {
     return id;
   }
 
-  FtsObject getObject( int id)
+  public FtsObject getObject( int id)
   {
     return (FtsObject)objectTable.get( new Integer( id));
   }

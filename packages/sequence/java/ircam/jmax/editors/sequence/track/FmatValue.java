@@ -94,6 +94,16 @@ public class FmatValue extends AbstractEventValue
     return info;
   }
   
+  public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
+  {
+    FontMetrics fm = gc.getGraphicDestination().getFontMetrics( SequencePanel.rulerFont);
+    String text = "#"+objId;
+    int width =  fm.stringWidth(text) + 6;
+    int duration = ((FmatAdapter)gc.getAdapter()).getInvWidth(width);
+    
+    setProperty("duration", new Double(duration));
+  }  
+  
   static class FmatValueInfo extends AbstractValueInfo {
     /**
     * Returns the name of this value object */

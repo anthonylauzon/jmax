@@ -116,7 +116,11 @@ public class SequenceWindow extends JFrame implements EditorContainer{
   
   public void setWindowName(String name)
   {
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + name));
+    if(name != null && !name.equals(""))
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("sequence " + name));
+    else
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("sequence #"+((FtsGraphicObject)sequenceData).getObjectID()));
+
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
   

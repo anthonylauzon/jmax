@@ -330,6 +330,7 @@ public void endTrackUpload( TrackDataModel track)
 {
 	uploading  = false;
 	setRangeMode(getRangeMode(), false);
+  uploadEnd();
 }
 public void startPaste(){}
 public void endPaste(){}
@@ -340,6 +341,9 @@ public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
 }
 
 public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+
+/******************/
+void uploadEnd(){}
 
 /*****************************************************************************
 * ListSelectionListener interface

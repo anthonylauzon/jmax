@@ -3968,6 +3968,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   }
   
   /* hack: there won't actually be any object of fvec_class */
+  fts_class_instantiate(fmat_class);
   o->cl = fmat_class;
 }
 

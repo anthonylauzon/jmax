@@ -25,6 +25,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.track.Event;
 
+import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
@@ -77,13 +78,15 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
   Event e = (Event) obj;
   
   SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-	FontMetrics fm = gc.getGraphicDestination().getFontMetrics(stringFont);
+	FontMetrics fm = gc.getGraphicDestination().getFontMetrics( SequencePanel.rulerFont);
+  String text = "#"+e.getValue().getProperty("objid");
+  
   Dimension d = gc.getGraphicDestination().getSize();
   
 	int x = gc.getAdapter().getX(e);
   int y = (d.height - DEFAULT_HEIGHT)/2;
   
-	int width = ((MonoDimensionalAdapter)gc.getAdapter()).getLenght(e);	
+	int width = ((MonoDimensionalAdapter)gc.getAdapter()).getLenght(e); 	
 	int height = DEFAULT_HEIGHT+2;  
   
 	switch(state)
@@ -114,11 +117,13 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	
 	g.drawRect(x, y, width, height);
   g.drawLine(x, 0, x, d.height);
-      
-		/*if(e instanceof TrackEvent)
-		    TextRenderer.getRenderer().render(g, mess, x+BUTTON_WIDTH+1+2, y+1, width-2, height-2);*/
+    
+  if(!( e instanceof UtilTrackEvent))
+  {
+    g.setFont(SequencePanel.rulerFont);
+    g.drawString(text, x+2, y+height/2+3);
+  }
 }
-
 /**
 * returns true if the given event contains the given (graphic) point
  */

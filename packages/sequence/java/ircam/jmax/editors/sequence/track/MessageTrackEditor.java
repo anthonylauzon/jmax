@@ -36,7 +36,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 
 /**
- * A Monodimensional view for a generic Sequence. 
+* A Monodimensional view for a generic Sequence. 
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
@@ -58,7 +58,7 @@ public class MessageTrackEditor extends MonoTrackEditor
 				int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
 				//currentEvt.setProperty("duration", new Integer(lenght));
 				currentEvt.setProperty("duration", new Double(lenght));
-	  
+        
 				int time = (int)currentEvt.getTime()+lenght;
 				gc.getScrollManager().scrollIfNeeded(time+((PartitionAdapter)gc.getAdapter()).getInvWidth(20));
 				
@@ -91,171 +91,171 @@ public class MessageTrackEditor extends MonoTrackEditor
 				updateEventsLength();
 			}
 		});
-  }
-    
-  void createPopupMenu()
-  {
-    popup = new TrackBasePopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
-  }
+}
+
+void createPopupMenu()
+{
+  popup = new TrackBasePopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
+}
+
+void doEdit(Event evt, int x, int y)
+{
+  isEditing = true;
+  currentEvt = evt;
+  PartitionAdapter a = ((PartitionAdapter)gc.getAdapter());
   
-  void doEdit(Event evt, int x, int y)
-  {
-    isEditing = true;
-    currentEvt = evt;
-    PartitionAdapter a = ((PartitionAdapter)gc.getAdapter());
-    
-    String text = a.getLabel(evt);
-    
-    int evtx = a.getX(evt)+MessageEventRenderer.BUTTON_WIDTH+2+1;
-    int evty = a.getY(evt)+1;
-    
-    int evtLenght, evtHeight;
-    
-    text.trim();
-    if(!text.equals(""))
+  String text = a.getLabel(evt);
+  
+  int evtx = a.getX(evt)+MessageEventRenderer.BUTTON_WIDTH+2+1;
+  int evty = a.getY(evt)+1;
+  
+  int evtLenght, evtHeight;
+  
+  text.trim();
+  if(!text.equals(""))
 		{
-			evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc);
-			evtHeight = TextRenderer.getRenderer().getTextHeight(text, gc);
+    evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc);
+    evtHeight = TextRenderer.getRenderer().getTextHeight(text, gc);
 		}	
-    else
+  else
 		{
-			evtLenght = MessageEventRenderer.DEFAULT_TEXT_WIDTH-5;
-			evtHeight = MessageValue.DEFAULT_HEIGHT;
+    evtLenght = MessageEventRenderer.DEFAULT_TEXT_WIDTH-5;
+    evtHeight = MessageValue.DEFAULT_HEIGHT;
 		}
-    
-    area.doEdit(text, evtx, evty, evtLenght, evtHeight);
-
-    setCaretPosition(text, x-evtx, y-evty);
-  }
   
-  void setCaretPosition(String text, int x, int y)
-  {
-    int pos = area.viewToModel(new Point(x, y));
-    
-    if ((pos >= 0) && (pos <= text.length()))
-      area.setCaretPosition(pos);
-    else
-      area.setCaretPosition(text.length());
-  }
-
-  void setMessage()
-  {
-    if(currentEvt!=null)
-      ((MessageValue)currentEvt.getValue()).setText(area.getText(), (TrackEvent)currentEvt, gc);
-    endEdit();
-  }
+  area.doEdit(text, evtx, evty, evtLenght, evtHeight);
   
-  void endEdit()
-  {
-    area.setText("");
-    area.setVisible(false);
-    requestFocus();
-    currentEvt = null;
-    isEditing = false;
-  }
+  setCaretPosition(text, x-evtx, y-evty);
+}
 
-  int pressX, pressY;
-  protected void processMouseEvent(MouseEvent e)
-  {
-    int id = e.getID();
-    
-    if(isEditing)
-      if((id==MouseEvent.MOUSE_PRESSED)&&(e.getClickCount() == 1))
-			{
-				((UndoableData)track.getTrackDataModel()).beginUpdate();
-				setMessage();
-				((UndoableData)track.getTrackDataModel()).endUpdate();
-			}
-				else if(isExitedFromTrack(e))
-				{
-					setMessage();
-					repaint();
-	}
-    super.processMouseEvent(e);
-    
-    if(id==MouseEvent.MOUSE_PRESSED)
+void setCaretPosition(String text, int x, int y)
+{
+  int pos = area.viewToModel(new Point(x, y));
+  
+  if ((pos >= 0) && (pos <= text.length()))
+    area.setCaretPosition(pos);
+  else
+    area.setCaretPosition(text.length());
+}
+
+void setMessage()
+{
+  if(currentEvt!=null)
+    ((MessageValue)currentEvt.getValue()).setText(area.getText(), (TrackEvent)currentEvt, gc);
+  endEdit();
+}
+
+void endEdit()
+{
+  area.setText("");
+  area.setVisible(false);
+  requestFocus();
+  currentEvt = null;
+  isEditing = false;
+}
+
+int pressX, pressY;
+protected void processMouseEvent(MouseEvent e)
+{
+  int id = e.getID();
+  
+  if(isEditing)
+    if((id==MouseEvent.MOUSE_PRESSED)&&(e.getClickCount() == 1))
+    {
+      ((UndoableData)track.getTrackDataModel()).beginUpdate();
+      setMessage();
+      ((UndoableData)track.getTrackDataModel()).endUpdate();
+    }
+      else if(isExitedFromTrack(e))
       {
-	pressX = e.getX();
-	pressY = e.getY();
+        setMessage();
+        repaint();
       }
-    else 
-      if(id==MouseEvent.MOUSE_RELEASED)
-	startEditIfNeeded(e);
-  }
+      super.processMouseEvent(e);
   
-  boolean isExitedFromTrack(MouseEvent e)
+  if(id==MouseEvent.MOUSE_PRESSED)
   {
-    return ((e.getID()==MouseEvent.MOUSE_EXITED)&&
-	    (!area.getBounds().contains(e.getX(), e.getY())));
+    pressX = e.getX();
+    pressY = e.getY();
   }
+  else 
+    if(id==MouseEvent.MOUSE_RELEASED)
+      startEditIfNeeded(e);
+}
 
-  TrackEvent editEvt;
-  void startEditIfNeeded(MouseEvent e)
+boolean isExitedFromTrack(MouseEvent e)
+{
+  return ((e.getID()==MouseEvent.MOUSE_EXITED)&&
+          (!area.getBounds().contains(e.getX(), e.getY())));
+}
+
+TrackEvent editEvt;
+void startEditIfNeeded(MouseEvent e)
+{
+  int x = e.getX();
+  int y = e.getY();
+  if((pressX <= x+2)&&(pressX >= x-2)&&(pressY <= y+2)&&(pressY >= y-2))
   {
-    int x = e.getX();
-    int y = e.getY();
-    if((pressX <= x+2)&&(pressX >= x-2)&&(pressY <= y+2)&&(pressY >= y-2))
-      {
-	editEvt = (TrackEvent) gc.getRenderManager().
+    editEvt = (TrackEvent) gc.getRenderManager().
 	  firstObjectContaining(pressX, pressY);
-	
-	if (editEvt != null) 
+    
+    if (editEvt != null) 
 	  { 
 	    if(!((MessageValue)editEvt.getValue()).isOnTheButton(editEvt, pressX, gc))
 	      SwingUtilities.invokeLater(new Runnable(){
-		  public void run()
-		  {
-		    doEdit(editEvt, pressX, pressY);
-		  }
-		});
+          public void run()
+        {
+            doEdit(editEvt, pressX, pressY);
+        }
+        });
 	  }
-      }
   }
+}
 
-  void updateEventProperties(Object whichObject, String propName, Object propValue)
+void updateEventProperties(Object whichObject, String propName, Object propValue)
+{
+  if(propName.equals("message"))
   {
-    if(propName.equals("message"))
-      {
-	String text = (String)propValue;
-	TrackEvent evt = (TrackEvent)whichObject;
-	int width = TextRenderer.getRenderer().getTextWidth(text, gc);
-	int height = TextRenderer.getRenderer().getTextHeight(text, gc);
+    String text = (String)propValue;
+    TrackEvent evt = (TrackEvent)whichObject;
+    int width = TextRenderer.getRenderer().getTextWidth(text, gc);
+    int height = TextRenderer.getRenderer().getTextHeight(text, gc);
 	  
-	if(width < MessageEventRenderer.MINIMUM_WIDTH) 
-	  width  = MessageEventRenderer.MINIMUM_WIDTH;
-
-	if(height < MessageValue.DEFAULT_HEIGHT) 
-	  height = MessageValue.DEFAULT_HEIGHT;		
-	
-	int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
-	evt.setProperty("duration", new Double(lenght));
-	evt.setProperty("height", new Integer(height));
-      }
+    if(width < MessageEventRenderer.MINIMUM_WIDTH) 
+      width  = MessageEventRenderer.MINIMUM_WIDTH;
+    
+    if(height < MessageValue.DEFAULT_HEIGHT) 
+      height = MessageValue.DEFAULT_HEIGHT;		
+    
+    int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
+    evt.setProperty("duration", new Double(lenght));
+    evt.setProperty("height", new Integer(height));
   }
+}
 
-  public void updateNewObject(Object obj)
-  {
-    TrackEvent evt = (TrackEvent)obj;
-    ((MessageValue)(evt.getValue())).updateLength(evt, gc); 
-    ((MessageValue)(evt.getValue())).updateHeight(evt, gc); 
-  }
+public void updateNewObject(Object obj)
+{
+  TrackEvent evt = (TrackEvent)obj;
+  ((MessageValue)(evt.getValue())).updateLength(evt, gc); 
+  ((MessageValue)(evt.getValue())).updateHeight(evt, gc); 
+}
 
-    //update "duration" in order to have the same graphic length with the new zoom value
-    //for all events in track  (called at zoom change). Called also at message object instantiation
-    //to avoid the problem of the gc==null and so setting the good duration
-    void updateEventsLength()
-    {
+//update "duration" in order to have the same graphic length with the new zoom value
+//for all events in track  (called at zoom change). Called also at message object instantiation
+//to avoid the problem of the gc==null and so setting the good duration
+void updateEventsLength()
+{
 	TrackEvent aTrackEvent;
 	for (Enumeration e = gc.getDataModel().getEvents(); e.hasMoreElements();) 
-	  {      
-	      aTrackEvent = (TrackEvent) e.nextElement();
-	      ((MessageValue)aTrackEvent.getValue()).updateLength(aTrackEvent, gc); 
-	  }
-    }
+  {      
+    aTrackEvent = (TrackEvent) e.nextElement();
+    ((MessageValue)aTrackEvent.getValue()).updateLength(aTrackEvent, gc); 
+  }
+}
 
-  SequenceTextArea area;
-  boolean isEditing = false;
-  Event currentEvt = null;
+SequenceTextArea area;
+boolean isEditing = false;
+Event currentEvt = null;
 }
 
 
