@@ -1,8 +1,12 @@
-dnl $Id: configure.in,v 1.95 2002/09/18 15:27:17 borghesi Exp $
+dnl $Id: configure.in,v 1.96 2002/10/21 13:24:49 dechelle Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.96  2002/10/21 13:24:49  dechelle
+dnl C++ client library in progress.
+dnl Fixed $0. in expressions.
+dnl
 dnl Revision 1.95  2002/09/18 15:27:17  borghesi
 dnl *** empty log message ***
 dnl
@@ -293,7 +297,7 @@ then
 	tmp_CPPFKLAGS="$CPPFLAGS"
 	tmp_CFLAGS="$CFLAGS"
 	tmp_CXXFLAGS="$CXXFLAGS"
-	tmp_LDFLAGS="$LDFLAG"
+	tmp_LDFLAGS="$LDFLAGS"
 	tmp_LIBS="$LIBS"
 
 	dnl Set new value of CPPFLAGS, CFLAGS, CXXFLAGS and LDFLAGS
@@ -323,7 +327,7 @@ then
 	CPPFLAGS="$tmp_CPPFKLAGS"
 	CFLAGS="$tmp_CFLAGS"
 	CXXFLAGS="$tmp_CXXFLAGS"
-	LDFLAG="$tmp_LDFLAGS"
+	LDFLAGS="$tmp_LDFLAGS"
 	LIBS="$tmp_LIBS"
 	dnl Add jack in packages to compile
 	ADDITIONAL_PACKAGES="$ADDITIONAL_PACKAGES jack"
