@@ -15,7 +15,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public boolean iAmPatcher = false;
   public ErmesSketchWindow itsSubWindow = null;
-
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -80,15 +79,12 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public void makeFtsObject()
   {
-    try
-      {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
-      }
-    catch (FtsException e)
-      {
-	// Enzo !!! Aiuto :-> (MDC)
-      }
-
+    try{
+      itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
+    }
+    catch (FtsException e){
+      // Enzo !!! Aiuto :-> (MDC)
+    }
     if (itsFtsObject instanceof FtsContainerObject)
       YouArePatcher(true);
   }
@@ -166,6 +162,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   public void Paint_specific(Graphics g) {
     if(!itsSelected) g.setColor(itsLangNormalColor);
     else g.setColor(itsLangSelectedColor);
+
     g.fillRect(itsX+1,itsY+1,currentRect.width-2, currentRect.height-2);
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
     

@@ -1104,8 +1104,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     if (inAnApplet) {
       dispose();
     } else {
-      if (isSubPatcher) setVisible(false);
-      else Close();
+      Close();
+      /*try{
+	System.out.println("evento = "+Toolkit.getDefaultToolkit().getSystemEventQueue().getNextEvent());
+	}catch(Exception emammete){}*/
     }
   }
   public void windowOpened(WindowEvent e){}

@@ -190,21 +190,23 @@ class ErmesObjComment extends ErmesObject {
   }
 
   public void Paint_specific(Graphics g) {
-    if (itsArgs.equals("")) return;	//VERY strange case: who asked to paint an empty comment?
-    if(itsSelected) {
-      g.setColor(Color.gray);
-      g.fill3DRect(itsX+1,itsY+1, 4, currentRect.height-2, true);
-      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    if(!itsSketchPad.itsRunMode){ 
+      if(itsSelected) g.setColor(Color.gray);
+      else g.setColor(itsSketchPad.getBackground());
+      g.fill3DRect(itsX,itsY, currentRect.width, currentRect.height, true);
+    
+      //drag box
+      if(itsSelected) {
+	g.setColor(Color.gray.darker());
+	g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+      }
     }
-    else {
-      g.setColor(itsSketchPad.getBackground());
-      g.fillRect(itsX+1,itsY+1, 4, currentRect.height-2);
-      // unpaint the drag rect. 
-      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-    }  
-    g.setColor(Color.black);
-    g.setFont(itsFont);
-    DrawParsedString(g);
+    //text
+    if(!itsArgs.equals(" ")){
+      g.setColor(Color.black);
+      g.setFont(itsFont);
+      DrawParsedString(g);
+    }
   }
 	
   private void DrawParsedString(Graphics theGraphics){
