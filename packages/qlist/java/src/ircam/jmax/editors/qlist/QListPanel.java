@@ -15,12 +15,17 @@ public class QListPanel extends JPanel implements ActionListener {
   //QList itsQList;
   FtsAtomList itsAtomList;
   TextArea itsTextArea;
+  int caretPosition;
   Button itsSetButton;
   Button itsGetButton;
 
-  public QListPanel(FtsAtomList theAtomList) { 
+  public QListPanel(FtsAtomList theAtomList) 
+  { 
     super();
+
     itsTextArea = new TextArea(40, 40);
+    caretPosition = 0;
+
     Panel aPanel = new Panel();
     aPanel.setLayout(new GridLayout(1, 2));
     itsSetButton = new Button("set");
@@ -40,28 +45,41 @@ public class QListPanel extends JPanel implements ActionListener {
     setBackground(Color.white);
   }
 
-  public void fillContent(FtsAtomList theContent) {
-    itsTextArea.setText(theContent.getValuesAsText());
+  public void fillContent(FtsAtomList theContent) 
+  {
+    itsTextArea.setText( theContent.getValuesAsText());
+
     itsAtomList = theContent;
   }
  
-  public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == itsSetButton) {
-      itsAtomList.setValuesAsText(itsTextArea.getText());
-    }
-    else if (e.getSource() == itsGetButton) {
-      itsAtomList.forceUpdate();
-    }
+  public void actionPerformed(ActionEvent e) 
+  {
+    caretPosition = itsTextArea.getCaretPosition();
+
+    if (e.getSource() == itsSetButton) 
+      {
+	itsAtomList.setValuesAsText( itsTextArea.getText());
+      }
+    else if (e.getSource() == itsGetButton) 
+      {
+	itsAtomList.forceUpdate();
+      }
+
     //in every case, update the content
     fillContent(itsAtomList);
+
+    itsTextArea.requestFocus();
+    itsTextArea.setCaretPosition( caretPosition);
   }
 
-  public Dimension preferredSize() {
+  public Dimension preferredSize() 
+  {
     Dimension d = new Dimension(512, 412);
     return d;
   }
 
-  public Dimension minimumSize() {
+  public Dimension minimumSize() 
+  {
     return preferredSize();
   }
 }
