@@ -537,9 +537,10 @@ ivec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	this->values[i] = 0.0;
   
       if( ivec_editor_is_open(this))
-	fts_client_send_message( this->editor, fts_s_size, ac, at);
-
-      data_object_set_dirty( o);
+	{
+	  fts_client_send_message( this->editor, fts_s_size, ac, at);
+	  data_object_set_dirty( o);
+	}
     }
 }
 

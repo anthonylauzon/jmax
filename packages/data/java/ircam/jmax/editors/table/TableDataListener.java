@@ -38,6 +38,6 @@ public interface TableDataListener {
 
   abstract public void tableSetted();
   abstract public void tableCleared();
-  abstract public void sizeChanged(int size);
+  abstract public void sizeChanged(int size, int oldSize);
 }
 

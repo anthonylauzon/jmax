@@ -115,13 +115,13 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	{
 	  updateHorizontalScrollbar();
 	  updateVerticalScrollbar();
-	  gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+	  gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
 						    ((TableAdapter)gc.getAdapter()).getXZoom(), 
 						    gc.getVisiblePixelsSize());
 	  if(gc.getAdapter().getXZoom() > 0.5)		    
 	    gc.getFtsObject().requestGetValues();
-	    else
-	      gc.getFtsObject().requestGetPixels(0, 0);
+	  else
+	    gc.getFtsObject().requestGetPixels(0, 0);
 	}
       });
     //470 is the default size of the TableDisplay .......
@@ -361,11 +361,17 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   {
     itsCenterPanel.repaint();
   }
-  public void sizeChanged(int size)
+  public void sizeChanged(int size, int oldSize)
   {
+    if( oldSize == 0)
+      {
+	gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+						   ((TableAdapter)gc.getAdapter()).getXZoom(), 
+						   gc.getVisiblePixelsSize());
+	gc.getFtsObject().requestGetValues();
+      }
     updateHorizontalScrollbar();
-    if(!itsHorizontalControl.isVisible())
-      itsCenterPanel.repaint();
+    itsCenterPanel.repaint();
   }
 
   /**

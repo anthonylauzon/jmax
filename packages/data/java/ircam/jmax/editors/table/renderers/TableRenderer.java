@@ -97,6 +97,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     if(gc.getAdapter().getXZoom() >= 0.5)
       {
 	if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
+	
 	int index = gc.getAdapter().getInvX( r.x);
 	int visibleSize = gc.getAdapter().getInvX( r.x+r.width);
 	

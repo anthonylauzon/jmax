@@ -118,6 +118,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   {
     if(size != newSize)
       {
+	int oldSize = size;
 	size = newSize;
 	
 	int[] temp =  new int[size];
@@ -127,7 +128,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	
 	visibles = temp;
 	
-	notifySizeChanged(size);
+	notifySizeChanged(size, oldSize);
       }
   }
 
@@ -135,6 +136,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   public void setVisibles(int nArgs , FtsAtom args[])
   {
     int i = 0;
+    int oldSize = size;
     size = args[0].intValue;    
     visibleSize = args[1].intValue;    
     visibles = new int[size];
@@ -151,7 +153,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     
     lastIndex = i;
     
-    notifySizeChanged(size);
+    notifySizeChanged(size, oldSize);
 
     if((size <= lastIndex)||(visibleSize <= lastIndex))
       notifySet();
@@ -564,10 +566,10 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
   * utility to notify the data base change to all the listeners
   */
 
-  private void notifySizeChanged(int size)
+  private void notifySizeChanged(int size, int oldSize)
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((TableDataListener) e.nextElement()).sizeChanged(size);
+      ((TableDataListener) e.nextElement()).sizeChanged(size, oldSize);
   }
 
   private void notifySet()
