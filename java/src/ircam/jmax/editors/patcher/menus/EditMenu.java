@@ -65,7 +65,7 @@ public class EditMenu extends PatcherMenu
 
     addSeparator();
 
-    add(Actions.findAction, "Find");
+    add(Actions.findAction, "Find", Event.CTRL_MASK, KeyEvent.VK_F);
     add(Actions.findErrorsAction, "Find Errors");
 
     addSeparator();

@@ -31,6 +31,7 @@
 */
 
 #define SAFE_MEM
+#define HELP_PURIFY
 
 extern char *fts_safe_malloc(unsigned long size, const char *filename, int line);
 extern void fts_safe_free(char *p);

@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
-#define OPS_LIMIT 256*1024
+#define OPS_LIMIT 512*1024
 #define BLOCK_CACHE_SIZE 16
 
 #include "smem.h"

@@ -12,7 +12,6 @@
  * 
  */
 
-
 #include <pthread.h>
 #include <dmedia/audiofile.h>
 #include "fts.h"
@@ -40,6 +39,9 @@
    format for the channells, or using some kind of convention of channel packeting.
    really the fifo do no assumption on the semantic of the content.
 
+   Reader and writers can close their part of the communication; once both
+   part are closed, we destroy the fifo; before, we call a destroy callback,
+   that can be used to destroy other shared resources used for the communication.
    */
 
 
@@ -54,7 +56,7 @@ typedef struct fts_sample_fifo
   int    read_block;		/* the size of the blocks being read, constant */
   int    read_pending;		/* != zero if a thread is blocked on reading */
   pthread_cond_t read_cond;	/* the read (fifo empty) semaphor */
-  int    read_status;		/* the out of band data written by the writer thread */
+  int    reader_eof;		/* the reader eof flag */
 
   /* Writing */
 
@@ -62,7 +64,12 @@ typedef struct fts_sample_fifo
   int    write_block;		/* the size of the blocks being read, constant */
   int    write_pending;		/* != zero if a thread is blocked on writing */
   pthread_cond_t write_cond;	/* the write (fifo full) semaphor */
-  int    write_status;		/* the out of band data written by the writer thread */
+  int    writer_eof;		/* the writer eof flag */
+
+  /* Destroy call back*/
+
+  void   (* destroy_callback)(void *);
+  void   *destroy_callback_data;
 
   /* Mutex */
 
@@ -79,18 +86,18 @@ static void fts_sample_fifo_describe(const char *msg, fts_sample_fifo_t *fifo)
   fprintf(stderr, "\tread_p %d\n", fifo->read_p);
   fprintf(stderr, "\tread_block %d\n", fifo->read_block);
   fprintf(stderr, "\tread_pending %d\n", fifo->read_pending);
-  fprintf(stderr, "\tread_status %d\n", fifo->read_status);
+  fprintf(stderr, "\treader_eof %d\n", fifo->reader_eof);
   fprintf(stderr, "\twrite_p %d\n", fifo->write_p);
   fprintf(stderr, "\twrite_block %d\n", fifo->write_block);
   fprintf(stderr, "\twrite_pending %d\n", fifo->write_pending);
-  fprintf(stderr, "\twrite_status %d\n", fifo->write_status);
+  fprintf(stderr, "\twriter_eof %d\n", fifo->writer_eof);
 }
 
 static fts_heap_t *sample_fifo_heap;
 
 /* Create a new empty fifo, of a given size */
 
-fts_sample_fifo_t *fts_sample_fifo_new(int size, int read_block, int write_block)
+static fts_sample_fifo_t *fts_sample_fifo_new(int size, int read_block, int write_block)
 {
   fts_sample_fifo_t *sf= (fts_sample_fifo_t *) fts_heap_alloc(sample_fifo_heap);
 
@@ -100,27 +107,38 @@ fts_sample_fifo_t *fts_sample_fifo_new(int size, int read_block, int write_block
   sf->read_p       = 0;
   sf->read_block   = read_block;
   sf->read_pending = 0;
-  sf->read_status  = 0;
+  sf->reader_eof   = 0;
   pthread_cond_init(&(sf->read_cond), NULL);
 
   sf->write_p = 0;
   sf->write_block   = write_block;
   sf->write_pending = 0;
-  sf->write_status  = 0;
+  sf->writer_eof    = 0;
   pthread_cond_init(&(sf->write_cond), NULL);
+
+  sf->destroy_callback = 0;
+  sf->destroy_callback_data = 0;
 
   pthread_mutex_init(&(sf->mutex), NULL);
 
   return sf;
 }
 
+static void fts_sample_fifo_set_destroy_callback(fts_sample_fifo_t *sf, void (* fun)(void *), void *data)
+{
+  sf->destroy_callback = fun;
+  sf->destroy_callback_data = data;
+}
 
 /* Destroy must be called when the two parties already agreed to give up
    synchronization; calling this function with a thread blocked inside the fifo
    will cause impredictable effects */
 
-void fts_sample_fifo_destroy(fts_sample_fifo_t *sf)
+static void fts_sample_fifo_destroy(fts_sample_fifo_t *sf)
 {
+  if (sf->destroy_callback)
+    (* sf->destroy_callback)(sf->destroy_callback_data);
+
   pthread_cond_destroy(&(sf->read_cond));
   pthread_cond_destroy(&(sf->write_cond));
   pthread_mutex_destroy(&(sf->mutex));
@@ -130,32 +148,58 @@ void fts_sample_fifo_destroy(fts_sample_fifo_t *sf)
 
 /* Ask for a pointer to a buffer ofsample to be read; size of the buffer
    is the declared read size at the sample fifo new time.
-   return a pointer to the sample buffer; 
+   Return the a pointer to the sample buffer thru a pointer argument,
+   and the number of samples the called can actually write; if the value
+   is less than the read block size, we are in writer eof situation,
+   no more read should be tryied.
+
    the buffer is locked until the call to _got (see below) */
 
-float *fts_sample_fifo_want_to_get(fts_sample_fifo_t *sf)
+static int fts_sample_fifo_want_to_get(fts_sample_fifo_t *sf, float **p)
 {
+  int ret;
+
+  if (sf->writer_eof)
+    {
+      *p = (float *)0;
+      return 0;
+    }
+
   pthread_mutex_lock(&(sf->mutex));
 
-  if ((sf->write_p - sf->read_p + sf->size) % sf->size < sf->read_block)
+  if (((sf->write_p - sf->read_p + sf->size) % sf->size) < sf->read_block)
     {
       sf->read_pending = 1;
       pthread_cond_wait(&(sf->read_cond), &(sf->mutex));
       sf->read_pending = 0;
+
+      if (((sf->write_p - sf->read_p + sf->size) % sf->size) < sf->read_block)
+	ret = (sf->write_p - sf->read_p + sf->size) % sf->size;
+      else
+	ret = sf->read_block;
     }
+  else
+    ret = sf->read_block;
 
   pthread_mutex_unlock(&(sf->mutex));
 
-  return sf->buf + sf->read_p;
+  (*p) = sf->buf + sf->read_p;
+
+  return ret;
 }
 
 /* Signal that the last get operation is completed, and the used buffer
    is empty; it may wake up a thread blocked in want_to_put if unlocking
    this buffer make the space available .
+
+   Do nothing in case the writer is in eof.
  */
 
-void fts_sample_fifo_got(fts_sample_fifo_t *sf)
+static void fts_sample_fifo_got(fts_sample_fifo_t *sf)
 {
+  if (sf->writer_eof)
+    return;
+
   pthread_mutex_lock(&(sf->mutex));
 
   sf->read_p = (sf->read_p + sf->read_block) % sf->size;
@@ -172,10 +216,18 @@ void fts_sample_fifo_got(fts_sample_fifo_t *sf)
 
 /* Ask for a pointer to a buffer of 'samples' sample in which to write; samples must
    be a divisor of the fifo size; it can blocks the thread until
-   the buffer is available; return a pointer to the buffer to be filled*/
+   the buffer is available */
 
-float *fts_sample_fifo_want_to_put(fts_sample_fifo_t *sf)
+static int fts_sample_fifo_want_to_put(fts_sample_fifo_t *sf, float **p)
 {
+  int ret;
+
+  if (sf->reader_eof)
+    {
+      *p = (float *)0;
+      return 0;
+    }
+
   pthread_mutex_lock(&(sf->mutex));
 
   if ((sf->read_p != sf->write_p) && (sf->read_p - sf->write_p + sf->size) % sf->size  <= sf->write_block)
@@ -183,11 +235,20 @@ float *fts_sample_fifo_want_to_put(fts_sample_fifo_t *sf)
       sf->write_pending = 1;
       pthread_cond_wait(&(sf->write_cond), &(sf->mutex));
       sf->write_pending = 0;
+
+      if ((sf->read_p != sf->write_p) && (sf->read_p - sf->write_p + sf->size) % sf->size  <= sf->write_block)
+	ret = (sf->read_p - sf->write_p + sf->size) % sf->size;
+      else
+	ret = sf->write_block;
     }
+  else
+    ret = sf->write_block;
 
   pthread_mutex_unlock(&(sf->mutex));
 
-  return sf->buf + sf->write_p;
+  (*p) = sf->buf + sf->write_p;
+
+  return ret;
 }
 
 
@@ -196,8 +257,11 @@ float *fts_sample_fifo_want_to_put(fts_sample_fifo_t *sf)
    this buffer make the samples available .
  */
 
-void fts_sample_fifo_putted(fts_sample_fifo_t *sf)
+static void fts_sample_fifo_putted(fts_sample_fifo_t *sf)
 {
+  if (sf->reader_eof)
+    return;
+
   pthread_mutex_lock(&(sf->mutex));
 
   sf->write_p = (sf->write_p + sf->write_block) % sf->size;
@@ -210,45 +274,80 @@ void fts_sample_fifo_putted(fts_sample_fifo_t *sf)
   pthread_mutex_unlock(&(sf->mutex));
 }
 
-int fts_sample_fifo_get_read_block(fts_sample_fifo_t *sf)
+static int fts_sample_fifo_get_read_block(fts_sample_fifo_t *sf)
 {
   return sf->read_block;
 }
 
-int fts_sample_fifo_get_write_block(fts_sample_fifo_t *sf)
+static int fts_sample_fifo_get_write_block(fts_sample_fifo_t *sf)
 {
   return sf->write_block;
 }
 
+/* 
+   Controlling the sample fifo
+   */
 
-/* Put the out of band command; note that in a given application,
-   either the reader or the writer should write the cmd, but not both,
-   and the other should read it; also, the sample fifo give no provision
-   of extra synchronization, if the command reader is currently blocked,
-   it will read the command when waken up by the normal read/write operations */
+/* Called by the reader, to tell
+   the writer that nobody will read anymore from the fifo;
+   if the writer is waiting on a want_to_put, it will be
+   waken up with an error return value.
+   After this call fifo will be closed, any want_to/done operation will return
+   an error value.
+   */
 
-void fts_sample_fifo_set_read_status(fts_sample_fifo_t *sf, int v)
+static void fts_sample_fifo_reader_eof(fts_sample_fifo_t *sf)
 {
-  sf->read_status = v;
+  pthread_mutex_lock(&(sf->mutex));
+
+  sf->reader_eof = 1;
+
+  if (sf->write_pending)
+    pthread_cond_signal(&(sf->write_cond));
+
+  if (sf->writer_eof)
+    fts_sample_fifo_destroy(sf);
+
+  pthread_mutex_unlock(&(sf->mutex));
 }
 
-int fts_sample_fifo_get_read_status(fts_sample_fifo_t *sf)
+/* Called by the writer, to tell
+   the reader that nobody will write anymore from the fifo;
+   if the reader is waiting on a want_to_get, it will be
+   waken up with an error return value (telling how many samples are left
+   on the fifo).
+   After this call fifo will be closed, any want_to/done operation will return
+   an error value.
+   */
+
+
+static void fts_sample_fifo_writer_eof(fts_sample_fifo_t *sf)
 {
-  return sf->read_status;
+  pthread_mutex_lock(&(sf->mutex));
+
+  sf->writer_eof = 1;
+
+  if (sf->read_pending)
+    pthread_cond_signal(&(sf->read_cond));
+
+  if (sf->reader_eof)
+    fts_sample_fifo_destroy(sf);
+
+  pthread_mutex_unlock(&(sf->mutex));
 }
 
-void fts_sample_fifo_set_write_status(fts_sample_fifo_t *sf, int v)
+static int fts_sample_fifo_is_reader_eof(fts_sample_fifo_t *sf)
 {
-  sf->write_status = v;
+  return sf->reader_eof;
 }
 
-int fts_sample_fifo_get_write_status(fts_sample_fifo_t *sf)
+static int fts_sample_fifo_is_writer_eof(fts_sample_fifo_t *sf)
 {
-  return sf->write_status;
+  return sf->writer_eof;
 }
 
 
-void fts_sample_fifo_init()
+static void fts_sample_fifo_init()
 {
   sample_fifo_heap = fts_heap_new(sizeof(fts_sample_fifo_t));
 }
@@ -294,7 +393,7 @@ static fts_heap_t *cmd_fifo_heap;
 
 /* Create a new empty fifo, of a given size */
 
-fts_cmd_fifo_t *fts_cmd_fifo_new()
+static fts_cmd_fifo_t *fts_cmd_fifo_new()
 {
   fts_cmd_fifo_t *cf= (fts_cmd_fifo_t *) fts_heap_alloc(cmd_fifo_heap);
 
@@ -316,7 +415,7 @@ fts_cmd_fifo_t *fts_cmd_fifo_new()
    synchronization; calling this function with a thread blocked inside the fifo
    will cause impredictable effects */
 
-void fts_cmd_fifo_destroy(fts_cmd_fifo_t *cf)
+static void fts_cmd_fifo_destroy(fts_cmd_fifo_t *cf)
 {
   pthread_cond_destroy(&(cf->read_cond));
   pthread_cond_destroy(&(cf->write_cond));
@@ -326,7 +425,7 @@ void fts_cmd_fifo_destroy(fts_cmd_fifo_t *cf)
 
 /* Get a command, and execute it, outside of the lock */
   
-void fts_cmd_fifo_exec_one(fts_cmd_fifo_t *cf)
+static void fts_cmd_fifo_exec_one(fts_cmd_fifo_t *cf)
 {
   void (*fun)(void *);
   void *v;
@@ -361,7 +460,7 @@ void fts_cmd_fifo_exec_one(fts_cmd_fifo_t *cf)
    be a divisor of the fifo size; it can blocks the thread until
    the buffer is available; return a pointer to the buffer to be filled*/
 
-void fts_cmd_fifo_add_command(fts_cmd_fifo_t *cf,  void (*fun)(void *), void *v)
+static void fts_cmd_fifo_add_command(fts_cmd_fifo_t *cf,  void (*fun)(void *), void *v)
 {
   pthread_mutex_lock(&(cf->mutex));
 
@@ -385,7 +484,7 @@ void fts_cmd_fifo_add_command(fts_cmd_fifo_t *cf,  void (*fun)(void *), void *v)
   pthread_mutex_unlock(&(cf->mutex));
 }
 
-void fts_cmd_fifo_init()
+static void fts_cmd_fifo_init()
 {
   cmd_fifo_heap = fts_heap_new(sizeof(fts_cmd_fifo_t));
 }
@@ -410,7 +509,7 @@ static void fts_async_call(void (*fun)(void *), void *v)
   fts_cmd_fifo_add_command(async_call_fifo, fun, v);
 }
 
-void fts_async_init()
+static void fts_async_init()
 {
   int rc;
 
@@ -441,8 +540,6 @@ static int          sgi_readsf_get_nchans(fts_dev_t *dev);
 
 static void fts_readsf_forker(void *data);
 
-#define SFDEV_CLOSE 1
-#define SFDEV_EOF   2
 
 static void sgi_readsf_init(void)
 {
@@ -489,7 +586,6 @@ struct readsf_data
   /* housekeeping */
 
   int active; /* Used directly by the readsf object */
-  int eof;
 };
 
 
@@ -502,9 +598,14 @@ static void readsf_data_describe(const char *msg, struct readsf_data *data)
   fprintf(stderr, "\tfile_name %s\n", fts_symbol_name(data->file_name));
   fprintf(stderr, "\tnch %d\n", data->nch);
   fprintf(stderr, "\tactive %d\n", data->active);
-  fprintf(stderr, "\teof %d\n", data->eof);
 }
 
+/* Destroy callback */
+
+void readsf_destroy_data(void *dev_data)
+{
+  fts_free(dev_data);
+}
 
 static fts_status_t
 sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
@@ -522,7 +623,6 @@ sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* get the file name */
 
   dev_data->file_name = fts_get_symbol(&args[0]);
-  dev_data->eof = 0;
   dev_data->active = 0;
 
   /* parse the other file parameters : channels 
@@ -544,7 +644,7 @@ sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Make a sample fifo */
 
   dev_data->fifo = fts_sample_fifo_new(dev_data->fifo_size, MAXVS * dev_data->nch, dev_data->file_block);
-
+  fts_sample_fifo_set_destroy_callback(dev_data->fifo, readsf_destroy_data, dev_data);
   /*  Start the reader thread  using a async call*/
 
   fts_async_call(fts_readsf_forker, (void *)dev_data);
@@ -557,11 +657,9 @@ sgi_readsf_close(fts_dev_t *dev)
 {
   struct readsf_data *dev_data;
 
-  dev_data = fts_dev_get_device_data(dev);
+  dev_data = (struct readsf_data *) fts_dev_get_device_data(dev);
 
-  /* Just tell the worker thread to close and destroy everything */
-
-  fts_sample_fifo_set_read_status(dev_data->fifo, SFDEV_CLOSE);
+  fts_sample_fifo_reader_eof(dev_data->fifo);
 
   return fts_Success;
 }
@@ -607,6 +705,9 @@ sgi_readsf_get(fts_word_t *argv)
   int n;
   int ch;
   int i,j;
+  int doit = 0;
+  float *in;
+  int ret;
 
   nchans = fts_word_get_long(argv + 1);
   n = fts_word_get_long(argv + 2);
@@ -618,44 +719,52 @@ sgi_readsf_get(fts_word_t *argv)
       /* return all zeros if not active or if write only or in the eof case */
 
       if (dev_data->active)
+	doit = 1;
+    }
+
+  if (doit)
+    ret = fts_sample_fifo_want_to_get(dev_data->fifo, &in);
+  else
+    ret = 0;
+
+  if (ret == nchans * MAXVS)
+    {
+      /* do the data transfer, transforming from interleaved to separate channels */
+
+      for (ch = 0; ch < nchans; ch++)
 	{
-	  float *in;
-	  int ret;
+	  float *out;
 
-	  in = fts_sample_fifo_want_to_get(dev_data->fifo);
+	  out = (float *) fts_word_get_ptr(argv + 3 + ch);
+
+	  for (i = ch, j = 0; j < n; i = i + nchans, j++)
+	    out[j] = in[i];
+	}
+    }
+  else
+    {
+      /* do a partial data transfer, fill what missing with zeros */
       
-	  /* do the data transfer, transforming from interleaved to separate channels */
+      for (ch = 0; ch < nchans; ch++)
+	{
+	  float *out;
 
-	  for (ch = 0; ch < nchans; ch++)
+	  out = (float *) fts_word_get_ptr(argv + 3 + ch);
+	  
+	  for (i = ch, j = 0; j < n; i = i + nchans, j++)
 	    {
-	      float *out;
-
-	      out = (float *) fts_word_get_ptr(argv + 3 + ch);
-
-	      for (i = ch, j = 0; j < n; i = i + nchans, j++)
+	      if (i < ret)
 		out[j] = in[i];
+	      else
+		out[j] = 0.0f;
 	    }
-
-	  /* Unlock the buffer */
-
-	  fts_sample_fifo_got(dev_data->fifo);
-
-	  return;
 	}
     }
 
-  /* If there is a null device, or if the device is not active,
-     just put zeros */
+  /* Unlock the buffer if needed */
 
-  for (ch = 0; ch < nchans; ch++)
-    {
-      float *out;
-
-      out = (float *) fts_word_get_ptr(argv + 3 + ch);	  
-
-      for(i = 0; i < n; i++)
-	out[i] = 0.0f;
-    }
+  if (doit)
+    fts_sample_fifo_got(dev_data->fifo);
 }
 
 
@@ -663,13 +772,6 @@ sgi_readsf_get(fts_word_t *argv)
    file_block samples at a time; note that this value should be the same
    used to initialize the sample fifo.
 */
-
-/* @@@@@ should add check on the results !!!, and put the result on status in case of problems ??? */
-
-/* @@@ Must handle the eof case: read a partial block, then fill with
-   zeros what left, and signal eof to the others, waiting for a close signal ?
-   */
-
 
 static void *fts_readsf_worker(void *data)
 {
@@ -688,7 +790,7 @@ static void *fts_readsf_worker(void *data)
   if (file == AF_NULL_FILEHANDLE)
     {
       eof = 1;
-      fts_sample_fifo_set_write_status(fifo, SFDEV_EOF);
+      fts_sample_fifo_writer_eof(fifo);
     }
   else
     {
@@ -703,19 +805,20 @@ static void *fts_readsf_worker(void *data)
 
   /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
 
-  while (fts_sample_fifo_get_read_status(fifo) != SFDEV_CLOSE)
+  while (! eof)
     {
+      int ret;
       float *p;
 
-      p = fts_sample_fifo_want_to_put(fifo);
+      ret = fts_sample_fifo_want_to_put(fifo, &p);
 
-      if (eof)
-	{
-	  /* Just fill with zeros */
+      /**Check ret; if it is less than the block we are in 
+	reader_eof situation; stop the loop and close the file.
+	We do not need to write partial blocks, because on the other side
+	there is nobody that read */
 
-	  for (i = 0; i < dev_data->file_block; i++)
-	    p[i] = 0.0f;
-	}
+      if (ret != dev_data->file_block)
+	eof = 1;
       else
 	{
 	  ret = afReadFrames(file, AF_DEFAULT_TRACK, p, frames_for_block);
@@ -730,20 +833,19 @@ static void *fts_readsf_worker(void *data)
 	      /* Set the eof flag */
 
 	      eof = 1;
-	      fts_sample_fifo_set_write_status(fifo, SFDEV_EOF);
 	    }
+	  else
+	    fts_sample_fifo_putted(fifo);
 	}
-
-      fts_sample_fifo_putted(fifo);
     }
 
   /* Close the file, free all the structures and exit the thread */
 
-  afCloseFile(file);
-  
-  fts_sample_fifo_destroy(fifo);
-  fts_free(dev_data);
+  fts_sample_fifo_writer_eof(fifo);
 
+  if (file != AF_NULL_FILEHANDLE)
+    afCloseFile(file);
+  
   return NULL;
 }
 
@@ -822,7 +924,6 @@ struct writesf_data
   /* housekeeping */
 
   int active; /* Used directly by the writesf object */
-  int eof;
 };
 
 
@@ -835,7 +936,11 @@ static void writesf_data_describe(const char *msg, struct writesf_data *data)
   fprintf(stderr, "\tfile_name %s\n", fts_symbol_name(data->file_name));
   fprintf(stderr, "\tnch %d\n", data->nch);
   fprintf(stderr, "\tactive %d\n", data->active);
-  fprintf(stderr, "\teof %d\n", data->eof);
+}
+
+void writesf_destroy_data(void *dev_data)
+{
+  fts_free(dev_data);
 }
 
 
@@ -856,7 +961,6 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* get the file name */
 
   dev_data->file_name = fts_get_symbol(&args[0]);
-  dev_data->eof = 0;
   dev_data->active = 0;
 
   /* parse the other file parameters : channels and format.
@@ -887,7 +991,6 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 	format_name = fts_soundfile_format_get_default();
     }
 
-
   dev_data->format_descr = fts_soundfile_format_get_descriptor(format_name);
   dev_data->file_block = fts_get_int_by_name(nargs, args, fts_new_symbol("fileblock"), 16 * 1024);
   dev_data->fifo_size  = fts_get_int_by_name(nargs, args, fts_new_symbol("fifosize"),  64 * 1024);
@@ -895,6 +998,7 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Make a sample fifo */
 
   dev_data->fifo = fts_sample_fifo_new(dev_data->fifo_size, dev_data->file_block, MAXVS * dev_data->nch);
+  fts_sample_fifo_set_destroy_callback(dev_data->fifo, writesf_destroy_data, dev_data);
 
   /*  Start the reader thread  using a async call*/
 
@@ -912,7 +1016,7 @@ sgi_writesf_close(fts_dev_t *dev)
 
   /* Just tell the worker thread to close and destroy everything */
 
-  fts_sample_fifo_set_write_status(dev_data->fifo, SFDEV_CLOSE);
+  fts_sample_fifo_writer_eof(dev_data->fifo);
 
   return fts_Success;
 }
@@ -974,23 +1078,31 @@ sgi_writesf_put(fts_word_t *argv)
 	  float *out;
 	  int ret;
 
-	  out = fts_sample_fifo_want_to_put(dev_data->fifo);
+	  ret = fts_sample_fifo_want_to_put(dev_data->fifo, &out);
       
-	  /* do the data transfer, transforming from interleaved to separate channels */
+	  /* check ret; if ret is different from the block size,
+	     the worker thread made a call to reader_eof; this means
+	     that an i/o error occurred; we just stop reading/writing.
+	     */
 
-	  for (ch = 0; ch < nchans; ch++)
+	  if (ret == MAXVS * nchans)
 	    {
-	      float *in;
+	      /* do the data transfer, transforming from interleaved to separate channels */
 
-	      in = (float *) fts_word_get_ptr(argv + 3 + ch);
+	      for (ch = 0; ch < nchans; ch++)
+		{
+		  float *in;
 
-	      for (i = ch, j = 0; j < n; i = i + nchans, j++)
-		in[i] = out[j];
+		  in = (float *) fts_word_get_ptr(argv + 3 + ch);
+
+		  for (i = ch, j = 0; j < n; i = i + nchans, j++)
+		    out[i] = in[j];
+		}
+
+	      /* Unlock the buffer */
+
+	      fts_sample_fifo_putted(dev_data->fifo);
 	    }
-
-	  /* Unlock the buffer */
-
-	  fts_sample_fifo_putted(dev_data->fifo);
 
 	  return;
 	}
@@ -1015,8 +1127,6 @@ static void *fts_writesf_worker(void *data)
   int frames_for_block = (dev_data->file_block / dev_data->nch);
   AFfilesetup setup;
 
-  fts_sample_fifo_describe("Starting writesf_worker", fifo);
-
   /* Actually Open the audio file  */
 
   setup = afNewFileSetup();
@@ -1032,7 +1142,7 @@ static void *fts_writesf_worker(void *data)
   if (file == AF_NULL_FILEHANDLE)
     {
       eof = 1;
-      fts_sample_fifo_set_write_status(fifo, SFDEV_EOF);
+      fts_sample_fifo_reader_eof(fifo);
     }
   else
     {
@@ -1043,34 +1153,31 @@ static void *fts_writesf_worker(void *data)
 
   /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
 
-  while (fts_sample_fifo_get_write_status(fifo) != SFDEV_CLOSE)
+  while (! eof)
     {
+      int ret;
       float *p;
 
-      p = fts_sample_fifo_want_to_get(fifo);
+      ret = fts_sample_fifo_want_to_get(fifo, &p);
 
-      if (! eof)
-	{
-	  ret = afWriteFrames(file, AF_DEFAULT_TRACK, p, frames_for_block);
+      /* @@@ Test ret; if it is not equal to the block size,
+	 we are in reader_eof; write what you can, and exit the thread
+	 */
 
-	  if (ret != frames_for_block)
-	    {
-	      /* I/O Error, ignore data from now own */
-	      /* Set the eof flag */
+      afWriteFrames(file, AF_DEFAULT_TRACK, p, ret / dev_data->nch);
 
-	      eof = 1;
-	    }
-	}
+      if (ret != dev_data->file_block)
+	eof = 1;
 
-      fts_sample_fifo_putted(fifo);
+      fts_sample_fifo_got(fifo);
     }
 
   /* Close the file, free all the structures and exit the thread */
 
-  afCloseFile(file);
-  
-  fts_sample_fifo_destroy(fifo);
-  fts_free(dev_data);
+  fts_sample_fifo_reader_eof(fifo);
+
+  if (file != AF_NULL_FILEHANDLE)
+    afCloseFile(file);
 
   return NULL;
 }

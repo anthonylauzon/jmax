@@ -339,7 +339,7 @@ void fts_dev_class_sig_set_get_fun(fts_dev_class_t *dev_class,  void (* get_fun)
 
   dev_class->methods.sig_methods.get_fun = get_fun;
 
-  sprintf(buf, "%s_read", fts_symbol_name(fts_dev_class_get_name(dev_class)));
+  sprintf(buf, "%s_get", fts_symbol_name(fts_dev_class_get_name(dev_class)));
   get_fun_name = fts_new_symbol_copy(buf);
 
   dev_class->methods.sig_methods.get_fun_name = get_fun_name;
@@ -355,7 +355,7 @@ void fts_dev_class_sig_set_put_fun(fts_dev_class_t *dev_class,  void (* put_fun)
 
   dev_class->methods.sig_methods.put_fun = put_fun;
 
-  sprintf(buf, "%s_read", fts_symbol_name(fts_dev_class_get_name(dev_class)));
+  sprintf(buf, "%s_put", fts_symbol_name(fts_dev_class_get_name(dev_class)));
   put_fun_name = fts_new_symbol_copy(buf);
 
   dev_class->methods.sig_methods.put_fun_name = put_fun_name;
