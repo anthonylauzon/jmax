@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.44 $ IRCAM $Date: 1998/10/13 17:11:52 $
+ *      $Revision: 1.45 $ IRCAM $Date: 1998/10/14 17:07:37 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -307,30 +307,27 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
     {
       /* Compute the expressions with the correct offset */
 
-      if (ac > 1)
-	{
-	  e = fts_expression_eval(patcher, ac, at,  1024, new_args);
+      e = fts_expression_eval(patcher, ac, at,  1024, new_args);
 	  
-	  if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
-	    {
-	      /* Error in expression */
+      if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
+	{
+	  /* Error in expression */
 
-	      obj = fts_error_object_new(patcher, aoc, aot,
-					 fts_expression_get_msg(e),
-					 fts_expression_get_err_arg(e));
-	    }
-	  else if (! fts_is_symbol(&new_args[0]))
-	    {
-	      /* Missing class name, or class name is not a symbol */
+	  obj = fts_error_object_new(patcher, aoc, aot,
+				     fts_expression_get_msg(e),
+				     fts_expression_get_err_arg(e));
+	}
+      else if (! fts_is_symbol(&new_args[0]))
+	{
+	  /* Missing class name, or class name is not a symbol */
 
-	      obj = fts_error_object_new(patcher, aoc, aot,
-					 "The first argument should be a class name, but is not a symbol");
-	    }
-	  else
-	    {
-	      at = new_args;
-	      ac = fts_expression_get_count(e);
-	    }
+	  obj = fts_error_object_new(patcher, aoc, aot,
+				     "The first argument should be a class name, but is not a symbol");
+	}
+      else
+	{
+	  at = new_args;
+	  ac = fts_expression_get_count(e);
 	}
     }
 

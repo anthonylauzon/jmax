@@ -970,55 +970,86 @@ static int fts_op_eval(fts_expression_state_t *e)
 
 	      fts_set_symbol(ptos, fts_new_symbol_copy(buf));
 	    }
-	  else if (fts_is_float(tos) || fts_is_float(ptos))
-	    {
-	      fts_set_float(ptos,
-			    fts_get_float_num(ptos) + fts_get_float_num(tos));
-	    }
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    {
-	      fts_set_int(ptos,
-			  fts_get_int(ptos) + fts_get_int(tos));
-	    }
 	  else
-	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator + ", 0);
+	    {
+	      if (fts_is_float(tos))
+		if (fts_is_float(ptos))
+		  fts_set_float(ptos, fts_get_float(ptos) + fts_get_float(tos));
+		else if (fts_is_int(ptos))
+		  fts_set_float(ptos, ((float) fts_get_int(ptos)) + fts_get_float(tos));
+		else
+		  return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator +", 0);
+	      else if (fts_is_int(tos))
+		if (fts_is_float(ptos))
+		  fts_set_float(ptos, fts_get_float(ptos) + ((float) fts_get_int(tos)));
+		else if (fts_is_int(ptos))
+		  fts_set_int(ptos, fts_get_int(ptos) - fts_get_int(tos));
+		else
+		  return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator +", 0);
+	      else
+		return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator +", 0);
+	    }
 	  break;
 
 	case FTS_OP_MINUS:
-	  if (fts_is_float(tos) || fts_is_float(ptos))
-	    fts_set_float(ptos,
-			  fts_get_float_num(ptos) - fts_get_float_num(tos));
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    fts_set_int(ptos,
-			fts_get_int(ptos) - fts_get_int(tos));
+	  if (fts_is_float(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) - fts_get_float(tos));
+	    else if (fts_is_int(ptos))
+	      fts_set_float(ptos, ((float) fts_get_int(ptos)) - fts_get_float(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator -", 0);
+	  else if (fts_is_int(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) - ((float) fts_get_int(tos)));
+	    else if (fts_is_int(ptos))
+	      fts_set_int(ptos, fts_get_int(ptos) - fts_get_int(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator -", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator -", 0);
 	  break;
 
 	case FTS_OP_TIMES:
-	  if (fts_is_float(tos) || fts_is_float(ptos))
-	    fts_set_float(ptos,
-			  fts_get_float_num(ptos) * fts_get_float_num(tos));
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    fts_set_int(ptos,
-			fts_get_int(ptos) * fts_get_int(tos));
+	  if (fts_is_float(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) * fts_get_float(tos));
+	    else if (fts_is_int(ptos))
+	      fts_set_float(ptos, ((float) fts_get_int(ptos)) * fts_get_float(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator *", 0);
+	  else if (fts_is_int(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) * ((float) fts_get_int(tos)));
+	    else if (fts_is_int(ptos))
+	      fts_set_int(ptos, fts_get_int(ptos) * fts_get_int(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator *", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator *", 0);
 	  break;
 
 	case FTS_OP_DIV:
-	  if (fts_is_float(tos) || fts_is_float(ptos))
-	    fts_set_float(ptos,
-			  fts_get_float_num(ptos) / fts_get_float_num(tos));
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    fts_set_int(ptos,
-			fts_get_int(ptos) / fts_get_int(tos));
+	  if (fts_is_float(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) / fts_get_float(tos));
+	    else if (fts_is_int(ptos))
+	      fts_set_float(ptos, ((float) fts_get_int(ptos)) / fts_get_float(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator /", 0);
+	  else if (fts_is_int(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) / ((float) fts_get_int(tos)));
+	    else if (fts_is_int(ptos))
+	      fts_set_int(ptos, fts_get_int(ptos) / fts_get_int(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator /", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator /", 0);
 	  break;
 
 	case FTS_OP_DOT:
-	  if (fts_is_symbol(tos) || fts_is_object(ptos))
+	  if (fts_is_symbol(tos) && fts_is_object(ptos))
 	    {
 	      fts_object_t *obj = fts_get_object(ptos);
 	      fts_symbol_t prop = fts_get_symbol(tos);
@@ -1124,38 +1155,74 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_GREATER:
-	  if (fts_is_float(tos) || fts_is_float(ptos))
-	    fts_set_int(ptos, fts_get_float_num(ptos) > fts_get_float_num(tos));
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    fts_set_int(ptos, fts_get_int(ptos) > fts_get_int(tos));
+	  if (fts_is_float(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) > fts_get_float(tos));
+	    else if (fts_is_int(ptos))
+	      fts_set_float(ptos, ((float) fts_get_int(ptos)) > fts_get_float(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >", 0);
+	  else if (fts_is_int(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) > ((float) fts_get_int(tos)));
+	    else if (fts_is_int(ptos))
+	      fts_set_int(ptos, fts_get_int(ptos) > fts_get_int(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >", 0);
-	  break;
 
 	case FTS_OP_GREATER_EQUAL:
-	  if (fts_is_float(tos) || fts_is_float(ptos))
-	    fts_set_int(ptos, fts_get_float_num(ptos) >= fts_get_float_num(tos));
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    fts_set_int(ptos, fts_get_int(ptos) >= fts_get_int(tos));
+	  if (fts_is_float(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) >= fts_get_float(tos));
+	    else if (fts_is_int(ptos))
+	      fts_set_float(ptos, ((float) fts_get_int(ptos)) >= fts_get_float(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >=", 0);
+	  else if (fts_is_int(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) >= ((float) fts_get_int(tos)));
+	    else if (fts_is_int(ptos))
+	      fts_set_int(ptos, fts_get_int(ptos) >= fts_get_int(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >=", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator >=", 0);
-	  break;
 
 	case FTS_OP_SMALLER:
-	  if (fts_is_float(tos) || fts_is_float(ptos))
-	    fts_set_int(ptos, fts_get_float_num(ptos) < fts_get_float_num(tos));
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    fts_set_int(ptos, fts_get_int(ptos) < fts_get_int(tos));
+	  if (fts_is_float(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) < fts_get_float(tos));
+	    else if (fts_is_int(ptos))
+	      fts_set_float(ptos, ((float) fts_get_int(ptos)) < fts_get_float(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <", 0);
+	  else if (fts_is_int(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) < ((float) fts_get_int(tos)));
+	    else if (fts_is_int(ptos))
+	      fts_set_int(ptos, fts_get_int(ptos) < fts_get_int(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <", 0);
-	  break;
 
 	case FTS_OP_SMALLER_EQUAL:
-	  if (fts_is_float(tos) || fts_is_float(ptos))
-	    fts_set_int(ptos,
-			fts_get_float_num(ptos) <= fts_get_float_num(tos));
-	  else if (fts_is_int(tos) && fts_is_int(ptos))
-	    fts_set_int(ptos, fts_get_int(ptos) <= fts_get_int(tos));
+	  if (fts_is_float(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) <= fts_get_float(tos));
+	    else if (fts_is_int(ptos))
+	      fts_set_float(ptos, ((float) fts_get_int(ptos)) <= fts_get_float(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <=", 0);
+	  else if (fts_is_int(tos))
+	    if (fts_is_float(ptos))
+	      fts_set_float(ptos, fts_get_float(ptos) <= ((float) fts_get_int(tos)));
+	    else if (fts_is_int(ptos))
+	      fts_set_int(ptos, fts_get_int(ptos) <= fts_get_int(tos));
+	    else
+	      return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <=", 0);
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator <=", 0);
 	  break;
