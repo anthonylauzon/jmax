@@ -46,14 +46,14 @@ public class FtsIntValueObject extends FtsObject
   int value; 
 
   /* for the message box */
+    public FtsIntValueObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+    {
+	super(fts, parent, null, className, className);
+    }
+
     public FtsIntValueObject(Fts fts, FtsObject parent, String className, String description)
     {
 	super(fts, parent, null, className, description);
-    }
-
-    public FtsIntValueObject(Fts fts, FtsObject parent/*, int objId*/, String className)
-    {
-	super(fts, parent, null, className, className);
     }
 
     /** Set the value. Tell it to the server, also */

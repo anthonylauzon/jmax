@@ -61,7 +61,10 @@ public class FileMenu extends DefaultFileMenu
 	  insert(Actions.saveToAction, "SaveAs", 4);
 	}
      insertSeparator(6);
+
      insert(Actions.printAction, "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 7);
   }
 }
+
+
 

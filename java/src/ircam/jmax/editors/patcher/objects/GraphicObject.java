@@ -26,6 +26,7 @@
 package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
+import java.lang.reflect.*;
 import java.awt.event.*;
 import java.util.*;
 
@@ -52,66 +53,66 @@ import ircam.jmax.editors.patcher.actions.*;
 
 abstract public class GraphicObject implements DisplayObject
 {
-  static class ObjectGeometry
+  public static class ObjectGeometry
   {
     // All this parameters can be changed without changing the geometry
     // of the patch, i.e. the connection positions, unless stated otherwise
 	
-    static final int INOUTLET_WIDTH = 5;
-    static final int INOUTLET_HEIGHT = 3;
+    public static final int INOUTLET_WIDTH = 5;
+    public static final int INOUTLET_HEIGHT = 3;
 	
-    static final int HIGHLIGHTED_INOUTLET_HEIGHT = 6;
-    static final int HIGHLIGHTED_INOUTLET_WIDTH = 7;
+    public static final int HIGHLIGHTED_INOUTLET_HEIGHT = 6;
+    public static final int HIGHLIGHTED_INOUTLET_WIDTH = 7;
 	
     // The part of the highlight that go inside the 
     // Rectangle 
 
-    static final int HIGHLIGHTED_INLET_OVERLAP = 5;
+    public static final int HIGHLIGHTED_INLET_OVERLAP = 5;
 
     // The part of the highlight that go inside the 
     // Rectangle 
 
-    static final int HIGHLIGHTED_OUTLET_OVERLAP = 5;
+    public static final int HIGHLIGHTED_OUTLET_OVERLAP = 5;
 
     // PAD is the distance between the object border and the 
     // center of the inlet/outlet; CHANGE the Connection geometry
 
-    static final int INOUTLET_PAD = 4;
+    public static final int INOUTLET_PAD = 4;
 
     // INLET_OVERLAP is the part of the inlet rectangle that
     // go inside the object
 
-    static final int INLET_OVERLAP = 2;
+    public static final int INLET_OVERLAP = 2;
 
     // INLET_OFFSET is the vertical distance between the anchor point
     // and the object; CHANGE the Connection geometry
 
-    static final int INLET_OFFSET = 1;
+    public static final int INLET_OFFSET = 1;
 
     // OUTLET_OVERLAP is the part of the inlet rectangle that
     // go inside the object
 
-    static final int OUTLET_OVERLAP = 2;
+    public static final int OUTLET_OVERLAP = 2;
 
     // OUTLET_OFFSET is the vertical distance between the anchor point
     // and the object; CHANGE the Connection geometry
 
-    static final int OUTLET_OFFSET = 0;
+    public static final int OUTLET_OFFSET = 0;
 
     // Sensibility areas 
 
     // Resize area 
 
-    static final int H_RESIZE_SENSIBLE_WIDTH = 4;
-    static final int V_RESIZE_SENSIBLE_HEIGHT = 5;
+    public static final int H_RESIZE_SENSIBLE_WIDTH = 4;
+    public static final int V_RESIZE_SENSIBLE_HEIGHT = 5;
 
     // Inlet and outlets Max
 
-    static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
+    public static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
  
     //dimension of in/outlet sensible area during connection
     
-    static final int INOUTLET_CONNECTED_SENSIBLE_AREA = /*30*/20;
+    public static final int INOUTLET_CONNECTED_SENSIBLE_AREA = /*30*/20;
   }
 
   // This two flags say if the object parts are sensible, and if the in/outlets are sensibles
@@ -150,6 +151,10 @@ abstract public class GraphicObject implements DisplayObject
 
   int inletDistance; // the distance between two inlets anchor point
   int outletDistance; // the distance between two outlets anchor point
+  public int getInletDistance(){return inletDistance;}
+  public int getOutletDistance(){return outletDistance;}
+  public void setInletDistance(int dist){inletDistance=dist;}
+  public void setOutletDistance(int dist){outletDistance=dist;}
 
   protected Font itsFont = null;
   protected FontMetrics itsFontMetrics = null;
@@ -163,31 +168,33 @@ abstract public class GraphicObject implements DisplayObject
 
   static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsObject object) 
   {
-    GraphicObject gobj;
+    GraphicObject gobj = null;
     String theName = object.getClassName();
+    Class aClass = ObjectCreatorManager.getGraphicClass(theName);
 
-    if (theName.equals( "messbox"))
-      gobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);
-    else if (theName.equals( "messconst"))
-      gobj = new ircam.jmax.editors.patcher.objects.MessConst( sketch, object);
-    else if (theName.equals( "display"))
-      gobj = new ircam.jmax.editors.patcher.objects.Display( sketch, object);
-    else if (theName.equals( "button"))
-      gobj = new ircam.jmax.editors.patcher.objects.Bang( sketch, object);
-    else if (theName.equals( "toggle"))
-      gobj = new ircam.jmax.editors.patcher.objects.Toggle( sketch, object);
-    else if (theName.equals( "intbox"))
-      gobj = new ircam.jmax.editors.patcher.objects.IntBox( sketch, object);
-    else if (theName.equals( "floatbox"))
-      gobj = new ircam.jmax.editors.patcher.objects.FloatBox( sketch, object);
-    else if (theName.equals( "jcomment"))
-      gobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
-    else if ( theName.equals( "slider"))
-      gobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
-    else if ( theName.equals( "vecdisplay"))
-      gobj = new ircam.jmax.editors.patcher.objects.VectorDisplay( sketch, object);
-    else if (theName.equals( "fork"))
-      gobj = new ircam.jmax.editors.patcher.objects.Fork( sketch, object);
+    if(aClass != null)
+      {
+	Object[] arg = new Object[] {sketch, object};
+	try
+	  {
+	    Constructor constr = aClass.getConstructors()[0];    
+	    if(constr != null)
+	      gobj = (GraphicObject)(constr.newInstance(arg));
+	    
+	  } 
+	catch (InstantiationException e) 
+	  {
+	    System.out.println(e);
+	  } 
+	catch (IllegalAccessException e) 
+	  {
+	    System.out.println(e);
+	  } 
+	catch (InvocationTargetException e) 
+	  {
+	    System.out.println(e);
+	  } 
+      }
     else if (theName.equals( "inlet"))
       gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
     else if (theName.equals( "outlet"))
@@ -197,7 +204,8 @@ abstract public class GraphicObject implements DisplayObject
     else
       gobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
 
-    object.setObjectListener(gobj);
+    if(gobj!=null)
+      object.setObjectListener(gobj);
 
     return gobj;
   }
@@ -229,9 +237,9 @@ abstract public class GraphicObject implements DisplayObject
       fontName = itsSketchPad.getDefaultFontName();
 
     if (fontSize < 0)      
-	fontSize = itsSketchPad.getDefaultFontSize();
+      fontSize = itsSketchPad.getDefaultFontSize();
     if (fontStyle < 0)      
-	fontStyle = itsSketchPad.getDefaultFontStyle();
+      fontStyle = itsSketchPad.getDefaultFontStyle();
 
     itsFont = FontCache.lookupFont(fontName, fontSize, fontStyle);
     itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize, fontStyle);
@@ -250,7 +258,7 @@ abstract public class GraphicObject implements DisplayObject
   
   public final int getX() 
   {
-      return ScaleTransform.getInstance().scaleX(ftsObject.getX());
+    return ScaleTransform.getInstance().scaleX(ftsObject.getX());
   }
 
   protected void setX( int x) 
@@ -272,7 +280,7 @@ abstract public class GraphicObject implements DisplayObject
 
   public final int getWidth() 
   {
-      return ScaleTransform.getInstance().scaleX(ftsObject.getWidth());
+    return ScaleTransform.getInstance().scaleX(ftsObject.getWidth());
   }
 
   public void setWidth( int w) 
@@ -286,24 +294,24 @@ abstract public class GraphicObject implements DisplayObject
   }
   public void setWidthShift( int w) 
   {
-      setWidth(w);
+    setWidth(w);
   }
   public final int getHeight() 
   {
-      if(isSquare())
-	  return ScaleTransform.getInstance().scaleX(ftsObject.getHeight());
-      else
-	  return ScaleTransform.getInstance().scaleY(ftsObject.getHeight());
+    if(isSquare())
+      return ScaleTransform.getInstance().scaleX(ftsObject.getHeight());
+    else
+      return ScaleTransform.getInstance().scaleY(ftsObject.getHeight());
   }
 
   public void setHeight( int h) 
   {
     if (h > 0)
       {
-	  if(isSquare())
-	      ftsObject.setHeight(ScaleTransform.getInstance().invScaleX(h));
-	  else
-	      ftsObject.setHeight(ScaleTransform.getInstance().invScaleY(h));
+	if(isSquare())
+	  ftsObject.setHeight(ScaleTransform.getInstance().invScaleX(h));
+	else
+	  ftsObject.setHeight(ScaleTransform.getInstance().invScaleY(h));
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
   }
@@ -313,13 +321,12 @@ abstract public class GraphicObject implements DisplayObject
     return false;
   }
 
-
   public void scale(float scaleX, float scaleY)
   {
-      setX(Math.round(getX()*scaleX));
-      setY(Math.round(getY()*scaleY));
-      setWidth(Math.round(getWidth()*scaleX));
-      setHeight(Math.round(getHeight()*scaleY));
+    setX(Math.round(getX()*scaleX));
+    setY(Math.round(getY()*scaleY));
+    setWidth(Math.round(getWidth()*scaleX));
+    setHeight(Math.round(getHeight()*scaleY));
   }
 
   // Special version that do not update the connections.
@@ -374,37 +381,37 @@ abstract public class GraphicObject implements DisplayObject
 
   public void setFontStyle(int style)
   {
-      setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), style));
+    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), style));
   }
 
   public void changeFontStyle(String style, boolean selected)
   {
-      int fstyle = -1;
+    int fstyle = -1;
       
-      if(style.equals("Bold"))
+    if(style.equals("Bold"))
       {
-	  if(itsFont.isBold() && !selected)
-	      if(itsFont.isItalic())  fstyle = Font.ITALIC;
-	      else fstyle = Font.PLAIN;
-	  else
-	      if(!itsFont.isBold() && selected)
-		  if(!itsFont.isItalic())  fstyle = Font.BOLD;
-		  else fstyle = Font.BOLD + Font.ITALIC; 
+	if(itsFont.isBold() && !selected)
+	  if(itsFont.isItalic())  fstyle = Font.ITALIC;
+	  else fstyle = Font.PLAIN;
+	else
+	  if(!itsFont.isBold() && selected)
+	    if(!itsFont.isItalic())  fstyle = Font.BOLD;
+	    else fstyle = Font.BOLD + Font.ITALIC; 
       }
-      else
-	  if(style.equals("Italic"))
-	      {
-		  if(itsFont.isItalic() && !selected)
-		      if(itsFont.isBold())  fstyle = Font.BOLD;
-		      else fstyle = Font.PLAIN;
-		   else
-		       if(!itsFont.isItalic() && selected)
-			   if(!itsFont.isBold())  fstyle = Font.ITALIC;
-			   else fstyle = Font.BOLD + Font.ITALIC;
-	      }
+    else
+      if(style.equals("Italic"))
+	{
+	  if(itsFont.isItalic() && !selected)
+	    if(itsFont.isBold())  fstyle = Font.BOLD;
+	    else fstyle = Font.PLAIN;
+	  else
+	    if(!itsFont.isItalic() && selected)
+	      if(!itsFont.isBold())  fstyle = Font.ITALIC;
+	      else fstyle = Font.BOLD + Font.ITALIC;
+	}
 
-      if(fstyle!=-1)
-	  setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), fstyle));
+    if(fstyle!=-1)
+      setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), fstyle));
   }
 
   public void fontSmaller()
@@ -547,24 +554,24 @@ abstract public class GraphicObject implements DisplayObject
 
   public void redraw()
   {
-      itsSketchPad.repaint(getX(),
-			   getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-			   ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
-			   getWidth(),
-			   getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-			   ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-			   ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 2);
+    itsSketchPad.repaint(getX(),
+			 getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
+			 getWidth(),
+			 getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+			 ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+			 ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 2);
   }
 
   public void updateRedraw()
   {
-      itsSketchPad.paintAtUpdateEnd(this, getX(),
-				    getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-				    ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
-				    getWidth(),
-				    getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-				    ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-				    ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+    itsSketchPad.paintAtUpdateEnd(this, getX(),
+				  getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+				  ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+				  getWidth(),
+				  getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+				  ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+				  ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   public void redrawConnections()
@@ -1023,10 +1030,10 @@ abstract public class GraphicObject implements DisplayObject
 
   public void moveBy( int dx, int dy) 
   {
-      if (dx != 0)
-	  setX( getX() + dx);
-      if (dy != 0)
-	  setY( getY() + dy);
+    if (dx != 0)
+      setX( getX() + dx);
+    if (dy != 0)
+      setY( getY() + dy);
   }
 
   public void resizing(boolean isResizing){}
@@ -1035,13 +1042,13 @@ abstract public class GraphicObject implements DisplayObject
 
   public void getBounds(Rectangle bounds) 
   {
-      bounds.x = getX();
-      bounds.y = (getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+    bounds.x = getX();
+    bounds.y = (getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
 		ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP);
-      bounds.width  = getWidth();
-      bounds.height = (getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-		       ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-		       ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+    bounds.width  = getWidth();
+    bounds.height = (getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+		     ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+		     ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   // There are two intersect function: one cover the paint needs, and include all
@@ -1051,33 +1058,32 @@ abstract public class GraphicObject implements DisplayObject
 
   public final boolean intersects(Rectangle r)
   {
-      return !((r.x + r.width <= getX()) ||
-	       (r.y + r.height <= (getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+    return !((r.x + r.width <= getX()) ||
+	     (r.y + r.height <= (getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
 				 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1)) ||
-	       (r.x >= getX() + getWidth()) ||
-	       (r.y >= (getY() + getHeight() + ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT -
+	     (r.x >= getX() + getWidth()) ||
+	     (r.y >= (getY() + getHeight() + ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT -
 		      ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 1)));
   }
 
-
   public final boolean coreIntersects(Rectangle r)
   {
-      return !((r.x + r.width <= getX()) ||
-	       (r.y + r.height <= getY()) ||
-	       (r.x >= getX() + getWidth()) ||
-	       (r.y >= (getY() + getHeight())));
+    return !((r.x + r.width <= getX()) ||
+	     (r.y + r.height <= getY()) ||
+	     (r.x >= getX() + getWidth()) ||
+	     (r.y >= (getY() + getHeight())));
   }
 
   public boolean pointInObject(int px, int py)
   {
-      int x = getX();
-      int y = getY();
+    int x = getX();
+    int y = getY();
     return ((px>=x)&&(px<=x+getWidth())&&(py>=y)&&(py<=y+getHeight()));
   }
 
   public void rectangleUnion(Rectangle r)
   {
-      SwingUtilities.computeUnion(getX(), getY(), getWidth(), getHeight(), r);
+    SwingUtilities.computeUnion(getX(), getY(), getWidth(), getHeight(), r);
   }
 
   final public void setLayer(int v)
@@ -1094,7 +1100,7 @@ abstract public class GraphicObject implements DisplayObject
 
   public void dispose()
   {
-      ftsObject.setObjectListener(null);
+    ftsObject.setObjectListener(null);
   }
 
   public void showErrorDescription()

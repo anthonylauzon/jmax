@@ -28,10 +28,20 @@ include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 all:
 	(cd c; $(MAKE) -k all)
+	(cd java ; $(MAKE) all)	
 .PHONY: all
 
 clean:
+	(cd java ; $(MAKE) clean)	
 	(cd c; $(MAKE) clean)
+.PHONY: clean
+
+all_java:
+	(cd java ; $(MAKE) all)
+.PHONY: all
+
+clean_java:
+	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
 install:
@@ -39,5 +49,6 @@ install:
 	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj/guiobj.jpk
 	$(INSTALL_DATA) guiobj.scm $(lib_install_dir)/packages/guiobj/guiobj.scm
 	( cd help; $(MAKE) $@)
+	( cd java; $(MAKE) $@)
 	( cd c; $(MAKE) $@)
 .PHONY: install

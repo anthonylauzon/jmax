@@ -47,14 +47,13 @@ import ircam.jmax.editors.patcher.interactions.*;
 abstract public class Editable extends GraphicObject implements FtsInletsListener, FtsOutletsListener
 {
   boolean editing = false;
-  ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
+  public ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
-  Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
     computeRenderer();
-
     if ((renderer instanceof TextRenderer) && (getWidth() == -1))
       {
 	renderer.update();
@@ -128,8 +127,8 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 	super.setHeight(renderer.getHeight() + getTextHeightOffset());
       }
     else{
-      super.setWidth( getMinimumWidth());
-      super.setHeight( renderer.getHeight() + getTextHeightOffset());
+	super.setWidth( getMinimumWidth());
+	super.setHeight( renderer.getHeight() + getTextHeightOffset());
     } 
   }
 

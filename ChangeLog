@@ -1,3 +1,33 @@
+2001-04-25  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* added packages/alsa/src/alsarawmidiport.c (that contains a ALSA raw midi port...)
+
+	* remove fts/src/runtime/devices/null.c and fts/src/runtime/devices/profdev.c: no longer used
+
+	* added profileaudioport (in package io). It outputs on its outlet
+	the estimated sample rate.
+
+	* changed the default audio port mechanism: now the default audio
+	port is defined by a variable (DefaultAudioPort). This way, the
+	default audio port can be set from a patch (we are moving slowly
+	to configuration done by patches). Also changed the nullaudioport
+	mechanism (still a little bit ugly).
+
+2001-04-10  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* finalized scope and vector display
+	* moved scope and vector display to guiobj package
+
+2001-04-06  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* added oscilloscope
+
+2001-04-03  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* added vector display object to guiobj package and client sources (includiong images)
+
+	* added cut~ and scope~ to signal package
+
 2001-03-30  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* java/src/ircam/jmax/editors/patcher/objects/Display.java: bug

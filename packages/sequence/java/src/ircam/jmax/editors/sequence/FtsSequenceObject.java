@@ -50,14 +50,14 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   /**
    * constructor.
    */
-    public FtsSequenceObject(Fts fts, FtsObject parent, String variableName, String classname)
-    {
-	super(fts, parent, variableName, "sequence", "sequence");
-	
-	listeners = new MaxVector();
-	initValueInfoTable();
-	SequenceImages.init();
-    }
+ public FtsSequenceObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+ {
+     super(fts, parent, variableName, "sequence", "sequence");
+     
+     listeners = new MaxVector();
+     initValueInfoTable();
+     SequenceImages.init();
+ }
 
     private final void initValueInfoTable()
     {

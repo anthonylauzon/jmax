@@ -86,16 +86,16 @@ public class ObjectSetViewer extends JPanel {
 	      setText( ((FtsObject) obj).getDescription());
 	      setIcon( errorIcon);
 	    }
-	  else if (obj instanceof FtsPatcherObject)
+	  /*else if (obj instanceof FtsPatcherObject)
 	    {
 	      setText( ((FtsObject) obj).getDescription());
 	      setIcon( patcherIcon);
 	    }
 	  else if (obj instanceof FtsMessageObject)
-	    {
-	      setText( ((FtsMessageObject) obj).getMessage());
-	      setIcon( messageIcon);
-	    }
+	      {
+		  setText( ((FtsMessageObject) obj).getMessage());
+		  setIcon( messageIcon);
+	      }
 	  else if (obj instanceof FtsMessConstObject)
 	    {
 	      setText( ((FtsObject) obj).getDescription());
@@ -115,7 +115,7 @@ public class ObjectSetViewer extends JPanel {
 	    {
 	      setText( ((FtsObject) obj).getDescription());
 	      setIcon( commentIcon);
-	    }
+	      }*/
 	  else
 	    {
 	      setText( ((FtsObject) obj).getDescription());
@@ -189,5 +189,6 @@ public class ObjectSetViewer extends JPanel {
   protected JList jList;
   private ObjectSelectedListener objectSelectedListener;
 }
+
 
 

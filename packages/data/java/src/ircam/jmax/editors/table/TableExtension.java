@@ -27,7 +27,7 @@ package ircam.jmax.editors.table;
 
 import ircam.jmax.script.pkg.*;
 import ircam.jmax.script.*;
-import ircam.jmax.fts.*;
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /**
@@ -38,13 +38,13 @@ public class TableExtension extends tcl.lang.Extension implements JavaExtension
 {
   public void init(Interpreter interp)
   {
-      FtsObject.registerFtsObjectCreator("ivec", new FtsTableObjectCreator());
+      ObjectCreatorManager.registerFtsClass("ivec", ircam.jmax.editors.table.FtsTableObject.class);
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
-      FtsObject.registerFtsObjectCreator("ivec", new FtsTableObjectCreator());
+      ObjectCreatorManager.registerFtsClass("ivec", ircam.jmax.editors.table.FtsTableObject.class);
   }
 }
 

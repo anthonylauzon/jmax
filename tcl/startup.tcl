@@ -90,17 +90,3 @@ if {[runHooks "start"] != "true"} {
     runHooks "defaultStart"
 }
 
-# if profiling is on, close audio device 
-# and install the profile device; this after
-#the when start, i.e. including user configuration
-
-if {[systemProperty "profile"] == "true"} {
-    puts "running with pseudo audio device for profiling"
-    resetAudioOut
-    resetAudioIn
-    openDefaultAudioOut profile
-} 
-
-
-
-

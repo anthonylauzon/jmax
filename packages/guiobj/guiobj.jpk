@@ -27,9 +27,9 @@ package require data
 ## package declaration
 package provide guiobj
 
-# load dynamic libraries into the server
 global jmaxArch jmaxMode
 ucs load module guiobj $dir/c/lib/$jmaxArch/$jmaxMode/libguiobj.so
+java::load -classpath "$dir/java/classes" ircam.jmax.guiobj.GuiObjExtension
 
 ## load help patch table
 sourceFile $dir/help/guiobj.help.index.tcl

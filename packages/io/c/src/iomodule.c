@@ -29,10 +29,10 @@
 extern void fakestream_config(void);
 extern void filestream_config(void);
 extern void in_config(void);
-extern void in_tilda_config( void);
+extern void in_out_tilda_config( void);
 extern void loopback_config(void);
 extern void out_config(void);
-extern void out_tilda_config( void);
+extern void profileaudioport_config( void);
 extern void serial_config( void);
 extern void udp_config(void);
 extern void udpreceive_config(void);
@@ -45,10 +45,10 @@ fts_io_init(void)
   fakestream_config();
   filestream_config();
   in_config();
-  in_tilda_config();
+  in_out_tilda_config();
   loopback_config();
   out_config();
-  out_tilda_config();
+  profileaudioport_config();
   serial_config();
   udp_config();
   udpreceive_config();

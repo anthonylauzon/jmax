@@ -34,6 +34,7 @@ fts_class_t *fvec_class = 0;
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_load = 0;
 static fts_symbol_t sym_open_file = 0;
+static fts_symbol_t sym_local = 0;
 
 /********************************************************
  *
@@ -574,6 +575,19 @@ fvec_save_bmax(fvec_t *vec, fts_bmax_file_t *f)
 }
 
 static void
+fvec_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+
+  if(this->persistent)
+    {
+      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
+      
+      fvec_save_bmax(this, f);
+    }
+}
+
+static void
 fvec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   fvec_t *this = (fvec_t *)obj;
@@ -612,6 +626,22 @@ fvec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  /* fts_object_blip(o, "no comment"); */
 	  break;
 	}
+    }
+}
+
+static void
+fvec_set_persistent(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fvec_t *this = (fvec_t *)obj;
+
+  if(fts_is_symbol(value))
+    {
+      fts_symbol_t s = fts_get_symbol(value);
+
+      if(s == fts_s_yes)
+	this->persistent = 1;
+      else
+	this->persistent = 0;	
     }
 }
 
@@ -657,6 +687,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->size = 0;
   this->alloc = 0;
 
+  this->persistent = 0;
   this->sr = 0.0;
 
   if(ac == 0)
@@ -735,10 +766,9 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, sym_load, fvec_load);
 
-  /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
-
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sr"), fvec_set_sr);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), fvec_set_persistent);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);
   

@@ -423,24 +423,33 @@ fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
 
 /* ucs function to set the default audio and midi ports */
 
-static fts_status_t fts_ucs_default_audio(int argc, const fts_atom_t *argv)
+static fts_status_t fts_ucs_newobj(int argc, const fts_atom_t *argv)
 {
-  if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
-    {
-      post( "Setting default audio port to \"%s\"", fts_symbol_name( fts_get_symbol( argv)));
-      if (argc >= 2)
-	{
-	  post( "arguments: ");
-	  post_atoms( argc-1, argv+1);
-	  post( ")");
-	}
-      post( "\n");
+  fts_object_t *obj;
 
-      fts_audioport_set_default( argc, argv);
-    }
+  obj = fts_eval_object_description( fts_get_root_patcher(), argc, argv);
 
   return fts_Success;
 }
+
+/*  static fts_status_t fts_ucs_default_audio(int argc, const fts_atom_t *argv) */
+/*  { */
+/*    if ((argc >= 1)  && (fts_is_symbol(&argv[0]))) */
+/*      { */
+/*        post( "Setting default audio port to \"%s\"", fts_symbol_name( fts_get_symbol( argv))); */
+/*        if (argc >= 2) */
+/*  	{ */
+/*  	  post( "arguments: "); */
+/*  	  post_atoms( argc-1, argv+1); */
+/*  	  post( ")"); */
+/*  	} */
+/*        post( "\n"); */
+
+/*        fts_audioport_set_default( argc, argv); */
+/*      } */
+
+/*    return fts_Success; */
+/*  } */
 
 static fts_status_t fts_ucs_default_midi(int argc, const fts_atom_t *argv)
 {
@@ -536,9 +545,14 @@ fts_ucs_install_commands()
 
   /* Audio and MIDI related commands  */
 
-  fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("audio"), fts_ucs_default_audio,
-			 "default audio <name> [<args>]*",
-			 "defines the default audio port");
+  fts_ucs_define_command( fts_new_symbol("newobj"), 0, fts_ucs_newobj,
+			 "newobj [<args>]*",
+			 "creates an object");
+
+
+/*    fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("audio"), fts_ucs_default_audio, */
+/*  			 "default audio <name> [<args>]*", */
+/*  			 "defines the default audio port"); */
 
   fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("midi"), fts_ucs_default_midi,
 			 "default midi <name> [<args>]*",

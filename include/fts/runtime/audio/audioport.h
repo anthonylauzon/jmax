@@ -108,6 +108,6 @@ extern int fts_audioport_report_xrun( void);
 extern void fts_audioport_add_input_output_objects( void);
 
 extern void fts_audioport_set_default( int argc, const fts_atom_t *argv);
-extern fts_audioport_t *fts_audioport_get_default( void);
+extern fts_audioport_t *fts_audioport_get_default( fts_object_t *obj);
 
 #endif

@@ -95,7 +95,12 @@ proc jmaxGetAudioBuffer {} {
 }
 
 proc defaultAudio { audioPortName args } {
-  eval [ concat "ucs" "default" "audio" $audioPortName $args ]
+    if { $args != "" } {
+	puts [concat "Setting default audio port to " $audioPortName "(arguments:" $args ")"]
+    } else {
+	puts [concat "Setting default audio port to" $audioPortName]
+    }
+    eval [ concat "ucs" "newobj" "DefaultAudioPort : " $audioPortName $args ]
 }
 
 proc defaultMidi { midiPortName args } {

@@ -112,7 +112,7 @@ public class Actions
   //Object popup actions
   public static EditorAction bringToFrontObjectAction = new BringToFrontObjectAction();
   public static EditorAction sendToBackObjectAction = new SendToBackObjectAction();
-  public static EditorAction setObjectColorAction = new SetObjectColorAction();
+    //public static EditorAction setObjectColorAction = new SetObjectColorAction();
   public static EditorAction removeConnectionsAction = new RemoveInOutletConnection();
   public static EditorAction fitToTextPopUpAction = new FitToTextPopUpAction();
   public static EditorAction fontBiggerPopUpAction = new FontBiggerPopUpAction();
@@ -122,8 +122,8 @@ public class Actions
   public static EditorAction fontStylesPopUpAction = new FontStylesPopUpAction();
   public static EditorAction fontPopUpAction = new FontPopUpAction();
   public static EditorAction jmaxFontPopUpAction = new JMaxFontPopUpAction();
-  public static EditorAction inspectObjectAction = new InspectObjectAction();
-  public static EditorAction changeSliderOrientationAction = new ChangeSliderOrientation();
+    //public static EditorAction inspectObjectAction = new InspectObjectAction();
+    //public static EditorAction changeSliderOrientationAction = new ChangeSliderOrientation();
 }
 
 

@@ -45,7 +45,7 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   ac--;
   at++;
 
-  port = fts_audioport_get_default();
+  port = fts_audioport_get_default(o);
   if ( !port)
     {
       fts_object_set_error( o, "Default audio port is not defined");

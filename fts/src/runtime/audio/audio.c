@@ -31,8 +31,8 @@ extern void nullaudioport_config( void);
 
 static void audio_init( void)
 {
-  audioport_config();
   nullaudioport_config();
+  audioport_config();
 }
 
 fts_module_t fts_audio_module = {"FTS Audio", "FTS Audio Input Output system ", audio_init, 0, 0};

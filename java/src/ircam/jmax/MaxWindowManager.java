@@ -113,17 +113,17 @@ public class MaxWindowManager implements WindowListener
   }
 
 
-  void suspendWindow(Frame window)
-  {
-    windowOperationCount++;
-    windows.removeElement(window);
-  }
+    /*void suspendWindow(Frame window)
+      {
+      windowOperationCount++;
+      windows.removeElement(window);
+      }
 
-  void readdWindow(Frame window)
-  {
-    windowOperationCount++;
-    windows.addElement(window);
-  }
+      void readdWindow(Frame window)
+      {
+      windowOperationCount++;
+      windows.addElement(window);
+      }*/
 
   public ListModel getWindowList()
   {
@@ -196,36 +196,22 @@ public class MaxWindowManager implements WindowListener
 
   // Event handler for WindowListener
 
-  public void windowClosing(WindowEvent e)
-  {
-  }
+  public void windowClosing(WindowEvent e){}
 
-  public void windowOpened(WindowEvent e)
-  {
-  }
+  public void windowOpened(WindowEvent e){}
   
   public void windowClosed(WindowEvent e)
   {
     removeWindow((Frame) e.getWindow());
   }
 
-  public void windowIconified(WindowEvent e)
-  {
-    suspendWindow((Frame) e.getWindow());
-  }
+  public void windowIconified(WindowEvent e){}
 
-  public void windowDeiconified(WindowEvent e)
-  {
-    readdWindow((Frame) e.getWindow());
-  }
+  public void windowDeiconified(WindowEvent e){}
 
-  public void windowActivated(WindowEvent e)
-  {
-  }
+  public void windowActivated(WindowEvent e){}
 
-  public void windowDeactivated(WindowEvent e)
-  {
-  }
+  public void windowDeactivated(WindowEvent e){}
 
   public void TileWindows()
   {

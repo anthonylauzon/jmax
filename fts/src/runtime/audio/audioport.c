@@ -25,8 +25,33 @@
  */
 
 /*
- * This file's author: François Déchelle
- */
+TODO:
+remove function fts_audioport_add_input_output_objects( void). See NOTE below.
+
+NOTE:
+the fts_audioport_add_input_output_objects( void) is called by the dsp compiler
+to make sure that all audioport will schedule their corresponding audioport_in
+and audioport_out objects. This is to be sure that once an audioport is opened
+and has a valid input or ouput, it will schedule the input or output object
+and therefore synchronize fts, avoiding free run and 100% CPU eating.
+
+But the result was that the null_audioport was scheduled... So I added the test
+      if (port == null_audioport)
+	continue;
+in fts_audioport_add_input_output_objects. But I don't like this solution.
+
+The problem is that you can't create the input or output objects in 
+fts_audioport_init because you don't know yet the number of input
+channels or output channels.
+
+May be we could create the objects in fts_audioport_set_input_channels
+or fts_audioport_set_output_function (resp. output). In these functions,
+we are sure that the port is valid in the corresponding direction.
+
+*/
+
+
+
 
 #include <stdlib.h>
 #ifndef MACOSX
@@ -42,12 +67,16 @@ static fts_class_t *audioportout_class;
 
 static fts_audioport_t *audioport_list = 0;
 
-static fts_symbol_t s__superclass = 0;
-static fts_symbol_t s_audioport = 0;
+static fts_symbol_t s_default_audio_port;
+
+static fts_symbol_t s__superclass;
+static fts_symbol_t s_audioport;
 static fts_symbol_t s_audioportin;
 static fts_symbol_t s_audioportout;
 static fts_symbol_t s_indispatch;
 static fts_symbol_t s_outdispatch;
+
+static fts_audioport_t *null_audioport;
 
 /*		   
 
@@ -141,13 +170,10 @@ void fts_audioport_delete( fts_audioport_t *port)
     fts_object_delete_from_patcher( port->audioportout);
 }
 
-static void audioport_default_idle_function( fts_audioport_t *port, ftl_wrapper_t fun, int len, int channels, float *sig)
+static void audioport_call_io_fun( fts_audioport_t *port, ftl_wrapper_t fun, int len, int channels, float *sig)
 {
   fts_word_t *at;
   int i;
-
-  if (!fun || channels == 0)
-    return;
 
   at = (fts_word_t *)alloca( (channels+2) * sizeof( fts_word_t));
 
@@ -163,7 +189,7 @@ void fts_audioport_idle( fts_word_t *args)
 {
   fts_audioport_t *port;
   float *sig_dummy, *sig_zero;
-  int i, tick_size;
+  int i, tick_size, at_least_one_io_fun_called;
 
   tick_size = fts_get_tick_size();
   sig_dummy = (float *)alloca( tick_size * sizeof( float));
@@ -172,15 +198,47 @@ void fts_audioport_idle( fts_word_t *args)
   for ( i = 0; i < tick_size; i++)
     sig_zero[i] = 0.0;
 
+  at_least_one_io_fun_called = 0;
   for ( port = audioport_list; port; port = port->next)
     {
       if ( port->idle_function == AUDIOPORT_DEFAULT_IDLE)
 	{
-	  audioport_default_idle_function( port, fts_audioport_get_input_function( port), tick_size, fts_audioport_get_input_channels( port), sig_dummy);
-	  audioport_default_idle_function( port, fts_audioport_get_output_function( port), tick_size, fts_audioport_get_output_channels( port), sig_zero);
+	  ftl_wrapper_t fun;
+	  int channels;
+
+	  fun = fts_audioport_get_input_function( port);
+	  channels = fts_audioport_get_input_channels( port);
+
+	  if (fun && channels != 0)
+	    {
+	      audioport_call_io_fun( port, fun, tick_size, channels, sig_dummy);
+	      at_least_one_io_fun_called = 1;
+	    }
+
+	  fun = fts_audioport_get_output_function( port);
+	  channels = fts_audioport_get_output_channels( port);
+	  if (fun && channels != 0)
+	    {
+	      audioport_call_io_fun( port, fun, tick_size, channels, sig_zero);
+	      at_least_one_io_fun_called = 1;
+	    }
 	}
       else if ( port->idle_function)
-	(*port->idle_function)( port);
+	{
+	  (*port->idle_function)( port);
+	  at_least_one_io_fun_called = 1;
+	}
+    }
+
+  if ( !at_least_one_io_fun_called)
+    {
+      ftl_wrapper_t fun;
+      fts_word_t at[1];
+
+      fun = fts_audioport_get_output_function( null_audioport);
+      fts_word_set_ptr( at+0, null_audioport);
+
+      (*fun)( at);
     }
 }
 
@@ -196,6 +254,70 @@ void __fts_audioport_set_output_function( fts_audioport_t *port, fts_symbol_t na
   port->output_fun_name = name;
   port->output_fun = fun;
   fts_dsp_declare_function( name, fun);
+}
+
+
+
+typedef struct _audioport_guard_t {
+  fts_object_t head;
+  int at_least_one_io_fun_called;
+} audioport_guard_t;
+
+static audioport_guard_t *audioport_guard;
+
+static void audioport_guard_arm( void)
+{
+  audioport_guard->at_least_one_io_fun_called = 0;
+}
+
+static void audioport_guard_unarm( void)
+{
+  audioport_guard->at_least_one_io_fun_called = 1;
+}
+
+static int audioport_guard_is_armed( void)
+{
+  return !audioport_guard->at_least_one_io_fun_called;
+}
+
+static void audioport_guard_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dsp_add_object(o);
+}
+
+static void audioport_guard_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dsp_remove_object(o);
+}
+
+static void audioport_guard_put_prologue( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  audioport_guard_arm();
+}
+
+static void audioport_guard_put_epilogue( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if ( audioport_guard_is_armed() )
+    {
+      fts_atom_t args[1];
+
+      /* schedule the null audioport */
+      fts_set_ptr( args+0, null_audioport);
+      fts_dsp_add_function( fts_audioport_get_output_function_name( null_audioport), 1, args);
+    }
+}
+
+static fts_status_t audioport_guard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init( cl, sizeof( audioport_guard_t), 0, 0, 0);
+
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, audioport_guard_init);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, audioport_guard_delete, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put_prologue, audioport_guard_put_prologue);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put_epilogue, audioport_guard_put_epilogue);
+
+  return fts_Success;
 }
 
 
@@ -221,8 +343,6 @@ static void audioportin_init( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 static void audioportin_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_audioportin_t *this = (fts_audioportin_t *)o;
-
   fts_dsp_remove_object(o);
 }
 
@@ -246,6 +366,8 @@ static void audioportin_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac
     fts_set_symbol( args+2+i, fts_dsp_get_output_name( dsp, i));
 
   fts_dsp_add_function( fts_audioport_get_input_function_name( this->port), channels+2, args);
+
+  audioport_guard_unarm();
 }
 
 static fts_status_t audioportin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -302,8 +424,6 @@ static void audioportout_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
 static void audioportout_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_audioportout_t *this = (fts_audioportout_t *)o;
-
   fts_dsp_remove_object(o);
 }
 
@@ -327,6 +447,8 @@ static void audioportout_put( fts_object_t *o, int winlet, fts_symbol_t s, int a
     fts_set_symbol( args+2+i, fts_dsp_get_input_name( dsp, i));
 
   fts_dsp_add_function( fts_audioport_get_output_function_name( this->port), channels+2, args);
+
+  audioport_guard_unarm();
 }
 
 static fts_status_t audioportout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -488,6 +610,9 @@ void fts_audioport_add_input_output_objects( void)
 
   for ( port = audioport_list; port; port = port->next)
     {
+      if (port == null_audioport)
+	continue;
+
       fts_audioport_create_audioportin( port);
       fts_audioport_create_audioportout( port);
     }
@@ -515,43 +640,49 @@ int fts_audioport_report_xrun( void)
 
 
 
-
-
-static fts_audioport_t *default_audioport = 0;
-
-void fts_audioport_set_default( int argc, const fts_atom_t *argv)
+fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 {
-  fts_object_t *obj;
-  fts_atom_t a[1];
+  fts_atom_t *value;
+  fts_audioport_t *default_audioport = 0;
 
-  fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &obj);
+  value = fts_variable_get_value( fts_object_get_patcher( obj), s_default_audio_port);
 
-  if (!obj)
-    return;
-
-  fts_object_get_prop( obj, fts_s_state, a);
-
-  if ( !fts_is_object( a) || !fts_object_is_audioport( fts_get_object( a)) )
+  if (value && fts_is_object(value))
     {
-      fts_object_delete_from_patcher( obj);
-      return;
+      default_audioport = (fts_audioport_t *)fts_get_object( value);
     }
+  
+  if (obj)
+    fts_variable_add_user( fts_object_get_patcher(obj), s_default_audio_port, obj);
 
-  if (default_audioport)
-    {
-      fts_object_delete_from_patcher( (fts_object_t *)default_audioport);
-    }
-
-  default_audioport = (fts_audioport_t *)fts_get_object( a);
+  return default_audioport;
 }
 
-fts_audioport_t *fts_audioport_get_default( void)
+
+static void create_null_audioport( void)
 {
-  return default_audioport;
+  fts_object_t *obj;
+  fts_atom_t argv[1];
+
+  fts_set_symbol( &argv[0], fts_new_symbol("nullaudioport"));
+
+  fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, &obj);
+  null_audioport = (fts_audioport_t *)obj;
+}
+
+static void create_audioport_guard( void)
+{
+  fts_atom_t argv[1];
+
+  fts_set_symbol( &argv[0], fts_new_symbol("audioport_guard"));
+
+  fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, (fts_object_t **)&audioport_guard);
 }
 
 void audioport_config( void)
 {
+  s_default_audio_port = fts_new_symbol( "DefaultAudioPort");
+
   s__superclass = fts_new_symbol( "_superclass");
   s_audioport = fts_new_symbol( "audioport");
   s_audioportin = fts_new_symbol( "audioportin");
@@ -564,5 +695,10 @@ void audioport_config( void)
 
   fts_metaclass_install( s_audioportin, audioportin_instantiate, fts_never_equiv);
   fts_metaclass_install( s_audioportout, audioportout_instantiate, fts_never_equiv);
+
+  fts_class_install( fts_new_symbol( "audioport_guard"), audioport_guard_instantiate);
+
+  create_null_audioport();
+  create_audioport_guard();
 }
 

@@ -56,6 +56,7 @@ public class FtsObject
   static Object[] methodArgs2 = new Object[2];
   static Object[] methodArgs3 = new Object[2];
   static Method methodCache = null;
+  static String classNameCache = null;
   static String selectorCache = null;
 
   static {
@@ -66,11 +67,6 @@ public class FtsObject
     methodArgs1[0] = new Integer(1);
     methodArgs2[0] = new Integer(2);    
     methodArgs3[0] = new Integer(3);    
-  }
-
-  static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
-  {
-    creators.put(nameclass, creator);
   }
 
   /******************************************************************************/
@@ -102,7 +98,7 @@ public class FtsObject
     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
     Object creator;
-    FtsObject obj;
+    FtsObject obj = null;
     StringBuffer description;
 
     /* Note that we do the unparsing relative to ':' and variables
@@ -114,43 +110,41 @@ public class FtsObject
     
     if (className != null)
       {
-	Object ctr = creators.get(className);
-	
-	if(ctr != null)
-	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, variableName, className, nArgs, args);
-	else if (className == "jpatcher")
-	  obj =  new FtsPatcherObject(fts, parent, variableName, FtsParse.unparseArguments(nArgs, args));
-	else if (className == "inlet")
-	    obj =  new FtsInletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	else if (className == "outlet")
-	  obj =  new FtsOutletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	else if (className == "fork")
-	  obj =  new FtsForkObject(fts, parent, args[0].intValue);
-	else if (className == "jcomment")
-	  obj =  new FtsCommentObject(fts, parent);
-	else if (className == "messbox")
-	  obj =  new FtsMessageObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	else if (className == "messconst")
-	  obj =  new FtsMessConstObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	else if (className == "display")
-	  obj =  new FtsDisplayObject(fts, parent);
-	else if (className == "vecdisplay")
-	  obj =  new FtsVectorDisplayObject(fts, parent);
-	else if (className == "slider")
-	  obj =  new FtsSliderObject(fts, parent);
-	else if (className == "intbox")
-	  obj =  new FtsIntValueObject(fts, parent, className);
-	else if (className == "toggle")
-	  obj =  new FtsIntValueObject(fts, parent, className);
-	else if (className == "button")
-	  obj =  new FtsBangObject(fts, parent, className);
-	else if (className == "floatbox")
-	  obj =  new FtsFloatValueObject(fts, parent, className);
-	else if (className == "__selection")
-	  obj =  new FtsSelection(fts, parent);
-	else if (className == "__clipboard")
-	  obj =  new FtsClipboard(fts, parent);
-	else
+	  Class theClass = ObjectCreatorManager.getFtsClass(className);
+	  if(theClass != null)
+	      {
+		  Object[] arg = new Object[] {fts, parent, variableName, className, new Integer(nArgs), args};
+		  Class[] cls = new Class[] { ircam.jmax.fts.Fts.class, ircam.jmax.fts.FtsObject.class, 
+					      java.lang.String.class, java.lang.String.class , 
+					      java.lang.Integer.TYPE, ircam.jmax.fts.FtsAtom[].class};
+		  try{
+		      Constructor constr = theClass.getConstructor(cls);
+
+		      if(constr != null)
+			  obj = (FtsObject)(constr.newInstance(arg));
+
+		  } catch (NoSuchMethodException e) {
+		      System.out.println(e);
+		  } catch (InstantiationException e) {
+		      System.out.println(e);
+		  } catch (IllegalAccessException e) {
+		      System.out.println(e);
+		  } catch (InvocationTargetException e) {
+		      System.out.println(e);
+		      e.printStackTrace();
+		  } 
+	      }
+	  else if (className == "jpatcher")
+	      obj =  new FtsPatcherObject(fts, parent, variableName, FtsParse.unparseArguments(nArgs, args));
+	  else if (className == "inlet")
+	      obj =  new FtsInletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
+	  else if (className == "outlet")
+	      obj =  new FtsOutletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
+	  else if (className == "__selection")
+	      obj =  new FtsSelection(fts, parent);
+	  else if (className == "__clipboard")
+	      obj =  new FtsClipboard(fts, parent);
+	  else
 	    {
 		String descrpt;
 		if(nArgs==0) 
@@ -347,11 +341,11 @@ public class FtsObject
 
   /** The number of inlets of this object. */
 
-  int ninlets;		    
+  public int ninlets;		    
 
   /** The number of outlets of this object */
 
-  int noutlets;
+  public int noutlets;
 
   /**
    * The object string description. Always set at object creation.
@@ -374,7 +368,7 @@ public class FtsObject
   protected int fontStyle = -1;
   protected int layer = -1;
   protected MaxData data;
-  protected String comment;
+  protected String comment = "";
 
   //
   //  Handling of properties
@@ -619,13 +613,8 @@ public class FtsObject
    */
   protected FtsObject(Fts fts, FtsObject parent, String variableName, String className, String description)
   {
-    //super();
-    
     this.fts = fts;
     this.parent = parent;
-
-    /*if (objId != -1)
-      setObjectId(objId);*/
 
     this.variableName = variableName;
     this.className = className;
@@ -899,10 +888,12 @@ public class FtsObject
   {
     try
       {
-	if(selector != selectorCache)
+	  String cname = getClass().getName();
+	  if((selector != selectorCache)||(!cname.equals(classNameCache)))
 	  {
 	    selectorCache = selector;
 	    methodCache = getClass().getMethod(selector, parameterTypes);
+	    classNameCache = cname;
 	  }
 
 	switch(nArgs)

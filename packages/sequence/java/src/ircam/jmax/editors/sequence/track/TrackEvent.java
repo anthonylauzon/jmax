@@ -40,13 +40,23 @@ import ircam.jmax.toolkit.*;
 
 public class TrackEvent extends FtsObject implements Event, Drawable, UndoableData, Cloneable
 {
-    public TrackEvent(Fts fts, double time, EventValue value)
+    //public TrackEvent(Fts fts, double time, EventValue value)
+    public TrackEvent(Fts fts, FtsObject parent, String variableName, String className, int nArgs, FtsAtom args[])
     {
 	super(fts, null, null, "seqevent", "seqevent");
+	
+	this.time = (double)args[0].getFloat();
 
-	this.time = time;
-    
-	setValue(value);
+	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[1].getString()).newInstance());
+	for(int i = 0; i< nArgs-2; i++)
+	{
+	    Object obj = args[2+i].getValue();
+	    if(obj instanceof Float) 
+		obj = new Double(((Float)obj).doubleValue());
+	    evtArgs[i] = obj;	  
+	}
+	evtValue.setPropertyValues(nArgs-2, evtArgs);   
+	setValue(evtValue);
     }
 
     /**
@@ -266,6 +276,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     public static double DEFAULT_TIME = 0;
 
     private TrackDataModel itsTrackDataModel;
+    static Object[] evtArgs = new Object[128];
 }
 
 

@@ -693,6 +693,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void paintComponent(Graphics g)
   {
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     displayList.paint(g);
   }
   

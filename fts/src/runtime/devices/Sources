@@ -50,8 +50,6 @@ endif
 SOURCES = \
 devconf.c \
 devices.c \
-profdev.c \
-null.c \
 bytestream.c \
 $(ARCH_SOURCES)
 

@@ -155,7 +155,7 @@ public class TextRenderer implements ObjectRenderer
     return (area.getLineCount()>1);
   }
 
-  boolean isTextLonger(){
+  public boolean isTextLonger(){
     return (SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs()) >= 
 	     owner.getWidth() - owner.getTextWidthOffset());
   }
@@ -167,9 +167,9 @@ public class TextRenderer implements ObjectRenderer
   public int getHeight()
   {
     if(isTextLonger()||isMultiLine())
-      return area.getPreferredSize().height;
+	return area.getPreferredSize().height;
     else
-      return area.getRHeight();
+	return area.getRHeight();
   }
 
   public int getColWidth(){

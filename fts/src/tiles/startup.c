@@ -218,20 +218,6 @@ static void  fts_assign_boot_devices(int argc, char **argv)
       pd_argc = 0;
     }
 
-  /* Set the client dev from the command line arguments.
-     */
-  fts_open_logical_device(fts_new_symbol("client"), 0, 0,
-			  class_name, pd_argc, pd_argv);
-
-  /* Open the nullaudioport as default audio port.
-     This will prevent fts taking 100% CPU time by running unsyncronized 
-     and locking the machine because running SCHED_FIFO
-  */
-  {
-    fts_atom_t argv[1];
-
-    fts_set_symbol( &argv[0], fts_new_symbol("nullaudioport"));
-
-    fts_audioport_set_default( 1, argv);
-  }
+  /* Set the client dev from the command line arguments. */
+  fts_open_logical_device(fts_new_symbol("client"), 0, 0, class_name, pd_argc, pd_argv);
 }

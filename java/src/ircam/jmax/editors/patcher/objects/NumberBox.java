@@ -122,8 +122,17 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   // ----------------------------------------
   // ValueAsText property
   // ----------------------------------------
-  abstract void setValueAsText( String value);
-  abstract String getValueAsText();
+  abstract public void setValueAsText( String value);
+  abstract public String getValueAsText();
+
+  public boolean isValueValid()
+  {
+      return valueValid;
+  }
+  public void setValueValid(boolean valid)
+  {
+      valueValid = valid;
+  }
 
   public void inspect() 
   {
