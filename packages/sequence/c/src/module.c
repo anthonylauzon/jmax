@@ -33,13 +33,15 @@ extern void track_config(void);
 extern void event_config(void);
 
 extern void note_config(void);
-extern void midival_config(void);
 extern void seqmess_config(void);
+extern void segment_config(void);
 
 extern void seqfind_config(void);
 extern void seqstep_config(void);
 extern void seqplay_config(void);
 extern void seqrec_config(void);
+
+extern void getdur_config(void);
 
 void
 sequence_config(void)
@@ -52,9 +54,12 @@ sequence_config(void)
 
   note_config();
   seqmess_config();
+  segment_config();
 
   seqfind_config();
   seqstep_config();
   seqplay_config();
   seqrec_config();
+
+  getdur_config();
 }

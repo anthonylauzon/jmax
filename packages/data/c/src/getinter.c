@@ -192,7 +192,12 @@ getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 		index--;
 	    }
 	  else if(bpf_get_slope(bpf, index) == DBL_MAX)
-	    index++;
+	    {
+	      index++;
+
+	      while(bpf_get_slope(bpf, index) == DBL_MAX)
+		index++;
+	    }
 	  
 	  /* remember new index */
 	  this->index = index;

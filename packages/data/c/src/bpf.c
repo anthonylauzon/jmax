@@ -82,20 +82,21 @@ bpf_append_point(bpf_t *bpf, double time, double value)
 
   if(size > 0)
     {
-      /* Keeping trace of a marvelous optimization bug in VC++ compiler. Beats me! */
-      if(time > bpf->points[size - 1].time)
+      double duration = bpf_get_time(bpf, size - 1);
+      
+      if(time <= duration)
+	{
+	  time = duration;
+	  
+	  /* set jump for previous point */
+	  bpf->points[size - 1].slope = DBL_MAX;
+	}
+      else
 	{
 	  /* set slope for previous point */
 	  bpf->points[size - 1].slope = 
 	    (value - bpf->points[size - 1].value) / 
 	    (time - bpf->points[size - 1].time);
-	}
-      else
- 	{
-	  time = bpf->points[size - 1].time;
-	  
-	  /* set jump for previous point */
-	  bpf->points[size - 1].slope = DBL_MAX;
 	}
     }
   
@@ -289,7 +290,7 @@ bpf_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-bpf_append_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
 
@@ -639,7 +640,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, bpf_get_state);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, bpf_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, bpf_append_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, bpf_append);
   
   /* graphical editor */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, bpf_open_editor);

@@ -31,14 +31,22 @@
  */
 
 #include <fts/fts.h>
+#include "param.h"
 
-/*------------------------- slider class -------------------------------------*/
-
-typedef struct {
+typedef struct 
+{
   fts_object_t o;
   int n;
 } slider_t;
 
+typedef struct 
+{
+  slider_t slider;
+  param_t *param;
+} slider_param_t;
+
+/* for parameter slider */
+static fts_symbol_t sym__remote_value = 0;
 
 static void
 slider_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -123,8 +131,7 @@ slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 
 static void
-slider_get_value(fts_daemon_action_t action, fts_object_t *obj,
-	       fts_symbol_t property, fts_atom_t *value)
+slider_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   slider_t *this = (slider_t *)obj;
 
@@ -132,8 +139,7 @@ slider_get_value(fts_daemon_action_t action, fts_object_t *obj,
 }
 
 static void
-slider_put_value(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
+slider_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   slider_t *this = (slider_t *)obj;
 
@@ -142,7 +148,6 @@ slider_put_value(fts_daemon_action_t action, fts_object_t *obj,
   fts_outlet_send(obj, 0, fts_s_int, 1, value);
   fts_object_ui_property_changed(obj, fts_s_value);
 }
-
 
 static void
 slider_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -189,31 +194,96 @@ static void slider_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int 
   fprintf( file, "#P slider %d %d %d %d;\n", x, y, w, max_value - min_value + 1);
 }
 
+/**************************************************
+ *
+ *  parameter slider
+ *
+ */
+static void
+slider_param_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  slider_param_t *this = (slider_param_t *)obj;
 
+  this->slider.n = fts_get_int(value);
+  fts_object_ui_property_changed(obj, fts_s_value);
+  fts_send_message((fts_object_t *)this->param, fts_SystemInlet, sym__remote_value, 1, value);
+}
+
+static void
+slider_param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  slider_param_t *this = (slider_param_t *)o;
+
+  ac--;
+  at++;
+
+  if(ac > 0 && param_atom_is(at))
+    {
+      this->param = param_atom_get(at);
+      param_add_listener(this->param, o);
+    }
+  else
+    fts_object_set_error(o, "Wrong arguments");
+}
+
+static void
+slider_param_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  slider_param_t *this = (slider_param_t *)o;
+
+  param_remove_listener(this->param, o);
+}
+
+/**************************************************
+ *
+ *  parameter slider
+ *
+ */
 static fts_status_t
 slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(slider_t), 1, 1, 0);
+  ac--;
+  at++;
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, slider_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, slider_send_ui_properties); 
+  if(ac == 0)
+    {
+      fts_class_init(cl, sizeof(slider_t), 1, 1, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, slider_send_properties); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, slider_send_ui_properties); 
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), slider_assist); 
+      
+      fts_method_define_varargs(cl, 0, fts_s_set, slider_set);
+      fts_method_define_varargs(cl, 0, fts_s_bang, slider_bang);
+      
+      fts_method_define_varargs(cl, 0, fts_s_int, slider_int);
+      fts_method_define_varargs(cl, 0, fts_s_float, slider_float);
+      fts_method_define_varargs(cl, 0, fts_s_list, slider_list);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, slider_save_dotpat); 
+      
+      /* Add  the value daemon */
+      fts_class_add_daemon(cl, obj_property_get, fts_s_value, slider_get_value);
+      fts_class_add_daemon(cl, obj_property_put, fts_s_value, slider_put_value);
+      
+      fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+    }
+  else
+    {
+      fts_class_init(cl, sizeof(slider_param_t), 0, 0, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, slider_param_init); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, slider_param_delete); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), slider_assist); 
-
-  fts_method_define_varargs(cl, 0, fts_s_set, slider_set);
-  fts_method_define_varargs(cl, 0, fts_s_bang, slider_bang);
-
-  fts_method_define_varargs(cl, 0, fts_s_int, slider_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, slider_float);
-  fts_method_define_varargs(cl, 0, fts_s_list, slider_list);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, slider_save_dotpat); 
-
-   /* Add  the value daemon */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_value, slider_get_value);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_value, slider_put_value);
-
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, slider_send_properties); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, slider_send_ui_properties); 
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, sym__remote_value, slider_set);
+      
+      fts_class_add_daemon(cl, obj_property_get, fts_s_value, slider_get_value);
+      fts_class_add_daemon(cl, obj_property_put, fts_s_value, slider_param_put_value);
+    }
 
   return fts_Success;
 }
@@ -221,6 +291,7 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 slider_config(void)
 {
-  fts_class_install(fts_new_symbol("slider"),slider_instantiate);
-}
+  sym__remote_value = fts_new_symbol("_remote_value");
 
+  fts_metaclass_install(fts_new_symbol("slider"), slider_instantiate, fts_arg_equiv);
+}

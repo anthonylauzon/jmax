@@ -308,10 +308,13 @@ scope_ftl(fts_word_t *argv)
 
   if(data->trigger == scope_period)
     {
+      /* threshold is off */
+      
       for(i=0; i<n_tick; i++)
 	{
 	  float f = in[i];
 	  
+	  /* store sample to circular buffer */
 	  buf[index] = f;
 	  
 	  if(count >= period)
@@ -330,6 +333,7 @@ scope_ftl(fts_word_t *argv)
 
 	  count++;
 
+	  /* advance in circular buffer */
 	  index++;
 	  if(index >= SCOPE_BUFFER_SIZE)
 	    index = 0;
@@ -343,16 +347,18 @@ scope_ftl(fts_word_t *argv)
 	{
 	  float f = in[i];
 	  
+	  /* store sample to circular buffer */
 	  buf[index] = f;
 	  
 	  if(count <= 0)
 	    {
 	      /* waiting for trigger */
-	      if(last < threshold && f >= threshold)
+	      if(last <= threshold && f >= threshold)
 		{
-		  /* trigger */
+		  /* threshold reached: trigger now */
 		  data->start = index - pre;
 
+		  /* set start point of valid samples */
 		  if(data->start < 0)
 		    data->start += SCOPE_BUFFER_SIZE;
 
@@ -361,51 +367,64 @@ scope_ftl(fts_word_t *argv)
 		}
 	      else
 		{
+		  /* threshold not reached */
 		  if(count <= -period)
 		    {
-		      /* end of period without triggered */
+		      /* end of period */
+
+		      /* reset counter */
 		      count = 0;
+		      
+		      /* clear screen */
+		      data->send = 0;
+		      fts_timebase_add_call(fts_get_timebase(), data->object, scope_send_to_client, 0, 0.0);
 
 		      /* reset threshold for auto trigger */
 		      if(data->trigger == scope_auto)
-			data->threshold = 0.75 * max;
-		      
-		      max = MIN_FLOAT;
+			{
+			  data->threshold = 0.75 * max;
+			  max = MIN_FLOAT;
+			}
 		    }
 
+		  /* go on waiting for trigger */
 		  count--;
 		}
 	    }
 	  else 
 	    {
+	      /* is triggered */
 	      if(count >= period)
 		{
 		  /* reset threshold for auto trigger */
 		  if(data->trigger == scope_auto)
-		    data->threshold = 0.75 * max;
-		  
-		  max = MIN_FLOAT;
+		    {
+		      data->threshold = 0.75 * max;
+		      max = MIN_FLOAT;
+		    }
 
 		  /* start new period looking for trigger */
-		  count = -1;
+		  count = -2;
 		}
 	      else if(count == size)
 		{
 		  /* send recorded data */
 		  data->send = size;
 		  fts_timebase_add_call(fts_get_timebase(), data->object, scope_send_to_client, 0, 0.0);
-		  
-		  count++;
 		}
-	      else
-		count++;
+	      
+	      /* go on recording until display is filled */
+	      count++;
 	    }
 
+	  /* search maximum for auto trigger */
 	  if(f > max)
 	    max = f;
 
+	  /* store last value to detect ascending slope */
 	  last = f;
 
+	  /* advance in circular buffer */
 	  index++;	  
 	  if(index >= SCOPE_BUFFER_SIZE)
 	    index = 0;
@@ -416,6 +435,21 @@ scope_ftl(fts_word_t *argv)
   data->last = last;
   data->index = index;
   data->count = count;
+}
+
+static void 
+scope_dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
+{
+  fts_object_t *o = (fts_object_t *)listener;
+  scope_t *this = (scope_t *)listener;
+  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
+  int on = fts_get_int(value);
+
+  if(!on)
+    {
+      data->send = 0;
+      scope_send_to_client(o, 0, 0, 0, 0);
+    }
 }
 
 /***************************************************************************************
@@ -484,6 +518,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   scope_reset(data);
   
+  fts_param_add_listener(fts_s_dsp_on, this, scope_dsp_on_listener);
   fts_dsp_add_object((fts_object_t *)this);
 }
 

@@ -62,7 +62,7 @@ struct _track_
 #define track_get_first(t) ((t)->first)
 #define track_get_last(t) ((t)->last)
 #define track_get_size(t) ((t)->size)
-#define track_get_duration(t) ((t)->last->time - (t)->first->time)
+#define track_get_duration(t) ((t)->last->time)
 
 #define track_is_active(t) ((t)->active != 0)
 
@@ -82,6 +82,7 @@ extern void track_clear(track_t *track);
 extern event_t *track_get_event_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time_after(track_t *track, double time, event_t *here);
+extern event_t *track_get_event_with_duration_by_time(track_t *track, double time);
 
 /* high-lighting events in editor */
 extern void track_highlight_event(track_t *track, event_t *event);

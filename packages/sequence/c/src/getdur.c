@@ -17,37 +17,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ */
+#include <fts/fts.h>
+#include "seqsym.h"
+#include "track.h"
+
+/******************************************************
+ *
+ *  user methods
  *
  */
 
-#include "control.h"
+static void
+getdur_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *track = track_atom_get(at);
 
-extern void switch_config(void);
-extern void oneshot_config(void);
-extern void demux_config(void);
-extern void for_config(void);
-extern void count_config(void);
-extern void range_config(void);
-extern void fit_config(void);
-extern void sync_config(void);
-extern void mess_config(void);
-extern void make_config(void);
+  fts_outlet_float(o, 0, track_get_duration(track));
+}
+
+/******************************************************
+ *
+ *  class
+ *
+ */
+
+static fts_status_t
+getdur_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  /* initialize the class */
+  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
+  
+  fts_method_define_varargs(cl, 0, seqsym_track, getdur_track);
+  
+  return fts_Success;
+}
 
 void
-control_config(void)
+getdur_config(void)
 {
-  switch_config();
-  oneshot_config();
-  demux_config();
-  for_config();
-  count_config();
-  range_config();
-  fit_config();
-  sync_config();
-  mess_config();
-  make_config();
+  fts_class_install(fts_new_symbol("getdur"), getdur_instantiate);
 }

@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
  *
  */
 
@@ -37,14 +37,6 @@ typedef struct
   fts_object_t o;
   int on;
 } switch_t;
-
-static void
-switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  switch_t *this = (switch_t *)o;
-  
-  this->on = fts_get_int_arg(ac, at, 1, 0);
-}
 
 /************************************************************
  *
@@ -74,6 +66,14 @@ switch_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  *  class
  *
  */
+static void
+switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  switch_t *this = (switch_t *)o;
+  
+  this->on = fts_get_int_arg(ac, at, 1, 0);
+}
+
 static fts_status_t
 switch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -92,5 +92,5 @@ switch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 switch_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("switch"), switch_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("switch"), switch_instantiate);
 }

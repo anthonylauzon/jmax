@@ -31,21 +31,16 @@ fts_symbol_t seqsym_sequence = 0;
 fts_symbol_t seqsym_track = 0;
 fts_symbol_t seqsym_miditrack = 0;
 fts_symbol_t seqsym_event = 0;
+fts_symbol_t seqsym_segment = 0;
 
 /* events */
-fts_symbol_t seqsym_int = 0;
-fts_symbol_t seqsym_float = 0;
-fts_symbol_t seqsym_symbol = 0;
 fts_symbol_t seqsym_note = 0;
 fts_symbol_t seqsym_midi = 0;
-fts_symbol_t seqsym_midival = 0;
 fts_symbol_t seqsym_seqmess = 0;
 
 /* messages */
-fts_symbol_t seqsym_add = 0;
-fts_symbol_t seqsym_set = 0;
-fts_symbol_t seqsym_print = 0;
-fts_symbol_t seqsym_clear = 0;
+fts_symbol_t seqsym_insert = 0;
+fts_symbol_t seqsym_remove = 0;
 fts_symbol_t seqsym_export_midifile = 0;
 fts_symbol_t seqsym_export_midifile_dialog = 0;
 fts_symbol_t seqsym_import_midifile = 0;
@@ -78,6 +73,7 @@ seqsym_config(void)
   seqsym_miditrack = fts_new_symbol("miditrack");
   seqsym_track = fts_new_symbol("track");
   seqsym_event = fts_new_symbol("event");
+  seqsym_segment = fts_new_symbol("segment");
 
   /* event types */
   seqsym_note = fts_new_symbol("note");
@@ -85,6 +81,8 @@ seqsym_config(void)
   seqsym_seqmess = fts_new_symbol("seqmess");
   
   /* messages */
+  seqsym_insert = fts_new_symbol("insert");
+  seqsym_remove = fts_new_symbol("remove");
   seqsym_export_midifile = fts_new_symbol("export_midifile");
   seqsym_export_midifile_dialog = fts_new_symbol("export_midifile_dialog");
   seqsym_import_midifile = fts_new_symbol("import_midifile");

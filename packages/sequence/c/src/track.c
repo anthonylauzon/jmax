@@ -27,6 +27,7 @@
 #include <ftsconfig.h>
 #include "seqsym.h"
 #include "event.h"
+#include "segment.h"
 #include "track.h"
 #include "seqmidi.h"
 
@@ -234,8 +235,8 @@ track_remove_event(track_t *track, event_t *event)
 static void
 track_move_event(track_t *track, event_t *event, double time)
 {
-  event_t *next = event->next;
-  event_t *prev = event->prev;
+  event_t *next = event_get_next(event);
+  event_t *prev = event_get_prev(event);
 
   if((next && time > next->time) || (prev && time < prev->time))
     {
@@ -258,6 +259,7 @@ track_clear(track_t *track)
     {
       event_t *next = event_get_next(event);
       
+      event->next = event->prev = 0;
       fts_object_release((fts_object_t *)event);
       
       event = next;
@@ -318,12 +320,12 @@ track_merge(track_t *track, track_t *merge)
 event_t *
 track_get_event_by_time(track_t *track, double time)
 {
-  if(track_get_size(track) > 0 && time <= track->last->time)
+  if(track_get_size(track) > 0 && time <= event_get_time(track->last))
     {
       event_t *event = track->first;
       
-      while(time > event->time)
-	event = event->next;
+      while(time > event_get_time(event))
+	event = event_get_next(event);
 
       return event;  
     }
@@ -335,12 +337,12 @@ track_get_event_by_time(track_t *track, double time)
 event_t *
 track_get_next_by_time(track_t *track, double time)
 {
-  if(track_get_size(track) > 0 && time <= track->last->time)
+  if(track_get_size(track) > 0 && time < event_get_time(track->last))
     {
       event_t *event = track->first;
       
-      while(time >= event->time)
-	event = event->next;
+      while(time >= event_get_time(event))
+	event = event_get_next(event);
 
       return event;  
     }
@@ -352,7 +354,7 @@ track_get_next_by_time(track_t *track, double time)
 event_t *
 track_get_next_by_time_after(track_t *track, double time, event_t *here)
 {
-  if(track_get_size(track) > 0 && time <= track->last->time)
+  if(track_get_size(track) > 0 && time <= event_get_time(track->last))
     {
       event_t *event;
 
@@ -361,9 +363,27 @@ track_get_next_by_time_after(track_t *track, double time, event_t *here)
       else
 	event = track->first;
       
-      while(time >= event->time)
-	event = event->next;
+      while(time >= event_get_time(event))
+	event = event_get_next(event);
 
+      return event;  
+    }
+  else
+    return 0;
+}
+
+event_t *
+track_get_event_with_duration_by_time(track_t *track, double time)
+{
+  double duration = 0.0;
+
+  if(track_get_size(track) > 0 && time <= event_get_time(track->last) + event_get_duration(track->last))
+    {
+      event_t *event = track->first;
+      
+      while(time > event_get_time(event) + event_get_duration(event))
+	event = event_get_next(event);
+      
       return event;  
     }
   else
@@ -574,6 +594,86 @@ track_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_client_send_message((fts_object_t *)this, seqsym_active, 1, at);
 }
 
+static void 
+track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  
+  if(track_editor_is_open(this))
+    fts_client_send_message(o, fts_s_clear, 0, 0);
+  
+  track_clear(this);
+}
+
+static void 
+track_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  
+  if(ac >= 2 && fts_is_number(at))
+    {
+      fts_symbol_t track_type = track_get_type(this);
+      
+      if(track_type == fts_s_void || fts_get_selector(at + 1) == track_type)
+	{
+	  double time = fts_get_number_float(at);
+	  event_t *event = (event_t *)fts_object_create(event_class, 1, at + 1);
+	  
+	  /* add event to track */
+	  track_add_event(this, time, event);
+	}
+      else
+	fts_object_signal_runtime_error(o, "insert: event type missmatch\n");
+    }
+}
+  
+static void 
+track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  event_t *event = track_get_first(this);
+
+  while(event)
+    {
+      event_t *next = event_get_next(event);
+
+      if(fts_atom_are_equals(event_get_value(event), at))
+	track_remove_event(this, event);
+      
+      event = next;
+    }  
+}
+  
+static void 
+track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  fts_symbol_t track_name = track_get_name(this);
+  fts_symbol_t track_type = track_get_type(this);
+  int track_size = track_get_size(this);
+  event_t *event = track_get_first(this);  
+  const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
+
+  if(track_size == 0)
+    {
+      post("(\"%s\" empty %s track)\n", name_str, fts_symbol_name(track_type));
+      return;
+    }
+  else if(track_size == 1)
+    post("(\"%s\" 1 %s event) {\n", name_str, fts_symbol_name(track_type));
+  else
+    post("(\"%s\" %d %s events) {\n", name_str, track_size, fts_symbol_name(track_type));
+      
+  while(event)
+    {
+      post("  @%lf: ", event_get_time(event));
+      event_print(event);
+      event = event_get_next(event);
+    }  
+  
+  post("}\n");      
+}
+
 static void
 track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -616,47 +716,6 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       
   if(n > 0)
     fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);    
-}
-
-static void 
-track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  
-  if(track_editor_is_open(this))
-    fts_client_send_message(o, fts_s_clear, 0, 0);
-  
-  track_clear(this);
-}
-
-static void 
-track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  fts_symbol_t track_name = track_get_name(this);
-  fts_symbol_t track_type = track_get_type(this);
-  int track_size = track_get_size(this);
-  event_t *event = track_get_first(this);  
-  const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
-
-  if(track_size == 0)
-    {
-      post("(\"%s\" empty %s track)\n", name_str, fts_symbol_name(track_type));
-      return;
-    }
-  else if(track_size == 1)
-    post("(\"%s\" 1 %s event) {\n", name_str, fts_symbol_name(track_type));
-  else
-    post("(\"%s\" %d %s events) {\n", name_str, track_size, fts_symbol_name(track_type));
-      
-  while(event)
-    {
-      post("  @%lf: ", event_get_time(event));
-      event_print(event);
-      event = event_get_next(event);
-    }  
-  
-  post("}\n");      
 }
 
 /******************************************************
@@ -936,6 +995,12 @@ track_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_moveEvents, track_move_events_by_client_request);
 
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_active, track_active);
+
+  fts_method_define_varargs(cl, 0, seqsym_insert, track_insert);
+  fts_method_define_varargs(cl, 0, seqsym_remove, track_remove);
+
+  fts_method_define_varargs(cl, 0, fts_s_import, track_import);
+  fts_method_define_varargs(cl, 0, fts_s_export, track_export);
 
   return fts_Success;
 }

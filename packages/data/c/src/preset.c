@@ -309,7 +309,7 @@ preset_new_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   preset_t *this = (preset_t *)o;
 
-  this->current = preset_get_or_add(this, at + 0);; 
+  this->current = preset_get_or_add(this, at + 0);
 }
 
 static void

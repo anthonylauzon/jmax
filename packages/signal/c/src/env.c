@@ -603,6 +603,7 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->status = status_hold;
   this->mode = mode_continue;
 
+  this->ref = 0;
   this->bpf = (bpf_t *)fts_object_create(bpf_class, 0, 0);
 
   this->index = 0;
@@ -629,6 +630,9 @@ static void
 env_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
+
+  if(this->ref)
+    fts_object_release(this->ref);
 
   fts_object_destroy((fts_object_t *)this->bpf);
   fts_dsp_remove_object(o);

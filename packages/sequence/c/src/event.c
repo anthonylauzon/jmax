@@ -26,6 +26,7 @@
 #include <fts/fts.h>
 #include "seqsym.h"
 #include "event.h"
+#include "segment.h"
 #include "note.h"
 #include "seqmess.h"
 
@@ -36,6 +37,32 @@ fts_class_t *event_class = 0;
  *  generic event functions
  *
  */
+
+double 
+event_get_duration(event_t *event)
+{
+  fts_atom_t *value = &event->value;
+  double duration = 0.0;
+
+  if(segment_atom_is(value))
+    {
+      segment_t *segment = segment_atom_get(value);
+
+      duration = segment_get_duration(segment);
+    }
+  else if(note_atom_is(value))
+    {
+      segment_t *segment = segment_atom_get(value);
+
+      duration = segment_get_duration(segment);
+    }
+  else if(fts_is_object(value))
+    {
+      /* get duration property ?? */
+    }
+  
+  return duration;
+}
 
 void 
 event_get_array(event_t *event, fts_array_t *array)
@@ -177,7 +204,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 /**************************************************************
  *
- *  class
+ *  event class
  *
  */
 static void
@@ -219,9 +246,16 @@ event_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+/*****************************************************************
+ *
+ *  config & install
+ *
+ */
+
 void
 event_config(void)
 {
   fts_class_install(seqsym_event, event_instantiate);
+
   event_class = fts_class_get_by_name(seqsym_event);
 }

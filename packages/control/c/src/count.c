@@ -25,6 +25,8 @@
  */
 
 #include <fts/fts.h>
+#include <limits.h>
+#include <float.h>
 
 static fts_symbol_t sym_clip = 0;
 static fts_symbol_t sym_wrap = 0;
@@ -460,10 +462,10 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   ac--;
   at++;
   
-  this->mode = mode_clip;
+  this->mode = mode_wrap;
   this->value = 0;
   this->begin = 0;
-  this->end = 127;
+  this->end = INT_MAX;
   this->step = 1;
   this->reverse = 1;
 
@@ -479,10 +481,10 @@ count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   ac--;
   at++;
   
-  this->mode = mode_clip;
+  this->mode = mode_wrap;
   this->value = 0.0;
   this->begin = 0.0;
-  this->end = 0.1;
+  this->end = 0.5 * DBL_MAX;
   this->step = 0.01;
   this->reverse = 1;
 

@@ -939,7 +939,7 @@ ivec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	    post("%d ", ivec_get_element(this, i));
 	}
 
-      post("\n}");
+      post("\n}\n");
     }
   else if(size > 0)
     {

@@ -369,6 +369,44 @@ sequence_export_track_by_index(fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
+sequence_insert_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(ac > 0 && fts_is_number(at))
+    {
+      int index = fts_get_number_int(at);
+      track_t *track = sequence_get_track_by_index(this, index);
+      
+      if(track)
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_insert, ac - 1, at + 1);
+      else	
+	fts_object_signal_runtime_error(o, "insert: no track #%d", index);
+    }
+  else
+    fts_object_signal_runtime_error(o, "insert: track number required");  
+}
+
+static void
+sequence_remove_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(ac > 0 && fts_is_number(at))
+    {
+      int index = fts_get_number_int(at);
+      track_t *track = sequence_get_track_by_index(this, index);
+      
+      if(track)
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_remove, ac - 1, at + 1);
+      else	
+	fts_object_signal_runtime_error(o, "remove: no track #%d", index);
+    }
+  else
+    fts_object_signal_runtime_error(o, "remove: track number required");  
+}
+
+static void
 sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -678,6 +716,9 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_clear, sequence_clear);
   fts_method_define_varargs(cl, 0, fts_s_print, sequence_print);
+
+  fts_method_define_varargs(cl, 0, seqsym_insert, sequence_insert_event);
+  fts_method_define_varargs(cl, 0, seqsym_remove, sequence_remove_event);
   
   /* MIDI files */
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_import_midifile_dialog, sequence_import_midifile_dialog);

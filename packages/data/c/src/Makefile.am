@@ -5,6 +5,7 @@ bpf.c \
 col.c \
 copy.c \
 data.c \
+dispatch.c \
 fill.c \
 fmat.c \
 fvec.c \
@@ -16,8 +17,10 @@ getval.c \
 ivec.c \
 mat.c \
 messtab.c \
+param.c \
 preset.c \
 row.c \
+tup.c \
 value.c \
 vec.c \
 dumpfile.c
@@ -34,6 +37,7 @@ ivec.h \
 mat.h \
 message.h \
 messtab.h \
+param.h \
 preset.h \
 row.h \
 value.h \

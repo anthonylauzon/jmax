@@ -9,7 +9,9 @@ for.c \
 oneshot.c \
 range.c \
 switch.c \
-sync.c 
+sync.c \
+mess.c \
+make.c
 
 noinst_HEADERS=\
 control.h

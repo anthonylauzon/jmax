@@ -48,7 +48,8 @@ public class FtsIntValueObject extends FtsObject
   /* for the message box */
     public FtsIntValueObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
     {
-	super(fts, parent, null, className, className);
+	super(fts, parent, null, className,  
+	      (nArgs > 0) ? className + " " + FtsParse.unparseArguments(nArgs, args) : className);
     }
 
     public FtsIntValueObject(Fts fts, FtsObject parent, String className, String description)

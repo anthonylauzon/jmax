@@ -83,55 +83,71 @@ static void
 signal_play_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   signal_play_t *this = (signal_play_t *)o;
-  double value = fts_get_number_float(at);
-  
-  if(value < 0.0)
-    value = 0.0;
 
-  this->begin = value * this->conv_position;
+  if(fts_is_number(at))
+    {
+      double value = fts_get_number_float(at);
+      
+      if(value < 0.0)
+	value = 0.0;
+      
+      this->begin = value * this->conv_position;
+    }
 }
 
 static void 
 signal_play_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   signal_play_t *this = (signal_play_t *)o;
-  double value = fts_get_number_float(at);
-  
-  if(value < 0.0)
-    value = 0.0;
 
-  this->end = value * this->conv_position;
+  if(fts_is_number(at))
+    {
+      double value = fts_get_number_float(at);
+      
+      if(value < 0.0)
+	value = 0.0;
+      
+      this->end = value * this->conv_position;
+    }
 }
 
 static void 
 signal_play_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   signal_play_t *this = (signal_play_t *)o;
-  double value = fts_get_number_float(at);
-  
-  if(value < 0.0)
-    value = 0.0;
 
-  this->step = value * this->conv_step;
+  if(fts_is_number(at))
+    {
+      double value = fts_get_number_float(at);
+      
+      if(value < 0.0)
+	value = 0.0;
+      
+      this->step = value * this->conv_step;
+    }
 }
 
 static void 
 signal_play_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   signal_play_t *this = (signal_play_t *)o;
-  double value = fts_get_number_float(at);
-  double begin = this->begin;
-  double end = this->end;
-  
-  if(value > 0.0)
+
+  if(fts_is_number(at))
     {
-      if(end > begin)
-	this->step = this->conv_step * (end - begin) / (value * this->conv_position);
-      else if(begin > end)
-	this->step = this->conv_step * (end - begin) / (value * this->conv_position);
+      double value = fts_get_number_float(at);
+      double begin = this->begin;
+      double end = this->end;
+      
+      if(value > 0.0)
+	{
+	  if(end > begin)
+	    this->step = this->conv_step * (end - begin) / (value * this->conv_position);
+	  else if(begin > end)
+	    this->step = this->conv_step * (begin - end) / (value * this->conv_position);
+	}
+      else
+	this->step = this->conv_step;
     }
-  else
-    this->position = end;
 }
 
 static void 
@@ -139,7 +155,7 @@ signal_play_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   signal_play_t *this = (signal_play_t *)o;
 
-  switch (ac)
+  switch(ac)
     {
     default:
     case 4:
@@ -149,17 +165,35 @@ signal_play_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     case 2:
       signal_play_set_begin(o, 0, 0, 1, at + 1);
     case 1:
-      signal_play_set_object(o, 0, 0, 1, at);
-      break;
+      if(fts_is_object(at + 1))
+	signal_play_set_object(o, 0, 0, 1, at);
     case 0:
       break;
     }
 }
 
 static void 
-signal_play_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+signal_play_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   signal_play_t *this = (signal_play_t *)o;
+
+  if(fts_is_number(at))
+    {
+      double locate = fts_get_number_float(at);
+
+      if(locate > 0.0)
+	this->position = locate;
+      else
+	this->position = 0.0;	
+    }
+}
+
+static void 
+signal_play_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  signal_play_t *this = (signal_play_t *)o;
+
+  signal_play_set(o, 0, 0, ac, at);
 
   this->position = this->begin;
   this->mode = mode_play;
@@ -171,7 +205,7 @@ signal_play_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   signal_play_t *this = (signal_play_t *)o;
 
   signal_play_set(o, 0, 0, ac, at);
-  signal_play_bang(o, 0, 0, 0, 0);
+  signal_play_start(o, 0, 0, 0, 0);
 }
 
 static void 
@@ -225,14 +259,6 @@ signal_play_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->mode = mode_stop;
 }
 
-static void
-signal_play_rewind(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  signal_play_t *this = (signal_play_t *)o;
-
-  this->position = 0.0;
-}
-
 /************************************************************
  *
  *  class API
@@ -284,21 +310,24 @@ signal_play_class_init(fts_class_t *cl, fts_symbol_t type)
 
   fts_class_init(cl, sizeof(signal_play_t), 4, 2, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, signal_play_bang);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), signal_play_locate);
   fts_method_define_varargs(cl, 0, fts_new_symbol("play"), signal_play_play);
   fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), signal_play_loop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("cycle"), signal_play_cycle);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), signal_play_pause);
-  fts_method_define_varargs(cl, 0, fts_s_stop, signal_play_stop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), signal_play_rewind);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), signal_play_stop);
 
-  fts_method_define_varargs(cl, 0, type, signal_play_set_object);
   fts_method_define_varargs(cl, 0, fts_new_symbol("begin"), signal_play_set_begin);
   fts_method_define_varargs(cl, 0, fts_new_symbol("end"), signal_play_set_end);
   fts_method_define_varargs(cl, 0, fts_new_symbol("speed"), signal_play_set_speed);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("duration"), signal_play_set_duration);
 
   fts_method_define_varargs(cl, 0, fts_s_set, signal_play_set);
-  fts_method_define_varargs(cl, 0, fts_s_list, signal_play_list);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), signal_play_start);
+  fts_method_define_varargs(cl, 0, fts_s_bang, signal_play_start);
+  fts_method_define_varargs(cl, 0, type, signal_play_start);
+  fts_method_define_varargs(cl, 0, fts_s_list, signal_play_start);
 
   fts_method_define_varargs(cl, 1, fts_s_int, signal_play_set_begin);
   fts_method_define_varargs(cl, 1, fts_s_float, signal_play_set_begin);

@@ -20,49 +20,31 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+#ifndef _SEGMENT_H_
+#define _SEGMENT_H_
 
-#ifndef _MESS_MESSAGE_H_
-#define _MESS_MESSAGE_H_
+#include <fts/fts.h>
 
-/************************************************************************
- *
- *  message object
- *
- *  note: this message object is not intended to be send anywhere as an object
- *
- */
-
-#include "data.h"
-
-#define MESSAGE_OK 0
-
-typedef struct
+typedef struct _segment_
 {
   fts_object_t o;
-  fts_symbol_t s;
-  int ac;
-  fts_atom_t *at;
-} message_t;
+  fts_atom_t value;
+  double duration;
+  double attack;
+  double release;
+} segment_t;
 
-DATA_API fts_class_t *message_class;
-DATA_API fts_symbol_t message_symbol;
-DATA_API fts_type_t message_type;
+#define segment_get_value(s) (&(s)->value)
+#define segment_get_duration(s) ((s)->duration)
+#define segment_get_attack(s) ((s)->attack)
+#define segment_get_release(s) ((s)->release)
 
-DATA_API void message_clear(message_t *mess);
-DATA_API void message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
-
-#define message_get_selector(m) ((m)->s)
-#define message_get_ac(m) ((m)->ac)
-#define message_get_at(m) ((m)->at)
-
-#define message_output(o, i, m) do { \
-    fts_object_refer((fts_object_t *)(m)); \
-    fts_outlet_send((o), (i), (m)->s, (m)->ac, (m)->at); \
-    fts_object_release((fts_object_t *)(m)); \
-  } while(0);
-
+/* segment atoms */
+#define segment_atom_set(ap, x) fts_set_object_with_type((ap), (x), seqsym_segment)
+#define segment_atom_get(ap) ((segment_t *)fts_get_object(ap))
+#define segment_atom_is(ap) (fts_is_a((ap), seqsym_segment))
 
 #endif

@@ -26,8 +26,6 @@
 
 #include <fts/fts.h>
 
-
-
 typedef struct sigthrough
 {
   fts_object_t  o;
@@ -39,41 +37,12 @@ sigthru_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts
   fts_outlet_send(o, 1, s, ac, av); 
 }
 
-static void
-sigthru_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
-{
-  dsp_list_insert(o);
-}
-
-static void
-sigthru_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
-{
-  dsp_list_remove(o);
-}
-
-static void
-sigthru_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-
-  if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
-    fts_dsp_add_function_copy(fts_dsp_get_input_name(dsp, 0), fts_dsp_get_output_name(dsp, 0), fts_dsp_get_input_size(dsp, 0));
-}
-
 static fts_status_t
 sigthru_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sigthru_t), 1, 2, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigthru_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigthru_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigthru_put);
-
   fts_method_define_varargs(cl, 0, fts_s_anything, sigthru_anything);
-
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
 
   return fts_Success;
 }

@@ -76,22 +76,15 @@ getsize_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 getsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  if(ac == 1)
-    {
-      /* initialize the class */
-      fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
-      
-      fts_method_define_varargs(cl, 0, vec_symbol, getsize_vec);
-      fts_method_define_varargs(cl, 0, ivec_symbol, getsize_ivec);
-      fts_method_define_varargs(cl, 0, fvec_symbol, getsize_fvec);
-      fts_method_define_varargs(cl, 0, mat_symbol, getsize_mat);
-      
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
+  /* initialize the class */
+  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
+  
+  fts_method_define_varargs(cl, 0, vec_symbol, getsize_vec);
+  fts_method_define_varargs(cl, 0, ivec_symbol, getsize_ivec);
+  fts_method_define_varargs(cl, 0, fvec_symbol, getsize_fvec);
+  fts_method_define_varargs(cl, 0, mat_symbol, getsize_mat);
+  
+  return fts_Success;
 }
 
 void

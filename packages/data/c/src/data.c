@@ -47,6 +47,11 @@ extern void copy_config(void);
 
 extern void dumpfile_config(void);
 
+extern void param_config(void);
+extern void dispatch_config(void);
+
+extern void tup_config(void);
+
 DATA_API void
 data_config(void)
 {
@@ -75,5 +80,10 @@ data_config(void)
   copy_config();
 
   dumpfile_config();
+
+  param_config();
+  dispatch_config();
+
+  tup_config();
 }
 
