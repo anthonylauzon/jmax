@@ -82,6 +82,7 @@ class MoveConnectInteraction extends Interaction
 	editor.getDisplayList().add(connection);
 	editor.getDisplayList().sortDisplayList();
 	connection.updateDimensions();
+	ErmesSelection.patcherSelection.select( connection);	
 	connection.redraw();
       }
     catch (FtsException e)
@@ -113,7 +114,7 @@ class MoveConnectInteraction extends Interaction
 
 	moveStart.x = src.getOutletAnchorX(outlet);
 	moveStart.y = src.getOutletAnchorY(outlet);
-	editor.resetHighlightedOutlet();
+	//editor.resetHighlightedOutlet();
 	editor.setConnectingObject(src);
       }
     else if (Squeack.isDown(squeack) && Squeack.isShift(squeack))
@@ -122,7 +123,6 @@ class MoveConnectInteraction extends Interaction
 	  {
 	    editor.resetHighlightedInlet(); 
 	    doConnection(editor, src, outlet, dst, inlet);
-	    //editor.setConnectingObject(null);
 	  }
       }
     else if (Squeack.isDown(squeack))
@@ -130,6 +130,7 @@ class MoveConnectInteraction extends Interaction
 	if (destinationChoosen)
 	  {
 	    editor.resetHighlightedInlet(); 
+	    editor.resetHighlightedOutlet();
 	    doConnection(editor, src, outlet, dst, inlet);
 	  }
 
@@ -154,7 +155,7 @@ class MoveConnectInteraction extends Interaction
 		inlet = area.getNumber();
 		editor.setHighlightedInlet(dst, inlet);
 		destinationChoosen = true;
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(true);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y,
 						    dst.getInletAnchorX(inlet), dst.getInletAnchorY(inlet));
@@ -162,7 +163,7 @@ class MoveConnectInteraction extends Interaction
 	      }
 	    else
 	      {
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(false);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
 		editor.getDisplayList().redrawDragLine();
@@ -177,13 +178,14 @@ class MoveConnectInteraction extends Interaction
 	    destinationChoosen = false;
 	  }
 
-	editor.getDisplayList().dragLine();
+	editor.getDisplayList().dragLine(false);
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
 	editor.getDisplayList().redrawDragLine();
       }
-    else if(squeack==Squeack.SHIFT_UP)
+    else if((squeack==Squeack.SHIFT_UP)||(squeack==Squeack.ESCAPE)||(squeack==Squeack.DELETE))
       {
+	editor.resetHighlightedOutlet();
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().noDrag();
 	editor.setConnectingObject(null);

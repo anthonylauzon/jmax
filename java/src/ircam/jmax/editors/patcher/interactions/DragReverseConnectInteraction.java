@@ -81,6 +81,7 @@ class DragReverseConnectInteraction extends Interaction
 	editor.getDisplayList().add(connection);
 	editor.getDisplayList().sortDisplayList();
 	connection.updateDimensions();
+	ErmesSelection.patcherSelection.select( connection);	
 	connection.redraw();
       }
     catch (FtsException e)
@@ -105,7 +106,7 @@ class DragReverseConnectInteraction extends Interaction
 
 	dragStart.x = dst.getInletAnchorX(inlet);
 	dragStart.y = dst.getInletAnchorY(inlet);
-	editor.resetHighlightedInlet();
+	//editor.resetHighlightedInlet();
 	editor.setConnectingObject(dst);
 	dragged = false;
       }
@@ -126,6 +127,8 @@ class DragReverseConnectInteraction extends Interaction
 
 	    // clean up
 	    if((!Squeack.isShift(squeack))||(!destinationChoosen)){
+	      editor.resetHighlightedInlet();
+
 	      editor.getDisplayList().noDrag();
 	      editor.getDisplayList().redrawDragLine();
 	      editor.setCursor(Cursor.getDefaultCursor());
@@ -160,7 +163,7 @@ class DragReverseConnectInteraction extends Interaction
 		outlet = area.getNumber();
 		editor.setHighlightedOutlet(src, outlet);
 		destinationChoosen = true;
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(true);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, 
 						    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
@@ -168,7 +171,7 @@ class DragReverseConnectInteraction extends Interaction
 	      }
 	    else 
 	      {
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(false);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
 		editor.getDisplayList().redrawDragLine();
@@ -184,7 +187,7 @@ class DragReverseConnectInteraction extends Interaction
 	    destinationChoosen = false;
 	  }
 
-	editor.getDisplayList().dragLine();
+	editor.getDisplayList().dragLine(false);
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
 	editor.getDisplayList().redrawDragLine();

@@ -81,6 +81,7 @@ class MoveReverseConnectInteraction extends Interaction
 	editor.getDisplayList().add(connection);
 	editor.getDisplayList().sortDisplayList();
 	connection.updateDimensions();
+	ErmesSelection.patcherSelection.select( connection);	
 	connection.redraw();
       }
     catch (FtsException e)
@@ -113,7 +114,7 @@ class MoveReverseConnectInteraction extends Interaction
 	moveStart.x = dst.getInletAnchorX(inlet);
 	moveStart.y = dst.getInletAnchorY(inlet);
 	editor.setConnectingObject(dst);
-	editor.resetHighlightedInlet();
+	//editor.resetHighlightedInlet();
       }
     else if (Squeack.isDown(squeack) && Squeack.isShift(squeack))
       {
@@ -123,7 +124,6 @@ class MoveReverseConnectInteraction extends Interaction
 	  {
 	    editor.resetHighlightedOutlet(); 
 	    doConnection(editor, src, outlet, dst, inlet);
-	    //editor.setConnectingObject(null);
 	  }
       }
     else if (Squeack.isDown(squeack))
@@ -133,6 +133,7 @@ class MoveReverseConnectInteraction extends Interaction
 	if (destinationChoosen)
 	  {
 	    editor.resetHighlightedOutlet(); 
+	    editor.resetHighlightedInlet();
 	    doConnection(editor, src, outlet, dst, inlet);
 	  }
 
@@ -157,7 +158,7 @@ class MoveReverseConnectInteraction extends Interaction
 		outlet = area.getNumber();
 		editor.setHighlightedOutlet(src, outlet);
 		destinationChoosen = true;
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(true);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, 
 						    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
@@ -165,7 +166,7 @@ class MoveReverseConnectInteraction extends Interaction
 	      }
 	    else 
 	      {
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(false);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
 		editor.getDisplayList().redrawDragLine();
@@ -180,13 +181,14 @@ class MoveReverseConnectInteraction extends Interaction
 	    destinationChoosen = false;
 	  }
 
-	editor.getDisplayList().dragLine();
+	editor.getDisplayList().dragLine(false);
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
 	editor.getDisplayList().redrawDragLine();
       }
-    else if(squeack==Squeack.SHIFT_UP)
+    else if((squeack==Squeack.SHIFT_UP)||(squeack==Squeack.ESCAPE)||(squeack==Squeack.DELETE))
       {
+	editor.resetHighlightedInlet();
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().noDrag();
 	editor.setConnectingObject(null);

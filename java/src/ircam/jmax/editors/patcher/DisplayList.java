@@ -49,13 +49,13 @@ import ircam.jmax.editors.patcher.interactions.*;
  */
 
 
-public class DisplayList
+public class DisplayList 
 {
   ErmesSketchPad sketch;
 
-  final static int NO_DRAG        = 0;
-  final static int DRAG_RECTANGLE = 1;
-  final static int DRAG_LINE      = 2;
+  final static int NO_DRAG             = 0;
+  final static int DRAG_RECTANGLE      = 1;
+  final static int DRAG_LINE           = 2;
 
   int dragMode = NO_DRAG;
   Rectangle dragRectangle = new Rectangle();
@@ -620,7 +620,12 @@ public class DisplayList
 	break;
 
       case DRAG_LINE:
-	g.setColor( Color.black);
+
+	if(dragLineConnected) 
+	  g.setColor( Color.gray);
+	else  
+	  g.setColor( Color.black);
+
 	g.drawLine( lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
 	break;
 
@@ -776,7 +781,7 @@ public class DisplayList
 
   BoundCollector boundCollector = new BoundCollector();
 
-  Rectangle getBounds(Rectangle r)
+  public Rectangle getBounds(Rectangle r)
   {
     // Note that the bounds always include the 0.0 corner
     // this is done on purpose, it is not a bug.
@@ -909,8 +914,10 @@ public class DisplayList
     dragMode = DRAG_RECTANGLE;
   }
 
-  public void dragLine()
+  boolean dragLineConnected = false;
+  public void dragLine(boolean connected)
   {
+    dragLineConnected = connected;
     dragMode = DRAG_LINE;
   }
 

@@ -106,6 +106,11 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     MaxWindowManager.getWindowManager().addWindow(this);
 
+    //set the GlassPane for the rootPane
+    /*GlassPanel glass = new GlassPanel();
+      glass.setDoubleBuffered(false);
+      setGlassPane(new GlassPanel());*/
+
     // Create the ClipboardManager
     PatcherClipboardManager.createManager();
     

@@ -54,11 +54,16 @@ import ircam.jmax.toolkit.*;
 
 public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGroupListener
 {
+  
   boolean somethingToUpdate = false;
   Rectangle invalid = new Rectangle();
+  
+  //GlassPanel glass;
   public void paintAtUpdateEnd(GraphicObject object, int x, int y, int w, int h)
   {
     displayList.addToUpdate(object);
+    //glass.addToUpdate(object);
+
     if(!somethingToUpdate){
       somethingToUpdate = true;
       invalid.setBounds(x, y, w, h);
@@ -68,6 +73,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   }
   public void resetUpdate(){
     displayList.resetUpdateObjects();
+    //glass.resetUpdateObjects();
     somethingToUpdate = false;
   }
   public Rectangle getUpdateRect(){
@@ -85,6 +91,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void updateGroupStart()
   {
+    
     resetUpdate();
   }
 
@@ -92,13 +99,15 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   {
     Rectangle rect = getEditorContainer().getViewRectangle();
     Graphics gr;
-    
+
     if (isLocked()/* && syncPaint*/){
-      gr = getGraphics();
       SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
+      gr = getGraphics();
       gr.setClip(invalid);
       displayList.updatePaint(gr);
-      //((Container)this).repaint();
+      /*if(!glass.isVisible())
+	glass.setVisible(true);
+	glass.repaint();*/
     }    
     else
       repaint(invalid); 
@@ -225,8 +234,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // --------------------------------------------------------------
 
   void InitFromFtsContainer( FtsPatcherData theContainerObject)
-  {
-    FtsPatcherData aFtsPatcherData = theContainerObject;
+  {    FtsPatcherData aFtsPatcherData = theContainerObject;
     Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
     int osize = aFtsPatcherData.getObjects().size();
     boolean doLayers = false;
@@ -306,6 +314,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     // Install the display List object
 
     displayList = new DisplayList(this);
+
     engine      = new InteractionEngine(this);
     keyMap      = new KeyMap(this);
 
@@ -313,7 +322,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     if (MaxApplication.getProperty("dg") != null)
       {
-	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
+	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false); 
 	setDoubleBuffered(false);
 	setDebugGraphicsOptions(DebugGraphics.FLASH_OPTION);
       }
@@ -334,6 +343,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     fixSize();
 
     requestDefaultFocus(); 
+
+    //glass = ((GlassPanel)((JFrame)itsEditorContainer.getFrame()).getGlassPane());
   }
 	
 
@@ -598,21 +609,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     displayList.paint(g);
   }
   
-  public void update(Graphics g)
-  {
-    //se e' vero quello che raccontano: l'update e' chiamato sulo su repaint espliciti dell'user
-    //mentre il paint su quelli di sistema... ora l'update puo' distinguere di gia' sistema da utente
-    //resta da distinguere tra update da fts e gli altri paint... il controllo su locked dovrebbe bastare
-    // controllare che funzioni veramente...
-    System.err.println("update sketch");
-
-    if(isLocked())
-      displayList.updatePaint(g);
-    else
-      displayList.paint(g);
-    super.update(g);
-  }
-
    final public void redraw()
   {
     repaint();

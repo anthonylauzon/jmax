@@ -33,11 +33,11 @@ import java.util.*;
 
 public class MaxRepaintManager extends RepaintManager
 {
-    public void paintDirtyRegions()
-    {
-	super.paintDirtyRegions();
-	Toolkit.getDefaultToolkit().sync();
-    } 
+  public void paintDirtyRegions()
+  {
+    super.paintDirtyRegions();
+    Toolkit.getDefaultToolkit().sync();
+  } 
 }
 
 

@@ -82,6 +82,8 @@ public class Squeack
   static public final int CTRL     = 0x20;
   static public final int SHIFT_UP = 0x30;
   static public final int ALT      = 0x40;
+  static public final int ESCAPE   = 0x50;
+  static public final int DELETE   = 0x60;
 
   static public final int MODIFICATION_MASK     = 0xf0;
 

@@ -83,6 +83,7 @@ class DragConnectInteraction extends Interaction
 	editor.getDisplayList().add(connection);
 	editor.getDisplayList().sortDisplayList();
 	connection.updateDimensions();
+	ErmesSelection.patcherSelection.select( connection);
 	connection.redraw();
       }
     catch (FtsException e)
@@ -107,7 +108,7 @@ class DragConnectInteraction extends Interaction
 
 	dragStart.x = src.getOutletAnchorX(outlet);
 	dragStart.y = src.getOutletAnchorY(outlet);
-	editor.resetHighlightedOutlet();
+	//editor.resetHighlightedOutlet();
 	editor.setConnectingObject(src);
 	dragged = false;
       }
@@ -125,6 +126,8 @@ class DragConnectInteraction extends Interaction
 
 	    // clean up
 	    if((!Squeack.isShift(squeack))||(!destinationChoosen)){
+	      editor.resetHighlightedOutlet();//??
+
 	      editor.getDisplayList().noDrag();
 	      editor.getDisplayList().redrawDragLine();
 	      editor.setConnectingObject(null);
@@ -158,7 +161,7 @@ class DragConnectInteraction extends Interaction
 		inlet = area.getNumber();
 		editor.setHighlightedInlet(dst, inlet);
 		destinationChoosen = true;
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(true);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y,
 						    dst.getInletAnchorX(inlet), dst.getInletAnchorY(inlet));
@@ -166,7 +169,7 @@ class DragConnectInteraction extends Interaction
 	      }
 	    else 
 	      {
-		editor.getDisplayList().dragLine();
+		editor.getDisplayList().dragLine(false);
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
 		editor.getDisplayList().redrawDragLine();
@@ -182,7 +185,7 @@ class DragConnectInteraction extends Interaction
 	    destinationChoosen = false;
 	  }
 
-	editor.getDisplayList().dragLine();
+	editor.getDisplayList().dragLine(false);
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
 	editor.getDisplayList().redrawDragLine();

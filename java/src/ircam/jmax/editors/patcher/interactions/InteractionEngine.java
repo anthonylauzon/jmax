@@ -530,6 +530,14 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
       {
 	processKeyEvent( Squeack.SHIFT_UP, e);
       }
+    else if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
+      {
+	processKeyEvent( Squeack.ESCAPE, e);
+      }
+    else if((e.getKeyCode() == KeyEvent.VK_BACK_SPACE)||(e.getKeyCode() == KeyEvent.VK_DELETE))
+      {
+	processKeyEvent( Squeack.DELETE, e);
+      }
   }
 }
 
