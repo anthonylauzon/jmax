@@ -9,8 +9,8 @@ alsarawmidiport.c \
 alsaseqmidiport.c \
 alsaseqmidi.c  
 
-libalsa_la_CFLAGS=-DDEBUG
-libalsa_la_LIBADD=-L$(top_builddir)/fts -lfts -lasound
+libalsa_la_CFLAGS=@ALSA_CFLAGS@
+libalsa_la_LIBADD=-L$(top_builddir)/fts -lfts @ALSA_LIBS@
 
 INCLUDES=-I$(top_srcdir)/include
 
