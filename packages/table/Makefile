@@ -38,3 +38,5 @@ install-noarch:
 	( cd java; $(MAKE) $@)
 .PHONY: install-noarch
 
+install-arch:
+.PHONY: install-arch
