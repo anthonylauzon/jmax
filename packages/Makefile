@@ -45,7 +45,7 @@ C_PACKAGES= $(ARCH_PACKAGES) \
 	sources \
 	system
 
-JAVA_PACKAGES=
+JAVA_PACKAGES=''
 
 MIXED_PACKAGES=data explode qlist sequence
 
@@ -58,7 +58,7 @@ all_c:
 .PHONY: all_c
 
 all_java:
-	for i in $(JAVA_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done
+	if [ _$(JAVA_PACKAGES)_ != __ ] ; then for i in $(JAVA_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done ; fi
 	for i in $(MIXED_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all_java ; fi ) ; done
 .PHONY: all_java
 
