@@ -55,8 +55,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     itsArgs = theFtsObject.getDescription().trim();
 
     super.Init(theSketchPad, theFtsObject);
-
-    
+    currentRect.height = itsFontMetrics.getHeight()+2*HEIGHT_DIFF;
     ParseText(itsArgs);
     
     if(!itsResized){
