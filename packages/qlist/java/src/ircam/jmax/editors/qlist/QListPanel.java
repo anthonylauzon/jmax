@@ -27,7 +27,6 @@ package ircam.jmax.editors.qlist;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
 import java.awt.*;
