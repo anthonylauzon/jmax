@@ -123,8 +123,6 @@ audiomanagers_get_buffer_sizes(fts_array_t* buffer_sizes_array)
 static void 
 audioconfig_update_devices(fts_audioconfig_t* config)
 {
-  int ac;
-  fts_atom_t* at;
   fts_symbol_t *names;
   fts_audioport_t* port;
   int channels;
@@ -201,6 +199,7 @@ audioconfig_update_labels(fts_audioconfig_t* config)
   fts_audiolabel_t* label = config->labels;
   int n = config->n_labels;
   int i;
+   
   /* Make a query on audiomanagers to know which input and output audioport are available */
   /* check input and output audioports */
 /*   for ( i = 0; i < n; ++i) */
@@ -511,7 +510,7 @@ fts_audioconfig_set_buffer_size(fts_audioconfig_t* config, int buffer_size)
 {
 /* #warning NOT YET IMPLEMENTED (fts_audioconfig_set_buffer_size) */
   int set_buffer_size;
-  fts_atom_t arg;
+
   /* check if buffer size is available with current use audioport */
   if (audioconfig_check_buffer_size(config, buffer_size))
   {
@@ -542,7 +541,7 @@ fts_audioconfig_set_sample_rate(fts_audioconfig_t* config, int sample_rate)
 {
 /* #warning NOT YET IMPLEMENTED , need to change dsp code to set sample rate */
   int set_sample_rate = 0;
-  fts_atom_t arg;
+
   /* check if sample rate is available with current use audioport */
   if (audioconfig_check_sample_rate(config, sample_rate))
   {

@@ -429,8 +429,6 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   fts_expression_t *expression;
   struct eval_data data;
   fts_status_t status;
-  int new_ac;
-  fts_atom_t *new_at;
 
   /* empty object */
   if (ac == 0)

@@ -57,7 +57,6 @@ void
 fts_audioport_init( fts_audioport_t *port)
 {
   fts_audioport_t *current;
-  int i;
 
   for ( current = audioport_list; current; current = current->next)
     if (current == port)
@@ -337,7 +336,7 @@ audiolabel_put( fts_symbol_t name, fts_audiolabel_t *label)
 static void
 audiolabel_remove( fts_symbol_t name)
 {
-  fts_atom_t k, v;
+  fts_atom_t k;
 
   fts_set_symbol( &k, name);
   fts_hashtable_remove( &audiolabel_table, &k);
@@ -472,7 +471,6 @@ static void
 audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
-  fts_symbol_t name;
 
   if (ac >= 1)
     self->name = fts_get_symbol( at);
@@ -605,7 +603,7 @@ fts_audiomanager_put_port( fts_symbol_t name, fts_audioport_t *port)
 void
 fts_audiomanager_remove_port( fts_symbol_t name)
 {
-  fts_atom_t k, v;
+  fts_atom_t k;
 
   fts_set_symbol( &k, name);
   fts_hashtable_remove( &audiomanager_table, &k);
