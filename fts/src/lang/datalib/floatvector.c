@@ -69,12 +69,15 @@ fts_float_vector_new(int size)
 
   fts_data_init((fts_data_t *) vector, fts_float_vector_data_class);
 
+  fprintf(stderr, "fts_float_vector_new: %lx\n", vector);
+
   return vector;
 }
 
 void
 fts_float_vector_delete(fts_float_vector_t *vector)
 {
+  fprintf(stderr, "fts_float_vector_delete: %lx\n", vector);
   fts_data_delete((fts_data_t *) vector);
   fts_free(vector->values);
   fts_free(vector);
