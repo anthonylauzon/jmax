@@ -98,7 +98,6 @@ class FtsAddListenerCmd implements Command
 	  TclObject list = TclList.newInstance();
 
 	  TclList.append(interp, list, TclString.newInstance(tclFunction));
-	  TclList.append(interp, list, owner);
 	  TclList.append(interp, list, ReflectObject.newInstance(interp, obj));
 	  TclList.append(interp, list, TclString.newInstance(name));
 	  if (value instanceof Integer)
@@ -109,6 +108,7 @@ class FtsAddListenerCmd implements Command
 	    TclList.append(interp, list, TclString.newInstance((String)value));
 	  else 
 	    TclList.append(interp, list, ReflectObject.newInstance(interp, value));
+	  TclList.append(interp, list, owner);
 
 	  EvalEvent evt = new EvalEvent(interp, list);
 	  interp.getNotifier().queueEvent(evt, TCL.QUEUE_TAIL);
