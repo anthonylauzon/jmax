@@ -59,15 +59,15 @@ class ErmesObjComment extends ErmesObject {
     //itsFontMetrics = theSketchPad.GetTextArea().getFontMetrics(itsFont);
     FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
+    itsArgs = theFtsObject.getArgumentsDescription().trim();
     preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
-    //itsFontMetrics = itsSketchPad.GetTextArea().getFontMetrics(itsFont);
     itsSketchPad.GetTextArea().setBackground(Color.white);
-    //currentRect = new Rectangle();
     // MDC:
-    itsArgs = theFtsObject.getArgumentsDescription().trim();
+    //itsArgs = theFtsObject.getArgumentsDescription().trim();
     
     ParseText(itsArgs);
+        
     return true;
   }
 	

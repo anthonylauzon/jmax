@@ -597,18 +597,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //--------------------------------------------------------
   public void InitFromDocument(ErmesPatcherDoc theDocument){
 	
-    //repaint();	//force a repaint to create a graphic context, and to allocate a graphic
-    /*Dimension d = preferredSize;
-      
-      //Create the offscreen graphics context, if no good one exists.
-		if ( (offGraphics == null)){
-		// || (d.width != offDimension.width)
-		// || (d.height != offDimension.height)  
-		//offDimension = d;
-		    offImage = createImage(d.width, d.height);
-		    offGraphics = offImage.getGraphics();
-		}*/
-
     FtsObject aFtsPatcher = theDocument.GetFtsPatcher();
     // chiama tanti AddObject...
     Vector objectVector = aFtsPatcher.getContainedObjects();	//usefull?
