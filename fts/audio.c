@@ -91,8 +91,8 @@ void fts_audioport_set_channels( fts_audioport_t *port, int direction, int chann
   int i;
 
   port->inout[direction].channels = channels;
-  port->inout[direction].channel_used = (int *)fts_malloc( sizeof( int));
-  port->inout[direction].buffers = (float **)fts_malloc( sizeof( float *));
+  port->inout[direction].channel_used = (int *)fts_malloc( channels * sizeof( int));
+  port->inout[direction].buffers = (float **)fts_malloc( channels * sizeof( float *));
 
   for ( i = 0; i < channels; i++)
     {
