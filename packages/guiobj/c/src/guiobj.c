@@ -42,10 +42,10 @@ extern void keyserver_config(void);
 extern void messconst_config(void);
 extern void panel_config(void);
 extern void runtime_errors_config(void);
-/*extern void scope_config(void);*/
+extern void scope_config(void);
 extern void slider_config(void);
 extern void toggle_config(void);
-/*extern void vecdisplay_config(void);*/
+extern void vecdisplay_config(void);
 
 void
 guiobj_config(void)
@@ -66,8 +66,8 @@ guiobj_config(void)
   messconst_config();
   panel_config();
   runtime_errors_config();
-  /*scope_config();*/
+  scope_config();
   slider_config();
   toggle_config();
-  /*vecdisplay_config(); */
+  vecdisplay_config(); 
 }
