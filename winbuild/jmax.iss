@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=jMax
-AppVerName=jMax 4.1-2003-07-21
+AppVerName=jMax 4.1-2003-07-23
 AppPublisher=IRCAM
 AppPublisherURL=http://www.ircam.fr/jmax
 AppSupportURL=http://www.ircam.fr/jmax
