@@ -3,7 +3,7 @@
 ## Special setting for local libs
 ##
 
-MAX_PACKAGE_NAME = qlist
+MAX_PACKAGE_NAME = table
 
 include $(ROOTDIR)/java/Makefiles/Makefile.package
 
