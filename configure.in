@@ -30,7 +30,7 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_HAVE_HEADERS( sys/param.h unistd.h alloca.h sys/time.h)
+AC_HAVE_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -43,5 +43,9 @@ AC_CHECK_FUNCS(socket)
 dnl Check for platform-specific code
 PLATFORM=linux
 AC_SUBST(PLATFORM)
+
+dnl Absolute pathname of top-level directory
+ABS_TOP_SRCDIR=`pwd`
+AC_SUBST(ABS_TOP_SRCDIR)
 
 AC_OUTPUT(Makefile fts/Makefile fts/version.c java/src/ircam/jmax/MaxVersion.java)
