@@ -121,6 +121,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 				  selection.deselectAll(); 
 		      }
 	  }
+      ((BpfGraphicContext)gc).displaySelectionInfo();		    
   }
 
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
@@ -137,10 +138,12 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   {
       BpfAdapter a = ((BpfGraphicContext)gc).getAdapter();
       FtsBpfObject data = ((BpfGraphicContext)gc).getFtsObject();
-      
+      BpfPoint start, end;
+
       float time = a.getInvX(x);
-      BpfPoint start = data.getPreviousPoint(time);
-      BpfPoint end = data.getNextPoint(time);
+      start = data.getPreviousPoint(time);
+      if(start!=null) end = data.getNextPoint(start);
+      else end = data.getNextPoint(time);
 	  
       if( start == null || end == null) return false;
 
@@ -219,6 +222,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 		
 	      singleObjectSelected(x, y, modifiers);
 	  }
+
       return onConnection;
   }
 

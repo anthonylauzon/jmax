@@ -78,7 +78,6 @@ public class BpfBackground implements Layer, ImageObserver{
     if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
       System.err.println("something wrong: incomplete Image  ");
     
-    //drawVerticalGrid(g, d.width, d.height);
     drawRectangle(g, d.width, d.height);
 
     //draw zero line if != from minimum
@@ -103,7 +102,6 @@ public class BpfBackground implements Layer, ImageObserver{
 	int x0 = gc.getAdapter().getX(0);
 
 	float maxTime = gc.getMaximumTime() - gc.getAdapter().getInvWidth(BpfAdapter.DX);
-	//int xMax = gc.getAdapter().getX(gc.getMaximumTime()) - BpfAdapter.DX;//????????????????????????
 	int xMax = gc.getAdapter().getX(maxTime);
 
 	int yMin = gc.getAdapter().getY(gc.getFtsObject().getMinimumValue());
@@ -137,18 +135,6 @@ public class BpfBackground implements Layer, ImageObserver{
   boolean toRepaintBack = false;
   FontMetrics fm;
   
-  public static final int KEYX = 31;
-  public static final int KEYWIDTH = 24;
-  public static final int KEYEND = KEYX + KEYWIDTH;
-
-  static public NumberFormat numberFormat;
-  static 
-  {
-      numberFormat = NumberFormat.getInstance();
-      numberFormat.setMaximumFractionDigits(2);
-      numberFormat.setGroupingUsed(false);
-  }
-
   public static final Color BPF_COLOR = new Color(230, 230, 230);
 }
 

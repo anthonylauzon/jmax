@@ -280,6 +280,8 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 	    PointRenderer.getRenderer().render(tempPoint, g, true, bgc);
 	  }
       }
+
+    displayMovingSelectionInfo(dx, dy);
     
     g.setPaintMode();
     g.setColor(Color.black);
@@ -310,6 +312,30 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     int getMovements()
     {
 	return itsMovements;
+    }
+
+    void displayMovingSelectionInfo(int dx, int dy)
+    {
+	BpfGraphicContext bgc = (BpfGraphicContext)gc;
+	BpfAdapter a = bgc.getAdapter();
+
+	BpfPoint first = bgc.getSelection().getFirstInSelection();
+	BpfPoint last = bgc.getSelection().getLastInSelection();
+	BpfPoint prev = bgc.getFtsObject().getPreviousPoint(first);
+
+	String text = "("+PointRenderer.numberFormat.format(a.getInvX(a.getX(first)+dx))+" , "+
+	    PointRenderer.numberFormat.format(a.getInvY(a.getY(first)+dy))+" )  ";
+		
+	if(bgc.getSelection().size() > 1)
+	    text = text+"["+(int)(last.getTime()-first.getTime())+"]";
+
+	if(prev!=null)
+	    {
+		float prevTime = a.getInvX(a.getX(first)+dx) - prev.getTime();
+		if(prevTime < 0) prevTime = 0;
+		text = PointRenderer.numberFormat.format(prevTime)+" --> "+text;
+	    }
+	bgc.displayInfo(text);
     }
 
   //--- Fields

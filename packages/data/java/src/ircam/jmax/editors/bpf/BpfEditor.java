@@ -51,12 +51,32 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 	this.geometry = g;
 	this.model = dataModel;
 
-	setLayout(null);
-	displayLabel = new JLabel();
-	displayLabel.setFont(BpfPanel.rulerFont);
-	displayLabel.setBackground(Color.white);
-	displayLabel.setBounds(2, 2, 102, 15);
-	add(displayLabel);
+	/******** display labels **********/
+	JPanel labelPanel = new JPanel();
+	labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
+	labelPanel.setOpaque(false);
+
+	displayMouseLabel = new JLabel();
+	displayMouseLabel.setFont(BpfPanel.rulerFont);
+	displayMouseLabel.setPreferredSize(new Dimension(102, 15));
+	displayMouseLabel.setMaximumSize(new Dimension(102, 15));
+	displayMouseLabel.setMinimumSize(new Dimension(102, 15));
+
+	infoLabel = new JLabel("", JLabel.RIGHT);
+	infoLabel.setFont(BpfPanel.rulerFont);
+	infoLabel.setPreferredSize(new Dimension(190, 15));
+	infoLabel.setMaximumSize(new Dimension(190, 15));
+	infoLabel.setMinimumSize(new Dimension(190, 15));
+
+	labelPanel.add(displayMouseLabel);
+	labelPanel.add(Box.createHorizontalGlue());
+	labelPanel.add(infoLabel);
+	
+	setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
+	add(labelPanel);
+	add(Box.createVerticalGlue());
+	/*********************************/
+
 	validate();
 	
 	model.addBpfListener(new BpfDataListener() {
@@ -70,7 +90,9 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		public void pointsChanged() {
 		    BpfEditor.this.repaint();
 		}
-		public void cleared(){BpfEditor.this.repaint();}
+		public void cleared(){
+		    BpfEditor.this.repaint();
+		}
 	    });
 
 	geometry.addTranspositionListener(new TranspositionListener() {
@@ -202,7 +224,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
     private void createGraphicContext(Geometry geometry, FtsBpfObject model, BpfToolManager manager)
     {
-	gc = new BpfGraphicContext(model, new BpfSelection(model)); //loopback?
+	gc = new BpfGraphicContext(model); //loopback?
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
 	ad = new BpfAdapter(geometry, gc);
@@ -212,7 +234,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 	gc.setRenderManager(renderer);
 	gc.setToolManager(manager);
 	
-	gc.setDisplay(displayLabel);
+	gc.setDisplay(displayMouseLabel, infoLabel);
     }
 
     public void setAdapter(BpfAdapter adapter)
@@ -361,7 +383,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
     MaxVector oldElements = new MaxVector();
     BpfTableDialog listDialog = null;
-    JLabel displayLabel;
+    JLabel displayMouseLabel, infoLabel;
 }
 
 

@@ -55,7 +55,8 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 
   protected  BpfDataModel itsModel;
   protected BpfPoint lastSelectedPoint = null;
-
+  protected BpfGraphicContext gc;
+  
   // Implementation notes: 
   // The ListSelectionModel, and then the SequenceSelection, 
   // are based on indexes, while the identity
@@ -64,9 +65,10 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
   // This imposes some extra-care while dealing with moving and deleting 
   // operation.
   // See also the notes in the objectMoved call.
-  public BpfSelection(BpfDataModel model) 
+  public BpfSelection(BpfDataModel model, BpfGraphicContext gc) 
   {
     itsModel = model;
+    this.gc = gc;
     setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION) ;
     model.addBpfListener(this);
   }
@@ -76,6 +78,7 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
   public void addSelectionInterval(int index1, int index2)
   {
     super.addSelectionInterval(index1, index2);
+    gc.displaySelectionInfo();
   }
 
   /**
