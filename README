@@ -1,6 +1,41 @@
 
-This is the first release of jMax 2.2 with saving/loading patches
-in binary file format. 
+jMax
 
-Release information will be provided via mail.
+(C) Copyright Ircam 1994, 1995, 1998
 
+
+Introduction
+
+jMax (``Java Max'') is a graphical programming environment 
+for developing real-time, interactive audio applications. 
+
+
+Installation and requirements
+
+See file installation.html in documentation directory for installation
+instructions.
+
+jMax requires the Java Development Kit or Java Runtime Environment.
+See file installation.html for further information.
+
+
+License Agreement
+
+See the file LICENSE for information on usage, redistribution
+of this software and for DISCLAIMER OF ALL WARRANTIES.
+
+
+Contact
+
+jMax home page: http://www.ircam.fr/jmax
+Ircam Forum: http://www.ircam.fr/departements/valorisation/forum/index-e.html
+
+jMax mail: jmax@ircam.fr
+
+
+
+The jMax team.
+François Déchelle
+Maurizio De Cecco
+Enzo Maggi
+Norbert Schnell
