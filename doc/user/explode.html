@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-<TITLE> jMax documentation </TITLE>
+   <TITLE> jMax documentation </TITLE>
 </HEAD>
 
 <BODY TEXT="#000000" BGCOLOR="#FFFFFF">
@@ -10,7 +10,7 @@
 <BR>
 <BR>
 
-<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TABLE CELLSPACING=0 CELLPADDING=0 >
 <TR>
 <TD ALIGN=CENTER VALIGN=TOP>
 <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
@@ -22,24 +22,63 @@
 
 <TD ALIGN=LEFT VALIGN=MIDDLE>
 <DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html">Documentation</A>
+<DT><IMG SRC="../images/dot.gif"> <A HREF="../index.html">Documentation</A>
+</DT>
+
 <DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html">User documentation</A>
+<DT><IMG SRC="../images/dot.gif"> <A HREF="index.html">User
+documentation</A> </DT>
+
 <DL>
-<DT> <IMG SRC="../images/dot.gif"> <A HREF="editors.html">Editors</A>
+<DT><IMG SRC="../images/dot.gif"> <A HREF="editors.html">Editors</A>
+</DT>
+
 <DL>
-<DT> <IMG SRC="../images/arrow_grey.gif"> <B><FONT SIZE=+2>Explode editor</FONT></B>
+<DT><IMG SRC="../images/arrow_grey.gif"> <B><FONT SIZE=+2>Explode
+editor</FONT></B> </DT>
 </DL>
 </DL>
 </DL>
 </DL>
 </TD>
-
 </TR>
 </TABLE>
 
-
 <HR>
+
+<UL>
+<LI><A HREF="#Introduction">Introduction</A></LI>
+
+<LI><A HREF="#The toolbar">Toolbar</A></LI>
+
+<LI><A HREF="#The status bar">Status bar</A></LI>
+
+<LI><A HREF="#The score panel">Score panel</A></LI>
+
+<LI><A HREF="#The tools">Tools</A></LI>
+
+<UL>
+<LI><A HREF="#Arrow tool">Arrow</A></LI>
+
+<LI><A HREF="#Adder tool">Adder</A></LI>
+
+<LI><A HREF="#Eraser tool">Eraser</A></LI>
+
+<LI><A HREF="#Vertical and Horizontal mover tools">Vertical and horizontal
+movers</A></LI>
+
+<LI><A HREF="#Zoomer tool">Zoomer</A></LI>
+</UL>
+
+<LI><A HREF="#Zoom and scroll sliders">Zoom and scroll sliders</A></LI>
+
+<LI><A HREF="#The settings panel">Settings panel</A></LI>
+</UL>
+
+<P>
+<HR WIDTH="100%"></P>
+
+<H2><A NAME="Introduction"></A>Introduction</H2>
 
 <P>The aim of this editor is to represent the data contained in an <I>explode</I>
 object. It is activated with a double-click on the corresponding object
@@ -64,19 +103,7 @@ consists of:</P>
 <P>The explode editor allow the visualization of events under a &quot;piano-roll&quot;
 representation.</P>
 
-<H2>The editor window</H2>
-
-<P>The following components are present in an explode window:</P>
-
-<UL>
-<LI>the <A HREF="#The toolbar">toolbar</A></LI>
-
-<LI>the <A HREF="#The status bar">status bar</A></LI>
-
-<LI>the piano-roll panel (<A HREF="#The score panel">the score</A>)</LI>
-
-<LI>the <A HREF="#Zoom and scroll sliders">zoom and scroll</A> sliders</LI>
-</UL>
+<UL></UL>
 
 <P>Another component, the <A HREF="#The settings panel">setting panel</A>,
 can be retrieved by selecting the options-&gt;settings menu.</P>
@@ -164,7 +191,7 @@ state of the event.</LI>
 <P>The initial, default tool for the explode editor is the selecter (the
 arrow). </P>
 
-<H3>Arrow tool</H3>
+<H3><A NAME="Arrow tool"></A>Arrow tool</H3>
 
 <P>The tasks of the Arrow are the following:</P>
 
@@ -190,7 +217,7 @@ the ssigned parameter for the vertical movements). <I>Upper</I> clipping
 is implemented just for the channel parameter, whose maximum value is 15.</LI>
 </UL>
 
-<H3>Adder tool</H3>
+<H3><A NAME="Adder tool"></A>Adder tool</H3>
 
 <P>This tool, whose icon is a little note, allows entering new notes in
 the explode data base. The status bar reports the current position of the
@@ -232,7 +259,7 @@ a new note will produce an event in the score with </P>
 <LI>channel = 0</LI>
 </UL>
 
-<H3>Eraser tool</H3>
+<H3><A NAME="Eraser tool"></A>Eraser tool</H3>
 
 <P>The icon of this tool is a little blue eraser gum. The status bar reports
 the current mouse coordinates (time, y parameter).</P>
@@ -271,7 +298,7 @@ starting time). Resizing cannot produce negative values for the length.</P>
 parameter (example, the velocity), resizing an event could result in changing
 <I>also</I> its y position, and vice-versa...</P>
 
-<H3>Zoomer tool</H3>
+<H3><A NAME="Zoomer tool"></A>Zoomer tool</H3>
 
 <P>This tool allows the changing of the x zoom factor of the current representation.
 A click everywhere in the score multiply the current zoom factor by two,
