@@ -43,23 +43,8 @@
 #include "tiles/messtile.h"
 #include "tiles/dsptile.h"
 
-
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
-
-
-/* fts_welcome_t: hw or module dependent welcome should be moved in the proper
-   module init function */
-
-static fts_welcome_t version_welcome = {FTS_VERSION_STRING};
-static fts_welcome_t compilation_info_welcome = {COMPILATION_INFO_STRING};
-
-#ifdef DEBUG
-static fts_welcome_t debug_welcome = {"compiled for DEBUG\n"};
-static char platform_name[256];
-static fts_welcome_t platform_welcome = { platform_name};
-#endif
-
 
 
 int main(int argc, char **argv)
@@ -86,20 +71,6 @@ int main(int argc, char **argv)
       argv++;
     }
 
-  /* Install the basic welcome messages */
-  /* fts_add_welcome(&version_welcome); */
-  /* fts_add_welcome(&compilation_info_welcome); */
-  post( "%s\n", FTS_VERSION_STRING);
-  post( "%s\n", COMPILATION_INFO_STRING);
-
-#ifdef DEBUG
-  /* fts_add_welcome(&debug_welcome);*/
-  post( "compiled for DEBUG\n");
-
-  post( "%s\n", FTS_ARCH_NAME);
-  /* fts_add_welcome( &platform_welcome); */
-#endif
-
   /* platform specific initialization */
   fts_platform_init();
 
@@ -114,10 +85,17 @@ int main(int argc, char **argv)
    */
   fts_assign_boot_devices(argc, argv);
 
-  /* The client device should be there, so try to flush the
-   * post buffer
+  /* The client device should be there, so we can post the initial messages.
+   * If previous post() are pending, it will flush them to the client device.
    */
-  post_flush();
+  post( "%s\n", FTS_VERSION_STRING);
+  post( "%s\n", COMPILATION_INFO_STRING);
+
+#ifdef DEBUG
+  post( "compiled for DEBUG\n");
+
+  post( "%s\n", FTS_ARCH_NAME);
+#endif
 
   /* After module initialization, compile the scheduler list */
   fts_sched_compile();
