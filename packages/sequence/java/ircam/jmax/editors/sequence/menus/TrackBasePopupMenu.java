@@ -24,10 +24,12 @@ package ircam.jmax.editors.sequence.menus;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
@@ -50,6 +52,7 @@ public class TrackBasePopupMenu extends JPopupMenu
   JSlider maxSlider, minSlider;
   Box maxBox, minBox;
   MoveTrackToAction moveToAction;
+  public EditorAction cutAction, copyAction, duplicateAction;
 
   public TrackBasePopupMenu( TrackBaseEditor editor, boolean isInSequence)
   {
@@ -124,6 +127,24 @@ public class TrackBasePopupMenu extends JPopupMenu
 	add(removeItem);
       }
 
+    if(JMaxApplication.getProperty("no_menus") != null)
+    {
+      addSeparator();
+
+      add( Actions.undoAction);
+      add( Actions.redoAction);
+
+      addSeparator();
+
+      cutAction = new Actions.CutAction();
+      copyAction = new Actions.CopyAction();
+      duplicateAction = new Actions.DuplicateAction();
+      add(cutAction);
+      add(copyAction);
+      add(Actions.pasteAction);
+      add(duplicateAction);
+    }
+
     addSeparator();
     item = new JMenuItem("Export Track");
     item.addActionListener(new ActionListener(){
@@ -168,6 +189,9 @@ public class TrackBasePopupMenu extends JPopupMenu
       updateMoveToMenu();
     
     updateViewMenu();
+
+    if(JMaxApplication.getProperty("no_menus") != null)
+      updateCutCopyPaste();
   }
 
   void updateMoveToMenu()
@@ -193,7 +217,26 @@ public class TrackBasePopupMenu extends JPopupMenu
 	trackCount = count;
       }
   }
-    
+
+
+  void updateCutCopyPaste()
+  {
+    if((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()))
+    {
+      //Empty selection
+      cutAction.setEnabled(false);
+      copyAction.setEnabled(false);
+      duplicateAction.setEnabled(false);
+    }
+    else
+    {
+      // Object selection
+      cutAction.setEnabled(true);
+      copyAction.setEnabled(true);
+      duplicateAction.setEnabled(true);
+    }
+  }
+  
   class SetViewAction extends AbstractAction {
     SetViewAction(int viewType, TrackBaseEditor editor)
     {

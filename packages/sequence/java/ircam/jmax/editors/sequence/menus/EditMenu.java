@@ -30,7 +30,6 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
 
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.actions.*;
@@ -43,12 +42,9 @@ public class EditMenu extends EditorMenu
 {
   EditorContainer container;
 
-  public EditorAction cutAction       			= new Actions.CutAction();
-  public EditorAction copyAction      			= new Actions.CopyAction();
-  public EditorAction pasteAction     			= new Actions.PasteAction();
-  public EditorAction duplicateAction 			= new Actions.DuplicateAction();
-  public EditorAction undoAction				= new Actions.UndoAction();
-  public EditorAction redoAction				= new Actions.RedoAction(); 
+  public EditorAction cutAction       	  = new Actions.CutAction();
+  public EditorAction copyAction          = new Actions.CopyAction();
+  public EditorAction duplicateAction 	  = new Actions.DuplicateAction();
 
   public EditMenu(EditorContainer container)
   {
@@ -59,38 +55,21 @@ public class EditMenu extends EditorMenu
     setHorizontalTextPosition(AbstractButton.LEFT);
     setMnemonic(KeyEvent.VK_E);
 
-    add(undoAction);
-    add(redoAction);
+    add(Actions.undoAction);
+    add(Actions.redoAction);
     addSeparator();
     add(cutAction);
     add(copyAction);
-    add(pasteAction);
+    add(Actions.pasteAction);
     add(duplicateAction);
-
-    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
-    DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
-    pasteAction.setEnabled((flavors != null) &&
-                           clipboardContent.isDataFlavorSupported(SequenceDataFlavor.getInstance()));
   }
 
   public void updateMenu()
   {
-/*
-    if((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()))
-      {
-	//Empty selection	
-	cutAction.setEnabled(false);
-	copyAction.setEnabled(false);
-	duplicateAction.setEnabled(false);
-      }
-    else
-      {
-	// Object selection
-	cutAction.setEnabled(true);
-	copyAction.setEnabled(true);
-	duplicateAction.setEnabled(true);
-      }
-*/
+    boolean enable = !((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()));
+    cutAction.setEnabled(enable);
+    copyAction.setEnabled(enable);
+    duplicateAction.setEnabled(enable);
   }
 }
 

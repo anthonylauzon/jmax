@@ -39,7 +39,19 @@ public class Actions
 {
   public static EditorAction exportAction    = new ExportAction();
   public static EditorAction importAction    = new ImportAction();
+  public static EditorAction cutAction       = new CutAction();
+  public static EditorAction copyAction      = new CopyAction();
+  public static EditorAction duplicateAction = new DuplicateAction();
+  public static EditorAction pasteAction     = new PasteAction();
+  public static EditorAction undoAction      = new UndoAction();
+  public static EditorAction redoAction      = new RedoAction();
 
+  public static EditorAction removeTrackAction  = new RemoveTrackAction();
+
+  //******** Merge reintroduction *******************//
+  public static EditorAction mergeAction     = new MergeAction();
+  public static EditorAction moveClosedTrackToAction = new MoveClosedTrackToAction();
+  
   public static class CutAction extends EditorAction
   {
     public CutAction()
@@ -105,21 +117,15 @@ public class Actions
 
    public static class RedoAction extends EditorAction
    {
-	  public RedoAction()
-		 {
-			super("Redo", null, KeyEvent.VK_R, KeyEvent.VK_Y, true);
-		 }
-      public void doAction(EditorContainer container)
-      {
-	((SequenceEditor)container.getEditor()).redo();
-      }
+     public RedoAction()
+     {
+       super("Redo", null, KeyEvent.VK_R, KeyEvent.VK_Y, true);
+     }
+     public void doAction(EditorContainer container)
+     {
+       ((SequenceEditor)container.getEditor()).redo();
+     }
    }
-
-  public static EditorAction removeTrackAction  = new RemoveTrackAction();
-
-  //******** Merge reintroduction *******************//
-  public static EditorAction mergeAction     = new MergeAction();
-  public static EditorAction moveClosedTrackToAction = new MoveClosedTrackToAction();
 }
 
 

@@ -22,9 +22,12 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.actions.*;
 import ircam.jmax.editors.sequence.tools.*;
 import ircam.jmax.editors.sequence.track.Event;
 import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.editors.sequence.menus.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -269,23 +272,13 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void copy()
   {
     ((ClipableData) trackData).copy();
-
-    if(itsContainer instanceof TrackWindow && (JMaxApplication.getProperty("no_menus") == null))
-    {
-      TrackWindow window = (TrackWindow)itsContainer;
-      window.getEditMenu().pasteAction.setEnabled(true);
-    }    
+    Actions.pasteAction.setEnabled(true);
   }
 
   public void cut()
   {
     ((ClipableData) trackData).cut();
-
-    if(itsContainer instanceof TrackWindow && (JMaxApplication.getProperty("no_menus") == null))
-    {
-      TrackWindow window = (TrackWindow)itsContainer;
-      window.getEditMenu().pasteAction.setEnabled(true);
-    }
+    Actions.pasteAction.setEnabled(true);
   }
 
   public void paste()
@@ -375,13 +368,13 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
       makeVisible(evt);
     }
-
-    if(itsContainer instanceof TrackWindow && (JMaxApplication.getProperty("no_menus") == null))
+    
+    if(JMaxApplication.getProperty("no_menus") == null)
     {
-      TrackWindow window = (TrackWindow)itsContainer;
-      window.getEditMenu().copyAction.setEnabled(numSelected > 0);
-      window.getEditMenu().cutAction.setEnabled(numSelected > 0);
-      window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
+      EditMenu menu = ((TrackWindow)itsContainer).getEditMenu();
+      menu.copyAction.setEnabled(numSelected > 0);
+      menu.cutAction.setEnabled(numSelected > 0);
+      menu.duplicateAction.setEnabled(numSelected > 0);
     }
   }
     

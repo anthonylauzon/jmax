@@ -1075,7 +1075,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     if (SequenceSelection.getCurrent().getModel() != this) 
       return;
     SequenceSelection.getCurrent().prepareACopy();
-    JMaxApplication.getSystemClipboard().setContents( SequenceSelection.getCurrent(), this);
+    SequenceClipboard.getClipboard().setContents( SequenceSelection.getCurrent(), this);
   }  
     
   public void paste()
@@ -1083,7 +1083,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     if (SequenceSelection.getCurrent().getModel() != this) 
       return;
 
-    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
+    Transferable clipboardContent = SequenceClipboard.getClipboard().getContents(this);
     Enumeration objectsToPaste = null;
 
     if (clipboardContent != null && areMyDataFlavorsSupported(clipboardContent))

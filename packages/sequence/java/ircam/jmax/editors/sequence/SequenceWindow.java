@@ -29,7 +29,6 @@ import java.awt.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
@@ -51,7 +50,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
   public final static int DEFAULT_WIDTH  = 800;
   public final static int DEFAULT_HEIGHT = 553;
   public final static int MAX_HEIGHT     = 800;
-  public final static int EMPTY_HEIGHT   = /*94*/92;
+  public final static int EMPTY_HEIGHT   = 92;
   /**
    * Constructor with FtsSequenceObject
    */

@@ -24,6 +24,7 @@ package ircam.jmax.editors.sequence;
 import ircam.jmax.editors.sequence.tools.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.track.Event;
+import ircam.jmax.editors.sequence.actions.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import javax.swing.*;
@@ -49,7 +50,6 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   FtsSequenceObject ftsSequenceObject;
   SequenceDataModel sequenceData;
   transient EditorContainer itsContainer;
-   private EditMenu editMenu;
   transient public SequenceRuler ruler;
   
   Box trackPanel;
@@ -76,13 +76,6 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   {  
     itsContainer = container;
     sequenceData = data;
-
-    if(itsContainer instanceof SequenceWindow && (JMaxApplication.getProperty("no_menus") == null))
-    {
-      SequenceWindow window = (SequenceWindow)itsContainer;
-      editMenu = window.getEditMenu();
-    }
-
     setDoubleBuffered(false);
     ftsSequenceObject = (FtsSequenceObject)data;
     ftsSequenceObject.addTrackListener(this);
@@ -467,8 +460,9 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     if(track!=null)
     {
       ((ClipableData) track.getTrackDataModel()).copy();
+
       if(JMaxApplication.getProperty("no_menus") == null)
-        editMenu.pasteAction.setEnabled(true);
+        Actions.pasteAction.setEnabled(true);
     }
   }
 
@@ -479,7 +473,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     {
       ((ClipableData) track.getTrackDataModel()).cut();
       if(JMaxApplication.getProperty("no_menus") == null)
-        editMenu.pasteAction.setEnabled(true);
+        Actions.pasteAction.setEnabled(true);
     }
   }
   
@@ -488,7 +482,6 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     Track track = mutex.getCurrent();
     if(track!=null)
       ((ClipableData) track.getTrackDataModel()).paste();
-
   }
   
   public void duplicate()
@@ -574,17 +567,17 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
       }
 
    if(itsContainer instanceof SequenceWindow && (JMaxApplication.getProperty("no_menus") == null))
-     {
-       SequenceWindow window = (SequenceWindow)itsContainer;
-       window.getEditMenu().copyAction.setEnabled(numSelected > 0);
-       window.getEditMenu().cutAction.setEnabled(numSelected > 0);
-       window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
-     }
+   {
+     SequenceWindow window = (SequenceWindow)itsContainer;
+     window.getEditMenu().copyAction.setEnabled(numSelected > 0);
+     window.getEditMenu().cutAction.setEnabled(numSelected > 0);
+     window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
+   }
   }
-    
-    public boolean eventIsVisible(Event evt)
-    {
-	int time = (int)evt.getTime();
+
+  public boolean eventIsVisible(Event evt)
+  {
+    int time = (int)evt.getTime();
 	int duration = ((Double)evt.getProperty("duration")).intValue();
 	int startTime = -geometry.getXTransposition(); 
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
