@@ -85,7 +85,7 @@ FTS_API void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t
  * @ingroup post
  */
 FTS_API void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj);
-
+FTS_API void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t *at);
 /**
  * Print a log message.
  * Log messages are printed in a file, located in user's home directory

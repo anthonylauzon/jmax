@@ -52,3 +52,9 @@ struct fts_patcher
 #define fts_patcher_is_open(p)     ((p)->open)
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
+
+
+
+
+
+

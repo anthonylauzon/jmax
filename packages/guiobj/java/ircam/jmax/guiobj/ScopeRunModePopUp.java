@@ -66,6 +66,8 @@ public class ScopeRunModePopUp extends JPopupMenu
   {
     popup.target = obj;
     popup.controlPanel.update(obj);    
+    popup.revalidate();
+    popup.pack();
   }
 }
 

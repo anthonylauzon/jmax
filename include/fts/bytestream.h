@@ -409,6 +409,8 @@ typedef struct _fts_memorystream_t fts_memorystream_t;
 
 /*@}*/
 
+void fts_memorystream_output_char(fts_bytestream_t *stream, unsigned char c);
+
 /**
  * Returns the characters written to the stream as an array. The array is not
  * allocated; instead, the internal buffer itself is returned.

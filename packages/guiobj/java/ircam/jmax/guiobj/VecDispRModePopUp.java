@@ -67,6 +67,8 @@ public class VecDispRModePopUp extends JPopupMenu
   {
     popup.target = obj;
     popup.controlPanel.update(obj);    
+    popup.revalidate();
+    popup.pack();
   }
 }
 

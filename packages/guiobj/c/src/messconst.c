@@ -111,6 +111,12 @@ messconst_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
+messconst_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+}
+
+static void
 messconst_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_ui_property_changed(o, fts_s_value);
@@ -187,6 +193,7 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, messconst_send_properties); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, messconst_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, messconst_spost_description); 
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, messconst_send);
   

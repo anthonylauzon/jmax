@@ -93,10 +93,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     prepareGraphicContext();
     itsCenterPanel.setGraphicContext(gc);
 
-    /*scalePanel = new ScalePanel(gc);
-      scalePanel.setBorder(new EtchedBorder());
-      add(scalePanel, BorderLayout.WEST);*/	    
-
     //... the renderer
     itsTableRenderer = new TableRenderer(gc);
     itsCenterPanel.setRenderer(itsTableRenderer);
@@ -209,36 +205,36 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     TableAdapter ta = new TableAdapter(tableData, itsCenterPanel.getSize(), gc.getVerticalMaximum());
 
     ta.addXZoomListener(new ZoomListener() {
-	    public void zoomChanged(float zoom, float oldZoom)
+	public void zoomChanged(float zoom, float oldZoom)
+	{
+	  gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+						    zoom, gc.getVisiblePixelsSize());
+	  updateHorizontalScrollbar();
+	  
+	  if(zoom > 0.5)
 	    {
-		gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-							  zoom, gc.getVisiblePixelsSize());
-		updateHorizontalScrollbar();
-
-		if(zoom > 0.5)
-		    {
-			if(oldZoom-zoom>0)
-			    {
-				int lvi = gc.getLastVisibleIndex()+10;
-				int lastId =  gc.getFtsObject().getLastUpdatedIndex();
-				if(lvi > lastId)
-				    gc.getFtsObject().requestGetValues(lastId, lvi);
-				else repaint();
-			    }		
-			else 
-			    repaint();
-		    }
-		else
-		  gc.getFtsObject().requestGetPixels(0, 0);
-	    }
-	});
-    ta.addYZoomListener(new ZoomListener() {
-	    public void zoomChanged(float zoom, float old)
-	    {
-		updateVerticalScrollbar();
+	      if(oldZoom-zoom>0)
+		{
+		  int lvi = gc.getLastVisibleIndex()+10;
+		  int lastId =  gc.getFtsObject().getLastUpdatedIndex();
+		  if(lvi > lastId)
+		    gc.getFtsObject().requestGetValues(lastId, lvi);
+		  else repaint();
+		}		
+	      else 
 		repaint();
 	    }
-	});
+	  else
+	    gc.getFtsObject().requestGetPixels(0, 0);
+	}
+      });
+    ta.addYZoomListener(new ZoomListener() {
+	public void zoomChanged(float zoom, float old)
+	{
+	  updateVerticalScrollbar();
+	  repaint();
+	}
+      });
 
     gc.setAdapter(ta);
     //gc.setStatusBar(itsStatusBar);
@@ -284,8 +280,11 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
 	    itsVerticalControl.setEnabled(true);
 	    itsVerticalControl.setVisible(true);		      
 	  }
+	int oldAmount = itsVerticalControl.getVisibleAmount();
+	int oldValue = itsVerticalControl.getValue();
 	itsVerticalControl.setVisibleAmount(verticalScope);
-	itsVerticalControl.setValue(-Math.round(start0/gc.getAdapter().getYZoom()));
+	//itsVerticalControl.setValue(-Math.round(start0/gc.getAdapter().getYZoom()));
+	itsVerticalControl.setValue( oldValue*verticalScope/oldAmount);
       }    
   }
   private int hScrollVal = 0;

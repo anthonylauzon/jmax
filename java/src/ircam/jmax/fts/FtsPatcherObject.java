@@ -196,7 +196,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setDescription"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPatcherObject)obj).setDescription( args.getLength(), args.getAtoms());
+	  ((FtsPatcherObject)obj).setDescription( args.getString( 0));
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWX"), new FtsMessageHandler(){
@@ -324,7 +324,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public FtsPatcherObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
   {
-    super(server, parent, id, className, FtsUnparse.unparseArguments( args, offset+1, length-1));
+    super(server, parent, id, className, (length > 0) ? args[offset].stringValue : null);
   }
 
   public FtsPatcherObject() throws IOException
@@ -872,18 +872,20 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     String errorDescription = "";
     String className = null;
 
-    boolean isTemplate = (args[10].intValue == 1);
-    int offset = 11;
+    boolean isTemplate;
+    int offset = 9;
 
     if(error!=0)
       {
-	errorDescription = args[9].stringValue;
+	errorDescription = args[offset++].stringValue;
 	
-	if((offset<nArgs) && args[offset].isSymbol()) 
-	  className = args[offset].symbolValue.toString();
+	if((offset < nArgs) && args[offset+1].isString()) 
+	  className = args[offset+1].stringValue;
       }    
-    else 
-      className = args[9].symbolValue.toString();
+    else
+      className = args[offset++].symbolValue.toString();
+
+    isTemplate = (args[offset++].intValue == 1);
 
     GraphicObject newObj;
     
@@ -1014,9 +1016,9 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     connections.removeAllElements();
   }
 
-  public void setDescription(int nArgs, FtsAtom args[])
+  public void setDescription(String descr)
   {
-    this.description = FtsUnparse.unparseArguments(args, 0, nArgs);
+    this.description = descr;
     if(getGraphicListener()!=null) getGraphicListener().redefined(this);
     if(getEditorFrame() != null) ((ErmesSketchWindow)getEditorFrame()).updateTitle(); 
   }

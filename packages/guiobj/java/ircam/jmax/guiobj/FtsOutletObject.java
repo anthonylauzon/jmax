@@ -49,7 +49,7 @@ public class FtsOutletObject  extends FtsGraphicObject
 
   public FtsOutletObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
   {
-    super(server, parent, id, className, FtsUnparse.unparseArguments(args, offset+1, length-1));
+    super(server, parent, id, className, args[offset].stringValue);
 
     ninlets = 1;
     noutlets = 0;

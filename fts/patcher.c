@@ -196,6 +196,12 @@ inlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fprintf( file, "#P inlet %d %d %d;\n", fts_get_int( &xa), fts_get_int( &ya), fts_get_int( &wa));
 }
 
+static void 
+inlet_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+}
+
 static fts_status_t
 inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -208,6 +214,7 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, inlet_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, inlet_delete);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, inlet_save_dotpat); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_spost_description, inlet_spost_description); 
       
       fts_class_define_thru(cl, 0);
       
@@ -310,6 +317,12 @@ outlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fprintf( file, "#P outlet %d %d %d;\n", fts_get_int( &xa), fts_get_int( &ya), fts_get_int( &wa));
 }
 
+static void 
+outlet_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+}
+
 static void
 outlet_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -334,7 +347,8 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, outlet_delete);
       
       fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, outlet_save_dotpat); 
-      
+      fts_method_define_varargs( cl, fts_SystemInlet, fts_s_spost_description, outlet_spost_description); 
+
       fts_class_define_thru(cl, outlet_propagate_input);
       
       fts_method_define_varargs(cl, 0, fts_s_anything, outlet_anything);
@@ -1176,6 +1190,15 @@ patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj, fts_symb
     fts_set_symbol(value, fts_s_patcher);
 }
 
+static void 
+patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if( !fts_object_is_error( o))
+    fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+  else
+    fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
+}
+
 /*
  * The remote functions
  */
@@ -1316,10 +1339,22 @@ fts_patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_patcher_upload_object( o, fts_get_object(&at[0]));
 }
 
+static fts_memorystream_t *patcher_memory_stream ;
+
+static fts_memorystream_t * patcher_get_memory_stream()
+{
+  if(!patcher_memory_stream)
+    patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, 0, 0);
+  return patcher_memory_stream;
+}
+
 void 
 fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 {
   fts_atom_t a[9];
+  fts_atom_t b[1];
+  fts_memorystream_t *stream;
+  fts_status_t stat;
 
   if(fts_object_get_class_name(obj) == fts_s_connection)
     {
@@ -1366,7 +1401,18 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       
       fts_client_add_int( this, fts_object_is_template(obj));
 
-      fts_client_add_atoms( this, obj->argc, obj->argv);
+      stream = patcher_get_memory_stream();
+      fts_memorystream_reset( stream);
+      
+      fts_set_object( b, stream);
+      stat = fts_send_message( obj, fts_SystemInlet, fts_s_spost_description, 1, b);
+      if(stat != fts_Success)
+	{
+	  fts_spost_object_description( (fts_bytestream_t *)stream, obj);
+	}
+      fts_memorystream_output_char((fts_bytestream_t *)stream,'\0');
+      fts_client_add_string( this, fts_memorystream_get_bytes( stream));
+
       fts_client_done_message( this);
 
       fts_object_get_prop(obj, fts_s_font, a);
@@ -1431,7 +1477,9 @@ static void
 fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
-  
+  fts_memorystream_t *stream;  
+  fts_atom_t a[1];
+
   if (ac >= 0)
     {
       fts_atom_t argv[512];
@@ -1456,7 +1504,14 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
 
       fts_patcher_redefine(this, argc, argv);
 
-      fts_client_send_message((fts_object_t *)this, sym_setDescription, argc - 1, argv + 1);
+      stream = patcher_get_memory_stream();
+      fts_memorystream_reset( stream);
+      fts_spost_object_description_args( (fts_bytestream_t *)stream, argc - 1, argv + 1);
+      fts_memorystream_output_char((fts_bytestream_t *)stream,'\0');
+      fts_set_string( a,  fts_memorystream_get_bytes( stream));
+      fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, a);
+
+      /*fts_client_send_message((fts_object_t *)this, sym_setDescription, argc - 1, argv + 1);*/
     
       fts_patcher_set_dirty((fts_patcher_t *)o, 1);
     }
@@ -1686,6 +1741,8 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 			    fts_patcher_redefine_from_client);
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_new_symbol("save_dotpat_file"), patcher_save_dotpat_file); 
+
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_spost_description, patcher_spost_description); 
 
   /* daemon for properties */
   fts_class_add_daemon(cl, obj_property_get, fts_s_patcher_type, patcher_get_patcher_type);

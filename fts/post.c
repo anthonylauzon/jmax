@@ -223,18 +223,18 @@ static void init_punctuation( void)
 
 void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
 {
-  int ac;
-  fts_atom_t *at;
+  fts_spost_object_description_args( stream, fts_object_get_description_size( obj), fts_object_get_description_atoms( obj));
+}
+
+void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t *at)
+{
   int do_new_line = 0;
   int add_blank = 0;
   fts_atom_t *value1;
   fts_atom_t *value2;
   int i;
 
-  ac = fts_object_get_description_size( obj);
-  at = fts_object_get_description_atoms( obj);
-
-  if (ac == 0)
+  if (ac <= 0)
     return;
   
   value2 = at;

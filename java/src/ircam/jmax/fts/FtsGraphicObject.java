@@ -138,7 +138,7 @@ public class FtsGraphicObject extends FtsObject {
   
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
-    this( server, parent, id, className, FtsUnparse.unparseArguments(args, offset, length));
+    this( server, parent, id, className, args[offset].stringValue);
   }
 
   public FtsGraphicObject(FtsServer server, FtsObject parent, int id, String className, String description)

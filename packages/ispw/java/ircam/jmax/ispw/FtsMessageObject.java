@@ -62,7 +62,7 @@ public class FtsMessageObject extends FtsIntValueObject
   
   public FtsMessageObject(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, objId, className, FtsUnparse.unparseArguments(args, offset+1, length-1));
+    super(server, parent, objId, className, args[offset].stringValue);
     
     setNumberOfInlets(1);
     setNumberOfOutlets(1);
