@@ -57,6 +57,11 @@ set jmaxHost "local"
 
 set jmaxNoConsole "false"
 
+
+## By default, show the register panel
+
+set jmaxNoRegister "false"
+
 ##
 ## Set the system packages path
 ##
