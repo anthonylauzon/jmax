@@ -87,6 +87,7 @@ public class MidiConfigPanel extends JPanel implements Editor
         midiTable.clearSelection();
         if( midiTable.getCellEditor() != null)
           midiTable.getCellEditor().cancelCellEditing();
+        midiTable.transferFocus();
       }
     });
 
