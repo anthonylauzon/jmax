@@ -20,13 +20,56 @@
  *
  */
 #include <fts/fts.h>
-#include <ftsconfig.h>
-
 #include "vec.h"
 #include "ivec.h"
 #include "fvec.h"
 #include "mat.h"
-#include "bpf.h"
+
+/******************************************************
+ *
+ *  object
+ *
+ */
+
+typedef struct 
+{
+  fts_object_t o;
+  fts_atom_t a;
+} copy_t;
+
+static void
+copy_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  copy_t *this = (copy_t *)o;
+
+  ac--;
+  at++;
+
+  fts_set_void(&this->a);
+  fts_atom_assign(&this->a, at);
+}
+
+static void
+copy_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  copy_t *this = (copy_t *)o;
+
+  fts_atom_void(&this->a);
+}
+
+/******************************************************
+ *
+ *  user methods
+ *
+ */
+
+static void
+copy_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  copy_t *this = (copy_t *)o;
+
+  fts_atom_assign(&this->a, at);
+}
 
 /* int vector */
 
@@ -116,14 +159,48 @@ copyto_fvec_from_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_outlet_send(o, 0, fvec_symbol, 1, &this->a);
 }
 
-static void
-copyto_bpf_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+/******************************************************
+ *
+ *  class
+ *
+ */
+
+static fts_status_t
+copyto_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  copy_t *this = (copy_t *)o;
-  bpf_t *this_bpf = bpf_atom_get(&this->a);
-  bpf_t *in_bpf = bpf_atom_get(at);
+  fts_symbol_t a[3];
 
-  bpf_copy(in_bpf, this_bpf);
+  if(ac == 2)
+    {
+      fts_class_init(cl, sizeof(copy_t), 2, 1, 0); 
+      
+      /* init/delete */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, copy_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, copy_delete);
+      
+      if(ivec_atom_is(at + 1))
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, copyto_ivec_from_ivec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, copyto_ivec_from_fvec);
+	  fts_method_define_varargs(cl, 1, ivec_symbol, copy_set_reference);
+	}
+      else if(fvec_atom_is(at + 1))
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, copyto_fvec_from_ivec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, copyto_fvec_from_fvec);
+	  fts_method_define_varargs(cl, 1, fvec_symbol, copy_set_reference);
+	}
+      else
+	return &fts_CannotInstantiate;
+    }
+  else
+    return &fts_CannotInstantiate;
+  
+  return fts_Success;
+}
 
-  fts_outlet_send(o, 0, bpf_symbol, 1, &this->a);
+void
+copy_config(void)
+{
+  fts_metaclass_install(fts_new_symbol("copyto"), copyto_instantiate, fts_arg_type_equiv);
 }

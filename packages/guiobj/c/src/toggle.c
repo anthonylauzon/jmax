@@ -29,72 +29,81 @@
 typedef struct
 {
   fts_object_t o;
-  int n;
+  long n;
 } toggle_t;
 
 
-static void 
-toggle_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void toggle_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_property_changed(o, fts_s_value);
 }
 
 
-static void 
-toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void toggle_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_ui_property_changed(o, fts_s_value);
+}
+
+static void toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   toggle_t *this = (toggle_t *) o;
+  int v;
 
-  if(ac > 0 && fts_is_number(at))
+  v = fts_get_number_int(at);
+
+  this->n = (v ? 1 : 0);
+
+  fts_outlet_int(o, 0, this->n);
+
+  fts_object_ui_property_changed(o, fts_s_value);
+}
+
+static void toggle_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  toggle_t *this = (toggle_t *) o;
+  int v;
+
+  if(fts_is_number(at))
     {
-      int n = (fts_get_number_int(at) != 0);
+      v = fts_get_number_int(at);
 
-      if(this->n != n)
-	{
-	  this->n = n;
-	  
-	  fts_object_ui_property_changed(o, fts_s_value);
-	}
+      this->n = (v ? 1 : 0);
+
+      fts_outlet_int(o, 0, this->n);
+
+      fts_object_ui_property_changed(o, fts_s_value);
     }
 }
 
-static void 
-toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void toggle_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   toggle_t *this = (toggle_t *) o;
-
-  toggle_set(o, 0, 0, 1, at);
-
-  fts_outlet_int(o, 0, this->n);
-}
-
-static void 
-toggle_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  toggle_t *this = (toggle_t *) o;
-
-  toggle_number(o, 0, 0, 1, at);
-}
-
-static void 
-toggle_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  toggle_t *this = (toggle_t *) o;
-
   this->n = !this->n;
 
-  fts_object_ui_property_changed(o, fts_s_value);
-
   fts_outlet_int(o, 0, this->n);
+
+  fts_object_ui_property_changed(o, fts_s_value);
 }
 
-static void 
-toggle_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+
+static void toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  toggle_t *this = (toggle_t *) o;
+  int v;
+
+  v = fts_get_int_arg(ac, at, 0, 0);
+
+  this->n = (v ? 1 : 0);
+
+  fts_object_ui_property_changed(o, fts_s_value);
+}
+
+static void toggle_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   FILE *file;
   fts_atom_t xa, ya, wa;
 
-  file = (FILE *)fts_get_pointer( at);
+  file = (FILE *)fts_get_ptr( at);
 
   fts_object_get_prop( o, fts_s_x, &xa);
   fts_object_get_prop( o, fts_s_y, &ya);
@@ -103,41 +112,57 @@ toggle_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fprintf( file, "#P toggle %d %d %d;\n", fts_get_int( &xa), fts_get_int( &ya), fts_get_int( &wa) );
 }
 
-static void 
-toggle_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+
+/* property daemon */
+
+static void toggle_get_value(fts_daemon_action_t action, fts_object_t *obj,
+	       fts_symbol_t property, fts_atom_t *value)
 {
   toggle_t *this = (toggle_t *)obj;
 
   fts_set_int(value, this->n);
 }
 
-static fts_status_t 
-toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t toggle_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[1];
+
   fts_class_init(cl, sizeof(toggle_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, toggle_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, toggle_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, toggle_toggle);
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, toggle_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, toggle_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_bang, toggle_bang, 0, a);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, toggle_save_dotpat); 
+  fts_method_define(cl, 0, fts_s_bang, toggle_bang, 0, a);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, toggle_set);
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_int, toggle_number, 1, a);
+  a[0] = fts_s_float;
+  fts_method_define(cl, 0, fts_s_float, toggle_number, 1, a);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, toggle_toggle);
-  fts_method_define_varargs(cl, 0, fts_s_int, toggle_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, toggle_number);
   fts_method_define_varargs(cl, 0, fts_s_list, toggle_list);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_set, toggle_set, 1, a);
+
+  a[0] = fts_s_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, toggle_save_dotpat, 1, a); 
+
+   /* Add  the value daemon */
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, toggle_get_value);
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+  a[0] = fts_s_int;
+  fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
 
   return fts_Success;
 }
 
-void 
-toggle_config(void)
+void toggle_config(void)
 {
   fts_class_install(fts_new_symbol("toggle"),toggle_instantiate);
 }
+
+
+
+

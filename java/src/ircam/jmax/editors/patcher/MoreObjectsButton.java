@@ -30,7 +30,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.*;
 
 //
 // The pop-up button used to display object-buttons in the toolbar when too long
@@ -50,18 +49,18 @@ public class MoreObjectsButton extends JMenuBar
 
       menu = new JMenu("");
       menu.setMargin(new Insets(0, 0, 0, 0));
-      menu.setIcon( JMaxIcons.moreObjects);
+      menu.setIcon(SystemIcons.get("_more_objects_"));
       menu.setPreferredSize(new Dimension(24, 19));
       menu.setMinimumSize(new Dimension(24, 19));
 
       for(Enumeration e = buttons; e.hasMoreElements();)
-	  menu.add((ToolButton)e.nextElement(), 0);
+	  menu.add((ErmesToolButton)e.nextElement(), 0);
       add(menu);
   }
 
   public void update(Enumeration buttons, int size)
   {
-      ToolButton button;
+      ErmesToolButton button;
       int count = menu.getItemCount();
       if(size == count) return;
       if(size>count)
@@ -69,7 +68,7 @@ public class MoreObjectsButton extends JMenuBar
 	      int i=0;
 	      for(Enumeration e = buttons; e.hasMoreElements();)
 		  {
-		      button = (ToolButton)e.nextElement();
+		      button = (ErmesToolButton)e.nextElement();
 
 		      if(i++ >= count)
 			menu.add(button, 0);

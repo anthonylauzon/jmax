@@ -32,7 +32,6 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.editors.console.*;
 
 /**
  * The "system statistics" dialog.
@@ -49,7 +48,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     parent = (Frame)dw;
   
-    control = JMaxApplication.getDspControl();
+    control = MaxApplication.getFts().getDspController();
     
     // Do a gc before giving statistics (added by mdc).    
     System.gc();
@@ -86,7 +85,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     String javaVersion = (String)(System.getProperties().getProperty("java.version")+" "+
 				  System.getProperties().getProperty("java.vendor"));
-    String jmaxVersion = JMaxApplication.getProperty("jmaxVersion");
+    String jmaxVersion = MaxApplication.getProperty("jmaxVersion");
     String osType = System.getProperties().getProperty("os.name")+" "+System.getProperties().getProperty("os.arch");
     String totalMemory = ""+Runtime.getRuntime().totalMemory();
     String usedMemory = "" +(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
@@ -133,9 +132,9 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
     JPanel pValues2 = new JPanel();
     pValues2.setLayout(new BoxLayout(pValues2, BoxLayout.Y_AXIS));
     pValues2.setPreferredSize(new Dimension(prefWidth, fm.getHeight()*2));
-    JLabel value6 = new JLabel(""+control.getSamplingRate());
+    JLabel value6 = new JLabel(control.getSamplingRate().toString());
     pValues2.add(value6);
-    JLabel value7 = new JLabel(""+control.getFifoSize());
+    JLabel value7 = new JLabel(control.getFifoSize().toString());
     pValues2.add(value7);
     
     p12.add(pValues2);

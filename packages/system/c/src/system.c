@@ -17,14 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ *
  */
 
-#include "system.h"
-
-extern void fts_signal_bus_config(void);
+#include <fts/fts.h>
 
 extern void dsp_config(void);
-/*  extern void arch_config(void); */
+extern void arch_config(void);
 
 extern void const_config(void);
 extern void argument_config(void);
@@ -35,20 +38,20 @@ extern void blip_config(void);
 extern void bus_config(void);
 extern void bus_tilda_config(void);
 
-void
-system_config(void)
+static void
+system_module_init(void)
 {
-
-  fts_signal_bus_config();
-
   dsp_config();
-/*    arch_config(); */
+  arch_config();
 
   const_config();
   argument_config();
 
   print_config();
+  blip_config();
 
   bus_config();
   bus_tilda_config();
 }
+
+fts_module_t system_module = {"system", "Basic System Objects", system_module_init, 0, 0};

@@ -240,19 +240,15 @@ public class MessageValue extends AbstractEventValue
 
 	public Class getPropertyType(int index)
 	{
-	    /*if(index < defPropertyCount)
-	      return propertyTypesArray[index];
-	      else
-	      return Integer.class;*/
-	    if(index==0)
-		return String.class;
+	    if(index < defPropertyCount)
+		return propertyTypesArray[index];
 	    else
 		return Integer.class;
 	}
 	
 	
 	String defNamesArray[] = {"message", "integer"};
-	//Class propertyTypesArray[] = {String.class, Integer.class};
+	Class propertyTypesArray[] = {String.class, Integer.class};
 	int defPropertyCount = 2;
     }
 
@@ -326,7 +322,7 @@ public class MessageValue extends AbstractEventValue
 
     //--- Fields
     public static final String fs = File.separator;
-    public static final String MESSAGE_NAME = "seqmess";
+    public static final String MESSAGE_NAME = "message";
     public static final String MESSAGE_PUBLIC_NAME = "message";
     public static MessageValueInfo info = new MessageValueInfo();
     public static final int DEFAULT_WIDTH = 290;
@@ -341,21 +337,14 @@ public class MessageValue extends AbstractEventValue
 
     static 
     {
-	/*
-	  WARNING:
-	  Waiting for a method to get the packagePath from the package name
-	*/
-	/*try
-	  {
-	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	  }
-	  catch(FileNotFoundException e){
-	  //System.err.println("Can't locate sequence images");
-	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	  }*/
-	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-	/*************************************************************/
-	
+	try
+	    {
+		path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+	    }
+	catch(FileNotFoundException e){
+	    //System.err.println("Can't locate sequence images");
+	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	}
 	MESSAGE_ICON = new ImageIcon(path+"message.gif");
     }
 }

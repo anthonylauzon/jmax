@@ -22,10 +22,16 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
+
+## package declaration
 package provide sequence
 
+# load server module
+global jmaxArch jmaxMode
+ucs load module sequence $dir/c/lib/$jmaxArch/$jmaxMode/libsequence.so
+
 # load client java class
-java::load -classpath "$dir/java" ircam.jmax.editors.sequence.SequenceExtension
+java::load -classpath "$dir/java/classes" ircam.jmax.editors.sequence.SequenceExtension
 
 ## load the help patch data base
 sourceFile $dir/help/sequence.help.index.tcl

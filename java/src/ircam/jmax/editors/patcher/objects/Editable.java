@@ -32,7 +32,7 @@ import java.util.*;
 import javax.swing.*;
 
 import ircam.jmax.fts.*;
-import ircam.fts.client.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.editors.patcher.*;
@@ -50,19 +50,19 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   int defaultWidth = -1;
   public ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
-  public Editable(FtsGraphicObject theFtsObject) 
+  public Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    super(theFtsObject);
-    computeRenderer();
-    renderer.update();
-  }
+    super( theSketchPad, theFtsObject);
 
-  public void setDefaults()
-  {
-    //if (getWidth() == -1)     
-    setWidth(getDefaultWidth());
-    /*else
-      updateDimensions();*/
+    computeRenderer();
+    
+    if ((renderer instanceof TextRenderer) && (getWidth() == -1))
+      {
+	renderer.update();
+	setWidth(getDefaultWidth());
+      }
+    else
+      updateDimensions();
   }
 
   public void updateDimensions()
@@ -78,29 +78,37 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     super.setHeightNoConnections(renderer.getHeight() + getTextHeightOffset());
   }
 
+  // By default, get an image renderer if there is an icon named as the class name,
+  // otherwise text.
+
   protected void computeRenderer()
   {
     Renderer r;
+    // Change the renderer if needed
+
+    /*Icon icon = Icons.get(ftsObject.getClassName());
+      
+      if (icon != null)
+      renderer = new IconRenderer(this, icon);
+      else if (! (renderer instanceof TextRenderer))*/
     renderer = new TextRenderer(this);
   }
 
-    /* it's still there only to redefine Patcher object */
-    /* when will be asynchronous remove them and use "redefined" */
-    public void redefine(String text) 
-    {
-	computeRenderer();
-      
-	updateDimensions();
-      
-	if(itsSketchPad.isAutomaticFitToText()){
-	    redraw();
-	    fitToText();
-	}
-	else
-	    redraw();
-	
-	super.redefine(text);    
-    }
+  public void redefine( String text) 
+  {
+      computeRenderer();
+
+      updateDimensions();
+	      
+      if(itsSketchPad.isAutomaticFitToText()){
+	  redraw();
+	  fitToText();
+      }
+      else
+	  redraw();
+
+    super.redefine(text);
+  }
 
 
   public int getMinimumWidth(){
@@ -126,18 +134,16 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   // redefined from base class
   public  void setWidth(int w) 
   {
-    if( w <= 0)
-      super.setWidth( getDefaultWidth());
-    else
-      if (renderer.canResizeWidthTo(w - getTextWidthOffset()))
-	{
-	  super.setWidth(w);
-	  super.setHeight(renderer.getHeight() + getTextHeightOffset());
-	}
-      else{
+    // renderer.update();
+    if (renderer.canResizeWidthTo(w - getTextWidthOffset()))
+      {
+	super.setWidth(w);
+	super.setHeight(renderer.getHeight() + getTextHeightOffset());
+      }
+    else{
 	super.setWidth( getMinimumWidth());
 	super.setHeight( renderer.getHeight() + getTextHeightOffset());
-      } 
+    } 
   }
 
   // redefined from base class, only when not editing
@@ -168,29 +174,29 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
   public void fitToText()
   {
-    renderer.update();
-    int w = ((TextRenderer)renderer).getTextWidth() + getTextWidthOffset() + 2;
+      renderer.update();
+      int w = ((TextRenderer)renderer).getTextWidth() + getTextWidthOffset() + 2;
+      
+      if(w < getMinimumWidth())
+	  super.setWidth( getMinimumWidth());
+      else
+	  super.setWidth( w);
 
-    if(w < getMinimumWidth())
-      super.setWidth( getMinimumWidth());
-    else
-      super.setWidth( w);
-
-    if(!((TextRenderer)renderer).isMultiLine())
-      super.setHeight(((TextRenderer)renderer).getRHeight() + getTextHeightOffset());
-    else
-      super.setHeight(((TextRenderer)renderer).getTextHeight() + getTextHeightOffset());
-
-    redraw();
+      if(!((TextRenderer)renderer).isMultiLine())
+	  super.setHeight(((TextRenderer)renderer).getRHeight() + getTextHeightOffset());
+      else
+	  super.setHeight(((TextRenderer)renderer).getTextHeight() + getTextHeightOffset());
+	      
+      redraw();
   }
 
-  public void setWidthToText(String text)
-  {
-      int tLength = SwingUtilities.computeStringWidth(getFontMetrics(), text)+ getTextWidthOffset() + 2; 	
-      if(tLength < getDefaultWidth()) tLength = getDefaultWidth();
+    public void setWidthToText(String text)
+    {
+	int tLength = SwingUtilities.computeStringWidth(getFontMetrics(), text)+ getTextWidthOffset() + 2; 	
+	if(tLength < getDefaultWidth()) tLength = getDefaultWidth();
 	
-      super.setWidth(tLength);
-  }
+	super.setWidth(tLength);
+    }
 
   // ----------------------------------------
   // ``Args'' property
@@ -211,16 +217,12 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   abstract public int getTextYOffset();
   abstract public int getTextWidthOffset();
   abstract public int getTextHeightOffset();
-
+    
   abstract public boolean isMultiline();
-  
+
   public void setEditing(boolean v)
   {
     editing = v;
-  }
-  public boolean isEditing()
-  {
-    return editing;
   }
 
    // ----------------------------------------

@@ -38,8 +38,6 @@ public class Settings {
   private Color selectedColor;
   private Color textColor;
   private Color selectedTextColor;
-  private Color consoleBackgroundColor;
-  private Color consoleForegroundColor;
 
   private static Settings singleInstance;
 
@@ -59,25 +57,11 @@ public class Settings {
     selectedColor = new Color( 51, 153, 204);
     textColor = Color.black;
     selectedTextColor = Color.black;
-    consoleBackgroundColor = Color.white;
-    consoleForegroundColor = Color.black;
   }
 
   public static Settings sharedInstance()
   {
     return singleInstance;
-  }
-
-  /* merry Xmas */
-  public void setCoolColors()
-  {
-      editBackgroundColor = Color.yellow;
-      lockBackgroundColor = Color.blue.darker();
-      consoleBackgroundColor = Color.magenta.darker();
-      consoleForegroundColor = Color.white;
-      objColor = Color.pink;
-      UIColor = new Color( 153, 204, 204);
-      selectedColor = Color.orange;
   }
 
   // ----------------------------------------
@@ -183,13 +167,4 @@ public class Settings {
   {
     this.selectedTextColor = selectedTextColor;
   }
-
-    public Color getConsoleBackgroundColor()
-    {
-	return consoleBackgroundColor;
-    }
-    public Color getConsoleForegroundColor()
-    {
-	return consoleForegroundColor;
-    }
 }

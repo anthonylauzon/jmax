@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
 
 #define M  (unsigned long)714025
 #define M2 (M/2)
@@ -55,7 +54,7 @@ void
 pink_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pink_t *this = (pink_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   fts_atom_t a[3];
   
   fts_set_ftl_data(a + 0, this->data);
@@ -68,8 +67,8 @@ pink_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 pink_cheap_ftl(fts_word_t *argv)
 {
-  pink_data_t *data = (pink_data_t *)fts_word_get_pointer(argv + 0);
-  float *out = (float *) fts_word_get_pointer(argv + 1);
+  pink_data_t *data = (pink_data_t *)fts_word_get_ptr(argv + 0);
+  float *out = (float *) fts_word_get_ptr(argv + 1);
   int n = fts_word_get_int(argv + 2);
   float b0 = data->b0;
   float b1 = data->b1;
@@ -95,8 +94,8 @@ pink_cheap_ftl(fts_word_t *argv)
 static void
 pink_ftl(fts_word_t *argv)
 {
-  pink_data_t *data = (pink_data_t *)fts_word_get_pointer(argv + 0);
-  float *out = (float *) fts_word_get_pointer(argv + 1);
+  pink_data_t *data = (pink_data_t *)fts_word_get_ptr(argv + 0);
+  float *out = (float *) fts_word_get_ptr(argv + 1);
   int n = fts_word_get_int(argv + 2);
   float b0 = data->b0;
   float b1 = data->b1;
@@ -190,6 +189,8 @@ pink_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 pink_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[3];
+
   fts_class_init(cl, sizeof(pink_t), 0, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pink_init);
@@ -208,6 +209,6 @@ pink_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 signal_pink_config(void)
 {
-  fts_class_install(fts_new_symbol("pink~"), pink_instantiate);
+  fts_metaclass_install(fts_new_symbol("pink~"), pink_instantiate, fts_always_equiv);
 }
 

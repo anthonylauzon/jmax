@@ -17,21 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Francois Dechelle, Norbert Schnell.
+ *
  */
 
 #include <fts/fts.h>
-#include <utils.h>
 #include "fvec.h"
 
 #include <stdlib.h>
-#include <ctype.h>
 
 #define FVEC_NO_ALLOC -1
 
 fts_symbol_t fvec_symbol = 0;
-fts_metaclass_t *fvec_type = 0;
+fts_type_t fvec_type = 0;
+fts_class_t *fvec_class = 0;
 
 static fts_symbol_t sym_text = 0;
+static fts_symbol_t sym_load = 0;
 static fts_symbol_t sym_open_file = 0;
 static fts_symbol_t sym_local = 0;
 
@@ -46,8 +51,8 @@ static fts_symbol_t sym_local = 0;
  *
  */
 
-void
-fvec_set_size(fvec_t *vec, int size)
+static void
+fvec_alloc(fvec_t *vec, int size)
 {
   int alloc = vec->alloc;
   float *values = vec->values;
@@ -97,7 +102,20 @@ fvec_set_const(fvec_t *vec, float c)
 }
 
 void
-fvec_set_with_onset_from_atoms(fvec_t *vec, int offset, int ac, const fts_atom_t *at)
+fvec_set_size(fvec_t *vec, int size)
+{
+  int old_size = vec->size;
+  int i;
+
+  fvec_alloc(vec, size);
+
+  /* when extending: zero new values */
+  for(i=old_size; i<size; i++)
+    vec->values[i] = 0.0;	  
+}
+
+void
+fvec_set_from_atom_list(fvec_t *vec, int offset, int ac, const fts_atom_t *at)
 {
   int size = fvec_get_size(vec);
   int i;
@@ -176,18 +194,6 @@ fvec_get_max_value(fvec_t *vec)
   return max;
 }
 
-void
-fvec_copy(fvec_t *org, fvec_t *copy)
-{
-  int size = fvec_get_size(org);
-  int i;
-
-  fvec_set_size(copy, size);
-
-  for(i=0; i<size; i++)
-    copy->values[i] = org->values[i];  
-}
-
 /********************************************************
  *
  *  files
@@ -204,7 +210,7 @@ fvec_grow(fvec_t *vec, int size)
   while(!alloc || size > alloc)
     alloc += FVEC_BLOCK_SIZE;
 
-  fvec_set_size(vec, alloc);
+  fvec_alloc(vec, alloc);
 }
 
 int 
@@ -231,7 +237,7 @@ fvec_read_atom_file(fvec_t *vec, fts_symbol_t file_name)
 	}
       
       if(n > 0)
-	fvec_set_size(vec, n);
+	fvec_alloc(vec, n);
       
       fts_atom_file_close(file);
     }
@@ -265,37 +271,6 @@ fvec_write_atom_file(fvec_t *vec, fts_symbol_t file_name)
   return (i);
 }
 
-static int 
-fvec_file_is_text( fts_symbol_t file_name)
-{
-  char full_path[1024];
-  int n, i;
-  char buff[256];
-  FILE* fd;
-
-  if (!fts_file_get_read_path( fts_symbol_name( file_name), full_path))
-     return 0;
-
-  if ( (fd = fopen( full_path, "rb")) == NULL)
-    return 0;
-
-  if ( (n = fread( buff, 1, 256, fd)) < 256)
-    {
-      fclose( fd);
-      return 0;
-    }
-
-  for ( i = 0; i < n; i++)
-    {
-      if ( !isgraph(buff[i]) && !isspace(buff[i]))
-	return 0;
-    }
-
-  fclose( fd);
-
-  return 1;
-}
-
 /********************************************************************
  *
  *   user methods
@@ -305,7 +280,11 @@ fvec_file_is_text( fts_symbol_t file_name)
 static void
 fvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_object(o, 0, o);
+  fvec_t *this = (fvec_t *)o;
+  fts_atom_t a[1];
+
+  fvec_atom_set(a, this);
+  fts_outlet_send(o, 0, fvec_symbol, 1, a);
 }
 
 static void
@@ -326,7 +305,7 @@ fvec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fvec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
 
@@ -336,7 +315,7 @@ fvec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       int offset = fts_get_number_int(at);
 
       if(offset >= 0 && offset < size)
-	fvec_set_with_onset_from_atoms(this, offset, ac - 1, at + 1);
+	fvec_set_from_atom_list(this, offset, ac - 1, at + 1);
     }
 }
 
@@ -484,7 +463,7 @@ fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   fvec_t *this = (fvec_t *)o;
 
-  if(ac > 0 && fts_is_number(at))
+  if(ac == 1 && fts_is_number(at))
     {
       int size = fts_get_number_int(at);
       
@@ -493,7 +472,7 @@ fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  int old_size = this->size;
 	  int i;
 
-	  fvec_set_size(this, size);
+	  fvec_alloc(this, size);
 
 	  /* when extending: zero new values */
 	  for(i=old_size; i<size; i++)
@@ -556,7 +535,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac > 0 && fts_is_symbol(at))
     {
       fts_symbol_t file_name = fts_get_symbol(at);
-      fts_audiofile_t *sf = 0;
+      fts_soundfile_t *sf = 0;
       int size = 0;
       float sr = 0.0;
       int onset, n_read;
@@ -577,7 +556,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	/* force sampling rate to given property */
 	sr = this->sr;
 
-      if (fvec_file_is_text( file_name))
+      if (fts_file_is_text( file_name))
 	{
 	  size = fvec_read_atom_file(this, file_name);
 
@@ -588,25 +567,15 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
       else
 	{
-	  /* FIXME: sample rate conversion!! */
-	  sf = fts_audiofile_open_read(file_name);
-	  
-	  if( fts_audiofile_valid(sf))
+	  sf = fts_soundfile_open_read_float(file_name, 0, sr, onset);
+      
+	  if(sf) /* soundfile successfully opened */
 	    {
-	      float file_sr;
+	      float file_sr = fts_soundfile_get_samplerate(sf);
 	      float *ptr;
-	    
-	      if (fts_audiofile_seek(sf, onset) != 0) 
-		{
-		  post("fvec: can't seek position in file \"%s\"\n", fts_symbol_name(file_name));
-		  fts_audiofile_delete(sf);
-		  return;		  
-		}
-
-	      file_sr = fts_audiofile_get_sample_rate(sf);
 
 	      if(!n_read)
-		n_read = fts_audiofile_get_num_frames(sf);
+		n_read = fts_soundfile_get_size(sf);
 
 	      /* make enough space for resampled file */
 	      if(sr > 0.0 && sr != file_sr)
@@ -615,19 +584,18 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 		/* get temporary sample rate from file */
 		this->sr = -file_sr;
 
-	      
-	      fvec_set_size(this, n_read);
+	      fvec_alloc(this, n_read);
 	      ptr = fvec_get_ptr(this);
-	    
-	      size = fts_audiofile_read(sf, &ptr, 1, n_read);
-	    
-	      fts_audiofile_delete(sf);
-	      
+
+	      size = fts_soundfile_read_float(sf, ptr, n_read);
+
+	      fts_soundfile_close(sf);
+
 	      if(size > 0)
 		fvec_output(o, 0, 0, 0, 0);
 	      else
 		post("fvec: can't load from soundfile \"%s\"\n", fts_symbol_name(file_name));
-	    
+	  
 	      return;
 	    }
 	}
@@ -636,44 +604,44 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_atom_t a[4];
       
-      fts_set_symbol(a, fts_s_load);
+      fts_set_symbol(a, sym_load);
       fts_set_symbol(a + 1, sym_open_file);
-      fts_set_symbol(a + 2, fts_project_get_dir());
+      fts_set_symbol(a + 2, fts_get_project_dir());
       fts_set_symbol(a + 3, fts_new_symbol(" "));
       fts_client_send_message(o, fts_s_openFileDialog, 4, a);
     }
 }
 
 static void
-fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-    
+
   if(file_name)
     {
       int n_write = fts_get_int_arg(ac, at, 1, 0);
       float sr = fts_get_float_arg(ac, at, 2, 0.0f);
       int vec_size = fvec_get_size(this);
-      fts_audiofile_t *sf = 0;
+      fts_soundfile_t *sf = 0;
       int size = 0;
       
       if(sr <= 0.0)
 	sr = fts_dsp_get_sample_rate();
-    
-      sf = fts_audiofile_open_write(file_name, sr, 1, fts_s_16bits);
-    
-      if( fts_audiofile_valid(sf))
+
+      sf = fts_soundfile_open_write_float(file_name, 0, sr);
+
+      if(sf) /* soundfile successfully opened */
 	{
 	  float *ptr = fvec_get_ptr(this);
-    
+
 	  if(n_write <= 0 || n_write > vec_size)
 	    n_write = vec_size;
-    
-	  size = fts_audiofile_write(sf, &ptr, 1, n_write);
-    
-	  fts_audiofile_delete(sf);
-    
+      
+	  size = fts_soundfile_write_float(sf, ptr, n_write);
+
+	  fts_soundfile_close(sf);
+
 	  if(size <= 0)
 	    post("fvec: can't save to soundfile \"%s\"\n", fts_symbol_name(file_name));
 	}
@@ -718,112 +686,84 @@ fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	    post("%f ", fvec_get_element(this, i));
 	}
 
-      post("\n}\n");
+      post("\n}");
     }
   else if(size)
     {
       for(i=0; i<size-1; i++)
 	post("%f ", fvec_get_element(this, i));
 
-      post("%f}\n", fvec_get_element(this, size - 1));
+      post("%f}", fvec_get_element(this, size - 1));
     }
   else
-    post("}\n");
+    post("}");
 }
 
 static void
-fvec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
   float *values = fvec_get_ptr(this);
   int size = fvec_get_size(this);
-  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
-  int onset = fts_array_get_size(array);
-  fts_atom_t *atoms;
+  fts_list_t *array = fts_get_list(at);
+  fts_atom_t a;
   int i;
-  
-  fts_array_set_size(array, onset + size);  
-  atoms = fts_array_get_atoms(array) + onset;
-
-  for(i=0; i<size; i++)
-    fts_set_float(atoms + i, values[i]);
-}
-
-static void
-fvec_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fvec_t *this = (fvec_t *)o;
-
-  fvec_set_size(this, ac);
-  fvec_set_with_onset_from_atoms(this, 0, ac, at);
-}
-
-static void
-fvec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fvec_t *this = (fvec_t *)o;
-  fvec_t *in = fvec_atom_get(at);
-  
-  fvec_copy(in, this);
-}
-
-static void
-fvec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fvec_t *this = (fvec_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
-  int size = fvec_get_size(this);
-  fts_message_t *mess;
-  int i;
-
-  /* send size message */
-  mess = fts_dumper_message_new(dumper, fts_s_size);  
-  fts_message_append_int(mess, size);
-  fts_dumper_message_send(dumper, mess);
-
-  /* get new set message and append onset 0 */
-  mess = fts_dumper_message_new(dumper, fts_s_set);
-  fts_message_append_int(mess, 0);
   
   for(i=0; i<size; i++)
     {
-      fts_message_append_float(mess, this->values[i]);
-      
-      if(fts_message_get_ac(mess) >= 256)
-	{
-	  fts_dumper_message_send(dumper, mess);
-
-	  /* new set message and append onset i + 1 */
-	  mess = fts_dumper_message_new(dumper, fts_s_set);
-	  fts_message_append_int(mess, i + 1);
-	}
-    }
+      fts_set_float(&a, values[i]);
   
-  if(fts_message_get_ac(mess) > 1) 
-    fts_dumper_message_send(dumper, mess);
+      fts_list_append(array, 1, &a);
+    }
 }
 
 static void
-fvec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+fvec_restore_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fvec_t *this = (fvec_t *)obj;
+  fvec_t *this = (fvec_t *)o;
 
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
+  fvec_set_from_atom_list(this, 0, ac, at);
 }
 
 static void
-fvec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+fvec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fvec_t *this = (fvec_t *)obj;
+  fvec_t *this = (fvec_t *)o;
 
-  fts_set_symbol(value, this->keep);
+  if(this->keep == fts_s_yes)
+    {
+      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);      
+      int size = fvec_get_size(this);
+      fts_atom_t av[257];
+      int ac = 1;
+      int i;
+      
+      fts_set_int(av, 0); /* set offset to 0 */
+      
+      for(i=0; i<size; i++)
+	{
+	  fts_set_float(av + ac, this->values[i]);
+	  ac++;
+	  
+	  if(ac == 257)
+	    {
+	      fts_bmax_save_message(f, fts_s_set, ac, av);
+	      fts_set_int(av , i + 1); /* set next offset */
+	      ac = 1;
+	    }
+	}
+      
+      if(ac > 1) 
+	fts_bmax_save_message(f, fts_s_set, ac, av);
+    }
 }
 
 static void
 fvec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  fvec_t *this = (fvec_t *)obj;
+
+  fvec_atom_set(value, this);
 }
 
 static void
@@ -838,6 +778,35 @@ fvec_set_sr(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property
       if(sr > 0.0)
 	this->sr = sr;
     }
+}
+
+static void
+fvec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
+
+  if (cmd == fts_s_object)
+    fts_object_blip(o, "vec of floats");
+  else if (cmd == fts_s_inlet)
+    {
+      int n = fts_get_int_arg(ac, at, 1, 0);
+
+      switch(n)
+	{
+	case 0:
+	  /* fts_object_blip(o, "no comment"); */
+	  break;
+	}
+    }
+}
+
+static void
+fvec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fvec_t *this = (fvec_t *)obj;
+
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
 }
 
 /*********************************************************
@@ -857,25 +826,29 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->values = 0;
   this->size = 0;
   this->alloc = FVEC_NO_ALLOC;
-  this->keep = fts_s_no;
 
   this->sr = 0.0;
 
+  this->keep = fts_s_no;
 
   if(ac == 0)
-    fvec_set_size(this, 0);
+    {
+      fvec_alloc(this, 0);
+      this->keep = fts_s_no;
+    }
   else if(ac == 1 && fts_is_int(at))
     {
-      fvec_set_size(this, fts_get_int(at));
+      fvec_alloc(this, fts_get_int(at));
       fvec_zero(this);
+      this->keep = fts_s_no;
     }
-  else if(ac == 1 && fts_is_tuple(at))
+  else if(ac == 1 && fts_is_list(at))
     {
-      fts_tuple_t *tup = fts_get_tuple(at);
-      int size = fts_tuple_get_size(tup);
+      fts_list_t *aa = fts_get_list(at);
+      int size = fts_list_get_size(aa);
       
-      fvec_set_size(this, size);
-      fvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
+      fvec_alloc(this, size);
+      fvec_set_from_atom_list(this, 0, size, fts_list_get_ptr(aa));
       this->keep = fts_s_args;
     }
   else if(ac == 1 && fts_is_symbol(at))
@@ -883,28 +856,28 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_symbol_t file_name = fts_get_symbol(at);
       int size = 0;
       
-      if (fvec_file_is_text( file_name))
+      if (fts_file_is_text( file_name))
 	{
 	  size = fvec_read_atom_file(this, file_name);
 	}
       else
 	{
-	  /*fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, 0, 0);
+	  fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, 0, 0);
 
-	    if(sf)
+	  if(sf) /* soundfile successfully opened */
 	    {
-	    float *ptr;
-	    
-	    size = fts_soundfile_get_size(sf);
-	    
-	    fvec_set_size(this, size);
-	    ptr = fvec_get_ptr(this);
-	    
-	    size = fts_soundfile_read_float(sf, ptr, size);
-	    fvec_set_size(this, size);
-	    
-	    fts_soundfile_close(sf);
-	    }*/
+	      float *ptr;
+	  
+	      size = fts_soundfile_get_size(sf);
+	  
+	      fvec_alloc(this, size);
+	      ptr = fvec_get_ptr(this);
+	  
+	      size = fts_soundfile_read_float(sf, ptr, size);
+	      fvec_alloc(this, size);
+
+	      fts_soundfile_close(sf);
+	    }
 	}
 
       if(size == 0)
@@ -914,8 +887,8 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(ac > 1)
     {
-      fvec_set_size(this, ac);
-      fvec_set_with_onset_from_atoms(this, 0, ac, at);
+      fvec_alloc(this, ac);
+      fvec_set_from_atom_list(this, 0, ac, at);
 
       this->keep = fts_s_args;
     }
@@ -941,45 +914,41 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fvec_delete);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fvec_print); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_state_as_array"), fvec_get_state_as_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("restore_state_from_array"), fvec_restore_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fvec_assist); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, fvec_set_elements);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, fvec_set_from_instance);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, fvec_set_from_array);
+  /* save and restore to/from bmax file */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, fvec_save_bmax); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, fvec_set);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, fvec_size);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_load, fvec_load);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, fvec_get_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, fvec_dump);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, fvec_save_soundfile); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_load, fvec_load);
-
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sr"), fvec_set_sr);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, fvec_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, fvec_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("sr"), fvec_set_sr);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), fvec_set_keep);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, fvec_clear);
-  fts_method_define_varargs(cl, 0, fts_s_fill, fvec_fill);
-  fts_method_define_varargs(cl, 0, fts_s_set, fvec_set_elements);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), fvec_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), fvec_fill);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fvec_set);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), fvec_reverse);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), fvec_rotate);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), fvec_sort);
   fts_method_define_varargs(cl, 0, fts_new_symbol("scramble"), fvec_scramble);
 
-  fts_method_define_varargs(cl, 0, fts_s_size, fvec_size);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("size"), fvec_size);
   
-  fts_method_define_varargs(cl, 0, fts_s_import, fvec_import);
-  fts_method_define_varargs(cl, 0, fts_s_export, fvec_export);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("import"), fvec_import);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), fvec_export);
   
-  fts_method_define_varargs(cl, 0, fts_s_load, fvec_load);
-  fts_method_define_varargs(cl, 0, fts_s_save, fvec_save_soundfile);
+  fts_method_define_varargs(cl, 0, sym_load, fvec_load);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("save"), fvec_save);
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, fvec_symbol, 1, &fvec_symbol);      
+  fts_outlet_type_define(cl, 0, fvec_symbol, 1, &fvec_type);      
 
   return fts_Success;
 }
@@ -994,9 +963,14 @@ void
 fvec_config(void)
 {
   sym_text = fts_new_symbol("text");
+  sym_load = fts_new_symbol("load");
   sym_open_file = fts_new_symbol("open file");
 
   fvec_symbol = fts_new_symbol("fvec");
+  fvec_type = fvec_symbol;
 
-  fvec_type = fts_class_install(fvec_symbol, fvec_instantiate);
+  fts_class_install(fvec_symbol, fvec_instantiate);
+  fvec_class = fts_class_get_by_name(fvec_symbol);
+
+  fts_atom_type_register(fvec_symbol, fvec_class);
 }

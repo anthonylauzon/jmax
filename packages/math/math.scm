@@ -23,9 +23,13 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
+(provide-package "math" "0.0.0")
+
+(ucs "load" "module" "math" (file-cat dir "c" "lib" jmax-arch jmax-mode "libmath.so"))
+
 ;; help
-(load-silently (file-cat dir "help" "math.help.index.scm"))
-(help-summary "math summary" (file-cat dir "help" "math.summary.jmax"))
+(sshh-load (file-cat dir "help" "math.help.index.scm"))
+(help-summary "Math" (file-cat dir "help" "math.summary.jmax"))
 
 (println "package: math (math classes)")
 

@@ -25,6 +25,9 @@
 
 package provide ispwmath
 
+global jmaxArch jmaxMode
+ucs load module ispwmath $dir/c/lib/$jmaxArch/$jmaxMode/libispwmath.so
+
 puts "package: ISPW math (ISPW math classes)"
 
 # help

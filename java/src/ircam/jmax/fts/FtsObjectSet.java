@@ -25,117 +25,177 @@
 
 package ircam.jmax.fts;
 
-import java.util.*;
 import java.io.*;
+import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 
-import ircam.fts.client.*;
-import ircam.jmax.*;
+import ircam.jmax.utils.*;
+import ircam.jmax.mda.*;
 
-/** Object set class.
+
+/** Object set remote data class.
  *  
  */
 
-public class FtsObjectSet extends FtsObject implements ListModel
+public class FtsObjectSet extends FtsRemoteData
 {
-  MaxVector list, dataListeners;
+  /** Key for remote calls */
+
+  static final int REMOTE_CLEAN     = 1;
+  static final int REMOTE_APPEND    = 2;
+  static final int REMOTE_REMOVE_ONE    = 3;
+
+  /** Keys for queries */
+
+  static final int REMOTE_FIND          = 4;
+  static final int REMOTE_FIND_ERRORS   = 5;
+  static final int REMOTE_FIND_FRIENDS  = 6;
+
+  MaxVector list;
+  ObjectSetListModel model;
   FtsEditListener editListener;
+
+  class ObjectSetListModel extends AbstractListModel
+  {
+    public java.lang.Object getElementAt(int index)
+    {
+      return list.elementAt(index);
+    }
+
+    public int getSize()
+    {
+      return list.size();
+    }
+
+    void listChanged()
+    {
+      fireContentsChanged(this, 0, list.size());
+    }
+  }
 
   class ObjectSetEditListener implements FtsEditListener
   {
-    public void objectAdded(FtsObject object){}
+    public void objectAdded(FtsObject object)
+    {
+    }
+
     public void objectRemoved(FtsObject object)
     {
       list.removeElement(object);
-      fireListChanged();
+      model.listChanged();
     }
-    public void connectionAdded(FtsConnection connection){}
-    public void connectionRemoved(FtsConnection connection){}
-    public void atomicAction(boolean active){}      
+
+    public void connectionAdded(FtsConnection connection)
+    {
+    }
+
+    public void connectionRemoved(FtsConnection connection)
+    {
+    }
   }
 
-  static
+  public FtsObjectSet()
   {
-    FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsObjectSet)obj).clear();
-	}
-      });
-    FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("append"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsObjectSet)obj).append( args);
-	}
-      });
-    FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsObjectSet)obj).removeObject( args.getObject( 0));
-	}
-      });
-  }
-
-
-  public FtsObjectSet() throws IOException
-  {
-    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__objectset"));
+    super();
 
     list = new MaxVector();
-    dataListeners = new MaxVector();
-      
-    editListener = new ObjectSetEditListener();
-    FtsPatcherObject.addGlobalEditListener(editListener);
+    model = new ObjectSetListModel();
   }
   
+  /** Overwrite the super class fts.
+    The object set need to be an edit listener, to autmatically
+    delete a deleted object from the set.
+    */
+
+  public void setFts(Fts fts)
+  {
+    super.setFts(fts);
+
+    editListener = new ObjectSetEditListener();
+    getFts().addEditListener(editListener);
+  }
+
   public void release()
   {
-    FtsPatcherObject.removeGlobalEditListener(editListener);
+    getFts().removeEditListener(editListener);
+    super.release();
   }
 
-  public void append(FtsArgs args)
-  {
-    for(int i=0; i<args.getLength(); i++)
-      list.addElement(args.getObject(i));
+  /** get the content of the set as a list model */
 
-    fireListChanged();
-  }
-
-  public void clear()
+  public ListModel getListModel()
   {
-    list.removeAllElements();
-    fireListChanged();
+    return model;
   }
 
-  public void removeObject(FtsObject obj)
+  /** execute remote calls */
+
+  public final void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    list.removeElement(obj);
-    fireListChanged();
+    switch( key)
+      {
+      case REMOTE_CLEAN:
+	list.removeAllElements();
+	model.listChanged();
+	break;
+
+      case REMOTE_APPEND:
+
+	while (! stream.endOfArguments())
+	  list.addElement(stream.getNextObjectArgument());
+
+	model.listChanged();
+	break;
+
+      case REMOTE_REMOVE_ONE:
+	list.removeElement(stream.getNextObjectArgument());
+
+      default:
+	break;
+      }
   }
 
-  /** listmodel interface */
-  public Object getElementAt(int index)
+  /* Client to server queries */
+
+  public void find(FtsObject context, String name)
   {
-    return list.elementAt(index);
+    remoteCallStart(REMOTE_FIND);
+    remoteCallAddArg(context);
+    remoteCallAddArg(name);
+    remoteCallEnd();
+
+    getFts().sync();
   }
-  public int getSize()
+
+
+  public void find(FtsObject context, Object values[])
   {
-    return list.size();
+    remoteCall(REMOTE_FIND, values);
   }
-  public void addListDataListener(ListDataListener l)
+
+
+  public void find(FtsObject context, MaxVector values)
   {
-    dataListeners.addElement(l);
+    remoteCall(REMOTE_FIND, context, values);
   }
-  public void removeListDataListener(ListDataListener l)
+
+
+  public void findErrors(FtsObject context)
   {
-    dataListeners.removeElement(l);
+    remoteCallStart(REMOTE_FIND_ERRORS);
+    remoteCallAddArg(context);
+    remoteCallEnd();
   }
-  private void fireListChanged()
+
+
+  public void findFriends(FtsObject target)
   {
-    ListDataEvent evt = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
-    for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
-      ((ListDataListener)e.nextElement()).contentsChanged(evt);
+    remoteCallStart(REMOTE_FIND_FRIENDS);
+    remoteCallAddArg(target);
+    remoteCallEnd();
   }
 }
+
+
 

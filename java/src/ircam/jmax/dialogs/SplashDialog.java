@@ -29,72 +29,96 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import javax.swing.*;
 
 /**
  * The initial dialog.
  */
 
-public class SplashDialog extends Window {
+public class SplashDialog extends Window implements KeyListener, MouseListener, /*ActionListener ,*/ ComponentListener{
+  static final int SPLASH_WIDTH = 400;
+  static final int SPLASH_HEIGHT = 300;
 
-  private static final int SPLASH_SHOW_DURATION = 4000;
-  private static final int SPLASH_WIDTH = 400;
-  private static final int SPLASH_HEIGHT = 300;
+  String itsVersionString;
+  Image itsImage;
 
-  public SplashDialog( String filename, String version) 
-  {
+  public SplashDialog(String filename, String version) {
+
     super(new Frame());
 
     itsVersionString = version;
     itsImage = Toolkit.getDefaultToolkit().getImage(filename);
         
+    addKeyListener(this);
+    addMouseListener(this);
+    
     Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
     setLocation((screenDim.width - SPLASH_WIDTH) / 2, (screenDim.height - SPLASH_HEIGHT) / 2);
 
     pack();
     setVisible(true);
     
-    timer = new Timer( SPLASH_SHOW_DURATION, new ActionListener() {
-	public void actionPerformed( ActionEvent e)
-	{
-	  disposeSplash();
-	}
-      });
-    timer.setRepeats(false);
-    timer.start();
-
-    addKeyListener( new KeyAdapter() {
-	public void keyPressed(KeyEvent e){
-	  disposeSplash();
-	}
-      });
-    addMouseListener( new MouseAdapter() {
-	public void mousePressed(MouseEvent e){
-	  disposeSplash();
-	}
-      });
+    //Timer aTimer = new Timer(4000, this);
+    //aTimer.setRepeats(false);
+    //aTimer.start();
   }
 	
-  private void disposeSplash()
-  {
-    setVisible(false);
-    itsImage = null;
-    dispose();
-    timer.stop();
-  }
+    /*public void actionPerformed(ActionEvent e) {
+      setVisible(false);
+      itsImage = null;
+      dispose();
+      Timer aTimer = (Timer) e.getSource();
+      aTimer.stop();
+      }*/
 
-  public Dimension getMinimumSize() 
+   void disposeSplash()
+   {
+       setVisible(false);
+       itsImage = null;
+       dispose();
+       MaxApplication.splash = null;
+   }
+
+  //////////////////////////////////////////////////////////mouseListener--inizio
+  public void mouseClicked(MouseEvent e){}
+  public void mousePressed(MouseEvent e){
+    setVisible(false);
+  }
+  public void mouseReleased(MouseEvent e){}
+  public void mouseEntered(MouseEvent e){}
+  public void mouseExited(MouseEvent e){}
+
+  //////////////////////////////////////////////////keyListener
+  public void keyTyped(KeyEvent e){}
+  public void keyReleased(KeyEvent e){}  
+  public void keyPressed(KeyEvent e){
+    setVisible(false);
+  }
+  ///////////////////////////////////////////////////ComponentListener
+  
+  public void componentHidden(ComponentEvent e){}
+  public void componentShown(ComponentEvent e)
   {
-    return new Dimension(SPLASH_WIDTH, SPLASH_HEIGHT);
+      disposeSplash();
+  }
+  public void componentMoved(ComponentEvent e){}
+  public void componentResized(ComponentEvent e){}
+  ///////////////////////////////////////////////////////////
+
+  public Dimension getMinimumSize() {
+    Dimension d = new Dimension(SPLASH_WIDTH, SPLASH_HEIGHT);
+    return d;
   }    
   
-  public Dimension getPreferredSize() 
-  {
+  public Dimension getPreferredSize() {
     return getMinimumSize();	
   }
   
-  public void paint(Graphics g) 
-  {
+  //--------------------------------------------------------
+  //	paint
+  //--------------------------------------------------------
+  public void paint(Graphics g) {
     Dimension d = getSize();
 
     g.drawImage(itsImage, 0, 0, this);
@@ -102,8 +126,4 @@ public class SplashDialog extends Window {
     g.setColor(Color.black);
     g.drawString(itsVersionString, 20, 20);
   }
-
-  private String itsVersionString;
-  private Image itsImage;
-  private Timer timer;
 }

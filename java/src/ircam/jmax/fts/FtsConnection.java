@@ -20,7 +20,7 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
 package ircam.jmax.fts;
@@ -28,14 +28,13 @@ package ircam.jmax.fts;
 import ircam.jmax.*;
 import java.io.*;
 import java.util.*;
-import ircam.fts.client.*;
 
 /**
  * The proxy of an Fts connection.
  * Deals with the connection creation/deletion and saving/loading.
  */
 
-public class FtsConnection extends FtsObject implements Serializable
+public class FtsConnection implements Serializable
 {
   /* numbering doubled on server side (mess_types.h) */
   public static final int fts_connection_invalid = 0; /* from error object or type missmatch */
@@ -44,15 +43,17 @@ public class FtsConnection extends FtsObject implements Serializable
   public static final int fts_connection_object = 3; /* objects */
   public static final int fts_connection_signal = 4; /* signal connection */
 
+  private transient Fts  fts; // the server this connection belong to.
+
   private transient int id;
 
   protected transient FtsConnectionListener listener;
   
   private transient boolean deleted = false; 
-  FtsGraphicObject from;
+  FtsObject from;
   int outlet;
 
-  FtsGraphicObject to;
+  FtsObject to;
   int inlet;
 
   int type;
@@ -62,31 +63,29 @@ public class FtsConnection extends FtsObject implements Serializable
    * @see ircam.jmax.fts.Fts#makeFtsConnection
    */
 
-  FtsConnection(FtsServer server, FtsPatcherObject patcher, int id, FtsGraphicObject from, 
-		int outlet, FtsGraphicObject to, int inlet, int type)
+  FtsConnection(Fts fts, FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet, int type)
   {
-    super(server, patcher, id);
-    
+    this.fts    = fts;
+    this.id     = id;
     this.from   = from;
     this.outlet = outlet;
     this.to     = to;
     this.inlet  = inlet;
     this.type   = type;
 
-    /*if (patcher != null)
-      patcher.addConnection(this);*/
+    if (data != null)
+      data.addConnection(this);
   }
 
-  FtsConnection(FtsServer server, FtsPatcherObject patcher, int id, FtsGraphicObject from, 
-		int outlet, FtsGraphicObject to, int inlet)
+  FtsConnection(Fts fts, FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
-      this(server, patcher, id, from, outlet, to, inlet, fts_connection_anything);
+    this(fts, data, id, from, outlet, to, inlet, fts_connection_anything);
   }
 
   /** Set the unique object listener */
   public void setConnectionListener(FtsConnectionListener obj)
   {
-      listener = obj;
+    listener = obj;
   }
 
   /** Get the current object listener */
@@ -95,7 +94,7 @@ public class FtsConnection extends FtsObject implements Serializable
     return listener;
   }
 
-  void redefine(FtsGraphicObject from, int outlet, FtsGraphicObject to, int inlet, int type)
+  void redefine(FtsObject from, int outlet, FtsObject to, int inlet, int type)
   {
     this.from   = from;
     this.outlet = outlet;
@@ -103,8 +102,7 @@ public class FtsConnection extends FtsObject implements Serializable
     this.inlet  = inlet;
     this.type   = type;
 
-    if(listener!=null)
-	listener.typeChanged(type);
+    listener.typeChanged(type);
   }
 
   /**
@@ -132,9 +130,11 @@ public class FtsConnection extends FtsObject implements Serializable
 
     deleted = true;
 
-    ircam.jmax.editors.patcher.ErmesSelection.getFtsSelection().removeConnection(this);
+    fts.getSelection().removeConnection(this);
+
+    from.setDirty();
 	
-    ((FtsPatcherObject)from.getParent()).requestDeleteConnection(this);
+    fts.getServer().deleteConnection(this);
   }
 
 
@@ -146,8 +146,10 @@ public class FtsConnection extends FtsObject implements Serializable
   {
     deleted = true;
 
-    if ((from.getParent() != null)&&(from.getParent() instanceof FtsPatcherObject))
-	((FtsPatcherObject)from.getParent()).removeConnection(this);
+    from.setDirty(); // from and to must be in the same document !!
+
+    if (from.getPatcherData() != null)
+      from.getPatcherData().removeConnection(this);
 
     // Clean up
 
@@ -157,14 +159,14 @@ public class FtsConnection extends FtsObject implements Serializable
 
   /** Access the From. The From is the FtsObject origin of the connection. */
 
-  public FtsGraphicObject getFrom()
+  public FtsObject getFrom()
   {
     return from;
   }
 
   /** Access the To. The To is the FtsObject destination of the connection. */
 
-  public FtsGraphicObject getTo()
+  public FtsObject getTo()
   {
     return to;
   }

@@ -25,8 +25,6 @@
 
 package ircam.jmax.toolkit.menus;
 
-import java.io.*;
-
 import java.awt.*;
 import java.awt.event.*;
 
@@ -34,9 +32,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.editors.console.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
+import ircam.jmax.utils.*;
 
 /** Implement the patcher editor File Menu */
 
@@ -48,7 +46,6 @@ public class DefaultFileMenu extends EditorMenu
     super("File");
 
     setHorizontalTextPosition(AbstractButton.LEFT);
-    setDefaultNumEntries(7);
 
     add(DefaultActions.newAction, "New", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
     add(DefaultActions.openAction, "Open", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
@@ -61,69 +58,21 @@ public class DefaultFileMenu extends EditorMenu
     
     dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_SPACE);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
-  
-    JMaxApplication.getRecentFileHistory().addListDataListener(new ListDataListener(){
-	public void contentsChanged(ListDataEvent e)
-	{
-	  buildRecentFiles();
-	}
-	public void intervalAdded(ListDataEvent e)
-	{
-	  buildRecentFiles();
-	}    
-	public void intervalRemoved(ListDataEvent e) 
-	{
-	  buildRecentFiles();
-	}
-      });
-
-    buildRecentFiles();
   }
 
   public void updateMenu()
   {
-    if(JMaxApplication.getFtsServer() != null)
-      {
-	dspMenuItem.setEnabled(true);
-
-	boolean dspOn = JMaxApplication.getDspControl().getDspOn();
-      
-	if(dspOn) 
-	  dspMenuItem.setText("Desactivate DSP");
-	else
-	  dspMenuItem.setText("Activate DSP");
-      }
-    else
-      dspMenuItem.setEnabled(false);
-  }
-
-  void buildRecentFiles()
-  {
-    RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
-	
-    //remove all recent Files
-    int num = getItemCount() - getDefaultNumEntries();
-    while(num>0)
-      {
-	remove(getItemCount()-1); 
-	num--;
-      }
-
-    if(recentFileHistory.size() > 0)          
-      {  
-	File file;
-	JMenuItem jMenuItem;
-
-	addSeparator();
-
-	for (int i = 0; i < recentFileHistory.size(); ++i)
+      if(MaxApplication.getFts()!=null)
 	  {
-	    file = (File)recentFileHistory.get(i);
-		  
-	    jMenuItem = add(new OpenAction(file), (i+1)+":  "+file.getName());
-	    jMenuItem.setMnemonic(Character.forDigit(i+1, 10));
+	      dspMenuItem.setEnabled(true);
+
+	      boolean dspOn = MaxApplication.getFts().getDspController().getDspOn().booleanValue();
+      
+	      if(dspOn) dspMenuItem.setText("Desactivate DSP");
+	      else dspMenuItem.setText("Activate DSP");
 	  }
-      }
+      else
+	  dspMenuItem.setEnabled(false);
   }
 }
 

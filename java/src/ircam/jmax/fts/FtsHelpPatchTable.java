@@ -28,8 +28,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.io.*;
 
-import ircam.jmax.*;
-import ircam.fts.client.*;
+import ircam.jmax.mda.*;
 
 /**
  * This class provide a registration service for help Patches.
@@ -85,7 +84,7 @@ public class FtsHelpPatchTable
 
   /** Get a named help patch summary filename */
 
-  static public String getHelpSummaryPatch(String className)
+  static String getHelpSummaryPatch(String className)
   {
     return (String) helpSummaryTable.get(className);
   }
@@ -94,44 +93,51 @@ public class FtsHelpPatchTable
 
   static public boolean openHelpPatch(FtsObject obj)
   {
-      /*if (exists(obj.getClassName()))
-	{
+    if (exists(obj.getClassName()))
+      {
 	try
-	{
-	File file = new File(getHelpPatch(obj.getClassName()));
-	MaxDocument document;
-	    
-	document = Mda.loadDocument(obj.getFts(), file);
-	document.edit();
-	}
+	  {
+	    File file = new File(getHelpPatch(obj.getClassName()));
+	    MaxDocument document;
+
+	    document = Mda.loadDocument(obj.getFts(), file);
+	    document.edit();
+	  }
 	catch (MaxDocumentException e)
-	{
-	return false;
-	}
+	  {
+	    return false;
+	  }
 
 	return true;
-	}
-	else*/
+      }
+    else
       return false;
   }
 
 
   /** Open an help summary patch */
 
-  static public void openHelpSummary( String name)
+  static public boolean openHelpSummary(MaxContext context, String name)
   {
     if (summaryExists(name))
       {
-	String file = getHelpSummaryPatch(name);
 	try
 	  {
-	    JMaxApplication.getFtsServer().getRoot().load( file);
+	    File file = new File(getHelpSummaryPatch(name));
+	    MaxDocument document;
+
+	    document = Mda.loadDocument(context, file);
+	    document.edit();
 	  }
-	catch(IOException e)
+	catch (MaxDocumentException e)
 	  {
-	    System.err.println("[FtsHelpPatchTable]: I/O error opening Help Summary file "+file);
+	    return false;
 	  }
+
+	return true;
       }
+    else
+      return false;
   }
 
   /** Get an enumeration of the available summaries */

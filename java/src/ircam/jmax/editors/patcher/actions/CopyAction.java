@@ -41,7 +41,7 @@ public class CopyAction extends EditorAction
 {
   public  void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.getManager().Copy(container);
+    PatcherClipboardManager.clipboardManager.Copy(container);
   }
 }
 

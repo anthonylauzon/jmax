@@ -26,13 +26,13 @@
 package ircam.jmax.editors.patcher;
 
 import java.util.*;
-import java.io.*;
 import java.awt.*; 
 import java.awt.datatransfer.*;
 import javax.swing.*; 
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -53,19 +53,12 @@ public class ErmesSelection implements Transferable
   private MaxVector connections = new MaxVector();
   private ErmesSketchPad owner;
 
-  private FtsSelection ftsSelection;
-
-  public static FtsSelection getFtsSelection()
-  {
-      return patcherSelection.ftsSelection;
-  }
-
   public static DataFlavor patcherSelectionFlavor = new DataFlavor(ircam.jmax.fts.FtsSelection.class, "PatcherSelection");
   public static DataFlavor flavors[] = { patcherSelectionFlavor };
 
   public Object getTransferData(DataFlavor flavor)
   {
-    return ftsSelection;
+    return MaxApplication.getFts().getSelection();
   } 
 
   public DataFlavor[]  getTransferDataFlavors() 
@@ -84,20 +77,10 @@ public class ErmesSelection implements Transferable
       flavors = new DataFlavor[1];
 
     flavors[0] = patcherSelectionFlavor;
-  
-    try
-	{
-	    ftsSelection = new FtsSelection();
-	}
-    catch(IOException e)
-	{
-	    System.err.println("[ErmesSelection]: Error in FtsSelection creation!");
-	    e.printStackTrace();
-	}
   }
 
 
-  public void select( GraphicObject object) 
+  public void select(GraphicObject object) 
   {
     if (object.getSketchPad() != owner)
       setOwner(object.getSketchPad());
@@ -105,7 +88,7 @@ public class ErmesSelection implements Transferable
     if (! objects.contains( object))
       {
 	objects.addElement( object);
-	ftsSelection.addObject( object.getFtsObject());
+	MaxApplication.getFts().getSelection().addObject( object.getFtsObject());
 	object.setSelected(true);
       }
   }
@@ -118,7 +101,7 @@ public class ErmesSelection implements Transferable
     if (! connections.contains( connection))
       {
 	connections.addElement( connection);
-	ftsSelection.addConnection( connection.getFtsConnection());
+	MaxApplication.getFts().getSelection().addConnection( connection.getFtsConnection());
 	connection.setSelected(true);
       }
   }
@@ -129,7 +112,7 @@ public class ErmesSelection implements Transferable
       {
 	object.setSelected(false);
 	objects.removeElement( object);
-	ftsSelection.removeObject( object.getFtsObject());
+	MaxApplication.getFts().getSelection().removeObject( object.getFtsObject());
       }
   }
 
@@ -139,7 +122,7 @@ public class ErmesSelection implements Transferable
       {
 	connection.setSelected(false);
 	connections.removeElement( connection);
-	ftsSelection.removeConnection( connection.getFtsConnection());
+	MaxApplication.getFts().getSelection().removeConnection( connection.getFtsConnection());
       }
   }
 
@@ -163,11 +146,7 @@ public class ErmesSelection implements Transferable
   {
     return (GraphicObject) objects.elementAt(0);
   }
-
-  public Enumeration getSelectedObjects()
-  {
-    return objects.elements();
-  }
+  
   public void deselectAll() 
   {
     for (Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
@@ -178,7 +157,7 @@ public class ErmesSelection implements Transferable
 
     objects.removeAllElements();
     connections.removeAllElements();
-    ftsSelection.clean();
+    MaxApplication.getFts().getSelection().clean();
   }
 
   public void redraw() 
@@ -203,11 +182,6 @@ public class ErmesSelection implements Transferable
   public boolean isEmpty() 
   {
     return objects.isEmpty() && connections.isEmpty();
-  }
-
-  public boolean isObjectsEmpty() 
-  {
-    return objects.isEmpty();
   }
 
   public boolean hasObjects() 
@@ -248,26 +222,16 @@ public class ErmesSelection implements Transferable
 
   public void deleteAll()
   {
-    if( connections.size() > 0)
-      {
-	for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
-	  ((GraphicConnection) e.nextElement()).delete();
-	
-	connections.removeAllElements();
-      }
-    
-    if( objects.size() > 0)
-      {
-	getOwner().getFtsPatcher().requestDeleteObjects(objects.elements());
-	
-	for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
-	  ((GraphicObject) e.nextElement()).delete();
-	
-	objects.removeAllElements();
-      }
-    
-    ftsSelection.clean();
-    
+    for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
+	((GraphicConnection) e.nextElement()).delete();
+
+    for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
+	((GraphicObject) e.nextElement()).delete();
+
+    objects.removeAllElements();
+    connections.removeAllElements();
+    MaxApplication.getFts().getSelection().clean();
+
     if (owner != null)
       owner.getDisplayList().reassignLayers();
   }
@@ -431,6 +395,21 @@ public class ErmesSelection implements Transferable
   {
     if(hasObjects())
       owner.getDisplayList().objectsToBack(objects.getObjectArray(), objects.size());
+  }
+
+  public boolean openHelpPatches()
+  {
+    GraphicObject object;
+      
+    for (Enumeration en = objects.elements(); en.hasMoreElements(); )
+      {
+	object = (GraphicObject) en.nextElement();
+	
+	if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
+	  return false;
+      }
+
+    return true;
   }
 
   // Queries about selection geometry

@@ -62,11 +62,10 @@ class HelpInteraction extends Interaction
 	object = (GraphicObject) area.getTarget();
 
 	if (object != null)
-	  /*if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
-	    JOptionPane.showMessageDialog(editor.getEditorContainer().getFrame(), 
-	    "Sorry, no help for object "+object.getFtsObject().getDescription(), 
-	    "Warning", JOptionPane.INFORMATION_MESSAGE); */
-	  editor.getFtsPatcher().requestOpenHelpPatch( object.getFtsObject());
+	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
+	      JOptionPane.showMessageDialog(editor.getEditorContainer().getFrame(), 
+					    "Sorry, no help for object "+object.getFtsObject().getClassName(), 
+					    "Warning", JOptionPane.INFORMATION_MESSAGE); 
 
 	locked = false;
 	editor.endInteraction();

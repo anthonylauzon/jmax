@@ -26,21 +26,8 @@
 #ifndef _SEQUENCE_H_
 #define _SEQUENCE_H_
 
-#ifdef WIN32
-#if defined(SEQUENCE_EXPORTS)
-#define SEQUENCE_API __declspec(dllexport)
-#else
-#define SEQUENCE_API __declspec(dllimport)
-#endif
-#else
-#define SEQUENCE_API extern
-#endif
-
 #include <fts/fts.h>
 #include "track.h"
-
-SEQUENCE_API void
-sequence_config(void);
 
 /*****************************************************************
  *
@@ -55,22 +42,19 @@ typedef struct _sequence_
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
 
-  fts_array_t array;
-
   int open; /* flag: is 1 if sequence editor is open */
-  track_t *last_track; /* last created track */
-
-  fts_symbol_t keep;
+  double zoom; 
+  int scroll; 
+  track_t *currently_loaded_event_track; /* its more like a hack for loading bmax files */
 } sequence_t;
 
 #define sequence_get_size(s) ((s)->size)
 #define sequence_get_first_track(s) ((s)->tracks)
-#define sequence_get_keep(s) ((s)->keep)
 
 #define sequence_set_editor_open(s) ((s)->open = 1)
 #define sequence_set_editor_close(s) ((s)->open = 0)
 #define sequence_editor_is_open(s) ((s)->open != 0)
-
+ 
 extern void sequence_add_track(sequence_t *sequence, track_t *track);
 extern void sequence_remove_track(sequence_t *sequence, track_t *track);
 

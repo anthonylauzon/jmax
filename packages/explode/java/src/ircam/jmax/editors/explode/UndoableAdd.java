@@ -60,7 +60,7 @@ class UndoableAdd extends AbstractUndoableEdit {
   
   public void undo()
   {
-    itsEvent.getDataModel().deleteEvent(itsEvent);
+    itsEvent.getDataModel().removeEvent(itsEvent);
   }
 
 }

@@ -25,7 +25,18 @@
 
 package ircam.jmax.editors.explode.menus;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.datatransfer.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
+import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.explode.*;
 import ircam.jmax.editors.explode.actions.*;

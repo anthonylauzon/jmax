@@ -139,22 +139,14 @@ public class AmbitusValue extends AbstractEventValue
 
     public Class getPropertyType(int index)
     {
-	/*if(index < defPropertyCount)
-	  return propertyTypesArray[index];
-	  else
-	  return Integer.class;*/
-	switch(index){
-	case 0: 
-	    return Integer.class;
-	case 1:
-	    return Double.class;
-	default:
-	    return Integer.class;
-	}
+      if(index < defPropertyCount)
+	return propertyTypesArray[index];
+      else
+	return Integer.class;
     }
  
     String defNamesArray[] = {"pitch", "duration", "midi_velocity", "midi_channel"};
-      //Class propertyTypesArray[] = {Integer.class, Double.class, Integer.class, Integer.class};
+    Class propertyTypesArray[] = {Integer.class, Double.class, Integer.class, Integer.class};
     int defPropertyCount = 4;
   }
 
@@ -221,21 +213,14 @@ public class AmbitusValue extends AbstractEventValue
 
   static 
   {
-      /*
-	WARNING:
-	Waiting for a method to get the packagePath from the package name
-      */
-      /*try
-	{
+    try
+      {
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	}
-	catch(FileNotFoundException e){
-	path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	}*/
-      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-      /*************************************************************/
-      
-      AMBITUS_ICON = new ImageIcon(path+"note.gif");
+      }
+    catch(FileNotFoundException e){
+      path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+    }
+    AMBITUS_ICON = new ImageIcon(path+"note.gif");
   }
 
   static String nameArray[] = {"pitch", "duration", "midi_velocity", "midi_channel"};

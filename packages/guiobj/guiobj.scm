@@ -21,12 +21,15 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-(append-local-path this-package (file-cat "java" "classes"))
-(load-class this-package "ircam.jmax.guiobj.GuiObjExtension")
+;; package declaration
+(provide-package "guiobj" "0.0.0")
+
+; load dynamic libraries into the server
+(ucs "load" "module" "guiobj" (file-cat dir "c" "lib" jmax-arch jmax-mode "libguiobj.so"))
 
 ;; load help patch table
-(load-silently (file-cat dir "help" "guiobj.help.index.scm"))
-(help-summary "GUI summary" (file-cat dir "help" "guiobj.summary.jmax"))
+(sshh-load (file-cat dir "help" "guiobj.help.index.scm"))
 
-(println "package: guiobj (user interface objects)")
+; load silently
+;post "package: guiobj"
 

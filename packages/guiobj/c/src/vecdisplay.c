@@ -39,6 +39,7 @@ typedef struct
   int range;
   int n;
   fts_atom_t a[1024];
+  fts_alarm_t alarm;
   double period;
   int gate;
   int pending;
@@ -56,15 +57,40 @@ static fts_symbol_t sym_bounds = 0;
  *
  */
 static void
-vecdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_deliver(vecdisplay_t *this)
+{
+  if(fts_object_patcher_is_open((fts_object_t *)this))
+    {
+      if(this->gate)
+	{
+	  this->pending = 0;
+	  this->gate = 0;
+	  
+	  if(this->scroll)
+	    fts_client_send_message((fts_object_t *)this, sym_scroll, this->n, this->a);
+	  else
+	    fts_client_send_message((fts_object_t *)this, sym_display, this->n, this->a);
+	  
+	  this->n = 0;
+	  
+	  fts_alarm_set_delay(&this->alarm, this->period);
+	}
+      else
+	this->pending = 1;
+    }
+  else
+    this->pending = 0;
+}
+
+static void
+vecdisplay_alarm(fts_alarm_t *alarm, void *o)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
-  fts_patcher_t *patcher = fts_object_get_patcher(o);
 
-  if(patcher && fts_patcher_is_open(patcher))
+  if(fts_object_patcher_is_open((fts_object_t *)this) && this->pending)
     {
-      this->gate = 0; /* close gate for period */
-      this->pending = 0; /* is delivered */
+      this->gate = 0;
+      this->pending = 0;
       
       if(this->scroll)
 	fts_client_send_message(o, sym_scroll, this->n, this->a);
@@ -73,19 +99,10 @@ vecdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       this->n = 0;
       
-      fts_timebase_add_call(fts_get_timebase(), o, vecdisplay_send, 0, this->period);
+      fts_alarm_set_delay(&this->alarm, this->period);
     }
   else
     this->gate = 1;
-}
-
-static void
-vecdisplay_deliver(vecdisplay_t *this)
-{
-  this->pending = 1; /* there is something to deliver */
-  
-  if(this->gate)
-    vecdisplay_send((fts_object_t *)this, 0, 0, 0, 0);
 }
 
 /************************************************************
@@ -335,15 +352,15 @@ vecdisplay_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-vecdisplay_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
   fts_atom_t a[2];
 
   fts_set_float(a + 0, this->min);
   fts_set_float(a + 1, this->max);
-  fts_dumper_send(dumper, sym_bounds, 2, a);
+  fts_bmax_save_message(file, sym_bounds, 2, a);
 }
 
 /************************************************************
@@ -371,6 +388,16 @@ vecdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   this->pending = 0;
 
   this->scroll = 0;
+
+  fts_alarm_init(&this->alarm, 0, vecdisplay_alarm, (void *)this);
+}
+
+static void
+vecdisplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vecdisplay_t * this = (vecdisplay_t *)o;
+
+  fts_alarm_reset(&this->alarm);
 }
 
 static fts_status_t 
@@ -379,11 +406,11 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(vecdisplay_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vecdisplay_init);
-
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vecdisplay_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, vecdisplay_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, vecdisplay_dump);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, vecdisplay_save_bmax);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, vecdisplay_set_size_by_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("size"), vecdisplay_set_size_by_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), vecdisplay_set_range_by_client);
 
   fts_method_define_varargs(cl, fts_SystemInlet, sym_bounds, vecdisplay_set_bounds);
@@ -395,7 +422,7 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, vecdisplay_list);
   fts_method_define_varargs(cl, 0, fvec_symbol, vecdisplay_fvec);
   fts_method_define_varargs(cl, 0, ivec_symbol, vecdisplay_ivec);
-  fts_method_define_varargs(cl, 0, fts_s_clear, vecdisplay_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), vecdisplay_clear);
 
   return fts_Success;
 }

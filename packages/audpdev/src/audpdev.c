@@ -293,10 +293,10 @@ static void audp_dac_put( fts_word_t *argv)
   audp_dev_data_t *data;
   int n_channels, channel, n, i, j, ret,r;
 
-  dev = *((fts_dev_t **)fts_word_get_pointer( argv));
+  dev = *((fts_dev_t **)fts_word_get_ptr( argv));
   data = (audp_dev_data_t *)fts_dev_get_device_data( dev);
-  n_channels = fts_word_get_int(argv + 1);
-  n = fts_word_get_int(argv + 2);
+  n_channels = fts_word_get_long(argv + 1);
+  n = fts_word_get_long(argv + 2);
  
   /* Platform specific code should go here */
 
@@ -308,7 +308,7 @@ static void audp_dac_put( fts_word_t *argv)
     {
       float *in;
   
-      in = (float *) fts_word_get_pointer( argv + 3 + channel);
+      in = (float *) fts_word_get_ptr( argv + 3 + channel);
       j = channel;
       for ( i = 0; i < n; i++)
 	{	  
@@ -489,11 +489,11 @@ static void audp_adc_get( fts_word_t *args)
   int n_channels, channel, n, i, j, sz;
 
  
-  dev = *((fts_dev_t **)fts_word_get_pointer( args));
+  dev = *((fts_dev_t **)fts_word_get_ptr( args));
 
   data = (audp_dev_data_t *)fts_dev_get_device_data( dev);
-  n_channels = fts_word_get_int(args + 1);
-  n = fts_word_get_int(args + 2);
+  n_channels = fts_word_get_long(args + 1);
+  n = fts_word_get_long(args + 2);
 
   /* if(n_channels != data->handle->audp_header->channels)
     {
@@ -541,7 +541,7 @@ static void audp_adc_get( fts_word_t *args)
   if (data->in_fifo.end - data->in_fifo.begin > data->in_fifo.high) 
     data->in_stats.fifo_high++;
 
-  /* pop the vector */
+  /* pop the fts_vector */
   sz = n * n_channels * sizeof(platform_sample_t);
 
   if (audp_fifo_read(&data->in_fifo, sz, data->samples_buffer) < 0) {
@@ -557,7 +557,7 @@ static void audp_adc_get( fts_word_t *args)
     {
       float *out;
       
-      out = (float *) fts_word_get_pointer( args + 3 + channel);
+      out = (float *) fts_word_get_ptr( args + 3 + channel);
       
       j = channel;
       for ( i = 0; i < n; i++)

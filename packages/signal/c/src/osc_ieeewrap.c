@@ -26,7 +26,6 @@
 
 
 #include <fts/fts.h>
-#include <utils.h>
 #include "osc.h"
 
 typedef struct osc_data
@@ -53,8 +52,8 @@ typedef struct osc_data
 static void
 osc_ftl_control_input_ptr(fts_word_t *argv)
 {
-  osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict out = (float *) fts_word_get_pointer(argv + 1);
+  osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict out = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   float * restrict buf = data->table.ptr;
   double incr = data->incr.absolute;
@@ -84,8 +83,8 @@ osc_ftl_control_input_ptr(fts_word_t *argv)
 static void
 osc_ftl_control_input_fvec(fts_word_t *argv)
 {
-  osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict out = (float *) fts_word_get_pointer(argv + 1);
+  osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict out = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   float * restrict buf = fvec_get_ptr(data->table.fvec);
   double incr = data->incr.absolute;
@@ -115,9 +114,9 @@ osc_ftl_control_input_fvec(fts_word_t *argv)
 static void
 osc_ftl_signal_input_ptr(fts_word_t *argv)
 {
-  osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict in = (float *) fts_word_get_pointer(argv + 1);
-  float * restrict out  = (float *) fts_word_get_pointer(argv + 2);
+  osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict in = (float *) fts_word_get_ptr(argv + 1);
+  float * restrict out  = (float *) fts_word_get_ptr(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
   float * restrict buf = data->table.ptr;
   double factor = data->incr.factor;
@@ -147,9 +146,9 @@ osc_ftl_signal_input_ptr(fts_word_t *argv)
 static void
 osc_ftl_signal_input_fvec(fts_word_t *argv)
 {
-  osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict in = (float *) fts_word_get_pointer(argv + 1);
-  float * restrict out  = (float *) fts_word_get_pointer(argv + 2);
+  osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict in = (float *) fts_word_get_ptr(argv + 1);
+  float * restrict out  = (float *) fts_word_get_ptr(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
   float * restrict buf = fvec_get_ptr(data->table.fvec);
   double factor = data->incr.factor;
@@ -179,8 +178,8 @@ osc_ftl_signal_input_fvec(fts_word_t *argv)
 static void
 osc_ftl_signal_input_inplace_ptr(fts_word_t *argv)
 {
-  osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict sig = (float *) fts_word_get_pointer(argv + 1);
+  osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict sig = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   float * restrict buf = data->table.ptr;
   double factor = data->incr.factor;
@@ -210,8 +209,8 @@ osc_ftl_signal_input_inplace_ptr(fts_word_t *argv)
 static void
 osc_ftl_signal_input_inplace_fvec(fts_word_t *argv)
 {
-  osc_data_t *data = (osc_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict sig = (float *) fts_word_get_pointer(argv + 1);
+  osc_data_t *data = (osc_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict sig = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   float * restrict buf = fvec_get_ptr(data->table.fvec);
   double factor = data->incr.factor;

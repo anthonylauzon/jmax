@@ -35,7 +35,7 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.fts.client.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -126,7 +126,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   private static boolean followingOutletLocations = false;
 
   static final int ERROR_MESSAGE_DISPLAY_PAD = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.INOUTLET_WIDTH + 1;
-  private static Font errorFont = new Font(ircam.jmax.Platform.FONT_NAME, Font.BOLD, ircam.jmax.Platform.FONT_SIZE);
+  private static Font errorFont = new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.BOLD, ircam.jmax.utils.Platform.FONT_SIZE);
 
   final public static void setFollowingInOutletLocations(boolean v)
   {
@@ -147,7 +147,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   protected transient ErmesSketchPad itsSketchPad;
 
-  protected transient FtsGraphicObject ftsObject = null;
+  protected transient FtsObject ftsObject = null;
 
   private transient boolean selected = false;
 
@@ -165,16 +165,69 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   public static final int ON_OUTLET = 1;
   public static final int ON_OBJECT = 2;
 
-  protected GraphicObject( FtsGraphicObject theFtsObject) 
+  // A Static method that work as a virtual constructor;
+  // given an FTS object, build the proper FTS Object
+
+  static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsObject object) 
+  {
+    GraphicObject gobj = null;
+    String theName = object.getClassName();
+    Class aClass = ObjectCreatorManager.getGraphicClass(theName);
+
+    if(aClass != null)
+      {
+	Object[] arg = new Object[] {sketch, object};
+	try
+	  {
+	    Constructor constr = aClass.getConstructors()[0];    
+	    if(constr != null)
+	      gobj = (GraphicObject)(constr.newInstance(arg));
+	    
+	  } 
+	catch (InstantiationException e) 
+	  {
+	    System.out.println(e);
+	  } 
+	catch (IllegalAccessException e) 
+	  {
+	    System.out.println(e);
+	  } 
+	catch (InvocationTargetException e) 
+	  {
+	    System.out.println(e);
+	  } 
+      }
+    else if (theName.equals( "inlet"))
+      gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
+    else if (theName.equals( "outlet"))
+      gobj = new ircam.jmax.editors.patcher.objects.Outlet( sketch, object);
+    else if (theName.equals( "jpatcher"))
+      gobj = new ircam.jmax.editors.patcher.objects.Patcher( sketch, object);
+    else
+      gobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
+
+    if(gobj!=null)
+      object.setObjectListener(gobj);
+
+    return gobj;
+  }
+
+  protected GraphicObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     String fontName;
     int fontSize;
     int fontStyle;
 
+    if(assistArgs == null)
+      {
+	assistArgs = new FtsAtom[2];
+	
+	for(int i = 0; i < assistArgs.length; i++)
+	  assistArgs[i] = new FtsAtom();
+      }
+    
+    itsSketchPad = theSketchPad;
     ftsObject = theFtsObject;
-    itsSketchPad = ((ErmesSketchWindow)((FtsPatcherObject)ftsObject.getParent()).getEditorFrame()).getSketchPad();
-
-    ftsObject.setObjectListener(this);
 
     selected = false;
 
@@ -200,11 +253,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void delete()
   {
-    itsSketchPad.getDisplayList().deleteConnectionsForObject(this);
     itsSketchPad.getDisplayList().remove(this);
-    itsSketchPad.getFtsPatcher().removeObject( ftsObject);
     dispose();
-    //ftsObject.delete();
+    ftsObject.delete();
   }
   
   public final int getX() 
@@ -267,26 +318,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
       }
   }
 
-  public void setCurrentBounds(int x, int y, int w, int h)
-  {
-    if(( w <= 0)||( h <= 0))
-      {
-	ftsObject.setCurrentX( ScaleTransform.getInstance().invScaleX(x));
-	ftsObject.setCurrentY( ScaleTransform.getInstance().invScaleY(y));
-	setDefaults();
-      }
-    else
-      ftsObject.setCurrentBounds( ScaleTransform.getInstance().invScaleX(x),
-				  ScaleTransform.getInstance().invScaleY(y),
-				  ScaleTransform.getInstance().invScaleX(w),
-				  isSquare() ? ScaleTransform.getInstance().invScaleX(h) 
-				  : ScaleTransform.getInstance().invScaleY(h ));
-    
-    //itsSketchPad.getDisplayList().updateConnectionsFor(this);
-  }
-
-  public void setDefaults(){}
-
   public boolean isSquare()
   {
     return false;
@@ -308,6 +339,11 @@ abstract public class GraphicObject implements DisplayObject, Serializable
       {
 	setHeight(h);
       }
+  }
+
+  public void setColor(int color)
+  {
+    ftsObject.setColor(color);
   }
 
   public Font getFont() 
@@ -403,28 +439,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     ftsObject.setFont(itsFont.getName());
     ftsObject.setFontSize(itsFont.getSize());
     ftsObject.setFontStyle(itsFont.getStyle());
-  }
-
-  public void setCurrentFont( String fontName, int fontSize, int fontStyle) 
-  {
-    if(fontName == null)
-      fontName = itsSketchPad.getDefaultFontName();
-    if( fontSize <= 0)
-      fontSize = itsSketchPad.getDefaultFontSize();
-    if( ( fontStyle != Font.PLAIN) && ( fontStyle != Font.ITALIC) && ( fontStyle != Font.BOLD))
-      fontStyle = itsSketchPad.getDefaultFontStyle();
-
-    setCurrentFont( FontCache.lookupFont( fontName, fontSize, fontStyle));
-  }
-
-  public void setCurrentFont(Font font)
-  {
-    itsFont = font;
-    itsFontMetrics = itsSketchPad.getFontMetrics( itsFont);
-
-    ftsObject.setCurrentFontName( itsFont.getName());
-    ftsObject.setCurrentFontSize( itsFont.getSize());
-    ftsObject.setCurrentFontStyle( itsFont.getStyle());
   }
 
   public void fitToText()
@@ -580,10 +594,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void redefine(String text) 
   {
-      updateInOutlets();
+    updateInOutlets();
   }
-
-  public void redefined(){}
 
   final public void setSelected(boolean v) 
   {
@@ -595,7 +607,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     return selected;
   }
 
-  public final FtsGraphicObject getFtsObject() 
+  public final FtsObject getFtsObject() 
   {
     return ftsObject;
   }
@@ -791,7 +803,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     final int anchorY  = getY() - 1;
     final int nInlets = ftsObject.getNumberOfInlets();
     
-    if( itsSketchPad.getConnectingObject()!=this)
+    if(itsSketchPad.getConnectingObject()!=this)
       {	   	
 	int d;
 	int start = getInletAnchorX(0);
@@ -1148,7 +1160,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   // Assist code
   // Protected against repetitions of assist messages
 
-    //private static FtsAtom assistArgs[] = null;
+  private static FtsAtom assistArgs[] = null;
 
   static FtsObject lastAssistedObject;
   static int lastPosition;
@@ -1183,8 +1195,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if (canDoAssist(ASSIST_OBJECT, 0))
       {
-	  /*assistArgs[0].stringValue = "object";
-	    ftsObject.sendMessage(-1, "assist", 1, assistArgs);*/
+	assistArgs[0].stringValue = "object";
+	ftsObject.sendMessage(-1, "assist", 1, assistArgs);
       }
   }
 
@@ -1192,9 +1204,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if (canDoAssist(ASSIST_INLET, n))
       {
-	  /*assistArgs[0].setString("inlet");
-	    assistArgs[1].setInt(n);
-	    ftsObject.sendMessage(-1, "assist", 2, assistArgs);*/
+	assistArgs[0].setString("inlet");
+	assistArgs[1].setInt(n);
+	ftsObject.sendMessage(-1, "assist", 2, assistArgs);
       }
   }
 
@@ -1202,9 +1214,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if (canDoAssist(ASSIST_OUTLET, n))
       {
-	  /*assistArgs[0].setString("outlet");
-	    assistArgs[1].setInt(n);
-	    ftsObject.sendMessage(-1, "assist", 2, assistArgs);*/
+	assistArgs[0].setString("outlet");
+	assistArgs[1].setInt(n);
+	ftsObject.sendMessage(-1, "assist", 2, assistArgs);
       }
   }
 

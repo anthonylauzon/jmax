@@ -21,6 +21,15 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
+;; package declaration
+(provide-package "system" "0.0.0")
+
+; load dynamic libraries into the server
+(ucs "load" "module" "system" (file-cat dir "c" "lib" jmax-arch jmax-mode "libsystem.so"))
+
 ;help
-(load-silently (file-cat dir "help" "system.help.index.scm"))
-(help-summary "system summary" (file-cat dir "help" "system.summary.jmax"))
+(help-patch "var" (file-cat dir "help" "var.help.jmax"))
+(help-patch "const" (file-cat dir "help" "const.help.jmax"))
+
+; load silently
+;post "package: system"

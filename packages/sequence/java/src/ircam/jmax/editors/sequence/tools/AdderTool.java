@@ -78,7 +78,7 @@ public class AdderTool extends Tool implements PositionListener {
     {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	
-	egc.getTrack().setProperty("selected", Boolean.TRUE);
+	egc.getTrack().setProperty("active", Boolean.TRUE);
 
 	if(egc.getDataModel().isLocked()) return;
 

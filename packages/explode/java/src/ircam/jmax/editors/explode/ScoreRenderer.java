@@ -25,13 +25,14 @@
 
 package ircam.jmax.editors.explode;
 
-import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.io.File;
+import ircam.jmax.MaxApplication;
 
 /**
  * The main class for a score representation.

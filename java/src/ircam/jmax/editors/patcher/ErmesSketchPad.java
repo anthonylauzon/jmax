@@ -32,16 +32,16 @@ import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.util.*;
 import java.lang.*;
-import java.io.*;
 
 import javax.swing.*; 
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
-import ircam.fts.client.*;
 
 import ircam.jmax.toolkit.*;
 
@@ -53,60 +53,17 @@ import ircam.jmax.toolkit.*;
  * offscreen and much, much more...
  */
 
-class UpdateGroupNotifier {
-  static ArrayList sketchPadList = new ArrayList();
-  
-  static void add( ErmesSketchPad sketchPad)
-  {
-    sketchPadList.add( sketchPad);
-  }
-
-  static void remove( ErmesSketchPad sketchPad)
-  {
-    sketchPadList.remove( sketchPad);
-  }
-
-  static
-  {
-    FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "update_group_begin"), new UpdateGroupBeginHandler());
-    FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "update_group_end"), new UpdateGroupEndHandler());
-  }
-}
-
-class UpdateGroupBeginHandler implements FtsMessageHandler {
-  public void invoke( FtsObject obj, FtsArgs args)
-  {
-    for( Iterator i = UpdateGroupNotifier.sketchPadList.iterator(); i.hasNext(); )
-      {
-	ErmesSketchPad sketchPad = (ErmesSketchPad)i.next();
-	sketchPad.updateGroupStart();
-      }
-  }  
-}
-
-class UpdateGroupEndHandler implements FtsMessageHandler {
-  public void invoke( FtsObject obj, FtsArgs args)
-  {
-    for( Iterator i = UpdateGroupNotifier.sketchPadList.iterator(); i.hasNext(); )
-      {
-	ErmesSketchPad sketchPad = (ErmesSketchPad)i.next();
-	sketchPad.updateGroupEnd();
-      }
-  }  
-}
-
-
-
-public class ErmesSketchPad extends JComponent implements  Editor, Printable
+public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGroupListener, Printable
 {
-
-
+  
   private boolean somethingToUpdate = false;
   private Rectangle invalid = new Rectangle();
   
+  //GlassPanel glass;
   public void paintAtUpdateEnd(GraphicObject object, int x, int y, int w, int h)
   {
     displayList.addToUpdate(object);
+    //glass.addToUpdate(object);
 
     if(!somethingToUpdate){
       somethingToUpdate = true;
@@ -117,23 +74,33 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   }
   public void resetUpdate(){
     displayList.resetUpdateObjects();
+    //glass.resetUpdateObjects();
     somethingToUpdate = false;
   }
   public Rectangle getUpdateRect(){
     return invalid;
   }
+  // --------------------------------------
+  // FtsUpdateGroupListener interface
+  // --------------------------------------  
+  static boolean syncPaint = false;
+  
+  static void setSyncPaint(boolean v)
+  {
+    syncPaint = v;
+  }
 
-  void updateGroupStart()
+  public void updateGroupStart()
   {
       resetUpdate();
   }
 
-  void updateGroupEnd()
+  public void updateGroupEnd()
   {
     Rectangle rect = getEditorContainer().getViewRectangle();
     Graphics gr;
 
-    if (isLocked()){
+    if (isLocked()/* && syncPaint*/){
 	gr = getGraphics();
 	if(gr!=null)
 	    {
@@ -142,6 +109,9 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 		gr.setClip(invalid);
 		displayList.updatePaint(gr);
 	    }
+	/*if(!glass.isVisible())
+	  glass.setVisible(true);
+	  glass.repaint();*/
     }    
     else
 	repaint(invalid); 
@@ -169,27 +139,46 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     return itsEditorContainer;
   }
 
-  private FtsPatcherObject itsPatcher;
+  private Fts fts;
 
-  public FtsPatcherObject getFtsPatcher()
+  final public Fts getFts()
+  {
+    return fts;
+  }
+
+  private FtsObject itsPatcher;
+
+  public FtsObject getFtsPatcher()
   {
     return itsPatcher;
   }
 
   public boolean isARootPatcher()
   {
-    return (getFtsPatcher().getParent() == getFtsPatcher().getServer().getRoot());
+    return (getFtsPatcher().getParent() == getFts().getRootObject());
   }
 
   public boolean isASubPatcher()
   {
-    return !itsPatcher.isARootPatcher();
+    return ((!itsDocument.isRootData(itsPatcherData))&&(itsPatcher instanceof FtsPatcherObject));
   }
   public boolean isATemplate()
   {
-      
-      //return ((!itsDocument.isRootData(itsPatcher))&&!(itsPatcher instanceof FtsPatcherObject));
-      return (itsPatcher instanceof FtsTemplateObject);
+    return ((!itsDocument.isRootData(itsPatcherData))&&!(itsPatcher instanceof FtsPatcherObject));
+  }
+
+  private FtsPatcherData itsPatcherData;
+
+  public FtsPatcherData getFtsPatcherData()
+  {
+    return itsPatcherData;
+  }
+
+  MaxDocument itsDocument;
+  
+  public MaxDocument getDocument()
+  {
+    return itsDocument;
   }
 
   // ---------------------------------------------------------------------
@@ -261,12 +250,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   private int incrementalPasteOffsetX;
   private int incrementalPasteOffsetY;
   private int numberOfPaste = 0;
-  private GraphicObject anOldPastedObject = null;
-  private int startPasteX = -1;
-  private int startPasteY = -1;
+  private FtsObject anOldPastedObject = null;
   private int lastCopyCount;
-  private MaxVector pastedObjects     = new MaxVector();
-  private MaxVector pastedConnections = new MaxVector();
 
   int getPasteNumber(){
     return ++numberOfPaste;
@@ -275,32 +260,12 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   {
     numberOfPaste = n;
   }  
-  void setOldPastedObject(GraphicObject obj){
+  void setOldPastedObject(FtsObject obj){
     anOldPastedObject = obj;
   }
-  void setStartPasteXY(int x, int y){
-    startPasteX = x;
-    startPasteY = y;
-  }
-  GraphicObject getOldPastedObject(){
+  FtsObject getOldPastedObject(){
     return anOldPastedObject;
   }
-  int getStartPasteX(){
-    return startPasteX;
-  }
-  int getStartPasteY(){
-    return startPasteY;
-  }
-  public void addPastedObject(GraphicObject obj)
-  {
-    pastedObjects.addElement( obj);
-  }
-
-  public void addPastedConnection(GraphicConnection c)
-  {
-    pastedConnections.addElement( c);
-  }
-
   void setIncrementalPasteOffsets(int offsetX, int offsetY){
     incrementalPasteOffsetX = offsetX;
     incrementalPasteOffsetY = offsetY;
@@ -311,14 +276,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   int getPasteOffsetY(){
     return incrementalPasteOffsetY;
   }
-  int getPasteDX()
-  {
-    return numberOfPaste*incrementalPasteOffsetX;
-  }
-  int getPasteDY()
-  {
-    return numberOfPaste*incrementalPasteOffsetY;
-  }
   void setLastCopyCount(int count){
     lastCopyCount = count;
   }
@@ -326,57 +283,106 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     return lastCopyCount;
   }
 
-  public void startPaste(){}
+  // --------------------------------------------------------------
+  // init
+  // --------------------------------------------------------------
 
-  public void endPaste()
-  {
-    ErmesSelection.patcherSelection.deselectAll();
-    for(Enumeration e = pastedObjects.elements(); e.hasMoreElements();)
-      ErmesSelection.patcherSelection.select( (GraphicObject)e.nextElement());
-    for(Enumeration e = pastedConnections.elements(); e.hasMoreElements();)
-      ErmesSelection.patcherSelection.select( (GraphicConnection)e.nextElement());
-    
-    setOldPastedObject(  ErmesSelection.patcherSelection.getSingleton());    
-    if(( startPasteX == -1)||( startPasteY == -1))
-      setStartPasteXY( anOldPastedObject.getX(), anOldPastedObject.getY());
+  void InitFromFtsContainer( FtsPatcherData theContainerObject)
+  {    
+    FtsPatcherData aFtsPatcherData = theContainerObject;
+    Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
+    int osize = aFtsPatcherData.getObjects().size();
+    boolean doLayers = false;
 
-    pastedObjects.removeAllElements();
-    pastedConnections.removeAllElements();
+    for ( int i = 0; i < osize; i++)
+      {
+	GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsObject)objects[i]);
+
+	displayList.add( object);
+
+	if (object.getLayer() < 0)
+	  doLayers = true;
+      }
+
+    MaxVector connectionVector = aFtsPatcherData.getConnections();
+    Object[] connections = aFtsPatcherData.getConnections().getObjectArray();
+    int csize = aFtsPatcherData.getConnections().size();
+
+    for ( int i = 0; i < csize; i++)
+      {
+	GraphicConnection connection;
+	FtsConnection fc = (FtsConnection)connections[i];
+
+	connection = new GraphicConnection(this, 
+					   displayList.getGraphicObjectFor(fc.getFrom()), fc.getFromOutlet(), 
+					   displayList.getGraphicObjectFor(fc.getTo()), fc.getToInlet(),
+					   fc.getType(), fc);
+	displayList.add(connection);
+	connection.updateDimensions();
+      }
+
+    if (doLayers)
+      displayList.reassignLayers();
+
+    displayList.sortDisplayList();
+
+    //fix bug 170
+    aFtsPatcherData.getDocument().setSaved(true);
+  
+    ///////////////////////////////////////////////////////////////
+    /*int width = ScaleTransform.getInstance().scaleX(aFtsPatcherData.getWindowWidth());
+      int height = ScaleTransform.getInstance().scaleY(aFtsPatcherData.getWindowHeight());
     
-    fixSize();
-    repaint();
+      if (width <= 0)
+      width = ScaleTransform.getInstance().scaleX(480);
+      
+      if (height <= 0)
+      height =  ScaleTransform.getInstance().scaleY(500);
+
+      setSize(width, height);
+      setPreferredSize(new Dimension(width, height));*/
+    //////////////////////////////////////////////////////////////
   }
 
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-  ErmesSketchPad(EditorContainer container, FtsPatcherObject thePatcher) 
+  ErmesSketchPad(EditorContainer container, FtsPatcherData thePatcherData) 
   {
+    super();
+
     String s;
 
     // Setting the local variables
     itsEditorContainer = container;
 
-    itsPatcher      = thePatcher;
+    itsPatcherData  = thePatcherData;
+    fts = itsPatcherData.getFts();
+    itsPatcher      = thePatcherData.getContainerObject(); // ???
+
+    itsDocument     = itsPatcher.getDocument();
 
     // Initialize state
-    //itsPatcher.setPatcherListener(new ErmesPatcherListener(this));
+    itsPatcherData.setPatcherListener(new ErmesPatcherListener(this));
 
+    //fts.addUpdateGroupListener( this);//bug fix 11/5 
+    
     // Get the defaultFontName and Size
-    defaultFontName = JMaxApplication.getProperty("jmaxDefaultFont");
+    defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
 
     if (defaultFontName == null)
-      defaultFontName = ircam.jmax.Platform.FONT_NAME;
+      defaultFontName = ircam.jmax.utils.Platform.FONT_NAME;
 
-    s = JMaxApplication.getProperty("jmaxDefaultFontSize");
+    s = MaxApplication.getProperty("jmaxDefaultFontSize");
     
     if (s == null)
-	defaultFontSize = ircam.jmax.Platform.FONT_SIZE;
+	defaultFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
     else
       defaultFontSize = Integer.parseInt(s);
 
 
-    defaultFontStyle = ircam.jmax.Platform.FONT_STYLE;
+    defaultFontStyle = ircam.jmax.utils.Platform.FONT_STYLE;
+
 
     // Install the display List object
 
@@ -387,23 +393,25 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
     // Next two temporary (mdc)
 
-    if (JMaxApplication.getProperty("dg") != null)
+    if (MaxApplication.getProperty("dg") != null)
       {
 	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false); 
 	setDoubleBuffered(false);
 	setDebugGraphicsOptions(DebugGraphics.FLASH_OPTION);
       }
-    else if (JMaxApplication.getProperty("nodb") != null)
+    else if (MaxApplication.getProperty("nodb") != null)
       {
 	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
 	setDoubleBuffered(false);
       }
 
     setOpaque(true);
-    setLayout(null);
+    setLayout( null);
 
     itsEditField = new EditField( this);
     add( itsEditField);
+
+    InitFromFtsContainer( itsPatcherData);
 
     fixSize();
 
@@ -411,7 +419,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
     requestDefaultFocus(); 
 
-    UpdateGroupNotifier.add( this);
+    //glass = ((GlassPanel)((JFrame)itsEditorContainer.getFrame()).getGlassPane());
   }
   
   private float sx, sy;
@@ -499,17 +507,14 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   String getTitle(){
     String name;
 
-    if (itsPatcher.isARootPatcher())
+    if (itsDocument.isRootData(itsPatcherData))
+      name = itsDocument.getName();
+    else if (itsPatcher instanceof FtsPatcherObject)
       {
-	name = itsPatcher.getName();
-	if(name == null) name = "untitled";
+	name = "patcher " + itsPatcher.getDescription();
       }
-      else if(itsPatcher instanceof FtsTemplateObject)
-	  name = "template " + itsPatcher.getDescription();
-      else if (itsPatcher instanceof FtsPatcherObject)
-	  name = "patcher " + itsPatcher.getDescription();
-      else 
-	  name = "template " + itsPatcher.getDescription();
+    else
+      name = "template " + itsPatcher.getClassName();
     return name;
   }
 
@@ -589,68 +594,41 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   // create a graphic Object
   // ---------------------------------------------------------------
 
-  public void addNewObject(GraphicObject object, boolean doEdit)
+  GraphicObject makeObject( String description, int x, int y)
   {
-    
-    displayList.add( object);
-	
-    if(object.getLayer() == -1)
-      displayList.reassignLayers();
+    FtsObject fo;
+    GraphicObject object = null;
 
-    object.redraw();
-	
-    if (doEdit && newObjectEdit && (object instanceof Editable))
+    try
       {
-	// The EditField is not really ready until the control
-	// is returned back to the event loop; this is why we invoke textEditObject 
-	// with an invoke later command.
-	
-	final Editable obj  = (Editable)object;
-	
-	SwingUtilities.invokeLater(new Runnable() {
-	    public void run()
-	    { textEditObject((Editable)obj);}});
-      }
-  }
+	fo = fts.makeFtsObject( itsPatcher, description);
 
-  public void objectRedefined(FtsGraphicObject fObj)
-  {
-    GraphicObject obj = displayList.getGraphicObjectFor( fObj);
-    if ((obj instanceof Editable)&&(getTextEditedObject() == obj))
-      stopTextEditing();
-    else 
+	fo.setX( x);
+	fo.setY( y);
+
+	object = GraphicObject.makeGraphicObject( this, fo);
+	displayList.add( object);
+	displayList.reassignLayers();
+
+	object.redraw();
+      }
+    catch ( FtsException ftse)
       {
-	obj.setDefaults();
-	repaint();
+	System.err.println( "ErmesSketchPad:mousePressed: INTERNAL ERROR: FTS Instantiation Error: " + ftse);
+	ftse.printStackTrace();
       }
+
+    return object;
   }
-
-  public GraphicConnection addNewConnection(FtsConnection fc)
-  {
-      GraphicConnection connection = new GraphicConnection(this,displayList.getGraphicObjectFor(fc.getFrom()),
-							   fc.getFromOutlet(), 
-							   displayList.getGraphicObjectFor(fc.getTo()),
-							   fc.getToInlet(), fc.getType(), fc);
-      displayList.add(connection);
-      displayList.sortDisplayList();
-      connection.updateDimensions();
-      ErmesSelection.patcherSelection.select( connection);
-      connection.redraw();
-
-      return connection;
-  }
-
-    /***************************************************************/
-    /***************************************************************/
 
     //debug utility 
     private void printObjectsDescription()
     {
-	Object[] objects = itsPatcher.getObjects().getObjectArray();
-	int osize = itsPatcher.getObjects().size();
+	Object[] objects = itsPatcherData.getObjects().getObjectArray();
+	int osize = itsPatcherData.getObjects().size();
 
 	for ( int i = 0; i < osize; i++)
-	    System.err.println("obj "+(FtsGraphicObject)objects[i]+" "+((FtsGraphicObject)objects[i]).getDescription());
+	    System.err.println("obj "+(FtsObject)objects[i]+" "+((FtsObject)objects[i]).getDescription());
     }
 
   // -----------------------------------------------------------------------
@@ -701,12 +679,9 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   {
     // Should select or highlight obj if it is an FtsObject
 
-    if (obj instanceof FtsGraphicObject) 
+    if (obj instanceof FtsObject) 
       {
-	if(isLocked())
-	    setLocked(false);
-
-	GraphicObject object = displayList.getGraphicObjectFor((FtsGraphicObject) obj);
+	GraphicObject object = displayList.getGraphicObjectFor((FtsObject) obj);
 
 	if (object != null)
 	  {
@@ -725,8 +700,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 		object.redraw();
 	      }
 
-	    showSelection();	  
-	  }	
+	    showSelection();
+	  }
       }
   }
 
@@ -737,30 +712,30 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   }
   
   public int print(Graphics g, PageFormat pf, int pi) throws PrinterException 
-  {
-    Paper paper = pf.getPaper();
-    Point sketchPos = SwingUtilities.convertPoint(this, getLocation(), (ErmesSketchWindow)itsEditorContainer);
-    double onsetX = pf.getImageableX()+sketchPos.x;
-    double onsetY = pf.getImageableY()+sketchPos.y;
-    double width = pf.getImageableWidth();
-    double height = pf.getImageableHeight();
-    double scaleX = width / (getSize().width);
-    double scaleY = height / (getSize().height + 31);
-    double scale = (scaleX < scaleY)? scaleX: scaleY;
-    
-    if(scale < 1.0)
-      ((Graphics2D)g).scale(scale, scale);
-    
-    ((Graphics2D)g).translate(onsetX, onsetY);
-    
-    if (pi >= 1) {
-      return Printable.NO_SUCH_PAGE;
-    }
-    displayList.paint((Graphics2D) g);
-    return Printable.PAGE_EXISTS;
-  }
+    {
+	Paper paper = pf.getPaper();
+	Point sketchPos = SwingUtilities.convertPoint(this, getLocation(), (ErmesSketchWindow)itsEditorContainer);
+	double onsetX = pf.getImageableX()+sketchPos.x;
+	double onsetY = pf.getImageableY()+sketchPos.y;
+	double width = pf.getImageableWidth();
+	double height = pf.getImageableHeight();
+	double scaleX = width / (getSize().width);
+	double scaleY = height / (getSize().height + 31);
+	double scale = (scaleX < scaleY)? scaleX: scaleY;
 
-  final public void redraw()
+	if(scale < 1.0)
+	  ((Graphics2D)g).scale(scale, scale);
+
+	((Graphics2D)g).translate(onsetX, onsetY);
+
+	if (pi >= 1) {
+	    return Printable.NO_SUCH_PAGE;
+	}
+	displayList.paint((Graphics2D) g);
+	return Printable.PAGE_EXISTS;
+    }
+
+   final public void redraw()
   {
     repaint();
   }
@@ -768,14 +743,14 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   // ------------------------------------------------------------------------
   // toolbar support
   // ------------------------------------------------------------------------
-  private ToolBar toolBar;
+  private ErmesToolBar toolBar;
 
-  final void setToolBar( ToolBar toolBar)
+  final void setToolBar( ErmesToolBar toolBar)
   {
     this.toolBar = toolBar;
   }
 
-  final public ToolBar getToolBar( )
+  final public ErmesToolBar getToolBar( )
   {
     return toolBar;
   }
@@ -788,8 +763,10 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   void cleanAll()
   {
-    itsPatcher.resetPatcherListener();
+    itsPatcherData.resetPatcherListener();
     
+    fts.removeUpdateGroupListener( this);
+
     engine.dispose();
 
     if (ErmesSelection.patcherSelection.ownedBy(this))
@@ -803,10 +780,10 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     itsEditorContainer = null;// should not be needed, here to get the grabber !!
 
     itsPatcher = null;
+    itsPatcherData = null;
     itsEditField = null;
     anOldPastedObject = null;
-
-    UpdateGroupNotifier.remove( this);
+    itsDocument = null;
   }
 
 
@@ -816,33 +793,20 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   public void Close(boolean doCancel)
   {
-    if ( itsPatcher.isARootPatcher())
-      {
-	if( PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
+      if (! itsDocument.isRootData(itsPatcherData))
 	  {
-	    itsPatcher.stopUpdates();		      
-	    itsPatcher.requestDestroyEditor();
-	    //FtsPatcherObject.fireAtomicAction(true); 
-	    try
-	      {
-		itsPatcher.delete();
-	      }
-	    catch(IOException e){
-	      System.err.println("[ErmesSketchPad]: IO error deleting patcher");
-	    }
-
-	    ((ErmesSketchWindow)itsEditorContainer).Destroy();
+	      itsPatcherData.stopUpdates();
+	      Mda.dispose(itsPatcherData); 
 	  }
-      }
-    else
-      {
-	itsPatcher.stopUpdates();	
-	itsPatcher.requestDestroyEditor();
-	itsPatcher.resetPatcherListener();
-	((ErmesSketchWindow)itsEditorContainer).Destroy();
-      }
-
-    KeyEventsManager.removeProducer(this);
+      else 
+	  {
+	      if(PatcherSaveManager.saveClosing(getEditorContainer(), doCancel))
+		  itsDocument.dispose();
+	      // Just call dispose on the document
+	      // Mda will indirectly call Destroy, and will close all the other editors
+	  }
+    
+      KeyEventsManager.removeProducer(this);
   }
 
   
@@ -851,7 +815,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   // -----------------------------------------------------------------------
 
   private int waiting = 0;
-  
+
   public void waiting()
   {
     if (waiting >= 0)
@@ -877,7 +841,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   // initialMode property of a patcher is set and it is set
   // to something different than "run" (usually, "edit" :)
   void InitLock(){
-    if (itsPatcher.getRecursiveEditMode() == FtsPatcherObject.EDIT_MODE)
+    if (itsPatcherData.getRecursiveEditMode() == FtsPatcherData.EDIT_MODE)
       setLocked( false);
     else
       setLocked( true);
@@ -892,7 +856,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     // the patch, so that subpatcher can use it as their initial mode
     if (locked)
       {
-	itsPatcher.setEditMode(FtsPatcherObject.RUN_MODE);
+	itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
 	setRunModeInteraction();
 
 	if (isTextEditingObject())
@@ -904,7 +868,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     else
     {
       setEditModeInteraction();
-      itsPatcher.setEditMode(FtsPatcherObject.EDIT_MODE);
+      itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
     }
     redraw();
     
@@ -1062,13 +1026,27 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     showMessage(message);
 
     stopTextEditing();
+    setCursor(Cursors.get(description));     
 
     engine.setTopInteraction(Interactions.addModeInteraction);    
   }
 
   public void makeAddModeObject(int x, int y, boolean edit)
   {
-    itsPatcher.requestAddObject(newObjectDescription, x, y, edit);
+    GraphicObject object = makeObject(newObjectDescription, x, y);
+
+    if (edit && newObjectEdit && (object instanceof Editable))
+      {
+	// The EditField is not really ready until the control
+	// is returned back to the event loop; this is why we invoke textEditObject 
+	// with an invoke later command.
+	
+	final Editable obj  = (Editable)object;
+	
+	SwingUtilities.invokeLater(new Runnable() {
+	  public void run()
+	    { textEditObject((Editable)obj);}});
+      }
   }
 
   public  InteractionEngine getEngine()
@@ -1242,32 +1220,29 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   public void resizeToWindow(int width, int height){
     if (itsPatcher != null) {
-      itsPatcher.setWindowWidth(Math.round(ScaleTransform.getInstance().invScaleX(width)));
-      itsPatcher.setWindowHeight(Math.round(ScaleTransform.getInstance().invScaleY(height)));
+      itsPatcherData.setWindowWidth(Math.round(ScaleTransform.getInstance().invScaleX(width)));
+      itsPatcherData.setWindowHeight(Math.round(ScaleTransform.getInstance().invScaleY(height)));
       fixSize();
     }
   }
   public void relocateToWindow(int x, int y){
     if (itsPatcher != null) {
-	itsPatcher.setWindowX(x);
-	itsPatcher.setWindowY(y);
+	//itsPatcherData.setWindowX(Math.round(ScaleTransform.getInstance().invScaleX(x)));
+	//itsPatcherData.setWindowY(Math.round(ScaleTransform.getInstance().invScaleY(y)));
+	itsPatcherData.setWindowX(x);
+	itsPatcherData.setWindowY(y);
     }
   }
 
   void stopUpdates(){
     // Do the test because the awt can call this before itsPatcher is ready
-    if (itsPatcher != null)
-      itsPatcher.stopUpdates();
+    if (itsPatcherData != null)
+      itsPatcherData.stopUpdates();
   }
   void startUpdates(){
     // Do the test because the awt can call this before itsPatcher is ready
-    if (itsPatcher != null)
-      itsPatcher.startUpdates();
-  }
-
-  public void setDirty(boolean dirty)
-  {
-    getToolBar().setDirty(dirty);
+    if (itsPatcherData != null)
+      itsPatcherData.startUpdates();
   }
 }
 

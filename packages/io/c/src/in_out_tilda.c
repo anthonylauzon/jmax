@@ -17,6 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
+ *
  */
 
 #include <fts/fts.h>
@@ -146,6 +151,9 @@ static fts_status_t in_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom
 {
   int outlets = 0, i;
 
+  ac--;
+  at++;
+
   if ( !in_out_class_check( ac, at, &outlets))
     return &fts_CannotInstantiate;
 
@@ -181,8 +189,8 @@ static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_tilda_t *this  = (out_tilda_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
-  void *propagate_context = fts_get_pointer(at + 1);
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
+  void *propagate_context = fts_get_ptr(at + 1);
   int inlet = fts_get_int(at + 2);
   fts_object_t *outdispatcher;
 
@@ -195,6 +203,9 @@ static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
 static fts_status_t out_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int inlets = 0, i;
+
+  ac--;
+  at++;
 
   if ( !in_out_class_check( ac, at, &inlets))
     return &fts_CannotInstantiate;

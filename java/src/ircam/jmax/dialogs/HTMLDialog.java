@@ -35,6 +35,7 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 import java.net.URL;
 import java.io.IOException;
@@ -93,7 +94,7 @@ public class HTMLDialog extends JDialog
 
   private static String getUrlName(String packageName, String pageName){
     String separator = System.getProperty("file.separator");
-    return "file:"+ JMaxApplication.getProperty("jmaxRoot")+ 
+    return "file:"+ MaxApplication.getProperty("jmaxRoot")+ 
       separator+"doc"+
       separator+"user"+
       separator+"packages"+

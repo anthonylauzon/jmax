@@ -41,6 +41,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.Geometry;
 
@@ -60,7 +61,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     Box trackPanel;
     JScrollPane scrollTracks;
     Hashtable trackContainers = new Hashtable();
-    MutexPropertyHandler mutex = new MutexPropertyHandler("selected");
+    MutexPropertyHandler mutex = new MutexPropertyHandler("active");
     //---
     JLabel itsZoomLabel;
     JScrollBar itsTimeScrollbar;
@@ -142,8 +143,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    }
 	});
  
-    statusBar.setSize(SequenceWindow.DEFAULT_WIDTH, 30);
-    //statusBar.setPreferredSize(new Dimension(SequenceWindow.DEFAULT_WIDTH, 30));
+    statusBar.setSize(Sequence.DEFAULT_WIDTH, 30);
+    //statusBar.setPreferredSize(new Dimension(Sequence.DEFAULT_WIDTH, 30));
 
     JPanel toolbarPanel = new JPanel();
     toolbarPanel.setSize(228, 25);
@@ -154,7 +155,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     statusBar.addWidgetAt(toolbarPanel, 2);
     statusBar.validate();
 
-    ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
+    ruler.setSize(Sequence.DEFAULT_WIDTH, 20);
+    //ruler.setPreferredSize(new Dimension(Sequence.DEFAULT_WIDTH, 30));
 
     northSection.add(statusBar);
     northSection.add(ruler);	
@@ -169,12 +171,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
 	    {
+		if(zoom == oldZoom) return;
 		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
 		TrackEvent lastEvent = sequenceData.getLastEvent();
 		if(lastEvent!=null)
 		    resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
 							 ((Double)lastEvent.getProperty("duration")).intValue()));
+		ftsSequenceObject.requestSetZoom(zoom);
 	    }
     });
 
@@ -192,6 +196,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    int currentTime = e.getValue();
 	    
 	    geometry.setXTransposition(-currentTime);	    
+	    ftsSequenceObject.requestSetScroll(-currentTime);
 	}
     });
 
@@ -227,7 +232,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackContainers.put(track, trackContainer);
 
 	teditor.getSelection().addListSelectionListener(this);//????
-	track.setProperty("selected", Boolean.TRUE);
+	track.setProperty("active", Boolean.TRUE);
 
 	//added to update maximum time if needed
 	track.getTrackDataModel().addListener(this);    
@@ -237,21 +242,21 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//resize the frame //////////////////////////////////////////////////////////////
 	int height;	
 	Dimension dim = itsContainer.getFrame().getSize();
-	if(dim.height < SequenceWindow.MAX_HEIGHT)
+	if(dim.height < Sequence.MAX_HEIGHT)
 	{
 	    int tcHeight = trackContainer.getSize().height;
 	    
 	    if(sequenceData.trackCount() == 1)
 		itsContainer.getFrame().
-		    setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
+		    setSize(dim.width, Sequence.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
 	    else
-		if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
+		if(dim.height + tcHeight <= Sequence.MAX_HEIGHT)
 		    itsContainer.getFrame().
 			setSize(dim.width, dim.height + tcHeight);
 		else 
-		    if(dim.height < SequenceWindow.MAX_HEIGHT)
+		    if(dim.height < Sequence.MAX_HEIGHT)
 			itsContainer.getFrame().
-			    setSize(dim.width, SequenceWindow.MAX_HEIGHT);
+			    setSize(dim.width, Sequence.MAX_HEIGHT);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -290,11 +295,11 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//resize of the frame
 	Dimension dim = itsContainer.getFrame().getSize();
  	if(sequenceData.trackCount() == 0)
-	     itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT);	
+	     itsContainer.getFrame().setSize(dim.width, Sequence.EMPTY_HEIGHT);	
 	else
 	    if(!scrollTracks.getVerticalScrollBar().isVisible())		
 		itsContainer.getFrame().setSize(dim.width, 
-						SequenceWindow.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
+						Sequence.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
     
 	itsContainer.getFrame().validate();
 	
@@ -309,6 +314,11 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackContainer.validate();
 	trackPanel.validate();
 	scrollTracks.validate();
+
+	/*Rectangle absBounds = SwingUtilities.convertRectangle(trackContainer, trackContainer.getBounds(), trackPanel);
+	  scrollTracks.getViewport().scrollRectToVisible(absBounds);
+	  
+	  itsContainer.getFrame().validate();*/
     }
 
     public void trackMoved(Track track, int oldPosition, int newPosition)
@@ -345,7 +355,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackPanel.validate();
 	scrollTracks.validate();
 	scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
-	track.setProperty("selected", Boolean.TRUE);
+	track.setProperty("active", Boolean.TRUE);
     }
 
    /**
@@ -542,12 +552,22 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	return ftsSequenceObject;
     }
   //------------------- Editor interface ---------------
+  final public Fts getFts()
+  {
+    return MaxApplication.getFts();
+  }
+    
+    public MaxDocument getDocument()
+    {
+	return ftsSequenceObject.getDocument();
+    }
+
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
-    ftsSequenceObject.requestDestroyEditor(); 
+    ftsSequenceObject.closeEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
     

@@ -27,9 +27,9 @@
 
 #include <fts/fts.h>
 
-#define is_ibinop(ac, at)    (((ac) == 0) || (((ac) == 1) && fts_is_int(at)))
-#define is_fbinop(ac, at)    (((ac) == 1) && fts_is_float(at))
-#define is_sbinop(ac, at)    (((ac) == 1) && fts_is_symbol(at))
+#define is_ibinop(ac, at)    (((ac) == 1) || (((ac) == 2) && fts_is_long(&(at)[1])))
+#define is_fbinop(ac, at)    (((ac) == 2) && fts_is_float(&(at)[1]))
+#define is_sbinop(ac, at)    (((ac) == 2) && fts_is_symbol(&(at)[1]))
 
 typedef struct
 {
@@ -87,15 +87,15 @@ static void
 ibinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if (ac >= 2)
-    if (fts_is_int(&at[1]) || fts_is_float(&at[1]))
+    if (fts_is_long(&at[1]) || fts_is_float(&at[1]))
       ibinop_set_right(o, winlet, s, 1, at + 1);
 
   if (ac >= 1)
     {
-      if (fts_is_int(&at[0]))
-	fts_send_message(o, 0, fts_s_int, 1, at);
+      if (fts_is_long(&at[0]))
+	fts_message_send(o, 0, fts_s_int, 1, at);
       else if (fts_is_float(&at[0]))
-	fts_send_message(o, 0, fts_s_float, 1, at);
+	fts_message_send(o, 0, fts_s_float, 1, at);
     }
 }
 
@@ -106,29 +106,52 @@ ibinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
   ibinop_t *this = (ibinop_t *)o;
 
   this->value = 0;
-  this->operator = fts_get_int_arg(ac, at, 1, 0);
+  this->operator = fts_get_long_arg(ac, at, 1, 0);
 }
 
 
 static fts_status_t
-ibinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t bang_meth, fts_method_t number_meth)
+ibinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at,
+		   fts_method_t bang_meth,
+		   fts_method_t number_meth)
 {
+  fts_symbol_t a[2];
+
   fts_class_init(cl, sizeof(ibinop_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, ibinop_init);
+  /* system inlet */
 
-  fts_method_define_varargs(cl, 0, fts_s_set, ibinop_set_left);
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_int;
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, ibinop_init, 2, a, 1);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, number_meth);
-  fts_method_define_varargs(cl, 0, fts_s_float, number_meth);
-  fts_method_define_varargs(cl, 0, fts_s_bang, bang_meth);
+  /* inlet #0 */
+
+  a[0] = fts_s_number;
+  fts_method_define(cl, 0, fts_new_symbol("set"), ibinop_set_left, 1, a);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_int, number_meth, 1, a);
+
+  a[0] = fts_s_float;
+  fts_method_define(cl, 0, fts_s_float, number_meth, 1, a);
+
+  fts_method_define(cl, 0, fts_s_bang, bang_meth, 0, 0);
 
   fts_method_define_varargs(cl, 0, fts_s_list, ibinop_list);
 
-  fts_method_define_varargs(cl, 1, fts_s_float, ibinop_set_right);
-  fts_method_define_varargs(cl, 1, fts_s_int, ibinop_set_right);
+  /* inlet #1 */
 
-  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+  a[0] = fts_s_float;
+  fts_method_define(cl, 1, fts_s_float, ibinop_set_right, 1, a);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 1, fts_s_int, ibinop_set_right, 1, a);
+
+  /* outlet #0 */
+
+  a[0] = fts_s_int;
+  fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
       
   return fts_Success;
 }
@@ -168,15 +191,15 @@ static void
 fbinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if (ac >= 2)
-    if (fts_is_int(&at[1]) || fts_is_float(&at[1]))
+    if (fts_is_long(&at[1]) || fts_is_float(&at[1]))
       fbinop_set_right(o, winlet, s, 1, at + 1);
 
   if (ac >= 1)
     {
-      if (fts_is_int(&at[0]))
-	fts_send_message(o, 0, fts_s_int, 1, at);
+      if (fts_is_long(&at[0]))
+	fts_message_send(o, 0, fts_s_int, 1, at);
       else if (fts_is_float(&at[0]))
-	fts_send_message(o, 0, fts_s_float, 1, at);
+	fts_message_send(o, 0, fts_s_float, 1, at);
     }
 }
 
@@ -192,28 +215,54 @@ fbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static fts_status_t
-fbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t bang_meth, fts_method_t number_meth, fts_symbol_t outlet_type)
+fbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at,
+		  fts_method_t bang_meth,
+		  fts_method_t number_meth,
+		  fts_symbol_t outlet_type)
 {
+  fts_symbol_t a[2];
+
   fts_class_init(cl, sizeof(fbinop_t), 2, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fbinop_init);
+  /* inlet system */
 
-  fts_method_define_varargs(cl, 0, fts_s_set, fbinop_set_left);
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_float;
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, fbinop_init, 2, a);
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, bang_meth);
+  /* inlet #0 */
+  a[0] = fts_s_number;
+  fts_method_define(cl, 0, fts_new_symbol("set"), fbinop_set_left, 1, a);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, number_meth);
-  fts_method_define_varargs(cl, 0, fts_s_float, number_meth);
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_int, number_meth, 1, a);
+
+  a[0] = fts_s_float;
+  fts_method_define(cl, 0, fts_s_float, number_meth, 1, a);
       
   fts_method_define_varargs(cl, 0, fts_s_list, fbinop_list);
   
-  fts_method_define_varargs(cl, 1, fts_s_float, fbinop_set_right);
-  fts_method_define_varargs(cl, 1, fts_s_int, fbinop_set_right);
+  fts_method_define(cl, 0, fts_s_bang, bang_meth, 0, 0);
+
+  /* inlet #1 */
+  a[0] = fts_s_float;
+  fts_method_define(cl, 1, fts_s_float, fbinop_set_right, 1, a);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 1, fts_s_int, fbinop_set_right, 1, a);
+
+  /* outlet #0 */
 
   if (outlet_type == fts_s_int)
-    fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+    {
+      a[0] = fts_s_int;
+      fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
+    }
   else
-    fts_outlet_type_define_varargs(cl, 0, fts_s_float);
+    {
+      a[0] = fts_s_float;
+      fts_outlet_type_define(cl, 0, fts_s_float, 1, a);
+    }
 
   return fts_Success;
 }
@@ -256,7 +305,7 @@ sbinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     sbinop_set_right(o, winlet, s, 1, at + 1);
 
   if (ac >= 1 && fts_is_symbol(&at[0]))
-    fts_send_message(o, 0, fts_s_int, 1, at);
+    fts_message_send(o, 0, fts_s_int, 1, at);
 }
 
 
@@ -271,23 +320,43 @@ sbinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
 
 
 static fts_status_t
-sbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at, fts_method_t bang_meth, fts_method_t symbol_meth)
+sbinop_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at,
+		   fts_method_t bang_meth,
+		   fts_method_t symbol_meth)
 {
-  if(ac == 1 && fts_is_symbol(at))
+  if((ac == 2) && fts_is_symbol(&at[1]))
     {
+      fts_symbol_t a[2];
+
       fts_class_init(cl, sizeof(sbinop_t), 2, 1, 0);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sbinop_init);
+      /* system inlet */
 
-      fts_method_define_varargs(cl, 0, fts_s_bang, bang_meth);
-      fts_method_define_varargs(cl, 0, fts_s_set, sbinop_set_left);
-      fts_method_define_varargs(cl, 0, fts_s_symbol, symbol_meth);
+      a[0] = fts_s_symbol;
+      a[1] = fts_s_symbol;
+      fts_method_define(cl, fts_SystemInlet, fts_s_init, sbinop_init, 2, a);
+
+      /* inlet #0 */
+
+      a[0] = fts_s_symbol;
+      fts_method_define(cl, 0, fts_new_symbol("set"), sbinop_set_left, 1, a);
+
+      a[0] = fts_s_symbol;
+      fts_method_define(cl, 0, fts_s_symbol, symbol_meth, 1, a);
+
+      fts_method_define(cl, 0, fts_s_bang, bang_meth, 0, 0);
 
       fts_method_define_varargs(cl, 0, fts_s_list, sbinop_list);
 
-      fts_method_define_varargs(cl, 1, fts_s_symbol, sbinop_set_right);
+      /* inlet #1 */
 
-      fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+      a[0] = fts_s_symbol;
+      fts_method_define(cl, 1, fts_s_symbol, sbinop_set_right, 1, a);
+
+      /* outlet #0 */
+
+      a[0] = fts_s_int;
+      fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
       
       return fts_Success;
     }

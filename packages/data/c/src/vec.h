@@ -30,8 +30,9 @@
 #include "data.h"
 #include "mat.h"
 
-DATA_API fts_metaclass_t *vec_type;
+DATA_API fts_type_t vec_type;
 DATA_API fts_symbol_t vec_symbol;
+DATA_API fts_class_t *vec_class;
 
 typedef mat_t vec_t;
 
@@ -46,12 +47,13 @@ typedef mat_t vec_t;
 
 #define vec_void(x) (mat_void((mat_t *)(x)))
 #define vec_set_const(x, a) (mat_set_const((mat_t *)(x), (a)))
-#define vec_set_with_onset_from_atoms(mx, x, ac, at) mat_set_with_onset_from_atoms((mat_t *)(mx), (x), (ac), (at))
+#define vec_set_from_atom_list(mx, x, ac, at) mat_set_from_atom_list((mat_t *)(mx), (x), (ac), (at))
 
 DATA_API int vec_read_atom_file(vec_t *vec, fts_symbol_t file_name);
 DATA_API int vec_write_atom_file(vec_t *vec, fts_symbol_t file_name);
 
 /* vec atoms */
+#define vec_atom_set(ap, x) fts_set_object_with_type((ap), (x), vec_type)
 #define vec_atom_get(ap) ((vec_t *)fts_get_object(ap))
 #define vec_atom_is(ap) (fts_is_a((ap), vec_type))
 

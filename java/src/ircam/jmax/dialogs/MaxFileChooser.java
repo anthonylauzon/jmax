@@ -36,6 +36,8 @@ import javax.swing.filechooser.*; // tmp !!
 
 
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 /**
  * 
  * A File Dialog that provide the concept
@@ -51,14 +53,14 @@ public class MaxFileChooser
 
   private static boolean configured = false;
 
-  public static final int JMAX_FILE_TYPE = 1;
-  public static final int PAT_FILE_TYPE = 0;
+  public static final int SAVE_JMAX_TYPE = 0;
+  public static final int SAVE_PAT_TYPE = 1;
 
-  private static int saveType = JMAX_FILE_TYPE;
+  private static int saveType = SAVE_JMAX_TYPE;
 
   static void makeFileChooser()
   {
-    fd = new JFileChooser( JMaxApplication.getProperty("user.dir"));
+    fd = new JFileChooser( MaxApplication.getProperty("user.dir"));
   }
 
   public static int getSaveType()
@@ -79,9 +81,9 @@ public class MaxFileChooser
 	name = "untitled.jmax";
     String suffix = "";
 
-    if (saveType == JMAX_FILE_TYPE)
+    if (saveType == SAVE_JMAX_TYPE)
       suffix = ".jmax";
-    else if (saveType == PAT_FILE_TYPE)
+    else if (saveType == SAVE_PAT_TYPE)
       suffix = ".pat";
 
     if ( name.endsWith( ".jmax") || name.endsWith( ".pat"))
@@ -103,7 +105,7 @@ public class MaxFileChooser
     if (!configured)
       configure();
 
-    if (getSaveType() == MaxFileChooser.JMAX_FILE_TYPE)
+    if (getSaveType() == MaxFileChooser.SAVE_JMAX_TYPE)
       formatComboBox.setSelectedIndex( 0);
     else
       formatComboBox.setSelectedIndex( 1);
@@ -191,9 +193,9 @@ public class MaxFileChooser
 	public void actionPerformed( ActionEvent e)
 	{
 	  if ( ((JComboBox)e.getSource()).getSelectedIndex() == 0)
-	    setSaveType( JMAX_FILE_TYPE);
+	    setSaveType( SAVE_JMAX_TYPE);
 	  else
-	    setSaveType( PAT_FILE_TYPE);
+	    setSaveType( SAVE_PAT_TYPE);
 	}
       } );
   }
@@ -201,8 +203,22 @@ public class MaxFileChooser
   /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
   private static void configure()
   {
-      nickNackFileDialog();
-      configured = true;
+    if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
+      {
+	fd.setFileFilter(Mda.getAllDocumentsFileFilter());
+
+	Enumeration e = Mda.getDocumentFileFilters();
+	while (e.hasMoreElements())
+	  fd.addChoosableFileFilter((javax.swing.filechooser.FileFilter) e.nextElement());
+
+	fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
+
+	fd.setFileView(Mda.getFileView());
+      }
+
+    nickNackFileDialog();
+    
+    configured = true;
   }
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */

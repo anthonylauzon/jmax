@@ -36,7 +36,7 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
-import ircam.fts.client.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -98,7 +98,7 @@ public class DisplayList
     displayObjects.removeElement( object);
   }
 
-  GraphicObject getGraphicObjectFor(FtsGraphicObject obj)
+  GraphicObject getGraphicObjectFor(FtsObject obj)
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
@@ -198,12 +198,6 @@ public class DisplayList
     displayObjects.removeElement( connection);
   }
 
-  public void remove(FtsConnection connection)
-  {    
-    remove( getGraphicConnectionFor( connection));
-    reassignLayers();
-  }
-
   GraphicConnection getGraphicConnectionFor(FtsConnection c)
   {
     Object[] values = displayObjects.getObjectArray();
@@ -268,7 +262,7 @@ public class DisplayList
 	  GraphicConnection connection = (GraphicConnection) values[i];
 
 	  if ((connection.getSourceObject() == obj) || (connection.getDestObject() == obj))
-	      connection.updateDimensions();
+	    connection.updateDimensions();
 	}
   }
 
@@ -652,7 +646,9 @@ public class DisplayList
       {
       case DRAG_RECTANGLE:
 	g.setColor( Color.black);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	g.drawRect( dragRectangle.x, dragRectangle.y, dragRectangle.width, dragRectangle.height);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	break;
 
       case DRAG_LINE:

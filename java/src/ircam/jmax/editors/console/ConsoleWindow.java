@@ -18,42 +18,106 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
 
 package ircam.jmax.editors.console;
 
 import java.io.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.print.*;
+import java.awt.event.*;
+import java.awt.datatransfer.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.jmax.script.*;
+
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.editors.console.menus.*;
 import ircam.jmax.widgets.ConsoleArea;
-import ircam.fts.client.*;
 
 /**
  * Window containing a console
  */
  
-public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Printable {
+public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Printable{
+
+  static private ConsoleWindow consoleWindowSingleInstance = null;
 
   private ConsoleArea consoleArea;
+  private boolean noConsole;
+  private ConsoleDocument document;
   private ControlPanel controlPanel;
+  private DefaultHelpMenu helpMenu;
 
-  private void makeContent()
+  static {
+    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
+	    public String getToolName() { return "Console";}
+	    public void open() { consoleWindowSingleInstance.toFront();}
+    });
+  }
+
+  public static void append( String line)
   {
-    getContentPane().setLayout(new BorderLayout());
+    if ( consoleWindowSingleInstance.noConsole)
+      System.out.println( line);
+    else
+      consoleWindowSingleInstance.consoleArea.append( line);
+  }
+
+  public static void init()
+  {
+    consoleWindowSingleInstance.getControlPanel().init(MaxApplication.getFts());
+    consoleWindowSingleInstance.helpMenu.init();
+  }
+
+  public ConsoleWindow()
+  {
+    super("jMax Console");
+
+    if(MaxApplication.splash != null)
+	addComponentListener(MaxApplication.splash);
+
+    MaxWindowManager.setTopFrame( this);
+
+    setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);
 
     consoleArea = new ConsoleArea( 1000, 80);
 
+    noConsole = true;
+    if ( (MaxApplication.getProperty("jmaxNoConsole") == null) || 
+	 (MaxApplication.getProperty("jmaxNoConsole").equals("false")))
+      {
+	System.setOut( new PrintStream( new ConsoleOutputStream( consoleArea)));
+	noConsole = false;
+      }
+    else
+      consoleArea.append( "Output redirected to Java standard output");
+    
+    // Register this console window as *the* console window
+
+    if ( consoleWindowSingleInstance == null)
+      consoleWindowSingleInstance = this;
+    
+    makeMenuBar();
+
+    getContentPane().setLayout(new BorderLayout());
+
     JScrollPane jsp = new JScrollPane( consoleArea);
+
     jsp.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     //jsp.getViewport().setBackingStoreEnabled( true);
 
     getContentPane().add( BorderLayout.CENTER, jsp);
+
 
     JPanel toolbarPanel = new JPanel();
     toolbarPanel.setLayout(new BorderLayout());
@@ -61,70 +125,68 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
     JToolBar toolbar = new JToolBar("Control Panel", JToolBar.HORIZONTAL);
     toolbar.setPreferredSize(new Dimension(250, 23));
-
-    controlPanel = new ControlPanel();
-
-    toolbar.add( controlPanel);
-
+    toolbar.add(controlPanel = new ControlPanel(MaxApplication.getFts()));
     toolbar.addAncestorListener(new AncestorListener(){
-	public void ancestorAdded(AncestorEvent event)
-	{
-	  Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
-	  if(!(frame instanceof ConsoleWindow))
-	    MaxWindowManager.getWindowManager().addWindow(frame);
-	}
-	public void ancestorRemoved(AncestorEvent event)
-	{
-	  Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
-	  if(!(frame instanceof ConsoleWindow))
-	    MaxWindowManager.getWindowManager().removeWindow(frame);
-	}
-	public void ancestorMoved(AncestorEvent event){}
-      });
+	    public void ancestorAdded(AncestorEvent event)
+	    {
+		Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
+		if(!(frame instanceof ConsoleWindow))
+		    MaxWindowManager.getWindowManager().addWindow(frame);
+	    }
+	    public void ancestorRemoved(AncestorEvent event)
+	    {
+		Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
+		if(!(frame instanceof ConsoleWindow))
+		    MaxWindowManager.getWindowManager().removeWindow(frame);
+	    }
+	    public void ancestorMoved(AncestorEvent event){}
+	});
 
     toolbarPanel.add( BorderLayout.NORTH, toolbar);
-
     getContentPane().add( BorderLayout.NORTH, toolbarPanel);
-  }
 
-  private void makeMenuBar()
-  {
-    JMenuBar mb = new JMenuBar();
-
-    mb.add( new FileMenu()); 
-    mb.add( new MaxWindowJMenu( "Windows", this));
-    mb.add(Box.createHorizontalGlue());
-    mb.add( new DefaultHelpMenu());
-    
-    setJMenuBar( mb);
-  }
-
-  public ConsoleWindow( String title)
-  {
-    super( title);
-
-    makeContent();
-    makeMenuBar();
-
-    MaxWindowManager.setTopFrame( this);
-    addWindowListener( MaxWindowManager.getWindowManager());
-    
-    setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);
     setLocation(0,0);
     setSize( 500, 600);
+
+    document = new ConsoleDocument(MaxApplication.getFts());
 
     setVisible( true);
   }
   
+  private final void makeMenuBar()
+  {
+    JMenuBar mb = new JMenuBar();
+
+    // File menu    
+    mb.add( new FileMenu()); 
+
+    // Edit menu
+    //mb.add( new EditMenu( this));
+    
+    // Tool menu 
+    //mb.add( new ircam.jmax.toolkit.menus.MaxToolsJMenu( "Tools"));
+
+    // Windows Menu
+    mb.add( new ircam.jmax.toolkit.menus.MaxWindowJMenu( "Windows", this));
+    
+    // Add some separation between help and the others.
+    mb.add(Box.createHorizontalGlue());
+
+    // Build up the help Menu 
+    mb.add(helpMenu = new DefaultHelpMenu());
+    
+    setJMenuBar( mb);
+  }
 
   public ControlPanel getControlPanel()
   {
     return controlPanel;
   }
-
-  public ConsoleArea getConsoleArea()
+    
+  // Methods from interface Editor
+  final public Fts getFts()
   {
-    return consoleArea;
+    return MaxApplication.getFts();
   }
 
   public EditorContainer getEditorContainer()
@@ -134,6 +196,10 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
   public void Close(boolean doCancel)
   {
+  }
+
+  public MaxDocument getDocument(){
+    return document;
   }
 
   // Methods from interface EditorContainer
@@ -157,19 +223,19 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     return getContentPane().getBounds();
   }
 
-  public int print( Graphics g, PageFormat pf, int pi) throws PrinterException 
+  public int print(Graphics g, PageFormat pf, int pi) throws PrinterException 
   {
-    Point consolePos = SwingUtilities.convertPoint(consoleArea, getLocation(), this);
-    double onsetX = pf.getImageableX()+consolePos.x;
-    double onsetY = pf.getImageableY()+consolePos.y;
+      Point consolePos = SwingUtilities.convertPoint(consoleArea, getLocation(), this);
+      double onsetX = pf.getImageableX()+consolePos.x;
+      double onsetY = pf.getImageableY()+consolePos.y;
       
-    ((Graphics2D)g).translate(onsetX, onsetY);
+      ((Graphics2D)g).translate(onsetX, onsetY);
 
-    if (pi >= 1) {
-      return Printable.NO_SUCH_PAGE;
+	if (pi >= 1) {
+	    return Printable.NO_SUCH_PAGE;
+	}
+	consoleArea.print((Graphics2D) g);
+	return Printable.PAGE_EXISTS;
     }
-    consoleArea.print((Graphics2D) g);
-    return Printable.PAGE_EXISTS;
-  }
 }
 

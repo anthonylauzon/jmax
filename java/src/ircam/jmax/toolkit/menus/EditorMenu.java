@@ -43,6 +43,7 @@ import ircam.jmax.toolkit.actions.*;
 
 public abstract class EditorMenu extends JMenu					 
 {
+    
   public EditorMenu(String name)
   {
     super(name);
@@ -62,16 +63,6 @@ public abstract class EditorMenu extends JMenu
 	    {
 	    }
 	});
-  }
-
-  public int DEFAULT_NUM_ENTRIES;
-  public void setDefaultNumEntries(int n)
-  {
-      DEFAULT_NUM_ENTRIES = n;
-  }
-  public int getDefaultNumEntries()
-  {
-      return DEFAULT_NUM_ENTRIES;
   }
 
   public JMenuItem add(EditorAction action, String name, int modifiers, int mnemonic)

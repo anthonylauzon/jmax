@@ -28,7 +28,8 @@
 #include "fmat.h"
 
 fts_symbol_t fmat_symbol = 0;
-fts_metaclass_t *fmat_type = 0;
+fts_type_t fmat_type = 0;
+fts_class_t *fmat_class = 0;
 
 static fts_symbol_t sym_text = 0;
 
@@ -86,7 +87,7 @@ fmat_set_const(fmat_t *mat, float c)
 }
 
 void
-fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at)
+fmat_set_from_atom_list(fmat_t *mat, int offset, int ac, const fts_atom_t *at)
 {
   int size = mat->m * mat->n;
   int i;
@@ -112,17 +113,17 @@ fmat_set_from_lists(fmat_t *mat, int ac, const fts_atom_t *at)
   
   for(i=0; i<ac; i++)
     {
-      if(fts_is_tuple(at + i))
+      if(fts_is_list(at + i))
 	{
-	  fts_tuple_t *tup = fts_get_tuple(at + i);
-	  int size = fts_tuple_get_size(tup);
+	  fts_list_t *aa = fts_get_list(at + i);
+	  int size = fts_list_get_size(aa);
 
 	  if(size > n)
 	    size = n;
 	  
 	  for(j=0; j<size; j++)
 	    {
-	      fts_atom_t *a = fts_tuple_get_element(tup, j);
+	      fts_atom_t *a = &fts_list_get_element(aa, j);
 	    
 	      if(fts_is_number(a))
 		mat->values[i * n + j] = fts_get_number_float(a);
@@ -282,7 +283,7 @@ fmat_read_atom_file_separator(fmat_t *fmat, fts_symbol_t file_name, fts_symbol_t
       for(k=0; k<ac; k++)
 	{
 	  /* ooops! */
-	  if(fts_atom_same_type(&a, &at[k]) && a.value.fts_int == at[k].value.fts_int)
+	  if(a.type == at[k].type && a.value.fts_int == at[k].value.fts_int)
 	    {
 	      skip = 1;
 	      break;
@@ -397,7 +398,11 @@ fmat_write_atom_file_separator(fmat_t *fmat, fts_symbol_t file_name, fts_symbol_
 static void
 fmat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_object(o, 0, o);
+  fmat_t *this = (fmat_t *)o;
+  fts_atom_t a[1];
+
+  fmat_atom_set(a, this);
+  fts_outlet_send(o, 0, fmat_symbol, 1, a);
 }
 
 static void
@@ -432,7 +437,7 @@ fmat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       int offset = fts_get_number_int(at);
 
       if(offset >= 0 && offset < size)
-	fmat_set_with_onset_from_atoms(this, offset, ac - 1, at + 1);
+	fmat_set_from_atom_list(this, offset, ac - 1, at + 1);
     }
 }
 
@@ -518,11 +523,11 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       post("}\n");
     }
 
-  post("}\n");
+  post("}");
 }
 
 void 
-fmat_dump(fmat_t *mat, fts_dumper_t *dumper)
+fmat_save_bmax(fmat_t *mat, fts_bmax_file_t *f)
 {
   fts_atom_t av[256];
   int size = fmat_get_m(mat) * fmat_get_n(mat);
@@ -538,18 +543,65 @@ fmat_dump(fmat_t *mat, fts_dumper_t *dumper)
 
       if (ac == 256)
 	{
+	  /* Code a push of all the values */
+	  fts_bmax_code_push_atoms(f, ac, av);
+
+	  /* Code a push of the offset */
+	  fts_bmax_code_push_int(f, offset);
+
+	  /* Code a "set" message for 256 values plus offset */
+	  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
+	  offset = offset + ac;
+
+	  /* Code a pop of all the values  */
+	  fts_bmax_code_pop_args(f, ac);
+
+	  ac = 0;
 	}
     }
 
   if (ac != 0)
     {
+      /* Code a push of all the values */
+      fts_bmax_code_push_atoms(f, ac, av);
+
+      /* Code a push of the offset */
+      fts_bmax_code_push_int(f, offset);
+
+      /* Code an "append" message for the values left */
+      fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
+
+      /* Code a pop of all the values  */
+      fts_bmax_code_pop_args(f, ac);
     }
 }
 
 static void
 fmat_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  fmat_t *this = (fmat_t *)obj;
+
+  fmat_atom_set(value, this);
+}
+
+static void
+fmat_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
+
+  if (cmd == fts_s_object)
+    fts_object_blip(o, "mat of floats");
+  else if (cmd == fts_s_inlet)
+    {
+      int n = fts_get_int_arg(ac, at, 1, 0);
+
+      switch(n)
+	{
+	case 0:
+	  /* fts_object_blip(o, "no comment"); */
+	  break;
+	}
+    }
 }
 
 /*********************************************************
@@ -599,7 +651,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fmat_alloc(this, fts_get_int(at), 1);
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
     fmat_alloc(this, fts_get_int(at), fts_get_int(at + 1));
-  else if(fts_is_tuple(at))
+  else if(fts_is_list(at))
     {
       int m = 0;
       int n = 0;
@@ -608,10 +660,10 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       /* check n (longest row) and m */
       for(i=0; i<ac; i++)
 	{
-	  if(fts_is_tuple(at + i))
+	  if(fts_is_list(at + i))
 	    {
-	      fts_tuple_t *tup = (fts_tuple_t *)fts_get_pointer(at + i);
-	      int size = fts_tuple_get_size(tup);
+	      fts_list_t *aa = fts_get_list(at + i);
+	      int size = fts_list_get_size(aa);
 	      
 	      if(size > n)
 		n = size;
@@ -625,8 +677,6 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fmat_alloc(this, m, n);
       fmat_set_from_lists(this, ac, at);
     }
-  else
-    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void
@@ -637,33 +687,45 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_free(this->values);
 }
 
+static int
+fmat_check(int ac, const fts_atom_t *at)
+{
+  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_list(at))) || (ac > 1));
+}
+
 static fts_status_t
 fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fmat_t), 1, 1, 0);
+  if(fmat_check(ac - 1, at + 1))
+    {
+      fts_class_init(cl, sizeof(fmat_t), 1, 1, 0);
   
-  /* init / delete */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fmat_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fmat_delete);
+      /* init / delete */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fmat_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fmat_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fmat_print); 
-  
-  /* define variable */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_state);
-  
-  fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
-  
-  fts_method_define_varargs(cl, 0, fts_s_clear, fmat_clear);
-  fts_method_define_varargs(cl, 0, fts_s_fill, fmat_fill);
-  fts_method_define_varargs(cl, 0, fts_s_set, fmat_set);
-  
-  fts_method_define_varargs(cl, 0, fts_s_import, fmat_import);
-  fts_method_define_varargs(cl, 0, fts_s_export, fmat_export);
-  
-  /* type outlet */
-  fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_symbol);      
-  
-  return fts_Success;
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fmat_print); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fmat_assist); 
+
+      /* define variable */
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_state);
+
+      fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
+
+      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), fmat_clear);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), fmat_fill);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fmat_set);
+      
+      fts_method_define_varargs(cl, 0, fts_new_symbol("import"), fmat_import);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), fmat_export);
+
+      /* type outlet */
+      fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_type);      
+
+      return fts_Success;
+    }
+  else
+    return &fts_CannotInstantiate;
 }
 
 /********************************************************************
@@ -672,11 +734,21 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *
  */
 
+static int
+fmat_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+{
+  return fmat_check(ac1 - 1, at1 + 1);
+}
+
 void 
 fmat_config(void)
 {
   sym_text = fts_new_symbol("text");
   fmat_symbol = fts_new_symbol("fmat");
+  fmat_type = fmat_symbol;
 
-  fmat_type = fts_class_install(fmat_symbol, fmat_instantiate);
+  fts_metaclass_install(fmat_symbol, fmat_instantiate, fmat_equiv);
+  fmat_class = fts_class_get_by_name(fmat_symbol);
+
+  fts_atom_type_register(fmat_symbol, fmat_class);
 }

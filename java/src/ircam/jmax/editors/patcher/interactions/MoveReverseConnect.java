@@ -61,38 +61,31 @@ class MoveReverseConnect extends Interaction
 	return;
       }
 
-    /*******************************************************************/
-    /*************** ASYNCRONOUS CONNECTION CREATION *******************/
-
-    editor.getFtsPatcher().requestAddConnection(src.getFtsObject(), outlet, dst.getFtsObject(), inlet);    
-
-    /*try
+    try
       {
-      FtsConnection fc;
-      GraphicConnection connection;
-      
-      fc = editor.getFts().makeFtsConnection(src.getFtsObject(), outlet, 
-      dst.getFtsObject(), inlet);
-      
-      connection = new GraphicConnection(editor, 
-      src, outlet,
-      dst, inlet,
-      fc.getType(), fc);
+	FtsConnection fc;
+	GraphicConnection connection;
+
+	fc = editor.getFts().makeFtsConnection(src.getFtsObject(), outlet, 
+					       dst.getFtsObject(), inlet);
+	
+	connection = new GraphicConnection(editor, 
+					   src, outlet,
+					   dst, inlet,
+					   fc.getType(), fc);
 		
-      editor.getDisplayList().add(connection);
-      editor.getDisplayList().sortDisplayList();
-      connection.updateDimensions();
-      ErmesSelection.patcherSelection.select( connection);	
-      connection.redraw();
+	editor.getDisplayList().add(connection);
+	editor.getDisplayList().sortDisplayList();
+	connection.updateDimensions();
+	ErmesSelection.patcherSelection.select( connection);	
+	connection.redraw();
       }
-      catch (FtsException e)
+    catch (FtsException e)
       {
-      // Just don't do the connection in case of troubles.
-      
-      // editor.showMessage("Cannot connect");
-      }*/
-    /*******************************************************************/
-    /*******************************************************************/
+	// Just don't do the connection in case of troubles.
+
+	// editor.showMessage("Cannot connect");
+      }
   }
 
   public void setDest(GraphicObject obj, int in){

@@ -34,7 +34,9 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
@@ -81,6 +83,7 @@ public class TextMenu extends EditorMenu
     fakeFontButton = new JRadioButtonMenuItem( "fake");
     itsFontMenuGroup.add(fakeFontButton);
 
+    //add(new JLabel(" Font Sizes"));
     item = new JMenuItem(" Font Sizes");
     item.setEnabled(false);
     add(item);
@@ -94,6 +97,12 @@ public class TextMenu extends EditorMenu
 	fontSizeItems.addElement(radioItem);
     }
 
+    /*itsBaseSizesMenu = new JMenu("Change Base Size");
+      FillBaseSizesMenu( itsBaseSizesMenu);    
+      add(itsBaseSizesMenu);
+
+      addSeparator();*/
+
     itsSizesMenu = new JMenu("Java Sizes");
 
     FillSizesMenu( itsSizesMenu);    
@@ -101,6 +110,7 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
+    //add(new JLabel(" Font Styles"));
     item = new JMenuItem(" Font Styles");
     item.setEnabled(false);
     add(item);
@@ -114,6 +124,7 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
+    //add(new JLabel(" Fonts"));
     item = new JMenuItem(" Fonts");
     item.setEnabled(false);
     add(item);
@@ -147,6 +158,24 @@ public class TextMenu extends EditorMenu
     fitItem = add(Actions.fitToTextAction, "Fit To Text", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_T);
   }
 
+    /*private void FillBaseSizesMenu( JMenu menu)
+      {
+      int sizes[] = {8, 10, 12, 14, 18, 24};
+      JRadioButtonMenuItem item; 
+      itsBaseSizesMenuGroup = new ButtonGroup();
+
+      fakeBaseSizeButton = new JRadioButtonMenuItem( "fake");
+      itsBaseSizesMenuGroup.add(fakeBaseSizeButton);
+
+      for (int i = 0; i < sizes.length; i++)
+      {
+      item = new JRadioButtonMenuItem(Integer.toString(sizes[i]));
+      menu.add(item);
+      item.addActionListener(Actions.fontBaseSizesAction);
+	  itsBaseSizesMenuGroup.add(item);
+	  }
+	  }*/
+
   private void FillSizesMenu( JMenu menu)
   {
     int sizes[] = {8, 9, 10, 12, 14, 18, 24, 36, 48};
@@ -164,7 +193,12 @@ public class TextMenu extends EditorMenu
     private int numFontFloor = 1;
     private void FillFontMenu( JMenu theFontMenu)
     {
+	/*****************/
+	//jdk117-->jdk1.3//
+	//String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
 	String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+	/*****************/
+
 	JRadioButtonMenuItem item;
 	
 	int num = 0;
@@ -180,6 +214,7 @@ public class TextMenu extends EditorMenu
 		    num++;
 		else
 		    {
+			//qui crea un sotto menu
 			JMenu subMenu = new JMenu("more...");
 			currentMenu.add(subMenu);
 			currentMenu = subMenu;
@@ -345,6 +380,18 @@ public class TextMenu extends EditorMenu
 	    boldItem.setSelected(false);
 	    italicItem.setSelected(false);
 	}
+
+    /*for ( int i = 0; i < itsBaseSizesMenu.getItemCount(); i++)
+      {
+      item = (JRadioButtonMenuItem)itsBaseSizesMenu.getItem( i);
+      
+      if (Integer.parseInt(item.getText()) == ScaleTransform.getInstance().baseSize)
+      {
+      item.setSelected(true);
+      break;
+      }
+      }*/
+
   }
 }
 

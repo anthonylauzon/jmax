@@ -35,7 +35,6 @@
 
 #include <fts/fts.h>
 
-fts_symbol_t sym_setComment = 0;
 
 static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -43,9 +42,9 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   int x, y, w, font_index;
   fts_symbol_t text;
   fts_atom_t a;
-  const char *p;
+  char *p;
 
-  file = (FILE *)fts_get_pointer( at);
+  file = (FILE *)fts_get_ptr( at);
 
   fts_object_get_prop( o, fts_s_x, &a);
   x = fts_get_int( &a);
@@ -59,7 +58,7 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   fts_object_get_prop( o, fts_s_comment, &a);
 
-  for ( p = fts_get_symbol( &a); *p; p++)
+  for ( p = fts_symbol_name( fts_get_symbol( &a)); *p; p++)
     {
       if ( *p == ',' || *p == ';')
 	fprintf( file, "\\%c", *p);
@@ -70,21 +69,14 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fprintf( file, ";\n");
 }
 
-static void comment_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_atom_t a[1];
-  
-  fts_object_get_prop(o, fts_s_comment, a);
-  if( fts_get_symbol(a))
-    fts_client_send_message(o, sym_setComment, 1, a);
-}
-
 static fts_status_t comment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_type_t t[1];
+
   fts_class_init(cl, sizeof( fts_object_t), 0, 0, 0);
 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, comment_save_dotpat); 
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_send_properties, comment_send_properties); 
+  t[0] = fts_t_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, comment_save_dotpat, 1, t); 
 
   return fts_Success;
 }
@@ -92,6 +84,5 @@ static fts_status_t comment_instantiate(fts_class_t *cl, int ac, const fts_atom_
 void comment_config(void)
 {
   fts_class_install(fts_new_symbol("jcomment"), comment_instantiate);
-  sym_setComment = fts_new_symbol("setComment");
 }
 

@@ -505,10 +505,6 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   public void mouseReleased( MouseEvent e)
   {
     processEvent(Squeack.UP, e);
-
-    if (e.isPopupTrigger()) {
-      processEvent(Squeack.POP_UP, e);
-    }
   }
 
   // The following methods are not used by the interaction engine.

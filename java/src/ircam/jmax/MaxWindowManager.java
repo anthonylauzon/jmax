@@ -107,8 +107,8 @@ public class MaxWindowManager implements WindowListener
 
     windowOperationCount++;
 
-    if(/*(windows.size() > 0)&&(*/windows.contains(window))/*)*/
-	windows.setElementAt(window, windows.indexOf(window));
+    if (windows.size() > 0)
+      windows.setElementAt(window, windows.indexOf(window));
   }
 
 
@@ -153,15 +153,6 @@ public class MaxWindowManager implements WindowListener
   public static Frame getTopFrame()
   {
     return topFrame;
-  }
-
-  private static Frame currentFrame = null;
-  public static Frame getCurrentFrame()
-  {
-      if(currentFrame!=null)
-	  return currentFrame;
-      else
-	  return topFrame;
   }
 
   /** Produce a unique window title for the Name 
@@ -210,26 +201,16 @@ public class MaxWindowManager implements WindowListener
   
   public void windowClosed(WindowEvent e)
   {
-    if(currentFrame == e.getWindow()) currentFrame=null;
     removeWindow((Frame) e.getWindow());
   }
 
-  public void windowIconified(WindowEvent e)
-  {
-      if(currentFrame == e.getWindow()) currentFrame=null;
-  }
+  public void windowIconified(WindowEvent e){}
 
   public void windowDeiconified(WindowEvent e){}
 
-  public void windowActivated(WindowEvent e)
-  {
-      currentFrame = (Frame)e.getWindow();
-  }
+  public void windowActivated(WindowEvent e){}
 
-  public void windowDeactivated(WindowEvent e)
-  {
-      if(currentFrame == e.getWindow()) currentFrame=null;
-  }
+  public void windowDeactivated(WindowEvent e){}
 
   public void TileWindows()
   {

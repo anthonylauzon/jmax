@@ -17,6 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *
+ * Authors: Norbert Schnell
  */
 #include <stdio.h>
 #include <string.h>
@@ -134,7 +137,7 @@ serial_set_speed(serial_t *this, fts_symbol_t sym)
     speed = B57600;
   else if(sym == sym_b115200)
     speed = B115200;
-#ifdef B230400
+#ifndef SGI
   /* This is not defined on SGI */
   else if(sym == sym_b230400)
     speed = B230400;
@@ -460,6 +463,8 @@ serial_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t 
 serial_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_type_t t[3];
+
   fts_class_init( cl, sizeof( serial_t), 1, 1, 0);
   fts_bytestream_class_init(cl);
 

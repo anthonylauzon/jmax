@@ -70,7 +70,7 @@ class UndoableAdd extends AbstractUndoableEdit {
   { 
       TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
       if(evt!=null)
-	  trkObj.deleteEvent(evt);
+	  trkObj.removeEvent(evt);
       else
 	  die();
   }

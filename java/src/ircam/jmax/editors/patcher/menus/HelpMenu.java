@@ -33,7 +33,9 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
@@ -48,8 +50,10 @@ public class HelpMenu extends DefaultHelpMenu
 {
   public HelpMenu()
   {
-    super();    
+    super();
+    
     insert(Actions.openHelpPatchAction, "Object Help", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_H, 0);
+    /*insert(Actions.showHtmlAction, "Editor Help", 1);*/
   }
 }
 

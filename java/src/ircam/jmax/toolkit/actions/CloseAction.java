@@ -40,6 +40,5 @@ public class CloseAction extends EditorAction
   public void doAction(EditorContainer container)
   {
     container.getEditor().Close(true);
-    System.gc();
   }
 }

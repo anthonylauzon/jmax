@@ -30,7 +30,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
-import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
@@ -111,7 +111,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 		}
 	    });
 
-	itsTrack.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
+	itsTrack.getTrackDataModel().addLockListener(new LockListener(){
 		public void lock(boolean lock)
 		{
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
@@ -119,10 +119,6 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 
 		    oldElements.removeAllElements();
 		    getTrack().setProperty("locked", new Boolean(lock));
-		}
-		public void active(boolean active)
-		{
-		    getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
 		}
 	    });
 
@@ -141,7 +137,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 	    public void propertyChange(PropertyChangeEvent e)
 		{
 
-		    if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
+		    if (e.getPropertyName().equals("active") && e.getNewValue().equals(Boolean.TRUE))
 			SequenceSelection.setCurrent(selection);
 		}
 	});
@@ -291,7 +287,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
+	return new Dimension(Sequence.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
     }
 
     public Track getTrack()

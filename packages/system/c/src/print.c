@@ -45,7 +45,7 @@ print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  this->prompt = fts_get_symbol_arg(ac, at, 1, fts_s_print);
+  this->prompt = fts_get_symbol_arg(ac, at, 1, fts_new_symbol("print"));
 }
 
 
@@ -60,7 +60,7 @@ print_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  post("%s: bang\n", this->prompt);
+  post("%s: bang\n", fts_symbol_name(this->prompt));
 }
 
 static void
@@ -68,7 +68,7 @@ print_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  post("%s: {", this->prompt);
+  post("%s: {", fts_symbol_name(this->prompt));
   post_atoms(ac, at);
   post("}\n");
 }
@@ -78,7 +78,7 @@ print_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   print_t *this = (print_t *)o;
 
-  post("%s: %d\n", this->prompt, fts_get_int(at));
+  post("%s: %d\n", fts_symbol_name(this->prompt), fts_get_int(at));
 }
 
 static void
@@ -86,7 +86,7 @@ print_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   print_t *this = (print_t *)o;
 
-  post("%s: %f\n", this->prompt, fts_get_float(at));
+  post("%s: %f\n", fts_symbol_name(this->prompt), fts_get_float(at));
 }
 
 static void
@@ -94,7 +94,7 @@ print_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   print_t *this = (print_t *)o;
 
-  post("%s: '%s'\n", this->prompt, fts_get_symbol(at));
+  post("%s: '%s'\n", fts_symbol_name(this->prompt), fts_symbol_name(fts_get_symbol(at)));
 }
 
 static void
@@ -102,33 +102,37 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   print_t *this = (print_t *)o;
 
-  post("%s: ", this->prompt);
+  post("%s: ", fts_symbol_name(this->prompt));
   
   if(ac == 0)
-    post("%s\n", s);
+    {
+      post_symbol(s);
+      post("\n");
+    }
   else if(ac == 1 && fts_is_object(at))
     {
-      /* print object */
       fts_object_t *obj = fts_get_object(at);
 
       if(s == fts_object_get_class_name(obj))
 	{
-	  post("<%s> ", s);
+	  post_symbol(s);
+	  post(" ");
 
 	  if(fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0) != fts_Success)
-	    post("<???>\n");
+	    post("???");
+      
+	  post("\n");
 	}
     }
   else if(ac == 1 && s == fts_get_selector(at))
     {
-      /* simple value */
       post_atoms(1, at);
       post("\n");
     }
   else
     {
-      /* ordinary message */
-      post("%s ", s);
+      post_symbol(s);
+      post(" ");
       post_atoms(ac, at);
       post("\n");
     }
@@ -143,9 +147,13 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
 {
+  fts_symbol_t a[2];
+
   fts_class_init(cl, sizeof(print_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, print_init);
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_symbol;
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, print_init, 2, a, 1);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, print_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, print_int);
@@ -160,5 +168,5 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
 void
 print_config(void)
 {
-  fts_class_install(fts_s_print, print_instantiate);
+  fts_class_install(fts_new_symbol("print"), print_instantiate);
 }

@@ -18,6 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ *
  */
 
 #ifndef _FTS_H
@@ -42,15 +46,17 @@
  *
  * FTS includes mainly the following components:
  *
- * \li object system
- * \li DSP system
- * \li scheduler
- * \li timing system
- * \li file handling
- * \li client/server communication
- * \li system utilities: memory management
- * \li platform dependend components: dynamic loading, memory management, scheduling, ...
- * \li misc utilities: hash tables, sampling rate conversion routines, four-point interpolation, ...
+ * \li object system (lang/mess/)
+ * \li DSP system (lang/dsp/, lang/ftl/)
+ * \li scheduler (runtime/scheduler/)
+ * \li timing system (runtime/time/)
+ * \li device abstractions (runtime/devices/)
+ * \li file handling (runtime/files/)
+ * \li client/server communication (runtime/client/, tiles/messtile.*)
+ * \li configuration handling: UCS (tiles/ucs.*)
+ * \li system utilities: memory management, module sytem, ... (sys/)
+ * \li platform dependend components: dynamic loading, memory management, scheduling, ... (non-portable/)
+ * \li misc utilities: hash tables, sampling rate conversion routines, four-point interpolation, ... (lang/utils/)
  *
  * This documentation is generated automatically from the comments in the header files of FTS.
  */
@@ -59,99 +65,18 @@
 extern "C" {
 #endif
 
-#ifdef WIN32
-#if defined(FTSDLL_EXPORTS)
-#define FTS_API __declspec(dllexport)
-#else
-#define FTS_API __declspec(dllimport)
-#endif
-#else
-#define FTS_API extern
-#endif
-
-#include <fts/config.h>
-
-/* *** The inclusion order is important *** */
-#include <fts/types.h>
-#include <fts/status.h>
-#include <fts/malloc.h>
-#include <fts/symbol.h>
-#include <fts/stack.h>
-#include <fts/property.h>
-#include <fts/iterator.h>
-#include <fts/hashtable.h>
-#include <fts/list.h>
-#include <fts/objectlist.h>
-#include <fts/variable.h>
-#include <fts/class.h>
-#include <fts/atom.h>
-#include <fts/object.h>
-#include <fts/connection.h>
-#include <fts/expression.h>
-#include <fts/objectset.h>
-#include <fts/array.h>
-#include <fts/tuple.h>
-#include <fts/message.h>
-#include <fts/patcher.h>
-#include <fts/doctor.h>
-#include <fts/errobj.h>
-#include <fts/label.h>
-#include <fts/param.h>
-#include <fts/package.h>
-
-#include <fts/time.h>
-
-#include <fts/ftl.h>
-#include <fts/ftlmem.h>
-#include <fts/dsp.h>
-
-#include <fts/fpe.h>
-
-#include <fts/file.h>
-#include <fts/atomfile.h>
-#include <fts/midi.h>
-#include <fts/midifile.h>
-#include <fts/bytestream.h>
-#include <fts/post.h>
-#include <fts/sched.h>
-#include <fts/audio.h>
-#include <fts/audiofile.h>
-
-#include <fts/project.h>
-
-#include <fts/client.h>
-
-
-/*
- * FTS version 
- */
-FTS_API const char *fts_get_version( void);
-
-/*
- * FTS global initialization 
- */
-FTS_API void fts_init( int argc, char **argv);
-
-/*
- * FTS global shutdown 
- */
-FTS_API void fts_shutdown( void);
-
-/*
- * Command line arguments access
- */
-FTS_API fts_symbol_t fts_cmd_args_get( fts_symbol_t name);
-
-/*
- * Root directory
- */
-FTS_API fts_symbol_t fts_get_root_directory( void);
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
+#include <fts/tiles/startup.h>
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+
+
 
 
 

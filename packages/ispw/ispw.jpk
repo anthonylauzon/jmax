@@ -26,8 +26,29 @@
 ## package declaration
 package provide ispw
 
+package require data
+
+# load the dynamic libraries in FTS
+global jmaxArch jmaxMode
+ucs load module ispw_control $dir/lib/$jmaxArch/$jmaxMode/libcontrol.so
+ucs load module ispw_data $dir/lib/$jmaxArch/$jmaxMode/libdata.so
+ucs load module ispw_filters $dir/lib/$jmaxArch/$jmaxMode/libfilters.so
+ucs load module ispw_io $dir/lib/$jmaxArch/$jmaxMode/libio.so
+ucs load module ispw_midi $dir/lib/$jmaxArch/$jmaxMode/libmidi.so
+ucs load module ispw_sampling $dir/lib/$jmaxArch/$jmaxMode/libsampling.so
+ucs load module ispw_pitch $dir/lib/$jmaxArch/$jmaxMode/libpitch.so
+ucs load module ispw_signal $dir/lib/$jmaxArch/$jmaxMode/libsignal.so
+
 # load client java class
-java::load -classpath "$dir/java" ircam.jmax.ispw.ISPWExtension
+java::load -classpath "$dir/java/classes" ircam.jmax.ispw.ISPWExtension
+
+## set path for abstractions
+abstractionDirectory $dir/abs/compatibility
+templateDirectory $dir/templates/compatibility
+templateDirectory $dir/templates/extensions
+
+## set path for wave tables
+dataDirectory $dir/sounds
 
 ## load the help patch tables
 sourceFile $dir/help/control/control.help.index.tcl

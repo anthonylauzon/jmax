@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
 #include "osc.h"
 
 struct osc_ftl_symbols osc_ftl_symbols_ptr = {0, 0, 0};
@@ -153,7 +152,7 @@ static void
 osc_put_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
 
   osc_put(this, dsp, &osc_ftl_symbols_ptr);
 }
@@ -162,7 +161,7 @@ static void
 osc_put_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
 
   osc_put(this, dsp, &osc_ftl_symbols_fvec);
 }
@@ -266,7 +265,7 @@ osc_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
   
-  if(ac == 1)
+  if(ac == 2)
     {
       fts_method_define_varargs(cl, 0, fts_s_int, osc_set_freq);
       fts_method_define_varargs(cl, 0, fts_s_float, osc_set_freq);
@@ -295,7 +294,7 @@ osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 1, fvec_symbol, osc_set_fvec);
 
-  if(ac == 2)
+  if(ac == 3)
     {
       fts_method_define_varargs(cl, 0, fts_s_int, osc_set_freq);
       fts_method_define_varargs(cl, 0, fts_s_float, osc_set_freq);
@@ -312,9 +311,9 @@ osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0 || (ac == 1 && fts_is_number(at)))
+  if(ac == 1 || (ac == 2 && fts_is_number(at + 1)))
     return osc_instantiate_cosine(cl, ac, at);
-  else if ((ac == 1 && fvec_atom_is(at)) || (ac == 2 && fts_is_number(at) && fvec_atom_is(at + 1)))
+  else if ((ac == 2 && fvec_atom_is(at + 1)) || (ac == 3 && fts_is_number(at + 1) && fvec_atom_is(at + 2)))
     return osc_instantiate_fvec(cl, ac, at);
   else
     return &fts_CannotInstantiate;

@@ -33,15 +33,16 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.editors.console.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
-public class DSPAction extends EditorAction {
+public class DSPAction extends EditorAction
+{
   public void doAction(EditorContainer container)
   {
-    FtsDspControl control = JMaxApplication.getDspControl();
-    control.requestSetDspOn(!control.getDspOn());
+      FtsDspControl control = container.getEditor().getFts().getDspController();
+      boolean on = control.getDspOn().booleanValue();
+      control.setDspOn(new Boolean(!on));
   }
 }
 

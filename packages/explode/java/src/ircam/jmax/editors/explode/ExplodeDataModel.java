@@ -86,7 +86,7 @@ public interface ExplodeDataModel {
   /**
    * deletes an event from the database
    */
-  public abstract void deleteEvent(ScrEvent theEvent);
+  public abstract void removeEvent(ScrEvent theEvent);
 
 
   /**

@@ -32,6 +32,7 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 /**
  * This class implements a simple question dialog.  Use it thru the

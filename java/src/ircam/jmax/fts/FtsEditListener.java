@@ -25,7 +25,6 @@
 
 package ircam.jmax.fts;
 
-import ircam.fts.client.*;
 /**
   This interface define a listener of the changes
   at the server level; for now, only objectRemoved is actually
@@ -49,7 +48,4 @@ public interface FtsEditListener
   /** Called when a connection is removed in the listened server */
 
   public void connectionRemoved(FtsConnection connection);
-
-  /** Called starting/ending an atomic edition (like opening a patch) */
-  public void atomicAction(boolean active);  
 }

@@ -24,7 +24,7 @@
  *
  */
 
-#include "control.h"
+#include <fts/fts.h>
 
 extern void switch_config(void);
 extern void oneshot_config(void);
@@ -35,8 +35,8 @@ extern void range_config(void);
 extern void fit_config(void);
 extern void sync_config(void);
 
-void
-control_config(void)
+static void
+control_init(void)
 {
   switch_config();
   oneshot_config();
@@ -47,3 +47,5 @@ control_config(void)
   fit_config();
   sync_config();
 }
+
+fts_module_t control_module = {"control", "control classes", control_init, 0, 0};

@@ -33,51 +33,47 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.fts.client.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
 public class OpenAction extends EditorAction
 {
-  Frame frame;
-  private File preset_file;
-  
-  public OpenAction()
-  {
-    preset_file = null;
-  }
-
-  public OpenAction(File file)
-  {
-     preset_file = file;
-  }
-  
   public void doAction(EditorContainer container)
   {
-    File file;
-
-    if (preset_file == null)
-      file = MaxFileChooser.chooseFileToOpen(container.getFrame());
-    else
-      file = preset_file;
-	
-    frame = container.getFrame();
+    File file = MaxFileChooser.chooseFileToOpen(container.getFrame());
 
     if (file != null)
       {
-	//FtsPatcherObject.fireAtomicAction(true);
-	RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
-	recentFileHistory.addFile(file);
+	Cursor temp = container.getFrame().getCursor();
 
 	try
-	  {	
-	    JMaxApplication.getFtsServer().getRoot().load(file.getAbsolutePath());
-	  }
-	catch(IOException e)
 	  {
-	    System.err.println("[OpenAction]: I/O error loading file "+file.getAbsolutePath());
+	    MaxDocument document;
+
+	    container.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	    document = Mda.loadDocument(container.getEditor().getFts(), file);
+	
+	    try
+	      {
+		if (document.getDocumentType().isEditable())
+		  document.edit();
+	      }
+	    catch (MaxDocumentException ex)
+	      {
+		// Ignore MaxDocumentException exception in running the editor
+		// May be an hack, may be is ok; move this stuff to an action
+		// handler !!
+	      }
+
+	    container.getFrame().setCursor(temp);
+ 	  }
+	catch (MaxDocumentException e)
+	  {
+	    container.getFrame().setCursor(temp);
+	    JOptionPane.showMessageDialog(container.getFrame(), e.toString(), 
+					  "Error", JOptionPane.ERROR_MESSAGE);
 	  }
       }
   }

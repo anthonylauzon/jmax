@@ -27,7 +27,6 @@
 #include <fts/fts.h>
 
 static fts_class_t *bus_class = 0;
-static fts_metaclass_t *bus_type = 0;
 static fts_symbol_t bus_symbol = 0;
 
 static fts_symbol_t throw_symbol = 0;
@@ -78,8 +77,8 @@ throw_bus_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(winlet < n_channels)
     {  
-      fts_channel_send(bus_get_channel(bus, winlet), 0, s, ac, at);
-      fts_channel_send(bus_get_channel(bus, BUS_CHANNEL), winlet, s, ac, at);
+      fts_channel_output_message_from_targets(bus_get_channel(bus, winlet), 0, s, ac, at);
+      fts_channel_output_message_from_targets(bus_get_channel(bus, BUS_CHANNEL), winlet, s, ac, at);
     }
 }
 
@@ -91,8 +90,8 @@ throw_channel_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   
   if(this->channel != BUS_NOWHERE)
     {
-      fts_channel_send(bus_get_channel(bus, this->channel), 0, s, ac, at);
-      fts_channel_send(bus_get_channel(bus, BUS_CHANNEL), this->channel, s, ac, at);
+      fts_channel_output_message_from_targets(bus_get_channel(bus, this->channel), 0, s, ac, at);
+      fts_channel_output_message_from_targets(bus_get_channel(bus, BUS_CHANNEL), this->channel, s, ac, at);
     }
 }
 
@@ -135,6 +134,7 @@ static void
 throw_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
+  bus_t **bus;
 
   ac--;
   at++;
@@ -160,9 +160,6 @@ static void
 throw_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
-
-  if(this->channel != BUS_NOWHERE)
-    fts_channel_remove_target(bus_get_channel(this->bus, this->channel), o);
   
   fts_object_release((fts_object_t *)this->bus);  
 }
@@ -170,7 +167,10 @@ throw_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 static fts_status_t
 throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && fts_is_a( at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))  
+  ac--;
+  at++;
+
+  if(ac > 0 && fts_is_a(at, bus_symbol) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
 	{
@@ -252,6 +252,7 @@ static void
 catch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
+  bus_t **bus;
 
   ac--;
   at++;
@@ -277,9 +278,6 @@ static void
 catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
-
-  if(this->channel != BUS_NOWHERE)
-    fts_channel_remove_target(bus_get_channel(this->bus, this->channel), o);
   
   fts_object_release((fts_object_t *)this->bus);  
 }
@@ -287,13 +285,17 @@ catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 static fts_status_t
 catch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && fts_is_a(at, bus_type) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
+  ac--;
+  at++;
+
+  if(ac > 0 && fts_is_a(at, bus_symbol) && (ac == 1 || (ac == 2 && fts_is_int(at + 1))))
     {
       if(ac == 1) 
 	{
 	  /* bus */
 	  bus_t *bus = (bus_t *)fts_get_object(at);
 	  int n_channels = bus_get_size(bus);
+	  int i;
 
 	  fts_class_init(cl, sizeof(access_t), 1, n_channels, 0);
 	  
@@ -330,8 +332,8 @@ bus_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   bus_t *this = (bus_t *)o;
 
-  fts_channel_send(bus_get_channel(this, winlet), 0, s, ac, at);
-  fts_channel_send(bus_get_channel(this, BUS_CHANNEL), winlet, s, ac, at);
+  fts_channel_output_message_from_targets(bus_get_channel(this, winlet), 0, s, ac, at);
+  fts_channel_output_message_from_targets(bus_get_channel(this, BUS_CHANNEL), winlet, s, ac, at);
 }
 
 static void
@@ -370,7 +372,9 @@ bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
 static void
 bus_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  bus_t *this = (bus_t *)obj;
+
+  fts_set_object_with_type(value, this, bus_symbol);
 }
 
 static fts_status_t
@@ -378,6 +382,9 @@ bus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n_channels = 0;
   int i;
+
+  ac--;
+  at++;
 
   if(ac == 0)
     n_channels = 1;
@@ -406,7 +413,7 @@ bus_config(void)
   catch_symbol = fts_new_symbol("catch");
   bus_symbol = fts_new_symbol("bus");
 
-  bus_type = fts_metaclass_install(bus_symbol, bus_instantiate, fts_first_arg_equiv);
+  fts_metaclass_install(bus_symbol, bus_instantiate, fts_first_arg_equiv);
   fts_metaclass_install(throw_symbol, throw_instantiate, fts_never_equiv);
   fts_metaclass_install(catch_symbol, catch_instantiate, fts_never_equiv);
 }

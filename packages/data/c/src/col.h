@@ -30,8 +30,9 @@
 #include "data.h"
 #include "mat.h"
 
+DATA_API fts_type_t col_type;
 DATA_API fts_symbol_t col_symbol;
-DATA_API fts_metaclass_t *col_type;
+DATA_API fts_class_t *col_class;
 
 typedef struct
 {
@@ -54,8 +55,8 @@ DATA_API void col_set_const(col_t *col, fts_atom_t atom);
 DATA_API void col_set_from_atoms(col_t *col, int onset, int ac, const fts_atom_t *at);
 
 /* col atoms */
+#define col_atom_set(ap, x) fts_set_object_with_type((ap), (x), col_type)
 #define col_atom_get(ap) ((col_t *)fts_get_object(ap))
 #define col_atom_is(ap) (fts_is_a((ap), col_type))
 
 #endif
-

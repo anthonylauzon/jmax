@@ -27,7 +27,7 @@ import java.beans.*;
 import java.awt.event.*;
 import javax.swing.*;
 import ircam.jmax.toolkit.*;
-import ircam.jmax.JMaxApplication;
+import ircam.jmax.MaxApplication;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.editors.sequence.renderers.*;
@@ -49,11 +49,11 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
 	openButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	openButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 
-	activeButton = new JButton(SequenceImages.getImageIcon("unmute"));
- 	activeButton.setToolTipText("active/inactive");
-	activeButton.setPreferredSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
-	activeButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
-	activeButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
+	muteButton = new JButton(SequenceImages.getImageIcon("unmute"));
+ 	muteButton.setToolTipText("active/inactive");
+	muteButton.setPreferredSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
+	muteButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
+	muteButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 
 	barButton = new JButton();
 	barButton.setHorizontalAlignment(AbstractButton.LEFT);
@@ -65,28 +65,36 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
 	barButton.setPreferredSize(new Dimension(TOGGLEBAR_DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT));
 
 	add(openButton);
-	add(activeButton);
+	add(muteButton);
 	add(barButton);
 
 	barButton.addActionListener(new ActionListener(){
 	    public void actionPerformed(ActionEvent e)
 		{
 		    track.setProperty("opened", Boolean.TRUE);
-		    track.setProperty("selected", Boolean.TRUE);
+		    track.setProperty("active", Boolean.TRUE);
 		}
 	});
 	openButton.addActionListener(new ActionListener(){
 	    public void actionPerformed(ActionEvent e)
 		{
 		    track.setProperty("opened", Boolean.TRUE);
-		    track.setProperty("selected", Boolean.TRUE);
+		    track.setProperty("active", Boolean.TRUE);
 		}
 	});
 
-	activeButton.addActionListener(new ActionListener(){
+	muteButton.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent e)
 		{
-		    track.getFtsTrack().requestSetActive(!active);
+		    /*if(muteButton.isSelected() && (!mute)) 
+		      track.setProperty("mute", Boolean.TRUE);
+		      else 
+		      if(!muteButton.isSelected() && mute) 
+		      track.setProperty("mute", Boolean.FALSE);*/
+		    if(mute)
+			track.setProperty("mute", Boolean.FALSE);
+		    else
+			track.setProperty("mute", Boolean.TRUE);
 		}
 	    });
 
@@ -148,19 +156,23 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
     {
       String name = evt.getPropertyName();
       
-      if(name.equals("active"))
+      if(name.equals("mute"))
       {
-	  active = ((Boolean) evt.getNewValue()).booleanValue();
-	  if(active)
-	      activeButton.setIcon(SequenceImages.getImageIcon("unmute"));
+	  mute = ((Boolean) evt.getNewValue()).booleanValue();
+	  //muteButton.setSelected(mute);
+	  if(mute)
+	      //muteButton.setForeground(Color.red);
+	      muteButton.setIcon(SequenceImages.getImageIcon("mute"));
 	  else
-	      activeButton.setIcon(SequenceImages.getImageIcon("mute"));
+	      //muteButton.setForeground(Color.green);
+	      muteButton.setIcon(SequenceImages.getImageIcon("unmute"));
       }
     }
     public static Font toggleBarFont = new Font("monospaced", Font.PLAIN, 10);
+    public static Font muteFont = new Font("dialog", Font.BOLD, 10);
     boolean opened = true;
-    boolean active = true;
-    JButton openButton, barButton, activeButton;
+    boolean mute = false;
+    JButton openButton, barButton, muteButton;
     public static int TOGGLEBAR_HEIGHT = 14; 
     public static int TOGGLEBAR_DEFAULT_WIDTH = 1500; 
     int trackIndex;

@@ -29,11 +29,9 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
-import ircam.fts.client.*;
-import ircam.jmax.toolkit.*;
-
-import java.io.*;
+import ircam.jmax.fts.*;
 import javax.swing.undo.*;
+import ircam.jmax.toolkit.*;
 
 /**
  * The class representing an event in a track. These objects have a time 
@@ -42,27 +40,24 @@ import javax.swing.undo.*;
 
 public class TrackEvent extends FtsObject implements Event, Drawable, UndoableData, Cloneable
 {
-  public TrackEvent(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)
-  {
-    super(server, parent, objId);
+    //public TrackEvent(Fts fts, double time, EventValue value)
+    public TrackEvent(Fts fts, FtsObject parent, String variableName, String className, int nArgs, FtsAtom args[])
+    {
+	super(fts, null, null, "seqevent", "seqevent");
 	
-    this.time = (double)args[0].floatValue;
-    
-    EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[1].stringValue).newInstance());
-    
-    for(int i = 0; i< length-2; i++)
-      {
-	Object obj = args[offset+2+i].getValue();
-	
-	if(obj instanceof Float) 
-	  obj = new Double(((Float)obj).doubleValue());
-	
-	evtArgs[i] = obj;	  
-      }
-	
-    evtValue.setPropertyValues(length-2, evtArgs);   
-    setValue(evtValue);
-  }
+	this.time = (double)args[0].getFloat();
+
+	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[1].getString()).newInstance());
+	for(int i = 0; i< nArgs-2; i++)
+	{
+	    Object obj = args[2+i].getValue();
+	    if(obj instanceof Float) 
+		obj = new Double(((Float)obj).doubleValue());
+	    evtArgs[i] = obj;	  
+	}
+	evtValue.setPropertyValues(nArgs-2, evtArgs);   
+	setValue(evtValue);
+    }
 
     /**
      * Sets the data model this event belongs to */
@@ -98,18 +93,20 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
      * This is the method that must be called by the editors to
      * change the initial time of an event. It takes care of
      * keeping the data base consistency */
-  public void move(double time)
-  {
-    ((FtsTrackObject)itsTrackDataModel).requestEventMove(this, time);
-  }
+    public void move(double time)
+    {
+	((FtsTrackObject)itsTrackDataModel).requestEventMove(this, time);
+    }
 
-  public void moveTo(double time)
-  {
-    if (((UndoableData) itsTrackDataModel).isInGroup())
-      ((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this, time));
-    
-    itsTrackDataModel.moveEvent(this, time);
-  }
+    public void moveTo(double time)
+    {
+	if (((UndoableData) itsTrackDataModel).isInGroup())
+	    ((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this, time));
+		
+	itsTrackDataModel.moveEvent(this, time);
+		
+	((FtsTrackObject)itsTrackDataModel).setDirty();    
+    }
     
 
     public boolean isHighlighted()
@@ -122,54 +119,48 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     }
     /**
      * Set the named property */
-  public void setProperty(String name, Object theValue)
-  {
-    
-    //int intVal;
-    double doubleVal;
-    
-    if (itsTrackDataModel != null)
-      {
-	if (((UndoableData) itsTrackDataModel).isInGroup()&&(!name.equals("time")))
-	  ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransf(this, name, theValue));
-      }
+    public void setProperty(String name, Object theValue)
+    {
+
+	//int intVal;
+	double doubleVal;
 	
-    if (theValue instanceof Double) 
-      {
-	doubleVal = ((Double)theValue).doubleValue();
-	if (name.equals("time"))
-	  setTime(doubleVal);
-	else  {
-	  if (value != null) value.setProperty(name, theValue); //unknown Double property
-	}
-      }
-    else if (value != null)
-      value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
-    
-    if (itsTrackDataModel != null)
-      {
-	itsTrackDataModel.changeEvent(this, name, theValue);
-      }
-    
-    //send the set message to the fts event object
-    sendSetMessage(value.getValueInfo().getName(), value.getPropertyCount(), value.getPropertyValues());
-  }
+	if (itsTrackDataModel != null)
+	    {
+		if (((UndoableData) itsTrackDataModel).isInGroup()&&(!name.equals("time")))
+		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransf(this, name, theValue));
+	    }
+	
+	if (theValue instanceof Double) 
+	    {
+		doubleVal = ((Double)theValue).doubleValue();
+		if (name.equals("time"))
+		    setTime(doubleVal);
+		else  {
+		    if (value != null) value.setProperty(name, theValue); //unknown Double property
+		}
+	    }
+	else if (value != null)
+	    value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
+	
+	if (itsTrackDataModel != null)
+	    {
+		itsTrackDataModel.changeEvent(this, name, theValue);
+	    }
 
-  void sendSetMessage(String type, int nArgs, Object arguments[])
-  {
-    args.clear();
-    for(int i=0; i<nArgs; i++)
-      args.add(arguments[i]);
-
-    try{
-      send( FtsSymbol.get("set"), args);
+	//send the set message to the fts event object
+	sendSetMessage(value.getValueInfo().getName(), value.getPropertyCount(), value.getPropertyValues());
+    
+	((FtsTrackObject)itsTrackDataModel).setDirty();
     }
-    catch(IOException e)
-      {
-	System.err.println("TrackEvent: I/O Error sending set Message!");
-	e.printStackTrace(); 
-      }
-  }
+
+    void sendSetMessage(String type, int nArgs, Object args[])
+    {
+	for(int i=0; i<nArgs; i++)
+	    FtsTrackObject.sendArgs[i].setValue(args[i]);
+
+	sendMessage(FtsObject.systemInlet, "set", nArgs, FtsTrackObject.sendArgs);
+    }
 
     /**
      * Get the given property.
@@ -177,58 +168,58 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
      * property handled by this object's value field.
      * Usually, the time property is not get with the getProperty method, 
      * but via the direct methods getTime() */
-  public Object getProperty(String name)
-  {
-    if (name.equals("time"))
-      return new Double(time);
-    else if (value != null && !value.getProperty(name).equals(EventValue.UNKNOWN_PROPERTY))
-      return value.getProperty(name); //this is not a know property, ask to the value object
-    else return EventValue.DEFAULT_PROPERTY;
-  }
+    public Object getProperty(String name)
+    {
+	if (name.equals("time"))
+	    return new Double(time);
+	else if (value != null && !value.getProperty(name).equals(EventValue.UNKNOWN_PROPERTY))
+	    return value.getProperty(name); //this is not a know property, ask to the value object
+	else return EventValue.DEFAULT_PROPERTY;
+    }
 
-  /**
-   * Returns the value of this event */
-  public EventValue getValue()
-  {
-    return value;
-  }
+    /**
+     * Returns the value of this event */
+    public EventValue getValue()
+    {
+	return value;
+    }
 
-  /** Set the Value corresponding to this event */
-  public void setValue(EventValue value)
-  {
-    this.value = value;
-  }
+    /** Set the Value corresponding to this event */
+    public void setValue(EventValue value)
+    {
+	this.value = value;
+    }
 
-  /* --------- Drawable interface ----------*/
-  
-  public SeqObjectRenderer getRenderer()
-  {
-    if (value!= null)
-      return value.getRenderer();
-    else return AmbitusEventRenderer.getRenderer();
-    // difficult choice here:
-    // the value field is not there yet, and we're asked to provide
-    // a renderer for this object of unknown type.
-    // AmbitusEventRenderer is choosen here because it is a renderer 
-    // that is able at least to correctly show
-    // a rectangle with the starting time of an event.
-  }
-  
-  /* --------- Undoable data interface ----------*/
-  
+    /* --------- Drawable interface ----------*/
+
+    public SeqObjectRenderer getRenderer()
+    {
+	if (value!= null)
+	    return value.getRenderer();
+	else return AmbitusEventRenderer.getRenderer();
+	// difficult choice here:
+	// the value field is not there yet, and we're asked to provide
+	// a renderer for this object of unknown type.
+	// AmbitusEventRenderer is choosen here because it is a renderer 
+	// that is able at least to correctly show
+	// a rectangle with the starting time of an event.
+    }
+
+    /* --------- Undoable data interface ----------*/
+
     /**
      * Tells the model to start an undo section */
-  public  void beginUpdate()  
-  {
-    //((UndoableData) itsTrackDataModel).beginUpdate();
-    inGroup = true;
-  }
+    public  void beginUpdate()  
+    {
+      //((UndoableData) itsTrackDataModel).beginUpdate();
+	inGroup = true;
+    }
     
-  /**
-   * posts an undo edit in the buffers */
-  public  void postEdit(UndoableEdit e)
-  {
-  }
+    /**
+     * posts an undo edit in the buffers */
+    public  void postEdit(UndoableEdit e)
+    {
+    }
     
     /**
      * Signal that the undoable section ended */
@@ -286,8 +277,6 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 
     private TrackDataModel itsTrackDataModel;
     static Object[] evtArgs = new Object[128];
-
-    protected FtsArgs args = new FtsArgs();
 }
 
 

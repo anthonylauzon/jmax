@@ -43,7 +43,7 @@ struct _event_
   fts_object_t o;
   double time; /* time tag */
   fts_atom_t value; /* value */
-  struct _track_ *track; /* event track */
+  struct _eventtrk_ *track; /* event track */
   event_t *prev; /* previous in track */
   event_t *next; /* next in track */
 };
@@ -68,13 +68,10 @@ struct _event_
 #define event_get_float(e) fts_get_float(&(e)->value)
 #define event_get_object(e) fts_get_object(&(e)->value)
 
-#define event_get_type(e) (fts_get_selector(&(e)->value))
-
-extern void event_get_array(event_t *event, fts_array_t *array);
-extern void event_dump(event_t *event, fts_dumper_t *dumper);
-
+extern fts_symbol_t event_get_type(event_t *event);
+extern void event_get_atoms(event_t *event, int *n_atoms, fts_atom_t *atoms);
 extern void event_print(event_t *event);
 extern void event_upload(event_t *event);
+extern void event_save_bmax(fts_bmax_file_t *file, event_t *event);
 
 #endif
-

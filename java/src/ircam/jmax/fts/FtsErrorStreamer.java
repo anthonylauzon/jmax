@@ -99,7 +99,10 @@ class FtsErrorStreamer implements Runnable
 		out.println("FTS crashed.\n");
 		System.out.println( "FTS crashed\n");
 
-		JMaxApplication.ftsQuitted();
+		/*JOptionPane.showMessageDialog(null, "jMax server connection lost! \n Quit user interface.", 
+					      "Fatal Error", JOptionPane.ERROR_MESSAGE); 
+					      Runtime.getRuntime().exit(0);*/
+		MaxApplication.ftsQuitted();
 	      }
 	    else
 	      {

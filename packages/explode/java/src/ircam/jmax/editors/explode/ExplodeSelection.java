@@ -28,8 +28,8 @@ package ircam.jmax.editors.explode;
 import java.util.*;
 import javax.swing.*;
 import java.awt.datatransfer.*;
-import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 import java.lang.reflect.*;
 
 /**

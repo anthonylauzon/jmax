@@ -23,14 +23,16 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
+(provide-package "data" "0.0.0")
+
+(ucs "load" "module" "data" (file-cat dir "c" "lib" jmax-arch jmax-mode "libdata.so"))
+
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.bpf.BpfExtension")
-(load-class this-package "ircam.jmax.editors.table.TableExtension")
 
 ;; help
-(load-silently (file-cat dir "help" "data.help.index.scm"))
-(help-summary "data summary" (file-cat dir "help" "data.summary.jmax"))
+(sshh-load (file-cat dir "help" "data.help.index.scm"))
 
 (println "package: data (data structures)")
 

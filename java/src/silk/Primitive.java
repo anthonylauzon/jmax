@@ -328,31 +328,31 @@ public class Primitive extends Procedure {
     case GE: 		return numCompare(args, 'G');
     case MAX: 		return numCompute(args, 'X', num(x));
     case MIN: 		return numCompute(args, 'N', num(x));
-    case PLUS:		return numCompute(args, '+', 0.0f);
+    case PLUS:		return numCompute(args, '+', 0.0);
     case MINUS:		return numCompute(rest(args), '-', num(x));
-    case TIMES:		return numCompute(args, '*', 1.0f);
+    case TIMES:		return numCompute(args, '*', 1.0);
     case DIVIDE:	return numCompute(rest(args), '/', num(x));
-    case QUOTIENT:      float d = num(x)/num(y);
-                        return num((float) (d > 0 ? Math.floor(d) : Math.ceil(d)));
+    case QUOTIENT:      double d = num(x)/num(y);
+                        return num(d > 0 ? Math.floor(d) : Math.ceil(d));
     case REMAINDER:     return num((long)num(x) % (long)num(y));
     case MODULO:        long xi = (long)num(x), yi = (long)num(y), m = xi % yi;
                         return num((xi*yi > 0 || m == 0) ? m : m + yi);
-    case ABS: 		return num((float) Math.abs(num(x)));
-    case FLOOR: 	return num((float) Math.floor(num(x)));
-    case CEILING: 	return num((float) Math.ceil(num(x))); 
+    case ABS: 		return num(Math.abs(num(x)));
+    case FLOOR: 	return num(Math.floor(num(x)));
+    case CEILING: 	return num(Math.ceil(num(x))); 
     case TRUNCATE: 	d = num(x);
-      	                return num((float) ((d < 0.0) ? Math.ceil(d) : Math.floor(d))); 
-    case ROUND: 	return num((float) Math.round(num(x)));
-    case EXP:           return num((float) Math.exp(num(x)));
-    case LOG:           return num((float) Math.log(num(x)));
-    case SIN:           return num((float) Math.sin(num(x)));
-    case COS:           return num((float) Math.cos(num(x)));
-    case TAN:           return num((float) Math.tan(num(x)));
-    case ASIN:          return num((float) Math.asin(num(x)));
-    case ACOS:          return num((float) Math.acos(num(x)));
-    case ATAN:          return num((float) Math.atan(num(x)));
-    case SQRT:      	return num((float) Math.sqrt(num(x)));
-    case EXPT:      	return num((float) Math.pow(num(x), num(y)));
+      	                return num((d < 0.0) ? Math.ceil(d) : Math.floor(d)); 
+    case ROUND: 	return num(Math.round(num(x)));
+    case EXP:           return num(Math.exp(num(x)));
+    case LOG:           return num(Math.log(num(x)));
+    case SIN:           return num(Math.sin(num(x)));
+    case COS:           return num(Math.cos(num(x)));
+    case TAN:           return num(Math.tan(num(x)));
+    case ASIN:          return num(Math.asin(num(x)));
+    case ACOS:          return num(Math.acos(num(x)));
+    case ATAN:          return num(Math.atan(num(x)));
+    case SQRT:      	return num(Math.sqrt(num(x)));
+    case EXPT:      	return num(Math.pow(num(x), num(y)));
     case NUMBERTOSTRING:return numberToString(x, y);
     case STRINGTONUMBER:return stringToNumber(x, y);
     case GCD:           return (args == null) ? ZERO : gcd(args);
@@ -365,8 +365,7 @@ public class Primitive extends Procedure {
     case CHARWHITESPACEQ: return truth(Character.isWhitespace(chr(x)));
     case CHARUPPERCASEQ:  return truth(Character.isUpperCase(chr(x)));
     case CHARLOWERCASEQ:  return truth(Character.isLowerCase(chr(x)));
-	//    case CHARTOINTEGER:   return new Double((double)chr(x));
-    case CHARTOINTEGER:   return new Integer((int)chr(x));
+    case CHARTOINTEGER:   return new Double((double)chr(x));
     case INTEGERTOCHAR:   return chr((char)(int)num(x));
     case CHARUPCASE:      return chr(Character.toUpperCase(chr(x)));
     case CHARDOWNCASE:    return chr(Character.toLowerCase(chr(x)));
@@ -534,8 +533,8 @@ public class Primitive extends Procedure {
 
   public static Object numCompare(Object args, char op) {
     while (rest(args) instanceof Pair) {
-      float x = num(first(args)); args = rest(args);
-      float y = num(first(args));
+      double x = num(first(args)); args = rest(args);
+      double y = num(first(args));
       switch (op) {
       case '>': if (!(x >  y)) return FALSE; break;
       case '<': if (!(x <  y)) return FALSE; break;
@@ -548,7 +547,7 @@ public class Primitive extends Procedure {
     return TRUE;
   }
 
-  public static Object numCompute(Object args, char op, float result) {
+  public static Object numCompute(Object args, char op, double result) {
     if (args == null) {
       switch (op) {
       case '-': return num(0 - result);
@@ -557,7 +556,7 @@ public class Primitive extends Procedure {
       }
     } else {
       while (args instanceof Pair) {
-	float x = num(first(args)); args = rest(args);
+	double x = num(first(args)); args = rest(args);
 	switch (op) {
 	case 'X': if (x > result) result = x; break;
 	case 'N': if (x < result) result = x; break;
@@ -588,8 +587,7 @@ public class Primitive extends Procedure {
   public static int stringCompare(Object x, Object y, boolean ci) {
     if (x instanceof char[] && y instanceof char[]) {
       char[] xc = (char[])x, yc = (char[])y;
-      int len = (xc.length < yc.length)? xc.length : yc.length;
-      for (int i = 0; i < len; i++) {
+      for (int i = 0; i < xc.length; i++) {
 	int diff = (!ci) ? xc[i] - yc[i]
 	  : Character.toUpperCase(xc[i]) - Character.toUpperCase(yc[i]);
 	if (diff != 0) return diff;
@@ -616,7 +614,7 @@ public class Primitive extends Procedure {
     int base = (y instanceof Number) ? (int)num(y) : 10;
     try {
       return (base == 10) 
-	? Float.valueOf(stringify(x, false))
+	? Double.valueOf(stringify(x, false))
 	: num(Long.parseLong(stringify(x, false), base));
     } catch (NumberFormatException e) { return FALSE; }
   }
@@ -647,9 +645,8 @@ public class Primitive extends Procedure {
   }
 
   static boolean isExact(Object x) {
-    if (x instanceof Integer) return true;
-    if (!(x instanceof Float)) return false;
-    float d = num(x);
+    if (!(x instanceof Double)) return false;
+    double d = num(x);
     return (d == Math.round(d) && Math.abs(d) < 102962884861573423.0);
   }
 

@@ -30,8 +30,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import ircam.jmax.*;
-import ircam.jmax.editors.patcher.*;
+import ircam.jmax.utils.Platform;
 /**
  * A <code>ConsoleArea</code> Swing component is a component for
  * fast display of text lines.
@@ -115,8 +114,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
     jump = 0;
 
     setOpaque( true);
-    setBackground(Settings.sharedInstance().getConsoleBackgroundColor());
-    setForeground(Settings.sharedInstance().getConsoleForegroundColor());
+    setBackground( Color.white);
 
     addComponentListener( new ComponentAdapter() {
       public void componentShown( ComponentEvent e)
@@ -337,8 +335,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
       }
 
     // add the line to the buffer
-    int linenum = (first + nLines) % rows;
-    buffer[linenum] = line;
+    buffer[ (first + nLines) % rows] = line;
     nLines++;
 
     int y = (nLines - 1) * lineHeight;
@@ -363,7 +360,10 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
   public void paintComponent( Graphics g)
   {
+    /*****************/
+    //jdk117-->jdk1.3//
     ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    /*****************/
 
     Rectangle clip = g.getClipBounds();
     int clipWidth = clip.width;
@@ -396,7 +396,6 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
 	lineToPaint++;
       }
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
   
   public void print( Graphics g)
@@ -432,7 +431,6 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
 	lineToPaint++;
       }
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 }
 

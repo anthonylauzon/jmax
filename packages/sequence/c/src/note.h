@@ -36,15 +36,25 @@ typedef struct _note_
   fts_object_t head;
   int pitch;
   double duration;
+  int midi_velocity; /* optinal property for MIDI notes (will get an fts property) */
+  int midi_channel; /* optinal property for MIDI notes (will get an fts property) */
 } note_t;
 
 #define NOTE_DEF_PITCH 64
 #define NOTE_DEF_DURATION 100
+#define NOTE_DEF_MIDI_VELOCITY 64
+#define NOTE_DEF_MIDI_CHANNEL 1
 
 #define note_set_pitch(n, x) ((n)->pitch = (x))
 #define note_get_pitch(n) ((n)->pitch)
 
 #define note_set_duration(n, x) ((n)->duration = (x))
 #define note_get_duration(n) ((n)->duration)
+
+#define note_set_midi_velocity(n, x) ((n)->midi_velocity = (x))
+#define note_get_midi_velocity(n) (((n)->midi_velocity >= 0)? (n)->midi_velocity: NOTE_DEF_MIDI_VELOCITY)
+
+#define note_set_midi_channel(n, x) ((n)->midi_channel = (x))
+#define note_get_midi_channel(n) (((n)->midi_channel >= 0)? (n)->midi_channel: NOTE_DEF_MIDI_CHANNEL)
 
 #endif

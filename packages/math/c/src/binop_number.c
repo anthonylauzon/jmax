@@ -239,9 +239,9 @@ binop_number_min_left_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       int right = fts_get_int(&this->right);
 
       if(right < left)
-	fts_outlet_primitive(o, 0, &this->right);
+	fts_outlet_send(o, 0, fts_s_int, 1, &this->right);
       else
-	fts_outlet_primitive(o, 0, at);  
+	fts_outlet_send(o, 0, fts_s_int, 1, at);  
     }
   else
     {
@@ -249,9 +249,9 @@ binop_number_min_left_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       float right = fts_get_float(&this->right);
       
       if(right < left)
-	fts_outlet_primitive(o, 0, &this->right);
+	fts_outlet_send(o, 0, fts_s_int, 1, &this->right);
       else
-	fts_outlet_primitive(o, 0, at);  
+	fts_outlet_send(o, 0, fts_s_int, 1, at);  
     }
 }
 
@@ -268,7 +268,7 @@ binop_number_max_left_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       if(right > left)
 	fts_outlet_int(o, 0, right);
       else
-	fts_outlet_primitive(o, 0, at);  
+	fts_outlet_send(o, 0, fts_s_int, 1, at);  
     }
   else
     {
@@ -278,7 +278,7 @@ binop_number_max_left_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       if(right > left)
 	fts_outlet_float(o, 0, right);
       else
-	fts_outlet_primitive(o, 0, at);  
+	fts_outlet_send(o, 0, fts_s_int, 1, at);  
     }
 }
 
@@ -399,9 +399,9 @@ binop_number_min_left_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   float left = fts_get_float(at);
     
   if(fts_get_number_float(&this->right) < left)
-    fts_outlet_primitive(o, 0, &this->right);
+    fts_outlet_send(o, 0, fts_get_selector(&this->right), 1, &this->right);
   else
-    fts_outlet_primitive(o, 0, at);  
+    fts_outlet_send(o, 0, fts_s_float, 1, at);  
 }
 
 static void
@@ -411,9 +411,9 @@ binop_number_max_left_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   float left = fts_get_float(at);
     
   if(fts_get_number_float(&this->right) > left)
-    fts_outlet_primitive(o, 0, &this->right);
+    fts_outlet_send(o, 0, fts_get_selector(&this->right), 1, &this->right);
   else
-    fts_outlet_primitive(o, 0, at);  
+    fts_outlet_send(o, 0, fts_s_float, 1, at);  
 }
 
 /**************************************************************************************
@@ -435,7 +435,7 @@ binop_ivec_add_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] += right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -451,7 +451,7 @@ binop_ivec_sub_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] -= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -467,7 +467,7 @@ binop_ivec_mul_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] *= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -488,7 +488,7 @@ binop_ivec_div_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
 	l[i] = 0;
     }
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -504,7 +504,7 @@ binop_ivec_bus_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] = right - l[i];
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -525,7 +525,7 @@ binop_ivec_vid_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
 	l[i] = 0;
     }
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -541,7 +541,7 @@ binop_ivec_ee_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] == right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -557,7 +557,7 @@ binop_ivec_ne_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] != right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -573,7 +573,7 @@ binop_ivec_gt_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] > right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -589,7 +589,7 @@ binop_ivec_ge_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] >= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -605,7 +605,7 @@ binop_ivec_lt_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] < right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -621,7 +621,7 @@ binop_ivec_le_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] <= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -637,7 +637,7 @@ binop_ivec_min_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] = (right <= l[i])? right: l[i];
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 static void
@@ -653,7 +653,7 @@ binop_ivec_max_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] = (right >= l[i])? right: l[i];
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, ivec_symbol, 1, at);
 }
 
 /**************************************************************************************
@@ -675,7 +675,7 @@ binop_fvec_add_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] += right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -691,7 +691,7 @@ binop_fvec_sub_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] -= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -707,7 +707,7 @@ binop_fvec_mul_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] *= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -728,7 +728,7 @@ binop_fvec_div_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
 	l[i] = 0;
     }
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -744,7 +744,7 @@ binop_fvec_bus_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] = right - l[i];
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -765,7 +765,7 @@ binop_fvec_vid_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
 	l[i] = 0;
     }
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -781,7 +781,7 @@ binop_fvec_ee_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] == right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -797,7 +797,7 @@ binop_fvec_ne_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] != right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -813,7 +813,7 @@ binop_fvec_gt_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] > right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -829,7 +829,7 @@ binop_fvec_ge_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] >= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -845,7 +845,7 @@ binop_fvec_lt_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] < right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -861,7 +861,7 @@ binop_fvec_le_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for(i=0; i<size; i++)
     l[i] = l[i] <= right;
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -877,7 +877,7 @@ binop_fvec_min_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] = (right <= l[i])? right: l[i];
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 static void
@@ -893,7 +893,7 @@ binop_fvec_max_number_inplace(fts_object_t *o, int winlet, fts_symbol_t s, int a
   for(i=0; i<size; i++)
     l[i] = (right >= l[i])? right: l[i];
 
-  fts_outlet_object(o, 0, (fts_object_t *)left);
+  fts_outlet_send(o, 0, fvec_symbol, 1, at);
 }
 
 /**************************************************************************************

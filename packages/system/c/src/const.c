@@ -62,7 +62,7 @@ const_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   const_t *this = (const_t *) o;
 
-  fts_outlet_atom(o, 0, &this->a);
+  fts_outlet_send(o, 0, fts_get_selector(&this->a), 1, &this->a);
 }
 
 /********************************************************************
@@ -83,9 +83,9 @@ const_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
 static fts_status_t
 const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1)
+  if(ac == 2)
     {
-      if(fts_is_tuple(at))
+      if(fts_is_list(at + 1))
 	{
 	  fts_class_init(cl, sizeof(const_t), 0, 0, 0);
 	  
@@ -98,13 +98,15 @@ const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	}
       else
 	{
+	  fts_type_t t = fts_get_selector(at + 1);
+
 	  fts_class_init(cl, sizeof(const_t), 1, 1, 0);
 	  
 	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, const_init);
 	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, const_delete);
 	  
 	  fts_method_define_varargs(cl, 0, fts_s_bang, const_bang);
-	  fts_outlet_type_define_varargs(cl, 0, fts_get_selector(at));
+	  fts_outlet_type_define(cl, 0, fts_get_selector(at + 1), 1, &t);
 	  
 	  fts_class_add_daemon(cl, obj_property_get, fts_s_state, const_get_state);
       

@@ -26,10 +26,7 @@
 package ircam.jmax.fts;
 
 import java.beans.*;
-import java.io.*;
-
-import ircam.fts.client.*;
-import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 /** Java class for the dsp control remote data class.
  *
@@ -39,292 +36,150 @@ import ircam.jmax.*;
  * corresponding to DSP server properties.
  */
 
-public class FtsDspControl extends FtsObject
+ public class FtsDspControl extends FtsRemoteData
 {
-  protected int dacSlip;
-  protected int invalidFpe;
-  protected int divideByZeroFpe;
-  protected int overflowFpe;
-  protected int denormalizedFpe;
-  protected int samplingRate;
-  protected int fifoSize;
-  protected boolean dspOn;
+  /* Incoming calls */
+
+  static final int DAC_SLIP_STATE     = 1;
+  static final int INVALID_FPE_STATE  = 2;
+  static final int DIVIDE_BY_ZERO_FPE_STATE  = 3;
+  static final int OVERFLOW_FPE_STATE = 4;
+  static final int DENORMALIZED_FPE_STATE = 41;
+  static final int SAMPLING_RATE = 5;
+  static final int FIFO_SIZE     = 6;
+  static final int DSP_ON        = 7;
+
+  /* Outgoing calls (also DSP_ON can be outgoing) */
+
+  static final int FPE_START_COLLECT = 8;
+  static final int FPE_STOP_COLLECT  = 9;
+  static final int FPE_CLEAR_COLLECT = 10;
+
+  static final int DSP_PRINT  = 11;
+
+  static final int DSP_CONTROL_SET_CHECK_NAN = 13;
+
+  protected Integer dacSlip;
+  protected Integer invalidFpe;
+  protected Integer divideByZeroFpe;
+  protected Integer overflowFpe;
+  protected Integer denormalizedFpe;
+  protected Integer samplingRate;
+  protected Integer fifoSize;
+  protected Boolean dspOn;
 
   protected PropertyChangeSupport listeners;
-  boolean atomic = false;
 
-  protected FtsArgs args = new FtsArgs();
-
-  static
+  public FtsDspControl()
   {
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDspOnState"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setDspOn( ( args.getInt( 0) == 0) ? false : true);
-	}
-      });
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setFifoSize"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setFifoSize( args.getInt( 0));
-	}
-      });
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setSamplingRate"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setSamplingRate( args.getInt( 0));
-	}
-      });
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDACSlipState"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setDacSlip( args.getInt( 0));
-	}
-      });
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setInvalidFpeState"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setInvalidFpe( args.getInt( 0));
-	}
-      });
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDivideByZeroFpeState"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setDivideByZeroFpe( args.getInt( 0));
-	}
-      });
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setOverflowFpeState"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setOverflowFpe( args.getInt( 0));
-	}
-      });
-    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDenormalizeFpeState"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsDspControl)obj).setDenormalizedFpe( args.getInt( 0));
-	}
-      });
-  }
-    
-  public FtsDspControl() throws IOException
-  {
-    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__dspcontrol"));
+    super();
 
-    dacSlip         = 0;
-    invalidFpe      = 0;
-    divideByZeroFpe = 0;
-    overflowFpe     = 0;
-    denormalizedFpe = 0;
-    samplingRate    = 0;
-    fifoSize        = 0;
-    dspOn           = false;
+    dacSlip         = new Integer(0);
+    invalidFpe      = new Integer(0);
+    divideByZeroFpe = new Integer(0);
+    overflowFpe     = new Integer(0);
+    denormalizedFpe = new Integer(0);
+    samplingRate    = new Integer(0);
+    fifoSize        = new Integer(0);
+    dspOn           = new Boolean(false);
 
     listeners = new PropertyChangeSupport(this);
-
-    FtsPatcherObject.addGlobalEditListener(new FtsEditListener(){	    
-	public void objectAdded(FtsObject object)
-	{
-	  if(!atomic && dspOn) restart();
-	};
-	public void objectRemoved(FtsObject object){};
-	public void connectionAdded(FtsConnection connection)
-	{
-	  if(!atomic && dspOn) restart();
-	};
-	public void connectionRemoved(FtsConnection connection){};
-	public void atomicAction(boolean active)
-	{
-	  atomic = active;
-	  if(!atomic && dspOn) restart();
-	};
-      });
   }
 
   /* Accessors for fields */
 
-  public int getDacSlip()
+  public Integer getDacSlip()
   {
     return dacSlip;
   }
 
-  public int getInvalidFpe()
+  public Integer getInvalidFpe()
   {
     return invalidFpe;
   }
 
-  public int getDivideByZeroFpe()
+  public Integer getDivideByZeroFpe()
   {
     return divideByZeroFpe;
   }
 
-  public int getOverflowFpe ()
+  public Integer getOverflowFpe ()
   {
     return overflowFpe ;
   }
 
-  public int getDenormalizedFpe ()
+  public Integer getDenormalizedFpe ()
   {
     return denormalizedFpe ;
   }
 
-  public int getSamplingRate()
+  public Integer getSamplingRate()
   {
     return samplingRate;
   }
 
-  public int getFifoSize()
+  public Integer getFifoSize()
   {
     return fifoSize;
   }
 
-  public boolean getDspOn()
+  public Boolean getDspOn()
   {
     return dspOn;
   }
 
   /* Modifiers, for values that can be modified */
 
-  public void setSamplingRate(int value)
+  public void setSamplingRate(Integer value)
   {
-    int old = samplingRate;
     samplingRate = value;
-    listeners.firePropertyChange("samplingRate", new Integer(old), new Integer(samplingRate));
+    
+    // Remote call to be implemented
   }
 
-  public void setFifoSize(int value)
+  public void setFifoSize(Integer value)
   {
-    int old = fifoSize;
     fifoSize = value;
-    listeners.firePropertyChange("fifoSize", new Integer(old), new Integer(fifoSize));
+
+    // Remote call to be implemented
   }
 
-  public void setInvalidFpe(int value)
+  public void setDspOn(Boolean value)
   {
-    int old = invalidFpe;
-    invalidFpe = value;
-    listeners.firePropertyChange("invalidFpe", new Integer(old), new Integer(invalidFpe));
-  }
-
-  public void setOverflowFpe(int value)
-  {
-    int old = overflowFpe;
-    overflowFpe = value;
-    listeners.firePropertyChange("overflowFpe", new Integer(old), new Integer(overflowFpe));
-  }
-
-  public void setDivideByZeroFpe(int value)
-  {
-    int old = divideByZeroFpe;
-    divideByZeroFpe = value;
-    listeners.firePropertyChange("divideByZeroFpe", new Integer(old), new Integer(divideByZeroFpe));
-  }
-
-  public void setDenormalizedFpe(int value)
-  {
-    int old = denormalizedFpe;
-    denormalizedFpe = value;
-    listeners.firePropertyChange("denormalizedFpe", new Integer(old), new Integer(denormalizedFpe));
-  }
-
-  public void setDacSlip(int value)
-  {
-    int old = dacSlip;
-    dacSlip = value;
-    listeners.firePropertyChange("dacSlip", new Integer(old), new Integer(dacSlip));
-  }
-
-  public void setDspOn(boolean value)
-  {
-    boolean old = dspOn;
-    dspOn = value;
-    listeners.firePropertyChange("dspOn", new Boolean(old), new Boolean(dspOn));
-  }
-
-  public void requestSetDspOn(boolean value)
-  {
-    args.clear();
-    args.addBoolean(value);
-      
-    try{
-      send( FtsSymbol.get("dsp_on"), args);
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsDspControl: I/O Error sending dspOn Message!");
-	e.printStackTrace(); 
-      }
+      remoteCall( DSP_ON, (value.booleanValue() ? 1 : 0));
   }
 
   public void dspPrint()
   {
-    try{
-      send( FtsSymbol.get("dsp_print"));
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsDspControl: I/O Error sending dsp_print Message!");
-	e.printStackTrace(); 
-      }
-  }
-
-  public void restart()
-  {
-    try{
-      send( FtsSymbol.get("dsp_restart"));
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsDspControl: I/O Error sending dsp_restart Message!");
-	e.printStackTrace(); 
-      }
+    remoteCall( DSP_PRINT);
   }
 
   /* Fpe support */
 
   public void startFpeCollecting(FtsObjectSet set)
   {
-    args.clear();
-    args.addObject(set);
-      
-    try{
-      send( FtsSymbol.get("fpe_start_collect"), args);
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsDspControl: I/O Error sending fpe_start_collect Message!");
-	e.printStackTrace(); 
-      }
+    Object args[] = new Object[1];
+
+    args[0] = set;
+    remoteCall(FPE_START_COLLECT, args);
   }
 
   public void stopFpeCollecting()
   {
-    try{
-      send( FtsSymbol.get("fpe_stop_collecting"));
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsDspControl: I/O Error sending fpe_stop_collect Message!");
-	e.printStackTrace(); 
-      }
+    remoteCall(FPE_STOP_COLLECT);
   }
 
   public void clearFpeCollecting()
   {
-    try{
-      send( FtsSymbol.get("fpe_clear_collecting"));
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsDspControl: I/O Error sending fpe_clear_collecting Message!");
-	e.printStackTrace(); 
-      }
+    remoteCall(FPE_CLEAR_COLLECT);
   }
 
   public void setCheckNan( boolean checkNan)
   {
-    /*sendArgs[0].setInt(checkNan ? 1 : 0);
-      sendMessage(FtsObject.systemInlet, "set_check_nan", 1, sendArgs);*/
+    Object args[] = new Object[1];
+
+    args[0] = new Integer( checkNan ? 1 : 0);
+    remoteCall( DSP_CONTROL_SET_CHECK_NAN, args);
   }
 
   /* Listeners support */
@@ -338,5 +193,74 @@ public class FtsDspControl extends FtsObject
   {
     listeners.removePropertyChangeListener(listener);
   }
+
+  /* remote call support */
+
+  public final void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    Object oldValue, newValue;
+    String prop;
+
+    newValue = (Integer) stream.getNextArgument();
+
+    switch(key)
+      {
+      case DAC_SLIP_STATE:
+	oldValue = dacSlip;
+	dacSlip  = (Integer) newValue;
+	prop     = "dacSlip";
+	break;
+      case INVALID_FPE_STATE:
+	oldValue = invalidFpe;
+	invalidFpe = (Integer) newValue;
+	prop     = "invalidFpe";
+	break;
+      case DIVIDE_BY_ZERO_FPE_STATE:
+	oldValue = divideByZeroFpe;
+	divideByZeroFpe = (Integer) newValue;
+	prop     = "divideByZeroFpe";
+	break;
+      case OVERFLOW_FPE_STATE:
+	oldValue = overflowFpe;
+	overflowFpe = (Integer) newValue;
+	prop     = "overflowFpe";
+	break;
+      case DENORMALIZED_FPE_STATE:
+	oldValue = denormalizedFpe;
+	denormalizedFpe = (Integer) newValue;
+	prop = "denormalizedFpe";
+	break;
+
+      case SAMPLING_RATE:
+	oldValue = samplingRate;
+	samplingRate = (Integer) newValue;
+	prop     = "samplingRate";
+	break;
+      case FIFO_SIZE:
+	oldValue = fifoSize;
+	fifoSize = (Integer) newValue;
+	prop     = "fifoSize";
+	break;
+      case DSP_ON:
+	if ((newValue instanceof Integer) && (((Integer) newValue).intValue() == 0))
+	  newValue = new Boolean(false);
+	else
+	  newValue = new Boolean(true);
+
+	oldValue = dspOn;
+	dspOn    = (Boolean) newValue;
+	prop     = "dspOn";
+	break;
+      default:
+	return;
+      }
+
+    listeners.firePropertyChange(prop, oldValue, newValue);
+  }
 }
+
+
+
+
 

@@ -34,7 +34,9 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
@@ -154,7 +156,11 @@ public class TextPopUpMenu extends JMenu
     private int numFontFloor = 1;
     private void FillFontMenu( JMenu theFontMenu)
     {
+	/*****************/
+	//jdk117-->jdk1.3//
+	//String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
 	String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+	/*****************/
 
 	JRadioButtonMenuItem item;
 	
@@ -171,6 +177,7 @@ public class TextPopUpMenu extends JMenu
 		    num++;
 		else
 		    {
+			//qui crea un sotto menu
 			JMenu subMenu = new JMenu("more...");
 			currentMenu.add(subMenu);
 			currentMenu = subMenu;

@@ -112,7 +112,7 @@ public class CombTool extends Tool implements CombListener{
   public void combStart(int x, int y, int modifiers) 
   {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-    egc.getTrack().setProperty("selected", Boolean.TRUE);
+    egc.getTrack().setProperty("active", Boolean.TRUE);
 
     if(egc.getDataModel().isLocked()) return;
 

@@ -21,12 +21,18 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
+;; package declaration
+(provide-package "qlist" "0.0.0")
+
+; load server module
+(ucs "load" "module" "qlist" (file-cat dir "c" "lib" jmax-arch jmax-mode "libqlist.so"))
+
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.qlist.QListExtension")
 
 ; just one help patch to declare
-(help-patch "qlist" (file-cat dir "help" "qlist.help.jmax"))
+(help-patch "qlist" (file-cat dir "qlist.help.jmax"))
 
 (println "package: qlist (ISPW queue file class with editor)")
 

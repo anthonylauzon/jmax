@@ -24,13 +24,15 @@
  *
  */
 
-#include "math.h"
+#include <fts/fts.h>
 
 extern void math_binop_config(void);
 
-void
-math_config(void)
+static void
+math_init(void)
 {
   math_binop_config();
 }
+
+fts_module_t math_module = {"math", "math classes", math_init, 0, 0};
 

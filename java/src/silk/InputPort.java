@@ -201,11 +201,8 @@ public class InputPort extends SchemeUtils {
       pushChar(ch);
       // Try potential numbers, but catch any format errors.
       if (c == '.' || c == '+' || c == '-' || (c >= '0' && c <= '9')) {
-	try { return new Integer(buff.toString()); }
-	catch (NumberFormatException e) {
-	    try { return new Float(buff.toString()); }
-	    catch (NumberFormatException e1) { ; }
-	}
+	try { return new Double(buff.toString()); }
+	catch (NumberFormatException e) { ; }
       }
       return buff.toString().toLowerCase().intern();
     }

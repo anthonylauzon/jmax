@@ -21,12 +21,66 @@
  */
 
 #include <fts/fts.h>
-#include <ftsconfig.h>
-
 #include "vec.h"
 #include "ivec.h"
 #include "fvec.h"
 #include "mat.h"
+
+/******************************************************
+ *
+ *  object
+ *
+ */
+
+typedef struct 
+{
+  fts_object_t o;
+  fts_atom_t a;
+} fill_t;
+
+static void
+fill_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fill_t *this = (fill_t *)o;
+
+  ac--;
+  at++;
+
+  fts_set_void(&this->a);
+  fts_atom_assign(&this->a, at);
+}
+
+static void
+fill_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fill_t *this = (fill_t *)o;
+
+  fts_atom_void(&this->a);
+}
+
+/******************************************************
+ *
+ *  user methods
+ *
+ */
+
+static void
+fill_set_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fill_t *this = (fill_t *)o;
+
+  this->a = at[0];
+}
+
+static void
+fill_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fill_t *this = (fill_t *)o;
+
+  fts_atom_assign(&this->a, at);
+}
+
+/* number */
 
 static void
 fillfrom_number_to_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -234,4 +288,92 @@ fillfrom_fvec_to_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     in_ptr[i] = this_ptr[i];
   
   fts_outlet_send(o, 0, fvec_symbol, 1, at);
+}
+
+/******************************************************
+ *
+ *  class
+ *
+ */
+
+static fts_status_t
+fillto_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  if(ac == 2)
+    {
+      fts_class_init(cl, sizeof(fill_t), 2, 1, 0); 
+      
+      /* init/delete */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fill_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fill_delete);
+      
+      if(ivec_atom_is(at + 1))
+	{
+	  fts_method_define_varargs(cl, 0, fts_s_int, fillto_ivec_from_number);
+	  fts_method_define_varargs(cl, 0, fts_s_float, fillto_ivec_from_number);
+	  fts_method_define_varargs(cl, 0, ivec_symbol, fillto_ivec_from_ivec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, fillto_ivec_from_fvec);
+	  fts_method_define_varargs(cl, 1, ivec_symbol, fill_set_reference);
+	}
+      else if(fvec_atom_is(at + 1))
+	{
+	  fts_method_define_varargs(cl, 0, fts_s_int, fillto_fvec_from_number);
+	  fts_method_define_varargs(cl, 0, fts_s_float, fillto_fvec_from_number);
+	  fts_method_define_varargs(cl, 0, ivec_symbol, fillto_fvec_from_ivec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, fillto_fvec_from_fvec);
+	  fts_method_define_varargs(cl, 1, fvec_symbol, fill_set_reference);
+	}
+      else
+	return &fts_CannotInstantiate;
+    }
+  else
+    return &fts_CannotInstantiate;
+  
+  return fts_Success;
+}
+
+static fts_status_t
+fillfrom_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  if(ac == 2)
+    {
+      fts_class_init(cl, sizeof(fill_t), 2, 1, 0); 
+      
+      /* init/delete */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fill_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fill_delete);
+
+      if(fts_is_number(at + 1))
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, fillfrom_number_to_ivec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, fillfrom_number_to_fvec);
+	  fts_method_define_varargs(cl, 1, fts_s_int, fill_set_number);
+	  fts_method_define_varargs(cl, 1, fts_s_float, fill_set_number);
+	}
+      else if(ivec_atom_is(at + 1))
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, fillfrom_ivec_to_ivec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, fillfrom_ivec_to_fvec);
+	  fts_method_define_varargs(cl, 1, ivec_symbol, fill_set_reference);
+	}
+      else if(fvec_atom_is(at + 1))
+	{
+	  fts_method_define_varargs(cl, 0, ivec_symbol, fillfrom_fvec_to_ivec);
+	  fts_method_define_varargs(cl, 0, fvec_symbol, fillfrom_fvec_to_fvec);
+	  fts_method_define_varargs(cl, 1, fvec_symbol, fill_set_reference);
+	}
+      else
+	return &fts_CannotInstantiate;
+    }
+  else
+    return &fts_CannotInstantiate;
+  
+  return fts_Success;
+}
+
+void
+fill_config(void)
+{
+  fts_metaclass_install(fts_new_symbol("fillto"), fillto_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("fillfrom"), fillfrom_instantiate, fts_arg_type_equiv);
 }

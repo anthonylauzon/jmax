@@ -57,7 +57,7 @@ public class MutexPropertyHandler {
 		Track temp;
 		PropertyChangeListener pcl;
 
-		if (!e.getPropertyName().equals("selected")) return;
+		if (!e.getPropertyName().equals("active")) return;
 		
 		/** HACK! the ignore_callback flag is here just to avoid endless loops */
 		if (ignore_callbacks) return;

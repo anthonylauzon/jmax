@@ -198,7 +198,7 @@ static void
 bpf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   double sr = fts_dsp_get_output_srate(dsp, 0);
   fts_atom_t a[3];
@@ -207,7 +207,7 @@ bpf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
   bpf_stop(o, 0, 0, 0, 0);
 
-  fts_set_pointer(a + 0, this);
+  fts_set_ptr(a + 0, this);
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
@@ -217,8 +217,8 @@ bpf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 static void
 bpf_ftl(fts_word_t *argv)
 {
-  bpf_t *this = (bpf_t *) fts_word_get_pointer(argv + 0);
-  float *out = (float *) fts_word_get_pointer(argv + 1);
+  bpf_t *this = (bpf_t *) fts_word_get_ptr(argv + 0);
+  float *out = (float *) fts_word_get_ptr(argv + 1);
   fts_ramp_t *ramp = &this->ramp;
   int n_tick = fts_word_get_int(argv + 2);
   int i = 0;
@@ -300,7 +300,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int i;
 
-  for(i=0; i<ac; i++)
+  for(i=1; i<ac; i++)
     if(!fts_is_number(at + i))
       return &fts_CannotInstantiate;
 

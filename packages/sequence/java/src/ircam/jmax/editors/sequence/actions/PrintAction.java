@@ -42,11 +42,11 @@ public class PrintAction extends EditorAction
   public void doAction(EditorContainer container)
   {
       //SequencePanel panel = (SequencePanel)container.getEditor();
-      SequenceWindow panel = (SequenceWindow)container;
+      Sequence panel = (Sequence)container;
 
     RepaintManager.currentManager(panel).setDoubleBufferingEnabled(false);
 
-    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Sequence", null, null);
+    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Sequence", MaxApplication.getProperties());
 
     if (aPrintjob != null)
       {

@@ -24,6 +24,7 @@
 #
 
 SOURCES = \
+arch.c \
 argument.c \
 blip.c \
 bus.c \
@@ -33,6 +34,3 @@ dsp1.c \
 print.c \
 system.c \
 ucsobj.c \
-sigbus.c \
-
-#arch.c \

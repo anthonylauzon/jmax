@@ -17,6 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ *
  */
 
 /* 
@@ -25,14 +30,8 @@
  * measured by dividing the profile_interval by the elapsed system time.
  */
 
-#include <fts/fts.h>
-
-#if HAVE_WINDOWS_H
-#include <windows.h>
-#else
 #include <sys/time.h>
-#endif
-
+#include <fts/fts.h>
 
 #define DEFAULT_PROFILE_INTERVAL 10000
 
@@ -42,38 +41,39 @@ typedef struct {
   int samples_count;
   int estimated_sample_rate;
   double last_time;
+  fts_alarm_t output_alarm;
 } profileaudioport_t;
 
-static void profileaudioport_output_estimation( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void profileaudioport_output_alarm( fts_alarm_t *alarm, void *p)
 {
-  profileaudioport_t *this = (profileaudioport_t *)o;
+  profileaudioport_t *this = (profileaudioport_t *)p;
 
   fts_outlet_int( (fts_object_t *)this, 0, this->estimated_sample_rate);
 }
 
 static void profileaudioport_output( fts_word_t *argv)
 {
-  profileaudioport_t *this = (profileaudioport_t *)fts_word_get_pointer( argv+0);
-  int n = fts_word_get_int(argv + 1);
+  profileaudioport_t *this;
+  int n;
+
+  this = (profileaudioport_t *)fts_word_get_ptr( argv+0);
+  n = fts_word_get_long(argv + 1);
 
   this->samples_count += n;
 
   if (this->samples_count >= this->profile_interval)
     {
-#ifdef WIN32
-      double now = GetTickCount() * 1000.0;
-#else
       struct timeval tm;
       double now;
 
       gettimeofday( &tm, 0);
-      now = (double)tm.tv_sec + (double)tm.tv_usec * 1000000.0;
-#endif
+
+      now = (double)tm.tv_sec + (double)tm.tv_usec / 1000000.0;
 
       this->estimated_sample_rate = (int)(this->samples_count / (now - this->last_time));
       this->last_time = now;
 
-      fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, profileaudioport_output_estimation, 0, 0.0);
+      fts_alarm_set_delay( &this->output_alarm, 0.0f);
 
       this->samples_count = 0;
     }
@@ -82,9 +82,7 @@ static void profileaudioport_output( fts_word_t *argv)
 static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
-#ifndef WIN32
   struct timeval tm;
-#endif
 
   fts_audioport_init( &this->head);
 
@@ -97,12 +95,10 @@ static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, 
 
   this->profile_interval = fts_get_int_arg( ac, at, 0, DEFAULT_PROFILE_INTERVAL);
 
-#ifdef WIN32
-  this->last_time = GetTickCount() * 1000.0;
-#else
+  fts_alarm_init( &(this->output_alarm), 0, profileaudioport_output_alarm, this);	
+
   gettimeofday( &tm, 0);
   this->last_time = tm.tv_sec + 1000000 * tm.tv_usec;
-#endif
 
   this->samples_count = 0;
 }
@@ -111,6 +107,7 @@ static void profileaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s,
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 
+  fts_alarm_reset(&this->output_alarm);	
   fts_audioport_delete( &this->head);
 }
 
@@ -124,7 +121,7 @@ static fts_status_t profileaudioport_instantiate(fts_class_t *cl, int ac, const 
   fts_class_init( cl, sizeof( profileaudioport_t), 0, 1, 0);
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, profileaudioport_init);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, profileaudioport_delete);
+  fts_method_define( cl, fts_SystemInlet, fts_s_delete, profileaudioport_delete, 0, 0);
 
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, profileaudioport_get_state);
 

@@ -41,7 +41,7 @@ public class CutAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.getManager().Cut(container);
+    PatcherClipboardManager.clipboardManager.Cut(container);
   }
 }
 

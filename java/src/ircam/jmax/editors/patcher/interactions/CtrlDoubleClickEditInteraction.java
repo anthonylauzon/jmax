@@ -39,10 +39,11 @@ import ircam.jmax.editors.patcher.objects.*;
 
 
 class CtrlDoubleClickEditInteraction extends Interaction
-{ 
+{
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    GraphicObject object = (GraphicObject) area.getTarget();	  
+    GraphicObject object = (GraphicObject) area.getTarget();
+	  
     object.editContent();
     editor.endInteraction();
   }

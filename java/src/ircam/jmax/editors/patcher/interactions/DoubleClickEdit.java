@@ -46,7 +46,7 @@ class  DoubleClickEdit extends Interaction
 
     if (object.hasContent())
       {
-	  object.editContent();
+	object.editContent();
       }
     else
       {

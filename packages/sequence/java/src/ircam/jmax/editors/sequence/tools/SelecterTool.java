@@ -78,7 +78,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   {
       SequenceGraphicContext egc = (SequenceGraphicContext)gc;
 
-      egc.getTrack().setProperty("selected", Boolean.TRUE);	    
+      egc.getTrack().setProperty("active", Boolean.TRUE);	    
       
       if(egc.getDataModel().isLocked()) return;
 

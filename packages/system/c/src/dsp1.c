@@ -39,7 +39,7 @@ static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t
   dsp_t *this = (dsp_t *)listener;
 
   if (fts_is_int(value))
-    fts_outlet_int((fts_object_t *) this, 0, fts_get_int(value));
+    fts_outlet_send((fts_object_t *) this, 0, fts_s_int, 1, value);
 }
 
 static void
@@ -61,7 +61,7 @@ dsp_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 dsp_on_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(fts_get_int_arg(ac, at, 0, 0))
+  if(fts_get_long_arg(ac, at, 0, 0))
     fts_param_set_int(fts_s_dsp_on, 1);
   else
     fts_param_set_int(fts_s_dsp_on, 0);
@@ -84,7 +84,7 @@ dsp_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
       filename = fts_symbol_name(fts_get_symbol(at));
 
-      f = fopen(filename, "wb");
+      f = fopen(filename, "w");
 
       if (f)
 	dsp_chain_fprint(f);
@@ -116,22 +116,28 @@ dsp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[1];
+
   fts_class_init(cl, sizeof(dsp_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsp_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dsp_delete);
+  a[0] = fts_s_symbol;
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, dsp_init, 1, a);
 
-  fts_method_define_varargs(cl, 0, fts_s_start, dsp_start);
-  fts_method_define_varargs(cl, 0, fts_s_stop, dsp_stop);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, dsp_delete, 0, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, dsp_on_off);
+  fts_method_define(cl, 0, fts_new_symbol("start"), dsp_start, 0, 0);
+  fts_method_define(cl, 0, fts_new_symbol("stop"), dsp_stop, 0, 0);
+ 
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_int, dsp_on_off, 1, a);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, dsp_print);
-  fts_method_define_varargs(cl, 0, fts_s_print, dsp_print);
+  fts_method_define(cl, 0, fts_s_bang, dsp_print, 0, 0);
+  fts_method_define(cl, 0, fts_new_symbol("print"), dsp_print, 0, 0);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("save"), dsp_save);
+  a[0] = fts_s_symbol;
+  fts_method_define(cl, 0, fts_new_symbol("save"), dsp_save, 1, a);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("print-signals"), dsp_print_signals);
+  fts_method_define(cl, 0, fts_new_symbol("print-signals"), dsp_print_signals, 0, 0);
   
   return fts_Success;
 }
@@ -140,6 +146,6 @@ void
 dsp_config(void)
 {
   fts_class_install(fts_new_symbol("dsp"),dsp_instantiate);
-  fts_alias_install(fts_new_symbol("dsp~"), fts_new_symbol("dsp"));
+  fts_class_alias(fts_new_symbol("dsp~"), fts_new_symbol("dsp"));
 }
 

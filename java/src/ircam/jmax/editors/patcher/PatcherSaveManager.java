@@ -21,9 +21,12 @@
 
 package ircam.jmax.editors.patcher;
 
+import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 
+import ircam.jmax.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
 
@@ -39,18 +42,38 @@ public class PatcherSaveManager
   
   static public boolean save( EditorContainer container)
   {
+    // first, tentative implementation:
+    // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
+    // we should RECEIVE this FILE, or contruct it when we load this document
+		
+    // The "canSave" method of a data tell if it can be saved
+    // i.e. if it have a document , and if we can write to its document file
+
+    // Change in semantic: now Save() is active *only* on root level patchers 
+    // SHOULD BECOME Gray in the others
+
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
-    FtsPatcherObject patcherObj = sketch.getFtsPatcher();
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
     boolean saved = false;
     
-    if (! patcherObj.isARootPatcher())
-      return saveFromSubPatcher(container, patcherObj.getRootPatcher());
-      
-    if (patcherObj.canSave())
+    if (! document.isRootData(patcherData))
+	return saveFromSubPatcher(container, document);
+
+    if (document.canSave())
       {
-	patcherObj.save();      
-	saved = true;
+	try
+	  {
+	    document.save();
+
+	    saved = true;
+	  }
+	catch ( MaxDocumentException e)
+	  {
+	      JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					    "Error", JOptionPane.ERROR_MESSAGE); 
+	  }
       }
     else
       saved = saveAs(container);
@@ -60,18 +83,32 @@ public class PatcherSaveManager
 
   static public boolean saveAs(EditorContainer container)
   {
+    File file;
+
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
-    FtsPatcherObject patcherObj = sketch.getFtsPatcher();
 
-    if (! patcherObj.isARootPatcher())
-      return saveAsFromSubPatcher( container, patcherObj.getRootPatcher());
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    boolean saved = false;
+    int saveType;
+ 
+    if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
+      saveType = MaxFileChooser.SAVE_PAT_TYPE;
+    else
+      saveType = MaxFileChooser.SAVE_JMAX_TYPE;
 
-    File file = MaxFileChooser.chooseFileToSave( container.getFrame(), null, 
-					    "Save As", MaxFileChooser.JMAX_FILE_TYPE);
-    
+    if (! document.isRootData(patcherData))
+	return saveAsFromSubPatcher(container , document);
+
+    file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
+					    document.getDocumentFile(), 
+					    "Save As",
+   					    saveType);
+
     if (file == null)
       return false;
 
+    // Test if file exists already
     if (file.exists())
       {
 	int result = JOptionPane.showConfirmDialog( container.getFrame(),
@@ -84,18 +121,68 @@ public class PatcherSaveManager
 	  return false;
       }
 
-    patcherObj.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
+    //document.bindToDocumentFile( file);
+    // (fd) This does not work... It always binds the document to the *first* document
+    // handler that can handle it. So it there are several document handler, it's the mess.
+    // Conclusion about mda ?
 
-    return true;
+    document.setDocumentFile( file );
+
+    MaxDocumentHandler documentHandler = null;
+
+    if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
+      documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
+    else
+      documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
+
+    document.setDocumentHandler( documentHandler);
+
+    document.setSaved( false );
+
+    container.getFrame().setTitle( file.toString()); 
+
+    try
+      {
+	document.save();
+	saved = true;
+      }
+    catch ( MaxDocumentException e)
+      {
+	  /*new ErrorDialog( container.getFrame(), e.getMessage());*/
+	  JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					"Error", JOptionPane.ERROR_MESSAGE); 
+      }
+    return saved;
   }
 
-  static boolean saveAsFromSubPatcher(EditorContainer ec, FtsPatcherObject patcherObj)
+  static ErmesSketchWindow window = null;
+  static ErmesSketchPad sketch = null;
+
+  static boolean saveAsFromSubPatcher(EditorContainer ec, MaxDocument document)
   {
-    File file = MaxFileChooser.chooseFileToSave( ec.getFrame(), null, 
-						 "Save As", MaxFileChooser.JMAX_FILE_TYPE);    
+    File file;
+    boolean saved = false;
+    sketch = (ErmesSketchPad)ec.getEditor();
+
+    FtsObject containerObj = ((FtsPatcherData)document.getRootData()).getContainerObject();
+
+    sketch.waiting();
+    containerObj.getFts().editPropertyValue( containerObj ,  
+					    new MaxDataEditorReadyListener()
+					    {
+					      public void editorReady(MaxDataEditor editor)
+						{
+						  window = ((ErmesDataEditor)editor).getSketchWindow();
+						  sketch.stopWaiting();
+						}
+					    });  
+
+    file = MaxFileChooser.chooseFileToSave( window, document.getDocumentFile(), "Save As");
+
     if (file == null)
       return false;
-      
+
+    // Test if file exists already
     if (file.exists())
       {
 	int result = JOptionPane.showConfirmDialog( ec.getFrame(),
@@ -103,28 +190,49 @@ public class PatcherSaveManager
 						    "Warning",
 						    JOptionPane.YES_NO_OPTION,
 						    JOptionPane.WARNING_MESSAGE);
-	
+
 	if ( result != JOptionPane.OK_OPTION)
 	  return false;
       }
 
-    patcherObj.save( MaxFileChooser.getSaveType(), file.getAbsolutePath());
-    return true;
-  }
+    document.bindToDocumentFile( file);
 
+    window.setTitle( file.toString()); 
 
-  static boolean saveFromSubPatcher(EditorContainer container, FtsPatcherObject patcherObj)
-  {
-    boolean saved = false;
-      
-    if (patcherObj.canSave())
+    try
       {
-	patcherObj.save();
+	document.save();
 	saved = true;
       }
+    catch ( MaxDocumentException e)
+      {
+	  /*new ErrorDialog( window , e.getMessage());*/
+	  JOptionPane.showMessageDialog( window, e.getMessage(), 
+					"Error", JOptionPane.ERROR_MESSAGE); 
+      }
+    return saved;
+  }
+
+  static boolean saveFromSubPatcher(EditorContainer container, MaxDocument document)
+  {
+    boolean saved = false;
+    
+    if (document.canSave())
+      {
+	try
+	  {
+	    document.save();
+	    saved = true;
+	  }
+	catch ( MaxDocumentException e)
+	  {
+	      /*new ErrorDialog( container.getFrame(), e.getMessage());*/
+	      JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					    "Error", JOptionPane.ERROR_MESSAGE); 
+	  }
+      }
     else
-      saved = saveAsFromSubPatcher(container, patcherObj);
-  
+	saved = saveAsFromSubPatcher(container, document);
     return saved;
   }
 
@@ -135,84 +243,100 @@ public class PatcherSaveManager
 
   static public void saveTo(EditorContainer container)
   {
-    /*File file;
-      
-      ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
-      FtsPatcherObject patcherObj = (FtsPatcherObject)sketch.getFtsPatcher();
-      
-      file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
-      document.getDocumentFile(), 
-      "Save To",
-      MaxFileChooser.JMAX_FILE_TYPE);
-      
-      if (file == null)
-      return;
-      
-      if (file.exists())
-      {
-      int result = JOptionPane.showConfirmDialog( container.getFrame(),
-      "File \"" + file.getName() + "\" exists.\nOK to overwrite ?",
-      "Warning",
-      JOptionPane.YES_NO_OPTION,
-      JOptionPane.WARNING_MESSAGE);
-      
-      if ( result != JOptionPane.OK_OPTION)
-      return;
-      }
-      
-      MaxDocumentHandler documentHandler = null;
+    File file;
 
-      if ( MaxFileChooser.getSaveType() == MaxFileChooser.PAT_FILE_TYPE)
+    ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    int saveType;
+ 
+    if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
+      saveType = MaxFileChooser.SAVE_PAT_TYPE;
+    else
+      saveType = MaxFileChooser.SAVE_JMAX_TYPE;
+
+    file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
+					    document.getDocumentFile(), 
+					    "Save To",
+					    saveType);
+
+    if (file == null)
+      return;
+
+    // Test if file exists already
+    if (file.exists())
+      {
+	int result = JOptionPane.showConfirmDialog( container.getFrame(),
+						    "File \"" + file.getName() + "\" exists.\nOK to overwrite ?",
+						    "Warning",
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.WARNING_MESSAGE);
+
+	if ( result != JOptionPane.OK_OPTION)
+	  return;
+      }
+
+    MaxDocumentHandler documentHandler = null;
+
+    if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
       documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
-      else
+    else
       documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
 
-      try
+    try
       {
-      if (patcherObj.isARootPatcher(patcherData))
-      {
-      //document.saveTo( file, documentHandler);
+	if (document.isRootData(patcherData))
+	  {
+	    // Make a document save to
+	    document.saveTo( file, documentHandler);
+	  }
+	else
+	  {
+	    // Make a subdocument save to
+	    document.saveSubDocumentTo( patcherData, file, documentHandler);
+	  }
       }
-      else
+    catch ( MaxDocumentException e)
       {
-      //document.saveSubDocumentTo( patcherObj, file, documentHandler);
+	  /*new ErrorDialog(container.getFrame(), e.getMessage());*/
+	  JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
+					"Error", JOptionPane.ERROR_MESSAGE); 
       }
-      }
-      catch ( MaxDocumentException e)
-      {
-      JOptionPane.showMessageDialog(container.getFrame(), e.getMessage(), 
-      "Error", JOptionPane.ERROR_MESSAGE); 
-      }*/
   }
   
   static public boolean saveClosing(EditorContainer container, boolean doCancel)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
-    FtsPatcherObject patcherObj = sketch.getFtsPatcher();
-    boolean toClose = true;
-      
-    if(patcherObj.isARootPatcher() && ( patcherObj.isDirty()))
+
+    MaxDocument document = sketch.getDocument();
+    FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    boolean toClose=true;
+
+    if(document.isRootData(patcherData) && (!document.isSaved()))
       {
-	String message;
-	if(patcherObj.getName() != null)
-	  message = "File " + patcherObj.getName() + " is not saved.\n Do you want to save it now?";
-	else {
-	  message = ("Patch " + container.getFrame().getTitle() + " is not saved.\n Do you want to save it now?");
-	}
-      
-	Object[] options = { "Save", "Don't save", "Cancel" };
-	int result = JOptionPane.showOptionDialog(null, message, "File Not Saved", 
-						  JOptionPane.YES_NO_CANCEL_OPTION,
-						  JOptionPane.QUESTION_MESSAGE,
-						  null, options, options[0]);
-      
-	if(result == JOptionPane.CANCEL_OPTION)
-	  toClose = false;
-	if(result == JOptionPane.YES_OPTION)
-	  toClose = save(container);	  
+	  String message;
+	  if(document.getDocumentFile() != null)
+	      message = "File " + document.getDocumentFile() + " is not saved.\n Do you want to save it now?";
+	  else {
+	      if(document.getName()!=null)   
+		  message = ("Patch " + document.getName() + " is not saved.\n Do you want to save it now?");
+	      else
+		  message = ("Patch " + container.getFrame().getTitle() + " is not saved.\n Do you want to save it now?");
+	  }
+
+	  Object[] options = { "Save", "Don't save", "Cancel" };
+	  int result = JOptionPane.showOptionDialog(null, message, "File Not Saved", 
+						    JOptionPane.YES_NO_CANCEL_OPTION,
+						    JOptionPane.QUESTION_MESSAGE,
+						    null, options, options[0]);
+
+	  if(result == JOptionPane.CANCEL_OPTION)
+	      toClose = false;
+	  if(result == JOptionPane.YES_OPTION)
+	      toClose = save(container);	  
       }
-      
-      return toClose;
+    return toClose;
   }
 }
 

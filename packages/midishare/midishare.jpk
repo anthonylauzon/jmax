@@ -25,6 +25,9 @@
 
 package provide midishare
 
+global jmaxArch jmaxMode
+ucs load module midishare $dir/c/lib/$jmaxArch/$jmaxMode/libmidishare.so
+
 helpSummary "MidiShare summary" $dir/help/midishare.summary.jmax
 helpPatch midishareport $dir/help/midishareport.help.jmax
 

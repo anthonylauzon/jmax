@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
 #include "fvec.h"
 #include "play.h"
 
@@ -63,14 +62,14 @@ static void
 play_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_fvec_t *this = (play_fvec_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   double sr = fts_dsp_get_output_srate(dsp, 0);
   fts_atom_t a[3];
 
   play_fvec_reset(this, n_tick, sr);
 
-  fts_set_pointer(a + 0, &this->play);
+  fts_set_ptr(a + 0, &this->play);
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
@@ -80,8 +79,8 @@ play_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 play_fvec_ftl(fts_word_t *argv)
 {
-  signal_play_t *this = (signal_play_t *) fts_word_get_pointer(argv + 0);
-  float *out = (float *) fts_word_get_pointer(argv + 1);
+  signal_play_t *this = (signal_play_t *) fts_word_get_ptr(argv + 0);
+  float *out = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   fvec_t *fvec = (fvec_t *)this->object;
   float *buf = fvec_get_ptr(fvec);
@@ -120,6 +119,9 @@ play_fvec_ftl(fts_word_t *argv)
       if(end > size)
 	end = size;
 
+      /*if((tick_end_position - (end - this->pre)) * step >= 0))*/
+      /*fts_alarm_set_delay(&this->alarm, 0.0);*/
+  
       if((end - tick_end_position) * step >= 0.0)
 	{
 	  int i;
@@ -204,8 +206,6 @@ play_fvec_ftl(fts_word_t *argv)
 			    
 			    fts_idefix_set_float(&index, position);
 			    this->mode = mode_stop;
-
-			    fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, signal_play_bang_at_end, 0, 0.0);
 			  }
 			}
 		    }
@@ -241,7 +241,7 @@ play_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 { 
   play_fvec_t *this = (play_fvec_t *)o;
 
-  signal_play_delete(&this->play);
+  signal_play_reset(&this->play);
 }
 
 static fts_status_t

@@ -27,6 +27,10 @@
 ## package declaration
 package provide oss
 
+# load dynamic libraries into the server
+global jmaxArch jmaxMode
+ucs load module oss $dir/lib/$jmaxArch/$jmaxMode/liboss.so
+
 # summary and help patches
 helpSummary "OSS summary" $dir/help/oss.summary.jmax
 helpPatch ossaudioport $dir/help/ossaudioport.help.jmax

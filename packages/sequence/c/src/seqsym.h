@@ -30,38 +30,52 @@
 
 /* sequence components */
 extern fts_symbol_t seqsym_sequence;
-extern fts_symbol_t seqsym_miditrack;
 extern fts_symbol_t seqsym_track;
+extern fts_symbol_t seqsym_eventtrk;
 extern fts_symbol_t seqsym_event;
 
 /* events */
+extern fts_symbol_t seqsym_float;
+extern fts_symbol_t seqsym_int;
+extern fts_symbol_t seqsym_symbol;
 extern fts_symbol_t seqsym_note;
-extern fts_symbol_t seqsym_seqmess;
+extern fts_symbol_t seqsym_midival;
+extern fts_symbol_t seqsym_message;
+
+/* properties */
+extern fts_symbol_t seqsym_midi_channel;
+extern fts_symbol_t seqsym_midi_velocity;
 
 /* messages */
-extern fts_symbol_t seqsym_export_midifile;
-extern fts_symbol_t seqsym_export_midifile_dialog;
-extern fts_symbol_t seqsym_import_midifile;
-extern fts_symbol_t seqsym_import_midifile_dialog;
-extern fts_symbol_t seqsym_add_track;
-extern fts_symbol_t seqsym_remove_track;
-extern fts_symbol_t seqsym_move_track;
-extern fts_symbol_t seqsym_add_event;
-extern fts_symbol_t seqsym_active;
+extern fts_symbol_t seqsym_add;
+extern fts_symbol_t seqsym_set;
+extern fts_symbol_t seqsym_get_atoms;
+extern fts_symbol_t seqsym_print;
+extern fts_symbol_t seqsym_clear;
+extern fts_symbol_t seqsym_export_midi;
+extern fts_symbol_t seqsym_export_midi_dialog;
+extern fts_symbol_t seqsym_import_midi;
+extern fts_symbol_t seqsym_import_midi_dialog;
+extern fts_symbol_t seqsym_bmax_add_track;
+extern fts_symbol_t seqsym_bmax_add_event;
+extern fts_symbol_t seqsym_set_zoom;
+extern fts_symbol_t seqsym_set_scroll;
 
-/* messages from/to client */
+/* messages to client */
+extern fts_symbol_t seqsym_createEditor;
+extern fts_symbol_t seqsym_destroyEditor;
 extern fts_symbol_t seqsym_addTracks;
-extern fts_symbol_t seqsym_removeTracks;
+extern fts_symbol_t seqsym_deleteTracks;
 extern fts_symbol_t seqsym_moveTrack;
 extern fts_symbol_t seqsym_setName;
-extern fts_symbol_t seqsym_getName;
-extern fts_symbol_t seqsym_makeEvent;
-extern fts_symbol_t seqsym_addEvent;
 extern fts_symbol_t seqsym_addEvents;
-extern fts_symbol_t seqsym_removeEvents;
+extern fts_symbol_t seqsym_deleteEvents;
 extern fts_symbol_t seqsym_moveEvents;
 extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_openFileDialog;
+extern fts_symbol_t seqsym_lock;
+extern fts_symbol_t seqsym_unlock;
+extern fts_symbol_t seqsym_setEditorGeometry;
 
 #endif
 

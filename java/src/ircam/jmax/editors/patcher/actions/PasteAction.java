@@ -41,7 +41,7 @@ public class PasteAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.getManager().Paste(container);    
+    PatcherClipboardManager.clipboardManager.Paste(container);    
   }
 }
 

@@ -28,8 +28,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.text.*;
 
-import ircam.jmax.*;
-import ircam.fts.client.*;
+import ircam.jmax.utils.*;
 
 /** Lexical analyzer/unparser.
  * This class implement a lexical analizer for object and message box
@@ -94,7 +93,7 @@ public class FtsParse
 
   boolean toStream;
   Object parsedToken;
-    //FtsStream stream;
+  FtsStream stream;
   String str;
   StringBuffer token;
   int pos = 0; // counter for the string scan
@@ -107,12 +106,12 @@ public class FtsParse
     toStream = false;
   }
 
-    /*FtsParse(String str, FtsStream stream)
-      {
-      this.str = str;
-      this.stream = stream;
-      toStream = true;
-      }*/
+  FtsParse(String str, FtsStream stream)
+  {
+    this.str = str;
+    this.stream = stream;
+    toStream = true;
+  }
 
   /** try handling */
 
@@ -246,45 +245,45 @@ public class FtsParse
      and put it in the parsedToken variable.
      */
 
-    final private void ParseInt() throws java.io.IOException
-    {
-	/*if (toStream)
+  final private void ParseInt() throws java.io.IOException
+  {
+    if (toStream)
+      {
+	try
 	  {
-	  try
+	    stream.sendInt( Integer.parseInt( token.toString()));
+	  }
+	catch( NumberFormatException e)
 	  {
-	  stream.sendInt( Integer.parseInt( token.toString()));
+	    throw new java.io.IOException();
 	  }
-	  catch( NumberFormatException e)
-	  {
-	  throw new java.io.IOException();
-	  }
-	  }
-	  else*/
+      }
+    else
       parsedToken = new Integer(token.toString());
   }
 
   final private void ParseFloat() throws java.io.IOException
   {
-      /*if (toStream)
-	{
+    if (toStream)
+      {
 	try
-	{
-	stream.sendFloat( Float.valueOf( token.toString()).floatValue() );
-	}
+	  {
+	    stream.sendFloat( Float.valueOf( token.toString()).floatValue() );
+	  }
 	catch( NumberFormatException e)
-	{
-	throw new java.io.IOException();
-	}
-	}
-	else*/
+	  {
+	    throw new java.io.IOException();
+	  }
+      }
+    else
       parsedToken = new Float(token.toString());
   }
 
   final private void ParseString() throws java.io.IOException
   {
-      /*if (toStream)
-	stream.sendString(token);
-	else*/
+    if (toStream)
+      stream.sendString(token);
+    else
       parsedToken = token.toString();
   }
 
@@ -567,24 +566,43 @@ public class FtsParse
    * during editing).
    */
 
-    /*public static void parseAndSendObject(String str, FtsStream stream) throws java.io.IOException
+  public static void parseAndSendObject(String str, FtsStream stream) throws java.io.IOException
+  {
+    FtsParse parser = new FtsParse(str, stream);
+
+    while (! parser.atEndOfString())
       {
-      FtsParse parser = new FtsParse(str, stream);
-      
-      while (! parser.atEndOfString())
-      {
-      while ((! parser.atEndOfString()) && parser.isSeparator(parser.currentChar()))
-      parser.nextChar();
-      
-      if (parser.atEndOfString())
-      break;
-      if (! parser.tryFloat())
-      if (! parser.tryInt())
-      if (! parser.tryKeywords())
-      if (! parser.tryQString())
-      parser.tryString();
+	/* First, a multiple separator skip loop,
+	   just to allow ignoring separators in the
+	   single automata.
+
+	   Should be cleaner and nicer :-< ...
+	   */
+
+	while ((! parser.atEndOfString()) && parser.isSeparator(parser.currentChar()))
+	  parser.nextChar();
+
+	if (parser.atEndOfString())
+	  break;
+
+	/* The order is important, beacause the 
+	   last parser get accept everything as a symbol,
+	   for easiness of implementation; also, a float is made
+	   first of an int, followed by the decimal point; so
+	   float must come before ints.
+	   
+	   Every parser return 1 and advance the pointer to the
+	   char after the end of the reconized token only
+	   if the parsing has been succesfull.
+	 */
+
+	if (! parser.tryFloat())
+	  if (! parser.tryInt())
+	    if (! parser.tryKeywords())
+	      if (! parser.tryQString())
+		parser.tryString();
       }
-      }*/
+  }
 
   /** Parse an list of atoms in a MaxVector */
 
@@ -663,7 +681,7 @@ public class FtsParse
       
   static private final boolean wantASpaceBefore(FtsAtom value)
   {
-    if (value.isString())
+    if (value.type == value.STRING)
       {
 	String keywords[] = {"+", "-", "*", "/", "%", 
 			     "&&", "&", "||", "|", "==", "!=", "!", ">=", "^",
@@ -699,7 +717,7 @@ public class FtsParse
       
   static private final boolean dontWantASpaceBefore(FtsAtom value)
   {
-    if (value.isString())
+    if (value.type == value.STRING)
       {
 	String keywords[] = {")", "[", "]", "}", ",", ";", ".", "="};
 
@@ -735,7 +753,7 @@ public class FtsParse
 
   static private final boolean wantASpaceAfter(FtsAtom value)
   {
-    if (value.isString())
+    if (value.type == value.STRING)
       {
 	String keywords[] = { "+", "-", "*", "/", "%", 
 			      ",", "&&", "&", "||", "|", "==", "!=", "!", ">=",
@@ -771,7 +789,7 @@ public class FtsParse
       
   static private final boolean dontWantASpaceAfter(FtsAtom value)
   {
-    if (value.isString())
+    if (value.type == value.STRING)
       {
 	String keywords[] = { "(", "[", "{", 
 			      "$", "'", ".", "=" };
@@ -997,8 +1015,7 @@ public class FtsParse
   
   
   /*  Unparse a description passed as a array of FtsAtom */
-  //static public String unparseArguments(int nArgs, FtsAtom args[])
-  static public String unparseArguments(FtsAtom args[], int offset, int nArgs)
+  static public String unparseArguments(int nArgs, FtsAtom args[])
   {
     if (nArgs > 0)
       {
@@ -1010,9 +1027,9 @@ public class FtsParse
 	FtsAtom value2;
 	int i;
 
-	value2 = args[offset];
+	value2 = args[0];
 	value1 = value2;
-	i = offset+1;
+	i = 1;
 
 	while (value1 != null)
 	  {
@@ -1023,20 +1040,52 @@ public class FtsParse
 
 	    doNewLine = false;
 
-	    if (i >= nArgs+offset)
+	    if (i >= nArgs)
 	      value2 = null;
 	    else
 	      value2 = args[i++];
 
-	    if(value1.isInt())
-	      descr.append(value1.intValue);
-	    else if(value1.isFloat())
-	      descr.append(removeZeroAtEnd(formatter.format(value1.floatValue)));
-	    else if(value1.isString())
-		noNewLine = unparseString( value1.stringValue, descr);
-	    else if(value1.isSymbol())
-		noNewLine = unparseString( value1.symbolValue.toString(), descr);
-	    else descr.append("??");
+	    switch (value1.type)
+	      {
+		  //case value1.INT:
+	      case FtsAtom.INT:
+		descr.append(value1.intValue);
+		break;
+		//case value1.FLOAT:
+	      case FtsAtom.FLOAT:
+		descr.append(removeZeroAtEnd(formatter.format(value1.floatValue)));
+		break;
+		//case value1.STRING:
+	      case FtsAtom.STRING:
+		/* Lexical quoting check */
+		String s = value1.stringValue;
+		
+		if (isAnInt(s) || isAFloat(s) || (!isAKeyword(s) && includeStartToken(s)))
+		  {
+		    descr.append("\"");
+		    descr.append(s);
+		    descr.append("\"");
+		  }
+		else
+		  descr.append(s);
+
+		if (s.equals("'"))
+		  noNewLine = true;
+		/*else if (s.equals(";"))
+		  {
+		  if (noNewLine)
+		  noNewLine = false;
+		  else
+		  doNewLine = true;
+		  }*/
+		else
+		  noNewLine = false;
+
+		break;
+		
+	      default:
+		descr.append("??");
+	      }
 
 	    /* decide to put or not a blank between the two */
 	    if (wantASpaceAfter(value1))
@@ -1061,19 +1110,4 @@ public class FtsParse
     else
       return "";
   }
-
-  static boolean unparseString(String s, StringBuffer descr)
-  {
-     if (isAnInt(s) || isAFloat(s) || (!isAKeyword(s) && includeStartToken(s)))
-       {
-	 descr.append("\"");
-	 descr.append(s);
-	 descr.append("\"");
-       }
-     else
-       descr.append(s);
-     
-     return s.equals("'");
-  }
 }
-

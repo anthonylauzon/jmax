@@ -36,6 +36,7 @@ typedef struct {
   fts_object_t o;
   fts_atom_t a;
   char string[STRING_SIZE];
+  fts_alarm_t alarm;
   double period;
   int gate;
   int pending;
@@ -49,7 +50,7 @@ static fts_symbol_t sym_display = 0;
 static int
 symbol_contains_blank(fts_symbol_t s)
 {
-  const char *str = s;
+  const char *str = fts_symbol_name(s);
   int n = strlen(str);
   int i;
 
@@ -98,12 +99,12 @@ append_blank_and_atom(char *str, const fts_atom_t *a)
       fts_symbol_t sym = fts_get_symbol(a);
 
       if(symbol_contains_blank(sym))
-	snprintf(s, STRING_SIZE - n, " \"%s\"", sym);
+	snprintf(s, STRING_SIZE - n, " \"%s\"", fts_symbol_name(sym));
       else
-	snprintf(s, STRING_SIZE - n, " %s", sym);
+	snprintf(s, STRING_SIZE - n, " %s", fts_symbol_name(sym));
     }
   else
-    snprintf(s, STRING_SIZE - n, " <%s>", fts_get_class(a)->name);
+    snprintf(s, STRING_SIZE - n, " <%s>", fts_symbol_name(fts_get_type(a)));
 }
 
 static void
@@ -121,12 +122,12 @@ append_atom(char *str, const fts_atom_t *a)
       fts_symbol_t sym = fts_get_symbol(a);
 
       if(symbol_contains_blank(sym))
-	snprintf(s, STRING_SIZE - n, "\"%s\"", sym);
+	snprintf(s, STRING_SIZE - n, "\"%s\"", fts_symbol_name(sym));
       else
-	snprintf(s, STRING_SIZE - n, "%s", sym);
+	snprintf(s, STRING_SIZE - n, "%s", fts_symbol_name(sym));
     }
   else
-    snprintf(s, STRING_SIZE - n, "<%s>", fts_get_class(a)->name);
+    snprintf(s, STRING_SIZE - n, "<%s>", fts_symbol_name(fts_get_type(a)));
 }
 
 /************************************************************
@@ -135,12 +136,30 @@ append_atom(char *str, const fts_atom_t *a)
  *
  */
 static void
-display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_deliver(display_t *this)
+{
+  if(fts_object_patcher_is_open((fts_object_t *)this))
+    {
+      if(this->gate)
+	{
+	  this->pending = 0;
+	  this->gate = 0;
+	  
+	  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
+	  
+	  fts_alarm_set_delay(&this->alarm, this->period);
+	}
+      else
+	this->pending = 1;
+    }
+}
+
+static void
+display_alarm(fts_alarm_t *alarm, void *o)
 {
   display_t * this = (display_t *)o;
-  fts_patcher_t *patcher = fts_object_get_patcher(o);
 
-  if(patcher && fts_patcher_is_open(patcher))
+  if(fts_object_patcher_is_open((fts_object_t *)this))
     {
       if(this->dsp)
 	{
@@ -162,7 +181,7 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      
 	      this->absmax = MIN_FLOAT;
 	      
-	      fts_timebase_add_call(fts_get_timebase(), o, display_send, 0, this->period);
+	      fts_alarm_set_delay(&this->alarm, this->period);
 	    }
 	}
       else if(this->pending)
@@ -172,7 +191,7 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  
 	  fts_client_send_message(o, fts_s_set, 1, &this->a);
 	  
-	  fts_timebase_add_call(fts_get_timebase(), o, display_send, 0, this->period);
+	  fts_alarm_set_delay(&this->alarm, this->period);
 	}
       else
 	this->gate = 1;
@@ -184,15 +203,6 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
-static void
-display_deliver(display_t *this)
-{
-  this->pending = 1;
-
-  if(this->gate)
-    display_send((fts_object_t *)this, 0, 0, 0, 0);
-}
-
 /************************************************************
  *
  *  dsp
@@ -202,7 +212,7 @@ static void
 display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t *this = (display_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
 
   if(fts_dsp_is_sig_inlet((fts_object_t *)this, 0) && !fts_dsp_is_input_null(dsp, 0))
     {
@@ -216,11 +226,10 @@ display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->dsp = 1;
       this->absmax = MIN_FLOAT;
       this->last = MIN_FLOAT;
+      
+      fts_alarm_set_delay(&this->alarm, this->period);
 
-      fts_timebase_remove_object(fts_get_timebase(), o);
-      fts_timebase_add_call(fts_get_timebase(), o, display_send, 0, this->period);
-
-      fts_set_pointer(a + 0, this);
+      fts_set_ptr(a + 0, this);
       fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
       fts_set_int(a + 2, fts_dsp_get_input_size(dsp, 0));
       
@@ -231,8 +240,8 @@ display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 display_ftl(fts_word_t *argv)
 {
-  display_t *this = (display_t *) fts_word_get_pointer(argv + 0);
-  float *in = (float *) fts_word_get_pointer(argv + 1);
+  display_t *this = (display_t *) fts_word_get_ptr(argv + 0);
+  float *in = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   int i;
 
@@ -275,7 +284,7 @@ display_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
-  sprintf(this->string, "'%s\'", fts_get_symbol(at));
+  sprintf(this->string, "'%s\'", fts_symbol_name(fts_get_symbol(at)));
 
   display_deliver(this);
 }
@@ -314,19 +323,14 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   display_t * this = (display_t *)o;
   int i;
-  
-  if(ac == 1 && fts_is_object(at) && s == fts_object_get_class_name(fts_get_object(at)))
-    sprintf(this->string, "<%s> ", s);
-  else 
-    {
-      if(symbol_contains_blank(s))
-	sprintf(this->string, "\"%s\"", s);
-      else
-	sprintf(this->string, "%s", s);
-      
-      for(i=0; i<ac; i++)
-	append_blank_and_atom(this->string, at + i);
-    }
+
+  if(symbol_contains_blank(s))
+    sprintf(this->string, "\"%s\"", fts_symbol_name(s));
+  else
+    sprintf(this->string, "%s", fts_symbol_name(s));
+
+  for(i=0; i<ac; i++)
+    append_blank_and_atom(this->string, at + i);
 
   display_deliver(this);
 }
@@ -344,6 +348,7 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   dsp_list_insert(o);
 
   fts_set_string(&this->a, this->string);
+  fts_alarm_init(&this->alarm, 0, display_alarm, (void *)this);
 
   this->period = 50.0;
   this->gate = 1;
@@ -358,6 +363,7 @@ display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
+  fts_alarm_reset(&this->alarm);
   dsp_list_remove(o);
 }
 
@@ -370,7 +376,7 @@ display_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, display_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, display_put);
-
+  
   fts_method_define_varargs(cl, 0, fts_s_int, display_int);
   fts_method_define_varargs(cl, 0, fts_s_float, display_float);
   fts_method_define_varargs(cl, 0, fts_s_symbol, display_symbol);

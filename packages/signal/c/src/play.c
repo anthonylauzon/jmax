@@ -59,8 +59,8 @@ signal_play_set_conv_step(signal_play_t *this, double c)
  *
  */
 
-void 
-signal_play_bang_at_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+signal_play_bang_at_end(fts_alarm_t *alarm, void *o)
 {
   fts_outlet_bang((fts_object_t *)o, 1);
 }
@@ -258,12 +258,16 @@ signal_play_init(signal_play_t *this, int ac, const fts_atom_t *at)
   else
     fts_object_set_error((fts_object_t *)this, "Something to play required as first argument");
 
+  fts_alarm_init(&this->alarm, 0, signal_play_bang_at_end, this);    
+
   fts_dsp_add_object((fts_object_t *)this);
 }
 
 void
-signal_play_delete(signal_play_t *this)
+signal_play_reset(signal_play_t *this)
 { 
+  fts_alarm_reset(&this->alarm);
+
   fts_dsp_remove_object((fts_object_t *)this);
 }
 
@@ -273,7 +277,7 @@ signal_play_class_register(fts_symbol_t name, fts_instantiate_fun_t fun)
   fts_atom_t k, v;
 
   fts_set_symbol( &k, name);
-  fts_set_pointer(&v, fun);
+  fts_set_fun(&v, (fts_fun_t)fun);
   fts_hashtable_put(&signal_play_class_table, &k, &v);
 }
 
@@ -282,14 +286,14 @@ signal_play_class_init(fts_class_t *cl, fts_symbol_t type)
 {
   int i;
 
-  fts_class_init(cl, sizeof(signal_play_t), 4, 2, 0);
-
+  fts_class_init(cl, sizeof(signal_play_t), 4, 2, 0); 
+  
   fts_method_define_varargs(cl, 0, fts_s_bang, signal_play_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("play"), signal_play_play);
   fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), signal_play_loop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("cycle"), signal_play_cycle);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), signal_play_pause);
-  fts_method_define_varargs(cl, 0, fts_s_stop, signal_play_stop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), signal_play_stop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), signal_play_rewind);
 
   fts_method_define_varargs(cl, 0, type, signal_play_set_object);
@@ -321,21 +325,17 @@ signal_play_class_init(fts_class_t *cl, fts_symbol_t type)
 static fts_status_t
 signal_play_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t name;
+  fts_symbol_t name = fts_get_selector(at + 1);
   fts_atom_t a, k;
 
-  if(ac > 0 && fts_is_object(at))
+  fts_set_symbol( &k, name);
+  if(fts_hashtable_get( &signal_play_class_table, &k, &a))
     {
-      fts_set_symbol( &k, name);
-      if(fts_hashtable_get( &signal_play_class_table, &k, &a))
-	{
-	  fts_instantiate_fun_t fun = (fts_instantiate_fun_t)fts_get_pointer(&a);
-	  
-	  return fun(cl, ac, at);
-	}
-    }
-
+      fts_instantiate_fun_t fun = (fts_instantiate_fun_t)fts_get_fun(&a);
       
+      return fun(cl, ac, at);
+    }
+  
   return &fts_CannotInstantiate;
 }
 

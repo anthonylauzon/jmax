@@ -37,7 +37,7 @@ struct wave_ftl_symbols
 {
   fts_symbol_t outplace;
   fts_symbol_t inplace;
-};
+} sym_wave_t;
 
 extern struct wave_ftl_symbols wave_ftl_symbols_ptr;
 extern struct wave_ftl_symbols wave_ftl_symbols_fvec;

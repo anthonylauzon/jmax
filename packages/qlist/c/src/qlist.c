@@ -17,6 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ *
  */
 
 
@@ -28,30 +33,19 @@
  *
  */
 
+
 #include <fts/fts.h>
-#include <ftsprivate/client.h>
-#include <ftsprivate/patcher.h>
-#include "qlist.h"
-#include "atomlist.h"
 #include "naming.h"
 
-fts_symbol_t sym_setAtomList = 0;
-
-typedef struct _qlist_
+typedef struct
 {
   fts_object_t  ob;
-
-  int open; /* flag: is 1 if sequence editor is open */
 
   fts_atom_list_t *atom_list;
   fts_atom_list_iterator_t *iterator;
 
 } qlist_t;
 
-
-#define qlist_set_editor_open(q) ((q)->open = 1)
-#define qlist_set_editor_close(q) ((q)->open = 0)
-#define qlist_editor_is_open(q) ((q)->open != 0)
 
 /* Method for message "rewind" inlet 0 */
 
@@ -74,7 +68,7 @@ static void
 qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
-  long drop = fts_get_int_arg(aac, at, 0, 0);
+  long drop = fts_get_long_arg(aac, at, 0, 0);
   fts_atom_t av[NATOM];
   fts_atom_t *ap;
   int ac;
@@ -89,7 +83,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
       if (!target)
 	{
-	  if (fts_is_float(av) || fts_is_int(av))
+	  if (fts_is_float(av) || fts_is_long(av))
 	    {
 	      fts_atom_t waka[11];
 	      fts_atom_t *wp = waka+1;
@@ -100,7 +94,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		{
 		  *wp = *fts_atom_list_iterator_current(this->iterator);
 
-		  if ((! fts_is_int(wp)) && (! fts_is_float(wp)))
+		  if ((! fts_is_long(wp)) && (! fts_is_float(wp)))
 		    break;
 
 		  fts_atom_list_iterator_next(this->iterator);
@@ -108,19 +102,24 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		}
 
 	      if (count == 1)
-		fts_outlet_primitive(o, 0, av);
+		{
+		  if (fts_is_float(&waka[0]))
+		    fts_outlet_send(o, 0, fts_s_float, 1, av);
+		  else
+		    fts_outlet_send(o, 0, fts_s_int, 1, av);
+		}
 	      else 
 		{
 		  if (count > 10)
 		    count = 10;
 
-		  fts_outlet_atoms(o, 0, count, waka);
+		  fts_outlet_send(o, 0, fts_s_list, count, waka);
 		}
 	      break;
 	    }
-	  else if (fts_is_int(av))
+	  else if (fts_is_long(av))
 	    {
-	      fts_outlet_primitive(o, 0, av);
+	      fts_outlet_send(o, 0, fts_s_int, 1, av);
 
 	      break;
 	    }
@@ -177,22 +176,22 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
       if (! drop)
 	{
-	  if (fts_is_int(ap))
+	  if (fts_is_long(ap))
 	    {
 	      if (ac > 1)
-		fts_send_message(target, 0, fts_s_list, ac, ap);
+		fts_message_send(target, 0, fts_s_list, ac, ap);
 	      else 
-		fts_send_message(target, 0, fts_s_int, ac, ap);
+		fts_message_send(target, 0, fts_s_int, ac, ap);
 	    }
 	  else if (fts_is_float(ap))
 	    {
 	      if (ac >1) 
-		fts_send_message(target, 0, fts_s_list, ac, ap);
+		fts_message_send(target, 0, fts_s_list, ac, ap);
 	      else 
-		fts_send_message(target, 0, fts_s_float, ac, ap);
+		fts_message_send(target, 0, fts_s_float, ac, ap);
 	    }
 	  else if (fts_is_symbol(ap) && (fts_get_symbol(ap) != fts_s_semi) && (fts_get_symbol(ap) != fts_s_comma))
-	    fts_send_message(target, 0, fts_get_symbol(ap), ac - 1, ap + 1);
+	    fts_message_send(target, 0, fts_get_symbol(ap), ac - 1, ap + 1);
 	}
 
       if (!is_comma)
@@ -211,10 +210,6 @@ qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_atom_list_append(this->atom_list, ac, at);
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
-
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
-
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 /* Method for message "set" [<arg>*] inlet 0 */
@@ -226,10 +221,6 @@ qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   fts_atom_list_set( this->atom_list, ac, at);
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
-
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
-
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 /* Method for message "clear" inlet 0 */
@@ -241,10 +232,6 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_atom_list_clear(this->atom_list);
   fts_atom_list_iterator_init(this->iterator, this->atom_list);
-
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, sym_atomlist_update, 0, 0);
-
-  fts_patcher_set_dirty((fts_patcher_t *)o->patcher, 1);
 }
 
 /* Method for message "flush" inlet 0 */
@@ -271,19 +258,12 @@ static void
 qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
-  fts_atom_t a[1];
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-
-  this->open = 0;
- 
-  if(name)
-    {
-      fts_set_symbol(a, name);
-      this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 1, a);
-    }
+  if (name)
+      this->atom_list = fts_atom_list_new_with_name(name);
   else
-    this->atom_list = (fts_atom_list_t *)fts_object_create(atomlist_type, 0, 0);
-
+      this->atom_list = fts_atom_list_new();
+  
   this->iterator  = fts_atom_list_iterator_new(this->atom_list);
 }
 
@@ -293,37 +273,17 @@ qlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   qlist_t *this = (qlist_t *)o;
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_delete, 0, 0);
+  fts_atom_list_free(this->atom_list);
   fts_atom_list_iterator_free(this->iterator);
-
-  fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 }
 
 static void
-qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
-  fts_atom_t a[1];
+  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
 
-  if(!fts_object_has_id((fts_object_t *)this->atom_list))
-  {
-    ((fts_object_t *)this->atom_list)->patcher = o->patcher;
-    fts_client_register_object((fts_object_t *)this->atom_list, -1);     
-  }
-  
-  fts_set_int(a, fts_get_object_id((fts_object_t *)this->atom_list));
-  fts_client_send_message((fts_object_t *)this, sym_setAtomList, 1, a);
-
-  fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_upload, 0, 0);
-}
-
-static void
-qlist_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  qlist_t *this = (qlist_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-
-  fts_atom_list_dump(this->atom_list, dumper, (fts_object_t *)this);
+  fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
 #define MAX_ATOMS_PER_LINE 18
@@ -337,7 +297,7 @@ static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fts_atom_list_iterator_t *iterator;
   int count;
 
-  file = (FILE *)fts_get_pointer( at);
+  file = (FILE *)fts_get_ptr( at);
 
   if ( o->argc > 1)
     fprintf( file, "#N qlist %s;\n", fts_symbol_name( fts_get_symbol( o->argv + 1)));
@@ -394,67 +354,70 @@ static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fprintf( file, "#P newobj %d %d %d %d qlist;\n", x, y, w, font_index);
 }
 
-static void
-qlist_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  qlist_t *this = (qlist_t *)o;
-
-  qlist_set_editor_open(this);
-  fts_client_send_message(o, fts_s_openEditor, 0, 0);
-  qlist_upload(o, 0, 0, 0, 0);
-}
+/* Daemon for getting the property "data".
+   Note that we return a pointer to the data; 
+   if the request come from the client, it will be the
+   kernel to handle the export of the data, not the explode
+   object.
+ */
 
 static void
-qlist_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_get_data(fts_daemon_action_t action, fts_object_t *obj,
+	       fts_symbol_t property, fts_atom_t *value)
 {
-  qlist_t *this = (qlist_t *)o;
+  qlist_t *this = (qlist_t *)obj;
 
-  qlist_set_editor_close(this);
-}
-
-static void 
-qlist_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  qlist_t *this = (qlist_t *) o;
-
-  if(qlist_editor_is_open(this))
-    {
-      qlist_set_editor_close(this);
-      fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
-    }
+  fts_set_data(value, (fts_data_t *) this->atom_list);
 }
 
 static fts_status_t
 qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[2];
+
   fts_class_init(cl, sizeof(qlist_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, qlist_init);
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_symbol;
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, qlist_init, 2, a, 1);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, qlist_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, qlist_upload);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, qlist_delete, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, qlist_clear);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, qlist_dump);
+  /* Methods for saving in bmax */
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, qlist_save_dotpat); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_clear, qlist_clear, 0, 0);
+
+  a[0] = fts_s_ptr;
+  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, qlist_save_bmax, 1, a);
+
+  a[0] = fts_s_ptr;
+  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, qlist_save_dotpat, 1, a); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, qlist_append);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, qlist_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, qlist_destroy_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, qlist_close_editor); 
+  /* Method for loading from the user interface */
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), qlist_rewind);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("flush"), qlist_flush);
-  fts_method_define_varargs(cl, 0, fts_s_clear, qlist_clear);
+  a[0] = fts_s_int;
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("next"), qlist_next);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("read"), qlist_read);
+  fts_method_define(cl, 0, fts_new_symbol("rewind"), qlist_rewind, 0, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, qlist_set);
+  fts_method_define(cl, 0, fts_new_symbol("flush"), qlist_flush, 0, 0);
+
+  fts_method_define(cl, 0, fts_s_clear, qlist_clear, 0, 0);
+
+  a[0] = fts_s_int;
+  fts_method_define_optargs(cl, 0, fts_new_symbol("next"), qlist_next, 1, a, 0);
+
+  a[0] = fts_s_symbol;
+  fts_method_define(cl, 0, fts_new_symbol("read"), qlist_read, 1, a);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), qlist_set);
 
   fts_method_define_varargs(cl, 0, fts_s_append, qlist_append);
+
+  /* daemon for data property */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_data, qlist_get_data);
 
   return fts_Success;
 }
@@ -463,7 +426,11 @@ qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 qlist_config(void)
 {
-  sym_setAtomList = fts_new_symbol("setAtomList");
-  
-  fts_class_install(fts_new_symbol("qlist"), qlist_instantiate);
+  fts_class_install(fts_new_symbol("qlist"),qlist_instantiate);
 }
+
+
+
+
+
+

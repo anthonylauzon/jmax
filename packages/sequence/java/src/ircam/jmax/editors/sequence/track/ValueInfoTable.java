@@ -36,11 +36,7 @@ public class ValueInfoTable {
 
     public static ValueInfo getValueInfo(String type)
     {
-	ValueInfo info = (ValueInfo)(infos.get(type));
-	if(info == null)
-	    info = AnythingValue.info;
-	
-	return info;
+	return (ValueInfo)(infos.get(type));
     }
 
     public static Enumeration getTypeNames()

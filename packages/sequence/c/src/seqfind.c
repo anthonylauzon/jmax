@@ -29,14 +29,14 @@
 #include "sequence.h"
 #include "track.h"
 #include "event.h"
+#include "eventtrk.h"
+#include "seqref.h"
 
 static fts_symbol_t sym_question = 0;
 
 typedef struct _seqfind_
 {
-  fts_object_t head; /* sequence reference object */
-  track_t *track;
-  fts_array_t array;
+  seqref_t o; /* sequence reference object */
 } seqfind_t;
 
 /************************************************************
@@ -49,43 +49,48 @@ static void
 seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqfind_t *this = (seqfind_t *)o;
-  event_t *event = track_get_first(this->track);
-	  
-  while(event)
+  eventtrk_t *track = seqref_get_reference(o);
+
+  if(track)
     {
-      fts_atom_t *atoms;
+      event_t *event = eventtrk_get_first(track);
+      fts_atom_t a[2];
+      fts_atom_t atoms[64];
       int n_atoms;
-      int i;
-      
-      fts_array_clear(&this->array);
-      event_get_array(event, &this->array);
-      
-      n_atoms = fts_array_get_size(&this->array);
-      atoms = fts_array_get_atoms(&this->array);
-      
-      if(ac > n_atoms)
-	ac = n_atoms;
-      
-      for(i=0; i<ac; i++)
+	  
+      fts_set_ptr(a, &n_atoms);
+      fts_set_ptr(a + 1, atoms);
+	  
+      while(event)
 	{
-	  if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == sym_question)
-	    continue;
-	  else if(fts_is_int(at + i) && fts_is_float(atoms + i) && fts_get_int(at + i) == (int)fts_get_float(atoms + i))
-	    continue;
-	  else if(fts_is_float(at + i) && fts_is_int(atoms + i) && fts_get_float(at + i) == (float)fts_get_int(atoms + i))
-	    continue;
-	  else if( !fts_atom_same_type( at+i, atoms+i) || fts_get_int(at + i) != fts_get_int(atoms + i))
-	    break;
+	  int i;
+
+	  event_get_atoms(event, &n_atoms, atoms);
+	      
+	  if(ac > n_atoms)
+	    ac = n_atoms;
+
+	  for(i=0; i<ac; i++)
+	    {
+	      if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == sym_question)
+		continue;
+	      else if(fts_is_int(at + i) && fts_is_float(atoms + i) && fts_get_int(at + i) == (int)fts_get_float(atoms + i))
+		continue;
+	      else if(fts_is_float(at + i) && fts_is_int(atoms + i) && fts_get_float(at + i) == (float)fts_get_int(atoms + i))
+		continue;
+	      else if(fts_get_type(at + i) != fts_get_type(atoms + i) || fts_get_int(at + i) != fts_get_int(atoms + i))
+		break;
+	    }
+	      
+	  if(i == ac)
+	    {
+	      fts_outlet_float(o, 1, (float)event_get_time(event));
+	      fts_outlet_send(o, 0, fts_s_list, n_atoms, atoms);
+	      break;
+	    }
+	      
+	  event = event_get_next(event);
 	}
-      
-      if(i == ac)
-	{
-	  fts_outlet_float(o, 1, (float)event_get_time(event));
-	  fts_outlet_atoms(o, 0, n_atoms, atoms);
-	  break;
-	}
-      
-      event = event_get_next(event);
     }
 }
 
@@ -94,9 +99,7 @@ seqfind_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   seqfind_t *this = (seqfind_t *)o;
 
-  fts_object_release(this->track);
-  this->track = track_atom_get(at);
-  fts_object_refer(this->track);
+  seqref_set_reference(o, ac, at);
 }
 
 /************************************************************
@@ -110,50 +113,36 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   seqfind_t *this = (seqfind_t *)o;
 
-  ac--;
-  at++;
-
-  this->track = 0;
-
-  if(track_atom_is(at))
-    {
-      this->track = (track_t *)fts_get_object(at);
-      fts_object_refer(this->track);
-      
-      fts_array_init(&this->array, 0, 0);
-    }
-  else
-    fts_object_set_error(o, "Argument of event track required");
+  seqref_init(o, ac, at);
 }
 
 static void 
 seqfind_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqfind_t *this = (seqfind_t *)o;
-
-  if(this->track)
-    {
-      fts_object_release(this->track);
-      fts_array_destroy(&this->array);
-    }
 }
 
 static fts_status_t
 seqfind_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(seqfind_t), 2, 2, 0);
+  if(ac > 2 && fts_is_symbol(at) && fts_is_object(at + 1) && fts_is_int(at + 2))
+    {
+      fts_class_init(cl, sizeof(seqfind_t), 2, 2, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqfind_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqfind_delete);
-  
-  fts_method_define_varargs(cl, 0, fts_s_int, seqfind_find);
-  fts_method_define_varargs(cl, 0, fts_s_float, seqfind_find);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, seqfind_find);
-  fts_method_define_varargs(cl, 0, fts_s_list, seqfind_find);
-  
-  fts_method_define_varargs(cl, 1, seqsym_track, seqfind_set_reference);
-  
-  return fts_Success;
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqfind_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqfind_delete);
+
+      fts_method_define_varargs(cl, 0, fts_s_int, seqfind_find);
+      fts_method_define_varargs(cl, 0, fts_s_float, seqfind_find);
+      fts_method_define_varargs(cl, 0, fts_s_symbol, seqfind_find);
+      fts_method_define_varargs(cl, 0, fts_s_list, seqfind_find);
+
+      fts_method_define_varargs(cl, 1, fts_s_list, seqfind_set_reference);
+
+      return fts_Success;
+    }
+  else
+    return &fts_CannotInstantiate;    
 }
 
 void

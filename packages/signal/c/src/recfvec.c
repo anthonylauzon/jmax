@@ -50,6 +50,7 @@ typedef struct _rec_fvec_
 
   enum rec_mode {mode_stop, mode_pause, mode_rec} mode;
   
+  fts_alarm_t alarm;
 } rec_fvec_t;
 
 static fts_symbol_t sym_rec = 0;
@@ -61,7 +62,7 @@ static fts_symbol_t sym_rec = 0;
  */
 
 static void 
-rec_fvec_bang_at_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fvec_bang_at_end(fts_alarm_t *alarm, void *o)
 {
   fts_outlet_bang((fts_object_t *)o, 0);
 }
@@ -194,14 +195,14 @@ static void
 rec_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   rec_fvec_t *this = (rec_fvec_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   double sr = fts_dsp_get_input_srate(dsp, 0);
   fts_atom_t a[3];
 
   rec_fvec_reset(this, n_tick, sr);
 
-  fts_set_pointer(a + 0, this);
+  fts_set_ptr(a + 0, this);
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
@@ -211,8 +212,8 @@ rec_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 rec_fvec_ftl(fts_word_t *argv)
 {
-  rec_fvec_t *this = (rec_fvec_t *) fts_word_get_pointer(argv + 0);
-  float *in = (float *) fts_word_get_pointer(argv + 1);
+  rec_fvec_t *this = (rec_fvec_t *) fts_word_get_ptr(argv + 0);
+  float *in = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   fvec_t *fvec = this->fvec;
   float *buf = fvec_get_ptr(fvec);
@@ -264,7 +265,7 @@ rec_fvec_ftl(fts_word_t *argv)
 		  if(index >= end)
 		    {
 		      /* end reached */
-		      fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, rec_fvec_bang_at_end, 0, 0.0);
+		      fts_alarm_set_delay(&this->alarm, 0.0);
 		      
 		      index = end;
 		      
@@ -305,6 +306,9 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->sr = 0.001 * fts_dsp_get_sample_rate();
   this->sp = 1000. / fts_dsp_get_sample_rate();
 
+  /* init output alarm */
+  fts_alarm_init(&this->alarm, 0, rec_fvec_bang_at_end, this);    
+
   if(ac > 0 && fvec_atom_is(at))
     rec_fvec_set(o, 0, 0, ac, at);
   else
@@ -316,23 +320,25 @@ rec_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 { 
   rec_fvec_t *this = (rec_fvec_t *)o;
 
+  fts_alarm_reset(&this->alarm);
   fts_dsp_remove_object(o);
 }
 
 static fts_status_t
 rec_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  int i;
+
   fts_class_init(cl, sizeof(rec_fvec_t), 3, 1, 0); 
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, rec_fvec_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, rec_fvec_delete);
-
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, rec_fvec_put);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, rec_fvec_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rec"), rec_fvec_rec);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), rec_fvec_pause);
-  fts_method_define_varargs(cl, 0, fts_s_stop, rec_fvec_stop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), rec_fvec_stop);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("begin"), rec_fvec_set_begin);
   fts_method_define_varargs(cl, 0, fts_new_symbol("end"), rec_fvec_set_end);

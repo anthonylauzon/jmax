@@ -29,6 +29,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 
 import java.util.*;
 import java.awt.Component;
@@ -87,7 +88,7 @@ public class DeleteTool extends Tool implements PositionListener {
 		    egc.getSelection().deleteAll();
 		else
 		    {
-			egc.getDataModel().deleteEvent(aEvent);		
+			egc.getDataModel().removeEvent(aEvent);		
 			egc.getSelection().deselectAll();
 		    }
 	    }

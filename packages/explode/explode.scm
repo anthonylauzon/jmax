@@ -21,13 +21,18 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
+;; package declaration
+(provide-package "explode" "0.0.0")
+
+; load server module
+(ucs "load" "module" "explode" (file-cat dir "c" "lib" jmax-arch jmax-mode "libexplode.so"))
+
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.explode.ExplodeExtension")
 
 ;; load the help patch data base
-(load-silently (file-cat dir "help" "explode.help.index.scm"))
-(help-summary "explode summary" (file-cat dir "help" "explode.summary.jmax"))
+(sshh-load (file-cat dir "help" "explode.help.index.scm"))
 
 (println "package: explode (ISPW sequencing class with editor)")
 

@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
 #include "wave.h"
 
 struct wave_ftl_symbols wave_ftl_symbols_ptr = {0, 0};
@@ -127,7 +126,7 @@ static void
 wave_put_cosine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wave_t *this = (wave_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
 
   wave_put(this, dsp, &wave_ftl_symbols_ptr);
 }
@@ -136,7 +135,7 @@ static void
 wave_put_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wave_t *this = (wave_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
 
   wave_put(this, dsp, &wave_ftl_symbols_fvec);
 }
@@ -249,9 +248,9 @@ wave_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 wave_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0)
+  if(ac == 1)
     return wave_instantiate_cosine(cl, ac, at);
-  else if (ac == 1 && fvec_atom_is(at))
+  else if (ac == 2 && fvec_atom_is(at + 1))
     return wave_instantiate_fvec(cl, ac, at);
   else
     return &fts_CannotInstantiate;

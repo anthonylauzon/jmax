@@ -26,6 +26,10 @@
 ## package declaration
 package provide control
 
+# load server module
+global jmaxArch jmaxMode
+ucs load module control $dir/c/lib/$jmaxArch/$jmaxMode/libcontrol.so
+
 ## load the help patch data base
 sourceFile $dir/help/control.help.index.tcl
 helpSummary "control summary" $dir/help/control.summary.jmax

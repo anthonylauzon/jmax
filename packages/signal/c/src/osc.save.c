@@ -58,7 +58,7 @@ osc_ctl_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   osc_ctl_t *this = (osc_ctl_t *)o;
   osc_ctl_data_t *data = (osc_ctl_data_t *)ftl_data_get_ptr(this->data);
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   float sr = fts_dsp_get_output_srate(dsp, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   fts_atom_t a[3];
@@ -77,8 +77,8 @@ osc_ctl_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 osc_ctl_ftl(fts_word_t *argv)
 {
-  osc_ctl_data_t *data = (osc_ctl_data_t *)fts_word_get_pointer(argv + 0);
-  float *out = (float *) fts_word_get_pointer(argv + 1);
+  osc_ctl_data_t *data = (osc_ctl_data_t *)fts_word_get_ptr(argv + 0);
+  float *out = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   fvec_t *fvec = data->fvec;
   fts_intphase_t phi = data->phase;
@@ -169,6 +169,8 @@ osc_ctl_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 osc_ctl_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[3];
+
   fts_class_init(cl, sizeof(osc_ctl_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_ctl_init);
@@ -216,7 +218,7 @@ osc_sig_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   osc_sig_t *this = (osc_sig_t *)o;
   osc_sig_data_t *data = (osc_sig_data_t *)ftl_data_get_ptr(this->data);
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   float sr = fts_dsp_get_output_srate(dsp, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   fts_atom_t a[4];
@@ -236,9 +238,9 @@ osc_sig_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 osc_sig_ftl(fts_word_t *argv)
 {
-  osc_sig_data_t *data = (osc_sig_data_t *)fts_word_get_pointer(argv + 0);
-  float *in = (float *) fts_word_get_pointer(argv + 1);
-  float *out = (float *) fts_word_get_pointer(argv + 2);
+  osc_sig_data_t *data = (osc_sig_data_t *)fts_word_get_ptr(argv + 0);
+  float *in = (float *) fts_word_get_ptr(argv + 1);
+  float *out = (float *) fts_word_get_ptr(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
   fvec_t *fvec = data->fvec;
   fts_intphase_t phi = data->phase;
@@ -316,6 +318,8 @@ osc_sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[3];
+
   fts_class_init(cl, sizeof(osc_sig_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_sig_init);
@@ -337,12 +341,12 @@ osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && !fvec_atom_is(at))
+  if(ac > 1 && !fvec_atom_is(at + 1))
     return &fts_CannotInstantiate;
 
-  if(ac == 0 || (ac == 1 && fvec_atom_is(at)))
+  if(ac == 1 || (ac == 2 && fvec_atom_is(at + 1)))
     return osc_sig_instantiate(cl, ac, at);
-  else if ((ac == 1 && fts_is_number(at)) || (ac == 2 && fts_is_number(at) && fvec_atom_is(at + 1)))
+  else if ((ac == 2 && fts_is_number(at + 1)) || (ac == 3 && fts_is_number(at + 1) && fvec_atom_is(at + 2)))
     return osc_ctl_instantiate(cl, ac, at);
   else
     return &fts_CannotInstantiate;

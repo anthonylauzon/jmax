@@ -44,19 +44,14 @@ public class SequenceTools implements ToolProvider{
   {
     String path = null;
     String fs = File.separator;
-    /*
-      WARNING:
-      Waiting for a method to get the packagePath from the package name
-    */
-    /*try
+
+    try
       {
-      path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
       }
-      catch(FileNotFoundException e){
-      path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-      }*/
-    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????????	 
-    /*************************************************************/
+    catch(FileNotFoundException e){
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+    }
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
     tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));

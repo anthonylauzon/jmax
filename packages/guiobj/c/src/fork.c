@@ -53,8 +53,12 @@ fork_set_outlets(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t 
 fork_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[1];
   int n_outs;
   
+  ac--;
+  at++;
+
   if(ac > 0)
     n_outs = fts_get_int(at);
   else

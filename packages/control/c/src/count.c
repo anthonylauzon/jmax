@@ -46,8 +46,7 @@ typedef struct
   int begin;
   int end;
   int step;
-  int reverse; /* running direction when for reverse mode */
-  int signal; /* flag whether carrier has to be signaled */
+  int reverse;
 } count_int_t;
 
 typedef struct 
@@ -59,7 +58,6 @@ typedef struct
   double end;
   double step;
   double reverse;
-  int signal;
 } count_float_t;
 
 /************************************************************
@@ -86,11 +84,8 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       switch(this->mode)
 	{
 	case mode_clip:
-
 	  value = target;
-
 	  break;
-
 	case mode_wrap:
 	  {
 	    value += begin - end;
@@ -116,20 +111,14 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  }
 	  break;
 	}
-
-      carrier = this->signal;
+      
+      carrier = 1;
     }
   else
-    {
-      this->value = value + step;
-      this->signal = 1;
-    }
+    this->value = value + step;
   
   if(carrier)
-    {
-      this->signal = 0;
-      fts_outlet_bang(o, 1);
-    }
+    fts_outlet_bang(o, 1);
 
   fts_outlet_int(o, 0, value);
 }
@@ -214,11 +203,11 @@ count_int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 count_int_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  if(fts_is_tuple(value))
+  if(fts_is_list(value))
     {
-      fts_tuple_t *list = fts_get_tuple(value);
+      fts_list_t *list = fts_get_list(value);
 
-      count_int_set(o, 0, 0, fts_tuple_get_size(list), fts_tuple_get_atoms(list));
+      count_int_set(o, 0, 0, fts_list_get_size(list), fts_list_get_ptr(list));
     }
   else if(fts_is_number(value))
     count_int_set_value(o, 0, 0, 1, value);
@@ -323,16 +312,13 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	  break;
 	}
       
-      carrier = this->signal;
+      carrier = 1;
     }
   else
     this->value = value + step;
   
   if(carrier)
-    {
-      this->signal = 0;
-      fts_outlet_bang(o, 1);
-    }
+    fts_outlet_bang(o, 1);
 
   fts_outlet_float(o, 0, value);
 }
@@ -440,11 +426,11 @@ count_float_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 count_float_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  if(fts_is_tuple(value))
+  if(fts_is_list(value))
     {
-      fts_tuple_t *list = fts_get_tuple(value);
+      fts_list_t *list = fts_get_list(value);
 
-      count_float_set(o, 0, 0, fts_tuple_get_size(list), fts_tuple_get_atoms(list));
+      count_float_set(o, 0, 0, fts_list_get_size(list), fts_list_get_ptr(list));
     }
   else if(fts_is_number(value))
     count_float_set_value(o, 0, 0, 1, value);
@@ -506,7 +492,6 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->end = 127;
   this->step = 1;
   this->reverse = 1;
-  this->signal = 1;
 
   count_int_set_parameters(o, 0, 0, ac - 1, at + 1);
   count_int_reset(o, 0, 0, 0, 0);
@@ -523,7 +508,6 @@ count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->end = 0.1;
   this->step = 0.01;
   this->reverse = 1;
-  this->signal = 1;
 
   count_float_set_parameters(o, 0, 0, ac - 1, at + 1);
   count_float_reset(o, 0, 0, 0, 0);
@@ -548,6 +532,9 @@ count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
   int i;
+
+  ac--;
+  at++;
 
   for(i=0; i<ac; i++)
     if(!fts_is_number(at + i))
@@ -608,7 +595,7 @@ count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 int
 count_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return count_is_int(ac0, at0) == count_is_int(ac1, at1);
+  return count_is_int(ac0 - 1, at0 + 1) == count_is_int(ac1 - 1, at1 + 1);
 }
 
 void

@@ -47,7 +47,7 @@ public class MouseDragTracker extends InteractionModule {
     {  
 	previousX = e.getX();		
 	previousY = e.getY();		
-	itsListener.dragStart(previousX, previousY, e);
+	itsListener.dragStart(previousX, previousY);
 	InteractionSemaphore.lock();
     }
  
@@ -62,7 +62,7 @@ public class MouseDragTracker extends InteractionModule {
 	int deltaY = e.getY()-previousY;
 	int deltaX = e.getX()-previousX;
 
-	itsListener.dynamicDrag(deltaX, deltaY, e);
+	itsListener.dynamicDrag(deltaX, deltaY);
 	previousX = e.getX();		
 	previousY = e.getY();		
     } 

@@ -114,61 +114,14 @@ static void
 explay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explay_t *this = (explay_t *)o;
+  long n = (long) fts_get_number_int(at);
 
-  if(fts_is_number(at))
+  if (n)
     {
-      long n = (long) fts_get_number_int(at);
-      
-      if (n)
-	{
-	  explode_t *explode;
-	  
-	  explode = explode_get_by_name(this->explode_name);
-	  
-	  if (! explode)
-	    {
-	      post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
-	      this->current = 0;
-	    }
-	  else
-	    {
-	      this->serial = explode->serial;
-	      
-	      if (! this->serial)
-		{
-		  post("explay: %s: recording\n", fts_symbol_name(this->explode_name));
-		  this->current = 0;
-		}
-	      else
-		{
-		  this->current = explode->data.evt;
-		  
-		  if (this->current)
-		    fts_outlet_int(o, 0, this->current->time);
-		  else
-		    post("explay: %s: empty\n", fts_symbol_name(this->explode_name));
-		}
-	    }
-	}
-      else
-	this->current = 0;
-    }
-}
-
-static void
-explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  explay_t *this = (explay_t *)o;
-
-  if(ac > 2 && fts_is_int(at + 0) && fts_is_int(at + 1) && fts_is_int(at + 2))
-    {
-      long n1 = fts_get_int(at + 0);
-      long n2 = fts_get_int(at + 1);
-      long n3 = fts_get_int(at + 2);
       explode_t *explode;
-      
-      explode = explode_get_by_name(this->explode_name); 
-      
+
+      explode = explode_get_by_name(this->explode_name);
+
       if (! explode)
 	{
 	  post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
@@ -177,7 +130,7 @@ explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       else
 	{
 	  this->serial = explode->serial;
-	  
+
 	  if (! this->serial)
 	    {
 	      post("explay: %s: recording\n", fts_symbol_name(this->explode_name));
@@ -185,22 +138,61 @@ explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	    }
 	  else
 	    {
-	      evt_t *e;
-	      
-	      for (e = explode->data.evt; e; e = e->next)
-		if (e->pit == n1 && e->vel == n2 && e->chan == n3)
-		  break;
-	      
-	      if (! e)
-		{
-		  post("explay: startat: note not found\n");
-		  this->current = 0;
-		}
-	      else if (e->next)
-		{
-		  fts_outlet_int(o, 0, e->next->time - e->time);
-		  this->current = e->next;
-		}
+	      this->current = explode->data.evt;
+
+	      if (this->current)
+		fts_outlet_int(o, 0, this->current->time);
+	      else
+		post("explay: %s: empty\n", fts_symbol_name(this->explode_name));
+	    }
+	}
+    }
+  else
+    this->current = 0;
+}
+
+static void
+explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  explay_t *this = (explay_t *)o;
+  long n1 = fts_get_long(at + 0);
+  long n2 = fts_get_long(at + 1);
+  long n3 = fts_get_long(at + 2);
+  explode_t *explode;
+
+  explode = explode_get_by_name(this->explode_name); 
+
+  if (! explode)
+    {
+      post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
+      this->current = 0;
+    }
+  else
+    {
+      this->serial = explode->serial;
+
+      if (! this->serial)
+	{
+	  post("explay: %s: recording\n", fts_symbol_name(this->explode_name));
+	  this->current = 0;
+	}
+      else
+	{
+	  evt_t *e;
+
+	  for (e = explode->data.evt; e; e = e->next)
+	    if (e->pit == n1 && e->vel == n2 && e->chan == n3)
+	      break;
+	  
+	  if (! e)
+	    {
+	      post("explay: startat: note not found\n");
+	      this->current = 0;
+	    }
+	  else if (e->next)
+	    {
+	      fts_outlet_int(o, 0, e->next->time - e->time);
+	      this->current = e->next;
 	    }
 	}
     }
@@ -212,7 +204,7 @@ static void
 explay_nth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explay_t *this = (explay_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 0);
+  long n = fts_get_long_arg(ac, at, 0, 0);
   explode_t *explode;
 
   explode = explode_get_by_name(this->explode_name); 
@@ -246,11 +238,8 @@ explay_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   explay_t *this = (explay_t *)o;
   
-  if(fts_is_symbol(at))
-    {
-      this->explode_name = fts_get_symbol(at);
-      this->current = 0;
-    }
+  this->explode_name = fts_get_symbol(at);
+  this->current = 0;
 }
 
 
@@ -282,40 +271,64 @@ explay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   explay_t *this = (explay_t *)o;
 
-  if(ac > 1 && fts_is_symbol(at))
-    {
-      this->explode_name = fts_get_symbol_arg(ac, at, 1, 0);
-      this->current = 0;
-    }
-
-  fts_object_set_error(o, "Argument of explode name required");
+  this->explode_name = fts_get_symbol_arg(ac, at, 1, 0);
+  this->current = 0;
 }
 
 
 static fts_status_t
 explay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[5];
+
+  /* initialize the class */
+
   fts_class_init(cl, sizeof(explay_t), 2, 5, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, explay_init);
+  /* define the system methods */
 
-  fts_method_define_varargs(cl, 0, fts_s_bang, explay_bang);
-  fts_method_define_varargs(cl, 0, fts_s_int, explay_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, explay_number);
+  a[0] = fts_s_symbol;
+  a[1] = fts_s_symbol;
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, explay_init, 2, a, 1);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, explay_number_1);
-  fts_method_define_varargs(cl, 1, fts_s_float, explay_number_1);
+  /* Explay number methods */
 
-  fts_method_define_varargs(cl, 0, fts_s_set, explay_set);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("nth"), explay_nth);
-  fts_method_define_varargs(cl, 0, fts_s_print, explay_print);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("startat"), explay_startat);
+  fts_method_define(cl, 0, fts_s_bang, explay_bang, 0, 0);
 
-  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 2,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 3,	fts_s_int);
-  fts_outlet_type_define_varargs(cl, 4,	fts_s_int);
+  a[0] = fts_s_int;
+  fts_method_define(cl, 0, fts_s_int, explay_number, 1, a);
+  a[0] = fts_s_float;
+  fts_method_define(cl, 0, fts_s_float, explay_number, 1, a);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 1, fts_s_int, explay_number_1, 1, a);
+  a[0] = fts_s_float;
+  fts_method_define(cl, 1, fts_s_float, explay_number_1, 1, a);
+
+  /* Other methods */
+
+  a[0] = fts_s_int;
+  fts_method_define_optargs(cl, 0, fts_new_symbol("nth"), explay_nth, 1, a, 0);
+
+  a[0] = fts_s_symbol;
+  fts_method_define(cl, 0, fts_new_symbol("set"), explay_set, 1, a);
+
+  a[0] = fts_s_symbol;
+  fts_method_define_optargs(cl, 0, fts_new_symbol("print"), explay_print, 1, a, 0);
+
+  a[0] = fts_s_int;
+  a[1] = fts_s_int;
+  a[2] = fts_s_int;
+  fts_method_define(cl, 0, fts_new_symbol("startat"), explay_startat, 3, a);
+
+  /* Type the outlet */
+
+  a[0] = fts_s_int;
+  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
+  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
+  fts_outlet_type_define(cl, 2,	fts_s_int, 1, a);
+  fts_outlet_type_define(cl, 3,	fts_s_int, 1, a);
+  fts_outlet_type_define(cl, 4,	fts_s_int, 1, a);
 
   return fts_Success;
 }
@@ -325,3 +338,8 @@ explay_config(void)
 {
   fts_class_install(fts_new_symbol("explay"),explay_instantiate);
 }
+
+
+
+
+

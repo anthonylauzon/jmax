@@ -38,7 +38,7 @@ struct osc_ftl_symbols
   fts_symbol_t control_input;
   fts_symbol_t signal_input;
   fts_symbol_t signal_input_inplace;
-};
+} sym_osc_t;
 
 extern struct osc_ftl_symbols osc_ftl_symbols_ptr;
 extern struct osc_ftl_symbols osc_ftl_symbols_fvec;

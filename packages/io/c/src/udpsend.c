@@ -172,50 +172,41 @@ typedef struct {
 static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udpsend_t *this = (udpsend_t *)o;
+  int port;
+  struct hostent *h;
+  const char *host;
 
-  ac--;
-  at++;
+  host = fts_symbol_name( fts_get_symbol_arg( ac, at, 1, 0));
+  port = fts_get_int_arg( ac, at, 2, 0);
 
-  if(ac > 0 && fts_is_symbol(at))
+  this->socket = socket(AF_INET, SOCK_DGRAM, 0);
+
+  if (this->socket == -1)
     {
-      int port;
-      struct hostent *h;
-      const char *host;
-      
-      host = fts_symbol_name( fts_get_symbol_arg( ac, at, 1, 0));
-      port = fts_get_int_arg( ac, at, 2, 0);
-      
-      this->socket = socket(AF_INET, SOCK_DGRAM, 0);
-      
-      if (this->socket == -1)
-	{
-	  post( "Cannot open socket (%s)\n", strerror( errno));
-	  return;
-	}
-      
-      memset( &this->my_addr, 0, sizeof( this->my_addr));
-      
-      this->my_addr.sin_family = AF_INET;
-      
-      h = gethostbyname( host);
-      
-      if ( !h)
-	{
-	  post( "udpsend: cannot find host %s\n", host);
-	  
-	  close( this->socket);
-	  this->socket = -1;
-	  
-	  return;
-	}
-      
-      this->my_addr.sin_addr.s_addr = ((struct in_addr *)h->h_addr_list[0])->s_addr;
-      this->my_addr.sin_port = htons( port);
-      
-      protoencode_init( &this->encoder);
+      post( "Cannot open socket (%s)\n", strerror( errno));
+      return;
     }
-  else
-    fts_object_set_error(o, "Hostname argument required");
+
+  memset( &this->my_addr, 0, sizeof( this->my_addr));
+
+  this->my_addr.sin_family = AF_INET;
+
+  h = gethostbyname( host);
+
+  if ( !h)
+    {
+      post( "udpsend: cannot find host %s\n", host);
+
+      close( this->socket);
+      this->socket = -1;
+
+      return;
+    }
+
+  this->my_addr.sin_addr.s_addr = ((struct in_addr *)h->h_addr_list[0])->s_addr;
+  this->my_addr.sin_port = htons( port);
+
+  protoencode_init( &this->encoder);
 }
 
 static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -267,10 +258,17 @@ static void udpsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
 static fts_status_t udpsend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_type_t t[3];
+
   fts_class_init( cl, sizeof( udpsend_t), 1, 0, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, udpsend_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, udpsend_delete);
+  t[0] = fts_t_symbol;
+  t[1] = fts_t_symbol;
+  t[2] = fts_t_int;
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, udpsend_init, 3, t);
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, udpsend_delete, 0, 0);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, udpsend_anything);
 

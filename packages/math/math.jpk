@@ -25,6 +25,9 @@
 
 package provide math
 
+global jmaxArch jmaxMode
+ucs load module math $dir/c/lib/$jmaxArch/$jmaxMode/libmath.so
+
 puts "package: math (math classes)"
 
 # help

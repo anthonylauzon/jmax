@@ -25,12 +25,12 @@
 
 package ircam.jmax.editors.sequence;
 
-import ircam.jmax.*;
 import ircam.jmax.editors.sequence.track.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.datatransfer.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 import java.lang.reflect.*;
 
 /**
@@ -426,7 +426,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
 		deselectAll();
 
-		itsModel.deleteEvents(v.elements());
+		itsModel.removeEvents(v.elements());
 		v = null;
 	    }
     }

@@ -29,13 +29,13 @@ import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.*;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import java.io.File;
-import ircam.jmax.JMaxApplication;
+import ircam.jmax.MaxApplication;
 
 /**
  * The main class for a monodimensionalTrack representation.

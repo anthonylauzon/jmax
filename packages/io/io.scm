@@ -21,7 +21,10 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-(println "package: io (I/O class library: udp, ...)")
+;; package declaration
+(provide-package "io" "0.0.0")
 
-(load-silently (file-cat dir "help" "io.help.index.scm"))
-(help-summary "I/O summary" (file-cat dir "help" "io.summary.jmax"))
+; load dynamic libraries into the server
+(ucs "load" "module" "io" (file-cat dir "c" "lib" jmax-arch jmax-mode "libio.so"))
+
+(println "package: io (I/O class library: udp, ...)")

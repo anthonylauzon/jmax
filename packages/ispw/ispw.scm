@@ -21,12 +21,33 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-(append-local-path this-package (file-cat "java" "classes"))
-(load-class this-package "ircam.jmax.ispw.ISPWExtension")
+;; package declaration
+(provide-package "ispw" "0.0.0")
+
+; load the dynamic libraries in FTS
+(ucs "load" "module" "ispw_control" (file-cat dir "lib" jmax-arch jmax-mode "libcontrol.so"))
+(ucs "load" "module" "ispw_data" (file-cat dir "lib" jmax-arch jmax-mode "libdata.so"))
+(ucs "load" "module" "ispw_filters" (file-cat dir "lib" jmax-arch jmax-mode "libfilters.so"))
+(ucs "load" "module" "ispw_io" (file-cat dir "lib" jmax-arch jmax-mode "libio.so"))
+(ucs "load" "module" "ispw_midi" (file-cat dir "lib" jmax-arch jmax-mode "libmidi.so"))
+(ucs "load" "module" "ispw_sampling" (file-cat dir "lib" jmax-arch jmax-mode "libsampling.so"))
+(ucs "load" "module" "ispw_pitch" (file-cat dir "lib" jmax-arch jmax-mode "libpitch.so"))
+(ucs "load" "module" "ispw_signal" (file-cat dir "lib" jmax-arch jmax-mode "libsignal.so"))
+
+;; set path for abstractions
+(abstraction-directory (file-cat dir "abs" "compatibility"))
+(template-directory (file-cat dir "templates" "compatibility"))
+(template-directory (file-cat dir "templates" "extensions"))
+
+;; set path for wave tables
+(data-directory (file-cat dir "sounds"))
 
 ;; load the help patch tables
-(load-silently (file-cat dir "help" "control" "control.help.index.scm"))
-(load-silently (file-cat dir "help" "signal" "signal.help.index.scm"))
+(sshh-load (file-cat dir "help" "control" "control.help.index.scm"))
+(sshh-load (file-cat dir "help" "signal" "signal.help.index.scm"))
+
+;; load the reference manual data base
+;sourceFile $dir/doc/reference.tcl
 
 (println "package: ISPW (ISPW standard class library)")
 

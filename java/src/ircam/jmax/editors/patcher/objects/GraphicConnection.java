@@ -31,6 +31,7 @@ import java.util.*;
 import java.lang.Math;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -72,13 +73,13 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 			   FtsConnection theFtsConnection) 
   {
     ftsConnection = theFtsConnection;
-    from          = fromObj;
-    to            = toObj;
-    sketch        = theSketchPad;
-    inlet         = theInlet;
-    outlet        = theOutlet;
-    type          = theType;
-    selected      = false;
+    from    = fromObj;
+    to      = toObj;
+    sketch     = theSketchPad;
+    inlet      = theInlet;
+    outlet     = theOutlet;
+    type = theType;
+    selected         = false;
 
     ftsConnection.setConnectionListener(this);
   }

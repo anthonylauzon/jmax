@@ -77,14 +77,17 @@ switch_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 switch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[3];
+
   fts_class_init(cl, sizeof(switch_t), 2, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, switch_init);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, switch_input);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, switch_set);
-  fts_method_define_varargs(cl, 1, fts_s_float, switch_set);
+  a[0] = fts_s_number;
+  fts_method_define(cl, 1, fts_s_int, switch_set, 1, a);
+  fts_method_define(cl, 1, fts_s_float, switch_set, 1, a);
 
   return fts_Success;
 }
@@ -92,5 +95,5 @@ switch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 switch_config(void)
 {
-  fts_class_install(fts_new_symbol("switch"), switch_instantiate);
+  fts_metaclass_install(fts_new_symbol("switch"), switch_instantiate, fts_always_equiv);
 }

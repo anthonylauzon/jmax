@@ -17,6 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ *
  */
 
 
@@ -101,14 +106,19 @@ static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
 static fts_status_t udp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_type_t t[2];
+
   fts_class_init( cl, sizeof( udp_t), 0, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, udp_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, udp_delete);
+  t[0] = fts_t_symbol;
+  t[1] = fts_t_int;
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, udp_init, 2, t);
 
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, udp_delete, 0, 0);
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_sched_ready, udp_receive);
 
-  fts_outlet_type_define_varargs( cl, 0, fts_s_int);
+  t[0] = fts_t_int;
+  fts_outlet_type_define( cl, 0, fts_type_get_selector(fts_t_int), 1, t);
 
   return fts_Success;
 }

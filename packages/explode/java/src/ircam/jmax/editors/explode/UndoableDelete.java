@@ -55,7 +55,7 @@ class UndoableDelete extends AbstractUndoableEdit {
   {
     //since a redo can only occur after a corresponding undo,
     // there's no need to copy-construct the deleted event.
-    itsEvent.getDataModel().deleteEvent(itsEvent);
+    itsEvent.getDataModel().removeEvent(itsEvent);
   }  
   
   public void undo()

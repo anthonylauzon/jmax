@@ -34,7 +34,9 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
@@ -82,6 +84,7 @@ public class EditMenu extends EditorMenu
     addSeparator();
 
     add(Actions.findAction, "Find", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_F);
+    add(Actions.findErrorsAction, "Find Errors");
 
     addSeparator();
 
@@ -101,7 +104,7 @@ public class EditMenu extends EditorMenu
 
   public void updateMenu()
   {
-    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
+    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
 
     if (sketch.isLocked())

@@ -24,20 +24,20 @@
  *
  */
 
-#include "midi.h"
+#include <fts/fts.h>
 
 extern void midiin_config(void);
 extern void midiout_config(void);
 extern void sysex_config(void);
 extern void rawmidiport_config(void);
-extern void midiport_config( void);
 
-void
-midi_config(void)
+static void
+midi_init(void)
 {
   midiin_config();
   midiout_config();
   sysex_config();
   rawmidiport_config();
-  midiport_config();
 }
+
+fts_module_t midi_module = {"midi", "MIDI i/o classes", midi_init, 0, 0};

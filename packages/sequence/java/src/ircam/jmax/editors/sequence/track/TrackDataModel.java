@@ -123,12 +123,12 @@ public interface TrackDataModel {
      * deletes an event from the database
      * @param theEvent the TrackEvent to be removed
      */
-    public abstract void deleteEvent(TrackEvent theEvent);
-    public abstract void deleteEvents(Enumeration events);
+    public abstract void removeEvent(TrackEvent theEvent);
+    public abstract void removeEvents(Enumeration events);
     /**
      * Deletes all the events 
      */
-    public abstract void deleteAllEvents();
+    public abstract void removeAllEvents();
     
     /**
      * requires to be notified when the database changes
@@ -151,8 +151,8 @@ public interface TrackDataModel {
     public abstract void addHighlightListener(HighlightListener listener);
     public abstract void removeHighlightListener(HighlightListener listener);
 
-    public abstract void addTrackStateListener(TrackStateListener listener);
-    public abstract void removeTrackStateListener(TrackStateListener listener);
+    public abstract void addLockListener(LockListener listener);
+    public abstract void removeLockListener(LockListener listener);
     /**
      * Move all the events of the given model in this model, and
      * remove them from the original one. Merge is possible only between tracks

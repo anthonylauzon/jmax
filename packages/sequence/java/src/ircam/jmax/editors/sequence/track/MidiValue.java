@@ -119,15 +119,14 @@ public class MidiValue extends AbstractEventValue
 	}
 	public Class getPropertyType(int index)
 	{
-	    /*if(index < defPropertyCount)
-	      return propertyTypesArray[index];
-	      else
-	      return Integer.class;*/
-	    return Integer.class;
+	    if(index < defPropertyCount)
+		return propertyTypesArray[index];
+	    else
+		return Integer.class;
 	}
 
 	String defNamesArray[] = {"integer", "number", "channel"};
-	//Class propertyTypesArray[] = {Integer.class, Integer.class, Integer.class};
+	Class propertyTypesArray[] = {Integer.class, Integer.class, Integer.class};
 	int defPropertyCount = 3;
     }
 
@@ -192,20 +191,16 @@ public class MidiValue extends AbstractEventValue
 
     static 
     {
-	/*
-	  WARNING:
-	  Waiting for a method to get the packagePath from the package name
-	*/
-	/*try
-	  {
-	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	  }
-	  catch(FileNotFoundException e){
-	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	  }*/
-	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-	/*************************************************************/
-	
+	try
+	    {
+		path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+	    }
+	catch(FileNotFoundException e){
+	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	}
 	MIDI_ICON = new ImageIcon(path+"midi.gif");
     }
 }
+
+
+

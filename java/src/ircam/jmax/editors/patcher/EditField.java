@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.actions.*;
 
@@ -81,7 +82,7 @@ public class EditField extends JTextArea implements FocusListener
 
     public void keyTyped(KeyEvent e)
     {
-      if (consumeNext)
+	if (consumeNext)
 	{
 	  e.consume();
 	  consumeNext = false;
@@ -137,9 +138,9 @@ public class EditField extends JTextArea implements FocusListener
 
     sketch = editor;
 
-    setFont(FontCache.lookupFont(ircam.jmax.Platform.FONT_NAME,
-				 ircam.jmax.Platform.FONT_SIZE,
-				 ircam.jmax.Platform.FONT_STYLE));
+    setFont(FontCache.lookupFont(ircam.jmax.utils.Platform.FONT_NAME,
+				 ircam.jmax.utils.Platform.FONT_SIZE,
+				 ircam.jmax.utils.Platform.FONT_STYLE));
 
     Keymap myMap = JTextComponent.addKeymap(null, getKeymap());
 
@@ -205,9 +206,9 @@ public class EditField extends JTextArea implements FocusListener
 	    int pos = viewToModel(location);
 
 	    if ((pos >= 0) && (pos <= owner.getArgs().length()))
-	      setCaretPosition(pos);
+		setCaretPosition(pos);
 	    else
-	      setCaretPosition(owner.getArgs().length());
+		setCaretPosition(owner.getArgs().length());
 	  }
 	else
 	  {
@@ -217,7 +218,7 @@ public class EditField extends JTextArea implements FocusListener
 					 public void run()
 					   {
 					     int pos = viewToModel(location);
-					     
+
 					     if (pos >= 0)
 					       setCaretPosition(pos);
 					     else
@@ -269,11 +270,11 @@ public class EditField extends JTextArea implements FocusListener
 				     if (getText() != null)
 				       {
 					 Dimension d;
-					 
+
 					 owner.redraw();
 					 owner.redrawConnections();
 					 
-					  if(owner.isMultiline())
+					 if(owner.isMultiline())
 					     {
 						 d = getPreferredSize();
 						 owner.setHeight(d.height + owner.getTextHeightOffset());
@@ -285,11 +286,11 @@ public class EditField extends JTextArea implements FocusListener
 						 d = getSize();
 						 d.width = owner.getWidth() - owner.getTextWidthOffset();
 					     }
-
+					 
 					 owner.redraw();
 					 owner.redrawConnections();
-
-					 setSize(d);
+					 
+					 setSize(d);		 
 					 sketch.fixSize();
 				       }
 				   }

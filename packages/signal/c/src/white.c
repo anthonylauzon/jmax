@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include <utils.h>
 
 typedef struct 
 {
@@ -38,7 +37,7 @@ void
 white_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   white_t *this = (white_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
   fts_atom_t a[2];
   
   fts_set_symbol(a + 0, fts_dsp_get_output_name(dsp, 0));
@@ -50,7 +49,7 @@ white_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 white_ftl(fts_word_t *argv)
 {
-  float *out = (float *) fts_word_get_pointer(argv + 0);
+  float *out = (float *) fts_word_get_ptr(argv + 0);
   int n = fts_word_get_int(argv + 1);
   int i;
   
@@ -83,6 +82,8 @@ white_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 white_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  fts_symbol_t a[3];
+
   fts_class_init(cl, sizeof(white_t), 0, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, white_init);
@@ -101,5 +102,5 @@ white_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 signal_white_config(void)
 {
-  fts_class_install(fts_new_symbol("white~"), white_instantiate);
+  fts_metaclass_install(fts_new_symbol("white~"), white_instantiate, fts_always_equiv);
 }

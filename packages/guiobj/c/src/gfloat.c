@@ -119,7 +119,7 @@ gfloat_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int x, y, w, font_index;
   fts_atom_t a;
 
-  file = (FILE *)fts_get_pointer( at);
+  file = (FILE *)fts_get_ptr( at);
 
   fts_object_get_prop( o, fts_s_x, &a);
   x = fts_get_int( &a);
@@ -145,12 +145,11 @@ static void
 gfloat_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   gfloat_t *this = (gfloat_t *)obj;
-  float f = fts_get_float(value);
 
-  this->f = f;
+  this->f = fts_get_float(value);
 
   fts_object_ui_property_changed(obj, fts_s_value);
-  fts_outlet_float(obj, 0, f);
+  fts_outlet_send(obj, 0, fts_s_float, 1, value);
 }
 
 
@@ -159,9 +158,8 @@ gfloat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(gfloat_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, gfloat_send_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, gfloat_send_ui_properties); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "setValue"), gfloat_number);
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, gfloat_send_properties, 0, 0); 
+  fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, gfloat_send_ui_properties, 0, 0); 
 
   fts_method_define_varargs(cl, 0, fts_s_bang, gfloat_bang);
 

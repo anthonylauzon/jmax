@@ -29,5 +29,5 @@ import ircam.jmax.fts.*;
 
 public interface ObjectSelectedListener
 {
-  public abstract void objectSelected(FtsGraphicObject object);
+  public abstract void objectSelected(FtsObject object);
 }

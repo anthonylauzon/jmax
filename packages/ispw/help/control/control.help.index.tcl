@@ -52,6 +52,7 @@ helpPatch prepend $dir/prepend.help.jmax
 helpPatch unpack $dir/unpack.help.jmax
 
 ## timing (9)
+helpPatch at $dir/at.help.jmax
 helpPatch clock $dir/clock.help.jmax
 helpPatch delay $dir/delay.help.jmax
 helpPatch metro $dir/metro.help.jmax
@@ -78,15 +79,31 @@ helpPatch r $dir/receive.help.jmax
 helpPatch t $dir/trigger.help.jmax
 
 ## genarators (6)
+helpPatch bpe $dir/bpe.help.jmax
 helpPatch line $dir/line.help.jmax
 helpPatch drunk $dir/drunk.help.jmax
 helpPatch random $dir/random.help.jmax
 
-## midi (4)
+## midi support (19)
 helpPatch Rsend $dir/Rsend.help.jmax
 helpPatch Rreceive $dir/Rsend.help.jmax
+helpPatch bendin $dir/bendin.help.jmax
+helpPatch bendout $dir/bendout.help.jmax
+helpPatch ctlin $dir/ctlin.help.jmax
+helpPatch ctlout $dir/ctlout.help.jmax
 helpPatch makenote $dir/makenote.help.jmax
+helpPatch midiformat $dir/midiformat.help.jmax
+helpPatch midiin $dir/midiin.help.jmax
+helpPatch midiout $dir/midiout.help.jmax
+helpPatch midiparse $dir/midiparse.help.jmax
+helpPatch notein $dir/notein.help.jmax
+helpPatch noteout $dir/noteout.help.jmax
+helpPatch pgmin $dir/pgmin.help.jmax
+helpPatch pgmout $dir/pgmout.help.jmax
 helpPatch stripnote $dir/stripnote.help.jmax
+helpPatch sysexin $dir/sysexin.help.jmax
+helpPatch touchin $dir/touchin.help.jmax
+helpPatch touchout $dir/touchout.help.jmax
 
 # polyphonic (2)
 helpPatch poly $dir/poly.help.jmax

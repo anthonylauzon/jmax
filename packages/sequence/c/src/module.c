@@ -24,37 +24,40 @@
  *
  */
 
-#include "sequence.h"
+#include <fts/fts.h>
 
 extern void seqsym_config(void);
 
-extern void sequence_class_config(void);
-extern void track_config(void);
+extern void sequence_config(void);
+extern void eventtrk_config(void);
 extern void event_config(void);
 
 extern void note_config(void);
 extern void midival_config(void);
-extern void seqmess_config(void);
+extern void message_config(void);
 
 extern void seqfind_config(void);
 extern void seqstep_config(void);
 extern void seqplay_config(void);
 extern void seqrec_config(void);
 
-void
-sequence_config(void)
+static void
+sequence_module_init(void)
 {
   seqsym_config();
 
-  sequence_class_config();
-  track_config();
+  sequence_config();
+  eventtrk_config();
   event_config();
 
   note_config();
-  seqmess_config();
+  midival_config();
+  message_config();
 
   seqfind_config();
   seqstep_config();
   seqplay_config();
   seqrec_config();
 }
+
+fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};

@@ -26,12 +26,17 @@
 package ircam.jmax.editors.explode;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.undo.*;
 
 import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 
   /**
@@ -43,7 +48,7 @@ public class ExplodePanel extends JPanel implements Editor{
    */
   ExplodeTablePanel itsTablePanel;
   ScrPanel itsScrPanel;
-  FtsExplodeObject explodeObject;
+  ExplodeRemoteData explodeRemoteData;
   ExplodeDataModel explodeData;
   public int defaultView = PIANOROLL_VIEW;
   public int currentView = PIANOROLL_VIEW;
@@ -56,13 +61,13 @@ public class ExplodePanel extends JPanel implements Editor{
   {  
     itsContainer = container;
     explodeData = data;
-    explodeObject = (FtsExplodeObject)data;
-    ExplodeTableModel model = new ExplodeTableModel(explodeObject);
+    explodeRemoteData = (ExplodeRemoteData)data;
+    ExplodeTableModel model = new ExplodeTableModel(explodeRemoteData);
 
-    ExplodeSelection s = new ExplodeSelection(explodeObject);
+    ExplodeSelection s = new ExplodeSelection(explodeRemoteData);
     itsTablePanel = new ExplodeTablePanel(model, s);
     // creates the Piano roll view
-    itsScrPanel = new ScrPanel(this, explodeObject, s);
+    itsScrPanel = new ScrPanel(this, explodeRemoteData, s);
      // make the newly created selection the current one
     ExplodeSelection.setCurrent(s);
 
@@ -162,8 +167,17 @@ public class ExplodePanel extends JPanel implements Editor{
     return itsContainer.getFrame();
   }
   //------------------- Editor interface ---------------
+  final public Fts getFts()
+  {
+    return MaxApplication.getFts();
+  }
+
   public EditorContainer getEditorContainer(){
     return itsContainer;
+  }
+
+  public MaxDocument getDocument(){
+    return explodeRemoteData.getDocument();
   }
 
   public void Close(boolean doCancel){

@@ -26,6 +26,10 @@
 ## package declaration
 package provide system
 
+# load dynamic libraries into the server
+global jmaxArch jmaxMode
+ucs load module system $dir/c/lib/$jmaxArch/$jmaxMode/libsystem.so
+
 #help
 sourceFile $dir/help/system.help.index.tcl
 helpSummary "system summary" $dir/help/system.summary.jmax

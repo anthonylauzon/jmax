@@ -28,12 +28,10 @@ package ircam.jmax.editors.sequence;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
-import ircam.fts.client.*;
-import ircam.jmax.*;
-import ircam.jmax.fts.FtsObjectWithEditor;
+import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
 
 import java.util.*;
-import java.io.*;
 import javax.swing.*;
 
 /**
@@ -42,146 +40,133 @@ import javax.swing.*;
  */
 public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDataModel
 {
- static
-  {
-    FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("addTracks"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsSequenceObject)obj).addTracks(args.getLength(), args.getAtoms());
-	}
-      });
-    FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("removeTracks"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsSequenceObject)obj).removeTracks(args.getLength(), args.getAtoms());
-	}
-      });
-    FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("moveTrack"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsSequenceObject)obj).moveTrack((FtsTrackObject)args.getObject( 0), args.getInt( 1));
-	}
-      });
-    FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsSequenceObject)obj).setName(args.getSymbol( 0).toString());
-	}
-      });
-  }
-  
   /**
    * constructor.
    */
-  public FtsSequenceObject(FtsServer server, FtsObject parent, int objId, String classname, FtsAtom args[], int offset, int length)
-  {
-    super(server, parent, objId, classname, args, offset, length);
+ public FtsSequenceObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+ {
+     super(fts, parent, variableName, "sequence", "sequence");
+     
+     listeners = new MaxVector();
+     initValueInfoTable();
+     SequenceImages.init();
+ }
 
-    listeners = new MaxVector();
-    initValueInfoTable();
-    SequenceImages.init();
-  }
+    private final void initValueInfoTable()
+    {
+	ValueInfoTable.registerInfo(AmbitusValue.info);
+	ValueInfoTable.registerInfo(IntegerValue.info);
+	ValueInfoTable.registerInfo(MessageValue.info);
+	ValueInfoTable.registerInfo(FloatValue.info);
+	ValueInfoTable.registerInfo(MidiValue.info);
+    }
 
-  private final void initValueInfoTable()
-  {
-    ValueInfoTable.registerInfo(AmbitusValue.info);
-    ValueInfoTable.registerInfo(IntegerValue.info);
-    ValueInfoTable.registerInfo(MessageValue.info);
-    ValueInfoTable.registerInfo(FloatValue.info);
-  }
+    //////////////////////////////////////////////////////////////////////////////////////
+    //// MESSAGES called from fts.
+    //////////////////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////////////////
-  //// MESSAGES called from fts.
-  //////////////////////////////////////////////////////////////////////////////////////
-  
   /**
    * Fts callback: open the editor associated with this FtsSequenceObject.
    * If not exist create them else show them.
    */
-  public void openEditor(int argc, FtsAtom[] argv)
+  public void createEditor(int nArgs, FtsAtom args[])
   {
     if(sequence == null)
-      {
-	sequence = new SequenceWindow(this);
-	setEditorFrame(sequence);
-      }
+	{
+	    sequence = new Sequence(this);
+	    setEditorFrame(sequence);
+	}
     showEditor();
   }
 
   /**
    * Fts callback: destroy the editor associated with this FtsSequenceObject.
    */
-  public void destroyEditor()
+  public void destroyEditor(int nArgs, FtsAtom args[])
   {
-    sequence = null;
-    disposeEditor();
+      sequence = null;
+      disposeEditor();
   }
+
   public void addTracks(int nArgs , FtsAtom args[])
   {
-    FtsTrackObject trackObj;
-    TrackBase track;
-    int time;
-    int trackTime = 0;
-    
-    for(int i=0; i<nArgs; i++)
-      {
-	trackObj = (FtsTrackObject)(args[i].objectValue);
-	/*trackObj.setParent(this);*/
-	
-	track = new TrackBase(trackObj);
-	tracks.addElement(track);
-	
-	notifyTrackAdded(track);
-	
-	time = (int)trackObj.getMaximumTime();
-	if(time>trackTime) trackTime = time;	      
-      }
-    
-    notifyTracksAdded(trackTime);
+      FtsTrackObject trackObj;
+      TrackBase track;
+      int time;
+      int trackTime = 0;
+      
+      for(int i=0; i<nArgs; i++)
+	  {
+	      trackObj = (FtsTrackObject)(args[i].getObject());
+	      trackObj.setParent(this);//!!!!!!!!!!!
+
+	      track = new TrackBase(trackObj);
+	      tracks.addElement(track);
+
+	      notifyTrackAdded(track);
+
+	      time = (int)trackObj.getMaximumTime();
+	      if(time>trackTime) trackTime = time;	      
+	  }
+
+      setDirty();
+      
+      notifyTracksAdded(trackTime);
   }
    
-  public void removeTracks(int nArgs , FtsAtom args[])
+  public void deleteTracks(int nArgs , FtsAtom args[])
   {
-    FtsTrackObject trackObj;
-    Track track;
-    int time;
-    int trackTime = 0;
-    
-    for(int i=0; i<nArgs; i++)
-      {
-	trackObj = (FtsTrackObject)(args[i].objectValue);
-	track = getTrack(trackObj);
-	tracks.removeElement(track);
-	notifyTrackRemoved(track);
-      }    
+      FtsTrackObject trackObj;
+      Track track;
+      int time;
+      int trackTime = 0;
+      
+      for(int i=0; i<nArgs; i++)
+	  {
+	      trackObj = (FtsTrackObject)(args[i].getObject());
+	      track = getTrack(trackObj);
+	      tracks.removeElement(track);
+	      notifyTrackRemoved(track);
+	  }    
+      setDirty();
   }
 
-  public void moveTrack(FtsTrackObject trackObj, int newPosition)
-  {
-    int time;
-    int trackTime = 0;
-    
-    Track track = getTrack(trackObj);
-    int oldPosition = getTrackIndex(track);
-    
-    sequence.itsSequencePanel.moveTrackTo(track, newPosition);
-    notifyTrackMoved(track, oldPosition, newPosition);
-  }
+    public void moveTrack(int nArgs , FtsAtom args[])
+    {
+	int time;
+	int trackTime = 0;
+      
+	FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
+	Track track = getTrack(trackObj);
+	int oldPosition = getTrackIndex(track);
+	int newPosition = args[1].getInt();
+	
+	sequence.itsSequencePanel.moveTrackTo(track, newPosition);
+	notifyTrackMoved(track, oldPosition, newPosition);
 
-  public void setName(String name)
-  {
-    sequence.setName(name);
-  }
+	setDirty();
+    }
 
-  public void setOpenedAllTracks(boolean opened)
-  {
-    Track track;
-    Object val;
-    if(opened) val = Boolean.TRUE;
-    else val = Boolean.FALSE;
-    for(Enumeration e = tracks.elements(); e.hasMoreElements();)
-      ((Track)e.nextElement()).setProperty("opened", val);
-  }
+    public void setName(int nArgs , FtsAtom args[])
+    {
+	sequence.setName(args[0].getString());
+    }
+
+    public void setEditorGeometry(int nArgs , FtsAtom args[])
+    {
+	sequence.itsSequencePanel.geometry.setXZoom((int)(100*args[0].getFloat()));
+	sequence.itsSequencePanel.itsTimeScrollbar.setValue(-args[1].getInt());
+    }    
+
+    public void setOpenedAllTracks(boolean opened)
+    {
+	Track track;
+	Object val;
+	if(opened) val = Boolean.TRUE;
+	else val = Boolean.FALSE;
+	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+	    ((Track)e.nextElement()).setProperty("opened", val);
+    }
 
   /**
    * return how many tracks in the sequence
@@ -209,28 +194,28 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
   public int getTrackIndex(Track track)
   {
-    return tracks.indexOf(track);
+      return tracks.indexOf(track);
   }
     
   public Enumeration getTracks()
   {
-    return tracks.elements();
+      return tracks.elements();
   }
 
   public Enumeration getTracks(ValueInfo type)
   {
-    Track track;
-    Vector temp = new Vector();
-    for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+      Track track;
+      Vector temp = new Vector();
+      for(Enumeration e = tracks.elements(); e.hasMoreElements();)
       {
 	track = (Track)e.nextElement();
 	if(track.getTrackDataModel().getType() == type) temp.addElement(track);
       }
-    return temp.elements();
+      return temp.elements();
   }
-  /**
-   * Returns the track associated with this FtsTrackObject 
-   */
+    /**
+     * Returns the track associated with this FtsTrackObject 
+     */
   public Track getTrack(FtsTrackObject obj)
   {
     Track track;
@@ -242,17 +227,17 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     return null;
   }
 
-  public Enumeration getTypes()
-  {
-    ValueInfo type;
-    Vector types = new Vector();
-    for(Enumeration e = tracks.elements(); e.hasMoreElements();)
-      {
-	type = ((Track)e.nextElement()).getTrackDataModel().getType();
-	if(!types.contains(type)) types.addElement(type);
-      }
-    return types.elements();
-  }
+    public Enumeration getTypes()
+    {
+	ValueInfo type;
+	Vector types = new Vector();
+	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+	{
+	    type = ((Track)e.nextElement()).getTrackDataModel().getType();
+	    if(!types.contains(type)) types.addElement(type);
+	}
+	return types.elements();
+    }
 
   /**
    * Remove a Track from this sequencer 
@@ -260,16 +245,16 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   public void removeTrack(Track track)
   {
     if(track==null) return;
-    
+
     int result = JOptionPane.OK_OPTION;
     if(track.getTrackDataModel().length() > 0)
-      result = JOptionPane.showConfirmDialog( sequence,
-					      "Removing tracks is not Undoable.\nOK to remove ?",
-					      "Warning",
-					      JOptionPane.YES_NO_OPTION,
-					      JOptionPane.WARNING_MESSAGE);
+	result = JOptionPane.showConfirmDialog( sequence,
+						"Removing tracks is not Undoable.\nOK to remove ?",
+						"Warning",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
     if(result == JOptionPane.OK_OPTION)
-      requestTrackRemove(track);
+	requestTrackRemove(track);
   }
 
   public void changeTrack(Track track)
@@ -277,91 +262,70 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     notifyTrackChanged(track);
   }
 
-  public TrackEvent getLastEvent()
-  {
-    Track track;
-    TrackEvent evt;
-    TrackEvent lastEvt = null;
-    for(Enumeration e = tracks.elements(); e.hasMoreElements();)
-      {
-	track = (Track)e.nextElement();
-	evt = track.getTrackDataModel().getLastEvent();
-	if(lastEvt == null) lastEvt = evt;
-	else 
-	  if(evt!=null)		    
-	    if(lastEvt.getTime() < evt.getTime()) lastEvt = evt;
-      }
-    return lastEvt;
-  }
+    public TrackEvent getLastEvent()
+    {
+	Track track;
+	TrackEvent evt;
+	TrackEvent lastEvt = null;
+	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+	    {
+		track = (Track)e.nextElement();
+		evt = track.getTrackDataModel().getLastEvent();
+		if(lastEvt == null) lastEvt = evt;
+		else 
+		    if(evt!=null)		    
+			if(lastEvt.getTime() < evt.getTime()) lastEvt = evt;
+	    }
+	return lastEvt;
+    }
 
-  public void requestTrackCreation(String type)
-  {
-    args.clear();
-    args.addSymbol( FtsSymbol.get(type));
+    public void requestTrackCreation(String type)
+    {
+	FtsTrackObject.sendArgs[0].setString(type); 
+	sendMessage(FtsObject.systemInlet, "add_track", 1, FtsTrackObject.sendArgs);
+    }
+
+    public void requestTrackMove(Track track, int position)
+    {
+	FtsTrackObject.sendArgs[0].setObject(track.getFtsTrack()); 
+	FtsTrackObject.sendArgs[1].setInt(position); 
+	sendMessage(FtsObject.systemInlet, "move_track", 2, FtsTrackObject.sendArgs);
+    }
+
+    public void requestTrackRemove(Track track)
+    {
+	FtsTrackObject.sendArgs[0].setObject((FtsTrackObject)track.getTrackDataModel()); 
+	sendMessage(FtsObject.systemInlet, "remove_track", 1, FtsTrackObject.sendArgs);
+    }
     
-    try{
-      send( FtsSymbol.get("add_track"), args);
+    public void requestSetZoom(float zoom)
+    {
+	FtsTrackObject.sendArgs[0].setFloat(zoom); 
+	sendMessage(FtsObject.systemInlet, "set_zoom", 1, FtsTrackObject.sendArgs);    
+	setDirty();
     }
-    catch(IOException e)
-      {
-	System.err.println("FtsSequenceObject: I/O Error sending add_track Message!");
-	e.printStackTrace(); 
-      }
-  }
 
-  public void requestTrackMove(Track track, int position)
-  {
-    args.clear();
-    args.addObject( track.getFtsTrack());
-    args.addInt( position);
-	
-    try{
-      send( FtsSymbol.get("move_track"), args);
+    public void requestSetScroll(int scroll)
+    {
+	FtsTrackObject.sendArgs[0].setInt(scroll); 
+	sendMessage(FtsObject.systemInlet, "set_scroll", 1, FtsTrackObject.sendArgs);    
+	setDirty();
     }
-    catch(IOException e)
-      {
-	System.err.println("FtsSequenceObject: I/O Error sending move_track Message!");
-	e.printStackTrace(); 		
-      }
-  }
-  public void requestTrackRemove(Track track)
-  {
-    args.clear();
-    args.addObject( track.getFtsTrack());
-	
-    try{
-      send( FtsSymbol.get("remove_track"), args);
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsSequenceObject: I/O Error sending remove_track Message!");
-	e.printStackTrace(); 		
-      }
-  }
 
-  public void requestSequenceName()
-  {
-    try{
-      send( FtsSymbol.get("getName"));
+    public void requestSequenceName()
+    {
+	sendMessage(FtsObject.systemInlet, "get_name", 0, null);
     }
-    catch(IOException e)
-      {
-	System.err.println("FtsSequenceObject: I/O Error sending getName Message!");
-	e.printStackTrace(); 		
-      }
-  }
 
-  public void importMidiFile()
-  {
-    try{
-      send( FtsSymbol.get("import_midi_dialog"));
+    public void importMidiFile()
+    {
+	sendMessage(FtsObject.systemInlet, "import_midi_dialog", 0, null);
     }
-    catch(IOException e)
-      {
-	System.err.println("FtsSequenceObject: I/O Error sending import_midi_dialog Message!");
-	e.printStackTrace(); 		
-      }
-  }
+
+    public void closeEditor()
+    {
+	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+    }
 
   /**
    * Require to be notified when database change
@@ -409,13 +373,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       ((TrackListener)(e.nextElement())).trackMoved(track, oldPosition, newPosition);
   }
 
-  SequenceWindow sequence = null;  
+  Sequence sequence = null;  
   
   Vector tracks = new Vector();
   MaxVector listeners = new MaxVector();
   String name = new String("unnamed"); //to be assigned by FTS, usually via a specialized KEY
-  
-  protected FtsArgs args = new FtsArgs();
 }
 
 

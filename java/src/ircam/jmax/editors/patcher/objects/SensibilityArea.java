@@ -25,8 +25,8 @@
 
 package ircam.jmax.editors.patcher.objects;
 
+import ircam.jmax.utils.*;
 
-import ircam.jmax.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 public class SensibilityArea 

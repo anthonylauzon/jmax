@@ -27,8 +27,9 @@
 #include <fts/fts.h>
 #include "mat.h"
 
+fts_type_t mat_type = 0;
 fts_symbol_t mat_symbol = 0;
-fts_metaclass_t *mat_type = 0;
+fts_class_t *mat_class = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
@@ -39,42 +40,8 @@ static fts_symbol_t sym_comma = 0;
  *
  */
 
-void
-mat_alloc(mat_t *mat, int m, int n)
-{
-  int size = m * n;
-
-  if(size > 0)
-    {
-      int i;
-
-      mat->data = fts_malloc(m * n * sizeof(fts_atom_t));
-      mat->m = m;
-      mat->n = n;
-      mat->alloc = size;
-
-      /* set all atoms to void */
-      for(i=0; i<size; i++)
-	fts_set_void(mat->data + i);
-    }
-  else
-    {
-      mat->data = 0;
-      mat->m = 0;
-      mat->n = 0;    
-      mat->alloc = 0;
-    }
-}
-
-void
-mat_free(mat_t *mat)
-{
-  if(mat->m * mat->n)
-    fts_free(mat->data);
-}
-
-void
-mat_set_size(mat_t *mat, int m, int n)
+static void
+set_size(mat_t *mat, int m, int n)
 {
   int size = m * n;
   
@@ -121,6 +88,49 @@ mat_set_size(mat_t *mat, int m, int n)
 }
 
 void
+mat_set_size(mat_t *mat, int m, int n)
+{
+  int size = m * n;
+  
+  if(size > mat->alloc)
+    {
+      int i;
+
+      if(mat->alloc)
+	mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
+      else
+	mat->data = fts_malloc(size * sizeof(fts_atom_t));
+
+      /* set newly allocated region to void */
+      for(i=mat->alloc; i<size; i++)
+	fts_set_void(mat->data + i);
+      
+      mat->m = m;
+      mat->n = n;
+      mat->alloc = size;
+    }
+  else
+    {
+      int old_size = mat->m * mat->n;
+      int i;
+
+      if(size <= 0)
+	m = n = size = 0;
+
+      /* void region cut off */
+      for(i=size; i<old_size; i++)
+	{
+	  fts_atom_t *ap = mat->data + i;
+
+	  fts_atom_void(ap);
+	}
+      
+      mat->m = m;
+      mat->n = n;
+    }
+}
+
+extern void
 mat_set_element(mat_t *mat, int i, int j, fts_atom_t value)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
@@ -128,7 +138,7 @@ mat_set_element(mat_t *mat, int i, int j, fts_atom_t value)
   fts_atom_assign(ap, &value);
 }
 
-void
+extern void
 mat_void_element(mat_t *mat, int i, int j)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
@@ -166,7 +176,7 @@ mat_void(mat_t *mat)
 }
 
 void
-mat_set_with_onset_from_atoms(mat_t *mat, int onset, int ac, const fts_atom_t *at)
+mat_set_from_atom_list(mat_t *mat, int onset, int ac, const fts_atom_t *at)
 {
   fts_atom_t *ap = mat->data + onset;
   int m = mat_get_m(mat);
@@ -178,7 +188,7 @@ mat_set_with_onset_from_atoms(mat_t *mat, int onset, int ac, const fts_atom_t *a
     ac = size - onset;
   
   for(i=0; i<ac; i++)
-    fts_atom_assign(ap + i, at + i);
+    fts_atom_assign(ap, at + i);
 }
 
 void
@@ -190,10 +200,10 @@ mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
   
   for(i=0; i<ac; i++)
     {
-      if(fts_is_tuple(at + i))
+      if(fts_is_list(at + i))
 	{
-	  fts_tuple_t *tup = fts_get_tuple(at + i);
-	  int size = fts_tuple_get_size(tup);
+	  fts_list_t *aa = fts_get_list(at + i);
+	  int size = fts_list_get_size(aa);
 
 	  if(size > n)
 	    size = n;
@@ -201,27 +211,14 @@ mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
 	  for(j=0; j<size; j++)
 	    {
 	      fts_atom_t *matp = mat->data + i * n + j;
-	      fts_atom_t *ap = fts_tuple_get_element(tup, j);
+	      fts_atom_t *aap = &fts_list_get_element(aa, j);
 	    
-	      fts_atom_assign(matp, ap);
+	      fts_atom_assign(matp, aap);
 	    }
 	}
       else
 	break;
     }
-}
-
-void
-mat_copy(mat_t *org, mat_t *copy)
-{
-  int m = mat_get_m(org);
-  int n = mat_get_n(org);
-  int i;
-
-  mat_set_size(copy, org->m, org->n);
-
-  for(i=0; i<m*n; i++)
-    copy->data[i] = org->data[i];
 }
 
 /********************************************************
@@ -240,7 +237,7 @@ mat_grow(mat_t *mat, int size)
   while(size > alloc)
     alloc += MAT_BLOCK_SIZE;
 
-  mat_set_size(mat, alloc, 1);
+  set_size(mat, alloc, 1);
 }
 
 int 
@@ -361,8 +358,7 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
       for(k=0; k<ac; k++)
 	{
 	  /* ooops! */
-	  /*if( a.type == at[k].type && a.value.fts_int == at[k].value.fts_int)*/
-	  if( fts_atom_same_type(&a, &at[k]) && a.value.fts_int == at[k].value.fts_int)
+	  if(a.type == at[k].type && a.value.fts_int == at[k].value.fts_int)
 	    {
 	      skip = 1;
 	      break;
@@ -465,7 +461,11 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
 static void
 mat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_object(o, 0, o);
+  mat_t *this = (mat_t *)o;
+  fts_atom_t a[1];
+
+  mat_atom_set(a, this);
+  fts_outlet_send(o, 0, mat_symbol, 1, a);
 }
 
 static void
@@ -510,7 +510,7 @@ mat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-mat_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
 
@@ -518,34 +518,16 @@ mat_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     {
       int m = mat_get_m(this);
       int n = mat_get_n(this);
+      int size = m * n;
       int i = fts_get_number_int(at);
       int j = fts_get_number_int(at + 1);
 
       if(i >= 0 && i < m && j >= 0 && j < n)
-	mat_set_with_onset_from_atoms(this, i * n + j, ac - 2, at + 2);
-    }
-}
+	{
+	  int offset = i * n + j;
 
-static void
-mat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mat_t *this = (mat_t *)o;
-
-  if(ac > 1 && fts_is_number(at))
-    {
-      int m = mat_get_m(this);
-      int n = mat_get_n(this);
-      int i = fts_get_number_int(at);
-
-      ac--;
-      at++;
-      
-      /* clip to row */
-      if(ac > n)
-	ac = n;
-
-      if(i >= 0 && i < m)
-	mat_set_with_onset_from_atoms(this, i * n, ac, at);
+	  mat_set_from_atom_list(this, offset, ac - 2, at + 2);
+	}
     }
 }
 
@@ -553,7 +535,6 @@ static void
 mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  int old_size = mat_get_m(this)* mat_get_n(this);
   int m = 0;
   int n = 0;
   int i;
@@ -572,11 +553,11 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       n = fts_get_number_int(at + 1);
       
       if(m >= 0 && n >= 0)
-	mat_set_size(this, m, n);
+	set_size(this, m, n);
     }
 
   /* set newly allocated region to void */
-  for(i=old_size; i<m*n; i++)
+  for(i=this->alloc; i<m*n; i++)
     fts_set_void(this->data + i);
 }
 
@@ -635,50 +616,30 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-mat_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mat_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mat_t *this = (mat_t *)o;
-  mat_t *set = mat_atom_get(at);
+  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
 
-  mat_copy(set, this);
-}
-
-static void
-mat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mat_t *this = (mat_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_atom_t *data = this->data;
-  int m = mat_get_m(this);
-  int n = mat_get_n(this);
-  int size = m * n;
-  fts_message_t *mess;
-  int i, j;
-
-  /* dump size message */
-  mess = fts_dumper_message_new(dumper, fts_s_size);  
-  fts_message_append_int(mess, m);
-  fts_message_append_int(mess, n);
-  fts_dumper_message_send(dumper, mess);
-
-  for(i=0; i<m; i++)
+  if (cmd == fts_s_object)
+    fts_object_blip(o, "mat of values");
+  else if (cmd == fts_s_inlet)
     {
-      /* new row */
-      mess = fts_dumper_message_new(dumper, fts_s_row);  
-      fts_message_append_int(mess, i);
-  
-      for(j=0; j<n; j++)
-	{
-	  fts_atom_t *d = data + i * n + j;
+      int n = fts_get_int_arg(ac, at, 1, 0);
 
-	  /* cannot dump objects yet */
-	  if(fts_is_object(d))
-	    fts_message_append_int(mess, 0);
-	  else
-	    fts_message_append(mess, 1, d);
+      switch(n)
+	{
+	case 0:
+	  fts_object_blip(o, "mat commands");
+	  break;
 	}
     }
 }
+
+/********************************************************************
+ *
+ *  system functions
+ *
+ */
 
 static void
 mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -697,30 +658,15 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       post("}\n");
     }
 
-  post("}\n");
-}
-
-static void
-mat_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  mat_t *this = (mat_t *)obj;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-mat_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  mat_t *this = (mat_t *)obj;
-
-  fts_set_symbol(value, this->keep);
+  post("}");
 }
 
 static void
 mat_get_mat(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, obj);
+  mat_t *this = (mat_t *)obj;
+
+  mat_atom_set(value, this);
 }
 
 /********************************************************************
@@ -728,6 +674,40 @@ mat_get_mat(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property
  *   class
  *
  */
+
+void
+mat_alloc(mat_t *mat, int m, int n)
+{
+  int size = m * n;
+
+  if(size > 0)
+    {
+      int i;
+
+      mat->data = fts_malloc(m * n * sizeof(fts_atom_t));
+      mat->m = m;
+      mat->n = n;
+      mat->alloc = size;
+
+      /* set all atoms to void */
+      for(i=0; i<size; i++)
+	fts_set_void(mat->data + i);
+    }
+  else
+    {
+      mat->data = 0;
+      mat->m = 0;
+      mat->n = 0;    
+      mat->alloc = 0;
+    }
+}
+
+void
+mat_free(mat_t *mat)
+{
+  if(mat->m * mat->n)
+    fts_free(mat->data);
+}
 
 static void
 mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -737,15 +717,13 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   ac--;
   at++;
 
-  this->keep = fts_s_no;
-
   if(ac == 0)
     mat_alloc(this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
     mat_alloc(this, fts_get_int(at), 1);
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
     mat_alloc(this, fts_get_int(at), fts_get_int(at + 1));
-  else if(fts_is_tuple(at))
+  else if(fts_is_list(at))
     {
       int m = 0;
       int n = 0;
@@ -754,10 +732,10 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       /* check n (longest row) and m */
       for(i=0; i<ac; i++)
 	{
-	  if(fts_is_tuple(at + i))
+	  if(fts_is_list(at + i))
 	    {
-	      fts_tuple_t *tup = fts_get_tuple(at + i);
-	      int size = fts_tuple_get_size(tup);
+	      fts_list_t *aa = fts_get_list(at + i);
+	      int size = fts_list_get_size(aa);
 	      
 	      if(size > n)
 		n = size;
@@ -770,11 +748,7 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       
       mat_alloc(this, m, n);
       mat_set_from_lists(this, ac, at);
-
-      this->keep = fts_s_args;
     }
-  else
-    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void
@@ -785,45 +759,53 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   mat_free(this);
 }
 
+static int
+mat_check(int ac, const fts_atom_t *at)
+{
+  return (ac == 0 || (ac == 1 && fts_is_int(at)) || (ac == 2 && fts_is_int(at) && fts_is_int(at + 1)) || fts_is_list(at));
+}
+
 static fts_status_t
 mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(mat_t), 1, 1, 0);
+  if(mat_check(ac - 1, at + 1))
+    {
+      fts_class_init(cl, sizeof(mat_t), 1, 1, 0);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mat_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, mat_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mat_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, mat_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, mat_print); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, mat_print); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), mat_assist);
 
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, mat_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, mat_get_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_mat);
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_mat);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, mat_set_from_instance);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, mat_set_elements);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_row, mat_set_row_elements);
+      /* user methods */
+      fts_method_define_varargs(cl, 0, fts_s_bang, mat_output);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, mat_size);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), mat_clear);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), mat_fill);      
+      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), mat_set);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, mat_dump);
-  
-  /* user methods */
-  fts_method_define_varargs(cl, 0, fts_s_bang, mat_output);
-
-  fts_method_define_varargs(cl, 0, fts_s_clear, mat_clear);
-  fts_method_define_varargs(cl, 0, fts_s_fill, mat_fill);      
-  fts_method_define_varargs(cl, 0, fts_s_set, mat_set_elements);
-  fts_method_define_varargs(cl, 0, fts_s_row, mat_set_row_elements);
-
-  fts_method_define_varargs(cl, 0, fts_s_size, mat_size);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("size"), mat_size);
             
-  fts_method_define_varargs(cl, 0, fts_s_import, mat_import); 
-  fts_method_define_varargs(cl, 0, fts_s_export, mat_export); 
+      fts_method_define_varargs(cl, 0, fts_new_symbol("import"), mat_import); 
+      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), mat_export); 
 
-  /* type outlet */
-  fts_outlet_type_define(cl, 0, mat_symbol, 1, &mat_symbol);
+      /* type outlet */
+      fts_outlet_type_define(cl, 0, mat_symbol, 1, &mat_type);
 
-  return fts_Success;
+      return fts_Success;
+    }
+  else
+    return &fts_CannotInstantiate;
+
+}
+
+static int
+mat_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+{
+  return mat_check(ac1 - 1, at1 + 1);
 }
 
 void
@@ -832,6 +814,10 @@ mat_config(void)
   sym_text = fts_new_symbol("text");
   sym_comma = fts_new_symbol(",");
   mat_symbol = fts_new_symbol("mat");
+  mat_type = mat_symbol;
 
-  mat_type = fts_class_install(mat_symbol, mat_instantiate);
+  fts_metaclass_install(mat_symbol, mat_instantiate, mat_equiv);
+  mat_class = fts_class_get_by_name(mat_symbol);
+
+  fts_atom_type_register(mat_symbol, mat_class);
 }

@@ -98,7 +98,7 @@ get_code(const fts_atom_t *a)
 	return 32;
       else
 	{
-	  const char *str = sym;
+	  const char *str = fts_symbol_name(sym);
 	  
 	  if(str[1] == '\0')
 	    {
@@ -187,7 +187,7 @@ key_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 key_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0)
+  if(ac == 1)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
@@ -195,7 +195,7 @@ key_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, key_delete);
     }
 
-  else if(ac == 1)
+  else if(ac == 2)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
@@ -271,7 +271,7 @@ keystat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 keystat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0)
+  if(ac == 1)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
       
@@ -279,7 +279,7 @@ keystat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, keystat_delete);
     }
 
-  else if(ac == 1)
+  else if(ac == 2)
     {
       fts_class_init(cl, sizeof(fts_key_t), 0, 1, 0);
       

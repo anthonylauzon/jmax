@@ -28,7 +28,7 @@ package ircam.jmax.toolkit;
 import java.util.*;
 import java.awt.datatransfer.*;
 
-import ircam.jmax.*;
+import ircam.jmax.utils.*;
 
 /**
  * An abstract base class implementing the selection interface,

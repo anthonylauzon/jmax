@@ -47,44 +47,39 @@ class ErmesPatcherListener implements FtsPatcherListener
     this.sketch = sketch;
   }
 
-  public void objectAdded(FtsPatcherObject patch, FtsGraphicObject object, boolean doedit)
+  public void objectAdded(FtsPatcherData data, FtsObject object)
   {
     // We handle only the case of object added thru 
     // pasting;
     // in reality, this should be the only way to add objects
     // to the sketch.
-    /*if(PatcherClipboardManager.getManager().isPasting())
-      PatcherClipboardManager.getManager().addPastedObject(object);*/    
+    if(PatcherClipboardManager.clipboardManager.isPasting())
+      PatcherClipboardManager.clipboardManager.addPastedObject(object);
   }
 
-  public void objectRedefined(FtsPatcherObject patch, FtsGraphicObject obj)
+  public void objectRemoved(FtsPatcherData data, FtsObject object)
   {
-      sketch.getDisplayList().getGraphicObjectFor(obj).redefined();
+    // In general, objects are never really removed under the
+    // FTS initiative, so you do not needed to implement
+    // this method.
+    // You should know that an object is removed and then re-added
+    // each time is redefined; this is currently handled in the 
+    // redefinition code in GraphicObject; if you decide to implement
+    // this method, you must take care of this.
   }
 
-  public void objectRemoved(FtsPatcherObject patch, FtsGraphicObject object)
-  {
-      // In general, objects are never really removed under the
-      // FTS initiative, so you do not needed to implement
-      // this method.
-      // You should know that an object is removed and then re-added
-      // each time is redefined; this is currently handled in the 
-      // redefinition code in GraphicObject; if you decide to implement
-      // this method, you must take care of this.
-  }
-
-  public void connectionAdded(FtsPatcherObject patch, FtsConnection connection)
+  public void connectionAdded(FtsPatcherData data, FtsConnection connection)
   {
     // We handle only the case of connection added thru 
     // pasting;
     // in reality, this should be the only way to add connections 
     // to the sketch.
-      
-    /*if(PatcherClipboardManager.getManager().isPasting())
-      PatcherClipboardManager.getManager().addPastedConnection(connection);*/
+
+    if(PatcherClipboardManager.clipboardManager.isPasting())
+      PatcherClipboardManager.clipboardManager.addPastedConnection(connection);
   }
 
-  public void connectionRemoved(FtsPatcherObject patch, FtsConnection connection)
+  public void connectionRemoved(FtsPatcherData data, FtsConnection connection)
   {
     final FtsConnection c = connection;
 
@@ -117,19 +112,19 @@ class ErmesPatcherListener implements FtsPatcherListener
     });
   }
 
-  public void patcherChangedNumberOfInlets(FtsPatcherObject patch, int nins)
+  public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins)
   {
     sketch.redraw(); // ??? Why
   }
 
-  public void patcherChangedNumberOfOutlets(FtsPatcherObject patch, int nouts)
+  public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts)
   {
     sketch.redraw(); // ??? Why
   }
 
-  public void patcherChanged(FtsPatcherObject patch)
+  public void patcherChanged(FtsPatcherData data)
   {
-      sketch.getDisplayList().getGraphicObjectFor(patch).redefined();
+    // not implemented yet; it should redo the sketch content.
   }
 
   public void patcherHaveMessage(String msg)

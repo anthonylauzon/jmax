@@ -26,7 +26,6 @@
 
 
 #include <fts/fts.h>
-#include <utils.h>
 #include "wave.h"
 
 #define PHASE_FRAC_BITS 8
@@ -38,9 +37,9 @@
 static void
 wave_ftl_outplace_ptr(fts_word_t *argv)
 {
-  wave_data_t *data = (wave_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict in = (float *) fts_word_get_pointer(argv + 1);
-  float * restrict out = (float *) fts_word_get_pointer(argv + 2);
+  wave_data_t *data = (wave_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict in = (float *) fts_word_get_ptr(argv + 1);
+  float * restrict out = (float *) fts_word_get_ptr(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
   float *buf = data->table.ptr;
   int i;
@@ -62,9 +61,9 @@ wave_ftl_outplace_ptr(fts_word_t *argv)
 static void
 wave_ftl_outplace_fvec(fts_word_t *argv)
 {
-  wave_data_t *data = (wave_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict in = (float *) fts_word_get_pointer(argv + 1);
-  float * restrict out = (float *) fts_word_get_pointer(argv + 2);
+  wave_data_t *data = (wave_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict in = (float *) fts_word_get_ptr(argv + 1);
+  float * restrict out = (float *) fts_word_get_ptr(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
   float *buf = fvec_get_ptr(data->table.fvec);
   int i;
@@ -86,8 +85,8 @@ wave_ftl_outplace_fvec(fts_word_t *argv)
 static void
 wave_ftl_inplace_ptr(fts_word_t *argv)
 {
-  wave_data_t *data = (wave_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict sig = (float *) fts_word_get_pointer(argv + 1);
+  wave_data_t *data = (wave_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict sig = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   float *buf = data->table.ptr;
   int i;
@@ -109,8 +108,8 @@ wave_ftl_inplace_ptr(fts_word_t *argv)
 static void
 wave_ftl_inplace_fvec(fts_word_t *argv)
 {
-  wave_data_t *data = (wave_data_t *)fts_word_get_pointer(argv + 0);
-  float * restrict sig = (float *) fts_word_get_pointer(argv + 1);
+  wave_data_t *data = (wave_data_t *)fts_word_get_ptr(argv + 0);
+  float * restrict sig = (float *) fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   float *buf = fvec_get_ptr(data->table.fvec);
   int i;
