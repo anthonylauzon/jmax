@@ -57,7 +57,6 @@ static fts_array_t audioconfig_sample_rates_array;
 static fts_array_t audioconfig_buffer_sizes_array;
 
 
-static fts_symbol_t audioconfig_s_unconnected;
 static fts_symbol_t audioconfig_s_name;
 static fts_symbol_t audioconfig_s_buffer_sizes;
 static fts_symbol_t audioconfig_s_sampling_rates;
@@ -257,9 +256,9 @@ audioconfig_update_devices(audioconfig_t* config)
   fts_array_clear(&audioconfig_sample_rates_array);
   fts_array_clear(&audioconfig_buffer_sizes_array);
 
-  fts_array_append_symbol(&audioconfig_inputs_array, audioconfig_s_unconnected);
+  fts_array_append_symbol(&audioconfig_inputs_array, fts_s_unconnected);
   fts_array_append_int(&audioconfig_inputs_array, -1);
-  fts_array_append_symbol(&audioconfig_outputs_array, audioconfig_s_unconnected);
+  fts_array_append_symbol(&audioconfig_outputs_array, fts_s_unconnected);
   fts_array_append_int(&audioconfig_outputs_array, -1);
 
   /* get devices names from all audiomanagers */
@@ -367,8 +366,8 @@ audioconfig_label_insert(audioconfig_t* config, int index, fts_symbol_t name)
 
 
   label->name = name;
-  label->input_device = audioconfig_s_unconnected;
-  label->output_device = audioconfig_s_unconnected;
+  label->input_device = fts_s_unconnected;
+  label->output_device = fts_s_unconnected;
   
   /* insert label to list */
   while ((*p) && n--)
@@ -420,7 +419,7 @@ static void
 audioconfig_label_set_input_port(audioconfig_t* config, audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
 {
   if(audioport == NULL)
-    name = audioconfig_s_unconnected;
+    name = fts_s_unconnected;
 
   if(audioport != label->input_audioport || name != label->input_device) 
   {
@@ -443,7 +442,7 @@ static void
 audioconfig_label_set_output_port(audioconfig_t *config, audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
 {
   if(audioport == NULL)
-    name = audioconfig_s_unconnected;
+    name = fts_s_unconnected;
   
   if(audioport != label->output_audioport || name != label->output_device) 
   {
@@ -461,7 +460,6 @@ audioconfig_label_set_output_port(audioconfig_t *config, audiolabel_t *label, in
     fts_config_set_dirty( (config_t *)fts_config_get(), 1);
   }
 }
-
 
 
 void
@@ -503,7 +501,7 @@ audioconfig_set_input_port(audioconfig_t* config, int index, fts_symbol_t name)
   if(label->output_audioport)
     audioconfig_label_set_output_port(config, label, index, NULL, NULL);
 
-  if(name == audioconfig_s_unconnected)
+  if(name == fts_s_unconnected)
   {
     audioconfig_label_set_input_port(config, label, index, NULL, NULL);
   }
@@ -524,7 +522,7 @@ audioconfig_set_output_port(audioconfig_t* config, int index, fts_symbol_t name)
   if(label->output_audioport)
     audioconfig_label_set_output_port(config, label, index, NULL, NULL);
 
-  if(name == audioconfig_s_unconnected)
+  if(name == fts_s_unconnected)
   {
     audioconfig_label_set_output_port(config, label, index, NULL, NULL);
   }
@@ -967,7 +965,6 @@ void fts_audioconfig_config(void)
 {
   /* AUDIO configuration class */
   audioconfig_s_name = fts_new_symbol("__audioconfig");  
-  audioconfig_s_unconnected = fts_new_symbol("-");
 
   audioconfig_s_buffer_sizes = fts_new_symbol("buffer_sizes");
   audioconfig_s_sampling_rates = fts_new_symbol("sampling_rates");

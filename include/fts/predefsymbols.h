@@ -130,6 +130,7 @@ PREDEF_SYMBOL( fts_s_remove_listener, "remove_listener")
 PREDEF_SYMBOL( fts_s_empty_object, "empty object")
 PREDEF_SYMBOL( fts_s_get_element, "get_element")
 PREDEF_SYMBOL( fts_s_empty_string, "")
+PREDEF_SYMBOL( fts_s_unconnected, "-")
 
 /* client messages */
 PREDEF_SYMBOL( fts_s_openFileDialog, "openFileDialog")

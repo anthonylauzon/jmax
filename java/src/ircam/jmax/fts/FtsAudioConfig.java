@@ -308,6 +308,9 @@ public class FtsAudioConfig extends FtsObject
     
     if( listener != null)
       label.setListener( listener);
+  
+    if( listener != null)
+      listener.labelInserted( index, label);
   }
 
   void removeLabel( FtsAudioLabel label)

@@ -177,13 +177,13 @@ audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   audiolabel_t* self = (audiolabel_t*)o;
   fts_symbol_t name;
-  fts_symbol_t input_device = NULL;
+  fts_symbol_t input_device = fts_s_unconnected;
   fts_audioport_t* input_audioport = NULL;
-  int input_channel = 0;
+  int input_channel = -1;
 
-  fts_symbol_t output_device = NULL;
+  fts_symbol_t output_device = fts_s_unconnected;
   fts_audioport_t* output_audioport = NULL;
-  int output_channel = 0;
+  int output_channel = -1;
 
   self->name = name;
   self->input_device = input_device;

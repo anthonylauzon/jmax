@@ -67,8 +67,9 @@ public class FtsAudioLabel extends FtsObject
   public FtsAudioLabel(FtsServer server, FtsObject parent, int id, FtsAtom args[], int offset, int length)
   {
     super(server, parent, id);
-    
+
     label = args[ offset].symbolValue.toString();
+    
     if( length-offset >= 3)
       {
 	input = args[offset+1].symbolValue.toString();

@@ -1358,7 +1358,6 @@ static fts_midiport_t *midinull = NULL;
 
 static fts_symbol_t midiconfig_s_name;
 static fts_symbol_t midiconfig_s_internal_bus;
-static fts_symbol_t midiconfig_s_unconnected;
 static fts_symbol_t midiconfig_s_inputs;
 static fts_symbol_t midiconfig_s_outputs;
 
@@ -1488,8 +1487,8 @@ midiconfig_label_insert(midiconfig_t *config, int index, fts_symbol_t name)
   midilabel_t *label = midilabel_new(name);
   int n = index;
 
-  label->input_name = midiconfig_s_unconnected;
-  label->output_name = midiconfig_s_unconnected;
+  label->input_name = fts_s_unconnected;
+  label->output_name = fts_s_unconnected;
 
   /* inset label to list */
   while((*p) && n--)
@@ -1507,8 +1506,8 @@ midiconfig_label_insert(midiconfig_t *config, int index, fts_symbol_t name)
       
     fts_set_int(args, index);
     fts_set_symbol(args + 1, name);
-    fts_set_symbol(args + 2, midiconfig_s_unconnected);
-    fts_set_symbol(args + 3, midiconfig_s_unconnected);
+    fts_set_symbol(args + 2, fts_s_unconnected);
+    fts_set_symbol(args + 3, fts_s_unconnected);
     fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
   }
   
@@ -1553,7 +1552,7 @@ static void
 midiconfig_label_set_input(midiconfig_t *config, midilabel_t *label, int index, fts_midiport_t *midiport, fts_symbol_t name)
 {
   if(midiport == NULL)
-    name = midiconfig_s_unconnected;
+    name = fts_s_unconnected;
 
   if(midiport != label->input || name != label->input_name) 
   {
@@ -1576,7 +1575,7 @@ static void
 midiconfig_label_set_output(midiconfig_t *config, midilabel_t *label, int index, fts_midiport_t *midiport, fts_symbol_t name)
 {
   if(midiport == NULL)
-    name = midiconfig_s_unconnected;
+    name = fts_s_unconnected;
   
   if(midiport != label->output || name != label->output_name) 
   {
@@ -1615,7 +1614,7 @@ midiconfig_set_input(midiconfig_t *config, int index, fts_symbol_t name)
   if(name != midiconfig_s_internal_bus && label->output && label->output_name == midiconfig_s_internal_bus)
     midiconfig_label_set_output(config, label, index, NULL, NULL);
 
-  if(name == midiconfig_s_unconnected)
+  if(name == fts_s_unconnected)
     midiconfig_label_set_input(config, label, index, NULL, NULL);
   else if(name == midiconfig_s_internal_bus)
     midiconfig_label_set_internal(config, label, index);
@@ -1632,7 +1631,7 @@ midiconfig_set_output(midiconfig_t *config, int index, fts_symbol_t name)
   if(name != midiconfig_s_internal_bus && label->input && label->input_name == midiconfig_s_internal_bus)
     midiconfig_label_set_input(config, label, index, NULL, NULL);
 
-  if(name == midiconfig_s_unconnected)
+  if(name == fts_s_unconnected)
     midiconfig_label_set_output(config, label, index, NULL, NULL);
   else if(name == midiconfig_s_internal_bus)
     midiconfig_label_set_internal(config, label, index);
@@ -1691,8 +1690,8 @@ midiconfig_update_devices(midiconfig_t *config)
   fts_array_clear(&midiconfig_inputs);
   fts_array_clear(&midiconfig_outputs);
 
-  fts_array_append_symbol(&midiconfig_inputs, midiconfig_s_unconnected);
-  fts_array_append_symbol(&midiconfig_outputs, midiconfig_s_unconnected);
+  fts_array_append_symbol(&midiconfig_inputs, fts_s_unconnected);
+  fts_array_append_symbol(&midiconfig_outputs, fts_s_unconnected);
 
   fts_array_append_symbol(&midiconfig_inputs, midiconfig_s_internal_bus);
   fts_array_append_symbol(&midiconfig_outputs, midiconfig_s_internal_bus);
@@ -2186,7 +2185,6 @@ fts_midi_config(void)
   
   midiconfig_s_name = fts_new_symbol("__midiconfig");
   midiconfig_s_internal_bus = fts_new_symbol("Internal Bus");
-  midiconfig_s_unconnected = fts_new_symbol("-");
   midiconfig_s_inputs = fts_new_symbol("inputs");
   midiconfig_s_outputs = fts_new_symbol("outputs");  
   fts_array_init(&midiconfig_inputs, 0, 0);

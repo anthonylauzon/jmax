@@ -440,8 +440,8 @@ public class MidiConfigPanel extends JPanel implements Editor
   private MidiTableModel midiModel;
   private ConfigurationEditor window;
   private FtsMidiConfig midiMan;
-  private final int DEFAULT_WIDTH = 500;
-  private final int DEFAULT_HEIGHT = 260;
+  private final int DEFAULT_WIDTH = 450;
+  private final int DEFAULT_HEIGHT = 240;
 
   private Font defaultLabelFont;
 }

@@ -162,6 +162,10 @@ public class AudioConfigPanel extends JPanel implements Editor
     audioTable.setPreferredScrollableViewportSize( new Dimension(TABLE_DEFAULT_WIDTH, TABLE_DEFAULT_HEIGHT));
     audioTable.setRowHeight(17);
     audioTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
+    audioTable.getColumnModel().getColumn(2).setPreferredWidth(40);
+    audioTable.getColumnModel().getColumn(2).setMaxWidth(40);
+    audioTable.getColumnModel().getColumn(4).setPreferredWidth(40);
+    audioTable.getColumnModel().getColumn(4).setMaxWidth(40);
 
     scrollPane = new JScrollPane( audioTable);
     scrollPane.setPreferredSize( new Dimension( TABLE_DEFAULT_WIDTH, TABLE_DEFAULT_HEIGHT));
@@ -291,6 +295,14 @@ public class AudioConfigPanel extends JPanel implements Editor
     sRateCombo.setSelectedItem(""+audioConfig.getSamplingRate());
   }
 
+  public void labelInserted( int index, FtsAudioLabel label)
+  {
+    if(!label.getLabel().equals( audioModel.getValueAt( index, 0)))
+      audioModel.forceValue( index, 0, label.getLabel());
+    audioModel.forceValue( index, 1, label.getInput());
+    audioModel.forceValue( index, 3, label.getOutput());
+  }
+
   public void labelInputChanged( FtsAudioLabel label)
   {
     int index = audioConfig.getLabelIndex( label);
@@ -418,11 +430,11 @@ public class AudioConfigPanel extends JPanel implements Editor
 	case 1: 
 	  return "in device";
 	case 2: 
-	  return "in channel";
+	  return "in #";
 	case 3: 
 	  return "out device";
 	case 4: 
-	  return "out channel";
+	  return "out #";
 	default:
 	  return "";
 	}
@@ -521,9 +533,9 @@ public class AudioConfigPanel extends JPanel implements Editor
       
       temp[size-1][0] = label.getLabel();
       temp[size-1][1] = label.getInput();
-      temp[size-1][2] = ""+label.getInputChannel();
+      temp[size-1][2] = (label.getInputChannel() == -1) ? null : ""+label.getInputChannel();
       temp[size-1][3] = label.getOutput();
-      temp[size-1][4] = ""+label.getOutputChannel();
+      temp[size-1][4] = (label.getOutputChannel() == -1) ? null : ""+label.getOutputChannel();
       
       data = temp;
     }
@@ -685,8 +697,8 @@ public class AudioConfigPanel extends JPanel implements Editor
   private AudioTableModel audioModel;
   private ConfigurationEditor window;
   private FtsAudioConfig audioConfig;
-  private final int TABLE_DEFAULT_WIDTH = 500;
-  private final int TABLE_DEFAULT_HEIGHT = 180;
+  private final int TABLE_DEFAULT_WIDTH = 450;
+  private final int TABLE_DEFAULT_HEIGHT = 160;
   private Font defaultLabelFont;
 
   JComboBox channelsCombo, bSizeCombo, sRateCombo, sourceCombo, destCombo;
