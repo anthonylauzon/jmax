@@ -336,12 +336,18 @@ public class ErmesObject implements FtsPropertyHandler {
       itsFont = new Font(aFont,itsSketchPad.sketchFont.getStyle(), aIntSize);
     }
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
-    if(aResized==null) itsResized = false;
-    else itsResized = true;
+    
+    if (currentRect == null) makeCurrentRect(theFtsObject);
+    
+    if(aResized == null) itsResized = IsResizedObject(currentRect.width);
+    else {
+      if(aResized.equals("on")) itsResized = true;
+      else itsResized = false;
+    }
 
     laidOut = false;
     
-    if (currentRect == null) makeCurrentRect(theFtsObject);
+    //if (currentRect == null) makeCurrentRect(theFtsObject);
 
     itsFtsObject = theFtsObject;
     update(itsFtsObject);
@@ -428,6 +434,9 @@ public class ErmesObject implements FtsPropertyHandler {
   public boolean ConnectionRequested(ErmesObjInOutlet theRequester) {return true;};
   public boolean ConnectionAbort(ErmesObjInOutlet theRequester) {return true;};
   
+  public boolean IsResizedObject(int theWidth){
+    return false;
+  }
   
   public boolean MouseMove(MouseEvent e,int x,int y){
     if (itsSketchPad.itsRunMode) return false;

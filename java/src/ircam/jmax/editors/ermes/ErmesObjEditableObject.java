@@ -144,6 +144,11 @@ import ircam.jmax.fts.*;
     else return super.MouseUp(evt, x, y);
   }
 
+  public boolean IsResizedObject(int theWidth){
+    return (theWidth>MaxWidth(itsFontMetrics.stringWidth(itsArgs)+2*WIDTH_DIFF,
+			    (itsInletList.size())*12, (itsOutletList.size())*12));
+  }
+
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);

@@ -58,9 +58,17 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
     
     ParseText(itsArgs);
-    if(!IsResizeTextCompat(0,0)) RestoreDimensions();
-
+    
+    if(!itsResized){
+      if(!IsResizeTextCompat(0,0)) RestoreDimensions();
+    }
+    
     return true;		// Why this method return a value ????
+  }
+
+  public boolean IsResizedObject(int theWidth){
+    return (theWidth>MaxWidth(itsFontMetrics.stringWidth(itsArgs)+currentRect.height/2+20,
+			    (itsInletList.size())*12, (itsOutletList.size())*12));
   }
 
   // starting of the graphic/FTS mix

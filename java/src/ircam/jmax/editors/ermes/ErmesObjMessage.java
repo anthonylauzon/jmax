@@ -49,6 +49,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     if(!IsResizeTextCompat(0,0)) RestoreDimensions();
     return true;  
   }
+
 	
   //--------------------------------------------------------
   // makeFtsObject, redefineFtsObject

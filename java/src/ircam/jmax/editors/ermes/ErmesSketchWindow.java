@@ -1226,6 +1226,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	aFObject.put("fs", aErmesObject.itsFont.getSize());
 
       if(aErmesObject.itsResized) aFObject.put("resized", "on");
+      else aFObject.put("resized", "off");
       // if (aErmesObject.itsJustification != itsSketchPad.itsJustificationMode)
       //aFObject.put("jsf", aErmesObject.itsJustification);
       //moved to putOtherProperties
