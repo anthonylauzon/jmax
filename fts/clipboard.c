@@ -150,7 +150,7 @@ clipboard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *
  */
 
-void fts_kernel_clipboard_init(void)
+void fts_clipboard_config(void)
 {
   fts_class_install(fts_new_symbol("__clipboard"), clipboard_instantiate);
 }

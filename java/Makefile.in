@@ -79,7 +79,7 @@ SUBDIRS = src
 packagedir = $(pkgdatadir)/java
 package_DATA = jacl.jar tcljava.jar jmax.jar
 
-JAR_DEP = $(shell find src -name "*.java")
+JAR_DEP = $(shell find src -name "*.class")
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -312,7 +312,29 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 jmax.jar: $(JAR_DEP)	
-	( cd src; jar -cvf ../jmax.jar `find ircam silk -name "*.class"` )
+	-rm jmax.jar
+	( cd src ; jar -cvf ../jmax.jar ircam/jmax/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/dialogs/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/console/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/actions/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/interactions/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/menus/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/objects/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/fts/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/mda/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/pkg/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/scm/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/scm/kawa/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/scm/silk/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/tcl/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/toolkit/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/toolkit/actions/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/toolkit/menus/*.class )
+	( cd src ; jar -uvf ../jmax.jar ircam/jmax/widgets/*.class )
+	( cd src ; jar -uvf ../jmax.jar silk/*.class )
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

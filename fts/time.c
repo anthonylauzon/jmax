@@ -33,19 +33,6 @@
 static fts_heap_t *alarms_heap = 0;
 static fts_heap_t *timers_heap = 0;
 
-/***************************************************
- *
- *     Module initialization
- *
- */
-void 
-fts_kernel_time_init(void)
-{
-  alarms_heap = fts_heap_new(sizeof(fts_alarm_t));
-  timers_heap = fts_heap_new(sizeof(fts_timer_t));
-}
-
-
 /****************************************************************************
  *
  *  clocks
@@ -275,3 +262,18 @@ fts_timer_stop(fts_timer_t *timer)
       timer->time = timer->time + (timer->clock->time - timer->start);
     }
 }
+
+
+/***************************************************
+ *
+ *     Module initialization
+ *
+ */
+
+void fts_kernel_time_init(void)
+{
+  alarms_heap = fts_heap_new(sizeof(fts_alarm_t));
+  timers_heap = fts_heap_new(sizeof(fts_timer_t));
+}
+
+

@@ -22,107 +22,50 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <fts/fts.h>
-#include <ftsprivate/patcher.h>
 #include <ftsprivate/platform.h>
 #include <ftsprivate/package.h>
 #include <fts/project.h>
 
 
 /***********************************************************************
- *
- * Command line arguments:
- *  - stored in variable in a subpatcher
- *  - can be retrieved from C code or in a patcher
- *
+ * 
+ * Command line arguments
+ * 
  */
 
-typedef struct _v_t {
-  fts_object_t head;
-  fts_atom_t value;
-} v_t;
+static fts_hashtable_t cmd_args;
 
-static fts_symbol_t s___v;
-static fts_symbol_t s_yes;
-static fts_patcher_t *cmd_args_patcher;
-
-static void v_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_cmd_args_put( fts_symbol_t name, fts_symbol_t value)
 {
-  v_t *this = (v_t *)o;
+  fts_atom_t k, v;
 
-  this->value = at[1];
-}
-
-static void v_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  v_t *this = (v_t *)o;
-
-  *value = this->value;
-}
-
-static fts_status_t v_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init( cl, sizeof( v_t), 0, 0, 0);
-
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, v_init);
-  fts_class_add_daemon( cl, obj_property_get, fts_s_state, v_get_state);
-
-  return fts_Success;
-}
-
-static int fts_cmd_args_put( fts_symbol_t name, fts_symbol_t value)
-{
-  fts_atom_t a[4];
-  fts_object_t *newobj;
-
-  fts_set_symbol( a+0, name);
-  fts_set_symbol( a+1, fts_s_colon);
-  fts_set_symbol( a+2, s___v);
-  fts_set_symbol( a+3, value);
-
-  newobj = fts_eval_object_description( cmd_args_patcher, 4, a);
-
-  return !fts_object_is_error( newobj);
+  fts_set_symbol( &k, name);
+  fts_set_symbol( &v, value);
+  fts_hashtable_put( &cmd_args, &k, &v);
 }
 
 fts_symbol_t fts_cmd_args_get( fts_symbol_t name)
 {
-  fts_atom_t *value;
+  fts_atom_t k, v;
 
-  value = fts_variable_get_value( cmd_args_patcher, name);
+  fts_set_symbol( &k, name);
+  if (fts_hashtable_get( &cmd_args, &k, &v))
+    return fts_get_symbol( &v);
 
-  if (!fts_is_symbol( value))
-    return 0;
-
-  return fts_get_symbol( value);
-}
-
-static void fts_cmd_args_init( void)
-{
-  fts_atom_t a[2];
-
-  s___v = fts_new_symbol( "__v");
-  fts_class_install( s___v, v_instantiate);
-
-  s_yes = fts_new_symbol( "yes");
-
-  fts_set_symbol( a+0, fts_s_patcher);
-  fts_set_symbol( a+1, fts_new_symbol("environnment"));
-  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, (fts_object_t **)&cmd_args_patcher);
-  if ( !cmd_args_patcher)
-    {
-      fprintf( stderr, "cannot create environnment patcher\n");
-      return;
-    }
+  return 0;
 }
 
 static void fts_cmd_args_parse( int argc, char **argv)
 {
   int filecount = 1;
   char filevar[32];
-  fts_symbol_t name, value;
+  fts_symbol_t name, value, s_yes;
 
-  fts_cmd_args_init();
+  fts_hashtable_init( &cmd_args, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+
+  s_yes = fts_new_symbol( "yes");
 
   argc--;
   argv++;
@@ -209,50 +152,43 @@ void fts_load_project( void)
  *
  */
 
-extern void fts_kernel_abstraction_init( void);
-extern void fts_kernel_atom_init( void);
-extern void fts_kernel_audio_init( void);
-extern void fts_kernel_autosave_init( void);
-extern void fts_kernel_bytestream_init( void);
-extern void fts_kernel_class_init( void);
-extern void fts_kernel_clipboard_init( void);
-extern void fts_kernel_connection_init( void);
-extern void fts_kernel_doctor_init( void);
-extern void fts_kernel_dsp_graph_init( void);
-extern void fts_kernel_dsp_init( void);
-extern void fts_kernel_expression_init( void);
-extern void fts_kernel_ftl_init( void);
+/*
+ * Kernel initialisation:
+ * these functions initializes the kernel structures
+ */
+
 extern void fts_kernel_hashtable_init( void);
-extern void fts_kernel_inout_init(void);
-extern void fts_kernel_midi_init( void);
-extern void fts_kernel_objectset_init( void);
+extern void fts_kernel_symbol_init( void);
+extern void fts_kernel_atom_init( void);
 extern void fts_kernel_objtable_init( void);
-extern void fts_kernel_objtable_init( void);
-extern void fts_kernel_oldclient_init( void);
+extern void fts_kernel_list_init( void);
+extern void fts_kernel_class_init( void);
+extern void fts_kernel_property_init( void);
+extern void fts_kernel_package_init( void);
+extern void fts_kernel_doctor_init( void);
+extern void fts_kernel_connection_init( void);
 extern void fts_kernel_oldftsdata_init( void);
 extern void fts_kernel_oldpatcherdata_init( void);
-extern void fts_kernel_olducs_init( void);
-extern void fts_kernel_param_init( void);
-extern void fts_kernel_patcher_init( void);
-extern void fts_kernel_patparser_init( void);
-extern void fts_kernel_property_init( void);
-extern void fts_kernel_sched_init( void);
-extern void fts_kernel_selection_init( void);
-extern void fts_kernel_soundfile_init( void);
-extern void fts_kernel_symbol_init( void);
-extern void fts_kernel_template_init( void);
 extern void fts_kernel_variable_init( void);
-extern void fts_kernel_time_init(void);
-extern void fts_kernel_list_init( void);
-extern void fts_kernel_package_init(void);
+extern void fts_kernel_patcher_init( void);
+extern void fts_kernel_expression_init( void);
+extern void fts_kernel_ftl_init( void);
+extern void fts_kernel_param_init( void);
+extern void fts_kernel_dsp_graph_init( void);
+extern void fts_kernel_dsp_init( void);
+extern void fts_kernel_abstraction_init( void);
+extern void fts_kernel_template_init( void);
+extern void fts_kernel_autosave_init( void);
+extern void fts_kernel_patparser_init( void);
+extern void fts_kernel_time_init( void);
+extern void fts_kernel_soundfile_init( void);
+extern void fts_kernel_sched_init( void);
 
-
-extern void fts_oldclient_start( void);
-
-
-void fts_init( int argc, char **argv)
+static void fts_kernel_init( void)
 {
-  /* *** Attention !!! The order is important *** */
+  /*
+   *** Attention !!! The order is important ***
+   */
   fts_kernel_hashtable_init();
   fts_kernel_symbol_init();
   fts_kernel_atom_init();
@@ -261,7 +197,6 @@ void fts_init( int argc, char **argv)
   fts_kernel_class_init();
   fts_kernel_property_init();
   fts_kernel_package_init();
-  fts_kernel_objectset_init();
   fts_kernel_doctor_init();
   fts_kernel_connection_init();
   fts_kernel_oldftsdata_init();
@@ -275,27 +210,54 @@ void fts_init( int argc, char **argv)
   fts_kernel_dsp_init();
   fts_kernel_abstraction_init();
   fts_kernel_template_init();
-
-  /* For the rest, the order is no longer important */
-  fts_kernel_audio_init();
-  fts_kernel_inout_init();
-  fts_kernel_bytestream_init();
   fts_kernel_autosave_init();
-  fts_kernel_clipboard_init();
-  fts_kernel_midi_init();
   fts_kernel_patparser_init();
-  fts_kernel_sched_init();
-  fts_kernel_selection_init();
-  fts_kernel_soundfile_init();
-  fts_kernel_oldclient_init();
-  fts_kernel_olducs_init();
   fts_kernel_time_init();
+  fts_kernel_soundfile_init();
+  fts_kernel_sched_init();
+}
 
+extern void fts_audio_config( void);
+extern void fts_bytestream_config( void);
+extern void fts_client_config( void);
+extern void fts_clipboard_config( void);
+extern void fts_inout_config( void);
+extern void fts_midi_config( void);
+extern void fts_objectset_config();
+extern void fts_oldclient_config( void);
+extern void fts_selection_config( void);
+
+/*
+ * Installation of kernel packages 
+ * The order is not relevant
+ */
+static void fts_kernel_classes_config( void)
+{
+  fts_audio_config();
+  fts_bytestream_config();
+  fts_client_config();
+  fts_clipboard_config();
+  fts_inout_config();
+  fts_midi_config();
+  fts_objectset_config();
+  fts_oldclient_config();
+  fts_selection_config();
+}
+
+void fts_init( int argc, char **argv)
+{
+  /* Initialization */
+  fts_kernel_init();
+
+  /* Must be here, since it can be used by further modules */
   fts_cmd_args_parse( argc, argv);
 
+  /* Platform dependant initialization */
   fts_platform_init();
 
-  fts_load_project();
+  /* Installation of kernel classes */
+  fts_kernel_classes_config();
 
-  fts_oldclient_start();
+  /* Load the initial project */
+  fts_load_project();
 }

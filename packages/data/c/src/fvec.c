@@ -267,6 +267,37 @@ fvec_write_atom_file(fvec_t *vec, fts_symbol_t file_name)
   return (i);
 }
 
+static int 
+fvec_file_is_text( fts_symbol_t file_name)
+{
+  char full_path[1024];
+  int n, i;
+  char buff[256];
+  FILE* fd;
+
+  if (!fts_file_get_read_path( fts_symbol_name( file_name), full_path))
+     return 0;
+
+  if ( (fd = fopen( full_path, "rb")) == NULL)
+    return 0;
+
+  if ( (n = fread( buff, 1, 256, fd)) < 256)
+    {
+      fclose( fd);
+      return 0;
+    }
+
+  for ( i = 0; i < n; i++)
+    {
+      if ( !isgraph(buff[i]) && !isspace(buff[i]))
+	return 0;
+    }
+
+  fclose( fd);
+
+  return 1;
+}
+
 /********************************************************************
  *
  *   user methods
@@ -552,7 +583,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	/* force sampling rate to given property */
 	sr = this->sr;
 
-      if (fts_file_is_text( file_name))
+      if (fvec_file_is_text( file_name))
 	{
 	  size = fvec_read_atom_file(this, file_name);
 
@@ -826,7 +857,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_symbol_t file_name = fts_get_symbol(at);
       int size = 0;
       
-      if (fts_file_is_text( file_name))
+      if (fvec_file_is_text( file_name))
 	{
 	  size = fvec_read_atom_file(this, file_name);
 	}

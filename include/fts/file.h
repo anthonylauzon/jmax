@@ -41,8 +41,6 @@ FTS_API FILE* fts_file_open(const char *name, const char *mode);
 
 FTS_API int fts_file_close(FILE* fd);
 
-FTS_API int fts_file_is_text( fts_symbol_t file_name);
-
 /*
  *  Directory paths
  */

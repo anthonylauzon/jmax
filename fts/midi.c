@@ -884,8 +884,7 @@ fts_midiport_t *fts_midiport_get_default(void)
  *  Initialization of the midi module
  */ 
 
-void 
-fts_kernel_midi_init(void)
+void fts_midi_config(void)
 {
   fts_s_midiport = fts_new_symbol("midiport");
   fts_s__superclass = fts_new_symbol("_superclass");

@@ -4,7 +4,6 @@ libfts_la_SOURCES= \
 OLDclient.c \
 OLDftsdata.c \
 OLDpatcherdata.c \
-OLDucs.c \
 abstraction.c \
 array.c \
 atom.c \
@@ -13,6 +12,7 @@ audio.c \
 autosave.c \
 bytestream.c \
 class.c \
+client.c \
 clipboard.c \
 connection.c \
 doctor.c \

@@ -163,37 +163,6 @@ fts_file_close(FILE* fd)
   return fclose(fd);
 }
 
-int 
-fts_file_is_text( fts_symbol_t file_name)
-{
-  char full_path[1024];
-  int n, i;
-  char buff[256];
-  FILE* fd;
-
-  if (!fts_file_get_read_path( fts_symbol_name( file_name), full_path))
-     return 0;
-
-  if ( (fd = fopen( full_path, "rb")) == NULL)
-    return 0;
-
-  if ( (n = fread( buff, 1, 256, fd)) < 256)
-    {
-      fclose( fd);
-      return 0;
-    }
-
-  for ( i = 0; i < n; i++)
-    {
-      if ( !isgraph(buff[i]) && !isspace(buff[i]))
-	return 0;
-    }
-
-  fclose( fd);
-
-  return 1;
-}
-
 char*
 fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
 {

@@ -817,7 +817,7 @@ static fts_status_t nullaudioport_instantiate(fts_class_t *cl, int ac, const fts
  *
  */
 
-void fts_kernel_audio_init( void)
+void fts_audio_config( void)
 {
   fts_atom_t argv[1];
 

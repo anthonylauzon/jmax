@@ -28,13 +28,56 @@
  * 
  */
 
+#include "ftsconfig.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mach-o/dyld.h> 
 
-#include <fts/sys/hw.h>
+#include <fts/fts.h>
+#include <ftsprivate/fpe.h>
+#include <ftsprivate/platform.h>
 
+
+/***********************************************************************
+ *
+ * Root directory
+ *
+ */
+
+fts_symbol_t fts_get_default_root_directory( void)
+{
+  return fts_new_symbol( DEFAULT_ROOT);
+}
+
+fts_symbol_t
+fts_get_user_config( void)
+{
+  char* home;
+  char path[MAXPATHLEN];
+
+  home = getenv("HOME");
+  fts_make_absolute_path(home, ".jmaxcf", path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol_copy(path);
+  }
+
+  return NULL;
+}
+
+fts_symbol_t 
+fts_get_system_config( void)
+{
+  char path[MAXPATHLEN];
+
+  fts_make_absolute_path(DEFAULT_ROOT, "config.jmax", path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol_copy(path);
+  }
+
+  return NULL;  
+}
 
 /* *************************************************************************** */
 /*                                                                             */
@@ -81,11 +124,16 @@ odbc_private_extern void linkEdit_symbol_handler (NSLinkEditErrors c, int errorN
     sprintf( stored_error_message, "errors during link edit for file %s : %s", fileName, errorString); 
 } 
 
-void *fts_dl_open( const char *filename, char *error)
+fts_status_t fts_load_library( const char *filename, const char *symbol)
 {
+  static char error_description[1024];
+  static fts_status_description_t load_library_error = { error_description};
+  static int dl_init = 0;
+  static char *full_sym_name;
+  static int full_sym_name_length;
+  NSSymbol s; 
   NSObjectFileImage image; 
   void *ret;
-  static int dl_init = 0;
 
   if ( !dl_init)
     {
@@ -100,23 +148,13 @@ void *fts_dl_open( const char *filename, char *error)
       dl_init = 1;
     }
 
-  stored_error_message = error;
+  stored_error_message = error_description;
 
   if ( NSCreateObjectFileImageFromFile( filename, &image) != NSObjectFileImageSuccess )
-    return 0;
+    return &load_library_error;
 
-  ret = NSLinkModule( image, filename, NSLINKMODULE_OPTION_BINDNOW); 
-
-  stored_error_message = 0;
-
-  return ret;
-}
-
-int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error)
-{
-  static char *full_sym_name;
-  static int full_sym_name_length;
-  NSSymbol s; 
+  if ( !NSLinkModule( image, filename, NSLINKMODULE_OPTION_BINDNOW))
+    return &load_library_error;
 
   if ( !full_sym_name || strlen( symbol) + 2 >= full_sym_name_length)
     {
@@ -127,15 +165,20 @@ int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error
   strcpy( full_sym_name, "_");
   strcat( full_sym_name, symbol);
 
-  stored_error_message = error;
-
   s = NSLookupSymbolInModule( (NSModule)handle, full_sym_name); 
 
-  *address = NSAddressOfSymbol( s);
+  fun = (void (*)(void))NSAddressOfSymbol( s);
 
   stored_error_message = 0;
 
-  return 1;
+  if ( !fun)
+    {
+      return &load_library_error;
+    }
+
+  (*fun)();
+
+  return fts_Success;
 }
 
 /* *************************************************************************** */

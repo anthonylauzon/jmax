@@ -397,8 +397,6 @@ static void start_watchdog( void)
 
 void fts_platform_init( void)
 {
-  fts_atom_t a;
-
   if ( !fts_cmd_args_get( fts_new_symbol( "no-watchdog")))
     start_watchdog();
 

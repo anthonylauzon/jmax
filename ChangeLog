@@ -1,3 +1,11 @@
+2001-10-15  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Changed kernel initialization: now splited into fts_kernel_*_init 
+	(initialization of kernel structures) and fts_*_config (installation
+	of kernel classes), so that the kernel objects can 1) access the
+	command line arguments and 2) rely on the fact that the necessary
+	platform initializations are done.
+
 2001-09-28  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* changed fts/saver.c in order to be able to open a .jmax file

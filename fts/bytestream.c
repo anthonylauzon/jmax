@@ -142,8 +142,7 @@ fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_t *listener)
  *
  */
 
-void
-fts_kernel_bytestream_init( void)
+void fts_bytestream_config( void)
 {
   fts_s_bytestream = fts_new_symbol("bytestream");
   fts_s__superclass = fts_new_symbol("_superclass");

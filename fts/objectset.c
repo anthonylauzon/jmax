@@ -124,9 +124,9 @@ objectset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *
  */
 
-void fts_kernel_objectset_init( void)
+void fts_objectset_config( void)
 {
   objectset_symbol = fts_new_symbol("__objectset");
   sym_objectset_append = fts_new_symbol("append");
-  fts_class_install(objectset_symbol, objectset_instantiate);
+  fts_class_install( objectset_symbol, objectset_instantiate);
 }

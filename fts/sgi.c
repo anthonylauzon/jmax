@@ -27,6 +27,8 @@
  *  - FPU settings
  */
 
+#include "ftsconfig.h"
+
 #include <string.h>
 #include <dlfcn.h>
 #include <sys/types.h>
@@ -42,8 +44,49 @@
 #include <sys/mman.h>
 #include <sched.h>
 
-#include <fts/sys/hw.h>
+#include <fts/fts.h>
+#include <ftsprivate/fpe.h>
+#include <ftsprivate/platform.h>
 
+
+/***********************************************************************
+ *
+ * Root directory
+ *
+ */
+
+fts_symbol_t fts_get_default_root_directory( void)
+{
+  return fts_new_symbol( DEFAULT_ROOT);
+}
+
+fts_symbol_t
+fts_get_user_config( void)
+{
+  char* home;
+  char path[MAXPATHLEN];
+
+  home = getenv("HOME");
+  fts_make_absolute_path(home, ".jmaxcf", path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol_copy(path);
+  }
+
+  return NULL;
+}
+
+fts_symbol_t 
+fts_get_system_config( void)
+{
+  char path[MAXPATHLEN];
+
+  fts_make_absolute_path(DEFAULT_ROOT, "config.jmax", path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol_copy(path);
+  }
+
+  return NULL;  
+}
 
 /* *************************************************************************** */
 /*                                                                             */
@@ -53,36 +96,34 @@
 
 /* The SGI implementation uses dlopen() and dlsym(). */
 
-void *fts_dl_open( const char *filename, char *error)
+fts_status_t fts_load_library( const char *filename, const char *symbol)
 {
+  static char error_description[1024];
+  static fts_status_description_t load_library_error = { error_description};
   void *handle;
+  void (*fun)(void);
 
   handle = dlopen( filename, RTLD_NOW | RTLD_GLOBAL);
 
   if (!handle)
-    strcpy( error, dlerror());
-
-  return handle;
-}
-
-int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error)
-{
-  void *p;
-  char *dlerr;
-
-  p = dlsym( handle, symbol);
-
-  dlerr = dlerror();
-  if (dlerr != NULL)
     {
-      strcpy( error, dlerr);
-      return 0;
+      strcpy( error_description, dlerror());
+      return &load_library_error;
     }
 
-  *address = p;
-  
-  return 1;
+  fun = (void (*)(void))dlsym( handle, symbol);
+
+  if ( fun == NULL)
+    {
+      strcpy( error_description, dlerror());
+      return &load_library_error;
+    }
+
+  (*fun)();
+
+  return fts_Success;
 }
+
 
 /* *************************************************************************** */
 /*                                                                             */
@@ -282,45 +323,22 @@ static int find_isolated_cpu( void)
   return 0;
 }
 
-static int get_cpu_from_command_line( int argc, char **argv, int *pcpu)
-{
-  while ( argc)
-    {
-      if ( ! strncmp( *argv, "--cpu=", 6))
-	{
-	  char *p = strchr( *argv, '=') + 1;
-
-	  if (sscanf( p, "%d", pcpu) == 1)
-	    return 1;
-	  else
-	    {
-	      post( "Invalid CPU number: %s\n", p);
-	      return -1;
-	    }
-	}
-      
-      argc--;
-      argv++;
-    }
-
-  return 0;
-}
-
-void fts_platform_init( int argc, char **argv)
+void fts_platform_init( void )
 {
   struct sched_param param;
-  
   int cpu = -1;
   int r;
+  fts_symbol_t s_cpu;
 
-  r = get_cpu_from_command_line( argc, argv, &cpu);
+  if ( (s_cpu = fts_cmd_args_get( fts_new_symbol( "cpu"))) )
+    cpu = atoi( fts_symbol_name( s_cpu));
 
-  if ( r == 1)
+  if ( cpu >=0 )
     {
       if ( run_on_cpu( cpu) >= 0)
 	post( "Running on CPU %d\n", cpu);
     }
-  else if ( r == 0)
+  else
     {
       cpu = find_isolated_cpu();
 

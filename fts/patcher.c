@@ -60,6 +60,7 @@
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/expression.h>
 #include <ftsprivate/inout.h>
+#include <ftsprivate/loader.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/template.h>
@@ -750,6 +751,31 @@ patcher_save_dotpat_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     }
 }
 
+/* 
+ * load a .jmax file
+ * at[0]: filename
+*/
+static void 
+patcher_load_jmax_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const char *filename = fts_symbol_name( fts_get_symbol( at));
+  fts_object_t *patcher;
+
+  patcher = fts_binary_file_load( filename, o, 0, 0, 0);
+
+  if (patcher == 0)
+    {
+      post("Cannot read jmax file %s\n", filename);
+      return;
+    }
+
+  /* Save the file name, for future autosaves and other services */
+  fts_object_put_prop( patcher, fts_s_filename, at);
+
+  /* activate the post-load init, like loadbangs */	  
+  fts_message_send( patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+}
+
 
 /* **********************************************************************
  *
@@ -859,6 +885,9 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   t[0] = fts_t_symbol;
   fts_method_define( cl, fts_SystemInlet, fts_new_symbol("save_dotpat_file"), patcher_save_dotpat_file, 1, t); 
+
+  t[0] = fts_t_symbol;
+  fts_method_define( cl, fts_SystemInlet, fts_new_symbol("load_jmax_file"), patcher_load_jmax_file, 1, t); 
 
   /* daemon for properties */
   fts_class_add_daemon(cl, obj_property_get, fts_s_data, patcher_get_data);

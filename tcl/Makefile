@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /usr/local
+prefix = /u/worksta/dechelle/projects/jmax/3.0.0/jmax-install/
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
