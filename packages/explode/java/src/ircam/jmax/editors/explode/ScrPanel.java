@@ -52,6 +52,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     aScrollbar.addAdjustmentListener(new AdjustmentListener() {
       public void adjustmentValueChanged(AdjustmentEvent e) {
 	logicalTime = e.getValue();
+	System.err.println("moving to ms "+logicalTime);
 	int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
 	((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
 	itsRenderer.render(getGraphics(), temp, temp+10);
