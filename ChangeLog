@@ -1,5 +1,12 @@
 2003-05-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/winbuild/packages.dsw : removed obsolete packages (Windows port)
+	* packages/ispw/c/src/osc.h: added missing ISPW_API in function declaration (Windows port)
+
+	* packages/numeric/c/src/numeric.h: added missing declaration of random_config (Windows port)
+
+	* include/fts/packages.h: added missing FTS_API for fts_package_get_class declaration (Windows port)
+	
 	* packages/io/c/src/filestream.c, packages/io/c/src/wacom.c: applied patches send by Jarek Myszewski (Windows port).
 
 	* packages/ispw/winbuild/ispw.dsp, packages/ispw/winbuild/ispw_java.mak: applied patches send by Jarek Myszewski (Windows port).
