@@ -18,11 +18,10 @@ public class MoverTool extends Tool implements PositionListener, DragListener {
   /**
    * constructor.
    */
-  public MoverTool(GraphicContext theGc, ImageIcon theIcon, int theDirection) 
+  public MoverTool(ImageIcon theIcon, int theDirection) 
   {
     super("mover", theIcon);
     
-    gc = theGc;
     itsMouseTracker = new MouseTracker(this);
     itsSelectionMover = new ExplodeSelectionMover(this, theDirection);
 
@@ -78,7 +77,7 @@ public class MoverTool extends Tool implements PositionListener, DragListener {
     ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
 
     // starts a serie of undoable transitions
-    egc.getDataModel().beginUpdate();
+    ((UndoableData) egc.getDataModel()).beginUpdate();
 
     for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
       {
@@ -88,7 +87,7 @@ public class MoverTool extends Tool implements PositionListener, DragListener {
 	egc.getAdapter().setY(aEvent, egc.getAdapter().getY(aEvent)+deltaY);
       }
 
-    egc.getDataModel().endUpdate();
+    ((UndoableData) egc.getDataModel()).endUpdate();
 
     mountIModule(itsMouseTracker);
     gc.getGraphicDestination().repaint();    

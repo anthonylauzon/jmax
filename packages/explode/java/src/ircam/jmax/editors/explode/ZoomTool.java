@@ -14,11 +14,10 @@ import javax.swing.ImageIcon;
 public class ZoomTool extends Tool implements PositionListener {
 
   /** constructor */
-  public ZoomTool(GraphicContext theGc, ImageIcon theImageIcon) 
+  public ZoomTool(ImageIcon theImageIcon) 
   {
     super("zoomer", theImageIcon);
 
-    gc = theGc;
     itsMouseTracker = new MouseTracker(this);
   }
 

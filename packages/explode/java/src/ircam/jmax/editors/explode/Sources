@@ -7,6 +7,7 @@ SOURCES = \
 	DurationMapper.java	\
 	Explode.java		\
 	ExplodeDataEditor.java  \
+	ExplodeDataFlavor.java  \
 	ExplodeDataListener.java	\
 	ExplodeDataModel.java	\
 	ExplodeExtension.java	\

@@ -18,7 +18,7 @@ public class VerboseMouseTracker extends MouseTracker {
   {  
     ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
 
-    egc.getStatusBar().post(Explode.toolbar.getTool(), ""+
+    egc.getStatusBar().post(egc.toolbar.getTool(), ""+
 			   (egc.getAdapter().getInvX(e.getX()))+
 			   ", "+
 			   (egc.getAdapter().getInvY(e.getY())));

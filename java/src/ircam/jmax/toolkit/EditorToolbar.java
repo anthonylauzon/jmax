@@ -11,13 +11,17 @@ import java.awt.event.*;
  * to be called when the user selects a new tool.
  * EditorToolbar class keeps a JPopupMenu with all the tools inserted;
  * this Popup can be accessed and used as an alternative for choosing 
- * a tool (example, right-mouse click).
+ * a tool (example, right-mouse click). A toolbar can be public (the same
+ * object is shared between every editor's window, or private (every window
+ * has its own local toolbar). 
  */
 public class EditorToolbar extends JToolBar implements ActionListener, WindowListener{
   
   /**
    * constructor. It inserts the tools provided by the given
-   * ToolbarProvider
+   * ToolbarProvider. The direction parameter specify if the
+   * toolbar should be HORIZONTAL or VERTICAL. 
+   * For now, the toolbar is private to a window (and the tools are static!)
    */
   public EditorToolbar(ToolbarProvider theProvider, int direction) 
   {
@@ -26,7 +30,6 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
     
     if (direction == VERTICAL)
       setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    currentContext = theProvider.getGraphicContext();
 
     /** prepare the popup */
     itsPopupMenu = new JPopupMenu();
@@ -45,28 +48,11 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
 
     setTool(theProvider.getDefaultTool());
 
-  }
-
-  /**
-   * Another graphic context  wants to be a client of this toolbar.
-   * This means that the current Tool and Interaction Module will be redirect 
-   * to act on the given Graphic context when the corresponding 
-   * window is activated 
-   * @see Tool
-   * @see InteractionModule
-   * @see GraphicContext*/
-  public void addClient(GraphicContext gc)
-  {
-    itsClients.put(gc.getFrame(), gc);
-    gc.getFrame().addWindowListener(this);  
-  }
-
-  /**
-   * Remove a client graphic context */
-  public void removeClient(GraphicContext gc)
-  {
-    itsClients.remove(gc.getFrame());
-    gc.getFrame().removeWindowListener(this);  
+    itsClientGc = theProvider.getGraphicContext();
+    itsClientFrame = itsClientGc.getFrame();
+    itsClientFrame.addWindowListener(this);  
+    
+    currentTool.reActivate(itsClientGc);
   }
 
   public void setTool(Tool t)
@@ -151,7 +137,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
     Tool aTool = (Tool) itsTools.get(aSource);
     
     currentTool.deactivate();
-    aTool.reActivate(currentContext);
+    aTool.reActivate(itsClientGc);
 
     setTool(aTool);
     
@@ -185,31 +171,31 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
   public void windowActivated(WindowEvent e)
   {
 
-    GraphicContext gc = (GraphicContext) itsClients.get(e.getWindow());
-    currentContext = gc;
-    currentTool.reActivate(gc);
-    //itsFrame.toFront();
+    currentTool.reActivate(itsClientGc);
+
   }
 
   public void windowDeactivated(WindowEvent e)
   {
   }
 
-  //---- Fields 
+  //---- Fields and accessors
 
   public JPopupMenu itsPopupMenu;
 
   Hashtable itsTools = new Hashtable();
   Tool currentTool = null;
-  GraphicContext currentContext;
 
   JFrame itsFrame;
-  Hashtable itsClients = new Hashtable();
+  Frame itsClientFrame;
+  GraphicContext itsClientGc;
   Vector listeners = new Vector();
 
   private ButtonGroup itsButtonGroup = new ButtonGroup();
   public static final int VERTICAL = 0;
   public static final int HORIZONTAL = 1;
+
+
 }
 
 

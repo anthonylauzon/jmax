@@ -162,7 +162,7 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
       return;
     }
 
-    gc.getDataModel().beginUpdate();
+    ((UndoableData) gc.getDataModel()).beginUpdate();
 
 
     Enumeration en;
@@ -208,7 +208,7 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
 	  }
       }
 
-    gc.getDataModel().endUpdate();
+    ((UndoableData) gc.getDataModel()).endUpdate();
 
   }
 

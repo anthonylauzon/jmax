@@ -30,8 +30,6 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     setBackground(Color.white);
     setDoubleBuffered(false);
 
-    tools = new Vector();
-
     //-- prepares the NORTH Status bar
     
     JPanel northSection = new JPanel();
@@ -63,7 +61,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 	{
 	  if (e.isPopupTrigger()) 
 	    {
-	      Explode.toolbar.itsPopupMenu.show (e.getComponent(), e.getX()-10, e.getY()-10);
+	      tb.itsPopupMenu.show (e.getComponent(), e.getX()-10, e.getY()-10);
 	    }
 	  else 
 	    super.processMouseEvent(e);
@@ -177,14 +175,10 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
     gc.setFrame(GraphicContext.getFrame(this));
 
-    // create the unique instance of toolbar if it does not exist already
-    if (Explode.toolbar == null) {
-      tb = new EditorToolbar(this, EditorToolbar.HORIZONTAL);
-    }
-    else tb = Explode.toolbar;
-    
-    // add itself as a client of the toolbar
-    linkToToolbar(tb);
+    tb = new EditorToolbar(this, EditorToolbar.HORIZONTAL);
+    tb.setFloatable(false);
+
+    gc.setToolbar(tb);
 
     // prepare the Panel containing the toolbar when anchored
     JPanel c = new JPanel() {
@@ -221,12 +215,6 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     
     itsStatusBar.addWidgetAt(c, 2);
 
-    // in case the toolbar is anchored, a new window "steals" it 
-    // from the preceding owner.
-    // the c.add() call invokes indirectly the addImpl method of the toolbar's JPanel.
-    // PROBLEM for (future?) developers: when the Toolbar changes owner, there's
-    // no way to anchor it in the preceding owner. Why? Is there a UI method
-    // to do this? Note anyway that this is a non standard behaviour..
     if ( toolbarAnchored)
       {
 	tb.setSize(200, 30);
@@ -234,40 +222,35 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
       }
 
  
+    tb.addToolListener(this);
+    itsStatusBar.post(tb.getTool(), "");
     return tb;
   }
 
-  /**
-   * link this panel to a pre-existing toolbar */
-  void linkToToolbar(EditorToolbar t)
-  {
-    t.addClient(gc);
-    t.addToolListener(this);
-    itsStatusBar.post(t.getTool(), "");
-  } 
 
   /**
    * prepares the tools that will be used with this editor.
-   * 
+   * Tools are static (ex.: there's just one arrow tool) and are reused.
    */
-  private void initTools() 
+  static void initTools() 
   {
 
+    if (tools != null) return; //tools have already been created...
+
+    tools = new Vector();
     String fs = File.separator;
     String path = MaxApplication.getProperty("root")+fs+"packages/explode/images"+fs;
 
-    itsDefaultTool = new ArrowTool(gc, new ImageIcon(path+"selecter.gif"));
-
+    itsDefaultTool = new ArrowTool(new ImageIcon(path+"selecter.gif"));
     tools.addElement( itsDefaultTool);
-
-    tools.addElement(new ScrAddingTool(gc,  new ImageIcon(path+"adder.gif")));
-    tools.addElement(new DeleteTool(gc, new ImageIcon(path+"eraser.gif")));
-    tools.addElement(new MoverTool(gc, new ImageIcon(path+"vmover.gif"), 
+    tools.addElement(new ScrAddingTool(new ImageIcon(path+"adder.gif")));
+    tools.addElement(new DeleteTool(new ImageIcon(path+"eraser.gif")));
+    tools.addElement(new MoverTool(new ImageIcon(path+"vmover.gif"), 
 				   MoverTool.VERTICAL_MOVEMENT));
-    tools.addElement(new MoverTool(gc, new ImageIcon(path+"hmover.gif"), 
+    tools.addElement(new MoverTool(new ImageIcon(path+"hmover.gif"), 
 				   MoverTool.HORIZONTAL_MOVEMENT));
-    tools.addElement(new ResizerTool(gc, new ImageIcon(path+"resizer.gif")));
-    tools.addElement(new ZoomTool(gc, new ImageIcon(path+"zoomer.gif")));
+    tools.addElement(new ResizerTool(new ImageIcon(path+"resizer.gif")));
+    tools.addElement(new ZoomTool(new ImageIcon(path+"zoomer.gif")));
 
   }
 
@@ -426,10 +409,12 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   
   ExplodeGraphicContext gc;
 
-  Vector tools;
+  // the tools are static: this means that there will be, say, just one arrow
+  // tool instance in the system
   EditorToolbar itsToolbar;
 
-  Tool itsDefaultTool;
+  static Vector tools;
+  static Tool itsDefaultTool;
 
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
   

@@ -1,6 +1,7 @@
 package ircam.jmax.toolkit;
 
 import java.util.*;
+import java.awt.datatransfer.*;
 
 import ircam.jmax.utils.*;
 
@@ -8,9 +9,14 @@ import ircam.jmax.utils.*;
  * An abstract base class implementing the selection interface,
  * taking care of the listener's mechanism; actually, only the 
  * selectAll() method needs to be implemented.
+ * An abstract selection implements the Transferable interface, in
+ * order to provide a support for clipboard operations based on selections.
+ * Add the flavours this selection can support via the addFlavour method,
+ * And redefine the getTransferData method in order to return the
+ * Transferable suited for your kind of object
  * @see SelectionHandler
  */
-public abstract class AbstractSelection implements SelectionHandler {
+public abstract class AbstractSelection implements SelectionHandler, Transferable {
   
 
   /**
@@ -20,6 +26,7 @@ public abstract class AbstractSelection implements SelectionHandler {
   {
     selected = new MaxVector();
     listeners = new MaxVector();
+    dataFlavors = new MaxVector();
   }
 
   /**
@@ -160,11 +167,40 @@ public abstract class AbstractSelection implements SelectionHandler {
       }
   }
 
+  /** utility function */
+  protected void addFlavor(DataFlavor flavor)
+  {
+    dataFlavors.addElement(flavor);
+  }
+
+  /** Transferable interface */
+  public boolean isDataFlavorSupported(DataFlavor flavor)
+  {
+    for (int i = 0; i < dataFlavors.size(); i++)
+      {
+	if (flavor.equals(dataFlavors.getObjectArray()[i]))
+	  return true;
+      }
+    return false;
+  }
+
+  /** Transferable interface */
+  public DataFlavor[] getTransferDataFlavors()
+  {
+    return (DataFlavor[]) dataFlavors.getObjectArray();
+  }
+
+  /** Transferable interface */
+  public Object getTransferData(DataFlavor flavor) 
+  {
+    return null;
+  }
 
   //--- Fields
 
   protected MaxVector selected;
   protected MaxVector listeners;
+  protected MaxVector dataFlavors;
 
   public static final int OBJECT_SELECTED = 1;
   public static final int GROUP_SELECTED = 2;

@@ -3,6 +3,7 @@ SOURCES = \
 	$(INCLUDE_PATH)/AbstractLayer.java	\
 	$(INCLUDE_PATH)/AbstractRenderer.java	\
 	$(INCLUDE_PATH)/AbstractUndoableObject.java	\
+	$(INCLUDE_PATH)/ClipableData.java	\
 	$(INCLUDE_PATH)/DirectionChooser.java		\
 	$(INCLUDE_PATH)/DynamicDragListener.java		\
 	$(INCLUDE_PATH)/DirectionListener.java		\

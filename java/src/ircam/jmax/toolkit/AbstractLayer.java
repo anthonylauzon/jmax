@@ -4,7 +4,7 @@ package ircam.jmax.toolkit;
 import java.awt.*;
 
 /** A simple implementation of the Layer interface, with a default behaviour
- * for the render method with Rectangle.
+ * for the render method with Rectangle argument.
  * See the Layer interface for a documentation on the Layer mechanism. 
  * @see Layer 
  * @see RenderManager*/
@@ -26,3 +26,4 @@ public abstract class AbstractLayer implements Layer {
     return null;
   }
 }
+

@@ -1,23 +1,22 @@
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.MaxApplication;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
 import java.lang.*;
+import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
 
 
 /**
  * A concrete implementation of the ExplodeDataModel.
- * It handles the datas coming from a remote explode in FTS
+ * It handles the datas coming from a remote explode in FTS.
+ * ExplodeRemoteData offers support for undo and clipboard operations.
  */
-// implementation notes: the structure used is an ordered array of ScrEvents.
-// A better structure for look-up (ex. TDTree) would require the use of a
-// mean of communicate the identity of an event between the editor and the explode not
-// based on indexes.
-public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeDataModel
+public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeDataModel, ircam.jmax.toolkit.ClipableData, ClipboardOwner
 {
   /* Events are stored in an array; the array is larger than
      needed to allow insertions, and reallocated by need.
@@ -25,7 +24,12 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
      need moving objects around; then, we assume that lookup
      is more frequent than editing (true, every repaint imply
      a look up) */
-
+  // implementation notes: the structure reflects the ordered array of events
+  // in FTS.
+  // A better structure for look-up (ex. TDTree) would require the use of a
+  // mean of communicate the identity of an event between the editor 
+  // and FTS that is not based on indexes.
+  
 
   /**
    * constructor.
@@ -622,7 +626,62 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     }
   }
 
-  
+  // ClipableData functionalities
+  public void cut()
+  {
+    copy();
+    // remove them
+    
+    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+      removeEvent((ScrEvent)(e.nextElement()));
+  }  
+
+  public void copy()
+  {
+    MaxApplication.systemClipboard.setContents(ExplodeSelection.getSelection().getACopy(), this);
+  }  
+
+
+  public void paste()
+  {
+    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    ExplodeSelection objectsToPaste = null;
+
+    if (clipboardContent.isDataFlavorSupported(ExplodeDataFlavor.getInstance()))
+      {
+	try {
+	  objectsToPaste = (ExplodeSelection) clipboardContent.getTransferData(ExplodeDataFlavor.getInstance());
+	} catch (UnsupportedFlavorException ufe)
+	  {
+	    // this should never happen, but...
+	    System.err.println("Clipboard error in paste: content does not support "+ExplodeDataFlavor.getInstance().getHumanPresentableName());
+	  } 
+	catch (IOException ioe)
+	  {
+	    System.err.println("Clipboard error in paste: content is no more an "+ExplodeDataFlavor.getInstance().getHumanPresentableName());
+	  }
+
+      }
+
+    if (objectsToPaste != null)
+      {
+	ScrEvent event;
+	
+	beginUpdate();  //the paste is undoable
+	for (Enumeration e = objectsToPaste.getSelected(); e.hasMoreElements();)
+	  {
+	    event = (ScrEvent) e.nextElement();
+	    addEvent(event);
+	  }
+	endUpdate();
+      }
+    
+  }  
+
+  public void lostOwnership(Clipboard clipboard,
+			    Transferable contents)
+  {
+  }
 
   //----- Fields
   /** Key for remote call add */

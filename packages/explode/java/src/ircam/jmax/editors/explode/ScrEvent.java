@@ -135,8 +135,8 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject{
     if (time < 0) time = 0;
     if (itsExplodeDataModel != null)
       {
-	if (itsExplodeDataModel.isInGroup())
-	  itsExplodeDataModel.postEdit(new UndoableMove(this));
+	if (((UndoableData) itsExplodeDataModel).isInGroup())
+	  ((UndoableData) itsExplodeDataModel).postEdit(new UndoableMove(this));
 	
 	itsExplodeDataModel.moveEvent(this, time);
       }
@@ -149,8 +149,8 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject{
     if (pitch < 0) pitch = 0;
     if (itsExplodeDataModel != null)
       {
-	if (itsExplodeDataModel.isInGroup())
-	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+	if (((UndoableData) itsExplodeDataModel).isInGroup())
+	  ((UndoableData) itsExplodeDataModel).postEdit(new UndoableEventTransformation(this));
       }
 
     itsPitch = pitch;
@@ -167,8 +167,8 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject{
     if (duration < 0) duration = 0;
     if (itsExplodeDataModel != null)
       {
-	if (itsExplodeDataModel.isInGroup())
-	itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+	if (((UndoableData) itsExplodeDataModel).isInGroup())
+	((UndoableData) itsExplodeDataModel).postEdit(new UndoableEventTransformation(this));
       }
 
     itsDuration = duration;
@@ -185,8 +185,8 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject{
     if (velocity <0) velocity = 0;
     if (itsExplodeDataModel != null)
       {
-	if (itsExplodeDataModel.isInGroup())
-	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+	if (((UndoableData) itsExplodeDataModel).isInGroup())
+	  ((UndoableData) itsExplodeDataModel).postEdit(new UndoableEventTransformation(this));
       }
 
     itsVelocity = velocity;
@@ -204,8 +204,8 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject{
     if (channel > 15) channel = 15;
     if (itsExplodeDataModel != null)
       {
-	if (itsExplodeDataModel.isInGroup())
-	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+	if (((UndoableData) itsExplodeDataModel).isInGroup())
+	  ((UndoableData) itsExplodeDataModel).postEdit(new UndoableEventTransformation(this));
       }
 
     itsChannel = channel;
@@ -227,12 +227,12 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject{
   /** Undoable data interface */
   public void beginUpdate()
   {
-    itsExplodeDataModel.beginUpdate();
+    ((UndoableData) itsExplodeDataModel).beginUpdate();
   }
 
   public void endUpdate()
   {
-    itsExplodeDataModel.endUpdate();
+    ((UndoableData) itsExplodeDataModel).endUpdate();
   }
 
   public String toString()

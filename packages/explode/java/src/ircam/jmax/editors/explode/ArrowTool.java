@@ -21,11 +21,9 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   /**
    * Constructor. 
    */
-  public ArrowTool(GraphicContext theGc, ImageIcon theImageIcon) 
+  public ArrowTool(ImageIcon theImageIcon) 
   {
     super("arrow", theImageIcon);
-    
-    gc = theGc;
     
     itsDirectionChooser = new DirectionChooser(this);
     itsSelectionMover = new ExplodeSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
@@ -95,7 +93,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     if (itsMoveMode == CLONE) 
       {
 	// starts a serie of undoable add transition
-	egc.getDataModel().beginUpdate();
+	((UndoableData)egc.getDataModel()).beginUpdate();
 	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    aEvent = (ScrEvent) e.nextElement();
@@ -113,14 +111,14 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	    
 
 	  }
-	egc.getDataModel().endUpdate();
+	((UndoableData) egc.getDataModel()).endUpdate();
       }
 
     else
       {
 	// starts a serie of undoable moves
 	
-	egc.getDataModel().beginUpdate();
+	((UndoableData) egc.getDataModel()).beginUpdate();
 	
 	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
 	  {
@@ -132,7 +130,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	      egc.getAdapter().setY(aEvent, egc.getAdapter().getY(aEvent)+deltaY);
 	  }
 	
-	egc.getDataModel().endUpdate();
+	((UndoableData) egc.getDataModel()).endUpdate();
 	
       }
     

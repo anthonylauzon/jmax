@@ -19,11 +19,10 @@ public class ScrAddingTool extends Tool implements PositionListener {
    * the Adapter, the model. All these informations are in the
    * given graphic context.
    */
-  public ScrAddingTool(GraphicContext theGc, ImageIcon theImageIcon) 
+  public ScrAddingTool(ImageIcon theImageIcon) 
   {
     super("adder", theImageIcon);
 
-    gc = theGc;
     itsMouseTracker = new VerboseMouseTracker(this);
   }
 
@@ -53,17 +52,16 @@ public class ScrAddingTool extends Tool implements PositionListener {
     ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
     ScrEvent aEvent = new ScrEvent();
 
-
     egc.getAdapter().setX(aEvent, x);
     egc.getAdapter().setY(aEvent, y);
 
     // starts an undoable transition
-    egc.getDataModel().beginUpdate();
+    ((UndoableData) egc.getDataModel()).beginUpdate();
 
     egc.getDataModel().addEvent(aEvent);
 
     // ends the undoable transition
-    egc.getDataModel().endUpdate();
+    ((UndoableData) egc.getDataModel()).endUpdate();
 
     
   } 

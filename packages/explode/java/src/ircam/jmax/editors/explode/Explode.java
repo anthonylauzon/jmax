@@ -14,7 +14,6 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.undo.*;
 
-
 /**
  * the main class of the explode package.
  * It inherits from MaxEditor, and implements the MaxDataEditor Interface.
@@ -40,7 +39,7 @@ public class Explode extends MaxEditor implements AAAReadme {
     itsPanel = new ScrPanel(explodeData);
     getContentPane().add(itsPanel);
     
-    toolbar = itsPanel.prepareToolbar();
+    itsPanel.prepareToolbar();
     
     
     //----
@@ -60,11 +59,6 @@ public class Explode extends MaxEditor implements AAAReadme {
   public void SetupMenu()
   {
     Menu editMenu = getEditMenu();
-
-    editMenu.remove(getCopyMenu());
-    editMenu.remove(getPasteMenu());
-    editMenu.remove(getCutMenu());
-    editMenu.remove(getDuplicateMenu());
 
     Menu optionsMenu = new Menu("Options");    
 
@@ -103,11 +97,27 @@ public class Explode extends MaxEditor implements AAAReadme {
 
   }
 
+  //6 jan.
+  protected void Copy()
+  {
+    ((ClipableData) explodeData).copy();
+  }
+
+  protected void Cut()
+  {
+    ((ClipableData) explodeData).cut();
+  }
+
+  protected void Paste()
+  {
+    ((ClipableData) explodeData).paste();
+  }
+
   protected void Undo()
   {
     try 
       {
-	explodeData.undo();
+	((UndoableData) explodeData).undo();
       } catch (CannotUndoException e1) {
 	System.out.println("can't undo");
       }
@@ -117,7 +127,7 @@ public class Explode extends MaxEditor implements AAAReadme {
   {
     try 
       {
-	explodeData.redo();
+	((UndoableData) explodeData).redo();
       } catch (CannotRedoException e1) {
 	System.out.println("can't redo");
       }
@@ -128,6 +138,5 @@ public class Explode extends MaxEditor implements AAAReadme {
 
   ScrPanel itsPanel;
   ExplodeDataModel explodeData;
-  static EditorToolbar toolbar;
 }
 

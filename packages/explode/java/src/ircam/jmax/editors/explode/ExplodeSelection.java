@@ -2,13 +2,14 @@
 package ircam.jmax.editors.explode;
 
 import java.util.*;
+import java.awt.datatransfer.*;
 import ircam.jmax.toolkit.*;
 
 /**
  * A selection of explode events. Use the static constructor to create the
  * (unique) explode selection of the system.
  */ 
-public class ExplodeSelection extends AbstractSelection implements ExplodeDataListener {
+public class ExplodeSelection extends AbstractSelection implements ExplodeDataListener{
 
   /**
    * constructor
@@ -17,6 +18,7 @@ public class ExplodeSelection extends AbstractSelection implements ExplodeDataLi
   {
     super();
     itsModel = theModel;
+    addFlavor(ExplodeDataFlavor.getInstance());
   }
 
   /**
@@ -67,8 +69,40 @@ public class ExplodeSelection extends AbstractSelection implements ExplodeDataLi
       deSelect(whichObject);
   }
 
+  /** Transferable interface */
+  public Object getTransferData(DataFlavor flavor) 
+  {
+    return itsCopy; 
+  }
+
+  /**
+   * Function used by clipboard operations.
+   */ 
+  ExplodeSelection getACopy()
+  {
+    if (itsCopy == null) itsCopy = new ExplodeSelection(itsModel);
+    else itsCopy.deselectAll();
+    
+    ScrEvent aEvent;
+
+    for (Enumeration e = getSelected(); e.hasMoreElements();)
+      {
+	aEvent = (ScrEvent) e.nextElement();
+	
+	itsCopy.select(new ScrEvent(aEvent.getDataModel(),
+				    aEvent.getTime(),
+				    aEvent.getPitch(),
+				    aEvent.getVelocity(),
+				    aEvent.getDuration(),
+				    aEvent.getChannel()));
+      }
+
+    return itsCopy;
+  }
+
   //--- Fields
   private static ExplodeSelection itsSelection; 
+  private static ExplodeSelection itsCopy; // for clipboard use
   ExplodeDataModel itsModel;
 
 }

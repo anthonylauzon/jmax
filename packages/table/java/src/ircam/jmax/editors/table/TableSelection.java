@@ -7,7 +7,7 @@ import ircam.jmax.toolkit.*;
 
 /**
  * The selection in a table.
- * In this implementation, it is represented as am array of booleans,
+ * In this implementation, it is represented as an array of booleans,
  * so the basic "object" to select is actually a range (represented as an awt Point). 
  * @see AbstractSelection 
  *

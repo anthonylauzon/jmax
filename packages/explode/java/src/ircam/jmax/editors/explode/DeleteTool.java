@@ -17,11 +17,10 @@ public class DeleteTool extends Tool implements PositionListener {
   /**
    * Constructor. 
    */
-  public DeleteTool(GraphicContext theGc, ImageIcon theImageIcon) 
+  public DeleteTool(ImageIcon theImageIcon) 
   {
     super("eraser", theImageIcon);
     
-    gc = theGc;    
     itsMouseTracker = new VerboseMouseTracker(this);
   }
 
@@ -52,14 +51,14 @@ public class DeleteTool extends Tool implements PositionListener {
       {
 	ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
 	// starts an undoable transition
-	egc.getDataModel().beginUpdate();
+	((UndoableData) egc.getDataModel()).beginUpdate();
 
 	if (ExplodeSelection.getSelection().isInSelection(aEvent))
 	  {
 	    Enumeration e;
 	    MaxVector v = new MaxVector();
 
-	    // copy the selected elements in another MaxVector
+	    // copy the selected elements in another MaxVector (why?)
 	    for ( e = ExplodeSelection.getSelection().getSelected();
 		  e.hasMoreElements();)
 	      {
@@ -78,7 +77,7 @@ public class DeleteTool extends Tool implements PositionListener {
 	    ExplodeSelection.getSelection().deselectAll();
 	  }
 
-	egc.getDataModel().endUpdate();
+	((UndoableData) egc.getDataModel()).endUpdate();
       }
   } 
   

@@ -23,3 +23,4 @@ public interface ToolbarProvider {
    */
   abstract GraphicContext getGraphicContext();
 }
+

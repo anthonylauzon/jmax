@@ -72,7 +72,15 @@ public class ExplodeGraphicContext extends GraphicContext {
     return itsLogicalTime;
   }
 
+  public void setToolbar(EditorToolbar t)
+  {
+    toolbar = t;
+  }
 
+  public EditorToolbar getToolbar()
+  {
+    return toolbar;
+  }
   //---- Fields 
 
 
@@ -81,6 +89,8 @@ public class ExplodeGraphicContext extends GraphicContext {
   Adapter itsAdapter;
 
   int itsLogicalTime;
+
+  EditorToolbar toolbar;
 }
 
 

@@ -18,11 +18,10 @@ public class ResizerTool extends SelecterTool implements DragListener {
   /**
    * constructor.
    */
-  public ResizerTool(GraphicContext theGc, ImageIcon theIcon) 
+  public ResizerTool(ImageIcon theIcon) 
   {
     super("Resizer", theIcon);
     
-    gc = theGc;
     itsSelectionResizer = new ExplodeSelectionResizer(this);
 
   }
@@ -64,7 +63,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
     ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
 
     // starts a serie of undoable transitions
-    egc.getDataModel().beginUpdate();
+    ((UndoableData) egc.getDataModel()).beginUpdate();
     
     for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
       {
@@ -74,7 +73,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
 	  egc.getAdapter().setLenght(aEvent, egc.getAdapter().getLenght(aEvent)+deltaX);
       }
 
-    egc.getDataModel().endUpdate();
+    ((UndoableData) egc.getDataModel()).endUpdate();
     
     mountIModule(itsSelecter);
 

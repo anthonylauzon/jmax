@@ -4,9 +4,8 @@ import javax.swing.ImageIcon;
 
 /**
  * The base class for tools: it handles the name and the icon,
- * the mounting of the interaction modules, and the activation/deactivation. 
+ * the mounting of the interaction modules, and their activation/deactivation.
  */
-//impl. note: try to merge this class with the swing concept of Action
 abstract public class Tool implements StatusBarClient{
 
   /**
@@ -20,7 +19,8 @@ abstract public class Tool implements StatusBarClient{
 
   /**
    * called when this tool is "mounted" on a Graphic context.
-   * It switches the Graphic context and mount the default IM
+   * It switches the Graphic context and mount the default IM, if no one
+   * is currently active.
    */ 
   public void reActivate(GraphicContext theGc)
   {
@@ -57,8 +57,7 @@ abstract public class Tool implements StatusBarClient{
    */
   static public void mountIModule(InteractionModule im, int x, int y) 
   {
-    //ehy!
-    /*currentInteractionModule*/im.interactionBeginAt(x, y);
+    im.interactionBeginAt(x, y);
     mountIModule(im);
 
   }

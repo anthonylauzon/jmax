@@ -42,7 +42,14 @@ public class Tabler extends MaxEditor {
   /** 
    * Personalize the menubar */
   public void SetupMenu(){
+
+    getCopyMenu().setEnabled(false);
+    getPasteMenu().setEnabled(false);
+    getCutMenu().setEnabled(false);
+    getDuplicateMenu().setEnabled(false);
+
     getEditMenu().add(new MenuItem("-"));
+
     itsRefreshMenuItem = new MenuItem("Refresh");
     getEditMenu().add(itsRefreshMenuItem);
     itsRefreshMenuItem.addActionListener(new ActionListener() {

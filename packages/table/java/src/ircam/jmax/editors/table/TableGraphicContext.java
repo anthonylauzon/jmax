@@ -26,6 +26,7 @@ public class TableGraphicContext extends GraphicContext{
   TableDataModel itsModel;
   TableAdapter itsAdapter;
   CoordinateWriter itsWriter;
+  EditorToolbar toolbar;
 
   public TableDataModel getDataModel()
   {
@@ -57,6 +58,15 @@ public class TableGraphicContext extends GraphicContext{
     itsWriter = cw;
   }
 
+  public void setToolbar(EditorToolbar t)
+  {
+    toolbar = t;
+  }
+
+  public EditorToolbar getToolbar()
+  {
+    return toolbar;
+  }
 }
 
 

@@ -30,7 +30,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     setBackground(Color.white);
     setDoubleBuffered(true);
 
-    tools = new Vector();
 
     //make the NORTH Status bar 
     prepareStatusBar();
@@ -134,14 +133,10 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
     gc.setFrame(GraphicContext.getFrame(this));
 
-    // create the unique instance of toolbar if it does not exist already
-    if (Tabler.toolbar == null) {
-      tb = new EditorToolbar(this, EditorToolbar.VERTICAL);
-    }
-    else tb = Tabler.toolbar;
+    tb = new EditorToolbar(this, EditorToolbar.VERTICAL);
+    tb.setFloatable(false);
     
-    // add itself as a client of the toolbar
-    linkToToolbar(tb);
+    gc.setToolbar(tb);
 
     // prepare the JPanel containing the toolbar when anchored
     JPanel c = new JPanel() {
@@ -176,12 +171,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     
     c.setSize(30, 200);
     
-    // idiosynchrasies of the JToolbar class:
-    // can't add directly a JPanel (jp) containing the JToolbar in a side
-    // of the main container, because unanchor the toolbar will result
-    // in emptying jp, resizing the main container, jp will desappear,
-    // and the JToolbar cannot be anchored again.
-    // must put jp in another panel instead
     toolbarPanel = new JPanel() {
       public Dimension getMinimumSize()
 	{
@@ -200,19 +189,15 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     add(toolbarPanel, BorderLayout.WEST);
 
     
-    // in case the toolbar is anchored, a new window "steals" it 
-    // from the preceding owner.
-    // the c.add() call invokes indirectly the addImpl method of the toolbar's JPanel.
-    // PROBLEM for developers: when the Toolbar changes owner, there's
-    // no way to anchor it in the preceding owner. Why? Is there a UI method
-    // to do this? Note anyway that this is a non standard behaviour..
     if ( toolbarAnchored)
       {
 	tb.setSize(30, 200);
 	c.add(tb, BorderLayout.CENTER);
       }
 
- 
+    tb.addToolListener(this);
+    itsStatusBar.post(tb.getTool(), "");
+
     return tb;
   }
 
@@ -336,15 +321,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   }
 
-  /**
-   * link this panel to a pre-existing toolbar */
-  void linkToToolbar(EditorToolbar t)
-  {
-    t.addClient(gc);
-    t.addToolListener(this);
-    itsStatusBar.post(t.getTool(), "");
-  } 
-
 
   /**
    * prepares the tools that will be used with this editor.
@@ -353,6 +329,9 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   private void initTools() 
   {
 
+    if (tools != null) return; //someone else created it
+
+    tools = new Vector();
     String fs = File.separator;
     String path = MaxApplication.getProperty("root")+fs+"packages/table/images"+fs;
 
@@ -361,7 +340,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     tools.addElement( itsDefaultTool);
     tools.addElement( new PencilTool(new ImageIcon(path+"pencil.gif")));
     tools.addElement( new LinerTool(new ImageIcon(path+"liner.gif")));
-    //tools.addElement( new TableCutter(new ImageIcon(path+"cesors.gif")));
 
   }
 
@@ -471,14 +449,14 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   //--- Fields
 
-  Vector tools;
+  static Vector tools;
   final static int PANEL_WIDTH = 500;
   final static int PANEL_HEIGHT = 300;
   InfoPanel itsStatusBar;
 
   Scrollbar itsPositionControl;
 
-  Tool itsDefaultTool;
+  static Tool itsDefaultTool;
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
 
   EditorToolbar tb;

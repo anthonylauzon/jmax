@@ -2,15 +2,16 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.toolkit.UndoableData;
+import ircam.jmax.toolkit.*;
 
 import java.util.Enumeration;
 
 /**
- * the functionalities of the model for the explode data. 
+ * the functionalities of the model for the explode data, with support 
+ * for undo and clipboard (StandardData interface) 
  * ExplodeRemoteData implements it.
  */
-public interface ExplodeDataModel extends UndoableData{
+public interface ExplodeDataModel {
 
   /**
    * how many events in the database?
