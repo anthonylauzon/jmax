@@ -12,6 +12,13 @@
 #include "runtime/sched.h"
 #include "runtime/time.h"
 
+#define TIME_DEBUG
+
+#ifdef TIME_DEBUG
+#include <stdio.h>
+static void fts_alarm_describe(char *msg, fts_clock_t *clock);
+#endif
+
 /* hack to make the old fashioned understand aswell */
 
 #ifndef SGI
@@ -341,7 +348,9 @@ fts_clock_get_real_time_p(fts_symbol_t clock_name)
 static void
 fts_clock_reset(fts_clock_t *clock)
 {
-  fts_alarm_t *p;
+  fts_alarm_t *alarm;
+
+  fts_alarm_describe("Before reset", clock); /* @@@ debug */
 
   /* Move the logical time */
 
@@ -349,19 +358,30 @@ fts_clock_reset(fts_clock_t *clock)
 
   /* update the cyclic alarms  */
 
-  for (p = clock->alarm_list; p ; p = p->next) 
-    if (p->cycle)
+  /* Wrong code: in this way 'p' can move down in the
+     list, so the work can be redone multiple times for
+     multiple timers */
+
+  for (alarm = clock->alarm_list; alarm ; alarm = alarm->next) 
+    if (alarm->cycle)
       {
-	fts_alarm_unarm(p);
-	fts_alarm_arm(p);
+	fts_alarm_unarm(alarm);
+
+	/* Update the cycle_counter */
+
+	alarm->cycle_counter = trunc(clock->logical_time / alarm->cycle) + 1;
+	alarm->when = clock->logical_time + alarm->cycle;
+
+	fts_alarm_arm(alarm);
       }
 
-  clock->future_alarm_list = clock->alarm_list;
-	  
   /* note the test on stricly less than */
 
+  clock->future_alarm_list = clock->alarm_list;
   while (clock->future_alarm_list && clock->future_alarm_list->when < *(clock->real_time))
     clock->future_alarm_list = clock->future_alarm_list->next;
+
+  fts_alarm_describe("After reset", clock); /* @@@ debug */
 }
 
 /******************************************************************************/
@@ -520,11 +540,11 @@ fts_alarm_set_cycle(fts_alarm_t *alarm, double cycle)
 
 #ifdef TIME_DEBUG
 static void
-fts_alarm_describe(fts_clock_t *clock)
+fts_alarm_describe(char *msg, fts_clock_t *clock)
 {
   fts_alarm_t *alarm;
 
-  fprintf(stderr, "Alarm queue for clock %s (time %lf)\n",
+  fprintf(stderr, "%s: Alarm queue for clock %s (time %lf)\n", msg,
 	  fts_symbol_name(clock->name), clock->logical_time);
   
   for (alarm = clock->alarm_list; alarm; alarm = alarm->next)
