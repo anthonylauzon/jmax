@@ -14,7 +14,13 @@ else
 MIDISHARE_PKG_DIR=
 endif
 
-SUBDIRS=utils control data guiobj io ispw ispwmath midi macosx numeric sequence signal system dtd @PLATFORM_PACKAGES@ $(JACK_PKG_DIR) winbuild dsdev mmio winmidi $(MIDISHARE_PKG_DIR) asio
+if COND_COMPILE_UNIXDTD
+UNIXDTD_DIR=unixdtd
+else
+UNIXDTD_DIR=
+endif
+
+SUBDIRS=utils control data guiobj io ispw ispwmath midi macosx numeric sequence signal system dtd @PLATFORM_PACKAGES@ $(JACK_PKG_DIR) winbuild dsdev mmio winmidi $(MIDISHARE_PKG_DIR) asio $(UNIXDTD_DIR)
 
 
 
