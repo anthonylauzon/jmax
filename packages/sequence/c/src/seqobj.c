@@ -170,15 +170,18 @@ seqobj_track_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_object_t *track;
   fts_atom_t a[3];
   
+  /* make new event object */
   fts_set_symbol(a + 0, seqtrack_symbol);
   fts_set_symbol(a + 1, type);
   fts_set_symbol(a + 2, name);
-
-  /* make new event object */
   fts_object_new(0, 3, a, &track);  
 
   /* add it to the track */
   sequence_add_track(this, (sequence_track_t *)track);
+
+  /* add track to sequence at client */
+  fts_set_object(a + 0, (fts_object_t *)track);	    
+  fts_client_send_message(o, sym_addTrack, 1, a);
 }
 
 /* remove track by client request */
