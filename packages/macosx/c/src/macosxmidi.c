@@ -386,6 +386,9 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       name = fts_get_symbol(&k);
       fts_client_add_symbol( o, fts_get_symbol( name));  
     }
+  fts_client_add_symbol( o, fts_s_internal); 
+  fts_client_add_symbol( o, fts_s_export); 
+
   fts_client_done_message( o);  
 
   fts_hashtable_get_keys(&this->destinations, &keys);
@@ -399,6 +402,9 @@ macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       name = fts_get_symbol(&k);
       fts_client_add_symbol( o, fts_get_symbol( name)); 
     }
+  fts_client_add_symbol( o, fts_s_internal); 
+  fts_client_add_symbol( o, fts_s_export); 
+
   fts_client_done_message( o);  
 
   /*while(label)
