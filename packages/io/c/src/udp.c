@@ -52,7 +52,7 @@ static void udp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     int port;
     struct sockaddr_in addr;
 
-    port = fts_get_int( &at[1]);
+    port = fts_get_int_arg( ac, at, 1, 0);
 
     post( "Created UDP object on port %d\n", port);
 

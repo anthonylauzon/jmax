@@ -32,7 +32,7 @@ static void
 change_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   long n;
-  if ((n = fts_get_number(at)) != ((change_t *)o)->r_state)
+  if ((n = fts_get_number_int(at)) != ((change_t *)o)->r_state)
     {
       fts_outlet_send(o, 0, fts_s_int, ac, at);
       ((change_t *)o)->r_state = n;

@@ -57,7 +57,7 @@ ibinop_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->operator = (long) fts_get_number(at);
+  this->operator = (long) fts_get_number_int(at);
 }
 
 
@@ -159,7 +159,7 @@ fbinop_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->operator = (float) fts_get_number(at);
+  this->operator = (float) fts_get_number_float(at);
 }
 
 
@@ -358,7 +358,7 @@ iadd_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = (long) fts_get_number(at);
+  this->value = (long) fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value + this->operator);
 }
 
@@ -376,7 +376,7 @@ fadd_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_float(o, 0, this->value + this->operator);
 }
 
@@ -414,7 +414,7 @@ isub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value - this->operator);
 }
 
@@ -433,7 +433,7 @@ fsub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_float(o, 0, this->value - this->operator);
 }
 
@@ -471,7 +471,7 @@ imul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value * this->operator);
 }
 
@@ -490,7 +490,7 @@ fmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_float(o, 0, this->value * this->operator);
 }
 
@@ -525,7 +525,7 @@ idiv_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
 
   if (this->operator == 0)
     {
@@ -555,7 +555,7 @@ fdiv_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
 
   /*  if (this->operator == 0.)
     {
@@ -602,7 +602,7 @@ ibus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->operator - this->value);
 }
 
@@ -620,7 +620,7 @@ fbus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_float(o, 0, this->operator - this->value);
 }
 
@@ -657,7 +657,7 @@ ivid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   if (this->value == 0)
     {
       fts_outlet_int(o, 0, 0);
@@ -685,7 +685,7 @@ fvid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   if (this->value == 0.)
     {
       fts_outlet_float(o, 0, 0.);
@@ -733,7 +733,7 @@ ige_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value >= this->operator);
 }
 
@@ -754,7 +754,7 @@ fge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_int(o, 0, this->value >= this->operator);
 }
 
@@ -791,7 +791,7 @@ ile_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value <= this->operator);
 }
 
@@ -810,7 +810,7 @@ fle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_int(o, 0, this->value <= this->operator);
 }
 
@@ -847,7 +847,7 @@ igt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value > this->operator);
 }
 
@@ -865,7 +865,7 @@ fgt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_int(o, 0, this->value >this->operator);
 }
 
@@ -900,7 +900,7 @@ ilt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value < this->operator);
 }
 
@@ -920,7 +920,7 @@ flt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_int(o, 0, this->value < this->operator);
 }
 
@@ -956,7 +956,7 @@ iee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value == this->operator);
 }
 
@@ -974,7 +974,7 @@ fee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_int(o, 0, this->value == this->operator);
 }
 
@@ -1029,7 +1029,7 @@ ine_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value != this->operator);
 }
 
@@ -1047,7 +1047,7 @@ fne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = (float) fts_get_number(at);
+  this->value = (float) fts_get_number_float(at);
   fts_outlet_int(o, 0, this->value != this->operator);
 }
 
@@ -1102,7 +1102,7 @@ imin_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, (this->value < this->operator)? this->value: this->operator);
 }
 
@@ -1120,7 +1120,7 @@ fmin_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_float(at);
   fts_outlet_int(o, 0, (this->value < this->operator)? this->value: this->operator);
 }
 
@@ -1155,7 +1155,7 @@ imax_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, (this->value > this->operator)? this->value: this->operator);
 }
 
@@ -1172,7 +1172,7 @@ fmax_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
 {
   fbinop_t *this = (fbinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_float(at);
   fts_outlet_int(o, 0, (this->value > this->operator)? this->value: this->operator);
 }
 
@@ -1209,7 +1209,7 @@ ba_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value & this->operator);
 }
 
@@ -1242,7 +1242,7 @@ bo_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value | this->operator);
 }
 
@@ -1274,7 +1274,7 @@ la_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value && this->operator);
 }
 
@@ -1305,7 +1305,7 @@ lo_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value || this->operator);
 }
 
@@ -1336,7 +1336,7 @@ pc_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
 
   if (this->operator == 0)
     {
@@ -1374,7 +1374,7 @@ ls_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value << this->operator);
 }
 
@@ -1412,7 +1412,7 @@ rs_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   ibinop_t *this = (ibinop_t *)o;
 
-  this->value = fts_get_number(at);
+  this->value = fts_get_number_int(at);
   fts_outlet_int(o, 0, this->value >> this->operator);
 }
 

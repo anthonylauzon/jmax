@@ -132,7 +132,7 @@ static void
 sig_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigobj_t *this = (sigobj_t *)o;
-  float value = (float) fts_get_number(at);
+  float value = (float) fts_get_number_float(at);
 
   ftl_data_copy(float, this->sig_ftl_data, &value);
 }

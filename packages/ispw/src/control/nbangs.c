@@ -45,7 +45,7 @@ nbangs_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int i;
 
   if ((ac >= 2) && fts_is_number(&at[1]))
-    this->count = fts_get_number(&at[1]);
+    this->count = fts_get_number_int(&at[1]);
     
   for (i = 0; i < this->count; i++)
     {
@@ -60,7 +60,7 @@ nbangs_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   nbangs_t *this = (nbangs_t *) o;
 
-  this->count = fts_get_number(at);
+  this->count = fts_get_number_int(at);
 }
 
 

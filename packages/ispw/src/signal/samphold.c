@@ -80,7 +80,7 @@ static void
 sigsamphold_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigsamphold_t *this = (sigsamphold_t *)o;
-  float f = (float) fts_get_number(at);
+  float f = (float) fts_get_number_float(at);
 
   ftl_data_set(samphold_state_t, this->samphold_ftl_data, val, &f);
 }

@@ -116,7 +116,7 @@ static void
 iroute_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int ns = ((iroute_t *)o)->ns;
-  long n = (long)fts_get_number(at), *p = ((iroute_t *)o)->s_n+ns;
+  long n = (long)fts_get_number_int(at), *p = ((iroute_t *)o)->s_n+ns;
   int match = 0;
 
   while (ns--)

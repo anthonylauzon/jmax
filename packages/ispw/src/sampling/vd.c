@@ -76,7 +76,7 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
   if(ac && fts_is_number(at))
     {
-      float max_incr = fts_get_number(at);
+      float max_incr = fts_get_number_float(at);
 
       if(max_incr < 1.0f)
 	this->max_incr = 4.0f;

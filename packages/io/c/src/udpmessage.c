@@ -97,33 +97,33 @@ static void updmessage_fd_fun( int fd, void *data)
 
 static void updmessage_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    updmessage_t *this = (updmessage_t *)o;
-    int port;
-    struct sockaddr_in addr;
+  updmessage_t *this = (updmessage_t *)o;
+  int port;
+  struct sockaddr_in addr;
 
-    port = fts_get_int( &at[1]);
+  port = fts_get_int_arg( ac, at, 1, 0);
 
-    post( "Created UDPmessage object on port %d\n", port);
+  post( "Created UDPmessage object on port %d\n", port);
 
-    this->socket = socket(AF_INET, SOCK_DGRAM, 0);
+  this->socket = socket(AF_INET, SOCK_DGRAM, 0);
 
-    if (this->socket == -1)
-	{
-	    post( "Cannot open socket\n");
-	    return;
-	}
+  if (this->socket == -1)
+    {
+      post( "Cannot open socket\n");
+      return;
+    }
 
-    memset( &addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(port);
+  memset( &addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_port = htons(port);
 
-    if ( bind( this->socket, &addr, sizeof(struct sockaddr_in)) == -1)
-	{
-	    post( "Cannot bind socket\n");
-	    close( this->socket);
-	    return;
-	}
+  if ( bind( this->socket, &addr, sizeof(struct sockaddr_in)) == -1)
+    {
+      post( "Cannot bind socket\n");
+      close( this->socket);
+      return;
+    }
 
   fts_thread_add_fd( fts_thread_get_current(), this->socket, updmessage_fd_fun, this);
 }

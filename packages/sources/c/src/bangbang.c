@@ -25,7 +25,7 @@ static void bangbang_bang( fts_object_t *object, int winlet, fts_symbol_t s, int
   int i;
 
   for ( i = this->noutlets - 1; i >= 0; i--)
-    fts_outlet_bang( object, i);
+    fts_outlet_send( object, i, fts_s_bang, 0, 0);
 }
 
 static void bangbang_init( fts_object_t *object, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

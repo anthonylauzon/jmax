@@ -72,7 +72,7 @@ static void
 tabpoke_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabpoke_t *this = (tabpoke_t *)o;
-  long n = fts_get_number(at);
+  long n = fts_get_number_int(at);
   sampbuf_t *buf;
 
   buf = sampbuf_get(this->tab_name);
@@ -102,7 +102,7 @@ tabpoke_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   tabpoke_t *this = (tabpoke_t *)o;
 
-  this->value = (float)fts_get_number(at);
+  this->value = fts_get_number_float(at);
   this->state = 1;
 }
 
@@ -120,7 +120,7 @@ static void
 tabpoke_center(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabpoke_t *this = (tabpoke_t *)o;
-  long len = fts_get_number(at);
+  long len = fts_get_number_int(at);
   sampbuf_t *buf;
 
   buf = sampbuf_get(this->tab_name);

@@ -195,7 +195,7 @@ static void
 sigline_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigline_t *this = (sigline_t *)o;
-  float target = fts_get_number(at);
+  float target = fts_get_number_float(at);
 
   sigline_set_target((sigline_t *)o, target);
 }

@@ -186,7 +186,7 @@ float fts_param_get_float(fts_symbol_t name, float default_value)
   v = fts_param_get(name);
 
   if (v && fts_is_number(v))
-    return (float) fts_get_number(v);
+    return fts_get_number_float(v);
   else
     return default_value;
 }

@@ -634,7 +634,7 @@ static void
 explode_number_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
-  long int n = fts_get_number(at);
+  long int n = fts_get_number_int(at);
   
   if (n < 0)
     n = 0;
@@ -708,7 +708,7 @@ explode_number_1_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   explode_t *this = (explode_t *)o;
 
-  this->n1 = fts_get_number(at);
+  this->n1 = fts_get_number_int(at);
   this->set1 = 1;
 }
 
@@ -719,7 +719,7 @@ explode_number_2_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   explode_t *this = (explode_t *)o;
 
-  this->n2 = fts_get_number(at);
+  this->n2 = fts_get_number_int(at);
   this->set2 = 1;
 }
 
@@ -730,7 +730,7 @@ explode_number_3_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   explode_t *this = (explode_t *)o;
 
-  this->n3 = fts_get_number(at);
+  this->n3 = fts_get_number_int(at);
   this->set3 = 1;
 }
 
@@ -741,7 +741,7 @@ explode_number_4_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   explode_t *this = (explode_t *)o;
 
-  this->n4 = fts_get_number(at);
+  this->n4 = fts_get_number_int(at);
 }
 
 /* list method, inlet 0 */

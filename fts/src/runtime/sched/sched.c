@@ -505,7 +505,7 @@ fts_sched_set_sampling_rate(void *listener, fts_symbol_t name, const fts_atom_t 
     {
       float f;
 
-      f = (float) fts_get_number(value);
+      f = fts_get_number_float(value);
       tick_length =  ((MAXVS * 1000) / f); /* set the scheduler tick */
     }
 }

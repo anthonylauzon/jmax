@@ -39,7 +39,7 @@ toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   toggle_t *this = (toggle_t *) o;
   int v;
 
-  v = fts_get_number(at);
+  v = fts_get_number_int(at);
 
   this->n = (v ? 1 : 0);
 
@@ -56,7 +56,7 @@ toggle_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if(fts_is_number(at))
     {
-      v = fts_get_number(at);
+      v = fts_get_number_int(at);
 
       this->n = (v ? 1 : 0);
 

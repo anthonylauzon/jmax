@@ -253,7 +253,7 @@ phasor_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   phasor_t *this = (phasor_t *)o;
   phasor_state_t *state = ftl_data_get_ptr(this->state);
-  double phase = (double)fts_get_number(at);
+  double phase = (double)fts_get_number_float(at);
   
   state->phase = (fts_intphase_t)(phase * FTS_INTPHASE_RANGE);
 }
@@ -265,7 +265,7 @@ phasor_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   phasor_t *this = (phasor_t *)o;
   phasor_state_t *state = ftl_data_get_ptr(this->state);
-  double f = (double) fts_get_number(at);
+  double f = (double) fts_get_number_float(at);
 
   fts_wrapper_frac_set(&state->phase, f);
 }

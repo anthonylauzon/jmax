@@ -89,7 +89,7 @@ static void
 button_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   button_t *this = (button_t *)o;
-  float time = fts_get_number(at);
+  float time = fts_get_number_float(at);
 
   if(time > 0.0f)
     this->duration = time;

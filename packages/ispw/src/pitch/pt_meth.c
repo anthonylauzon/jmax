@@ -168,7 +168,7 @@ static void pt_common_meth_coefs(fts_object_t *o, int winlet, fts_symbol_t s, in
          x->ctl.coeffs[i] = def_amp_coeffs[i];
    }else if(ac == pt_common_N_AMP_COEFFS){
       for(i=0; i<ac; i++){
-         float coef = (fts_is_number(at+i))? fts_get_number(at+i): 0.0f;
+         float coef = (fts_is_number(at+i))? fts_get_number_float(at+i): 0.0f;
          if(coef < 0) coef = 0;
          else if(coef > 1) coef = 1;
          x->ctl.coeffs[i] = coef;

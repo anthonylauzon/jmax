@@ -62,7 +62,7 @@ sigsnapshot_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   sigsnapshot_t *this = (sigsnapshot_t *)o;
 
-  this->val = (float) fts_get_number(at);
+  this->val = fts_get_number_float(at);
 }
 
 static void
