@@ -387,7 +387,8 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   status = fts_expression_new( ac, at, &expression);
   if (status == fts_ok)
   {
-    status = fts_expression_reduce( expression, patcher, 0, 0, eval_object_description_expression_callback, &data);
+      fts_patcher_t *scope = fts_patcher_get_scope(patcher);
+    status = fts_expression_reduce( expression, scope, 0, 0, eval_object_description_expression_callback, &data);
 
     if (status == fts_ok)
       obj = data.obj;
@@ -999,10 +1000,10 @@ object_move_properties(fts_object_t *old, fts_object_t *new)
   /* copy only the editor properties here, not the others !!! */
   if (fts_object_is_standard_patcher(old))
   {
-    fts_patcher_set_wx((fts_patcher_t *)new, fts_patcher_get_wx((fts_patcher_t *)old));
-    fts_patcher_set_wy((fts_patcher_t *)new, fts_patcher_get_wy((fts_patcher_t *)old));
-    fts_patcher_set_ww((fts_patcher_t *)new, fts_patcher_get_ww((fts_patcher_t *)old));
-    fts_patcher_set_wh((fts_patcher_t *)new, fts_patcher_get_wh((fts_patcher_t *)old));
+      object_move_property(old, new, fts_s_wx);
+      object_move_property(old, new, fts_s_wy);
+      object_move_property(old, new, fts_s_ww);
+      object_move_property(old, new, fts_s_wh);
   }
 
   object_move_property(old, new, fts_s_x);

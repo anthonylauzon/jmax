@@ -1703,11 +1703,10 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   
   if (fts_object_is_patcher(obj))
   {
-    fts_patcher_t *patobj = (fts_patcher_t *)obj;
-    fts_bmax_code_new_property_int(f, obj, fts_s_wx, fts_patcher_get_wx(patobj));
-    fts_bmax_code_new_property_int(f, obj, fts_s_wy, fts_patcher_get_wy(patobj));
-    fts_bmax_code_new_property_int(f, obj, fts_s_ww, fts_patcher_get_ww(patobj));
-    fts_bmax_code_new_property_int(f, obj, fts_s_wh, fts_patcher_get_wh(patobj));
+    fts_bmax_code_new_property(f, obj, fts_s_wx);
+    fts_bmax_code_new_property(f, obj, fts_s_wy);
+    fts_bmax_code_new_property(f, obj, fts_s_ww);
+    fts_bmax_code_new_property(f, obj, fts_s_wh);
   }
 
   /* if argc is zero, we pop the 0 value pushed above */
@@ -1772,10 +1771,10 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_fontSize);
   fts_bmax_code_new_property(f, obj, fts_s_fontStyle);
 
-  fts_bmax_code_new_property_int(f, obj, fts_s_wx, fts_patcher_get_wx(patobj));
-  fts_bmax_code_new_property_int(f, obj, fts_s_wy, fts_patcher_get_wy(patobj));
-  fts_bmax_code_new_property_int(f, obj, fts_s_ww, fts_patcher_get_ww(patobj));
-  fts_bmax_code_new_property_int(f, obj, fts_s_wh, fts_patcher_get_wh(patobj));
+  fts_bmax_code_new_property(f, obj, fts_s_wx);
+  fts_bmax_code_new_property(f, obj, fts_s_wy);
+  fts_bmax_code_new_property(f, obj, fts_s_ww);
+  fts_bmax_code_new_property(f, obj, fts_s_wh);
 
   fts_bmax_code_new_property(f, obj, fts_s_layer);
 

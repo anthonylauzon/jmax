@@ -55,12 +55,6 @@ struct fts_patcher
   fts_symbol_t file_name;
   
   int save_id;
-  
-  /* patcher window properties */
-  int wx;
-  int wy;
-  int ww;
-  int wh;
 };    
 
 #define fts_patcher_is_open(p)     ((p)->open)
