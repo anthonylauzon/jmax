@@ -48,9 +48,21 @@ io_config(void)
   udpreceive_config();
   udpsend_config();
 
-#if 0
+/* serial devices are only available on linux ? */
+#ifdef linux
   serial_config();
+#endif /* linux */
+
+#if 0 
   wacom_config();
-#endif
-#endif
+#endif /* no yet tested */
+ 
+#endif /* WIN32 */
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
