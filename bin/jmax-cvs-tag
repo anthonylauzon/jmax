@@ -1,0 +1,79 @@
+#!/bin/sh
+# ---------------------------------------------------------------------------
+help ()
+{
+    cat >&2 << HELP_EOF
+
+Usage:
+    jmax-cvs-tag [-qualifier <qualifier>]
+
+Does a ``cvs tag'' of the sources of jMax.
+
+The tag used is the following string:
+V_M_N_P<qualifier>
+where M, N and P are respectively the major number, minor number and
+patch level of the current release, taken from file VERSION.
+
+Options:
+  -qualifier <qualifier>           (optional)
+    defines the qualifier part of the tag
+
+HELP_EOF
+}
+
+# ---------------------------------------------------------------------------
+# Options decrypting
+OPT="none"
+QUALIFIER=
+
+for ARG in $@
+do
+    if [ $OPT = "none" ]
+    then
+	case $ARG in
+	\-qualifier )
+	    OPT=$ARG ;;
+	\-help | \-h | \-\? )
+	    help ;
+	    exit 2 ;;
+	*)
+	    help ;
+	    exit 2 ;;
+	esac
+    else
+	case $OPT in
+	\-qualifier )
+	    QUALIFIER=$ARG ;;
+	esac
+	OPT="none";
+    fi
+done
+
+# ---------------------------------------------------------------------------
+# Check that we have all what we need
+if [ `hostname` != maelzel ]
+then
+    echo "Incorrect host (log on maelzel to call this script, because CVS ...)"
+    exit 1
+fi
+
+if [ \! -r VERSION ]
+then
+    echo "Cannot find file VERSION (probably you're not in the correct directory ...)"
+    exit 1
+fi
+
+# ---------------------------------------------------------------------------
+MAJOR=`awk '$1=="MAJOR" { print $2; }' VERSION`
+MINOR=`awk '$1=="MINOR" { print $2; }' VERSION`
+PATCH_LEVEL=`awk '$1=="PATCH_LEVEL" { print $2; }' VERSION`
+
+VERSION=$MAJOR.$MINOR.$PATCH_LEVEL
+
+V=`echo $VERSION | sed -e 's/^/V_/' -e 's/\./_/g'`
+TAG="${V}${QUALIFIER}"
+
+echo "... Tagging sources with tag $TAG"
+cvs tag $TAG
+
+echo "... Done"
