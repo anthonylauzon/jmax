@@ -3,7 +3,6 @@ package_JAVA = \
 AdderTool.java \
 ArrowTool.java \
 CombTool.java \
-DeleteTool.java \
 LinerTool.java \
 ResizerTool.java \
 ScrollerTool.java \

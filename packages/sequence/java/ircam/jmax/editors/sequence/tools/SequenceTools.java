@@ -49,12 +49,11 @@ public class SequenceTools implements ToolProvider{
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
     tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));
-    tools[2] = new DeleteTool(new ImageIcon(path+"delete.gif"));
-    tools[3] = new ResizerTool(new ImageIcon(path+"hresize.gif"));
-    tools[4] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-    tools[5] = new ScrollerTool(new ImageIcon(path+"scroller.gif"));
-    tools[6] = new LinerTool(new ImageIcon(path+"liner.gif"));
-    tools[7] = new CombTool(new ImageIcon(path+"comber.gif"));
+    tools[2] = new ResizerTool(new ImageIcon(path+"hresize.gif"));
+    tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+    tools[4] = new ScrollerTool(new ImageIcon(path+"scroller.gif"));
+    tools[5] = new LinerTool(new ImageIcon(path+"liner.gif"));
+    tools[6] = new CombTool(new ImageIcon(path+"comber.gif"));
   }
 
   public Enumeration getTools()
@@ -86,7 +85,7 @@ public class SequenceTools implements ToolProvider{
   }
 
   //---
-  Tool tools[] = new Tool[8];
+  Tool tools[] = new Tool[7];
   public static SequenceTools instance = new SequenceTools();
 }
 

@@ -106,7 +106,6 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   {
     itsSelectionMover.setDirection(theDirection);
     mountIModule(itsSelectionMover, startingPoint.x, startingPoint.y);
-
   }
   
   /**

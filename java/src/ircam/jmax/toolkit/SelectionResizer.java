@@ -46,8 +46,17 @@ abstract public class SelectionResizer extends InteractionModule implements XORP
     itsXORHandler = new XORHandler(this, XORHandler.ABSOLUTE);
     itsStartingPoint = new Point();
 
+    movement = HORIZONTAL_MOVEMENT;
   }
-  
+
+  /**
+   * set the direction of movement (constants HORIZONTAL_MOVEMENT  or 
+   * VERTICAL_MOVEMENT, or both)
+   */
+  public void setDirection(int theDirection) 
+  {
+    movement = theDirection;
+  }
 
   /**
    * sets the point on which to start the movement
@@ -65,7 +74,6 @@ abstract public class SelectionResizer extends InteractionModule implements XORP
    */
   public void mouseDragged(MouseEvent e) 
   {
-
     itsXORHandler.moveTo(e.getX(), e.getY());
   }
 
@@ -76,7 +84,16 @@ abstract public class SelectionResizer extends InteractionModule implements XORP
   {
     itsXORHandler.end();
 
-    itsListener.dragEnd(e.getX(), e.getY(), e); //this 0 is not generic!
+    int endX = itsStartingPoint.x;
+    int endY = itsStartingPoint.y;
+
+    if ( movement == HORIZONTAL_MOVEMENT)
+      endX = e.getX();
+    else     
+      if ( movement == VERTICAL_MOVEMENT)
+	endY = e.getY();
+    
+    itsListener.dragEnd( endX, endY, e);
     InteractionSemaphore.unlock();
   }
 
@@ -103,5 +120,7 @@ abstract public class SelectionResizer extends InteractionModule implements XORP
   protected int previousY;
 
   public Point itsStartingPoint;
-
+  public static final int HORIZONTAL_MOVEMENT = 1;
+  public static final int VERTICAL_MOVEMENT = 2; 
+  protected int movement;
 }

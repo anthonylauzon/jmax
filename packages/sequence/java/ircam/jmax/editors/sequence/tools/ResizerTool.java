@@ -37,7 +37,7 @@ import javax.swing.undo.*;
  * It uses a SelectionResizer to actually resize the
  * objects.
  */
-public class ResizerTool extends SelecterTool implements DragListener {
+public class ResizerTool extends SelecterTool implements DirectionListener, DragListener {
 
   /**
    * constructor.
@@ -46,6 +46,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
   {
     super("Resizer", theIcon);
     
+    itsDirectionChooser = new DirectionChooser(this);
     itsSelectionResizer = new SequenceSelectionResizer(this);
   }
 
@@ -58,12 +59,30 @@ public class ResizerTool extends SelecterTool implements DragListener {
   }
 
   /**
+   * called by the DirectionChooser UI module
+   */
+  public void directionChoosen(int theDirection) 
+  {
+    itsSelectionResizer.setDirection(theDirection);
+    mountIModule(itsSelectionResizer, startingPoint.x, startingPoint.y);    
+  }
+  
+  /**
+   * called by the DirectionChooser UI module
+   */
+  public void directionAbort()
+  {
+    mountIModule(itsSelecter);
+  }
+  
+  /**
    * a single object has been selected, in coordinates x, y:
    * Mount the resizer interaction module.
    * Overrides the abstract SelecterTool.singleObjectSelected */
   public void singleObjectSelected(int x, int y, int modifiers) 
   {
-    mountIModule(itsSelectionResizer, x, y);
+    //mountIModule(itsSelectionResizer, x, y);
+    mountIModule(itsDirectionChooser, x, y);
   }
 
   /** 
@@ -82,19 +101,33 @@ public class ResizerTool extends SelecterTool implements DragListener {
   {
     TrackEvent aEvent;
 
-    int deltaX = x-startingPoint.x;
+    int deltaX = x-startingPoint.x; 
+    int deltaY = y-startingPoint.y;
+
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
     // starts a serie of undoable transitions
     ((UndoableData) egc.getDataModel()).beginUpdate();
     
-    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-      {
-	aEvent = (TrackEvent) e.nextElement();
+    if( deltaX != 0)
+      for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	{
+	  aEvent = (TrackEvent) e.nextElement();
 
-	if (egc.getAdapter().getLenght(aEvent)+deltaX > 0)
-	  egc.getAdapter().setLenght(aEvent, egc.getAdapter().getLenght(aEvent)+deltaX);
-      }
+	  if (egc.getAdapter().getLenght( aEvent) + deltaX > 0)
+	    egc.getAdapter().setLenght( aEvent, egc.getAdapter().getLenght( aEvent) + deltaX);
+	}
+    else
+      if( deltaY != 0)
+	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	  {
+	    aEvent = (TrackEvent) e.nextElement();
+	    
+	    if ( egc.getAdapter().getHeigth( aEvent) - deltaY >= 0)
+	      egc.getAdapter().setHeigth( aEvent, egc.getAdapter().getHeigth( aEvent) - deltaY);
+	    else
+	      egc.getAdapter().setHeigth( aEvent, 0);
+	  }          
 
     ((UndoableData) egc.getDataModel()).endUpdate();
     
@@ -109,8 +142,8 @@ public class ResizerTool extends SelecterTool implements DragListener {
   }
     
   //------------ Fields
-  SelectionResizer itsSelectionResizer;
-
+  SequenceSelectionResizer itsSelectionResizer;
+  DirectionChooser itsDirectionChooser;
 }
 
 

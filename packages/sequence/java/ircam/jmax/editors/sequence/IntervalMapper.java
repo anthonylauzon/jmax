@@ -35,7 +35,7 @@ public class IntervalMapper extends Mapper {
   {
     if (value < 0)
       {
-	value = -value;
+	value = 0;
       }
     
     e.setProperty("interval", new Double(value));    

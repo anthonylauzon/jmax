@@ -44,7 +44,7 @@ public class SequenceSelectionResizer extends SelectionResizer {
 
     initAutoScroll();
   }
-  
+
   /******************* autoscrolling *******************/
 
   javax.swing.Timer scrollTimer;
@@ -160,21 +160,39 @@ public class SequenceSelectionResizer extends SelectionResizer {
     TrackEvent aTrackEvent;
     UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), egc.getDataModel());
 
-    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-      {
-	aTrackEvent = (TrackEvent) e.nextElement();
-	a.setX( tempEvent, a.getX( aTrackEvent));
-	a.setY( tempEvent, a.getY( aTrackEvent));
-	a.setHeigth( tempEvent, a.getHeigth( aTrackEvent));
-	a.setType( tempEvent, a.getType( aTrackEvent));
+    if( movement == HORIZONTAL_MOVEMENT)
+      for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	{
+	  aTrackEvent = (TrackEvent) e.nextElement();
+	  a.setX( tempEvent, a.getX( aTrackEvent));
+	  a.setY( tempEvent, a.getY( aTrackEvent));
+	  a.setHeigth( tempEvent, a.getHeigth( aTrackEvent));
+	  a.setType( tempEvent, a.getType( aTrackEvent));
 
-	a.setLenght( tempEvent, a.getLenght( aTrackEvent) + dx);
-	aTrackEvent.getRenderer().renderBounds( tempEvent, g, false, egc);
-	
-	if( aTrackEvent == last) 
+	  a.setLenght( tempEvent, a.getLenght( aTrackEvent) + dx);
+	  aTrackEvent.getRenderer().renderBounds( tempEvent, g, false, egc);
+	  
+	  if( aTrackEvent == last) 
 	    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),
 				    a.LenghtMapper.getName()+" "+a.getInvLenght(tempEvent));
-      }
+	}
+    else
+      for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	{
+	  aTrackEvent = (TrackEvent) e.nextElement();
+	  a.setX( tempEvent, a.getX( aTrackEvent));
+	  a.setY( tempEvent, a.getY( aTrackEvent));
+	  a.setLenght( tempEvent, a.getLenght( aTrackEvent));
+	  a.setType( tempEvent, a.getType( aTrackEvent));
+
+	  a.setHeigth( tempEvent, a.getHeigth( aTrackEvent) - dy);
+
+	  aTrackEvent.getRenderer().renderBounds( tempEvent, g, false, egc);
+	  
+	  if( aTrackEvent == last) 
+	    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),
+				    a.HeigthMapper.getName()+" "+a.getHeigth( tempEvent));
+	}
 	 
     g.setPaintMode();
     g.setColor(Color.black);
@@ -182,8 +200,6 @@ public class SequenceSelectionResizer extends SelectionResizer {
     g.setClip(tempr);//????
     g.dispose();
   }
-
-  //---- Fields
 }
 
 

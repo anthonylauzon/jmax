@@ -108,21 +108,19 @@ abstract public class Adapter implements MappingListener{
   /**
    * set the parameter of the event associated with the graphic X
    */
-    public void setX(Event e, int x) 
-    {
-	XMapper.set(e, getInvX(x));
-    }
-
+  public void setX(Event e, int x) 
+  {
+    XMapper.set(e, getInvX(x));
+  }
 
   /**
    * set the parameter of the event associated with the Y
    */
-    public void setY(Event e, int y) 
-    {
-	YMapper.set(e, y);
-    }
+  public void setY(Event e, int y) 
+  {
+    YMapper.set(e, y);
+  }
   
-
   /**
    * get the Lenght value for this event
    */
@@ -143,10 +141,10 @@ abstract public class Adapter implements MappingListener{
     {
     }
 
-    public int getHeigth(Event e)
-    {
-	return NOTE_DEFAULT_HEIGTH;
-    }
+  public int getHeigth(Event e)
+  {
+    return NOTE_DEFAULT_HEIGTH;
+  }
  
   /**
    * get the label value (int) for this event
