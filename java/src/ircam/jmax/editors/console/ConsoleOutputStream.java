@@ -29,15 +29,14 @@ import java.io.*;
 import ircam.jmax.widgets.ConsoleArea;
 
 /**
- * The console outptut stream, used to construct a PrintStream
+ * The console output stream, used to construct a PrintStream
  * that can be used as System.out.
  */
 
-class ConsoleOutputStream extends OutputStream
-{
+public class ConsoleOutputStream extends OutputStream {
   private ConsoleArea consoleArea;
   private StringBuffer buffer;
-  int prev;
+  private int prev;
 
   public ConsoleOutputStream( ConsoleArea consoleArea)
   {
@@ -45,27 +44,29 @@ class ConsoleOutputStream extends OutputStream
     buffer = new StringBuffer();
   }
 
-  public void write( int b) 
-  {
-      /* We have to handle the "\r\n" sequence on the windows
-         systems. */
-      if (b == '\r') {
-	appendToConsole();
-      } else if (b == '\n') {
-	if (prev != '\r') {
-  	  appendToConsole();
-	}
-      } else {
-	buffer.append( (char)b );
-      }
-      
-      prev = b;
-  }
-
-  public void appendToConsole()
+  private void appendToConsole()
   {
     consoleArea.append( buffer.toString());
     buffer.setLength(0);
+  }
+
+  public void write( int b) 
+  {
+    /* We have to handle the "\r\n" sequence on the windows
+       systems. */
+    if (b == '\r')
+      appendToConsole();
+    else if (b == '\n') 
+      {
+	if (prev != '\r') 
+	  {
+	    appendToConsole();
+	  }
+      } 
+    else
+      buffer.append( (char)b );
+      
+    prev = b;
   }
 
   public void flush()

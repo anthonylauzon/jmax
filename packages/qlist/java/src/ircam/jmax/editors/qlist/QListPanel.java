@@ -189,12 +189,12 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
   public void Copy(){
     if (itsTextArea.getSelectedText() != null){
       String toCopy = itsTextArea.getSelectedText();
-      MaxApplication.systemClipboard.setContents(new StringSelection(toCopy), this);
+      JMaxApplication.getSystemClipboard().setContents(new StringSelection(toCopy), this);
     }
   }
 
   public void Paste(){
-    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
     if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor)){
       try{
 	String toPaste = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);

@@ -73,10 +73,10 @@ public class ToolBar extends JPanel implements ComponentListener{
     bGroup = new ButtonGroup();
     bGroup.add( noneButton);
 
-    lockEditButton = new JToggleButton( SystemIcons.get( "_lock_mode_"));
+    lockEditButton = new JToggleButton( JMaxIcons.lockMode);
     lockEditButton.setDoubleBuffered( false);
     lockEditButton.setMargin( new Insets(0,0,0,0));
-    lockEditButton.setSelectedIcon( SystemIcons.get( "_edit_mode_"));
+    lockEditButton.setSelectedIcon( JMaxIcons.editMode);
     lockEditButton.setFocusPainted( false);
     lockEditButton.addItemListener( new ItemListener() {
 	public void itemStateChanged(ItemEvent e)
@@ -97,7 +97,7 @@ public class ToolBar extends JPanel implements ComponentListener{
     widgets.setLayout( new BoxLayout( widgets, BoxLayout.X_AXIS));
     
     //to save button
-    toSaveButton = new JButton(SystemIcons.get( "_to_save_"));
+    toSaveButton = new JButton( JMaxIcons.toSave);
     toSaveButton.setDoubleBuffered( false);
     toSaveButton.setMargin( new Insets(0,0,0,0));
     toSaveButton.addActionListener( new ActionListener() {
@@ -116,7 +116,7 @@ public class ToolBar extends JPanel implements ComponentListener{
     if ((sketch.getFtsPatcher().getParent() != null) &&
 	(!sketch.isARootPatcher()))
       {
-	upButton = new JButton(SystemIcons.get( "_up_"));
+	upButton = new JButton( JMaxIcons.up);
 	upButton.setDoubleBuffered( false);
 	upButton.setMargin( new Insets(0,0,0,0));
 	upButton.setToolTipText("show parent patcher");

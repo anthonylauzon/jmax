@@ -28,7 +28,7 @@ public class JMaxPackageLoader {
   public static void load( String packageName) throws JMaxPackageLoadingException
   {
     String fs = File.separator;
-    String packagePath = ((String)MaxApplication.getProperty( "jmaxRoot")) + fs + "packages";
+    String packagePath = ((String)JMaxApplication.getProperty( "jmaxRoot")) + fs + "packages";
     String jarPath = packagePath + fs + packageName + fs + "java" + fs + packageName + ".jar";
 
     char[] ch = packageName.toCharArray();

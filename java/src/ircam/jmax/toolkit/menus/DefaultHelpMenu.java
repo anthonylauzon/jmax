@@ -32,66 +32,35 @@ import javax.swing.event.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.actions.*;
 
-/** Implement the patcher editor File Menu */
+public class DefaultHelpMenu extends EditorMenu {
 
-public class DefaultHelpMenu extends EditorMenu
-{
-  private boolean initDone = false;
-  private int numEntries = 0;
   public DefaultHelpMenu()
   {
     super("Help");
-    setHorizontalTextPosition(AbstractButton.LEFT);
+    setHorizontalTextPosition( AbstractButton.LEFT);
 
-    add(DefaultActions.statisticsAction, "System Info");
+    add( DefaultActions.statisticsAction, "System Info");
     addSeparator();
-
-    // Adding the summaries 
-    Enumeration en = FtsHelpPatchTable.getSummaries(); 
-
-    while (en.hasMoreElements())
-       {
-	 final String str = (String) en.nextElement();
-	 add( new OpenHelpSummaryAction(str), str);
-	 initDone = true;
-	 numEntries++;
-       }
   }
 
-  public void init()
-  {
-    if(initDone) return;
-    Enumeration en = FtsHelpPatchTable.getSummaries(); 
-    numEntries = 0;
-    while (en.hasMoreElements())
-    {
-	final String str = (String) en.nextElement();
-	add( new OpenHelpSummaryAction(str), str);
-	numEntries++;
-    }   
-  }
-    
   public void updateMenu()
   {
-      if(FtsHelpPatchTable.getNumSummaries() > numEntries) 
+    if ( FtsHelpPatchTable.getNumSummaries() > numEntries) 
       {	      
-	  Enumeration en = FtsHelpPatchTable.getSummaries(); 
-	  int count = 1;
-	  while (en.hasMoreElements())
-	      {
-		  final String str = (String) en.nextElement();
-		  if(count > numEntries)
-		      {			      
-			  add( new OpenHelpSummaryAction(str), str);
-			  numEntries++;
-		      }
-		  count++;
+	Enumeration en = FtsHelpPatchTable.getSummaries(); 
+	int count = 1;
+	while (en.hasMoreElements())
+	  {
+	    final String str = (String) en.nextElement();
+	    if(count > numEntries)
+	      {			      
+		add( new OpenHelpSummaryAction(str), str);
+		numEntries++;
 	      }
+	    count++;
+	  }
       }
   }
+
+  private int numEntries = 0;
 }
-
-
-
-
-

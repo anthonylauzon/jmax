@@ -18,10 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Based on Max/ISPW by Miller Puckette.
-//
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-// 
 
 package ircam.jmax.fts;
 
@@ -29,32 +25,28 @@ import java.io.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
-import ircam.jmax.editors.console.*;
+import ircam.jmax.widgets.ConsoleArea;
 
-/** Java class for the dsp control remote data class.
- *
- * It offer visibility and control over a number of DSP related
- * server parameter and status.
- * It is implemented as a Java Beans, with Java Beans Properties 
- * corresponding to DSP server properties.
- */
+public class FtsConsole extends FtsObject {
 
-public class FtsConsole extends FtsObject
-{
   static
   {
     FtsObject.registerMessageHandler( FtsConsole.class, FtsSymbol.get("print_line"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ConsoleWindow.append( args.getString(0)); 
+	  ((FtsConsole)obj).consoleArea.append( args.getString(0)); 
 	}
       });
   }
     
-  public FtsConsole(FtsArgs args) throws IOException
+  public FtsConsole( ConsoleArea consoleArea) throws IOException
   {
-    super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("console_stream"), args);
+    super( JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("console_stream"));
+
+    this.consoleArea = consoleArea;
   }
+
+  private ConsoleArea consoleArea;
 }
 
 

@@ -28,9 +28,17 @@ import javax.swing.*;
 public class JMaxUtilities {
   public static ImageIcon loadIconFromResource( String name, JMaxPackage jmaxPackage)
   {
-    InputStream is = jmaxPackage.getClass().getResourceAsStream( name);
+    return loadAux( jmaxPackage.getClass().getResourceAsStream( name));
+  }
 
-    if (is == null)
+  public static ImageIcon loadIconFromResource( String name)
+  {
+    return loadAux( ClassLoader.getSystemResourceAsStream( name));
+  }
+
+  private static ImageIcon loadAux( InputStream in)
+  {
+    if (in == null)
       return null;
 
     int n;
@@ -41,7 +49,7 @@ public class JMaxUtilities {
       {
 	do
 	  {
-	    n = is.read( b);
+	    n = in.read( b);
 	    if ( n <= 0)
 	      break;
 	    buffer.write( b, 0, n);

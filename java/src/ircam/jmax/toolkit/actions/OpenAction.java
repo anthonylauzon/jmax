@@ -75,7 +75,7 @@ public class OpenAction extends EditorAction
 		
 		//MaxDocument document = Mda.loadDocument(fts, file);
 		
-		RecentFileHistory recentFileHistory = MaxApplication.getRecentFileHistory();
+		RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
 		recentFileHistory.addFile(file);
 	
 		try

@@ -746,7 +746,7 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     if (ExplodeSelection.getCurrent().getModel() != this) 
       return;
     ExplodeSelection.getCurrent().prepareACopy();
-    MaxApplication.systemClipboard.setContents(ExplodeSelection.getCurrent(), this);
+    JMaxApplication.getSystemClipboard().setContents(ExplodeSelection.getCurrent(), this);
   }  
 
 
@@ -755,7 +755,7 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     if (ExplodeSelection.getCurrent().getModel() != this) 
       return;
 
-    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
     Enumeration objectsToPaste = null;
 
     if (clipboardContent != null && clipboardContent.isDataFlavorSupported(ExplodeDataFlavor.getInstance()))

@@ -189,12 +189,12 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   {
     JMenu menu;
 
-    if (name.charAt(0) == '%')
-      {
-	menu = new JMenu();
-	menu.setIcon(Icons.get(name));
-      }
-    else
+//      if (name.charAt(0) == '%')
+//        {
+//  	menu = new JMenu();
+//  	menu.setIcon( Icons.get(name));
+//        }
+//      else
       menu = new JMenu(name);
 
     popup.add(menu);

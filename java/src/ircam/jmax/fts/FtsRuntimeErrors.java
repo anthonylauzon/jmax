@@ -54,7 +54,7 @@ public class FtsRuntimeErrors extends FtsObject implements ListModel
 
   public FtsRuntimeErrors() throws IOException
   {
-    super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__runtimeerrors"));
+    super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("__runtimeerrors"));
       
     list = new Vector();
     dataListeners = new Vector();

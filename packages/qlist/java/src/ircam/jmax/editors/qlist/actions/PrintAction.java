@@ -41,7 +41,7 @@ public class PrintAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob(container.getFrame(), "Printing QList", MaxApplication.getProperties());
+    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob(container.getFrame(), "Printing QList", null, null);
     if(aPrintjob != null){
       Graphics aPrintGraphics = aPrintjob.getGraphics();
       if(aPrintGraphics != null){

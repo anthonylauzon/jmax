@@ -38,10 +38,10 @@ import ircam.jmax.toolkit.*;
 
 public class ObjectSetViewer extends JPanel {
 
-  private final static ImageIcon patcherIcon = SystemIcons.get("_patcher_");
-  private final static ImageIcon objectIcon = SystemIcons.get("_object_");
-  private final static ImageIcon inletIcon = SystemIcons.get("_inlet_");
-  private final static ImageIcon outletIcon =  SystemIcons.get("_outlet_");
+  private final static ImageIcon patcherIcon = JMaxIcons.patcher;
+  private final static ImageIcon objectIcon = JMaxIcons.object;
+  private final static ImageIcon inletIcon = JMaxIcons.inlet;
+  private final static ImageIcon outletIcon =  JMaxIcons.outlet;
 
   static class ObjectCellRenderer extends DefaultListCellRenderer
   {
@@ -147,13 +147,14 @@ public class ObjectSetViewer extends JPanel {
 	  icon = inletIcon;
       else if (obj instanceof FtsOutletObject)
 	  icon = outletIcon;
-      else if(ObjectCreatorManager.containsClass(className))
-	  if(SystemIcons.get(className)!=null)
-	      icon = SystemIcons.get(className);
-	  else
-	      icon = objectIcon;
-      else
-	  icon = objectIcon;
+      else 
+	{
+	  icon = JMaxClassMap.getIcon( className);
+
+	  if ( icon == null)
+	    icon = objectIcon;
+	}
+
       return icon;
   }  
   protected JList jList;

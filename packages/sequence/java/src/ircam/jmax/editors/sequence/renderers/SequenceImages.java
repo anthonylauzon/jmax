@@ -57,9 +57,9 @@ public class SequenceImages {
 	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+File.separator+"images"+File.separator;
 	  }
 	  catch(FileNotFoundException e){
-	  path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
 	  }*/
-	path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
 	/*************************************************************/
 
 	image = Toolkit.getDefaultToolkit().getImage(path+"violinClef.gif");

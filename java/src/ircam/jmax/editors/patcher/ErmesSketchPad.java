@@ -330,12 +330,12 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     itsPatcher.setPatcherListener(new ErmesPatcherListener(this));
 
     // Get the defaultFontName and Size
-    defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
+    defaultFontName = JMaxApplication.getProperty("jmaxDefaultFont");
 
     if (defaultFontName == null)
       defaultFontName = ircam.jmax.Platform.FONT_NAME;
 
-    s = MaxApplication.getProperty("jmaxDefaultFontSize");
+    s = JMaxApplication.getProperty("jmaxDefaultFontSize");
     
     if (s == null)
 	defaultFontSize = ircam.jmax.Platform.FONT_SIZE;
@@ -354,13 +354,13 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     // Next two temporary (mdc)
 
-    if (MaxApplication.getProperty("dg") != null)
+    if (JMaxApplication.getProperty("dg") != null)
       {
 	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false); 
 	setDoubleBuffered(false);
 	setDebugGraphicsOptions(DebugGraphics.FLASH_OPTION);
       }
-    else if (MaxApplication.getProperty("nodb") != null)
+    else if (JMaxApplication.getProperty("nodb") != null)
       {
 	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
 	setDoubleBuffered(false);
@@ -1007,7 +1007,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     showMessage(message);
 
     stopTextEditing();
-    setCursor(JMaxClassMap.getCursor(description));     
+    setCursor( JMaxClassMap.getCursor( description));     
 
     engine.setTopInteraction(Interactions.addModeInteraction);    
   }

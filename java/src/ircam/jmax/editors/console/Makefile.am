@@ -1,6 +1,5 @@
 packagedir=$(pkgdatadir)
 package_JAVA = \
-ConsoleModule.java\
 ConsoleOutputStream.java\
 ConsoleWindow.java\
 ControlPanel.java\

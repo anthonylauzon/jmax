@@ -230,9 +230,9 @@ public class AmbitusValue extends AbstractEventValue
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
 	}
 	catch(FileNotFoundException e){
-	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
 	}*/
-      path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
       /*************************************************************/
       
       AMBITUS_ICON = new ImageIcon(path+"note.gif");

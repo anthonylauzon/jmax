@@ -54,7 +54,7 @@ public class FtsClipboard  extends FtsObject
 
   public FtsClipboard() throws IOException
   {
-      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__clipboard"));
+      super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("__clipboard"));
   }
 
   public void copy(FtsSelection sel)

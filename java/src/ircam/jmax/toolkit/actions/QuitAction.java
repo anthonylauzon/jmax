@@ -39,7 +39,7 @@ public class QuitAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    MaxApplication.Quit();
+    JMaxApplication.Quit();
   }
 }
 

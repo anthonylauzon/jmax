@@ -43,7 +43,7 @@ public class FtsErrorFinderObject extends FtsObject
 
   public FtsErrorFinderObject() throws IOException
   {
-      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__errorfinder"));
+      super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("__errorfinder"));
   }
 
   public void findErrors(FtsObjectSet set)

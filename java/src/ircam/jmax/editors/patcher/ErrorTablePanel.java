@@ -194,8 +194,8 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
   private FtsErrorFinderObject errorFinder;
   private ErrorTableModel tableModel;
   private ObjectSelectedListener objectSelectedListener;
-  public static ImageIcon errorIcon = SystemIcons.get("_error_object_");
-  public static ImageIcon patcherIcon = SystemIcons.get("_patcher_");
+  public static ImageIcon errorIcon = JMaxIcons.errorObject;
+  public static ImageIcon patcherIcon = JMaxIcons.patcher;
 }
 
 

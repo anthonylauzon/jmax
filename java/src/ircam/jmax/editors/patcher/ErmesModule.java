@@ -46,7 +46,7 @@ public class ErmesModule
 	// Install the customized Repaint Manager
 	RepaintManager.setCurrentManager(manager);
 	// Optionally set the syncPaint flag
-	if (MaxApplication.getProperty("syncPaint") != null)
+	if (JMaxApplication.getProperty("syncPaint") != null)
 	  ErmesSketchPad.setSyncPaint(true);
 	  //manager.setSyncPaint(true);
 	

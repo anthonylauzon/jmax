@@ -187,9 +187,9 @@ public class IntegerValue extends AbstractEventValue
 	  }
 	  catch(FileNotFoundException e){
 	  //System.err.println("Can't locate sequence images");
-	  path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
 	  }*/
-	path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
 	/*************************************************************/
 	
 	INTEGER_ICON = new ImageIcon(path+"integer.gif");

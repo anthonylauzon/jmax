@@ -46,7 +46,7 @@ public class PrintAction extends EditorAction
 
     RepaintManager.currentManager(panel).setDoubleBufferingEnabled(false);
 
-    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Sequence", MaxApplication.getProperties());
+    PrintJob aPrintjob = container.getFrame().getToolkit().getPrintJob( container.getFrame(), "Printing Sequence", null, null);
 
     if (aPrintjob != null)
       {

@@ -93,7 +93,7 @@ public class HTMLDialog extends JDialog
 
   private static String getUrlName(String packageName, String pageName){
     String separator = System.getProperty("file.separator");
-    return "file:"+ MaxApplication.getProperty("jmaxRoot")+ 
+    return "file:"+ JMaxApplication.getProperty("jmaxRoot")+ 
       separator+"doc"+
       separator+"user"+
       separator+"packages"+

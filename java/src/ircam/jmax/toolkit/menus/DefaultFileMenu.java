@@ -62,65 +62,67 @@ public class DefaultFileMenu extends EditorMenu
     dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_SPACE);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
   
-    MaxApplication.getRecentFileHistory().addListDataListener(new ListDataListener(){
-	    public void contentsChanged(ListDataEvent e)
-	    {
-		buildRecentFiles();
-	    }
-	    public void intervalAdded(ListDataEvent e)
-	    {
-		buildRecentFiles();
-	    }    
-	    public void intervalRemoved(ListDataEvent e) 
-	    {
-		buildRecentFiles();
-	    }
-	});
+    JMaxApplication.getRecentFileHistory().addListDataListener(new ListDataListener(){
+	public void contentsChanged(ListDataEvent e)
+	{
+	  buildRecentFiles();
+	}
+	public void intervalAdded(ListDataEvent e)
+	{
+	  buildRecentFiles();
+	}    
+	public void intervalRemoved(ListDataEvent e) 
+	{
+	  buildRecentFiles();
+	}
+      });
 
     buildRecentFiles();
   }
 
   public void updateMenu()
   {
-      if(MaxApplication.getServer() != null)
-	  {
-	      dspMenuItem.setEnabled(true);
+    if(JMaxApplication.getServer() != null)
+      {
+	dspMenuItem.setEnabled(true);
 
-	      boolean dspOn = ConsoleWindow.getInstance().getDspControl().getDspOn();
+	boolean dspOn = ConsoleWindow.getInstance().getDspControl().getDspOn();
       
-	      if(dspOn) dspMenuItem.setText("Desactivate DSP");
-	      else dspMenuItem.setText("Activate DSP");
-	  }
-       else
-	  dspMenuItem.setEnabled(false);
+	if(dspOn) 
+	  dspMenuItem.setText("Desactivate DSP");
+	else
+	  dspMenuItem.setText("Activate DSP");
+      }
+    else
+      dspMenuItem.setEnabled(false);
   }
 
   void buildRecentFiles()
   {
-      RecentFileHistory recentFileHistory = MaxApplication.getRecentFileHistory();
+    RecentFileHistory recentFileHistory = JMaxApplication.getRecentFileHistory();
 	
-      //remove all recent Files
-      int num = getItemCount() - getDefaultNumEntries();
-      while(num>0)
-	  {
-	      remove(getItemCount()-1); 
-	      num--;
-	  }
+    //remove all recent Files
+    int num = getItemCount() - getDefaultNumEntries();
+    while(num>0)
+      {
+	remove(getItemCount()-1); 
+	num--;
+      }
 
-      if(recentFileHistory.size() > 0)          
+    if(recentFileHistory.size() > 0)          
       {  
-	  File file;
-	  JMenuItem jMenuItem;
+	File file;
+	JMenuItem jMenuItem;
 
-	  addSeparator();
+	addSeparator();
 
-	  for (int i = 0; i < recentFileHistory.size(); ++i)
-	      {
-		  file = (File)recentFileHistory.get(i);
+	for (int i = 0; i < recentFileHistory.size(); ++i)
+	  {
+	    file = (File)recentFileHistory.get(i);
 		  
-		  jMenuItem = add(new OpenAction(file), (i+1)+":  "+file.getName());
-		  jMenuItem.setMnemonic(Character.forDigit(i+1, 10));
-	      }
+	    jMenuItem = add(new OpenAction(file), (i+1)+":  "+file.getName());
+	    jMenuItem.setMnemonic(Character.forDigit(i+1, 10));
+	  }
       }
   }
 }

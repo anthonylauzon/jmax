@@ -108,7 +108,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 
 	if(!ErmesSelection.patcherSelection.isObjectsEmpty())
 	  {
-	    MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
+	    JMaxApplication.getSystemClipboard().setContents(ErmesSelection.patcherSelection, this);
 
 	    ftsClipboard.copy(ErmesSelection.getFtsSelection());
 	    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
@@ -134,7 +134,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	  Cursor temp = container.getFrame().getCursor();
 	  container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	  MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
+	  JMaxApplication.getSystemClipboard().setContents(ErmesSelection.patcherSelection, this);
 	  ftsClipboard.copy( ErmesSelection.getFtsSelection());
 	  sketch.setLastCopyCount(ftsClipboard.getCopyCount());
 	  sketch.resetPaste(0);	  
@@ -156,7 +156,7 @@ public class PatcherClipboardManager implements ClipboardOwner
     if (sketch.isLocked())
       sketch.setLocked(false);
 
-    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
 
     if (clipboardContent == null)
       return;  // Should never happen

@@ -53,9 +53,9 @@ public class BpfTools implements ToolProvider{
       path  = MaxApplication.getPackageHandler().locatePackage("data").getPath()+fs+"images"+fs;
       }
       catch(FileNotFoundException e){
-      path = MaxApplication.getProperty("dataPackageDir")+File.separator+"images"+File.separator;
+      path = JMaxApplication.getProperty("dataPackageDir")+File.separator+"images"+File.separator;
       }*/
-    path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;	 
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;	 
     /*************************************************************/
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));

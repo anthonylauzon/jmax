@@ -1,3 +1,12 @@
+2002-02-18  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* java: added JMaxClassMap to centralize data bases of object creator,
+	icons, cursors
+
+	* cleaned a lot the Java code of package ircam.jmax
+
+	* added FtsServerEvent in client/java/ircam/fts/client
+
 2002-02-14  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* java/src/ircam/jmax: added package loading, changed implementation of

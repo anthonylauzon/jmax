@@ -103,17 +103,17 @@ public class Guiobj implements JMaxPackage {
 	}
       };
 
-    JMaxClassMap.put( "fork", forkCreator, "icons/fork.gif", "icons/fork_cursor.gif", this);
-    JMaxClassMap.put( "jcomment", jcommentCreator, "icons/jcomment.gif", "icons/jcomment_cursor.gif", this);
-    JMaxClassMap.put( "messconst", messconstCreator, "icons/messconst.gif", "icons/messconst_cursor.gif", this);
-    JMaxClassMap.put( "button", buttonCreator, "icons/button.gif", "icons/button_cursor.gif", this);
-    JMaxClassMap.put( "toggle", toggleCreator, "icons/toggle.gif", "icons/toggle_cursor.gif", this);
-    JMaxClassMap.put( "slider", sliderCreator, "icons/slider.gif", "icons/slider_cursor.gif", this);
-    JMaxClassMap.put( "intbox", intboxCreator, "icons/intbox.gif", "icons/intbox_cursor.gif", this);
-    JMaxClassMap.put( "floatbox", floatboxCreator, "icons/floatbox.gif", "icons/floatbox_cursor.gif", this);
-    JMaxClassMap.put( "display", displayCreator, "icons/display.gif", "icons/display_cursor.gif", this);
-    JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "icons/vecdisplay.gif", "icons/vecdisplay_cursor.gif", this);
-    JMaxClassMap.put( "scope", scopeCreator, "icons/scope.gif", "icons/scope_cursor.gif", this);
+    JMaxClassMap.put( "fork", forkCreator, "/icons/fork.gif", "/icons/fork_cursor.gif", this);
+    JMaxClassMap.put( "jcomment", jcommentCreator, "/icons/jcomment.gif", "/icons/jcomment_cursor.gif", this);
+    JMaxClassMap.put( "messconst", messconstCreator, "/icons/messconst.gif", "/icons/messconst_cursor.gif", this);
+    JMaxClassMap.put( "button", buttonCreator, "/icons/button.gif", "/icons/button_cursor.gif", this);
+    JMaxClassMap.put( "toggle", toggleCreator, "/icons/toggle.gif", "/icons/toggle_cursor.gif", this);
+    JMaxClassMap.put( "slider", sliderCreator, "/icons/slider.gif", "/icons/slider_cursor.gif", this);
+    JMaxClassMap.put( "intbox", intboxCreator, "/icons/intbox.gif", "/icons/intbox_cursor.gif", this);
+    JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", this);
+    JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", this);
+    JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", this);
+    JMaxClassMap.put( "scope", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", this);
 
     ircam.jmax.editors.console.ConsoleWindow.append( "package Guiobj loaded (Java Classes)");
   }

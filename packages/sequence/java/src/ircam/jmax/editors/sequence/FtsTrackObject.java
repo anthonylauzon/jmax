@@ -923,7 +923,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     if (SequenceSelection.getCurrent().getModel() != this) 
       return;
     SequenceSelection.getCurrent().prepareACopy();
-    MaxApplication.systemClipboard.setContents(SequenceSelection.getCurrent(), this);
+    JMaxApplication.getSystemClipboard().setContents(SequenceSelection.getCurrent(), this);
   }  
     
   public void paste()
@@ -931,7 +931,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     if (SequenceSelection.getCurrent().getModel() != this) 
       return;
 
-    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
     Enumeration objectsToPaste = null;
 
     if (clipboardContent != null && areMyDataFlavorsSupported(clipboardContent))

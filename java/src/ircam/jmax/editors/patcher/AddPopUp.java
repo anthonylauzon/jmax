@@ -115,9 +115,9 @@ public class AddPopUp extends JPopupMenu
   {
     JMenuItem item;
 
-    if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
-      item = new JMenuItem(SystemIcons.get(cmd));
-    else
+//      if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
+//        item = new JMenuItem(SystemIcons.get(cmd));
+//      else
       item = new JMenuItem(cmd);
 
     item.addActionListener(new AddPopUpListener(descr, message, edit));
@@ -138,12 +138,12 @@ public class AddPopUp extends JPopupMenu
   {
     JMenu menu;
 
-    if (name.charAt(0) == '%')
-      {
-	menu = new JMenu();
-	menu.setIcon(SystemIcons.get(name));
-      }
-    else
+//      if (name.charAt(0) == '%')
+//        {
+//  	menu = new JMenu();
+//  	menu.setIcon(SystemIcons.get(name));
+//        }
+//      else
       menu = new JMenu(name);
 
     popup.add(menu);
@@ -163,9 +163,9 @@ public class AddPopUp extends JPopupMenu
     if (menu == null)
       menu = addAbbreviationMenu(menuName);
     
-    if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
-      item = new JMenuItem(SystemIcons.get(cmd));
-    else
+//      if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
+//        item = new JMenuItem(SystemIcons.get(cmd));
+//      else
       item = new JMenuItem(cmd);
 
     item.addActionListener(new AddPopUpSubMenuListener(descr, message, edit));

@@ -86,7 +86,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     String javaVersion = (String)(System.getProperties().getProperty("java.version")+" "+
 				  System.getProperties().getProperty("java.vendor"));
-    String jmaxVersion = MaxApplication.getProperty("jmaxVersion");
+    String jmaxVersion = JMaxApplication.getProperty("jmaxVersion");
     String osType = System.getProperties().getProperty("os.name")+" "+System.getProperties().getProperty("os.arch");
     String totalMemory = ""+Runtime.getRuntime().totalMemory();
     String usedMemory = "" +(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());

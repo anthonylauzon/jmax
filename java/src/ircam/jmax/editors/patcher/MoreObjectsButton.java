@@ -30,6 +30,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.*;
 
 //
 // The pop-up button used to display object-buttons in the toolbar when too long
@@ -49,7 +50,7 @@ public class MoreObjectsButton extends JMenuBar
 
       menu = new JMenu("");
       menu.setMargin(new Insets(0, 0, 0, 0));
-      menu.setIcon(SystemIcons.get("_more_objects_"));
+      menu.setIcon( JMaxIcons.moreObjects);
       menu.setPreferredSize(new Dimension(24, 19));
       menu.setMinimumSize(new Dimension(24, 19));
 

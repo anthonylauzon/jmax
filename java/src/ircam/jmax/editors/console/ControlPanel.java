@@ -42,14 +42,11 @@ import ircam.jmax.widgets.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 
-public class ControlPanel extends JPanel
-{
+public class ControlPanel extends JPanel {
   private JPanel debugPanel;
 
   private FtsDspControl control;
 
-//    private IndicatorWithMemory dacSlipIndicator;
-//    private IndicatorWithMemory fpeIndicator;
   private MemoryLed fpeLed;
   private MemoryLed syncLed;
 
@@ -61,8 +58,7 @@ public class ControlPanel extends JPanel
   private boolean lock = false;
 
 
-  class DspControlAdapter implements PropertyChangeListener
-  {
+  class DspControlAdapter implements PropertyChangeListener {
     String prop;
     MemoryLed led;
 
@@ -83,8 +79,7 @@ public class ControlPanel extends JPanel
     }
   }
 
-  class DspOnControlAdapter implements PropertyChangeListener
-  {
+  class DspOnControlAdapter implements PropertyChangeListener {
     String prop;
     JToggleButton b;
 
@@ -150,17 +145,17 @@ public class ControlPanel extends JPanel
     dspLabel.setAlignmentY(Component.CENTER_ALIGNMENT);    
     add(dspLabel);
 
-    dspOnButton = new JToggleButton(SystemIcons.get( "_dsp_off_"));
+    dspOnButton = new JToggleButton( JMaxIcons.dspOff);
     dspOnButton.setDoubleBuffered( false);
     dspOnButton.setMargin( new Insets(0,0,0,0));
-    dspOnButton.setSelectedIcon( SystemIcons.get( "_dsp_on_"));
+    dspOnButton.setSelectedIcon( JMaxIcons.dspOn);
     dspOnButton.setPreferredSize(new Dimension(25, 25));   
     dspOnButton.setFocusPainted( false);  
     dspOnButton.setAlignmentY(Component.CENTER_ALIGNMENT);    
 
     add(dspOnButton);
 
-    if (MaxApplication.getProperty("debug") != null)
+    if (JMaxApplication.getProperty("debug") != null)
       {
 	add( Box.createRigidArea(new Dimension(5,0)));
 
@@ -180,55 +175,48 @@ public class ControlPanel extends JPanel
 
   public void init()
   {
-      try
-	  {
-	      control = new FtsDspControl();
-	  }
-      catch(IOException e)
-	  {
-	      System.err.println("ControlPanel: Error in FtsDspControl creation!");
-	      e.printStackTrace();
-	  }
+    try
+      {
+	control = new FtsDspControl();
+      }
+    catch(IOException e)
+      {
+	System.err.println("ControlPanel: Error in FtsDspControl creation!");
+	e.printStackTrace();
+      }
 
-      new DspControlAdapter("invalidFpe", control, fpeLed);
-      new DspControlAdapter("divideByZeroFpe", control, fpeLed);
-      new DspControlAdapter("overflowFpe", control, fpeLed);
+    new DspControlAdapter("invalidFpe", control, fpeLed);
+    new DspControlAdapter("divideByZeroFpe", control, fpeLed);
+    new DspControlAdapter("overflowFpe", control, fpeLed);
       
-      new DspControlAdapter("dacSlip", control, syncLed);
-      dspOnButton.setSelected(control.getDspOn());
-      new DspOnControlAdapter("dspOn", control, dspOnButton);
+    new DspControlAdapter("dacSlip", control, syncLed);
+    dspOnButton.setSelected(control.getDspOn());
+    new DspOnControlAdapter("dspOn", control, dspOnButton);
 
-      dspOnButton.addItemListener(new ItemListener() {
-	      public void itemStateChanged(ItemEvent e) {
+    dspOnButton.addItemListener(new ItemListener() {
+	public void itemStateChanged(ItemEvent e) {
 		  
-		  if ( !lock)
-		      {
-			  if (e.getStateChange() == ItemEvent.DESELECTED)
-			      control.requestSetDspOn(false);
-			  else  if (e.getStateChange() == ItemEvent.SELECTED)
-			      control.requestSetDspOn(true);
-		      }
-	      }});
-      if (MaxApplication.getProperty("debug") != null)
-	  {
-	      dspPrintButton.addActionListener( new ActionListener() {
-		      public  void actionPerformed( ActionEvent e)
-		      {
-			  control.dspPrint();
-		      }
-		  });  
-	  }
+	  if ( !lock)
+	    {
+	      if (e.getStateChange() == ItemEvent.DESELECTED)
+		control.requestSetDspOn(false);
+	      else  if (e.getStateChange() == ItemEvent.SELECTED)
+		control.requestSetDspOn(true);
+	    }
+	}});
+    if (JMaxApplication.getProperty("debug") != null)
+      {
+	dspPrintButton.addActionListener( new ActionListener() {
+	    public  void actionPerformed( ActionEvent e)
+	    {
+	      control.dspPrint();
+	    }
+	  });  
+      }
   }
 
   public FtsDspControl getDspControl()
   {
-      return control;
+    return control;
   }
 }
-
-
-
-
-
-
-

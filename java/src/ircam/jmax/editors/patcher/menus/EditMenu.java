@@ -101,7 +101,7 @@ public class EditMenu extends EditorMenu
 
   public void updateMenu()
   {
-    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
 
     if (sketch.isLocked())

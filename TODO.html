@@ -357,6 +357,7 @@ edition and much simpler in the code)
 per editor, or one "Editors" menu with either sub-menus or item with separators 
   </li>
   <li>first, needs to check all the current menu items </li>
+  <li> remove the ToolFinder interface (used only to add 2 items: Console and ToolsPanel </li>
 </ul>
   
 <p>
@@ -381,6 +382,22 @@ annotation with a menu item </li>
 <p>
  Check editors on-line help
 </p>
+
+<p>
+Delete JMaxApplication.getProperty() and use system properties.
+</p>
+
+<p>
+Delete all occurences of Max*.java and replace it by JMax*.java,
+idem for Ermes*
+</p>
+
+<p>
+Clean the console component so that it can be used in other places.
+Create a console patch object that is a bytestream (so that it can 
+be passed to a "print" object) and that opens a console when double-clicked.
+</p>
+
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Packaging</h3>

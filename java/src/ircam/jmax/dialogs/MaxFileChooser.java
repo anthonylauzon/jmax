@@ -58,7 +58,7 @@ public class MaxFileChooser
 
   static void makeFileChooser()
   {
-    fd = new JFileChooser( MaxApplication.getProperty("user.dir"));
+    fd = new JFileChooser( JMaxApplication.getProperty("user.dir"));
   }
 
   public static int getSaveType()

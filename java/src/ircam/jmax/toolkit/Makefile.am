@@ -24,10 +24,6 @@ InteractionModule.java\
 InteractionSemaphore.java\
 Layer.java\
 LockListener.java\
-MaxToolsJMenu.java\
-MaxToolsMenu.java\
-MaxWindowJMenu.java\
-MaxWindowMenu.java\
 MouseDragTracker.java\
 MouseTracker.java\
 NumericPropertyEditor.java\

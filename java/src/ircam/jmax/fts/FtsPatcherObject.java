@@ -274,7 +274,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   }
   public FtsPatcherObject() throws IOException
   {
-    super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("jpatcher"));
+    super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("jpatcher"));
   }
   /** Get all the objects in this patcherdata */
 
