@@ -297,3 +297,10 @@ void aflib_config(void)
 {
   fts_audiofile_set_loader( "Linux/SGI Audiofile library", &aflib_loader);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
