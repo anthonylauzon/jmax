@@ -358,6 +358,8 @@ bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
       
       if(ac & 1)
 	{
+	  set_size(this, 1);
+
 	  if(fts_is_number(at))
 	    value = fts_get_number_float(at);
 	  else
