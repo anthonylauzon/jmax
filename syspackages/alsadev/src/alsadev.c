@@ -58,18 +58,14 @@ extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
   It contains ALSA specific datas.
 */
 
-#define CHANNEL_CNT 20
-
-
 typedef struct alsa_pcm_dev_data {
   snd_pcm_t *handle;
-  snd_pcm_t *pcm_handle[CHANNEL_CNT];
   int n_voices;
   long bytes_count;
   short *fmtbuf;
 } alsa_pcm_dev_data_t;
 
-#define DEFAULT_N_VOICES 1
+#define DEFAULT_N_VOICES 2
 
 
 /*----------------------------------------------------------------------------*/
@@ -123,140 +119,21 @@ static void alsa_dac_init(void)
   [3] (int)    2
 */
 
-int
-set_parameters (int card, int rate, int latency_samples)
-
-{
-        snd_ctl_t *ctl_handle;
-        int i, err, dev, idx;
-        snd_switch_t sw;
-
-        if ((err = snd_ctl_open (&ctl_handle, card)) < 0) {
-                fprintf(stderr, 
-                        "error: control open (%i): %s\n", 
-                        card, snd_strerror(err));
-                return 1;
-        }
-
-        /* SAMPLE RATE */
-
-        strcpy (sw.name, "sample rate");
-
-        if ((err = snd_ctl_switch_read (ctl_handle, &sw)) < 0) {
-                fprintf (stderr, "can't read sample rate (%s)\n",
-                         snd_strerror (err));
-                return 1;
-        }
-
-        post ("Old sample rate: %ukHz\n", sw.value.data32[0]);
-
-        sw.value.data32[0] = rate;
-
-        if ((err = snd_ctl_switch_write (ctl_handle, &sw)) < 0) {
-                fprintf (stderr, "can't write sample rate (%s)\n",
-                         snd_strerror (err));
-                return 1;
-        }
-
-        post ("New sample rate: %ukHz\n", sw.value.data32[0]);
-
-        /* LATENCY */
-
-        strcpy (sw.name, "latency");
-
-        if ((err = snd_ctl_switch_read (ctl_handle, &sw)) < 0) {
-                fprintf (stderr, "can't read latency (%s)\n",
-                         snd_strerror (err));
-                return 1;
-        }
-
-        post ("Old latency: %d samples\n", sw.value.data16[0]);
-
-        sw.value.data16[0] = latency_samples;
-
-        if ((err = snd_ctl_switch_write (ctl_handle, &sw)) < 0) {
-                fprintf (stderr, "can't write latency (%s)\n",
-                         snd_strerror (err));
-                return 1;
-        }
-
-        post ("New latency: %d samples\n", sw.value.data16[0]);
-
-        return 0;
-}
-
-static fts_status_t open_subdev( snd_pcm_t **handle, int subdev)
-{
-  snd_pcm_channel_params_t params;
-  int err;
-
-  if ( (err = snd_pcm_open_subdevice( handle, 0, 0, subdev, SND_PCM_OPEN_PLAYBACK)) < 0 )
-    {
-      post( "Error: snd_pcm_open_subdevice() failed: %s\n", snd_strerror (err));
-      return &fts_dev_open_error;
-    }
-
-
-  memset( &params, 0, sizeof( params));
-
-  params.channel = SND_PCM_CHANNEL_PLAYBACK;
-  params.mode = SND_PCM_MODE_BLOCK;
-  params.start_mode = SND_PCM_START_DATA;
-  params.stop_mode = SND_PCM_STOP_ROLLOVER;
-
-  params.format.format = SND_PCM_SFMT_U32_LE; 
-  params.format.rate = 44100;
-  params.format.voices = 1;
-  params.format.interleave = 0;
-
-  params.buf.block.frag_size = 4 * 1024;
-  params.buf.block.frags_min = 2;
-  params.buf.block.frags_max = 2;
-
-  /*    params.buf.stream.queue_size = n_voices * sizeof( short) * MAXVS; */
-  /*    params.buf.stream.fill = SND_PCM_FILL_SILENCE; */
-  /*    params.buf.stream.max_fill = 1024; */
-
-#if 0
-  if ((err = snd_pcm_channel_flush (*handle, SND_PCM_CHANNEL_PLAYBACK)) < 0) 
-    {
-      post( "Error: snd_pcm_channel_flush() failed: %s\n", snd_strerror (err));
-
-      return &fts_dev_open_error;
-    }
-#endif
-
-  if ((err = snd_pcm_channel_params( *handle, &params)) < 0)
-    { 
-      post( "Error: snd_pcm_channel_params() failed: %s\n", snd_strerror( err ));
-      snd_pcm_close( *handle ); 
-
-      return &fts_dev_open_error;
-    } 
-
-  if ( (err = snd_pcm_channel_prepare (*handle, SND_PCM_CHANNEL_PLAYBACK)) < 0)
-    {
-      post( "Error: snd_pcm_channel_prepare() failed: %s\n", snd_strerror (err));
-      return &fts_dev_open_error;
-    }
-
-  return fts_Success;
-}
-
-
 static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  int n_voices, i;
+  int n_voices;
   int err, card, device;
   alsa_pcm_dev_data_t *data;
-  snd_pcm_t **handle;
-  snd_pcm_channel_info_t channel_info;
   snd_pcm_channel_params_t params;
 
-  n_voices = 8;
+  /* Parameter parsing */
+  n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
+  card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), 0);
+  device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
 
   /* Allocation of device data */
   data = (alsa_pcm_dev_data_t *)fts_malloc( sizeof( alsa_pcm_dev_data_t));
+
   /* Device data settings */
   data->n_voices = n_voices;
   data->bytes_count = 0;
@@ -264,37 +141,52 @@ static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
 
   fts_dev_set_device_data( dev, data);
 
-  /* Parameter parsing */
-  n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
-
-  post( "n_voices %d\n", n_voices);
-
-  card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), snd_defaults_pcm_card());
-  device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
-
-  /* ALSA handle opening */
-#if 0
-  if ( snd_pcm_open( &handle, card, device, SND_PCM_OPEN_PLAYBACK) )
+  if (( err = snd_pcm_open( &data->handle, card, device, SND_PCM_OPEN_PLAYBACK)) < 0)
     {
-      post( "Error: snd_pcm_open() failed\n");
+      post( "Error: snd_pcm_open failed (%s)\n", snd_strerror( err));
+      return &fts_dev_open_error;
+    }
+
+#if 0
+  if ((err = snd_pcm_channel_flush( data->handle, SND_PCM_CHANNEL_PLAYBACK)) < 0)
+    {
+      post( "Error: snd_pcm_flush failed (%s)\n", snd_strerror( err));
       return &fts_dev_open_error;
     }
 #else
+  snd_pcm_channel_flush( data->handle, SND_PCM_CHANNEL_PLAYBACK);
+#endif
 
-  if (set_parameters ( 0, 44100, 1024))
+  memset( &params, 0, sizeof( params));
+
+  params.channel = SND_PCM_CHANNEL_PLAYBACK;
+  params.mode = SND_PCM_MODE_BLOCK;
+  params.start_mode = SND_PCM_START_FULL;
+  params.stop_mode = SND_PCM_STOP_STOP;
+
+  params.format.format = SND_PCM_SFMT_S16_LE; 
+  params.format.rate = 44100;
+  params.format.voices = n_voices;
+  params.format.interleave = 1;
+
+  params.buf.block.frag_size = 256;
+  params.buf.block.frags_max = -1;
+  params.buf.block.frags_min = 1;
+
+  if ((err = snd_pcm_channel_params( data->handle, &params)) < 0)
+    { 
+      post( "Error: snd_pcm_channel_params() failed: %s\n", snd_strerror( err ));
+      snd_pcm_close( data->handle ); 
+
+      return &fts_dev_open_error;
+    } 
+
+  if ( (err = snd_pcm_channel_prepare( data->handle, SND_PCM_CHANNEL_PLAYBACK)) < 0)
     {
+      post( "Error: snd_pcm_channel_prepare() failed: %s\n", snd_strerror (err));
       return &fts_dev_open_error;
     }
-      
 
-  for ( i = 0; i < CHANNEL_CNT; i++)
-    {
-      fts_status_t err;
-
-      if ( (err = open_subdev( &(data->pcm_handle[i]), i)) != fts_Success)
-	return err;
-    }
-#endif
   /* This is to inform the scheduler that it should use this device to check for I/O errors */
   fts_dsp_set_dac_slip_dev( dev);
 
@@ -356,7 +248,7 @@ static void alsa_dac_put( fts_word_t *argv)
 {
   fts_dev_t *dev;
   alsa_pcm_dev_data_t *data;
-  int n_voices, voice, n, i, j;
+  int n_voices, voice, n, i, j, size, err;
 
   dev = *((fts_dev_t **)fts_word_get_ptr( argv));
 
@@ -380,7 +272,16 @@ static void alsa_dac_put( fts_word_t *argv)
     }
 
   /* output the buffer */
-  snd_pcm_write( data->handle, data->fmtbuf, n * n_voices * sizeof( short));
+  size = n * n_voices * sizeof( short);
+  if ((err = snd_pcm_write( data->handle, data->fmtbuf, size)) != size)
+    {
+      static int count = 0;
+
+      if (count++ < 100)
+	{
+	  post( "error when writing %d %s\n", err, snd_strerror( err));
+	}
+    }
 }
 
 
@@ -432,60 +333,68 @@ static fts_status_t alsa_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   int n_voices;
   int err, card, device;
   alsa_pcm_dev_data_t *data;
-  snd_pcm_t *handle;
-  snd_pcm_channel_info_t channel_info;
   snd_pcm_channel_params_t params;
+
+  /* Parameter parsing */
+  n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
+  card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), 0);
+  device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
 
   /* Allocation of device data */
   data = (alsa_pcm_dev_data_t *)fts_malloc( sizeof( alsa_pcm_dev_data_t));
 
-  /* Parameter parsing */
-  n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
-
-  card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), snd_defaults_pcm_card());
-  device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
-
-  /* ALSA handle opening */
-  if ( snd_pcm_open( &handle, card, device, SND_PCM_OPEN_CAPTURE) )
-    {
-      post( "Error: snd_pcm_open() failed\n");
-      return &fts_dev_open_error;
-    }
-
-  if ( snd_pcm_channel_info( handle, &channel_info) )
-    {
-      post( "Error: snd_pcm_channel_info() failed\n");
-      return &fts_dev_open_error;
-    }
-
-  if ( n_voices > channel_info.max_voices || n_voices < channel_info.min_voices )
-    {
-      post( "Error: wrong number of voices ( %d <= %d <= %d)\n", channel_info.min_voices, n_voices, channel_info.max_voices);
-      return &fts_dev_open_error;
-    }
-
-  params.format.interleave = 1;
-  params.format.format = SND_PCM_SFMT_S16_LE; 
-  params.format.rate = 44100;
-  params.format.voices = 2;
-  params.buf.block.frag_size = n_voices * sizeof( short) * MAXVS;
-  params.buf.block.frags_max = fts_param_get_int(fts_s_fifo_size, 256) / MAXVS;
-
-  if ((err = snd_pcm_channel_params( handle, &params)) < 0)
-    { 
-      post( "Error: snd_pcm_channel_params() failed: %s\n", snd_strerror( err ));  
-      snd_pcm_close( handle ); 
-
-      return &fts_dev_open_error;
-    } 
-
   /* Device data settings */
-  data->handle = handle;
   data->n_voices = n_voices;
   data->bytes_count = 0;
   data->fmtbuf = (short *)fts_malloc( MAXVS * n_voices * sizeof( short));
 
   fts_dev_set_device_data( dev, data);
+
+  if (( err = snd_pcm_open( &data->handle, card, device, SND_PCM_OPEN_CAPTURE)) < 0)
+    {
+      post( "Error: snd_pcm_open failed (%s)\n", snd_strerror( err));
+      return &fts_dev_open_error;
+    }
+
+#if 0
+  if ((err = snd_pcm_channel_flush( data->handle, SND_PCM_CHANNEL_CAPTURE)) < 0)
+    {
+      post( "Error: snd_pcm_flush failed (%s)\n", snd_strerror( err));
+      return &fts_dev_open_error;
+    }
+#else
+  snd_pcm_channel_flush( data->handle, SND_PCM_CHANNEL_CAPTURE);
+#endif
+
+  memset( &params, 0, sizeof( params));
+
+  params.channel = SND_PCM_CHANNEL_CAPTURE;
+  params.mode = SND_PCM_MODE_BLOCK;
+  params.start_mode = SND_PCM_START_DATA;
+  params.stop_mode = SND_PCM_STOP_STOP;
+
+  params.format.format = SND_PCM_SFMT_S16_LE; 
+  params.format.rate = 44100;
+  params.format.voices = n_voices;
+  params.format.interleave = 1;
+
+  params.buf.block.frag_size = 256;
+  params.buf.block.frags_max = 10;
+  params.buf.block.frags_min = 1;
+
+  if ((err = snd_pcm_channel_params( data->handle, &params)) < 0)
+    { 
+      post( "Error: snd_pcm_channel_params() failed: %s\n", snd_strerror( err ));  
+      snd_pcm_close( data->handle ); 
+
+      return &fts_dev_open_error;
+    } 
+
+  if ( (err = snd_pcm_channel_prepare( data->handle, SND_PCM_CHANNEL_CAPTURE)) < 0)
+    {
+      post( "Error: snd_pcm_channel_prepare() failed: %s\n", snd_strerror (err));
+      return &fts_dev_open_error;
+    }
 
   return fts_Success;
 }
@@ -531,7 +440,7 @@ static void alsa_adc_get( fts_word_t *argv)
 {
   fts_dev_t *dev;
   alsa_pcm_dev_data_t *data;
-  int n_voices, voice, n, i, j;
+  int n_voices, voice, n, i, j, size, err;
 
   dev = *((fts_dev_t **)fts_word_get_ptr( argv));
 
@@ -540,7 +449,17 @@ static void alsa_adc_get( fts_word_t *argv)
   n_voices = fts_word_get_long(argv + 1);
   n = fts_word_get_long(argv + 2);
 
-  snd_pcm_read( data->handle, data->fmtbuf, n * n_voices * sizeof( short));
+  size = n * n_voices * sizeof( short);
+
+  if ((err = snd_pcm_read( data->handle, data->fmtbuf, size)) != size)
+    {
+      static int count = 0;
+
+      if (count++ < 100)
+	{
+	  post( "error when reading %d %s\n", err, snd_strerror( err));
+	}
+    }
 
   for ( voice = 0; voice < n_voices; voice++)
     {
