@@ -117,31 +117,27 @@ fts_kernel_config(void)
 {
   /* LANG modules */
 
-  fts_install_module(&fts_mess_module);   /* Install the MAX interpreter module */
-
-  fts_install_module(&fts_utils_module);      /* Install the FTS utils */
-
-  fts_install_module(&fts_datalib_module);      /* Install the FTS data lib */
-
-  fts_install_module(&fts_veclib_module);  /* Install the FTS vector function*/
-
-  fts_install_module(&fts_dsp_module);       /* Install the DSP engine */
+  fts_install_module( &fts_mess_module);   /* Install the MAX interpreter module */
+  fts_install_module( &fts_utils_module);      /* Install the FTS utils */
+  fts_install_module( &fts_datalib_module);      /* Install the FTS data lib */
+  fts_install_module( &fts_veclib_module);  /* Install the FTS vector function*/
+  fts_install_module( &fts_ftl_module);       /* Install the FTL engine ***MUST BE BEFORE DSP*** */
+  fts_install_module( &fts_dsp_module);       /* Install the DSP engine */
 
   /* RUNTIME modules */
 
-  fts_install_module(&fts_sched_module);     /* the fts scheduler module */
-  fts_install_module(&fts_dev_module);      /* the device support  system */
-
-  fts_install_module(&fts_midi_module);     /* the fts MIDI system */
-  fts_install_module(&fts_time_module);    /* the time handling module */
-  fts_install_module(&fts_audio_module);    /* the fts AUDIO I/O  system */
-  fts_install_module(&fts_client_module);   /* the fts <--> client communication system */
+  fts_install_module( &fts_sched_module);     /* the fts scheduler module */
+  fts_install_module( &fts_dev_module);      /* the device support  system */
+  fts_install_module( &fts_midi_module);     /* the fts MIDI system */
+  fts_install_module( &fts_time_module);    /* the time handling module */
+  fts_install_module( &fts_audio_module);    /* the fts AUDIO I/O  system */
+  fts_install_module( &fts_client_module);   /* the fts <--> client communication system */
 
   /* TILES modules */
 
-  fts_install_module(&fts_ucs_module);      /* the fts universal configuration  system */
-  fts_install_module(&fts_dsptile_module);      /* the fts universal configuration  system */
-  fts_install_module(&fts_messtile_module);      /* the fts universal configuration  system */
+  fts_install_module( &fts_ucs_module);      /* the fts universal configuration  system */
+  fts_install_module( &fts_dsptile_module);      /* the fts universal configuration  system */
+  fts_install_module( &fts_messtile_module);      /* the fts universal configuration  system */
 }
 
 
