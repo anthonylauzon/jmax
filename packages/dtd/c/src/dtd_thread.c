@@ -32,6 +32,19 @@
 static fts_symbol_t dtd_thread_symbol;
 fts_class_t* dtd_thread_type;
 
+void dtd_thread_set_state(dtd_thread_t* self,
+			  fts_audiofile_t* sf, 
+			  dtd_buffer_t* com_buffer, 
+			  const int* const buffer_index,
+			  const int* const is_eof)
+{
+    self->sf = sf;
+    self->com_buffer = com_buffer;
+    self->buffer_index = buffer_index;
+    self->is_eof = is_eof;
+}
+
+
 static void
 dtd_thread_read(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {

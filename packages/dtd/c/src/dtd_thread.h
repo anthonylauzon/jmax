@@ -52,6 +52,12 @@ typedef struct
 } dtd_thread_t;
 
 
+FTS_API void dtd_thread_set_state(dtd_thread_t* self,
+				  fts_audiofile_t* sf, 
+				  dtd_buffer_t* com_buffer, 
+				  const int* const buffer_index,
+				  const int* const is_eof);
+
 extern fts_class_t* dtd_thread_type;
 
 #endif /* DTD_THREAD_H_ */
