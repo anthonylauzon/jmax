@@ -74,6 +74,7 @@ do_it ()
 	    for a in $ARCHS
 	    do
 		echo mkdir -p $i/$a/debug $i/$a/opt
+		mkdir -p $i/$a/debug $i/$a/opt
 	    done
        fi
     done
