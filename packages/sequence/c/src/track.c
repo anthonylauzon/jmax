@@ -820,7 +820,10 @@ track_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     {
       /* set persistence flag */
       if(fts_is_number(at) && this->persistence >= 0)
-	this->persistence = (fts_get_number_int(at) != 0);
+	{
+	  this->persistence = (fts_get_number_int(at) != 0);
+	  fts_client_send_message(o, fts_s_persistence, 1, at);
+	}
     }
   else
     {
@@ -1057,7 +1060,7 @@ track_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(track_t), track_init, track_delete);
 
-  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
   fts_class_message_varargs(cl, fts_s_persistence, track_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui); 
 

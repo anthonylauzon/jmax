@@ -389,7 +389,10 @@ preset_set_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fts_preset_t *this = (fts_preset_t *)obj;
 
   if(fts_is_number(at) && this->persistence >= 0)
-    this->persistence = fts_get_number_int(at);
+    {
+      this->persistence = fts_get_number_int(at);
+      fts_client_send_message(o, fts_s_persistence, 1, at);
+    }
 }
 
 /******************************************************
@@ -463,7 +466,7 @@ preset_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_persistence, preset_set_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, preset_update_gui); 
-b
+
   fts_class_message_varargs(cl, fts_s_dump, preset_dump); 
   fts_class_message_varargs(cl, sym_new_preset, preset_new_preset);
   fts_class_message_varargs(cl, sym_dump_mess, preset_dump_mess);

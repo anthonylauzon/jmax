@@ -144,7 +144,7 @@ fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty)
 {
   if(this == fts_get_root_patcher()) return;
 
-  if( ((fts_object_t *)this)->patcher != fts_get_root_patcher())
+  if( ((fts_object_t *)this)->patcher != fts_get_root_patcher() && !fts_object_is_template((fts_object_t *)this))
     fts_patcher_set_dirty( ((fts_object_t *)this)->patcher, is_dirty);
   else
     {
@@ -1215,7 +1215,7 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	  fts_atom_t a_name;
 
 	  fts_set_symbol(&a_name, fts_object_get_name(obj));
-	  fts_client_send_message(obj, fts_s_set_name, 1, &a_name);
+	  fts_client_send_message(obj, fts_s_name, 1, &a_name);
 	}
 
       fts_object_get_prop(obj, fts_s_font, a_font + 0);

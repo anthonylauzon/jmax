@@ -121,7 +121,7 @@ public class FtsGraphicObject extends FtsObject {
 	  ((FtsGraphicObject)obj).setCurrentLayer( args.getInt( 0));
 	}
       });
-    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "set_name"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "name"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsGraphicObject)obj).setVariableName( args.getSymbol( 0).toString());
@@ -575,7 +575,7 @@ public class FtsGraphicObject extends FtsObject {
 	args.addSymbol( FtsSymbol.get( name));
 
 	try{
-	  send( FtsSymbol.get("set_name"), args);
+	  send( FtsSymbol.get("name"), args);
 	}
 	catch(IOException e)
 	  {

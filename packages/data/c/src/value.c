@@ -149,7 +149,7 @@ value_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(value_t), value_init, value_delete);
 
-  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
 
   fts_class_message_varargs(cl, fts_s_post, value_post);
 

@@ -66,7 +66,10 @@ data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     {
       /* set persistence flag (if its not set to args) */
       if(fts_is_number(at) && this->persistence > data_object_persistence_args)
-	this->persistence = (fts_get_number_int(at) != 0);
+	{
+	  this->persistence = (fts_get_number_int(at) != 0);
+	  fts_client_send_message(o, fts_s_persistence, 1, at);
+	}
     }
   else
     {

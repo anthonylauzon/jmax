@@ -1295,7 +1295,7 @@ fmat_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fmat_t), fmat_init, fmat_delete);
   
-  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
 

@@ -1639,7 +1639,7 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   if (fts_object_get_definition(obj) != NULL)
     {
       fts_bmax_code_push_symbol(f, fts_object_get_name(obj));
-      fts_bmax_code_obj_mess(f, fts_s_set_name, 1);
+      fts_bmax_code_obj_mess(f, fts_s_name, 1);
       fts_bmax_code_pop_args(f, 1);
     }
 }

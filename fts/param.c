@@ -276,7 +276,10 @@ param_set_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_param_t *this = (fts_param_t *)o;
 
   if(fts_is_number(at) && this->persistence >= 0)
-    this->persistence = fts_get_number_int(at);
+    {
+      this->persistence = fts_get_number_int(at);
+      fts_client_send_message(o, fts_s_persistence, 1, at);
+    }
 }
 
 /********************************************************************
@@ -313,7 +316,7 @@ param_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_param_t), param_init, param_delete);
 
-  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
   fts_class_message_varargs(cl, fts_s_persistence, param_set_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, param_update_gui); 
 
