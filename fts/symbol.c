@@ -26,7 +26,7 @@
  *  - predefinitions of some symbols
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 /* **********************************************************************
  *

@@ -12,6 +12,7 @@ class.c \
 clipboard.c \
 connection.c \
 doctor.c \
+dspgraph.c \
 errobj.c \
 expression.c \
 fpe.c \

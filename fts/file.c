@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>

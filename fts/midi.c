@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 /*
  * This files contains all things MIDI related:

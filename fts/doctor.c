@@ -50,7 +50,7 @@
 
   */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 typedef struct fts_object_doctor
 {

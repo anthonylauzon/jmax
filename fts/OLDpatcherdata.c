@@ -20,7 +20,7 @@
  * 
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/OLDftsdata.h>
 #include <fts/private/OLDpatcherdata.h>
 

@@ -20,7 +20,7 @@
  * 
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 void fts_objectset_init( fts_objectset_t *set)
 {

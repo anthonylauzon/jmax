@@ -20,7 +20,7 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 /* MIDI status bytes */
 #define NOTE_OFF 0x80

@@ -26,7 +26,7 @@
  * */
 
 #include <string.h>
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 /***************************************************************
  *

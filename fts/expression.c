@@ -61,7 +61,7 @@
 
 /* #define EXPRESSION_TRACE_DEBUG */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/expression.h>
 
 /* Operator codes: symbols can store a special operator code,

@@ -27,7 +27,7 @@
 #include <unistd.h>
 #endif
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/bmaxhdr.h>
 #include <fts/private/loader.h>
 

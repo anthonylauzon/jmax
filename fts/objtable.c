@@ -25,7 +25,7 @@
  * The 0 id map by definition to the NULL pointer.
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/objtable.h>
 
 static fts_hashtable_t object_table;

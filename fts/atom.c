@@ -27,7 +27,7 @@
 
 #include <string.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 static fts_hashtable_t fts_atom_type_table;
 

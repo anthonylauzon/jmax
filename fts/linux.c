@@ -40,7 +40,7 @@
 #include <errno.h>
 
 /*  #include <fts/fts.h>  not yet (platform.h) */
-#include "fts/ftsnew.h"
+#include "fts/fts.h"
 #include "fts/private/fpe.h"
 #include "fts/private/platform.h"
 

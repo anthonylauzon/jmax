@@ -58,7 +58,7 @@
 #include <unistd.h>
 #endif
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/errobj.h>
 #include <fts/private/vm.h>
 #include <fts/private/object.h>

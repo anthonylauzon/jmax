@@ -44,7 +44,7 @@
 
 #define INITIAL_SELECTION_SIZE 16
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/selection.h>
 
 static void

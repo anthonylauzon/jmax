@@ -46,7 +46,7 @@
 
 #include <audiofile.h>
 #include <string.h>
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 #ifndef HAVE_AF_VIRTUAL_PARAMETERS 
 #define READ_BLOCK_SIZE 1024

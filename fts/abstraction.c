@@ -44,7 +44,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/errobj.h>
 #include <fts/private/patcher.h>
 #include <fts/private/patparser.h>

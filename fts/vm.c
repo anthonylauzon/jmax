@@ -104,7 +104,7 @@
 #define VM_SAFE
 #endif
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/vm.h>
 
 #define EVAL_STACK_DEPTH   8192

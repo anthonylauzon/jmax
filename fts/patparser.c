@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/patparser.h>
 
 

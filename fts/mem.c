@@ -43,7 +43,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 /***********************************************************************
  *

@@ -24,7 +24,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 
 /* --------------------------------------------------------------------------- */

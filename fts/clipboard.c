@@ -31,7 +31,7 @@
    to the object itself.
 */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 #include <stdlib.h>
 #include <sys/types.h>

@@ -20,7 +20,7 @@
  * 
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 #define ARRAY_DEFAULT_ALLOC_INCREMENT 64
 

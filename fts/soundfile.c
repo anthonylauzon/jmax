@@ -27,7 +27,7 @@
  * in soundfiles_default.c and soundfiles_af.c.
  * */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 /* generally explicitly supported file format symbols (see down for explain) */
 fts_symbol_t fts_s_aiffc = 0;

@@ -52,7 +52,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/patcher.h>
 
 extern fts_class_t *inlet_class;

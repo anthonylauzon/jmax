@@ -25,7 +25,7 @@
 
 #include <string.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <fts/private/class.h>
 
 /* Return Status declarations */

@@ -27,7 +27,7 @@
  *  - fts_timer
  *
  */
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 #include <math.h>
 
 static fts_heap_t *alarms_heap = 0;

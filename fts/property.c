@@ -70,7 +70,7 @@
 
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 static fts_heap_t *daemon_heap;
 static fts_heap_t *plist_cell_heap;

@@ -24,7 +24,7 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 /* Implement autosave functions; autosave is implemented
    only for catastrophic situations, but can be easily implemented 

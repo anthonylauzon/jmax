@@ -20,7 +20,7 @@
  * 
  */
 
-#include <fts/ftsnew.h>
+#include <fts/fts.h>
 
 static fts_heap_t *cell_heap;
 
