@@ -9,6 +9,7 @@
 #include "lang/mess.h"
 
 static fts_symbol_t fts_new_builtin_symbol(const char *name, int code);
+static int same_string(const char *s1, const char *s2);
 
 /* Predefined ATOM TYPE symbols */
 
@@ -75,6 +76,7 @@ fts_symbol_t fts_s_error;
 
 /* Symbols related to builtin classes */
 
+fts_symbol_t fts_s_old_patcher;
 fts_symbol_t fts_s_patcher;
 fts_symbol_t fts_s_inlet;
 fts_symbol_t fts_s_outlet;
@@ -115,7 +117,7 @@ static void
 fts_predefine_symbols(void)
 {
   /* **************** WARNING *************************
-     In ANY case, do not change the association symbol value in the following;
+     In ANY case, do not change the index assigned to  symbols in the following;
      just add new pairs, in any order, but do not change existing values;
      this code are part of the binary format, and of the client protocol; you
      would simply screw up compatibility with existing files;
@@ -205,7 +207,8 @@ fts_predefine_symbols(void)
   /* Symbols related to builtin classes */
   /* WARNING: read the warning at the beginning of the function */
 
-  fts_s_patcher    = fts_new_builtin_symbol("patcher", 50);
+  fts_s_old_patcher    = fts_new_builtin_symbol("patcher", 50);
+  fts_s_patcher    = fts_new_builtin_symbol("jpatcher", 86);
   fts_s_inlet      = fts_new_builtin_symbol("inlet",   51);
   fts_s_outlet     = fts_new_builtin_symbol("outlet",  52);
   fts_s_qlist      = fts_new_builtin_symbol("qlist",   53);
@@ -248,20 +251,12 @@ fts_predefine_symbols(void)
   fts_s_else        = fts_new_builtin_symbol(":", 83);
   fts_s_assign      = fts_new_builtin_symbol("=", 84);
 
+  /* FTS Data  */
 
-  /* Last number user: 85 (max, 255 predefined symbols !! ) */
+  fts_s_data        = fts_new_builtin_symbol("data", 87);
+
+  /* Last number used: 87 (max, 255 predefined symbols !! ) */
   /* WARNING: read the warning at the beginning of the function */
-
-
-  /* (fd)
-     As I don't know if 85 is not used elsewhere, and I read the
-     warning at the beginning of the function, I don't add this
-     as a builtin symbol.
-     But I don't find it very convenient.
-     Also, if this a possibility to break the binary file format,
-     be sure that this will happen...
-  */
-  fts_s_data       = fts_new_symbol( "data");
 }
 
 
@@ -364,7 +359,7 @@ fts_new_symbol(const char *name)
 
   for (; sp; sp = sp->next_in_table)
     {
-      if (! strcmp(name, sp->name))
+      if (same_string(name, sp->name))
 	return sp;
     }
 
@@ -402,7 +397,7 @@ fts_new_symbol_copy(const char *name)
 
   for (; sp; sp = sp->next_in_table)
     {
-      if (! strcmp(name, sp->name))
+      if (same_string(name, sp->name))
 	return sp;
     }
 
@@ -463,4 +458,29 @@ int fts_get_builtin_symbol_index(fts_symbol_t s)
   return s->index;
 }
 
+
+/* Local implementation string equality test */
+
+static int same_string(const char *s1, const char *s2)
+{
+  if (s1 == s2)
+    return 1;
+
+  if ((s1 == 0) || (s2 == 0))
+    {
+      fprintf(stderr, "Null argument for same_string\n");
+      return 0;
+    }
+
+  while (*s1 == *s2)
+    {
+      s1++;
+      s2++;
+
+      if ((*s1 == '\0') && (*s2 == '\0'))
+	return 1;
+    }
+
+  return 0;
+}
 

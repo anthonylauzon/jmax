@@ -5,7 +5,6 @@
 #endif
 
 #include <fcntl.h>
-#include <stdio.h>
 
 #include "sys.h"
 #include "lang.h"

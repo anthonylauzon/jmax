@@ -6,10 +6,9 @@ import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /** An instance of this document handler can load MaxDocument from
- *  a tcl file obeyng the "jmax" command conventions.
- * This version actually ask FTS to load the file, using the new
- * incremental Application Layer architecture; the result
- * is a speed improvement of a factor of 40 (minimum).
+ *  a bmax binary file.
+ * Ask FTS to load the file, using the new
+ * incremental Application Layer architecture.
  */
 
 public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler

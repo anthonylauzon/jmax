@@ -49,19 +49,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else if (name.equals("deletedObject")) {
       // just an hack: remove the watch temporarly, add it just after
       // to avoid recursion
-      itsPatcher.removeWatch("deletedObject", this);
       itsSketchPad.itsHelper.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()), false);
-      itsPatcher.watch("deletedObject", this);
     }
-    else if (name.equals("deleteConnection")) {
-      itsPatcher.removeWatch("deleteConnection", this);
-      ErmesObject objFrom = (ErmesObject) (((FtsConnection)value).getFrom()).getRepresentation();
-      int outletFrom = ((FtsConnection)value).getFromOutlet();
-      ErmesObject objTo = (ErmesObject) (((FtsConnection)value).getTo()).getRepresentation();
-      int inletTo = ((FtsConnection)value).getToInlet();
-      itsSketchPad.itsHelper.DeleteConnectionByInOut(objFrom, outletFrom, objTo, inletTo, false);
-      itsPatcher.watch("deleteConnection", this);
+    else if (name.equals("deletedConnection")) {
+      itsSketchPad.itsHelper.DeleteGraphicConnection((ErmesConnection) ((FtsConnection)value).getRepresentation(), false);
     }
+
     if (!pasting) itsSketchPad.paintDirtyList();
   }
 
@@ -93,7 +86,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   boolean pasting = false;
   public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
   //  public ErmesObject itsOwner;//in case this is a subpatcher
-  public boolean isAbstraction = false;
+
   final String FILEDIALOGMENUITEM = "File dialog...";
   public static int preferredWidth = 490;
   public static int preferredHeight = 450;
@@ -102,7 +95,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   ErmesScrollerView itsScrollerView = new ErmesScrollerView(this, itsSketchPad);
   ErmesSwToolbar itsToolBar = new ErmesSwToolbar(itsSketchPad);
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
-  ErmesSwVarEdit itsVarEdit;//created when we need a variable editor (abstractions)!
   public FtsContainerObject itsPatcher;
   private Menu itsJustificationMenu;
   private Menu itsResizeObjectMenu;
@@ -150,12 +142,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   {
   }
 
-  /** Tell the editor the data has changed; it pass a sigle Java
-   * Object that may code what is changed and where; if the argument
-   * is null, means usually that all the data is changed
-   */
-  public void dataChanged(Object reason){}
-
   //end of the MaxDataEditor interface
 
 
@@ -174,6 +160,13 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsDocument = patcher.getDocument();
     itsPatcher = patcher;
 
+    /* (mdc) deleteConnection watcher always active; 
+       connections can be deleted as side effect of 
+       editing on other windows; other watches should be istalled 
+       here also,*/
+
+    itsPatcher.watch("deletedConnection", this);
+
     if (itsDocument.getRootData() == getData())
       setTitle(itsDocument.getName());
     else
@@ -181,15 +174,13 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
     itsSketchPad.setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));						// communicate with
     Init(); //MaxEditor base class init (standard menu handling)
-    isAbstraction = false;
+
     itsSketchPad.SetToolBar(itsToolBar);	// inform the Sketch of the ToolBar to 
 
     InitSketchWin();
     validate();
     itsPatcher.open();
 
-    // (fd) is it faster like that ? YES ? but it's quite hard to see...
-    //if ( MaxEditor.IN_FILE)
     InitFromContainer(itsPatcher);
 
     setVisible(true);
@@ -220,21 +211,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       return "patcher " + theFtsPatcher.getObjectName();
     else
       return theFtsPatcher.getClassName();
-  }
-
-    //--------------------------------------------------------
-    //	CONSTRUCTOR
-    //
-    //--------------------------------------------------------    
-  public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow, boolean theIsAbstraction)
-  {
-    super(Mda.getDocumentTypeByName("patcher"));
-    isAbstraction = theIsAbstraction;
-    itsSketchPad.SetToolBar(itsToolBar);	// inform the Sketch of the ToolBar to 
-    itsSketchPad.setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));						// communicate with
-      
-    InitSketchWin();
-    validate();
   }
 
   int horizontalOffset() {
@@ -305,10 +281,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     setSize(new Dimension(600, 300));
     itsToolBar.setSize(600, /*150630*/25);    
     getContentPane().add(itsToolBar);
-    if (isAbstraction ) {
-      ErmesSwVarEdit itsVarEdit = new ErmesSwVarEdit(itsSketchPad, 1);
-      getContentPane().add(itsVarEdit, "stick_both");
-    }
+
     /*{//1506
       JPanel aPanel = new JPanel();
 
@@ -875,26 +848,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     return (itsDocument.getRootData() == getData()) && (! itsDocument.isSaved());
   }
 
-  private boolean SaveBody(){
-    setVisible(false);
-    setTitle(itsDocument.getDocumentFile().toString()); 
-    setVisible(true);
-    //2705 CreateFtsGraphics(this);
-
-    try
-      {
-	itsDocument.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
-	itsDocument.save();
-      }
-    catch (MaxDocumentException e)
-      {
-	new ErrorDialog(this, e.getMessage());
-	return false;
-      }
-
-    return true;
-  }
-
   public void Save() {
     // first, tentative implementation:
     // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
@@ -903,15 +856,40 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     // The "canSave" method of a data tell if it can be saved
     // i.e. if it have a document , and if we can write to its document file
 
+    /* Change in semantic: now Save() is active *only* on root level patchers 
+       SHOULD BECOME Gray in the others
+     */
+
+    if (itsDocument.getRootData() != getData())
+      {
+	new ErrorDialog(this, "Only root patchers can be saved");
+	return;
+      }
+
     if (itsDocument.canSave())
-      SaveBody();
+      {
+	try
+	  {
+	    itsDocument.save();
+	  }
+	catch (MaxDocumentException e)
+	  {
+	    new ErrorDialog(this, e.getMessage());
+	  }
+      }
     else
       SaveAs();
   }
 
-  public void SaveAs() {
-    String oldTitle = getTitle();
+  public void SaveAs()
+  {
     File file;
+
+    if (itsDocument.getRootData() != getData())
+      {
+	new ErrorDialog(this, "Only root patchers can be saved");
+	return;
+      }
 
     file = MaxFileChooser.chooseFileToSave(this, "Save As", itsDocument.getDocumentFile());
 
@@ -919,10 +897,50 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       return;
     else
       itsDocument.bindToDocumentFile(file);
-    
-    SaveBody();
+
+    //setVisible(false);
+    setTitle(file.toString()); 
+    // setVisible(true);
+
+    try
+      {
+	itsDocument.save();
+      }
+    catch (MaxDocumentException e)
+      {
+	new ErrorDialog(this, e.getMessage());
+      }
   }
 
+  public void SaveTo()
+  {
+    File file;
+
+    file = MaxFileChooser.chooseFileToSave(this, "Save As", itsDocument.getDocumentFile());
+
+    if (file == null)
+      return;
+
+    try
+      {
+	if (itsDocument.getRootData() == getData())
+	  {
+	    // Make a document save to
+
+	    itsDocument.saveTo(file);
+	  }
+	else
+	  {
+	    // Make a subdocument save to
+
+	    itsDocument.saveSubDocumentTo(getData(), file);
+	  }
+      }
+    catch (MaxDocumentException e)
+      {
+	new ErrorDialog(this, e.getMessage());
+      }
+  }
 
   public void Print(){
     PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Patcher", MaxApplication.getProperties());
@@ -1088,7 +1106,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e){
     if(!itsClosing){
-      MaxApplication.setCurrentWindow(this);
       ErmesSketchPad.RequestOffScreen(itsSketchPad);
       if(itsSketchPad.getGraphics()!= null)
 	itsSketchPad.update(itsSketchPad.getGraphics());
@@ -1109,9 +1126,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public void windowActivated(WindowEvent e){
     requestFocus();
-    if(!itsClosing){
-      MaxApplication.setCurrentWindow(this);
-    }
   }
 
   ///////////////////////////////////////////////////////////////////////////

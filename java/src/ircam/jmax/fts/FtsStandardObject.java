@@ -28,23 +28,6 @@ public class FtsStandardObject extends FtsObject
   {
     super(parent, className, description, objId);
   }
-
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                      CLIENT API and  PROPERTIES                           */
-  /*                                                                           */
-  /*****************************************************************************/
-
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-    // Save as "object ..."
-
-    writer.print("object {" + description + "}");
-
-    savePropertiesAsTcl(writer);
-  }
 }
 
 

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -176,7 +175,10 @@ static void fts_binary_file_dispose( fts_binary_file_desc_t *desc)
    for clipboards).
    */
 
-fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent)
+fts_object_t *fts_binary_file_load( const char *name,
+				    fts_object_t *parent,
+				    int ac, const fts_atom_t *at,
+				    fts_expression_state_t *e)
 {
   fts_object_t *obj;
   fts_binary_file_desc_t desc;
@@ -187,7 +189,7 @@ fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent)
       return 0;
     }
 
-  obj = fts_run_mess_vm(parent, desc.code, desc.symbols);
+  obj = fts_run_mess_vm(parent, desc.code, desc.symbols, ac, at, e);
 
   if (obj == 0)
     post("fts_binary_file_load: VM return null for %s\n", name);
@@ -196,4 +198,5 @@ fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent)
 
   return obj;
 }
+
 

@@ -33,7 +33,6 @@
    It include now the scheduler time generation.
 */
 
-#include <stdio.h>		/* for debug and description code */
 #include "sys.h"
 #include "lang.h"
 #include "runtime/sched.h"

@@ -16,19 +16,15 @@
  */
 
 
-fts_object_t *fts_error_object_new(fts_patcher_t *parent, int id, int ac, const fts_atom_t *at)
+fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
-  int i;
-  fts_atom_t a;
-  fts_atom_t description[4];
+
+  fts_atom_t description[1];
 
   fts_set_symbol(&description[0], fts_s_patcher);
-  fts_set_symbol(&description[1], fts_new_symbol("error"));
-  fts_set_int(&description[2], 0);
-  fts_set_int(&description[3], 0);
 
-  obj = fts_object_new(parent, id, 4, description);
+  obj = fts_make_object(parent, 1, description);
 
   /* flag the patcher as error */
 
@@ -44,7 +40,6 @@ void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet)
 {
   if (fts_object_get_inlets_number(obj) <= ninlet)
     fts_patcher_redefine((fts_patcher_t *) obj,
-			 fts_s_error,
 			 ninlet + 1,
 			 fts_object_get_outlets_number(obj));
 }
@@ -54,7 +49,6 @@ void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet)
 {
   if (fts_object_get_outlets_number(obj) <= noutlet)
     fts_patcher_redefine((fts_patcher_t *) obj,
-			 fts_s_error,
 			 fts_object_get_inlets_number(obj),
 			 noutlet + 1);
 }

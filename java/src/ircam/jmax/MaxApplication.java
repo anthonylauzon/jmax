@@ -84,19 +84,6 @@ public class MaxApplication extends Object
 
   static MaxWhenHookTable  itsHookTable = null;
 
-  /**
-   * @deprecated
-   */
-
-  public static void setCurrentWindow(MaxEditor theWindow){
-    if (theWindow instanceof ErmesSketchWindow)
-      itsSketchWindow = (ErmesSketchWindow)theWindow;
-  }
-
-  public static ErmesSketchWindow getCurrentWindow() {
-    return itsSketchWindow;
-  }
-	
   /** Functions to add application hooks */
 
   public static void addHook(String name, String code)

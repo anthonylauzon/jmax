@@ -28,18 +28,25 @@ public class FtsPatcherDocumentType extends MaxDocumentType
 
     try
       {
-	patcher = (FtsContainerObject) Fts.makeFtsObject(Fts.getServer().getRootObject(), "patcher", "unnamed 0 0");
+	patcher = (FtsContainerObject) Fts.makeFtsObject(Fts.getServer().getRootObject(), "jpatcher");
 
 	// Put some geometrical property for the window, so we can see it.
+	// Do both a put and a localPut but it should be a series of put/ask
+	// pair.
 
 	patcher.put("wx", 100);
+	patcher.localPut("wx", 100);
 	patcher.put("wy", 100);
+	patcher.localPut("wy", 100);
 	patcher.put("ww", 500);
+	patcher.localPut("ww", 500);
 	patcher.put("wh", 480);
+	patcher.localPut("wh", 480);
 
 	// Put a new empty patch in edit mode
 
 	patcher.put("initialMode", "edit");
+	patcher.localPut("initialMode", "edit");
 
 	FtsPatcherDocument document = new FtsPatcherDocument();
 
@@ -60,10 +67,10 @@ public class FtsPatcherDocumentType extends MaxDocumentType
     return true;
   }
 
-  /** For the moment, we don't do a patch document from a data;
-    in other terms, we cannot yet do a "saveCopyAs" on a subpatch
-    Soon ...
-    */
+  public boolean canMakeSubDocumentFile(MaxData data)
+  {
+    return true;
+  }
 }
 
 

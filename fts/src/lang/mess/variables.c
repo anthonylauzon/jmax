@@ -1,128 +1,513 @@
 /* FTS Variable handling */
 
+/*
+ * Structure description.
+ *
+ * fts_binding_t : is the implementation of the binding of a name to a value.
+ *              i.e. the low level implementation of a variable.
+ *
+ * fts_env_t  : it is a list of bindings; represent an environment mappin
+ *              a set of names to a set of values.
+ */
+
+
 #include "sys.h"
 #include "lang.h"
 #include "lang/mess/messP.h"
 
-/* Heaps */
+#define TRACE_DEBUG
 
-static fts_heap_t variables_heap;
-static fts_heap_t var_ref_heap;
-
-/* Variable handling */
+/* Errors */
 
 static fts_status_description_t fts_redefinedVariable = {"Redefined variable"};
 
-static fts_variable_t *fts_patcher_variable_new(fts_object_t *owner, fts_patcher_t *p, fts_symbol_t name, fts_atom_t *value)
+  
+/****************************************************************************/
+/*                                                                          */
+/*  Binding direct Manipulation                                             */
+/*                                                                          */
+/****************************************************************************/
+
+static fts_heap_t bindings_heap;
+static fts_heap_t objlist_heap;
+static fts_heap_t var_refs_heap;
+
+static fts_binding_t *fts_binding_new(fts_env_t *env, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner)
 {
-  fts_variable_t *v;
+  fts_binding_t *v;
 
-  v = (fts_variable_t *) fts_heap_alloc(&variables_heap);
+  v = (fts_binding_t *) fts_heap_alloc(&bindings_heap);
 
-  v->owner = owner;
   v->name = name;
-  v->next = p->env;
+  v->env  = env;
+  v->owner = owner;
+  v->next  = 0;
+  v->users = 0;
+  v->suspended = 0;
   v->value = *value;
+  v->wannabes = 0;
 
-  p->env = v;
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "New Binding in ");
+  fprintf_object(stderr, env->patcher);
+  fprintf(stderr, " for variable %s, value ", fts_symbol_name(name));
+  fprintf_atoms(stderr, 1, value);
+  fprintf(stderr, " owner ");
+  fprintf_object(stderr, owner);
+  fprintf(stderr, "\n");
+#endif
 
   return v;
 }
 
-static void
-fts_patcher_variable_remove(fts_patcher_t *patcher, fts_object_t *owner)
+
+static void fts_binding_delete(fts_binding_t *var)
 {
-  /* HERE @@@ ADD propagation of variable removing/unbinding */
+  fts_binding_t **b;		/* indirect precursor */
+  fts_object_list_t   *u;
 
-  fts_variable_t **p;		/* indirect precursor */
+#ifdef TRACE_DEBUG
+  if (var->env)
+    {
+      fprintf(stderr, "Remove Binding in ");
+      fprintf_object(stderr, var->env->patcher);
+    }
+  else
+    {
+      fprintf(stderr, "Remove Binding for variable %s\n", fts_symbol_name(var->name));
+      fprintf(stderr, "Recomputing :\n");
+    }
+#endif
 
-  p = &(patcher->env); 
+  /* Remove the binding from the environment */
+
+  if (var->env)
+    for (b = &(var->env->first); *b; b = &((*b)->next))
+      if (*b == var)
+	{
+	  *b = var->next;
+
+	  break;
+	}
+
+  /* The binding is no more in the environment; we can now
+     redefine the object, without any risk of inference.
+     In the same moment, we Free the users list
+     */
+
+  u = var->users;
+  while (u)
+    {
+      fts_object_t *obj;
+      fts_object_list_t *tmp;
+
+      tmp = u;
+      u = u->next;
+      obj = tmp->obj;
+
+      fts_heap_free((char *)tmp, &objlist_heap);
+
+#ifdef TRACE_DEBUG
+      fprintf(stderr, "\t");
+      fprintf_object(stderr, obj);
+      fprintf(stderr, "\n");
+#endif
+
+      fts_object_recompute(obj);
+    }
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Done.\n");
+#endif
+
+  /* free the binding */
+
+  fts_heap_free((char *)var, &bindings_heap);
+}
+
+
+static void fts_binding_suspend(fts_binding_t *var)
+{
+  fts_object_list_t   *u;
+
+#ifdef TRACE_DEBUG
+  if (var->env)
+    {
+      fprintf(stderr, "Suspend Binding in ");
+      fprintf_object(stderr, var->env->patcher);
+      fprintf(stderr, " for variable %s\n", fts_symbol_name(var->name));
+    }
+  else
+    {
+      fprintf(stderr, "Suspend Binding for variable %s\n", fts_symbol_name(var->name));
+    }
+
+  fprintf(stderr, "Suspending users variables :\n");
+#endif
+
+  var->suspended = 1;
+
+  /* Recursive calls to suspend all the variables bind to users of this
+     binding */
+
+  for (u = var->users; u; u = u->next)
+    if (! fts_object_is_error(u->obj))
+      {
+#ifdef TRACE_DEBUG
+	fprintf(stderr, "\t");
+	fprintf_object(stderr, u->obj);
+	fprintf(stderr, "\n");
+#endif
+
+	fts_variable_suspend(u->obj, fts_object_get_variable(u->obj));
+      }
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Done.\n");
+#endif
+}
+
+/*
+ * NOTE: If an variable had an error or void value, and is restored to an error or
+ * void value, it do no propagation; this to stop loop propagation.
+ */
+
+static void fts_binding_restore(fts_binding_t *var, fts_atom_t *value, fts_object_t *owner)
+{
+  int do_propagation;
+
+  if (fts_is_object(&(var->value)) && fts_object_is_error(fts_get_object(&(var->value))) &&
+      fts_is_object(value) && fts_object_is_error(fts_get_object(value)))
+    do_propagation = 0;
+  else
+    do_propagation = 1;
+
+  var->suspended = 0;
+  var->owner = owner;
+  var->value = *value;
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Restoring Binding in ");
+  fprintf_object(stderr, var->env->patcher);
+  fprintf(stderr, " for variable %s, value ", fts_symbol_name(var->name));
+  fprintf_atoms(stderr, 1, value);
+  fprintf(stderr, " owner ");
+  fprintf_object(stderr, owner);
+  fprintf(stderr, "\n");
+#endif
+
+  /* Recursive calls to recover all the variables bind to users of this
+     binding, and redefine the objects */
+
+  if (do_propagation)
+    {
+      fts_object_list_t *u;
+
+#ifdef TRACE_DEBUG
+      fprintf(stderr, "Recomputing: \n");
+#endif
+      /* this loop remove objects from the users list, while indirectly
+	 the calls will add objects to the user list; what we do then
+	 is to remove the user list from the binding, and loop
+	 on it; the redefinition will implicitly re-add the users to the
+	 user list; we free the old user list during the loop */
+
+      u = var->users;
+      var->users = 0;
+
+      while (u)
+	{
+	  fts_object_t *obj;
+	  fts_object_list_t *tmp;
+
+	  tmp = u;
+	  u = u->next;
+	  
+	  obj = tmp->obj;
+	  
+	  fts_heap_free((char *)tmp, &objlist_heap);
+
+#ifdef TRACE_DEBUG
+	  fprintf(stderr, "\t");
+	  fprintf_object(stderr, obj);
+	  fprintf(stderr, "\n");
+#endif
+	  fts_object_recompute(obj);
+	}
+
+#ifdef TRACE_DEBUG
+      fprintf(stderr, "Done.\n");
+#endif
+    }
+}
+
+
+static int fts_binding_is_suspended(fts_binding_t *var)
+{
+  return var->suspended;
+}
+
+
+static void fts_binding_add_user(fts_binding_t *var, fts_object_t *object)
+{
+  fts_object_list_t *u;
+  fts_binding_list_t *b;
+
+  u = (fts_object_list_t *) fts_heap_alloc(&objlist_heap);
+
+  u->obj  = object;
+  u->next = var->users;
+  var->users = u;
+
+  /* Add the var_refs in the object */
+
+  b = (fts_binding_list_t *) fts_heap_alloc(&var_refs_heap);
+
+  b->next = object->var_refs;
+  b->var = var;
+  object->var_refs = b;
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "New User ");
+  fprintf_object(stderr, object);
+  fprintf(stderr, " for variable %s in ", fts_symbol_name(var->name));
+  fprintf_object(stderr, var->env->patcher);
+  fprintf(stderr, "\n");
+#endif
+
+}
+
+
+void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
+{
+  fts_object_list_t   **u;	/* indirect precursor */
+  fts_binding_list_t  **b;	/* indirect precursor */
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Remove User ");
+  fprintf_object(stderr, object);
+
+  if (var->env)
+    {
+      fprintf(stderr, " for variable %s in ", fts_symbol_name(var->name));
+      fprintf_object(stderr, var->env->patcher);
+      fprintf(stderr, "\n");
+    }
+  else
+    {
+      fprintf(stderr, " for variable %s\n", fts_symbol_name(var->name));
+    }
+#endif
+
+  /* Remove the user from the binding */
+
+  for (u = &(var->users); *u; u = &((*u)->next))
+    if ((*u)->obj == object)
+	{
+	  fts_object_list_t   *p;
+
+	  p = *u;
+	  *u = (*u)->next;
+
+	  fts_heap_free((char *)p, &objlist_heap);
+	  break;
+	}
+
+  /* remove the var_refs in the object */
+
+  for (b = &(object->var_refs); *b; b = &((*b)->next))
+    if ((*b)->var == var)
+	{
+	  fts_binding_list_t   *p;
+
+	  p = *b;
+	  *b = (*b)->next;
+
+	  fts_heap_free((char *)p, &var_refs_heap);
+	  break;
+	}
+
+  /* Then, if no user are left, and if there are no owner (i.e. undefined variable)
+     delete the binding */
+
+  if ((var->users == 0) && (var->owner == 0))
+    fts_binding_delete(var);
+}
+
+
+
+static void fts_binding_add_wannabe(fts_binding_t *var, fts_object_t *object)
+{
+  fts_object_list_t *w;
+
+  w = (fts_object_list_t *) fts_heap_alloc(&objlist_heap);
+
+  w->next = var->wannabes;
+  w->obj = object;
+  var->wannabes = w;
+  
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "New Wannabe ");
+  fprintf_object(stderr, object);
+  fprintf(stderr, " for variable %s in ", fts_symbol_name(var->name));
+  fprintf_object(stderr, var->env->patcher);
+  fprintf(stderr, "\n");
+#endif
+}
+
+
+void fts_binding_remove_wannabe(fts_binding_t *var, fts_object_t *object)
+{
+  fts_object_list_t   **w;	/* indirect precursor */
+
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Remove Wannabe ");
+  fprintf_object(stderr, object);
+  fprintf(stderr, " for variable %s in ", fts_symbol_name(var->name));
+  fprintf_object(stderr, var->env->patcher);
+  fprintf(stderr, "\n");
+#endif
+
+  /* Remove the wannabe from the binding */
+
+  for (w = &(var->wannabes); *w; w = &((*w)->next))
+    if ((*w)->obj == object)
+	{
+	  fts_object_list_t   *p;
+
+	  p = *w;
+	  *w = (*w)->next;
+
+	  fts_heap_free((char *)p, &objlist_heap);
+	  break;
+	}
+}
+
+
+/****************************************************************************/
+/*                                                                          */
+/*  Environent Manipulation                                                 */
+/*                                                                          */
+/****************************************************************************/
+
+void fts_env_init(fts_env_t *env, fts_object_t *patcher)
+{
+  env->first = 0;
+  env->patcher = patcher;
+}
+
+
+static fts_binding_t *fts_env_add_binding(fts_env_t *env, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner)
+{
+  fts_binding_t *var;
+
+  var = fts_binding_new(env, name, value, owner);
+  
+  var->next = env->first;
+  env->first = var;
+
+  return var;
+}
+
+
+static void fts_env_remove_bindings(fts_env_t *env, fts_object_t *owner)
+{
+  fts_binding_t **p;		/* indirect precursor */
+
+  p = &(env->first);
+
+  /* Look and remove the binding */
 
   while (*p)
     if ((*p)->owner == owner)
       {
-	fts_variable_t *p2;
+	fts_binding_t *var = *p;
 
-	p2 = *p;
 	*p = (*p)->next;
-	
-	fts_heap_free((char *)p2, &variables_heap);
+	var->env = 0;		/* to prevent the binding from removing itself */
+	fts_binding_delete(var);
       }
     else
       p = &((*p)->next);
 }
 
 
-static void
-fts_patcher_variable_remove_by_name(fts_patcher_t *patcher, fts_symbol_t name)
+static void fts_env_remove_suspended_bindings(fts_env_t *env, fts_object_t *owner)
 {
-  /* HERE @@@ ADD propagation of variable removing/unbinding */
+  fts_binding_t **p;		/* indirect precursor */
 
-  fts_variable_t **p;		/* indirect precursor */
+  p = &(env->first);
 
-  p = &(patcher->env); 
+  /* Look and remove the binding */
 
   while (*p)
-    if ((*p)->name == name)
+    if (((*p)->owner == owner) && (*p)->suspended)
       {
-	fts_variable_t *p2;
+	fts_binding_t *var = *p;
 
-	p2 = *p;
 	*p = (*p)->next;
-	
-	fts_heap_free((char *)p2, &variables_heap);
+	var->env = 0;		/* to prevent the binding from removing itself */
+	fts_binding_delete(var);
       }
     else
       p = &((*p)->next);
 }
 
 
-/* Remove the variables the patcher declared internally */
-
-void
-fts_patcher_remove_variables(fts_patcher_t *patcher)
+static void fts_env_suspend_bindings(fts_env_t *env, fts_object_t *owner)
 {
-  fts_patcher_variable_remove(patcher, (fts_object_t *) patcher);
+  fts_binding_t *var = 0;
+
+  var = env->first;
+
+  while (var)
+    {
+      if (var->owner == owner)
+	fts_binding_suspend(var);
+
+      var = var->next;
+    }
 }
 
 
-/* Remove the variables owner defined in its patcher */
-   
-void
-fts_variable_remove_all(fts_object_t *owner)
+static fts_binding_t *fts_env_get_binding(fts_env_t *env, fts_symbol_t name)
 {
-  fts_patcher_variable_remove(fts_object_get_patcher(owner), owner);
-}
+  fts_binding_t *var = 0;
 
-static fts_variable_t *fts_patcher_variable_get(fts_patcher_t *patcher, fts_symbol_t name)
-{
-  fts_variable_t *p;
-
-  for (p = patcher->env; p ; p = p->next)
-    if (p->name == name)
-      return p;
+  for (var = env->first; var; var = var->next)
+    if (var->name == name)
+      return var;
 
   return 0;
 }
 
 
-fts_atom_t *fts_variable_get_value(fts_object_t *obj, fts_symbol_t name)
+
+/****************************************************************************/
+/*                                                                          */
+/*    Scope handlingand  High level Public API                              */
+/*                                                                          */
+/****************************************************************************/
+
+
+static fts_binding_t *fts_variable_get_binding(fts_object_t *scope, fts_symbol_t name)
 {
   fts_patcher_t *patcher;
 
-  if (fts_object_is_patcher(obj))
-    patcher = (fts_patcher_t *) obj;
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
   else
-    patcher = fts_object_get_patcher(obj);
+    patcher = fts_object_get_patcher(scope);
 
   while (patcher)
     {
-      fts_variable_t *v;
+      fts_binding_t *v;
 
-      v = fts_patcher_variable_get(patcher, name);
+      v = fts_env_get_binding(fts_patcher_get_env(patcher), name);
 
       if (v)
-	return &(v->value);
+	return v;
       
       patcher = fts_object_get_patcher((fts_object_t *) patcher);
     }
@@ -130,94 +515,365 @@ fts_atom_t *fts_variable_get_value(fts_object_t *obj, fts_symbol_t name)
   return 0;
 }
 
-fts_status_t
-fts_patcher_variable_define(fts_patcher_t *patcher, fts_symbol_t name, fts_atom_t *value)
-{
-  fts_variable_t *v;
+/*
+  Define a suspended variable in the inner scope corresponding to the
+  passed object ; cause automatic stealing of any object
+  within the scope of the variable that referred an outer variable with the same
+  name; the actual redefinition will be made at "restore" time.
 
-  v = fts_patcher_variable_get(patcher, name);
+ */
+
+
+void fts_variable_define(fts_object_t *scope, fts_symbol_t name, fts_object_t *owner)
+{
+  fts_atom_t value;
+  fts_patcher_t *patcher;
+  fts_binding_t *v, *up_v;
+
+  fts_set_void(&value);
+
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
+  else
+    patcher = fts_object_get_patcher(scope);
+
+  up_v = fts_variable_get_binding(scope, name);
+
+  v = fts_env_get_binding(fts_patcher_get_env(patcher), name);
 
   if (v)
-    return &fts_redefinedVariable;
+    {
+      /* suspended variable case; variable already defined do nothing
+       * for now.
+       * Note that redefinitions should be check before calling this
+       * function using fts_variable_can_define.
+       */
+
+      return;
+    }
   else
     {
-      fts_patcher_variable_new((fts_object_t *) patcher, patcher, name, value);
+      v = fts_env_add_binding(fts_patcher_get_env(patcher), name, &value, owner);
+      fts_binding_suspend(v);
+    }
 
-      return fts_Success;
+
+  /* Steal and suspends all the references, in the local scope, to 
+     variables with the same name */
+
+  if (up_v)
+    {
+      fts_object_list_t   **u;	/* indirect precursor */
+
+#ifdef TRACE_DEBUG
+      fprintf(stderr, "Found upper variable for %s\n Stealing: \n", fts_symbol_name(up_v->name));
+#endif      
+
+      u = &(up_v->users);
+
+      while (*u)
+	{
+	  fts_object_t *user = (* u)->obj;
+
+	  if (fts_object_is_in_patcher((*u)->obj, patcher))
+	    {
+#ifdef TRACE_DEBUG
+	      fprintf(stderr, "\t");
+	      fprintf_object(stderr, user);
+	      fprintf(stderr, "\n");
+	      fprintf(stderr, " stealed\n");
+#endif
+
+	      fts_binding_remove_user(up_v, user);
+	      fts_binding_add_user(v, user);
+	      fts_variable_suspend(user, fts_object_get_variable(user));
+	    }
+	  else
+	    u = &((*u)->next);
+	}
+#ifdef TRACE_DEBUG
+      fprintf(stderr, "Done.\n");
+#endif
+    }
+  else
+    {
+#ifdef TRACE_DEBUG
+      fprintf(stderr, " upper variable for %s not found.\n", fts_symbol_name(name));
+#endif
     }
 }
 
+/* Verify if a fts_variable_define can be issued in the passed scope.
+   Note that this is not like testing if a variable is bound; the binding can be 
+   inherited from a surrounding patcher.
+ */
 
-fts_status_t
-fts_variable_bind_to_object(fts_symbol_t name, fts_object_t *obj)
+int fts_variable_can_define(fts_object_t *scope, fts_symbol_t name)
 {
   fts_patcher_t *patcher;
-  fts_variable_t *v;
+  fts_binding_t *v;
 
-  patcher = fts_object_get_patcher(obj);
-
-  v = fts_patcher_variable_get(patcher, name);
-
-  if (v)
-    return &fts_redefinedVariable;
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
   else
-    {
-      fts_atom_t a;
+    patcher = fts_object_get_patcher(scope);
 
-      fts_set_object(&a, obj);
-      fts_patcher_variable_new(obj, patcher, name, &a);
+  v = fts_env_get_binding(fts_patcher_get_env(patcher), name);
 
-      obj->varname = name;
-      return fts_Success;
-    }
+  return (v == 0);
+}
+
+/* Return 1 if the variable exists *and* it is suspended */
+
+int fts_variable_is_suspended(fts_object_t *scope, fts_symbol_t name)
+{
+  fts_patcher_t *patcher;
+  fts_binding_t *v;
+
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
+  else
+    patcher = fts_object_get_patcher(scope);
+
+  v = fts_env_get_binding(fts_patcher_get_env(patcher), name);
+
+  return (v != 0) && fts_binding_is_suspended(v);
 }
 
 
-void fts_variable_unbind_to_object(fts_object_t *obj)
+/* Remove the variable bound to the name in the scope represented by the object;
+   the removing is generic enough to support any possible style of future declarations.
+   cause a redefinition of all the objects that use the same variable.
+   Can be called also on suspended variables; in this case, it recursively resolve
+   all the suspended bindings dependent on this one; to resolve means in this
+   case to redefine the object, and either redefine or undefine the object
+   binding.
+   */
+
+
+void fts_variable_undefine(fts_object_t *scope, fts_symbol_t name)
 {
-  if (obj->varname)
-    fts_patcher_variable_remove_by_name(fts_object_get_patcher(obj), obj->varname);
+  /* if a wanna be exist, just suspend the binding,
+     don't delete it, and recover it with the wannabe as value
+     by recomputing the wannabe.
+     No need to scope manipulation, we are guaranteed that the 
+     wannabe is in the same patcher of the original object, so the user
+     list is consistent.
+   */
+
+  fts_binding_t *var;
+
+  var = fts_variable_get_binding(scope, name);
+
+  if (var)
+    {
+      if (var->wannabes)
+	{
+	  fts_object_list_t *w;
+	  fts_object_t *wannabe;
+
+	  w = var->wannabes;
+	  var->wannabes = w->next;
+	  wannabe = w->obj;
+	  fts_heap_free((char *)w, &objlist_heap);
+	  
+	  fts_binding_suspend(var);
+
+	  fts_object_recompute(wannabe);
+	}
+      else
+	fts_binding_delete(var);
+    }
 }
 
+/*
+  Like fts_variable_undefine, but act on all the variables in the current scope defined
+  by 'owner'
+  */
 
-void fts_variable_env_clean(fts_variable_t **env)
+void fts_variables_undefine(fts_object_t *scope, fts_object_t *owner)
 {
-  while (*env)
-    {
-      fts_variable_t *v;
+  fts_patcher_t *patcher;
+  fts_binding_t *v;
 
-      v = *env;
-      env = &((*env)->next);
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
+  else
+    patcher = fts_object_get_patcher(scope);
 
-      fts_heap_free((char *) v, &variables_heap);
-    }
+  fts_env_remove_bindings(fts_patcher_get_env(patcher), owner);
+}
+
+/*
+  Suspend  the variable bound to the name in the scope represented by the object;
+  To suspend means to keep the dependency structure and value, but don't consider
+  the binding valid; all the binding to objects dependent on this variable are
+  recursively suspended.
+
+  Note that a variable should be suspended only temporarly; i.e. variables are
+  never suspended between two user level atomic operations.
+  */
+
+
+void fts_variable_suspend(fts_object_t *scope, fts_symbol_t name)
+{
+  fts_binding_t *var;
+
+  var = fts_variable_get_binding(scope, name);
+
+  if (var)
+    fts_binding_suspend(var);
 }
 
 
 /*
+  Like fts_variable_suspend, but act on all the variables in the current scope defined
+  by 'owner'
+  */
+
+
+void fts_variables_suspend(fts_object_t *scope, fts_object_t *owner)
+{
+  fts_patcher_t *patcher;
+  fts_binding_t *v;
+
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
+  else
+    patcher = fts_object_get_patcher(scope);
+
+  fts_env_suspend_bindings(fts_patcher_get_env(patcher), owner);
+}
+
+void fts_variables_undefine_suspended(fts_object_t *scope, fts_object_t *owner)
+{
+  fts_patcher_t *patcher;
+  fts_binding_t *v;
+
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
+  else
+    patcher = fts_object_get_patcher(scope);
+
+  fts_env_remove_suspended_bindings(fts_patcher_get_env(patcher), owner);
+}
+
+
+/*
+ * Restore a suspended variable.
  *
- * expression variable dependencies  handling support
+ * All the recursively dependent objects are redefined, and their
+ * bindings recursively redefined.
+ * A variable may be restored by a different owner in case of object ridefinition.
  *
  */
 
-#ifdef TODO
-static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_symbol_t name)
+void fts_variable_restore(fts_object_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner)
 {
-  fts_var_ref_t *p;
+  fts_patcher_t *patcher;
+  fts_binding_t *v;
 
-  p = (fts_var_ref_t *) fts_heap_alloc(&var_ref_heap);
+  if (fts_object_is_standard_patcher(scope))
+    patcher = (fts_patcher_t *) scope;
+  else
+    patcher = fts_object_get_patcher(scope);
 
-  p->var  = name; 
-  p->next  = e->var_refs;
-  e->var_refs = p;
+  v = fts_env_get_binding(fts_patcher_get_env(patcher), name);
+
+  if (v && fts_binding_is_suspended(v))
+    fts_binding_restore(v, value, owner);
 }
-#endif
 
+
+/* Access the value of a variable in the scope represented by an object */
+
+fts_atom_t *fts_variable_get_value(fts_object_t *scope, fts_symbol_t name)
+{
+  fts_binding_t *v;
+
+  v = fts_variable_get_binding(scope, name);
+
+  if (! v)
+    {
+      /* make the root void variable here */
+
+      fts_atom_t a;
+
+      fts_set_void(&a);
+      v = fts_env_add_binding(fts_patcher_get_env(fts_get_root_patcher()), name, &a, 0);
+    }
+
+  if (fts_binding_is_suspended(v))
+    return 0;
+  else
+    return &(v->value);
+}
+
+
+/*
+  Add a user to a variable in a given scope.
+  A user is an object that referentiate the variable and so need to 
+  be redefined when the variable change value.
+  */
+
+void fts_variable_add_user(fts_object_t *scope, fts_symbol_t name, fts_object_t *user)
+{
+  fts_binding_t *var;
+
+  var = fts_variable_get_binding(scope, name);
+
+  fts_binding_add_user(var, user);
+}
+
+
+
+/*
+  A variable wannabe is an object that want to redefine that variable.
+  If the original definer of the variable is delete, one wannabe
+  should be selected to become the new variable definer.
+  */
+
+void fts_variable_add_wannabe(fts_object_t *scope, fts_symbol_t name, fts_object_t *wannabe)
+{
+  fts_binding_t *var;
+
+  var = fts_variable_get_binding(scope, name);
+
+  if (var)
+    fts_binding_add_wannabe(var, wannabe);
+}
+
+
+void fts_variable_remove_wannabe(fts_object_t *scope, fts_symbol_t name, fts_object_t *wannabe)
+{
+  fts_binding_t *var;
+
+  var = fts_variable_get_binding(scope, name);
+
+  if (var)
+    fts_binding_remove_wannabe(var, wannabe);
+}
 
 /* Module init function */
 
 void fts_variables_init(void)
 {
-  fts_heap_init(&variables_heap, sizeof(fts_variable_t), 256);
-  fts_heap_init(&var_ref_heap, sizeof(fts_var_ref_t), 16);
+  fts_heap_init(&bindings_heap, sizeof(fts_binding_t), 256);
+  fts_heap_init(&objlist_heap, sizeof(fts_object_list_t), 256);
+  fts_heap_init(&var_refs_heap, sizeof(fts_binding_list_t), 256);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

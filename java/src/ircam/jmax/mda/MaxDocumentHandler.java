@@ -54,6 +54,11 @@ abstract public class MaxDocumentHandler
   abstract protected MaxDocument loadDocument(File file) throws MaxDocumentException;
 
   abstract public void saveDocument(MaxDocument document, File file) throws MaxDocumentException;
+
+  protected void saveSubDocument(MaxDocument document, MaxData data, File file) throws MaxDocumentException
+  {
+    throw new MaxDocumentException("SYSTEM ERROR: Cannot save subdocuments !");
+  }
 }
 
 

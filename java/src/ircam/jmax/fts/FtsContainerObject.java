@@ -2,7 +2,6 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
-import tcl.lang.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
@@ -113,12 +112,11 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
     localPut("newObject", obj); // the newObject property keep the last object created
   }
 
-  /** Remove an object from this container. */
+  /** Remove the connections arriving or starting from an object
+    from this container. */
 
-  final void removeObjectFromContainer(FtsObject obj)
+  final void removeObjectConnectionsFromContainer(FtsObject obj)
   {
-    localPut("deletedObject", obj); // the deleteObject property keep the last object deleted
-
     // First, look in the connections, and collect the connections
     // to be deleted then delete them
     // WARNING: doing like that *because* FtsConnection.delete change
@@ -145,63 +143,19 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 	if ((c.from == obj) || (c.to == obj))
 	  c.delete();
       }
+  }
 
+  /** Remove the  object from this container.
+    Connections are not touched, so they should be cleanup before.
+    */
+
+  final void removeObjectFromContainer(FtsObject obj)
+  {
+    localPut("deletedObject", obj); // the deleteObject property keep the last object deleted
     objects.removeElement(obj);
   }
 
-  /** Replace an object with an other one in all the connections
-   *   that are consistent after the substitution.
-   * We assume that the container is open !!
-   */
 
-  void replaceInConnections(FtsObject oldObject, FtsObject newObject)
-  {
-    // First, collect the connections that will not be consistent 
-    // with newObject in a new Vectro
-
-    Vector toDelete = new Vector();
-
-    for (int i = 0; i < connections.size(); i++)
-      {
-	FtsConnection conn = (FtsConnection)connections.elementAt(i);
-
-	if ((conn.from == oldObject) && (conn.outlet >= newObject.getNumberOfOutlets()))
-	  toDelete.addElement(conn);
-	else if ((conn.to == oldObject) && (conn.inlet >= newObject.getNumberOfInlets()))
-	  toDelete.addElement(conn);
-      }
-
-    // Then delete them 
-    // It is slow, but safer because removing elements in vector
-    // shift the content, so that calling "delete" in a loop on
-    // "connections" would change the connections content ...
-
-    for (int i = 0; i < toDelete.size(); i++)
-      {
-	FtsConnection conn = (FtsConnection)toDelete.elementAt(i);
-
-	conn.delete();
-      }
-
-    // Then, redo the connections
-
-    for (int i = 0; i < connections.size(); i++)
-      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
-  }
-
-
-  /** Replace an object with an other one in all the connections
-   * without checking for errors; used when the new object is an error object
-   * We assume that the container is open !!
-   */
-
-  void replaceInAllConnections(FtsObject oldObject, FtsObject newObject)
-  {
-    // Redo the connections
-
-    for (int i = 0; i < connections.size(); i++)
-      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
-  }
 
   /** Overwrite the getObjects methods so to download the patcher
     by need */
@@ -230,7 +184,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   final void removeConnectionFromContainer(FtsConnection obj)
   {
-    localPut("deleteConnection", obj); // the deleteConnection property keep the last connection deleted
+    localPut("deletedConnection", obj); // the deleteConnection property keep the last connection deleted
     connections.removeElement(obj);
   }
 
@@ -256,7 +210,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
     open = true;
     Fts.getServer().openPatcher(this);
-    Fts.getServer().syncToFts();
+    Fts.sync();
   }
 
   /** Close tell FTS that this patcher is not "alive". */
@@ -280,10 +234,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   private final void download()
   {
     if (! downLoaded)
-      {
-	Fts.getServer().sendDownloadPatcher(this);
-	Fts.getServer().syncToFts();
-      }
+      Fts.getServer().sendDownloadPatcherAndSync(this);
 
     downLoaded = true;
   }
@@ -295,8 +246,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   final void redownload()
   {
-    Fts.getServer().sendDownloadPatcher(this);
-    Fts.getServer().syncToFts();
+    Fts.getServer().sendDownloadPatcherAndSync(this);
     downLoaded = true;
   }
 
@@ -361,30 +311,13 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
       containerPropertyHandlerTable.callHandlers(property, value, author);
   }
 
-  /** The Tcl eval for an object; just eval the script, but handle
-   *  a globally available container stack.
+  /* ask fts to send back the value property (and so call the handlers) 
+     for the objects in a patcher.
    */
-
-  public static Stack containerStack = new Stack(); // should not be public !
-
-
-  public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
+     
+  public void askAll(String name)
   {
-    containerStack.push(this);
-
-    // We need to call _BasicThisWrapper because in this way we
-    // provide a "local" environment to the code being executed, i.e. al
-    // the variables will be locals
-
-    TclObject list = TclList.newInstance();
-
-    TclList.append(interp, list, TclString.newInstance("_BasicThisWrapper"));
-    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
-    TclList.append(interp, list, script);
-
-    interp.eval(list, 0);
-
-    containerStack.pop();
+    Fts.getServer().askAllObjectProperty(this, name);
   }
 
 

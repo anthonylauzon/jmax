@@ -55,17 +55,35 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
   public void propertyChanged(FtsObject obj, String name, Object value) {
     //handle the "error" property, the only one we're listening at
-    
-    Integer errorFlag = null;
-    if (name.equals("error") && value != null)
-      DoublePaint();
-    
+    // call super for the others
+
+    if (name.equals("error"))
+      {
+	if (value != null)
+	  DoublePaint();
+      }
+    else
+      {
+	System.err.println("Got property " + name + " value " + value);
+      
+	super.propertyChanged(obj, name, value);
+      }
   }
 
   public void YouArePatcher(boolean what) {
     iAmPatcher = what;
   }
-	
+
+  /* Inspector */
+
+  public boolean inspectorAlreadyOpen() {
+    return (ErmesPatcherInspector.isOpen() && ErmesPatcherInspector.getInspectedObject() == itsFtsObject);
+  }
+
+  public void openInspector() {
+    if (iAmPatcher)
+      ErmesPatcherInspector.inspect((FtsContainerObject) itsFtsObject);
+  }
 
   //--------------------------------------------------------
   // makeFtsObject and redefineFtsObject() 
@@ -88,11 +106,12 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 
   public void redefineFtsObject()
   {
-    GetSketchWindow().itsPatcher.watch("deleteConnection", GetSketchWindow());
-
     try
       {
 	itsFtsObject = Fts.redefineFtsObject(itsFtsObject, itsArgs);
+
+	itsFtsObject.watch("ins", this);
+	itsFtsObject.watch("outs", this);
       }
     catch (FtsException e)
       {
@@ -103,8 +122,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
       }
 
     this.YouArePatcher(itsFtsObject instanceof FtsContainerObject);
-
-    GetSketchWindow().itsPatcher.removeWatch("deleteConnection", GetSketchWindow());
   }
   
   //--------------------------------------------------------
@@ -113,25 +130,46 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
   
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) 
   {
-
     if ( evt.getClickCount() > 1 ) 
       {
-	Cursor temp = itsSketchPad.getCursor();
-       
-	if ( itsFtsObject instanceof FtsObjectWithData)
+	MaxData data = null;
+
+	// New implementation: try to get the "data"
+	// property, and if not null edit it.
+
+	itsFtsObject.ask("data");
+	Fts.sync();
+	data = (MaxData) itsFtsObject.get("data");	
+
+	/* HACK !! */
+
+	if ((data != null) && (data instanceof FtsRemoteData))
 	  {
+	    ((FtsRemoteData) data).setDocument(GetSketchWindow().itsDocument);
+	  }
+
+	/* HACK END !! */
+
+
+	if ((data == null) && (itsFtsObject instanceof FtsObjectWithData))
+	  {
+	    // Fall back the old obsolete behaviour
+	    // Should be substituted by the previous one
+	    // need changes to table, qlist and patcher (?)
+	    // for this
+
+	    data = ((FtsObjectWithData) itsFtsObject).getData();	   
+	  }
+
+	if (data != null)
+	  {
+	    Cursor temp = itsSketchPad.getCursor();
+
 	    itsSketchPad.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
 	    try
 	      {
-		// New !!! Actually the same thing can be done for 
-		// patchers now !!!
-	   
-		MaxData data;
-	   
-		data = ((FtsObjectWithData) itsFtsObject).getData();	   
-		Mda.edit( data);
-
+		Mda.edit(data);
 	      }
 	    catch ( MaxDocumentException e)
 	      {
@@ -139,7 +177,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsPrope
 		System.err.println( e);
 	      }
 
-	    itsSketchPad.setCursor( temp);
+
+	    itsSketchPad.setCursor(temp);
 	  }
       }
     else if ( !itsSketchPad.itsRunMode) 

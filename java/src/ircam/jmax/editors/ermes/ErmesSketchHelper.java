@@ -121,38 +121,25 @@ class ErmesSketchHelper extends Object{
     if (paintNow) itsSketchPad.paintDirtyList();
   }
   
-  //--------------------------------------------------------
-  //	DeleteConnectionByInOut
-  //	delete one connection routine
-  //--------------------------------------------------------
-  
-  public void DeleteConnectionByInOut(ErmesObject srcObj, int srcOut, ErmesObject destObj, int destIn, boolean paintNow)
-  {
-    ErmesObjOutlet out;
-    ErmesObjInlet  in;
-    ErmesObject aObject = null;
-    ErmesConnection aConnection = null;
-
-    out = (ErmesObjOutlet) srcObj.itsOutletList.elementAt(srcOut);
-    in  = (ErmesObjInlet) destObj.itsInletList.elementAt(destIn);
-    
-    for(Enumeration e = out.itsConnections.elements(); e.hasMoreElements();) {
-      aConnection = (ErmesConnection) e.nextElement();
-      if(aConnection.itsInlet == in) break;
-    }
-
-    if(aConnection!=null) {
-      DeleteConnection(aConnection, false);
-      if (paintNow) itsSketchPad.paintDirtyList();
-    }
-  }
-
 
   //--------------------------------------------------------
   //	DeleteConnection
   //	delete one connection routine
   //--------------------------------------------------------
+
   public void DeleteConnection(ErmesConnection theConnection, boolean paintNow) {
+
+    if (theConnection.itsFtsConnection != null)
+      theConnection.itsFtsConnection.delete();	//delete from FTS
+
+    DeleteGraphicConnection(theConnection, paintNow);
+  }
+
+  //--------------------------------------------------------
+  //	DeleteConnection
+  //	delete one connection routine
+  //--------------------------------------------------------
+  public void DeleteGraphicConnection(ErmesConnection theConnection, boolean paintNow) {
     ErmesObjOutlet aOutlet = theConnection.GetOutlet();
     ErmesObjInlet aInlet = theConnection.GetInlet();
     
@@ -163,12 +150,10 @@ class ErmesSketchHelper extends Object{
     if(aInlet.GetConnections().size()==0) aInlet.SetConnected(false, false);
     if(aOutlet.GetConnections().size()==0) aOutlet.SetConnected(false, false);
 
-    if (theConnection.itsFtsConnection != null)
-      theConnection.itsFtsConnection.delete();	//delete from FTS
-
     itsSketchPad.markSketchAsDirty();
     if (paintNow) itsSketchPad.paintDirtyList();
   }
+
 
 
   //--------------------------------------------------------

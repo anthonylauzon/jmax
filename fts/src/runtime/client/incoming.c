@@ -12,7 +12,6 @@
  */
 
 #include <string.h>
-#include <stdio.h> 
 
 #include "protocol.h"
 #include "sys.h"

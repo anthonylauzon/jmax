@@ -11,6 +11,10 @@ import java.util.*;
 
 public class FtsConnection 
 {
+  /** on screen representation of the Fts Connection */
+
+  Object representation = null;
+
   /** to protect against double deletion.
     temporary, waiting for a more event/based editor
     */
@@ -39,6 +43,14 @@ public class FtsConnection
     from.getParent().addConnectionToContainer(this);
   }
 
+  void redefine(FtsObject from, int outlet, FtsObject to, int inlet)
+  {
+    this.from   = from;
+    this.outlet = outlet;
+    this.to     = to;
+    this.inlet  = inlet;
+  }
+
   /**
    * Get the fts connection id. <p>
    */
@@ -53,29 +65,6 @@ public class FtsConnection
   final void setConnectionId(int id)
   {
     this.id = id;
-  }
-
-
-  /** Replace one object with the other in the connection
-   *  valid only if we are doing a replace on the FTS side, also,
-   *  this do not change the connections in FTS; this is why this method
-   * is not public
-   */
-
-  void replace(FtsObject oldObject, FtsObject newObject)
-  {
-    if ((from == oldObject) || (to == oldObject))
-      {
-	Fts.getServer().deleteConnection(this);
-
-	if (from == oldObject)
-	  from = newObject;
-
-	if (to == oldObject)
-	  to = newObject;
-
-	Fts.getServer().newConnection(id, from, outlet, to, inlet);
-      }
   }
 
   /** Undo the connection. */
@@ -94,6 +83,24 @@ public class FtsConnection
 	
     Fts.getServer().deleteConnection(this);
 
+    from.getParent().removeConnectionFromContainer(this);
+  }
+
+
+  /** Undo the connection, only the client part */
+
+  public void release()
+  {
+    if (deleted)
+      return;
+
+    deleted = true;
+
+    Fts.getSelection().removeConnection(this);
+
+    from.setDirty();
+    to.setDirty();
+	
     from.getParent().removeConnectionFromContainer(this);
   }
 
@@ -125,16 +132,23 @@ public class FtsConnection
     return inlet;
   }
 
-  /** Save support. Save the connection as a TCL command. */
-
-  void saveAsTcl(PrintWriter writer)
-  {
-    writer.print("connection $obj(" + from.getObjectId() + ") " + outlet + " $obj(" + to.getObjectId() + ") " + inlet);
-  }
-
   public String  toString()
   {
     return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ", #" + id + ")";
+  }
+
+  /** Get the representation of this connection in the editor. */
+
+  public final Object getRepresentation()
+  {
+    return representation;
+  }
+
+  /** Set the representation of this connection in the editor. */
+
+  public final void setRepresentation(Object r)
+  {
+    representation = r;
   }
 }
 

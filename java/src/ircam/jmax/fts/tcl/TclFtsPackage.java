@@ -36,52 +36,23 @@ public class TclFtsPackage
   {
     Interp interp = MaxApplication.getTclInterp();
 
-    // File Format
-
-    interp.createCommand("patcher",   new FtsPatcherCmd());
-    interp.createCommand("object",    new FtsObjectCmd());
-    interp.createCommand("declare",   new FtsDeclareCmd());
-    interp.createCommand("comment",   new FtsCommentCmd());
-    interp.createCommand("inlet",     new FtsInletCmd());
-    interp.createCommand("outlet",    new FtsOutletCmd());
-    interp.createCommand("connection", new FtsConnectionCmd());
-
-
     // Abstraction and templates declaration, help and blah blah
 
     interp.createCommand("abstraction",  new FtsAbstractionCmd());
     interp.createCommand("abstractionPath",  new FtsAbstractionPathCmd());
+    interp.createCommand("template",  new FtsTemplateCmd());
+    interp.createCommand("templatePath",  new FtsTemplatePathCmd());
 
     interp.createCommand("helpPatch",  new FtsHelpPatchCmd());
     interp.createCommand("referenceURL",  new FtsReferenceURLCmd());
 
-    // Messages
+    // UCS
 
-    interp.createCommand("mess", new FtsMessCmd());
     interp.createCommand("ucs", new FtsUcsCmd());
-
-    // Access to object characteristic
-
-    interp.createCommand("className", new FtsClassNameCmd());
-
-    // Getting an object by name
-
-    interp.createCommand("getObjectByName", new FtsGetObjectByNameCmd());
-
-    // Access to object FTS properties
-
-    interp.createCommand("setProperty", new FtsSetPropertyCmd());
-    interp.createCommand("addListener", new FtsAddListenerCmd());
 
     // Sync
 
     interp.createCommand("sync", new FtsSyncCmd());
-
-    // Data
-
-    interp.createCommand("integerVector", new FtsIntegerVectorCmd());
-    interp.createCommand("atomList", new FtsAtomListCmd());
-    interp.createCommand("setData", new FtsSetDataCmd());
   }
 }
 

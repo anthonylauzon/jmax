@@ -45,6 +45,15 @@
 		       // Push the new object in the object stack
 		       // Don't touch the argument stack.
 
+   MAKE_TOP_OBJ   <nargs>   // Take <nargs> + lambda argument from the evaluation stack
+                       // and make an object with top of the object stack as parent.
+		       // Push the new object in the object stack
+		       // Don't touch the argument stack.
+		       // lambda is the value of a special internal vm register
+		       // that is filled loading templates; it is used to
+		       // add arguments to the first object created from the vm invocation
+		       // environment
+
    PUT_PROP   <sym> // Put the top of the evaluation stack value
                     // as property <sym> for the object at the top 
 		    // of the object stack
@@ -83,7 +92,6 @@
 #endif
 
 
-#include <stdio.h> /* DEBUG */
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/vm.h"
@@ -94,14 +102,14 @@
 #define OBJECT_TABLE_STACK_DEPTH 4096
 
 static fts_atom_t eval_stack[EVAL_STACK_DEPTH];
-static fts_atom_t *eval_tos;
+static fts_atom_t *eval_tos = eval_stack + EVAL_STACK_DEPTH;
 
 static fts_object_t *object_stack[OBJECT_STACK_DEPTH];
-static fts_object_t **object_tos;
+static fts_object_t **object_tos = object_stack + OBJECT_STACK_DEPTH;
 
 static fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
-static fts_object_t ***object_table_tos;
-static fts_object_t **object_table;
+static fts_object_t ***object_table_tos = object_table_stack + OBJECT_TABLE_STACK_DEPTH;
+static fts_object_t **object_table = 0;
 
 /* Macros to do checks operations */
 
@@ -133,6 +141,9 @@ static fts_object_t **object_table;
 /* The parent argument is pushed to the object stack, so to be used
    as parent by the make operations; at the end, return the top of the
    object stack.
+
+   Also, if the expression argument is not null, the assignement are put 
+   in the stack before, with the assignement syntax and constant values.
    */
 
 #define GET_B(p)    ((signed char) p[0])
@@ -151,24 +162,71 @@ static float GET_F(unsigned char *p)
   return f;
 }
 
-
-fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_symbol_t symbol_table[])
+static void fts_object_push_assignement(fts_symbol_t name, fts_atom_t *value, void *data)
 {
+  fts_object_t *obj = (fts_object_t *)data;
+  fts_atom_t a;
+
+  eval_tos--;
+  *eval_tos = *value;
+
+  fts_set_symbol(&a, fts_s_assign);
+  eval_tos--;
+  *eval_tos = a;
+
+  fts_set_symbol(&a, name);
+  eval_tos--;
+  *eval_tos = a;
+}
+
+fts_object_t *fts_run_mess_vm(fts_object_t *parent,
+			      unsigned char *program,
+			      fts_symbol_t symbol_table[],
+			      int ac, const fts_atom_t *at,
+			      fts_expression_state_t *e)
+{
+  int i;
   unsigned char cmd;
   unsigned char *p;
+  int lambda;
 
-  /* initialize the vm; this part of the code is not recursive, of course ! */
+  /* initialize the vm; this part of the code is not recursive, but it should,
+   because the vm can be called recursively for templates*/
 
-  p = program;
 
-  eval_tos = eval_stack + EVAL_STACK_DEPTH; /* point to the actually filled cell */
+  /* eval_tos = eval_stack + EVAL_STACK_DEPTH; */  /* point to the actually filled cell */
+  /* object_tos = object_stack + OBJECT_STACK_DEPTH; */
+  /* object_table_tos = object_table_stack + OBJECT_TABLE_STACK_DEPTH; */
 
-  object_tos = object_stack + OBJECT_STACK_DEPTH;
+  /* if there is an expression argument, push the assignement description
+     in the stack, so that templates will accept argument by name
+     Compute the total number of pushed atoms in lambda.
+     */
+
+
+  if (e)
+    lambda = fts_expression_map_to_assignements(e, fts_object_push_assignement, 0);
+  else
+    lambda = 0;
+
+  lambda = 3 * lambda + ac;
+
+  /* setting arguments and parent */
+
   object_tos--;
   *object_tos = parent;
 
-  object_table_tos = object_table_stack + OBJECT_TABLE_STACK_DEPTH;
-  object_table = 0;
+  for (i = ac - 1; i >= 0; i--)
+    {
+      /* Push the atoms in the value stack */
+
+      eval_tos--;
+      *eval_tos = at[i];
+    }
+
+  /* Do the evaluation */
+
+  p = program;
 
   while (1)
     {
@@ -589,7 +647,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    fprintf(stderr, "MAKE_OBJ_B %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs, eval_tos);
 
 	    /* Push the object in the object stack */
 
@@ -610,7 +668,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    fprintf(stderr, "MAKE_OBJ_S %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs, eval_tos);
 
 	    /* Push the object in the object stack */
 
@@ -632,7 +690,71 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
+	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs, eval_tos);
+
+	    /* Push the object in the object stack */
+
+	    object_tos--;
+	    *object_tos = new;
+	    p += 4;
+	  }
+	  break;	
+
+	case FVM_MAKE_TOP_OBJ_B:
+	  {
+	    /* MAKE_TOP_OBJ_B   <nargs> */
+
+	    fts_object_t *new;
+	    int nargs = GET_B(p);
+
+#ifdef VM_DEBUG
+	    fprintf(stderr, "MAKE_TOP_OBJ_B %d\n", nargs);
+#endif
+
+	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs + lambda, eval_tos);
+
+	    /* Push the object in the object stack */
+
+	    object_tos--;
+	    *object_tos = new;
+	    p += 1;
+	  }
+	  break;	
+
+	case FVM_MAKE_TOP_OBJ_S:
+	  {
+	    /* MAKE_TOP_OBJ_S   <nargs> */
+
+	    fts_object_t *new;
+	    int nargs = GET_S(p);
+
+#ifdef VM_DEBUG
+	    fprintf(stderr, "MAKE_TOP_OBJ_S %d\n", nargs);
+#endif
+
+	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs + lambda, eval_tos);
+
+	    /* Push the object in the object stack */
+
+	    object_tos--;
+	    *object_tos = new;
+	    p += 2;
+	  }
+	  break;	
+
+
+	case FVM_MAKE_TOP_OBJ_L:
+	  {
+	    /* MAKE_TOP_OBJ_L   <nargs> */
+
+	    fts_object_t *new;
+	    int nargs = GET_L(p);
+
+#ifdef VM_DEBUG
+	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
+#endif
+
+	    new  = fts_object_new((fts_patcher_t *) (*object_tos), nargs + lambda, eval_tos);
 
 	    /* Push the object in the object stack */
 

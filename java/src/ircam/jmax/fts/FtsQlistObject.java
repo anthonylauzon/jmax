@@ -51,7 +51,7 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
     this.list.forceUpdate();
 
     // (fd) already done in FtsAtomList::forceUpdate, but twice is better than once...
-    Fts.getServer().syncToFts();
+    Fts.sync();
 
     return list;
   }
@@ -61,7 +61,7 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
     // We may have a pending save/update
     // Sync, than discard the list
 
-    Fts.getServer().syncToFts();
+    Fts.sync();
     list.setObject(null);
 
     // set the new list, bind to this object
@@ -76,21 +76,6 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
   {
     Mda.dispose(list);
     super.delete();
-  }
-
-
-  // Save the object 
-  // Data is saved by the surrounding saved, patcher or selection
-  // because need more context
-
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-    // Save as "object ..."
-
-    writer.print("object {" + description + "}");
-    savePropertiesAsTcl(writer);
-
   }
 }
 

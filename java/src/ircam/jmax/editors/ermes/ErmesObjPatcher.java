@@ -13,19 +13,30 @@ import ircam.jmax.utils.*;
  * The "patcher" graphic object. It knows the subpatchers it contains.
  */
 
-public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler{
-
+public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler
+{
   String itsNameString = new String();
 
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
   String pathForLoading;
  
-  public void propertyChanged(FtsObject obj, String name, Object value) {
-    if (name.equals("ins") || name.equals("outs"))
-      update(itsFtsObject);
-    //maybe some graphic refresh after this?
+  /* Note: propertyChanged moved to the upper class, because inlets and outlets
+     can change for standard objects also (if they are abstractions that we are
+     editing); if you need to handle some property here, use the following example code:
+
+  public void propertyChanged(FtsObject obj, String name, Object value)
+  {
+    if (name.equals(<MY_PROPERY>))
+      {
+	// Handle MY PROPERTY
+      }
+    else
+      super.propertyChanged(obj, name, value);
   }
+
+ */
+
   
   //--------------------------------------------------------
   // Constructor
@@ -54,9 +65,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
     itsArgs = theFtsObject.getDescription().trim();
 
     super.Init(theSketchPad, theFtsObject);
-    itsFtsObject.watch("ins", this);
-    itsFtsObject.watch("outs", this);
-    
     resizeBy(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-getItsHeight());
     ParseText(itsArgs);
     
@@ -80,9 +88,9 @@ public class ErmesObjPatcher extends ErmesObjEditableObject implements FtsProper
     try
       {
 	if (itsArgs.equals(""))
-	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "patcher", "unnamed 0 0");
+	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "jpatcher");
 	else
-	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
+	  itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "jpatcher", itsArgs);
 
 	if (itsFtsObject == null) System.err.println("AAAAAAAAAAAHHHHHHHHH");
 	((FtsContainerObject) itsFtsObject).setDownloaded();

@@ -14,11 +14,8 @@ import com.sun.java.swing.*;
  * The abstract base class for all the Ermes editors. It provides utility methods
  * such as the Window menu handling, initialisation, and others.
  */
-public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener {
-
-  // (fd) 
-  public static boolean IN_FILE = false; // (fd)
-
+public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener
+{
   MaxDocumentType editedType;
 
   public Menu itsFileMenu;
@@ -190,12 +187,19 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 				    { Save();}});
 
 
-    aMenuItem = new MenuItem("Save As...");
+    aMenuItem = new MenuItem("Save As ...");
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new ActionListener()
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { SaveAs();}});
+
+    aMenuItem = new MenuItem("Save To ...");
+    fileMenu.add(aMenuItem);
+    aMenuItem.addActionListener(new ActionListener()
+				{
+				  public  void actionPerformed(ActionEvent e)
+				    { SaveTo();}});
 
     fileMenu.add(new MenuItem("-"));
 
@@ -266,7 +270,11 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void Save()
   {}//override this function if you want to save your content
-  public void SaveAs(){}//override this function if you want to save your content
+
+  public void SaveAs()
+  {}//override this function if you want to save your content 
+
+  public void SaveTo(){}//override this function if you want to save your content to a file
 
   public void Close()
   {
@@ -299,7 +307,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e)
   {
-    MaxApplication.setCurrentWindow(this);
   }
 
   public void focusLost(FocusEvent e){}
@@ -334,9 +341,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     if (file != null)
       {
-	// (fd)
-	IN_FILE = true;
-
 	Cursor temp = getCursor();
 
 	try
@@ -365,9 +369,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	    setCursor(temp);
 	    new ErrorDialog(this, e.toString());
 	  }
-
-	// (fd)
-	IN_FILE = false;
       }
   }
 

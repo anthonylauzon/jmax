@@ -40,12 +40,6 @@ public class FtsClipboard  extends FtsObject
 
     patcher.redownload();
   }
-
-  /** Cannot save as TCL */
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-  }
 }
 
 

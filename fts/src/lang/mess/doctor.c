@@ -35,7 +35,7 @@
 
 typedef struct fts_object_doctor
 {
-  fts_object_t *(* fun)(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at);
+  fts_object_t *(* fun)(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 } fts_object_doctor_t;
 
 static fts_hash_table_t fts_doctor_table;
@@ -48,7 +48,7 @@ void fts_doctor_init()
 
 
 void fts_register_object_doctor(fts_symbol_t class_name,
-				fts_object_t *(* fun)(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at))
+				fts_object_t *(* fun)(fts_patcher_t *patcher, int ac, const fts_atom_t *at))
 {
   void *data;
   fts_object_doctor_t *d;
@@ -66,8 +66,14 @@ void fts_register_object_doctor(fts_symbol_t class_name,
 
 }
 
+int fts_object_doctor_exists(fts_symbol_t class_name)
+{
+  void *data;
 
-fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
+  return fts_hash_table_lookup(&fts_doctor_table, class_name, &data);
+}
+
+fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   void *data;
   fts_symbol_t class_name;
@@ -78,7 +84,7 @@ fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, long id, int ac, co
     {
       fts_object_doctor_t *d = (fts_object_doctor_t *) data;
 
-      return (* d->fun)(patcher, id, ac, at);
+      return (* d->fun)(patcher, ac, at);
     }
   else
     return 0;

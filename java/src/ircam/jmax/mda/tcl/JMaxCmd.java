@@ -56,7 +56,6 @@ class JMaxCmd implements Command
 	    // Set the name and info
 
 	    document.setName(name);
-	    document.setInfo(info);
 
 	    // Eval the body inside the document 
 

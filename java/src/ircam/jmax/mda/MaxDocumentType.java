@@ -121,6 +121,16 @@ abstract public class MaxDocumentType
     return false;
   }
 
+
+  /** Return true if the document type can save a new document file (sub document)
+   * from a given data.
+   */
+
+  public boolean canMakeSubDocumentFile(MaxData data)
+  {
+    return false;
+  }
+
   /** Register an document in the document table (called by the MaxDocument 
     constructor) */
 

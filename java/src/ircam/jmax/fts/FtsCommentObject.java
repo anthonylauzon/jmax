@@ -39,22 +39,6 @@ public class FtsCommentObject extends FtsObject
     Fts.getServer().sendSetMessage(this, description);
     setDirty();
   }
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                      CLIENT API and  PROPERTIES                           */
-  /*                                                                           */
-  /*****************************************************************************/
-
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-    // Save as "declare ..."
-
-    writer.print("comment {" + description + "}");
-
-    savePropertiesAsTcl(writer);
-  }
 }
 
 

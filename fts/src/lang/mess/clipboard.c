@@ -3,6 +3,8 @@
    it is created by the patparser when it cannot find 
    an object, in order to mantain the consistency of the
    parsing (inlet and outlets are relative to the position).
+
+   It should not be an object !!!!
 */
 
 #include <stdlib.h>
@@ -50,7 +52,7 @@ clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
-  fts_binary_file_load(fts_symbol_name(this->file), fts_get_object(at));
+  fts_binary_file_load(fts_symbol_name(this->file), fts_get_object(at), 0, 0, 0);
 }
 
 

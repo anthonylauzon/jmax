@@ -59,10 +59,6 @@ FtsDataObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDataObject.java)
 .PHONY: FtsDataObject
 
-FtsDeclarationObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDeclarationObject.java)
-.PHONY: FtsDeclarationObject
-
 FtsDotPatRemoteDocumentHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatRemoteDocumentHandler.java)
 .PHONY: FtsDotPatRemoteDocumentHandler
@@ -232,9 +228,12 @@ FtsUpdateGroupListener:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsUpdateGroupListener.java)
 .PHONY: FtsUpdateGroupListener
 
-FtsValueObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsValueObject.java)
-PHONY:
+FtsRemoteData:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsRemoteData.java)
+.PHONY: FtsRemoteData
+
+
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

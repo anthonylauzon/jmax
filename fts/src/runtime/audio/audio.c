@@ -8,7 +8,6 @@
 
 /* Include files */
 
-#include <stdio.h>
 
 #include "sys.h"
 #include "lang.h"

@@ -1,7 +1,6 @@
 #ifndef _PATLEX_H_
 #define _PATLEX_H_
 
-#include <stdio.h>
 
 /* Token types */
 

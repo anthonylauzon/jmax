@@ -5,7 +5,6 @@
 
 #include "gphiter.h"
 
-#include <stdio.h>
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -88,8 +87,12 @@ static void expand_patcher( fts_patcher_t *p, char *s)
 {
   if (p)
     {
+      fts_atom_t name;
+
       expand_patcher( p->o.patcher, s);
-      strcat( s, fts_symbol_name( p->name));
+
+      fts_object_get_prop((fts_object_t *)p, fts_s_name, &name);
+      strcat( s, fts_symbol_name(fts_get_symbol(&name)));
       strcat( s, ".");
     }
 }

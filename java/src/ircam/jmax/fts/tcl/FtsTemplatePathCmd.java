@@ -1,27 +1,24 @@
 package ircam.jmax.fts.tcl;
 
-
 import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
-import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 /**
- * This class define the TCL Command <b>className</b>,
- * that get the class name of a FTS object. <p>
+ * This class define the TCL Command <b>template</b>,
+ * used to declare a template. <p>
  *
  * The Command Syntax is : <p>
  *
  * <code>
- *  className <i>obj</i>
+ *     templatePath <i>path </i>
  * </code> <p>
  *
- * @see FtsObject#getClassName
  */
 
-class FtsClassNameCmd implements Command
+class FtsTemplatePathCmd implements Command
 {
   /** Method implementing the TCL command. */
 
@@ -29,13 +26,17 @@ class FtsClassNameCmd implements Command
   {
     if (argv.length == 2)
       {
-	FtsObject obj = (FtsObject) ReflectObject.get(interp, argv[1]);
+	String path;
 
-	interp.setResult(obj.getClassName());
+	// Retrieve the arguments
+
+	path = argv[1].toString();
+
+	Fts.getServer().sendTemplateDeclarePath(path);
       }
     else
       {
-	throw new TclNumArgsException(interp, 1, argv, "<obj>");
+	throw new TclNumArgsException(interp, 1, argv, "<path>");
       }
   }
 }

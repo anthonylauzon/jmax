@@ -12,12 +12,19 @@ extern fts_expression_state_t *fts_expression_eval(fts_object_t *object,
 
 extern int fts_expression_get_count(fts_expression_state_t *e);
 
-#define  FTS_EXPRESSION_OK           0
-#define  FTS_EXPRESSION_SYNTAX_ERROR 1
-#define  FTS_EXPRESSION_UNDEFINED_VARIABLE 2
-#define  FTS_EXPRESSION_OP_TYPE_ERROR     3
+/* Error codes must be negative numbers */
+
+#define  FTS_EXPRESSION_OK                      0
+#define  FTS_EXPRESSION_SYNTAX_ERROR           -1
+#define  FTS_EXPRESSION_UNDEFINED_VARIABLE     -2
+#define  FTS_EXPRESSION_OP_TYPE_ERROR          -3
+#define  FTS_EXPRESSION_ERROR_OBJECT_REFERENCE -4
 
 extern int  fts_expression_get_status(fts_expression_state_t *e);
-extern void fts_expression_assign_properties(fts_expression_state_t *e, fts_object_t *obj);
+extern void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *obj);
 
+
+extern int fts_expression_map_to_assignements(fts_expression_state_t *e,
+					       void (* f)(fts_symbol_t name, fts_atom_t *value, void *data),
+					       void *data);
 #endif

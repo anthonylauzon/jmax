@@ -2,7 +2,6 @@
    Platform initialization for the SGI platform.
 */
 
-#include <stdio.h>		/* hw specific file, can include stdio.h */
 #include <errno.h>
 
 #include <sys/fcntl.h>

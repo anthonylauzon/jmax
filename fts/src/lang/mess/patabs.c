@@ -18,7 +18,6 @@
  * to all the instances, to allow dynamic redefinition
  */
 
-#include <stdio.h>		/* for error reporting, temp. */
 #include <string.h>
 
 #include "sys.h"
@@ -184,23 +183,14 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
  *
  */
 
-static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, int id, int ac, const fts_atom_t *at)
+static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
-  fts_symbol_t name;
-  char name_buf[1024];
-  char *p;
-  int i;
   fts_patlex_t *in; 
-  fts_atom_t a;
-  fts_atom_t description[4];
+  fts_atom_t description[1];
 
   fts_set_symbol(&description[0], fts_s_patcher);
-  fts_set_symbol(&description[1], fts_new_symbol("unnamed"));
-  fts_set_int(&description[2], 0);
-  fts_set_int(&description[3], 0);
-
-  obj = fts_object_new((fts_patcher_t *)patcher, id, 4, description);
+  obj = fts_make_object((fts_patcher_t *)patcher, 1, description);
 
   /* flag the patcher as abstraction */
 
@@ -212,7 +202,7 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
 
   fts_patparse_parse_patlex(obj, in);
 
-  fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *) obj, fts_get_symbol(&at[0]));
+  fts_patcher_reassign_inlets_outlets((fts_patcher_t *) obj);
 
   fts_patlex_close(in);
 
@@ -220,13 +210,22 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
 }
 
 
-fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int id, int ac, const fts_atom_t *at)
+fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
   fts_symbol_t name;
   char name_buf[1024];
   char *p;
   FILE *file;
+
+  /* @@@ */
+  unsigned long foo = (unsigned long) fts_symbol_name(fts_get_symbol(at));
+
+  if (foo < (32 * 1024))
+    {
+      fprintf(stderr, "Suspect symbol address %lx\n", foo);
+      fprintf(stderr, "Suspect symbol >%s<\n", fts_symbol_name(fts_get_symbol(at)));
+    }
 
   strcpy(name_buf, fts_symbol_name(fts_get_symbol(&at[0])));
 
@@ -249,13 +248,13 @@ fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int id, int a
   file = fts_abstraction_find_declared_file(name);
 
   if (file)
-    return fts_make_abstraction(file, patcher, id, ac, at);
+    return fts_make_abstraction(file, patcher, ac, at);
   else
     return 0;
 }
 
 
-fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int id, int ac, const fts_atom_t *at)
+fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
   fts_symbol_t name;
@@ -284,7 +283,7 @@ fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int id, int ac,
   file = fts_abstraction_find_path_file(name);
 
   if (file)
-    return fts_make_abstraction(file, patcher, id, ac, at);
+    return fts_make_abstraction(file, patcher, ac, at);
   else
     return 0;
 }

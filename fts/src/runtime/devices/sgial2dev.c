@@ -13,7 +13,6 @@
 /* Include files */
 
 #include <unistd.h>
-#include <stdio.h>		
 #ifdef IRIX63
 #include <sys/dmcommon.h>	/* for stamp_t on IRIX 6.3 */
 #endif

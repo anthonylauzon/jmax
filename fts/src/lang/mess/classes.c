@@ -13,7 +13,6 @@
 
 /* This file implement the class/metaclass structure */
 
-#include <stdio.h>		/* TMp @@@ */
 
 #include "sys.h"
 #include "lang/mess.h"

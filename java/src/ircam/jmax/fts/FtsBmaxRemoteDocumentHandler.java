@@ -98,6 +98,17 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");
   }
 
+  protected void saveSubDocument(MaxDocument document, MaxData data, File file) throws MaxDocumentException
+  {
+    if ((document instanceof FtsPatcherDocument) && (data instanceof FtsObject))
+      {
+	Fts.getServer().savePatcherBmax((FtsObject) data, file.getAbsolutePath());
+      }
+    else
+      throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");
+
+  }
+
   public boolean canSaveTo(File file)
   {
     return true;

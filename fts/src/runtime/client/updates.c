@@ -19,7 +19,6 @@
    and send them to the client.
    */
 
-#include <stdio.h>
 
 #include "sys.h"
 #include "lang.h"
@@ -43,7 +42,7 @@ fts_client_updates_init(void)
   fts_sched_declare(fts_client_updates_sched, provide, fts_new_symbol("control"), "fts_client_updates_sched");
 }
 
-static void
+static  void
 fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
 {
   fts_atom_t a;
@@ -52,6 +51,20 @@ fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
     {
       fts_object_get_prop(obj, name, &a);
 
+      /* If the property if an fts_data, we
+	 export to the client it if needed 
+	 before sending back the property */
+
+      if (fts_is_data(&a))
+	{
+	  fts_data_t *d;
+	  
+	  d = fts_get_data(&a);
+
+	  if (! fts_data_is_exported())
+	    fts_data_export(d);
+	}
+	  
       if (! fts_is_void(&a))
 	{
 	  fts_client_mess_start_msg(CLIENTPROP_CODE);

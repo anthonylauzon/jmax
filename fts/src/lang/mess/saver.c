@@ -1,5 +1,4 @@
 #include <limits.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -593,6 +592,18 @@ void fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
+void fts_bmax_code_make_top_obj(fts_bmax_file_t *f, int value)
+{
+  /* MAKE_TOP_OBJ   <nargs> */
+
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "\tMAKE_TOP_OBJ %d\n", value);
+#endif
+
+  fts_bmax_write_opcode_for(f, FVM_MAKE_TOP_OBJ, value );
+  fts_bmax_write_int(f, value);
+}
+
 
 void fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
 {
@@ -830,6 +841,8 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
       fts_bmax_code_new_property(f, obj, fts_s_wy);
       fts_bmax_code_new_property(f, obj, fts_s_wh);
       fts_bmax_code_new_property(f, obj, fts_s_ww);
+      fts_bmax_code_new_property(f, obj, fts_s_ninlets);
+      fts_bmax_code_new_property(f, obj, fts_s_noutlets);
     }
 
   /* If argc is zero, we pop the 0 value pushed above */
@@ -845,6 +858,62 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_set_ptr(&a, f);
 
   fts_send_message(obj, fts_SystemInlet, fts_s_save_bmax, 1, &a);
+}
+
+
+/*
+  Code the top level patcher object instantiation and properties 
+  */
+   
+static void
+fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
+{
+  fts_atom_t a;
+
+  /* Push the object arguments, make the object, and put it in the object table, then push the args 
+   * and the objects (should we, or should we group the pop later ?).
+   * 
+   * The pop  of the arguments is done at the end, because we reuse
+   * the top of the stack for properties (use set instead of push)
+   */
+
+#ifdef SAVER_DEBUG
+  fprintf(stderr, "Saving Top Object %lx %d: ", obj,  obj->id);
+  fprintf_atoms(stderr, obj->argc, obj->argv);
+  fprintf(stderr, "\n");
+#endif
+
+  fts_set_symbol(&a, fts_s_patcher);
+  fts_bmax_code_push_atoms(f, 1, &a);
+
+  fts_bmax_code_make_top_obj(f, 1);
+
+  if (objidx >= 0)
+    fts_bmax_code_mv_obj(f, objidx);
+
+  /* Write persistent properties to the file.
+     Here, it should use some property data base to find out
+     the good properties.
+     */
+
+  fts_bmax_code_new_property(f, obj, fts_s_x);
+  fts_bmax_code_new_property(f, obj, fts_s_y);
+  fts_bmax_code_new_property(f, obj, fts_s_height);
+  fts_bmax_code_new_property(f, obj, fts_s_width);
+
+  fts_bmax_code_new_property(f, obj, fts_s_font);
+  fts_bmax_code_new_property(f, obj, fts_s_fontSize);
+
+  fts_bmax_code_new_property(f, obj, fts_s_wx);
+  fts_bmax_code_new_property(f, obj, fts_s_wy);
+  fts_bmax_code_new_property(f, obj, fts_s_wh);
+  fts_bmax_code_new_property(f, obj, fts_s_ww);
+  fts_bmax_code_new_property(f, obj, fts_s_ninlets);
+  fts_bmax_code_new_property(f, obj, fts_s_noutlets);
+
+  /* pop the argument */
+
+  fts_bmax_code_pop_args(f, 1);
 }
 
 
@@ -916,7 +985,7 @@ fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *
 /* Code a new patcher, and leave it in the top of the stack !!! */
 
 static void
-fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
+fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int top)
 {
   int i;
   fts_patcher_t *patcher = (fts_patcher_t *) obj;
@@ -926,9 +995,16 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
   fprintf(stderr, "Saving Patcher %d\n", obj->id);
 #endif
 
-  /* First generate the code to push the patcher in the top of the stack */
+  /* First generate the code to push the patcher in the top of the stack,
+     asking for the top_level special code (template argument fetch and
+     patcher object instead of 
+     (no effect for not a template or no args).
+     */
 
-  fts_bmax_code_new_object(f, obj, idx);
+  if (top)
+    fts_bmax_code_new_top_object(f, obj, idx);
+  else
+    fts_bmax_code_new_object(f, obj, idx);
     
   /* Allocate a new object table frame of the right dimension */
 
@@ -944,7 +1020,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 	  /* Save the object recursively as a patcher, and then pop it from the stack */
 
 
-	  fts_bmax_code_new_patcher(f, p,i);
+	  fts_bmax_code_new_patcher(f, p, i, 0);
 	  fts_bmax_code_pop_objs(f, 1);
 	}
       else
@@ -990,7 +1066,7 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 
   if (f)
     {
-      fts_bmax_code_new_patcher(f, patcher, -1);
+      fts_bmax_code_new_patcher(f, patcher, -1, 1);
 
       /* code the return command */
 
@@ -1029,7 +1105,7 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 	    {
 	      /* Save the object recursively as a patcher, and then pop it from the stack */
 	      
-	      fts_bmax_code_new_patcher(f, p, objidx);
+	      fts_bmax_code_new_patcher(f, p, objidx, 0);
 	      fts_bmax_code_pop_objs(f, 1);
 	    }
 	  else

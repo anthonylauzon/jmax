@@ -237,7 +237,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
   {
     if(itsSketchPad.itsRunMode || evt.isControlDown())
       {
-	Fts.getServer().syncToFts();
+	Fts.sync();
 
 	DoublePaint();
 	return true;

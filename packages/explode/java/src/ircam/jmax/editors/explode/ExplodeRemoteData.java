@@ -1,6 +1,7 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import java.lang.*;
 import java.io.*;
 import java.util.*;
@@ -82,5 +83,15 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   private Vector itsEvents;
   private Vector listeners;
+
+  /* The MaxData interface */
+
+
+  /** Get the a name for this data, for UI purposes only */
+
+  public String getName()
+  {
+    return "explode";
+  }
 }
 

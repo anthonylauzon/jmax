@@ -60,23 +60,6 @@ public class FtsMessageObject extends FtsObject
     Fts.getServer().sendSetMessage(this, description);
     setDirty();
   }
-
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                      CLIENT API and  PROPERTIES                           */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-    // Save as "declare ..."
-
-    writer.print("object {messbox {" + description + "}}");
-
-    savePropertiesAsTcl(writer);
-
-  }
 }
 
 

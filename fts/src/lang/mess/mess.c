@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.13 $ IRCAM $Date: 1998/05/28 14:04:19 $
+ *      $Revision: 1.14 $ IRCAM $Date: 1998/06/26 15:43:01 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -25,7 +25,6 @@ fts_module_t fts_mess_module = {"Mess", "The new Mess module", fts_mess_init,
 
 
 
-/* Forward declarations  */
 
 static void
 fts_mess_init(void)
@@ -34,6 +33,11 @@ fts_mess_init(void)
 
   fts_symbols_init();
 
+  /* Init the FTS data module  and id table */
+
+  fts_data_id_init();
+  fts_data_module_init();
+
   /* Initialize the classes module */
 
   fts_classes_init();
@@ -41,6 +45,18 @@ fts_mess_init(void)
   /* Initialize the objects module  */
 
   fts_objects_init();
+
+  /* Initialize the object doctor housekeeping */
+
+  fts_doctor_init();
+
+  /* Initialize the connections module  */
+
+  fts_connections_init();
+
+  /* Initialize the messages module  */
+
+  fts_messages_init();
 
   /* Initialize the property system */
 
@@ -78,14 +94,14 @@ fts_mess_init(void)
   
   fts_abstraction_init();
 
-  /* Initialize the object doctor housekeeping */
-
-  fts_doctor_init();
-
   /* Initialize the expression subsystem */
 
   fts_expressions_init();
   fts_variables_init();
+
+  /* Initialize the template subsystem */
+  
+  fts_template_init();
 
   /* Do the void object */
 

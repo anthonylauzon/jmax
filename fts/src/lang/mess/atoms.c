@@ -2,7 +2,6 @@
   Generic, may be debug, function to deal with atoms
  */
 
-#include <stdio.h>
 
 #include "sys.h"
 #include "lang/mess.h"
@@ -22,11 +21,11 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 	ps = " ";
 
       if (fts_is_symbol(&at[i]))
-	fprintf(f,"(symbol)%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
+	fprintf(f,"%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
       else if (fts_is_long(&at[i]))
-	fprintf(f,"(int)%d%s", fts_get_long(&at[i]), ps);
+	fprintf(f,"%d%s", fts_get_long(&at[i]), ps);
       else if (fts_is_float(&at[i]))
-	fprintf(f,"(float)%f%s", fts_get_float(&at[i]), ps);
+	fprintf(f,"%f%s", fts_get_float(&at[i]), ps);
       else if (fts_is_ptr(&at[i]) )
 	fprintf(f,"(ptr)%lx%s", (unsigned long) fts_get_ptr( &at[i]), ps);
       else if (fts_is_object(&at[i]))
@@ -35,10 +34,8 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 
 	  obj = fts_get_object(&at[i]);
 
-	  if (obj)
-	    fprintf(f,"(obj)%d%s", fts_object_get_id(obj), ps);
-	  else
-	    fprintf(f,"(obj)<null>");
+	  fprintf_object(f, obj);
+	  fprintf(f,"%s", ps);
 	}
       else if (fts_is_connection(&at[i]))
 	{
@@ -46,15 +43,14 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 
 	  c = fts_get_connection(&at[i]);
 
-	  if (c)
-	    fprintf(f,"(obj)%d%s", fts_connection_get_id(c), ps);
-	  else
-	    fprintf(f,"(obj)<null>");
+	  fprintf_connection(f, c);
+	  fprintf(f,"%s", ps);
 	}
       else if (fts_is_void(&at[i]))
-	fprintf(f,"(void)%s", ps);
+	fprintf(f,"<void>%s", ps);
       else
-	fprintf(f,"(type %d)???%s", fts_get_type(&at[i]), ps);
+	fprintf(f,"<%s>%lx%s", fts_symbol_name(fts_get_type(&at[i])), 
+		(unsigned long) fts_get_ptr( &at[i]), ps);
     }
 }
 

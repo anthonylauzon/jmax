@@ -94,6 +94,7 @@ extern fts_symbol_t fts_s_error;
 
 /* Symbols related to builtin classes */
 
+extern fts_symbol_t fts_s_old_patcher;
 extern fts_symbol_t fts_s_patcher;
 extern fts_symbol_t fts_s_inlet;
 extern fts_symbol_t fts_s_outlet;

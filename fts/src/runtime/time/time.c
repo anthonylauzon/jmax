@@ -15,7 +15,6 @@
 #define TIME_DEBUG
 
 #ifdef TIME_DEBUG
-#include <stdio.h>
 static void fts_alarm_describe(char *msg, fts_clock_t *clock);
 #endif
 

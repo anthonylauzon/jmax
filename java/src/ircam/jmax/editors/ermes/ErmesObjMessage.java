@@ -72,13 +72,19 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   // "value" property; it is an hack, should be done more cleanly.
 
   public void propertyChanged(FtsObject obj, String name, Object value) {
-    itsArgs = (String) value;
-    ParseText(itsArgs);
-    if (!canResizeBy(0, 0)) {
-      ResizeToText(0,0);
-      itsSketchPad.repaint();
-    }
-    else Paint(itsSketchPad.getGraphics());
+    if (name.equals("value"))
+      {
+	itsArgs = (String) value;
+	ParseText(itsArgs);
+	if (!canResizeBy(0, 0)) {
+	  ResizeToText(0,0);
+	  itsSketchPad.repaint();
+	}
+	else
+	  Paint(itsSketchPad.getGraphics());
+      }
+    else
+      super.propertyChanged(obj, name, value);
   }
 
   public boolean isUIController() {

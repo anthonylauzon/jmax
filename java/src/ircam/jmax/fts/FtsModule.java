@@ -24,5 +24,9 @@ public class FtsModule
     // Install the FTS tcl commands
 
     ircam.jmax.fts.tcl.TclFtsPackage.installPackage();
+
+    // Install the meta data object
+
+    FtsRemoteMetaData.install();
   }
 }

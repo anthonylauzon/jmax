@@ -201,7 +201,8 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler{
     previousVelocity = 0;
     acceleration = 0;
     if(itsSketchPad.itsRunMode){
-      Fts.getServer().syncToFts();
+      itsFtsObject.ask("value");
+      Fts.sync();
       DoublePaint();
       return true;
     }

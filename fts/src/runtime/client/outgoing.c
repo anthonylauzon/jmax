@@ -12,7 +12,6 @@
  */
 
 #include <string.h>
-#include <stdio.h> 
 
 #include "protocol.h"
 #include "sys.h"
@@ -57,7 +56,7 @@ fts_client_mess_start_msg(int type)
 }
 
 void
-fts_client_mess_add_long(long value)
+fts_client_mess_add_int(int value)
 {
   sprintf(outbuf, "%c%ld", LONG_POS_CODE, value);
 
@@ -84,9 +83,9 @@ fts_client_mess_add_object(fts_object_t *obj)
 
 
 void
-fts_client_mess_add_connection(fts_object_t *obj)
+fts_client_mess_add_connection(fts_connection_t *c)
 {
-  sprintf(outbuf, "%c%ld", CONNECTION_CODE, (obj ? fts_connection_get_id(obj) : 0));
+  sprintf(outbuf, "%c%ld", CONNECTION_CODE, (c ? fts_connection_get_id(c) : 0));
 
   fts_client_send_string(outbuf);
 }
@@ -180,7 +179,7 @@ fts_client_upload_object(fts_object_t *obj)
   if (obj->id == FTS_NO_ID)
     fts_object_table_register(obj);
 
-  if (fts_object_is_abstraction(obj))
+  if (fts_object_is_abstraction(obj) || fts_object_is_template(obj))
     {
       /* Send the abstraction object */
 

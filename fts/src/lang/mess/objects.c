@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.33 $ IRCAM $Date: 1998/07/21 16:48:46 $
+ *      $Revision: 1.34 $ IRCAM $Date: 1998/07/27 10:46:14 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -15,30 +15,10 @@
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 
-/* #define DO_EXPRESSIONS */
+/* forward declarations  */
 
-extern void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at); /* @@@ */
-static fts_heap_t connection_heap;
-
-#ifdef DEBUG 
-#define INIT_CHECK_STATUS 1
-#else
-#define INIT_CHECK_STATUS 0
-#endif
-
-static long fts_mess_run_time_check = INIT_CHECK_STATUS;
-
-
-/* Return Status */
-
-fts_status_description_t fts_MethodNotFound = {"method not found"};
-fts_status_description_t fts_ObjectCannotConnect = {"object cannot connect"};
-fts_status_description_t fts_NoSuchConnection = {"no such connection"};
-fts_status_description_t fts_ArgumentMissing = {"argument missing"};
-fts_status_description_t fts_ArgumentTypeMismatch = {"argument type mismatch"};
-fts_status_description_t fts_ExtraArguments = {"extra arguments"};
-fts_status_description_t fts_InvalidMessage = {"invalid symbol message"};
-fts_status_description_t fts_DoubleConnection = {"the connection already exists"};
+static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
+static void fts_object_send_kernel_properties(fts_object_t *obj);
 
 /******************************************************************************/
 /*                                                                            */
@@ -48,7 +28,6 @@ fts_status_description_t fts_DoubleConnection = {"the connection already exists"
 
 void fts_objects_init()
 {
-  fts_heap_init(&connection_heap, sizeof(fts_connection_t), 256);
 }
 
 /******************************************************************************/
@@ -59,18 +38,38 @@ void fts_objects_init()
 
 /* A static function making the real FTS object if possible. */
 
-static fts_object_t *
-fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
+fts_object_t *
+fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   fts_status_t   status;
   fts_class_t   *cl;
   fts_object_t  *obj;
   int i;
 
-  cl = fts_class_instantiate(ac, at);
+  if (fts_get_symbol(at) == fts_s_patcher)
+    {
+      /* Patcher behave diffreentrly w.r.t. than other objects;
+	 the metaclass do not depend on the arguments, but on the inlets/outlets.
+	 New patchers are created with zero in zero outs, and changed later 
+	 */
+      fts_atom_t a[3];
+
+      fts_set_symbol(&a[0], fts_s_patcher);
+      fts_set_int(&a[1], 0);
+      fts_set_int(&a[2], 0);
+
+      cl = fts_class_instantiate(3, a);
+    }
+  else
+    cl = fts_class_instantiate(ac, at);
 
   if (! cl)
-    return 0;
+    {
+      fprintf(stderr, "Cannot instantiate class for %s\n",
+	      fts_symbol_name(fts_get_symbol(at))); /* @@@ */
+
+      return 0;
+    }
 
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
   obj->cl = cl;
@@ -79,6 +78,7 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   obj->properties = 0;
   obj->varname    = 0;
+  obj->id         = FTS_NO_ID;
 
   if (cl->noutlets)
     {
@@ -94,15 +94,12 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
     
   /* Add the object in the patcher
    * the test is only usefull during the root patcher building
+   * and in rare (and wrong) cases where a service object is created
+   * without a father
    */
 
   if (patcher)
     fts_patcher_add_object(patcher, obj);
-
-  /* set the id and put the object in the object table */
-
-  obj->id = id;
-  fts_object_table_put(id, obj);
 
   /* send the init message */
 
@@ -111,15 +108,18 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
     long save_check_status;
 
-    save_check_status = fts_mess_run_time_check;
-    fts_mess_run_time_check = 1;
+    save_check_status = fts_mess_get_run_time_check();
+    fts_mess_set_run_time_check(1);
 
     status = fts_message_send(obj, fts_SystemInlet, fts_s_init, ac, at);
-    fts_mess_run_time_check = save_check_status;
+    fts_mess_set_run_time_check(save_check_status);
   }
 
   if (status != fts_Success && status != &fts_MethodNotFound)
     {
+      fprintf(stderr, "Cannot instantiate object for %s\n",
+	      fts_symbol_name(fts_get_symbol(at))); /* @@@@ */
+
       if (patcher)
 	fts_patcher_remove_object(patcher, obj);
 
@@ -137,147 +137,293 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
       fts_block_free((char *)obj, obj->cl->size);
 
-
-      if ( id != FTS_NO_ID) /* (fd): purified... */
-	fts_object_table_remove(id);
-
       return 0;
     }
-
 
   return obj;
 }
 
-/* the new function create an object in a patcher
 
-   In order, do the following:
+/* Utility functions to assign a property
+   as found by the expression parser
+   */
 
-   1- check for a explicitly declared abstraction
-   2- check for a standard object
-   3- check for path declared abstraction
-   4- check for object doctors
-   5- if everything else fail, do an error object
 
-   3- is not tryied if the metaclass does exists; i.e. an abstraction
-      is not used to fix an error in an object ... ????
+static void fts_object_assign_property(fts_symbol_t name, fts_atom_t *value, void *data)
+{
+  fts_object_t *obj = (fts_object_t *)data;
+
+  fts_object_put_prop(obj, name, value);
+}
+
+/*
+  This function create an object in a patcher, appling all the 
+  expression/object semantic
  */
 
 
 fts_object_t *
-fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
+fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 {
   fts_object_t  *obj = 0;
   fts_metaclass_t *mcl;
   fts_symbol_t  var;
-#ifdef DO_EXPRESSIONS
-  fts_expression_state_t *e;
+  fts_expression_state_t *e = 0;
   int ac;
-  fts_atom_t at[1024]; /* Actually, the evaluated atom vector
-			   should be the copy for the object,
-			   and the expression parser should be able
-			   to tell how many atoms we need before
-			   evaluating the expression !! */
-#else
-#define at aot  
-#define ac aoc
-#endif
-
-#if 0
-  /* DEBUG TRACE */
-  fprintf(stderr, "Creating object ");
+  const fts_atom_t *at;
+  fts_atom_t new_args[1024]; /* Actually, the evaluated atom vector
+				should be the copy for the object,
+				and the expression parser should be able
+				to tell how many atoms we need before
+				evaluating the expression !! Yes, and Pere Noel
+				should come twice a year, also.*/
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Object new ");
   fprintf_atoms(stderr, aoc, aot);
   fprintf(stderr, "\n");
-  /* DEBUG TRACE END*/
 #endif
 
-  /* Explicit check for zero arguments; in this case, we
-     just make an error object 
-     */
 
-  if (aoc == 0)
-    obj = fts_error_object_new(patcher, id, aoc, aot);
+  /* First of all, we check if we are in the case of a object variable definition syntax */
 
-#ifdef DO_EXPRESSIONS
-  if (! obj)
+  if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) && (fts_get_symbol(&aot[1]) == fts_s_else))
     {
-      if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) && (fts_get_symbol(&aot[1]) == fts_s_else))
-	{
-	  /* foo : <obj> syntax; extract the variable name */
+      /* foo : <obj> syntax; extract the variable name */
       
-	  var = fts_get_symbol(&aot[0]);
-	  /* If the variable already exists, make an error object  */
+      var = fts_get_symbol(&aot[0]);
 
-	  if (fts_variable_get_value((fts_object_t *) patcher, var))
-	    obj = fts_error_object_new(patcher, id, aoc, aot);
+      /* If the variable already exists in this local context, make an wannabe error object  */
+
+      if (! (fts_variable_is_suspended((fts_object_t *) patcher, var) ||
+	     fts_variable_can_define((fts_object_t *) patcher, var)))
+	{
+	  /* Error: redefined variable */
+
+	  fprintf(stderr, "@@@ Error: redefining variable %s\n", fts_symbol_name(var));
+
+	  obj = fts_error_object_new(patcher, aoc, aot);
+	  obj->is_wannabe = 1;
+
+	  fts_variable_add_wannabe((fts_object_t *) patcher, var, obj);
+
+	  var = 0;		/* forget about the variable, no binding to do */
 	}
       else
-	var = 0;
+	{
+	  /* otherwise, set the ac/at pair to skip the variable */
+	  
+	  ac = aoc - 2;
+	  at = aot + 2;
+	}
+    }
+  else
+    {
+      var = 0;
+      ac = aoc;
+      at = aot;
+    }
+
+  /* prepare the variable, if defined */
+
+  if ((var != 0) && ( ! fts_variable_is_suspended((fts_object_t *) patcher, var)))
+    {
+      /* Define the variable, suspended;
+	 this will also steal all the objects referring to the same variable name
+	 in the local scope from any variable defined outside the scope */
+
+      fts_variable_define((fts_object_t *) patcher, var, obj);
+    }
+
+  /* Then, check for zero arguments, and produce an error object in this case */
+
+  if ((! obj) && (aoc == 0))
+    {
+      /* error: zero arguments */
+
+      fprintf(stderr, "@@@ Error: zero arguments in object\n");
+
+      obj = fts_error_object_new(patcher, aoc, aot);
+    }
+
+  /* 
+   * The creation algorithm will try all the following techniques in
+   * the given order until an object is created:
+   *
+   * 1- Get the first argument; if it is a symbol, and there is an
+   *    object doctor for this name, delegate the object creation to
+   *    the doctor, without further evaluation; if the doctor return
+   *    null, return an error object.
+   *
+   * 2- Expression-evaluate the whole description; if the evaluation
+   *    give an error, return an error object.
+   *    If the first value is not a symbol, return an error object.
+   *    Otherwise consider the result of the evaluation as the description
+   *    of the object for the following.
+   *
+   * 3 - if an object doctor exists for the object name, delegate to it the 
+   *     object creation without further evaluation; if the doctor
+   *     return null, return an error object.
+   * 
+   * 4 - if an explicitly declared template exists, instantiate
+   *     that template.
+   *
+   * 5 - if an explicitly declared abstraction exists, instantiate
+   *     that abstraction.
+   * 
+   * 6- if an FTS class  exists, instantiate that class.
+   * 
+   * 7 - if an template exists in the template path, instantiate
+   *     that template.
+   *
+   * 8 - if an abstraction exists in the abstraction path, instantiate
+   *     that abstraction.
+   *
+   *   
+   * 9- Make an error object
+   *
+   */
+
+  /* 1-  try the doctor */
+
+  if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
+    {
+      obj = fts_call_object_doctor(patcher, ac, at);
 
       if (! obj)
 	{
-	  /* Compute the expressions with the correct offset */
+	  /* Error in object doctor */
 
-	  e = fts_expression_eval((fts_object_t *)patcher, (var ? aoc - 2 : aoc),
-			      (var ? aot + 2 : aot), 1024, at);
-	  
-	  if (fts_expression_get_status(e) == FTS_EXPRESSION_OK)
-	    ac = fts_expression_get_count(e);
-	  else
-	    obj = fts_error_object_new(patcher, id, aoc, aot);
+	  fprintf(stderr, "@@@ Error: Error in object doctor \n");
+
+	  obj = fts_error_object_new(patcher, aoc, aot);
 	}
-
     }
+
+  /* 2- Expression evaluate */
+
+  if (! obj)
+    {
+      /* Note that waiting for the new parser we just do *not* evaluate the class name */
+      /* TMP HACK BEGIN */
+
+      /* TMP HACK END*/
+      /* Compute the expressions with the correct offset */
+      /* e = fts_expression_eval((fts_object_t *)patcher, ac, at,  1024, new_args); */
+      /* TMP IF */
+
+      if (ac > 1)
+	{
+	  new_args[0] = at[0];
+
+	  e = fts_expression_eval((fts_object_t *)patcher, ac - 1, at + 1,  1023, new_args + 1);
+	  
+	  if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
+	    {
+	      /* Error in expression */
+
+	      fprintf(stderr, "@@@ Error: Error in expression \n");
+
+	      obj = fts_error_object_new(patcher, aoc, aot);
+	    }
+	  else if (! fts_is_symbol(&new_args[0]))
+	    {
+	      /* Missing class name, or class name is not a symbol */
+
+	      fprintf(stderr, "@@@ Error: class name is not a symbol\n");
+
+	      obj = fts_error_object_new(patcher, aoc, aot);
+	    }
+	  else
+	    {
+	      at = new_args;
+	      ac = fts_expression_get_count(e) + 1; /* + 1 TMP */
+	    }
+	}
+    }
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "After expression eval ");
+  fprintf_atoms(stderr, ac, at);
+  fprintf(stderr, "\n");
 #endif
 
+  /* 3- Retry the object doctor */
+
+  if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
+    {
+      obj = fts_call_object_doctor(patcher, ac, at);
+
+      if (! obj)
+	{
+	  /* Error in object doctor */
+
+	  fprintf(stderr, "@@@ Error: Error in object doctor \n");
+
+	  obj = fts_error_object_new(patcher, aoc, aot);
+	}
+    }
+
+  /* 4- explicitly declared template  */
+
   if (! obj)
     {
-      if (! fts_is_symbol(&at[0]))
-	{
-	  fprintf(stderr,"Non symbol class name in object creation\n"); /* @@@@ ERROR !!! */
-	  return 0;
-	}
-
       /* First of all, try an explicitly declared abstraction */
 
-      obj =  fts_abstraction_new_declared(patcher, id, ac, at);
+      obj =  fts_template_new_declared(patcher, ac, at, e);
     }
+
+
+  /* 5- explicitly declared abstraction  */
 
   if (! obj)
     {
-      /* If not there, look for the metaclass: if there,
-	 try to make an object; if the meta class is there
-	 but we cannot make the object, do an error object */
+      /* First of all, try an explicitly declared abstraction */
 
-      mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
+      obj =  fts_abstraction_new_declared(patcher, ac, at);
+    }
 
-      if (mcl != 0)
+
+  /* 6- Make the object if the FTS class exists */
+
+  if ((! obj) && fts_metaclass_get_by_name(fts_get_symbol(&at[0])))
+    {
+      /* We have a metaclass: this prevent looking for 
+	 further abstractions */
+
+      obj =  fts_make_object(patcher, ac, at);
+
+      if (! obj)
 	{
-	  /* We have a metaclass: this prevent looking for 
-	     further abstractions */
+	  /* Standard FTS instantiation error  */
 
-	  obj =  fts_make_object(patcher, id, ac, at);
+	  obj = fts_error_object_new(patcher, aoc, aot);
 
-	  /* No object yet, Try with an object doctor */
-
-	  if (! obj)
-	    obj = fts_call_object_doctor(patcher, id, ac, at);
-	}
-      else
-	{
-	  /* no metaclass; try with a  path abstraction */
-
-	  if (! obj)
-	    obj = fts_abstraction_new_search(patcher, id, ac, at);
-
-	  /* No object yet, Try with an object doctor */
-
-	  if (! obj)
-	    obj = fts_call_object_doctor(patcher, id, ac, at);
+	  fprintf(stderr, "@@@ Error: FTS Error object instantiation for description :");
+	  fprintf_atoms(stderr, aoc, aot);
+	  fprintf(stderr, "\n");
 	}
     }
 
+  /* 7- Try a path template  */
+
+  if (! obj)
+    obj = fts_template_new_search(patcher, ac, at, e);
+
+  /* 8 - Try a path abstraction */
+
+  if (! obj)
+    obj = fts_abstraction_new_search(patcher, ac, at);
+
+
+  /* 9- Make an error object */
+
   if (!obj)
-    obj = fts_error_object_new(patcher, id, aoc, aot);
+    {
+      /* Object not found */
+
+      fprintf(stderr, "@@@ Error: Object not found %s\n", fts_symbol_name(fts_get_symbol(aot)));
+      obj = fts_error_object_new(patcher, aoc, aot);
+    }
 
   /* Object created (at worst, a error object) do the last operations, like setting 
      the object description, variables and properties;
@@ -285,38 +431,52 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
      changed the object definition, for persistent fixes !!
      */
 
- if ((fts_object_is_patcher(obj) && (! fts_patcher_is_standard((fts_patcher_t *)obj))) || (! obj->argv))
+  if ((fts_object_is_patcher(obj) && (! fts_patcher_is_standard((fts_patcher_t *)obj))) || (! obj->argv))
     fts_object_set_description(obj, aoc, aot);
 
-#ifdef DO_EXPRESSIONS
-  if (! fts_object_is_error(obj))
+  /* Assign the variable references to the object; do it also if
+     it is an error object, because we may try to recompute, and recover,
+     the object, if one of this variables have been redefined. */
+
+  if (e)
+    fts_expression_add_variables_user(e, obj);
+
+  /* 
+     If it is not an error, and not a template, assign the local variables/properties.
+     Note that in case of the template, this operation has been done during the load vm code
+     execution; little weird, but needed to avoid object recomputing during loading.
+     */
+
+  if (e && (! fts_object_is_error(obj)) && (! fts_object_is_template(obj)))
     {
-      /* First, assign all the expression properties to the object */
-      
-      fts_expression_assign_properties(e, obj);
-
-      /* then, assign it to the variable if any */
-
-      if (var != 0)
-	fts_variable_bind_to_object(var, obj);
+      if (fts_object_is_patcher(obj))
+	fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) obj);
+      else
+	fts_expression_map_to_assignements(e, fts_object_assign_property, (void *) obj);
     }
-#endif
+
+  /* then, assign it to the variable if any */
+
+  if (var != 0)
+    {
+      fts_atom_t a;
+
+      fts_set_object(&a, obj);
+      fts_variable_restore(obj, var, &a, obj);
+      obj->varname = var;
+    }
 
   return obj;
 }
 
-#ifdef TO_DO
 
 /*
  * fts_object_redefine replace an object with a new
  * one whose definition is passed as argument, leaving the same
- * connections (including their ids) and the same id.
+ * connections, properties and id.
  *
- * If the object is a standandard object, and the class do not change, 
- * if the object define the "redefine" method, a message with the new
- * description is sent, and then the object description is changed; otherwise
- * a new object is created, and the old one is deleted; *no* mechanism for transferring
- * the old state to the new object is defined (it probabily should !! for properties).
+ * For the moment *no* mechanism for transferring
+ * the old state to the new object is defined.
  * Waiting for a better property system, persistent/clint properties are anyway 
  * transferred to the new object before deleting the old one.
  * 
@@ -324,143 +484,110 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
  * the patcher redefine function is called instead, look in the patcher.c file.
  */
 
-fts_object_t *
-fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
+
+fts_object_t *fts_object_recompute(fts_object_t *old)
 {
-  fts_patcher_t *parent;
-  fts_object_t  *new;
+  fts_object_t *obj;
 
-  /* First of all, if the object being redefined is bound to a variable,
-     unbind the variable (and let the system propagate the unbinding */
 
-  if (fts_object_is_patcher(old))
-    return fts_patcher_redefine(old, ac, at); /* @@@ nome funzione sbagliata lato patcher !! */
+  obj = fts_object_redefine(old, old->argc, old->argv);
 
-  /* We got an object here */
-
-  /* Get the new class name  */
-
-  /* Verify if it is the same */
-  
-  /* It is, look for the redefine method; 
-     if there, send the message and return old */
-
-  /* not there, make a new object with the same ID, transfer connections
-     and properties; doing this, check connections: if some connections
-     with ID are removed, we need to inform the client (raise events ?? HOW ???)
+  /* Error property handling; currently it is a little bit
+     of an hack beacause we need a explit "zero"  error
+     property on a non error redefined object; actually
+     the error property daemon should be a global daemon !
      */
 
-  parent = fts_object_get_patcher(old);
-  new    = fts_object_new(parent, FTS_NO_ID, ac, at);
+  if (obj->id != FTS_NO_ID)
+    {
+      if (! fts_object_is_error(obj))
+	{
+	  fts_atom_t a;
 
-  if (! new)
-    return (fts_object_t *) 0;
+	  fts_set_int(&a, 0);
+	  fts_object_put_prop(obj, fts_s_error, &a);
+	}
 
-  fts_object_replace(old, new);
+      fts_object_send_kernel_properties(obj);
+    }
+
+  return obj;
+}
+
+
+fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
+{
+  int id;
+  fts_symbol_t  var;
+  fts_object_t  *new;
+
+  /* check for the "var : <obj> syntax" and  extract the variable name if any */
+
+  if ((ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_else))
+    var = fts_get_symbol(&at[0]);
+  else
+    var = 0;
+
+  /* @@@@@ WHAT IF THE OBJECT IS A WANNABE ??? */
+
+  /* if the old object define a variable, and the new definition
+     do not define  the same variable, delete the variable;
+     if the new object define the same variable,  just suspend it.
+     */
+
+  if (old->varname)
+    {
+      if (old->varname == var)
+	fts_variable_suspend(old, old->varname);
+      else
+	fts_variable_undefine(old, old->varname);
+
+      /* Anyway, take away the name from the old object */
+
+      old->varname = 0;
+    }
+
+  /* Second, if the object being redefined is a standard patcher,
+     redefine it */
+
+  if (fts_object_is_standard_patcher(old))
+    return (fts_object_t *) fts_patcher_redefine_description((fts_patcher_t *) old, ac, at); 
+
+  /* get the old id, and remove old from the object table */
+
+  if (old->id != FTS_NO_ID)
+    {
+      id = old->id;
+      fts_object_table_remove(old->id);
+      old->id = FTS_NO_ID;
+    }
+  else
+    {
+      id = FTS_NO_ID;
+    }
+
+  /* Make the new object  */
+
+  new = fts_object_new(fts_object_get_patcher(old), ac, at);
+  fts_object_set_id(new, id);
+
+  /* If new is an error object, assure that there are enough inlets
+   and outlets for the connections */
+
+  if (fts_object_is_error(new))
+    {
+      fts_error_object_fit_inlet(new, old->cl->ninlets - 1);
+      fts_error_object_fit_outlet(new, old->cl->noutlets - 1);
+    }
+
+  fts_object_move_connections(old, new);
+  fts_object_move_properties(old, new);
+
   fts_object_delete(old);
-
-
-  /* Finally, also for patchers, rebuild the variable bindings if needed or not already done */
 
   return new;
 }
 
-
-/*
- * object replace substitute an object with another in the
- * graph, i.e. rebuild all the connection the old object had
- * in the new object.
- *
- * Also, the new object actually get the id of the old object.
- * and the old object get the id of the new one.
- *
- * It should raise a property changed event on the client side.
- * It should also handle the case of a container object; may be we should
- * have a "fts_object_replace" method
- * 
- * fts_object_replace do *not* delete the old object; it may be used
- * to build debug structures, for example, where you want to keep
- * the original object inside a wrapper patcher !!!
- * the new Id can be used to access the old object; note that the
- * old object is kept under the same patcher, until deleted.
- *
- * Note that the new object should be instantiated in the same
- * patch as the old; the behaviour is undefined in other cases.
- */
-
-void
-fts_object_replace(fts_object_t *old, fts_object_t *new)
-{
-  int inlet, outlet;
-  fts_atom_t at[1];
-  fts_patcher_t *patcher;
-  int id;
-
-  /*
-   * first, send to the new object a message "replace" <old>;
-   * ignore errors (i.e.,if it is not understood, no problem, 
-   * nothing to do).
-   * 
-   * The message can be used by complex object to transfer the content
-   * from the old to the new object, for example in case of a patcher.
-   */
-
-  fts_set_object(&at[0], old);
-
-  fts_message_send(new, fts_SystemInlet, fts_s_replace, 1, at);
-
-  /* swap old and new in the object table */
-
-  id = new->id;
-  fts_object_table_remove(old->id);
-
-  new->id = old->id;
-  fts_object_table_put(new->id, new);
-
-  old->id = id;
-  fts_object_table_put(old->id, old);
-
-  /* reproduce in new, and delete in old,  
-     all the old outgoing connections */
-
-  for (outlet = 0; outlet < old->cl->noutlets; outlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons
-	 and methods  can fire correctly */
-
-      for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
-	{
-	  if (outlet < fts_object_get_outlets_number(new))
-	    fts_object_connect(new, p->woutlet, p->dst, p->winlet);
-
-	  fts_object_disconnect(old, p->woutlet, p->dst, p->winlet);
-	}
-    }
-
-  /* reproduce in new, and delete in old,  
-     all the old incoming connections */
-
-  for (inlet = 0; inlet < old->cl->ninlets; inlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons
-	 and methods  can fire correctly */
-
-      for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
-	{
-	  if (inlet < fts_object_get_inlets_number(new))
-	    fts_object_connect(p->src, p->woutlet, new, p->winlet);
-
-	  fts_object_disconnect(p->src, p->woutlet, old, p->winlet);
-	}
-    }
-}
-
-
-#endif
 /* This is to support "changing" objects; usefull during 
  * .pat loading, where not all the information is available 
  *    at the right place; used currently explode in the fts1.5 package.
@@ -544,70 +671,47 @@ void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_
 }
 
 
-
 /* 
-   All this should be somehow reviewed .... it is not completely satisfying,
-   and should be more modular 
+   Add the id to the object.
+   Called when we know the id, usually in messtiles.c
    */
 
-void
-fts_object_send_properties(fts_object_t *obj)
+
+void fts_object_set_id(fts_object_t *obj, int id)
 {
-  /* If the object have an ID (i.e. was created by the client, or a property has
-     been assigned to it),
-     ask the object to send the ninlets and noutlets  properties,
-     and name and declaration if any. */
+  
+  /* set the id and put the object in the object table */
 
-  if (obj->id != FTS_NO_ID) 
-    { 
-      fts_object_property_changed_urgent(obj, fts_s_x);
-      fts_object_property_changed_urgent(obj, fts_s_y);
-      fts_object_property_changed_urgent(obj, fts_s_height);
-      fts_object_property_changed_urgent(obj, fts_s_width);
+  if (obj->id != FTS_NO_ID)
+    fts_object_table_remove(obj->id);
 
-      fts_object_property_changed_urgent(obj, fts_s_font);
-      fts_object_property_changed_urgent(obj, fts_s_fontSize);
-
-      if (fts_object_is_patcher(obj))
-	{
-	  fts_object_property_changed_urgent(obj, fts_s_wx);
-	  fts_object_property_changed_urgent(obj, fts_s_wy);
-	  fts_object_property_changed_urgent(obj, fts_s_wh);
-	  fts_object_property_changed_urgent(obj, fts_s_ww);
-	}
-
-      fts_object_property_changed_urgent(obj, fts_s_ninlets);
-      fts_object_property_changed_urgent(obj, fts_s_noutlets);
-      fts_object_property_changed_urgent(obj, fts_s_name);
-
-      fts_object_property_changed_urgent(obj, fts_s_min_value);
-      fts_object_property_changed_urgent(obj, fts_s_max_value);
-
-      /* The following properties are here only temporarly; they should
-	 be in the relative objects */
-
-      fts_object_property_changed_urgent(obj, fts_s_value); 
-      fts_object_property_changed_urgent(obj, fts_s_size); 
-
-      if (fts_object_is_error(obj))
-	fts_object_property_changed_urgent(obj, fts_s_error);
-
-      /* Declarations are not yet really supported */
-
-      /* fts_object_property_changed_urgent(obj, fts_new_symbol("declaration")); */
+  if (id != FTS_NO_ID) 
+    {
+      obj->id = id;
+      fts_object_table_put(id, obj);
     }
 }
-
-
+     
 
 void
 fts_object_delete(fts_object_t *obj)
 {
   int outlet, inlet;
 
-  /* Unbind it from its if needed variable */
+  /* Unbind it from its variable if any */
 
-  fts_variable_unbind_to_object(obj);
+  if (fts_object_get_variable(obj))
+    fts_variable_undefine(obj, fts_object_get_variable(obj));
+
+  /* Or, if the object is a wannabe, remove it from the variable */
+
+  if (obj->is_wannabe)
+    fts_variable_remove_wannabe(obj, obj->varname, obj);
+
+  /* Remove it as user of its var refs */
+
+  while (obj->var_refs)
+    fts_binding_remove_user(obj->var_refs->var, obj);
 
   /* take it away from the update queue, if there */
 
@@ -683,626 +787,17 @@ fts_object_delete(fts_object_t *obj)
 
 /******************************************************************************/
 /*                                                                            */
-/*                            Connections                                     */
-/*                                                                            */
-/******************************************************************************/
-
-fts_connection_t *fts_object_connect(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
-{
-  fts_outlet_decl_t *outlet;
-  fts_inlet_decl_t *inlet;
-  fts_class_mess_t *mess = 0;
-  fts_connection_t *outconn;
-  int anything;
-
-  /* first of all, if one of the two object is an error object,
-     add the required inlets/outlets to it */
-
-  if (fts_object_is_error(out))
-    fts_error_object_fit_outlet(out, woutlet);
-
-  if (fts_object_is_error(in))
-    fts_error_object_fit_inlet(in, winlet);
-
-  /* check the range */
-
-  if (woutlet >= out->cl->noutlets || woutlet < 0)
-    {
-      post("Outlet out of range\n");
-
-      return 0;
-    }
-
-
-  /* check againsts double connections */
-  { 
-    fts_connection_t *p;
-
-    for (p = out->out_conn[woutlet]; p ; p = p->next_same_src)
-    {
-      if ((p->dst == in) && (p->winlet == winlet))
-	{
-	  /* Found, return error message */
-
-	  post("Double Connection\n");
-
-	  return 0;
-	}
-    }
-  }
-
-  /* find the outlet and the inlet in the class structure */
-
-  outlet = &out->cl->outlets[woutlet];
-
-  if (winlet == fts_SystemInlet)
-    inlet = in->cl->sysinlet;
-  else if (winlet < in->cl->ninlets && winlet >= 0)
-    inlet = &in->cl->inlets[winlet];
-  else
-    {
-      post("Inlet out of range \n");
-
-      return 0;
-    }
-
-  if (outlet->tmess.symb)
-    {
-      mess = fts_class_mess_inlet_get(inlet, outlet->tmess.symb, &anything);
-
-      if (! mess)
-	{
-	  post("Cannot connect\n");
-
-	  return 0;
-	}
-    }
-
-  outconn = (fts_connection_t *) fts_heap_alloc(&connection_heap);
-
-  outconn->id  = id;
-  outconn->src = out;
-  outconn->woutlet = woutlet;
-  outconn->dst = in;
-  outconn->winlet = winlet;
-
-  if (id != FTS_NO_ID)
-    fts_connection_table_put(id, outconn);
-
-  /* pre-initialize the cache, if possible */
-
-  if (mess)
-    {
-      if (fts_mess_run_time_check)
-	{
-	  outconn->symb = 0;
-	  outconn->mth  = 0;
-	}
-      else if (anything)
-	{
-	  /* we cache the method for anything here because, since the
-	   outlet is typed, we are sure we will always call the anything method
-	   for this type */
-
-	  outconn->symb = 0;
-	  outconn->mth  = mess->mth;
-	}
-      else
-	{
-	  outconn->symb = mess->tmess.symb;
-	  outconn->mth  = mess->mth;
-	}
-    }
-  else
-    {
-      outconn->symb = 0;
-      outconn->mth  = 0;
-    }
-
-  /* add the connection to the outlet list and to the inlet list  */
-
-  if (! out->out_conn[woutlet])
-    {
-      outconn->next_same_src = 0;
-      out->out_conn[woutlet] = outconn;
-    }
-  else
-    {
-      outconn->next_same_src = out->out_conn[woutlet];
-      out->out_conn[woutlet] = outconn;
-    }
-
-  if (! in->in_conn[winlet])
-    {
-      outconn->next_same_dst = 0;
-      in->in_conn[winlet] = outconn;
-    }
-  else
-    {
-      outconn->next_same_dst = in->in_conn[winlet];
-      in->in_conn[winlet] = outconn;
-    }
-
-  return outconn;
-}
-
-/* disconnect return fts_NoSuchConnection if the connection didn't existed */
-
-void fts_object_disconnect(fts_connection_t *conn)
-{ 
-  fts_object_t *src;
-  fts_object_t *dst;
-  fts_connection_t **p;		/* indirect precursor */
-  fts_connection_t *prev = 0;
-
-  src = conn->src;
-  dst  = conn->dst;
-
-  /* look for the connection in the output list of src, and remove it */
-
-  for (p = &src->out_conn[conn->woutlet]; *p ; p = &((*p)->next_same_src))
-    {
-      if ((*p) == conn)
-	{
-	  *p = (*p)->next_same_src;
-	  break;
-	}
-    }
-
-  /* look for it  in the input list of in, and remove it*/
-
-  for (p = &dst->in_conn[conn->winlet]; *p ; p = &((*p)->next_same_dst))
-    if ((*p) == conn)
-      {
-	*p = (*p)->next_same_dst;
-	break;
-      }
-
-  /* Unregister the connection */
-
-  if (conn->id != FTS_NO_ID)
-    fts_connection_table_remove(conn->id);
-
-  /* Free the connection, and return */
-
-  fts_heap_free((char *) conn, &connection_heap);
-}
-
-
-/******************************************************************************/
-/*                                                                            */
-/*                            Messaging                                       */
-/*                                                                            */
-/******************************************************************************/
-
-static fts_status_t
-fts_args_check(fts_class_mess_t *mess, int ac, const fts_atom_t *at)
-{
-  fts_mess_type_t *tmess = &(mess->tmess);
-  int i;
-
-  if (tmess->mandatory_args == FTS_VAR_ARGS)
-    return fts_Success;
-
-  if (ac < tmess->mandatory_args)
-    return &fts_ArgumentMissing;
-
-  if (ac > tmess->nargs)
-    return &fts_ExtraArguments;
-
-  for (i = 0; i < ac; i++)
-    {
-      if (tmess->arg_types[i] == fts_s_anything)
-	continue;
-      else if ((tmess->arg_types[i] == fts_s_number) &&
-	       ((fts_get_type(&at[i]) == fts_s_int) || 
-		(fts_get_type(&at[i]) == fts_s_float)))
-	continue;
-      else if (fts_get_type(&at[i]) == tmess->arg_types[i])
-	continue;
-      else
-	return &fts_ArgumentTypeMismatch;
-    }
-
-  return fts_Success;
-}
-
-void
-fts_mess_set_run_time_check(int flag)
-{
-  fts_mess_run_time_check = flag;
-}
-
-fts_status_t
-fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_status_t status;
-
-  fts_inlet_decl_t *in;
-  fts_class_mess_t *mess;
-  fts_class_t *cl = o->cl;
-  int anything;
-
-  if (winlet == fts_SystemInlet)
-    in = cl->sysinlet;
-  else if (winlet < cl->ninlets && winlet >= 0)
-    in = &cl->inlets[winlet];
-  else
-    {
-      fprintf(stderr,"Inlet %d out of range, for message %s to an object `%s'\n", winlet,
-	   (s ? fts_symbol_name(s) : "(null)"), fts_symbol_name(fts_object_get_class_name(o)));  /* @@@@ ERROR !!! */
-      return &fts_InletOutOfRange;
-    }
-
-  mess = fts_class_mess_inlet_get(in, s, &anything);
-
-  if (mess)
-    {
-      if (fts_mess_run_time_check)
-	{
-	  status = fts_args_check(mess, ac, at);
-
-	  if (status != fts_Success)
-	    {
-#ifdef PRINT_ERRORS
-	      fprintf(stderr,"%s error for object of class %s, inlet %d, message %s arguments:",
-		   status->description, fts_symbol_name(fts_object_get_class_name(o)), 
-		   winlet,  fts_symbol_name(s)); /* @@@@ ERROR !!! */
-
-	      fprintf_atoms(stderr, ac, at);
-	      fprintf(stderr,"\n");/* @@@@ ERROR !!! */
-#endif
-
-	      return status;
-	    }
-	}
-
-      (*mess->mth)(o, winlet, s, ac, at);
-      return fts_Success;
-    }
-
-  return &fts_MethodNotFound;
-}
-
-
-fts_status_t
-fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
-		 int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache)
-{
-  fts_status_t status;
-  fts_inlet_decl_t *in;
-  fts_class_mess_t *mess;
-  fts_class_t *cl = o->cl;
-  fts_class_mess_t **messtable;
-  int i;
-
-  if (winlet == fts_SystemInlet)
-    in = cl->sysinlet;
-  else if (winlet < cl->ninlets && winlet >= 0)
-    in = &cl->inlets[winlet];
-  else
-    {
-      fprintf(stderr,"Inlet %d out of range, for message %s to an object `%s'\n", winlet,
-	   (s ? fts_symbol_name(s) : "(null)"), fts_symbol_name(fts_object_get_class_name(o))); /* @@@@ ERROR !!! */
-      return &fts_InletOutOfRange;
-    }
-
-
-  messtable = in->messlist;
-
-  if ((in->nmess == 1) && (messtable[0]->tmess.symb == fts_s_anything))
-    {
-      /* special case for the anything as unique method */
-      
-      mess = messtable[0];
-      *symb_cache = 0;
-      *mth_cache  = mess->mth;
-    }
-  else
-    {
-      mess = 0;
-      for (i = 0; i < in->nmess; i++)
-	{
-	  if (messtable[i]->tmess.symb == s)
-	    {
-	      mess = messtable[i];
-
-	      *symb_cache = mess->tmess.symb;
-	      *mth_cache = mess->mth;
-
-	      break;
-	    }
-	  else if (messtable[i]->tmess.symb == fts_s_anything)
-	    {
-	      /* found and temporary stored a method for anything;
-		 since it is not unique, we do not cache it */
-
-	      mess = messtable[i];
-	    }
-	}
-    }
-
-  if (mess)
-    {
-      if (fts_mess_run_time_check)
-	{
-	  status = fts_args_check(mess, ac, at);
-
-	  if (status != fts_Success)
-	    {
-	      fprintf(stderr,"%s error for object of class %s, inlet %d, message %s arguments:",
-		   status->description, fts_symbol_name(fts_object_get_class_name(o)), winlet,
-		   fts_symbol_name(s));  /* @@@@ ERROR !!! */
-	      fprintf_atoms(stderr, ac, at);
-	      fprintf(stderr,"\n");/* @@@@ ERROR !!! */
-
-	      return status;
-	    }
-
-	  /* empty the connection cache if check is active */
-
-	  *symb_cache = 0;
-	  *mth_cache = 0;
-	}
-
-      (*mess->mth)(o, winlet, s, ac, at);
-
-      return fts_Success;
-    }
-  else
-    {
-      fprintf(stderr,"Unknown message %s for object of class %s, inlet %d\n", 
-	   fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet); /* @@@@ ERROR !!! */
-
-      return &fts_MethodNotFound;
-    }
-}
-
-
-/* All the call to this  Function are overwritten to macro in case of optimization.
-   The function is left here so that a user can compile an object with -g to test it
-*/
-#undef fts_outlet_send
-
-fts_status_t
-fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
-		int ac, const fts_atom_t *at)
-{
-  fts_connection_t *conn;
-  fts_class_t *cl = o->cl;
-  fts_outlet_decl_t *out;
-  fts_status_t status;
-
-  if (woutlet >= cl->noutlets || woutlet < 0)
-    {
-      fprintf(stderr,"fts_outlet_send: outlet out of range #%d for object of class `%s'\n", woutlet, 
-	   fts_symbol_name(fts_object_get_class_name(o))); /* @@@@ ERROR !!! */
-
-      return &fts_OutletOutOfRange;
-    }
-
-  out = &cl->outlets[woutlet];
-
-  if (!s)
-    {
-      fprintf(stderr,"fts_outlet_send: invalid message null symbol on outlet #%d for object of class `%s'\n", 
-	   fts_symbol_name(s), woutlet, fts_symbol_name(fts_object_get_class_name(o))); /* @@@@ ERROR !!! */
-
-      return &fts_InvalidMessage;
-    }
-
-  if (out->tmess.symb && out->tmess.symb != s)
-    {
-      fprintf(stderr, "fts_outlet_send: invalid message symbol `%s' on outlet #%d for object of class `%s'\n",
-	   fts_symbol_name(s), woutlet, fts_symbol_name(fts_object_get_class_name(o)));	/* @@@ ERROR !!! */
-
-      return &fts_InvalidMessage;
-    }
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      /* second test is for the anything case */
-
-      if ((conn->symb == s) || (!conn->symb && conn->mth))
-	{
-	  fts_class_mess_t *mess;
-	  int anything;
-
-	  mess = fts_class_mess_get(conn->dst->cl, conn->winlet, s, &anything);
-
-	  if ((status = fts_args_check(mess, ac, at)) != fts_Success)
-	    return status;
-
-	  (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
-	}
-      else
-	fts_send_message_cache(conn->dst, conn->winlet, s, ac, at, &conn->symb, &conn->mth);
-
-      conn = conn->next_same_src;
-    }
-
-  return fts_Success;
-}
-
-
-/* Utility functions */
-
-/*
-   The fts_outlet_* functions call will be overwritten by macro
-   expansion in case of -O optimization; the functions are 
-   always compiled, also to allow user object to be compiled with
-   -g also with -O compiled libraries.
-*/
-#undef fts_outlet_int
-void
-fts_outlet_int(fts_object_t *o, int woutlet, int n)
-{
-  fts_connection_t *conn;
-  fts_atom_t atom;
-
-  fts_set_long(&atom, n);
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_int, 1, &atom); 
-
-      conn = conn->next_same_src;
-    }
-}
-
-#undef fts_outlet_float
-void
-fts_outlet_float(fts_object_t *o, int woutlet, float f)
-{
-  fts_connection_t *conn;
-  fts_atom_t atom;
-
-  fts_set_float(&atom, f);
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_float, 1, &atom); 
-
-      conn = conn->next_same_src;
-    }
-}
-
-#undef fts_outlet_symbol
-void
-fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
-{
-  fts_connection_t *conn;
-  fts_atom_t atom;
-
-  fts_set_symbol(&atom, s);
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_symbol, 1, &atom); 
-
-      conn = conn->next_same_src;
-    }
-}
-
-#undef fts_outlet_list
-void
-fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
-{
-  fts_connection_t *conn;
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_list, ac, at); 
-
-      conn = conn->next_same_src;
-    }
-}
-
-#undef fts_outlet_bang
-void
-fts_outlet_bang(fts_object_t *o, int woutlet)
-{
-  fts_connection_t *conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_bang, 0, 0); 
-
-      conn = conn->next_same_src;
-    }
-}
-
-/* 
-   function to get values by name;  later, argument by name will be supported in
-   class discrimination function, using keywords ...
-
- */
-
-
-long
-fts_get_int_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int def)
-{
-  int i;
-
-  for (i = 0; i < (argc - 1); i++)
-    if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == name) && fts_is_long(&at[i+1]))
-      return fts_get_long(&at[i+1]);
-
-  return def;
-}
-
-
-float
-fts_get_float_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, float def)
-{
-  int i;
-
-  for (i = 0; i < (argc - 1); i++)
-    if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == name) && fts_is_float(&at[i+1]))
-      return fts_get_float(&at[i+1]);
-
-  return def;
-}
-
-
-fts_symbol_t
-fts_get_symbol_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, fts_symbol_t def)
-{
-  int i;
-
-  for (i = 0; i < (argc - 1); i++)
-    if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == name) && fts_is_symbol(&at[i+1]))
-      return fts_get_symbol(&at[i+1]);
-
-  return def;
-}
-
-
-/* Boolean as 1 or 0: simply require that the symbol exists in the arguments,
-   otherwise return the default, that should be 0, in the current implementation.
-   In the future will do a smarter parsing, this is why the default argument is
-   present
- */
-
-long
-fts_get_boolean_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int def)
-{
-  int i;
-
-  for (i = 0; i < argc; i++)
-    if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == name))
-      return 1;
-
-  return def;
-}
-
-
-
-/******************************************************************************/
-/*                                                                            */
 /*                          Object Access                                     */
 /*                                                                            */
 /******************************************************************************/
 
 
-fts_symbol_t 
-fts_object_get_class_name( fts_object_t *obj)
+fts_symbol_t fts_object_get_class_name( fts_object_t *obj)
 {
   return fts_get_class_name(obj->cl);
 }
 
-int 
-fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s)
+int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s)
 {
   int anything;
 
@@ -1310,5 +805,195 @@ fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s)
     return 1;
   else
     return 0;
+}
+
+/* Test recursively if an object is inside a patcher (or its subpatchers) */
+
+int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
+{
+  if (! obj)
+    return 0;
+  else if (obj == (fts_object_t *) patcher)
+    return 1;
+  else
+    return fts_object_is_in_patcher((fts_object_t *) fts_object_get_patcher(obj), patcher);
+}
+
+
+/******************************************************************************/
+/*                                                                            */
+/*                          Object Basic property handling                    */
+/*                                                                            */
+/******************************************************************************/
+
+/* 
+   All this should be somehow reviewed .... it is not completely satisfying,
+   and should be more modular 
+   */
+
+void
+fts_object_send_properties(fts_object_t *obj)
+{
+  /* If the object have an ID (i.e. was created by the client, or a property has
+     been assigned to it),
+     ask the object to send the ninlets and noutlets  properties,
+     and name and declaration if any. */
+
+  if (obj->id != FTS_NO_ID) 
+    { 
+      fts_object_property_changed_urgent(obj, fts_s_x);
+      fts_object_property_changed_urgent(obj, fts_s_y);
+      fts_object_property_changed_urgent(obj, fts_s_height);
+      fts_object_property_changed_urgent(obj, fts_s_width);
+
+      fts_object_property_changed_urgent(obj, fts_s_font);
+      fts_object_property_changed_urgent(obj, fts_s_fontSize);
+
+      if (fts_object_is_patcher(obj) && (! fts_object_is_error(obj)))
+	{
+	  fts_object_property_changed_urgent(obj, fts_s_wx);
+	  fts_object_property_changed_urgent(obj, fts_s_wy);
+	  fts_object_property_changed_urgent(obj, fts_s_wh);
+	  fts_object_property_changed_urgent(obj, fts_s_ww);
+	}
+
+      fts_object_property_changed_urgent(obj, fts_s_ninlets);
+      fts_object_property_changed_urgent(obj, fts_s_noutlets);
+
+      fts_object_property_changed_urgent(obj, fts_s_min_value);
+      fts_object_property_changed_urgent(obj, fts_s_max_value);
+
+      /* The following properties are here only temporarly; they should
+	 be in the relative objects */
+
+      fts_object_property_changed_urgent(obj, fts_s_value); 
+      fts_object_property_changed_urgent(obj, fts_s_size); 
+      fts_object_property_changed_urgent(obj, fts_s_name) ;
+
+      if (fts_object_is_error(obj))
+	fts_object_property_changed_urgent(obj, fts_s_error);
+
+      /* Declarations are not yet really supported */
+
+      /* fts_object_property_changed_urgent(obj, fts_new_symbol("declaration")); */
+    }
+}
+
+
+/* Properties to be sent after a recomputing */
+
+static void
+fts_object_send_kernel_properties(fts_object_t *obj)
+{
+  /* If the object have an ID (i.e. was created by the client, or a property has
+     been assigned to it),
+     ask the object to send the ninlets and noutlets  properties,
+     and name and declaration if any. */
+
+  if (obj->id != FTS_NO_ID) 
+    { 
+      fts_object_property_changed_urgent(obj, fts_s_ninlets);
+      fts_object_property_changed_urgent(obj, fts_s_noutlets);
+
+      fts_object_property_changed_urgent(obj, fts_s_min_value);
+      fts_object_property_changed_urgent(obj, fts_s_max_value);
+
+      /* The following properties are here only temporarly; they should
+	 be in the relative objects */
+
+      fts_object_property_changed_urgent(obj, fts_s_value); 
+      fts_object_property_changed_urgent(obj, fts_s_size); 
+      fts_object_property_changed_urgent(obj, fts_s_error);
+      fts_object_property_changed_urgent(obj, fts_s_name) ;
+
+      /* Declarations are not yet really supported */
+
+      /* fts_object_property_changed_urgent(obj, fts_new_symbol("declaration")); */
+    }
+}
+
+
+static void fts_move_property(fts_object_t *old, fts_object_t *new, fts_symbol_t name)
+{
+  fts_atom_t a;
+
+  fts_object_get_prop(old, name, &a);
+
+  if (! fts_is_void(&a))
+    fts_object_put_prop(new, name, &a);
+}
+
+  
+
+static void fts_object_move_properties(fts_object_t *old, fts_object_t *new)
+{
+  /* Copy only the editor properties here, not the others !!! */
+
+  if (fts_object_is_standard_patcher(old))
+    {
+      fts_move_property(old, new, fts_s_wx);
+      fts_move_property(old, new, fts_s_wy);
+      fts_move_property(old, new, fts_s_wh);
+      fts_move_property(old, new, fts_s_ww);
+    }
+
+  fts_move_property(old, new, fts_s_x);
+  fts_move_property(old, new, fts_s_y);
+  fts_move_property(old, new, fts_s_height);
+  fts_move_property(old, new, fts_s_width);
+  fts_move_property(old, new, fts_s_font);
+  fts_move_property(old, new, fts_s_fontSize);
+}
+
+/* Debug print
+   An object is printed as:
+
+   <{description} #id>
+
+   If no description is present, is printed as
+
+   < "metaclass-name" #id>
+ */
+
+
+void fprintf_object(FILE *f, fts_object_t *obj)
+{
+  if (! obj)
+    {
+      fprintf(f, "<NULL OBJ>");
+    }
+  else if (obj->argv)
+    {
+      if (fts_object_is_error(obj))
+	fprintf(f, "<ERROR {");
+      else
+	fprintf(f, "<{");
+
+      fprintf_atoms(f, obj->argc, obj->argv);
+      fprintf(f, "} #%d>", obj->id);
+    }
+  else
+    fprintf(f, "<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->id);
+}
+
+
+void post_object(fts_object_t *obj)
+{
+  if (! obj)
+    {
+      post("<NULL OBJ>");
+    }
+  else if (obj->argv)
+    {
+      if (fts_object_is_error(obj))
+	post("<ERROR {");
+      else
+	post("<{");
+
+      postatoms(obj->argc, obj->argv);
+      post("} #%d>", obj->id);
+    }
+  else
+    post("<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->id);
 }
 

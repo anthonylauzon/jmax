@@ -9,5 +9,4 @@ import ircam.jmax.mda.*;
 
 public interface FtsDataObject extends MaxData
 {
-  abstract public void saveAsTcl(PrintWriter pw);
 }

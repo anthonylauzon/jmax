@@ -1,7 +1,6 @@
 SOURCES = \
 	Fts.java			\
 	FtsAbstractionObject.java	\
-	FtsAtomList.java		\
 	FtsBmaxRemoteDocumentHandler.java		\
 	FtsClientProtocol.java		\
 	FtsCommentObject.java		\
@@ -39,7 +38,6 @@ SOURCES = \
 	FtsReferenceURLTable.java	\
 	FtsRemoteData.java		\
 	FtsRemoteDataID.java		\
-	FtsRemoteDataObject.java	\
 	FtsRemoteMetaData.java		\
 	FtsRexecDatagramPort.java	\
 	FtsRexecDatagramServer.java	\
@@ -53,6 +51,8 @@ SOURCES = \
 	FtsSubProcessPort.java		\
 	FtsSubProcessServer.java	\
 	FtsTableObject.java		\
-	FtsTclPropertyParser.java	\
-	FtsUpdateGroupListener.java	\
-	FtsValueObject.java		\
+	FtsUpdateGroupListener.java
+
+
+
+

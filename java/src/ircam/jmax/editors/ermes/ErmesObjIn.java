@@ -44,18 +44,15 @@ class ErmesObjIn extends ErmesObject {
     // 2) the constructor of the super class calls an abstract function defined in the subclass
     // 3) this function is called on a partially initialized object.
     // May be this is a potential source of problems ?
-    int temp = theSketchPad.GetSketchWindow().itsPatcher.getNumberOfInlets();
-    if (temp == 0) {//top patcher special case!
-      //make the first
-      temp = 1;
-      GetSketchWindow().itsPatcher.setNumberOfInlets(1);
-    }
-    
-    if (theSketchPad.inCount < temp)
-      itsId = theSketchPad.inCount++;   //for now no deleting handled
-    else
-      itsId = temp - 1;
-    // } (fd)
+
+    /* (mdc): changed: the inlet number do not need to be 
+       less than the actual number of inlets; you may change the number later.
+       May be it should be the next unused value; in this way, each new
+       object get a new value, so "make an inlet" "delete it" and "make an inlet"
+       will produce inlet 2 instead of inlet 1.
+       */
+
+    itsId = theSketchPad.inCount++;   //for now no deleting handled
 
     super.Init(theSketchPad, x, y, theString);	//this was not here...
     makeCurrentRect(x, y);

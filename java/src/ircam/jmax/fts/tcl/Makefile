@@ -116,7 +116,7 @@ FtsVersionCmd:
 .PHONY: FtsVersionCmd
 
 TclFtsPackage:
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) TclFtsPackage.ja)
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) TclFtsPackage.java)
 .PHONY: TclFtsPackage
 
 

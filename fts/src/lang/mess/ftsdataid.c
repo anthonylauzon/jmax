@@ -45,9 +45,7 @@ void fts_data_id_put( int id, fts_data_t *d)
   if (id <= 0)
     return;
 
-  if (data_table_size == 0)
-    init_table();
-  else if (id >= data_table_size)
+  if (id >= data_table_size)
     grow_table( id);
     
   data_table[id] = d;
@@ -55,12 +53,13 @@ void fts_data_id_put( int id, fts_data_t *d)
 
 fts_data_t *fts_data_id_get( int id)
 {
-  if (data_table_size == 0)
-    init_table();
-
   if (id <= 0 || id > data_table_size)
     return 0;
 
   return data_table[id];
 }
 
+void fts_data_id_init()
+{
+  init_table();
+}

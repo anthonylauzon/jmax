@@ -8,7 +8,6 @@
 */
 
 #include <string.h>
-#include <stdio.h>
 
 #include "sys.h"
 #include "lang.h"

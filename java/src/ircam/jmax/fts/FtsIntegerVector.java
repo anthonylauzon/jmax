@@ -106,7 +106,7 @@ public class FtsIntegerVector implements FtsDataObject
     if (object != null)
       {
 	Fts.getServer().sendObjectMessage(object, -1, "update", (Vector) null);
-	Fts.getServer().syncToFts();
+	Fts.sync();
       }
   }
 
@@ -153,32 +153,6 @@ public class FtsIntegerVector implements FtsDataObject
   public void changed()
   {
     changed(0, values.length - 1);
-  }
-
-  /** Saving as tcl, both embedded in a .tpa or in a table file*/
-
-  public void saveAsTcl(PrintWriter pw)
-  {
-    pw.println("integerVector " + values.length + " {");
-
-    if (pw instanceof IndentedPrintWriter)
-      ((IndentedPrintWriter) pw).indentMore();
-
-    for (int i = 0; i < values.length; i++)
-      {
-	if ((i % 8) == 7)
-	  pw.println(Integer.toString(values[i]));
-	else
-	{
-	  pw.print(Integer.toString(values[i]));
-	  pw.print("\t");
-	}
-      }
-
-    if (pw instanceof IndentedPrintWriter)
-      ((IndentedPrintWriter) pw).indentLess();
-
-    pw.println("}");
   }
 }
 

@@ -29,7 +29,7 @@ class FtsClientProtocol
 	    (c == int_type_code) ||
 	    (c == float_type_code)   ||
 	    (c == object_type_code)   ||
-	    //	    (c == connection_type_code) || // (fd) was missing... Is it intentionnal ?
+	    (c == connection_type_code) || // (fd) was missing... Is it intentionnal ? NO !! :-< ..
 	    (c == data_type_code)   ||
 	    (c == string_start_code) ||
 	    (c == end_of_message_code) ||
@@ -78,14 +78,15 @@ class FtsClientProtocol
   static final int remote_call_code = '!';
 
   static final int fts_save_patcher_bmax_cmd = 'S';
-  static final int fts_save_patcher_tpat_cmd = 'T';
 
   static final int fts_load_patcher_bmax_cmd = 'U';
-  static final int fts_load_patcher_tpat_cmd = 'V';
   static final int fts_load_patcher_dpat_cmd = 'Z';
 
   static final int fts_declare_abstraction_cmd      = 'E';
   static final int fts_declare_abstraction_path_cmd = 'F';
+
+  static final int fts_declare_template_cmd      = 'y';
+  static final int fts_declare_template_path_cmd = 'w';
 
   static final int fts_download_patcher_cmd = 'D';
   static final int fts_download_object_cmd = 'G';
@@ -95,12 +96,11 @@ class FtsClientProtocol
   static final int fts_close_patcher_cmd = 'C';
   static final int fts_patcher_loaded_cmd = 'L';
 
-
-
-
   static final int fts_new_object_cmd = 'n';
   static final int fts_new_abstraction_cmd = 'A';
   static final int fts_redefine_patcher_cmd = 'Q';
+  static final int fts_redefine_object_cmd = 'R';
+  static final int fts_redefine_connection_cmd = 'V';
   static final int fts_reposition_inlet_cmd = 'X';
   static final int fts_reposition_outlet_cmd = 'Y';
 
@@ -113,6 +113,7 @@ class FtsClientProtocol
 
   static final int fts_put_property_cmd = 'p';
   static final int fts_get_property_cmd = 'g';
+  static final int fts_get_all_property_cmd = 'B';
 
   static final int fts_property_value_cmd = 'P';
   static final int fts_server_message_cmd = 'M';
@@ -136,18 +137,18 @@ class FtsClientProtocol
 	return "post";
       case 'S':
 	return "fts_save_patcher_bmax";
-      case 'T':
-	return "fts_save_patcher_tpat";
       case 'U':
 	return "fts_load_patcher_bmax";
-      case 'V':
-	return "fts_load_patcher_tpat";
       case 'Z':
 	return "fts_load_patcher_dpat";
       case 'E':
 	return "fts_declare_abstraction";
       case 'F':
 	return "fts_declare_abstraction_path";
+      case 'y':
+	return "fts_declare_template";
+      case 'w':
+	return "fts_declare_template_path";
       case 'D':
 	return "fts_download_patcher";
       case 'G':
@@ -166,6 +167,10 @@ class FtsClientProtocol
  	return "fts_new_abstraction";
       case 'Q':
 	return "fts_redefine_patcher";
+      case 'R':
+	return "fts_redefine_object";
+      case 'V':
+	return "fts_redefine_connection";
       case 'X':
 	return "fts_reposition_inlet";
       case 'Y':
@@ -195,7 +200,7 @@ class FtsClientProtocol
       case '!':
 	return "fts_remote_call";
       default:
-	return "(unknown command)";
+	return "(unknown command: " + (char) command + " )";
       }
   }
 }

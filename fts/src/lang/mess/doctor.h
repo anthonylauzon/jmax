@@ -4,9 +4,7 @@
 
 extern void fts_register_object_doctor(fts_symbol_t class_name,
 				       fts_object_t *(* fun)(fts_patcher_t *patcher,
-							     long id,
 							     int ac,
 							     const fts_atom_t *at));
-
 
 #endif

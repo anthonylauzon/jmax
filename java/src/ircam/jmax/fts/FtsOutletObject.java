@@ -56,18 +56,6 @@ public class FtsOutletObject  extends FtsObject
   {
     return 0;
   }
-
-
-  /** Save the object to a TCL stream. */
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-    // Save as "inlet ..."
-
-    writer.print("outlet " + position);
-
-    savePropertiesAsTcl(writer);
-  }
 }
 
 

@@ -30,23 +30,6 @@ public class FtsAbstractionObject  extends FtsContainerObject
 
     this.className = className;
   }
-
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                      CLIENT API and  PROPERTIES                           */
-  /*                                                                           */
-  /*****************************************************************************/
-
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-    // Save as "object ..."
-
-    writer.print("object {" + description + "}");
-
-    savePropertiesAsTcl(writer);
-  }
 }
 
 

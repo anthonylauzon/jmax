@@ -152,13 +152,5 @@ class ErmesRegion
       g.fillRect(aRect.x, aRect.y, aRect.width, aRect.height);
     }
   }
-
-  public void writeRegionOnErrorStream(){
-    System.err.println("");
-    for (Enumeration li = itsAreas.elements(); 
-	 li.hasMoreElements();) {
-      System.err.println(((ErmesArea) li.nextElement()).getArea().toString());
-    }
-  }
 }
 

@@ -41,8 +41,11 @@ class ErmesPatcherInspector extends Frame {
       public void actionPerformed(ActionEvent e) {
 	
 	try{
-	  itsPatcherObject.setNumberOfInlets(Integer.parseInt(itsInsField.getText()));
-	  itsPatcherObject.setNumberOfOutlets(Integer.parseInt(itsOutsField.getText()));
+	  itsPatcherObject.put("ins", Integer.parseInt(itsInsField.getText()));
+	  itsPatcherObject.put("outs", Integer.parseInt(itsOutsField.getText()));
+	  itsPatcherObject.ask("ins");
+	  itsPatcherObject.ask("outs");
+	  Fts.sync();
 	}
 	catch (NumberFormatException e1){
 	  //ignore and close

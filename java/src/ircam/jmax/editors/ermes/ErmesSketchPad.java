@@ -191,8 +191,7 @@ Rectangle previousResizeRect = new Rectangle();
     nameTable.put("slider", ircam.jmax.editors.ermes.ErmesObjSlider.class);
     nameTable.put("inlet", ircam.jmax.editors.ermes.ErmesObjIn.class);
     nameTable.put("outlet", ircam.jmax.editors.ermes.ErmesObjOut.class);
-    // nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjExternal.class);
-    nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
+    nameTable.put("jpatcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
   }
 
   int itsAddObject;
@@ -285,56 +284,6 @@ Rectangle previousResizeRect = new Rectangle();
     }
   }
 
-  //--------------------------------------------------------
-  //	AddObjectForName
-  //  adding an object given itsName and parameters.
-  //	It is used by scripts
-  //--------------------------------------------------------
-  public ErmesObject AddObjectByName(String theName, int x, int y, String args) {
-    ErmesObject aObject = null;
-    ErmesObjOutlet aOutlet;
-    int i;
-    Rectangle aRect;
-    
-    try { 
-      aObject = (ErmesObject) Class.forName(theName).newInstance();	
-    }  catch(ClassNotFoundException e) {return null;}
-    catch(IllegalAccessException e) {return null;}
-    catch(InstantiationException e) {return null;}
-    //finally {
-    aObject.Init(this, x, y, args);
-      //something went wrong...
-    //};
-      itsElements.addElement(aObject);
-      aObject.DoublePaint();
-
-      if(theName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
-	itsPatcherElements.addElement(aObject);
-      if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
-
-      return aObject;
-  }
-  
-  //--------------------------------------------------------
-  //	AddConnectionByInOut
-  //  adding a connection given the source, dest, inlet, outlet.
-  //	Used by scripts
-  //--------------------------------------------------------
-  public ErmesConnection AddConnectionByInOut(ErmesObject srcObj, int srcOut, ErmesObject destObj, int destIn)
-  {
-    ErmesObjOutlet out;
-    ErmesObjInlet in;
-    ErmesObject aObject = null;
-
-    out = (ErmesObjOutlet) srcObj.itsOutletList.elementAt(srcOut);
-    in  = (ErmesObjInlet) destObj.itsInletList.elementAt(destIn);
-
-    in.ChangeState(false, true, false); //warning: how many repaint() this function costs?
-    out.ChangeState(false, true, false);//warning: how many repaint() this function costs?
-
-    ErmesConnection aConnection = itsHelper.TraceConnection(out, in, true);
-    return aConnection;
-  }
   
   public Font getSketchFont() {
     return sketchFont;
@@ -1020,7 +969,6 @@ Rectangle previousResizeRect = new Rectangle();
 
   public void mousePressed(MouseEvent e)
   {
-    MaxApplication.setCurrentWindow(itsSketchWindow);
     itsSketchWindow.requestFocus();//???
     
     int x = e.getX();
@@ -1142,7 +1090,6 @@ Rectangle previousResizeRect = new Rectangle();
     int x = e.getX();
     int y = e.getY();
 
-    MaxApplication.setCurrentWindow(itsSketchWindow);
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode || e.isControlDown()) {

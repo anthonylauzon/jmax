@@ -1,7 +1,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "gphiter.h"
-#include <stdio.h>
+
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -93,7 +93,8 @@ static void handle_connection_to_system_object( graph_iterator_t *iter, fts_conn
       newobject = fts_patcher_get_inlet( system_object, connection->winlet);
       if (newobject == 0)
 	{
-	  fprintf( stderr, "Warning (gphiter.c): patcher without inlet...\n");
+	  /* Got a lot of those */
+	  /* fprintf( stderr, "Warning (gphiter.c): patcher without inlet...\n"); */
 	  return;
 	}
 

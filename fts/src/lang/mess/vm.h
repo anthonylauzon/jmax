@@ -69,6 +69,7 @@
 #define FVM_MAKE_OBJ_S        (FVM_MAKE_OBJ | FVM_S_ARG)
 #define FVM_MAKE_OBJ_L        (FVM_MAKE_OBJ | FVM_L_ARG)
 
+
 #define FVM_PUT_PROP          14
 #define FVM_PUT_PROP_B        (FVM_PUT_PROP | FVM_B_ARG)
 #define FVM_PUT_PROP_S        (FVM_PUT_PROP | FVM_S_ARG)
@@ -89,8 +90,17 @@
 #define FVM_POP_OBJ_TABLE     19
 #define FVM_CONNECT           20
 
-extern fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_symbol_t symbol_table[]);
+#define FVM_MAKE_TOP_OBJ      21
+#define FVM_MAKE_TOP_OBJ_B    (FVM_MAKE_TOP_OBJ | FVM_B_ARG)
+#define FVM_MAKE_TOP_OBJ_S    (FVM_MAKE_TOP_OBJ | FVM_S_ARG)
+#define FVM_MAKE_TOP_OBJ_L    (FVM_MAKE_TOP_OBJ | FVM_L_ARG)
 
+
+extern fts_object_t *fts_run_mess_vm(fts_object_t *parent,
+				     unsigned char *program,
+				     fts_symbol_t symbol_table[],
+				     int ac, const fts_atom_t *at,
+				     fts_expression_state_t *e);
 
 #endif
 

@@ -39,14 +39,19 @@ extern fts_class_mess_t *fts_class_mess_get(fts_class_t *cl, int winlet, fts_sym
  *  Functions to handle patcher/object relationship
  */
 
+extern void fts_create_root_patcher(void);
 extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
+extern int fts_patcher_number_of_objects(fts_patcher_t *this);
+extern void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data);
 
 /* Functions for direct .pat loading support */
 
 extern void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in);
 
-extern void fts_patcher_reassign_inlets_outlets_name(fts_patcher_t *obj, fts_symbol_t new_name);
+extern void fts_patcher_reassign_inlets_outlets(fts_patcher_t *obj);
+extern void fts_patcher_reassign_name(fts_patcher_t *this, fts_symbol_t new_name);
+
 /* 
  * Property related private functions
  */
@@ -56,6 +61,10 @@ extern void fts_properties_free(fts_object_t *obj);
 /* Doctor */
 
 extern void fts_doctor_init();
-extern fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at);
+extern fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+extern int fts_object_doctor_exists(fts_symbol_t class_name);
+
+#include "lang/mess/variables.h"
+
 
 #endif

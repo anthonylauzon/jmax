@@ -87,7 +87,7 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
   public MaxData getData()
   {
     this.vector.forceUpdate();
-    Fts.getServer().syncToFts();
+    Fts.sync();
 
     return vector;
   }
@@ -97,7 +97,7 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
     // We may have a pending save/update
     // Sync, than discard the vector
 
-    Fts.getServer().syncToFts();
+    Fts.sync();
     vector.setObject(null);
 
     // set the new vector, bind to this object
@@ -114,19 +114,6 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
   {
     Mda.dispose(vector);
     super.delete();
-  }
-
-  // Save the object 
-  // Data is saved by the surrounding saved, patcher or selection
-  // because need more context
-
-  public void saveAsTcl(PrintWriter writer)
-  {
-    // Save as "object ..."
-
-    writer.print("object {" + description + "}");
-
-    savePropertiesAsTcl(writer);
   }
 }
 

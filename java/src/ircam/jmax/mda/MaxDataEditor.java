@@ -40,13 +40,6 @@ public interface MaxDataEditor
    */
 
   abstract public void syncData();
-
-  /** Tell the editor the data has changed; it pass a sigle Java
-   * Object that may code what is changed and where; if the argument
-   * is null, means usually that all the data is changed
-   */
-
-  abstract public void dataChanged(Object reason);
 }
 
 

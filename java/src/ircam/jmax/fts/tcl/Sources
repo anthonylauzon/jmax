@@ -1,25 +1,12 @@
 SOURCES = \
 	  FtsAbstractionCmd.java \
 	  FtsAbstractionPathCmd.java \
-	  FtsAddListenerCmd.java \
-	  FtsAtomListCmd.java \
-	  FtsClassNameCmd.java \
-	  FtsCommentCmd.java \
-	  FtsConnectionCmd.java \
-	  FtsDeclareCmd.java \
-	  FtsGetObjectByNameCmd.java \
-	  FtsHelpPatchCmd.java \
-	  FtsInletCmd.java \
-	  FtsIntegerVectorCmd.java \
-	  FtsMessCmd.java \
-	  FtsObjectCmd.java \
-	  FtsOutletCmd.java \
-	  FtsPatcherCmd.java \
-	  FtsReferenceURLCmd.java \
-	  FtsSetDataCmd.java \
-	  FtsSetPropertyCmd.java \
-	  FtsSyncCmd.java \
 	  FtsTemplateCmd.java \
+	  FtsTemplatePathCmd.java \
+	  FtsHelpPatchCmd.java \
+	  FtsReferenceURLCmd.java \
+	  FtsSyncCmd.java \
 	  FtsUcsCmd.java \
-	  FtsVersionCmd.java \
 	  TclFtsPackage.java
+
+

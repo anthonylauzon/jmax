@@ -98,7 +98,7 @@ public class FtsAtomList implements FtsDataObject
     if (object != null)
       {
 	Fts.getServer().sendObjectMessage(object, -1, "update", (Vector) null);
-	Fts.getServer().syncToFts();
+	Fts.sync();
       }
   }
 
@@ -131,34 +131,6 @@ public class FtsAtomList implements FtsDataObject
 	Fts.getServer().sendSetMessage(object, values);
 	object.setDirty();
       }
-  }
-
-  /** Saving as tcl, both embedded in a .tpa or in a table file*/
-
-  public void saveAsTcl(PrintWriter pw)
-  {
-    pw.print("atomList {");
-
-    if (pw instanceof IndentedPrintWriter)
-      ((IndentedPrintWriter) pw).indentMore();
-
-    for (int i = 0; i < values.size(); i++)
-      {
-	Object element = values.elementAt(i);
-
-	if ((i % 16) == 0)
-	  pw.println(element.toString());
-	else
-	  {
-	    pw.print(element.toString());
-	    pw.print(" ");
-	  }
-      }
-
-    if (pw instanceof IndentedPrintWriter)
-      ((IndentedPrintWriter) pw).indentLess();
-
-    pw.println("}");
   }
 }
 

@@ -10,7 +10,6 @@
  *
  */
 
-/* #define DO_EXPRESSIONS */
 
 /* THE REAL FTS 2.0 patcher class
 
@@ -83,12 +82,12 @@ inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       this->position = fts_get_long_arg(ac, at, 1, 0);
 
-      if (this->position < fts_object_get_inlets_number((fts_object_t *)patcher))
+      if ((this->position >= 0) && (this->position < fts_object_get_inlets_number((fts_object_t *)patcher)))
 	patcher->inlets[this->position] = this;
     }
   else
     {
-      /* compatibility with ".pat" files: inlet will be
+      /* OFF inlets: inlet will be
 	 redefined later
        */
       
@@ -185,7 +184,7 @@ outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     {
       this->position = fts_get_long_arg(ac, at, 1, 0);
 
-      if (this->position < fts_object_get_outlets_number((fts_object_t *)patcher))
+      if ((this->position >= 0) && (this->position < fts_object_get_outlets_number((fts_object_t *)patcher)))
 	patcher->outlets[this->position] = this;
     }
   else
@@ -308,7 +307,7 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
    */
 
 
-static void
+/*static*/ void
 patcher_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
@@ -317,9 +316,7 @@ patcher_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->open = 1;
 
   for (p = this->objects; p ; p = p->next_in_patcher)
-    {
       fts_object_send_properties(p);
-    }
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (! fts_object_is_patcher(p))
@@ -360,9 +357,10 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_patcher_t *this = (fts_patcher_t *) o;
 
-  /* get the name */
+  /* Put the name as property if any */
 
-  this->name = fts_get_symbol_arg(ac, at, 1, fts_new_symbol("unnamed"));
+  if (ac >= 2)
+    fts_object_put_prop(o, fts_s_name, &at[1]);
 
   /* should use block allocation ?? */
 
@@ -391,13 +389,13 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->objects = (fts_object_t *) 0;
   this->open    = 0;		/* start as closed */
-  this->env     = 0;
+  
+  fts_env_init(&(this->env), (fts_object_t *) this);
   fts_patcher_set_standard(this);
 }
 
 
-/* static void */
-void
+static void 
 patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
@@ -413,7 +411,7 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* Delete all the variables */
 
-  fts_variable_env_clean(&(this->env));
+  fts_variables_undefine((fts_object_t *)this, (fts_object_t *)this);
 
   /* delete the inlets and inlets tables */
 
@@ -427,42 +425,6 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 /* Error property handling */
 
 static void
-patcher_get_name(fts_daemon_action_t action, fts_object_t *obj,
-		  int idx, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_patcher_t *this = (fts_patcher_t *) obj;
-
-  if (fts_patcher_is_standard(this))
-    {
-      fts_set_symbol(value, this->name);
-    }
-  else
-    {
-      /* Template, or error, use the class name as patcher name, for the moment */
-
-      if ((obj->argc >= 3) &&
-	  fts_is_symbol(&obj->argv[0]) &&
-	  fts_is_symbol(&obj->argv[1])
-	  && (fts_get_symbol(&obj->argv[1]) == fts_s_else))
-	{
-	  /* foo : <obj> syntax; extract the class name */
-
-	  *value = obj->argv[2];
-	}
-      /* (fd) trying to fix the `empty object' crash */
-      else if ( obj->argc > 0)
-	{
-	  *value = obj->argv[0];
-	}
-      else
-	{
-	  fts_set_symbol( value, fts_s_void);
-	}
-    }
-}
-
-
-static void
 patcher_get_error(fts_daemon_action_t action, fts_object_t *obj,
 		  int idx, fts_symbol_t property, fts_atom_t *value)
 {
@@ -472,18 +434,45 @@ patcher_get_error(fts_daemon_action_t action, fts_object_t *obj,
     fts_set_int(value, 0);
 }
 
+/* Daemons to set nins and nouts */
+
+static void
+patcher_put_ninlets(fts_daemon_action_t action, fts_object_t *obj,
+		    int idx, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_patcher_t *this = (fts_patcher_t *) obj;
+  int ninlets, noutlets;
+
+  ninlets = fts_get_int(value);
+  noutlets = fts_object_get_outlets_number(obj);
+
+  fts_patcher_redefine(this, ninlets, noutlets);
+}
+
+static void
+patcher_put_noutlets(fts_daemon_action_t action, fts_object_t *obj,
+		  int idx, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_patcher_t *this = (fts_patcher_t *) obj;
+  int ninlets, noutlets;
+
+  ninlets = fts_object_get_inlets_number(obj);
+  noutlets = fts_get_int(value);
+
+  fts_patcher_redefine(this, ninlets, noutlets);
+}
+
 /* Class instantiation */
 
 static fts_status_t
 patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
   int ninlets;
   int noutlets;
   int i;
 
-  ninlets  = fts_get_long_arg(ac, at, 2, 0);
-  noutlets = fts_get_long_arg(ac, at, 3, 0);
+  ninlets  = fts_get_long_arg(ac, at, 1, 0);
+  noutlets = fts_get_long_arg(ac, at, 2, 0);
 
   /* initialize the class */
 
@@ -491,13 +480,9 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* define the init system method */
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_int;
-  a[3] = fts_s_int;
-  fts_method_define_optargs(cl,fts_SystemInlet, fts_s_init, patcher_init, 4, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, patcher_init);
 
-  fts_method_define(cl,fts_SystemInlet, fts_s_delete, patcher_delete, 0, 0);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, patcher_delete, 0, 0);
 
   for (i = 0; i < ninlets; i ++)
     fts_method_define_varargs(cl, i, fts_s_anything, patcher_anything);
@@ -506,15 +491,14 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("open"), patcher_open, 0, 0); 
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("close"), patcher_close, 0, 0); 
 
-  /* No methods really installed on the inlets  */
-
   /* daemon for error property */
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_error, patcher_get_error);
 
-  /* daemon for name property */
+  /* daemons for setting nins and nouts */
 
-  fts_class_add_daemon(cl, obj_property_get, fts_s_name, patcher_get_name);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_ninlets, patcher_put_ninlets);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_noutlets, patcher_put_noutlets);
 
   return fts_Success;
 }
@@ -523,72 +507,76 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 /* 
  * Redefine a patcher inplace from a new description in term of "object" description.
  * 
- * For the moment, parse the arguments, and call fts_patcher redefine.
- * It should also reset the local patcher variables (only those defined by the 
- * previuos definition !!!, and parse the new ones).
- * Than, send back properties nins, nouts and name.
+ * Actually handle the variables; here ins and outs cannot be changed
+ * (for patchers, they do not depend on the description).
+ *
  */
 
-void
-fts_patcher_redefine_description(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
+/* Utility functions to assign variables to a patcher
+   as found by the expression parser
+   */
+
+
+void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data)
 {
-#ifdef DO_EXPRESSIONS 
+  fts_object_t *obj = (fts_object_t *)data;
+
+  if (fts_variable_is_suspended(obj, name))
+    {
+      fts_variable_restore(obj, name, value, obj);
+    }
+  else
+    {
+      fts_variable_define(obj, name, obj);
+      fts_variable_restore(obj, name, value, obj);
+    }
+}
+
+fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
+{
   fts_expression_state_t *e;
   int ac;
   fts_atom_t at[3]; /* Actually, the evaluated atom vector */
-#else
-#define at aot  
-#define ac aoc
-#endif
 
-#ifdef DO_EXPRESSIONS 
+  /* 1- suspend  the patcher internal variables if any */
 
-  /* 1- unbound the patcher variable if any */
+  fts_variables_suspend((fts_object_t *) this, (fts_object_t *) this);
 
-  /* To be implemented !!! */
-
-  /* 2- delete  the patcher internal variable if any */
-
-  fts_patcher_remove_variables(this);
-
-  /* 3- eval the expression
+  /* 2- eval the expression
      Ignore the errors, for the moment !!
      */
 
   e = fts_expression_eval((fts_object_t *)this, aoc, aot, 3, at);
   ac = fts_expression_get_count(e);
-#endif
 
-    /* 4- redefine the patcher */
+  /* 3- set the new variables */
 
-    fts_patcher_redefine(this, fts_get_symbol(&at[0]),fts_get_int(&at[1]), fts_get_int(&at[2]));
+  fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
-    /* 5- set the new variables */
+  /* 4- register the patcher as user of the used variables */
 
-#ifdef DO_EXPRESSIONS
-    fts_expression_assign_properties(e, (fts_object_t *)this);
-#endif
+  fts_expression_add_variables_user(e, (fts_object_t *)this);
 
-    /* 6- Send the properties */
+  /* 5- undefine all the locals that are still suspended  */
 
-    fts_object_send_properties((fts_object_t *)this);
+  fts_variables_undefine_suspended((fts_object_t *) this, (fts_object_t *) this);
+
+  return this;
 }
 
 /*
- * Redefine a patcher "inplace" by changing directly the name, inlets and outlets
+ * Redefine a patcher "inplace" by changing directly the inlets and outlets
  * and *the class* of the object.
- * To do this, it heavily rely on the internals of the message system !!!
+ * To do this, it heavily rely on the internals of the message system; the patcher
+ * is a primitive special class for the message system.
  * 
- * If the name argument is null, it do not change the name.
- * It update also the patcher description (argc, argv) , only if the patcher is not
- * an abstraction.
  *
  * Also, this function assume that the inlet/outlet housekeeping is done in the editor;
  * it do not delete redundant inlets or outlets.
  */
 
 void
-fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, int new_noutlets)
+fts_patcher_redefine(fts_patcher_t *this, int new_ninlets, int new_noutlets)
 {
   fts_object_t *obj_this = (fts_object_t *)this;
   int old_ninlets;
@@ -596,6 +584,10 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 
   old_ninlets = fts_object_get_inlets_number((fts_object_t *) this);
   old_noutlets = fts_object_get_outlets_number((fts_object_t *) this);
+
+  /* Delete all the connections that will not be pertinent any more */
+
+  fts_object_trim_connections(obj_this, new_ninlets, new_noutlets);
 
   /* Reallocate and copy the patcher inlets, incoming connections and inlets properties if needed */
 
@@ -670,11 +662,6 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	    }
 	}
     }
-
-  /* If it is a standard patcher, change the description for ninlets */
-
-  if (fts_patcher_is_standard(this))
-    fts_set_int(&(obj_this->argv[2]), new_ninlets);
 
   /* Reallocate and copy the patcher outlets, incoming connections and outlets properties if needed */
 
@@ -751,21 +738,6 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	}
     }
 
-  /* If it is a standard patcher abstraction, change the description for noutlets */
-
-  if (fts_patcher_is_standard(this))
-    fts_set_int(&(obj_this->argv[3]), new_noutlets);
-
-  /* Set the new name if not null */
-
-  if (name != 0)
-    {
-      this->name = name;
-
-      if (fts_patcher_is_standard(this))
-	fts_set_symbol(&(obj_this->argv[1]), name);
-    }
-
   {
     fts_object_t *p;
 
@@ -783,35 +755,40 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
   }
 
   /*
-   * Finally , change the patcher class (of course, not the metaclass); also,
-   * no init method needed here; we could conditionally use the description
-   * if the object is not an abstraction, but is probabily not worth doing it.
+   * Finally , change the patcher class (of course, not the metaclass).
    */
 
   {
-    fts_atom_t description[4];
+    fts_atom_t a[3];
 
-    fts_set_symbol(&description[0], fts_s_patcher);
-    fts_set_symbol(&description[1], this->name);
-    fts_set_int(&description[2], new_ninlets);
-    fts_set_int(&description[3], new_noutlets);
-
-    obj_this->cl = fts_class_instantiate(4, description);
+    fts_set_symbol(&a[0], fts_s_patcher);
+    fts_set_int(&a[1], new_ninlets);
+    fts_set_int(&a[2], new_noutlets);
+    obj_this->cl = fts_class_instantiate(3, a);
   }
 }
 
-/* Functions for object management; register and remove  an object in a patcher. */
+/* Functions for object management; register and remove  an object in a patcher.
+   An object is always added to the end; this is to reduce (or suppress) the
+   number of redefinitions at loading time (by definition, a non error object
+   is defined after all the variables it define, so it will be *after* the
+   variables in the list).
+ */
 
-void
-fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
+void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 {
+  fts_object_t **p;		/* indirect precursor */
+
   obj->patcher = this;
-  obj->next_in_patcher = this->objects;
-  this->objects = obj;
+
+  for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
+    {
+    }
+
+  *p = obj;
 }
 
-void
-fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
+void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 {
   fts_object_t **p;		/* indirect precursor */
 
@@ -823,6 +800,18 @@ fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 	return;
       }
 }
+
+int fts_patcher_number_of_objects(fts_patcher_t *this)
+{
+  int i = 0;
+  fts_object_t *p;	
+
+  for (p = this->objects; p; p = p->next_in_patcher)
+    i++;
+
+  return i;
+}
+
 
 /* Functions for direct .pat loading support */
 
@@ -861,12 +850,10 @@ fts_patcher_count_outlet_objects(fts_patcher_t *this)
  * It assume that the patcher have no inlets and outlets,
  * allocate the new ones, and *change* the class of the patcher,
  * using the fts_patcher_redefine function.
- * 
- * The new_name may be null; in this case, the name is not changed at all.
  */
 
 void
-fts_patcher_reassign_inlets_outlets_name(fts_patcher_t *this, fts_symbol_t new_name)
+fts_patcher_reassign_inlets_outlets(fts_patcher_t *this)
 {
   fts_object_t *p;
   int i, j;
@@ -880,7 +867,7 @@ fts_patcher_reassign_inlets_outlets_name(fts_patcher_t *this, fts_symbol_t new_n
 
   /* make a redefine the old patcher */
 
-  fts_patcher_redefine(this, new_name, ninlets, noutlets);
+  fts_patcher_redefine(this, ninlets, noutlets);
 
   /* Store the inlets in the inlet arrays; not so redundant as may seems,
      because patcher_redefine do not reposition inlets with 
@@ -960,6 +947,39 @@ fts_patcher_reassign_inlets_outlets_name(fts_patcher_t *this, fts_symbol_t new_n
     fts_outlet_reposition((fts_object_t *) this->outlets[i], i);
 }
 
+/*
+  Support for .pat parsing ONLY.
+  Change the name in an existing patcher.
+
+  Use fts_patcher_redefine for patcher changes outside .pat file
+  parsing.
+  */
+
+void
+fts_patcher_reassign_name(fts_patcher_t *this, fts_symbol_t name)
+{
+  fts_object_t *obj_this = (fts_object_t *)this;
+  fts_atom_t args[2];
+
+  /* Set the new name if not null */
+
+  if (name != 0)
+    {
+      /* rebuild the object description */
+
+      if (fts_patcher_is_standard(this) && obj_this->argv)
+	{
+	  fts_set_symbol(&args[0], fts_s_patcher);
+	  fts_set_symbol(&args[1], name);
+	  fts_object_set_description(obj_this, 2, args);
+
+	  /* Put the name property */
+
+	  fts_object_put_prop(obj_this, fts_s_name, &args[1]);
+	}
+    }
+}
+
 
 /* accessing inlets and outlets in patcher */
 
@@ -987,18 +1007,10 @@ fts_patcher_get_outlet(fts_object_t *patcher, int outlet)
 
 /* Class/metaclass installation  */
 
-static int
-fts_patcher_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at1)
-{
-  return ((fts_get_int(&at0[2]) == fts_get_int(&at1[2])) &&
-	  (fts_get_int(&at0[3]) == fts_get_int(&at1[3])));
-}
-
-
 static void
 internal_patcher_config(void)
 {
-  fts_metaclass_create(fts_s_patcher, patcher_instantiate, fts_patcher_equiv);
+  fts_metaclass_create(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
 }
 
@@ -1008,30 +1020,60 @@ internal_patcher_config(void)
    of 1 !!!
    */
 
-fts_object_t *fts_root_patcher;
+static fts_patcher_t *fts_root_patcher;
 
 void fts_create_root_patcher()
 {
-  fts_atom_t description[4];
+  fts_atom_t description[2];
   fts_object_t *patcher;
 
   fts_set_symbol(&description[0], fts_s_patcher);
   fts_set_symbol(&description[1], fts_new_symbol("root"));
-  fts_set_int(&description[2], 0);
-  fts_set_int(&description[3], 0);
 
-  fts_root_patcher = fts_object_new((fts_patcher_t *)0, 1, 4, description);
+  fts_root_patcher = (fts_patcher_t *) fts_object_new((fts_patcher_t *)0, 2, description);
+
+  fts_object_set_id((fts_object_t *)fts_root_patcher, 1);
 }
 
 static void fts_delete_root_patcher()
 {
-  fts_object_delete(fts_root_patcher);
+  fts_object_delete((fts_object_t *) fts_root_patcher);
 }
 
-fts_object_t *fts_get_root_patcher()
+fts_patcher_t *fts_get_root_patcher()
 {
   return fts_root_patcher;
 }
+
+/* Converted/Doctor for the old patcher format */
+
+static fts_object_t *patcher_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_atom_t a[2];
+  fts_object_t *obj;
+
+  fts_set_symbol(&a[0], fts_s_patcher);
+
+  if (ac >= 2)
+    {
+      a[1] = at[1];
+      obj = fts_make_object(patcher, 2, a);
+      fts_object_set_description(obj, 2, a);
+
+      if (ac >= 3)
+	fts_object_put_prop(obj, fts_s_ninlets, &at[2]);
+
+      if (ac >= 4)
+	fts_object_put_prop(obj, fts_s_noutlets, &at[3]);
+    }
+  else
+    obj = fts_make_object(patcher, 1, at);
+
+  return obj;
+}
+
+
+
 
 
 
@@ -1041,6 +1083,7 @@ fts_object_t *fts_get_root_patcher()
 
 void fts_patcher_init(void)
 {
+  fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);
   internal_patcher_config();
   internal_inlet_config();
   internal_outlet_config();

@@ -76,6 +76,7 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     return true;
   }
 
+	
   public void Paint_specific(Graphics g) {
     if (g == null) return;
     if(!itsFlashing){

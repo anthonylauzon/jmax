@@ -12,7 +12,6 @@
 /* Include files */
 
 #include <unistd.h>
-#include <stdio.h>		
 #include <audio.h>
 #include <audiofile.h>
 #include <dmedia/midi.h>

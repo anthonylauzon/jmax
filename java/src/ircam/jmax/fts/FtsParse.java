@@ -4,9 +4,10 @@ import java.util.*;
 
 /**
  * This class implement a lexical analizer for object and message box
- * content (and TCL commands, of course); it is in the object layer
+ * content; it is in the object layer
  * because the lexical conventions depend on the fts language, and not
  * on the editor; other clients can use the same lexical analizer. <p>
+ * The parsing should do straight to FTS !!
  * 
  * The lexer is done in the  non-deterministic, multiple 
  * automata style, and is implemented  by the class FtsParse. <p>

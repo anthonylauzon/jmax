@@ -10,26 +10,50 @@
 /* (fd) I know, this is not correct. But it is needed ... */
 #include "runtime.h"
 
+
+/*
+ * (MDC): done some change: the function table is now directly
+ * accessed; this means that the key must be <= FUNCTION_TABLE_SIZE
+ * (assert changed); the function table is an array part of the
+ * structure, then.
+ *
+ * A mechanism to handle data object content export here has been added; each
+ * data_class have added field that is the class export function; this
+ * function is called in the export, and should actually copy the
+ * content of the data object to the client; it is called at most once for
+ * every data object; this mechanism is needed
+ * to separate the users of the fts_data from the implementation of
+ * the fts_data; in some case, it is the kernel itself that decide to
+ * export an fts_data.
+ * A good question is why a separate function and not a function in the
+ * function table: mostly because is not called remotely but locally;
+ * it can be changed, possibly.
+ *
+ * Now fts_data_remote_call automatically export and upload the data if needed.
+ * Also, the property update system automatically export a data that is the 
+ * value of a property sent to the client.
+ *
+ *
+ * An init function is explicitly called by the mess.c global init function.
+ *
+ * fts_malloc are used instead malloc.
+ */
+
+
 #define FUNCTION_TABLE_SIZE 32
 
-typedef struct _fts_data_fun_entry_t fts_data_fun_entry_t;
-
-struct fts_data_fun_entry {
-  int key;
-  fts_data_fun_t fun;
-};
 
 struct fts_data_class {
-  fts_symbol_t java_class_name;
-  int n_functions;
-  struct fts_data_fun_entry *functions_table;
+  fts_symbol_t data_class_name;
+  fts_data_export_fun_t export_fun;
+  fts_data_fun_t  functions_table[FUNCTION_TABLE_SIZE];
 };
 
 static fts_data_t *meta_data = 0;
 
 static void meta_data_init()
 {
-  meta_data = (fts_data_t *) malloc( sizeof( fts_data_t));
+  meta_data = (fts_data_t *) fts_malloc( sizeof( fts_data_t));
   assert( meta_data != 0);
 
   meta_data->class = 0;
@@ -38,43 +62,29 @@ static void meta_data_init()
   fts_data_id_put( 1, meta_data);
 }
 
-fts_data_class_t *fts_data_class_new( fts_symbol_t java_class_name)
+fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name,  fts_data_export_fun_t export_fun)
 {
+  int i;
   fts_data_class_t *class;
 
-  class = (fts_data_class_t *)malloc( sizeof( fts_data_class_t));
+  class = (fts_data_class_t *)fts_malloc( sizeof( fts_data_class_t));
   assert( class != 0);
 
-  class->java_class_name = java_class_name;
+  class->data_class_name = data_class_name;
+  class->export_fun      = export_fun;
 
-  class->n_functions = 0;
-  class->functions_table = (struct fts_data_fun_entry *)malloc( sizeof( struct fts_data_fun_entry) * FUNCTION_TABLE_SIZE);
-  assert( class->functions_table != 0);
+  for (i = 0; i < FUNCTION_TABLE_SIZE; i++)
+    class->functions_table[i] = 0;
 
   return class;
 }
 
 void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_fun_t function)
 {
-  assert( class->n_functions < FUNCTION_TABLE_SIZE);
+  assert( key < FUNCTION_TABLE_SIZE);
 
-  class->functions_table[class->n_functions].key = key;
-  class->functions_table[class->n_functions].fun = function;
-
-  class->n_functions++;
+  class->functions_table[key] = function;
 }
-
-static fts_data_fun_t fts_data_class_function_lookup( fts_data_class_t *class, int key)
-{
-  int i;
-
-  for ( i = 0; i < class->n_functions; i++)
-    if ( class->functions_table[i].key == key)
-      return class->functions_table[i].fun;
-
-  return 0;
-}
-
 
 static int new_id()
 {
@@ -95,9 +105,6 @@ void fts_data_export( fts_data_t *d)
 {
   fts_atom_t a[2];
 
-  if ( meta_data == 0)
-    meta_data_init();
-
   if ( d->id == NO_ID)
     {
       d->id = new_id();
@@ -105,9 +112,17 @@ void fts_data_export( fts_data_t *d)
       fts_data_id_put( d->id, d);
 
       fts_set_int( &(a[0]), d->id);
-      fts_set_symbol( &(a[1]), d->class->java_class_name);
+      fts_set_symbol( &(a[1]), d->class->data_class_name);
       fts_data_remote_call( meta_data, 1, 2, a);
+
+      (* d->class->export_fun)(d);
     }
+}
+
+
+int fts_data_is_exported( fts_data_t *d)
+{
+  return d->id != NO_ID;
 }
 
 int fts_data_get_id( fts_data_t *d)
@@ -119,9 +134,9 @@ void fts_data_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
 {
   fts_data_fun_t function;
 
-  function = fts_data_class_function_lookup( d->class, key);
+  function = d->class->functions_table[key];
 
-  if (!function)
+  if (! function)
     {
       fprintf( stderr, "%d: no function for this key\n", key);
       return;
@@ -132,10 +147,20 @@ void fts_data_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
 
 void fts_data_remote_call( fts_data_t *d, int key, int ac, fts_atom_t *at)
 {
+  if (! fts_data_is_exported(d))
+    fts_data_export(d);
+
   fts_client_mess_start_msg( REMOTE_CALL_CODE);
-  fts_client_mess_add_long( d->id);
-  fts_client_mess_add_long( key);
+  fts_client_mess_add_int( d->id);
+  fts_client_mess_add_int( key);
   fts_client_mess_add_atoms( ac, at);
   fts_client_mess_send_msg();
 }
 
+
+/* Initialize the fts data module */
+
+void fts_data_module_init()
+{
+  meta_data_init();
+}

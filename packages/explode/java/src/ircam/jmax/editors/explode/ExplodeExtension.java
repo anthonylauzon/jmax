@@ -12,11 +12,13 @@ import ircam.jmax.mda.*;
 
 public class ExplodeExtension extends tcl.lang.Extension
 {
+  ExplodeRemoteData data;
+
   public void init(Interp interp)
   {
     Mda.installEditorFactory( new ExplodeFactory());
 
-    FtsObject.registerRemoteDataObjectClass( "explode");
+    Fts.registerRemoteDataClass( "explode_data", ircam.jmax.editors.explode.ExplodeRemoteData.class);
   }
 }
 

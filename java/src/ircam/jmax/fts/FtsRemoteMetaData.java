@@ -2,20 +2,19 @@ package ircam.jmax.fts;
 
 import java.lang.*;
 import java.io.*;
+import ircam.jmax.mda.*;
 
-class FtsRemoteMetaData extends FtsRemoteData {
-
+class FtsRemoteMetaData extends FtsRemoteData
+{
   public static void install()
-    {
-      System.err.println( "Ouf ! installed");
-
-      FtsRemoteDataID.put( 1, new FtsRemoteMetaData());
-    }
+  {
+    FtsRemoteDataID.put( 1, new FtsRemoteMetaData());
+  }
 
   protected FtsRemoteMetaData()
-    {
-      super();
-    }
+  {
+    super();
+  }
 
   private void newFtsRemoteData( Object args[])
   {
@@ -24,13 +23,11 @@ class FtsRemoteMetaData extends FtsRemoteData {
     Class dataJavaClass;
     FtsRemoteData newRemoteData;
 
-    try
+    dataJavaClass = Fts.getRemoteDataClass(className);
+
+    if (dataJavaClass == null)
       {
-	dataJavaClass = Class.forName( className);
-      }
-    catch( java.lang.ClassNotFoundException e)
-      {
-	System.err.println( e + " cannot load class " + className);
+	System.err.println( "Don't find Java class for " + className);
 	return;
       }
 
@@ -54,14 +51,37 @@ class FtsRemoteMetaData extends FtsRemoteData {
   }
 
   public final void call( int key, Object args[])
-    {
-      switch( key) {
-      case 1:
-	newFtsRemoteData( args);
-	break;
-      default:
-	break;
-      }
+  {
+    switch( key) {
+    case 1:
+      newFtsRemoteData( args);
+      break;
+    default:
+      break;
     }
+  }
+
+  /* MaxData interface */
+
+  /** Get the document this data belong to.
+    Doesn't mind for the meta data, because it will never 
+    be edited.
+    */
+
+  public MaxDocument getDocument()
+  {
+    return null;
+  }
+
+  /** Get the a name for this data, for UI purposes only */
+
+  public String getName()
+  {
+    return "metaData";
+  }
 }
+
+
+
+
 

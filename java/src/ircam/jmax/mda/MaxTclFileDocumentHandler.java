@@ -108,8 +108,7 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
 	    
 	    pw.println("jmax " + document.getDocumentType().getName() +
 		       " " + document.getName() +
-		       " {" + document.getInfo() +
-		       "} {");
+		       " {} {");
 	
 	    pw.indentMore();
 	    ((MaxTclDocument) document).saveContentAsTcl(pw);

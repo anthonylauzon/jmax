@@ -9,9 +9,7 @@ import ircam.jmax.fts.*;
 /**
  * The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
  */
-abstract class ErmesObjEditableObject extends ErmesObject {
-	
-	
+abstract class ErmesObjEditableObject extends ErmesObject implements FtsPropertyHandler {
 
   int HEIGHT_DIFF = 3;
   int TEXT_OFFSET;
@@ -64,6 +62,7 @@ abstract class ErmesObjEditableObject extends ErmesObject {
       itsSketchPad.GetEditField().setVisible(true);
       itsSketchPad.GetEditField().requestFocus();
     }
+
     return true;
   }
   
@@ -88,9 +87,23 @@ abstract class ErmesObjEditableObject extends ErmesObject {
 
     itsInEdit = false;
 
+    itsFtsObject.watch("ins", this);
+    itsFtsObject.watch("outs", this);
+
     return true;
   }
 
+  /* Property handling */
+
+  public void propertyChanged(FtsObject obj, String name, Object value)
+  {
+    if (name.equals("ins") || name.equals("outs"))
+      update(itsFtsObject);
+    //maybe some graphic refresh after this?
+    // Yes (mdc) :->
+    itsSketchPad.repaint();
+  }
+  
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------

@@ -35,21 +35,27 @@ typedef enum fts_daemon_action {
   outlet_property_put, outlet_property_get, outlet_property_remove
 } fts_daemon_action_t;
 
-typedef struct fts_metaclass		 fts_metaclass_t;
-typedef struct fts_class		 fts_class_t;
-typedef struct fts_object		 fts_object_t;
 
-typedef struct fts_mess_type		 fts_mess_type_t;
-typedef struct fts_class_mess		 fts_class_mess_t;
-typedef struct fts_connection		 fts_connection_t;
-typedef struct fts_inlet_decl		 fts_inlet_decl_t;
-typedef struct fts_outlet_decl		 fts_outlet_decl_t;
-typedef struct fts_patcher		 fts_patcher_t;
-typedef struct fts_inlet		 fts_inlet_t;
-typedef struct fts_outlet		 fts_outlet_t;
+typedef struct fts_metaclass    fts_metaclass_t;
+typedef struct fts_class        fts_class_t;
+typedef struct fts_object       fts_object_t;
 
-typedef struct fts_selection		 fts_selection_t;
-typedef struct fts_variable		 fts_variable_t;
+
+typedef struct fts_mess_type    fts_mess_type_t;
+typedef struct fts_class_mess   fts_class_mess_t;
+typedef struct fts_connection   fts_connection_t;
+typedef struct fts_inlet_decl   fts_inlet_decl_t;
+typedef struct fts_outlet_decl  fts_outlet_decl_t;
+typedef struct fts_patcher      fts_patcher_t;
+typedef struct fts_inlet        fts_inlet_t;
+typedef struct fts_outlet       fts_outlet_t;
+
+typedef struct fts_selection    fts_selection_t;
+
+typedef struct fts_binding_list fts_binding_list_t;
+typedef struct fts_object_list  fts_object_list_t;
+typedef struct fts_binding	fts_binding_t;
+typedef struct fts_env		fts_env_t;
 
 typedef struct fts_data			fts_data_t;
 typedef struct fts_data_class		fts_data_class_t;
@@ -141,6 +147,7 @@ struct fts_plist {
  * Data functions
  */
 typedef void (*fts_data_fun_t)( fts_data_t *d, int ac, fts_atom_t *at);
+typedef void (*fts_data_export_fun_t)( fts_data_t *d);
 
 
 /*
@@ -284,9 +291,14 @@ struct fts_object
   int id;		/*  id for the object */
 
   /* Variable: If this object is bound to a variable,
-     this is the variable (and object) name */
+     this is the variable  name */
 
   fts_symbol_t varname;
+  int is_wannabe;		/* wannabe flag */
+
+  /* Variables referred by the object */
+
+  fts_binding_list_t *var_refs; /* handled completely in the variable.c file */
 
   /* connections */
 
@@ -300,14 +312,47 @@ struct fts_object
   fts_plist_t **outlets_properties;	
 };
 
+/* Commodity structure to keep a list of objects */
+
+struct fts_object_list
+{
+  fts_object_t *obj;
+
+  struct fts_object_list *next;
+};
+
+
+/* Commodity structure to keep a list of bindings */
+
+struct fts_binding_list
+{
+  fts_binding_t *var;
+
+  struct fts_binding_list *next;
+};
+
+
 /* Variable structure */
 
-struct fts_variable
+struct fts_binding
 {
-  fts_symbol_t  name;
-  fts_atom_t    value;
-  fts_object_t  *owner;		/* the object that defined this variable */
-  fts_variable_t *next;
+  fts_symbol_t   name;
+  fts_object_t  *owner;
+  int            suspended;
+  fts_atom_t     value;
+  fts_object_list_t *users;	/* object that use this variables */
+  fts_object_list_t *wannabes;	/* object that want to redefine this variables locally, if any*/
+  struct fts_env  *env;		/* back pointer to the environment where the variable is stored */
+  fts_binding_t *next;		/* next in the environent */
+};
+
+
+/* Variable environment */
+
+struct fts_env
+{
+  fts_binding_t *first;
+  fts_object_t *patcher;
 };
 
 /* Patcher structure */
@@ -316,7 +361,6 @@ struct fts_patcher
 {
   fts_object_t o;
 
-  fts_symbol_t   name;		/* the patcher name */
   fts_inlet_t  **inlets;	/* the patcher inlet array */
   fts_outlet_t **outlets;	/* the patcher outlet array */
 
@@ -329,7 +373,7 @@ struct fts_patcher
 
   /* Variables */
 
-  fts_variable_t *env;
+  fts_env_t env;
 };    
 
 

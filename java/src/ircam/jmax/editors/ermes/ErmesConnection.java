@@ -59,6 +59,7 @@ public class ErmesConnection implements ErmesDrawable{
       {
 	itsFtsConnection = Fts.makeFtsConnection(itsFromObject.itsFtsObject,theOutlet.GetOutletNum(), 
 					     itsToObject.itsFtsObject, theInlet.GetInletNum());
+	itsFtsConnection.setRepresentation(this);
       }
     catch (FtsException e)
       {
@@ -119,6 +120,7 @@ public class ErmesConnection implements ErmesDrawable{
     itsOutlet = theOutlet;
     itsFtsConnection = theFtsConnection;
     itsSelected = false;
+    itsFtsConnection.setRepresentation(this);
   }
 
   public ErmesConnection(ErmesObject fromObj, ErmesObject toObj, ErmesSketchPad theSketchPad, int theOutlet, int theInlet, FtsConnection theFtsConnection){
@@ -129,11 +131,13 @@ public class ErmesConnection implements ErmesDrawable{
     itsInletNum = theInlet;
     itsOutletNum = theOutlet;
     itsSelected = false;
+    itsFtsConnection.setRepresentation(this);
   }
   
   public void update(FtsConnection theFtsConnection) {
     
     itsFtsConnection = theFtsConnection;
+    itsFtsConnection.setRepresentation(this);
     itsInlet = (ErmesObjInlet) itsToObject.itsInletList.elementAt(itsInletNum);
     itsOutlet = (ErmesObjOutlet) itsFromObject.itsOutletList.elementAt(itsOutletNum);
     itsOutlet.AddConnection(this);

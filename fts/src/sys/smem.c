@@ -26,7 +26,6 @@
 #define OPS_LIMIT 256*1024
 #define BLOCK_CACHE_SIZE 16
 
-#include <stdio.h>		/* HW specific file, can include stdio.h */
 #ifdef SGI
 #include <malloc.h>
 #endif

@@ -26,7 +26,6 @@
 #include "sys.h"
 
 #ifdef HAS_DL
-#include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <dlfcn.h>

@@ -260,7 +260,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler{
 
       itsMovingThrottle = false;
       itsFtsObject.put("value", itsInteger+itsRangeMin);
-      Fts.getServer().syncToFts();
+      Fts.sync();
 
       return true;
     }

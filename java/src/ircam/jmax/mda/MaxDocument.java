@@ -21,7 +21,6 @@ abstract public class MaxDocument
   protected MaxDocumentType    type    = null;
   private   DefaultListModel editors = new DefaultListModel();
   protected String name = null; // name of the document, for UI purposes
-  protected String info = null; // comment field; store and get back, but don't use for semantic purpose
   protected boolean saved = false;   // saved flag
 
   /** A constructor that get only the type */
@@ -138,20 +137,6 @@ abstract public class MaxDocument
     this.name = name;
   }
 
-  /** Getting the info */
-
-  public String getInfo()
-  {
-    return info;
-  }
-
-  /** Setting the info */
-
-  public void setInfo(String info)
-  {
-    this.info = info;
-  }
-
   /** Get the root data of the document */
 
   public MaxData getRootData()
@@ -239,6 +224,40 @@ abstract public class MaxDocument
       }
 
     handler.saveDocument(this, file);
+  }
+
+  /** Save a subdocument to a given file, without changing the
+   *  original binding of the document 
+   *
+   *  A sub document is a document corresponding to a part of the document.
+   *  the save semantic is to create a *new* document file which content is a part
+   *  of the current document; not all document types allow subdocuments; the canMakeSubDocumentFile
+   *  method of the corresponding document type be redefined to return true in order to allow sub document
+   *  for a document type (should this method be in documenttype ?? 
+   * 
+   *  The actual subdocument saving is implemented in the document handler.
+   */
+
+  public void saveSubDocumentTo(MaxData data, File file) throws MaxDocumentException
+  {
+    if (type.canMakeSubDocumentFile(data))
+      {
+	MaxDocumentHandler handler = Mda.findDocumentHandlerFor(file, this);
+
+	if (handler == null)
+	  throw new MaxDocumentException("Cannot save to " + file);
+
+	for (int i = 0; i < editors.size() ; i++)
+	  {
+	    MaxDataEditor editor;
+
+	    editor = (MaxDataEditor) editors.elementAt(i);
+
+	    editor.syncData();
+	  }
+
+	handler.saveSubDocument(this, data, file);
+      }
   }
 
   /** Saved flag query: true if the document have been saved to its current

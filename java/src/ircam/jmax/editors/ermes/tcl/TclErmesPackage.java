@@ -13,6 +13,7 @@ import ircam.jmax.*;
 
 /**
  * The Ermes package (as a set of TCL/ready commands).
+ * Reduced: TCL is phasing out, kept only config related commands
  */
 
 
@@ -27,45 +28,13 @@ public class TclErmesPackage
   {
     Interp interp = MaxApplication.getTclInterp();
 
-    /* Ermes commands*/
-    
-    /* patcher commands */
-    interp.createCommand("PatNew", new ErmesPatNewCmd());
-    
-    /* object commands */
-    interp.createCommand("ObjNew", new ErmesObjNewObjCmd());
-    interp.createCommand("ObjConnect", new ErmesConnectCmd());
-    interp.createCommand("ObjDisconnect", new ErmesDisconnectCmd());
-    
-    interp.createCommand("ObjSetPos", new ErmesObjectSetPositionCmd());
-    interp.createCommand("ObjSetSize", new ErmesObjectSetSizeCmd());
-    interp.createCommand("ObjGetPosX", new ErmesObjectGetPositionXCmd());
-    interp.createCommand("ObjGetPosY", new ErmesObjectGetPositionYCmd());
-    interp.createCommand("ObjGetSizeW", new ErmesObjectGetSizeWCmd());
-    interp.createCommand("ObjGetSizeH", new ErmesObjectGetSizeHCmd());
-
-    // Move is not there
-    //    interp.createCommand("ObjMove", new ErmesObjectMoveCmd());
-
-    /* current selection */
-    interp.createCommand("SelGetObjList", new ErmesSelectedCmd());
-
-    /* graphics */
-    interp.createCommand("graphicson", new ErmesGraphicsOnCmd());
-    interp.createCommand("graphicsoff", new ErmesGraphicsOffCmd());
-
     /* preload commands*/
+
     interp.createCommand("toolbarPreloadIcon", new ErmesToolbarPreloadIconCmd());
 
     /* debug */
-    interp.createCommand("probe", new GlobalProbeCmd());
 
-    /* obsolete */
-    interp.createCommand("new",	new ErmesPatNewCmd());
-    interp.createCommand("newobj", new ErmesObjNewObjCmd());
-    interp.createCommand("connect", new ErmesConnectCmd());
-    interp.createCommand("selected", new ErmesSelectedCmd());
-    //interp.createCommand("debugregions", new ErmesDebugRegionsCmd());
+    interp.createCommand("probe", new GlobalProbeCmd());
   }
 }
 

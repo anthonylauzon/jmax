@@ -22,7 +22,6 @@ import java.io.*;
 
 public class FtsServer 
 {
-  // Probe probe;
   public static boolean debug = false;
 
   /** The FtsPort used to communicate with FTS */
@@ -78,9 +77,6 @@ public class FtsServer
 
   public void start()
   {
-    // probe = new Probe("FTS", 10000, 1000); //@@@
-    // probe.start();//@@@
-
     port.start();
 
     // Build the root patcher, by mapping directly to object id 1 on FTS
@@ -128,27 +124,6 @@ public class FtsServer
       }
   }
 
-
-  /** Send a "save patcher as tpat" messages to FTS.*/
-
-  final void savePatcherTpat(FtsObject patcher, String filename)
-  {
-    if (FtsServer.debug)
-      System.err.println("savePatcherTpat(" + patcher + "," + filename + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_save_patcher_tpat_cmd);
-	port.sendObject(patcher);
-	port.sendString(filename);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
   /** send a "load patcher as bmax" messages to FTS.*/
 
   final void loadPatcherBmax(FtsObject parent, int id, String filename)
@@ -159,24 +134,6 @@ public class FtsServer
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_load_patcher_bmax_cmd);
-	port.sendObject(parent);
-	port.sendInt(id);
-	port.sendString(filename);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-  final void loadPatcherTpat(FtsObject parent, int id, String filename)
-  {
-    if (FtsServer.debug)
-      System.err.println("loadPatcherTpat(" + parent + ", " + id + ", " + filename + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_load_patcher_tpat_cmd);
 	port.sendObject(parent);
 	port.sendInt(id);
 	port.sendString(filename);
@@ -246,9 +203,48 @@ public class FtsServer
   }
 
 
-  /** Send a "download patcher" messages to FTS.*/
+  /** Send a "template declare" message to FTS */
 
-  final void sendDownloadPatcher(FtsObject patcher)
+  final public void sendTemplateDeclare(String template, String filename)
+  {
+    if (FtsServer.debug)
+      System.err.println("sendTemplateDeclare(" + template + ", " + filename + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_declare_template_cmd);
+	port.sendString(template);
+	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "template declare" message to FTS */
+
+  final public void sendTemplateDeclarePath(String path)
+  {
+    if (FtsServer.debug)
+      System.err.println("sendTemplateDeclarePath(" + path + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_declare_template_path_cmd);
+	port.sendString(path);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "download patcher" messages to FTS and do a sync */
+
+  final void sendDownloadPatcherAndSync(FtsObject patcher)
   {
     if (FtsServer.debug)
       System.err.println("sendDownloadPatcher(" + patcher + ")");
@@ -262,12 +258,14 @@ public class FtsServer
     catch (java.io.IOException e)
       {
       }
+
+    syncToFts();
   }
 
 
   /** Send a "download patcher" messages to FTS.*/
 
-  final void sendDownloadPatcher(int id)
+  final void sendDownloadPatcherAndSync(int id)
   {
     if (FtsServer.debug)
       System.err.println("sendDownloadPatcher(" + id + ")");
@@ -281,6 +279,8 @@ public class FtsServer
     catch (java.io.IOException e)
       {
       }
+
+    syncToFts();
   }
 
 
@@ -408,7 +408,7 @@ public class FtsServer
       }
   }
 
-  /** Send a "redefine object" messages to a patcher in FTS.
+  /** Send a "redefine patcher" messages to a patcher in FTS.
    *  Special optimized version for patcher loading/editing
    */
 
@@ -428,6 +428,27 @@ public class FtsServer
       {
       }
   }
+
+  /** Send a "redefine object" messages to an object in FTS.
+   */
+
+  final void redefineObject(FtsObject obj, String description)
+  {
+    if (FtsServer.debug)
+      System.err.println("redefineObject(" + description + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
+	port.sendObject(obj);
+	FtsParseToPort.parseAndSendObject(description, port);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
 
   /** Reposition an inlet  */
 
@@ -752,10 +773,30 @@ public class FtsServer
 
   /** Send a "get property" messages to FTS. */
 
-  final void getObjectProperty(FtsObject object, String name)
+  final void askObjectProperty(FtsObject object, String name)
   {
     if (FtsServer.debug)
-      System.err.println("getObjectProperty(" + object + ", " + name + ")");
+      System.err.println("askObjectProperty(" + object + ", " + name + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_get_property_cmd);
+	port.sendObject(object);
+	port.sendString(name);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "get all property" messages to FTS; argument should be a container */
+
+  final void askAllObjectProperty(FtsObject object, String name)
+  {
+    if (FtsServer.debug)
+      System.err.println("askAllObjectProperty(" + object + ", " + name + ")");
 
     try
       {
@@ -1009,6 +1050,32 @@ public class FtsServer
 	  if (FtsServer.debug)
 	    System.err.println("New Connection #" + id + " " + from + "." + outlet + " -> " + to + "." + inlet);
 	}
+      break;
+
+      case FtsClientProtocol.fts_redefine_connection_cmd:
+	{
+	  int id;
+	  FtsObject from, to;
+	  int outlet, inlet;
+	  FtsConnection c;
+
+	  c      = (FtsConnection)  msg.getArgument(0);
+	  from   = (FtsObject) msg.getArgument(1);
+	  outlet = ((Integer)  msg.getArgument(2)).intValue();
+	  to     = (FtsObject) msg.getArgument(3);
+	  inlet  = ((Integer)  msg.getArgument(4)).intValue();
+
+	  c.redefine(from, outlet, to, inlet);
+
+	  if (FtsServer.debug)
+	    System.err.println("Connection Redefined " + c);
+	}
+      break;
+
+      case FtsClientProtocol.fts_disconnect_objects_cmd:
+	FtsConnection c;
+	c = (FtsConnection)  msg.getArgument(0);
+	c.release();
 	break;
 
       case FtsClientProtocol.remote_call_code:
@@ -1025,7 +1092,7 @@ public class FtsServer
 
 	  if (data == null)
 	    {
-	      System.err.println( "Unknown data " + id);
+	      System.err.println( "FtsServer: Unknown data " + id);
 	      return;
 	    }
 
@@ -1042,6 +1109,7 @@ public class FtsServer
 	}
 
       default:
+	System.err.println( "!!!!!!!!! Received unknown message from client " + msg);
 	break;
       }
   }
@@ -1112,7 +1180,7 @@ public class FtsServer
    * not to all the objects.
    */
 
-  private void registerObject(FtsObject object)
+  void registerObject(FtsObject object)
   {
     if (object == null)
       System.err.println("registerObject got a null object");
@@ -1170,7 +1238,7 @@ public class FtsServer
    * transparent to the object.
    */
 
-  private void unregisterObject(FtsObject obj)
+  void unregisterObject(FtsObject obj)
   {
     objectTable.setElementAt(null, obj.getObjectId());
   }

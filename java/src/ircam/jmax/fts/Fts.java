@@ -145,8 +145,6 @@ public class Fts
    * similarity with the constructors, because it can produce 
    * a different Java object from the argument, so logically they are not method of the object.
    *
-   * It just produce a new object (calling makeFtsObject), and replace the old with it in the 
-   * container of the old, and in FTS.
    *
    *  In case of errors, i.e. if the new object do not exists, we just throw an exception
    *  and do nothing.
@@ -172,58 +170,25 @@ public class Fts
     // makeFtsObject can throw a connection if the
     // object do not exists.
 
-    newObject = makeFtsObject(parent, description);
+    int id;
 
-    if (newObject.get("error") != null)
-      {
-	// Error object; simply keep all the connections,
-	// and artificially set the number of inlets and outlets
-	// to the previous ones.
+    id = oldObject.getObjectId();
 
-	newObject.setNumberOfInlets(oldInlets);
-	newObject.setNumberOfOutlets(oldOutlets);
-	parent.replaceInAllConnections(oldObject, newObject);
-      }
+    // Delete locally the old object
+
+    server.redefineObject(oldObject, description);
+    oldObject.release();
+    server.sendDownloadObject(id);
+    
+    // Wait for FTS to do his work
+
+    server.syncToFts();
+    newObject = server.getObjectByFtsId(id);
+    
+    if (newObject != null)
+      newObject.setDirty();
     else
-      {
-	// replaceInConnections should delete the connections
-	// not existing any more
-
-	parent.replaceInConnections(oldObject, newObject);
-      }
-
-    // Move the old properties to the new object
-    // for the moment, hardcoded: x, y, w, h, font, fs
-    // Ignore the name (to be reviewed), and window properties 
-    // (you cannot redefine a patcher object
-
-    Object value;
-
-    value = oldObject.get("x");
-    if (value != null)
-      newObject.put("x", value); 
-
-    value = oldObject.get("y");
-    if (value != null)
-      newObject.put("y", value); 
-
-    value = oldObject.get("w");
-    if (value != null)
-      newObject.put("w", value); 
-
-    value = oldObject.get("h");
-    if (value != null)
-      newObject.put("h", value); 
-
-    value = oldObject.get("font");
-    if (value != null)
-      newObject.put("font", value); 
-
-    value = oldObject.get("fs");
-    if (value != null)
-      newObject.put("fs", value); 
-
-    oldObject.delete();
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, description));
 
     return newObject;
   }
@@ -311,5 +276,26 @@ public class Fts
   static String getUserPassword()
   {
     return userPassword;
+  }
+
+  /* Sync command */
+
+  static public void sync()
+  {
+    getServer().syncToFts();
+  }
+
+  /* The RemoteMetaData class data base */
+
+  static private Hashtable remoteDataClassTable = new Hashtable();
+
+  static public void registerRemoteDataClass(String name, Class dataClass)
+  {
+    remoteDataClassTable.put(name, dataClass);
+  }
+
+  static Class getRemoteDataClass(String name)
+  {
+    return (Class) remoteDataClassTable.get(name);
   }
 }

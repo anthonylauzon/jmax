@@ -1,7 +1,5 @@
 package ircam.jmax.fts;
 
-import tcl.lang.*;
-
 import java.io.*;
 import java.util.*;
 import java.text.*;
@@ -17,12 +15,8 @@ import ircam.jmax.mda.*;
  * FTS instantiation 
  */
 
-abstract public class FtsObject implements MaxTclInterpreter
+abstract public class FtsObject 
 {
-
-  // (fd) hash table to register objects with remote datas
-  static private Hashtable remoteDataClassNames;
-
   static private NumberFormat numberFormat;
 
   /* code to set generic properties meta-properties */
@@ -31,30 +25,6 @@ abstract public class FtsObject implements MaxTclInterpreter
   {
     // Ins and outs
 
-    FtsPropertyDescriptor.setPersistent("ins", true);
-    FtsPropertyDescriptor.setPersistent("outs", true);
-
-    // Name
-
-    FtsPropertyDescriptor.setPersistent("name", true);
-    FtsPropertyDescriptor.setDefaultValue("name", "unnamed");
-
-    // Graphic information
-
-    FtsPropertyDescriptor.setPersistent("x", true);
-    FtsPropertyDescriptor.setPersistent("y", true);
-    FtsPropertyDescriptor.setPersistent("w", true);
-    FtsPropertyDescriptor.setPersistent("h", true);
-
-    FtsPropertyDescriptor.setPersistent("wx", true);
-    FtsPropertyDescriptor.setPersistent("wy", true);
-    FtsPropertyDescriptor.setPersistent("ww", true);
-    FtsPropertyDescriptor.setPersistent("wh", true);
-
-    // fonts 
-
-    FtsPropertyDescriptor.setPersistent("font", true);
-    FtsPropertyDescriptor.setPersistent("fs", true);
     FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
 
     // Number format for messages coming from FTS (to be cleaned up:
@@ -64,9 +34,6 @@ abstract public class FtsObject implements MaxTclInterpreter
     numberFormat.setMaximumFractionDigits(6);
     numberFormat.setMinimumFractionDigits(1);
     numberFormat.setGroupingUsed(false);
-
-    // (fd) 
-    remoteDataClassNames = new Hashtable();
   }
 
   /******************************************************************************/
@@ -152,7 +119,7 @@ abstract public class FtsObject implements MaxTclInterpreter
       return new FtsTableObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("qlist"))
       return new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
-    else if (className.equals("patcher"))
+    else if (className.equals("jpatcher"))
       return new FtsPatcherObject(parent, makeDescription(3, msg), objId);
     else if (className.equals("inlet"))
       return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
@@ -163,22 +130,19 @@ abstract public class FtsObject implements MaxTclInterpreter
     else if (className.equals("comment"))
       return new FtsCommentObject(parent, makeDescription(3, msg), objId);
     else if (className.equals("slider"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("intbox"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("floatbox"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("toggle"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("param"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("__selection"))
       return new FtsSelection(parent, className, "__selection", objId);
     else if (className.equals("__clipboard"))
       return new FtsClipboard(parent, className, "__clipboard", objId);
-    // (fd)
-    else if ( isRegisteredRemoteDataObjectClass( className))
-      return new FtsRemoteDataObject(parent, className, makeDescription(2, msg), objId);
     else
       return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
   }
@@ -198,18 +162,6 @@ abstract public class FtsObject implements MaxTclInterpreter
     /* if the object has been succesfully created, set the parent dirty */
 
     return new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
-  }
-
-  // (fd)
-  static boolean isRegisteredRemoteDataObjectClass( String className)
-  {
-    return remoteDataClassNames.containsKey( className);
-  }
-
-  // (fd)
-  public static void registerRemoteDataObjectClass( String className)
-  {
-    remoteDataClassNames.put( className, new Boolean( true));
   }
 
   /******************************************************************************/
@@ -315,10 +267,12 @@ abstract public class FtsObject implements MaxTclInterpreter
 
 
   /**
-   * Store and access the properties, activating
+   * "put" send the property to fts; localPut 
+   * store and access the properties, activating
    * watchers here and in the container if needed.
    * Also "catch" and locally process properties
    * valid for all the objects.
+   *
    *
    * Values here have been already parsed from the Tcl
    * command.
@@ -354,21 +308,18 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void put(String name, Object value, Object author)
   {
-    Object old;
-
-    old = get(name);
-    
-    if ((old == null) || (! old.equals(value)))
-      {
-	if (FtsPropertyDescriptor.isPersistent(name))
-	  setDirty();
-
-	Fts.getServer().putObjectProperty(this, name, value);
-	
-	localPut(name, value, author);
-      }
+    Fts.getServer().putObjectProperty(this, name, value);
   }
 
+
+  /* ask fts to send back the value property (and so call the handlers) */
+     
+  public void ask(String name)
+  {
+    Fts.getServer().askObjectProperty(this, name);
+  }
+
+  
   /** Check if a property correspond to a Java builtin property
    * (Java bean like) and set it; return true in this case.
    * in a far (?) future, this can use BeanInfos instead of handcoded 
@@ -385,12 +336,12 @@ abstract public class FtsObject implements MaxTclInterpreter
   {
     if (name.equals("ins"))
       {
-	setNumberOfInlets(((Integer)value).intValue());
+	this.ninlets = ((Integer)value).intValue();
 	return true;
       }
     else if (name.equals("outs"))
       {
-	setNumberOfOutlets(((Integer)value).intValue());
+	this.noutlets = ((Integer)value).intValue();
 	return true;
       }
     else if (name.equals("x"))
@@ -474,9 +425,30 @@ abstract public class FtsObject implements MaxTclInterpreter
   /** Local put is a version of put that do not send
     values to FTS.
     */
-  void localPut(String name, Object value)
+
+  public void localPut(String name, int value)
+  {
+    localPut(name, new Integer(value), null);
+  }
+
+  public void localPut(String name, float value)
+  {
+    localPut(name, new Float(value), null);
+  }
+
+  public void localPut(String name, Object value)
   {
     localPut(name, value, null);
+  }
+
+  public void localPut(String name, int value, Object author)
+  {
+    localPut(name, new Integer(value), author);
+  }
+
+  public void localPut(String name, float value, Object author)
+  {
+    localPut(name, new Float(value), author);
   }
 
   void localPut(String name, Object value, Object author)
@@ -800,20 +772,6 @@ abstract public class FtsObject implements MaxTclInterpreter
       document.setSaved(false);
   }
 
-  /** Set the number of inlets */
-
-  public void setNumberOfInlets(int ninlets)
-  {
-    this.ninlets = ninlets;
-  }
-
-  /** Set the number of inlets */
-
-  public void setNumberOfOutlets(int noutlets)
-  {
-    this.noutlets = noutlets;
-  }
-
   /** Get the complete textual description of the object. */
 
   public String getDescription()
@@ -844,8 +802,22 @@ abstract public class FtsObject implements MaxTclInterpreter
   {
     Fts.getSelection().removeObject(this);
     parent.setDirty();
+    parent.removeObjectConnectionsFromContainer(this);
     parent.removeObjectFromContainer(this); 
     Fts.getServer().freeObject(this);
+  }
+
+  /**
+   * Delete the Java object, without touching the FTS object represented.
+   * 
+   */
+
+  public void release()
+  {
+    Fts.getSelection().removeObject(this);
+    parent.setDirty();
+    parent.removeObjectFromContainer(this); 
+    Fts.getServer().unregisterObject(this);
   }
 
   // Communication with the object
@@ -934,117 +906,6 @@ abstract public class FtsObject implements MaxTclInterpreter
 	    hnd.handleMessage(msg);
 	  }
       }
-  }
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               SAVING                                      */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  /** Save the object to a PrintWriter as TCL code; actually defined by the object */
-
-  abstract public void saveAsTcl(PrintWriter writer);
-
-  // May be this two functions should go elsewhere, so that
-  // can be used also for connections.
-
-  /** Save the object properties as tcl code; should not print any new line.
-   */
-
-  void savePropertiesAsTcl(PrintWriter writer)
-  {
-    Vector names;
-    boolean firstDone = false;
-
-    names = new Vector();
-
-    getPropertyNames(names);
-
-    if (names.size() > 0)
-      {
-	writer.print(" {");
-
-	for (int i = 0; i < names.size(); i++)
-	  {
-	    String property;
-
-	    property = (String) names.elementAt(i);
-
-	    // Save all the persistent properties that have a value
-
-	    if (FtsPropertyDescriptor.isPersistent(property))
-	      {
-		Object value;
-		Object defaultValue;
-		
-		value = this.get(property);
-		defaultValue =  FtsPropertyDescriptor.getDefaultValue(property);
-
-		if ((value != null) && ((defaultValue == null) || (! value.equals(defaultValue))))
-		  {
-		    if (! firstDone)
-		      firstDone = true;
-		    else
-		      writer.print(" ");
-
-		    writer.print(property);
-		    writer.print(" ");
-		    writer.print(FtsPropertyDescriptor.unparse(property, value));
-		  }
-	      }
-	  }
-	
-	writer.print("}");
-      }
-  }
-
-  /**  Take a property list list in the form of a 
-   *   TclList, and parse and set all the properties
-   */
-
-  public void parseTclProperties(Interp interp, TclObject list) throws FtsException
-  {
-    try
-      {
-	int length;
-
-	length = TclList.getLength(interp, list);
-
-	if ((length % 2) == 1)
-	  throw new FtsException(new FtsError(FtsError.TPA_ERROR, "in property list"));
-
-	for (int i = 0; i < length; i += 2)
-	  {
-	    String prop;
-	    TclObject obj;
-
-	    prop =  (TclList.index(interp, list, i + 0)).toString();
-	    obj  =  TclList.index(interp, list, i + 1);
-
-	    put(prop, FtsPropertyDescriptor.parse(interp, prop, obj));
-	  }
-      }
-    catch (TclException e)
-      {
-	throw new FtsException(new FtsError(FtsError.TPA_ERROR, "in property list"));
-      }
-  }
-
-  /** The Tcl eval for an object; just eval the script, for the basic case
-   */
-
-
-  public void eval(Interp interp, String  script) throws tcl.lang.TclException
-  {
-    eval(interp, TclString.newInstance(script));
-  }
-
-  /** as the previous one, getting the script as tclObject */
-
-  public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
-  {
-    interp.eval(script, 0);
   }
 }
 

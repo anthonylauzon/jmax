@@ -22,7 +22,7 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
     setTitle( "Explode");
 
-    ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) ((FtsRemoteDataObject)maxData).getRemoteData();
+    ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) maxData;
 
     
     getContentPane().add(new ScrPanel(explodeRemoteData));
@@ -70,11 +70,6 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
   // MaxDataEditor interface
   public void syncData()
-  {
-  }
-
-  // MaxDataEditor interface
-  public void dataChanged( Object reason)
   {
   }
 
