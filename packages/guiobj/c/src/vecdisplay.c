@@ -53,7 +53,7 @@ static fts_symbol_t sym_scroll = 0;
 static fts_symbol_t sym_bounds = 0;
 
 static void 
-vecdisplay_data_changed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+vecdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /************************************************************
  *
@@ -82,7 +82,7 @@ vecdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  
 	  this->n = 0;
 	  
-	  fts_timebase_add_call(fts_get_timebase(), o, vecdisplay_data_changed, 0, this->period);
+	  fts_timebase_add_call(fts_get_timebase(), o, vecdisplay_called, 0, this->period);
 	}
     }
   else
@@ -100,7 +100,7 @@ vecdisplay_deliver(vecdisplay_t *this)
 }
 
 static void 
-vecdisplay_data_changed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_update_request(o);
 }
