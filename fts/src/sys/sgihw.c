@@ -45,6 +45,13 @@ flush_all_underflows_to_zero(void)
   union fpc_csr f;
   f.fc_word = get_fpc_csr();
   f.fc_struct.flush = 1;
+  
+  /* f.fc_struct.en_invalid = 0; */
+  /* f.fc_struct.en_divide0 = 0; */
+  /* f.fc_struct.en_overflow = 0; */
+  /* f.fc_struct.en_underflow = 0; */
+  /* f.fc_struct.en_inexact = 0; */
+
   set_fpc_csr(f.fc_word);
 }
 

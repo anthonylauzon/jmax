@@ -4,4 +4,6 @@ sgi	all	o2r10k
 sgi	all	origin
 origin	all	origin
 o2r10k	all	o2r10k
+o2r5k	all	o2r5k
+irix6.2	all	irix6.2
 linuxpc	all	linuxpc

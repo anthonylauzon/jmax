@@ -32,14 +32,9 @@ ucs set sample_rate $jmaxSampleRate
 #   installed audio devices.
 #
 
-# print audio properties
-puts "jMax default audio configuration"
-puts "  sample rate: $jmaxSampleRate"
-puts "  audio buffers: $jmaxAudioBuffer"
+if {$jmaxArch == "irix6.2"} {
 
-if {$jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
-
-#    puts "    default: 2/2"
+#    puts "Irix 6.2 audio configuration: analog 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
 #    ucs open device out~ default as SgiALOut channels 2 fifo_size $jmaxAudioBuffer
 #    ucs open device in~ default as SgiALIn channels 2 fifo_size $jmaxAudioBuffer
 #    
@@ -48,56 +43,49 @@ if {$jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
 
 } elseif {$jmaxArch == "o2r5k" || $jmaxArch == "o2r10k"} {
 
-    puts "    analog: 2/2 (default)"
-    ucs open device in~ analog as SgiALIn ALdevice AnalogIn channels 2 fifo_size $jmaxAudioBuffer
-    ucs open device out~ analog as SgiALOut ALdevice AnalogOut channels 2 fifo_size $jmaxAudioBuffer
+#    puts "O2 audio configuration: analog 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device in~ default as SgiALIn ALdevice AnalogIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice AnalogOut channels 2 fifo_size $jmaxAudioBuffer
 
-    ucs default in~ analog
-    ucs default out~ analog
+#    ucs default in~ default
+#    ucs default out~ default
 
 } elseif {$jmaxArch == "origin"} {
 
-#     one ADAT card
+#    puts "Origin audio configuration: ADAT 8/8 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
-#    puts "    multi: 8/8 (default)"
-#    ucs open device in~ multi as SgiALIn ALdevice ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ multi as SgiALOut ALdevice ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    puts "Origin audio configuration: AES 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device in~ default as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
 
-#    puts "    stereo: 2/2"
-#    ucs open device in~ stereo as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ stereo as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
+#    puts "Origin audio configuration: RAD1.ADAT 8/8 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device in~ default as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD1.ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
-#    ucs default in~ multi
-#    ucs default out~ multi
-#     two ADAT cards
+#    puts "Origin audio configuration: RAD1.AES 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device in~ default as SgiALIn ALdevice RAD1.AESIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD1.AESOut channels 2 fifo_size $jmaxAudioBuffer
 
+#    puts "Origin audio configuration: RAD2.ADAT 8/8 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device in~ default as SgiALIn ALdevice RAD2.ADATIn channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD2.ADATOut channels 8 fifo_size $jmaxAudioBuffer
 
-#    puts "    multi1: 8/8 (default)"
-#    ucs open device in~ multi1 as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ multi1 as SgiALOut ALdevice RAD1.ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    puts "Origin audio configuration: RAD2.AES 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device in~ default as SgiALIn ALdevice RAD2.AESIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size $jmaxAudioBuffer
 
-#    puts "    stereo1: 2/2"
-#    ucs open device in~ stereo1 as SgiALIn ALdevice RAD1.AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ stereo1 as SgiALOut ALdevice RAD1.AESOut channels 2 fifo_size $jmaxAudioBuffer
-
-#    puts "    multi2: 8/8"
-#    ucs open device in~ multi2 as SgiALIn ALdevice RAD2.ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ multi2 as SgiALOut ALdevice RAD2.ADATOut channels 8 fifo_size $jmaxAudioBuffer
-
-#    puts "    stereo2: 2/2"
-#    ucs open device in~ stereo2 as SgiALIn ALdevice RAD2.AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ stereo2 as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size $jmaxAudioBuffer
-
-#    ucs default in~ multi1
-#    ucs default out~ multi1
+#    ucs default in~ default
+#    ucs default out~ default
 
 } elseif {$jmaxArch == "linuxpc"} {
 
-    puts "    default: 2/2"
-    ucs open device out~ default as oss_dac
+#    puts "OSS audio configuration: 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    ucs open device out~ default as oss_dac
 #    ucs open device in~ default as oss_adc
    
-    ucs default out~ default 
+#    ucs default out~ default 
 #    ucs default in~ default
 
 } else {

@@ -8,6 +8,14 @@
 #
 
 ####################################
+## host architecture table
+set jmaxHostArch(astor) "origin"
+set jmaxHostArch(mimi) "origin"
+set jmaxHostArch(bonang) "o2r10k"
+set jmaxHostArch(banya) "irix6.2"
+set jmaxHostArch(marimba) "o2r5k"
+
+####################################
 ## mashine setup (for now here)
 
 ## set jMax servers host architecture
@@ -68,9 +76,6 @@ proc helloWorld {x y} {
 #
 
 when start {
-
-  # declare setup for the examples
-  sourceFile $jmaxRootDir/examples/examples.tcl
   "Welcome to jMax!"
   puts "(try examples in $jmaxRootDir/examples)"
 

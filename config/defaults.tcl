@@ -12,8 +12,15 @@
 set jmaxDefaultHost [exec hostname]
 
 ## set jMax servers host architectures (array of host names)
-set jmaxHostArch(myHost) "hisArch"
-set jmaxHostArch(anotherHost) "anotherArch"
+# (IRCAM's SGI machines)
+set jmaxHostArch(astor) "origin"
+set jmaxHostArch(mimi) "origin"
+set jmaxHostArch(octane) "origin"
+set jmaxHostArch(bonang) "o2r10k"
+set jmaxHostArch(marimba) "o2r5k"
+set jmaxHostArch(tabla) "o2r5k"
+set jmaxHostArch(banya) "irix6.2"
+set jmaxHostArch(brian) "irix6.2"
 
 
 ####################################

@@ -39,9 +39,7 @@ if {[systemProperty "myProperty"] == "myValue"} {
 
 if {$jmaxArch == "origin" || $jmaxArch == "irix6.2" || $jmaxArch == "irix5.3" || $jmaxArch == "mips1"} {
 
-    puts "jMax default MIDI configuration"
-    puts "(make sure that you lauched the MIDI deamon using the startmidi command)"
-    puts "  port: $jmaxMidiPort"
+    puts "MIDI configuration: $jmaxMidiPort"
     ucs open device midi 0 as sgi_midi port $jmaxMidiPort
 
 } elseif {$jmaxArch == "o2r5k" || $jmaxArch == "o2r10k"} {
