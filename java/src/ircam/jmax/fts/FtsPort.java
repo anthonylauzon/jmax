@@ -290,14 +290,30 @@ abstract class FtsPort implements Runnable
 
   final void sendValue(Object o) throws java.io.IOException 
   {
-    if (o instanceof Integer)
-      sendInt((Integer) o);
+    if (o instanceof FtsParse.IntegerString)
+      {
+	sendInt(o.toString());
+      }
+    else if (o instanceof FtsParse.FloatString)
+      {
+	sendFloat(o.toString());
+      }
+    else if (o instanceof Integer)
+      {
+	sendInt((Integer) o);
+      }
     else if (o instanceof Float)
-      sendFloat((Float) o);
+      {
+	sendFloat((Float) o);
+      }
     else if (o instanceof FtsObject)
-      sendObject((FtsObject) o);
+      {
+	sendObject((FtsObject) o);
+      }
     else if (o instanceof String)
-      sendString((String)o);
+      {
+	sendString((String)o);
+      }
   }
   
 

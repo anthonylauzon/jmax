@@ -96,6 +96,7 @@ public class FtsAtomList
 
     for (int i = 0 ; i < updateSize; i++)
       values.addElement(msg.getArgument(i + 2));
+
   }
 
   /** Declare that a range in the list has been changed
