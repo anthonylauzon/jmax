@@ -132,20 +132,21 @@ public class Selecter extends InteractionModule implements XORPainter {
    */
   public void XORDraw(int dx, int dy) 
   {
+    Graphics g = gc.getGraphicDestination().getGraphics();
 
-    itsRunningG.setColor(Color.gray);
-    itsRunningG.setXORMode(Color.white); //there's an assumption here on the color of the background.
+    g.setColor(Color.gray);
+    g.setXORMode(Color.white); //there's an assumption here on the color of the background.
 
     movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy);
 
-    tempRect.setBounds(startSelection.x, startSelection.y, movingPoint.x-startSelection.x, movingPoint.y-startSelection.y);
+    tempRect.setBounds( startSelection.x, startSelection.y, movingPoint.x-startSelection.x, movingPoint.y-startSelection.y);
     normalizeRectangle(tempRect);
 
     if((tempRect.width>=2)||(tempRect.height>=2)) 
-	itsRunningG.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+      g.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
 
-    itsRunningG.setPaintMode();
-    itsRunningG.setColor(Color.black);
+    g.setPaintMode();
+    g.setColor(Color.black);
   }
 
 
