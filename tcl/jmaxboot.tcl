@@ -1,0 +1,54 @@
+##
+## Jmaxboot.tcl is the first tcl file to be loaded
+##
+## it load all the intrinsic tcl functions (i.e. the function
+## jmax *need* in order to work), the jmax package system,
+## and then the configuration file, that in turn should load
+## the packages.
+##
+
+##
+## Intrinsic functions
+## Must be loaded with "source", and not sourceFile,
+
+source $jmaxRootDir/tcl/intrinsics.tcl
+
+##
+## Tcl implementation of the tcl package command
+##
+
+sourceFile $jmaxRootDir/tcl/packages.tcl
+
+##
+## Max packages 
+##
+
+sourceFile $jmaxRootDir/tcl/jmaxpkg.tcl
+
+##
+## Declare the 'virtual' jmax package
+##
+
+package provide jMax 2.0.2
+
+
+##
+## User Configuration (use source to get global variables)
+##
+
+source $jmaxUserDir/.ermesrc
+
+##
+## Standard config.
+##
+
+sourceFile $jmaxRootDir/config/ermesrc.tcl
+
+
+
+
+
+
+
+
+
