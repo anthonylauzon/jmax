@@ -26,6 +26,12 @@
 #include <fts/fts.h>
 #include "event.h"
 
+
+/*{ 
+ *  Scoob score object (generalisation of note)
+ */
+
+
 extern fts_class_t *scoob_class;
 
 enum scoob_type_enum
@@ -63,10 +69,31 @@ typedef struct _scoob_
 #define scoob_set_duration(n, x) ((n)->duration = (x))
 #define scoob_get_duration(n) ((n)->duration)
 
-extern void scoob_set_velocity(scoob_t *this, int velocity);
-extern int scoob_get_velocity(scoob_t *this);
 
-extern void scoob_set_channel(scoob_t *this, int channel);
-extern int scoob_get_channel(scoob_t *this);
+/*{ 
+ * Properties
+ */
+
+int  scoob_declare_property(fts_symbol_t name, fts_symbol_t type);
+int  scoob_property_get_index(scoob_t *this, fts_symbol_t name);
+
+/* general */
+void scoob_property_get(scoob_t *this, fts_symbol_t name, fts_atom_t *p);
+int  scoob_property_set(scoob_t *this, fts_symbol_t name, const fts_atom_t *value);
+
+void scoob_property_get_by_index(scoob_t *this, int index, fts_atom_t *p);
+void scoob_property_set_by_index(scoob_t *this, int index, const fts_atom_t *value);
+
+/* standard */
+void scoob_set_velocity(scoob_t *this, int velocity);
+int  scoob_get_velocity(scoob_t *this);
+
+void scoob_set_channel(scoob_t *this, int channel);
+int  scoob_get_channel(scoob_t *this);
+
+/*} */
+
+/*} */
+
 
 #endif

@@ -83,14 +83,27 @@ scoob_get_type_from_atom(const fts_atom_t *at)
  *  scoob properties
  *
  */
-static void
+
+int
+scoob_property_get_index(scoob_t *this, fts_symbol_t name)
+{
+  fts_atom_t k, a;
+
+  fts_set_symbol(&k, name);
+  if(fts_hashtable_get(&scoob_property_indices, &k, &a))
+      return fts_get_int(&a);
+  else
+      return -1;
+}
+
+void
 scoob_property_get_by_index(scoob_t *this, int index, fts_atom_t *p)
 {
   if(index < fts_array_get_size(&this->properties))
     fts_atom_assign(p, fts_array_get_element(&this->properties, index));
 }
 
-static void
+void
 scoob_property_get(scoob_t *this, fts_symbol_t name, fts_atom_t *p)
 {
   fts_atom_t k, a;
@@ -100,7 +113,7 @@ scoob_property_get(scoob_t *this, fts_symbol_t name, fts_atom_t *p)
     scoob_property_get_by_index(this, fts_get_int(&a), p);
 }
 
-static void
+void
 scoob_property_set_by_index(scoob_t *this, int index, const fts_atom_t *value)
 {
   fts_array_set_element(&this->properties, index, value);
@@ -121,6 +134,10 @@ scoob_property_set(scoob_t *this, fts_symbol_t name, const fts_atom_t *value)
   return 0;
 }
 
+
+/**
+ * Method to get or set property.
+ */
 static void
 scoob_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -132,7 +149,7 @@ scoob_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     scoob_property_get(this, s, fts_get_return_value());
 }
 
-void
+int
 scoob_declare_property(fts_symbol_t name, fts_symbol_t type)
 {
   fts_atom_t k, a;
@@ -150,9 +167,17 @@ scoob_declare_property(fts_symbol_t name, fts_symbol_t type)
     
     fts_class_message_varargs(scoob_class, name, scoob_property);
 
-    scoob_n_properties++;
+    return scoob_n_properties++;
   }
+  else
+      return -1;
 }
+
+
+
+/*
+ * some standard properties 
+ */
 
 void
 scoob_set_velocity(scoob_t *this, int velocity)
