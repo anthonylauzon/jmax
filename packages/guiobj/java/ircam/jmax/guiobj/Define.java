@@ -78,6 +78,11 @@ public class Define extends Editable implements FtsObjectErrorListener{
     return typeWidth;
   }
 
+  public void updateTypeWidth( String type)
+  {
+    typeWidth = boldFontMetrics.stringWidth( type);
+  }
+
   public String getArgs()
   {
     return ((FtsDefineObject)ftsObject).getExpression();

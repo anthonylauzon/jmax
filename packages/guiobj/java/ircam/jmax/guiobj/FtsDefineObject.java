@@ -124,6 +124,7 @@ public class FtsDefineObject extends FtsGraphicObject
   public void setCurrentType( String type)
   {
     this.type = type;
+    ((Define)listener).updateTypeWidth( type);
   }
   
   private String expression = null;
