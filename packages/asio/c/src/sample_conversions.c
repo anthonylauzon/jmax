@@ -45,9 +45,9 @@ const float fIScaler32 = (float)(1.0f / 0x7FFFFFFFL);  /* 1 / fScaler32 */
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_uint8(long size,float* src,char* dest)
+void fts_convert_float32_to_uint8(unsigned long size,float* src,char* dest)
 {
-	while(--size >= 0)
+	while(size--)
 		*dest++ = (unsigned char)(128 + ((*src++) * fScaler8));
 }
 /*****************************************************************************/
@@ -55,10 +55,10 @@ void fts_convert_float32_to_uint8(long size,float* src,char* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_uint8clip(long size,float* src,char* dest)
+void fts_convert_float32_to_uint8clip(unsigned long size,float* src,char* dest)
 {
   float tmp;
-	while(--size >= 0)
+	while(size--)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f); 
@@ -70,9 +70,9 @@ void fts_convert_float32_to_uint8clip(long size,float* src,char* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int8(long size,float* src,char* dest)
+void fts_convert_float32_to_int8(unsigned long size,float* src,char* dest)
 {
-	while(--size >= 0)
+	while(size--)
 		*dest++ = (char)((*src++) * fScaler8);
 }
 /*****************************************************************************/
@@ -80,10 +80,10 @@ void fts_convert_float32_to_int8(long size,float* src,char* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int8clip(long size,float* src,char* dest)
+void fts_convert_float32_to_int8clip(unsigned long size,float* src,char* dest)
 {
   float tmp;
-	while(--size >= 0)
+	while(size--)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f); 
@@ -95,10 +95,10 @@ void fts_convert_float32_to_int8clip(long size,float* src,char* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int16(long size,float* src,short* dest)
+void fts_convert_float32_to_int16(unsigned long size,float* src,short* dest)
 {
   /* slow method */
-	while(--size >= 0)
+	while(size--)
 		*dest++ = (short)((*src++) * fScaler16);
 }
 /*****************************************************************************/
@@ -106,11 +106,11 @@ void fts_convert_float32_to_int16(long size,float* src,short* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int16clip(long size,float* src,short* dest)
+void fts_convert_float32_to_int16clip(unsigned long size,float* src,short* dest)
 {
   /* slow method */
   float tmp;
-	while(--size >= 0)
+	while(size--)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f); 
@@ -122,12 +122,12 @@ void fts_convert_float32_to_int16clip(long size,float* src,short* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int24P(long size,float* src,char* dest)
+void fts_convert_float32_to_int24P(unsigned long size,float* src,char* dest)
 {
   long l;
   char* pl = (char*)&l;
 
-	while(--size >= 0)
+	while(size--)
   {
 		l = (long)((*src++) * fScaler24);
     
@@ -144,13 +144,13 @@ void fts_convert_float32_to_int24P(long size,float* src,char* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int24Pclip(long size,float* src,char* dest)
+void fts_convert_float32_to_int24Pclip(unsigned long size,float* src,char* dest)
 {
   float tmp;
   long l;
   char* pl = (char*)&l;
 
-	while(--size >= 0)
+	while(size--)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f);
@@ -169,12 +169,12 @@ void fts_convert_float32_to_int24Pclip(long size,float* src,char* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int24L(long size,float* src,long* dest)
+void fts_convert_float32_to_int24L(unsigned long size,float* src,long* dest)
 {
   long l;
   char* pl = (char*)&l;
 
-	while(--size >= 0)
+	while(size--)
   {
 		l = (long)((*src++) * fScaler24);
 
@@ -191,13 +191,13 @@ void fts_convert_float32_to_int24L(long size,float* src,long* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int24Lclip(long size,float* src,long* dest)
+void fts_convert_float32_to_int24Lclip(unsigned long size,float* src,long* dest)
 {
   float tmp;
   long l;
   char* pl = (char*)&l;
 
-	while(--size >= 0)
+	while(size--)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f);
@@ -216,12 +216,12 @@ void fts_convert_float32_to_int24Lclip(long size,float* src,long* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int24R(long size,float* src,long* dest)
+void fts_convert_float32_to_int24R(unsigned long size,float* src,long* dest)
 {
   long l;
   char* pl = (char*)&l;
 
-	while(--size >= 0)
+	while(size--)
   {
 		l = (long)((*src++) * fScaler24);
 
@@ -241,13 +241,13 @@ void fts_convert_float32_to_int24R(long size,float* src,long* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int24Rclip(long size,float* src,long* dest)
+void fts_convert_float32_to_int24Rclip(unsigned long size,float* src,long* dest)
 { 
   float tmp;
   long l;
   char* pl = (char*)&l;
 
-	while(--size >= 0)
+	while(size--)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f);
@@ -269,9 +269,9 @@ void fts_convert_float32_to_int24Rclip(long size,float* src,long* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int32(long size,float* src,long* dest)
+void fts_convert_float32_to_int32(unsigned long size,float* src,long* dest)
 {
-	while(--size >= 0)
+	while(size--)
 		*dest++ = (long)((*src++) * fScaler32);
 }
 /*****************************************************************************/
@@ -279,11 +279,11 @@ void fts_convert_float32_to_int32(long size,float* src,long* dest)
 
 
 /*****************************************************************************/
-void fts_convert_float32_to_int32clip(long size,float* src,long* dest)
+void fts_convert_float32_to_int32clip(unsigned long size,float* src,long* dest)
 {
   float tmp;
 
-	while(--size >= 0)
+	while(size--)
   {
     tmp = *src++;
     CLIP(tmp, -1.0f, 1.0f);
@@ -297,9 +297,9 @@ void fts_convert_float32_to_int32clip(long size,float* src,long* dest)
 
 
 /*****************************************************************************/
-void fts_convert_int8_to_float32(long size,char* src,float* dest)
+void fts_convert_int8_to_float32(unsigned long size,char* src,float* dest)
 {
-	while(--size >= 0)
+	while(size--)
     *dest++ = (float)((*src++) * fIScaler8);
 }
 /*****************************************************************************/
@@ -307,9 +307,9 @@ void fts_convert_int8_to_float32(long size,char* src,float* dest)
 
 
 /*****************************************************************************/
-void fts_convert_uint8_to_float32(long size,char* src,float* dest)
+void fts_convert_uint8_to_float32(unsigned long size,char* src,float* dest)
 {
-	while(--size >= 0)
+	while(size--)
     *dest++ = (float)(((*src++) - 128) * fIScaler8);
 }
 /*****************************************************************************/
@@ -317,9 +317,9 @@ void fts_convert_uint8_to_float32(long size,char* src,float* dest)
 
 
 /*****************************************************************************/
-void fts_convert_int16_to_float32(long size,short* src,float* dest)
+void fts_convert_int16_to_float32(unsigned long size,short* src,float* dest)
 {
-	while(--size >= 0)
+	while(size--)
     *dest++ = (float)((*src++) * fIScaler16);
 }
 /*****************************************************************************/
@@ -327,14 +327,14 @@ void fts_convert_int16_to_float32(long size,short* src,float* dest)
 
 
 /*****************************************************************************/
-void fts_convert_int24P_to_float32(long size,char* src,float* dest)
+void fts_convert_int24P_to_float32(unsigned long size,char* src,float* dest)
 {
   char sc[4];
   long l;
 
   sc[3] = 0;
  
-	while(--size >= 0)
+	while(size--)
   {
     sc[0] = src[0];
     sc[1] = src[1];
@@ -350,14 +350,14 @@ void fts_convert_int24P_to_float32(long size,char* src,float* dest)
 
 
 /*****************************************************************************/
-void fts_convert_int24L_to_float32(long size,long* src,float* dest)
+void fts_convert_int24L_to_float32(unsigned long size,long* src,float* dest)
 {
   char sc[4];
   long l; 
   char* csrc = (char*)src;
   sc[3] = 0;
 
-	while(--size >= 0)
+	while(size--)
   {
     sc[0] = csrc[1];
     sc[1] = csrc[2];
@@ -373,14 +373,14 @@ void fts_convert_int24L_to_float32(long size,long* src,float* dest)
 
 
 /*****************************************************************************/
-void fts_convert_int24R_to_float32(long size,long* src,float* dest)
+void fts_convert_int24R_to_float32(unsigned long size,long* src,float* dest)
 {
   char sc[4];
   long l; 
   char* csrc = (char*)src;
   sc[3] = 0;
 
-	while(--size >= 0)
+	while(size--)
   {
     sc[0] = csrc[0];
     sc[1] = csrc[1];
@@ -396,9 +396,9 @@ void fts_convert_int24R_to_float32(long size,long* src,float* dest)
 
 
 /*****************************************************************************/
-void fts_convert_int32_to_float32(long size,long* src,float* dest)
+void fts_convert_int32_to_float32(unsigned long size,long* src,float* dest)
 {
-	while(--size >= 0)
+	while(size--)
     *dest++ = (float)((*src++) * fIScaler32);
 }
 /*****************************************************************************/

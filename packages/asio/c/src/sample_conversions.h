@@ -40,31 +40,31 @@ extern "C"
 #endif
 
 /* One channel, Floating point to Integer */
-void fts_convert_float32_to_uint8(long size,float* src,char* dest);
-void fts_convert_float32_to_int8(long size,float* src,char* dest);
-void fts_convert_float32_to_int16(long size,float* src,short* dest);
-void fts_convert_float32_to_int24P(long size,float* src,char* dest);
-void fts_convert_float32_to_int24L(long size,float* src,long* dest);
-void fts_convert_float32_to_int24R(long size,float* src,long* dest);
-void fts_convert_float32_to_int32(long size,float* src,long* dest);
+void fts_convert_float32_to_uint8(unsigned long size,float* src,char* dest);
+void fts_convert_float32_to_int8(unsigned long size,float* src,char* dest);
+void fts_convert_float32_to_int16(unsigned long size,float* src,short* dest);
+void fts_convert_float32_to_int24P(unsigned long size,float* src,char* dest);
+void fts_convert_float32_to_int24L(unsigned long size,float* src,long* dest);
+void fts_convert_float32_to_int24R(unsigned long size,float* src,long* dest);
+void fts_convert_float32_to_int32(unsigned long size,float* src,long* dest);
 
 /* One channel, Floating point to cliped Integer */
-void fts_convert_float32_to_uint8clip(long size,float* src,char* dest);
-void fts_convert_float32_to_int8clip(long size,float* src,char* dest);
-void fts_convert_float32_to_int16clip(long size,float* src,short* dest);
-void fts_convert_float32_to_int24Pclip(long size,float* src,char* dest);
-void fts_convert_float32_to_int24Lclip(long size,float* src,long* dest);
-void fts_convert_float32_to_int24Rclip(long size,float* src,long* dest);
-void fts_convert_float32_to_int32clip(long size,float* src,long* dest);
+void fts_convert_float32_to_uint8clip(unsigned long size,float* src,char* dest);
+void fts_convert_float32_to_int8clip(unsigned long size,float* src,char* dest);
+void fts_convert_float32_to_int16clip(unsigned long size,float* src,short* dest);
+void fts_convert_float32_to_int24Pclip(unsigned long size,float* src,char* dest);
+void fts_convert_float32_to_int24Lclip(unsigned long size,float* src,long* dest);
+void fts_convert_float32_to_int24Rclip(unsigned long size,float* src,long* dest);
+void fts_convert_float32_to_int32clip(unsigned long size,float* src,long* dest);
 
 /* One channel, Integer to Floating point */
-void fts_convert_uint8_to_float32(long size,char* src,float* dest);
-void fts_convert_int8_to_float32(long size,char* src,float* dest);
-void fts_convert_int16_to_float32(long size,short* src,float* dest);
-void fts_convert_int24P_to_float32(long size,char* src,float* dest);
-void fts_convert_int24L_to_float32(long size,long* src,float* dest);
-void fts_convert_int24R_to_float32(long size,long* src,float* dest);
-void fts_convert_int32_to_float32(long size,long* src,float* dest);
+void fts_convert_uint8_to_float32(unsigned long size,char* src,float* dest);
+void fts_convert_int8_to_float32(unsigned long size,char* src,float* dest);
+void fts_convert_int16_to_float32(unsigned long size,short* src,float* dest);
+void fts_convert_int24P_to_float32(unsigned long size,char* src,float* dest);
+void fts_convert_int24L_to_float32(unsigned long size,long* src,float* dest);
+void fts_convert_int24R_to_float32(unsigned long size,long* src,float* dest);
+void fts_convert_int32_to_float32(unsigned long size,long* src,float* dest);
 
 #ifdef __cplusplus
 }
