@@ -29,22 +29,8 @@ PACKAGE_DIR = ircam/jmax/editors/console/tcl
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
-INCLUDE_PATH := $(JAVA_SRC_ROOT)/$(PACKAGE_DIR)
-include Sources2
-
-all: 
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
+all: $(CLASSES)
 .PHONY: all
-
-
-ConsoleOpenCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleOpenCmd.java)
-.PHONY: ConsoleOpenCmd
-
-TclConsolePackage:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclConsolePackage.java)
-.PHONY: TclConsolePackage
-
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

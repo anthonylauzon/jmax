@@ -29,16 +29,8 @@ PACKAGE_DIR = ircam/jmax/toolkit
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
-INCLUDE_PATH := $(JAVA_SRC_ROOT)/$(PACKAGE_DIR)
-include Sources2
-
-all: 
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
+all: $(CLASSES)
 .PHONY: all
-
-MaxWindowMenu:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWindowMenu.java)
-.PHONY: MaxWindowMenu
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

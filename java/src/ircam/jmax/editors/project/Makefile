@@ -28,30 +28,8 @@ ROOTDIR = ../../../../../..
 PACKAGE_DIR = ircam/jmax/editors/project
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
-include Sources
 
-all: 
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
+all: $(CLASSES)
 .PHONY: all
-
-Project:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Project.java)
-.PHONY: Project
-
-ProjectBar:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectBar.java)
-.PHONY: ProjectBar
-
-ProjectEntry:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectEntry.java)
-.PHONY: ProjectEntry
-
-ProjectNewDialog:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectNewDialog.java)
-.PHONY: ProjectNewDialog
-
-ProjectWindow:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectWindow.java)
-.PHONY: ProjectWindow
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

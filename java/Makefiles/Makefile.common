@@ -78,14 +78,12 @@ JAVA_SRC_ROOT =  $(ROOTDIR)/java/src
 # JDK1.2)
 JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl/jacl.jar
 
-LOCAL_PATH = $(ROOTDIR)/$(PACKAGE_DIR)
-
 # Includes environment's CLASSPATH, for Swing on JDK 1.1
 JMAX_CLASSPATH = $$CLASSPATH:$(JAVA_SRC_ROOT):$(JAVA_CLASSES_ROOT):$(JAVA_LIBS_CLASSPATH)
 
 JFLAGS = -d $(JAVA_CLASSES_ROOT) $(JAVAC_FLAGS) $(DEPFLAG)
 
-CLASS_FILES = $(addprefix $(JAVA_CLASSES_ROOT)/$(PACKAGE_DIR)/, $(addsuffix .class , $(basename $(SOURCES))))
+CLASSES = $(addprefix $(JAVA_CLASSES_ROOT)/$(PACKAGE_DIR)/, $(shell ls *.java | sed s/.java/.class/))
 
 
 

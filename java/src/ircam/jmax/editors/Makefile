@@ -28,13 +28,18 @@ ROOTDIR = ../../../../..
 PACKAGE_DIR = ircam/jmax/editors
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
-INCLUDE_PATH := $(JAVA_SRC_ROOT)/$(PACKAGE_DIR)
-include Sources2
 
 all: 
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
-
+	(cd console ; $(MAKE) all)
+	(cd patcher ; $(MAKE) all)
+	(cd control ; $(MAKE) all)
 .PHONY: all
+
+clean:
+	(cd console ; $(MAKE) clean)
+	(cd patcher ; $(MAKE) clean)
+	(cd control ; $(MAKE) clean)
+.PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 
