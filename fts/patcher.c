@@ -61,7 +61,6 @@ fts_symbol_t sym_objectRedefined = 0;
 fts_symbol_t sym_setRedefined = 0;
 fts_symbol_t sym_setDescription;
 fts_symbol_t sym_setSaved;
-fts_symbol_t sym_endUpload;
 fts_symbol_t sym_startPaste;
 fts_symbol_t sym_endPaste;
 fts_symbol_t sym_noHelp;
@@ -1081,7 +1080,7 @@ patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	    }
 	}
 
-      fts_client_send_message((fts_object_t *)this, sym_endUpload, 0, 0);
+      fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);
     }
 }
 
@@ -1229,7 +1228,6 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
 	  class = fts_object_get_class(obj);
 	}
-
 
       if(fts_class_get_name(class) != NULL)
 	fts_client_add_symbol( o, fts_class_get_name(class));
@@ -2043,7 +2041,6 @@ void fts_kernel_patcher_init(void)
   sym_redefineObject = fts_new_symbol("redefineObject");
   sym_objectRedefined = fts_new_symbol("objectRedefined");
   sym_setRedefined = fts_new_symbol("setRedefined");
-  sym_endUpload = fts_new_symbol("endUpload");
   sym_setDescription = fts_new_symbol("setDescription");
   sym_setSaved = fts_new_symbol("setSaved");
   sym_startPaste = fts_new_symbol("startPaste");
