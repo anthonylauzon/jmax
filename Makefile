@@ -27,10 +27,10 @@ include VERSION
 
 ifdef SNAPSHOT
 version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)$(SNAPSHOT)
-disttag=V_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
+disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)$(SNAPSHOT)
 else
 version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)
-disttag=V_$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)
+disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)
 endif
 distdir=jmax-$(version)
 
