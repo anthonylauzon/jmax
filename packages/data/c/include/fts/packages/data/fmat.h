@@ -97,6 +97,11 @@ DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 DATA_API void fmat_set_const(fmat_t *mat, float c);
 
 /**
+* @ingroup fmat
+ */
+DATA_API void fmat_copy(fmat_t *orig, fmat_t *copy);
+
+/**
  * @ingroup fmat
  */
 DATA_API void fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
