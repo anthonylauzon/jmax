@@ -68,6 +68,18 @@ public class MonoTrackPopupMenu extends JPopupMenu
     
     add(moveMenu);
 
+    addSeparator();
+    
+    item = new JMenuItem("Change Range");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    ChangeRangeDialog.changeRange(MonoTrackPopupMenu.getPopupTarget().getTrack(), 
+					  MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame());
+	}
+    });
+    add(item);
+
     pack();
   }
 

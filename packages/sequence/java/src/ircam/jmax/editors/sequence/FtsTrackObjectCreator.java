@@ -16,7 +16,7 @@ public class FtsTrackObjectCreator implements FtsObjectCreator
     {
 	String name = args[0].getString();
 	String valueType = args[1].getString();
-	
+
 	return new FtsTrackObject(fts, name, ValueInfoTable.getValueInfo(valueType));
     }
 }

@@ -110,8 +110,8 @@ public class MonoTrackRenderer extends AbstractRenderer{
   {
     TrackEvent aTrackEvent;
     
-    /*int*/double startTime = gc.getAdapter().getInvX(x);
-    /*int*/double endTime = gc.getAdapter().getInvX(x+w);
+    double startTime = gc.getAdapter().getInvX(x);
+    double endTime = gc.getAdapter().getInvX(x+w);
 
     tempList.removeAllElements();
 

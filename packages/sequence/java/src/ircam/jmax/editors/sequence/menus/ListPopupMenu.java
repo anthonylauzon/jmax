@@ -64,11 +64,11 @@ public class ListPopupMenu extends JPopupMenu
 	    }
     });
     add(item);    
-    item = new JMenuItem("Add After Selection");
+    item = new JMenuItem("Add After");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	    {
-		ListPopupMenu.getPopupTarget().addAfterSelection();
+		ListPopupMenu.getPopupTarget().addAfter();
 	    }
     });
     add(item);

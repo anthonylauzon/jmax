@@ -94,6 +94,8 @@ class TrackContainer extends JPanel {
 		  setMaximumSize(new Dimension(getMaximumSize().width, height));
 		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
 	      }
+	  else if(name.equals("maximumValue") || name.equals("minimumValue"))
+	      trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
     }
     
     AbstractButton b;

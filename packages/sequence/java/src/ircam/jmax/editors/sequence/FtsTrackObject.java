@@ -56,7 +56,6 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	listeners = new MaxVector();
 
 	this.name = name;
-	//sequenceData = sequence;
 	
 	/* prepare the flavors for the clipboard */
 	if (flavors == null)
@@ -88,9 +87,10 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     }
     public void addEvents(int nArgs , FtsAtom args[])
     {
-	TrackEvent evt;
-	int evtTime, index;
-	int maxTime = 0;
+	TrackEvent evt = null;
+	int evtTime;
+	int index = -1;
+	int maxTime = 0;//???
 	for(int i=0; i<nArgs; i++)
 	    {
 		evt = (TrackEvent)(args[i].getObject());
@@ -117,7 +117,10 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 		////////////////////////
 	    }
 
-	notifyObjectsAdded(maxTime);
+	if(nArgs>1)
+	    notifyObjectsAdded(maxTime);
+	else
+	    notifyObjectAdded(evt, index);
     }
 
   public void requestEventCreation(float time, String type, int nArgs, Object args[])
@@ -126,53 +129,12 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     sendArgs[1].setString(type);
       
     for(int i=0; i<nArgs; i++)
-      sendArgs[2+i].setValue(args[i]);
+	sendArgs[2+i].setValue(args[i]);
 
     sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
   }
   
     
-    /**
-     * Create an AbstractSequence with an empty type vector 
-     */
-    /*public FtsTrackObject(Fts fts)
-      {
-      super(fts, null, null, "seqtrack", "seqtrack");
-      listeners = new MaxVector();
-      
-      // prepare the flavors for the clipboard 
-      if (flavors == null)
-      flavors = new DataFlavor[1];
-      flavors[0] = sequenceFlavor;
-      
-      }*/
-
-  
-    
-    /**
-     * Create an AbstractSequence and initialize the type vector
-     * with the given enumeration of types.
-     */
-    /*public AbstractSequence( Enumeration types)
-      {
-      super();
-      listeners = new MaxVector();
-	
-      // prepare the flavors for the clipboard 
-      if (flavors == null)
-      flavors = new DataFlavor[1];
-      flavors[0] = sequenceFlavor;
-      
-      if (types == null)
-      return;
-
-      while(types.hasMoreElements())
-      {
-      infos.addElement(types.nextElement());
-      }
-      
-      }*/
-
     /**
      * how many events in the database?
      */
@@ -202,6 +164,10 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	return new SequenceEnumeration();
     }
     
+    public Enumeration getEvents(int startIndex , int endIndex)
+    {
+	return new SequenceEnumeration(startIndex, endIndex);
+    }
     
     /**
      * returns a given event
@@ -626,10 +592,31 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     private class SequenceEnumeration implements Enumeration
     {
 	int p;
+	int start, end;
+	public SequenceEnumeration()
+	{
+	    start = 0;
+	    end = events_fill_p;
+	    p = start;
+	}
+	public SequenceEnumeration(int startIndex, int endIndex)
+	{
+	    if(startIndex < 0) 
+		start = 0;
+	    else 
+		start = startIndex;
+
+	    if(endIndex > events_fill_p)
+		end = events_fill_p;
+	    else
+		end = endIndex + 1;
+	    
+	    p = start;
+	}
 	
 	public boolean hasMoreElements()
 	{
-	    return p < events_fill_p;
+	    return p < end;
 	}
 	
 	public Object nextElement()
@@ -681,16 +668,15 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	    while (index < length() && events[index].getTime() <= endTime)
 		{
 		    e = events[index++];
-		    if (e.getTime() >= startTime ||
-			e.getTime()+((Integer)e.getProperty("duration")).intValue() >= startTime )
+		   
+		    if (e.getTime() >= startTime || e.getTime()+((Integer)e.getProperty("duration")).intValue() >= startTime)
 			{
 			    return e;
 			}
 		}
 	    return null;
 	}
-	
-	
+
 	//--- Intersection Fields
 	double endTime;
 	double startTime;
@@ -729,8 +715,9 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	    while(index < endIndex)
 		{
 		    e = events[index++];
+
 		    if (e.getTime()+((Integer)e.getProperty("duration")).intValue() <=endTime)
-		    {
+			{
 			    return e;
 			}
 		}

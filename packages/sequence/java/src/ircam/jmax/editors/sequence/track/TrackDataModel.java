@@ -58,6 +58,11 @@ public interface TrackDataModel {
      * returns an enumeration of all the events
      */
     public abstract Enumeration getEvents();
+
+    /**
+     * returns an enumeration of all the events between start and end index
+     */
+    public abstract Enumeration getEvents(int startIndex, int endIndex);
     
     
     /**

@@ -47,6 +47,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     public MonoTrackEditor(Geometry g, Track track)
     {
 	super();
+	if(track.getProperty("maximumValue")==null)
+	    track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
+	if(track.getProperty("minimumValue")==null)
+	    track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+
 
 	this.geometry = g;
 	this.track = track;
@@ -133,8 +138,9 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	gc = new SequenceGraphicContext(model, selection, track); //loopback?
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
-
-	gc.setAdapter(new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
+	MonoDimensionalAdapter ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
+	track.getPropertySupport().addPropertyChangeListener(ad);
+	gc.setAdapter(ad);
 
 	renderer = new MonoTrackRenderer(gc);
 	gc.setRenderManager(renderer);
@@ -176,13 +182,13 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     public Dimension getMinimumSize()
     {
-	return new Dimension(400, 80);
+	return new Dimension(400, /*80*/127);
 	//return new Dimension(400, 40);for split
     }
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(400, 80);
+	return new Dimension(400, /*80*/127);
     }
 
     public Track getTrack()

@@ -29,10 +29,27 @@ public class AmbitusValue extends AbstractEventValue
       {
 	properties.put((String) e.nextElement(), DEFAULT_PROPERTY);
       }
-    properties.put("duration", new Integer(100));
-    properties.put("ambitus", new Integer(0));
+    
+    setProperty("duration", new Integer(100));
+    setProperty("ambitus", new Integer(0));
   }
-  
+
+  Object duration;
+  public void setProperty(String name, Object value)
+  {
+      if(name.equals("duration"))
+	  duration = value;
+      
+      super.setProperty(name, value);
+  }
+  public Object getProperty(String name)
+  {
+      if(name.equals("duration"))
+	  return duration;
+      else
+	  return super.getProperty(name);
+  }
+
   public ValueInfo getValueInfo()
   {
     return info;

@@ -161,9 +161,8 @@ public class ScoreRenderer extends AbstractRenderer{
     TrackEvent aTrackEvent;
 
     tempList.removeAllElements();
-    /*int*/double startTime = gc.getAdapter().getInvX(x);
-    /*int*/double endTime = gc.getAdapter().getInvX(x+w);
-
+    double startTime = gc.getAdapter().getInvX(x);
+    double endTime = gc.getAdapter().getInvX(x+w);
 
     for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
       {

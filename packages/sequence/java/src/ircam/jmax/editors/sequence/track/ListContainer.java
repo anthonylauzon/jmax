@@ -22,48 +22,14 @@
 //
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
+package ircam.jmax.editors.sequence.track;
 
-package ircam.jmax.editors.sequence;
-
-import ircam.jmax.editors.sequence.track.*;
+import java.awt.*;
 
 /**
- * A simple Mapper that accesses the Integer parameter
- */ 
-public class IntegerMapper extends Mapper {
-  
-  /**
-   * set the Integer of this event
-   */
-  public void set(Event e, int value) 
-  {
-      e.setProperty("integer", new Integer(value));
-  }
-
-  /**
-   * get the Integer of this event
-   */
-  public int get(Event e) 
-  {
-    return ((Integer)e.getProperty("integer")).intValue();
-  }
-
-  /**
-   * access the static instance
-   */
-  public static Mapper getMapper() 
-  {
-    if (itsIntegerMapper == null)
-       itsIntegerMapper = new IntegerMapper();
-    return itsIntegerMapper;
-  }
-
-  //--- Fields
-
-  static IntegerMapper itsIntegerMapper;
+ */
+public interface ListContainer {
+    abstract public boolean isVisible(int y);
+    abstract public Rectangle getVisibleRect();
 }
-
-
-
-
 

@@ -81,7 +81,7 @@ abstract public class Adapter implements MappingListener{
     /**
      * Returns the value of the X coordinate in the given graphic context.
      * e_m_ will be in the future the only one? */
-    public /*int*/double getX(Event e, GraphicContext gc)
+    public double getX(Event e, GraphicContext gc)
     {
 	return getX(e);
     }
@@ -98,7 +98,7 @@ abstract public class Adapter implements MappingListener{
   /**
    * get the value of the parameter associated with the graphic X
    */
-    abstract public /*int*/double getInvX(int x);
+    abstract public double getInvX(int x);
   
 
   /**

@@ -57,6 +57,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
   private SelectionOwner itsOwner;  
   protected  TrackDataModel itsModel;
+  protected TrackEvent lastSelectedEvent = null;
 
   // Implementation notes: 
   // The ListSelectionModel, and then the SequenceSelection, 
@@ -150,7 +151,10 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     int index = itsModel.indexOf((TrackEvent) obj);
 
     if (!isSelectedIndex(index)) 
-	addSelectionInterval(index, index);
+	{
+	    lastSelectedEvent = (TrackEvent)obj;
+	    addSelectionInterval(index, index);
+	}
   }
   
   /** Select the given enumeration of objects.
@@ -173,6 +177,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   public void deSelect(Object obj)
   {
     int index = itsModel.indexOf((TrackEvent) obj);
+    if(obj == lastSelectedEvent) lastSelectedEvent = null;
     removeSelectionInterval(index, index);
   }
 
@@ -231,6 +236,10 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     return count;
   }
 
+  public TrackEvent getLastSelectedEvent()
+    {
+	return lastSelectedEvent;
+    }
 
   /** selects all the objects. 
    */
@@ -243,8 +252,8 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
    */
   public  void deselectAll()
   {
-
-    clearSelection();
+      lastSelectedEvent = null;
+      clearSelection();
   }
 
 

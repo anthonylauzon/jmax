@@ -45,6 +45,21 @@ public class IntegerValue extends AbstractEventValue
 	properties.put("integer", new Integer(0));
     }
 
+    Object intValue;
+    public void setProperty(String name, Object value)
+    {
+	if(name.equals("integer"))
+	    intValue = value;
+      
+      super.setProperty(name, value);
+  }
+  public Object getProperty(String name)
+  {
+      if(name.equals("integer"))
+	  return intValue;
+      else
+	  return super.getProperty(name);
+  }
 
     public ValueInfo getValueInfo() 
     {
@@ -101,6 +116,8 @@ public class IntegerValue extends AbstractEventValue
 
     public static final String INTEGER_NAME = "intevt";
     public static IntegerValueInfo info = new IntegerValueInfo();
+    public static final int DEFAULT_MAX_VALUE = 127;
+    public static final int DEFAULT_MIN_VALUE = 0;
 
     static String nameArray[] = {"integer"};
     static int propertyCount = 1;

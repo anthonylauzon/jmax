@@ -18,7 +18,7 @@ public class FtsEventObjectCreator implements FtsObjectCreator
 	
 	for(int i = 0; i<nArgs-2; i++)
 	    evtArgs[i] = args[2+i].getValue();	
-	
+
 	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(valueType).newInstance());
 	evtValue.setPropertyValues(nArgs-2, evtArgs);
 	

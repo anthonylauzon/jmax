@@ -193,8 +193,7 @@ public class PartitionBackground implements Layer, ImageObserver{
       
     private void drawVerticalGrid(Graphics g)
     {
-	AmbitusValue value = new AmbitusValue();
-	UtilTrackEvent tempEvent = new UtilTrackEvent(value);
+	UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
 	Dimension d = gc.getGraphicDestination().getSize();
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
 	int timeStep;

@@ -126,7 +126,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 				   JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     trackPanel.add(verticalGlue);
 
-    ftsSequenceObject.requestTrackCreation("ambitus");
+    ftsSequenceObject.requestTrackCreation("noteevt");
 
     setLayout(new BorderLayout());
 
@@ -453,33 +453,39 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	return ((time>startTime)&&(time+dur<endTime));
     }
     
+    ///////AUTOMATIC SCROLLING  
     public boolean pointIsVisible(int x, int y)
     {
 	Rectangle r = itsContainer.getViewRectangle();
 	return ((x > r.x + ScoreBackground.KEYEND) && (x < r.x + r.width - TrackContainer.BUTTON_WIDTH));
     }
 
-
-    private int scrollingDelta = 10; 
-    public boolean scrollBy(int x, int y)
+    private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
+    private int scrolledDelta = 2;//the corresponding graphic delta
+    public int scrollBy(int x, int y)
     {
 	Rectangle r = itsContainer.getViewRectangle();
 	if(x < r.x  + ScoreBackground.KEYEND)
 	    {
-		itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
-		return false;//going to left
+		if(itsTimeScrollbar.getValue()-scrollingDelta >0)
+		{
+		    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
+		    return -scrolledDelta;//scroll to left
+		}
+		else return 0;//is already scrolled to zero
 	    }
 	else
 	    {		
 		if(x > r.x + r.width - TrackContainer.BUTTON_WIDTH)
-		    {
-			int value = itsTimeScrollbar.getValue()+scrollingDelta;
-			if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
-			    itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
-			
-			itsTimeScrollbar.setValue(value);
-		    }
-		return true;//going to rigth
+		{
+		    int value = itsTimeScrollbar.getValue()+scrollingDelta;
+		    if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
+			itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
+		    
+		    itsTimeScrollbar.setValue(value);
+		    return scrolledDelta;//scroll to rigth
+		}
+		else return 0;//the mouse is in the window
 	    }
     }
 

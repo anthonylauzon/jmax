@@ -30,6 +30,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 import java.awt.*;
 import java.beans.*;
 import java.awt.event.*;
@@ -45,7 +46,7 @@ import java.text.NumberFormat;
  * a Midi value) */
 public class ListPanel extends PopupToolbarPanel implements TrackDataListener, MouseListener, ListSelectionListener, KeyListener
 {
-    public ListPanel(Track track, PopupProvider provider)
+    public ListPanel(Track track, PopupProvider provider, ListContainer container)
     {
       super(provider);
 
@@ -54,6 +55,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
       setLayout(null);
 
       this.track = track;
+      this.container = container;
       data = track.getTrackDataModel();	
 
       data.addListener(this);
@@ -67,7 +69,6 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
       addMouseListener(this);
       addKeyListener(this);
 
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       area = new JTextArea();
       area.setCursor( Cursor.getPredefinedCursor( Cursor.TEXT_CURSOR));
       area.setEditable(true);
@@ -99,6 +100,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     public void objectAdded(Object spec, int index) 
     {
 	setSize(300, getSize().height+20);
+	setPreferredSize(new Dimension(300, getPreferredSize().height+20));
 	select((TrackEvent)spec, index, 0);
 	repaint();
     }
@@ -135,30 +137,45 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	g.setColor(Color.white);
 	g.fillRect(0, 0, r.width, r.height);
 
-	if(currentIndex!=-1)
-	{
-	  g.setColor(SequencePanel.violetColor.brighter());
-	  g.fillRect(0, (currentIndex)*ystep+1, r.width, ystep-1);
-	}
+	drawSelection(g, r);
 
 	g.setColor(Color.black);
-	int y = ystep;	    
-	for(Enumeration e = data.getEvents(); e.hasMoreElements();)
-	{
-	    evt = (TrackEvent) e.nextElement();
+	
+	int first = firstIndexVisible();
+	int last = lastIndexVisible();
 
-	    g.drawString(""+numberFormat.format(evt.getTime()), 5, y-2);
-	    g.drawString(""+((Integer)evt.getProperty("pitch")).intValue(), 5+xstep, y-2);
-	    g.drawString(""+((Integer)evt.getProperty("duration")).intValue(), 5+2*xstep, y-2);
+	int y = ystep*(first+1);	    
 
-	    y = y+ystep;
-	}
-
+	for(Enumeration e = data.getEvents(first, last); e.hasMoreElements();)
+	    {
+		evt = (TrackEvent) e.nextElement();
+	  
+		g.drawString(""+numberFormat.format(evt.getTime()), 5, y-2);
+		g.drawString(""+((Integer)evt.getProperty("pitch")).intValue(), 5+xstep, y-2);
+		g.drawString(""+((Integer)evt.getProperty("duration")).intValue(), 5+2*xstep, y-2);	  
+		
+		y = y+ystep;
+	    }
+	  
 	g.setColor(Color.lightGray);
-	for(int i=1; i<data.length();i++)
-	    g.drawLine(5, (ystep)*i, 5+r.width, (ystep)*i);
+
+	for(int i = first+1; i <= last;i++)
+	  g.drawLine(5, (ystep)*i, 5+r.width, (ystep)*i);
     }
    
+    void drawSelection(Graphics g, Rectangle r)
+    {
+	int index;
+	TrackEvent evt;
+	g.setColor(SequencePanel.violetColor.brighter());
+	for(Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
+	    {
+		evt = (TrackEvent) e.nextElement();
+		index = data.indexOf(evt);
+		g.fillRect(0, (index)*ystep+1, r.width, ystep-1);
+	    }
+    }
+
     int getEventIndex(int y)
     {
 	int index = y/ystep;
@@ -172,6 +189,17 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	if(index > 2) index = 2;
 	return index;
     }
+
+    int firstIndexVisible()
+    {
+	return getEventIndex(container.getVisibleRect().y);
+    }
+    int lastIndexVisible()
+    {
+	Rectangle r = container.getVisibleRect();
+	return getEventIndex(r.y+r.height+3*ystep);
+    }
+
     public void mouseClicked(MouseEvent e){}
     public void mousePressed(MouseEvent e)
     {
@@ -186,14 +214,26 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	if(data.length()!=0)
 	    {
 		index = getEventIndex(y);
-		if(index==currentIndex)//already selected
-		    {
-			currentParamInEvent = getEventParamIndex(x);		
-			doEdit(index, currentParamInEvent, currentEvent);
-		    }
+		evt = data.getEventAt(index);
+		if(SequenceSelection.getCurrent().isInSelection(evt))
+		{
+		    if(!e.isShiftDown())
+			{
+			    if(isEditing) endEdit();
+			    select(evt, index, getEventParamIndex(x));
+			    doEdit(index, currentParamInEvent, currentEvent);			    
+			}
+		    else
+			{
+			    if(isEditing) endEdit();
+			    SequenceSelection.getCurrent().deSelect(evt);
+			}
+		}
 		else
 		    {
-			SequenceSelection.getCurrent().deselectAll();
+			if(isEditing) endEdit();
+			if(!e.isShiftDown())
+			    SequenceSelection.getCurrent().deselectAll();
 			SequenceSelection.getCurrent().select(data.getEventAt(index));
 		    }
 	    }
@@ -202,6 +242,15 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     public void mouseEntered(MouseEvent e){}
     public void mouseExited(MouseEvent e){}
     
+    protected void processMouseEvent(MouseEvent e)
+    {
+	if (e.isPopupTrigger()) 
+	    {
+		popupx = e.getX();
+		popupy = e.getY();
+	    }
+	super.processMouseEvent(e);
+    }
 
     public void addListListener(TrackListListener listener)
     {
@@ -250,22 +299,34 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     //listSelectionListener interface
     public void valueChanged(ListSelectionEvent e)
     {
-	TrackEvent evt;
+	TrackEvent evt = null;
 	int index, size;
 	size = SequenceSelection.getCurrent().size();
-
+	
 	if(size==1)
-	{
-	  evt = (TrackEvent)SequenceSelection.getCurrent().getSelected().nextElement();
-	  index = data.indexOf(evt);
-	  if(index!=currentIndex)
-	    select(evt, index, currentParamInEvent);
-	}
-	else deselect(currentEvent, currentIndex);
+	    {
+		evt = (TrackEvent)SequenceSelection.getCurrent().getSelected().nextElement();
+		index = data.indexOf(evt);
+		
+		if(index!=currentIndex)
+		    select(evt, index, currentParamInEvent);
+	    }
+	else
+	    {
+		evt = SequenceSelection.getCurrent().getLastSelectedEvent();
+		requestFocus();
+		if(evt != null)
+		    {
+			requestFocus();
+			index = data.indexOf(evt);
+			select(evt, index, currentParamInEvent);
+		    }
+	    }	
     }
 
     void doEdit(int index, int param, TrackEvent evt)
     {
+	isEditing = true;
 	area.setBounds(xstep*param+1, index*ystep+2, xstep, ystep-4);
 	area.requestFocus();
 	switch(param)
@@ -287,6 +348,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	area.setText("");
 	area.setVisible(false);
 	requestFocus();
+	isEditing = false;
     }
 
     void setEventValue()
@@ -357,7 +419,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	    {
 		if(index>0)
 		    {
-			SequenceSelection.getCurrent().deselectAll();
+			if(!e.isShiftDown())
+			    SequenceSelection.getCurrent().deselectAll();
 			SequenceSelection.getCurrent().select(data.getEventAt(index-1));
 		    }
 	    }
@@ -366,7 +429,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		    {
 			if(index<data.length()-1)
 			    {
-				SequenceSelection.getCurrent().deselectAll();
+				if(!e.isShiftDown())
+				    SequenceSelection.getCurrent().deselectAll();
 				SequenceSelection.getCurrent().select(data.getEventAt(index+1));
 			    }
 		    }
@@ -376,36 +440,49 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
     public void removeSelection()
     {
-	if(currentEvent!=null)
-	    data.removeEvent(currentEvent);
+	MaxVector v = new MaxVector();
+	// copy the selected elements in another MaxVector (cannot remove
+	// elements of a Vector inside a loop based on an enumeration of this vector, it simply does'nt work...)
+	for (Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
+	    v.addElement(e.nextElement());
+	    
+	// remove them
+	for (int i = 0; i< v.size(); i++)
+	    data.removeEvent((TrackEvent)(v.elementAt(i)));
+	v = null;
     }
 
-    public void addAfterSelection()
+    public void addAfter()
     {
-	if(currentEvent!=null)
-	    {
-		
-		/*TrackEvent aEvent = new TrackEvent((EventValue) currentEvent.getValue().getValueInfo().newInstance());						
-		  aEvent.setTime(currentEvent.getTime());
-		  aEvent.setProperty("duration", currentEvent.getProperty("duration"));
-		  aEvent.setProperty("pitch", currentEvent.getProperty("pitch"));
-		  data.addEvent(aEvent);*/
-	    }
-    }
+	int index = getEventIndex(popupy);
+	if(index<0) return;
 
+	TrackEvent popupEvent = data.getEventAt(index);  
+	if(popupEvent!=null)
+	    ((FtsTrackObject)data).requestEventCreation((float)popupEvent.getTime(), 
+				      popupEvent.getValue().getValueInfo().getName(), 
+				      popupEvent.getValue().getPropertyCount(), 
+				      popupEvent.getValue().getPropertyValues());
+    }
 
     final public static int xstep = 100;
     final public static int ystep = 20;
     TrackDataModel data;
     Track track;
+    ListContainer container;
     TrackEvent currentEvent = null;
     int currentIndex = -1;
+    Vector selectedIndexVector = new Vector();
+
     int currentParamInEvent = 0;
 
     Rectangle selRect = new Rectangle();
     Vector listeners = new Vector();
 
     JTextArea area;
+    boolean isEditing = false;
+
+    private int popupx, popupy;
 
     static public NumberFormat numberFormat;
     static 

@@ -27,6 +27,7 @@ package ircam.jmax.editors.sequence.renderers;
 
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.Event;
 
 import ircam.jmax.toolkit.*;
 
@@ -64,16 +65,13 @@ public class IntegerEventRenderer implements ObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-    TrackEvent e = (TrackEvent) obj;
+    Event e = (Event) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int x = gc.getAdapter().getX(e);
-    int heigth = gc.getAdapter().getHeigth(e);
-    int y =  (heigth > 0 )? (gc.getGraphicDestination().getSize().height/2 - gc.getAdapter().getHeigth(e))
-	                  : gc.getGraphicDestination().getSize().height/2;
+    int y = gc.getAdapter().getY(e);    
+    int heigth = gc.getAdapter().getHeigth(e);    
     int lenght = gc.getAdapter().getLenght(e); //fixed length
-
-    heigth = (heigth > 0)?heigth:-heigth;
 
     if (selected) 
 	g.setColor(Color.red);
@@ -82,7 +80,6 @@ public class IntegerEventRenderer implements ObjectRenderer {
 
     //event's Rectangle
     g.fillRect(x, y, lenght, heigth);
-
   }
   
   /**
@@ -98,13 +95,14 @@ public class IntegerEventRenderer implements ObjectRenderer {
    */
   public boolean contains(Object obj, int x, int y, GraphicContext theGc) 
   {
-    TrackEvent e = (TrackEvent) obj;
+    Event e = (Event) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
+    int evty = gc.getAdapter().getY(e);    
     int evtheigth = gc.getAdapter().getHeigth(e);
-    int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
-	                                          : gc.getGraphicDestination().getSize().height/2;
+    //int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
+    //	                                          : gc.getGraphicDestination().getSize().height/2;
     int evtlenght = gc.getAdapter().getLenght(e);
 
     evtheigth = (evtheigth > 0)? evtheigth : -evtheigth;
@@ -129,19 +127,21 @@ public class IntegerEventRenderer implements ObjectRenderer {
    */
   public boolean touches(Object obj, int x, int y, int w, int h, GraphicContext theGc) 
   {
-    TrackEvent e = (TrackEvent) obj;
+    Event e = (Event) obj;
     SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
+    int evty = gc.getAdapter().getY(e);    
     int evtheigth = gc.getAdapter().getHeigth(e);
-    int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
-	                                          : gc.getGraphicDestination().getSize().height/2;
+    //int evty = (gc.getAdapter().getHeigth(e) > 0) ? gc.getGraphicDestination().getSize().height/2 - evtheigth
+    //                                          : gc.getGraphicDestination().getSize().height/2;
     int evtlenght = gc.getAdapter().getLenght(e);
 
     evtheigth = (evtheigth > 0)? evtheigth:-evtheigth;
 
     eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
     tempRect.setBounds(x, y, w, h);
+
     return  eventRect.intersects(tempRect);
 
   }
@@ -159,5 +159,5 @@ public class IntegerEventRenderer implements ObjectRenderer {
 
     SequenceGraphicContext gc;
     public static IntegerEventRenderer staticInstance;
- 
+    public final static int INTEGER_WIDTH = 2;
 }

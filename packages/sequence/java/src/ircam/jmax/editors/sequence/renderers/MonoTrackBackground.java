@@ -82,17 +82,19 @@ public class MonoTrackBackground implements Layer{
     g.fillRect(0, 0, w, h);
 
     g.setColor(Color.black);
-    g.drawLine(0, h/2, w, h/2);
+
+    int y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
+    g.drawLine(0, y0, w, y0);
+    //vertical line at time 0
+    g.drawLine(PartitionBackground.KEYEND, 0, PartitionBackground.KEYEND, h);
   }
 
   private void drawVerticalGrid(Graphics g, int w, int h)
   {
-    AmbitusValue value = new AmbitusValue();
-    UtilTrackEvent tempEvent = new UtilTrackEvent(value);
+    UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
     int windowTime = (int)(gc.getAdapter().getInvX(w) - gc.getAdapter().getInvX(KEYEND)) - 1 ;
     int timeStep;
-    
-	
+    	
     timeStep = findBestTimeStep(windowTime);
 	
     g.setColor(Color.lightGray);
@@ -100,7 +102,7 @@ public class MonoTrackBackground implements Layer{
     int xPosition;
     int snappedTime;
     
-    for (int i=gc.getLogicalTime(); i<gc.getLogicalTime()+windowTime; i+=timeStep) 
+    for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
     {
       snappedTime = (i/timeStep)*timeStep;
       tempEvent.setTime(snappedTime);

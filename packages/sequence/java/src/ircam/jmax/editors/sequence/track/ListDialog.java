@@ -11,7 +11,7 @@ import ircam.jmax.editors.sequence.menus.*;
  * This dialog sets the "integer" property of the client TrackEvent.
  * */
 
-class ListDialog extends JDialog implements TrackDataListener, TrackListListener, PopupProvider{
+class ListDialog extends JDialog implements TrackDataListener, TrackListListener, PopupProvider, ListContainer{
     
     ListDialog(Track track, Frame frame)
     {
@@ -32,7 +32,7 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 
 	panel.add(labelPanel);
 	
-	list = new ListPanel(track, this);
+	list = new ListPanel(track, this, this);
 	scroll = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 					     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	scroll.setBackground(Color.white);
@@ -103,6 +103,18 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
     {
 	ListPopupMenu.update(list);
 	return ListPopupMenu.getInstance();
+    }
+    /**
+     * ListContainer interface
+     */
+    public boolean isVisible(int y)
+    {
+	Rectangle r = scroll.getViewport().getViewRect();
+	return ((y >= r.y)&&(y <= r.y +r.height));
+    }
+    public Rectangle getVisibleRect()
+    {
+      return scroll.getViewport().getViewRect();
     }
 
     Track track;
