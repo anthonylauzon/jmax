@@ -145,29 +145,32 @@ static int
 mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
 {
   int n = 0;
-
+  
   if(obj)
+  {
+    int ac = fts_object_get_description_size( obj);
+    const fts_atom_t *at = fts_object_get_description_atoms( obj);
+    
+    if(ac > 0)
     {
-      int ac = fts_object_get_description_size( obj);
-      const fts_atom_t *at = fts_object_get_description_atoms( obj);
-
-      if(ac > 0)
+      if (ac > 1)
+      {
+	if(fts_is_symbol(at + 1) && fts_get_symbol(at + 1) == fts_s_colon)
 	{
-	  if(fts_is_symbol(at + 1) && fts_get_symbol(at + 1) == fts_s_colon)
-	    {
-	      ac -= 2;
-	      at += 2;
-	    }
-	  
-	  n = mempost( pp, psize, offset, "(:");
-	  n += mempost_atoms( pp, psize, offset + n, ac, at);
-	  n += mempost( pp, psize, offset + n, ")");
+	  ac -= 2;
+	  at += 2;
 	}
-      else if(fts_object_get_class_name(obj) != NULL)
-	n = mempost( pp, psize, offset, "(:%s)", fts_object_get_class_name(obj));
-      else
-	n = mempost( pp, psize, offset, "(:\?\?\?)");
+      }
+      
+      n = mempost( pp, psize, offset, "(:");
+      n += mempost_atoms( pp, psize, offset + n, ac, at);
+      n += mempost( pp, psize, offset + n, ")");
     }
+    else if(fts_object_get_class_name(obj) != NULL)
+      n = mempost( pp, psize, offset, "(:%s)", fts_object_get_class_name(obj));
+    else
+      n = mempost( pp, psize, offset, "(:\?\?\?)");
+  }
   else
     n = mempost( pp, psize, offset, "<null object>");
   
@@ -732,3 +735,9 @@ void fts_kernel_post_init( void)
   init_punctuation();
 }
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
