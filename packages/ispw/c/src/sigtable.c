@@ -302,33 +302,30 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     {
       /* FIXME: sample rate conversion!!! */
       fts_audiofile_t* af = fts_audiofile_open_read(file_name);
+      int n_samples;
 	
-      if (!fts_audiofile_valid(af)) 
+      if (!fts_audiofile_is_valid(af)) 
 	{
-	  post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);
+	  post("table~: %s: can't open soundfile to read \"%s\"\n", this->name, file_name);	
+	  fts_audiofile_close(af);
 	  return;
 	}
 
       if (fts_audiofile_seek(af, n_onset) != 0) 
 	{
 	  post("table~: %s: can't seek position in file \"%s\"\n", this->name, file_name);
-	  fts_audiofile_delete(af);
+	  fts_audiofile_close(af);
 	  return;
 	}
 
-      if (fts_audiofile_valid(af))
-	{
-	  int n_samples = fts_audiofile_read(af, &buf, 1, size);
-	
-	  fts_audiofile_delete(af);
-	
-	  if(n_samples > 0)
-	    fts_outlet_int(o, 0, n_samples);
-	  else
-	    post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);      
-	}
+      n_samples = fts_audiofile_read(af, &buf, 1, size);
+      
+      fts_audiofile_close(af);
+      
+      if(n_samples > 0)
+	fts_outlet_int(o, 0, n_samples);
       else
-	post("table~: %s: can't open soundfile to read \"%s\"\n", this->name, file_name);	
+	post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);      
     }
 }
 
@@ -360,12 +357,12 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(file_name)
     {
-      fts_audiofile_t *af = fts_audiofile_open_write(file_name, sr, 1, format);
+      fts_audiofile_t *af = fts_audiofile_open_write(file_name, 1, sr, format);
       
-      if (fts_audiofile_valid(af))
+      if (fts_audiofile_is_valid(af))
 	{
 	  int n_samples = fts_audiofile_write(af, &buf, 1, n_save);
-	  fts_audiofile_delete(af);
+	  fts_audiofile_close(af);
 	  
 	  if(n_samples <= 0)
 	    post("table~: %s: can't save samples to file \"%s\"\n", this->name , file_name);

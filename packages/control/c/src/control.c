@@ -26,24 +26,38 @@
 
 #include "control.h"
 
+extern void sync_config(void);
+extern void tup_config(void);
+
 extern void switch_config(void);
 extern void oneshot_config(void);
 extern void demux_config(void);
+
 extern void for_config(void);
 extern void count_config(void);
+
 extern void range_config(void);
 extern void fit_config(void);
-extern void sync_config(void);
+
+extern void mess_config(void);
+extern void make_config(void);
 
 void
 control_config(void)
 {
+  sync_config();
+  tup_config();
+
   switch_config();
   oneshot_config();
   demux_config();
+
   for_config();
   count_config();
+
   range_config();
   fit_config();
-  sync_config();
+
+  mess_config();
+  make_config();
 }

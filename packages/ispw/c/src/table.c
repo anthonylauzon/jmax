@@ -279,7 +279,7 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   table_t *this = (table_t *)o;
   fts_atom_t a;
-  fts_object_t *obj;
+  fts_object_t *obj = 0;
   fts_symbol_t name = 0;
   int size = FTS_TABLE_DEFAULT_SIZE;
 

@@ -37,7 +37,5 @@ public class Qlist implements JMaxPackage {
       }; 
 
     JMaxClassMap.put( "qlist", qlistCreator, null, null, this);
-
-    System.out.println( "package QList loaded (Java Classes)");
   }
 }

@@ -35,26 +35,19 @@
 enum midi_type
 {
   midi_type_any = -1,
-  midi_type_note = 0,
-  midi_type_poly_pressure,
-  midi_type_control_change,
-  midi_type_program_change,
-  midi_type_channel_pressure,
-  midi_type_pitch_bend,
-  midi_type_system,
-  n_midi_types
-};
-
-enum midi_system_type
-{
-  midi_system_any = -1,
-  midi_system_exclusive = 0,
+  midi_note = 0,
+  midi_poly_pressure,
+  midi_control_change,
+  midi_program_change,
+  midi_channel_pressure,
+  midi_pitch_bend,
+  midi_system_exclusive,
   midi_time_code,
   midi_song_position_pointer,
   midi_song_select,
   midi_tune_request,
   midi_real_time,
-  n_midi_system_types
+  n_midi_types
 };
 
 enum midi_real_time_event
@@ -194,13 +187,13 @@ typedef struct fts_midievent
   fts_object_t head;
   
   enum midi_type type;
-  int id; /* channel or system type id */
 
   union {
 
     struct {
-      int first;
-      int second;
+      int channel; /* channel */
+      int first; /* first byte */
+      int second; /* second byte (optional) */
     } channel_message;
 
     fts_array_t system_exclusive; /* system exclusive message */
@@ -222,30 +215,27 @@ typedef struct fts_midievent
 } fts_midievent_t;
 
 #define fts_midievent_get_type(e) ((e)->type)
-#define fts_midievent_get_id(e) ((e)->id)
-
 #define fts_midievent_set_type(e, x) ((e)->type = (x))
-#define fts_midievent_set_id(e, x) ((e)->id = (x))
 
 /* channel events */
-#define fts_midievent_is_channel_message(e) ((e)->type <= midi_type_pitch_bend)
-#define fts_midievent_is_note(e) ((e)->type == midi_type_note)
-#define fts_midievent_is_poly_pressure(e) ((e)->type == midi_type_poly_pressure)
-#define fts_midievent_is_control_change(e) ((e)->type == midi_type_control_change)
-#define fts_midievent_is_program_change(e) ((e)->type == midi_type_program_change)
-#define fts_midievent_is_channel_pressure(e) ((e)->type == midi_type_channel_pressure)
-#define fts_midievent_is_pitch_bend(e) ((e)->type == midi_type_pitch_bend)
+#define fts_midievent_is_channel_message(e) ((e)->type <= midi_pitch_bend)
+#define fts_midievent_is_note(e) ((e)->type == midi_note)
+#define fts_midievent_is_poly_pressure(e) ((e)->type == midi_poly_pressure)
+#define fts_midievent_is_control_change(e) ((e)->type == midi_control_change)
+#define fts_midievent_is_program_change(e) ((e)->type == midi_program_change)
+#define fts_midievent_is_channel_pressure(e) ((e)->type == midi_channel_pressure)
+#define fts_midievent_is_pitch_bend(e) ((e)->type == midi_pitch_bend)
 
-#define fts_midievent_channel_message_get_channel(e) ((e)->id)
+#define fts_midievent_channel_message_get_channel(e) ((e)->data.channel_message.channel)
 #define fts_midievent_channel_message_get_first(e) ((e)->data.channel_message.first)
 #define fts_midievent_channel_message_get_second(e) ((e)->data.channel_message.second)
 
-#define fts_midievent_channel_message_set_channel(e, x) ((e)->id = (x))
+#define fts_midievent_channel_message_set_channel(e, x) ((e)->data.channel_message.channel = (x))
 #define fts_midievent_channel_message_set_first(e, x) ((e)->data.channel_message.first = (x))
 #define fts_midievent_channel_message_set_second(e, x) ((e)->data.channel_message.second = (x))
 
 #define fts_midievent_channel_message_has_second_byte(e)((e)->data.channel_message.second != MIDI_EMPTY_BYTE)
-#define fts_midievent_channel_message_get_status_byte(e) (144 + ((e)->type << 4) + (e)->id)
+#define fts_midievent_channel_message_get_status_byte(e) (144 + ((e)->type << 4) + (e)->data.channel_message.channel)
 
 FTS_API fts_midievent_t *fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, int byte2);
 FTS_API fts_midievent_t *fts_midievent_note_new(int channel, int note, int velocity);
@@ -262,10 +252,7 @@ FTS_API fts_midievent_t *fts_midievent_pitch_bend_new(int channel, int LSB, int 
 #define fts_is_midievent(ap) fts_is_a(ap, fts_s_midievent)
 
 /* system exclusive events */
-#define fts_midievent_is_system_exclusive(e) ((e)->type == midi_type_system && (e)->id == midi_system_exclusive)
-
-#define fts_midievent_system_get_type(e) ((e)->id)
-#define fts_midievent_system_set_type(e, x) ((e)->id = (x))
+#define fts_midievent_is_system_exclusive(e) ((e)->type == midi_system_exclusive)
 
 #define fts_midievent_system_exclusive_get_size(e) (fts_array_get_size(&(e)->data.system_exclusive))
 #define fts_midievent_system_exclusive_get_atoms(e) (fts_array_get_atoms(&(e)->data.system_exclusive))
@@ -274,7 +261,7 @@ FTS_API fts_midievent_t *fts_midievent_system_exclusive_new(void);
 FTS_API void fts_midievent_system_exclusive_append(fts_midievent_t *event, int byte);
 
 /* time code events */
-#define fts_midievent_is_time_code(e) ((e)->type == midi_type_system && (e)->id == midi_time_code)
+#define fts_midievent_is_time_code(e) ((e)->type == midi_time_code)
 
 #define fts_midievent_time_code_get_type(e) ((e)->data.time_code.type)
 #define fts_midievent_time_code_get_hour(e) ((e)->data.time_code.hour)
@@ -297,10 +284,10 @@ FTS_API void fts_midievent_system_exclusive_append(fts_midievent_t *event, int b
 FTS_API fts_midievent_t *fts_midievent_time_code_new(int type, int hour, int minute, int second, int frame);
 
 /* system real-time events */
-#define fts_midievent_is_real_time(e) ((e)->type == midi_type_system && (e)->id == midi_real_time)
+#define fts_midievent_is_real_time(e) ((e)->type == midi_real_time)
 #define fts_midievent_real_time_get(e) ((e)->data.real_time)
 #define fts_midievent_real_time_set(e, x) ((e)->data.real_time = (x))
-#define fts_midievent_real_time_get_status_byte(e) (248 + (e)->id)
+#define fts_midievent_real_time_get_status_byte(e) (248 + (e)->data.real_time)
 
 FTS_API fts_midievent_t *fts_midievent_real_time_new(enum midi_real_time_event tag);
 
@@ -310,7 +297,7 @@ FTS_API fts_midievent_t *fts_midievent_real_time_new(enum midi_real_time_event t
 #define fts_midievent_song_select_get(e) ((e)->data.song_select)
 #define fts_midievent_song_select_set(e, x) ((e)->data.song_select = (x))
 
-FTS_API fts_class_t *midievent_class;
+FTS_API fts_metaclass_t *fts_midievent_type;
 FTS_API fts_symbol_t fts_s_midievent;
 
 /****************************************************

@@ -1,3 +1,10 @@
+2002-03-27  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* reintroduced midievent from 3.0.x branch
+	* added classes control/dispatch.c control/make.c control/mess.c control/tup.c 
+	* minor changes in fts/audiofile.c
+	* adapted fvec.c (table~ and tab1~ to be tested!)
+
 2002-03-15  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fixed audio on Mac OS X and added time-constrainted scheduling
@@ -5,6 +12,7 @@
 2002-03-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* removed class name from class instantiation functions in class.c and all objects
+	* fts_object_create() now works with metaclass
 	* bug fix in object redefinition and metro (crashed when redefined while running)
 	* removed math package from compilation
 

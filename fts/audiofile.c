@@ -20,54 +20,28 @@
  * 
  */
 
+#include <string.h>
 #include <fts/fts.h>
-#include <ftsconfig.h>
 
-#define fts_audiofile_loader_open_write(_f)      (*fts_audiofile_loader->open_write)(_f)
-#define fts_audiofile_loader_open_read(_f)       (*fts_audiofile_loader->open_read)(_f)
+/* sample formats */
+fts_symbol_t fts_s_int8;
+fts_symbol_t fts_s_int16;
+fts_symbol_t fts_s_int24;
+fts_symbol_t fts_s_int32;
+fts_symbol_t fts_s_uint8;
+fts_symbol_t fts_s_uint16;
+fts_symbol_t fts_s_uint24;
+fts_symbol_t fts_s_uint32;
+fts_symbol_t fts_s_float32;
+fts_symbol_t fts_s_float64;
 
-static fts_status_t fts_audiofile_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
-static void fts_audiofile_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_audiofile_destroy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
-/* FIXME: TEST_READ */
-/*  #define TEST_READ 1 */
-/*  #define NUM_CHAN  16 */
-#if TEST_READ
-static void fts_audiofile_put_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_audiofile_ftl_read(fts_word_t *argv)
-#elif TEST_WRITE
-static void fts_audiofile_put_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void fts_audiofile_ftl_write(fts_word_t *argv);
-#endif
-
-/*******************************************************
- *
- * Global variables
- *
- */
+/* file formats */
+fts_symbol_t fts_s_aiff;
+fts_symbol_t fts_s_wav;
+fts_symbol_t fts_s_snd;
+fts_symbol_t fts_s_raw;
 
 fts_audiofile_loader_t* fts_audiofile_loader = NULL;
-static fts_metaclass_t *fts_audiofile_type = NULL;
-
-/*******************************************************
- *
- * Module configuration
- *
- */
-
-void 
-fts_kernel_audiofile_init(void)
-{
-  fts_s_audiofile = fts_new_symbol("audiofile");
-  fts_audiofile_type = fts_class_install(fts_s_audiofile, fts_audiofile_instantiate);
-}
-
-/*******************************************************
- *
- * Audio file loader
- *
- */
 
 int 
 fts_audiofile_set_loader(char* name, fts_audiofile_loader_t* loader)
@@ -77,252 +51,182 @@ fts_audiofile_set_loader(char* name, fts_audiofile_loader_t* loader)
   return 0;
 }
 
-/*******************************************************
- *
- * Audio file class
- *
- */
-
-static fts_status_t
-fts_audiofile_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+void
+fts_audiofile_set_file_format_by_suffix(fts_audiofile_t* aufile, fts_symbol_t suffix)
 {
-  int i;
-
-#ifdef TEST_READ
-  fts_class_init(cl, sizeof(fts_audiofile_t), 0, NUM_CHAN, 0);
-#elif TEST_WRITE
-  fts_class_init(cl, sizeof(fts_audiofile_t), NUM_CHAN, 0, 0);
-#else
-  fts_class_init(cl, sizeof(fts_audiofile_t), 0, 0, 0);
-#endif
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_audiofile_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_audiofile_destroy);
-
-#ifdef TEST_READ
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, fts_audiofile_put_read);
-  fts_dsp_declare_function(fts_s_audiofile, fts_audiofile_ftl_read);
-  for (i = 0; i < NUM_CHAN; i++) {
-    fts_dsp_declare_outlet(cl, i);
-  }
-#elif TEST_WRITE
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, fts_audiofile_put_write);
-  fts_dsp_declare_function(fts_s_audiofile, fts_audiofile_ftl_write);
-  for (i = 0; i < NUM_CHAN; i++) {
-    fts_dsp_declare_inlet(cl, i);
-  }
-#endif
-
-  return fts_Success;
+  if(suffix == fts_s_aiff)
+    aufile->file_format = audiofile_aiff;
+  else if(suffix == fts_s_wav)
+    aufile->file_format = audiofile_wave;
+  else if(suffix == fts_s_snd)
+    aufile->file_format = audiofile_snd;
+  else
+    aufile->file_format = audiofile_file_format_null;
 }
 
-
-/*******************************************************
- *
- * Audio file constructor/deconstructor
- *
- */
-
-static void 
-fts_audiofile_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+void
+fts_audiofile_set_sample_format_by_name(fts_audiofile_t* aufile, fts_symbol_t name)
 {
-  fts_audiofile_t* aufile = (fts_audiofile_t *)o;
+  if(name == fts_s_int8)
+    {
+      aufile->sample_format = audiofile_int8;
+      aufile->bytes_per_sample = 1;
+    }
+  else if(name == fts_s_int16)
+    {
+      aufile->sample_format = audiofile_int16;
+      aufile->bytes_per_sample = 2;
+    }
+  else if(name == fts_s_int24)
+    {
+      aufile->sample_format = audiofile_int24;
+      aufile->bytes_per_sample = 3;
+    }
+  else if(name == fts_s_int32)
+    {
+      aufile->sample_format = audiofile_int32;
+      aufile->bytes_per_sample = 4;
+    }
+  else if(name == fts_s_uint8)
+    {
+      aufile->sample_format = audiofile_uint8;
+      aufile->bytes_per_sample = 1;
+    }
+  else if(name == fts_s_uint16)
+    {
+      aufile->sample_format = audiofile_uint16;
+      aufile->bytes_per_sample = 2;
+    }
+  else if(name == fts_s_uint24)
+    {
+      aufile->sample_format = audiofile_uint24;
+      aufile->bytes_per_sample = 3;
+    }
+  else if(name == fts_s_uint32)
+    {
+      aufile->sample_format = audiofile_uint32;
+      aufile->bytes_per_sample = 4;
+    }
+  else if(name == fts_s_float32)
+    {
+      aufile->sample_format = audiofile_float32;
+      aufile->bytes_per_sample = 4;
+    }
+  else if(name == fts_s_float64)
+    {
+      aufile->sample_format = audiofile_float64;
+      aufile->bytes_per_sample = 8;
+    }
+  else
+    {
+      aufile->sample_format = audiofile_sample_format_null;
+      aufile->bytes_per_sample = 0;
+    }
+}
 
-  ac--;
-  at++;
+static fts_audiofile_t *
+audiofile_new(fts_symbol_t filename, fts_symbol_t mode)
+{
+  fts_audiofile_t *aufile = (fts_audiofile_t *)fts_malloc(sizeof(fts_audiofile_t));
 
-  if (fts_audiofile_loader == NULL) {
-    fts_object_set_error(o, "No audio file loader has been installed");
-    return;
-  }
+  aufile->filename = filename;
+  aufile->mode = mode;
 
-#if defined(TEST_READ) || defined(TEST_WRITE)
-  /* FIXME: if the audiofile object is an error object (e.g. because
-     file not found), it isn't destroyed when the init params are
-     changed (e.g. filename has been edited). instead it is
-     initialized twice and added to the dsp twice!!! */
-/*    fts_dsp_add_object(o); */
-#endif
-
-  aufile->filename = NULL;
-  aufile->sample_rate = 0;
   aufile->channels = 0;
-  aufile->format = 0;
+  aufile->sample_rate = 0;
+  aufile->sample_format = audiofile_sample_format_null;
+  aufile->bytes_per_sample = 0;
+  aufile->file_format = audiofile_file_format_null;
+  aufile->frames = 0;
+  
   aufile->handle = NULL;
+  aufile->error = NULL;
 
-  if (ac == 1) {
-
-    /* open a new audio file for reading */
-
-    if (!fts_is_symbol(at)) { 
-      fts_object_set_error(o, "First argument should be a filename");
-      return;
-    }
-
-    aufile->filename = fts_get_symbol(at);
-    
-    if (fts_audiofile_loader_open_read(aufile) != 0) {
-      fts_object_set_error(o, fts_audiofile_error(aufile)); 
-      return;
-    }
-
-#if defined(TEST_READ)
-    fts_dsp_add_object(o);
-#endif
-    
-  } else if (ac == 4) {
-
-    /* open a new audio file for writing */
-
-    if (!fts_is_symbol(at)) { 
-      fts_object_set_error(o, "First argument should be a filename");
-      return;
-    }
-    if (!fts_is_int(at + 1)) { 
-      fts_object_set_error(o, "Second argument should be the sample rate as integer");
-      return;
-    }
-    if (!fts_is_int(at + 2)) { 
-      fts_object_set_error(o, "Third argument should be the number of channels as integer");
-      return;
-    }
-    if (!fts_is_symbol(at + 3)) { 
-      fts_object_set_error(o, "Fourth argument should be the sample format");
-      return;
-    }
-
-    aufile->filename = fts_get_symbol(at); 
-    aufile->sample_rate = fts_get_int(at + 1);
-    aufile->channels = fts_get_int(at + 2);
-    aufile->format = fts_get_symbol(at + 3);
-
-    if (fts_audiofile_loader_open_write(aufile) != 0) {
-      fts_object_set_error(o, fts_audiofile_error(aufile));      
-      return;
-    }
-
-#if defined(TEST_WRITE)
-    fts_dsp_add_object(o);
-#endif
-
-  } else {
-    fts_object_set_error(o, "Wrong number of arguments");
-  }
+  return aufile;
 }
 
-static void 
-fts_audiofile_destroy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_audiofile_t* aufile = (fts_audiofile_t *)o;
-  fts_audiofile_close(aufile);
-
-#if defined(TEST_READ) || defined(TEST_WRITE)
-  fts_dsp_remove_object(o);
-#endif
-}
-
-
-/*******************************************************
- *
- * Audio file methods
- *
- */
-fts_audiofile_t* 
-fts_audiofile_open_write(fts_symbol_t  filename, int sample_rate, int channels, fts_symbol_t sample_format)
-{
-  fts_atom_t a[4];
-
-  fts_set_symbol(&a[0], fts_new_symbol(filename));
-  fts_set_int(&a[1], sample_rate);
-  fts_set_int(&a[2], channels);
-  fts_set_symbol(&a[3], fts_new_symbol(sample_format));
-
-  return (fts_audiofile_t *) fts_object_create(fts_audiofile_type, 4, a);
-}
-
-fts_audiofile_t* 
+fts_audiofile_t *
 fts_audiofile_open_read(fts_symbol_t filename)
 {
-  fts_atom_t a[1];
-  fts_set_symbol(&a[0], fts_new_symbol(filename));
-  return (fts_audiofile_t *) fts_object_create(fts_audiofile_type, 1, a);
+  if (fts_audiofile_loader != NULL) 
+    {
+      fts_audiofile_t *aufile = audiofile_new(filename, fts_s_read);
+      
+      /* open file */
+      fts_audiofile_loader->open_read(aufile);
+
+      /* allocate buffer with default length */
+      fts_audiofile_loader->buffer_length(aufile, 0);
+
+      return aufile;
+    }
+  else
+    {
+      fts_log("[audiofile] trying to open audiofile without loader set");
+      return NULL;
+    }
+}
+
+fts_audiofile_t * 
+fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, fts_symbol_t sample_format)
+{
+  if (fts_audiofile_loader != NULL) 
+    {
+      fts_audiofile_t *aufile = audiofile_new(filename, fts_s_write);
+      char *suffix = strrchr(filename, '.');
+
+      aufile->channels = channels;
+      aufile->sample_rate = sample_rate;
+      
+      if(suffix != NULL)
+	fts_audiofile_set_file_format_by_suffix(aufile, fts_new_symbol_copy(suffix + 1));
+      else
+	fts_audiofile_set_file_format_by_suffix(aufile, 0);
+
+      /* open file */
+      fts_audiofile_loader->open_write(aufile);
+      
+      /* allocate buffer with default length */
+      fts_audiofile_loader->buffer_length(aufile, 0);
+
+      return aufile;
+    }
+  else
+    {
+      fts_log("[audiofile] trying to open audiofile without loader set");
+      return NULL;
+    }
 }
 
 void 
-fts_audiofile_delete(fts_audiofile_t* aufile)
+fts_audiofile_close(fts_audiofile_t* aufile)
 {
-  fts_object_destroy( (fts_object_t*) aufile);
+  if(fts_audiofile_loader != NULL)
+    {
+      if(aufile)
+	{
+	  fts_audiofile_loader->close(aufile);
+	  fts_free(aufile);
+	}
+    }
 }
 
-#if TEST_READ
-
-void
-fts_audiofile_put_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+void 
+fts_kernel_audiofile_init(void)
 {
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  fts_atom_t a[2 + NUM_CHAN];
-  int i;
+  fts_s_int8 = fts_new_symbol("int8");
+  fts_s_int16 = fts_new_symbol("int16");
+  fts_s_int24 = fts_new_symbol("int24");
+  fts_s_int32 = fts_new_symbol("int32");
+  fts_s_uint8 = fts_new_symbol("uint8");
+  fts_s_uint16 = fts_new_symbol("uint16");
+  fts_s_uint24 = fts_new_symbol("uint24");
+  fts_s_uint32 = fts_new_symbol("uint32");
+  fts_s_float32 = fts_new_symbol("float32");
+  fts_s_float64 = fts_new_symbol("float64");
 
-  fts_set_pointer(a + 0, o);
-  fts_set_int(a + 1, fts_dsp_get_output_size(dsp, 0));
-
-  for (i = 0; i < NUM_CHAN; i++) {
-    fts_set_symbol(a + 2 + i, fts_dsp_get_output_name(dsp, i));
-  }
-  
-  fts_dsp_add_function(fts_s_audiofile, 2 + NUM_CHAN, a);
+  fts_s_aiff = fts_new_symbol("aiff");
+  fts_s_wav = fts_new_symbol("wav");
+  fts_s_snd = fts_new_symbol("snd");
+  fts_s_raw = fts_new_symbol("raw");
 }
-
-void
-fts_audiofile_put_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  fts_atom_t a[2 + NUM_CHAN];
-  int i;
-
-  fts_set_pointer(a + 0, o);
-  fts_set_int(a + 1, fts_dsp_get_input_size(dsp, 0));
-
-  for (i = 0; i < NUM_CHAN; i++) {
-    fts_set_symbol(a + 2 + i, fts_dsp_get_input_name(dsp, i));
-  }
-  
-  fts_dsp_add_function(fts_s_audiofile, 2 + NUM_CHAN, a);
-}
-
-#endif
-
-
-#if TEST_WRITE
-
-static void
-fts_audiofile_ftl_read(fts_word_t *argv)
-{
-  fts_audiofile_t *this = (fts_audiofile_t *)fts_word_get_pointer(argv + 0);
-  int n = fts_word_get_int(argv + 1);
-  float* buf[NUM_CHAN];
-  int i;
-
-  for (i = 0; i < NUM_CHAN; i++) {
-    buf[i] = (float *)fts_word_get_pointer(argv + 2 + i);
-  }
-
-  fts_audiofile_read(this, &buf[0], NUM_CHAN, n); 
-}
-
-static void
-fts_audiofile_ftl_write(fts_word_t *argv)
-{
-  fts_audiofile_t *this = (fts_audiofile_t *)fts_word_get_pointer(argv + 0);
-  int n = fts_word_get_int(argv + 1);
-  float* buf[NUM_CHAN];
-  int i;
-
-  for (i = 0; i < NUM_CHAN; i++) {
-    buf[i] = (float *)fts_word_get_pointer(argv + 2 + i);
-  }
-
-  fts_audiofile_write(this, &buf[0], NUM_CHAN, n); 
-}
-
-#endif

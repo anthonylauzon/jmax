@@ -210,7 +210,7 @@ fvec_grow(fvec_t *vec, int size)
 int 
 fvec_read_atom_file(fvec_t *vec, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
   int n = 0;
   fts_atom_t a;
   char c;
@@ -246,7 +246,7 @@ fvec_write_atom_file(fvec_t *vec, fts_symbol_t file_name)
   int size = fvec_get_size(vec);
   int i;
 
-  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  file = fts_atom_file_open(file_name, "w");
 
   if(!file)
     return -1;
@@ -273,7 +273,7 @@ fvec_file_is_text( fts_symbol_t file_name)
   char buff[256];
   FILE* fd;
 
-  if (!fts_file_get_read_path( fts_symbol_name( file_name), full_path))
+  if (!fts_file_get_read_path(file_name, full_path))
      return 0;
 
   if ( (fd = fopen( full_path, "rb")) == NULL)
@@ -520,10 +520,10 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       if(size > 0)
 	fvec_output(o, 0, 0, 0, 0);
       else
-	post("fvec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
+	fts_object_signal_runtime_error(o, "can't import from text file \"%s\"\n", file_name);
     }
   else
-    post("fvec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
+    fts_object_signal_runtime_error(o, "unknown import file format \"%s\"\n", file_format);
 }
 
 static void
@@ -542,10 +542,10 @@ fvec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fvec_write_atom_file(this, file_name);
       
       if(size < 0)
-	post("fvec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
+	fts_object_signal_runtime_error(o, "can't export to text file \"%s\"\n", file_name);
     }
   else
-    post("fvec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
+    fts_object_signal_runtime_error(o, "export file format \"%s\"\n", file_format);
 }
 
 static void
@@ -584,22 +584,22 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  if(size > 0)
 	    fvec_output(o, 0, 0, 0, 0);
 	  else
-	    post("fvec: can't load from file \"%s\"\n", fts_symbol_name(file_name));	  
+	    fts_object_signal_runtime_error(o, "can't load from file \"%s\"\n", file_name);	  
 	}
       else
 	{
 	  /* FIXME: sample rate conversion!! */
 	  sf = fts_audiofile_open_read(file_name);
 	  
-	  if( fts_audiofile_valid(sf))
+	  if( fts_audiofile_is_valid(sf))
 	    {
 	      float file_sr;
 	      float *ptr;
 	    
-	      if (fts_audiofile_seek(sf, onset) != 0) 
+	      if (onset > 0 && fts_audiofile_seek(sf, onset) != 0) 
 		{
-		  post("fvec: can't seek position in file \"%s\"\n", fts_symbol_name(file_name));
-		  fts_audiofile_delete(sf);
+		  fts_object_signal_runtime_error(o, "can't seek position in file \"%s\"\n", file_name);
+		  fts_audiofile_close(sf);
 		  return;		  
 		}
 
@@ -614,21 +614,23 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	      else
 		/* get temporary sample rate from file */
 		this->sr = -file_sr;
-
 	      
 	      fvec_set_size(this, n_read);
 	      ptr = fvec_get_ptr(this);
 	    
 	      size = fts_audiofile_read(sf, &ptr, 1, n_read);
 	    
-	      fts_audiofile_delete(sf);
+	      fts_audiofile_close(sf);
 	      
 	      if(size > 0)
 		fvec_output(o, 0, 0, 0, 0);
 	      else
-		post("fvec: can't load from soundfile \"%s\"\n", fts_symbol_name(file_name));
-	    
-	      return;
+		fts_object_signal_runtime_error(o, "can't load from soundfile \"%s\"\n", file_name);
+	    }
+	  else
+	    {
+	      fts_object_signal_runtime_error(o, "can't open file \"%s\"\n", file_name);
+	      fts_audiofile_close(sf);
 	    }
 	}
     }
@@ -661,9 +663,9 @@ fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
       if(sr <= 0.0)
 	sr = fts_dsp_get_sample_rate();
     
-      sf = fts_audiofile_open_write(file_name, sr, 1, fts_s_16bits);
+      sf = fts_audiofile_open_write(file_name, 1, sr, fts_s_int16);
     
-      if( fts_audiofile_valid(sf))
+      if( fts_audiofile_is_valid(sf))
 	{
 	  float *ptr = fvec_get_ptr(this);
     
@@ -672,13 +674,16 @@ fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
     
 	  size = fts_audiofile_write(sf, &ptr, 1, n_write);
     
-	  fts_audiofile_delete(sf);
+	  fts_audiofile_close(sf);
     
 	  if(size <= 0)
-	    post("fvec: can't save to soundfile \"%s\"\n", fts_symbol_name(file_name));
+	    fts_object_signal_runtime_error(o, "can't save to soundfile \"%s\"\n", file_name);
 	}
       else
-	post("fvec: can't open soundfile to write \"%s\"\n", fts_symbol_name(file_name));
+	{
+	  fts_object_signal_runtime_error(o, "can't open soundfile to write \"%s\"\n", file_name);
+	  fts_audiofile_close(sf);
+	}
     }
 }
 
@@ -908,7 +913,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
 
       if(size == 0)
-	fts_object_set_error(o, "Cannot load fvec from file \"%s\"", fts_symbol_name(file_name));
+	fts_object_set_error(o, "Cannot load fvec from file \"%s\"", file_name);
 
       this->keep = fts_s_args;
     }

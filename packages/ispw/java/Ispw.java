@@ -37,7 +37,5 @@ public class Ispw implements JMaxPackage {
       }; 
 
     JMaxClassMap.put( "messbox", messageCreator, "/icons/messbox.gif", "/icons/messbox_cursor.gif", this);
-
-    System.out.println( "package: ispw (Java Classes)");
   }
 }

@@ -268,7 +268,7 @@ void post_atoms( int ac, const fts_atom_t *at)
  * Anyway, it does not hurt...
  */
 
-static double log_time;
+static double log_time = 0.0;
 static const char *log_file_name = NULL;
 static char *log_buffer = NULL;
 static int log_buffer_size;

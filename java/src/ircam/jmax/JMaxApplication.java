@@ -279,7 +279,7 @@ public class JMaxApplication extends FtsClient {
     initModules();
     openConsole();
     openConnection();
-    initConsole();
+    /*initConsole();*/
 
     // This should be really here, right before we eventually open command line documents
     recentFileHistory.load();
@@ -365,10 +365,6 @@ public class JMaxApplication extends FtsClient {
     else
       consoleWindow.getConsoleArea().append( "Output redirected to Java standard output");
     
-    System.out.println( "jMax copyright (C) 1994, 1995, 1998, 1999 IRCAM - Centre Georges Pompidou");
-    System.out.println( "jMax is free software with ABSOLUTELY NO WARRANTY.");
-    System.out.println( "(see file LICENSE for more details)");	
-
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
 	public String getToolName() { return "Console";}
 	public void open() { consoleWindow.toFront();}
@@ -487,6 +483,9 @@ public class JMaxApplication extends FtsClient {
 		}
 	    }
 	  });
+
+	
+	initConsole();
 
 	send( FtsSymbol.get( "get_packages"));
       }

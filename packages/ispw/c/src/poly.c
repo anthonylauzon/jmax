@@ -64,8 +64,8 @@ poly_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	{
 	  voice_t *von = 0;
 	  voice_t *voff = 0;
-	  long     ion;
-	  long     ioff;
+	  long ion = 0;
+	  long ioff = 0;
 
 	  for (i = 0, v = x->v; i < x->nvoice; i++, v++)
 	    {

@@ -533,30 +533,35 @@ void fts_patlex_next_token(fts_patlex_t *this)
 
 /* Local symbols */
 
-static fts_symbol_t fts_s_max;
-static fts_symbol_t fts_s_v2;
-static fts_symbol_t fts_s_diesN;
-static fts_symbol_t fts_s_diesn;
-static fts_symbol_t fts_s_diesP;
-static fts_symbol_t fts_s_diesp;
-static fts_symbol_t fts_s_diesT;
-static fts_symbol_t fts_s_diest;
-static fts_symbol_t fts_s_diesX;
-static fts_symbol_t fts_s_diesx;
-static fts_symbol_t fts_s_newex;
-static fts_symbol_t fts_s_newobj;
-static fts_symbol_t fts_s_vpatcher;
-static fts_symbol_t fts_s_vtable;
-static fts_symbol_t fts_s_slider;
-static fts_symbol_t fts_s_flonum;
-static fts_symbol_t fts_s_intbox;
-static fts_symbol_t fts_s_floatbox;
-static fts_symbol_t fts_s_messbox;
-static fts_symbol_t fts_s_button;
-static fts_symbol_t fts_s_toggle;
-static fts_symbol_t fts_s_connect;
-static fts_symbol_t fts_s_pop;
-static fts_symbol_t fts_s_load_init;
+static fts_symbol_t patlex_sym_max;
+static fts_symbol_t patlex_sym_v2;
+static fts_symbol_t patlex_sym_diesN;
+static fts_symbol_t patlex_sym_diesn;
+static fts_symbol_t patlex_sym_diesP;
+static fts_symbol_t patlex_sym_diesp;
+static fts_symbol_t patlex_sym_diesT;
+static fts_symbol_t patlex_sym_diest;
+static fts_symbol_t patlex_sym_diesX;
+static fts_symbol_t patlex_sym_diesx;
+static fts_symbol_t patlex_sym_newex;
+static fts_symbol_t patlex_sym_newobj;
+static fts_symbol_t patlex_sym_vpatcher;
+static fts_symbol_t patlex_sym_vtable;
+static fts_symbol_t patlex_sym_slider;
+static fts_symbol_t patlex_sym_flonum;
+static fts_symbol_t patlex_sym_intbox;
+static fts_symbol_t patlex_sym_floatbox;
+static fts_symbol_t patlex_sym_messbox;
+static fts_symbol_t patlex_sym_button;
+static fts_symbol_t patlex_sym_toggle;
+static fts_symbol_t patlex_sym_message;
+static fts_symbol_t patlex_sym_table;
+static fts_symbol_t patlex_sym_qlist;
+static fts_symbol_t patlex_sym_explode;
+static fts_symbol_t patlex_sym_connect;
+static fts_symbol_t patlex_sym_comment;
+static fts_symbol_t patlex_sym_pop;
+static fts_symbol_t patlex_sym_load_init;
 
 /* Forward declarations */
 
@@ -721,7 +726,7 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
 
       /* activate the post-load init, like loadbangs */
 
-      fts_send_message(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
+      fts_send_message(patcher, fts_SystemInlet, patlex_sym_load_init, 0, 0);
 
       return patcher;
     }
@@ -739,14 +744,14 @@ int fts_is_dotpat_file(fts_symbol_t filename)
     {
       fts_patlex_next_token(in);
 
-      if (! token_sym_equals(in, fts_s_max))
+      if (! token_sym_equals(in, patlex_sym_max))
 	{
 	  isdotpat = 0;
 	}
 
       fts_patlex_next_token(in); 
 
-      if (! token_sym_equals(in, fts_s_v2))
+      if (! token_sym_equals(in, patlex_sym_v2))
 	{
 	  isdotpat = 0;
 	}
@@ -770,7 +775,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 
   fts_patlex_next_token(in);
 
-  if (! token_sym_equals(in, fts_s_max))
+  if (! token_sym_equals(in, patlex_sym_max))
     {
       pat_error("file not in .pat format (header error)");
       return;
@@ -778,7 +783,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 
   fts_patlex_next_token(in); 
 
-  if (! token_sym_equals(in, fts_s_v2))
+  if (! token_sym_equals(in, patlex_sym_v2))
     {
       pat_error("file not in .pat format (header error)");
       return;
@@ -830,11 +835,11 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
     {
       fts_patlex_next_token(in); 
 
-      if (token_sym_equals(in, fts_s_diesN))
+      if (token_sym_equals(in, patlex_sym_diesN))
 	{
 	  fts_patlex_next_token(in);
 
-	  if (token_sym_equals(in, fts_s_vpatcher))
+	  if (token_sym_equals(in, patlex_sym_vpatcher))
 	    {
 	      fts_atom_t description[1];
 
@@ -848,20 +853,20 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 	      lastNObjectType = fts_s_patcher;
 	    }
-	  else if (token_sym_equals(in, fts_s_qlist))
+	  else if (token_sym_equals(in, patlex_sym_qlist))
 	    {
 	      fts_atom_t description[1];
 
-	      fts_set_symbol(&description[0], fts_s_qlist);
+	      fts_set_symbol(&description[0], patlex_sym_qlist);
 	      lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
-	      lastNObjectType = fts_s_qlist;
+	      lastNObjectType = patlex_sym_qlist;
 
 	      /* skip the rest of the command: #N qlist argument are ignored */
 
 	      while (in->ttype != FTS_LEX_EOC)
 		fts_patlex_next_token(in);
 	    }
-	  else if (token_sym_equals(in, fts_s_vtable))
+	  else if (token_sym_equals(in, patlex_sym_vtable))
 	    {
 	      int haveName = 0;
 	      int argc;
@@ -878,7 +883,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	      
 	      /* get the name */
 
-	      fts_set_symbol(&description[0], fts_s_table);
+	      fts_set_symbol(&description[0], patlex_sym_table);
 
 	      if (argc >= 8)
 		{
@@ -904,20 +909,20 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 		  lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 2, description);
 		}
 
-	      lastNObjectType = fts_s_table;
+	      lastNObjectType = patlex_sym_table;
 
 	      /* skip the ';' */
 
 	      fts_patlex_next_token(in);
 	    }
-	  else if (token_sym_equals(in, fts_s_explode))
+	  else if (token_sym_equals(in, patlex_sym_explode))
 	    {
 	      fts_atom_t description[1];
 
-	      fts_set_symbol(&description[0], fts_s_explode);
+	      fts_set_symbol(&description[0], patlex_sym_explode);
 
 	      lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
-	      lastNObjectType = fts_s_explode;
+	      lastNObjectType = patlex_sym_explode;
 
 	      /* skip the rest of the command */
 
@@ -925,17 +930,17 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 		fts_patlex_next_token(in);
 	    }
 	}
-      else if (token_sym_equals(in, fts_s_diesP))
+      else if (token_sym_equals(in, patlex_sym_diesP))
 	{
 	  /* get the line name */
 
 	  fts_patlex_next_token(in); 
 
-	  if (token_sym_equals(in, fts_s_connect))
+	  if (token_sym_equals(in, patlex_sym_connect))
 	    {
 	      fts_patparse_parse_connection(parent, in);
 	    }
-	  else if (token_sym_equals(in, fts_s_pop))
+	  else if (token_sym_equals(in, patlex_sym_pop))
 	    {
 	      fts_patlex_next_token(in);	/* skip ';' */
 	      
@@ -958,7 +963,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 	  fts_patlex_next_token(in);/* skip ';' */
 	}
-      else if (token_sym_equals(in, fts_s_diesT))
+      else if (token_sym_equals(in, patlex_sym_diesT))
 	{
 	  fts_patlex_next_token(in); /* get the command */
 
@@ -979,10 +984,10 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	      return;
 	    }
 	}
-      else if (token_sym_equals(in, fts_s_diesX))
+      else if (token_sym_equals(in, patlex_sym_diesX))
 	{
 
-	  if (lastNObjectType == fts_s_qlist)
+	  if (lastNObjectType == patlex_sym_qlist)
 	    {
 	      int argc;
 	      fts_atom_t args[512];
@@ -998,7 +1003,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	      
 	      fts_patlex_next_token(in);/* skip ';' ?? */
 	    }
-	  else if (lastNObjectType == fts_s_explode)
+	  else if (lastNObjectType == patlex_sym_explode)
 	    {
 	      fts_symbol_t selector;
 	      int argc;
@@ -1154,18 +1159,18 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
   fts_patparse_parse_graphic_description(in, graphicDescr);
 
-  if (objclass == fts_s_slider)
+  if (objclass == patlex_sym_slider)
     {
       fts_atom_t description[1];
 
       fts_patparse_set_range(graphicDescr, in);
 
-      fts_set_symbol(&description[0], fts_s_slider);
+      fts_set_symbol(&description[0], patlex_sym_slider);
 
       obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
       fts_patparse_set_slider_graphic_properties(graphicDescr, obj);
     }
-  else if (objclass == fts_s_newex)
+  else if (objclass == patlex_sym_newex)
     {
       fts_atom_t description[512];
       int argc;
@@ -1212,7 +1217,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       if (obj)
 	fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
-  else if (objclass == fts_s_newobj)
+  else if (objclass == patlex_sym_newobj)
     {
       /* Special handling for patchers, qlist, explode and table */
 
@@ -1251,18 +1256,18 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	      fts_patcher_reassign_inlets_outlets((fts_patcher_t *)lastNObject);
 	    }
 	}
-      else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_qlist) &&
-	       (lastNObjectType == fts_s_qlist))
+      else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == patlex_sym_qlist) &&
+	       (lastNObjectType == patlex_sym_qlist))
 	{
 	  fts_patparse_set_text_graphic_properties(graphicDescr, lastNObject);
 	}
-      else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_table) &&
-	       (lastNObjectType == fts_s_table))
+      else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == patlex_sym_table) &&
+	       (lastNObjectType == patlex_sym_table))
 	{
 	  fts_patparse_set_text_graphic_properties(graphicDescr, lastNObject);
 	}
-      else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_explode) &&
-	       (lastNObjectType == fts_s_explode))
+      else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == patlex_sym_explode) &&
+	       (lastNObjectType == patlex_sym_explode))
 	{
 	  /* First, look if we have a name there */
 
@@ -1322,49 +1327,49 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_patparse_set_font_index(graphicDescr, in);
 
-      fts_set_symbol(&description[0], fts_s_intbox);
+      fts_set_symbol(&description[0], patlex_sym_intbox);
       obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
-  else if (objclass == fts_s_flonum)
+  else if (objclass == patlex_sym_flonum)
     {
       fts_atom_t description[1];
 
       fts_patparse_set_font_index(graphicDescr, in);
 
-      fts_set_symbol(&description[0], fts_s_floatbox);
+      fts_set_symbol(&description[0], patlex_sym_floatbox);
       obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
-  else if (objclass == fts_s_button)
+  else if (objclass == patlex_sym_button)
     {
       fts_atom_t description[1];
 
-      fts_set_symbol(&description[0], fts_s_button);
+      fts_set_symbol(&description[0], patlex_sym_button);
       obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }
-  else if (objclass == fts_s_toggle)
+  else if (objclass == patlex_sym_toggle)
     {
       fts_atom_t description[1];
 
-      fts_set_symbol(&description[0], fts_s_toggle);
+      fts_set_symbol(&description[0], patlex_sym_toggle);
 
       obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }
-  else if (objclass == fts_s_message)
+  else if (objclass == patlex_sym_message)
     {
       fts_atom_t description[512];
       int argc;
 
       fts_patparse_set_font_index(graphicDescr, in);
 
-      fts_set_symbol(&description[0], fts_s_messbox);
+      fts_set_symbol(&description[0], patlex_sym_messbox);
 
       fts_patparse_set_messbox_mode(in);
       argc = fts_patparse_read_object_arguments(description + 1, in);
@@ -1376,14 +1381,14 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
-  else if (objclass == fts_s_comment)
+  else if (objclass == patlex_sym_comment)
     {
       fts_atom_t description[512];
       int argc;
 
       fts_patparse_set_font_index(graphicDescr, in);
 
-      fts_set_symbol(&description[0], fts_s_comment);
+      fts_set_symbol(&description[0], patlex_sym_comment);
 
       argc = fts_patparse_read_object_arguments(description + 1, in);
 
@@ -1513,30 +1518,33 @@ static void pat_warning(const char *description)
 
 void fts_kernel_patparser_init()
 {
-  fts_s_max = fts_new_symbol("max");
-  fts_s_v2 = fts_new_symbol("v2");
-  fts_s_diesN = fts_new_symbol("#N");
-  fts_s_diesn = fts_new_symbol("#n");
-  fts_s_diesP = fts_new_symbol("#P");
-  fts_s_diesp = fts_new_symbol("#p");
-  fts_s_diesT = fts_new_symbol("#T");
-  fts_s_diest = fts_new_symbol("#t");
-  fts_s_diesX = fts_new_symbol("#X");
-  fts_s_diesx = fts_new_symbol("#x");
-  fts_s_newex = fts_new_symbol("newex");
-  fts_s_newobj = fts_new_symbol("newobj");
-  fts_s_vpatcher = fts_new_symbol("vpatcher");
-  fts_s_vtable = fts_new_symbol("vtable");
-  fts_s_slider = fts_new_symbol("slider");
-  fts_s_number = fts_new_symbol("number");
-  fts_s_flonum = fts_new_symbol("flonum");
-  fts_s_intbox = fts_new_symbol("intbox");
-  fts_s_floatbox = fts_new_symbol("floatbox");
-  fts_s_messbox = fts_new_symbol("messbox");
-  fts_s_button = fts_new_symbol("button");
-  fts_s_toggle = fts_new_symbol("toggle");
-  fts_s_message = fts_new_symbol("message");
-  fts_s_connect = fts_new_symbol("connect");
-  fts_s_pop = fts_new_symbol("pop");
-  fts_s_load_init = fts_new_symbol("load_init");
+  patlex_sym_max = fts_new_symbol("max");
+  patlex_sym_v2 = fts_new_symbol("v2");
+  patlex_sym_diesN = fts_new_symbol("#N");
+  patlex_sym_diesn = fts_new_symbol("#n");
+  patlex_sym_diesP = fts_new_symbol("#P");
+  patlex_sym_diesp = fts_new_symbol("#p");
+  patlex_sym_diesT = fts_new_symbol("#T");
+  patlex_sym_diest = fts_new_symbol("#t");
+  patlex_sym_diesX = fts_new_symbol("#X");
+  patlex_sym_diesx = fts_new_symbol("#x");
+  patlex_sym_newex = fts_new_symbol("newex");
+  patlex_sym_newobj = fts_new_symbol("newobj");
+  patlex_sym_vpatcher = fts_new_symbol("vpatcher");
+  patlex_sym_vtable = fts_new_symbol("vtable");
+  patlex_sym_slider = fts_new_symbol("slider");
+  patlex_sym_flonum = fts_new_symbol("flonum");
+  patlex_sym_intbox = fts_new_symbol("intbox");
+  patlex_sym_floatbox = fts_new_symbol("floatbox");
+  patlex_sym_messbox = fts_new_symbol("messbox");
+  patlex_sym_button = fts_new_symbol("button");
+  patlex_sym_toggle = fts_new_symbol("toggle");
+  patlex_sym_message = fts_new_symbol("message");
+  patlex_sym_table = fts_new_symbol("table");
+  patlex_sym_qlist = fts_new_symbol("qlist");
+  patlex_sym_explode = fts_new_symbol("explode");
+  patlex_sym_connect = fts_new_symbol("connect");
+  patlex_sym_comment = fts_new_symbol("comment");
+  patlex_sym_pop = fts_new_symbol("pop");
+  patlex_sym_load_init = fts_new_symbol("load_init");
 }

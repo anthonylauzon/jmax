@@ -116,14 +116,15 @@ fi
 
 AC_CHECK_HEADER( "alsa/asoundlib.h", alsa_found="yes")
 
+PLATFORM_PACKAGES="oss unixdtd aflib"
+
 if test "x$alsa_found" = "xyes" ; then
-PLATFORM_PACKAGES="alsa oss unixdtd"
 CONFIG_FILE=config_linux_alsa.jmax
+PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 else
-PLATFORM_PACKAGES="oss unixdtd"
 CONFIG_FILE=config_linux_oss.jmax
 fi
-FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty` "
+FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty` -laudiofile"
 ACX_C_RESTRICT
 ;;
 
@@ -248,6 +249,9 @@ packages/Makefile
 packages/alsa/Makefile
 packages/alsa/c/Makefile
 packages/alsa/c/src/Makefile
+packages/aflib/Makefile
+packages/aflib/c/Makefile
+packages/aflib/c/src/Makefile
 packages/control/Makefile
 packages/control/c/Makefile
 packages/control/c/src/Makefile

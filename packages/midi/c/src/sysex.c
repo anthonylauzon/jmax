@@ -20,8 +20,6 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #include <fts/fts.h>
@@ -43,7 +41,7 @@ sysexin_callback(fts_object_t *o, fts_midievent_t *event, double time)
 {
   sysex_t *this = (sysex_t *)o;
 
-  fts_outlet_atoms(o, 0, fts_midievent_system_exclusive_get_size(event), fts_midievent_system_exclusive_get_atoms(event));
+  fts_outlet_send(o, 0, fts_s_list, fts_midievent_system_exclusive_get_size(event), fts_midievent_system_exclusive_get_atoms(event));
 }
 
 static void
@@ -72,7 +70,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else
     {
-      this->port = fts_midiport_get_default();
+      this->port = fts_midiport_get_default_in();
       
       if(!this->port)
 	fts_object_set_error(o, "Default MIDI port is not defined");
@@ -80,7 +78,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   /* add call back to midi port */
   if(this->port)
-    fts_midiport_add_listener(this->port, midi_type_system, midi_system_exclusive, midi_controller_any, o, sysexin_callback);
+    fts_midiport_add_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o, sysexin_callback);
 }
 
 static void 
@@ -89,7 +87,7 @@ sysexin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sysex_t *this = (sysex_t *)o;
 
   if(this->port)
-    fts_midiport_remove_listener(this->port, midi_type_system, midi_system_exclusive, midi_controller_any, o);
+    fts_midiport_remove_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o);
 }
 
 static fts_status_t
@@ -158,7 +156,7 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
   else
     {
-      this->port = fts_midiport_get_default();
+      this->port = fts_midiport_get_default_out();
       
       if(!this->port)
 	fts_object_set_error(o, "Default MIDI port is not defined");
@@ -175,7 +173,6 @@ static fts_status_t
 sysexout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sysex_t), 1, 0, 0);
-
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sysexout_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sysexout_delete);
   
