@@ -1040,7 +1040,7 @@ __fts_package_midi_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_package_t* pkg = (fts_package_t *)o;
   
   if( ac == 1)
-    pkg->midi_config = fts_get_symbol(&at[0]);  
+    pkg->midi_config = fts_package_make_relative_path(pkg, fts_get_symbol(&at[0]));  
   else
     pkg->midi_config = NULL;
 

@@ -23,6 +23,8 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
+#include <string.h> 
+
 #if HAVE_DIRECT_H
 #include <direct.h>
 #endif
@@ -35,10 +37,13 @@
 
 static fts_package_t* fts_project = NULL;
 static fts_symbol_t sym_project = NULL;
+static char *loading_project_dir = NULL;
 
 fts_package_t* 
 fts_project_open(const char* filename)
 {
+  char *fnm;
+
   if (fts_project != NULL) {
     fts_project_close();
   }
@@ -49,7 +54,12 @@ fts_project_open(const char* filename)
 
   fts_log("[project]: Opening project %s\n", filename);
   
+  fnm = strcpy( fts_malloc( strlen( filename) + 1), filename);
+  loading_project_dir = fts_dirname( fnm);
+
   fts_project = fts_package_load_from_file(sym_project, filename);
+
+  loading_project_dir = NULL;
 
   /* make the project the current package context */
   fts_package_push(fts_project);
@@ -105,9 +115,13 @@ fts_project_get_dir(void)
 {
   if ((fts_project != NULL ) && (fts_package_get_dir(fts_project) != NULL)) {
     return fts_package_get_dir(fts_project);
-  } else {
-    char buf[1024];
-    
-    return fts_new_symbol_copy(getcwd(buf, 1024));
-  }
+  } else 
+    if( loading_project_dir != NULL)
+	return loading_project_dir;
+    else
+      {
+	char buf[1024];
+	
+	return fts_new_symbol_copy(getcwd(buf, 1024));
+      }
 }
