@@ -65,10 +65,14 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 static void adc_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   adc_tilda_t *this = (adc_tilda_t *)o;
-  int i;
 
-  for ( i = 0; i < fts_object_get_outlets_number( o); i++)
-    fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
+  if(this->port)
+    {
+      int i;
+
+      for ( i = 0; i < fts_object_get_outlets_number( o); i++)
+	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
+    }
 }
 
 static void adc_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
