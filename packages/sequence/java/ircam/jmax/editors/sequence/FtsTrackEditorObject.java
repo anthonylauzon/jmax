@@ -62,15 +62,19 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
 
 public void setEditorState( int nArgs, FtsAtom args[])
 {
-		wx = args[0].intValue;
-		wy = args[1].intValue;
-		ww = args[2].intValue;
-		wh = args[3].intValue;
-		label = args[4].symbolValue.toString();
-		zoom = (float)args[5].doubleValue;
-		transp = args[6].intValue;
-	
-		trackObj.restoreEditorState();   
+		int x = args[0].intValue;
+		int y = args[1].intValue;
+		int w = args[2].intValue;
+		int h = args[3].intValue;
+		String label = args[4].symbolValue.toString();
+		float zoom = (float)args[5].doubleValue;
+		int transp = args[6].intValue;
+		
+		if( x!= this.wx || y!=this.wy || w!=this.ww || h!=this.wh || !label.equals(this.label) || zoom != this.zoom || transp != this.transp)
+		{	
+			this.wx = x; this.wy = y; this.ww = w; this.wh = h; this.label = label; this.zoom = zoom; this.transp = transp;
+			trackObj.restoreEditorState();   
+		}
 }
 
 public void requestSetWindow()
