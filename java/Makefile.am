@@ -29,3 +29,6 @@ $(JARFILE): $(JAR_DEP)
 		cd src ; jar -cvf ../$(JARFILE) jmax.jar.root `find . -name "*.class"`; \
 	fi
 
+
+install-data-hook:
+	cd $(DESTDIR)$(pkgdatadir)/java; find . -name "*.class" -exec rm {} \;
