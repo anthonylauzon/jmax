@@ -647,6 +647,9 @@ void dsp_chain_create(int vs)
   if (dsp_is_running)
     dsp_chain_delete();
 
+  /* ask all audioports to create their input and output objects */
+  fts_audioport_add_input_output_objects();
+
   /* ask ftl to start memory relocation */
   ftl_mem_start_memory_relocation();/* should it be elsewhere ?? */
 

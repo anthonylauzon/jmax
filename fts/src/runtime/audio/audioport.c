@@ -131,6 +131,12 @@ void fts_audioport_delete( fts_audioport_t *port)
 
       previous = current;
     }
+
+  if (port->audioportin)
+    fts_object_delete_from_patcher( port->audioportin);
+
+  if (port->audioportout)
+    fts_object_delete_from_patcher( port->audioportout);
 }
 
 static void audioport_default_idle_function( fts_audioport_t *port, ftl_wrapper_t fun, int len, int channels, float *sig)
@@ -161,7 +167,7 @@ void fts_audioport_idle( fts_word_t *args)
   sig_dummy = (float *)alloca( tick_size * sizeof( float));
   sig_zero = (float *)alloca( tick_size * sizeof( float));
 
-  for ( i = 0; i < fts_get_tick_size(); i++)
+  for ( i = 0; i < tick_size; i++)
     sig_zero[i] = 0.0;
 
   for ( port = audioport_list; port; port = port->next)
@@ -393,13 +399,6 @@ fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *
   fts_object_t *in;
   fts_atom_t a[3];
 
-  if ( !port->audioportin)
-    {
-      fts_set_symbol( a+0, s_audioportin);
-      fts_set_ptr( a+1, port);
-      fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportin);
-    }
-
   fts_set_symbol( a+0, s_indispatch);
   fts_set_object( a+1, owner);
   fts_set_int( a+2, outlet);
@@ -434,13 +433,6 @@ fts_object_t *fts_audioport_get_out_object( fts_audioport_t *port, int inlet)
   fts_object_t *out;
   fts_atom_t a[2];
 
-  if ( !port->audioportout)
-    {
-      fts_set_symbol( a+0, s_audioportout);
-      fts_set_ptr( a+1, port);
-      fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportout);
-    }
-
   fts_set_symbol( a+0, s_outdispatch);
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, &out);
 
@@ -456,6 +448,32 @@ void fts_audioport_remove_out_object( fts_object_t *out_object)
   while ((p = out_object->out_conn[0]))
     fts_connection_delete(p);
 }
+
+void fts_audioport_add_input_output_objects( void)
+{
+  fts_audioport_t *port;
+  fts_atom_t a[2];
+
+  for ( port = audioport_list; port; port = port->next)
+    {
+      if ( !port->audioportin && port->input_channels)
+	{
+	  fts_set_symbol( a+0, s_audioportin);
+	  fts_set_ptr( a+1, port);
+	  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportin);
+	}
+
+      if ( !port->audioportout && port->output_channels)
+	{
+	  fts_set_symbol( a+0, s_audioportout);
+	  fts_set_ptr( a+1, port);
+	  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportout);
+	}
+    }
+}
+
+
+
 
 int fts_audioport_report_xrun( void)
 {

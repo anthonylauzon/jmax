@@ -34,8 +34,11 @@
  * it just sleeps for a while after receiving enough samples
  */
 
+#include <sys/time.h>
 #include <unistd.h>
 #include <fts/fts.h>
+
+#include <stdio.h>
 
 /* ---------------------------------------------------------------------- */
 /* The fts_audioport_t derived class                                      */
@@ -51,7 +54,13 @@ static void nullaudioport_output( fts_word_t *argv)
 
   if ( fts_timer_elapsed_time( &port->timer) >= (double)100.0)
     {
-      usleep( 100000);
+      struct timespec pause_time;
+
+      pause_time.tv_sec = 0;
+      pause_time.tv_nsec = 100000000L;
+
+      nanosleep( &pause_time, 0);
+
       fts_timer_zero( &port->timer);
     }
 }

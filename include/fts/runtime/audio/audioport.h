@@ -104,6 +104,9 @@ extern void fts_audioport_remove_out_object( fts_object_t *out_object);
 #define fts_audioport_set_xrun_function(P,F) (((fts_audioport_t *)(P))->xrun_function = (F))
 extern int fts_audioport_report_xrun( void);
 
+/* Used by the DSP compiler */
+extern void fts_audioport_add_input_output_objects( void);
+
 extern void fts_audioport_set_default( int argc, const fts_atom_t *argv);
 extern fts_audioport_t *fts_audioport_get_default( void);
 
