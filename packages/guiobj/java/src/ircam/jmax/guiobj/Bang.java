@@ -68,7 +68,8 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 		public void actionPerformed(ActionEvent e)
 		{
 		    Color color = JColorChooser.showDialog(null,"Choose Source Color", Color.yellow);
-		    ((Bang)ObjectPopUp.getPopUpTarget()).setColor(color);
+		    if(color!=null)
+			((Bang)ObjectPopUp.getPopUpTarget()).setColor(color);
 		}
 	    });
     }
