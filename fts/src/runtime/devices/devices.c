@@ -371,13 +371,15 @@ fts_dev_open(fts_symbol_t class_name, int nargs, const fts_atom_t *args)
       
       dev->dev_class = dev_class;
       dev->device_data = (void *)0;
-      dev->next = open_dev_list;
-      open_dev_list = dev;
 
       ret = (* dev_class->open_fun)(dev, nargs, args);
       
       if (ret == fts_Success)
-	return dev;
+	{
+	  dev->next = open_dev_list;
+	  open_dev_list = dev;
+	  return dev;
+	}
       else
 	return (fts_dev_t *)0;
     }
