@@ -86,7 +86,11 @@ FTS_API void fts_object_set_outlets_number(fts_object_t *o, int n);
 FTS_API void fts_object_set_inlets_number(fts_object_t *o, int n);
 
 /* object in patcher */
-#define fts_object_get_patcher(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->patcher): NULL)
+#define fts_object_get_patcher(o) ( \
+	((o)->context != NULL)  \
+	?  (((fts_object_patcher_data_t *) (o)->context)->patcher) \
+	:  NULL)
+
 FTS_API void fts_object_set_patcher(fts_object_t *o, fts_patcher_t *patcher);
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */
