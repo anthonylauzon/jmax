@@ -106,3 +106,8 @@ FTS_API void fts_sched_run_one_tick(void);
 
 FTS_API void fts_sched_set_run_under_callback(void);
 FTS_API void fts_sched_unset_run_under_callback(void);
+
+FTS_API int fts_sched_is_running(void);
+FTS_API void fts_sched_running_add_listener(fts_object_t* object, fts_method_t method);
+FTS_API void fts_sched_running_remove_listener(fts_object_t* objet);
+
