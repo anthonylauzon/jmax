@@ -76,12 +76,7 @@ public class FtsMessageObject extends FtsIntValueObject
   {
     this.message = message;
     
-    /*MaxVector vec = new MaxVector();
-      FtsParse.parseAtoms(message, vec);*/
-    
     args.clear();
-    /*for(int i=0; i<vec.size(); i++)
-      args.add(vec.elementAt(i));*/
     args.addRawString( message);
     
     try{
@@ -105,8 +100,8 @@ public class FtsMessageObject extends FtsIntValueObject
   
   public void setCurrentMessage(int nArgs, FtsAtom args[])
   {
-      this.message = FtsMessageObject.preParseMessage( FtsUnparse.unparseArguments(args, 0, nArgs));
-      ((FtsMessageListener) listener).messageChanged(message);
+    this.message = FtsMessageObject.preParseMessage( FtsUnparse.unparseArguments(args, 0, nArgs));
+    ((FtsMessageListener) listener).messageChanged(message);
   }
 
   public static String preParseMessage(String text)

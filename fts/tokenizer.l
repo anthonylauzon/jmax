@@ -39,7 +39,7 @@
 %option noyywrap
 
 whites		[ \t\n]
-letter		[A-Za-z_]
+letter		[A-Za-z_~]
 decdigit	-?[0-9]
 hexdigit	[0-9a-fA-F]
 decint		{decdigit}+
