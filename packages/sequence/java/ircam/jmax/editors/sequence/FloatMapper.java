@@ -46,7 +46,7 @@ public class FloatMapper {
 
   public String getName()
   {
-    return "float";
+    return "value";
   }
 
   /**

@@ -44,10 +44,10 @@ public class IntegerMapper extends Mapper {
     return ((Integer)e.getProperty("value")).intValue();
   }
 
-    public String getName()
-    {
-	return "integer";
-    }
+  public String getName()
+  {
+    return "value";
+  }
 
   /**
    * access the static instance

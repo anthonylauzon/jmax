@@ -33,13 +33,13 @@ import java.beans.*;
  * An adapter that treats the y parameter as a constant*/
 public class IntegerAdapter extends MonoDimensionalAdapter{
 
-    public IntegerAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
-    {
-	super(geometry, gc, constant);
-	
-	YMapper = IntegerMapper.getMapper();
-	viewMode = MonoTrackEditor.PEAKS_VIEW;
-    }
+  public IntegerAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
+  {
+    super(geometry, gc, constant);
+    
+    YMapper = IntegerMapper.getMapper();
+    viewMode = MonoTrackEditor.PEAKS_VIEW;
+  }
 
   public String getType( Event e)
   {
@@ -53,15 +53,15 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
      * it returns the Y value of the event,
      * making the needed cordinate conversions.
      */
-    public int getY(Event e) 
-    {  
-	int value = YMapper.get(e) - minValue;
-	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)height/(float)range);
-	
-	return height - (int)(value*step);
-    }
+  public int getY(Event e) 
+  {  
+    int value = YMapper.get(e) - minValue;
+    int height = gc.getGraphicDestination().getSize().height;
+    int range = getRange();
+    float step = (float)((float)height/(float)range);
+    
+    return height - (int)(value*step);
+  }
 
     /**
      * it returns the Y graphic value of the event from the y logic value,
