@@ -270,7 +270,7 @@ inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fts_inlet_t *this  = (fts_inlet_t *) o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
-  int pos = fts_get_int_arg(ac, at, 1, 0);
+  int pos = fts_get_int_arg(ac, at, 1, -1);
 
   /* Initialize to a non valid value */
   this->position = -1;
@@ -401,7 +401,7 @@ outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fts_outlet_t *this = (fts_outlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
-  int pos = fts_get_int_arg(ac, at, 1, 0);
+  int pos = fts_get_int_arg(ac, at, 1, -1);
 
   this->position = -1;      
   this->next = 0;      
