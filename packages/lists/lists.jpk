@@ -5,8 +5,12 @@ package provide lists
 global jmaxArch jmaxMode
 ucs load module lists $dir/lib/$jmaxArch/$jmaxMode/liblists.so
 
-## declare abstractions
-sourceFile $dir/abs/lists.abs.index.tcl
+# require ISPW classes for the templates
+package require ispw
+
+## declare templates
+template listcompose $dir/templates/listcompose.jmax
+template listdecompose $dir/templates/listdecompose.jmax
 
 ## load the help patch data base
 #sourceFile $dir/help/lists.help.index.tcl

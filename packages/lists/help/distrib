@@ -1,0 +1,15 @@
+all	all	list.help.jmax
+all	all	listappend.help.jmax
+all	all	listarith.help.jmax
+all	all	listcompose.help.jmax
+all	all	listdecompose.help.jmax
+all	all	listelement.help.jmax
+all	all	listhead.help.jmax
+all	all	listlength.help.jmax
+all	all	listprepend.help.jmax
+all	all	listreverse.help.jmax
+all	all	lists.help.index.tcl
+all	all	lists.overview.jmax
+all	all	lists.summary.jmax
+all	all	listsublist.help.jmax
+all	all	listtail.help.jmax
