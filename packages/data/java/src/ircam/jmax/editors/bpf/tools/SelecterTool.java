@@ -74,7 +74,8 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public void selectionPointChoosen(int x, int y, int modifiers) 
   {
-      if((modifiers & InputEvent.CTRL_MASK)!=0)
+      //if((modifiers & InputEvent.CTRL_MASK)!=0)
+      if((modifiers & SHORTCUT)!=0)
 	  controlAction(x, y, modifiers);
       else
 	  {
@@ -175,5 +176,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   //--- Fields
   Selecter itsSelecter;
   Point startingPoint = new Point();
+  public static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 }
 
