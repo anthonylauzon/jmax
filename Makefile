@@ -129,6 +129,7 @@ dist: cvs-tag
 	mkdir $(distdir)
 	cvs export -r $(disttag) -d $(distdir) max
 	tar cvf - $(distdir) | gzip -c --best > $(distdir).tar.gz 
+	chmod 644 $(distdir).tar.gz 
 	rm -rf $(distdir)
 .PHONY: dist
 
