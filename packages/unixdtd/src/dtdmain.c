@@ -45,6 +45,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sched.h>
+#include <sys/stat.h>
 #include <signal.h>
 #include <audiofile.h>
 #ifdef USE_UDP
@@ -52,8 +53,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
-
-#include "fts.h"
 
 #include "dtddefs.h"
 #include "dtdfifo.h"
@@ -210,13 +209,64 @@ static int dtd_write_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, i
   return n_write;
 }
 
+static const char *splitpath( const char *path, char *result, char sep)
+{
+  if ( *path == '\0')
+    return 0;
+
+  while ( *path != sep && *path != '\0')
+    {
+      *result++ = *path++;
+    }
+
+  *result = '\0';
+
+  if ( *path)
+    return path+1;
+
+  return path;
+}
+
+static int file_exists( const char *filename)
+{
+  struct stat statbuf;
+
+  return ( stat( filename, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
+}
+
+static int search_file_in_path( const char *filename, const char *path, char *full_path)
+{
+  char pathelem[N];
+
+  if (*filename == '/')
+    {
+      strcpy( full_path, filename);
+
+      return file_exists( full_path);
+    }
+
+  while ( (path = splitpath( path, pathelem, ':')) )
+    {
+      strcpy( full_path, pathelem);
+      strcat( full_path, "/");
+      strcat( full_path, filename);
+
+      DTD_DEBUG( __debug( "searching `%s'", full_path) );
+
+      if (file_exists( full_path))
+	  return 1;
+    }
+
+  return 0;
+}
+
 static AFfilehandle dtd_open_file_read( const char *filename, const char *path, int n_channels)
 {
   char full_path[N+N];
   AFfilehandle file;
   int file_channels, sampfmt, sampwidth;
 
-  if ( !fts_file_search_in_path( filename, path, full_path) )
+  if ( !search_file_in_path( filename, path, full_path) )
     {
       fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
       return AF_NULL_FILEHANDLE;
@@ -476,6 +526,7 @@ static void dtd_main_loop( int fd)
 
       FD_ZERO( &rfds);
 
+      FD_SET( 0, &rfds);
       FD_SET( fd, &rfds);
       
       retval = select( fd+1, &rfds, NULL, NULL, &tv);
@@ -559,11 +610,6 @@ static void dtd_no_real_time( void)
 	{
 	  fprintf( stderr, "[dtdserver] cannot give up real-time priority (%s)\n", strerror( errno));
 	}
-    }
-
-  /* Get rid of root privilege if we have them */
-  if (setreuid(getuid(), getuid()) == -1)
-    {
     }
 }
 

@@ -23,9 +23,19 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR = ../../../..
+DISTDIR = ../../../../fts
 PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
 PACKAGELIB=$(LIBDIR)/libmath.so
+
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
-include $(JMAXDISTDIR)/Makefiles/Makefile.package
+all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
+
+TOCLEAN = $(PACKAGELIB)
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
+

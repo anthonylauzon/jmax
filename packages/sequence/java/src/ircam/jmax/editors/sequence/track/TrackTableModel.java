@@ -56,7 +56,7 @@ class TrackTableModel extends AbstractTableModel{
    * The number of columns in this model */
   public int getColumnCount() 
   { 
-      return 2 + model.getType().getPropertyCount();
+      return 2 + model.getNumProperty();
   }
   
   /**
@@ -70,8 +70,7 @@ class TrackTableModel extends AbstractTableModel{
 	  if(col == 1) 
 	      return Double.class;
 	  else	      
-	      //return model.getTypeAt(0).getPropertyType(col-2);
-	      return model.getType().getPropertyType(col-2);
+	      return model.getTypeAt(0).getPropertyType(col-2);
   }
 
   /**
@@ -119,8 +118,7 @@ class TrackTableModel extends AbstractTableModel{
 	      else
 		  {
 		      int i = 2;
-		      //for(Enumeration e = model.getTypeAt(0).getPropertyNames(); e.hasMoreElements();)
-		      for(Enumeration e = model.getType().getPropertyNames(); e.hasMoreElements();)
+		      for(Enumeration e = model.getTypeAt(0).getPropertyNames(); e.hasMoreElements();)
 			  {
 			      name = (String)e.nextElement();
 			      if(i==col)

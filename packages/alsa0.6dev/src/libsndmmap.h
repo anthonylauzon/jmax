@@ -14,7 +14,7 @@ typedef struct {
   int xrun;
 } mmapdev_t;
 
-extern int snd_open( mmapdev_t *d, int card, int dev, int subdev, int format, int sampling_rate, int fragment_size, int init_frag);
+extern int snd_open( mmapdev_t *d, int card, int dev, int subdev, int format, int sampling_rate, int fragment_size);
 extern int snd_start( mmapdev_t *d);
 extern int snd_close( mmapdev_t *d);
 

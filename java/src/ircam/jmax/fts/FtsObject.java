@@ -129,8 +129,6 @@ public class FtsObject
 	  obj =  new FtsCommentObject(fts, parent);
 	else if (className == "messbox")
 	  obj =  new FtsMessageObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	else if (className == "display")
-	  obj =  new FtsDisplayObject(fts, parent);
 	else if (className == "slider")
 	  obj =  new FtsSliderObject(fts, parent);
 	else if (className == "intbox")

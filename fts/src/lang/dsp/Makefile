@@ -22,10 +22,21 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-JMAXDISTDIR = ../../../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.fts
+
+ROOTDIR = ../../..
+
+include $(ROOTDIR)/Makefiles/Makefile.common
+include Sources
+
+MODULE_LIB=$(LIBDIR)/libDsp.a
+
+all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/dsp
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts/lang/dsp ; done
 .PHONY: install
+
+TOCLEAN = $(MODULE_LIB)
+
+include $(ROOTDIR)/Makefiles/Makefile.misc

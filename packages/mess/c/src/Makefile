@@ -11,9 +11,19 @@
 #  for DISCLAIMER OF WARRANTY.
 #  
 
-JMAXDISTDIR = ../../../..
+DISTDIR = ../../../../fts
 PACKAGEROOT = ..
-PACKAGELIB=$(LIBDIR)/libmess.so
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 
-include $(JMAXDISTDIR)/Makefiles/Makefile.package
+PACKAGELIB=$(LIBDIR)/libmess.so
+
+all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
+
+TOCLEAN = $(PACKAGELIB)
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
+

@@ -33,8 +33,8 @@ clean:
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa0.6dev
-	$(INSTALL_DATA) alsa0.6dev.jpk $(lib_install_dir)/packages/alsa0.6dev/alsa0.6dev.jpk
-	$(INSTALL_DATA) alsa0.6dev.scm $(lib_install_dir)/packages/alsa0.6dev/alsa0.6dev.scm
+	$(INSTALL_DATA) alsadev.jpk $(lib_install_dir)/packages/alsa0.6dev/alsadev.jpk
+	$(INSTALL_DATA) alsadev.scm $(lib_install_dir)/packages/alsa0.6dev/alsadev.scm
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa0.6dev/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libalsadev.so $(lib_install_dir)/packages/alsa0.6dev/lib/$(ARCH)/opt/libalsadev.so )
 .PHONY: install
@@ -44,6 +44,6 @@ install:
 # on Linux
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/alsa0.6dev
-	$(INSTALL_DATA) alsa0.6dev.jpk $(lib_install_dir)/packages/alsa0.6dev/alsa0.6dev.jpk
-	$(INSTALL_DATA) alsa0.6dev.scm $(lib_install_dir)/packages/alsa0.6dev/alsa0.6dev.scm
+	$(INSTALL_DATA) alsadev.jpk $(lib_install_dir)/packages/alsa0.6dev/alsadev.jpk
+	$(INSTALL_DATA) alsadev.scm $(lib_install_dir)/packages/alsa0.6dev/alsadev.scm
 .PHONY: install-noarch

@@ -23,35 +23,32 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR= ../../..
-PACKAGEROOT = ..
-PACKAGELIB=$(LIBDIR)/libunixdtd.so
+JMAXROOTDIR= ../../..
+DISTDIR= $(JMAXROOTDIR)/fts
 
-##
-## Extra definitions
-##
+PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
+#SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o
+# This is for debug
+SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o $(OBJDIR)/libtime.o
 
 # Note: some $(SERVER_OBJECTS) are not in the SOURCES because they are not added to the .so library
-#SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o
-SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o $(OBJDIR)/libtime.o # This is for debug
+
+PACKAGELIB=$(LIBDIR)/libunixdtd.so
 DTD_BIN = $(BINDIR)/dtd
-FTS_LIB=$(JMAXDISTDIR)/fts/lib/$(ARCH)/$(MODE)/libfts.a
-TOCLEAN=$(SERVER_OBJECTS) $(PACKAGE_LIB) $(DTD_BIN)  
-
-##
-## Standard Makefile for packages
-##
-include $(JMAXDISTDIR)/Makefiles/Makefile.package
-
-##
-## Extra rules
-##
 
 all: $(LIBDIR) $(OBJDIR) $(BINDIR) $(PACKAGELIB) $(DTD_BIN)
 
 $(DTD_BIN): $(SERVER_OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $^ $(FTS_LIB) -laudiofile
+	$(CC) $(CFLAGS) -o $@ $^ -laudiofile
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
+
+TOCLEAN=$(SERVER_OBJECTS) $(PACKAGE_LIB) $(DTD_BIN)  
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
 

@@ -142,7 +142,7 @@ void fts_sched_remove_fd( fts_sched_t *sched, int fd)
     }
 }
 
-void fts_sched_remove( fts_sched_t *sched, fts_object_t *object)
+void fts_sched_remove( fts_sched_t *sched, fts_method_t method)
 {
   fd_callback_t **p;
 
@@ -150,7 +150,7 @@ void fts_sched_remove( fts_sched_t *sched, fts_object_t *object)
 
   while (*p)
     {
-      if ( (*p)->fd == FD_NO_SELECT && (*p)->object == object)
+      if ( (*p)->fd == FD_NO_SELECT && (*p)->method == method)
 	{
 	  fd_callback_t *to_remove;
 

@@ -20,21 +20,8 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-
-PLATFORM := linux-intel
-
-CC := gcc
-LD := gcc
-ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC
-ARCH_LDFLAGS := -rdynamic
-LDSO=ld
-LDSOFLAGS=-export-dynamic -shared
-SOLIBS=-lc
-
-CC_ALL_FLAG := -Xlinker --whole-archive
-CC_NONE_FLAG := -Xlinker --no-whole-archive
-
-FTS_SYS_LIBS = -ldl -laudiofile -lm -lpthread
+# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+#
 
 INSTALL=install
 INSTALL_DATA=$(INSTALL) --mode=0644
@@ -49,3 +36,12 @@ lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
 
+ARCH_PACKAGES=ossdev unixdtd
+
+ifeq ($(ENABLE_ALSA),yes)
+ARCH_PACKAGES:= $(ARCH_PACKAGES) alsadev
+endif
+
+ifeq ($(ENABLE_ALSA0.6),yes)
+ARCH_PACKAGES:= $(ARCH_PACKAGES) alsa0.6dev
+endif

@@ -23,10 +23,21 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR= ../../..
+JMAXROOTDIR= ../../..
+DISTDIR= $(JMAXROOTDIR)/fts
+
 PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
 MORESOLIBS=-lasound
+
 PACKAGELIB=$(LIBDIR)/libalsadev.so
 
-include $(JMAXDISTDIR)/Makefiles/Makefile.package
+all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
+
+TOCLEAN = $(PACKAGELIB)
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
 

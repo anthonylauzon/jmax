@@ -131,6 +131,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 				    gc.getScrollManager().makeVisible(temp);
 				    first = false;
 				}
+			    //temp.getRenderer().render(temp, g, true, gc);
 			    temp.setHighlighted(true);
 			    temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
 			    oldElements.addElement(temp);			    
@@ -139,14 +140,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	    });
 
 	component = this;
-    }
-
-    public void reinit()
-    {
-	track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
-	track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));	
-	setViewMode(PIANOROLL_VIEW);		
-	((FtsTrackObject)track.getTrackDataModel()).setUntitled();
     }
 
     public JMenu getToolsMenu()
@@ -320,6 +313,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	{
 	    viewMode=viewType;
 	    renderer.setViewMode(viewMode);
+	    //((PartitionAdapter)gc.getAdapter()).setViewMode(viewMode);
 	    track.setProperty("viewMode", new Integer(viewType));
 	    repaint();
 	}    
@@ -342,7 +336,11 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     private void createListDialog()
     {
+	/*****************/
+	//list-->table//
+	//listDialog = new ListDialog(track, gc.getFrame(), gc);
 	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+	/*****************/
     }
 
     public boolean isDisplayLabels()
@@ -393,12 +391,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	{
 	    if(SequenceTextArea.isDeleteKey(e))
 		{
-		    if(e.getID()==KeyEvent.KEY_PRESSED)
-			{
-			    ((UndoableData)track.getTrackDataModel()).beginUpdate();
-			    editor.getSelection().deleteAll();
-			}	    
-		}
+		  ((UndoableData)track.getTrackDataModel()).beginUpdate();
+		  editor.getSelection().deleteAll();
+		}	    
 	    else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
 		if(e.isControlDown())
 		    editor.getSelection().selectPrevious();
@@ -437,6 +432,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     ScorePanel itsScore;
 
     MaxVector oldElements = new MaxVector();
+    /*****************/
+    //list-->table//
+    //ListDialog listDialog = null;
     SequenceTableDialog listDialog = null;
     /*****************/
 

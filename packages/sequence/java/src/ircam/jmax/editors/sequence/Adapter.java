@@ -173,9 +173,9 @@ abstract public class Adapter implements MappingListener{
    */
   public void edit(Frame theFrame) 
   {
-      //SettingsDialog asd = SettingsDialog.createSettingsDialog(this, theFrame);
-      //asd.pack();
-      //asd.setVisible(true);
+    SettingsDialog asd = SettingsDialog.createSettingsDialog(this, theFrame);
+    asd.pack();
+    asd.setVisible(true);
   }
 
 

@@ -313,7 +313,7 @@ osc_ftl_fun(fts_word_t *argv)
 {
   float *freq  = (float *) fts_word_get_ptr(argv + 0);
   float *phase = (float *) fts_word_get_ptr(argv + 1);
-  float *out = (float *) fts_word_get_ptr(argv + 2);
+  float *out   = (float *) fts_word_get_ptr(argv + 2);
   osc_ftl_t *this = (osc_ftl_t *)fts_word_get_ptr(argv + 3);
   int n = fts_word_get_int(argv + 4);
   fts_intphase_t phi_freq = this->phase;

@@ -27,679 +27,106 @@
 #ifndef _FTS_MIDIPORT_H_
 #define _FTS_MIDIPORT_H_
 
-#define MIDIPORT_ALL_CHANNELS 0
-#define MIDIPORT_ALL_NUMBERS -1
+typedef struct _fts_midiport_ fts_midiport_t;
 
-/**
- * The MIDI port abstraction (fts_midiport_t()).
+/****************************************************
  *
- * The MIDI port is an abstraction of classes representing MIDI in/output devices.
- * A MIDI port represents a single MIDI connection (carrying 16 MIDI channels).
- * For multi-port MIDI sofware systems or devices (as MidiShare) \e one FTS MIDI port object
- * should represent \e one (virtual or physical) MIDI port.
+ *  MIDI status
  *
- * MIDI ports are FTS objects.
- *
- * Various i/o objects can refer to an FTS MIDI port in order to receive MIDI events (listeners) 
- * or send events to a virtual or physical MIDI port.
- * MIDI port listeners can be registered for a specific MIDI channel and note or contoller number.
- *
- * If an i/o object refers to a MIDI port object by a named variable,
- * the same program (patch) can be configured for completely different setups
- * simply by redefining the MIDI port object defining the variable.
- * Different MIDI ports are implemented for different platforms and MIDI i/o APIs as well as for
- * other devices or protocols implementing standard MIDI events.
- *
- * The API documented by this module permits to implement MIDI port classes.
- * It contains the MIDI port structure itself and the initialization functions for the FTS class 
- * implementing an FTS MIDI port: fts_midiport_class_init(), fts_midiport_init() and fts_midiport_delete().
- *
- * A MIDI port class allowing MIDI input, calls fts_midiport_set_input() in the objects initialization
- * and uses the provided input functions (e.g. fts_midiport_input_note()) in the routines handling incoming MIDI data.
- * These functions propagate the incoming MIDI events to the listening i/o objects refering to the MIDI port.
- *
- * For the output a MIDI port class must implement an output function for each type of MIDI events.
- * The output functions are bundeled into a structure (@ref fts_midiport_output_functions_t)
- * and declared by fts_midiport_set_output() in the objects initialization.
- *
- * @defgroup midiport MIDI port
  */
-
-/**
- * Function called for polyphonic MIDI event (note, poly pressure change, controller value change).
- *
- * @typedef void (*fts_midiport_poly_fun_t)(fts_object_t *o, int channel, int number, int value, double time)
- *
- * @ingroup midiport
- */
-
-/**
- * Function called for monophonic MIDI events (program change, channel pressure change, pitch bend wheel change).
- *
- * @typedef void (*fts_midiport_channel_fun_t)(fts_object_t *o, int channel, int value, double time)
- *
- * @ingroup midiport
- */
-
-/**
- * Function called for incommig system exclusive data MIDI events.
- *
- * @typedef void (*fts_midiport_sysex_fun_t)(fts_object_t *o, int ac, const fts_atom_t *at, double time)
- *
- * @ingroup midiport
- */
-
-/**
- * Add a system exclusive byte to an i/o buffer.
- *
- * @typedef void (*fts_midiport_sysex_byte_fun_t)(fts_object_t *o, int c)
- */
-
-/**
- * Flush system exclusive i/o buffer.
- *
- * @typedef void (*fts_midiport_sysex_flush_fun_t)(fts_object_t *o, double time)
- *
- * @ingroup midiport
- */
-
-typedef void (*fts_midiport_poly_fun_t)(fts_object_t *o, int channel, int number, int value, double time);
-typedef void (*fts_midiport_channel_fun_t)(fts_object_t *o, int channel, int value, double time);
-typedef void (*fts_midiport_sysex_fun_t)(fts_object_t *o, int ac, const fts_atom_t *at, double time);
-
-typedef void (*fts_midiport_sysex_byte_fun_t)(fts_object_t *o, int c);
-typedef void (*fts_midiport_sysex_flush_fun_t)(fts_object_t *o, double time);
-
-typedef struct fts_midiport_listeners fts_midiport_listeners_t;
-
-/**
- * MIDI port output functions.
- *
- * This is the structure of output functions to be implemented by a MIDI port class.
- * It contains one function for each type of MIDI event.
- * The system exclusive output is handled by two functions: 
- * The \c sysex_byte function is adding a byte to an internal buffer.
- * If a sysex block is completed the buffer is flushed and sent out with the exact time tag by \c sysex_flush.
- *
- * @code
- *   struct fts_midiport_output_functions
- *   {
- *     fts_midiport_poly_fun_t note;
- *     fts_midiport_poly_fun_t poly_pressure;
- *     fts_midiport_poly_fun_t control_change;
- *     fts_midiport_channel_fun_t program_change;
- *     fts_midiport_channel_fun_t channel_pressure;
- *     fts_midiport_channel_fun_t pitch_bend;
- *     fts_midiport_sysex_byte_fun_t sysex_byte;
- *     fts_midiport_sysex_flush_fun_t sysex_flush;
- *   };
- * @endcode
- *
- * @anchor fts_midiport_output_functions_t
- * @typedef fts_midiport_output_functions_t
- *
- * @ingroup midiport
- */
-
-/* @code */
-typedef struct fts_midiport_output_functions
+enum _fts_midi_status_ 
 {
-  fts_midiport_poly_fun_t note;
-  fts_midiport_poly_fun_t poly_pressure;
-  fts_midiport_poly_fun_t control_change;
-  fts_midiport_channel_fun_t program_change;
-  fts_midiport_channel_fun_t channel_pressure;
-  fts_midiport_channel_fun_t pitch_bend;
-  fts_midiport_sysex_byte_fun_t sysex_byte;
-  fts_midiport_sysex_flush_fun_t sysex_flush;
-} fts_midiport_output_functions_t;
-/* @endcode */
+  fts_midi_status_note = 0, 
+  fts_midi_status_poly_pressure, 
+  fts_midi_status_control_change, 
+  fts_midi_status_program_change, 
+  fts_midi_status_channel_pressure, 
+  fts_midi_status_pitch_bend,
+  fts_midi_status_system_exclusive,
+  fts_midi_status_n
+};
 
-/** 
- * @name The FTS MIDI port structure
- */
-/*@{*/
+typedef enum _fts_midi_status_ fts_midi_status_t;
 
-/**
- * The FTS MIDI port structure.
+/****************************************************
  *
- * The FTS MIDI port "inherits" from FTS object.
- * The structure \b fts_midiport_t itself must be included by a class implementing a MIDI port:
+ *  MIDI in callbacks and listeners
  *
- * @code
- *   typedef struct my_midiport
- *   {
- *     fts_midiport_t port;
- *     ... 
- *   } my_midiport_t;
- * @endcode
- *
- * A MIDI port class must call \c fts_midiport_init() and \c fts_midiport_delete() 
- * in the objects \e init and \e delete Methods.
- *
- * @typedef fts_midiport_t
- *
- * @ingroup midiport
  */
-typedef struct fts_midiport
+typedef void (*fts_midiport_channel_message_callback_t)(fts_object_t *listener, int channel, int x, int y, double time);
+typedef void (*fts_midiport_system_exclusive_callback_t)(fts_object_t *listener, int ac, const fts_atom_t *at, double time);
+
+typedef union _fts_midiport_callback_
+{
+  fts_midiport_channel_message_callback_t channel_message;
+  fts_midiport_system_exclusive_callback_t system_exclusive;
+} fts_midiport_callback_t;
+
+typedef struct _fts_midiport_listener_
+{
+  fts_midiport_callback_t callback;
+  fts_object_t *listener;
+  struct _fts_midiport_listener_ *next;
+} fts_midiport_listener_t;
+
+/****************************************************
+ *
+ *  MIDI out functions
+ *
+ */
+typedef void (*fts_midiport_channel_message_output_t)(fts_midiport_t *port, int status, int channel, int x, int y, double time);
+typedef void (*fts_midiport_system_exclusive_output_t)(fts_midiport_t *port, int ac, const fts_atom_t *at, double time);
+typedef int (*fts_midiport_system_exclusive_get_t)(fts_midiport_t *port);
+
+/****************************************************
+ *
+ *  MIDI port
+ *
+ */
+extern fts_symbol_t fts_s__superclass;
+extern fts_symbol_t fts_s_midiport;
+
+struct _fts_midiport_
 {
   fts_object_t o;
 
-  /* input listeners */
-  fts_midiport_listeners_t *listeners;
+  /* call backs */
+  fts_midiport_listener_t *channel_message_listeners[fts_midi_status_n - 1][17]; /* 16 channels(1..16) + omni (0) */
+  fts_midiport_listener_t *system_exclusive_listeners; /* 16 channels(1..16) + omni (0) */
 
-  /* output functions (declared by MIDI port class) */
-  fts_midiport_output_functions_t *output;
+  /* MIDI output functions */
+  fts_midiport_channel_message_output_t channel_message_output;
+  fts_midiport_system_exclusive_output_t system_exclusive_output;
 
-  /* system exclusive input buffer */
+  /* system exclusive message atoms */
   fts_atom_t *sysex_at;
   int sysex_ac;
   int sysex_alloc;
+};
 
-} fts_midiport_t;
-
-/*@}*/ /* The FTS MIDI port structure */
-
-/** 
- * @name Initializing a MIDI port
- *
- * Initialization of classes and objects implementing a MIDI port.
- */
-/*@{*/ /* Initializing a MIDI port */
-
-/**
- * Initialize a class implementing an FTS MIDI port.
- *
- * @fn void fts_midiport_class_init(fts_class_t *cl)
- * @param cl FTS class
- *
- * @ingroup midiport
- */
-
-/**
- * Initialize a MIDI port structure.
- *
- * @fn void fts_midiport_init(fts_midiport_t *port)
- * @param port the MIDI port
- *
- * @ingroup midiport
- */
-
-/**
- * Free a MIDI port structures temporary buffers.
- *
- * @fn void fts_midiport_delete(fts_midiport_t *port)
- * @param port the MIDI port
- * @warning This function doesn't free the MIDI port structure itself.
- *
- * @ingroup midiport
- */
-
-extern void fts_midiport_class_init(fts_class_t *cl);
-extern void fts_midiport_init(fts_midiport_t *port);
+extern void fts_midiport_init(fts_midiport_t *port, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out);
 extern void fts_midiport_delete(fts_midiport_t *port);
+extern void fts_midiport_class_init(fts_class_t *cl);
 
-/**
- * Declare initialized MIDI port as input.
- *
- * @fn void fts_midiport_set_input(fts_midiport_t *port)
- * @param port the MIDI port
- *
- * @ingroup midiport
- */
+extern void fts_midiport_add_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener, fts_midiport_callback_t fun);
+extern void fts_midiport_remove_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener);
 
-/**
- * Declare an initialized MIDI port as output and assign it's output functions.
- *
- * @fn void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_functions_t *functions)
- * @param port the MIDI port
- * @param functions structure of implemented output functions
- *
- * @ingroup midiport
- */
-
-extern void fts_midiport_set_input(fts_midiport_t *port);
-extern void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_functions_t *functions);
-
-/*@}*/ /* Initializing a MIDI port */
-
-/** 
- * @name Handling incoming MIDI events
- *
- * Functions to call the associated MIDI port listeners on incoming events.
- */
-/*@{*/
-
-/**
- * Call all note event listeners of the MIDI port.
- *
- * For each incoming MIDI event a function is called by the object implementing an MIDI port, which calls all
- * listeners for a given MIDI channel and (if any) note or controller number.
- *
- * @fn void fts_midiport_input_note(fts_midiport_t *port, int channel, int number, int value, double time)
- * @param port the MIDI port itself
- * @param channel the MIDI channel of the incoming event
- * @param number the MIDI note or controller number of the incoming event
- * @param value the velocity, pressure, controller, program or pitch bend value of the incoming event
- * @param time an offset time of the incoming MIDI event (in msec) regarding the current logical (tick) time
- *
- * @ingroup midiport
- */
-
-/**
- * Call poly pressure change event listeners of the MIDI port.
- *
- * @fn void fts_midiport_input_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time)
- * @see fts_midiport_input_note()
- *
- * @ingroup midiport
- */
-
-/**
- * Call controller change event listeners of the MIDI port.
- *
- * @fn void fts_midiport_input_control_change(fts_midiport_t *port, int channel, int number, int value, double time)
- * @see fts_midiport_input_note()
- *
- * @ingroup midiport
- */
-
-/**
- * Call program change event listeners of the MIDI port.
- *
- * @fn void fts_midiport_input_program_change(fts_midiport_t *port, int channel, int value, double time)
- * @see fts_midiport_input_note()
- *
- * @ingroup midiport
- */
-
-/**
- * Call channel pressure change event listeners of the MIDI port.
- *
- * @fn void fts_midiport_input_channel_pressure(fts_midiport_t *port, int channel, int value, double time)
- * @see fts_midiport_input_note()
- *
- * @ingroup midiport
- */
-
-/**
- * Call system exclusive data event listeners of the MIDI port.
- *
- * @fn void fts_midiport_input_pitch_bend(fts_midiport_t *port, int channel, int value, double time)
- * @see fts_midiport_input_note()
- *
- * @ingroup midiport
- */
-
-/**
- * Add byte to the MIDI port's internal sysex buffer.
- *
- * @fn void fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value)
- * @see fts_midiport_input_system_exclusive_call()
- *
- * @ingroup midiport
- */
-
-/**
- * Call system exclusive data event listeners of the MIDI port with the data of the internal buffer.
- *
- * @fn void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, double time)
- * @see fts_midiport_input_system_exclusive_byte()
- *
- * @ingroup midiport
- */
-
-extern void fts_midiport_input_note(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_input_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_input_control_change(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_input_program_change(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_input_channel_pressure(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_input_pitch_bend(fts_midiport_t *port, int channel, int value, double time);
-
-extern void fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value);
-extern void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, double time);
-
-/*@}*/ /* Handling incoming MIDI events */
-
+extern int fts_midiport_has_superclass(fts_object_t *obj);
 
 /****************************************************
  *
- *  MIDI port i/o
+ *  MIDI in/out functions
  *
  */
 
-/**
- * MIDI port i/o classes listening or sending events to a MIDI port.
- *
- * The API documented by this module permits to implement objects refering to MIDI port.
- * These objects can receive events from the MIDI port and send events from the MIDI port.
- *
- * An i/o object can check if a given object implements an FTS MIDI port and whether it is an input and/or an output 
- * using the functions fts_midiport_check(), fts_midiport_is_input() and fts_midiport_is_output().
- * The API provides functions for declaring an object as a listener to a MIDI port (see fts_bytestream_add_listener()) 
- * and output functions sending events out of a MIDI port (see fts_midiport_output_note()).
- *
- * @defgroup midiport_io MIDI port i/o
- */
+/* midiport functions called on input (call all listeners) */
+extern void fts_midiport_channel_message(fts_midiport_t *port, fts_midi_status_t status, int channel, int x, int y, double time);
+extern void fts_midiport_system_exclusive(fts_midiport_t *port, double time);
+extern void fts_midiport_system_exclusive_add_byte(fts_midiport_t *port, int value);
 
-/** 
- * @name Refering to a MIDI port
- *
- * Functions for objects refering to MIDI port as input (listeners) or output.
- */
-/*@{*/
-
-/**
- * Check whether an FTS object implements the MIDI port abstraction
- *
- * An object who wants to listen to or output via a MIDI port should check if the object it referes to implements the MIDI port abstraction
- *
- * @fn int fts_midiport_check(fts_object_t *obj)
- * @param obj the object to be checked
- * @return non-zero if object implements an FTS MIDI port 
- *
- * @ingroup midiport_io
- */
-
-/**
- * Check whether an FTS MIDI port is an input
- *
- * @fn int fts_midiport_is_input(fts_midiport_t *port)
- * @param port the MIDI port to be checked
- * @return non-zero if port is input
- *
- * @ingroup midiport_io
- */
-
-/**
- * Check whether an FTS MIDI port is an input
- *
- * @fn fts_midiport_is_output(fts_midiport_t *port)
- * @param port the MIDI port to be checked
- * @return non-zero if port is input
- *
- * @ingroup midiport_io
- */
-extern int fts_midiport_check(fts_object_t *obj);
-extern int fts_midiport_is_input(fts_midiport_t *port);
-extern int fts_midiport_is_output(fts_midiport_t *port);
-
-/*@}*/ /* Refering to a MIDI port.*/
-
-/* define functions by macros */
-#define fts_midiport_is_input(p) ((p)->listeners != 0)
-#define fts_midiport_is_output(p) ((p)->output != 0)
-
-
-/***********************************************************************
- *
- *  MIDI port listeners
- *
- */
-
-/** 
- * @name MIDI port listeners
- *
- * Functions used by objects listening to a MIDI port
- */
-/*@{*/
-
-/**
- * Register note event listener to a MIDI port.
- *
- * In order to receive incoming MIDI messages of a certain type and channel from a MIDI port, 
- * an FTS object registeres itself as a listener to the MIDI port using this function.
- *
- * @fn void fts_midiport_add_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun)
- * @param port the listened MIDI port
- * @param chan the listened MIDI channel (1..16, MIDIPORT_ALL_CHANNELS for omni)
- * @param num the listened MIDI note or controller number (0..127, MIDIPORT_ALL_NUMBERS for omni)
- * @param obj the listening object
- * @param fun listener function to be called for incoming MIDI messages of the given MIDI type and channel
- *
- * @ingroup midiport_io
- */
-
-/**
- * Register poly pressure change event listener to a MIDI port.
- *
- * @fn void fts_midiport_add_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun)
- * @see fts_midiport_add_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Register controller change event listener to a MIDI port.
- *
- * @fn void fts_midiport_add_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun)
- * @see fts_midiport_add_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Register program change event listener to a MIDI port.
- *
- * @fn void fts_midiport_add_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun)
- * @see fts_midiport_add_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Register channel pressure change event listener to a MIDI port.
- *
- * @fn void fts_midiport_add_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun)
- * @see fts_midiport_add_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Register system exclusive data event listener to a MIDI port.
- *
- * @fn void fts_midiport_add_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun)
- * @see fts_midiport_add_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Register system exclusive data event listener to a MIDI port.
- *
- * @fn void fts_midiport_add_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj, fts_midiport_sysex_fun_t fun)
- * @see fts_midiport_add_listener_note()
- *
- * @ingroup midiport_io
- */
-
-extern void fts_midiport_add_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
-extern void fts_midiport_add_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
-extern void fts_midiport_add_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
-extern void fts_midiport_add_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
-extern void fts_midiport_add_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
-extern void fts_midiport_add_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
-extern void fts_midiport_add_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj, fts_midiport_sysex_fun_t fun);
-
-/**
- * Remove note event listener from a MIDI port.
- *
- * An object listening to a MIDI port must be removed as listener before being destroyed.
- * Typically this is done in the object's delete method.
- *
- * @fn void fts_midiport_remove_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj)
- * @param port the listened MIDI port
- * @param chan the listened MIDI channel (1..16, MIDIPORT_ALL_CHANNELS for omni)
- * @param num the listened MIDI note or controller number (0..127, MIDIPORT_ALL_NUMBERS for omni)
- * @param obj the listening object
- *
- * @ingroup midiport_io
- */
-
-/**
- * Remove poly pressure change event listener from a MIDI port.
- *
- * @fn void fts_midiport_remove_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj)
- * @see fts_midiport_remove_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Remove controller change event listener from a MIDI port.
- *
- * @fn void fts_midiport_remove_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj)
- * @see fts_midiport_remove_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Remove program change event listener from a MIDI port.
- *
- * @fn void fts_midiport_remove_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj)
- * @see fts_midiport_remove_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Remove channel pressure change event listener from a MIDI port.
- *
- * @fn void fts_midiport_remove_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj)
- * @see fts_midiport_remove_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Remove system exclusive data event listener from a MIDI port.
- *
- * @fn void fts_midiport_remove_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj)
- * @see fts_midiport_remove_listener_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Remove system exclusive data event listener from a MIDI port.
- *
- * @fn void fts_midiport_remove_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj)
- * @see fts_midiport_remove_listener_note()
- *
- * @ingroup midiport_io
- */
-
-extern void fts_midiport_remove_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
-extern void fts_midiport_remove_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
-extern void fts_midiport_remove_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
-extern void fts_midiport_remove_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj);
-extern void fts_midiport_remove_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj);
-extern void fts_midiport_remove_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj);
-extern void fts_midiport_remove_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj);
-
-/*@}*/ /* MIDI port listeners */
-
-/****************************************************
- *
- *  MIDI port output
- *
- */
-
-/** 
- * @name MIDI port output
- *
- * Functions used by objects to output events through a MIDI port
- */
-/*@{*/
-
-/**
- * Output note event via a MIDI port.
- *
- * @fn void fts_midiport_output_note(fts_midiport_t *port, int channel, int number, int value, double time)
- * @param port the MIDI port
- * @param channel the MIDI channel of the incoming event
- * @param number the MIDI note or controller number of the incoming event
- * @param value the velocity, pressure, controller, program or pitch bend value of the incoming event
- * @param time an offset time of the incoming MIDI event (in msec) regarding the current logical (tick) time
- *
- * @ingroup midiport_io
- */
-
-/**
- * Output poly pressure change event via a MIDI port.
- *
- * @fn void fts_midiport_output_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time)
- * @see fts_midiport_output_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Output controller change event via a MIDI port.
- *
- * @fn void fts_midiport_output_control_change(fts_midiport_t *port, int channel, int number, int value, double time)
- * @see fts_midiport_output_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Output program change event via a MIDI port.
- *
- * @fn void fts_midiport_output_program_change(fts_midiport_t *port, int channel, int value, double time)
- * @see fts_midiport_output_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Output channel pressure change event via a MIDI port.
- *
- * @fn void fts_midiport_output_channel_pressure(fts_midiport_t *port, int channel, int value, double time)
- * @see fts_midiport_output_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Output system exclusive data event via a MIDI port.
- *
- * @fn void fts_midiport_output_pitch_bend(fts_midiport_t *port, int channel, int value, double time)
- * @see fts_midiport_output_note()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Add byte to the sysex buffer output buffer.
- *
- * @fn void fts_midiport_output_system_exclusive_byte(fts_midiport_t *port, int value)
- * @see fts_midiport_output_system_exclusive_call()
- *
- * @ingroup midiport_io
- */
-
-/**
- * Flush system exclusive output buffer and output system exclusive event via a MIDI port.
- *
- * @fn void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double time)
- * @see fts_midiport_output_system_exclusive_byte()
- *
- * @ingroup midiport_io
- */
-
-extern void fts_midiport_output_note(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_output_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_output_control_change(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_output_program_change(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_output_channel_pressure(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_output_pitch_bend(fts_midiport_t *port, int channel, int bend, double time);
-extern void fts_midiport_output_system_exclusive_byte(fts_midiport_t *port, int value);
-extern void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double time);
-
-/*@}*/ /* MIDI port output */
+/* functions called by midi output objects */
+#define fts_midiport_output_channel_message(p, s, c, x, y, t) ((p)->channel_message_output((p), (s), (c), (x), (y), (t)))
+#define fts_midiport_output_system_exclusive(p, n, a, t) ((p)->system_exclusive_output((p), (n), (a), (t)))
 
 /****************************************************
  *

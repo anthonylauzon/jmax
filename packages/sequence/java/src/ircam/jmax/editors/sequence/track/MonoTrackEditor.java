@@ -80,16 +80,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 		public void highlight(Enumeration elements, double time)
 		{
 		    TrackEvent temp;
-		    boolean first = true; 
-		    
-		    Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
+		    boolean first = true;
 		    Graphics gr = getGraphics();		    
-		    gr./*setClip*/clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
-
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
 			{
 			    temp = (TrackEvent) e.nextElement();
-			    temp.setHighlighted(false);
 			    temp.getRenderer().render(temp, gr, false, gc);
 			}
 		    oldElements.removeAllElements();		    
@@ -97,12 +92,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 		    for (Enumeration e = elements; e.hasMoreElements();) 
 			{
 			    temp = (TrackEvent) e.nextElement();
-			    if(first)
+			     if(first)
 				{
 				    gc.getScrollManager().makeVisible(temp);
 				    first = false;
 				}
-			    temp.setHighlighted(true);
 			    temp.getRenderer().render(temp, gr, true, gc);
 			    oldElements.addElement(temp);
 			}
@@ -158,8 +152,6 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
 	setOpaque(false);
     }
-
-    public void reinit(){}
     
     public JMenu getToolsMenu()
     {
@@ -302,11 +294,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	if(SequenceTextArea.isDeleteKey(e))
 	    {
-		if(e.getID()==KeyEvent.KEY_PRESSED)
-		    {
-			((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
-			selection.deleteAll();
-		    }
+		((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
+		selection.deleteAll();
 	    }
 	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
 	    if(e.isControlDown())

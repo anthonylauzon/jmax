@@ -43,37 +43,49 @@ import ircam.jmax.toolkit.menus.*;
 
 public class TrackMenu extends EditorMenu
 {
+  JMenuItem removeTrackItem;
+  JMenu addTrackMenu;
+
+  EditorContainer container;
+  
   public TrackMenu(EditorContainer container, SequenceDataModel sequenceModel)
   {
     super("Track");
+
+    this.container = container;
     this.sequenceModel = sequenceModel;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
-    JMenu addTrackMenu = new JMenu("Add Track");
-    FillAddTrackMenu(addTrackMenu);
+    addTrackMenu    = new JMenu("Add Track");
+    FillAddTrackMenu( addTrackMenu);
     add(addTrackMenu);
     
-    JMenuItem removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
+    removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
 
     addSeparator();
     add(Actions.exportAction, "Export Track");
 
-    //******** Merge reintroduction *******************//
-    addSeparator();
-    add(Actions.mergeAction, "Merge Tracks...", java.awt.Event.CTRL_MASK, KeyEvent.VK_M);
+    //add(Actions.mergeAction, "Merge Tracks...", java.awt.Event.CTRL_MASK, KeyEvent.VK_M);
   }
     
-  private void FillAddTrackMenu(JMenu menu)
+  private void FillAddTrackMenu( JMenu menu)
   {
-    for(Enumeration e = TrackEditorFactoryTable.getTypes(); e.hasMoreElements();)
-	menu.add(new AddTrackAction((ValueInfo)e.nextElement()));
+    JMenuItem item; 
+    ValueInfo info;
+
+    for (Enumeration e = TrackEditorFactoryTable.getTypes(); e.hasMoreElements();)
+      {	
+	  info = (ValueInfo)e.nextElement();
+	  menu.add(new AddTrackAction(info));
+      }
   }
 
 
   class AddTrackAction extends AbstractAction {
     AddTrackAction(ValueInfo info)
     {
-      super(info.getPublicName(), info.getIcon());      
+      super(info.getPublicName(), info.getIcon());
+      
       this.info = info;
     }
     
@@ -88,7 +100,6 @@ public class TrackMenu extends EditorMenu
   //---
   SequenceDataModel sequenceModel;
 }
-
 
 
 

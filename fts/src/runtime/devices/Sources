@@ -48,12 +48,11 @@ ARCH_SOURCES = unixdev.c
 endif
 
 SOURCES = \
-devconf.c \
-devices.c \
-profdev.c \
-null.c \
-bytestream.c \
-$(ARCH_SOURCES)
+	  devconf.c \
+	  devices.c \
+	  profdev.c \
+	  null.c    \
+	  $(ARCH_SOURCES)
 
 
 

@@ -119,10 +119,10 @@ extern void fts_sched_add( fts_sched_t *sched, fts_method_t method, fts_object_t
     Remove from the sched a method that has been added with fts_sched_add
   Arguments:
     sched: the sched 
-    object: the object to remove
+    method: the method to remove
   Returns: nothing.
 */
-extern void fts_sched_remove( fts_sched_t *sched, fts_object_t *object);
+extern void fts_sched_remove( fts_sched_t *sched, fts_method_t method);
 
 /* run time */
 extern void fts_sched_run(void);

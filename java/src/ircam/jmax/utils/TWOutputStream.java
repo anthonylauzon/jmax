@@ -26,7 +26,6 @@
 package ircam.jmax.utils;
 import java.awt.*;
 import java.io.*;
-import javax.swing.*;
 
 /** 
  *A simple OutputStream associated with the TextWindow 

@@ -355,11 +355,6 @@ extern fts_status_t fts_close_logical_device(fts_symbol_t name, int ac, const ft
 
 extern fts_status_t fts_reset_logical_device(fts_symbol_t name);
 
-
-
-/* (fd) a function that is prototyped here, but defined in lang/dsp/dsp.c !!!! */
-extern void fts_dsp_set_dac_slip_dev( fts_dev_t *dev);
-
 #endif
 
 

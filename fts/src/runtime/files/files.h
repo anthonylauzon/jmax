@@ -27,36 +27,7 @@
 #ifndef _FTS_FILES_H_
 #define _FTS_FILES_H_
 
-/**
- * Search for a file in a path.
- *
- * A path is a list of directories separated by ':'
- *
- * If file is found, the full path will be returned in <code>full_path</code>. It is under
- * the responsability of the caller to pass a buffer which will not overflow.
- * 
- * @fn void fts_file_search_in_path( const path *filename, const char *search_path, char *full_path)
- * @param filename     the name of the file to be searched
- * @param search_path  the list of directories to be searched in
- * @param full_path    the full path of result, if file is found
- *
- * @return 1 if file is found, 0 if not
- */
-extern int fts_file_search_in_path( const char *filename, const char *search_path, char *full_path);
-
-
 extern void fts_file_get_write_path(const char *path, char *full_path);
-
-/* Utility to find a given file in the
-   a given column separated path list.
-   If the path list is a null pointer,
-   use the deafault path list .
-
-   Return 1 if the file was found, 0 otherwise.
-   If  the pathname pointer is not null, we copy the file pathname if
-   found.
-   */
-
 extern int fts_file_get_read_path(const char *name, char *pathname);
 
 extern int fts_file_open(const char *name, const char *mode);

@@ -34,47 +34,25 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-static const char *splitpath( const char *path, char *result, char sep)
-{
-  if ( *path == '\0')
-    return 0;
+/* for the moment, we emulate the 0.26 sematic,
+   but we really need something stronger
+*/
 
-  while ( *path != sep && *path != '\0')
-    {
-      *result++ = *path++;
-    }
+/* Utility to find a given file in the
+   a given column separated path list.
+   If the path list is a null pointer,
+   use the deafault path list .
 
-  *result = '\0';
+   Return 1 if the file was found, 0 otherwise.
+   If  the pathname pointer is not null, we copy the file pathname if
+   found.
+   */
 
-  return ( *path != '\0') ? path+1 : path;
-}
-
-static int file_exists( const char *filename)
+static int file_exists(const char *path)
 {
   struct stat statbuf;
 
-  return ( stat( filename, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
-}
-
-int fts_file_search_in_path( const char *filename, const char *search_path, char *full_path)
-{
-  if (*filename == '/')
-    {
-      strcpy( full_path, filename);
-
-      return file_exists( full_path);
-    }
-
-  while ( (search_path = splitpath( search_path, full_path, ':')) )
-    {
-      strcat( full_path, "/");
-      strcat( full_path, filename);
-
-      if (file_exists( full_path))
-	  return 1;
-    }
-
-  return 0;
+  return (stat(path, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 
 int fts_file_get_read_path(const char *path, char *full_path)

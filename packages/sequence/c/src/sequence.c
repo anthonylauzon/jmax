@@ -145,7 +145,7 @@ sequence_move_track(sequence_t *sequence, track_t *track, int index)
  *
  */
 
-static void
+void
 sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -155,7 +155,7 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->open = 0;  
 }
 
-static void
+void
 sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -179,7 +179,7 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 /* add new track by client request */
-static void
+void
 sequence_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -205,7 +205,7 @@ sequence_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 }
 
 /* remove track by client request */
-static void
+void
 sequence_remove_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -223,7 +223,7 @@ sequence_remove_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_
 }
 
 /* move track by client request */
-static void
+void
 sequence_move_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -239,7 +239,7 @@ sequence_move_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
     }
 }
 
-static void
+void
 sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -273,7 +273,7 @@ sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_client_send_message(o, seqsym_addTracks, n, a);
 }
 
-static void
+void
 sequence_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -283,7 +283,7 @@ sequence_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   sequence_upload(o, 0, 0, 0, 0);
 }
 
-static void
+void
 sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -292,7 +292,7 @@ sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   /* here we could as well un-upload the objects (and the client would have to destroy the proxies) */
 }
 
-static void
+void
 sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -304,7 +304,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     sequence_upload(o, 0, 0, 0, 0);
 }
 
-static void 
+void 
 sequence_import_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -322,7 +322,7 @@ sequence_import_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_t s
   fts_client_send_message((fts_object_t *)this, seqsym_openFileDialog, 4, a);
 }
 
-static void
+void
 sequence_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -333,7 +333,7 @@ sequence_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     sequence_import_midifile_with_dialog(o, 0, 0, 1, at);
 }
 
-static void
+void
 sequence_export_track_by_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -353,7 +353,7 @@ sequence_export_track_by_index(fts_object_t *o, int winlet, fts_symbol_t s, int 
     }
 }
 
-static void
+void
 sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -385,7 +385,7 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 }
 
-static void
+void
 sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -413,20 +413,6 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       
       if(track)
 	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_print, 0, 0);
-    }
-}
-
-static void
-sequence_send_name_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-  
-  if(fts_object_get_variable(o))
-    {
-      fts_atom_t a[1];
-      
-      fts_set_symbol(a, fts_object_get_variable(o));
-      fts_client_send_message(o, seqsym_setName, 1, a);
     }
 }
 
@@ -517,7 +503,6 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_track"), sequence_add_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_track"), sequence_remove_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move_track"), sequence_move_track_by_client_request);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_name"), sequence_send_name_to_client);
 
       fts_method_define_varargs(cl, 0, seqsym_clear, sequence_clear);
       fts_method_define_varargs(cl, 0, seqsym_print, sequence_print);

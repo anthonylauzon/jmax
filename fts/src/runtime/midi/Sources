@@ -25,5 +25,4 @@
 
 SOURCES = \
 midi.c \
-midiport.c \
-midiparser.c \
+midiport.c

@@ -31,7 +31,6 @@ struct fts_atom_list;
 typedef struct fts_atom_list fts_atom_list_t;
 
 extern fts_atom_list_t *fts_atom_list_new( void);
-extern fts_atom_list_t *fts_atom_list_new_with_name( fts_symbol_t name);
 extern void fts_atom_list_free( fts_atom_list_t *list);
 
 extern void fts_atom_list_clear( fts_atom_list_t *list);

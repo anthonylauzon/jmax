@@ -29,6 +29,5 @@
 
 #include "runtime/devices/devices.h"
 #include "runtime/devices/unixdev.h"
-#include "runtime/devices/bytestream.h"
 
 #endif

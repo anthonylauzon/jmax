@@ -116,5 +116,4 @@ extern fts_symbol_t fts_s_dsp_descr;
 /* The function that is called by the scheduler */
 extern void fts_dsp_chain_poll( void);
 
-
 #endif

@@ -60,6 +60,3 @@ extern track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t na
 extern track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
 
 #endif
-
-
-

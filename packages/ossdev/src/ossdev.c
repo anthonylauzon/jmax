@@ -58,6 +58,8 @@
 
 #include "fts.h"
 
+extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
+
 /* 
    (François Déchelle, dechelle@ircam.fr)
    On LinuxPPC, the natural endianism of the machine is big endian,

@@ -97,6 +97,7 @@ public class ExplodePanel extends JPanel implements Editor{
 	remove(itsView);
       }
 
+
     if (view == PIANOROLL_VIEW)
       itsView = itsScrPanel;
     else 
@@ -182,7 +183,6 @@ public class ExplodePanel extends JPanel implements Editor{
 
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
-    MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
 }
 

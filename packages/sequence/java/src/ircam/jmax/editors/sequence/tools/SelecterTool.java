@@ -76,35 +76,41 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public void selectionPointChoosen(int x, int y, int modifiers) 
   {
-      SequenceGraphicContext egc = (SequenceGraphicContext)gc;
+    TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+    
+    SequenceGraphicContext egc = (SequenceGraphicContext)gc;
 
-      egc.getTrack().setProperty("active", Boolean.TRUE);	    
-      
-      if(egc.getDataModel().isLocked()) return;
+    egc.getTrack().setProperty("active", Boolean.TRUE);
 
-      egc.getGraphicDestination().requestFocus();//???
+    egc.getGraphicDestination().requestFocus();//???
 
-      TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
-      if (aTrackEvent != null) 
-	  { //click on event
-	      startingPoint.setLocation(x,y);
+    if (aTrackEvent != null) 
+      { //click on event
+	startingPoint.setLocation(x,y);
 
-	      if (!SequenceSelection.getCurrent().isInSelection(aTrackEvent)) 
-		  {
-		      if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
-			  SequenceSelection.getCurrent().deselectAll();
-
-		      SequenceSelection.getCurrent().select(aTrackEvent);
-		  }
-	      else
-		  SequenceSelection.getCurrent().setLastSelectedEvent(aTrackEvent);
-	      
-	      singleObjectSelected(x, y, modifiers);
+	if (!SequenceSelection.getCurrent().isInSelection(aTrackEvent)) 
+	  {
+	    if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+	      {
+		SequenceSelection.getCurrent().deselectAll();
+	      } 
+	    SequenceSelection.getCurrent().select(aTrackEvent);
 	  }
-      else //click on empty
-	  if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-	      if (!SequenceSelection.getCurrent().isSelectionEmpty())
-		  SequenceSelection.getCurrent().deselectAll(); 
+	else
+	    SequenceSelection.getCurrent().setLastSelectedEvent(aTrackEvent);
+
+	singleObjectSelected(x, y, modifiers);
+      }
+    else //click on empty
+      {
+      if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+	{
+	  if (!SequenceSelection.getCurrent().isSelectionEmpty())
+	      SequenceSelection.getCurrent().deselectAll(); 
+	  
+	}
+      
+    }
   }
 
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
@@ -117,16 +123,14 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public void selectionChoosen(int x, int y, int w, int h) 
   {
-      if(((SequenceGraphicContext)gc).getDataModel().isLocked()) return;
-
       gc.getGraphicDestination().requestFocus();//???
 
-      if (w ==0) w=1;// at least 1 pixel wide
-      if (h==0) h=1;
+    if (w ==0) w=1;// at least 1 pixel wide
+    if (h==0) h=1;
     
-      selectArea(x, y, w, h);
+    selectArea(x, y, w, h);
     
-      multipleObjectSelected();
+    multipleObjectSelected();
   }
 
   /**
@@ -135,7 +139,8 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   void selectArea(int x, int y, int w, int h) 
   { 
       SequenceGraphicContext egc = (SequenceGraphicContext)gc;
-      selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
+      //SequenceSelection.getCurrent().setModel(egc.getTrack().getTrackDataModel());
+      selectArea(gc.getRenderManager(), SequenceSelection.getCurrent(), x, y,  w,  h);
   }
 
   

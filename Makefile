@@ -23,42 +23,49 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR=.
+DISTDIR=.
 
 ifdef ARCH
-include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+include $(DISTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
 all:
-	$(MAKE) -C fts $@
-	$(MAKE) -C java $@
-	$(MAKE) -C packages $@
+	(cd fts; $(MAKE) $@)
+
+	(cd java ; $(MAKE) $@)
+	(cd lib; $(MAKE) $@)
+	(cd packages; $(MAKE) $@)
 .PHONY: all
 
 all_c:
-	$(MAKE) -C fts all
-	$(MAKE) -C packages all_c
+	(cd fts; $(MAKE) all)
+	(cd lib; $(MAKE) all_c)
+	(cd packages; $(MAKE) all_c)
 .PHONY: all_c
 
 all_java:
-	$(MAKE) -C java all
-	$(MAKE) -C packages all_java
+	(cd java ; $(MAKE) all)
+	(cd lib; $(MAKE) all_java)
+	(cd packages; $(MAKE) all_java)
 .PHONY: all_java
 
 clean:
-	$(MAKE) -C fts $@
-	$(MAKE) -C java $@
-	$(MAKE) -C packages $@
+	(cd fts; $(MAKE) $@)
+	(cd java ; $(MAKE) $@)
+	(cd lib; $(MAKE) $@)
+	(cd packages; $(MAKE) $@)
 .PHONY: clean
 
 clean_c:
-	$(MAKE) -C fts clean
-	$(MAKE) -C packages clean_c
+	(cd fts; $(MAKE) clean)
+	(cd packages; $(MAKE) clean_c)
+	(cd lib; $(MAKE) clean_c)
 .PHONY: clean_c
 
 clean_java:
-	$(MAKE) -C java clean
-	$(MAKE) -C packages clean_java
+	(cd java ; $(MAKE) clean)
+	(cd lib; $(MAKE) clean_java)
+	(cd packages; $(MAKE) clean_java)
 .PHONY: clean_java
 
 #
@@ -114,7 +121,7 @@ r10k-irix6.5:
 # do the TAGS file
 #
 TAGS:
-	find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.scm" -o -name "*.tcl" \) -print | etags -L -
+	find . \! \( -name '*~' \) \( -name "*.c" -o -name "*.h" -o -name "*.java" -o -name "Makefile.*" -o -name "Makefile" -o -name "*.scm" -o -name "*.html" \) -print | etags -t -
 .PHONY: TAGS
 
 #
@@ -137,8 +144,8 @@ cvs-tag: spec-files
 # update the spec files for version number
 #
 spec-files:
-	$(MAKE) -C utils/rpm $@
-	$(MAKE) -C utils/sgi $@
+	(cd utils/rpm ; $(MAKE) $@)
+	(cd utils/sgi ; $(MAKE) $@)
 .PHONY: spec-files
 
 #
@@ -184,36 +191,37 @@ old-dist:
 install: install-doc install-bin install-includes
 .PHONY: install
 
+MAKE_INSTALL=$(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" INSTALL_LIB="$(INSTALL_LIB)" INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_SETUID="$(INSTALL_SETUID)"
+
 install-doc:
 	$(INSTALL_DIR) $(doc_install_dir)
 	$(INSTALL_DATA) LICENCE.fr $(doc_install_dir)/LICENCE.fr
 	$(INSTALL_DATA) LICENSE $(doc_install_dir)/LICENSE
 	$(INSTALL_DATA) README $(doc_install_dir)/README
 	$(INSTALL_DATA) VERSION $(doc_install_dir)/VERSION
-	$(MAKE) -C doc doc_install_dir=$(doc_install_dir) install
+	( cd doc ; $(MAKE_INSTALL) doc_install_dir=$(doc_install_dir) install )
 .PHONY: install-doc
 
 install-bin:
 	$(INSTALL_DIR) $(bin_install_dir)
-	$(MAKE) -C bin install
+	( cd bin ; $(MAKE_INSTALL) bin_install_dir=$(bin_install_dir) install )
 	$(INSTALL_DIR) $(lib_install_dir)
-	$(MAKE) -C config install 
-	$(MAKE) -C images install 
-	$(MAKE) -C java install 
-	$(MAKE) -C scm install 
-	$(MAKE) -C tcl install 
-	$(MAKE) -C fts install
-	$(MAKE) -C packages install 
+	( cd config ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd images ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd java ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd scm ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd tcl ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd fts ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install ) ; \
+	( cd packages ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
 # The following line is a hack that installs the <package>.jpk file on all platforms
 # (this is so that you can load the sgidev package even if you are running the GUI
 # on Linux
-	$(MAKE) -C packages install-noarch 
+	( cd packages ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install-noarch )
 .PHONY: install-bin
 
 install-includes:
-	$(MAKE) -C fts/src install
+	( cd fts/src ; $(MAKE_INSTALL) include_install_dir=$(include_install_dir) install )
 .PHONY: install-includes
-
 
 #
 # new-patch, new-minor, new-major
@@ -225,11 +233,11 @@ new-patch:
 	$(MAKE) spec-files
 
 new-minor:
-	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2]+1, 0) }'  VERSION > VERSION.out
+	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2]+1, a[3]) }'  VERSION > VERSION.out
 	mv VERSION.out VERSION
 	$(MAKE) spec-files
 
 new-major:
-	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1]+1, 0, 0) }'  VERSION > VERSION.out
+	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1]+1, a[2], a[3]) }'  VERSION > VERSION.out
 	mv VERSION.out VERSION
 	$(MAKE) spec-files

@@ -26,7 +26,6 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /*
@@ -66,10 +65,8 @@ public class ExplodeDataEditor extends AbstractMaxDataEditor
     // do the work here.
 
     if (! window.isVisible())
-	{
-	    window.setVisible(true);
-	    MaxWindowManager.getWindowManager().addWindow(window);
-	}
+      window.setVisible(true);
+
     window.toFront();
   }
 

@@ -168,8 +168,6 @@ abstract public class GraphicObject implements DisplayObject
 
     if (theName.equals( "messbox"))
       gobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);
-    else if (theName.equals( "display"))
-      gobj = new ircam.jmax.editors.patcher.objects.Display( sketch, object);
     else if (theName.equals( "button"))
       gobj = new ircam.jmax.editors.patcher.objects.Bang( sketch, object);
     else if (theName.equals( "toggle"))

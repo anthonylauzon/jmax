@@ -41,9 +41,7 @@ public class FtsAtomList extends FtsRemoteData
 
   static final int REMOTE_UPDATE = 1;
   static final int REMOTE_SET    = 2;
-  static final int REMOTE_NAME   = 3;
-  
-  String name; // the list name (read only)
+
   MaxVector values = new MaxVector();
 
   public FtsAtomList()
@@ -63,12 +61,6 @@ public class FtsAtomList extends FtsRemoteData
   public MaxVector getValues()
   {
     return values;
-  }
-
-  /* Access the name */
-  public String getName()
-  {
-    return name;
   }
 
   /** Get the content of the atom list as text. */
@@ -123,11 +115,6 @@ public class FtsAtomList extends FtsRemoteData
 	  values.addElement(stream.getNextArgument());
 
 	break;
-
-      case REMOTE_NAME:
-	name = stream.getNextStringArgument();
-	break;    	
-
       default:
 	break;
       }

@@ -23,8 +23,19 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR = ../../../..
+DISTDIR = ../../../../fts
 PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
 PACKAGELIB=$(LIBDIR)/libmidi.so
 
-include $(JMAXDISTDIR)/Makefiles/Makefile.package
+MODULE_CFLAGS=
+
+all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
+
+TOCLEAN = $(PACKAGELIB)
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
+

@@ -24,473 +24,22 @@
  *
  */
 
-#include "sys.h"
-#include "lang.h"
+#include "fts.h"
 #include "midiport.h"
 
-#define SYSEX_BLOCK_SIZE 512
-
-static fts_symbol_t fts_s__superclass = 0;
-static fts_symbol_t fts_s_midiport = 0;
+#define SYSEX_ATOMS_ALLOC_BLOCK 256
 
 static fts_midiport_default_function_t fts_midiport_default_function = 0;
 
-union _fts_midiport_callback_
-{
-  fts_midiport_poly_fun_t poly;
-  fts_midiport_channel_fun_t channel;
-  fts_midiport_sysex_fun_t sysex;
-};
-
-typedef struct fts_midiport_listener
-{
-  union _fts_midiport_callback_ callback;
-  fts_object_t *listener;
-  struct fts_midiport_listener *next;
-} fts_midiport_listener_t;
-
-struct fts_midiport_listeners
-{
-  fts_midiport_listener_t *note[17][128]; /* channels 1..16 + 0 for omni */
-  fts_midiport_listener_t *poly_pressure[17][128];
-  fts_midiport_listener_t *control_change[17][128]; /* controller number 1..128 + 0 for omni */
-  fts_midiport_listener_t *program_change[17];
-  fts_midiport_listener_t *channel_pressure[17];
-  fts_midiport_listener_t *pitch_bend[17];
-  fts_midiport_listener_t *system_exclusive;
-};
-
-/****************************************************
- *
- *  MIDI port class
- *
- */
-
-void 
-fts_midiport_class_init(fts_class_t *cl)
-{
-  fts_atom_t a[1];
-
-  fts_set_symbol(a, fts_s_midiport);
-
-  fts_class_put_prop(cl, fts_s__superclass, a); /* set _superclass property to "midiport" */
-}
+fts_symbol_t fts_s__superclass = 0;
+fts_symbol_t fts_s_midiport = 0;
 
 void
-fts_midiport_init(fts_midiport_t *port)
+fts_midiport_config(void)
 {
-  port->listeners = 0;
-  port->output = 0;
-
-  port->sysex_at = 0;
-  port->sysex_ac = 0;
-  port->sysex_alloc = 0;
+  fts_s_midiport = fts_new_symbol("midiport");
+  fts_s__superclass = fts_new_symbol("_superclass");
 }
-
-void
-fts_midiport_delete(fts_midiport_t *port)
-{
-  if(port->sysex_alloc)
-    fts_block_free(port->sysex_at, port->sysex_alloc);
-
-  if(port->listeners)
-    fts_free(port->listeners);
-}
-
-void
-fts_midiport_set_input(fts_midiport_t *port)
-{
-  fts_midiport_listeners_t *listeners = fts_malloc(sizeof(fts_midiport_listeners_t));
-  int i;
-
-  for(i=0; i<=16; i++)
-    {
-      int j;
-
-      for(j=0; j<=127; j++)
-	{
-	  listeners->note[i][j] = 0;
-	  listeners->poly_pressure[i][j] = 0;
-	  listeners->control_change[i][j] = 0;
-	}
-
-      listeners->program_change[i] = 0;
-      listeners->channel_pressure[i] = 0;
-      listeners->pitch_bend[i] = 0;
-    }
-
-  listeners->system_exclusive = 0;
-
-  port->listeners = listeners;
-}
-
-void
-fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_functions_t *functions)
-{
-  port->output = functions;
-}
-
-int
-fts_midiport_check(fts_object_t *obj)
-{
-  fts_atom_t a[1];
-
-  fts_object_get_prop(obj, fts_s__superclass, a);
-
-  if(fts_is_symbol(a) && fts_get_symbol(a) == fts_s_midiport)
-    return 1;
-  else
-    return 0;
-}
-
-/****************************************************
- *
- *  MIDI port listeners
- *
- */
-
-static void 
-add_poly_listener(fts_midiport_listener_t **list, fts_object_t *object, fts_midiport_poly_fun_t fun)
-{
-  fts_midiport_listener_t *l = (fts_midiport_listener_t *)fts_malloc(sizeof(fts_midiport_listener_t));
-
-  l->callback.poly = fun;
-  l->listener = object;
-  l->next = *list;
-  
-  *list = l;
-}
-
-static void 
-add_channel_listener(fts_midiport_listener_t **list, fts_object_t *object, fts_midiport_channel_fun_t fun)
-{
-  fts_midiport_listener_t *l = (fts_midiport_listener_t *)fts_malloc(sizeof(fts_midiport_listener_t));
-
-  l->callback.channel = fun;
-  l->listener = object;
-  l->next = *list;
-  
-  *list = l;
-}
-
-static void 
-remove_listener(fts_midiport_listener_t **list, fts_object_t *o)
-{
-  fts_midiport_listener_t *l = *list;
-
-  if(l)
-    {
-      fts_midiport_listener_t *freeme = 0;
-      
-      if(l->listener == o)
-	{
-	  freeme = l;
-	  *list = l->next;
-	}
-      else
-	{
-	  while(l->next)
-	    {
-	      if(l->next->listener == o)
-		{
-		  freeme = l->next;
-		  l->next = l->next->next;
-		  
-		  break;
-		}
-	      
-	      l = l->next;
-	    }
-	}
-      
-      /* free removed listener */
-      if(freeme)
-	fts_free(freeme);
-    }
-}
-
-#define CLIP_CHANNEL(c) (c < 0)? 0: ((c > 16)? 16: c)
-#define CLIP_NUMBER(n) (n < 0)? 0: ((n > 128)? 128: n);
-
-static void
-call_poly_listeners(fts_midiport_listener_t *list[][128], int channel, int number, int value, double time)
-{
-  fts_midiport_listener_t *l; 
-
-  l = list[channel][number + 1];
-  while(l)
-    {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
-
-  l = list[channel][0];
-  while(l)
-    {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
-
-  l = list[0][number + 1];
-  while(l)
-    {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
-
-  l = list[0][0];
-  while(l)
-    {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
-}
-
-static void
-call_channel_listeners(fts_midiport_listener_t **list, int channel, int value, double time)
-{
-  fts_midiport_listener_t *l; 
-
-  l = list[channel];
-  while(l)
-    {
-      l->callback.channel(l->listener, channel, value, time);
-      l = l->next;
-    }
-
-  l = list[0];
-  while(l)
-    {
-      l->callback.channel(l->listener, channel, value, time);
-      l = l->next;
-    }
-
-}
-
-/* add listeners */
-
-void
-fts_midiport_add_listener_note(fts_midiport_t *port, int channel, int number, fts_object_t *o, fts_midiport_poly_fun_t fun)
-{
-  add_poly_listener(&port->listeners->note[channel][number + 1], o, fun);
-}
-
-void
-fts_midiport_add_listener_poly_pressure(fts_midiport_t *port, int channel, int number, fts_object_t *o, fts_midiport_poly_fun_t fun)
-{
-  add_poly_listener(&port->listeners->poly_pressure[channel][number + 1], o, fun);
-}
-
-void
-fts_midiport_add_listener_control_change(fts_midiport_t *port, int channel, int number, fts_object_t *o, fts_midiport_poly_fun_t fun)
-{
-  add_poly_listener(&port->listeners->control_change[channel][number + 1], o, fun);
-}
-
-void
-fts_midiport_add_listener_program_change(fts_midiport_t *port, int channel, fts_object_t *o, fts_midiport_channel_fun_t fun)
-{
-  add_channel_listener(&port->listeners->program_change[channel], o, fun);
-}
-
-void
-fts_midiport_add_listener_channel_pressure(fts_midiport_t *port, int channel, fts_object_t *o, fts_midiport_channel_fun_t fun)
-{
-  add_channel_listener(&port->listeners->channel_pressure[channel], o, fun);
-}
-
-void
-fts_midiport_add_listener_pitch_bend(fts_midiport_t *port, int channel, fts_object_t *o, fts_midiport_channel_fun_t fun)
-{
-  add_channel_listener(&port->listeners->pitch_bend[channel], o, fun);
-}
-
-void
-fts_midiport_add_listener_system_exclusive(fts_midiport_t *port, fts_object_t *o, fts_midiport_sysex_fun_t fun)
-{
-  fts_midiport_listener_t *l = (fts_midiport_listener_t *)fts_malloc(sizeof(fts_midiport_listener_t));
-
-  l->callback.sysex = fun;
-  l->listener = o;
-  l->next = port->listeners->system_exclusive;
-  
-  port->listeners->system_exclusive = l;
-}
-
-/* remove listeners */
-
-void
-fts_midiport_remove_listener_note(fts_midiport_t *port, int channel, int number, fts_object_t *o)
-{
-  remove_listener(&port->listeners->note[channel][number + 1], o);
-}
-
-void
-fts_midiport_remove_listener_poly_pressure(fts_midiport_t *port, int channel, int number, fts_object_t *o)
-{
-  remove_listener(&port->listeners->poly_pressure[channel][number + 1], o);
-}
-
-void
-fts_midiport_remove_listener_control_change(fts_midiport_t *port, int channel, int number, fts_object_t *o)
-{
-  remove_listener(&port->listeners->control_change[channel][number + 1], o);
-}
-
-void
-fts_midiport_remove_listener_program_change(fts_midiport_t *port, int channel, fts_object_t *o)
-{
-  remove_listener(&port->listeners->program_change[channel], o);
-}
-
-void
-fts_midiport_remove_listener_channel_pressure(fts_midiport_t *port, int channel, fts_object_t *o)
-{
-  remove_listener(&port->listeners->channel_pressure[channel], o);
-}
-
-void
-fts_midiport_remove_listener_pitch_bend(fts_midiport_t *port, int channel, fts_object_t *o)
-{
-  remove_listener(&port->listeners->pitch_bend[channel], o);
-}
-
-void
-fts_midiport_remove_listener_system_exclusive(fts_midiport_t *port, fts_object_t *o)
-{
-  remove_listener(&port->listeners->system_exclusive, o);
-}
-
-/* call listeners */
-
-void
-fts_midiport_input_note(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  call_poly_listeners(port->listeners->note, channel, number, value, time);
-}
-
-void
-fts_midiport_input_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  call_poly_listeners(port->listeners->poly_pressure, channel, number, value, time);
-}
-
-void
-fts_midiport_input_control_change(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  call_poly_listeners(port->listeners->control_change, channel, number, value, time);
-}
-
-void
-fts_midiport_input_program_change(fts_midiport_t *port, int channel, int value, double time)
-{
-  call_channel_listeners(port->listeners->program_change, channel, value, time);
-}
-
-void
-fts_midiport_input_channel_pressure(fts_midiport_t *port, int channel, int value, double time)
-{
-  call_channel_listeners(port->listeners->channel_pressure, channel, value, time);
-}
-
-void
-fts_midiport_input_pitch_bend(fts_midiport_t *port, int channel, int value, double time)
-{
-  call_channel_listeners(port->listeners->pitch_bend, channel, value, time);
-}
-
-void
-fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value)
-{
-  int index = port->sysex_ac;
-
-  if(index >= port->sysex_alloc)
-    {
-      int new_alloc = port->sysex_alloc + SYSEX_BLOCK_SIZE;
-      fts_atom_t *new_buf = fts_block_alloc(new_alloc * sizeof(fts_atom_t));
-      int i;
-      
-      if(port->sysex_alloc)
-	{
-	  for(i=0; i<port->sysex_alloc; i++)
-	    new_buf[i] = port->sysex_at[i];
-	  
-	  fts_block_free(port->sysex_at, port->sysex_alloc * sizeof(fts_atom_t));
-	}
-      
-      port->sysex_at = new_buf;
-      port->sysex_alloc = new_alloc;
-    }
-
-  fts_set_int(port->sysex_at + index, value);
-  port->sysex_ac++;
-}
-
-void
-fts_midiport_input_system_exclusive_call(fts_midiport_t *port, double time)
-{
-  fts_midiport_listener_t *l = port->listeners->system_exclusive;
-
-  while(l)
-    {
-      l->callback.sysex(l->listener, port->sysex_ac, port->sysex_at, time);
-      l = l->next;
-    }
-
-  port->sysex_ac = 0;
-}
-
-/****************************************************
- *
- *  MIDI port output
- *
- */
-
-void fts_midiport_output_note(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  port->output->note((fts_object_t *)port, channel, number, value, time);
-}
-
-void fts_midiport_output_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  port->output->poly_pressure((fts_object_t *)port, channel, number, value, time);
-}
-
-void fts_midiport_output_control_change(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  port->output->control_change((fts_object_t *)port, channel, number, value, time);
-}
-
-void fts_midiport_output_program_change(fts_midiport_t *port, int channel, int value, double time)
-{
-  port->output->program_change((fts_object_t *)port, channel, value, time);
-}
-
-void fts_midiport_output_channel_pressure(fts_midiport_t *port, int channel, int value, double time)
-{
-  port->output->channel_pressure((fts_object_t *)port, channel, value, time);
-}
-
-void fts_midiport_output_pitch_bend(fts_midiport_t *port, int channel, int value, double time)
-{
-  port->output->pitch_bend((fts_object_t *)port, channel, value, time);
-}
-
-void fts_midiport_output_system_exclusive_byte(fts_midiport_t *port, int value)
-{
-  port->output->sysex_byte((fts_object_t *)port, value);
-}
-
-void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double time)
-{
-  port->output->sysex_flush((fts_object_t *)port, time);
-}
-
-/****************************************************
- *
- *  default MIDI port
- *
- */
 
 fts_midiport_t *
 fts_midiport_get_default(void)
@@ -505,8 +54,181 @@ fts_midiport_set_default_function(fts_midiport_default_function_t fun)
 }
 
 void
-fts_midiport_config(void)
+fts_midiport_init(fts_midiport_t *port, fts_midiport_channel_message_output_t chmess_out, fts_midiport_system_exclusive_output_t sysex_out)
 {
-  fts_s_midiport = fts_new_symbol("midiport");
-  fts_s__superclass = fts_new_symbol("_superclass");
+  int i, j;
+
+  for(i=fts_midi_status_note; i<=fts_midi_status_pitch_bend; i++)
+    for(j=0; j<=16; j++)
+      port->channel_message_listeners[i][j] = 0;
+
+  port->system_exclusive_listeners = 0;
+
+  port->channel_message_output = chmess_out;
+  port->system_exclusive_output = sysex_out;
+
+  port->sysex_at = 0;
+  port->sysex_ac = 0;
+  port->sysex_alloc = 0;
+}
+
+void
+fts_midiport_delete(fts_midiport_t *port)
+{
+  if(port->sysex_alloc)
+    fts_block_alloc(port->sysex_alloc * sizeof(fts_atom_t));
+}
+
+void 
+fts_midiport_class_init(fts_class_t *cl)
+{
+  fts_atom_t a[1];
+
+  fts_set_symbol(a, fts_s_midiport);
+
+  fts_class_put_prop(cl, fts_s__superclass, a); /* set _superclass property to "midiport" */
+}
+
+int 
+fts_midiport_has_superclass(fts_object_t *obj)
+{
+  fts_atom_t a[1];
+
+  fts_object_get_prop(obj, fts_s__superclass, a);
+
+  if(fts_is_symbol(a) && fts_get_symbol(a) == fts_s_midiport)
+    return 1;
+  else
+    return 0;
+}
+
+void 
+fts_midiport_add_listener(fts_midiport_t *port, fts_midi_status_t status, int channel, fts_object_t *listener, fts_midiport_callback_t fun)
+{
+  fts_midiport_listener_t *l = (fts_midiport_listener_t *)fts_malloc(sizeof(fts_midiport_listener_t));
+
+  if(channel < 0)
+    channel = 0;
+  else if(channel > 16)
+    channel = 16;  
+
+  if(status < fts_midi_status_system_exclusive)
+    {
+      l->callback = fun;
+      l->listener = listener;
+      l->next = port->channel_message_listeners[status][channel];
+      
+      port->channel_message_listeners[status][channel] = l;
+    }
+  else
+    {
+      l->callback = fun;
+      l->listener = listener;
+      l->next = port->system_exclusive_listeners;
+      
+      port->system_exclusive_listeners = l;      
+    }
+}
+
+void 
+fts_midiport_remove_listener(struct _fts_midiport_ *port, fts_midi_status_t status, int channel, fts_object_t *listener)
+{
+  fts_midiport_listener_t **root;  
+  fts_midiport_listener_t *l;
+  fts_midiport_listener_t *freeme =  0;
+
+  if(status < fts_midi_status_system_exclusive)
+    root = &port->channel_message_listeners[status][channel];
+  else
+    root = &port->system_exclusive_listeners;
+
+  l = *root;
+
+  if(l && l->listener == listener)
+    {
+      freeme = l;
+      *root = l->next;
+    }
+  else
+    {
+      while(l->next)
+	{
+	  if(l->next->listener == listener)
+	    {
+	      freeme = l->next;
+	      l->next = l->next->next;
+
+	      break;
+	    }
+	  
+	  l = l->next;
+	}
+    }
+
+  /* free removed listener */
+  if(freeme)
+    fts_free(freeme);
+}
+
+void
+fts_midiport_channel_message(fts_midiport_t *port, fts_midi_status_t status, int channel, int x, int y, double time)
+{
+  fts_midiport_listener_t *l;
+
+  /* run everybody registerd for this status and this channel */
+  l = port->channel_message_listeners[status][channel];
+  while(l)
+    {
+      l->callback.channel_message(l->listener, channel, x, y, time);
+      l = l->next;
+    }
+
+  /* run everybody registerd for this status in onmi mode (channel 0) */
+  l = port->channel_message_listeners[status][0];
+  while(l)
+    {
+      l->callback.channel_message(l->listener, channel, x, y, time);
+      l = l->next;
+    }
+}
+
+void
+fts_midiport_system_exclusive(fts_midiport_t *port, double time)
+{
+  fts_midiport_listener_t *l = port->system_exclusive_listeners;
+
+  while(l)
+    {
+      l->callback.system_exclusive(l->listener, port->sysex_ac, port->sysex_at, time);
+      l = l->next;
+    }
+
+  port->sysex_ac = 0;
+}
+
+void
+fts_midiport_system_exclusive_add_byte(fts_midiport_t *port, int value)
+{
+  int index = port->sysex_ac;
+
+  if(index >= port->sysex_alloc)
+    {
+      int new_alloc = port->sysex_alloc + SYSEX_ATOMS_ALLOC_BLOCK;
+      fts_atom_t *new_at = fts_block_alloc(new_alloc * sizeof(fts_atom_t));
+      int i;
+      
+      if(port->sysex_alloc)
+	{
+	  for(i=0; i<port->sysex_alloc; i++)
+	    new_at[i] = port->sysex_at[i];
+	  
+	  fts_block_free(port->sysex_at, port->sysex_alloc * sizeof(fts_atom_t));
+	}
+      
+      port->sysex_at = new_at;
+      port->sysex_alloc = new_alloc;
+    }
+
+  fts_set_int(port->sysex_at + index, value);
+  port->sysex_ac++;
 }

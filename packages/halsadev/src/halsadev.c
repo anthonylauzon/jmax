@@ -50,6 +50,8 @@
 #include "fts.h"
 #include "hm.h"
 
+extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
+
 /*
   NOTE: (François Déchelle, dechelle@ircam.fr)
   There is a problem with the FTS devices API: to open a device for input 

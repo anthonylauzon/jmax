@@ -657,3 +657,15 @@ fts_status_t fts_reset_logical_device(fts_symbol_t name)
   else
     return fts_Success;
 }
+
+
+
+
+
+
+
+
+
+
+
+

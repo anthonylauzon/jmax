@@ -26,7 +26,6 @@
 package ircam.jmax.fts;
 
 import java.io.*;
-import java.awt.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
@@ -86,19 +85,7 @@ class FtsErrorStreamer implements Runnable
     MaxWindowManager.getWindowManager().addWindow(window);
     out = window.getPrintStream();
     window.pack();
-    window.setVisible(true);
-    window.addWindowListener(new WindowListener(){
-	    public void windowClosing(WindowEvent e){
-		out = null;
-		window = null;
-	    }
-	    public void windowOpened(WindowEvent e){}
-	    public void windowClosed(WindowEvent e){}
-	    public void windowIconified(WindowEvent e){}       
-	    public void windowDeiconified(WindowEvent e){}
-	    public void windowActivated(WindowEvent e){}
-	    public void windowDeactivated(WindowEvent e){}  
-	});
+    window.show();
 
     out.println("Output to this window come from the Fts Standard Error");
     out.println("In general, it means that you just discovered a jMax bug");

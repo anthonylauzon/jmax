@@ -53,12 +53,8 @@ public interface TrackDataModel {
      * return the time of the last event
      */
     public abstract double getMaximumTime();
-        
-    /**
-     * true if the track is locked
-     */
-    public abstract boolean isLocked();
-
+    
+    
     /**
      * returns an enumeration of all the events
      */
@@ -103,6 +99,28 @@ public interface TrackDataModel {
     public abstract void addEvent(TrackEvent theEvent);
 
     /**
+     * create an event and add it in the database. 
+     * callback from fts 
+     * @param objId the id of the new FtsSequenceEventObject
+     * @param timeTag the time tag of the new event
+     * @param valueType the EventVale type for the new Event
+     * @param nArgs the num of args for this value
+     * @param args the Vector of arguments (Objects)
+     */
+    //public abstract void addNewEvent(int objId, double timeTag, String valueType, int nArgs, Object args[]);
+    
+    /**
+     * send a addEvent message to fts
+     * @param trackId the id of the track where we wont to add the new event
+     * @param objId the id of the new event
+     * @param time the time tag of the new event
+     * @param valueType the EventVale type for the new event
+     * @param nArgs the num of args for this value
+     * @param args the Vector of arguments (Objects)
+     */
+    //public abstract void sendAddEventMessage(int trackId, int objId, float time, String valueType, int nArgs, Object args[]);
+
+    /**
      * generic change of an event in the database.
      * Call this function to signal the parameters changing of the event, except
      * the initial time and the duration parameters. Use moveEvent and resizeEvent for that.
@@ -140,14 +158,27 @@ public interface TrackDataModel {
      */
     public abstract void removeListener(TrackDataListener theListener);
     
+
     public abstract String getName();
+    /**
+     * Returns an Enumeration of all the types (ValueInfo) contained in this
+     * model */
+    public abstract Enumeration getTypes();
+
+    public abstract ValueInfo getTypeAt(int i);
 
     /**
-     * Returns the types (ValueInfo) contained in this
-     * model 
-     */
-    public abstract ValueInfo getType();
-    
+     * Returns true if this models currently contains events of the given type */
+    public abstract boolean containsType(ValueInfo info);
+
+    /*
+     * Return the number of different types in this model */
+    public abstract int getNumTypes();
+
+    public abstract int getNumProperty();
+
+    public abstract Enumeration getPropertyNames();
+
     public abstract void addHighlightListener(HighlightListener listener);
     public abstract void removeHighlightListener(HighlightListener listener);
 
@@ -155,10 +186,19 @@ public interface TrackDataModel {
     public abstract void removeLockListener(LockListener listener);
     /**
      * Move all the events of the given model in this model, and
-     * remove them from the original one. Merge is possible only between tracks
-     * of the same type and is not undoable.
+     * remove them from the original one. After this operation, the old
+     * model is empty, but its content can be get back using the unmergeModel() call.
      */
-    public abstract void mergeModel(TrackDataModel model);
+    //public abstract void mergeModel(TrackDataModel model);
+
+    /**
+     * Fill the given TrackDataModel with all the event of type info
+     * contained in this MultiSequence. This function could be used to
+     * reverse the effect of a mergeModel call. 
+     * The resulting model can have a different content if the merged model
+     * have been edited in the meanwhile.
+     */
+    //public abstract void unmergeModel(TrackDataModel model, ValueInfo info);
 
     /**
      * Error code
@@ -171,7 +211,6 @@ public interface TrackDataModel {
     public int NO_SUCH_EVENT = Integer.MIN_VALUE;
   
 }
-
 
 
 

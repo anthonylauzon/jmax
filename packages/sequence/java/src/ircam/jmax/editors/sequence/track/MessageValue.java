@@ -50,30 +50,36 @@ public class MessageValue extends AbstractEventValue
 	super();
 
 	setText("", null, null);
-	setProperty("integer", integer);
-	setProperty("open", open);
+	properties.put("integer", integer);
+	properties.put("open", open);
     }
 
     public void setProperty(String name, Object value)
     {
 	if(name.equals("message"))
 	    message = value;
-	else if(name.equals("integer"))
-	    integer = value;
-	else if(name.equals("open"))
-	    open = value;
-	else super.setProperty(name, value);
+	else
+	    if(name.equals("integer"))
+		integer = value;
+	else
+	    if(name.equals("open"))
+		open = value;
+
+	super.setProperty( name, value);
     }
 
     public Object getProperty(String name)
     {
 	if(name.equals("message"))
 	    return message;
-	else if(name.equals("integer"))
-	    return integer;
-	else if(name.equals("open"))
-	    return open;
-	else return super.getProperty(name);
+	else
+	    if(name.equals("integer"))
+		return integer;
+	    else
+		if(name.equals("open"))
+		    return open;
+	    else
+		return super.getProperty(name);
     }
 
     public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc)

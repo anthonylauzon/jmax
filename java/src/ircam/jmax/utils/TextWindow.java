@@ -27,22 +27,20 @@ package ircam.jmax.utils;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import javax.swing.*;
 
 /**
  * The base class for all the Text window - related components.
  * Ex: TextEditor, Ermes Console.
  */
-public class TextWindow extends JFrame implements KeyListener, WindowListener{
-  int NUM_ROWS = 46;
+public class TextWindow extends Frame implements KeyListener, WindowListener{
+  int NUM_ROWS = 50;
   int NUM_COLS = 70;
-  public JTextArea itsTextArea;
+  public TextArea itsTextArea;
   public PrintStream itsPrintStream;
   OutputStream itsOutputStream;
   String filler;
   String buffer = new String();
-  static Font itsFont = new Font(Platform.FONT_NAME, Font.PLAIN, Platform.FONT_SIZE);
-    
+
   public TextWindow() {
     addKeyListener(this);
     addWindowListener(this);
@@ -50,8 +48,11 @@ public class TextWindow extends JFrame implements KeyListener, WindowListener{
   
   public TextWindow(String title) {
     super(title);
-    getContentPane().setLayout(new BorderLayout());
-
+    setLayout(new BorderLayout());
+    setBackground(Color.white);
+    setForeground(Color.blue);
+    Font thisFont = new Font(Platform.FONT_NAME, Font.PLAIN, Platform.FONT_SIZE);
+    setFont(thisFont);
     filler = new String();
     for (int i = 0; i< NUM_COLS; i++) {
       filler += "_";
@@ -80,17 +81,20 @@ public class TextWindow extends JFrame implements KeyListener, WindowListener{
   }
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////keyListener --fine
-    public void windowClosing(WindowEvent e){
-	setVisible(false);
-	dispose();
-    }
-    public void windowOpened(WindowEvent e){}
-    public void windowClosed(WindowEvent e){}
-    public void windowIconified(WindowEvent e){}       
-    public void windowDeiconified(WindowEvent e){}
-    public void windowActivated(WindowEvent e){}
-    public void windowDeactivated(WindowEvent e){}  
- 
+
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////WindowListener --inizio
+  public void windowClosing(WindowEvent e){
+    setVisible(false);
+    dispose();
+  }
+  public void windowOpened(WindowEvent e){}
+  public void windowClosed(WindowEvent e){}
+  public void windowIconified(WindowEvent e){}       
+  public void windowDeiconified(WindowEvent e){}
+  public void windowActivated(WindowEvent e){}
+  public void windowDeactivated(WindowEvent e){}  
+
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --fine
   public PrintStream getPrintStream() {
@@ -98,33 +102,29 @@ public class TextWindow extends JFrame implements KeyListener, WindowListener{
   }
   
   public void Init() {
-    itsTextArea = new JTextArea();
+    Rectangle r = getBounds();
+    
+    itsTextArea = new TextArea(NUM_ROWS, NUM_COLS);
+    itsTextArea.setEditable(true);
     itsTextArea.setBackground(Color.white);
-    itsTextArea.setForeground(Color.blue);
-    itsTextArea.setFont(itsFont);
-
-    JScrollPane scroll = new JScrollPane(itsTextArea, 
-					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-    getContentPane().add("Center", scroll);
-    getContentPane().validate();
+    add("Center", itsTextArea);
+    validate();
+    itsTextArea.setVisible(true);
+    itsTextArea.requestFocus();
     addKeyListener(this);
     addWindowListener(this);
-    pack();
-    validate();
   }
   
-    public Dimension getPreferredSize() {
-	Dimension d = new Dimension();
-	d.width = itsTextArea.getFontMetrics(itsFont).stringWidth(filler);
-	d.height = itsTextArea.getFontMetrics(itsFont).getHeight() * NUM_ROWS;
-	return d;
-    }
+  public Dimension getPreferredSize() {
+    Dimension d = new Dimension();
+    d.width = itsTextArea.getFontMetrics(itsTextArea.getFont()).stringWidth(filler);
+    d.height = itsTextArea.getFontMetrics(itsTextArea.getFont()).getHeight() * NUM_ROWS;
+    return d;
+  }
   
-    public Dimension getMinimumSize() {
-	return getPreferredSize();
-    }
+  public Dimension getMinimumSize() {
+    return getPreferredSize();
+  }
 }
 
 

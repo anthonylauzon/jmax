@@ -39,6 +39,9 @@
 
 #include "fts.h"
 
+extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
+
+
 /******************************************************************************/
 /*                                                                            */
 /* Audio devices                                                              */

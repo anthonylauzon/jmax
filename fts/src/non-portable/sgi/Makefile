@@ -22,5 +22,16 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-JMAXDISTDIR = ../../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.fts
+ROOTDIR = ../../..
+
+include $(ROOTDIR)/Makefiles/Makefile.common
+include Sources
+
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libhw.a
+
+$(LIBDIR)/libSys.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/libhw.a $(OBJECTS)
+
+TOCLEAN = $(LIBDIR)/libhw.a
+
+include $(ROOTDIR)/Makefiles/Makefile.misc

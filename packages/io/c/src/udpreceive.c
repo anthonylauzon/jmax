@@ -35,6 +35,7 @@
 #include <stdio.h>
 
 #include "fts.h"
+#include "protocol.h"
 
 #define UDP_PACKET_SIZE 512
 

@@ -34,8 +34,18 @@ import ircam.jmax.utils.*;
 
 public class FtsForkObject extends FtsObject
 {
-  public FtsForkObject(Fts fts, FtsObject parent, int nOuts)
+  /*****************************************************************************/
+  /*                                                                           */
+  /*                               CONSTRUCTORS                                */
+  /*                                                                           */
+  /*****************************************************************************/
+
+  /**
+   * Create a FtsForkObject object
+   */
+
+    public FtsForkObject(Fts fts, FtsObject parent, int nOuts)
   {
-    super(fts, parent, null, "fork", "");
+      super(fts, parent, null, "fork", "");
   }
 }

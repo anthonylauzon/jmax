@@ -23,16 +23,25 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 
-JMAXDISTDIR = ../../../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.fts
+ROOTDIR = ../../..
 
-lib-recursive: lib
-	(cd portable; $(MAKE) lib)
-.PHONY:lib-recursive
+include $(ROOTDIR)/Makefiles/Makefile.common
+include Sources
 
-cleanobjs-recursive: cleanobjs
-	(cd portable ; $(MAKE) cleanobjs)
-.PHONY:cleanobjs-recursive
+
+MODULE_LIB=$(LIBDIR)/libVecLib.a
+
+all: $(LIBDIR) $(OBJDIR) portable $(MODULE_LIB)
+
+clean : portable_clean
+
+portable:
+	(cd portable; $(MAKE) all)	
+.PHONY: portable
+
+portable_clean:
+	(cd portable; $(MAKE) clean)	
+.PHONY: portable_clean
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/lang/veclib
@@ -41,3 +50,6 @@ install:
 	(cd portable ; $(MAKE) install)
 .PHONY: install
 
+TOCLEAN = $(MODULE_LIB)
+
+include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -21,27 +21,9 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+#
 
-PLATFORM := linux-ppc
+include $(DISTDIR)/Makefiles/Makefile.linux
 
-CC := gcc
-LD := gcc
-
-ARCH_CFLAGS := -pipe -Wall -DLINUX -DLINUXPPC
-ARCH_LDFLAGS := -rdynamic
-
-LD_ALL_FLAG := --whole-archive
-LD_NONE_FLAG := --no-whole-archive
-CC_ALL_FLAG := -Xlinker --whole-archive
-CC_NONE_FLAG := -Xlinker --no-whole-archive
-
-ARCH_OPT_CFLAGS := -O6 -funroll-all-loops
-ARCH_OPT_LDFLAGS := 
-
-FTS_SYS_LIBS = -lm -ldl -laudiofile -lpthread
-FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
-
-## Rule for dynamic libraries
-$(LIBDIR)/%.so : $(LIBDIR)/%.a
-	ld $(FTS_SOFLAGS) -export-dynamic -shared -o $@ $(LD_ALL_FLAG) $(LIBDIR)/$*.a  $(LD_NONE_FLAG) $(SOLIBS) -lc $(MORESOLIBS)
+ARCH_PACKAGES=ossdev unixdtd
 

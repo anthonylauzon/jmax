@@ -100,9 +100,6 @@ dsp_module_shutdown(void)
 }
 
 
-/*
-  (fd) Wonderfull !!! Magnifique !!!
-*/
 
 struct fts_dev;
 typedef struct fts_dev fts_dev_t;

@@ -67,12 +67,38 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	    flavors = new DataFlavor[1];
 	flavors[0] = sequenceFlavor;
 
-	this.info = info;
+	addInfoType(info);
     }
 
-    public void setUntitled()
+    void addInfoType(ValueInfo info)
     {
-	trackName = "untitled";
+	String name;
+
+	infos.addElement(info);
+	
+	for(Enumeration e = info.getPropertyNames(); e.hasMoreElements();)
+	    {
+		name = (String)e.nextElement();
+		if(!propertyNameExist(name))
+		    {
+			namePropertyVector.addElement(name);
+			numProperties++;
+		    }
+	    }
+
+	addFlavor(info.getDataFlavor());
+    }
+
+    boolean propertyNameExist(String name)
+    {
+	String aName;
+	for(Enumeration e = namePropertyVector.elements(); e.hasMoreElements();)
+	    {
+		aName = (String)e.nextElement();
+		if(aName.equals(name))
+		    return true;
+	    }
+	return false;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -182,13 +208,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
   public void lock(int nArgs , FtsAtom args[])
   {
-      locked = true;
       notifyLock(true);
   }
 
   public void unlock(int nArgs , FtsAtom args[])
   {
-      locked = false;
       notifyLock(false);
   }
 
@@ -274,11 +298,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		if(time>max) max = time;
 	    }
 	return max;
-    }
-
-    public boolean isLocked()
-    {
-	return locked;
     }
     
     /**
@@ -688,7 +707,10 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	copy();
 	
 	beginUpdate(); //cut is undoable
+
 	SequenceSelection.getCurrent().deleteAll();
+
+	endUpdate();
     }
     
     public void copy()
@@ -697,6 +719,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	    return;
 	SequenceSelection.getCurrent().prepareACopy();
 	MaxApplication.systemClipboard.setContents(SequenceSelection.getCurrent(), this);
+
     }  
     
     public void paste()
@@ -725,43 +748,27 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	if (objectsToPaste != null)
 	    {
 		Event event;
-				
+		
+		
 		SequenceSelection.getCurrent().deselectAll();
 
-		if(objectsToPaste.hasMoreElements())
-		    {
-			event = (Event) objectsToPaste.nextElement();
-			
-			if(event.getValue().getValueInfo() != getType())
-			    {
-				System.err.println("Clipboard error in paste: attempt to copy <"+event.getValue().getValueInfo().getPublicName()+"> events in <"+getType().getPublicName()+"> track!");
-				return;
-			    }
+		beginUpdate();  //the paste is undoable
 
-			try {
-
-			    beginUpdate();  //the paste is undoable
-
-
+		try {
+		    while (objectsToPaste.hasMoreElements())
+			{
+			    event = (Event) objectsToPaste.nextElement();
 			    requestEventCreationWithoutUpload((float)event.getTime(), 
 							      event.getValue().getValueInfo().getName(), 
 							      event.getValue().getPropertyCount(), 
 							      event.getValue().getPropertyValues());
-		    
-			    while (objectsToPaste.hasMoreElements())
-				{
-				    event = (Event) objectsToPaste.nextElement();
-				    requestEventCreationWithoutUpload((float)event.getTime(), 
-								      event.getValue().getValueInfo().getName(), 
-								      event.getValue().getPropertyCount(), 
-								      event.getValue().getPropertyValues());
-				}
-		    
-			    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
 			}
-			catch (Exception e) {}
-		    }
-	    }
+		    
+		    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
+		}
+		catch (Exception e) {}
+		
+	  }
     }
     
     /** ClipboardOwner interface */
@@ -1000,40 +1007,92 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
 
     /**
-     * Move all the events of the given model in this model. Merging is allowed only between 
-     * tracks of the same type. Merging is not undoable.      
+     * Move all the events of the given model in this MultiSequence, and
+     * remove them from the original one. After this operation, the old
+     * model is empty, but its content can be get back using the unmergeModel() call.
      */
-    public void mergeModel(TrackDataModel model)
-    {
-	Event event;
+    /*public void mergeModel(TrackDataModel model)
+      {
+      for (Enumeration e = model.getEvents(); e.hasMoreElements();)
+      {
+      
+      addEvent((TrackEvent) e.nextElement());
+      }
+      
+      for (Enumeration e = model.getTypes(); e.hasMoreElements();)
+      infos.addElement(e.nextElement());
+      
+      model.removeAllEvents();
+      }*/
 
-	beginUpdate(); 
-	
-	try {
-	    for (Enumeration e = model.getEvents(); e.hasMoreElements();)
-		{
-		    event = (Event) e.nextElement();
-		    requestEventCreationWithoutUpload((float)event.getTime(), 
-						      event.getValue().getValueInfo().getName(), 
-						      event.getValue().getPropertyCount(), 
-						      event.getValue().getPropertyValues());
-		}	    
-	    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
-	}
-	catch (Exception e) {}
-    }
 
     /**
-     * Returns the ValueInfo contained in this model
+     * Fill the given TrackDataModel with all the event of type info
+     * contained in this MultiSequence. This function could be used to
+     * reverse the effect of a mergeModel call. 
+     * The resulting models can have a different content if the MultiSequence
+     * object have been edited in the meanwhile.
      */
-    public ValueInfo getType()
+    /*public void unmergeModel(TrackDataModel model, ValueInfo info)
+      {
+      if (!infos.contains(info))
+      return; 
+      // no elements of type info are present.
+      
+      infos.removeElement(info);
+      
+      TrackEvent temp;
+      for (Enumeration e = getEvents(); e.hasMoreElements();)
+      {
+      temp = (TrackEvent) e.nextElement();
+      if (temp.getValue().getValueInfo().equals(info))
+      {
+      model.addEvent(temp);
+      }
+      }
+
+      }*/
+
+    /**
+     * Returns an enumeration of all the ValueInfo merged in this model
+     */
+    public Enumeration getTypes()
     {
-	return info;
+	return infos.elements();
+    }
+
+    public ValueInfo getTypeAt(int i)
+    {
+	return (ValueInfo) infos.elementAt(i);
+    }
+    /**
+     * Returns true if this models currently contains events of the given type */
+    public boolean containsType(ValueInfo info)
+    {
+	return infos.contains(info);
+    }
+
+
+    /**
+     * Returns the number of types */
+    public int getNumTypes()
+    {
+	return infos.size();
     }
 
     public String getName()
     {
 	return trackName;
+    }
+
+    public int getNumProperty()
+    {
+	return numProperties;
+    }
+
+    public Enumeration getPropertyNames()
+    {
+	return namePropertyVector.elements();
     }
 
     public DataFlavor[] getDataFlavors()
@@ -1085,9 +1144,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     }
 
     //---  AbstractSequence fields
-    ValueInfo info;
+    int numProperties = 0;
+    Vector namePropertyVector = new Vector();
 
-    boolean locked = false;
     int events_size   = 256;	// 
     int events_fill_p  = 0;	// next available position
     TrackEvent events[] = new TrackEvent[256];
@@ -1095,17 +1154,17 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     private MaxVector hhListeners;
     private MaxVector lockListeners;
     private MaxVector tempVector = new MaxVector();
+    MaxVector infos = new MaxVector();
     private String trackName;
     public DataFlavor flavors[];
-
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
-    public static FtsAtom[] sendArgs = new FtsAtom[128];
-    static
-    {
-	for(int i=0; i<128; i++)
-	    sendArgs[i]= new FtsAtom();
-    }
+  public static FtsAtom[] sendArgs = new FtsAtom[128];
+  static
+  {
+    for(int i=0; i<128; i++)
+      sendArgs[i]= new FtsAtom();
+  }
 }
 
 

@@ -23,11 +23,22 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR= ../../../..
-PACKAGEROOT= ..
+JMAXROOTDIR= ../../../..
+DISTDIR= $(JMAXROOTDIR)/fts
+
+PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
 PACKAGELIB=$(LIBDIR)/libio.so
 
-include $(JMAXDISTDIR)/Makefiles/Makefile.package
+MODULE_CFLAGS= -I$(JMAXROOTDIR)/lib/protocol/c/src
+MORESOLIBS=$(JMAXROOTDIR)/lib/protocol/c/lib/$(ARCH)/libProtocol.a
 
+all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
 
+TOCLEAN = $(PACKAGELIB)
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
 

@@ -49,7 +49,7 @@ public class MidiValue extends AbstractEventValue
 	setProperty("duration", new Double(64.0));
     }
 
-  Object intValue, channel, number, duration;
+  Object intValue, channel, number;
 
   public void setProperty(String name, Object value)
     {
@@ -59,9 +59,8 @@ public class MidiValue extends AbstractEventValue
 	    number = value;
 	else if(name.equals("channel"))
 	    channel = value;
-	else if(name.equals("duration"))
-	    duration = value;
-	else super.setProperty(name, value);
+
+      super.setProperty(name, value);
   }
   public Object getProperty(String name)
   {
@@ -71,9 +70,8 @@ public class MidiValue extends AbstractEventValue
 	  return number;
       if(name.equals("channel"))
 	  return channel;
-      if(name.equals("duration"))
-	  return duration;
-      else return super.getProperty(name);
+      else
+	  return super.getProperty(name);
   }
 
     public ValueInfo getValueInfo() 

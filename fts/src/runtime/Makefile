@@ -22,25 +22,25 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-lib-recursive:
-	(cd sched; $(MAKE) lib)
-	(cd time; $(MAKE) lib)
-	(cd files; $(MAKE) lib)
-	(cd midi; $(MAKE) lib)
-	(cd audio; $(MAKE) lib)
-	(cd client; $(MAKE) lib)
-	(cd devices; $(MAKE) lib)
-.PHONY: lib-recursive
+all:
+	(cd sched; $(MAKE) $@)
+	(cd time; $(MAKE) $@)
+	(cd files; $(MAKE) $@)
+	(cd midi; $(MAKE) $@)
+	(cd audio; $(MAKE) $@)
+	(cd client; $(MAKE) $@)
+	(cd devices; $(MAKE) $@)
+.PHONY: all
 
-cleanobjs-recursive:
-	(cd sched; $(MAKE) cleanobjs)
-	(cd time; $(MAKE) cleanobjs)
-	(cd files; $(MAKE) cleanobjs)
-	(cd midi; $(MAKE) cleanobjs)
-	(cd audio; $(MAKE) cleanobjs)
-	(cd client; $(MAKE) cleanobjs)
-	(cd devices; $(MAKE) cleanobjs)
-.PHONY: cleanobjs-recursive
+clean:
+	(cd sched; $(MAKE) $@)
+	(cd time; $(MAKE) $@)
+	(cd files; $(MAKE) $@)
+	(cd midi; $(MAKE) $@)
+	(cd audio; $(MAKE) $@)
+	(cd client; $(MAKE) $@)
+	(cd devices; $(MAKE) $@)
+.PHONY: all
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts/runtime

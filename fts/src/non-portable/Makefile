@@ -22,14 +22,15 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-JMAXDISTDIR = ../../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.fts
+ROOTDIR = ../..
 
-lib-recursive:
-	(cd $(PLATFORM); $(MAKE) lib)
-.PHONY: lib-recursive
+include $(ROOTDIR)/Makefiles/Makefile.common
 
-cleanobjs-recursive:
-	(cd $(PLATFORM); $(MAKE) cleanobjs)
-.PHONY: cleanobjs-recursive
+all:
+	(cd $(PLATFORM); $(MAKE) $@)
+.PHONY: all
+
+clean:
+	(cd $(PLATFORM); $(MAKE) $@)
+.PHONY: all
 

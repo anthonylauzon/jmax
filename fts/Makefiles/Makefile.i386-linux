@@ -1,0 +1,55 @@
+# 
+# jMax
+# Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# See file LICENSE for further informations on licensing terms.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# 
+# Based on Max/ISPW by Miller Puckette.
+#
+# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+
+
+
+VENDOR := gnu
+OS_TYPE := unix
+PLATFORM := linux-intel
+
+CC := gcc
+LD := gcc
+ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC
+# Compiling for a pentium (what about a i486 ? :-)))
+ARCH_OPT_CFLAGS := -O2 -mpentium -funroll-all-loops
+ARCH_LDFLAGS := -rdynamic
+
+LD_ALL_FLAG := --whole-archive
+LD_NONE_FLAG := --no-whole-archive
+CC_ALL_FLAG := -Xlinker --whole-archive
+CC_NONE_FLAG := -Xlinker --no-whole-archive
+
+
+# Portland compiler
+#CC := pgcc
+#LD := pgcc
+#ARCH_CFLAGS := -DLINUX -DLINUXPC
+#ARCH_OPT_CFLAGS := -v -O2 -Munroll -tp p6 -Mnoframe  -Muchar -pc 64 
+#ARCH_OPT_LDFLAGS := -v
+
+FTS_SYS_LIBS = -ldl -laudiofile -lm -lpthread
+FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
+
+
+

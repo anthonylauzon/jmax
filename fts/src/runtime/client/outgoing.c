@@ -48,9 +48,6 @@
 #include "runtime/client/client.h"
 #include "runtime/client/outgoing.h"
 
-#ifdef INCOMING_DEBUG_TRACE
-extern const char *protocol_printable_cmd( int cmd);
-#endif
 
 /******************************************************************************/
 /*                                                                            */

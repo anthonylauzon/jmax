@@ -28,7 +28,4 @@ package provide midishare
 global jmaxArch jmaxMode
 ucs load module midishare $dir/c/lib/$jmaxArch/$jmaxMode/libmidishare.so
 
-helpSummary MidiShare $dir/help/midishare.summary.jmax
-helpPatch midishareport $dir/help/midishareport.help.jmax
-
-puts "package: midishare (MidiShare MIDI port)"
+puts "package: midishare (midishare MIDI port)"

@@ -198,3 +198,5 @@ event_config(void)
   fts_class_install(seqsym_event, event_instantiate);
   event_class = fts_class_get_by_name(seqsym_event);
 }
+
+

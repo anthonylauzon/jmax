@@ -72,27 +72,26 @@ public class DeleteTool extends Tool implements PositionListener {
   /**
    * called by the MouseTracker
    */
-    public void positionChoosen(int x, int y, int modifiers) 
-    {
+  public void positionChoosen(int x, int y, int modifiers) 
+  {
+    TrackEvent aEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+    
+    if (aEvent != null) 
+      {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-	if(egc.getDataModel().isLocked()) return;
 
-	TrackEvent aEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
-	
-	if (aEvent != null) 
+	// starts an undoable transition	
+	((UndoableData) egc.getDataModel()).beginUpdate();
+
+	if( egc.getSelection().isInSelection(aEvent))
+	    egc.getSelection().deleteAll();
+	else
 	    {
-		// starts an undoable transition	
-		((UndoableData) egc.getDataModel()).beginUpdate();
-
-		if( egc.getSelection().isInSelection(aEvent))
-		    egc.getSelection().deleteAll();
-		else
-		    {
-			egc.getDataModel().removeEvent(aEvent);		
-			egc.getSelection().deselectAll();
-		    }
+		egc.getDataModel().removeEvent(aEvent);		
+		egc.getSelection().deselectAll();
 	    }
-    } 
+      }
+  } 
 
     //---- Fields
 

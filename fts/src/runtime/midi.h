@@ -29,6 +29,5 @@
 
 #include "runtime/midi/midi.h"
 #include "runtime/midi/midiport.h"
-#include "runtime/midi/midiparser.h"
 
 #endif

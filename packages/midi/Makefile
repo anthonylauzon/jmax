@@ -49,5 +49,4 @@ install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/midi
 	$(INSTALL_DATA) midi.jpk $(lib_install_dir)/packages/midi/midi.jpk
 	( cd c ; $(MAKE) $@)
-	( cd help ; $(MAKE) $@)
 .PHONY: install

@@ -53,7 +53,6 @@ note_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     case 1:
       this->pitch = fts_get_number_int(at + 0);
     default:
-      break;
     }
 }
 

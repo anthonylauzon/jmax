@@ -202,6 +202,9 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
      * as a result of a merge */
     public void trackAdded(Track track)
     {
+	//if(track.getName().equals("untitled"))
+	//  track.getFtsTrack().requestSetName("untitled"+getCurrentUntitledTrackIndex());
+
 	TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
 	teditor.getGraphicContext().setToolManager(manager);
 	teditor.getGraphicContext().setFrame(itsContainer.getFrame());
@@ -251,6 +254,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
 	  teditor.updateNewObject((TrackEvent)e.nextElement());
     }
+
+    /*public int getCurrentUntitledTrackIndex()
+      {
+      int index = 0;	
+      while(sequenceData.getTrackByName("untitled"+index) != null)
+      index++;
+      
+      return index;
+      }*/
 
     public void tracksAdded(int maxTime)
     {
@@ -336,6 +348,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public void objectsAdded(int maxTime) 
     {
 	resizePanelToTime(maxTime);	
+	System.err.println("sequencePanel objectAdded");
     }
     public void objectDeleted(Object whichObject, int index){}
     public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
@@ -439,21 +452,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	      }
   }
 
-    /*public void Settings(){
-      itsScrPanel.settings();
+    public void Settings(){
+	//itsScrPanel.settings();
+    }
+
+    /*public void Merge(){
+      new MergeDialog(sequenceData, geometry);
       }*/
-
-    //******** Merge reintroduction *******************//
-    public void Merge(){
-	new MergeDialog(sequenceData, geometry, this);
-    }
     
-    public void reinitTrackEditor(Track track)
-    {
-	((TrackContainer) trackContainers.get(track)).getTrackEditor().reinit();	
-    }
-    
-
     public void removeActiveTrack()
     {
 	Track track = mutex.getCurrent();
@@ -464,15 +470,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public Track getCurrentTrack()
     {
 	return mutex.getCurrent();
-    }
-
-    public TrackEditor getCurrentTrackEditor()
-    {
-	Track current = mutex.getCurrent();
-	if(current != null)
-	    return ((TrackContainer) trackContainers.get(current)).getTrackEditor();
-	else
-	    return null;
     }
 
     public Frame getFrame(){
@@ -499,8 +496,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   }
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
-    ftsSequenceObject.closeEditor(); 
-    MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
+    ftsSequenceObject.closeEditor();
   }
     
     /**

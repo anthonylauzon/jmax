@@ -22,8 +22,12 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-JMAXDISTDIR = ../../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.fts
+
+
+ROOTDIR = ../..
+
+include $(ROOTDIR)/Makefiles/Makefile.common
+include Sources
 
 DATE:= $(shell date | sed 's/\"//'g)
 HOST:= $(shell hostname)
@@ -31,18 +35,42 @@ MODULE_CFLAGS:= -DCOMPILATION_INFO_STRING='"(compiled by $(USER) for $(ARCH) on 
 
 FTS_BIN = $(BINDIR)/fts
 
-bin:  $(BINDIR) $(FTS_BIN)
+all:  $(BINDIR) $(LIBDIR) $(OBJDIR) $(FTS_BIN)
 
 TOCLEAN = $(FTS_BIN)
 
-## Rule to make an fts executable
+# (fd) Because of automatic rules for .a, this no longer works
+# Maybe the Makefile organization is too complicated ? Why
+# making archives for each subdirectory (even with 1 file) ?...
+# removed include $(ROOTDIR)/Makefiles/Makefile.misc
+
+## Rule to make an fts executable; here to simplify makefiles.
 ifeq ($(ARCH),macosx)
 $(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
 	rm -f $(FTS_BIN)
 	$(CC) $(FTS_LDFLAGS) -o $@ $(OBJDIR)/*.o $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
 else
-$(FTS_BIN) : $(OBJECTS) $(FTS_LIB) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
+$(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
 	rm -f $(FTS_BIN)
-	$(CC) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_LIB) $(FTS_ARCH_LIBS) $(CC_NONE_FLAG) $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
+	$(CC) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_LIBS) $(FTS_ARCH_LIBS) $(CC_NONE_FLAG)   $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
 endif
+
+cleanobjs:
+	rm -f $(OBJECTS)
+
+clean:
+	rm -f $(OBJECTS)
+	rm -f $(TOCLEAN)
+
+$(OBJDIR)/%.o : %.c
+	$(CC) -c  $(CFLAGS) $< -o $@
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+$(LIBDIR):
+	mkdir -p $(LIBDIR)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
 

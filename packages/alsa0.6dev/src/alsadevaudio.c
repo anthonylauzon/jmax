@@ -44,16 +44,58 @@
 #include "fts.h"
 #include "libsndmmap.h"
 
+extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
+
 #define DEFAULT_N_CHANNELS 2
 #define DEF_SAMPLING_RATE ((float)44100.0f)
 #define DEF_FIFO_SIZE 256
 
 typedef struct {
-  snd_pcm_t *handle;
+  mmapdev_t md;
+  int count;
   int n_channels;
 } alsa_dev_data_t;
 
 #define GET_DEV_DATA(DEV) ((alsa_dev_data_t *)fts_dev_get_device_data( DEV))
+
+static alsa_dev_data_t *single_instance = 0;
+
+static alsa_dev_data_t *create_instance( int nargs, const fts_atom_t *args)
+{
+  int n_channels, sampling_rate, fifo_size, frag_size, card, device, subdevice;
+  alsa_dev_data_t *data;
+
+  sampling_rate = (int) fts_param_get_float( fts_s_sampling_rate, DEF_SAMPLING_RATE);
+  fifo_size = fts_param_get_int(fts_s_fifo_size, DEF_FIFO_SIZE);
+
+  /* Compute fragment size */
+  /* For now, we assume that there is only 2 fragments in the buffer */
+  frag_size = fifo_size / 2;
+  if (frag_size % FTS_DEF_TICK_SIZE != 0)
+    {
+      frag_size = FTS_DEF_TICK_SIZE * (frag_size / FTS_DEF_TICK_SIZE + 1);
+    }
+
+  /* Parameter parsing */
+  n_channels = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), DEFAULT_N_CHANNELS);
+  card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), 0);
+  device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
+  subdevice = fts_get_int_by_name( nargs, args, fts_new_symbol( "subdevice"), 0);
+
+  /* Allocation of device data */
+  data = (alsa_dev_data_t *)fts_malloc( sizeof( alsa_dev_data_t));
+
+  if (snd_open( &data->md, card, device, subdevice, SND_PCM_SFMT_S32_LE, sampling_rate, frag_size) < 0)
+    return 0;
+
+  if (snd_start( &data->md) < 0)
+    return 0;
+
+  data->count = 0;
+  data->n_channels = n_channels;
+
+  return data;
+}
 
 /*----------------------------------------------------------------------------*/
 /* Audio output device                                                        */
@@ -72,6 +114,19 @@ typedef struct {
 
 static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
+  /* 
+     There is only one instance now, because of the way the FTS "devices"
+     are opened (input and output separated, which does not work well).
+  */
+  if (single_instance == 0)
+    {
+      single_instance = create_instance( nargs, args);
+
+      if ( !single_instance)
+	return &fts_dev_open_error;
+    }
+
+  /* This is to inform the scheduler that it should use this device to check for I/O errors */
   fts_dsp_set_dac_slip_dev( dev);
 
   return fts_Success;
@@ -82,17 +137,19 @@ static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
 */
 static fts_status_t alsa_dac_close(fts_dev_t *dev)
 {
+  if (single_instance != 0 && snd_close( &single_instance->md) < 0)
+    {
+      single_instance = 0;
+
+      return &fts_dev_open_error;
+    }
 
   return fts_Success;
 }
 
 static int alsa_dac_get_nchans( fts_dev_t *dev)
 {
-  alsa_pcm_dev_data_t *data;
-
-  data = GET_DEV_DATA( dev);
-
-  return data->n_channels;
+  return single_instance->n_channels;
 }
 
 static int alsa_dac_get_nerrors( fts_dev_t *dev)

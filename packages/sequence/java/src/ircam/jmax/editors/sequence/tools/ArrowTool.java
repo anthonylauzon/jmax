@@ -129,12 +129,13 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
+
     
     if(deltaX != 0) 
 	{	    
 	    // starts a serie of undoable moves
 	    ((UndoableData) egc.getDataModel()).beginUpdate();
-	    
+
 	    if(!a.isHorizontalMovementBounded())
 		{
 		    int i = 0;

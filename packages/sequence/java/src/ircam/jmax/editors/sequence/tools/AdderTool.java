@@ -54,6 +54,7 @@ public class AdderTool extends Tool implements PositionListener {
       itsMidiMouseTracker = new MidiMouseTracker(this);
   }
 
+
     /**
      * the default interaction module for this tool
      */
@@ -69,6 +70,7 @@ public class AdderTool extends Tool implements PositionListener {
     {
     }
 
+
     int remember_x; 
     int remember_y;
     /**
@@ -80,22 +82,38 @@ public class AdderTool extends Tool implements PositionListener {
 	
 	egc.getTrack().setProperty("active", Boolean.TRUE);
 
-	if(egc.getDataModel().isLocked()) return;
-
 	// starts an undoable transition	
 	((UndoableData) egc.getDataModel()).beginUpdate();
 	//endUpdate is called in addEvents in dataModel
-
-	//with Shift add to selection
-	if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
+	
+	if (egc.getTrack().getTrackDataModel().getNumTypes()>1)
+	  {
+	      // In case of multitrack, the operation is postponed:
+	      // a popup is shown to allow the user to choose the type of event to add.
+	      popupChoose(x, y, egc.getTrack());
+	      return;
+	  }
+	else
+	    {
+		//with Shift add to selection
+		if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
 	       
-	ValueInfo info = egc.getTrack().getTrackDataModel().getType();
-	addEvent(x, y, (EventValue) info.newInstance());
+		ValueInfo info = (ValueInfo) egc.getTrack().getTrackDataModel().getTypes().nextElement();
+		addEvent(x, y, (EventValue) info.newInstance());
+	    }
     }
-        
+    
+    
+    static FtsAtom[] sendArgs = new FtsAtom[128];
+    static
+    {
+	for(int i=0; i<128; i++)
+	    sendArgs[i]= new FtsAtom();
+    }
+
     void addEvent(int x, int y, EventValue value)
     {
-	UtilTrackEvent aEvent = new UtilTrackEvent(value);
+	UtilTrackEvent aEvent = new UtilTrackEvent(value); // create a new event with the given FtsRemoteData type
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	
 	egc.getAdapter().setX(aEvent, x);
@@ -108,7 +126,47 @@ public class AdderTool extends Tool implements PositionListener {
 							  value.getPropertyValues());
     }
 
+    void popupChoose(int x, int y, Track track)
+    {
+
+	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	JPopupMenu popup = new JPopupMenu();
+
+	for (Enumeration e = track.getTrackDataModel().getTypes(); e.hasMoreElements();)
+	  {
+	      ValueInfo info = (ValueInfo) e.nextElement();
+	      PrivateAction a = new PrivateAction(info, x, y);
+	  
+	      popup.add(a);
+	  }
+
+	popup.show(gc.getGraphicDestination(), x-5, y-5);
+    }
+
+
+    class PrivateAction extends AbstractAction {
+	public PrivateAction(ValueInfo info, int x, int y)
+	{
+	    super( info.getName(), info.getIcon());
+
+	    this.info = info;
+	    this.x = x;
+	    this.y = y;
+	}
+    
+	public void actionPerformed(ActionEvent e)
+	{
+	    addEvent(x, y, (EventValue) info.newInstance());
+	}
+
+	int x;
+	int y;
+	ValueInfo info;
+
+    }
+
   //-------------- Fields
+
   MidiMouseTracker itsMidiMouseTracker;
 }
 

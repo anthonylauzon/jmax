@@ -1,0 +1,77 @@
+# 
+# jMax
+# Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# See file LICENSE for further informations on licensing terms.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# 
+# Based on Max/ISPW by Miller Puckette.
+#
+# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+
+# 
+# Generic rule to make a libray
+#
+ifdef RANLIB
+$(LIBDIR)/%.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/$*.a $?
+	$(RANLIB) $(LIBDIR)/$*.a
+.PRECIOUS: $(OBJECTS)
+else
+$(LIBDIR)/%.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/$*.a $?
+.PRECIOUS: $(OBJECTS)
+endif
+
+
+TODELETE = $(FTSBIN)
+
+#depend:
+#	$(MAKEDEPEND) $(SOURCES)
+
+#include $(DEPENDFILE)
+
+cleanobjs:
+	rm -f $(OBJECTS)
+
+clean:
+	rm -f $(OBJECTS)
+	rm -f $(TOCLEAN)
+
+cleanall:
+	rm -f $(TODELETE)
+	rm -f $(TOCLEAN)
+	rm -f $(OBJECTS)
+
+##
+## Compilation rules for all architectures, not worth separatings.
+## 
+
+$(OBJDIR)/%.o : %.c
+	$(CC) -c  $(CFLAGS) $< -o $@
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+$(LIBDIR):
+	mkdir -p $(LIBDIR)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
+
+
+

@@ -28,27 +28,21 @@ all_c: all
 clean_c: clean
 .PHONY: clean_c
 
-all: lib-recursive
-	(cd tiles; $(MAKE) bin)
+all: 
+	(cd non-portable ; $(MAKE) $@)
+	(cd sys; $(MAKE) $@)
+	(cd lang; $(MAKE) $@)
+	(cd runtime; $(MAKE) $@)
+	(cd tiles; $(MAKE) $@)
 .PHONY: all
 
-lib-recursive:
-	(cd non-portable ; $(MAKE) lib-recursive)
-	(cd sys; $(MAKE) lib)
-	(cd lang; $(MAKE) lib-recursive)
-	(cd runtime; $(MAKE) lib-recursive)
-.PHONY: lib-recursive
-
-clean: cleanobjs-recursive
+clean:
+	(cd non-portable ; $(MAKE) $@)
+	(cd sys; $(MAKE) $@)
+	(cd lang; $(MAKE) $@)
+	(cd runtime; $(MAKE) $@)
 	(cd tiles; $(MAKE) $@)
 .PHONY: clean
-
-cleanobjs-recursive:
-	(cd non-portable ; $(MAKE) cleanobjs-recursive)
-	(cd sys; $(MAKE) cleanobjs)
-	(cd lang; $(MAKE) cleanobjs-recursive)
-	(cd runtime; $(MAKE) cleanobjs-recursive)
-.PHONY: cleanobjs-recursive
 
 install:
 	$(INSTALL_DIR) $(include_install_dir)/fts
