@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.105 2003/01/28 12:00:30 borghesi Exp $
+dnl $Id: configure.in,v 1.106 2003/01/30 10:19:31 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.106  2003/01/30 10:19:31  p_tisserand
+dnl Add installation of default configuration file
+dnl
 dnl Revision 1.105  2003/01/28 12:00:30  borghesi
 dnl changes in utils, data, sequence includes
 dnl
@@ -369,6 +372,7 @@ AC_ARG_WITH(jack-ldflags,
        fi
     fi])
 
+HAVE_LIB_JACK="false"
 dnl output JACK feature
 if test "$with_jack" = "yes"
 then
@@ -410,13 +414,13 @@ then
 	CXXFLAGS="$tmp_CXXFLAGS"
 	LDFLAGS="$tmp_LDFLAGS"
 	LIBS="$tmp_LIBS"
-	dnl Add jack in packages to compile
-	AM_CONDITIONAL(COND_COMPILE_JACK, test "$HAVE_LIB_JACK" = "true")	
-	dnl Define macro to enable scheduler special function (fts_sched_run_one_tick)
+	dnl Set default project and AUDIO/MIDI configuration file
 	DEFAULT_PROJECT_FILE=default_project_linux_jack.jprj
 	DEFAULT_CONFIG_FILE=default_config_linux_jack.jcfg
 fi
-
+		
+dnl Add jack in packages to compile	
+AM_CONDITIONAL(COND_COMPILE_JACK, test "$HAVE_LIB_JACK" = "true")	
 
 AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
