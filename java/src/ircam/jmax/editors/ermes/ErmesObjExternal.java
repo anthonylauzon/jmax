@@ -41,7 +41,6 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 
     if (name == "error") 
       {
-	System.err.println("Got value for error " + value + " in error " + obj);
 	if ((value != null) && (value instanceof Integer)) 
 	  {
 	    isError = ((Integer)value).intValue();

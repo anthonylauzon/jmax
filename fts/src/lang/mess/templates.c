@@ -293,7 +293,9 @@ static fts_object_t *fts_make_template_instance(fts_template_t *template,
   
   /* flag the patcher as template, and set the template */
 
-  fts_patcher_set_template((fts_patcher_t *)obj, template);
+
+  if (obj)
+    fts_patcher_set_template((fts_patcher_t *)obj, template);
 
   return obj;
 }
