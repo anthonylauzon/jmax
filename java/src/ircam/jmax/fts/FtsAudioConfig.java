@@ -46,7 +46,7 @@ public class FtsAudioConfig extends FtsObject
 	  ((FtsAudioConfig)obj).setBufferSizes( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsAudioConfig.class, FtsSymbol.get("sampling_rate"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsAudioConfig.class, FtsSymbol.get("sampling_rate"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsAudioConfig)obj).setSamplingRate( args.getInt( 0));
@@ -99,26 +99,6 @@ public class FtsAudioConfig extends FtsObject
   public FtsAudioConfig() throws IOException
   { 
     super( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("audio_config"));
-    labels = new Vector();
-  }
-
-  public FtsAudioConfig( String isBidon)
-  { 
-    super( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), 100);
-    sources = new String[4];
-    sources[0] = "source1"; sources[1] = "source2"; sources[2] = "source3"; sources[3] = "source4";
-    sourceChannels = new int[4];
-    sourceChannels[0] = 4; sourceChannels[1] = 6; sourceChannels[2] = 2; sourceChannels[3] = 8; 
-    destinations = new String[4];
-    destinations[0] = "dest1"; destinations[1] = "dest2"; destinations[2] = "dest3"; destinations[3] = "dest4"; 
-    destinationChannels = new int[4];
-    destinationChannels[0] = 2; destinationChannels[1] = 4; destinationChannels[2] = 8; destinationChannels[3] = 4; 
-    bufferSizes = new String[7];
-    bufferSizes[0] = "64"; bufferSizes[1] = "128"; bufferSizes[2] = "256"; bufferSizes[3] = "512"; 
-    bufferSizes[4] = "1024"; bufferSizes[5] = "2048"; bufferSizes[6] = "4096";
-    samplingRates = new String[5];
-    samplingRates[0] = "32"; samplingRates[1] = "44.1"; samplingRates[2] = "48"; samplingRates[3] = "88.2"; 
-    samplingRates[4] = "96";
     labels = new Vector();
   }
 
@@ -219,6 +199,8 @@ public class FtsAudioConfig extends FtsObject
   void setSamplingRate(int sr)
   {
     samplingRate = sr;
+    if(listener != null)
+      listener.samplingRateChanged();
   }
 
   public int getSamplingRate()
@@ -244,6 +226,8 @@ public class FtsAudioConfig extends FtsObject
   void setBufferSize(int bs)
   {
     bufferSize = bs;
+    if(listener != null)
+      listener.bufferSizeChanged();
   }
 
   public int getBufferSize()

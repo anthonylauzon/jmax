@@ -85,8 +85,9 @@ public class AudioConfigPanel extends JPanel implements Editor
     bSizeCombo.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	  try{	    
-	    int bs = Integer.parseInt( (String) bSizeCombo.getSelectedItem());	    	  
-	    audioConfig.requestSetBufferSize( bs);
+	    int bs = Integer.parseInt( (String) bSizeCombo.getSelectedItem());	  
+	    if( bs != audioConfig.getBufferSize())
+	      audioConfig.requestSetBufferSize( bs);
 	  }
 	  catch( NumberFormatException nfe){}
 	}
@@ -115,7 +116,8 @@ public class AudioConfigPanel extends JPanel implements Editor
 	public void actionPerformed(ActionEvent e) {
 	  try{	    
 	    int sr = Integer.parseInt( (String) sRateCombo.getSelectedItem());	    	  
-	    audioConfig.requestSetSamplingRate( sr);
+	    if( sr != audioConfig.getSamplingRate())
+	      audioConfig.requestSetSamplingRate( sr);
 	  }
 	  catch( NumberFormatException nfe){}
 	}
@@ -143,15 +145,13 @@ public class AudioConfigPanel extends JPanel implements Editor
 	    case 0:
 	      return super.getCellEditor(row, column);
 	    case 1:
-	      return msCellEditor;
-	    case 2:
 	      return inputCellEditor;
-	    case 3:
+	    case 2:
 	      updateChannelsCellEditor( row, column);
 	      return channelsCellEditor;
-	    case 4:
+	    case 3:
 	      return outputCellEditor;
-	    case 5:
+	    case 4:
 	      updateChannelsCellEditor( row, column);
 	      return channelsCellEditor;
 	    default: 
@@ -187,6 +187,9 @@ public class AudioConfigPanel extends JPanel implements Editor
     
     if( audioConfig == null) return;
 
+    bSizeCombo.setSelectedItem(""+audioConfig.getBufferSize());
+    sRateCombo.setSelectedItem(""+audioConfig.getSamplingRate());
+
     for( Enumeration e = audioConfig.getLabels(); e.hasMoreElements();)
       audioModel.addRow( (FtsAudioLabel) e.nextElement());    
   }
@@ -195,23 +198,17 @@ public class AudioConfigPanel extends JPanel implements Editor
   {
     if( audioConfig == null) return;
 
-    String[] ms = {"mono", "stereo"};
-    JComboBox msCombo = new JComboBox( ms);
-    msCombo.setBackground( Color.white);
-    msCombo.setFont( ConfigurationEditor.tableFont);
-    msCellEditor = new DefaultCellEditor( msCombo);
-
     channelsCombo = new JComboBox();
     channelsCombo.setBackground( Color.white);
     channelsCombo.setFont( ConfigurationEditor.tableFont);
     channelsCellEditor = new DefaultCellEditor( channelsCombo);
 
-    JComboBox sourceCombo = new JComboBox( audioConfig.getSources());
+    sourceCombo = new JComboBox( audioConfig.getSources());
     sourceCombo.setBackground( Color.white);
     sourceCombo.setFont( ConfigurationEditor.tableFont);
     inputCellEditor = new DefaultCellEditor( sourceCombo);
 
-    JComboBox destCombo = new JComboBox( audioConfig.getDestinations());
+    destCombo = new JComboBox( audioConfig.getDestinations());
     destCombo.setBackground( Color.white);
     destCombo.setFont( ConfigurationEditor.tableFont);
     outputCellEditor = new DefaultCellEditor( destCombo);
@@ -225,18 +222,13 @@ public class AudioConfigPanel extends JPanel implements Editor
     if( val != null)
       {
 	int ch;
-	if( colId == 3)
+	if( colId == 2)
 	  ch = audioConfig.getInDeviceChannels( (String)val);
 	else
 	  ch = audioConfig.getOutDeviceChannels( (String)val);
 	
-	String type = (String) audioModel.getValueAt( rowId, 1);
-	if( (type==null) || ((type!=null) && type.equals("mono")))
-	  for( int i = 0; i < ch; i++)
-	    channelsCombo.addItem( ""+i);
-	else
-	  for( int i = 0; i < ch-1; i++)
-	    channelsCombo.addItem( i+" - "+(i+1));
+	for( int i = 0; i < ch; i++)
+	  channelsCombo.addItem( ""+i);
       }
     channelsCombo.validate();
     channelsCellEditor = new DefaultCellEditor( channelsCombo);
@@ -289,46 +281,14 @@ public class AudioConfigPanel extends JPanel implements Editor
     revalidate(); 
   }
 
-  public void labelTypeChanged( FtsAudioLabel label)
-  {
-    int index = audioConfig.getLabelIndex( label);
-    if( index == -1) return;
+  public void bufferSizeChanged()
+  {  
+    bSizeCombo.setSelectedItem(""+audioConfig.getBufferSize());
+  }
 
-    String tp = (String)audioModel.getValueAt( index, 1);    
-    audioModel.setRowValues( index, null, label.getType(), 
-			     null, null, null, null);
-    audioTable.revalidate();
-    revalidate();
-
-    // type changed    
-    if( tp != null)
-      {
-	int idIn = ((JComboBox)audioTable.prepareEditor( channelsCellEditor, index, 3)).getSelectedIndex();
-	int idOut = ((JComboBox)audioTable.prepareEditor( channelsCellEditor, index, 5)).getSelectedIndex();
-
-	if( idIn > -1)
-	  {
-	    updateChannelsCellEditor( index, 3);
-	    audioTable.editCellAt( index, 3);	
-	    if( idIn < channelsCombo.getItemCount())
-	      channelsCombo.setSelectedIndex( idIn);
-	    else
-	      channelsCombo.setSelectedIndex( idIn-1);
-	  }
-
-	if( idOut > -1)
-	  {
-	    updateChannelsCellEditor( index, 5);
-	    audioTable.editCellAt( index, 5);	
-	    if( idOut < channelsCombo.getItemCount())
-	      channelsCombo.setSelectedIndex( idOut);
-	    else
-	      channelsCombo.setSelectedIndex( idOut-1);
-	  }
-      }
-      
-    audioTable.revalidate();
-    revalidate();
+  public void samplingRateChanged()
+  {  
+    sRateCombo.setSelectedItem(""+audioConfig.getSamplingRate());
   }
 
   public void labelInputChanged( FtsAudioLabel label)
@@ -336,48 +296,76 @@ public class AudioConfigPanel extends JPanel implements Editor
     int index = audioConfig.getLabelIndex( label);
     if( index == -1) return;
 
-    int idIn = ((JComboBox)audioTable.prepareEditor( channelsCellEditor, index, 3)).getSelectedIndex();
-    
-    if( idIn > -1)
-      {
-	updateChannelsCellEditor( index, 3);
-	audioTable.editCellAt( index, 3);		
-	if( idIn < channelsCombo.getItemCount())
-	  channelsCombo.setSelectedIndex( idIn);
-	else
-	  channelsCombo.setSelectedIndex( 0);
-      }
+    int numCh = audioConfig.getInDeviceChannels( label.getInput());
+    int currentCh = numCh;
+    try{	    
+      currentCh = Integer.parseInt(  (String)audioModel.getValueAt( index, 2));
+    }
+    catch( NumberFormatException nfe){} 
+
+    if( currentCh >= numCh)
+      audioModel.forceValue( index, 2, "0");
+
+    validateTable();
   }
+
+  public void labelInChannelChanged( FtsAudioLabel label)
+  {
+    int index = audioConfig.getLabelIndex( label);
+    if( index == -1) return;
+    
+    int ch = label.getInputChannel();
+    if( !((String)audioModel.getValueAt( index, 2)).equals( ""+ch))
+      audioModel.forceValue( index, 2, ""+ch);
+
+    validateTable();
+  }
+
   public void labelOutputChanged( FtsAudioLabel label)
   {
     int index = audioConfig.getLabelIndex( label);
     if( index == -1) return;
     
-    int idOut = ((JComboBox)audioTable.prepareEditor( channelsCellEditor, index, 5)).getSelectedIndex();
+    int numCh = audioConfig.getOutDeviceChannels( label.getOutput());
+    int currentCh = numCh;
+    try{	    
+      currentCh = Integer.parseInt(  (String)audioModel.getValueAt( index, 4));
+    }
+    catch( NumberFormatException nfe){} 
+    if( currentCh >= numCh)
+      audioModel.forceValue( index, 4, "0");
 
-    if( idOut > -1)
-      {
-	updateChannelsCellEditor( index, 5);
-	audioTable.editCellAt( index, 5);	
-	if( idOut < channelsCombo.getItemCount())
-	  channelsCombo.setSelectedIndex( idOut);
-	else
-	  channelsCombo.setSelectedIndex( 0);
-      }
+    validateTable();
   }
 
-  public void labelChanged( FtsAudioLabel label)
+  public void labelOutChannelChanged( FtsAudioLabel label)
   {
     int index = audioConfig.getLabelIndex( label);
     if( index == -1) return;
+    
+    int ch = label.getOutputChannel();
+    if( !((String)audioModel.getValueAt( index, 4)).equals( ""+ch))
+      audioModel.forceValue( index, 4, ""+ch);
 
-    String inChannel = ( label.getInputChannel() == -1) ? null : ""+label.getInputChannel();
-    String outChannel = ( label.getOutputChannel() == -1) ? null : ""+label.getOutputChannel();
+    validateTable();
+  }
 
-    audioModel.setRowValues( index, label.getLabel(), label.getType(), 
-			     label.getInput(), inChannel, label.getOutput(), outChannel);
+  public void labelNameChanged( FtsAudioLabel label)
+  {
+    int index = audioConfig.getLabelIndex( label);
+    if( index == -1) return;
+    
+    audioModel.forceValue( index, 0, label.getLabel());
+    validateTable();
+  }
+
+  void validateTable()
+  {
     audioTable.revalidate();
     revalidate();
+    if( audioTable.getCellEditor() != null)
+      audioTable.getCellEditor().stopCellEditing();
+    audioTable.transferFocus();
   }
 
   void Add()
@@ -406,7 +394,7 @@ public class AudioConfigPanel extends JPanel implements Editor
 
     public int getColumnCount() 
     { 
-      return 6;
+      return 5;
     }
   
     public Class getColumnClass(int col)
@@ -428,14 +416,12 @@ public class AudioConfigPanel extends JPanel implements Editor
 	case 0: 
 	  return "label";
 	case 1: 
-	  return "type";
-	case 2: 
 	  return "in device";
-	case 3: 
+	case 2: 
 	  return "in channel";
-	case 4: 
+	case 3: 
 	  return "out device";
-	case 5: 
+	case 4: 
 	  return "out channel";
 	default:
 	  return "";
@@ -453,11 +439,11 @@ public class AudioConfigPanel extends JPanel implements Editor
       
       if( size > rows)
       {
-        temp = new Object[size+5][6];
+        temp = new Object[size+5][5];
         rows = size+5;
       }
       else
-        temp = new Object[size][6];
+        temp = new Object[size][5];
 
       if(index == -1)
         {
@@ -468,14 +454,12 @@ public class AudioConfigPanel extends JPanel implements Editor
             temp[i][2] = data[i][2];
             temp[i][3] = data[i][3];
             temp[i][4] = data[i][4];
-            temp[i][5] = data[i][5];
           }
           temp[size-1][0] = "unnamed";
           temp[size-1][1] = null;
           temp[size-1][2] = null;
           temp[size-1][3] = null;
           temp[size-1][4] = null;
-          temp[size-1][5] = null;
           index = size-2;
         }
       else
@@ -487,7 +471,6 @@ public class AudioConfigPanel extends JPanel implements Editor
             temp[i][2] = data[i][2];
 	    temp[i][3] = data[i][3];
 	    temp[i][4] = data[i][4];
-	    temp[i][5] = data[i][5];
           }
 
           temp[index+1][0] = "unnamed";
@@ -495,7 +478,6 @@ public class AudioConfigPanel extends JPanel implements Editor
           temp[index+1][2] = null;
           temp[index+1][3] = null;
           temp[index+1][4] = null;
-          temp[index+1][5] = null;
 
           for(int j = index+2; j < size; j++)
           {
@@ -504,7 +486,6 @@ public class AudioConfigPanel extends JPanel implements Editor
             temp[j][2] = data[j-1][2];
 	    temp[j][3] = data[j-1][3];
 	    temp[j][4] = data[j-1][4];
-	    temp[j][5] = data[j-1][5];
           }
         }
 
@@ -523,11 +504,11 @@ public class AudioConfigPanel extends JPanel implements Editor
 
       if( size > rows)
         {
-          temp = new Object[size+5][6];
+          temp = new Object[size+5][5];
           rows = size+5;
         }
       else
-        temp = new Object[size][6];
+        temp = new Object[size][5];
 
       for(int i = 0; i < size-1; i++)
         {
@@ -536,15 +517,13 @@ public class AudioConfigPanel extends JPanel implements Editor
           temp[i][2] = data[i][2];
           temp[i][3] = data[i][3];
           temp[i][4] = data[i][4];
-          temp[i][5] = data[i][5];
         }
       
       temp[size-1][0] = label.getLabel();
-      temp[size-1][1] = label.getType();
-      temp[size-1][2] = label.getInput();
-      temp[size-1][3] = ""+label.getInputChannel();
-      temp[size-1][4] = label.getOutput();
-      temp[size-1][5] = ""+label.getOutputChannel();
+      temp[size-1][1] = label.getInput();
+      temp[size-1][2] = ""+label.getInputChannel();
+      temp[size-1][3] = label.getOutput();
+      temp[size-1][4] = ""+label.getOutputChannel();
       
       data = temp;
     }
@@ -564,7 +543,6 @@ public class AudioConfigPanel extends JPanel implements Editor
 		  data[i][2] = data[i+1][2];
 		  data[i][3] = data[i+1][3];
 		  data[i][4] = data[i+1][4];
-		  data[i][5] = data[i+1][5];
 		}
 	    }
           else rowId = size;
@@ -574,7 +552,6 @@ public class AudioConfigPanel extends JPanel implements Editor
 	  data[size][2] = null;
 	  data[size][3] = null;
 	  data[size][4] = null;
-	  data[size][5] = null;
 
 	  fireTableDataChanged();
 	  audioConfig.requestRemoveLabel( rowId);
@@ -588,7 +565,13 @@ public class AudioConfigPanel extends JPanel implements Editor
 	return data[row][col];
     }
 
-    public void setRowValues(int row, Object v1, Object v2, Object v3, Object v4, Object v5, Object v6)
+    public void forceValue(int row, int col, Object value)
+    {
+       data[row][col] = value;
+       fireTableCellUpdated(row, col);
+    }
+
+    public void setRowValues(int row, Object v1, Object v2, Object v3, Object v4, Object v5)
     {
       if( v1 != null)
       {
@@ -614,11 +597,6 @@ public class AudioConfigPanel extends JPanel implements Editor
       {
         data[row][4] = v5;
         fireTableCellUpdated(row, 4);
-      }
-      if( v6 != null)
-      {
-        data[row][5] = v6;
-        fireTableCellUpdated(row, 5);
       }
     }
     
@@ -648,26 +626,20 @@ public class AudioConfigPanel extends JPanel implements Editor
 	      if( oldValue == null)
 		audioConfig.requestInsertLabel( row, (String)value);	      
 	      else
-		{
-                  audioConfig.requestRemoveLabel( row);	
-		  audioConfig.requestInsertLabel( row, (String)value);	
-		}
+		label.requestChangeLabel( (String)value);
 	      break;
 	    case 1:
-	      label.requestSetDevType( (String)value);
-	      break;
-	    case 2:
 	      label.requestSetInput( (String)value);
 	      break;
-	    case 3:
+	    case 2:
 	      chn = channelsCombo.getSelectedIndex();
 	      if( chn > -1)
 		label.requestSetInChannel( chn);
 	      break;
-	    case 4:
+	    case 3:
 	      label.requestSetOutput( (String)value);
 	      break;
-	    case 5:
+	    case 4:
 	      chn = channelsCombo.getSelectedIndex();
 	      if( chn > -1)
 		label.requestSetOutChannel( chn);
@@ -707,7 +679,6 @@ public class AudioConfigPanel extends JPanel implements Editor
   private JTable audioTable;
   private DefaultCellEditor inputCellEditor;
   private DefaultCellEditor outputCellEditor;
-  private DefaultCellEditor msCellEditor;
   private DefaultCellEditor channelsCellEditor;
 
   private JScrollPane scrollPane;
@@ -718,7 +689,7 @@ public class AudioConfigPanel extends JPanel implements Editor
   private final int TABLE_DEFAULT_HEIGHT = 180;
   private Font defaultLabelFont;
 
-  JComboBox channelsCombo, bSizeCombo, sRateCombo;
+  JComboBox channelsCombo, bSizeCombo, sRateCombo, sourceCombo, destCombo;
 }
 
 

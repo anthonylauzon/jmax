@@ -346,7 +346,7 @@ audioconfig_label_get_by_index(audioconfig_t* config, int index)
 }
 
 /* Return NULL if no such label name */
-static audiolabel_t*
+audiolabel_t*
 audioconfig_label_get_by_name(audioconfig_t* config, fts_symbol_t name)
 {
   audiolabel_t* label = config->labels;
@@ -558,26 +558,8 @@ audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
     fts_client_send_message(o, fts_s_clear, 0, 0);
 }
 
-
-static void
-audioconfig_restore_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-#warning NOT YET IMPLEMENTED (audioconfig_restore_label)
-  audioconfig_t* self = (audioconfig_t*)o;
-  fts_symbol_t name = fts_get_symbol(at);
-
-}
-
-/*  - "insert",   (index, int)         (insert new label at given index ) */
-/*                (label, symbol)      (la liste peut etre partielle, mais id et label ils sont toujours la) */
-/*                (mono/stereo, int) */
-/*                (input device, symbol) */
-/*                (input channel, int) */
-/*                (output device, symbol) */
-/*                (output channel, int) */
-
 /* name utility */
-static fts_symbol_t
+fts_symbol_t
 audioconfig_get_fresh_label_name(audioconfig_t *config, fts_symbol_t name)
 {
   const char *str = name;
@@ -617,29 +599,45 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   int n = 0;
   audiolabel_t* label;
 
-  /* check if name is not already used */
-  if (audioconfig_label_get_by_name(self, name) != NULL)
-    name = audioconfig_get_fresh_label_name(self, name);
+  if( name == fts_s_default)
+    {
+      label = audioconfig_label_get_by_name( self, name);
+
+      if( label == NULL)
+	label = audioconfig_label_insert( self, 0, name);
+    }
+  else
+    {
+      /* check if name is not already used */
+      if (audioconfig_label_get_by_name(self, name) != NULL)
+	name = audioconfig_get_fresh_label_name(self, name);
   
-  label = audioconfig_label_insert(self, index, name);
+      label = audioconfig_label_insert(self, index, name);
+    }
+
+  if( ac == 6)
+    {
+      label->input_device = fts_get_symbol(at + 2);
+      label->input_channel = fts_get_int(at + 3);
+      label->output_device = fts_get_symbol(at + 4);
+      label->output_channel = fts_get_int(at + 5);
+    }
+  
   if (fts_object_has_id(o))
-  {
-    fts_atom_t args[8];
-    fts_client_register_object((fts_object_t *)label, fts_get_client_id(o));
-    /* send new label to client */
-    
-    fts_set_int(args, index);
-    fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
-    fts_set_symbol(args + 2, label->name);
-    fts_set_int(args + 3, label->stereo_flag);
-    fts_set_symbol(args + 4, label->input_device);
-    fts_set_int(args + 5, label->input_channel);
-    fts_set_symbol(args + 6, label->output_device);
-    fts_set_int(args + 7, label->output_channel);
-    fts_client_send_message(o, fts_s_insert, 8, args);
-
-  }
-
+    {
+      fts_atom_t args[7];
+      fts_client_register_object((fts_object_t *)label, fts_get_client_id(o));
+      /* send new label to client */
+      
+      fts_set_int(args, index);
+      fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
+      fts_set_symbol(args + 2, label->name);
+      fts_set_symbol(args + 3, label->input_device);
+      fts_set_int(args + 4, label->input_channel);
+      fts_set_symbol(args + 5, label->output_device);
+      fts_set_int(args + 6, label->output_channel);
+      fts_client_send_message(o, fts_s_insert, 7, args);    
+    }
 }
 
 
@@ -748,17 +746,40 @@ fts_audioconfig_set_sample_rate(audioconfig_t* config, int sample_rate)
 void
 fts_audioconfig_dump( audioconfig_t *this, fts_bmax_file_t *f)
 {
-#warning NOT YET IMPLEMENTED (fts_audioconfig_dump)
   audiolabel_t* label = this->labels;
-  
-  /* save what you want, Patrice */
-  /* mais chaque message doit etre sauve' avec selecteur fts_audio_config 
-     et avec premier argument le vrai selecteur */
-  /*while(label)
+  int i = 0;
+  fts_atom_t a[7];
+
+  /* save buffer_size */
+  fts_set_symbol(a, audioconfig_s_buffer_size);
+  fts_set_int(a+1, this->buffer_size);
+  fts_bmax_code_push_atoms(f, 2, a);
+  fts_bmax_code_obj_mess(f, fts_s_audio_config, 2);
+  fts_bmax_code_pop_args(f, 2);
+
+  /* save sampling_rate */
+  fts_set_symbol(a, audioconfig_s_sampling_rate);
+  fts_set_int(a+1, this->sample_rate);
+  fts_bmax_code_push_atoms(f, 2, a);
+  fts_bmax_code_obj_mess(f, fts_s_audio_config, 2);
+  fts_bmax_code_pop_args(f, 2);
+
+  while(label)
     {
-    fts_bmax_code_push_symbol(f, label->name);
-    
-    }*/
+      fts_set_symbol(a, fts_s_insert);
+      fts_set_int(a+1, i);
+      fts_set_symbol(a+2, label->name);
+      fts_set_symbol(a+3, label->input_device);
+      fts_set_int(a+4, label->input_channel);
+      fts_set_symbol(a+5, label->output_device);
+      fts_set_int(a+6, label->output_channel);
+      fts_bmax_code_push_atoms(f, 7, a);
+      fts_bmax_code_obj_mess(f, fts_s_audio_config, 7);
+      fts_bmax_code_pop_args(f, 7);
+      i++;
+
+      label = label->next;
+    }
 }
 
 static void 
@@ -766,8 +787,12 @@ audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 {
   audioconfig_t* self = (audioconfig_t*)o;
   int buffer_size = fts_get_int(at);
-  
+  fts_atom_t arg;
+      
   post("[audioconfig:] new buffer size: %d\n", fts_audioconfig_set_buffer_size(self, buffer_size));  
+
+  fts_set_int(&arg, self->buffer_size);
+  fts_client_send_message( o, audioconfig_s_buffer_size, 1, &arg);
 }
 
 static void
@@ -777,7 +802,11 @@ audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   audioconfig_t* self = (audioconfig_t*)o;
   int sample_rate = fts_get_int(at);
   fts_atom_t arg;
+
   post("[audioconfig:] new sample rate: %d\n", fts_audioconfig_set_sample_rate(self, sample_rate));  
+ 
+  fts_set_int(&arg, self->sample_rate);
+  fts_client_send_message( o, audioconfig_s_sampling_rate, 1, &arg); 
 }
 
 static void
@@ -821,12 +850,12 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   audioconfig_t *self = (audioconfig_t *)o;
   audiolabel_t* label = self->labels;
   int index;
+  fts_atom_t args[7];
 
   for (index = 0; index < self->n_labels; ++index)
   {
     if (fts_object_has_id(o))
     {
-      fts_atom_t args[8];
       if (!fts_object_has_id((fts_object_t*)label))
       {
 	fts_client_register_object((fts_object_t *)label, fts_get_client_id(o));
@@ -836,12 +865,11 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       fts_set_int(args, index);
       fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
       fts_set_symbol(args + 2, label->name);
-      fts_set_int(args + 3, label->stereo_flag);
-      fts_set_symbol(args + 4, label->input_device);
-      fts_set_int(args + 5, label->input_channel);
-      fts_set_symbol(args + 6, label->output_device);
-      fts_set_int(args + 7, label->output_channel);
-      fts_client_send_message(o, fts_s_insert, 8, args);      
+      fts_set_symbol(args + 3, label->input_device);
+      fts_set_int(args + 4, label->input_channel);
+      fts_set_symbol(args + 5, label->output_device);
+      fts_set_int(args + 6, label->output_channel);
+      fts_client_send_message(o, fts_s_insert, 7, args);      
     }
     label = label->next;
   }
@@ -857,6 +885,11 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   
   audioconfig_update_sample_rates(self);
   audioconfig_update_buffer_sizes(self);
+
+  fts_set_int(args, self->sample_rate);
+  fts_client_send_message(o, audioconfig_s_sampling_rate, 1, args); 
+  fts_set_int(args, self->buffer_size);
+  fts_client_send_message(o, audioconfig_s_buffer_size, 1, args); 
 }
 
 
@@ -882,9 +915,8 @@ audiconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_spost(stream, "labels\n");
   while(NULL != label)
   {
-    fts_spost(stream, "\t%s: stereo: input: %s channel: %d output: %s channel: %d\n",
+    fts_spost(stream, "\t%s: input: %s channel: %d output: %s channel: %d\n",
 	      label->name, 
-	      label->stereo_flag, 
 	      label->input_device, label->input_channel,
 	      label->output_device, label->output_channel);
     label = label->next;

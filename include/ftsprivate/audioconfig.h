@@ -40,7 +40,8 @@ extern fts_class_t* audioconfig_type;
 
 extern void fts_audioconfig_set_defaults(audioconfig_t* config);
 extern void fts_audioconfig_dump( audioconfig_t *mc, fts_bmax_file_t *f);
-
+extern fts_symbol_t audioconfig_get_fresh_label_name(audioconfig_t *config, fts_symbol_t name);
+extern audiolabel_t*audioconfig_label_get_by_name(audioconfig_t* config, fts_symbol_t name);
 
 #endif /* _FTS_PRIVATE_AUDIOCONFIG_H_ */
 

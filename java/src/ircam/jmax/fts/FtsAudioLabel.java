@@ -33,10 +33,10 @@ public class FtsAudioLabel extends FtsObject
 
   static
   {
-    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("label_type"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("label"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsAudioLabel)obj).setType( args.getInt( 0));
+	  ((FtsAudioLabel)obj).setLabelName( args.getSymbol( 0).toString());
 	}
       });
     FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("input"), new FtsMessageHandler(){
@@ -51,13 +51,13 @@ public class FtsAudioLabel extends FtsObject
 	  ((FtsAudioLabel)obj).setOutput( args.getSymbol( 0).toString());
 	}
       });
-    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("input_channel"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("in_channel"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsAudioLabel)obj).setInputChannel( args.getInt( 0));
 	}
       });
-    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("output_channel"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("out_channel"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsAudioLabel)obj).setOutputChannel( args.getInt( 0));
@@ -69,16 +69,15 @@ public class FtsAudioLabel extends FtsObject
     super(server, parent, id);
     
     label = args[ offset].symbolValue.toString();
-    setType(args[offset + 1].intValue);
-    if( length-offset >= 4)
+    if( length-offset >= 3)
       {
-	input = args[offset+2].symbolValue.toString();
-	inChannel = args[offset+3].intValue;
+	input = args[offset+1].symbolValue.toString();
+	inChannel = args[offset+2].intValue;
       }
-    if( length-offset == 6)
+    if( length-offset == 5)
       {
-	output = args[offset+4].symbolValue.toString();
-	outChannel = args[offset+5].intValue;
+	output = args[offset+3].symbolValue.toString();
+	outChannel = args[offset+4].intValue;
       }
   }
 
@@ -90,6 +89,21 @@ public class FtsAudioLabel extends FtsObject
   /*****************************************************/
   /***********     Client -----> Server    *************/
   /*****************************************************/  
+  public void requestChangeLabel( String label)
+  {
+    args.clear();   
+    args.addSymbol( FtsSymbol.get( label));
+
+    try
+      {
+	send( FtsSymbol.get( "label"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsAudioLabel: I/O Error sending ChangeLabel Message!");
+	e.printStackTrace(); 
+      }
+  }
 
   public void requestSetInput( String input)
   {
@@ -105,9 +119,6 @@ public class FtsAudioLabel extends FtsObject
 	System.err.println("FtsAudioLabel: I/O Error sending input Message!");
 	e.printStackTrace(); 
       }
-
-    /* DEBUG ONLY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! to remove */
-    setInput( input);
   }
 
   public void requestSetOutput( String output)
@@ -124,29 +135,8 @@ public class FtsAudioLabel extends FtsObject
 	System.err.println("FtsAudioLabel: I/O Error sending output Message!");
 	e.printStackTrace(); 
       }
-
-    /* DEBUG ONLY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! to remove */
-    setOutput( output);
   }
 
-  public void requestSetDevType( String type)
-  {
-    args.clear();    
-    args.addInt( type.equals("mono") ? MONO : STEREO);
-    
-    try
-      {
-	send( FtsSymbol.get( "label_type"), args);
-      }
-    catch(IOException e)
-      {
-	System.err.println("FtsAudioLabel: I/O Error sending label_type Message!");
-	e.printStackTrace(); 
-      }
-    /* DEBUG ONLY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! to remove */
-    setType( type.equals("mono") ? MONO : STEREO);
-  }
-  
   public void requestSetInChannel( int ch)
   {
     args.clear();
@@ -185,18 +175,13 @@ public class FtsAudioLabel extends FtsObject
     return label;
   }
 
-  public void setType( int tp)
+  public void setLabelName( String label)
   {
-    this.type = ( tp == MONO) ? "mono" : "stereo";
+    this.label = label;
     if( listener != null)
-      listener.labelTypeChanged( this);
+      listener.labelNameChanged( this);
   }
 
-  public String getType()
-  {
-    return type;
-  }
-  
   public void setInput( String in)
   {
     input = in;
@@ -213,7 +198,7 @@ public class FtsAudioLabel extends FtsObject
   {
     inChannel = inCh;
     if( listener != null)
-      listener.labelChanged( this);
+      listener.labelInChannelChanged( this);
   }
 
   public int getInputChannel()
@@ -237,7 +222,7 @@ public class FtsAudioLabel extends FtsObject
   {
     outChannel = outCh;
     if( listener != null)
-      listener.labelChanged( this);
+      listener.labelOutChannelChanged( this);
   }
 
   public int getOutputChannel()
@@ -246,12 +231,9 @@ public class FtsAudioLabel extends FtsObject
   }
 
   private String label = null;
-  private String type = null;
   private String input = null;
   private String output = null;
   public int inChannel, outChannel; 
   private ircam.jmax.editors.configuration.AudioConfigPanel listener = null;
-  public static final int MONO = 0;
-  public static final int STEREO = 1;
 }
 
