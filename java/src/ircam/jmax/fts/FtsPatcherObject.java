@@ -133,6 +133,12 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  ((FtsPatcherObject)obj).addObject( args.getLength(), args.getAtoms());
 	}
       });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("removeObject"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).releaseObject( ( FtsGraphicObject)args.getObject( 0));	  
+	}
+      });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addConnection"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -809,7 +815,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	e.printStackTrace(); 
       }
   
-    removeObject(oldObject);
+    //removeObject(oldObject);
   }
 
   public void requestAddConnection(FtsGraphicObject from, int outlet, FtsGraphicObject to, int inlet)
@@ -959,6 +965,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   public void objectRedefined(FtsGraphicObject obj)
   {
     ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.objectRedefined( obj);
+  }
+
+  public void releaseObject( FtsGraphicObject obj)
+  {
+    removeObject( obj);
+    if( getEditorFrame() != null)
+      ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove( obj);
   }
 
   /**************************************************************/

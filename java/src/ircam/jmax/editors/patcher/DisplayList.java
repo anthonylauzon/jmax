@@ -98,6 +98,11 @@ public class DisplayList
     displayObjects.removeElement( object);
   }
 
+  public void remove(FtsGraphicObject object)
+  {    
+    remove( getGraphicObjectFor( object));
+  }
+
   GraphicObject getGraphicObjectFor(FtsGraphicObject obj)
   {
     Object[] values = displayObjects.getObjectArray();

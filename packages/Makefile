@@ -20,7 +20,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /u/worksta/borghesi/projects/jmax-install
+prefix = /net/lichtung/u.lichtung/worksta/borghesi/projects/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -71,7 +71,7 @@ DOT_LIBS =
 ECHO = echo
 EXEEXT = 
 FTSDIR = ${exec_prefix}/bin
-FTS_SYS_LIBS = -ldl -lpthread  
+FTS_SYS_LIBS = -ldl -lpthread  -laudiofile
 JAVACFLAGSX = 
 JAVACX = javac
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
@@ -81,13 +81,13 @@ OBJDUMP = @OBJDUMP@
 OBJEXT = o
 PACKAGE = jmax
 PLATFORM = linux
-PLATFORM_PACKAGES = oss unixdtd
+PLATFORM_PACKAGES = oss unixdtd aflib
 RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
 STRIP = strip
 VERSION = 3.1.0_latest_cvs
 
-SUBDIRS = utils control data guiobj io ispw ispwmath lists midi numeric qlist signal system oss unixdtd
+SUBDIRS = utils control data guiobj io ispw ispwmath lists midi numeric qlist signal system oss unixdtd aflib
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

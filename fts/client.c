@@ -107,6 +107,7 @@ static fts_symbol_t s_update_group_begin;
 static fts_symbol_t s_update_group_end;
 static fts_symbol_t s_set_value;
 static fts_symbol_t s_package_loaded;
+static fts_symbol_t s_remove_object;
 
 static fts_heap_t *update_heap;
 
@@ -1602,6 +1603,9 @@ void fts_client_release_object(fts_object_t *obj)
       return;
     }
 
+  fts_set_object(a, obj);
+  fts_client_send_message( (fts_object_t *)obj->patcher, s_remove_object, 1, a);
+
   client_release_object( client, obj);
 }
 
@@ -1730,6 +1734,7 @@ void fts_client_config( void)
   s_update_group_end = fts_new_symbol( "update_group_end");
   s_set_value = fts_new_symbol( "setValue");
   s_package_loaded = fts_new_symbol( "package_loaded");
+  s_remove_object = fts_new_symbol( "removeObject");
 
   update_heap = fts_heap_new( sizeof( update_entry_t));
 

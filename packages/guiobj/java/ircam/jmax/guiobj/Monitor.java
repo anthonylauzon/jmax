@@ -48,6 +48,7 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
   private transient boolean isOn = false;
   private int iconWidth;
   private static Color deselectedColor = new Color(204, 204, 204);
+  private static Color selectedColor = deselectedColor.darker();
 
   public Monitor(FtsGraphicObject theFtsObject) 
   {
@@ -99,7 +100,7 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
     if ( !isSelected())
       g.setColor( deselectedColor);
     else
-      g.setColor( deselectedColor.darker());
+      g.setColor( selectedColor);
     
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
@@ -121,11 +122,10 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
     int w = getWidth();
     int h = getHeight();
 
-    //g.setColor( Settings.sharedInstance().getUIColor());
     if ( !isSelected())
       g.setColor( deselectedColor);
     else
-      g.setColor( deselectedColor.darker());
+      g.setColor( selectedColor);
 
     g.fillRect( x + 3, y + 3, w - 6, h - 6);
 

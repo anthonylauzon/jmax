@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ../..
-prefix = /u/worksta/borghesi/projects/jmax-install
+prefix = /net/lichtung/u.lichtung/worksta/borghesi/projects/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -67,7 +67,7 @@ DOT_LIBS =
 ECHO = echo
 EXEEXT = 
 FTSDIR = ${exec_prefix}/bin
-FTS_SYS_LIBS = -ldl -lpthread  
+FTS_SYS_LIBS = -ldl -lpthread  -laudiofile
 JAVACFLAGSX = 
 JAVACX = javac
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
@@ -77,7 +77,7 @@ OBJDUMP = @OBJDUMP@
 OBJEXT = o
 PACKAGE = jmax
 PLATFORM = linux
-PLATFORM_PACKAGES = oss unixdtd
+PLATFORM_PACKAGES = oss unixdtd aflib
 RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
 STRIP = strip

@@ -638,6 +638,8 @@ fts_object_recompute(fts_object_t *old)
       */
       if (obj->head.id != FTS_NO_ID)
 	fts_object_send_kernel_properties(obj);
+
+      fts_client_upload_object(obj, -1);
     }
 
   return obj;
