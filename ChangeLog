@@ -1,3 +1,16 @@
+2003-02-19  Olivier Chapuis  <olivier.chapuis@free.fr>
+
+	* packages/alsa/c/src/alsaaudioport.c
+	(alsaaudioport_open_input):
+	(alsaaudioport_open_output):
+	(alsastream_open):
+	Closed the pcm if an error occur. Do not log error msg when the null
+	plugin is used
+
+	* packages/alsa/c/src/alsaaudiomanager.c
+	(alsaaudiomanager_get_channels_max): 
+	Closed the pcm handle if we cannot get the hw config
+	
 2003-02-18  Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 
 	* add a popup "Open File" DialogBox if readsf/writesf object receive open message 
