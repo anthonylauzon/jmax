@@ -175,8 +175,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     if (dirtySketch) 
       return;
 
-    if ( (dirtyConnections != null) && ( !dirtyConnections.contains( theConnection)))
-      dirtyConnections.addElement( theConnection);
+    if (dirtyConnections != null)
+      {
+	if ( !dirtyConnections.contains( theConnection))
+	  dirtyConnections.addElement( theConnection);
+      }
     else
       {
 	dirtyConnections = new MaxVector();
@@ -189,8 +192,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     if (dirtySketch) 
       return;
 
-    if ( (dirtyObjects != null) && ( !dirtyObjects.contains( theObject)))
-      dirtyObjects.addElement( theObject);
+    if (dirtyObjects != null)
+      {
+	if ( !dirtyObjects.contains( theObject))
+	  dirtyObjects.addElement( theObject);
+      }
     else
       {
 	dirtyObjects = new MaxVector();
@@ -737,24 +743,29 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   void InitFromFtsContainer( FtsPatcherData theContainerObject)
   {
     FtsPatcherData aFtsPatcherData = theContainerObject;
-    MaxVector objectVector = aFtsPatcherData.getObjects();	//usefull?
-    FtsObject	fo;
-    FtsConnection fc;
 
-    for ( Enumeration e = objectVector.elements(); e.hasMoreElements(); )
-      AddObject( (FtsObject)e.nextElement());
+    Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
+    int osize = aFtsPatcherData.getObjects().size();
+
+    for ( int i = 0; i < osize; i++)
+      AddObject( (FtsObject)objects[i]);
 		
     // chiama tanti AddConnection...
-    MaxVector connectionVector = aFtsPatcherData.getConnections();	//usefull?
-    ErmesObject fromObj, toObj;
-    
-    for ( Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();)
-      {
-	fc = (FtsConnection)e2.nextElement();
 
-	fromObj = getErmesObjectFor(fc.getFrom());
-	toObj   = getErmesObjectFor(fc.getTo());
-	AddConnection( fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
+    MaxVector connectionVector = aFtsPatcherData.getConnections();	//usefull?
+
+    Object[] connections = aFtsPatcherData.getConnections().getObjectArray();
+    int csize = aFtsPatcherData.getConnections().size();
+
+    for ( int i = 0; i < csize; i++)
+      {
+	FtsConnection fc = (FtsConnection)connections[i];
+
+	AddConnection( getErmesObjectFor(fc.getFrom()),
+		       getErmesObjectFor(fc.getTo()),
+		       fc.getFromOutlet(),
+		       fc.getToInlet(),
+		       fc);
       }
 
     repaint();
@@ -1767,11 +1778,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsOutPop.Redefine( itsPatcher.getNumberOfOutlets());
   }
 
+  static int paintCount = 0;
   public void paint( Graphics g)
   {
-
-    // System.err.println("Painting " + this);
-
     if (deleted) //should be kept?
       return;    // introduced by cvs update
 
@@ -1802,7 +1811,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	DrawOffScreen( g);
       }
 
-    //    System.err.println("Painting Done for " + this);
+    theToolkit.sync(); // @@@@
   }		
   
   void SetResizeState( ErmesObject theResizingObject, int newStatus)

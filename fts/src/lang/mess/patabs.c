@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <sys/stat.h>
 
 #include "sys.h"
 #include "lang/mess.h"
@@ -137,6 +138,7 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
   char buf[1024];
   int i;
   FILE *file;
+  struct stat statbuf;
 
   /*
    * Look in the search path, either with or without ".pat" or ".abs"
@@ -154,7 +156,12 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
 
       sprintf(buf, "%s/%s", fts_symbol_name(filename), fts_symbol_name(name));
 
-      file = fopen(buf, "r");
+      /* If the file is there and it is a regular file and not a directory , open it */
+
+      if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
+	file = fopen(buf, "r");
+      else
+	file = 0;
 
       if (! file)
 	{
@@ -162,14 +169,21 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
 
 	  sprintf(buf, "%s/%s.abs", fts_symbol_name(filename), fts_symbol_name(name));
 
-	  file = fopen(buf, "r");
+	  if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
+	    file = fopen(buf, "r");
+	  else
+	    file = 0;
 	      
 	  if (! file)
 	    {
 	      /* Try .pat */
 
 	      sprintf(buf, "%s/%s.pat", fts_symbol_name(filename), fts_symbol_name(name));
-	      file = fopen(buf, "r");
+
+	      if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
+		file = fopen(buf, "r");
+	      else
+		file = 0;
 	    }
 	}
 

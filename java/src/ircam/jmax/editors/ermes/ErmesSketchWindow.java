@@ -65,8 +65,8 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   }
 
 
-  MaxVector ftsObjectsPasted = new MaxVector();
-  MaxVector ftsConnectionsPasted = new MaxVector();
+  static MaxVector ftsObjectsPasted = new MaxVector();
+  static MaxVector ftsConnectionsPasted = new MaxVector();
 
   public static int preferredWidth = 490;
   public static int preferredHeight = 450;

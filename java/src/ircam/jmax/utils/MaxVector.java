@@ -20,7 +20,7 @@ public class MaxVector
 	int newSize = objects.length;
 
 	while (newSize < requestedSize)
-	  newSize *= 2;
+	  newSize = ( 3 * newSize) / 2;
 
 	Object oldObjects[] = objects;
 

@@ -17,34 +17,80 @@ public class MultiLineText {
   {
     width = 0;
     fm = null;
-    text = "";
-    lines = new MaxVector();
+    text = null;
+    lines = null;
   }
 
   private void adjust()
   {
     char array[] = text.toCharArray();
-    int i, start = 0;
+    int start;
+    int length;
 
-    lines.removeAllElements();
+    /* Loop changed beacause it could
+       generate a check on a length bigger by one
+       then the length of the string (MDC); also added a time and memory optimization
+       for the sigle line case (optimize if charsWidth take time, of course);
+       the vector is allocated by need, and in the case of a single line
+       a special enumerator is used.
+       Also, modified the callers of adjust so that adjust is not called
+       with 0 width or without font metrics.
+       */
 
-    for ( i = 0; i < array.length; i++)
+    if ((array.length <= 1) ||
+	((text.indexOf('\n') == -1) && fm.charsWidth( array, 0, array.length) <= width))
       {
-	if ( array[i] == '\n')
-	  {
-	    lines.addElement( new String( array, start, i - start));
-	    start = i + 1;
-	  }
-	else if (fm != null && fm.charsWidth( array, start, i - start + 1) >= width)
-	  {
-	    lines.addElement( new String( array, start, i - start));
-	    start = i;
-	  }
+	lines = null;
+	return;
       }
 
-    if ( i > start || i == 0)
+    // Start point to the start of an ideal current string
+    // of length length; the loop try to make the string longer
+
+    if (lines == null)
+      lines = new MaxVector();
+    else
+      lines.removeAllElements();
+
+    start = 0;
+    length = 1;
+
+    while (true)
       {
-	lines.addElement( new String( array, start, i - start));
+	if (start + length >= array.length)
+	  {
+	    // String end, cannot make bigger
+	    // generate the current string and return
+
+	    if (start < array.length)
+	      lines.addElement( new String( array, start, array.length - start));
+
+	    return;
+	  }
+	else if (array[ start + length] == '\n')
+	  {
+	    // Next char is a new line, so generate the current string
+	    // and skip the new line
+
+	    lines.addElement( new String( array, start, length));
+	    start = start + length + 1;
+	    length = 1;
+	  }
+	else if (fm.charsWidth( array, start, length + 1) >= width)
+	  {
+	    // Next char make the string too long, 
+	    // generate the current string and advance
+
+	    lines.addElement( new String( array, start, length));
+	    start = start + length;
+	    length = 1;
+	  }
+	else
+	  {
+	    // We can make the current string longer
+	       
+	    length++;
+	  }
       }
   }
 
@@ -59,7 +105,8 @@ public class MultiLineText {
 
     debug();
 
-    adjust();
+    if ((fm != null) && (text != null) && (width != 0))
+      adjust();
   }
 
   public void setFontMetrics( FontMetrics fm)
@@ -68,7 +115,8 @@ public class MultiLineText {
 
     debug();
 
-    adjust();
+    if ((fm != null) && (text != null) && (width != 0))
+      adjust();
   }
 
   public void setText( String text)
@@ -77,12 +125,16 @@ public class MultiLineText {
 
     debug();
 
-    adjust();
+    if ((fm != null) && (text != null) && (width != 0))
+      adjust();
   }
 
   public int getRows()
   {
-    return lines.size();
+    if (lines != null)
+      return lines.size();
+    else
+      return 1;
   }
 
   final class MultiLineTextEnumerator implements Enumeration {
@@ -105,8 +157,34 @@ public class MultiLineText {
     private Enumeration elements;
   }
 
+
+  final class MultiLineSimpleEnumerator implements Enumeration {
+
+    MultiLineSimpleEnumerator()
+    {
+      more = true;
+    }
+
+    public boolean hasMoreElements()
+    {
+      return more;
+    }
+
+    public Object nextElement()
+    {
+      more = false;
+      return text;
+    }
+
+    private boolean more;
+  }
+
   public Enumeration elements()
   {
-    return new MultiLineTextEnumerator();
+    if (lines == null)
+      return new MultiLineSimpleEnumerator();
+    else
+      return new MultiLineTextEnumerator();
   }
 }
+

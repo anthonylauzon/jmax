@@ -198,4 +198,9 @@ FindPanel:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FindPanel.java)
 .PHONY: FindPanel
 
+MultiLineText:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MultiLineText.java)
+.PHONY: FindPanel MultiLineText
+
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
