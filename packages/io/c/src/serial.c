@@ -134,7 +134,7 @@ serial_set_speed(serial_t *this, fts_symbol_t sym)
     speed = B57600;
   else if(sym == sym_b115200)
     speed = B115200;
-#ifndef SGI
+#ifdef B230400
   /* This is not defined on SGI */
   else if(sym == sym_b230400)
     speed = B230400;
