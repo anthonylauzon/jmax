@@ -67,36 +67,93 @@ set_size(bpf_t *bpf, int size)
   bpf->size = size;
 }
 
-static void
+void
+bpf_clear(bpf_t *bpf)
+{
+  bpf->size = 0;
+}
+
+void
 bpf_append_point(bpf_t *bpf, double time, double value)
 {
   int size = bpf->size;
-  double duration = bpf_get_duration(bpf);
 
-  if(time <= duration)
+  if(size > 0)
     {
-      time = duration;
+      double duration = bpf_get_time(bpf, size - 1);
+      
+      if(time <= duration)
+	{
+	  time = duration;
+	  
+	  /* set jump for previous point */
+	  bpf->points[size - 1].slope = DBL_MAX;
+	}
+      else
+	{
+	  /* set slope for previous point */
+	  bpf->points[size - 1].slope = 
+	    (value - bpf->points[size - 1].value) / 
+	    (time - bpf->points[size - 1].time);
+	}
+      
+      set_size(bpf, size + 1);
 
-      /* set jump for previous point */
-      bpf->points[size - 1].slope = DBL_MAX;
+      /* set point */
+      bpf->points[size].time = time;
+      bpf->points[size].value = value;
+      bpf->points[size].slope = 0.0;
     }
   else
     {
-      /* set slope for previous point */
-      bpf->points[size - 1].slope = 
-	(value - bpf->points[size - 1].value) / 
-	(time - bpf->points[size - 1].time);
+      set_size(bpf, 1);
+      
+      /* set point */
+      bpf->points[0].time = time;
+      bpf->points[0].value = value;
+      bpf->points[0].slope = 0.0;
     }
-  
-  set_size(bpf, size + 1);
-  
-  /* set point */
-  bpf->points[size].time = time;
-  bpf->points[size].value = value;
-  bpf->points[size].slope = 0.0;
 }
 
-static void
+void
+bpf_set_point(bpf_t *bpf, int index, double time, double value)
+{
+  int size = bpf->size;
+
+  if(index < size)
+    {
+      double dt;
+
+      /* set slope of point before */
+      if(index > 0)
+	{
+	  dt = time - bpf->points[index - 1].time;
+
+	  if(dt == 0.0)
+	    bpf->points[index - 1].slope = DBL_MAX;
+	  else
+	    bpf->points[index - 1].slope = (value - bpf->points[index - 1].value) / dt;
+	}
+
+      /* set point */
+      bpf->points[index].time = time;
+      bpf->points[index].value = value;
+      
+      if(index < size - 1)
+	{
+	  dt = bpf->points[index + 1].time - bpf->points[index].time;
+	  
+	  if(dt == 0.0)
+	    bpf->points[index].slope = DBL_MAX;
+	  else
+	    bpf->points[index].slope = (bpf->points[index + 1].value - value) / dt;
+	}
+      else
+	bpf->points[index].slope = 0.0;
+    }
+}
+
+void
 bpf_insert_point(bpf_t *bpf, double time, double value)
 {
   int size = bpf->size;
@@ -120,32 +177,13 @@ bpf_insert_point(bpf_t *bpf, double time, double value)
       /* kick points to the back */
       for(j=size; j>i; j--)
 	bpf->points[j] = bpf->points[j - 1];
-      
-      /* set slope of point before */
-      if(i > 0)
-	{
-	  dt = time - bpf->points[i - 1].time;
 
-	  if(dt == 0.0)
-	    bpf->points[i - 1].slope = DBL_MAX;
-	  else
-	    bpf->points[i - 1].slope = (value - bpf->points[i - 1].value) / dt;
-	}
-
-      /* set new point */
-      bpf->points[i].time = time;
-      bpf->points[i].value = value;
-
-      dt = bpf->points[i + 1].time - bpf->points[i].time;
-      
-      if(dt == 0.0)
-	bpf->points[i].slope = DBL_MAX;
-      else
-	bpf->points[i].slope = (bpf->points[i + 1].value - value) / dt;
+      /* set point */
+      bpf_set_point(bpf, i, time, value);
     }
 }
 
-static void
+void
 bpf_remove_points(bpf_t *bpf, int index, int n)
 {
   int size = bpf->size;
@@ -156,13 +194,7 @@ bpf_remove_points(bpf_t *bpf, int index, int n)
 	n = size - index;
       
       if(size <= n)
-	{
-	  set_size(bpf, 1);
-	  
-	  bpf->points[0].time = 0.0;
-	  bpf->points[0].value = 0.0;  
-	  bpf->points[0].slope = 0.0;
-	}
+	set_size(bpf, 0);
       else
 	{
 	  int i;
@@ -193,7 +225,7 @@ bpf_remove_points(bpf_t *bpf, int index, int n)
     }
 }
 
-static void
+void
 bpf_simplify(bpf_t *bpf, double time, double value)
 {
   int size = bpf->size;
@@ -208,6 +240,18 @@ bpf_simplify(bpf_t *bpf, double time, double value)
       else
 	i++;
     }
+}
+
+void
+bpf_copy(bpf_t *org, bpf_t *copy)
+{
+  int size = bpf_get_size(org);
+  int i;
+
+  set_size(copy, size);
+
+  for(i=0; i<size; i++)
+    copy->points[i] = org->points[i];
 }
 
 #define BPF_CLIENT_BLOCK_SIZE 64
@@ -257,18 +301,6 @@ bpf_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-bpf_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  bpf_t *this = (bpf_t *)o;
-
-  set_size(this, 1);
-  
-  this->points[0].time = 0.0;
-  this->points[0].value = 0.0;
-  this->points[0].slope = 0.0;
-}
-
-static void
 bpf_append_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
@@ -278,10 +310,9 @@ bpf_append_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       double onset_time = bpf_get_duration(this);
       double time = 0.0;
       double value = 0.0;
-      int odd = ac & 1;
       int i;
       
-      if(odd)
+      if(ac & 1)
 	{
 	  if(fts_is_number(at))
 	    value = fts_get_number_float(at);
@@ -305,8 +336,10 @@ bpf_append_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	  else
 	    value = 0.0;
 	  
-	  bpf_append_point(this, onset_time + time, value);
+	  bpf_append_point(this, time, value);
 	}      
+
+      this->editid++;
     }
 }
 
@@ -315,43 +348,50 @@ bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 {
   bpf_t *this = (bpf_t *)o;
 
-  bpf_clear(o, 0, 0, 0, 0);
+  bpf_clear(this);
 
   if(ac > 0)
     {
-      int odd = ac & 1;
       double time = 0.0;
       double value = 0.0;
+      int i;
       
-      if(!odd)
+      if(ac & 1)
 	{
 	  if(fts_is_number(at))
-	    time = fts_get_number_float(at);
-
-	  /* skip time */
+	    value = fts_get_number_float(at);
+	  else
+	    value = 0.0;
+	  
+	  this->points[0].time = 0.0;
+	  this->points[0].value = value;
+	  this->points[0].slope = 0.0;
+	  
+	  /* skip value */
 	  ac--;
 	  at++;
 	}
-      
-      if(fts_is_number(at))
-	value = fts_get_number_float(at);
-      else
-	value = 0.0;
 
-      this->points[0].time = time;
-      this->points[0].value = value;
-      this->points[0].slope = 0.0;
-      
-      /* skip value */
-      ac--;
-      at++;
-
-      if(ac)
-	bpf_append_from_array(o, 0, 0, ac, at);
+      for(i=0; i<ac; i+=2)
+	{
+	  if(fts_is_number(at + i))
+	    time = fts_get_number_float(at + i);
+	  else
+	    time = 0.0;
+	  
+	  if(fts_is_number(at + i + 1))
+	    value = fts_get_number_float(at + i + 1);
+	  else
+	    value = 0.0;
+	  
+	  bpf_append_point(this, time, value);
+	}
     }
 
   if(bpf_editor_is_open(this))
     bpf_set_client(this);
+
+  this->editid++;
 }
 
 static void
@@ -388,18 +428,6 @@ bpf_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
-void
-bpf_copy(bpf_t *org, bpf_t *copy)
-{
-  int size = bpf_get_size(org);
-  int i;
-
-  set_size(copy, size);
-
-  for(i=0; i<size; i++)
-    copy->points[i] = org->points[i];
-}
-
 /************************************************************
  *
  *  client methods
@@ -416,6 +444,8 @@ bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   bpf_insert_point(this, time, value);
   fts_client_send_message(o, sym_addPoint, ac, at);
+
+  this->editid++;
 }
 
 static void
@@ -427,6 +457,8 @@ bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
   
   bpf_remove_points(this, index, size);
   fts_client_send_message(o, sym_removePoints, ac, at);
+
+  this->editid++;
 }
 
 static void
@@ -441,12 +473,13 @@ bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
     {
       double time = fts_get_float(at + 2 * i + 1);
       double value = fts_get_float(at + 2 * i + 2);
-      
-      this->points[index + i].time = time;
-      this->points[index + i].value = value;
+
+      bpf_set_point(this, index + i, time, value);
     }
   
   fts_client_send_message(o, sym_setPoints, ac, at);
+
+  this->editid++;
 }
 
 static void
@@ -504,40 +537,22 @@ bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   bpf_t *this = (bpf_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   int size = bpf_get_size(this);
-  double last_time = this->points[0].time;
-  double append_time = 0.0;
   fts_message_t *mess;
   int i;
   
   /* first message will be send */
   mess = fts_dumper_message_new(dumper, fts_s_set);
 
-  /* appand first point */
-  fts_message_append_float(mess, this->points[0].time);
-  fts_message_append_float(mess, this->points[0].value);
-
-  for(i=1; i<size; i++)
+  for(i=0; i<size; i++)
     {
       double time = this->points[i].time;
       double value = this->points[i].value;
       
-      /* cut at jump points to make sur not to end set message on jump point */
-      if(time == last_time)
-	{
-	  fts_dumper_message_send(dumper, mess);
-	  mess = fts_dumper_message_new(dumper, fts_s_append); /* next message will be append */
-	  
-	  append_time = time;
-	}
-      
-      fts_message_append_float(mess, time - append_time);
+      fts_message_append_float(mess, time);
       fts_message_append_float(mess, value);
-
-      last_time = time;
     }
   
-  if(fts_message_get_ac(mess) > 0) 
-    fts_dumper_message_send(dumper, mess);
+  fts_dumper_message_send(dumper, mess);
 }
 
 static void
@@ -598,6 +613,8 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
       this->keep = fts_s_no;
     }
+
+  this->editid = 0;
 }
 
 static void

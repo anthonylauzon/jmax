@@ -39,7 +39,10 @@ typedef struct _env_
   enum env_mode {mode_continue, mode_sustain} mode;
   enum env_status {status_hold, status_running} status;
 
-  bpf_t *bpf;
+  bpf_t *ref; /* reference to bpf */
+  int editid;
+
+  bpf_t *bpf; /* internal bpf */
   int index; /* target index */
 
   double base_time;
@@ -49,9 +52,9 @@ typedef struct _env_
   double time; /* current time */
   double value; /* current value */
 
+  double duration; /* fixed duration in mode continue (adjust speed for duration > 0.0) */
   double speed; /* reading speed */
-  double step; /* speed / sr */
-
+  double conv; /* 1000. / sr */
 } env_t;
 
 
@@ -71,7 +74,13 @@ static void
 env_start(env_t *this)
 {
   bpf_t *bpf = this->bpf;
-  int size = bpf_get_size(bpf);
+  int size;
+
+  if(this->ref && bpf_get_editid(this->ref) != this->editid)
+    {
+      bpf_copy(this->ref, this->bpf);
+      this->editid = bpf_get_editid(this->ref);
+    }
 
   this->index = 0;
 
@@ -79,15 +88,20 @@ env_start(env_t *this)
   this->base_time = 0.0;
   this->time = 0.0;
 
+  size = bpf_get_size(bpf);
+
   if(size)
     {
       double first_time = bpf_get_time(bpf, 0);
+
+      if(this->mode == mode_continue && this->duration > 0.0)
+	this->speed = bpf_get_duration(bpf) / this->duration;
 
       if(first_time == 0.0)
 	{
 	  int index = 1;
 
-	  /* jump to last point of time zero */
+	  /* jump over points at time zero */
 	  while(index < size && bpf_get_time(bpf, index) == 0.0)
 	    index++;
 
@@ -114,28 +128,220 @@ env_start(env_t *this)
 }
 
 static void 
-env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
   bpf_t *bpf = bpf_atom_get(at);
 
-  bpf_copy(bpf, this->bpf);
+  if(this->ref != bpf)
+    {
+      if(this->ref)
+	fts_object_release(this->ref);
+
+      /* set new reference */
+      this->ref = bpf;
+      fts_object_refer(bpf);
+      
+      /* set internal bpf */
+      bpf_copy(bpf, this->bpf);
+      this->editid = bpf_get_editid(this->ref);
+    }
+}
+
+static void 
+env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+
+  env_set_bpf(o, 0, 0, 1, at);
   env_start(this);
 }
 
 static void 
-env_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+  bpf_t *bpf = this->bpf;
+  double value = fts_get_double(at);
+
+  /* stop envelope */
+  this->status = status_hold;
+
+  /* reset bpf */
+  bpf_clear(bpf);
+      
+  /* clear reference */
+  if(this->ref)
+    {
+      fts_object_release(this->ref);
+      this->ref = 0;
+    }
+
+  /* set current value */
+  this->value = value;
+}
+
+static void 
+env_set_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+  bpf_t *bpf = this->bpf;
+  double last_time = 0.0;
+  int i;
+  
+  /* reset bpf */
+  bpf_clear(bpf);
+  
+  /* clear reference */
+  if(this->ref)
+    {
+      fts_object_release(this->ref);
+      this->ref = 0;
+    }
+  
+  if(ac & 1)
+    {
+      double value = 0.0;
+      
+      if(fts_is_number(at))
+	value = fts_get_number_float(at);
+      
+      bpf_append_point(bpf, 0.0, value);
+      
+      ac--;
+      at++;
+    }
+  
+  for(i=0; i<ac; i+=2)
+    {
+      double time = 0.0;
+      double value = 0.0;
+      
+      if(fts_is_number(at + i))
+	time = fts_get_number_float(at + i);
+      
+      if(fts_is_number(at + i + 1))
+	value = fts_get_number_float(at + i + 1);
+      
+      bpf_append_point(bpf, last_time + time, value);
+      
+      last_time = time;
+    }
+}
+
+static void 
+env_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
 
+  if(ac)
+    {
+      env_set_array(o, 0, 0, ac, at);
+      env_start(this);
+    }
+}
+
+static void 
+env_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+
+  if(ac == 1 && bpf_atom_is(at))
+    env_set_bpf(o, 0, 0, 1, at);
+  else
+    env_set_array(o, 0, 0, ac, at);
+}
+
+static void 
+env_adsr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+  bpf_t *bpf = this->bpf;
+  double attack_time = 0.0;
+  double decay_time = 0.0;
+  double sustain_level = 0.0;
+  double release_time = 0.0;
+
+  /* force sustain mode */
+  this->mode = mode_sustain;
+
+  /* reset bpf */
+  bpf_clear(bpf);
+      
+  /* clear reference */
+  if(this->ref)
+    {
+      fts_object_release(this->ref);
+      this->ref = 0;
+    }
+
+  switch(ac)
+    {
+    default:
+    case 4:
+      if(fts_is_number(at + 3))
+	release_time = fts_get_number_float(at + 3);
+
+      if(release_time < 0.0)
+	release_time = 0.0;
+
+    case 3:
+      if(fts_is_number(at + 2))
+	sustain_level = fts_get_number_float(at + 2);
+
+      if(sustain_level < 0.0)
+	sustain_level = 0.0;
+
+    case 2:
+      if(fts_is_number(at + 1))
+	decay_time = fts_get_number_float(at + 1);
+
+      if(decay_time < 0.0)
+	decay_time = 0.0;
+
+    case 1:
+      if(fts_is_number(at + 0))
+	attack_time = fts_get_number_float(at + 0);
+
+      if(attack_time < 0.0)
+	attack_time = 0.0;
+
+    case 0:
+      break;
+    }
+
+  /* construct bpf (sustain time = attack + decay + release) */
+  bpf_append_point(bpf, attack_time, 1.0);
+  bpf_append_point(bpf, attack_time + decay_time, sustain_level);
+  bpf_append_point(bpf, 2 * (attack_time + decay_time) + release_time, sustain_level);
+  bpf_append_point(bpf, 2 * (attack_time + decay_time + release_time), 0.0);
+
+  /* go */
   env_start(this);
+}
+
+static void 
+env_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+
+  /* just go */
+  env_start(this);
+}
+
+static void 
+env_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  env_t *this = (env_t *)o;
+  int size = bpf_get_size(this->bpf);
+  
+  this->status = status_hold;
 }
 
 static void 
 env_release(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
-  enum env_status status = this->status;
   bpf_t *bpf = this->bpf;
   int size = bpf_get_size(bpf);
   int index = this->index;
@@ -190,129 +396,38 @@ env_release(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 }
 
-static void 
-env_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  env_t *this = (env_t *)o;
-  int size = bpf_get_size(this->bpf);
-  
-  this->status = status_hold;
-}
-
-static void 
-env_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  env_t *this = (env_t *)o;
-  bpf_t *bpf = this->bpf;
-  double value = fts_get_double(at);
-
-  bpf_clear(bpf);
-  this->status = status_hold;
-
-  this->value = value;
-}
-
-static void 
-env_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+env_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
 
-  if(ac)
+  if(fts_is_number(at))
     {
-      bpf_t *bpf = this->bpf;
-      double last_time = 0.0;
-      int i;
-      
-      bpf_clear(bpf);
-      
-      if(ac & 1)
+      double speed = fts_get_number_float(at);
+	
+      if(speed > 0.0)
 	{
-	  double value = 0.0;
+	  this->speed = speed;
 
-	  if(fts_is_number(at))
-	    value = fts_get_number_float(at);
-	  
-	  bpf_append_point(bpf, 0.0, value);
-
-	  ac--;
-	  at++;
+	  /* unable duration adjustment */
+	  this->duration = 0.0;
 	}
-      
-      for(i=0; i<ac; i+=2)
-	{
-	  double time = 0.0;
-	  double value = 0.0;
-
-	  if(fts_is_number(at + i))
-	    time = fts_get_number_float(at + i);
-
-	  if(fts_is_number(at + i + 1))
-	    value = fts_get_number_float(at + i + 1);
-
-	  bpf_append_point(bpf, last_time + time, value);
-
-	  last_time = time;
-	}
-
-      env_start(this);
+      else
+	fts_object_signal_runtime_error(o, "speed must be > 0.0");
     }
+  else
+    fts_object_signal_runtime_error(o, "cannot set speed from non number value");
 }
 
-static void 
-env_adsr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+env_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
-  bpf_t *bpf = this->bpf;
-  double attack_time = 0.0;
-  double decay_time = 0.0;
-  double sustain_level = 0.0;
-  double release_time = 0.0;
 
-  this->mode = mode_sustain;
-
-  bpf_clear(bpf);
-
-  switch(ac)
-    {
-    default:
-    case 4:
-      if(fts_is_number(at + 3))
-	release_time = fts_get_number_float(at + 3);
-      
-      if(release_time < 0.0)
-	release_time = 0.0;
-
-    case 3:
-      if(fts_is_number(at + 2))
-	sustain_level = fts_get_number_float(at + 2);
-
-      if(sustain_level < 0.0)
-	sustain_level = 0.0;
-
-    case 2:
-      if(fts_is_number(at + 1))
-	decay_time = fts_get_number_float(at + 1);
-
-      if(decay_time < 0.0)
-	decay_time = 0.0;
-
-    case 1:
-      if(fts_is_number(at + 0))
-	attack_time = fts_get_number_float(at + 0);
-
-      if(attack_time < 0.0)
-	attack_time = 0.0;
-
-    case 0:
-      break;
-    }
-  
-  bpf_append_point(bpf, attack_time, 1.0);
-  bpf_append_point(bpf, attack_time + decay_time, sustain_level);
-  bpf_append_point(bpf, attack_time + decay_time + 10, sustain_level);
-  bpf_append_point(bpf, attack_time + decay_time + 10 + release_time, 0.0);
-
-  env_start(this);
+  if(fts_is_number(at))
+    this->duration = fts_get_number_float(at);
+  else
+    fts_object_signal_runtime_error(o, "cannot set duration from non number value");
 }
 
 /************************************************************
@@ -324,7 +439,7 @@ env_adsr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 env_reset(env_t *this, int n_tick, double sr)
 {
-  this->step = 1000.0 * this->speed / sr;
+  this->conv = 1000.0 / sr;
 }
 
 static void
@@ -353,7 +468,7 @@ env_ftl(fts_word_t *argv)
   bpf_t *bpf = this->bpf;
   double time = this->time;
   double value = this->value;
-  double step = this->step;
+  double step = this->speed * this->conv;
   double incr = step * this->base_slope;
 
   if(this->status == status_hold)
@@ -498,11 +613,14 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->time = 0.0; /* current time */
   this->value = 0.0; /* current value */
 
+  this->duration = 0.0; /* fixed duration in mode continue (adjust speed for duration > 0.0) */
   this->speed = 1.0; /* reading speed */
-  this->step = 0.0; /* reading speed / sr */
+  this->conv = 1.0; /* 1000.0 / sr */
+
+  this->editid = 0;
 
   if(bpf_atom_is(at))
-    bpf_copy(bpf_atom_get(at), this->bpf);
+    env_set_bpf(o, 0, 0, 1, at);
 
   fts_dsp_add_object(o);
 }
@@ -519,7 +637,7 @@ env_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 env_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(env_t), 1, 2, 0);
+  fts_class_init(cl, sizeof(env_t), 2, 2, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, env_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, env_delete);
@@ -528,17 +646,19 @@ env_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("mode"), env_set_mode);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), env_set_mode_prop);
 
-  fts_method_define_varargs(cl, 0, bpf_symbol, env_bpf);
-  fts_method_define_varargs(cl, 0, fts_s_bang, env_bang);
+  fts_method_define_varargs(cl, 0, fts_s_bang, env_go);
+  fts_method_define_varargs(cl, 1, fts_s_bang, env_release);
+
   fts_method_define_varargs(cl, 0, fts_s_stop, env_stop);
 
+  fts_method_define_varargs(cl, 0, bpf_symbol, env_bpf);
   fts_method_define_varargs(cl, 0, fts_s_int, env_number);
   fts_method_define_varargs(cl, 0, fts_s_float, env_number);
-
   fts_method_define_varargs(cl, 0, fts_s_list, env_array);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("release"), env_release);
   fts_method_define_varargs(cl, 0, fts_new_symbol("adsr"), env_adsr);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("speed"), env_set_speed);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("duration"), env_set_duration);
 
   fts_dsp_declare_outlet(cl, 0);
 

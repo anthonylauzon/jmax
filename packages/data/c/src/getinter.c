@@ -181,7 +181,7 @@ getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    {
 	      index++;
 	      
-	      while(time > bpf_get_time(bpf, index + 1))
+	      while(time >= bpf_get_time(bpf, index + 1))
 		index++;
 	    }
 	  else if(time < bpf_get_time(bpf, index))
