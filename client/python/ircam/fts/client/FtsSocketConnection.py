@@ -1,5 +1,6 @@
 import os
 import socket
+import select
 from FtsClientException import FtsClientException
 from FtsServerConnection import FtsServerConnection
 
@@ -27,6 +28,7 @@ class FtsSocketConnection(FtsServerConnection):
         Close communication with the FTS server
         """
         FtsServerConnection.stopThread(self)
+        self.sock.shutdown(2)
         self.sock.close()
         return
     
@@ -34,26 +36,26 @@ class FtsSocketConnection(FtsServerConnection):
         """
         Read at most length bytes from the socket connected to the FTS server
         """
-        try:
+        rlist, wlist, xlist = select.select([self.sock],[],[])
+        if self.sock in rlist:
             byte = self.sock.recv(length)
             n  = len(byte)
-            return (n, byte)
-        except socket.error, err:
-            if n < 0:
-                raise FtsClientException("Failed to read the input connection", err.args[1], err.args[0])
-        if n == 0:
-            raise FtsClientException("End of input", 0, "")
-
+            if n == 0:
+                raise FtsClientException("End of input", 0)
+            else:
+                return (n, byte)
+        else:
+            # select failed ...., raise exception
+            raise FtsClientException("Select failed on read socket, stop listening", 0)
     
     def write(self, byte, length):
         """
         Write length bytes to the socket connected to the FTS server
         """
-        try:
-            tmp = self.sock.send(byte[:length])
-            return
-        except socket.error, err:
-            raise FtsClientException("Error in sending message", err.args[1], err.args[0])
+        tmp = self.sock.send(byte[:length])
+        if tmp == 0:
+            raise FtsClientException("Error in sending message", 0)
+        return
 
     
     def __connect(self):        
