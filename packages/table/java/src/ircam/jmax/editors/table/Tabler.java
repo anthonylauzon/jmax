@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.io.*;
+import com.sun.java.swing.*;
 
 /** 
  A simple table editor
@@ -17,10 +18,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   
   TablePanel itsTablePanel;
   TextField itsFormula;
-  Label itsCoordX;
-  Label itsCoordY;
-  Label itsCurrentValue;
-  Panel itsFrontHeader;
+  JLabel itsCoordX;
+  JLabel itsCoordY;
+  JLabel itsCurrentValue;
+  JPanel itsFrontHeader;
   MenuItem itsRefreshMenuItem;
   Dimension preferredSize = new Dimension(512,412);
   ScrollPane itsScrollPane;
@@ -38,40 +39,30 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
       setTitle(itsData.getDocument().getName());
     }
 
-    getContentPane().setLayout(new BorderLayout());
-    getContentPane().setBackground(Color.white);
+    JPanel aContent = new JPanel();
+    aContent.setLayout(new BorderLayout());
 
-    itsFormula = new TextField("", 40);
-    itsFormula.resize(300, 20);
-    getContentPane().add("South", itsFormula);
-    
-    itsTablePanel = new TablePanel(this);
-    itsTablePanel.resize(itsTablePanel.getPreferredSize().width,itsTablePanel.getPreferredSize().height);
-    
-    itsScrollPane = new ScrollPane();
-    itsScrollPane.add(itsTablePanel);
-    itsScrollPane.setScrollPosition(0, 0);
-    getContentPane().add("Center", itsScrollPane);
+    aContent.setBackground(Color.white);
 
-    itsFrontHeader = new Panel();
-    itsFrontHeader.setLayout(new BorderLayout());
+    //-------- front header
+
+    itsFrontHeader = new JPanel();
     itsFrontHeader.setBackground(Color.lightGray);
     
-    Panel aPanel = new Panel();
-    aPanel.resize(80,20);
+    JPanel aPanel = new JPanel();
     aPanel.setBackground(Color.lightGray);
 
-    Label aLabel1 = new Label("x: ");
+    JLabel aLabel1 = new JLabel("x: ");
     aLabel1.setBackground(Color.lightGray);
-    Label aLabel2 = new Label("current value: ");
+    JLabel aLabel2 = new JLabel("current value: ");
     aLabel2.setBackground(Color.lightGray);
-    Label aLabel3 = new Label("y: ");
+    JLabel aLabel3 = new JLabel("y: ");
     aLabel3.setBackground(Color.lightGray);
-    itsCoordX = new Label("000");
+    itsCoordX = new JLabel("000");
     itsCoordX.setBackground(Color.lightGray);
-    itsCoordY = new Label("000");
+    itsCoordY = new JLabel("000");
     itsCoordY.setBackground(Color.lightGray);
-    itsCurrentValue = new Label("000");
+    itsCurrentValue = new JLabel("000");
     itsCurrentValue.setBackground(Color.lightGray);
 
     aPanel.add(aLabel1);
@@ -82,22 +73,45 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     aPanel.add(itsCoordY);
     aPanel.validate();
     
-    itsFrontHeader.add("West", aPanel);
+    Dimension frontHeaderSize = new Dimension(512, 20);
+    aPanel.setMinimumSize(frontHeaderSize);
+    aPanel.setPreferredSize(frontHeaderSize);
 
-    itsFrontHeader.resize(512, 20);
+    itsFrontHeader.add(aPanel);
 
-    getContentPane().add("North", itsFrontHeader);
+
+    aContent.add(itsFrontHeader, BorderLayout.NORTH);
     
+    //------------------ table panel into a ScrollPane
+
+    itsTablePanel = new TablePanel(this);
+    itsTablePanel.setSize(itsTablePanel.getPreferredSize().width,itsTablePanel.getPreferredSize().height);
+    
+    itsScrollPane = new ScrollPane();
+    itsScrollPane.add(itsTablePanel);
+    itsScrollPane.setScrollPosition(0, 0);
+    aContent.add(itsScrollPane, BorderLayout.CENTER);
+
+    //-----------------  formula
+    itsFormula = new TextField("", 40);
+    itsFormula.resize(300, 20);
+    aContent.add( itsFormula, BorderLayout.SOUTH);
+    
+    getContentPane().add(aContent);
+
     Init();
     
+    preferredSize.width = itsTablePanel.getPreferredSize().width;
+
     itsTablePanel.fillTable(itsData);
     itsTablePanel.repaint();
-    preferredSize.width = itsTablePanel.getPreferredSize().width;//????????
 
     itsScrollPane.setScrollPosition(0,30);
     validate();
     itsFormula.addKeyListener(this);
+
     setBounds(100, 100, getPreferredSize().width,getPreferredSize().height);
+
     setVisible(true);
   }
 
@@ -111,7 +125,6 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   }
 
    // the MaxDataEditor interface
-  // S.V.P. this interface should be implemented !!!
 
   public void quitEdit()
   {
@@ -123,8 +136,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   {
     if (!isVisible()) setVisible(true);
     itsData.forceUpdate();
-    itsTablePanel.paint(itsTablePanel.getGraphics());
-    itsTablePanel.updateOldValues();
+    itsTablePanel.repaint();
 
     toFront();
   }
@@ -157,9 +169,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
       public  void actionPerformed(ActionEvent e)
 	{ 
 	  itsData.forceUpdate();
-	  //scure itsTablePanel.recreateOffScreen();
-	  itsTablePanel.paint(itsTablePanel.getGraphics());
-	  itsTablePanel.updateOldValues();
+	  itsTablePanel.repaint();
 	}});
   }
 

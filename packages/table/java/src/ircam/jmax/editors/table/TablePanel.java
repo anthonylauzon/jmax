@@ -19,8 +19,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   int old_dragx = 0;
   int old_dragy = 0;
   int values[];
-  int oldValues[];
-  int previousHilighted = -1;
+
   Tabler itsTabler;
   
   public TablePanel(Tabler theTabler) {
@@ -28,7 +27,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     itsTabler = theTabler;
     setBackground(Color.white);
     values = new int[theTabler.itsData.getSize()];
-    oldValues = new int[theTabler.itsData.getSize()];
+
     addMouseMotionListener(this);
     addMouseListener(this);
   }
@@ -37,7 +36,6 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     if (vector != null && vector.length != 0) {
       values = vector;
       N_POINTS = itsTabler.itsData.getSize();
-      updateOldValues();
     }
   }
 
@@ -50,13 +48,11 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     else return 0;
   }
 
-  void updateOldValues(){
-    for(int i=0;i<N_POINTS;i++){
-      oldValues[i]=values[i];
-    }
-  }
 
   public void update(Graphics g) {
+    g.setColor(Color.white);
+    g.fillRect(0, 0, getSize().width, getSize().height);
+    paint(g);
   }
 
   public void paint(Graphics g) {
@@ -75,13 +71,10 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void mouseMoved(MouseEvent e){
     int x = e.getX()/x_scale_factor;
     int y = e.getY();
-    if (x < values.length) { 
-      itsTabler.setCoordinates(x, getSize().height-y);
-      //working code, commented for efficiency
-      /*if (previousHilighted != -1) highlight(previousHilighted, false);
-	previousHilighted = x;
-	highlight(x, true);*/
-    }
+    if (x < values.length) 
+      { 
+	itsTabler.setCoordinates(x, getSize().height-y);
+      }
   }
   
   public void mouseDragged(MouseEvent e){
@@ -89,13 +82,12 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     int y = e.getY();
     y = getSize().height-y;
     if (x<0 || x> N_POINTS-2) return;
-    //oldValues[x]=values[x];
+    
     values[x] = y;
     Interpolate(old_dragx, old_dragy, x, y);
     old_dragx = x; old_dragy = y;
     PaintSingle(x, getGraphics());
-    oldValues[x]=values[x];
-    //scure DoublePaint(x);
+
     itsTabler.setCoordinates(x, y);
   }
   //////////////////////////////////////////////////////////////////
@@ -108,24 +100,18 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     if (oldx == newx) return;	//nothing to do
     
     float factor = (newy-oldy)/Math.abs(newx-oldx);
-    if (newx>oldx) for (int i=oldx+1; i<newx; i++) {
-      //oldValues[i]=values[i];
+    if (newx>oldx) for (int i=oldx+1; i<newx; i++) 
+      {
       values[i] = (int) (values[i-1]+factor);
       PaintSingle(i, getGraphics());
-      oldValues[i]=values[i];
-      //scure DoublePaint(i);
-    }
-    else for (int i=oldx-1; i>newx; i--) {
-      //oldValues[i]=values[i];
+      }
+    else for (int i=oldx-1; i>newx; i--) 
+      {
       values[i] = (int) (values[i+1]+factor);
       PaintSingle(i, getGraphics());
-      oldValues[i]=values[i];
-      //scure DoublePaint(i);
-    }
+      }
   }
   
-    /////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////mouseListener--inizio
   public void mouseClicked(MouseEvent e){}
   
   public void mousePressed(MouseEvent e){
@@ -135,11 +121,10 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     if (x<0 || x>N_POINTS-2) return;
     old_dragx = x;
     old_dragy = y;
-    //oldValues[x]=values[x];
+
     values[x] = y;
     PaintSingle(x, getGraphics());
-    oldValues[x]=values[x];
-    //scure DoublePaint(x);
+
   }
 
   public void mouseReleased(MouseEvent e){
@@ -151,34 +136,24 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 
   public void mouseEntered(MouseEvent e){}
   public void mouseExited(MouseEvent e){}
-  //////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////mouseListener--fine
-  Rectangle toolRect = new Rectangle();
+
+
+
   void PaintSingle(int index, Graphics g) {
     Dimension d = size();
-    //System.err.println("old + new "+oldValues[index]+" "+values[index]);
-    if(oldValues[index]>values[index]){
-      g.setColor(Color.white);
-      g.fillRect(index*x_scale_factor, d.height-oldValues[index], x_scale_factor,oldValues[index]-values[index]);
-    }
-    else{
-      g.setColor(Color.black);
-      g.fillRect(index*x_scale_factor, d.height-values[index], x_scale_factor, values[index]);
-    }
-  }
 
-  void highlight(int index, boolean on_off) {
-    Graphics g = getGraphics();
-    Dimension d = getSize();
+    g.setColor(Color.white);
+    g.fillRect(index*x_scale_factor, 0, x_scale_factor, d.height);
 
-    if (on_off) g.setColor(Color.gray);
-    else g.setColor(Color.black);
+    g.setColor(Color.black);
     g.fillRect(index*x_scale_factor, d.height-values[index], x_scale_factor, values[index]);
+
   }
+
 
   void ApplyFormula(String theFormula) {
-    //we should evaluate something like:
-    //"set x <i>; set y values[i]; [eval <theFormula>] (or <theFormula>)
+    //evaluate this TCL expression:
+    //"set x <i>; set y values[i]; [eval <theFormula>]
     String s = new String();
     int temp;
     int start=0;
@@ -186,7 +161,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     String ps = new String();
     
     //analize string s; if it begins with "[" is a subset operator
-    if (theFormula.startsWith("[")) { //parserino al volo
+    if (theFormula.startsWith("[")) { 
       int p = theFormula.indexOf(']');
       int semic;
       ps = theFormula.substring(1,p);
@@ -209,7 +184,6 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 	"eval \" expr " + theFormula + "\"\n";
       try {
 	MaxApplication.getTclInterp().eval(s);
-	//oldValues[i]=values[i];
 	values[i] = Integer.parseInt(MaxApplication.getTclInterp().getResult().toString());
       } 	catch (TclException e) {
 	itsTabler.itsFormula.setText("TCL error: " + e);
@@ -221,8 +195,7 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
       }
       itsTabler.itsData.changed();
     }
-    paint(getGraphics());
-    updateOldValues();
+    repaint();
   }
 
   public Dimension preferredSize() {
