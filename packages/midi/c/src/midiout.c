@@ -441,7 +441,7 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   /* if there is still no port just get default */
   if(!this->port)
-    this->port = fts_midiport_get_default();
+    this->port = fts_midiport_get_default_out();
   
   if(!this->port)
     fts_object_set_error(o, "Default MIDI port is not defined");

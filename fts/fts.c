@@ -119,7 +119,6 @@ void fts_load_project( void)
 {
   fts_symbol_t project_symbol;
   fts_symbol_t project_file;
-  fts_package_t* project = NULL;
 
   project_symbol = fts_new_symbol( "project");
 
@@ -139,10 +138,9 @@ void fts_load_project( void)
   /* create an empty project */
   if (project_file == NULL) {
     fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
-    project = fts_package_new(project_symbol);
-    fts_project_set(project);
+    fts_project_set(fts_project_new(project_symbol));
   } else {
-    project = fts_project_open(fts_symbol_name( project_file));
+    fts_project_set(fts_project_open(fts_symbol_name( project_file)));
   }
 }
 
@@ -165,6 +163,7 @@ extern void fts_kernel_list_init( void);
 extern void fts_kernel_class_init( void);
 extern void fts_kernel_property_init( void);
 extern void fts_kernel_package_init( void);
+extern void fts_kernel_project_init( void);
 extern void fts_kernel_doctor_init( void);
 extern void fts_kernel_connection_init( void);
 extern void fts_kernel_variable_init( void);
@@ -196,6 +195,7 @@ static void fts_kernel_init( void)
   fts_kernel_class_init();
   fts_kernel_property_init();
   fts_kernel_package_init();
+  fts_kernel_project_init();
   fts_kernel_doctor_init();
   fts_kernel_connection_init();
   fts_kernel_variable_init();

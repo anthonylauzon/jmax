@@ -35,9 +35,11 @@ struct fts_bmax_file {
   struct _saver_dumper *dumper;
 };
 
-/* used by package class only!!! */
+/* used by package and project class only!!! */
 extern void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at);
 extern void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym);
+extern void fts_bmax_code_push_int(fts_bmax_file_t *f, int value);
+extern void fts_bmax_code_push_float(fts_bmax_file_t *f, float value);
 extern void fts_bmax_code_pop_args(fts_bmax_file_t *f, int value);
 extern void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs);
 extern void fts_bmax_code_return(fts_bmax_file_t *f);

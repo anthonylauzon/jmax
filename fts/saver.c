@@ -435,7 +435,7 @@ fts_bmax_code_return(fts_bmax_file_t *f)
   fts_bmax_write_opcode(f, FVM_RETURN);
 }
 
-static void 
+void 
 fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
 {
   /* PUSH_INT   <int>   */
@@ -447,7 +447,7 @@ fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-static void 
+void 
 fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 {
   /* PUSH_FLOAT <float> */

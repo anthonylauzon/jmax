@@ -25,4 +25,9 @@
 
 extern void fts_audio_idle( void);
 
+extern void fts_audioport_set_default( int argc, const fts_atom_t *argv);
+extern void fts_audioport_set_default_in( int argc, const fts_atom_t *argv);
+extern void fts_audioport_set_default_out( int argc, const fts_atom_t *argv);
+
+
 #endif

@@ -2335,24 +2335,24 @@ static fts_status_t fts_ucs_newobj(int argc, const fts_atom_t *argv)
 /*    return fts_Success; */
 /*  } */
 
-static fts_status_t fts_ucs_default_midi(int argc, const fts_atom_t *argv)
-{
-  if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
-    { 
-      post( "Setting default MIDI port to \"%s\"", fts_symbol_name( fts_get_symbol( argv)));
-      if (argc >= 2)
-	{
-	  post( "arguments: ");
-	  post_atoms( argc-1, argv+1);
-	  post( ")");
-	}
-      post( "\n");
+/*  static fts_status_t fts_ucs_default_midi(int argc, const fts_atom_t *argv) */
+/*  { */
+/*    if ((argc >= 1)  && (fts_is_symbol(&argv[0]))) */
+/*      {  */
+/*        post( "Setting default MIDI port to \"%s\"", fts_symbol_name( fts_get_symbol( argv))); */
+/*        if (argc >= 2) */
+/*  	{ */
+/*  	  post( "arguments: "); */
+/*  	  post_atoms( argc-1, argv+1); */
+/*  	  post( ")"); */
+/*  	} */
+/*        post( "\n"); */
 
-      fts_midiport_set_default( argc, argv);
-    }
+/*        fts_midiport_set_default( argc, argv); */
+/*      } */
 
-  return fts_Success;
-}
+/*    return fts_Success; */
+/*  } */
 
 
 /*
@@ -2430,9 +2430,9 @@ fts_ucs_install_commands()
 /*  			 "default audio <name> [<args>]*", */
 /*  			 "defines the default audio port"); */
 
-  fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("midi"), fts_ucs_default_midi,
-			 "default midi <name> [<args>]*",
-			 "defines the default midi port");
+/*    fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("midi"), fts_ucs_default_midi, */
+/*  			 "default midi <name> [<args>]*", */
+/*  			 "defines the default midi port"); */
 
   /* Parameters */
 

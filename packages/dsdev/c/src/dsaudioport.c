@@ -28,8 +28,7 @@
 
 /* These macros are used to test and debug possible synchronization
    and latency configurations */
-#define DSDEV_SYNC_ON_OUTPUT 0
-#define DSDEV_NUM_FRAGMENTS 32
+#define DEFAULT_NUM_FRAGMENTS 16
 #define DEFAULT_FIFO_SIZE 8192
 #define DEFAULT_SAMPLING_RATE (44100.0f)
 #define DEFAULT_CHANNELS 2
@@ -41,10 +40,6 @@ static HWND fts_wnd = NULL;
 /* the handle to this dll instance to create the fsck'ing window */
 static HINSTANCE dsdev_instance = NULL;
 
-
-static fts_symbol_t fts_s_read_only = NULL;
-static fts_symbol_t fts_s_write_only = NULL;
-static fts_symbol_t fts_s_read_write = NULL;
 
 int fts_win32_create_window();
 int fts_win32_destroy_window();
@@ -67,24 +62,30 @@ typedef struct {
   fts_audioport_t head;
 
   WAVEFORMATEX* format;
-  int state; 
-  unsigned int buffer_byte_size;
-  unsigned int buffer_sample_size;
-  fts_symbol_t mode;                /* write only, read only or read & write */
+
   LPGUID guid;
+  fts_symbol_t device;
+
+  int state; 
+  
+  /* write only, read only or read & write */
+  fts_symbol_t mode;                
 
   /* the number of buffers (fts ticks) that go a the fifo buffer */
   unsigned int num_buffers;
 
-  /*  
-      the current implementation devides the driver's fifo buffer in a
+  /* the current implementation devides the driver's fifo buffer in a
       number of fragments. the fragment size is always a multiple of
-      FTS tick size. the use of fragments avoids a synchronization
-      at every tick but rather on a multiple of the tick
-      size. hopefully it will make things more efficient. huh...  
-  */
+      FTS tick size. the use of fragments avoids a synchronization at
+      every tick but rather on a multiple of the tick size. hopefully
+      it will make things more efficient. huh...  */
   unsigned int num_fragments;
+
+  /* a couple of values I store here for convenience so they aren't
+     calculated over and over again */
   unsigned int fragment_size;
+  unsigned int buffer_byte_size;
+  unsigned int buffer_sample_size;
 
   int no_xrun_message_already_posted;
 
@@ -107,14 +108,6 @@ typedef struct {
   unsigned int cur_cbuffer;
   unsigned int cur_cfragment;
 
-  char* default_device;
-  int default_channels;
-  int default_fragments;
-  int default_fifo_size;
-  fts_symbol_t default_mode;
-
-  int sync_on_output;
-
 } dsaudioport_t;
 
 static void dsaudioport_input( fts_word_t *argv);
@@ -136,7 +129,6 @@ dsaudioport_input(fts_word_t *argv)
   short *buf1, *buf2;
   DWORD bytes1, bytes2, boffset, soffset;
   HRESULT hr;
-  FILE* log; /* FIXME */
   int print_log = 0;
  
   dev = (dsaudioport_t *) fts_word_get_ptr(argv+0);
@@ -148,7 +140,7 @@ dsaudioport_input(fts_word_t *argv)
   n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_input_channels(dev);
   
-  if ((dev->mode == fts_s_read_only) || (dev->mode == fts_s_read_write)) {
+  if ((dev->mode == fts_s_read) || (dev->mode == fts_s_read_write)) {
     
     /* Calculate the byte and sample offset in the fifo buffer */
     boffset = dev->cur_cbuffer * dev->buffer_byte_size;    
@@ -156,22 +148,14 @@ dsaudioport_input(fts_word_t *argv)
     
     /* If we reached the end of the fragment, wait till the next
        fragment becomes available */
-    if (!dev->sync_on_output && (dev->cur_cbuffer % dev->fragment_size) == 0) {
+    if ((dev->cur_cbuffer % dev->fragment_size) == 0) {
+
       dev->cur_cfragment = 1 + dev->cur_cbuffer / dev->fragment_size;
       if (dev->cur_cfragment == dev->num_fragments) {
 	dev->cur_cfragment = 0;
       }
-      WaitForSingleObject(dev->event[dev->cur_cfragment], 1000);
+      WaitForSingleObject(dev->cevent[dev->cur_cfragment], 1000);
     }
-    
-#if 0  
-    IDirectSoundCaptureBuffer_GetCurrentPosition(dev->dscBuffer, &bytes1, &bytes2);
-    log = fopen("C:\\dsaudioport.txt", "a");
-    fprintf(log, "cur=%i\tstart=%u\tend=%u\tread=%u\tcapture=%u\n", 
-	    dev->cur_cbuffer, boffset, 
-	    boffset + dev->buffer_byte_size, bytes2, bytes1);
-    fclose(log);
-#endif
     
     
     /* Lock */
@@ -214,7 +198,6 @@ dsaudioport_output(fts_word_t *argv)
   short *buf1, *buf2;
   DWORD bytes1, bytes2, boffset, soffset;    
   int n, channels, ch, i, j;
-  FILE* log; /* FIXME */
   DWORD bend;
 
   dev = (dsaudioport_t *) fts_word_get_ptr(argv+0);
@@ -223,7 +206,7 @@ dsaudioport_output(fts_word_t *argv)
     return;
   }
 
-  if ((dev->mode == fts_s_write_only) || (dev->mode == fts_s_read_write)) {
+  if ((dev->mode == fts_s_write) || (dev->mode == fts_s_read_write)) {
 
     n = fts_word_get_int(argv + 1);
     channels = fts_audioport_get_output_channels(dev);
@@ -236,7 +219,8 @@ dsaudioport_output(fts_word_t *argv)
     
     /* If we reached the end of the fragment, wait till the next
        fragment becomes available */
-    if (dev->sync_on_output && (dev->cur_buffer % dev->fragment_size) == 0) {
+    if ((dev->cur_buffer % dev->fragment_size) == 0) {
+
       dev->cur_fragment = 1 + dev->cur_buffer / dev->fragment_size;
       if (dev->cur_fragment == dev->num_fragments) {
 	dev->cur_fragment = 0;
@@ -246,16 +230,19 @@ dsaudioport_output(fts_word_t *argv)
     }
     
 #if 0
-    IDirectSoundBuffer_GetCurrentPosition(dev->dsBuffer, &bytes1, &bytes2);
-    log = fopen("C:\\dsaudioport.txt", "a");
-    fprintf(log, "buf=%i\tfrag=%i\tplay=%u\twrite=%u\tstart=%u\tend=%u\toverlap=%i\n", 
-	    dev->cur_buffer, dev->cur_fragment, 
-	    bytes1, bytes2,
-	    boffset, bend,
-	    (((bytes1 <= boffset) && (boffset <= bytes2))
-	     || (bytes1 <= bend) && (bend <= bytes2)));
-    
-    fclose(log);
+    {
+      FILE* log; /* FIXME */
+      IDirectSoundBuffer_GetCurrentPosition(dev->dsBuffer, &bytes1, &bytes2);
+      log = fopen("C:\\dsaudioport.txt", "a");
+      fprintf(log, "buf=%i\tfrag=%i\tplay=%u\twrite=%u\tstart=%u\tend=%u\toverlap=%i\n", 
+	      dev->cur_buffer, dev->cur_fragment, 
+	      bytes1, bytes2,
+	      boffset, bend,
+	      (((bytes1 <= boffset) && (boffset <= bytes2))
+	       || (bytes1 <= bend) && (bend <= bytes2)));
+      
+      fclose(log);
+    }
 #endif
     
     /* Lock */
@@ -302,14 +289,17 @@ dsaudioport_enum_callback(LPGUID guid, LPCSTR description,
   dsaudioport_t *dev = (dsaudioport_t *) context;
 
   fts_log("[dsaudioport]: audio device \"%s\"\n", description);
-  if ((dev->default_device != NULL) && (strcmp(dev->default_device, description) == 0)) {
+
+  if ((dev->device != NULL) && (strcmp(fts_symbol_name(dev->device), description) == 0)) {
     fts_log("[dsaudioport]: found default audio device\n");
     dev->guid = guid;
   }
-  if (dev->default_device == NULL) {
+
+  if ((dev->device == fts_s_default) && (dev->guid == NULL)) {
     dev->guid = guid;
-    dev->default_device = strdup(description);
+    dev->device = fts_new_symbol_copy(description);
   }
+
   return 1;
 }
 
@@ -321,10 +311,10 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   dsaudioport_t *dev = (dsaudioport_t *)o;
   DSBUFFERDESC desc;
   HRESULT hr;
-  char str[256];
   int err = 0;
   DSCBUFFERDESC cdesc;
   DSCAPS caps;
+
 
   ac--;
   at++;
@@ -358,80 +348,70 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   dev->cevent = NULL;
   dev->cur_cbuffer = 0;
   dev->cur_cfragment = 0;
-  dev->sync_on_output = 1;
+  dev->device = NULL;
+  dev->mode = NULL;
+
+  /*************************** fts settings ********************************/
+
+  fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
+  sample_rate = (int) fts_dsp_get_sample_rate();
+  frames = fts_dsp_get_tick_size();
 
 
   /*************************** default settings ********************************/
 
-  if (fts_get_regvalue_string("AudioDevice", str, 256) != 0) {
-    dev->default_device = NULL;
-  } else {
-    dev->default_device = strdup(str);
+  /*
+    
+    dsdev <device> <read_write> <channels> <fragments>
+
+   */
+  
+  dev->device = fts_get_symbol_arg(ac, at, 0, fts_s_default);
+  dev->mode = fts_get_symbol_arg(ac, at, 1, fts_s_write);
+  channels = fts_get_int_arg(ac, at, 2, DEFAULT_CHANNELS);
+  dev->num_fragments = fts_get_int_arg(ac, at, 3, DEFAULT_NUM_FRAGMENTS);
+
+  if ((dev->mode != fts_s_read_write) 
+      && (dev->mode != fts_s_read) 
+      && (dev->mode != fts_s_write) ) {
+    fts_log("[dsdev]: Unknown device mode '%s'\n", fts_symbol_name(dev->mode));
+    dev->mode = fts_s_write;      
   }
-
-  if (fts_get_regvalue_int("AudioDeviceChannels", &dev->default_channels) != 0) {
-    dev->default_channels = DEFAULT_CHANNELS;
-  }
-
-  if (fts_get_regvalue_int("AudioDeviceFragments", &dev->default_fragments) != 0) {
-    dev->default_fragments = DSDEV_NUM_FRAGMENTS;
-  }
-
-  if (fts_get_regvalue_int("AudioDeviceBufferSize", &dev->default_fifo_size) != 0) {
-    dev->default_fifo_size = DEFAULT_FIFO_SIZE;
-  }
-
-  if (fts_get_regvalue_string("AudioDeviceMode", str, 256) != 0) {
-    dev->default_mode = fts_s_read_write;
-  } else {
-    dev->default_mode = fts_new_symbol_copy(str);    
-    if ((dev->default_mode != fts_s_read_write) 
-	&& (dev->default_mode != fts_s_read_only) 
-	&& (dev->default_mode != fts_s_write_only) ) {
-      fts_log("[dsdev]: Unknown device mode '%s'\n", fts_symbol_name(dev->default_mode));
-      dev->default_mode = fts_s_read_write;      
-    }
-  }
-
-  /*************************** settings and format ********************************/
-
-  /* set the basic audio settings */
-
-#if 0
-  /* FIXME: for now we use the values of the registry until the FTS
-     configuration has been put in place */
-  channels = fts_get_int_arg(ac, at, 0, DEFAULT_CHANNELS);
-  fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
-  dev->num_fragments = DSDEV_NUM_FRAGMENTS;
-#else
-  channels = dev->default_channels;
-  fifo_size = dev->default_fifo_size;
-  dev->num_fragments = dev->default_fragments;
-  dev->mode = dev->default_mode;
-#endif
 
   /* try to find the GUID of the audio device */
   DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, (LPVOID) dev);              
 
 
-  /************************ store the current setting ***********************************/
-
-  fts_set_regvalue_string("AudioDevice", dev->default_device);
-  fts_set_regvalue_int("AudioDeviceChannels", dev->default_channels);
-  fts_set_regvalue_int("AudioDeviceFragments", dev->default_fragments);
-  fts_set_regvalue_int("AudioDeviceBufferSize", dev->default_fifo_size);
-  fts_set_regvalue_string("AudioDeviceMode", fts_symbol_name(dev->default_mode));
-
-
-
   /************************ set basic parameters ***********************************/
 
-  sample_rate = (int) fts_dsp_get_sample_rate();
-  frames = fts_dsp_get_tick_size();
   dev->buffer_sample_size = channels * frames;
   dev->buffer_byte_size = dev->buffer_sample_size * sizeof(short);
   dev->num_buffers = fifo_size / frames;
+
+  /* Assure a useable value of the number of fragments. */
+
+  if (dev->num_fragments > dev->num_buffers) {
+    dev->num_fragments = dev->num_buffers;
+
+  } else if (dev->num_fragments < 2) {
+    dev->num_fragments = 2;
+
+  } else if ((dev->num_buffers % dev->num_fragments) != 0) {
+
+    /* Assure that the number of buffers is an integer multiple of the
+       number of fragments. If not, reduce the number of fragments
+       untill it is the case. */
+
+    while (--dev->num_fragments >= 2) {
+      if ((dev->num_buffers % dev->num_fragments) == 0) {
+	break;
+      }
+    }
+  }
+
   dev->fragment_size = dev->num_buffers / dev->num_fragments;
+
+  
 
   /* create and initialize the buffer format */
   dev->format = (WAVEFORMATEX*) fts_malloc(sizeof(WAVEFORMATEX));
@@ -447,7 +427,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /*************************** output ********************************/
 
-  if ((dev->mode == fts_s_write_only) || (dev->mode == fts_s_read_write)) {
+  if ((dev->mode == fts_s_write) || (dev->mode == fts_s_read_write)) {
 
     hr = DirectSoundCreate(dev->guid, &dev->direct_sound, NULL);
     if (hr != DS_OK) {
@@ -500,6 +480,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
     hr = IDirectSound_CreateSoundBuffer(dev->direct_sound, &desc, &dev->dsBuffer, NULL);
     if (hr != DS_OK) {
+      post("Error opening DirectSound device (failed to create the secondary buffer)\n");
       fts_object_set_error(o, "Error opening DirectSound device (failed to create the secondary buffer)");
       goto error_recovery;
     }
@@ -516,6 +497,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     for (i = 0; i < dev->num_fragments; i++) {
       dev->event[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
       if (dev->event[i] == NULL) {
+	post("Error opening DirectSound device (failed to create the notifications events)\n");
 	fts_object_set_error(o, "Error opening DirectSound device (failed to create the notifications events)");
 	goto error_recovery;
       }
@@ -527,11 +509,13 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     hr = IDirectSoundBuffer_QueryInterface(dev->dsBuffer, &IID_IDirectSoundNotify, (LPVOID*) &dev->notify);
     if (hr != S_OK) {
       dev->notify = NULL;
+      post("Error opening DirectSound device (failed to create notify interface: %s)", fts_win32_error(hr));
       fts_object_set_error(o, "Error opening DirectSound device (failed to create notify interface: %s)", fts_win32_error(hr));
       goto error_recovery;
     }
     hr = IDirectSoundNotify_SetNotificationPositions(dev->notify, dev->num_fragments, dev->position);
     if (hr != S_OK) {
+      post("Error opening DirectSound device (failed to set notify positions: %s)\n", fts_win32_error(hr));
       fts_object_set_error(o, "Error opening DirectSound device (failed to set notify positions: %s)", fts_win32_error(hr));
       goto error_recovery;
     }
@@ -549,11 +533,12 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /*************************** input ********************************/
 
-  if ((dev->mode == fts_s_read_only) || (dev->mode == fts_s_read_write)) {
+  if ((dev->mode == fts_s_read) || (dev->mode == fts_s_read_write)) {
 
     hr = DirectSoundCaptureCreate(dev->guid, &dev->direct_sound_capture, NULL);
     if (hr != DS_OK) {
-      fts_object_set_error(o, "Warning: dsaudioport: failed to create direct sound capture\n");
+      post("Warning: dsaudioport: failed to create direct sound capture\n");
+      fts_object_set_error(o, "Warning: dsaudioport: failed to create direct sound capture");
       dev->direct_sound_capture = NULL;
       goto error_recovery;
     }
@@ -569,6 +554,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     /* create the sound input buffer */
     hr = IDirectSoundCapture_CreateCaptureBuffer(dev->direct_sound_capture, &cdesc, &dev->dscBuffer, NULL);
     if (hr != DS_OK) {
+      post("Error opening DirectSound device (failed to create the capture buffer)\n");
       fts_object_set_error(o, "Error opening DirectSound device (failed to create the capture buffer)");
       goto error_recovery;
     }
@@ -585,6 +571,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     for (i = 0; i < dev->num_fragments; i++) {
       dev->cevent[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
       if (dev->cevent[i] == NULL) {
+	post("Error opening DirectSound device (failed to create the notifications events)\n");
 	fts_object_set_error(o, "Error opening DirectSound device (failed to create the notifications events)");
 	goto error_recovery;
       }
@@ -596,6 +583,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     hr = IDirectSoundBuffer_QueryInterface(dev->dscBuffer, &IID_IDirectSoundNotify, (LPVOID*) &dev->cnotify);
     if (hr != S_OK) {
       dev->cnotify = NULL;
+      post("Error opening DirectSound device (failed to create notify interface: %s)\n", fts_win32_error(hr));
       fts_object_set_error(o, "Error opening DirectSound device (failed to create notify interface: %s)", fts_win32_error(hr));
       goto error_recovery;
     }
@@ -619,17 +607,14 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 
-  if (dev->mode == fts_s_read_only) {
-    dev->sync_on_output = 0;
+  if (dev->mode == fts_s_read) {
     hr = IDirectSoundCaptureBuffer_Start(dev->dscBuffer, DSCBSTART_LOOPING);
 
   } else if  (dev->mode == fts_s_read_write) {
-    dev->sync_on_output = DSDEV_SYNC_ON_OUTPUT;
     hr = IDirectSoundCaptureBuffer_Start(dev->dscBuffer, DSCBSTART_LOOPING);
     hr = IDirectSoundBuffer_Play(dev->dsBuffer, 0, 0, DSBPLAY_LOOPING);
 
   } else {
-    dev->sync_on_output = 1;
     hr = IDirectSoundBuffer_Play(dev->dsBuffer, 0, 0, DSBPLAY_LOOPING);
   }
 
@@ -885,14 +870,6 @@ dsaudioport_config(void)
     return;
   }
 
-  fts_s_read_only = fts_new_symbol("read_only");
-  fts_s_write_only = fts_new_symbol("write_only");
-  fts_s_read_write = fts_new_symbol("read_write");
-
   dsaudioport_symbol = fts_new_symbol("dsaudioport");
   fts_class_install( dsaudioport_symbol, dsaudioport_instantiate);
-  fts_audioport_set_default_class(dsaudioport_symbol);
-
-  /* FIXME: force the creation of the audio device */
-  fts_audioport_get_default(NULL);
 }

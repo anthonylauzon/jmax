@@ -65,5 +65,5 @@ sequence_config(void)
   getdur_config();
 
   segment_config();
-  segplay_config();
+  seqplay_config();
 }

@@ -162,7 +162,7 @@ midiin_get_port(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **
     }
   
   if(!*port)
-    *port = fts_midiport_get_default();  
+    *port = fts_midiport_get_default_in();  
 
   if(!*port)
     {

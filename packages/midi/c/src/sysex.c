@@ -72,7 +72,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else
     {
-      this->port = fts_midiport_get_default();
+      this->port = fts_midiport_get_default_in();
       
       if(!this->port)
 	fts_object_set_error(o, "Default MIDI port is not defined");
@@ -95,8 +95,6 @@ sysexin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 sysexin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_midiport_t *port;
-
   fts_class_init(cl, sizeof(sysex_t), 0, 1, 0);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sysexin_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sysexin_delete);
@@ -160,7 +158,7 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
   else
     {
-      this->port = fts_midiport_get_default();
+      this->port = fts_midiport_get_default_out();
       
       if(!this->port)
 	fts_object_set_error(o, "Default MIDI port is not defined");
@@ -176,8 +174,6 @@ sysexout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static fts_status_t
 sysexout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_midiport_t *port;  
-
   fts_class_init(cl, sizeof(sysex_t), 1, 0, 0);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sysexout_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sysexout_delete);

@@ -80,6 +80,7 @@ struct _fts_package_t {
   fts_object_t object;
 
   fts_symbol_t name;
+  fts_symbol_t filename;
   fts_symbol_t dir;
   fts_package_state_t state;
   char* error;
@@ -106,11 +107,11 @@ struct _fts_package_t {
  * @ingroup package */
 fts_package_t* fts_package_new(fts_symbol_t name);
 
-/** Deletes the ressources allocated by this package.
+/** Destroys the ressources allocated by this package.
  *
  * @param pkg the package
  * @ingroup package */
-void fts_package_delete(fts_package_t* pkg);
+void fts_package_destroy(fts_package_t* pkg);
 
 /**
  * Try to load all the default files such as the shared library.
@@ -143,11 +144,11 @@ void fts_package_set_error(fts_package_t* pkg, const char* s);
 /**
  * Tell this package it depends on an other package. 
  *
- * @fn void fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
+ * @fn void fts_package_require_package(fts_package_t* pkg, fts_symbol_t required_pkg)
  * @param pkg the package
  * @param required_pkg the name of the required package
  * @ingroup package */
-void fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg);
+void fts_package_require_package(fts_package_t* pkg, fts_symbol_t required_pkg);
 
 /**
  * Returns the class with the specified name. Returns NULL if this

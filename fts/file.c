@@ -115,12 +115,23 @@ fts_file_correct_separators( char *filename)
   int i, len, r = 0;
 
   len = strlen(filename);
+  
+  /* replace something like "/c/..." with "c:\..."  */ 
+  if ((len > 3) && (filename[0] == '/')  && (filename[2] == '/') 
+      && (((filename[1] >= 'a') && (filename[1] <= 'z'))
+	  || ((filename[1] >= 'A') && (filename[1] <= 'Z')))) {
+    filename[0] = filename[1];
+    filename[1] = ':';
+    filename[2] = '\\';
+  }
+
   for (i = 0; i < len; i++) {
     if (filename[i] == '/') {
       filename[i] = '\\';
       r = 1;
     }
   }
+
   return r;
 #else
   return 0;

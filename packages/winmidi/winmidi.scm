@@ -20,3 +20,5 @@
 ;
 
 (println "package: winmidi (Midi port for Windows)")
+(help-summary "winmidi summary" (file-cat dir "help" "winmidi.summary.jmax"))
+

@@ -39,6 +39,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/connection.h>
+#include <ftsprivate/audio.h>
 
 
 #define AUDIOPORT_DEFAULT_IDLE ((void (*)( struct _fts_audioport_t *port))-1)
@@ -682,12 +683,27 @@ int fts_audioport_report_xrun( void)
 /*                                                                        */
 /* ********************************************************************** */
 
-#ifdef WIN32
-
 static fts_audioport_t *default_audioport = 0;
-static fts_symbol_t default_audioport_class = 0;
+static fts_audioport_t *default_audioport_in = 0;
+static fts_audioport_t *default_audioport_out = 0;
 
-void fts_audioport_set_default( int argc, const fts_atom_t *argv)
+
+fts_audioport_t *fts_audioport_get_default( void)
+{
+  return default_audioport;
+}
+
+fts_audioport_t *fts_audioport_get_default_in( void)
+{
+  return (default_audioport_in != NULL)? default_audioport_in : default_audioport;
+}
+
+fts_audioport_t *fts_audioport_get_default_out( void)
+{
+  return (default_audioport_out != NULL)? default_audioport_out : default_audioport;
+}
+
+void fts_audioport_set_default_aux( int argc, const fts_atom_t *argv, fts_audioport_t **port)
 {
   fts_object_t *obj;
   fts_atom_t a[1];
@@ -705,53 +721,56 @@ void fts_audioport_set_default( int argc, const fts_atom_t *argv)
       return;
     }
 
-  if (default_audioport)
+  if (*port)
     {
-      fts_object_delete_from_patcher( (fts_object_t *)default_audioport);
+      fts_object_delete_from_patcher( (fts_object_t *)*port);
     }
 
-  default_audioport = (fts_audioport_t *)fts_get_object( a);
+  *port = (fts_audioport_t *)fts_get_object( a);
 }
 
-void fts_audioport_set_default_class( fts_symbol_t name)
+void fts_audioport_set_default( int argc, const fts_atom_t *argv)
 {
-  default_audioport_class = name;
-}
-
-fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
-{
-  if ((default_audioport == 0) && (default_audioport_class != 0)) {
-    fts_atom_t a[1];
-    fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", fts_symbol_name(default_audioport_class));
-    fts_set_symbol(a, default_audioport_class);
-    fts_audioport_set_default(1, a);
+  if ((default_audioport_in != NULL) || (default_audioport_out != NULL)) {
+    post("Either use 'default_audio' or the combination of 'default_audio_in/out'. You cannot use both.\n");
+    return;
   }
-  return default_audioport;  
+
+  if (default_audioport == NULL) { 
+    fts_audioport_set_default_aux(argc, argv, &default_audioport);
+  } else {
+    post("To use the new audio settings, save the current project and restart jMax.\n");
+  }
 }
 
-#else
-
-fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
+void fts_audioport_set_default_in( int argc, const fts_atom_t *argv)
 {
-  fts_atom_t *value;
-  fts_audioport_t *default_audioport = 0;
+  if (default_audioport != NULL) {
+    post("Either use 'default_audio' or the combination of 'default_audio_in/out'. You cannot use both.\n");
+    return;
+  }
 
-  value = fts_variable_get_value_or_void( fts_object_get_patcher( obj), s_default_audio_port);
-
-  if (value && fts_is_object(value))
-    default_audioport = (fts_audioport_t *)fts_get_object( value);
-  
-  if (obj)
-    fts_variable_add_user( fts_object_get_patcher(obj), s_default_audio_port, obj);
-
-  return default_audioport;
+  if (default_audioport_in == NULL) {
+    fts_audioport_set_default_aux(argc, argv, &default_audioport_in);
+  } else {
+    post("To use the new audio settings, save the current project and restart jMax.\n");
+  }
 }
 
-void fts_audioport_set_default_class( fts_symbol_t name)
+void fts_audioport_set_default_out( int argc, const fts_atom_t *argv)
 {
+  if (default_audioport != NULL) {
+    post("Either use 'default_audio' or the combination of 'default_audio_in/out'. You cannot use both.\n");
+    return;
+  }
+
+  if (default_audioport_out == NULL) {
+    fts_audioport_set_default_aux(argc, argv, &default_audioport_in);
+  } else {
+    post("To use the new audio settings, save the current project and restart jMax.\n");
+  }
 }
 
-#endif
 
 
 /***********************************************************************

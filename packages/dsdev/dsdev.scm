@@ -20,3 +20,4 @@
 ;
 
 (println "package: dsdev (DirectSound audioport)")
+(help-summary "dsdev summary" (file-cat dir "help" "dsdev.summary.jmax"))

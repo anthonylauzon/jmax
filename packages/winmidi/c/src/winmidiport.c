@@ -37,6 +37,10 @@
 #define SYSEX 0xf0
 #define SYSEX_END 0xf7
 
+#define WINMIDI_READ 1
+#define WINMIDI_WRITE 2
+
+
 static char winmidiport_error_buffer[256];
 
 #define msg_pack(_s,_p1,_p2) ((DWORD) ((_s) | (((_p1) & 0x7f) << 8) | (((_p2) & 0x7f) << 16)))
@@ -88,6 +92,7 @@ winmidi_tostring(DWORD midi, char* buf, int len)
  *  Win midi port
  *
  */
+
 typedef struct _winmidiport_t
 {
   fts_midiport_t port;
@@ -100,6 +105,7 @@ typedef struct _winmidiport_t
   DWORD incoming[BUFFER_SIZE];
   int head;
   int tail;
+  unsigned int flags;
 } winmidiport_t;
 
 
@@ -217,7 +223,6 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
 
     /* check for incoming sysex messages */
-
     for (i = 0; i < 2; i++) {
 
       /* check for incoming messages */
@@ -272,7 +277,6 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
      be send, swap the two sysex buffers. */
     if ((this->outhdr[cur_send].dwFlags & MHDR_DONE) 
 	&& (this->outhdr[cur_fill].dwBytesRecorded > 0)) {
-
       midiOutUnprepareHeader(this->hmidiout, &this->outhdr[cur_send], sizeof(MIDIHDR));
       this->outhdr[cur_send].dwFlags = 0;
       this->outhdr[cur_send].dwBytesRecorded = 0;
@@ -324,71 +328,74 @@ winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 
   EnterCriticalSection(&this->critical_section);
 
-  if (fts_midievent_is_channel_message(event)) {
-    if (fts_midievent_channel_message_has_second_byte(event)) {
-      
-      res = midiOutShortMsg(this->hmidiout, 
-			    msg_pack(fts_midievent_channel_message_get_status_byte(event),
-				     fts_midievent_channel_message_get_first(event), 
-				     fts_midievent_channel_message_get_second(event)));
+  if (this->hmidiout != NULL) {
 
+    if (fts_midievent_is_channel_message(event)) {
+      if (fts_midievent_channel_message_has_second_byte(event)) {
+	
+	res = midiOutShortMsg(this->hmidiout, 
+			      msg_pack(fts_midievent_channel_message_get_status_byte(event),
+				       fts_midievent_channel_message_get_first(event), 
+				       fts_midievent_channel_message_get_second(event)));
+	
+      } else {
+	
+	res = midiOutShortMsg(this->hmidiout, 
+			      msg_pack(fts_midievent_channel_message_get_status_byte(event),
+				       fts_midievent_channel_message_get_first(event), 
+				       0));
+      }
+      
     } else {
       
-      res = midiOutShortMsg(this->hmidiout, 
-			    msg_pack(fts_midievent_channel_message_get_status_byte(event),
-				     fts_midievent_channel_message_get_first(event), 
-				     0));
-    }
-
-  } else {
-
-    switch(fts_midievent_get_type(event)) {
-      
-    case midi_system_exclusive:
-      {
-	int i;
-	int size = fts_midievent_system_exclusive_get_size(event);
-	fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
-	int cur = this->cur_outhdr;
-	int len = this->outhdr[cur].dwBufferLength;
-	unsigned char* buffer = (unsigned char*) this->outhdr[cur].lpData;
-	int n = this->outhdr[cur].dwBytesRecorded;
-
-	buffer[n++] = SYSEX;
-	if (n == len) {
-	  buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
-	}
-  	
-	for (i = 0; i < size; i++) {
-	  buffer[n++] = fts_get_int(atoms + i) & 0x7f;
+      switch(fts_midievent_get_type(event)) {
+	
+      case midi_system_exclusive:
+	{
+	  int i;
+	  int size = fts_midievent_system_exclusive_get_size(event);
+	  fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
+	  int cur = this->cur_outhdr;
+	  int len = this->outhdr[cur].dwBufferLength;
+	  unsigned char* buffer = (unsigned char*) this->outhdr[cur].lpData;
+	  int n = this->outhdr[cur].dwBytesRecorded;
+	  
+	  buffer[n++] = SYSEX;
 	  if (n == len) {
 	    buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
 	  }
+	  
+	  for (i = 0; i < size; i++) {
+	    buffer[n++] = fts_get_int(atoms + i) & 0x7f;
+	    if (n == len) {
+	      buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
+	    }
+	  }
+	  
+	  buffer[n++] = SYSEX_END;
+	  if (n == len) {
+	    buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
+	  }
+	  
+	  this->outhdr[cur].dwBytesRecorded = n;	
 	}
+	break;
 	
-	buffer[n++] = SYSEX_END;
-	if (n == len) {
-	  buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
-	}
+      case midi_real_time:
+	res = midiOutShortMsg(this->hmidiout, msg_pack(fts_midievent_real_time_get_status_byte(event), 0, 0));
+	break;
 	
-	this->outhdr[cur].dwBytesRecorded = n;	
+      default:
+	break;
       }
-      break;
-      
-    case midi_real_time:
-      res = midiOutShortMsg(this->hmidiout, msg_pack(fts_midievent_real_time_get_status_byte(event), 0, 0));
-      break;
-      
-    default:
-      break;
     }
-  }
-  
-  if (res != MMSYSERR_NOERROR) {
-    char msg[256];
-    midiOutGetErrorText(res, &msg[0], 256);
-    post("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
-    fts_log("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
+    
+    if (res != MMSYSERR_NOERROR) {
+      char msg[256];
+      midiOutGetErrorText(res, &msg[0], 256);
+      post("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
+      fts_log("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
+    }
   }
 
   LeaveCriticalSection(&this->critical_section);
@@ -429,17 +436,19 @@ winmidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t 
  */
 
 static void
-winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   winmidiport_t *this = (winmidiport_t *)o;
   MMRESULT res;
   UINT i, err, num;
   MIDIOUTCAPS out_caps;
   MIDIINCAPS in_caps;
-  char devname[256];
+  fts_symbol_t devname;
   char msg[256];
   int in_num = 0;
   int out_num = MIDI_MAPPER;
+  int input = 1;
+  fts_symbol_t tmp;
 
   fts_midiport_init(&this->port);
   fts_midiport_set_input(&this->port);
@@ -455,131 +464,187 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->hmidiin = NULL;
   this->cur_outhdr = 0;
 
-  devname[0] = 0;
+  /* check for the device name */
+  devname = fts_get_symbol_arg(ac, at, 0, fts_s_default);
+
+  /* check for read or write access */
+  tmp = fts_get_symbol_arg(ac, at, 1, fts_s_read);
+  this->flags = (tmp == fts_s_read)? WINMIDI_READ : (tmp == fts_s_write)? WINMIDI_WRITE : WINMIDI_READ | WINMIDI_WRITE;
+
 
   /* open midi output device */
+  if (this->flags & WINMIDI_WRITE) {
 
-  /* check if there any midi devices installed */
-  num = midiOutGetNumDevs(); 
+    /* check if there any midi devices installed */
+    num = midiOutGetNumDevs(); 
 
-  if (num == 0) {
-    post("Warning: winmidiport: no MIDI out devices found\n");
-    fts_log("[winmidiport]: No MIDI out devices found\n");
+    if (num == 0) {
+      post("Warning: winmidiport: no MIDI out devices found\n");
+      fts_log("[winmidiport]: No MIDI out devices found\n");
 
-  } else {
-
-    /* search the id of the default midi out (print out the list to the log for debugging) */
-    for (i = 0; i < num; i++) {
-      res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
-      if (res == MMSYSERR_NOERROR) {
-	fts_log("[winmidiport]: midi out port %d: \"%s\"\n", i, out_caps.szPname);
-	if (strcmp(out_caps.szPname, devname) == 0) {
-	  out_num = i;
-	  fts_log("[winmidiport]: found default midi out port in device list\n");
-	}
-      }
-    }
-
-    /* try opening the default port */
-    res = midiOutGetDevCaps(out_num, &out_caps, sizeof(MIDIOUTCAPS));
-    if (res == MMSYSERR_NOERROR) {
-      fts_log("[winmidiport]: trying to open midi out port \"%s\"\n", out_caps.szPname);
-    }
-    err = midiOutOpen(&this->hmidiout, out_num, 0, 0, CALLBACK_NULL);
-    if (err != MMSYSERR_NOERROR) {
-      post("Warning: winmidiport: couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
-      fts_log("[winmidiport]: Couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
-      this->hmidiout = NULL;
     } else {
-      fts_log("[winmidiport]: midi out opened okay\n");
-    }
-    
-    /* if the default midi mapper failed, try opening a hardware port */
-    if (this->hmidiout == NULL) {
+
+      /* search the id of the default midi out (print out the list to the log for debugging) */
       for (i = 0; i < num; i++) {
 	res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
-	if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology == MOD_MIDIPORT)) {
-	  err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
-	  if (err == MMSYSERR_NOERROR) {
-	    post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
-	    fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
-    	    break;
-	  } else {
-	    this->hmidiout = NULL;
+	if (res == MMSYSERR_NOERROR) {
+	  fts_log("[winmidiport]: midi out port %d: \"%s\"\n", i, out_caps.szPname); 
+
+#if 0
+	  fts_log("[winmidiport]: MOD_FMSYNTH = %d\n", (out_caps.wTechnology == MOD_FMSYNTH));
+	  fts_log("[winmidiport]: MOD_MAPPER = %d\n", (out_caps.wTechnology == MOD_MAPPER));
+	  fts_log("[winmidiport]: MOD_MIDIPORT = %d\n", (out_caps.wTechnology == MOD_MIDIPORT));
+	  fts_log("[winmidiport]: MOD_SQSYNTH = %d\n", (out_caps.wTechnology == MOD_SQSYNTH));
+	  fts_log("[winmidiport]: MOD_SYNTH = %d\n", (out_caps.wTechnology == MOD_SYNTH));
+#endif
+
+	  if (strcmp(out_caps.szPname, fts_symbol_name(devname)) == 0) {
+	    out_num = i;
+	    fts_log("[winmidiport]: Found default midi out port in device list\n");
+	  }
+	}
+      }
+
+      /* try opening the default port */
+      res = midiOutGetDevCaps(out_num, &out_caps, sizeof(MIDIOUTCAPS));
+
+      if (res == MMSYSERR_NOERROR) {
+	fts_log("[winmidiport]: Trying to open midi out port \"%s\"\n", out_caps.szPname);
+
+	/*
+
+	  I continue to have problems with the Microsoft Soft
+	  Synth. Opening the synth sometimes blocks the system
+	  completely. I haven't been able to reproduce the error on
+	  the development machines. Until some final solution is
+	  found, warn the user of a possible crash and let him decide
+	  to take the risk.
+
+	 */
+
+	if (strstr(out_caps.szPname, "Microsoft") != NULL) {
+	  if (MessageBox(NULL, "The Microsoft Soft Synth is not supported by FTS and \n"
+			 "might cause FTS to crash. If you have any problems, please \n"
+			 "select an other MIDI device in the Windows Configuration Panels \n"
+			 "and restart FTS. Do you want to continue?", 
+			 "FTS Initialization", 
+			 MB_YESNO | MB_ICONSTOP | MB_APPLMODAL) == IDNO) {
+	    
+	    fts_object_set_error(o, "Failed to open the MIDI port");
+	    return;
+	  }
+	}
+
+	err = midiOutOpen(&this->hmidiout, out_num, 0, 0, CALLBACK_NULL);
+	
+	if (err != MMSYSERR_NOERROR) {
+	  post("Warning: winmidiport: couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
+	  fts_log("[winmidiport]: Couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
+	  this->hmidiout = NULL;
+	} else {
+	  fts_log("[winmidiport]: Opened\n");
+	}
+      }
+    
+      /*
+	
+	I'm not sure whether it's a good idea to try and open an other
+	port if the default port failed. I'll keep it for now until
+	someone complains.
+
+       */
+
+      /* if the default midi mapper failed, try opening a hardware port */
+      if (this->hmidiout == NULL) {
+	for (i = 0; i < num; i++) {
+	  res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
+	  if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology == MOD_MIDIPORT)) {
+	    err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
+	    if (err == MMSYSERR_NOERROR) {
+	      post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
+	      fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
+	      break;
+	    } else {
+	      this->hmidiout = NULL;
+	    }
+	  }
+	}
+    
+	/* if the hardware midi devices failed, try opening a software synth */
+	if (this->hmidiout == NULL) {
+	  for (i = 0; i < num; i++) {
+	    res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
+	    if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology != MOD_MIDIPORT)) {
+	      err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
+	      if (err == MMSYSERR_NOERROR) {
+		post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
+		fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
+		break;
+	      } else {
+		this->hmidiout = NULL;
+	      } 
+	    }
+	  }
+	}
+
+	if (this->hmidiout == NULL) {
+	  post("Warning: winmidiport: failed to opened a midi out device; midi out not available\n");
+	  fts_log("[winmidiport]: Failed to opened a midi out device; midi out not available\n");
+	  
+	} else {
+	  
+	  /* setup the buffers for outgoing sysex messages */
+	  for (i = 0; i < 2; i++) {
+	    this->outhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
+	    this->outhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
+	    this->outhdr[i].dwBytesRecorded = 0;
+	    this->outhdr[i].dwUser = i;
+	    this->outhdr[i].dwFlags = (i == 0)? 0 : MHDR_DONE; 
 	  }
 	}
       }
     }
-    
-    /* if the hardware midi devices failed, try opening a software synth */
-    if (this->hmidiout == NULL) {
-      for (i = 0; i < num; i++) {
-	res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
-	if ((res == MMSYSERR_NOERROR) && (out_caps.wTechnology != MOD_MIDIPORT)) {
-	  err = midiOutOpen(&this->hmidiout, i, 0, 0, CALLBACK_NULL);
-	  if (err == MMSYSERR_NOERROR) {
-	    post("Warning: winmidiport: instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
-	    fts_log("[winmidiport]: Instead, opened MIDI out device: %s (id=%d)\n", out_caps.szPname, i);
-	    break;
-	  } else {
-	    this->hmidiout = NULL;
-	  } 
-	}
-      }
-    }
-
-    if (this->hmidiout == NULL) {
-      post("Warning: winmidiport: failed to opened a midi out device; midi out not available\n");
-      fts_log("[winmidiport]: Failed to opened a midi out device; midi out not available\n");
-
-    } else {
-
-      /* setup the buffers for outgoing sysex messages */
-      for (i = 0; i < 2; i++) {
-	this->outhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
-	this->outhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
-	this->outhdr[i].dwBytesRecorded = 0;
-	this->outhdr[i].dwUser = i;
-	this->outhdr[i].dwFlags = (i == 0)? 0 : MHDR_DONE; 
-      }
-    }
   }
-
+    
   /* open midi input device */
+  
+  if (this->flags & WINMIDI_READ) {
 
-  /* check if there any midi devices installed */
-  num = midiInGetNumDevs(); 
-
-  if (num == 0) {
-    post("Warning: winmidiport: no MIDI in devices found\n");
-    fts_log("[winmidiport]: No MIDI in devices found\n");
-
-  } else {
-
-    for (i = 0; i < num; i++) {
-      res = midiInGetDevCaps(i, &in_caps, sizeof(MIDIINCAPS));
-      if (res == MMSYSERR_NOERROR) {
-	fts_log("[winmidiport]: midi in port %d: \"%s\"\n", i, in_caps.szPname);
-	if (strcmp(in_caps.szPname, devname) == 0) {
-	  in_num = i;
-	  fts_log("[winmidiport]: found default midi in port in device list\n");
+    /* check if there any midi devices installed */
+    num = midiInGetNumDevs(); 
+    
+    if (num == 0) {
+      post("Warning: winmidiport: no MIDI in devices found\n");
+      fts_log("[winmidiport]: No MIDI in devices found\n");
+	
+    } else {
+      
+      for (i = 0; i < num; i++) {
+	res = midiInGetDevCaps(i, &in_caps, sizeof(MIDIINCAPS));
+	if (res == MMSYSERR_NOERROR) {
+	  fts_log("[winmidiport]: midi in port %d: \"%s\"\n", i, in_caps.szPname);
+	  if (strcmp(in_caps.szPname, fts_symbol_name(devname)) == 0) {
+	    in_num = i;
+	    fts_log("[winmidiport]: found default midi in port in device list\n");
+	  }
 	}
       }
-    }
+	
+      /* try opening the default device  */
+      res = midiInGetDevCaps(in_num, &in_caps, sizeof(MIDIINCAPS));
+      if (res == MMSYSERR_NOERROR) {
+	fts_log("[winmidiport]: Trying to open midi in port \"%s\"\n", in_caps.szPname);
+      }
 
-    /* try opening device  */
-    res = midiInGetDevCaps(in_num, &in_caps, sizeof(MIDIINCAPS));
-    if (res == MMSYSERR_NOERROR) {
-      fts_log("[winmidiport]: trying to open midi in port \"%s\"\n", in_caps.szPname);
-    }
+      err = midiInOpen(&this->hmidiin, in_num, (DWORD) winmidiport_callback_in, (DWORD) this, CALLBACK_FUNCTION);
 
-    err = midiInOpen(&this->hmidiin, in_num, (DWORD) winmidiport_callback_in, (DWORD) this, CALLBACK_FUNCTION);
-    if (err != MMSYSERR_NOERROR) {
-      post("Warning: winmidiport: couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
-      fts_log("[winmidiport]: Couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
-      this->hmidiin = NULL;
-    } else {
-      fts_log("[winmidiport]: midi in opened okay\n");
+      if (err != MMSYSERR_NOERROR) {
+	post("Warning: winmidiport: couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
+	fts_log("[winmidiport]: Couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
+	this->hmidiin = NULL;
+      } else {
+	fts_log("[winmidiport]: Opened\n");
+      }
     }
     
     /* if the default midi device failed, try opening any port */
@@ -602,9 +667,9 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     if (this->hmidiin == NULL) {
       post("Warning: winmidiport: failed to opened a midi in device; midi input not available\n");
       fts_log("[winmidiport]: Failed to opened a midi in device; midi input not available\n");
-
+	
     } else {
-
+	
       /* setup the buffers for incoming sysex messages */
       for (i = 0; i < 2; i++) {
 	this->inhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
@@ -641,14 +706,14 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       } 
     }
   }
-
+  
   LeaveCriticalSection(&this->critical_section);
 
   fts_sched_add(o, FTS_SCHED_ALWAYS);
 }
 
 static void 
-winmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   winmidiport_t *this = (winmidiport_t *)o;
   int i, cur_send;
@@ -711,10 +776,29 @@ winmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_sched_remove(o);
 }
 
-static int 
-winmidiport_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+static void
+winmidiport_reopen(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  return 1;
+  ac--;
+  at++;
+
+  winmidiport_close(o, 0, NULL, 0, NULL);
+  winmidiport_open(o, 0, NULL, ac, at);
+}
+
+static void
+winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  ac--;
+  at++;
+  
+  winmidiport_open(o, winlet, s, ac, at);
+}
+
+static void 
+winmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  winmidiport_close(o, winlet, s, ac, at);
 }
 
 static fts_status_t
@@ -725,6 +809,7 @@ winmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_midiport_class_init(cl);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, winmidiport_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_reopen, winmidiport_reopen);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, winmidiport_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, winmidiport_dispatch);
   
@@ -734,11 +819,102 @@ winmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+
+
+
+/*************************************************
+ *
+ *  Win midi 
+ *
+ */
+
+typedef struct _winmidi_t
+{
+  fts_object_t object;
+} winmidi_t;
+
+static void 
+winmidi_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+}
+
+static void 
+winmidi_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+}
+
+static void 
+winmidi_ins(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t a[64];
+  fts_symbol_t name;
+  MIDIINCAPS caps;
+  int i, num;
+
+  num = midiInGetNumDevs(); 
+
+  if (num == 0) {
+    return;
+  }
+
+  for (i = 0; i < num && i < 64; i++) {
+    midiInGetDevCaps(i, &caps, sizeof(MIDIINCAPS));
+    name = fts_new_symbol_copy(caps.szPname);
+    fts_set_symbol(&a[i], name);
+  }
+
+  fts_outlet_send(o, 0, fts_s_list, num, a);
+}
+
+static void 
+winmidi_outs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t a[64];
+  fts_symbol_t name;
+  MIDIOUTCAPS caps;
+  int i, num;
+
+  num = midiOutGetNumDevs(); 
+
+  if (num == 0) {
+    return;
+  }
+
+  for (i = 0; i < num && i < 64; i++) {
+    midiOutGetDevCaps(i, &caps, sizeof(MIDIOUTCAPS));
+    name = fts_new_symbol_copy(caps.szPname);
+    fts_set_symbol(&a[i], name);
+  }
+
+  fts_outlet_send(o, 0, fts_s_list, num, a);
+}
+
+static fts_status_t
+winmidi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(winmidi_t), 1, 1, 0);
+      
+  fts_midiport_class_init(cl);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, winmidi_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, winmidi_delete);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("ins"), winmidi_ins);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("outs"), winmidi_outs);
+
+  return fts_Success;
+}
+
+
+
+/*************************************************
+ *
+ *  Module config 
+ *
+ */
+
 void
 winmidiport_config(void)
 {
-  fts_symbol_t winmidiport_symbol;
-  winmidiport_symbol = fts_new_symbol("winmidiport");
-  fts_metaclass_install( winmidiport_symbol, winmidiport_instantiate, winmidiport_equiv);
-  fts_midiport_set_default_class(winmidiport_symbol);
+  fts_metaclass_install( fts_new_symbol("winmidiport"), winmidiport_instantiate, fts_always_equiv);
+  fts_metaclass_install( fts_new_symbol("winmidi"), winmidi_instantiate, fts_always_equiv);
 }

@@ -615,9 +615,11 @@ FTS_API void fts_midiport_output(fts_midiport_t *port, fts_midievent_t *event, d
 /*@}*/ /* MIDI port listeners and output function */
 
 /* default midi port */
-FTS_API fts_midiport_t *fts_midiport_get_default(void);
-FTS_API void fts_midiport_set_default( int argc, const fts_atom_t *argv);
-FTS_API void fts_midiport_set_default_class( fts_symbol_t name);
+FTS_API fts_midiport_t *fts_midiport_get_default_in(void);
+FTS_API fts_midiport_t *fts_midiport_get_default_out(void);
+FTS_API void fts_midiport_reopen_default(int ac, fts_atom_t* at);
+FTS_API void fts_midiport_reopen_default_in(int ac, fts_atom_t* at);
+FTS_API void fts_midiport_reopen_default_out(int ac, fts_atom_t* at);
 
 
 /*****************************************************

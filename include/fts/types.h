@@ -42,6 +42,7 @@ typedef struct fts_outlet fts_outlet_t;
 typedef struct fts_template fts_template_t;
 typedef struct fts_abstraction fts_abstraction_t;
 typedef struct _fts_package_t fts_package_t;
+typedef struct _fts_project_t fts_project_t;
 
 
 typedef union  fts_word fts_word_t;

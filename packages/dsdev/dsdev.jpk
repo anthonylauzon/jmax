@@ -29,9 +29,4 @@ package provide dsdev
 
 # load dynamic libraries into the server
 ucs load module dsdev $dir/lib/dsdev.dll
-
-# summary and help patches
-#helpSummary "DsDev summary" $dir/help/dsdev.summary.jmax
-#helpPatch dsaudioport $dir/help/dsaudioport.help.jmax
-
-post "package: dsdev (DirectSound audioport)"
+helpSummary "dsdev summary" $dir/help/dsdev.summary.jmax

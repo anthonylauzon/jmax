@@ -1140,49 +1140,207 @@ fts_midiport_output(fts_midiport_t *port, fts_midievent_t *event, double time)
  *
  */
 
-static fts_midiport_t *default_midiport = 0;
-static fts_symbol_t default_midiport_class = 0;
 
-void fts_midiport_set_default( int argc, const fts_atom_t *argv)
+static fts_midiport_t *default_midiport = 0;
+static fts_midiport_t *default_midiport_out = 0;
+static fts_midiport_t *default_midiport_in = 0;
+
+int
+fts_midiport_open(fts_midiport_t ** port, int ac, fts_atom_t* at)
 {
   fts_object_t *obj;
   fts_atom_t a[1];
 
-  fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &obj);
-
-  if (!obj)
-    return;
-
-  fts_object_get_prop( obj, fts_s_state, a);
-
-  if ( !fts_is_object( a) || !fts_object_is_midiport( fts_get_object( a)) )
-    {
-      fts_object_delete_from_patcher( obj);
-      return;
-    }
-
-  if (default_midiport)
-    {
-      fts_object_delete_from_patcher( (fts_object_t *)default_midiport);
-    }
-
-  default_midiport = (fts_midiport_t *)fts_get_object( a);
-}
-
-fts_midiport_t *fts_midiport_get_default(void)
-{
-  if ((default_midiport == 0) && (default_midiport_class != 0)) {
-    fts_atom_t a[1];
-    fts_log("[midiport]: No default midiport was installed, instanciating the default class %s\n", fts_symbol_name(default_midiport_class));
-    fts_set_symbol(a, default_midiport_class);
-    fts_midiport_set_default(1, a);
+  if (*port != NULL) {
+    fts_object_delete_from_patcher( (fts_object_t*) *port);
+    *port = NULL;
   }
-  return default_midiport;
+  
+  /* try to instanciate */
+  fts_object_new_to_patcher( fts_get_root_patcher(), ac, at, &obj);
+  
+  if (obj == NULL) {
+    return -1;
+  }
+  
+  /* check if it's a midiport */
+  fts_object_get_prop(obj, fts_s_state, a);
+  
+  if (!fts_is_object(a) || !fts_object_is_midiport( fts_get_object( a)) ) {
+    fts_object_delete_from_patcher( obj);
+    return -1;
+  }
+  
+  *port = (fts_midiport_t *) fts_get_object( a);
+
+  return 0;
 }
 
-void fts_midiport_set_default_class( fts_symbol_t name)
+void
+fts_midiport_reopen_default_in(int ac, fts_atom_t* at)
 {
-  default_midiport_class = name;
+  if (default_midiport_in == NULL) {
+    return;
+  }
+
+  if (ac == 0) {
+    return;
+  }
+
+  if (fts_object_get_class_name((fts_object_t*) default_midiport_in) != fts_get_symbol(&at[0])) {
+    post("Impossible to dynamically re-open MIDI ports from different MIDI port classes.\n"
+	 "Restart jMax to use the new settings.\n");
+    return;
+  }
+
+  fts_send_message((fts_object_t*) default_midiport_in, fts_SystemInlet, fts_s_reopen, ac, at);
+}
+
+void
+fts_midiport_reopen_default_out(int ac, fts_atom_t* at)
+{
+  if (default_midiport_out == NULL) {
+    return;
+  }
+
+  if (ac == 0) {
+    return;
+  }
+
+  if (fts_object_get_class_name((fts_object_t*) default_midiport_out) != fts_get_symbol(&at[0])) {
+    post("Impossible to dynamically re-open MIDI ports from different MIDI port classes.\n"
+	 "Restart jMax to use the new settings.\n");
+    return;
+  }
+
+  fts_send_message((fts_object_t*) default_midiport_out, fts_SystemInlet, fts_s_reopen, ac, at);
+}
+
+void
+fts_midiport_reopen_default(int ac, fts_atom_t* at)
+{
+  if (default_midiport == NULL) {
+    return;
+  }
+
+  if (ac == 0) {
+    return;
+  }
+
+  if (fts_object_get_class_name((fts_object_t*) default_midiport) != fts_get_symbol(&at[0])) {
+    post("Impossible to dynamically re-open MIDI ports from different MIDI port classes.\n"
+	 "Restart jMax to use the new settings.\n");
+    return;
+  }
+
+  fts_send_message((fts_object_t*) default_midiport, fts_SystemInlet, fts_s_reopen, ac, at);
+}
+
+fts_midiport_t *
+fts_midiport_get_default_in(void)
+{
+  fts_atom_t* at;
+  int ac;
+
+  /* if a midi in port was already instantiated, use that one */
+  if (default_midiport_in != NULL) {
+    return default_midiport_in;
+  }
+
+  /* if a midi port was already instantiated, use that one, instead */
+  if (default_midiport != NULL) {
+    default_midiport;
+  }
+
+  /* no midi port has been instantiated. ask the project if the user
+     specified any midi ports. try the default midi in port first. */
+
+  fts_project_get_default_midi_in(&ac, &at);
+  
+  if ((ac > 0) && (at != NULL)) {
+
+    if (fts_midiport_open(&default_midiport_in, ac, at) != 0) {
+      return NULL;
+    }
+
+    return default_midiport_in;
+
+  } else {
+
+    /* no default midi in port was specified. check if the user
+       specified a default midi port */
+
+    fts_project_get_default_midi(&ac, &at);
+
+    if ((ac == 0) && (at == NULL)) {
+      post("[midiport]: No default midiport was specified\n");
+      fts_log("[midiport]: No default midiport was specified\n");
+      return NULL;
+    }
+
+    if (fts_midiport_open(&default_midiport, ac, at) != 0) {
+      return NULL;
+    }
+
+    return default_midiport;
+  }
+
+  /* not reached */
+  return NULL;
+}
+
+
+fts_midiport_t *
+fts_midiport_get_default_out(void)
+{
+  fts_atom_t* at;
+  int ac;
+
+  /* if a midi out port was already instantiated, use that one */
+  if (default_midiport_out != NULL) {
+    return default_midiport_out;
+  }
+
+  /* if a midi port was already instantiated, use that one, instead */
+  if (default_midiport != NULL) {
+    default_midiport;
+  }
+
+  /* no midi port has been instantiated. ask the project if the user
+     specified any midi ports. try the default midi out port first. */
+
+  fts_project_get_default_midi_out(&ac, &at);
+  
+  if ((ac > 0) && (at != NULL)) {
+
+    if (fts_midiport_open(&default_midiport_out, ac, at) != 0) {
+      return NULL;
+    }
+
+    return default_midiport_out;
+
+  } else {
+
+    /* no default midi in port was specified. check if the user
+       specified a default midi port */
+
+    fts_project_get_default_midi(&ac, &at);
+
+    if ((ac == 0) && (at == NULL)) {
+      post("[midiport]: No default midiport was specified\n");
+      fts_log("[midiport]: No default midiport was specified\n");
+      return NULL;
+    }
+
+    if (fts_midiport_open(&default_midiport, ac, at) != 0) {
+      return NULL;
+    }
+
+    return default_midiport;
+  }
+
+  /* not reached */
+  return NULL;
 }
 
 /************************************************************
