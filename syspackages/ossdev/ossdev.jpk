@@ -31,4 +31,4 @@ package provide ossdev
 global jmaxArch jmaxMode
 ucs load module ossdev $dir/c/lib/$jmaxArch/$jmaxMode/libossdev.so
 
-post "package: OSS devices"
+post "package: ossdev (OSS devices)"

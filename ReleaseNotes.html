@@ -1,0 +1,457 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20 i686) [Netscape]">
+   <title>jMax Release notes</title>
+<!--                                                                      -->
+<!-- jMax                                                                 -->
+<!--                                                                      -->
+<!-- Copyright (C) 1999 by IRCAM                                          -->
+<!-- All rights reserved.                                                 -->
+<!--                                                                      -->
+<!-- This program may be used and distributed under the terms of the      -->
+<!-- accompanying LICENSE.                                                -->
+<!--                                                                      -->
+<!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
+<!-- for DISCLAIMER OF WARRANTY.                                          -->
+<!--                                                                      -->
+</head>
+<body>
+&nbsp;
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<td ALIGN=LEFT><a href="http://www.ircam.fr/jmax/"><img SRC="jmax_logo_tiny.gif" ALT="jMax" BORDER=0 ></a></td>
+
+<td ALIGN=RIGHT><a href="http://www.ircam.fr/"><img SRC="ircam_banner.gif" ALT="IRCAM - Centre Georges Pompidou" BORDER=0 height=40 width=37></a></td>
+</tr>
+</table>
+
+<hr>
+<h1>
+<i>j</i>Max Release Notes</h1>
+
+<ul>
+<li>
+<a href="#2.4.10">Release notes for <i>j</i>Max 2.4.10</a></li>
+
+<li>
+<a href="#2.4.5">Release notes for <i>j</i>Max 2.4.5</a></li>
+
+<li>
+<a href="#2.3.15">Release notes for <i>j</i>Max 2.3.15</a></li>
+
+<li>
+<a href="#2.3.14">Release notes for <i>j</i>Max 2.3.14</a></li>
+
+<li>
+<a href="#2.3.13">Release notes for <i>j</i>Max 2.3.13</a></li>
+
+<li>
+<a href="#2.3.12">Release notes for <i>j</i>Max 2.3.12</a></li>
+
+<li>
+<a href="#2.3.11">Release notes for <i>j</i>Max 2.3.11</a></li>
+</ul>
+<!-------------------------------------------------------------------------------><a NAME="2.4.5"></a>
+<br>
+<hr>
+<h1>
+Release notes for <i>j</i>Max 2.4.10</h1>
+
+<h3>
+Supported platforms</h3>
+The following platforms are supported:
+<ul>
+<li>
+Irix 6.5 for R5000 and R10000 processors</li>
+
+<li>
+Linux for Intel processors</li>
+
+<li>
+Linux for PPC</li>
+</ul>
+
+<h3>
+Bugs</h3>
+Among others the following bugs were fixed:
+<ul>
+<li>
+<b><font face="Arial,Helvetica">readsf~</font></b> was cutting end of sound
+files and doesn't anymore</li>
+
+<li>
+confirmation closing editted patchers</li>
+
+<li>
+compiling under ppc-linux</li>
+
+<li>
+ppc-linux OSS audio i/o</li>
+</ul>
+<b>Please note</b> that a number of problems with classes handling soundfiles
+(<b><font face="Arial,Helvetica">readsf~</font></b>, <b><font face="Arial,Helvetica">writesf~</font></b>,
+<b><font face="Arial,Helvetica">table~</font></b>, ... crashing the server)
+were caused by bogus (or incompatible?) versions of the <i>libaudiofile</i>
+library required by <i>j</i>Max. Make sure that you are using a recent
+version of the library.
+<p>For a complete list of fixed and remaining bugs, please refer to the
+IRCAM's <a href="http://www.ircam.fr/bugs">bug tracking system</a>.
+<h3>
+Features</h3>
+
+<h4>
+Patcher editor</h4>
+The following features have been added to the patcher editor:
+<ul>
+<li>
+electric connection feedback</li>
+
+<li>
+a right mouse pop-up menu with following class dependent functions</li>
+
+<ul>
+<li>
+bring to front</li>
+
+<li>
+remove connections</li>
+
+<li>
+font settings</li>
+
+<li>
+fit to text</li>
+
+<li>
+<b><font face="Arial,Helvetica">slider</font></b>: range setting and orientation
+change (vertical/horizontal);</li>
+
+<li>
+<b><font face="Arial,Helvetica">bang</font></b>: change color</li>
+
+<li>
+<b><font face="Arial,Helvetica">inlet</font></b> and <b><font face="Arial,Helvetica">outlet</font></b>:
+change index</li>
+</ul>
+
+<li>
+automatic fit to text</li>
+</ul>
+
+<p><br><!-------------------------------------------------------------------------------><a NAME="2.4.10"></a>
+<br>
+<hr>
+<h1>
+Release notes for <i>j</i>Max 2.4.5</h1>
+This release introduces significant changes in the FTS kernel, in the user
+interface, in the development API and in the license...
+<h3>
+Status</h3>
+This release is considered stable.
+<h3>
+Supported platforms</h3>
+The following platforms are supported:
+<ul>
+<li>
+Irix 6.3 for R5000 and R10000 processors</li>
+
+<li>
+Irix 6.5 for R4000, R5000 and R10000 processors</li>
+
+<li>
+Linux for Intel processors</li>
+</ul>
+
+<h3>
+Fixed bugs</h3>
+For a complete list of fixed and remaining bugs, please refer to the Ircam
+bug tracking system, at the following URL:
+<a href="http://www.ircam.fr/bugs/">http://www.ircam.fr/bugs/</a>
+<p>Some older bugs have been replaced by newer ones, others have been kept.
+<h3>
+New features</h3>
+
+<h4>
+Patcher editor</h4>
+The patch editor of version 2.4.x is a new implementation of the existing
+patch editor. It introduces bug fixes, improvements in the user interface
+(text handling, feedback, updates, ...) and new functionalities (icons
+for objects or comments, ...).
+<h4>
+Multi-threaded kernel</h4>
+The FTS server kernel is now multi-threaded. The kernel threads are for
+now used only by the new implementation of the direct-to-disk objects.
+Others uses are in development.
+<h4>
+Scheduler</h4>
+The FTS server kernel incorporates a new scheduler that enables to add
+and remove dynamically file descriptors in the scheduler's <tt>select()</tt>
+system call. This is illustrated in the <i>udp</i> and <i>udpmessage</i>
+objects that read bytes on a UDP port. See the sources of the object for
+further explanations.
+<h4>
+Object development API</h4>
+This release includes the object development API and documentation. Please
+refer to the <i>Control Objects Developer's Guide</i> for documentation.
+<p>A package named "sources" with objects source code is given as an example
+and a starting point.
+<h4>
+Direct-to-disk objects</h4>
+The first use of the multi-threaded kernel is a new implementation of the
+direct-to-disk objects (<i>readsf~</i> and <i>writesf~</i>). These objects
+are now implemented as wrappers of an FTS device that does the file access,
+all the file I/O being done in separate threads. This implementation guarantees
+that file accesses are non-blocking and that file reading/writing and samples
+conversion is done on a separate processor when running on a multi-processor
+machine.
+<p><b>NOTE:</b> On the Linux platform, the direct-to-disk objects use the
+<i>Audio
+File Library</i>, by Michael Pruett. This library is available under the
+GNU Library General Public License. This library must be installed before
+using <i>readsf~</i> and
+<i>writesf~</i> objects. Please refer to
+<a href="http://www.68k.org./~michael/audiofile/">http://www.68k.org./~michael/audiofile/</a>
+for information and download.
+<p><!-------------------------------------------------------------------------------><a NAME="2.3.15"></a>
+<br>
+<hr>
+<h1>
+Release notes for <i>j</i>Max 2.3.15</h1>
+
+<h3>
+Status</h3>
+This release is considered:
+<ul>
+<li>
+<b>stable</b> on SGI</li>
+
+<li>
+<b>beta</b> on Linux. Namely, the system has not been extensively tested
+and its performance is not fully representative of the final performance
+that can be achieved on Linux.</li>
+</ul>
+
+<h3>
+Supported platforms</h3>
+This release have been compiled on:
+<ul>
+<li>
+IRIX 6.5 for R10000, R5000, R4x00 processors</li>
+
+<li>
+IRIX 6.3 for R10000, R5000 processors</li>
+
+<li>
+Linux for Intel Pentium-Pro and Pentium-II processors. jMax uses glibc
+and has been tested on Redhat 5.1 and 5.2.</li>
+</ul>
+
+<h3>
+Fixed bugs</h3>
+The following bugs have been fixed:
+<ul>
+<li>
+#154: systune maxlkmem must be checked</li>
+
+<li>
+#155: Pasting in a text field with already selected text</li>
+
+<li>
+(not reported): qlist jumps to top of text after paste</li>
+</ul>
+This release implements a workaround for the following bug:
+<ul>
+<li>
+#139: printing in the console can freeze jmax.</li>
+
+<br>By starting jMax either with the option "-jmaxNoConsole true" or by
+adding the command "set jmaxNoConsole true" in your .jmaxrc file, console
+printout will not show in the console window, but in the standard output
+of the java process, usually a shell, and will not freeze java. A new console
+graphic component will be implemented in a next release.</ul>
+
+<h4>
+Floating-point exceptions tracking</h4>
+Support has been added to track floating-point exceptions. When floating-point
+exceptions occur, you can open the "Fpe Panel" in "Tools" menu. This panel
+will show the objects that triggered these exceptions (either in control
+or in DSP computation). A supplementary option allows to track floating
+point NaN (Not a Number) in DSP computation.
+<br><b>Warning:</b> This option is very time-consuming and can dramatically
+decrease performance.
+<p><!-------------------------------------------------------------------------------><a NAME="2.3.14"></a>
+<br>
+<hr>
+<h1>
+Release notes for <i>j</i>Max 2.3.14</h1>
+
+<h3>
+Supported platforms</h3>
+This release have been compiled on:
+<ul>
+<li>
+IRIX 6.5 for R10000, R5000, R4x00 processors</li>
+
+<li>
+IRIX 6.3 for R10000, R5000 processors</li>
+</ul>
+
+<h3>
+Fixed bugs</h3>
+The following bugs have been fixed:
+<ul>
+<li>
+(not in bug report base): crash at dsp start</li>
+
+<li>
+(not in bug report base): "start" message to "dac~" object did not work</li>
+
+<li>
+(not in bug report base): vd~ down-sampling and interpolation fixed</li>
+</ul>
+
+<h3>
+New features</h3>
+The following features have been added:
+<ul>
+<li>
+qlist: text can be copied/pasted</li>
+
+<li>
+qlist can be imported and exported as text files</li>
+</ul>
+
+<h3>
+Known bugs</h3>
+Printing a patch (via the "Print" menu) is broken (it generates a bitmap
+Postscript file that is not printable).
+<p><!-------------------------------------------------------------------------------><a NAME="2.3.13"></a>
+<br>
+<hr>
+<h1>
+Release notes for <i>j</i>Max 2.3.13</h1>
+
+<h3>
+Supported platform</h3>
+This release have been compiled on:
+<ul>
+<li>
+IRIX 6.5 for R10000, R5000, R4x00 processors.</li>
+
+<li>
+IRIX 6.3 for R5000 processors.</li>
+</ul>
+
+<h3>
+Fixed bugs</h3>
+The following bugs have been fixed:
+<ul>
+<li>
+#129: numberbox</li>
+
+<li>
+#127: changing connected abstraction for template</li>
+
+<li>
+#114: CTRL-e in text field</li>
+
+<li>
+#109: copy in an object/message/comment</li>
+
+<li>
+#83: Duplicate = CTL-C + Ctl-V</li>
+
+<li>
+#130: table</li>
+
+<li>
+(not in bug report base): changing number of inlets and outlets of a patcher</li>
+
+<li>
+(not in bug report base): unparsing of symbols looking like numbers ("-0"
+for example)</li>
+</ul>
+
+<h3>
+New features</h3>
+The following features have been added:
+<ul>
+<li>
+an "up" button in toolbar, that opens the parent patch</li>
+
+<li>
+a DSP on/off button in control panel, that starts/stops dsp and reflect
+the current state of DSP execution</li>
+
+<li>
+pasting to a locked patch will unlock it and do the paste</li>
+
+<li>
+find will unlock the destination patch (no more selected objects in lock
+mode)</li>
+
+<li>
+a first version of a Help Menu has been implemented. Help on an object
+can be accessed via the Help shortcut (Ctrl-H) or via Alt-click on an object.
+The help menu has also items for help summary patches.</li>
+</ul>
+<!-------------------------------------------------------------------------------><a NAME="2.3.12"></a>
+<br>
+<hr>
+<h1>
+Release notes for <i>j</i>Max 2.3.12</h1>
+
+<h3>
+Status</h3>
+This release is qualified as <tt>beta</tt>; the system is quite stable,
+enough to be used in concert situation; the user interface still has some
+glitches and instability anyway.
+<h3>
+Supported platform</h3>
+This release have been compiled on:
+<ul>
+<li>
+IRIX 6.5 for r10000 and r5000 processors.</li>
+
+<li>
+IRIX 6.3 for r5000 processors.</li>
+</ul>
+IRIX 6.2 will probably not be supported, as the AudioFile library on IRIX
+6.2 lacks some features used by jMax. We suggest that you upgrade to IRIX
+6.5.
+<h4>
+Changes in I/O configuration</h4>
+The I/O configuration commands have been simplified a little; old .jmaxrc
+files need to be changed; refer to the user configuration.
+<h4>
+Changes in CLASSPATH setting</h4>
+Swing classes are now distributed with <i>j</i>Max. It is no longer required
+to download Swing. Setting CLASSPATH is also no longer needed.
+<h3>
+Known Problems and bugs</h3>
+Main problems regards the patch editor; in particular, overlapped objects
+are not handled properly, and this produce bizarre situations when copy/pasting
+in a crowded patch.
+<p><!-------------------------------------------------------------------------------><a NAME="2.3.11"></a>
+<br>
+<hr>
+<h1>
+Release notes for <i>j</i>Max 2.3.11</h1>
+
+<h3>
+Status</h3>
+This release is qualified as <tt>beta</tt>; the system is quite stable,
+enough to be used in concert situation; the user interface still has some
+glitches and instability anyway.
+<h3>
+Supported platform</h3>
+This release have been compiled on IRIX 6.5 for r10000 and r5000 processors.
+<h3>
+Known Problems and bugs</h3>
+Main problems regards the patch editor; in particular, overlapped objects
+are not handled properly, and this produce bizarre situations when copy/pasting
+in a crowded patch.
+</body>
+</html>

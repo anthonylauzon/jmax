@@ -37,4 +37,4 @@ defineDevice alsaStereoIn     { alsa_adc } "ALSA audio in"
 defineDevice alsaStereoOut    { alsa_dac } "ALSA audio out"
 defineDevice alsaQuadOut      { alsa_dac channels 4 } "ALSA quad audio out"
 
-post "package: ALSA devices"
+post "package: alsedev (ALSA devices)"

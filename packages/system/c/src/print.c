@@ -117,12 +117,36 @@ print_int_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   print_t *this = (print_t *)o;
   int_vector_t *ivec = int_vector_atom_get(at);
   int size = int_vector_get_size(ivec);
-  int i;
 
   post("%s: <ivec> {", fts_symbol_name(this->prompt));
 
-  if(size)
+  if(size > 8)
     {
+      int size8 = (size / 8) * 8;
+      int i, j;
+
+      for(i=0; i<size8; i+=8)
+	{
+	  /* print one line of 8 with indent */
+	  post("\n  ");
+	  for(j=0; j<8; j++)
+	    post("%d ", int_vector_get_element(ivec, i + j));
+	}
+	  
+      /* print last line with indent */
+      if(i < size)
+	{
+	  post("\n  ");
+	  for(; i<size; i++)
+	    post("%d ", int_vector_get_element(ivec, i));
+	}
+
+      post("\n}\n");
+    }
+  else if(size > 0)
+    {
+      int i;
+      
       for(i=0; i<size-1; i++)
 	post("%d ", int_vector_get_element(ivec, i));
 
@@ -142,7 +166,30 @@ print_float_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   post("%s: <fvec> {", fts_symbol_name(this->prompt));
 
-  if(size)
+  if(size > 8)
+    {
+      int size8 = (size / 8) * 8;
+      int i, j;
+
+      for(i=0; i<size8; i+=8)
+	{
+	  /* print one line of 8 with indent */
+	  post("\n  ");
+	  for(j=0; j<8; j++)
+	    post("%f ", float_vector_get_element(fvec, i + j));
+	}
+	  
+      /* print last line with indent */
+      if(i < size)
+	{
+	  post("\n  ");
+	  for(; i<size; i++)
+	    post("%f ", float_vector_get_element(fvec, i));
+	}
+
+      post("\n}\n");
+    }
+  else if(size)
     {
       for(i=0; i<size-1; i++)
 	post("%f ", float_vector_get_element(fvec, i));
