@@ -29,6 +29,7 @@
 extern void midiin_config(void);
 extern void midiout_config(void);
 extern void sysex_config(void);
+extern void rawmidiport_config(void);
 
 static void
 midi_init(void)
@@ -36,6 +37,7 @@ midi_init(void)
   midiin_config();
   midiout_config();
   sysex_config();
+  rawmidiport_config();
 }
 
 fts_module_t midi_module = {"midi", "MIDI i/o classes", midi_init, 0, 0};

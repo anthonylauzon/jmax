@@ -1,0 +1,12 @@
+helpPatch notein $dir/note.help.jmax
+helpPatch noteout $dir/note.help.jmax
+helpPatch polyin $dir/poly.help.jmax
+helpPatch polyout $dir/poly.help.jmax
+helpPatch ctlin $dir/ctl.help.jmax
+helpPatch ctlout $dir/ctl.help.jmax
+helpPatch pgmin $dir/pgm.help.jmax
+helpPatch pgmout $dir/pgm.help.jmax
+helpPatch touchin $dir/touch.help.jmax
+helpPatch touchout $dir/touch.help.jmax
+helpPatch bendin $dir/bend.help.jmax
+helpPatch bendout $dir/bend.help.jmax

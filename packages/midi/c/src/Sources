@@ -28,3 +28,4 @@ midi.c \
 midiin.c \
 midiout.c \
 sysex.c \
+rawmidiport.c \
