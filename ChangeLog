@@ -1,3 +1,8 @@
+2003-07-22  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* moved license to GNU Lesser General Public License. Changed all headers,
+	removed old license files and added new one.
+
 2003-07-22  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in: added configure error if check class of javax.swing.JButton failed.

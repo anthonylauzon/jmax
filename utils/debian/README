@@ -5,7 +5,7 @@ It was downloaded from http://www.ircam.fr/jmax
 
 Upstream Authors: Francois Dechelle, Riccardo Borghesi, Norbert Schnell
 
-jMax is distributed under the GNU General Public License.
+jMax is distributed under the GNU Lesser General Public License.
 
 We choose to consider that jMax dynamically loaded extensions,
 herein named "packages", are separate programs and as so are
