@@ -82,7 +82,7 @@ typedef struct {
 /* alsastream_t functions                                                 */
 /* ********************************************************************** */
 
-#define ERROR(FUN,ERR) do {post( "Error: %s() failed: %s\n", FUN, snd_strerror( ERR )); return ERR;} while (0)
+#define ERROR(FUN,ERR) do {fprintf( stderr, "Error: %s() failed: %s\n", FUN, snd_strerror( ERR )); return ERR;} while (0)
 
 /* ---------------------------------------------------------------------- */
 /* alsatream_open: opens a stream                                         */

@@ -376,7 +376,7 @@ static void indispatch_propagate_input(fts_object_t *o, int winlet, fts_symbol_t
 
 static fts_status_t indispatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init( cl, sizeof( fts_object_t), 1, 0, 0);
+  fts_class_init( cl, sizeof( indispatch_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, indispatch_init);
 
@@ -399,7 +399,7 @@ fts_object_t *fts_audioport_get_in_object( fts_audioport_t *port, fts_object_t *
       fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, &port->audioportin);
     }
 
-  fts_set_symbol( a+0, s_outdispatch);
+  fts_set_symbol( a+0, s_indispatch);
   fts_set_object( a+1, target);
   fts_set_int( a+2, outlet);
   fts_object_new_to_patcher( fts_get_root_patcher(), 3, a, &in);
@@ -450,6 +450,9 @@ void fts_audioport_set_default( int argc, const fts_atom_t *argv)
 
   fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &obj);
 
+  if (!obj)
+    return;
+
   if ( !fts_object_is_audioport( obj))
     {
       fts_object_delete_from_patcher( obj);
@@ -478,7 +481,7 @@ void audioport_config( void)
   s_indispatch = fts_new_symbol( "indispatch");
   s_outdispatch = fts_new_symbol( "outdispatch");
 
-/*    fts_metaclass_install( s_indispatch, indispatch_instantiate, fts_never_equiv); */
+  fts_metaclass_install( s_indispatch, indispatch_instantiate, fts_never_equiv);
   fts_metaclass_install( s_outdispatch, outdispatch_instantiate, fts_never_equiv);
 
   fts_metaclass_install( s_audioportin, audioportin_instantiate, fts_never_equiv);

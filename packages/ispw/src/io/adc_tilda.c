@@ -40,6 +40,11 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   at++;
 
   port = fts_audioport_get_default();
+  if ( !port)
+    {
+      fts_object_set_error( o, "Default audio port is not defined");
+      return;    
+    }
 
   outlets = fts_object_get_outlets_number( o);
 
@@ -65,7 +70,7 @@ static fts_status_t adc_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
   if (ac == 0)
     outlets = 2;
   else
-    outlets = ac - 1;
+    outlets = ac;
 
   fts_class_init( cl, sizeof( fts_object_t), 0, outlets, 0);
 

@@ -50,6 +50,11 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   this->targets = (fts_object_t **)fts_malloc( inlets * sizeof( fts_object_t *));
 
   port = fts_audioport_get_default();
+  if ( !port)
+    {
+      fts_object_set_error( o, "Default audio port is not defined");
+      return;    
+    }
 
   if ( ac != 0)
     {
