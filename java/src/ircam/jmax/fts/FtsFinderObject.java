@@ -110,9 +110,9 @@ public class FtsFinderObject extends FtsObject
     args.clear();
     args.add(set);
     args.add(target);
-      
+
     try{
-      send( FtsSymbol.get("finder_friends"), args);
+      send( FtsSymbol.get("finder_find_friends"), args);
     }
     catch(IOException e)
       {
