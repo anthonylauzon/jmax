@@ -29,7 +29,7 @@ DSP execution:
 
 DSP prélude:
  pour tous les audioport actifs, appeler audioport.input
- mettre à 0 les buffers des audiolabels
+ mettre à 0 les buffers des audioports
 
 DSP chain:
  input~_dsp: audiolabel->audioport->copy_in( outputbuffer, tick_size, audiolabel->channel)
@@ -164,8 +164,4 @@ void fts_audioport_close( fts_audioport_t *port)
 
 ======================================================================
 TODO:
- - merge fts/audiolabel.c into fts/audio.c
- - merge include/ftsprivate/audiolabel.h into include/ftsprivate/audio.h
- - add code for idle
- - complete audioport API (fts_audioport_init/delete, reference count, open/close)
  - change alsaaudioport and ossaudioport w.r.t. new API 

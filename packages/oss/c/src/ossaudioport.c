@@ -18,19 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
- */
-
-/*
- * This file's authors:
- * François Déchelle (dechelle@ircam.fr)
- */
-
-/* 
- * This file include the jMax OSS audio port.
  */
 
 #include <stdio.h>
@@ -270,41 +257,39 @@ static void ossaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int 
 
 static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ossaudioport_t *this = (ossaudioport_t *)o;
-
+  ossaudioport_t *self = (ossaudioport_t *)o;
   int channels = 2;
   
-  /* channels is given by audiomanager */
-  fts_audioport_init( &this->head);
+  fts_audioport_init( (fts_audioport_t *)self);
 
-  this->fifo_size = DEFAULT_FIFO_SIZE;
+  self->fifo_size = DEFAULT_FIFO_SIZE;
 
-  this->device_name = fts_get_symbol(at);
+  self->device_name = fts_get_symbol(at);
 
-  fts_audioport_set_io_fun((fts_audioport_t*)this, FTS_AUDIO_INPUT, ossaudioport_input_fun);
-  fts_audioport_set_io_fun((fts_audioport_t*)this, FTS_AUDIO_OUTPUT, ossaudioport_output_fun);
+  fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, ossaudioport_input_fun);
+  fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, ossaudioport_output_fun);
 
-  fts_audioport_set_copy_fun((fts_audioport_t*)this, FTS_AUDIO_INPUT, ossaudioport_input_copy_fun);
-  fts_audioport_set_copy_fun((fts_audioport_t*)this, FTS_AUDIO_OUTPUT, ossaudioport_output_copy_fun);
+  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, ossaudioport_input_copy_fun);
+  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, ossaudioport_output_copy_fun);
 
-/*   fts_audioport_set_xrun_function( (fts_audioport_t *)this, ossaudioport_xrun); */
+/*   fts_audioport_set_xrun_function( (fts_audioport_t *)self, ossaudioport_xrun); */
 
-  this->buff_size =  fts_dsp_get_tick_size() * channels * sizeof(short);
-  this->adc_fmtbuf = (short *)fts_malloc(this->buff_size);
-  this->dac_fmtbuf = (short *)fts_malloc(this->buff_size);
+  self->buff_size =  fts_dsp_get_tick_size() * channels * sizeof(short);
+  self->adc_fmtbuf = (short *)fts_malloc(self->buff_size);
+  self->dac_fmtbuf = (short *)fts_malloc(self->buff_size);
 
-  this->no_xrun_message_already_posted = 0;
+  self->no_xrun_message_already_posted = 0;
 }
 
 static void ossaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ossaudioport_t *this = (ossaudioport_t *)o;
+  ossaudioport_t *self = (ossaudioport_t *)o;
 
-  fts_audioport_delete( &this->head);
+  fts_audioport_delete( &self->head);
 
 
-  fts_free( this->adc_fmtbuf);
-  fts_free( this->dac_fmtbuf);
+  fts_free( self->adc_fmtbuf);
+  fts_free( self->dac_fmtbuf);
 }
 
 static void ossaudioport_instantiate(fts_class_t *cl)

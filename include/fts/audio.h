@@ -69,8 +69,9 @@ struct fts_audioport_direction {
   fts_audioport_io_fun_t io_fun;
   fts_audioport_copy_fun_t copy_fun;
   fts_audioport_mute_fun_t mute_fun;
-  unsigned int used_channels;
+  int channel_used[FTS_AUDIOPORT_MAX_CHANNELS];
   int max_channels;
+  int nlabels;
   fts_audiolabel_t *labels;
 };
 
@@ -79,6 +80,7 @@ struct fts_audioport {
   fts_symbol_t name;
   struct fts_audioport *next;
   struct fts_audioport_direction inout[2];
+  float *mix_buffers[FTS_AUDIOPORT_MAX_CHANNELS];
   void (*idle_function)( struct fts_audioport *port);
   int (*xrun_function)( struct fts_audioport *port);
 };
@@ -86,15 +88,26 @@ struct fts_audioport {
 FTS_API void fts_audioport_init( fts_audioport_t *port);
 FTS_API void fts_audioport_delete( fts_audioport_t *port);
 
+#define fts_audioport_get_max_channels( port, direction) \
+  ((port)->inout[(direction)].max_channels)
 #define fts_audioport_set_max_channels( port, direction, max_channel) \
   ((port)->inout[(direction)].max_channels = (max_channels))
 
 #define fts_audioport_set_io_fun( port, direction, fun) \
   ((port)->inout[(direction)].io_fun = (fun))
+#define fts_audioport_get_io_fun( port, direction) \
+  ((port)->inout[(direction)].io_fun)
+
 #define fts_audioport_set_copy_fun( port, direction, fun) \
   ((port)->inout[(direction)].copy_fun = (fun))
+#define fts_audioport_get_copy_fun( port, direction) \
+  ((port)->inout[(direction)].copy_fun)
+
 #define fts_audioport_set_mute_fun( port, direction, fun) \
   ((port)->inout[(direction)].mute_fun = (fun))
+#define fts_audioport_get_mute_fun( port, direction) \
+  ((port)->inout[(direction)].mute_fun)
+
 
 #define fts_audioport_set_idle_fun( port, fun) \
   ((port)->mute_fun = (fun))
@@ -130,6 +143,9 @@ struct fts_audiolabel {
 #define fts_audiolabel_get_port_name( label, direction) ((label)->inout[(direction)].port_name)
 #define fts_audiolabel_get_port( label, direction) ((label)->inout[(direction)].port)
 #define fts_audiolabel_get_channel( label, direction) ((label)->inout[(direction)].channel)
+
+FTS_API void fts_audiolabel_input( fts_audiolabel_t *label, float *buff, int buffsize);
+FTS_API void fts_audiolabel_output( fts_audiolabel_t *label, float *buff, int buffsize);
 
 /**
  * Audiolabels have listeners, that are called when audiolabels are created/deleted.

@@ -35,10 +35,6 @@ extern int fts_audioport_is_channel_used( fts_audioport_t *port, int direction, 
 extern void fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label);
 extern void fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label);
 
-#define fts_audioport_get_io_fun( port, direction) ((port)->inout[(direction)].io_fun)
-#define fts_audioport_get_copy_fun( port, direction) ((port)->inout[(direction)].copy_fun)
-#define fts_audioport_get_mute_fun( port, direction) ((port)->inout[(direction)].mute_fun)
-
 #define fts_audioport_is_direction( port, direction) ((port)->inout[(direction)].valid)
 #define fts_audioport_is_input( port) fts_audioport_is_direction( (port), FTS_AUDIO_INPUT)
 #define fts_audioport_is_output( port) fts_audioport_is_direction( (port), FTS_AUDIO_OUTPUT)

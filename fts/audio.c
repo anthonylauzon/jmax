@@ -44,10 +44,16 @@
 
 static fts_audioport_t *audioport_list = 0;
 
+static fts_symbol_t s_open_input;
+static fts_symbol_t s_open_output;
+static fts_symbol_t s_close_input;
+static fts_symbol_t s_close_output;
+
 void
 fts_audioport_init( fts_audioport_t *port)
 {
   fts_audioport_t *current;
+  int i;
 
   port->idle_function = AUDIOPORT_DEFAULT_IDLE;
 
@@ -57,6 +63,9 @@ fts_audioport_init( fts_audioport_t *port)
 
   port->next = audioport_list;
   audioport_list = port;
+
+  for ( i = 0; i < FTS_AUDIOPORT_MAX_CHANNELS; i++)
+    port->mix_buffers[i] = NULL;
 }
 
 void
@@ -72,21 +81,24 @@ fts_audioport_delete( fts_audioport_t *port)
 	  break;
 	}
     }
+
+  /* FIXME */
+  /* unset all the input/output ports for all the labels that refers to this port */
 }
 
 void
 fts_audioport_set_channel_used( fts_audioport_t *port, int channel, int direction, int used)
 {
-  if (used)
-    port->inout[direction].used_channels |= 1 << channel;
-  else
-    port->inout[direction].used_channels &= ~(1 << channel);
+  port->inout[direction].channel_used[ channel] = used;
+
+  if (used && direction == FTS_AUDIO_OUTPUT && port->mix_buffers[channel] == NULL)
+    port->mix_buffers[channel] = (float *)fts_malloc( sizeof(float) * fts_dsp_get_tick_size());
 }
 
 int
 fts_audioport_is_channel_used( fts_audioport_t *port, int channel, int direction)
 {
-  return port->inout[direction].used_channels & ~(1 << channel);
+  return port->inout[direction].channel_used[channel];
 }
 
 static fts_audiolabel_t **lookup_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
@@ -103,11 +115,19 @@ void
 fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
 {
   fts_audiolabel_t **p = lookup_label( port, direction, label);
+  fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? s_open_input : s_open_output;
 
   if (!*p)
     {
+      fts_object_refer( (fts_object_t *)label);
+
       *p = label;
       (*p)->inout[direction].next_same_port = 0;
+
+      /* Increment labels count and call "open" method if count becomes 1 */
+      port->inout[direction].nlabels++;
+      if (port->inout[direction].nlabels == 1)
+	fts_send_message( (fts_object_t *)port, selector, 0, 0);
     }
 }
 
@@ -115,9 +135,19 @@ void
 fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
 {
   fts_audiolabel_t **p = lookup_label( port, direction, label);
+  fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? s_close_input : s_close_output;
 
   if (*p)
-    *p = (*p)->inout[direction].next_same_port;
+    {
+      fts_object_release( (fts_object_t *)label);
+
+      *p = (*p)->inout[direction].next_same_port;
+
+      /* Decrement labels count and call "close" method if count becomes 0 */
+      port->inout[direction].nlabels--;
+      if (port->inout[direction].nlabels == 0)
+	fts_send_message( (fts_object_t *)port, selector, 0, 0);
+    }
 }
 
 
@@ -206,6 +236,7 @@ audiolabel_fire_removed( fts_symbol_t label_name)
 static void
 audiolabel_set_port( fts_audiolabel_t *label, int direction, fts_symbol_t port_name)
 {
+  /* Make a query on audiomanager to retrieve corresponding fts_audioport_t* */
   fts_audioport_t *port = fts_audiomanager_get_port( port_name);
 
   if ( label->inout[direction].port != NULL)
@@ -242,9 +273,6 @@ audiolabel_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   fts_symbol_t port_name = fts_get_symbol(at);
 
-  post("[audiolabel:] audiolabel_input, label name: %s, output port: %s\n", self->name, port_name);
-
-  /* Make a query on audiomanager to retreive corresponding fts_audioport_t* */
   audiolabel_set_port( self, FTS_AUDIO_INPUT, port_name);
 
   fts_client_send_message(o, fts_s_input, 1, at);  
@@ -258,12 +286,9 @@ audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   fts_symbol_t port_name = fts_get_symbol(at);
 
-  post("[audiolabel:] audiolabel_output, label name: %s, output port: %s\n", self->name, port_name);
-  
-  /* Make a query on audiomanager to retreive corresponding fts_audioport_t* */
   audiolabel_set_port( self, FTS_AUDIO_OUTPUT, port_name);
 
-  fts_client_send_message(o,  fts_s_output, 1, at);  
+  fts_client_send_message(o, fts_s_output, 1, at);  
 
   fts_config_set_dirty((fts_config_t *)fts_config_get(), 1);
 }
@@ -365,6 +390,27 @@ audiolabel_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, s_output_channel, audiolabel_output_channel);
 }
 
+void
+fts_audiolabel_input( fts_audiolabel_t *label, float *buff, int buffsize)
+{
+  fts_audioport_t *port = fts_audiolabel_get_port( label, FTS_AUDIO_INPUT);
+  int channel = fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT);
+
+  (*fts_audioport_get_copy_fun(port, FTS_AUDIO_INPUT))(port, buff, buffsize, channel);
+}
+
+void
+fts_audiolabel_output( fts_audiolabel_t *label, float *buff, int buffsize)
+{
+  fts_audioport_t *port = fts_audiolabel_get_port( label, FTS_AUDIO_OUTPUT);
+  int channel = fts_audiolabel_get_channel( label, FTS_AUDIO_OUTPUT);
+  float *mix_buff = port->mix_buffers[channel];
+  int i;
+  
+  for ( i = 0; i < buffsize; i++)
+    mix_buff[i] += buff[i];
+}
+
 
 /* **********************************************************************
  * 
@@ -460,50 +506,54 @@ fts_symbol_t *fts_audiomanager_get_output_names(void)
  * audio idle
  *
  */
+
 void fts_audio_idle( void)
 {
   fts_audioport_t *port;
-  float *sig_dummy, *sig_zero;
-  int i, tick_size, at_least_one_io_fun_called;
+  int channel, tick_size, at_least_one_io_fun_called;
 
   tick_size = fts_dsp_get_tick_size();
-  sig_dummy = (float *)alloca( tick_size * sizeof( float));
-  sig_zero = (float *)alloca( tick_size * sizeof( float));
-
-  for ( i = 0; i < tick_size; i++)
-    sig_zero[i] = 0.0;
 
   at_least_one_io_fun_called = 0;
   for ( port = audioport_list; port; port = port->next)
-  {
-    if ( port->idle_function == AUDIOPORT_DEFAULT_IDLE)
     {
-/*       ftl_wrapper_t fun; */
-/*       int channels; */
+      if ( !fts_audioport_is_input( port))
+	continue;
 
-/*       fun = fts_audioport_get_input_function( port); */
-/*       channels = fts_audioport_get_input_channels( port); */
+      (*fts_audioport_get_io_fun( port, FTS_AUDIO_INPUT))( port);
+      at_least_one_io_fun_called = 1;
 
-/*       if (fun && channels != 0) */
-/*       { */
-/* 	audioport_call_io_fun( port, fun, tick_size, channels, sig_dummy); */
-/* 	at_least_one_io_fun_called = 1; */
-/*       } */
+      for ( channel = 0; channel < fts_audioport_get_max_channels( port, FTS_AUDIO_INPUT); channel++)
+	{
+	  int i;
+	  float *mix_buff = port->mix_buffers[channel];
 
-/*       fun = fts_audioport_get_output_function( port); */
-/*       channels = fts_audioport_get_output_channels( port); */
-/*       if (fun && channels != 0) */
-/*       { */
-/* 	audioport_call_io_fun( port, fun, tick_size, channels, sig_zero); */
-/* 	at_least_one_io_fun_called = 1; */
-/*       } */
+	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_INPUT, channel))
+	    continue;
+
+	  for ( i = 0; i < tick_size; i++)
+	    mix_buff[i] = 0.0;
+	}
     }
-    else if ( port->idle_function)
+
+  for ( port = audioport_list; port; port = port->next)
     {
-      (*port->idle_function)( port);
+      if ( !fts_audioport_is_output( port))
+	continue;
+
+      for ( channel = 0; channel < fts_audioport_get_max_channels( port, FTS_AUDIO_OUTPUT); channel++)
+	{
+	  float *mix_buff = port->mix_buffers[channel];
+
+	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_OUTPUT, channel))
+	    continue;
+
+	  (*fts_audioport_get_copy_fun(port, FTS_AUDIO_OUTPUT))(port, mix_buff, tick_size, channel);
+	}
+
+      (*fts_audioport_get_io_fun( port, FTS_AUDIO_OUTPUT))( port);
       at_least_one_io_fun_called = 1;
     }
-  }
 
   if ( !at_least_one_io_fun_called)
     fts_sleep();
@@ -517,6 +567,11 @@ void fts_audio_idle( void)
 
 void fts_audio_config( void)
 {
+  s_open_input = fts_new_symbol( "open_input");
+  s_open_output = fts_new_symbol( "open_output");
+  s_close_input = fts_new_symbol( "close_input");
+  s_close_output = fts_new_symbol( "close_output");
+
   audiolabel_listeners_heap = fts_heap_new( sizeof( audiolabel_listener_t));
 
   s_input_channel = fts_new_symbol("input_channel");  
