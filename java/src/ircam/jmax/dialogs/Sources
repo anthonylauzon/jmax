@@ -1,5 +1,4 @@
 SOURCES = \
-           ConnectionDialog.java \
            ErrorDialog.java \
            FileNotSavedDialog.java \
 	   QuitDialog.java \

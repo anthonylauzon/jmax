@@ -22,10 +22,6 @@ all:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
-ConnectionDialog:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConnectionDialog.java)
-.PHONY: ConnectionDialog
-
 ErrorDialog:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErrorDialog.java)
 .PHONY: ErrorDialog
