@@ -23,6 +23,6 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-include Makefiles/Makefile.linux
+include $(DISTDIR)/Makefiles/Makefile.linux
 
 INSTALL_ARCHS=i386-linux
