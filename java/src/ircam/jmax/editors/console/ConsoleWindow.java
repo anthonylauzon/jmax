@@ -59,7 +59,15 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     // Should depend on a flag.
 
     if (! MaxApplication.getProperty("jmaxNoConsole").equals("true"))
-      System.setOut(itsConsole.getPrintStream()); 
+      {
+	System.setOut(itsConsole.getPrintStream());
+      }
+    else
+      {
+	itsConsole.getPrintStream().println( "Output redirected to Java standard output");
+	itsConsole.getTextArea().setRows( 10);
+      }
+
 
     getContentPane().setLayout(new BorderLayout());
 

@@ -15,3 +15,5 @@ src	all	soundfiles.c
 src	all	soundfiles.h
 src	all	soundformats.c
 src	all	soundformats.h
+src	all	sttools.c
+

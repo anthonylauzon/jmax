@@ -1,4 +1,6 @@
 src	all	Makefile
+src	all	STtools
+src	all	STtools.h
 src	all	audio
 src	all	audio.h
 src	all	client
