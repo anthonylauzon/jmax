@@ -74,7 +74,7 @@ case "$check_memory" in
   CFLAGS="$CFLAGS -fcheck-memory-usage"
   ;;
 esac
-AM_PATH_ALSA(0.9.0)
+dnl AM_PATH_ALSA(0.9.0)
 if test "x$alsa_found" = "xyes" ; then
 PLATFORM_PACKAGES="alsa oss unixdtd"
 CONFIG_FILE=config_linux_alsa.jmax
