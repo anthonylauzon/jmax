@@ -177,8 +177,6 @@ fts_unit_conv_msec_to_S(float msec, void *sr)
   return (*((float *)sr) * 0.001f * msec);
 }
 
-
-
 fts_symbol_t 
 fts_unit_get_samples_arg(int ac, const fts_atom_t *at, int n, fts_symbol_t def)
 {

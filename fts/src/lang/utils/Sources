@@ -1,4 +1,7 @@
-SOURCES = units.c    \
-	  hashtab.c  \
-	  utils.c
-
+SOURCES = \
+  utils.c \
+  floatfuns.c \
+  hashtab.c \
+  ramps.c \
+  units.c \
+  wto.c
