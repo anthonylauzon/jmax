@@ -449,6 +449,7 @@ fmat_set_row_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   }
 }
 
+
 static void
 fmat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -462,6 +463,7 @@ fmat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_return(&t);
 }
+
 
 static void
 fmat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -494,6 +496,8 @@ fmat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     this->values[i] = 0.0;
 }
 
+
+/* called by get element message */
 static void
 fmat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -509,7 +513,67 @@ fmat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
 }
 
-/**************************************************************************************
+
+/* copy a column (first arg) into an fvec (created here or given as second
+   argument) */
+static void 
+fmat_get_column(fts_object_t *o, int winlet, fts_symbol_t s, 
+		int ac, const fts_atom_t *at)
+{
+    fmat_t *this = (fmat_t *) o;
+
+    if (ac > 0  &&  fts_is_number(at))
+    {
+	int m   = fmat_get_m(this);	/* num. rows */
+	int n   = fmat_get_n(this);	/* num. columns */
+	int col = fts_get_number_int(at);
+
+	if (0 <= col  &&  col < n)
+	{
+	    fvec_t *    myfvec;
+	    int		myown;
+	    int		i, pos, stride;
+	    fts_atom_t  ret;
+
+	    if (ac > 1  &&  fts_is_a(at+1, fvec_type))
+	    {
+		myfvec = (fvec_t *) fts_get_object(at+1);
+		myown  = 1;
+	    }
+	    else
+	    {
+		myfvec = (fvec_t *) fts_object_create(fvec_type, 0, NULL);
+		myown  = 0;
+	    }
+
+	    fvec_set_size(myfvec, m);
+    
+	    /* copy values (elem index is i * n + col) */
+	    pos    = col;
+	    stride = n;
+	    for (i = 0; i < m; i++)
+	    {
+		fvec_set_element(myfvec, i, this->values[pos]);
+		pos += stride;
+	    }
+
+	    /* return fvec, destroy if unused */
+	    if (myown)
+		fts_object_refer(myfvec);
+
+	    fts_set_object(&ret, (fts_object_t *) myfvec);
+	    fts_return(&ret);
+
+	    if (myown)
+		fts_object_release(myfvec);
+	}
+    }
+}
+
+
+
+
+/******************************************************************************
 *
 *  arithmetics
 *
@@ -1288,6 +1352,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_export, fmat_export);
 
   fts_class_message_varargs(cl, fts_s_get_element, fmat_return_element);
+  fts_class_message_varargs(cl, fts_new_symbol("getcol"), fmat_get_column);
 
   fts_class_inlet_bang(cl, 0, data_object_output);
 
@@ -1303,3 +1368,10 @@ fmat_config(void)
 
   fmat_type = fts_class_install(fmat_symbol, fmat_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
