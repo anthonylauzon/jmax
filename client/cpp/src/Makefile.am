@@ -10,7 +10,7 @@ BinaryProtocolDecoder.cpp \
 BinaryProtocolEncoder.cpp \
 Hashtable.cpp 
 
-libftsclient_la_LDFLAGS = -no-undefined
+libftsclient_la_LDFLAGS = -no-undefined -release @FTSCLIENT_VERSION@
 
 libftsclient_la_LIBADD= -lstdc++
 
