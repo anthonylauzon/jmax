@@ -140,7 +140,7 @@ alsaaudiomanager_scan_devices()
 	    {
 	      fts_object_refer((fts_object_t*) port);
 	      fts_audiomanager_put_port(fts_s_default, port);
-	      post("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
+	      fts_post("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
 	      fts_log("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
 	    }	    
 	  }
@@ -152,7 +152,7 @@ alsaaudiomanager_scan_devices()
 	  {
 	    fts_object_refer((fts_object_t*) port);
 	    fts_audiomanager_put_port(fts_s_default, port);
-	    post("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
+	    fts_post("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
 	    fts_log("[alsaaudiomanager] default is %s\n", snd_pcm_info_get_name(pcminfo));
 	  }	  
 	}	

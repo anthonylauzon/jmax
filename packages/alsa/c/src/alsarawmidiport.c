@@ -35,7 +35,7 @@ alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   n = snd_rawmidi_read( this->handle_in, this->receive_buffer, ALSA_SYSEX_BUFFER_LENGTH);
   if ( n <= 0 && n != -EAGAIN)
     {
-      post( "snd_rawmidi_read returns %d !!!\n", n);
+      fts_post( "snd_rawmidi_read returns %d !!!\n", n);
       return;
     }
 

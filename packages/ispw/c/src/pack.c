@@ -119,7 +119,7 @@ pack_inlet(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 pack_error_inlet(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  post("pack object want number or symbol in inlet %d\n", winlet);
+  fts_post("pack object want number or symbol in inlet %d\n", winlet);
   fts_object_error(o, "pack object want number or symbol in inlet %d", winlet);
 }
 

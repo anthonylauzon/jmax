@@ -129,7 +129,7 @@ static void post_log( void)
     if (q)
     {
       *q = '\0';
-      post( "%s\n", p);
+      fts_post( "%s\n", p);
       p = q+1;
     }
   }
@@ -161,7 +161,7 @@ static int post_snd_output_buffer(snd_output_t* out)
   {
     output_content[buffer_size - 1] = '\0';
   }
-  post("%s\n", output_content);
+  fts_post("%s\n", output_content);
   return buffer_size;
 }
 
@@ -408,7 +408,7 @@ alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, in
       
       if (err < 0)
       {
-	post("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
+	fts_post("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
 	fts_log("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
 	fts_object_error(o, "Sample rate change failed (%s)", snd_strerror(err));
       }
@@ -430,7 +430,7 @@ alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, in
       
       if (err < 0)
       {
-	post("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
+	fts_post("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
 	fts_log("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
       }
       else
@@ -467,7 +467,7 @@ alsaaudioport_buffer_size_change(fts_object_t* o, int winlet, fts_symbol_t s, in
       
       if (err < 0)
       {
-	post("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
+	fts_post("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
 	fts_log("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
 	fts_object_error(o, "buffer size change failed (%s)", snd_strerror(err));
       }
@@ -489,7 +489,7 @@ alsaaudioport_buffer_size_change(fts_object_t* o, int winlet, fts_symbol_t s, in
       
       if (err < 0)
       {
-	post("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
+	fts_post("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
 	fts_log("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
       }
       else
@@ -614,7 +614,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   if (err != sampling_rate)
   {
     fts_log("[alsaaudioport] rate doesn't match (requested %iHz, get %iHz)\n", sampling_rate, err);
-    post("[alsaaudioport] rate doesn't match (requested %iHz, get %iHz)\n", sampling_rate, err);
+    fts_post("[alsaaudioport] rate doesn't match (requested %iHz, get %iHz)\n", sampling_rate, err);
   }
   
   stream->rate = err;
@@ -756,7 +756,7 @@ static void FUN_NAME(fts_audioport_t* port, float** buffers, int buffsize) \
     else if (r == -EPIPE)  \
       xrun(alsa_port, alsa_port->capture.handle);  \
     else if (r < 0)  \
-      post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
+      fts_post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
     if (r > 0)  \
     {  \
       count -= r;  \
@@ -814,7 +814,7 @@ static void FUN_NAME(fts_audioport_t* port, float** buffers, int buffsize) \
     else if (r == -EPIPE)  \
       xrun(alsa_port, alsa_port->capture.handle);  \
     else if (r < 0)  \
-      post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
+      fts_post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
     if (r > 0)  \
     {  \
       result += r;  \
@@ -890,7 +890,7 @@ static void FUN_NAME(fts_audioport_t* port, float** buffers, int buffsize) \
     else if ( r == -EPIPE )  \
       xrun( alsa_port, alsa_port->playback.handle);  \
     else if (r < 0)  \
-      post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
+      fts_post( "%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
     if ( r > 0)  \
     {  \
       count -= r;  \
@@ -951,7 +951,7 @@ static void FUN_NAME(fts_audioport_t* port, float** buffers, int buffsize) \
     else if (r == -EPIPE)  \
       xrun(alsa_port, alsa_port->playback.handle);  \
     else if (r < 0)  \
-      post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
+      fts_post("%s error: %d, %s\n", #SND_PCM_FUN, r, snd_strerror(r));  \
     if (r > 0)  \
     {  \
       result += r;  \
@@ -1096,7 +1096,7 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   if (err != 0)
   {
     fts_object_error(o, "Error when trying to open alsastream \n");
-    post("[alsaaudioport_open_input] err: %s \n", snd_strerror(err));
+    fts_post("[alsaaudioport_open_input] err: %s \n", snd_strerror(err));
     fts_log("[alsaaudioport_open_input] err: %s \n", snd_strerror(err));
     if (self->capture.handle != NULL)
     {
@@ -1141,7 +1141,7 @@ alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   if (err != 0)
   {
     fts_object_error(o, "Error when trying to open alsastream \n");
-    post("[alsaaudioport_open_output] err: %s \n", snd_strerror(err));
+    fts_post("[alsaaudioport_open_output] err: %s \n", snd_strerror(err));
     fts_log("[alsaaudioport_open_output] err: %s \n", snd_strerror(err));
     if (self->playback.handle != NULL)
     {
@@ -1266,8 +1266,8 @@ alsaaudioport_print_all_device(alsaaudioport_t* self)
   snd_output_t *out;
   int err;
 
-  post("****************************************\n");
-  post("****************************************\n");
+  fts_post("****************************************\n");
+  fts_post("****************************************\n");
   err = snd_output_buffer_open(&out);
   if (err < 0)
   {
@@ -1285,14 +1285,14 @@ alsaaudioport_print_all_device(alsaaudioport_t* self)
     }
     else
     {
-      post("Capture Stream \n");
+      fts_post("Capture Stream \n");
       post_snd_output_buffer(out);
     }
     snd_output_flush(out);
   }
 
-  post("****************************************\n");
-  post("****************************************\n");
+  fts_post("****************************************\n");
+  fts_post("****************************************\n");
 
   if (NULL != self->playback.handle)
   {
@@ -1303,13 +1303,13 @@ alsaaudioport_print_all_device(alsaaudioport_t* self)
     }
     else
     {
-      post("Playback Stream \n");
+      fts_post("Playback Stream \n");
       post_snd_output_buffer(out);
     }
     snd_output_flush(out);
   }
-  post("****************************************\n");
-  post("****************************************\n");
+  fts_post("****************************************\n");
+  fts_post("****************************************\n");
 
 
   snd_output_close(out);    

@@ -69,7 +69,7 @@ dsp_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if (!fts_dsp_is_active())
   {
     fts_object_error(o, "Cannot print dsp chains if dsp is inactive");
-    post("[dsp] Cannot print dsp chains if dsp is inactive\n");
+    fts_post("[dsp] Cannot print dsp chains if dsp is inactive\n");
   }
   else
   {

@@ -199,11 +199,11 @@ static void ossaudioport_debug( int fd)
   audio_buf_info info;
 
   if ( ioctl( fd, SNDCTL_DSP_GETOSPACE, &info) == -1)
-    post( "SNDCTL_DSP_GETOSPACE\n");
-  post( "fragments: %d\n", info.fragments);
-  post( "total number of fragments: %d\n", info.fragstotal);
-  post( "fragment size: %d bytes\n", info.fragsize);
-  post( "bytes: %d\n", info.bytes);
+    fts_post( "SNDCTL_DSP_GETOSPACE\n");
+  fts_post( "fragments: %d\n", info.fragments);
+  fts_post( "total number of fragments: %d\n", info.fragstotal);
+  fts_post( "fragment size: %d bytes\n", info.fragsize);
+  fts_post( "bytes: %d\n", info.bytes);
 }
 #endif
 
@@ -230,7 +230,7 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
     if (close(self->fd) < 0)
     {
       fts_object_error(o, "cannot close device (%s)\n", strerror(errno));
-      post("[ossaudioport:] cannot close device (%s)\n", strerror(errno));
+      fts_post("[ossaudioport:] cannot close device (%s)\n", strerror(errno));
       return;
     }
     self->fd = -1;
@@ -240,7 +240,7 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   if ( (self->fd = open( device_name, flags, 0)) < 0 )
     {
       fts_object_error( o, "cannot open device \"%s\" (%s)", device_name, strerror( errno));
-      post("[ossaudioport:] cannot open device \"%s\" (%s)", device_name, strerror( errno));
+      fts_post("[ossaudioport:] cannot open device \"%s\" (%s)", device_name, strerror( errno));
       return;
     }
 
@@ -256,7 +256,7 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   if (ioctl( self->fd, SNDCTL_DSP_SETFRAGMENT, &fragparam))
     {
       fts_object_error( o, "cannot set fragment size or number of fragment (%s)", strerror( errno));
-      post("ossaudioport: cannot set fragment size or number of fragment (%s)\n", strerror( errno));
+      fts_post("ossaudioport: cannot set fragment size or number of fragment (%s)\n", strerror( errno));
       return;
     }
 
@@ -275,7 +275,7 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   if ( (ioctl( self->fd, SNDCTL_DSP_SETFMT, &format) == -1) || (format != wanted_format))
     {
       fts_object_error( o, "cannot set sample format to signed 16 bits little endian (%s)", strerror( errno));
-      post("ossaudioport: cannot set sample format to signed 16 bits little endian (%s)\n", strerror( errno));
+      fts_post("ossaudioport: cannot set sample format to signed 16 bits little endian (%s)\n", strerror( errno));
       return;
     }
 
@@ -284,7 +284,7 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   if ( (ioctl( self->fd, SNDCTL_DSP_CHANNELS, &p_channels) == -1) || (channels != p_channels) )
     {
       fts_object_error( o, "cannot set number of channels (%s)", strerror( errno));
-      post("ossaudioport: cannot set number of channels (%s)\n", strerror( errno));
+      fts_post("ossaudioport: cannot set number of channels (%s)\n", strerror( errno));
       return;
     }
 
@@ -293,13 +293,13 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   if (ioctl( self->fd, SNDCTL_DSP_SPEED, &p_sample_rate) == -1)
     {
       fts_object_error( o, "cannot set sample rate (%s)", strerror( errno));
-      post("ossaudioport: cannot set sample rate (%s)\n", strerror( errno));
+      fts_post("ossaudioport: cannot set sample rate (%s)\n", strerror( errno));
       return;
     }
 
   if (sample_rate != p_sample_rate)
     {
-      post("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
+      fts_post("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
 	   sample_rate, p_sample_rate);
       fts_log("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
 	      sample_rate, p_sample_rate);

@@ -402,12 +402,12 @@ alsaseqmidi_scan_hashtable(fts_hashtable_t* ht)
       snd_seq_t* seq = port->seq;
       if (seq != NULL)
       {
-	post("hashtabke keys: %s \t %s has a valid ALSA sequencer handle \n",
+	fts_post("hashtabke keys: %s \t %s has a valid ALSA sequencer handle \n",
 	     name, port->name);
       }
       else
       {
-	post("hashtable keys: %s \t %s has not a valid ALSA sequencer handle \n",
+	fts_post("hashtable keys: %s \t %s has not a valid ALSA sequencer handle \n",
 	     name, port->name);
       }
     }
@@ -415,12 +415,12 @@ alsaseqmidi_scan_hashtable(fts_hashtable_t* ht)
     {
       if (fts_is_symbol(&a))
       {
-	post("hashtable keys: %s \t values is not an object, is a symbol %s \n", 
+	fts_post("hashtable keys: %s \t values is not an object, is a symbol %s \n", 
 	     name, fts_get_symbol(&a));
       }
       else
       {
-	post("hashtable keys: %s \t values is not an object nor a symbol \n", name);
+	fts_post("hashtable keys: %s \t values is not an object nor a symbol \n", name);
       }
     }
   }
