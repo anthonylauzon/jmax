@@ -61,25 +61,15 @@ change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 change_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(change_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, change_init, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, change_init);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, change_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, change_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, change_int);
+  fts_method_define_varargs(cl, 0, fts_s_set, change_set);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, change_int, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_set, change_set, 1, a);
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 
   return fts_Success;
 }

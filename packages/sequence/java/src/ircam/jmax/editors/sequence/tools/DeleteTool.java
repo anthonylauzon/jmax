@@ -87,7 +87,7 @@ public class DeleteTool extends Tool implements PositionListener {
 		    egc.getSelection().deleteAll();
 		else
 		    {
-			egc.getDataModel().removeEvent(aEvent);		
+			egc.getDataModel().deleteEvent(aEvent);		
 			egc.getSelection().deselectAll();
 		    }
 	    }

@@ -332,23 +332,6 @@ fts_ucs_set_updates_period(int argc, const fts_atom_t *argv)
  *
  */
 
-static fts_status_t
-fts_ucs_mess_set_msgmode(int argc, const fts_atom_t *argv)
-{
-  if ((argc == 1) && fts_is_symbol(&argv[0]))
-    {
-      fts_symbol_t mode = fts_get_symbol(&argv[0]);
-
-      if (mode == fts_new_symbol("check"))
-	fts_mess_set_run_time_check(1);
-      else if (mode == fts_new_symbol("fast"))
-	fts_mess_set_run_time_check(0);
-    }
-
-  return fts_Success;
-}
-
-
 extern void fts_set_mess_trace(int b);
 
 static fts_status_t
@@ -445,7 +428,7 @@ fts_ucs_install_commands()
 {
   /* Help and printout */
 
-  fts_ucs_define_command(fts_new_symbol("print"), 0,  fts_ucs_lib_print,
+  fts_ucs_define_command(fts_s_print, 0,  fts_ucs_lib_print,
 			 "print [<args>]*", "print its arguments");
 
   fts_ucs_define_command(fts_new_symbol("help"), 0,  fts_ucs_lib_help,
@@ -453,15 +436,15 @@ fts_ucs_install_commands()
 
   /* System commands */
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("defaultpath"), fts_ucs_lib_set_path,
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("defaultpath"), fts_ucs_lib_set_path,
 			 "set defaultpath <path>", "system command");
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("updates_per_ticks"),
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("updates_per_ticks"),
 			 fts_ucs_set_updates_per_ticks,
 			 "set update_per_ticks <int>",
 			 "Set how many value updates are sent by FTS in a single scheduling tick");
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("update_period"),
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("update_period"),
 			 fts_ucs_set_updates_period,
 			 "set update_period <int>",
 			 "Set every how much FTS perform an  update");
@@ -471,10 +454,6 @@ fts_ucs_install_commands()
 /*  			 "dynamically load a module"); */
 
   /* Message system function  */
-
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("msgmode"),  fts_ucs_mess_set_msgmode,
-			 "set msgmode [check | fast]",
-			 "Set the FTS message mode\ncheck mode give you more tests\nduring object developement");
 
   fts_ucs_define_command(fts_new_symbol("mess"), fts_new_symbol("trace"),  fts_ucs_set_mess_trace,
 			 "mess trace [1 | 0]",
@@ -497,13 +476,13 @@ fts_ucs_install_commands()
 
   /* Parameters */
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("param"), fts_ucs_set_param,
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("param"), fts_ucs_set_param,
 			 "set param <name> <value>",
 			 "set an FTS parameter");
 
   /* Fonts */
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("fonts"), fts_ucs_set_fonts,
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("fonts"), fts_ucs_set_fonts,
 			 "set fonts <int> <int> <int> <int> <int> <int> <int> <int>",
 			 "set an FTS parameter");
 }

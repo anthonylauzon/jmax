@@ -425,18 +425,18 @@ scope_ftl(fts_word_t *argv)
  */
 
 static void 
-scope_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scope_t *this = (scope_t *)o;
-  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  fts_atom_t a[1];
+  fts_atom_t a;
 
-  fts_set_float(a, this->period_msec);
-  fts_bmax_save_message(file, sym_set_period, 1, a);
+  fts_set_float(&a, this->period_msec);
+  fts_dumper_send(dumper, sym_set_period, 1, &a);
 
-  fts_set_float(a, data->threshold);
-  fts_bmax_save_message(file, sym_set_threshold, 1, a);
+  fts_set_float(&a, data->threshold);
+  fts_dumper_send(dumper, sym_set_threshold, 1, &a);
 }
 
 static void 
@@ -512,13 +512,13 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, scope_put);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("size"), scope_set_size_by_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, scope_set_size_by_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), scope_set_range_by_client);
   fts_method_define_varargs(cl, fts_SystemInlet, sym_set_period, scope_set_period);
   fts_method_define_varargs(cl, fts_SystemInlet, sym_set_threshold, scope_set_threshold);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("onset"), scope_set_pre_delay);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, scope_save_bmax); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, scope_dump); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, scope_upload); 
 
   dsp_sig_inlet(cl, 0);

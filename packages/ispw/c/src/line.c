@@ -298,14 +298,14 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* define the system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, line_init);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), line_stop);
+  fts_method_define_varargs(cl, 0, fts_s_stop, line_stop);
 
   if(ac <= 1  || fts_is_int(at+1))
     {
       fts_method_define_varargs(cl, 0, fts_s_int, line_int_number);
       fts_method_define_varargs(cl, 0, fts_s_float, line_int_number);
       fts_method_define_varargs(cl, 0, fts_s_list, line_int_list); 
-      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), line_int_set);
+      fts_method_define_varargs(cl, 0, fts_s_set, line_int_set);
  
       fts_outlet_type_define_varargs(cl, 0, fts_s_int);
     }
@@ -314,7 +314,7 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_int, line_float_number);
       fts_method_define_varargs(cl, 0, fts_s_float, line_float_number);
       fts_method_define_varargs(cl, 0, fts_s_list, line_float_list);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), line_float_set);
+      fts_method_define_varargs(cl, 0, fts_s_set, line_float_set);
  
       fts_outlet_type_define_varargs(cl, 0, fts_s_float);
     }

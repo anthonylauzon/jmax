@@ -56,7 +56,7 @@ DATA_API void fvec_set_size(fvec_t *vector, int size);
 DATA_API void fvec_set_const(fvec_t *vector, float c);
 #define fvec_zero(v) fvec_set_const((v), 0.0)
 
-DATA_API void fvec_set_from_atom_list(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
+DATA_API void fvec_set_with_onset_from_atoms(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
 
 DATA_API float fvec_get_sum(fvec_t *vector);
 DATA_API float fvec_get_sub_sum(fvec_t *vector, int from, int to);

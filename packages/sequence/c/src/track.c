@@ -47,7 +47,7 @@ create_event(int ac, const fts_atom_t *at)
   fts_symbol_t type = fts_get_symbol(at);
   event_t *event = 0;
 
-  if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
+  if(type == fts_s_int || type == fts_s_float || type == fts_s_symbol)
     event = (event_t *)fts_object_create(event_class, 1, at + 1);
   else
     {
@@ -458,6 +458,7 @@ track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
 {
   track_t *this = (track_t *)o;
   double time = fts_get_float(at + 0);
+  fts_array_t array;
   event_t *event;
   
   /* make new event object */
@@ -503,7 +504,7 @@ track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
   int i;
   
   /*  remove event objects from client */
-  fts_client_send_message(o, seqsym_deleteEvents, ac, at);
+  fts_client_send_message(o, seqsym_removeEvents, ac, at);
   
   for(i=0; i<ac; i++)
     {
@@ -543,6 +544,7 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_t *this = (track_t *)o;
   event_t *event = track_get_first(this);
   fts_atom_t a[TRACK_BLOCK_SIZE];
+  fts_array_t array;
   int n = 0;
   
   if(!fts_object_has_id((fts_object_t *)this))
@@ -559,16 +561,24 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_client_send_message(o, seqsym_setName, 1, a);
 	}
     }
+  
+  fts_array_init(&array, 0, 0);
 
   while(event)
     {
       if(!fts_object_has_id((fts_object_t *)event))
 	{
 	  /* create event at client */
-	  event_upload(event);
+	  int ac;
+	  fts_atom_t *at;
+	  
+	  event_get_array(event, &array);
+	  
+	  ac = fts_array_get_size(&array);
+	  at = fts_array_get_atoms(&array);
+	  fts_client_upload((fts_object_t *)event, seqsym_event, ac, at);
 
 	  fts_set_object(a + n, (fts_object_t *)event);
-	  
 	  n++;
 
 	  if(n == TRACK_BLOCK_SIZE)
@@ -580,6 +590,8 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       
       event = event_get_next(event);
     }
+
+  fts_array_destroy(&array);
  
   if(n > 0)
     fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);    
@@ -590,7 +602,7 @@ track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   track_t *this = (track_t *)o;
   
-  fts_client_send_message(o, seqsym_clear, 0, 0);
+  fts_client_send_message(o, fts_s_clear, 0, 0);
   
   track_clear(this);
 }
@@ -602,14 +614,32 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_symbol_t track_name = track_get_name(this);
   fts_symbol_t track_type = this->type;
   event_t *event = track_get_first(this);  
+  fts_array_t array;
   
   post("track of %s (%s): %d event(s)\n", fts_symbol_name(track_type), track_name? fts_symbol_name(track_name): "untitled", track_get_size(this));
   
+  fts_array_init(&array, 0, 0);
+
   while(event)
     {
-      event_print(event);
+      int size;
+      fts_atom_t *atoms;
+           
+      fts_array_clear(&array);
+      event_get_array(event, &array);
+
+      size = fts_array_get_size(&array);
+      atoms = fts_array_get_atoms(&array);
+
+      post("  @%lf: ", fts_get_float(atoms + 0));
+      post("<%s> ", fts_get_symbol(atoms + 1));
+      post_atoms(size - 2, atoms + 2);
+      post("\n");
+
       event = event_get_next(event);
     }  
+
+  fts_array_destroy(&array);
 }
 
 /******************************************************
@@ -664,10 +694,42 @@ track_export_to_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int
  * 
  */
 
-static void
-track_add_event_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+void 
+track_write_to_dumper(track_t *this, fts_dumper_t *dumper)
+{
+  event_t *event = track_get_first(this);
+  fts_message_t *mess;
+
+  while(event)
+    {
+      int ac;
+      fts_atom_t *at;
+
+      /* get new add event message */
+      mess = fts_dumper_message_new(dumper, seqsym_add_event);
+
+      /* get event as array */
+      event_get_array(event, fts_message_get_args(mess));
+
+      /* dump add event message */
+      fts_dumper_message_send(dumper, mess);
+
+      event = event_get_next(event);
+    }  
+}
+
+static void 
+track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);  
+
+  track_write_to_dumper(this, dumper);
+}
+
+void
+track_add_event_from_array(track_t *this, int ac, const fts_atom_t *at)
+{
   double time = fts_get_float(at + 0);
   event_t *event;
   
@@ -679,35 +741,46 @@ track_add_event_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     track_append_event(this, time, event);
 }
 
-static void 
-track_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+track_add_event_from_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
-  event_t *event = track_get_first(this);
-  fts_symbol_t name = track_get_name(this);
 
-  if(name)
-    {
-      fts_bmax_code_push_symbol(file, name);
-      fts_bmax_code_push_symbol(file, this->type);
-      
-      fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_track, 2);
-      fts_bmax_code_pop_args(file, 2);
-    }
+  track_add_event_from_array(this, ac, at);
+}
+
+/******************************************************
+ *
+ *  properties
+ * 
+ */
+
+static void
+track_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  track_t *this = (track_t *)obj;
+
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
+}
+
+static void
+track_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  track_t *this = (track_t *)obj;
+
+  if(this->sequence)
+    fts_set_symbol(value, sequence_get_keep(this->sequence));
   else
-    {
-      fts_bmax_code_push_symbol(file, this->type);
-      
-      fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_track, 1);
-      fts_bmax_code_pop_args(file, 1);
-    }
-  
-  while(event)
-    {
-      event_save_bmax(file, event);
-      event = event_get_next(event);
-    }  
+    fts_set_symbol(value, this->keep);
+}
+
+static void
+track_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  track_t *this = (track_t *)o;
+
+  fts_set_object_with_type(value, this, seqsym_track);
 }
 
 /******************************************************
@@ -735,6 +808,8 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->size = 0;
   this->type = seqsym_note;
   
+  this->keep = fts_s_no;
+
   if(ac > 0)
     {
       if(fts_is_symbol(at))
@@ -752,14 +827,6 @@ track_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_clear(this);
 }
 
-static void
-track_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  sequence_t *this = (sequence_t *)o;
-
-  fts_set_object_with_type(value, this, seqsym_track);
-}
-
 static fts_status_t
 track_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -768,25 +835,25 @@ track_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, track_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, track_delete);
 
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, track_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, track_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, track_get_state);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, track_save_bmax);
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_bmax_add_event, track_add_event_from_bmax);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, track_dump);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_add_event, track_add_event_from_dump);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, track_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_print, track_print);
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_clear, track_clear_method);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, track_print);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, track_clear_method);
 
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midifile_dialog, track_export_to_midifile_dialog);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_export_midifile, track_export_to_midifile);
     
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_name"), track_set_name_by_client_request);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_event"), track_add_event_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("make_event"), track_make_event_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_events"), track_remove_events_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move_events"), track_move_events_by_client_request);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("clear_track"), track_clear_method);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_setName, track_set_name_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_addEvent, track_add_event_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_makeEvent, track_make_event_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_removeEvents, track_remove_events_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_moveEvents, track_move_events_by_client_request);
 
   return fts_Success;
 }

@@ -29,12 +29,169 @@
 #define INIT_CHECK_STATUS 0
 #endif
 
-static long fts_mess_run_time_check = INIT_CHECK_STATUS;
+/************************************************
+ *
+ *  message class
+ *
+ */
+fts_class_t *fts_message_class = 0;
 
+static int 
+is_token(fts_symbol_t s)
+{
+  return ((s == fts_s_dot) ||
+	  (s == fts_s_comma) ||
+	  (s == fts_s_semi) ||
+	  (s == fts_s_colon) ||
+	  (s == fts_s_double_colon) ||
+	  (s == fts_s_quote) ||
+	  (s == fts_s_comma));
+}
 
+void
+fts_message_clear(fts_message_t *mess)
+{
+  mess->s = 0;
+  fts_array_clear(&mess->args);
+}
+
+void
+fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  int i;
+
+  mess->s = s;
+  fts_array_clear(&mess->args);
+  fts_array_append(&mess->args, ac, at);
+}
+
+static void
+message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_message_t *this = (fts_message_t *)o;
+
+  ac--;
+  at++;
+
+  this->s = 0;
+  fts_array_init(&this->args, 0, 0);
+
+  /* check arguments */
+  if(ac > 0)
+    {
+      int i;
+
+      /* check for separators and lists */
+      for(i=0; i<ac; i++)
+	{
+	  if(fts_is_symbol(at + i) && is_token(fts_get_symbol(at + i)))
+	    {
+	      fts_object_set_error(o, "Syntax error in message or constant");
+	      return;
+	    }
+	  else if(fts_is_array(at + i))
+	    {
+	      fts_object_set_error(o, "List cannot be argument of a message or constructor");
+	      return;
+	    }
+	}
+
+      /* first arg is symbol */
+      if(fts_is_symbol(at))
+	{
+	  fts_symbol_t name = fts_get_symbol(at);
+	  fts_class_t *cl;
+
+	  if(fts_atom_type_lookup(name, &cl))
+	    fts_object_set_error(o, "Symbol %s cannot be used as message", fts_symbol_name(name));
+	  else
+	    fts_message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
+	}
+      else if(ac == 1)
+	fts_message_set(this, fts_get_selector(at), 1, at); /* value format: <non symbol value> (without type specifyer) */
+      else
+	fts_message_set(this, fts_s_list, ac, at); /* implicit list format: <non symbol value> [<value> ...] */
+    }
+}
+
+static void
+message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_message_t *this = (fts_message_t *)o;
+
+  fts_array_destroy(&this->args);
+}
+
+static fts_status_t
+message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_message_t), 0, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, message_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, message_delete);
+  
+  return fts_Success;
+}
+
+void
+fts_message_config(void)
+{
+  fts_class_install(fts_s_message, message_instantiate);
+  fts_message_class = fts_class_get_by_name(fts_s_message);
+}
+
+/************************************************
+ *
+ *  message dumper
+ *
+ */
+
+void
+fts_dumper_init(fts_dumper_t *dumper, fts_method_t send)
+{
+  dumper->send = send;
+  dumper->message = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
+
+  fts_object_refer(dumper->message);
+}
+
+void
+fts_dumper_destroy(fts_dumper_t *dumper)
+{
+  fts_object_release(dumper->message);
+}
+
+fts_message_t *
+fts_dumper_message_new(fts_dumper_t *dumper, fts_symbol_t selector)
+{
+  fts_message_set(dumper->message, selector, 0, 0);
+
+  return dumper->message;
+}
+
+void
+fts_dumper_message_send(fts_dumper_t *dumper, fts_message_t *message)
+{
+  fts_symbol_t s = fts_message_get_selector(message);
+  int ac = fts_message_get_ac(message);
+  const fts_atom_t *at = fts_message_get_at(message);
+
+  dumper->send((fts_object_t *)dumper, 0, s, ac, at);
+}
+
+void
+fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dumper->send((fts_object_t *)dumper, 0, s, ac, at);  
+}
+
+/************************************************
+ *
+ *  message handling
+ *
+ */
 
 /* Return Status */
-
 fts_status_description_t fts_MethodNotFound = {"method not found"};
 fts_status_description_t fts_ArgumentMissing = {"argument missing"};
 fts_status_description_t fts_ArgumentTypeMismatch = {"argument type mismatch"};
@@ -45,57 +202,6 @@ fts_status_description_t fts_InvalidMessage = {"invalid symbol message"};
 
 int fts_objstack_top = 0; /* Next free slot; can overflow, must be checked */
 fts_object_t *fts_objstack[FTS_OBJSTACK_SIZE];
-
-/******************************************************************************/
-/*                                                                            */
-/*                            Messaging                                       */
-/*                                                                            */
-/******************************************************************************/
-
-static fts_status_t
-fts_args_check(fts_class_mess_t *mess, int ac, const fts_atom_t *at)
-{
-  fts_mess_type_t *tmess = &(mess->tmess);
-  int i;
-
-  if (tmess->mandatory_args == FTS_VAR_ARGS)
-    return fts_Success;
-
-  if (ac < tmess->mandatory_args)
-    return &fts_ArgumentMissing;
-
-  if (ac > tmess->nargs)
-    return &fts_ExtraArguments;
-
-  for (i = 0; i < ac; i++)
-    {
-      if (tmess->arg_types[i] == fts_s_anything)
-	continue;
-      else if ((tmess->arg_types[i] == fts_s_number) &&
-	       ((fts_get_type(&at[i]) == fts_s_int) || 
-		(fts_get_type(&at[i]) == fts_s_float)))
-	continue;
-      else if (fts_get_type(&at[i]) == tmess->arg_types[i])
-	continue;
-      else
-	return &fts_ArgumentTypeMismatch;
-    }
-
-  return fts_Success;
-}
-
-
-void fts_mess_set_run_time_check(int flag)
-{
-  fts_mess_run_time_check = flag;
-}
-
-
-int fts_mess_get_run_time_check()
-{
-  return fts_mess_run_time_check;
-}
-
 
 fts_status_t 
 fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -118,11 +224,6 @@ fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if (mess)
     {
-      status = fts_args_check(mess, ac, at);
-      
-      if (status != fts_Success)
-	return status;
-
       FTS_OBJSTACK_PUSH(o);
       (*mess->mth)(o, winlet, s, ac, at);
       FTS_OBJSTACK_POP(o);
@@ -187,27 +288,6 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   if (mess)
     {
-      if (fts_mess_get_run_time_check())
-	{
-	  status = fts_args_check(mess, ac, at);
-
-	  if (status != fts_Success)
-	    {
-	      post("%s error for object of class %s, inlet %d, message %s arguments:",
-		   status->description, fts_symbol_name(fts_object_get_class_name(o)), winlet,
-		   fts_symbol_name(s));
-	      post_atoms(ac, at);
-	      post("\n");
-
-	      return status;
-	    }
-
-	  /* empty the connection cache if check is active */
-
-	  *symb_cache = 0;
-	  *mth_cache = 0;
-	}
-
       FTS_OBJSTACK_PUSH(o);
       (*mess->mth)(o, winlet, s, ac, at);
       FTS_OBJSTACK_POP(o);
@@ -216,8 +296,6 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
   else
     {
-      /*post("Unknown message %s for object of class %s, inlet %d\n", 
-	fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet);*/
       fts_object_signal_runtime_error(o, "Unknown message %s for object of class %s, inlet %d", 
 				      fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet);
 
@@ -255,18 +333,9 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 
   while(conn)
     {
-      /* second test is for the anything case */
-
       if ((conn->symb == s) || (!conn->symb && conn->mth))
 	{
-	  fts_class_mess_t *mess;
-	  int anything;
-
-	  mess = fts_class_mess_get(conn->dst->head.cl, conn->winlet, s, &anything);  /* @@@anything */
-
-	  if ((status = fts_args_check(mess, ac, at)) != fts_Success)
-	    return status;
-
+	  /* call cashed method */
 	  FTS_OBJSTACK_PUSH(conn->dst);
 	  (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
 	  FTS_OBJSTACK_POP(conn->dst);
@@ -371,4 +440,3 @@ void fts_outlet_bang(fts_object_t *o, int woutlet)
       conn = conn->next_same_src;
     }
 }
-

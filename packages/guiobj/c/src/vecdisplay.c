@@ -335,15 +335,15 @@ vecdisplay_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-vecdisplay_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
-  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   fts_atom_t a[2];
 
   fts_set_float(a + 0, this->min);
   fts_set_float(a + 1, this->max);
-  fts_bmax_save_message(file, sym_bounds, 2, a);
+  fts_dumper_send(dumper, sym_bounds, 2, a);
 }
 
 /************************************************************
@@ -381,9 +381,9 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vecdisplay_init);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, vecdisplay_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, vecdisplay_save_bmax);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, vecdisplay_dump);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("size"), vecdisplay_set_size_by_client);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, vecdisplay_set_size_by_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), vecdisplay_set_range_by_client);
 
   fts_method_define_varargs(cl, fts_SystemInlet, sym_bounds, vecdisplay_set_bounds);
@@ -395,7 +395,7 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, vecdisplay_list);
   fts_method_define_varargs(cl, 0, fvec_symbol, vecdisplay_fvec);
   fts_method_define_varargs(cl, 0, ivec_symbol, vecdisplay_ivec);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), vecdisplay_clear);
+  fts_method_define_varargs(cl, 0, fts_s_clear, vecdisplay_clear);
 
   return fts_Success;
 }

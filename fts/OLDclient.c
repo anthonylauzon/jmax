@@ -260,7 +260,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
 
   this->updates_scheduled = 0;
-
+  
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);
 }
@@ -297,7 +297,7 @@ static fts_status_t oldclient_instantiate(fts_class_t *cl, int ac, const fts_ato
   fts_class_init( cl, sizeof( oldclient_t), 0, 0, 0);
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, oldclient_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, oldclient_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, oldclient_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, oldclient_receive);
 
@@ -406,12 +406,6 @@ static void oldclient_flush( oldclient_t *this)
  *
  */
 
-/*
- * Defining INCOMING_DEBUG_TRACE will produce a trace
- * of the incoming messages on the standard error
- */
-/*  #define INCOMING_DEBUG_TRACE */
-
 static void (* mess_dispatch_table[256])(int, const fts_atom_t *);
 
 #define S_CMD                      (256+1)
@@ -501,15 +495,7 @@ static void fts_client_parse_char( char c)
     else if ( c == EOM_CODE)
       {
 	if (mess_dispatch_table[ cmd ])
-	  {
-#ifdef INCOMING_DEBUG_TRACE
-	    fts_log( "Dispatching '%c' ", cmd);
-	    fprintf_atoms( stderr, ac, at);
-	    fts_log( "\n");
-#endif
-
-	    (*mess_dispatch_table[ cmd ])( ac, at);
-	  }
+	  (*mess_dispatch_table[ cmd ])(ac, at);
 
 	state = S_CMD;
       }
@@ -619,16 +605,6 @@ static void fts_client_parse_char( char c)
       }
     break;
 
-    /*case DATA_CODE:
-      ivalue += ((int)c & 0xff) << shift_table[ count++ ];
-      if ( count == 4)
-      {
-      fts_set_data( &a, fts_data_id_get( ivalue));
-      add_arg( &a);
-      state = S_ARG;
-      }
-      break;*/
-
   default:
     protocol_error( c, state);
     if ( c == EOM_CODE)
@@ -649,7 +625,6 @@ static void fts_client_install(char type, void (* fun) (int, const fts_atom_t *)
  *
  */
 
-
 /* Functions to open a message, close a message, send a valur, send a list of atoms.
    Messages to the client; there is only one client at this level, so we don't have
    any client argument (a part for the coding of the client id in the stream).
@@ -657,13 +632,6 @@ static void fts_client_install(char type, void (* fun) (int, const fts_atom_t *)
    We send the values as we get them; the device implement buffering
    if it need it.
 */
-
-/*
- * Defining OUTGOING_DEBUG_TRACE will produce a trace
- * of the outgoing messages on the standard error
- */
-
-/*  #define OUTGOING_DEBUG_TRACE       */
 
 static void fts_client_send_string(const char *msg)
 {
@@ -685,9 +653,6 @@ void fts_client_start_msg( int type)
 {
   oldclient_put_char( oldclient, (char)type);
 
-#ifdef OUTGOING_DEBUG_TRACE      
-  fprintf(stderr, "Sending '%c' ", (char)type);
-#endif
 }
 
 void fts_client_start_clientmess(void)
@@ -697,31 +662,13 @@ void fts_client_start_clientmess(void)
 
 void fts_client_add_int(int value)
 {
-#ifdef OUTGOING_DEBUG_TRACE      
-  fts_log( "%d ", value);
-#endif
-
   oldclient_put_char( oldclient, INT_CODE);
   fts_client_send_int(value);
 }
 
 
-/*void fts_client_add_data( fts_data_t *data)
-  {
-  #ifdef OUTGOING_DEBUG_TRACE      
-  fprintf_data( stderr, data);
-  #endif
-
-  oldclient_put_char( oldclient, DATA_CODE);
-  fts_client_send_int( data ? fts_data_get_id(data) : 0);
-  }*/
-
 void fts_client_add_object(fts_object_t *obj)
 {  
-#ifdef OUTGOING_DEBUG_TRACE      
-  fprintf_object( stderr, obj);
-#endif
-
   oldclient_put_char( oldclient, OBJECT_CODE);
   fts_client_send_int( obj ? fts_object_get_id(obj) : 0);
 }
@@ -777,10 +724,6 @@ static int cache_symbol( fts_symbol_t s)
 
 void fts_client_add_symbol(fts_symbol_t s)
 {
-#ifdef OUTGOING_DEBUG_TRACE      
-  fts_log( "%s ", fts_symbol_name(s) );
-#endif
-
   if ( fts_symbol_get_cache_index(s) >= 0 )   /* Is symbol cached ? */
     {
       oldclient_put_char( oldclient, SYMBOL_CACHED_CODE);
@@ -803,10 +746,6 @@ void fts_client_add_symbol(fts_symbol_t s)
 
 void fts_client_add_string(const char *s)
 {
-#ifdef OUTGOING_DEBUG_TRACE      
-  fts_log( "%s ", s);
-#endif
-
   oldclient_put_char( oldclient, STRING_CODE);
   fts_client_send_string(s);
   oldclient_put_char( oldclient, STRING_END_CODE);
@@ -846,12 +785,7 @@ void
 fts_client_done_msg(void)
 {
   /*  Add the eom code  */
-
   oldclient_put_char( oldclient, (char) EOM_CODE);
-
-#ifdef OUTGOING_DEBUG_TRACE      
-  fprintf(stderr, "<EOM>\n");
-#endif
 }
 
 /* 
@@ -942,7 +876,7 @@ void fts_client_upload_object(fts_object_t *obj)
   fts_object_send_properties(obj);
 
   /* Also, send to the object the message upload, in the case the object have more data/initialization to do */
-  fts_message_send(obj, fts_SystemInlet, fts_s_upload, 0, 0);
+  fts_send_message(obj, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
 
@@ -1111,18 +1045,8 @@ static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 	    fts_client_upload_object(obj);
 	}
 
-      /* If the value is void, send a null value only
-	 if the property is a special registered property;
-	 for the moment, only fts_s_data; it should be done
-	 better */
-
       if (fts_is_void(&a))
-	{
-	  /*if (name == fts_s_data)
-	    fts_set_data(&a, (fts_data_t *) 0);
-	    else*/
-	  return;
-	}
+	return;
 
 #ifdef UPDATE_TRACE 
       {
@@ -1493,7 +1417,7 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
 	  }
 
 	  /* activate the post-load init, like loadbangs */	  
-	  fts_message_send(patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+	  fts_send_message(patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
 	}
       else
 	printf_mess("System Error in FOS message LOAD PATCHER BMAX: null patcher", ac, av);
@@ -1854,7 +1778,7 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
 	 messages that have no methods defined
 	 */
 
-      fts_message_send(obj, inlet, selector, ac - 3, av + 3);
+      fts_send_message(obj, inlet, selector, ac - 3, av + 3);
     }
   else
     printf_mess("System Error in FOS message MESS: bad args", ac, av);
@@ -2347,23 +2271,6 @@ fts_ucs_set_updates_period(int argc, const fts_atom_t *argv)
  *
  */
 
-static fts_status_t
-fts_ucs_mess_set_msgmode(int argc, const fts_atom_t *argv)
-{
-  if ((argc == 1) && fts_is_symbol(&argv[0]))
-    {
-      fts_symbol_t mode = fts_get_symbol(&argv[0]);
-
-      if (mode == fts_new_symbol("check"))
-	fts_mess_set_run_time_check(1);
-      else if (mode == fts_new_symbol("fast"))
-	fts_mess_set_run_time_check(0);
-    }
-
-  return fts_Success;
-}
-
-
 extern void fts_set_mess_trace(int b);
 
 static fts_status_t
@@ -2460,7 +2367,7 @@ fts_ucs_install_commands()
 {
   /* Help and printout */
 
-  fts_ucs_define_command(fts_new_symbol("print"), 0,  fts_ucs_lib_print,
+  fts_ucs_define_command(fts_s_print, 0,  fts_ucs_lib_print,
 			 "print [<args>]*", "print its arguments");
 
   fts_ucs_define_command(fts_new_symbol("help"), 0,  fts_ucs_lib_help,
@@ -2468,15 +2375,15 @@ fts_ucs_install_commands()
 
   /* System commands */
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("defaultpath"), fts_ucs_lib_set_path,
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("defaultpath"), fts_ucs_lib_set_path,
 			 "set defaultpath <path>", "system command");
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("updates_per_ticks"),
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("updates_per_ticks"),
 			 fts_ucs_set_updates_per_ticks,
 			 "set update_per_ticks <int>",
 			 "Set how many value updates are sent by FTS in a single scheduling tick");
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("update_period"),
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("update_period"),
 			 fts_ucs_set_updates_period,
 			 "set update_period <int>",
 			 "Set every how much FTS perform an  update");
@@ -2486,10 +2393,6 @@ fts_ucs_install_commands()
 /*  			 "dynamically load a module"); */
 
   /* Message system function  */
-
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("msgmode"),  fts_ucs_mess_set_msgmode,
-			 "set msgmode [check | fast]",
-			 "Set the FTS message mode\ncheck mode give you more tests\nduring object developement");
 
   fts_ucs_define_command(fts_new_symbol("mess"), fts_new_symbol("trace"),  fts_ucs_set_mess_trace,
 			 "mess trace [1 | 0]",
@@ -2512,13 +2415,13 @@ fts_ucs_install_commands()
 
   /* Parameters */
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("param"), fts_ucs_set_param,
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("param"), fts_ucs_set_param,
 			 "set param <name> <value>",
 			 "set an FTS parameter");
 
   /* Fonts */
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("fonts"), fts_ucs_set_fonts,
+  fts_ucs_define_command(fts_s_set, fts_new_symbol("fonts"), fts_ucs_set_fonts,
 			 "set fonts <int> <int> <int> <int> <int> <int> <int> <int>",
 			 "set an FTS parameter");
 }
@@ -2535,8 +2438,6 @@ static void fts_olducs_init(void)
   fts_client_install(UCS_CODE, fts_ucs_client_dispatch);
   fts_ucs_install_commands();
 }
-
-
 
 /***********************************************************************
  *
@@ -2574,4 +2475,3 @@ void fts_oldclient_shutdown( void)
   }
   oldclient = 0;
 }
-

@@ -50,12 +50,16 @@
  *
  * @ingroup array
  */
-typedef struct _fts_array_t {
+typedef struct _fts_array_t 
+{
+  fts_object_t head;
   fts_atom_t *atoms;
   int size;
   int alloc_increment;
   int alloc;
 } fts_array_t;
+
+FTS_API fts_class_t *fts_array_class;
 
 /*@}*/
 
@@ -129,6 +133,16 @@ FTS_API void fts_array_append_int( fts_array_t *array, int i);
 FTS_API void fts_array_append_float( fts_array_t *array, float f);
 FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
 
+/**
+ * Prepend elements at the beginning of the array
+ * 
+ * @fn void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at)
+ * @param array the array
+ * @param ac the atoms count
+ * @param at atoms to append
+ * @ingroup array
+ */
+FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at);
 /**
  * Get the content of an array
  * 

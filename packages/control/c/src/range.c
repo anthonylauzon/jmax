@@ -186,7 +186,6 @@ range_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
   int i, n;
 
   if(ac == 1)
@@ -204,18 +203,15 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(range_t), n + 1, n + 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, range_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, range_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, range_delete);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, range_int, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, range_float, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, range_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, range_float);
 
   for(i=0; i<n; i++)
     {
-      a[0] = fts_s_number;
-      fts_method_define(cl, i + 1, fts_s_int, range_point, 1, a);
-      fts_method_define(cl, i + 1, fts_s_float, range_point, 1, a);
+      fts_method_define_varargs(cl, i + 1, fts_s_int, range_point);
+      fts_method_define_varargs(cl, i + 1, fts_s_float, range_point);
     }
 
   return fts_Success;

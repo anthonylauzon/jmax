@@ -50,19 +50,6 @@ static fts_symbol_t sym_change_event  = 0;
 static fts_symbol_t sym_remove_event  = 0;
 static fts_symbol_t sym_add_event     = 0;
 
-void explay_config(void);
-
-/****************************************************************************/
-/*                                                                          */
-/*                      Naming handling                                     */
-/*                                                                          */
-/****************************************************************************/
-
-/* if names are duplicated, the explode is not registered, and
-   cannot be accessed by name; the internal symbol is set to zero
-   Question: should the explode share data like table ?
-*/
-
 static fts_hashtable_t explode_table;
 
 explode_t *
@@ -436,7 +423,6 @@ explode_hangon(explode_t *this, evt_t *e)
 }
 
 /* send out an event matched by follower */
-
 static void
 explode_sendevt(explode_t *this, evt_t *e, int noteon)	
 {
@@ -458,32 +444,26 @@ explode_dofollow(explode_t *this, long int n)
   newskip.next = this->skip;
 
   /* check against skip array */
-
   for (sp = &newskip; (sp2 = sp->next);)
     {
       int drop = 0;
       long pit = sp2->evt->pit;
 
       /* if a skip is too old (score time skipped  >= FTIME) then kill it */
-
       if (this->matchscoretime - sp2->evt->time >= this->ftime)
 	drop = 1;
 
       /* here's the payoff for the skip array:
 	 if the pitch is in the array eat it. */
-
       if (pit == n || (this->oct && (pit == n+12 || pit == n-12)))
 	{
 	  /* if you haven't already sent one */
-
 	  if (!eat)	
 	    {
 	      /* send the match */
-
 	      explode_sendevt(this, sp2->evt, 1);
 
 	      /* and add to hang list */
-
 	      explode_hangon(this, sp2->evt);
 	    }
 
@@ -505,13 +485,11 @@ explode_dofollow(explode_t *this, long int n)
     return;
 
   /* search forward in list for matching note */
-
   for (; ; this->current = e->next)
     {
       e = this->current;
 
       /* if at end of score no match */
-
       if (!e)
 	{
 	  this->current = evtwas;
@@ -519,32 +497,26 @@ explode_dofollow(explode_t *this, long int n)
 	}
 
       /* interested only in channel 1 */
-
       if (e->chan != 1)
 	continue;
 
       /* if already ate all the anytime-skippable notes */
-
       if (gotem)	
 	{
 	  /* and if, past that, you ate ftime into the future */
-
 	  if (e->time > tquit)
 	    {
 	      /* then there is no match. */
-
 	      this->current = evtwas;
 	      return;
 	    }
 	}
 
       /* break if got the good note */
-
       if (e->pit == n || (this->oct && (e->pit == n+12 || e->pit == n-12)))
 	break;
 
       /* if you got NFWD notes already */
-
       if (!gotem && ++count > this->nfwd)
 	{
 	  gotem = 1;
@@ -553,17 +525,14 @@ explode_dofollow(explode_t *this, long int n)
     }
 
   /* If you break out here, it means you just matched x->current. */
-
   this->matchscoretime = this->current->time;
 
   /* put note in note-hang list for matching note-off later */
-
   explode_hangon(this, this->current);
 
   /* put skipped notes into skip list; output any notes in
      other channels we
      have jumped get output */
-
   for (e = evtwas; e != this->current; e = e->next)
     if (e->chan == 1) 
       {
@@ -576,18 +545,15 @@ explode_dofollow(explode_t *this, long int n)
       explode_sendevt(this, e, 1);
 
   /* output the winning note */
-
   explode_sendevt(this, this->current, 1);
 
   /* and set pointer to the note after that */
-
   this->current = this->current->next;
 }
 
 
 
 /* note-off handler for score following */
-
 static void
 explode_fnoteoff(explode_t *this, long int n)
 {
@@ -613,33 +579,47 @@ explode_fnoteoff(explode_t *this, long int n)
   this->hang = stub.next;
 }
 
-
-
-/****************************************************************************/
-/*                                                                          */
-/*                      User methods: Event handling & connect              */
-/*                                                                          */
-/****************************************************************************/
-
-
-
-/* "append" method, inlet 0, */
+/************************************************************
+ *
+ *  user methods
+ *
+ */
 
 static void
 explode_append_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
+  int i0 = 0;
+  int i1 = 0;
+  int i2 = 0;
+  int i3 = 0;
+  int i4 = 0;
 
-  explode_doappend(this,
-		   fts_get_int(&at[0]),
-		   fts_get_int(&at[1]),
-		   fts_get_int(&at[2]),
-		   fts_get_int(&at[3]),
-		   fts_get_int(&at[4]));
+  switch(ac)
+    {
+    default:
+    case 5:
+      if(fts_is_int(at + 4))
+	i4 = fts_get_int(at + 4);
+    case 4:
+      if(fts_is_int(at + 3))
+	i3 = fts_get_int(at + 3);
+    case 3:
+      if(fts_is_int(at + 2))
+	i2 = fts_get_int(at + 2);
+    case 2:
+      if(fts_is_int(at + 1))
+	i1 = fts_get_int(at + 1);
+    case 1:
+      if(fts_is_int(at + 0))
+	i0 = fts_get_int(at + 0);
+    case 0:
+      break;
+    }
+
+  explode_doappend(this, i0, i1, i2, i3, i4);
 }
 
-
-/* "stop" method, inlet 0; also called around  */
 
 static void
 explode_stop_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -649,8 +629,6 @@ explode_stop_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   explode_stop(this);
 }
 
-
-/* "start" method, inlet 0 */
 
 static void
 explode_start_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -675,8 +653,6 @@ explode_start_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 
-/* "record" method, inlet 0 */
-
 static void
 explode_record_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -687,8 +663,6 @@ explode_record_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   this->rectime = 0;
   this->serial = 0;
 }
-
-/* "follow" method, inlet 0 */
 
 static void
 explode_follow_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -712,18 +686,35 @@ explode_follow_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 
-/* "followat" method, inlet 0 */
-
 static void
 explode_followat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
+  int i0 = 0;
+  int i1 = 0;
+  int i2 = 0;
   evt_t *e;
+
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(fts_is_int(at + 2))
+	i2 = fts_get_int(at + 2);
+    case 2:
+      if(fts_is_int(at + 1))
+	i1 = fts_get_int(at + 1);
+    case 1:
+      if(fts_is_int(at + 0))
+	i0 = fts_get_int(at + 0);
+    case 0:
+      break;
+    }
 
   explode_stop(this);
   this->matchscoretime = 0;
 
-  explode_at(this, fts_get_int(at + 0), fts_get_int(at + 1), fts_get_int(at + 2));
+  explode_at(this, i0, i1, i2);
 
   e = this->current;
 
@@ -734,16 +725,33 @@ explode_followat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     this->mode = MFOLLOW;
 }
 
-/* "startat" method, inlet 0 */
-
 static void
 explode_startat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
+  int i0 = 0;
+  int i1 = 0;
+  int i2 = 0;
   evt_t *e;
 
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(fts_is_int(at + 2))
+	i2 = fts_get_int(at + 2);
+    case 2:
+      if(fts_is_int(at + 1))
+	i1 = fts_get_int(at + 1);
+    case 1:
+      if(fts_is_int(at + 0))
+	i0 = fts_get_int(at + 0);
+    case 0:
+      break;
+    }
+
   explode_stop(this);
-  explode_at(this, fts_get_int(at + 0), fts_get_int(at + 1), fts_get_int(at + 2));
+  explode_at(this, i0, i1, i2);
 
   if ((e = this->current) && e->next)
     {
@@ -753,8 +761,6 @@ explode_startat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     }
 }
 
-
-/* "nth" method, inlet 0 */
 
 static void
 explode_nth_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -773,20 +779,27 @@ explode_nth_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
 }
 
-/* "params" method, inlet 0 ??? */
-
 static void
 explode_params_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
 
-  this->nfwd  = fts_get_int(at + 0);
-  this->ftime = fts_get_int(at + 1);
-  this->oct   = fts_get_int(at + 2);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(fts_is_int(at + 2))
+	this->oct = fts_get_int(at + 2);
+    case 2:
+      if(fts_is_int(at + 1))
+      this->ftime = fts_get_int(at + 1);
+    case 1:
+      if(fts_is_int(at + 0))
+	this->nfwd = fts_get_int(at + 0);
+    case 0:
+      break;
+    }
 }
-
-/* "clear" methods, inlet 0.
-   Also called around, should be splitted in a function plus a method */
 
 static void
 explode_clear_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -795,8 +808,6 @@ explode_clear_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   explode_clear(this);
 }
-
-/* "next" method, inlet 0 */
 
 static void
 explode_next_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -823,8 +834,6 @@ explode_next_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     post("explode: next: not playing\n");
 }
 
-
-/* int/float method, inlet 0 */
 
 static void
 explode_number_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -897,8 +906,6 @@ explode_number_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
 }
 
-/* int/float method, inlet 1 */
-
 static void
 explode_number_1_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -907,8 +914,6 @@ explode_number_1_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   this->n1 = fts_get_number_int(at);
   this->set1 = 1;
 }
-
-/* int/float method, inlet 2 */
 
 static void
 explode_number_2_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -919,8 +924,6 @@ explode_number_2_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   this->set2 = 1;
 }
 
-/* int/float method, inlet 3 */
-
 static void
 explode_number_3_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -930,8 +933,6 @@ explode_number_3_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   this->set3 = 1;
 }
 
-/* int/float method, inlet 4 */
-
 static void
 explode_number_4_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -939,8 +940,6 @@ explode_number_4_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
   this->n4 = fts_get_number_int(at);
 }
-
-/* list method, inlet 0 */
 
 static void
 explode_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -982,13 +981,11 @@ explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   explode_export_midifile(this, file_name);
 }
 
-/****************************************************************************/
-/*                                                                          */
-/*                      System methods: init, delete                        */
-/*                                                                          */
-/****************************************************************************/
-
-/* init method, system inlet */
+/****************************************************
+ *
+ *  class
+ *
+ */
 
 static void
 explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1027,8 +1024,6 @@ explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     this->data.name = 0;
 }
 
-/* delete method, system inlet */
-
 static void
 explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1041,14 +1036,8 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fts_client_send_message(o, sym_destroyEditor, 0, 0);
 }
 
-
-/* Daemon of the "name" property; you can change the name of
-   an explode only if the name was not set before */
-
-static void explode_put_name_daemon(fts_daemon_action_t action,
-			     fts_object_t *obj,
-			     fts_symbol_t property,
-			     fts_atom_t *value)
+static void 
+explode_put_name_daemon(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   explode_t *this = (explode_t *)obj;
 
@@ -1078,24 +1067,8 @@ static void explode_put_name_daemon(fts_daemon_action_t action,
     }
 }
 
-/****************************************************************************/
-/*                                                                          */
-/*                      Bmax Saving and reloading                           */
-/*                                                                          */
-/****************************************************************************/
-
-/* We have special methods for bmax saving and loading; it work more or less
-   as the .pat saving, but the time is saved as absolute, i.e. the precise
-   content of the event structure is directly saved and restored.
-
-   We use the restore message and the stop message (on system inlet) to initialize
-   and end the loading, and a special append message on the system inlet to 
-   append an event
-   */
-
-
 static void
-explode_append_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_append_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
   evt_t *cur = this->current;
@@ -1126,42 +1099,35 @@ explode_append_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
 
 static void
-explode_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
-  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_message_t *mess;
   evt_t *e;
 
-  /* Code the restore message */
+  /* dump restore message */
+  fts_dumper_send(dumper, fts_s_restore, 0, 0);
 
-  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_restore, 0);
-
-  /* Loop on all the events */
-
+  /* dump the events */
   for (e = this->data.evt ; e ; e = e->next)
     {
-      /* Push directly the append argument in reverse order
-	 e->chan,  e->dur, e->vel, e->pit, e->time 
-	 */
+      /* get new dumper message */
+      mess = fts_dumper_message_new(dumper, fts_s_append);
 
-      fts_bmax_code_push_int(f, e->chan);
-      fts_bmax_code_push_int(f, e->dur);
-      fts_bmax_code_push_int(f, e->vel);
-      fts_bmax_code_push_int(f, e->pit);
-      fts_bmax_code_push_int(f, e->time);
+      /* put event */
+      fts_message_append_int(mess, e->time);
+      fts_message_append_int(mess, e->pit);
+      fts_message_append_int(mess, e->vel);
+      fts_message_append_int(mess, e->dur);
+      fts_message_append_int(mess, e->chan);
 
-      /* Code the message */
-
-      fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_append, 5);
-
-      /* Then, pop the arguments */
-
-      fts_bmax_code_pop_args(f, 5);
+      /* send dumper message */
+      fts_dumper_message_send(dumper, mess);
     }
 
-  /* Code the stop message */
-
-  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_stop, 0);
+  /* dump stop message */
+  fts_dumper_send(dumper, fts_s_stop, 0, 0);
 }
 
 static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1245,13 +1211,11 @@ static void
 explode_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* Only argument, the zero based index of the event to suppress */
-
   explode_t *this = (explode_t *)o;
   int delete = fts_get_int(at);
   evt_t **pe, *e;			/* indirect precursor */
 
   /* Find the position */
-
   pe = &(this->data.evt);
   while (delete > 0)
     {
@@ -1260,7 +1224,6 @@ explode_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 
   /* Remove it from the list and free it */
-
   e = *pe;
   (*pe)  = (*pe)->next;
   fts_heap_free((char *) e, explode_evt_heap);
@@ -1293,7 +1256,6 @@ explode_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   e->chan = fts_get_int(&at[5]);
 
   /* Look for the good position */
-
   pe = &(this->data.evt);
   while (add > 0)
     {
@@ -1302,7 +1264,6 @@ explode_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 
   /* Insert it */
-
   e->next = (*pe);
   (*pe)  = e;
 
@@ -1328,7 +1289,6 @@ explode_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   evt_t **pe, *e;			/* indirect precursor */
 
   /* First, found the event and remote it from the list */
-
   pe = &(this->data.evt);
   while (change > 0)
     {
@@ -1339,7 +1299,6 @@ explode_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   e = *pe;
 
   /* Change the event  */
-
   e->time = fts_get_int(&at[1]);
   e->pit  = fts_get_int(&at[2]);
   e->vel  = fts_get_int(&at[3]);
@@ -1368,7 +1327,6 @@ explode_change_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   evt_t **pe, *e;			/* indirect precursor */
 
   /* First, found the event and remote it from the list */
-
   pe = &(this->data.evt);
   while (change > 0)
     {
@@ -1380,17 +1338,14 @@ explode_change_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   (*pe)  = (*pe)->next;
 
   /* Change the event  */
-
   e->time = fts_get_int(&at[1]);
 
   /* Find the correct new position */
-
   pe = &(this->data.evt); 
   while (*pe && ((*pe)->time <= e->time))
     pe = &( (*pe)->next);
 
   /* Insert it */
-
   e->next = (*pe);
   (*pe)  = e;
 
@@ -1437,108 +1392,58 @@ explode_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[MAXAPPENDARGS];
   int i;
-
-  /* initialize the class */
 
   fts_class_init(cl, sizeof(explode_t), 5, 5, 0); 
 
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, explode_init_mth, 2, a, 1);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, explode_delete_mth, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, explode_init_mth);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, explode_delete_mth);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, explode_upload);
-  /* Bmax related methods */
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_restore, explode_record_mth, 0, 0); 
-  fts_method_define(cl, fts_SystemInlet, fts_s_stop, explode_stop_mth, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_restore, explode_record_mth); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_stop, explode_stop_mth);
 
-  a[0] = fts_s_int;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  a[3] = fts_s_int;
-  a[4] = fts_s_int;
-  fts_method_define(cl, fts_SystemInlet, fts_s_append, explode_append_from_bmax, 5, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, explode_append_event);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, explode_dump);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, explode_save_dotpat); 
 
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, explode_save_bmax, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, explode_number_mth);
+  fts_method_define_varargs(cl, 0, fts_s_float, explode_number_mth);
 
-  a[0] = fts_s_ptr;
-  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, explode_save_dotpat, 1, a); 
+  fts_method_define_varargs(cl, 1, fts_s_int, explode_number_1_mth);
+  fts_method_define_varargs(cl, 1, fts_s_float, explode_number_1_mth);
 
-  /* Explode number methods */
+  fts_method_define_varargs(cl, 2, fts_s_int, explode_number_2_mth);
+  fts_method_define_varargs(cl, 2, fts_s_float, explode_number_2_mth);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, explode_number_mth, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, explode_number_mth, 1, a);
+  fts_method_define_varargs(cl, 3, fts_s_int, explode_number_3_mth);
+  fts_method_define_varargs(cl, 3, fts_s_float, explode_number_3_mth);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, explode_number_1_mth, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, explode_number_1_mth, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 2, fts_s_int, explode_number_2_mth, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 2, fts_s_float, explode_number_2_mth, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 3, fts_s_int, explode_number_3_mth, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 3, fts_s_float, explode_number_3_mth, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 4, fts_s_int, explode_number_4_mth, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 4, fts_s_float, explode_number_4_mth, 1, a);
-
-  /* lists */
+  fts_method_define_varargs(cl, 4, fts_s_int, explode_number_4_mth);
+  fts_method_define_varargs(cl, 4, fts_s_float, explode_number_4_mth);
 
   fts_method_define_varargs(cl, 0, fts_s_list, explode_list_mth);
 
-  /* Other methods */
+  fts_method_define_varargs(cl, 0, fts_new_symbol("next"), explode_next_mth);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("nth"), explode_nth_mth);
 
+  fts_method_define_varargs(cl, 0, fts_s_append, explode_append_mth);
 
-  fts_method_define(cl, 0, fts_new_symbol("next"), explode_next_mth, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_clear, explode_clear_mth);
+  fts_method_define_varargs(cl, 0, fts_s_start, explode_start_mth);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("record"), explode_record_mth); 
+  fts_method_define_varargs(cl, 0, fts_s_stop, explode_stop_mth);
 
-  a[0] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("nth"), explode_nth_mth, 1, a, 0);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("follow"), explode_follow_mth);
 
-  for ( i = 0; i < MAXAPPENDARGS; i++)
-    a[i] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_s_append, explode_append_mth, MAXAPPENDARGS, a, 5);
-
-  fts_method_define(cl, 0, fts_s_clear, explode_clear_mth, 0, 0);
-  fts_method_define(cl, 0, fts_s_start, explode_start_mth, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("record"), explode_record_mth, 0, 0); 
-  fts_method_define(cl, 0, fts_s_stop, explode_stop_mth, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("follow"), explode_follow_mth, 1, a, 0);
-
-  a[0] = fts_s_int;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("startat"), explode_startat_mth, 3, a);
-
-  a[0] = fts_s_int;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("followat"), explode_followat_mth, 3, a);
-
-  a[0] = fts_s_int;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("params"), explode_params_mth, 3, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("startat"), explode_startat_mth);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("followat"), explode_followat_mth);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("params"), explode_params_mth);
 
   /* graphical editor */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), explode_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), explode_close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, explode_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, explode_close_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("hide"), explode_hide_editor);
   
   fts_method_define_varargs(cl, fts_SystemInlet, sym_add_event, explode_add);
@@ -1547,24 +1452,22 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, sym_change_time, explode_change_time);
 
   /* export standard MIDI file */
-  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), explode_export);
+  fts_method_define_varargs(cl, 0, fts_s_export, explode_export);
 
   /* Type the outlet */
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 2,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 3,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 4,	fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
+  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
+  fts_outlet_type_define_varargs(cl, 2,	fts_s_int);
+  fts_outlet_type_define_varargs(cl, 3,	fts_s_int);
+  fts_outlet_type_define_varargs(cl, 4,	fts_s_int);
 
   /* Add the rename daemon */
-
   fts_class_add_daemon(cl, obj_property_put, fts_s_name, explode_put_name_daemon);
-
-  /* daemon for data property */
 
   return fts_Success;
 }
+
+void explay_config(void);
 
 void
 explode_config(void)

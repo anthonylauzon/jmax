@@ -57,24 +57,12 @@ mtof_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static fts_status_t
 mtof_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(mtof_t), 1, 1, 0); 
 
-  /* methods */
+  fts_method_define_varargs(cl, 0, fts_s_int, mtof_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, mtof_float);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, mtof_int, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, mtof_float, 1, a);
-
-  /* Type the outlet */
-
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0,	fts_s_float, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_float);
 
   return fts_Success;
 }

@@ -48,44 +48,56 @@ static void
 matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matrix_t *this = (matrix_t *)o;
-  int n_ins = fts_get_int(at + 1); /* # of ins */
-  int n_outs = fts_get_int(at + 2); /* # of outs */
-  float def_time = fts_get_float_arg(ac, at, 3, 0.0f);
-  fts_ramp_t *ramps;
-  int n, in, out, i;
-
-  /* buffer for FTL arguments */
-  this->ftl_args = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * (5 + n_ins + n_outs));
-
-  /* get minimum of n_ins/n_outs */
-  n = (n_ins < n_outs)? n_ins: n_outs;
   
-  /* allocate array of buffer pointers */
-  this->bufs = (float **)fts_malloc(sizeof(float *) * n);
-  for(i=0; i<n; i++)
-    this->bufs[i] = 0;
+  ac--;
+  at++;
 
-  /* allocate ramps */
-  this->ramps = ftl_data_alloc(sizeof(fts_ramp_t) * n_outs * n_ins);
-  ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
-
-  /* initialize ramps */
-  for(out=0; out<n_outs; out++)
+  if(ac > 1 && fts_is_int(at) && fts_is_int(at + 1))
     {
-      for(in=0; in<n_ins; in++)
-	{
-	  fts_ramp_t *ramp = ramps + out * n_ins + in;
-	  fts_ramp_init(ramp, 0.0);
-	}
-    }
-  
-  this->n_ins = n_ins;
-  this->n_outs = n_outs;
-  this->def_time = def_time;
-  this->cr = 1.0f; /* will be properly set in the put routine */
-  this->n_tick = 0;
+      int n_ins = fts_get_int(at); /* # of ins */
+      int n_outs = fts_get_int(at + 1); /* # of outs */
+      float def_time = 0.0;
+      fts_ramp_t *ramps;
+      int n, in, out, i;
+      
+      if(ac > 2 && fts_is_number(at + 2))
+	def_time = fts_get_number_float(at + 2);
 
-  dsp_list_insert(o);
+      /* buffer for FTL arguments */
+      this->ftl_args = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * (5 + n_ins + n_outs));
+      
+      /* get minimum of n_ins/n_outs */
+      n = (n_ins < n_outs)? n_ins: n_outs;
+      
+      /* allocate array of buffer pointers */
+      this->bufs = (float **)fts_malloc(sizeof(float *) * n);
+      for(i=0; i<n; i++)
+	this->bufs[i] = 0;
+      
+      /* allocate ramps */
+      this->ramps = ftl_data_alloc(sizeof(fts_ramp_t) * n_outs * n_ins);
+      ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+      
+      /* initialize ramps */
+      for(out=0; out<n_outs; out++)
+	{
+	  for(in=0; in<n_ins; in++)
+	    {
+	      fts_ramp_t *ramp = ramps + out * n_ins + in;
+	      fts_ramp_init(ramp, 0.0);
+	    }
+	}
+      
+      this->n_ins = n_ins;
+      this->n_outs = n_outs;
+      this->def_time = def_time;
+      this->cr = 1.0f; /* will be properly set in the put routine */
+      this->n_tick = 0;
+      
+      dsp_list_insert(o);
+    }
+  else
+    fts_object_set_error(o, "Matrix dimension arguments required");
 }
 
 static void matrix_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -333,7 +345,6 @@ matrix_all(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 static fts_status_t 
 matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[6];
   int n_ins = fts_get_int_arg(ac, at, 1, 0);
   int n_outs = fts_get_int_arg(ac, at, 2, 0);
   int i, j;
@@ -343,38 +354,14 @@ matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(matrix_t), n_ins + 1, n_outs, 0);
   
-  /* system methods */
-  a[0] = fts_s_symbol; /* class */
-  a[1] = fts_s_int; /* # of ins */
-  a[2] = fts_s_int; /* # of outs */
-  a[3] = fts_s_number; /* opt: default fade time */
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, matrix_init, 4, a, 3);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, matrix_delete, 0, 0);
-  
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("put"), matrix_put, 1, a);
-
-  /* user methods */
-
-  a[0] = fts_s_int; /* in */
-  a[1] = fts_s_int; /* out */
-  a[2] = fts_s_number; /* level */
-  a[3] = fts_s_number; /* opt: fade time */
-  fts_method_define_optargs(cl, n_ins, fts_s_list, matrix_node, 4, a, 3);
-
-  a[0] = fts_s_int; /* in */
-  a[1] = fts_s_number; /* level */
-  a[2] = fts_s_number; /* opt: fade time */
-  fts_method_define_optargs(cl, n_ins, fts_new_symbol("in"), matrix_in, 3, a, 2);
-
-  a[0] = fts_s_int; /* out */
-  a[1] = fts_s_number; /* level */
-  a[2] = fts_s_number; /* opt: fade time */
-  fts_method_define_optargs(cl, n_ins, fts_new_symbol("out"), matrix_out, 3, a, 2);
-
-  a[0] = fts_s_number; /* level */
-  a[1] = fts_s_number; /* opt: fade time */
-  fts_method_define_optargs(cl, n_ins, fts_new_symbol("all"), matrix_all, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, matrix_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, matrix_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), matrix_put);
+    
+  fts_method_define_varargs(cl, n_ins, fts_s_list, matrix_node);
+  fts_method_define_varargs(cl, n_ins, fts_new_symbol("in"), matrix_in);
+  fts_method_define_varargs(cl, n_ins, fts_new_symbol("out"), matrix_out);
+  fts_method_define_varargs(cl, n_ins, fts_new_symbol("all"), matrix_all);
     
   /* dsp in/outlets */
   for(i=0; i<n_ins; i++)

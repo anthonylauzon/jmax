@@ -138,27 +138,15 @@ sigsamphold_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static fts_status_t
 sigsamphold_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(sigsamphold_t), 2, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_float;
-  a[2] = fts_s_float;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigsamphold_init, 3, a, 1);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigsamphold_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigsamphold_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigsamphold_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigsamphold_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigsamphold_put);
   
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sigsamphold_number, 1, a);
-  
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sigsamphold_number, 1, a);
-  
-  fts_method_define(cl, 0, fts_new_symbol("reset"), sigsamphold_reset, 0, a);
+  fts_method_define_varargs(cl, 0, fts_s_float, sigsamphold_number);
+  fts_method_define_varargs(cl, 0, fts_s_int, sigsamphold_number);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), sigsamphold_reset);
   
   dsp_sig_inlet(cl, 0);
   dsp_sig_inlet(cl, 1);

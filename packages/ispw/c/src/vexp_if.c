@@ -244,13 +244,13 @@ static fts_status_t
 expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   const char *buf;
-  fts_symbol_t a[4];
   struct expr *x;
   int i, mark;
   int varnum;
   struct ex_ex *eptr;
 
-  ac--;at++;			/* throw away the class name argument */
+  ac--;
+  at++;
   
   if (!ac)
     return &fts_ArgumentMissing;
@@ -267,7 +267,6 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
 
   /* computing the var number, before initing the class */
-
   mark = 0;
   varnum = 0;
   for (i = MAX_VARS-1, eptr = &x->exp_var[MAX_VARS-1]; i >= 0 ; i--, eptr--)
@@ -278,26 +277,16 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       }
 
   /* declaring the class */
-
   fts_class_init(cl, sizeof(t_expr), (varnum ? varnum : 1), 1, (void *)x);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, expr_init, 2, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, expr_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, expr_delete);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, expr_delete, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_int, expr_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, expr_float);
+  fts_method_define_varargs(cl, 0, fts_s_bang, expr_bang);
 
-  a[0] = fts_s_number;
-  fts_method_define(cl, 0, fts_s_int, expr_int, 1, a);
-
-  a[0] = fts_s_number;
-  fts_method_define(cl, 0, fts_s_float, expr_float, 1, a);
-
-  fts_method_define(cl, 0, fts_s_bang, expr_bang, 0, a);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, expr_symbol, 1, a);
-
+  fts_method_define_varargs(cl, 0, fts_s_symbol, expr_symbol);
   fts_method_define_varargs(cl, 0, fts_s_list, expr_list);
 
   mark = 0;
@@ -308,30 +297,26 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	case 0:
 	  if (mark)
 	    {
-	      a[0] = fts_s_number;
-	      fts_method_define(cl, i, fts_s_int, expr_setint, 1, a);
-	      fts_method_define(cl, i, fts_s_float, expr_setint, 1, a);
+	      fts_method_define_varargs(cl, i, fts_s_int, expr_setint);
+	      fts_method_define_varargs(cl, i, fts_s_float, expr_setint);
 	    }
 	  break;
 
 	case ET_II:
 	  mark = 1;
-	  a[0] = fts_s_number;
-	  fts_method_define(cl, i, fts_s_int, expr_setint, 1, a);
-	  fts_method_define(cl, i, fts_s_float, expr_setint, 1, a);
+	  fts_method_define_varargs(cl, i, fts_s_int, expr_setint);
+	  fts_method_define_varargs(cl, i, fts_s_float, expr_setint);
 	  break;
 
 	case ET_FI:
 	  mark = 1;
-	  a[0] = fts_s_number;
-	  fts_method_define(cl, i, fts_s_float, expr_setfloat, 1, a);
-	  fts_method_define(cl, i, fts_s_int, expr_setfloat, 1, a);
+	  fts_method_define_varargs(cl, i, fts_s_float, expr_setfloat);
+	  fts_method_define_varargs(cl, i, fts_s_int, expr_setfloat);
 	  break;
 
 	case ET_SI:
 	  mark = 1;
-	  a[0] = fts_s_symbol;
-	  fts_method_define(cl, i, fts_s_symbol, expr_setsymb, 1, a);
+	  fts_method_define_varargs(cl, i, fts_s_symbol, expr_setsymb);
 	  break;
 
 	default:
@@ -343,14 +328,8 @@ expr_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-/* For the moment, expr is never equiv
-   fts_args_equiv screw up everything for float args;
-   actually this require a special equiv function, that will
-   be written once we a reasonable parser for the expr objects.
- */
-
 void
 expr_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("expr"),expr_instantiate, fts_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("expr"),expr_instantiate, fts_never_equiv);
 }

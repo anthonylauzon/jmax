@@ -270,44 +270,23 @@ sigcoef_bpass2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static fts_status_t
 sigcoef_bpass2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(sigcoef_bpass2_t), 3, 6, 0); 
 
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_float;
-  a[2] = fts_s_float;
-  a[3] = fts_s_float;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigcoef_bpass2_init, 4, a, 1);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigcoef_bpass2_delete, 0, 0);
-
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigcoef_bpass2_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigcoef_bpass2_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigcoef_bpass2_put);
 
-  /* Sigcoef_Bpass2 args */
+  fts_method_define_varargs(cl, 0, fts_s_bang, sigcoef_bpass2_bang);
+  fts_method_define_varargs(cl, 0, fts_s_float, sigcoef_bpass2_float);
+  fts_method_define_varargs(cl, 1, fts_s_float, sigcoef_bpass2_float_1);
+  fts_method_define_varargs(cl, 2, fts_s_float, sigcoef_bpass2_float_2);
 
-  fts_method_define(cl, 0, fts_s_bang, sigcoef_bpass2_bang, 0, 0);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sigcoef_bpass2_float, 1, a);
-  fts_method_define(cl, 1, fts_s_float, sigcoef_bpass2_float_1, 1, a);
-  fts_method_define(cl, 2, fts_s_float, sigcoef_bpass2_float_2, 1, a);
-
-  /* Type the outlet */
-
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0,	fts_s_float, 1, a);
-  fts_outlet_type_define(cl, 1,	fts_s_float, 1, a);
-  fts_outlet_type_define(cl, 2,	fts_s_float, 1, a);
-  fts_outlet_type_define(cl, 3,	fts_s_float, 1, a);
-  fts_outlet_type_define(cl, 4,	fts_s_float, 1, a);
-  fts_outlet_type_define(cl, 5,	fts_s_float, 1, a);
-
-  /* define the first inlet as dsp */
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_float);
+  fts_outlet_type_define_varargs(cl, 1,	fts_s_float);
+  fts_outlet_type_define_varargs(cl, 2,	fts_s_float);
+  fts_outlet_type_define_varargs(cl, 3,	fts_s_float);
+  fts_outlet_type_define_varargs(cl, 4,	fts_s_float);
+  fts_outlet_type_define_varargs(cl, 5,	fts_s_float);
 
   dsp_sig_inlet(cl, 0);
 
@@ -317,7 +296,7 @@ sigcoef_bpass2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 sigcoef_bpass2_config(void)
 {
-  fts_class_install(fts_new_symbol("coef_bpass2~"),sigcoef_bpass2_instantiate);
+  fts_class_install(fts_new_symbol("coef_bpass2~"), sigcoef_bpass2_instantiate);
 }
 
 

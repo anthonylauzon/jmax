@@ -250,8 +250,5 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 pipe_config(void)
 {
-  fts_s_clear = fts_new_symbol("clear");
-  fts_s_flush = fts_new_symbol("flush");
-
-  fts_metaclass_install(fts_new_symbol("pipe"), pipe_instantiate, fts_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("pipe"), pipe_instantiate, fts_narg_equiv);
 }

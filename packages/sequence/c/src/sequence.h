@@ -58,11 +58,14 @@ typedef struct _sequence_
   fts_array_t array;
 
   int open; /* flag: is 1 if sequence editor is open */
-  track_t *currently_loaded_event_track; /* its more like a hack for loading bmax files */
+  track_t *last_track; /* last created track */
+
+  fts_symbol_t keep;
 } sequence_t;
 
 #define sequence_get_size(s) ((s)->size)
 #define sequence_get_first_track(s) ((s)->tracks)
+#define sequence_get_keep(s) ((s)->keep)
 
 #define sequence_set_editor_open(s) ((s)->open = 1)
 #define sequence_set_editor_close(s) ((s)->open = 0)

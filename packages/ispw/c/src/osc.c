@@ -59,22 +59,24 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t wrap_mode = fts_get_symbol_arg(ac, at, 2, 0);
 
-  if(!name)
-    return;
-
-  fts_set_symbol( &k, name);
-  if (fts_hashtable_get( sigtab1_ht, &k, &data))
-    {
-      this->wavetab = (wavetab_t *)fts_get_ptr(&data);
-      this->wavetab->refcnt++;
+  if(name)
+    {    
+      fts_set_symbol( &k, name);
+      if (fts_hashtable_get( sigtab1_ht, &k, &data))
+	{
+	  this->wavetab = (wavetab_t *)fts_get_ptr(&data);
+	  this->wavetab->refcnt++;
+	}
+      else
+	{
+	  this->wavetab = wavetable_new(name, wrap_mode);
+	  
+	  fts_set_ptr(&data, this->wavetab);
+	  fts_hashtable_put(sigtab1_ht, &k, &data);
+	}
     }
   else
-    {
-      this->wavetab = wavetable_new(name, wrap_mode);
-
-      fts_set_ptr(&data, this->wavetab);
-      fts_hashtable_put(sigtab1_ht, &k, &data);
-    }
+    fts_object_set_error(o, "Name argument required");
 }
 
 static void
@@ -99,17 +101,13 @@ sigtab1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(sigtab1_t), 1, 0, 0);
 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigtab1_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigtab1_delete);
+
+  fts_method_define_varargs(cl, 0, fts_s_bang, sigtab1_reload);
+  
   wavetable_init();
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigtab1_init, 3, a, 1);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigtab1_delete, 0, a);
-
-  fts_method_define(cl, 0, fts_s_bang, sigtab1_reload, 0, a);
-  
   return fts_Success;
 }
 
@@ -251,33 +249,16 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
 static fts_status_t
 osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(osc_t), 2, 1, 0);
 
-  /* System methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, osc_put);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, osc_init, 2, a, 1);
+  fts_method_define_varargs(cl, 0, fts_s_set, osc_set);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, osc_delete, 0, 0);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, osc_put, 1, a);
-
-  /* User method */
-
-  a[0] = fts_s_symbol;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("set"), osc_set, 1, a, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, osc_number, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, osc_number, 1, a);
-
-  /* DSP declarations */
+  fts_method_define_varargs(cl, 0, fts_s_int, osc_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, osc_number);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_inlet(cl, 1);

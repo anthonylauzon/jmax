@@ -80,17 +80,17 @@ vec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-vec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
 
-  if(ac > 2 && fts_is_number(at) && fts_is_number(at + 1))
+  if(ac > 1 && fts_is_number(at))
     {
       int size = vec_get_size(this);
       int i = fts_get_number_int(at);
 
       if(i >= 0 && i < size)
-	vec_set_from_atom_list(this, i, ac - 2, at + 2);
+	vec_set_with_onset_from_atoms(this, i, ac - 1, at + 1);
     }
 }
 
@@ -129,9 +129,7 @@ vec_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(file_format == sym_text)
     {
-      int size = 0;
-
-      size = vec_read_atom_file(this, file_name);
+      int size = vec_read_atom_file(this, file_name);
 
       if(size <= 0)
 	post("vec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
@@ -152,9 +150,7 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(file_format == sym_text)
     {
-      int size = 0;
-
-      size = vec_write_atom_file(this, file_name);
+      int size = vec_write_atom_file(this, file_name);
 
       if(size < 0)
 	post("vec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
@@ -164,7 +160,7 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-vec_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
   fts_atom_t *values = vec_get_ptr(this);
@@ -182,31 +178,57 @@ vec_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
-vec_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vec_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
 
-  vec_set_from_atom_list(this, 0, ac, at);
+  vec_set_with_onset_from_atoms(this, 0, ac, at);
 }
 
 static void
-vec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
+  mat_copy(mat_atom_get(at), (mat_t *)o);
+}
 
-  if (cmd == fts_s_object)
-    fts_object_blip(o, "vec of values");
-  else if (cmd == fts_s_inlet)
+static void
+vec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
+  fts_atom_t *values = vec_get_ptr(this);
+  int size = vec_get_size(this);
+  fts_message_t *mess;
+  int i;
+
+  /* send size message */
+  mess = fts_dumper_message_new(dumper, fts_s_size);  
+  fts_message_append_int(mess, size);
+  fts_dumper_message_send(dumper, mess);
+
+  /* get new set message and append onset 0 */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_append_int(mess, 0);
+  
+  for(i=0; i<size; i++)
     {
-      int n = fts_get_int_arg(ac, at, 1, 0);
-
-      switch(n)
+      if(fts_is_object(values + i))
+	fts_message_append_int(mess, 0);
+      else
+	fts_message_append(mess, 1, values + i);
+      
+      if(fts_message_get_ac(mess) >= 256)
 	{
-	case 0:
-	  fts_object_blip(o, "vec commands");
-	  break;
+	  fts_dumper_message_send(dumper, mess);
+
+	  /* new set message and append onset i + 1 */
+	  mess = fts_dumper_message_new(dumper, fts_s_set);
+	  fts_message_append_int(mess, i + 1);
 	}
     }
+  
+  if(fts_message_get_ac(mess) > 1) 
+    fts_dumper_message_send(dumper, mess);
 }
 
 /********************************************************
@@ -299,6 +321,23 @@ vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
+vec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  vec_t *this = (vec_t *)obj;
+
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
+}
+
+static void
+vec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  vec_t *this = (vec_t *)obj;
+
+  fts_set_symbol(value, this->keep);
+}
+
+static void
 vec_get_vec(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   vec_t *this = (vec_t *)obj;
@@ -320,23 +359,31 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   ac--;
   at++;
 
+  this->keep = fts_s_no;
+
   if(ac == 0)
     mat_alloc((mat_t *)this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
     mat_alloc((mat_t *)this, fts_get_int(at), 1);
-  else if(ac == 1 && fts_is_list(at))
+  else if(ac == 1 && fts_is_array(at))
     {
       fts_array_t *aa = fts_get_array(at);
       int size = fts_array_get_size(aa);
       
       mat_alloc((mat_t *)this, size, 1);
-      vec_set_from_atom_list(this, 0, size, fts_array_get_atoms(aa));
+      vec_set_with_onset_from_atoms(this, 0, size, fts_array_get_atoms(aa));
+
+      this->keep = fts_s_args;
     }
   else if(ac > 1)
     {
       mat_alloc((mat_t *)this, ac, 1);
-      vec_set_from_atom_list(this, 0, ac, at);
+      vec_set_with_onset_from_atoms(this, 0, ac, at);
+
+      this->keep = fts_s_args;
     }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void
@@ -347,55 +394,45 @@ vec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   mat_free((mat_t *)this);
 }
 
-static int
-vec_check(int ac, const fts_atom_t *at)
-{
-  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_list(at))) || ac > 1);
-}
-
 static fts_status_t
 vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(vec_check(ac - 1, at + 1))
-    {
-      fts_class_init(cl, sizeof(vec_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(vec_t), 1, 1, 0);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vec_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vec_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vec_delete);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, vec_set_elements);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, vec_set_from_instance);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, vec_set_from_array);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, vec_append_state_to_array);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, vec_set_state_from_array);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, vec_print); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), vec_assist); 
-      
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, vec_get_vec);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, vec_size);
 
-      /* user methods */
-      fts_method_define_varargs(cl, 0, fts_s_bang, vec_output);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), vec_clear);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), vec_fill);      
-      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), vec_set);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("size"), vec_size);
-            
-      fts_method_define_varargs(cl, 0, fts_new_symbol("import"), vec_import); 
-      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), vec_export); 
-
-      /* type outlet */
-      fts_outlet_type_define(cl, 0, vec_symbol, 1, &vec_type);
-
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
-
-}
-
-static int
-vec_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return vec_check(ac1 - 1, at1 + 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, vec_get_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, vec_dump);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, vec_print); 
+  
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, vec_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, vec_get_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, vec_get_vec);
+  
+  /* user methods */
+  fts_method_define_varargs(cl, 0, fts_s_bang, vec_output);
+  
+  fts_method_define_varargs(cl, 0, fts_s_clear, vec_clear);
+  fts_method_define_varargs(cl, 0, fts_s_fill, vec_fill);      
+  fts_method_define_varargs(cl, 0, fts_s_set, vec_set_elements);
+  
+  fts_method_define_varargs(cl, 0, fts_s_size, vec_size);
+  
+  fts_method_define_varargs(cl, 0, fts_s_import, vec_import); 
+  fts_method_define_varargs(cl, 0, fts_s_export, vec_export); 
+  
+  /* type outlet */
+  fts_outlet_type_define(cl, 0, vec_symbol, 1, &vec_type);
+  
+  return fts_Success;
 }
 
 void
@@ -405,7 +442,7 @@ vec_config(void)
   vec_symbol = fts_new_symbol("vec");
   vec_type = vec_symbol;
 
-  fts_metaclass_install(vec_symbol, vec_instantiate, vec_equiv);
+  fts_class_install(vec_symbol, vec_instantiate);
   vec_class = fts_class_get_by_name(vec_symbol);
 
   fts_atom_type_register(vec_symbol, vec_class);

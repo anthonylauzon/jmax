@@ -753,7 +753,9 @@ fts_package_save_hashtable( fts_bmax_file_t *f, fts_hashtable_t *ht, fts_symbol_
       if (fun != NULL)
 	(*fun)(a+1);
 
-      fts_bmax_save_message( f, selector, 2, a);
+      fts_bmax_code_push_atoms(f, 2, a);
+      fts_bmax_code_obj_mess(f, fts_SystemInlet, selector, 2);
+      fts_bmax_code_pop_args(f, 2);
     }
 }
 
@@ -1064,7 +1066,7 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_help, __fts_package_help);
   fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
 
-  /* All these methods are also defined for SystemInlet, as fts_bmax_save_message
+  /* All these methods are also defined for SystemInlet, as bmax saving
      allows only messages to SystemInlet... 
   */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_require, __fts_package_require);
@@ -1151,7 +1153,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
 
   /* Send a "print" message to the result */
-  if ( (status = fts_message_send( obj, 0, fts_s_print, 0, 0)) != fts_Success)
+  if ( (status = fts_send_message( obj, 0, fts_s_print, 0, 0)) != fts_Success)
     post( "Message send failed (%s)\n", fts_status_get_description(status));
 
   if (fts_object_get_class(obj) == fts_package_class) {

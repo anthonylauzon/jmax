@@ -158,24 +158,16 @@ prepend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 prepend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
-  
   fts_class_init(cl, sizeof(prepend_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, prepend_init);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, prepend_delete, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, prepend_list, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, prepend_list, 1, a);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, prepend_list, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, prepend_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_set, prepend_set);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, prepend_list);
+  fts_method_define_varargs(cl, 0, fts_s_float, prepend_list);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, prepend_list);
   fts_method_define_varargs(cl, 0, fts_s_list, prepend_list);
   fts_method_define_varargs(cl, 0, fts_s_anything, prepend_anything);
 

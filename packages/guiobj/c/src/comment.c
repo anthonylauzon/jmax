@@ -71,12 +71,9 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 
 static fts_status_t comment_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_type_t t[1];
-
   fts_class_init(cl, sizeof( fts_object_t), 0, 0, 0);
 
-  t[0] = fts_t_ptr;
-  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, comment_save_dotpat, 1, t); 
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, comment_save_dotpat); 
 
   return fts_Success;
 }

@@ -44,35 +44,12 @@ time_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_outlet_float(o, 0, fts_get_time());
 }
 
-static void
-time_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  timeobj_t *x = (timeobj_t *)o;
-}
-
 static fts_status_t
 time_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
+  fts_class_init(cl, sizeof(timeobj_t), 1, 1, 0);
 
-  /* initialize the class */
-
-  fts_class_init(cl, sizeof(timeobj_t), 2, 1, 0); 
-
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, time_init, 2, a, 1);
-
-  /* user methods */
-
-  fts_method_define(cl, 0, fts_s_bang, time_bang, 0, 0);
-
-  /* Type the outlet */
-
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, time_bang);
 
   return fts_Success;
 }

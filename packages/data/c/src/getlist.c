@@ -65,7 +65,7 @@ getlist_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       getlist_t *this = (getlist_t *)o;
       fts_object_t *input = fts_get_object(at);
       fts_class_t *class = fts_object_get_class(input);
-      fts_method_t method = fts_class_get_method(class, fts_SystemInlet, fts_s_append_state_to_array);
+      fts_method_t method = fts_class_get_method(class, fts_SystemInlet, fts_s_get_array);
 
       if(method)
 	{
@@ -75,7 +75,7 @@ getlist_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	  /* get object state as array */
 	  fts_set_array(&a, &this->list);
-	  fts_message_send(input, fts_SystemInlet, fts_s_append_state_to_array, 1, &a);
+	  method(input, 0, fts_s_get_array, 1, &a);
 	  
 	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 	}

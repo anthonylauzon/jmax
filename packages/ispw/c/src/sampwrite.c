@@ -38,29 +38,36 @@
 typedef struct
 {
   fts_object_t _o;
-
-  fts_symbol_t   tab_name;
-
-  ftl_data_t     sampwrite_data;
+  fts_symbol_t tab_name;
+  ftl_data_t sampwrite_data;
 } sampwrite_t;
 
 static void
 sampwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sampwrite_t *this = (sampwrite_t *)o;
-  fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
-  sampbuf_t *null = 0;
-  long l;
 
-  this->tab_name = tab_name;
-  this->sampwrite_data = ftl_data_new(sampwrite_ctl_t);
+  ac--;
+  at++;
 
-  ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, buf, &null);
-
-  l = 0x7fffffff;
-  ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, onset, &l);
-
-  dsp_list_insert(o);
+  if(ac > 0 && fts_is_symbol(at))
+    {
+      fts_symbol_t tab_name = fts_get_symbol(at);
+      sampbuf_t *null = 0;
+      long l;
+      
+      this->tab_name = tab_name;
+      this->sampwrite_data = ftl_data_new(sampwrite_ctl_t);
+      
+      ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, buf, &null);
+      
+      l = 0x7fffffff;
+      ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, onset, &l);
+      
+      dsp_list_insert(o);
+    }
+  else
+    fts_object_set_error(o, "Name argument required");
 }
 
 static void
@@ -179,33 +186,18 @@ sampwrite_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const
 static fts_status_t
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(sampwrite_t), 1, 0, 0);
 
-  a[0] = fts_s_symbol; /* class */
-  a[1] = fts_s_symbol; /* name of tab_name */
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sampwrite_init, 2, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sampwrite_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sampwrite_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sampwrite_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sampwrite_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sampwrite_put);
   
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_set, sampwrite_set, 1, a);
-  
-  fts_method_define(cl, 0, fts_s_bang, sampwrite_bang, 0, a);
-  
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sampwrite_set_by_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_set, sampwrite_set);  
+  fts_method_define_varargs(cl, 0, fts_s_bang, sampwrite_bang);
+  fts_method_define_varargs(cl, 0, fts_s_int, sampwrite_set_by_int);
   
   dsp_sig_inlet(cl, 0);
 
-  /* DSP properties  */
-
-  /* fts_class_put_prop(cl, fts_s_dsp_is_sink, fts_true); */
-  
   return fts_Success;
 }
 
@@ -217,4 +209,3 @@ sampwrite_config(void)
   dsp_symbol = fts_new_symbol("sampwrite");
   dsp_declare_function(dsp_symbol, ftl_sampwrite);
 }
-

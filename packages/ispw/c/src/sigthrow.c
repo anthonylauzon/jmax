@@ -49,24 +49,32 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_atom_t a, k;
 
-  fts_set_symbol( &k, name);
-
-  if ( name && fts_symbol_name(name) != "" && fts_hashtable_get(&catch_table, &k, &a))
-    {
-      post("catch~: duplicated name: %s (last ignored)\n", fts_symbol_name(name));
-      this->name = 0;
-    }
-  else
-    {
-      fts_set_ptr(&a, this);
-      fts_hashtable_put(&catch_table, &k, &a);
-
-      this->name = name;
-      dsp_list_insert(o);
-    }
+  ac--;
+  at++;
 
   this->buf = 0;
   this->n_tick = 0;
+
+  if(ac > 0 && fts_is_symbol(at))
+    {
+      fts_set_symbol( &k, name);
+      
+      if (fts_symbol_name(name) != "" && fts_hashtable_get(&catch_table, &k, &a))
+	{
+	  post("catch~: duplicated name: %s (last ignored)\n", fts_symbol_name(name));
+	  this->name = 0;
+	}
+      else
+	{
+	  fts_set_ptr(&a, this);
+	  fts_hashtable_put(&catch_table, &k, &a);
+	  
+	  this->name = name;
+	  dsp_list_insert(o);
+	}
+    }
+  else
+    fts_object_set_error(o, "Name argument required");
 }
 
 static void
@@ -172,18 +180,11 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 sigcatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(sigcatch_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigcatch_init, 2, a, 1);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigcatch_delete, 0, a);
-
-  a[0] = fts_s_ptr; 
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigcatch_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigcatch_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigcatch_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigcatch_put);
  
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
@@ -376,24 +377,14 @@ sigthrow_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(sigthrow_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigthrow_init, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigthrow_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigthrow_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigthrow_put);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigthrow_delete, 0, a);
-
-  a[0] = fts_s_ptr; 
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigthrow_put, 1, a);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_set, sigthrow_set, 1, a);
- 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sigthrow_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_set, sigthrow_set);
+  fts_method_define_varargs(cl, 0, fts_s_int, sigthrow_int);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);

@@ -123,12 +123,12 @@ public interface TrackDataModel {
      * deletes an event from the database
      * @param theEvent the TrackEvent to be removed
      */
-    public abstract void removeEvent(TrackEvent theEvent);
-    public abstract void removeEvents(Enumeration events);
+    public abstract void deleteEvent(TrackEvent theEvent);
+    public abstract void deleteEvents(Enumeration events);
     /**
      * Deletes all the events 
      */
-    public abstract void removeAllEvents();
+    public abstract void deleteAllEvents();
     
     /**
      * requires to be notified when the database changes

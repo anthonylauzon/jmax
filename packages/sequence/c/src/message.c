@@ -90,7 +90,7 @@ message_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
  */
 
 static void
-message_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *)o;
   
@@ -99,7 +99,7 @@ message_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 }
 
 void 
-message_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *)o;
   fts_array_t *array = fts_get_array(at);
@@ -141,8 +141,8 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, message_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, message_append_state_to_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, message_set_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, message_get_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, message_set_from_array);
 
   return fts_Success;
 }

@@ -272,46 +272,21 @@ void pt_common_delete(pt_common_obj_t *x)
 
 void pt_common_instantiate(fts_class_t *cl)
 {
-   fts_symbol_t a[4];
-
-   a[0] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("reference-pitch"), pt_common_meth_ref_pitch, 1, a, 0);
-
-   a[0] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("reference-freq"), pt_common_meth_ref_freq, 1, a, 0);
-
-   a[0] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("rough-pitch"), pt_common_meth_rough_pitch, 1, a, 0);
-
-   a[0] = fts_s_number;
-   a[1] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("pitch-range"), pt_common_meth_pitch_range, 2, a, 0);
-
-   a[0] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("stick"), pt_common_meth_stick, 1, a, 0);
-
-   a[0] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("stretch"), pt_common_meth_stretch, 1, a, 0);
-
+   fts_method_define_varargs(cl, 0, fts_new_symbol("reference-pitch"), pt_common_meth_ref_pitch);
+   fts_method_define_varargs(cl, 0, fts_new_symbol("reference-freq"), pt_common_meth_ref_freq);
+   fts_method_define_varargs(cl, 0, fts_new_symbol("rough-pitch"), pt_common_meth_rough_pitch);
+   fts_method_define_varargs(cl, 0, fts_new_symbol("pitch-range"), pt_common_meth_pitch_range);
+   fts_method_define_varargs(cl, 0, fts_new_symbol("stick"), pt_common_meth_stick);
+   fts_method_define_varargs(cl, 0, fts_new_symbol("stretch"), pt_common_meth_stretch);
    fts_method_define_varargs(cl, 0, fts_new_symbol("coefs"), pt_common_meth_coefs);
-
-   a[0] = fts_s_number;
-   a[1] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("amp-range"), pt_common_meth_amp_range, 2, a, 0);
-
-   a[0] = fts_s_number;
-   a[1] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("quality-range"), pt_common_meth_quality_range, 2, a, 0);
-
-   a[0] = fts_s_number;
-   fts_method_define_optargs(cl, 0, fts_new_symbol("debounce-time"), pt_common_meth_debouncetime, 1, a, 0);
-   
+   fts_method_define_varargs(cl, 0, fts_new_symbol("amp-range"), pt_common_meth_amp_range);
+   fts_method_define_varargs(cl, 0, fts_new_symbol("quality-range"), pt_common_meth_quality_range);
+   fts_method_define_varargs(cl, 0, fts_new_symbol("debounce-time"), pt_common_meth_debouncetime);
    fts_method_define_varargs(cl, 0, fts_new_symbol("pt_common_tune"), pt_common_meth_obsolete);
    fts_method_define_varargs(cl, 0, fts_new_symbol("ampl_threshold"), pt_common_meth_obsolete);
    fts_method_define_varargs(cl, 0, fts_new_symbol("quality_threshold"), pt_common_meth_obsolete);
-   
-   a[0] = fts_s_int;
-   fts_method_define(cl, 0, fts_new_symbol("print-kernel"), pt_common_meth_print_kernel, 1, a);
+
+   fts_method_define_varargs(cl, 0, fts_new_symbol("print-kernel"), pt_common_meth_print_kernel);
 
    pt_common_init_millers_dumsqrt();
 }

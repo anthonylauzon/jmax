@@ -52,9 +52,7 @@ ISPW_API void fts_atom_list_iterator_next( fts_atom_list_iterator_t *iter);
 ISPW_API int fts_atom_list_iterator_end( const fts_atom_list_iterator_t *iter);
 ISPW_API fts_atom_t *fts_atom_list_iterator_current( const fts_atom_list_iterator_t *iter);
 
-/* Save to bmax */
-
-ISPW_API void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_object_t *target);
+ISPW_API void fts_atom_list_dump(fts_atom_list_t *list, fts_dumper_t *dump, fts_object_t *target);
 
 /* Generic find support */
 

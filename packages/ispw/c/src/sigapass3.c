@@ -50,7 +50,7 @@ sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   float zero = 0.0f;
   float one = 1.0f;
 
-  this->biquad_state = ftl_data_new(biquad_df1_state_t);
+  this->biquad_state = ftl_data_new(biquad_state_t);
   this->biquad_coefs = ftl_data_new(biquad_coefs_t);
 
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, a0, &zero);
@@ -92,10 +92,10 @@ sigapass3_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   float conv;
   float zero = 0.0;
 
-  ftl_data_set(biquad_df1_state_t, this->biquad_state, xnm1, &zero);
-  ftl_data_set(biquad_df1_state_t, this->biquad_state, xnm2, &zero);
-  ftl_data_set(biquad_df1_state_t, this->biquad_state, ynm1, &zero);
-  ftl_data_set(biquad_df1_state_t, this->biquad_state, ynm2, &zero);
+  ftl_data_set(biquad_state_t, this->biquad_state, xnm1, &zero);
+  ftl_data_set(biquad_state_t, this->biquad_state, xnm2, &zero);
+  ftl_data_set(biquad_state_t, this->biquad_state, ynm1, &zero);
+  ftl_data_set(biquad_state_t, this->biquad_state, ynm2, &zero);
 
   conv = (2.0f * 3.14159265f) / fts_dsp_get_input_srate(dsp, 0);
 
@@ -119,7 +119,7 @@ ftl_apass3(fts_word_t *argv)
   float *in_freq = (float *)fts_word_get_ptr(argv + 1);
   float *in_q = (float *)fts_word_get_ptr(argv + 2);
   float *out_sig = (float *)fts_word_get_ptr(argv + 3);
-  biquad_df1_state_t *biquad_state = (biquad_df1_state_t *)fts_word_get_ptr(argv + 4);
+  biquad_state_t *biquad_state = (biquad_state_t *)fts_word_get_ptr(argv + 4);
   biquad_coefs_t *biquad_coefs = (biquad_coefs_t *)fts_word_get_ptr(argv + 5);
   float conv = fts_word_get_float(argv + 6);
   long n_tick = fts_word_get_int(argv + 7);
@@ -148,7 +148,7 @@ ftl_apass3(fts_word_t *argv)
   fts_word_set_ptr(biquad_args + 2, biquad_state);
   fts_word_set_ptr(biquad_args + 3, biquad_coefs);
   fts_word_set_int(biquad_args + 4, n_tick_half);
-  ftl_biquad_df1(biquad_args);
+  ftl_biquad(biquad_args);
  
   /* calculate values for second half of vector */
   theta = conv * in_freq[n_tick_half];
@@ -168,28 +168,21 @@ ftl_apass3(fts_word_t *argv)
   /* compute second half of vector */
   fts_word_set_ptr(biquad_args + 0, in_sig + n_tick_half);
   fts_word_set_ptr(biquad_args + 1, out_sig + n_tick_half);
-  /* fts_word_set_ptr(biquad_args + 2, biquad_state); */ /* already set */
+  /* fts_word_set_ptr(biquad_args + 2, biquad_state); */
   /* fts_word_set_ptr(biquad_args + 3, biquad_coefs); */
   /* fts_word_set_long(biquad_args + 4, n_tick_half); */
-  ftl_biquad_df1(biquad_args);
+  ftl_biquad(biquad_args);
 }		
 
 static fts_status_t
 sigapass3_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
-  /* initialize the class */
   fts_class_init(cl, sizeof(sigapass3_t), 3, 1, 0); 
 
-  /* define the system methods */
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigapass3_init, 1, a);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigapass3_delete, 0, 0);
-
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigapass3_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigapass3_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigapass3_put);
 
-  /* signal inlets/outlets */
   dsp_sig_inlet(cl, 0);
   dsp_sig_inlet(cl, 1);
   dsp_sig_inlet(cl, 2);

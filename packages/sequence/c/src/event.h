@@ -68,11 +68,7 @@ struct _event_
 #define event_get_float(e) fts_get_float(&(e)->value)
 #define event_get_object(e) fts_get_object(&(e)->value)
 
-extern fts_symbol_t event_get_type(event_t *event);
-extern void event_append_state_to_array(event_t *event, fts_array_t *array);
-extern void event_print(event_t *event);
-extern void event_upload(event_t *event);
-extern void event_save_bmax(fts_bmax_file_t *file, event_t *event);
+extern void event_get_array(event_t *event, fts_array_t *array);
 
-extern void event_get_atoms(event_t *event, int *n_atoms, fts_atom_t *atoms);
 #endif
+

@@ -138,58 +138,33 @@ sustain_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   sustain_t *this = (sustain_t *)o;
 
   this->sustained_notes = 0;
-  this->vel   = fts_get_int_arg(ac, at, 1, 0);
-  this->sust  = fts_get_int_arg(ac, at, 2, 0);
+  this->vel = fts_get_int_arg(ac, at, 1, 0);
+  this->sust = fts_get_int_arg(ac, at, 2, 0);
 }
 
 
 static fts_status_t
 sustain_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[10];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(sustain_t), 3, 2, 0); 
 
-  /* system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sustain_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sustain_clear);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int  ;
-  a[2] = fts_s_int  ;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sustain_init, 3, a, 1);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sustain_clear, 0, 0); /* sustain_clear is
-										installed twice */
-  /* Sustain methods */
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sustain_number, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sustain_number, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, sustain_number_1, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, sustain_number_1, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 2, fts_s_int, sustain_number_2, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 2, fts_s_float, sustain_number_2, 1, a);
-
+  fts_method_define_varargs(cl, 0, fts_s_int, sustain_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, sustain_number);
   fts_method_define_varargs(cl, 0, fts_s_list, sustain_list);
 
-  fts_method_define(cl, 0, fts_new_symbol("clear"), sustain_clear, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_clear, sustain_clear);
 
-  /* Type the outlets */
+  fts_method_define_varargs(cl, 1, fts_s_int, sustain_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_float, sustain_number_1);
 
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
+  fts_method_define_varargs(cl, 2, fts_s_int, sustain_number_2);
+  fts_method_define_varargs(cl, 2, fts_s_float, sustain_number_2);
+
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
+  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
 
   return fts_Success;
 }

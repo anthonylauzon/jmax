@@ -171,37 +171,14 @@ delwrite_realloc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 delwrite_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
-
   fts_class_init(cl, sizeof(delwrite_t), 1, 1, 0); 
 
-  /* System methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delwrite_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delwrite_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, delwrite_put);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_anything;
-  a[3] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, delwrite_init, 4, a, 2);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, delwrite_delete, 0, 0);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, delwrite_put, 1, a);
-
-  fts_method_define(cl, 0, fts_new_symbol("clear"), delwrite_clear, 0, 0);
-  
-  a[0] = fts_s_number; /* size or no */
-  fts_method_define(cl, 0, fts_new_symbol("realloc"), delwrite_realloc, 1, a);
-
-  /* DSP declarations */
-
-  /* ask if any delread or vd is a sink to know if delwrite should be executed */
-
-  /* fts_class_add_get_daemon(cl, fts_s_dsp_is_sink, delwrite_is_dsp_sink_get_daemon); */
-
-  /* outlet 0 is used only for order forcing */
-  /* BUT: the buffer size must be propagated to the following object!!! */
-  /* fts_class_put_long_prop(cl, fts_s_dsp_order_forcing_outlet, 0); */
+  fts_method_define_varargs(cl, 0, fts_s_clear, delwrite_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("realloc"), delwrite_realloc);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);

@@ -166,7 +166,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 
 #define SEND_MESSAGE \
   if (ev_dest_is_object) \
-    { if(target) fts_message_send((fts_object_t *)target, 0, ev_sym, ev_argc, ev_fp); } \
+    { if(target) fts_send_message((fts_object_t *)target, 0, ev_sym, ev_argc, ev_fp); } \
   else \
     fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
 
@@ -601,12 +601,12 @@ static void messbox_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, 
 }
 
 
-static void messbox_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messbox_t *this = (messbox_t *)o;
-  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
+  fts_dumper_t *dumper = (fts_dumper_t *) fts_get_object(at);
 
-  fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
+  fts_atom_list_dump(this->atom_list, dumper, (fts_object_t *) this);
 }
 
 
@@ -795,7 +795,7 @@ static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  messbox_append_noupdate);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  messbox_clear_noupdate);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, messbox_save_bmax);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, messbox_dump);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat); 
 
   fts_method_define_varargs(cl, 0, fts_s_bang, messbox_eval);

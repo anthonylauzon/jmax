@@ -467,9 +467,10 @@ fts_simple_class_mess_get(fts_inlet_decl_t *in, fts_symbol_t s)
 */
 
 fts_class_mess_t *
-fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s, int *panything)
+fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s)
 {
   fts_inlet_decl_t *in;
+  int panything;
 
   if (winlet == fts_SystemInlet)
     in = cl->sysinlet;
@@ -478,7 +479,7 @@ fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s, int *panything)
   else
     return 0;
 
-  return fts_class_mess_inlet_get(in, s, panything);
+  return fts_class_mess_inlet_get(in, s, &panything);
 }
 
 

@@ -36,8 +36,7 @@ static fts_symbol_t sym_local = 0;
 static fts_symbol_t sym_openEditor = 0;
 static fts_symbol_t sym_closeEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
-static fts_symbol_t sym_set = 0;
-static fts_symbol_t sym_append = 0;
+
 static fts_symbol_t sym_set_visibles = 0;
 static fts_symbol_t sym_append_visibles = 0;
 static fts_symbol_t sym_set_pixels = 0;
@@ -95,20 +94,20 @@ ivec_set_const(ivec_t *vec, int c)
 }
 
 void
-ivec_set_from_atom_list(ivec_t *vec, int offset, int ac, const fts_atom_t *at)
+ivec_set_with_onset_from_atoms(ivec_t *vec, int onset, int ac, const fts_atom_t *at)
 {
   int size = ivec_get_size(vec);
   int i;
  
-  if(offset + ac > size)
-    ac = size - offset;
+  if(onset + ac > size)
+    ac = size - onset;
   
   for(i=0; i<ac; i++)
     {
       if(fts_is_number(at + i))
-	vec->values[i + offset] = fts_get_number_int(at + i);
+	vec->values[i + onset] = fts_get_number_int(at + i);
       else
-	vec->values[i + offset] = 0;
+	vec->values[i + onset] = 0;
     }
 }
 
@@ -172,6 +171,17 @@ ivec_get_max_value(ivec_t *vec)
       max = vec->values[i];
 
   return max;
+}
+
+void
+ivec_copy(ivec_t *org, ivec_t *copy)
+{
+  int i;
+  
+  ivec_set_size(copy, org->size);
+
+  for(i=0; i<org->size; i++)
+    copy->values[i] = org->values[i];
 }
 
 /********************************************************
@@ -269,7 +279,7 @@ ivec_send_visibles(ivec_t *ivec)
   int count = 0; 
   int send = 0;
   int current = 0;
-  int vecoffset = 2;
+  int veconset = 2;
 
   while(n > 0)
     {
@@ -281,12 +291,12 @@ ivec_send_visibles(ivec_t *ivec)
       else
 	{
 	  fts_set_int(&a[0], count);
-	  vecoffset = 1;
+	  veconset = 1;
 	}
-      send = (n > IVEC_CLIENT_BLOCK_SIZE-vecoffset)? IVEC_CLIENT_BLOCK_SIZE-vecoffset: n;
+      send = (n > IVEC_CLIENT_BLOCK_SIZE-veconset)? IVEC_CLIENT_BLOCK_SIZE-veconset: n;
 
       for(i = 0; ((i < send)&&(current+i<vecsize)); i++)
-	  fts_set_int(&a[i+vecoffset], ivec->values[current+i]);
+	  fts_set_int(&a[i+veconset], ivec->values[current+i]);
 
       if(!append)
 	{
@@ -349,16 +359,16 @@ ivec_insert_pixels(ivec_t *ivec, int startId, int size)
   int i;
   fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
   int vecsize = ivec_get_size(ivec);
-  float k = (1/ivec->zoom);
-  int send = (int)(size/k)+1;
+  float k = (1 / ivec->zoom);
+  int send = (int)(size * ivec->zoom) + 1;
   int current = startId;
 
-  fts_set_int(&a[0], (int)((startId - ivec->vindex)/k));
+  fts_set_int(&a[0], (int)((startId - ivec->vindex) * ivec->zoom));
   
-  for(i = 0; ((i < send)&&((int)(current+i*k)<vecsize)); i++)
+  for(i = 0; ((i < send) && ((int)(current + i * k) < vecsize)); i++)
     fts_set_int(&a[i+1], ivec->values[(int)(current+k*i)]);
       
-  fts_client_send_message((fts_object_t *)ivec, sym_append_pixels, send+1, a);
+  fts_client_send_message((fts_object_t *)ivec, sym_append_pixels, send + 1, a);
 }
 
 static void
@@ -452,30 +462,32 @@ ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ivec_set_const(this, constant);
 
   if(ivec_editor_is_open(this))
-      {
-	if(this->zoom<0.5) ivec_send_pixels(this);
-	ivec_send_visibles(this);
-      }
+    {
+      if(this->zoom < 0.5) 
+	ivec_send_pixels(this);
+
+      ivec_send_visibles(this);
+    }
 }
 
 static void
-ivec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
 
   if(ac > 1 && fts_is_number(at))
     {
       int size = ivec_get_size(this);
-      int offset = fts_get_number_int(at);
+      int onset = fts_get_number_int(at);
 
-      if(offset >= 0 && offset < size)
+      if(onset >= 0 && onset < size)
 	{
-	  ivec_set_from_atom_list(this, offset, ac - 1, at + 1);
+	  ivec_set_with_onset_from_atoms(this, onset, ac - 1, at + 1);
 	  
 	  if(ivec_editor_is_open(this))
 	    {
-	      if(this->zoom<0.5) 
-		ivec_insert_pixels(this, offset, ac - 1);
+	      if(this->zoom < 0.5) 
+		ivec_insert_pixels(this, onset, ac - 1);
 	      
 	      fts_client_send_message((fts_object_t *)this, sym_append_visibles, ac, at);
 	    }
@@ -822,7 +834,9 @@ ivec_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   this->vsize = v_size;
   this->pixsize = pix_size;
 
-  if(this->zoom<0.5) ivec_send_pixels(this);
+  if(this->zoom < 0.5)
+    ivec_send_pixels(this);
+
   ivec_send_visibles(this);
 }
 
@@ -945,40 +959,52 @@ ivec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-ivec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
+  ivec_t *set = ivec_atom_get(at);
 
-  if(this->keep == fts_s_yes)
-    {
-      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);      
-      int size = ivec_get_size(this);
-      fts_atom_t av[257];
-      int ac = 1;
-      int i;
-      
-      fts_set_int(av, 0); /* set offset to 0 */
-      
-      for(i=0; i<size; i++)
-	{
-	  fts_set_int(av + ac, this->values[i]);
-	  ac++;
-	  
-	  if(ac == 257)
-	    {
-	      fts_bmax_save_message(f, fts_s_set, ac, av);
-	      fts_set_int(av , i + 1); /* set next offset */
-	      ac = 1;
-	    }
-	}
-      
-      if(ac > 1) 
-	fts_bmax_save_message(f, fts_s_set, ac, av);
-    }
+  ivec_copy(set, this);
 }
 
 static void
-ivec_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
+  int size = ivec_get_size(this);
+  fts_message_t *mess;
+  int i;
+
+  /* send size message */
+  mess = fts_dumper_message_new(dumper, fts_s_size);  
+  fts_message_append_int(mess, size);
+  fts_dumper_message_send(dumper, mess);
+
+  /* get new set message and append onset 0 */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_append_int(mess, 0);
+  
+  for(i=0; i<size; i++)
+    {
+      fts_message_append_int(mess, this->values[i]);
+      
+      if(fts_message_get_ac(mess) >= 256)
+	{
+	  fts_dumper_message_send(dumper, mess);
+
+	  /* new set message and append onset i + 1 */
+	  mess = fts_dumper_message_new(dumper, fts_s_set);
+	  fts_message_append_int(mess, i + 1);
+	}
+    }
+  
+  if(fts_message_get_ac(mess) > 1) 
+    fts_dumper_message_send(dumper, mess);
+}
+
+static void
+ivec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
   int *values = ivec_get_ptr(this);
@@ -996,31 +1022,12 @@ ivec_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void
-ivec_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
 
-  ivec_set_from_atom_list(this, 0, ac, at);
-}
-
-static void
-ivec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
-
-  if (cmd == fts_s_object)
-    fts_object_blip(o, "vector of ints");
-  else if (cmd == fts_s_inlet)
-    {
-      int n = fts_get_int_arg(ac, at, 1, 0);
-
-      switch(n)
-	{
-	case 0:
-	  /* fts_object_blip(o, "no comment"); */
-	  break;
-	}
-    }
+  ivec_set_size(this, ac);
+  ivec_set_with_onset_from_atoms(this, 0, ac, at);
 }
 
 static void
@@ -1030,6 +1037,14 @@ ivec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
 
   if(this->keep != fts_s_args && fts_is_symbol(value))
     this->keep = fts_get_symbol(value);
+}
+
+static void
+ivec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  ivec_t *this = (ivec_t *)obj;
+
+  fts_set_symbol(value, this->keep);
 }
 
 static void
@@ -1069,29 +1084,25 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->keep = fts_s_no;
 
   if(ac == 0)
-    {
-      ivec_set_size(this, 0);
-      this->keep = fts_s_no;
-    }
+    ivec_set_size(this, 0);
   else if(ac == 1 && fts_is_int(at))
     {
       ivec_set_size(this, fts_get_int(at));
       ivec_set_const(this, 0);
-      this->keep = fts_s_no;
     }
-  else if(ac == 1 && fts_is_list(at))
+  else if(ac == 1 && fts_is_array(at))
     {
       fts_array_t *aa = fts_get_array(at);
       int size = fts_array_get_size(aa);
 
       ivec_set_size(this, size);
-      ivec_set_from_atom_list(this, 0, size, fts_array_get_atoms(aa));
+      ivec_set_with_onset_from_atoms(this, 0, size, fts_array_get_atoms(aa));
       this->keep = fts_s_args;
     }
   else if(ac > 1)
     {
       ivec_set_size(this, ac);
-      ivec_set_from_atom_list(this, 0, ac, at);
+      ivec_set_with_onset_from_atoms(this, 0, ac, at);
       this->keep = fts_s_args;
     }
   else
@@ -1123,40 +1134,43 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, ivec_delete);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, ivec_print); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, ivec_append_state_to_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, ivec_set_state_from_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
-      /* save and restore to/from bmax file */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_save_bmax); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set_elements);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, ivec_set_from_instance);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, ivec_set_from_array);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, ivec_size);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, ivec_get_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, ivec_dump);
+
   fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), ivec_reverse);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), ivec_rotate);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), ivec_sort);
   fts_method_define_varargs(cl, 0, fts_new_symbol("scramble"), ivec_scramble);
 
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, ivec_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, ivec_get_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), ivec_clear);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), ivec_fill);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), ivec_set);
+  fts_method_define_varargs(cl, 0, fts_s_clear, ivec_clear);
+  fts_method_define_varargs(cl, 0, fts_s_fill, ivec_fill);
+  fts_method_define_varargs(cl, 0, fts_s_set, ivec_set_elements);
       
-  fts_method_define_varargs(cl, 0, fts_new_symbol("size"), ivec_size);
+  fts_method_define_varargs(cl, 0, fts_s_size, ivec_size);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("import"), ivec_import);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), ivec_export);
+  fts_method_define_varargs(cl, 0, fts_s_import, ivec_import);
+  fts_method_define_varargs(cl, 0, fts_s_export, ivec_export);
 
   fts_method_define_varargs(cl, 0, fts_s_print, ivec_print); 
 
       /* graphical editor */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), ivec_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, ivec_open_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("hide"), ivec_hide_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), ivec_close_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, ivec_close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set_elements);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_from_client"), ivec_get_to_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_pixels_from_client"), ivec_get_pixels_to_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_visible_window"), ivec_set_visible_window);
@@ -1190,8 +1204,6 @@ ivec_config(void)
   sym_openEditor = fts_new_symbol("openEditor");
   sym_closeEditor = fts_new_symbol("closeEditor");
   sym_destroyEditor = fts_new_symbol("destroyEditor");
-  sym_set = fts_new_symbol("set");
-  sym_append = fts_new_symbol("append");
   sym_copy_client = fts_new_symbol("copy");
   sym_paste_client = fts_new_symbol("paste");
   sym_cut_client = fts_new_symbol("cut");

@@ -162,24 +162,17 @@ clip_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, clip_init);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, clip_float, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, clip_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, clip_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, clip_float);
 
   fts_method_define_varargs(cl, 0, fts_s_set, clip_set);
   fts_method_define_varargs(cl, 0, fts_s_list, clip_list);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, clip_set_min, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, clip_set_min, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, clip_set_min);
+  fts_method_define_varargs(cl, 1, fts_s_float, clip_set_min);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 2, fts_s_int, clip_set_max, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 2, fts_s_float, clip_set_max, 1, a);
+  fts_method_define_varargs(cl, 2, fts_s_int, clip_set_max);
+  fts_method_define_varargs(cl, 2, fts_s_float, clip_set_max);
 
   return fts_Success;
 }

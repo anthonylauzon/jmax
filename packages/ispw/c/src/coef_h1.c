@@ -268,40 +268,30 @@ sigcoef_hlshelf1_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static fts_status_t
 sigcoef_hlshelf1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
   int i;
 
   fts_class_init(cl, sizeof(sigcoef_hlshelf1_t), 5, 6, 0);
 
-  fts_method_define(cl, 0, fts_s_bang, sigcoef_hlshelf1_bang, 0, 0);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sigcoef_hlshelf1_in0, 1, a);
-  fts_method_define(cl, 1, fts_s_float, sigcoef_hlshelf1_in1, 1, a);
-  fts_method_define(cl, 2, fts_s_float, sigcoef_hlshelf1_in2, 1, a);
-  fts_method_define(cl, 3, fts_s_float, sigcoef_hlshelf1_in3, 1, a);
-  fts_method_define(cl, 4, fts_s_float, sigcoef_hlshelf1_in4, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sigcoef_hlshelf1_in0, 1, a);
-  fts_method_define(cl, 1, fts_s_int, sigcoef_hlshelf1_in1, 1, a);
-  fts_method_define(cl, 2, fts_s_int, sigcoef_hlshelf1_in2, 1, a);
-  fts_method_define(cl, 3, fts_s_int, sigcoef_hlshelf1_in3, 1, a);
-  fts_method_define(cl, 4, fts_s_int, sigcoef_hlshelf1_in4, 1, a);
-
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigcoef_hlshelf1_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigcoef_hlshelf1_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigcoef_hlshelf1_put);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigcoef_hlshelf1_delete, 0, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, sigcoef_hlshelf1_bang);
 
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigcoef_hlshelf1_put, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_float, sigcoef_hlshelf1_in0);
+  fts_method_define_varargs(cl, 1, fts_s_float, sigcoef_hlshelf1_in1);
+  fts_method_define_varargs(cl, 2, fts_s_float, sigcoef_hlshelf1_in2);
+  fts_method_define_varargs(cl, 3, fts_s_float, sigcoef_hlshelf1_in3);
+  fts_method_define_varargs(cl, 4, fts_s_float, sigcoef_hlshelf1_in4);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, sigcoef_hlshelf1_in0);
+  fts_method_define_varargs(cl, 1, fts_s_int, sigcoef_hlshelf1_in1);
+  fts_method_define_varargs(cl, 2, fts_s_int, sigcoef_hlshelf1_in2);
+  fts_method_define_varargs(cl, 3, fts_s_int, sigcoef_hlshelf1_in3);
+  fts_method_define_varargs(cl, 4, fts_s_int, sigcoef_hlshelf1_in4);
 
   dsp_sig_inlet(cl, 0);
   
-  a[0] = fts_s_float;
-  for (i = 0; i < 6; i++)
-    fts_outlet_type_define(cl, i, fts_s_float, 1, a);
-
   return fts_Success;
 }
 

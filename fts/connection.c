@@ -136,12 +136,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
 
   if (mess)
     {
-      if (fts_mess_get_run_time_check())
-	{
-	  conn->symb = 0;
-	  conn->mth  = 0;
-	}
-      else if (anything)
+      if (anything)
 	{
 	  /* we found an anything method at the inlet:
 	     we cache the method for anything here because, since the

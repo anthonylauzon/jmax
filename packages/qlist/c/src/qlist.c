@@ -186,19 +186,19 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 	  if (fts_is_int(ap))
 	    {
 	      if (ac > 1)
-		fts_message_send(target, 0, fts_s_list, ac, ap);
+		fts_send_message(target, 0, fts_s_list, ac, ap);
 	      else 
-		fts_message_send(target, 0, fts_s_int, ac, ap);
+		fts_send_message(target, 0, fts_s_int, ac, ap);
 	    }
 	  else if (fts_is_float(ap))
 	    {
 	      if (ac >1) 
-		fts_message_send(target, 0, fts_s_list, ac, ap);
+		fts_send_message(target, 0, fts_s_list, ac, ap);
 	      else 
-		fts_message_send(target, 0, fts_s_float, ac, ap);
+		fts_send_message(target, 0, fts_s_float, ac, ap);
 	    }
 	  else if (fts_is_symbol(ap) && (fts_get_symbol(ap) != fts_s_semi) && (fts_get_symbol(ap) != fts_s_comma))
-	    fts_message_send(target, 0, fts_get_symbol(ap), ac - 1, ap + 1);
+	    fts_send_message(target, 0, fts_get_symbol(ap), ac - 1, ap + 1);
 	}
 
       if (!is_comma)
@@ -312,12 +312,12 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-qlist_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
-  fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
 
-  fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
+  fts_atom_list_dump(this->atom_list, dumper, (fts_object_t *)this);
 }
 
 #define MAX_ATOMS_PER_LINE 18
@@ -421,50 +421,32 @@ qlist_hide(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(qlist_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, qlist_init, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, qlist_init);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, qlist_delete, 0, 0);
-  fts_method_define(cl, fts_SystemInlet, fts_s_upload, qlist_upload, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, qlist_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, qlist_upload);
 
-  /* Methods for saving in bmax */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, qlist_clear);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, qlist_dump);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_clear, qlist_clear, 0, 0);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, qlist_save_bmax, 1, a);
-
-  a[0] = fts_s_ptr;
-  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, qlist_save_dotpat, 1, a); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, qlist_save_dotpat); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, qlist_append);
 
-  /* Method for loading from the user interface */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, qlist_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, qlist_close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_hide, qlist_hide); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), qlist_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), qlist_close_editor);
-  fts_method_define_varargs(cl,fts_SystemInlet, sym_hide, qlist_hide); 
+  fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), qlist_rewind);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("flush"), qlist_flush);
+  fts_method_define_varargs(cl, 0, fts_s_clear, qlist_clear);
 
-  a[0] = fts_s_int;
+  fts_method_define_varargs(cl, 0, fts_new_symbol("next"), qlist_next);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("read"), qlist_read);
 
-  fts_method_define(cl, 0, fts_new_symbol("rewind"), qlist_rewind, 0, 0);
-
-  fts_method_define(cl, 0, fts_new_symbol("flush"), qlist_flush, 0, 0);
-
-  fts_method_define(cl, 0, fts_s_clear, qlist_clear, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("next"), qlist_next, 1, a, 0);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("read"), qlist_read, 1, a);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), qlist_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, qlist_set);
 
   fts_method_define_varargs(cl, 0, fts_s_append, qlist_append);
 
@@ -483,9 +465,3 @@ qlist_config(void)
   
   fts_class_install(fts_new_symbol("qlist"), qlist_instantiate);
 }
-
-
-
-
-
-

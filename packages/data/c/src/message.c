@@ -24,7 +24,6 @@
  *
  */
 #include <fts/fts.h>
-#include "message.h"
 
 fts_symbol_t message_symbol = 0;
 fts_type_t message_type = 0;
@@ -126,7 +125,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_object_set_error(o, "Syntax error in message or constant");
 	      return;
 	    }
-	  else if(fts_is_list(at + i))
+	  else if(fts_is_array(at + i))
 	    {
 	      fts_object_set_error(o, "List cannot be argument of a message or constructor");
 	      return;

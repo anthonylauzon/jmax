@@ -63,7 +63,7 @@ class UndoableDelete extends AbstractUndoableEdit {
     // there's no need to copy-construct the deleted event.
       TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
       if(evt!=null)
-	  trkObj.removeEvent(evt);
+	  trkObj.deleteEvent(evt);
       else
 	  die();
   }  

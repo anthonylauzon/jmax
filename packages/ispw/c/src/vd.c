@@ -226,17 +226,12 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 static fts_status_t
 vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
-
   fts_class_init(cl, sizeof(vd_t), 2, 1, 0);
 
-  /* System methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vd_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, vd_delete, 0, 0);
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, vd_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vd_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, vd_put);
 
-  /* DSP declarations */
   dsp_sig_inlet(cl, 0);
   dsp_sig_inlet(cl, 1); 
   dsp_sig_outlet(cl, 0);        

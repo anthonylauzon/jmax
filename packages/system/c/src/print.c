@@ -45,7 +45,7 @@ print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  this->prompt = fts_get_symbol_arg(ac, at, 1, fts_new_symbol("print"));
+  this->prompt = fts_get_symbol_arg(ac, at, 1, fts_s_print);
 }
 
 
@@ -147,13 +147,9 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(print_t), 1, 0, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, print_init, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, print_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, print_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, print_int);
@@ -168,5 +164,5 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
 void
 print_config(void)
 {
-  fts_class_install(fts_new_symbol("print"), print_instantiate);
+  fts_class_install(fts_s_print, print_instantiate);
 }

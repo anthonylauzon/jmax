@@ -45,8 +45,8 @@ static fts_object_t *messbox_doctor(fts_patcher_t *patcher, int ac, const fts_at
 
       if (ac > 1)
 	{
-	  fts_message_send(obj, fts_SystemInlet, fts_s_clear, 0, 0);
-	  fts_message_send(obj, fts_SystemInlet, fts_s_append, ac - 1, at + 1);
+	  fts_send_message(obj, fts_SystemInlet, fts_s_clear, 0, 0);
+	  fts_send_message(obj, fts_SystemInlet, fts_s_append, ac - 1, at + 1);
 	}
 
       return obj;

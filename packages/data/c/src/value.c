@@ -37,12 +37,6 @@ fts_class_t *value_class = 0;
  *
  */
 
-void
-value_set(value_t *this, fts_atom_t a)
-{
-  fts_atom_assign(&this->a, &a);
-}
-
 static void
 value_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -64,8 +58,8 @@ value_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   value_t *this = (value_t *)o;
 
-  if(ac > 0)
-    value_set(this, at[0]);
+  if(ac > 0) 
+    fts_atom_assign(&this->a, at);
 }
 
 static void
@@ -94,7 +88,7 @@ value_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-value_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
   fts_array_t *array = fts_get_array(at);
@@ -103,11 +97,29 @@ value_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-value_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
 
-  value_set(this, at[0]);
+  fts_atom_assign(&this->a, at);
+}
+
+static void
+value_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  value_t *this = (value_t *)o;
+  value_t *in = value_atom_get(at);
+  
+  fts_atom_assign(&this->a, &in->a);
+}
+
+static void
+value_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  value_t *this = (value_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+
+  fts_dumper_send(dumper, fts_s_set, 1, &this->a);
 }
 
 /********************************************************************
@@ -154,14 +166,20 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, value_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, value_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), value_print);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, value_append_state_to_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, value_set_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, value_print);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, value_set_from_instance);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, value_dump);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, value_get_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, value_set_from_array);
   
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, value_set_value);
+
   fts_method_define_varargs(cl, 0, fts_s_bang, value_output);
   fts_method_define_varargs(cl, 0, fts_s_anything, value_set_and_output);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), value_clear);
+  fts_method_define_varargs(cl, 0, fts_s_clear, value_clear);
   
   fts_method_define_varargs(cl, 1, fts_s_anything, value_set_value);
 

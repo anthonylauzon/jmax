@@ -164,17 +164,14 @@ pack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 pack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a;
   fts_atom_t sat[2];
   int n;
 
   /* throw away the class name argument */
-
   ac--;
   at++;
 
   /* then provide default arguments */
-
   if (!ac)
     {
       ac = 2;
@@ -186,28 +183,21 @@ pack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(pack_t), ac, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pack_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pack_delete);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, pack_delete, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_bang, pack_bang);
 
-  fts_method_define(cl, 0, fts_s_bang,    pack_bang, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_list, pack_list);
 
-  fts_method_define_varargs(cl, 0, fts_s_list,    pack_list);
-
-  a = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int,    pack_send, 1, &a);
-  a = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float,  pack_send, 1, &a);
-  a = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, pack_send, 1, &a);
+  fts_method_define_varargs(cl, 0, fts_s_int, pack_send);
+  fts_method_define_varargs(cl, 0, fts_s_float, pack_send);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, pack_send);
 
   for (n = 1; n < ac; at++, n++)
     {
-      a = fts_s_int;
-      fts_method_define(cl, n, fts_s_int,    pack_inlet, 1, &a);
-      a = fts_s_float;
-      fts_method_define(cl, n, fts_s_float,  pack_inlet, 1, &a);
-      a = fts_s_symbol;
-      fts_method_define(cl, n, fts_s_symbol, pack_inlet, 1, &a);
+      fts_method_define_varargs(cl, n, fts_s_int, pack_inlet);
+      fts_method_define_varargs(cl, n, fts_s_float, pack_inlet);
+      fts_method_define_varargs(cl, n, fts_s_symbol, pack_inlet);
     }
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);

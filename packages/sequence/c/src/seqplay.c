@@ -362,9 +362,9 @@ seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqplay_delete);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqplay_locate);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplay_start);
+  fts_method_define_varargs(cl, 0, fts_s_start, seqplay_start);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqplay_pause);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqplay_stop);
+  fts_method_define_varargs(cl, 0, fts_s_stop, seqplay_stop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sync"), seqplay_sync);
   
   fts_method_define_varargs(cl, 1, fts_s_float, seqplay_set_speed);

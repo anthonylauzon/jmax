@@ -243,26 +243,17 @@ sigline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(sigline_t), 2, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigline_init, 2, a, 0);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigline_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigline_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigline_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigline_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigline_put);
   
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sigline_number, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sigline_number, 1, a);
-
   fts_method_define_varargs(cl, 0, fts_s_list, sigline_list);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, sigline_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, sigline_number);
   
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, sigline_number_1, 1, a);
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, sigline_number_1, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_float, sigline_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_int, sigline_number_1);
   
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);

@@ -51,7 +51,7 @@ typedef struct _timebase_entry_
 
 
 static timebase_entry_t *
-timebase_entry_new(fts_object_t *object, fts_method_t method, fts_atom_t *atom, double time)
+timebase_entry_new(fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double time)
 {
   timebase_entry_t *entry = fts_heap_alloc(timebase_entry_heap);
 
@@ -325,7 +325,7 @@ fts_timebase_locate(fts_timebase_t *timebase)
  */
 
 void 
-fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *object, fts_method_t method, fts_atom_t *atom, double delay)
+fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *object, fts_method_t method, const fts_atom_t *atom, double delay)
 {
   timebase_entry_t *entry;
 

@@ -217,7 +217,7 @@ setval_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   getval_t *this = (getval_t *)o;
   
   if(ac > 0 && s == fts_get_selector(at))
-    value_set((value_t *)this->obj, at[0]);
+    value_set((value_t *)this->obj, at);
 }
 
 /******************************************************

@@ -70,22 +70,14 @@ noise_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 noise_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
   fts_class_init(cl, sizeof(noise_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, noise_init, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, noise_delete, 0, 0);
-
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, noise_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, noise_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, noise_put);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
-
-  noise_dsp_symbol = fts_new_symbol("noise");
-  dsp_declare_function(noise_dsp_symbol, noise_dsp_function);
 
   return fts_Success;
 }
@@ -93,5 +85,8 @@ noise_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 noise_config(void)
 {
+  noise_dsp_symbol = fts_new_symbol("noise");
+  dsp_declare_function(noise_dsp_symbol, noise_dsp_function);
+
   fts_class_install(fts_new_symbol("noise~"), noise_instantiate);
 }

@@ -142,8 +142,8 @@ makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, makenote_init);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), makenote_clear);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), makenote_stop);
+  fts_method_define_varargs(cl, 0, fts_s_clear, makenote_clear);
+  fts_method_define_varargs(cl, 0, fts_s_stop, makenote_stop);
 
   fts_method_define_varargs(cl, 0, fts_s_int, makenote_pitch);
   fts_method_define_varargs(cl, 0, fts_s_float, makenote_pitch);

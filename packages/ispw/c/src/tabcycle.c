@@ -39,19 +39,19 @@ static fts_symbol_t tabcycle_fun_symbol = 0;
  
 typedef struct
 {
-  int size;			/* cycle size */
-  int offset;			/* sample offset (grows by the vectorSize) */
-  sampbuf_t *buf;		/* samp tab buffer */
+  int size; /* cycle size */
+  int offset; /* sample offset (grows by the vectorSize) */
+  sampbuf_t *buf; /* samp tab buffer */
 } tabcycle_ctl_t;
 
 typedef struct
 {
   fts_object_t obj; 
   ftl_data_t tabcycle_data;
-  fts_symbol_t tab_name;		/* symbol bound to table we'll use */
-  float value;			/* value to write ot samptab */
-  int state;			/* inlet state - table style */
-  int size;			/* cache info: cycle size */
+  fts_symbol_t tab_name; /* symbol bound to table we'll use */
+  float value; /* value to write ot samptab */
+  int state; /* inlet state - table style */
+  int size; /* cache info: cycle size */
 } tabcycle_t;
 
 
@@ -59,17 +59,26 @@ static void
 tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabcycle_t *this = (tabcycle_t *)o;
-  fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
-  int size = fts_get_int(at + 2);
 
-  this->tab_name = tab_name;
-  this->value = 0;
-  this->state = 0;
-  this->size = size;
+  ac--;
+  at++;
 
-  this->tabcycle_data = ftl_data_new(tabcycle_ctl_t);
-
-  dsp_list_insert(o); /* just put object in list */
+  if(ac == 2 && fts_is_symbol(at) && fts_is_int(at + 1))
+    {
+      fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 0, 0);
+      int size = fts_get_int(at + 1);
+      
+      this->tab_name = tab_name;
+      this->value = 0;
+      this->state = 0;
+      this->size = size;
+      
+      this->tabcycle_data = ftl_data_alloc(sizeof(tabcycle_ctl_t));
+      
+      dsp_list_insert(o);
+    }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 
@@ -197,31 +206,14 @@ tabcycle_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 static fts_status_t
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(tabcycle_t), 1, 1, 0);
 
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_int;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, tabcycle_init, 3, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, tabcycle_delete, 0, 0);
-
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tabcycle_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tabcycle_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, tabcycle_put);
 
-  /* user methods */
-
-  fts_method_define(cl, 0, fts_s_bang, tabcycle_bang, 0, 0);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("set"), tabcycle_set, 1, a);
-
-  /* Type the outlet */
+  fts_method_define_varargs(cl, 0, fts_s_bang, tabcycle_bang);
+  fts_method_define_varargs(cl, 0, fts_s_set, tabcycle_set);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);

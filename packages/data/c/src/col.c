@@ -239,9 +239,9 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, col_output);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), col_clear);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), col_fill);      
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), col_set);
+  fts_method_define_varargs(cl, 0, fts_s_clear, col_clear);
+  fts_method_define_varargs(cl, 0, fts_s_fill, col_fill);      
+  fts_method_define_varargs(cl, 0, fts_s_set, col_set);
   
   /* type outlet */
   fts_outlet_type_define(cl, 0, col_symbol, 1, &col_type);

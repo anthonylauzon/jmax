@@ -23,6 +23,8 @@
 #ifndef _FTS_PRIVATE_SAVER_H
 #define _FTS_PRIVATE_SAVER_H
 
+typedef struct fts_bmax_file fts_bmax_file_t;
+struct _saver_dumper;
 
 struct fts_bmax_file {
   FILE *file;
@@ -30,7 +32,16 @@ struct fts_bmax_file {
   fts_symbol_t *symbol_table;
   unsigned int symbol_table_size;
   int symbol_table_static;
+  struct _saver_dumper *dumper;
 };
+
+/* used by package class only!!! */
+extern void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at);
+extern void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym);
+extern void fts_bmax_code_pop_args(fts_bmax_file_t *f, int value);
+extern void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs);
+extern void fts_bmax_code_return(fts_bmax_file_t *f);
+extern void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx);
 
 extern int fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symbol_t *symbol_table, int symbol_table_size);
 extern void fts_bmax_file_sync( fts_bmax_file_t *f);

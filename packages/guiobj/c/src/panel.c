@@ -79,40 +79,19 @@ panel_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->tag = 0;
 }
 
-
-static void
-panel_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-}
-
-
-/* Register panel for savepanel and openpanel */
-
-
 static fts_status_t
 panel_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
   fts_class_init(cl, sizeof(panel_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, panel_init, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, panel_init);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, panel_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_update_tag"), panel_connect); 
 
-  /* fts_method_define(cl, fts_SystemInlet, fts_s_send_event, panel_evsched, 0, 0); */
+  fts_method_define_varargs(cl, 0, fts_s_bang, panel_bang);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, panel_symbol);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("set_update_tag"), panel_connect, 1, a); 
-
-  fts_method_define(cl, 0, fts_s_bang, panel_bang, 0, 0);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, panel_symbol, 1, a);
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0, fts_s_bang, 1, a);
+  fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
 
   return fts_Success;
 }

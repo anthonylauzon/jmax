@@ -35,101 +35,29 @@ fts_class_t *event_class = 0;
  *
  */
 
-fts_symbol_t
-event_get_type(event_t *event)
-{
-  fts_symbol_t type = 0;
-
-  if(fts_is_object(&event->value))
-    {
-      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      
-      type = fts_object_get_class_name(obj);
-    }
-  else if(!fts_is_void(&event->value))
-    type = fts_type_get_selector(fts_get_type(&event->value));
-
-  return type;
-}
-
 void 
-event_append_state_to_array(event_t *event, fts_array_t *array)
+event_get_array(event_t *event, fts_array_t *array)
 {
-
   if(fts_is_object(&event->value))
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      fts_atom_t a;
+      fts_symbol_t type = fts_object_get_class_name(obj);
+      fts_atom_t a[2];
       
-      fts_set_array(&a, array);
-      fts_send_message(obj, fts_SystemInlet, fts_s_append_state_to_array, 1, &a);
+      fts_set_array(a, array);
+      fts_send_message(obj, fts_SystemInlet, fts_s_get_array, 1, a);
+
+      fts_set_float(a + 0, (float) event->time);
+      fts_set_symbol(a + 1, type);
+      fts_array_prepend(array, 2, a);
     }
   else if(!fts_is_void(&event->value))
-    fts_array_append(array, 1, &event->value);
-}
-
-void
-event_print(event_t *event)
-{
-  fts_symbol_t type = event_get_type(event);
-
-  if(type)
     {
-      fts_array_t array;
-      
-      fts_array_init(&array, 0, 0);
-      event_append_state_to_array(event, &array);
+      fts_symbol_t type = fts_type_get_selector(fts_get_type(&event->value));
 
-      post("  @%lf: ", event_get_time(event));
-      post("<%s> ", fts_symbol_name(type));
-      post_atoms(fts_array_get_size(&array), fts_array_get_atoms(&array));
-      post("\n");
-
-      fts_array_destroy(&array);
-    }
-}
-
-void
-event_upload(event_t *event)
-{
-  fts_symbol_t type = event_get_type(event);
-
-  if(type)
-    {
-      fts_array_t array;
-      fts_atom_t at[2];
-      
-      fts_set_float(at + 0, (float) event->time);
-      fts_set_symbol(at + 1, type);
-      fts_array_init(&array, 2, at);
-
-      event_append_state_to_array(event, &array);
-
-      fts_client_upload((fts_object_t *)event, seqsym_event, fts_array_get_size(&array), fts_array_get_atoms(&array));
-
-      fts_array_destroy(&array);
-    }
-}
-
-void
-event_save_bmax(fts_bmax_file_t *file, event_t *event)
-{
-  fts_symbol_t type = event_get_type(event);
-
-  if(type)
-    {
-      fts_array_t array;
-      fts_atom_t at[2];
-      
-      fts_set_float(at + 0, (float) event->time);
-      fts_set_symbol(at + 1, type);
-      fts_array_init(&array, 2, at);
-
-      event_append_state_to_array(event, &array);
-
-      fts_bmax_save_message(file, seqsym_bmax_add_event, fts_array_get_size(&array), fts_array_get_atoms(&array));
-
-      fts_array_destroy(&array);
+      fts_array_append_float(array, (float)event->time);
+      fts_array_append_symbol(array, type);
+      fts_array_append(array, 1, &event->value);
     }
 }
 
@@ -147,7 +75,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
 
-      fts_send_message(obj, fts_SystemInlet, seqsym_set, ac, at);
+      fts_send_message(obj, fts_SystemInlet, fts_s_set, ac, at);
     }
   else
     this->value = at[0];
@@ -185,7 +113,7 @@ event_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, event_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, event_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_set, event_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, event_set);
 
   return fts_Success;
 }

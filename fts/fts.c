@@ -213,6 +213,8 @@ static void fts_kernel_init( void)
   fts_kernel_sched_init();
 }
 
+extern void fts_array_config( void);
+extern void fts_message_config( void);
 extern void fts_audio_config( void);
 extern void fts_bytestream_config( void);
 extern void fts_client_config( void);
@@ -222,6 +224,7 @@ extern void fts_midi_config( void);
 extern void fts_objectset_config();
 extern void fts_oldclient_config( void);
 extern void fts_selection_config( void);
+extern void fts_saver_config( void);
 
 /*
  * Installation of kernel packages 
@@ -229,6 +232,8 @@ extern void fts_selection_config( void);
  */
 static void fts_kernel_classes_config( void)
 {
+  fts_array_config();
+  fts_message_config();
   fts_audio_config();
   fts_bytestream_config();
   fts_client_config();
@@ -238,6 +243,7 @@ static void fts_kernel_classes_config( void)
   fts_objectset_config();
   fts_oldclient_config();
   fts_selection_config();
+  fts_saver_config();
 }
 
 void fts_init( int argc, char **argv)

@@ -85,7 +85,7 @@ const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 2)
     {
-      if(fts_is_list(at + 1))
+      if(fts_is_array(at + 1))
 	{
 	  fts_class_init(cl, sizeof(const_t), 0, 0, 0);
 	  

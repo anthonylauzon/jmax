@@ -54,7 +54,7 @@ DATA_API fts_type_t fmat_type;
 DATA_API void fmat_set_const(fmat_t *mat, float c);
 #define fmat_zero(m) fmat_set_const((m), 0.0)
 
-DATA_API void fmat_set_from_atom_list(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
+DATA_API void fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
 
 /* fmat atoms */
 #define fmat_atom_set(ap, x) fts_set_object_with_type((ap), (x), fmat_type)

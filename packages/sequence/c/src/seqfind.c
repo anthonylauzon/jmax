@@ -58,10 +58,10 @@ seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       int i;
       
       fts_array_clear(&this->array);
-      event_append_state_to_array(event, &this->array);
+      event_get_array(event, &this->array);
       
-      n_atoms = fts_array_get_size(&this->array);
-      atoms = fts_array_get_atoms(&this->array);
+      n_atoms = fts_array_get_size(&this->array) - 2;
+      atoms = fts_array_get_atoms(&this->array) + 2;
       
       if(ac > n_atoms)
 	ac = n_atoms;

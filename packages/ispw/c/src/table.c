@@ -40,10 +40,6 @@ typedef struct
   fts_symbol_t name;
 } table_t;
 
-static fts_symbol_t sym_open_editor = 0;
-static fts_symbol_t sym_close_editor = 0;
-static fts_symbol_t sym_size = 0;
-
 /********************************************************************
  *
  *   user methods
@@ -95,7 +91,7 @@ table_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 /* set by atom list */
 static void
-table_set_from_atom_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_set_with_onset_from_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *vec = ((table_t *)o)->vec;
   int offset;
@@ -103,7 +99,7 @@ table_set_from_atom_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   offset = fts_get_int_arg(ac, at, 0, 0);
 
   if (ac > 1)
-    ivec_set_from_atom_list(vec, offset, ac - 1, at + 1);
+    ivec_set_with_onset_from_atoms(vec, offset, ac - 1, at + 1);
 }
 
 static void
@@ -174,7 +170,7 @@ static void
 table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *vec = ((table_t *)o)->vec;
-  fts_message_send((fts_object_t *)vec, 0, s, ac, at);
+  fts_send_message((fts_object_t *)vec, 0, s, ac, at);
 }
 
 /*********************************************************************
@@ -184,23 +180,15 @@ table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-table_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+table_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-
-  ivec_atom_set(value, this->vec);  
-}
-
-static void
-table_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  table_t *this = (table_t *)o;
-  fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
   
-  fts_message_send((fts_object_t *)this->vec, fts_SystemInlet, fts_s_save_bmax, ac, at);
+  fts_send_message((fts_object_t *)this->vec, fts_SystemInlet, fts_s_save, ac, at);
 }
 
-static int get_int_property( fts_object_t *object, fts_symbol_t property_name, int def)
+static int 
+get_int_property( fts_object_t *object, fts_symbol_t property_name, int def)
 {
   fts_atom_t a;
 
@@ -290,7 +278,7 @@ static void
 table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
-  fts_atom_t a[1];
+  fts_atom_t a;
   fts_object_t *obj;
   fts_symbol_t name = 0;
   int size = FTS_TABLE_DEFAULT_SIZE;
@@ -313,31 +301,34 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  fts_object_refer(obj);
 	  
 	  if(size > ivec_get_size((ivec_t *)obj))
-	    fts_message_send(obj, 0, sym_size, 1, at + 1);
+	    fts_send_message(obj, 0, fts_s_size, 1, at + 1);
 
 	  this->vec = (ivec_t *)obj;
 	  this->name = name;
   
 	  return;
 	}
+      else
+	{
+	  fts_object_set_error(o, "Object %s is not a table", fts_symbol_name(name));
+	  return;
+	}
     }
   else if(ac > 0 && fts_is_number(at))
     size = fts_get_number_int(at);
   
-  /* new table */
-  fts_set_int(a, size);
-  obj = fts_object_create(ivec_class, 1, a);
-  
-  fts_object_refer(obj);
-
-  if(name)
-    ispw_register_named_object(obj, name);
-
-  this->vec = (ivec_t *)obj;
   this->name = name;
 
-  fts_set_symbol(a, fts_s_yes);
-  fts_object_put_prop((fts_object_t *)this->vec, fts_s_keep, a);
+  if(this->name)
+    ispw_register_named_object(obj, this->name);
+
+  this->vec = (ivec_t *)fts_object_create(ivec_class, 0, 0);
+  fts_object_refer(this->vec);
+
+  ivec_set_size(this->vec, size);
+
+  fts_set_symbol(&a, fts_s_yes);
+  fts_object_put_prop((fts_object_t *)this->vec, fts_s_keep, &a);
 }
 
 static void
@@ -356,66 +347,55 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   table_t *this = (table_t *)o;
 
-  fts_message_send((fts_object_t *)this->vec, fts_SystemInlet, sym_open_editor, 0, 0);
+  fts_send_message((fts_object_t *)this->vec, fts_SystemInlet, fts_s_open_editor, 0, 0);
 }
 
 static fts_status_t
 table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
+  /* table [int] */
+  fts_class_init(cl, sizeof(table_t), 2, 1, 0);
   
-  if(ac == 1 || (ac == 2 && (fts_is_int(at + 1) || fts_is_symbol(at + 1))) || (ac == 3 && fts_is_symbol(at + 1) && fts_is_number(at + 2)))
-    {
-      /* [var :] table [int] */
-      fts_class_init(cl, sizeof(table_t), 2, 1, 0);
-      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete);
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), table_open_editor);
-
-      /* save/load bmax file if not instantiated with reference */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, table_save_bmax);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_from_atom_list);
-
-      fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, table_save_dotpat); 
-
-      /* user methods */
-      fts_method_define_number(cl, 0, table_index);
-      fts_method_define_number(cl, 1, table_store_value);
-      
-      fts_method_define_varargs(cl, 0, fts_s_list, table_list);
-      fts_method_define_varargs(cl, 0, fts_s_set, table_set_from_atom_list);
-      
-      fts_method_define_varargs(cl, 0, fts_new_symbol("const"), table_const);
-      fts_method_define(cl, 0, fts_s_clear, table_clear, 0, 0);
-      
-      a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_new_symbol("inv"), table_inv, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("quantile"), table_quantile, 1,  a);
-      fts_method_define(cl, 0, fts_s_bang, table_get_random, 0, 0);
-      
-      fts_method_define(cl, 0, fts_new_symbol("sum"), table_sum, 0, 0);
-      
-      a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_new_symbol("size"), table_size, 1, a);
-      
-      fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
-      
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, table_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, table_delete);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, table_open_editor);
+  
+  /* save/load bmax file if not instantiated with reference */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, table_set_with_onset_from_atoms);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, table_save);  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, table_save_dotpat); 
+  
+  /* user methods */
+  fts_method_define_varargs(cl, 0, fts_s_int, table_index);
+  fts_method_define_varargs(cl, 0, fts_s_float, table_index);
+  
+  fts_method_define_varargs(cl, 0, fts_s_list, table_list);
+  fts_method_define_varargs(cl, 0, fts_s_set, table_set_with_onset_from_atoms);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("const"), table_const);
+  fts_method_define_varargs(cl, 0, fts_s_clear, table_clear);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("inv"), table_inv);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("quantile"), table_quantile);
+  fts_method_define_varargs(cl, 0, fts_s_bang, table_get_random);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("sum"), table_sum);
+  
+  fts_method_define_varargs(cl, 0, fts_s_size, table_size);
+  
+  fts_method_define_varargs(cl, 1, fts_s_int, table_store_value);
+  fts_method_define_varargs(cl, 1, fts_s_float, table_store_value);
+  
+  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+  
+  return fts_Success;
 }
 
 void
 table_config(void)
 {
-  sym_open_editor = fts_new_symbol("open_editor");
-  sym_close_editor = fts_new_symbol("close_editor");
-  sym_size = fts_new_symbol("size");
-
-  fts_metaclass_install(fts_new_symbol("table"), table_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("table"), table_instantiate);
 }
 
 /********************************************************************

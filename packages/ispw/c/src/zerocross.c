@@ -24,11 +24,7 @@
  *
  */
 
-/* a zero crossing counter */
-/* By : Francois Dechelle; ported to the new FTS by mdc */
-
 #include <fts/fts.h>
-
 
 typedef struct S_zerocross
 {
@@ -38,14 +34,6 @@ typedef struct S_zerocross
 } zerocross_t;
 
 static fts_symbol_t zerocross_function = 0;
-
-/* ---------- DSP method ---------- */
-
-/* Args:
-     float *in1		 input vector 
-     zerocrossctl *x	 control 
-     long n		  number of points 
-*/
 
 static void
 ftl_zerocross(fts_word_t *argv)
@@ -73,8 +61,6 @@ ftl_zerocross(fts_word_t *argv)
   this->count = count;
 }
 
-/* ---------- method put : put in or out the DSP chain ---------- */
-
 static void
 zerocross_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -89,9 +75,6 @@ zerocross_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   dsp_add_funcall(zerocross_function, 3, argv);
 }
 
-
-/* ---------- method bang : reset the count ---------- */
-
 static void
 zerocross_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -100,9 +83,6 @@ zerocross_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_outlet_int(o, 0, this->count);
   this->count = 0;
 }
-
-
-/* ---------- method new : instance creation ---------- */
 
 static void
 zerocross_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -127,35 +107,21 @@ zerocross_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 
-/* ---------- method setup : class creation ---------- */
-
 static fts_status_t
 zerocross_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(zerocross_t), 1, 1, 0); 
 
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, zerocross_init, 1, a);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, zerocross_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, zerocross_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, zerocross_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, zerocross_put);
 
-  /* Zerocross user methods */
-
-  fts_method_define(cl, 0, fts_s_bang, zerocross_bang, 0, 0);
-
-  /* Type the outlet */
+  fts_method_define_varargs(cl, 0, fts_s_bang, zerocross_bang);
 
   dsp_sig_inlet(cl, 0);
 
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
 
   zerocross_function = fts_new_symbol("zerocross");
   dsp_declare_function(zerocross_function, ftl_zerocross);

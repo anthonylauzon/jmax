@@ -21,7 +21,6 @@
  */
 
 #include <fts/fts.h>
-#include "message.h"
 #include "messtab.h"
 
 fts_symbol_t messtab_symbol = 0;
@@ -43,18 +42,18 @@ messtab_store(messtab_t *messtab, const fts_atom_t *key, fts_symbol_t s, int ac,
 {
   fts_hashtable_t *hash = (fts_is_int(key))? &messtab->table_int: &messtab->table_symbol;
   fts_atom_t value;
-  message_t *mess;
+  fts_message_t *mess;
 
   if(s)
     {
-      mess = (message_t *)fts_object_create(message_class, 0, 0);
-      message_set(mess, s, ac, at);
+      mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
+      fts_message_set(mess, s, ac, at);
     }
   else
     {
       fts_symbol_t error = 0;
 
-      mess = (message_t *)fts_object_create(message_class, ac, at);
+      mess = (fts_message_t *)fts_object_create(fts_message_class, ac, at);
       error = fts_object_get_error((fts_object_t *)mess);
 
       if(error)
@@ -77,14 +76,14 @@ messtab_store(messtab_t *messtab, const fts_atom_t *key, fts_symbol_t s, int ac,
   return 0;
 }
 
-static message_t *
+static fts_message_t *
 messtab_recall(messtab_t *messtab, const fts_atom_t *key)
 {
   fts_hashtable_t *hash = (fts_is_int(key))? &messtab->table_int: &messtab->table_symbol;
   fts_atom_t value;
   
   if(fts_hashtable_get(hash, key, &value))
-    return (message_t *)fts_get_object(&value);
+    return (fts_message_t *)fts_get_object(&value);
   else
     return 0;
 }
@@ -104,12 +103,41 @@ messtab_remove(messtab_t *messtab, const fts_atom_t *key)
 }
 
 static void
+messtab_remove_all(messtab_t *messtab)
+{
+  fts_hashtable_t *hashtabs[2];
+  int tab;
+	  
+  hashtabs[0] = &messtab->table_int;
+  hashtabs[1] = &messtab->table_symbol;
+
+  for(tab=0; tab<2; tab++)
+    {
+      fts_hashtable_t *hash = hashtabs[tab];
+      fts_iterator_t iterator;
+      
+      /* get int table */
+      fts_hashtable_get_values(hash, &iterator);
+	      
+      while(fts_iterator_has_more(&iterator))
+	{
+	  fts_atom_t value;
+		      
+	  fts_iterator_next(&iterator, &value);
+	  fts_atom_void(&value);
+	}
+	      
+      fts_hashtable_clear(hash);
+    }
+}
+
+static void
 messtab_get_entry(messtab_t *messtab, fts_atom_t *key, fts_symbol_t *s, int *ac, const fts_atom_t **at)
 {
-  message_t *mess = messtab_recall(messtab, key);
-  fts_symbol_t mess_s = message_get_selector(mess);
-  int mess_ac = message_get_ac(mess);
-  const fts_atom_t *mess_at = message_get_at(mess);
+  fts_message_t *mess = messtab_recall(messtab, key);
+  fts_symbol_t mess_s = fts_message_get_selector(mess);
+  int mess_ac = fts_message_get_ac(mess);
+  const fts_atom_t *mess_at = fts_message_get_at(mess);
   
   if(mess_ac == 1 && (fts_get_selector(mess_at) == mess_s))
     *s = 0;
@@ -141,6 +169,51 @@ messtab_get_keys(messtab_t *messtab, fts_array_t *array)
 
 	  fts_iterator_next(iterator, &key);
 	  fts_array_append(array, 1, &key);
+	}
+    }
+}
+
+void
+messtab_copy(messtab_t *org, messtab_t *copy)
+{
+  fts_hashtable_t *org_hash[2];
+  fts_hashtable_t *copy_hash[2];
+  int tab;
+
+  /* clear copy */
+  messtab_remove_all(copy);
+
+  /* init org hash tables */
+  org_hash[0] = &org->table_int;
+  org_hash[1] = &org->table_symbol;
+
+  /* init copy hash tables */
+  copy_hash[0] = &copy->table_int;
+  copy_hash[1] = &copy->table_symbol;
+
+  for(tab=0; tab<2; tab++)
+    {
+      fts_iterator_t key_iterator;
+      fts_iterator_t value_iterator;
+      
+      /* iterate on org hash table */
+      fts_hashtable_get_keys(org_hash[tab], &key_iterator);
+      fts_hashtable_get_values(org_hash[tab], &value_iterator);
+	      
+      while(fts_iterator_has_more(&key_iterator))
+	{
+	  fts_atom_t key;
+	  fts_atom_t value;
+		      
+	  /* get key */
+	  fts_iterator_next(&key_iterator, &key);
+	  fts_iterator_next(&value_iterator, &value);
+
+	  /* claim message entry */
+	  fts_atom_refer(&value);
+
+	  /* store entry to copy hash table */
+	  fts_hashtable_put(copy_hash[tab], &key, &value);
 	}
     }
 }
@@ -178,10 +251,10 @@ messtab_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   if(ac > 0 && (fts_is_symbol(at) || fts_is_int(at)))
     {
-      message_t *mess = messtab_recall(this, at);
+      fts_message_t *mess = messtab_recall(this, at);
 
       if(mess)
-	message_output(o, 0, mess);
+	fts_message_output(o, 0, mess);
     }
 }
 
@@ -190,108 +263,13 @@ messtab_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   messtab_t *this = (messtab_t *)o;
 
-  if(!this->locked)
-    {
-      if(ac > 0)
-	{ 
-	  if(fts_is_int(at) || fts_is_symbol(at))
-	    messtab_remove(this, at);
-	}
-      else
-	{
-	  fts_hashtable_t *hashtabs[2];
-	  int tab;
-	  
-	  hashtabs[0] = &this->table_int;
-	  hashtabs[1] = &this->table_symbol;
-
-	  for(tab=0; tab<2; tab++)
-	    {
-	      fts_hashtable_t *hash = hashtabs[tab];
-	      fts_iterator_t iterator;
-      
-	      /* get int table */
-	      fts_hashtable_get_values(hash, &iterator);
-	      
-	      while ( fts_iterator_has_more( &iterator) )
-		{
-		  fts_atom_t value;
-		      
-		  fts_iterator_next( &iterator, &value);
-		  fts_atom_void(&value);
-		}
-	      
-	      fts_hashtable_clear(hash);
-	    }
-	}
+  if(ac > 0)
+    { 
+      if(fts_is_int(at) || fts_is_symbol(at))
+	messtab_remove(this, at);
     }
-}
-
-static void
-messtab_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messtab_t *this = (messtab_t *)o;
-  fts_array_t *array = fts_get_array(at);
-  int size = 0;
-  fts_iterator_t iterators[2];
-  int tab;
-
-  fts_hashtable_get_keys(&this->table_int, iterators + 0);
-  fts_hashtable_get_keys(&this->table_symbol, iterators + 1);
-
-  for(tab=0; tab<2; tab++)
-    {
-      fts_iterator_t *iterator = iterators + tab;
-
-      while ( fts_iterator_has_more( iterator) )
-	{
-	  fts_atom_t key;
-	  message_t *mess;
-	  fts_symbol_t mess_s;
-	  int mess_ac;
-	  const fts_atom_t *mess_at;
-	  fts_array_t *aa;
-	  fts_atom_t a;
-	  
-	  size++;
-	  fts_array_set_size(array, size);
-
-	  fts_iterator_next( iterator, &key);
-	  messtab_get_entry(this, &key, &mess_s, &mess_ac, &mess_at);
-
-	  aa = (fts_array_t *)fts_malloc(sizeof(fts_array_t));
-	  fts_array_init(aa, 1, &key);
-	  
-	  if(mess_s)
-	    {
-	      fts_set_symbol(&a, mess_s);
-	      fts_array_append(aa, 1, &a);
-	    }
-	  
-	  fts_array_append(aa, mess_ac, mess_at);
-
-	  fts_set_array(&a, aa);
-	  fts_array_set_element(array, size - 1, &a);
-	}
-    }
-}
-
-static void
-messtab_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  messtab_t *this = (messtab_t *)o;
-  int i;
-
-  messtab_clear(o, 0, 0, 0, 0);
-
-  for(i=0; i<ac; i++)
-    {
-      fts_array_t *aa = fts_get_array(at + i);
-      int aac = fts_array_get_size(aa);
-      fts_atom_t *aat = fts_array_get_atoms(aa);
-
-      messtab_store(this, aat, 0, aac - 1, aat + 1);
-    }
+  else
+    messtab_remove_all(this);
 }
 
 static void
@@ -318,10 +296,10 @@ static void
 getmess_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getmess_t *this = (getmess_t *)o;
-  message_t *mess = messtab_recall(this->messtab, &this->key);
+  fts_message_t *mess = messtab_recall(this->messtab, &this->key);
 
   if(mess)
-    message_output(o, 0, mess);
+    fts_message_output(o, 0, mess);
 }
 
 static void
@@ -337,6 +315,54 @@ putmess_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   getmess_t *this = (getmess_t *)o;
 
   messtab_store(this->messtab, &this->key, s, ac, at);
+}
+
+static void
+messtab_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtab_t *this = (messtab_t *)o;
+  messtab_t *in = messtab_atom_get(at);
+  
+  messtab_copy(in, this);
+}
+
+static void
+messtab_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtab_t *this = (messtab_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_iterator_t iterators[2];
+  fts_message_t *mess;
+  int tab;
+
+  fts_hashtable_get_keys(&this->table_int, iterators + 0);
+  fts_hashtable_get_keys(&this->table_symbol, iterators + 1);
+
+  for(tab=0; tab<2; tab++)
+    {
+      fts_iterator_t *iterator = iterators + tab;
+
+      while(fts_iterator_has_more(iterator))
+	{
+	  fts_atom_t key;
+	  fts_message_t *mess;
+	  fts_symbol_t mess_s;
+	  int mess_ac;
+	  const fts_atom_t *mess_at;
+	  
+	  fts_iterator_next(iterator, &key);
+	  messtab_get_entry(this, &key, &mess_s, &mess_ac, &mess_at);
+	  
+	  mess = fts_dumper_message_new(dumper, fts_s_put);
+	  fts_message_append(mess, 1, &key);
+
+	  if(mess_s)
+	    fts_message_append_symbol(mess, mess_s);
+
+	  fts_message_append(mess, mess_ac, mess_at);
+	  fts_dumper_message_send(dumper, mess);
+	}
+    }
 }
 
 /**********************************************************
@@ -384,7 +410,7 @@ messtab_import_from_coll(messtab_t *this, fts_symbol_t file_name)
   messtab_clear((fts_object_t *)this, 0, 0, 0, 0);
   fts_set_void(&key);
 
-  while (error == 0 && fts_atom_file_read(file, &a, &c))
+  while(error == 0 && fts_atom_file_read(file, &a, &c))
     {
       switch(state)
 	{
@@ -485,16 +511,16 @@ messtab_export_to_coll(messtab_t *this, fts_symbol_t file_name)
     {
       fts_iterator_t *iterator = iterators + tab;
 
-      while ( fts_iterator_has_more( iterator) )
+      while(fts_iterator_has_more(iterator))
 	{
 	  fts_atom_t key;
-	  message_t *mess;
+	  fts_message_t *mess;
 	  fts_symbol_t mess_s;
 	  int mess_ac;
 	  const fts_atom_t *mess_at;
 	  fts_atom_t a;
 	  
-	  fts_iterator_next( iterator, &key);
+	  fts_iterator_next(iterator, &key);
 	  messtab_get_entry(this, &key, &mess_s, &mess_ac, &mess_at);
 	  
 	  /* write key */
@@ -623,6 +649,31 @@ getmess_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
+messtab_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  messtab_t *this = (messtab_t *)obj;
+
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
+}
+
+static void
+messtab_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  messtab_t *this = (messtab_t *)obj;
+
+  fts_set_symbol(value, this->keep);
+}
+
+static void
+messtab_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  messtab_t *this = (messtab_t *) obj;
+  
+  fts_set_object_with_type(value, (fts_object_t *)this, messtab_symbol);
+}
+
+static void
 messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
@@ -634,11 +685,11 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_hashtable_init(&this->table_int, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->table_symbol, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
 
-  this->locked = 0;
+  this->keep = fts_s_no;
 
   for(i=0; i<ac; i++)
     {
-      if(fts_is_list(at + i))
+      if(fts_is_array(at + i))
 	{
 	  fts_array_t *list = fts_get_array(at + i);
 	  int lac = fts_array_get_size(list);
@@ -676,6 +727,8 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  messtab_clear(o, 0, 0, 0, 0);
 	  fts_object_set_error(o, "Wrong arguments");
 	}
+
+      this->keep = fts_s_args;
     }
 }
 
@@ -687,33 +740,29 @@ messtab_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   messtab_clear(o, 0, 0, 0, 0);
 }
 
-static void
-messtab_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  messtab_t *this = (messtab_t *) obj;
-  
-  fts_set_object_with_type(value, (fts_object_t *)this, messtab_symbol);
-}
-
 static fts_status_t
 messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(messtab_t), 1, 1, 0);
   
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, messtab_get_state);
-  
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messtab_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messtab_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, messtab_append_state_to_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, messtab_set_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, messtab_set_from_instance);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, messtab_put);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("import"), messtab_import);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), messtab_export);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, messtab_dump);
+
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, messtab_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, messtab_get_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, messtab_get_state);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("put"), messtab_put);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("get"), messtab_get);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), messtab_clear);
+  fts_method_define_varargs(cl, 0, fts_s_import, messtab_import);
+  fts_method_define_varargs(cl, 0, fts_s_export, messtab_export);
+  
+  fts_method_define_varargs(cl, 0, fts_s_put, messtab_put);
+  fts_method_define_varargs(cl, 0, fts_s_get, messtab_get);
+  fts_method_define_varargs(cl, 0, fts_s_clear, messtab_clear);
   
   return fts_Success;
 }

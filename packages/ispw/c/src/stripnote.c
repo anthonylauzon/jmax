@@ -83,30 +83,16 @@ stripnote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 stripnote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[10];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(stripnote_t), 2, 2, 0); 
 
-  /* Stripnote methods */
+  fts_method_define_varargs(cl, 0, fts_s_int, stripnote_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, stripnote_float);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, stripnote_int, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, stripnote_float, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, stripnote_number_1, 1, a);
-
+  fts_method_define_varargs(cl, 1, fts_s_int, stripnote_number_1);
   fts_method_define_varargs(cl, 1, fts_s_list, stripnote_list);
 
-  /* Type the outlet */
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
+  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
 
   return fts_Success;
 }

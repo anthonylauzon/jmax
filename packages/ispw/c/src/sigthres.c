@@ -271,7 +271,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, sigthres_status_int);
   fts_method_define_varargs(cl, 0, fts_s_float, sigthres_status_float);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), sigthres_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, sigthres_set);
   
   fts_method_define_varargs(cl, 1, fts_s_float, sigthres_hi_thresh);
   fts_method_define_varargs(cl, 1, fts_s_int, sigthres_hi_thresh);

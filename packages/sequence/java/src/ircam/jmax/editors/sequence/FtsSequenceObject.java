@@ -113,7 +113,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       notifyTracksAdded(trackTime);
   }
    
-  public void deleteTracks(int nArgs , FtsAtom args[])
+  public void removeTracks(int nArgs , FtsAtom args[])
   {
       FtsTrackObject trackObj;
       Track track;
@@ -293,7 +293,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
     public void requestSequenceName()
     {
-	sendMessage(FtsObject.systemInlet, "get_name", 0, null);
+	sendMessage(FtsObject.systemInlet, "getName", 0, null);
     }
 
     public void importMidiFile()
@@ -303,7 +303,7 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 
     public void closeEditor()
     {
-	sendMessage(FtsObject.systemInlet, "close_editor", 0, null);
+	sendMessage(FtsObject.systemInlet, "closeEditor", 0, null);
     }
 
   /**

@@ -400,42 +400,17 @@ sigtable_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(sigtable_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol; /* class */
-  a[1] = fts_s_symbol; /* name */
-  a[2] = fts_s_anything; /* unit or size or no */
-  a[3] = fts_s_number; /* size or no */
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigtable_init, 4, a, 2);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigtable_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigtable_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, put_dsp_check_size);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("read"), sigtable_read);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("write"), sigtable_write);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("load"), sigtable_load);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("save"), sigtable_save);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigtable_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, put_dsp_check_size, 1, a);
-  
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_new_symbol("read"), sigtable_read, 2, a, 1);
-  
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("write"), sigtable_write, 1, a);
-  
-  a[0] = fts_s_symbol; /* file name */
-  a[1] = fts_s_number; /* onset */
-  a[2] = fts_s_number; /* sampling rate (might cause implicit conversion) */
-  a[3] = fts_s_symbol; /* (raw) format causes reading of raw data */
-  fts_method_define_optargs(cl, 0, fts_new_symbol("load"), sigtable_load, 4, a, 1);
-  
-  a[0] = fts_s_symbol; /* file name */
-  a[1] = fts_s_number; /* length (in # of samples) */
-  a[2] = fts_s_number; /* sampling rate (might cause implicit conversion) */
-  a[3] = fts_s_symbol; /* (raw) format causes reading of raw data */
-  fts_method_define_optargs(cl, 0, fts_new_symbol("save"), sigtable_save, 4, a, 1);
-  
-  a[1] = fts_s_number; /* size */
-  fts_method_define(cl, 0, fts_new_symbol("realloc"), sigtable_realloc, 1, a);
-
-  /* outlet */
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a); /* # of samples read from file */
+  fts_method_define_varargs(cl, 0, fts_new_symbol("realloc"), sigtable_realloc);
 
   return fts_Success;
 }

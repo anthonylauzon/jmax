@@ -87,20 +87,20 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   {
     super.selectionPointDoubleClicked(x, y, modifiers);
     if (gc.getRenderManager().firstObjectContaining(x, y) == null)
-	((SequenceGraphicContext)gc).getTrackEditor().showListDialog();
+      ((SequenceGraphicContext)gc).getTrackEditor().showListDialog();
   }
 
-    public void edit(int x, int y, int modifiers)
-    {
-	TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+  public void edit(int x, int y, int modifiers)
+  {
+    TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
     
-	if (aTrackEvent != null) 
-	    { //click on event
-		aTrackEvent.getValue().edit(x, y, modifiers, aTrackEvent, (SequenceGraphicContext)gc);
+    if (aTrackEvent != null) 
+      { //click on event
+	aTrackEvent.getValue().edit(x, y, modifiers, aTrackEvent, (SequenceGraphicContext)gc);
 
-		gc.getGraphicDestination().repaint();
-	    }
-    }
+	gc.getGraphicDestination().repaint();
+      }
+  }
 
 
   /**
@@ -137,86 +137,55 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     int deltaX = x-startingPoint.x;
     
     if(deltaX != 0) 
-	{	    
-	    // starts a serie of undoable moves
-	    ((UndoableData) egc.getDataModel()).beginUpdate();
+      {	    
+	// starts a serie of undoable moves
+	((UndoableData) egc.getDataModel()).beginUpdate();
 	    
-	    if(a.isHorizontalMovementAllowed())
-		if(!a.isHorizontalMovementBounded())
-		    {
-			/*int i = 0;
-			  for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-			  {
-			  aEvent = (TrackEvent) e.nextElement();		    
-			  FtsTrackObject.sendArgs[i].setObject(aEvent);
-			  FtsTrackObject.sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));
-			  i+=2;
+	if(a.isHorizontalMovementAllowed())
+	  if(!a.isHorizontalMovementBounded())
+	    egc.getTrack().getFtsTrack().requestEventsMove(egc.getSelection().getSelected(), deltaX, a);
+	  else
+	    {
+	      for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+		{
+		  int prevX = 0;
+		  int nextX = 0;
+			
+		  aEvent = (TrackEvent) e.nextElement();
+			
+		  FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
+		  TrackEvent next = ftsTrk.getNextEvent(aEvent);
+		  if(next!=null)
+		    nextX = a.getX(next)-1;
+		  TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
+		  if(prev!=null)
+		    prevX = a.getX(prev)+1;
+			
+		  if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
+		    a.setX(aEvent, nextX);
+		  else
+		    if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
+		      a.setX(aEvent, prevX);
+		    else
+		      a.setX(aEvent, a.getX(aEvent) + deltaX);
+		}
+	    }
 
-			  if(i>=FtsTrackObject.NUM_ARGS-1)
-			  {	
-			  egc.getTrack().getFtsTrack().sendMessage(FtsObject.systemInlet,
-			  "move_events", 
-			  i, 
-			  FtsTrackObject.sendArgs);
-			  i=0;
-			  }
-			  }
-			  if(i!=0)
-			  egc.getTrack().getFtsTrack().sendMessage(FtsObject.systemInlet, 
-			  "move_events", i, FtsTrackObject.sendArgs);*/
-
-			//if(egc.getSelection().size()<egc.getTrack().getFtsTrack().NUM_ARGS/2)
-			
-			egc.getTrack().getFtsTrack().requestEventsMove(egc.getSelection().getSelected(), deltaX, a);
-			
-			/*else
-			  {
-			  MaxVector copy = new MaxVector();
-			  for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-			  copy.addElement((TrackEvent) e.nextElement());
-			  
-			  egc.getTrack().getFtsTrack().requestEventsMove(copy.elements(), deltaX, a);
-			  }*/
-		    }
-		else
-		    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-			{
-			    int prevX = 0;
-			    int nextX = 0;
-			
-			    aEvent = (TrackEvent) e.nextElement();
-			
-			    FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
-			    TrackEvent next = ftsTrk.getNextEvent(aEvent);
-			    if(next!=null)
-				nextX = a.getX(next)-1;
-			    TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
-			    if(prev!=null)
-				prevX = a.getX(prev)+1;
-			
-			    if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
-				a.setX(aEvent, nextX);
-			    else
-				if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
-				    a.setX(aEvent, prevX);
-				else
-				    a.setX(aEvent, a.getX(aEvent) + deltaX);
-			}
-	}
-    if(deltaY!=0)
-	{
+	if(deltaY!=0)
+	  {
 	    ((UndoableData) egc.getDataModel()).beginUpdate();
 	    for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-		{
-		    aEvent = (TrackEvent) e.nextElement();
-		    a.setY(aEvent, a.getY(aEvent)+deltaY);
-		}    
+	      {
+		aEvent = (TrackEvent) e.nextElement();
+		a.setY(aEvent, a.getY(aEvent)+deltaY);
+	      }    
 	    ((UndoableData) egc.getDataModel()).endUpdate();
-	}
-    mountIModule(itsSelecter);
-    gc.getGraphicDestination().repaint();    
+	  }
+	mountIModule(itsSelecter);
+	gc.getGraphicDestination().repaint();    
+      }
   }
-
+  
   public void updateStartingPoint(int deltaX, int deltaY)
   {
     startingPoint.x+=deltaX;
@@ -233,8 +202,3 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   final static int CLONE = 1;
   int itsMoveMode;
 }
-
-
-
-
-

@@ -743,8 +743,6 @@ pbank_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
-
   if(ac < 5)
     {
       /* pbank <# of cols> <#of rows> <name> */
@@ -752,9 +750,8 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, fts_s_list, pbank_set_and_get);
 
-      a[0] = fts_t_int;
-      fts_method_define(cl, 0, fts_s_int, pbank_get_row, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("recall"), pbank_recall, 1, a);
+      fts_method_define_varargs(cl, 0, fts_s_int, pbank_get_row);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), pbank_recall);
 
       /* type the outlet */
       fts_outlet_type_define_varargs(cl, 0, fts_s_list);
@@ -766,9 +763,8 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, fts_s_list, pbank_set_and_get_to_receives);
 
-      a[0] = fts_t_int;
-      fts_method_define(cl, 0, fts_s_int, pbank_get_row_to_receives, 1, a);
-      fts_method_define(cl, 0, fts_new_symbol("recall"), pbank_recall_to_receives, 1, a);
+      fts_method_define_varargs(cl, 0, fts_s_int, pbank_get_row_to_receives);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), pbank_recall_to_receives);
     }
   else
     return &fts_CannotInstantiate;
@@ -776,17 +772,14 @@ pbank_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pbank_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pbank_delete);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), pbank_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, pbank_set);
   fts_method_define_varargs(cl, 0, fts_new_symbol("put"), pbank_put);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("store"), pbank_store, 1, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("store"), pbank_store);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("write"), pbank_write, 1, a);
-  fts_method_define(cl, 0, fts_new_symbol("read"), pbank_read, 1, a);
-  fts_method_define(cl, 0, fts_new_symbol("export"), pbank_export, 2, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("write"), pbank_write);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("read"), pbank_read);
+  fts_method_define_varargs(cl, 0, fts_s_export, pbank_export);
 
   return fts_Success;
 }

@@ -162,25 +162,19 @@ rewrap_b(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static fts_status_t
 rewrap_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(rewrap_t), 3, 2, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, rewrap_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, rewrap_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, rewrap_delete);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, rewrap_number, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, rewrap_number, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, rewrap_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, rewrap_number);
 
-  a[0] = fts_s_number;
-  fts_method_define(cl, 1, fts_s_int, rewrap_a, 1, a);
-  fts_method_define(cl, 1, fts_s_float, rewrap_a, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, rewrap_a);
+  fts_method_define_varargs(cl, 1, fts_s_float, rewrap_a);
 
-  a[0] = fts_s_number;
-  fts_method_define(cl, 2, fts_s_int, rewrap_b, 1, a);
-  fts_method_define(cl, 2, fts_s_float, rewrap_b, 1, a);
+  fts_method_define_varargs(cl, 2, fts_s_int, rewrap_b);
+  fts_method_define_varargs(cl, 2, fts_s_float, rewrap_b);
 
   return fts_Success;
 }

@@ -96,24 +96,15 @@ sigsamplerate_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(sigparam_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigsamplerate_init, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigparam_delete, 0, 0);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigparam_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigsamplerate_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigparam_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigparam_put);
   
-  fts_method_define(cl, 0, fts_s_bang, sigparam_bang, 0, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, sigparam_bang);
 
   dsp_sig_inlet(cl, 0);
   
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0, fts_s_float, 1, a);
-
-  /* DSP properties  */
-
-  /* fts_class_put_prop(cl, fts_s_dsp_is_sink, fts_true); */
+  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
 
   return fts_Success;
 }
@@ -121,28 +112,17 @@ sigsamplerate_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 sigvectorsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
   fts_class_init(cl, sizeof(sigparam_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigvectorsize_init, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigparam_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigparam_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigvectorsize_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigparam_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigparam_put);
   
-  fts_method_define(cl, 0, fts_s_bang, sigparam_bang, 0, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, sigparam_bang);
 
   dsp_sig_inlet(cl, 0);
   
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
-
-  /* DSP properties  */
-
-  /*   fts_class_put_prop(cl, fts_s_dsp_is_sink, fts_true); */
+  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 
   return fts_Success;
 }

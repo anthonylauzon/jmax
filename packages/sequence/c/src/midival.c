@@ -38,7 +38,7 @@ fts_class_t *midival_class = 0;
  */
 
 static void
-midival_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midival_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midival_t *this = (midival_t *)o;
   
@@ -56,7 +56,7 @@ midival_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 }
 
 void 
-midival_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midival_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midival_t *this = (midival_t *)o;
   fts_array_t *array = fts_get_array(at);
@@ -95,8 +95,8 @@ midival_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midival_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, midival_append_state_to_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, midival_set_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, midival_get_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, midival_set_from_array);
 
   return fts_Success;
 }

@@ -38,8 +38,6 @@ typedef struct sigprint_t {
   float *buf;
 } sigprint_t;
 
-static fts_symbol_t print_dsp_function = 0;
-
 static void
 sigprint_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -146,7 +144,7 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
   fts_set_ptr(argv + 1, o);
   fts_set_int(argv + 2, n_tick);
-  dsp_add_funcall(print_dsp_function, 3, argv);
+  dsp_add_funcall(fts_s_print, 3, argv);
 }
 
 static fts_status_t
@@ -162,8 +160,7 @@ sigprint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, sigprint_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, sigprint_int);
 
-  print_dsp_function = fts_new_symbol("print");
-  dsp_declare_function(print_dsp_function, ftl_sigprint);
+  dsp_declare_function(fts_s_print, ftl_sigprint);
 
   dsp_sig_inlet(cl, 0);
 

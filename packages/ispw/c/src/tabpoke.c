@@ -47,10 +47,19 @@ static void
 tabpoke_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabpoke_t *this = (tabpoke_t *)o;
-  fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
 
-  this->tab_name = tab_name;
-  this->state    = 0;
+  ac--;
+  at++;
+
+  if(ac > 0 && fts_is_symbol(at))
+    {
+      fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
+      
+      this->tab_name = tab_name;
+      this->state = 0;
+    }
+  else
+    fts_object_set_error(o, "Name argument required");
 }
 
 
@@ -170,36 +179,21 @@ tabpoke_center(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(tabpoke_t), 2, 1, 0); 
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, tabpoke_init, 2, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tabpoke_init);
   
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0,	fts_s_float, 1, a);
-
-  /* user methods */
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, tabpoke_number, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, tabpoke_number, 1, a);
-
-  a[0] = fts_s_anything;
-  fts_method_define(cl, 0, fts_new_symbol("set"), tabpoke_set, 1, a);
-
+  fts_method_define_varargs(cl, 0, fts_s_set, tabpoke_set);
+  fts_method_define_varargs(cl, 0, fts_s_int, tabpoke_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, tabpoke_number);
   fts_method_define_varargs(cl, 0, fts_s_list, tabpoke_list);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, tabpoke_set_value, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, tabpoke_set_value, 1, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("center"), tabpoke_center);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("center"), tabpoke_center, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, tabpoke_set_value);
+  fts_method_define_varargs(cl, 1, fts_s_float, tabpoke_set_value);
+
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_float);
 
   return fts_Success;
 }

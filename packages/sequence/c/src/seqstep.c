@@ -149,9 +149,9 @@ seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       while(next && event_get_time(next) == time)
 	{
 	  fts_array_clear(&this->array);
-	  event_append_state_to_array(next, &this->array);
+	  event_get_array(next, &this->array);
 	  
-	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
+	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array) - 2, fts_array_get_atoms(&this->array) + 2);
 	  
 	  event = next;
 	  next = event_get_next(next);
@@ -208,9 +208,9 @@ seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       while(prev && event_get_time(prev) == time)
 	{
 	  fts_array_clear(&this->array);
-	  event_append_state_to_array(prev, &this->array);
+	  event_get_array(prev, &this->array);
 	  
-	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
+	  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array) - 2, fts_array_get_atoms(&this->array) + 2);
 	  
 	  event = prev;
 	  prev = event_get_prev(prev);

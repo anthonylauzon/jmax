@@ -102,7 +102,7 @@ void fts_timebase_reset(fts_timebase_t *timebase);
  *
  */
 
-void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *o, fts_method_t m, fts_atom_t *a, double delay);
+void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *o, fts_method_t m, const fts_atom_t *a, double delay);
 void fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object);
 void fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object);
 

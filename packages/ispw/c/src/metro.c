@@ -115,8 +115,8 @@ metro_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, metro_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, metro_start);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), metro_start);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), metro_stop);
+  fts_method_define_varargs(cl, 0, fts_s_start, metro_start);
+  fts_method_define_varargs(cl, 0, fts_s_stop, metro_stop);
 
   fts_method_define_varargs(cl, 0, fts_s_int, metro_number);
   fts_method_define_varargs(cl, 0, fts_s_float, metro_number);

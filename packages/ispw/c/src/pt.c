@@ -330,7 +330,7 @@ static fts_status_t pt_class_instantiate(fts_class_t *cl, int ac, const fts_atom
   fts_method_define_varargs(cl, 0, fts_new_symbol("gliss-time"), pt_gliss_time);
   fts_method_define_varargs(cl, 0, fts_new_symbol("reattack"), pt_reattack);
 	
-  fts_method_define_varargs(cl, 0, fts_new_symbol("print"), pt_print);
+  fts_method_define_varargs(cl, 0, fts_s_print, pt_print);
 	
   /* classes signal inlets and outlets */
   dsp_sig_inlet(cl, INLET_sig);

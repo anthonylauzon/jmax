@@ -40,12 +40,27 @@
 
 /* #define SAVER_DEBUG */
 
+/* saver dumper utility */
+static fts_class_t *cl_saver_dumper = 0;
+static fts_symbol_t s_saver_dumper = 0;
+
+typedef struct _saver_dumper
+{
+  fts_dumper_t head;
+  fts_bmax_file_t *file;
+} saver_dumper_t;
+
+#define saver_dumper_set_file(d, f) ((d)->file = (f))
+
+static saver_dumper_t *saver_dumper = 0;
+
 union swap_union_t {
   unsigned long l;
   char c[4];
 };
 
-static int has_to_swap(void)
+static int 
+has_to_swap(void)
 {
   union swap_union_t u;
 
@@ -53,7 +68,8 @@ static int has_to_swap(void)
   return u.c[0] != 0x11;
 }
 
-static void swap_long( unsigned long *p)
+static void 
+swap_long( unsigned long *p)
 {
   union swap_union_t *pu;
   char tmp;
@@ -69,7 +85,8 @@ static void swap_long( unsigned long *p)
 
 #define DEFAULT_SYMBOL_TABLE_SIZE 4*1024
 
-static int fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *symbol_table, int symbol_table_size)
+static int 
+fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *symbol_table, int symbol_table_size)
 {
   fts_binary_file_header_t header;
 
@@ -88,7 +105,6 @@ static int fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *
     }
 
   /* Initialize the header */
-
   f->header.magic_number = FTS_BINARY_FILE_MAGIC;
   f->header.code_size = 0;
   f->header.n_symbols = 0;
@@ -96,7 +112,6 @@ static int fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *
   f->file = file;
 
   /* write the init header to the file */
-
   header = f->header;
   if (has_to_swap())
     {
@@ -111,10 +126,22 @@ static int fts_bmax_file_open_fd( fts_bmax_file_t *f, FILE *file, fts_symbol_t *
       return -1;
     }
 
+  if(!saver_dumper)
+    {
+      /* create dumper */
+      saver_dumper = (saver_dumper_t *)fts_object_create(cl_saver_dumper, 0, 0);
+      fts_object_refer(saver_dumper);
+    }
+
+  saver_dumper_set_file(saver_dumper, f);
+
+  f->dumper = saver_dumper;
+
   return 0;
 }
 
-int fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symbol_t *symbol_table, int symbol_table_size)
+int 
+fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symbol_t *symbol_table, int symbol_table_size)
 {
   FILE *file;
 
@@ -144,7 +171,8 @@ int fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_
 }
 
 
-void fts_bmax_file_sync( fts_bmax_file_t *f)
+void 
+fts_bmax_file_sync( fts_bmax_file_t *f)
 {
   unsigned int i;
   char c;
@@ -196,6 +224,7 @@ void fts_bmax_file_sync( fts_bmax_file_t *f)
 void fts_bmax_file_close( fts_bmax_file_t *f)
 {
   fts_bmax_file_sync( f);
+
   fclose( f->file);
 }
 
@@ -226,7 +255,6 @@ fts_bmax_find_objidx_in_selection(fts_object_t *obj, fts_selection_t *sel)
 
   /* If we exit from here, a big coding error have been done,
      or a message system inconsistency discovered !!! */
-
   return -1;
 }
 
@@ -258,28 +286,23 @@ fts_bmax_find_objidx(fts_object_t *obj)
 
   /* If we exit from here, a big coding error have been done,
      or a message system inconsistency discovered !!! */
-
   return -1;
 }
 
-static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
+static int 
+fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   unsigned int i;
 
   /* First, search for the symbol in the symbol table */
-
   for (i = 0; i < f->header.n_symbols; i++)
     if (f->symbol_table[i] == sym)
       return i;
   
-  /* is not there, add it, resizing the table if there
-   * is no place
-   */
-
+  /* is not there, add it, resizing the table if there is no place */
   if (f->header.n_symbols >= f->symbol_table_size)
     {
       /* resize symbol table  */
-
       fts_symbol_t *new_table;
       int new_size;
       int i;
@@ -306,8 +329,8 @@ static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 				 
 
 /* Utilities */
-
-static unsigned char fts_bmax_get_argcode(int value)
+static unsigned char 
+fts_bmax_get_argcode(int value)
 {
   if ((127 >= value) && (value >= -128))
     return FVM_B_ARG;
@@ -317,8 +340,8 @@ static unsigned char fts_bmax_get_argcode(int value)
     return FVM_L_ARG;
 }
 
-
-static void fts_bmax_write_opcode_for(fts_bmax_file_t *f, unsigned char opcode, int value)
+static void 
+fts_bmax_write_opcode_for(fts_bmax_file_t *f, unsigned char opcode, int value)
 {
   unsigned char c = opcode | fts_bmax_get_argcode(value);
 
@@ -326,8 +349,8 @@ static void fts_bmax_write_opcode_for(fts_bmax_file_t *f, unsigned char opcode, 
   f->header.code_size++;
 }
 
-
-static void fts_bmax_write_opcode(fts_bmax_file_t *f, unsigned char opcode)
+static void 
+fts_bmax_write_opcode(fts_bmax_file_t *f, unsigned char opcode)
 {
   unsigned char c = opcode;
   
@@ -335,9 +358,8 @@ static void fts_bmax_write_opcode(fts_bmax_file_t *f, unsigned char opcode)
   f->header.code_size++;
 }
 
-
-
-static void fts_bmax_write_b_int(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_write_b_int(fts_bmax_file_t *f, int value)
 {
   unsigned char c;
 
@@ -346,8 +368,8 @@ static void fts_bmax_write_b_int(fts_bmax_file_t *f, int value)
   f->header.code_size++;
 }
 
-
-static void fts_bmax_write_s_int(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_write_s_int(fts_bmax_file_t *f, int value)
 {
   unsigned char c[2];
       
@@ -358,7 +380,8 @@ static void fts_bmax_write_s_int(fts_bmax_file_t *f, int value)
   f->header.code_size += 2;
 }
 
-static void fts_bmax_write_l_int(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_write_l_int(fts_bmax_file_t *f, int value)
 {
   unsigned char c[4];
       
@@ -371,7 +394,8 @@ static void fts_bmax_write_l_int(fts_bmax_file_t *f, int value)
   f->header.code_size += 4;
 }
 
-static void fts_bmax_write_int(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_write_int(fts_bmax_file_t *f, int value)
 {
   unsigned char argcode  = fts_bmax_get_argcode(value);
 
@@ -383,7 +407,8 @@ static void fts_bmax_write_int(fts_bmax_file_t *f, int value)
     fts_bmax_write_l_int(f, value);
 }
 
-static void fts_bmax_write_float(fts_bmax_file_t *f, float value)
+static void 
+fts_bmax_write_float(fts_bmax_file_t *f, float value)
 {
   float fv = value;
   unsigned int fx = *((unsigned int *)&fv);
@@ -400,11 +425,10 @@ static void fts_bmax_write_float(fts_bmax_file_t *f, float value)
 
 
 /* One functions for each opcode (without considering the argument length) */
-
-void fts_bmax_code_return(fts_bmax_file_t *f)
+void 
+fts_bmax_code_return(fts_bmax_file_t *f)
 {
   /* RETURN */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tRETURN\n");
 #endif
@@ -412,11 +436,10 @@ void fts_bmax_code_return(fts_bmax_file_t *f)
   fts_bmax_write_opcode(f, FVM_RETURN);
 }
 
-
-void fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
 {
   /* PUSH_INT   <int>   */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPUSH_INT %d\n", value);
 #endif
@@ -425,11 +448,10 @@ void fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
+static void 
+fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 {
   /* PUSH_FLOAT <float> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPUSH_FLOAT %f\n", value);
 #endif
@@ -438,11 +460,10 @@ void fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
   fts_bmax_write_float(f, value);
 }
 
-
-void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
+void 
+fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   /* PUSH_SYM   <int>   */
-
   int value;
 
 #ifdef SAVER_DEBUG
@@ -456,11 +477,10 @@ void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_set_int(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_code_set_int(fts_bmax_file_t *f, int value)
 {
   /* SET_INT   <int>   */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tSET_INT %d\n", value);
 #endif
@@ -469,11 +489,10 @@ void fts_bmax_code_set_int(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_set_float(fts_bmax_file_t *f, float value)
+static void 
+fts_bmax_code_set_float(fts_bmax_file_t *f, float value)
 {
   /* SET_FLOAT <float> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tSET_FLOAT %f\n", value);
 #endif
@@ -482,11 +501,10 @@ void fts_bmax_code_set_float(fts_bmax_file_t *f, float value)
   fts_bmax_write_float(f, value);
 }
 
-
-void fts_bmax_code_set_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
+static void 
+fts_bmax_code_set_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   /* SET_SYM   <int>   */
-
   int value;
 
 #ifdef SAVER_DEBUG
@@ -500,11 +518,10 @@ void fts_bmax_code_set_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_pop_args(fts_bmax_file_t *f, int value)
+void 
+fts_bmax_code_pop_args(fts_bmax_file_t *f, int value)
 {
   /* POP_ARGS    <int>   // pop n values  from the argument stack */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPOP_ARGS %d\n", value);
 #endif
@@ -513,11 +530,10 @@ void fts_bmax_code_pop_args(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_push_obj(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_code_push_obj(fts_bmax_file_t *f, int value)
 {
   /* PUSH_OBJ   <objidx> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPUSH_OBJ %d\n", value);
 #endif
@@ -526,11 +542,10 @@ void fts_bmax_code_push_obj(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_mv_obj(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_code_mv_obj(fts_bmax_file_t *f, int value)
 {
   /* MV_OBJ     <objidx> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tMV_OBJ %d\n", value);
 #endif
@@ -539,12 +554,10 @@ void fts_bmax_code_mv_obj(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-
-void fts_bmax_code_pop_objs(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_code_pop_objs(fts_bmax_file_t *f, int value)
 {
   /* POP_OBJS    <int> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPOP_OBJS %d\n", value);
 #endif
@@ -553,11 +566,10 @@ void fts_bmax_code_pop_objs(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
 {
   /* MAKE_OBJ   <nargs> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tMAKE_OBJ %d\n", value);
 #endif
@@ -569,7 +581,6 @@ void fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
 static void fts_bmax_code_make_top_obj(fts_bmax_file_t *f, int value)
 {
   /* MAKE_TOP_OBJ   <nargs> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tMAKE_TOP_OBJ %d\n", value);
 #endif
@@ -578,11 +589,10 @@ static void fts_bmax_code_make_top_obj(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
+static void 
+fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   /* PUT_PROP   <sym> */
-
   int value;
 
 #ifdef SAVER_DEBUG
@@ -597,11 +607,9 @@ void fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
   fts_bmax_write_int(f, value);
 }
 
-
 void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs)
 {
   /* OBJ_MESS   <inlet> <sel> <nargs> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tOBJ_MESS %d %d (%s) %d\n",
 	  inlet,
@@ -616,11 +624,10 @@ void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int
   fts_bmax_write_l_int(f, nargs);
 }
 
-
-void fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value)
+static void 
+fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value)
 {
   /* PUSH_OBJ_TABLE <int> */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPUSH_OBJ_TABLE %d\n", value);
 #endif
@@ -629,11 +636,10 @@ void fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value)
   fts_bmax_write_int(f, value);
 }
 
-
-void fts_bmax_code_pop_obj_table(fts_bmax_file_t *f)
+static void 
+fts_bmax_code_pop_obj_table(fts_bmax_file_t *f)
 {
   /* POP_OBJ_TABLE */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tPOP_OBJ_TABLE\n");
 #endif
@@ -641,10 +647,10 @@ void fts_bmax_code_pop_obj_table(fts_bmax_file_t *f)
   fts_bmax_write_opcode(f, FVM_POP_OBJ_TABLE);
 }
 
-void fts_bmax_code_connect(fts_bmax_file_t *f)
+static void 
+fts_bmax_code_connect(fts_bmax_file_t *f)
 {
   /* CONNECT */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "\tCONNECT\n");
 #endif
@@ -652,20 +658,9 @@ void fts_bmax_code_connect(fts_bmax_file_t *f)
   fts_bmax_write_opcode(f, FVM_CONNECT);
 }
 
-
-
-/*
- * Higher level (Macro) functions, convenience functions.
- * 
- */
-
-
-/* push atom args: pushed backward, to have them in the right order
- * in the stack at execution time
- */
-
-
-void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at)
+/* push atom args: pushed backward, to have them in the right order in the stack at execution time */
+void 
+fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at)
 {
   int i;
 
@@ -682,12 +677,9 @@ void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at)
     }
 }
 
-
-/* set atom arg: set an atom as top of the stack
- */
-
-
-void fts_bmax_code_set_atom(fts_bmax_file_t *f, const fts_atom_t *a)
+/* set atom arg: set an atom as top of the stack */
+static void 
+fts_bmax_code_set_atom(fts_bmax_file_t *f, const fts_atom_t *a)
 {
   if (fts_is_int(a))
     fts_bmax_code_set_int(f, fts_get_int(a));
@@ -698,30 +690,21 @@ void fts_bmax_code_set_atom(fts_bmax_file_t *f, const fts_atom_t *a)
 }
 
 /* Objects, connections, patchers */
-
-/* Code a new property: push the property value, code the put
-   instruction, pop the value.
-
-   The object passed must be on the top of the object stack.
-   */
-
-
-static void fts_bmax_code_new_property(fts_bmax_file_t *f, fts_object_t *obj, fts_symbol_t prop)
+static void
+fts_bmax_code_new_property(fts_bmax_file_t *f, fts_object_t *obj, fts_symbol_t prop)
 {
   fts_atom_t value;
   
   fts_object_get_prop(obj, prop, &value);
 
-  if (! fts_is_void(&value))
+  if(!fts_is_void(&value))
     {
       fts_bmax_code_set_atom(f, &value);
       fts_bmax_code_put_prop(f, prop);
     }
 }
 
-
 /* Code a new object, and leave him in the top of the object stack */
-
 void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 {
   fts_atom_t a;
@@ -732,7 +715,6 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * The pop  of the arguments is done at the end, because we reuse
    * the top of the stack for properties (use set instead of push)
    */
-
 #ifdef SAVER_DEBUG 
   fprintf(stderr, "Saving Object %lx %d: ", obj,  obj->head.id);
   fprintf_atoms(stderr, obj->argc, obj->argv);
@@ -752,7 +734,6 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
      an object with zero argument is an empty "error" object, left there by mistake
      during editing.
      */
-
   if (obj->argc == 0)
     fts_bmax_code_push_int(f, 0);
 
@@ -760,7 +741,6 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
      Here, it should use some property data base to find out
      the good properties.
      */
-
   fts_bmax_code_new_property(f, obj, fts_s_x);
   fts_bmax_code_new_property(f, obj, fts_s_y);
   fts_bmax_code_new_property(f, obj, fts_s_height);
@@ -797,25 +777,24 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
     }
 
   /* If argc is zero, we pop the 0 value pushed above */
-
   if  (obj->argc == 0)
     fts_bmax_code_pop_args(f, 1);
   else
     fts_bmax_code_pop_args(f, obj->argc);
 
-  /* Here, send a message to the object to give it the opportunity
-     to save its data, if any; ignore error return ! */
+  /* send a dump message to the object to give it the opportunity to save its data */
+  fts_object_get_prop(obj, fts_s_keep, &a);
 
-  fts_set_ptr(&a, f);
-
-  fts_send_message(obj, fts_SystemInlet, fts_s_save_bmax, 1, &a);
+  /* dump if there is no keep property or if keep=yes */
+  if(fts_is_void(&a) || (fts_is_symbol(&a) && fts_get_symbol(&a) == fts_s_yes))
+    {
+      fts_set_object(&a, (fts_object_t *)saver_dumper);
+      fts_send_message(obj, fts_SystemInlet, fts_s_dump, 1, &a);
+    }
 }
 
 
-/*
-  Code the top level patcher object instantiation and properties 
-  */
-   
+/* Code the top level patcher object instantiation and properties */
 static void
 fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 {
@@ -827,7 +806,6 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * The pop  of the arguments is done at the end, because we reuse
    * the top of the stack for properties (use set instead of push)
    */
-
 #ifdef SAVER_DEBUG
   fprintf(stderr, "Saving Top Object %lx %d: ", obj,  obj->head.id);
   fprintf_atoms(stderr, obj->argc, obj->argv);
@@ -841,11 +819,6 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 
   if (objidx >= 0)
     fts_bmax_code_mv_obj(f, objidx);
-
-  /* Write persistent properties to the file.
-     Here, it should use some property data base to find out
-     the good properties.
-     */
 
   fts_bmax_code_new_property(f, obj, fts_s_x);
   fts_bmax_code_new_property(f, obj, fts_s_y);
@@ -869,7 +842,6 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_flash);
 
   /* pop the argument */
-
   fts_bmax_code_pop_args(f, 1);
 }
 
@@ -884,28 +856,22 @@ fts_bmax_code_new_connection(fts_bmax_file_t *f, fts_connection_t *conn, int fro
 
 
   /* Push the inlet and outlet (this order) in the evaluation stack */
-
   fts_bmax_code_push_int(f, conn->winlet);
   fts_bmax_code_push_int(f, conn->woutlet);
 
   /* Push the to object, push the from object in the object stack */
-
   fts_bmax_code_push_obj(f, fts_bmax_find_objidx(conn->dst));
   fts_bmax_code_push_obj(f, fromidx);
 
   /* code the connect command */
-
   fts_bmax_code_connect(f);
 
   /* Pop 2 values from the evaluation stack */
-
   fts_bmax_code_pop_args(f, 2);
 
   /* Pop 2 object from the object stack */
-
   fts_bmax_code_pop_objs(f, 2);
 }
-
 
 static void
 fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *conn, fts_selection_t *sel)
@@ -916,31 +882,24 @@ fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *
 #endif
 
   /* Push the inlet and outlet (this order) in the evaluation stack */
-
   fts_bmax_code_push_int(f, conn->winlet);
   fts_bmax_code_push_int(f, conn->woutlet);
 
   /* Push the to object, push the from object in the object stack */
-
   fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->dst, sel));
   fts_bmax_code_push_obj(f, fts_bmax_find_objidx_in_selection(conn->src, sel));
 
   /* code the connect command */
-
   fts_bmax_code_connect(f);
 
   /* Pop 2 values from the evaluation stack */
-
   fts_bmax_code_pop_args(f, 2);
 
   /* Pop 2 object from the object stack */
-
   fts_bmax_code_pop_objs(f, 2);
 }
 
-
 /* Code a new patcher, and leave it in the top of the stack !!! */
-
 static void
 fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int top)
 {
@@ -957,18 +916,15 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
      patcher object instead of 
      (no effect for not a template or no args).
      */
-
   if (top)
     fts_bmax_code_new_top_object(f, obj, idx);
   else
     fts_bmax_code_new_object(f, obj, idx);
     
   /* Allocate a new object table frame of the right dimension */
-
   fts_bmax_code_push_obj_table(f, fts_patcher_get_objects_count(patcher));
 
   /* Code all the objects */
-
   i = 0;
   for (p = patcher->objects; p ; p = p->next_in_patcher)
     {
@@ -977,7 +933,6 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
 	  (! fts_object_is_template(p)))
 	{
 	  /* Save the object recursively as a patcher, and then pop it from the stack */
-
 
 	  fts_bmax_code_new_patcher(f, p, i, 0);
 	  fts_bmax_code_pop_objs(f, 1);
@@ -993,7 +948,6 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
     }
 
   /* For each object, for each outlet, code all the connections */
-
   i = 0;
   for (p = patcher->objects; p ; p = p->next_in_patcher)
     {
@@ -1011,13 +965,11 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
     }
 
   /* Finally, pop the object table */
-
   fts_bmax_code_pop_obj_table(f);
 }
 
-
-
-void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
+void 
+fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 {
   fts_bmax_file_t f;
 
@@ -1027,7 +979,6 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
   fts_bmax_code_new_patcher( &f, patcher, -1, 1);
 
   /* code the return command */
-
   fts_bmax_code_return( &f);
   fts_bmax_file_close( &f);
 
@@ -1046,15 +997,14 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
       Used *only* for autosave
    */
 
-
 /* Use static structure; cannot save recursively; needed to avoid alloc during save
  as much as possible, to try autosaves in panic situations.
  */
-
 #define STATIC_SYMBOL_TABLE_SIZE 32 * 1024
 static fts_symbol_t static_symbol_table[STATIC_SYMBOL_TABLE_SIZE];
 
-void fts_save_simple_as_bmax( const char *filename, fts_object_t *patcher)
+void 
+fts_save_simple_as_bmax( const char *filename, fts_object_t *patcher)
 {
   fts_bmax_file_t f;
 
@@ -1069,7 +1019,6 @@ void fts_save_simple_as_bmax( const char *filename, fts_object_t *patcher)
   fts_bmax_file_close( &f);
 }
 
-
 static void
 fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 {
@@ -1081,11 +1030,9 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 #endif
 
   /* Allocate a new object table frame of the right dimension */
-
   fts_bmax_code_push_obj_table(f, selection->objects_count);
 
   /* Code all the objects */
-
   objidx = 0;
   for (i = 0; i < selection->objects_size; i++)
     {
@@ -1105,7 +1052,6 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 	  else
 	    {
 	      /* Code a new object and pop it from the object stack */
-
 	      fts_bmax_code_new_object(f, p, objidx);
 	      fts_bmax_code_pop_objs(f, 1);
 	    }
@@ -1115,7 +1061,6 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
     }
 
   /* For each object, for each outlet, code all the connections */
-
   for (i = 0; i < selection->connections_size; i++)
     {
       if (selection->connections[i])
@@ -1130,7 +1075,6 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
     }
 
   /* Finally, pop the object table */
-
   fts_bmax_code_pop_obj_table(f);
 }
 
@@ -1146,16 +1090,54 @@ void fts_save_selection_as_bmax( FILE *file, fts_object_t *selection)
   fts_bmax_code_new_selection( &f, selection);
 
   /* code the return command */
-
   fts_bmax_code_return( &f);
   fts_bmax_file_sync( &f);
 }
 
-void
-fts_bmax_save_message(fts_bmax_file_t *file, fts_symbol_t selector, int ac, const fts_atom_t *at)
+/******************************************************
+ *
+ *  saver dumper utility
+ *
+ */
+
+static void
+saver_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_bmax_code_push_atoms(file, ac, at);
-  fts_bmax_code_obj_mess(file, fts_SystemInlet, selector, ac);
-  fts_bmax_code_pop_args(file, ac);
+  saver_dumper_t *this = (saver_dumper_t *)o;
+  
+  fts_bmax_code_push_atoms(this->file, ac, at);
+  fts_bmax_code_obj_mess(this->file, fts_SystemInlet, s, ac);
+  fts_bmax_code_pop_args(this->file, ac);
 }
 
+static void
+saver_dumper_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dumper_init((fts_dumper_t *)o, saver_dumper_send);
+}
+  
+static void
+saver_dumper_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dumper_destroy((fts_dumper_t *)o);
+}
+  
+static fts_status_t
+saver_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(saver_dumper_t), 0, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, saver_dumper_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, saver_dumper_delete);
+
+  return fts_Success;
+}
+
+void
+fts_saver_config(void)
+{
+  s_saver_dumper = fts_new_symbol("saver_dumper");
+
+  fts_class_install(s_saver_dumper, saver_dumper_instantiate);
+  cl_saver_dumper = fts_class_get_by_name(s_saver_dumper);
+}

@@ -192,31 +192,14 @@ delread_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 delread_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-
   fts_class_init(cl, sizeof(delread_t), 1, 1, 0);
 
-  /* System methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delread_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delread_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, delread_put);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_anything;
-  a[3] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, delread_init, 4, a, 2);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, delread_delete, 0, 0);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, delread_put, 1, a);
-
-  /* User methods */
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, delread_number, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, delread_number, 1, a);
-
-  /* DSP declarations */
+  fts_method_define_varargs(cl, 0, fts_s_int, delread_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, delread_number);
 
   dsp_sig_inlet(cl, 0); /* for order forcing (shadock) */
   dsp_sig_outlet(cl, 0);        

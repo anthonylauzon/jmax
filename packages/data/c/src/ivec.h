@@ -48,7 +48,7 @@ DATA_API fts_class_t *ivec_class;
 DATA_API fts_symbol_t ivec_symbol;
 DATA_API fts_type_t ivec_type;
 
-DATA_API void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
+DATA_API void ivec_set_with_onset_from_atoms(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 
 #define ivec_get_size(v) ((v)->size)
 DATA_API void ivec_set_size(ivec_t *vector, int size);
@@ -60,8 +60,9 @@ DATA_API void ivec_set_size(ivec_t *vector, int size);
 
 DATA_API void ivec_set_const(ivec_t *vector, int c);
 #define ivec_zero(v) ivec_set_const((v), 0)
+DATA_API void ivec_copy(ivec_t *org, ivec_t *copy);
 
-DATA_API void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
+DATA_API void ivec_set_with_onset_from_atoms(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 
 DATA_API int ivec_get_sum(ivec_t *vector);
 DATA_API int ivec_get_sub_sum(ivec_t *vector, int from, int to);

@@ -72,14 +72,14 @@ FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
      do {fts_set_type(ap, fts_s_int); fts_word_set_int(fts_atom_value(ap), (x));} while (0)
 #define fts_set_float(ap, x) \
      do {fts_set_type(ap, fts_s_float); fts_word_set_float(fts_atom_value(ap), (x));} while (0)
-#define fts_set_connection(ap, x)       \
-     do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_atom_value(ap), (x));} while (0)
-/*#define fts_set_data(ap, x) \
-  do {fts_set_type(ap, fts_s_data); fts_word_set_data( fts_atom_value(ap), (x));} while (0)*/
 #define fts_set_array(ap, x) \
-     do {fts_set_type(ap, fts_s_list); fts_word_set_ptr(fts_atom_value(ap), (x));} while (0)
+     do {fts_set_type(ap, fts_s_array); fts_word_set_object(fts_atom_value(ap), (fts_object_t *)(x));} while (0)
+#define fts_set_message(ap, x) \
+     do {fts_set_type(ap, fts_s_message); fts_word_set_object(fts_atom_value(ap), (fts_object_t *)(x));} while (0)
 #define fts_set_object(ap, x) \
      do {fts_set_object_type(ap, fts_s_object); fts_word_set_object(fts_atom_value(ap), (x));} while (0)
+#define fts_set_connection(ap, x)       \
+     do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_void(ap) (fts_set_type(ap, fts_s_void))
 #define fts_set_error(ap) (fts_set_type(ap, fts_s_error))
@@ -94,10 +94,10 @@ FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
 #define fts_get_string(ap) (fts_word_get_string(fts_atom_value(ap)))
 #define fts_get_ptr(ap) (fts_word_get_ptr(fts_atom_value(ap)))
 #define fts_get_fun(ap) (fts_word_get_fun(fts_atom_value(ap)))
-#define fts_get_connection(ap) (fts_word_get_connection(fts_atom_value(ap)))
-/*#define fts_get_data(ap) (fts_word_get_data(fts_atom_value(ap)))*/
-#define fts_get_array(ap) ((fts_array_t *)fts_word_get_ptr(fts_atom_value(ap)))
+#define fts_get_array(ap) ((fts_array_t *)fts_word_get_object(fts_atom_value(ap)))
+#define fts_get_message(ap) ((fts_message_t *)fts_word_get_object(fts_atom_value(ap)))
 #define fts_get_object(ap) (fts_word_get_object(fts_atom_value(ap)))
+#define fts_get_connection(ap) (fts_word_get_connection(fts_atom_value(ap)))
 
 /* check atoms for predefined types */
 #define fts_is_int(ap) fts_is_a(ap, fts_s_int)
@@ -109,10 +109,10 @@ FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
 #define fts_is_fun(ap) fts_is_a(ap, fts_s_fun)
 #define fts_is_void(ap) fts_is_a(ap, fts_s_void)
 #define fts_is_error(ap) fts_is_a(ap, fts_s_error)
-#define fts_is_connection(ap) fts_is_a(ap, fts_s_connection)
-/*#define fts_is_data(ap) (fts_is_a(ap, fts_s_data))*/
-#define fts_is_list(ap) (fts_is_a(ap, fts_s_list))
+#define fts_is_array(ap) (fts_is_a(ap, fts_s_array))
+#define fts_is_message(ap) (fts_is_a(ap, fts_s_message))
 #define fts_is_object(ap) ((unsigned int)((ap)->type) & 1)
+#define fts_is_connection(ap) fts_is_a(ap, fts_s_connection)
 
 /* atom that can be objects */
 #define fts_atom_refer(ap) do {if(fts_is_object(ap)) fts_object_refer(fts_get_object(ap));} while(0)

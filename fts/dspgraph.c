@@ -161,7 +161,7 @@ graph_iterator_step( graph_iterator_t *iter)
       fts_set_fun(a + 0, (fts_fun_t)graph_iterator_push);
       fts_set_ptr(a + 1, iter);
       fts_set_int(a + 2, iter->top->connection->winlet);
-      stat = fts_message_send(dest, fts_SystemInlet, fts_s_propagate_input, 3, a);
+      stat = fts_send_message(dest, fts_SystemInlet, fts_s_propagate_input, 3, a);
 
       if(stat == fts_Success)
 	{
@@ -570,7 +570,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
       */
 
       fts_set_ptr(&a, node->descr);
-      fts_message_send(node->o, fts_SystemInlet, fts_s_put, 1, &a);
+      fts_send_message(node->o, fts_SystemInlet, fts_s_put, 1, &a);
 
       {
 	ftl_instruction_info_t *info;
@@ -800,7 +800,7 @@ dsp_graph_schedule_depth(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int woutle
       dsp_graph_schedule_node(graph, dest);
       dsp_graph_succ_realize(graph, dest, dsp_graph_schedule_depth, fts_c_signal);
 
-      fts_message_send( dest->o, fts_SystemInlet, fts_new_symbol("put_after_successors"), 0, 0);
+      fts_send_message( dest->o, fts_SystemInlet, fts_new_symbol("put_after_successors"), 0, 0);
     }
 }
 
@@ -827,7 +827,7 @@ dsp_graph_send_message( fts_dsp_graph_t *graph, fts_symbol_t message)
   fts_dsp_node_t *node;
 
   for( node = nodes; node; node = node->next)
-    fts_message_send( node->o, fts_SystemInlet, message, 0, 0);
+    fts_send_message( node->o, fts_SystemInlet, message, 0, 0);
 }
 
 static void 

@@ -200,8 +200,8 @@ static void
 poly_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long pit   = fts_get_int_arg(ac, at, 0, 0);
-  long vel   = fts_get_int_arg(ac, at, 1, 0);
+  long pit = fts_get_int_arg(ac, at, 0, 0);
+  long vel = fts_get_int_arg(ac, at, 1, 0);
   long which = fts_get_int_arg(ac, at, 2, 0);
   voice_t *v;
 
@@ -256,51 +256,21 @@ poly_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 poly_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(poly_t), 2, 3, 0); 
 
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, poly_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, poly_delete);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, poly_init, 3, a, 1);
+  fts_method_define_varargs(cl, 0, fts_s_stop, poly_stop);
+  fts_method_define_varargs(cl, 0, fts_s_clear, poly_clear);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, poly_delete, 0, 0);
-
-  /* Poly args */
-
-  fts_method_define(cl, 0, fts_new_symbol("stop"), poly_stop, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("clear"), poly_clear, 0, 0);
-
-  a[0] = fts_s_int;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("set"), poly_set, 3, a);
-
+  fts_method_define_varargs(cl, 0, fts_s_set, poly_set);
   fts_method_define_varargs(cl, 0, fts_s_list, poly_list);
+  fts_method_define_varargs(cl, 0, fts_s_int, poly_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, poly_number);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, poly_number, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, poly_number, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, poly_number_1, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, poly_number_1, 1, a);
-
-  /* Type the outlet */
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 2,	fts_s_int, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, poly_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_float, poly_number_1);
 
   return fts_Success;
 }

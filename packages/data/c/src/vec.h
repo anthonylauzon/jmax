@@ -47,7 +47,7 @@ typedef mat_t vec_t;
 
 #define vec_void(x) (mat_void((mat_t *)(x)))
 #define vec_set_const(x, a) (mat_set_const((mat_t *)(x), (a)))
-#define vec_set_from_atom_list(mx, x, ac, at) mat_set_from_atom_list((mat_t *)(mx), (x), (ac), (at))
+#define vec_set_with_onset_from_atoms(mx, x, ac, at) mat_set_with_onset_from_atoms((mat_t *)(mx), (x), (ac), (at))
 
 DATA_API int vec_read_atom_file(vec_t *vec, fts_symbol_t file_name);
 DATA_API int vec_write_atom_file(vec_t *vec, fts_symbol_t file_name);

@@ -1055,7 +1055,7 @@ patcher_save_objects( FILE *file, fts_object_t *object)
  	  fts_atom_t a;
 
 	  fts_set_ptr( &a, file);
-	  fts_message_send( object, fts_SystemInlet, fts_s_save_dotpat, 1, &a);
+	  fts_send_message( object, fts_SystemInlet, fts_s_save_dotpat, 1, &a);
 	}
       else
 	{
@@ -1177,7 +1177,7 @@ patcher_load_jmax_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fts_object_put_prop( patcher, fts_s_filename, at);
 
   /* activate the post-load init, like loadbangs */	  
-  fts_message_send( patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+  fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
 }
 
 
@@ -1215,12 +1215,12 @@ patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj, fts_symb
 static void fts_patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   patcher_open(o, fts_SystemInlet, fts_s_open, 0, 0);
-  /*fts_message_send(o, fts_SystemInlet, fts_s_open, 0, 0);*/
+  /*fts_send_message(o, fts_SystemInlet, fts_s_open, 0, 0);*/
 }
 static void fts_patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   patcher_close(o, fts_SystemInlet, fts_s_close, 0, 0);
-  /*fts_message_send(o, fts_SystemInlet, fts_s_close, 0, 0);*/  
+  /*fts_send_message(o, fts_SystemInlet, fts_s_close, 0, 0);*/  
 }
 
 /**
@@ -1327,11 +1327,11 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     fts_method_define_varargs(cl, i, fts_s_anything, patcher_anything);
 
   fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("load_init"), patcher_load_init); 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("open"), patcher_open); 
-  fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("close"), patcher_close); 
+  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_open, patcher_open); 
+  fts_method_define_varargs(cl,fts_SystemInlet, fts_s_close, patcher_close); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), close_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, close_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("show_object"), show_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("stop_waiting"), stop_waiting);
   fts_method_define_varargs(cl,fts_SystemInlet, sym_hide, patcher_hide); 

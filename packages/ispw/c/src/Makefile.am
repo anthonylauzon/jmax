@@ -37,7 +37,6 @@ fft_ftl.c \
 filters.c \
 float.c \
 fourpoint.c \
-ftl_biquad.c \
 ftl_delay.c \
 ftl_fir.c \
 ftl_iir.c \

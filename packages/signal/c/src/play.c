@@ -289,7 +289,7 @@ signal_play_class_init(fts_class_t *cl, fts_symbol_t type)
   fts_method_define_varargs(cl, 0, fts_new_symbol("loop"), signal_play_loop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("cycle"), signal_play_cycle);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), signal_play_pause);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), signal_play_stop);
+  fts_method_define_varargs(cl, 0, fts_s_stop, signal_play_stop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rewind"), signal_play_rewind);
 
   fts_method_define_varargs(cl, 0, type, signal_play_set_object);

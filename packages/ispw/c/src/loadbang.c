@@ -42,9 +42,9 @@ loadbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(loadbang_t), 1, 1, 0);
 
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("load_init"), loadbang_load_init, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("load_init"), loadbang_load_init);
 
-  fts_outlet_type_define(cl, 0, fts_s_bang, 0, 0);
+  fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
 
   return fts_Success;
 }

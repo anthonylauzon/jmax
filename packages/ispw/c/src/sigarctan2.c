@@ -147,22 +147,12 @@ sigarctan2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static fts_status_t
 sigarctan2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(sigarctan2_t), 2, 1, 0); 
 
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigarctan2_init, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigarctan2_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigarctan2_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigarctan2_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigarctan2_put);
-
-  /* Type the outlet */
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_inlet(cl, 1);

@@ -48,23 +48,33 @@ static void
 iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   iir_t *this = (iir_t *)o;
-  float *coefs;
-  float zero = 0.0f;
-  long n_order;
-  long i;
 
-  n_order = ac - 1;
+  if(ac > 1 && ac <= 5)
+    {
+      float *coefs;
+      long n_order;
+      long i;
+      
+      n_order = ac - 1;
+      
+      this->n_order = n_order;
+      this->coefs = ftl_data_alloc(sizeof(float) * n_order);
+      this->state = ftl_data_alloc(sizeof(float) * n_order);
+      
+      coefs = (float *)ftl_data_get_ptr(this->coefs);
 
-  this->n_order = n_order;
-  this->coefs = ftl_data_alloc(sizeof(float) * n_order);
-  this->state = ftl_data_alloc(sizeof(float) * n_order);
-
-  coefs = (float *)ftl_data_get_ptr(this->coefs);
-  for(i=0; i<n_order; i++)
-    coefs[i] = fts_get_float_arg(ac, at, i + 1, 0.0f);
+      for(i=0; i<n_order; i++)
+	{
+	  if(fts_is_number(at + i))
+	    coefs[i] = fts_get_float_arg(ac, at, i + 1, 0.0f);
+	  else
+	    coefs[i] = 0.0;
+	}
   
-  dsp_list_insert(o);
- 
+      dsp_list_insert(o);
+    }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 
@@ -142,33 +152,22 @@ iir_set_coef(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *a
 static fts_status_t
 iir_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-  fts_symbol_t sym_clear;
   int i;
  
-  if(ac <= 1 || ac > 5)
-    return &fts_CannotInstantiate;
-
   fts_class_init(cl, sizeof(iir_t), ac, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, iir_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, iir_delete, 0, a);
-
-  a[0] = fts_s_ptr; 
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, iir_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, iir_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, iir_put);
   
-  /* user methods */
-  a[0] = fts_s_float;
   for(i=1; i<ac; i++)
-    fts_method_define(cl, i, fts_s_float, iir_set_coef, 1, a);
+    {
+      fts_method_define_varargs(cl, i, fts_s_int, iir_set_coef);
+      fts_method_define_varargs(cl, i, fts_s_float, iir_set_coef);
+    }
 
-  a[0] = fts_s_int;
-  for(i=1; i<ac; i++)
-    fts_method_define(cl, i, fts_s_int, iir_set_coef, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_clear, iir_clear);
 
-  fts_method_define(cl, 0, fts_new_symbol("clear"), iir_clear, 0, 0);
-
-  /* dsp in/outlets */
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
   

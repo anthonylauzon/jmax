@@ -31,17 +31,11 @@ typedef struct
   fts_object_t o;
 } unpack_t;
 
-/*
-   Installed for lists, but also
-   for floats and ints
- */
-
 static fts_symbol_t unpack_s_f = 0;
 static fts_symbol_t unpack_s_i = 0;
 
 static void
-unpack_send(fts_object_t *o, int winlet, fts_symbol_t s,
-	  int ac, const fts_atom_t *at)
+unpack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int i;
 
@@ -55,30 +49,24 @@ unpack_send(fts_object_t *o, int winlet, fts_symbol_t s,
 
       outlet_type = fts_object_get_outlet_type(o, i);
 
-      if ((outlet_type == fts_s_int) && fts_is_int(&at[i]))
-	fts_outlet_send(o, i, outlet_type, 1, &at[i]);
-      else if ((outlet_type == fts_s_int) && fts_is_float(&at[i]))
+      if ((outlet_type == fts_s_int) && fts_is_int(at + i))
+	fts_outlet_send(o, i, outlet_type, 1, at + i);
+      else if ((outlet_type == fts_s_int) && fts_is_float(at + i))
 	{
-	  fts_set_int(&a, (long) fts_get_float(&at[i]));
+	  fts_set_int(&a, (int)fts_get_float(at + i));
 	  fts_outlet_send(o, i, outlet_type, 1, &a);
 	}
-      else if ((outlet_type == fts_s_float) && fts_is_float(&at[i]))
-	fts_outlet_send(o, i, outlet_type, 1, &at[i]);
-      else if ((outlet_type == fts_s_float) && fts_is_int(&at[i]))
+      else if ((outlet_type == fts_s_float) && fts_is_float(at + i))
+	fts_outlet_send(o, i, outlet_type, 1, at + i);
+      else if ((outlet_type == fts_s_float) && fts_is_int(at + i))
 	{
-	  fts_set_float(&a, (float) fts_get_int(&at[i]));
+	  fts_set_float(&a, (float)fts_get_int(at + i));
 	  fts_outlet_send(o, i, outlet_type, 1, &a);
 	}
-      else if ((outlet_type == fts_s_symbol) && fts_is_symbol(&at[i]))
-	fts_outlet_send(o, i, outlet_type, 1, &at[i]);
-      else
-	{
-	  /* if type cannot match, do not send the relative message */
-	}
+      else if ((outlet_type == fts_s_symbol) && fts_is_symbol(at + i))
+	fts_outlet_send(o, i, outlet_type, 1, at + i);
     }
 }
-
-
 
 static fts_status_t
 unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -86,64 +74,44 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a;
   int i;
 
-  ac--;at++;			/* throw away the class name argument */
+  ac--;
+  at++;
 
-  if (! ac)
+  if (!ac)
     {
       fts_class_init(cl, sizeof(unpack_t), 1, 2, 0);
 
-      a = fts_s_int;
-      fts_outlet_type_define(cl, 0, fts_s_int, 1, &a);
-      fts_outlet_type_define(cl, 1, fts_s_int, 1, &a);
+      fts_outlet_type_define_varargs(cl, 0, fts_s_int);
+      fts_outlet_type_define_varargs(cl, 1, fts_s_int);
     }
   else
     fts_class_init(cl, sizeof(unpack_t), 1, ac, 0);
 
-
   fts_method_define_varargs(cl, 0, fts_s_list, unpack_send);
+  fts_method_define_varargs(cl, 0, fts_s_int, unpack_send);
+  fts_method_define_varargs(cl, 0, fts_s_float, unpack_send);
 
-  a = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, unpack_send, 1, &a);
-
-  a = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, unpack_send, 1, &a);
-
-  for (i = 0; i < ac; i++)
+  for(i=0; i<ac; i++)
     {
-      if (fts_is_float(&at[i]))
-	{
-	  a = fts_s_float;
-	  fts_outlet_type_define(cl, i, fts_s_float, 1, &a);
-	}
-      else if (fts_is_int(&at[i]))
-	{
-	  a = fts_s_int;
-	  fts_outlet_type_define(cl, i, fts_s_int, 1, &a);
-	}
-      else if (fts_is_symbol(&at[i]))
+      if (fts_is_float(at + i))
+	fts_outlet_type_define_varargs(cl, i, fts_s_float);
+      else if (fts_is_int(at + i))
+	fts_outlet_type_define_varargs(cl, i, fts_s_int);
+      else if (fts_is_symbol(at + i))
 	{
 	  fts_symbol_t sym = fts_get_symbol(at + i);
+
 	  if(sym == unpack_s_i)
-	    {
-	      a = fts_s_int;
-	      fts_outlet_type_define(cl, i, fts_s_int, 1, &a);
-	    }
+	    fts_outlet_type_define_varargs(cl, i, fts_s_int);
 	  else if(sym == unpack_s_f)
-	    {
-	      a = fts_s_float;
-	      fts_outlet_type_define(cl, i, fts_s_float, 1, &a);
-	    }
+	    fts_outlet_type_define_varargs(cl, i, fts_s_float);
 	  else
-	    {
-	      a = fts_s_symbol;
-	      fts_outlet_type_define(cl, i, fts_s_symbol, 1, &a);
-	    }
+	    fts_outlet_type_define_varargs(cl, i, fts_s_symbol);
 	}
     }
   
   return fts_Success;
 }
-
 
 void
 unpack_config(void)
@@ -153,5 +121,3 @@ unpack_config(void)
 
   fts_metaclass_install(fts_new_symbol("unpack"),unpack_instantiate, fts_arg_type_equiv);
 }
-
-

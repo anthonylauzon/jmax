@@ -523,7 +523,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("reattack"), pitch_reattack);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("loud"), pitch_loud);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("print"), pitch_print);
+  fts_method_define_varargs(cl, 0, fts_s_print, pitch_print);
 
   /* classes signal inlets and outlets */
   dsp_sig_inlet(cl, 0);

@@ -334,7 +334,7 @@ rec_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, rec_fvec_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("rec"), rec_fvec_rec);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), rec_fvec_pause);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), rec_fvec_stop);
+  fts_method_define_varargs(cl, 0, fts_s_stop, rec_fvec_stop);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("begin"), rec_fvec_set_begin);
   fts_method_define_varargs(cl, 0, fts_new_symbol("end"), rec_fvec_set_end);

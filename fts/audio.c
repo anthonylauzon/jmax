@@ -320,7 +320,7 @@ static fts_status_t audioport_guard_instantiate(fts_class_t *cl, int ac, const f
   fts_class_init( cl, sizeof( audioport_guard_t), 0, 0, 0);
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, audioport_guard_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, audioport_guard_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, audioport_guard_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put_prologue, audioport_guard_put_prologue);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put_epilogue, audioport_guard_put_epilogue);
@@ -400,7 +400,7 @@ static fts_status_t audioportin_instantiate(fts_class_t *cl, int ac, const fts_a
   fts_class_init( cl, sizeof( fts_audioportin_t), 0, outlets, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, audioportin_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, audioportin_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, audioportin_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, audioportin_put);
 
   for ( i = 0; i < outlets; i++)
@@ -567,7 +567,7 @@ static fts_status_t audioportout_instantiate(fts_class_t *cl, int ac, const fts_
   fts_class_init( cl, sizeof( fts_audioportout_t), inlets, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, audioportout_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, audioportout_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, audioportout_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, audioportout_put);
 
   for ( i = 0; i < inlets; i++)

@@ -68,21 +68,15 @@ random_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 random_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(random_t), 2, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, random_init, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, random_init);
 
-  fts_method_define(cl, 0, fts_s_bang, random_bang, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_bang, random_bang);
+  fts_method_define_varargs(cl, 1, fts_s_int, random_in1);
 
-  a[0] = fts_s_number;
-  fts_method_define_optargs(cl, 1, fts_s_int, random_in1, 1, a, 0);
+  fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
   return fts_Success;
 }
 

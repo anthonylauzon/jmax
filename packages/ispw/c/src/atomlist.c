@@ -402,73 +402,42 @@ fts_atom_t *fts_atom_list_iterator_current( const fts_atom_list_iterator_t *iter
   return iter->atom;
 }
 
-/********************************************************************************/
-/*                                                                              */
-/*                     Saving Atom Lists to Bmax files                          */
-/*                                                                              */
-/********************************************************************************/
-
-/* this function save an atom list to a bmax file as a set of messages
-   to an object (passed as argument).
-   The first message is "clear" to clean the atom list,
-   the others are a number of append, each of max 256 elements.
-   Note that the there is provision here for the loading; the messages
-   must be understood natively by the object saving the atom list (within
-   its save_bmax method); in the future, a better support for data will
-   be implemented.
-   */
-
-void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_object_t *target)
+void 
+fts_atom_list_dump(fts_atom_list_t *list, fts_dumper_t *dumper, fts_object_t *target)
 {
   fts_atom_list_iterator_t *iterator;
-  fts_atom_t av[256];
-  int ac = 0;
+  fts_message_t *mess;
+  
+  /* send clear message */
+  fts_dumper_send(dumper, fts_s_clear, 0, 0);
 
-  /* Code a "clear" message without arguments */
+  /* start new append message */
+  mess = fts_dumper_message_new(dumper, fts_s_append);
 
-  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_clear, 0);
-
+  /* iterate over atom list */
   iterator = fts_atom_list_iterator_new(list);
 
-  while (! fts_atom_list_iterator_end(iterator))
+  while(!fts_atom_list_iterator_end(iterator))
     {
-      av[ac++] = *fts_atom_list_iterator_current(iterator);
-      fts_atom_list_iterator_next(iterator);
+      /* append atom to message */
+      fts_message_append(mess, 1, fts_atom_list_iterator_current(iterator));
 
-      if (ac == 256)
+      if(fts_message_get_ac(mess) >= 256)
 	{
-	  /* Code a push of all the values */
+	  /* send append message */
+	  fts_dumper_message_send(dumper, mess);
 
-	  fts_bmax_code_push_atoms(f, ac, av);
-
-	  /* Code an "append" message for 256 values */
-
-	  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_append, ac);
-
-	  /* Code a pop of all the values  */
-
-	  fts_bmax_code_pop_args(f, ac);
-
-	  /* Put the arg counter to zero */
-
-	  ac = 0;
+	  /* start new append message */
+	  mess = fts_dumper_message_new(dumper, fts_s_append);
 	}
+
+      /* nest iteration */
+      fts_atom_list_iterator_next(iterator);
     }
 
-  if (ac != 0)
-    {
-      /* Code a push of all the values */
-
-      fts_bmax_code_push_atoms(f, ac, av);
-
-      /* Code an "append" message for the values left */
-      
-      fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_append, ac);
-
-      /* Code a pop of all the values  */
-
-      fts_bmax_code_pop_args(f, ac);
-    }
+  /* send rest of atoms */
+  if(fts_message_get_ac(mess) > 0)
+    fts_dumper_message_send(dumper, mess);
 
   fts_atom_list_iterator_free(iterator);
 }
@@ -509,13 +478,3 @@ void atom_list_config(void)
 
   fts_class_install(atomlist_symbol, atom_list_instantiate);
 }
-
-
-
-
-
-
-
-
-
-

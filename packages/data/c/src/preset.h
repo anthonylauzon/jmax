@@ -35,6 +35,7 @@ typedef struct
   fts_object_t **objects;
   fts_hashtable_t hash;
   int n_objects;
+  fts_object_t **current; /* current preset (for loading) */
   fts_symbol_t keep;
 } preset_t;
 

@@ -34,7 +34,7 @@ typedef struct messtab
   fts_object_t o;
   fts_hashtable_t table_symbol;
   fts_hashtable_t table_int;
-  int locked;
+  fts_symbol_t keep;
 } messtab_t;
 
 DATA_API fts_class_t *messtab_class;

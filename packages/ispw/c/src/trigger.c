@@ -260,18 +260,16 @@ trigger_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   x->noutlets = ac - 1;		/* don't count the class name in the arguments !!! */
 }
 
-/* no delete method */
-
 static fts_status_t
 trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a;
-  int n;
   trigger_outlet_t *trigger_outlet_table;
   int noutlets;
   int all_bang, all_thru;
+  int n;
 
-  ac--;at++;			/* throw away the class name argument */
+  ac--;
+  at++;
 
   /* Create the trigger_outlet_table structure, to be put in the user data of the class 
      Looks for each argument; arguments can be:
@@ -379,80 +377,53 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       all_thru = 0;
     }
 
-  /* initialize the class: create as many outlets that there are arguments */
-
   fts_class_init(cl, sizeof(trigger_t), 1, noutlets, (void *)trigger_outlet_table);
-
-  /* define message template entries */
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, trigger_init);
 
   if (all_bang)
-    {
-      fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_bang);
-    }
+    fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_bang);
   else if (all_thru)
-    {
-      fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_thru);
-    }
+    fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_thru);
   else
     {
-      a = fts_s_int;
-      fts_method_define(cl, 0, fts_s_int, trigger_int, 1, &a);
+      fts_method_define_varargs(cl, 0, fts_s_int, trigger_int);
+      fts_method_define_varargs(cl, 0, fts_s_float, trigger_float);
+      fts_method_define_varargs(cl, 0, fts_s_symbol, trigger_symbol);
 
-      a = fts_s_float;
-      fts_method_define(cl, 0, fts_s_float, trigger_float, 1, &a);
-
-      a = fts_s_symbol;
-      fts_method_define(cl, 0, fts_s_symbol, trigger_symbol, 1, &a);
-
-      fts_method_define(cl, 0, fts_s_bang, trigger_bang, 0, 0);
+      fts_method_define_varargs(cl, 0, fts_s_bang, trigger_bang);
 
       fts_method_define_varargs(cl, 0, fts_s_list, trigger_list);
       fts_method_define_varargs(cl, 0, fts_s_anything, trigger_bang);
     }
 
   /* Type the outlet using the trigger_outlet_table */
-
   for (n = 0; n < noutlets;  n++)
-    switch (trigger_outlet_table[n])
-      {
-      case trigger_outlet_long:
+    {
+      switch (trigger_outlet_table[n])
 	{
-	  fts_symbol_t a;
-	    
-	  a = fts_s_int;
-	  fts_outlet_type_define(cl,  n,  fts_s_int, 1, &a);
-	}
-	break;
-      case trigger_outlet_float:
-	{
-	  fts_symbol_t a;
-	    
-	  a = fts_s_float;
-	  fts_outlet_type_define(cl,  n,  fts_s_float, 1, &a);
-	}
-	break;
-      case trigger_outlet_symbol:
-	{
-	  fts_symbol_t a;
+	case trigger_outlet_long:
+	  fts_outlet_type_define_varargs(cl,  n,  fts_s_int);
+	  break;
+	case trigger_outlet_float:
+	  fts_outlet_type_define_varargs(cl,  n,  fts_s_float);
+	  break;
+	case trigger_outlet_symbol:
+	  fts_outlet_type_define_varargs(cl,  n,  fts_s_symbol);
+	  break;
+	case trigger_outlet_list:
+	  fts_outlet_type_define_varargs(cl,  n,  fts_s_list);
+	  break;
 	  
-	  a = fts_s_symbol;
-	  fts_outlet_type_define(cl,  n,  fts_s_symbol, 1, &a);
+	case trigger_outlet_bang:
+	  fts_outlet_type_define_varargs(cl,  n,  fts_s_bang);
+	  break;
+	  
+	case trigger_outlet_thru:
+	  /* no type in this case */
+	  break;
 	}
-	break;
-      case trigger_outlet_list:
-	fts_outlet_type_define_varargs(cl,  n,  fts_s_list);
-	break;
-
-      case trigger_outlet_bang:
-	fts_outlet_type_define(cl,  n,  fts_s_bang, 0, 0);
-	break;
-
-      case trigger_outlet_thru:
-	/* no type in this case */
-	break;
-      }
+    }
 
     return fts_Success;
 }

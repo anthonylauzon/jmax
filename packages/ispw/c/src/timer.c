@@ -114,8 +114,8 @@ timer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_new_symbol("zero"), timer_zero);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), timer_start);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), timer_stop);
+  fts_method_define_varargs(cl, 0, fts_s_start, timer_start);
+  fts_method_define_varargs(cl, 0, fts_s_stop, timer_stop);
   fts_method_define_varargs(cl, 0, fts_new_symbol("continue"), timer_continue);
   fts_method_define_varargs(cl, 0, fts_new_symbol("time"), timer_send_time);
 

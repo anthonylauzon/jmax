@@ -426,7 +426,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
 		deselectAll();
 
-		itsModel.removeEvents(v.elements());
+		itsModel.deleteEvents(v.elements());
 		v = null;
 	    }
     }

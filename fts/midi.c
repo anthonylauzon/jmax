@@ -188,7 +188,7 @@ fts_midievent_real_time_new(enum midi_real_time_event tag)
  */
 
 static void
-midievent_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midievent_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
   int type = fts_get_int(at + 0);
@@ -221,7 +221,7 @@ midievent_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
-midievent_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midievent_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
   fts_array_t *array = fts_get_array(at);
@@ -331,8 +331,8 @@ midievent_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, midievent_print);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, midievent_append_state_to_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, midievent_set_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, midievent_get_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, midievent_set_from_array);
 
   return fts_Success;
 }

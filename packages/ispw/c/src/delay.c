@@ -103,7 +103,7 @@ delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delay_init);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, delay_input);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), delay_stop);
+  fts_method_define_varargs(cl, 0, fts_s_stop, delay_stop);
 
   fts_method_define_varargs(cl, 1, fts_s_int, delay_set_delay_time);
   fts_method_define_varargs(cl, 1, fts_s_float, delay_set_delay_time);

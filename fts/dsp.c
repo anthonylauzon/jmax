@@ -218,7 +218,7 @@ sig_dummy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 void 
 fts_dsp_declare_inlet(fts_class_t *cl, int num)
 {
-  fts_method_define(cl, num, fts_s_sig, sig_dummy, 0, 0);
+  fts_method_define_varargs(cl, num, fts_s_sig, sig_dummy);
 }
 
 void 

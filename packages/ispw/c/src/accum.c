@@ -116,52 +116,33 @@ accum_float_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static fts_status_t
 accum_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(accum_t), 3, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, accum_init, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, accum_init);
 
-  a[0] = fts_s_number;
-  fts_method_define(cl, 0, fts_s_set, accum_set, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_set, accum_set);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, accum_int_middle, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, accum_float_middle, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, accum_int_middle);
+  fts_method_define_varargs(cl, 1, fts_s_float, accum_float_middle);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 2, fts_s_int, accum_int_right, 1, a);
-  a[0] = fts_s_float;
-  fts_method_define(cl, 2, fts_s_float, accum_float_right, 1, a);
+  fts_method_define_varargs(cl, 2, fts_s_int, accum_int_right);
+  fts_method_define_varargs(cl, 2, fts_s_float, accum_float_right);
 
   if ((ac <= 1) || fts_is_int(at + 1))
     {
-      a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_s_int, iaccum_int, 1, a);
+      fts_method_define_varargs(cl, 0, fts_s_bang, iaccum_bang);
+      fts_method_define_varargs(cl, 0, fts_s_int, iaccum_int);
+      fts_method_define_varargs(cl, 0, fts_s_float, iaccum_float);      
 
-      a[0] = fts_s_float;
-      fts_method_define(cl, 0, fts_s_float, iaccum_float, 1, a);
-      
-      fts_method_define(cl, 0, fts_s_bang, iaccum_bang, 0, a);
-
-      a[0] = fts_s_int;
-      fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
+      fts_outlet_type_define_varargs(cl, 0, fts_s_int);
     }
   else
     {
-      a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_s_int, faccum_int, 1, a);
+      fts_method_define_varargs(cl, 0, fts_s_bang, faccum_bang);
+      fts_method_define_varargs(cl, 0, fts_s_int, faccum_int);
+      fts_method_define_varargs(cl, 0, fts_s_float, faccum_float);
 
-      a[0] = fts_s_float;
-      fts_method_define(cl, 0, fts_s_float, faccum_float, 1, a);
-      
-      fts_method_define(cl, 0, fts_s_bang, faccum_bang, 0, a);
-
-      a[0] = fts_s_float;
-      fts_outlet_type_define(cl, 0, fts_s_float, 1, a);
+      fts_outlet_type_define_varargs(cl, 0, fts_s_float);
     }
 
   return fts_Success;

@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include "message.h"
 
 #define MESSCONST_FLASH_TIME 125.0f
 
@@ -38,7 +37,7 @@
 typedef struct 
 {
   fts_object_t o;
-  message_t *mess;
+  fts_message_t *mess;
   int value; /* for blicking */
 } messconst_t;
 
@@ -71,7 +70,7 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_timebase_add_call(fts_get_timebase(), o, messconst_off, 0, MESSCONST_FLASH_TIME);
     }
 
-  fts_outlet_send(o, 0, message_get_selector(this->mess), message_get_ac(this->mess), message_get_at(this->mess));
+  fts_outlet_send(o, 0, fts_message_get_selector(this->mess), fts_message_get_ac(this->mess), fts_message_get_at(this->mess));
 }
 
 static void
@@ -79,7 +78,7 @@ messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   messconst_t *this = (messconst_t *)o;
 
-  fts_outlet_send(o, 0, message_get_selector(this->mess), message_get_ac(this->mess), message_get_at(this->mess));
+  fts_outlet_send(o, 0, fts_message_get_selector(this->mess), fts_message_get_ac(this->mess), fts_message_get_at(this->mess));
 }
  
 /************************************************
@@ -134,24 +133,24 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if(ac > 0)
     {
-      message_t *mess;
+      fts_message_t *mess;
 
-      if(ac == fts_is_list(at))
+      if(ac == fts_is_array(at))
 	{
 	  fts_array_t *list = fts_get_array(at);
 
 	  /* create empty message */
-	  mess = (message_t *)fts_object_create(message_class, 0, 0);
+	  mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
 	  
 	  /* set message to list */
-	  message_set(mess, fts_s_list, fts_array_get_size(list), fts_array_get_atoms(list));
+	  fts_message_set(mess, fts_s_list, fts_array_get_size(list), fts_array_get_atoms(list));
 	}
       else
 	{
 	  fts_symbol_t error;
 
 	  /* try to create message */
-	  mess = (message_t *)fts_object_create(message_class, ac, at);
+	  mess = (fts_message_t *)fts_object_create(fts_message_class, ac, at);
 	  error = fts_object_get_error((fts_object_t *)mess);
 	  
 	  if(error)

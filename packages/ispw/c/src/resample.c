@@ -115,26 +115,16 @@ sigup_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 sigup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
+  fts_atom_t a;
 
   fts_class_init(cl, sizeof(sigup_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigup_init, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigup_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigup_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigup_put);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigup_delete, 0, 0);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigup_put, 1, a);
-
-  /* declare the object upsampling for the DSP compiler */
-
-  {
-    fts_atom_t av;
-
-    fts_set_int(&av, 1);
-    fts_class_put_prop(cl, fts_s_dsp_upsampling, &av);
-  }
+  fts_set_int(&a, 1);
+  fts_class_put_prop(cl, fts_s_dsp_upsampling, &a);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
@@ -201,27 +191,16 @@ sigdown_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 sigdown_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
+  fts_atom_t a;
 
   fts_class_init(cl, sizeof(sigdown_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigdown_init, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigdown_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigdown_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigdown_put);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigdown_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigdown_put, 1, a);
-
-  /* declare the object downsampling for the DSP compiler */
-
-  {
-    fts_atom_t av;
-
-    fts_set_int(&av, 1);
-    fts_class_put_prop(cl, fts_s_dsp_downsampling, &av);
-  }
-
+  fts_set_int(&a, 1);
+  fts_class_put_prop(cl, fts_s_dsp_downsampling, &a);
 
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);

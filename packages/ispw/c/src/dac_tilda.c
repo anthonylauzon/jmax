@@ -110,8 +110,8 @@ static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dac_tilda_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dac_tilda_delete);
 
-  fts_method_define( cl, 0, fts_new_symbol("start"), dac_tilda_start, 0, 0);
-  fts_method_define( cl, 0, fts_new_symbol("stop"), dac_tilda_stop, 0, 0);
+  fts_method_define_varargs( cl, 0, fts_s_start, dac_tilda_start);
+  fts_method_define_varargs( cl, 0, fts_s_stop, dac_tilda_stop);
 
   for ( i = 0; i < inlets; i++)
     fts_dsp_declare_inlet( cl, i);

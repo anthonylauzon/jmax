@@ -78,26 +78,26 @@ extern "C" {
 #include <fts/atom.h>
 #include <fts/symbol.h>
 
-#include <fts/array.h>
 #include <fts/stack.h>
+
+#include <fts/property.h>
 #include <fts/iterator.h>
 #include <fts/hashtable.h>
 #include <fts/list.h>
 #include <fts/objectlist.h>
-
-#include <fts/connection.h>
-#include <fts/property.h>
-#include <fts/expression.h>
-#include <fts/class.h>
 #include <fts/variable.h>
+
+#include <fts/class.h>
 #include <fts/object.h>
+#include <fts/connection.h>
+#include <fts/expression.h>
 #include <fts/objectset.h>
-#include <fts/patcher.h>
+#include <fts/array.h>
 #include <fts/message.h>
+#include <fts/patcher.h>
 #include <fts/doctor.h>
 #include <fts/errobj.h>
 #include <fts/label.h>
-#include <fts/saver.h>
 #include <fts/param.h>
 #include <fts/package.h>
 

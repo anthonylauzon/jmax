@@ -239,9 +239,9 @@ row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, row_output);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), row_clear);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), row_fill);      
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), row_set);
+  fts_method_define_varargs(cl, 0, fts_s_clear, row_clear);
+  fts_method_define_varargs(cl, 0, fts_s_fill, row_fill);      
+  fts_method_define_varargs(cl, 0, fts_s_set, row_set);
   
   /* type outlet */
   fts_outlet_type_define(cl, 0, row_symbol, 1, &row_type);

@@ -40,6 +40,7 @@ typedef struct
   int m; /* # of rows */
   int n; /* # of columns */
   int alloc; /* current alloc size for lazy allocation */
+  fts_symbol_t keep;
 } mat_t;
 
 DATA_API void mat_set_size(mat_t *mat, int m, int n);
@@ -56,8 +57,9 @@ DATA_API void mat_void_element(mat_t *mat, int i, int j);
 
 DATA_API void mat_void(mat_t *mat);
 DATA_API void mat_set_const(mat_t *mat, fts_atom_t atom);
+DATA_API void mat_copy(mat_t *org, mat_t *copy);
 
-DATA_API void mat_set_from_atom_list(mat_t *mat, int offset, int ac, const fts_atom_t *at);
+DATA_API void mat_set_with_onset_from_atoms(mat_t *mat, int offset, int ac, const fts_atom_t *at);
 
 DATA_API int mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name);
 DATA_API int mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name);

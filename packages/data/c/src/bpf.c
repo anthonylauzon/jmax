@@ -34,8 +34,6 @@ fts_class_t *bpf_class = 0;
 static fts_symbol_t sym_openEditor = 0;
 static fts_symbol_t sym_closeEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
-static fts_symbol_t sym_set = 0;
-static fts_symbol_t sym_append = 0;
 static fts_symbol_t sym_addPoint = 0;
 static fts_symbol_t sym_removePoints = 0;
 static fts_symbol_t sym_setPoints = 0;
@@ -111,11 +109,11 @@ bpf_set_client(bpf_t *bpf)
 
       if(!append)
 	{
-	  fts_client_send_message((fts_object_t *)bpf, sym_set, 2 * send, a);
+	  fts_client_send_message((fts_object_t *)bpf, fts_s_set, 2 * send, a);
 	  append = 1;
 	}
       else
-	fts_client_send_message((fts_object_t *)bpf, sym_append, 2 * send, a);
+	fts_client_send_message((fts_object_t *)bpf, fts_s_append, 2 * send, a);
 	
       n -= send;
     }
@@ -312,7 +310,7 @@ bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-bpf_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
   int size = bpf_get_size(this);
@@ -341,9 +339,6 @@ bpf_copy(bpf_t *org, bpf_t *copy)
 
   for(i=0; i<size; i++)
     copy->points[i] = org->points[i];
-
-  if(bpf_editor_is_open(copy))
-    bpf_set_client(copy);
 }
 
 /************************************************************
@@ -463,77 +458,57 @@ bpf_hide_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 static void
-bpf_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
+  bpf_t *in = bpf_atom_get(at);
+  
+  bpf_copy(in, this);
 
-  if(this->keep == fts_s_yes)
-    {
-      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);      
-      int size = bpf_get_size(this);
-      double last_time = this->points[0].time;
-      double append_time = 0.0;
-      int append = 0;
-      fts_atom_t a[256];
-      int n = 2;
-      int i;
-      
-      fts_set_float(a, last_time);
-      fts_set_float(a + 1, this->points[0].value);
-
-      for(i=1; i<size; i++)
-	{
-	  double time = this->points[i].time;
-	  double value = this->points[i].value;
-
-	  if(n == 256 || time == last_time)
-	    {
-	      if(!append)
-		{
-		  fts_bmax_save_message(f, fts_s_set, n, a);
-		  append = 1;
-		}
-	      else
-		fts_bmax_save_message(f, fts_s_append, n, a);
-
-	      append_time = time;
-	      n = 0;
-	    }
-
-	  fts_set_float(a + n, time - append_time);
-	  fts_set_float(a + n + 1, value);
-	  
-	  n += 2;
-	}
-      
-      if(n > 0) 
-	{
-	  if(!append)
-	    fts_bmax_save_message(f, fts_s_set, n, a);
-	  else
-	    fts_bmax_save_message(f, fts_s_append, n, a);
-	}
-    }
+  if(bpf_editor_is_open(this))
+    bpf_set_client(this);
 }
 
 static void
-bpf_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
+  bpf_t *this = (bpf_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  int size = bpf_get_size(this);
+  double last_time = this->points[0].time;
+  double append_time = 0.0;
+  fts_message_t *mess;
+  int i;
+  
+  /* first message will be send */
+  mess = fts_dumper_message_new(dumper, fts_s_set);
 
-  if (cmd == fts_s_object)
-    fts_object_blip(o, "break point function");
-  else if (cmd == fts_s_inlet)
+  /* appand first point */
+  fts_message_append_float(mess, this->points[0].time);
+  fts_message_append_float(mess, this->points[0].value);
+
+  for(i=1; i<size; i++)
     {
-      int n = fts_get_int_arg(ac, at, 1, 0);
-
-      switch(n)
+      double time = this->points[i].time;
+      double value = this->points[i].value;
+      
+      /* cut at jump points to make sur not to end set message on jump point */
+      if(time == last_time)
 	{
-	case 0:
-	  /* fts_object_blip(o, "no comment"); */
-	  break;
+	  fts_dumper_message_send(dumper, mess);
+	  mess = fts_dumper_message_new(dumper, fts_s_append); /* next message will be append */
+	  
+	  append_time = time;
 	}
+      
+      fts_message_append_float(mess, time - append_time);
+      fts_message_append_float(mess, value);
+
+      last_time = time;
     }
+  
+  if(fts_message_get_ac(mess) > 0) 
+    fts_dumper_message_send(dumper, mess);
 }
 
 static void
@@ -543,6 +518,14 @@ bpf_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t propert
 
   if(this->keep != fts_s_args && fts_is_symbol(value))
     this->keep = fts_get_symbol(value);
+}
+
+static void
+bpf_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  bpf_t *this = (bpf_t *)obj;
+
+  fts_set_symbol(value, this->keep);
 }
 
 static void
@@ -626,21 +609,24 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, bpf_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, bpf_delete);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, bpf_append_state_to_array);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, bpf_set);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, bpf_set_from_instance);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, bpf_dump);
+
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, bpf_get_array);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, bpf_set);
+
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, bpf_print);
 
-      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), bpf_set_keep);
+      fts_class_add_daemon(cl, obj_property_put, fts_s_keep, bpf_set_keep);
+      fts_class_add_daemon(cl, obj_property_get, fts_s_keep, bpf_get_keep);
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, bpf_get_state);
 
-      /* save and restore bmax file */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, bpf_save_bmax); 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, bpf_set);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append, bpf_append);
 
       /* graphical editor */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), bpf_open_editor);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), bpf_close_editor);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_open_editor, bpf_open_editor);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_close_editor, bpf_close_editor);
       fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("hide"), bpf_hide_editor); 
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
@@ -651,7 +637,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, fts_s_set, bpf_set);
 
-      fts_method_define_varargs(cl, 0, fts_new_symbol("open_editor"), bpf_open_editor);
+      fts_method_define_varargs(cl, 0, fts_s_open_editor, bpf_open_editor);
 
       return fts_Success;
     }
@@ -674,8 +660,6 @@ bpf_config(void)
   sym_openEditor = fts_new_symbol("openEditor");
   sym_closeEditor = fts_new_symbol("closeEditor");
   sym_destroyEditor = fts_new_symbol("destroyEditor");
-  sym_set = fts_new_symbol("set");
-  sym_append = fts_new_symbol("append");
   sym_addPoint = fts_new_symbol("addPoint");
   sym_removePoints = fts_new_symbol("removePoints");
   sym_setPoints = fts_new_symbol("setPoints");

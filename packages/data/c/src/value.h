@@ -39,7 +39,7 @@ DATA_API fts_class_t *value_class;
 DATA_API fts_symbol_t value_symbol;
 DATA_API fts_type_t value_type;
 
-DATA_API void value_set(value_t *value, fts_atom_t a);
+#define value_set(v, x) fts_atom_assign(&(v)->a, (x))
 #define value_get(v) ((v)->a)
 
 /* value atoms */

@@ -27,23 +27,19 @@
 #include <fts/fts.h>
 #include <math.h>
 
-enum {
-  in_low = 0,
-  in_high,
-  out_low,
-  out_high,
-  base,
-  n_params
-};
-
-typedef struct{
-  fts_object_t _o;
+typedef struct
+{
+  fts_object_t head;
   int linear;
-  float params[n_params];
-  float in_shift;
-  float in_scale;
-  float out_shift;
-  float out_scale;
+  double inlow;
+  double inhigh;
+  double outlow;
+  double outhigh;
+  double base;
+  double in_shift;
+  double in_scale;
+  double out_shift;
+  double out_scale;
 } logscale_t;
 
 /********************
@@ -63,118 +59,187 @@ typedef struct{
  */
 
 static void
-logscale_compute_params(logscale_t *x)
+logscale_compute_params(logscale_t *this)
 {
-  float in_range, out_range;
+  double in_range, out_range;
 
-  if(x->params[base] <= 0.)
+  if(this->base <= 0.)
     {
       post("error: logscale: base must be > 0.\n");
       return;
     }
 
-  in_range = x->params[in_high] - x->params[in_low];
-  out_range = x->params[out_high] - x->params[out_low];
+  in_range = this->inhigh - this->inlow;
+  out_range = this->outhigh - this->outlow;
+
   if(in_range == 0. || out_range == 0.)
     {
       post("error: logscale: high and low value can't be the same\n");
       return;
     }
 
-  if(x->params[base] == 1.)
+  if(this->base == 1.)
     {
-      x->in_scale = out_range / in_range;
-      x->in_shift = -x->params[in_low] * x->in_scale + x->params[out_low];
-      x->linear = 1;
+      this->in_scale = out_range / in_range;
+      this->in_shift = -this->inlow * this->in_scale + this->outlow;
+      this->linear = 1;
     }
   else
     {      
-      x->in_scale = (x->params[base] - 1.) / in_range;
-      x->in_shift = -x->params[in_low] * x->in_scale + 1;
-      x->out_scale = out_range / log(x->params[base]);
-      x->out_shift = x->params[out_low];
-      x->linear = 0;
+      this->in_scale = (this->base - 1.0) / in_range;
+      this->in_shift = -this->inlow * this->in_scale + 1;
+      this->out_scale = out_range / log(this->base);
+      this->out_shift = this->outlow;
+      this->linear = 0;
     }
 }
 
 static void
-logscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+logscale_set_inlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  logscale_t *x = (logscale_t *)o;
+  logscale_t *this = (logscale_t *)o;
 
-  at++; ac--; /* skip class name */
-  x->params[in_low]   = fts_get_float_arg(ac, at, in_low, 0.0f);
-  x->params[in_high]  = fts_get_float_arg(ac, at, in_high, 1.0f);
-  x->params[out_low]  = fts_get_float_arg(ac, at, out_low, 0.0f);
-  x->params[out_high] = fts_get_float_arg(ac, at, out_high, 127.0f);
-  x->params[base] = fts_get_float_arg(ac, at, base, 1.0f);
-  logscale_compute_params(x);
+  if(fts_is_number(at))
+    this->inlow = fts_get_number_float(at);
+
+  logscale_compute_params(this);
 }
 
 static void
-logscale_param(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_set_inhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  logscale_t *x = (logscale_t *)o;
-  x->params[winlet-1] = fts_get_float_arg(ac, at, 0, 0.0f);
-  logscale_compute_params(x);
+  logscale_t *this = (logscale_t *)o;
+
+  if(fts_is_number(at))
+    this->inhigh = fts_get_number_float(at);
+
+  logscale_compute_params(this);
+}
+
+static void
+logscale_set_outlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  logscale_t *this = (logscale_t *)o;
+
+  if(fts_is_number(at))
+    this->outlow = fts_get_number_float(at);
+
+  logscale_compute_params(this);
+}
+
+static void
+logscale_set_outhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  logscale_t *this = (logscale_t *)o;
+
+  if(fts_is_number(at))
+    this->outhigh = fts_get_number_float(at);
+
+  logscale_compute_params(this);
+}
+
+static void
+logscale_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  logscale_t *this = (logscale_t *)o;
+
+  if(fts_is_number(at))
+    this->base = fts_get_number_float(at);
+
+  logscale_compute_params(this);
 }
 
 static void
 logscale_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  logscale_t *x = (logscale_t *)o;
-  int i;
-  
-  for(i=0; i<ac; i++)
-    x->params[i] = fts_get_float_arg(ac, at, i, 0.0f);
-  logscale_compute_params(x);
+  logscale_t *this = (logscale_t *)o;
+
+  switch(ac)
+    {
+    default:
+    case 5:
+      if(fts_is_number(at + 4))
+	this->base = fts_get_number_float(at + 4);
+    case 4:
+      if(fts_is_number(at + 3))
+	this->outhigh = fts_get_number_float(at + 3);
+    case 3:
+      if(fts_is_number(at + 2))
+	this->outlow = fts_get_number_float(at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	this->inhigh = fts_get_number_float(at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
+	this->inlow = fts_get_number_float(at + 0);
+    case 0:
+      break;
+    }
+
+  logscale_compute_params(this);
 }
 
 static void
 logscale_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  logscale_t *x = (logscale_t *)o;
-  float f = fts_get_float_arg(ac, at, 0, 0.0f);
+  logscale_t *this = (logscale_t *)o;
+  double f = fts_get_number_float(at);
 
-  if(x->linear)
-    f = f * x->in_scale + x->in_shift;
+  if(this->linear)
+    f = f * this->in_scale + this->in_shift;
   else
-    f = x->out_scale * log(f * x->in_scale + x->in_shift) + x->out_shift;
+    f = this->out_scale * log(f * this->in_scale + this->in_shift) + this->out_shift;
   
   fts_outlet_float(o, 0, f);
+}
+
+static void
+logscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  logscale_t *this = (logscale_t *)o;
+
+  at++; 
+  ac--;
+
+  this->inlow = 0.0;
+  this->inhigh = 0.0;
+  this->outlow = 0.0;
+  this->outhigh = 0.0;
+  this->base = 1.0;
+
+  logscale_set(o, 0, 0, ac, at);
 }
 
 static fts_status_t
 logscale_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[6];
   int i;
 
-  fts_class_init(cl, sizeof(logscale_t), 1 + n_params, 1, 0);
+  fts_class_init(cl, sizeof(logscale_t), 6, 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_number;
-  a[2] = fts_s_number;
-  a[3] = fts_s_number;
-  a[4] = fts_s_number;
-  a[5] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, logscale_init, 6, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, logscale_init);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), logscale_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, logscale_set);
 
-  a[0] = fts_s_number;
-  fts_method_define(cl, 0, fts_s_int, logscale_number, 1, a);
-  fts_method_define(cl, 0, fts_s_float, logscale_number, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, logscale_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, logscale_number);
 
-  a[0] = fts_s_number;
-  for (i=1; i<=n_params; i++)
-    {
-      fts_method_define(cl, i, fts_s_int, logscale_param, 1, a);
-      fts_method_define(cl, i, fts_s_float, logscale_param, 1, a);
-    }
+  fts_method_define_varargs(cl, 1, fts_s_int, logscale_set_inlow);
+  fts_method_define_varargs(cl, 1, fts_s_float, logscale_set_inlow);
 
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0, fts_s_float, 1, a);
+  fts_method_define_varargs(cl, 2, fts_s_int, logscale_set_inhigh);
+  fts_method_define_varargs(cl, 2, fts_s_float, logscale_set_inhigh);
+
+  fts_method_define_varargs(cl, 3, fts_s_int, logscale_set_outlow);
+  fts_method_define_varargs(cl, 3, fts_s_float, logscale_set_outlow);
+
+  fts_method_define_varargs(cl, 4, fts_s_int, logscale_set_outhigh);
+  fts_method_define_varargs(cl, 4, fts_s_float, logscale_set_outhigh);
+
+  fts_method_define_varargs(cl, 5, fts_s_int, logscale_set_base);
+  fts_method_define_varargs(cl, 5, fts_s_float, logscale_set_base);
+
+  fts_outlet_type_define_varargs(cl, 0, fts_s_float);
   
   return fts_Success;
 }

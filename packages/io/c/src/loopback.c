@@ -163,12 +163,12 @@ static fts_status_t
 loopback_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(loopback_t), 1, 1, 0);
+
   fts_bytestream_class_init(cl);
   
-  /* define variable */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, loopback_get_state);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, loopback_init);
   
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, loopback_init, 1, &fts_t_symbol);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, loopback_get_state);
   
   fts_method_define_varargs(cl, 0, fts_s_int, loopback_int);
   fts_method_define_varargs(cl, 0, fts_s_float, loopback_float);

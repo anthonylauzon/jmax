@@ -48,7 +48,10 @@ struct _track_
   event_t *first; /* pointer to first event */
   event_t *last; /* pointer to last event */
   int size; /* # of events in track */
+  fts_symbol_t keep;
 };
+
+#define track_set_sequence(t, s) ((t)->sequence = (s))
 
 #define track_get_sequence(t) ((t)->sequence)
 #define track_get_next(t) ((t)->next)
@@ -76,6 +79,9 @@ extern event_t *track_get_event_by_time_after(track_t *track, double time, event
 extern void track_highlight_event(track_t *track, event_t *event);
 extern void track_highlight_cluster(track_t *track, event_t *event, event_t *next);
 extern event_t *track_highlight_and_next(track_t *track, event_t *event);
+
+extern void track_write_to_dumper(track_t *this, fts_dumper_t *dumper);
+extern void track_add_event_from_array(track_t *this, int ac, const fts_atom_t *at);
 
 /* track atoms */
 #define track_atom_set(ap, x) fts_set_object_with_type((ap), (x), seqsym_track)

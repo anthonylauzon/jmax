@@ -237,33 +237,17 @@ selection_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 selection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(fts_selection_t), 0, 0, 0); 
 
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, selection_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, selection_delete);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init,  selection_init, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_object"),  selection_add_object);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_object"), selection_remove_object);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_connection"), selection_add_connection);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_connection"), selection_remove_connection);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete,  selection_delete, 0, 0);
-
-
-  a[0] = fts_s_object;
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("add_object"),  selection_add_object, 1, a);
-
-  a[0] = fts_s_object;
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("remove_object"), selection_remove_object, 1, a);
-
-  a[0] = fts_s_connection;
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("add_connection"), selection_add_connection, 1, a);
-
-  a[0] = fts_s_connection;
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("remove_connection"), selection_remove_connection, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_clear,  selection_clear, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, selection_clear);
 
   return fts_Success;
 }

@@ -305,25 +305,17 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
 static fts_status_t decrypt_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[5];
+  fts_class_init(cl, sizeof(decrypt_t), 2, 2, 0);
 
-  fts_class_init( cl, sizeof( decrypt_t), 2, 2, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, decrypt_init);
 
-  fts_method_define( cl, 0, fts_s_bang, decrypt_bang, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_new_symbol( "enable"), decrypt_enable);
+  fts_method_define_varargs(cl, 0, fts_new_symbol( "format"), decrypt_format);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  a[3] = fts_s_int;
-  a[4] = fts_s_int;
-  fts_method_define_optargs( cl, fts_SystemInlet, fts_s_init, decrypt_init, 5, a, 1);
+  fts_method_define_varargs(cl, 0, fts_s_bang, decrypt_bang);
+  fts_method_define_varargs(cl, 0, fts_s_int, decrypt_int);
 
-  a[0] = fts_s_int;
-  fts_method_define( cl, 0, fts_s_int, decrypt_int, 1, a);
-  fts_method_define( cl, 0, fts_new_symbol( "enable"), decrypt_enable, 1, a);
-  fts_method_define( cl, 1, fts_s_int, decrypt_chn, 1, a);
-
-  fts_method_define_varargs( cl, 0, fts_new_symbol( "format"), decrypt_format);
+  fts_method_define_varargs(cl, 1, fts_s_int, decrypt_chn);
 
   return fts_Success;
 }

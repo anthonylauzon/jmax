@@ -24,7 +24,8 @@
 
 #define ARRAY_DEFAULT_ALLOC_INCREMENT 64
 
-void fts_array_init( fts_array_t *array, int ac, const fts_atom_t *at)
+void 
+fts_array_init(fts_array_t *array, int ac, const fts_atom_t *at)
 {
   array->atoms = 0;
   array->size = 0;
@@ -32,98 +33,168 @@ void fts_array_init( fts_array_t *array, int ac, const fts_atom_t *at)
   array->alloc_increment = ARRAY_DEFAULT_ALLOC_INCREMENT;
 
   if (ac > 0)
-    fts_array_set( array, ac, at);
+    fts_array_set(array, ac, at);
 }
 
-void fts_array_destroy( fts_array_t *array)
+void 
+fts_array_destroy(fts_array_t *array)
 {
-  fts_array_clear( array);
-  fts_free( array->atoms);
+  fts_array_clear(array);
+  fts_free(array->atoms);
   array->atoms = 0;
   array->size = 0;
   array->alloc = 0;
 }
 
-void fts_array_clear( fts_array_t *array)
-{
-  fts_array_set_size( array, 0);
-}
-
-void fts_array_set_size( fts_array_t *array, int new_size)
+void 
+fts_array_set_size(fts_array_t *array, int new_size)
 {
   int i;
 
-  if ( new_size > array->alloc)
+  if(new_size > array->alloc)
     {
-      while ( array->alloc < new_size)
+      while (array->alloc < new_size)
 	array->alloc += array->alloc_increment;
 
-      array->atoms = fts_realloc( array->atoms, array->alloc * sizeof(fts_atom_t));
+      array->atoms = fts_realloc(array->atoms, array->alloc * sizeof(fts_atom_t));
 
       /* void newly allocated region */
-      for( i = array->size; i < array->alloc; i++)
-	fts_set_void( array->atoms + i);
+      for(i=array->size; i < array->alloc; i++)
+	fts_set_void(array->atoms + i);
     }
   else
     {
-      if( new_size < 0)
+      if(new_size < 0)
 	new_size = 0;
 
       /* void region cut off at end */
-      /* if new_size >= array->size, this will do nothing */
-      for( i = new_size; i < array->size; i++)
-	fts_atom_void( array->atoms + i);
+      for(i=new_size; i<array->size; i++)
+	fts_atom_void(array->atoms + i);
     }
 
   array->size = new_size;
 }
 
-void fts_array_set( fts_array_t *array, int ac, const fts_atom_t *at)
+void 
+fts_array_clear(fts_array_t *array)
+{
+  if(array->size)
+    {
+      int i;
+
+      for(i=0; i<array->size; i++)
+	fts_atom_void(array->atoms + i);
+      
+      array->size = 0;
+    }
+}
+
+void 
+fts_array_set(fts_array_t *array, int ac, const fts_atom_t *at)
 {
   int i;
  
-  fts_array_set_size( array, ac);
+  fts_array_set_size(array, ac);
 
-  for( i = 0; i < ac; i++)
-    fts_atom_assign( array->atoms + i, at + i);
+  for(i = 0; i < ac; i++)
+    fts_atom_assign(array->atoms + i, at + i);
 }
 
-void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at)
+void 
+fts_array_append(fts_array_t *array, int ac, const fts_atom_t *at)
 {
   int old_size = array->size;
   int i;
  
-  fts_array_set_size( array, old_size + ac);
+  fts_array_set_size(array, old_size + ac);
 
-  for( i = 0; i < ac; i++)
-    {
-      fts_atom_t *ap = array->atoms + old_size + i;
-      
-      fts_atom_assign( ap, at + i);
-    }
+  for(i = 0; i < ac; i++)
+    fts_atom_assign(array->atoms + old_size + i, at + i);
 }
 
-void fts_array_append_int( fts_array_t *array, int i)
+void 
+fts_array_append_int(fts_array_t *array, int i)
 {
   int size = array->size;
  
-  fts_array_set_size( array, size + 1);
+  fts_array_set_size(array, size + 1);
   fts_set_int(array->atoms + size, i);
 }
 
-void fts_array_append_float( fts_array_t *array, float f)
+void 
+fts_array_append_float(fts_array_t *array, float f)
 {
   int size = array->size;
  
-  fts_array_set_size( array, size + 1);
+  fts_array_set_size(array, size + 1);
   fts_set_float(array->atoms + size, f);
 }
 
-void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s)
+void 
+fts_array_append_symbol(fts_array_t *array, fts_symbol_t s)
 {
   int size = array->size;
  
-  fts_array_set_size( array, size + 1);
+  fts_array_set_size(array, size + 1);
   fts_set_symbol(array->atoms + size, s);
 }
 
+void 
+fts_array_prepend(fts_array_t *array, int ac, const fts_atom_t *at)
+{
+  int old_size = array->size;
+  int i;
+ 
+  fts_array_set_size(array, old_size + ac);
+
+  /* shift array towards end */
+  for(i=old_size-1; i>=0; i++)
+    array->atoms[ac + i] = array->atoms[i];
+
+  for(i=0; i<ac; i++)
+    fts_atom_assign(array->atoms + i, at + i);
+}
+
+/************************************************
+ *
+ *  array class
+ *
+ */
+fts_class_t *fts_array_class = 0;
+
+static void
+array_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_array_t *this = (fts_array_t *)o;
+
+  ac--;
+  at++;
+
+  fts_array_init(this, ac, at);
+}
+
+static void
+array_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_array_t *this = (fts_array_t *)o;
+
+  fts_array_destroy(this);
+}
+
+static fts_status_t
+array_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_array_t), 0, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, array_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, array_delete);
+  
+  return fts_Success;
+}
+
+void
+fts_array_config(void)
+{
+  fts_class_install(fts_s_array, array_instantiate);
+  fts_array_class = fts_class_get_by_name(fts_s_array);
+}

@@ -54,19 +54,24 @@ fts_symbol_t seqsym_export_midifile = 0;
 fts_symbol_t seqsym_export_midifile_dialog = 0;
 fts_symbol_t seqsym_import_midifile = 0;
 fts_symbol_t seqsym_import_midifile_dialog = 0;
-fts_symbol_t seqsym_bmax_add_track = 0;
-fts_symbol_t seqsym_bmax_add_event = 0;
+fts_symbol_t seqsym_add_track = 0;
+fts_symbol_t seqsym_remove_track = 0;
+fts_symbol_t seqsym_move_track = 0;
+fts_symbol_t seqsym_add_event = 0;
 
-/* messages to client */
+/* messages from/to client */
 fts_symbol_t seqsym_createEditor = 0;
 fts_symbol_t seqsym_closeEditor = 0;
 fts_symbol_t seqsym_destroyEditor = 0;
 fts_symbol_t seqsym_addTracks = 0;
-fts_symbol_t seqsym_deleteTracks = 0;
+fts_symbol_t seqsym_removeTracks = 0;
 fts_symbol_t seqsym_moveTrack = 0;
 fts_symbol_t seqsym_setName = 0;
+fts_symbol_t seqsym_getName = 0;
+fts_symbol_t seqsym_makeEvent = 0;
+fts_symbol_t seqsym_addEvent = 0;
 fts_symbol_t seqsym_addEvents = 0;
-fts_symbol_t seqsym_deleteEvents = 0;
+fts_symbol_t seqsym_removeEvents = 0;
 fts_symbol_t seqsym_moveEvents = 0;
 fts_symbol_t seqsym_highlightEvents = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
@@ -81,9 +86,6 @@ seqsym_config(void)
   seqsym_event = fts_new_symbol("event");
 
   /* event types */
-  seqsym_int = fts_new_symbol("int");
-  seqsym_float = fts_new_symbol("float");
-  seqsym_symbol = fts_new_symbol("symbol");
   seqsym_note = fts_new_symbol("note");
   seqsym_midi = fts_new_symbol("midi");
   seqsym_midival = fts_new_symbol("midival");
@@ -94,27 +96,28 @@ seqsym_config(void)
   seqsym_midi_velocity = fts_new_symbol("midi_velocity");
 
   /* messages */
-  seqsym_add = fts_new_symbol("add");
-  seqsym_set = fts_new_symbol("set");
-  seqsym_print = fts_new_symbol("print");
-  seqsym_clear = fts_new_symbol("clear");
   seqsym_export_midifile = fts_new_symbol("export_midifile");
   seqsym_export_midifile_dialog = fts_new_symbol("export_midifile_dialog");
   seqsym_import_midifile = fts_new_symbol("import_midifile");
   seqsym_import_midifile_dialog = fts_new_symbol("import_midifile_dialog");
-  seqsym_bmax_add_track = fts_new_symbol("bmax_add_track");
-  seqsym_bmax_add_event = fts_new_symbol("bmax_add_event");
+  seqsym_add_track = fts_new_symbol("add_track");
+  seqsym_remove_track = fts_new_symbol("remove_track");
+  seqsym_move_track = fts_new_symbol("move_track");
+  seqsym_add_event = fts_new_symbol("add_event");
 
   /* messages to client */
   seqsym_createEditor = fts_new_symbol("createEditor");
   seqsym_closeEditor = fts_new_symbol("closeEditor");
   seqsym_destroyEditor = fts_new_symbol("destroyEditor");
   seqsym_addTracks = fts_new_symbol("addTracks");
-  seqsym_deleteTracks = fts_new_symbol("deleteTracks");
+  seqsym_removeTracks = fts_new_symbol("removeTracks");
   seqsym_moveTrack = fts_new_symbol("moveTrack");
   seqsym_setName = fts_new_symbol("setName");
+  seqsym_getName = fts_new_symbol("getName");
+  seqsym_makeEvent = fts_new_symbol("makeEvent");
+  seqsym_addEvent = fts_new_symbol("addEvent");
   seqsym_addEvents = fts_new_symbol("addEvents");
-  seqsym_deleteEvents = fts_new_symbol("deleteEvents");
+  seqsym_removeEvents = fts_new_symbol("removeEvents");
   seqsym_moveEvents = fts_new_symbol("moveEvents");
   seqsym_highlightEvents = fts_new_symbol("highlightEvents");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");

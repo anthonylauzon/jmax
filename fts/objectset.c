@@ -25,7 +25,6 @@
 
 fts_symbol_t objectset_symbol = 0;
 fts_symbol_t sym_objectset_append = 0;
-fts_symbol_t sym_objectset_clear = 0;
 fts_symbol_t sym_objectset_remove = 0;
 
 /***********************************************************************
@@ -50,7 +49,7 @@ void
 fts_objectset_clear( fts_objectset_t *set)
 {
   fts_hashtable_clear( &set->hashtable);  
-  fts_client_send_message((fts_object_t *)set, sym_objectset_clear, 0, 0);
+  fts_client_send_message((fts_object_t *)set, fts_s_clear, 0, 0);
 }
 
 void 
@@ -128,7 +127,6 @@ void fts_objectset_config( void)
 {
   objectset_symbol = fts_new_symbol("__objectset");
   sym_objectset_append = fts_new_symbol("append");
-  sym_objectset_clear = fts_new_symbol("clear");
   sym_objectset_remove = fts_new_symbol("remove");
   fts_class_install(objectset_symbol, objectset_instantiate);
 }

@@ -184,7 +184,7 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       
       type = track_get_type(this->track);
 
-      if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
+      if(type == fts_s_int || type == fts_s_float || type == fts_s_symbol)
 	this->class = 0;
       else
 	this->class = fts_class_get_by_name(type);
@@ -213,9 +213,9 @@ seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqrec_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqrec_delete);
   
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqrec_start);
+  fts_method_define_varargs(cl, 0, fts_s_start, seqrec_start);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqrec_pause);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqrec_stop);
+  fts_method_define_varargs(cl, 0, fts_s_stop, seqrec_stop);
   
   fts_method_define_varargs(cl, 0, fts_s_int, seqrec_record);
   fts_method_define_varargs(cl, 0, fts_s_float, seqrec_record);

@@ -62,8 +62,8 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   voxalloc_t *this = (voxalloc_t *) o;
 
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  int n_vox    = fts_get_int_arg(ac, at, 2, 16);
-  int n_args   = fts_get_int_arg(ac, at, 3, 6);
+  int n_vox = fts_get_int_arg(ac, at, 2, 16);
+  int n_args = fts_get_int_arg(ac, at, 3, 6);
   int i_dur = fts_get_int_arg(ac, at, 4, 0);
   int dur = fts_get_int_arg(ac, at, 5, 0);
   char rec_name[MAX_size_rec_name + 1];
@@ -226,54 +226,30 @@ voxalloc_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[10];
-
-  /* initialize the class */
-
   if(fts_get_int_arg(ac, at, 4, 0) == 0)
     fts_class_init(cl, sizeof(voxalloc_t), 2, 2, 0); /* no dur arg in list -> dur inlet */
   else
     fts_class_init(cl, sizeof(voxalloc_t), 1, 2, 0); /* no dur inlet */
 
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, voxalloc_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, voxalloc_delete);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_int; /* # of voices */
-  a[3] = fts_s_int; /* # of arguments */
-  a[4] = fts_s_int; /* idx of duration arg in incoming lists */
-  a[5] = fts_s_int; /* default length */
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, voxalloc_init, 6, a, 2);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, voxalloc_delete, 0, 0);
-
-  /* voxalloc args */
-
-  fts_method_define(cl, 0, fts_s_bang, voxalloc_bang, 0, 0);
-
-  fts_method_define(cl, 0, fts_new_symbol("used"), voxalloc_used, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_bang, voxalloc_bang);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("used"), voxalloc_used);
 
   fts_method_define_varargs(cl, 0, fts_s_list, voxalloc_list);
+  fts_method_define_varargs(cl, 0, fts_s_int, voxalloc_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, voxalloc_float);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, voxalloc_int, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, voxalloc_float, 1, a);
-
-  if(fts_get_int_arg(ac, at, 4, 0) == 0){ /* dur inlet */
-    a[0] = fts_s_int;
-    fts_method_define(cl, 1, fts_s_int, voxalloc_number_1, 1, a);
-    a[0] = fts_s_float;
-    fts_method_define(cl, 1, fts_s_float, voxalloc_number_1, 1, a);
-  }
+  if(fts_get_int_arg(ac, at, 4, 0) == 0)
+    { 
+      /* dur inlet */
+      fts_method_define_varargs(cl, 1, fts_s_int, voxalloc_number_1);
+      fts_method_define_varargs(cl, 1, fts_s_float, voxalloc_number_1);
+    }
   
-  /* Type the outlets */
-
-  fts_outlet_type_define(cl, 0,	fts_s_bang, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_bang);
+  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
 
   return fts_Success;
 }

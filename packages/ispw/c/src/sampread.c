@@ -59,7 +59,7 @@ sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
   float max_speed = (unit ? fts_get_float_arg(ac, at, 3, 0.0f): fts_get_float_arg(ac, at, 2, 0.0f));
   sampbuf_t *null = 0;
-  float    zero = 0.0f;
+  float zero = 0.0f;
 
   this->tab_name = tab_name;
 
@@ -194,29 +194,16 @@ sampread_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-
   fts_class_init(cl, sizeof(sampread_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;		/* class */
-  a[1] = fts_s_symbol;		/* name of table */
-  a[2] = fts_s_anything; /* unit or max_speed (?) */
-  a[3] = fts_s_number; /* max_speed (?) */
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sampread_init, 3, a, 2);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sampread_init);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sampread_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sampread_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sampread_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sampread_put);
   
-  a[0] = fts_s_int;
-  fts_method_define_optargs(cl, 0, fts_s_int, sampread_set_by_int, 1, a, 0);
-  
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_set, sampread_set, 1, a);
-  
-  a[0] = fts_s_float;
-  fts_method_define_optargs(cl, 0, fts_s_jump, sampread_jump, 1, a, 0);
+  fts_method_define_varargs(cl, 0, fts_s_int, sampread_set_by_int);
+  fts_method_define_varargs(cl, 0, fts_s_set, sampread_set);
+  fts_method_define_varargs(cl, 0, fts_s_jump, sampread_jump);
   
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);

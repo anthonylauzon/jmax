@@ -42,7 +42,7 @@ typedef struct
  */
 
 static void
-atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_add(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -71,7 +71,7 @@ atom_add(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_sub(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -100,7 +100,7 @@ atom_sub(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_mul(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -129,7 +129,7 @@ atom_mul(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_div(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_div(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -187,7 +187,7 @@ atom_div(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_gt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_gt(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -216,7 +216,7 @@ atom_gt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_ge(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_ge(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -245,7 +245,7 @@ atom_ge(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_lt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_lt(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -274,7 +274,7 @@ atom_lt(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_le(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_le(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -303,7 +303,7 @@ atom_le(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_ne(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_ne(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -332,7 +332,7 @@ atom_ne(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
 }
 
 static void
-atom_ee(const fts_atom_t *left, fts_atom_t *right, fts_atom_t *result)
+atom_ee(const fts_atom_t *left, const fts_atom_t *right, fts_atom_t *result)
 {
   if(fts_is_int(left))
     {
@@ -726,7 +726,6 @@ listarith_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
   fts_symbol_t class_name = fts_get_symbol(at);
 
   /* initialization */
@@ -734,7 +733,7 @@ listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listarith_init);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, listarith_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, listarith_delete);
 
   /* user methods */
   fts_method_define_varargs(cl, 1, fts_s_list, listarith_set_right_list);

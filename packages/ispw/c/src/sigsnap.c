@@ -96,30 +96,17 @@ sigsnapshot_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static fts_status_t
 sigsnapshot_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
   fts_class_init(cl, sizeof(sigsnapshot_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigsnapshot_init, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigsnapshot_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigsnapshot_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigsnapshot_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigsnapshot_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigsnapshot_put);
   
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sigsnapshot_number, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, sigsnapshot_number, 1, a);
-
-  fts_method_define(cl, 0, fts_s_bang, sigsnapshot_bang, 0, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, sigsnapshot_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, sigsnapshot_number);
+  fts_method_define_varargs(cl, 0, fts_s_bang, sigsnapshot_bang);
   
   dsp_sig_inlet(cl, 0);
-
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0, fts_s_float, 1, a);
 
   sigsnapshot_function = fts_new_symbol("snapshot");
   dsp_declare_function(sigsnapshot_function, sigsnapshot_dsp);

@@ -79,7 +79,7 @@ VERSION = @VERSION@
 
 packagedir = $(pkgdatadir)/packages/data/c
 package_LTLIBRARIES = libdata.la
-libdata_la_SOURCES =  bpf.c col.c copy.c data.c fill.c fmat.c fvec.c getinter.c getlist.c getrange.c getsize.c getval.c ivec.c mat.c message.c messtab.c preset.c row.c value.c vec.c 
+libdata_la_SOURCES =  bpf.c col.c copy.c data.c fill.c fmat.c fvec.c getinter.c getlist.c getrange.c getsize.c getval.c ivec.c mat.c messtab.c preset.c row.c value.c vec.c dumpfile.c
 
 
 INCLUDES = -I@top_srcdir@/packages/utils/c/src
@@ -97,7 +97,7 @@ libdata_la_LDFLAGS =
 libdata_la_LIBADD = 
 libdata_la_OBJECTS =  bpf.lo col.lo copy.lo data.lo fill.lo fmat.lo \
 fvec.lo getinter.lo getlist.lo getrange.lo getsize.lo getval.lo ivec.lo \
-mat.lo message.lo messtab.lo preset.lo row.lo value.lo vec.lo
+mat.lo messtab.lo preset.lo row.lo value.lo vec.lo dumpfile.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -111,10 +111,10 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/bpf.P .deps/col.P .deps/copy.P .deps/data.P \
-.deps/fill.P .deps/fmat.P .deps/fvec.P .deps/getinter.P .deps/getlist.P \
-.deps/getrange.P .deps/getsize.P .deps/getval.P .deps/ivec.P \
-.deps/mat.P .deps/message.P .deps/messtab.P .deps/preset.P .deps/row.P \
-.deps/value.P .deps/vec.P
+.deps/dumpfile.P .deps/fill.P .deps/fmat.P .deps/fvec.P \
+.deps/getinter.P .deps/getlist.P .deps/getrange.P .deps/getsize.P \
+.deps/getval.P .deps/ivec.P .deps/mat.P .deps/messtab.P .deps/preset.P \
+.deps/row.P .deps/value.P .deps/vec.P
 SOURCES = $(libdata_la_SOURCES)
 OBJECTS = $(libdata_la_OBJECTS)
 

@@ -115,7 +115,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	setDirty();
     }
 
-  public void deleteEvents(int nArgs , FtsAtom args[])
+  public void removeEvents(int nArgs , FtsAtom args[])
   {
     int removeIndex;
     TrackEvent event = null;
@@ -124,7 +124,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       {
 	event = (TrackEvent)(args[i].getObject());
 	removeIndex = indexOf(event);
-	removeEventAt(removeIndex);
+	deleteEventAt(removeIndex);
       }
     // ends the undoable transition
     endUpdate();
@@ -278,7 +278,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	else
 	  sendArgs[2+i].setValue(args[i]);
       }
-    sendMessage(FtsObject.systemInlet, "add_event", 2+nArgs, sendArgs);
+    sendMessage(FtsObject.systemInlet, "addEvent", 2+nArgs, sendArgs);
   }
   
   public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object args[])
@@ -294,14 +294,14 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	  sendArgs[2+i].setValue(args[i]);
       }
 
-    sendMessage(FtsObject.systemInlet, "make_event", 2+nArgs, sendArgs);
+    sendMessage(FtsObject.systemInlet, "makeEvent", 2+nArgs, sendArgs);
   }
 
   public void requestEventMove(TrackEvent evt, double newTime)
   {
     sendArgs[0].setObject(evt); 
     sendArgs[1].setDouble(newTime);
-    sendMessage(FtsObject.systemInlet, "move_events", 2, sendArgs);
+    sendMessage(FtsObject.systemInlet, "moveEvents", 2, sendArgs);
   }
 
   public void requestEventsMove(Enumeration events, int deltaX, Adapter a)
@@ -319,7 +319,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		  }
 	      else
 		  {
-		      sendMessage(FtsObject.systemInlet, "move_events", i, sendArgs);
+		      sendMessage(FtsObject.systemInlet, "moveEvents", i, sendArgs);
 		      i=0;
 		      sendArgs[i].setObject(aEvent);
 		      sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));		      
@@ -328,18 +328,18 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	  }
       
       if(i!=0)
-	  sendMessage(FtsObject.systemInlet, "move_events", i, sendArgs);
+	  sendMessage(FtsObject.systemInlet, "moveEvents", i, sendArgs);
   }
 
   public void requestSetName(String newName)
   {
     sendArgs[0].setString(newName); 
-    sendMessage(FtsObject.systemInlet, "set_name", 1, sendArgs);
+    sendMessage(FtsObject.systemInlet, "setName", 1, sendArgs);
   }    
 
   public void requestClearTrack()
   {
-    sendMessage(FtsObject.systemInlet, "clear_track", 0, null);
+    sendMessage(FtsObject.systemInlet, "clear", 0, null);
   }    
 
   public void export()
@@ -639,12 +639,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     /**
      * deletes an event from the database
      */
-    public void removeEvent(TrackEvent event)
+    public void deleteEvent(TrackEvent event)
     {
 	sendArgs[0].setObject(event);
-	sendMessage(FtsObject.systemInlet, "remove_events", 1, sendArgs);
+	sendMessage(FtsObject.systemInlet, "removeEvents", 1, sendArgs);
     }
-    public void removeEvents(Enumeration events)
+    public void deleteEvents(Enumeration events)
     {
       int i = 0;
       for (Enumeration e = events; e.hasMoreElements();) 
@@ -653,23 +653,23 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		  sendArgs[i++].setObject((TrackEvent) e.nextElement());
 	      else
 		  {
-		      sendMessage(FtsObject.systemInlet, "remove_events", NUM_ARGS, sendArgs); 
+		      sendMessage(FtsObject.systemInlet, "removeEvents", NUM_ARGS, sendArgs); 
 		      i = 0;
 		  }
 	  }
       
       if(i!=0)
-	  sendMessage(FtsObject.systemInlet, "remove_events", i, sendArgs);
+	  sendMessage(FtsObject.systemInlet, "removeEvents", i, sendArgs);
       
     }
 
-    public void removeAllEvents()
+    public void deleteAllEvents()
     {
 	while(events_fill_p != 0)
-	  removeEvent(events[0]);
+	  deleteEvent(events[0]);
     }
 
-    private void removeEventAt(int removeIndex)
+    private void deleteEventAt(int removeIndex)
     {
 	TrackEvent event = getEventAt(removeIndex);
 	if (removeIndex == NO_SUCH_EVENT || removeIndex == EMPTY_COLLECTION)

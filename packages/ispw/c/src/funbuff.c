@@ -56,7 +56,6 @@ typedef struct
 
 /*    ZLL LOCAL FUNCTIONS +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  */
 
-
 static struct zll *
 zll_new(void)  
 {
@@ -66,7 +65,6 @@ zll_new(void)
 }
 
 /*  deletes xfirst thru xlast and rejoines  */		
-
 static void
 zll_delete(struct zll *xfirst, struct zll *xlast)        
 {
@@ -82,7 +80,6 @@ zll_delete(struct zll *xfirst, struct zll *xlast)
 
 
 /*  returns copy of region from x to x + w of list  or 0  */
-
 static struct zll *
 zll_copy(struct zll *list, long int x1, long int w)
 {
@@ -202,7 +199,6 @@ zll_prinlist(struct zll *list)
 }
 
 /* accepts a vector : x1 y1 x2 y2 x3 y3 ... places it in a zll list  returns list or 0 */
-
 static struct zll *
 zll_vecToZll(int ac, const fts_atom_t *av)
 {
@@ -227,7 +223,6 @@ zll_vecToZll(int ac, const fts_atom_t *av)
   for (count = 0; count < 2; count++, av++)
     {
       /* pick off first element */
-
       if (fts_is_int(av))
 	current->x = fts_get_int(av);
       else
@@ -251,7 +246,6 @@ zll_vecToZll(int ac, const fts_atom_t *av)
   for (count = 2; count < ac; count++, av++)
     {
       /* pick off any others */
-
       current->next = zll_new();
       current->next->prev = current;
       current = current->next;
@@ -423,7 +417,6 @@ zll_hop1(struct zll *function, float precision)
     } 
 
   /*  no ray_ptr->next  so return  */
-  
   outfun->next = zll_new();	/* append last point to end of output fun */
   outfun->next->prev = outfun;	/*  build outfun from left to right  */
   outfun = outfun->next;
@@ -432,7 +425,7 @@ zll_hop1(struct zll *function, float precision)
   outfun->y = ray_ptr->y;
   zllf_freefun(killptr);
 
-  return(outfun_head);			/*  finally return pointer to reduced data */
+  return(outfun_head); /*  finally return pointer to reduced data */
 }
 
 
@@ -504,7 +497,6 @@ funbuff_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 /* select region x and width */
 /* method select, inlet 0 */
-
 static void
 funbuff_select(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -520,7 +512,6 @@ funbuff_select(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if (sel_width < 0)
     {
       /* don't change the selection if there is an error */
-
       post("funbuff select:  arg2 (width)  must be non-negative\n");
     }
   
@@ -533,7 +524,6 @@ funbuff_select(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
    event just before; UNLESS "GOTO n" has been called, in which case 
    the difference value is the x of next event - n */ 
 /* method next, inlet 0 */
-
 static void
 funbuff_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -570,7 +560,6 @@ funbuff_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 /* warning: the name lies, the function have also side effects on this */
-
 static struct zll *
 funbuff_getElement(funbuff_t *this, long int index)
 {
@@ -609,7 +598,6 @@ funbuff_getElement(funbuff_t *this, long int index)
     relative to N instead of the x value of the previous event returned by NEXT"  */
 
 /* method goto, inlet 0 */
-
 static void
 funbuff_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -632,9 +620,7 @@ funbuff_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
-/* support function:
-   returns overwriten list  or 0.
-   list must be 0 terminated  */
+/* support function: returns overwriten list  or 0. list must be 0 terminated  */
 
 static struct zll *
 funbuff_write(funbuff_t *this, struct zll *list)		
@@ -657,7 +643,6 @@ funbuff_write(funbuff_t *this, struct zll *list)
   if (! funbuff_first(this))
     {
       /* if funbuff is empty then attach list     */
-
       this->head.next = list;
       list->prev = &this->head;
       this->foot = end;
@@ -673,14 +658,12 @@ funbuff_write(funbuff_t *this, struct zll *list)
   if (x1 > current->x)
     {
       /*  append list  */
-
       current->next = list;
       list->prev = current;
       return 0;
     }
   
   /*   insert list start   */
-
   splice1 = current->prev;		
   splice1->next = list;
   list->prev = splice1;
@@ -706,7 +689,6 @@ funbuff_write(funbuff_t *this, struct zll *list)
   if (splice2)
     {
       /*     insert list end  and 0 cap overwrite   */
-
       splice2->prev->next = 0;
       end->next = splice2;
       splice2->prev = end;
@@ -716,7 +698,6 @@ funbuff_write(funbuff_t *this, struct zll *list)
 }
 
 /* method int/float, inlet 1 */
-
 static void
 funbuff_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -728,7 +709,6 @@ funbuff_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 /* sends nearest value (<=)  index  or lowest val in buffer  */
 /* method int/float, inlet 0 */
-
 static void
 funbuff_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -790,71 +770,71 @@ funbuff_interp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
    is always relative to itself,  that is it is only a shape   */
 
 /* method interptab, inlet 0 */
-
 static void
 funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
-  int xn  = fts_get_int(at + 0);
-  fts_symbol_t sym = fts_get_symbol(at + 1);
-  struct zll *z;
-  long x1, x2, tab_domain, tab_range, tab_x, tab_y;
-  long  low = 0, high = 0;
-  ivec_t *tab = 0;
-  fts_object_t *obj;
   
-  obj = ispw_get_object_by_name(sym);
-
-  if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
-    tab = (ivec_t *)obj;
-  
-  if (! tab)
+  if(ac == 2 && fts_is_int(at) && fts_is_symbol(at + 1))
     {
-      post("funbuff interptab: %s is not a known table\n", fts_symbol_name(sym));
-      return;
+      int xn  = fts_get_int(at + 0);
+      fts_symbol_t sym = fts_get_symbol(at + 1);
+      struct zll *z;
+      long x1, x2, tab_domain, tab_range, tab_x, tab_y;
+      long  low = 0, high = 0;
+      ivec_t *tab = 0;
+      fts_object_t *obj;
+      
+      obj = ispw_get_object_by_name(sym);
+      
+      if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
+	tab = (ivec_t *)obj;
+      
+      if (! tab)
+	{
+	  post("funbuff interptab: %s is not a known table\n", fts_symbol_name(sym));
+	  return;
+	}
+      
+      z = funbuff_getElement(this,xn);
+      
+      if (! z)
+	{
+	  /*  no data in funbuff output zero */
+	  fts_outlet_int((fts_object_t *)this, 0, 0L);
+	  return;
+	}
+      else if ((xn <= z->x) || (!z->next)) 
+	{
+	  /*  no data in funbuff output zero?????  */
+	  fts_outlet_int((fts_object_t *)this, 0, z->y);
+	  return;
+	}
+      
+      tab_domain = ivec_get_size(tab);
+      low  = ivec_get_min_value(tab);
+      high = ivec_get_max_value(tab);
+      tab_range = high - low;
+      
+      if (tab_range == 0)
+	{
+	  post("funbuff_interptab: Table must be non zero\n");
+	  return;
+	}
+      
+      x1 = z->x;
+      x2 = z->next->x;
+      
+      tab_x = tab_domain * ((xn - x1) / (float)(x2 - x1));
+      tab_y = ivec_get_element(tab, tab_x) - low;
+      xn = z->y + (z->next->y - z->y) * (float)tab_y / tab_range;
+      
+      fts_outlet_int((fts_object_t *)this, 0, xn);
     }
-
-  z = funbuff_getElement(this,xn);
-
-  if (! z)
-    {
-      /*  no data in funbuff output zero */
-
-      fts_outlet_int((fts_object_t *)this, 0, 0L);
-      return;
-    }
-  else if ((xn <= z->x) || (!z->next)) 
-    {
-      /*  no data in funbuff output zero?????  */
-
-      fts_outlet_int((fts_object_t *)this, 0, z->y);
-      return;
-    }
-
-  tab_domain = ivec_get_size(tab);
-  low  = ivec_get_min_value(tab);
-  high = ivec_get_max_value(tab);
-  tab_range = high - low;
-
-  if (tab_range == 0)
-    {
-      post("funbuff_interptab: Table must be non zero\n");
-      return;
-    }
-
-  x1 = z->x;
-  x2 = z->next->x;
-
-  tab_x = tab_domain * ((xn - x1) / (float)(x2 - x1));
-  tab_y = ivec_get_element(tab, tab_x) - low;
-  xn = z->y + (z->next->y - z->y) * (float)tab_y / tab_range;
-
-  fts_outlet_int((fts_object_t *)this, 0, xn);			
 }
 
 
 /* method set, inlet 0 */
-
 static void
 funbuff_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -883,7 +863,6 @@ funbuff_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 /* method find, inlet 0 */
-
 static void
 funbuff_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -904,7 +883,6 @@ funbuff_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 /* method dump, inlet 0 */
-
 static void
 funbuff_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -927,7 +905,6 @@ funbuff_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 /*  returns *copy of selected region of list or 0  */
 /* method copy, inlet 0 */
-
 static void
 funbuff_copy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -946,7 +923,6 @@ funbuff_copy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 /* cuts zll in selected region returns cut zll or 0  */
 /* method cut, inlet 0 */
-
 static void
 funbuff_cut(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -972,7 +948,6 @@ funbuff_cut(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 /* method clear, inlet 0 */
 /* clears zll in selected region */
-
 static void
 funbuff_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -986,7 +961,6 @@ funbuff_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 /* method reduce, inlet 0 */
 /* reduces zll in selected region */
-
 static void
 funbuff_reduce(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1022,7 +996,6 @@ funbuff_reduce(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 /* method undo, inlet 0 */
 /* takes contents of global undo buffer and writes it into funbuff*/
-
 static void
 funbuff_undo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1039,7 +1012,6 @@ funbuff_undo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 /* pastes a copy corresponding to my selected region from clipboard into myself */
 /* method paste, inlet 0 */
-
 static void
 funbuff_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1063,7 +1035,6 @@ funbuff_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 /* method bang inlet 0 */
 /*    DEBUG HERE +++++++++++++++++++++++++++++++++   */
-
 static void
 funbuff_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1099,11 +1070,13 @@ funbuff_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 /* Method init, system inlet; args = optional symbol */
 /* should have a method delete !!! ??? !!! */
-
 static void
 funbuff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
+
+  ac--;
+  at++;
 
   this->head.prev = 0;
   this->head.next = 0;
@@ -1114,87 +1087,46 @@ funbuff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->foot = 0;
   this->yvalid = 0;
   this->gotoDelta = -1L;
-  this->sym = fts_get_symbol_arg(ac, at, 1, 0);
+
+  if(ac > 0 && fts_is_symbol(at))
+    this->sym = fts_get_symbol(at);
+  else
+    fts_object_set_error(o, "Name argument required");
 }
 
 
 static fts_status_t
 funbuff_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(funbuff_t), 2, 3, 0); 
 
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, funbuff_init);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, funbuff_init, 2, a, 1);
+  fts_method_define_varargs(cl, 0, fts_s_set, funbuff_set);
 
-  /* Funbuff args */
+  fts_method_define_varargs(cl, 0, fts_s_bang, funbuff_bang);
+  fts_method_define_varargs(cl, 0, fts_s_int, funbuff_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, funbuff_number);
 
-  fts_method_define(cl, 0, fts_s_bang, funbuff_bang, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("next"), funbuff_next);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("goto"), funbuff_goto);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reduce"), funbuff_reduce);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("interp"), funbuff_interp);
+  fts_method_define_varargs(cl, 0, fts_s_print, funbuff_print);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, funbuff_number, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_clear, funbuff_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("interptab"), funbuff_interptab);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("cut"), funbuff_cut);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("copy"), funbuff_copy);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("paste"), funbuff_paste);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("dump"), funbuff_dump);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("find"), funbuff_find);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("undo"), funbuff_undo);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, funbuff_number, 1, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("select"), funbuff_select);
 
-  fts_method_define(cl, 0, fts_new_symbol("next"), funbuff_next, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("goto"), funbuff_goto, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_new_symbol("reduce"), funbuff_reduce, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("interp"), funbuff_interp, 1, a);
-
-  fts_method_define(cl, 0, fts_new_symbol("print"), funbuff_print, 0, 0);
-
-  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), funbuff_set);
-
-  fts_method_define(cl, 0, fts_new_symbol("clear"), funbuff_clear, 0, 0);
-
-
-  a[0] = fts_s_int;
-  a[1] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("interptab"), funbuff_interptab, 2, a);
-
-  fts_method_define(cl, 0, fts_new_symbol("cut"), funbuff_cut, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("copy"), funbuff_copy, 0, 0);
-
-  fts_method_define(cl, 0, fts_new_symbol("paste"), funbuff_paste, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("dump"), funbuff_dump, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("find"), funbuff_find, 1, a);
-
-  fts_method_define(cl, 0, fts_new_symbol("undo"), funbuff_undo, 0, 0);
-
-  a[0] = fts_s_number;
-  a[1] = fts_s_number;
-  fts_method_define(cl, 0, fts_new_symbol("select"), funbuff_select, 2, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, funbuff_number_1, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, funbuff_number_1, 1, a);
-
-  /* Type the outlet */
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
-
-  fts_outlet_type_define(cl, 2,	fts_s_bang, 0, 0);
+  fts_method_define_varargs(cl, 1, fts_s_int, funbuff_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_float, funbuff_number_1);
 
   return fts_Success;
 }

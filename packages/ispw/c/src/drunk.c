@@ -164,50 +164,22 @@ drunk_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 drunk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(drunk_t), 3, 1, 0); 
 
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, drunk_init);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_number;
-  a[2] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, drunk_init, 3, a, 1);
+  fts_method_define_varargs(cl, 0, fts_s_set, drunk_set);
 
-  /* Drunk args */
-
-  fts_method_define(cl, 0, fts_s_bang, drunk_bang, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("set"), drunk_set, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int,   drunk_number, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, drunk_number, 1, a);
-
+  fts_method_define_varargs(cl, 0, fts_s_bang, drunk_bang);
+  fts_method_define_varargs(cl, 0, fts_s_int, drunk_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, drunk_number);
   fts_method_define_varargs(cl, 0, fts_s_list, drunk_list);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int,   drunk_number_1, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int,   drunk_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_float, drunk_number_1);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, drunk_number_1, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 2, fts_s_int,   drunk_number_2, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 2, fts_s_float, drunk_number_2, 1, a);
-
-  /* Type the outlet */
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
+  fts_method_define_varargs(cl, 2, fts_s_int,   drunk_number_2);
+  fts_method_define_varargs(cl, 2, fts_s_float, drunk_number_2);
 
   return fts_Success;
 }

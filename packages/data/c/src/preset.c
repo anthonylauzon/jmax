@@ -22,6 +22,79 @@
 #include <fts/fts.h>
 #include "preset.h"
 
+static fts_symbol_t sym_preset_dumper = 0;
+static fts_symbol_t sym_new_preset = 0;
+static fts_symbol_t sym_dump_mess = 0;
+
+/******************************************************
+ *
+ *  preset dumper utility
+ *
+ */
+
+static fts_class_t *preset_dumper_class = 0;
+
+typedef struct 
+{
+  fts_dumper_t head;
+  fts_dumper_t *dumper;
+  int index;
+} preset_dumper_t;
+
+#define preset_dumper_set_index(d, i) ((d)->index = (i))
+
+static void
+preset_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preset_dumper_t *this = (preset_dumper_t *)o;
+  fts_message_t *mess;
+  
+  mess = fts_dumper_message_new(this->dumper, sym_dump_mess);
+
+  fts_message_append_int(mess, this->index);
+  fts_message_append_symbol(mess, s);
+  fts_message_append(mess, ac, at);
+
+  fts_dumper_message_send(this->dumper, mess);
+}
+
+static void
+preset_dumper_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preset_dumper_t *this = (preset_dumper_t *)o;
+
+  ac--;
+  at++;
+
+  /* init super */
+  fts_dumper_init((fts_dumper_t *)this, preset_dumper_send);
+
+  this->dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_object_refer(this->dumper);
+}
+  
+static void
+preset_dumper_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preset_dumper_t *this = (preset_dumper_t *)o;
+  
+  fts_object_release(this->dumper);
+
+  /* delete super */
+  fts_dumper_destroy((fts_dumper_t *)this);
+}
+  
+static fts_status_t
+preset_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(preset_dumper_t), 0, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preset_dumper_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preset_dumper_delete);
+
+  return fts_Success;
+}
+
 /******************************************************
  *
  *  preset
@@ -32,17 +105,14 @@ fts_symbol_t preset_symbol = 0;
 fts_type_t preset_type = 0;
 fts_class_t *preset_class = 0;
 
-static fts_symbol_t sym_add_state_from_bmax = 0;
-static fts_symbol_t sym_add_array_from_bmax = 0;
-
 static int
 preset_check_object(preset_t *this, fts_object_t *obj)
 {
   fts_class_t *class = fts_object_get_class(obj);
-  fts_method_t get_meth = fts_class_get_method(class, fts_SystemInlet, fts_s_append_state_to_array);
-  fts_method_t restore_meth = fts_class_get_method(class, fts_SystemInlet, fts_s_set_state_from_array);
+  fts_method_t meth_set = fts_class_get_method(class, fts_SystemInlet, fts_s_set_from_instance);
+  fts_method_t meth_dump = fts_class_get_method(class, fts_SystemInlet, fts_s_dump);
 
-  return (get_meth != 0 && restore_meth != 0);
+  return (meth_set != 0) && (meth_dump != 0);
 }
 
 static void
@@ -52,39 +122,49 @@ preset_remove(preset_t *this, const fts_atom_t *key)
 
   if(fts_hashtable_get(&this->hash, key, &value))
     {
-      fts_array_t *states = (fts_array_t *)fts_get_ptr(&value);
+      fts_object_t **clones = (fts_object_t **)fts_get_ptr(&value);
       int i;
 
       for(i=0; i<this->n_objects; i++)
-	fts_array_destroy(states + i);
+	fts_object_release(clones[i]);
 
-      fts_free(states);
+      fts_free(clones);
       fts_hashtable_remove(&this->hash, key);      
     }
 }
 
-static fts_array_t *
+static fts_object_t **
 preset_get_or_add(preset_t *this, const fts_atom_t *key)
 {
-  fts_array_t *states;
   fts_atom_t value;
-  
+  fts_object_t **clones;
+
   if(fts_hashtable_get(&this->hash, key, &value))
-    states = fts_get_array(&value);
+    {
+      int i;
+
+      clones = (fts_object_t **)fts_get_ptr(&value);
+
+      for(i=0; i<this->n_objects; i++)
+	{
+	  fts_object_release(clones[i]);
+	  clones[i] = 0;
+	}
+    }
   else
     {
       int i;
-      
-      states = (fts_array_t *)fts_malloc(sizeof(fts_array_t) * this->n_objects);
+
+      clones = (fts_object_t **)fts_malloc(sizeof(fts_object_t *) * this->n_objects);
       
       for(i=0; i<this->n_objects; i++)
-	fts_array_init(states + i, 0, 0);
+	clones[i] = 0;
 
-      fts_set_ptr(&value, (void *)states);
+      fts_set_ptr(&value, (void *)clones);
       fts_hashtable_put(&this->hash, key, &value);
     }
 
-  return states;
+  return clones;
 }
 
 void
@@ -129,7 +209,6 @@ preset_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       while(fts_iterator_has_more( &iterator))
 	{
 	  fts_atom_t key;
-	  fts_array_t *states;
 	  int i;
 	  
 	  fts_iterator_next( &iterator, &key);
@@ -144,41 +223,56 @@ static void
 preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preset_t *this = (preset_t *)o;
-  int i;  
 
   if(fts_is_int(at))
     {
-      fts_atom_t value;
-      fts_array_t *states;
-
-      if(fts_hashtable_get(&this->hash, at, &value))
+      fts_object_t **objects = this->objects;
+      fts_object_t **clones;
+      fts_atom_t a;
+      int i;  
+  
+      if(fts_hashtable_get(&this->hash, at, &a))
 	{
-	  states = (fts_array_t *)fts_get_ptr(&value);
+	  /* overwrite existing preset */
+	  clones = (fts_object_t **)fts_get_ptr(&a);
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_array_set_size(states + i, 0);
+	      fts_class_t *class = fts_object_get_class(this->objects[i]);
 
-	      /* get object state as array */
-	      fts_set_array(&value, states + i);
-	      fts_message_send(this->objects[i], fts_SystemInlet, fts_s_append_state_to_array, 1, &value);
+	      /* release old clone */
+	      fts_object_release(clones[i]);
+
+	      /* create new clone */
+	      clones[i] = fts_object_create(class, 0, 0);
+
+	      fts_set_object(&a, objects[i]);
+	      fts_send_message(clones[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+
+	      fts_object_refer(clones[i]);
 	    }
 	}
       else
 	{
-	  states = (fts_array_t *)fts_malloc(sizeof(fts_array_t) * this->n_objects);
+	  /* create new preset */
+	  clones = (fts_object_t **)fts_malloc(sizeof(fts_object_t *) * this->n_objects);
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_array_init(states + i, 0, 0);
+	      fts_class_t *class = fts_object_get_class(this->objects[i]);
 
-	      /* get object state as array */
-	      fts_set_array(&value, states + i);
-	      fts_message_send(this->objects[i], fts_SystemInlet, fts_s_append_state_to_array, 1, &value);
+	      /* create new clone */
+	      clones[i] = fts_object_create(class, 0, 0);
+
+	      fts_set_object(&a, objects[i]);
+	      fts_send_message(clones[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+
+	      fts_object_refer(clones[i]);
 	    }
 
-	  fts_set_ptr(&value, (void *)states);
-	  fts_hashtable_put(&this->hash, at, &value);
+	  /* store new preset */
+	  fts_set_ptr(&a, (void *)clones);
+	  fts_hashtable_put(&this->hash, at, &a);
 	}
     }
 }
@@ -190,19 +284,19 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(fts_is_int(at))
     {
-      fts_atom_t value;
+      fts_atom_t a;
 
-      if(fts_hashtable_get(&this->hash, at, &value))
+      if(fts_hashtable_get(&this->hash, at, &a))
 	{
-	  fts_array_t *states = fts_get_array(&value);
-	  int i;
+	  fts_object_t **clones = fts_get_ptr(&a);
+	  int i, j;
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_atom_t *atoms = fts_array_get_atoms(states + i);
-	      int size = fts_array_get_size(states + i);
+	      fts_atom_t a;
 
-	      fts_message_send(this->objects[i], fts_SystemInlet, fts_s_set_state_from_array, size, atoms);
+	      fts_set_object(&a, clones[i]);
+	      fts_send_message(this->objects[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
 	    }
 
 	  fts_outlet_send(o, 0, fts_s_int, 1, at);
@@ -210,119 +304,75 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
-/******************************************************
- *
- *  bmax files
- *
- */
-
 static void
-preset_add_state_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_new_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preset_t *this = (preset_t *)o;
-  fts_array_t *states = preset_get_or_add(this, at + 0);
-  int i_object = fts_get_int(at + 1);
 
-  fts_array_set(states + i_object, ac - 2, at + 2);
+  this->current = preset_get_or_add(this, at + 0);; 
 }
 
-/* add array to preset at given index of state of given object */
 static void
-preset_add_array_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preset_t *this = (preset_t *)o;
-  fts_array_t *states = preset_get_or_add(this, at + 0);
-  int i_object = fts_get_int(at + 1);
-  int i_array = fts_get_int(at + 2);
-
-  if(i_object < this->n_objects)
+  int index = fts_get_int(at + 0);
+  fts_symbol_t selector = fts_get_symbol(at + 1);
+  fts_atom_t a;
+  
+  /* create new clone */
+  if(!this->current[index])
     {
-      fts_array_t *atoms = fts_malloc(sizeof(fts_array_t));
-      fts_atom_t *a = fts_array_get_element(states + i_object, i_array);
+      fts_class_t *class = fts_object_get_class(this->objects[index]);
 
-      fts_array_init(atoms, ac - 3, at + 3);
-      fts_set_array(a, atoms);
+      this->current[index] = fts_object_create(class, 0, 0);
     }
+
+  fts_send_message(this->current[index], fts_SystemInlet, selector, ac - 2, at + 2);
 }
 
 static void
-preset_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   preset_t *this = (preset_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  preset_dumper_t *preset_dumper = (preset_dumper_t *)fts_object_create(preset_dumper_class, 1, at);
+  fts_iterator_t iterator;
 
-  if(this->keep == fts_s_yes)
+  fts_object_refer(preset_dumper);
+  
+  /* dump presets */
+  fts_hashtable_get_keys(&this->hash, &iterator);      
+  
+  while(fts_iterator_has_more( &iterator))
     {
-      fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
-      fts_iterator_t iterator;
+      fts_object_t **clones;
+      fts_atom_t key;
+      fts_atom_t a;
+      int i;
       
-      fts_hashtable_get_keys(&this->hash, &iterator);
+      /* get preset clones */
+      fts_iterator_next( &iterator, &key);
+      fts_hashtable_get(&this->hash, &key, &a);
       
-      while(fts_iterator_has_more( &iterator))
+      clones = (fts_object_t **)fts_get_ptr(&a);
+      
+      /* dump preset message */
+      fts_dumper_send(dumper, sym_new_preset, 1, &key);
+
+      /* dump messages of clones */
+      for(i=0; i<this->n_objects; i++)
 	{
-	  fts_atom_t key;
-	  fts_atom_t value;
-	  fts_array_t *states;
-	  int i;
+	  /* set current clone index */
+	  preset_dumper_set_index(preset_dumper, i);
 	  
-	  fts_iterator_next( &iterator, &key);
-	  fts_hashtable_get(&this->hash, &key, &value);
-	  
-	  states = (fts_array_t *)fts_get_ptr(&value);
-	      
-	  /* save states */
-	  for(i=0; i<this->n_objects; i++)
-	    {
-	      fts_atom_t *atoms = fts_array_get_atoms(states + i);
-	      int size = fts_array_get_size(states + i);
-	      int j;
-
-	      /* save state as array */
-	      for(j=0; j<size; j++)
-		{
-		  /* if list init state atom as 0 */
-		  if(fts_is_list(atoms + j))
-		    fts_bmax_code_push_int(f, 0);
-		  else
-		    fts_bmax_code_push_atoms(f, 1, atoms + j);
-		}
-	      
-	      /* write object index */
-	      fts_bmax_code_push_int(f, i);
-
-	      /* write key */
-	      fts_bmax_code_push_atoms(f, 1, &key);
-
-	      fts_bmax_code_obj_mess(f, fts_SystemInlet, sym_add_state_from_bmax, size + 2);
-	      fts_bmax_code_pop_args(f, size + 2);
-
-	      /* save sub arrays */
-	      for(j=0; j<size; j++)
-		{
-		  if(fts_is_list(atoms + j))
-		    {
-		      fts_array_t *array = fts_get_array(atoms + j);
-		      int n = fts_array_get_size(array);
-
-		      /* write array */
-		      fts_bmax_code_push_atoms(f, n, fts_array_get_atoms(array));
-
-		      /* write array index */
-		      fts_bmax_code_push_int(f, j);
-
-		      /* write object index */
-		      fts_bmax_code_push_int(f, i);
-		      
-		      /* write key */
-		      fts_bmax_code_push_atoms(f, 1, &key);
-		      
-		      fts_bmax_code_obj_mess(f, fts_SystemInlet, sym_add_array_from_bmax, n + 3);
-		      fts_bmax_code_pop_args(f, n + 3);
-		    }
-		}
-
-	    }
+	  /* dump clone messages */
+	  fts_set_object(&a, (fts_object_t *)preset_dumper);
+	  fts_send_message(clones[i], fts_SystemInlet, fts_s_dump, 1, &a);
 	}
     }
+  
+  fts_object_release((fts_object_t *)preset_dumper);
 }
 
 static void
@@ -330,8 +380,24 @@ preset_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
 {
   preset_t *this = (preset_t *)obj;
 
-  if(this->keep != fts_s_args && fts_is_symbol(value))
+  if(fts_is_symbol(value))
     this->keep = fts_get_symbol(value);
+}
+
+static void
+preset_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  preset_t *this = (preset_t *)obj;
+
+  fts_set_symbol(value, this->keep);
+}
+
+static void
+preset_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  preset_t *this = (preset_t *) obj;
+  
+  fts_set_object_with_type(value, (fts_object_t *)this, preset_symbol);
 }
 
 /******************************************************
@@ -385,6 +451,7 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->n_objects = ac;
   this->keep = fts_s_no;
+  this->current = 0;
 }
 
 static void
@@ -399,35 +466,27 @@ preset_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_object_release(this->objects[i]);
 }
 
-static void
-preset_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  preset_t *this = (preset_t *) obj;
-  
-  fts_set_object_with_type(value, (fts_object_t *)this, preset_symbol);
-}
-
 static fts_status_t
 preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(preset_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(preset_t), 1, 1, 0);
   
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, preset_get_state);
-
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preset_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preset_delete);
 
   /* save and restore to/from bmax file */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, preset_save_bmax); 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_add_state_from_bmax, preset_add_state_from_bmax);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_add_array_from_bmax, preset_add_array_from_bmax);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, preset_dump); 
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_new_preset, preset_new_preset);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_dump_mess, preset_dump_mess);
 
   /* persistency */
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), preset_set_keep);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, preset_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, preset_get_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, preset_get_state);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("store"), preset_store);
   fts_method_define_varargs(cl, 0, fts_new_symbol("recall"), preset_recall);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), preset_clear);
+  fts_method_define_varargs(cl, 0, fts_s_clear, preset_clear);
 
   return fts_Success;
 }
@@ -435,16 +494,16 @@ preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 preset_config(void)
 {
-  fts_s_append_state_to_array = fts_s_append_state_to_array;
-  fts_s_set_state_from_array = fts_s_set_state_from_array;
-
-  sym_add_state_from_bmax = fts_new_symbol("add_state_from_bmax");
-  sym_add_array_from_bmax = fts_new_symbol("add_array_from_bmax");
-
   preset_symbol = fts_new_symbol("preset");
   preset_type = preset_symbol;
 
+  sym_new_preset = fts_new_symbol("new_preset");
+  sym_dump_mess = fts_new_symbol("dump_mess");
+  sym_preset_dumper = fts_new_symbol("preset_dumper");
+
   fts_class_install(preset_symbol, preset_instantiate);
   preset_class = fts_class_get_by_name(preset_symbol);
-}
 
+  fts_class_install(sym_preset_dumper, preset_dumper_instantiate);
+  preset_dumper_class = fts_class_get_by_name(sym_preset_dumper);
+}

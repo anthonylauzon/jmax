@@ -100,5 +100,4 @@ struct fts_atom
 
 typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
 
-
 #endif

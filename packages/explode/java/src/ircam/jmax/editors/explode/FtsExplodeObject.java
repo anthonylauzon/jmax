@@ -391,32 +391,32 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
   /**
    * remove an event from the data base. It searches for it with a binary search.
    */
-  public void removeEvent(ScrEvent event)
+  public void deleteEvent(ScrEvent event)
   {
-    int removeIndex;
+    int deleteIndex;
 
-    removeIndex = indexOf(event);
-    removeEventAt(removeIndex);
+    deleteIndex = indexOf(event);
+    deleteEventAt(deleteIndex);
   }
 
 
-  private void removeEventAt(int removeIndex)
+  private void deleteEventAt(int deleteIndex)
   {
-    ScrEvent event = getEventAt(removeIndex);
-    if (removeIndex == NO_SUCH_EVENT || removeIndex == EMPTY_COLLECTION)
+    ScrEvent event = getEventAt(deleteIndex);
+    if (deleteIndex == NO_SUCH_EVENT || deleteIndex == EMPTY_COLLECTION)
       return;
     
     if (isInGroup())
       postEdit(new UndoableDelete(event));
     
-    deleteRoomAt(removeIndex);
+    deleteRoomAt(deleteIndex);
     
     // Send the remove command to fts
     
-    sendArgs[0].setInt(removeIndex);
+    sendArgs[0].setInt(deleteIndex);
     sendMessage(FtsObject.systemInlet, "remove_event", 1, sendArgs);    
 	    
-    notifyObjectDeleted(event, removeIndex);
+    notifyObjectDeleted(event, deleteIndex);
   }
 
   /** The simplest (and slowest) implementation */
@@ -424,7 +424,7 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
   {
     for (int i = first; i<= last; i++)
       {
-	removeEventAt(first);
+	deleteEventAt(first);
       }
   }
 
@@ -666,7 +666,7 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
 
     for (Enumeration e = ExplodeSelection.getCurrent().getSelected(); e.hasMoreElements();)
       {
-	removeEvent((ScrEvent) e.nextElement());
+	deleteEvent((ScrEvent) e.nextElement());
       }
 
     endUpdate();

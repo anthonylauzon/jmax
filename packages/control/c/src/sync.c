@@ -103,7 +103,7 @@ sync_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
       if(in >= 0 && in < n)
 	*bits = 1 << in;
     }
-  else if(fts_is_list(at))
+  else if(fts_is_array(at))
     {
       fts_array_t *l = fts_get_array(at);
       fts_atom_t *a = fts_array_get_atoms(l);

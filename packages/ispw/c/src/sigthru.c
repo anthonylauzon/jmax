@@ -64,23 +64,11 @@ sigthru_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 sigthru_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(sigthru_t), 1, 2, 0);
 
-  /* define the init system method */
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, sigthru_init, 1, a);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigthru_put, 1, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigthru_delete, 0, 0);
-
-  /* define the application  methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigthru_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigthru_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigthru_put);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, sigthru_anything);
 

@@ -160,16 +160,11 @@ ftl_wahwah(fts_word_t *argv)
 static fts_status_t
 wahwah_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
-
   fts_class_init(cl, sizeof(wahwah_t), 3, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, wahwah_init, 1, a);
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, wahwah_delete, 0, a);
-
-  a[0] = fts_s_ptr;  
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, wahwah_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wahwah_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wahwah_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, wahwah_put);
   
   /* signal inlets and outlets */
   dsp_sig_inlet(cl, 0);

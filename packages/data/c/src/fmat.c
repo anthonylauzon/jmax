@@ -87,7 +87,7 @@ fmat_set_const(fmat_t *mat, float c)
 }
 
 void
-fmat_set_from_atom_list(fmat_t *mat, int offset, int ac, const fts_atom_t *at)
+fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at)
 {
   int size = mat->m * mat->n;
   int i;
@@ -113,7 +113,7 @@ fmat_set_from_lists(fmat_t *mat, int ac, const fts_atom_t *at)
   
   for(i=0; i<ac; i++)
     {
-      if(fts_is_list(at + i))
+      if(fts_is_array(at + i))
 	{
 	  fts_array_t *aa = fts_get_array(at + i);
 	  int size = fts_array_get_size(aa);
@@ -437,7 +437,7 @@ fmat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       int offset = fts_get_number_int(at);
 
       if(offset >= 0 && offset < size)
-	fmat_set_from_atom_list(this, offset, ac - 1, at + 1);
+	fmat_set_with_onset_from_atoms(this, offset, ac - 1, at + 1);
     }
 }
 
@@ -527,7 +527,7 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 void 
-fmat_save_bmax(fmat_t *mat, fts_bmax_file_t *f)
+fmat_dump(fmat_t *mat, fts_dumper_t *dumper)
 {
   fts_atom_t av[256];
   int size = fmat_get_m(mat) * fmat_get_n(mat);
@@ -543,36 +543,11 @@ fmat_save_bmax(fmat_t *mat, fts_bmax_file_t *f)
 
       if (ac == 256)
 	{
-	  /* Code a push of all the values */
-	  fts_bmax_code_push_atoms(f, ac, av);
-
-	  /* Code a push of the offset */
-	  fts_bmax_code_push_int(f, offset);
-
-	  /* Code a "set" message for 256 values plus offset */
-	  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
-	  offset = offset + ac;
-
-	  /* Code a pop of all the values  */
-	  fts_bmax_code_pop_args(f, ac);
-
-	  ac = 0;
 	}
     }
 
   if (ac != 0)
     {
-      /* Code a push of all the values */
-      fts_bmax_code_push_atoms(f, ac, av);
-
-      /* Code a push of the offset */
-      fts_bmax_code_push_int(f, offset);
-
-      /* Code an "append" message for the values left */
-      fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_set, ac + 1);
-
-      /* Code a pop of all the values  */
-      fts_bmax_code_pop_args(f, ac);
     }
 }
 
@@ -582,26 +557,6 @@ fmat_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
   fmat_t *this = (fmat_t *)obj;
 
   fmat_atom_set(value, this);
-}
-
-static void
-fmat_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t cmd = fts_get_symbol_arg(ac, at, 0, 0);
-
-  if (cmd == fts_s_object)
-    fts_object_blip(o, "mat of floats");
-  else if (cmd == fts_s_inlet)
-    {
-      int n = fts_get_int_arg(ac, at, 1, 0);
-
-      switch(n)
-	{
-	case 0:
-	  /* fts_object_blip(o, "no comment"); */
-	  break;
-	}
-    }
 }
 
 /*********************************************************
@@ -651,7 +606,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fmat_alloc(this, fts_get_int(at), 1);
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
     fmat_alloc(this, fts_get_int(at), fts_get_int(at + 1));
-  else if(fts_is_list(at))
+  else if(fts_is_array(at))
     {
       int m = 0;
       int n = 0;
@@ -660,7 +615,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       /* check n (longest row) and m */
       for(i=0; i<ac; i++)
 	{
-	  if(fts_is_list(at + i))
+	  if(fts_is_array(at + i))
 	    {
 	      fts_array_t *aa = fts_get_array(at + i);
 	      int size = fts_array_get_size(aa);
@@ -690,7 +645,7 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static int
 fmat_check(int ac, const fts_atom_t *at)
 {
-  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_list(at))) || (ac > 1));
+  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_array(at))) || (ac > 1));
 }
 
 static fts_status_t
@@ -705,19 +660,18 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fmat_delete);
   
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fmat_print); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fmat_assist); 
 
       /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, fmat_get_state);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
 
-      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), fmat_clear);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), fmat_fill);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fmat_set);
+      fts_method_define_varargs(cl, 0, fts_s_clear, fmat_clear);
+      fts_method_define_varargs(cl, 0, fts_s_fill, fmat_fill);
+      fts_method_define_varargs(cl, 0, fts_s_set, fmat_set);
       
-      fts_method_define_varargs(cl, 0, fts_new_symbol("import"), fmat_import);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), fmat_export);
+      fts_method_define_varargs(cl, 0, fts_s_import, fmat_import);
+      fts_method_define_varargs(cl, 0, fts_s_export, fmat_export);
 
       /* type outlet */
       fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_type);      
