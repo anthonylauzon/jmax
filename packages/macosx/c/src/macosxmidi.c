@@ -541,16 +541,6 @@ macosxmidi_state( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     MIDIDeviceRef device = NULL;
     
     post("  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
-
-    MIDIEndpointGetEntity(endpoint, &entity);
-    if(entity != NULL) {
-      post(" entity='%s'", macosxmidi_reference_get_name((MIDIEndpointRef)entity));
-
-      MIDIEntityGetDevice(entity, &device);
-      if(device != NULL)
-        post(" device='%s'", macosxmidi_reference_get_name((MIDIEndpointRef)device));
-    }
-
     post("\n");
   }
 
@@ -562,16 +552,6 @@ macosxmidi_state( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     MIDIDeviceRef device = NULL;
 
     post("  %d: '%s' (%d)", i, macosxmidi_reference_get_name(endpoint), macosxmidi_reference_get_id(endpoint));
-
-    MIDIEndpointGetEntity(endpoint, &entity);
-    if(entity != NULL) {
-      post(" entity='%s'", macosxmidi_reference_get_name((MIDIEndpointRef)entity));
-
-      MIDIEntityGetDevice(entity, &device);
-      if(device != NULL)
-        post(" device='%s'", macosxmidi_reference_get_name((MIDIEndpointRef)device));
-    }
-
     post("\n");
   }
 }
@@ -604,12 +584,12 @@ macosxmidi_set_default_label(macosxmidi_t *this)
 
   if(input == NULL && MIDIGetNumberOfSources > 0) {
     MIDIEndpointRef ref = MIDIGetSource(0);
-    macosxmidi_create_input(mm, 0, macosxmidi_reference_get_name(ref), macosxmidi_reference_get_id(ref));
+    macosxmidi_create_input(mm, 0, fts_s_default, macosxmidi_reference_get_id(ref));
   }
 
   if(output == NULL && MIDIGetNumberOfDestinations > 0) {
     MIDIEndpointRef ref = MIDIGetDestination(0);
-    macosxmidi_create_output(mm, 0, macosxmidi_reference_get_name(ref), macosxmidi_reference_get_id(ref));
+    macosxmidi_create_output(mm, 0, fts_s_default, macosxmidi_reference_get_id(ref));
   }
 }
 
