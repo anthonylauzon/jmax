@@ -771,6 +771,8 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 void 
 dsaudioport_config(void)
 {
+  fts_symbol_t dsaudioport_symbol;
+
   /* make sure we have a valid instance handle */
   if (dsdev_instance == NULL) {
     post("Warning: dsaudioport: invalid DLL instance handle\n");
@@ -795,5 +797,10 @@ dsaudioport_config(void)
     return;
   }
 
-  fts_class_install( fts_new_symbol("dsaudioport"), dsaudioport_instantiate);
+  dsaudioport_symbol = fts_new_symbol("dsaudioport");
+  fts_class_install( dsaudioport_symbol, dsaudioport_instantiate);
+  fts_audioport_set_default_class(dsaudioport_symbol);
+
+  /* FIXME: force the creation of the audio device */
+  fts_audioport_get_default(NULL);
 }

@@ -682,6 +682,55 @@ int fts_audioport_report_xrun( void)
 /*                                                                        */
 /* ********************************************************************** */
 
+#ifdef WIN32
+
+static fts_audioport_t *default_audioport = 0;
+static fts_symbol_t default_audioport_class = 0;
+
+void fts_audioport_set_default( int argc, const fts_atom_t *argv)
+{
+  fts_object_t *obj;
+  fts_atom_t a[1];
+
+  fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &obj);
+
+  if (!obj)
+    return;
+
+  fts_object_get_prop( obj, fts_s_state, a);
+
+  if ( !fts_is_object( a) || !fts_object_is_audioport( fts_get_object( a)) )
+    {
+      fts_object_delete_from_patcher( obj);
+      return;
+    }
+
+  if (default_audioport)
+    {
+      fts_object_delete_from_patcher( (fts_object_t *)default_audioport);
+    }
+
+  default_audioport = (fts_audioport_t *)fts_get_object( a);
+}
+
+void fts_audioport_set_default_class( fts_symbol_t name)
+{
+  default_audioport_class = name;
+}
+
+fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
+{
+  if ((default_audioport == 0) && (default_audioport_class != 0)) {
+    fts_atom_t a[1];
+    fts_log("[audioport]: No default audioport was installed, instanciating the default class %s\n", fts_symbol_name(default_audioport_class));
+    fts_set_symbol(a, default_audioport_class);
+    fts_audioport_set_default(1, a);
+  }
+  return default_audioport;  
+}
+
+#else
+
 fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 {
   fts_atom_t *value;
@@ -697,6 +746,13 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 
   return default_audioport;
 }
+
+void fts_audioport_set_default_class( fts_symbol_t name)
+{
+}
+
+#endif
+
 
 /***********************************************************************
  *

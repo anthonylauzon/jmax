@@ -54,10 +54,8 @@
 	(if (string=? jmax-connection "socket")
 	    (println "jMax starting server on " jmax-host " via UDP/IP port " jmax-port))))
 
-(println "jMax Host type " jmax-host-type)
-
-(if (string=? jmax-mode "debug")
-    (println "jMax in DEBUG mode"))
+;(if (string=? jmax-mode "debug")
+;    (println "jMax in DEBUG mode"))
 
 (fts-connect jmax-server-dir jmax-server-name jmax-connection jmax-host "" (string->number jmax-port))
 

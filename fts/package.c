@@ -160,6 +160,13 @@ fts_package_load(fts_symbol_t name)
   fts_package_t* pkg;
   char path[MAXPATHLEN];
   char filename[MAXPATHLEN];
+  fts_atom_t n, p;
+
+  /* avoid loading the package twice */
+  fts_set_symbol(&n, name);
+  if (fts_hashtable_get(&fts_packages, &n, &p)) {
+    return fts_get_ptr(&p);
+  }
 
   /* locate the directory of the package */
   if (!fts_find_file(NULL, fts_get_package_paths(), fts_symbol_name(name), path, MAXPATHLEN) 
@@ -185,7 +192,12 @@ fts_package_load(fts_symbol_t name)
   
   /* load the default files */
   fts_package_load_default_files(pkg);
-  
+
+  /* put the package in the hashtable */
+  fts_set_symbol(&n, name);
+  fts_set_ptr(&p, pkg);
+  fts_hashtable_put(&fts_packages, &n, &p);    
+
   return pkg;
 }
 
@@ -202,10 +214,6 @@ fts_package_get(fts_symbol_t name)
   } else {
     /* try to load it */
     pkg = fts_package_load(name);
-
-    fts_set_ptr(&p, pkg);
-    fts_hashtable_put(&fts_packages, &n, &p);    
-
     return pkg;
   }
 }
@@ -306,6 +314,9 @@ fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
 
   fts_set_symbol(&n, required_pkg);
   pkg->packages = fts_list_append(pkg->packages, &n);
+
+  /* provoke the loading the package */
+  fts_package_load(required_pkg);
 }
 
 void 
