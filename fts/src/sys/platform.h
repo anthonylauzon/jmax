@@ -49,7 +49,7 @@
 #define HAS_OSS /* the OSS sound system */
 #define VECLIB_LOOP_UNROLL 4
 #define FTS_USE_NAMED_PIPES
-#define LITTLE_ENDIAN
+#define FTS_HAS_LITTLE_ENDIAN
 
 /*********************************************************************
  *
@@ -60,9 +60,7 @@
 
 #define FTS_ARCH_NAME "sgi"
 
-#if defined(IRIX6_4)
-#define HAS_PTHREADS
-#else
+#if (!defined(IRIX6_4))
 #define restrict /* needed for compatibility with the newer restrict keyword */
 #endif
 
@@ -75,7 +73,7 @@
 /* #define HAS_TTY_DEV */ /* don't commit with this on until ttydev is fixed */
 #define VECLIB_LOOP_UNROLL 8
 #define FTS_USE_NAMED_PIPES
-#define BIG_ENDIAN
+#define FTS_HAS_BIG_ENDIAN
 
 /*********************************************************************
  *
@@ -91,7 +89,7 @@
 #define HAS_TIME_OF_THE_DAY
 #define HAS_UNROLL_BY8
 #define HAS_UNIX
-#define BIG_ENDIAN
+#define FTS_HAS_BIG_ENDIAN
 
 #else
 
