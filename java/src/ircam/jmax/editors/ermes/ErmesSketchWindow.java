@@ -58,14 +58,13 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     if (!pasting) itsSketchPad.paintDirtyList();
   }
 
-  public void componentResized(ComponentEvent e) {
-    //System.err.println("era "+getSize().width+", "+getSize().height);
-    if (itsPatcher == null) System.err.println("internal warning: patcher resized while FtsPatcher is null");     
-    else {
-      itsPatcher.put("ww", getSize().width-horizontalOffset());
-      itsPatcher.put("wh", getSize().height-verticalOffset());
-      //System.err.println("e' "+(Integer) itsPatcher.get("ww")+", "+(Integer) itsPatcher.get("wh"));
-    }
+  public void componentResized(ComponentEvent e) 
+  {
+    if (itsPatcher != null) 
+      {
+	itsPatcher.put( "ww", getSize().width - horizontalOffset());
+	itsPatcher.put( "wh", getSize().height - verticalOffset());
+      }
   }
 
   public void componentMoved(ComponentEvent e) {
@@ -118,21 +117,22 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   CheckboxMenuItem itsAutoroutingMenu;
   MenuItem itsRunModeMenuItem;
   MenuItem itsSelectAllMenuItem;
-  boolean itsClosing = false;
+
   boolean itsChangingRunEditMode = false;
   //public String itsTitle;
   public MaxDocument itsDocument;
 
 
-  public void reEdit() {
+  public void reEdit() 
+  {
     setVisible(true);
     toFront();
   }
 
-
-  public void quitEdit() {
-
+  public void quitEdit() 
+  {
     itsPatcher.close();
+    itsPatcher = null; // (fd) ???
     Destroy();
   }
 
@@ -875,11 +875,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   /** Method to close the editor (do not touch the patcher) */
   void Destroy()
   {
-    itsClosing = true;
-    itsClosing = false;
     setVisible(false);
     dispose();
-    return;
   }
 
   public boolean ShouldSave() {
@@ -1142,12 +1139,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
-  public void focusGained(FocusEvent e){
-    if(!itsClosing){
-      ErmesSketchPad.RequestOffScreen(itsSketchPad);
-      if(itsSketchPad.getGraphics()!= null)
-	itsSketchPad.update(itsSketchPad.getGraphics());
-    }
+  public void focusGained(FocusEvent e)
+  {
+    ErmesSketchPad.RequestOffScreen(itsSketchPad);
+    if(itsSketchPad.getGraphics()!= null)
+      itsSketchPad.update(itsSketchPad.getGraphics());
   } 
 
   public void focusLost(FocusEvent e){
