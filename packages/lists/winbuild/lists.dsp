@@ -63,7 +63,7 @@ LINK32=link.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "..\lib\"
+# PROP Output_Dir "..\c\lib\"
 # PROP Intermediate_Dir "Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
@@ -88,51 +88,51 @@ LINK32=link.exe
 # Name "lists - Win32 Debug"
 # Begin Source File
 
-SOURCE=..\src\list.c
+SOURCE=..\c\src\list.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listarith.c
+SOURCE=..\c\src\listarith.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listelement.c
+SOURCE=..\c\src\listelement.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listhead.c
+SOURCE=..\c\src\listhead.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listjoin.c
+SOURCE=..\c\src\listjoin.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listreverse.c
+SOURCE=..\c\src\listreverse.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\lists.c
+SOURCE=..\c\src\lists.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\lists.h
+SOURCE=..\c\src\lists.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listsize.c
+SOURCE=..\c\src\listsize.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listsublist.c
+SOURCE=..\c\src\listsublist.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listsum.c
+SOURCE=..\c\src\listsum.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\listtail.c
+SOURCE=..\c\src\listtail.c
 # End Source File
 # End Target
 # End Project

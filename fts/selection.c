@@ -217,7 +217,6 @@ static fts_status_t
 selection_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[1];
-  int argc;
 
   /* initialize the class */
 

@@ -19,12 +19,4 @@
 ; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ;
 
-;; package declaration
-(provide-package "winmidi" "0.0.0")
-
-; load dynamic libraries into the server
-(ucs "load" "module" "winmidi" (file-cat dir "c" "lib" (libname "winmidi")))
-;(help-summary "Winmidi summary" (file-cat dir "help" "winmidi.summary.jmax"))
-;(help-patch "winmidiport" (file-cat dir "help" "winmidiport.help.jmax"))
-
 (println "package: winmidi (Midi port for Windows)")

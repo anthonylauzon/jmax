@@ -23,6 +23,79 @@
 #ifndef _FTS_FILE_H_
 #define _FTS_FILE_H_
 
+FTS_API int fts_file_exists(const char *name);
+
+FTS_API int fts_is_file(const char *name);
+
+FTS_API int fts_is_directory(const char *name);
+
+/**
+ *
+ * @return 0 if the filename remained unchanged, 1 if it was changed
+ */
+FTS_API int fts_file_correct_separators( char *filename);
+
+FTS_API FILE* fts_file_open(const char *name, const char *mode);
+
+FTS_API int fts_file_close(FILE* fd);
+
+FTS_API int fts_file_is_text( fts_symbol_t file_name);
+
+/*
+ *  Directory paths
+ */
+
+/** Creates the absolute file path. The result is copied in the buf
+ *  argument. 
+ *
+ * @fn char* fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
+ * @param parent the parent directory of the file 
+ * @param file the name of the file
+ * @param buf the user allocated buffer which will contain the full path
+ * @param len the length of the buffer 
+ * @returns the pointer to buf. 
+ */
+FTS_API char* fts_make_absolute_path(const char* parent, const char* file, char* buf, int len);
+
+/** 
+ * Find a file on a set of paths.
+ *
+ * @fn int fts_find_file(fts_list_t* paths, const char *filename, char* buf, int len)
+ * @param paths the list of search paths
+ * @param filename the name of the file
+ * @param buf the user allocated buffer which will contain the full path
+ * @param len the length of the buffer 
+ * @returns 0 if the file was not found, 1 if the directory was found 
+ */
+FTS_API int fts_find_file(fts_list_t* paths, const char *filename, char* buf, int len);
+
+/** 
+ * Find a directory on a set of paths.
+ *
+ * @fn int fts_find_directory(fts_list_t* paths, const char *dirname, char* buf, int len)
+ * @param paths the list of search paths
+ * @param dirname the name of the directory
+ * @param buf the user allocated buffer which will contain the full path
+ * @param len the length of the buffer 
+ * @returns 0 if the directory was not found, 1 if the directory was found 
+ */
+FTS_API int fts_find_directory(fts_list_t* paths, const char *dirname, char* buf, int len);
+
+FTS_API char fts_file_separator;
+FTS_API char fts_path_separator;
+
+
+/********************************************************************/
+/********************************************************************/
+/*********************** will disappear *****************************/
+/********************************************************************/
+/********************************************************************/
+
+
+FTS_API void fts_set_search_path(fts_symbol_t search_path);
+FTS_API fts_symbol_t fts_get_search_path(void);
+
+
 /**
  * Search for a file in a path.
  *
@@ -55,29 +128,8 @@ FTS_API void fts_file_get_write_path(const char *path, char *full_path);
 
 FTS_API int fts_file_get_read_path(const char *name, char *pathname);
 
-FTS_API FILE* fts_file_open(const char *name, const char *mode);
-FTS_API int fts_file_close(FILE* fd);
-
-FTS_API int fts_file_is_text( fts_symbol_t file_name);
-
-/*
- *  Directory paths
- */
-
-FTS_API void fts_set_search_path(fts_symbol_t search_path);
-FTS_API fts_symbol_t fts_get_search_path(void);
 
 FTS_API void fts_set_project_dir(fts_symbol_t project_dir);
 FTS_API fts_symbol_t fts_get_project_dir(void);
-
-/** Creates the absolute file path. The result is copied in the buf
-    argument. Returns the pointer to buf. */
-FTS_API char* fts_make_absolute_path(const char* parent, const char* file, char* buf, int len);
-
-/** Returns 0 if the file was not found, 1 if the file was found */
-FTS_API int fts_find_file(fts_list_t* paths, const char *filename, char* buf, int len);
-
-FTS_API char fts_file_separator;
-FTS_API char fts_path_separator;
 
 #endif

@@ -27,9 +27,9 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/package.h>
 
 const int fts_SystemInlet = -1;
-
 
 
 /* Return Status declarations */
@@ -40,7 +40,6 @@ fts_status_description_t fts_InletOutOfRange = {"inlet out of range"};
 fts_status_description_t fts_OutletOutOfRange = {"outlet out of range"};
 fts_status_description_t fts_OutletAlreadyDefined = {"outlet already defined"};
 fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
-
 
 /* Static  declarations  */
 
@@ -100,11 +99,12 @@ static void fts_atom_type_copy( int ac, fts_symbol_t *at, fts_symbol_t **sat)
 /*                                                                            */
 /******************************************************************************/
 
-fts_status_t fts_metaclass_install( fts_symbol_t name, 
-				    fts_instantiate_fun_t instantiate_fun, 
-				    fts_equiv_fun_t equiv_fun)
+
+fts_metaclass_t*
+fts_new_metaclass( fts_symbol_t name,
+		   fts_instantiate_fun_t instantiate_fun,
+		   fts_equiv_fun_t equiv_fun)
 {
-  fts_atom_t data, k;
   fts_metaclass_t *mcl;
 
   mcl = fts_zalloc(sizeof(fts_metaclass_t));
@@ -113,18 +113,14 @@ fts_status_t fts_metaclass_install( fts_symbol_t name,
   mcl->equiv_fun = equiv_fun;
   mcl->name = name;
 
-  fts_set_symbol( &k, name);
-  if (fts_hashtable_get(&fts_metaclass_table, &k, &data))
-    {
-      return &fts_DuplicatedMetaclass;
-    }
-  else
-    {
-      fts_set_ptr(&data, mcl);
-      fts_hashtable_put(&fts_metaclass_table, &k, &data);
-    }
+  return mcl;
+}
 
-  return fts_Success;
+fts_status_t fts_metaclass_install( fts_symbol_t name, 
+				    fts_instantiate_fun_t instantiate_fun, 
+				    fts_equiv_fun_t equiv_fun)
+{
+  return fts_package_add_metaclass(fts_get_current_package(), name, instantiate_fun, equiv_fun);
 }
 
 
@@ -136,17 +132,7 @@ fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instant
 
 static void fts_metaclass_alias_realize( fts_symbol_t new_name, fts_symbol_t old_name)
 {
-  fts_atom_t data, k;
-
-  fts_set_symbol( &k, new_name);
-  if ((fts_hashtable_get(&fts_metaclass_alias_table, &k, &data)) ||
-      (fts_hashtable_get(&fts_metaclass_table, &k, &data)))
-    return;			/* error: duplicated meta class */
-  else
-    {
-      fts_set_symbol(&data, old_name);
-      fts_hashtable_put(&fts_metaclass_alias_table, &k, &data);
-    }
+  fts_package_add_metaclass_alias(fts_get_current_package(), new_name, old_name);
 }
 
 void fts_metaclass_alias( fts_symbol_t new_name, fts_symbol_t old_name)
@@ -185,25 +171,53 @@ void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name)
 
 static fts_symbol_t fts_metaclass_get_real_name(fts_symbol_t name)
 {
-  fts_atom_t data, k;
+  fts_metaclass_t *mcl;
 
-  fts_set_symbol( &k, name);
-  if (fts_hashtable_get(&fts_metaclass_alias_table, &k, &data))
-    return (fts_symbol_t )fts_get_symbol(&data);
-  else
-    return name;
+  mcl = fts_metaclass_get_by_name(name);
+  return (mcl != NULL)? mcl->name : NULL;
 }
 
 
-fts_metaclass_t *fts_metaclass_get_by_name(fts_symbol_t name)
+fts_metaclass_t*
+fts_metaclass_get_by_name(fts_symbol_t name)
 {
-  fts_atom_t data, k;
+  fts_package_t *pkg;
+  fts_metaclass_t *mcl;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
 
-  fts_set_symbol( &k, fts_metaclass_get_real_name(name));
-  if (fts_hashtable_get(&fts_metaclass_table, &k, &data))
-    return (fts_metaclass_t *) fts_get_ptr(&data);
-  else
-    return (fts_metaclass_t *) 0;
+  /* ask the current package */
+  pkg = fts_get_current_package();
+  mcl = fts_package_get_metaclass(pkg, name);
+  if (mcl != NULL) {
+    return mcl;
+  }
+
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &pkg_iter);
+
+  while ( fts_iterator_has_more( &pkg_iter)) {
+    fts_iterator_next( &pkg_iter, &pkg_name);
+    pkg = fts_get_package(fts_get_symbol(&pkg_name));
+    
+    if (pkg == NULL) {
+      continue;
+    }
+
+    mcl = fts_package_get_metaclass(pkg, name);
+    if (mcl != NULL) {
+      return mcl;
+    }
+  }
+
+  /* ask the system package */
+  pkg = fts_get_system_package();
+  mcl = fts_package_get_metaclass(pkg, name);
+  if (mcl != NULL) {
+    return mcl;
+  }
+
+  return NULL;
 }
 
 

@@ -23,10 +23,6 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(provide-package "ispwmath" "0.0.0")
-
-(ucs "load" "module" "ispwmath" (file-cat dir "c" "lib" (libname "ispwmath")))
-
 ;; help
 (load-silently (file-cat dir "help" "ispwmath.help.index.scm"))
 (help-summary "ISPW math summary" (file-cat dir "help" "ispwmath.summary.jmax"))

@@ -21,14 +21,6 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-;; package declaration
-(provide-package "qlist" "0.0.0")
-
-(require-package "ispw" "0.0.0")
-
-; load server module
-(ucs "load" "module" "qlist" (file-cat dir "c" "lib" (libname "qlist")))
-
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.qlist.QListExtension")

@@ -21,12 +21,6 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-;; package declaration
-(provide-package "explode" "0.0.0")
-
-; load server module
-(ucs "load" "module" "explode" (file-cat dir "c" "lib" (libname "explode")))
-
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.explode.ExplodeExtension")

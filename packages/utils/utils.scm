@@ -23,9 +23,5 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(provide-package "utils" "0.0.0")
-
-(ucs "load" "module" "utils" (file-cat dir "c" "lib" (libname "utils")))
-
 (println "package: utils (utility functions)")
 

@@ -1569,88 +1569,89 @@ fts_mess_client_load_patcher_dpat(int ac, const fts_atom_t *av)
     printf_mess("System Error in FOS message LOAD PATCHER DPAT: bad args", ac, av);
 }
 
+  /* FIXME [pH07] */
 
 /* DECLARE_ABSTRACTION   <name> <file> */
 
-static void
-fts_mess_client_declare_abstraction(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received declare abstraction ", ac, av);
+/*  static void */
+/*  fts_mess_client_declare_abstraction(int ac, const fts_atom_t *av) */
+/*  { */
+/*    trace_mess("Received declare abstraction ", ac, av); */
 
-  if (ac == 2 && fts_is_symbol(&av[0]) && fts_is_symbol(&av[1]))
-    {
-      fts_symbol_t abstraction;
-      fts_symbol_t filename;
+/*    if (ac == 2 && fts_is_symbol(&av[0]) && fts_is_symbol(&av[1])) */
+/*      { */
+/*        fts_symbol_t abstraction; */
+/*        fts_symbol_t filename; */
 
-      abstraction = fts_get_symbol(&av[0]);
-      filename = fts_get_symbol(&av[1]);
+/*        abstraction = fts_get_symbol(&av[0]); */
+/*        filename = fts_get_symbol(&av[1]); */
 
-      fts_abstraction_declare(abstraction, filename);
-    }
-  else
-    printf_mess("System Error in FOS message DEFINE ABSTRACTION: bad args", ac, av);
+/*        fts_abstraction_declare(abstraction, filename); */
+/*      } */
+/*    else */
+/*      printf_mess("System Error in FOS message DEFINE ABSTRACTION: bad args", ac, av); */
 
-}
+/*  } */
 
 /* DECLARE_ABSTRACTION_PATH   <path> */
 
-static void
-fts_mess_client_declare_abstraction_path(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received declare abstraction path ", ac, av);
+/*  static void */
+/*  fts_mess_client_declare_abstraction_path(int ac, const fts_atom_t *av) */
+/*  { */
+/*    trace_mess("Received declare abstraction path ", ac, av); */
 
-  if (ac == 1 && fts_is_symbol(&av[0]))
-    {
-      fts_symbol_t path;
+/*    if (ac == 1 && fts_is_symbol(&av[0])) */
+/*      { */
+/*        fts_symbol_t path; */
 
-      path = fts_get_symbol(&av[0]);
+/*        path = fts_get_symbol(&av[0]); */
 
-      fts_abstraction_declare_path(path);
-    }
-  else
-    printf_mess("System Error in FOS message DEFINE ABSTRACTION PATH: bad args", ac, av);
-}
+/*        fts_abstraction_declare_path(path); */
+/*      } */
+/*    else */
+/*      printf_mess("System Error in FOS message DEFINE ABSTRACTION PATH: bad args", ac, av); */
+/*  } */
 
 /* DECLARE_TEMPLATE   <name> <file> */
 
-static void
-fts_mess_client_declare_template(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received declare template ", ac, av);
+/*  static void */
+/*  fts_mess_client_declare_template(int ac, const fts_atom_t *av) */
+/*  { */
+/*    trace_mess("Received declare template ", ac, av); */
 
-  if (ac == 2 && fts_is_symbol(&av[0]) && fts_is_symbol(&av[1]))
-    {
-      fts_symbol_t template;
-      fts_symbol_t filename;
+/*    if (ac == 2 && fts_is_symbol(&av[0]) && fts_is_symbol(&av[1])) */
+/*      { */
+/*        fts_symbol_t template; */
+/*        fts_symbol_t filename; */
 
-      template = fts_get_symbol(&av[0]);
-      filename = fts_get_symbol(&av[1]);
+/*        template = fts_get_symbol(&av[0]); */
+/*        filename = fts_get_symbol(&av[1]); */
 
-      fts_template_declare(template, filename);
-    }
-  else
-    printf_mess("System Error in FOS message DEFINE TEMPLATE: bad args", ac, av);
+/*        fts_template_declare(template, filename); */
+/*      } */
+/*    else */
+/*      printf_mess("System Error in FOS message DEFINE TEMPLATE: bad args", ac, av); */
 
-}
+/*  } */
 
 /* DECLARE_TEMPLATE_PATH   <path> */
 
-static void
-fts_mess_client_declare_template_path(int ac, const fts_atom_t *av)
-{
-  trace_mess("Received declare template path ", ac, av);
+/*  static void */
+/*  fts_mess_client_declare_template_path(int ac, const fts_atom_t *av) */
+/*  { */
+/*    trace_mess("Received declare template path ", ac, av); */
 
-  if (ac == 1 && fts_is_symbol(&av[0]))
-    {
-      fts_symbol_t path;
+/*    if (ac == 1 && fts_is_symbol(&av[0])) */
+/*      { */
+/*        fts_symbol_t path; */
 
-      path = fts_get_symbol(&av[0]);
+/*        path = fts_get_symbol(&av[0]); */
 
-      fts_template_declare_path(path);
-    }
-  else
-    printf_mess("System Error in FOS message DEFINE TEMPLATE PATH: bad args", ac, av);
-}
+/*        fts_template_declare_path(path); */
+/*      } */
+/*    else */
+/*      printf_mess("System Error in FOS message DEFINE TEMPLATE PATH: bad args", ac, av); */
+/*  } */
 
 
 
@@ -2129,11 +2130,11 @@ static void fts_messtile_init(void)
   fts_client_install(LOAD_PATCHER_BMAX_CODE, fts_mess_client_load_patcher_bmax);
   fts_client_install(LOAD_PATCHER_DPAT_CODE, fts_mess_client_load_patcher_dpat);
 
-  fts_client_install(DECLARE_ABSTRACTION_CODE, fts_mess_client_declare_abstraction);
-  fts_client_install(DECLARE_ABSTRACTION_PATH_CODE, fts_mess_client_declare_abstraction_path);
+/*    fts_client_install(DECLARE_ABSTRACTION_CODE, fts_mess_client_declare_abstraction); */
+/*    fts_client_install(DECLARE_ABSTRACTION_PATH_CODE, fts_mess_client_declare_abstraction_path); */
 
-  fts_client_install(DECLARE_TEMPLATE_CODE, fts_mess_client_declare_template);
-  fts_client_install(DECLARE_TEMPLATE_PATH_CODE, fts_mess_client_declare_template_path);
+/*    fts_client_install(DECLARE_TEMPLATE_CODE, fts_mess_client_declare_template); */
+/*    fts_client_install(DECLARE_TEMPLATE_PATH_CODE, fts_mess_client_declare_template_path); */
 
   fts_client_install(DOWNLOAD_OBJECT_CODE, fts_mess_client_download_object);
   fts_client_install(DOWNLOAD_CONNECTION_CODE, fts_mess_client_download_connection);

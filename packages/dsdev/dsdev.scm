@@ -19,12 +19,4 @@
 ; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ;
 
-;; package declaration
-(provide-package "dsdev" "0.0.0")
-
-; load dynamic libraries into the server
-(ucs "load" "module" "dsdev" (file-cat dir "c" "lib" (libname "dsdev")))
-;(help-summary "DsDev summary" (file-cat dir "help" "dsdev.summary.jmax"))
-;(help-patch "dsaudioport" (file-cat dir "help" "dsaudioport.help.jmax"))
-
 (println "package: dsdev (DirectSound audioport)")

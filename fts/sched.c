@@ -219,7 +219,7 @@ static void run_always( fts_sched_t *sched)
 static void fts_sched_do_select(fts_sched_t *sched)
 {
   fd_set readfds, writefds, exceptfds;
-  int r, n_fd;
+  int n_fd;
 
   n_fd = compute_fds( sched, &readfds, &writefds, &exceptfds);
 

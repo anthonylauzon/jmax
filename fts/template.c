@@ -60,6 +60,7 @@
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/loader.h>
+#include <ftsprivate/package.h>
 
 #define TEMPLATE_DEBUG 
 
@@ -221,31 +222,38 @@ fts_template_get_filename(fts_template_t *template)
  *
  */
 
-void 
-fts_template_declare(fts_symbol_t name, fts_symbol_t filename)
-{
-  fts_package_add_template(fts_get_current_package(), name, filename);
-  fts_recompute_errors();
-}
-
-void 
-fts_template_declare_path(fts_symbol_t path)
-{
-  fts_package_add_template_path(fts_get_current_package(), path);
-  fts_recompute_errors();
-}
-
 fts_object_t*
 fts_template_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_expression_state_t *e)
 {
   fts_template_t *template;
+  fts_package_t *pkg;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
 
-  template = fts_package_get_declared_template(fts_get_current_package(), fts_get_symbol(&at[0]));
-
-  if (template)
+  pkg = fts_get_current_package();
+  template = fts_package_get_declared_template(pkg, fts_get_symbol(&at[0]));
+  if (template) {
     return fts_make_template_instance(template, patcher, ac, at, e);
-  else
-    return 0;
+  }
+  
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &pkg_iter);
+
+  while ( fts_iterator_has_more( &pkg_iter)) {
+    fts_iterator_next( &pkg_iter, &pkg_name);
+    pkg = fts_get_package(fts_get_symbol(&pkg_name));
+    
+    if (pkg == NULL) {
+      continue;
+    }
+
+    template = fts_package_get_declared_template(pkg, fts_get_symbol(&at[0]));
+    if (template) {
+      return fts_make_template_instance(template, patcher, ac, at, e);
+    }
+  }
+  
+  return 0;
 }
 
 
@@ -253,13 +261,34 @@ fts_object_t*
 fts_template_new_search(fts_patcher_t *patcher,	int ac, const fts_atom_t *at, fts_expression_state_t *e)
 {
   fts_template_t *template;
+  fts_package_t *pkg;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
 
-  template = fts_package_get_template_in_path(fts_get_current_package(), fts_get_symbol(&at[0]));
-
-  if (template)
+  pkg = fts_get_current_package();
+  template = fts_package_get_template_in_path(pkg, fts_get_symbol(&at[0]));
+  if (template) {
     return fts_make_template_instance(template, patcher, ac, at, e);
-  else
-    return 0;
+  }
+  
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &pkg_iter);
+
+  while ( fts_iterator_has_more( &pkg_iter)) {
+    fts_iterator_next( &pkg_iter, &pkg_name);
+    pkg = fts_get_package(fts_get_symbol(&pkg_name));
+    
+    if (pkg == NULL) {
+      continue;
+    }
+
+    template = fts_package_get_template_in_path(pkg, fts_get_symbol(&at[0]));
+    if (template) {
+      return fts_make_template_instance(template, patcher, ac, at, e);
+    }
+  }
+  
+  return 0;
 }
 
 

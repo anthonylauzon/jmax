@@ -180,7 +180,6 @@ fts_soundfile_format_is_raw(fts_symbol_t name)
 void
 fts_kernel_soundfile_init(void)
 {
-  fts_soundfile_format_t format;
   fts_hashtable_init(&the_fts_soundfile_standard_formats_hashtable, 0, FTS_HASHTABLE_MEDIUM);
   
   fts_s_aiffc = fts_new_symbol("aiffc");

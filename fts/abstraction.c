@@ -48,75 +48,78 @@
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/patparser.h>
+#include <ftsprivate/package.h>
 
-enum abstraction_mode {fts_abstraction_cache, fts_abstraction_declaration};
-
-typedef struct fts_abstraction
+struct fts_abstraction
 {
   fts_symbol_t name;
   fts_symbol_t filename;
-} fts_abstraction_t;
- 
-static fts_hashtable_t abstraction_table;
-#define INIT_SEARCH_PATH_SIZE 16
-static fts_symbol_t *search_path_table;
-static int search_path_size;
-static int search_path_fill;
+};
 
 
-static void fts_abstraction_add_declaration(fts_symbol_t name, fts_symbol_t filename)
+fts_abstraction_t* 
+fts_new_abstraction(fts_symbol_t name, fts_symbol_t filename)
 {
   fts_abstraction_t *abs;
-  fts_atom_t k, v;
-
-  /* If the declaration existed already, remove it first */
-
-  fts_set_symbol( &k, name);
-  if (fts_hashtable_get(&abstraction_table, &k, &v))
-    fts_hashtable_remove(&abstraction_table, &k);
 
   abs = (fts_abstraction_t *) fts_malloc(sizeof(fts_abstraction_t));
+  if (abs == NULL) {
+    return NULL;
+  }
 
   abs->name = name;
   abs->filename = filename;
-
-  fts_set_ptr(&v, abs);
-  fts_hashtable_put(&abstraction_table, &k, &v);
+  
+  return abs;
 }
 
-
-void fts_abstraction_declare(fts_symbol_t name, fts_symbol_t filename)
+fts_symbol_t 
+fts_abstraction_get_filename(fts_abstraction_t *abstraction)
 {
-  fts_abstraction_add_declaration(name, filename);
-  fts_recompute_errors();
+  return abstraction->filename;
 }
 
 
-void fts_abstraction_declare_path(fts_symbol_t path)
+fts_object_t* 
+fts_abstraction_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  if (search_path_fill >= search_path_size)
-    {
-      /* realloc the path table */
-      fts_symbol_t *new_table;
-      int i;
-      
-      search_path_size = 2 * search_path_size;
-      new_table = (fts_symbol_t *) fts_malloc(search_path_size * sizeof(fts_symbol_t *));
+  /* FIXME [pH07] */
+/*    fts_symbol_t name; */
+/*    FILE *file; */
 
-      for (i = 0; i < search_path_fill ; i++)
-	new_table[i] = search_path_table[i];
-      
-      fts_free(search_path_table);
-      search_path_table = new_table;
-    }
+/*    name = get_name_without_extension( fts_get_symbol( at)); */
+/*    file = fts_abstraction_find_declared_file( name); */
 
-  search_path_table[search_path_fill++] = path;
-
-  /* Try to fix some error object */
-
-  fts_recompute_errors();
+/*    if (file) */
+/*      return fts_make_abstraction(file, patcher, ac, at); */
+/*    else */
+    return 0;
 }
 
+
+fts_object_t*
+fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  /* FIXME [pH07] */
+/*    fts_symbol_t name; */
+/*    FILE *file; */
+
+/*    name = get_name_without_extension( fts_get_symbol( at)); */
+/*    file = fts_abstraction_find_path_file(name); */
+
+/*    if (file) */
+/*      return fts_make_abstraction(file, patcher, ac, at); */
+/*    else */
+    return 0;
+}
+
+
+/***********************************************************************/
+/***********************************************************************/
+/***********************************************************************/
+/***********************************************************************/
+
+#if 0
 
 static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
 {
@@ -270,34 +273,13 @@ static fts_symbol_t get_name_without_extension( fts_symbol_t name)
 }
 
 
-fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t name;
-  FILE *file;
+#endif
 
-  name = get_name_without_extension( fts_get_symbol( at));
-  file = fts_abstraction_find_declared_file( name);
+/***********************************************************************/
+/***********************************************************************/
+/***********************************************************************/
+/***********************************************************************/
 
-  if (file)
-    return fts_make_abstraction(file, patcher, ac, at);
-  else
-    return 0;
-}
-
-
-fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t name;
-  FILE *file;
-
-  name = get_name_without_extension( fts_get_symbol( at));
-  file = fts_abstraction_find_path_file(name);
-
-  if (file)
-    return fts_make_abstraction(file, patcher, ac, at);
-  else
-    return 0;
-}
 
 /***********************************************************************
  *
@@ -307,9 +289,9 @@ fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const f
 
 void fts_kernel_abstraction_init()
 {
-  fts_hashtable_init(&abstraction_table, 0, FTS_HASHTABLE_MEDIUM);
+/*    fts_hashtable_init(&abstraction_table, 0, FTS_HASHTABLE_MEDIUM); */
 
-  search_path_size  = INIT_SEARCH_PATH_SIZE;
-  search_path_table = (fts_symbol_t *) fts_malloc(search_path_size * sizeof(fts_symbol_t *));
-  search_path_fill  = 0;
+/*    search_path_size  = INIT_SEARCH_PATH_SIZE; */
+/*    search_path_table = (fts_symbol_t *) fts_malloc(search_path_size * sizeof(fts_symbol_t *)); */
+/*    search_path_fill  = 0; */
 }

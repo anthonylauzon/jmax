@@ -10,14 +10,11 @@
 ;;  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
 ;;  for DISCLAIMER OF WARRANTY.
 ;;  
-(provide-package "mess" "0.0.0")
-
-(ucs "load" "module" "mess" (file-cat dir "c" "lib" (libname "mess")))
-
-(println "package: mess (message classes)")
 
 ;; help
 (load-silently (file-cat dir "help" "mess.help.index.scm"))
 (help-summary "mess summary" (file-cat dir "help" "mess.summary.jmax"))
+
+(println "package: mess (message classes)")
 
 

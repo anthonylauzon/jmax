@@ -23,14 +23,10 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(provide-package "numeric" "0.0.0")
-
-(ucs "load" "module" "numeric" (file-cat dir "c" "lib" (libname "numeric")))
-
-(println "package: numeric (numeric classes)")
-
 ;; help
 (load-silently (file-cat dir "help" "numeric.help.index.scm"))
 (help-summary "numeric summary" (file-cat dir "help" "numeric.summary.jmax"))
+
+(println "package: numeric (numeric classes)")
 
 

@@ -21,6 +21,7 @@ typedef struct fts_patcher fts_patcher_t;
 typedef struct fts_inlet fts_inlet_t;
 typedef struct fts_outlet fts_outlet_t;
 typedef struct fts_template fts_template_t;
+typedef struct fts_abstraction fts_abstraction_t;
 typedef struct fts_patcher_data fts_patcher_data_t;
 
 typedef union  fts_word fts_word_t;

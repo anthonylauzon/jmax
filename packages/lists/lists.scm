@@ -21,21 +21,6 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-;; package declaration
-(provide-package "lists" "0.0.0")
-
-; load the dynamic libraries into the server
-(ucs "load" "module" "lists" (file-cat dir "lib" (libname "lists")))
-
-; require ISPW classes for the templates
-(require-package "ispw" "0.0.0")
-
-;; declare templates
-(template "listcompose" (file-cat dir "templates" "listcompose.jmax"))
-(template "listdecompose" (file-cat dir "templates" "listdecompose.jmax"))
-(template "lcomp" (file-cat dir "templates" "listcompose.jmax"))
-(template "ldeco" (file-cat dir "templates" "listdecompose.jmax"))
-
 ;; load the help patch data base
 (load-silently (file-cat dir "help" "lists.help.index.scm"))
 

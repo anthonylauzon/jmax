@@ -23,12 +23,6 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(require-package "utils" "0.0.0")
-
-(provide-package "data" "0.0.0")
-
-(ucs "load" "module" "data" (file-cat dir "c" "lib" (libname "data")))
-
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.bpf.BpfExtension")

@@ -92,8 +92,6 @@ static void fts_binding_delete(fts_binding_t *var)
   while (var->users)
     {
       fts_mess_obj_list_t   *u;
-      fts_object_t *obj;
-      fts_mess_obj_list_t *tmp;
 
       u = var->users;
 
@@ -233,7 +231,6 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 static void fts_binding_add_users_to_set(fts_binding_t *var, fts_objectset_t *set)
 {
   fts_mess_obj_list_t  *u;	
-  fts_atom_t a[1];
 
   for (u = var->users; u; u = u->next)
     {
@@ -332,7 +329,6 @@ static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *obje
 static void fts_binding_add_definitions_to_set(fts_binding_t *var, fts_objectset_t *set)
 {
   fts_mess_obj_list_t  *u;	
-  fts_atom_t a[1];
 
   for (u = var->definitions; u; u = u->next)
     {
@@ -666,7 +662,6 @@ void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner)
 /* restore a suspended variable */
 void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner)
 {
-  fts_patcher_t *patcher;
   fts_binding_t *v;
 
   scope = fts_variable_get_scope(scope, name);

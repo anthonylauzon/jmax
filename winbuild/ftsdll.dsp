@@ -253,6 +253,10 @@ SOURCE=..\fts\post.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\project.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\property.c
 # End Source File
 # Begin Source File

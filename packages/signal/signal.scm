@@ -23,12 +23,6 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(provide-package "signal" "0.0.0")
-
-(require-package "data" "0.0.0")
-
-(ucs "load" "module" "signal" (file-cat dir "c" "lib" (libname "signal")))
-
 (println "package: signal (basic signal classes)")
 
 (load-silently (file-cat dir "help" "signal.help.index.scm"))

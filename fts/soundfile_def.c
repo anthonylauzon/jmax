@@ -109,7 +109,6 @@ fts_soundfile_t *fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symb
 {
   char full_path[1024];
   const char *path = fts_symbol_name(file_name);
-  int af_format;
 
   /* get full path of file location */
   fts_file_get_write_path(path, full_path);

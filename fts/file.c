@@ -72,161 +72,45 @@ char fts_file_separator = '/';
 #endif
 
 
-/* global search path */
-static fts_symbol_t fts_search_path = 0;
-
-/* global project path */
-static fts_symbol_t fts_project_dir = 0;
-
-
-
-
-static const char *
-splitpath( const char *path, char *result, char sep)
-{
-  if ( *path == '\0')
-    return 0;
-
-  while ( *path != sep && *path != '\0')
-    {
-      *result++ = *path++;
-    }
-
-  *result = '\0';
-
-  return ( *path != '\0') ? path+1 : path;
-}
-
-static int 
-file_exists( const char *filename)
+int 
+fts_file_exists( const char *filename)
 {
   struct stat statbuf;
-
-  return ( stat( filename, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
+  return stat( filename, &statbuf) == 0;
 }
 
 int 
-fts_file_search_in_path( const char *filename, const char *search_path, char *full_path)
+fts_is_file(const char *name)
 {
-  if (fts_path_is_absolute(filename))
-    {
-      strcpy( full_path, filename);
-
-      return file_exists( full_path);
-    }
-
-  while ( (search_path = splitpath( search_path, full_path, fts_path_separator)) )
-    {
-      strcat( full_path, "/");
-      strcat( full_path, filename);
-
-      if (file_exists( full_path))
-	  return 1;
-    }
-
-  return 0;
+  struct stat statbuf;
+  return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 
 int 
-fts_file_get_read_path(const char *path, char *full_path)
+fts_is_directory(const char *name)
 {
-  if (fts_path_is_absolute(path))
-    {
-      if (file_exists(path))
-	{
-	  strcpy(full_path, path);	  
-	  return 1;
-	}
+  struct stat statbuf;
+  return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFDIR);
+}
+
+int 
+fts_file_correct_separators( char *filename)
+{
+#ifdef WIN32
+  int i, len, r = 0;
+
+  len = strlen(filename);
+  for (i = 0; i < len; i++) {
+    if (filename[i] == '/') {
+      filename[i] = '\\';
+      r = 1;
     }
-  else
-    {
-      const char *begin, *end, *next;
-
-      next = fts_symbol_name(fts_get_search_path());
-      
-      while (next)
-	{
-	  char buf[1024];
-	  
-	  begin = next;
-	  
-	  if ((end = strchr(begin, fts_path_separator)) || (end = strchr(begin, ','))) /* path followed by separator */
-	    next = end + 1; /* skip seperator */
-	  else
-	    {
-	      end = begin + strlen(begin); /* last path in list */
-	      next = 0; /* end of string */
-	    }	  
-	  
-	  if (fts_path_is_absolute(begin)) /* absolute default path */
-	    buf[0] = '\0';
-	  else if (fts_get_project_dir())
-	    strcpy(buf, fts_symbol_name(fts_get_project_dir()));
-	  else
-	    begin = 0; /* invalid directory */
-
-	  if (begin)
-	    {
-	      strncat(buf, begin, end - begin);
-	      strcat(buf, "/");
-	      strcat(buf, path);
-	  
-	      /* look for the file */
-	      
-	      if (file_exists(buf))
-		{
-		  if (full_path)
-		    strcpy(full_path, buf);
-		  
-		  return 1;
-		}
-	    }
-	}
-      
-      /* look in project directory itself */
-      
-      if (fts_get_project_dir())
-	{
-	  char buf[1024];
-
-	  strcpy(buf, fts_symbol_name(fts_get_project_dir()));
-	  strcat(buf, "/");
-	  strcat(buf, path);
-	  
-	  if (file_exists(buf))
-	    {
-	      if (full_path)
-		strcpy(full_path, buf);
-	      
-	      return 1;
-	    }
-	}
-    }
-
+  }
+  return r;
+#else
   return 0;
+#endif
 }
-
-void fts_file_get_write_path(const char *path, char *full_path)
-{
-  if (full_path)
-    {
-      if (fts_path_is_absolute(path))
-	strcpy(full_path, path); /* path is absolute (just copied) */
-      else
-	{
-	  if (fts_get_project_dir())
-	    {
-	      strcpy(full_path, fts_symbol_name(fts_get_project_dir()));
-	      strcat(full_path, "/");
-	    }
-	  else
-	    full_path[0] = '\0';
-	  
-	  strcat(full_path, path);
-	}
-    }
-}
-
 
 static FILE*
 fts_do_file_open(const char *path, const char *mode)
@@ -294,12 +178,60 @@ fts_file_is_text( fts_symbol_t file_name)
   return 1;
 }
 
+char*
+fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
+{
+  if (!fts_path_is_absolute(file) && (parent != NULL)) {
+    snprintf(buf, len, "%s%c%s", parent, fts_file_separator, file);
+  } else {
+    snprintf(buf, len, "%s", file);
+  }
+  fts_file_correct_separators(buf);
+  return buf;
+}
 
-/*******************************************************
- *
- *  functions for directory handling
- *
- */
+int 
+fts_find_file(fts_list_t* paths, const char* filename, char* buf, int len)
+{
+  while (paths) {
+    fts_make_absolute_path(fts_symbol_name(fts_get_symbol(fts_list_get(paths))), filename, buf, len);
+    if (fts_file_exists(buf)) {
+      return 1;
+    }
+    paths = fts_list_next(paths);
+  }
+
+  buf[0] = 0;
+  return 0;
+}
+
+/**************************************************************/
+/**************************************************************/
+/**************** old stuff, should disappear *****************/
+/**************************************************************/
+/**************************************************************/
+
+/* global search path */
+static fts_symbol_t fts_search_path = 0;
+
+/* global project path */
+static fts_symbol_t fts_project_dir = 0;
+
+static const char *
+splitpath( const char *path, char *result, char sep)
+{
+  if ( *path == '\0')
+    return 0;
+
+  while ( *path != sep && *path != '\0')
+    {
+      *result++ = *path++;
+    }
+
+  *result = '\0';
+
+  return ( *path != '\0') ? path+1 : path;
+}
 
 /*
    The default search path is set with an UCS command,
@@ -336,33 +268,124 @@ fts_get_project_dir(void)
     }
 }
 
-char*
-fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
+int 
+fts_file_search_in_path( const char *filename, const char *search_path, char *full_path)
 {
-  if (!fts_path_is_absolute(file)) {
-    snprintf(buf, len, "%s%c%s", parent, fts_file_separator, file);
-  } else {
-    snprintf(buf, len, "%s", file);
-  }
-  return buf;
+  if (fts_path_is_absolute(filename))
+    {
+      strcpy( full_path, filename);
+
+      return fts_file_exists( full_path);
+    }
+
+  while ( (search_path = splitpath( search_path, full_path, fts_path_separator)) )
+    {
+      strcat( full_path, "/");
+      strcat( full_path, filename);
+
+      if (fts_file_exists( full_path))
+	  return 1;
+    }
+
+  return 0;
 }
 
 int 
-fts_find_file(fts_list_t* paths, const char* filename, char* buf, int len)
+fts_file_get_read_path(const char *path, char *full_path)
 {
-  struct stat statbuf;
+  if (fts_path_is_absolute(path))
+    {
+      if (fts_file_exists(path))
+	{
+	  strcpy(full_path, path);	  
+	  return 1;
+	}
+    }
+  else
+    {
+      const char *begin, *end, *next;
 
-  while (paths) {
-    
-    fts_make_absolute_path(fts_symbol_name(fts_get_symbol(fts_list_get(paths))), filename, buf, len);
+      next = fts_symbol_name(fts_get_search_path());
+      
+      while (next)
+	{
+	  char buf[1024];
+	  
+	  begin = next;
+	  
+	  if ((end = strchr(begin, fts_path_separator)) || (end = strchr(begin, ','))) /* path followed by separator */
+	    next = end + 1; /* skip seperator */
+	  else
+	    {
+	      end = begin + strlen(begin); /* last path in list */
+	      next = 0; /* end of string */
+	    }	  
+	  
+	  if (fts_path_is_absolute(begin)) /* absolute default path */
+	    buf[0] = '\0';
+	  else if (fts_get_project_dir())
+	    strcpy(buf, fts_symbol_name(fts_get_project_dir()));
+	  else
+	    begin = 0; /* invalid directory */
 
-    if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG)) {
-      return 1;
+	  if (begin)
+	    {
+	      strncat(buf, begin, end - begin);
+	      strcat(buf, "/");
+	      strcat(buf, path);
+	  
+	      /* look for the file */
+	      
+	      if (fts_file_exists(buf))
+		{
+		  if (full_path)
+		    strcpy(full_path, buf);
+		  
+		  return 1;
+		}
+	    }
+	}
+      
+      /* look in project directory itself */
+      
+      if (fts_get_project_dir())
+	{
+	  char buf[1024];
+
+	  strcpy(buf, fts_symbol_name(fts_get_project_dir()));
+	  strcat(buf, "/");
+	  strcat(buf, path);
+	  
+	  if (fts_file_exists(buf))
+	    {
+	      if (full_path)
+		strcpy(full_path, buf);
+	      
+	      return 1;
+	    }
+	}
     }
 
-    paths = fts_list_next(paths);
-  }
-
-  buf[0] = 0;
   return 0;
+}
+
+void fts_file_get_write_path(const char *path, char *full_path)
+{
+  if (full_path)
+    {
+      if (fts_path_is_absolute(path))
+	strcpy(full_path, path); /* path is absolute (just copied) */
+      else
+	{
+	  if (fts_get_project_dir())
+	    {
+	      strcpy(full_path, fts_symbol_name(fts_get_project_dir()));
+	      strcat(full_path, "/");
+	    }
+	  else
+	    full_path[0] = '\0';
+	  
+	  strcat(full_path, path);
+	}
+    }
 }

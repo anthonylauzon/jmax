@@ -23,10 +23,6 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(provide-package "midi" "0.0.0")
-
-(ucs "load" "module" "midi" (file-cat dir "c" "lib" (libname "midi")))
-
 (help-summary "MIDI summary" (file-cat dir "help" "midi.summary.jmax"))
 (load-silently (file-cat dir "help" "midi.help.index.scm"))
 

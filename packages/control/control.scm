@@ -23,10 +23,6 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(provide-package "control" "0.0.0")
-
-(ucs "load" "module" "control" (file-cat dir "c" "lib" (libname "control")))
-
 ;; help
 (load-silently (file-cat dir "help" "control.help.index.scm"))
 (help-summary "control summary" (file-cat dir "help" "control.summary.jmax"))

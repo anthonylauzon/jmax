@@ -25,6 +25,8 @@
 #include <fts/fts.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/platform.h>
+#include <ftsprivate/package.h>
+#include <fts/project.h>
 
 
 /***********************************************************************
@@ -212,8 +214,8 @@ extern void fts_kernel_template_init( void);
 extern void fts_kernel_variable_init( void);
 extern void fts_kernel_time_init(void);
 extern void fts_kernel_list_init( void);
-
 extern void fts_kernel_package_init(void);
+
 
 extern void fts_oldclient_start( void);
 
@@ -225,6 +227,8 @@ void fts_init( int argc, char **argv)
   fts_kernel_symbol_init();
   fts_kernel_atom_init();
   fts_kernel_objtable_init();
+  fts_kernel_list_init();
+  fts_kernel_package_init();
   fts_kernel_class_init();
   fts_kernel_objectset_init();
   fts_kernel_doctor_init();
@@ -256,9 +260,39 @@ void fts_init( int argc, char **argv)
   fts_kernel_oldclient_init();
   fts_kernel_olducs_init();
   fts_kernel_time_init();
-  fts_kernel_list_init();
 
-  fts_kernel_package_init();
+  {
+    fts_package_t* project;
+
+    project = fts_open_project(NULL);
+    
+    /* FIXME: hack [pH07] */
+    fts_package_set_state(project, fts_package_loaded);
+
+    /* register all the current packages as required packages */
+    fts_package_require(project, fts_new_symbol("utils"));
+    fts_package_require(project, fts_new_symbol("system"));
+    fts_package_require(project, fts_new_symbol("data"));
+    fts_package_require(project, fts_new_symbol("mess"));
+    fts_package_require(project, fts_new_symbol("guiobj"));
+    fts_package_require(project, fts_new_symbol("control"));
+    fts_package_require(project, fts_new_symbol("numeric"));
+    fts_package_require(project, fts_new_symbol("math"));
+    fts_package_require(project, fts_new_symbol("ispw"));
+    fts_package_require(project, fts_new_symbol("lists"));
+    fts_package_require(project, fts_new_symbol("midi"));
+    fts_package_require(project, fts_new_symbol("sequence"));
+    fts_package_require(project, fts_new_symbol("signal"));
+    fts_package_require(project, fts_new_symbol("ispwmath"));
+    fts_package_require(project, fts_new_symbol("qlist"));
+    fts_package_require(project, fts_new_symbol("explode"));
+    fts_package_require(project, fts_new_symbol("io"));
+#ifdef WIN32
+    fts_package_require(project, fts_new_symbol("dsdev"));
+    fts_package_require(project, fts_new_symbol("winmidi"));
+#else
+#endif
+  }
 
   fts_cmd_args_parse( argc, argv);
 

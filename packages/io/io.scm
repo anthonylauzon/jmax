@@ -21,12 +21,6 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-;; package declaration
-(provide-package "io" "0.0.0")
-
-; load dynamic libraries into the server
-(ucs "load" "module" "io" (file-cat dir "c" "lib" (libname "io")))
-
 (println "package: io (I/O class library: udp, ...)")
 
 (load-silently (file-cat dir "help" "io.help.index.scm"))

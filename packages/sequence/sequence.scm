@@ -21,12 +21,6 @@
 ; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;
 
-;; package declaration
-(provide-package "sequence" "0.0.0")
-
-; load server module
-(ucs "load" "module" "sequence" (file-cat dir "c" "lib" (libname "sequence")))
-
 ; load client java class
 (append-local-path this-package (file-cat "java" "classes"))
 (load-class this-package "ircam.jmax.editors.sequence.SequenceExtension")
