@@ -15,14 +15,10 @@ import ircam.jmax.editors.ermes.*;
 class ErmesObjBang extends ErmesObject /*implements ActionListener */{
 
   boolean itsFlashing = false;
-  //FlashingThread	itsFlashingThread;
   static Dimension preferredSize = new Dimension(20,20);
-  //  Timer itsTimer = new Timer(100, this);
-  boolean userInitiatedFlash = false;
 
   public ErmesObjBang(){
     super();
-    //itsTimer.setCoalesce(false);
   }
 
   /*  public void actionPerformed(ActionEvent e) {
@@ -62,41 +58,33 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     if (itsSketchPad.itsRunMode) {
       itsFtsObject.sendMessage(0, "bang", null);
       itsFlashing = true;
-      Paint_specific(itsSketchPad.getGraphics());
-      userInitiatedFlash = true;
     }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
   }
 
-  public boolean MouseUp_specific(MouseEvent e, int x, int y) {
+  /*  public boolean MouseUp_specific(MouseEvent e, int x, int y) {
     if (!userInitiatedFlash) return false; //fts is controlling this flash
     else {
       itsFlashing = false;
       Paint_specific(itsSketchPad.getGraphics());
+      userInitiatedFlash = false;
       return true;
     }
-  }
+  }*/
 
   protected void FtsValueChanged(Object value) {
+    int on_off = ((Integer) value).intValue();
 
-    /*if (itsTimer.isRunning()) {
-      // "overlap": lasse-moi terminer!;
-      return;
-    }*/
-    if (userInitiatedFlash) return;
-    if (((Integer) value).intValue() == 1) {
+    System.err.println(""+on_off);
+    if (on_off == 1) {
 	itsFlashing = true;
     }
     else {
 	itsFlashing = false;
     }
     Paint_specific(itsSketchPad.getGraphics());
-
-
-    /*itsTimer.setRepeats(false);
-    itsTimer.start(); //end of flash will be done in actionPerformed*/
   }
 	
   public boolean NeedPropertyHandler(){
@@ -120,10 +108,12 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     return true;	//for now, everything is allowed
   }
   
-  public void Paint_specific(Graphics g) { 
-    if(!itsSelected) g.setColor(itsUINormalColor);
-    else g.setColor(itsUISelectedColor);
-    if(itsFlashing) {
+  public void Paint_specific(Graphics g) {
+    if(!itsFlashing){
+      if(!itsSelected) g.setColor(itsUINormalColor);
+      else g.setColor(itsUISelectedColor);
+    }
+    else{
       g.setColor(Color.yellow);
       itsFlashing = false;
     }
@@ -131,10 +121,8 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     g.fill3DRect(itsX+2,itsY+2, currentRect.width-4,  currentRect.height-4, true);
     g.setColor(Color.black);
     g.drawRect(itsX, itsY, currentRect.width-1, currentRect.height-1);
-    g.setColor(Color.darkGray);
     g.drawOval(itsX+5, itsY+5, currentRect.width-10, currentRect.height-10);
  
-    g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
