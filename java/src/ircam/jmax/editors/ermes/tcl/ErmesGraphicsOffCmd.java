@@ -29,7 +29,12 @@ class ErmesGraphicsOffCmd implements Command
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length == 1)
-      MaxApplication.itsSketchWindow.itsSketchPad.itsGraphicsOn = false;
+      {
+	if (MaxApplication.itsSketchWindow == null)
+	  System.err.println("Cavoli amari");
+	else
+	  MaxApplication.itsSketchWindow.itsSketchPad.itsGraphicsOn = false;
+      }
     else
       throw new TclNumArgsException(interp, 1, argv, "");
   }
