@@ -159,6 +159,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
       if (ac == 1 && fts_is_object( at))
 	{
 	  eval_data->obj = fts_get_object( at);
+	  fts_object_refer( eval_data->obj);
 
 	  return fts_ok;
 	}
@@ -254,6 +255,7 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
     }
 
   fts_patcher_add_object( patcher, obj);    
+  fts_object_release( obj);
 
   /* Add the newly created object as user of the expression's variables,
      even if it is an error object, because we may try to recompute, and recover,

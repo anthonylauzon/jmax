@@ -375,10 +375,11 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
-    expression_stack_pop_frame( exp);
 
     if ((status = (*callback)( ac, at, data)) != fts_ok)
       return status;
+
+    expression_stack_pop_frame( exp);
 
     break;
 
