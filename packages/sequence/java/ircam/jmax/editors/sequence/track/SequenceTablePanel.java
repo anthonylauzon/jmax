@@ -131,6 +131,7 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	public void endTrackUpload( TrackDataModel track)
 	{
 	  uploading = false;
+	  table.revalidate();
 	}
 	public void startPaste(){}
 	public void endPaste(){}

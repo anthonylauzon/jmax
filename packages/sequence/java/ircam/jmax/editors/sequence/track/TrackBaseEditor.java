@@ -253,6 +253,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
   public void endTrackUpload( TrackDataModel track)
   {
     uploading  = false;
+	repaint();
   }
   public void startPaste(){}
   public void endPaste(){}
