@@ -203,7 +203,8 @@ sgi-pkg:
 # creates a rpm
 #
 rpm:
-	(cd pkg/rpm ; $(MAKE) VERSION=$(VERSION) rpm)
+	echo $(version)
+	(cd pkg/rpm ; $(MAKE) version=$(version) rpm)
 .PHONY: rpm
 
 #
