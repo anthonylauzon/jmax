@@ -422,11 +422,24 @@ dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, 
       int nin;
       dsp_signal *previous_sig;
 
+#if 0
+      if (! dest->descr->in)
+	dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * ninputs);
+#else
       if (! dest->descr->in)
 	/* (fd) to avoid writing past the end of the dsp_descr... */
 	dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * fts_object_get_inlets_number(dest->o));
+#endif
 
       nin = dsp_input_get(dest->o, winlet);
+
+#if 0
+      if (nin >= ninputs)
+	{
+	  /* fprintf( stderr, "nin(%d) >= ninputs(%d) for object %s\n", nin, ninputs, full_name( dest->o)); */
+	  return;
+	}
+#endif
 
       previous_sig = dest->descr->in[nin];
       if ((! previous_sig) || (previous_sig == sig_zero))
