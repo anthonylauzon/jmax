@@ -1,4 +1,4 @@
-Name: jMax
+Name: jmax
 Summary: graphical programming environment for developing audio applications
 Version: 2.4.12
 Release: 1
