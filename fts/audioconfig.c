@@ -324,10 +324,15 @@ fts_audioconfig_set_defaults(fts_audioconfig_t* audioconfig)
 {
   if(audioconfig != NULL)
   {
-    fts_audiolabel_t *label = audioconfig_label_get_by_index(audioconfig, 0);
+    fts_audiolabel_t* label_L = audioconfig_label_get_by_index(audioconfig, 0);
+    fts_audiolabel_t* label_R = audioconfig_label_get_by_index(audioconfig, 1);
       
-    if(label == NULL)
-      label = audioconfig_label_insert(audioconfig, 0, fts_s_default);
+    if((label_L == NULL)
+       && (label_R == NULL))
+    {
+      label_L = audioconfig_label_insert(audioconfig, 0, fts_new_symbol("default L"));
+      label_R = audioconfig_label_insert(audioconfig, 1, fts_new_symbol("default R"));
+    }
 
 #if 0
     if(label->input_audioport == NULL)
@@ -366,7 +371,6 @@ audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 
   audioconfig_erase_labels(self);
-  audioconfig_label_insert(self, 0, fts_s_default);
 
   if (fts_object_has_id(o))
     fts_client_send_message(o, fts_s_clear, 0, 0);
@@ -414,30 +418,21 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   fts_audiolabel_t* label;
 
   if( name == fts_s_default)
-    {
-      label = fts_audioconfig_label_get_by_name( self, name);
-
-      if( label == NULL)
-	label = audioconfig_label_insert( self, 0, name);
-    }
+  {
+    label = fts_audioconfig_label_get_by_name( self, name);
+    
+    if( label == NULL)
+      label = audioconfig_label_insert( self, 0, name);
+  }
   else
-    {
-      /* check if name is not already used */
-      if (fts_audioconfig_label_get_by_name(self, name) != NULL)
-	name = fts_audioconfig_get_fresh_label_name(self, name);
+  {
+    /* check if name is not already used */
+    if (fts_audioconfig_label_get_by_name(self, name) != NULL)
+      name = fts_audioconfig_get_fresh_label_name(self, name);
+    
+    label = audioconfig_label_insert(self, index, name);
+  }
   
-      label = audioconfig_label_insert(self, index, name);
-    }
-
-  /* It seems that this method is never called with 6 arguments */
-/*   if( ac == 6) */
-/*     { */
-/*       label->input_device = fts_get_symbol(at + 2); */
-/*       label->input_channel = fts_get_int(at + 3); */
-/*       label->output_device = fts_get_symbol(at + 4); */
-/*       label->output_channel = fts_get_int(at + 5); */
-/*     } */
-
   if (6 == ac)
   {
     fts_send_message((fts_object_t*)label, fts_s_input, 1, at + 2);
@@ -447,20 +442,20 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   }
 
   if (fts_object_has_id(o))
-    {
-      fts_atom_t args[7];
-      fts_client_register_object((fts_object_t *)label, fts_get_client_id(o));
-      /* send new label to client */
-      
-      fts_set_int(args, index);
-      fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
-      fts_set_symbol(args + 2, fts_audiolabel_get_name(label));
-      fts_set_symbol(args + 3, fts_audiolabel_get_port_name(label, FTS_AUDIO_INPUT));
-      fts_set_int(args + 4, fts_audiolabel_get_channel(label, FTS_AUDIO_INPUT));
-      fts_set_symbol(args + 5, fts_audiolabel_get_port_name(label, FTS_AUDIO_OUTPUT));
-      fts_set_int(args + 6, fts_audiolabel_get_channel(label, FTS_AUDIO_OUTPUT));
-      fts_client_send_message(o, fts_s_insert, 7, args);    
-    }
+  {
+    fts_atom_t args[7];
+    fts_client_register_object((fts_object_t *)label, fts_get_client_id(o));
+    /* send new label to client */
+    
+    fts_set_int(args, index);
+    fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
+    fts_set_symbol(args + 2, fts_audiolabel_get_name(label));
+    fts_set_symbol(args + 3, fts_audiolabel_get_port_name(label, FTS_AUDIO_INPUT));
+    fts_set_int(args + 4, fts_audiolabel_get_channel(label, FTS_AUDIO_INPUT));
+    fts_set_symbol(args + 5, fts_audiolabel_get_port_name(label, FTS_AUDIO_OUTPUT));
+    fts_set_int(args + 6, fts_audiolabel_get_channel(label, FTS_AUDIO_OUTPUT));
+    fts_client_send_message(o, fts_s_insert, 7, args);    
+  }
 }
 
 
