@@ -987,12 +987,12 @@ marker_track_append_bar(track_t *marker_track)
     /* get last bar meter and tempo */
     while(marker_event != NULL)
     {
-      double t = NULL;
+      double t = -1.0;
       scomark = (scomark_t *)fts_get_object(event_get_value(marker_event));
       time = event_get_time(marker_event);
       
       scomark_get_tempo(scomark, &t);
-      if(t != NULL) tempo = t;
+      if(t > 0.0) tempo = t;
       
       if(scomark_is_bar(scomark))
       {
