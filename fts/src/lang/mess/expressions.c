@@ -130,6 +130,10 @@ struct fts_expression_state
   int op_type_stack[FTS_EXPR_MAX_DEPTH];
   int op_stack_p;		/* point to the last actually used cell */
 
+  int expr_size;		/* the expression list being parsed */
+  const fts_atom_t *expr; 
+
+  int in;			/* current input atom in expression list*/
   int count;			/* result counter */
   int ret;			/* return code */
 
@@ -234,6 +238,11 @@ static fts_atom_t *value_stack_peek(fts_expression_state_t *e, int i)
   return &(e->value_stack[e->value_stack_p - i]);
 }
 
+static const fts_atom_t *current_in(fts_expression_state_t *e)
+{
+  return &(e->expr[e->in]);
+}
+
 /* Private Macros and functions */
 
 /* Return 1 in case of error, 0 otherwise */
@@ -245,7 +254,7 @@ static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_symbol_t n
 
 static fts_expression_state_t *expr_state = 0;
 
-static fts_expression_state_t *fts_get_expression_state()
+static fts_expression_state_t *fts_get_expression_state(int expr_size, const fts_atom_t *expr)
 {
   if (expr_state == NULL)
     {
@@ -271,10 +280,13 @@ static fts_expression_state_t *fts_get_expression_state()
 
   value_stack_set_empty(expr_state);
   op_stack_set_empty(expr_state);
-  expr_state->count = 0;			/* result counter */
-  expr_state->assignements = 0;			/* init assignement  list */
-  expr_state->var_refs = 0;		/* init var ref list */
-  expr_state->ret  = FTS_EXPRESSION_OK;	/* init return status */
+  expr_state->expr         = expr;		/* expression  */
+  expr_state->expr_size    = expr_size;		/* expression size */
+  expr_state->in           = 0;		/* input counter */
+  expr_state->count        = 0;	/* result counter */
+  expr_state->assignements = 0;	/* init assignement  list */
+  expr_state->var_refs     = 0;	/* init var ref list */
+  expr_state->ret          = FTS_EXPRESSION_OK;	/* init return status */
 
   return expr_state;
 }
@@ -302,10 +314,7 @@ fts_expression_state_t *fts_expression_eval(fts_object_t *object,
 
 #define TRY(call)             {int ret; ret = call; if (ret != FTS_EXPRESSION_OK) return ret;}
 
-static int fts_do_expression_eval(fts_expression_state_t *e,
-						      fts_object_t *object,
-						      int expr_size, const fts_atom_t *expr,
-						      fts_atom_t *result)
+static int fts_do_expression_eval(fts_expression_state_t *e, fts_object_t *object, fts_atom_t *result)
 {
   int ret;
   int i;
@@ -318,24 +327,24 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
   op_stack_set_empty(e);
   status = waiting_arg;
 
-  for (i = 0; i < expr_size; i++)
+  while (e->in < e->expr_size)
     {
       if (status == waiting_arg)
 	{
-	  if (fts_is_open_par(&expr[i]))
+	  if (fts_is_open_par(current_in(e)))
 	    {
 	      op_stack_push(e, FTS_OP_OPEN_PAR, FTS_PAR_OP_TYPE);
 
 	      status = waiting_arg;
 	    }
-	  else if (fts_is_closed_par(&expr[i]))
+	  else if (fts_is_closed_par(current_in(e)))
 	    {
 	      return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced closed parentesis\n");	
 	    }
-	  else if (fts_is_operator(&expr[i]))
+	  else if (fts_is_operator(current_in(e)))
 	    {
-	      if (fts_op_can_be_unary(fts_get_operator(&expr[i])))
-		op_stack_push(e, fts_get_operator(&expr[i]), FTS_UNARY_OP_TYPE);
+	      if (fts_op_can_be_unary(fts_get_operator(current_in(e))))
+		op_stack_push(e, fts_get_operator(current_in(e)), FTS_UNARY_OP_TYPE);
 	      else
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
 					"Syntax error, expression start with operator");
@@ -344,7 +353,7 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
 	    {
 	      /* Anything else is an argument */
 
-	      value_stack_push(e, &expr[i]);
+	      value_stack_push(e, current_in(e));
 
 	      while ((! op_stack_is_empty(e)) && (op_type_stack_top(e) == FTS_UNARY_OP_TYPE))
 		{
@@ -356,7 +365,7 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
 	}
       else
 	{
-	  if (fts_is_open_par(&expr[i]))
+	  if (fts_is_open_par(current_in(e)))
 	    {
 	      while ((! op_stack_is_empty(e)) && (op_stack_top(e) != FTS_OP_OPEN_PAR))
 		{
@@ -368,13 +377,14 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
 	      if (op_stack_is_empty(e) && value_stack_is_deep(e, 1))
 		{
 		  *result = * value_stack_top(e);
-		  return i - 1;
+		  e->in --;
+		  return FTS_EXPRESSION_OK;
 		}
 	      else
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
 					"Syntax error in expression (1)");
 	    }
-	  else if (fts_is_closed_par(&expr[i]))
+	  else if (fts_is_closed_par(current_in(e)))
 	    {
 	      while ((! op_stack_is_empty(e)) && (op_stack_top(e) != FTS_OP_OPEN_PAR))
 		{
@@ -390,13 +400,13 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
 
 	      status = waiting_op;
 	    }
-	  else if (fts_is_operator(&expr[i]))
+	  else if (fts_is_operator(current_in(e)))
 	    {
 	      /* Is this code correct for unary ops ??? */
 
 	      int op;
 
-	      op = fts_get_operator(&expr[i]);
+	      op = fts_get_operator(current_in(e));
 
 	      if (fts_op_can_be_binary(op))
 		{
@@ -423,7 +433,8 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
 		  if (op_stack_is_empty(e) && value_stack_is_deep(e, 1))
 		    {
 		      *result = *value_stack_top(e);
-		      return i - 1;
+		      e->in --;
+		      return FTS_EXPRESSION_OK;
 		    }
 		  else
 		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
@@ -443,7 +454,8 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
 	      if (op_stack_is_empty(e) && value_stack_is_deep(e, 1))
 		{
 		  *result = *value_stack_top(e);
-		  return i - 1;
+		  e->in --;
+		  return FTS_EXPRESSION_OK;
 		}
 	      else
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
@@ -478,7 +490,7 @@ static int fts_do_expression_eval(fts_expression_state_t *e,
     return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
 			    "Syntax error in expression (4)");
 
-  return i;
+  return FTS_EXPRESSION_OK;
 }
 
 /* This thing work only for ints, for now !!!, no type promotion !! */
@@ -944,23 +956,18 @@ fts_expression_state_t *fts_expression_eval(fts_object_t *object,
 {
   fts_expression_state_t *e;
 
-  e = fts_get_expression_state();
+  e = fts_get_expression_state(expr_size, expr);
 
-  while ((e->count < result_size) && expr_size > 0)
+  while ((e->count < result_size) && (e->in < expr_size))
     {
       int ret;
 
-      ret = fts_do_expression_eval(e, object, expr_size, expr, &result[e->count]);
+      ret = fts_do_expression_eval(e, object, &result[e->count]);
 
-      if (ret > 0)
+      if (ret == FTS_EXPRESSION_OK)
 	{
-	  expr_size =- ret;
-
 	  if (!fts_is_void(&result[e->count]))
 	    e->count++;
-
-	  if (e->count == result_size)
-	    break;
 	}
       else
 	{
