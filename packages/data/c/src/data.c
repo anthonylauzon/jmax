@@ -730,9 +730,9 @@ data_config(void)
   
   vec_config();
   ivec_config();
-  fvec_config();
   mat_config();
   fmat_config();
+  fvec_config();
   col_config();
   row_config();
   bpf_config();

@@ -31,6 +31,12 @@ FTS_API void *fts_realloc(void *p, unsigned int size);
 FTS_API void fts_free(void *p);
 
 /* Heap allocator */
+struct _fts_heap_t {
+  char *free_list;
+  unsigned int current_block_group;
+  unsigned int block_size;
+  unsigned int reserved_blocks;
+};
 typedef struct _fts_heap_t fts_heap_t;
 
 FTS_API fts_heap_t *fts_heap_new(unsigned int block_size);

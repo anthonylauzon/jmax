@@ -623,8 +623,6 @@ fmat_export_audiofile(fmat_t *mat, fts_symbol_t file_name)
 }
 
 
-
-
 /********************************************************************
  *
  *  check & errors
@@ -3837,7 +3835,7 @@ fmat_initialize(fmat_t *self)
   self->alloc = -1;
   self->onset = 0.0;
   self->domain = 0.0;
-  self->sr = fts_dsp_get_sample_rate();
+  self->sr = 1.0;
   self->opened = 0;
 }
 

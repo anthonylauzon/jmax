@@ -273,7 +273,7 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
   }
   else
-	fts_object_open_dialog(o, fts_s_open, s_open_file);
+	fts_object_open_dialog(o, fts_s_open, s_open_file, ac, at);
 }
 
 static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

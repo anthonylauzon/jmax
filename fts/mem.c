@@ -141,12 +141,12 @@ void fts_free(void *p)
 #define SHARED_HEAP_MAX_SIZE 256
 #define FREE_TO_USED_RATIO    5
 
-struct _fts_heap_t {
+/*struct _fts_heap_t {
   char *free_list;
   unsigned int current_block_group;
   unsigned int block_size;
   unsigned int reserved_blocks;
-};
+};*/
 
 static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long)];
 
