@@ -88,7 +88,7 @@ class ErmesObjComment extends ErmesObject {
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    Resize(itsFontMetrics.stringWidth(itsMaxString)+10-currentRect.width, itsFontMetrics.getHeight()*itsParsedTextVector.size()-currentRect.height);
+    Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-currentRect.width, itsFontMetrics.getHeight()*itsParsedTextVector.size()-currentRect.height);
     itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
@@ -118,9 +118,9 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.GetTextArea().itsOwner = this;
 
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width, itsFontMetrics.getHeight()*5);
+      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width+10, itsFontMetrics.getHeight()*5);
     else
-      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width+10,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
 
     itsMaxString = "";
     itsParsedTextVector.removeAllElements();
@@ -146,7 +146,7 @@ class ErmesObjComment extends ErmesObject {
   
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsMaxString)+10 - currentRect.width,
+      Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET - currentRect.width,
 	     itsFontMetrics.getHeight()*itsParsedTextVector.size()- currentRect.height);
     }
     else ResizeToText(0,0);
@@ -156,14 +156,14 @@ class ErmesObjComment extends ErmesObject {
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<itsFontMetrics.stringWidth(itsMaxString)+10) aWidth = itsFontMetrics.stringWidth(itsMaxString)+10;
+    if(aWidth<itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET) aWidth = itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size()) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size();
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
-    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString)+10)||
+    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET)||
        (currentRect.height+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size()))
       return false;
     else return true;
@@ -251,7 +251,7 @@ class ErmesObjComment extends ErmesObject {
   public Dimension getMinimumSize() {
     if(itsParsedTextVector.size()==0) return getPreferredSize();
     else
-      return new Dimension(itsFontMetrics.stringWidth(itsMaxString)+10,
+      return new Dimension(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET,
 			   itsFontMetrics.getHeight()*itsParsedTextVector.size());
   }
 

@@ -111,7 +111,9 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
       d1.height = height;
       itsOwner.setSize(d1.width, d1.height);
     }
-        
+    
+    itsOwner.ResizeToText(0,0);
+    
     //itsOwner.Repaint();
    
     AbortEdit();
@@ -212,7 +214,10 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
       if(aOldIndex==-1) return fm.stringWidth(theString);
       else return fm.stringWidth(theString.substring(aOldIndex));
     }
-    else return fm.stringWidth(theString.substring(aOldIndex, aIndex));
+    else {
+      if(aOldIndex==-1) return fm.stringWidth(theString.substring(0,aIndex));
+      else return fm.stringWidth(theString.substring(aOldIndex, aIndex));
+    }
   }  
   
   public int GetCurrentLineChars(String theString){
@@ -227,7 +232,10 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
       if(aOldIndex==-1) return theString.length();
       else return theString.length()-aOldIndex;
     }
-    else return aIndex-aOldIndex;
+    else{
+      if(aOldIndex==-1) return aIndex;
+      else return aIndex-aOldIndex;
+    }
   }
 
   //--------------------------------------------------------
