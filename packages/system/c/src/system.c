@@ -17,12 +17,18 @@ extern void ucs_config(void);
 extern void dsp_config(void);
 extern void arch_config(void);
 
+extern var_config(void);
+extern argument_init(void);
+
 static void
 system_module_init(void)
 {
   ucs_config();
   dsp_config();
   arch_config();
+
+  var_config();
+  argument_init();
 }
 
 fts_module_t system_module = {"system", "Basic System Objects", system_module_init};

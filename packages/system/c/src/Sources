@@ -15,3 +15,5 @@ arch.c \
 dsp1.c \
 system.c \
 ucsobj.c \
+var.c \
+argument.c
