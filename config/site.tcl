@@ -22,10 +22,11 @@
 # machines; what follow, as an example, is the current host type configuration
 # in Ircam
 
-set jmaxHostTypeTable("astor.ircam.fr")      origin
-set jmaxHostTypeTable("stradivari.ircam.fr") octane
-set jmaxHostTypeTable("maggini.ircam.fr")    octane
-set jmaxHostTypeTable("amati.ircam.fr")      octane
-set jmaxHostTypeTable("marimba.ircam.fr")    o2r5ki63
-set jmaxHostTypeTable("libido.ircam.fr")     linuxpc
-set jmaxHostTypeTable("linotte.ircam.fr")    linuxpc
+set jmaxHostTypeTable(astor.ircam.fr)      origin
+set jmaxHostTypeTable(stradivari.ircam.fr) octane
+set jmaxHostTypeTable(maggini.ircam.fr)    octane
+set jmaxHostTypeTable(amati.ircam.fr)      octane
+set jmaxHostTypeTable(marimba.ircam.fr)    o2r5ki63
+set jmaxHostTypeTable(libido.ircam.fr)     linuxpc
+set jmaxHostTypeTable(linotte.ircam.fr)    linuxpc
+
