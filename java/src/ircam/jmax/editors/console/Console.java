@@ -17,6 +17,7 @@ public class Console extends Panel{
   Interp itsInterp;
   PrintStream itsPrintStream; 
   ConsoleThread itsConsoleThread;
+  ConsoleKeyListener itsKeyListener;
   KeyListener itsContainer;
 
   public Console(Interp i) {
@@ -36,7 +37,9 @@ public class Console extends Panel{
     gridbag.setConstraints(itsTextArea, c);    
     add(itsTextArea);
 
-    itsTextArea.addKeyListener(new ConsoleKeyListener(this));
+    itsKeyListener = new ConsoleKeyListener(this);
+    itsTextArea.addKeyListener(itsKeyListener);  
+    itsTextArea.addMouseListener(new ConsoleMouseListener(this));
     itsConsoleThread = new ConsoleThread(this);
     /*
      * The console thread runs as a daemon so that it gets terminated 
@@ -64,10 +67,12 @@ public class Console extends Panel{
   public void PutLine(String s) {
     //e.m.text.insert(s + "\n", 100000);
     itsTextArea.append(s + "\n");
+    itsKeyListener.intercept+=s.length();
   }
   
   public void Put(String s) {
     itsTextArea.append(s);
+    itsKeyListener.intercept+=s.length();
     //e.m.text.insert(s, 100000);
   }
     

@@ -29,6 +29,7 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     addFocusListener(this);
   }
  
+
   ////////////////
   /*public boolean lostFocus() {
     return true;
@@ -37,6 +38,7 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
   // lostFocus
   //--------------------------------------------------------
   public boolean LostFocus() {
+    //System.out.println("LostFocus");
     if (!focused) return true;
     else {
       focused = false;
@@ -73,6 +75,7 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
     }
     else {
       itsOwner.itsArgs = aTextString;
+      //System.out.println("making FtsObject with args:"+itsOwner.itsArgs);
       itsOwner.makeFtsObject();
     }
 
@@ -253,7 +256,7 @@ public class ErmesObjEditField extends TextField implements KeyListener, FocusLi
 	  requestFocus();
 	}
 	//e.e.setText(s);
-	select(start+1,start+1);
+	select(start/*+1*/,start/*+1*/);
       }
     }
   }

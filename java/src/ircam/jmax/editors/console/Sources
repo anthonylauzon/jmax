@@ -3,4 +3,6 @@ SOURCES = Console.java \
 	  ConsoleWriter.java \
           ConsoleWindow.java \
 	  ConsoleThread.java \
-	  ConsoleDocument.java
+	  ConsoleDocument.java \
+	  ConsoleMouseListener.java
+
