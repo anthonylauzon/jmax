@@ -33,29 +33,30 @@
  */
 typedef struct
 {
-    fts_dsp_object_t head;
-    int n_channels;
-    fts_symbol_t filename;
+  fts_dsp_object_t head;
+  int n_channels;
+  fts_symbol_t filename;
+  
+  /* sound file to write */
+  fts_audiofile_t* sf;
 
-    /* sound file to write */
-    fts_audiofile_t* sf;
+  /* communication buffer */
+  dtd_buffer_t* com_buffer;
 
-    /* communication buffer */
-    dtd_buffer_t* com_buffer;
+  int buffer_index;
+  int write_index;
+  int is_open;
+  int is_started;
+  int is_eof;
 
-    int buffer_index;
-    int write_index;
-    int is_open;
-    int is_started;
-    int is_eof;
-
-    fts_thread_worker_t* thread_worker;
+  fts_thread_worker_t* thread_worker;
 } writesf_t;
 
 static fts_symbol_t writesf_symbol;
 
 static fts_symbol_t s_record;
 static fts_symbol_t s_pause;
+static fts_symbol_t s_open_file;
 
 
 void writer_set_state(writesf_t* self,
@@ -64,42 +65,42 @@ void writer_set_state(writesf_t* self,
 		      const int* const buffer_index,
 		      const int* const is_eof)
 {
-    dtd_thread_t* reader = (dtd_thread_t*)self->thread_worker->thread_function->object;
-    dtd_thread_set_state(reader, sf, com_buffer, buffer_index, is_eof);
+  dtd_thread_t* reader = (dtd_thread_t*)self->thread_worker->thread_function->object;
+  dtd_thread_set_state(reader, sf, com_buffer, buffer_index, is_eof);
 }
 
 static void create_writer_thread(writesf_t* self)
 {
-    fts_thread_worker_t* thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
-    dtd_thread_t* writer = (dtd_thread_t*)fts_object_create(dtd_thread_type, 0, 0);
-    fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
+  fts_thread_worker_t* thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
+  dtd_thread_t* writer = (dtd_thread_t*)fts_object_create(dtd_thread_type, 0, 0);
+  fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
     
-    thread_job->object = (fts_object_t*)writer;
-    thread_job->method = fts_class_get_method_varargs(fts_object_get_class(thread_job->object),
-					      fts_s_write);
-    if (0 == thread_job->method)
-    {
-	fts_log("[readsf~] no such method \n");
-	fts_object_error((fts_object_t*)self, "no such method, init failed \n");
-	fts_free(thread_job);
-	return;
-    }
+  thread_job->object = (fts_object_t*)writer;
+  thread_job->method = fts_class_get_method_varargs(fts_object_get_class(thread_job->object),
+						    fts_s_write);
+  if (0 == thread_job->method)
+  {
+    fts_log("[readsf~] no such method \n");
+    fts_object_error((fts_object_t*)self, "no such method, init failed \n");
+    fts_free(thread_job);
+    return;
+  }
     
-    thread_job->ac = 0;
-    thread_job->at = NULL;
-    thread_job->symbol = fts_s_write;
+  thread_job->ac = 0;
+  thread_job->at = NULL;
+  thread_job->symbol = fts_s_write;
     
-    thread_job->delay_ms = writer->delay_ms;
-    thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
-    thread_worker->thread_function = thread_job;
-    self->thread_worker = thread_worker;
+  thread_job->delay_ms = writer->delay_ms;
+  thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
+  thread_worker->thread_function = thread_job;
+  self->thread_worker = thread_worker;
 }
 
 static void delete_writer_thread(writesf_t* self)
 {
-    fts_object_destroy(self->thread_worker->thread_function->object);
-    fts_free(self->thread_worker->thread_function);
-    fts_free(self->thread_worker);
+  fts_object_destroy(self->thread_worker->thread_function->object);
+  fts_free(self->thread_worker->thread_function);
+  fts_free(self->thread_worker);
 }
 
 
@@ -120,30 +121,30 @@ static void writesf_dsp( fts_word_t *argv)
 
   if (0 == self->is_started)
   {
-      return;
+    return;
   }
 
   /* channels loop */
   for (channels = 0; channels < self->n_channels; ++channels)
   {
-      in = (float*)fts_word_get_pointer(argv + 2 + channels);
-      /* Write from buffer */
-      for (n = 0; n < n_tick; ++n)
-      {
-	  buffer[channels][n + self->write_index] = in[n];
-      }
+    in = (float*)fts_word_get_pointer(argv + 2 + channels);
+    /* Write from buffer */
+    for (n = 0; n < n_tick; ++n)
+    {
+      buffer[channels][n + self->write_index] = in[n];
+    }
   }
   self->write_index += n_tick;
 
   if ((self->write_index + n_tick) > com_buffer->size)
   {
-      com_buffer->full = 1;
-      com_buffer->end_index = self->write_index;
-      /* swap buffer index */
-      self->buffer_index += 1;
-      self->buffer_index %= 2;
-      /* reset write index */
-      self->write_index = 0;
+    com_buffer->full = 1;
+    com_buffer->end_index = self->write_index;
+    /* swap buffer index */
+    self->buffer_index += 1;
+    self->buffer_index %= 2;
+    /* reset write index */
+    self->write_index = 0;
   }
 }
 
@@ -169,100 +170,109 @@ static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
 static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    writesf_t* self = (writesf_t*)o;
-    fts_audiofile_t* sf;
+  writesf_t* self = (writesf_t*)o;
+  fts_audiofile_t* sf;
 
-    /* if a file is already open we close the previous file */
-    if (1 == self->is_open)
-    {
-	/* call close */
-	writesf_close(o, winlet, s, ac, at);
+  /* if a file is already open we close the previous file */
+  if (1 == self->is_open)
+  {
+    /* call close */
+    writesf_close(o, winlet, s, ac, at);
+  }
+
+  if (ac > 0 && fts_is_symbol(at))
+  {
+    self->filename = fts_get_symbol(at);	    
+    sf = fts_audiofile_open_write(self->filename, self->n_channels,
+				  (int)(fts_dsp_get_sample_rate()),
+				  fts_s_int16);
+    if (fts_audiofile_is_valid(sf))
+    {		
+      /* set writer thread state */
+      writer_set_state(self, sf, self->com_buffer, &self->buffer_index, &self->is_eof);
+
+      /* start writer thread */
+      fts_thread_manager_create_thread(self->thread_worker);
+      self->sf = sf;
+      self->is_open = 1;
     }
-
-    if (ac > 0)
+    else
     {
-	self->filename = fts_get_symbol(at);	    
-	sf = fts_audiofile_open_write(self->filename, self->n_channels,
-				      (int)(fts_dsp_get_sample_rate()),
-				      fts_s_int16);
-	if (fts_audiofile_is_valid(sf))
-	{		
-	    /* set writer thread state */
-	    writer_set_state(self, sf, self->com_buffer, &self->buffer_index, &self->is_eof);
-
-	    /* start writer thread */
-	    fts_thread_manager_create_thread(self->thread_worker);
-	    self->sf = sf;
-	    self->is_open = 1;
-	}
-	else
-	{
-	    post("[writesf~] audiofile (%s) is not valid \n", self->filename);
-	    fts_log("[writesf~] audiofile (%s) is not valid \n", self->filename);
-	}
+      post("[writesf~] audiofile (%s) is not valid \n", self->filename);
+      fts_log("[writesf~] audiofile (%s) is not valid \n", self->filename);
     }
-    
+  }    
+  else
+  {
+    fts_atom_t a[4];
+	
+    fts_set_symbol(a, fts_s_open);
+    fts_set_symbol(a + 1, s_open_file);
+    fts_set_symbol(a + 2, fts_project_get_dir());
+    fts_set_symbol(a + 3, fts_new_symbol(" "));
+    fts_client_send_message(o, fts_s_openFileDialog, 4, a);
+  }   
 }
 
 static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    writesf_t* self = (writesf_t*)o;
-    int i;
+  writesf_t* self = (writesf_t*)o;
+  int i;
 
-    if (1 == self->is_open)
+  if (1 == self->is_open)
+  {
+    /* Here we stop the worker_thread */
+    fts_thread_manager_cancel_thread(self->thread_worker);
+    /* we close the soundfile */
+    fts_audiofile_close(self->sf);
+    /* set buffer to empty and set write_index, end_index to buffer begin */
+    for (i = 0; i < 2; ++i)
     {
-	/* Here we stop the worker_thread */
-	fts_thread_manager_cancel_thread(self->thread_worker);
-	/* we close the soundfile */
-	fts_audiofile_close(self->sf);
-	/* set buffer to empty and set write_index, end_index to buffer begin */
-	for (i = 0; i < 2; ++i)
-	{
-	    self->com_buffer[i].full = 0;
-	    self->com_buffer[i].end_index = 0;
-	}
-	self->is_open = 0;
-	self->is_started = 0;
-	self->is_eof = 0;
-	self->write_index = 0;
+      self->com_buffer[i].full = 0;
+      self->com_buffer[i].end_index = 0;
     }
+    self->is_open = 0;
+    self->is_started = 0;
+    self->is_eof = 0;
+    self->write_index = 0;
+  }
 }
 
 static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    writesf_t* self = (writesf_t*)o;
-    post("[writesf~] start \n");
-    self->is_started = 1;
+  writesf_t* self = (writesf_t*)o;
+  post("[writesf~] start \n");
+  self->is_started = 1;
 }
 
 
 static void writesf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    writesf_t* self = (writesf_t*)o;
-    dtd_buffer_t* com_buffer;
-    /* tell thread writer to write all buffer */
-    self->is_eof = 1;
+  writesf_t* self = (writesf_t*)o;
+  dtd_buffer_t* com_buffer;
+  /* tell thread writer to write all buffer */
+  self->is_eof = 1;
 
-    com_buffer = &self->com_buffer[self->buffer_index];
-    /* check if buffer is empty */
-    if (0 == com_buffer->full)
-    {
-	/* set full flag and end_index of current buffer */
-	com_buffer->full = 1;
-	com_buffer->end_index = self->write_index;
-    }
-    self->is_started = 0;
-    /* reset write index */
-    self->write_index = 0;
-    post("[writesf~] stop\n");
+  com_buffer = &self->com_buffer[self->buffer_index];
+  /* check if buffer is empty */
+  if (0 == com_buffer->full)
+  {
+    /* set full flag and end_index of current buffer */
+    com_buffer->full = 1;
+    com_buffer->end_index = self->write_index;
+  }
+  self->is_started = 0;
+  /* reset write index */
+  self->write_index = 0;
+  post("[writesf~] stop\n");
 }
 
 static void writesf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    writesf_t* self = (writesf_t*)o;
-    post("[writesf~] pause \n");
-    self->is_started += 1;
-    self->is_started = self->is_started % 2;
+  writesf_t* self = (writesf_t*)o;
+  post("[writesf~] pause \n");
+  self->is_started += 1;
+  self->is_started = self->is_started % 2;
 }
 
 static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -279,23 +289,23 @@ static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 
   if(ac == 2 && fts_is_symbol( at + 1))
   {
-      self->filename = fts_get_symbol( at + 1);
+    self->filename = fts_get_symbol( at + 1);
   }
 
   /* Memory Allocation */
   self->com_buffer = fts_malloc(2 * sizeof(dtd_buffer_t));
   for (i = 0; i < 2; ++i)
   {
-      dtd_buffer_t* com_buffer = &self->com_buffer[i];
-      com_buffer->size = DTD_COM_BUF_DEFAULT_SIZE;
-      com_buffer->n_channels = n_channels;
-      com_buffer->buffer = fts_malloc(n_channels * sizeof(float*));
-      for (j = 0; j < n_channels; ++j)
-      {
-	  com_buffer->buffer[j] = fts_malloc(com_buffer->size * sizeof(float));
-      }
-      com_buffer->full = 0;
-      com_buffer->end_index = 0;
+    dtd_buffer_t* com_buffer = &self->com_buffer[i];
+    com_buffer->size = DTD_COM_BUF_DEFAULT_SIZE;
+    com_buffer->n_channels = n_channels;
+    com_buffer->buffer = fts_malloc(n_channels * sizeof(float*));
+    for (j = 0; j < n_channels; ++j)
+    {
+      com_buffer->buffer[j] = fts_malloc(com_buffer->size * sizeof(float));
+    }
+    com_buffer->full = 0;
+    com_buffer->end_index = 0;
   }
 
   self->write_index = 0;
@@ -325,12 +335,12 @@ static void writesf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
   /* Memory Deallocation */
   for (i = 0; i < 2; ++i)
   {
-      dtd_buffer_t* com_buffer = &self->com_buffer[i];
-      for (j = 0; j < self->n_channels; ++j)
-      {
-	  fts_free(com_buffer->buffer[j]);
-      }
-      fts_free(com_buffer->buffer);
+    dtd_buffer_t* com_buffer = &self->com_buffer[i];
+    for (j = 0; j < self->n_channels; ++j)
+    {
+      fts_free(com_buffer->buffer[j]);
+    }
+    fts_free(com_buffer->buffer);
   }
   fts_free(self->com_buffer);
 
@@ -344,21 +354,21 @@ static void writesf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 static void
 writesf_instantiate(fts_class_t* cl)
 {
-    fts_class_init(cl, sizeof(writesf_t), writesf_init, writesf_delete);
+  fts_class_init(cl, sizeof(writesf_t), writesf_init, writesf_delete);
 
-    fts_class_message_varargs(cl, fts_s_put, writesf_put);
+  fts_class_message_varargs(cl, fts_s_put, writesf_put);
 
-    fts_class_message_varargs(cl, fts_s_open, writesf_open);
-    fts_class_message_varargs(cl, fts_s_close, writesf_close);
+  fts_class_message_varargs(cl, fts_s_open, writesf_open);
+  fts_class_message_varargs(cl, fts_s_close, writesf_close);
 
-    fts_class_message_varargs(cl, fts_s_start, writesf_start);
-    fts_class_message_varargs(cl, fts_s_stop, writesf_stop);
-    fts_class_message_varargs(cl, s_pause, writesf_pause);
+  fts_class_message_varargs(cl, fts_s_start, writesf_start);
+  fts_class_message_varargs(cl, fts_s_stop, writesf_stop);
+  fts_class_message_varargs(cl, s_pause, writesf_pause);
 
-    fts_class_inlet_thru(cl, 0);
+  fts_class_inlet_thru(cl, 0);
 
-    fts_dsp_declare_inlet(cl, 0);
-    fts_dsp_declare_function(writesf_symbol, writesf_dsp);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_function(writesf_symbol, writesf_dsp);
 }
 
 
@@ -372,7 +382,15 @@ void writesf_config(void)
 {
   s_record = fts_new_symbol( "record");
   s_pause = fts_new_symbol( "pause");
+  s_open_file = fts_new_symbol("open file");
   
   writesf_symbol = fts_new_symbol("writesf~");
   fts_class_install(writesf_symbol, writesf_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
