@@ -26,7 +26,7 @@
 #include <fts/fts.h>
 #include <fts/packages/sequence/sequence.h>
 
-extern fts_class_t *event_class;
+FTS_API fts_class_t *event_class;
 
 struct _event_
 {
@@ -61,8 +61,8 @@ struct _event_
 
 #define event_get_type(e) (fts_get_class(&(e)->value))
 
-extern double event_get_duration(event_t *event);
-extern void event_set_duration(event_t *event, double duration);
+FTS_API double event_get_duration(event_t *event);
+FTS_API void event_set_duration(event_t *event, double duration);
 
 /**
 * Upload changes in event or event's value to client

@@ -27,7 +27,7 @@
 #include <fts/packages/sequence/marker.h>
 #include <fts/packages/sequence/sequence.h>
 
-extern fts_class_t *track_class;
+FTS_API fts_class_t *track_class;
 
 struct _track_
 { 
@@ -61,8 +61,14 @@ struct _track_
 #define track_get_last(t) ((t)->last)
 #define track_get_size(t) ((t)->size)
 #define track_get_last_time(t) (((t)->last)? (t)->last->time: 0.0)
+
+#ifdef WIN32
+#define track_get_duration(t) 0
+//#error fmax non defini
+#else
 #define track_get_duration(t) \
   ((track_get_markers(t))? (fmax(track_get_last_time(track_get_markers(t)), track_get_last_time(t))): (track_get_last_time(t)))
+#endif
 
 #define track_is_active(t) ((t)->active != 0)
 #define track_do_save_editor(t) ((t)->save_editor != 0)
@@ -78,41 +84,41 @@ struct _track_
 #define track_get_markers(t) ((t)->markers)
 #define track_is_marker(t) (track_get_type(t) == scomark_class)
 
-extern void track_add_event(track_t *track, double time, event_t *event);
-extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *after);
-extern void track_append_event(track_t *track, double time, event_t *event);
-extern void track_move_event(track_t *track, event_t *event, double time);
-extern void track_remove_event(track_t *track, event_t *event);
-extern void track_merge(track_t *track, track_t *merge);
-extern void track_clear(track_t *track);
-extern void track_copy(track_t *org, track_t *copy);
+FTS_API void track_add_event(track_t *track, double time, event_t *event);
+FTS_API void track_add_event_after(track_t *track, double time, event_t *event, event_t *after);
+FTS_API void track_append_event(track_t *track, double time, event_t *event);
+FTS_API void track_move_event(track_t *track, event_t *event, double time);
+FTS_API void track_remove_event(track_t *track, event_t *event);
+FTS_API void track_merge(track_t *track, track_t *merge);
+FTS_API void track_clear(track_t *track);
+FTS_API void track_copy(track_t *org, track_t *copy);
 
 
-extern void track_add_event_and_upload(track_t *track, double time, event_t *event);
-extern void track_add_event_after_and_upload(track_t *track, double time, event_t *event, event_t *after);
-extern void track_move_event_and_upload(track_t *track, event_t *event, double time);
-extern void track_remove_event_and_upload(track_t *track, event_t *event);
-extern void track_merge_and_upload(track_t *track, track_t *merge);
-extern void track_clear_and_upload(track_t *track);
+FTS_API void track_add_event_and_upload(track_t *track, double time, event_t *event);
+FTS_API void track_add_event_after_and_upload(track_t *track, double time, event_t *event, event_t *after);
+FTS_API void track_move_event_and_upload(track_t *track, event_t *event, double time);
+FTS_API void track_remove_event_and_upload(track_t *track, event_t *event);
+FTS_API void track_merge_and_upload(track_t *track, track_t *merge);
+FTS_API void track_clear_and_upload(track_t *track);
 
-extern void track_update_editor (track_t *self);
-extern void track_upload_event(track_t *self, event_t *event);
+FTS_API void track_update_editor (track_t *self);
+FTS_API void track_upload_event(track_t *self, event_t *event);
 
-extern void track_set_dirty(track_t *track);
+FTS_API void track_set_dirty(track_t *track);
 
-extern event_t *track_get_event_by_time(track_t *track, double time);
-extern event_t *track_get_next_by_time(track_t *track, double time);
-extern event_t *track_get_next_by_time_after(track_t *track, double time, event_t *here);
-extern event_t *track_get_left_by_time_from(track_t *track, double time, event_t *here);
+FTS_API event_t *track_get_event_by_time(track_t *track, double time);
+FTS_API event_t *track_get_next_by_time(track_t *track, double time);
+FTS_API event_t *track_get_next_by_time_after(track_t *track, double time, event_t *here);
+FTS_API event_t *track_get_left_by_time_from(track_t *track, double time, event_t *here);
 
-extern track_t *track_get_or_make_markers(track_t *track);
-extern scomark_t *track_insert_marker(track_t *track, double time, fts_symbol_t type);
+FTS_API track_t *track_get_or_make_markers(track_t *track);
+FTS_API scomark_t *track_insert_marker(track_t *track, double time, fts_symbol_t type);
 
-extern void track_segment_get(track_t *self, double begin, double end, event_t **first, event_t **after);
-extern void track_segment_shift(track_t *self, event_t *first, event_t *after, double begin, double end, double shift);
-extern void track_segment_stretch(track_t *self, event_t *first, event_t *after, double begin, double end, double stretch);
-extern void track_segment_quantize(track_t *self, event_t *first, event_t *after, double begin, double end, double quantize);
-extern void track_move_events_at_client(track_t *self, event_t *first, event_t *after);
+FTS_API void track_segment_get(track_t *self, double begin, double end, event_t **first, event_t **after);
+FTS_API void track_segment_shift(track_t *self, event_t *first, event_t *after, double begin, double end, double shift);
+FTS_API void track_segment_stretch(track_t *self, event_t *first, event_t *after, double begin, double end, double stretch);
+FTS_API void track_segment_quantize(track_t *self, event_t *first, event_t *after, double begin, double end, double quantize);
+FTS_API void track_move_events_at_client(track_t *self, event_t *first, event_t *after);
 
 /** @name highlighting events in editor
  *  @{ */
@@ -123,7 +129,7 @@ extern void track_move_events_at_client(track_t *self, event_t *first, event_t *
  *
  * @param event	pointer to track event
  */
-extern void track_highlight_event(track_t *track, event_t *event);
+FTS_API void track_highlight_event(track_t *track, event_t *event);
 
 /**
  * Highlight events in track editor (up to 64) and set cursor to start
@@ -133,7 +139,7 @@ extern void track_highlight_event(track_t *track, event_t *event);
  * @param n	number of events in event array
  * @param event	array of track events
  */
-extern void track_highlight_events(track_t *track, int n, event_t *event[]);
+FTS_API void track_highlight_events(track_t *track, int n, event_t *event[]);
 
 /**
  * Set cursor to arbitrary time in track editor.
@@ -141,7 +147,7 @@ extern void track_highlight_events(track_t *track, int n, event_t *event[]);
  *
  * @param time	time to display in editor
  */
-extern void track_highlight_time(track_t *track, double time);
+FTS_API void track_highlight_time(track_t *track, double time);
 
 /**
  * Highlight events in track editor (up to 64) and set cursor to arbitrary time.
@@ -152,7 +158,7 @@ extern void track_highlight_time(track_t *track, double time);
  * @param n	number of events in event array
  * @param event	array of track events
  */
-extern void track_highlight_events_and_time(track_t *track, double time, 
+FTS_API void track_highlight_events_and_time(track_t *track, double time, 
 					    int n, event_t *event[]);
 
 /**
@@ -162,7 +168,7 @@ extern void track_highlight_events_and_time(track_t *track, double time,
  * @param event pointer to first event
  * @param event pointer to last event
  */
-extern void track_highlight_cluster(track_t *track, event_t *event, event_t *next);
+FTS_API void track_highlight_cluster(track_t *track, event_t *event, event_t *next);
 
 /**
  * Highlight one event in track editor, set cursor on its starting time.
@@ -171,12 +177,12 @@ extern void track_highlight_cluster(track_t *track, event_t *event, event_t *nex
  * @return next event in track
  * @param event	pointer to track event
  */
-extern event_t *track_highlight_and_next(track_t *track, event_t *event);
+FTS_API event_t *track_highlight_and_next(track_t *track, event_t *event);
 
 /** @}	end of doc group highlighting */
 
-extern void track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-extern void track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-extern void track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #endif  /* _SEQUENCE_TRACK_H_ */

@@ -55,8 +55,8 @@ enum scoob_propidx_enum
   scoob_propidx_channel
 };
 
-extern fts_class_t *scoob_class;
-extern enumeration_t *scoob_type_enumeration;
+FTS_API fts_class_t *scoob_class;
+FTS_API enumeration_t *scoob_type_enumeration;
 
 #define scoob_set_type(s, x) ((s)->type = (x))
 #define scoob_get_type(s) ((s)->type)

@@ -26,7 +26,7 @@
 #include <fts/fts.h>
 #include <fts/packages/sequence/sequence.h>
 
-extern fts_class_t *track_editor_class;
+FTS_API fts_class_t *track_editor_class;
 
 struct _track_editor
 { 
@@ -49,7 +49,7 @@ struct _track_editor
   fts_array_t columns; /* list of table column names */
 };
 
-extern void track_editor_upload(track_editor_t *this);
-extern void track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper);
+FTS_API void track_editor_upload(track_editor_t *this);
+FTS_API void track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper);
 
 #endif
