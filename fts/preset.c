@@ -114,7 +114,10 @@ preset_remove(fts_preset_t *this, const fts_atom_t *key)
       int i;
 
       for(i=0; i<this->n_objects; i++)
-	fts_object_release(clones[i]);
+	{
+	  if(clones[i] != NULL)
+	    fts_object_release(clones[i]);
+	}
 
       fts_free(clones);
       fts_hashtable_remove(&this->hash, key);      
@@ -131,22 +134,27 @@ preset_get_or_add(fts_preset_t *this, const fts_atom_t *key)
     {
       int i;
 
+      /* empty existing preset */
       clones = (fts_object_t **)fts_get_pointer(&value);
 
       for(i=0; i<this->n_objects; i++)
 	{
-	  fts_object_release(clones[i]);
-	  clones[i] = 0;
+	  if(clones[i] != NULL)
+	    {
+	      fts_object_release(clones[i]);
+	      clones[i] = NULL;
+	    }
 	}
     }
   else
     {
       int i;
 
+      /* create new preset */
       clones = (fts_object_t **)fts_malloc(sizeof(fts_object_t *) * this->n_objects);
       
       for(i=0; i<this->n_objects; i++)
-	clones[i] = 0;
+	clones[i] = NULL;
 
       fts_set_pointer(&value, (void *)clones);
       fts_hashtable_put(&this->hash, key, &value);
@@ -229,7 +237,8 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_class_t *type = fts_object_get_class(this->objects[i]);
 
 	      /* release old clone */
-	      fts_object_release(clones[i]);
+	      if(clones[i] != NULL)
+		fts_object_release(clones[i]);
 
 	      /* create new clone */
 	      clones[i] = fts_object_create(type, NULL, 0, 0);
@@ -282,10 +291,13 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
-	      fts_atom_t a;
-
-	      fts_set_object(&a, clones[i]);
-	      fts_send_message(this->objects[i], fts_s_set_from_instance, 1, &a);
+	      if(clones[i] != NULL)
+		{
+		  fts_atom_t a;
+		  
+		  fts_set_object(&a, clones[i]);
+		  fts_send_message(this->objects[i], fts_s_set_from_instance, 1, &a);
+		}
 	    }
 
 	  fts_outlet_int(o, 0, n);
@@ -307,7 +319,7 @@ preset_new_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
-  this->current = preset_get_or_add(this, at + 0);; 
+  this->current = preset_get_or_add(this, at + 0);
 }
 
 static void
@@ -368,9 +380,12 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	      /* set current clone index */
 	      preset_dumper_set_index(preset_dumper, i);
 	  
-	      /* dump clone messages */
-	      fts_set_object(&a, (fts_object_t *)preset_dumper);
-	      fts_send_message(clones[i], fts_s_dump_state, 1, &a);
+	      if(clones[i] != NULL)
+		{
+		  /* dump clone messages */
+		  fts_set_object(&a, (fts_object_t *)preset_dumper);
+		  fts_send_message(clones[i], fts_s_dump_state, 1, &a);
+		}
 	    }
 	}
 
@@ -419,6 +434,56 @@ preset_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     }
 
   fts_name_gui_method(o, 0, 0, 0, 0);
+}
+
+static void
+preset_redefine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_preset_t *this = (fts_preset_t *)o;
+  fts_preset_t *old = (fts_preset_t *)fts_get_object(at);
+
+  if(fts_object_get_class((fts_object_t *)old) == fts_preset_class)
+    {
+      int n = this->n_objects;
+      fts_iterator_t iterator;
+      fts_atom_t a;
+      int i;
+      
+      if(n > old->n_objects)
+	n = old->n_objects;
+      
+      fts_hashtable_get_keys(&old->hash, &iterator);      
+      
+      while(fts_iterator_has_more( &iterator))
+	{
+	  fts_object_t **this_clones = NULL;      
+	  fts_object_t **old_clones;
+	  fts_atom_t key;
+	  int i;
+      
+      /* get preset clones */
+	  fts_iterator_next( &iterator, &key);
+	  fts_hashtable_get(&old->hash, &key, &a);
+      
+	  old_clones = (fts_object_t **)fts_get_pointer(&a);
+
+	  /* copy old clones of matching class from old object */
+	  for(i=0; i<n; i++)
+	    {
+	      if(old_clones[i] != NULL && fts_object_get_class(old_clones[i]) == fts_object_get_class(this->objects[i]))
+		{
+		  if(this_clones == NULL)
+		    this_clones = preset_get_or_add(this, &key);
+	      
+		  this_clones[i] = old_clones[i];
+		  fts_object_refer(this_clones[i]);
+		}
+	    }
+	}
+
+      fts_set_int(&a, old->persistence);
+      preset_persistence(o, 0, 0, 1, &a);
+    }
 }
 
 /******************************************************
@@ -495,6 +560,8 @@ preset_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, preset_update_gui); 
 
   fts_class_message_varargs(cl, fts_s_dump, preset_dump);
+  fts_class_message_varargs(cl, fts_s_redefine, preset_redefine);
+
   fts_class_message_varargs(cl, sym_new_preset, preset_new_preset);
   fts_class_message_varargs(cl, sym_dump_mess, preset_dump_mess);
 

@@ -502,31 +502,25 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
   /* redefine object if not scheduled for removal */
   if(old_id != FTS_DELETE)
     {
-      
+      fts_patcher_t *patcher = fts_object_get_patcher(old);
       fts_symbol_t name = fts_object_get_name(old);
       fts_object_t *new;
-      
+      fts_atom_t a;
+
       /* unbind variables from old object */
       fts_object_unname(old);
       fts_object_unbind(old);
 
-      /* assure that the old object won't be destroyed when removed from patcher */
-      old->refcnt++;
-
-      /* remove the old object from the patcher */
-      if(old->patcher)
-	fts_patcher_remove_object(old->patcher, old);
-      
-      /* call deconstructor of old object */
-      if(old->refcnt == 1)
-	fts_class_get_deconstructor( fts_object_get_class( old))(old, fts_system_inlet, fts_s_delete, 0, 0);
-      
-      /* make the new object  */
-      new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
+      /* create new object */
+      new = fts_eval_object_description(patcher, ac, at);
       
       /* update the loading vm */
       fts_vm_substitute_object(old, new);
       
+      /* remove old from client and update list */
+      fts_object_unclient(old);
+      fts_update_reset(old);
+
       /* if new is an error object, assure that there are enough inlets and outlets for the connections */
       if (fts_object_is_error(new))
 	{
@@ -534,10 +528,8 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 	  fts_error_object_fit_outlet(new, old->n_outlets - 1);
 	}
       
-      /* move graphic properties from old to new object */
+      /* move graphic properties and connections from old to new object */
       fts_object_move_properties(old, new);
-      
-      /* move the connections from the old to the new object */
       fts_object_move_connections(old, new);
       
       /* set name of new object */
@@ -549,19 +541,13 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 	  fts_send_message(new, fts_s_name, 1, &a);
 	}
 
-      /* remove old from client and update list */
-      fts_object_unclient(old);
-      fts_update_reset(old);
-      
-      /* destroy or let live */
-      if(old->refcnt == 1)
-	fts_object_free(old);
-      else
-	{
-	  old->refcnt--;
-	  old->patcher = NULL;
-	}
+      /* try to rescue the old object state to the new one */
+      fts_set_object(&a, old);
+      fts_send_message(new, fts_s_redefine, 1, &a);
 
+      /* remove the old object from the patcher */
+      fts_patcher_remove_object(old->patcher, old);
+      
       /* upload new object if old object was uploaded */
       if(old_id != FTS_NO_ID)
 	{
