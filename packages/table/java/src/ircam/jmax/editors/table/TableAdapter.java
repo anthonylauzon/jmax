@@ -75,6 +75,22 @@ public class TableAdapter {
     return (int) ((oY-y)/itsYZoom);
   }
 
+  /**
+   * A method that allows setting the X zoom factor under the form
+   * of a rational number */
+  public void setXZoomFraction(int numerator, int denominator)
+  {
+    setXZoom(((float)numerator)/denominator);
+  }
+
+  /**
+   * A method that allows setting the Y zoom factor under the form
+   * of a rational number. Use this to avoid graphical undersampling. */
+  public void setYZoomFraction(int numerator, int denominator)
+  {
+    setYZoom(((float)numerator)/denominator);
+  }
+
   private void notifyZoomChanged(int whichOne, float value)
   {
     MaxVector listeners;

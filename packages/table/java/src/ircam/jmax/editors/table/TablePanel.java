@@ -36,6 +36,9 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //make the NORTH Status bar 
     prepareStatusBar();
 
+    //... the panel that will contain the toolbar
+    prepareToolbarPanel();
+
     //... the center panel (the sensible area)
     prepareCenterPanel();
 
@@ -45,8 +48,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //... the vertical position controller
     prepareVerticalScrollbar();
 
-    //... the panel that will contain the toolbar
-    prepareToolbarPanel();
 
     //... the widgets in the statusBar
     addWidgets();
@@ -118,12 +119,27 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   /** 
    * Set the initial parameters of the Adapter */
-  private void setOriginAndZoom(TableAdapter ta)
+  private void setOriginAndZoom(TableAdapter ta, TableDataModel tm)
   {
+
+    float fx = findZoomRatioClosestTo(((float)itsCenterPanel.getSize().width)/tm.getSize());
     ta.setYZoom(INITIAL_Y_ZOOM);
-    ta.setXZoom(INITIAL_X_ZOOM);
+    ta.setXZoom(fx);
     
     ta.setOY(INITIAL_Y_ORIGIN);
+
+  }
+
+  /**
+   * utility routine to find a float number under the form n/1 or 1/n closest
+   * to the given float. This kind of ratios are usefull to avoid graphical
+   * undersampling problems */
+  private float findZoomRatioClosestTo(float f)
+  {
+    if (f >1) 
+	return Math.round(f)-1;
+    else
+	return (float)(((float)1)/Math.ceil(1/f));
 
   }
 
@@ -238,7 +254,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     xLabel.setSize(15,InfoPanel.INFO_HEIGHT );
     xLabel.setVerticalAlignment(JLabel.CENTER);
     
-    currentXZoom = new JLabel(((int)(INITIAL_X_ZOOM*100))+"%");
+    currentXZoom = new JLabel(((int)(gc.getAdapter().getXZoom()*100))+"%");
     currentXZoom.setFont(new Font(currentXZoom.getFont().getName(), Font.BOLD, 10));
     currentXZoom.setBorder(new EtchedBorder());
     currentXZoom.setSize(40, InfoPanel.INFO_HEIGHT);
@@ -258,7 +274,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     yLabel.setSize(15,InfoPanel.INFO_HEIGHT );
     yLabel.setVerticalAlignment(JLabel.CENTER);
 
-    currentYZoom = new JLabel(((int)(INITIAL_Y_ZOOM*100))+"%");
+    currentYZoom = new JLabel(((int)(gc.getAdapter().getYZoom()*100))+"%");
     currentYZoom.setFont(new Font(currentYZoom.getFont().getName(), Font.BOLD, 10));
     currentYZoom.setBorder(new EtchedBorder());
     currentYZoom.setOpaque(true);
@@ -278,13 +294,20 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       public void increment()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  a.setXZoom(a.getXZoom()*2);
+	  if (a.getXZoom()>=1)
+	    a.setXZoom(a.getXZoom()+1);
+	  else
+	    a.setXZoom(a.getXZoom()*(1/(1-a.getXZoom())));
+
 	}
 
       public void decrement()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  a.setXZoom(a.getXZoom()/2);
+	  if (a.getXZoom()>1)
+	    a.setXZoom(a.getXZoom()-1);
+	  else
+	    a.setXZoom(a.getXZoom()*(1/(1+a.getXZoom())));
 	}
     };
 
@@ -293,13 +316,20 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       public void increment()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  a.setYZoom(a.getYZoom()*2);
+	  if (a.getYZoom()>=1)
+	    a.setYZoom(a.getYZoom()+1);
+	  else
+	    a.setYZoom(a.getYZoom()*(1/(1-a.getYZoom())));
+
 	}
 
       public void decrement()
 	{
 	  TableAdapter a = gc.getAdapter();
-	  a.setYZoom(a.getYZoom()/2);
+	  if (a.getYZoom()>1)
+	    a.setYZoom(a.getYZoom()-1);
+	  else
+	    a.setYZoom(a.getYZoom()*(1/(1+a.getYZoom())));
 	}
     };
 
@@ -324,7 +354,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   {
     itsCenterPanel = new CenterPanel();
  
-    itsCenterPanel.setBounds(10, itsStatusBar.getSize().height+10, PANEL_WIDTH, PANEL_HEIGHT);
+    itsCenterPanel.setBounds(toolbarPanel.getSize().width, InfoPanel.INFO_WIDTH, getSize().width-toolbarPanel.getSize().width/*PANEL_WIDTH*/, getSize().height-InfoPanel.INFO_HEIGHT/*PANEL_HEIGHT*/);
 
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setDoubleBuffered(true);
@@ -358,7 +388,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 	  }
       });
 
-      setOriginAndZoom(ta);
+      setOriginAndZoom(ta, tm);
       gc.setAdapter(ta);
       gc.setStatusBar(itsStatusBar);
     }
@@ -511,6 +541,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   static Vector tools;
   final static int PANEL_WIDTH = 500;
   final static int PANEL_HEIGHT = 300;
+
   InfoPanel itsStatusBar;
 
   Scrollbar itsPositionControl;
