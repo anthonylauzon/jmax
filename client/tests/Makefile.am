@@ -1,3 +1,3 @@
-SUBDIRS=cpp java
+SUBDIRS=cpp #java
 
 
