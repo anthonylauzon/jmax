@@ -292,8 +292,10 @@ public class JMaxApplication {
 	    System.err.println("JMaxApplication: IOEception quitting application "+e);
 	  }
     
-    FtsErrorStreamer.stopFtsErrorStreamer();
-
+    if (!singleInstance.isAttached)
+	{
+	    FtsErrorStreamer.stopFtsErrorStreamer();
+	}
     Runtime.getRuntime().exit(0);
   }
 
@@ -641,7 +643,7 @@ public class JMaxApplication {
 	System.out.println( "jMax starting server on "
 			    + ((hostName == null) ? "localhost" : hostName)
 			    + " via "+ connectionType + " connection"); 
-
+	
 	String ftsDir = (String)properties.get( "jmaxServerDir");
 	String ftsName = (String)properties.get( "jmaxServerName");
 
@@ -656,6 +658,13 @@ public class JMaxApplication {
 	if (connectionType.equals("pipe"))
 	  argv[argc++] = "--stdio";
 	    
+	// Support for project and configuration file given in command line
+	if ((String)properties.get("jmaxProject") != null)
+	  argv[argc++] = "--project="+((String)properties.get("jmaxProject"));
+
+	if ((String)properties.get("jmaxConfig") != null)
+	  argv[argc++] = "--config="+((String)properties.get("jmaxConfig"));
+
 	Object o = properties.get("attach");
 
 	FtsProcess fts = null;
@@ -664,7 +673,8 @@ public class JMaxApplication {
         if (o != null && ((String)o).equals( "true"))
 	  {
 	    System.out.println( "Attaching to FTS on host " + hostName);
-	    killFtsOnQuit = false;
+	    killFtsOnQuit = true;
+	    isAttached = true;
 	  }	
 	else
 	  {                 
@@ -783,6 +793,7 @@ public class JMaxApplication {
   private MaxVector toOpen;
   private boolean noConsole;
   private boolean killFtsOnQuit;
+    private boolean isAttached;
   private FtsPatcherObject rootPatcher;
   private JMaxClient clientObject;
   private FtsProject project;
