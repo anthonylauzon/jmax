@@ -79,6 +79,7 @@ public class FtsIntegerVector
   public void forceUpdate()
   {
     FtsServer.getServer().sendObjectMessage(object, -1, "update", null);
+    FtsServer.getServer().syncToFts();
   }
 
   void updateFromMessage(FtsMessage msg)
