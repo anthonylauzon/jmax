@@ -783,31 +783,34 @@ fts_dsp_graph_init(fts_dsp_graph_t *graph, int tick_size, double sample_rate)
 void
 fts_dsp_graph_compile(fts_dsp_graph_t *graph)
 {
-  /* ask ftl to start memory relocation */
-  ftl_mem_start_memory_relocation();/* should it be elsewhere ?? */
-
-  ftl_program_init(graph->chain);
-  ftl_program_set_current_subroutine(graph->chain, ftl_program_add_main(graph->chain));
-
-  fts_dsp_signal_init();
-
-  sig_zero = fts_dsp_signal_new(graph->tick_size, graph->sample_rate);
-  fts_dsp_signal_reference( sig_zero);
-
-  dsp_graph_reinit(graph);
-  dsp_graph_send_message(graph, fts_s_put_prologue);
-  dsp_graph_count_predecessors(graph);
-  dsp_graph_schedule(graph);
-
-  dsp_graph_check_loop(graph);
-  dsp_graph_send_message(graph, fts_s_put_epilogue);
-  
-  ftl_mem_end_memory_relocation();
-  
-  ftl_program_add_return(graph->chain);
-  ftl_program_compile(graph->chain);
-  
-  graph->status = status_compiled;
+  if(graph->status != status_compiled)
+  {
+    /* ask ftl to start memory relocation */
+    ftl_mem_start_memory_relocation();/* should it be elsewhere ?? */
+    
+    ftl_program_init(graph->chain);
+    ftl_program_set_current_subroutine(graph->chain, ftl_program_add_main(graph->chain));
+    
+    fts_dsp_signal_init();
+    
+    sig_zero = fts_dsp_signal_new(graph->tick_size, graph->sample_rate);
+    fts_dsp_signal_reference( sig_zero);
+    
+    dsp_graph_reinit(graph);
+    dsp_graph_send_message(graph, fts_s_put_prologue);
+    dsp_graph_count_predecessors(graph);
+    dsp_graph_schedule(graph);
+    
+    dsp_graph_check_loop(graph);
+    dsp_graph_send_message(graph, fts_s_put_epilogue);
+    
+    ftl_mem_end_memory_relocation();
+    
+    ftl_program_add_return(graph->chain);
+    ftl_program_compile(graph->chain);
+    
+    graph->status = status_compiled;
+  }
 }
 
 void 

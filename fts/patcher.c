@@ -1091,7 +1091,7 @@ patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
         for (c = fts_object_get_outlet_connections(p, outlet); c ; c = c->next_same_src)
           fts_object_upload( (fts_object_t *)c);
       }
-    }
+   }
 
     fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
   }
@@ -1869,21 +1869,31 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 patcher_delete_objects( fts_object_t *obj)
 {
-  if (obj == NULL)
-    return;
-
-  if(fts_dsp_is_active() && fts_is_dsp_object(obj))
-    fts_dsp_desactivate();
-
-  fts_update_reset(obj);
-  fts_client_release_object(obj);
-  fts_object_set_id(obj, FTS_DELETE);
-  
-  patcher_delete_objects( fts_object_get_next_in_patcher(obj) );
-
-  fts_object_remove_name(obj);
-  fts_object_remove_patcher_data(obj);
-  fts_object_release( obj);
+  if (obj != NULL)
+    {
+      int outlet;
+      
+      for (outlet = 0; outlet < fts_object_get_outlets_number(obj); outlet++)
+	{
+	  fts_connection_t *c;
+	  
+	  for (c = fts_object_get_outlet_connections(obj, outlet); c ; c = c->next_same_src)
+	    fts_client_release_object( (fts_object_t *)c);
+	}
+      
+      fts_update_reset(obj);
+      fts_client_release_object(obj);
+      fts_object_set_id(obj, FTS_DELETE);
+      
+      patcher_delete_objects( fts_object_get_next_in_patcher(obj) );
+      
+      if(fts_dsp_is_active() && fts_is_dsp_object(obj))
+	fts_dsp_desactivate();
+      
+      fts_object_remove_name(obj);
+      fts_object_remove_patcher_data(obj);
+      fts_object_release( obj);
+    }
 }
 
 static void
