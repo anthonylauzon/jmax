@@ -1580,34 +1580,49 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public void AlignSelectedObjects(String thePosition){
     ErmesObject aObject;
     int aValue;
+    Vector aConnVector = new Vector();
+    Vector aConnSetVector = new Vector();
     if(thePosition.equals("Top")){
       aValue = MinYSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
+	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
+	RemoveElementRgn(aObject);
 	aObject.MoveBy(0, aValue-aObject.GetY());
+	SaveOneElementRgn(aObject);
       }
     }
     else if(thePosition.equals("Left")){
       aValue = MinXSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
+	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
+	RemoveElementRgn(aObject);
 	aObject.MoveBy(aValue-aObject.GetX(), 0);
+	SaveOneElementRgn(aObject);
       }
     }
     else if(thePosition.equals("Bottom")){
       aValue = MaxYSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
+	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
+	RemoveElementRgn(aObject);
 	aObject.MoveBy(0, aValue-aObject.GetY());
+	SaveOneElementRgn(aObject);
       }
     }
     else if(thePosition.equals("Right")){
       aValue = MaxXSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
+	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
+	RemoveElementRgn(aObject);
 	aObject.MoveBy(aValue-aObject.GetX(), 0);
+	SaveOneElementRgn(aObject);
       }
     }
+    RerouteAlignedObjectConnections(aConnVector, aConnSetVector);
     repaint();
   }
   
@@ -1651,6 +1666,55 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     return aMaxX;
   }
 
+  private void RerouteAlignedObjectConnections(Vector theConnVector, Vector theConnSetVector){
+    ErmesConnection aConnection;
+    for(Enumeration e = theConnVector.elements(); e.hasMoreElements();) {
+      aConnection = (ErmesConnection)e.nextElement();
+      if(aConnection.itsAutorouted){
+	if(!aConnection.GetErrorState()) {
+	  RemoveConnRgn(aConnection);
+	  aConnection.GetConnectionSet().RemoveRgn(aConnection);
+	}
+	aConnection.Delete();
+	aConnection.PrepareToRouting();
+	aConnection.AutoRouting();
+	if(!aConnection.GetErrorState()){ 
+	  SaveConnectionRgn(aConnection);
+	  aConnection.GetConnectionSet().SaveRgn(aConnection);
+	}
+      }
+      else aConnection.PrepareToRouting();
+    }
+    itsHelper.UpdateConnectionSet(theConnSetVector);
+  }
+
+  private void ConnectionsToRouting(Vector theConnVector, Vector theConnSetVector, ErmesObject aObject){
+    ErmesObjInlet aInlet;
+    ErmesObjOutlet aOutlet;
+    ErmesConnection aConnection;
+    for(Enumeration e = aObject.GetInletList().elements(); e.hasMoreElements();) {
+      aInlet = (ErmesObjInlet)e.nextElement();
+      for(Enumeration e1 = aInlet.GetConnections().elements(); e1.hasMoreElements();) {
+	aConnection = (ErmesConnection)e1.nextElement();
+	if(!theConnVector.contains(aConnection)) {
+	  theConnVector.addElement(aConnection);
+	  if(!theConnSetVector.contains(aConnection.GetConnectionSet())) 
+	    theConnSetVector.addElement(aConnection.GetConnectionSet());
+	}
+      }
+    }
+    for(Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
+      aOutlet = (ErmesObjOutlet)e.nextElement();
+      for(Enumeration e1 = aOutlet.GetConnections().elements(); e1.hasMoreElements();) {
+	aConnection = (ErmesConnection)e1.nextElement();
+	if(!theConnVector.contains(aConnection)) {
+	  theConnVector.addElement(aConnection);
+	  if(!theConnSetVector.contains(aConnection.GetConnectionSet())) 
+	    theConnSetVector.addElement(aConnection.GetConnectionSet());
+	}
+      }
+    }
+  }
 }
 
 
