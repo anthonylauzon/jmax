@@ -1250,7 +1250,11 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 mat_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  mat_copy((mat_t *) from, (mat_t *) to);
+  mat_t *dest = (mat_t *) to;
+  mat_copy((mat_t *) from, dest);
+  
+  if(mat_editor_is_open(dest))
+    mat_upload(dest);
 }
 
 

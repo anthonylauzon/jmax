@@ -162,7 +162,11 @@ dict_copy(dict_t *org, dict_t *copy)
 static void
 dict_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  dict_copy((dict_t *)from, (dict_t *)to);
+  dict_t *dest =(dict_t *)to;
+  dict_copy((dict_t *)from, dest);
+
+  if(dict_editor_is_open(dest))
+    dict_upload(dest);
 }
 
 static void

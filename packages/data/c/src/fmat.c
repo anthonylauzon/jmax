@@ -332,7 +332,11 @@ fmat_copy(fmat_t *org, fmat_t *copy)
 static void
 fmat_copy_function(const fts_object_t *from, fts_object_t *to)
 {
-  fmat_copy((fmat_t *)from, (fmat_t *)to);
+  fmat_t *dest = (fmat_t *)to;
+  fmat_copy((fmat_t *)from, dest);
+  
+  if(fmat_editor_is_open(dest))
+    fmat_upload(dest);
 }
 
 static int
