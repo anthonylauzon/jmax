@@ -1449,18 +1449,27 @@ public class FtsServer  implements Runnable
 	break;
 	
       case FtsClientProtocol.fts_update_group_start_cmd:
-	
+
+	if (FtsServer.debug)
+	  System.err.println("< Update Group Start");
+
 	if (updateGroupDepth == 0)
 	  {
-	    updateGroupDepth++;
-
-	      if (updateGroupListeners != null)
-		for (int i = 0; i < updateGroupListeners.size(); i++)
-		  ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
+	    updateGroupDepth++;	
+	
+	    if (updateGroupListeners != null)
+	      for (int i = 0; i < updateGroupListeners.size(); i++)
+		((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
 	  }
+	else
+	  updateGroupDepth++;	
+	
 	break;
 
       case FtsClientProtocol.fts_update_group_end_cmd:
+	if (FtsServer.debug)
+	  System.err.println("< Update Group End");
+
 	updateGroupDepth--;
 
 	if (updateGroupDepth == 0)
