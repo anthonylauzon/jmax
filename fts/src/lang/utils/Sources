@@ -15,6 +15,7 @@ SOURCES = \
   floatfuns.c \
   hashtab.c \
   ramps.c \
+  ramp_vectors.c \
   units.c \
-  srconv.c \
-  wto.c
+  ieeewrap.c \
+  srconv.c

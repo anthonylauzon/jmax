@@ -20,142 +20,113 @@
  *
  *    defines:
  *
- *      fts_wapper_t ... wrapper registers
+ *      fts_wapper_t ... wrapper register
  *      
- *      void fts_wrapper_init(fts_wrapper_t *w);
- *        ... initializes internal wrapper registers
+ *      void fts_wrapper_set(fts_wrapper_t *w, double value, int bits);
+ *        ... sets value to be wrapped into 2 ^ bits
  *
- *      void fts_wrapper_set(fts_wrapper_t *w, double value, double range);
- *        ... sets value to be wrapped into range
+ *      int fts_wrapper_get_integer(fts_wrapper_t *w, int int_bits);
+ *        ... get integer part wrapped to 2 ^ int_bits
  *
- *      int fts_wrapper_get_integer(fts_wrapper_t *w, double int_range);
- *        ... get integer part (int_range must be a power of two)
- *
- *      double fts_wrapper_get_wrapped(fts_wrapper_t *w, double range);
- *        ... gets value wrapped into range
+ *      double fts_wrapper_wrap(fts_wrapper_t *w, int bits);
+ *        ... gets value wrapped into 2 ^ bits
  *
  */
-
-#define UNITBIT32 1572864. /* 3*2^19 -- bit 32 has value 1 */
 
 /* machine-dependent definitions of word order*/
 #if defined(FTS_HAS_BIG_ENDIAN)
 
-#define MSB_OFFSET 0    /* word offset to find MSB */
-#define LSB_OFFSET 1    /* word offset to find LSB */
-#define fts_int32 long  /* a data type that has 32 bits */
+#define MSB_OFFSET 0 /* word offset to find MSW */
+#define LSB_OFFSET 1 /* word offset to find LSW */
+typedef long fts_int32_t; /* a data type that has 32 bits */
 
 #elif defined(FTS_HAS_LITTLE_ENDIAN)
 
-#define MSB_OFFSET 1    /* word offset to find MSB */
-#define LSB_OFFSET 0    /* word offset to find LSB */
-#define fts_int32 long  /* a data type that has 32 bits */
+#define MSB_OFFSET 1 /* word offset to find MSW */
+#define LSB_OFFSET 0 /* word offset to find LSW */
+typedef long fts_int32_t; /* a data type that has 32 bits */
 
 #else
 
 #define MSB_OFFSET endianess_undefined
-#define LSB_OFFSET endianess_undefined
-#define fts_int32 int32_type_undefined
+#define LSB_OFFSET endianxess_undefined
+#define fts_int32_t int32_type_undefined
 
 #endif
+
+#define FTS_WRAP_NORMALIZED_MSW 1094189056 /* normalized MSW for wrapping into 0...1 */
+#define FTS_WRAP_NORMALIZED_MSW_BIT 1048576 /* add for each bit of range more (2 ^ 20) */
+
+#define UNITBIT32 ((double)1572864.0) /* 3*2^19 -- bit 32 has value 1 */
 
 typedef union _fts_wrap_fudge
 {
   double f;
-  fts_int32 i[2];
-} fts_wrap_fudge_t;
-
-typedef struct _fts_wrapper
-{
-  union _fts_wrap_fudge fudge;
-  fts_int32 normalized_msw;
+  fts_int32_t i[2];
 } fts_wrapper_t;
 
-#define fts_wrapper_init(wrapper, float_range) \
+/* get the normalized MSW for a certain range (2 ^ bits)
+   same as: fts_wrap_normalized_msw[bits]
+*/
+#define fts_wrap_normalized_msw(wrapper, bits) \
 ( \
-  (wrapper)->fudge.f = UNITBIT32 * (double)(float_range), \
-  (wrapper)->normalized_msw = (wrapper)->fudge.i[MSB_OFFSET] \
+  (wrapper)->f = (double)(value) + UNITBIT32 * (double)(1 << bits), \
+  (wrapper)->i[MSB_OFFSET] \
 )
 
-#define fts_wrapper_set_raw(wrapper, value) \
-  ((wrapper)->fudge.f = (value)) \
+/* set wrapper with value to be wrapped to the range of 2 ^ bits */
+#define fts_wrapper_set(wrapper, value, bits) \
+  ((wrapper)->f = (double)(value) + UNITBIT32 * (double)(1 << bits))
 
-#define fts_wrapper_set(wrapper, value, float_range)  \
-  fts_wrapper_set_raw((wrapper), (value) + UNITBIT32 * (double)(float_range))
+/* get value back from wrapper (remove offset) */
+#define fts_wrapper_get(wrapper, bits) \
+  ((wrapper)->f - UNITBIT32 * (double)(1 << bits))
 
-#define fts_wrapper_get_integer_raw(wrapper) \
-  ((wrapper)->fudge.i[MSB_OFFSET])
+/* set wrapper with value to be wrapped to the range of 2 ^ bits */
+#define fts_wrapper_frac_set(wrapper, value) \
+  ((wrapper)->f = (double)(value) + UNITBIT32)
 
-#define fts_wrapper_get_integer(wrapper, int_range) \
-  (wrapper)->fudge.i[MSB_OFFSET] & ((int_range) - 1)
+/* get value back from wrapper (remove offset) */
+#define fts_wrapper_frac_get(wrapper) \
+  ((wrapper)->f - UNITBIT32)
 
-#define fts_wrapper_get_wrapped(wrapper, float_range) \
+/* get integral part fit to the integer range */
+#define fts_wrapper_get_int(wrapper, int_bits) \
+  ((wrapper)->i[MSB_OFFSET] & ((1 << int_bits) - 1))
+
+/* wrap and get it */
+#define fts_wrapper_get_wrap(wrapper, bits) \
 ( \
-  (wrapper)->fudge.i[MSB_OFFSET] = (wrapper)->normalized_msw, \
-  (wrapper)->fudge.f - UNITBIT32 * (double)(float_range) \
+  (wrapper)->i[MSB_OFFSET] = FTS_WRAP_NORMALIZED_MSW + (bits) * FTS_WRAP_NORMALIZED_MSW_BIT, \
+  (wrapper)->f - UNITBIT32 * (double)(1 << bits) \
 )
 
-/* wrap value ones into a given range */
-#define fts_wrap(wrapper, value, range) \
+/* wrap to fractional part and get it */
+#define fts_wrapper_frac_get_wrap(wrapper) \
 ( \
-  (wrapper)->fudge.f = (value) + UNITBIT32 * (double)(range), \
-  (wrapper)->fudge.i[MSB_OFFSET] = (wrapper)->normalized_msw, \
-  (wrapper)->fudge.f - UNITBIT32 * (double)(range) \
+  (wrapper)->i[MSB_OFFSET] = FTS_WRAP_NORMALIZED_MSW, \
+  (wrapper)->f - UNITBIT32 \
 )
 
-/*************************************************************************
- *
- *  wrap and split (int, frac) floating point values in a certain range
- *
- *    defines:
- *
- *      void fts_wrap_value_init(fts_wrap_value_t *x, double init_value);
- *        ... initializes registers of wrapped value
- *
- *      int fts_wrap_value_get_int(fts_wrap_value_t *x, long range);
- *        ... gets interger part of x inside range (power of 2)
- *            (MUST be called BEFORE fts_wrap_value_get_frac())
- *
- *      double fts_wrap_value_get_frac(fts_wrap_value_t *x);
- *        ... gets fractional part of x 
- *
- *      double fts_wrap_value_get_wrapped(fts_wrap_value_t *x, long range);
- *        ... gets index wrapped into it's range
- *
- */
+#define fts_wrapper_copy(in_wrapper, out_wrapper) \
+  ((out_wrapper)->f = (in_wrapper)->f)
 
-typedef struct _fts_wrap_value
-{
-  double value;
-  fts_wrapper_t wrapper;
-} fts_wrap_value_t;
+#define fts_wrapper_incr(wrapper, incr) \
+  (wrapper)->f += (double)incr;
 
-#define fts_wrap_value_init(wv, init) \
+/* wrap value ones into a given range (2 ^ bits) */
+#define fts_wrap(wrapper, value, bits) \
 ( \
-  fts_wrapper_init(&(wv)->wrapper, 1.0), \
-  (wv)->value = (init) + UNITBIT32 \
+  (wrapper)->f = (double)(value) + UNITBIT32 * (double)(1 << bits), \
+  (wrapper)->i[MSB_OFFSET] = FTS_WRAP_NORMALIZED_MSW + (bits) * FTS_WRAP_NORMALIZED_MSW_BIT, \
+  (wrapper)->f - UNITBIT32 * (double)(1 << bits) \
 )
-  
-#define fts_wrap_value_incr(wv, incr) \
-  ((wv)->value += (incr))
 
-#define fts_wrap_value_set(wv) \
-  (fts_wrapper_set_raw(&(wv)->wrapper, (wv)->value))
-
-#define fts_wrap_value_set_with_offset(wv, offset) \
-  (fts_wrapper_set_raw(&(wv)->wrapper, (wv)->value) + (offset))
-
-#define fts_wrap_value_get_int(wv, range) \
-  (fts_wrapper_get_integer(&(wv)->wrapper, (range)))
-
-#define fts_wrap_value_get_frac(wv) \
-  (fts_wrapper_get_wrapped(&(wv)->wrapper, 1.0))
-
-#define fts_wrap_value_get_wrapped(wv, range) \
+#define fts_frac(wrapper, value) \
 ( \
-  fts_wrapper_init(&(wv)->wrapper, (range)), \
-  fts_wrapper_set(&(wv)->wrapper, (wv)->value - UNITBIT32, (range)), \
-  (wv)->value = fts_wrapper_get_wrapped(&(wv)->wrapper, (range)) \
+  (wrapper)->f = (double)(value) + UNITBIT32, \
+  (wrapper)->i[MSB_OFFSET] = FTS_WRAP_NORMALIZED_MSW, \
+  (wrapper)->f - UNITBIT32 \
 )
 
 #endif
