@@ -41,6 +41,7 @@ project_root.gif \
 question.gif \
 stop.gif \
 to_save.gif \
+to_save_selected.gif \
 tool_edit_mode.gif \
 tool_err.gif \
 tool_ext.gif \
@@ -50,6 +51,7 @@ tool_out.gif \
 tool_patcher.gif \
 tool_text.gif \
 tool_up.gif \
+tool_up_selected.gif \
 tux.gif \
 warning.gif 
 

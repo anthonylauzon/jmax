@@ -33,7 +33,9 @@ public class JMaxIcons {
   public static final ImageIcon lockMode = loadIcon( "tool_lock_mode.gif");
   public static final ImageIcon editMode = loadIcon( "tool_edit_mode.gif");
   public static final ImageIcon up = loadIcon( "tool_up.gif");
+  public static final ImageIcon upSelected = loadIcon( "tool_up_selected.gif");
   public static final ImageIcon toSave = loadIcon( "to_save.gif");
+  public static final ImageIcon toSaveSelected = loadIcon( "to_save_selected.gif");
   public static final ImageIcon dspOn = loadIcon( "dsp_on.gif");
   public static final ImageIcon dspOff = loadIcon( "dsp_off.gif");
   public static final ImageIcon dspUndef = loadIcon( "dsp_undef.gif");
