@@ -24,7 +24,8 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
+
+import ircam.jmax.*;
 
 /**
  * This class is used to show the FTS standard error by listening on
@@ -98,9 +99,10 @@ class FtsErrorStreamer implements Runnable
 		out.println("FTS crashed.\n");
 		System.out.println( "FTS crashed\n");
 
-		JOptionPane.showMessageDialog(null, "jMax server connection lost! \n Quit user interface.", 
-					  "Fatal Error", JOptionPane.ERROR_MESSAGE); 
-		Runtime.getRuntime().exit(0);
+		/*JOptionPane.showMessageDialog(null, "jMax server connection lost! \n Quit user interface.", 
+					      "Fatal Error", JOptionPane.ERROR_MESSAGE); 
+					      Runtime.getRuntime().exit(0);*/
+		MaxApplication.ftsQuitted();
 	      }
 	    else
 	      {

@@ -513,6 +513,18 @@ public class MaxApplication extends Object
     Runtime.getRuntime().exit(0);
   }
 
+  private static boolean shown = false;
+  public static void ftsQuitted()
+  {
+      if(!shown)
+	  {
+	      shown = true;
+	      JOptionPane.showMessageDialog(null, "jMax server connection lost! \n Quit user interface.", 
+					    "Fatal Error", JOptionPane.ERROR_MESSAGE); 
+	      Runtime.getRuntime().exit(0);
+	  }
+  } 
+
     // Scripting interface
 
     // The theMaxApplication is an empty object since everything in
