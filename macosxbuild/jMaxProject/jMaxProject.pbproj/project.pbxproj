@@ -383,6 +383,30 @@
 			settings = {
 			};
 		};
+		F59FA8FA035350B401664092 = {
+			isa = PBXFileReference;
+			name = ObjectControlPanel.java;
+			path = ../../java/src/ircam/jmax/toolkit/ObjectControlPanel.java;
+			refType = 2;
+		};
+		F59FA8FB035350B401664092 = {
+			fileRef = F59FA8FA035350B401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F59FA8FC0353512801664092 = {
+			isa = PBXFileReference;
+			name = StandardControlPanel.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/objects/StandardControlPanel.java;
+			refType = 2;
+		};
+		F59FA8FD0353512801664092 = {
+			fileRef = F59FA8FC0353512801664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5A37B8F0327C67501664092 = {
 			fileRef = F8F010EB028D890E01664092;
 			isa = PBXBuildFile;
@@ -13955,6 +13979,7 @@
 				F880FE2F0283013E01664092,
 				F880FE300283013E01664092,
 				F880FE310283013E01664092,
+				F59FA8FC0353512801664092,
 			);
 			isa = PBXGroup;
 			name = objects;
@@ -14487,6 +14512,7 @@
 				F880FEA20283013E01664092,
 				F880FEA30283013E01664092,
 				F880FEA40283013E01664092,
+				F59FA8FA035350B401664092,
 				F880FEA50283013E01664092,
 				F880FEA60283013E01664092,
 				F880FEA70283013E01664092,
@@ -15407,6 +15433,8 @@
 				F8B73FC502C0DF1A01664092,
 				F8B73FC602C0DF1A01664092,
 				F8B73FC702C0DF1A01664092,
+				F59FA8FB035350B401664092,
+				F59FA8FD0353512801664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -19385,7 +19413,6 @@
 				F8DC5E8B028683C301664092,
 				F8DC5E8C028683C301664092,
 				F8DC5E8D028683C301664092,
-				F8DC5E8E028683C301664092,
 				F8DC5E8F028683C301664092,
 				F8DC5E90028683C301664092,
 				F8DC5E91028683C301664092,
@@ -19501,7 +19528,6 @@
 				F8DC5E63028683C301664092,
 				F8DC5E64028683C301664092,
 				F8DC5E65028683C301664092,
-				F8DC5E66028683C301664092,
 				F8DC5E67028683C301664092,
 				F8DC5E68028683C301664092,
 				F8DC5E69028683C301664092,
@@ -19677,12 +19703,6 @@
 			isa = PBXFileReference;
 			name = Monitor.java;
 			path = ../../packages/guiobj/java/ircam/jmax/guiobj/Monitor.java;
-			refType = 2;
-		};
-		F8DC5E66028683C301664092 = {
-			isa = PBXFileReference;
-			name = ObjectControlPanel.java;
-			path = ../../packages/guiobj/java/ircam/jmax/guiobj/ObjectControlPanel.java;
 			refType = 2;
 		};
 		F8DC5E67028683C301664092 = {
@@ -19909,12 +19929,6 @@
 		};
 		F8DC5E8D028683C301664092 = {
 			fileRef = F8DC5E65028683C301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8DC5E8E028683C301664092 = {
-			fileRef = F8DC5E66028683C301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
