@@ -393,11 +393,12 @@ fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
 {
   fts_atom_t n;
 
-  fts_set_symbol(&n, required_pkg);
-  pkg->packages = fts_list_append(pkg->packages, &n);
-
   /* provoke the loading the package */
-  fts_package_load(required_pkg);
+  if(NULL != fts_package_load(required_pkg))
+  {
+    fts_set_symbol(&n, required_pkg);
+    pkg->packages = fts_list_append(pkg->packages, &n);    
+  }
 }
 
 void 
