@@ -35,6 +35,8 @@ FTS_API fts_class_t *fts_tuple_class;
 
 #define fts_tuple_clear(t) (fts_array_clear(&(t)->args))
 #define fts_tuple_set_size(t, n) (fts_array_set_size(&(t)->args, (n)))
+
+/* the following set/prepend/append functions refer the added elements */
 #define fts_tuple_set(t, n, a) (fts_array_set(&(t)->args, (n), (a)))
 
 #define fts_tuple_prepend(t, n, a) (fts_array_prepend(&(t)->args, (n), (a)))
