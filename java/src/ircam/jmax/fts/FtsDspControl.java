@@ -146,9 +146,7 @@ import ircam.jmax.fts.*;
 
   public void setDspOn(Boolean value)
   {
-    dspOn = value;
-
-    remoteCall( DSP_ON, (dspOn.booleanValue() ? 1 : 0));
+      remoteCall( DSP_ON, (value.booleanValue() ? 1 : 0));
   }
 
   public void dspPrint()

@@ -56,15 +56,6 @@ public class DefaultHelpMenu extends EditorMenu
 	 initDone = true;
 	 numEntries++;
        }
-    
-    addMenuListener(new MenuListener(){
-	    public void menuSelected(MenuEvent e)
-	    {
-		update();
-	    }
-	    public void menuDeselected(MenuEvent e){}
-	    public void menuCanceled(MenuEvent e){}
-	});
   }
 
   public void init()
@@ -80,7 +71,7 @@ public class DefaultHelpMenu extends EditorMenu
     }   
   }
     
-  public void update()
+  public void updateMenu()
   {
       if(FtsHelpPatchTable.getNumSummaries() > numEntries) 
       {	      

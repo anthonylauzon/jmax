@@ -47,15 +47,6 @@ import ircam.jmax.toolkit.menus.*;
 
 public class OptionsMenu extends EditorMenu
 {
-  class OptionsMenuListener implements MenuListener
-  {
-    public void menuSelected(MenuEvent e){
-      updateMenu();
-    }
-    public void menuDeselected(MenuEvent e){}
-    public void menuCanceled(MenuEvent e){}
-  }
-
   JMenuItem settingsItem;
   JMenuItem viewItem;
 
@@ -71,11 +62,9 @@ public class OptionsMenu extends EditorMenu
 
     settingsItem          = add(Actions.settingsAction, "Settings...");
     viewItem = add(Actions.viewAction, "Table view");
-
-    addMenuListener(new OptionsMenuListener());
   }
 
-  private void updateMenu()
+  public void updateMenu()
   {
     if(((ExplodePanel)container.getEditor()).getCurrentView()==ExplodePanel.PIANOROLL_VIEW){
       viewItem.setText("Table View");

@@ -196,74 +196,74 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public void paint( Graphics g) 
   {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
+      int x = getX();
+      int y = getY();
+      int w = getWidth();
+      int h = getHeight();
     
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
-    /* Paint the box */
+      // Paint the box 
 
-    if( !isSelected()) 
+      if( !isSelected()) 
       g.setColor( Settings.sharedInstance().getUIColor());
-    else
+      else
       g.setColor( Settings.sharedInstance().getUIColor().darker());
+      
+      g.fill3DRect( x+1, y+1, w-2,  h-2, true);
 
-    g.fill3DRect( x+1, y+1, w-2,  h-2, true);
-
-    /* Paint the throttle */
-    g.setColor( Color.black);  
-    int pixels, pos;
-    if(orientation==VERTICAL_OR)
-    {
-      pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-      pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
-      //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/(rangeMax - rangeMin);
-
-      g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
-    }
-    else
-    {
-      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
-      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
-    }
-    super.paint(g);
-
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      // Paint the throttle 
+      g.setColor( Color.black);  
+      int pixels, pos;
+      if(orientation==VERTICAL_OR)
+      {
+	  pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	  pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+	  //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/(rangeMax - rangeMin);
+      
+	  g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+      }
+      else
+	  {
+	      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+	      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+	  }
+      super.paint(g);
+      
+      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   }
-
+  
   public void updatePaint(Graphics g) 
   {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
+      int x = getX();
+      int y = getY();
+      int w = getWidth();
+      int h = getHeight();
 
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+      
+      /* Paint the box */ 
+      g.setColor( Settings.sharedInstance().getUIColor());
+      g.fillRect( x+2, y+2, w-4,  h-4);
 
-    /* Paint the box */
-    g.setColor( Settings.sharedInstance().getUIColor());
-    g.fillRect( x+2, y+2, w-4,  h-4);
-
-    /* Paint the throttle */
-    g.setColor( Color.black);
-    int pixels, pos;
-    if(orientation==VERTICAL_OR)
-    {
-      pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-      pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
-      g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
-    }
-    else
-    {
-      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
-      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
-      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
-    }
-
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      /* Paint the throttle */ 
+      g.setColor( Color.black);
+      int pixels, pos;
+      if(orientation==VERTICAL_OR)
+	  {
+	      pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	      pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+	      g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
+	  }
+      else
+	  {
+	      pixels = w - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
+	      pos = x + UP_OFFSET + (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
+	      g.drawRect(pos, y + THROTTLE_LATERAL_OFFSET, THROTTLE_HEIGHT - 1, h - 2*THROTTLE_LATERAL_OFFSET - 1); 
+	  }
+      
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   }
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)

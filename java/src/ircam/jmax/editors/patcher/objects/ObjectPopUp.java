@@ -61,6 +61,7 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
 
     add(Actions.bringToFrontObjectAction, "Bring To Front");
     add(Actions.sendToBackObjectAction, "Send To Back");
+    //add(Actions.inspectObjectAction, "Inspect");
     pack();
 
     addPopupMenuListener(this);

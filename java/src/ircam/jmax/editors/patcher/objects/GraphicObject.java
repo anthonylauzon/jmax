@@ -36,6 +36,7 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
+import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
 import ircam.jmax.editors.patcher.actions.*;
@@ -549,6 +550,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void inspect() 
   {
+      InspectDialog.inspect(this);
   }
 
   // Add one to cope with the inlet/outlets

@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -25,34 +25,26 @@
 
 package ircam.jmax.toolkit.actions;
 
+import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-/** This class define a set of static variables 
- *  containing all the standard actions used for the
- *  patcher editor; please notes that actions objects are
- *  shared between all the editor instances.
- */
-
-public class DefaultActions
+public class DSPAction extends EditorAction
 {
-  public static EditorAction newAction      = new NewAction();
-  public static EditorAction openAction     = new OpenAction();
-  public static EditorAction closeAction    = new CloseAction();
-  public static EditorAction statisticsAction = new StatisticsAction();
-  public static EditorAction dspAction     = new DSPAction();
-  public static EditorAction quitAction     = new QuitAction();
+  public void doAction(EditorContainer container)
+  {
+      FtsDspControl control = container.getEditor().getFts().getDspController();
+      boolean on = control.getDspOn().booleanValue();
+      control.setDspOn(new Boolean(!on));
+  }
 }
-
-
-
-
-
-
-
-
-
 
 
 

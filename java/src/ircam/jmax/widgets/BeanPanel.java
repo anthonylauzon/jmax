@@ -192,7 +192,7 @@ public class BeanPanel extends JPanel {
 
     try
       {
-	descriptors = Introspector.getBeanInfo( beanInstance.getClass() ).getPropertyDescriptors();
+	  descriptors = Introspector.getBeanInfo( beanInstance.getClass() ).getPropertyDescriptors();
       }
     catch ( IntrospectionException e)
       {

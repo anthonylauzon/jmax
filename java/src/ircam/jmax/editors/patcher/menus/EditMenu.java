@@ -48,22 +48,6 @@ import ircam.jmax.toolkit.menus.*;
 
 public class EditMenu extends EditorMenu
 {
-  class EditMenuListener implements MenuListener
-  {
-    public void menuSelected(MenuEvent e)
-    {
-      updateMenu();
-    }
-
-    public void menuDeselected(MenuEvent e)
-    {
-    }
-
-    public void menuCanceled(MenuEvent e)
-    {
-    }
-  }
-
   ErmesSketchPad sketch;
 
   JMenuItem cutItem;
@@ -116,11 +100,9 @@ public class EditMenu extends EditorMenu
     addSeparator();
 
     lockItem = add(Actions.lockAction, "Lock", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_E);
-
-    addMenuListener(new EditMenuListener());
   }
 
-  private void updateMenu()
+  public void updateMenu()
   {
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();

@@ -27,14 +27,12 @@ package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
-/*****************/
-//jdk117-->jdk1.3//
 import java.awt.geom.*;
-/****************/
 import java.awt.image.*;
 import java.awt.image.ImageObserver;
 import java.util.*;
 import javax.swing.*;
+import java.beans.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
@@ -57,7 +55,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     private static final int DEFAULT_FLASH_DURATION = 125;
 
     private static Hashtable imageTable = new Hashtable();
-
+ 
     boolean flashing = false;
     boolean isResizing = false;
     int flashColorIndex = ColorPopUpMenu.getColorIndex("yellow")+1;  
@@ -73,7 +71,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
 	if (width == -1)
 	    setWidth( DEFAULT_WIDTH);
 	else if (width <= MINIMUM_WIDTH)
-	    setWidth( MINIMUM_WIDTH);
+	    setWidth( MINIMUM_WIDTH);    
     }
 
     // redefined from base class

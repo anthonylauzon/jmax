@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
@@ -42,10 +43,26 @@ import ircam.jmax.toolkit.actions.*;
 
 public abstract class EditorMenu extends JMenu					 
 {
+    
   public EditorMenu(String name)
   {
     super(name);
     setDelay(0); // ?? Usefull ?
+
+    addMenuListener(new MenuListener(){
+	    public void menuSelected(MenuEvent e)
+	    {
+		updateMenu();
+	    }
+	
+	    public void menuDeselected(MenuEvent e)
+	    {
+	    }
+
+	    public void menuCanceled(MenuEvent e)
+	    {
+	    }
+	});
   }
 
   public JMenuItem add(EditorAction action, String name, int modifiers, int mnemonic)
@@ -106,7 +123,9 @@ public abstract class EditorMenu extends JMenu
     insert(item, position);
 
     return item;
-  }
+  } 
+    
+  public void updateMenu(){};
 }
 
 

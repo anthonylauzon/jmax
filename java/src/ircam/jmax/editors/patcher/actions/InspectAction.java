@@ -46,7 +46,7 @@ public class InspectAction extends EditorAction
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
-	    { object.inspect();}});
+		{ object.inspect();}});
       }
   }
 }

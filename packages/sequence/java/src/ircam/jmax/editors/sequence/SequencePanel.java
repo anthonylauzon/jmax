@@ -215,7 +215,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackPanel.remove(verticalGlue);
 	TrackContainer trackContainer = new TrackContainer(track, teditor);
 	trackContainer.setBorder(new EtchedBorder()); 
-	trackContainer.setMaximumSize(new Dimension(trackContainer.getMaximumSize().width, teditor.getDefaultHeight()));//?????
+	
+	//trackContainer.setMaximumSize(new Dimension(trackContainer.getMaximumSize().width, teditor.getDefaultHeight()));//?????
 
 	trackPanel.add(trackContainer);
 	trackPanel.add(verticalGlue);
@@ -247,10 +248,12 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 		    setSize(dim.width, Sequence.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
 	    else
 		if(dim.height + tcHeight <= Sequence.MAX_HEIGHT)
-		    itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
+		    itsContainer.getFrame().
+			setSize(dim.width, dim.height + tcHeight);
 		else 
 		    if(dim.height < Sequence.MAX_HEIGHT)
-			itsContainer.getFrame().setSize(dim.width, Sequence.MAX_HEIGHT);
+			itsContainer.getFrame().
+			    setSize(dim.width, Sequence.MAX_HEIGHT);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////

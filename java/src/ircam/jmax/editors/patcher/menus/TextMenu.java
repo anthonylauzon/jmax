@@ -67,22 +67,6 @@ public class TextMenu extends EditorMenu
 
     ErmesSketchPad sketch;
 
-    class TextMenuListener implements MenuListener
-    {
-	public void menuSelected(MenuEvent e)
-	{
-	    updateMenu();
-	}
-	
-	public void menuDeselected(MenuEvent e)
-	{
-	}
-
-	public void menuCanceled(MenuEvent e)
-	{
-	}
-    }
-
   public TextMenu(ErmesSketchPad sketch)
   {
     super("Text");
@@ -172,8 +156,6 @@ public class TextMenu extends EditorMenu
     automaticFitItem.addActionListener(Actions.setAutomaticFitAction);
 
     fitItem = add(Actions.fitToTextAction, "Fit To Text", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_T);
-
-    addMenuListener(new TextMenuListener());
   }
 
     /*private void FillBaseSizesMenu( JMenu menu)
@@ -253,7 +235,7 @@ public class TextMenu extends EditorMenu
     For the moment, still compare the font names.
     */
 
-  private void updateMenu()
+  public void updateMenu()
   {
     JRadioButtonMenuItem item;
     boolean sizeExist;

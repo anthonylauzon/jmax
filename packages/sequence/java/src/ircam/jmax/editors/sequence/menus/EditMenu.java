@@ -47,22 +47,6 @@ import ircam.jmax.toolkit.menus.*;
 
 public class EditMenu extends EditorMenu
 {
-  class EditMenuListener implements MenuListener
-  {
-    public void menuSelected(MenuEvent e)
-    {
-      updateMenu();
-    }
-
-    public void menuDeselected(MenuEvent e)
-    {
-    }
-
-    public void menuCanceled(MenuEvent e)
-    {
-    }
-  }
-
   EditorContainer container;
 
   JMenuItem undoItem;
@@ -89,11 +73,9 @@ public class EditMenu extends EditorMenu
     copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
     pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
     duplicateItem = add(Actions.duplicateAction, "Duplicate", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_D);
-
-    addMenuListener(new EditMenuListener());
   }
 
-  private void updateMenu()
+  public void updateMenu()
   {
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();

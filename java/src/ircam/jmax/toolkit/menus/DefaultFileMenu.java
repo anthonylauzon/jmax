@@ -31,6 +31,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 import ircam.jmax.utils.*;
@@ -39,6 +40,7 @@ import ircam.jmax.utils.*;
 
 public class DefaultFileMenu extends EditorMenu
 {
+  JMenuItem dspMenuItem;
   public DefaultFileMenu()
   {
     super("File");
@@ -53,8 +55,17 @@ public class DefaultFileMenu extends EditorMenu
     add(DefaultActions.closeAction, "Close", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_W);
 
     addSeparator();
-
+    
+    dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_SPACE);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
+  }
+
+  public void updateMenu()
+  {
+      boolean dspOn = MaxApplication.getFts().getDspController().getDspOn().booleanValue();
+      
+      if(dspOn) dspMenuItem.setText("Desactivate DSP");
+      else dspMenuItem.setText("Activate DSP");
   }
 }
 

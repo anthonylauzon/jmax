@@ -161,7 +161,7 @@ public class KeyEventsManager implements KeyListener
       }
   }
 
-  public void keyTyped(KeyEvent e){ }
+  public void keyTyped(KeyEvent e){}
     
 
   ////////////// Producers /////////////////////

@@ -329,6 +329,20 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
     //fix bug 170
     aFtsPatcherData.getDocument().setSaved(true);
+  
+    ///////////////////////////////////////////////////////////////
+    /*int width = ScaleTransform.getInstance().scaleX(aFtsPatcherData.getWindowWidth());
+      int height = ScaleTransform.getInstance().scaleY(aFtsPatcherData.getWindowHeight());
+    
+      if (width <= 0)
+      width = ScaleTransform.getInstance().scaleX(480);
+      
+      if (height <= 0)
+      height =  ScaleTransform.getInstance().scaleY(500);
+
+      setSize(width, height);
+      setPreferredSize(new Dimension(width, height));*/
+    //////////////////////////////////////////////////////////////
   }
 
   //--------------------------------------------------------
@@ -1013,11 +1027,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     showMessage(message);
 
     stopTextEditing();
-    /*****************/
-    //jdk117-->jdk1.3//
-    //setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
     setCursor(Cursors.get(description));     
-    /*****************/
 
     engine.setTopInteraction(Interactions.addModeInteraction);    
   }

@@ -172,6 +172,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     // Make it visible, at the end
     //setVisible( true);
+    //pack();
   }
 
   private final void makeTitle()

@@ -290,14 +290,11 @@ public class EditField extends JTextArea implements FocusListener
     if (owner != null)
       sketch.stopTextEditing();
   }
-  /*****************/
-  //jdk117-->jdk1.3//
   public void paintComponent(Graphics g)
   {
       ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
       super.paintComponent(g);
   }
-  /*****************/
 }
 
 

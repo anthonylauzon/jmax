@@ -244,9 +244,8 @@ static void fts_dsp_control_remote_dsp_on( fts_data_t *d, int ac, const fts_atom
   if ((ac == 1) && fts_is_int(at))
     {
       fts_dsp_control_t *this = (fts_dsp_control_t *)d;
-      int on;
 
-      fts_param_set_by(fts_s_dsp_on, at, this);
+      fts_param_set(fts_s_dsp_on, at);
     }
 }
 
@@ -303,3 +302,8 @@ void fts_dsp_control_config( void)
   fts_data_class_define_function( fts_dsp_control_data_class, DSP_CONTROL_SET_CHECK_NAN,
 				  fts_dsp_control_set_check_nan);
 }
+
+
+
+
+
