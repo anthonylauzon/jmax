@@ -94,21 +94,24 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       && (fts_get_class(at) == fts_udpstream_class))
   {
     self->udp_stream = (fts_bytestream_t*)fts_get_object(at);
-    fts_object_refer((fts_object_t*)self->udp_stream);
   }
   else
   {
     /* create udp stream */
     self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
-    if (self->udp_stream != NULL)
+    if (self->udp_stream == NULL)
     {
-      fts_object_refer((fts_object_t*)self->udp_stream);
-    }
-    else
-    {
-      fts_object_error(o, "Cannot create udp stream component");
+      fts_object_error(o, "Cannot create udp stream component (%s)", fts_get_error());
     }
   }
+
+  /* check if bytestream is an input one */
+  if (!fts_bytestream_is_input(self->udp_stream))
+  {
+    fts_object_error(o, "udpreceive need an input udpstream");
+    return;
+  }
+  fts_object_refer((fts_object_t*)self->udp_stream);
 
   /* 1 outlet for sending received message */
   fts_object_set_outlets_number(o, 1);
@@ -119,8 +122,14 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udpreceive_t *self = (udpreceive_t *)o;
-  fts_object_release((fts_object_t*)self->binary_protocol);
-  fts_object_release((fts_object_t*)self->udp_stream);
+  if (self->binary_protocol != NULL)
+  {
+    fts_object_release((fts_object_t*)self->binary_protocol);
+  }
+  if (self->udp_stream != NULL)
+  {
+    fts_object_release((fts_object_t*)self->udp_stream);
+  }
 }
 
 static void udpreceive_instantiate(fts_class_t *cl)
