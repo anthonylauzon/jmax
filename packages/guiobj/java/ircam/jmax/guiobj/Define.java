@@ -42,6 +42,9 @@ public class Define extends Editable implements FtsObjectErrorListener{
 
   int typeWidth = 0;
 
+  private String varName = null;
+  private int varWidth = 0;
+
   public Define( FtsDefineObject theFtsObject) 
   {
     super( theFtsObject);
@@ -80,6 +83,27 @@ public class Define extends Editable implements FtsObjectErrorListener{
     return ((FtsDefineObject)ftsObject).getExpression();
   }
 
+  public void setCurrentName( String name)
+  {
+    if( name.equals(""))
+      {
+	varName = "";
+	varWidth = 0;
+      }
+    else
+      {
+	varName = name;	
+	varWidth = getFontMetrics().stringWidth( varName) + 6;
+      }
+
+    redraw();
+  }
+
+  public String getName()
+  {
+    return varName;
+  }
+
   // redefined from base class
   public void setWidth( int theWidth)
   {
@@ -91,11 +115,30 @@ public class Define extends Editable implements FtsObjectErrorListener{
     super.setWidth( theWidth);
   }
 
+  public void setWidthToText(String text)
+  {
+    int space;
+    if( text.equals(""))
+      space = getFontMetrics().stringWidth("    ");
+    else
+      space = getFontMetrics().stringWidth(" ");
+    
+    forceWidth(  getTextHeightOffset() + getTypeWidth() + space + getFontMetrics().stringWidth( text) + 6 + getVariableWidth());
+  }
+
   public void setFont( Font theFont)
   {
     super.forceFont( theFont);
     boldFont = getFont().deriveFont( Font.BOLD | Font.ITALIC);
     boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
+    
+    if( varName != null && !varName.equals(""))
+    {
+      int oldw = getWidth() - varWidth;
+      varWidth = getFontMetrics().stringWidth( varName) + 6;
+    }
+    
+    typeWidth = boldFontMetrics.stringWidth( ((FtsDefineObject)ftsObject).getType());
     
     forceWidth( getWidth());
     forceHeight( getFontMetrics().getHeight() + getTextHeightOffset());
@@ -108,6 +151,20 @@ public class Define extends Editable implements FtsObjectErrorListener{
     super.setCurrentFont( font);
     boldFont = font.deriveFont( Font.BOLD | Font.ITALIC);
     boldFontMetrics = itsSketchPad.getFontMetrics( boldFont);
+    
+    typeWidth = boldFontMetrics.stringWidth( ((FtsDefineObject)ftsObject).getType());
+    
+    if( varName != null)
+    {
+      int oldw = getWidth() - varWidth;
+      varWidth = getFontMetrics().stringWidth( varName) + 6;
+      setWidth( oldw + varWidth);
+    }
+  }
+
+  public int getVariableWidth()
+  {
+    return varWidth;
   }
 
   public void redefine( String text) 
@@ -144,14 +201,9 @@ public class Define extends Editable implements FtsObjectErrorListener{
     redraw();
   } 
     
-  public void validChanged( boolean valid) 
-  {
-    redraw();
-  } 
-
   public void fitToText()
   {
-    forceWidth(  getTextHeightOffset() + getTypeWidth() + getFontMetrics().stringWidth(" ") + getFontMetrics().stringWidth( ((FtsDefineObject)ftsObject).getExpression()) + 6);
+    setWidthToText( ((FtsDefineObject)ftsObject).getExpression());
   }
 
   public Dimension getMinimumSize() 
@@ -188,7 +240,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
     
   public Color getTextForeground()
   {
-    if( ((FtsDefineObject)ftsObject).isValid())
+    if( !ftsObject.isError())
       return Color.black;
     else
       {
@@ -237,7 +289,7 @@ public class Define extends Editable implements FtsObjectErrorListener{
   {
     int x = getX();
     int y = getY();
-    int w = getWidth();
+    int w = getWidth() - varWidth;
     int h = getHeight();
 
     g.setColor( getTextBackground());
@@ -256,7 +308,34 @@ public class Define extends Editable implements FtsObjectErrorListener{
 	g.setFont( getFont());
 	g.drawString( ((FtsDefineObject)ftsObject).getExpression(), x + getTextXOffset(), y + bottom);
       }
+    
+        /* draw variable name */
+
+    if( varName!= null)
+      {	  
+        if( isSelected())
+          g.setColor( selVarColor);
+        else
+          g.setColor( varColor);
+
+	g.fillRect( x+w, y+1, varWidth-1, h-2);
+
+        if( isSelected())
+          g.setColor( Settings.sharedInstance().getObjColor().darker());
+        else
+          g.setColor( Settings.sharedInstance().getObjColor());
+
+	g.drawLine( x+w-2, y+1, x+w-2, y+h-2);
+	g.setColor( Color.black);
+	g.drawLine( x+w-1, y+1, x+w-1, y+h-2);
+	g.setFont( getFont());
+	g.drawString( varName, x+w+2, y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2);
+      }
+    
     super.paint( g);
   }
+  
+  Color varColor = new Color( 153, 204, 204, 100);
+  Color selVarColor = new Color( 107, 142, 142, 100);
 }
 

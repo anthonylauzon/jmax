@@ -51,16 +51,22 @@ public class FtsGraphicObject extends FtsObject {
 	  ((FtsGraphicObject)obj).setNumberOfOutlets( args.getInt( 0));
 	}
       });
-    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get("setError"), new FtsMessageHandler(){
+	FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get("error"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsGraphicObject)obj).setError( args.getInt( 0));
+		if( args.getLength() > 0)
+		{
+			((FtsGraphicObject)obj).setError(1);
+			((FtsGraphicObject)obj).setErrorDescription( args.getString( 0));
+		}
+		else
+			((FtsGraphicObject)obj).setError(0);
 	}
-      });
+  });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setErrorDescription"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsGraphicObject)obj).setErrorDescription(args.getSymbol( 0).toString());
+	  
 	}
       });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setX"), new FtsMessageHandler(){

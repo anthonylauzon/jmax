@@ -2290,6 +2290,12 @@
 			path = ../../packages/macosx/c/src/macosxmidi.c;
 			refType = 2;
 		};
+		F7B6E71203FBE61901664058 = {
+			fileRef = F85122C7028BE16601664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F7D8EEDE03F1326801664058 = {
 			isa = PBXFileReference;
 			name = default_project.jprj;
@@ -7488,6 +7494,7 @@
 				F85122D6028BE16701664092,
 				F85122D7028BE16701664092,
 				F85122D8028BE16701664092,
+				F7B6E71203FBE61901664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17392,7 +17399,7 @@
 			buildSettings = {
 				BUILD_SETTING = "";
 				DEBUGGING_SYMBOLS = NO;
-				FRAMEWORK_SEARCH_PATHS = "build /Users/schnell/Projects/jmax/macosxbuild/jMaxProject/build";
+				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
 				LIBRARY_SEARCH_PATHS = "";
 				OPTIMIZATION_CFLAGS = "-O3";

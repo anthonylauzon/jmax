@@ -34,6 +34,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -209,9 +210,9 @@ public class ConfigPackagePanel extends JPanel implements Editor
     if (ftsPkg instanceof FtsProject)
       tabbedPane.addTab("Package Path", packagePathScrollPane);
     
-    tabbedPane.addTab("Template Path", templPathScrollPane);
     tabbedPane.addTab("Data Path", dataPathScrollPane);
     tabbedPane.addTab("Templates", templateScrollPane);         
+    tabbedPane.addTab("Template Path", templPathScrollPane);
     tabbedPane.addTab("Help Patches", helpScrollPane);    
 
     if (ftsPkg instanceof FtsProject)

@@ -44,13 +44,7 @@ public class FtsDefineObject extends FtsGraphicObject
 	  {
 	    ((FtsDefineObject)obj).setExpression( args.getString(0));
 	  }
-	});
-     FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("valid"), new FtsMessageHandler(){
-	  public void invoke(FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsDefineObject)obj).setValid( (args.getInt(0) != 0));
-	  }
-	});
+      });
     }
 
   public FtsDefineObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
@@ -131,21 +125,8 @@ public class FtsDefineObject extends FtsGraphicObject
     ((Define)listener).typeChanged( type);
   }
   
-   public boolean isValid()
-  {
-    return valid;
-  }
-  
-  public void setValid( boolean valid)
-  {
-    this.valid = valid;
-    ((Define)listener).validChanged( valid);
-  }
-
-  
   private String expression;
   private String type;
-  private boolean valid = true;
 }
 
 
