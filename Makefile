@@ -166,7 +166,7 @@ spec-files:
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-src-dist: spec-files cvs-tag 
+src-dist: spec-files
 	rm -rf $(distdir)
 	umask 22
 	mkdir $(distdir)
