@@ -615,7 +615,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     if ((mouseY < inletsAnchorY) || (mouseX < getX()) ||
 	(mouseX > getX()+getWidth()) || (mouseY > inletsAnchorY+getHeight()))
       {
-	area.setTransparent(true);
+	//area.setTransparent(true);
+	area.setTransparent(false);
 	area.setCost(xcost + Math.abs(mouseY - inletsAnchorY));
       }
 
@@ -632,7 +633,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     if ((mouseY > outletsAnchorY) || (mouseX < getX()) ||
 	(mouseY < getY()-1) || (mouseX > getX()+getWidth()))
       {
-	area.setTransparent(true);
+	//area.setTransparent(true);
+	area.setTransparent(false);
 	area.setCost(xcost + Math.abs(mouseY - outletsAnchorY));
       }
 
