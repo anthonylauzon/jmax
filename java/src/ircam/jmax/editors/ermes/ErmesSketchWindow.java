@@ -345,7 +345,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     aMenuItem.addActionListener(this);
     windowsMenu.add(new MenuItem("-"));
     //#windowsMenu.add(aMenuItem = new MenuItem("Project Manager Ctrl+M"));
-    aMenuItem.addActionListener(this);
+    //aMenuItem.addActionListener(this);
     windowsMenu.add(aMenuItem = new MenuItem("jMax Console  Ctrl+J"));
     aMenuItem.addActionListener(this);
     AddWindowItems(windowsMenu);
@@ -635,30 +635,33 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	}
       }       
       else if(aInt == 69){//e
-	ErmesObject aObject;
-	itsChangingRunEditMode = true;
-	MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
-	MenuItem aSelectAllItem = itsEditMenu.getItem(5);
-	if(!itsSketchPad.GetRunMode()){  
+	if (itsSketchPad.GetRunMode()) setRunMode(false);
+	else setRunMode(true);
+	return;
+	/*ErmesObject aObject;
+	  itsChangingRunEditMode = true;
+	  MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
+	  MenuItem aSelectAllItem = itsEditMenu.getItem(5);
+	  if(!itsSketchPad.GetRunMode()){  
 	  setBackground(Color.white);
 	  itsSketchPad.SetRunMode(true);
 	  for(Enumeration en1 = itsSketchPad.itsElements.elements(); en1.hasMoreElements();) {
-	    aObject = (ErmesObject)en1.nextElement();
-	    aObject.RunModeSetted();
+	  aObject = (ErmesObject)en1.nextElement();
+	  aObject.RunModeSetted();
 	  }
 	  itsToolBar.setRunMode(true);
 	  aRunEditItem.setLabel("Edit mode Ctrl+E");
 	  aSelectAllItem.setEnabled(false);
-	}
-	else {
+	  }
+	  else {
 	  itsChangingRunEditMode = true;
 	  setBackground(ErmesSketchPad.sketchColor);
 	  itsSketchPad.SetRunMode(false);
 	  itsToolBar.setRunMode(false);
 	  aRunEditItem.setLabel("Run mode Ctrl+E");
 	  aSelectAllItem.setEnabled(true);
-	}
-	requestFocus();
+	  }
+	  requestFocus();*/
       }
       else if (aInt == 47){//?
 	//ask help for the reference Manual for the selected element...
@@ -920,29 +923,14 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
   private void WindowsMenuAction(MenuItem theMenuItem, String theString) {
     ErmesObject aObject;
-    if (theString.equals("Run mode Ctrl+E")) {   
-      itsChangingRunEditMode = true;
-      theMenuItem.setLabel("Edit mode Ctrl+E");
-      itsEditMenu.getItem(5).setEnabled(false);//selectall
-      setBackground(Color.white);
-      itsSketchPad.SetRunMode(true);
-      for (Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-	aObject = (ErmesObject)e.nextElement();
-	aObject.RunModeSetted();
-      }
-      itsToolBar.setRunMode(true);
+    if (theString.equals("Run mode Ctrl+E")) {
+      setRunMode(true);
+      return;
     }
     else if (theString.equals("Edit mode Ctrl+E")) {
-      itsChangingRunEditMode = true;
-      theMenuItem.setLabel("Run mode Ctrl+E");
-      itsEditMenu.getItem(5).setEnabled(true);//selectall
-      setBackground(ErmesSketchPad.sketchColor);
-      itsSketchPad.SetRunMode(false);
-      itsToolBar.setRunMode(false);
+      setRunMode(false);
+      return;
     }
-    //else if (theString.equals("Project Manager Ctrl+M")) {
-    //# MaxApplication.GetProjectWindow().toFront();
-    //}
     else if (theString.equals("jMax Console  Ctrl+J")) {
       MaxApplication.GetConsoleWindow().ToFront();
     }
@@ -1138,12 +1126,31 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
 
   public void setRunMode(boolean theRunMode) {
-    itsSketchPad.SetRunMode(theRunMode);//an error. The name should be setRunMode
+    ErmesObject aObject;
+    itsChangingRunEditMode = true;
+    MenuItem aRunEditItem = itsWindowsMenu.getItem(0);
+    MenuItem aSelectAllItem = itsEditMenu.getItem(5);
+    if(theRunMode)  
+      setBackground(Color.white);
+    else setBackground(ErmesSketchPad.sketchColor);
+    
+    itsSketchPad.SetRunMode(theRunMode);
+    for(Enumeration en1 = itsSketchPad.itsElements.elements(); en1.hasMoreElements();) {
+      aObject = (ErmesObject)en1.nextElement();
+      aObject.RunModeSetted();
+    }
     itsToolBar.setRunMode(theRunMode);
-    //itsRepaintManager.markCompletelyDirty(itsToolBar);
-    //itsRepaintManager.repaintDirtyRegions();
-    getContentPane().repaint();
-    requestFocus();
+    if (theRunMode)
+      aRunEditItem.setLabel("Edit mode Ctrl+E");
+    else aRunEditItem.setLabel("Run mode Ctrl+E");
+    aSelectAllItem.setEnabled(theRunMode);
+  requestFocus();
+  
+  //old    itsSketchPad.SetRunMode(theRunMode);//an error. The name should be setRunMode
+  //old itsToolBar.setRunMode(theRunMode);
+  //old    getContentPane().repaint();
+  //old requestFocus();
+  //old  
   }
 
   public void ToFront(){
