@@ -20,6 +20,8 @@
  * 
  */
 
+#define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
+
 #include "ftsconfig.h"
 
 #ifdef WIN32
@@ -701,11 +703,18 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       return;
     }
 
+  fts_bytestream_add_listener(this->stream, (fts_object_t *) this, client_receive);
+
   this->client_id = new_client_id++;
   client_table_put( this->client_id, this);
 
-  fts_bytestream_add_listener(this->stream, (fts_object_t *) this, client_receive);
+  fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
 
+#ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
+  fts_set_int( &k, 0);
+  fts_set_object( &v, (fts_object_t *)fts_get_root_patcher());
+  fts_hashtable_put( &this->object_table, &k, &v);
+#else
   fts_set_symbol( a, fts_s_patcher);
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, &this->root_patcher);
 
@@ -715,6 +724,17 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       return;
     }
 
+  fts_object_refer( this->root_patcher);
+
+  fts_set_int( &k, 0);
+  fts_set_object( &v, this->root_patcher);
+  fts_hashtable_put( &this->object_table, &k, &v);
+#endif
+
+  fts_set_int( &k, 1);
+  fts_set_object( &v, (fts_object_t *)this);
+  fts_hashtable_put( &this->object_table, &k, &v);
+
   fts_stack_init( &this->send_sb, unsigned char);
 
   this->state = 0;
@@ -723,16 +743,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_stack_init( &this->receive_sb, unsigned char);
 
-  fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
-
-  fts_set_int( &k, 0);
-  fts_set_object( &v, this->root_patcher);
-  fts_hashtable_put( &this->object_table, &k, &v);
-
-  fts_set_int( &k, 1);
-  fts_set_object( &v, (fts_object_t *)this);
-  fts_hashtable_put( &this->object_table, &k, &v);
-
   fts_log( "[client]: Accepted client connection on socket\n");
 }
 
@@ -740,7 +750,10 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   client_t *this = (client_t *)o;
 
-  fts_object_delete_from_patcher( this->root_patcher);
+#ifndef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
+  fts_object_release( this->root_patcher);
+/*    fts_object_delete_from_patcher( this->root_patcher); */
+#endif
 
   client_table_remove( this->client_id);
 
@@ -785,6 +798,7 @@ typedef struct {
 static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_controller_t *this = (client_controller_t *)o;
+  fts_symbol_t name;
   fts_object_t *target;
   fts_object_t *from;
   fts_object_t *to;
@@ -814,7 +828,9 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
       return;
     }
 
-  v = fts_variable_get_value( fts_object_get_patcher(o), fts_get_symbol( at));
+  name = fts_get_symbol( at);
+
+  v = fts_variable_get_value( fts_object_get_patcher(o), name);
   if (!v || !fts_is_object(v))
     {
       fts_object_set_error( (fts_object_t *)this, "First argument does not refer to an object");
@@ -829,6 +845,8 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
       fts_object_set_error( (fts_object_t *)this, "First argument must be a \"bus\" or a \"label\"");
       return;
     }
+
+  fts_variable_add_user( fts_object_get_patcher( (fts_object_t *)this), name, (fts_object_t *)this);
 
   channel_number = fts_get_int_arg( ac, at, 1, 0);
 
