@@ -30,86 +30,110 @@
 #include <fts/fts.h>
 #include "Rsend.h"
 
-
-
 typedef struct 
 {
   fts_object_t _ob;
-
+  fts_array_t output;
 } Rsend_t;
 
-/* the format look like not correct; , ReceiveName collide with the type of non commercial
-   sysex */
-
-/* output a non-commercial SYSEX message using the format: 
-0xF0 0x7F ReceiveName<ascii> NUL TYPE<A_LONG etc> ATOM<ascii> NUL TYPE ATOM TYPE ATOM.... 0xF7 */
-
+/**********************************************************
+ *
+ *  Rsend is a historical object to send messages between two patches via MIDI.
+ *  An Rreceive object has to be used to receive them (see Rreceive.c).
+ *  The message selector is interpreted (by Rreceive) as a target.
+ *  Rsend has to be connected to a sysexout object.
+ *
+ *  message to sysex block encoding:
+ *
+ *  head:
+ *
+ *    0xF0 (added by sysexout)
+ *    0x7F (sysex realtime id)
+ *    <bytes of receive name as string> 
+ *    NULL 
+ *
+ *  for each atom of the message:
+ *
+ *    <type id>
+ *    <bytes of atom as string>
+ *    NULL
+ *
+ *  end:
+ *
+ *    0xF7 (added by sysexout)
+ *
+ */
 
 static void
-Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int argc, const fts_atom_t *av)
+Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   Rsend_t *this = (Rsend_t *)o;
-  int i;
-  int len;
-  fts_atom_t a[SYSEXMAX + 1];
-  char outstr[SYSEXMAX+1];
-  char data[STRLENMAX];
-  int bytecount = 0;
-	
-  if (argc > MAXLEN)
-    {
-      post("Rsend: list too long\n");
-      return;
-    }
-	
-  strcpy(outstr, fts_symbol_name(s)); /* get name */
-  bytecount += strlen(fts_symbol_name(s)) + 1; /* increment past inserted '\0' */
+  const char *name = fts_symbol_name(s);
+  char string[STRLENMAX];
+  fts_atom_t a;
+  int i, j;
 
-  for(i=0; i<argc; i++)
+  fts_array_set_size(&this->output, 0);
+
+  /* write sysex real-time message id 0x7F */
+  fts_set_int(&a, 0x7F);
+  fts_array_append(&this->output, 1, &a);
+
+  /* write selector name */
+  for(j=0; j<=strlen(name); j++)
     {
-      if (fts_is_int(&av[i]))
+      fts_set_int(&a, name[j]);
+      fts_array_append(&this->output, 1, &a);
+    }
+
+  for(i=0; i<ac; i++)
+    {
+      if (fts_is_int(at + i))
 	{
-	  data[0] = (char) RSEND_LONG;
-	  sprintf(data + 1,"%d", fts_get_int(&av[i]));
+	  string[0] = (char)RSEND_LONG;
+	  snprintf(string + 1, STRLENMAX, "%d", fts_get_int(at + i));
 	}
-      else if (fts_is_float(&av[i]))
+      else if (fts_is_float(at + i))
 	{
-	  data[0] = (char) RSEND_FLOAT;
-	  sprintf(data + 1,"%#f", fts_get_float(&av[i]));
+	  string[0] = (char)RSEND_FLOAT;
+	  snprintf(string + 1, STRLENMAX, "%#f", fts_get_float(at + i));
 	}
-      else if (fts_is_symbol(&av[i]))
+      else if (fts_is_symbol(at + i))
 	{
-	  data[0] = (char) RSEND_SYM;
-	  sprintf(data + 1,"%s", fts_symbol_name(fts_get_symbol(&av[i])));
+	  string[0] = (char)RSEND_SYM;
+	  snprintf(string + 1, STRLENMAX, "%s", fts_symbol_name(fts_get_symbol(at + i)));
 	}
       else
 	{
-	  post("Rsend: unrecognized token\n");
-	  return;
+	  string[0] = (char)RSEND_SYM;
+	  snprintf(string + 1, STRLENMAX, "?");
 	}
 
-      len = strlen(data) + 1;
-      if (bytecount + len >= SYSEXMAX)
+      for(j=0; j<=strlen(string); j++)
 	{
-	  post("Rsend: message longer than %d charactors\n", SYSEXMAX);
-	  return;
+	  fts_set_int(&a, string[j]);
+	  fts_array_append(&this->output, 1, &a);
 	}
-
-      strcpy(outstr + bytecount, data);
-      bytecount += len;
     }
 
-  for(i=0; i<bytecount-2; i++)
-    fts_set_int(a + i, (int)outstr[i]);
-  
-  fts_outlet_send(o, 0, fts_s_list, bytecount - 1, a);
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->output), fts_array_get_atoms(&this->output));
 }
 
+static void
+Rsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  Rsend_t *this = (Rsend_t *)o;
+  
+  fts_array_init(&this->output, 0, 0);
+}
 
+static void
+Rsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  Rsend_t *this = (Rsend_t *)o;
 
-/* No init , no delete */
-
-/* One inlet, one outlet  */
+  fts_array_destroy(&this->output);
+}
 
 static fts_status_t
 Rsend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -117,6 +141,9 @@ Rsend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_symbol_t a[1];
 
   fts_class_init(cl, sizeof(Rsend_t), 1, 1, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, Rsend_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, Rsend_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, Rsend_anything);
 

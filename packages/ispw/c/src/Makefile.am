@@ -57,8 +57,6 @@ message.c \
 message_doctor.c \
 metro.c \
 mididecrypt.c \
-midiformat.c \
-midiparse.c \
 mtof.c \
 naming.c \
 nbangs.c \
@@ -125,7 +123,5 @@ voxalloc.c \
 wahwah.c \
 wavetab.c \
 zerocross.c 
-
-#midi.c \
 
 INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src

@@ -84,9 +84,6 @@ extern void dac_tilda_config(void);
 extern void adc_tilda_config(void);
 
 /* midi */
-/*extern void midi_config(void);*/
-/*extern void midiformat_config(void);*/
-/*extern void midiparse_config(void);*/
 extern void makenote_config(void);
 extern void stripnote_config(void);
 extern void sustain_config(void);
@@ -215,9 +212,6 @@ ispw_config(void)
   adc_tilda_config();
 
   /* midi */
-  /*midi_config();*/
-  /*midiformat_config();*/
-  /*midiparse_config();*/
   makenote_config();
   stripnote_config();
   sustain_config();

@@ -29,164 +29,153 @@
 
 typedef struct 
 {
-  fts_object_t _ob;
-  int   sxindex;
-  char  receiveBuff[SYSEXMAX+1];
-  int   atomcount;
+  fts_object_t o;
+  fts_array_t args;
 } Rreceive_t;
 
-
-/* ******************** */
-
-#define IGNORE -1
-
 static void
-Rreceive_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scan_atom(fts_atom_t *atom, int type, char *string)
 {
-  Rreceive_t *this = (Rreceive_t *)o;
+  switch(type)
+    {
 
-  this->sxindex = IGNORE;
+    case RSEND_LONG:
+      {
+	int d;
+	
+	sscanf(string,"%d",&d);
+	fts_set_int(atom, d);
+      }
+      break;
+
+    case RSEND_FLOAT:
+      {
+	float f;
+	
+	sscanf(string,"%f",&f);
+	fts_set_float(atom, f);
+      }
+      break;
+
+    case RSEND_SYM:
+
+      fts_set_symbol(atom, fts_new_symbol_copy(string)); 
+      break;
+
+    default:
+      fts_set_void(atom);
+    }
 }
 
-
 static void
-Rreceive_set_atom(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const fts_atom_t *at)
+Rreceive_input(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_atom_t *at)
 {
   Rreceive_t *this = (Rreceive_t *)o;
-  long n = fts_get_int(at);
-  fts_atom_t av[MAXLEN];
-  int i,ac = 0;
-  long l;
-  fts_label_t *label;
-  fts_symbol_t sel;
-
-  if (n == 0xF0)
-    {
-      this->sxindex = 0;
-      this->atomcount = 0;
-      return;
-    }
-  else if (this->sxindex == 0 && n != 0x7F)	
-    {		
-      this->sxindex = IGNORE;
-      return;
-    }
-  else if (this->sxindex == IGNORE) 
-    return;
-  else if (n != 0xF7)		/* get the stuff */
-    {
-      if (this->sxindex == SYSEXMAX)
-	{
-	  post("Rreceive: SYSEX message too long, aborting\n");
-	  this->sxindex = IGNORE;
-	  return;
-	}
-      this->receiveBuff[this->sxindex] = (char) n;
-    }
-  else		/* data ready */
-    {
-      this->receiveBuff[this->sxindex] = '\0'; /* write an end of string at end */
-
-      for (i=0; i < this->sxindex; i++)
-	{
-	  if (this->receiveBuff[i] == '\0')
-	    {
-	      long l;
-	      float f;
-
-	      if (ac == MAXLEN)
-		{
-		  post("Rreceive: too many atoms in message, aborting\n");
-		  return;
-		}
-
-	      switch (this->receiveBuff[i+1])
-		{
-		case RSEND_LONG:
-		  sscanf(this->receiveBuff+i+2,"%ld",&l);
-		  fts_set_int(&av[ac], l);
-		  break;
-		case RSEND_FLOAT:
-		  sscanf(this->receiveBuff+i+2,"%f",&f);
-		  fts_set_float(&av[ac], f);
-		  break;
-		case RSEND_SYM:
-		  fts_set_symbol(&av[ac], fts_new_symbol_copy(this->receiveBuff+i+2)); 
-		  break;
-		default:
-		  post("Rreceive: unrecognized atom type in message, aborting\n");
-		  return;
-		}
-
-	      ac++;
-	    }
-	}
-
-      sel = fts_new_symbol_copy(this->receiveBuff + 1);
-      label = fts_label_get(fts_object_get_patcher(o), sel);
-      
-      if(fts_label_is_connected(label))
-	{
-	  if (fts_is_int(av))
-	    {
-	      if (ac >1)
-		fts_label_send(label, fts_s_list, ac, av);
-	      else
-		fts_label_send(label, fts_s_int, ac, av);
-	    }
-	  else if (fts_is_float(av))
-	    {
-	      if (ac >1)
-		fts_label_send(label, fts_s_list, ac, av);
-	      else
-		fts_label_send(label, fts_s_float, ac, av);
-	    }
-	  else if (fts_is_symbol(av))
-	    fts_label_send(label, fts_get_symbol(av), ac - 1, av + 1);
-	}
-      else
-	fts_outlet_send(o, 0, sel, ac, av);
-
-      this->sxindex = IGNORE;
-
-      return;
-    }
-
-  this->sxindex++;
-}
-
-
-static void
-Rreceive_list(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_atom_t *at)
-{
-  Rreceive_t *this = (Rreceive_t *)o;
-  fts_atom_t a[1];
+  char string[STRLENMAX];
+  fts_symbol_t target = 0;
+  fts_label_t *label = 0;
+  int type = 0;
+  int c = 0;
+  int j = 0;
   int i;
 
-  fts_set_int(a, 0xF0);
-  Rreceive_set_atom(o, 0, 0, 1, a);
+  fts_array_set_size(&this->args, 0);
 
-  for(i=0; i<ac; i++)
-    Rreceive_set_atom(o, 0, 0, 1, at + i);
+  /* skip sysex real-time id */
+  for(i=1; i<ac; i++)
+    {
+      int c = fts_get_int(at + i);
+      fts_atom_t a;
 
-  fts_set_int(a, 0xF7);
-  Rreceive_set_atom(o, 0, 0, 1, a);
+      if(c == 0)
+	{
+	  string[j] = '\0';
+	  
+	  if(type == 0)
+	    target = fts_new_symbol_copy(string);
+	  else
+	    {
+	      scan_atom(&a, type, string);
+	      fts_array_append(&this->args, 1, &a);
+	    }
+	  
+	  j = 0;
+	}
+      else if(c <= RSEND_SYM)
+	type = c;
+      else if(j < STRLENMAX)
+	string[j++] = c;
+    }
+
+  if(target)
+    {
+      label = fts_label_get(fts_object_get_patcher(o), target);
+  
+      if(label)
+	{
+	  int size = fts_array_get_size(&this->args);
+	  
+	  if(size > 0)
+	    {      
+	      fts_atom_t *atoms = fts_array_get_atoms(&this->args);
+	      
+	      if (fts_is_int(atoms))
+		{
+		  if (size > 1)
+		    fts_label_send(label, fts_s_list, size, atoms);
+		  else
+		    fts_label_send(label, fts_s_int, size, atoms);
+		}
+	      else if (fts_is_float(atoms))
+		{
+		  if (size > 1)
+		    fts_label_send(label, fts_s_list, size, atoms);
+		  else
+		    fts_label_send(label, fts_s_float, size, atoms);
+		}
+	      else if (fts_is_symbol(atoms))
+		fts_label_send(label, fts_get_symbol(atoms), size - 1, atoms + 1);
+	    }
+	}
+      else
+	fts_outlet_send(o, 0, target, fts_array_get_size(&this->args), fts_array_get_atoms(&this->args));	
+    }
+  else
+    {
+      int size = fts_array_get_size(&this->args);
+	
+      if(size)
+	fts_outlet_send(o, 0, fts_s_list, size, fts_array_get_atoms(&this->args));
+    }
 }
 
-/* No init , no delete */
+static void
+Rreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  Rreceive_t *this = (Rreceive_t *)o;
+  
+  fts_array_init(&this->args, 0, 0);
+}
 
-/* One inlet, one outlet  */
+static void
+Rreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  Rreceive_t *this = (Rreceive_t *)o;
+
+  fts_array_destroy(&this->args);
+}
 
 static fts_status_t
 Rreceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
   fts_class_init(cl, sizeof(Rreceive_t), 1, 1, 0);
 
-  fts_method_define(cl, 0, fts_s_bang, Rreceive_bang, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, Rreceive_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, Rreceive_delete);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, Rreceive_list);
+  fts_method_define_varargs(cl, 0, fts_s_int, Rreceive_input);
+  fts_method_define_varargs(cl, 0, fts_s_float, Rreceive_input);
+  fts_method_define_varargs(cl, 0, fts_s_list, Rreceive_input);
 
   return fts_Success;
 }
@@ -197,10 +186,3 @@ Rreceive_config(void)
 {
   fts_class_install(fts_new_symbol("Rreceive"), Rreceive_instantiate);
 }
-
-
-
-
-
-
-

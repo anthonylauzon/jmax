@@ -187,10 +187,8 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
     while (iArg--) list_store[iArg] = at[iArg];
 	
-    if(fts_label_is_connected(label))
+    if(label)
       fts_label_send(label, fts_s_list, n_args, list_store);
-    else
-      post("%s: label \"%s\" not found\n", CLASS_name, fts_symbol_name(sym_receive[idx]));
   }
 
   idx++;

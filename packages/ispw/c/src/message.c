@@ -272,7 +272,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		}
 	      else
 		{
-		  post("messbox: invalid $ argument\n"); /*ERROR: should be an event ? */
+		  post("messbox: invalid $ argument\n");
 		  lex_out_type = lex_type_error;
 		  lex_status = lex_list_read;
 		}
@@ -281,39 +281,33 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 	    {
 	      if (fts_get_symbol(rd_out) == ev_s_star)
 		{
+		  lex_out_value = 0;
 		  lex_out_type = lex_type_void;
-		  lex_status   = lex_env_read;
+		  lex_status = lex_env_read;
 
 		  /* Set the reader to read from the beginning of the env */
-
-		  rd_command   = rd_read_env;
+		  rd_command = rd_read_env;
 		  rd_env_count = 0;
 		}
-	      else if (fts_variable_get_value(((fts_object_t *)this)->patcher, fts_get_symbol(rd_out)))
+	      else
 		{
 		  lex_out_value = fts_variable_get_value(((fts_object_t *)this)->patcher, fts_get_symbol(rd_out));
-
-		  if(!fts_is_void(lex_out_value))
+		  
+		  if(lex_out_value)
 		    {
 		      lex_out_type = lex_type_value;
 		      lex_status = lex_list_read;
 		    }
 		  else
-		    lex_out_type = lex_type_error;	
-		}
-	      else
-		lex_out_type = lex_type_error;
-	      
-	      if(lex_out_type == lex_type_error)
-		{
-		  fts_symbol_t var_name = fts_get_symbol(rd_out);
-		  
-		  post("messbox: undefined variable %s\n", fts_symbol_name(var_name)); /*ERROR: should be an event ? */
+		    {
+		      post("messbox: undefined variable %s\n", fts_symbol_name(fts_get_symbol(rd_out)));
+		      lex_out_type = lex_type_error;		  
+		    }
 		}
 	    }
 	  else
 	    {
-	      post("messbox: syntax error after $\n"); /*ERROR: should be an event ? */
+	      post("messbox: syntax error after $\n");
 	      lex_out_type = lex_type_error;
 	    }
 	  break;

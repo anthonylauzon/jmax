@@ -328,7 +328,8 @@ pbank_send_message_to_label(pbank_t *this, int i, fts_symbol_t s, int ac, const 
   fts_symbol_t name = this->receives[i];
   fts_label_t *label = fts_label_get(fts_object_get_patcher((fts_object_t *)this), name);
 
-  fts_label_send(label, s, ac, at);
+  if(label)
+    fts_label_send(label, s, ac, at);
 }
 
 static void

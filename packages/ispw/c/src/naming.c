@@ -71,7 +71,7 @@ ispw_get_target(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_label_t *label = fts_label_get(scope, name);
   
-  if(fts_label_is_connected(label))
+  if(label)
     return (fts_object_t *)label;
   else
     return ispw_get_object_by_name(name);
