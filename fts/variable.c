@@ -229,14 +229,12 @@ fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *o
   fts_definition_t *def = fts_definition_get(scope, name);
 
   fts_definition_add_listener(def, obj);
-  fts_patcher_object_add_binding(obj, def);
   
   if(fts_is_void(&def->value))
   {
     def = fts_definition_get(fts_get_root_patcher(), name);
 
     fts_definition_add_listener(def, obj);
-    fts_patcher_object_add_binding(obj, def);
   }
 }
 

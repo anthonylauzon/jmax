@@ -33,6 +33,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/object.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/parser.h>
 #include <ftsprivate/message.h>
 #include "parser.h"
@@ -718,9 +719,14 @@ static void add_variables_user_aux( fts_parsetree_t *tree, fts_patcher_t *scope,
 
   add_variables_user_aux( tree->left, scope, obj);
   add_variables_user_aux( tree->right, scope, obj);
-
+  
   if ( tree->token == TK_DOLLAR && fts_is_symbol( &tree->value) )
-    fts_name_add_listener(scope, fts_get_symbol( &tree->value), obj);
+  {
+    fts_symbol_t name = fts_get_symbol( &tree->value);
+
+    fts_name_add_listener(scope, name, obj);
+    fts_object_add_binding(obj, scope, name);
+  }
 }
 
 void fts_expression_add_variables_user( fts_expression_t *exp, fts_patcher_t *scope, fts_object_t *obj)

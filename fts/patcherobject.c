@@ -733,10 +733,13 @@ fts_patcher_object_set_name(fts_object_t *obj, fts_symbol_t wanted_name, int glo
         patcher_data_remove_name(data);
     }
 
-    if(global)
-      fts_definition_set_global(data->definition);
-    else
-      fts_definition_set_local(data->definition);
+    if(data->definition != NULL)
+    {
+      if(global)
+        fts_definition_set_global(data->definition);
+      else
+        fts_definition_set_local(data->definition);
+    }
     
     fts_patcher_set_dirty(patcher, 1);
   
@@ -796,13 +799,24 @@ fts_patcher_object_is_global(fts_object_t *obj)
 *
 */
 void
-fts_patcher_object_add_binding(fts_object_t *obj, fts_definition_t *def)
+fts_object_add_binding(fts_object_t *obj, fts_patcher_t *patcher, fts_symbol_t name)
 {
   fts_object_patcher_data_t *data = fts_object_get_patcher_data(obj);
+  fts_patcher_t *scope = fts_patcher_get_scope(patcher);
+  fts_definition_t *def = fts_definition_get(scope, name);
   fts_atom_t a;
   
   fts_set_pointer(&a, def);
   data->name_refs = fts_list_prepend(data->name_refs, &a);
+
+  /* add as well to global scope if value is undefined */
+  if(fts_is_void(&def->value))
+  {
+    def = fts_definition_get(fts_get_root_patcher(), name);
+    
+    fts_set_pointer(&a, def);
+    data->name_refs = fts_list_prepend(data->name_refs, &a);
+  }  
 }
 
 static void

@@ -51,12 +51,12 @@ extern void fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
 
+extern void fts_object_add_binding(fts_object_t *obj, fts_patcher_t *scope, fts_symbol_t name);
+
 /* name of object in patcher */
 extern void fts_patcher_object_set_name(fts_object_t *obj, fts_symbol_t sym, int global);
 extern fts_symbol_t fts_patcher_object_get_name(fts_object_t *obj);
 extern int fts_patcher_object_is_global(fts_object_t *obj);
-
-extern void fts_patcher_object_add_binding(fts_object_t *obj, fts_definition_t *def);
 
 /* persistence */
 extern void fts_patcher_object_set_state_persistence(fts_object_t *obj, int persistence);
