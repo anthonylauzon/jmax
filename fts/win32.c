@@ -176,6 +176,8 @@ void fts_platform_init( int argc, char **argv)
   }
   closesocket(sock);
 
+  /* load audio packages */
+  fts_package_load(fts_new_symbol("dsdev"));
   /* boost the priority of the fts thread */
 /*    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS); */
   SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
