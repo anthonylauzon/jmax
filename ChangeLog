@@ -1,3 +1,11 @@
+2003-02-13  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* transformed note into score object scoob (package sequence)   
+
+2003-02-12  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* adapted define object in order to declare constants and template arguments (help patch to be added)
+
 2003-02-11  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 
 	* fixed template arguments in vm
