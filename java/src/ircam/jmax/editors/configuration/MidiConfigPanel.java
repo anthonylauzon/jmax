@@ -63,7 +63,11 @@ public class MidiConfigPanel extends JPanel implements Editor
 	  switch( column)
 	    {
 	    case 0:
-	      return super.getCellEditor(row, column);
+	      TableCellEditor editor = super.getCellEditor(row, column);
+	      if( row == 0)
+		editor.getTableCellEditorComponent( midiTable, midiModel.getValueAt( 0, 0), false, 0, 0)
+		  .setForeground( Color.red);	      
+	      return editor;
 	    case 1:
 	      return inputCellEditor;
 	    case 2:
