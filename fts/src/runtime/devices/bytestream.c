@@ -73,7 +73,7 @@ fts_bytestream_class_init(fts_class_t *cl)
 }
 
 int 
-fts_bytestream_has_superclass(fts_object_t *obj)
+fts_bytestream_check(fts_object_t *obj)
 {
   fts_atom_t a[1];
 

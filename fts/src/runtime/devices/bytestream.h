@@ -73,7 +73,7 @@ extern void fts_bytestream_class_init(fts_class_t *cl);
 extern void fts_bytestream_add_listener(fts_bytestream_t *stream, fts_object_t *listener, fts_bytestream_callback_t fun);
 extern void fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_t *listener);
 
-extern int fts_bytestream_has_superclass(fts_object_t *obj);
+extern int fts_bytestream_check(fts_object_t *obj);
 
 #define fts_bytestream_is_input(s) ((s)->input != 0)
 #define fts_bytestream_is_output(s) ((s)->output != 0)
