@@ -132,12 +132,10 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
    */
   private void computeEnclosure(Rectangle destination) 
   {  
-    BpfPoint min_x;
-    BpfPoint min_y;
-    BpfPoint max_x;
-    BpfPoint max_y;
+    int min_x, min_y, max_x, max_y;
     
     BpfPoint point;
+    BpfAdapter a = ((BpfGraphicContext) gc).getAdapter();
     
     Enumeration e=((BpfGraphicContext)gc).getSelection().getSelected();
     point = (BpfPoint) e.nextElement();    
@@ -145,34 +143,25 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     if (point == null) return; //empty selection...
     else 
       {
-	min_x = point;
-	max_x = point;
-	min_y = point;
-	max_y = point;
+	  min_x = max_x = a.getX(point);
+	  min_y = max_y = a.getY(point);
       }
 
-    BpfAdapter a = ((BpfGraphicContext) gc).getAdapter();
-    
+    int x, y;
     for (; e.hasMoreElements();)
       {
 	point = (BpfPoint) e.nextElement();
-
-	if (a.getX(point) < a.getX(min_x)) 
-	 min_x = point;
-     
-	if (a.getY(point) < a.getY(min_y)) 
-	  min_y = point;
+	x = a.getX(point);
+	y = a.getY(point);
 	
-	if (a.getX(point) > a.getX(max_x)) 
-	  max_x = point;
+	if (x < min_x) min_x = x;
+	else if (x > max_x) max_x = x;	
 	
-	if (a.getY(point) > a.getY(max_y)) 
-	  max_y = point;
+	if (y < min_y) min_y = y;
+	else if (y > max_y) max_y = y;
       }
 
-    destination.setBounds(a.getX(min_x), a.getY(min_y),
-			  a.getX(max_x)+a.getLenght(max_x)-a.getX(min_x),
-			  a.getY(max_y)-a.getY(min_y)+10);
+    destination.setBounds(min_x, min_y, max_x-min_x, max_y-min_y);
   }
 
     public void mouseReleased(MouseEvent e)
@@ -203,6 +192,8 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     BpfPoint movPoint;
     Graphics g = gc.getGraphicDestination().getGraphics();
     BpfGraphicContext bgc = (BpfGraphicContext)gc;
+    BpfAdapter a = bgc.getAdapter();
+    FtsBpfObject ftsObj = bgc.getFtsObject();
 
     if(bgc.getSelection().isInSelection(bgc.getFtsObject().getPointAt(0)))
 	dx = 0;
@@ -213,6 +204,44 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 
     g.clipRect(clip.x, clip.y, clip.width, clip.height);
     
+    //clip deltaY///////////////////
+    if(dy > 0)
+    {
+	int minY = a.getY(bgc.getSelection().getMinValueInSelection());
+	int h = bgc.getGraphicDestination().getSize().height;
+	if(minY + dy > h)
+	    dy = h - minY;
+    }
+    else
+    {
+	int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
+	if(maxY + dy < 0)
+	    dy = -maxY;
+    }
+	
+    //// Clip deltaX
+    BpfPoint last, first;
+    first =  bgc.getSelection().getFirstInSelection();
+    if(bgc.getSelection().size()==1)
+	last = first;
+    else
+	last =  bgc.getSelection().getLastInSelection();
+    int lastX =  a.getX(last);
+    int firstX = a.getX(first);
+
+    BpfPoint next = ftsObj.getNextPoint(last);
+    BpfPoint prev = ftsObj.getPreviousPoint(first);
+    int nextX = -1;
+    int prevX = -1;
+    if(next!=null)
+	nextX = a.getX(next);
+    if(prev!=null)
+	prevX = a.getX(prev);
+
+    if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
+    else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;
+
+    ////////////////////////
     g.setColor(Color.gray);
 
     if (dragMode == RECT_DRAG) {
@@ -231,45 +260,42 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
       {
 	g.setXORMode(Color.gray); 
 
-	BpfAdapter a = bgc.getAdapter();
-	FtsBpfObject ftsObj = bgc.getFtsObject();
-
 	 //clip deltaY///////////////////
-	if(dy > 0)
-	{
-	    int minY = a.getY(bgc.getSelection().getMinValueInSelection());
-	    int h = bgc.getGraphicDestination().getSize().height;
-	    if(minY + dy > h)
-		dy = h - minY;
-	}
-	else
-	{
-	    int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
-	    if(maxY + dy < 0)
-		dy = -maxY;
-	}
+	/*if(dy > 0)
+	  {
+	  int minY = a.getY(bgc.getSelection().getMinValueInSelection());
+	  int h = bgc.getGraphicDestination().getSize().height;
+	  if(minY + dy > h)
+	  dy = h - minY;
+	  }
+	  else
+	  {
+	  int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
+	  if(maxY + dy < 0)
+	  dy = -maxY;
+	  }
 	
-	//// Clip deltaX
-	BpfPoint last, first;
-	first =  bgc.getSelection().getFirstInSelection();
-	if(bgc.getSelection().size()==1)
-	    last = first;
-	else
-	    last =  bgc.getSelection().getLastInSelection();
-	int lastX =  a.getX(last);
-	int firstX = a.getX(first);
+	  //// Clip deltaX
+	  BpfPoint last, first;
+	  first =  bgc.getSelection().getFirstInSelection();
+	  if(bgc.getSelection().size()==1)
+	  last = first;
+	  else
+	  last =  bgc.getSelection().getLastInSelection();
+	  int lastX =  a.getX(last);
+	  int firstX = a.getX(first);
 
-	BpfPoint next = ftsObj.getNextPoint(last);
-	BpfPoint prev = ftsObj.getPreviousPoint(first);
-	int nextX = -1;
-	int prevX = -1;
-	if(next!=null)
-	    nextX = a.getX(next);
-	if(prev!=null)
-	    prevX = a.getX(prev);
+	  BpfPoint next = ftsObj.getNextPoint(last);
+	  BpfPoint prev = ftsObj.getPreviousPoint(first);
+	  int nextX = -1;
+	  int prevX = -1;
+	  if(next!=null)
+	  nextX = a.getX(next);
+	  if(prev!=null)
+	  prevX = a.getX(prev);
 
-	if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
-	else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;
+	  if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
+	  else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;*/
 
 	////////////////////////
 	for (Enumeration e = bgc.getSelection().getSelected(); e.hasMoreElements();)

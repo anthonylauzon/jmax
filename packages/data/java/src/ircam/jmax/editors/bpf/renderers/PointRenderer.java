@@ -96,18 +96,8 @@ public class PointRenderer implements ObjectRenderer {
 		    if (!bgc.getSelection().isInSelection(next))
 			g.drawLine(x, y, adapter.getX(next), adapter.getY(next));
 		    else
-			{//qui anche il next e' selezionato
-			    //qui deve vedere se il next e' < della sua posizione originale e clipparlo
-			    //deve fare la stessa cosa con se stesso rispetto al prev
-			    
+			{
 			    int nextX = adapter.getX(next)+((UtilBpfPoint)point).getDeltaX(adapter);
-			    //if(nextX < adapter.getX(original)) nextX = adapter.getX(original)+1;
-			    
-			    //si fa dare il next del next 
-			    /*BpfPoint nextnext = model.getNextPoint(next);
-			      if(nextnext!=null)
-			      if(nextX > adapter.getX(nextnext)) nextX = adapter.getX(nextnext)-1;*/		 
-			    
 			    g.drawLine(x, y, nextX, adapter.getY(next)+((UtilBpfPoint)point).getDeltaY(adapter));
 			}
 
