@@ -46,6 +46,7 @@ defineDevice stereoOut1 { oss_dac } "OSS audio out"
 defineDevice midi { oss_midi } "OSS MIDI"
 
 when platformStart {
+    package require ossdev
     package require pdtddev
 }
 
