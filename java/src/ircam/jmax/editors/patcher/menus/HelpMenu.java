@@ -49,7 +49,7 @@ public class HelpMenu extends DefaultHelpMenu
   public HelpMenu()
   {
     super();    
-    insert(Actions.openHelpPatchAction, "Object Help", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_HELP, 0);
+    insert(Actions.openHelpPatchAction, "Object Help", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), Platform.HELP_KEY, 0);
   }
 }
 

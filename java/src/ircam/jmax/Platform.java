@@ -50,6 +50,7 @@ public class Platform
   static public int    RIGHT_KEY      = KeyEvent.VK_RIGHT;
   static public int    UP_KEY         = KeyEvent.VK_UP;
   static public int    DOWN_KEY       = KeyEvent.VK_DOWN;
+  static public int    HELP_KEY       = 0;
 
   static public String  SYSTEM     = null;
   static public boolean INAPPLET   = false;
@@ -177,6 +178,7 @@ public class Platform
     FONT_SIZE     = 10;
     FONT_STYLE    = Font.PLAIN;
     FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
+    HELP_KEY      = KeyEvent.VK_HELP;
   }
 
   //------------------------------------------
@@ -195,6 +197,7 @@ public class Platform
     DOWN_KEY    = 40;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
+    HELP_KEY    = KeyEvent.VK_H;
 
     FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
@@ -218,6 +221,7 @@ public class Platform
     DELETE_KEY  = 8;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
+    HELP_KEY    = KeyEvent.VK_H;
     FONT_SIZE   = 18;
     FONT_STYLE  = Font.PLAIN;
     FONT_NAME   = new String("monaco");
@@ -235,6 +239,7 @@ public class Platform
     BACKSPACE_KEY = 127;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
+    HELP_KEY    = KeyEvent.VK_H;
     FONT_NAME = new String("Arial");
     FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
@@ -261,6 +266,7 @@ public class Platform
     BACKSPACE_KEY = 127;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
+    HELP_KEY    = KeyEvent.VK_H;
     FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
     FONT_SIZE   = 10;
     FONT_STYLE  = Font.PLAIN;
