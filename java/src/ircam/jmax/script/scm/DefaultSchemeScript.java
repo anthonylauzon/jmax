@@ -25,7 +25,8 @@
 package ircam.jmax.script.scm;
 import ircam.jmax.script.*;
 
-/** DefaultSchemeScript
+/**
+ * DefaultSchemeScript
  *
  * Implements a simple Scheme script consisting of a String
  *  expression. The evaluation expects no arguments. 
@@ -34,7 +35,8 @@ public class DefaultSchemeScript implements Script {
     String expr;
     Interpreter itsInterp;
 
-    /** Creates a default Scheme script from a string. Eval will call
+    /**
+     *  Creates a default Scheme script from a string. Eval will call
      *  the interpreter given as parameter.
      *
      *  @param interp The attached interpreter.
@@ -45,7 +47,8 @@ public class DefaultSchemeScript implements Script {
 	expr = s;
     }
 
-    /** Eval this script script using the interpreter passed as argument.
+    /**
+     *  Eval this script script using the interpreter passed as argument.
      *
      *  @param interp The script's interpreter. */
     public Object eval(Interpreter interp) throws ScriptException 

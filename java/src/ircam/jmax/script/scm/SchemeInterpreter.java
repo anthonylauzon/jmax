@@ -40,84 +40,27 @@ import java.awt.*;
  *  Extends the jMax interpreter with some additionnal useful
  *  methods. Provides some basic functions for Scheme interpreters.
  */
-public abstract class SchemeInterpreter implements Interpreter, ActionListener
+public abstract class SchemeInterpreter implements Interpreter
 { 
-    /** The script menu item hash table will help to find the script
-     *  bounded to a menu item. */
-    protected Hashtable menuScriptTable;
-
-    /** The script menu hash table will help to find the menu bounded
-     *  to a document type. */
-    protected Hashtable menuTypeTable;
-
     /** The package handler. */
     PackageHandler itsPackageHandler;
 
     public SchemeInterpreter() 
     {
-	menuScriptTable = new Hashtable();
-	menuTypeTable = new Hashtable();
-	//JMenu allMenu = new JMenu("Script"); Wait till it swings
-	Menu allMenu = new Menu("Script"); 
-	menuTypeTable.put("all", allMenu);
 	itsPackageHandler = new PackageHandler();
     }
 
-    public void addScriptMenuItem(String type, String name, Object key, Script script)
+    public void addScriptMenu(String type, Script script, String name, Object key)
     {
-	// No Swing, just Java
-//  	JMenu typeMenu = (JMenu) menuTypeTable.get(type);
-//  	if (typeMenu == null) {
-//  	    typeMenu = new JMenu(type);
-//  	    menuTypeTable.put(type, typeMenu);
-//  	}
-//  	if (name.equals("-")) {
-//  	    typeMenu.addSeparator();
-//  	} else {
-//  	    JMenuItem menuItem = new JMenuItem(name);
-//  	    if (key instanceof KeyStroke) {
-//  		menuItem.setAccelerator((KeyStroke) key);
-//  	    }
-//  	    menuItem.addActionListener(this);
-//  	    menuScriptTable.put(menuItem, script);
-//  	}
-
-	Menu typeMenu = (Menu) menuTypeTable.get(type);
-	if (typeMenu == null) {
-	    /* This implementation does not check whether the document
-	     *  type is registered at the Mda or not. It just adds the
-	     *  menu in the appropriate scripting menu. The rationale
-	     *  is that the user might define a script before the
-	     *  document type is declared by the package. */
-	    typeMenu = new Menu(type);
-	    menuTypeTable.put(type, typeMenu);
-	}
-	if (name.equals("-")) {
-	    typeMenu.addSeparator();
+	KeyStroke stroke = (KeyStroke) key;
+	if (type.equals("all")) {
+	    MaxDocumentType.addGlobalScript(new ScriptAction(script, name, stroke.getModifiers(), stroke.getKeyCode()));
 	} else {
-	    MenuItem menuItem = new MenuItem(name);
-	    menuItem.addActionListener(this);
-	    /* I prefer storing the menu item in the table using the
-	     * menu object as key instead of it's name to allow
-	     * multiple use of the same menu name. */
-	    menuScriptTable.put(menuItem, script);
-	    typeMenu.add(menuItem);
-	}
-    }
-
-    public void actionPerformed(ActionEvent e) 
-    {
-	Object src = e.getSource();
-	//if (src instanceof JMenuItem) {
-	if (src instanceof MenuItem) {
-	    Script script = (Script) menuScriptTable.get(src);
-	    //define();
-	    try {
-		script.eval();
-	    } catch (ScriptException ex) {
-		// What do we do? Print a message on the output?
-		System.out.println("Dear user, please contact the author of the script.");
-		System.out.println("An error slipped in: " + ex.getMessage());
+	    MaxDocumentType doctype = Mda.getDocumentTypeByName(type);
+	    if (doctype == null) {
+		System.out.println("Document type " + type + " is not defined");
+	    } else {
+		doctype.addScript(new ScriptAction(script, name, stroke.getModifiers(), stroke.getKeyCode()));
 	    }
 	}
     }
@@ -132,7 +75,6 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
 	if (alt) modifiers += ActionEvent.ALT_MASK;
 	if (meta) modifiers += ActionEvent.META_MASK;
 	if (shift) modifiers += ActionEvent.SHIFT_MASK;
-
 	char c = Character.toUpperCase(keyStr.charAt(0));
 	int key;
 	if (Character.isDigit(c)) {
@@ -145,12 +87,12 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
 	return KeyStroke.getKeyStroke(key, modifiers);
     }
 
-    /** Returns the script menu for a given document type, or null if
-     *  non is avaible. */
-    public Menu getScriptMenu(String type)
-    {
-	return (Menu) menuTypeTable.get(type);	
+    public Object ask(String question, String type) {
+	String s = ircam.jmax.dialogs.InputDialog.ask(question);
+	return convertToScheme(s, type);
     }
+
+    public abstract Object convertToScheme(String value, String type);
 
     /** Defines a new variable in the current environment. Takes care
      *  to lower-case and internalize the variable name. */
@@ -194,7 +136,8 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
 	return pkg;
     }
 
-    /** Unfortunately, Silk and Kawa don't use Java strings to
+    /**
+     *  Unfortunately, Silk and Kawa don't use Java strings to
      *  represent Scheme strings. This method helps the conversion.
      *  The equivalent Scheme functions is "to-java-string" (defined
      *  in scheme_interface.scm). Note that when a Java method or
@@ -209,9 +152,11 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
 	}
     }
 
-    /** The Java "null" value is not represented in Scheme. Silk and
+    /**
+     *  The Java "null" value is not represented in Scheme. Silk and
      *	Kawa handle this value differently. This method is provided to
-     *	test in Scheme whether an object is null or not. */
+     *	test in Scheme whether an object is null or not. 
+     */
     public static boolean isNull(Object obj) 
     {
 	return obj == null;
@@ -222,12 +167,14 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
 	return itsPackageHandler;
     }
 
-    /** This methods creates a MaxSchemeDocument. It can be invoked in
+    /**
+     *  This methods creates a MaxSchemeDocument. It can be invoked in
      *  a Scheme file using (jmax <type> <version> <name> <info>
      *  <body>). Unfortunately the body has to be a string and not a
      *  procedure, because silk is not open enough to call a procedure
      *  with the current environment and I/O. Hopefully this will
-     *  change in the future.*/
+     *  change in the future.
+     */
     public MaxDocument loadMaxDocument(String type, String version, String name, 
 				       String info, String body) throws ScriptException 
     {
@@ -236,20 +183,17 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
 	// Create a new instance of the type
 	document = Mda.getDocumentTypeByName(type).newDocument(MaxApplication.getFts());
 
-	if (false /*document instanceof MaxSchemeDocument FIXME*/)
-	    {
-		// Set the name and info
-		document.setName(name);
-		
-		// Eval the body inside the document 
-		// FIXME ((MaxSchemeDocument) document).eval(this, body);
-		
-		// Finally, return the document to the interpreter    
-		return document;
-	    }
-	else
-	    {
-		throw new ScriptException(type + " is not a Scheme based jMax document");
-	    }
+	if (false /*document instanceof MaxSchemeDocument FIXME*/) {
+	    // Set the name and info
+	    document.setName(name);
+	    
+	    // Eval the body inside the document 
+	    // FIXME ((MaxSchemeDocument) document).eval(this, body);
+	    
+	    // Finally, return the document to the interpreter    
+	    return document;
+	} else {
+	    throw new ScriptException(type + " is not a Scheme based jMax document");
+	}
     }
 }
