@@ -70,7 +70,7 @@ public class PencilTool extends TableTool implements DynamicDragListener {
 
   /**
    * DynamicDragListener interface */
-  public void dragStart(int x, int y)
+  public void dragStart(int x, int y, MouseEvent e)
   {
     getGc().getFtsObject().beginUpdate();
     previousX = x;
@@ -80,7 +80,7 @@ public class PencilTool extends TableTool implements DynamicDragListener {
 
   /**
    * DynamicDragListener interface */
-  public void dynamicDrag(int x, int y)
+  public void dynamicDrag(int x, int y, MouseEvent e)
   {
     TableAdapter ta = getGc().getAdapter();
     int x1 = previousX;

@@ -74,7 +74,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
   /**
    * DynamicDragListener interface
    */
-    public void dragStart(int x, int y)
+    public void dragStart(int x, int y, MouseEvent e)
     {
 	mountIModule(itsDirectionChooser, x, y);
 	tempX = x;
@@ -86,7 +86,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
 
     int dddx = 0;
     int dddy = 0;
-    public void dynamicDrag(int deltaX, int deltaY)
+    public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
 	TableAdapter a = ((TableGraphicContext)gc).getAdapter();
 	if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
