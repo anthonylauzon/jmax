@@ -40,16 +40,16 @@
 #define UDP_PACKET_SIZE 512
 
 typedef struct {
-    fts_object_t o;
-    int socket;
-    char buffer[UDP_PACKET_SIZE];
-} updmessage_t;
+  fts_object_t o;
+  int socket;
+  char buffer[UDP_PACKET_SIZE];
+} udpreceive_t;
 
-#define MAXATOMS 128
+#define MAXATOMS 1024
 
-static void updmessage_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpreceive_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  updmessage_t *this = (updmessage_t *)o;
+  udpreceive_t *this = (udpreceive_t *)o;
   fts_atom_t argv[MAXATOMS];
   fts_symbol_t selector = fts_s_list;
   int size, i, argc, first_token;
@@ -107,15 +107,15 @@ static void updmessage_receive( fts_object_t *o, int winlet, fts_symbol_t s, int
 }
 
 
-static void updmessage_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  updmessage_t *this = (updmessage_t *)o;
+  udpreceive_t *this = (udpreceive_t *)o;
   int port;
   struct sockaddr_in addr;
 
   port = fts_get_int_arg( ac, at, 1, 0);
 
-  post( "Created UDPmessage object on port %d\n", port);
+  post( "Created udpreceive object on port %d\n", port);
 
   this->socket = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -137,38 +137,38 @@ static void updmessage_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       return;
     }
 
-  fts_sched_add_fd( fts_sched_get_current(), this->socket, 1, updmessage_receive, (fts_object_t *)this);
+  fts_sched_add_fd( fts_sched_get_current(), this->socket, 1, udpreceive_receive, (fts_object_t *)this);
 }
 
-static void updmessage_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    updmessage_t *this = (updmessage_t *)o;
+  udpreceive_t *this = (udpreceive_t *)o;
 
-    if ( this->socket >= 0)
-      {
-	fts_sched_remove_fd( fts_sched_get_current(), this->socket);
+  if ( this->socket >= 0)
+    {
+      fts_sched_remove_fd( fts_sched_get_current(), this->socket);
 
-	close( this->socket);
-      }
+      close( this->socket);
+    }
 }
 
-static fts_status_t updmessage_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t udpreceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_type_t t[2];
 
-  fts_class_init( cl, sizeof( updmessage_t), 0, 1, 0);
+  fts_class_init( cl, sizeof( udpreceive_t), 0, 1, 0);
 
   t[0] = fts_t_symbol;
   t[1] = fts_t_int;
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, updmessage_init, 2, t);
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, udpreceive_init, 2, t);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, updmessage_delete, 0, 0);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, udpreceive_delete, 0, 0);
 
   return fts_Success;
 }
 
-void udpmessage_config( void)
+void udpreceive_config( void)
 {
-  fts_class_install( fts_new_symbol("udpmessage"), updmessage_instantiate);
+  fts_class_install( fts_new_symbol("udpreceive"), udpreceive_instantiate);
 }

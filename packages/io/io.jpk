@@ -32,3 +32,7 @@ global jmaxArch jmaxMode
 ucs load module io $dir/c/lib/$jmaxArch/$jmaxMode/libio.so
 
 post "package: io (I/O class library: udp, ...)"
+
+# help
+sourceFile $dir/help/io.help.index.tcl
+helpSummary "IO" $dir/help/io.summary.jmax

@@ -26,6 +26,7 @@
 SOURCES= \
 iomodule.c	\
 udp.c		\
-udpmessage.c	\
+udpreceive.c	\
+udpsend.c	\
 serial.c	\
 

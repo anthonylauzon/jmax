@@ -27,14 +27,16 @@
 #include "fts.h"
 
 extern void udp_config(void);
-extern void udpmessage_config(void);
+extern void udpsend_config(void);
+extern void udpreceive_config(void);
 extern void serial_config( void);
 
 static void
 fts_io_init(void)
 {
   udp_config();
-  udpmessage_config();
+  udpsend_config();
+  udpreceive_config();
   serial_config();
 }
 
