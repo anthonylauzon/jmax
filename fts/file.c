@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include <ftsprivate/package.h>
 #include <ftsconfig.h>
 
 #include <limits.h>
@@ -67,24 +68,24 @@ char fts_file_separator = '/';
 #endif
 
 
-int 
-fts_file_exists( const char *filename)
+int fts_file_exists( const char *filename)
 {
   struct stat statbuf;
+
   return stat( filename, &statbuf) == 0;
 }
 
-int 
-fts_is_file(const char *name)
+int fts_is_file(const char *name)
 {
   struct stat statbuf;
+
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 
-int 
-fts_is_directory(const char *name)
+int fts_is_directory(const char *name)
 {
   struct stat statbuf;
+
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFDIR);
 }
 
@@ -98,8 +99,7 @@ char *fts_dirname( char *name)
   return name;
 }
 
-int 
-fts_file_correct_separators( char *filename)
+static int fts_file_correct_separators( char *filename)
 {
 #ifdef WIN32
   int i, len, r = 0;
@@ -117,65 +117,32 @@ fts_file_correct_separators( char *filename)
 #endif
 }
 
-static FILE*
-fts_do_file_open(const char *path, const char *mode)
-{
-  if (*mode == 'w')
-    return fopen(path, "wb");
-  else
-    return fopen(path, "rb");
-}
-
-FILE* 
-fts_file_open(const char *name,  const char *mode)
-{
-  char path[1024];
-
-  if (*mode == 'w')
-    {
-      fts_file_get_write_path(name, path);
-
-      return fts_do_file_open(path,  mode);
-    }
-  else
-    {
-      if (fts_file_get_read_path(name, path))
-	return fts_do_file_open(path, mode); /* @@@ */
-      else
-	return NULL;
-    }
-}
-
-int 
-fts_file_close(FILE* fd)
-{
-  return fclose(fd);
-}
-
-char*
-fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
+char *fts_make_absolute_path(const char* parent, const char* file, char* buf, int len)
 {
   char path[MAXPATHLEN];
 
-  if (!fts_path_is_absolute(file)) {
-    if (parent != NULL) {
-      snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
-    } else {
-      char buf[MAXPATHLEN];
-      getcwd(buf, MAXPATHLEN);
-      snprintf(path, len, "%s%c%s", buf, fts_file_separator, file);      
-    }
-  } else {
-    snprintf(path, len, "%s", file);
-  }
+  if (!fts_path_is_absolute(file))
+    {
+      if (parent != NULL)
+	snprintf(path, len, "%s%c%s", parent, fts_file_separator, file);
+      else 
+	{
+	  char cwd[MAXPATHLEN];
+
+	  getcwd( cwd, MAXPATHLEN);
+	  snprintf( path, len, "%s%c%s", cwd, fts_file_separator, file);      
+	}
+    } 
+  else
+    snprintf( path, len, "%s", file);
+
 
   /* correct possible separators */
   fts_file_correct_separators(path);
 
   /* try to resolve symbolic links */
-  if (realpath(path, buf) == NULL) {
+  if (realpath(path, buf) == NULL)
     snprintf(buf, len, "%s", path);      
-  } 
 
   return buf;
 }
@@ -215,8 +182,7 @@ fts_find_file_aux(const char* root, const char* path, const char* filename, char
   return fts_file_exists(buf);
 }
 
-int 
-fts_find_file(const char* root, fts_list_t* paths, const char* filename, char* buf, int len)
+int fts_file_find_in_path(const char* root, fts_list_t* paths, const char* filename, char* buf, int len)
 {
   const char* path;
 
@@ -239,164 +205,31 @@ fts_find_file(const char* root, fts_list_t* paths, const char* filename, char* b
   return 0;
 }
 
-/*
-  FIXME
-  old stuff, should disappear
-*/
-
-/* global search path */
-static fts_symbol_t fts_search_path = 0;
-
-static const char *
-splitpath( const char *path, char *result, char sep)
+char *fts_file_find( const char *filename, char *buf, int len)
 {
-  if ( *path == '\0')
-    return 0;
+  fts_package_t *pkg;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
 
-  while ( *path != sep && *path != '\0')
+  pkg = fts_project_get();
+  if (fts_package_get_data_file( pkg, filename, buf, len))
+    return buf;
+  
+      /* ask the required packages of the current package */
+  fts_package_get_required_packages( pkg, &pkg_iter);
+
+  while ( fts_iterator_has_more( &pkg_iter)) 
     {
-      *result++ = *path++;
-    }
-
-  *result = '\0';
-
-  return ( *path != '\0') ? path+1 : path;
-}
-
-/*
-   The default search path is set with an UCS command,
-   but also from the user interface.
- */
-void
-fts_set_search_path(fts_symbol_t search_path)
-{
-  fts_search_path = search_path;
-}
-
-fts_symbol_t 
-fts_get_search_path()
-{
-  return fts_search_path;
-}
-
-int 
-fts_file_search_in_path( const char *filename, const char *search_path, char *full_path)
-{
-  if (fts_path_is_absolute(filename))
-    {
-      strcpy( full_path, filename);
-
-      return fts_file_exists( full_path);
-    }
-
-  while ( (search_path = splitpath( search_path, full_path, fts_path_separator)) )
-    {
-      strcat( full_path, "/");
-      strcat( full_path, filename);
-
-      if (fts_file_exists( full_path))
-	  return 1;
-    }
-
-  return 0;
-}
-
-int 
-fts_file_get_read_path(const char *path, char *full_path)
-{
-  if (fts_path_is_absolute(path))
-    {
-      if (fts_file_exists(path))
-	{
-	  strcpy(full_path, path);	  
-	  return 1;
-	}
-    }
-  else
-    {
-      const char *begin, *end, *next;
-
-      next = fts_get_search_path();
+      fts_iterator_next( &pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
       
-      while (next)
-	{
-	  char buf[1024];
-	  
-	  begin = next;
-	  
-	  if ((end = strchr(begin, fts_path_separator)) || (end = strchr(begin, ','))) /* path followed by separator */
-	    next = end + 1; /* skip seperator */
-	  else
-	    {
-	      end = begin + strlen(begin); /* last path in list */
-	      next = 0; /* end of string */
-	    }	  
-	  
-	  if (fts_path_is_absolute(begin)) /* absolute default path */
-	    buf[0] = '\0';
-	  else if (fts_project_get_dir())
-	    strcpy(buf, fts_project_get_dir());
-	  else
-	    begin = 0; /* invalid directory */
-
-	  if (begin)
-	    {
-	      strncat(buf, begin, end - begin);
-	      strcat(buf, "/");
-	      strcat(buf, path);
-	  
-	      /* look for the file */
-	      
-	      if (fts_file_exists(buf))
-		{
-		  if (full_path)
-		    strcpy(full_path, buf);
-		  
-		  return 1;
-		}
-	    }
-	}
+      if (pkg == NULL)
+	continue;
       
-      /* look in project directory itself */
-      
-      if (fts_project_get_dir())
-	{
-	  char buf[1024];
-
-	  strcpy(buf, fts_project_get_dir());
-	  strcat(buf, "/");
-	  strcat(buf, path);
-	  
-	  if (fts_file_exists(buf))
-	    {
-	      if (full_path)
-		strcpy(full_path, buf);
-	      
-	      return 1;
-	    }
-	}
+      if (fts_package_get_data_file( pkg, filename, buf, len))
+	return buf;
     }
 
-  return 0;
+  return NULL;
 }
 
-void fts_file_get_write_path(const char *path, char *full_path)
-{
-  if (full_path)
-    {
-      if (fts_path_is_absolute(path))
-	strcpy(full_path, path); /* path is absolute (just copied) */
-      else
-	{
-	  if (fts_project_get_dir())
-	    {
-	      strcpy(full_path, fts_project_get_dir());
-	      strcat(full_path, "/");
-	    }
-	  else
-	    full_path[0] = '\0';
-	  
-	  strcat(full_path, path);
-	}
-    }
-}

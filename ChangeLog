@@ -1,5 +1,9 @@
 2002-04-09  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* removed old functions for file searching and implemented fts_file_find
+	that looks in project path and then in required packages paths. Cleaned
+	code in file.c. Changed objects w.r.t. this change.
+
 	* hacked loading of patch files so that the search paths of the
 	project contains the directory of the patch file.
 

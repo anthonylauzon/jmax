@@ -22,6 +22,10 @@
 
 #include <string.h>
 #include <fts/fts.h>
+#include <ftsconfig.h>
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
 
 /* sample formats */
 fts_symbol_t fts_s_int8;
@@ -151,9 +155,14 @@ fts_audiofile_open_read(fts_symbol_t filename)
   if (fts_audiofile_loader != NULL) 
     {
       int ret;
-
-      fts_audiofile_t *aufile = audiofile_new(filename, fts_s_read);
+      char buf[MAXPATHLEN];
+      fts_audiofile_t *aufile;
       
+      if (fts_file_find( filename, buf, MAXPATHLEN) == NULL)
+	return NULL;
+      
+      aufile = audiofile_new( buf, fts_s_read);
+
       /* open file */
       ret = fts_audiofile_loader->open_read(aufile);
 
@@ -175,8 +184,14 @@ fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, f
 {
   if (fts_audiofile_loader != NULL) 
     {
-      fts_audiofile_t *aufile = audiofile_new(filename, fts_s_write);
-      char *suffix = strrchr(filename, '.');
+      fts_audiofile_t *aufile;
+      char buf[MAXPATHLEN];
+      char *suffix;
+
+      fts_make_absolute_path( NULL, filename, buf, MAXPATHLEN);
+
+      aufile = audiofile_new(filename, fts_s_write);
+      suffix = strrchr(filename, '.');
 
       aufile->channels = channels;
       aufile->sample_rate = sample_rate;

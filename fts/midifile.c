@@ -21,6 +21,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fts/fts.h>
+#include <ftsconfig.h>
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
 
 /* MIDI status bytes */
 #define NOTE_OFF 0x80
@@ -865,11 +869,10 @@ fts_midifile_init(fts_midifile_t *file, FILE *fp, fts_symbol_t name)
 fts_midifile_t *
 fts_midifile_open_read(fts_symbol_t name)
 {
-  char full_path[1024];
-  const char *path = fts_symbol_name(name);
+  char full_path[MAXPATHLEN];
   FILE *fp;
 
-  if (!fts_file_get_read_path(path, full_path))
+  if (fts_file_find( name, full_path, MAXPATHLEN) == NULL)
     return 0;
 
   fp = fopen(full_path, "rb");
@@ -890,11 +893,9 @@ fts_midifile_t *
 fts_midifile_open_write(fts_symbol_t name)
 {
   char full_path[1024];
-  const char *path = fts_symbol_name(name);
   FILE *fp;
 
-  /* get full path of file location */
-  fts_file_get_write_path(path, full_path);
+  fts_make_absolute_path( NULL, name, full_path, MAXPATHLEN);
 
   fp = fopen(full_path, "wb");
 

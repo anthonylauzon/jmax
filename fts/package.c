@@ -172,7 +172,7 @@ fts_package_load(fts_symbol_t name)
   }
 
   /* locate the directory of the package */
-  if (!fts_find_file(NULL, fts_get_package_paths(), name, path, MAXPATHLEN) 
+  if (!fts_file_find_in_path(NULL, fts_get_package_paths(), name, path, MAXPATHLEN) 
       || !fts_is_directory(path)) {
     fts_log("[package]: Couldn't find package %s\n", name);
     pkg = fts_package_new(name);
@@ -423,7 +423,7 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
       
       snprintf(filename, MAXPATHLEN, "%s.jmax", name);
 
-      if (!fts_find_file(root, pkg->template_paths, filename, path, MAXPATHLEN))
+      if (!fts_file_find_in_path(root, pkg->template_paths, filename, path, MAXPATHLEN))
 	return NULL;
       
       /* Register the template */
@@ -564,37 +564,41 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
   fts_set_symbol( &k, name);
 
   if ((pkg->abstractions_in_path != NULL) 
-      && fts_hashtable_get(pkg->abstractions_in_path, &k, &a)) {
-    return (fts_abstraction_t *) fts_get_pointer(&a);
-  } else {
-    char filename[MAXPATHLEN];
-    char path[MAXPATHLEN];
-    fts_abstraction_t* t;
-    fts_atom_t n, p;
-    const char* root;
-
-    root = (pkg->dir != NULL)? pkg->dir : NULL;
-
-    snprintf(filename, MAXPATHLEN, "%s.abs", name);
-    if (!fts_find_file(root, pkg->abstraction_paths, filename, path, MAXPATHLEN)) {
-      return NULL;
+      && fts_hashtable_get(pkg->abstractions_in_path, &k, &a)) 
+    {
+      return (fts_abstraction_t *) fts_get_pointer(&a);
     }
+  else
+    {
+      char filename[MAXPATHLEN];
+      char path[MAXPATHLEN];
+      fts_abstraction_t* t;
+      fts_atom_t n, p;
+      const char* root;
 
-    /* Register the abstraction */
-    t = fts_abstraction_new(name, fts_new_symbol_copy(path), fts_new_symbol_copy(filename));
+      root = (pkg->dir != NULL)? pkg->dir : NULL;
 
-    /* Create the database if necessary */
-    if (pkg->abstractions_in_path == NULL) {
-      pkg->abstractions_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->abstractions_in_path, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+      snprintf(filename, MAXPATHLEN, "%s.abs", name);
+      if (!fts_file_find_in_path(root, pkg->abstraction_paths, filename, path, MAXPATHLEN))
+	{
+	  return NULL;
+	}
+
+      /* Register the abstraction */
+      t = fts_abstraction_new(name, fts_new_symbol_copy(path), fts_new_symbol_copy(filename));
+
+      /* Create the database if necessary */
+      if (pkg->abstractions_in_path == NULL) {
+	pkg->abstractions_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
+	fts_hashtable_init(pkg->abstractions_in_path, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+      }
+
+      fts_set_symbol(&n, name);
+      fts_set_pointer(&p, t);
+      fts_hashtable_put(pkg->abstractions_in_path, &n, &p);  
+
+      return t;
     }
-
-    fts_set_symbol(&n, name);
-    fts_set_pointer(&p, t);
-    fts_hashtable_put(pkg->abstractions_in_path, &n, &p);  
-
-    return t;
-  }
 }
 
 
@@ -681,9 +685,7 @@ fts_package_add_data_path(fts_package_t* pkg, fts_symbol_t path)
 int 
 fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename, char *buf, int len)
 {
-  const char* root = (pkg->dir != NULL)? pkg->dir : NULL;
-
-  return fts_find_file(root, pkg->data_paths, filename, buf, len);
+  return fts_file_find_in_path( pkg->dir, pkg->data_paths, filename, buf, len);
 }
 
 /********************************************************************

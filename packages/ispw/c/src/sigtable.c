@@ -164,18 +164,22 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   int samps_left, samps_to_read, samps_read;
   char tempbuf[TEMPBUFSIZE+320];
   FILE* fd;
+  char buf[1024];
 
-  if ((fd = fts_file_open(file_name, "r")) < 0){
+  if ( fts_file_find( file_name, buf, 1024) == NULL)
+    post("table~: %s: can't open\n", file_name);
+    return;
+
+  if ((fd = fopen( file_name, "r")) < 0){
     post("table~: %s: can't open\n", file_name);
     return;
   }
 
-  if (fseek(fd, onset, 0) < 0)
-    {
-      post("table~: %s: can't seek to beginning\n", file_name);
-      fts_file_close(fd);
-      return;
-    }
+  if (fseek(fd, onset, 0) < 0){
+    post("table~: %s: can't seek to beginning\n", file_name);
+    fclose(fd);
+    return;
+  }
 
   samps_left = samps_to_read = size + GUARDPTS;
   while(samps_left > 0){
@@ -206,7 +210,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   
   while(samps_left-- > 0) *buf_ptr++ = 0.0f;
 
-  fts_file_close(fd);
+  fclose(fd);
 }
 
 static void
@@ -220,8 +224,11 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   SNDSoundStruct header;
   float *buf_ptr;
   int bufno = 0;
+  char buf[1024];
 
-  if ((fd = fts_file_open(file_name, "w")) < 0){
+  fts_make_absolute_path( NULL, file_name, buf, 1024);
+
+  if ((fd = fopen( file_name, "w")) < 0){
     post("table~: can't create file: %s\n", file_name);
     return;
   }
@@ -235,7 +242,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
 
   if (fwrite((char *)&header, 1, sizeof(header), fd) < (int)sizeof(header)){
     post("table~: write error in header of file: %s\n", file_name);
-    fts_file_close(fd);
+    fclose(fd);
     return;
   }
 
@@ -270,7 +277,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
     samps_to_write -= writehere;
     bufno++;
   }
-  fts_file_close(fd);
+  fclose(fd);
   post("table~: wrote file: %s\n",  file_name);
 }
 

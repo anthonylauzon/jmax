@@ -23,6 +23,9 @@
 #include <ftsconfig.h>
 
 #include <string.h>
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -49,6 +52,7 @@ fts_atom_file_t *
 fts_atom_file_open(const char *name, const char *mode)
 {
   fts_atom_file_t *f;
+  char buf[MAXPATHLEN];
 
   f = (fts_atom_file_t *) fts_malloc(sizeof(fts_atom_file_t));
 
@@ -56,13 +60,17 @@ fts_atom_file_open(const char *name, const char *mode)
 
   if (f->mode == 'w')
     {
-      f->fd = fts_file_open(name, mode);
+      fts_make_absolute_path( NULL, name, buf, MAXPATHLEN);
+      f->fd = fopen( buf, mode);
     }
   else
     {
       /* anything else is like 'r' */
 
-      f->fd = fts_file_open(name, mode);
+      if (fts_file_find( name, buf, MAXPATHLEN) == NULL)
+	return 0;
+
+      f->fd = fopen( buf, mode);
       f->count = 0;
       f->read = 0;
     }
@@ -76,7 +84,7 @@ fts_atom_file_open(const char *name, const char *mode)
 void
 fts_atom_file_close(fts_atom_file_t *f)
 {
-  fts_file_close(f->fd);
+  fclose(f->fd);
   fts_free(f);
 }
 

@@ -1051,6 +1051,13 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
   fts_package_add_abstraction_path( fts_project_get(), fts_new_symbol( dir_name));
   fts_package_add_data_path( fts_project_get(), fts_new_symbol( dir_name));
 
+  /*
+    We change the working directory so that it is the directory of the
+    opened patch.
+  */
+  chdir( dir_name);
+
+
   /* here finds the file-type if is a jmax_file do 
      fts_binary_file_load( filename, parent, 0, 0)
      else if is a dot_pat file do 
