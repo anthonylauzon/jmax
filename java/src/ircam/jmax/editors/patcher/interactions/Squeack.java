@@ -80,13 +80,14 @@ public class Squeack
 
   // Modifiers, 4 bit reserved, multiple value possible, but not currently generated
 
-  static public final int SHIFT    = 0x10;
-  //static public final int CTRL     = 0x20;
-  static public final int SHORTCUT = 0x20;
-  static public final int SHIFT_UP = 0x30;
-  static public final int ALT      = 0x40;
-  static public final int ESCAPE   = 0x50;
-  static public final int DELETE   = 0x60;
+  static public final int SHIFT         = 0x10;
+  //static public final int CTRL        = 0x20;
+  static public final int SHORTCUT      = 0x20;
+  static public final int SHIFT_UP      = 0x30;
+  static public final int ALT           = 0x40;
+  static public final int ESCAPE        = 0x50;
+  static public final int DELETE        = 0x60;
+  static public final int MIDDLE_BUTTON = 0x70;
 
   static public final int MODIFICATION_MASK     = 0xf0;
 
@@ -109,7 +110,11 @@ public class Squeack
   {
     return (squeack & ALT) != 0;
   }
-
+    
+  static final public boolean isMiddleButton(int squeack)
+  {
+    return (squeack & MIDDLE_BUTTON) != 0;
+  }
   // Location, 8 bit reserved
 
   static public final int UNKNOWN    = 0x0000;
@@ -208,6 +213,11 @@ public class Squeack
 	mod = "Shortcut";
     else
       mod = "";
+
+    if(isMiddleButton(squeack))
+	mod = "MiddleButton";
+    else
+	mod = "";
 
     if (isAlt(squeack))
       mod = "Alt";

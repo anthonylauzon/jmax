@@ -50,7 +50,7 @@ public class GuiObjExtension extends tcl.lang.Extension implements JavaExtension
       ObjectCreatorManager.registerFtsClass("messconst", ircam.jmax.guiobj.FtsMessConstObject.class);
       ObjectCreatorManager.registerGraphicClass("messconst", ircam.jmax.guiobj.MessConst.class, "guiobj");
 
-      ObjectCreatorManager.registerFtsClass("button", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerFtsClass("button", ircam.jmax.guiobj.FtsBangObject.class);
       ObjectCreatorManager.registerGraphicClass("button", ircam.jmax.guiobj.Bang.class, "guiobj");
 
       ObjectCreatorManager.registerFtsClass("toggle", ircam.jmax.fts.FtsIntValueObject.class);
@@ -87,7 +87,7 @@ public class GuiObjExtension extends tcl.lang.Extension implements JavaExtension
       ObjectCreatorManager.registerFtsClass("messconst", ircam.jmax.guiobj.FtsMessConstObject.class);
       ObjectCreatorManager.registerGraphicClass("messconst", ircam.jmax.guiobj.MessConst.class, "guiobj");
 
-      ObjectCreatorManager.registerFtsClass("button", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerFtsClass("button", ircam.jmax.guiobj.FtsBangObject.class);
       ObjectCreatorManager.registerGraphicClass("button", ircam.jmax.guiobj.Bang.class, "guiobj");
 
       ObjectCreatorManager.registerFtsClass("toggle", ircam.jmax.fts.FtsIntValueObject.class);

@@ -140,8 +140,10 @@ class EditModeInteraction extends Interaction
 	    editor.resetHighlighted();
 	    return Interactions.vResizeInteraction;
 
-	  case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
-	  case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):
+	    /*case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
+	      case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):*/
+	  case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.TEXT):
+	  case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.OBJECT):
 	    // Help
 	    editor.resetHighlighted();
 	    return Interactions.helpInteraction;
