@@ -136,7 +136,10 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     ValueInfoTable.init();
     SequenceImages.init();
 
-    this.info = ValueInfoTable.getValueInfo(args[offset].symbolValue.toString());
+    if( args[offset].symbolValue != null)
+      this.info = ValueInfoTable.getValueInfo(args[offset].symbolValue.toString());
+    else
+      this.info = AnythingValue.info;
 
     if(length > offset+1)
       this.trackName = args[offset+1].symbolValue.toString();
