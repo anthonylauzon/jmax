@@ -44,6 +44,7 @@ class VResizeInteraction extends SubInteraction
 	object.redraw();
 	object.resizeBy(0, mouse.y - oldMouse.y);
 	object.redraw();
+	engine.getSketch().fixSize(); 
 	break;
 
       case Squeack.UP:
