@@ -16,9 +16,9 @@ public class ArrowTool extends ScrTool implements PositionListener, DirectionLis
   /**
    * Constructor. 
    */
-  public ArrowTool(GraphicContext theGc) 
+  public ArrowTool(GraphicContext theGc, ImageIcon theImageIcon) 
   {
-    super("arrow", new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/selecter.gif"));
+    super("arrow", theImageIcon);
     
     gc = theGc;
     

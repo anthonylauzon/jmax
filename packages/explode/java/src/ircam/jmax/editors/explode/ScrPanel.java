@@ -4,7 +4,9 @@ import com.sun.java.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
 
+import ircam.jmax.*;
   /**
    * The actual panel of a score editor. It contains the "sensible" part.
    * The graphic representation is handled by 
@@ -155,22 +157,20 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   private void initTools() 
   {
 
-    itsDefaultTool = new ArrowTool(gc);
+    String fs = File.separator;
+    String path = MaxApplication.getProperty("root")+fs+"packages/explode/images"+fs;
+
+    itsDefaultTool = new ArrowTool(gc, new ImageIcon(path+"selecter.gif"));
 
     tools.addElement( itsDefaultTool);
 
-    tools.addElement(new ScrAddingTool(gc,
-				       new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/adder.gif")));
-    tools.addElement(new DeleteTool(gc,  
-				    new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/eraser.gif")));
-    tools.addElement(new MoverTool(gc, 
-				   new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/vmover.gif"), 
+    tools.addElement(new ScrAddingTool(gc,  new ImageIcon(path+"adder.gif")));
+    tools.addElement(new DeleteTool(gc, new ImageIcon(path+"eraser.gif")));
+    tools.addElement(new MoverTool(gc, new ImageIcon(path+"vmover.gif"), 
 				   MoverTool.VERTICAL_MOVEMENT));
-    tools.addElement(new MoverTool(gc, 
-				   new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/hmover.gif"), 
+    tools.addElement(new MoverTool(gc, new ImageIcon(path+"hmover.gif"), 
 				   MoverTool.HORIZONTAL_MOVEMENT));
-    tools.addElement(new ResizerTool(gc, 
-				   new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/resizer.gif")));
+    tools.addElement(new ResizerTool(gc, new ImageIcon(path+"resizer.gif")));
 
   }
 
