@@ -27,36 +27,67 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
   ErmesSketchPad itsSketchPad;
   FtsConnection itsFtsConnection;
   private boolean selected;
-  Rectangle  itsRectangle = new Rectangle();
+
+  private int startX;
+  private int startY;
+  private int endX;
+  private int endY;
+
+  static final int UP_RIGHT = 0;
+  static final int UP_LEFT  = 0;
+  static final int DOWN_RIGHT = 0;
+  static final int DOWN_LEFT  = 0;
+  private boolean down;
+  private boolean right;
+
+  // For info in the near function, see http://www.exaflop.org/docs/cgafaq/
+
+  private int squaredK;
+
+  public ErmesConnection(ErmesSketchPad theSketchPad,
+			 ErmesObject fromObj, int theOutlet,
+			 ErmesObject toObj, int theInlet,
+			 FtsConnection theFtsConnection) 
+  {
+    itsFtsConnection = theFtsConnection;
+    itsFromObject    = fromObj;
+    itsToObject      = toObj;
+    itsSketchPad     = theSketchPad;
+    itsInletNum      = theInlet;
+    itsOutletNum     = theOutlet;
+    selected         = false;
+  }
+
+
+  void update()
+  {
+    startX = itsFromObject.getConnectionStartX( itsOutletNum);
+    startY = itsFromObject.getConnectionStartY( itsOutletNum);
+    endX   = itsToObject.getConnectionEndX( itsInletNum);
+    endY   = itsToObject.getConnectionEndY( itsInletNum);
+
+    down  = (startX <= endX);
+    right = (startY <= endY);
+
+    squaredK = 9 * ((startX - endX)*(startX - endX) + (startY - endY)*(startY - endY));
+  }
 
   ErmesSketchPad getSketchPad() 
-    {
-      return itsSketchPad;
-    }
+  {
+    return itsSketchPad;
+  }
 
   ErmesObject getSourceObject() 
-    {
-      return itsFromObject;
-    }
+  {
+    return itsFromObject;
+  }
 
   ErmesObject getDestObject() 
-    {
-      return itsToObject;
-    }
+  {
+    return itsToObject;
+  }
 
   
-  public ErmesConnection( ErmesSketchPad theSketchPad, ErmesObject fromObj, int theOutlet, ErmesObject toObj, int theInlet, FtsConnection theFtsConnection) 
-    {
-      itsFtsConnection = theFtsConnection;
-      itsFromObject = fromObj;
-      itsToObject = toObj;
-      itsSketchPad = theSketchPad;
-      itsInletNum = theInlet;
-      itsOutletNum = theOutlet;
-      selected = false;
-    }
-
-
   // Destructor
 
   void delete()
@@ -84,124 +115,73 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
     return selected;
   }
 
-  boolean IsNearToPoint( int x, int y) 
-    {
-      int startX = itsFromObject.getConnectionStartX( itsOutletNum);
-      int startY = itsFromObject.getConnectionStartY( itsOutletNum);
-      int endX = itsToObject.getConnectionEndX( itsInletNum);
-      int endY = itsToObject.getConnectionEndY( itsInletNum);
+  boolean isNear( int x, int y)
+  {
+    int z = (startY - y) * (endX - x) - (startX - x) * (endY - y);
 
-      int dx = java.lang.Math.abs( endX - startX);
-      int dy = java.lang.Math.abs( endY - startY);
+    return (z*z < squaredK);
+  }
 
-      if ( dx > dy)
-	return ( SegmentIntersect( x, y-3, x, y+3, startX, startY, endX, endY));
-      else
-	return ( SegmentIntersect( x-3, y, x+3, y, startX, startY, endX, endY));
-    }
+  public void paint( Graphics g) 
+  {
+    g.setColor( Color.black);
 
-
-  private boolean SegmentIntersect( int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) 
-    {
-      int dx21 = x2 - x1;
-      int dx31 = x3 - x1;
-      int dx41 = x4 - x1;
-      int dy21 = y2 - y1;
-      int dy31 = y3 - y1;
-      int dy41 = y4 - y1;
-      int det1 = dx31*dy21 - dy31*dx21;
-      int det2 = dx41*dy21 - dy41*dx21;
-
-      if ( ( det1 == 0)&&( det2 == 0)) 
-	{
-	  if ( ( y1 == y2)&&( y1 == y3)&&( y1 == y4))
-	    return ( Scambio( x1, x2, x3, x4));
-	  else
-	    return ( Scambio( y1, y2, y3, y4));
-	} 
-      else 
-	{
-	  int dx32 = x3 - x2;
-	  int dx34 = x3 - x4;
-	  int dy32 = y3 - y2;
-	  int dy34 = y3 - y4;
-	  int det3 = dx34*dy31 - dy34*dx31;
-	  int det4 = dx34*dy32 - dy34*dx32;
-	  return ( ( ( ( det1<=0)&&( det2>=0))||( ( det1>=0)&&( det2<=0)))&&
-		   ( ( ( det3<=0)&&( det4>=0))||( ( det3>=0)&&( det4<=0))));
-	}
-    }
-
-  boolean Scambio( int x1, int x2, int x3, int x4) 
-    {
-      int temp;
-      if ( x2 < x1) 
-	{
-	  temp = x2;
-	  x2 = x1;
-	  x1 = temp;
-	}
-      if ( x4 < x3) 
-	{
-	  temp = x4;
-	  x4 = x3;
-	  x3 = temp;
-	}
-
-      return ( ( x2 > x3)&&( x4 > x1));
-    }
-
-  public void Paint( Graphics g) 
-    {
-      int startX = itsFromObject.getConnectionStartX( itsOutletNum);
-      int startY = itsFromObject.getConnectionStartY( itsOutletNum);
-      int endX = itsToObject.getConnectionEndX( itsInletNum);
-      int endY = itsToObject.getConnectionEndY( itsInletNum);
-
-      g.setColor( Color.black);
-      if ( selected) 
-	{
-	  if ( java.lang.Math.abs( startX-endX)>50) 
-	    {
-	      g.drawLine( startX, startY, endX, endY);
-	      g.drawLine( startX, startY+1, endX, endY+1);
-	    } 
-	  else 
-	    {
-	      g.drawLine( startX, startY, endX, endY);
-	      g.drawLine( startX-1, startY, endX-1, endY);
-	    }
-	} 
-      else
-	g.drawLine( startX, startY, endX, endY);
-    }
+    if ( selected) 
+      {
+	if ( java.lang.Math.abs( startX-endX)>50) 
+	  {
+	    g.drawLine( startX, startY, endX, endY);
+	    g.drawLine( startX, startY+1, endX, endY+1);
+	  } 
+	else 
+	  {
+	    g.drawLine( startX, startY, endX, endY);
+	    g.drawLine( startX-1, startY, endX-1, endY);
+	  }
+      } 
+    else
+      g.drawLine( startX, startY, endX, endY);
+  }
 
   // Connections should store their bounds !!!
 
   public void redraw()
   {
-    int startX = itsFromObject.getConnectionStartX( itsOutletNum);
-    int startY = itsFromObject.getConnectionStartY( itsOutletNum);
-    int endX = itsToObject.getConnectionEndX( itsInletNum);
-    int endY = itsToObject.getConnectionEndY( itsInletNum);
-      
-    itsSketchPad.repaint(Math.min(startX, endX), Math.min(startY, endY),
-			 Math.abs(startX - endX), Math.abs(startY - endY));
+    if (down)
+      {
+	if (right)
+      	  itsSketchPad.repaint(startX, startY, endX - startX, endY - startY);
+	else
+	  itsSketchPad.repaint(startX, endY, endX - startX, startY - endY);
+      }
+    else
+      if (right)
+	itsSketchPad.repaint(endX, startY, startX - endX, endY - startY);
+    else
+	itsSketchPad.repaint(endX, endY, startX - endX, startY - endY);
   }
 
-  public Rectangle getBounds()
-  {
-    int startX = itsFromObject.getConnectionStartX( itsOutletNum);
-    int startY = itsFromObject.getConnectionStartY( itsOutletNum);
-    int endX = itsToObject.getConnectionEndX( itsInletNum);
-    int endY = itsToObject.getConnectionEndY( itsInletNum);
-      
-    itsRectangle.x      = Math.min(startX, endX);
-    itsRectangle.y      = Math.min(startY, endY);
-    itsRectangle.width  = Math.abs(startX - endX);
-    itsRectangle.height = Math.abs(startY - endY);
 
-    return itsRectangle;
+  public final boolean intersects(Rectangle r)
+  {
+    if (down)
+      {
+	if (right)
+	  return !((r.x + r.width <= startX) || (r.y + r.height <= startY) ||
+		   (r.x >= endX) || (r.y >= endY));
+	else
+	  return !((r.x + r.width <= startX) || (r.y + r.height <= endY) ||
+		   (r.x >= endX) || (r.y >= startY));
+      }
+    else
+      {
+	if (right)
+	  return !((r.x + r.width <= endX) || (r.y + r.height <= startY) ||
+		   (r.x >= startX) || (r.y >= endY));
+	else
+	  return !((r.x + r.width <= endX) || (r.y + r.height <= endY) ||
+		   (r.x >= startX) || (r.y >= startY));
+      }
   }
 }
 

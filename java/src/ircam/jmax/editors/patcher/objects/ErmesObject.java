@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import javax.swing.*;
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
@@ -40,15 +42,11 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   protected Font itsFont = null;
   protected FontMetrics itsFontMetrics = null;
 
-  static final int PADS_DISTANCE = 12;
-  static final int DRAG_DIMENSION = 4;
-
-  private Rectangle itsRectangle = new Rectangle();
+  private Rectangle bounds;
 
   // Sensibility areas
   private static InletSensibilityArea inletArea = new InletSensibilityArea();
   private static OutletSensibilityArea outletArea = new OutletSensibilityArea();
-  private static InletOutletSensibilityArea inletOutletArea = new InletOutletSensibilityArea();
   private static HResizeSensibilityArea hResizeArea = new HResizeSensibilityArea();
 
 
@@ -98,7 +96,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
     selected = false;
 
-    itsRectangle = new Rectangle( theFtsObject.getX(), theFtsObject.getY(),
+    bounds = new Rectangle( theFtsObject.getX(), theFtsObject.getY(),
 				  theFtsObject.getWidth(), theFtsObject.getHeight());
 
     fontName = itsFtsObject.getFont();
@@ -130,51 +128,55 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   
   public final int getX() 
   {
-    return itsRectangle.x;
+    return bounds.x;
   }
 
   protected void setX( int theX) 
   {
-    itsRectangle.x = theX;
-    itsFtsObject.setX( itsRectangle.x);
+    bounds.x = theX;
+    itsFtsObject.setX( bounds.x);
+    itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getY() 
   {
-    return itsRectangle.y;
+    return bounds.y;
   }
 
   protected void setY( int theY) 
   {
-    itsRectangle.y = theY;
-    itsFtsObject.setY( itsRectangle.y);
+    bounds.y = theY;
+    itsFtsObject.setY( bounds.y);
+    itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getWidth() 
   {
-    return itsRectangle.width;
+    return bounds.width;
   }
 
   public void setWidth( int w) 
   {
     if (w > 0)
       {
-	itsRectangle.width = w;
+	bounds.width = w;
 	itsFtsObject.setWidth( w);
+	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
   }
 
   public final int getHeight() 
   {
-    return itsRectangle.height;
+    return bounds.height;
   }
 
   public void setHeight( int h) 
   {
     if (h > 0)
       {
-	itsRectangle.height = h;
+	bounds.height = h;
 	itsFtsObject.setHeight( h);
+	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
   }
 
@@ -265,7 +267,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
       }
   }
 
-  public void Paint( Graphics g)
+  public void paint( Graphics g)
   {
     g.setColor( Color.black);
 
@@ -283,7 +285,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   public void redraw()
   {
-    itsSketchPad.repaint( itsRectangle.x, itsRectangle.y - 1, itsRectangle.width, itsRectangle.height + 2 );
+    itsSketchPad.repaint( bounds.x, bounds.y - 1, bounds.width, bounds.height + 2 );
     itsSketchPad.getDisplayList().redrawConnectionsFor(this); // experimental
   }
 
@@ -359,41 +361,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     return io;
   }
 
-  private int findNearestInOutlet_old( int mouseX, int n)
-  {
-    if ( n == 0)
-      return -1;
-
-    int w = getWidth();
-
-    int x = mouseX - getX();
-    int distance = w / n;
-    int hole = distance/3;
-    int nearestLeft = x / (w / n);
-
-    int io = -1;
-
-    if (nearestLeft == 0)
-      {
-	if ( x < distance - hole)
-	  io = 0;
-      }
-    else if (nearestLeft == n - 1)
-      {
-	if ( x > (n - 1)*distance + hole)
-	  io = n - 1;
-      }
-    else
-      {
-	int nearestLeftX = nearestLeft * distance;
-	
-	if ( x > nearestLeftX + hole && x < nearestLeftX + distance - hole)
-	  io = nearestLeft;
-      }
-
-    return io;
-  }
-
   public SensibilityArea findSensibilityArea( int mouseX, int mouseY)
     {
       int x = getX();
@@ -438,20 +405,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
       return null;
     }
 
-  public SensibilityArea findConnectionSensibilityArea( int mouseX, int mouseY)
-    {
-      int inlet = findNearestInOutlet( mouseX, itsFtsObject.getNumberOfInlets());
-
-      if ( inlet >= 0)
-	{
-	  inletOutletArea.setNumber( inlet);
-	  inletOutletArea.setObject(this);
-	  return inletOutletArea;
-	}
-
-      return null;
-    }
-
   // This method is called whenever we want to edit the content of
   // an object within a separate editor; do nothing by default
 
@@ -471,15 +424,35 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     if ( theDeltaH == 0 && theDeltaV == 0)
       return;
 
-    setX( itsRectangle.x + theDeltaH);
-    setY( itsRectangle.y + theDeltaV);
+    setX( bounds.x + theDeltaH);
+    setY( bounds.y + theDeltaV);
   }
 
   public Rectangle getBounds() 
   {
     // (fd, mdc) Bounds don't copy the bound rectangle any more
     // and nobody is allowed to modify it.
-    return itsRectangle;
+    return bounds;
+  }
+
+  public boolean intersects(Rectangle rect)
+  {
+    return bounds.intersects(rect);
+  }
+
+  public boolean contains(Point point)
+  {
+    return bounds.contains(point);
+  }
+
+  public boolean contains(int x, int y)
+  {
+    return bounds.contains(x, y);
+  }
+
+  public void rectangleUnion(Rectangle rect)
+  {
+    SwingUtilities.computeUnion(bounds.x, bounds.y, bounds.width, bounds.height, rect);
   }
 
 
@@ -500,7 +473,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   public Dimension Size() 
   {
-    return ( new Dimension( itsRectangle.width, itsRectangle.height));
+    return ( new Dimension( bounds.width, bounds.height));
   }
 
   // Called at ErmesObject disposal
@@ -527,8 +500,8 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
 	if (annotation != null)
 	  {
-	    ax = itsRectangle.x + itsRectangle.width / 2;
-	    ay = itsRectangle.y + itsRectangle.height / 2;
+	    ax = bounds.x + bounds.width / 2;
+	    ay = bounds.y + bounds.height / 2;
 	    aw = itsFontMetrics.stringWidth( annotation);
 	    ah = itsFontMetrics.getHeight();
 
@@ -545,3 +518,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
       }
   }
 }
+
+
+

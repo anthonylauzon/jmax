@@ -189,7 +189,7 @@ public class TextMenu extends JMenu
       {
 	item = (JRadioButtonMenuItem)itsFontsMenu.getItem( i);
 
-	if (item.getLabel().equals(fontName))
+	if (item.getText().equals(fontName))
 	  {
 	    item.setSelected(true);
 	    break;
@@ -200,7 +200,7 @@ public class TextMenu extends JMenu
       {
 	item = (JRadioButtonMenuItem)itsSizesMenu.getItem( i);
 
-	if (Integer.parseInt(item.getLabel()) == fontSize)
+	if (Integer.parseInt(item.getText()) == fontSize)
 	  {
 	    item.setSelected(true);
 	    break;

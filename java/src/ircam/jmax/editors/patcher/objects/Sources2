@@ -15,6 +15,7 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/ErmesObjSlider.java    \
 	$(INCLUDE_PATH)/ErmesObjSliderDialog.java    \
 	$(INCLUDE_PATH)/ErmesObjToggle.java    \
+	$(INCLUDE_PATH)/TextSensibilityArea.java \
 	$(INCLUDE_PATH)/InletSensibilityArea.java \
 	$(INCLUDE_PATH)/OutletSensibilityArea.java \
 	$(INCLUDE_PATH)/HResizeSensibilityArea.java \

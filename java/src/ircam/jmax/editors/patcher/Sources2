@@ -24,6 +24,7 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/ErmesDrawable.java  \
 	$(INCLUDE_PATH)/ErmesModule.java  \
 	$(INCLUDE_PATH)/EditField.java  \
+	$(INCLUDE_PATH)/TextRenderer.java  \
 	$(INCLUDE_PATH)/ErmesObjInOutPop.java  \
 	$(INCLUDE_PATH)/ErmesPatcherFactory.java  \
 	$(INCLUDE_PATH)/ErmesPatcherListener.java  \
@@ -37,7 +38,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FpePanel.java  \
 	$(INCLUDE_PATH)/KeyMap.java      \
 	$(INCLUDE_PATH)/KeyEventClient.java  \
-	$(INCLUDE_PATH)/MultiLineText.java  \
 	$(INCLUDE_PATH)/Settings.java
 
 

@@ -113,7 +113,7 @@ public class EditMenu extends PatcherMenu
   {
     if (locked)
       {
-	lockItem.setLabel("Unlock");
+	lockItem.setText("Unlock");
 	enableSelectAll(false);
 	enableCut(false);
 	enableCopy(false);
@@ -122,7 +122,7 @@ public class EditMenu extends PatcherMenu
       }
     else
       {
-	lockItem.setLabel("Lock");
+	lockItem.setText("Lock");
 
 	if (ErmesSelection.patcherSelection.isEmpty())
 	  {

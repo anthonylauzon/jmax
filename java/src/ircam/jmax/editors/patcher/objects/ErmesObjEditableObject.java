@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import javax.swing.*;
+
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
@@ -16,39 +18,36 @@ import ircam.jmax.editors.patcher.*;
 abstract public class ErmesObjEditableObject extends ErmesObject implements FtsInletsListener, FtsOutletsListener
 {
   boolean editing = false;
-
-  protected MultiLineText itsText = new MultiLineText();
+  TextRenderer textRenderer;
 
   ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
-    itsText.setFontMetrics( getFontMetrics());
-    itsText.setText( getArgs());
-
     if (getWidth() == -1)
       setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
-    else
-      updateDimensions();
+
+    textRenderer = new TextRenderer(this);
+    textRenderer.update();
   }
 
-  private void updateDimensions()
+  public void updateDimensions()
   {
-    itsText.setWidth( getWidth() - 2*getTextXOffset());
-    super.setHeight( getFontMetrics().getHeight()*itsText.getRows() + 2*getTextYOffset());
+    textRenderer.update();
+    super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
   }
 
   // redefined from base class
-  public  void setWidth( int theWidth) 
+
+  public  void setWidth(int w) 
   {
-    int minWidth = getFontMetrics().stringWidth( "m ") + 2*getTextXOffset();
+    // textRenderer.update();
 
-    if (theWidth < minWidth)
-      theWidth = minWidth;
-
-    super.setWidth( theWidth);
-
-    updateDimensions();
+    if (textRenderer.canResizeWidthTo(w - getTextWidthOffset()))
+      {
+	super.setWidth(w);
+	super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
+      }
   }
 
   // redefined from base class, only when not editing
@@ -61,64 +60,11 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   }
 
   // redefined from base class
-  public void setFont( Font theFont)
+  public void setFont( Font f)
   {
-    super.setFont( theFont);
-
-    if ( itsText != null)
-      {
-	itsText.setFontMetrics( getFontMetrics());
-
-	super.setHeight( getFontMetrics().getHeight()*itsText.getRows() + 2*getTextYOffset());
-      }
-  }
-
-
-  // (em) set the text AND adjust the dimension of the object accordingly
-  protected void setText( String text)
-  {
-    itsText.setText(text);
-    updateDimensions();
-  }
-
-  // get the number of rows in the multiline text;
-  // needed in editing
-
-  public int getRows()
-  {
-    return itsText.getRows();
-  }
-
-  public void dispose()
-  {
-    itsText = null;
-    super.dispose();
-  }
-
-  // ----------------------------------------
-  // White and text area offset
-  // for now, this base class provides default value.
-  // These methods should be abstracts.
-  // ----------------------------------------
-
-  public int getWhiteXOffset()
-  {
-    return 0;
-  }
-
-  public int getWhiteYOffset()
-  {
-    return 0;
-  }
-
-  protected int getTextXOffset()
-  {
-    return 0;
-  }
-
-  protected int getTextYOffset()
-  {
-    return 0;
+    super.setFont( f);
+    textRenderer.setFont(f);
+    super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
   }
 
   // ----------------------------------------
@@ -131,23 +77,14 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   // ``TextBackground'' property
   // ----------------------------------------
 
-  public Color getTextBackground()
-  {
-    return Color.white;
-  }
+  abstract public Color getTextBackground();
 
   // Properties to position correctly the text editor
 
-  abstract public int getTextEditorX();
-  abstract public int getTextEditorY();
-  abstract public int getTextEditorWidth();
-  abstract public int getTextEditorHeight();
-
-  public Insets getTextEditorMargin()
-  {
-    return null;
-  }
-
+  abstract public int getTextXOffset();
+  abstract public int getTextYOffset();
+  abstract public int getTextWidthOffset();
+  abstract public int getTextHeightOffset();
 
   public void setEditing(boolean v)
   {
@@ -162,29 +99,60 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   {
     redraw();
     redrawConnections();
+    itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public void outletsChanged(int n)
   {
     redraw();
     redrawConnections();
+    itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
-    
-  protected void DrawParsedString( Graphics theGraphics) 
+
+  static Container ic = new Panel();
+
+  protected void DrawParsedString(Graphics g) 
   {
     if (editing)
       return;
 
-    int x = getX() + getTextXOffset();
-    int y = getY() + getTextYOffset() + getFontMetrics().getAscent();
-    int height = getFontMetrics().getHeight();
+    textRenderer.setBackground(getTextBackground());
 
-    for ( Enumeration e = itsText.elements(); e.hasMoreElements(); ) 
+    SwingUtilities.paintComponent(g,
+				  textRenderer,
+				  ic,
+				  getX() + getTextXOffset(),
+				  getY() + getTextYOffset(),
+				  getWidth() - getTextWidthOffset(),
+				  getHeight() - getTextHeightOffset());
+  }
+
+  // Text Sensibility area 
+
+  private static SensibilityArea textArea = new TextSensibilityArea();
+
+  public SensibilityArea findSensibilityArea( int mouseX, int mouseY)
+  {
+    int dx = mouseX - (getX() + getTextXOffset());
+    int dy = mouseY - (getY() + getTextYOffset());
+
+    if ((dx >= 0) && (dx < getWidth() - getTextWidthOffset()) &&
+	(dy >= 0) && (dy < getHeight() - getTextHeightOffset()))
       {
-	theGraphics.drawString( (String)e.nextElement(), x, y);
-	y += height;
+	textArea.setObject(this);
+	return 	textArea;
       }
+    else
+      return super.findSensibilityArea( mouseX, mouseY);
   }
 }
+
+
+
+
+
+
+
+
 
 

@@ -159,6 +159,22 @@ public class DisplayList
 	}
   }
 
+  public void updateConnectionsFor(ErmesObject obj)
+  {
+    Object[] values = displayObjects.getObjectArray();
+    int size = displayObjects.size();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof ErmesConnection)
+	{
+	  ErmesConnection connection = (ErmesConnection) values[i];
+
+	  if ((connection.getSourceObject() == obj) || 
+	      (connection.getDestObject() == obj))
+	    connection.update();
+	}
+  }
+
   // Generic operation on objects in the display List
 
   public void applyToConnections(ConnectionAction action)
@@ -193,7 +209,7 @@ public class DisplayList
 
     for (int i = 0; i < size; i++)
       for (int j = 0; j < i; j++)
-	if (after(values[j], values[i]))
+	if (isAfter(values[j], values[i]))
 	  {
 	    Object v;
 
@@ -203,7 +219,7 @@ public class DisplayList
 	  }
   }
 
-  private final boolean after(Object do1, Object do2)
+  private final boolean isAfter(Object do1, Object do2)
   {
     if (do1 instanceof ErmesObject)
       {
@@ -276,7 +292,7 @@ public class DisplayList
 	  {
 	    ErmesObject object = (ErmesObject) values[i];
 
-	    if (object.getBounds().contains( x,y))
+	    if (object.contains( x,y))
 	      {
 		SensibilityArea area = object.findSensibilityArea( x, y);
 
@@ -290,7 +306,7 @@ public class DisplayList
 	  {
 	    ErmesConnection  connection = (ErmesConnection) values[i];
 
-	    if (connection.IsNearToPoint( x, y))
+	    if (connection.isNear( x, y))
 	      return connection;
 	  }
       }
@@ -305,11 +321,35 @@ public class DisplayList
   //                                                                            //
   ////////////////////////////////////////////////////////////////////////////////
 
+  boolean doneOnce = false;
+  static Container ic = new Panel();
 
   public void paint( Graphics g)
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
+
+    // Very First, if this is the first paint for the window,
+    // we do a fake paint with the textRenderer (doesn't work
+    // before its first paint) and then we update the dimension
+    // of all the editable objects; also, don't ask me why we are
+    // doing two updateDimensions ...
+
+    if (! doneOnce)
+      {
+	doneOnce = true;
+
+	for ( int i = 0; i < size; i++)
+	  {
+	    ErmesDrawable object = (ErmesDrawable) values[i];
+
+	    if (object instanceof ErmesObjEditableObject)
+	      {
+		((ErmesObjEditableObject)object).paint(g);
+		((ErmesObjEditableObject)object).updateDimensions(); // HACK ? Yes !
+	      }
+	  }
+      }
 
     // First, paint the background
 
@@ -326,8 +366,8 @@ public class DisplayList
       {
 	ErmesDrawable object = (ErmesDrawable) values[i];
 
-	if (clip.intersects(object.getBounds()))
-	  object.Paint( g);
+	if (object.intersects(clip))
+	  object.paint( g);
       }
 
     // Finally, draw the Drag/effermeral thingies
@@ -394,7 +434,7 @@ public class DisplayList
 
     public void processObject(ErmesObject object)
       {
-	if (object.getBounds().intersects( rect))
+	if (object.intersects( rect))
 	  {
 	    if (object.isSelected())
 	      {
@@ -501,9 +541,7 @@ public class DisplayList
     
     public void processObject(ErmesObject object)
     {
-      Rectangle bounds = object.getBounds();
-
-      SwingUtilities.computeUnion(bounds.x, bounds.y, bounds.width, bounds.height, r);      
+      object.rectangleUnion(r);
     }
   }
 

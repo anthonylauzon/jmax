@@ -2,19 +2,19 @@ package ircam.jmax.editors.patcher.interactions;
 
 import java.awt.*;
 
-import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
-
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-/** The interaction handling Moves cursor changes; 
-  Note that each interaction should set its initial cursor.
+/** The interaction handling moving objects in edit mode; 
+  As a special case, can open the editfield on the object
+  content if the move didn't worked out.
   */
 
 
 class MoveInteraction extends SubInteraction
 {
+  ErmesObject object;
+
   MoveInteraction(InteractionEngine engine, Interaction master)
   {
     super(engine, master);
@@ -23,30 +23,43 @@ class MoveInteraction extends SubInteraction
   void configureInputFilter(InputFilter filter)
   {
     filter.setFollowingMoves(true);
+    filter.setAutoScrolling(true);
   }
-
 
   void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    if (squeack == (Squeack.MOVE | Squeack.BACKGROUND))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.OBJECT))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.CONNECTION))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.HRESIZE_HANDLE))
-      engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
-    if (squeack == (Squeack.MOVE | Squeack.VRESIZE_HANDLE))
-      engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
-    if (squeack == (Squeack.MOVE | Squeack.INLET))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
-    if (squeack == (Squeack.MOVE | Squeack.OUTLET))
-      engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-    
-    end();
+    switch (squeack)
+      {
+      case (Squeack.DOWN | Squeack.OBJECT):
+	
+	object = (ErmesObject) dobject;
+	engine.getDisplayList().objectToFront(object);
+
+	if (! object.isSelected())
+	  {
+	    if (! ErmesSelection.patcherSelection.isEmpty() )
+	      {
+		ErmesSelection.patcherSelection.redraw();
+		ErmesSelection.patcherSelection.deselectAll();
+	      }
+
+	    ErmesSelection.patcherSelection.select(object);
+	    object.redraw();
+	  }
+	engine.getSketch().setCursor(Cursor.getDefaultCursor());
+	break;
+
+      case Squeack.DRAG:
+	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
+	engine.getSketch().fixSize(); 
+	break;
+
+      case Squeack.UP:
+	end();
+	break;
+      }
   }
 }
-
 
 
 

@@ -2,7 +2,7 @@ package ircam.jmax.editors.patcher.objects;
 
 import ircam.jmax.editors.patcher.*;
 
-public class SensibilityArea implements DisplayObject
+public abstract class SensibilityArea implements DisplayObject
 {
   ErmesObject object; // the object this area belong to
 
@@ -15,5 +15,7 @@ public class SensibilityArea implements DisplayObject
   {
     return  object;
   }
+
+  abstract public int getSqueackBits();
 }
 

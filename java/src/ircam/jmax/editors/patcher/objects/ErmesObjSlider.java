@@ -70,17 +70,17 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     void eraseAndPaint( Graphics g) 
     {
       if ( !erased)
-	Paint( g, XOR_MODE);      
+	paint( g, XOR_MODE);      
 
-      Paint( g, PAINT_MODE);
+      paint( g, PAINT_MODE);
     }
 
     void paintNoErase( Graphics g) 
     {
-      Paint( g, PAINT_MODE);
+      paint( g, PAINT_MODE);
     }
 
-    private  void Paint( Graphics g, int mode) 
+    private  void paint( Graphics g, int mode) 
     {
       int deltaX = getX() + THROTTLE_LATERAL_OFFSET;
       int deltaY;
@@ -283,7 +283,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 	if ( itsSketchPad.isLocked())
 	  Paint_movedThrottle( g);
 	else
-	  Paint( g);
+	  paint( g);
 
 	g.dispose();
       }
@@ -403,7 +403,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     itsThrottle.eraseAndPaint( g);
   }
 
-  public void Paint( Graphics g) 
+  public void paint( Graphics g) 
   {
     if( !isSelected()) 
       g.setColor( Settings.sharedInstance().getUIColor());
@@ -414,7 +414,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
     itsThrottle.paintNoErase( g);
 
-    super.Paint( g);
+    super.paint( g);
   }
 
   public void moveBy( int theDeltaH, int theDeltaV) 
@@ -427,13 +427,8 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   public SensibilityArea findSensibilityArea( int mouseX, int mouseY)
   {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
-
-    if (mouseY >= y + h - VResizeSensibilityArea.height
-	 && mouseX >= x + w / 2)
+    if (mouseY >= getY() + getHeight() - VResizeSensibilityArea.height
+	 && mouseX >= getX() + getWidth() / 2)
       {
 	vResizeArea.setObject(this);
 	return vResizeArea;

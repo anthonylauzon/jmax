@@ -35,24 +35,9 @@ public class ErmesObjComment extends ErmesObjEditableObject {
   {
     ((FtsCommentObject)itsFtsObject).setComment( text);
 
-    // (em) set the text and adjust the size
-    setText( text);
-  }
+    // Adjust the size
 
-  // ----------------------------------------
-  // White area offset
-  // ----------------------------------------
-  private static final int WHITE_X_OFFSET = 2;
-  private static final int WHITE_Y_OFFSET = 2;
-
-  public final int getWhiteXOffset()
-  {
-    return WHITE_X_OFFSET;
-  }
-
-  public final int getWhiteYOffset()
-  {
-    return WHITE_Y_OFFSET;
+    updateDimensions();
   }
 
   // ----------------------------------------
@@ -61,37 +46,40 @@ public class ErmesObjComment extends ErmesObjEditableObject {
   private static final int TEXT_X_OFFSET = 2;
   private static final int TEXT_Y_OFFSET = 2;
 
-  protected final int getTextXOffset()
+  public int getTextXOffset()
   {
     return TEXT_X_OFFSET;
   }
 
-  protected final int getTextYOffset()
+  public int getTextYOffset()
   {
     return TEXT_Y_OFFSET;
   }
 
-  public int getTextEditorX()
+  public int getTextWidthOffset()
   {
-    return getX() + 2;
+    return 6;
   }
 
-  public int getTextEditorY()
+  public int getTextHeightOffset()
   {
-    return getY() + 2;
+    return 4;
   }
 
-  public int getTextEditorWidth()
+  public Color getTextBackground()
   {
-    return getWidth() - 6;
+    if (itsSketchPad.isLocked())
+      return Color.white;
+    else
+      {
+	if (isSelected())
+	  return Color.gray;
+	else
+	  return itsSketchPad.getBackground();
+      }
   }
 
-  public int getTextEditorHeight()
-  {
-    return getHeight() - 4;
-  }
-
-  public void Paint(Graphics g) 
+  public void paint(Graphics g) 
   {
     if ( !itsSketchPad.isLocked())
       {
@@ -104,18 +92,7 @@ public class ErmesObjComment extends ErmesObjEditableObject {
       }
 
     //text
-    g.setColor( Color.black);
-    g.setFont( getFont());
     DrawParsedString( g);
-  }
-
-  // ----------------------------------------
-  // ``TextBackground'' property
-  // ----------------------------------------
-
-  public Color getTextBackground()
-  {
-    return itsSketchPad.getBackground();
   }
 
   //--------------------------------------------------------

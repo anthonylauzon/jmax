@@ -66,12 +66,12 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
 	itsToggled = temp;
 
 	Graphics g = itsSketchPad.getGraphics();
-	Paint( g);
+	paint( g);
 	g.dispose();
       }
   }
 
-  public void Paint(Graphics g) 
+  public void paint(Graphics g) 
   {
     int x = getX();
     int y = getY();
@@ -92,6 +92,6 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
 	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
       }
 
-    super.Paint( g);
+    super.paint( g);
   }
 }

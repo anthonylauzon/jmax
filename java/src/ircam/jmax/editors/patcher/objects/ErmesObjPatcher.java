@@ -39,8 +39,8 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   {
     ( (FtsPatcherObject)itsFtsObject).redefinePatcher( text);
     
-    // (em) set the text and adjust the size
-    setText( getArgs());
+    // adjust the size
+    updateDimensions();
   }
 	
 
@@ -55,61 +55,43 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   }
 
   // ----------------------------------------
-  // White area offset
-  // ----------------------------------------
-  private static final int WHITE_X_OFFSET = 4;
-  private static final int WHITE_Y_OFFSET = 4;
-
-  public final int getWhiteXOffset()
-  {
-    return WHITE_X_OFFSET;
-  }
-
-  public final int getWhiteYOffset()
-  {
-    return WHITE_Y_OFFSET;
-  }
-
-  // ----------------------------------------
   // Text area offset
   // ----------------------------------------
   private static final int TEXT_X_OFFSET = 4;
-  private static final int TEXT_Y_OFFSET = 3; // WAS 2
-
-  protected final int getTextXOffset()
+  private static final int TEXT_Y_OFFSET = 3;
+  
+  public int getTextXOffset()
   {
     return TEXT_X_OFFSET;
   }
 
-  protected final int getTextYOffset()
+  public int getTextYOffset()
   {
     return TEXT_Y_OFFSET;
   }
 
-  public int getTextEditorX()
+  public int getTextWidthOffset()
   {
-    return getX() + 4;
+    return 7;
   }
 
-  public int getTextEditorY()
+  public int getTextHeightOffset()
   {
-    return getY() + 3;
+    return 7;
   }
 
-  public int getTextEditorWidth()
+  public Color getTextBackground()
   {
-    return getWidth() - 6;
+    if (isSelected()) 
+      return Settings.sharedInstance().getSelectedColor();
+    else 
+      return Settings.sharedInstance().getObjColor();
   }
-
-  public int getTextEditorHeight()
-  {
-    return getHeight() - 7;
-  }
-
 
   // ----------------------------------------
   // Inspector
   // ----------------------------------------
+
   public void inspect() 
   {
   }
@@ -117,7 +99,8 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   //--------------------------------------------------------
   // Paint stuff
   //--------------------------------------------------------
-  public void Paint( Graphics g) 
+
+  public void paint( Graphics g) 
   {
     if (isSelected()) 
       g.setColor( Settings.sharedInstance().getSelectedColor());
@@ -127,20 +110,8 @@ class ErmesObjPatcher extends ErmesObjEditableObject
     g.fill3DRect( getX() + 1, getY() + 1, getWidth() - 2, getHeight() - 2, true);
     g.draw3DRect( getX() + 2, getY() + 2, getWidth() - 5, getHeight() - 5, false);
     
-    g.setColor( Color.black);
-    g.setFont( getFont());
     DrawParsedString( g);
 
-    super.Paint( g);
+    super.paint( g);
   }
-
-  // ----------------------------------------
-  // ``TextBackground'' property
-  // ----------------------------------------
-
-  public Color getTextBackground()
-  {
-    return Settings.sharedInstance().getObjColor();
-  }
-
 }

@@ -88,7 +88,7 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
   }
 
 
-  public void Paint( Graphics g) 
+  public void paint( Graphics g) 
   {
     int x = getX();
     int xp1 = x + 1;
@@ -139,7 +139,7 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
 		  x + hd2 + 5, 
 		  y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2 + 1);
 
-    super.Paint( g);
+    super.paint( g);
   }
 
   String getVisibleString(String theString) 

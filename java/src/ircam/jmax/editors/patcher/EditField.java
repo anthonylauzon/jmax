@@ -16,11 +16,11 @@ import javax.swing.event.*;
 // The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
 //
 
-public class EditField extends JTextArea  {
+public class EditField extends JTextArea
+{
 
   private ErmesObjEditableObject owner = null;
   private ErmesSketchPad sketch = null;
-  private boolean focused = false;
 
   // Private action classes 
 
@@ -107,6 +107,8 @@ public class EditField extends JTextArea  {
   {
     super();
 
+    setCursor( Cursor.getPredefinedCursor( Cursor.TEXT_CURSOR));
+
     sketch = editor;
 
     setFont(FontCache.lookupFont(ircam.jmax.utils.Platform.FONT_NAME,
@@ -123,7 +125,7 @@ public class EditField extends JTextArea  {
 
     setEditable(true);
     setLineWrap(true);
-    setWrapStyleWord(false);
+    setWrapStyleWord(true);
 
     selectAll();
   }
@@ -139,15 +141,13 @@ public class EditField extends JTextArea  {
     owner.setEditing(true);
     setFont(owner.getFont());
     setText(owner.getArgs());
+
     setBackground(owner.getTextBackground());
 
-    setBounds(owner.getTextEditorX(),
-	      owner.getTextEditorY(),
-	      owner.getTextEditorWidth(),
-	      owner.getTextEditorHeight());
-
-    if (owner.getTextEditorMargin() != null)
-      setMargin(owner.getTextEditorMargin());
+    setBounds(owner.getX() + owner.getTextXOffset(),
+	      owner.getY() + owner.getTextYOffset(),
+	      owner.getWidth() - owner.getTextWidthOffset(),
+	      owner.getHeight() - owner.getTextHeightOffset());
 
     if (p != null)
       {
@@ -218,44 +218,16 @@ public class EditField extends JTextArea  {
   {
     if (getText() != null)
       {
-	try
-	  {
-	    Rectangle eol = modelToView(getText().length());
+	Dimension d = getPreferredSize();
 
-	    if (eol.y >= getHeight())
-	      {
-		owner.setHeight(owner.getHeight() + owner.getFontMetrics().getHeight());
-		owner.redraw();
-		reshape(owner.getTextEditorX(),
-			  owner.getTextEditorY(),
-			  owner.getTextEditorWidth(),
-			  owner.getTextEditorHeight());
-
-		sketch.fixSize();
-	      }
-	  }
-	catch (javax.swing.text.BadLocationException e)
-	  {
-	    System.err.println("Resize, if needed, exception" + e);
-	  }
+	owner.redraw();
+	owner.setHeight(d.height + owner.getTextHeightOffset());
+	owner.redraw();
+	setSize(d);
+	sketch.fixSize();
       }
   }
        
-
-  private Dimension minimumSize = new Dimension();
-
-  public Dimension getMinimumSize() 
-  {
-    minimumSize.setSize(owner.getWidth() - owner.getWhiteXOffset(),
-			owner.getHeight() - owner.getWhiteYOffset());
-    return minimumSize;
-  }
-
-  public Dimension getPreferredSize() 
-  {
-    return getMinimumSize();
-  }
-
   // Support for cut editing operations
 
   void deleteSelectedText()

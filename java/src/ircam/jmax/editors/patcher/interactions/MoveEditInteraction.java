@@ -14,7 +14,7 @@ import ircam.jmax.editors.patcher.objects.*;
 class MoveEditInteraction extends SubInteraction
 {
   ErmesObject object;
-  boolean editAtUp;
+  boolean dragged;
 
   MoveEditInteraction(InteractionEngine engine, Interaction master)
   {
@@ -31,16 +31,41 @@ class MoveEditInteraction extends SubInteraction
   {
     switch (squeack)
       {
-      case (Squeack.DOWN | Squeack.OBJECT):
+      case (Squeack.DOWN | Squeack.TEXT):
 	
-	object = (ErmesObject) dobject;
+	object = ((SensibilityArea) dobject).getObject();
 	engine.getDisplayList().objectToFront(object);
+	dragged = false;
 
-	if (object.isSelected())
+	break;
+
+      case Squeack.DRAG:
+
+	if (! dragged)
 	  {
-	    editAtUp = true;
+	    engine.getSketch().setCursor(Cursor.getDefaultCursor());
+
+	    dragged = true;
+
+	    if (! object.isSelected())
+	      {
+		if (! ErmesSelection.patcherSelection.isEmpty() )
+		  {
+		    ErmesSelection.patcherSelection.redraw();
+		    ErmesSelection.patcherSelection.deselectAll();
+		  }
+
+		ErmesSelection.patcherSelection.select(object);
+		object.redraw();
+	      }
 	  }
-	else
+
+	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
+	engine.getSketch().fixSize(); 
+	break;
+
+      case Squeack.UP:
+	if (! dragged)
 	  {
 	    if (! ErmesSelection.patcherSelection.isEmpty() )
 	      {
@@ -48,31 +73,10 @@ class MoveEditInteraction extends SubInteraction
 		ErmesSelection.patcherSelection.deselectAll();
 	      }
 
-	    ErmesSelection.patcherSelection.select(object);
-	    object.redraw();
-	    editAtUp = false;
-	  }
-	engine.getSketch().setCursor(Cursor.getDefaultCursor());
-	break;
-
-      case Squeack.DRAG:
-	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
-	engine.getSketch().fixSize(); 
-	editAtUp = false;
-	break;
-
-      case Squeack.UP:
-	if (editAtUp && (object instanceof ErmesObjEditableObject))
-	  {
-	    ErmesSelection.patcherSelection.redraw();
-	    ErmesSelection.patcherSelection.deselectAll();
 	    engine.getSketch().textEditObject((ErmesObjEditableObject)object, mouse);
 	  }
 	end();
 	break;
-
-      default:
-	object.gotSqueack(squeack, mouse, oldMouse);
       }
   }
 }

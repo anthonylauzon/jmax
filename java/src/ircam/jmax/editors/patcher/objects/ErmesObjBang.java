@@ -104,7 +104,7 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
 		getHeight() - 2*(CIRCLE_ORIGIN+1) - 1);
   }
 
-  public void Paint( Graphics g) 
+  public void paint( Graphics g) 
   {
     int x = getX();
     int y = getY();
@@ -126,6 +126,6 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
 		w - 2*CIRCLE_ORIGIN - 1,
 		h - 2*CIRCLE_ORIGIN - 1);
 
-    super.Paint( g);
+    super.paint( g);
   }
 }

@@ -23,7 +23,7 @@ public class ErmesObjIn extends ErmesObjInOut {
     ((FtsInletObject)itsFtsObject).setPosition( itsId);
   }
 
-  public void Paint(Graphics g) 
+  public void paint(Graphics g) 
   {
     if (isSelected())
       g.setColor( Settings.sharedInstance().getSelectedColor());
@@ -65,7 +65,7 @@ public class ErmesObjIn extends ErmesObjInOut {
     g.setColor( Color.black);
     g.drawString( s, xs, ys);
 
-    super.Paint( g);
+    super.paint( g);
   }
 
   public void editContent()

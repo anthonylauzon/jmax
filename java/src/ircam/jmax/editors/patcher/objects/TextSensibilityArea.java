@@ -2,12 +2,10 @@ package ircam.jmax.editors.patcher.objects;
 
 import ircam.jmax.editors.patcher.interactions.Squeack;
 
-public class VResizeSensibilityArea extends SensibilityArea 
+public class TextSensibilityArea extends SensibilityArea
 {
-  static int height = 4;
-
   public int getSqueackBits()
   {
-    return Squeack.VRESIZE_HANDLE;
+    return Squeack.TEXT;
   }
 }

@@ -44,9 +44,6 @@ class RunCtrlInteraction extends SubInteraction
 	object.gotSqueack(squeack, mouse, oldMouse);
 	end();
 	break;
-
-      default:
-	object.gotSqueack(squeack, mouse, oldMouse);
       }
   }
 }

@@ -34,7 +34,7 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
 	itsInteger = value;
 
 	Graphics g = itsSketchPad.getGraphics();
-	Paint(g);
+	paint(g);
 	g.dispose();
       }
   }

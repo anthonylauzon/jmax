@@ -32,23 +32,6 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
     return ((FtsMessageObject)itsFtsObject).getMessage();
   }
 
-  // ----------------------------------------
-  // White area offset
-  // ----------------------------------------
-//   private static final int WHITE_X_OFFSET = 3;
-//   private static final int WHITE_Y_OFFSET = 3;
-  private static final int WHITE_X_OFFSET = 4;
-  private static final int WHITE_Y_OFFSET = 2;
-
-  public final int getWhiteXOffset()
-  {
-    return WHITE_X_OFFSET;
-  }
-
-  public final int getWhiteYOffset()
-  {
-    return WHITE_Y_OFFSET;
-  }
 
   // ----------------------------------------
   // Text area offset
@@ -58,44 +41,33 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
   private static final int TEXT_X_OFFSET = 3;
   private static final int TEXT_Y_OFFSET = 2;
 
-  protected final int getTextXOffset()
+  public int getTextXOffset()
   {
     return TEXT_X_OFFSET;
   }
 
-  protected final int getTextYOffset()
+  public int getTextYOffset()
   {
     return TEXT_Y_OFFSET;
   }
 
-  // Properties to position correctly the text editor
-
-  public int getTextEditorX()
+  public int getTextWidthOffset()
   {
-    return getX() + 3;
+    return 6;
   }
 
-  public int getTextEditorY()
+  public int getTextHeightOffset()
   {
-    return getY() + 2;
-  }
-
-  public int getTextEditorWidth()
-  {
-    return getWidth() - 6;
-  }
-
-  public int getTextEditorHeight()
-  {
-    return getHeight() - 4;
+    return 4;
   }
 
   public void redefine( String text) 
   {
     ((FtsMessageObject)itsFtsObject).setMessage( text);
 
-    // (em) set the text and adjust the size
-    setText( text);
+    // adjust the size
+
+    updateDimensions();
   }
 
   // Set the text when FTS change the message content
@@ -104,12 +76,11 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
   {
     // (fd) To be redone
     // Should be a nice repaint ??
-    // (em) set the text and adjust the size
 
-    setText( message);
+    // updateDimensions();
 
     Graphics g = itsSketchPad.getGraphics();
-    Paint(g);
+    paint(g);
     g.dispose();
   }
 
@@ -133,36 +104,40 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
       }
   }
 
-  public void Paint(Graphics g) 
+  // ----------------------------------------
+  // ``TextBackground'' property
+  // ----------------------------------------
+
+  public Color getTextBackground()
   {
-    if ( !itsSketchPad.isLocked()) 
+    if (! itsSketchPad.isLocked()) 
       {
 	if( itsFlashing) 
-	  g.setColor( Settings.sharedInstance().getSelectedColor());
+	  return Settings.sharedInstance().getSelectedColor();
 	else
 	  {
-	    if(isSelected()) 
-	      g.setColor( Settings.sharedInstance().getSelectedColor());
+	    if (isSelected()) 
+	      return Settings.sharedInstance().getSelectedColor();
 	    else
-	      g.setColor( Color.white);
+	      return Color.white;
 	  }
       }
     else 
       {
 	if ( itsFlashing || isSelected())
-	  g.setColor( Settings.sharedInstance().getSelectedColor());
+	  return Settings.sharedInstance().getSelectedColor();
 	else 
-	  //g.setColor( Settings.sharedInstance().getUIColor());
-	  g.setColor( Color.white);
+	  return Color.white;
       }
-  
+  }
+
+  public void paint(Graphics g) 
+  {
+    g.setColor(getTextBackground());
     g.fillRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2);
-    //g.fill3DRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2, true);
     
-    g.setColor( Color.black);
-    g.setFont( getFont());
     DrawParsedString( g);
 
-    super.Paint( g);
+    super.paint( g);
   }
 }

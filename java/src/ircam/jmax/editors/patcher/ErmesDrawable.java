@@ -7,7 +7,7 @@ import java.awt.*;
  */
 
 public interface ErmesDrawable {
-  abstract public void Paint(Graphics g);
+  abstract public void paint(Graphics g);
   abstract public void redraw();
-  abstract public Rectangle getBounds();
+  abstract public boolean intersects(Rectangle r);
 }

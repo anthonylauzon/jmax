@@ -25,8 +25,9 @@ class IdleEditInteraction extends Interaction
   Interaction hResizeInteraction;
   Interaction vResizeInteraction;
   Interaction moveEditInteraction;
-  Interaction dragConnectInteraction;
   Interaction moveInteraction;
+  Interaction dragConnectInteraction;
+  Interaction followInteraction;
   Interaction connectionSelectInteraction;
   Interaction connectionToggleSelectInteraction;
   Interaction doubleClickEditInteraction;
@@ -42,11 +43,12 @@ class IdleEditInteraction extends Interaction
     hResizeInteraction    = new HResizeInteraction(engine, this);
     vResizeInteraction    = new VResizeInteraction(engine, this);
     moveEditInteraction   = new MoveEditInteraction(engine, this);
-    dragConnectInteraction = new DragConnectInteraction(engine, this);
     moveInteraction       = new MoveInteraction(engine, this);
+    dragConnectInteraction = new DragConnectInteraction(engine, this);
+    followInteraction       = new FollowInteraction(engine, this);
     connectionSelectInteraction = new ConnectionSelectInteraction(engine, this);
     connectionToggleSelectInteraction = new ConnectionToggleSelectInteraction(engine, this);
-    doubleClickEditInteraction = new DoubleClickEditInteraction(engine, this);
+    doubleClickEditInteraction = new CtrlDoubleClickEditInteraction(engine, this);
   }
 
   void configureInputFilter(InputFilter filter)
@@ -60,7 +62,7 @@ class IdleEditInteraction extends Interaction
     if (Squeack.isMove(squeack))
       {
       	// Move
-	engine.setInteraction(moveInteraction);
+	engine.setInteraction(followInteraction);
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
       }
     else switch (squeack)
@@ -77,6 +79,11 @@ class IdleEditInteraction extends Interaction
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
 	break;
       case (Squeack.DOWN | Squeack.OBJECT):
+	// Drag Select
+	engine.setInteraction(moveInteraction);
+	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
+	break;
+      case (Squeack.DOWN | Squeack.TEXT):
 	// Drag Select
 	engine.setInteraction(moveEditInteraction);
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
@@ -115,7 +122,8 @@ class IdleEditInteraction extends Interaction
 	engine.setInteraction(helpInteraction);
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
 	break;
-      case (Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+      case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.TEXT):
+      case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.OBJECT):
 	// Edit Content 
 	engine.setInteraction(doubleClickEditInteraction);
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);

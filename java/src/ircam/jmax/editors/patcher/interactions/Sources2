@@ -15,7 +15,10 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/InteractionEngine.java \
 	$(INCLUDE_PATH)/MoveEditInteraction.java \
 	$(INCLUDE_PATH)/MoveInteraction.java \
+	$(INCLUDE_PATH)/FollowInteraction.java \
 	$(INCLUDE_PATH)/RunCtrlInteraction.java \
 	$(INCLUDE_PATH)/Squeack.java \
 	$(INCLUDE_PATH)/SubInteraction.java \
 	$(INCLUDE_PATH)/VResizeInteraction.java \
+	$(INCLUDE_PATH)/CtrlDoubleClickEditInteraction.java \
+	$(INCLUDE_PATH)/DoubleClickEditInteraction.java

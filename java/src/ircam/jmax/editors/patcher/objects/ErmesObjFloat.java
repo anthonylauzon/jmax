@@ -38,7 +38,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
     itsFloat = value;
 
     Graphics g = itsSketchPad.getGraphics();
-    Paint(g);
+    paint(g);
     g.dispose();
   }
 

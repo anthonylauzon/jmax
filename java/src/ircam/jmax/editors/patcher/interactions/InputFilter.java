@@ -128,14 +128,8 @@ final class InputFilter implements MouseMotionListener, MouseListener
       return Squeack.OBJECT;
     else if (object instanceof ErmesConnection)
       return Squeack.CONNECTION;
-    else if (object instanceof HResizeSensibilityArea)
-      return Squeack.HRESIZE_HANDLE;
-    else if (object instanceof VResizeSensibilityArea)
-      return Squeack.VRESIZE_HANDLE;
-    else if (object instanceof OutletSensibilityArea)
-      return Squeack.OUTLET;
-    else if (object instanceof InletSensibilityArea)
-      return Squeack.INLET;
+    else if (object instanceof SensibilityArea)
+      return ((SensibilityArea)object).getSqueackBits();
     else
       return Squeack.UNKNOWN;
   }

@@ -85,7 +85,8 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   public ErmesObjInOutPop itsInPop = null;
   public ErmesObjInOutPop itsOutPop = null;
-  private EditField itsEditField = null;
+  private EditField itsEditField;
+  private TextRenderer textRenderer;
 
   // FONT HANDLING
 
@@ -298,6 +299,9 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     itsEditField = new EditField( this);
     add( itsEditField);
 
+    // TEST
+    // textRenderer = new TextRenderer(this);
+
     itsEditField.setVisible( false);
     
     setBackground( Settings.sharedInstance().getEditBackgroundColor());
@@ -481,6 +485,11 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   final public EditField getEditField()
   {
     return itsEditField;
+  }
+
+  final public TextRenderer getTextRenderer()
+  {
+    return textRenderer;
   }
 
   final public boolean isTextEditingObject()

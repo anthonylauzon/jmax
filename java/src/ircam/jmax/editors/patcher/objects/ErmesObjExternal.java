@@ -63,8 +63,10 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
 	System.out.println("Error in redefining object, action cancelled");
       }
 
-    // (em) set the text and adjust the size
-    setText( getArgs());
+    
+    // (em) adjust the size
+
+    updateDimensions();
   }
 
 
@@ -80,76 +82,45 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
 
 
   // ----------------------------------------
-  // White area offset
-  // ----------------------------------------
-  // Settings for 20 pixels height
-  private static final int WHITE_X_OFFSET = 3;
-  private static final int WHITE_Y_OFFSET = 3;
-  // Settings for 18 pixels height
-//   private static final int WHITE_X_OFFSET = 2;
-//   private static final int WHITE_Y_OFFSET = 2;
-
-  public final int getWhiteXOffset()
-  {
-    return WHITE_X_OFFSET;
-  }
-
-  public final int getWhiteYOffset()
-  {
-    return WHITE_Y_OFFSET;
-  }
-
-  // ----------------------------------------
   // Text area offset
   // ----------------------------------------
-  // Settings for 20 pixels height
-  private static final int TEXT_X_OFFSET = 4;
-  private static final int TEXT_Y_OFFSET = 2;
-  // Settings for 18 pixels height
-//   private static final int TEXT_X_OFFSET = 3;
-//   private static final int TEXT_Y_OFFSET = 1;
 
-  protected final int getTextXOffset()
+  private static final int TEXT_X_OFFSET = 3;
+  private static final int TEXT_Y_OFFSET = 3;
+
+  public int getTextXOffset()
   {
     return TEXT_X_OFFSET;
   }
 
-  protected final int getTextYOffset()
+  public int getTextYOffset()
   {
     return TEXT_Y_OFFSET;
   }
 
-  public int getTextEditorX()
+  public int getTextWidthOffset()
   {
-    return getX() + 4;
+    return 5;
   }
 
-  public int getTextEditorY()
+  public int getTextHeightOffset()
   {
-    return getY() + 2;
+    return 5;
   }
 
-  public int getTextEditorWidth()
+  public Color getTextBackground()
   {
-    return getWidth() - 6;
-  }
-
-  public int getTextEditorHeight()
-  {
-    return getHeight() - 6;
-  }
-
-  final static Insets margin = new Insets(0, 0, 0, 0);
-
-  public Insets getTextEditorMargin()
-  {
-    return margin;
+    if (isSelected())
+      return Settings.sharedInstance().getSelectedColor();
+    else
+      return Color.white;
   }
 
   // ----------------------------------------
   // Paint stuff
   // ----------------------------------------
-  public void Paint(Graphics g) 
+
+  public void paint(Graphics g) 
   {
     if (isError == -1)
       {
@@ -174,25 +145,11 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
     int w = getWidth();
     int h = getHeight();
 
-    // For 20 pixels height
     g.fill3DRect( x+1, y+1, w-2, h-2, true);
-    // For 18 pixels height
-//     g.draw3DRect( x+1, y+1, w-3, h-3, true);
 
-    if (isSelected())
-      g.setColor( Settings.sharedInstance().getSelectedColor());
-    else
-      g.setColor( Color.white);
-
-    int whiteXOffset = getWhiteXOffset();
-    int whiteYOffset = getWhiteYOffset();
-    g.fillRect( x + whiteXOffset, y + whiteYOffset, w - 2*whiteXOffset, h - 2*whiteYOffset);
-
-    g.setColor( Color.black);
-    g.setFont( getFont());
     DrawParsedString( g);
 
-    super.Paint( g);
+    super.paint( g);
   }
 }
 
