@@ -100,10 +100,10 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   MaxDocumentType editedType;
 
-  public Menu itsFileMenu;
-  public Menu itsNewFileMenu;
-  public Menu itsEditMenu;	
-  public Menu itsWindowsMenu;
+  private Menu itsFileMenu;
+  private Menu itsNewFileMenu;
+  private Menu itsEditMenu;	
+  private Menu itsWindowsMenu;
 
 
   public MaxEditor(String title, MaxDocumentType type, boolean register)
@@ -164,6 +164,12 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     removeKeyListener(this);
     removeWindowListener(this);
     doDestroyDispose();
+
+    itsFileMenu.remove(itsNewFileMenu);    
+    getMenuBar().remove(itsFileMenu);
+    getMenuBar().remove(itsEditMenu);
+    getMenuBar().remove(itsWindowsMenu);
+
     setVisible(false);
     dispose();
   }

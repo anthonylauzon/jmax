@@ -100,6 +100,8 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   private Menu itsSizesMenu;	
   private Menu itsFontsMenu;
   private Menu itsExecutionMenu;
+  private Menu itsTextMenu;
+  private Menu itsGraphicsMenu;
 
   CheckboxMenuItem itsSelectedSizeMenu;   //the Selected objects size MenuItem
   CheckboxMenuItem itsSketchSizeMenu;     //the SketchPad size MenuItem
@@ -324,12 +326,12 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     //GetClearMenu().setEnabled(false);
     
     // Add the Graphics menu
-    Menu itsGraphicsMenu = new Menu( "Graphics");
+    itsGraphicsMenu = new Menu( "Graphics");
     menuBar.add( itsGraphicsMenu);
     FillGraphicsMenu( itsGraphicsMenu);
 
     // Add the Text menu
-    Menu itsTextMenu = new Menu( "Text");
+    itsTextMenu = new Menu( "Text");
     menuBar.add( itsTextMenu);
     FillTextMenu( itsTextMenu);
 
@@ -811,6 +813,14 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
     itsPatcher.removeWatch( this);
     itsSketchPad.cleanAll();
+
+    itsGraphicsMenu.remove( itsAlignObjectMenu);
+    itsTextMenu.remove( itsSizesMenu);
+    itsTextMenu.remove( itsFontsMenu);
+
+    getMenuBar().remove(itsExecutionMenu);
+    getMenuBar().remove(itsTextMenu);
+    getMenuBar().remove(itsGraphicsMenu);
 
     itsSketchPad = null;
     itsPatcher = null;

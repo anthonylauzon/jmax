@@ -257,7 +257,11 @@ public class MaxApplication extends Object
     
     // Look if there are documents to open in the 
     // command line.
-    
+
+    long startTime = 0;
+    if (getProperty("jmaxLoadBenchmark") != null)
+      startTime = System.currentTimeMillis();
+
     for (int i = 0 ; i < toOpen.size(); i++)
       {
 	MaxDocument document = null;
@@ -276,6 +280,11 @@ public class MaxApplication extends Object
 	  { 
 	    if ((document != null) && document.getDocumentType().isEditable())
 	      document.edit();
+
+	    /* Special Support for load/unload benchmark  */
+
+	    if (getProperty("jmaxLoadUnloadBenchmark") != null)
+	      document.dispose();
 	  }
 	catch (MaxDocumentException e)
 	  {
@@ -283,6 +292,24 @@ public class MaxApplication extends Object
 	    // May be an hack, may be is ok; move this stuff to an action
 	    // handler !!
 	  }
+      }
+
+    /* Report the loading time if needed */
+
+
+    if (getProperty("jmaxLoadBenchmark") != null)
+      {
+	long elapsedTime;
+
+	elapsedTime = System.currentTimeMillis() - startTime;
+
+	System.err.println("jMax version " + MaxVersion.getMaxVersion());
+	System.err.println(" date " + new Date());
+	System.err.println(" loading time " + elapsedTime + " msecs");
+	System.err.println("Total memory " + Runtime.getRuntime().totalMemory());
+	System.err.println("Used memory " + (Runtime.getRuntime().totalMemory() -
+					     Runtime.getRuntime().freeMemory()));
+
       }
   }
   

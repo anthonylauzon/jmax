@@ -19,7 +19,10 @@ class ErmesObjInt extends ErmesObjNumberBox {
   {
     super( theSketchPad, theFtsObject);
 
-    itsInteger = ((Integer)itsFtsObject.get("value")).intValue();
+    Object value  = (Integer)itsFtsObject.get("value");
+
+    if (value instanceof Integer)
+      itsInteger = ((Integer)value).intValue();
   }
 
   public void propertyChanged(FtsObject obj, String name, Object value) 

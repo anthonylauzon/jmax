@@ -2084,7 +2084,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //	DeleteConnection
   //	delete one connection routine
   //--------------------------------------------------------
-  void DeleteConnection( ErmesConnection theConnection, boolean paintNow)
+  void DeleteConnection( ErmesConnection theConnection)
   {
     if (theConnection.itsFtsConnection != null)
       theConnection.itsFtsConnection.delete();
@@ -2096,6 +2096,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   //--------------------------------------------------------
   void DeleteGraphicConnection( ErmesConnection theConnection, boolean paintNow)
   {
+    /* Removing from the selection may be redundant if the deleting was started
+       from the UI, but is needed if the deleted has been started by FTS */
+
     currentSelection.removeConnection( theConnection);
     itsConnections.removeElement( theConnection);
 
@@ -2145,16 +2148,18 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     ErmesObject aObject;
     ErmesConnection aConnection;
 
-    while ( !currentSelection.itsObjects.isEmpty()) 
+    while (! currentSelection.itsObjects.isEmpty()) 
       {
 	aObject = (ErmesObject) currentSelection.itsObjects.elementAt( 0);
 	DeleteObject( aObject, false);
       }
       
-    while (!currentSelection.itsConnections.isEmpty())
+    while (! currentSelection.itsConnections.isEmpty())
       {
 	aConnection = (ErmesConnection) currentSelection.itsConnections.elementAt( 0);
-	DeleteConnection( aConnection, false);
+	currentSelection.removeConnection( aConnection);
+
+	DeleteConnection( aConnection);
       }
     
     GetSketchWindow().DeselectionUpdateMenu();

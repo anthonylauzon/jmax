@@ -97,6 +97,9 @@ public class MaxVector
 
   public final Object elementAt(int index)
   {
+    if (index > fillPointer)	//@@@
+      System.err.println("BACO BACO");
+
     return objects[index];
   }
 

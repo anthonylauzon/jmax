@@ -1190,8 +1190,7 @@ public class FtsServer
 	  c = (FtsConnection)  msg.getNextArgument();
 
 	  if (FtsServer.debug) 
-	    System.err.println("Connection Release" + c);
-
+	    System.err.println("Connection Release " + c);
 
 	  Fts.getSelection().removeConnection(c);
 	  c.release();

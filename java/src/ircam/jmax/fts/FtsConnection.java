@@ -87,16 +87,13 @@ public class FtsConnection
 
   public void release()
   {
-    if (deleted)
-      return;
-
     deleted = true;
 
     from.setDirty(); // from and to must be in the same document !!
 
     if (from.getPatcherData() != null)
       from.getPatcherData().removeConnection(this);
-	
+
     // Clean up
 
     from = null;
