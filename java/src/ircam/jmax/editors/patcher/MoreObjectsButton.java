@@ -49,7 +49,7 @@ public class MoreObjectsButton extends JMenuBar
 
       menu = new JMenu("");
       menu.setMargin(new Insets(0, 0, 0, 0));
-      menu.setIcon(Icons.get("_more_objects_"));
+      menu.setIcon(SystemIcons.get("_more_objects_"));
       menu.setPreferredSize(new Dimension(24, 19));
       menu.setMinimumSize(new Dimension(24, 19));
 
