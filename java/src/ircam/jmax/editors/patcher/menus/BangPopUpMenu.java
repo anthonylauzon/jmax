@@ -69,8 +69,7 @@ public class BangPopUpMenu extends JMenu
 	    if(!source.getValueIsAdjusting())
 		{
 		    if(current!=null)
-			((FtsIntValueObject)current.getFtsObject()).setFlashDuration(flash);
-
+			((FtsBangObject)current.getFtsObject()).setFlashDuration(flash);
 		}
 
 	    flashLabel.setText(""+flash);
@@ -92,12 +91,14 @@ public class BangPopUpMenu extends JMenu
 
   public static void update(Bang obj)
   {
-    int flash = ((FtsIntValueObject)obj.getFtsObject()).getFlashDuration();
+    int flash = ((FtsBangObject)obj.getFtsObject()).getFlashDuration();
     bangPopup.current = obj;
 
     bangPopup.flashSlider.setValue(flash);
   }
 }
+
+
 
 
 

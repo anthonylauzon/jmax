@@ -134,7 +134,7 @@ public class FtsObject
 	else if (className == "toggle")
 	  obj =  new FtsIntValueObject(fts, parent, className);
 	else if (className == "button")
-	  obj =  new FtsIntValueObject(fts, parent, className);
+	  obj =  new FtsBangObject(fts, parent, className);
 	else if (className == "floatbox")
 	  obj =  new FtsFloatValueObject(fts, parent, className);
 	else if (className == "__selection")

@@ -35,7 +35,7 @@ import ircam.jmax.*;
  * from the server.
  */
 
-public class FtsIntValueObject extends FtsObject
+public class FtsBangObject extends FtsIntValueObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -43,53 +43,38 @@ public class FtsIntValueObject extends FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
-  int value; 
+  int flashDuration;
 
   /* for the message box */
-    public FtsIntValueObject(Fts fts, FtsObject parent, String className, String description)
+    public FtsBangObject(Fts fts, FtsObject parent, String className, String description)
     {
-	super(fts, parent, null, className, description);
+	super(fts, parent, className, description);
     }
 
-    public FtsIntValueObject(Fts fts, FtsObject parent/*, int objId*/, String className)
+    public FtsBangObject(Fts fts, FtsObject parent, String className)
     {
-	super(fts, parent, null, className, className);
+	super(fts, parent, className);
     }
 
-    /** Set the value. Tell it to the server, also */
-
-    public void setValue(int value)
+    public void setFlashDuration(int fd)
     {
-	this.value = value;
-	fts.getServer().putObjectProperty(this, "value", value);
+	flashDuration = fd;
+	fts.getServer().putObjectProperty(this, "flash", fd);
+	setDirty();
     }
 
-    /** Get the current value */
-
-    public int getValue()
+    public int getFlashDuration()
     {
-	return value;
+	return flashDuration;
     }
 
-    /** Ask the server for the latest value */
-
-    public void updateValue()
-    {
-	fts.getServer().askObjectProperty(this, "value");
-    }
-       
     /* Over write the localPut message to handle value changes;
      */
 
     protected void localPut(String name, int newValue)
     {
-	if (name == "value")
-	    {
-		value = newValue;
-		
-		if (listener instanceof FtsIntValueListener)
-		    ((FtsIntValueListener) listener).valueChanged(newValue);
-	    }
+	if (name == "flash")
+	    flashDuration = newValue;
 	else
 	    super.localPut(name, newValue);
     }
