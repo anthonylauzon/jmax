@@ -81,8 +81,8 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     itsArgs = (String) value;
     ParseText(itsArgs);
     /*if(IsResizeTextCompat(0, 0)) Resize(0, 0);
-    else ResizeToText(0, 0);
-    itsSketchPad.repaint();*/
+      else ResizeToText(0, 0);
+      itsSketchPad.repaint();*/
     if (!IsResizeTextCompat(0, 0)) {
       ResizeToText(0,0);
       itsSketchPad.repaint();
