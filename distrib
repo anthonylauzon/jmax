@@ -13,5 +13,5 @@ all		all		images
 all		all		java
 all		all		packages
 all		all		tcl
-src		all		tests
+all		all		tests
 
