@@ -51,6 +51,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     
     itsDirectionChooser = new DirectionChooser(this);
     itsSelectionMover = new SequenceSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
+    itsSelectionResizer = new SequenceSelectionResizer(this);
   }
 
   /**
@@ -65,10 +66,6 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
    * overrides the abstract SelecterTool.singleObjectSelected */
   void singleObjectSelected(int x, int y, int modifiers)
   {
-    if ((modifiers & InputEvent.ALT_MASK) == 0)
-      itsMoveMode = SIMPLE;
-    else itsMoveMode = CLONE;
-    
     mountIModule(itsDirectionChooser, x, y);
   }
 
@@ -82,7 +79,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   /******************************************************************************
    *********** AddingEvents *****************************************************
    ******************************************************************************/
-    public void controlAction(int x, int y, int modifiers)
+  public void controlAction(int x, int y, int modifiers)
   {
     mountIModule(itsSelectionMover);
 
@@ -145,10 +142,19 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   /**
    * called by the DirectionChooser UI module
    */
-  public void directionChoosen(int theDirection) 
+  public void directionChoosen(int theDirection, int modifiers) 
   {
-    itsSelectionMover.setDirection(theDirection);
-    mountIModule(itsSelectionMover, startingPoint.x, startingPoint.y);
+    if((modifiers & SHORTCUT)!=0 && (modifiers & MouseEvent.ALT_MASK)!=0)
+      {
+	itsSelectionResizer.setDirection(theDirection);
+	mountIModule(itsSelectionResizer, startingPoint.x, startingPoint.y);
+	resizing = true;
+      }
+    else
+      {
+	itsSelectionMover.setDirection(theDirection);
+	mountIModule(itsSelectionMover, startingPoint.x, startingPoint.y);
+      }
   }
   
   /**
@@ -166,13 +172,65 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
    */
   public void dragEnd(int x, int y, MouseEvent evt)
   {
+    int deltaY = y-startingPoint.y;
+    int deltaX = x-startingPoint.x;
+
+    if(resizing)
+      {
+	resizeSelection(deltaX, deltaY);
+	resizing = false;	    
+      }
+    else
+	moveSelection(deltaX, deltaY);
+
+    mountIModule(itsSelecter);
+    gc.getGraphicDestination().repaint();    
+  }
+  
+  public void updateStartingPoint(int deltaX, int deltaY)
+  {
+    startingPoint.x+=deltaX;
+    startingPoint.y+=deltaY;
+  }
+
+  void resizeSelection(int deltaX, int deltaY)
+  {
+    TrackEvent aEvent;
+	  
+    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	  
+    // starts a serie of undoable transitions
+    ((UndoableData) egc.getDataModel()).beginUpdate();
+    
+    if( deltaX != 0)
+      for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	{
+	  aEvent = (TrackEvent) e.nextElement();
+
+	  if (egc.getAdapter().getLenght( aEvent) + deltaX > 0)
+	    egc.getAdapter().setLenght( aEvent, egc.getAdapter().getLenght( aEvent) + deltaX);
+	}
+    else
+      if( deltaY != 0)
+	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	  {
+	    aEvent = (TrackEvent) e.nextElement();
+	    
+	    if ( egc.getAdapter().getHeigth( aEvent) - deltaY >= 0)
+	      egc.getAdapter().setHeigth( aEvent, egc.getAdapter().getHeigth( aEvent) - deltaY);
+	    else
+	      egc.getAdapter().setHeigth( aEvent, 0);
+	  }          
+
+    ((UndoableData) egc.getDataModel()).endUpdate();
+  }
+
+  void moveSelection(int deltaX, int deltaY)
+  {
     TrackEvent aEvent;
     TrackEvent newEvent;
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
     Adapter a = egc.getAdapter();
-
-    int deltaY = y-startingPoint.y;
-    int deltaX = x-startingPoint.x;
 
     if(deltaX != 0) 
       {	    
@@ -188,9 +246,9 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 		{
 		  int prevX = 0;
 		  int nextX = 0;
-			
+		  
 		  aEvent = (TrackEvent) e.nextElement();
-			
+		  
 		  FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
 		  TrackEvent next = ftsTrk.getNextEvent(aEvent);
 		  if(next!=null)
@@ -198,7 +256,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 		  TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
 		  if(prev!=null)
 		    prevX = a.getX(prev)+1;
-			
+		      
 		  if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
 		    a.setX(aEvent, nextX);
 		  else
@@ -210,32 +268,23 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	    }
       }
     if(deltaY!=0)
-	{
-	  ((UndoableData) egc.getDataModel()).beginUpdate();
-	  for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
-	    {
-	      aEvent = (TrackEvent) e.nextElement();
-	      a.setY(aEvent, a.getY(aEvent)+deltaY);
-	    }    
-	  ((UndoableData) egc.getDataModel()).endUpdate();
-	}
-    mountIModule(itsSelecter);
-    gc.getGraphicDestination().repaint();    
+      {
+	((UndoableData) egc.getDataModel()).beginUpdate();
+	for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
+	  {
+	    aEvent = (TrackEvent) e.nextElement();
+	    a.setY(aEvent, a.getY(aEvent)+deltaY);
+	  }    
+	((UndoableData) egc.getDataModel()).endUpdate();
+      }
   }
-  
-  public void updateStartingPoint(int deltaX, int deltaY)
-  {
-    startingPoint.x+=deltaX;
-    startingPoint.y+=deltaY;
-  }
+
   //---Fields
   MaxVector times = new MaxVector();
   MaxVector movingEvents = new MaxVector();
 
   DirectionChooser itsDirectionChooser;
   SelectionMover itsSelectionMover;
-
-  final static int SIMPLE = 0;
-  final static int CLONE = 1;
-  int itsMoveMode;
+  SequenceSelectionResizer itsSelectionResizer;
+  boolean resizing = false;
 }

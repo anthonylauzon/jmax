@@ -64,19 +64,19 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     //
   }
 
-    /**
-     * Called at double-click. Interested tools will derive this method
-     * with the specific semantic */
-    public void edit(int x, int y, int modifiers)
-    {
-    }
+  /**
+   * Called at double-click. Interested tools will derive this method
+   * with the specific semantic */
+  public void edit(int x, int y, int modifiers)
+  {
+  }
 
   /**
    * called by the Selecter UI module at mouse down
    */
   public void selectionPointChoosen(int x, int y, int modifiers) 
   {
-    if((modifiers & SHORTCUT)!=0)
+    if((modifiers & SHORTCUT)!=0 && (modifiers & MouseEvent.ALT_MASK)==0)
       controlAction(x, y, modifiers);
     else
     {
@@ -126,16 +126,16 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public void selectionChoosen(int x, int y, int w, int h) 
   {
-      if(((SequenceGraphicContext)gc).getDataModel().isLocked()) return;
-
-      gc.getGraphicDestination().requestFocus();//???
-
-      if (w ==0) w=1;// at least 1 pixel wide
-      if (h==0) h=1;
+    if(((SequenceGraphicContext)gc).getDataModel().isLocked()) return;
     
-      selectArea(x, y, w, h);
+    gc.getGraphicDestination().requestFocus();//???
     
-      multipleObjectSelected();
+    if (w ==0) w=1;// at least 1 pixel wide
+    if (h==0) h=1;
+    
+    selectArea(x, y, w, h);
+    
+    multipleObjectSelected();
   }
 
   /**
@@ -143,8 +143,8 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   void selectArea(int x, int y, int w, int h) 
   { 
-      SequenceGraphicContext egc = (SequenceGraphicContext)gc;
-      selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
+    SequenceGraphicContext egc = (SequenceGraphicContext)gc;
+    selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
   }
 
   
@@ -154,7 +154,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public static void selectArea(RenderManager r, SequenceSelection s, int x, int y, int w, int h) 
   {
-      s.select(r.objectsIntersecting(x, y, w, h));
+    s.select(r.objectsIntersecting(x, y, w, h));
   }
 
   /**
@@ -171,4 +171,5 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   Point startingPoint = new Point();
   public static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 }
+
 

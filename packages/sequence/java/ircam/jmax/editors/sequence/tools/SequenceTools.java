@@ -43,10 +43,9 @@ public class SequenceTools implements ToolProvider{
  
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????????	 
     
-    tools = new Tool[2];
+    tools = new Tool[1];
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
-    tools[1] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
   }
 
   public Enumeration getTools()

@@ -59,68 +59,21 @@ public class TrackBasePopupMenu extends JPopupMenu
     target = editor;
     this.isInSequence = isInSequence;
 
-    /////////// Tools /////////////////////////////////////////
-    Tool tool;
-    ButtonGroup toolsMenuGroup = new ButtonGroup();
-    
-    for(Enumeration e = target.getGraphicContext().getToolManager().getTools(); e.hasMoreElements();)
-      {
-	tool = (Tool)e.nextElement();
-	item = new JRadioButtonMenuItem(tool.getName(), tool.getIcon());
-	item.addActionListener((ActionListener)target.getGraphicContext().getToolManager());
-	toolsMenuGroup.add(item);
-	add(item);
-      }
-    
-    ((JRadioButtonMenuItem)getComponent(0)).setSelected(true);
-    ////////////////////////////////////////////////////////////////////////////
-
-    if(isInSequence)
-      {
-	addSeparator();
-	moveMenu = new JMenu("Move to Position");
-	item = new JMenuItem(""+trackCount);
-	item.addActionListener( moveToAction);
-	moveMenu.add(item);
-    
-	add(moveMenu);
-      }
-
-    addSeparator();
-
-    if(isInSequence)
-      {
-	nameItem = new JMenuItem("Name");
-	nameItem.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e)
-	    {
-	      ChangeTrackNameDialog.changeName(target.getTrack(),  
-					       target.getGraphicContext().getFrame(),
-					       SwingUtilities.convertPoint(target, x, y,
-									   target.getGraphicContext().getFrame()));
-	    }
-	  });
-	
-	add(nameItem);
-      }
-    boolean added = addRangeMenu();
-
-    if(added)
-      addSeparator();
-
-    ////////////////////// View Menu //////////////////////////////
-
     addViewMenu();
-    
+
     item = new JMenuItem("View as list");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
 	  target.showListDialog();
 	}
-    });
+      });
     add(item);
+
     addSeparator();
+
+    if( addRangeMenu())
+      addSeparator();
 
     item = new JMenuItem("Select All");
     item.addActionListener(new ActionListener(){
@@ -135,6 +88,27 @@ public class TrackBasePopupMenu extends JPopupMenu
     if(isInSequence)
       {
 	addSeparator();
+
+	nameItem = new JMenuItem("Name");
+	nameItem.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e)
+	    {
+	      ChangeTrackNameDialog.changeName(target.getTrack(),  
+					       target.getGraphicContext().getFrame(),
+					       SwingUtilities.convertPoint(target, x, y,
+									   target.getGraphicContext().getFrame()));
+	    }
+	  });
+	
+	add(nameItem);
+
+	moveMenu = new JMenu("Move to Position");
+	item = new JMenuItem(""+trackCount);
+	item.addActionListener( moveToAction);
+	moveMenu.add(item);
+    
+	add(moveMenu);
+
 	removeItem = new JMenuItem("Remove Track");
 	removeItem.addActionListener(new ActionListener(){
 	    public void actionPerformed(ActionEvent e)
