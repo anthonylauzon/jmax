@@ -1,6 +1,6 @@
 SUBDIRS= src
 
-packagedir=$(pkgdatadir)/packages/sequence/java
+packagedir=$(pkgdatadir)/packages/sequence/java/classes
 JAR = sequence.jar
 package_DATA= $(JAR)
 package_JAVA= Sequence.java
