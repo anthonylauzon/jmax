@@ -52,7 +52,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
     
     // Do a gc before giving statistics (added by mdc).    
     System.gc();
-    
+
     //Create middle section.
     JPanel p1 = new JPanel();
     p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
@@ -63,8 +63,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     JPanel pNames = new JPanel();
     pNames.setLayout(new BoxLayout(pNames, BoxLayout.Y_AXIS));
-    pNames.setPreferredSize(new Dimension(130, 75));
-    
+        
     JLabel name1 = new JLabel("jMax");
     pNames.add(name1);
     JLabel name2 = new JLabel("Platform");
@@ -75,26 +74,38 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
     pNames.add(name4);
     JLabel name5 = new JLabel("Used memory ");
     pNames.add(name5);
+    
+    FontMetrics fm = name1.getFontMetrics(name1.getFont());
+
+    pNames.setPreferredSize(new Dimension(130, fm.getHeight()*6));
 
     p11.add(pNames);
 
     p11.add(Box.createHorizontalGlue());
 
+    String javaVersion = (String)(System.getProperties().getProperty("java.version")+" "+
+				  System.getProperties().getProperty("java.vendor"));
+    String jmaxVersion = MaxApplication.getProperty("jmaxVersion");
+    String osType = System.getProperties().getProperty("os.name")+" "+System.getProperties().getProperty("os.arch");
+    String totalMemory = ""+Runtime.getRuntime().totalMemory();
+    String usedMemory = "" +(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+    String strings[] = {javaVersion, jmaxVersion, osType, totalMemory, usedMemory};
+
+    int prefWidth = getMaxSize(strings, fm);
+
     JPanel pValues = new JPanel();
     pValues.setLayout(new BoxLayout(pValues, BoxLayout.Y_AXIS));
-    pValues.setPreferredSize(new Dimension(150, 75));
+    pValues.setPreferredSize(new Dimension(prefWidth, fm.getHeight()*6));
     
-    JLabel value1 = new JLabel(MaxApplication.getProperty("jmaxVersion"));
+    JLabel value1 = new JLabel(jmaxVersion);
     pValues.add(value1);
-    JLabel value2 = new JLabel((String)(System.getProperties().getProperty("os.name"))+" "+
-			       (String)(System.getProperties().getProperty("os.arch")));
+    JLabel value2 = new JLabel(osType);
     pValues.add(value2);
-    JLabel value3 = new JLabel((String)(System.getProperties().getProperty("java.version")+" "+
-					System.getProperties().getProperty("java.vendor")));
+    JLabel value3 = new JLabel(javaVersion);
     pValues.add(value3);
-    JLabel value4 = new JLabel("" + Runtime.getRuntime().totalMemory());
+    JLabel value4 = new JLabel(totalMemory);
     pValues.add(value4);
-    JLabel value5 = new JLabel("" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+    JLabel value5 = new JLabel(usedMemory);
     pValues.add(value5);
 
     p11.add(pValues);
@@ -107,7 +118,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     JPanel pNames2 = new JPanel();
     pNames2.setLayout(new BoxLayout(pNames2, BoxLayout.Y_AXIS));
-    pNames2.setPreferredSize(new Dimension(130, 30));
+    pNames2.setPreferredSize(new Dimension(130, fm.getHeight()*2));
     
     JLabel name6 = new JLabel("Sampling Rate");
     pNames2.add(name6);
@@ -120,7 +131,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     JPanel pValues2 = new JPanel();
     pValues2.setLayout(new BoxLayout(pValues2, BoxLayout.Y_AXIS));
-    pValues2.setPreferredSize(new Dimension(150, 25));
+    pValues2.setPreferredSize(new Dimension(prefWidth, fm.getHeight()*2));
     JLabel value6 = new JLabel(control.getSamplingRate().toString());
     pValues2.add(value6);
     JLabel value7 = new JLabel(control.getFifoSize().toString());
@@ -130,24 +141,28 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     p1.add(p12);
 
+    p1.setPreferredSize(new Dimension(140+prefWidth , fm.getHeight()*8));
     getContentPane().add("Center", p1);
     
-    //Create bottom row.
-    JPanel p2 = new JPanel();
-    p2.setPreferredSize(new Dimension(200, 35));
-    p2.setLayout(new FlowLayout(FlowLayout.CENTER));
-    JButton okButton = new JButton("OK");
-    okButton.addActionListener(this);
-    p2.add(okButton);
-    getContentPane().add("South", p2);
-
     addKeyListener(this);
 
     //Initialize this dialog to its preferred size.
+    getContentPane().validate();
     pack();  
 
     setLocation(100, 100);
     setVisible(true);
+  }
+
+  int getMaxSize(String[] strings, FontMetrics fm)
+  {
+      int temp, max = 0;
+      for(int i =0; i<strings.length; i++)
+	  {	  
+	      temp = SwingUtilities.computeStringWidth(fm, strings[i]);
+	      if(temp > max) max = temp;
+	  }
+      return max;
   }
 
   public void actionPerformed(ActionEvent e){    

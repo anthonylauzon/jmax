@@ -80,7 +80,7 @@ public class PatcherFontManager
   private Hashtable fontNames = new Hashtable();
   private Hashtable fontSizes = new Hashtable();
 
-  private String[] jmaxFontSizesNames = {"small", "normal", "large", "big", "bigger", "huge"};
+  private String[] jmaxFontSizesNames = {"tiny", "small", "normal", "large", "larger", "huge"};
   private String[] jmaxFontNames = {"Variable Width Font", "Fixed Width Font"};
   private String[] defaultFontNames = {"Lucida Sans", "Lucida Bright"};
   private int[] defaultFontSizes = {8, 10, 12, 14, 18, 24};

@@ -28,7 +28,7 @@ package ircam.jmax.utils;
 
 import java.awt.*;
 import java.awt.event.*;
-
+import ircam.jmax.editors.patcher.PatcherFontManager;
 
 //=====================================================
 //   Platform 
@@ -180,12 +180,10 @@ public class Platform
     BACKSPACE_KEY = 127;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
-    //FONT_NAME = Toolkit.getDefaultToolkit().getFontList()[1];
-    //FONT_NAME = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[1];
-    FONT_NAME = new String("default");
-    FONT_SIZE   = 10;
+    //FONT_NAME = new String("default");
+    FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
+    FONT_SIZE   = 12;
     FONT_STYLE  = Font.PLAIN;
-    //FONT_NAME   = new String("helvetica");
   }
 }
  

@@ -99,24 +99,6 @@ public class TextMenu extends EditorMenu
     fakeFontButton = new JRadioButtonMenuItem( "fake");
     itsFontMenuGroup.add(fakeFontButton);
 
-    /*add(new JLabel(" Fonts"));
-
-      for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
-      {
-      radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontNames()[i]);
-      add(radioItem);
-      radioItem.addActionListener(Actions.jmaxFontAction);
-      itsFontMenuGroup.add(radioItem);
-      fontNameItems.addElement(radioItem);
-      }
-    
-      itsFontsMenu = new JMenu("Java Fonts");
-
-      FillFontMenu(itsFontsMenu);
-      add(itsFontsMenu);
-
-      addSeparator();*/
-
     add(new JLabel(" Font Sizes"));
 
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontSizes().length; i++)
