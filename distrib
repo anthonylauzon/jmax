@@ -12,5 +12,5 @@ all	all	packages
 all	all	tcl
 all	all	tests
 free	sgi	LICENSE
-free	linuxpc	LICENSE-BETA	LICENSE
+free	linuxpc	LICENSE
 src	all	Makefile
