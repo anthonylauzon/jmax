@@ -34,6 +34,7 @@
 #include <ftsprivate/loader.h> 
 #include <ftsprivate/config.h> /* require audioconfig.h and midi.h */
 
+#include <ftsprivate/platform.h> /* fts_get_user_configuration */
 /****************************************************
  *
  *  AUDIO/MIDI configuration class
@@ -130,6 +131,15 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
   else
     fts_log( "config save: cannot open file %s\n", file_name);
+}
+
+static void
+config_save_as_default(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_atom_t a[1];
+  
+  fts_set_symbol(a, fts_get_user_configuration(1));
+  config_save(o, 0, s, 1, a);
 }
 
 static void
@@ -285,6 +295,7 @@ config_instantiate(fts_class_t* cl)
 
   fts_class_message_varargs(cl, fts_s_load, config_load);
   fts_class_message_varargs(cl, fts_s_save, config_save);
+  fts_class_message_varargs(cl, fts_new_symbol("save_as_default"), config_save_as_default);
   fts_class_message_varargs(cl, fts_s_midi_config, config_midi_message);
   fts_class_message_varargs(cl, fts_s_audio_config, config_audio_message);
   fts_class_message_varargs(cl, fts_s_upload, config_upload);
