@@ -20,39 +20,45 @@ include Sources
 DATE:= $(shell date)
 MODULE_CFLAGS:= -DCOMPILATION_INFO_STRING='"Compiled by $(USER) for $(ARCH) on $(DATE)\n"'
 
+
+ifdef STATIC
+FTS_BIN_STATIC= $(BINDIR)/fts.static
+
+FTS_PACKAGE_DIR=$(ROOTDIR)/../packages
+
+FTS_PACKAGE_LIBS=\
+$(FTS_PACKAGE_DIR)/additive/lib/$(ARCH)/$(MODE)/libadditive.a \
+$(FTS_PACKAGE_DIR)/eric/lib/$(ARCH)/$(MODE)/liberic.a \
+$(FTS_PACKAGE_DIR)/explode/c/lib/$(ARCH)/$(MODE)/libexplode.a \
+$(FTS_PACKAGE_DIR)/guiobj/c/lib/$(ARCH)/$(MODE)/libguiobj.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libcontrol.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libdata.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libfilters.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libio.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libmidi.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libpitch.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libsampling.a \
+$(FTS_PACKAGE_DIR)/ispw/lib/$(ARCH)/$(MODE)/libsignal.a \
+$(FTS_PACKAGE_DIR)/lists/lib/$(ARCH)/$(MODE)/liblists.a \
+$(FTS_PACKAGE_DIR)/manoury/lib/$(ARCH)/$(MODE)/libmanoury.a \
+$(FTS_PACKAGE_DIR)/qlist/c/lib/$(ARCH)/$(MODE)/libqlist.a \
+$(FTS_PACKAGE_DIR)/system/c/lib/$(ARCH)/$(MODE)/libsystem.a
+
+all: $(FTS_BIN_STATIC)
+
+$(FTS_BIN_STATIC) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
+	rm -f $(FTS_BIN_STATIC)
+	$(LD) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_PACKAGE_LIBS) $(FTS_LIBS) $(CC_NONE_FLAG) $(FTS_ARCH_LIBS) $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS) 
+
+else
+
 FTS_BIN = $(BINDIR)/fts
-
-ifeq ($(ARCH),rhapsody)
-
-FTS_PACKAGE_LIBDIR=$(ROOTDIR)/../packages/fts1.5/lib/$(ARCH)/$(MODE)
-FTS_PACKAGE_LIBS= \
-$(FTS_PACKAGE_LIBDIR)/libadditive.a \
-$(FTS_PACKAGE_LIBDIR)/libcontrol.a \
-$(FTS_PACKAGE_LIBDIR)/libdata.a \
-$(FTS_PACKAGE_LIBDIR)/libevents.a \
-$(FTS_PACKAGE_LIBDIR)/libfilters.a \
-$(FTS_PACKAGE_LIBDIR)/libio.a \
-$(FTS_PACKAGE_LIBDIR)/liblists.a \
-$(FTS_PACKAGE_LIBDIR)/libmath.a \
-$(FTS_PACKAGE_LIBDIR)/libmidi.a \
-$(FTS_PACKAGE_LIBDIR)/libsampling.a \
-$(FTS_PACKAGE_LIBDIR)/libscorefollow.a \
-$(FTS_PACKAGE_LIBDIR)/libsigbasic.a \
-$(FTS_PACKAGE_LIBDIR)/libsigmath.a \
-$(FTS_PACKAGE_LIBDIR)/libsystem.a \
-$(FTS_PACKAGE_LIBDIR)/libui.a 
-
-endif
 
 all: $(FTS_BIN)
 
-ifeq ($(ARCH),rhapsody)
-
-$(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
-	rm -f $(FTS_BIN)
-	$(LD) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_PACKAGE_LIBS) $(FTS_LIBS) $(CC_NONE_FLAG) $(FTS_ARCH_LIBS) $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS)  $(FTS_USER_LIBS) 
-
 endif
+
+
 
 TOCLEAN = $(FTS_BIN)
 

@@ -1,9 +1,9 @@
-ifneq ($(ARCH),rhapsody)
+ifdef STATIC
 
 SOURCES = \
 dsptile.c	\
 messtile.c	\
-startup.c	\
+startup_static.c	\
 ucs.c		\
 
 else
@@ -11,7 +11,7 @@ else
 SOURCES = \
 dsptile.c	\
 messtile.c	\
-startup_rhapsody.c	\
+startup.c	\
 ucs.c		\
 
 endif
