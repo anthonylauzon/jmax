@@ -25,6 +25,32 @@ struct fts_bmax_file
 };
 
 
+union swap_union_t {
+  long l;
+  char c[4];
+};
+
+static int has_to_swap()
+{
+  union swap_union_t u;
+
+  u.l = 0x11223344;
+  return u.c[0] != 0x11;
+}
+
+static void swap_long( long *p)
+{
+  union swap_union_t *pu;
+  char tmp;
+
+  pu = (union swap_union_t *)p;
+  tmp = pu->c[0];
+  pu->c[0] = pu->c[3];
+  pu->c[3] = tmp;
+  tmp = pu->c[1];
+  pu->c[1] = pu->c[2];
+  pu->c[2] = tmp;
+}
 
 #define SYMBOL_TABLE_SIZE 64
 
@@ -34,6 +60,7 @@ fts_open_bmax_file_for_writing(fts_symbol_t file, int dobackup)
 {
   fts_bmax_file_t *f;
   const char *name;
+  fts_binary_file_header_t header;
 
   /* Get the file name */
 
@@ -79,7 +106,15 @@ fts_open_bmax_file_for_writing(fts_symbol_t file, int dobackup)
 
   /* write the init header to the file */
 
-  if (fwrite(&(f->header), sizeof(fts_binary_file_header_t), 1, f->fd) < 1)
+  header = f->header;
+  if (has_to_swap())
+    {
+      swap_long( &header.magic_number);
+      swap_long( &header.code_size);
+      swap_long( &header.n_symbols);
+    }
+
+  if ( fwrite( &header, sizeof(fts_binary_file_header_t), 1, f->fd) < 1)
     {
       perror("fts_open_bmax_file_for_writing: write header ");
       return 0;
@@ -96,6 +131,8 @@ fts_close_bmax_file(fts_bmax_file_t *f)
 {
   int i;
   char c;
+  fts_binary_file_header_t header;
+
   /* Write the symbol table */
 
 #ifdef SAVER_DEBUG
@@ -112,7 +149,6 @@ fts_close_bmax_file(fts_bmax_file_t *f)
     }
 
 
-
   /* Write the ending zero */
 
   c = '\0';
@@ -125,7 +161,16 @@ fts_close_bmax_file(fts_bmax_file_t *f)
 #endif
 
   fseek(f->fd, 0, SEEK_SET);
-  fwrite(&(f->header), sizeof(fts_binary_file_header_t), 1, f->fd);
+
+  header = f->header;
+  if (has_to_swap())
+    {
+      swap_long( &header.magic_number);
+      swap_long( &header.code_size);
+      swap_long( &header.n_symbols);
+    }
+
+  fwrite( &header, sizeof(fts_binary_file_header_t), 1, f->fd);
 
   /* close the file */
 

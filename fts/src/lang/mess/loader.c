@@ -15,6 +15,33 @@ typedef struct fts_binary_file_desc_t {
   fts_symbol_t *symbols;
 } fts_binary_file_desc_t;
 
+union swap_union_t {
+  long l;
+  char c[4];
+};
+
+static int has_to_swap()
+{
+  union swap_union_t u;
+
+  u.l = 0x11223344;
+  return u.c[0] != 0x11;
+}
+
+static void swap_long( long *p)
+{
+  union swap_union_t *pu;
+  char tmp;
+
+  pu = (union swap_union_t *)p;
+  tmp = pu->c[0];
+  pu->c[0] = pu->c[3];
+  pu->c[3] = tmp;
+  tmp = pu->c[1];
+  pu->c[1] = pu->c[2];
+  pu->c[2] = tmp;
+}
+
 static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 {
   int fd;
@@ -49,6 +76,13 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
     {
       perror( "fts_binary_file_map");
       return -1;
+    }
+
+  if (has_to_swap())
+    {
+      swap_long( &header.magic_number);
+      swap_long( &header.code_size);
+      swap_long( &header.n_symbols);
     }
 
   if (header.magic_number != FTS_BINARY_FILE_MAGIC)

@@ -41,6 +41,7 @@ extern fts_symbol_t fts_s_object;
 extern fts_symbol_t fts_s_connection;
 extern fts_symbol_t fts_s_true;
 extern fts_symbol_t fts_s_false;
+extern fts_symbol_t fts_s_data;
 
 /* Symbols related to messages, objects and classes */
 

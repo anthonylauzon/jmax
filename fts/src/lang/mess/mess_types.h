@@ -51,6 +51,8 @@ typedef struct fts_outlet		 fts_outlet_t;
 typedef struct fts_selection		 fts_selection_t;
 typedef struct fts_variable		 fts_variable_t;
 
+typedef struct fts_data			fts_data_t;
+typedef struct fts_data_class		fts_data_class_t;
 
 /*
  *  SYMBOLS
@@ -87,6 +89,18 @@ union fts_word
   char                *fts_str;
   fts_object_t        *fts_obj;
   fts_connection_t    *fts_connection;
+  fts_data_t          *fts_data;
+};
+
+/*
+ * FTS data
+ * Are C structure plus an id and a ``class''
+ * Used for low-level data communication with the client.
+ */
+
+struct fts_data {
+  fts_data_class_t *class;
+  int id;
 };
 
 
@@ -121,6 +135,12 @@ struct fts_atom
 struct fts_plist {
   struct fts_plist_cell *head;
 };
+
+
+/*
+ * Data functions
+ */
+typedef void (*fts_data_fun_t)( fts_data_t *d, int ac, fts_atom_t *at);
 
 
 /*

@@ -60,6 +60,9 @@
 #define fts_set_connection(ap, x)       \
      do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_get_value(ap), (x));} while (0)
 
+#define fts_set_data(ap, x)       \
+     do {fts_set_type(ap, fts_s_data); fts_word_set_data( fts_get_value(ap), (x));} while (0)
+
 #define fts_set_void(ap)           (fts_set_type(ap, fts_s_void))
 
 #define fts_set_true(ap)           (fts_set_type(ap, fts_s_true))
@@ -79,6 +82,7 @@
 
 #define fts_get_object(ap)         (fts_word_get_object(fts_get_value(ap)))
 #define fts_get_connection(ap)     (fts_word_get_connection(fts_get_value(ap)))
+#define fts_get_data(ap)         (fts_word_get_data(fts_get_value(ap)))
 
 #define fts_is_void(ap)            fts_is_a(ap, fts_s_void)
 #define fts_is_symbol(ap)          fts_is_a(ap, fts_s_symbol)
@@ -92,6 +96,7 @@
 #define fts_is_connection(ap)      fts_is_a(ap, fts_s_connection)
 #define fts_is_true(ap)            fts_is_a(ap, fts_s_true)
 #define fts_is_false(ap)           fts_is_a(ap, fts_s_false)
+#define fts_is_data(ap)            fts_is_a(ap, fts_s_data)
 
 /* Convenience macros to deal with type and atom algebra */
 

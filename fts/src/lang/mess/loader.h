@@ -17,6 +17,7 @@ typedef struct fts_binary_file_header_t {
   long n_symbols;
 } fts_binary_file_header_t;
 
+/* 'bMax' */
 #define FTS_BINARY_FILE_MAGIC 0x624D6178
 
 

@@ -1,25 +1,28 @@
 SOURCES = $(ARCH_SOURCES) \
 atoms.c		\
 classes.c	\
+clipboard.c	\
+doctor.c	\
+errobj.c	\
 events.c	\
+expressions.c	\
+ftsdata.c	\
+ftsdataid.c	\
 loader.c	\
-saver.c         \
-vm.c		\
 mess.c		\
+naming.c	\
 objects.c	\
 objtable.c	\
+patabs.c	\
 patcher.c	\
-naming.c        \
+patlex.c	\
+patparser.c	\
 properties.c	\
+saver.c		\
+selection.c	\
+send.c		\
 symbols.c	\
-send.c          \
-errobj.c       \
-voidobject.c       \
-patlex.c        \
-patabs.c        \
-patparser.c     \
-selection.c     \
-clipboard.c     \
-doctor.c        \
-expressions.c   \
-variables.c
+variables.c	\
+vm.c		\
+voidobject.c	\
+

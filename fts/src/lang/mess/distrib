@@ -4,6 +4,8 @@ all	all	doctor.h
 all	all	errobj.h
 all	all	events.h
 all	all	expressions.h
+all	all	ftsdata.h
+all	all	ftsdataid.h
 all	all	loader.h
 all	all	mess_types.h
 all	all	naming.h
@@ -17,5 +19,6 @@ all	all	properties.h
 all	all	saver.h
 all	all	send.h
 all	all	symbols.h
+all	all	variables.h
 all	all	vm.h
 all	all	words.h

@@ -23,6 +23,7 @@ fts_symbol_t fts_s_object;
 fts_symbol_t fts_s_connection;
 fts_symbol_t fts_s_true;
 fts_symbol_t fts_s_false;
+fts_symbol_t fts_s_data;
 
 /* Predefined symbols for the mess system */
 
@@ -247,8 +248,20 @@ fts_predefine_symbols(void)
   fts_s_else        = fts_new_builtin_symbol(":", 83);
   fts_s_assign      = fts_new_builtin_symbol("=", 84);
 
+
   /* Last number user: 85 (max, 255 predefined symbols !! ) */
   /* WARNING: read the warning at the beginning of the function */
+
+
+  /* (fd)
+     As I don't know if 85 is not used elsewhere, and I read the
+     warning at the beginning of the function, I don't add this
+     as a builtin symbol.
+     But I don't find it very convenient.
+     Also, if this a possibility to break the binary file format,
+     be sure that this will happen...
+  */
+  fts_s_data       = fts_new_symbol( "data");
 }
 
 
