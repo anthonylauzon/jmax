@@ -172,6 +172,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 	  {
 	    try
 	      {
+		FtsArgs args = new FtsArgs();
 		if (singleInstance != null)
 		  singleInstance.close();
 
@@ -179,6 +180,8 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
 		// send message to fts to open the configuration file
 		// ...
+		args.addString(f.getAbsolutePath());
+		JMaxApplication.getConfig().send(FtsSymbol.get("load"), args);		
 	      }
 	    catch ( IOException e)
 	      {
