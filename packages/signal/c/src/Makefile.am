@@ -3,6 +3,7 @@ package_LTLIBRARIES=libsignal.la
 libsignal_la_SOURCES= \
 binop.c \
 cut.c \
+env.c \
 matrix.c \
 osc.c \
 osc_ieeewrap.c \

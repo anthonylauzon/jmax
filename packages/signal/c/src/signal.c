@@ -64,8 +64,9 @@ signal_config(void)
   signal_cut_config();
 
   signal_play_config();
-  signal_play_fvec_config();
-  signal_play_bpf_config();
 
+  signal_play_fvec_config();
   signal_rec_fvec_config();
+
+  signal_env_config();
 }
