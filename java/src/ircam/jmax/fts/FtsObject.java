@@ -112,7 +112,7 @@ public class FtsObject
     if (className != null)
       {
 	Object ctr = creators.get(className);
-	
+
 	if(ctr != null)
 	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, nArgs, args);
 	else if (className == "jpatcher")

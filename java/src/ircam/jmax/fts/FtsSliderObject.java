@@ -47,9 +47,9 @@ public class FtsSliderObject extends FtsIntValueObject
    * Create a FtsObject object;
    */
 
-    public FtsSliderObject(Fts fts, FtsObject parent/*, int objId*/)
+    public FtsSliderObject(Fts fts, FtsObject parent)
   {
-      super(fts, parent/*, objId*/, "slider", "slider");
+      super(fts, parent, "slider", "slider");
   }
 
 

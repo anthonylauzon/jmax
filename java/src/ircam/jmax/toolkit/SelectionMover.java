@@ -80,6 +80,11 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
     itsXORHandler.moveTo(e.getX(), e.getY());
   }
 
+  public void moveTo(int x, int y)
+  {
+    itsXORHandler.moveTo(x, y);
+  }
+
   /**
    * overrides InteractionModule.mouseReleased()
    */
@@ -113,7 +118,7 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
    */
   abstract public void XORDraw(int dx, int dy);
 
-
+    
 
   //---- Fields
   DragListener itsListener;

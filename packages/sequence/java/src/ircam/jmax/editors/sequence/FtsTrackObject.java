@@ -76,14 +76,11 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
      */
     public void addEvent(int nArgs , FtsAtom args[])
     {
-	//String trackName = args[0].getString();
 	TrackEvent evt = (TrackEvent)(args[0].getObject());
-	//TrackDataModel model = getTrackByName(trackName).getTrackDataModel();
 
 	// starts an undoable transition
 	//((UndoableData)model).beginUpdate();
     
-	//model.addEvent(evt);
 	addEvent(evt);
     
 	// ends the undoable transition
