@@ -45,7 +45,7 @@ do
 done
 
 # On SGI, check maximum lockable memory
-if [ -x /usr/sbin/systune maxlkmem ]
+if [ -x /usr/sbin/systune ]
 then
     MAXLKMEM=`/usr/sbin/systune maxlkmem | awk '{ print $3;}'`
     if [ $MAXLKMEM -lt 2000 ]
