@@ -32,7 +32,6 @@ class FtsDatagramClientPort extends FtsPort
   String host;
   String path = ".";
   String ftsName = "fts";
-  Process proc;
   int port;
 
   FtsDatagramClientPort(String host, int port)
@@ -63,7 +62,6 @@ class FtsDatagramClientPort extends FtsPort
 
     try
       {
-	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream());
 	in_packet  = new DatagramPacket(in_data , in_data.length);
 	socket.receive(in_packet);
 	out_packet.setAddress(in_packet.getAddress());
@@ -83,8 +81,6 @@ class FtsDatagramClientPort extends FtsPort
     socket.close();
     in_packet = null;
     out_packet = null;
-
-    proc.destroy();
   }
 
   boolean isOpen()
