@@ -174,14 +174,13 @@ void fts_object_set_error(fts_object_t *obj, const char *format, ...)
   fts_object_put_prop(obj, fts_s_error_description, &a);
 }
 
+void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...)
+{
+  va_list ap;
+  char buf[1024];
 
-
-
-
-
-
-
-
-
-
-
+  va_start(ap, format);
+  vsprintf(buf, format, ap);
+  va_end(ap);
+  post("error: %s\n", buf);
+}
