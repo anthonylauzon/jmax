@@ -26,7 +26,6 @@
 
 #define BUFFER_SIZE 1024
 #define SYSEX_BUFFER_SIZE 1024
-#define SYSEX_BUFFER_FULL 0xffffffff
 
 #define NOTEOFF 0x80
 #define NOTEON 0x90
@@ -36,6 +35,7 @@
 #define CHANNELPRESSURE 0xd0
 #define PITCHBEND 0xe0
 #define SYSEX 0xf0
+#define SYSEX_END 0xf7
 
 static char winmidiport_error_buffer[256];
 
@@ -152,7 +152,10 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   winmidiport_t *this = (winmidiport_t *)o;
   int i;
+  UINT err;
+  char msg[256];
 
+  /* handle the short midi messages */
   while (winmidiport_available(this)) {
     
     DWORD msg = this->incoming[this->tail++];
@@ -191,37 +194,51 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   for (i = 0; i < 2; i++) {
 
     /* check for incoming messages */
-    if (this->inhdr[i].dwFlags == MHDR_DONE) {
+    if (this->inhdr[i].dwFlags & MHDR_DONE) {
       int size = this->inhdr[i].dwBytesRecorded;
-      int j;
-
-      /* first,prepare and add the second buffer to the driver */
-      if (this->inhdr[1 - i].dwFlags == 0) {
-	if (midiInPrepareHeader(this->hmidiin, &this->inhdr[1 - i], sizeof(MIDIHDR)) != MMSYSERR_NOERROR ) {
-	  post("Warning: winmidiport: Couldn't prepare sysex buffer\n");
-	  fts_log("Warning: winmidiport: Couldn't prepare sysex buffer\n");
-	} else if (midiInAddBuffer(this->hmidiin, &this->inhdr[1 - i], sizeof(MIDIHDR)) != MMSYSERR_NOERROR ) {
-	  post("Warning: winmidiport: Couldn't add sysex buffer\n");
-	  fts_log("Warning: winmidiport: Couldn't add sysex buffer\n");
-	}      
-      }
-
-      /* send the sysex message thru the midiport */
-      for (j = 0; j < size; j++) {
-	fts_midiport_input_system_exclusive_byte(&this->port, this->inhdr[i].lpData[j]);
-      }
-      fts_midiport_input_system_exclusive_call(&this->port, 0.0);
+      int j; 
 
       /* unprepare the buffer and flag it as available */
       midiInUnprepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
       this->inhdr[i].dwFlags = 0;
+
+      /* send the sysex message thru the midiport. start at position 1
+         to skip the start-of-sysex byte, and skip the end-of-sysex
+         byte */
+      for (j = 1; j < size - 1; j++) {
+	fts_midiport_input_system_exclusive_byte(&this->port, this->inhdr[i].lpData[j]);
+      }
+      fts_midiport_input_system_exclusive_call(&this->port, 0.0);
+
+      /* prepare and add the buffer to the driver */
+      if (this->inhdr[i].dwFlags == 0) {
+
+	err = midiInPrepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
+
+	if (err == MMSYSERR_NOERROR ) {
+
+	  err = midiInAddBuffer(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
+	  if (err != MMSYSERR_NOERROR ) {
+	    midiInGetErrorText(err, &msg[0], 256);
+	    post("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
+	    fts_log("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
+	  }      
+
+	} else {
+	  midiInGetErrorText(err, &msg[0], 256);
+	  post("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
+	  fts_log("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
+	}
+      }
     }
 
+
     /* check if the outgoing messages are finished */
-    if (this->outhdr[i].dwFlags == MHDR_DONE) {
+    if (this->outhdr[i].dwFlags & MHDR_DONE) {
       midiOutUnprepareHeader(this->hmidiout, &this->outhdr[i], sizeof(MIDIHDR));
       this->outhdr[i].dwFlags = 0;
-    }
+      this->outhdr[i].dwBytesRecorded = 0;
+    } 
   }
 }
 
@@ -311,7 +328,11 @@ winmidiport_send_system_exclusive_byte(fts_object_t *o, int value)
     return;
   }
 
-  if (len == bytes) {
+  /* add the start of sysex status byte */
+  if (bytes == 0) {
+    this->outhdr[n].lpData[bytes++] = (char) SYSEX;
+    this->outhdr[n].dwBytesRecorded++;
+  } else if (bytes == len) {
     char* newbuf = fts_malloc(len + SYSEX_BUFFER_SIZE);
     memcpy(newbuf, this->outhdr[n].lpData, len);
     fts_free(this->outhdr[n].lpData);
@@ -328,15 +349,35 @@ winmidiport_send_system_exclusive_flush(fts_object_t *o, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
   int n = this->cur_outhdr;
+  int len = this->outhdr[n].dwBufferLength;
+  int bytes = this->outhdr[n].dwBytesRecorded;
+  UINT err;
+  MMRESULT r;
 
   if (this->outhdr[n].dwFlags != 0) {
     return;
   }
 
-  if ((midiOutPrepareHeader(this->hmidiout, &this->outhdr[n], sizeof(MIDIHDR)) == MMSYSERR_NOERROR)
-      && (midiOutLongMsg(this->hmidiout, &this->outhdr[n], sizeof(MIDIHDR) == MMSYSERR_NOERROR))) {
-    this->cur_outhdr = 1 - this->cur_outhdr;
+  /* add the end of sysex status byte */
+  winmidiport_send_system_exclusive_byte(o, SYSEX_END);
+
+  err = midiOutPrepareHeader(this->hmidiout, &this->outhdr[n], sizeof(MIDIHDR));
+  if (err == MMSYSERR_NOERROR) {
+
+    err = midiOutLongMsg(this->hmidiout, &this->outhdr[n], sizeof(MIDIHDR));
+    if (err != MMSYSERR_NOERROR) {
+      char msg[256];
+      midiOutGetErrorText(err, &msg[0], 256);
+      post("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
+      fts_log("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
+      this->outhdr[n].dwBytesRecorded = 0;
+    }
+    
   } else {
+    char msg[256];
+    midiOutGetErrorText(err, &msg[0], 256);
+    post("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
+    fts_log("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
     this->outhdr[n].dwBytesRecorded = 0;
   }
 }
@@ -380,6 +421,7 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   UINT i, err, num;
   MIDIOUTCAPS out_caps;
   MIDIINCAPS in_caps;
+  char msg[256];
 
   fts_midiport_init(&this->port);
   fts_midiport_set_input(&this->port);
@@ -529,20 +571,32 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	this->inhdr[i].dwBytesRecorded = 0;
 	this->inhdr[i].dwUser = i;
 	this->inhdr[i].dwFlags = 0;
-      }
       
-      /* prepare and add the first buffer for incoming sysex messages */
-      if (midiInPrepareHeader(this->hmidiin, &this->inhdr[0], sizeof(MIDIHDR)) != MMSYSERR_NOERROR ) {
-	post("Warning: winmidiport: Couldn't prepare sysex buffer\n");
-	fts_log("[winmidiport]: Couldn't prepare sysex buffer\n");
-      } else if (midiInAddBuffer(this->hmidiin, &this->inhdr[0], sizeof(MIDIHDR)) != MMSYSERR_NOERROR ) {
-	post("Warning: winmidiport: Couldn't add sysex buffer\n");
-	fts_log("[winmidiport]: Couldn't add sysex buffer\n");
+	/* prepare and add the buffer for incoming sysex messages */
+	err = midiInPrepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
+
+	if (err == MMSYSERR_NOERROR ) {
+	
+	  err = midiInAddBuffer(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
+	  if (err != MMSYSERR_NOERROR ) {
+	    midiInGetErrorText(err, &msg[0], 256);
+	    post("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
+	    fts_log("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
+	  }      
+	
+	} else {
+	  midiInGetErrorText(err, &msg[0], 256);
+	  post("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
+	  fts_log("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
+	}
       }
 
-      if (midiInStart(this->hmidiin) != MMSYSERR_NOERROR) {
-	post("Warning: winmidiport: failed to start the input device; midi input not available\n");
-	fts_log("[winmidiport]: Failed to start the input device; midi input not available\n");
+      /* start the midi input */
+      err = midiInStart(this->hmidiin);
+      if (err != MMSYSERR_NOERROR) {
+	midiInGetErrorText(err, &msg[0], 256);
+	post("Warning: winmidiport: failed to start the input device; midi input not available (%s)\n", msg);
+	fts_log("[winmidiport]: Failed to start the input device; midi input not available (%s)\n", msg);
       } 
     }
   }
