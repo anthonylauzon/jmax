@@ -97,7 +97,7 @@ FTS_API int fts_mess_get_run_time_check(void);
 	      (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
 #define fts_get_double_arg(AC, AT, N, DEF) \
-((N) < (AC) ? (fts_is_long(&(AT)[N]) ? (double) fts_get_long(&(AT)[N]) : \
+((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (double) fts_get_int(&(AT)[N]) : \
 	      (fts_is_float(&(AT)[N]) ? (double) fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
 #define fts_get_long_arg(AC, AT, N, DEF)   fts_get_int_arg(AC, AT, N, DEF)
