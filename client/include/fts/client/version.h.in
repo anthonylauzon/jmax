@@ -20,10 +20,6 @@
  * 
  */
 
-#ifndef _CLIENT_VERSION_H_
-#define _CLIENT_VERSION_H_
-
 static const char *client_version = "@CLIENT_VERSION@";
 
-#endif
 

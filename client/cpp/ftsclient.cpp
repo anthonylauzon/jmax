@@ -258,88 +258,13 @@ ostream &operator<<( ostream &os, FtsArgs &args)
 }
 
 /* ********************************************************************** */
-/* FtsServer                                                              */
+/* FtsServerConnnection and derived classes                               */
 /* ********************************************************************** */
 
-int FtsServer::_initialized = 0;
+const int FtsSocketConnection::DEFAULT_PORT = 2023;
+const int FtsSocketConnection::DEFAULT_CONNECT_TIMEOUT = 30;
 
-void FtsServer::initialize()
-{
-#if defined(WIN32)
-  if (_initialized) {
-    return;
-  }
-
-  _initialized++;
-
-  WORD wVersionRequested;
-  WSADATA wsaData;
-  int result;
-
-  wVersionRequested = MAKEWORD(2, 2);
-  
-  result = WSAStartup( wVersionRequested, &wsaData );
-  if (result != 0) {
-    throw FtsClientException( "Couldn't initialize WinSock", result);
-  }
-  
-  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-    WSACleanup();
-    throw FtsClientException( "Bad WinSock version");
-  }
-#endif
-}
-
-FtsServer::FtsServer()
-{
-  initialize();
-
-  _socket = -1;
-  _object = 0;
-  _remote = 0;
-  _root = 0;
-  _args = new FtsArgs();
-  _hostname = "127.0.0.1";
-  _port = FTSSERVER_DEFAULT_PORT;
-  _connectTimeout = FTSSERVER_DEFAULT_CONNECT_TIMEOUT;
-  _threaded = 1;
-  _receiveBufferSize = FTSSERVER_DEFAULT_RECEIVE_BUFFER_SIZE;
-
-  _newObjectId = 16; // Ids 0 to 15 are reserved for pre-defined system objects
-  _receiveBuffer = 0;
-  _receiveThread = (thread_t)NULL;
-  _serverState = NOT_CONNECTED;
-}
-
-FtsServer::~FtsServer()
-{
-  if (_serverState == CONNECTED)
-    disconnect();
-
-  if (_receiveBuffer) 
-    delete _receiveBuffer;
-
-  if (_remote)
-    delete _remote;
-
-  if (_root)
-    delete _root;
-
-  if (_args)
-    delete _args;
-}
-
-void FtsServer::setReceiveBufferSize( int receiveBufferSize)
-{
-  // Cannot change buffer size after initialization because it can be in use
-  // by the receive thread
-  if ( _serverState != NOT_CONNECTED)
-    return;
-
-  _receiveBufferSize = receiveBufferSize;
-}
-
-int FtsServer::connectOnce() throw( FtsClientException )
+int FtsSocketConnection::connectOnce() throw( FtsClientException )
 {
   struct sockaddr_in server_addr;
   struct hostent *hostptr;
@@ -370,13 +295,13 @@ int FtsServer::connectOnce() throw( FtsClientException )
 #ifdef WIN32
   closesocket( _socket);
 #else
-  close( _socket);
+  ::close( _socket);
 #endif
 
   return -1;
 }
 
-void FtsServer::connect() throw( FtsClientException)
+void FtsSocketConnection::connect() throw( FtsClientException )
 {
   int r;
 
@@ -392,6 +317,136 @@ void FtsServer::connect() throw( FtsClientException)
 
   if ( r < 0)
     throw FtsClientException( "Cannot connect", errno);
+}
+
+FtsSocketConnection::FtsSocketConnection( const char *hostname, int port, int connectTimeout) throw( FtsClientException)
+  : _socket( -1), _hostname( hostname), _port( port), _connectTimeout( connectTimeout)
+{
+  connect();
+}
+
+FtsSocketConnection::FtsSocketConnection() throw( FtsClientException)
+{
+  FtsSocketConnection( "127.0.0.1", DEFAULT_PORT, DEFAULT_CONNECT_TIMEOUT);
+}
+
+void FtsSocketConnection::close() throw( FtsClientException)
+{
+#ifdef WIN32
+  int r;
+  char buf[1024];
+  if (_socket != INVALID_SOCKET) {
+    /* call WSAAsyncSelect ??? */
+    ::shutdown(_socket, 0x02);
+    while (1) {
+      r = recv(_socket, buf, 1024, 0);
+      if ((r == 0) || (r == SOCKET_ERROR)) {
+	break;
+      }
+    }
+    closesocket(_socket);
+  }
+#else
+  if (_socket >= 0) {
+    ::close(_socket);
+  }
+#endif
+}
+
+int FtsSocketConnection::read( unsigned char *buffer, int n) throw( FtsClientException)
+{
+  int r;
+
+#if defined(WIN32)
+  r = recv( _socket, (char*) buffer, n, 0);
+  if (r == SOCKET_ERROR)
+    {
+      throw FtsClientException( "Error in message receiving", WSAGetLastError());
+    }
+  if (r == 0)
+    {
+      throw FtsClientException( "Socket closed");
+    }
+#else
+  if( (r = ::read( _socket, buffer, n)) < 0)
+    {
+      throw FtsClientException( "Error in message receiving", errno);
+    }
+#endif
+
+  return r;
+}
+
+int FtsSocketConnection::write( unsigned char *buffer, int n) throw( FtsClientException)
+{
+  int r;
+
+#if defined(WIN32)
+  if ( send( _socket, buffer, n, 0) < 0)
+    {
+      throw FtsClientException( "Error in sending message", WSAGetLastError());
+    }
+#else
+  if ( (r == ::write( _socket, buffer, n)) < 0)
+    {
+      throw FtsClientException( "Error in sending message", errno);
+    }
+#endif
+
+  return r;
+}
+
+/* ********************************************************************** */
+/* FtsServer                                                              */
+/* ********************************************************************** */
+
+const int FtsServer::DEFAULT_RECEIVE_BUFFER_SIZE = 65536;
+
+int FtsServer::_initialized = 0;
+
+void FtsServer::initialize()
+{
+#if defined(WIN32)
+  if (_initialized) {
+    return;
+  }
+
+  _initialized++;
+
+  WORD wVersionRequested;
+  WSADATA wsaData;
+  int result;
+
+  wVersionRequested = MAKEWORD(2, 2);
+  
+  result = WSAStartup( wVersionRequested, &wsaData );
+  if (result != 0) {
+    throw FtsClientException( "Couldn't initialize WinSock", result);
+  }
+  
+  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+    WSACleanup();
+    throw FtsClientException( "Bad WinSock version");
+  }
+#endif
+}
+
+FtsServer::FtsServer( FtsServerConnection *connection, int threaded)
+{
+  initialize();
+
+  _connection = connection;
+
+  _object = 0;
+  _remote = 0;
+  _root = 0;
+  _args = new FtsArgs();
+
+  _newObjectId = 16; // Ids 0 to 15 are reserved for pre-defined system objects
+  _receiveBuffer = new unsigned char[DEFAULT_RECEIVE_BUFFER_SIZE];
+
+  _receiveThread = (thread_t)NULL;
+  _serverState = NOT_CONNECTED;
 
   // Create objects with predefined IDs
   _root = new FtsObject( this, 0);
@@ -399,11 +454,9 @@ void FtsServer::connect() throw( FtsClientException)
 
   _state = 0;
 
-  _receiveBuffer = new unsigned char[_receiveBufferSize];
-
   _serverState = CONNECTED;
 
-  if (!_threaded)
+  if (!threaded)
     return;
 
 #ifdef WIN32
@@ -425,28 +478,31 @@ void FtsServer::connect() throw( FtsClientException)
 #endif
 }
 
+FtsServer::FtsServer() throw( FtsClientException)
+{
+  FtsServer( new FtsSocketConnection(), 1);
+}
+
+FtsServer::~FtsServer()
+{
+  if (_serverState == CONNECTED)
+    disconnect();
+
+  if (_receiveBuffer) 
+    delete _receiveBuffer;
+
+  if (_remote)
+    delete _remote;
+
+  if (_root)
+    delete _root;
+
+  if (_args)
+    delete _args;
+}
+
 void FtsServer::disconnect() throw( FtsClientException)
 {
-#ifdef WIN32
-  int r;
-  char buf[1024];
-  if (_socket != INVALID_SOCKET) {
-    /* call WSAAsyncSelect ??? */
-    ::shutdown(_socket, 0x02);
-    while (1) {
-      r = recv(_socket, buf, 1024, 0);
-      if ((r == 0) || (r == SOCKET_ERROR)) {
-	break;
-      }
-    }
-    closesocket(_socket);
-  }
-#else
-  if (_socket >= 0) {
-    close(_socket);
-  }
-#endif
-
   if (_receiveThread)
     wait();
 
@@ -488,55 +544,35 @@ void FtsServer::receive() throw( FtsClientException)
 {
   int n;
 
-#if defined(WIN32)
-  n = recv( _socket, (char*) _receiveBuffer, _receiveBufferSize, 0);
-  if (n == SOCKET_ERROR)
-    {
-      _serverState = DISCONNECTED;
-      throw FtsClientException( "Error in message receiving", WSAGetLastError());
-    }
-  if (n == 0)
-    {
-      _serverState = DISCONNECTED;
-      throw FtsClientException( "Socket closed");
-    }
-#else
-  if( (n = read( _socket, _receiveBuffer, _receiveBufferSize)) < 0)
-    {
-      _serverState = DISCONNECTED;
-      throw FtsClientException( "Error in message receiving", errno);
-    }
-#endif
-
   decode( _receiveBuffer, n);
 }
 
 void FtsServer::poll() throw( FtsClientException)
 {
-  fd_set readfds;
-  struct timeval tv;
-  int r;
+//    fd_set readfds;
+//    struct timeval tv;
+//    int r;
 
-  FD_ZERO( &readfds);
-  FD_SET( _socket, &readfds);
+//    FD_ZERO( &readfds);
+//    FD_SET( _socket, &readfds);
 
-  tv.tv_sec = 0;
-  tv.tv_usec = 0;
+//    tv.tv_sec = 0;
+//    tv.tv_usec = 0;
 
-  r = select( _socket+1, &readfds, NULL, NULL, &tv);
+//    r = select( _socket+1, &readfds, NULL, NULL, &tv);
 
-  if (r < 0)
-    {
-#if defined(WIN32)
-      throw FtsClientException( "Error in select()", WSAGetLastError());
-#else
-      throw FtsClientException( "Error in select()", errno);
-#endif
-    }
-  else if ( r == 0)
-    return;
-  else
-    receive();
+//    if (r < 0)
+//      {
+//  #if defined(WIN32)
+//        throw FtsClientException( "Error in select()", WSAGetLastError());
+//  #else
+//        throw FtsClientException( "Error in select()", errno);
+//  #endif
+//      }
+//    else if ( r == 0)
+//      return;
+//    else
+//      receive();
 }
 
 void FtsServer::wait() throw( FtsClientException)
@@ -639,19 +675,7 @@ void FtsServer::endMessage() throw( FtsClientException)
   if (_serverState != CONNECTED)
     throw FtsClientException( "Error in sending message");
 
-#if defined(WIN32)
-  if ( send( _socket, _message, _message.length(), 0) < 0)
-    {
-      _serverState = DISCONNECTED;
-      throw FtsClientException( "Error in sending message", WSAGetLastError());
-    }
-#else
-  if ( write( _socket, _message, _message.length()) < 0)
-    {
-      _serverState = DISCONNECTED;
-      throw FtsClientException( "Error in sending message", errno);
-    }
-#endif
+  // _connection.write( _message, _message.length());
 }
 
 void FtsServer::aEndObject()
