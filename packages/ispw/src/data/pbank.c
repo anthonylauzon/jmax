@@ -28,7 +28,6 @@ typedef struct
   fts_atom_t *out_list;         /* list for output on int method */
   fts_symbol_t *receives;	/* used for back door messaging */
   fts_symbol_t name;		/* pbank data/file name <optional> */ 
-  fts_symbol_t vol;		/* default volume */
 } pbank_t;
 
 
@@ -54,7 +53,7 @@ typedef struct
 static fts_hash_table_t pbank_data_table;
 
 int
-pbank_read_file(pbank_data_t *data, fts_symbol_t file_name, fts_symbol_t vol)
+pbank_read_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_file_t *f;
   int ret;
@@ -62,7 +61,7 @@ pbank_read_file(pbank_data_t *data, fts_symbol_t file_name, fts_symbol_t vol)
   int current_column, current_row;
 
 
-  f = fts_atom_file_open(fts_symbol_name(file_name), vol, "r");
+  f = fts_atom_file_open(fts_symbol_name(file_name), "r");
 
   if(!f){
     post("pbank: can't open file to read: %s\n", fts_symbol_name(file_name));
@@ -119,14 +118,14 @@ pbank_read_file(pbank_data_t *data, fts_symbol_t file_name, fts_symbol_t vol)
 }
 
 int
-pbank_write_file(pbank_data_t *data, fts_symbol_t file_name, fts_symbol_t vol)
+pbank_write_file(pbank_data_t *data, fts_symbol_t file_name)
 {
   fts_atom_t  a, *av;
   fts_atom_file_t *f;
   int i, j;
 
 
-  f = fts_atom_file_open(fts_symbol_name(file_name), vol, "w");
+  f = fts_atom_file_open(fts_symbol_name(file_name), "w");
   if(!f){
     post("pbank: can't open file to write: %s\n", fts_symbol_name(file_name));
     return(0);
@@ -638,7 +637,7 @@ pbank_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   pbank_t *this = (pbank_t *)o;
 
-  pbank_read_file(this->data, fts_get_symbol(at), this->vol);
+  pbank_read_file(this->data, fts_get_symbol(at));
 }
 
 
@@ -649,7 +648,7 @@ pbank_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   pbank_t *this = (pbank_t *)o;
 
-  pbank_write_file(this->data, fts_get_symbol(at), this->vol);
+  pbank_write_file(this->data, fts_get_symbol(at));
 }
 
 
@@ -675,8 +674,7 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   this->name = 0;
   this->receives = 0;
-  this->vol = fts_get_default_directory();
-    
+
   columns = fts_get_long_arg(ac, at, 0, 0);
   rows = fts_get_long_arg(ac, at, 1, 0);
 
@@ -718,7 +716,7 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   
   this->data = pbank_data_new(this->name, columns, rows);
   if(this->name)
-    pbank_read_file(this->data, this->name, this->vol); /* read in data from file (at least try it) */
+    pbank_read_file(this->data, this->name); /* read in data from file (at least try it) */
 
   this->data->dirty = 0;
 }

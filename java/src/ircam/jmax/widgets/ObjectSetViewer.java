@@ -44,23 +44,36 @@ public class ObjectSetViewer extends JPanel {
     {
       if (obj != null)
 	{
-	  setText( ((FtsObject) obj).getDescription());
-	  
 	  if ( selected)
 	    setBackground( selectedColor);
 	  else
 	    setBackground( jlist.getBackground());
 
 	  if (((FtsObject) obj).isError())
-	    setIcon( errorIcon);
+	    {
+	      setText( ((FtsObject) obj).getDescription());
+	      setIcon( errorIcon);
+	    }
 	  else if (obj instanceof FtsPatcherObject)
-	    setIcon( patcherIcon);
+	    {
+	      setText( ((FtsObject) obj).getDescription());
+	      setIcon( patcherIcon);
+	    }
 	  else if (obj instanceof FtsMessageObject)
-	    setIcon( messageIcon);
+	    {
+	      setText( ((FtsMessageObject) obj).getMessage());
+	      setIcon( messageIcon);
+	    }
 	  else if (obj instanceof FtsCommentObject)
-	    setIcon( commentIcon);
+	    {
+	      setText( ((FtsObject) obj).getDescription());
+	      setIcon( commentIcon);
+	    }
 	  else
-	    setIcon( objectIcon);
+	    {
+	      setText( ((FtsObject) obj).getDescription());
+	      setIcon( objectIcon);
+	    }
 	}
 
       return this;
@@ -79,10 +92,22 @@ public class ObjectSetViewer extends JPanel {
       if (e.getClickCount() == 2)
 	{
 	  int index = jList.locationToIndex(e.getPoint());
-	  FtsObject object = (FtsObject) jList.getModel().getElementAt(index);
+	  
+	  if (index < jList.getModel().getSize())
+	    {
+	      if (objectSelectedListener != null)
+		{
+		  FtsObject object = (FtsObject) jList.getModel().getElementAt(index);
 
-	  if (objectSelectedListener != null)
-	    objectSelectedListener.objectSelected(object);
+		  objectSelectedListener.objectSelected(object);
+		}
+	    }
+	  else
+	    {
+	      System.err.println("Problem in ObjectSetViewer " + ObjectSetViewer.this);
+	      System.err.println(" point " + e.getPoint() + " index " + index);
+	      System.err.println(" listener " + objectSelectedListener);
+	    }
 	}
     }
   }

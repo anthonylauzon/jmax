@@ -125,6 +125,10 @@ FtsPatcherDocument:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherDocument.java)
 .PHONY: FtsPatcherDocument
 
+FtsPatcherData:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherData.java)
+.PHONY: FtsPatcherData
+
 FtsPatcherDocumentType:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherDocumentType.java)
 .PHONY: FtsPatcherDocumentType

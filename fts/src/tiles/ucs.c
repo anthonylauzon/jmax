@@ -309,7 +309,7 @@ static fts_status_t
 fts_ucs_lib_set_path(int argc, const fts_atom_t *argv)
 {
   if (fts_is_symbol(argv))
-    fts_set_default_search_path(fts_get_symbol(argv));
+    fts_set_search_path(fts_get_symbol(argv));
 
   return fts_Success;
 }
@@ -446,22 +446,23 @@ fts_ucs_mess_set_msgmode(int argc, const fts_atom_t *argv)
 static fts_status_t
 fts_ucs_dev_close_device(int argc, const fts_atom_t *argv)
 {
-  fts_symbol_t logical_dev_name;
-
-  const fts_atom_t *ld_argv;
-  int ld_argc;
-
   if ((argc >= 1) && fts_is_symbol(&argv[0]))
     {
-      logical_dev_name = fts_get_symbol(&argv[0]);
-      ld_argv = argv + 1;
-      ld_argc = argc - 1;
+      return fts_close_logical_device(fts_get_symbol(&argv[0]), argc - 1, argv + 1);
     }
   else
     return &bad_command; /* bad unset device command */
+}
 
 
-  return fts_close_logical_device(logical_dev_name, ld_argc, ld_argv);
+static fts_status_t fts_ucs_dev_reset_device(int argc, const fts_atom_t *argv)
+{
+  if ((argc >= 1) && fts_is_symbol(&argv[0]))
+    {
+      return fts_reset_logical_device(fts_get_symbol(&argv[0]));
+    }
+  else
+    return &bad_command; /* bad unset device command */
 }
 
 
@@ -637,7 +638,12 @@ fts_ucs_install_commands()
 			 "open the <logdev> logical device\nby assigning to it the <physdev> device");
 
   fts_ucs_define_command(fts_new_symbol("close"), fts_new_symbol("device"), fts_ucs_dev_close_device,
-			 "close <logdev>",
+			 "close device <logdev>",
+			 "close the <logdev> logical device");
+
+
+  fts_ucs_define_command(fts_new_symbol("reset"), fts_new_symbol("device"), fts_ucs_dev_reset_device,
+			 "reset device <logdev>",
 			 "close the <logdev> logical device");
 
 

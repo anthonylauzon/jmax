@@ -71,3 +71,4 @@ void fts_data_id_init()
 {
   init_table();
 }
+

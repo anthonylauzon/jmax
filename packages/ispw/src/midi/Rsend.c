@@ -47,12 +47,12 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int argc, const fts_
 	  data[0] = (char) RSEND_LONG;
 	  sprintf(data+1,"%ld", fts_get_long(&av[i]));
 	}
-      else if (fts_is_float(av))
+      else if (fts_is_float(&av[i]))
 	{
 	  data[0] = (char) RSEND_FLOAT;
 	  sprintf(data+1,"%#f", fts_get_float(&av[i]));
 	}
-      else if (fts_is_symbol(av))
+      else if (fts_is_symbol(&av[i]))
 	{
 	  data[0] = (char) RSEND_SYM;
 	  sprintf(data+1,"%s", fts_symbol_name(fts_get_symbol(&av[i])));

@@ -5,10 +5,7 @@
 
 #include <string.h>
 #include <fcntl.h>
-
-#ifdef SGI
 #include <sys/stat.h>
-#endif
 
 /* for the moment, we emulate the 0.26 sematic,
    but we really need something stronger
@@ -24,28 +21,21 @@
    found.
    */
 
-static int
-file_exists(const char *path)
-{
-  int fd;
 
-  fd = open(path, O_RDONLY);
-  
-  if (fd >= 0)
-    {
-      close(fd);
-      return 1;
-    }
-  else
-    return 0;
+static int file_exists(const char *path)
+{
+  struct stat statbuf;
+
+  return (stat(path, &statbuf) == 0) && (statbuf.st_mode & S_IFREG);
 }
 
-int
-fts_file_find(const char *path, const char *path_list, char *full_path)
+
+
+int fts_file_find(const char *path, char *full_path)
 {
-  if(path[0] == '/')
+  if (path[0] == '/')
     {
-      if(file_exists(path))
+      if (file_exists(path))
 	{
 	  strcpy(full_path, path);	  
 	  return 1;
@@ -55,18 +45,15 @@ fts_file_find(const char *path, const char *path_list, char *full_path)
     {
       const char *begin, *end, *next;
 
-      if (!path_list)
-	next = fts_symbol_name(fts_get_default_search_path());
-      else
-	next = path_list;
+      next = fts_symbol_name(fts_get_search_path());
       
-      while(next)
+      while (next)
 	{
 	  char buf[1024];
 	  
 	  begin = next;
 	  
-	  if((end = strchr(begin, ':')) || (end = strchr(begin, ','))) /* path followed by separator */
+	  if ((end = strchr(begin, ':')) || (end = strchr(begin, ','))) /* path followed by separator */
 	    next = end + 1; /* skip seperator */
 	  else
 	    {
@@ -74,14 +61,14 @@ fts_file_find(const char *path, const char *path_list, char *full_path)
 	      next = 0; /* end of string */
 	    }	  
 	  
-	  if(begin[0] == '/') /* absolute default path */
+	  if (begin[0] == '/') /* absolute default path */
 	    buf[0] = '\0';
-	  else if(fts_get_project_dir())
+	  else if (fts_get_project_dir())
 	    strcpy(buf, fts_symbol_name(fts_get_project_dir()));
 	  else
 	    begin = 0; /* invalid directory */
 
-	  if(begin)
+	  if (begin)
 	    {
 	      strncat(buf, begin, end - begin);
 	      strcat(buf, "/");
@@ -89,9 +76,9 @@ fts_file_find(const char *path, const char *path_list, char *full_path)
 	  
 	      /* look for the file */
 	      
-	      if(file_exists(buf))
+	      if (file_exists(buf))
 		{
-		  if(full_path)
+		  if (full_path)
 		    strcpy(full_path, buf);
 		  
 		  return 1;
@@ -101,7 +88,7 @@ fts_file_find(const char *path, const char *path_list, char *full_path)
       
       /* look in project directory itself */
       
-      if(fts_get_project_dir())
+      if (fts_get_project_dir())
 	{
 	  char buf[1024];
 
@@ -109,9 +96,9 @@ fts_file_find(const char *path, const char *path_list, char *full_path)
 	  strcat(buf, "/");
 	  strcat(buf, path);
 	  
-	  if(file_exists(buf))
+	  if (file_exists(buf))
 	    {
-	      if(full_path)
+	      if (full_path)
 		strcpy(full_path, buf);
 	      
 	      return 1;
@@ -122,16 +109,15 @@ fts_file_find(const char *path, const char *path_list, char *full_path)
   return 0;
 }
 
-void
-fts_file_get_write_path(const char *path, char *full_path)
+void fts_file_get_write_path(const char *path, char *full_path)
 {
-  if(full_path)
+  if (full_path)
     {
-      if(path[0] == '/')
+      if (path[0] == '/')
 	strcpy(full_path, path); /* path is absolute (just copied) */
       else
 	{
-	  if(fts_get_project_dir())
+	  if (fts_get_project_dir())
 	    {
 	      strcpy(full_path, fts_symbol_name(fts_get_project_dir()));
 	      strcat(full_path, "/");
@@ -143,6 +129,7 @@ fts_file_get_write_path(const char *path, char *full_path)
 	}
     }
 }
+
 
 static int
 fts_do_file_open(const char *path, const char *mode)
@@ -157,113 +144,26 @@ fts_do_file_open(const char *path, const char *mode)
     return open(path, O_RDONLY);
 }
 
-static int
-fts_file_open_with_path(fts_symbol_t path, fts_symbol_t dir, const char *name, const char *mode)
+int fts_file_open(const char *name,  const char *mode)
 {
-  char buf[1024];
-  int fd;
-  const char *p, *end;
+  char path[1024];
 
-  p = fts_symbol_name(path);
-
-  while (1)
+  if (*mode == 'w')
     {
-      /* finding the end of the current path */
-      
-      if (strchr(p, ':'))
-	end = strchr(p,':');
-      else  if (strchr(p, ','))
-	end = strchr(p,',');
-      else
-	end = p + strlen(p);
+      fts_file_get_write_path(name, path);
 
-      /* composing the file name */
-
-      if ((*p != '/') && dir)
-	{
-	  strcpy(buf, fts_symbol_name(dir));
-	  strcat(buf, "/");
-	  strncat(buf, p, end - p);
-	  strcat(buf, "/");
-	  strcat(buf, name);
-	}
-      else
-	{
-	  buf[0] = '\0';
-	  strncat(buf, p, end - p); /* use strncat instead of strcpy because the
-				       former guarantee null termination, and not the
-				       latter !!!!!!!*/
-	  strcat(buf, "/");
-	  strcat(buf, name);
-	}
-
-      /* look for the file */
-
-      fd = fts_do_file_open(buf, mode);
-
-      if (fd >= 0)
-	return fd;
-
-      /* test for loop end, and failure */
-      
-      if (*end)
-	p = end + 1;
-      else
-	return -1;	/* loop end, nothing found */
-    }
-}
-
-int
-fts_file_open(const char *name, fts_symbol_t dir, const char *mode)
-{
-  int fd = -1;
-
-  if (name[0] == '/')
-    {
-      return fts_do_file_open(name, mode);
+      return fts_do_file_open(path,  mode);
     }
   else
     {
-      /* The algorithm is the following: 
-	 we look for the file first in the directory
-	 specified, if any; than, we use the path;
-	 if we have the directory, relative component
-	 of the path are interpreted relative to the
-	 directory, if specified, otherwise are ignored.
-       */
-
-      if (dir)
-	{
-	  char buf[1024];
-
-	  sprintf(buf, "%s/%s", fts_symbol_name(dir), name);
-
-	  fd = fts_do_file_open(buf, mode);
-
-	  if (fd >= 0)
-	    return fd;
-	}
-      
-      /* No directory found, and the name is not an absolute path
-	 If we have a use the search_path, if set, or otherwise use
-	 the default path
-	 */
-
-      if (fts_get_search_path())
-	fd = fts_file_open_with_path(fts_get_search_path(), dir, name, mode);
-
-      if (fd >= 0)
-	return fd;
-
-      if (fts_get_default_search_path())
-	fd = fts_file_open_with_path(fts_get_default_search_path(), dir, name, mode);
-
-      return fd;
+      if (fts_file_find(name, path))
+	return fts_do_file_open(path, mode); /* @@@ */
+      else
+	return -1;
     }
 }
 
-int
-fts_file_close(int fd)
+int fts_file_close(int fd)
 {
   return close(fd);
 }
@@ -283,4 +183,6 @@ fts_files_init(void)
 }
 
 fts_module_t fts_files_module = {"FTS Files", "FTS File handling", fts_files_init, 0, 0};
+
+
 

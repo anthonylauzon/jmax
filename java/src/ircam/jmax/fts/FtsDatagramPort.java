@@ -53,12 +53,18 @@ class FtsDatagramPort extends FtsPort
 	System.out.println("Error while opening server socket " + e);
       }
 
-
-
     try
       {
-	command = ("rsh " + host + " " + path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
-		   + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
+	if (host.equals(InetAddress.getLocalHost().getHostName()))
+	  {
+	    command = (path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
+		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
+	  }
+	else
+	  {
+	    command = ("rsh " + host + " " + path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
+		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
+	  }
       }
     catch (UnknownHostException e)
       {

@@ -1,11 +1,6 @@
 #ifndef _DIRECTORIES_H_
 #define _DIRECTORIES_H_
 
-extern void fts_set_default_directory(fts_symbol_t dir);
-extern fts_symbol_t fts_get_default_directory(void);
-
-extern void fts_set_default_search_path(fts_symbol_t search_path);
-extern fts_symbol_t fts_get_default_search_path(void);
 
 extern void fts_set_search_path(fts_symbol_t search_path);
 extern fts_symbol_t fts_get_search_path(void);

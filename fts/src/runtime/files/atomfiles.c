@@ -51,7 +51,7 @@ struct _fts_atom_file_t_
 
 
 fts_atom_file_t *
-fts_atom_file_open(const char *name, fts_symbol_t dir, const char *mode)
+fts_atom_file_open(const char *name, const char *mode)
 {
   fts_atom_file_t *f;
 
@@ -61,13 +61,13 @@ fts_atom_file_open(const char *name, fts_symbol_t dir, const char *mode)
 
   if (f->mode == 'w')
     {
-      f->fd = fts_file_open (name, dir, mode);
+      f->fd = fts_file_open(name, mode);
     }
   else
     {
       /* anything else is like 'r' */
 
-      f->fd = fts_file_open(name, dir, mode);
+      f->fd = fts_file_open(name, mode);
       f->count = 0;
       f->read = 0;
     }

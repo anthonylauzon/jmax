@@ -54,6 +54,7 @@ static void midi_poll(void);
 static fts_status_t fts_set_midi_logical_dev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_dev_t   *fts_get_midi_logical_dev(int ac, const fts_atom_t *at);
 static fts_status_t fts_unset_midi_logical_dev(int ac, const fts_atom_t *at);
+static fts_status_t fts_reset_midi_logical_dev();
 static void         fts_midi_close_all(void);
 
 fts_module_t fts_midi_module = {"Midi", "Midi communication", midi_init, midi_restart, midi_shutdown};
@@ -67,7 +68,9 @@ midi_init(void)
 			  fts_char_dev,
 			  fts_set_midi_logical_dev,
 			  fts_get_midi_logical_dev,
-			  fts_unset_midi_logical_dev);
+			  fts_unset_midi_logical_dev,
+			  fts_reset_midi_logical_dev
+			  );
 }
 
 
@@ -281,6 +284,13 @@ fts_unset_midi_logical_dev(int ac, const fts_atom_t *at)
     }
   else
     return &invalid_midi_dev;	/* error: invalid MIDI device specification */
+}
+
+
+fts_status_t fts_reset_midi_logical_dev()
+{
+  fts_midi_close_all();
+  return fts_Success;
 }
 
 

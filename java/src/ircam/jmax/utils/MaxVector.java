@@ -98,7 +98,10 @@ public class MaxVector
   public final Object elementAt(int index)
   {
     if (index > fillPointer)	//@@@
-      System.err.println("BACO BACO");
+      {
+	System.err.println("MaxVector: index " + index + " out of bounds ");
+	Thread.dumpStack();
+      }
 
     return objects[index];
   }

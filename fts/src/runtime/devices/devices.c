@@ -448,6 +448,7 @@ struct fts_logical_dev_declaration
   fts_status_t (* set_fun)(fts_dev_t *dev, int ac, const fts_atom_t *at);
   fts_dev_t   *(* get_fun)(int ac, const fts_atom_t *at);
   fts_status_t (* unset_fun)(int ac, const fts_atom_t *at);
+  fts_status_t (* reset_fun)();
 
   struct fts_logical_dev_declaration *next;
 };
@@ -461,7 +462,9 @@ fts_declare_logical_dev(fts_symbol_t name,
 			fts_dev_type_t dev_type,
 			fts_status_t (* set_fun)(fts_dev_t *dev, int ac, const fts_atom_t *at),
 			fts_dev_t   *(* get_fun)(int ac, const fts_atom_t *at),
-			fts_status_t (* unset_fun)(int ac, const fts_atom_t *at))
+			fts_status_t (* unset_fun)(int ac, const fts_atom_t *at),
+			fts_status_t (* reset_fun)()
+			)
 {
   struct fts_logical_dev_declaration *ld;
 
@@ -472,6 +475,7 @@ fts_declare_logical_dev(fts_symbol_t name,
   ld->set_fun   = set_fun;
   ld->get_fun   = get_fun;
   ld->unset_fun = unset_fun;
+  ld->reset_fun = reset_fun;
 
   ld->next = logical_dev_list;
   logical_dev_list = ld;
@@ -479,8 +483,7 @@ fts_declare_logical_dev(fts_symbol_t name,
 
 /* utility function to access the logical device by name */
 
-static struct fts_logical_dev_declaration *
-get_logical_dev_declaration(fts_symbol_t logical_dev_name)
+static struct fts_logical_dev_declaration *get_logical_dev_declaration(fts_symbol_t logical_dev_name)
 {
   struct fts_logical_dev_declaration *p;
 
@@ -492,8 +495,7 @@ get_logical_dev_declaration(fts_symbol_t logical_dev_name)
 }
 
 
-fts_dev_t *
-fts_get_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
+fts_dev_t *fts_get_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
 {
   struct fts_logical_dev_declaration *ld;
 
@@ -506,8 +508,7 @@ fts_get_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
 }
 
 
-fts_status_t
-fts_set_logical_device(fts_dev_t *dev, fts_symbol_t name, int ac, const fts_atom_t *at)
+fts_status_t fts_set_logical_device(fts_dev_t *dev, fts_symbol_t name, int ac, const fts_atom_t *at)
 {
   struct fts_logical_dev_declaration *ld;
 
@@ -518,8 +519,7 @@ fts_set_logical_device(fts_dev_t *dev, fts_symbol_t name, int ac, const fts_atom
 }
 
 
-fts_status_t
-fts_unset_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
+fts_status_t fts_unset_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
 {
   fts_status_t ret;
   struct fts_logical_dev_declaration *ld;
@@ -536,9 +536,8 @@ fts_unset_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
    device, and then the description of the physical device to open
    */
 
-fts_status_t
-fts_open_logical_device(fts_symbol_t name, int lac, const fts_atom_t *lat,
-			fts_symbol_t pname, int pac, const fts_atom_t *pat)
+fts_status_t fts_open_logical_device(fts_symbol_t name, int lac, const fts_atom_t *lat,
+				     fts_symbol_t pname, int pac, const fts_atom_t *pat)
 {
   fts_dev_t *dev;
   fts_status_t ret;
@@ -571,8 +570,7 @@ fts_open_logical_device(fts_symbol_t name, int lac, const fts_atom_t *lat,
 
 
 
-fts_status_t
-fts_close_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
+fts_status_t fts_close_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
 {
   fts_dev_t *dev;
   fts_status_t ret;
@@ -588,6 +586,19 @@ fts_close_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at)
       fts_dev_close(dev);
       return ret;
     }
+  else
+    return fts_Success;
+}
+
+
+fts_status_t fts_reset_logical_device(fts_symbol_t name)
+{
+  struct fts_logical_dev_declaration *ld;
+
+  ld = get_logical_dev_declaration(name);
+
+  if (ld)
+    return (* ld->reset_fun)();
   else
     return fts_Success;
 }

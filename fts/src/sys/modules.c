@@ -174,7 +174,7 @@ fts_module_load(const char *name, const char *filename)
     }
   else
     {
-      if (fts_file_find(libname, 0, pathbuf))
+      if (fts_file_find(libname, pathbuf))
 	loadpath = pathbuf;
       else
 	{

@@ -872,7 +872,7 @@ public class FtsServer
     if (! connected)
       return;
 
-    if (FtsServer.debug)
+    if (FtsServer.debug) 
       System.err.println( "remoteCall(" + data + ", " + key + "," + arg + ")");
 
     try
@@ -896,7 +896,7 @@ public class FtsServer
     if (! connected)
       return;
 
-    if (FtsServer.debug)
+    if (FtsServer.debug) 
       System.err.println( "remoteCall(" + data + ", " + key + "," + args + ")");
 
     try
@@ -946,7 +946,7 @@ public class FtsServer
     if (! connected)
       return;
 
-    if (FtsServer.debug) 
+    if (FtsServer.debug)
       System.err.println( "remoteCall(" + data +
 			  ", " + key + ", " + offset + ", " + size + ", " + values 
 			  + "[" + values.length + "]" + ")");

@@ -9,18 +9,18 @@
 ## default host settings
 
 ## jMax servers default host name
-set jmaxDefaultHost [exec hostname]
+set  jmaxDefaultHost [exec "canonhost `hostname`"]
 
 ## set jMax servers host architectures (array of host names)
 # (IRCAM's SGI machines)
-set jmaxHostArch(astor) "origin"
-set jmaxHostArch(mimi) "origin"
-set jmaxHostArch(octane) "origin"
-set jmaxHostArch(bonang) "o2r10k"
-set jmaxHostArch(marimba) "o2r5k"
-set jmaxHostArch(tabla) "o2r5k"
-set jmaxHostArch(banya) "irix6.2"
-set jmaxHostArch(brian) "irix6.2"
+set jmaxHostArch(astor.ircam.fr) "origin"
+set jmaxHostArch(mimi.ircam.fr) "origin"
+set jmaxHostArch(octane.ircam.fr) "origin"
+set jmaxHostArch(bonang.ircam.fr) "o2r10k"
+set jmaxHostArch(marimba.ircam.fr) "o2r5k"
+set jmaxHostArch(tabla.ircam.fr) "o2r5k"
+set jmaxHostArch(banya.ircam.fr) "irix6.2"
+set jmaxHostArch(brian.ircam.fr) "irix6.2"
 
 
 ####################################

@@ -131,9 +131,12 @@ void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_
 
 static int new_id()
 {
-  static int count = 2;
+  /* First allocated ID is two */
 
-  return count++;
+  static int count = 0;
+
+  count = count + 2;
+  return count;
 }
 
 #define NO_ID -1
@@ -267,8 +270,9 @@ void fts_data_call( fts_data_t *d, int key, int ac, const fts_atom_t *at)
 
   if (! function)
     {
-      fprintf( stderr, "%d: no function for this key, data %lx, class %s\n", key, d,
-	       fts_symbol_name(d->class->data_class_name));
+      fprintf( stderr, "%d: no function for this key, data", key);
+      fprintf_data( stderr, d);
+      fprintf( stderr, "\n");
       return;
     }
 
@@ -323,6 +327,23 @@ void fts_data_module_init()
 
 
 
+/* Debug and printout functions */
+
+
+void fprintf_data(FILE *f, fts_data_t *data)
+{
+  if (! data)
+    {
+      fprintf(f, "<NULL DATA>");
+    }
+  else if (data->class)
+    {
+      fprintf(f, "<:%s #%lx(%d):>", fts_symbol_name(data->class->data_class_name), data, data->id);
+    }
+  else
+    fprintf(f, "<: Unconsistent data #%lx :>", data);
+  
+}
 
 
 

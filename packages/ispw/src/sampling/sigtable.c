@@ -34,7 +34,6 @@ typedef struct{
   sampbuf_t buf; /* pointer to the sampbuf */
   float check_size; /* store size here to check it @ dsp start */
   fts_symbol_t unit; /* S, KS, msec or sec */
-  fts_symbol_t volume; /* volume (i.e. directory) */
 } sigtable_t;
 
 
@@ -77,7 +76,6 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   this->check_size = size;
   this->unit = unit;
-  this->volume = fts_get_default_directory();
 
   dsp_list_insert(o);
 }
@@ -145,7 +143,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if (!this->name) return;
 
-  if ((fd = fts_file_open(fts_symbol_name(file_name), this->volume, "r")) < 0){
+  if ((fd = fts_file_open(fts_symbol_name(file_name), "r")) < 0){
     post("%s: %s: can't open\n", CLASS_NAME, fts_symbol_name(file_name));
     return;
   }
@@ -204,7 +202,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
 
   if (!this->name) return;
 
-  if ((fd = fts_file_open(fts_symbol_name(file_name), this->volume, "w")) < 0){
+  if ((fd = fts_file_open(fts_symbol_name(file_name), "w")) < 0){
     post("%s: can't create file: %s\n", CLASS_NAME, fts_symbol_name(file_name));
     return;
   }

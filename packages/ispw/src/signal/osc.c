@@ -27,7 +27,6 @@ static fts_hash_table_t *sigtab1_ht;
 typedef struct {
   sinsamp_t *samps;
   fts_symbol_t sym;
-  fts_symbol_t dir;
   int refcnt;
 } wavetab_t;
 
@@ -41,7 +40,7 @@ static void
 wavetable_load(wavetab_t *wavetab)
 {
   const char *name = fts_symbol_name(wavetab->sym);
-  int fd = fts_file_open(name, wavetab->dir, "r");
+  int fd = fts_file_open(name, "r");
   const char *basename, *s2;
   char *tempbuf, *rats;
   long  n;
@@ -120,7 +119,6 @@ wavetable_new(fts_symbol_t s)
   wavetab->sym = s;
   wavetab->refcnt = 1;
   wavetab->samps = samps;
-  wavetab->dir = fts_get_default_directory();
   wavetable_load(wavetab);
   return wavetab;
 }

@@ -55,9 +55,27 @@ class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
     DoublePaint();
   }
 
+  static private NumberFormat numberFormat;
+
+  static
+  {
+    // Number format for controlling the float printed by the float box.
+    // essentially used to avoid scientific notation in float.
+    
+    numberFormat = NumberFormat.getInstance(Locale.US);
+    numberFormat.setMaximumFractionDigits(6);
+    numberFormat.setMinimumFractionDigits(0);
+
+    if (numberFormat instanceof DecimalFormat)
+      ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(true);
+
+    numberFormat.setGroupingUsed(false);
+  }
+
+
   String getValueAsText()
   {
-    return String.valueOf( itsFloat);
+    return numberFormat.format( itsFloat);
   }
 
   //--------------------------------------------------------

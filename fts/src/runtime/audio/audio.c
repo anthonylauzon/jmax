@@ -88,10 +88,12 @@ struct fts_audio_output_logical_device
 static fts_status_t fts_audio_dev_set_input_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_dev_t   *fts_audio_dev_get_input_ldev(int ac, const fts_atom_t *at);
 static fts_status_t fts_audio_unset_input_logical_dev(int ac, const fts_atom_t *at);
+static fts_status_t fts_audio_reset_input_logical_dev();
 
 static fts_status_t fts_audio_dev_set_output_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at);
 static fts_dev_t   *fts_audio_dev_get_output_ldev(int ac, const fts_atom_t *at);
 static fts_status_t fts_audio_unset_output_logical_dev(int ac, const fts_atom_t *at);
+static fts_status_t fts_audio_reset_output_logical_dev();
 
 
 static void fts_audio_init(void);
@@ -122,13 +124,17 @@ fts_audio_init(void)
 			  fts_sig_dev,
 			  fts_audio_dev_set_input_ldev,
 			  fts_audio_dev_get_input_ldev,
-			  fts_audio_unset_input_logical_dev);
+			  fts_audio_unset_input_logical_dev,
+			  fts_audio_reset_input_logical_dev
+			  );
 
   fts_declare_logical_dev(fts_new_symbol("out~"), 
 			  fts_sig_dev,
 			  fts_audio_dev_set_output_ldev,
 			  fts_audio_dev_get_output_ldev,
-			  fts_audio_unset_output_logical_dev);
+			  fts_audio_unset_output_logical_dev,
+			  fts_audio_reset_output_logical_dev
+			  );
 
   /* init the audio logical device hash tables  */
 
@@ -137,7 +143,7 @@ fts_audio_init(void)
 }
 
 
-static void fts_audio_unset_an_input_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
+static void fts_audio_close_an_input_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
   fts_atom_t a;
   fts_audio_input_logical_device_t *ldev = (fts_audio_input_logical_device_t *) fts_get_ptr(data);
@@ -154,7 +160,7 @@ static void fts_audio_unset_an_input_device(fts_symbol_t name, fts_atom_t *data,
 }
 
 
-static void fts_audio_unset_an_output_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
+static void fts_audio_close_an_output_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
   fts_atom_t a;
   fts_audio_output_logical_device_t *ldev = (fts_audio_output_logical_device_t *) fts_get_ptr(data);
@@ -174,16 +180,16 @@ static void fts_audio_unset_an_output_device(fts_symbol_t name, fts_atom_t *data
 static void
 fts_audio_shutdown(void)
 {
-  fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_unset_an_input_device, 0);
-  fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_unset_an_output_device, 0);
+  fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_close_an_input_device, 0);
+  fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_close_an_output_device, 0);
 }
 
 
 static void
 fts_audio_restart(void)
 {
-  fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_unset_an_input_device, 0);
-  fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_unset_an_output_device, 0);
+  fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_close_an_input_device, 0);
+  fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_close_an_output_device, 0);
 }
 
 
@@ -471,6 +477,13 @@ fts_audio_unset_input_logical_dev(int ac, const fts_atom_t *at)
 }
 
 
+static fts_status_t fts_audio_reset_input_logical_dev()
+{
+  fts_hash_table_apply(&fts_audio_input_logical_device_table, fts_audio_close_an_input_device, 0);
+
+  return fts_Success;
+}
+
 /*
    Install the device as output device, allocate the needed buffers and
    initialize the output_nchans  variable.
@@ -594,6 +607,14 @@ fts_audio_unset_output_logical_dev(int ac, const fts_atom_t *at)
     }
 
   dsp_make_dsp_off_chain();	/* recompute the off dsp chain */
+
+  return fts_Success;
+}
+
+
+static fts_status_t fts_audio_reset_output_logical_dev()
+{
+  fts_hash_table_apply(&fts_audio_output_logical_device_table, fts_audio_close_an_output_device, 0);
 
   return fts_Success;
 }

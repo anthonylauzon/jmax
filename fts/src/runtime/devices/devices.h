@@ -303,7 +303,8 @@ extern void fts_declare_logical_dev(fts_symbol_t name,
 				    fts_dev_type_t dev_type,
 				    fts_status_t (* set_fun)(fts_dev_t *dev, int ac, const fts_atom_t *at),
 				    fts_dev_t   *(* get_fun)(int ac, const fts_atom_t *at),
-				    fts_status_t (* unset_fun)(int ac, const fts_atom_t *at));
+				    fts_status_t (* unset_fun)(int ac, const fts_atom_t *at),
+				    fts_status_t (* reset_fun)());
 
 /* Low level C access to logical devices; callers should take care of 
  closing and unsetting previous devices */
@@ -319,6 +320,10 @@ extern fts_status_t fts_open_logical_device(fts_symbol_t name, int lac, const ft
 					    fts_symbol_t pname, int pac, const fts_atom_t *pat);
 
 extern fts_status_t fts_close_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at);
+
+/* Close all the devices of a logical device */
+
+extern fts_status_t fts_reset_logical_device(fts_symbol_t name);
 
 #endif
 

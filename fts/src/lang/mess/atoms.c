@@ -46,6 +46,15 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 	  fprintf_connection(f, c);
 	  fprintf(f,"%s", ps);
 	}
+      else if (fts_is_data(&at[i]))
+	{
+	  fts_data_t *obj;
+
+	  obj = fts_get_data(&at[i]);
+
+	  fprintf_data(f, obj);
+	  fprintf(f,"%s", ps);
+	}
       else if (fts_is_void(&at[i]))
 	fprintf(f,"<void>%s", ps);
       else if (fts_is_error(&at[i]))
@@ -86,6 +95,8 @@ int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
 	return fts_get_float(a1) == fts_get_float(a2);
       else if (fts_is_object(a1))
 	return fts_get_object(a1) == fts_get_object(a2);
+      else if (fts_is_data(a1))
+	return fts_get_data(a1) == fts_get_data(a2);
       else if (fts_is_true(a1))
 	return fts_is_true(a2);
       else if (fts_is_false(a1))

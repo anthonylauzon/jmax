@@ -27,7 +27,6 @@ typedef const struct fts_symbol_descr *fts_symbol_t;
 typedef union  fts_word          fts_word_t;
 typedef struct fts_atom          fts_atom_t;
 typedef struct fts_atom_array    fts_atom_array_t;
-
 typedef struct fts_plist                 fts_plist_t;
 
 typedef enum fts_daemon_action {
