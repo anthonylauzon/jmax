@@ -20,17 +20,94 @@
  *
  */
 
-/* definition file for logging functions (post and co) */
+#include <stdarg.h>
 
-FTS_API void post_atoms(int ac, const fts_atom_t *at);
+/**
+ *
+ * Printing and logging functions
+ *
+ *
+ * @defgroup post post
+ */
 
-FTS_API void post(const char *format , ...); 
+#if 0
+/**
+ * Print a message on a bytestream, a la printf.
+ * This function take a va_list argument.
+ *
+ * This function do not call the va_end macro. Consequently,  the
+ * value of  ap is undefined after the call. The application
+ * should call va_end(ap) itself afterwards, as in:
+ *
+ * <pre>
+  va_list ap;
 
-FTS_API void post_error(fts_object_t *obj, const char *format , ...); 
+  va_start( ap, format);
+  fts_vspost( stream, format, ap);
+  va_end( ap);
+ * </pre>
+ *
+ * @fn void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap)
+ * @param stream the bytestream on which the chars will be printed
+ * @param format the format string (see printf)
+ * @param ap the arguments
+ * @ingroup post
+ */
+FTS_API void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap);
+#endif
 
-FTS_API void fts_log(char* fmt, ...);
+/**
+ * Print a message on a bytestream, a la printf.
+ * This function accepts a variable number of arguments
+ *
+ * @fn void fts_spost( fts_bytestream_t *stream, const char *format, ...)
+ * @param stream the bytestream on which the chars will be printed
+ * @param format the format string (see printf)
+ * @ingroup post
+ */
+FTS_API void fts_spost( fts_bytestream_t *stream, const char *format, ...);
+
+/**
+ * Print an array of atoms on a bytestream
+ *
+ * @fn void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
+ * @param stream the bytestream on which the chars will be printed
+ * @param ac the atoms count
+ * @param at atoms to print
+ * @ingroup post
+ */
+FTS_API void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at);
+
+/**
+ * Print a log message.
+ * Log messages are printed in a file, located in user's home directory
+ * and named:
+ * <ul>
+ *   <li> .fts_log on Unix systems </li> 
+ *   <li> fts_log.txt on Windows </li> 
+ * </ul>
+ *
+ * @fn void fts_log( const char *format, ...)
+ * @param format the format string (see printf)
+ * @ingroup post
+ */
+FTS_API void fts_log( char *format, ...);
+
+/**
+ * Print an array of atoms as a log message.
+ *
+ * @fn void fts_log_atoms( int ac, const fts_atom_t *at)
+ * @param ac the atoms count
+ * @param at atoms to print
+ * @ingroup post
+ * @see fts_log
+ */
 FTS_API void fts_log_atoms( int ac, const fts_atom_t *at);
 
-
+/*
+ * Compatibility ???
+ */
+FTS_API void post( const char *format, ...);
+FTS_API void post_atoms( int ac, const fts_atom_t *at);
 
 

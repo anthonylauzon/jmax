@@ -490,7 +490,7 @@ struct ex_ex *
 			  optr->ex_type = ET_FLT;	\
 			    optr->ex_flt = (float)left.ex_int op right.ex_flt;\
     } else {			\
-	     post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
+	     fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
 	__LINE__, right.ex_type);		\
 	  return (exNULL);	\
 	  }	\
@@ -502,12 +502,12 @@ struct ex_ex *
 				  optr->ex_type = ET_FLT;	\
 				    optr->ex_flt = left.ex_flt op right.ex_flt; 	\
 				    } else {			\
-					  post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
+					  fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
 						__LINE__, right.ex_type);		\
 						  return (exNULL);	\
 						  }	\
 						  } else { 	\
-					  post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad left type %ld\n",__LINE__,left.ex_type);\
+					  fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad left type %ld\n",__LINE__,left.ex_type);\
 					    return (exNULL);		\
 					    }		\
   return (eptr);
@@ -522,7 +522,7 @@ struct ex_ex *
 			  optr->ex_type = ET_INT;	\
 			    optr->ex_int=left.ex_int op (long)right.ex_flt;	\
 			    } else {			\
-				  post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
+				  fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
 		__LINE__, right.ex_type);		\
 		  return (exNULL);	\
 		  }	\
@@ -534,12 +534,12 @@ struct ex_ex *
 				  optr->ex_type = ET_INT;	\
 				    optr->ex_int = (long)left.ex_flt op (long)right.ex_flt;\
 				    } else {			\
-					  post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
+					  fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",	\
 						__LINE__, right.ex_type);		\
 						  return (exNULL);	\
 						  }	\
 						  } else { 	\
-					  post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad left type %ld\n",__LINE__,left.ex_type);\
+					  fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad left type %ld\n",__LINE__,left.ex_type);\
 					    return (exNULL);		\
 					    }		\
   return (eptr);
@@ -568,7 +568,7 @@ struct ex_ex *
  case ET_II:
     optr->ex_type = ET_INT;
     if (eptr->ex_int == -1) {
-      post_error((fts_object_t *) exp, "expr: ex_eval: inlet number not set\n");
+      fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval: inlet number not set\n");
       return (exNULL);
     }
     optr->ex_int = exp->exp_var[eptr->ex_int].ex_int;
@@ -576,7 +576,7 @@ struct ex_ex *
  case ET_FI:
     optr->ex_type = ET_FLT;
     if (eptr->ex_int == -1) {
-      post_error((fts_object_t *) exp, "expr: ex_eval: inlet number not set\n");
+      fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval: inlet number not set\n");
       return (exNULL);
     }
     optr->ex_flt = exp->exp_var[eptr->ex_int].ex_flt;
@@ -584,7 +584,7 @@ struct ex_ex *
  case ET_VSYM:
     optr->ex_type = ET_SYM;
     if (eptr->ex_int == -1) {
-      post_error((fts_object_t *) exp, "expr: ex_eval: inlet number not set\n");
+      fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval: inlet number not set\n");
       return (exNULL);
     }
     optr->ex_ptr = exp->exp_var[eptr->ex_int].ex_ptr;
@@ -600,15 +600,15 @@ struct ex_ex *
  case ET_LP:
  case ET_LB:
  default:
-    post_error((fts_object_t *) exp, "expr: ex_eval: unexpected type %d\n", eptr->ex_type);
+    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval: unexpected type %d\n", eptr->ex_type);
     return (exNULL);
   }
   if (!eptr[1].ex_type) {
-    post_error((fts_object_t *) exp, "expr: ex_eval: not enough nodes 1\n");
+    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval: not enough nodes 1\n");
     return (exNULL);
   }
   if (!unary_op(eptr->ex_op) && !eptr[2].ex_type) {
-    post_error((fts_object_t *) exp, "expr: ex_eval: not enough nodes 2\n");
+    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval: not enough nodes 2\n");
     return (exNULL);
   }
   
@@ -658,7 +658,7 @@ struct ex_ex *
 	}
 	optr->ex_flt = (float)left.ex_int/right.ex_flt;
       } else {
-	post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
+	fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
 	      __LINE__, right.ex_type);
 	return (exNULL);
       }
@@ -678,12 +678,12 @@ struct ex_ex *
 	}
 	optr->ex_flt = left.ex_flt / right.ex_flt;
       } else {
-	post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
+	fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
 	      __LINE__, right.ex_type);
 	return (exNULL);
       }
     } else {
-	post_error((fts_object_t *) exp, 
+	fts_object_signal_runtime_error((fts_object_t *) exp, 
 		   "expr: ex_eval(%d): bad left type %ld\n",
 		   __LINE__,left.ex_type);
       return (exNULL);
@@ -708,7 +708,7 @@ struct ex_ex *
 	}
 	optr->ex_int=left.ex_int % (long)right.ex_flt;
       } else {
-	post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
+	fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
 	      __LINE__, right.ex_type);
 	return (exNULL);
       }
@@ -729,12 +729,12 @@ struct ex_ex *
 	optr->ex_int =
 	  (long)left.ex_flt % (long)right.ex_flt;
       } else {
-	post_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
+	fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_eval(%d): bad right type %ld\n",
 	      __LINE__, right.ex_type);
 	return (exNULL);
       }
     } else { 
-	post_error((fts_object_t *) exp, 
+	fts_object_signal_runtime_error((fts_object_t *) exp, 
 		   "expr: ex_eval(%d): bad left type %ld\n",
 	    __LINE__,left.ex_type);
       return (exNULL);
@@ -780,7 +780,7 @@ struct ex_ex *
  case OP_COMMA:
  case OP_SEMI:
  default:
-   post_error((fts_object_t *) exp, "expr: ex_print: bad op 0x%x\n", eptr->ex_op);
+   fts_object_signal_runtime_error((fts_object_t *) exp, "expr: ex_print: bad op 0x%x\n", eptr->ex_op);
     return (exNULL);
   }
   /* NOTREACHED */
@@ -806,7 +806,7 @@ struct ex_ex *
     return (exNULL);
   }
   if (f->f_argc > MAX_ARGS) {
-    post_error((fts_object_t *) exp, "expr: eval_func: asking too many arguments\n");
+    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: eval_func: asking too many arguments\n");
     return (exNULL);
   }
   
@@ -829,14 +829,14 @@ struct ex_ex *eval_tab(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr)
   
   if (eptr->ex_type == ET_SI) {
     if (!exp->exp_var[eptr->ex_int].ex_ptr) {
-	post_error((fts_object_t *) exp, "expr: syntax error: no string for inlet %ld\n", eptr->ex_int);
+	fts_object_signal_runtime_error((fts_object_t *) exp, "expr: syntax error: no string for inlet %ld\n", eptr->ex_int);
       return (exNULL);
     }
     tbl = (char *) exp->exp_var[eptr->ex_int].ex_ptr;
   } else if (eptr->ex_type == ET_TBL)
     tbl = (char *) eptr->ex_ptr;
   else {
-    post_error((fts_object_t *) exp, "expr: eval_tbl: bad type %ld\n", eptr->ex_type);
+    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: eval_tbl: bad type %ld\n", eptr->ex_type);
     return (exNULL);
   }
   eptr = ex_eval(exp, ++eptr, &arg);

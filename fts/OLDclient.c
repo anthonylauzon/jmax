@@ -784,7 +784,7 @@ fts_client_add_atom(const fts_atom_t *atom)
   else  if (fts_is_object( atom))
     fts_client_add_object( fts_get_object(atom));
   else
-    fprintf(stderr, "Wrong atom type in fts_client_add_atoms: %s\n", fts_atom_get_printable_typeid(atom));
+    fts_log( "Wrong atom type in fts_client_add_atoms: %s\n", fts_get_selector(atom));
 }
 
 void 
@@ -1049,11 +1049,11 @@ static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 
 #ifdef UPDATE_TRACE 
       {
-	fprintf(stderr, "Sending property %s value " , fts_symbol_name(name));
-	fprintf_atoms(stderr, 1, &a);
-	fprintf(stderr, " for object ");
+	fts_log( "Sending property %s value " , fts_symbol_name(name));
+	fts_log_atoms( 1, &a);
+	fts_log( " for object ");
 	fprintf_object(stderr, obj);
-	fprintf(stderr, "\n");
+	fts_log( "\n");
       }
 #endif
 
@@ -1314,9 +1314,9 @@ static fts_symbol_t fts_s_setDescription;
 static void
 printf_mess(const char *msg, int ac, const fts_atom_t *av)
 {
-  fprintf(stderr, "%s (%d args): ", msg, ac);
-  fprintf_atoms(stderr, ac, av);
-  fprintf(stderr, "\n");
+  fts_log( "%s (%d args): ", msg, ac);
+  fts_log_atoms( ac, av);
+  fts_log( "\n");
 }
 
 
@@ -1335,9 +1335,9 @@ trace_mess(const char *msg, int ac, const fts_atom_t *av)
 {
   if (do_mess_trace)
     {
-      fprintf(stderr, "%s: ", msg); 
-      fprintf_atoms(stderr, ac, av);
-      fprintf(stderr, "\n");
+      fts_log( "%s: ", msg); 
+      fts_log_atoms( ac, av);
+      fts_log( "\n");
     }
 }
 

@@ -470,9 +470,7 @@ gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr, int vector_size, double sam
 	  invs = (*iop)->length;
 	else if (invs != (*iop)->length)
 	  {
-	    post("DSP: inputs don't match for object ");
-	    post_object( o);
-	    post("\n");
+	    fts_object_signal_runtime_error( o, "DSP: inputs don't match");
 	    return 0;
 	  }
       }
@@ -864,9 +862,7 @@ dsp_graph_check_loop( fts_dsp_graph_t *graph)
     {
       if ( !IS_SCHEDULED(node))
 	{
-	  post("Loop in dsp graph: object ");
-	  post_object( node->o);
-	  post(" not scheduled\n");
+	  fts_object_signal_runtime_error( node->o, "Loop in dsp graph: object not scheduled");
 	}
     }
 }

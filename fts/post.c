@@ -21,279 +21,520 @@
  *
  */
 
-/* This file include all the kernel provided post like
-   (client printing) functions.
-*/
-
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
-#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 
-#include <ftsprivate/OLDclient.h>
+/***********************************************************************
+ *
+ * Functions that print in memory, varargs and va_list versions
+ * The buffer that is passed as an argument is reallocated if necessary
+ * using fts_realloc()
+ *
+ * Note: *pp can be NULL, but if != NULL, then *psize must be the
+ * true size of memory pointed by *pp.
+ *
+ */
 
+/* Forward declaration */
+static int mempost_atoms( char **pp, int *psize, int ac, const fts_atom_t *at);
 
-/******************************************************************************/
-/*                                                                            */
-/*              Basic Post Functions                                          */
-/*                                                                            */
-/******************************************************************************/
-
-/*
-   Due to limitation in the handling of  string type argument,
-   post cannot be buffer events, must be immediate events.
-*/
-
-static int
-symbol_contains_blank(fts_symbol_t s)
+static int vmempost( char **pp, int *psize, const char *format, va_list ap)
 {
-  const char *str = fts_symbol_name(s);
-  int n = strlen(str);
-  int i;
+  int n;
 
-  for(i=0; i<n; i++)
+  if ( *pp == NULL)
     {
-      if(str[i] == ' ')
-	return 1;
+      *psize = 2048;
+      *pp = fts_malloc( *psize);
+    }
+  else assert (*psize != 0);
+
+  /* from man vsnprintf */
+  while (1) 
+    {
+      /* Try to print in the allocated space. */
+      n = vsnprintf( *pp, *psize, format, ap);
+
+      /* If that worked, exit the loop. */
+      if (n > -1 && n < *psize)
+	break;
+
+      /* Else try again with more space. */
+      if (n > -1)    /* glibc 2.1 */
+	*psize = n + 1; /* precisely what is needed */
+      else           /* glibc 2.0 */
+	*psize *= 2;  /* twice the old size */
+
+      if ((*pp = fts_realloc( *pp, *psize)) == NULL)
+	return -1;
     }
 
-  return 0;
+  return n;
 }
 
-void
-post_vector(int n, float *fp)
+static int mempost( char **pp, int *psize, const char *format, ...)
 {
-  int i;
-  
-  for (i = 0; i < n; i+=4)
-    post("%4d: %f %f %f %f\n", i, fp[i], fp[i+1], fp[i+2], fp[i+3]);
+  va_list ap;
+  int n;
 
-  post("\n");
+  va_start( ap, format);
+  n = vmempost( pp, psize, format, ap);
+  va_end( ap);
+
+  return n;
 }
 
-void
-post_symbol(fts_symbol_t sym)
+static int mempost_symbol( int *psize, char **pp, fts_symbol_t s)
 {
-  if(symbol_contains_blank(sym))
-    post("\"%s\"", fts_symbol_name(sym));
+  if ( strchr( s, ' ') != NULL)
+    return mempost( pp, psize, "\"%s\"", s);
+
+  return mempost( pp, psize, "%s", s);
+}
+
+static int mempost_object( char **pp, int *psize, fts_object_t *obj)
+{
+  if (! obj)
+    return mempost( pp, psize, "{NULL OBJ}");
+
+  if (obj->argv)
+    {
+      int n;
+
+      n = mempost( pp, psize, "{");
+      n += mempost_atoms( pp, psize, obj->argc, obj->argv);
+      n += mempost( pp, psize, "}");
+
+      return n;
+    }
+
+  return mempost( pp, psize, "<\"%s\" #%d>", fts_object_get_class_name(obj), fts_object_get_id(obj));
+}
+
+/* To be removed */
+static int mempost_connection( char **pp, int *psize, fts_connection_t *connection)
+{
+  if (connection != 0)
+    return mempost( pp, psize, "<CONNECTION %d.%d %d.%d #%d>",
+		    connection->src->head.id, connection->woutlet, connection->dst->head.id, connection->winlet, connection->id);
+
+  return mempost( pp, psize, "<CONNECTION null>");
+}
+
+static int mempost_atoms( char **pp, int *psize, int ac, const fts_atom_t *at)
+{
+  int i, n = 0;
+
+  for ( i = 0; i < ac; i++, at++)
+    {
+      if ( fts_is_void( at))
+	n += mempost( pp, psize, "<void>");
+      else if ( fts_is_int( at))
+	n += mempost( pp, psize, "%d", fts_get_int( at));
+      else if ( fts_is_float( at))
+	n += mempost( pp, psize, "%f", fts_get_float( at));
+      else if ( fts_is_symbol( at))
+	n += mempost( pp, psize, "%s", fts_get_symbol( at));
+      else if ( fts_is_object( at))
+	n += mempost_object( pp, psize, fts_get_object( at));
+      else if ( fts_is_pointer( at) )
+	n += mempost( pp, psize, "%p", fts_get_pointer( at));
+      else if ( fts_is_string( at))
+	n += mempost( pp, psize, "%s", fts_get_string( at));
+      /* To be removed */
+      else if ( fts_is_connection( at))
+	n += mempost_connection( pp, psize, fts_get_connection( at));
+      else
+	n += mempost( pp, psize, "<UNKNOWN TYPE>%x", fts_get_int( at));
+
+      if ( i != ac-1)
+	n += mempost( pp, psize, " ");
+    }
+
+  return n;
+}
+
+/***********************************************************************
+ * 
+ * Functions that print on a bytestream
+ *
+ */
+
+static char *post_buffer = NULL;
+static int post_buffer_size;
+
+static void fts_vspost( fts_bytestream_t *stream, const char *format, va_list ap)
+{
+  int n;
+
+  n = vmempost( &post_buffer, &post_buffer_size, format, ap);
+
+  fts_bytestream_output( stream, n, post_buffer);
+  fts_bytestream_flush( stream);
+}  
+
+void fts_spost( fts_bytestream_t *stream, const char *format, ...)
+{
+  va_list ap;
+
+  va_start( ap, format);
+  fts_vspost( stream, format, ap);
+  va_end( ap);
+}
+
+void fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
+{
+  int n;
+
+  n = mempost_atoms( &post_buffer, &post_buffer_size, ac, at);
+
+  fts_bytestream_output( stream, n, post_buffer);
+  fts_bytestream_flush( stream);
+}
+
+/***********************************************************************
+ *
+ * Compatibility
+ *
+ */
+
+static fts_stack_t *post_stack = NULL;
+
+/* forward declaration */
+static fts_bytestream_t *fts_get_default_console_stream( void);
+
+static void post_output_chars( char *buffer, int n)
+{
+  if (fts_get_default_console_stream())
+    {
+      fts_bytestream_output( fts_get_default_console_stream(), n, post_buffer);
+      fts_bytestream_flush( fts_get_default_console_stream());
+    }
   else
-    post("%s", fts_symbol_name(sym));
-}
-
-void
-post_atoms(int ac, const fts_atom_t *at)
-{
-  int i;
-
-  for(i=0; i<ac; i++)
+    /* May be this is to be done in all cases */
     {
-      char *ps;
+      int i;
 
-      if (i == (ac - 1))
-	ps = "";
-      else
-	ps = " ";
-
-      if (fts_is_int(at + i))
-	post("%d%s", fts_get_int(at + i), ps);
-      else if (fts_is_float(at + i))
-	post("%g%s", fts_get_float(at + i), ps);
-      else if (fts_is_symbol(at + i))
+      if (post_stack == NULL)
 	{
-	  fts_symbol_t sym = fts_get_symbol(at + i);
-	  
-	  if(symbol_contains_blank(sym))
-	    post("\"%s\"%s", fts_symbol_name(sym), ps);
-	  else
-	    post("%s%s", fts_symbol_name(sym), ps);
+	  post_stack = (fts_stack_t *)fts_malloc( sizeof( fts_stack_t));
+	  fts_stack_init( post_stack, char);
 	}
-      else if (fts_is_void(at + i))
-	post("<void>%s", ps);
-      else
-	post("<%s>%s", fts_atom_get_printable_typeid(at + i), ps);
-    }
-}
 
-#define POST_LINE_MAXLENGTH 2048
+      for ( i = 0; i < n; i++)
+	fts_stack_push( post_stack, char, post_buffer[i]);
+    }    
+}
 
 void post( const char *format, ...)
 {
   va_list ap;
-  char buf[POST_LINE_MAXLENGTH];
-  char *p;
-  static char post_buffer[POST_LINE_MAXLENGTH];
-  static char *fill_p = post_buffer;
+  int n;
 
   va_start( ap, format);
-  vsprintf( buf, format, ap);
+  n = vmempost( &post_buffer, &post_buffer_size, format, ap);
   va_end( ap);
 
-  p = buf;
-  while ( *p)
-    {
-      if (*p == '\n')
-	{
-	  *fill_p = '\0';
-
-	  if (fts_client_is_up())
-	    {
-	      fts_client_start_msg( POST_LINE_CODE);
-	      fts_client_add_string( post_buffer);
-	      fts_client_done_msg();
-	    }
-	  else
-	    {
-	      fprintf( stderr, "%s\n", post_buffer);
-	    }
-
-	  fill_p = post_buffer;
-	}
-      else
-	{
-	  *fill_p = *p;
-	  fill_p++;
-	}
-
-      p++;
-    }
+  post_output_chars( post_buffer, n);
 }
 
-/* 
- * The way to post object error message is to use this function;
- * Same syntax as post, add a first object argument; this argument
- * will be used to allow the user to retrieve the patch where the 
- * objetc is.
- *
- * Currently, the strategy is to use the error and errdesc properties;
- * it is actually a temporary hack, a special "console" should be written.
- * 
- */
-
-void post_error(fts_object_t *obj, const char *format , ...)
+void post_atoms( int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
-  va_list ap;
-  char buf[512];
+  int n;
 
-  va_start( ap, format);
+  n = mempost_atoms( &post_buffer, &post_buffer_size, ac, at);
 
-  vsprintf(buf, format, ap);
-
-  va_end(ap);
-
-  fts_set_int(&a, 1);
-  fts_object_put_prop(obj, fts_s_error, &a);
-
-  if (fts_object_has_id(obj))
-    fts_object_ui_property_changed(obj, fts_s_error);
-
-  fts_set_symbol(&a, fts_new_symbol_copy(buf));
-  fts_object_put_prop(obj, fts_s_error_description, &a);
-
-  fts_client_start_msg(POST_CODE);
-  fts_client_add_string(buf);
-  fts_client_done_msg();
+  post_output_chars( post_buffer, n);
 }
 
-
+/***********************************************************************
+ *
+ * log functions
+ * (equivalent of post functions, but printing on a log file)
+ *
+ */
 
 /*
- * iiwu_log
+ * it may seem strange that in the following functions,
+ * we reopen the file at each call, but it is ***not***.
+ * this way, you are guaranteed that the file's content
+ * is updated after each log, even in case of fts crash !!!
+ *
+ * question: ok for windows, but is this really necessary on linux ? 
+ * Anyway, it does not hurt...
  */
 
-static char* log_file = NULL;
-static double log_time = 0;
+static double log_time;
+static const char *log_file_name = NULL;
+static char *log_buffer = NULL;
+static int log_buffer_size;
 
-char* fts_log_date(char* buf, int len)
+static void log_date( FILE *log)
 {
-#ifdef WIN32
+#ifdef win32
   char t[9];
   char d[9];
+
   _strdate(d);
   _strtime(t);
-  snprintf(buf, len, "%s %s", d, t);
+  fprintf( log, "%s %s", d, t);
 #else
   time_t t;
 
   time( &t);
-  snprintf(buf, len, "%s", ctime( &t));
+  fprintf( log, "%s", ctime( &t));
 #endif
-  return buf;
 }
 
-void fts_log_init(void)
+static void log_init( void)
 {
-  FILE* log;
+  FILE *log;
   char buf[1024];
 
 #ifdef WIN32
-  log_file = "C:\\fts_log.txt";
+  log_file_name = "c:\\fts_log.txt";
 #else
-  char* home = getenv("HOME");
-  if (home) {
-    snprintf(buf, 1024, "%s/.fts_log", home);
-    log_file = strdup(buf);
-  } else {
-    log_file = "/tmp/fts_log";
-  }
+  if (getenv("HOME"))
+    {
+      snprintf( buf, sizeof( buf), "%s/.fts_log", getenv("HOME"));
+      log_file_name = strdup( buf);
+    }
+  else
+    log_file_name = "/tmp/fts_log";
 #endif
 
-  log_time = fts_systime();
-
   /* truncate the file */
-  log = fopen(log_file, "w");
-  fprintf(log, "[log]: Started logging on %s\n", fts_log_date(buf, 1024));
-  fclose(log);
+  log = fopen( log_file_name, "w");
+
+  if (log != NULL)
+    {
+      fprintf( log, "[log]: started logging on ");
+      log_date( log);
+      fprintf( log, "\n");
+
+      fclose(log);
+    }
 }
 
-/*
- * It may seem strange that in the following functions,
- * we reopen the file at each call, but it is *not*.
- * This way, you are guaranteed that the file's content
- * is updated after each log, even in case of FTS crash !!!
- */
-void fts_log(char* fmt, ...)
+void fts_log( char *format, ...)
 {
-  FILE* log;
-  va_list args; 
+  va_list ap; 
+  FILE *log;
 
-  if (log_file == NULL) {
-    fts_log_init();
-  }
+  if (log_file_name == NULL)
+    log_init();
 
-  log = fopen(log_file, "a");
-  if (log == NULL) {
+  log = fopen( log_file_name, "a");
+  if (log == NULL)
     return;
-  }
 
-  fprintf(log, "[%u]", (unsigned int) (fts_systime() - log_time));
+  fprintf( log, "[%u]", (unsigned int) (fts_systime() - log_time));
 
-  va_start (args, fmt); 
-  vfprintf(log, fmt, args); 
-  va_end (args); 
+  va_start( ap, format); 
+  vfprintf( log, format, ap);
+  va_end( ap);
 
-  fflush(log);
-  fclose(log);
+  fflush( log);
+  fclose( log);
 }
 
 void fts_log_atoms( int ac, const fts_atom_t *at)
 {
-  FILE* log;
+  FILE *log;
+  int n;
 
-  if (log_file == NULL) {
-    fts_log_init();
-  }
+  if (log_file_name == NULL)
+    log_init();
 
-  log = fopen(log_file, "a");
-  if (log == NULL) {
+  log = fopen( log_file_name, "a");
+  if (log == NULL)
     return;
-  }
 
-  fprintf_atoms( log, ac, at);
+  n = mempost_atoms( &log_buffer, &log_buffer_size, ac, at);
+
+  fwrite( log_buffer, n, 1, log);
 
   fflush(log);
-  fclose(log);
+  fclose( log);
 }
+
+
+/***********************************************************************
+ *
+ * console stream
+ * this object maintains an internal stack for line buffering.
+ *
+ * this code must be moved to the java console object (in package guiobj very likely)
+ *
+ */
+
+typedef struct consolestream {
+  fts_bytestream_t bytestream;
+  fts_stack_t line_buffer;
+} consolestream_t;
+
+static fts_symbol_t s_print_line;
+
+static void consolestream_output(fts_bytestream_t *stream, int count, const unsigned char *buf)
+{
+  consolestream_t *this = (consolestream_t *)stream;
+  int i;
+
+  for ( i = 0; i < count; i++)
+    {
+      if ( buf[i] == '\n')
+	{
+	  fts_atom_t a[1];
+
+	  fts_stack_push( &this->line_buffer, char, '\0');
+
+	  fts_set_string( a, fts_stack_get_base( &this->line_buffer));
+	  fts_client_send_message( (fts_object_t *)this, s_print_line, 1, a);
+
+	  fts_stack_clear( &this->line_buffer);
+	}
+      else
+	fts_stack_push( &this->line_buffer, char, buf[i]);
+    }
+}
+
+static void consolestream_output_char(fts_bytestream_t *stream, unsigned char c)
+{
+  consolestream_output(stream, 1, &c);
+}
+
+static void consolestream_flush( fts_bytestream_t *stream)
+{
+}
+
+static void consolestream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  consolestream_t *this = (consolestream_t *) o;
+
+  fts_bytestream_init( (fts_bytestream_t *)this);
+
+  fts_bytestream_set_output( (fts_bytestream_t *)this, 
+			     consolestream_output,
+			     consolestream_output_char,
+			     consolestream_flush);
+
+  fts_stack_init( &this->line_buffer, char);
+}
+
+static fts_status_t consolestream_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init( cl, sizeof(consolestream_t), 0, 0, 0);
+  fts_bytestream_class_init( cl);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, consolestream_init);
+
+  s_print_line = fts_new_symbol( "print_line");
+
+  return fts_Success;
+}
+
+
+/***********************************************************************
+ *
+ * Default console
+ * 
+ * Installed by client
+ *
+ */
+
+static fts_bytestream_t *default_console_stream;
+
+fts_bytestream_t *fts_get_default_console_stream( void)
+{
+  return default_console_stream;
+}
+
+void fts_set_default_console_stream( fts_bytestream_t *stream)
+{
+  if (default_console_stream)
+    fts_object_release( (fts_object_t *)default_console_stream);
+
+  default_console_stream = stream;
+
+  if (default_console_stream)
+    fts_object_refer( (fts_object_t *)stream);
+
+  /* Post accumulated messages */
+  if (post_stack != NULL)
+    {
+      fts_bytestream_output( stream, fts_stack_get_top( post_stack), fts_stack_get_base( post_stack));
+      fts_bytestream_flush( stream);
+    }
+}
+
+/***********************************************************************
+ *
+ * Hack
+ *
+ */
+
+static void stderrstream_output(fts_bytestream_t *stream, int count, const unsigned char *buf)
+{
+  fwrite( buf, count, 1, stderr);
+}
+
+static void stderrstream_output_char(fts_bytestream_t *stream, unsigned char c)
+{
+  stderrstream_output( stream, 1, &c);
+}
+
+static void stderrstream_flush( fts_bytestream_t *stream)
+{
+  fflush( stderr);
+}
+
+static void stderrstream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_bytestream_init( (fts_bytestream_t *)o);
+
+  fts_bytestream_set_output( (fts_bytestream_t *)o, 
+			     stderrstream_output,
+			     stderrstream_output_char,
+			     stderrstream_flush);
+}
+
+static fts_status_t stderrstream_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init( cl, sizeof(fts_bytestream_t), 0, 0, 0);
+  fts_bytestream_class_init( cl);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, stderrstream_init);
+
+  return fts_Success;
+}
+
+
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+
+void fts_post_config( void)
+{
+  /* hack */
+  {
+    fts_symbol_t s;
+    fts_atom_t argv[1];
+    fts_object_t *stderrstream;
+
+    s = fts_new_symbol( "stderrstream");
+    fts_class_install( s, stderrstream_instantiate);
+
+    fts_set_symbol( argv, s);
+    fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, &stderrstream);
+
+    fts_set_default_console_stream( (fts_bytestream_t *)stderrstream);
+  }
+}
+

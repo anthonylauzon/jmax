@@ -1,3 +1,13 @@
+2002-02-08  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed the atoms implementation. The tag was a symbol, it is now a hacked
+	fts_metaclass_t * (hacked by the last bit that is set to one to identify 
+	primitive types). 
+
+	* changed the post implementation. post and other functions now print the
+	characters on a byte stream. The clients can install their default console
+	byte stream.
+
 2002-01-22  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* changing FTS code to remove symbol cache index from symbol structure

@@ -919,6 +919,9 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   this->client_id = client_table_add( this);
 
+  /* Set my client id */
+  this->head.head.id = OBJECT_ID( 1, this->client_id);
+
   fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
 
 #ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION

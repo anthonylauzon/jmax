@@ -338,11 +338,11 @@ void fts_hashtable_stats( fts_hashtable_t *h)
 }
 
 #ifdef DEBUG
-void fts_hashtable_fprintf( fts_hashtable_t *h, FILE *f)
+void fts_hashtable_log( fts_hashtable_t *h)
 {
   int i;
 
-  fprintf( f, "Hashtable: length = %d count = %d rehash = %d\n", h->length, h->count, h->rehash_count);
+  fts_log( "Hashtable: length = %d count = %d rehash = %d\n", h->length, h->count, h->rehash_count);
 
   for ( i = 0; i < h->length; i++)
     {
@@ -351,18 +351,18 @@ void fts_hashtable_fprintf( fts_hashtable_t *h, FILE *f)
       if (!h->table[i])
 	continue;
 
-      fprintf( f, "[%d] ", i);
+      fts_log( "[%d] ", i);
 
       for ( c = h->table[i]; c; c = c->next)
 	{
-	  fprintf( f, "(");
-	  fprintf_atoms( f, 1, &c->key);
-	  fprintf( f, ",");
-	  fprintf_atoms( f, 1, &c->value);
-	  fprintf( f, ") ");
+	  fts_log( "(");
+	  fts_log_atoms( 1, &c->key);
+	  fts_log( ",");
+	  fts_log_atoms( 1, &c->value);
+	  fts_log( ") ");
 	}
 
-      fprintf( f, "\n");
+      fts_log( "\n");
     }
 }
 #endif

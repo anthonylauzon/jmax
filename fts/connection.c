@@ -374,19 +374,6 @@ fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
     }
 }
 
-/* (debug) print a connection as:
- * <CONNECTION fromId.outlet toId.inlet #id>
- */
-void 
-fprintf_connection(FILE *f, fts_connection_t *conn)
-{
-  if (conn != 0)
-    fprintf(f, "<CONNECTION %d.%d %d.%d #%d>",
-	    conn->src->head.id, conn->woutlet, conn->dst->head.id, conn->winlet, conn->id);
-  else
-    fprintf(f, "<CONNECTION null>");
-}
-
 void 
 fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type)
 {

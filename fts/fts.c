@@ -157,92 +157,57 @@ void fts_load_project( void)
  * these functions initializes the kernel structures
  */
 
-extern void fts_kernel_hashtable_init( void);
-extern void fts_kernel_symbol_init( void);
-extern void fts_kernel_atom_init( void);
-extern void fts_kernel_objtable_init( void);
-extern void fts_kernel_list_init( void);
-extern void fts_kernel_class_init( void);
-extern void fts_kernel_property_init( void);
-extern void fts_kernel_package_init( void);
-extern void fts_kernel_doctor_init( void);
-extern void fts_kernel_connection_init( void);
-extern void fts_kernel_variable_init( void);
-extern void fts_kernel_patcher_init( void);
-extern void fts_kernel_expression_init( void);
-extern void fts_kernel_ftl_init( void);
-extern void fts_kernel_param_init( void);
-extern void fts_kernel_dsp_graph_init( void);
-extern void fts_kernel_dsp_init( void);
-extern void fts_kernel_abstraction_init( void);
-extern void fts_kernel_template_init( void);
-extern void fts_kernel_autosave_init( void);
-extern void fts_kernel_patparser_init( void);
-extern void fts_kernel_time_init( void);
-extern void fts_kernel_soundfile_init( void);
-extern void fts_kernel_sched_init( void);
-extern void fts_kernel_audiofile_init( void);
+#define _K_DECNCALL(F) { extern void F(void); F(); }
 
 static void fts_kernel_init( void)
 {
   /*
    *** Attention !!! The order is important ***
    */
-  fts_kernel_hashtable_init();
-  fts_kernel_symbol_init();
-  fts_kernel_atom_init();
-  fts_kernel_objtable_init();
-  fts_kernel_list_init();
-  fts_kernel_class_init();
-  fts_kernel_property_init();
-  fts_kernel_package_init();
-  fts_kernel_doctor_init();
-  fts_kernel_connection_init();
-  fts_kernel_variable_init();
-  fts_kernel_patcher_init();
-  fts_kernel_expression_init();
-  fts_kernel_ftl_init();
-  fts_kernel_param_init();
-  fts_kernel_dsp_graph_init();
-  fts_kernel_dsp_init();
-  fts_kernel_abstraction_init();
-  fts_kernel_template_init();
-  fts_kernel_autosave_init();
-  fts_kernel_patparser_init();
-  fts_kernel_time_init();
-  fts_kernel_soundfile_init();
-  fts_kernel_sched_init();
-  fts_kernel_audiofile_init();
+  _K_DECNCALL( fts_kernel_hashtable_init);
+  _K_DECNCALL( fts_kernel_symbol_init);
+  _K_DECNCALL( fts_kernel_atom_init);
+  _K_DECNCALL( fts_kernel_objtable_init);
+  _K_DECNCALL( fts_kernel_list_init);
+  _K_DECNCALL( fts_kernel_class_init);
+  _K_DECNCALL( fts_kernel_property_init);
+  _K_DECNCALL( fts_kernel_package_init);
+  _K_DECNCALL( fts_kernel_array_init);
+  _K_DECNCALL( fts_kernel_doctor_init);
+  _K_DECNCALL( fts_kernel_connection_init);
+  _K_DECNCALL( fts_kernel_variable_init);
+  _K_DECNCALL( fts_kernel_patcher_init);
+  _K_DECNCALL( fts_kernel_expression_init);
+  _K_DECNCALL( fts_kernel_ftl_init);
+  _K_DECNCALL( fts_kernel_param_init);
+  _K_DECNCALL( fts_kernel_dsp_graph_init);
+  _K_DECNCALL( fts_kernel_dsp_init);
+  _K_DECNCALL( fts_kernel_abstraction_init);
+  _K_DECNCALL( fts_kernel_template_init);
+  _K_DECNCALL( fts_kernel_autosave_init);
+  _K_DECNCALL( fts_kernel_patparser_init);
+  _K_DECNCALL( fts_kernel_time_init);
+  _K_DECNCALL( fts_kernel_sched_init);
+  _K_DECNCALL( fts_kernel_soundfile_init);
+  _K_DECNCALL( fts_kernel_audiofile_init);
 }
-
-extern void fts_array_config( void);
-extern void fts_message_config( void);
-extern void fts_audio_config( void);
-extern void fts_bytestream_config( void);
-extern void fts_client_config( void);
-extern void fts_clipboard_config( void);
-extern void fts_label_config( void);
-extern void fts_midi_config( void);
-extern void fts_objectset_config();
-extern void fts_selection_config( void);
-extern void fts_saver_config( void);
 
 /*
  * Installation of kernel packages 
  */
 static void fts_kernel_classes_config( void)
 {
-  fts_array_config();
-  fts_message_config();
-  fts_audio_config();
-  fts_bytestream_config();
-  fts_client_config();
-  fts_clipboard_config();
-  fts_label_config();
-  fts_midi_config();
-  fts_objectset_config();
-  fts_selection_config();
-  fts_saver_config();
+  _K_DECNCALL( fts_message_config);
+  _K_DECNCALL( fts_audio_config);
+  _K_DECNCALL( fts_bytestream_config);
+  _K_DECNCALL( fts_client_config);
+  _K_DECNCALL( fts_clipboard_config);
+  _K_DECNCALL( fts_label_config);
+  _K_DECNCALL( fts_midi_config);
+  _K_DECNCALL( fts_objectset_config);
+  _K_DECNCALL( fts_post_config);
+  _K_DECNCALL( fts_selection_config);
+  _K_DECNCALL( fts_saver_config);
 }
 
 void fts_init( int argc, char **argv)

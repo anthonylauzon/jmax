@@ -948,7 +948,7 @@ static int fts_op_eval(fts_expression_state_t *e)
   int op_type = op_type_stack_top(e);
 
 #ifdef EXPRESSION_TRACE_DEBUG
-  fprintf(stderr, "Evaluting op %d\n", op);
+  fts_log( "Evaluting op %d\n", op);
 #endif
 
   if (op_type == FTS_UNARY_OP_TYPE)
@@ -1509,9 +1509,9 @@ void fts_expression_printf_assignements(fts_expression_state_t *e)
 
   while (p)
     {
-      fprintf(stderr, "\tGot name %s value ", fts_symbol_name(p->name));
-      fprintf_atoms(stderr, 1, &(p->value));
-      fprintf(stderr, "\n");
+      fts_log( "\tGot name %s value ", fts_symbol_name(p->name));
+      fts_log_atoms( 1, &(p->value));
+      fts_log( "\n");
       p = p->next;
     }
 }
@@ -1528,9 +1528,9 @@ fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,
   fts_expression_state_t *e;
 
 #ifdef EXPRESSION_TRACE_DEBUG
-  fprintf(stderr, "Expression: Evaluting: ");
-  fprintf_atoms(stderr, expr_size, expr);
-  fprintf(stderr, "\n");
+  fts_log( "Expression: Evaluting: ");
+  fts_log_atoms( expr_size, expr);
+  fts_log( "\n");
 #endif
 
   /* Calles of fts_expression_eval should free the resulting structure */
@@ -1554,16 +1554,16 @@ fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,
       else
 	{
 #ifdef EXPRESSION_TRACE_DEBUG
-	  fprintf(stderr, "Error in Expression: %s\n", e->msg);	/* @@@ */
+	  fts_log( "Error in Expression: %s\n", e->msg);	/* @@@ */
 #endif
 	  return e;
 	}
     }
 
 #ifdef EXPRESSION_TRACE_DEBUG
-  fprintf(stderr, "\tgot result: ");
-  fprintf_atoms(stderr, e->count, result);
-  fprintf(stderr, "\n");
+  fts_log( "\tgot result: ");
+  fts_log_atoms( e->count, result);
+  fts_log( "\n");
   fts_expression_printf_assignements(e);
 #endif
 

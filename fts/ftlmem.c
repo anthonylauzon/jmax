@@ -292,7 +292,7 @@ ftl_mem_end_memory_relocation(void)
 	p = p->next_block;
       }
 
-    fprintf(stderr, "FTL MEM allocated %d bytes, in %d blocks\n", total_size, blocks);
+    fts_log( "FTL MEM allocated %d bytes, in %d blocks\n", total_size, blocks);
   }
 #endif
 }

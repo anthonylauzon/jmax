@@ -93,7 +93,8 @@ Intelligent client connection process (auto connect to running server)
 </p>
 
 <p>
-(( Create a udpstream derived from bytestream ))
+Add a UDP connection: create a udpstream derived from bytestream, add packet numbering 
+and may be simple packet reordering (window of N packets, with N < 10).
 </p>
 
 <!-- ---------------------------------------------------------------------- -->
@@ -145,6 +146,11 @@ Configuration editor [see <a href="notes/io-configuration.html">notes/io-configu
 and Linux) or use the OS X framework for building JAVA applications.
 </p>
 
+<p>
+Evaluate use of Java Drag&amp;Drop API
+</p>
+
+
 <!-- ---------------------------------------------------------------------- -->
 <h3>Changes in the object set</h3>
   
@@ -158,6 +164,18 @@ and Linux) or use the OS X framework for building JAVA applications.
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Changes in the FTS expression parser</h3>
+
+<p>
+Add a first scanner+parser using Flex+Bison for parsing of protocol unparsed
+strings (see "Dynamic client/server connection").
+</p>
+
+<p>
+Extends this parser to be able to parse arrays of atoms (by switching scanner)
+and implement a first grammar for expressions (similar to the actual grammar,
+plus implementation of the dot operator and may be object creation).
+</p>
+
  
 <!-- ---------------------------------------------------------------------- -->
 <h3>Portable soundfile I/O</h3>
@@ -225,11 +243,6 @@ thread, as well as MIDI input.
 </p>
 
 <p>
- Do a DSP profiler using a thread and an object set for viewing results
-(sorted by objects, classes and patches)
-</p>
-
-<p>
  Do an async file reader (based on methods callback)
 </p>
 
@@ -284,6 +297,11 @@ with ALSA). Check ALSA version number.
 <!-- ---------------------------------------------------------------------- -->
 <h3>Compilation issues</h3>
   
+<p>
+Fix link command line for fts: -lfts -L??? (automake 1.5 adds automatically -L.libs,
+previous versions did not)
+</p>
+
 <p>
  Reintegrate compilation stuff for compilation date.
 </p>
@@ -360,6 +378,14 @@ annotation with a menu item </li>
 <p>
  Move tutorials to a separate source tree and make a rpm from it.
 </p>
+
+
+
+<p>
+ Do a DSP profiler using a thread and an object set for viewing results
+(sorted by objects, classes and patches)
+</p>
+
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Misc</h3>

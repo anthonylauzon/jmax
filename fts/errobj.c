@@ -187,7 +187,7 @@ fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...)
   fts_atom_t a[2];
 
   va_start(ap, format);
-  vsprintf(buf, format, ap);
+  vsnprintf( buf, sizeof(buf), format, ap);
   va_end(ap);
 
   if(runtime_error_handler)

@@ -61,7 +61,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
     {
       optr->ex_type = ET_INT;
       optr->ex_int = 0;
-      post_error((fts_object_t *) exp, "expr: %s: can't find table\n", fts_symbol_name(s));
+      fts_object_signal_runtime_error((fts_object_t *) exp, "expr: %s: can't find table\n", fts_symbol_name(s));
       return 1;
     }
 
@@ -95,7 +95,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
     break;
 
   default:	/* do something with strings */
-    post_error((fts_object_t *) exp, "expr: bad argument for table '%s'\n", fts_symbol_name(s));
+    fts_object_signal_runtime_error((fts_object_t *) exp, "expr: bad argument for table '%s'\n", fts_symbol_name(s));
     return (1);
   }
   return (0);

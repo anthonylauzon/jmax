@@ -139,7 +139,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_symbol_t name = fts_get_symbol(at);
 	  fts_class_t *cl;
 
-	  if(fts_atom_type_lookup(name, &cl))
+	  if( fts_metaclass_get_by_name( name) != NULL)
 	    fts_object_set_error(o, "Symbol %s cannot be used as message", fts_symbol_name(name));
 	  else
 	    message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */

@@ -396,12 +396,6 @@ FTS_API fts_metaclass_t *fts_t_connection;
  */
 FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
 
-/*
- * Print function for debug
- * Not documented
- */
-FTS_API void fprintf_atoms( FILE *f, int ac, const fts_atom_t *at);
-
 /* An initializer for empty atoms */
 #define FTS_NULL { 0, {0}}
 

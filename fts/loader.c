@@ -104,7 +104,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
   /* allocate code */
 
 #ifdef LOAD_DEBUG
-  fprintf(stderr, "Reading %d bytecodes\n", header.code_size);
+  fts_log( "Reading %d bytecodes\n", header.code_size);
 #endif
 
   desc->code = (unsigned char *)fts_malloc( header.code_size);
@@ -125,7 +125,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
   /* allocate code and read symbols */
 
 #ifdef LOAD_DEBUG
-  fprintf(stderr, "Reading %d symbols\n", header.n_symbols);
+  fts_log( "Reading %d symbols\n", header.n_symbols);
 #endif
 
   if (header.n_symbols > 0)
@@ -152,7 +152,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
 	    {
 	      desc->symbols[symbolIndex]= fts_new_symbol_copy(buf);
 #ifdef LOAD_DEBUG
-	      fprintf(stderr, "Reading symbol %s\n", fts_symbol_name(desc->symbols[symbolIndex]));
+	      fts_log( "Reading symbol %s\n", fts_symbol_name(desc->symbols[symbolIndex]));
 #endif
 	      symbolIndex++;
 	      i = 0;
@@ -186,7 +186,7 @@ fts_object_t *fts_binary_file_load( const char *name,
   fts_binary_file_desc_t desc;
 
 #ifdef LOAD_DEBUG
-  fprintf(stderr, "Reading binary file %s\n", name);
+  fts_log( "Reading binary file %s\n", name);
 #endif
 
     /* open the file */

@@ -187,9 +187,9 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
   fts_atom_t new_args[1024];
 
 #ifdef TRACE_DEBUG
-  fprintf(stderr, "Object new ");
-  fprintf_atoms(stderr, aoc, aot);
-  fprintf(stderr, "\n");
+  fts_log( "Object new ");
+  fts_log_atoms( aoc, aot);
+  fts_log( "\n");
 #endif
 
   /* first of all, we check if we are in the case of a object variable definition syntax */
@@ -305,9 +305,9 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
     }
 
 #ifdef TRACE_DEBUG
-  fprintf(stderr, "After expression eval ");
-  fprintf_atoms(stderr, ac, at);
-  fprintf(stderr, "\n");
+  fts_log( "After expression eval ");
+  fts_log_atoms( ac, at);
+  fts_log( "\n");
 #endif
 
   /* 3- Retry the object doctor */
@@ -1104,6 +1104,7 @@ fts_object_move_properties(fts_object_t *old, fts_object_t *new)
  *  send a blip for an object (i.e. a message that will be shown in the status line)
  *
  */
+/* to be removed */
 void 
 fts_object_blip(fts_object_t *obj, const char *format , ...)
 {
@@ -1131,51 +1132,3 @@ fts_object_get_package(fts_object_t *obj)
     return fts_metaclass_get_package(fts_object_get_metaclass(obj));
 }
 
-/**************************************************************************************
- *
- *  debug print 
- *
- *  object is printed as:
- *    <description> <id>
- *
- *  if no description is present
- *    <metaclass-name> <id>
- */
-void 
-fprintf_object(FILE *f, fts_object_t *obj)
-{
-  if (! obj)
-    {
-      fprintf(f, "<NULL OBJ>");
-    }
-  else if (obj->argv)
-    {
-      if (fts_object_is_error(obj))
-	fprintf(f, "<ERROR {");
-      else
-	fprintf(f, "<{");
-
-      fprintf_atoms(f, obj->argc, obj->argv);
-      fprintf(f, "} #%lx(%d)>", (unsigned long) obj, obj->head.id);
-    }
-  else
-    fprintf(f, "<\"%s\" #%lx(%d)>", fts_symbol_name(fts_object_get_class_name(obj)),
-	    (unsigned long) obj, obj->head.id);
-}
-
-void 
-post_object(fts_object_t *obj)
-{
-  if (! obj)
-    {
-      post("{NULL OBJ}");
-    }
-  else if (obj->argv)
-    {
-      post("{");
-      post_atoms(obj->argc, obj->argv);
-      post("}");
-    }
-  else
-    post("<\"%s\" #%d>", fts_symbol_name(fts_object_get_class_name(obj)), obj->head.id);
-}

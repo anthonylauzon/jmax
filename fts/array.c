@@ -214,9 +214,13 @@ array_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-void
-fts_array_config(void)
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+void fts_kernel_array_init(void)
 {
-  fts_array_metaclass = fts_class_install(fts_s_array, array_instantiate);
-  fts_array_class = fts_class_get_by_name(fts_s_array);
+  fts_array_metaclass = fts_class_install( fts_s_array, array_instantiate);
+  fts_array_class = fts_class_get_by_name( fts_s_array);
 }

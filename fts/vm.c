@@ -246,7 +246,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* PUSH_INT_B   <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_INT_B %d\n", GET_B(p));
+	    fts_log( "PUSH_INT_B %d\n", GET_B(p));
 #endif
 
 	    eval_tos--;
@@ -260,7 +260,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* PUSH_INT_S   <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_INT_S %d\n", GET_S(p));
+	    fts_log( "PUSH_INT_S %d\n", GET_S(p));
 #endif
 
 	    eval_tos--;
@@ -274,7 +274,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* PUSH_INT_L   <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_INT_L %d\n", GET_L(p));
+	    fts_log( "PUSH_INT_L %d\n", GET_L(p));
 #endif
 
 	    eval_tos--;
@@ -288,7 +288,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* PUSH_FLOAT <float> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_FLOAT %f\n", GET_F(p));
+	    fts_log( "PUSH_FLOAT %f\n", GET_F(p));
 #endif
 	    
 	    eval_tos--;
@@ -306,7 +306,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    s  = symbol_table[GET_B(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_B %d (%s)\n", GET_B(p), s);
+	    fts_log( "PUSH_SYM_B %d (%s)\n", GET_B(p), s);
 #endif
 
 	    eval_tos--;
@@ -324,7 +324,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    s  = symbol_table[GET_S(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_S %s\n", s);
+	    fts_log( "PUSH_SYM_S %s\n", s);
 #endif
 
 	    eval_tos--;
@@ -342,7 +342,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    s  = symbol_table[GET_L(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_L %s\n", s);
+	    fts_log( "PUSH_SYM_L %s\n", s);
 #endif
 
 	    eval_tos--;
@@ -356,7 +356,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* SET_INT_B   <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "SET_INT_B %d\n", GET_B(p));
+	    fts_log( "SET_INT_B %d\n", GET_B(p));
 #endif
 
 	    fts_set_int(&eval_stack[eval_tos], GET_B(p));
@@ -369,7 +369,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* SET_INT_S   <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "SET_INT_S %d\n", GET_S(p));
+	    fts_log( "SET_INT_S %d\n", GET_S(p));
 #endif
 
 	    fts_set_int(&eval_stack[eval_tos], GET_S(p));
@@ -382,7 +382,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* SET_INT_L   <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "SET_INT_L %d\n", GET_L(p));
+	    fts_log( "SET_INT_L %d\n", GET_L(p));
 #endif
 
 	    fts_set_int(&eval_stack[eval_tos], GET_L(p));
@@ -395,7 +395,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* SET_FLOAT <float> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "SET_FLOAT %f\n", GET_F(p));
+	    fts_log( "SET_FLOAT %f\n", GET_F(p));
 #endif
 	    
 	    fts_set_float(&eval_stack[eval_tos], GET_F(p));
@@ -408,7 +408,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* SET_SYM_B   <idx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "SET_SYM_B %d\n", GET_B(p));
+	    fts_log( "SET_SYM_B %d\n", GET_B(p));
 #endif
 
 	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_B(p)]);
@@ -421,7 +421,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* SET_SYM_S   <idx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "SET_SYM_S %d\n", GET_S(p));
+	    fts_log( "SET_SYM_S %d\n", GET_S(p));
 #endif
 
 	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_S(p)]);
@@ -434,7 +434,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* SET_SYM_L   <idx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "SET_SYM_L %d\n", GET_L(p));
+	    fts_log( "SET_SYM_L %d\n", GET_L(p));
 #endif
 
 	    fts_set_symbol(&eval_stack[eval_tos], symbol_table[GET_L(p)]);
@@ -447,7 +447,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* POP_ARGS_B    <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "POP_ARGS_B %d\n", GET_B(p));
+	    fts_log( "POP_ARGS_B %d\n", GET_B(p));
 #endif
 
 	    eval_tos += GET_B(p);
@@ -460,7 +460,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* POP_ARGS_S    <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "POP_ARGS_S %d\n", GET_S(p));
+	    fts_log( "POP_ARGS_S %d\n", GET_S(p));
 #endif
 
 	    eval_tos += GET_S(p);
@@ -473,7 +473,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* POP_ARGS_L    <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "POP_ARGS_L %d\n", GET_L(p));
+	    fts_log( "POP_ARGS_L %d\n", GET_L(p));
 #endif
 
 	    eval_tos += GET_L(p);
@@ -489,7 +489,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* PUSH_OBJ_B   <objidx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_OBJ_B %d\n", GET_B(p));
+	    fts_log( "PUSH_OBJ_B %d\n", GET_B(p));
 #endif
 
 	    object_tos--;
@@ -503,7 +503,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* PUSH_OBJ_S   <objidx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_OBJ_S %d\n", GET_S(p));
+	    fts_log( "PUSH_OBJ_S %d\n", GET_S(p));
 #endif
 
 	    object_tos--;
@@ -518,7 +518,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* PUSH_OBJ_L   <objidx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_OBJ_L %d\n", GET_L(p));
+	    fts_log( "PUSH_OBJ_L %d\n", GET_L(p));
 #endif
 
 	    object_tos--;
@@ -533,7 +533,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* MV_OBJ_B     <objidx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MV_OBJ_B %d\n", GET_B(p));
+	    fts_log( "MV_OBJ_B %d\n", GET_B(p));
 #endif
 
 	    object_table[GET_B(p)] = object_stack[object_tos];
@@ -546,7 +546,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* MV_OBJ_S     <objidx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MV_OBJ_S %d\n", GET_S(p));
+	    fts_log( "MV_OBJ_S %d\n", GET_S(p));
 #endif
 
 	    object_table[GET_S(p)] = object_stack[object_tos];
@@ -559,7 +559,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* MV_OBJ_L     <objidx> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MV_OBJ_L %d\n", GET_L(p));
+	    fts_log( "MV_OBJ_L %d\n", GET_L(p));
 #endif
 
 	    object_table[GET_L(p)] = object_stack[object_tos];
@@ -573,7 +573,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* POP_OBJS_B    <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "POP_OBJ_B %d\n", GET_B(p));
+	    fts_log( "POP_OBJ_B %d\n", GET_B(p));
 #endif
 
 	    object_tos += GET_B(p);
@@ -586,7 +586,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* POP_OBJS_S    <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "POP_OBJ_S %d\n", GET_S(p));
+	    fts_log( "POP_OBJ_S %d\n", GET_S(p));
 #endif
 
 	    object_tos += GET_S(p);
@@ -600,7 +600,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* POP_OBJS_L    <int> */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "POP_OBJ_L %d\n", GET_L(p));
+	    fts_log( "POP_OBJ_L %d\n", GET_L(p));
 #endif
 
 	    object_tos += GET_L(p);
@@ -618,15 +618,15 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    int nargs = GET_B(p);
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MAKE_OBJ_B %d\n", nargs);
+	    fts_log( "MAKE_OBJ_B %d\n", nargs);
 #endif
 
 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "\t");
+	    fts_log( "\t");
 	    fprintf_object(stderr, new);
-	    fprintf(stderr, "\n");
+	    fts_log( "\n");
 #endif
 
 	    /* Push the object in the object stack */
@@ -645,7 +645,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    int nargs = GET_S(p);
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MAKE_OBJ_S %d\n", nargs);
+	    fts_log( "MAKE_OBJ_S %d\n", nargs);
 #endif
 
 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
@@ -667,7 +667,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    int nargs = GET_L(p);
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
+	    fts_log( "MAKE_OBJ_L %d\n", nargs);
 #endif
 
 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
@@ -688,7 +688,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    int nargs = GET_B(p);
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MAKE_TOP_OBJ_B %d\n", nargs);
+	    fts_log( "MAKE_TOP_OBJ_B %d\n", nargs);
 #endif
 
 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
@@ -710,7 +710,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    int nargs = GET_S(p);
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MAKE_TOP_OBJ_S %d\n", nargs);
+	    fts_log( "MAKE_TOP_OBJ_S %d\n", nargs);
 #endif
 
 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
@@ -733,7 +733,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    int nargs = GET_L(p);
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
+	    fts_log( "MAKE_OBJ_L %d\n", nargs);
 #endif
 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
 				  &eval_stack[eval_tos]);
@@ -755,7 +755,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    prop = symbol_table[GET_B(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_B %s\n", prop);
+	    fts_log( "PUT_PROP_B %s\n", prop);
 #endif
 
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
@@ -772,7 +772,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    prop = symbol_table[GET_S(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_S %s\n", prop);
+	    fts_log( "PUT_PROP_S %s\n", prop);
 #endif
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
 	    p += 2;
@@ -788,7 +788,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    prop = symbol_table[GET_L(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_S %s\n", prop);
+	    fts_log( "PUT_PROP_S %s\n", prop);
 #endif
 
 	    fts_object_put_prop(object_stack[object_tos], prop, &eval_stack[eval_tos]);
@@ -812,7 +812,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    p += 4;
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "OBJ_MESS %d %s %d\n", inlet, sel, nargs);
+	    fts_log( "OBJ_MESS %d %s %d\n", inlet, sel, nargs);
 #endif
 
 	    fts_send_message(object_stack[object_tos], inlet, sel, nargs, &eval_stack[eval_tos]);
@@ -824,7 +824,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* CONNECT */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "CONNECT\n");
+	    fts_log( "CONNECT\n");
 #endif
 	    fts_connection_new(FTS_NO_ID, object_stack[object_tos], fts_get_int(&eval_stack[eval_tos]),
 			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1]));
@@ -839,7 +839,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	    int size;
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_OBJ_TABLE_B %d\n", GET_B(p));
+	    fts_log( "PUSH_OBJ_TABLE_B %d\n", GET_B(p));
 #endif
 
 	    size = GET_B(p);
@@ -862,7 +862,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	    int size;
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_OBJ_TABLE_S %d\n", GET_S(p));
+	    fts_log( "PUSH_OBJ_TABLE_S %d\n", GET_S(p));
 #endif
 
 	    size = GET_S(p);
@@ -884,7 +884,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 	    int size;
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_OBJ_TABLE_L %d\n", GET_L(p));
+	    fts_log( "PUSH_OBJ_TABLE_L %d\n", GET_L(p));
 #endif
 
 	    size = GET_L(p);
@@ -903,7 +903,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* POP_OBJ_TABLE */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "POP_OBJ_TABLE\n");
+	    fts_log( "POP_OBJ_TABLE\n");
 #endif
 
 	    if (object_table)
@@ -921,7 +921,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    /* RETURN */
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "RETURN\n");
+	    fts_log( "RETURN\n");
 #endif
 
 	    /* Rewind the template/patcher argument */

@@ -64,6 +64,7 @@
 #include <ftsprivate/template.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/objtable.h>
+#include <ftsprivate/label.h>
 
 fts_metaclass_t *patcher_metaclass = 0;
 
@@ -197,7 +198,7 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       return fts_Success;
     }
-  else if(ac == 1 && (fts_is_symbol(at) || fts_is_a(at, fts_s_label)))
+  else if(ac == 1 && (fts_is_symbol(at) || fts_is_label(at)))
     return receive_instantiate(cl, ac, at);
   else
     return &fts_CannotInstantiate;
@@ -328,7 +329,7 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       return fts_Success;
     }
-  else if(ac == 1 && (fts_is_symbol(at) || fts_is_a(at, fts_s_label)))
+  else if(ac == 1 && (fts_is_symbol(at) || fts_is_label(at)))
     return send_instantiate(cl, ac, at);
   else
     return &fts_CannotInstantiate;
@@ -796,11 +797,11 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_patcher_set_standard(this);
 
   /* Define the "args" variable */
-  this->args = (fts_array_t *)fts_malloc( sizeof( fts_array_t));
-  fts_array_init( this->args, ac, at);
+  this->args = (fts_array_t *)fts_object_create( fts_array_class, ac, at);
+  fts_object_refer( this->args);
 
-  fts_variable_define(this, fts_s_args);
-  fts_set_array(&va, this->args);
+  fts_variable_define( this, fts_s_args);
+  fts_set_array( &va, this->args);
   fts_variable_restore(this, fts_s_args, &va, o);
 
   /* should use block allocation ?? */
@@ -880,8 +881,8 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
 
   /* delete all the variables */
-  fts_array_destroy( this->args);
-  fts_free( this->args);
+  fts_object_release( this->args);
+
   fts_variables_undefine(this, (fts_object_t *)this);
 
   /* delete the inlets and inlets tables */

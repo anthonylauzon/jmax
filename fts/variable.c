@@ -195,9 +195,9 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
   fts_binding_list_t  **b;	/* indirect precursor */
 
 #ifdef TRACE_DEBUG
-  fprintf(stderr, "Remove User ");
+  fts_log( "Remove User ");
   fprintf_object(stderr, object);
-  fprintf(stderr, " for variable %s\n", fts_symbol_name(var->name));
+  fts_log( " for variable %s\n", fts_symbol_name(var->name));
 #endif
 
   /* remove the user from the binding (ignore the case where the binding is not there any more) */

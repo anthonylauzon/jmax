@@ -20,27 +20,6 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_CONNECTION_H_
-#define _FTS_PRIVATE_CONNECTION_H_
+fts_metaclass_t *fts_label_metaclass;
 
-/* init function */
-
-extern void fts_connections_init(void);
-
-/* Connections */
-
-extern void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int doclient);
-extern void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets);
-extern void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets);
-
-#define fts_connection_get_id(c) ((c)->id)
-#define fts_connection_get_source(c) ((c)->src)
-#define fts_connection_get_outlet(c) ((c)->woutlet)
-#define fts_connection_get_destination(c) ((c)->dst)
-#define fts_connection_get_inlet(c) ((c)->winlet)
-#define fts_connection_get_type(c) ((c)->type)
-
-extern void fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type);
-
-#endif
-
+#define fts_is_label(p) (fts_is_a(p, fts_label_metaclass))

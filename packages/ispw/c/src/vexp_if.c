@@ -165,15 +165,15 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	switch (eptr->ex_type)
 	  {
 	  case ET_II:
-	    fprintf(stderr,"ET_II: %d \n", eptr->ex_int);
+	    fts_log("ET_II: %d \n", eptr->ex_int);
 	    break;
 
 	  case ET_FI:
-	    fprintf(stderr,"ET_FT: %f \n", eptr->ex_flt);
+	    fts_log("ET_FT: %f \n", eptr->ex_flt);
 	    break;
 
 	  default:
-	    fprintf(stderr,"oups\n");
+	    fts_log("oups\n");
 	  }
       }
   }
@@ -181,7 +181,7 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if (!ex_eval(x, x->exp_stack, &x->exp_res))
     {
-      /*       fprintf(stderr,"expr_bang(error evaluation)\n"); */
+      /*       fts_log("expr_bang(error evaluation)\n"); */
       return;
     }
   

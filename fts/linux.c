@@ -381,7 +381,7 @@ static void watchdog_high( void)
 	{
 	  armed = 1;
 	  kill( getppid(), SIGHUP);
-	  fprintf(stderr, "watchdog waking up\n"); 
+	  fts_log( "watchdog waking up\n"); 
 	}
       else
 	exit( 1);

@@ -180,13 +180,13 @@ fts_bmax_file_sync( fts_bmax_file_t *f)
   /* Write the symbol table */
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Writing symbol table [%d symbols]\n", f->header.n_symbols);
+  fts_log( "Writing symbol table [%d symbols]\n", f->header.n_symbols);
 #endif
 
   for ( i = 0; i < f->header.n_symbols; i++)
     {
 #ifdef SAVER_DEBUG
-      fprintf(stderr, "\t- %s\n", fts_symbol_name(f->symbol_table[i]));
+      fts_log( "\t- %s\n", fts_symbol_name(f->symbol_table[i]));
 #endif
       fwrite(fts_symbol_name(f->symbol_table[i]), sizeof(char),
 	     strlen(fts_symbol_name(f->symbol_table[i]))+1, f->file);
@@ -199,7 +199,7 @@ fts_bmax_file_sync( fts_bmax_file_t *f)
 
   /* seek to the beginning and rewrite the header */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Writing header\n");
+  fts_log( "Writing header\n");
 #endif
 
   fseek(f->file, 0, SEEK_SET);
@@ -428,7 +428,7 @@ fts_bmax_code_return(fts_bmax_file_t *f)
 {
   /* RETURN */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tRETURN\n");
+  fts_log( "\tRETURN\n");
 #endif
 
   fts_bmax_write_opcode(f, FVM_RETURN);
@@ -439,7 +439,7 @@ fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
 {
   /* PUSH_INT   <int>   */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPUSH_INT %d\n", value);
+  fts_log( "\tPUSH_INT %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_PUSH_INT, value);
@@ -451,7 +451,7 @@ fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 {
   /* PUSH_FLOAT <float> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPUSH_FLOAT %f\n", value);
+  fts_log( "\tPUSH_FLOAT %f\n", value);
 #endif
 
   fts_bmax_write_opcode(f, FVM_PUSH_FLOAT);
@@ -465,7 +465,7 @@ fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
   int value;
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPUSH_SYM %d (%s)\n",
+  fts_log( "\tPUSH_SYM %d (%s)\n",
 	  fts_bmax_add_symbol(f, sym),
 	  fts_symbol_name(sym));
 #endif
@@ -480,7 +480,7 @@ fts_bmax_code_set_int(fts_bmax_file_t *f, int value)
 {
   /* SET_INT   <int>   */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tSET_INT %d\n", value);
+  fts_log( "\tSET_INT %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_SET_INT, value);
@@ -492,7 +492,7 @@ fts_bmax_code_set_float(fts_bmax_file_t *f, float value)
 {
   /* SET_FLOAT <float> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tSET_FLOAT %f\n", value);
+  fts_log( "\tSET_FLOAT %f\n", value);
 #endif
 
   fts_bmax_write_opcode(f, FVM_SET_FLOAT);
@@ -506,7 +506,7 @@ fts_bmax_code_set_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
   int value;
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tSET_SYM %d (%s)\n",
+  fts_log( "\tSET_SYM %d (%s)\n",
 	  fts_bmax_add_symbol(f, sym),
 	  fts_symbol_name(sym));
 #endif
@@ -521,7 +521,7 @@ fts_bmax_code_pop_args(fts_bmax_file_t *f, int value)
 {
   /* POP_ARGS    <int>   // pop n values  from the argument stack */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPOP_ARGS %d\n", value);
+  fts_log( "\tPOP_ARGS %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_POP_ARGS, value );
@@ -533,7 +533,7 @@ fts_bmax_code_push_obj(fts_bmax_file_t *f, int value)
 {
   /* PUSH_OBJ   <objidx> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPUSH_OBJ %d\n", value);
+  fts_log( "\tPUSH_OBJ %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_PUSH_OBJ, value );
@@ -545,7 +545,7 @@ fts_bmax_code_mv_obj(fts_bmax_file_t *f, int value)
 {
   /* MV_OBJ     <objidx> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tMV_OBJ %d\n", value);
+  fts_log( "\tMV_OBJ %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_MV_OBJ, value );
@@ -557,7 +557,7 @@ fts_bmax_code_pop_objs(fts_bmax_file_t *f, int value)
 {
   /* POP_OBJS    <int> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPOP_OBJS %d\n", value);
+  fts_log( "\tPOP_OBJS %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_POP_OBJS, value );
@@ -569,7 +569,7 @@ fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
 {
   /* MAKE_OBJ   <nargs> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tMAKE_OBJ %d\n", value);
+  fts_log( "\tMAKE_OBJ %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_MAKE_OBJ, value );
@@ -580,7 +580,7 @@ static void fts_bmax_code_make_top_obj(fts_bmax_file_t *f, int value)
 {
   /* MAKE_TOP_OBJ   <nargs> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tMAKE_TOP_OBJ %d\n", value);
+  fts_log( "\tMAKE_TOP_OBJ %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_MAKE_TOP_OBJ, value );
@@ -594,7 +594,7 @@ fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
   int value;
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPUT_PROP %d (%s)\n",
+  fts_log( "\tPUT_PROP %d (%s)\n",
 	  fts_bmax_add_symbol(f, sym),
 	  fts_symbol_name(sym));
 #endif
@@ -609,7 +609,7 @@ void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int
 {
   /* OBJ_MESS   <inlet> <sel> <nargs> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tOBJ_MESS %d %d (%s) %d\n",
+  fts_log( "\tOBJ_MESS %d %d (%s) %d\n",
 	  inlet,
 	  fts_bmax_add_symbol(f, sel),
 	  fts_symbol_name(sel),
@@ -627,7 +627,7 @@ fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value)
 {
   /* PUSH_OBJ_TABLE <int> */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPUSH_OBJ_TABLE %d\n", value);
+  fts_log( "\tPUSH_OBJ_TABLE %d\n", value);
 #endif
 
   fts_bmax_write_opcode_for(f, FVM_PUSH_OBJ_TABLE, value);
@@ -639,7 +639,7 @@ fts_bmax_code_pop_obj_table(fts_bmax_file_t *f)
 {
   /* POP_OBJ_TABLE */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tPOP_OBJ_TABLE\n");
+  fts_log( "\tPOP_OBJ_TABLE\n");
 #endif
 
   fts_bmax_write_opcode(f, FVM_POP_OBJ_TABLE);
@@ -650,7 +650,7 @@ fts_bmax_code_connect(fts_bmax_file_t *f)
 {
   /* CONNECT */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "\tCONNECT\n");
+  fts_log( "\tCONNECT\n");
 #endif
 
   fts_bmax_write_opcode(f, FVM_CONNECT);
@@ -714,9 +714,9 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * the top of the stack for properties (use set instead of push)
    */
 #ifdef SAVER_DEBUG 
-  fprintf(stderr, "Saving Object %lx %d: ", obj,  obj->head.id);
-  fprintf_atoms(stderr, obj->argc, obj->argv);
-  fprintf(stderr, "\n");
+  fts_log( "Saving Object %lx %d: ", obj,  obj->head.id);
+  fts_log_atoms( obj->argc, obj->argv);
+  fts_log( "\n");
 #endif
 
   fts_bmax_code_push_atoms(f, obj->argc, obj->argv);
@@ -805,9 +805,9 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * the top of the stack for properties (use set instead of push)
    */
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Top Object %lx %d: ", obj,  obj->head.id);
-  fprintf_atoms(stderr, obj->argc, obj->argv);
-  fprintf(stderr, "\n");
+  fts_log( "Saving Top Object %lx %d: ", obj,  obj->head.id);
+  fts_log_atoms( obj->argc, obj->argv);
+  fts_log( "\n");
 #endif
 
   fts_set_symbol(&a, fts_s_patcher);
@@ -848,7 +848,7 @@ static void
 fts_bmax_code_new_connection(fts_bmax_file_t *f, fts_connection_t *conn, int fromidx)
 {
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Connection (%d.%d -> %d.%d)\n",
+  fts_log( "Saving Connection (%d.%d -> %d.%d)\n",
 	  conn->src->head.id, conn->woutlet, conn->dst->head.id, conn->winlet);
 #endif
 
@@ -875,7 +875,7 @@ static void
 fts_bmax_code_new_connection_in_selection(fts_bmax_file_t *f, fts_connection_t *conn, fts_selection_t *sel)
 {
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Connection in selection(%d.%d -> %d.%d)\n",
+  fts_log( "Saving Connection in selection(%d.%d -> %d.%d)\n",
 	  conn->src->head.id, conn->woutlet, conn->dst->head.id, conn->winlet);
 #endif
 
@@ -906,7 +906,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
   fts_object_t *p;
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Patcher %d\n", obj->head.id);
+  fts_log( "Saving Patcher %d\n", obj->head.id);
 #endif
 
   /* First generate the code to push the patcher in the top of the stack,
@@ -1024,7 +1024,7 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
   fts_selection_t *selection = (fts_selection_t *) obj;
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Selection %d\n", obj->head.id);
+  fts_log( "Saving Selection %d\n", obj->head.id);
 #endif
 
   /* Allocate a new object table frame of the right dimension */

@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
   <title>jMax 3 development roadmap</title>
 </head>
-<body style="font-family: sans-serif; ">
+<body bgcolor="white" style="font-family: sans-serif; ">
  
+<center> 
 <h1>jMax 3 development roadmap</h1>
+ </center>
 
 <p>
 This development roadmap covers the upcoming jMax releases for major version number 3
@@ -37,8 +39,31 @@ with respect to the configuration and the dynamic client/server connection.
 Version 3.0 introduced the first version of the FTS <i>client library</i> which is
 the base for developping client applications.
 
+<p>
+ Content:
+</p>
+<ul>
+  <li><a href="#content of release 3.1">content of release 3.1</a>
+ </li>
+  <li><a href="#content of release 3.2">content of release 3.2</a>
+ </li>
+</ul>
 
-<h2>Content of release 3.1</h2>
+<!-- ---------------------------------------------------------------------- -->
+<p>
+ <a name="content of release 3.1"></a>
+ 
+<table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
+ <tbody>
+    <tr>
+ <td valign="Middle">
+      <h2>content of release 3.1</h2>
+      </td>
+ </tr>
+
+  </tbody>
+</table>
+</p>
 
 <p>
 This release can be considered as the first release that is "Tcl-free". It will
@@ -51,6 +76,7 @@ version 3.0:
 <li> changes in the object set
 <li> changes in the FTS expressions parser
 <li> portable soundfile I/O
+<li> direct-to-disk using threads
 </ul>
 
 <p>
@@ -166,11 +192,31 @@ is to be considered as critical for the user release.
 The reading and writing of soundfiles must be handles by a platform dependent
 package and implemented for all four platforms using standard soundfiles libraries.
 
- 
-<h2>Content of version 3.2</h2>
 
+<h3>direct-to-disk using threads</h3>
+ 
+<p> Several threads running their own scheduler and communicating via message
+ fifo (i.e. via control only)  </p>
+ 
+<p> Do an async sound file reader (based on methods callback) and reimplement
+ Direct-to-Disk  using async sound file reader.   </p>
+
+
+ 
+<!-- ---------------------------------------------------------------------- -->
 <p>
-This version will introduced 
+ <a name="content of release 3.2"></a>
+ 
+<table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
+ <tbody>
+    <tr>
+ <td valign="Middle">
+      <h2>content of release 3.2</h2>
+      </td>
+ </tr>
+  </tbody>
+</table>
+</p>
 
 <h3>variables and expression parsing</h3>
 
@@ -199,15 +245,6 @@ system for FTS after the jMax 3 user release should be developed in advance.
 or so?),  and the MIDI track.
 
  
-<h3>multi-thread</h3>
- 
-<p> Several threads running their own scheduler and communicating via message
- fifo (i.e. via control only)  </p>
- 
-<p> Do an async sound file reader (based on methods callback) and reimplement
- Direct-to-Disk  using async sound file reader.   </p>
-
-
 <h2>Content of version 3.3</h2>
 
  

@@ -76,13 +76,13 @@ fts_srconv_new(double ratio, int in_size, int channels)
  
   if(ratio > FTS_SRCONV_MAX_RATIO || inv_ratio > FTS_SRCONV_MAX_RATIO)
     {
-      fprintf(stderr, "srconv: can't change rate by more than a factor of %f\n", FTS_SRCONV_MAX_RATIO);
+      fts_log( "srconv: can't change rate by more than a factor of %f\n", FTS_SRCONV_MAX_RATIO);
       return 0;
     }
  
   if(channels > FTS_SRCONV_MAX_CHANNELS) 
     {
-      fprintf(stderr, "srconv: can't change rate on more than %d channels\n", FTS_SRCONV_MAX_CHANNELS);
+      fts_log( "srconv: can't change rate on more than %d channels\n", FTS_SRCONV_MAX_CHANNELS);
       return 0;
     }
  
@@ -98,7 +98,7 @@ fts_srconv_new(double ratio, int in_size, int channels)
       srconv->buffer[c] = (double *)fts_malloc((in_size + 2 * FILTER_SIZE) * sizeof(double));
       if(!srconv->buffer[c]) 
 	{
-	  fprintf(stderr, "srconv: allocation error!\n");
+	  fts_log( "srconv: allocation error!\n");
 	  return 0;
 	}
       

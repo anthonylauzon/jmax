@@ -128,6 +128,10 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 int
 main( int argc, char **argv)
 {
+  post( "jMax server version %s, Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.\n", fts_get_version());
+  post( "jMax comes with ABSOLUTELY NO WARRANTY.\n");
+  post( "This is free software, and you are welcome to redistribute it\nunder the conditions of the GNU GENERAL PUBLIC LICENSE.\nSee accompanying LICENSE for further informations\n");
+
   fts_init( argc, argv);
 
   fts_log("[main]: Run scheduler\n");

@@ -109,12 +109,11 @@ FTS_API void fts_object_redefine_variable(fts_object_t *o);
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 
+/* messages for the status line */
+FTS_API void fts_object_blip(fts_object_t *obj, const char *format , ...);
+
 /* change number of outlets */
 FTS_API void fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets);
-
-/* debug print */
-FTS_API void fprintf_object(FILE *f, fts_object_t *obj);
-FTS_API void post_object(fts_object_t *obj);
 
 #define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
 #define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)

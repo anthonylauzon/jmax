@@ -23,6 +23,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/patcher.h>
+#include <ftsprivate/label.h>
 
 /***********************************************************************
  *
@@ -299,7 +300,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  return;
 	}
     }
-  else if(fts_is_a(at + 1, fts_s_label))
+  else if(fts_is_label(at + 1))
     label = (fts_label_t *)fts_get_object(at + 1);
   else
     {
@@ -377,7 +378,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  return;
 	}
     }
-  else if(fts_is_a(at + 1, fts_s_label))
+  else if(fts_is_label(at + 1))
     label = (fts_label_t *)fts_get_object(at + 1);
   else
     {
@@ -419,7 +420,7 @@ receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static int
 label_connection_check(int ac, const fts_atom_t *at)
 {
-  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_symbol(at) || fts_is_a(at, fts_s_label))));
+  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_symbol(at) || fts_is_label(at))));
 }
 
 /***********************************************************************
@@ -431,7 +432,7 @@ label_connection_check(int ac, const fts_atom_t *at)
 void 
 fts_label_config(void)
 {
-  fts_class_install(fts_s_label, label_instantiate);
+  fts_label_metaclass = fts_class_install( fts_s_label, label_instantiate);
   fts_label_class = fts_class_get_by_name(fts_s_label);
 
   fts_alias_install(fts_s_receive, fts_s_inlet);

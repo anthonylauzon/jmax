@@ -62,6 +62,9 @@ which was always ignored)
 . changed #include "ftsconfig.h" to <ftsconfig.h>
 - platform specifics
 . added fts_systime()
+- post.c
+. cleaned the code
+. reimplemented post() using vsnprintf, in order to avoid buffer overflow
 
 include/
 - stack.h
@@ -81,6 +84,8 @@ include/
 . added macros for pointer to int conversions
 - all files
 . unified structure declarations (as in "typedef struct toto toto_t")
+- post.h
+. doxygenated
 
 packages/
 - everywhere
@@ -107,7 +112,10 @@ packages/
 . removed #include <ftsconfig.h>
 - sequence/c/src/track.c
 . removed #include <ftsconfig.h>
-
+- ispw/c/src/sigprint.c
+. integrated post_vector
+- ispw/c/src/vexp.c
+. removed post_error
 
 
 Changes from branch point bpV3_0_x to branch V3_0_x head
