@@ -55,7 +55,8 @@ public class SequenceTools implements ToolProvider{
     }
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
-    tools[1] = new AdderTool(new ImageIcon(path+"plus.gif"));
+    //tools[1] = new AdderTool(new ImageIcon(path+"plus.gif"));
+    tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));
     tools[2] = new DeleteTool(new ImageIcon(path+"delete.gif"));
     tools[3] = new ResizerTool(new ImageIcon(path+"hresize.gif"));
     tools[4] = new VResizerTool(new ImageIcon(path+"vresize.gif"));
