@@ -174,6 +174,29 @@ fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel
   fts_audioport_set_channel_unused( port, direction, fts_audiolabel_get_channel( label, direction));
 }
 
+static int
+audioport_iterator_has_more( fts_iterator_t *i)
+{
+  return i->data != NULL;
+}
+
+static void
+audioport_iterator_next( fts_iterator_t *i, fts_atom_t *p)
+{
+  fts_audioport_t *port = (fts_audioport_t *)i->data;
+
+  fts_set_object( p, (fts_object_t *)port);
+  i->data = port->next;
+}
+
+void
+fts_audioport_get_ports( fts_iterator_t *i)
+{
+  i->has_more = audioport_iterator_has_more;
+  i->next = audioport_iterator_next;
+  i->data = audioport_list;
+}
+
 
 /* **********************************************************************
  * 
@@ -354,13 +377,18 @@ audiolabel_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   fts_symbol_t port_name = fts_get_symbol(at);
+  fts_atom_t a[1];
 
   audiolabel_set_port( self, FTS_AUDIO_INPUT, port_name);
-  /* @@@@@@ set channel to 0 @@@@@@ */
-  /* Java do it in graphical interface */
-  audiolabel_set_channel(self, FTS_AUDIO_INPUT, 0);
 
   fts_client_send_message(o, fts_s_input, 1, at);  
+
+  /* set channel to 0 */
+  audiolabel_set_channel(self, FTS_AUDIO_OUTPUT, 0);
+
+  /* and send it to the client */
+  fts_set_int( a, 0);
+  fts_client_send_message( o, s_input_channel, 1, a);
 
   fts_config_set_dirty((fts_config_t *)fts_config_get(), 1);
 }
@@ -370,13 +398,18 @@ audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   fts_symbol_t port_name = fts_get_symbol(at);
+  fts_atom_t a[1];
 
   audiolabel_set_port( self, FTS_AUDIO_OUTPUT, port_name);
-  /* @@@@@@ set channel to 0 @@@@@@ */
-  /* Java do it in graphical interface */
-  audiolabel_set_channel(self, FTS_AUDIO_OUTPUT, 0);
 
   fts_client_send_message(o, fts_s_output, 1, at);  
+
+  /* set channel to 0 */
+  audiolabel_set_channel(self, FTS_AUDIO_OUTPUT, 0);
+
+  /* and send it to the client */
+  fts_set_int( a, 0);
+  fts_client_send_message( o, s_output_channel, 1, a);  
 
   fts_config_set_dirty((fts_config_t *)fts_config_get(), 1);
 }

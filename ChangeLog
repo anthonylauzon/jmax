@@ -1,3 +1,12 @@
+2003-02-26  Francois Dechelle  <dechelle@mac-dechelle.ircam.fr>
+
+	* changed Mac OS X audio port to support multiple devices. BUT it does not work 
+	(mainly because the IOProcs are called in different threads). Current fix is to
+	allow only the default output device in the configuration.
+
+	* fixed fts/audio.c: when changing a label's port, channel change to 0 was not mirrored 
+	to the client.
+	
 2003-02-25  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* change fts_udpstream_t implementation

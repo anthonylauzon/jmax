@@ -157,6 +157,15 @@ FTS_API int fts_audioport_is_channel_used( fts_audioport_t *port, int direction,
   ((port)->xrun_fun = (fun))
 
 /**
+ * Returns an iterator to enumerate all audio ports.
+ *
+ * @fn void fts_audioport_get_ports( fts_iterator_t *i)
+ * @param i the iterator
+ * @ingroup audio
+ */
+FTS_API void fts_audioport_get_ports( fts_iterator_t *i);
+
+/**
  * 
  * The audio label
  *
