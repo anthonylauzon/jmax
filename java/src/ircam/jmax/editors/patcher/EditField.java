@@ -71,43 +71,18 @@ public class EditField extends JTextArea implements FocusListener
   }
 
 
-  // Key Event Listener for Edit Field
-  // Horrible hack; it seems that there is bug in our
-  // version of Java/AWT and or Swwing, so that the event sequence is not
-  // correct, and we need to "filter it"; Pressing Ctrl-E generate:
   //
-  // Pressed VK_CONTROL
-  // Typed   'e'
-  // Pressed Ctrl-E
-  // 
-  // .. and no released events; this is completely inconsistent with
-  // what the doc say !!!
-
-  class EditFieldKeyListener implements KeyListener
-  {
-    boolean consumeNext = false;
-
-    public void keyTyped(KeyEvent e)
-    {
-      if (consumeNext)
-	{
-	  e.consume();
-	  consumeNext = false;
-	}
-    }
-
+  // KeyListener that stops editing for a non multiline text object
+  //
+  class EditFieldKeyListener extends KeyAdapter {
     public void keyPressed(KeyEvent e)
     {
-      if((e.getKeyCode() == KeyEvent.VK_CONTROL)||(e.isControlDown()))
-	consumeNext = true;
-      else if((!EditField.this.owner.isMultiline())&&(e.getKeyCode() == KeyEvent.VK_ENTER))
-	  {
-	      e.consume();
-	      EditField.this.sketch.stopTextEditing();
-	  }
+      if( !EditField.this.owner.isMultiline() && e.getKeyCode() == KeyEvent.VK_ENTER)
+	{
+	  e.consume();
+	  EditField.this.sketch.stopTextEditing();
+	}
     }
-
-    public  void keyReleased(KeyEvent e){}
   }
 
 

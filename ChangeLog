@@ -1,3 +1,10 @@
+2003-08-08  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* java/src/ircam/jmax/editors/patcher/EditField.java: fixed EditFieldKeyListener that introduced
+	a bizarre behaviour on Windows. Apparently, the hack that was implemented in EditFieldKeyListener
+	is no longer necessary. The only action that remains is trapping the Enter for non-multiline
+	editable objects (number box for instance).
+
 2003-08-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fixed the fix ;)
