@@ -22,7 +22,6 @@
 			buildPhases = (
 			);
 			buildSettings = {
-				OPTIMIZATION_CFLAGS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -562,7 +561,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = "../../packages/ispw/c/src ../../packages/utils/c/src ../../packages/data/c/src ../../include";
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libsignal;
@@ -2130,7 +2129,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = "../../packages/utils/c/src ../../packages/data/c/src ../../include";
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libispw;
@@ -3516,10 +3515,6 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
-		};
-		F84FE3D7028843B001664092 = {
-			isa = PBXTargetDependency;
-			target = F880FFEE028301DA01664092;
 		};
 		F85120F0028BD4D301664092 = {
 			children = (
@@ -6281,7 +6276,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libcontrol;
@@ -6722,7 +6717,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libio;
@@ -7077,7 +7072,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libispwmath;
@@ -7300,7 +7295,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libmidi;
@@ -7775,7 +7770,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libnumeric;
@@ -8251,7 +8246,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libsequence;
@@ -17384,7 +17379,6 @@
 				WRAPPER_EXTENSION = app;
 			};
 			dependencies = (
-				F84FE3D7028843B001664092,
 			);
 			isa = PBXApplicationTarget;
 			name = jMax;
@@ -17744,7 +17738,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = "../../packages/utils/c/src ../../include";
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libdata;
@@ -19505,7 +19499,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libguiobj;
@@ -20798,7 +20792,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libmacosx;
@@ -21040,7 +21034,7 @@
 			);
 			buildSettings = {
 				HEADER_SEARCH_PATHS = ../../include;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = libsystem;
