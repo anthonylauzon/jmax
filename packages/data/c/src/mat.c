@@ -1433,7 +1433,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_set_from_instance, "<mat: other>", "set from mat instance");
   fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row");
 
-  fts_class_doc(cl, fts_s_append, "<list: values>", "append row of atoms");
+  fts_class_doc(cl, fts_s_append, "<list: values>", "append row of atoms (up to given number of columns)");
   fts_class_doc(cl, fts_s_insert, "<int: pos> <int: num>", "insert num empty rows at row pos");
   fts_class_doc(cl, fts_s_delete, "<int: pos> <int: num>", "delete num rows from row pos");
 
