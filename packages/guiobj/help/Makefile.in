@@ -98,7 +98,8 @@ help_DATA = \
  slider.help.jmax \
  toggle.help.jmax \
  vecdisplay.help.jmax \
- matdisplay.help.jmax 
+ matdisplay.help.jmax \
+ xypad.help.jmax	
 
 
 EXTRA_DIST = $(help_DATA)
