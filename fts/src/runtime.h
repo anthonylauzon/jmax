@@ -19,6 +19,7 @@
 #include "runtime/client.h"
 #include "runtime/audio.h"
 #include "runtime/files.h"
+#include "runtime/STtools.h"
 #include "runtime/midi.h"
 #include "runtime/time.h"
 
