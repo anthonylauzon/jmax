@@ -45,7 +45,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"$(INTDIR)\jmaxrun.pch" /Yu"stdafx.h" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -178,7 +178,7 @@ LINK32_OBJS= \
 !IF "$(CFG)" == "jmaxrun - Win32 Release" || "$(CFG)" == "jmaxrun - Win32 Debug"
 SOURCE=..\fts\jmax.c
 
-"$(INTDIR)\jmax.obj" : $(SOURCE) "$(INTDIR)" "$(INTDIR)\jmaxrun.pch"
+"$(INTDIR)\jmax.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
