@@ -183,9 +183,26 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 
   /**
    * Set the named property */
-  public void setProperty(String name, Object theValue)
+  public void setProperty( String name, Object theValue)
   {    
     sendSetProperty( name, theValue);
+  }
+
+  public void unsetProperty( String name)
+  {    
+    args.clear();
+    args.addSymbol( FtsSymbol.get( name));
+    try{
+      send( FtsSymbol.get("unset"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("TrackEvent: I/O Error sending unsetProperty Message!");
+	e.printStackTrace(); 
+      }
+
+    if( value != null)
+      value.unsetProperty( name);
   }
 
   void sendSetProperty( String propName, Object propValue)
@@ -196,7 +213,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
       args.addSymbol( FtsSymbol.get( (String)propValue));
     else
       args.add( propValue);
-
+    
     try{
       send( FtsSymbol.get("set"), args);
     }

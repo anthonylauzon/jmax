@@ -95,6 +95,7 @@ public class UtilTrackEvent implements Event, Drawable
 	    value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
     }
 
+  public void unsetProperty(String name){}
 
     /**
      * Get the given property.

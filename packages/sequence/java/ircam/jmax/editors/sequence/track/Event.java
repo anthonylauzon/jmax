@@ -34,36 +34,38 @@ import ircam.jmax.editors.sequence.*;
  * The same structure is reflected on the server side. */
 public interface Event 
 {
-    /**
-     * Get the initial time for this event */
-    public abstract double getTime();
+  /**
+   * Get the initial time for this event */
+  public abstract double getTime();
+  
+  /**
+   * This is the method that must be called by the editors to
+   * change the initial time of an event. It takes care of
+   * keeping the data base consistency */
+  public abstract void move(double time);
+  /**
+   * Set the time for this event */
+  public abstract void setTime(double time);
+  
+  /**
+   * Set the named property */
+  public abstract void setProperty(String name, Object value);
 
-    /**
-     * This is the method that must be called by the editors to
-     * change the initial time of an event. It takes care of
-     * keeping the data base consistency */
-    public abstract void move(double time);
-    /**
-     * Set the time for this event */
-    public abstract void setTime(double time);
+  public abstract void unsetProperty(String name);
 
-    /**
-     * Set the named property */
-    public abstract void setProperty(String name, Object value);
-
-    /**
-     * Get the given property */
-    public abstract Object getProperty(String name);
-
-    /**
-     * Returns the value of this event as an FtsRemoteData */
-    public abstract EventValue getValue();
-
-    /** Set the FtsData corresponding to this event */
-    public abstract void setValue(EventValue value);
-
-    public abstract boolean isHighlighted();
-
+  /**
+   * Get the given property */
+  public abstract Object getProperty(String name);
+  
+  /**
+   * Returns the value of this event as an FtsRemoteData */
+  public abstract EventValue getValue();
+  
+  /** Set the FtsData corresponding to this event */
+  public abstract void setValue(EventValue value);
+  
+  public abstract boolean isHighlighted();
+  
   final public static int SELECTED    = 0;
   final public static int DESELECTED  = 1;
   final public static int HIGHLIGHTED = 2;

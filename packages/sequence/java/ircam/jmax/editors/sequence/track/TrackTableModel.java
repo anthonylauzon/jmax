@@ -59,14 +59,14 @@ class TrackTableModel extends AbstractTableModel{
    * The class representing a generic entry in (a column of) the table */
   public Class getColumnClass(int col)
   {
-      int type;
-      if(col == 0)
-	return Integer.class;
-      else 
-	if(col == 1) 
-	  return Double.class;
-	else	      
-	  return model.getPropertyType(col-2);
+    int type;
+    if(col == 0)
+      return Integer.class;
+    else 
+      if(col == 1) 
+	return Double.class;
+      else	      
+	return model.getPropertyType(col-2);
   }
 
   /**
@@ -81,11 +81,14 @@ class TrackTableModel extends AbstractTableModel{
 
     if (model instanceof UndoableData) //can't make assumptions...
       ((UndoableData) model).beginUpdate(); 
-      
+
     if(columnIndex == 1)
       event.move(((Double) aValue).doubleValue());
     else
-      event.setProperty(getColumnName(columnIndex), aValue);
+      if( aValue == null)
+	event.unsetProperty( getColumnName(columnIndex));
+      else 
+	event.setProperty( getColumnName(columnIndex), aValue);
 
     if (model instanceof UndoableData)
       ((UndoableData) model).endUpdate();

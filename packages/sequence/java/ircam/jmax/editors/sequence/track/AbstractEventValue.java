@@ -49,7 +49,7 @@ public class AbstractEventValue implements EventValue
     return model;
   }
   /**
-     * Set the named property */
+   * Set the named property */
   public void setProperty(String name, Object value)
   {
     if(properties==null)
@@ -57,6 +57,11 @@ public class AbstractEventValue implements EventValue
     properties.put(name, value);
   }
 
+  public void unsetProperty( String name)
+  {
+    if(properties != null && properties.containsKey( name))
+      properties.remove( name);
+  }
   /**
    * Get the given property */
   public Object getProperty(String name)
@@ -99,15 +104,17 @@ public class AbstractEventValue implements EventValue
       }      
     return propertyValuesArray;
   }
+
   public Object[] getPropertyValues()
   {
     int i = 0;
     Object prop;
     for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
       propertyValuesArray[i++] = getProperty( (String)e.nextElement());
-            
+    
     return propertyValuesArray;
   }
+
   public Object[] getDefinedPropertyNamesAndValues()
   {
     int i = 0;
@@ -125,6 +132,7 @@ public class AbstractEventValue implements EventValue
       }
     return propertyValuesArray;
   }
+
   public void setPropertyValues(int nArgs, Object args[])
   {
     for(int i = 0; i< nArgs-1; i+=2)
@@ -144,40 +152,37 @@ public class AbstractEventValue implements EventValue
     return false;
   }
 
-    public Object[] getLocalPropertyValues()
-    {
-	return propertyValuesArray;
-    }
-    public void setLocalPropertyValues(int nArgs, Object args[])
-    {
-    }
+  public Object[] getLocalPropertyValues()
+  {
+    return propertyValuesArray;
+  }
+  public void setLocalPropertyValues(int nArgs, Object args[]){}
 
-    /**
-     * Returns the renderer for this object */
-    public SeqObjectRenderer getRenderer()
+  /**
+   * Returns the renderer for this object */
+  public SeqObjectRenderer getRenderer()
+  {
+    return null; 
+  }
+  
+  public ValueInfo getValueInfo()
+  {
+    return AbstractValueInfo.instance;
+  }
+  
+  /**
+   * A convenience class to implement an empty enumeration */
+  public class EmptyEnumeration implements Enumeration {
+    public boolean hasMoreElements()
     {
-	return null; 
+      return false;
     }
-
-    public ValueInfo getValueInfo()
+    
+    public Object nextElement()
     {
-	return AbstractValueInfo.instance;
+      return null;
     }
-
-
-    /**
-     * A convenience class to implement an empty enumeration */
-    public class EmptyEnumeration implements Enumeration {
-      public boolean hasMoreElements()
-      {
-	return false;
-      }
-      
-      public Object nextElement()
-      {
-	return null;
-      }
-    }
+  }
 
   //--- Fields
   private String name;

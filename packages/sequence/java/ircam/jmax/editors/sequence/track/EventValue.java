@@ -43,6 +43,8 @@ public interface EventValue
    /**
      * Set the named property */
   public abstract void setProperty(String name, Object value);
+  
+  public abstract void unsetProperty( String name);
   /**
    * Get the given property */
   public abstract Object getProperty(String name);
