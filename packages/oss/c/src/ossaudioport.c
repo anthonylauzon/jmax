@@ -184,7 +184,7 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   sample_rate = (int)sr ;
   this->fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
-  strcpy( device_name, fts_symbol_name( fts_get_symbol_arg( ac, at, 0, s_slash_dev_slash_audio)));
+  strcpy( device_name, fts_get_symbol_arg( ac, at, 0, s_slash_dev_slash_audio));
 
   channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
 

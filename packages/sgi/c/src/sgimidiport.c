@@ -53,8 +53,8 @@ sgimidiport_open(sgimidiport_t *port, fts_symbol_t name)
 {
   if (mdInit() > 0)
     {
-      port->in = mdOpenInPort(fts_symbol_name(name));
-      port->out = mdOpenOutPort(fts_symbol_name(name));
+      port->in = mdOpenInPort(name);
+      port->out = mdOpenOutPort(name);
       
       if(port->in && port->out)
 	{
@@ -66,7 +66,7 @@ sgimidiport_open(sgimidiport_t *port, fts_symbol_t name)
       else
 	{
 	  /*should be considered:*/
-	  /*mdRegister(fts_symbol_name(name));*/
+	  /*mdRegister(name);*/
 
 	  port->in = 0;
 	  port->out = 0;

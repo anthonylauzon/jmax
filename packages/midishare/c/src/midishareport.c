@@ -97,7 +97,7 @@ midishare_reference_new(fts_symbol_t name)
   int i;
 
   /* establish connection to MidiShare */
-  number = MidiOpen((MidiName)fts_symbol_name(name));
+  number = MidiOpen((MidiName)name);
 
   /* set jMax magic word */
   MidiSetInfo(number, jmax_magic.ptr);

@@ -634,17 +634,17 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_symbol_t track_type = track_get_type(this);
   int track_size = track_get_size(this);
   event_t *event = track_get_first(this);  
-  const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
+  const char *name_str = track_name? track_name: "untitled";
 
   if(track_size == 0)
     {
-      post("(\"%s\" empty %s track)\n", name_str, fts_symbol_name(track_type));
+      post("(\"%s\" empty %s track)\n", name_str, track_type);
       return;
     }
   else if(track_size == 1)
-    post("(\"%s\" 1 %s event) {\n", name_str, fts_symbol_name(track_type));
+    post("(\"%s\" 1 %s event) {\n", name_str, track_type);
   else
-    post("(\"%s\" %d %s events) {\n", name_str, track_size, fts_symbol_name(track_type));
+    post("(\"%s\" %d %s events) {\n", name_str, track_size, track_type);
       
   while(event)
     {
@@ -719,9 +719,9 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       char *error = fts_midifile_get_error(file);
       
       if(error)
-	fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", fts_symbol_name(name), error);
+	fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", name, error);
       else if(size <= 0)
-	fts_object_signal_runtime_error(o, "import: couldn't get any data from \"%s\"\n", fts_symbol_name(name));
+	fts_object_signal_runtime_error(o, "import: couldn't get any data from \"%s\"\n", name);
       
       fts_midifile_close(file);
       
@@ -729,7 +729,7 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	track_upload(o, 0, 0, 0, 0);
     }
   else
-    fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", fts_symbol_name(name));
+    fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", name);
 }
       
 static void
@@ -741,7 +741,7 @@ track_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   char str[1024];
   fts_atom_t a[4];
 
-  snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
+  snprintf(str, 1024, "%s.mid", track_name? track_name: "untitled");
   default_name = fts_new_symbol_copy(str);
 
   fts_set_symbol(a, seqsym_import_midifile);
@@ -768,7 +768,7 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	fts_object_signal_runtime_error(o, "import: wrong arguments");  
     }
   else
-    fts_object_signal_runtime_error(o, "import: cannot import MIDI file to track of type %s", fts_symbol_name(type));
+    fts_object_signal_runtime_error(o, "import: cannot import MIDI file to track of type %s", type);
 }
 
 static void 
@@ -784,14 +784,14 @@ track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       char *error = fts_midifile_get_error(file);
 
       if(error)
-	fts_object_signal_runtime_error(o, "export: write error in \"%s\" (%s)\n", error, fts_symbol_name(name));
+	fts_object_signal_runtime_error(o, "export: write error in \"%s\" (%s)\n", error, name);
       else if(size <= 0)
-	fts_object_signal_runtime_error(o, "export: couldn't write any data to \"%s\"\n", fts_symbol_name(name));
+	fts_object_signal_runtime_error(o, "export: couldn't write any data to \"%s\"\n", name);
       
       fts_midifile_close(file);
     }
   else
-    fts_object_signal_runtime_error(o, "export: cannot open \"%s\"\n", fts_symbol_name(name));
+    fts_object_signal_runtime_error(o, "export: cannot open \"%s\"\n", name);
 }
 
 static void 
@@ -803,7 +803,7 @@ track_export_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   char str[1024];
   fts_atom_t a[4];
 
-  snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
+  snprintf(str, 1024, "%s.mid", track_name? track_name: "untitled");
   default_name = fts_new_symbol_copy(str);
 
   fts_set_symbol(a, seqsym_export_midifile);

@@ -77,7 +77,7 @@ static int readsf_do_open( readsf_t *this, fts_symbol_t filename)
   
   if (this->filename)
     {
-      this->fifo = dtdserver_open_read( this->server, fts_symbol_name(this->filename), this->n_channels);
+      this->fifo = dtdserver_open_read( this->server, this->filename, this->n_channels);
       
       if (this->fifo)
 	return 1;
@@ -503,7 +503,7 @@ static void writesf_do_open( writesf_t *this, fts_symbol_t filename)
   
   if(this->filename)
     {
-      this->fifo = dtdserver_open_write( this->server, fts_symbol_name(this->filename), this->n_channels);
+      this->fifo = dtdserver_open_write( this->server, this->filename, this->n_channels);
       
       if (this->fifo)
 	this->state = writesf_opened;

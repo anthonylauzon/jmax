@@ -83,7 +83,7 @@ filestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
   int n_wrote = fwrite(&c, 1, n, this->fd);
 
   if(n_wrote != n)
-    post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+    post("filestream %s: write error (%s)\n", this->name, strerror(errno));
 }
 
 static void
@@ -94,7 +94,7 @@ filestream_output_char(fts_bytestream_t *stream, unsigned char c)
   int n_wrote = fwrite(&c, 1, 1, this->fd);
   
   if(n_wrote != 1)
-    post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+    post("filestream %s: write error (%s)\n", this->name, strerror(errno));
 }
 
 static void
@@ -130,7 +130,7 @@ filestream_output_buffered(fts_bytestream_t *stream, int n, const unsigned char 
     }
   
   if(n_wrote != n)
-    post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+    post("filestream %s: write error (%s)\n", this->name, strerror(errno));
 }
 
 static void
@@ -147,7 +147,7 @@ filestream_output_char_buffered(fts_bytestream_t *stream, unsigned char c)
       n_wrote = fwrite(this->out_buf, 1, this->out_size, this->fd);
       
       if(n_wrote != out_size)
-	post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+	post("filestream %s: write error (%s)\n", this->name, strerror(errno));
 
       this->out_fill = 0;
     }
@@ -165,7 +165,7 @@ filestream_flush(fts_bytestream_t *stream)
       int n_wrote = fwrite(this->out_buf, 1, n, this->fd);
       
       if(n_wrote != n)
-	post("filestream %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+	post("filestream %s: write error (%s)\n", this->name, strerror(errno));
     }
 
   this->out_fill = 0;
@@ -308,15 +308,15 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       /* open file */
       if(in && out)
-	fd = fopen(fts_symbol_name(name), "w+b");
+	fd = fopen(name, "w+b");
       else if(in)
-	fd = fopen(fts_symbol_name(name), "rb");
+	fd = fopen(name, "rb");
       else if(out)
-	fd = fopen(fts_symbol_name(name), "wb");
+	fd = fopen(name, "wb");
       
       if(fd == NULL)
 	{
-	  fts_object_set_error(o, "filestream: Can't open file \"%s\" (%s)\n", fts_symbol_name(name), strerror(errno));
+	  fts_object_set_error(o, "filestream: Can't open file \"%s\" (%s)\n", name, strerror(errno));
 	  return;
 	}
 

@@ -546,12 +546,12 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   sampling_rate = (int)sr ;
   fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
-  strcpy( pcm_name, fts_symbol_name( fts_get_symbol_arg( ac, at, 0, DEFAULT_PCM_NAME)) );
+  strcpy( pcm_name, fts_get_symbol_arg( ac, at, 0, DEFAULT_PCM_NAME) );
 
   capture_channels = fts_get_int_arg( ac, at, 1, DEFAULT_INPUT_CHANNELS);
   playback_channels = fts_get_int_arg( ac, at, 2, DEFAULT_OUTPUT_CHANNELS);
 
-  format_name = fts_symbol_name( fts_get_symbol_arg( ac, at, 3, s_s16_le));
+  format_name = fts_get_symbol_arg( ac, at, 3, s_s16_le);
   format = snd_pcm_format_value( format_name);
   format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
 

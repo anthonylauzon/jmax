@@ -182,7 +182,7 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       struct hostent *h;
       const char *host;
       
-      host = fts_symbol_name( fts_get_symbol_arg( ac, at, 1, 0));
+      host = fts_get_symbol_arg( ac, at, 1, 0);
       port = fts_get_int_arg( ac, at, 2, 0);
       
       this->socket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -238,7 +238,7 @@ static void udpsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   protoencode_start( &this->encoder);
 
-  protoencode_put_string( &this->encoder, fts_symbol_name( s) );
+  protoencode_put_string( &this->encoder, s);
 
   while (ac--)
     {
@@ -247,7 +247,7 @@ static void udpsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac
       else if (fts_is_float( at))
 	protoencode_put_float( &this->encoder, fts_get_float( at));
       else if (fts_is_symbol( at))
-	protoencode_put_string( &this->encoder, fts_symbol_name( fts_get_symbol( at)) );
+	protoencode_put_string( &this->encoder, fts_get_symbol( at) );
 
       at++;
     }

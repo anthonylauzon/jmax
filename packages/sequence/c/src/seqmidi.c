@@ -38,7 +38,7 @@
 static void
 get_stripped_file_name_with_index(char *name_str, fts_symbol_t name, int index)
 {
-  const char *s = fts_symbol_name(name);
+  const char *s = name;
   int size;
   int i = strlen(s) - 1;
 

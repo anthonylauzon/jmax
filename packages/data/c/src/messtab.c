@@ -390,7 +390,7 @@ messtab_atom_buf_free(fts_atom_t *buf, int size)
 static int 
 messtab_import_from_coll(messtab_t *this, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
   int atoms_alloc = MESSTAB_ATOM_BUF_BLOCK_SIZE;
   fts_atom_t *atoms = 0;
   enum {read_key, read_comma, read_argument} state = read_key;
@@ -451,7 +451,7 @@ messtab_import_from_coll(messtab_t *this, fts_symbol_t file_name)
 		    state = read_key;
 		  }
 		else
-		  post("messtab: empty message found in coll file %s (ignored)\n", fts_symbol_name(file_name));
+		  post("messtab: empty message found in coll file %s (ignored)\n", file_name);
 	      }
 	    else
 	      {
@@ -472,7 +472,7 @@ messtab_import_from_coll(messtab_t *this, fts_symbol_t file_name)
     }
   
   if(error != 0)
-    post("messtab: error reading coll file %s (%s)\n", fts_symbol_name(file_name), error);
+    post("messtab: error reading coll file %s (%s)\n", file_name, error);
   else if(state != read_key)
     {
       if(n > 0)
@@ -481,7 +481,7 @@ messtab_import_from_coll(messtab_t *this, fts_symbol_t file_name)
 	  i++;
 	}
       
-      post("messtab: found unexpected ending in coll file %s\n", fts_symbol_name(file_name));
+      post("messtab: found unexpected ending in coll file %s\n", file_name);
     }
   
   messtab_atom_buf_free(atoms, atoms_alloc);
@@ -493,7 +493,7 @@ messtab_import_from_coll(messtab_t *this, fts_symbol_t file_name)
 static int 
 messtab_export_to_coll(messtab_t *this, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  fts_atom_file_t *file = fts_atom_file_open(file_name, "w");
   fts_iterator_t iterators[2];
   fts_atom_t  a;
   int size = 0;
@@ -568,12 +568,12 @@ messtab_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
     size = messtab_import_from_coll(this, file_name);    
   else
     {
-      post("messtab: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
+      post("messtab: unknown import file format \"%s\"\n", file_format);
       return;
     }
 
   if(size <= 0)
-    post("messtab: can't import from file \"%s\"\n", fts_symbol_name(file_name));  
+    post("messtab: can't import from file \"%s\"\n", file_name);  
 }
 
 static void
@@ -591,12 +591,12 @@ messtab_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
     size = messtab_export_to_coll(this, file_name);    
   else
     {
-      post("messtab: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
+      post("messtab: unknown export file format \"%s\"\n", file_format);
       return;
     }
 
   if(size <= 0)
-    post("messtab: can't export to file \"%s\"\n", fts_symbol_name(file_name));  
+    post("messtab: can't export to file \"%s\"\n", file_name);  
 }
 
 /**********************************************************
@@ -706,10 +706,10 @@ messtab_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      if(fts_is_int(&key))
 		post("  %d: ", fts_get_int(&key));
 	      else
-		post("  %s: ", fts_symbol_name(fts_get_symbol(&key)));
+		post("  %s: ", fts_get_symbol(&key));
 	      
 	      if(mess_s)
-		post("%s ", fts_symbol_name(mess_s));
+		post("%s ", mess_s);
 	      
 	      if(mess_ac)
 		post_atoms(mess_ac, mess_at);
@@ -761,7 +761,7 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 		  if(error)
 		    {
 		      messtab_clear(o, 0, 0, 0, 0);
-		      fts_object_set_error(o, fts_symbol_name(error));
+		      fts_object_set_error(o, error);
 		    }
 		}
 	      else

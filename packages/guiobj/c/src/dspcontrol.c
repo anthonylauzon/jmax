@@ -181,6 +181,7 @@ static void fts_dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, 
 
   sr = fts_dsp_get_sample_rate();
   fts_set_int(a, (int)sr );
+
   fts_client_send_message((fts_object_t *)this, sym_sampling_rate, 1, a);
 }
 

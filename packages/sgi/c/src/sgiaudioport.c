@@ -218,9 +218,9 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   sample_rate = (int)sr ;
   this->fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
-  strcpy( input_device_name, fts_symbol_name( fts_get_symbol_arg( ac, at, 0, s_analog_in)));
+  strcpy( input_device_name, fts_get_symbol_arg( ac, at, 0, s_analog_in));
   input_channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
-  strcpy( output_device_name, fts_symbol_name( fts_get_symbol_arg( ac, at, 2, s_analog_out)));
+  strcpy( output_device_name, fts_get_symbol_arg( ac, at, 2, s_analog_out));
   output_channels = fts_get_int_arg( ac, at, 3, DEFAULT_CHANNELS);
 
   if (input_channels)

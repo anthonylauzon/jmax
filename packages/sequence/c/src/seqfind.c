@@ -77,7 +77,7 @@ seqfind_any_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if(ac == 1 && fts_get_selector(at) == s)
     seqfind_find(o, winlet, s, 1, at);
   else
-    fts_object_signal_runtime_error(o, "doesn't understand message %s", fts_symbol_name(s));
+    fts_object_signal_runtime_error(o, "doesn't understand message %s", s);
 }
 
 static void
@@ -104,7 +104,7 @@ seqfind_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       else if(mode == sym_all)
 	this->mode = sym_all;
       else
-	fts_object_signal_runtime_error(o, "doesn't understand mode %s", fts_symbol_name(mode));
+	fts_object_signal_runtime_error(o, "doesn't understand mode %s", mode);
     }
   else
     fts_object_signal_runtime_error(o, "symbol argument required for message mode");

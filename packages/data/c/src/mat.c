@@ -246,7 +246,7 @@ mat_grow(mat_t *mat, int size)
 int 
 mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
   int m = 0;
   int n = 0;
   int i = 0;
@@ -313,7 +313,7 @@ mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
   int n = mat->n;
   int i, j;
 
-  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  file = fts_atom_file_open(file_name, "w");
 
   if(!file)
     return -1;
@@ -336,7 +336,7 @@ mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
 int 
 mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator, int ac, const fts_atom_t *at)
 {
-  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
   int m = 0;
   int n = 0;
   int i = 0;
@@ -433,7 +433,7 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
   fts_atom_t sep;
   int i, j;
 
-  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  file = fts_atom_file_open(file_name, "w");
 
   if(!file)
     return -1;
@@ -601,10 +601,10 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	size = mat_read_atom_file_newline(this, file_name);
 
       if(size <= 0)
-	post("mat: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
+	post("mat: can't import from text file \"%s\"\n", file_name);
     }
   else
-    post("mat: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
+    post("mat: unknown import file format \"%s\"\n", file_format);
 }
 
 static void
@@ -628,10 +628,10 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	size = mat_write_atom_file_newline(this, file_name);
 
       if(size < 0)
-	post("mat: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
+	post("mat: can't export to text file \"%s\"\n", file_name);
     }
   else
-    post("mat: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
+    post("mat: unknown export file format \"%s\"\n", file_format);
 }
 
 static void

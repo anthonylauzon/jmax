@@ -126,7 +126,7 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       
       if(mode == fts_s_read)
 	{
-	  this->file = fts_atom_file_open(fts_symbol_name(name), "r");
+	  this->file = fts_atom_file_open(name, "r");
 	  
 	  if(dumpfile_read_class_comment(this))
 	    this->status = dumpfile_opened_read;
@@ -135,12 +135,12 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	}
       else if(mode == fts_s_write)
 	{
-	  this->file = fts_atom_file_open(fts_symbol_name(name), "w");
+	  this->file = fts_atom_file_open(name, "w");
 	  this->status = dumpfile_opened_write;
 	}
       else
 	{
-	  fts_object_signal_runtime_error(o, "open: unknown mode: %s", fts_symbol_name(mode));
+	  fts_object_signal_runtime_error(o, "open: unknown mode: %s", mode);
 	  return;
 	}
 
@@ -148,7 +148,7 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	{
 	  char *str = (mode == fts_s_read)? "reading": "writing";
 
-	  fts_object_signal_runtime_error(o, "open: cannot open file %s for %s", fts_symbol_name(name), str);
+	  fts_object_signal_runtime_error(o, "open: cannot open file %s for %s", name, str);
 	  this->status = dumpfile_closed;
 	}
     }
@@ -193,7 +193,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	      this->block = 0;
 	    }
 	  else
-	    fts_object_signal_runtime_error(o, "dump: cannot dump object of class %s", fts_symbol_name(class_name));
+	    fts_object_signal_runtime_error(o, "dump: cannot dump object of class %s", class_name);
 	}
       else
 	fts_object_signal_runtime_error(o, "dump: object argument required");
@@ -219,7 +219,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	  if(this->class != fts_class_get_name(fts_object_get_class(object)))
 	    {
 	      /* wrong class */
-	      fts_object_signal_runtime_error(o, "restore: %s exspected", fts_symbol_name(this->class));
+	      fts_object_signal_runtime_error(o, "restore: %s exspected", this->class);
 	      return;
 	    }
 

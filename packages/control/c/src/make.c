@@ -56,7 +56,7 @@ make_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(error)
     {
       fts_object_destroy((fts_object_t *)obj);
-      fts_object_signal_runtime_error(o, "Error in object creation: %s", fts_symbol_name(error));
+      fts_object_signal_runtime_error(o, "Error in object creation: %s", error);
       return;
     }
 
@@ -76,7 +76,7 @@ make_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(ac == 1 && fts_get_selector(at) == s)
     make_args(o, 0, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "Doesn't understand '%s'", fts_symbol_name(s));
+    fts_object_signal_runtime_error(o, "Doesn't understand '%s'", s);
 }
 
 static void

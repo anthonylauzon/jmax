@@ -143,7 +143,7 @@ serial_set_speed(serial_t *this, fts_symbol_t sym)
     {
       const char *name;
 
-      name = fts_symbol_name( sym);
+      name = sym;
       sscanf( name+1, "%d", &speed);
     }
 
@@ -154,7 +154,7 @@ serial_set_speed(serial_t *this, fts_symbol_t sym)
 static void
 serial_set_flag(serial_t *this, fts_symbol_t sym)
 {
-  const char *name = fts_symbol_name(sym);
+  const char *name = sym;
 
   if(sym == sym_5bits)
     this->termios.c_cflag |= CS5;
@@ -185,7 +185,7 @@ serial_set_flag(serial_t *this, fts_symbol_t sym)
   else if(name[0] == 'b')
     serial_set_speed(this, sym);
   else
-    post("serial: invalid control flag: %s (ignored)\n", fts_symbol_name(sym));
+    post("serial: invalid control flag: %s (ignored)\n", sym);
 }
   
 /*********************************************************************
@@ -258,7 +258,7 @@ serial_output(fts_bytestream_t *stream, int n, const unsigned char *c)
     }
   
   if(n_wrote != n)
-    post("serial %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+    post("serial %s: write error (%s)\n", this->name, strerror(errno));
 }
 
 static void
@@ -275,7 +275,7 @@ serial_output_char(fts_bytestream_t *stream, unsigned char c)
       n_wrote = write(this->fd, this->out_buf, this->size);
       
       if(n_wrote != size)
-	post("serial %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+	post("serial %s: write error (%s)\n", this->name, strerror(errno));
 
       this->out_fill = 0;
     }
@@ -293,7 +293,7 @@ serial_flush(fts_bytestream_t *stream)
       int n_wrote = write(this->fd, this->out_buf, n);
       
       if(n_wrote != n)
-	post("serial %s: write error (%s)\n", fts_symbol_name(this->name), strerror(errno));
+	post("serial %s: write error (%s)\n", this->name, strerror(errno));
     }
 
   this->out_fill = 0;
@@ -400,11 +400,11 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(this->noread)
 	this->termios.c_cflag &= ~CREAD;
       
-      this->fd = open(fts_symbol_name(name), O_RDWR);
+      this->fd = open(name, O_RDWR);
       
       if(this->fd < 0)
 	{
-	  fts_object_set_error(o, "can't open serial port \"%s\" (%s)", fts_symbol_name(name), strerror( errno));
+	  fts_object_set_error(o, "can't open serial port \"%s\" (%s)", name, strerror( errno));
 	  return;
 	}
       

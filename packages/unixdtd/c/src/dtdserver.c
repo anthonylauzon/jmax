@@ -188,7 +188,7 @@ dtdfifo_t *dtdserver_open_read( dtdserver_t *server, const char *filename, int n
 
   if (fifo)
     {
-      sprintf( buffer, "openread %d %s %s %d", id, filename, fts_symbol_name(fts_get_search_path()), n_channels);
+      sprintf( buffer, "openread %d %s %s %d", id, filename, fts_get_search_path(), n_channels);
       dtdserver_send_command( server, buffer);
     }
 
@@ -209,7 +209,7 @@ dtdfifo_t *dtdserver_open_write( dtdserver_t *server, const char *filename, int 
 
       sr = (double)fts_dsp_get_sample_rate();
 
-      sprintf( buffer, "openwrite %d %s %s %f %d", id, filename, fts_symbol_name(fts_project_get_dir()), sr, n_channels);
+      sprintf( buffer, "openwrite %d %s %s %f %d", id, filename, fts_project_get_dir(), sr, n_channels);
       dtdserver_send_command( server, buffer);
     }
 
@@ -292,7 +292,7 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       close( from_child_pipe[1]);
 
       package = fts_package_get( fts_new_symbol( "unixdtd"));
-      sprintf( exe, "%s/c/dtd", fts_symbol_name( fts_package_get_dir( package)));
+      sprintf( exe, "%s/c/dtd", fts_package_get_dir( package));
       sprintf( buff1, "%d", this->block_frames);
       sprintf( buff2, "%d", this->max_channels);
       sprintf( buff3, "%d", this->fifo_blocks);
@@ -318,7 +318,7 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   if ( (this->server_socket = socket( PF_INET, SOCK_DGRAM, 0)) < 0)
     post( "[dtdserver] cannot open socket (%s)\n", strerror( errno));
 
-  base_name = fts_symbol_name( fts_get_symbol_arg( ac, at, 3, fts_new_symbol( DEFAULT_BASE_DIR)));
+  base_name = fts_get_symbol_arg( ac, at, 3, fts_new_symbol( DEFAULT_BASE_DIR));
   len = strlen( base_name);
   /* 
      append the process id of the server to the base name, so that you can have

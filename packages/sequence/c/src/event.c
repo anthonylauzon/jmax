@@ -164,7 +164,7 @@ event_print(event_t *event)
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
 
-      post("<%s> ", fts_symbol_name(event_get_type(event)));
+      post("<%s> ", event_get_type(event));
 
       fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0);
     }

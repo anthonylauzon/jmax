@@ -180,7 +180,7 @@ static fts_status_t audp_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   /*  mcast_addr_s = fts_get_symbol_by_name(nargs, args, fts_new_symbol("mcast_addr"), fts_new_symbol(DEFAULT_MCAST)); */
   ttl = fts_get_int_by_name(nargs, args, fts_new_symbol("ttl"), DEFAULT_TTL);
 
-  strcpy(addr, fts_symbol_name(dest));
+  strcpy(addr, dest);
   if((data->handle = audp_send_open(addr, port, ttl))==NULL)
     {
       post( "Error: audp_send_open() failed\n");
@@ -393,7 +393,7 @@ static fts_status_t audp_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   port = fts_get_int_by_name( nargs, args, fts_new_symbol("port"), DEFAULT_IN_PORT);
   packet_size = fts_get_int_by_name(nargs, args, fts_new_symbol("packetsize"), DEFAULT_PACKET_SIZE);
   mcast = fts_get_symbol_by_name(nargs, args, fts_new_symbol("mcast"), fts_new_symbol(DEFAULT_MCAST));
-  strcpy(mcast_addr, fts_symbol_name(mcast));
+  strcpy(mcast_addr, mcast);
   buf_size = packet_size*n_channels*sizeof(platform_sample_t) + HEADER_LEN;
   data->buffer_size = 0;
 

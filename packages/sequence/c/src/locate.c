@@ -155,7 +155,7 @@ locate_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       else if(mode == seqsym_segment)
 	this->mode = seqsym_segment;
       else
-	fts_object_signal_runtime_error(o, "doesn't understand mode %s", fts_symbol_name(mode));
+	fts_object_signal_runtime_error(o, "doesn't understand mode %s", mode);
     }
   else
     fts_object_signal_runtime_error(o, "symbol argument required for message mode");

@@ -127,10 +127,10 @@ vec_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       int size = vec_read_atom_file(this, file_name);
 
       if(size <= 0)
-	post("vec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
+	post("vec: can't import from text file \"%s\"\n", file_name);
     }
   else
-    post("vec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
+    post("vec: unknown import file format \"%s\"\n", file_format);
 }
 
 static void
@@ -148,10 +148,10 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       int size = vec_write_atom_file(this, file_name);
 
       if(size < 0)
-	post("vec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
+	post("vec: can't export to text file \"%s\"\n", file_name);
     }
   else
-    post("vec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
+    post("vec: unknown export file format \"%s\"\n", file_format);
 }
 
 static void
@@ -248,7 +248,7 @@ vec_grow(vec_t *vec, int size)
 int 
 vec_read_atom_file(vec_t *vec, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
   int n = 0;
   fts_atom_t a;
   char c;
@@ -281,7 +281,7 @@ vec_write_atom_file(vec_t *vec, fts_symbol_t file_name)
   int size = vec_get_size(vec);
   int i;
 
-  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+  file = fts_atom_file_open(file_name, "w");
 
   if(!file)
     return -1;

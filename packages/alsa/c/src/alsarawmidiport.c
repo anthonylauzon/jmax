@@ -150,7 +150,7 @@ alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   ac--;
   at++;
 
-  strcpy( name, fts_symbol_name( fts_get_symbol_arg( ac, at, 0, s_hw_0_0)) );
+  strcpy( name, fts_get_symbol_arg( ac, at, 0, s_hw_0_0) );
 
   if( (err = snd_rawmidi_open( &this->handle_in, &this->handle_out, name, O_RDWR | SND_RAWMIDI_NONBLOCK)) < 0)
     {

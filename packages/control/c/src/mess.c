@@ -65,7 +65,7 @@ mess_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(ac == 1 && fts_get_selector(at) == s)
     mess_args(o, 0, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "Doesn't understand '%s'", fts_symbol_name(s));
+    fts_object_signal_runtime_error(o, "Doesn't understand '%s'", s);
 }
 
 static void
@@ -119,7 +119,7 @@ mess_set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	    {
 	      fts_symbol_t classname = fts_object_get_class_name(object);
 	      fts_object_signal_runtime_error(o, "class %s doesn't understand %s", 
-					      fts_symbol_name(classname), fts_symbol_name(selector));
+					      classname, selector);
 	    }
 	}
     }

@@ -82,7 +82,7 @@ dsp_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       const char *filename;
 
-      filename = fts_symbol_name(fts_get_symbol(at));
+      filename = fts_get_symbol(at);
 
       f = fopen(filename, "wb");
 
