@@ -144,7 +144,6 @@ public class FtsHelpPatchTable
 
   static public Enumeration getSummaries()
   {
-      //return helpSummaryTable.keys();
       return helpSummaryVector.elements();
   }
 }
