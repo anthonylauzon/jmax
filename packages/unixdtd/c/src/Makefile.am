@@ -20,4 +20,6 @@ dtdfifo.h \
 dtdserver.h \
 libtime.h
 
+libunixdtd_la_LDFLAGS=-release @JMAX_VERSION@
+
 INCLUDES=-I$(top_srcdir)/include
