@@ -79,17 +79,18 @@ public class MidiConfigPanel extends JPanel implements Editor
     midiTable.setRowHeight(17);
     midiTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
 
-    midiTable.addMouseListener( new MouseAdapter(){
-	public void mousePressed( MouseEvent e){
-	  int index = midiTable.rowAtPoint( e.getPoint());
-	  if( index == -1)
-	    midiTable.getSelectionModel().clearSelection();
-	}
-      });
-
     scrollPane = new JScrollPane( midiTable);
     scrollPane.setPreferredSize( new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
+    scrollPane.addMouseListener( new MouseAdapter(){
+      public void mousePressed( MouseEvent e){
+        midiTable.clearSelection();
+        if( midiTable.getCellEditor() != null)
+          midiTable.getCellEditor().cancelCellEditing();
+      }
+    });
+
+    
     add( scrollPane);
 
     if( midiMan == null)
@@ -105,8 +106,8 @@ public class MidiConfigPanel extends JPanel implements Editor
     FtsMidiManager.MidiLabel label;
     for( Enumeration e = midiMan.getLabels(); e.hasMoreElements();)
       {
-	label = (FtsMidiManager.MidiLabel) e.nextElement();
-	midiModel.addRow( label.label, label.input, label.output);    
+      label = (FtsMidiManager.MidiLabel) e.nextElement();
+      midiModel.addRow( label.label, label.input, label.output);    
       }
   }
 
