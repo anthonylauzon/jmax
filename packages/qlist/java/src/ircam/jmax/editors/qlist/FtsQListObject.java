@@ -25,16 +25,7 @@
 
 package ircam.jmax.editors.qlist;
 
-import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
-import ircam.jmax.toolkit.*;
-
-import java.awt.datatransfer.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
 
 /**
  * A concrete implementation of the SequenceDataModel,

@@ -26,19 +26,14 @@
 package ircam.jmax.editors.explode;
 
 import java.io.*;
-import java.lang.*;
 import java.awt.event.*;
 import java.awt.*;
 
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
 import javax.swing.*;
-import javax.swing.table.*;
 
 import ircam.jmax.editors.explode.menus.*;
 
@@ -50,7 +45,7 @@ import ircam.jmax.editors.explode.menus.*;
 public class Explode extends JFrame implements EditorContainer, AAAReadme {
 
   //------------------- fields
-    ExplodeRemoteData explodeData;
+  FtsExplodeObject explodeObject;
   ExplodePanel itsExplodePanel;
   JMenu itsFileMenu;
   EditMenu itsEditMenu;
@@ -62,14 +57,14 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
    * constructor.
    * It creates the panels that will display the datas in maxData
    */
-  public Explode(ExplodeRemoteData maxData)
+  public Explode(FtsExplodeObject ftsObj)
   { 
     super();
 
-    explodeData = (ExplodeRemoteData) maxData;
+    explodeObject = ftsObj;
     MaxWindowManager.getWindowManager().addWindow(this);
 
-    makeTitle(maxData);
+    makeTitle(ftsObj);
 
 
     // Build The Menus and Menu Bar
@@ -81,7 +76,6 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
 	public void windowClosing(WindowEvent e)
 	{
 	    MaxWindowManager.getWindowManager().removeWindow(getFrame());
-	    System.err.println("meo "+getFrame());
 	}
 	public void windowDeiconified(WindowEvent e){}
 	public void windowIconified(WindowEvent e){}
@@ -89,7 +83,7 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
 	public void windowDeactivated(WindowEvent e){}
     });
 
-    itsExplodePanel = new ExplodePanel(this, maxData);
+    itsExplodePanel = new ExplodePanel(this, ftsObj);
     getContentPane().add(itsExplodePanel);
     pack();
     validate();
@@ -102,9 +96,9 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
 	PrintWriter pw = new PrintWriter(w);
 	
 	try {
-	    for (int i = 0; i<explodeData.length(); i++)
+	    for (int i = 0; i<explodeObject.length(); i++)
 		{
-		    pw.print((char) (128+explodeData.getEventAt(i).getPitch()));
+		    pw.print((char) (128+explodeObject.getEventAt(i).getPitch()));
 		}
 	}
 	catch(Exception e){}
@@ -114,8 +108,8 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
     
     // Build The Menus and Menu Bar
 
-  private final void makeTitle(ExplodeRemoteData maxData){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Explode " + maxData.getName()));
+  private final void makeTitle(FtsExplodeObject ftsObj){
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Explode " + ftsObj.getName()));
     MaxWindowManager.getWindowManager().windowChanged(this);
   } 
 
@@ -133,10 +127,6 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
     // Build the options menu
     itsOptionsMenu = new OptionsMenu(this); 
     mb.add( itsOptionsMenu); 
-
-    // New Tool menu 
-    /*itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
-      mb.add(itsToolsMenu);*/
 
     // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 

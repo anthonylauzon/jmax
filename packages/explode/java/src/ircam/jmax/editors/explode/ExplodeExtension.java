@@ -25,10 +25,8 @@
 
 package ircam.jmax.editors.explode;
 
-import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
+import ircam.jmax.*;
 import ircam.jmax.script.pkg.*;
-import ircam.jmax.script.*;
 
 /**
  * The explode extension; install the explode data type,
@@ -39,17 +37,13 @@ public class ExplodeExtension extends tcl.lang.Extension implements JavaExtensio
 {
   public void init(ircam.jmax.script.Interpreter interp)
   {
-    Mda.installEditorFactory( new ExplodeFactory());
-
-    Fts.registerRemoteDataClass( "explode_data", ircam.jmax.editors.explode.ExplodeRemoteData.class);
+      ObjectCreatorManager.registerFtsClass("explode", ircam.jmax.editors.explode.FtsExplodeObject.class);
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
-    Mda.installEditorFactory( new ExplodeFactory());
-
-    Fts.registerRemoteDataClass( "explode_data", ircam.jmax.editors.explode.ExplodeRemoteData.class);
+      ObjectCreatorManager.registerFtsClass("explode", ircam.jmax.editors.explode.FtsExplodeObject.class);
   }
 
 }

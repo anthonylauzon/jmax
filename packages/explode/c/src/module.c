@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include "explode.h"
 
 extern void explay_config(void);
 extern void explode_config(void);
@@ -36,4 +37,4 @@ fts_explode_init(void)
   explode_config();
 }
 
-fts_module_t explode_module = {"explode", "explode and explay scorfollowing/sequencing classes", fts_explode_init, 0, 0};
+/*fts_module_t explode_module = {"explode", "explode and explay scorfollowing/sequencing classes", fts_explode_init, 0, 0};*/

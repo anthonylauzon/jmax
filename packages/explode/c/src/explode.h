@@ -65,7 +65,6 @@ x_evt, x_sym, and x_next constant, though.  */
 
 typedef struct explode_data
 {
-  fts_data_t dataobj;
   fts_symbol_t name;		/* explode's name */
   evt_t *evt;			/* list of events */
 } explode_data_t;
@@ -92,6 +91,8 @@ typedef struct
 
   evt_t *current;
 
+  int open; /* flag: is 1 if explode editor is open */
+
   /* score follower state */
 
   long matchscoretime;
@@ -114,4 +115,7 @@ typedef struct
 
 extern explode_t *explode_get_by_name(fts_symbol_t name);
 
+#define explode_set_editor_open(e) ((e)->open = 1)
+#define explode_set_editor_close(e) ((e)->open = 0)
+#define explode_editor_is_open(e) ((e)->open != 0)
 

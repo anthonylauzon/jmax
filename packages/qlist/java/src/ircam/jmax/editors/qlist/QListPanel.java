@@ -30,17 +30,12 @@ import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
-import java.lang.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
-import java.awt.AWTEvent.*;
 import java.io.*;
-import tcl.lang.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
-//import javax.swing.text.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.dialogs.*;
@@ -51,8 +46,8 @@ import ircam.jmax.editors.qlist.actions.*;
  * A panel that is able to show the content of a FtsAtomList (qlist).
  * This component does not handle the communication with FTS, but it offers
  * a simple API (fillContent, getText) in order to be used from outside. */
-public class QListPanel extends JPanel implements Editor, ClipboardOwner/*, DocumentListener*/{
-  
+public class QListPanel extends JPanel implements Editor, ClipboardOwner 
+{  
   JTextArea itsTextArea;
   int caretPosition;
   Dimension preferred = new Dimension(512, 412);
@@ -116,7 +111,6 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner/*, Docu
 		fillContent(itsData);
 	    }
 	});
-    /*itsTextArea.getDocument().addDocumentListener(this);*/
   }
 
   /**
@@ -335,16 +329,6 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner/*, Docu
   }
   // ----------ClipboardOwner interface methods
   public void lostOwnership(Clipboard clipboard, Transferable contents) {}
-  //-----------DocumentListener interface methods
-    /*public void changedUpdate(DocumentEvent e){
-      changed = true;
-      }
-      public void insertUpdate(DocumentEvent e){
-      changed = true;
-      }
-      public void removeUpdate(DocumentEvent e){
-      changed = true;
-      } */
 }
 
 

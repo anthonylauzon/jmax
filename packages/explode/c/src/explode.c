@@ -29,26 +29,25 @@
 #include <fts/fts.h>
 #include "explode.h"
 
-/* explode data function keys */
-
-#define EXPLODE_LOAD_START    1
-#define EXPLODE_LOAD_APPEND   2
-#define EXPLODE_LOAD_END      3
-#define EXPLODE_CLEAN         4
-#define EXPLODE_APPEND        5
-#define EXPLODE_REMOTE_ADD    6
-#define EXPLODE_REMOTE_REMOVE 7
-#define EXPLODE_REMOTE_CHANGE 8
-#define EXPLODE_REMOTE_CHANGE_TIME 9
-#define EXPLODE_REMOTE_NAME   10
-
 static long explode_nextserial;
-
-static fts_data_class_t *explode_data_class = 0;
 
 static fts_heap_t *explode_evt_heap;
 static fts_heap_t *explode_hang_heap;
 static fts_heap_t *explode_skip_heap;
+
+static fts_symbol_t explode_symbol    = 0;
+static fts_symbol_t sym_openEditor    = 0;
+static fts_symbol_t sym_destroyEditor = 0;
+static fts_symbol_t sym_loadStart     = 0;
+static fts_symbol_t sym_loadAppend    = 0;
+static fts_symbol_t sym_loadEnd       = 0;
+static fts_symbol_t sym_clean         = 0;
+static fts_symbol_t sym_append        = 0;
+static fts_symbol_t sym_setName       = 0;
+static fts_symbol_t sym_change_time   = 0;
+static fts_symbol_t sym_change_event  = 0;
+static fts_symbol_t sym_remove_event  = 0;
+static fts_symbol_t sym_add_event     = 0;
 
 /****************************************************************************/
 /*                                                                          */
@@ -110,8 +109,6 @@ static void
 init_explode_register(void)
 {
   fts_hashtable_init(&explode_table, 0, FTS_HASHTABLE_MEDIUM);
-
-
 }
 
 /****************************************************************************/
@@ -148,19 +145,6 @@ explode_doappend(explode_t *this, long int time, long int pit, long int vel, lon
 	this->data.evt = e;
 
       this->current = e;
-
-      if (fts_data_is_exported((fts_data_t *) &(this->data)))
-	{
-	  fts_atom_t args[5];
-
-	  fts_set_int( &(args[0]), e->time);
-	  fts_set_int( &(args[1]), e->pit);
-	  fts_set_int( &(args[2]), e->vel);
-	  fts_set_int( &(args[3]), e->dur);
-	  fts_set_int( &(args[4]), e->chan);
-	  
-	  fts_data_remote_call((fts_data_t *) &(this->data), EXPLODE_APPEND, 5, args);
-	}
     }
 }
 
@@ -223,8 +207,8 @@ explode_clear(explode_t *this)
 
   explode_stop(this);
 
-  if (fts_data_is_exported((fts_data_t *) &(this->data)))
-    fts_data_remote_call((fts_data_t *) &(this->data), EXPLODE_CLEAN, 0, 0);
+  if(explode_editor_is_open(this))
+    fts_client_send_message((fts_object_t *)this, sym_clean, 0, 0);
 
   e = this->data.evt;
   while ( e)
@@ -1038,8 +1022,6 @@ explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       }
   else
     this->data.name = 0;
-
-  fts_data_init( (fts_data_t *) &(this->data), explode_data_class);
 }
 
 /* delete method, system inlet */
@@ -1049,9 +1031,11 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   explode_t *this = (explode_t *)o;
 
-  fts_data_delete((fts_data_t *) &(this->data));
   explode_clear(this);
   forget_explode(this, this->data.name);
+
+  if(fts_object_has_id(o))
+    fts_client_send_message(o, sym_destroyEditor, 0, 0);
 }
 
 
@@ -1222,6 +1206,22 @@ static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fprintf( file, ";\n");
 }
 
+static void
+explode_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  explode_t *this = (explode_t *)o;
+
+  explode_set_editor_open(this);
+  fts_client_send_message(o, sym_openEditor, 0, 0);
+  fts_send_message((fts_object_t *)this, fts_SystemInlet, fts_s_upload, 0, 0);
+}
+
+static void
+explode_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  explode_t *this = (explode_t *)o;
+  explode_set_editor_close(this);
+}
 
 /*
  * Two fts_data_t functions to add and remove elements from a sequence.
@@ -1229,17 +1229,18 @@ static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
  * take care of it.
  */
 
-static void explode_remote_remove( fts_data_t *d, int ac, const fts_atom_t *at)
+static void
+explode_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* Only argument, the zero based index of the event to suppress */
 
-  explode_data_t *data = (explode_data_t *)d;
+  explode_t *this = (explode_t *)o;
   int delete = fts_get_int(at);
   evt_t **pe, *e;			/* indirect precursor */
 
   /* Find the position */
 
-  pe = &(data->evt);
+  pe = &(this->data.evt);
   while (delete > 0)
     {
       pe = &( (*pe)->next);
@@ -1253,7 +1254,8 @@ static void explode_remote_remove( fts_data_t *d, int ac, const fts_atom_t *at)
   fts_heap_free((char *) e, explode_evt_heap);
 }
 
-static void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
+static void
+explode_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* Arguments: 
    * the zero based index
@@ -1264,11 +1266,11 @@ static void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
    * as event id.
    */
 
-  explode_data_t *data = (explode_data_t *)d;
+  explode_t *this = (explode_t *)o;
   int add;
   evt_t **pe, *e;			/* indirect precursor */
 
-  add  = fts_get_int(&at[0]);	/* add index */
+  add = fts_get_int(&at[0]);	/* add index */
 
   e = (evt_t *) fts_heap_alloc(explode_evt_heap);
 
@@ -1280,7 +1282,7 @@ static void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
 
   /* Look for the good position */
 
-  pe = &(data->evt);
+  pe = &(this->data.evt);
   while (add > 0)
     {
       pe = &( (*pe)->next);
@@ -1295,8 +1297,8 @@ static void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
   return;
 }
 
-
-static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
+static void
+explode_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* Arguments: 
    * the zero based index
@@ -1309,13 +1311,13 @@ static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
    * The function may need to move the event.
    */
 
-  explode_data_t *data = (explode_data_t *)d;
+  explode_t *this = (explode_t *)o;
   int change = fts_get_int(&at[0]);	/* change index */
   evt_t **pe, *e;			/* indirect precursor */
 
   /* First, found the event and remote it from the list */
 
-  pe = &(data->evt);
+  pe = &(this->data.evt);
   while (change > 0)
     {
       pe = &( (*pe)->next);
@@ -1335,7 +1337,8 @@ static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
   return;
 }
 
-static void explode_remote_change_time( fts_data_t *d, int ac, const fts_atom_t *at)
+static void
+explode_change_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* Arguments: 
    * the zero based index
@@ -1348,13 +1351,13 @@ static void explode_remote_change_time( fts_data_t *d, int ac, const fts_atom_t 
    * The function may need to move the event.
    */
 
-  explode_data_t *data = (explode_data_t *)d;
+  explode_t *this = (explode_t *)o;
   int change = fts_get_int(&at[0]);	/* change index */
   evt_t **pe, *e;			/* indirect precursor */
 
   /* First, found the event and remote it from the list */
 
-  pe = &(data->evt);
+  pe = &(this->data.evt);
   while (change > 0)
     {
       pe = &( (*pe)->next);
@@ -1367,15 +1370,11 @@ static void explode_remote_change_time( fts_data_t *d, int ac, const fts_atom_t 
   /* Change the event  */
 
   e->time = fts_get_int(&at[1]);
-  /*e->pit  = fts_get_int(&at[2]);
-    e->vel  = fts_get_int(&at[3]);
-    e->dur  = fts_get_int(&at[4]);
-    e->chan = fts_get_int(&at[5]);*/
 
   /* Find the correct new position */
 
-  pe = &(data->evt); 
-  while (*pe && ((*pe)->time <= e->time))/*ho messo l'uguale*/
+  pe = &(this->data.evt); 
+  while (*pe && ((*pe)->time <= e->time))
     pe = &( (*pe)->next);
 
   /* Insert it */
@@ -1386,58 +1385,33 @@ static void explode_remote_change_time( fts_data_t *d, int ac, const fts_atom_t 
   return;
 }
 
-/* Note that the explode data should actually be a different type
-   defined in a different file, and used by explode (hint: two explode
-   sharing the same sequence); for now, the two are almost merged
-   and the data object type is embedded in the object type */
-
-/* Data Export function */
-
-static void explode_data_export_fun(fts_data_t *d)
+static void
+explode_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  explode_data_t *data = (explode_data_t *)d;
+  explode_t *this = (explode_t *)o;
   evt_t *e;
   fts_atom_t args[5];
 
-  if (data->name)
+  if (this->data.name)
     {
-      fts_data_start_remote_call((fts_data_t *) data, EXPLODE_REMOTE_NAME);
-      fts_client_add_symbol(data->name);
-      fts_data_end_remote_call();
+      fts_set_symbol(&(args[0]), this->data.name);
+      fts_client_send_message((fts_object_t *)this, sym_setName, 1, args);
     }
 
-  fts_data_remote_call(d, EXPLODE_LOAD_START, 0, 0);
+  fts_client_send_message((fts_object_t *)this, sym_loadStart, 0, 0);
 
-  for ( e = data->evt; e; e = e->next)
+  for ( e = this->data.evt; e; e = e->next)
     {
       fts_set_int( &(args[0]), e->time);
       fts_set_int( &(args[1]), e->pit);
       fts_set_int( &(args[2]), e->vel);
       fts_set_int( &(args[3]), e->dur);
       fts_set_int( &(args[4]), e->chan);
-
-      fts_data_remote_call((fts_data_t *) data, EXPLODE_LOAD_APPEND, 5, args);
+      
+      fts_client_send_message((fts_object_t *)this, sym_loadAppend, 5, args);
     }
-
-  fts_data_remote_call(d, EXPLODE_LOAD_END, 0, 0);
+  fts_client_send_message((fts_object_t *)this, sym_loadEnd, 0, 0);
 }
-
-/* Daemon for getting the property "data".
-   Note that we return a pointer to the data; 
-   if the request come from the client, it will be the
-   kernel to handle the export of the data, not the explode
-   object.
- */
-
-static void
-explode_get_data(fts_daemon_action_t action, fts_object_t *obj,
-		 fts_symbol_t property, fts_atom_t *value)
-{
-  explode_t *this = (explode_t *)obj;
-
-  fts_set_data(value, (fts_data_t *) &(this->data));
-}
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -1464,7 +1438,8 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[1] = fts_s_symbol;
   fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, explode_init_mth, 2, a, 1);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, explode_delete_mth, 0, 0);
-
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, explode_upload);
   /* Bmax related methods */
 
   fts_method_define(cl, fts_SystemInlet, fts_s_restore, explode_record_mth, 0, 0); 
@@ -1549,6 +1524,15 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[2] = fts_s_int;
   fts_method_define(cl, 0, fts_new_symbol("params"), explode_params_mth, 3, a);
 
+  /* graphical editor */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), explode_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), explode_close_editor);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_add_event, explode_add);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_remove_event, explode_remove);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_change_event, explode_change);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_change_time, explode_change_time);
+
   /* export standard MIDI file */
   fts_method_define_varargs(cl, 0, fts_new_symbol("export"), explode_export);
 
@@ -1566,8 +1550,6 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* daemon for data property */
 
-  fts_class_add_daemon(cl, obj_property_get, fts_s_data, explode_get_data);
-
   return fts_Success;
 }
 
@@ -1578,13 +1560,21 @@ explode_config(void)
   explode_skip_heap = fts_heap_new(sizeof(skip_t));
   explode_hang_heap = fts_heap_new(sizeof(hang_t));
 
-  fts_class_install( fts_new_symbol( "explode"),explode_instantiate);
+  explode_symbol = fts_new_symbol("explode");
+  sym_openEditor = fts_new_symbol("openEditor");
+  sym_destroyEditor = fts_new_symbol("destroyEditor");
+  sym_loadStart = fts_new_symbol("loadStart");
+  sym_loadAppend = fts_new_symbol("loadAppend");
+  sym_loadEnd = fts_new_symbol("loadEnd");
+  sym_clean = fts_new_symbol("clean");
+  sym_append = fts_new_symbol("append");
+  sym_setName = fts_new_symbol("setName");
+  sym_change_time = fts_new_symbol("change_time");
+  sym_change_event = fts_new_symbol("change_event");
+  sym_remove_event = fts_new_symbol("remove_event");
+  sym_add_event = fts_new_symbol("add_event");
 
-  explode_data_class = fts_data_class_new( fts_new_symbol( "explode_data"));
-  fts_data_class_define_export_function(explode_data_class, explode_data_export_fun);
-  fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_ADD, explode_remote_add);
-  fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_REMOVE, explode_remote_remove);
-  fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_CHANGE, explode_remote_change);
-  fts_data_class_define_function(explode_data_class, EXPLODE_REMOTE_CHANGE_TIME, explode_remote_change_time);
+  fts_class_install(explode_symbol, explode_instantiate);
+
   init_explode_register();
 }
