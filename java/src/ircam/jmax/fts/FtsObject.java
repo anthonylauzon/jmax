@@ -1,5 +1,5 @@
 //
-// jMax
+// jmax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
 // This program is free software; you can redistribute it and/or
@@ -76,9 +76,10 @@ public class FtsObject
   //int objId, String variable, String className, int nArgs, FtsAtom args[])
 
   static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, 
-					    int objId, String variable, String className, FtsStream stream)
+					    int objId, String variable, String className, int nArgs, FtsAtom args[])
     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
+    Object creator;
     FtsObject obj;
     StringBuffer description;
 
@@ -89,49 +90,42 @@ public class FtsObject
     // Any addition of special classes should start by adding some lines
     // of code here.
     
-    if (className == null)
-      obj = new FtsObject(fts, parent, "", variable, "", objId);
-    else if (className == "inlet")
-      obj =  new FtsInletObject(fts, parent, objId, stream.getNextIntArgument());
-    else if (className == "outlet")
-      obj =  new FtsOutletObject(fts, parent, objId, stream.getNextIntArgument());
-    else if (className == "jpatcher")
-      /* jpatcher never has variable, yet */
-      obj =  new FtsPatcherObject(fts, parent, objId, FtsParse.unparseObjectDescription(stream));
-    else if (className == "messbox")
-      obj =  new FtsMessageObject(fts, parent, objId, FtsParse.unparseObjectDescription(stream));
-    else if (className == "jcomment")
-      obj =  new FtsCommentObject(fts, parent, objId, FtsParse.simpleUnparseObjectDescription(stream));
-    else if (className == "slider")
-      obj =  new FtsSliderObject(fts, parent, objId);
-    else if (className == "intbox")
-      obj =  new FtsIntValueObject(fts, parent, objId, className, "intbox");
-    else if (className == "toggle")
-      obj =  new FtsIntValueObject(fts, parent, objId, className, "toggle");
-    else if (className == "button")
-      obj =  new FtsIntValueObject(fts, parent, objId, className, "button");
-    else if (className == "floatbox")
-      obj =  new FtsFloatValueObject(fts, parent, objId, className, 0, null);
-    else if (className == "__selection")
-      obj =  new FtsSelection(fts, parent, objId);
-    else if (className == "__clipboard")
-      obj =  new FtsClipboard(fts, parent, objId);
-    else
+    if (className != null)
       {
 	Object ctr = creators.get(className);
 	
-	if(ctr!=null)
-	  {
-	    obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, objId, className, 0, null);
-	  }
+	if(ctr != null)
+	  obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, objId, className, 0, null);
+	else if (className == "inlet")
+	  obj =  new FtsInletObject(fts, parent, objId, args[0].intValue);
+	else if (className == "outlet")
+	  obj =  new FtsOutletObject(fts, parent, objId, args[0].intValue);
+	else if (className == "jpatcher")
+	  /* jpatcher never has variable, yet */
+	  obj =  new FtsPatcherObject(fts, parent, objId, nArgs, args);
+	else if (className == "messbox")
+	  obj =  new FtsMessageObject(fts, parent, objId, nArgs, args);
+	else if (className == "jcomment")
+	  obj =  new FtsCommentObject(fts, parent, objId, nArgs, args);
+	else if (className == "slider")
+	  obj =  new FtsSliderObject(fts, parent, objId);
+	else if (className == "intbox")
+	  obj =  new FtsIntValueObject(fts, parent, objId, className);
+	else if (className == "toggle")
+	  obj =  new FtsIntValueObject(fts, parent, objId, className);
+	else if (className == "button")
+	  obj =  new FtsIntValueObject(fts, parent, objId, className);
+	else if (className == "floatbox")
+	  obj =  new FtsFloatValueObject(fts, parent, objId, className);
+	else if (className == "__selection")
+	  obj =  new FtsSelection(fts, parent, objId);
+	else if (className == "__clipboard")
+	  obj =  new FtsClipboard(fts, parent, objId);
 	else
-	  {
-	    if (variable != null)
-	      obj = new FtsObject(fts, parent, className, variable, variable + " : " + FtsParse.unparseObjectDescription(className, stream), objId);
-	    else
-	      obj = new FtsObject(fts, parent, className, variable, FtsParse.unparseObjectDescription(className, stream), objId);
-	  }
+	  obj = new FtsObject(fts, parent, objId, variable, className, nArgs, args);
       }
+    else
+      obj = new FtsObject(fts, parent, objId, variable, null);
     
     if (data != null)
       data.addObject(obj);
@@ -318,8 +312,7 @@ public class FtsObject
   int noutlets;
 
   /**
-   * The object string description. 
-   * Always set at object creation.
+   * The object string description. Always set at object creation.
    */
 
   String description = null;
@@ -550,21 +543,108 @@ public class FtsObject
   /*****************************************************************************/
 
   /**
-   * Create a FtsObject object.
+   * FtsObject creator (object without arguments)
+   *
+   * @param fts the server
+   * @param parent the parent patcher
+   * @param objId the object id
+   * @param variableName the variable name or null
+   * @param className the class name or null
    */
-
-  protected FtsObject(Fts fts, FtsObject parent, String className, String variableName, String description, int objId)
+  protected FtsObject(Fts fts, FtsObject parent, int objId, String variableName, String className)
   {
     super();
 
-    this.fts       = fts;
-    this.variableName = variableName;
-    this.className    = className;
-    this.description  = description;
-    this.parent       = parent;
+    this.fts = fts;
+    this.parent = parent;
 
     if (objId != -1)
       setObjectId(objId);
+
+    if(variableName != null && className != null)
+      {
+	this.variableName = variableName;
+	this.className = className;
+	this.description = variableName + " : " + className;
+      }
+    else if(className != null)
+      {
+	this.variableName = null;
+	this.className = className;
+	this.description = className;
+      }
+    else
+      {
+	this.variableName = null;
+	this.className = null;
+	this.description = "";      
+      }
+  }
+
+  /**
+   * FtsObject creator (object with arguments)
+   *
+   * @param fts the server
+   * @param parent the parent patcher
+   * @param objId the object id
+   * @param variableName the variable name or null
+   * @param className the class name or null
+   * @param nArgs number of valid arguments in args array
+   * @param args arguments of object creation
+   */
+  protected FtsObject(Fts fts, FtsObject parent, int objId, String variableName, String className, int nArgs, FtsAtom args[])
+  {
+    super();
+    
+    this.fts = fts;
+    this.parent = parent;
+    
+    if (objId != -1)
+      setObjectId(objId);
+    
+    if(variableName != null && className != null)
+      {
+	this.variableName = variableName;
+	this.className = className;
+	this.description = variableName + " : " + className + FtsParse.unparseArguments(nArgs, args);
+      }
+    else if(className != null)
+      {
+	this.variableName = null;
+	this.className = className;
+	this.description = className + FtsParse.unparseArguments(nArgs, args);
+      }
+    else
+      {
+	this.variableName = null;
+	this.className = null;
+	this.description = "";      
+      }
+  }
+
+  /**
+   * FtsObject creator (object with one integer argument)
+   *
+   * @param fts the server
+   * @param parent the parent patcher
+   * @param objId the object id
+   * @param className the class name
+   * @param int an integer argument
+   */
+  protected FtsObject(Fts fts, FtsObject parent, int objId, String className, int i)
+  {
+    super();
+
+    this.fts = fts;
+    this.parent = parent;
+
+    if (objId != -1)
+      setObjectId(objId);
+
+    this.variableName = null;
+    this.className = className;
+    
+    this.description = className + i;
   }
 
 
@@ -599,7 +679,10 @@ public class FtsObject
 
   public final String getClassName()
   {
-    return className;
+    if(className != null)
+      return className;
+    else
+      return "";
   }
 
   FtsPatcherDocument document;

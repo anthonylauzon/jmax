@@ -657,6 +657,24 @@ public class FtsParse
       return false;
   }
       
+  static private final boolean wantASpaceBefore(FtsAtom value)
+  {
+    if (value.type == value.STRING)
+      {
+	String keywords[] = {"+", "-", "*", "/", "%", 
+			     "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", "^",
+			     ">>", ">", "<<", "<=", "<", "?", "::", ":" };
+
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals(value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+      
 
   static private final boolean dontWantASpaceBefore(Object value)
   {
@@ -667,6 +685,23 @@ public class FtsParse
 
 	for (int i = 0 ; i < keywords.length; i++)
 	  if (keywords[i].equals((String) value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+      
+  static private final boolean dontWantASpaceBefore(FtsAtom value)
+  {
+    if (value.type == value.STRING)
+      {
+	String keywords[] = {")", "[", "]", "}", ",", ";", "."};
+
+
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals(value))
 	    return true;
 
 	return false;
@@ -694,6 +729,25 @@ public class FtsParse
       return false;
   }
 
+  static private final boolean wantASpaceAfter(FtsAtom value)
+  {
+    if (value.type == value.STRING)
+      {
+	String keywords[] = { "+", "-", "*", "/", "%", 
+			      ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=",
+			      ">>", ">", "<<", "<=", "<", "?", "::", ":", "^",
+			      ";" };
+
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals(value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+
   static private final boolean dontWantASpaceAfter(Object value)
   {
     if (value instanceof String)
@@ -711,7 +765,23 @@ public class FtsParse
       return false;
   }
       
+  static private final boolean dontWantASpaceAfter(FtsAtom value)
+  {
+    if (value.type == value.STRING)
+      {
+	String keywords[] = { "(", "[", "{", 
+			      "$", "'", "." };
 
+	for (int i = 0 ; i < keywords.length; i++)
+	  if (keywords[i].equals(value))
+	    return true;
+
+	return false;
+      }
+    else
+      return false;
+  }
+      
   static private final boolean isAKeyword(String value)
   {
     String keywords[] = { "(", ")",
@@ -1097,10 +1167,101 @@ public class FtsParse
 
     return descr.toString();
   }
+  
+  
+  /*  Unparse a description passed as a vector of values
+      Used by atom list, available as a service for anybody.*/
+  
+  static String unparseArguments(int nArgs, FtsAtom args[])
+  {
+    if (nArgs > 0)
+      {
+	boolean doNewLine = false;
+	boolean addBlank = false;
+	boolean noNewLine = false;
+	StringBuffer descr = new StringBuffer();
+	FtsAtom value1;
+	FtsAtom value2;
+	int i;
+
+	value2 = args[0];
+	value1 = value2;
+	i = 1;
+
+	while (value1 != null)
+	  {
+	    if (doNewLine)
+	      descr.append("\n");
+	    else if (addBlank)
+	      descr.append(" ");
+
+	    doNewLine = false;
+
+	    if (i >= nArgs)
+	      value2 = null;
+	    else
+	      value2 = args[i++];
+
+	    switch (value1.type)
+	      {
+	      case value1.INT:
+		descr.append(value1.intValue);
+		break;
+	      case value1.FLOAT:
+		descr.append(formatter.format(value1.floatValue));
+		break;
+	      case value1.STRING:
+		/* Lexical quoting check */
+		String s = value1.stringValue;
+		
+		if (isAnInt(s) || isAFloat(s) || (!isAKeyword(s) && includeStartToken(s)))
+		  {
+		    descr.append("\"");
+		    descr.append(s);
+		    descr.append("\"");
+		  }
+		else
+		  descr.append(s);
+
+		if (s.equals("'"))
+		  noNewLine = true;
+		else if (s.equals(";"))
+		  {
+		    if (noNewLine)
+		      noNewLine = false;
+		    else
+		      doNewLine = true;
+		  }
+		else
+		  noNewLine = false;
+
+		break;
+		
+	      default:
+		descr.append("??");
+	      }
+
+	    /* decide to put or not a blank between the two */
+	    if (wantASpaceAfter(value1))
+	      addBlank = true;
+	    else if (dontWantASpaceAfter(value1))
+	      addBlank = false;
+	    else if (value2 != null)
+	      {
+		if (wantASpaceBefore(value2))
+		  addBlank = true;
+		else if (dontWantASpaceBefore(value2))
+		  addBlank = false;
+		else
+		  addBlank = true;	// if no body care, do a blank
+	      }
+
+	    value1 = value2;
+	  }
+
+	return descr.toString();
+      }
+    else
+      return "";
+  }
 }
-
-
-
-	
-
-

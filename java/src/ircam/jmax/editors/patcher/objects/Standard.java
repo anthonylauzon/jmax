@@ -87,7 +87,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
       } 
     catch (FtsException e) 
       {
-	System.out.println("Error in redefining object, action cancelled");
+	System.err.println("Error in redefining object, action cancelled");
       }
 
     super.redefine(text);

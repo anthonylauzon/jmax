@@ -687,16 +687,40 @@ abstract public class FtsStream
   }
 
 
-  private static FtsAtom args[];
-  private static int argsCount = 0;
+  private FtsAtom args[] = null;
+  private int argsCount = 0;
+
+  private void growArgsArray()
+  {
+    int oldLength;
+
+    if (args == null)
+      {
+	oldLength = 0;
+	args = new FtsAtom[128];
+      }
+    else
+      {
+	FtsAtom newArgs[];
+
+	oldLength = args.length;
+	newArgs = new FtsAtom[2 * oldLength];
+	System.arraycopy( args, 0, newArgs, 0, oldLength);
+	
+	args = newArgs;
+      }
+
+    for ( int i = oldLength; i < args.length; i++)
+      args[i] = new FtsAtom();
+  }
 
   public final int getNumberOfArgs()
   {
     return argsCount;
   }
+
   /**
-   * Returns the next arguments as an array of FtsAtom. This array is a static
-   * member of class FtsStream.
+   * Returns the next arguments as an array of FtsAtom. This array is a member of class FtsStream.
    *
    * @return   the message arguments as an array of FtsAtom
    * @exception java.io.IOException if an error occured during reading
@@ -706,8 +730,10 @@ abstract public class FtsStream
   public final FtsAtom[] getArgs()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
+    argsCount = 0;
+
     if (args == null)
-      args = new FtsAtom[128];
+      growArgsArray();
 
     while ( ! endOfArguments())
       {
@@ -748,13 +774,7 @@ abstract public class FtsStream
 	argsCount++;
 
 	if ( argsCount >= args.length)
-	  {
-	    FtsAtom newArgs[] = new FtsAtom[ 2 * args.length];
-
-	    System.arraycopy( args, 0, newArgs, 0, args.length);
-
-	    args = newArgs;
-	  }
+	  growArgsArray();
       }
 
     return args;

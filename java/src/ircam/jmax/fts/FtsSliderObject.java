@@ -49,7 +49,7 @@ public class FtsSliderObject extends FtsIntValueObject
 
   public FtsSliderObject(Fts fts, FtsObject parent, int objId)
   {
-    super(fts, parent, objId, "slider", "slider");
+    super(fts, parent, objId, "slider");
   }
 
 

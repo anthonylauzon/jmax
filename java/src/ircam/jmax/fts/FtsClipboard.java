@@ -55,7 +55,7 @@ public class FtsClipboard  extends FtsObject
 
   protected  FtsClipboard(Fts fts, FtsObject parent, int objId)
   {
-    super(fts, parent, "__clipboard", null, "", objId);
+    super(fts, parent, objId, null, "__clipboard");
   }
 
   public void copy(FtsSelection sel)

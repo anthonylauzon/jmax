@@ -50,7 +50,7 @@ public class FtsInOutletObject  extends FtsObject
   
   public FtsInOutletObject(Fts fts, FtsObject parent, int objId, String className, int position)
   {
-    super(fts, parent, className, null, className + " " + position, objId);
+    super(fts, parent, objId, className, position);
 
     this.position = position;
   }

@@ -53,6 +53,7 @@ public class FtsServer implements Runnable
   Fts fts;			// back pointer to the FTS object using this server
 
   public static boolean debug = false;
+  //public static boolean debug = true;
 
   boolean connected = false;
   boolean waiting = false;
@@ -1346,7 +1347,7 @@ public class FtsServer implements Runnable
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(fts, null, 1, "");
+    root = new FtsPatcherObject(fts, null, 1, 0, null);
     registerObject(root);
   }
 
@@ -1378,10 +1379,10 @@ public class FtsServer implements Runnable
 	  }
 	catch (java.lang.Exception e)
 	  {
-	    // Try to survive an exception
+	    //Try to survive an exception
 	    
-	    // System.err.println("System exception " + e);
-	    // e.printStackTrace();
+	    System.err.println("System exception " + e);
+	    e.printStackTrace();
 	  }
       }
 
@@ -1545,12 +1546,12 @@ public class FtsServer implements Runnable
 
 	      /* null description object? */
 	      if(!stream.endOfArguments())
-		{
+	 	{
 		  args = stream.getArgs();
 		  nArgs = stream.getNumberOfArgs();
 		}
 
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, null, className, stream);
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, null, className, nArgs, args);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1589,7 +1590,7 @@ public class FtsServer implements Runnable
 		  nArgs = stream.getNumberOfArgs();
 		}
 
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, variable, className, stream);
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, variable, className, nArgs, args);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
