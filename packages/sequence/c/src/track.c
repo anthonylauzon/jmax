@@ -717,7 +717,7 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_t *this = (track_t *)o;
   fts_symbol_t type = track_get_type(this);
 
-  if(type == fts_s_midievent && type == fts_s_void)
+  if(type == fts_s_midievent || type == fts_s_void)
     {
       if(ac == 0)
 	track_import_midifile_dialog(o, 0, 0, 0, 0);

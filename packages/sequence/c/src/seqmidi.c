@@ -189,7 +189,7 @@ inttrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   int type = fts_midievent_get_type(midievt);
 
-  if(type < midi_type_system)
+  if(type < midi_system_exclusive)
     {
       track_t *track = data->track;
       double time = fts_midifile_get_time(file);
@@ -345,7 +345,7 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, note_t *note)
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);
   event_t *off = track_get_first(data->free_track);
 
-  fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, 0, pitch, 64);
+  fts_midifile_write_channel_message(file, time_in_ticks, midi_note, 0, pitch, 64);
   data->size++;
 
   /* schedule note off */
@@ -388,7 +388,7 @@ seqmidi_write_note_offs(fts_midifile_t *file, double time)
       int off_pitch = event_get_int(off);
       
       /* write note off */
-      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_type_note, 0, off_pitch, 0);
+      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_note, 0, off_pitch, 0);
       data->size++;
 
       /* prevent off event being destroyed when moved to free_track */

@@ -324,35 +324,35 @@ midifile_read_track(fts_midifile_t *file)
 	{
 	case NOTE_OFF:
 	  data2 = readbyte(file); /* read but ignore */
-	  midifile_channel_message_call(file, midi_type_note, channel, data1, 0);
+	  midifile_channel_message_call(file, midi_note, channel, data1, 0);
 	  break;
 
 	case NOTE_ON:
 	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_type_note, channel, data1, data2);
+	  midifile_channel_message_call(file, midi_note, channel, data1, data2);
 	  break;
 	  
 	case POLY_PRESSURE:
 	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_type_poly_pressure, channel, data1, data2);
+	  midifile_channel_message_call(file, midi_poly_pressure, channel, data1, data2);
 	  break;
 	  
 	case CONTROL_CHANGE:
 	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_type_control_change, channel, data1, data2);
+	  midifile_channel_message_call(file, midi_control_change, channel, data1, data2);
 	  break;
 	  
 	case PROGRAM_CHANGE:
-	  midifile_channel_message_call(file, midi_type_program_change, channel, data1, MIDI_EMPTY_BYTE);
+	  midifile_channel_message_call(file, midi_program_change, channel, data1, MIDI_EMPTY_BYTE);
 	  break;
 	  
 	case CHANNEL_PRESSURE:
-	  midifile_channel_message_call(file, midi_type_channel_pressure, channel, data1, MIDI_EMPTY_BYTE);
+	  midifile_channel_message_call(file, midi_channel_pressure, channel, data1, MIDI_EMPTY_BYTE);
 	  break;
 	  
 	case PITCH_BEND:
 	  data2 = readbyte(file);
-	  midifile_channel_message_call(file, midi_type_pitch_bend, channel, data1, data2);
+	  midifile_channel_message_call(file, midi_pitch_bend, channel, data1, data2);
 	  break;
 
 	case SYSTEM_EXCLUSIVE: /* start of system exclusive */
@@ -745,7 +745,7 @@ fts_midifile_write_midievent(fts_midifile_t *file, int ticks, fts_midievent_t *e
     }
   else 
     {
-      switch(fts_midievent_system_get_type(event))
+      switch(fts_midievent_get_type(event))
 	{
 	case midi_system_exclusive:
 	  {
