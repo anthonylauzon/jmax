@@ -1,3 +1,7 @@
+2003-02-04  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* add command line arguments for project and AUDIO/MIDI configuration files
+
 2003-01-30  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* changed all "Authors:..." and "Based on MAX/ISPW" in all files.
