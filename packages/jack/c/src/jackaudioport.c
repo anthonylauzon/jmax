@@ -49,7 +49,6 @@ jackaudioport_input_fun(fts_audioport_t* port)
   jack_default_audio_sample_t* in;
 
   in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, get_jack_process_nframes());  
-  fts_log("[jackaudioport_input_fun] called %s\n",((jackaudioport_t*)port)->port_name);
 }
 
 static void
@@ -60,7 +59,6 @@ jackaudioport_output_fun(fts_audioport_t* port)
   jack_default_audio_sample_t* out;
 
   out = (jack_default_audio_sample_t*)jack_port_get_buffer(self->output_port, get_jack_process_nframes());
-  fts_log("[jackaudioport_output_fun] called %s\n",((jackaudioport_t*)port)->port_name);
 }
 
 /** 
@@ -74,14 +72,14 @@ jackaudioport_input_copy_fun( fts_audioport_t *port, float *buff, int buffsize, 
   /* Get JACK input port buffer pointer */
   jack_default_audio_sample_t* in;
   int i;
-  
+  int nsample_consumed = get_jack_process_consumed();
+
   in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, get_jack_process_nframes());  
 
   for (i = 0; i < buffsize; ++i)
   {
-    buff[i] = in[i];
+    buff[i] = in[i + nsample_consumed];
   }
-  fts_log("[jackaudioport_input_copy_fun] called %s\n",((jackaudioport_t*)port)->port_name);
 }
 
 static void 
@@ -91,12 +89,13 @@ jackaudioport_output_copy_fun( fts_audioport_t *port, float *buff, int buffsize,
   /* Get JACK input port buffer pointer */
   jack_default_audio_sample_t* out;
   int i;
+  int nsample_consumed = get_jack_process_consumed();
 
   out = (jack_default_audio_sample_t*)jack_port_get_buffer(self->output_port, get_jack_process_nframes());
 
   for (i = 0; i < buffsize; ++i)
   {
-    out[i] = buff[i];
+    out[i + nsample_consumed] = buff[i];
   }
 
   fts_log("[jackaudioport_output_copy_fun] called  %s\n", ((jackaudioport_t*)port)->port_name);

@@ -56,6 +56,7 @@ jack_client_t* jackaudiomanager_get_jack_client(void);
 fts_object_t* jackaudiomanager_get_manager_object(void);
 
 int get_jack_process_nframes(void);
+int get_jack_process_consumed(void);
 
 #endif /* JACKAUDIO_H_ */
 

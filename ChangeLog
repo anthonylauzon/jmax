@@ -1,3 +1,7 @@
+2002-12-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* Audio out works with jack.
+
 2002-12-26  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fixed many bugs in audio and ossaudioport. Now, audio out works with OSS.

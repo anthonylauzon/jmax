@@ -90,7 +90,7 @@ static fts_symbol_t s_unregister;
 static int nb_jack_audio_port = 0;
 
 static int jack_process_nframes = 0;
-
+static int jack_process_consumed = 0;
 /**************************************************
  *
  * jack jmax client 
@@ -109,6 +109,11 @@ static fts_object_t* jackaudiomanager_object = NULL;
 int get_jack_process_nframes()
 {
   return jack_process_nframes;
+}
+
+int get_jack_process_consumed()
+{
+  return jack_process_consumed;
 }
 
 fts_object_t* jackaudiomanager_get_manager_object()
@@ -134,12 +139,7 @@ int jackaudiomanager_process(jack_nframes_t nframes, void* arg)
   /* get number of samples of a FTS tick */
   int samples_per_tick = fts_dsp_get_tick_size();
   jack_process_nframes = nframes;
-
-/*   /\* TODO:  */
-/*      Check if in/out are valid pointer  */
-/*   *\/ */
-/*   self->input_buffer = in; */
-/*   self->output_buffer = out; */
+  jack_process_consumed = 0;
     
   /* TODO: 
      Need to be fix if (nframes % samples_per_tick != 0) 
@@ -156,10 +156,7 @@ int jackaudiomanager_process(jack_nframes_t nframes, void* arg)
     /*	fts_sched_run_one_tick_without_select(); */
     /* Run scheduler */
     fts_sched_run_one_tick();
-
-/*     /\* Step forward in input/output buffer *\/ */
-/*     self->input_buffer += samples_per_tick; */
-/*     self->output_buffer += samples_per_tick; */
+    jack_process_consumed += samples_per_tick;
   }
 
   return 0;
@@ -354,7 +351,6 @@ jackaudiomanager_thread_register(fts_object_t* o, int winlet, fts_symbol_t s, in
 	if (port->input_port != NULL)
 	{
 	  fts_log("[jackaudiomanager] jack input port %s registered \n", port_name);
-	  fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_INPUT);
 	}
       }
       else
@@ -368,7 +364,6 @@ jackaudiomanager_thread_register(fts_object_t* o, int winlet, fts_symbol_t s, in
 	if (port->output_port != NULL)
 	{
 	  fts_log("[jackaudiomanager] jack output port %s registered \n", port_name);
-	  fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_OUTPUT);
 	}
       }
       self->register_state = 0;
