@@ -178,17 +178,17 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
     String path = MaxApplication.jmaxProperties.getProperty("root")+fs+"images"+fs;
     String p = new String("ircam.jmax.editors.ermes.");
 
-    AddButton(p+"ErmesObjExternal", path+"extUp.gif");
-    AddButton(p+"ErmesObjMessage", path+"messUp.gif");
-    AddButton(p+"ErmesObjBang", path+"bangUp.gif");
-    AddButton(p+"ErmesObjToggle", path+"toggleUp.gif");
-    AddButton(p+"ErmesObjInt", path+"intUp.gif");
-    AddButton(p+"ErmesObjFloat", path+"floatUp.gif");
-    AddButton(p+"ErmesObjComment", path+"textUp.gif");
-    AddButton(p+"ErmesObjSlider", path+"sliderUp.gif");
-    AddButton(p+"ErmesObjIn", path+"inUp.gif");
-    AddButton(p+"ErmesObjOut", path+"outUp.gif");
-    AddButton(p+"ErmesObjPatcher", path+"patcherUp.gif");
+    AddButton(p+"ErmesObjExternal", path+"tool_ext.gif");
+    AddButton(p+"ErmesObjMessage", path+"tool_mess.gif");
+    AddButton(p+"ErmesObjPatcher", path+"tool_patcher.gif");
+    AddButton(p+"ErmesObjIn", path+"tool_in.gif");
+    AddButton(p+"ErmesObjOut", path+"tool_out.gif");
+    AddButton(p+"ErmesObjComment", path+"tool_text.gif");
+    AddButton(p+"ErmesObjBang", path+"tool_bang.gif");
+    AddButton(p+"ErmesObjToggle", path+"tool_toggle.gif");
+    AddButton(p+"ErmesObjSlider", path+"tool_slider.gif");
+    AddButton(p+"ErmesObjInt", path+"tool_int.gif");
+    AddButton(p+"ErmesObjFloat", path+"tool_float.gif");
   }
 
   public Dimension getMinimumSize(){

@@ -529,10 +529,10 @@ public class MaxApplication extends Object {
     // (and in particular, tcl built panels; thanks to the
     // jacl doc, that make this absolutely unclear.
 
-    Notifier notifier = itsInterp.getNotifier();
+    //Notifier notifier = itsInterp.getNotifier();
 
-    while (true)
-      notifier.doOneEvent(TCL.ALL_EVENTS);
+    // while (true)
+    // notifier.doOneEvent(TCL.ALL_EVENTS);
  }
 
   /** This private method build the tcl interpreter, 
