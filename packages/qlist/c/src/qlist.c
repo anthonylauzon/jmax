@@ -261,8 +261,12 @@ static void
 qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
-
-  this->atom_list = fts_atom_list_new();
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  if (name)
+      this->atom_list = fts_atom_list_new_with_name(name);
+  else
+      this->atom_list = fts_atom_list_new();
+  
   this->iterator  = fts_atom_list_iterator_new(this->atom_list);
 }
 
