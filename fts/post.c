@@ -206,7 +206,7 @@ static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "%", "&
 static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", ".", "=", 0};
 static fts_symbol_t want_a_space_after_symbols[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "::", ":", "^", ";", 0 };
 static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", "." , "=", 0 };
-static fts_symbol_t operators[] = { "$", ";", "+", "-", "*", "/", "(", ")", "[", "]", "{", "}", ".", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", ":", "=", 0};
+static fts_symbol_t operators[] = { "$", ";", ",", "+", "-", "*", "/", "(", ")", "[", "]", "{", "}", ".", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", ":", "=", 0};
 
 static void init_punctuation( void)
 {
