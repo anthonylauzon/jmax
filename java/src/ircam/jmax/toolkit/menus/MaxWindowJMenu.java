@@ -146,7 +146,11 @@ public class MaxWindowJMenu extends JMenu implements ListDataListener
 		    add(mi);
 		    mi.addActionListener(new ActionListener()
 			{ public  void actionPerformed(ActionEvent e)
-			    { w.toFront();}});
+			    { 
+				if(w.getState()==Frame.ICONIFIED) w.setState(Frame.NORMAL);
+				w.toFront();
+			    }
+			});
 		}
 	}
   }
