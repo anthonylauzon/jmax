@@ -361,9 +361,9 @@ define_expression_callback(int ac, const fts_atom_t *at, void *data)
       /* define argument with default value */
       if(ac == 2)
       {
-        fts_array_t *args = fts_patcher_get_args(fts_patcher_get_scope(self->patcher));
-        int size = fts_array_get_size(args);
-        fts_atom_t *atoms = fts_array_get_atoms(args);
+        fts_tuple_t *args = fts_patcher_get_args(fts_patcher_get_scope(self->patcher));
+        int size = fts_tuple_get_size(args);
+        fts_atom_t *atoms = fts_tuple_get_atoms(args);
         int index;
 
         /* get index */
@@ -383,9 +383,9 @@ define_expression_callback(int ac, const fts_atom_t *at, void *data)
     }
     else if(self->type == sym_args)
     {
-      fts_array_t *args = fts_patcher_get_args(fts_patcher_get_scope(self->patcher));
-      int size = fts_array_get_size(args);
-      fts_atom_t *atoms = fts_array_get_atoms(args);
+      fts_tuple_t *args = fts_patcher_get_args(fts_patcher_get_scope(self->patcher));
+      int size = fts_tuple_get_size(args);
+      fts_atom_t *atoms = fts_tuple_get_atoms(args);
 
       /* concat args and default values */
       if(ac > 1 || size > 1)
