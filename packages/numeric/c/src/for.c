@@ -36,7 +36,7 @@ for_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 {
   for_t *this = (for_t *)o;
 
-  if(this->is_int)
+  if (!this->is_int)
     {
       double init = this->init;
       double limit = this->limit;
