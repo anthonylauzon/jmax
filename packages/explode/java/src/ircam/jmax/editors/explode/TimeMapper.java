@@ -10,7 +10,7 @@ public class TimeMapper extends Mapper {
    */
   public void set(ScrEvent e, int value) 
   {
-    e.setTime(value);
+    e.move(value);
   }
   
   /**

@@ -4,6 +4,7 @@ SOURCES = \
 	$(INCLUDE_PATH)/AbstractRenderer.java	\
 	$(INCLUDE_PATH)/AbstractUndoableObject.java	\
 	$(INCLUDE_PATH)/DirectionChooser.java		\
+	$(INCLUDE_PATH)/DynamicDragListener.java		\
 	$(INCLUDE_PATH)/DirectionListener.java		\
 	$(INCLUDE_PATH)/DragListener.java		\
 	$(INCLUDE_PATH)/EditorToolbar.java		\

@@ -49,6 +49,7 @@ public class Explode extends MaxEditor implements AAAReadme {
     pack();
     setVisible(true);
 
+
   }
 
 

@@ -48,9 +48,11 @@ public class InfoPanel extends JPanel implements StatusBar{
    * The size of the controller will be adjusted to fit into the standard height */
   public void addWidget(Component theWidget)
   {
-    theWidget.setLocation(availablePosition, 4);
     if (theWidget.getSize().height > INFO_HEIGHT-8)
       theWidget.setSize(theWidget.getSize().width, INFO_HEIGHT-8);
+
+    theWidget.setLocation(availablePosition, (INFO_HEIGHT-theWidget.getSize().height)/2);
+
     add(theWidget);
     widgets.addElement(theWidget);
 

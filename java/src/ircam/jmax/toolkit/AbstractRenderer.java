@@ -1,6 +1,8 @@
 
 package ircam.jmax.toolkit;
 
+import ircam.jmax.utils.*;
+
 import java.util.*;
 import java.awt.*;
 
@@ -28,7 +30,13 @@ public class AbstractRenderer implements RenderManager {
    * render the objects in the given rectangle */
   public void render(Graphics g, Rectangle r)
   {
-    render(g);
+    Layer aLayer;
+
+    for (int i = 0; i< itsLayers.size(); i++)
+      {
+	aLayer = (Layer) itsLayers.elementAt(i);
+	aLayer.render(g, r, i);
+      }
   }
 
   /** add a layer */
@@ -79,5 +87,5 @@ public class AbstractRenderer implements RenderManager {
 
 
   //--- Fields
-  protected Vector itsLayers = new Vector();
+  protected MaxVector itsLayers = new MaxVector();
 }

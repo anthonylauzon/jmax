@@ -34,7 +34,9 @@ public class ScoreForeground implements Layer {
 
     Rectangle tempr = (Rectangle) g.getClip();
 
+    
     g.clipRect(ScoreBackground.KEYEND, 0, gc.getGraphicDestination().getSize().width-ScoreBackground.KEYEND, gc.getGraphicDestination().getSize().height);
+    
     for (Enumeration e = gc.getRenderManager().objectsIntersecting( r.x, r.y, r.width, r.height); e.hasMoreElements();) 
       {
 	temp = (ScrEvent) e.nextElement();

@@ -120,11 +120,15 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
 
     //-- prepares the SOUTH scrollbar (time scrolling) and its listener
-    int totalTime = 1000;
+    int totalTime = 0;
+    
     if (gc.getDataModel().length() != 0)
       {
-	totalTime = gc.getDataModel().getEventAt(gc.getDataModel().length()-1).getTime();
+	ScrEvent e = gc.getDataModel().getEventAt(gc.getDataModel().length()-1);
+	totalTime = ((e.getTime()+e.getDuration())*3)/2;
       }
+
+    if (totalTime < MINIMUM_TIME) totalTime = MINIMUM_TIME;
 
     itsTimeScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
     itsTimeScrollbar.setUnitIncrement(windowTimeWidth()/10);//WARN: setUnitIncrement seems not to work
@@ -430,6 +434,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
   
   public final int INITIAL_ZOOM = 20;
+  public static final int MINIMUM_TIME = 10000;
   Scrollbar itsTimeScrollbar;
   Scrollbar itsTimeZoom;
   JLabel itsZoomLabel;

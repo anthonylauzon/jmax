@@ -51,19 +51,21 @@ public class ScrAddingTool extends Tool implements PositionListener {
   public void positionChoosen(int x, int y, int modifiers) 
   {
     ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
-    ScrEvent aEvent = new ScrEvent(egc.getDataModel());
+    ScrEvent aEvent = new ScrEvent();
 
-    // starts an undoable transition
 
     egc.getAdapter().setX(aEvent, x);
     egc.getAdapter().setY(aEvent, y);
 
+    // starts an undoable transition
     egc.getDataModel().beginUpdate();
 
     egc.getDataModel().addEvent(aEvent);
 
-    
+    // ends the undoable transition
     egc.getDataModel().endUpdate();
+
+    
   } 
   
   //-------------- Fields

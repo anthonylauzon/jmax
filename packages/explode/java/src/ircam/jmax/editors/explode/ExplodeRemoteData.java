@@ -2,6 +2,8 @@ package ircam.jmax.editors.explode;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
+
 import java.lang.*;
 import java.io.*;
 import java.util.*;
@@ -11,6 +13,10 @@ import java.util.*;
  * A concrete implementation of the ExplodeDataModel.
  * It handles the datas coming from a remote explode in FTS
  */
+// implementation notes: the structure used is an ordered array of ScrEvents.
+// A better structure for look-up (ex. TDTree) would require the use of a
+// mean of communicate the identity of an event between the editor and the explode not
+// based on indexes.
 public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeDataModel
 {
   /* Events are stored in an array; the array is larger than
@@ -28,7 +34,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   {
     super();
       
-    listeners = new Vector();
+    listeners = new MaxVector();
   }
 
   /* Private methods */
@@ -55,10 +61,39 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	  max = med;
       }
     
-    return max;
+    if (events[min].getTime() > time)
+      return min;
+    else return max;
   
   }
 
+  public final int getFirstEventAt(int time)
+  {
+    if (events_fill_p == 0) 
+	return EMPTY_COLLECTION;
+    
+    else if (events[events_fill_p - 1].getTime()< time)  
+	return NO_SUCH_EVENT;
+    
+    
+    int min = 0;
+    int max = events_fill_p - 1;
+    int med = 0;
+
+    while (max > min+1)
+      {
+	med = (max + min) / 2;
+
+	if (events[med].getTime() >= time)
+	  max = med;
+	else 
+	  min = med;
+      }
+    
+    if (events[min].getTime() == time) return min;
+    else if (events[max].getTime() == time) return max;
+    else return NO_SUCH_EVENT;
+  }
 
   /**
    * utility function to make the event vector bigger
@@ -66,15 +101,15 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   protected final void reallocateEvents()
   {
     int new_size;
-    ScrEvent new_events[];
-   
+    ScrEvent temp_events[];
+
     new_size = (events_size * 3)/2;
-    new_events = new ScrEvent[new_size];
+    temp_events = new ScrEvent[new_size];
 
     for (int i = 0; i < events_size; i++)
-      new_events[i] = events[i];
+      temp_events[i] = events[i];
 
-    events = new_events;
+    events = temp_events;
     events_size = new_size;
   }
 
@@ -142,6 +177,116 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     return new ExplodeEnumeration();
   }
 
+  /**
+   * an utility class to implement the intersection with a range */
+  class Intersection implements Enumeration {
+    Intersection(int start, int end)
+    {
+      endTime = end;
+      startTime = start;
+      
+      index = getIndexAfter(endTime) ;
+      if (index == NO_SUCH_EVENT) index = events_fill_p -1;
+
+    } 
+
+    public boolean hasMoreElements()
+    {
+      nextObject = findNext();
+
+      return nextObject != null;
+    }
+
+    public Object nextElement()
+    {
+
+      return nextObject;
+    }
+
+    private Object findNext()
+    {
+      ScrEvent e;
+
+      while(index >=0)
+	{
+	  e = events[index--];
+	  if (e.getTime()+e.getDuration() >= startTime)
+	    {
+	      return e;
+	    }
+	}
+      return null;
+    }
+
+
+    //--- Fields
+    int endTime;
+    int startTime;
+    int index;
+    Object nextObject = null;
+  }
+
+  /**
+   * returns an enumeration of all the events that intersect a given range */
+
+  public Enumeration intersectionSearch(int start, int end)
+  {
+    return new Intersection(start,end);
+  }
+
+  class Inclusion implements Enumeration {
+    
+    Inclusion(int start, int end)
+    {
+      this.endTime = end;
+      index = getIndexAfter(start);
+      endIndex = getIndexAfter(end);
+    } 
+
+    public boolean hasMoreElements()
+    {
+      nextObject = findNext();
+      return nextObject != null;
+    }
+
+    public Object nextElement()
+    {
+      return nextObject;
+    }
+
+    private Object findNext()
+    {
+      ScrEvent e;
+      
+      while(index < endIndex)
+	{
+	  e = events[index++];
+	  if (e.getTime()+e.getDuration() <=endTime)
+	    {
+	      return e;
+	    }
+	}
+      return null;
+    }
+
+
+
+    //--- Fields
+    int endTime;
+    int index;
+    int endIndex;
+    Object nextObject = null;
+  }
+
+  /**
+   * Returns an enumeration of the events completely included
+   * in the given range. Note that this function is MUCH more
+   * efficient that the intersectionSearch, and should be used
+   * when possible */
+  public Enumeration inclusionSearch(int start, int end)
+  {
+    return new Inclusion(start, end);
+  }
 
   /**
    * adds an event in the data base
@@ -150,6 +295,8 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   public void addEvent(ScrEvent event)
   {
     int index;
+
+    event.setDataModel(this);
 
     index = getIndexAfter(event.getTime());
 
@@ -160,7 +307,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
     makeRoomAt(index);
     events[index] = event;
-    
+
     Object args[] = new Object[6];
     args[0] = new Integer(index);
     args[1] = new Integer(event.getTime());
@@ -175,9 +322,34 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     
     if (isInGroup())     
       postEdit(new UndoableAdd(event));
+    
   }
 
+  private int linearSearch(ScrEvent e)
+  {
+    for (int i = 0; i < events_fill_p; i++)
+      {
+	if (getEventAt(i) == e) return i;
+      }
+    return NO_SUCH_EVENT;
+  }
 
+  private int binarySearch(ScrEvent e)
+  {
+    int index = getFirstEventAt(e.getTime());
+    if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
+      {
+	return index;
+      }
+    
+    for(;getEventAt(index) != e; index++)
+      {
+	if (index >= events_fill_p) return NO_SUCH_EVENT;
+      }
+    
+    return index;
+  }
+  
   /**
    * remove an event from the data base
    */
@@ -186,29 +358,23 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   {
     int removeIndex;
 
-    // Linear search: a binary search would not
-    // work because we can have multiple events
-    // with the same key (time).
-
-    for (removeIndex = 0 ; removeIndex < events_fill_p; removeIndex++)
-      {
-	if (events[removeIndex] == event)
-	  {
-	    deleteRoomAt(removeIndex);
-
-	    // Send the remove command to fts
-
-	    Object args[] = new Object[1];
-	    args[0] = new Integer(removeIndex);
-	    remoteCall(REMOTE_REMOVE, args);
-
-	    notifyObjectDeleted(event);
-
-	    if (isInGroup())
-	      postEdit(new UndoableDelete(event));
-	    return;
-	  }
-      }
+    removeIndex = binarySearch(event);
+    if (removeIndex == NO_SUCH_EVENT || removeIndex == EMPTY_COLLECTION)
+      return;
+    
+    if (isInGroup())
+      postEdit(new UndoableDelete(event));
+    
+    deleteRoomAt(removeIndex);
+    
+    // Send the remove command to fts
+    
+    Object args[] = new Object[1];
+    args[0] = new Integer(removeIndex);
+    remoteCall(REMOTE_REMOVE, args);
+	    
+    notifyObjectDeleted(event);
+    
   }
 
 
@@ -225,97 +391,89 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   {
     int index;
 
-    for (index = 0 ; index < events_fill_p; index++)
-      {
-	if (events[index] == event)
-	  {
-	    // Send the change command to fts
+    index = binarySearch(event);
 
-	    Object args[] = new Object[6];
+    if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
+      return;
 
-	    args[0] = new Integer(index);
-	    args[1] = new Integer(event.getTime());
-	    args[2] = new Integer(event.getPitch());
-	    args[3] = new Integer(event.getVelocity());
-	    args[4] = new Integer(event.getDuration());
-	    args[5] = new Integer(event.getChannel());
+    // Send the change command to fts
+    
+    Object args[] = new Object[6];
+    
+    args[0] = new Integer(index);
+    args[1] = new Integer(event.getTime());
+    args[2] = new Integer(event.getPitch());
+    args[3] = new Integer(event.getVelocity());
+    args[4] = new Integer(event.getDuration());
+    args[5] = new Integer(event.getChannel());
+    
+    remoteCall(REMOTE_CHANGE, args);
+    
+    notifyObjectChanged(event);
 
-	    remoteCall(REMOTE_CHANGE, args);
-
-	    notifyObjectChanged(event);
-
-	    return;
-	  }
-      }
   }
 
+
   /**
-   *  Signal FTS that an object is moved, and move it
+   *  Signal FTS that an object is to be moved, and move it
    * in the data base; moving means changing the "index"
    * value, i.e. its time.
    */
 
-  public void moveEvent(ScrEvent event)
+  public void moveEvent(ScrEvent event, int newTime)
   {
     // Find the object
+    int index = binarySearch(event);
+    int newIndex = getIndexAfter(newTime);
     
-    int index;
+    if (newIndex == NO_SUCH_EVENT) newIndex = events_fill_p-1;
+    else if (event.getTime() < newTime) newIndex -=1;
+    
 
-    for (index = 0 ; index < events_fill_p; index++)
+    if (index == NO_SUCH_EVENT)
       {
-	if (events[index] == event)
-	  {
-	    // First, send the message to FTS
-
-	    Object args[] = new Object[6];
-
-	    args[0] = new Integer(index);
-	    args[1] = new Integer(event.getTime());
-	    args[2] = new Integer(event.getPitch());
-	    args[3] = new Integer(event.getVelocity());
-	    args[4] = new Integer(event.getDuration());
-	    args[5] = new Integer(event.getChannel());
-
-	    remoteCall(REMOTE_CHANGE, args);
-
-	    // Now, move the object with one step of bubble 
-	    // sorting
-    
-	    if ((index < (events_fill_p - 1)) && (events[index].getTime() > events[index+1].getTime()))
-	      {
-		// Move the object up
-
-		for (int i = index; i < (events_fill_p - 1); i++)
-		  if (events[i].getTime() > events[i+1].getTime())
-		    {
-		      ScrEvent e;
-
-		      e = events[i + 1];
-		      events[i + 1] = events[i];
-		      events[i] = e;
-		    }
-	      }
-	    else if ((index > 0) && events[index].getTime() < events[index-1].getTime())
-	      {
-		// Move the object down
-
-		for (int i = index; i > 0; i--)
-		  if (events[i].getTime() < events[i-1].getTime())
-		    {
-		      ScrEvent e;
-
-		      e = events[i - 1];
-		      events[i - 1] = events[i];
-		      events[i] = e;
-		    }
-	      }
-
-	    notifyObjectChanged(event);
-
-	    return;
-	  }
+	System.err.println("no such event error");
+	Thread.dumpStack();
+	return; //should rise an exception instead
       }
 
+    if (index == EMPTY_COLLECTION)
+      index = 0;
+    event.setTime(newTime);
+    
+    // inform FTS
+    
+    Object args[] = new Object[6];
+    
+    args[0] = new Integer(index);
+    args[1] = new Integer(event.getTime());
+    args[2] = new Integer(event.getPitch());
+    args[3] = new Integer(event.getVelocity());
+    args[4] = new Integer(event.getDuration());
+    args[5] = new Integer(event.getChannel());
+    
+    remoteCall(REMOTE_CHANGE, args);
+    
+    // rearranges the events in the DB 
+    if (index < newIndex) 
+      {
+	for (int i = index; i < newIndex; i++)
+	  {
+	    events[i] = events[i+1];
+	  }
+      }
+    else
+      {
+	for (int i = index; i > newIndex; i--)
+	  {
+	    events[i] = events[i-1];
+	  }
+	events[newIndex] = event;
+      }
+    
+    events[newIndex] = event;
+    notifyObjectChanged(event);
+    
   }
 
 
@@ -370,199 +528,126 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   }
   
 
-  /**
-   * access the first event whose starting time is 
-   * after a given time
-   */
-  public int indexOfFirstEventStartingAfter(int time) 
-  {
-    int index;
-    
-    index = getIndexAfter(time);
-    
-    if (index == events_fill_p)
-      return -1;
-    else
-      return index;
-  }
-
-
-  /**
-   * access the first event whose ENDING time is 
-   * after a given time
-   */
-  public int indexOfFirstEventEndingAfter(int time)
-  {
-
-    return indexOfLastEventEndingBefore(time) + 1;
-  }
-
-  /**
-   * access the last event whose ENDING time is 
-   * before a given time.
-   */
-  public int indexOfLastEventEndingBefore(int time) 
-  {
-
-    int index = getIndexAfter(time);
-    
-    // ENDING times are not ordered...
-    while(index >= 0 && events[index].getTime()+ events[index].getDuration() > time)
-      index --;
-
-    return index;    
-  }
-
-  /**
-   * access the last event whose starting time is 
-   * before a given time
-   */
-  public int indexOfLastEventStartingBefore(int time) 
-  {
-    int index;
-
-    index = getIndexAfter(time);
-    if (index == NO_SUCH_EVENT) return events_fill_p-1;
-
-    for (;index>=0;index--) 
-      {
-	if (events[index].getTime() < time)
-	  break;
-      }
-
-    return index;    
-  }
-
-
-  /**
-   * utility class to efficiently implement the eventsLivingAt call
-   */
-  private class ExplodeLivingEnumeration implements Enumeration {
-    
-    int index;
-    int time;
-    
-    private ExplodeLivingEnumeration(int theTime) 
-    {
-      time = theTime;
-      index = indexOfLastEventEndingBefore(time);
-      while(events[index].getTime()+events[index].getDuration() < time ) 
-	index++;
-    }
-
-    public boolean hasMoreElements() 
-    {
-      return events[index].getTime() <= time;
-    }
-    
-    public Object nextElement() 
-    {
-      return events[index++];
-    }
-    
-  }
-  
-  /**
-   * the enumeration of all the events active in a given moment
-   */
-  public Enumeration eventsLivingAt(int time) 
-  {  
-    return new ExplodeLivingEnumeration(time);
-  }
-
   /* a method inherited from FtsRemoteData */
 
   public void call( int key, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-    {
-      switch( key) {
-      case REMOTE_LOAD_START:
-	{
-	  // Clean the explode before a new loading (Needed ?? )
-
-	  for (int i = 0; i < events_fill_p; i++)
-	    events[i] = null;
-
-	  events_fill_p = 0;
-	}
-	break;
-
-      case REMOTE_LOAD_APPEND:
-	{
-	  // add events at the end; used during loading
-
-	  if (events_fill_p >= events_size)
-	    reallocateEvents();
-
-	  events[events_fill_p++] = new ScrEvent(this,
-						 stream.getNextIntArgument(),
-						 stream.getNextIntArgument(),
-						 stream.getNextIntArgument(),
-						 stream.getNextIntArgument(),
-						 stream.getNextIntArgument());
-	}
-	break;
-
-      case REMOTE_LOAD_END:
-	{
-	  // Sent at the end of the initial explode loading
-	}
-      break;
-
-      case REMOTE_CLEAN:
-	{
-	  // Clean the explode, after a record message
-
-	  beginUpdate();
-	  for (int i = 0; i < events_fill_p; i++)
-	    {
-	      postEdit(new UndoableDelete(events[i]));
-	      notifyObjectDeleted( events[i]);
-	      events[i] = null;
-	    }
-
-	  events_fill_p = 0;
-	  endUpdate();
-	}
-      break;
-
-      case REMOTE_APPEND:
-	{
-	  // add a note, after an FTS computation.
-	  int index;
-
-	  beginUpdate();
-	  if (events_fill_p >= events_size)
-	    reallocateEvents();
-
-	  index = events_fill_p++;
-	  events[index] = new ScrEvent(this,
-				       stream.getNextIntArgument(),
-				       stream.getNextIntArgument(),
-				       stream.getNextIntArgument(),
-				       stream.getNextIntArgument(),
-				       stream.getNextIntArgument());
-
-	  postEdit(new UndoableAdd(events[index]));
-	  endUpdate();
-	}
-	break;
-
-      default:
-	break;
+  {
+    switch( key) {
+    case REMOTE_LOAD_START:
+      {
+	// Clean the explode before a new loading (Needed ?? )
+	
+	for (int i = 0; i < events_fill_p; i++)
+	  events[i] = null;
+	
+	events_fill_p = 0;
       }
-    }
+    break;
 
+    case REMOTE_LOAD_APPEND:
+      {
+	// add events at the end; used during loading
+	
+	if (events_fill_p >= events_size)
+	  reallocateEvents();
+	
+	events[events_fill_p++] = new ScrEvent(this,
+					       stream.getNextIntArgument(),
+					       stream.getNextIntArgument(),
+					       stream.getNextIntArgument(),
+					       stream.getNextIntArgument(),
+					       stream.getNextIntArgument());
+      }
+    break;
     
+    case REMOTE_LOAD_END:
+      {
+	}
+    break;
+    
+    case REMOTE_CLEAN:
+      {
+	// Clean the explode, after a record message
+	
+	beginUpdate();
+	for (int i = 0; i < events_fill_p; i++)
+	  {
+	    postEdit(new UndoableDelete(events[i]));
+	    notifyObjectDeleted( events[i]);
+	    events[i] = null;
+	  }
+	
+	events_fill_p = 0;
+	endUpdate();
+      }
+    break;
+    
+    case REMOTE_APPEND:
+      {
+	System.err.println("called remote append: integrity check?");
+	// add a note, after an FTS computation.
+	int index;
+	
+	beginUpdate();
+	if (events_fill_p >= events_size)
+	  reallocateEvents();
+	
+	index = events_fill_p++;
+	events[index] = new ScrEvent(this,
+					  stream.getNextIntArgument(),
+					  stream.getNextIntArgument(),
+					  stream.getNextIntArgument(),
+					  stream.getNextIntArgument(),
+					  stream.getNextIntArgument());
+	
+	postEdit(new UndoableAdd(events[index]));
+	endUpdate();
+      }
+    break;
+    
+    default:
+      break;
+    }
+  }
 
+  
+  private void sort(ScrEvent[] elements)
+  {
+    sort(elements, 0, length()-1);
+  }
 
-
-  /* The MaxData interface */
-
+  /**
+   * bubble sort, betweem two index of the given vector.
+   * This function is usefull when we know in advance that
+   * a subset of the vector is already ordered (es. in moveEvent) */
+  private void sort(ScrEvent[] elements, int first, int last)
+  {
+    int i;
+    boolean doneSomething = true;
+    ScrEvent temp;
+    
+    while(doneSomething)
+      {
+	doneSomething = false;
+	
+	for (i = first; i < last-1; i++, last -= 1)
+	  {
+	    if(elements[i] == null || elements[i].getTime() >   
+	       elements[i+1].getTime() )
+	      {
+		temp = elements[i];
+		elements[i] = elements[i+1];
+		elements[i+1] = temp;
+		doneSomething = true;
+	      }
+	  }
+      }
+  }
 
   //----- Fields
   /** Key for remote call add */
-
+  
   static final int REMOTE_LOAD_START  = 1;
   static final int REMOTE_LOAD_APPEND = 2;
   static final int REMOTE_LOAD_END    = 3;
@@ -578,7 +663,8 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   int events_size   = 256;	// 
   int events_fill_p  = 0;	// next available position
   ScrEvent events[] = new ScrEvent[256];
-  private Vector listeners;
+  private MaxVector listeners;
+  private MaxVector tempVector = new MaxVector();
 }
 
 

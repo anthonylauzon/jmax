@@ -105,9 +105,12 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 				    aEvent.getVelocity(),
 				    aEvent.getDuration(),
 				    aEvent.getChannel());
+	    // must add the event to the model before moving it...
+	    aEvent.getDataModel().addEvent(newEvent);
 
 	    egc.getAdapter().setX(newEvent, egc.getAdapter().getX(aEvent)+deltaX);
-	    egc.getDataModel().addEvent(newEvent);
+	    egc.getAdapter().setY(newEvent, egc.getAdapter().getY(aEvent)+deltaY);
+	    
 
 	  }
 	egc.getDataModel().endUpdate();

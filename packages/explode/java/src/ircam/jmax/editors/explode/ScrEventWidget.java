@@ -172,7 +172,7 @@ class ScrEventWidget extends Box implements SelectionListener, ExplodeDataListen
 	for (en = ExplodeSelection.getSelection().getSelected(); en.hasMoreElements();)
 	  {
 	    temp = (ScrEvent) en.nextElement();
-	    temp.setTime(value);
+	    temp.move(value);
 	  }
       }
     else if (e.getSource() == pitchEditor.getCustomComponent()) 

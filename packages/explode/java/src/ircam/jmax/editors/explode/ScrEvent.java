@@ -2,11 +2,12 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 
 /**
  * The class representing a generic event in the score
  */
-public class ScrEvent extends AbstractUndoableObject {
+public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject{
 
 
   /**
@@ -50,6 +51,27 @@ public class ScrEvent extends AbstractUndoableObject {
     itsChannel = theChannel;
   }
 
+  // TwoOrderObject interface
+  public boolean firstLessOrEqual(TwoOrderObject obj)
+  {
+    return getFirst()<=obj.getFirst();
+  }
+
+  public boolean secondLessOrEqual(TwoOrderObject obj)
+  {
+    return getSecond()<=obj.getSecond();
+  }
+ 
+  public int getFirst()
+  {
+    return getTime();
+  }
+  
+  public int getSecond()
+  {
+    return getTime()+getDuration();
+  }
+  
 
   /**
    * get the starting time of this event
@@ -59,6 +81,7 @@ public class ScrEvent extends AbstractUndoableObject {
     return itsTime;
   }
 
+  
   /**
    * get the pitch of this event
    */
@@ -100,21 +123,25 @@ public class ScrEvent extends AbstractUndoableObject {
 
   public final void setTime(int time) 
   {
+    itsTime = time;
+  }
+
+  /**
+   * this is the method that must be called by the editors to
+   * change the initial time of an event. It takes care of
+   * keeping the data base consistency */
+  public void move(int time)
+  {
     if (time < 0) time = 0;
     if (itsExplodeDataModel != null)
       {
 	if (itsExplodeDataModel.isInGroup())
-	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+	  itsExplodeDataModel.postEdit(new UndoableMove(this));
+	
+	itsExplodeDataModel.moveEvent(this, time);
       }
-
-    itsTime = time;
-    
-    if (itsExplodeDataModel != null)
-      {
-	itsExplodeDataModel.moveEvent(this);
-      }
+    else setTime(time);
   }
-
 
   public final void setPitch(int pitch) 
   {
@@ -190,6 +217,13 @@ public class ScrEvent extends AbstractUndoableObject {
 
   }
 
+
+  public void setDataModel(ExplodeDataModel theDataModel)
+  {
+    itsExplodeDataModel = theDataModel;
+  }
+
+
   /** Undoable data interface */
   public void beginUpdate()
   {
@@ -199,6 +233,11 @@ public class ScrEvent extends AbstractUndoableObject {
   public void endUpdate()
   {
     itsExplodeDataModel.endUpdate();
+  }
+
+  public String toString()
+  {
+    return ""+itsTime+", "+(itsTime+itsDuration);
   }
 
   //------------ Fields

@@ -35,7 +35,9 @@ abstract public class Tool implements StatusBarClient{
 
   /**
    * called when this object is unmounted */
-  abstract public void deactivate();
+  public void deactivate() 
+  {
+  }
 
   /**
    * the method used to mount another interaction module in a tool

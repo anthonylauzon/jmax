@@ -30,62 +30,35 @@ public interface ExplodeDataModel extends UndoableData{
   public abstract ScrEvent getEventAt(int index);
 
 
-  /**
-   * access the first event whose starting time is 
-   * after a given time
-   */
-  public abstract int indexOfFirstEventStartingAfter(int time);
+  public abstract Enumeration intersectionSearch(int start, int end);
 
+  public abstract Enumeration inclusionSearch(int start, int end);
 
-  /**
-   * access the first event whose ENDING time is 
-   * after a given time
-   */
-  public abstract int indexOfFirstEventEndingAfter(int time);
-
-
-  /**
-   * access the last event whose ENDING time is 
-   * before a given time
-   */
-  public abstract int indexOfLastEventEndingBefore(int time);
-
-  /**
-   * access the last event whose starting time is 
-   * before a given time
-   */
-  public abstract int indexOfLastEventStartingBefore(int time);
-
-
-  /**
-   * the enumeration of all the events active at a given time value
-   */
-  public abstract Enumeration eventsLivingAt(int time);
-
-
+  public abstract int getFirstEventAt(int time);
+ 
   /**
    * adds an event in the database
    */
   public abstract void addEvent(ScrEvent theEvent);
 
   /**
-   * change an event in the database
+   * generic change of an event in the database.
+   * Call this function to signal the parameters changing of the event, except
+   * the initial time and the duration parameters. Use moveEvent and resizeEvent instead
    */
   public abstract void changeEvent(ScrEvent event);
 
   /**
    * move an event in the database
    */
-  public abstract void moveEvent(ScrEvent event);
+  public abstract void moveEvent(ScrEvent event, int time);
+
 
   /**
    * deletes an event from the database
    */
   public abstract void removeEvent(ScrEvent theEvent);
 
-
-  /*
-   */
 
   /**
    * requires to be notified when the database changes
@@ -99,6 +72,7 @@ public interface ExplodeDataModel extends UndoableData{
 
 
 }
+
 
 
 

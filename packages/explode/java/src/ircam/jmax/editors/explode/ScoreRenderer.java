@@ -1,6 +1,7 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -31,9 +32,9 @@ public class ScoreRenderer extends AbstractRenderer{
       gc.getAdapter().setYTransposition(136);
     }
 
-    tempList = new Vector();
+    tempList = new MaxVector();
 
-    itsLayers = new Vector();
+    itsLayers = new MaxVector();
 
     itsForegroundLayer = new ScoreForeground(gc);
 
@@ -80,9 +81,9 @@ public class ScoreRenderer extends AbstractRenderer{
     int startTime = gc.getAdapter().getInvX(0);
     int endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
 
-    for (int i=gc.getDataModel().indexOfFirstEventEndingAfter(startTime); i<=gc.getDataModel().indexOfLastEventStartingBefore(endTime); i++) 
+    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();)
       {      
-	aScrEvent = gc.getDataModel().getEventAt(i);
+	aScrEvent = (ScrEvent) e.nextElement();
 
 	if (getObjectRenderer().contains(aScrEvent, x, y))
 	  tempList.addElement(aScrEvent);
@@ -97,13 +98,12 @@ public class ScoreRenderer extends AbstractRenderer{
   {
     ScrEvent aScrEvent;
 
-    int startTime = gc.getAdapter().getInvX(0);
-    int endTime = gc.getAdapter().getInvX(gc.getGraphicDestination().getSize().width);
+    int time = gc.getAdapter().getInvX(x);
 
-    for (int i=gc.getDataModel().indexOfFirstEventEndingAfter(startTime); i<=gc.getDataModel().indexOfLastEventStartingBefore(endTime); i++) 
+    for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
       
       {      
-	aScrEvent = gc.getDataModel().getEventAt(i);
+	aScrEvent = (ScrEvent) e.nextElement();
 
 	if (getObjectRenderer().contains(aScrEvent, x, y))
 	  return aScrEvent;
@@ -125,9 +125,9 @@ public class ScoreRenderer extends AbstractRenderer{
     int endTime = gc.getAdapter().getInvX(x+w);
 
 
-    for (int i=gc.getDataModel().indexOfFirstEventEndingAfter(startTime); i<=gc.getDataModel().indexOfLastEventStartingBefore(endTime); i++) 
+    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
       {
-	aScrEvent = gc.getDataModel().getEventAt(i);
+	aScrEvent = (ScrEvent) e.nextElement();
 
 	if (getObjectRenderer().touches(aScrEvent, x, y, w, h))
 	  {
@@ -148,7 +148,7 @@ public class ScoreRenderer extends AbstractRenderer{
   public static final int XINTERVAL = 10;
   public static final int YINTERVAL = 3;
 
-  private Vector tempList;
+  private MaxVector tempList;
 }
 
 
