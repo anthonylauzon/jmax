@@ -275,10 +275,12 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->open = 0;
  
   if(name)
+    {
       fts_set_symbol(a, name);
+      this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 1, a);
+    }
   else
-      fts_set_symbol(a, fts_new_symbol(""));
-  this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 1, a);
+    this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 0, 0);
   
   fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_upload, 0, 0);
 
