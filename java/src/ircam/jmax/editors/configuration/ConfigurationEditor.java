@@ -40,7 +40,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 {    
   public ConfigurationEditor( FtsConfig config)
   {
-    super( "Configuration Editor");
+      super( "Configuration Editor :"+config.getFileName());
 
     singleInstance = this;
 
