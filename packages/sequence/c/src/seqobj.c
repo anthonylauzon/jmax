@@ -54,7 +54,7 @@ seqevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   sequence_event_t *this = (sequence_event_t *)o;
 
-  sequence_event_set_value(this, ac, at);
+  sequence_event_set_value(this, this->s, ac, at);
 }
 
 static fts_status_t
