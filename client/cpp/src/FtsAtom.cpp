@@ -35,7 +35,7 @@ namespace client {
     else if ( a.isDouble())
       os << a.value.doubleValue;
     else if ( a.isSymbol())
-      os << (const char *)a.value.symbolValue;
+      os << (const char *)a.value.stringValue;
     else if ( a.isString() || a.isRawString())
       os << a.value.stringValue;
     //   else if ( a.isObject())

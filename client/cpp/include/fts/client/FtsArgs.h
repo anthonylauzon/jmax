@@ -110,7 +110,7 @@ namespace client {
 
     const char *getSymbol( int index) const
     {
-      return _array[index].value.symbolValue;
+      return _array[index].value.stringValue;
     }
 
     const char *getString( int index) const

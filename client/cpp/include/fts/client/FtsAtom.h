@@ -38,6 +38,17 @@ namespace client {
     friend class FtsArgs;
     friend std::ostream &operator<<( std::ostream &os, const FtsAtom &a);
   public:
+
+    FtsAtom(): _type(VOID) 
+	  {
+	      value.stringValue = 0;
+	  };
+
+    ~FtsAtom() 
+	{ 
+	    if (0 != value.stringValue) 
+		delete[] value.stringValue;
+	}
     /**
      * Tests if atom contains a 'void' value (i.e. no valid value)
      * 
@@ -114,6 +125,10 @@ namespace client {
      */
     void setVoid()
     {
+	if (isStringType())
+	{
+	    clearString();
+	}
       _type = VOID;
     }
 
@@ -124,6 +139,10 @@ namespace client {
      */
     void setInt( int i)
     {
+	if (isStringType())
+	{
+	    clearString();
+	}
       _type = INT;
       value.intValue = i;
     }
@@ -135,6 +154,10 @@ namespace client {
      */
     void setDouble( double f)
     {
+	if (isStringType())
+	{
+	    clearString();
+	}
       _type = DOUBLE;
       value.doubleValue = f;
     }
@@ -146,8 +169,12 @@ namespace client {
      */
     void setSymbol( const char *s)
     {
+	if (isStringType())
+	{
+	    clearString();
+	}
       _type = SYMBOL;
-      value.symbolValue = s;
+      value.stringValue = std::strcpy(new char [std::strlen(s) + 1], s);
     }
 
     /**
@@ -157,8 +184,12 @@ namespace client {
      */
     void setString( const char *s)
     {
+	if (isStringType())
+	{
+	    clearString();
+	}
       _type = STRING;
-      value.stringValue = s;
+      value.stringValue = std::strcpy(new char [std::strlen(s) + 1], s);
     }
 
     /**
@@ -168,8 +199,12 @@ namespace client {
      */
     void setRawString( const char *s)
     {
+	if (isStringType())
+	{
+	    clearString();
+	}
       _type = RAW_STRING;
-      value.stringValue = s;
+      value.stringValue = std::strcpy(new char [std::strlen(s) + 1], s);
     }
 
     /**
@@ -179,16 +214,30 @@ namespace client {
      */
     void setObject( FtsObject *o)
     {
+	if (isStringType())
+	{
+	    clearString();
+	}
       _type = OBJECT;
       value.objectValue = o;
     }
+
+    inline int isStringType() const
+	{
+	    return (_type == STRING || _type == RAW_STRING || _type == SYMBOL);
+	} 
+
+      inline void clearString()
+	  {
+	      if (0 != value.stringValue)
+		  delete[] value.stringValue;
+	  }
 
   private:
 
     union {
       int intValue;
       double doubleValue;
-      const char *symbolValue;
       const char *stringValue;
       FtsObject *objectValue;
     } value;
