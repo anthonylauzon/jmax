@@ -414,6 +414,12 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     repaint();
   }
 
+  public void bounded()
+  {
+    itsTableRenderer.setMode(TableRenderer.BOUNDED);
+    repaint();
+  }
+
   public void changeBackgroundColor()
   {
     Color newColor = JColorChooser.showDialog(null,"Choose Background Color", itsTableRenderer.getBackColor());

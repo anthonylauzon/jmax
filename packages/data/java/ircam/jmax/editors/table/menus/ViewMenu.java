@@ -40,8 +40,7 @@ import ircam.jmax.toolkit.menus.*;
 
 public class ViewMenu extends EditorMenu
 {
-  JMenuItem hollowItem;
-  JMenuItem solidItem;
+  JMenuItem hollowItem, solidItem, boundedItem;
 
   EditorContainer container;
   
@@ -55,6 +54,7 @@ public class ViewMenu extends EditorMenu
 
     hollowItem   = add(Actions.hollowAction, "Hollow");
     solidItem    = add(Actions.solidAction, "Solid");
+    boundedItem  = add(Actions.boundedAction, "Bounded");
 
     addSeparator();
     

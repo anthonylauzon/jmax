@@ -89,6 +89,12 @@ public class Actions
 	((TablePanel)container.getEditor()).solid();
       }
     };
+  public static EditorAction boundedAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((TablePanel)container.getEditor()).bounded();
+      }
+    };
   public static EditorAction backColorAction = new EditorAction(){
       public void doAction(EditorContainer container)
       {

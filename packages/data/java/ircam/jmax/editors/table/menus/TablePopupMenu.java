@@ -44,7 +44,7 @@ public class TablePopupMenu extends JPopupMenu
   int x;
   int y;
   TableDisplay target = null;     
-  JMenuItem solidItem, hollowItem;
+  JMenuItem solidItem, hollowItem, boundedItem;
 
   public TablePopupMenu(TableDisplay editor)
   {
@@ -82,6 +82,11 @@ public class TablePopupMenu extends JPopupMenu
     hollowItem.addActionListener( Actions.hollowAction);
     viewGroup.add( hollowItem);
     add( hollowItem);    
+
+    boundedItem = new JRadioButtonMenuItem( "Bounded view");
+    boundedItem.addActionListener( Actions.boundedAction);
+    viewGroup.add( boundedItem);
+    add( boundedItem);    
 
     addSeparator();
     
