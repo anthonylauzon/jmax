@@ -32,138 +32,6 @@
 
 #include <fts/fts.h>
 
-/* ********************************************************************** */
-/* Protocol decoder                                                       */
-/* ********************************************************************** */
-
-enum decode_state { 
-  STATE_IN_TYPE,
-  STATE_IN_INT,
-  STATE_IN_FLOAT,
-  STATE_IN_STRING
-};
-
-#define STRING_MAX 256
-
-typedef struct _protodecode_t {
-  enum decode_state state;
-  int counter;
-  int int_value;
-  float float_value;
-  int string_len;
-  char string_value[STRING_MAX];
-} protodecode_t;
-
-typedef enum {
-  INT_TOKEN,
-  FLOAT_TOKEN,
-  STRING_TOKEN,
-  EOM_TOKEN,
-  RUNNING
-} protodecode_status_t;
-
-
-void protodecode_init( protodecode_t *pr)
-{
-  pr->state = STATE_IN_TYPE;
-}
-
-protodecode_status_t protodecode_run( protodecode_t *pr, unsigned char b)
-{
-  int ivalue;
-
-  switch( pr->state) {
-  case STATE_IN_TYPE:
-    if ( b == INT_CODE)
-      {
-	pr->state = STATE_IN_INT;
-	pr->counter = 4;
-	pr->int_value = 0;
-	return RUNNING;
-      }
-    else if ( b == FLOAT_CODE)
-      {
-	unsigned int zero = 0;
-
-	pr->state = STATE_IN_FLOAT;
-	pr->counter = 4;
-	pr->float_value = *((float *)&zero);
-	return RUNNING;
-      }
-    else if ( b == STRING_CODE)
-      {
-	pr->state = STATE_IN_STRING;
-	pr->string_len = 0;;
-	return RUNNING;
-      }
-    else if ( b == EOM_CODE)
-      return EOM_TOKEN;
-    break;
-
-  case STATE_IN_INT:
-    pr->int_value = (pr->int_value << 8) | b;
-
-    pr->counter--;
-    if (pr->counter == 0)
-      {
-	pr->state = STATE_IN_TYPE;
-	return INT_TOKEN;
-      }
-    else
-      return RUNNING;
-
-  case STATE_IN_FLOAT:
-    ivalue = *((unsigned int *)&(pr->float_value));
-    ivalue = (ivalue << 8) | b;
-    pr->float_value = *((float *)&ivalue);
-
-    pr->counter--;
-    if (pr->counter == 0)
-      {
-	pr->state = STATE_IN_TYPE;
-	return FLOAT_TOKEN;
-      }
-    else
-      return RUNNING;
-
-  case STATE_IN_STRING:
-    if ( b != STRING_END_CODE)
-      {
-	/* TODO: should realloc() on buffer overflow */
-	if ( pr->string_len < STRING_MAX)
-	  {
-	    pr->string_value[ pr->string_len] = (char)b;
-	    pr->string_len++;
-	  }
-	
-	return RUNNING;
-      }
-    else 
-      {
-	pr->string_value[ pr->string_len ] = '\0';
-	pr->state = STATE_IN_TYPE;
-
-	return STRING_TOKEN;
-      }
-  }
-
-  return RUNNING;
-}
-
-int protodecode_get_int( protodecode_t *pr)
-{
-  return pr->int_value;
-}
-
-float protodecode_get_float( protodecode_t *pr)
-{
-  return pr->float_value;
-}
-
-char *protodecode_get_string( protodecode_t *pr)
-{
-  return pr->string_value;
-}
 
 /* ********************************************************************** */
 /* udpreceive object                                                      */
@@ -176,79 +44,55 @@ typedef struct {
   fts_object_t o;
   int socket;
   char buffer[UDP_PACKET_SIZE];
+  fts_binary_protocol_t* binary_protocol;
 } udpreceive_t;
 
 #define MAXATOMS 1024
 
 static void udpreceive_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  udpreceive_t *this = (udpreceive_t *)o;
-  fts_atom_t argv[MAXATOMS];
+  udpreceive_t *self = (udpreceive_t *)o;
   fts_symbol_t selector = NULL;
-  int size, i, argc, first_token;
-  protodecode_t pr;
+  int argc;
+  fts_atom_t *argv;
+  fts_binary_protocol_t* binary_protocol = self->binary_protocol;
+  int size;
 
-  size = recvfrom( this->socket, this->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
+  size = recvfrom( self->socket, self->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
 
   if ( size <= 0)
     return;
 
-  protodecode_init( &pr);
-  argc = 0;
-  first_token = 0;
+  if (fts_binary_protocol_decode(binary_protocol, size, self->buffer) != size)
+  {
+    fts_log("[udpreceive] error in protocol decoding \n");
+    fts_object_error(o, "error in protocol decoding");
+    return;
+  }
 
-  for ( i = 0; i < size; i++)
-    {
-      protodecode_status_t t;
+  argc = fts_stack_size( &binary_protocol->input_args);
+  argv = (fts_atom_t *)fts_stack_base( &binary_protocol->input_args);
 
-      t = protodecode_run( &pr, this->buffer[i]);
+  selector = fts_get_symbol( argv+1);
+  argc -= 2;
+  argv += 2;
 
-      if ( t == INT_TOKEN)
-	{
-	  if (first_token == 0)
-	    first_token = 1;
-
-	  fts_set_int( &(argv[argc]), protodecode_get_int( &pr));
-	  argc++;
-	}
-      else if ( t == FLOAT_TOKEN)
-	{
-	  if (first_token == 0)
-	    first_token = 1;
-
-	  fts_set_float( &(argv[argc]), protodecode_get_float( &pr));
-	  argc++;
-	}
-      else if ( t == STRING_TOKEN)
-	{
-	  if (first_token == 0)
-	    {
-	      selector = fts_new_symbol( protodecode_get_string( &pr));
-	      first_token = 1;
-	    }
-	  else
-	    {
-	      fts_set_symbol( &(argv[argc]), fts_new_symbol( protodecode_get_string( &pr)));
-	      argc++;
-	    }
-	}
-      else if ( t == EOM_TOKEN)
-	break;
-    }
-
-  fts_outlet_send( (fts_object_t *)this, 0, selector, argc, argv);
+  fts_outlet_send( (fts_object_t *)self, 0, selector, argc, argv);
 }
 
 
 static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  udpreceive_t *this = (udpreceive_t *)o;
+  udpreceive_t *self = (udpreceive_t *)o;
   int port = fts_get_int_arg( ac, at, 0, 0);
   struct sockaddr_in addr;
 
-  this->socket = socket(AF_INET, SOCK_DGRAM, 0);
+  self->binary_protocol = (fts_binary_protocol_t*)fts_object_create(fts_binary_protocol_type, 0, NULL);
+  fts_object_refer((fts_object_t*)self->binary_protocol);
 
-  if (this->socket == -1)
+  self->socket = socket(AF_INET, SOCK_DGRAM, 0);
+
+  if (self->socket == -1)
     {
       post( "Cannot open socket\n");
       return;
@@ -259,24 +103,28 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port = htons(port);
 
-  if ( bind( this->socket, &addr, sizeof(struct sockaddr_in)) == -1)
+  if ( bind( self->socket, (const struct sockaddr*)&addr, sizeof(struct sockaddr_in)) == -1)
     {
       post( "Cannot bind socket\n");
-      close( this->socket);
+      close( self->socket);
       return;
     }
 
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
+  /* 1 outlet for sending received message */
+  fts_object_set_outlets_number(o, 1);
+
+  fts_sched_add( (fts_object_t *)self, FTS_SCHED_READ, self->socket);
 }
 
 static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  udpreceive_t *this = (udpreceive_t *)o;
+  udpreceive_t *self = (udpreceive_t *)o;
+  fts_object_release((fts_object_t*)self->binary_protocol);
 
-  if ( this->socket >= 0)
+  if ( self->socket >= 0)
     {
-      fts_sched_remove( (fts_object_t *)this);
-      close( this->socket);
+      fts_sched_remove( (fts_object_t *)self);
+      close( self->socket);
     }
 }
 
@@ -291,3 +139,12 @@ void udpreceive_config( void)
 {
   fts_class_install( fts_new_symbol("udpreceive"), udpreceive_instantiate);
 }
+
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
+

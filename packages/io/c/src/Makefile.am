@@ -7,8 +7,8 @@ in_out_tilda.c \
 iomodule.c \
 loopback.c \
 out.c \
-udp.c 
-#udpreceive.c \
+udp.c \
+udpreceive.c 
 #udpsend.c 
 
 # Not compiled yet (MAC OS X)
