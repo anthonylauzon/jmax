@@ -34,6 +34,7 @@
 #include "sys.h"
 #include "lang.h"
 #include "runtime/devices/devices.h"
+#include "runtime/devices/unixdev.h"
 
 /* Errors */
 
@@ -79,21 +80,20 @@ unixdev_init(void)
   */
 
 
-#define GET_BUFSIZE 2048
-#define PUT_BUFSIZE 2048
-
-typedef struct fd_dev_data
+struct fd_dev_data
 {
   /* In data */
 
-  char get_buf[GET_BUFSIZE];
+  char *get_buf;
+  int get_bufsize;
   int  get_read_p; 
   int  get_size;
   int  get_fd;
 
   /* Out data */
 
-  char put_buf[PUT_BUFSIZE];
+  char *put_buf;
+  int put_bufsize;
   int  put_buf_fill;
   int  put_fd;
 
@@ -102,41 +102,67 @@ typedef struct fd_dev_data
   int listener;
   int block_on_listen;
 
-} fd_dev_data_t;
+};
 
 
-static fd_dev_data_t *
-make_fd_data()
+fd_dev_data_t *fd_data_new( int get_bufsize, int put_bufsize)
 {
   fd_dev_data_t *p;
 
-  p = fts_malloc(sizeof(fd_dev_data_t));
+  p = fts_malloc( sizeof(fd_dev_data_t));
+
+  p->get_bufsize = get_bufsize;
+  p->get_buf = fts_malloc( p->get_bufsize);
   p->get_read_p = 0;
   p->get_size = 0;
-  p->put_buf_fill = 0;		/* leave place for the sequence number */
+
+  p->put_bufsize = put_bufsize;
+  p->put_buf = fts_malloc( p->put_bufsize);
+  p->put_buf_fill = 0;
+
   p->block_on_listen = 0;	/* by default, don't block on listen */
 
   return p;
 }
 
-
-static void
-free_fd_data(fd_dev_data_t *d)
+void fd_data_delete( fd_dev_data_t *d)
 {
-  fts_free(d);
+  fts_free( d->get_buf);
+  fts_free( d->put_buf);
+  fts_free( d);
 }
+
+void fd_data_set_input_fd( fd_dev_data_t *d, int fd)
+{
+  d->get_fd = fd;
+}
+
+int fd_data_get_input_fd( fd_dev_data_t *d)
+{
+  return d->get_fd;
+}
+
+void fd_data_set_output_fd( fd_dev_data_t *d, int fd)
+{
+  d->put_fd = fd;
+}
+
+int fd_data_get_output_fd( fd_dev_data_t *d)
+{
+  return d->put_fd;
+}
+
 
 /* Buffered non-blocking select based char read */
 
-static fts_status_t
-fd_dev_get(fts_dev_t *dev, unsigned char *cp)
+fts_status_t fd_dev_get( fts_dev_t *dev, unsigned char *cp)
 {
-  fd_dev_data_t *dev_data = (fd_dev_data_t *) fts_dev_get_device_data(dev);
+  fd_dev_data_t *d = (fd_dev_data_t *) fts_dev_get_device_data(dev);
 
-  if (dev_data->get_read_p < dev_data->get_size)
+  if (d->get_read_p < d->get_size)
     {
-      *cp = dev_data->get_buf[dev_data->get_read_p];
-      dev_data->get_read_p++;
+      *cp = d->get_buf[d->get_read_p];
+      d->get_read_p++;
       
       return fts_Success;
     }
@@ -149,29 +175,29 @@ fd_dev_get(fts_dev_t *dev, unsigned char *cp)
       timeout.tv_usec = 0;
 
       FD_ZERO(&check);
-      FD_SET(dev_data->get_fd, &check);
+      FD_SET(d->get_fd, &check);
       select(64, &check, (fd_set *)0, (fd_set *)0, &timeout);
 
-      if (FD_ISSET(dev_data->get_fd, &check))
+      if (FD_ISSET(d->get_fd, &check))
 	{
-	  dev_data->get_size = read(dev_data->get_fd, dev_data->get_buf, GET_BUFSIZE);
+	  d->get_size = read(d->get_fd, d->get_buf, d->get_bufsize);
 
-	  if (dev_data->get_size < 0)
+	  if (d->get_size < 0)
 	    {
 	      if (errno == EAGAIN)
 		return &fts_data_not_ready;
 	      else
 		return &fts_dev_io_error; /* error: File IO error */
 	    }
-	  else if (dev_data->get_size == 0)
+	  else if (d->get_size == 0)
 	    return &fts_dev_eof;
 	  
-	  dev_data->get_read_p = 0;
+	  d->get_read_p = 0;
       
 	  /* read ok */
 
-	  *cp = dev_data->get_buf[dev_data->get_read_p];
-	  dev_data->get_read_p++;
+	  *cp = d->get_buf[d->get_read_p];
+	  d->get_read_p++;
 	  
 	  return fts_Success;
 	}
@@ -182,56 +208,52 @@ fd_dev_get(fts_dev_t *dev, unsigned char *cp)
 
 /* output buffering */
 
-
-static fts_status_t
-fd_dev_put(fts_dev_t *dev, unsigned char c)
+fts_status_t fd_dev_put( fts_dev_t *dev, unsigned char c)
 {
-  fd_dev_data_t *dev_data = (fd_dev_data_t *) fts_dev_get_device_data(dev);
+  fd_dev_data_t *d = (fd_dev_data_t *) fts_dev_get_device_data(dev);
 
-  dev_data->put_buf[dev_data->put_buf_fill++] = c;
+  d->put_buf[d->put_buf_fill++] = c;
 
-  if (dev_data->put_buf_fill >= PUT_BUFSIZE)
+  if (d->put_buf_fill >= d->put_bufsize)
     {
       int r;
 
-      r = write(dev_data->put_fd, dev_data->put_buf, dev_data->put_buf_fill);
+      r = write(d->put_fd, d->put_buf, d->put_buf_fill);
 
-      if (r != dev_data->put_buf_fill)
+      if (r != d->put_buf_fill)
 	{
-	  dev_data->put_buf_fill = 0;
+	  d->put_buf_fill = 0;
 	  return &fts_dev_io_error; /* error: File IO error */
 	}
       else
-	dev_data->put_buf_fill = 0;
+	d->put_buf_fill = 0;
     }
   
   return fts_Success;
 }
 
-static fts_status_t
-fd_dev_flush(fts_dev_t *dev)
+fts_status_t fd_dev_flush( fts_dev_t *dev)
 {
-  fd_dev_data_t *dev_data = (fd_dev_data_t *) fts_dev_get_device_data(dev);
+  fd_dev_data_t *d = (fd_dev_data_t *) fts_dev_get_device_data(dev);
 
-  if (dev_data->put_buf_fill > 0)
+  if (d->put_buf_fill > 0)
     {
       int r;
 
-      r = write(dev_data->put_fd, dev_data->put_buf, dev_data->put_buf_fill);
+      r = write(d->put_fd, d->put_buf, d->put_buf_fill);
 
 
-      if (r != dev_data->put_buf_fill)
+      if (r != d->put_buf_fill)
 	{
-	  dev_data->put_buf_fill = 0;
+	  d->put_buf_fill = 0;
 	  return &fts_dev_io_error; /* error: File IO error */
 	}
       else
-	dev_data->put_buf_fill = 0;
+	d->put_buf_fill = 0;
     }
   
   return fts_Success;
 }
-
 
 
 /******************************************************************************/
@@ -283,12 +305,11 @@ init_stdio(void)
 }
 
 
-static fts_status_t
-open_stdio(fts_dev_t *dev, int nargs, const fts_atom_t *args)
+static fts_status_t open_stdio( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
   fd_dev_data_t *p;
 
-  p = make_fd_data();
+  p = fd_data_new( DEFAULT_GET_BUFSIZE, DEFAULT_PUT_BUFSIZE);
   p->get_fd = STDIN_FILENO;
   p->put_fd = STDOUT_FILENO;
 
@@ -298,10 +319,9 @@ open_stdio(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 }
 
 
-static fts_status_t
-close_stdio(fts_dev_t *dev)
+static fts_status_t close_stdio( fts_dev_t *dev)
 {
-  free_fd_data(fts_dev_get_device_data(dev));
+  fd_data_delete( fts_dev_get_device_data( dev));
 
   return fts_Success;
 }
@@ -349,7 +369,7 @@ open_npipe(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   char ftsTo[1024], ftsFrom[1024];
   fd_dev_data_t *p;
 
-  p = make_fd_data();
+  p = fd_data_new( DEFAULT_GET_BUFSIZE, DEFAULT_PUT_BUFSIZE);
 
   pipe_name = fts_symbol_name(fts_get_symbol_arg(nargs, args, 0, fts_new_symbol("/tmp/fts")));
 
@@ -376,7 +396,7 @@ close_npipe(fts_dev_t *dev)
   close(p->get_fd);
   close(p->put_fd);
 
-  free_fd_data(fts_dev_get_device_data(dev));
+  fd_data_delete( fts_dev_get_device_data( dev));
 
   return fts_Success;
 }
@@ -433,7 +453,8 @@ open_socket_server(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   unsigned short port;
   fd_dev_data_t *p;
 
-  p = make_fd_data();
+  p = fd_data_new( DEFAULT_GET_BUFSIZE, DEFAULT_PUT_BUFSIZE);
+
   port = (unsigned short) fts_get_int_by_name(nargs, args, fts_new_symbol("port"), 2000);/* 2000 is the default server port */
 
   p->block_on_listen = fts_get_boolean_by_name(nargs, args, fts_new_symbol("blocking"), 0);
@@ -476,7 +497,7 @@ close_socket_server(fts_dev_t *dev)
   close(p->get_fd);/* only one needed, in and out are the same fd */
   close(p->listener);
 
-  free_fd_data(fts_dev_get_device_data(dev));
+  fd_data_delete( fts_dev_get_device_data(dev));
 
   return fts_Success;
 }
@@ -764,7 +785,7 @@ open_socket_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   int sock;
   fd_dev_data_t *p;
 
-  p = make_fd_data();
+  p = fd_data_new( DEFAULT_GET_BUFSIZE, DEFAULT_PUT_BUFSIZE);
 
   fts_socket_parse(fts_get_symbol_arg(nargs, args, 0, 0), &address, &port);
 
@@ -815,7 +836,7 @@ close_socket_client(fts_dev_t *dev)
 
   close(p->get_fd);/* only one needed, in and out are the same fd */
 
-  free_fd_data(fts_dev_get_device_data(dev));
+  fd_data_delete(fts_dev_get_device_data(dev));
 
   return fts_Success;
 }
@@ -900,7 +921,7 @@ open_tty(fts_dev_t *dev, int nargs, fts_atom_t *args)
     Derived from the Eric Viara TTY code, i don't understand it completely ;->
      */
 
-  p = make_fd_data();
+  p = fd_data_new( DEFAULT_GET_BUFSIZE, DEFAULT_PUT_BUFSIZE);
 
   serial_port = fts_symbol_name(fts_get_symbol_arg(nargs, args, 0, "/dev/ttyd2"));
 
@@ -924,7 +945,7 @@ close_tty_client(fts_dev_t *dev)
 
   close(p->get_fd);/* only one needed, in and out are the same fd */
 
-  free_fd_data(fts_dev_get_device_data(dev));
+  fd_data_delete( fts_dev_get_device_data(dev));
 
   return fts_Success;
 }

@@ -31,6 +31,7 @@
 #include "sys.h"
 #include "lang.h"
 #include "runtime/devices/devices.h"
+#include "runtime/devices/unixdev.h"
 #include "runtime/files.h"
 
 /* Check this is right */
@@ -39,8 +40,9 @@
 
 /* forward declarations */
 
-static fts_status_t oss_dac_init(void);
-static fts_status_t oss_adc_init(void);
+static void oss_dac_init(void);
+static void oss_adc_init(void);
+static void oss_midi_init(void);
 
 /******************************************************************************/
 /*                                                                            */
@@ -196,8 +198,7 @@ static int          oss_dac_get_nchans(fts_dev_t *dev);
 
 /* Init and shutdown functions */
 
-static fts_status_t
-oss_dac_init(void)
+static void oss_dac_init(void)
 {
   fts_dev_class_t *oss_dac_class;
 
@@ -215,7 +216,7 @@ oss_dac_init(void)
 
   set_sig_dev_get_nchans_fun(oss_dac_class, oss_dac_get_nchans);
 
-  return fts_dev_class_register(fts_new_symbol("oss_dac"), oss_dac_class);
+  fts_dev_class_register(fts_new_symbol("oss_dac"), oss_dac_class);
 }
 
 /* OSS DAC control/options functions */
@@ -334,8 +335,7 @@ static int          oss_adc_get_nchans(fts_dev_t *dev);
 
 /* Init and functions */
 
-static fts_status_t
-oss_adc_init(void)
+static void oss_adc_init(void)
 {
   fts_dev_class_t *oss_adc_class;
 
@@ -351,7 +351,7 @@ oss_adc_init(void)
 
   set_sig_dev_get_nchans_fun(oss_adc_class, oss_adc_get_nchans);
 
-  return fts_dev_class_register(fts_new_symbol("oss_adc"), oss_adc_class);
+  fts_dev_class_register(fts_new_symbol("oss_adc"), oss_adc_class);
 }
 
 /* OSS ADC control/options functions: use the same parser as the dac */
@@ -449,12 +449,79 @@ oss_adc_get(fts_word_t *argv)
 
 /******************************************************************************/
 /*                                                                            */
+/* MIDI device                                                                */
+/*                                                                            */
+/******************************************************************************/
+
+#define MIDI_BUFSIZE 256
+
+static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
+{
+  fts_symbol_t name;
+  fd_dev_data_t *p;
+  int fd;
+
+  p = fd_data_new( MIDI_BUFSIZE, MIDI_BUFSIZE);
+  fts_dev_set_device_data( dev, (void *) p);
+
+  name = fts_get_symbol_by_name( ac, av, fts_new_symbol("device"), fts_new_symbol( "/dev/midi00"));
+  fd = open( fts_symbol_name( name), O_RDWR);
+
+  if (fd < 0)
+    {
+      return &fts_dev_open_error;
+    }
+
+  fd_data_set_input_fd( p, fd);
+  fd_data_set_output_fd( p, fd);
+
+  return fts_Success;
+}
+
+static fts_status_t oss_midi_close( fts_dev_t *dev)
+{
+  fd_dev_data_t *p = (fd_dev_data_t *)fts_dev_get_device_data( dev);
+
+  close( fd_data_get_input_fd( p));
+
+  fd_data_delete( p);
+
+  return fts_Success;
+}
+
+static fts_status_t oss_midi_put( fts_dev_t *dev, unsigned char c)
+{
+  fts_status_t status;
+
+  status = fd_dev_put( dev, c);
+  if (status != fts_Success)
+    return status;
+
+  return fd_dev_flush( dev);
+}
+
+
+static void oss_midi_init( void)
+{
+  fts_dev_class_t *oss_midi_class;
+
+  oss_midi_class = fts_dev_class_new( fts_char_dev);
+
+  set_open_fun( oss_midi_class, oss_midi_open);
+  set_close_fun( oss_midi_class, oss_midi_close);
+  set_char_dev_get_fun( oss_midi_class, fd_dev_get);
+  set_char_dev_put_fun( oss_midi_class, oss_midi_put);
+
+  fts_dev_class_register( fts_new_symbol( "oss_midi"), oss_midi_class);
+}
+
+/******************************************************************************/
+/*                                                                            */
 /*                              Init function                                 */
 /*                                                                            */
 /******************************************************************************/
 
-void
-ossdev_init(void)
+void ossdev_init(void)
 {
   /* defaults and init for the shared data */
 
@@ -464,5 +531,7 @@ ossdev_init(void)
 
   oss_dac_init();
   oss_adc_init();
+
+  oss_midi_init();
 }
 
