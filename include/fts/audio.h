@@ -90,8 +90,6 @@ FTS_API void fts_audioport_remove_input_object( fts_audioport_t *port, int chann
 /*  3)  corresponding to default (idle function created by fts_audioport_idle() */
 #define fts_audioport_set_idle_function(P,F) (((fts_audioport_t *)(P))->idle_function = (F))
 
-FTS_API void fts_audioport_idle( fts_word_t *args);
-
 /* dac slip report:
  the audioport xrun function returns an int saying that there has been an xrun since last call
  the dspcontrol calls fts_audioport_report_xrun to know the state of xrun

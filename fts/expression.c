@@ -352,21 +352,25 @@ static void expression_stack_init( fts_expression_t *exp)
 /*
  * Utility functions for creating objects
  */
-static fts_object_t *create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, int skip)
+static fts_object_t *create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, int offset)
 {
   fts_template_t *template;
   fts_class_t *cl;
+  fts_object_t *obj = NULL;
 
   if ((template = fts_package_get_declared_template( package, class_name)) != NULL)
-    return fts_template_make_instance( template, patcher, ac, at);
+    obj = fts_template_make_instance( template, patcher, ac-offset, at+offset);
 
   if ((cl = fts_package_get_class( package, class_name)) != NULL)
-    return fts_object_create( cl, patcher, ac-skip, at+skip);
+    obj = fts_object_create( cl, patcher, ac-offset, at+offset);
 
   if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
-    return fts_template_make_instance( template, patcher, ac, at);
+    obj = fts_template_make_instance( template, patcher, ac-offset, at+offset);
 
-  return NULL;
+  if (obj)
+    fts_object_set_description( obj, ac, at);
+
+  return obj;
 }
 
 static fts_object_t *

@@ -1838,9 +1838,6 @@ static void
 patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
-  int n_inlets = fts_get_int_arg(ac, at, 0, 0);
-  int n_outlets = fts_get_int_arg(ac, at, 1, 0);
-  fts_atom_t va;
 
   /* raw patcher arguments (the FTS object description stays always "jpatcher") */
   this->description_ac = 0;
@@ -1853,16 +1850,6 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->n_outlets = 0;
 
   fts_patcher_set_standard(this);
-
-  this->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
-  fts_object_refer(this->args);
-
-  /* define the "args" name */
-  fts_set_object( &va, (fts_object_t *)this->args);
-  /*fts_name_set_value( this, fts_s_args, &va);*/
-
-  patcher_redefine_number_of_inlets(this, n_inlets);
-  patcher_redefine_number_of_outlets(this, n_outlets);
 
   /* init object list */
   this->objects = NULL;

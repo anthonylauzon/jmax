@@ -76,11 +76,26 @@ tuple_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+tuple_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_tuple_t *this = (fts_tuple_t *)o;
+  int index = fts_get_int_arg( ac, at, 0, -1);
+  fts_atom_t a;
+
+  if (index >= 0 && index < fts_array_get_size( &this->args))
+    {
+      fts_return( fts_array_get_atoms( &this->args) + index);
+    }
+}
+
+static void
 tuple_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_tuple_t), tuple_init, tuple_delete);
 
   fts_class_message_varargs(cl, fts_s_post, tuple_post);
+  fts_class_message_varargs(cl, fts_s_get_element, tuple_element);
+
   fts_class_set_equals_function(cl, tuple_equals);
 }
 

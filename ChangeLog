@@ -1,3 +1,7 @@
+2002-12-12  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fixed templates w.r.t. $args[] variable and object description
+
 2002-12-10  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 
 	* finalized method declaration API and outlet/message sending dispatcher

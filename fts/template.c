@@ -70,24 +70,34 @@ fts_template_redefine(fts_template_t *template, fts_symbol_t filename)
 fts_object_t *
 fts_template_make_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj;
+  fts_patcher_t *instance;
 
   fts_package_push(template->package);
 
-  obj = fts_binary_file_load( template->filename, (fts_object_t *) patcher, ac, at);
+  instance = (fts_patcher_t *)fts_binary_file_load( template->filename, (fts_object_t *)patcher, ac, at);
 
   fts_package_pop(template->package);
     
-  if (obj)
+  if (instance)
     {
-      fts_patcher_set_template((fts_patcher_t *)obj, template);
+      fts_atom_t va;
 
-      fts_object_set_description(obj, ac, at);
+      fts_template_add_instance( template, (fts_object_t *)instance);
 
-      fts_template_add_instance( template, obj);
+      fts_patcher_set_template( instance, template);
+
+      /* define the "args" name */
+      /* FIXME: should it be kept into the 'args' member of the patcher ?
+	 Probably not, because it is only accessed via the "args" variable
+	 and the binding is removed when the patcher is deleted */
+      instance->args = (fts_tuple_t *)fts_object_create( fts_tuple_class, NULL, ac, at);
+      fts_object_refer( instance->args);
+
+      fts_set_object( &va, (fts_object_t *)instance->args);
+      fts_name_set_value( instance, fts_s_args, &va);
     }
 
-  return obj;
+  return (fts_object_t *)instance;
 }
 
 
