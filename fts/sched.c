@@ -272,8 +272,8 @@ fts_sched_run(void)
 void 
 fts_sched_halt(void)
 {
-  fts_param_set_int(sched_running_param, 0);
   main_sched.status = sched_halted;
+  fts_param_set_int(sched_running_param, 0);
 }
 
 int fts_sched_is_running(void)
