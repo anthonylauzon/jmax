@@ -31,7 +31,7 @@ include Sources
 
 PACKAGELIB=$(LIBDIR)/libmidishare.so
 
-MODULE_CFLAGS=-I/u/worksta/schnell/projects/midishare/src/linux/Include
+MODULE_CFLAGS=-I/usr/include
 MORESOLIBS=-lMidiShare
 
 all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)

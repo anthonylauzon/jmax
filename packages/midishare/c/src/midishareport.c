@@ -28,64 +28,194 @@
 #include <MidiShare.h>
 #include "fts.h"
 
-typedef struct _midishareport_
-{
-  fts_midiport_t head;
-  int refnum;
-  fts_symbol_t name;
-} midishareport_t;
+#define SYSEX_REALTIME 0x7f
 
-void
-midishareport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static union magic{char word[4]; void *ptr;} jmax_magic = {{'j', 'm', 'a', 'x'}};
+
+/*************************************************
+ *
+ *  MidiShare references
+ *
+ *  This is the thing which is regitered to MidiShare for being connected.
+ *  A jMax application can register multiple references.
+ *
+ */
+
+static fts_hash_table_t midishare_reference_table;
+
+typedef struct _midishare_reference_
 {
-  midishareport_t *port = (midishareport_t *)o;
-  int n_events = MidiCountEvs(port->refnum);
+  fts_object_t head;
+  fts_symbol_t name;
+  int number;
+  fts_midiport_t *ports[256];
+  int count; /* reference count */
+} midishare_reference_t;
+
+#define midishare_refer(r) ((r)->count++)
+#define midishare_release(r) ((r)->count--)
+#define midishare_no_reference(r) ((r)->count == 0)
+#define midishare_port_is_free(r, p) ((r)->ports[p] == 0)
+
+static void midishareport_input_event(fts_midiport_t *port, MidiEvPtr evt);
+
+static void
+midishare_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midishare_reference_t *ref = (midishare_reference_t *)o;
+  int n_events = MidiCountEvs(ref->number);
   int i;
 
   for(i=0; i<n_events; i++) 
     {
-      MidiEvPtr evt = MidiGetEv(port->refnum);
-      int type = EvType(evt);
-      
-      switch(type)
-	{
-	case typeKeyOn:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_note, Chan(evt) + 1, MidiGetField(evt, 0), MidiGetField(evt, 1), 0.0);
-	  break;
-	case typeKeyOff:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_note, Chan(evt) + 1, MidiGetField(evt, 0), 0, 0.0);
-	  break;
-	case typeKeyPress:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_poly_pressure, Chan(evt) + 1, MidiGetField(evt, 0), MidiGetField(evt, 1), 0.0);
-	  break;
-	case typeCtrlChange:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_control_change, Chan(evt) + 1, MidiGetField(evt, 0), MidiGetField(evt, 1), 0.0);
-	  break;
-	case typeProgChange:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_program_change, Chan(evt) + 1, MidiGetField(evt, 0), 0, 0.0);
-	  break;
-	case typeChanPress:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_channel_pressure, Chan(evt) + 1, MidiGetField(evt, 0), MidiGetField(evt, 1), 0.0);
-	  break;
-	case typePitchWheel:
-	  fts_midiport_channel_message(&port->head, fts_midi_status_pitch_bend, Chan(evt) + 1, MidiGetField(evt, 0) + (MidiGetField(evt, 1) << 7), 0, 0.0);
-	  break;
-	case typeSysEx:
-	  {
-	    int size = MidiCountFields(evt);
-	    int j;
-	    
-	    for(j=0; j<size - 2; j++)
-	      fts_midiport_system_exclusive_add_byte(&port->head, MidiGetField(evt, j + 1));
-	    
-	    fts_midiport_system_exclusive(&port->head, 0.0);
-	  }
-	  
-	  break;
-	}
+      MidiEvPtr evt = MidiGetEv(ref->number);
+      int port = Port(evt);
 
-      MidiFreeEv(evt);
+      if(ref->ports[port])
+	midishareport_input_event(ref->ports[port], evt);
     }
+}
+
+static midishare_reference_t *
+midishare_reference_hash(fts_symbol_t name)
+{
+  fts_atom_t atom;
+
+  if(fts_hash_table_lookup(&midishare_reference_table, name, &atom))
+    return (midishare_reference_t *)fts_get_ptr(&atom);
+  else
+    return 0;
+}
+
+static midishare_reference_t *
+midishare_reference_new(fts_symbol_t name)
+{
+  int number;
+  midishare_reference_t *ref;
+  fts_atom_t atom;
+  int i;
+
+  /* establish connection to MidiShare */
+  number = MidiOpen((MidiName)fts_symbol_name(name));
+
+  /* set jMax magic word */
+  MidiSetInfo(number, jmax_magic.ptr);
+  
+  /* make new reference */
+  ref = fts_malloc(sizeof(midishare_reference_t));
+  
+  /* init reference */
+  ref->name = name;
+  ref->number = number;
+  
+  for(i=0; i<256; i++)
+    ref->ports[i] = 0;
+  
+  ref->count = 0;
+  
+  /* insert reference to hashtable */
+  fts_set_ptr(&atom, ref);
+  fts_hash_table_insert(&midishare_reference_table, name, &atom);
+
+  return ref;
+}
+
+static midishare_reference_t *
+midishare_register(fts_symbol_t name, int num, fts_midiport_t *port)
+{
+  if(MidiShare())
+    {
+      midishare_reference_t *ref = midishare_reference_hash(name);
+      
+      /* create new reference */
+      if(!ref)
+	ref = midishare_reference_new(name);
+
+      /* add MidiShare polling to the scheduler (for now it is one entry per reference) */
+      if(midishare_no_reference(ref))
+	fts_sched_add(fts_sched_get_current(), midishare_dispatch, (fts_object_t *)ref);
+
+      midishare_refer(ref);
+
+      /* register port */
+      if(ref->ports[num] == 0)
+	ref->ports[num] = port;
+	  
+      return ref;
+    }
+  else
+    return 0;
+}
+
+static void
+midishare_unregister(midishare_reference_t *ref, int num)
+{
+  ref->ports[num] = 0;
+
+  midishare_release(ref);
+
+  /* remove MidiShare polling from the scheduler */
+  if(midishare_no_reference(ref))
+    fts_sched_remove(fts_sched_get_current(), (fts_object_t *)ref);
+}
+
+/*************************************************
+ *
+ *  MidiShare port
+ *
+ */
+
+typedef struct _midishareport_
+{
+  fts_midiport_t head;
+  midishare_reference_t *ref;
+  int port;
+  MidiEvPtr sysex;
+} midishareport_t;
+
+static void
+midishareport_input_event(fts_midiport_t *port, MidiEvPtr evt)
+{
+  int type = EvType(evt);
+  
+  switch(type)
+    {
+    case typeKeyOn:
+      fts_midiport_input_note(port, Chan(evt) + 1, MidiGetField(evt, 0), MidiGetField(evt, 1), 0.0);
+      break;
+    case typeKeyOff:
+      fts_midiport_input_note(port, Chan(evt) + 1, MidiGetField(evt, 0), 0, 0.0);
+      break;
+    case typeKeyPress:
+      fts_midiport_input_poly_pressure(port, Chan(evt) + 1, MidiGetField(evt, 0), MidiGetField(evt, 1), 0.0);
+      break;
+    case typeCtrlChange:
+      fts_midiport_input_control_change(port, Chan(evt) + 1, MidiGetField(evt, 0), MidiGetField(evt, 1), 0.0);
+      break;
+    case typeProgChange:
+      fts_midiport_input_program_change(port, Chan(evt) + 1, MidiGetField(evt, 0), 0.0);
+      break;
+    case typeChanPress:
+      fts_midiport_input_channel_pressure(port, Chan(evt) + 1, MidiGetField(evt, 0), 0.0);
+      break;
+    case typePitchWheel:
+      fts_midiport_input_pitch_bend(port, Chan(evt) + 1, MidiGetField(evt, 0) + (MidiGetField(evt, 1) << 7), 0.0);
+      break;
+    case typeSysEx:
+      {
+	int size = MidiCountFields(evt);
+	int j;
+	
+	for(j=0; j<size - 2; j++)
+	  fts_midiport_input_system_exclusive_byte(port, MidiGetField(evt, j + 1));
+	
+	fts_midiport_input_system_exclusive_call(port, 0.0);
+      }
+      
+      break;
+    }
+  
+  MidiFreeEv(evt);
 }
 
 /************************************************************
@@ -95,152 +225,163 @@ midishareport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
  */
 
 static void
-midishareport_send_channel_message(fts_midiport_t *port, int status, int channel, int x, int y, double time)
+midishareport_send_note(fts_object_t *o, int channel, int number, int value, double time)
 {
-  midishareport_t *this = (midishareport_t *)port;
+  midishareport_t *this = (midishareport_t *)o;
 
-  channel--; /* 1 to 16 -> 0 to 15 */
-
-  switch(status)
-    {
-    case fts_midi_status_note:
-      {
-	MidiEvPtr evt = MidiNewEv(typeKeyOn);
-
-	Chan(evt) = channel & 0x0F;
-
-	MidiSetField(evt, 0, x & 127);
-	MidiSetField(evt, 1, y & 127);
-
-	MidiSendIm(this->refnum, evt);
-	
-	break;
-      }
-    case fts_midi_status_poly_pressure:
-      {
-	MidiEvPtr evt = MidiNewEv(typeKeyPress);
-
-	Chan(evt) = channel & 0x0F;
-
-	MidiSetField(evt, 0, x & 127);
-	MidiSetField(evt, 1, y & 127);
-
-	MidiSendIm(this->refnum, evt);
-	
-	break;
-      }
-    case fts_midi_status_control_change:
-      {
-	MidiEvPtr evt = MidiNewEv(typeCtrlChange);
-
-	Chan(evt) = channel & 0x0F;
-
-	MidiSetField(evt, 0, x & 127);
-	MidiSetField(evt, 1, y & 127);
-
-	MidiSendIm(this->refnum, evt);
-	
-	break;
-      }
-    case fts_midi_status_program_change:
-      {	
-	MidiEvPtr evt = MidiNewEv(typeProgChange);
-
-	Chan(evt) = channel & 0x0F;
-
-	MidiSetField(evt, 0, x & 127);
-
-	MidiSendIm(this->refnum, evt);
-	
-	break;
-      }
-    case fts_midi_status_channel_pressure:
-      {
-	MidiEvPtr evt = MidiNewEv(typeChanPress);
-
-	Chan(evt) = channel & 0x0F;
-
-	MidiSetField(evt, 0, x & 127);
-
-	MidiSendIm(this->refnum, evt);
-	
-	break;
-      }
-    case fts_midi_status_pitch_bend:
-      {
-	MidiEvPtr evt = MidiNewEv(typePitchWheel);
-
-	Chan(evt) = channel & 0x0F;
-	
-	MidiSetField(evt, 0, x & 127);
-	MidiSetField(evt, 1, (x >> 7) & 127);
-	
-	MidiSendIm(this->refnum, evt);
-	
-	break;
-      }
-    }
+  MidiEvPtr evt = MidiNewEv(typeKeyOn);
+  
+  Port(evt) = this->port;
+  Chan(evt) = (channel - 1) & 0x0F;
+  
+  MidiSetField(evt, 0, number & 127);
+  MidiSetField(evt, 1, value & 127);
+  
+  MidiSendIm(this->ref->number, evt);
 }
 
 static void
-midishareport_send_system_exclusive(fts_midiport_t *port, int ac, const fts_atom_t *at, double time)
+midishareport_send_poly_pressure(fts_object_t *o, int channel, int number, int value, double time)
 {
-  midishareport_t *this = (midishareport_t *)port;
-  MidiEvPtr evt = MidiNewEv(typeSysEx);
-  int i;
+  midishareport_t *this = (midishareport_t *)o;
 
-  Chan(evt) = 0;
+  MidiEvPtr evt = MidiNewEv(typeKeyPress);
 
-  for(i=0; i<ac; i++)
-    MidiAddField(evt, fts_get_int(at + i));
+  Port(evt) = this->port;
+  Chan(evt) = (channel - 1) & 0x0F;
 
-  MidiSendIm(this->refnum, evt);
+  MidiSetField(evt, 0, number & 127);
+  MidiSetField(evt, 1, value & 127);
+
+  MidiSendIm(this->ref->number, evt);
 }
+
+static void
+midishareport_send_control_change(fts_object_t *o, int channel, int number, int value, double time)
+{
+  midishareport_t *this = (midishareport_t *)o;
+
+  MidiEvPtr evt = MidiNewEv(typeCtrlChange);
+
+  Port(evt) = this->port;
+  Chan(evt) = (channel - 1) & 0x0F;
+
+  MidiSetField(evt, 0, number & 127);
+  MidiSetField(evt, 1, value & 127);
+
+  MidiSendIm(this->ref->number, evt);
+}
+
+static void
+midishareport_send_program_change(fts_object_t *o, int channel, int value, double time)
+{	
+  midishareport_t *this = (midishareport_t *)o;
+
+  MidiEvPtr evt = MidiNewEv(typeProgChange);
+
+  Port(evt) = this->port;
+  Chan(evt) = (channel - 1) & 0x0F;
+
+  MidiSetField(evt, 0, value & 127);
+
+  MidiSendIm(this->ref->number, evt);
+}
+
+static void
+midishareport_send_channel_pressure(fts_object_t *o, int channel, int value, double time)
+{
+  midishareport_t *this = (midishareport_t *)o;
+
+  MidiEvPtr evt = MidiNewEv(typeChanPress);
+
+  Port(evt) = this->port;
+  Chan(evt) = (channel - 1) & 0x0F;
+
+  MidiSetField(evt, 0, value & 127);
+
+  MidiSendIm(this->ref->number, evt);
+}
+
+static void
+midishareport_send_pitch_bend(fts_object_t *o, int channel, int value, double time)
+{
+  midishareport_t *this = (midishareport_t *)o;
+
+  MidiEvPtr evt = MidiNewEv(typePitchWheel);
+
+  Port(evt) = this->port;
+  Chan(evt) = (channel - 1) & 0x0F;
+	
+  MidiSetField(evt, 0, value & 127);
+  MidiSetField(evt, 1, (value >> 7) & 127);
+	
+  MidiSendIm(this->ref->number, evt);
+}
+
+static void
+midishareport_send_system_exclusive_byte(fts_object_t *o, int value)
+{
+  midishareport_t *this = (midishareport_t *)o;
+
+  if(this->sysex == 0)
+    {
+      this->sysex = MidiNewEv(typeSysEx);
+
+      Port(this->sysex) = this->port;
+      Chan(this->sysex) = 0;
+      
+      /* send sysex real-time message */
+      MidiAddField(this->sysex, SYSEX_REALTIME);
+    }
+  
+  MidiAddField(this->sysex, value);
+}
+
+static void
+midishareport_send_system_exclusive_flush(fts_object_t *o, double time)
+{
+  midishareport_t *this = (midishareport_t *)o;
+
+  /* send sysex event to MidiShare */
+  MidiSendIm(this->ref->number, this->sysex);
+
+  /* reset sysex event */
+  this->sysex = 0;
+}
+
+static fts_midiport_output_functions_t midishareport_output_functions =
+{
+  midishareport_send_note,
+  midishareport_send_poly_pressure,
+  midishareport_send_control_change,
+  midishareport_send_program_change,
+  midishareport_send_channel_pressure,
+  midishareport_send_pitch_bend,
+  midishareport_send_system_exclusive_byte,
+  midishareport_send_system_exclusive_flush,
+};
 
 /************************************************************
  *
- *  object
+ *  methods
  *
  */
 
 static void
-midishareport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midishareport_reset_unused(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midishareport_t *this = (midishareport_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-
-  fts_midiport_init(&this->head);
-
-  this->refnum = -1;
-  this->name = 0;
-
-  if(name)
-    {
-      if (MidiShare())
-	this->refnum = MidiOpen((MidiName)fts_symbol_name(name));
-      else
-	{
-	  post("midishareport: didn't find MidiShare");
-	}
-
-      this->name = name;
-    }
+  int refnum;
+  int i;
   
-  if(this->refnum >= 0)
+  for(i=1; i<=MidiCountAppls(); ++i)
     {
-      fts_midiport_set_input(&this->head);
-      fts_midiport_set_output(&this->head, midishareport_send_channel_message, midishareport_send_system_exclusive);
+      refnum = MidiGetIndAppl(i);
 
-      fts_sched_add(fts_sched_get_current(), midishareport_dispatch, o);
+      post("Midishare (%d): '%s': %p\n", refnum, MidiGetName(refnum), MidiGetInfo(refnum));
+
+      /*MidiClose(refnum);*/
     }
-}
-
-static void 
-midishareport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midishareport_t *this = (midishareport_t *)o;
-
-  MidiClose(this->refnum);
 }
 
 /************************************************************
@@ -261,13 +402,14 @@ midishareport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_
  *  default port
  *
  */
+
 /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 extern fts_symbol_t fts_midi_hack_default_device_name;
 /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 
-midishareport_t *midishareport_default = 0;
+static midishareport_t *midishareport_default = 0;
 
-fts_midiport_t *
+static fts_midiport_t *
 midishareport_get_default(void)
 {
   if(!midishareport_default && fts_midi_hack_default_device_name)
@@ -289,20 +431,103 @@ midishareport_get_default(void)
  *  class
  *
  */
+
+static int
+midishareport_check(int ac, const fts_atom_t *at, fts_symbol_t *name, int *port)
+{
+  midishare_reference_t *ref;
+
+  if(ac > 0 && fts_is_symbol(at))
+    {
+      *name = fts_get_symbol(at);
+      
+      /* skip MidiShare name */
+      ac--;
+      at++;
+    }
+  else
+    *name = fts_new_symbol("jmax");
+  
+  if(ac > 0 && fts_is_int(at))
+    {
+      int p = fts_get_int(at);
+	  
+      if(p >= 0 && p < 256)
+	*port = p;
+      else
+	return 0;
+    }
+  else
+    *port = 0;
+
+  ref = midishare_reference_hash(*name);
+
+  if(ref && !midishare_port_is_free(ref, *port))
+    return 0;
+
+  return 1;
+}
+
+static void
+midishareport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midishareport_t *this = (midishareport_t *)o;
+  fts_symbol_t name = 0;
+  midishare_reference_t *ref;
+  int port = 0;
+  
+  midishareport_check(ac - 1, at + 1, &name, &port);
+
+  fts_midiport_init(&this->head);
+  fts_midiport_set_input(&this->head);
+  fts_midiport_set_output(&this->head, &midishareport_output_functions);
+  
+  this->ref = midishare_register(name, port, &this->head);
+  this->port = port;
+  this->sysex = 0;
+}
+
+static void 
+midishareport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midishareport_t *this = (midishareport_t *)o;
+  
+  midishare_unregister(this->ref, this->port);
+}
+
+static int 
+midishareport_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+{ 
+  fts_symbol_t name;
+  int port;
+
+  return midishareport_check(ac1 - 1, at1 + 1, &name, &port);
+}
+
 static fts_status_t
 midishareport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(midishareport_t), 1, 0, 0);
+  fts_symbol_t name;
+  int port;
 
-  fts_midiport_class_init(cl);
+  if(midishareport_check(ac - 1, at + 1, &name, &port))
+    {
+      fts_class_init(cl, sizeof(midishareport_t), 1, 0, 0);
+      
+      fts_midiport_class_init(cl);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midishareport_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midishareport_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midishareport_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midishareport_delete);
-
-  /* define variable */
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
-
-  return fts_Success;
+      fts_method_define_varargs(cl, 0, fts_new_symbol("reset_unused"), midishareport_reset_unused);
+    
+      /* define variable */
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
+      
+      return fts_Success;
+    }
+     
+  return &fts_CannotInstantiate;
 }
 
 void
@@ -310,7 +535,28 @@ midishareport_config(void)
 {
   fts_midiport_set_default_function(midishareport_get_default);
 
-  fts_class_install(fts_new_symbol("midishareport"), midishareport_instantiate);
+  fts_hash_table_init(&midishare_reference_table);
+
+  fts_metaclass_install(fts_new_symbol("midishareport"), midishareport_instantiate, midishareport_equiv);
 }
 
-fts_module_t midishare_module = {"midishare", "midishare MIDI classes", midishareport_config, 0, 0};
+void
+midishareport_cleanup(void)
+{
+  fts_hash_table_iterator_t hi;
+
+  /* close all registered connections to MidiShare */
+  for(fts_hash_table_iterator_init(&hi, &midishare_reference_table); !fts_hash_table_iterator_end(&hi); fts_hash_table_iterator_next(&hi))
+    {
+      fts_atom_t *atom = fts_hash_table_iterator_current_data(&hi);
+      midishare_reference_t *ref = (midishare_reference_t *)fts_get_ptr(atom);
+      
+      /* close MidiShare application */
+      MidiClose(ref->number);
+      
+      /* free reference */
+      fts_free(ref);  
+    }
+}
+
+fts_module_t midishare_module = {"midishare", "midishare MIDI classes", midishareport_config, midishareport_cleanup, 0};
