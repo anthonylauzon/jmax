@@ -104,6 +104,8 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(fts_is_number(at))
     metro_set_period(o, 0, 0, 1, at);
+  else
+    this->period = 100;
 }
 
 

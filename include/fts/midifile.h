@@ -52,6 +52,8 @@ struct _fts_midifile_
 
   fts_midifile_read_functions_t *read;
 
+  double time; /* current time in msec */
+  double time_conv; /* delta time / delta ticks */
   int ticks; /* current time in delta-time units */
   int bytes; /* writing: file offset at the beginning of the track, reading: bytes left to be read */
   int size; /* writing: file size in bytes */
@@ -71,6 +73,8 @@ struct _fts_midifile_
 #define fts_midifile_get_format(f) ((f)->format)
 #define fts_midifile_get_error(f) ((f)->error)
 
+#define fts_midifile_get_time(f) ((f)->time)
+
 #define fts_midifile_set_user_data(f, p) ((f)->user = (void *)(p))
 #define fts_midifile_get_user_data(f) ((f)->user)
 
@@ -79,10 +83,8 @@ struct _fts_midifile_
  *  time
  *
  */
-FTS_API int fts_midifile_time_to_ticks(fts_midifile_t *file, double msecs);
-
 #define fts_midifile_get_ticks(f) ((f)->ticks)
-FTS_API double fts_midifile_get_time(fts_midifile_t *file);
+FTS_API int fts_midifile_time_to_ticks(fts_midifile_t *file, double msecs);
 
 /*************************************************************
  *

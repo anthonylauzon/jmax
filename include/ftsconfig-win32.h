@@ -26,6 +26,12 @@
 #define M_PI  3.1415926535897932384626433832795
 #endif
 
+/* Don't warn about:
+   - unused variables
+   - double to float and int to float conversion
+*/
+#pragma warning( disable : 4101 4244 )  
+
 /* defines for included headers */
 #undef HAVE_UNISTD_H 
 #undef HAVE_ALLOCA_H 

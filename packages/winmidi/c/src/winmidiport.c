@@ -39,7 +39,8 @@
 #define WINMIDI_SYSEXIN   0
 
 #define BUFFER_SIZE 1024
-#define SYSEX_BUFFER_SIZE 1024
+#define SYSEX_HEADER_SIZE 1024
+#define SYSEX_BUFFER_SIZE 32768
 
 #define NOTEOFF 0x80
 #define NOTEON 0x90
@@ -78,18 +79,23 @@ typedef struct _winmidiport_t
   fts_midiport_t port;
   HMIDIOUT hmidiout;
   HMIDIIN hmidiin;
-  MIDIHDR outhdr[2];
+
   CRITICAL_SECTION critical_section;
-  int cur_outhdr;
+
 #if WINMIDI_SYSEXIN
   MIDIHDR inhdr[2];
 #endif
+
   DWORD incoming[BUFFER_SIZE];
   int head;
   int tail;
   unsigned int flags;
 
   int midiin_state;
+
+  MIDIHDR sysex_hdr;
+  unsigned char sysex_buffer[SYSEX_BUFFER_SIZE];
+  unsigned int sysex_count;
 
 } winmidiport_t;
 
@@ -268,23 +274,30 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
 
   if (this->hmidiout != NULL) {
-    cur_fill = this->cur_outhdr;
-    cur_send = 1 - this->cur_outhdr;
 
-    /* check if the outgoing message is finished. If we have new data to
-     be send, swap the two sysex buffers. */
-    if ((this->outhdr[cur_send].dwFlags & MHDR_DONE) 
-	&& (this->outhdr[cur_fill].dwBytesRecorded > 0)) {
-      midiOutUnprepareHeader(this->hmidiout, &this->outhdr[cur_send], sizeof(MIDIHDR));
-      this->outhdr[cur_send].dwFlags = 0;
-      this->outhdr[cur_send].dwBytesRecorded = 0;
-      this->cur_outhdr = cur_send;
+    /* check if the outgoing sysex message is finished. */
+    if (this->sysex_hdr.dwFlags & MHDR_DONE) {
+      midiOutUnprepareHeader(this->hmidiout, &this->sysex_hdr, sizeof(MIDIHDR));
+      this->sysex_hdr.dwFlags = 0;
+      this->sysex_hdr.dwBytesRecorded = 0;
+    }
+    
+    /* Check if there's new data to send */
+    if ((this->sysex_count > 0) && (this->sysex_hdr.dwFlags == 0)) {
 
-      res = midiOutPrepareHeader(this->hmidiout, &this->outhdr[cur_fill], sizeof(MIDIHDR));
+      this->sysex_hdr.dwFlags = 0;
+      this->sysex_hdr.dwBufferLength = this->sysex_count;      
+      this->sysex_hdr.dwBytesRecorded = this->sysex_count;
+
+      memcpy(this->sysex_hdr.lpData, &this->sysex_buffer[0], this->sysex_count);
+
+      res = midiOutPrepareHeader(this->hmidiout, &this->sysex_hdr, sizeof(MIDIHDR));
+      
       if (res == MMSYSERR_NOERROR) {
-	res = midiOutLongMsg(this->hmidiout, &this->outhdr[cur_fill], sizeof(MIDIHDR));
+	res = midiOutLongMsg(this->hmidiout, &this->sysex_hdr, sizeof(MIDIHDR));
+	this->sysex_count = 0;
       }	  
-
+      
       if (res != MMSYSERR_NOERROR) {
 	char msg[256];
 	midiOutGetErrorText(res, &msg[0], 256);
@@ -353,29 +366,20 @@ winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 	  int i;
 	  int size = fts_midievent_system_exclusive_get_size(event);
 	  fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
-	  int cur = this->cur_outhdr;
-	  int len = this->outhdr[cur].dwBufferLength;
-	  unsigned char* buffer = (unsigned char*) this->outhdr[cur].lpData;
-	  int n = this->outhdr[cur].dwBytesRecorded;
-	  
-	  buffer[n++] = SYSEX;
-	  if (n == len) {
-	    buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
+
+	  /* FIXME: If we can't store the message, drop it for
+	     now. (FIXME means that this has to be fixed ;) */
+	  if (this->sysex_count + size + 2 > SYSEX_BUFFER_SIZE) {
+	    return;
 	  }
-	  
+
+	  this->sysex_buffer[this->sysex_count++] = SYSEX;
+
 	  for (i = 0; i < size; i++) {
-	    buffer[n++] = fts_get_int(atoms + i) & 0x7f;
-	    if (n == len) {
-	      buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
-	    }
+	    this->sysex_buffer[this->sysex_count++] = fts_get_int(atoms + i) & 0x7f;
 	  }
 	  
-	  buffer[n++] = SYSEX_END;
-	  if (n == len) {
-	    buffer = winmidiport_realloc_sysex_buffer(&this->outhdr[cur], len + SYSEX_BUFFER_SIZE);
-	  }
-	  
-	  this->outhdr[cur].dwBytesRecorded = n;	
+	  this->sysex_buffer[this->sysex_count++] = SYSEX_END;	  
 	}
 	break;
 	
@@ -460,8 +464,9 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
   this->tail = 0;
   this->hmidiout = NULL;
   this->hmidiin = NULL;
-  this->cur_outhdr = 0;
   this->midiin_state = 0;
+
+  this->sysex_count = 0;
 
   /* check for the device name */
   devname = fts_get_symbol_arg(ac, at, 0, fts_s_default);
@@ -582,14 +587,12 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 	}
       }
 	
-      /* setup the buffers for outgoing sysex messages */
-      for (i = 0; i < 2; i++) {
-	this->outhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
-	this->outhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
-	this->outhdr[i].dwBytesRecorded = 0;
-	this->outhdr[i].dwUser = i;
-	this->outhdr[i].dwFlags = (i == 0)? 0 : MHDR_DONE; 
-      }
+      this->sysex_hdr.lpData = fts_malloc(SYSEX_BUFFER_SIZE);
+      this->sysex_hdr.dwBufferLength = SYSEX_BUFFER_SIZE;
+      this->sysex_hdr.dwBytesRecorded = 0;
+      this->sysex_hdr.dwUser = 0;
+      this->sysex_hdr.dwFlags = 0;
+
     }
   }
     
@@ -656,8 +659,8 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
     fts_log("[winmidiport]: Setting up buffers for sysex message\n");
 
     for (i = 0; i < 2; i++) {
-      this->inhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
-      this->inhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
+      this->inhdr[i].lpData = fts_malloc(SYSEX_HEADER_SIZE);
+      this->inhdr[i].dwBufferLength = SYSEX_HEADER_SIZE;
       this->inhdr[i].dwBytesRecorded = 0;
       this->inhdr[i].dwUser = i;
       this->inhdr[i].dwFlags = 0;
@@ -738,18 +741,10 @@ winmidiport_close(fts_object_t *o)
       fts_log("[winmidiport]: midiOutReset returned an error\n");      
     }
 
-    /* make sure everything is flushed */
-    for (i = 0; i < 2; i++) {
-      if ((this->outhdr[i].dwFlags != 0) && 
-	  (err = midiOutUnprepareHeader(hmidiout, &this->outhdr[i], sizeof(MIDIHDR))) != MMSYSERR_NOERROR) {
-	if (err == MIDIERR_STILLPLAYING) {
-	  fts_log("[winmidiport]: midiOutUnprepareHeader returned MIDIERR_STILLPLAYING\n");      
-	} else {
-	  fts_log("[winmidiport]: midiOutUnprepareHeader returned an error\n");      
-	}
-      }
+    if (this->sysex_hdr.dwFlags != 0) {
+      midiOutUnprepareHeader(hmidiout, &this->sysex_hdr, sizeof(MIDIHDR));
     }
-    
+
     if ((err = midiOutClose(hmidiout)) != MMSYSERR_NOERROR) {
       if (err == MIDIERR_STILLPLAYING) {
 	fts_log("[winmidiport]: midiOutClose returned MIDIERR_STILLPLAYING\n");      
@@ -758,11 +753,9 @@ winmidiport_close(fts_object_t *o)
       }
     }
 
-    for (i = 0; i < 2; i++) {
-      if (this->outhdr[i].lpData != NULL) {
-	fts_free(this->outhdr[i].lpData);
-	this->outhdr[i].lpData = NULL;
-      }
+    if (this->sysex_hdr.lpData != NULL) {
+      fts_free(this->sysex_hdr.lpData);
+      this->sysex_hdr.lpData = NULL;
     }
   }
 

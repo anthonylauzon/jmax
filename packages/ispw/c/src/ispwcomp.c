@@ -29,7 +29,7 @@
 void
 ispwcomp_config(void)
 {
-  fts_alias_install(fts_new_symbol("s"), fts_s_send);
-  fts_alias_install(fts_new_symbol("r"), fts_s_receive);
+  fts_alias_install(fts_new_symbol("s"), fts_s_inlet);
+  fts_alias_install(fts_new_symbol("r"), fts_s_outlet);
 }
 

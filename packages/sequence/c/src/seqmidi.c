@@ -71,23 +71,21 @@ get_stripped_file_name_with_index(char *name_str, fts_symbol_t name, int index)
  */
 typedef struct _seqmidi_read_data_
 {
-  sequence_t *sequence;
+  sequence_t *sequence; 
   track_t *track;
+  track_t *merge; 
   int track_index;
-
-  event_t *note_is_on[n_midi_channels][n_midi_notes]; /* table for reading notes */
-
-  double tempo; /* relative tempo */
-
   int size; /* number of event read */
+  event_t *note_is_on[n_midi_channels][n_midi_notes]; /* table for reading notes */
 } seqmidi_read_data_t;
 
 static void
 seqmidi_read_data_init(seqmidi_read_data_t *data)
 {
   data->sequence = 0;
-  data->track = 0;
   data->track_index = 0;
+  data->track = 0;
+  data->merge = 0;
   data->size = 0;
 } 
 
@@ -111,6 +109,15 @@ miditrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   track_append_event(track, time, event);
 
   data->size++;
+}
+
+static void
+miditrack_read_track_end(fts_midifile_t *file)
+{
+  seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
+
+  /* merge to track */
+  track_merge(data->merge, data->track);
 }
 
 static void
@@ -180,6 +187,7 @@ notetrack_read_track_end(fts_midifile_t *file)
 	  }
     }
 
+  track_merge(data->merge, data->track);
   data->track_index++;
 }
 
@@ -199,7 +207,7 @@ inttrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
       event_t *event;
       fts_atom_t a;
       
-      if(type <= fts_midievent_is_control_change(midievt))
+      if(fts_midievent_is_control_change(midievt))
 	value = fts_midievent_channel_message_get_second(midievt);
 
       fts_set_int(&a, value);
@@ -264,16 +272,14 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
   fts_midifile_read_functions_init(&read);
   fts_midifile_set_read_functions(file, &read);
   
-  if(track_get_type(track) == fts_s_midievent)
+  if(track_get_type(track) == fts_s_midievent || track_get_type(track) == fts_s_void)
     {
-      data.track = track;
+      read.track_end = miditrack_read_track_end;
       read.midi_event = miditrack_read_midievent;
-    } 
+    }
   else if(track_get_type(track) == seqsym_note)
     {
       int i, j;
-
-      data.track = track;
 
       /* set oll notes to off */
       for(i=0; i<n_midi_channels; i++)
@@ -285,13 +291,21 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
     }
   else if(track_get_type(track) == fts_s_int)
     {
+      read.track_end = miditrack_read_track_end;
       read.midi_event = inttrack_read_midievent;
     }
   else
     return 0;
  
+  data.merge = track; /* merge all MIDI tracks */
+
+  data.track = (track_t *)fts_object_create(track_class, 0, 0); /* read to temporary track */
+  fts_object_refer(data.track);
+
   fts_midifile_read(file);
   
+  fts_object_release(data.track);
+
   return data.size;
 }
 
@@ -315,7 +329,8 @@ sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
   read.track_end = sequence_read_track_end;
   
   fts_midifile_read(file);
-  
+
+  /* be sure that this is cleaned */
   if(data.track)
     fts_object_release(data.track);
 

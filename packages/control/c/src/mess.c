@@ -20,17 +20,9 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
- *
  */
 
 #include <fts/fts.h>
-
-/************************************************************
- *
- *  object
- *
- */
 
 typedef struct 
 {
@@ -39,12 +31,6 @@ typedef struct
   fts_symbol_t selector;
   fts_method_t method;
 } mess_t;
-
-/************************************************************
- *
- *  user methods
- *
- */
 
 static void
 mess_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -82,10 +68,12 @@ mess_set_selector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       this->selector = selector;
 
       if(this->object)
-	fts_object_release(this->object);
-
-      this->object = 0;
-      this->method = 0;
+	{
+	  fts_object_release(this->object);
+	  
+	  this->object = 0;
+	  this->method = 0;
+	}
     }
 }
 
@@ -161,12 +149,22 @@ mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_object_set_error(o, "Wrong arguments");
 }
 
+static void
+mess_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  mess_t *this = (mess_t *)o;
+
+  if(this->object)
+    fts_object_release(this->object);
+}
+  
 static fts_status_t
 mess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(mess_t), 2, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mess_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, mess_delete);
 
   fts_method_define_varargs(cl, 0, fts_s_int, mess_args);
   fts_method_define_varargs(cl, 0, fts_s_float, mess_args);

@@ -50,11 +50,13 @@
 #define	SMPTE_OFFSET 0x54
 #define	TIME_SIGNATURE 0x58
 #define	KEY_SIGNATURE 0x59
-#define	SEQUENCER_SPECIFIC 0x74
+#define	SEQUENCER_SPECIFIC 0x7f
 
 /* magic strings */
 #define MThd 0x4d546864
 #define MTrk 0x4d54726b
+
+#define FTS_MIDIFILE_DEFAULT_TEMPO 500000
 
 /*************************************************************
  *
@@ -240,6 +242,16 @@ midifile_read_header(fts_midifile_t *file)
   file->n_tracks = read16bit(file);
   file->division = read16bit(file);
 
+  if(file->division > 0)
+    file->time_conv = 0.001 * FTS_MIDIFILE_DEFAULT_TEMPO / (double)file->division;
+  else
+    {
+      double smpte_format = (file->division & 0xff00) >> 8;
+      double smpte_resolution = file->division & 0xff;
+
+      file->time_conv = 1000.0 / (smpte_format * smpte_resolution);
+    }
+
   if(!file->error && file->read->header)
     (*file->read->header)(file);
 
@@ -270,7 +282,10 @@ midifile_read_track(fts_midifile_t *file)
     }
 
   file->bytes = read32bit(file);
+
+  /* time starts at zero */
   file->ticks = 0;
+  file->time = 0.0;
 
   if (!file->error && file->read->track_start)
     (*file->read->track_start)(file);
@@ -279,9 +294,12 @@ midifile_read_track(fts_midifile_t *file)
     {
       int data1 = 0;
       int data2 = 0;
+      int ticks = readvarinum(file);
       int byte;
 
-      file->ticks += readvarinum(file); /* delta time */
+      file->ticks += ticks; /* delta time in ticks */
+      file->time += ticks * file->time_conv; /* delta time in msec */
+
       byte = readbyte(file);
       
       if(byte == EOF)
@@ -453,6 +471,9 @@ midifile_read_track(fts_midifile_t *file)
 		  int b2 = readbyte(file);
 		
 		  file->tempo = (b0 << 16) + (b1 << 8) + b2;
+
+		  if(file->division > 0)
+		    file->time_conv = 0.001 * (double)file->tempo / (double)file->division;
 		
 		  if (file->read->tempo)
 		    (*file->read->tempo)(file);
@@ -494,8 +515,31 @@ midifile_read_track(fts_midifile_t *file)
 		  if (file->read->key_signature)
 		    (*file->read->key_signature)(file, n_sharps_or_flats, major_or_minor);
 		  break;
+		}
+
+	      case SEQUENCER_SPECIFIC:
+		{
+		  /* sequencer specific data */
+		  midifile_string_clear(file);
 		  
-		default:
+		  while (file->bytes > lookfor)
+		    midifile_string_add_char(file, readbyte(file));
+		  
+		  /* ignore data */
+
+		  break;
+		}
+
+	      default:
+		{
+		  /* unknown meta event */
+		  midifile_string_clear(file);
+		  
+		  while (file->bytes > lookfor)
+		    midifile_string_add_char(file, readbyte(file));
+		  
+		  /* ignore data */
+		  
 		  break;
 		}
 	      }
@@ -656,6 +700,7 @@ fts_midifile_write_track_begin(fts_midifile_t *file)
   write32bit(file, 0); /* write length as 0 and correct later */
 
   file->ticks = 0; /* time starts from zero */
+  file->time = 0.0;
   file->size = 0; /* the header's length doesn't count */
 
   return 1;
@@ -845,7 +890,7 @@ fts_midifile_init(fts_midifile_t *file, FILE *fp, fts_symbol_t name)
   file->format = 0;
   file->n_tracks = 0;
   file->division = 0;
-  file->tempo = 50000;
+  file->tempo = FTS_MIDIFILE_DEFAULT_TEMPO;
 
   file->read = 0;
 
@@ -940,20 +985,6 @@ return i;
  *  timing
  *
  */
-
-double
-fts_midifile_get_time(fts_midifile_t *file)
-{
-  if(file->division > 0)
-    return (double)0.001 * (double)file->ticks * (double)file->tempo / (double)file->division;
-  else
-    {
-      double smpte_format = (file->division & 0xff00) >> 8;
-      double smpte_resolution = file->division & 0xff;
-
-      return (double)0.001 * (double)file->ticks / (smpte_format * smpte_resolution);
-    }
-}
 
 int
 fts_midifile_time_to_ticks(fts_midifile_t *file, double time)

@@ -292,7 +292,6 @@ track_merge(track_t *track, track_t *merge)
 	  insert_event_before(track, here, event);
 	  
 	  event_set_track(event, track);
-	  event_set_time(event, time);
 	  
 	  event = next;
 	}
@@ -302,8 +301,17 @@ track_merge(track_t *track, track_t *merge)
       track->first = merge->first;
       track->last = merge->last;
       track->size = merge->size;
-    }  
-  
+
+      while(event)
+	{
+	  event_t *next = event_get_next(event);
+	  
+	  event_set_track(event, track);
+	  
+	  event = next;
+	}
+    }
+
   /* merge track is empty */
   merge->first = 0;
   merge->last = 0;

@@ -211,7 +211,6 @@ pipe_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_atom_t sat[2];
   int i;
 
   ac--; 
@@ -241,8 +240,8 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, i, fts_s_symbol, pipe_atom_middle);
     }
 
-  fts_method_define_varargs(cl, i, fts_s_int, pipe_atom_delay);
-  fts_method_define_varargs(cl, i, fts_s_float, pipe_atom_delay);
+  fts_method_define_varargs(cl, ac - 1, fts_s_int, pipe_atom_delay);
+  fts_method_define_varargs(cl, ac - 1, fts_s_float, pipe_atom_delay);
 
   return fts_Success;
 }
