@@ -25,10 +25,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "ftsdll - Win32 Release"
 
 OUTDIR=.\..\fts\lib
@@ -60,7 +56,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ftlmem.obj"
 	-@erase "$(INTDIR)\fts.obj"
 	-@erase "$(INTDIR)\hashtable.obj"
-	-@erase "$(INTDIR)\inout.obj"
+	-@erase "$(INTDIR)\label.obj"
 	-@erase "$(INTDIR)\list.obj"
 	-@erase "$(INTDIR)\loader.obj"
 	-@erase "$(INTDIR)\mem.obj"
@@ -105,8 +101,42 @@ CLEAN :
 "$(INTDIR)" :
     if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+
+.c{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
+RSC=rc.exe
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
 BSC32_SBRS= \
@@ -136,7 +166,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\ftlmem.obj" \
 	"$(INTDIR)\fts.obj" \
 	"$(INTDIR)\hashtable.obj" \
-	"$(INTDIR)\inout.obj" \
 	"$(INTDIR)\list.obj" \
 	"$(INTDIR)\loader.obj" \
 	"$(INTDIR)\mem.obj" \
@@ -169,7 +198,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\variable.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj"
+	"$(INTDIR)\win32.obj" \
+	"$(INTDIR)\label.obj"
 
 "..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -207,7 +237,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ftlmem.obj"
 	-@erase "$(INTDIR)\fts.obj"
 	-@erase "$(INTDIR)\hashtable.obj"
-	-@erase "$(INTDIR)\inout.obj"
+	-@erase "$(INTDIR)\label.obj"
 	-@erase "$(INTDIR)\list.obj"
 	-@erase "$(INTDIR)\loader.obj"
 	-@erase "$(INTDIR)\mem.obj"
@@ -255,8 +285,42 @@ CLEAN :
 "$(INTDIR)" :
     if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+
+.c{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
+RSC=rc.exe
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
 BSC32_SBRS= \
@@ -286,7 +350,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\ftlmem.obj" \
 	"$(INTDIR)\fts.obj" \
 	"$(INTDIR)\hashtable.obj" \
-	"$(INTDIR)\inout.obj" \
 	"$(INTDIR)\list.obj" \
 	"$(INTDIR)\loader.obj" \
 	"$(INTDIR)\mem.obj" \
@@ -319,7 +382,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\variable.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj"
+	"$(INTDIR)\win32.obj" \
+	"$(INTDIR)\label.obj"
 
 "..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -327,36 +391,6 @@ LINK32_OBJS= \
 <<
 
 !ENDIF 
-
-.c{$(INTDIR)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(INTDIR)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(INTDIR)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
 
 
 !IF "$(NO_EXTERNAL_DEPS)" != "1"
@@ -501,9 +535,9 @@ SOURCE=..\fts\hashtable.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\inout.c
+SOURCE=..\fts\label.c
 
-"$(INTDIR)\inout.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\label.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -19,8 +19,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -36,7 +36,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -69,8 +68,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -86,7 +85,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -115,8 +113,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -132,7 +130,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -162,8 +159,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -179,7 +176,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -192,7 +188,6 @@
 	
 
 ..\fts\audio.c : \
-	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -211,8 +206,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -228,7 +223,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -260,8 +254,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -277,7 +271,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -308,8 +301,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -325,7 +318,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -354,8 +346,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -371,7 +363,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -384,7 +375,6 @@
 	
 
 ..\fts\client.c : \
-	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -403,8 +393,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -420,7 +410,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -433,6 +422,7 @@
 	"..\include\ftsprivate\client.h"\
 	"..\include\ftsprivate\connection.h"\
 	"..\include\ftsprivate\patcher.h"\
+	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\clipboard.c : \
@@ -454,8 +444,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -471,7 +461,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -505,8 +494,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -522,7 +511,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -558,8 +546,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -575,7 +563,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -604,8 +591,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -621,7 +608,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -655,8 +641,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -672,7 +658,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -705,8 +690,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -722,7 +707,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -753,8 +737,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -770,7 +754,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -785,7 +768,6 @@
 	
 
 ..\fts\file.c : \
-	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -804,8 +786,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -821,7 +803,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -831,6 +812,7 @@
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
+	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\fpe.c : \
@@ -852,8 +834,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -869,7 +851,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -899,8 +880,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -916,7 +897,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -945,8 +925,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -962,7 +942,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -991,8 +970,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1008,7 +987,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1039,8 +1017,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1056,7 +1034,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1066,7 +1043,7 @@
 	"..\include\fts\word.h"\
 	
 
-..\fts\inout.c : \
+..\fts\label.c : \
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -1085,8 +1062,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1102,7 +1079,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1110,7 +1086,6 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
-	"..\include\ftsprivate\inout.h"\
 	"..\include\ftsprivate\patcher.h"\
 	"..\include\ftsprivate\variable.h"\
 	
@@ -1134,8 +1109,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1151,7 +1126,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1180,8 +1154,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1197,7 +1171,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1229,8 +1202,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1246,7 +1219,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1276,8 +1248,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1293,7 +1265,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1323,8 +1294,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1340,7 +1311,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1369,8 +1339,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1386,7 +1356,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1415,8 +1384,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1432,7 +1401,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1476,8 +1444,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1493,7 +1461,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1522,8 +1489,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1539,7 +1506,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1569,8 +1535,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1586,7 +1552,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1598,7 +1563,6 @@
 	
 
 ..\fts\OLDclient.c : \
-	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -1617,8 +1581,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1634,7 +1598,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1658,6 +1621,7 @@
 	"..\include\ftsprivate\saver.h"\
 	"..\include\ftsprivate\symbol.h"\
 	"..\include\ftsprivate\template.h"\
+	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\package.c : \
@@ -1679,8 +1643,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1696,7 +1660,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1736,8 +1699,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1753,7 +1716,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1782,8 +1744,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1799,7 +1761,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1811,7 +1772,6 @@
 	"..\include\ftsprivate\connection.h"\
 	"..\include\ftsprivate\errobj.h"\
 	"..\include\ftsprivate\expression.h"\
-	"..\include\ftsprivate\inout.h"\
 	"..\include\ftsprivate\loader.h"\
 	"..\include\ftsprivate\object.h"\
 	"..\include\ftsprivate\objtable.h"\
@@ -1840,8 +1800,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1857,7 +1817,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1889,8 +1848,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1906,7 +1865,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1938,8 +1896,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -1955,7 +1913,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -1987,8 +1944,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2004,7 +1961,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2033,8 +1989,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2050,7 +2006,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2070,7 +2025,6 @@
 	
 
 ..\fts\sched.c : \
-	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -2089,8 +2043,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2106,7 +2060,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2116,6 +2069,7 @@
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
 	"..\include\ftsconfig.h"\
+	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\fts\selection.c : \
@@ -2137,8 +2091,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2154,7 +2108,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2184,8 +2137,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2201,7 +2154,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2232,8 +2184,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2249,7 +2201,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2278,8 +2229,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2295,7 +2246,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2324,8 +2274,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2341,7 +2291,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2373,8 +2322,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2390,7 +2339,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2419,8 +2367,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2436,7 +2384,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2465,8 +2412,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2482,7 +2429,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2520,8 +2466,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2537,7 +2483,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2566,8 +2511,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2583,7 +2528,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2615,8 +2559,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2632,7 +2576,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2646,7 +2589,6 @@
 	
 
 ..\fts\win32.c : \
-	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
@@ -2665,8 +2607,8 @@
 	"..\include\fts\ftlmem.h"\
 	"..\include\fts\fts.h"\
 	"..\include\fts\hashtable.h"\
-	"..\include\fts\inout.h"\
 	"..\include\fts\iterator.h"\
+	"..\include\fts\label.h"\
 	"..\include\fts\mem.h"\
 	"..\include\fts\message.h"\
 	"..\include\fts\midi.h"\
@@ -2682,7 +2624,6 @@
 	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\project.h"\
 	"..\include\fts\property.h"\
-	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
 	"..\include\fts\soundfile.h"\
 	"..\include\fts\stack.h"\
@@ -2691,4 +2632,5 @@
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
 	"..\include\ftsconfig-win32.h"\
+	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	

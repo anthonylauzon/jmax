@@ -24,6 +24,7 @@
  *
  */
 #include <fts/fts.h>
+#include "message.h"
 
 fts_symbol_t message_symbol = 0;
 fts_type_t message_type = 0;

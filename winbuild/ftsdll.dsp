@@ -177,7 +177,7 @@ SOURCE=..\fts\hashtable.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\inout.c
+SOURCE=..\fts\label.c
 # End Source File
 # Begin Source File
 
