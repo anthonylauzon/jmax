@@ -53,6 +53,16 @@ fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
  *
  */
 
+static unsigned int default_hash_function( const fts_atom_t *p)
+{
+  return (unsigned int)fts_get_object( p) >> 3;;
+}
+
+static int default_equals_function( const fts_atom_t *p1, const fts_atom_t *p2)
+{
+  return fts_get_object( p1) == fts_get_object( p2);
+}
+
 fts_class_t *
 fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
@@ -61,6 +71,9 @@ fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   cl->name = name;
   cl->instantiate_fun = instantiate_fun;
   cl->typeid = typeid++;
+
+  fts_class_set_hash_function( cl, default_hash_function);
+  fts_class_set_equals_function( cl, default_equals_function);
 
   if(name != NULL)
     {
@@ -113,14 +126,12 @@ fts_class_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name)
      (required) packages to find the patcher class.  */
   pkg = fts_get_system_package();
 
-  cl = fts_package_get_class(pkg, class_name);
-  if (cl != NULL)
+  if ((cl = fts_package_get_class(pkg, class_name)) != NULL)
     return cl;
 
   /* ask the current package */
   pkg = fts_get_current_package();
-  cl = fts_package_get_class(pkg, class_name);
-  if (cl != NULL)
+  if ((cl = fts_package_get_class(pkg, class_name)) != NULL)
     return cl;
 
   /* ask the required packages of the current package */
@@ -131,9 +142,7 @@ fts_class_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name)
       fts_atom_t a;
 
       fts_iterator_next( &iter, &a);
-
-      cl = get_class( fts_get_symbol( &a), class_name);
-      if (cl != NULL)
+      if ((cl = get_class( fts_get_symbol( &a), class_name)) != NULL)
 	return cl;
   }
 
@@ -277,11 +286,11 @@ fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, ft
   cl->constructor = (constructor != NULL) ? constructor: dummy_method;
   cl->deconstructor = (deconstructor != NULL) ? deconstructor: dummy_method;
 
-  cl->messages= fts_hashtable_new( fts_symbol_class, FTS_HASHTABLE_MEDIUM);
+  cl->messages= fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
   cl->default_handler = fts_class_default_error_handler;
 
   cl->ninlets = 0;
-  cl->inlets = fts_hashtable_new( fts_int_class, FTS_HASHTABLE_MEDIUM);
+  cl->inlets = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
 
   cl->noutlets = 0;
   cl->out_alloc = 0;
@@ -493,9 +502,9 @@ void fts_kernel_class_init( void)
   fts_class_class->heap = heap;
   fts_class_class->constructor = dummy_method;
   fts_class_class->deconstructor = dummy_method;
-  fts_class_class->messages = fts_hashtable_new( fts_symbol_class, FTS_HASHTABLE_MEDIUM);
+  fts_class_class->messages = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
   fts_class_class->default_handler = fts_class_default_error_handler;
-  fts_class_class->inlets = fts_hashtable_new( fts_int_class, FTS_HASHTABLE_MEDIUM);
+  fts_class_class->inlets = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
 
   fts_class_set_name( fts_class_class, fts_s_class);
 }

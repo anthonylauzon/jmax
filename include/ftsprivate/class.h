@@ -23,6 +23,17 @@
 #ifndef _FTS_PRIVATE_CLASS_H_
 #define _FTS_PRIVATE_CLASS_H_
 
+/* Predefined typeids */
+#define FTS_TYPEID_VOID     1
+#define FTS_TYPEID_INT      2
+#define FTS_TYPEID_FLOAT    3
+#define FTS_TYPEID_SYMBOL   4
+#define FTS_TYPEID_POINTER  5
+#define FTS_TYPEID_STRING   6
+
+#define fts_class_get_typeid(CL) ((CL)->typeid)
+
+
 /* the class of 'class' objects */
 extern fts_class_t *fts_class_class;
 

@@ -41,9 +41,6 @@ import ircam.jmax.editors.patcher.objects.*;
 // The Class implement all the operations availables on the selection.
 //
 
-// ^^^^ Since the selection is a single object, this will not work
-// ^^^^ on a multi server implementation; to be redone, in this case.
-
 public class ErmesSelection implements Transferable
 {
   static public ErmesSelection patcherSelection =  new ErmesSelection();

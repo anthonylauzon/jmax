@@ -469,10 +469,10 @@ macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
 
-  fts_hashtable_init(&this->inputs, fts_symbol_class, FTS_HASHTABLE_SMALL);
-  fts_hashtable_init(&this->outputs, fts_symbol_class, FTS_HASHTABLE_SMALL);
-  fts_hashtable_init(&this->sources, fts_symbol_class, FTS_HASHTABLE_SMALL);
-  fts_hashtable_init(&this->destinations, fts_symbol_class, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &this->inputs, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &this->outputs, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &this->sources, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &this->destinations, FTS_HASHTABLE_SMALL);
 
   this->delta = 0;
   this->notify = 0;

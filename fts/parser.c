@@ -1590,7 +1590,7 @@ void fts_kernel_parser_init( void)
 {
   parsetree_heap = fts_heap_new( sizeof( fts_parsetree_t));
 
-  fts_hashtable_init( &fts_token_table, fts_symbol_class, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &fts_token_table, FTS_HASHTABLE_MEDIUM);
 
 #define PUT_TOKEN(S,T)					\
  {							\

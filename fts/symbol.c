@@ -20,14 +20,7 @@
  * 
  */
 
-/*
- * Symbols:
- *  - symbol table
- *  - predefinitions of some symbols
- */
-
 #include <string.h>
-#include <stdio.h>
 
 #include <fts/fts.h>
 
@@ -42,7 +35,6 @@ fts_symbol_t fts_new_symbol( const char *s)
   fts_set_string( &k, (char *)s);
   if ( fts_hashtable_get( &symbol_table, &k, &v))
     {
-/*       fprintf( stderr, "[symbol] searching \"%s\", found, returning %p \"%s\"\n", s, fts_get_pointer( &v), (char *)fts_get_pointer( &v)); */
       return (fts_symbol_t)fts_get_pointer( &v);
     }
 
@@ -53,8 +45,6 @@ fts_symbol_t fts_new_symbol( const char *s)
   fts_set_string( &k, (char *)p);
   fts_set_pointer( &v, (char *)p);
   fts_hashtable_put( &symbol_table, &k, &v);
-
-/*   fprintf( stderr, "[symbol] searching \"%s\", not found, returning %p \"%s\"\n", s, p, p); */
 
   return (fts_symbol_t)p;
 }
@@ -85,7 +75,7 @@ static void fts_predefine_symbols(void)
 
 void fts_kernel_symbol_init(void)
 {
-  fts_hashtable_init( &symbol_table, fts_string_class, FTS_HASHTABLE_BIG);
+  fts_hashtable_init( &symbol_table, FTS_HASHTABLE_BIG);
 
   fts_predefine_symbols();
 }

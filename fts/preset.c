@@ -528,7 +528,7 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 
   /* init hash table */
-  fts_hashtable_init(&this->hash, fts_int_class, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &this->hash, FTS_HASHTABLE_SMALL);
 
   this->objects = (fts_object_t **)fts_malloc(sizeof(fts_object_t *) * ac);
 

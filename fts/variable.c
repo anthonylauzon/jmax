@@ -81,7 +81,7 @@ fts_definition_get(fts_patcher_t *scope, fts_symbol_t name)
     {
       hash = (fts_hashtable_t *)fts_malloc(sizeof(fts_hashtable_t));
       
-      fts_hashtable_init(hash, fts_symbol_class, FTS_HASHTABLE_MEDIUM);
+      fts_hashtable_init( hash, FTS_HASHTABLE_MEDIUM);
       fts_patcher_set_definitions(scope, hash);
     }
 

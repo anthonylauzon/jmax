@@ -93,7 +93,7 @@ forget_explode(explode_t *this, fts_symbol_t name)
 static void
 init_explode_register(void)
 {
-  fts_hashtable_init(&explode_table, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(&explode_table, FTS_HASHTABLE_MEDIUM);
 }
 
 /****************************************************************************/

@@ -30,6 +30,9 @@ namespace client {
 
   Hashtable<MessageHandlerEntry, FtsMessageHandler *> FtsObject::messageHandlersTable;
 
+  const int FtsObject::NO_ID = -1;
+  const int FtsObject::NEW_ID = -2;
+
   class MessageHandlerEntry {
   public:
     MessageHandlerEntry( const std::type_info &tid, const char *selector) 
@@ -61,8 +64,8 @@ namespace client {
     _selectorCache = 0;
     _serverConnection = serverConnection;
     _parent = parent;
-    _id = serverConnection->getNewObjectID();
-    _serverConnection->putObject(_id, this);
+
+    _id = _serverConnection->putObject( NEW_ID, this);
 
     _serverConnection->writeObject(FtsServerConnection::CLIENT_OBJECT_ID);
     _serverConnection->writeSymbol( "new_object");
@@ -79,8 +82,7 @@ namespace client {
     _serverConnection = serverConnection;
     _parent = parent;
 	
-    _id = _serverConnection->getNewObjectID();
-    _serverConnection->putObject(_id, this);
+    _id = _serverConnection->putObject( NEW_ID, this);
 
     _serverConnection->writeObject(FtsServerConnection::CLIENT_OBJECT_ID);
     _serverConnection->writeSymbol( "new_object");
@@ -100,9 +102,7 @@ namespace client {
 	
     _id = id;
     if (_id != NO_ID)
-      {
-	serverConnection->putObject(_id, this);
-      }
+      serverConnection->putObject(_id, this);
   }
 
   void FtsObject::send(const char* selector, FtsArgs* args) throw(FtsClientException)

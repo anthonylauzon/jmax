@@ -1,3 +1,8 @@
+2002-11-29  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* changed hashtable.[ch]: hashtables now accept keys of any type. A class can set its
+	hash function and equality function that are used if hashtable key is an object.
+
 2002-11-21  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* first setup for multi rpm building

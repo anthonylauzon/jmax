@@ -98,5 +98,5 @@ ispw_target_send(fts_object_t *target, fts_symbol_t s, int ac, const fts_atom_t 
 void 
 ispw_naming_init(void)
 {
-  fts_hashtable_init(&ispw_name_table, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(&ispw_name_table, FTS_HASHTABLE_MEDIUM);
 }

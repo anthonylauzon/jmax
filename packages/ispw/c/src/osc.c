@@ -321,7 +321,7 @@ osc_config(void)
   fts_class_install(fts_new_symbol("tab1~"),sigtab1_instantiate);
 
   sigtab1_ht = (fts_hashtable_t *)fts_malloc( sizeof( fts_hashtable_t));
-  fts_hashtable_init(sigtab1_ht, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(sigtab1_ht, FTS_HASHTABLE_MEDIUM);
 
   if (!wavetable_make_cos())
     {

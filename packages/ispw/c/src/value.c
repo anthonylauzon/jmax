@@ -149,7 +149,7 @@ value_instantiate(fts_class_t *cl)
 void
 ispw_value_config(void)
 {
-  fts_hashtable_init(&value_table, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &value_table, FTS_HASHTABLE_MEDIUM);
 
   sym_v = fts_new_symbol("v");
 

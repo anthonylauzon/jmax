@@ -26,19 +26,13 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*; 
-import java.awt.event.*;
-// import java.awt.AWTEvent.*;
-import java.awt.AWTEvent;
 import java.util.*;
 import java.lang.*;
 
-import ircam.jmax.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.fts.*;
 import ircam.fts.client.*;
-
+import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
-import ircam.jmax.editors.patcher.interactions.*;
 
 /** This class represent the display list of the patcher editor.
  *  It keep the data base of graphic objects, handle the paiting,

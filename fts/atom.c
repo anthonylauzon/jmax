@@ -37,20 +37,22 @@ int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
   if ( !fts_atom_same_type( p1, p2))
     return 0;
 
-  if ( fts_is_void( p1))
+  switch( fts_class_get_typeid( fts_get_class( p1)) ) {
+  case FTS_TYPEID_VOID:
     return fts_is_void( p2);
-  if ( fts_is_int( p1))
+  case FTS_TYPEID_INT:
     return fts_get_int( p1) == fts_get_int( p2);
-  if ( fts_is_float( p1))
+  case FTS_TYPEID_FLOAT:
     return fts_get_float( p1) == fts_get_float( p2);
-  if ( fts_is_symbol( p1))
+  case FTS_TYPEID_SYMBOL:
     return fts_get_symbol( p1) == fts_get_symbol( p2);
-  if ( fts_is_object( p1))
-    return fts_get_object( p1) == fts_get_object( p2);
-  if ( fts_is_pointer( p1))
+  case FTS_TYPEID_POINTER:
     return fts_get_pointer( p1) == fts_get_pointer( p2);
-  if ( fts_is_string( p1))
+  case FTS_TYPEID_STRING :
     return ! strcmp( fts_get_string( p1), fts_get_string( p2));
+  default:
+    return fts_get_object( p1) == fts_get_object( p2);
+  }
 
   return 0;
 }
@@ -99,39 +101,32 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
  *
  */
 
-#define FTS_TYPEID_VOID     1
-#define FTS_TYPEID_INT      2
-#define FTS_TYPEID_FLOAT    3
-#define FTS_TYPEID_SYMBOL   4
-#define FTS_TYPEID_POINTER  5
-#define FTS_TYPEID_STRING   6
-
-static fts_class_t void_class; 
+static fts_class_t void_class = { typeid : FTS_TYPEID_VOID};
 fts_class_t *fts_void_class = &void_class;
 
-static fts_class_t int_class;
+static fts_class_t int_class = { typeid : FTS_TYPEID_INT};
 fts_class_t *fts_int_class = &int_class;
 
-static fts_class_t float_class;
+static fts_class_t float_class = { typeid : FTS_TYPEID_FLOAT};
 fts_class_t *fts_float_class = &float_class;
 
-static fts_class_t symbol_class;
+static fts_class_t symbol_class = { typeid : FTS_TYPEID_SYMBOL};
 fts_class_t *fts_symbol_class = &symbol_class;
 
-static fts_class_t pointer_class;
+static fts_class_t pointer_class = { typeid : FTS_TYPEID_POINTER};
 fts_class_t *fts_pointer_class = &pointer_class;
 
-static fts_class_t string_class;
+static fts_class_t string_class = { typeid : FTS_TYPEID_STRING};
 fts_class_t *fts_string_class = &string_class;
 
 void fts_kernel_atom_init( void)
 {
-  void_class.typeid = FTS_TYPEID_VOID;
-  int_class.typeid = FTS_TYPEID_INT;
-  float_class.typeid = FTS_TYPEID_FLOAT;
-  symbol_class.typeid = FTS_TYPEID_SYMBOL;
-  pointer_class.typeid = FTS_TYPEID_POINTER;
-  string_class.typeid = FTS_TYPEID_STRING;
+/*   void_class.typeid = FTS_TYPEID_VOID; */
+/*   int_class.typeid = FTS_TYPEID_INT; */
+/*   float_class.typeid = FTS_TYPEID_FLOAT; */
+/*   symbol_class.typeid = FTS_TYPEID_SYMBOL; */
+/*   pointer_class.typeid = FTS_TYPEID_POINTER; */
+/*   string_class.typeid = FTS_TYPEID_STRING; */
 
   fts_class_set_name( &int_class, fts_s_int);
   fts_class_set_name( &float_class, fts_s_float);

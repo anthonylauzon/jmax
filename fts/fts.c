@@ -63,7 +63,7 @@ static void fts_cmd_args_parse( int argc, char **argv)
   char filevar[32];
   fts_symbol_t name, value, s_yes;
 
-  fts_hashtable_init( &cmd_args, fts_symbol_class, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &cmd_args, FTS_HASHTABLE_SMALL);
 
   s_yes = fts_new_symbol( "yes");
 

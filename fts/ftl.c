@@ -415,7 +415,7 @@ void ftl_program_init( ftl_program_t *prog)
   prog->main = 0;
   prog->subroutine_tos = 0;
 
-  fts_hashtable_init( &(prog->symbol_table), NULL, FTS_HASHTABLE_MEDIUM );
+  fts_hashtable_init( &(prog->symbol_table), FTS_HASHTABLE_MEDIUM );
 }
 
 ftl_program_t *ftl_program_new( void )
@@ -1089,6 +1089,6 @@ fts_object_t *ftl_program_get_current_object( ftl_program_t *prog)
 
 void fts_kernel_ftl_init( void)
 {
-  fts_hashtable_init( &ftl_functions_table, NULL, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &ftl_functions_table, FTS_HASHTABLE_MEDIUM);
 }
 

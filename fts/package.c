@@ -33,7 +33,6 @@
 #include <ftsprivate/package.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/template.h>
-#include <ftsprivate/abstraction.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/platform.h>
 #include <ftsprivate/class.h>
@@ -412,14 +411,6 @@ static void fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_
     } 
   else 
     {
-      
-      /* Create the database if necessary */
-      if (pkg->declared_templates == NULL) 
-	{
-	  pkg->declared_templates = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-	  fts_hashtable_init(pkg->declared_templates, fts_symbol_class, FTS_HASHTABLE_SMALL);
-	}
-      
       /* Register the template */
       template = fts_template_new(name, NULL, file);
 
@@ -460,7 +451,7 @@ fts_package_get_declared_template(fts_package_t* pkg, fts_symbol_t name)
 
   fts_set_symbol( &k, name);
 
-  if ((pkg->declared_templates != NULL) && fts_hashtable_get(pkg->declared_templates, &k, &a)) 
+  if (fts_hashtable_get(pkg->declared_templates, &k, &a)) 
     {
       fts_template_t *template = (fts_template_t *) fts_get_pointer(&a);
       
@@ -507,7 +498,7 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
       if (pkg->templates_in_path == NULL) 
 	{
 	  pkg->templates_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-	  fts_hashtable_init(pkg->templates_in_path, fts_symbol_class, FTS_HASHTABLE_SMALL);
+	  fts_hashtable_init( pkg->templates_in_path, FTS_HASHTABLE_SMALL);
 	}
       
       fts_set_symbol(&n, name);
@@ -528,10 +519,6 @@ fts_package_get_template_from_file(fts_package_t* pkg, fts_symbol_t filename)
   fts_template_t *template;
   fts_atom_t tmpl_atom;
   
-  if (pkg->declared_templates == NULL) {
-    return NULL;
-  }
-
   fts_hashtable_get_values(pkg->declared_templates, &iter);
 
   while ( fts_iterator_has_more( &iter)) {
@@ -561,123 +548,6 @@ fts_package_get_template_from_file(fts_package_t* pkg, fts_symbol_t filename)
 
 /********************************************************************
  *
- *   - abstractions
- */
-
-
-void 
-fts_package_add_abstraction(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
-{
-  fts_abstraction_t *abstraction;
-  fts_atom_t n, p;
-
-  /* If the declaration existed already, remove it first */
-  abstraction = fts_package_get_declared_abstraction(pkg, name);
-  
-  if (abstraction) {
-
-    /* FIXME */
-    
-    /* change the abstraction definition, and redefine all the instances */
-/*      fts_abstraction_redefine(abstraction, file); */
-
-  } else {
-
-    /* Create the database if necessary */
-    if (pkg->declared_abstractions == NULL) {
-      pkg->declared_abstractions = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->declared_abstractions, fts_symbol_class, FTS_HASHTABLE_SMALL);
-    }
-
-    /* Register the abstraction */
-    abstraction = fts_abstraction_new(name, NULL, file);
-    fts_set_symbol(&n, name);
-    fts_set_pointer(&p, abstraction);
-    fts_hashtable_put(pkg->declared_abstractions, &n, &p);  
-  }
-}
-
-void fts_package_add_abstraction_path(fts_package_t* pkg, fts_symbol_t path)
-{
-  fts_atom_t n;
-
-  fts_set_symbol(&n, path);
-  pkg->abstraction_paths = fts_list_append(pkg->abstraction_paths, &n);
-}
-
-fts_abstraction_t *
-fts_package_get_declared_abstraction(fts_package_t* pkg, fts_symbol_t name)
-{
-  fts_atom_t a, k;
-  fts_abstraction_t *abstraction;
-  char buf[MAXPATHLEN];
-
-  fts_set_symbol( &k, name);
-  if ((pkg->declared_abstractions != NULL) 
-      && fts_hashtable_get(pkg->declared_abstractions, &k, &a)) {
-    abstraction = (fts_abstraction_t *) fts_get_pointer(&a);
-
-    if (fts_abstraction_get_filename(abstraction) == NULL) {
-      fts_make_absolute_path(pkg->dir, 
-			     fts_abstraction_get_original_filename(abstraction), 
-			     buf, MAXPATHLEN);
-      fts_abstraction_set_filename(abstraction, fts_new_symbol(buf));
-    }
-
-    return abstraction;
-  } else {
-    return NULL;
-  }
-}
-
-fts_abstraction_t *
-fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
-{
-  fts_atom_t a, k;
-
-  fts_set_symbol( &k, name);
-
-  if ((pkg->abstractions_in_path != NULL) 
-      && fts_hashtable_get(pkg->abstractions_in_path, &k, &a)) 
-    {
-      return (fts_abstraction_t *) fts_get_pointer(&a);
-    }
-  else
-    {
-      char filename[MAXPATHLEN];
-      char path[MAXPATHLEN];
-      fts_abstraction_t* t;
-      fts_atom_t n, p;
-      const char* root;
-
-      root = (pkg->dir != NULL)? pkg->dir : NULL;
-
-      snprintf(filename, MAXPATHLEN, "%s.abs", name);
-      if (!fts_file_find_in_path(root, pkg->abstraction_paths, filename, path, MAXPATHLEN))
-	{
-	  return NULL;
-	}
-
-      /* Register the abstraction */
-      t = fts_abstraction_new(name, fts_new_symbol(path), fts_new_symbol(filename));
-
-      /* Create the database if necessary */
-      if (pkg->abstractions_in_path == NULL) {
-	pkg->abstractions_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-	fts_hashtable_init(pkg->abstractions_in_path, fts_symbol_class, FTS_HASHTABLE_SMALL);
-      }
-
-      fts_set_symbol(&n, name);
-      fts_set_pointer(&p, t);
-      fts_hashtable_put(pkg->abstractions_in_path, &n, &p);  
-
-      return t;
-    }
-}
-
-
-/********************************************************************
- *
  *   - classes 
  */
 
@@ -686,21 +556,12 @@ fts_package_add_class( fts_package_t* pkg, fts_class_t *cl, fts_symbol_t name)
 {
   fts_atom_t data, k;
 
-  /* Create the database if necessary */
-  if (pkg->classes == NULL) 
-    {
-      pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->classes, fts_symbol_class, FTS_HASHTABLE_SMALL);
-    }
-
   fts_set_symbol( &k, name);
   if (fts_hashtable_get(pkg->classes, &k, &data))
     return &fts_DuplicatedClass;
-  else
-    {
-      fts_set_pointer(&data, cl);
-      fts_hashtable_put(pkg->classes, &k, &data);
-    }
+
+  fts_set_pointer(&data, cl);
+  fts_hashtable_put(pkg->classes, &k, &data);
 
   if(fts_class_get_package(cl) == NULL)
     fts_class_set_package(cl, pkg);
@@ -711,31 +572,18 @@ fts_package_add_class( fts_package_t* pkg, fts_class_t *cl, fts_symbol_t name)
 fts_class_t *
 fts_package_get_class(fts_package_t* pkg, fts_symbol_t name)
 {
-  fts_atom_t data, k;
+  fts_atom_t k, v;
   
-  /* TEMPLATE: here, do the search :
-     1) declared template
-     2) class
-     3) template in path
-  */
-
   fts_set_symbol( &k, name);
-  
-  if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data))
-    return fts_get_pointer(&data);
-  else
-    return NULL;
+  if ( fts_hashtable_get( pkg->classes, &k, &v))
+    return (fts_class_t *)fts_get_object(&v);
+
+  return NULL;
 }
 
 void 
 fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter)
 {
-  if(pkg->classes == NULL)
-    {
-      pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->classes, fts_symbol_class, FTS_HASHTABLE_SMALL);
-    }
-
   fts_hashtable_get_keys(pkg->classes, iter);
 }
 
@@ -771,7 +619,7 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
 
   if (pkg->help == NULL) {
     pkg->help = fts_malloc(sizeof(fts_hashtable_t));
-    fts_hashtable_init(pkg->help, fts_symbol_class, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init( pkg->help, FTS_HASHTABLE_SMALL);
   }
   
   fts_set_symbol(&n, name);
@@ -806,15 +654,6 @@ fun_template( fts_atom_t *a)
   fts_template_t *template = (fts_template_t *)fts_get_pointer( a);
 
   fts_set_symbol( a, fts_template_get_original_filename( template));
-}
-
-static void 
-fun_abstraction( fts_atom_t *a)
-{
-  /* Must be done the same way as in templates */
-/*    
-  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_pointer( a);        
-  fts_set_symbol( a, fts_abstraction_get_original_filename( template)); */
 }
 
 static int 
@@ -946,7 +785,7 @@ __fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 			     fts_package_make_relative_path(pkg, fts_get_symbol(&at[i+1])), 
 			     -1);
   
-  if( fts_object_has_id( o) && pkg->declared_templates)
+  if( fts_object_has_id( o))
     fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -961,7 +800,7 @@ __fts_package_template_insert(fts_object_t *o, int winlet, fts_symbol_t s, int a
 			   fts_package_make_relative_path(pkg, fts_get_symbol(&at[1])), 
 			   fts_get_int( &at[2]));
   
-  if( fts_object_has_id( o) && pkg->declared_templates)
+  if( fts_object_has_id( o))
     fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -974,7 +813,7 @@ __fts_package_template_remove(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   fts_package_remove_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
 
-  if( fts_object_has_id( o) && pkg->declared_templates)
+  if( fts_object_has_id( o))
     fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
@@ -1000,29 +839,6 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     fts_package_upload_template_paths( pkg);
 
   fts_package_set_dirty( pkg, 1);
-}
-
-static void 
-__fts_package_abstraction(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-
-  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
-    fts_package_add_abstraction(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
-  }
-}
-
-static void 
-__fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  int i;
-
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {      
-      fts_package_add_abstraction_path(pkg, fts_get_symbol(&at[i]));
-    }
-  }
 }
 
 static void 
@@ -1180,10 +996,11 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   char path[MAXPATHLEN];
   char *dir;
 
-  if (ac == 0) {
-    post( "No filename specified\n");    
-    return;
-  }
+  if (ac == 0)
+    {
+      post( "No filename specified\n");    
+      return;
+    }
 
   filename = fts_get_symbol( at);
   
@@ -1195,76 +1012,74 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   fts_bmax_code_new_object( &f, o, -1);
 
-  if ( this->packages) {
+  if ( this->packages)
     fts_package_save_list( &f, this->packages, fts_s_require);
-  }
-  if ( this->template_paths) {
+
+  if ( this->template_paths)
     fts_package_save_list( &f, this->template_paths, fts_s_template_path);
-  }
-  if ( this->abstraction_paths) {
-    fts_package_save_list( &f, this->abstraction_paths, fts_s_abstraction_path);
-  }
-  if ( this->data_paths) {
+
+  if ( this->data_paths)
     fts_package_save_list( &f, this->data_paths, fts_s_data_path);
-  }
-  if ( this->declared_templates) {
-    fts_atom_t* a;
-    int i = 0;
-    fts_iterator_t keys;
+
+  if ( fts_hashtable_get_size(this->declared_templates))
+    {
+      fts_atom_t* a;
+      int i = 0;
+      fts_iterator_t keys;
 
 #if HAVE_ALLOCA
-    a = alloca(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
+      a = alloca(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
 #else
-    a = malloc(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
+      a = malloc(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
 #endif
               
-    fts_list_get_values( this->template_names, &keys);
+      fts_list_get_values( this->template_names, &keys);
       
-    while ( fts_iterator_has_more( &keys))
-      {
-	fts_iterator_next( &keys, a+i);
-	fts_hashtable_get( this->declared_templates, a+i, a+i+1);
-	fts_set_symbol( a+i+1, fts_template_get_original_filename(((fts_template_t *)fts_get_object( a+i+1))));
-	i+=2;
-      }      
-    fts_bmax_code_push_atoms(&f, i, a);
-    fts_bmax_code_obj_mess(&f, fts_s_template, i);
-    fts_bmax_code_pop_args(&f, i);
+      while ( fts_iterator_has_more( &keys))
+	{
+	  fts_iterator_next( &keys, a+i);
+	  fts_hashtable_get( this->declared_templates, a+i, a+i+1);
+	  fts_set_symbol( a+i+1, fts_template_get_original_filename(((fts_template_t *)fts_get_object( a+i+1))));
+	  i+=2;
+	}      
+      fts_bmax_code_push_atoms(&f, i, a);
+      fts_bmax_code_obj_mess(&f, fts_s_template, i);
+      fts_bmax_code_pop_args(&f, i);
   
 #ifndef HAVE_ALLOCA
-    free(a);
+      free(a);
 #endif    
-  }
-  if ( this->declared_abstractions) {
-    fts_package_save_hashtable( &f, this->declared_abstractions, fts_s_abstraction, fun_abstraction);
-  }
-  if ( this->help) {
-    fts_atom_t* a;
-    int i = 0;
-    fts_iterator_t keys;
+    }
+
+  if ( fts_hashtable_get_size(this->help))
+    {
+      fts_atom_t* a;
+      int i = 0;
+      fts_iterator_t keys;
 
 #if HAVE_ALLOCA
-    a = alloca(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
+      a = alloca(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
 #else
-    a = malloc(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
+      a = malloc(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
 #endif
               
-    fts_list_get_values( this->help_classes, &keys);
+      fts_list_get_values( this->help_classes, &keys);
       
-    while ( fts_iterator_has_more( &keys))
-      {
-	fts_iterator_next( &keys, a+i);
-	fts_hashtable_get( this->help, a+i, a+i+1);
-	i+=2;
-      }      
-    fts_bmax_code_push_atoms(&f, i, a);
-    fts_bmax_code_obj_mess(&f, fts_s_help, i);
-    fts_bmax_code_pop_args(&f, i);
+      while ( fts_iterator_has_more( &keys))
+	{
+	  fts_iterator_next( &keys, a+i);
+	  fts_hashtable_get( this->help, a+i, a+i+1);
+	  i+=2;
+	}      
+      fts_bmax_code_push_atoms(&f, i, a);
+      fts_bmax_code_obj_mess(&f, fts_s_help, i);
+      fts_bmax_code_pop_args(&f, i);
   
 #ifndef HAVE_ALLOCA
-    free(a);
+      free(a);
 #endif    
-  }
+    }
+
   if( this->midi_config)
     {
       fts_atom_t a[1];
@@ -1273,6 +1088,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_bmax_code_obj_mess(&f, fts_s_midi_config, 1);
       fts_bmax_code_pop_args(&f, 1);
     }
+
   if( this->audio_config)
     {
       fts_atom_t a[1];
@@ -1316,9 +1132,7 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if ( this->template_paths) {
     fts_package_print_list( this->template_paths, fts_s_template_path);
   }
-  if ( this->abstraction_paths) {
-    fts_package_print_list( this->abstraction_paths, fts_s_abstraction_path);
-  }
+
   if ( this->data_paths) {
     fts_package_print_list( this->data_paths, fts_s_data_path);
   }
@@ -1326,9 +1140,7 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if ( this->declared_templates) {
     fts_package_print_hashtable( this->declared_templates, fts_s_template, fun_template);
   }
-  if ( this->declared_abstractions) {
-    fts_package_print_hashtable( this->declared_abstractions, fts_s_abstraction, fun_abstraction);
-  }
+
   if ( this->help) {
     fts_package_print_hashtable( this->help, fts_s_help, NULL);
   }
@@ -1376,16 +1188,13 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->error = NULL;
   pkg->patcher = NULL;
   pkg->packages = NULL;
-  pkg->classes = NULL;
 
-  pkg->declared_templates = NULL;
+  pkg->classes = fts_hashtable_new( FTS_HASHTABLE_SMALL);
+  pkg->declared_templates = fts_hashtable_new( FTS_HASHTABLE_SMALL);
+
   pkg->template_names = NULL;
   pkg->templates_in_path = NULL;
   pkg->template_paths = NULL;
-
-  pkg->declared_abstractions = NULL;
-  pkg->abstractions_in_path = NULL;
-  pkg->abstraction_paths = NULL;
 
   pkg->help = NULL;
   pkg->help_classes = NULL;
@@ -1414,28 +1223,19 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if (pkg->windows != NULL) {
     fts_list_delete(pkg->windows);
   }
-  if (pkg->classes != NULL) {
-    fts_hashtable_destroy(pkg->classes);
-  }
-  if (pkg->declared_templates != NULL) {
-    fts_hashtable_destroy(pkg->declared_templates);
-    fts_list_delete(pkg->template_names);
-  }
+
+  fts_hashtable_destroy(pkg->classes);
+
+  fts_hashtable_destroy(pkg->declared_templates);
+  fts_list_delete(pkg->template_names);
+
   if (pkg->templates_in_path != NULL) {
     fts_hashtable_destroy(pkg->templates_in_path);
   }
   if (pkg->template_paths != NULL) {
     fts_list_delete(pkg->template_paths);
   }
-  if (pkg->declared_abstractions != NULL) {
-    fts_hashtable_destroy(pkg->declared_abstractions);
-  }
-  if (pkg->abstractions_in_path != NULL) {
-    fts_hashtable_destroy(pkg->abstractions_in_path);
-  }
-  if (pkg->abstraction_paths != NULL) {
-    fts_list_delete(pkg->abstraction_paths);
-  }
+
   if (pkg->help != NULL) {
     fts_hashtable_destroy(pkg->help);
     fts_list_delete(pkg->help_classes);
@@ -1562,11 +1362,6 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if ( this->template_paths)
     fts_package_upload_template_paths( this);
 
-  if ( this->abstraction_paths)
-    {
-      fts_list_get_values( this->abstraction_paths, &h);
-      fts_package_send_list( o, h, fts_s_abstraction_path);
-    }
   if ( this->data_paths)
     fts_package_upload_data_paths( this);
 
@@ -1645,8 +1440,6 @@ fts_package_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("insert_template"), __fts_package_template_insert);
   fts_class_message_varargs(cl, fts_new_symbol("remove_template"), __fts_package_template_remove);
   fts_class_message_varargs(cl, fts_s_template_path, __fts_package_template_path);
-  fts_class_message_varargs(cl, fts_s_abstraction, __fts_package_abstraction);
-  fts_class_message_varargs(cl, fts_s_abstraction_path, __fts_package_abstraction_path);
   fts_class_message_varargs(cl, fts_s_data_path, __fts_package_data_path);
   fts_class_message_varargs(cl, fts_s_help, __fts_package_help);
   fts_class_message_varargs(cl, fts_s_save, __fts_package_save);
@@ -1773,7 +1566,7 @@ fts_kernel_package_init(void)
     fts_package_stack[i] = NULL;
   }
 
-  fts_hashtable_init(&fts_packages, fts_symbol_class, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &fts_packages, FTS_HASHTABLE_MEDIUM);
 
   /* create the system package */
   system_symbol = fts_new_symbol("_system_");

@@ -474,7 +474,7 @@ midishareport_instantiate(fts_class_t *cl)
 void
 midishareport_config(void)
 {
-  fts_hashtable_init(&midishare_reference_table, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &midishare_reference_table, FTS_HASHTABLE_MEDIUM);
 
   fts_class_install( fts_new_symbol("midishareport"), midishareport_instantiate);
 }

@@ -25,7 +25,6 @@ import java.awt.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.jmax.toolkit.*;
 
 public class PatcherFontManager
 {

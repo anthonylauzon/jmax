@@ -90,9 +90,17 @@ namespace client {
     return NULL;
   }
 
-  void FtsServerConnection::putObject( int id, FtsObject *obj)
+  int FtsServerConnection::putObject( int id, FtsObject *obj)
   {
+    if (id == FtsObject::NO_ID)
+      return FtsObject::NO_ID;
+
+    if (id == FtsObject::NEW_ID)
+      id = getNewObjectID();
+
     _objectTable->put( id, obj);
+
+    return id;
   }
 
   void FtsServerConnection::writeInt( int v) throw( FtsClientException)

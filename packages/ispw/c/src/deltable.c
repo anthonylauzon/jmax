@@ -93,7 +93,7 @@ delay_table_get_entry(fts_symbol_t delay_name)
 void 
 delay_table_init(void)
 {
-  fts_hashtable_init(&delay_table, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init(&delay_table, FTS_HASHTABLE_MEDIUM);
 }
 
 del_buf_t *

@@ -1059,7 +1059,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_bytestream_add_listener( this->stream, (fts_object_t *) this, client_receive);
 
-  fts_hashtable_init( &this->object_table, fts_int_class, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &this->object_table, FTS_HASHTABLE_MEDIUM);
 
   client_predefine_objects( this);
 

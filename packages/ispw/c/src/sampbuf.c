@@ -34,7 +34,7 @@ static fts_hashtable_t the_sampbuf_hashtable;
 void
 sampbuf_table_init(void)
 {
-  fts_hashtable_init(&the_sampbuf_hashtable, 0, FTS_HASHTABLE_MEDIUM);
+  fts_hashtable_init( &the_sampbuf_hashtable, FTS_HASHTABLE_MEDIUM);
 }
 
 sampbuf_t *

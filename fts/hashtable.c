@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #include <fts/fts.h>
-
+#include <ftsprivate/class.h>
 
 #define FTS_HASHTABLE_STANDARD_LOAD_FACTOR  0.75
 
@@ -50,113 +50,88 @@ static fts_heap_t *hashtable_heap = 0;
 static fts_heap_t *cell_heap = 0;
 static fts_heap_t *iterator_heap = 0;
 
-static unsigned int hash_int( const fts_atom_t *a)
+static unsigned int hash( const fts_atom_t *p)
 {
-  return (unsigned int)fts_get_int( a);
-}
+  switch( fts_class_get_typeid( fts_get_class( p)) ) {
+  case FTS_TYPEID_VOID:
+    return 0;
+  case FTS_TYPEID_INT:
+    return (unsigned int)fts_get_int( p);
+  case FTS_TYPEID_FLOAT:
+    return (unsigned int)fts_get_float( p);
+  case FTS_TYPEID_SYMBOL:
+    return (unsigned int)fts_get_symbol( p) >> 3;
+  case FTS_TYPEID_POINTER:
+    return (unsigned int)fts_get_pointer( p) >> 3;
+  case FTS_TYPEID_STRING :
+    {
+      char *s = fts_get_string( p);
+      unsigned int h = 0;
 
-static int equals_int( const fts_atom_t *a, const fts_atom_t *b)
-{
-  return fts_get_int( a) == fts_get_int( b);
-}
+      while( *s)
+	{
+	  h = (h<<1) + *s;
+	  s++;
+	}
 
-static unsigned int hash_string( const fts_atom_t *a)
-{
-  char *s = fts_get_string( a);
-  unsigned int h = 0;
-
-  while( *s)
-  {
-      h = (h<<1) + *s;
-      s++;
+      return h;
+    }
+  default:
+    return (*fts_class_get_hash_function( fts_get_class(p)))(p);
   }
 
-  return h;
+  return 0;
 }
 
-static int equals_string( const fts_atom_t *a, const fts_atom_t *b)
+static int equals( const fts_atom_t *p1, const fts_atom_t *p2)
 {
-  return strcmp( fts_get_string( a), fts_get_string( b)) == 0;
+  if ( !fts_atom_same_type( p1, p2))
+    return 0;
+
+  switch( fts_class_get_typeid( fts_get_class( p1)) ) {
+  case FTS_TYPEID_VOID:
+    return fts_is_void( p2);
+  case FTS_TYPEID_INT:
+    return fts_get_int( p1) == fts_get_int( p2);
+  case FTS_TYPEID_FLOAT:
+    return fts_get_float( p1) == fts_get_float( p2);
+  case FTS_TYPEID_SYMBOL:
+    return fts_get_symbol( p1) == fts_get_symbol( p2);
+  case FTS_TYPEID_POINTER:
+    return fts_get_pointer( p1) == fts_get_pointer( p2);
+  case FTS_TYPEID_STRING :
+    return ! strcmp( fts_get_string( p1), fts_get_string( p2));
+  default:
+    return (*fts_class_get_equals_function( fts_get_class(p1)))( p1, p2);
+  }
+
+  return 0;
 }
 
-static unsigned int hash_symbol( const fts_atom_t *a)
-{
-  return (unsigned int)fts_get_symbol( a) >> 3;
-}
-
-static int equals_symbol( const fts_atom_t *a, const fts_atom_t *b)
-{
-  return fts_get_symbol( a) == fts_get_symbol( b);
-}
-
-static unsigned int hash_pointer( const fts_atom_t *a)
-{
-  return (unsigned int)fts_get_pointer( a) >> 3;
-}
-
-static int equals_pointer( const fts_atom_t *a, const fts_atom_t *b)
-{
-  return fts_get_pointer( a) == fts_get_pointer( b);
-}
-
-static void set_key_class( fts_hashtable_t *h, fts_class_t *key_class)
-{
-  if (key_class == fts_int_class)
-    {
-      h->hash_function = hash_int;
-      h->equals_function = equals_int;
-    }
-  else if (key_class == fts_string_class)
-    {
-      h->hash_function = hash_string;
-      h->equals_function = equals_string;
-    }
-  else if (key_class == fts_symbol_class || key_class == NULL)
-    {
-      h->hash_function = hash_symbol;
-      h->equals_function = equals_symbol;
-    }
-  else if (key_class == fts_pointer_class)
-    {
-      h->hash_function = hash_pointer;
-      h->equals_function = equals_pointer;
-    }
-  else
-    {
-      /* should use general hash and equal functions for atoms */
-    }
-}
-
-static int get_initial_capacity( int initial_capacity)
+void fts_hashtable_init( fts_hashtable_t *h, int initial_capacity)
 {
   switch (initial_capacity) {
   case FTS_HASHTABLE_SMALL:
-    return 7;
+    h->length = 7;
   case FTS_HASHTABLE_MEDIUM:
-    return 101;
+    h->length = 101;
   case FTS_HASHTABLE_BIG:
-    return 1031;
+    h->length = 1031;
   default:
-    return 101;
+    h->length = 101;
   }
-}
-
-void fts_hashtable_init( fts_hashtable_t *h, fts_class_t *key_class, int initial_capacity)
-{
-  set_key_class( h, key_class);
-
-  h->length = get_initial_capacity( initial_capacity);
+  
   h->count = 0;
   h->rehash_count = (int)(h->length * FTS_HASHTABLE_STANDARD_LOAD_FACTOR);
 
   h->table = (fts_hashtable_cell_t **) fts_zalloc( h->length * sizeof( fts_hashtable_cell_t *));
 }
 
-fts_hashtable_t *fts_hashtable_new( fts_class_t *key_class, int initial_capacity)
+fts_hashtable_t *fts_hashtable_new( int initial_capacity)
 {
   fts_hashtable_t *h = (fts_hashtable_t *)fts_heap_alloc( hashtable_heap);
 
-  fts_hashtable_init( h, key_class, initial_capacity);
+  fts_hashtable_init( h, initial_capacity);
 
   return h;
 }
@@ -197,9 +172,9 @@ static fts_hashtable_cell_t **lookup_cell( const fts_hashtable_t *h, const fts_a
 {
   fts_hashtable_cell_t **c;
 
-  c = &h->table[ (*h->hash_function)( key) % h->length];
+  c = &h->table[ hash( key) % h->length];
 
-  while (*c && !(*h->equals_function)( &(*c)->key, key))
+  while (*c && !equals( &(*c)->key, key))
     c = &(*c)->next;
 
   return c;
@@ -273,7 +248,7 @@ static void rehash( fts_hashtable_t *h)
 
       for ( c = old_table[i]; c; c = next)
 	{
-	  int index = (*h->hash_function)( &c->key) % h->length;
+	  int index = hash( &c->key) % h->length;
 
 	  next = c->next;
 	  c->next = h->table[index];

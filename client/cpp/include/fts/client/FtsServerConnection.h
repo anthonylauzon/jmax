@@ -37,11 +37,8 @@ namespace client {
     FtsServerConnection() throw( FtsClientException);
     virtual ~FtsServerConnection();
 
-    // FIXME
-    int getNewObjectID() { int id = _newObjectID; _newObjectID += 2; return id; }
-
     FtsObject *getObject( int id);
-    void putObject( int id, FtsObject *obj);
+    int putObject( int id, FtsObject *obj);
 
     void writeInt( int v) throw( FtsClientException);
     void writeDouble( double v) throw( FtsClientException);
@@ -65,6 +62,13 @@ namespace client {
 
   private:
     static void *receiveThread( void *arg);
+
+    int getNewObjectID()
+    {
+      int id = _newObjectID;
+      _newObjectID += 2; 
+      return id; 
+    }
 
     int _newObjectID;
     Hashtable< int, FtsObject *> *_objectTable;

@@ -2210,7 +2210,7 @@ fts_midi_config(void)
   fts_midi_types[midi_time_code] = fts_new_symbol("mtc");
   fts_midi_types[midi_real_time] = fts_new_symbol("rt");
 
-  fts_hashtable_init(&midi_type_hash, fts_symbol_class, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &midi_type_hash, FTS_HASHTABLE_SMALL);
   for(i=0; i<n_midi_types; i++)
     {
       fts_atom_t key;

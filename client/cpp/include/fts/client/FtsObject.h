@@ -31,7 +31,8 @@ namespace client {
     friend class BinaryProtocolEncoder;
     friend class BinaryProtocolDecoder;
   public:
-    static const int NO_ID = -1;
+    static const int NO_ID;
+    static const int NEW_ID;
 
     FtsObject( FtsServerConnection *serverConnection, FtsObject *parent, const char *ftsClassName) throw( FtsClientException);
 

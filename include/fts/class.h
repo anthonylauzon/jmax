@@ -21,6 +21,8 @@
  */
 
 typedef void (*fts_instantiate_fun_t)(fts_class_t *);
+typedef unsigned int (*fts_hash_function_t)( const fts_atom_t *);
+typedef int (*fts_equals_function_t)( const fts_atom_t *, const fts_atom_t *);
 
 typedef struct fts_class_outlet fts_class_outlet_t;
 
@@ -34,6 +36,10 @@ struct fts_class {
 
   /* A type id that separates primitive types from objects: lower values are primitive types */
   int typeid;
+
+  /* The hash function and equality function for this class */
+  fts_hash_function_t hash_function;
+  fts_equals_function_t equals_function;
 
   fts_instantiate_fun_t instantiate_fun;
   
@@ -60,6 +66,13 @@ struct fts_class {
 
   struct daemon_list *daemons;
 };
+
+/* Class hash function and equality function */
+#define fts_class_get_hash_function(cl) ((cl)->hash_function)
+#define fts_class_get_equals_function(cl) ((cl)->equals_function)
+
+#define fts_class_set_hash_function( cl, fun) ((cl)->hash_function = fun)
+#define fts_class_set_equals_function( cl, fun) ((cl)->equals_function = fun)
 
 
 /* Status return values */

@@ -773,7 +773,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_B(p);
 
-/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]); */
 	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
@@ -789,7 +788,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_S(p);
 
-/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]); */
 	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
@@ -806,7 +804,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_L(p);
 
-/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]); */
 	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
@@ -823,7 +820,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    int nargs = GET_B(p);
 
 
-/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]); */
 	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
@@ -839,8 +835,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_S(p);
 
-
-/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]); */
 	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
@@ -857,7 +851,6 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_L(p);
 
-/* 	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]); */
 	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
