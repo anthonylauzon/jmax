@@ -70,7 +70,7 @@ class MaxFtsConnectCmd implements Command
 	  }
       }
 
-    MaxApplication.setFts(new Fts( serverDir, serverName, connection, host, serverOptions, 0));
+    MaxApplication.setFts(new Fts( serverDir, serverName, connection, host, serverOptions, port));
   }
 }
 
