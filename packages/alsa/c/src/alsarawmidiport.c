@@ -24,42 +24,23 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <alsa/asoundlib.h>
-
 #include <fts/fts.h>
-
-static fts_symbol_t s_hw_0_0;
-static fts_symbol_t s_hw_1_0;
+#include "alsamidi.h"
 
 /* MIDI status bytes */
 #define STATUS_BYTE_SYSEX 0xf0
 #define STATUS_BYTE_SYSEX_END 0xf7
 
-#define BUFFER_LENGTH 512
-
-typedef struct _alsarawmidiport_
-{
-  fts_midiparser_t head; /* parser is a MIDI port */
-
-  snd_rawmidi_t *handle_in;
-  snd_rawmidi_t *handle_out;
-  int fd;
-
-  unsigned char receive_buffer[BUFFER_LENGTH]; /* system exclusive output buffer */
-  int sysex_head;
-} alsarawmidiport_t;
+fts_metaclass_t *alsarawmidiport_type = NULL;
 
 static void 
 alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  fts_midiparser_t *parser = (fts_midiparser_t *)o;
+  fts_midiparser_t *parser = &this->parser;
   int n, i;
 
-  n = snd_rawmidi_read( this->handle_in, this->receive_buffer, BUFFER_LENGTH);
+  n = snd_rawmidi_read( this->handle_in, this->receive_buffer, ALSA_SYSEX_BUFFER_LENGTH);
   if ( n <= 0 && n != -EAGAIN)
     {
       post( "snd_rawmidi_read returns %d !!!\n", n);
@@ -67,7 +48,17 @@ alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
 
   for ( i = 0; i < n; i++)
-    fts_midiparser_byte( parser, this->receive_buffer[i]);
+    {
+      fts_midievent_t *event = fts_midiparser_byte( parser, this->receive_buffer[i]);
+
+      if(event != NULL)
+	{
+	  fts_atom_t a;
+
+	  fts_set_object(&a, (fts_object_t *)event);
+	  fts_midiport_input(o, 0, 0, 1, &a);
+	}
+    }
 }
 
 static void
@@ -103,7 +94,7 @@ alsarawmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 	{
 	case midi_system_exclusive:
 	  {
-	    unsigned char buffer[BUFFER_LENGTH];
+	    unsigned char buffer[ALSA_SYSEX_BUFFER_LENGTH];
 	    int size = fts_midievent_system_exclusive_get_size(event);
 	    fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
 	    int i, n;
@@ -114,9 +105,9 @@ alsarawmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 	      {
 		buffer[n++] = fts_get_int(atoms + i) & 0x7f;
 		
-		if(n == BUFFER_LENGTH)
+		if(n == ALSA_SYSEX_BUFFER_LENGTH)
 		  {
-		    snd_rawmidi_write( this->handle_out, buffer, BUFFER_LENGTH);
+		    snd_rawmidi_write( this->handle_out, buffer, ALSA_SYSEX_BUFFER_LENGTH);
 		    n = 0;
 		  }
 	      }
@@ -143,23 +134,22 @@ static void
 alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  fts_midiparser_t *parser = (fts_midiparser_t *)o;
-  fts_symbol_t name;
-  char str[256];
-  int err, fd;
+  fts_midiparser_t *parser = &this->parser;
   struct pollfd fds;
-
+  int err, fd;
+  fts_atom_t k, a;
+  
   ac--;
   at++;
 
-  name = fts_get_symbol_arg(ac, at, 0, s_hw_1_0);
+  this->manager = (alsamidi_t *)fts_get_object(at);
+  this->name = fts_get_symbol(at + 1);
+  this->hw_name = fts_get_symbol(at + 2);
 
-  strcpy(str, name);
-
-  if( (err = snd_rawmidi_open( &this->handle_in, &this->handle_out, str, O_RDWR | SND_RAWMIDI_NONBLOCK)) < 0)
+  if( (err = snd_rawmidi_open( &this->handle_in, &this->handle_out, this->hw_name, O_RDWR | SND_RAWMIDI_NONBLOCK)) < 0)
     {
       fts_object_set_error(o, "Error opening ALSA raw MIDI port (%s)", snd_strerror( err));
-      post("alsarawmidiport: cannot open ALSA raw MIDI port %s (%s)\n", str, snd_strerror( err));
+      fts_log("alsarawmidiport: cannot open ALSA raw MIDI port %s (%s)\n", this->name, snd_strerror( err));
       return;
     }
 
@@ -173,11 +163,16 @@ alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   fts_sched_add(o, FTS_SCHED_READ, this->fd);
 
-  fts_midiparser_init( parser);
+  fts_midiparser_init(parser);
+  fts_midiport_init((fts_midiport_t *)this);
+  fts_midiport_set_input((fts_midiport_t *)this);
+  fts_midiport_set_output((fts_midiport_t *)this, alsarawmidiport_output);
 
-  fts_midiport_set_input((fts_midiport_t *)parser);
-  fts_midiport_set_output((fts_midiport_t *)parser, alsarawmidiport_output);
-
+  /* insert into device hashtable */
+  fts_set_symbol(&k, this->name);
+  fts_set_object(&a, o);
+  fts_hashtable_put(&this->manager->devices, &k, &a);
+  
   this->sysex_head = 0;
 }
 
@@ -185,22 +180,28 @@ static void
 alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  fts_midiparser_t *parser = (fts_midiparser_t *)o;
-
+  fts_midiparser_t *parser = &this->parser;
+  fts_atom_t k, a;
+  
   fts_sched_remove(o);
   fts_midiparser_reset(parser);
 
-  if (this->handle_in)
+  if(this->handle_in)
     {
       snd_rawmidi_drain( this->handle_in); 
       snd_rawmidi_close( this->handle_in);	
     }
 
-  if ( this->handle_out)
+  if( this->handle_out)
     {
       snd_rawmidi_drain( this->handle_out); 
       snd_rawmidi_close( this->handle_out);	
     }
+
+  /* replace midiport by hardware name in device hashtable */
+  fts_set_symbol(&k, this->name);
+  fts_set_symbol(&a, this->hw_name);
+  fts_hashtable_put(&this->manager->devices, &k, &a);
 }
 
 static fts_status_t 
@@ -220,9 +221,5 @@ alsarawmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void 
 alsarawmidiport_config( void)
 {
-  fts_class_install( fts_new_symbol("alsarawmidiport"), alsarawmidiport_instantiate);
-  fts_midiport_set_default_class(fts_new_symbol("alsarawmidiport"));
-
-  s_hw_0_0 = fts_new_symbol("hw:0,0");
-  s_hw_1_0 = fts_new_symbol("hw:1,0");
+  alsarawmidiport_type = fts_class_install(NULL, alsarawmidiport_instantiate);
 }

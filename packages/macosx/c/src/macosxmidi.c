@@ -498,6 +498,11 @@ macosxmidi_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
 
+  fts_hashtable_destroy(&this->inputs);
+  fts_hashtable_destroy(&this->outputs);
+  fts_hashtable_destroy(&this->sources);
+  fts_hashtable_destroy(&this->destinations);
+
   fts_midififo_destroy(&this->fifo);
   
   MIDIClientDispose(this->client);

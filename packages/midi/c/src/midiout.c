@@ -310,8 +310,6 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->channel = 0;
   this->number = 0;
 
-  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
-
   if(ac > 0) {
     if(fts_is_symbol(at)) {
       fts_symbol_t name = fts_get_symbol(at);
@@ -349,7 +347,9 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(this->port == NULL)
     this->port = fts_midimanager_get_output(fts_s_default);
 
-  if(this->port == NULL)
+  if(this->port != NULL)
+    fts_midimanger_register(o);
+  else
     fts_object_set_error(o, "Cannot find default MIDI output");
 }
 

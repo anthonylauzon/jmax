@@ -615,6 +615,7 @@ fts_object_t *
 fts_object_recompute(fts_object_t *old)
 {
   fts_object_t *obj;
+  int old_id = old->head.id;
 
   /* If the object being redefined is a standard patcher,
      redefine it using a patcher function, otherwise with 
@@ -629,7 +630,7 @@ fts_object_recompute(fts_object_t *old)
 	/*if (old->head.id != FTS_NO_ID)
 	  fts_client_release_object_data(old);*/
 
-      obj = fts_object_redefine(old, old->head.id, 1, old->argc, old->argv);
+      obj = fts_object_redefine(old, old->argc, old->argv);
 
       /* Error property handling; currently it is a little bit
 	 of an hack beacause we need a explit "zero"  error
@@ -637,7 +638,7 @@ fts_object_recompute(fts_object_t *old)
 	 the error property daemon should be a global daemon !
       */
 
-      if ( fts_object_has_id( obj))
+      if(old_id != FTS_NO_ID)
 	{
 	  fts_object_send_kernel_properties(obj);
 	  fts_client_upload_object(obj, -1);
@@ -650,14 +651,11 @@ fts_object_recompute(fts_object_t *old)
 
 
 fts_object_t *
-fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const fts_atom_t *at)
+fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 {
   int do_client;
   fts_symbol_t  var;
   fts_object_t  *new;
-
-  /* If the new and the old id are the same, or if old do not have an id, don't do any update on the client side */
-  do_client = ((old->head.id != FTS_NO_ID) && (old->head.id != new_id) && doclient);
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
   if (fts_object_description_defines_variable(ac, at))
@@ -675,8 +673,6 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
 
   fts_object_unbind(old);
 
-  /*if((old->head.id == new_id) && fts_object_description_variable_name_changed_only(fts_object_t *old, int ac, const fts_atom_t *at))*/
-
   /* unreference by hand */
   old->refcnt--;
 
@@ -684,17 +680,11 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
   if(old->refcnt == 0 && fts_class_get_deconstructor(old->head.cl))
     fts_class_get_deconstructor(old->head.cl)(old, fts_SystemInlet, fts_s_delete, 0, 0);
 
-  /* if old id and new id are the same, do the replace without telling the client */
-  if ((old->head.id != FTS_NO_ID) && (old->head.id == new_id))
-    {
-      fts_client_release_object( old);
-
-      old->head.id = FTS_NO_ID;
-    }
+  /* remove old from client */
+  fts_object_unclient(old);
 
   /* make the new object  */
   new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
-  fts_object_set_id(new, new_id);
   
   /* Update the loading vm */
   fts_vm_substitute_object(old, new);
@@ -715,9 +705,6 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
 
   /* move the connections from the old to the new object, tell the client if needed */
   fts_object_move_connections(old, new);
-
-  if(do_client)
-    fts_object_unclient(old);
 
   /* remove the object from the patcher */
   if(old->patcher)

@@ -20,25 +20,41 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Author: Guenter Geiger (geiger@epy.co.at), François Déchelle (dechelle@ircam.fr)
- *
  */
 
-#include <fts/fts.h>
+#ifndef _ALSAMIDI_H_
+#define _ALSAMIDI_H_
 
-/******************************************************************************/
-/*                                                                            */
-/* Module declaration                                                         */
-/*                                                                            */
-/******************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <alsa/asoundlib.h>
 
-extern void alsaaudioport_config( void);
-extern void alsamidi_config( void);
-extern void alsarawmidiport_config( void);
-
-void alsa_config(void)
+typedef struct _alsamidi_
 {
-  alsaaudioport_config();
-  alsarawmidiport_config();
-  alsamidi_config();
-}
+  fts_midimanager_t manager;
+  fts_array_t inputs;
+  fts_array_t outputs;
+  fts_hashtable_t devices;
+} alsamidi_t;
+
+#define ALSA_SYSEX_BUFFER_LENGTH 512
+
+typedef struct _alsarawmidiport_
+{
+  fts_midiport_t head;
+  fts_midiparser_t parser;
+  alsamidi_t *manager;
+  fts_symbol_t name;
+  fts_symbol_t hw_name;
+  snd_rawmidi_t *handle_in;
+  snd_rawmidi_t *handle_out;
+  int fd;
+  unsigned char receive_buffer[ALSA_SYSEX_BUFFER_LENGTH]; /* system exclusive output buffer */
+  int sysex_head;
+} alsarawmidiport_t;
+
+extern fts_metaclass_t *alsarawmidiport_type;
+
+#endif

@@ -1303,7 +1303,7 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_symbol_t class_name = fts_object_get_class_name(obj);
   fts_symbol_t file_name;
   fts_patcher_t *help_patch;
-  char *help_name;
+  const char *help_name;
   char path[256];
 
   help_name = fts_package_get_help( pkg, class_name);
@@ -1471,7 +1471,7 @@ fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol
 
   fts_object_t *oldobj = fts_get_object(&at[0]);
       
-  obj = fts_object_redefine(oldobj, -1, 1, ac - 1, at + 1);
+  obj = fts_object_redefine(oldobj, ac - 1, at + 1);
       
   fts_client_upload_object(obj, -1);
 

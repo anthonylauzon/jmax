@@ -124,10 +124,12 @@ fts_metaclass_t *
 fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
 {
   fts_metaclass_t *mcl = fts_metaclass_new(name, instantiate_fun, equiv_fun);
-  fts_class_t *cl = 0;
 
-  if(fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_Success)
-    return 0;
+  if(name != NULL)
+    {
+      if(fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_Success)
+	return 0;
+    }
 
   return mcl;
 }

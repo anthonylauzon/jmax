@@ -55,8 +55,6 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->port = NULL;
 
-  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
-
   name = fts_get_symbol(at);
 
   if(ac > 0 && fts_is_symbol(at)) {
@@ -73,7 +71,10 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   /* add call back to midi port or set error */
   if(this->port != NULL)
-    fts_midiport_add_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o, sysexin_callback);
+    {
+      fts_midiport_add_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o, sysexin_callback);
+      fts_midimanger_register(o);
+    }
   else
     fts_object_set_error(o, "Cannot find default MIDI output");
 }
@@ -127,8 +128,6 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   ac--;
   at++;
 
-  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
-
   this->port = NULL;
 
   name = fts_get_symbol(at);
@@ -145,7 +144,9 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(this->port == NULL)
     this->port = fts_midimanager_get_output(fts_s_default);
 
-  if(this->port == NULL)
+  if(this->port != NULL)
+    fts_midimanger_register(o);
+  else
     fts_object_set_error(o, "Cannot find default MIDI output");
 }
 

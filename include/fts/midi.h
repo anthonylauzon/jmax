@@ -245,12 +245,6 @@ FTS_API fts_midievent_t *fts_midievent_program_change_new(int channel, int numbe
 FTS_API fts_midievent_t *fts_midievent_channel_pressure_new(int channel, int value);
 FTS_API fts_midievent_t *fts_midievent_pitch_bend_new(int channel, int LSB, int MSB);
 
-
-#define fts_set_midievent(ap, x) \
-     do {fts_set_object_type(ap, fts_s_midievent); fts_word_set_object(fts_atom_value(ap), (fts_object_t *)(x));} while (0)
-#define fts_get_midievent(ap) ((fts_midievent_t *)fts_word_get_object(fts_atom_value(ap)))
-#define fts_is_midievent(ap) fts_is_a(ap, fts_s_midievent)
-
 /* system exclusive events */
 #define fts_midievent_is_system_exclusive(e) ((e)->type == midi_system_exclusive)
 
@@ -386,8 +380,6 @@ typedef struct fts_midiport
   fts_midiport_output_t output;
   
 } fts_midiport_t;
-
-FTS_API fts_metaclass_t *fts_midiport_type;
 
 /*@}*/ /* The FTS MIDI port structure */
 
@@ -690,6 +682,7 @@ FTS_API fts_symbol_t fts_midimanager_s_get_output;
 /* MIDI objects API */
 FTS_API fts_midiport_t *fts_midimanager_get_input(fts_symbol_t name);
 FTS_API fts_midiport_t *fts_midimanager_get_output(fts_symbol_t name);
+FTS_API void fts_midimanger_register(fts_object_t *obj);
 
 /* MIDI manager API */
 FTS_API void fts_midimanager_update(fts_midimanager_t *mm);
