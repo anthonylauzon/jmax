@@ -1,5 +1,7 @@
 2003-04-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>, Riccardo Borghesi  <Riccardo.Borghesi@ircam.fr>
 
+	* works on jMax Windows port (updated porject files, fixed source code).
+	
 	* include/ftsprivate/template.h, fts/patcher.c (patcher_open_help_patch): added support for 
 	template help patch
 
