@@ -30,6 +30,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
        It is very common to go low memory, so your component will
        repaint partially, or will not show up at all.
        Most of the time, you're forced to setDoubleBuffered(false).*/
+
     setDoubleBuffered(false);
     itsSketchPad = theSketchPad;
     setLayout (new BorderLayout());    
@@ -40,15 +41,11 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
     validate();
   }
 
-  /*public void paint(Graphics g) {
-   System.err.println("got a paint");
-   super.paint(g);
-  }*/
-
   /**
    * Add a button to the toolbar, trying not to load already loaded
    * gif files (case of multiple windows with same palette).
    */
+
   public void AddButton(String name, String gifFilePath) {
     ErmesSwToggleButton aToggleButton;
     ImageIcon aImageIcon = loadIcon(gifFilePath);

@@ -112,5 +112,4 @@ extern void fts_variable_add_wannabe(fts_patcher_t *scope, fts_symbol_t name, ft
 extern void fts_variable_remove_wannabe(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *wannabe);
 
 
-
 #endif

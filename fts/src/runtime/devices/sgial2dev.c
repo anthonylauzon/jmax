@@ -81,7 +81,7 @@ typedef struct
 {
   ALconfig   config;		/* the audio configuration structure */
   ALport     port;		/* the audio port */
-
+  stamp_t    fts_frames;		/* out frame number, for slip detection */
   const char *name;		/* the AL2.0 device name (may be usefull) */
   int nch;			/* number of channels; used also to compute the fifo_size */
   int fifo_size;		/* the fifo size is stored in samples frames*/
@@ -306,7 +306,14 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
       return &fts_dev_open_error;
     }
-  
+
+  /* record the dac out frame number */
+  {
+    stamp_t al_time;		/* ignore */
+
+    alGetFrameTime(dev_data->port, &(dev_data->fts_frames), &al_time);
+  }
+
   /* Allocate the DAC  formatting buffer */
 
   dev_data->dac_fmtbuf = (float *) fts_malloc(MAXVS * dev_data->nch * sizeof(float));
@@ -352,6 +359,9 @@ sgi_dac_get_nchans(fts_dev_t *dev)
 
 */
 
+#define DACSLIP_INTERVAL 700
+static int dac_slip_count = DACSLIP_INTERVAL;
+
 static void
 sgi_dac_put(fts_word_t *argv)
 {
@@ -364,6 +374,29 @@ sgi_dac_put(fts_word_t *argv)
   int nchans, ch, inc;
 
   dev_data = fts_dev_get_device_data(dev);
+
+  {
+    /* dac slip detection */
+    dac_slip_count--;
+
+    if (dac_slip_count < 0)
+      {
+	stamp_t al_frames;
+	stamp_t al_time;
+
+	dac_slip_count = DACSLIP_INTERVAL;
+	alGetFrameTime(dev_data->port, &al_frames, &al_time);
+
+	if (al_frames > (dev_data->fts_frames + dev_data->fifo_size))
+	  {
+	    post("DAC SLIP (%d) !!!\n",
+		 (long long int) al_frames - (dev_data->fts_frames + dev_data->fifo_size));
+	    dev_data->fts_frames = al_frames;
+	  }
+      }
+  }
+
+  dev_data->fts_frames += n;	/* count for the slip detection */
 
   nchans = dev_data->nch;
   off2 = nchans;

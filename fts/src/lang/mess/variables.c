@@ -13,7 +13,9 @@
 
 #include "sys.h"
 #include "lang.h"
+#include "lang/mess.h"
 #include "lang/mess/messP.h"
+#include "lang/datalib.h"
 
 /* #define TRACE_DEBUG */
 
@@ -335,6 +337,19 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 }
 
 
+static void fts_binding_add_users_to_set(fts_binding_t *var, fts_objectset_t *set)
+{
+  fts_object_list_t  *u;	
+
+  fprintf(stderr, "Adding users\n");
+  for (u = var->users; u; u = u->next)
+    {
+      fprintf(stderr, "\nAdding user %lx (%d)\n", u->obj, u->obj->id);
+      fts_objectset_add(set, u->obj);
+      
+    }
+  fprintf(stderr, "Done Adding users\n");
+}
 
 static void fts_binding_add_wannabe(fts_binding_t *var, fts_object_t *object)
 {
@@ -809,6 +824,23 @@ void fts_variable_remove_wannabe(fts_patcher_t *scope, fts_symbol_t name, fts_ob
 
   if (var)
     fts_binding_remove_wannabe(var, wannabe);
+}
+
+/* Support for find  */
+
+void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_objectset_t *set)
+{
+  fts_binding_t *b;
+
+  b = fts_variable_get_binding(scope, name);
+
+  if (b)
+    {
+      fprintf(stderr, "Looking for users of binding %s\n", fts_symbol_name(name));
+      fts_binding_add_users_to_set(b, set);
+    }
+  else
+    fprintf(stderr, "Binding not found: %s\n", fts_symbol_name(name));
 }
 
 /* Module init function */
