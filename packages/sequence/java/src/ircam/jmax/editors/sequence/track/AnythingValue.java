@@ -40,6 +40,8 @@ public class AnythingValue extends AbstractEventValue
   public AnythingValue()
   {
     super();
+  
+    setProperty("duration", new Double(1));
   }
   
   public ValueInfo getValueInfo()
@@ -94,8 +96,8 @@ public class AnythingValue extends AbstractEventValue
 	return Integer.class;
     }
  
-      String defNamesArray[] = {};
-      int defPropertyCount = 0;
+    String defNamesArray[] = {};
+    int defPropertyCount = 0;
   }
 
   public JPopupMenu getPopupMenu()

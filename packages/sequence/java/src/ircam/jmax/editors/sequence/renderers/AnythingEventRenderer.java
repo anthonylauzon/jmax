@@ -96,10 +96,8 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
 	      break;
 	  }
       
-      int heigth = 100;
-      int lenght = 5;
-
-      g.fillRect(x, y, lenght, heigth);
+      g.fillRect(x, y, ANY_LENGTH, ANY_HEIGHT);
+      g.fillOval(x-1, y-1, 5, 5);
   }
   
   /**
@@ -121,8 +119,8 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
     int evtx = adapter.getX(e);
     int evty = adapter.getY(e);    
 
-    int evtheigth = 100;
-    int evtlenght = 5;
+    int evtheigth = ANY_HEIGHT;
+    int evtlenght = ANY_LENGTH;
     if(evtheigth<0)
 	{
 	    evty += evtheigth;
@@ -154,8 +152,8 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
     int evtx = adapter.getX(e);
     int evty = adapter.getY(e);    
     
-    int evtheigth = 100;
-    int evtlenght = 5;
+    int evtheigth = ANY_LENGTH;
+    int evtlenght = ANY_HEIGHT;
 
     eventRect.setBounds(evtx, evty, evtlenght, evtheigth);	    
 
@@ -175,5 +173,7 @@ public class AnythingEventRenderer implements SeqObjectRenderer {
 
     SequenceGraphicContext gc;
     public static AnythingEventRenderer staticInstance;
+    public static int ANY_LENGTH = 3;
+    public static int ANY_HEIGHT = 50;
 }
 

@@ -56,7 +56,7 @@ public class AnythingTrackRenderer extends AbstractRenderer{
 
     tempList = new MaxVector();
 
-    itsForegroundLayer = new MonoTrackForeground(gc);
+    itsForegroundLayer = new AnythingTrackForeground(gc);
 
     itsLayers.addElement(new AnythingTrackBackground(gc));
     itsLayers.addElement(itsForegroundLayer);
@@ -112,7 +112,7 @@ public class AnythingTrackRenderer extends AbstractRenderer{
   //------------------  Fields
   SequenceGraphicContext gc;
 
-  MonoTrackForeground itsForegroundLayer;
+  AnythingTrackForeground itsForegroundLayer;
   
   protected MaxVector tempList;
 }

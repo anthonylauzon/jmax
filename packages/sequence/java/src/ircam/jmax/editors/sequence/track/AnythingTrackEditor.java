@@ -44,7 +44,7 @@ import javax.swing.event.*;
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
-public class AnythingTrackEditor extends JPanel implements TrackEditor
+public class AnythingTrackEditor extends JPanel implements ListSelectionListener, TrackEditor
 {
     public AnythingTrackEditor(Geometry g, Track track)
     {
@@ -54,12 +54,31 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
 	this.itsTrack = track;
 
 	itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
-	    public void objectDeleted(Object whichObject, int oldIndex) {}
-	    public void trackCleared() {}
-	    public void objectAdded(Object whichObject, int index) {}
-	    public void objectsAdded(int maxTime) {}
-	    public void objectChanged(Object whichObject, String propName, Object propValue) {}
-	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {}
+	    public void objectDeleted(Object whichObject, int oldIndex) 
+		{
+		    AnythingTrackEditor.this.repaint();
+		}
+	    public void trackCleared() 
+		{
+		    AnythingTrackEditor.this.repaint();
+		}
+	    public void objectAdded(Object whichObject, int index) 
+		{ 
+		    AnythingTrackEditor.this.repaint();
+		}
+	    public void objectsAdded(int maxTime) 
+		{
+		    AnythingTrackEditor.this.repaint();
+		    selection.deselectAll();
+		}
+	    public void objectChanged(Object whichObject, String propName, Object propValue) 
+		{
+		    AnythingTrackEditor.this.repaint();
+		}
+	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
+		{
+		    AnythingTrackEditor.this.repaint();
+		}
 	    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) {}
 	    public void trackNameChanged(String oldName, String newName) {
 		itsTrack.setProperty("trackName", newName);
@@ -83,7 +102,30 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
 
 	createGraphicContext(geometry, itsTrack.getTrackDataModel());
 
-	itsTrack.setProperty("locked", new Boolean(true));
+	//--- make this track's selection the current 
+	// one when the track is activated
+	itsTrack.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+		public void propertyChange(PropertyChangeEvent e)
+		{		    
+		    if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
+			SequenceSelection.setCurrent(selection);
+		}
+	});
+
+	//track.setProperty("locked", new Boolean(true));
+
+	selection.addListSelectionListener(this);
+
+	selection.setOwner(new SelectionOwner() {
+		public void selectionDisactivated()
+		{
+		    repaint();
+		}
+		public void selectionActivated()
+		{
+		    repaint();
+		}
+	});
 
 	setBackground(Color.lightGray);
 	setOpaque(false);
@@ -119,7 +161,7 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
 	gc = new SequenceGraphicContext(model, selection, this); //loopback?
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
-	ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
+	ad = new AnythingAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
 	itsTrack.getPropertySupport().addPropertyChangeListener(ad);
 	gc.setAdapter(ad);
 
@@ -127,7 +169,7 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
 	gc.setRenderManager(renderer);
     }
 
-    public void setAdapter(MonoDimensionalAdapter adapter)
+    public void setAdapter(AnythingAdapter adapter)
     {
 	itsTrack.getPropertySupport().removePropertyChangeListener(ad);	
 	itsTrack.getPropertySupport().addPropertyChangeListener(adapter);
@@ -145,6 +187,15 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
     public void updateNewObject(Object obj){};
     void updateEventProperties(Object whichObject, String propName, Object propValue){}
     void updateRange(Object whichObject){}  
+
+    /**
+     * ListSelectionListener interface
+     */
+    
+    public void valueChanged(ListSelectionEvent e)
+    {
+	repaint();
+    }
       
     /**
      * Track editor interface */
@@ -176,6 +227,27 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
     {
 	return itsTrack;
     }
+
+    public void processKeyEvent(KeyEvent e)
+    {
+	if(SequenceTextArea.isDeleteKey(e))
+	    {
+		if(e.getID()==KeyEvent.KEY_PRESSED)
+		    {
+			((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
+			selection.deleteAll();
+		    }
+	    }
+	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
+	    if(e.isControlDown())
+		selection.selectPrevious();
+	    else
+		selection.selectNext();
+
+	super.processKeyEvent(e);
+	requestFocus();
+    }
+
     //--- AnythingTrackEditor fields
     Geometry geometry;
     SequenceGraphicContext gc;
@@ -183,7 +255,7 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
     static public int DEFAULT_HEIGHT = 70;
     AnythingTrackRenderer renderer;
-    MonoDimensionalAdapter ad;
+    AnythingAdapter ad;
     Track itsTrack;
 }
 

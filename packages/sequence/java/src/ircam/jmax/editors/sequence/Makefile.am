@@ -7,6 +7,7 @@ AbstractValueDataFlavor.java \
 Adapter.java \
 AmbitusMapper.java \
 AmbitusValueDataFlavor.java \
+AnythingAdapter.java \
 ChannelMapper.java \
 CombDrawer.java \
 CombListener.java \

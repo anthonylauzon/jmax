@@ -121,11 +121,6 @@ public class AnythingTrackBackground implements Layer, ImageObserver{
     Image image = gc.getTrack().getTrackDataModel().getType().getIcon().getImage();    
     g.drawImage(image , 2, h-15, this);
 
-    g.setColor(Color.lightGray);
-
-    int y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
-    g.drawLine(0, y0, w, y0);
-
     //vertical line at time 0
     g.setColor(Color.black);
     g.drawLine(PartitionBackground.KEYEND, 0, PartitionBackground.KEYEND, h);
@@ -152,10 +147,6 @@ public class AnythingTrackBackground implements Layer, ImageObserver{
       
       g.drawLine(xPosition, 0, xPosition, h);
     }
-
-    int y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
-    g.setColor(Color.black);
-    g.drawLine(0, y0, w, y0);
   }
       
   /**

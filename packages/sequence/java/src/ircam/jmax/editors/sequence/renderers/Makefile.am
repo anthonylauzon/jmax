@@ -6,6 +6,7 @@ package_SOURCES = \
 AmbitusEventRenderer.java \
 AnythingEventRenderer.java \
 AnythingTrackBackground.java \
+AnythingTrackForeground.java \
 AnythingTrackRenderer.java \
 IntegerEventRenderer.java \
 IntegerTrackRenderer.java \

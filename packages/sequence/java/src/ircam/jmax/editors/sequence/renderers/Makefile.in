@@ -79,7 +79,7 @@ SUBDIRS =
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AmbitusEventRenderer.java AnythingEventRenderer.java AnythingTrackBackground.java AnythingTrackRenderer.java IntegerEventRenderer.java IntegerTrackRenderer.java MessageEventRenderer.java MonoTrackBackground.java MonoTrackForeground.java MonoTrackRenderer.java PartitionBackground.java ScoreBackground.java ScoreForeground.java ScoreRenderer.java SeqObjectRenderer.java SequenceImages.java TextRenderer.java 
+package_SOURCES =  AmbitusEventRenderer.java AnythingEventRenderer.java AnythingTrackBackground.java AnythingTrackForeground.java AnythingTrackRenderer.java IntegerEventRenderer.java IntegerTrackRenderer.java MessageEventRenderer.java MonoTrackBackground.java MonoTrackForeground.java MonoTrackRenderer.java PartitionBackground.java ScoreBackground.java ScoreForeground.java ScoreRenderer.java SeqObjectRenderer.java SequenceImages.java TextRenderer.java 
 
 
 JAVACX = @JAVACX@
@@ -100,12 +100,13 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 package_OBJECTS =  AmbitusEventRenderer.class \
 AnythingEventRenderer.class AnythingTrackBackground.class \
-AnythingTrackRenderer.class IntegerEventRenderer.class \
-IntegerTrackRenderer.class MessageEventRenderer.class \
-MonoTrackBackground.class MonoTrackForeground.class \
-MonoTrackRenderer.class PartitionBackground.class ScoreBackground.class \
-ScoreForeground.class ScoreRenderer.class SeqObjectRenderer.class \
-SequenceImages.class TextRenderer.class
+AnythingTrackForeground.class AnythingTrackRenderer.class \
+IntegerEventRenderer.class IntegerTrackRenderer.class \
+MessageEventRenderer.class MonoTrackBackground.class \
+MonoTrackForeground.class MonoTrackRenderer.class \
+PartitionBackground.class ScoreBackground.class ScoreForeground.class \
+ScoreRenderer.class SeqObjectRenderer.class SequenceImages.class \
+TextRenderer.class
 package_LDADD = $(LDADD)
 package_DEPENDENCIES = 
 package_LDFLAGS = 
@@ -276,7 +277,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

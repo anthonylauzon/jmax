@@ -260,6 +260,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   {
     int selIndex;
     TrackEvent event = null;
+    
     MaxVector events = new MaxVector();
 
     for(int i=0; i<nArgs; i++)
@@ -563,9 +564,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     public void addEvent(TrackEvent event)
     {
 	int index;
-	
 	event.setDataModel(this);
-	
 	index = getIndexAfter(event.getTime());
 	
 	if (index == EMPTY_COLLECTION)
@@ -575,7 +574,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	
 	makeRoomAt(index);
 	events[index] = event;
-
 	notifyObjectAdded(event, index);
 
 	if (isInGroup())     
@@ -693,8 +691,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	
 	notifyObjectDeleted(event, removeIndex);
     }
-
-
 
     /**
      * utility to notify the data base change to all the listeners
@@ -1046,7 +1042,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	{
 	    if (length() == 0) return null;
 	    TrackEvent e;
-
+	    
 	    while (index < length() && events[index].getTime() <= endTime)
 		{
 		    e = events[index++];	

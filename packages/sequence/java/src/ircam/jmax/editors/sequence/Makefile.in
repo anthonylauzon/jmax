@@ -79,7 +79,7 @@ SUBDIRS = actions menus renderers tools track
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AbstractValueDataFlavor.java Adapter.java AmbitusMapper.java AmbitusValueDataFlavor.java ChannelMapper.java CombDrawer.java CombListener.java DoubleMapper.java DurationMapper.java FloatAdapter.java FloatMapper.java FloatValueDataFlavor.java FtsSequenceObject.java FtsTrackObject.java HighlightListener.java IntEnumeration.java IntegerAdapter.java IntegerLabelMapper.java IntegerMapper.java IntegerValueDataFlavor.java LineDrawer.java LineListener.java Mapper.java MappingListener.java MessageAdapter.java MessageMapper.java MessageValueDataFlavor.java MidiMouseTracker.java MonoDimensionalAdapter.java MutexPropertyHandler.java PartitionAdapter.java PitchLabelMapper.java PitchMapper.java PositionMapper.java ScrollManager.java Sequence.java SequenceDataFlavor.java SequenceDataListener.java SequenceDataModel.java SequenceExtension.java SequenceGraphicContext.java SequencePanel.java SequenceRuler.java SequenceSelecter.java SequenceSelection.java SequenceSelectionMover.java SequenceSelectionResizer.java SequenceVerticalResizer.java StringMapper.java TimeMapper.java TrackContainer.java UndoableAdd.java UndoableDelete.java UndoableEventTransf.java UndoableMove.java VelocityMapper.java VerboseMouseTracker.java VerticalScrollable.java VerticalZoomable.java WholeNumberField.java 
+package_SOURCES =  AbstractValueDataFlavor.java Adapter.java AmbitusMapper.java AmbitusValueDataFlavor.java AnythingAdapter.java ChannelMapper.java CombDrawer.java CombListener.java DoubleMapper.java DurationMapper.java FloatAdapter.java FloatMapper.java FloatValueDataFlavor.java FtsSequenceObject.java FtsTrackObject.java HighlightListener.java IntEnumeration.java IntegerAdapter.java IntegerLabelMapper.java IntegerMapper.java IntegerValueDataFlavor.java LineDrawer.java LineListener.java Mapper.java MappingListener.java MessageAdapter.java MessageMapper.java MessageValueDataFlavor.java MidiMouseTracker.java MonoDimensionalAdapter.java MutexPropertyHandler.java PartitionAdapter.java PitchLabelMapper.java PitchMapper.java PositionMapper.java ScrollManager.java Sequence.java SequenceDataFlavor.java SequenceDataListener.java SequenceDataModel.java SequenceExtension.java SequenceGraphicContext.java SequencePanel.java SequenceRuler.java SequenceSelecter.java SequenceSelection.java SequenceSelectionMover.java SequenceSelectionResizer.java SequenceVerticalResizer.java StringMapper.java TimeMapper.java TrackContainer.java UndoableAdd.java UndoableDelete.java UndoableEventTransf.java UndoableMove.java VelocityMapper.java VerboseMouseTracker.java VerticalScrollable.java VerticalZoomable.java WholeNumberField.java 
 
 
 JAVACX = @JAVACX@
@@ -99,12 +99,12 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 package_OBJECTS =  AbstractValueDataFlavor.class Adapter.class \
-AmbitusMapper.class AmbitusValueDataFlavor.class ChannelMapper.class \
-CombDrawer.class CombListener.class DoubleMapper.class \
-DurationMapper.class FloatAdapter.class FloatMapper.class \
-FloatValueDataFlavor.class FtsSequenceObject.class FtsTrackObject.class \
-HighlightListener.class IntEnumeration.class IntegerAdapter.class \
-IntegerLabelMapper.class IntegerMapper.class \
+AmbitusMapper.class AmbitusValueDataFlavor.class AnythingAdapter.class \
+ChannelMapper.class CombDrawer.class CombListener.class \
+DoubleMapper.class DurationMapper.class FloatAdapter.class \
+FloatMapper.class FloatValueDataFlavor.class FtsSequenceObject.class \
+FtsTrackObject.class HighlightListener.class IntEnumeration.class \
+IntegerAdapter.class IntegerLabelMapper.class IntegerMapper.class \
 IntegerValueDataFlavor.class LineDrawer.class LineListener.class \
 Mapper.class MappingListener.class MessageAdapter.class \
 MessageMapper.class MessageValueDataFlavor.class MidiMouseTracker.class \
@@ -291,7 +291,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
