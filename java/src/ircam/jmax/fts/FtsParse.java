@@ -1000,6 +1000,9 @@ public class FtsParse
     Enumeration en = values.elements();
     StringBuffer descr = new StringBuffer();
 
+    if ( ! en.hasMoreElements())
+      return "";
+
     value2 = en.nextElement();
     value1 = value2;
 

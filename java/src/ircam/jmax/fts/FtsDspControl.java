@@ -36,6 +36,8 @@ public class FtsDspControl extends FtsRemoteData
 
   static final int DSP_PRINT  = 11;
 
+  static final int DSP_CONTROL_SET_CHECK_NAN = 13;
+
   protected Integer dacSlip;
   protected Integer invalidFpe;
   protected Integer divideByZeroFpe;
@@ -144,6 +146,14 @@ public class FtsDspControl extends FtsRemoteData
   public void clearFpeCollecting()
   {
     remoteCall(FPE_CLEAR_COLLECT);
+  }
+
+  public void setCheckNan( boolean checkNan)
+  {
+    Object args[] = new Object[1];
+
+    args[0] = new Integer( checkNan ? 1 : 0);
+    remoteCall( DSP_CONTROL_SET_CHECK_NAN, args);
   }
 
   /* Listeners support */
