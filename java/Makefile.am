@@ -1,31 +1,38 @@
-SUBDIRS= src lib
+SUBDIRS= src
 
 packagedir=$(pkgdatadir)/java
-package_DATA = jmax.jar
+JAR=jmax.jar
+package_DATA = $(JAR)
 
-JAR_DEP=$(shell find src -name "*.class")
+JAR_DEP=\
+	src/ircam/jmax/classpackage.stamp \
+	src/ircam/jmax/dialogs/classpackage.stamp \
+	src/ircam/jmax/editors/console/classpackage.stamp \
+	src/ircam/jmax/editors/patcher/classpackage.stamp \
+	src/ircam/jmax/editors/patcher/actions/classpackage.stamp \
+	src/ircam/jmax/editors/patcher/interactions/classpackage.stamp \
+	src/ircam/jmax/editors/patcher/menus/classpackage.stamp \
+	src/ircam/jmax/editors/patcher/objects/classpackage.stamp \
+	src/ircam/jmax/fts/classpackage.stamp \
+	src/ircam/jmax/toolkit/classpackage.stamp \
+	src/ircam/jmax/toolkit/actions/classpackage.stamp \
+	src/ircam/jmax/toolkit/menus/classpackage.stamp \
+	src/ircam/jmax/widgets/classpackage.stamp 
 
-jmax.jar: $(JAR_DEP)	
-	-rm jmax.jar
-	( cd src ; jar -cvf ../jmax.jar ircam/jmax/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/dialogs/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/console/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/actions/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/interactions/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/menus/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/editors/patcher/objects/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/fts/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/mda/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/pkg/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/scm/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/scm/kawa/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/scm/silk/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/script/tcl/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/toolkit/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/toolkit/actions/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/toolkit/menus/*.class )
-	( cd src ; jar -uvf ../jmax.jar ircam/jmax/widgets/*.class )
-	( cd src ; jar -uvf ../jmax.jar silk/*.class )
+CLEANFILES=${JAR}
+
+$(JAR): $(JAR_DEP)	
+	-test -f $(JAR) || rm -f $(JAR)
+	( cd src ; jar -cvf ../$(JAR) ircam/jmax/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/dialogs/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/console/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/actions/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/interactions/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/menus/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/objects/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/fts/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/actions/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/menus/*.class )
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/widgets/*.class )

@@ -1,5 +1,5 @@
-noinst_PROGRAMS = package
-package_SOURCES = \
+packagedir=$(pkgdatadir)
+package_JAVA = \
 BeanPanel.java\
 ColorPropertyEditor.java\
 ConsoleArea.java\
@@ -12,23 +12,7 @@ ObjectSelectedListener.java\
 ObjectSetViewer.java\
 SimpleLed.java
 
-JAVACX=@JAVACX@
-JAVACFLAGSX=@JAVACFLAGSX@
-JAVAC=@JAVAC@
-JAVAROOTX=@top_srcdir@/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
-
-SUFFIXES= .java .class
-
-.java.class:
-	$(CLASSPATH_ENVX) $(JAVACX) -d $(JAVAROOTX) $(JAVACFLAGSX) $?
-
-package: $(package_OBJECTS) $(package_DEPENDENCIES)
-
-clean-compile:
-	rm -f *.class
-
-clean-generic:
-	rm -f *~
-
-
+JAVAC= @JAVACX@
+JAVACFLAGS= @JAVACFLAGSX@
+JAVAROOT= @top_srcdir@/java/src
+CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):@top_srcdir@/client/java/ftsclient.jar

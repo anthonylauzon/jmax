@@ -31,85 +31,85 @@ import java.io.*;
 
 public class RecentFileHistory extends DefaultListModel
 {
-    int max_size;
+  int max_size;
 
-    public RecentFileHistory(int max_size0)
-    {
-	max_size = max_size0;
+  public RecentFileHistory(int max_size0)
+  {
+    max_size = max_size0;
 
-	load();
-    }
+    load();
+  }
 
-    public void load()
-    {
-	File file = history_file_name();
-	File recentFile;
+  public void load()
+  {
+    File file = history_file_name();
+    File recentFile;
 
-	if (!file.exists())
-	    return;
+    if (!file.exists())
+      return;
 
-	if (!file.canRead())
-	    {
-		System.out.println("history file name '" + file + "' has wrong permissions");
-		return;
-	    }
+    if (!file.canRead())
+      {
+	System.out.println("history file name '" + file + "' has wrong permissions");
+	return;
+      }
 
-	try
-	    {
-		FileReader fileWriter = new FileReader(file.toString());
-		BufferedReader bufferedReader = new BufferedReader(fileWriter);
-		String line;
+    try
+      {
+	FileReader fileWriter = new FileReader(file.toString());
+	BufferedReader bufferedReader = new BufferedReader(fileWriter);
+	String line;
 
-		while ((line = bufferedReader.readLine()) != null)
-		    {
-			recentFile = new File(line);
-			if (recentFile.exists() && recentFile.canRead())
-			    addFile(recentFile);
-		    }
-		bufferedReader.close();
-	    }
-	catch (IOException e)
-	    {
-		System.out.println("I/O error reading recent file history '" + file + "':\n" + e);
-	    }
-    }
+	while ((line = bufferedReader.readLine()) != null)
+	  {
+	    recentFile = new File(line);
+	    if (recentFile.exists() && recentFile.canRead())
+	      addFile(recentFile);
+	  }
+	bufferedReader.close();
+      }
+    catch (IOException e)
+      {
+	System.out.println("I/O error reading recent file history '" + file + "':\n" + e);
+      }
+  }
 
-    public void save()
-    {
-	File file = history_file_name();
+  public void save()
+  {
+    File file = history_file_name();
 	
-	try
-	    {
-		FileWriter fileWriter = new FileWriter(file.toString());
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+    try
+      {
+	FileWriter fileWriter = new FileWriter(file.toString());
+	BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-		// Save in reverse order
-		for (int i = size() - 1; i >= 0; i--)
-		    {
-			bufferedWriter.write(((File)get(i)).toString());
-			bufferedWriter.newLine();
-		    }
-		bufferedWriter.close();
-	    }
-	catch (IOException e)
-	    {
-		System.out.println("I/O error writing recent file history '" + file + "':\n" + e);
-	    }
-    }
+	// Save in reverse order
+	for (int i = size() - 1; i >= 0; i--)
+	  {
+	    bufferedWriter.write(((File)get(i)).toString());
+	    bufferedWriter.newLine();
+	  }
+	bufferedWriter.close();
+      }
+    catch (IOException e)
+      {
+	System.out.println("I/O error writing recent file history '" + file + "':\n" + e);
+      }
+  }
 
-    private File history_file_name()
-    {
-	return  new File(System.getProperty("user.home"), ".jmax_history");
-    }
+  private File history_file_name()
+  {
+    return  new File(System.getProperty("user.home"), ".jmax_history");
+  }
 
-    public void addFile(File file)
-    {
-	for (int i = 0; i < size(); ++i)
-	    if (((File)get(i)).compareTo(file) == 0)
-		return;
+  public void addFile(File file)
+  {
+    for (int i = 0; i < size(); ++i)
+      if (((File)get(i)).compareTo(file) == 0)
+	return;
 
-	add(0, file);
-	if (size() > max_size)
-	    removeRange(max_size, size() - 1);
-    }
+    add(0, file);
+    if (size() > max_size)
+      removeRange(max_size, size() - 1);
+  }
 }
