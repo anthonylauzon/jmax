@@ -156,8 +156,6 @@ fts_status_t fts_module_load(const char *name, const char *filename)
   fts_module_t *module, *s;
   void *handle;
 
-  fprintf( stderr, "fts_module_load( \"%s\", \"%s\")\n", name, (filename) ? filename : "null");
-
   /* test if the module has been already loaded  */
 
   for (s = fts_installed_modules; s; s = s->next)
@@ -197,8 +195,6 @@ fts_status_t fts_module_load(const char *name, const char *filename)
       fprintf(stderr, "Looking for module: %s\n", errorbuf);
       return &module_not_found;
     }
-
-  fprintf( stderr, "%s = 0x%08x\n", module_name, (unsigned int)module);
 
   /* add */
 
