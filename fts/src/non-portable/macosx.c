@@ -18,24 +18,31 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Author: Francois Dechelle.
- *
  */
 
 /*
- * This file contains MacOS-X implementation of the standard interface 
- * for dynamic linking.
+ * This file contains Mac OS X platform dependent functions:
+ *  - dynamic loader
+ *  - FPU settings
+ *  - real-time: scheduling mode and priority, memory locking
  * 
- * The MacOS-X implementation uses undocumented NEXTSTEP rld()...
- *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mach-o/dyld.h> 
+
+#include <fts/sys/hw.h>
+
+
+/* *************************************************************************** */
+/*                                                                             */
+/* Dynamic loader                                                              */
+/*                                                                             */
+/* *************************************************************************** */
+
+/* The MacOS-X implementation uses undocumented NEXTSTEP rld()...
 
 /* 
 #define odbc_private_extern __private_extern__ 
@@ -74,24 +81,11 @@ odbc_private_extern void linkEdit_symbol_handler (NSLinkEditErrors c, int errorN
     sprintf( stored_error_message, "errors during link edit for file %s : %s", fileName, errorString); 
 } 
 
-static int dl_init = 0;
-
-/*
-  Function: fts_dl_open
-  Description:
-   loads a dynamic library
-  Arguments: 
-   filename: the name of the library. This file will be searched using
-   platform specific search algorithm.
-   error: a string in which a description of the error will be stored
-   in case of error.
-  Returns: a "handle" to be used for further invocation of fts_dl_lookup,
-  0 if an error occured.
-*/
 void *fts_dl_open( const char *filename, char *error)
 {
   NSObjectFileImage image; 
   void *ret;
+  static int dl_init = 0;
 
   if ( !dl_init)
     {
@@ -118,22 +112,6 @@ void *fts_dl_open( const char *filename, char *error)
   return ret;
 }
 
-
-/*
-  Function: fts_dl_lookup
-  Description:
-   lookup the specified symbol in symbol table, returning the address
-   of this symbol
-  Arguments: 
-   handle: a handle returned by fts_dl_open
-   symbol: the symbol name
-   address: a pointer to a pointer: the address of the symbol
-   will be stored here upon return, if the function does not
-   return an error.
-   error: a string in which a description of the error will be stored
-   in case of error.
-  Returns: 1 if symbol is found, 0 if not
-*/
 int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error)
 {
   static char *full_sym_name;
@@ -158,5 +136,46 @@ int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error
   stored_error_message = 0;
 
   return 1;
+}
+
+/* *************************************************************************** */
+/*                                                                             */
+/* Floating-point unit                                                         */
+/*                                                                             */
+/* *************************************************************************** */
+
+void fts_enable_fpe_traps( void)
+{
+}
+
+void fts_disable_fpe_traps( void)
+{
+}
+
+unsigned int fts_check_fpe( void)
+{
+  return 0;
+}
+
+/* *************************************************************************** */
+/*                                                                             */
+/* Memory locking                                                              */
+/*                                                                             */
+/* *************************************************************************** */
+
+int fts_unlock_memory( void)
+{
+  return 0;
+}
+
+
+/* *************************************************************************** */
+/*                                                                             */
+/* Platform specific initialization                                            */
+/*                                                                             */
+/* *************************************************************************** */
+
+void fts_platform_init( int argc, char **argv)
+{
 }
 
