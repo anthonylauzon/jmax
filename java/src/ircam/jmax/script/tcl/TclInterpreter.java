@@ -80,9 +80,6 @@ public class TclInterpreter implements ircam.jmax.script.Interpreter
 		// create the startup configuration, included reading user files
 		// installing editors, data types and data handlers
 	
-		System.err.println( root + getSystemProperty("file.separator") + "tcl" +
-				    getSystemProperty("file.separator") +  "jmaxboot.tcl");
-
 		itsInterp.evalFile(root + getSystemProperty("file.separator") + "tcl" +
 				   getSystemProperty("file.separator") +  "jmaxboot.tcl");
 	    }

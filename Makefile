@@ -240,11 +240,11 @@ new-patch:
 	$(MAKE) spec-files
 
 new-minor:
-	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2]+1, a[3]) }'  VERSION > VERSION.out
+	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1], a[2]+1, 0) }'  VERSION > VERSION.out
 	mv VERSION.out VERSION
 	$(MAKE) spec-files
 
 new-major:
-	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1]+1, a[2], a[3]) }'  VERSION > VERSION.out
+	awk '{ split( $$1, a, "."); printf( "%d.%d.%d\n", a[1]+1, 0, 0) }'  VERSION > VERSION.out
 	mv VERSION.out VERSION
 	$(MAKE) spec-files
