@@ -79,7 +79,7 @@ SUBDIRS =
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AmbitusEventRenderer.java IntegerEventRenderer.java IntegerTrackRenderer.java MessageEventRenderer.java MonoTrackBackground.java MonoTrackForeground.java MonoTrackRenderer.java PartitionBackground.java ScoreBackground.java ScoreForeground.java ScoreRenderer.java SeqObjectRenderer.java SequenceImages.java TextRenderer.java 
+package_SOURCES =  AmbitusEventRenderer.java AnythingEventRenderer.java AnythingTrackBackground.java AnythingTrackRenderer.java IntegerEventRenderer.java IntegerTrackRenderer.java MessageEventRenderer.java MonoTrackBackground.java MonoTrackForeground.java MonoTrackRenderer.java PartitionBackground.java ScoreBackground.java ScoreForeground.java ScoreRenderer.java SeqObjectRenderer.java SequenceImages.java TextRenderer.java 
 
 
 JAVACX = @JAVACX@
@@ -98,7 +98,9 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../../../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-package_OBJECTS =  AmbitusEventRenderer.class IntegerEventRenderer.class \
+package_OBJECTS =  AmbitusEventRenderer.class \
+AnythingEventRenderer.class AnythingTrackBackground.class \
+AnythingTrackRenderer.class IntegerEventRenderer.class \
 IntegerTrackRenderer.class MessageEventRenderer.class \
 MonoTrackBackground.class MonoTrackForeground.class \
 MonoTrackRenderer.class PartitionBackground.class ScoreBackground.class \

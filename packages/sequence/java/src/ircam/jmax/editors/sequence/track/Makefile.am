@@ -6,6 +6,8 @@ package_SOURCES = \
 AbstractEventValue.java \
 AbstractValueInfo.java \
 AmbitusValue.java \
+AnythingTrackEditor.java\
+AnythingValue.java\
 ArrayEnumeration.java \
 ChangeRangeDialog.java \
 ChangeTrackNameDialog.java \

@@ -23,4 +23,5 @@ img_DATA=\
  float.gif \
  integer.gif \
  message.gif \
- midi.gif
+ anything.gif \
+ midi.gif 

@@ -41,7 +41,10 @@ public class TrackEditorFactoryTable {
     public static TrackEditor newEditor(Track track, Geometry geometry)
     {
 	TrackEditorFactory tef = (TrackEditorFactory) factories.get(track.getTrackDataModel().getType().getName());
-	return tef.newEditor(track, geometry);
+	if(tef!=null)
+	    return tef.newEditor(track, geometry);
+	else
+	    return new AnythingTrackEditor(geometry, track);
     }
 
     public static Enumeration getTypes()

@@ -81,6 +81,10 @@ public class TrackContainer extends JPanel {
     toggleBar = new ToggleBar(trackEditor, trackIndex);
     add(toggleBar, BorderLayout.NORTH);
     toggleBar.setVisible(false);
+
+
+    setPreferredSize(new Dimension(getPreferredSize().width, trackEditor.getDefaultHeight()));
+    setMaximumSize(new Dimension(getMaximumSize().width, trackEditor.getDefaultHeight()));
     
     // --- set the "active" property of the track when the button is pressed
     activationButton.addActionListener( new ActionListener() {

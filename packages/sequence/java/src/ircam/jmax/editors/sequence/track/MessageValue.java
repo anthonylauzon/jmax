@@ -240,15 +240,19 @@ public class MessageValue extends AbstractEventValue
 
 	public Class getPropertyType(int index)
 	{
-	    if(index < defPropertyCount)
-		return propertyTypesArray[index];
+	    /*if(index < defPropertyCount)
+	      return propertyTypesArray[index];
+	      else
+	      return Integer.class;*/
+	    if(index==0)
+		return String.class;
 	    else
 		return Integer.class;
 	}
 	
 	
 	String defNamesArray[] = {"message", "integer"};
-	Class propertyTypesArray[] = {String.class, Integer.class};
+	//Class propertyTypesArray[] = {String.class, Integer.class};
 	int defPropertyCount = 2;
     }
 

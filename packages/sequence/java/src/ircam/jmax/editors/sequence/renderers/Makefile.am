@@ -4,6 +4,9 @@ EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
 AmbitusEventRenderer.java \
+AnythingEventRenderer.java \
+AnythingTrackBackground.java \
+AnythingTrackRenderer.java \
 IntegerEventRenderer.java \
 IntegerTrackRenderer.java \
 MessageEventRenderer.java \

@@ -119,14 +119,15 @@ public class MidiValue extends AbstractEventValue
 	}
 	public Class getPropertyType(int index)
 	{
-	    if(index < defPropertyCount)
-		return propertyTypesArray[index];
-	    else
-		return Integer.class;
+	    /*if(index < defPropertyCount)
+	      return propertyTypesArray[index];
+	      else
+	      return Integer.class;*/
+	    return Integer.class;
 	}
 
 	String defNamesArray[] = {"integer", "number", "channel"};
-	Class propertyTypesArray[] = {Integer.class, Integer.class, Integer.class};
+	//Class propertyTypesArray[] = {Integer.class, Integer.class, Integer.class};
 	int defPropertyCount = 3;
     }
 

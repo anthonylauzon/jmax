@@ -110,14 +110,15 @@ public class IntegerValue extends AbstractEventValue
 	}
 	public Class getPropertyType(int index)
 	{
-	    if(index < defPropertyCount)
-		return propertyTypesArray[index];
-	    else
-		return Integer.class;
+	    /*if(index < defPropertyCount)
+	      return propertyTypesArray[index];
+	      else
+	      return Integer.class;*/
+	    return Integer.class;
 	}
 
 	String defNamesArray[] = {"integer"};
-	Class propertyTypesArray[] = {Integer.class};
+	//Class propertyTypesArray[] = {Integer.class};
 	int defPropertyCount = 1;
     }
 
