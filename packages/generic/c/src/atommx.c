@@ -82,9 +82,9 @@ atom_matrix_set_size(atom_matrix_t *mx, int m, int n)
   if(size > mx->alloc)
     {
       if(mx->alloc)
-	mx->data = fts_realloc(mx->data, m * n * sizeof(fts_atom_t));
+	mx->data = fts_realloc(mx->data, size * sizeof(fts_atom_t));
       else
-	mx->data = fts_malloc(m * n * sizeof(fts_atom_t));
+	mx->data = fts_malloc(size * sizeof(fts_atom_t));
     }
   else if(size > 0)
     {
@@ -137,7 +137,6 @@ int
 atom_matrix_import_ascii_newline(atom_matrix_t *mx, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
-  fts_atom_t *data = mx->data;
   int m = 0;
   int n = 0;
   int i = 0;
@@ -164,14 +163,14 @@ atom_matrix_import_ascii_newline(atom_matrix_t *mx, fts_symbol_t file_name)
 
       if(j < n)
 	{
-	  data[i * n + j] = a;
+	  mx->data[i * n + j] = a;
 	  j++;
 	  
 	  if(c == '\n')
 	    {
 	      /* void end of row */
 	      for(; j<n; j++)
-		fts_set_void(data + i * n + j);
+		fts_set_void(mx->data + i * n + j);
 	      
 	      /* reset to beginning of next row */
 	      i++;
@@ -190,7 +189,7 @@ atom_matrix_import_ascii_newline(atom_matrix_t *mx, fts_symbol_t file_name)
   if(j > 0)
     {
       for(; j<n; j++)
-	fts_set_void(data + n * i + j);
+	fts_set_void(mx->data + i * n + j);
       
       i++;
       j = 0;
@@ -238,7 +237,6 @@ int
 atom_matrix_import_ascii_separator(atom_matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator, int ac, fts_atom_t *at)
 {
   fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
-  fts_atom_t *data = mx->data;
   int m = 0;
   int n = 0;
   int i = 0;
@@ -276,7 +274,7 @@ atom_matrix_import_ascii_separator(atom_matrix_t *mx, fts_symbol_t file_name, ft
 	    {
 	      /* maybe void end of row */
 	      for(; j<n; j++)
-		fts_set_void(data + i * n + j);
+		fts_set_void(mx->data + i * n + j);
 	      
 	      /* reset to beginning of next row */
 	      i++;
@@ -290,7 +288,7 @@ atom_matrix_import_ascii_separator(atom_matrix_t *mx, fts_symbol_t file_name, ft
 	      if(n > mx->alloc)
 		atom_matrix_grow(mx, n);
 	      
-	      data[i * n + j] = a;
+	      mx->data[i * n + j] = a;
 	      j++;
 	    }
 	  else if(j < n)
@@ -298,7 +296,7 @@ atom_matrix_import_ascii_separator(atom_matrix_t *mx, fts_symbol_t file_name, ft
 	      if(m * n > mx->alloc)
 		atom_matrix_grow(mx, m * n);
 	      
-	      data[i * n + j] = a;
+	      mx->data[i * n + j] = a;
 	      j++;
 	    }
 	}
@@ -308,7 +306,7 @@ atom_matrix_import_ascii_separator(atom_matrix_t *mx, fts_symbol_t file_name, ft
   if(j > 0)
     {
       for(; j<n; j++)
-	fts_set_void(data + n * i + j);
+	fts_set_void(mx->data + n * i + j);
       
       i++;
       j = 0;

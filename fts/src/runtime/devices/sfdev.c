@@ -610,12 +610,10 @@ sgi_readsf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
     return &fts_dev_open_error;
 
   /* make the structure */
-
   dev_data = (struct readsf_data *) fts_malloc(sizeof(struct readsf_data));
   fts_dev_set_device_data(dev, dev_data);
 
   /* get the file name */
-
   dev_data->file_name = fts_get_symbol(&args[0]);
   dev_data->active = 0;
 
