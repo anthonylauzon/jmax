@@ -137,9 +137,10 @@ class ErmesObjSlider extends ErmesObject {
   //--------------------------------------------------------
   protected void FtsValueChanged(Object value) {
     
+    if (itsMovingThrottle) return;
     int temp = ((Integer) value).intValue();
     
-    last_value = temp;
+    /*last_value = temp;
     if (receiving_index < transmission_index && temp == transmission_buffer[receiving_index]) {
       //Ok, the buffer is working, the value is the one we sent...
       receiving_index += 1;
@@ -154,7 +155,7 @@ class ErmesObjSlider extends ErmesObject {
       // we're receiving other values, discard the buffer
       
       transmission_index = 0;
-      receiving_index = 0;
+      receiving_index = 0;*/
       if (itsInteger != temp) {
 	itsInteger = temp;
 	int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
@@ -166,7 +167,7 @@ class ErmesObjSlider extends ErmesObject {
 	if (itsSketchPad.itsRunMode) Paint_movedThrottle(itsSketchPad.getGraphics());
 	else Paint_specific(itsSketchPad.getGraphics());
       }
-    }		
+      //}		
   }
 
 
