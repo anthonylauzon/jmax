@@ -47,8 +47,6 @@ class ConsoleOutputStream extends OutputStream
 
   public void write( int b) 
   {
-      System.err.println("c=" + (char) b + "=" + b);
-
       /* We have to handle the "\r\n" sequence on the windows
          systems. */
       if (b == '\r') {
