@@ -36,8 +36,22 @@ import javax.swing.*;
  * A concrete implementation of the SequenceDataModel,
  * this class represents a model of a set of tracks.
  */
+
 public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDataModel
 {
+  class TrackAddedRunnable implements Runnable
+  {
+   TrackBase track;
+   TrackAddedRunnable(TrackBase trk)
+   {
+     super();
+     track = trk;
+   }
+   public void run(){
+     notifyTrackAdded(track);
+   }
+  }
+
  static
   {
     FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("addTracks"), new FtsMessageHandler(){
@@ -101,19 +115,20 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
   {
     disposeEditor();
   }
+  
   public void addTracks(int nArgs , FtsAtom args[])
   {
     FtsTrackObject trackObj;
-    TrackBase track;
     int time;
     int trackTime = 0;
-    
+    TrackBase track;
+
     int id = args[0].intValue;
     trackObj = new FtsTrackObject(getServer(), this, id, "track", args, 1, nArgs);
     track = new TrackBase(trackObj);
     tracks.addElement(track);
-    
-    notifyTrackAdded(track);
+
+    SwingUtilities.invokeLater(new TrackAddedRunnable( track));
   }
    
   public void removeTracks(int nArgs , FtsAtom args[])

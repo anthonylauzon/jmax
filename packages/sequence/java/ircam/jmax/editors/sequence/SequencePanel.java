@@ -166,7 +166,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
      * Callback from the model. This is called when a new track is added, but also
      * as a result of a merge */
   public void trackAdded(Track track)
-  {
+  {    
     TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
     teditor.getGraphicContext().setToolManager(manager);
     teditor.getGraphicContext().setFrame(itsContainer.getFrame());
@@ -203,16 +203,13 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 	int tcHeight = trackContainer.getSize().height;
 	
 	if(sequenceData.trackCount() == 1)
-	  itsContainer.getFrame().
-	    setSize(dim.width, SequenceWindow.EMPTY_HEIGHT /*+ ruler.getSize().height*/ + tcHeight);
+	  itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + tcHeight);
 	else
 	  if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
-	    itsContainer.getFrame().
-	      setSize(dim.width, dim.height + tcHeight);
+	    itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
 	  else 
 	    if(dim.height < SequenceWindow.MAX_HEIGHT)
-	      itsContainer.getFrame().
-		setSize(dim.width, SequenceWindow.MAX_HEIGHT);
+	      itsContainer.getFrame().setSize(dim.width, SequenceWindow.MAX_HEIGHT);
       }
 
     ///////////////////////////////////////////////////////////////////////////////////

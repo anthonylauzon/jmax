@@ -495,6 +495,8 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_object_create(track_class, 1, at);
 
+  fts_log("add_track 1 \n");
+
   /* add it to the sequence */
   sequence_add_track(this, track);
 
