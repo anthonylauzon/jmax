@@ -499,15 +499,6 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     ////////////////////////////////////////////////////////
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();
-
-  public final static int NUM_ARGS = 128;
-  public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
-
-  static
-    {
-	for(int i=0; i<NUM_ARGS; i++)
-	    sendArgs[i]= new FtsAtom();
-    }
 }
 
 

@@ -106,8 +106,6 @@ public class PointRenderer implements ObjectRenderer {
 		    {
 			g.drawLine(x, y-10, x, y+10);
 			g.drawLine(x-10, y, x+10, y);
-			bgc.display(numberFormat.format(point.getTime())+" - "+
-				    numberFormat.format(point.getValue()));
 		    }
 	    }
 	else //normal paint

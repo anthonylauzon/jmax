@@ -140,7 +140,7 @@ public class BpfGraphicContext extends GraphicContext {
 
     public void display(String text)
     {
-	display.setText(text);;
+	display.setText(text);
     }
 
     public void setDisplay(JLabel label)

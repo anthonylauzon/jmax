@@ -77,7 +77,7 @@ VERSION = @VERSION@
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AdderTool.java ArrowTool.java BpfTools.java DeleteTool.java ScrollerTool.java SelecterTool.java ZoomTool.java 
+package_SOURCES =  ArrowTool.java BpfTools.java ScrollerTool.java SelecterTool.java ZoomTool.java 
 
 
 JAVACX = @JAVACX@
@@ -96,8 +96,8 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../../../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-package_OBJECTS =  AdderTool.class ArrowTool.class BpfTools.class \
-DeleteTool.class ScrollerTool.class SelecterTool.class ZoomTool.class
+package_OBJECTS =  ArrowTool.class BpfTools.class ScrollerTool.class \
+SelecterTool.class ZoomTool.class
 package_LDADD = $(LDADD)
 package_DEPENDENCIES = 
 package_LDFLAGS = 
@@ -182,7 +182,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -97,6 +97,16 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 			setCursor(e.getTool().getCursor());
 		}
 	    });
+
+	addMouseListener(new MouseListener(){
+		public void mouseClicked(MouseEvent e){}
+		public void mousePressed(MouseEvent e){}
+		public void mouseReleased(MouseEvent e){}
+		public void mouseEntered(MouseEvent e){}
+		public void mouseExited(MouseEvent e){
+		    gc.display("");
+		}
+	    });
     }
 
     public void reinit(){}
@@ -199,6 +209,15 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     public Dimension getPreferredSize()
     {
 	return new Dimension(Bpf.DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+
+    public void processMouseMotionEvent(MouseEvent e)
+    {
+	float time = gc.getAdapter().getInvX(e.getX());
+	float val =  gc.getAdapter().getInvY(e.getY());
+	gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
+		   PointRenderer.numberFormat.format(val)+" )");
+	super.processMouseMotionEvent(e);
     }
 
     public void processKeyEvent(KeyEvent e)

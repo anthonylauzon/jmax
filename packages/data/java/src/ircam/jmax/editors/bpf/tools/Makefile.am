@@ -1,10 +1,8 @@
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
-AdderTool.java \
 ArrowTool.java \
 BpfTools.java \
-DeleteTool.java \
 ScrollerTool.java \
 SelecterTool.java \
 ZoomTool.java 

@@ -45,8 +45,9 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    */
  public FtsSequenceObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
  {
-     super(fts, parent, variableName, "sequence", "sequence");
-     
+     super(fts, parent, variableName, classname, 
+	      (nArgs > 0) ? classname + " " + FtsParse.unparseArguments(nArgs, args) : classname);
+
      listeners = new MaxVector();
      initValueInfoTable();
      SequenceImages.init();
