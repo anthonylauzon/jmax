@@ -51,7 +51,7 @@ class FtsDatagramStream extends FtsStream
   DatagramPacket in_packet;
 
   String host;
-  String path;
+  String ftsDir;
   String ftsName;
   Process proc;
 
@@ -61,19 +61,14 @@ class FtsDatagramStream extends FtsStream
    */
 
 
-  FtsDatagramStream(String host, String path, String ftsName)
+  FtsDatagramStream(String host, String ftsDir, String ftsName)
   {
-    super(host);
-
     String command;
 
     boolean realtime = false;
 
-    if (MaxApplication.getProperty("jmaxNoRealTime") != null)
-      realtime = MaxApplication.getProperty("jmaxNoRealTime").equals("true");
-
     this.host = host;
-    this.path = path;
+    this.ftsDir = ftsDir;
     this.ftsName = ftsName;
 
     try
@@ -87,14 +82,14 @@ class FtsDatagramStream extends FtsStream
 
     try
       {
-	if (host.equals(InetAddress.getLocalHost().getHostName()))
+	if (host.equals( "local") || host.equals( InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = (path + "/" + ftsName + ( realtime ? " -norealtime" : "")
+	    command = (ftsDir + "/" + ftsName 
 		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
 	  }
 	else
 	  {
-	    command = ("rsh " + host + " " + path + "/" + ftsName + ( realtime ? " -norealtime" : "")
+	    command = ("rsh " + host + " " + ftsDir + "/" + ftsName 
 		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
 	  }
       }

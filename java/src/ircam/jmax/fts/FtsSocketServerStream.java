@@ -51,8 +51,6 @@ class FtsSocketServerStream extends FtsStream
 
   FtsSocketServerStream(String host, String path, String ftsName)
   {
-    super(host);
-
     boolean realtime = false;
 
     if (MaxApplication.getProperty("jmaxNoRealTime") != null)

@@ -66,10 +66,10 @@ class MaxFtsConnectCmd implements Command
 				    port));
     else if (argv.length == 5)
       MaxApplication.setFts(new Fts(new String(argv[1].toString()),
-						 new String(argv[2].toString()),
-						 new String(argv[3].toString()),
-						 new String(argv[4].toString()),
-						 0));
+				    new String(argv[2].toString()),
+				    new String(argv[3].toString()),
+				    new String(argv[4].toString()),
+				    0));
     else
       throw new TclNumArgsException(interp, 1, argv, "<type> <ftsdir> <ftsname> <socket> <server> <port>");
   }

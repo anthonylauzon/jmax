@@ -44,8 +44,6 @@ class FtsSocketStream extends FtsStream
 
   FtsSocketStream(String host, int port)
   {
-    super(host+":"+port);
-
     this.host = host;
     this.port = port;
 

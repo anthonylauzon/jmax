@@ -44,18 +44,7 @@ import ircam.jmax.utils.*;
 
 abstract public class FtsStream
 {
-  /** Local Exception represeting a crash in the FTS server. */
-  String name;
   FtsServer server;
-
-  /**
-   * Create a connection, storing the name.
-   * The name will be used for the inputThread name.
-   */
-  FtsStream(String name)
-  {
-    this.name = name;
-  }
 
   /** Set the server. */
   void setServer(FtsServer server)

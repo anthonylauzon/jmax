@@ -93,7 +93,7 @@ public class Fts implements MaxContext
    * <dd> for a pipe based connection; don't use this, it works, but
    * with enourmous latencies; we don't know why.
    * </dl>
-   * @param serverName the name of the host where to run the server.
+   * @param host the name of the host where to run the server.
    * should be a complete internet domain name, or "local" to means the local
    * host.
    * @param port the number of port to be used, only for <code>socket</code> and 
@@ -101,34 +101,21 @@ public class Fts implements MaxContext
    */
 
   public Fts(String ftsDir, String ftsName, String connectionType,
-	     String serverName, int port)
+	     String host, int port)
   {
-    if (serverName.equals("local"))
-      {
-	try
-	  {
-	    serverName = InetAddress.getLocalHost().getHostName();
-	  } 
-	catch (java.net.UnknownHostException e)
-	  {
-	    return;
-	  }
-      }
-
     if (MaxApplication.getProperty("ssrun") != null)
       ftsName = ftsName + ".ss";
 
     if (connectionType.equals("socket")) 
-      server = new FtsServer(this, serverName, new FtsSocketStream(serverName, port));
+      server = new FtsServer(this, host, new FtsSocketStream( host, port));
     else if (connectionType.equals("udp")) 
-      server = new FtsServer(this, serverName, new FtsDatagramStream(serverName, ftsDir, ftsName));
+      server = new FtsServer(this, host, new FtsDatagramStream( host, ftsDir, ftsName));
     else if (connectionType.equals("udpclient")) 
-      server = new FtsServer(this, serverName + ":" + port,
-			     new FtsDatagramClientStream(serverName, ftsDir, ftsName, port));
+      server = new FtsServer(this, host+":"+port, new FtsDatagramClientStream( host, ftsDir, ftsName, port));
     else if (connectionType.equals("client") || connectionType.equals("tcp"))
-      server = new FtsServer(this, serverName, new FtsSocketServerStream(serverName, ftsDir, ftsName));
+      server = new FtsServer(this, host, new FtsSocketServerStream( host, ftsDir, ftsName));
     else if (connectionType.equals("local"))
-      server = new FtsServer(this, "fts", new FtsSubProcessStream(ftsDir, ftsName));
+      server = new FtsServer(this, "fts", new FtsSubProcessStream( ftsDir, ftsName));
     else
       System.out.println("unknown FTS connection type "+ connectionType +": can't connect to FTS");
 

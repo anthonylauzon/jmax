@@ -64,8 +64,6 @@ class FtsDatagramClientStream extends FtsStream
 
   FtsDatagramClientStream(String host, String path, String ftsName, int port)
   {
-    super(host);
-
     String command;
 
     this.host = host;

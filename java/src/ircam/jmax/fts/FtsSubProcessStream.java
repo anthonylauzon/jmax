@@ -44,7 +44,6 @@ class FtsSubProcessStream extends FtsStream
 
   FtsSubProcessStream(String path, String ftsName)
   {
-    super("fts");
     this.path = path;
     this.ftsName = ftsName;
 

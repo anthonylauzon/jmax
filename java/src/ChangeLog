@@ -1,3 +1,17 @@
+2000-03-16  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* ircam/fts: changed FtsDatagramStream, trying to fix the
+	hostname and rsh problem. Just removed the code:
+	    serverName = InetAddress.getLocalHost().getHostName();
+	But it is probably not enough, and the server connection
+	code must be redone.
+
+2000-03-14  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* ircam/fts: added a default implementation of handleMessage
+	in FtsObject that is based on Core Reflection API. Added a
+	method getArgs() in FtsStream and a class FtsAtom.
+
 2000-02-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Makefile (jar): fixed missing silk in jar building
