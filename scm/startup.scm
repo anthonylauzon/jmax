@@ -44,7 +44,7 @@
 ;;
 
 (define jmax-server-dir 
-  (file-cat jmax-root "fts" "bin" jmax-arch jmax-mode))
+  (file-cat jmax-root "bin"))
 
 (if (not (java-null? (get-property "jmaxServerDir")))
     (set! jmax-server-dir (get-property "jmaxServerDir")))
