@@ -1,0 +1,10 @@
+Fri Feb 13 18:27:40 1998  Francois Dechelle  <dechelle@linotte.ircam.fr>
+
+	* Modified:
+	. the DSP compiler (to remove the inlets not connected)
+	. files in the veclib for Rhapsody
+	. Makefiles for Rhapsody
+	. Linux OSS device
+	. FTL: prints now as C code
+		
+
