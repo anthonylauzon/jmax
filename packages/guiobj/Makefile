@@ -30,3 +30,13 @@ all:
 clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
+	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj
+	( cd c ; $(MAKE) install)
+	( cd help; $(MAKE) install)
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall

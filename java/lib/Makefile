@@ -23,17 +23,16 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-DISTDIR = ../../../../fts/
-PACKAGEROOT = ..
+install:
+	$(INSTALL_DIR) $(lib_install_dir)java/lib
+	$(INSTALL_DIR) $(lib_install_dir)java/lib/jacl
+	( cd jacl ; for f in jacl.jar README license.terms ; do $(INSTALL_DATA) $$f $(lib_install_dir)java/lib/jacl ; done )
+	$(INSTALL_DIR) $(lib_install_dir)java/lib/swing
+	( cd swing ; for f in CHANGES.txt LICENSE.txt README.html README.txt swingall.jar ; do $(INSTALL_DATA) $$f $(lib_install_dir)java/lib/swing ; done )
+.PHONY: install
 
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
 
-PACKAGELIB=$(LIBDIR)/libexplode.so
-
-all: $(PACKAGELIB)
-
-TOCLEAN = $(PACKAGELIB)
-
-include $(DISTDIR)/Makefiles/Makefile.lib.end
 

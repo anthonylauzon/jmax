@@ -33,6 +33,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDsp.a
 $(LIBDIR)/libDsp.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDsp.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/lang/dsp
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/dsp ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libDsp.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

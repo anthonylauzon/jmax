@@ -19,17 +19,11 @@ include Sources
 
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 
-## On Linux, the search patch of the linked .so must be given at link time, otherwise
-## dynamic link fails.
-#MORESOLIBS=$(PACKAGEROOT)/../../data/c/lib/$(ARCH)/$(MODE)/libdata.so
-MORESOLIBS=
+PACKAGELIB=$(LIBDIR)/libmess.so
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libmess.a $(LIBDIR)/libmess.so
+all: $(PACKAGELIB)
 
-$(LIBDIR)/libmess.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libmess.a $(OBJECTS)
-
-TOCLEAN = $(LIBDIR)/libmess.a $(LIBDIR)/libmess.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

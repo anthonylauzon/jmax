@@ -29,19 +29,13 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
+PACKAGELIB=$(LIBDIR)/libcontrol.so
+
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 
-## On Linux, the search patch of the linked .so must be given at link time, otherwise
-## dynamic link fails.
-#MORESOLIBS=$(PACKAGEROOT)/../../data/c/lib/$(ARCH)/$(MODE)/libdata.so
-MORESOLIBS=
+all: $(PACKAGELIB)
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libcontrol.a $(LIBDIR)/libcontrol.so
-
-$(LIBDIR)/libcontrol.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libcontrol.a $(OBJECTS)
-
-TOCLEAN = $(LIBDIR)/libcontrol.a $(LIBDIR)/libcontrol.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

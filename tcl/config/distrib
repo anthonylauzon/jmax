@@ -1,7 +1,0 @@
-all	all	linuxpc.tcl
-all	all	o2r10k.tcl
-all	all	o2r10ki63.tcl
-all	all	o2r5k.tcl
-all	all	o2r5ki63.tcl
-all	all	octane.tcl
-all	all	origin.tcl

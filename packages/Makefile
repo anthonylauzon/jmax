@@ -53,3 +53,14 @@ clean_java:
 	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_java ; fi ) ; done
 .PHONY: clean_java
 
+install:
+	$(INSTALL_DIR) $(lib_install_dir)packages
+	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) install) ; done
+	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) install ) ; done
+	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) install ) ; done
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall
+
+

@@ -60,6 +60,10 @@ endif
 
 ## includes
 
+ifndef MODE
+MODE=debug
+endif
+
 include $(ROOTDIR)/java/Makefiles/Makefile.$(MODE)
 
 ##

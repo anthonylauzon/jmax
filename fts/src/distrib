@@ -1,5 +1,0 @@
-all	all	Makefile
-all	all	lang
-all	all	runtime
-all	all	sys
-all	all	*.h

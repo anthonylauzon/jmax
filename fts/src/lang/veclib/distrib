@@ -1,7 +1,0 @@
-all	all	Makefile
-all	all	Sources
-all	all	include
-all	all	portable
-all	all	*.h
-
-

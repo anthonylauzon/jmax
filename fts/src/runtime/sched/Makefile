@@ -32,6 +32,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libSched.a
 $(LIBDIR)/libSched.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libSched.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/runtime/sched
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/sched ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libSched.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

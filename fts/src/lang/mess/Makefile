@@ -34,6 +34,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libMess.a
 $(LIBDIR)/libMess.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libMess.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/lang/mess
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/mess ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libMess.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -1,6 +1,0 @@
-src	all	Makefile.common
-src	all	Makefile.debug
-src	all	Makefile.misc
-src	all	Makefile.opt
-src	all	Makefile.package
-src	all	Makefile.package.misc

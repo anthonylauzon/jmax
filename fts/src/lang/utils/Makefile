@@ -34,6 +34,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libUtils.a
 $(LIBDIR)/libUtils.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libUtils.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/lang/utils
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/utils ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libUtils.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -29,14 +29,12 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
+PACKAGELIB=$(LIBDIR)/libdata.so
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../reftype/c/src
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libdata.a $(LIBDIR)/libdata.so
+all: $(PACKAGELIB)
 
-$(LIBDIR)/libdata.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libdata.a $(OBJECTS)
-
-TOCLEAN = $(LIBDIR)/libdata.a $(LIBDIR)/libdata.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

@@ -31,3 +31,9 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
+install:
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall
+

@@ -34,6 +34,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDevices.a
 $(LIBDIR)/libDevices.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDevices.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/runtime/devices
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/devices ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libDevices.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -1,7 +1,0 @@
-all	sgi		lib/irix63r10k/opt/libcontrol.so
-all	sgi		lib/irix63r5k/opt/libcontrol.so
-all	sgi		lib/irix65r10k/opt/libcontrol.so
-all	sgi		lib/irix65r4k/opt/libcontrol.so
-all	sgi		lib/irix65r5k/opt/libcontrol.so
-all	linuxpc		lib/linuxpc/opt/libcontrol.so
-all	linuxppc	lib/linuxpp/opt/libcontrol.so

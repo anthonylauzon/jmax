@@ -1,6 +1,0 @@
-src	all	Makefile
-src	all	Sources
-src	all	arch.c
-src	all	dsp1.c
-src	all	system.c
-src	all	ucsobj.c

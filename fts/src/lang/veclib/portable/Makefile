@@ -33,6 +33,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libPortableVecLib.a
 $(LIBDIR)/libPortableVecLib.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libPortableVecLib.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/lang/veclib/portable
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/veclib/portable ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libPortableVecLib.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -33,6 +33,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libAudio.a
 $(LIBDIR)/libAudio.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libAudio.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/runtime/audio
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/audio ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libAudio.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -30,3 +30,13 @@ all:
 clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/table/java/classes
+	( cd classes ; $(INSTALL_DATA) table.jar $(lib_install_dir)packages/table/java/classes )
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+

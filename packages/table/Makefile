@@ -30,3 +30,13 @@ all:
 clean:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/table
+	$(INSTALL_DATA) table.jpk $(lib_install_dir)/packages/table
+	( cd images; $(MAKE) install)
+	( cd java; $(MAKE) install)
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall

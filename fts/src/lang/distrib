@@ -1,9 +1,0 @@
-all	all	Makefile
-all	all	datalib
-all	all	dsp
-all	all	ftl
-all	all	mess
-all	all	utils
-all	all	veclib
-all	all	*.h
-

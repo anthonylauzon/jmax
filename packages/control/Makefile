@@ -39,3 +39,12 @@ clean_c:
 	(cd c ; $(MAKE) clean)
 .PHONY: clean_c
 
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/control
+	$(INSTALL_DATA) control.jpk $(lib_install_dir)/packages/control
+	( cd c ; $(MAKE) install)
+	( cd help; $(MAKE) install)
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall

@@ -29,19 +29,13 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
+PACKAGELIB=$(LIBDIR)/libgeneric.so
+
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
-## On Linux, the search patch of the linked .so must be given at link time, otherwise
-## dynamic link fails.
-#MORESOLIBS=$(PACKAGEROOT)/../../data/c/lib/$(ARCH)/$(MODE)/libdata.so
-MORESOLIBS=
+all: $(PACKAGELIB)
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libgeneric.a $(LIBDIR)/libgeneric.so
-
-$(LIBDIR)/libgeneric.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libgeneric.a $(OBJECTS)
-
-TOCLEAN = $(LIBDIR)/libgeneric.a $(LIBDIR)/libgeneric.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

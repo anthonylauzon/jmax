@@ -1,8 +1,0 @@
-all	sgi		lib/irix63r10k/opt/libqlist.so
-all	sgi		lib/irix63r5k/opt/libqlist.so
-all	sgi		lib/irix65r10k/opt/libqlist.so
-all	sgi		lib/irix65r4k/opt/libqlist.so
-all	sgi		lib/irix65r5k/opt/libqlist.so
-all	linuxpc		lib/linuxpc/opt/libqlist.so
-all	linuxppc	lib/linuxppc/opt/libqlist.so
-	

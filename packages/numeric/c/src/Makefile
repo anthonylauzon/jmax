@@ -31,14 +31,11 @@ include Sources
 
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
-MORESOLIBS=
+PACKAGELIB=$(LIBDIR)/libnumeric.so
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libnumeric.a $(LIBDIR)/libnumeric.so
+all: $(PACKAGELIB)
 
-$(LIBDIR)/libnumeric.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libnumeric.a $(OBJECTS)
-
-TOCLEAN = $(LIBDIR)/libnumeric.a $(LIBDIR)/libnumeric.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

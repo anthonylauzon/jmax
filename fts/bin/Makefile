@@ -23,17 +23,29 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-DISTDIR = ../../../../fts/
-PACKAGEROOT = ..
+ifeq ($(ARCH),sgi)
 
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/irix65r5k/opt
+	$(INSTALL_DIR) $(lib_install_dir)/fts/bin/irix65r10k/opt
+	( cd irix65r5k/opt ; $(INSTALL_PROGRAM) fts $(lib_install_dir)/fts/bin/irix65r5k/opt )
+	( cd irix65r10k/opt ; $(INSTALL_PROGRAM) fts $(lib_install_dir)/fts/bin/irix65r10k/opt )
+	( cd irix65r10k/opt ; $(INSTALL_PROGRAM) fts.on1 $(lib_install_dir)/fts/bin/irix65r10k/opt )
+.PHONY: install
 
-PACKAGELIB=$(LIBDIR)/libexplode.so
+else
+ifeq ($(ARCH),linuxpc)
 
-all: $(PACKAGELIB)
+install:
+	$(INSTALL_DIR) $(lib_install_dir)fts/bin/linuxpc/opt
+	( cd linuxpc/opt ; $(INSTALL_PROGRAM) fts $(lib_install_dir)fts/bin/linuxpc/opt )
+.PHONY: install
 
-TOCLEAN = $(PACKAGELIB)
+endif
+endif
 
-include $(DISTDIR)/Makefiles/Makefile.lib.end
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
 

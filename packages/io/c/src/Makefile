@@ -31,15 +31,14 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
+PACKAGELIB=$(LIBDIR)/libio.so
+
 MODULE_CFLAGS= -I$(JMAXROOTDIR)/lib/protocol/c/src
 MORESOLIBS=$(JMAXROOTDIR)/lib/protocol/c/lib/$(ARCH)/libProtocol.a
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libio.a $(LIBDIR)/libio.so
+all: $(PACKAGELIB)
 
-$(LIBDIR)/libio.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libio.a $(OBJECTS)
-
-TOCLEAN = $(LIBDIR)/libio.a
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

@@ -1,7 +1,0 @@
-all	sgi		lib/irix63r10k/opt/libguiobj.so
-all	sgi		lib/irix63r5k/opt/libguiobj.so
-all	sgi		lib/irix65r10k/opt/libguiobj.so
-all	sgi		lib/irix65r4k/opt/libguiobj.so
-all	sgi		lib/irix65r5k/opt/libguiobj.so
-all	linuxpc		lib/linuxpc/opt/libguiobj.so
-all	linuxppc	lib/linuxpp/opt/libguiobj.so

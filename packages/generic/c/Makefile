@@ -30,3 +30,13 @@ all:
 clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/generic/c
+	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)packages/generic/c/lib/$$d/opt ; done
+	for d in $(SUB_ARCHS) ; do ( cd lib/$$d/opt ; $(INSTALL_DATA) libgeneric.so $(lib_install_dir)packages/generic/c/lib/$$d/opt ) ; done
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall
+

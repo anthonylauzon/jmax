@@ -1,7 +1,0 @@
-all	all	button.help.jmax
-all	all	floatbox.help.jmax
-all	all	guiobj.help.index.tcl
-all	all	intbox.help.jmax
-all	all	messbox.help.jmax
-all	all	slider.help.jmax
-all	all	toggle.help.jmax

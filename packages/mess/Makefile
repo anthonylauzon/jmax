@@ -35,3 +35,13 @@ all_java:
 clean_java:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/mess
+	$(INSTALL_DATA) mess.jpk $(lib_install_dir)/packages/mess
+	( cd c ; $(MAKE) install)
+	( cd help; $(MAKE) install)
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall

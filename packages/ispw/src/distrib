@@ -1,9 +1,0 @@
-src	all	Makefile
-src	all	control
-src	all	data
-src	all	filters
-src	all	io
-src	all	midi
-src	all	pitch
-src	all	sampling
-src	all	signal

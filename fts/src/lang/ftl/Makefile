@@ -34,6 +34,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libFtl.a
 $(LIBDIR)/libFtl.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libFtl.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/lang/ftl
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/ftl ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libFtl.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

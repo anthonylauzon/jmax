@@ -1,9 +1,0 @@
-all		all	 	jacl/jacl.jar
-all		all		jacl/README
-all		all		jacl/license.terms
-all		all		swing/CHANGES.txt
-all		all		swing/LICENSE.txt
-all		all		swing/README.html
-all		all		swing/README.txt
-all		all		swing/swingall.jar
-

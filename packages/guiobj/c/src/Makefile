@@ -29,12 +29,11 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libguiobj.a $(LIBDIR)/libguiobj.so
+PACKAGELIB=$(LIBDIR)/libguiobj.so
 
-$(LIBDIR)/libguiobj.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libguiobj.a $(OBJECTS)
+all: $(PACKAGELIB)
 
-TOCLEAN = $(LIBDIR)/libguiobj.a $(LIBDIR)/libguiobj.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

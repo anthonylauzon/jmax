@@ -23,17 +23,12 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-DISTDIR = ../../../../fts/
-PACKAGEROOT = ..
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/java/classes
+	$(INSTALL_DATA) jmax.jar $(lib_install_dir)/java/classes
+.PHONY: install
 
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
-
-PACKAGELIB=$(LIBDIR)/libexplode.so
-
-all: $(PACKAGELIB)
-
-TOCLEAN = $(PACKAGELIB)
-
-include $(DISTDIR)/Makefiles/Makefile.lib.end
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
 

@@ -29,12 +29,11 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libmidi.a $(LIBDIR)/libmidi.so
+PACKAGELIB=$(LIBDIR)/libmidi.so
 
-$(LIBDIR)/libmidi.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libmidi.a $(OBJECTS)
+all: $(PACKAGELIB)
 
-TOCLEAN = $(LIBDIR)/libmidi.a $(LIBDIR)/libmidi.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

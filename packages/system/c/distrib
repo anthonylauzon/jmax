@@ -1,7 +1,0 @@
-all	sgi		lib/irix63r10k/opt/libsystem.so
-all	sgi		lib/irix63r5k/opt/libsystem.so
-all	sgi		lib/irix65r10k/opt/libsystem.so
-all	sgi		lib/irix65r4k/opt/libsystem.so
-all	sgi		lib/irix65r5k/opt/libsystem.so
-all	linuxpc		lib/linuxpc/opt/libsystem.so
-all	linuxppc	lib/linuxppc/opt/libsystem.so

@@ -1,5 +1,0 @@
-src	all	Makefile
-all	all	images
-all	all	java
-all	all	table.jpk
-

@@ -1,4 +1,0 @@
-all	all	Makefile
-all	all	UDPMessageTest.java
-all	all	UDPPort.java
-all	all	UDPTest.java

@@ -32,6 +32,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libTime.a
 $(LIBDIR)/libTime.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libTime.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/runtime/time
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/runtime/time ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libTime.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

@@ -33,12 +33,13 @@ ifeq ($(ARCH), solaris2)
 MORESOLIBS=/opt/LOCAL/sol/lib/libST.so /usr/demo/SOUND/lib/libaudio.a
 endif
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libio.a $(LIBDIR)/libio.so
+PACKAGELIB=$(LIBDIR)/libio.so
 
-$(LIBDIR)/libio.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libio.a $(OBJECTS)
+MORESOLIBS=$(JMAXROOTDIR)/lib/protocol/c/lib/$(ARCH)/libProtocol.a
 
-TOCLEAN = $(LIBDIR)/libio.a $(LIBDIR)/libio.so
+all: $(PACKAGELIB)
+
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

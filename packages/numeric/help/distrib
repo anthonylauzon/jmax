@@ -1,7 +1,0 @@
-all 	all	fvec.help.jmax
-all 	all	ivec.help.jmax
-all 	all	nsplit.help.jmax
-all 	all	numeric.help.index.tcl
-all 	all	numeric.summary.jmax
-all 	all	rewrap.help.jmax
-all 	all	wrap.help.jmax

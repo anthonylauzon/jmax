@@ -29,12 +29,11 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libsignal.a $(LIBDIR)/libsignal.so
+PACKAGELIB=$(LIBDIR)/libsignal.so
 
-$(LIBDIR)/libsignal.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libsignal.a $(OBJECTS)
+all: $(PACKAGELIB)
 
-TOCLEAN = $(LIBDIR)/libsignal.a $(LIBDIR)/libsignal.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

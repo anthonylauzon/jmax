@@ -30,3 +30,13 @@ all:
 clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/system
+	$(INSTALL_DATA) system.jpk $(lib_install_dir)/packages/system
+	( cd c ; $(MAKE) install)
+	( cd help; $(MAKE) install)
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall

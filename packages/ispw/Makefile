@@ -30,3 +30,27 @@ all:
 clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
+	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw
+	for d in $(SUB_ARCHS) ; do $(INSTALL_DIR) $(lib_install_dir)packages/ispw/lib/$$d/opt ; done
+	for d in $(SUB_ARCHS) ; do \
+		( cd lib/$$d/opt ; \
+			$(INSTALL_DATA) libcontrol.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_DATA) libdata.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_DATA) libfilters.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_DATA) libio.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_DATA) libmidi.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_DATA) libpitch.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_DATA) libsampling.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+			$(INSTALL_DATA) libsignal.so $(lib_install_dir)packages/ispw/lib/$$d/opt ; \
+		) ; done
+	( cd abs ; $(MAKE) install)
+	( cd help; $(MAKE) install)
+	( cd sounds; $(MAKE) install)
+	( cd templates; $(MAKE) install)
+.PHONY: install
+
+uninstall:
+.PHONY: uninstall

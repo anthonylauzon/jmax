@@ -1,7 +1,0 @@
-all	sgi		lib/irix63r10k/opt/libexplode.so
-all	sgi		lib/irix63r5k/opt/libexplode.so
-all	sgi		lib/irix65r10k/opt/libexplode.so
-all	sgi		lib/irix65r4k/opt/libexplode.so
-all	sgi		lib/irix65r5k/opt/libexplode.so
-all	linuxpc		lib/linuxpc/opt/libexplode.so
-all	linuxppc	lib/linuxppc/opt/libexplode.so

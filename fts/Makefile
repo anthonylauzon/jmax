@@ -33,3 +33,13 @@ all:
 clean:
 	(cd src; $(MAKE) clean)
 .PHONY: all
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)fts
+	( cd bin ; $(MAKE) install )
+	( cd src ; $(MAKE) install )
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall

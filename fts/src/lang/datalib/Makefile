@@ -34,6 +34,15 @@ all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDatalib.a
 $(LIBDIR)/libDatalib.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDatalib.a $(OBJECTS)
 
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts/lang/datalib
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts/lang/datalib ; done
+.PHONY: install
+
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall
+
 TOCLEAN = $(LIBDIR)/libDatalib.a
 
 include $(ROOTDIR)/Makefiles/Makefile.misc

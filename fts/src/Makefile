@@ -39,7 +39,12 @@ clean:
 	(cd tiles; $(MAKE) clean)
 .PHONY: all
 
-tags:
-	(find . \( -name "*.c" -o -name "*.h" \) -print | etags -t - )
-.PHONY: tags
+install:
+	$(INSTALL_DIR) $(include_install_dir)fts
+	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)fts ; done
+	for d in lang runtime sys ; do (cd $$d ; $(MAKE) install ) ; done
+.PHONY: install
 
+# remove the files copied by make install ?
+uninstall:
+.PHONY: uninstall

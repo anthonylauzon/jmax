@@ -1,5 +1,0 @@
-src	all	Makefile
-src	all	Sources
-src	all	dac1.c
-src	all	disk.c
-src	all	io.c

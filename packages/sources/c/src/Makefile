@@ -32,12 +32,11 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libsources.a $(LIBDIR)/libsources.so 
+PACKAGELIB=$(LIBDIR)/libsources.so 
 
-$(LIBDIR)/libsources.a: $(OBJECTS)
-	$(AR) $(ARFLAGS) $(LIBDIR)/libsources.a $(OBJECTS)
+all: $(PACKAGELIB)
 
-TOCLEAN = $(LIBDIR)/libsources.a $(LIBDIR)/libsources.so
+TOCLEAN = $(PACKAGELIB)
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

@@ -1,5 +1,0 @@
-all	all	README
-all	all	c
-all	all	java
-all	all	test-udp.jmax
-all	all	test-udpmessage.jmax

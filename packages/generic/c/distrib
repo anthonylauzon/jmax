@@ -1,7 +1,0 @@
-all	sgi		lib/irix63r10k/opt/libgeneric.so
-all	sgi		lib/irix63r5k/opt/libgeneric.so
-all	sgi		lib/irix65r10k/opt/libgeneric.so
-all	sgi		lib/irix65r4k/opt/libgeneric.so
-all	sgi		lib/irix65r5k/opt/libgeneric.so
-all	linuxpc		lib/linuxp/opt/libgeneric.so
-all	linuxppc	lib/linuxpp/opt/libgeneric.so
