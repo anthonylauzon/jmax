@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.4 $ IRCAM $Date: 1998/11/12 18:10:56 $
+ *      $Revision: 1.5 $ IRCAM $Date: 1998/11/16 13:53:31 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -829,7 +829,6 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 void explode_put_name_daemon(fts_daemon_action_t action,
 			     fts_object_t *obj,
-			     int idx,
 			     fts_symbol_t property,
 			     fts_atom_t *value)
 {
@@ -1109,7 +1108,7 @@ static void explode_data_export_fun(fts_data_t *d)
 
 static void
 explode_get_data(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+		 fts_symbol_t property, fts_atom_t *value)
 {
   explode_t *this = (explode_t *)obj;
 

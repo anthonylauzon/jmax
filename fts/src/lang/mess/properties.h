@@ -35,26 +35,11 @@
 extern void  fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
 extern void _fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
 
-extern void  fts_object_inlet_put_prop(fts_object_t *obj, int inlet, fts_symbol_t prop, const fts_atom_t *value);
-extern void _fts_object_inlet_put_prop(fts_object_t *obj, int inlet, fts_symbol_t prop, const fts_atom_t *value);
-
-extern void  fts_object_outlet_put_prop(fts_object_t *obj, int outlet, fts_symbol_t prop, const fts_atom_t *value);
-extern void _fts_object_outlet_put_prop(fts_object_t *obj, int outlet, fts_symbol_t prop, const fts_atom_t *value);
-
 extern void  fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
 extern void _fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
 
-extern void  fts_object_inlet_remove_prop(fts_object_t *obj, int inlet, fts_symbol_t property);
-extern void _fts_object_inlet_remove_prop(fts_object_t *obj, int inlet, fts_symbol_t property);
-
-extern void  fts_object_outlet_remove_prop(fts_object_t *obj, int outlet, fts_symbol_t property);
-extern void _fts_object_outlet_remove_prop(fts_object_t *obj, int outlet, fts_symbol_t property);
-
 extern void _fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
 extern void  fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
-
-extern void _fts_object_inlet_get_prop(fts_object_t *obj, int inlet, fts_symbol_t prop, fts_atom_t *value);
-extern void  fts_object_inlet_get_prop(fts_object_t *obj, int inlet, fts_symbol_t prop, fts_atom_t *value);
 
 /* Class version
 
@@ -67,13 +52,7 @@ extern void  fts_object_inlet_get_prop(fts_object_t *obj, int inlet, fts_symbol_
 */
 
 extern void fts_class_put_prop(fts_class_t *cl, fts_symbol_t property, const fts_atom_t *value);
-extern void fts_class_inlet_put_prop(fts_class_t *cl, int inlet, fts_symbol_t property, const fts_atom_t *value);
-extern void fts_class_outlet_put_prop(fts_class_t *cl, int outlet, fts_symbol_t property, const fts_atom_t *value);
-
 extern void fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property);
-extern void fts_class_inlet_remove_prop(fts_class_t *cl, int inlet, fts_symbol_t property);
-extern void fts_class_outlet_remove_prop(fts_class_t *cl, int outlet, fts_symbol_t property);
-
 
 
 /* 

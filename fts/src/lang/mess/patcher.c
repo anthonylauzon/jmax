@@ -737,7 +737,7 @@ patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 static void
 patcher_put_ninlets(fts_daemon_action_t action, fts_object_t *obj,
-		    int idx, fts_symbol_t property, fts_atom_t *value)
+		    fts_symbol_t property, fts_atom_t *value)
 {
   fts_patcher_t *this = (fts_patcher_t *) obj;
   int ninlets, noutlets;
@@ -750,7 +750,7 @@ patcher_put_ninlets(fts_daemon_action_t action, fts_object_t *obj,
 
 static void
 patcher_put_noutlets(fts_daemon_action_t action, fts_object_t *obj,
-		  int idx, fts_symbol_t property, fts_atom_t *value)
+		     fts_symbol_t property, fts_atom_t *value)
 {
   fts_patcher_t *this = (fts_patcher_t *) obj;
   int ninlets, noutlets;
@@ -767,7 +767,7 @@ patcher_put_noutlets(fts_daemon_action_t action, fts_object_t *obj,
 
 
 static void patcher_get_data(fts_daemon_action_t action, fts_object_t *obj,
-			     int idx, fts_symbol_t property, fts_atom_t *value)
+			     fts_symbol_t property, fts_atom_t *value)
 {
   fts_patcher_t *this = (fts_patcher_t *) obj;
 
@@ -781,7 +781,7 @@ static void patcher_get_data(fts_daemon_action_t action, fts_object_t *obj,
 /* Daemon to get the name property */
 
 static void patcher_get_name(fts_daemon_action_t action, fts_object_t *obj,
-			     int idx, fts_symbol_t property, fts_atom_t *value)
+			     fts_symbol_t property, fts_atom_t *value)
 {
   if (obj->varname)
     fts_set_symbol(value, obj->varname);
@@ -792,7 +792,7 @@ static void patcher_get_name(fts_daemon_action_t action, fts_object_t *obj,
 /* Daemon to get the patcher_type property */
 
 static void patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj,
-				     int idx, fts_symbol_t property, fts_atom_t *value)
+				     fts_symbol_t property, fts_atom_t *value)
 {
   fts_patcher_t *this = (fts_patcher_t *) obj;
 
@@ -812,7 +812,7 @@ static void patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *o
 
 static void
 patcher_get_state(fts_daemon_action_t action, fts_object_t *obj,
-		  int idx, fts_symbol_t property, fts_atom_t *value)
+		  fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, obj);
 }
@@ -1104,11 +1104,9 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 
 	  fts_block_free((char *)this->inlets, old_ninlets * sizeof(fts_inlet_t *));
 	  fts_block_free((char *)obj_this->in_conn, old_ninlets * sizeof(fts_connection_t *));
-	  fts_block_free((char *)obj_this->inlets_properties, old_ninlets * sizeof(fts_plist_t *));
 
 	  this->inlets = 0;
 	  obj_this->in_conn = 0;
-	  obj_this->inlets_properties = 0;
 	}
       else  if (old_ninlets > 0)
 	{
@@ -1117,11 +1115,9 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 	  int i;
 	  fts_inlet_t  **new_inlets;
 	  fts_connection_t **new_in_conn;
-	  fts_plist_t **new_inlets_properties;	
 
 	  new_inlets  = (fts_inlet_t **)  fts_block_alloc(new_ninlets * sizeof(fts_inlet_t *));
 	  new_in_conn = (fts_connection_t **) fts_block_zalloc(new_ninlets * sizeof(fts_connection_t *));
-	  new_inlets_properties = (fts_plist_t **) fts_block_zalloc(new_ninlets * sizeof(fts_plist_t *));
 
 	  for (i = 0; i < new_ninlets; i++)
 	    {
@@ -1129,23 +1125,19 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 		{
 		  new_inlets[i] = this->inlets[i];
 		  new_in_conn[i] = obj_this->in_conn[i];
-		  new_inlets_properties[i] = obj_this->inlets_properties[i];
 		}
 	      else
 		{
 		  new_inlets[i] = 0;
 		  new_in_conn[i] = 0;
-		  new_inlets_properties[i] = 0;
 		}
 	    }
 
 	  fts_block_free((char *)this->inlets, old_ninlets * sizeof(fts_inlet_t *));
 	  fts_block_free((char *)obj_this->in_conn, old_ninlets * sizeof(fts_connection_t *));
-	  fts_block_free((char *)obj_this->inlets_properties, old_ninlets * sizeof(fts_plist_t *));
 	      
 	  this->inlets = new_inlets;
 	  obj_this->in_conn = new_in_conn;
-	  obj_this->inlets_properties = new_inlets_properties;
 	}
       else 
 	{
@@ -1156,13 +1148,11 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 
 	  this->inlets = (fts_inlet_t **) fts_block_alloc(new_ninlets * sizeof(fts_inlet_t *));
 	  obj_this->in_conn = (fts_connection_t **) fts_block_zalloc(new_ninlets * sizeof(fts_connection_t *));
-	  obj_this->inlets_properties = (fts_plist_t **) fts_block_zalloc(new_ninlets * sizeof(fts_plist_t *));
 
 	  for (i = 0; i < new_ninlets; i++)
 	    {
 	      this->inlets[i] = 0;
 	      obj_this->in_conn[i] = 0;
-	      obj_this->inlets_properties[i] = 0;
 	    }
 	}
     }
@@ -1178,12 +1168,10 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 	     are old outlets to delete */
 
 	  fts_block_free((char *)this->outlets, old_noutlets * sizeof(fts_outlet_t *));
-	  fts_block_free((char *)obj_this->in_conn, old_noutlets * sizeof(fts_connection_t *));
-	  fts_block_free((char *)obj_this->outlets_properties, old_noutlets * sizeof(fts_plist_t *));
+	  fts_block_free((char *)obj_this->out_conn, old_noutlets * sizeof(fts_connection_t *));
 
 	  this->outlets = 0;
-	  obj_this->in_conn = 0;
-	  obj_this->outlets_properties = 0;
+	  obj_this->out_conn = 0;
 	}
       else  if (old_noutlets > 0)
 	{
@@ -1192,35 +1180,25 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 	  int i;
 	  fts_outlet_t  **new_outlets;
 	  fts_connection_t **new_out_conn;
-	  fts_plist_t **new_outlets_properties;	
 
 	  new_outlets  = (fts_outlet_t **)  fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
 	  new_out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets * sizeof(fts_connection_t *));
-	  new_outlets_properties = (fts_plist_t **) fts_block_zalloc(new_noutlets * sizeof(fts_plist_t *));
 
 	  for (i = 0; i < new_noutlets; i++)
 	    {
 	      new_outlets[i] = 0;
 
 	      if (i < old_noutlets)
-		{
-		  new_out_conn[i] = obj_this->out_conn[i];
-		  new_outlets_properties[i] = obj_this->outlets_properties[i];
-		}
+		new_out_conn[i] = obj_this->out_conn[i];
 	      else
-		{
-		  new_out_conn[i] = 0;
-		  new_outlets_properties[i] = 0;
-		}
+		new_out_conn[i] = 0;
 	    }
 
 	  fts_block_free((char *)this->outlets, old_noutlets * sizeof(fts_outlet_t *));
 	  fts_block_free((char *)obj_this->out_conn, old_noutlets * sizeof(fts_connection_t *));
-	  fts_block_free((char *)obj_this->outlets_properties, old_noutlets * sizeof(fts_plist_t *));
 	      
 	  this->outlets = new_outlets;
 	  obj_this->out_conn = new_out_conn;
-	  obj_this->outlets_properties = new_outlets_properties;
 	}
       else 
 	{
@@ -1231,13 +1209,11 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 
 	  this->outlets = (fts_outlet_t **) fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
 	  obj_this->out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets*sizeof(fts_connection_t *));
-	  obj_this->outlets_properties = (fts_plist_t **) fts_block_zalloc(new_noutlets*sizeof(fts_plist_t *));
 
 	  for (i = 0; i < new_noutlets; i++)
 	    {
 	      this->outlets[i] = 0;
 	      obj_this->out_conn[i] = 0;
-	      obj_this->outlets_properties[i] = 0;
 	    }
 	}
     }

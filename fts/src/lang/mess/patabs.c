@@ -124,8 +124,7 @@ static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
 	 is an error !!
 	 */
 
-      if (file)
-	return file;
+      return file;
     }
   
   return 0;

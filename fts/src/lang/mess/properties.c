@@ -18,8 +18,8 @@
 
    The DSP compiler will make large use of properties.
 
-   DAEMON: a daemon is a function that is called when an object or inlet/outlet property is
-   put, get or removed; the daemon is called with the object, (possibly the inlet/outlet),
+   DAEMON: a daemon is a function that is called when an object property is
+   put, get or removed; the daemon is called with the object, 
    the property name and value as argument; daemon are defined at the *class* level;
    daemons are installed on specific properties.
 
@@ -51,15 +51,14 @@
 #include "lang/mess.h"
 
 static const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
-static const fts_atom_t *fts_class_inlet_get_prop(fts_class_t *cl, int inlet, fts_symbol_t property);
-static const fts_atom_t *fts_class_outlet_get_prop(fts_class_t *cl, int outlet, fts_symbol_t property);
+
 static fts_heap_t *daemon_heap;
 static fts_heap_t *plist_cell_heap;
 static fts_heap_t *plist_heap;
 
 
 /** Local and naive implementation of property lists 
-    to use in storing properties; will change soon
+    to use in storing properties
     */
 
 
@@ -263,67 +262,9 @@ fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *
   d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_put, property);
   
   if (d)
-    (* d)(obj_property_put, obj, 0, property, (fts_atom_t *)value);
+    (* d)(obj_property_put, obj, property, (fts_atom_t *)value);
   else
     _fts_object_put_prop(obj, property, value);
-}
-
-/* Object inlet put */
-
-void
-_fts_object_inlet_put_prop(fts_object_t *obj, int inlet, fts_symbol_t property, const fts_atom_t *value)
-{
-  if (inlet >= fts_object_get_inlets_number(obj))
-    return;
-
-  if (! obj->inlets_properties[inlet])
-    obj->inlets_properties[inlet] = fts_plist_new();
-
-  fts_plist_put(obj->inlets_properties[inlet], property, value);
-}
-
-
-void
-fts_object_inlet_put_prop(fts_object_t *obj, int inlet, fts_symbol_t property, const fts_atom_t *value)
-{
-  fts_property_daemon_t d;
-
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), inlet_property_put, property);
-
-  if (d)
-    (* d)(inlet_property_put, obj, inlet, property, (fts_atom_t *) value);
-  else
-    _fts_object_inlet_put_prop(obj, inlet, property, value);
-}
-
-
-/* Object outlet put */
-
-void
-_fts_object_outlet_put_prop(fts_object_t *obj, int outlet, fts_symbol_t property, const fts_atom_t *value)
-{
-
-  if (outlet >= fts_object_get_outlets_number(obj))
-    return;
-
-  if (! obj->outlets_properties[outlet])
-    obj->outlets_properties[outlet] = fts_plist_new();
-
-  fts_plist_put(obj->outlets_properties[outlet], property, value);
-}
-
-
-void
-fts_object_outlet_put_prop(fts_object_t *obj, int outlet, fts_symbol_t property, const fts_atom_t *value)
-{
-  fts_property_daemon_t d;
-
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), outlet_property_put, property);
-
-  if (d)
-    (* d)(outlet_property_put, obj, outlet, property, (fts_atom_t *) value);
-  else
-    _fts_object_outlet_put_prop(obj, outlet, property, value);
 }
 
 
@@ -346,60 +287,7 @@ fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property)
   d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_remove, property);
 
   if (d)
-    (* d)(obj_property_remove, obj, 0, property, 0);
-  else
-    _fts_object_remove_prop(obj, property);
-}
-
-
-/* Object inlet remove properties */
-
-void
-_fts_object_inlet_remove_prop(fts_object_t *obj, int inlet, fts_symbol_t property)
-{
-  if (inlet >= fts_object_get_inlets_number(obj))
-    return;
-
-  if (obj->inlets_properties[inlet])
-    fts_plist_remove(obj->inlets_properties[inlet], property);
-}
-
-
-void
-fts_object_inlet_remove_prop(fts_object_t *obj, int inlet, fts_symbol_t property)
-{
-  fts_property_daemon_t d;
-
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), inlet_property_remove, property);
-
-  if (d)
-    (* d)(inlet_property_remove, obj, inlet, property, 0);
-  else
-    _fts_object_remove_prop(obj, property);
-}
-
-/* Object outlet remove properties */
-
-void
-_fts_object_outlet_remove_prop(fts_object_t *obj, int outlet, fts_symbol_t property)
-{
-  if (outlet >= fts_object_get_outlets_number(obj))
-    return;
-
-  if (obj->outlets_properties[outlet])
-    fts_plist_remove(obj->outlets_properties[outlet], property);
-}
-
-
-void
-fts_object_outlet_remove_prop(fts_object_t *obj, int outlet, fts_symbol_t property)
-{
-  fts_property_daemon_t d;
-
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), outlet_property_remove, property);
-
-  if (d)
-    (* d)(outlet_property_remove, obj, outlet, property, 0);
+    (* d)(obj_property_remove, obj, property, 0);
   else
     _fts_object_remove_prop(obj, property);
 }
@@ -460,160 +348,12 @@ fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 	  d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_get, property);
 
 	  if (d)
-	    (* d)(obj_property_remove, obj, 0, property, value);
+	    (* d)(obj_property_remove, obj, property, value);
 	  else
 	    fts_set_void(value);
 	}
     }
 }
-
-/* Object inlet get properties */
-
-void
-_fts_object_inlet_get_prop(fts_object_t *obj, int inlet, fts_symbol_t property, fts_atom_t *value)
-{
-  const fts_atom_t *ret;
-
-  if (inlet >= fts_object_get_inlets_number(obj))
-    {
-      fts_set_void(value);
-      return;
-    }
-
-  ret = 0;
-
-  if (obj->inlets_properties[inlet])
-    ret = fts_plist_get(obj->inlets_properties[inlet], property);
-
-  if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-
-  ret = fts_class_inlet_get_prop(obj->cl, inlet, property);
-
-  if (ret)
-    *value = *ret;
-  else
-    fts_set_void(value);
-}
-
-
-void
-fts_object_inlet_get_prop(fts_object_t *obj, int inlet, fts_symbol_t property, fts_atom_t *value)
-{
-  const fts_atom_t *ret;
-  fts_property_daemon_t d;
-
-  if (inlet >= fts_object_get_inlets_number(obj))
-    {
-      fts_set_void(value);
-      return;
-    }
-
-  ret = 0;
-
-  if (obj->inlets_properties[inlet])
-    ret = fts_plist_get(obj->inlets_properties[inlet], property);
-
-  if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-    
-  ret = fts_class_inlet_get_prop(obj->cl, inlet, property);
-
-  if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), inlet_property_get, property);
-
-  if (d)
-    (* d)(inlet_property_remove, obj, inlet, property, value);
-  else
-    fts_set_void(value);
-}
-
-
-/* Object outlet get properties */
-
-void
-_fts_object_outlet_get_prop(fts_object_t *obj, int outlet, fts_symbol_t property, fts_atom_t *value)
-{
-  const fts_atom_t *ret;
-
-  if (outlet >= fts_object_get_outlets_number(obj))
-    {
-      fts_set_void(value);
-      return;
-    }
-
-  ret = 0;
-
-  if (obj->outlets_properties[outlet])
-    ret = fts_plist_get(obj->outlets_properties[outlet], property);
-
-  if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-
-  ret = fts_class_outlet_get_prop(obj->cl, outlet, property);
-
-  if (ret)
-    *value = *ret;
-  else
-    fts_set_void(value);
-}
-
-
-void
-fts_object_outlet_get_prop(fts_object_t *obj, int outlet, fts_symbol_t property, fts_atom_t *value)
-{
-  const fts_atom_t *ret;
-  fts_property_daemon_t d;
-
-  if (outlet >= fts_object_get_outlets_number(obj))
-    {
-      fts_set_void(value);
-      return;
-    }
-
-  ret = 0;
-
-  if (obj->outlets_properties[outlet])
-    ret = fts_plist_get(obj->outlets_properties[outlet], property);
-
-  if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-    
-  ret = fts_class_outlet_get_prop(obj->cl, outlet, property);
-
-  if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), outlet_property_get, property);
-
-  if (d)
-    (* d)(outlet_property_remove, obj, outlet, property, value);
-  else
-    fts_set_void(value);
-}
-
-
-
 
 
 /* Class version
@@ -635,59 +375,11 @@ fts_class_put_prop(fts_class_t *cl, fts_symbol_t property, const fts_atom_t *val
 }
 
 void
-fts_class_inlet_put_prop(fts_class_t *cl, int inlet, fts_symbol_t property, const fts_atom_t *value)
-{
-  if (inlet >= cl->ninlets)
-    return;
-
-  if (! cl->inlets[inlet].properties)
-    cl->inlets[inlet].properties = fts_plist_new();
-
-  fts_plist_put(cl->inlets[inlet].properties, property, value);
-}
-
-void
-fts_class_outlet_put_prop(fts_class_t *cl, int outlet, fts_symbol_t property, const fts_atom_t *value)
-{
-  if (outlet >= cl->noutlets)
-    return;
-
-  if (! cl->outlets[outlet].properties)
-    cl->outlets[outlet].properties = fts_plist_new();
-
-  fts_plist_put(cl->outlets[outlet].properties, property, value);
-}
-
-
-void
 fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property)
 {
   if (cl->properties)
     fts_plist_remove(cl->properties, property);
 }
-
-
-void
-fts_class_inlet_remove_prop(fts_class_t *cl, int inlet, fts_symbol_t property)
-{
-  if (inlet >= cl->ninlets)
-    return;
-
-  if (cl->inlets[inlet].properties)
-    fts_plist_remove(cl->inlets[inlet].properties, property);
-}
-
-
-void
-fts_class_outlet_remove_prop(fts_class_t *cl, int outlet, fts_symbol_t property)
-{
-  if (outlet >= cl->noutlets)
-    return;
-
-  if (cl->outlets[outlet].properties)
-    fts_plist_remove(cl->outlets[outlet].properties, property);
-}
-
 
 /* null if no prop */
 
@@ -699,27 +391,6 @@ fts_class_get_prop(fts_class_t *cl, fts_symbol_t property)
   else
     return 0;
 }
-
-static const fts_atom_t *
-fts_class_inlet_get_prop(fts_class_t *cl, int inlet, fts_symbol_t property)
-{
-  if (cl->inlets[inlet].properties)
-    return fts_plist_get(cl->inlets[inlet].properties, property);
-  else
-    return 0;
-}
-
-
-static const fts_atom_t *
-fts_class_outlet_get_prop(fts_class_t *cl, int outlet, fts_symbol_t property)
-{
-  if (cl->outlets[outlet].properties)
-    return fts_plist_get(cl->outlets[outlet].properties, property);
-  else
-    return 0;
-}
-
-
 
 /* 
    Daemon handling
@@ -758,26 +429,6 @@ fts_class_remove_daemon(fts_class_t *cl,
 void
 fts_properties_free(fts_object_t *obj)
 {
-  int outlet, inlet;
-
-  if (obj->outlets_properties)
-    {
-      int i;
-
-      for (i = 0; i < obj->cl->noutlets; i++)
-	if (obj->outlets_properties[i])
-	  fts_plist_free(obj->outlets_properties[i]);
-    }
-
-  if (obj->inlets_properties)
-    {
-      int i;
-
-      for (i = 0; i < obj->cl->ninlets; i++)
-	if (obj->inlets_properties[i])
-	  fts_plist_free(obj->inlets_properties[i]);
-    }
-
   if (obj->properties)
     fts_plist_free(obj->properties);
 }

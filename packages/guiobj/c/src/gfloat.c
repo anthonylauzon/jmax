@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/30 17:24:47 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/10/30 17:49:31 $
  *
  */
 
@@ -92,7 +92,7 @@ gfloat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 static void
 gfloat_get_value(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+		 fts_symbol_t property, fts_atom_t *value)
 {
   gfloat_t *this = (gfloat_t *)obj;
 
@@ -102,7 +102,7 @@ gfloat_get_value(fts_daemon_action_t action, fts_object_t *obj,
 
 static void
 gfloat_put_value(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+		 fts_symbol_t property, fts_atom_t *value)
 {
   gfloat_t *this = (gfloat_t *)obj;
 

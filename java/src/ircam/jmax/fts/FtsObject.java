@@ -54,8 +54,13 @@ public class FtsObject
 
     /* Get the class name */
 
-    className = stream.getNextStringArgument();
-    className = className.intern();
+    if (stream.getNextType() == FtsStream.stringValue)
+      {
+	className = stream.getNextStringArgument();
+	className = className.intern();
+      }
+    else
+      className = "";
 
     /* Note that we do the unparsing relative to ':' and variables
        here; in the future, a dedicated API should be used ! */

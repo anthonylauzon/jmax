@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/08/27 10:16:45 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:23 $
  *
  * Maintain a symbol table and define a message-passing system
  */
@@ -48,7 +48,7 @@ static void symbol_obj_list(fts_object_t *, int, fts_symbol_t , int, const fts_a
 static void symbol_obj_init(fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
 static fts_status_t symbol_obj_instantiate(fts_class_t *, int, const fts_atom_t *);
 static void symbol_obj_get_state(fts_daemon_action_t action, fts_object_t *obj,
-			    int idx, fts_symbol_t property, fts_atom_t *value);
+			    fts_symbol_t property, fts_atom_t *value);
 
 /* ---------------- the metaclass configuration function ------------------ */
 

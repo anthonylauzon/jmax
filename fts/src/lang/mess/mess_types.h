@@ -31,8 +31,6 @@ typedef struct fts_plist                 fts_plist_t;
 
 typedef enum fts_daemon_action {
   obj_property_put, obj_property_get, obj_property_remove, 
-  inlet_property_put, inlet_property_get, inlet_property_remove, 
-  outlet_property_put, outlet_property_get, outlet_property_remove
 } fts_daemon_action_t;
 
 
@@ -172,16 +170,13 @@ typedef void (*fts_data_remote_destructor_t)(fts_data_t *d);
 /*
  * Universal daemon type;
  *
- * Depending on the type of action, the idx value may be not significative,
- * or may represent the inlet or outlet for the property.
- *
  * For get actions, the value argument is the pointer where the value is returned.
  * For put actions, the value argument is the pointer where the value is passed.
  * For remove actions, the value argument is ignored.
  */
 
 
-typedef void (* fts_property_daemon_t)(fts_daemon_action_t action, fts_object_t *obj, int idx, fts_symbol_t property, fts_atom_t *value);
+typedef void (* fts_property_daemon_t)(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
 
 
 /* generic class/object types */
@@ -273,8 +268,6 @@ struct fts_connection
 
 struct fts_inlet_decl
 {
-  fts_plist_t *properties;		/* class inlet dynamic properties */
-
   int nmess;
   int nalloc;
   fts_class_mess_t **messlist;
@@ -283,8 +276,6 @@ struct fts_inlet_decl
 
 struct fts_outlet_decl
 {
-  fts_plist_t *properties;		/* class outlet dynamic properties */
-
   fts_mess_type_t tmess;	
 };
 
@@ -327,8 +318,6 @@ struct fts_object
   /* object dynamic properties */
 
   fts_plist_t *properties;	
-  fts_plist_t **inlets_properties;	
-  fts_plist_t **outlets_properties;	
 };
 
 /* Commodity structure to keep a list of objects */

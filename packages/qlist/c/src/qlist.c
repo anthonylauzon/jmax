@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/09/25 17:36:32 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/09/28 15:39:46 $
  *
  * FTS by Miller Puckette
  * 
@@ -278,7 +278,7 @@ qlist_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 static void
 qlist_get_data(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+	       fts_symbol_t property, fts_atom_t *value)
 {
   qlist_t *this = (qlist_t *)obj;
 

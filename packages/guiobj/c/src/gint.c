@@ -100,7 +100,7 @@ gint_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
 static void
 gint_get_value(fts_daemon_action_t action, fts_object_t *obj,
-	       int idx, fts_symbol_t property, fts_atom_t *value)
+	       fts_symbol_t property, fts_atom_t *value)
 {
   gint_t *this = (gint_t *)obj;
 
@@ -109,7 +109,7 @@ gint_get_value(fts_daemon_action_t action, fts_object_t *obj,
 
 static void
 gint_put_value(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+		 fts_symbol_t property, fts_atom_t *value)
 {
   gint_t *this = (gint_t *)obj;
 

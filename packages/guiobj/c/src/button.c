@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.4 $ IRCAM $Date: 1998/11/17 14:32:01 $
+ *      $Revision: 1.5 $ IRCAM $Date: 1998/11/17 15:08:59 $
  *
  * Use a timer for blinking because Java timing is not reilable.
  * 
@@ -132,7 +132,7 @@ button_tick(fts_alarm_t *alarm, void *calldata)
 
 static void
 button_get_value(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+		 fts_symbol_t property, fts_atom_t *value)
 {
   button_t *this = (button_t *)obj;
 
@@ -142,7 +142,7 @@ button_get_value(fts_daemon_action_t action, fts_object_t *obj,
 
 static void
 button_put_value(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+		 fts_symbol_t property, fts_atom_t *value)
 {
   button_t *this = (button_t *)obj;
 

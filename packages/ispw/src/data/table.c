@@ -336,7 +336,7 @@ table_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 /* daemon for the getting the size property */
 
 static void
-table_get_size(fts_daemon_action_t action, fts_object_t *obj, int idx, fts_symbol_t property, fts_atom_t *value)
+table_get_size(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   table_t *this = (table_t *)obj;
 
@@ -353,7 +353,7 @@ table_get_size(fts_daemon_action_t action, fts_object_t *obj, int idx, fts_symbo
 
 static void
 table_get_data(fts_daemon_action_t action, fts_object_t *obj,
-		 int idx, fts_symbol_t property, fts_atom_t *value)
+	       fts_symbol_t property, fts_atom_t *value)
 {
   table_t *this = (table_t *)obj;
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.51 $ IRCAM $Date: 1998/10/30 17:48:28 $
+ *      $Revision: 1.52 $ IRCAM $Date: 1998/11/02 11:44:08 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -92,16 +92,10 @@ fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object
   obj->id         = FTS_NO_ID;
 
   if (cl->noutlets)
-    {
-      obj->out_conn = (fts_connection_t **) fts_block_zalloc(cl->noutlets * sizeof(fts_connection_t *));
-      obj->outlets_properties = (fts_plist_t **) fts_block_zalloc(cl->noutlets * sizeof(fts_plist_t *));
-    }
+    obj->out_conn = (fts_connection_t **) fts_block_zalloc(cl->noutlets * sizeof(fts_connection_t *));
 
   if (cl->ninlets)
-    {
-      obj->in_conn = (fts_connection_t **) fts_block_zalloc(cl->ninlets * sizeof(fts_connection_t *));
-      obj->inlets_properties = (fts_plist_t **) fts_block_zalloc(cl->ninlets * sizeof(fts_plist_t *));
-    }
+    obj->in_conn = (fts_connection_t **) fts_block_zalloc(cl->ninlets * sizeof(fts_connection_t *));
     
   /* Add the object in the patcher
    * the test is only usefull during the root patcher building
@@ -132,16 +126,10 @@ fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object
 	fts_patcher_remove_object(patcher, obj);
 
       if (obj->out_conn)
-	{
-	  fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
-	  fts_block_free((char *)obj->outlets_properties, obj->cl->noutlets*sizeof(fts_plist_t *));
-	}
+	fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
 
       if (obj->in_conn)
-	{
-	  fts_block_free((char *)obj->in_conn, obj->cl->ninlets*sizeof(fts_connection_t *));
-	  fts_block_free((char *)obj->inlets_properties, obj->cl->ninlets*sizeof(fts_plist_t *));
-	}
+	fts_block_free((char *)obj->in_conn, obj->cl->ninlets*sizeof(fts_connection_t *));
 
       fts_block_free((char *)obj, obj->cl->size);
       *ret = 0;
@@ -892,16 +880,10 @@ static void fts_object_free(fts_object_t *obj, int release)
   /* free the object */
 
   if (obj->out_conn)
-    {
-      fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
-      fts_block_free((char *)obj->outlets_properties, obj->cl->noutlets*sizeof(fts_plist_t *));
-    }
+    fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
 
   if (obj->in_conn)
-    {
-      fts_block_free((char *)obj->in_conn, obj->cl->ninlets*sizeof(fts_connection_t *));
-      fts_block_free((char *)obj->inlets_properties, obj->cl->ninlets*sizeof(fts_plist_t *));
-    }
+    fts_block_free((char *)obj->in_conn, obj->cl->ninlets*sizeof(fts_connection_t *));
 
   fts_block_free((char *)obj, obj->cl->size);
 }

@@ -97,7 +97,10 @@ fts_platform_init(void)
       param.sched_priority  = sched_get_priority_max(SCHED_FIFO);
 
       if (sched_setscheduler(0, SCHED_FIFO, &param) < 0)
-	running_real_time = 0;
+	{
+	  running_real_time = 0;
+	  memory_is_locked = 0;
+	}
       else
 	{
 	  /* Iff we are running real time, lock to physical memory, if we can */
