@@ -64,6 +64,11 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   /* create binary protocol */
   self->binary_protocol = (fts_binary_protocol_t*)fts_object_create(fts_binary_protocol_type, 0, NULL);
+  if (self->binary_protocol == NULL)
+  {
+    fts_object_error(o, "Cannot create binary protocol component");
+    return;
+  }
   fts_object_refer((fts_object_t*)self->binary_protocol);
 
   /* check number of argument */
