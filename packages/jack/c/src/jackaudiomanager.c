@@ -594,20 +594,26 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 #endif /* JACK_AUDIO_MANAGER_DEBUG */
       if (NULL != port->input_port)
       {   
-	/* call jack_connect */
-	jack_connect(manager_jack_client, port->port_name, jack_port_name(port->input_port));
-	fts_log("[jackaudiomanager] connect %s to %s \n", 
-		port->port_name, 
-		jack_port_name(port->input_port));
+	if (port->port_name != s_jmax_jack_input)
+	{
+	  /* call jack_connect */
+	  jack_connect(manager_jack_client, port->port_name, jack_port_name(port->input_port));
+	  fts_log("[jackaudiomanager] connect %s to %s \n", 
+		  port->port_name, 
+		  jack_port_name(port->input_port));
+	}
 	fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_INPUT);
       }
       else if (port->output_port != NULL)
       {
-	/* call jack_connect */
-	jack_connect(manager_jack_client, jack_port_name(port->output_port), port->port_name);	
-	fts_log("[jackaudiomanager] connect %s to %s \n", 
-		jack_port_name(port->output_port), 
-		port->port_name);
+	if (port->port_name != s_jmax_jack_output)
+	{
+	  /* call jack_connect */
+	  jack_connect(manager_jack_client, jack_port_name(port->output_port), port->port_name);	
+	  fts_log("[jackaudiomanager] connect %s to %s \n", 
+		  jack_port_name(port->output_port), 
+		  port->port_name);
+	}
 	fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_OUTPUT);
       }
 
@@ -1158,6 +1164,7 @@ void jackaudiomanager_config( void)
   fts_class_t* jam;
 
   fts_atom_t at[2]; /* for non connected jMax jack port */
+  fts_atom_t k, a;  /* for non connected jMax jack port */
 
   /* create pipe */
   if (0 != pipe(pipedes))
@@ -1200,7 +1207,9 @@ void jackaudiomanager_config( void)
 
   /*
     create non connected jMax jack port 
+    and add them to hashtables
   */
+  /* input */
   fts_set_int(at, JackPortIsOutput);
   fts_set_symbol(at + 1, s_jmax_jack_input);
   o = fts_object_create(jackaudioport_type, 2, at);
@@ -1208,7 +1217,11 @@ void jackaudiomanager_config( void)
   {
     fts_object_refer(o);
     fts_audiomanager_put_port(s_jmax_jack_input, (fts_audioport_t*)o);
+    fts_set_symbol(&k, s_jmax_jack_input);
+    fts_set_object(&a, o);
+    fts_hashtable_put(&jack_port_input_ht, &k, &a);      
   }
+  /* output */
   fts_set_int(at, JackPortIsInput);
   fts_set_symbol(at + 1, s_jmax_jack_output);
   o = fts_object_create(jackaudioport_type, 2, at);
@@ -1216,7 +1229,11 @@ void jackaudiomanager_config( void)
   {
     fts_object_refer(o);
     fts_audiomanager_put_port(s_jmax_jack_output, (fts_audioport_t*)o);
+    fts_set_symbol(&k, s_jmax_jack_output);
+    fts_set_object(&a, o);
+    fts_hashtable_put(&jack_port_output_ht, &k, &a);      
   }
+
 
   jackaudiomanager_thread_type = fts_class_install(fts_new_symbol("jackaudiomanager_thread"), 
 							   jackaudiomanager_thread_instantiate);
