@@ -80,12 +80,11 @@ static void messconst_redefine_number_of_inlets( fts_object_t *this, int new_nin
   this->in_conn = new_in_conn;
 
   /* change the object class */
-  fts_set_symbol( a, s_messconst);
-  fts_set_symbol( a+1, fts_s_ninlets);
-  fts_set_int(a+2, new_ninlets);
-  fts_set_symbol( a+3, fts_s_noutlets);
-  fts_set_int(a+4, 1); /* outlets */
-  this->head.cl = fts_class_instantiate( messconst_metaclass, 5, a);
+  fts_set_symbol( a, fts_s_ninlets);
+  fts_set_int(a+1, new_ninlets);
+  fts_set_symbol( a+2, fts_s_noutlets);
+  fts_set_int(a+3, 1); /* outlets */
+  this->head.cl = fts_class_instantiate( messconst_metaclass, 4, a);
 
   if (fts_object_has_id( this))
     {
@@ -287,9 +286,6 @@ static fts_status_t
 messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int ninlets = 1, noutlets = 1, i;
-
-  ac--;
-  at++;
 
   /* Do we have a new object description (i.e. "ins <INT> outs <INT>") or an old one ? */
   if (ac == 4 
