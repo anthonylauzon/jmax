@@ -15,5 +15,7 @@ defineDevice adatIn1  { SgiALIn ALdevice RAD1.ADATIn channels 8 } "8 channel ADA
 defineDevice adatOut   { SgiALOut ALdevice RAD1.ADATOut channels 8 } "8 channel ADAT card 1"
 defineDevice adatOut1  { SgiALOut ALdevice RAD1.ADATOut channels 8 } "8 channel ADAT card 1"
 
-defineDevice midi      { sgi_midi port SerialPort2 } "MIDI on startmidi port SerialPort2"
+defineDevice midi      { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
+defineDevice midi0     { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
+defineDevice midi1     { sgi_midi port SerialPort2 } "MIDI on startmidi port SerialPort2"
 
