@@ -138,7 +138,17 @@ FTS_API void fts_client_done_message( fts_object_t *obj);
  * @ingroup client
  */
 FTS_API void fts_client_upload_object( fts_object_t *obj, int client_id);
-FTS_API void fts_client_load_patcher( fts_symbol_t name, fts_object_t *parent, int client_id);
+/**
+ * Load a patcher from file
+ *
+ * @fn void fts_client_load_patcher( fts_symbol_t name, fts_object_t *parent, int client_id)
+ * @param name the file name 
+ * @param parent the parent object 
+ * @param client_id the client id 
+ *
+ * @ingroup client
+ */
+FTS_API int fts_client_load_patcher( fts_symbol_t name, fts_object_t *parent, int client_id);
 FTS_API void fts_client_register_object( fts_object_t *obj, int client_id);
 
 /* compatibility */

@@ -247,6 +247,15 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  ((FtsPatcherObject)obj).endPaste();
 	}
       });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("noHelp"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  FtsGraphicObject object = ( FtsGraphicObject)args.getObject( 0);
+	  JOptionPane.showMessageDialog(((ErmesSketchWindow)((FtsPatcherObject)obj).getEditorFrame()), 
+					"Sorry, no help for object "+object.getClassName(), 
+					"Warning", JOptionPane.INFORMATION_MESSAGE);
+	}
+      });
   }
 
   /*****************************************************************************************/

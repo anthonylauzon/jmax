@@ -1010,7 +1010,7 @@ static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t 
   fts_client_load_patcher( fts_get_symbol( at), fts_get_object( at+1), this->client_id);
 }
 
-void fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id)
+int fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id)
 {
   fts_atom_t a[3];
   fts_object_t *patcher;
@@ -1043,7 +1043,7 @@ void fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id
   if (patcher == 0)
     {
       fts_log("[patcher]: Cannot read file %s\n", filename);
-      return;
+      return 0;
     }
 
   client_register_object( client, patcher);
@@ -1065,6 +1065,8 @@ void fts_client_load_patcher(fts_symbol_t filename, fts_object_t *parent, int id
   fts_send_message( patcher, fts_SystemInlet, fts_new_symbol("openEditor"), 0, 0);
 
   fts_log("[patcher]: Finished loading patcher %s\n", filename);
+
+  return 1;
 }
 
 

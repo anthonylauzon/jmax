@@ -95,6 +95,7 @@ fts_symbol_t sym_setSaved;
 fts_symbol_t sym_endUpload;
 fts_symbol_t sym_startPaste;
 fts_symbol_t sym_endPaste;
+fts_symbol_t sym_noHelp;
 
 #define set_editor_open(q) ((q)->editor_open = 1)
 #define set_editor_close(q) ((q)->editor_open = 0)
@@ -1267,7 +1268,8 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   fts_log("[patcher] help %s\n", filename);
 
-  fts_client_load_patcher(filename, (fts_object_t *)fts_get_root_patcher(), fts_get_client_id(o));
+  if( !fts_client_load_patcher(filename, (fts_object_t *)fts_get_root_patcher(), fts_get_client_id(o)))
+    fts_client_send_message(o, sym_noHelp, 1, at); 
 }
 
 static void 
@@ -2341,6 +2343,7 @@ void fts_kernel_patcher_init(void)
   sym_setSaved = fts_new_symbol("setSaved");
   sym_startPaste = fts_new_symbol("startPaste");
   sym_endPaste = fts_new_symbol("endPaste");
+  sym_noHelp = fts_new_symbol("noHelp");
 
   fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);
 
