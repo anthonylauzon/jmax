@@ -1119,6 +1119,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     int x = e.getX();
     int y = e.getY();
     
+
     //(opt.) resetting the "firstclick" flag if safer but heavy 
     //(a repaint foreach mouseup...)
     //itsFirstClick = true;
