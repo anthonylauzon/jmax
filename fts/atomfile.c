@@ -125,6 +125,7 @@ fts_atom_file_close(fts_atom_file_t *f)
 
 #define IS_SEPARATOR(c) ((((c) == ' ') || ((c) == '\t') || ((c) == '\r') || ((c) == '\n') || ((c) == '\0'))? (c): 0)
 #define IS_DIGIT(c) (('0' <= (c)) && ((c) <= '9'))
+#define IS_EXP(c)   ((c) == 'e')
 #define IS_SIGN(c) (((c) == '+') || ((c) == '-'))
 #define IS_POINT(c) ('.' == (c))
 #define IS_BACKSLASH_QUOTE(c) ('\\' == (c))
@@ -290,7 +291,7 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
 		  read_type = a_float;
 		  status = read_separator;
 		}
-	      else if (IS_DIGIT(c))
+	      else if (IS_DIGIT(c)  ||  IS_EXP(c)  ||  IS_SIGN(c))
 		{
 		  /* go on in float */
 		  buf[fill_p++] = c;
@@ -411,6 +412,7 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
 	fts_set_int(at, l);
       }
     break;
+    
     case a_float:
       {
 	float f;
@@ -419,17 +421,20 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
 	fts_set_float(at, f);
       }
     break;
+    
     case a_symbol:
       if(strcmp("()", buf) == 0)
 	fts_set_void(at);
       else
 	fts_set_symbol(at, fts_new_symbol(buf));
       break;
+    
     default:
       break;
     }
 
   *separator = sep;
+  
   return 1; /* 1 is for atom found */
 }
 
