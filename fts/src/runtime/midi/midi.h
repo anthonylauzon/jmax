@@ -37,19 +37,19 @@ extern void fts_midi_poll( void);
 
 extern fts_midi_port_t *fts_midi_get_port(int idx);
 
-extern double *fts_get_midi_time_code_p(int idx); /*return a pointer to a long keeping
-						  the midi time code of the port */
+/* return a pointer to a long keeping the midi time code of the port */
+extern double *fts_get_midi_time_code_p(int idx); 
 
 typedef  void (* midi_action_t) (fts_midi_port_t *p, int midi_ev, void *user_data, int argc, fts_atom_t *at);
 
 extern void fts_midi_install_fun(fts_midi_port_t *port, int midi_ev, midi_action_t fun, void *user_data);
 extern void fts_midi_deinstall_fun(fts_midi_port_t *port, int midi_ev, midi_action_t fun, void *user_data);
+
+
 /* Macros identifing the MIDI_EV  in the above call.
    Note that the n argument to the _CH macros can be between 1 and 16.
    Should add at least the modulation wheel ...
 */
-
-
 #define FTS_MIDI_NOTE                       0
 #define FTS_MIDI_NOTE_CH(n)                 (FTS_MIDI_NOTE + (n))
 #define FTS_MIDI_POLY_AFTERTOUCH            (FTS_MIDI_NOTE + 16 + 1)
