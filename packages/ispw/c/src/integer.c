@@ -37,8 +37,7 @@ int_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   int_t *this = (int_t *) o;
 
-  if (fts_is_number(at))
-    fts_outlet_int(o, 0, this->i);
+  fts_outlet_int(o, 0, this->i);
 }
 
 static void
