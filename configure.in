@@ -280,8 +280,10 @@ dnl ###########################################################################
 dnl check for pkg-config
 AC_PATH_PROG(PKG_CONFIG,pkg-config,no)
 
+
 dnl ###########################################################################
 dnl choice of JACK package
+dnl ###########################################################################
 with_jack="no"
 AC_ARG_ENABLE(jack, dnl newline and indentation:
 [ 
@@ -368,6 +370,7 @@ AC_SUBST(JACK_LDFLAGS)
 
 dnl ###########################################################################
 dnl choice of MidiShare package
+dnl ###########################################################################
 with_midishare="no"
 AC_ARG_ENABLE(midishare, dnl newline and indentation:
 [ 
@@ -376,7 +379,7 @@ AC_ARG_ENABLE(midishare, dnl newline and indentation:
   with_midishare="no")
 
 
-dnl options to find JACK header and JACK library 
+dnl options to find Midishare header and Midishare library 
 AC_ARG_WITH(midishare-cflags,
   [  --with-midishare-cflags=MIDISHARE_CFLAGS	MidiShare support cflags (optional)],
   [MIDISHARE_CFLAGS="$withval";
@@ -432,17 +435,33 @@ then
 	LIBS="$tmp_LIBS"
 fi
 		
-dnl Add jack in packages to compile	
+dnl Add Midishare in packages to compile	
 AM_CONDITIONAL(COND_COMPILE_MIDISHARE, test "$HAVE_LIB_MIDISHARE" = "true")	
 
+dnl Midishare support
 AC_SUBST(MIDISHARE_CFLAGS)
 AC_SUBST(MIDISHARE_LDFLAGS)
 
 
+dnl ###########################################################################
+dnl unixdtd compilation
+dnl ###########################################################################
+with_unixdtd="no"
+AC_ARG_ENABLE(midishare, dnl newline and indentation:
+[ 
+  --enable-unixdtd[=value]	compile unixdtd package [default=no]],
+  with_unixdtd="$enableval",
+  with_unixdtd="no")
+
+dnl Add unixdtd in packages to compile
+AM_CONDITIONAL(COND_COMPILE_UNIXDTD, test "$with_unixdtd" = "yes")
+
 
 AC_SUBST(DEFAULT_CONFIG_FILE)
 
+dnl ###########################################################################
 dnl Check for doxygen
+dnl ###########################################################################
 AC_CHECK_PROG(HAVE_DOXYGEN, doxygen, "yes", "no")
 AM_CONDITIONAL(COND_DOXYGEN, test "$HAVE_DOXYGEN" = "yes")
 
