@@ -15,6 +15,8 @@ jcomment.gif					\
 jcomment_cursor.gif				\
 jpatcher.gif					\
 jpatcher_cursor.gif				\
+monitor.gif					\
+monitor_cursor.gif				\
 messconst.gif					\
 messconst_cursor.gif				\
 outlet.gif					\
