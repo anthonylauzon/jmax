@@ -16,7 +16,7 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
   Button okButton;
   
   public StatisticsDialog( Frame dw) {
-    super(dw, "System stats", false);
+    super(dw, "System statistics", false);
     parent = (Frame)dw;
     
     // Do a gc before giving statistics (added by mdc).
@@ -74,15 +74,19 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
   
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////keyListener--inizio
-  public void keyTyped(KeyEvent e){}
+  public void keyTyped(KeyEvent e)
+  {
+    if (e.getKeyChar() == '\r')
+      {
+	setVisible(false);
+	dispose();
+      }
+  }
+
   public void keyReleased(KeyEvent e){}
   
-  public void keyPressed(KeyEvent e){
-    if(e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){
-      setVisible(false);
-      dispose();     
-    }
-  }
+  public void keyPressed(KeyEvent e){}
+
   /////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////keyListener--fine
 }

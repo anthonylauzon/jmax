@@ -2459,6 +2459,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     if (locked)
       {
+	if (  editStatus == EDITING_OBJECT)
+	  {
+	    itsEditField.LostFocus();
+	    requestFocus();
+	  }
+
 	setBackground( Settings.sharedInstance().getLockBackgroundColor());
 
 	if (currentSelection.getOwner() == this)
@@ -2468,7 +2474,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       setBackground( Settings.sharedInstance().getEditBackgroundColor());
   }
 
-  protected final boolean isLocked()
+  final boolean isLocked()
   {
     return locked;
   }

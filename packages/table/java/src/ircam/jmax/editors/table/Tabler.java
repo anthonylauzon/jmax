@@ -22,9 +22,9 @@ public class Tabler extends MaxEditor {
     Init();
 
     if (theData.getName() != null)
-      setTitle("table " + theData.getName());
+      setTitle("Table " + theData.getName());
     else
-      setTitle("table " + theData.getName());
+      setTitle("Table");
 
     itsData = new TableRemoteData(theData);
 
@@ -42,9 +42,9 @@ public class Tabler extends MaxEditor {
   /** 
    * Personalize the menubar */
   public void SetupMenu(){
-    GetEditMenu().add(new MenuItem("-"));
+    getEditMenu().add(new MenuItem("-"));
     itsRefreshMenuItem = new MenuItem("Refresh");
-    GetEditMenu().add(itsRefreshMenuItem);
+    getEditMenu().add(itsRefreshMenuItem);
     itsRefreshMenuItem.addActionListener(new ActionListener() {
       public  void actionPerformed(ActionEvent e)
 	{ 

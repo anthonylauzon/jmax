@@ -25,6 +25,11 @@ public class ControlPanelFrame extends JFrame
     return controlPanel;
   }
 
+  private JPanel exceptionPanel;
+  private JPanel dspPanel;
+  private JPanel optionsPanel;
+  private JPanel debugPanel;
+
   private FtsDspControl control;
   private IndicatorWithMemory dacSlipIndicator;
   private IndicatorWithMemory invalidFpeIndicator;
@@ -82,28 +87,42 @@ public class ControlPanelFrame extends JFrame
     setSize( 300, 300);
     JPanel panel = new JPanel();
     panel.setBorder( new EmptyBorder( 5, 5, 5, 5));
+    panel.setLayout( new BoxLayout( panel, BoxLayout.X_AXIS));
 
-    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS));
-
-    dacSlipIndicator = new IndicatorWithMemory("Out of sync", "(dac slip...)");
-    panel.add(dacSlipIndicator);
-    new DspControlAdapter("dacSlip", control, dacSlipIndicator);
-
+    exceptionPanel = new JPanel();
+    exceptionPanel.setLayout( new BoxLayout( exceptionPanel, BoxLayout.Y_AXIS));
+    exceptionPanel.setBorder(BorderFactory.createTitledBorder("Exceptions"));
+    exceptionPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+    panel.add(exceptionPanel);
+    panel.add( Box.createRigidArea(new Dimension(5,0)));
+    
     invalidFpeIndicator = new IndicatorWithMemory("Invalid Operand");
-    panel.add(invalidFpeIndicator);
+    exceptionPanel.add(invalidFpeIndicator);
     new DspControlAdapter("invalidFpe", control, invalidFpeIndicator);
 
     divideByZeroFpeIndicator = new IndicatorWithMemory("Division By Zero");
-    panel.add(divideByZeroFpeIndicator);
+    exceptionPanel.add(divideByZeroFpeIndicator);
     new DspControlAdapter("divideByZeroFpe", control, divideByZeroFpeIndicator);
 
     overflowFpeIndicator = new IndicatorWithMemory("OverFlow");
-    panel.add(overflowFpeIndicator);
+    exceptionPanel.add(overflowFpeIndicator);
     new DspControlAdapter("overflowFpe", control, overflowFpeIndicator);
 
     //
     // Temporary code to show sampling rate and fifo size; it should
     // be a bean property editor field, probabily ...
+
+    dspPanel = new JPanel();
+    dspPanel.setLayout( new BoxLayout( dspPanel, BoxLayout.Y_AXIS));
+    dspPanel.setBorder(BorderFactory.createTitledBorder("DSP"));
+    dspPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+    panel.add(dspPanel);
+    panel.add( Box.createRigidArea(new Dimension(5,0)));
+
+    dacSlipIndicator = new IndicatorWithMemory("Out of sync", "(dac slip...)");
+    dspPanel.add(dacSlipIndicator);
+    new DspControlAdapter("dacSlip", control, dacSlipIndicator);
+
 
     JPanel samplingRatePanel = new JPanel();
 
@@ -120,7 +139,7 @@ public class ControlPanelFrame extends JFrame
     samplingRatePanel.add("West", samplingRateLabel);
     samplingRatePanel.add("East", samplingRateText);
 
-    panel.add(samplingRatePanel);
+    dspPanel.add(samplingRatePanel);
 
     JPanel fifoSizePanel = new JPanel();
 
@@ -137,7 +156,13 @@ public class ControlPanelFrame extends JFrame
     fifoSizePanel.add("West", fifoSizeLabel);
     fifoSizePanel.add("East", fifoSizeText);
 
-    panel.add(fifoSizePanel);
+    dspPanel.add(fifoSizePanel);
+
+    optionsPanel = new JPanel();
+    optionsPanel.setLayout( new BoxLayout( optionsPanel, BoxLayout.Y_AXIS));
+    optionsPanel.setBorder(BorderFactory.createTitledBorder("Run Time"));
+    optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+    panel.add(optionsPanel);
 
     dspOnButton = new JCheckBox("Dsp On");
     dspOnButton.setHorizontalTextPosition(JCheckBox.LEFT);
@@ -153,10 +178,19 @@ public class ControlPanelFrame extends JFrame
 	  control.setDspOn(Boolean.TRUE);
       }});
 
-    panel.add(dspOnButton);
+    optionsPanel.add(dspOnButton);
 
     if (MaxApplication.getProperty("debug") != null)
       {
+	panel.add( Box.createRigidArea(new Dimension(5,0)));
+
+	debugPanel = new JPanel();
+	debugPanel.setLayout( new BoxLayout( debugPanel, BoxLayout.Y_AXIS));
+	debugPanel.setBorder(BorderFactory.createTitledBorder("Debug"));
+	debugPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+
+	panel.add(debugPanel);
+
 	JButton  dspPrintButton;
 
 	dspPrintButton = new JButton("Print Dsp Chain");
@@ -167,7 +201,7 @@ public class ControlPanelFrame extends JFrame
 	    }
 	});
 
-	panel.add(dspPrintButton);
+	debugPanel.add(dspPrintButton);
       }
 
     getContentPane().add( panel);

@@ -56,14 +56,14 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 
     add( lockEditButton, BorderLayout.WEST);
 
-
-    upButton = new JButton(IconCache.getIcon( path + "tool_up.gif"));
-    upButton.setDoubleBuffered( false);
-    upButton.setMargin( new Insets(0,0,0,0));
-    upButton.addActionListener( new ActionListener() {
-      public void actionPerformed( ActionEvent e)
-	{
-	  if (itsSketchPad.itsPatcher.getParent() != null)
+    if ((itsSketchPad.itsPatcher.getParent() != null) &&
+	(itsSketchPad.itsPatcher.getParent() != Fts.getRootObject()))
+      {
+	upButton = new JButton(IconCache.getIcon( path + "tool_up.gif"));
+	upButton.setDoubleBuffered( false);
+	upButton.setMargin( new Insets(0,0,0,0));
+	upButton.addActionListener( new ActionListener() {
+	  public void actionPerformed( ActionEvent e)
 	    {
 	      itsSketchPad.waiting();
 	      Fts.editPropertyValue(itsSketchPad.itsPatcher.getParent(), itsSketchPad.itsPatcher, 
@@ -72,10 +72,10 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
 				      public void editorReady(MaxDataEditor editor)
 					{itsSketchPad.stopWaiting();}
 				    });
-	    }
-	}});
+	    }});
 
-    add( upButton, BorderLayout.EAST);
+	add( upButton, BorderLayout.EAST);
+      }
 
     cards = new JPanel();
     cards.setBorder( new EmptyBorder( 0, 0, 0, 0));

@@ -37,6 +37,13 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
     listeners = new MaxVector();
   }
 
+  /* Access the name */
+
+  public String getName()
+  {
+    return name;
+  }
+
   /* Private methods */
 
   final int getIndexAfter(int time)
@@ -605,7 +612,11 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	notifyObjectAdded(events[index]);
       }
     break;
-    
+
+    case REMOTE_NAME:
+      name = stream.getNextStringArgument();
+      break;    
+
     default:
       break;
     }
@@ -624,6 +635,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   static final int REMOTE_ADD    = 6;
   static final int REMOTE_REMOVE = 7;
   static final int REMOTE_CHANGE = 8;
+  static final int REMOTE_NAME   = 9;
 
   static final int EMPTY_COLLECTION = -1;
   static final int NO_SUCH_EVENT = -2;
@@ -633,6 +645,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   ScrEvent events[] = new ScrEvent[256];
   private MaxVector listeners;
   private MaxVector tempVector = new MaxVector();
+  String name;			// the explode name (read only)
 }
 
 

@@ -239,7 +239,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   private MenuItem CreateNewTypeMenu()
   {
-    MenuItem newMenu = new MenuItem("New " + editedType.getPrettyName() + " Ctrl+N");
+    MenuItem newMenu = new MenuItem("New " + editedType.getPrettyName(), new MenuShortcut(KeyEvent.VK_N));
 
     newMenu.addActionListener(new NewDocumentCreator(newMenu, editedType));
 
@@ -282,14 +282,14 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     fileMenu.add(itsNewFileMenu);
 
-    aMenuItem = new MenuItem("Open... Ctrl+O");
+    aMenuItem = new MenuItem("Open...",  new MenuShortcut(KeyEvent.VK_O));
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Open();}});
 
-    aMenuItem = new MenuItem("Close   Ctrl+W");
+    aMenuItem = new MenuItem("Close", new MenuShortcut(KeyEvent.VK_W));
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
@@ -299,7 +299,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     fileMenu.add(new MenuItem("-"));
 
-    aMenuItem = new MenuItem("Save  Ctrl+S");
+    aMenuItem = new MenuItem("Save", new MenuShortcut(KeyEvent.VK_S));
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
@@ -323,21 +323,21 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
     fileMenu.add(new MenuItem("-"));
 
-    aMenuItem = new MenuItem("Print... Ctrl+P");
+    aMenuItem = new MenuItem("Print...", new MenuShortcut(KeyEvent.VK_P));
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Print();}});
 
-    aMenuItem = new MenuItem("System statistics...");
+    aMenuItem = new MenuItem("Statistics...");
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    {      new StatisticsDialog(MaxEditor.this);}});
 
-    aMenuItem = new MenuItem("Quit    Ctrl+Q");
+    aMenuItem = new MenuItem("Quit", new MenuShortcut(KeyEvent.VK_Q));
     fileMenu.add(aMenuItem);
     aMenuItem.addActionListener(new MaxActionListener(aMenuItem)
 				{
@@ -352,7 +352,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   {
     Menu editMenu = new Menu("Edit");
 
-    itsUndoMenuItem = new MenuItem("Undo  Ctrl+Z", new MenuShortcut(90));
+    itsUndoMenuItem = new MenuItem("Undo", new MenuShortcut(KeyEvent.VK_Z));
     editMenu.add(itsUndoMenuItem);
     
     itsUndoMenuItem.addActionListener(new MaxActionListener(itsUndoMenuItem)
@@ -361,7 +361,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	  { Undo();}
       });
 
-    itsRedoMenuItem = new MenuItem("Redo  Ctrl+R", new MenuShortcut(82));
+    itsRedoMenuItem = new MenuItem("Redo", new MenuShortcut(KeyEvent.VK_R));
     editMenu.add(itsRedoMenuItem);
 
     itsRedoMenuItem.addActionListener(new MaxActionListener(itsRedoMenuItem)
@@ -369,28 +369,28 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 				  public void actionPerformed(ActionEvent e)
 				    { Redo();}});
 
-    itsCutMenuItem = new MenuItem("Cut  Ctrl+X");
+    itsCutMenuItem = new MenuItem("Cut", new MenuShortcut(KeyEvent.VK_X));
     editMenu.add(itsCutMenuItem);
     itsCutMenuItem.addActionListener(new MaxActionListener(itsCutMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Cut();}});
 
-    itsCopyMenuItem = new MenuItem("Copy  Ctrl+C");
+    itsCopyMenuItem = new MenuItem("Copy", new MenuShortcut(KeyEvent.VK_C));
     editMenu.add(itsCopyMenuItem);
     itsCopyMenuItem.addActionListener(new MaxActionListener(itsCopyMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Copy();}});
 
-    itsPasteMenuItem = new MenuItem("Paste  Ctrl+V");
+    itsPasteMenuItem = new MenuItem("Paste", new MenuShortcut(KeyEvent.VK_V));
     editMenu.add(itsPasteMenuItem);
     itsPasteMenuItem.addActionListener(new MaxActionListener(itsPasteMenuItem)
 				{
 				  public  void actionPerformed(ActionEvent e)
 				    { Paste();}});
 
-    itsDuplicateMenuItem = new MenuItem("Duplicate  Ctrl+D");
+    itsDuplicateMenuItem = new MenuItem("Duplicate", new MenuShortcut(KeyEvent.VK_D));
     editMenu.add(itsDuplicateMenuItem);
     itsDuplicateMenuItem.addActionListener(new MaxActionListener(itsDuplicateMenuItem)
 				{
@@ -428,14 +428,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   protected void Copy(){};
   protected void Paste(){};
 
-  protected void Find()
-  {
-  }
-
-  protected void FindAgain()
-  {
-  }
-  
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e)
@@ -519,74 +511,32 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio  
+
   public void keyTyped(KeyEvent e)
   {}
+
   public void keyReleased(KeyEvent e)
   {}
 
 
   public void keyPressed(KeyEvent e)
   {
-    // (e.m.) note on the shortcut handling:
-    // the class MenuShortcut should be used to associate a
-    // key combination to a MenuItem, instead of checking the
-    // keycode in this function.
-    // For an example, see the creation of the undo menu later
-    // in this file, in CreateEditMenu() method.
-    // A menu shortcut have precedence over all the other key listeners,
-    // so that one can invoke, say,  "CTRL-N" (new patcher) while editing an object.
-    int aInt = e.getKeyCode();
-    if (e.isControlDown())
-      {
-	if (aInt == 67) Copy();//c
-	else if (aInt == 78)
-	  {
-	    // Ctrl-N always create a new patcher
-
-	    if (editedType != null)
-	      {
-		Cursor temp = getCursor();
-
-		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
-		try
-		  {
-		    editedType.newDocument().edit();
-		  }
-		catch (MaxDocumentException ex)
-		  {
-		    // Ingnore exceptions here
-		  }
-
-		setCursor(temp);
-	      }
-	  }
-	else if (aInt == 79) Open();//o
-	else if (aInt == 80) Print();//p
-	else if (aInt == 81) MaxApplication.Quit(); //q
-	else if (aInt == 83) Save();//s
-	else if (aInt == 86) Paste();//v
-	else if (aInt == 68) {Copy(); Paste();} //d
-	else if (aInt == 87) Close();//w
-	else if (aInt == 88) Cut();//x
-	else if (aInt == 70) Find(); //F
-	else if (aInt == 71) FindAgain(); //G
-      }
   }
+
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
 
-  public Menu GetFileMenu()
+  public Menu getFileMenu()
   {
     return itsFileMenu;
   }
   
-  public Menu GetEditMenu()
+  public Menu getEditMenu()
   {
     return itsEditMenu;
   }
 
-  public MenuItem GetNewMenu()
+  public MenuItem getNewMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(1);
@@ -594,7 +544,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(0);
   }
 
-  public MenuItem GetOpenMenu()
+  public MenuItem getOpenMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(2);
@@ -602,7 +552,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(1);
   }
 
-  public MenuItem GetCloseMenu()
+  public MenuItem getCloseMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(3);
@@ -610,15 +560,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(2);
   }
 
-  public MenuItem GetOpenWithAutoroutingMenu()
-  {
-    if (editedType != null)
-      return itsFileMenu.getItem(4);
-    else
-      return itsFileMenu.getItem(3);
-  }
-
-  public MenuItem GetSaveMenu()
+  public MenuItem getSaveMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(6);
@@ -626,7 +568,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(5);
   }
 
-  public MenuItem GetSaveAsMenu()
+  public MenuItem getSaveAsMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(7);
@@ -634,7 +576,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(6);
   }
   
-  public MenuItem GetPrintMenu()
+  public MenuItem getPrintMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(9);
@@ -642,7 +584,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(8);
   }
 
-  public MenuItem GetSystemStatisticsMenu()
+  public MenuItem getSystemStatisticsMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(10);
@@ -650,7 +592,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(9);
   }
 
-  public MenuItem GetQuitMenu()
+  public MenuItem getQuitMenu()
   {
     if (editedType != null)
       return itsFileMenu.getItem(11);
@@ -658,32 +600,32 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       return itsFileMenu.getItem(10);
   }
 
-  public MenuItem GetCutMenu()
+  public MenuItem getCutMenu()
   {
     return itsCutMenuItem;
   }
   
-  public MenuItem GetCopyMenu()
+  public MenuItem getCopyMenu()
   {
     return itsCopyMenuItem;
   }
   
-  public MenuItem GetPasteMenu()
+  public MenuItem getPasteMenu()
   {
     return itsPasteMenuItem;
   }  
 
-  public MenuItem GetDuplicateMenu()
+  public MenuItem getDuplicateMenu()
   {
     return itsDuplicateMenuItem;
   }
 
-  public MenuItem GetUndoMenu()
+  public MenuItem getUndoMenu()
   {
     return itsUndoMenuItem;
   }  
 
-  public MenuItem GetRedoMenu()
+  public MenuItem getRedoMenu()
   {
     return itsRedoMenuItem;
   }

@@ -21,7 +21,6 @@ SOURCES := \
 	$(INCLUDE_PATH)/ErmesObjPatcher.java		\
 	$(INCLUDE_PATH)/ErmesObjSlider.java		\
 	$(INCLUDE_PATH)/ErmesObjSliderDialog.java	\
-	$(INCLUDE_PATH)/ErmesObjTextArea.java		\
 	$(INCLUDE_PATH)/ErmesObjThrottle.java		\
 	$(INCLUDE_PATH)/ErmesObjToggle.java		\
 	$(INCLUDE_PATH)/ErmesObject.java		\

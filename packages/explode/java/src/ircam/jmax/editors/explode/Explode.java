@@ -32,7 +32,7 @@ public class Explode extends MaxEditor implements AAAReadme {
 
     Init();
 
-    setTitle("Explode");
+    setTitle("Explode " + maxData.getName());
 
     // get the data
     explodeData = (ExplodeRemoteData) maxData;
@@ -59,12 +59,12 @@ public class Explode extends MaxEditor implements AAAReadme {
 
   public void SetupMenu()
   {
-    Menu editMenu = GetEditMenu();
+    Menu editMenu = getEditMenu();
 
-    editMenu.remove(GetCopyMenu());
-    editMenu.remove(GetPasteMenu());
-    editMenu.remove(GetCutMenu());
-    editMenu.remove(GetDuplicateMenu());
+    editMenu.remove(getCopyMenu());
+    editMenu.remove(getPasteMenu());
+    editMenu.remove(getCutMenu());
+    editMenu.remove(getDuplicateMenu());
 
     Menu optionsMenu = new Menu("Options");    
 

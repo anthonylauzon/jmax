@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/11/12 18:10:57 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/11/16 13:53:32 $
  *
  * Explode by Miller Puckette
  * Porting and simplifications by MDC.
@@ -56,6 +56,7 @@ x_evt, x_sym, and x_next constant, though.  */
 typedef struct explode_data
 {
   fts_data_t dataobj;
+  fts_symbol_t name;		/* explode's name */
   evt_t *evt;			/* list of events */
 } explode_data_t;
 
@@ -67,7 +68,6 @@ typedef struct
   explode_data_t data;
 
   long serial;			/* support for explay class */
-  fts_symbol_t name;		/* explode's name */
 
   long n1;			/* values of inlets */
   long n2;

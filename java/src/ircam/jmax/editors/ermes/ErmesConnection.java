@@ -8,7 +8,7 @@ import ircam.jmax.utils.*;
 import java.lang.Math;
 
 //
-// The graphic connection. It handles the paint, the autorouting,
+// The graphic connection. It handles the paint, 
 // the loading/saving of connections. It has user interface
 // methods (mouseclick, move, doubleclick...).
 //

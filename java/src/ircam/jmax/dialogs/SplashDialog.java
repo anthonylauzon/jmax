@@ -68,7 +68,7 @@ public class SplashDialog extends Dialog implements KeyListener, MouseListener, 
   public void keyReleased(KeyEvent e){}
   
   public void keyPressed(KeyEvent e){
-    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY) setVisible(false);
+    setVisible(false);
   }
   /////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////keyListener--fine

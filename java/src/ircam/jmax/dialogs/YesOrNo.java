@@ -88,6 +88,11 @@ public class YesOrNo extends Dialog implements ActionListener, KeyListener
 
   public void keyTyped(KeyEvent e)
   {
+    if (e.getKeyChar() == '\r')
+      {
+	answer = true;
+	setVisible(false);
+      }
   }
 
   public void keyReleased(KeyEvent e)
@@ -96,11 +101,6 @@ public class YesOrNo extends Dialog implements ActionListener, KeyListener
   
   public void keyPressed(KeyEvent e)
   {
-    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY)
-      {
-	answer = true;
-	setVisible(false);
-      }
   }
 }
 

@@ -14,17 +14,19 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
 
   protected int state;
   private StringBuffer currentText;
-
+  private String filter;
   private static final int DEFAULT_WIDTH = 40;
   private static final int DEFAULT_HEIGHT = 15;
   private static final int DEFAULT_VISIBLE_DIGIT = 3;
 
-  public ErmesObjNumberBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public ErmesObjNumberBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject, String filter) 
   {
     super( theSketchPad, theFtsObject);
 
     state = 0;
     currentText = new StringBuffer();
+
+    this.filter = filter;
 
     int minWidth = getMinWidth();
     if (getWidth() < minWidth)
@@ -181,36 +183,34 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
     return aString;
   }
 
-  public void keyPressed( KeyEvent e) 
+  // public void keyPressed( KeyEvent e) 
+  public void keyTyped( KeyEvent e) 
   {
-
-    if (e.getKeyCode() == 17)
-      return; //avoid CTRL as valid (independent) key
-
     state = 3;
 
     if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
       {
 	int c = e.getKeyChar();
 
-	if ( c == ircam.jmax.utils.Platform.ENTER_KEY||
-		  c == ircam.jmax.utils.Platform.RETURN_KEY ) 
+	if ( c == '\r')
 	  {
 	    setValueAsText( currentText.toString());
 
 	    currentText.setLength(0);
 	    state = 0;
 	  } 
-	else if ( ( c == ircam.jmax.utils.Platform.DELETE_KEY)||
-		  ( c == ircam.jmax.utils.Platform.BACKSPACE_KEY) ) 
+	else if ( ( c == 8) ||  ( c == 127))
 	  {
+	    /* The test is agains ^H and ^?, the standard backspace
+	       and delete characters */
+
 	    int l = currentText.length();
 
 	    l = ( l > 0 ) ? l - 1 : 0;
 
 	    currentText.setLength( l);
 	  }
-	else
+	else if (filter.indexOf(c) != -1)
 	  currentText.append( (char)c);
 
 	DoublePaint();
@@ -221,12 +221,13 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
   {
   }
 
-  public void keyTyped( KeyEvent e) 
+  public void keyPressed( KeyEvent e) 
   {
   }
 
   public void keyInputGained() 
   {
+    GetSketchPad().requestFocus();
     DoublePaint();
   }
 
@@ -237,3 +238,9 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
     DoublePaint();
   }
 }
+
+
+
+
+
+

@@ -61,7 +61,7 @@ public class QuitDialog extends Dialog
     {
       public void keyPressed(KeyEvent e)
       {
-	if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY)
+	if (e.getKeyCode() == KeyEvent.VK_ENTER)
 	  {
 	    answer = CANCEL; 
 	    setVisible(false);

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.6 $ IRCAM $Date: 1998/11/18 15:05:55 $
+ *      $Revision: 1.7 $ IRCAM $Date: 1998/12/10 14:44:09 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -27,6 +27,7 @@
 #define EXPLODE_REMOTE_ADD    6
 #define EXPLODE_REMOTE_REMOVE 7
 #define EXPLODE_REMOTE_CHANGE 8
+#define EXPLODE_REMOTE_NAME   9
 
 
 static long explode_nextserial;
@@ -799,14 +800,14 @@ explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if (name)
     if (register_explode(this, name))
-      this->name = name;
+      this->data.name = name;
     else
       {
 	post("explode: %s: named already exists\n", fts_symbol_name(name));
-	this->name = 0;
+	this->data.name = 0;
       }
   else
-    this->name = 0;
+    this->data.name = 0;
 
   fts_data_init( (fts_data_t *) &(this->data), explode_data_class);
 }
@@ -820,7 +821,7 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   fts_data_delete((fts_data_t *) &(this->data));
   explode_clear(this);
-  forget_explode(this, this->name);
+  forget_explode(this, this->data.name);
 }
 
 
@@ -834,7 +835,7 @@ void explode_put_name_daemon(fts_daemon_action_t action,
 {
   explode_t *this = (explode_t *)obj;
 
-  if (this->name == 0)
+  if (this->data.name == 0)
     {
       fts_atom_t av[2];
       fts_symbol_t name;
@@ -842,11 +843,11 @@ void explode_put_name_daemon(fts_daemon_action_t action,
       name = fts_get_symbol(value);
 
       if (register_explode(this, name))
-	this->name = name;
+	this->data.name = name;
       else
 	{
 	  post("explode: %s: named already exists\n", fts_symbol_name(name));
-	  this->name = 0;
+	  this->data.name = 0;
 
 	  return;
 	}
@@ -1082,6 +1083,13 @@ static void explode_data_export_fun(fts_data_t *d)
   explode_data_t *data = (explode_data_t *)d;
   evt_t *e;
   fts_atom_t args[5];
+
+  if (data->name)
+    {
+      fts_data_start_remote_call((fts_data_t *) data, EXPLODE_REMOTE_NAME);
+      fts_client_mess_add_symbol(data->name);
+      fts_data_end_remote_call();
+    }
 
   fts_data_remote_call(d, EXPLODE_LOAD_START, 0, 0);
 

@@ -99,15 +99,19 @@ public class FileNotSavedDialog extends Dialog implements ActionListener, KeyLis
   
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////keyListener--inizio
-  public void keyTyped(KeyEvent e){}
+  public void keyTyped(KeyEvent e)
+  {
+    if (e.getKeyChar() == '\r')
+      {
+	itsToSave = true;
+	setVisible(false);
+      }
+  }
+
   public void keyReleased(KeyEvent e){}
   
-  public void keyPressed(KeyEvent e){
-    if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){
-      itsToSave = true;
-      setVisible(false);
-    }
-  }
+  public void keyPressed(KeyEvent e){}
+
   /////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////keyListener--fine
 }

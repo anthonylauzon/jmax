@@ -24,7 +24,7 @@ class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
 
   ErmesObjFloat( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    super( theSketchPad, theFtsObject);
+    super( theSketchPad, theFtsObject, "0123456789.");
 
     itsFloat = ((FtsFloatValueObject)itsFtsObject).getValue();
   }

@@ -18,7 +18,7 @@ class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListener
 
   public ErmesObjInt( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    super( theSketchPad, theFtsObject);
+    super( theSketchPad, theFtsObject, "0123456789");
 
     itsInteger = ((FtsIntValueObject)itsFtsObject).getValue();
   }

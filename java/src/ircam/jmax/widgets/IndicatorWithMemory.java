@@ -36,10 +36,6 @@ public class IndicatorWithMemory extends JPanel {
     add( label);
     add( Box.createHorizontalGlue());
     add( indicatorLed);
-
-    Font font = label.getFont();
-
-    label.setFont( new Font( font.getName(), font.getStyle(), font.getSize() - 2));
   }
 
   public Dimension getMinimumSize()

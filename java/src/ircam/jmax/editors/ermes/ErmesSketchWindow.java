@@ -55,13 +55,8 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   // Enzo, forgive me ... it will be done as a clipboard provider
   // later ..
   
-  static private final int CLIPBOARD_EMPTY = 0;
-  static private final int CLIPBOARD_OBJECTS = 1;
-  static private final int CLIPBOARD_TEXT = 2;
-
-  static private int          clipboardType = CLIPBOARD_EMPTY;
   static private FtsClipboard ftsClipboard;
-  static private String       textClipboard = null;
+  static private String       textClipboard = "";
 
   static {
     try 
@@ -99,7 +94,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   CheckboxMenuItem itsSelectedFontMenu;   //the Selected objects font MenuItem
 
   MenuItem itsSelectAllMenuItem;
-
+  MenuItem itsLockMenuItem;
   public MaxDocument itsDocument;
 
   public void showObject( Object obj)
@@ -224,14 +219,14 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   {
     MenuBar menuBar = getMenuBar();
 
-    Menu editMenu = GetEditMenu();
+    Menu editMenu = getEditMenu();
 
-    editMenu.remove(GetUndoMenu());
-    editMenu.remove(GetRedoMenu());
+    editMenu.remove(getUndoMenu());
+    editMenu.remove(getRedoMenu());
 
     editMenu.addSeparator();
 
-    itsSelectAllMenuItem = new MenuItem( "Select All  Ctrl+A");
+    itsSelectAllMenuItem = new MenuItem( "Select All", new MenuShortcut(KeyEvent.VK_A));
     editMenu.add( itsSelectAllMenuItem);
     itsSelectAllMenuItem.addActionListener( new MaxActionListener(itsSelectAllMenuItem) {
       public  void actionPerformed( ActionEvent e)
@@ -268,7 +263,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
  	}
     });
 
-    MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
+    MenuItem inspectMenuItem = new MenuItem("Inspect", new MenuShortcut(KeyEvent.VK_I));
     editMenu.add(new MenuItem("-"));
     editMenu.add(inspectMenuItem);
 
@@ -279,10 +274,21 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	}
     });
 
-    GetCutMenu().setEnabled( true);
-    GetCopyMenu().setEnabled( true);
-    GetPasteMenu().setEnabled( true);
-    GetDuplicateMenu().setEnabled( true);
+    editMenu.add( new MenuItem( "-"));
+
+    itsLockMenuItem = new MenuItem( "Lock", new MenuShortcut(KeyEvent.VK_E));
+    editMenu.add( itsLockMenuItem);
+    itsLockMenuItem.addActionListener( new MaxActionListener(itsLockMenuItem) {
+      public void actionPerformed( ActionEvent e)
+ 	{
+	  setLocked(! isLocked());
+ 	}
+    });
+
+    getCutMenu().setEnabled( true);
+    getCopyMenu().setEnabled( true);
+    getPasteMenu().setEnabled( true);
+    getDuplicateMenu().setEnabled( true);
     
     // Add the Objects menu
     itsObjectsMenu = new Menu( "Objects");
@@ -312,53 +318,61 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   protected void Cut()
   {
-    Copy();
-    
-    if (clipboardType == CLIPBOARD_OBJECTS)
-      itsSketchPad.DeleteSelected();
-    else if (clipboardType == CLIPBOARD_TEXT)
-      itsSketchPad.deleteSelectedText();
+    if (itsSketchPad.canCopyText())
+      {
+	textClipboard = itsSketchPad.getSelectedText(); 
+	itsSketchPad.deleteSelectedText();
+      }
+    else
+      {
+	Cursor temp = getCursor();
+	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	ftsClipboard.copy( Fts.getSelection());
+	lastCopyCount = ftsClipboard.getCopyCount();
+	itsSketchPad.resetPaste(0);
+	itsSketchPad.DeleteSelected();
+
+	setCursor( temp);
+      }
   }
 
   private int lastCopyCount;
 
   protected void Copy()
   {
-    Cursor temp = getCursor();
-    setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-
     if (itsSketchPad.canCopyText())
       {
-	clipboardType = CLIPBOARD_TEXT;
 	textClipboard = itsSketchPad.getSelectedText(); 
       }
     else
       {
-	clipboardType = CLIPBOARD_OBJECTS;
+	Cursor temp = getCursor();
+	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+
 	ftsClipboard.copy( Fts.getSelection());
 	lastCopyCount = ftsClipboard.getCopyCount();
 	itsSketchPad.resetPaste(0);
-      }
 
-    setCursor( temp);
+	setCursor( temp);
+      }
   }
 
   private boolean pasting = false;
 
   protected void Paste()
   {
-    if (itsSketchPad.isLocked())
+    if (isLocked())
       return;
 
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-    if ((clipboardType == CLIPBOARD_TEXT) && (itsSketchPad.canPasteText()))
+    if (itsSketchPad.canPasteText())
       {
 	itsSketchPad.pasteText(textClipboard);
       }
-    else if (clipboardType == CLIPBOARD_OBJECTS)
+    else 
       {
 	pasting = true;
 
@@ -588,16 +602,9 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
       }
   }
 	
-  public void keyTyped( KeyEvent e)
-  {
-  }
-
-  public void keyReleased( KeyEvent e)
-  {
-  }
-
   // Modified to use inheritance and call the MaxEditor method
   // for all the standard key bindings
+
   public void keyPressed( KeyEvent e)
   {
     int aInt = e.getKeyCode();
@@ -642,22 +649,8 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
       }
     else if (e.isControlDown()) 
       {
-	if (aInt == 73)
-	  {
-	    // i
-	    inspectAction();
-	  }
-	else if (aInt == 90)
+	if (aInt == KeyEvent.VK_Z)
 	  itsSketchPad.showErrorDescriptions();
-	else if (aInt == 65)
-	  itsSketchPad.SelectAll();//a
-	else if (aInt == 69)
-	  {//e
-	    if (itsSketchPad.isLocked()) 
-	      setLocked( false);
-	    else 
-	      setLocked( true);
-	  }
 	else if (aInt == 47)
 	  {
 	    //ask help for the reference Manual for the selected element...
@@ -718,6 +711,18 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	// Finally, if we don't redefine the key, call the superclass method that define the standard things.
 	super.keyPressed( e);
       }
+  }
+
+  public void keyTyped(KeyEvent e)
+  {
+    if ( keyEventClient != null)
+      keyEventClient.keyTyped( e);
+  }
+
+  public void keyReleased(KeyEvent e)
+  {
+    if ( keyEventClient != null)
+      keyEventClient.keyReleased( e);
   }
 
   public static boolean isAnArrow( int code) 
@@ -1034,6 +1039,11 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     return itsSelectAllMenuItem;
   }
 
+  private MenuItem getLockMenuItem() 
+  {
+    return itsLockMenuItem;
+  }
+
   protected void setLocked( boolean locked)
   {
     // Store the mode in a non persistent, property of 
@@ -1049,10 +1059,21 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     itsToolBar.setLocked( locked);
 
     getSelectAllMenuItem().setEnabled( !locked);
+    getCutMenu().setEnabled( !locked);
+    getCopyMenu().setEnabled( !locked);
+    getPasteMenu().setEnabled( !locked);
+    getDuplicateMenu().setEnabled( !locked);
+
+    getLockMenuItem().setLabel(locked ? "Unlock" : "Lock");
 
     setKeyEventClient( null); //when changing mode, always remove key listeners
 
     requestFocus();
+  }
+
+  final boolean isLocked()
+  {
+    return itsSketchPad.isLocked();
   }
 
   public Dimension getMinimumSize() 
