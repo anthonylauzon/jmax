@@ -80,6 +80,7 @@ extern fts_symbol_t fts_s_atom_array;
 /* (fd)
    See mess_types.h for comment on fts_type_t
 */
+#define fts_t_anything fts_s_anything
 #define fts_t_void fts_s_void
 #define fts_t_float fts_s_float
 #define fts_t_int fts_s_int

@@ -147,7 +147,7 @@ static void fts_binding_delete(fts_binding_t *var)
 
 static void fts_binding_suspend(fts_binding_t *var)
 {
-  fts_object_list_t   *u;
+  fts_object_list_t *user;
 
 #ifdef TRACE_DEBUG
   fprintf(stderr, "Suspend Binding for variable %s\n", fts_symbol_name(var->name));
@@ -159,15 +159,18 @@ static void fts_binding_suspend(fts_binding_t *var)
   /* Recursive calls to suspend all the variables bound to users of this
      binding */
 
-  for (u = var->users; u; u = u->next)
-    if (! fts_object_is_error(u->obj))
+  for (user = var->users; user; user = user->next)
+    if (! fts_object_is_error(user->obj))
       {
+	fts_symbol_t user_var = fts_object_get_variable(user->obj);
+
 #ifdef TRACE_DEBUG
 	fprintf(stderr, "\t");
-	fprintf_object(stderr, u->obj);
+	fprintf_object(stderr, user->obj);
 	fprintf(stderr, "\n");
 #endif
-	fts_variable_suspend(u->obj->patcher, fts_object_get_variable(u->obj));
+	if(user_var)
+	  fts_variable_suspend(user->obj->patcher, user_var);
       }
 
 #ifdef TRACE_DEBUG
@@ -588,6 +591,25 @@ static fts_binding_t *fts_env_get_binding(fts_env_t *env, fts_symbol_t name)
 /*                                                                          */
 /****************************************************************************/
 
+static int
+fts_variable_is_global(fts_symbol_t name)
+{
+  char c = fts_symbol_name(name)[0];
+
+  /* variables with name starting with a capital letter are GLOBAL */
+  return (c >= 'A' && c <= 'Z');
+
+}
+
+static fts_patcher_t *
+fts_variable_get_scope(fts_patcher_t *scope, fts_symbol_t name)
+{
+  if(fts_variable_is_global(name))
+    return fts_get_root_patcher();
+  else
+    return scope;
+}
+
 /* Get a binding in a given scope for a given variable name.
    Search iteratively in the containing patchers ..
    */
@@ -595,6 +617,8 @@ static fts_binding_t *fts_env_get_binding(fts_env_t *env, fts_symbol_t name)
 static fts_binding_t *fts_variable_get_binding(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_patcher_t *patcher;
+
+  scope = fts_variable_get_scope(scope, name);
 
   patcher = scope;
 
@@ -629,76 +653,78 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
   fts_atom_t value;
   fts_binding_t *v, *up_v;
 
-  fts_set_void(&value);
+  scope = fts_variable_get_scope(scope, name);
 
+  fts_set_void(&value);
+  
   /* get a binding relevant for this scope (in this patcher or its parents) */
   up_v = fts_variable_get_binding(scope, name);
-
+  
   /* check if there is already a binding in this patcher */
   v = fts_env_get_binding(fts_patcher_get_env(scope), name);
-
+  
   if (v)
     {
-      /* double definition; just do nothing: next restore will produce the error*/
-      return;
+      if(fts_variable_is_global(name) && fts_is_void(&v->value))
+	fts_binding_suspend(v);
+      else
+	return; /* double definition */
     }
   else
     {
       /* add binding to this patcher */
       v = fts_env_add_binding(fts_patcher_get_env(scope), name, &value);
-
+      
       /* suspend recursivly all bindings referring to this variable */
       fts_binding_suspend(v);
-    }
 
-
-  /* does the new variable (v) shadow a variable from the parent scope (up_v)! */
-  if (up_v)
-    {
-      fts_object_list_t   **u;	/* indirect precursor */
-
-#ifdef TRACE_DEBUG
-      fprintf(stderr, "Found upper variable for %s\n Stealing: \n", fts_symbol_name(up_v->name));
-#endif      
-
-      /* steal all the references to the varable (users) from parent scope and suspend their references */
-      u = &(up_v->users);
-      while (*u)
+      /* does the new variable (v) shadow a variable from the parent scope (up_v)! */
+      if (up_v)
 	{
-	  fts_object_t *user = (* u)->obj;
-
-	  if (fts_object_is_in_patcher((*u)->obj, scope))
+	  fts_object_list_t   **u;	/* indirect precursor */
+	  
+#ifdef TRACE_DEBUG
+	  fprintf(stderr, "Found upper variable for %s\n Stealing: \n", fts_symbol_name(up_v->name));
+#endif      
+	  
+	  /* steal all the references to the varable (users) from parent scope and suspend their references */
+	  u = &(up_v->users);
+	  while (*u)
 	    {
-#ifdef TRACE_DEBUG
-	      fprintf(stderr, "\t");
-	      fprintf_object(stderr, user);
-	      fprintf(stderr, "\n");
-	      fprintf(stderr, " stealed\n");
-#endif
+	      fts_object_t *user = (* u)->obj;
 	      
-	      /* remove user from old binding and add to new binding */
-	      fts_binding_remove_user(up_v, user);
-	      fts_binding_add_user(v, user);
-
-	      /* suspend recursivly all variables referring to the users variable */
-	      if (fts_object_get_variable(user))
-		fts_variable_suspend(user->patcher, fts_object_get_variable(user));
+	      if (fts_object_is_in_patcher((*u)->obj, scope))
+		{
+#ifdef TRACE_DEBUG
+		  fprintf(stderr, "\t");
+		  fprintf_object(stderr, user);
+		  fprintf(stderr, "\n");
+		  fprintf(stderr, " stealed\n");
+#endif
+		  
+		  /* remove user from old binding and add to new binding */
+		  fts_binding_remove_user(up_v, user);
+		  fts_binding_add_user(v, user);
+		  
+		  /* suspend recursivly all variables referring to the users variable */
+		  if (fts_object_get_variable(user))
+		    fts_variable_suspend(user->patcher, fts_object_get_variable(user));
+		}
+	      else
+		u = &((*u)->next);
 	    }
-	  else
-	    u = &((*u)->next);
+#ifdef TRACE_DEBUG
+	  fprintf(stderr, "Done.\n");
+#endif
 	}
+      else
+	{
 #ifdef TRACE_DEBUG
-      fprintf(stderr, "Done.\n");
+	  fprintf(stderr, " upper variable for %s not found.\n", fts_symbol_name(name));
 #endif
-    }
-  else
-    {
-#ifdef TRACE_DEBUG
-      fprintf(stderr, " upper variable for %s not found.\n", fts_symbol_name(name));
-#endif
+	}
     }
 }
-
 
 /* Verify if a fts_variable_define can be issued in the passed scope.
    Note that this is not like testing if a variable is bound; the binding can be 
@@ -709,9 +735,11 @@ int fts_variable_can_define(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_binding_t *v;
 
+  scope = fts_variable_get_scope(scope, name);
+
   v = fts_env_get_binding(fts_patcher_get_env(scope), name);
 
-  if (v == 0)
+  if (v == 0 || fts_is_void(&v->value))
     return 1;
   else if ((v->definitions == 0) && fts_binding_is_suspended(v))
     return 1;
@@ -725,6 +753,8 @@ int fts_variable_can_define(fts_patcher_t *scope, fts_symbol_t name)
 int fts_variable_is_suspended(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_binding_t *v;
+
+  scope = fts_variable_get_scope(scope, name);
 
   v = fts_env_get_binding(fts_patcher_get_env(scope), name);
 
@@ -746,6 +776,8 @@ void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
 {
   fts_binding_t *var;
 
+  scope = fts_variable_get_scope(scope, name);
+
   var = fts_variable_get_binding(scope, name);
 
   if (var)
@@ -753,10 +785,7 @@ void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
 }
 
 
-/*
-  Like fts_variable_undefine, but act on all the variables in the current scope defined
-  by 'owner'
-  */
+/* Like fts_variable_undefine, but act on all the variables defined by 'owner' in the current scope */
 
 void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner)
 {
@@ -778,6 +807,8 @@ void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_binding_t *var;
 
+  scope = fts_variable_get_scope(scope, name);
+
   var = fts_variable_get_binding(scope, name);
 
   if (var)
@@ -785,10 +816,7 @@ void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name)
 }
 
 
-/*
-  Like fts_variable_suspend, but act on all the variables in the current scope defined
-  by 'owner'
-  */
+/* Like fts_variable_suspend, but act on all the variables defined by 'owner' in the current scope */
 
 void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner)
 {
@@ -796,10 +824,7 @@ void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner)
 }
 
 
-/*
-  Like fts_variable_suspend, but act on all the variables in the current scope defined
-  by 'owner' and suspended.
-  */
+/* Like fts_variable_suspend, but act on all the variables defined by 'owner' in the current scope and suspended. */
 
 void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner)
 {
@@ -821,6 +846,8 @@ void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *v
   fts_patcher_t *patcher;
   fts_binding_t *v;
 
+  scope = fts_variable_get_scope(scope, name);
+
   v = fts_env_get_binding(fts_patcher_get_env(scope), name);
 
   if (v)
@@ -836,6 +863,8 @@ void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *v
 fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_binding_t *v;
+
+  scope = fts_variable_get_scope(scope, name);
 
   v = fts_variable_get_binding(scope, name);
 
@@ -868,6 +897,8 @@ void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
 {
   fts_binding_t *var;
 
+  scope = fts_variable_get_scope(scope, name);
+
   var = fts_variable_get_binding(scope, name);
 
   fts_binding_add_user(var, user);
@@ -879,6 +910,8 @@ void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
 void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_object_set_t *set)
 {
   fts_binding_t *b;
+
+  scope = fts_variable_get_scope(scope, name);
 
   b = fts_variable_get_binding(scope, name);
 
@@ -898,18 +931,3 @@ void fts_variables_init(void)
   objlist_heap  = fts_heap_new(sizeof(fts_object_list_t));
   var_refs_heap = fts_heap_new(sizeof(fts_binding_list_t));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

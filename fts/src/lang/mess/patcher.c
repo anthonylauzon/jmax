@@ -1041,8 +1041,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
   fts_object_set_description(obj, aoc, aot);
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
-  if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) &&
-      (fts_get_symbol(&aot[1]) == fts_s_column))
+  if (fts_object_description_defines_variable(aoc, aot))
     {
       var = fts_get_symbol(&aot[0]);
       rat = aot + 2;

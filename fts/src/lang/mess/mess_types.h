@@ -51,6 +51,7 @@ typedef struct fts_plist                 fts_plist_t;
 */
 #define fts_type_t fts_symbol_t
 #define fts_type_get_selector(T) (T)
+#define fts_type_get_by_name(n) (n)
 
 typedef enum fts_daemon_action {
   obj_property_put, obj_property_get, obj_property_remove

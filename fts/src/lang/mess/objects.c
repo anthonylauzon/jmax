@@ -168,7 +168,7 @@ static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
   fts_object_put_prop(obj, name, value); 
 }
 
-static int
+int
 fts_object_description_defines_variable(int ac, const fts_atom_t *at)
 {
   return (ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_column);
@@ -178,23 +178,6 @@ static fts_symbol_t
 fts_object_description_get_variable_name(int ac, const fts_atom_t *at)
 {
   return fts_get_symbol(&at[0]);
-}
-
-static void
-fts_object_description_get_var_and_inst(int aoc, const fts_atom_t *aot, fts_symbol_t *var, int *ac, fts_atom_t const **at)
-{
-  if(fts_object_description_defines_variable(aoc, aot))
-    {
-      *var = fts_get_symbol(&aot[0]);
-      *ac = aoc - 2;
-      *at = aot + 2;
-    }
-  else
-    {
-      *var = 0;
-      *ac = aoc;
-      *at = aot;
-    }
 }
 
 /*
@@ -270,16 +253,16 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
    * The creation algorithm will try all the following techniques in
    * the given order until an object is created:
    *
-   * 1- Get the first argument; if it is a symbol, and there is an
-   *    object doctor for this name, delegate the object creation to
-   *    the doctor, without further evaluation; if the doctor return
-   *    null, return an error object.
+   * 1 - Get the first argument; if it is a symbol, and there is an
+   *     object doctor for this name, delegate the object creation to
+   *     the doctor, without further evaluation; if the doctor return
+   *     null, return an error object.
    *
-   * 2- Expression-evaluate the whole description; if the evaluation
-   *    give an error, return an error object.
-   *    If the first value is not a symbol, return an error object.
-   *    Otherwise consider the result of the evaluation as the description
-   *    of the object for the following.
+   * 2 - Expression-evaluate the whole description; if the evaluation
+   *     give an error, return an error object.
+   *     If the first value is not a symbol, return an error object.
+   *     Otherwise consider the result of the evaluation as the description
+   *     of the object for the following.
    *
    * 3 - if an object doctor exists for the object name, delegate to it the 
    *     object creation without further evaluation; if the doctor
@@ -291,7 +274,7 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
    * 5 - if an explicitly declared abstraction exists, instantiate
    *     that abstraction.
    * 
-   * 6- if an FTS class  exists, instantiate that class.
+   * 6 - if an FTS class exists, instantiate that class.
    * 
    * 7 - if an template exists in the template path, instantiate
    *     that template.
@@ -300,7 +283,7 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
    *     that abstraction.
    *
    *   
-   * 9- Make an error object
+   * 9 - Make an error object
    *
    */
 
@@ -741,7 +724,6 @@ void fts_object_reset_description(fts_object_t *obj)
 void fts_object_set_id(fts_object_t *obj, int id)
 {
   /* set the id and put the object in the object table */
-
   if (obj->id != FTS_NO_ID)
     fts_object_table_remove(obj->id);
 
