@@ -1,16 +1,19 @@
+# 
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
-#                      FTS 2.x makefile for GNU Make
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+# 
 #
-#			Copyright (c) 1997 by IRCAM
-#			    All rights reserved.
-#
-#  For any information regarding this and other IRCAM software, please
-#  send email to:
-#                              manager@ircam.fr
-#
-#
-#
-
 
 ROOTDIR = ../../../../../../..
 PACKAGE_DIR = ircam/jmax/editors/patcher/interactions
