@@ -10,7 +10,7 @@ system.c
 noinst_HEADERS=  \
 system.h
 
-libsystem_la_LDFLAGS= -module
+libsystem_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
 
 INCLUDES=-I$(top_srcdir)/include
 

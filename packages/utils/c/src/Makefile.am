@@ -16,6 +16,6 @@ noinst_HEADERS= \
 cfft.h \
 rfft_shuffle.h
 
-libutils_la_LDFLAGS= -module
+libutils_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
 
 INCLUDES=-I$(top_srcdir)/packages/utils/c/include -I$(top_srcdir)/include 
