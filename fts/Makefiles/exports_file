@@ -48,6 +48,7 @@ fts_s_stop
 fts_s_start
 fts_s_restore
 fts_s_open
+fts_s_upload
 fts_s_close
 fts_s_load
 fts_s_read

@@ -197,6 +197,11 @@ fts_client_upload_object(fts_object_t *obj)
 
   if (fts_object_get_patcher(obj))
     fts_object_send_properties(obj);
+
+  /* Also, send to the object the message upload, in the case
+     the object have more data/initialization to do */
+
+  fts_message_send(obj, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
 void

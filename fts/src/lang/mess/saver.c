@@ -11,7 +11,7 @@
 #include "lang/mess/loader.h"
 
 
-#define SAVER_DEBUG
+/* #define SAVER_DEBUG */
 
 struct fts_bmax_file
 {

@@ -21,8 +21,9 @@
 ifneq ($(ARCH),rhapsody)
 $(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
 	rm -f $(FTS_BIN)
-	$(LD) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_LIBS) $(FTS_ARCH_LIBS) $(CC_NONE_FLAG) $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)
+	$(LD) $(FTS_LDFLAGS) -o $@ $(OBJECTS) $(CC_ALL_FLAG) $(FTS_LIBS) $(FTS_ARCH_LIBS) $(CC_NONE_FLAG)   $(FTS_SYS_LIBS) $(FTS_USER_LIBS_FLAGS) $(FTS_USER_LIBS)  $(EXTRA_LDFLAGS)
 endif
+
 
 TODELETE = $(FTSBIN)
 
@@ -80,6 +81,9 @@ $(OBJDIR)/%.o : %.c
 
 #$(OBJDIR)/%.o : %.s $(OBJDIR)
 #	$(AS) -o $@  $<
+
+
+
 
 
 

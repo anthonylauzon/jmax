@@ -40,6 +40,7 @@ fts_symbol_t fts_s_stop;
 fts_symbol_t fts_s_restore;
 fts_symbol_t fts_s_start;
 fts_symbol_t fts_s_open;
+fts_symbol_t fts_s_upload;
 fts_symbol_t fts_s_close;
 fts_symbol_t fts_s_load;
 fts_symbol_t fts_s_read;
@@ -115,6 +116,7 @@ fts_predefine_symbols(void)
   fts_s_start             = fts_new_builtin_symbol("start",   22);
   fts_s_restore           = fts_new_builtin_symbol("restore", 23);
   fts_s_open              = fts_new_builtin_symbol("open",    24);
+  fts_s_upload            = fts_new_builtin_symbol("upload",  57);
   fts_s_close             = fts_new_builtin_symbol("close",   25);
   fts_s_load              = fts_new_builtin_symbol("load",    26);
   fts_s_read              = fts_new_builtin_symbol("read",    27);
@@ -154,7 +156,7 @@ fts_predefine_symbols(void)
   fts_s_table             = fts_new_builtin_symbol("table",   54);
   fts_s_explode           = fts_new_builtin_symbol("explode", 55);
 
-  /* Last number user: 56 (max, 255 predefined symbols !! ) */
+  /* Last number user: 57 (max, 255 predefined symbols !! ) */
 }
 
 

@@ -54,6 +54,7 @@ extern fts_symbol_t fts_s_stop;
 extern fts_symbol_t fts_s_start;
 extern fts_symbol_t fts_s_restore;
 extern fts_symbol_t fts_s_open;
+extern fts_symbol_t fts_s_upload;
 extern fts_symbol_t fts_s_close;
 extern fts_symbol_t fts_s_load;
 extern fts_symbol_t fts_s_read;

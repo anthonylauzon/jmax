@@ -78,7 +78,7 @@ public class FtsServer
 
   public void start()
   {
-    //    probe = new Probe("FTS", 10000, 100); //@@@
+    // probe = new Probe("FTS", 10000, 100); //@@@
     // probe.start();//@@@
 
     port.start();
@@ -810,7 +810,7 @@ public class FtsServer
     if (FtsServer.debug)
       System.err.println("syncToFts()");
 
-    // probe.mark("Sync ping");
+    // probe.mark("Sync ping");	// @@@
     try
       {
 	port.sendCmd(FtsClientProtocol.sync_cmd);
@@ -875,7 +875,7 @@ public class FtsServer
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
-	  // probe.mark("Property value in");
+	  // probe.mark("Property value in"); // @@@
 
  	  if (msg.getNumberOfArguments() >= 3)
  	    {
@@ -917,7 +917,7 @@ public class FtsServer
 	break;
 
       case FtsClientProtocol.sync_done_cmd:
-	// probe.mark("Pong in");
+	// probe.mark("Pong in"); // @@@
 	deliverPong();
 	break;
 	
@@ -1024,7 +1024,7 @@ public class FtsServer
       {
 	// ignore iand continue
       }
-    // probe.mark("Sync pong");
+    // probe.mark("Sync pong"); // @@@
   }
 
   /** Synchronization primitive for the Ping/Pong protocol. */
