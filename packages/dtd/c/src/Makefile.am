@@ -1,12 +1,9 @@
 packagedir=$(pkgdatadir)/packages/dtd/c
 package_LTLIBRARIES=libdtd.la
 libdtd_la_SOURCES= \
-dtdfifo.c \
-dtdmain.c \
-dtdmodule.c \
-dtdobjs.c \
-dtdserver.c \
-dummydtd.c \
+dtd.c \
+readsf.c \
+writesf.c \
 libtime.c 
 
 libdtd_la_LDFLAGS=-laudiofile -lpthread
