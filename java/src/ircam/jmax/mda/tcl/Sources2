@@ -1,0 +1,3 @@
+SOURCES := \
+	$(INCLUDE_PATH)/TclMdaPackage.java \
+	$(INCLUDE_PATH)/JMaxCmd.java

@@ -1,0 +1,39 @@
+SOURCES = \
+	$(INCLUDE_PATH)/AbstractSelection.java	\
+	$(INCLUDE_PATH)/AbstractUndoableObject.java	\
+	$(INCLUDE_PATH)/MaxWindowMenu.java	\
+	$(INCLUDE_PATH)/DirectionChooser.java	\
+	$(INCLUDE_PATH)/DirectionListener.java		\
+	$(INCLUDE_PATH)/DragListener.java		\
+	$(INCLUDE_PATH)/ObjectRenderer.java		\
+	$(INCLUDE_PATH)/GraphicContext.java		\
+	$(INCLUDE_PATH)/GraphicSelectionListener.java	\
+	$(INCLUDE_PATH)/InfoPanel.java			\
+	$(INCLUDE_PATH)/InteractionModule.java		\
+	$(INCLUDE_PATH)/Layer.java			\
+	$(INCLUDE_PATH)/MouseTracker.java		\
+	$(INCLUDE_PATH)/NumericPropertyEditor.java	\
+	$(INCLUDE_PATH)/NumericalWidget.java		\
+	$(INCLUDE_PATH)/PositionListener.java		\
+	$(INCLUDE_PATH)/ProportionalLayout.java		\
+	$(INCLUDE_PATH)/RenderManager.java		\
+	$(INCLUDE_PATH)/Tool.java			\
+	$(INCLUDE_PATH)/EditorToolbar.java		\
+	$(INCLUDE_PATH)/Selecter.java			\
+	$(INCLUDE_PATH)/SelectionMover.java		\
+	$(INCLUDE_PATH)/SelectionResizer.java		\
+	$(INCLUDE_PATH)/StatusBar.java			\
+	$(INCLUDE_PATH)/StatusBarClient.java		\
+	$(INCLUDE_PATH)/ToolChangeEvent.java		\
+	$(INCLUDE_PATH)/ToolListener.java		\
+	$(INCLUDE_PATH)/ToolbarProvider.java		\
+	$(INCLUDE_PATH)/Widget.java			\
+	$(INCLUDE_PATH)/XORHandler.java			\
+	$(INCLUDE_PATH)/XORPainter.java			\
+	$(INCLUDE_PATH)/SelectionHandler.java		\
+	$(INCLUDE_PATH)/UndoableData.java		\
+	$(INCLUDE_PATH)/SelectionListener.java	
+
+
+
+

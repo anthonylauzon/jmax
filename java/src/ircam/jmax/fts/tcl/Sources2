@@ -1,0 +1,10 @@
+# I am ircam/jmax/fts/tcl
+
+SOURCES := \
+	  $(INCLUDE_PATH)/FtsAbstractionCmd.java \
+	  $(INCLUDE_PATH)/FtsTemplateCmd.java \
+	  $(INCLUDE_PATH)/FtsHelpPatchCmd.java \
+	  $(INCLUDE_PATH)/FtsReferenceURLCmd.java \
+	  $(INCLUDE_PATH)/FtsSyncCmd.java \
+	  $(INCLUDE_PATH)/FtsUcsCmd.java \
+	  $(INCLUDE_PATH)/TclFtsPackage.java

@@ -1,0 +1,15 @@
+SOURCES := \
+           $(INCLUDE_PATH)/ExtensionFilter.java \
+           $(INCLUDE_PATH)/TextWindow.java    \
+	   $(INCLUDE_PATH)/IndentedPrintWriter.java \
+	   $(INCLUDE_PATH)/Platform.java \
+	   $(INCLUDE_PATH)/List.java \
+	   $(INCLUDE_PATH)/ListObject.java \
+	   $(INCLUDE_PATH)/ListIterator.java \
+           $(INCLUDE_PATH)/MetaListIterator.java \
+           $(INCLUDE_PATH)/Enumeration2.java \
+	   $(INCLUDE_PATH)/MetaList.java \
+	   $(INCLUDE_PATH)/GlobalProbe.java \
+           $(INCLUDE_PATH)/Oscilloscope.java \
+           $(INCLUDE_PATH)/OscillSource.java \
+           $(INCLUDE_PATH)/Probe.java

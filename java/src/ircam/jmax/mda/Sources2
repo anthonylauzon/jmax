@@ -1,0 +1,27 @@
+#ich bin ircam/jmax/mda
+
+
+MDA_PATH := $(INCLUDE_PATH)
+INCLUDE_PATH := $(INCLUDE_PATH)/tcl
+include $(INCLUDE_PATH)/Sources2
+
+INCLUDE_PATH := $(MDA_PATH)
+SOURCES := $(SOURCES)\
+	$(INCLUDE_PATH)/AbstractMaxDataEditor.java \
+	$(INCLUDE_PATH)/MaxData.java \
+	$(INCLUDE_PATH)/MaxDataEditor.java \
+	$(INCLUDE_PATH)/MaxDataEditorFactory.java \
+	$(INCLUDE_PATH)/MaxDataEditorReadyListener.java \
+	$(INCLUDE_PATH)/MaxDocument.java \
+	$(INCLUDE_PATH)/MaxDocumentException.java \
+	$(INCLUDE_PATH)/MaxDocumentHandler.java \
+	$(INCLUDE_PATH)/MaxDocumentType.java \
+	$(INCLUDE_PATH)/MaxEnv.java \
+	$(INCLUDE_PATH)/MaxTclDocument.java \
+	$(INCLUDE_PATH)/MaxTclExecutedDocument.java \
+	$(INCLUDE_PATH)/MaxTclExecutedDocumentHandler.java \
+	$(INCLUDE_PATH)/MaxTclExecutedDocumentType.java \
+	$(INCLUDE_PATH)/MaxTclFileDocumentHandler.java \
+	$(INCLUDE_PATH)/MaxTclInterpreter.java \
+	$(INCLUDE_PATH)/Mda.java \
+	$(INCLUDE_PATH)/MdaModule.java

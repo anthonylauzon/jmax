@@ -1,0 +1,4 @@
+SOURCES := \
+	  $(INCLUDE_PATH)/ControlModule.java \
+	  $(INCLUDE_PATH)/ControlPanelFrame.java \
+	  $(INCLUDE_PATH)/DspControl.java

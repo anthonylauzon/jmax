@@ -1,0 +1,16 @@
+## je suis ircam/jmax/editors/console
+
+CONSOLE_PATH := $(INCLUDE_PATH)
+INCLUDE_PATH := $(INCLUDE_PATH)/tcl
+include $(INCLUDE_PATH)/Sources2
+
+INCLUDE_PATH := $(CONSOLE_PATH)
+SOURCES := $(SOURCES)\
+	  $(INCLUDE_PATH)/ConsoleModule.java \
+	  $(INCLUDE_PATH)/Console.java \
+	  $(INCLUDE_PATH)/ConsoleKeyListener.java \
+	  $(INCLUDE_PATH)/ConsoleWriter.java \
+          $(INCLUDE_PATH)/ConsoleWindow.java \
+	  $(INCLUDE_PATH)/ConsoleThread.java \
+	  $(INCLUDE_PATH)/ConsoleTextArea.java \
+	  $(INCLUDE_PATH)/ConsoleMouseListener.java

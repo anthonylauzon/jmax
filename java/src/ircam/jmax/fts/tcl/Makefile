@@ -16,7 +16,9 @@ ROOTDIR = ../../../../../..
 PACKAGE_DIR = ircam/jmax/fts/tcl
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
-include Sources
+
+INCLUDE_PATH := $(JAVA_SRC_ROOT)/$(PACKAGE_DIR)
+include $(INCLUDE_PATH)/Sources2
 
 all: 
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) $(SOURCES))

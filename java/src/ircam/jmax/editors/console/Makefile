@@ -16,11 +16,12 @@ ROOTDIR = ../../../../../..
 PACKAGE_DIR = ircam/jmax/editors/console
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
-include Sources
+
+INCLUDE_PATH := $(JAVA_SRC_ROOT)/$(PACKAGE_DIR)
+include Sources2
 
 all: 
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
-	(cd tcl; $(MAKE) all)
 .PHONY: all
 
 ConsoleModule:
