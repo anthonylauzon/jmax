@@ -677,11 +677,11 @@ public class DisplayList
 
     // Second, paint the display objects in the right order
 
-    for ( int i = 0; i < displayObjects.size(); i++)
+    for ( int i = 0; i < displayObjects.size() && (i < values.length) ; i++)
       {
 	DisplayObject object = (DisplayObject) values[i];
 
-	if (object.intersects(clip))
+	if (( object != null) && object.intersects(clip))
 	  object.paint( g);
       }
 
