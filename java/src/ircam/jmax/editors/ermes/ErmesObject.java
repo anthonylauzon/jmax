@@ -484,7 +484,7 @@ public class ErmesObject implements FtsPropertyHandler {
 	if(IsResizeTextCompat(0, y-itsInitY)) Resize(0, y-itsInitY);
 	else ResizeToText(0, y-itsInitY);
       }
-      itsSketchPad.SaveOneElementRgn(this);
+      //itsSketchPad.SaveOneElementRgn(this);
       itsDragging = false;
       itsResized = true;
     }
@@ -539,6 +539,8 @@ public class ErmesObject implements FtsPropertyHandler {
     currentRect.width += theDeltaH;
     currentRect.height += theDeltaV;
     
+    itsSketchPad.SaveOneElementRgn(this);////////////??????
+
     ErmesObjInlet aInlet;
     ErmesObjOutlet aOutlet;
     int aInletDistance;
