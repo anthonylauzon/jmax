@@ -73,8 +73,12 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   void updateIntegerZone()
   {
     String val = getValueAsText();
-    val = val.substring(0, val.indexOf('.'));
-    intZoneWidth = getHeight()/2 + 5 + getFontMetrics().stringWidth( val);
+    int idx = val.indexOf('.');
+    if( idx != -1)
+      {
+	val = val.substring(0, idx);
+	intZoneWidth = getHeight()/2 + 5 + getFontMetrics().stringWidth( val);
+      }    
   }
   // ValueAsText property
 
