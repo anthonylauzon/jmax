@@ -12,26 +12,23 @@
 
 
 
-<h2>Version 2.5.1</h2>
+<h2>Small tasks</h2>
 
-
-<p>
-Fix DTD bugs (dtd runs as root, error messages, writesf~)
-
-
-<P>
-MAC OS X: change the halaudioport in order to use a fifo between
-IOProc and FTS main thread.
 
 <p>
 ALSA
 <ul>
 <li>latest version</li>
 <li>buffer size</li>
-<li>mmap mode</li>
+<li>mmap mode ardour-like with snd_pcm_mmap_forward
+<li>fix arguments (mmap + interleaved)
 <li>channel numbers / audioport channels</li>
 <li>error messages</li>
 </ul>
+
+<P>
+Help patches for SGI audio port
+
 
 <P>
 Graphix
@@ -41,8 +38,7 @@ Graphix
 <li>Java 2 SGI / MacOS X</li>
 </ul>
 
-<P>
-Release notes
+
 
 <h2>Client, protocol and devices</h2>
 
@@ -144,9 +140,6 @@ by a patch, and create classes, templates, abstractions in packages.
 <h2>Compilation issues</h2>
 
 <p>
-Make all FTS include files C++ compliant with #ifndef __cplusplus extern "C" { #endif
-
-<p>
 Move Makefiles to automake and autoconf
 
 <p>
@@ -180,25 +173,11 @@ Make a rpm from tutorials
 Packaging: distribute JRE (test running with JRE first) ?
 
 <p>
-Bugs:
-readsf/writesf
-
-<p>
-Audioports: ALSA: ardour-like mmap mode with snd_pcm_mmap_forward, fix arguments (mmap + interleaved),
-help patches for SGI audio port
-
-<p>
-Add doxygen for audioport
-
-<p>
 Configuration script for installation (see contributions from Christian Klippel)
 
 <p>
 
 <h2>User interface</h2>
-
-<p>
-Give the splash screen immediately (so that you know that something is going on...)
 
 <p>
 Unique menu for all editors (fits better in Mac OS X l&F):
@@ -239,15 +218,6 @@ Control scroll
 
 
 
-<h2>Forum</h2>
-
-<p>
-update site FTP
-
-<p>
-site Web Forum
-
-
 <h2>Documentation</h2>
 
 <p>
@@ -255,6 +225,9 @@ Update compiling
 
 <p>
 Make automaticaly a list of packages and classes
+
+<p>
+doxygenate all .h
 
 
 </body>

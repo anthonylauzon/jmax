@@ -60,6 +60,8 @@ defaultAudio halaudioport
 <li>no packaging into a Mac OS X application
 </ul>
 
+<p>
+On Linux, FTS has a watchdog that prevents FTS from locking the CPU.
 
 <p>
 <h3>Audio and MIDI configuration</h3>
@@ -70,6 +72,7 @@ was introduced for the MIDI configuartion on the ALSA/Linux platform.
 <p>
 <h3>User interface</h3>
 
+<P>
 The DSP calculation can be switched on an of by the keyboard short cut Control/SpaceBar.
 
 <p>
@@ -80,6 +83,7 @@ The error window has been removed.
 <p>
 <h3>Object set</h3>
 
+<p>
 The classes <tt><b>clock</b></tt> and <tt><b>at</b></tt> of the ISPW packages where removed. 
 It is no more possible to give a clock as first argument of the timing objects 
 such as metro or delay as it was before.
@@ -90,11 +94,15 @@ to obtain a trigger at the instant of the DSP calculation being switched on must
 replaced by an object <tt><b>dsp</b></tt> connected to an object <tt><b>select 1</b></tt> or <tt><b>sel 1</b></tt>.
 
 <p>
-In the signal package the classes play~ and rec~ where add (see the help patches).
+In the signal package the classes play~ and rec~ where added (see the help patches).
 
 <p>
 Two new objects have been introduced to the toolbar: 
 an oscilloscope and an object to display numerical values or vectors of values in a scrolling display.
+
+<p>
+The object <tt><b>writesf~</b></tt> has been fixed.
+
 
 <p>
 <h3>API changes</h3>
@@ -120,13 +128,14 @@ Three <i>modules</i> have been added to the doxygen generated API documentation 
 <li>DSP subsystem
 </ul>
 
-
+<p>
+The scheduler API has changed (see sched.h).
 
 
 <p>
 <h3>Bug fixes</h3>
 
-A major bug for DSP objects with multiple outlets (all outlets had the same signal) are fixed.
+A major bug for DSP objects with multiple outlets (all outlets had the same signal) is fixed.
 
 <p>
 The classes <tt><b>==</b></tt>, <tt><b>!=</b></tt>, etc. can be instantiated without double-quotes.
