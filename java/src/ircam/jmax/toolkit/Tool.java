@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
 import java.awt.*;
+import java.awt.image.*;
 
 /**
  * The base class for tools: it handles the name and the icon,
@@ -44,6 +45,7 @@ abstract public class Tool implements StatusBarClient{
   {
     setName(theName);
     setIcon(theImageIcon);
+    cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
   }
 
   /**
@@ -131,7 +133,40 @@ abstract public class Tool implements StatusBarClient{
 
   public Cursor getCursor()
   {
-    return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+    return cursor;
+  }
+
+  public void setCursor( ImageIcon icon)
+  {
+    this.cursor = loadCursor( icon);
+  }
+
+  public Cursor loadCursor( ImageIcon cursorIcon)
+  {
+    if (cursorIcon == null)
+      return null;
+
+    Image image = cursorIcon.getImage();
+    ImageObserver observer = new ImageObserver() {
+	public boolean imageUpdate( Image img, int infoflags, int x, int y, int width, int height)
+	{
+	  return false;
+	}
+      };
+    int imageWidth = image.getWidth(observer);
+    int imageHeight = image.getHeight(observer);
+
+    Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize( imageWidth, imageHeight);
+    BufferedImage bi = new BufferedImage( bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
+    bi.createGraphics().drawImage( image, 0, 0, observer);
+    
+    Point hs;
+    if ( bi.getHeight( observer) < 1)
+      hs = new Point(0,0);
+    else
+      hs = new Point(0, 1);
+    
+    return Toolkit.getDefaultToolkit().createCustomCursor( bi, hs, itsName + " cursor");
   }
 
   //---- Fields
@@ -139,6 +174,7 @@ abstract public class Tool implements StatusBarClient{
   ImageIcon itsIcon;
   protected static GraphicContext gc;
   static InteractionModule currentInteractionModule;
+  Cursor cursor;
 }
 
 
