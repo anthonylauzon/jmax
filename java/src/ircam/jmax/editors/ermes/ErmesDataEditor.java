@@ -49,7 +49,8 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
     if (window != null)
       {
 	window.setVisible(true);
-	window.toFront();
+	// window.toFront();
+	window.show();
 	window.itsPatcherData.startUpdates();
       }
   }

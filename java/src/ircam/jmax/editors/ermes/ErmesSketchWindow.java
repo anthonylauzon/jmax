@@ -406,6 +406,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener, C
 	  {
 	    try {
 	      textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
+	      itsSketchPad.deleteSelectedText();
 	      itsSketchPad.pasteText(textClipboard);
 	    }
 	    catch (Exception e) {System.err.println("error while pasting text: "+e);}
