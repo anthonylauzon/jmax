@@ -40,7 +40,9 @@
 #include <errno.h>
 
 /*  #include <fts/fts.h>  not yet (platform.h) */
-#include "fts_interns.h"
+#include "fts/ftsnew.h"
+#include "fts/private/fpe.h"
+#include "fts/private/platform.h"
 
 /* *************************************************************************** */
 /*                                                                             */
@@ -89,9 +91,6 @@ int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error
  */
 #undef ENABLE_DENORMALIZED_TRAPS
 
-
-/* (fd) HACK !!! */
-extern void fts_fpe_handler( int which);
 
 /* (Francois, dechelle@ircam.fr                                                */
 /* As Linux does not provide (yet?) a way to access the status of the          */
@@ -151,24 +150,25 @@ extern void fts_fpe_handler( int which);
 static void linux_fpe_signal_handler( int sig)
 {
   unsigned int s;
+  int which = 0;
 
   _FPU_GET_SW( s);
   _FPU_CLR_SW;
 
   if (s & _FPU_STATUS_ZE)
-    fts_fpe_handler( FTS_DIVIDE0_FPE);
-  else if (s & _FPU_STATUS_IE)
-    fts_fpe_handler( FTS_INVALID_FPE);
-  else if (s & _FPU_STATUS_OE)
-    fts_fpe_handler( FTS_OVERFLOW_FPE);
-  else if (s & _FPU_STATUS_UE)
-    fts_fpe_handler( FTS_UNDERFLOW_FPE);
-  else if (s & _FPU_STATUS_PE)
-    fts_fpe_handler( FTS_INEXACT_FPE);
-  else if (s & _FPU_STATUS_DE)
-    fts_fpe_handler( FTS_DENORMALIZED_FPE);
-  else
-    fts_fpe_handler(0);
+    which |= FTS_DIVIDE0_FPE;
+  if (s & _FPU_STATUS_IE)
+    which |= FTS_INVALID_FPE;
+  if (s & _FPU_STATUS_OE)
+    which |= FTS_OVERFLOW_FPE;
+  if (s & _FPU_STATUS_UE)
+    which |= FTS_UNDERFLOW_FPE;
+  if (s & _FPU_STATUS_PE)
+    which |= FTS_INEXACT_FPE;
+  if (s & _FPU_STATUS_DE)
+    which |= FTS_DENORMALIZED_FPE;
+
+  fts_fpe_handler( which);
 }
 
 void fts_enable_fpe_traps( void)
@@ -210,23 +210,20 @@ void fts_disable_fpe_traps( void)
 
 unsigned int fts_check_fpe( void)
 {
-  unsigned int s, ret;
+  unsigned int s;
+  int which = 0;
 
   _FPU_GET_SW( s);
   _FPU_CLR_SW;
 
-  ret = 0;
-
-  if (s & _FPU_STATUS_IE)
-    ret |= FTS_INVALID_FPE;
-
   if (s & _FPU_STATUS_ZE)
-    ret |= FTS_DIVIDE0_FPE;
-
+    which |= FTS_DIVIDE0_FPE;
+  if (s & _FPU_STATUS_IE)
+    which |= FTS_INVALID_FPE;
   if (s & _FPU_STATUS_OE)
-    ret |= FTS_OVERFLOW_FPE;
+    which |= FTS_OVERFLOW_FPE;
 
-  return ret;
+  return which;
 }
 
 /* *************************************************************************** */

@@ -14,6 +14,7 @@ connection.c \
 doctor.c \
 errobj.c \
 expression.c \
+fpe.c \
 ftl.c \
 ftlmem.c \
 hashtable.c \
