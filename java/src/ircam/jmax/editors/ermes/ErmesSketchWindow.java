@@ -171,9 +171,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     
     itsSubWindowsMenu = new Menu("SubWindows");
     itsSelectAllMenuItem = AddMenuItem(GetEditMenu(),"Select All  Ctrl+A");
-    //AddCheckboxMenuItem(GetEditMenu(),"Autorouting", true);
+    AddMenuSeparator(GetEditMenu());
     itsResizeObjectMenu =  AddSubMenu(GetEditMenu(),"Resize Object");
     FillResizeObjectMenu(itsResizeObjectMenu);
+    AddMenuSeparator(GetEditMenu());
     itsAlignObjectMenu =  AddSubMenu(GetEditMenu(),"Align Objects");
     FillAlignObjectsMenu(itsAlignObjectMenu);
     

@@ -137,21 +137,21 @@ class ErmesObjMessage extends ErmesObjEditableObject {
   //--------------------------------------------------------
   public void Paint_specific(Graphics g) {
     
-    if(!itsSelected) g.setColor(itsLangNormalColor);
+    if((!itsSelected)&&(!itsFlashing)) g.setColor(itsLangNormalColor);
     else g.setColor(itsLangSelectedColor);
  
     g.fillRect(itsX+1,itsY+1,currentRect.width-2, currentRect.height-2);
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
     
-    if(itsFlashing) g.setColor(itsLangNormalColor);
+    if(itsFlashing) g.setColor(itsLangSelectedColor);
     else g.setColor(Color.white);
     g.fillRect(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), currentRect.height-HEIGHT_DIFF);
     g.setColor(Color.black);
     g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
     
     g.setColor(Color.black);
-     if(!itsSketchPad.itsRunMode) 
-       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    if(!itsSketchPad.itsRunMode) 
+      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     
     g.setFont(itsFont);
     DrawParsedString(g);

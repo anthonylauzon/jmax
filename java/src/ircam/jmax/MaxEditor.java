@@ -748,7 +748,11 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     aMenuItem.addActionListener(this);
     return aMenuItem;
   }
-
+  
+  public void AddMenuSeparator(Menu theMenu){
+    theMenu.add(new MenuItem("-"));
+  }
+  
   public Menu AddSubMenu(Menu theMenu, String theSubMenuName){
     Menu aSubMenu =new Menu(theSubMenuName); 
     theMenu.add(aSubMenu);
