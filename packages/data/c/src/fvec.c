@@ -889,6 +889,7 @@ fslice_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fslice_error_index(self, NULL, "max");
 }
 
+
 static void
 fslice_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -907,8 +908,8 @@ fslice_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       
       for (i=stride; i<size; i+=stride)
       {
-        if (p[i] > max)
-          max = p[i];
+	if (fabsf(p[i]) > max)
+	  max = fabsf(p[i]);
       }
       
       fts_return_float(max);
@@ -918,6 +919,7 @@ fslice_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fslice_error_index(self, NULL, "absmax");
 }
 
+
 static void
 fslice_get_min_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -925,8 +927,8 @@ fslice_get_min_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
   if(fslice_check_index(self))
   {
-    const int size = fslice_get_size(self);
     const int stride = fslice_get_stride(self);
+    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
   
     if(size > 0)
     {
@@ -958,9 +960,9 @@ fslice_get_max_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
   if(fslice_check_index(self))
   {
-    const int size = fslice_get_size(self);
     const int stride = fslice_get_stride(self);
-  
+    const int size   = fslice_get_size(self) * stride;	/* index into fmat! */
+ 
     if(size > 0)
     {
       const float *p = fslice_get_ptr(self);
@@ -1303,3 +1305,11 @@ fvec_config(void)
   frow_class = fts_class_install(frow_symbol, frow_instantiate);
   fcol_class = fts_class_install(fcol_symbol, fcol_instantiate);
 }
+
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
