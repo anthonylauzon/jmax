@@ -418,7 +418,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 {
   if (version == 1)
     {
-      if(fts_is_symbol(at) && fts_get_symbol(at) == fts_s_patcher)
+      if(fts_is_symbol(at) && fts_get_symbol(at) == fts_s_jpatcher)
 	{
 	  return fts_eval_object_description( patcher, 1, at);	  
 	}
@@ -1625,21 +1625,15 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
       fts_bmax_code_new_property(f, obj, fts_s_ww);
     }
 
-  /* If argc is zero, we pop the 0 value pushed above */
-  if  (obj->argc == 0)
+  /* if argc is zero, we pop the 0 value pushed above */
+  if (obj->argc == 0)
     fts_bmax_code_pop_args(f, 1);
   else
     fts_bmax_code_pop_args(f, obj->argc);
 
   /* send a dump message to the object to give it the opportunity to save its data */
-  fts_object_get_prop(obj, fts_s_keep, &a);
-
-  /* dump if there is no keep property or if keep=yes */
-  if(fts_is_void(&a) || (fts_is_symbol(&a) && fts_get_symbol(&a) == fts_s_yes))
-    {
-      fts_set_object(&a, (fts_object_t *)saver_dumper);
-      fts_send_message(obj, fts_s_dump, 1, &a);
-    }
+  fts_set_object(&a, (fts_object_t *)saver_dumper);
+  fts_send_message(obj, fts_s_dump, 1, &a);
 
   /* save name */
   if (fts_object_get_definition(obj) != NULL)
@@ -1663,7 +1657,7 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * The pop  of the arguments is done at the end, because we reuse
    * the top of the stack for properties (use set instead of push)
    */
-  fts_set_symbol(&a, fts_s_patcher);
+  fts_set_symbol(&a, fts_s_jpatcher);
   fts_bmax_code_push_atoms(f, 1, &a);
 
   fts_bmax_code_make_top_obj(f, 1);

@@ -20,33 +20,6 @@
  * 
  */
 
-/**************************************************************************
- *
- *  THE REAL FTS 2.0 patcher class
- *
- *  The patcher class is a standard class, with real inlets and real
- *  outlets; it keeps track of its content; inlets and outlets objects
- *  have special and direct relationship with the patcher, that use them
- *  as place holder for the connections.
- *
- *  The patcher class do not have variable number of inlet/outlet;
- *  if the editor add a inlet or outlet, it replace the patcher object
- *  with a new one; the patcher have, for now, two arguments, the number
- *  of inputs and the number of outputs; in the future, it may handles the
- *  types from the inputs.
- *
- *  Inlets are only placeholders for the internal connections
- *  they receive no messages, send no messages; the messages are sent
- *  by the patcher object on its outlet; for the DSP, they are like through.
- *
- *  Housekeeping of the patcher structure is integrated in the message system;
- *  the patcher is not a standalone object anymore.
- *
- *  For now, until Input/output typing, all the inlets and outlets are
- *  DSP, and the patcher is integrated with the DSP compiler.
- *
- */
-
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -70,6 +43,7 @@ static fts_class_t *patcher_inout_class = 0;
 static fts_class_t *receive_class = 0;
 static fts_class_t *send_class = 0;
 
+fts_symbol_t sym_set_title = 0;
 fts_symbol_t sym_showObject = 0;
 fts_symbol_t sym_stopWaiting = 0;
 
@@ -97,20 +71,112 @@ fts_symbol_t sym_noHelp;
 #define editor_is_open(q) ((q)->editor_open != 0)
 #define fts_patcher_is_dirty(q)    ((q)->dirty != 0)
 
-static void
-printf_mess(const char *msg, int ac, const fts_atom_t *av)
+/*************************************************************
+ *
+ *  patcher memory stream
+ *
+ */
+static fts_memorystream_t *patcher_memory_stream ;
+
+static fts_memorystream_t * patcher_get_memory_stream()
 {
-  fprintf(stderr, "%s (%d args): ", msg, ac);
-  /*fprintf_atoms(stderr, ac, av);*/
-  fprintf(stderr, "\n");
+  if(!patcher_memory_stream)
+    patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, NULL, 0, 0);
+  return patcher_memory_stream;
 }
 
 /*************************************************************
  *
- *  inlet and outlet utilities
+ *  patcher objects and utilities
  *
  */
 
+void 
+fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
+{
+  fts_object_t **p = &this->objects;
+
+  obj->patcher = this;
+
+  /* add object as last in the list (nos: do we still need this?) */
+  while(*p != NULL)
+    p = &((*p)->next_in_patcher);
+
+  *p = obj;
+
+  fts_object_refer(obj);
+}
+
+void 
+fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
+{
+  fts_object_t **p;
+
+  for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
+    if (*p == obj)
+      {
+	fts_object_t *remove = *p;
+
+	*p = obj->next_in_patcher;
+
+	remove->patcher = NULL;
+	fts_object_release(remove);
+
+	return;
+      }
+}
+
+int 
+fts_patcher_get_objects_count(fts_patcher_t *this)
+{
+  int i = 0;
+  fts_object_t *p;	
+
+  for (p = this->objects; p; p = p->next_in_patcher)
+    i++;
+
+  return i;
+}
+
+/* set a patch as dirty or as saved */
+void 
+fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty)
+{
+  if(this == fts_get_root_patcher()) return;
+
+  if( ((fts_object_t *)this)->patcher != fts_get_root_patcher())
+    fts_patcher_set_dirty( ((fts_object_t *)this)->patcher, is_dirty);
+  else
+    {
+      if(this->dirty != is_dirty)
+	{
+	  this->dirty = is_dirty;
+
+	  if (editor_is_open(this))
+	    {
+	      fts_atom_t a[1];
+  
+	      fts_set_int(&a[0], is_dirty);
+	      fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
+	    }
+	}
+    }
+}
+
+void 
+fts_patcher_set_template(fts_patcher_t *this, fts_template_t *template)
+{
+  this->type = fts_p_template;
+  this->template = template;
+
+  fts_template_add_instance(template, (fts_object_t *) this);
+}
+
+/*************************************************************
+ *
+ *  patcher inlet and outlet utilities
+ *
+ */
 struct patcher_inout
 {
   fts_object_t o;
@@ -427,12 +493,17 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   else if(ac == 1 && fts_is_symbol(at))
     {
-      /* symbol: implicit label */
+      /* inlet label */
       fts_symbol_t name = fts_get_symbol(at);
       fts_label_t *label = fts_label_get_or_create(patcher, name);
 
-      fts_name_add_listener(patcher, name, o);
-      obj = (fts_object_t *)label;
+      if(label)
+	obj = (fts_object_t *)label;
+      else
+	{
+	  fts_object_set_error(o, "invalid label");
+	  return;	  
+	}
     }
   else if(ac == 1 && fts_is_object(at))
     obj = fts_get_object(at);
@@ -554,12 +625,17 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(ac == 1 && fts_is_symbol(at))
     {
-      /* symbol: implicit label */
+      /* outlet label */
       fts_symbol_t name = fts_get_symbol(at);
       fts_label_t *label = fts_label_get_or_create(patcher, name);
 
-      fts_name_add_listener(patcher, name, o);
-      obj = (fts_object_t *)label;
+      if(label)
+	obj = (fts_object_t *)label;
+      else
+	{
+	  fts_object_set_error(o, "invalid label");
+	  return;	  
+	}
     }
   else if(ac == 1 && fts_is_object(at))
     obj = fts_get_object(at);
@@ -640,10 +716,8 @@ send_instantiate(fts_class_t *cl)
 
 /*************************************************************
  *
- *  patcher class
+ *  patcher methods
  *
- *  the patcher send messages it receive on the inlets to the inlets outlets,
- *  output messages are directly send to the patcher outlets by the outlet objects
  */
 static void
 patcher_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
@@ -666,13 +740,34 @@ patcher_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_at
     }
 }
 
-/* load init:
- * The patcher sends recursively load_init to all the included objects, *first* to subpatchers,
- * and then to the other objects; this guarantee that any loadbang or similar
- * objects are executed first in the external patches and then in the external ones
- * (patchers have a protection against multiple load-init firing)
- *
- */
+static void 
+patcher_set_arguments( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_memorystream_t *stream = patcher_get_memory_stream();
+  fts_atom_t a;
+  int i;
+
+  /* set description */
+  this->description_ac = ac;
+  this->description_at = fts_realloc(this->description_at, sizeof(fts_atom_t) * ac);
+
+  for(i=0; i<ac; i++)
+    this->description_at[i] = at[i];
+
+  /* update string at patcher */
+  if(fts_object_has_id(o))
+    {
+      fts_memorystream_reset( stream);
+      fts_spost_object_description_args( (fts_bytestream_t *)stream, ac, (fts_atom_t *)at);
+      fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+      fts_set_string(&a,  fts_memorystream_get_bytes( stream));
+      fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, &a);
+    }
+
+  fts_patcher_set_dirty(this, 1);
+}
+
 static void
 patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -684,12 +779,14 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   this->load_init_fired = 1;
 
+  /* send load_init to patcher objects */
   for (p = this->objects; p ; p = p->next_in_patcher)
     if (fts_object_is_patcher(p))
       fts_send_message(p, s, ac, at);
 
+  /* send load_init to all simple objects */
   for (p = this->objects; p ; p = p->next_in_patcher)
-    if (! fts_object_is_patcher(p))
+    if (!fts_object_is_patcher(p))
       fts_send_message(p, s, ac, at);
 
 }
@@ -729,8 +826,9 @@ patcher_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
 }
 
+/* tool panel support */
 static void
-show_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_show_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj = fts_get_object(at);
@@ -746,666 +844,9 @@ show_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-stop_waiting(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_stop_waiting(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_client_send_message(o, sym_stopWaiting, 0, 0);
-}
-
-static int
-fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av)
-{
-  int i,j;
-
-  for (i = 0; i < (ac - sac + 1); i++)
-    if (fts_atom_equals(&sav[0], &av[i]))
-      {
-	/* Found the beginning, test the rest */
-	
-	for (j = 1; j < sac; j++)
-	  if (! fts_atom_equals(&sav[j], &av[j + i]))
-	    return 0;
-
-	return 1;
-      }
-
-  return 0;
-}
-
-/* the find engines */
-static void
-patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
-  fts_object_t *p;
-  fts_status_t ret;
-
-  /* see if this should be added */
-  if (fts_atom_is_subsequence(ac - 1, at + 1, o->argc, o->argv))
-    {
-      /* add only if the patcher is not the root patcher or a patcher in the root patcher */
-      if((this != fts_get_root_patcher())&&(o->patcher != fts_get_root_patcher()))
-	fts_objectset_add(set, o);
-    }
-  /* look if the objects in the patchers are to be found */
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    {
-      if (!fts_object_is_patcher(p))
-	{
-	  if (!fts_object_is_error(p))
-	    {
-	      fts_method_t find_method = fts_class_get_method(fts_object_get_class(p), fts_s_find);
-
-	      /* send the find message to the object; if the object do not implement it, do the standard check */
-	      if(find_method != NULL)
-		(*find_method)(p, fts_system_inlet, fts_s_find, ac, at);
-	      else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
-		fts_objectset_add(set, p);
-	    }
-	  else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
-	    fts_objectset_add(set, p);
-	}
-    }
-
-  /* do the recursive calls  */
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    {
-      if (fts_object_is_standard_patcher(p) ||
-	  fts_object_is_template(p) ||
-	  fts_object_is_abstraction(p))
-	fts_send_message(p, s, ac, at);
-    }
-}
-
-/* the find errors engines */
-static void
-patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
-  fts_object_t *p;
-
-  /* look if the objects in the patchers are to be found */
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    {
-      if(fts_object_is_error(p))
-	fts_objectset_add(set, p);
-    }
-
-  /* do the recursive calls  */
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    {
-      if (fts_object_is_standard_patcher(p) ||
-	  fts_object_is_template(p) ||
-	  fts_object_is_abstraction(p))
-	fts_send_message(p, s, ac, at);
-    }
-}
-
-static void
-patcher_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
-  void *propagate_context = fts_get_pointer(at + 1);
-  int n = fts_get_int(at + 2);
-  patcher_inout_t *inlet = this->inlets[n];
-
-  if(inlet)
-    {
-      fts_objectlist_t *targets = fts_channel_get_targets(&inlet->channel);
-      fts_objectlist_cell_t *p;
-      
-      for(p=fts_objectlist_get_head(targets); p; p=fts_objectlist_get_next(p))
-	propagate_fun(propagate_context, fts_objectlist_get_object(p), 0);
-    }
-}
-
-void 
-fts_patcher_set_template(fts_patcher_t *this, fts_template_t *template)
-{
-  this->type = fts_p_template;
-  this->template = template;
-
-  fts_template_add_instance(template, (fts_object_t *) this);
-}
-
-/* Methods: init put the pointers to zero */
-static void 
-patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  int n_inlets = fts_get_int_arg(ac, at, 0, 0);
-  int n_outlets = fts_get_int_arg(ac, at, 1, 0);
-  fts_atom_t va;
-  int i;
-  
-  this->inlets = NULL;
-  this->outlets = NULL;
-
-  this->n_inlets = 0;
-  this->n_outlets = 0;
-
-  fts_patcher_set_standard(this);
-
-  /* Define the "args" variable */
-  this->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
-  fts_object_refer(this->args);
-
-  fts_set_object( &va, (fts_object_t *)this->args);
-  fts_name_define( this, fts_s_args, &va);
-
-  patcher_redefine_number_of_inlets(this, n_inlets);
-  patcher_redefine_number_of_outlets(this, n_outlets);
-
-  this->objects = (fts_object_t *)0;
-  this->open = 0; /* start as closed */
-  this->editor_open = 0; /* start with editor closed */  
-  this->deleted = 0;
-  this->dirty = 0; /* start as saved */
-}
-
-/* delete patcher:
- *
- * Contained objects are deleted in the reverse order (last first);
- * it purpose is to reduce the number of redefinitions happening
- * and errors objects instantiated during a delete; locally to a patcher,
- * objects using variables come after objects defining the same variable,
- * so by deleting in the reverse order, we avoid redefinition within the
- * patchers; of course, if a variable is used somewhere else,
- * the user may be recomputed during delete.
- *
- * Also, since the list is can be indirectly reordered by a recompute
- * (i.e. a deletion), the last member is recomputed at each
- * interaction; slow, but the only alternative is to use a dynamic array
- * instead of a list. We will do it if it is a problem.
- */
-
-static void 
-patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_object_t *p;
-
-  if(editor_is_open(this))
-    {
-      set_editor_close(this);
-      fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
-    }
-
-  /* If it is a template, remove it from the template instance list */
-  if (fts_patcher_is_template(this))
-    fts_template_remove_instance(fts_patcher_get_template(this), (fts_object_t *) this);
-
-  /* Set the deleted and reset the open flag */
-  this->deleted = 1;
-  this->open = 0;
-
-  while (this->objects)
-    {
-      /* find last object in patcher */
-      p = this->objects;
-      while (p->next_in_patcher)
-	p = p->next_in_patcher;
-      
-      if(fts_dsp_is_active() && fts_is_dsp_object(p))
-	fts_dsp_desactivate();
-
-      fts_object_delete_from_patcher(p);
-    }
-
-  /* delete all the variables */
-  fts_object_release( this->args);
-
-  /* delete the inlets and inlets tables */
-  if (this->inlets)
-    fts_free( this->inlets);
-
-  if (this->outlets)
-    fts_free( this->outlets);
-}
-
-static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_atom_t a[4];
-  fts_object_t *p;
-
-  if(!fts_object_is_error((fts_object_t *)this))
-    {
-      fts_object_get_prop((fts_object_t *)this, fts_s_wx, a);
-      fts_object_get_prop((fts_object_t *)this, fts_s_wy, a+1);
-      fts_object_get_prop((fts_object_t *)this, fts_s_ww, a+2);
-      fts_object_get_prop((fts_object_t *)this, fts_s_wh, a+3);
-      
-      if( fts_get_int( a) && fts_get_int( a+1) && fts_get_int( a+2) && fts_get_int( a+3))
-	fts_client_send_message((fts_object_t *)this, sym_setPatcherBounds, 4, a);
-      
-      for (p = this->objects; p ; p = p->next_in_patcher)
-	fts_client_upload_object( p, -1);
-      
-      for (p = this->objects; p ; p = p->next_in_patcher)
-	{
-	  int outlet;
-	  
-	  for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
-	    {
-	      fts_connection_t *c;
-	      
-	      for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-		{
-		  ((fts_object_t *)c)->patcher = this;
-		  fts_client_upload_object( (fts_object_t *)c, -1);
-		}
-	    }
-	}
-
-      fts_client_send_message((fts_object_t *)this, sym_endUpload, 0, 0);
-    }
-}
-
-/***********************************************************************
- *
- *  .pat file format saving and loading
- *
- */
-static void patcher_save_dotpat_internal( FILE *file, fts_patcher_t *patcher);
-static void patcher_save_dotpat( FILE *file, fts_patcher_t *patcher);
-static void fts_patcher_save_as_dotpat( fts_symbol_t filename, fts_patcher_t *patcher);
-
-static int get_int_property( fts_object_t *object, fts_symbol_t property_name)
-{
-  fts_atom_t a;
-
-  fts_object_get_prop( object, property_name, &a);
-  return fts_get_int( &a);
-}
-
-static void 
-patcher_save_dotpat_object_geometry( FILE *file, fts_object_t *object)
-{
-  fprintf( file, "%d ", get_int_property( object, fts_s_x));     /* x */
-  fprintf( file, "%d ", get_int_property( object, fts_s_y));     /* y */
-  fprintf( file, "%d ", get_int_property( object, fts_s_width)); /* width */
-  fprintf( file, "%d", 1); /* font_index, a voir */
-}
-
-static void 
-patcher_save_dotpat_atoms( FILE *file, int ac, const fts_atom_t *at)
-{
-  int i;
-
-  for ( i = 0; i < ac; i++)
-    {
-      if (fts_is_int( at + i ))
-	fprintf( file, " %d", fts_get_int( at + i ));
-      else if (fts_is_float( at + i ))
-	fprintf( file, " %f", fts_get_float( at + i ));
-      else if (fts_is_symbol( at + i ))
-	fprintf( file, " %s", fts_get_symbol( at + i ) );
-    }
-}
-
-static int 
-find_object_index_in_patcher( fts_object_t *object)
-{
-  fts_object_t *o;
-  fts_patcher_t *patcher = fts_object_get_patcher(object);
-  int index = 0;
-  
-  for(o=patcher->objects; o; o=o->next_in_patcher)
-    {
-      if (object == o)
-	return index;
-
-      index++;
-    }
-
-  return -1;
-}
-
-static void 
-patcher_save_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  int type = fts_get_int(at);
-  fts_symbol_t filename = fts_get_symbol(at+1);
-  
-  if(type)
-    fts_save_patcher_as_bmax(filename, o);
-  else
-    fts_patcher_save_as_dotpat(filename, (fts_patcher_t *)o);
-
-  fts_patcher_set_dirty((fts_patcher_t *)o, 0);
-
-  fts_client_send_message(o, sym_setSaved, ac, at);
-}
-
-static void 
-patcher_save_objects( FILE *file, fts_object_t *object)
-{
-  while ( object)
-    {
-      if ( fts_object_is_standard_patcher( object) )
-	{
-	  patcher_save_dotpat( file, (fts_patcher_t *)object);
-
-	  fprintf( file, "#P newobj ");
-	  patcher_save_dotpat_object_geometry( file, object);
-	  fprintf( file, " patcher ");
-	  patcher_save_dotpat_atoms( file, object->argc - 1, object->argv + 1);
-	  fprintf( file, ";\n");
-	}
-      else if ( ! fts_object_is_patcher( object)
-		&& fts_class_get_method( fts_object_get_class(object), fts_s_save_dotpat) != NULL)
-	{
- 	  fts_atom_t a;
-
-	  fts_set_pointer( &a, file);
-	  fts_send_message( object, fts_s_save_dotpat, 1, &a);
-	}
-      else
-	{
-	  fprintf( file, "#P newex ");
-	  patcher_save_dotpat_object_geometry( file, object);
-	  patcher_save_dotpat_atoms( file, object->argc, object->argv);
-	  fprintf( file, ";\n");
-	}
-
-      object = object->next_in_patcher;
-    }
-}
-
-/* This auxiliary function is used to save the connections in reverse order.
- * There is no requested order for connections saving, but MAX/Opcode
- * saves in reverse order, so in order to ease text comparison of files,
- * we can save in reverse order.
- *
- * (apparently, the connection saving order depends from the MAX version...)
- */
-static void patcher_save_connections( FILE *file, fts_object_t *object, int patcher_object_count)
-{
-  int object_index = 0;
-
-  while ( object)
-    {
-      int outlet;
-
-      for ( outlet = 0; outlet < fts_object_get_outlets_number( object); outlet++)
-	{
-	  fts_connection_t *c;
-
-	  for ( c = object->out_conn[outlet]; c ; c = c->next_same_src)
-	    {
-	      if(fts_connection_get_type(c) > fts_c_hidden) /* don't save hidden connections */
-		{
-		  fprintf( file, "#P connect %d %d %d %d;\n", 
-			   patcher_object_count - 1 - object_index,
-			   outlet, 
-			   patcher_object_count - 1 - find_object_index_in_patcher( c->dst),
-			   c->winlet);
-		}
-	    }
-	}
-
-      object_index++;
-
-      object = object->next_in_patcher;
-    }
-}
-
-static void 
-patcher_save_dotpat( FILE *file, fts_patcher_t *patcher)
-{
-  int x_left, y_top, x_right, y_bottom;
-
-  /* save window properties */
-  x_left = get_int_property( (fts_object_t *)patcher, fts_s_wx);
-  y_top = get_int_property( (fts_object_t *)patcher, fts_s_wy);
-  x_right = x_left + get_int_property( (fts_object_t *)patcher, fts_s_ww);
-  y_bottom = y_top + get_int_property( (fts_object_t *)patcher, fts_s_wh);;
-
-  fprintf( file, "#N vpatcher %d %d %d %d;\n", x_left, y_top, x_right, y_bottom);
-
-  /* save objects */
-  patcher_save_objects( file, patcher->objects);
-
-  /* save connections */
-  patcher_save_connections( file, patcher->objects, fts_patcher_get_objects_count( patcher));
-
-  fprintf( file, "#P pop;\n");
-}
-
-/* 
- * save a patcher in .pat format:
- *
- * (note: this function does not check for nor add a .pat suffix to the file name,
- * it is left to the user interface)
-*/
-
-static void 
-fts_patcher_save_as_dotpat(fts_symbol_t filename, fts_patcher_t *patcher)
-{
-  FILE *file;
-
-  file = fopen( filename, "wb");
-
-  if ( file != NULL)
-    {
-      fprintf( file, "max v2;\n");
-      patcher_save_dotpat( file, patcher);
-      fclose( file);
-    }
-  else
-    {
-      /* this should be a dialog opened in the user interface */
-      post( "Error: cannot open %s for saving\n", filename );
-    }
-}
-
-/* .pat loading: reorder inlets and outlets regarding their x position in the patcher */
-static int 
-patcher_objects_compare_x(const void *left, const void *right)
-{
-  fts_object_t *obj_left = *((fts_object_t **)left);
-  fts_object_t *obj_right = *((fts_object_t **)right);
-  int x_left, x_right;
-  fts_atom_t a;
-  
-  fts_object_get_prop(obj_left, fts_s_x, &a);
-  x_left = fts_get_int(&a);
-
-  fts_object_get_prop(obj_right, fts_s_x, &a);
-  x_right = fts_get_int(&a);
-
-  return x_left - x_right;
-}
-
-#define MAX_INOUTS 256
-
-void
-fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this)
-{
-  fts_receive_t *receives[MAX_INOUTS];
-  fts_send_t *sends[MAX_INOUTS];
-  fts_object_t *p;
-  int n_ins = 0;
-  int n_outs = 0;
-  int i;
-
-  /* put all inlet receives in an array */
-  for (p=this->objects; p; p=p->next_in_patcher)
-    {
-      if(fts_object_get_class(p) == receive_class)
-	{
-	  fts_receive_t *receive = (fts_receive_t *)p;
-
-	  if(fts_object_get_class(receive->obj) == patcher_inout_class && n_ins < MAX_INOUTS)
-	    {
-	      receives[n_ins] = receive;
-	      n_ins++;
-	    }
-	}
-      else if(fts_object_get_class(p) == send_class)
-	{
-	  fts_send_t *send = (fts_send_t *)p;
-
-	  if(fts_object_get_class(send->obj) == patcher_inout_class && n_outs < MAX_INOUTS)
-	    {
-	      sends[n_outs] = send;
-	      n_outs++;
-	    }
-	}
-    }
-  
-  /* sort receives and assign inlets */
-  if(n_ins > 1)
-    {
-      patcher_redefine_number_of_inlets(this, n_ins);
-
-      /* sort receives */
-      qsort((void *)receives, n_ins, sizeof(fts_object_t *), patcher_objects_compare_x);
-      
-      /* assign new inlet to receive */
-      for(i=1; i<n_ins; i++)
-	receives[i]->obj = (fts_object_t *)patcher_get_inlet(this, i);
-    }
-
-  /* sort sends and assign outlets */
-  if(n_outs > 1)
-    {
-      patcher_redefine_number_of_outlets(this, n_outs);
-
-      /* sort sends */
-      qsort((void *)sends, n_outs, sizeof(fts_object_t *), patcher_objects_compare_x);
-      
-      /* assign new outlet to receive */
-      for(i=1; i<n_outs; i++)
-	sends[i]->obj = (fts_object_t *)patcher_get_outlet(this, i);
-    }
-}
-
-/***********************************************************************
- *
- * Properties
- *
- */
-
-/* daemon to get the patcher_type property */
-static void 
-patcher_get_patcher_type(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_patcher_t *this = (fts_patcher_t *) obj;
-
-  if (fts_patcher_is_abstraction(this))
-    fts_set_symbol(value, fts_s_abstraction);
-  else if (fts_patcher_is_template(this))
-    fts_set_symbol(value, fts_s_template);
-  else
-    fts_set_symbol(value, fts_s_patcher);
-}
-
-static void 
-patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if( !fts_object_is_error( o))
-    {
-      if( fts_patcher_is_template( (fts_patcher_t *)o) || fts_patcher_is_abstraction( (fts_patcher_t *)o))
-	fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
-      else
-	fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-2, o->argv+2);
-    }  
-  else
-    fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
-}
-
-/*
- * The remote functions
- */
-static void
-patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_object_t *p;
-
-  this->open = 1;
-
-  for(p = this->objects; p ; p = p->next_in_patcher)
-    {
-      if(fts_class_get_method( fts_object_get_class(p), fts_s_update_real_time) != NULL)
-	fts_update_request(p);
-    }
-}
-
-static void 
-patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *) o;
-
-  this->open = 0;
-}
-
-/**
- * This function send all the objects and connections in the patcher that have not
- * yet been uploaded; it is usefull after paste operations.
- */
-static void 
-patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_object_t *p;
-  fts_atom_t a[2];
-
-  /* upload all the not uploaded objects */
-
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    if (!fts_object_has_id(p))
-      fts_client_upload_object( p, -1);
-
-  /* For each object, for each outlet, upload all the not uploaded connections */
-
-  for (p = this->objects; p ; p = p->next_in_patcher)
-    {
-      int outlet;
-
-      for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
-	{
-	  fts_connection_t *c;
-
-	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
-	    if (!fts_object_has_id((fts_object_t *)c))
-	      {
-		((fts_object_t *)c)->patcher = this;
-		fts_client_upload_object((fts_object_t *)c, -1);
-	      }
-	}
-    }
-}
-
-/* Handle geometric properties */
-static void 
-patcher_set_wx( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_put_prop(o, fts_s_wx, at);
-}
-
-static void 
-patcher_set_wy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_put_prop(o, fts_s_wy, at);
-}
-
-static void 
-patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_put_prop(o, fts_s_ww, at);
-  /*  fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
-}
-
-static void 
-patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_put_prop(o, fts_s_wh, at);
-  /*fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
 }
 
 static fts_patcher_t * 
@@ -1463,36 +904,225 @@ patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     fts_client_send_message(o, sym_noHelp, 1, at); 
 }
 
-static void 
-patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+/* find utility */
+static int
+fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av)
 {
-  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)o, ac - 2, at + 2);
-  fts_atom_t a[1];
+  int i,j;
 
-  fts_object_put_prop(obj, fts_s_x, at);
-  fts_object_put_prop(obj, fts_s_y, at+1);
+  for (i = 0; i < (ac - sac + 1); i++)
+    if (fts_atom_equals(&sav[0], &av[i]))
+      {
+	/* Found the beginning, test the rest */
+	
+	for (j = 1; j < sac; j++)
+	  if (! fts_atom_equals(&sav[j], &av[j + i]))
+	    return 0;
 
-  fts_set_int(a, -1);
-  fts_object_put_prop(obj, fts_s_layer, a);
+	return 1;
+      }
 
-  fts_client_upload_object(obj, -1);
+  return 0;
+}
 
-  fts_patcher_set_dirty((fts_patcher_t *)o, 1);
+/* the find engines */
+static void
+patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
+  fts_object_t *p;
+  fts_status_t ret;
+
+  /* see if this should be added */
+  if (fts_atom_is_subsequence(ac - 1, at + 1, o->argc, o->argv))
+    {
+      /* add only if the patcher is not the root patcher or a patcher in the root patcher */
+      if((this != fts_get_root_patcher())&&(o->patcher != fts_get_root_patcher()))
+	fts_objectset_add(set, o);
+    }
+  /* look if the objects in the patchers are to be found */
+  for(p = this->objects; p; p = p->next_in_patcher)
+    {
+      if(!fts_object_is_patcher(p))
+	{
+	  if(!fts_object_is_error(p))
+	    {
+	      fts_method_t find_method = fts_class_get_method(fts_object_get_class(p), fts_s_find);
+
+	      /* send the find message to the object; if the object do not implement it, do the standard check */
+	      if(find_method != NULL)
+		(*find_method)(p, fts_system_inlet, fts_s_find, ac, at);
+	      else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
+		fts_objectset_add(set, p);
+	    }
+	  else if (fts_atom_is_subsequence(ac - 1, at + 1, p->argc, p->argv))
+	    fts_objectset_add(set, p);
+	}
+    }
+
+  /* do the recursive calls  */
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if (fts_object_is_standard_patcher(p) ||
+	  fts_object_is_template(p) ||
+	  fts_object_is_abstraction(p))
+	fts_send_message(p, s, ac, at);
+    }
+}
+
+/* the find errors engines */
+static void
+patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
+  fts_object_t *p;
+
+  /* look if the objects in the patchers are to be found */
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if(fts_object_is_error(p))
+	fts_objectset_add(set, p);
+    }
+
+  /* do the recursive calls  */
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if (fts_object_is_standard_patcher(p) ||
+	  fts_object_is_template(p) ||
+	  fts_object_is_abstraction(p))
+	fts_send_message(p, s, ac, at);
+    }
+}
+
+/*************************************************************
+ *
+ *  patcher upload and updates
+ *
+ */
+static void 
+patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_atom_t a[4];
+  fts_object_t *p;
+
+  if(!fts_object_is_error((fts_object_t *)this))
+    {
+      fts_object_get_prop((fts_object_t *)this, fts_s_wx, a);
+      fts_object_get_prop((fts_object_t *)this, fts_s_wy, a+1);
+      fts_object_get_prop((fts_object_t *)this, fts_s_ww, a+2);
+      fts_object_get_prop((fts_object_t *)this, fts_s_wh, a+3);
+      
+      if( fts_get_int( a) && fts_get_int( a+1) && fts_get_int( a+2) && fts_get_int( a+3))
+	fts_client_send_message((fts_object_t *)this, sym_setPatcherBounds, 4, a);
+      
+      for (p = this->objects; p ; p = p->next_in_patcher)
+	fts_client_upload_object( p, -1);
+      
+      for (p = this->objects; p ; p = p->next_in_patcher)
+	{
+	  int outlet;
+	  
+	  for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
+	    {
+	      fts_connection_t *c;
+	      
+	      for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
+		{
+		  ((fts_object_t *)c)->patcher = this;
+		  fts_client_upload_object( (fts_object_t *)c, -1);
+		}
+	    }
+	}
+
+      fts_client_send_message((fts_object_t *)this, sym_endUpload, 0, 0);
+    }
+}
+
+static void
+patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_object_t *p;
+
+  this->open = 1;
+
+  for(p = this->objects; p ; p = p->next_in_patcher)
+    {
+      if(fts_class_get_method( fts_object_get_class(p), fts_s_update_real_time) != NULL)
+	fts_update_request(p);
+    }
 }
 
 static void 
-fts_patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_patcher_upload_object( o, fts_get_object(&at[0]));
+  fts_patcher_t *this = (fts_patcher_t *) o;
+
+  this->open = 0;
 }
 
-static fts_memorystream_t *patcher_memory_stream ;
-
-static fts_memorystream_t * patcher_get_memory_stream()
+/**
+ * This function send all the objects and connections in the patcher that have not
+ * yet been uploaded; it is usefull after paste operations.
+ */
+static void 
+patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(!patcher_memory_stream)
-    patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_type, NULL, 0, 0);
-  return patcher_memory_stream;
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_object_t *p;
+  fts_atom_t a[2];
+
+  /* upload all the not uploaded objects */
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    if (!fts_object_has_id(p))
+      fts_client_upload_object( p, -1);
+
+  /* for each object, for each outlet, upload all the not uploaded connections */
+  for (p = this->objects; p ; p = p->next_in_patcher)
+    {
+      int outlet;
+
+      for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
+	{
+	  fts_connection_t *c;
+
+	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
+	    if (!fts_object_has_id((fts_object_t *)c))
+	      {
+		((fts_object_t *)c)->patcher = this;
+		fts_client_upload_object((fts_object_t *)c, -1);
+	      }
+	}
+    }
+}
+
+static void 
+patcher_set_wx( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_put_prop(o, fts_s_wx, at);
+}
+
+static void 
+patcher_set_wy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_put_prop(o, fts_s_wy, at);
+}
+
+static void 
+patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_put_prop(o, fts_s_ww, at);
+  /* fts_patcher_set_dirty((fts_patcher_t *)o, 1); */
+}
+
+static void 
+patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_put_prop(o, fts_s_wh, at);
+  /* fts_patcher_set_dirty((fts_patcher_t *)o, 1); */
 }
 
 void 
@@ -1606,17 +1236,32 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
     }
 }
 
-void 
-fts_patcher_redefine_connection(fts_object_t *patcher, fts_connection_t *c)
+static void 
+patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_client_start_message( patcher, sym_redefineConnection);
-  fts_client_add_object( patcher, (fts_object_t *)c);
-  fts_client_add_object( patcher, c->src);
-  fts_client_add_int( patcher, c->woutlet);
-  fts_client_add_object( patcher, c->dst);
-  fts_client_add_int( patcher, c->winlet);
-  fts_client_add_int( patcher, c->type);
-  fts_client_done_message( patcher);
+  fts_patcher_upload_object( o, fts_get_object(&at[0]));
+}
+
+/***********************************************************************
+ *
+ *  add objects from client
+ *
+ */
+static void 
+patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)o, ac - 2, at + 2);
+  fts_atom_t a[1];
+
+  fts_object_put_prop(obj, fts_s_x, at);
+  fts_object_put_prop(obj, fts_s_y, at+1);
+
+  fts_set_int(a, -1);
+  fts_object_put_prop(obj, fts_s_layer, a);
+
+  fts_client_upload_object(obj, -1);
+
+  fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 static void 
@@ -1631,38 +1276,6 @@ patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s
   fts_client_send_message(o, sym_objectRedefined, 1, &a);
 
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
-}
-
-static void 
-patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_memorystream_t *stream;  
-  fts_atom_t a[1];
-
-  if (ac >= 0)
-    {
-      fts_atom_t argv[512];
-      int argc;
-
-      fts_set_symbol(&argv[0], fts_s_patcher);
-
-      for (argc = 1; (argc <= ac) && (argc < 512) ; argc++)
-	argv[argc] = at[argc-1];
-
-      fts_patcher_redefine(this, argc, argv);
-
-      stream = patcher_get_memory_stream();
-      fts_memorystream_reset( stream);
-      fts_spost_object_description_args( (fts_bytestream_t *)stream, argc - 1, argv + 1);
-      fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-      fts_set_string( a,  fts_memorystream_get_bytes( stream));
-      fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, a);
-
-      fts_patcher_set_dirty( this, 1);
-    }
-  else
-    printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, at);
 }
 
 static void 
@@ -1830,44 +1443,442 @@ patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
-static void
-patcher_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_t *this = (fts_patcher_t *)o;
+/***********************************************************************
+ *
+ *  .pat file format saving and loading
+ *
+ */
+static void patcher_save_dotpat_internal( FILE *file, fts_patcher_t *patcher);
+static void patcher_save_dotpat( FILE *file, fts_patcher_t *patcher);
+static void fts_patcher_save_as_dotpat( fts_symbol_t filename, fts_patcher_t *patcher);
 
-  post("coucou!!!\n");
+static int get_int_property( fts_object_t *object, fts_symbol_t property_name)
+{
+  fts_atom_t a;
+
+  fts_object_get_prop( object, property_name, &a);
+  return fts_get_int( &a);
 }
 
+static void 
+patcher_save_dotpat_object_geometry( FILE *file, fts_object_t *object)
+{
+  fprintf( file, "%d ", get_int_property( object, fts_s_x));     /* x */
+  fprintf( file, "%d ", get_int_property( object, fts_s_y));     /* y */
+  fprintf( file, "%d ", get_int_property( object, fts_s_width)); /* width */
+  fprintf( file, "%d", 1); /* font_index, a voir */
+}
+
+static void 
+patcher_save_dotpat_atoms( FILE *file, int ac, const fts_atom_t *at)
+{
+  int i;
+
+  for ( i = 0; i < ac; i++)
+    {
+      if (fts_is_int( at + i ))
+	fprintf( file, " %d", fts_get_int( at + i ));
+      else if (fts_is_float( at + i ))
+	fprintf( file, " %f", fts_get_float( at + i ));
+      else if (fts_is_symbol( at + i ))
+	fprintf( file, " %s", fts_get_symbol( at + i ) );
+    }
+}
+
+static int 
+find_object_index_in_patcher( fts_object_t *object)
+{
+  fts_object_t *o;
+  fts_patcher_t *patcher = fts_object_get_patcher(object);
+  int index = 0;
+  
+  for(o=patcher->objects; o; o=o->next_in_patcher)
+    {
+      if (object == o)
+	return index;
+
+      index++;
+    }
+
+  return -1;
+}
+
+static void 
+patcher_save_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  int type = fts_get_int(at);
+  fts_symbol_t filename = fts_get_symbol(at+1);
+  
+  if(type)
+    fts_save_patcher_as_bmax(filename, o);
+  else
+    fts_patcher_save_as_dotpat(filename, (fts_patcher_t *)o);
+
+  fts_patcher_set_dirty((fts_patcher_t *)o, 0);
+
+  fts_client_send_message(o, sym_setSaved, ac, at);
+}
+
+static void 
+patcher_save_objects( FILE *file, fts_object_t *object)
+{
+  while ( object)
+    {
+      if ( fts_object_is_standard_patcher( object) )
+	{
+	  patcher_save_dotpat( file, (fts_patcher_t *)object);
+
+	  fprintf( file, "#P newobj ");
+	  patcher_save_dotpat_object_geometry( file, object);
+	  fprintf( file, " patcher ");
+	  patcher_save_dotpat_atoms( file, object->argc - 1, object->argv + 1);
+	  fprintf( file, ";\n");
+	}
+      else if ( ! fts_object_is_patcher( object)
+		&& fts_class_get_method( fts_object_get_class(object), fts_s_save_dotpat) != NULL)
+	{
+ 	  fts_atom_t a;
+
+	  fts_set_pointer( &a, file);
+	  fts_send_message( object, fts_s_save_dotpat, 1, &a);
+	}
+      else
+	{
+	  fprintf( file, "#P newex ");
+	  patcher_save_dotpat_object_geometry( file, object);
+	  patcher_save_dotpat_atoms( file, object->argc, object->argv);
+	  fprintf( file, ";\n");
+	}
+
+      object = object->next_in_patcher;
+    }
+}
+
+/* This auxiliary function is used to save the connections in reverse order.
+ * There is no requested order for connections saving, but MAX/Opcode
+ * saves in reverse order, so in order to ease text comparison of files,
+ * we can save in reverse order.
+ *
+ * (apparently, the connection saving order depends from the MAX version...)
+ */
+static void 
+patcher_save_connections( FILE *file, fts_object_t *object, int patcher_object_count)
+{
+  int object_index = 0;
+
+  while ( object)
+    {
+      int outlet;
+
+      for ( outlet = 0; outlet < fts_object_get_outlets_number( object); outlet++)
+	{
+	  fts_connection_t *c;
+
+	  for ( c = object->out_conn[outlet]; c ; c = c->next_same_src)
+	    {
+	      if(fts_connection_get_type(c) > fts_c_hidden) /* don't save hidden connections */
+		{
+		  fprintf( file, "#P connect %d %d %d %d;\n", 
+			   patcher_object_count - 1 - object_index,
+			   outlet, 
+			   patcher_object_count - 1 - find_object_index_in_patcher( c->dst),
+			   c->winlet);
+		}
+	    }
+	}
+
+      object_index++;
+
+      object = object->next_in_patcher;
+    }
+}
+
+static void 
+patcher_save_dotpat( FILE *file, fts_patcher_t *patcher)
+{
+  int x_left, y_top, x_right, y_bottom;
+
+  /* save window properties */
+  x_left = get_int_property( (fts_object_t *)patcher, fts_s_wx);
+  y_top = get_int_property( (fts_object_t *)patcher, fts_s_wy);
+  x_right = x_left + get_int_property( (fts_object_t *)patcher, fts_s_ww);
+  y_bottom = y_top + get_int_property( (fts_object_t *)patcher, fts_s_wh);;
+
+  fprintf( file, "#N vpatcher %d %d %d %d;\n", x_left, y_top, x_right, y_bottom);
+
+  /* save objects */
+  patcher_save_objects( file, patcher->objects);
+
+  /* save connections */
+  patcher_save_connections( file, patcher->objects, fts_patcher_get_objects_count( patcher));
+
+  fprintf( file, "#P pop;\n");
+}
+
+/* 
+ * save a patcher in .pat format:
+ *
+ * (note: this function does not check for nor add a .pat suffix to the file name,
+ * it is left to the user interface)
+ */
+
+static void 
+fts_patcher_save_as_dotpat(fts_symbol_t filename, fts_patcher_t *patcher)
+{
+  FILE *file;
+
+  file = fopen( filename, "wb");
+
+  if ( file != NULL)
+    {
+      fprintf( file, "max v2;\n");
+      patcher_save_dotpat( file, patcher);
+      fclose( file);
+    }
+  else
+    {
+      /* this should be a dialog opened in the user interface */
+      post( "Error: cannot open %s for saving\n", filename );
+    }
+}
+
+/* .pat loading: reorder inlets and outlets regarding their x position in the patcher */
+static int 
+patcher_objects_compare_x(const void *left, const void *right)
+{
+  fts_object_t *obj_left = *((fts_object_t **)left);
+  fts_object_t *obj_right = *((fts_object_t **)right);
+  int x_left, x_right;
+  fts_atom_t a;
+  
+  fts_object_get_prop(obj_left, fts_s_x, &a);
+  x_left = fts_get_int(&a);
+
+  fts_object_get_prop(obj_right, fts_s_x, &a);
+  x_right = fts_get_int(&a);
+
+  return x_left - x_right;
+}
+
+#define MAX_INOUTS 256
+
+void
+fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this)
+{
+  fts_receive_t *receives[MAX_INOUTS];
+  fts_send_t *sends[MAX_INOUTS];
+  fts_object_t *p;
+  int n_ins = 0;
+  int n_outs = 0;
+  int i;
+
+  /* put all inlet receives in an array */
+  for (p=this->objects; p; p=p->next_in_patcher)
+    {
+      if(fts_object_get_class(p) == receive_class)
+	{
+	  fts_receive_t *receive = (fts_receive_t *)p;
+
+	  if(fts_object_get_class(receive->obj) == patcher_inout_class && n_ins < MAX_INOUTS)
+	    {
+	      receives[n_ins] = receive;
+	      n_ins++;
+	    }
+	}
+      else if(fts_object_get_class(p) == send_class)
+	{
+	  fts_send_t *send = (fts_send_t *)p;
+
+	  if(fts_object_get_class(send->obj) == patcher_inout_class && n_outs < MAX_INOUTS)
+	    {
+	      sends[n_outs] = send;
+	      n_outs++;
+	    }
+	}
+    }
+  
+  /* sort receives and assign inlets */
+  if(n_ins > 1)
+    {
+      patcher_redefine_number_of_inlets(this, n_ins);
+
+      /* sort receives */
+      qsort((void *)receives, n_ins, sizeof(fts_object_t *), patcher_objects_compare_x);
+      
+      /* assign new inlet to receive */
+      for(i=1; i<n_ins; i++)
+	receives[i]->obj = (fts_object_t *)patcher_get_inlet(this, i);
+    }
+
+  /* sort sends and assign outlets */
+  if(n_outs > 1)
+    {
+      patcher_redefine_number_of_outlets(this, n_outs);
+
+      /* sort sends */
+      qsort((void *)sends, n_outs, sizeof(fts_object_t *), patcher_objects_compare_x);
+      
+      /* assign new outlet to receive */
+      for(i=1; i<n_outs; i++)
+	sends[i]->obj = (fts_object_t *)patcher_get_outlet(this, i);
+    }
+}
 
 /***********************************************************************
  *
- * Class instantiation
+ *  patcher class and system methods
  *
  */
+
+static void
+patcher_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+  void *propagate_context = fts_get_pointer(at + 1);
+  int n = fts_get_int(at + 2);
+  patcher_inout_t *inlet = this->inlets[n];
+
+  if(inlet)
+    {
+      fts_objectlist_t *targets = fts_channel_get_targets(&inlet->channel);
+      fts_objectlist_cell_t *p;
+      
+      for(p=fts_objectlist_get_head(targets); p; p=fts_objectlist_get_next(p))
+	propagate_fun(propagate_context, fts_objectlist_get_object(p), 0);
+    }
+}
+
+static void 
+patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+
+  if(fts_patcher_is_template( (fts_patcher_t *)o) || fts_patcher_is_abstraction( (fts_patcher_t *)o))
+    fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
+  else if(this->description_ac > 0)
+    fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), this->description_ac, this->description_at);
+}
+
+static void
+patcher_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_message_t *mess = fts_dumper_message_new( dumper, fts_s_set_arguments);
+
+  fts_message_append(mess, this->description_ac, this->description_at);
+  fts_dumper_message_send(dumper, mess);
+}
+
+static void 
+patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  int n_inlets = fts_get_int_arg(ac, at, 0, 0);
+  int n_outlets = fts_get_int_arg(ac, at, 1, 0);
+  fts_atom_t va;
+  int i;
+  
+  /* raw patcher arguments (the FTS object description stays always "jpatcher") */
+  this->description_ac = 0;
+  this->description_at = NULL;
+
+  this->inlets = NULL;
+  this->outlets = NULL;
+
+  this->n_inlets = 0;
+  this->n_outlets = 0;
+
+  fts_patcher_set_standard(this);
+
+  this->args = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
+  fts_object_refer(this->args);
+
+  /* define the "args" name */
+  fts_set_object( &va, (fts_object_t *)this->args);
+  /*fts_name_set_value( this, fts_s_args, &va);*/
+
+  patcher_redefine_number_of_inlets(this, n_inlets);
+  patcher_redefine_number_of_outlets(this, n_outlets);
+
+  this->objects = (fts_object_t *)0;
+  this->open = 0; /* start as closed */
+  this->editor_open = 0; /* start with editor closed */  
+  this->deleted = 0;
+  this->dirty = 0; /* start as saved */
+}
+
+static void 
+patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *) o;
+  fts_object_t *p;
+
+  if(editor_is_open(this))
+    {
+      set_editor_close(this);
+      fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
+    }
+
+  /* If it is a template, remove it from the template instance list */
+  if (fts_patcher_is_template(this))
+    fts_template_remove_instance(fts_patcher_get_template(this), (fts_object_t *) this);
+
+  /* Set the deleted and reset the open flag */
+  this->deleted = 1;
+  this->open = 0;
+
+  while (this->objects)
+    {
+      /* find last object in patcher */
+      p = this->objects;
+      while (p->next_in_patcher)
+	p = p->next_in_patcher;
+      
+      if(fts_dsp_is_active() && fts_is_dsp_object(p))
+	fts_dsp_desactivate();
+
+      fts_object_delete_from_patcher(p);
+    }
+
+  /* delete all the variables */
+  fts_object_release( this->args);
+
+  /* delete the inlets and inlets tables */
+  if (this->inlets)
+    fts_free( this->inlets);
+
+  if (this->outlets)
+    fts_free( this->outlets);
+}
+
 static void
 patcher_instantiate(fts_class_t *cl)
 {
-  /* initialize the class */
   fts_class_init(cl, sizeof(fts_patcher_t), patcher_init, patcher_delete);
-
-  fts_class_message_varargs(cl, fts_s_upload, fts_patcher_upload);
-  fts_class_message_varargs(cl, fts_s_upload_child, fts_patcher_upload_child);
 
   fts_class_message_varargs(cl, fts_s_find, patcher_find);
   fts_class_message_varargs(cl, fts_s_find_errors, patcher_find_errors);
 
+  fts_class_message_varargs(cl, fts_s_dump, patcher_dump);
   fts_class_message_varargs(cl, fts_s_propagate_input, patcher_propagate_input);
+  fts_class_message_varargs(cl, fts_s_spost_description, patcher_spost_description); 
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), patcher_load_init); 
   fts_class_message_varargs(cl, fts_new_symbol("open_help_patch"), patcher_open_help_patch); 
   fts_class_message_varargs(cl, fts_s_save, patcher_save_from_client); 
   fts_class_message_varargs(cl, fts_s_paste, patcher_paste); 
 
+  fts_class_message_varargs(cl, fts_s_set_arguments, patcher_set_arguments);
   fts_class_message_varargs(cl, fts_s_openEditor, patcher_open_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, patcher_destroy_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, patcher_close_editor); 
-  fts_class_message_varargs(cl, fts_new_symbol("show_object"), show_object);
-  fts_class_message_varargs(cl, fts_new_symbol("stop_waiting"), stop_waiting);
+  fts_class_message_varargs(cl, fts_new_symbol("show_object"), patcher_show_object);
+  fts_class_message_varargs(cl, fts_new_symbol("stop_waiting"), patcher_stop_waiting);
+
+  fts_class_message_varargs(cl, fts_s_upload, patcher_upload);
+  fts_class_message_varargs(cl, fts_s_upload_child, patcher_upload_child);
 
   fts_class_message_varargs(cl, fts_new_symbol("start_updates"), patcher_start_updates);
   fts_class_message_varargs(cl, fts_new_symbol("stop_updates"), patcher_stop_updates);
@@ -1882,161 +1893,10 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("add_connection"), patcher_add_connection_from_client);
   fts_class_message_varargs(cl, fts_new_symbol("delete_connection"), patcher_delete_connection_from_client);
   fts_class_message_varargs(cl, fts_new_symbol("redefine_object"), patcher_redefine_object_from_client);
-  fts_class_message_varargs(cl, fts_new_symbol("redefine_patcher"), patcher_redefine_from_client);
-
-  fts_class_message_varargs(cl, fts_s_print, patcher_print);
-
-  fts_class_message_varargs(cl, fts_s_spost_description, patcher_spost_description); 
 
   fts_class_set_default_handler(cl, patcher_input);
   fts_class_outlet_anything(cl, 0);
 }
-
-/*************************************************************
- *
- *  patcher re-definition
- *
- *  fts_patcher_redefine()
- *
- *    Redefine a patcher inplace from a new description in term of "object" description.
- *  
- *    Actually handle the variables; here ins and outs cannot be changed
- *    (for patchers, they do not depend on the description).
- *
- */
-
-/* assign variables to a patcher as found by the expression parser */
-
-fts_patcher_t *
-fts_patcher_redefine(fts_patcher_t *this, int ac, const fts_atom_t *at)
-{
-#if 0
-  fts_object_t *obj;
-  int ac;
-  fts_atom_t at[1024];
-  fts_atom_t a;
-
-  obj = (fts_object_t *) this; 
-
-  /* change the patcher definition */
-  fts_object_set_description(obj, ac, at);
-
-  /* change the patcher definition */
-  fts_object_set_description(obj, ac, at);
-
-  /* eval the expression */
-  e = fts_oldexpression_eval(obj->patcher, ac, at, 1024, at);
-  ac = fts_oldexpression_get_result_count(e);
-
-  if (fts_oldexpression_get_status(e) != FTS_OLDEXPRESSION_OK)
-    {
-      /* set error to expression error */
-      fts_object_set_error(obj, fts_oldexpression_get_msg(e), fts_oldexpression_get_err_arg(e));
-    }
-  else
-    {
-      /* reallocate the args */
-      fts_tuple_set( this->args, ac - 1, at + 1);
-
-      fts_set_object(&a, (fts_object_t *)this->args);
-      fts_variable_restore(this, fts_s_args, &a, obj);
-
-      /* register the patcher as user of the used variables */
-      fts_oldexpression_add_variables_user(e, obj);
-    }
-
-  /* free the expression state structure */
-  fts_oldexpression_state_free(e);
-#endif
-
-  return this;
-}
-
-/*************************************************************
- *
- *  add/remove objects
- *
- *    An object is always added to the end; this is to reduce (or suppress) the
- *    number of redefinitions at loading time (by definition, a non error object
- *    is defined after all the variables it define, so it will be *after* the
- *    variables in the list).
- *
- */
-
-void 
-fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
-{
-  fts_object_t **p;
-
-  obj->patcher = this;
-
-  for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
-    {
-    }
-
-  *p = obj;
-
-  fts_object_refer(obj);
-}
-
-void 
-fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
-{
-  fts_object_t **p;
-
-  for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
-    if (*p == obj)
-      {
-	fts_object_t *remove = *p;
-
-	*p = obj->next_in_patcher;
-
-	fts_object_release(remove);
-
-	return;
-      }
-}
-
-int 
-fts_patcher_get_objects_count(fts_patcher_t *this)
-{
-  int i = 0;
-  fts_object_t *p;	
-
-  for (p = this->objects; p; p = p->next_in_patcher)
-    i++;
-
-  return i;
-}
-
-/* set a patch as dirty or as saved: if this patcher is a sub-patcher propagate the set_dirty to his father
- * until a firts level patche is reached.
- * A "setDirty" message is sent to the client after is_dirty flag changed
- */
-void 
-fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty)
-{
-  if(this == fts_get_root_patcher()) return;
-
-  if( ((fts_object_t *)this)->patcher != fts_get_root_patcher())
-    fts_patcher_set_dirty( ((fts_object_t *)this)->patcher, is_dirty);
-  else
-    {
-      if(this->dirty != is_dirty)
-	{
-	  this->dirty = is_dirty;
-
-	  if (editor_is_open(this))
-	    {
-	      fts_atom_t a[1];
-  
-	      fts_set_int(&a[0], is_dirty);
-	      fts_client_send_message((fts_object_t *)this, fts_s_set_dirty, 1, a);
-	    }
-	}
-    }
-}
-
 
 /*************************************************************
  *
@@ -2098,7 +1958,7 @@ fts_patcher_get_top_level(fts_patcher_t *patcher)
 
 /***********************************************************************
  *
- * Initialization/shutdown
+ * initialization/shutdown
  *
  */
 
@@ -2128,7 +1988,7 @@ void fts_kernel_patcher_init(void)
   sym_endPaste = fts_new_symbol("endPaste");
   sym_noHelp = fts_new_symbol("noHelp");
 
-  patcher_class = fts_class_install(fts_s_patcher, patcher_instantiate);
+  patcher_class = fts_class_install(fts_s_jpatcher, patcher_instantiate);
   patcher_inout_class = fts_class_install(NULL, patcher_inout_instantiate);
 
   receive_class = fts_class_install(fts_s_receive, receive_instantiate);

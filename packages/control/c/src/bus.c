@@ -159,7 +159,7 @@ throw_instantiate(fts_class_t *cl)
 
   fts_class_inlet_varargs(cl, 1, throw_set_channel);
   fts_class_inlet(cl, 1, bus_type, throw_set_channel);
-  fts_class_inlet_number(cl, 0, access_set_index);
+  fts_class_inlet_number(cl, 1, access_set_index);
 }
 
 /*****************************************************************************
@@ -224,6 +224,8 @@ catch_instantiate(fts_class_t *cl)
   fts_class_inlet_varargs(cl, 0, catch_set_channel);
   fts_class_inlet(cl, 0, bus_type, catch_set_channel);
   fts_class_inlet_number(cl, 0, access_set_index);
+
+  fts_class_outlet_anything(cl, 0);
 }
 
 /*****************************************************************************
@@ -266,6 +268,10 @@ static void
 bus_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(bus_t), bus_init, bus_delete);
+
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+
+  fts_class_inlet_anything(cl, 0);
 }
 
 void

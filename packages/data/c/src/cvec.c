@@ -587,28 +587,6 @@ cvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 }
 
-static void
-cvec_set_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  cvec_t *this = (cvec_t *)o;
-
-  if(fts_is_symbol(value))
-    {
-      fts_symbol_t keep = fts_get_symbol(value);
-
-      if(keep != fts_s_no)
-	fts_object_signal_runtime_error(o, "no persistence for cvec");
-    }
-}
-
-static void
-cvec_get_keep(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  cvec_t *this = (cvec_t *)o;
-
-  fts_set_symbol(value, data_object_get_keep((data_object_t *)o));
-}
-
 /*********************************************************
  *
  *  class
@@ -619,12 +597,12 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   cvec_t *this = (cvec_t *)o;
   
+  data_object_init(o);
+
   this->values = 0;
   this->m = 0;
   this->n = 2;
   this->alloc = 0;
-  data_object_set_keep((data_object_t *)o, fts_s_no);
-
 
   if(ac == 0)
     cvec_set_size(this, 0);
@@ -640,14 +618,15 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       cvec_set_size(this, size);
       cvec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
-      data_object_set_keep((data_object_t *)o, fts_s_args);
+
+      data_object_persistence_args(o);
     }
   else if(ac > 1)
     {
       cvec_set_size(this, ac);
       cvec_set_with_onset_from_atoms(this, 0, ac, at);
 
-      data_object_set_keep((data_object_t *)o, fts_s_args);
+      data_object_persistence_args(o);
     }
   else
     fts_object_set_error(o, "bad arguments for cvec constructor");
@@ -667,13 +646,14 @@ cvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(cvec_t), cvec_init, cvec_delete);
   
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  /* fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence); */
+  /* fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); */
+  
   fts_class_message_varargs(cl, fts_s_post, cvec_post); 
   fts_class_message_varargs(cl, fts_s_print, cvec_print); 
   fts_class_message_varargs(cl, fts_s_set_from_instance, cvec_set_from_instance);
 
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, cvec_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, cvec_get_keep);
-  
   fts_class_message_varargs(cl, fts_s_fill, cvec_fill); 
   fts_class_message_varargs(cl, fts_s_set, cvec_set_elements);
 

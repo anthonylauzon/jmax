@@ -183,7 +183,7 @@ static void udpreceive_receive( fts_object_t *o, int winlet, fts_symbol_t s, int
 {
   udpreceive_t *this = (udpreceive_t *)o;
   fts_atom_t argv[MAXATOMS];
-  fts_symbol_t selector = fts_s_list;
+  fts_symbol_t selector = NULL;
   int size, i, argc, first_token;
   protodecode_t pr;
 

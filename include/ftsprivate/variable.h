@@ -23,11 +23,13 @@
 #ifndef _FTS_PRIVATE_VARIABLE_H_
 #define _FTS_PRIVATE_VARIABLE_H_
 
+typedef struct fts_definition_listener fts_definition_listener_t;
+
 struct fts_definition
 {
   fts_symbol_t name;
   fts_atom_t value;
-  fts_objectlist_t listeners;
+  fts_definition_listener_t *listeners;
 };
 
 #define fts_definition_get_name(d) ((d)->name)

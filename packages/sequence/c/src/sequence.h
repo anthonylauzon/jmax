@@ -52,6 +52,8 @@ typedef struct _sequence_
 { 
   fts_object_t o;
 
+  int persistence;
+
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
 
@@ -59,8 +61,6 @@ typedef struct _sequence_
 
   int open; /* flag: is 1 if sequence editor is open */
   track_t *last_track; /* last created track */
-
-  fts_symbol_t keep;
 } sequence_t;
 
 #define sequence_get_size(s) ((s)->size)

@@ -113,6 +113,3 @@ FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 #define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)
 
 FTS_API fts_package_t *fts_object_get_package(fts_object_t *obj);
-
-FTS_API fts_symbol_t fts_object_get_name(fts_object_t *obj);
-

@@ -32,6 +32,7 @@
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
 
-extern void fts_object_set_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void fts_object_set_name(fts_object_t *obj, fts_symbol_t sym);
+extern fts_symbol_t fts_object_get_name(fts_object_t *obj);
 
 #endif

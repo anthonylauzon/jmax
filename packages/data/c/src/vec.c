@@ -162,40 +162,49 @@ static void
 vec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
-  fts_atom_t *values = vec_get_ptr(this);
-  int size = vec_get_size(this);
-  fts_message_t *mess;
-  int i;
 
-  /* send size message */
-  mess = fts_dumper_message_new(dumper, fts_s_size);  
-  fts_message_append_int(mess, size);
-  fts_dumper_message_send(dumper, mess);
-
-  /* get new set message and append onset 0 */
-  mess = fts_dumper_message_new(dumper, fts_s_set);
-  fts_message_append_int(mess, 0);
-  
-  for(i=0; i<size; i++)
+  if(data_object_is_persistent(o))
     {
-      if(fts_is_object(values + i))
-	fts_message_append_int(mess, 0);
-      else
-	fts_message_append(mess, 1, values + i);
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
+      fts_atom_t *values = vec_get_ptr(this);
+      int size = vec_get_size(this);
+      fts_message_t *mess;
+      int i;
       
-      if(fts_message_get_ac(mess) >= 256)
-	{
-	  fts_dumper_message_send(dumper, mess);
+      /* save persistence flag */
+      mess = fts_dumper_message_new(dumper, fts_s_persistence);
+      fts_message_append_int(mess, 1);
+      fts_dumper_message_send(dumper, mess);
 
-	  /* new set message and append onset i + 1 */
-	  mess = fts_dumper_message_new(dumper, fts_s_set);
-	  fts_message_append_int(mess, i + 1);
+      /* send size message */
+      mess = fts_dumper_message_new(dumper, fts_s_size);  
+      fts_message_append_int(mess, size);
+      fts_dumper_message_send(dumper, mess);
+      
+      /* get new set message and append onset 0 */
+      mess = fts_dumper_message_new(dumper, fts_s_set);
+      fts_message_append_int(mess, 0);
+      
+      for(i=0; i<size; i++)
+	{
+	  if(fts_is_object(values + i))
+	    fts_message_append_int(mess, 0);
+	  else
+	    fts_message_append(mess, 1, values + i);
+	  
+	  if(fts_message_get_ac(mess) >= 256)
+	    {
+	      fts_dumper_message_send(dumper, mess);
+	      
+	      /* new set message and append onset i + 1 */
+	      mess = fts_dumper_message_new(dumper, fts_s_set);
+	      fts_message_append_int(mess, i + 1);
+	    }
 	}
+      
+      if(fts_message_get_ac(mess) > 1) 
+	fts_dumper_message_send(dumper, mess);
     }
-  
-  if(fts_message_get_ac(mess) > 1) 
-    fts_dumper_message_send(dumper, mess);
 }
 
 /********************************************************
@@ -354,7 +363,7 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   vec_t *this = (vec_t *)o;
 
-  data_object_set_keep((data_object_t *)o, fts_s_no);
+  data_object_init(o);
 
   if(ac == 0)
     mat_set_size((mat_t *)this, 0, 0);
@@ -368,14 +377,14 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       mat_set_size((mat_t *)this, size, 1);
       vec_set_with_onset_from_atoms(this, 0, size, fts_tuple_get_atoms(tup));
 
-      data_object_set_keep((data_object_t *)o, fts_s_args);
+      data_object_persistence_args(o);
     }
   else if(ac > 1)
     {
       mat_set_size((mat_t *)this, ac, 1);
       vec_set_with_onset_from_atoms(this, 0, ac, at);
 
-      data_object_set_keep((data_object_t *)o, fts_s_args);
+      data_object_persistence_args(o);
     }
   else
     fts_object_set_error(o, "bad arguments");
@@ -395,6 +404,10 @@ vec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(vec_t), vec_init, vec_delete);
   
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
+  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+
   fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);
   fts_class_message_varargs(cl, fts_s_set_from_array, vec_set_from_array);
 
@@ -403,10 +416,7 @@ vec_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_post, vec_post); 
   fts_class_message_varargs(cl, fts_s_print, vec_print); 
-  
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-  
+    
   fts_class_message_varargs(cl, fts_s_fill, vec_fill);      
   fts_class_message_varargs(cl, fts_s_set, vec_set_elements);
   

@@ -233,18 +233,50 @@ static void
 param_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
 
-  if(fts_is_tuple(&this->value))
+  if(this->persistence == 1)
     {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&this->value);
-      int n = fts_tuple_get_size(tuple);
-      const fts_atom_t *a = fts_tuple_get_atoms(tuple);
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+      fts_atom_t a;
 
-      fts_dumper_send(dumper, fts_s_set, n, a);
+      /* save persistence flag */
+      fts_set_int(&a, 1);
+      fts_dumper_send(dumper, fts_s_persistence, 1, &a);
+      
+      if(fts_is_tuple(&this->value))
+	{
+	  fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&this->value);
+	  int size = fts_tuple_get_size(tuple);
+	  const fts_atom_t *atoms = fts_tuple_get_atoms(tuple);
+	  
+	  fts_dumper_send(dumper, fts_s_set, size, atoms);
+	}
+      else
+	fts_dumper_send(dumper, fts_s_set, 1, &this->value);    
     }
-  else
-    fts_dumper_send(dumper, fts_s_set, 1, &this->value);    
+}
+
+static void
+param_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+
+  if(this->persistence >= 0)
+    {
+      fts_atom_t a;
+      
+      fts_set_int(&a, this->persistence);
+      fts_client_send_message(o, fts_s_persistence, 1, &a);
+    }
+}
+
+static void
+param_set_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+
+  if(fts_is_number(at) && this->persistence >= 0)
+    this->persistence = fts_get_number_int(at);
 }
 
 /********************************************************************
@@ -259,9 +291,13 @@ param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_param_t *this = (fts_param_t *)o;
 
   fts_set_void(&this->value);
-  this->keep = fts_s_no;
+  this->persistence = 0;
 
-  param_set_atoms(o, 0, 0, ac, at);
+  if(ac > 0)
+    {
+      param_set_atoms(o, 0, 0, ac, at);
+      this->persistence = -1;    
+    }
 }
 
 static void
@@ -273,29 +309,16 @@ param_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-param_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_param_t *this = (fts_param_t *)obj;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-param_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_param_t *this = (fts_param_t *)obj;
-
-  fts_set_symbol(value, this->keep);
-}
-
-static void
 param_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_param_t), param_init, param_delete);
 
-  fts_class_message_varargs(cl, fts_s_post, param_post);
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_persistence, param_set_persistence);
+  fts_class_message_varargs(cl, fts_s_update_gui, param_update_gui); 
 
+  fts_class_message_varargs(cl, fts_s_post, param_post);
+  
   fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
   fts_class_message_varargs(cl, fts_s_set, param_set_atoms);
   fts_class_message_varargs(cl, fts_s_dump, param_dump);
@@ -311,9 +334,6 @@ param_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_bang, param_update);
   fts_class_message_varargs(cl, fts_s_clear, param_clear);
-  
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, param_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, param_get_keep);
   
   fts_class_inlet_varargs(cl, 0, param_input_atoms);
   fts_class_outlet_varargs(cl, 0);

@@ -560,24 +560,33 @@ static void
 bpf_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  int size = bpf_get_size(this);
-  fts_message_t *mess;
-  int i;
   
-  /* first message will be send */
-  mess = fts_dumper_message_new(dumper, fts_s_set);
-
-  for(i=0; i<size; i++)
+  if(data_object_is_persistent(o))
     {
-      double time = this->points[i].time;
-      double value = this->points[i].value;
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+      int size = bpf_get_size(this);
+      fts_message_t *mess;
+      int i;
+
+      /* save persistence flag */
+      mess = fts_dumper_message_new(dumper, fts_s_persistence);
+      fts_message_append_int(mess, 1);
+      fts_dumper_message_send(dumper, mess);
+
+      /* first message will be send */
+      mess = fts_dumper_message_new(dumper, fts_s_set);
       
-      fts_message_append_float(mess, time);
-      fts_message_append_float(mess, value);
+      for(i=0; i<size; i++)
+	{
+	  double time = this->points[i].time;
+	  double value = this->points[i].value;
+	  
+	  fts_message_append_float(mess, time);
+	  fts_message_append_float(mess, value);
+	}
+      
+      fts_dumper_message_send(dumper, mess);
     }
-  
-  fts_dumper_message_send(dumper, mess);
 }
 
 /************************************************************
@@ -591,6 +600,8 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 { 
   bpf_t *this = (bpf_t *)o;
 
+  data_object_init(o);
+
   this->points = 0;
   this->alloc = 0;
   this->size = 0;
@@ -599,7 +610,8 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   if(ac > 0)
     {
       bpf_set(o, 0, 0, ac, at);
-      data_object_set_keep((data_object_t *)o, fts_s_args);
+
+      data_object_persistence_args(o);
     }
   else
     {
@@ -607,8 +619,6 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       
       this->points[0].time = 0.0;
       this->points[0].value = 0.0;
-
-      data_object_set_keep((data_object_t *)o, fts_s_no);
     }
 }
 
@@ -629,6 +639,10 @@ bpf_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(bpf_t), bpf_init, bpf_delete);
   
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
+  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+
   fts_class_message_varargs(cl, fts_s_set_from_instance, bpf_set_from_instance);
   fts_class_message_varargs(cl, fts_s_dump, bpf_dump);
   
@@ -645,9 +659,6 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("add_point"), bpf_add_point_by_client_request);
   fts_class_message_varargs(cl, fts_new_symbol("remove_points"), bpf_remove_points_by_client_request);
   fts_class_message_varargs(cl, fts_new_symbol("set_points"), bpf_set_points_by_client_request);
-  
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   
   fts_class_message_varargs(cl, fts_s_clear, bpf_set_clear);
   fts_class_message_varargs(cl, fts_s_set, bpf_set);

@@ -148,12 +148,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  ((FtsPatcherObject)obj).addConnection( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineConnection"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsPatcherObject)obj).redefineConnection( args.getLength(), args.getAtoms());
-	}
-      });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("objectRedefined"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -624,7 +618,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     args.addRawString( description);
       
     try{
-      send( FtsSymbol.get("redefine_patcher"), args);
+      send( FtsSymbol.get("set_arguments"), args);
     }
     catch(IOException e)
       {
@@ -939,14 +933,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	if( pasting)
 	  ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.addPastedConnection( gc);
       }
-  }
-
-  public void redefineConnection(int nArgs , FtsAtom args[])
-  {
-    FtsConnection connection = (FtsConnection) args[0].objectValue;
-    connection.redefine((FtsGraphicObject)args[1].objectValue, args[2].intValue, 
-			(FtsGraphicObject)args[3].objectValue, args[4].intValue, 
-			args[5].intValue);
   }
 
   public void releaseConnection(FtsConnection c)

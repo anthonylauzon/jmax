@@ -210,7 +210,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 
 	  if(meth)
 	    {
-	      (*meth)(eval_data->obj, fts_system_inlet, selector, ac, at);
+	      (*meth)(eval_data->obj, fts_system_inlet, selector, ac - 1, at + 1);
 
 	      if(fts_object_get_error(eval_data->obj) == NULL)
 		return fts_ok;
@@ -389,13 +389,6 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
     }
 }
 
-void
-fts_object_set_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac > 0 && fts_is_symbol(at))
-    fts_object_set_name(o, fts_get_symbol(at));
-}
-
 fts_symbol_t 
 fts_object_get_name(fts_object_t *obj)
 {
@@ -528,43 +521,19 @@ fts_object_delete_from_patcher(fts_object_t *obj)
 fts_object_t *
 fts_object_recompute(fts_object_t *old)
 {
-  fts_object_t *obj;
-  int old_id = fts_object_get_id( old);
-
-  /* If the object being redefined is a standard patcher,
-     redefine it using a patcher function, otherwise with 
-     the object function.
-  */
-  if (fts_object_is_standard_patcher(old))
-    obj = (fts_object_t *) fts_patcher_redefine((fts_patcher_t *) old, old->argc, old->argv);
-  else
-    {
-      obj = fts_object_redefine(old, old->argc, old->argv);
-
-      /* Error property handling; currently it is a little bit
-	 of an hack beacause we need a explit "zero"  error
-	 property on a non error redefined object; actually
-	 the error property daemon should be a global daemon !
-      */
-
-      if(obj != NULL && old_id != FTS_NO_ID)
-	{
-	  fts_client_upload_object(obj, -1);
-	  fts_client_upload_object_connections(obj);
-	}
-    }
-
-  return obj;
+  return fts_object_redefine(old, old->argc, old->argv);
 }
-
 
 fts_object_t *
 fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 {
+  int old_id = fts_object_get_id( old);
+
   /* redefine object if not scheduled for removal */
-  if( fts_object_get_id( old) != FTS_DELETE)
+  if(old_id != FTS_DELETE)
     {
-      fts_object_t  *new;
+      fts_symbol_t name = fts_object_get_name(old);
+      fts_object_t *new;
       
       /* unbind variables from old object */
       fts_object_unbind(old);
@@ -586,15 +555,21 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 	  fts_error_object_fit_outlet(new, old->n_outlets - 1);
 	}
       
-      /* 1. move the properties
-       * 2. upload the object (so the properties will be known to the client)
-       * 3. move the connections (the object need to be uploaded in order to move the connections) 
-       */
+      /* move graphic properties from old to new object */
       fts_object_move_properties(old, new);
       
       /* move the connections from the old to the new object */
       fts_object_move_connections(old, new);
       
+      /* set name of new object */
+      if(name != NULL)
+	{
+	  fts_atom_t a;
+
+	  fts_set_symbol(&a, name);
+	  fts_send_message(new, fts_s_set_name, 1, &a);
+	}
+
       /* remove old from client and update list */
       fts_object_unclient(old);
       fts_update_reset(old);
@@ -606,17 +581,21 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       if(old->patcher)
 	fts_patcher_remove_object(old->patcher, old);
       
-      
+      /* destroy or  */
       if(old->refcnt == 1)
 	fts_object_free(old);
       else
 	{
+	  old->refcnt--;
 	  old->patcher = NULL;
-	  fts_object_signal_runtime_error(old, "referenced %s object deleted from patcher", fts_object_get_class_name(old));
 	}
 
-      fts_client_upload_object(new, -1);
-      fts_client_upload_object_connections(new);
+      /* upload new object if old object was uploaded */
+      if(old_id != FTS_NO_ID)
+	{
+	  fts_client_upload_object(new, -1);
+	  fts_client_upload_object_connections(new);
+	}
       
       return new;
     }

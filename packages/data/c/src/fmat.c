@@ -1187,31 +1187,40 @@ static void
 fmat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  float *data = this->values;
-  int m = fmat_get_m(this);
-  int n = fmat_get_n(this);
-  int size = m * n;
-  fts_message_t *mess;
-  int i, j;
 
-  /* dump size message */
-  mess = fts_dumper_message_new(dumper, fts_s_size);  
-  fts_message_append_int(mess, m);
-  fts_message_append_int(mess, n);
-  fts_dumper_message_send(dumper, mess);
-
-  for(i=0; i<m; i++)
+  if(data_object_is_persistent(o))
     {
-      /* new row */
-      mess = fts_dumper_message_new(dumper, fts_s_row);  
-      fts_message_append_int(mess, i);
-  
-      for(j=0; j<n; j++)
-	{
-	  float f = data[i * n + j];
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+      float *data = this->values;
+      int m = fmat_get_m(this);
+      int n = fmat_get_n(this);
+      int size = m * n;
+      fts_message_t *mess;
+      int i, j;
+      
+      /* save persistence flag */
+      mess = fts_dumper_message_new(dumper, fts_s_persistence);
+      fts_message_append_int(mess, 1);
+      fts_dumper_message_send(dumper, mess);
 
-	  fts_message_append_float(mess, f);
+      /* dump size message */
+      mess = fts_dumper_message_new(dumper, fts_s_size);  
+      fts_message_append_int(mess, m);
+      fts_message_append_int(mess, n);
+      fts_dumper_message_send(dumper, mess);
+      
+      for(i=0; i<m; i++)
+	{
+	  /* new row */
+	  mess = fts_dumper_message_new(dumper, fts_s_row);  
+	  fts_message_append_int(mess, i);
+	  
+	  for(j=0; j<n; j++)
+	    {
+	      float f = data[i * n + j];
+	      
+	      fts_message_append_float(mess, f);
+	    }
 	}
     }
 }
@@ -1225,8 +1234,8 @@ static void
 fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
-  
-  data_object_set_keep((data_object_t *)o, fts_s_no);
+
+  data_object_init(o);
 
   if(ac == 0)
     fmat_set_size(this, 0, 0);
@@ -1267,7 +1276,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fmat_set_const(this, 0.0);
       fmat_set_from_tuples(this, ac, at);
 
-      data_object_set_keep((data_object_t *)o, fts_s_args);
+      data_object_persistence_args(o);
     }
   else
     fts_object_set_error(o, "bad arguments");
@@ -1286,15 +1295,16 @@ fmat_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fmat_t), fmat_init, fmat_delete);
   
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
+  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+
   fts_class_message_varargs(cl, fts_s_post, fmat_post); 
   fts_class_message_varargs(cl, fts_s_print, fmat_print); 
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, fmat_set_from_instance);
   fts_class_message_varargs(cl, fts_s_dump, fmat_dump);
   
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill);
   fts_class_message_varargs(cl, fts_s_set, fmat_set_elements);
   fts_class_message_varargs(cl, fts_s_row, fmat_set_row_elements);

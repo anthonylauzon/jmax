@@ -62,11 +62,7 @@ extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
 
-extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot);
-
 extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
-
-extern void fts_patcher_redefine_connection(fts_object_t *this, fts_connection_t *c);
 
 extern fts_patcher_t *fts_patcher_get_top_level(fts_patcher_t *patcher);
 

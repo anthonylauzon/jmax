@@ -29,7 +29,7 @@
 
 typedef struct _value_
 {
-  data_object_t o;
+  fts_object_t o;
   fts_atom_t a;		
 } value_t;
 

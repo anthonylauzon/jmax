@@ -25,6 +25,7 @@
 typedef struct 
 {
   fts_object_t o;
+  int persistence;
   fts_object_t **objects;
   fts_hashtable_t hash;
   int n_objects;

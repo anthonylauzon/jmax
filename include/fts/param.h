@@ -34,9 +34,9 @@ typedef struct fts_param_listener
 typedef struct fts_param
 {
   fts_object_t o;
+  int persistence;
   fts_atom_t value;
   fts_param_listener_t *listeners;
-  fts_symbol_t keep;
 } fts_param_t;
 
 FTS_API void fts_param_add_listener(fts_param_t *param, fts_object_t *object, fts_method_t method);

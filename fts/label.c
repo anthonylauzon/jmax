@@ -105,17 +105,15 @@ void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t pr
  *
  */
 
-static fts_hashtable_t *default_labels = 0;
 fts_class_t *fts_label_class = 0;
 
 fts_label_t *
-fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
+fts_label_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
 {
+  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
   fts_atom_t *value = fts_name_get_value(scope, name);
-  fts_label_t *label = NULL;
-  fts_atom_t key, a;
-  
-  fts_set_symbol(&key, name);
+  fts_label_t *label;
+  fts_atom_t a[2];
 
   if(fts_is_object(value))
     {
@@ -125,50 +123,24 @@ fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 	return (fts_label_t *)obj;
     }
 
-  if(default_labels == 0)
-    {
-      /* create hashtable if not existing yet */
-      default_labels = (fts_hashtable_t *) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init( default_labels, NULL, FTS_HASHTABLE_MEDIUM);
-    }
-  else if(fts_hashtable_get(default_labels, &key, &a))
-    return (fts_label_t *)fts_get_object(&a);
-
-  /* if there wasn't a variable nor a default, make a default */
-  fts_set_void(&a);
-  label = (fts_label_t *)fts_object_create(fts_label_class, NULL, 1, &a);
+  /*  create new label */
+  fts_set_object(a + 0, (fts_object_t *)scope);
+  fts_set_symbol(a + 1, name);
+  label = (fts_label_t *)fts_object_create(fts_label_class, NULL, 2, a);
   
-  fts_set_object(&a, (fts_object_t *)label);
-  fts_hashtable_put(default_labels, &key, &a);
-  
-  fts_object_refer((fts_object_t *)label);
-
   return label;
 }
 
 fts_label_t *
-fts_label_get(fts_patcher_t *scope, fts_symbol_t name)
+fts_label_get(fts_patcher_t *patcher, fts_symbol_t name)
 {
-  fts_atom_t *value = fts_name_get_value(scope, name);
-  fts_label_t *label = 0;
+  fts_atom_t *value = fts_name_get_value(patcher, name);
+  fts_label_t *label = NULL;
   
   if(value && fts_is_object(value) && fts_object_get_class(fts_get_object(value)))
     label = (fts_label_t *)fts_get_object(value);
-  else if(default_labels)
-    {
-      fts_atom_t a, key;
 
-      fts_set_symbol(&key, name);
-
-      if(fts_hashtable_get(default_labels, &key, &a))
-	label = (fts_label_t *)fts_get_object(&a);
-    }
-  
-  /* don't return unconnected default labels */
-  if(label && fts_channel_has_target(fts_label_get_channel(label)))
-    return label;
-  else
-    return 0;
+  return label;
 }
 
 static void
@@ -209,8 +181,25 @@ static void
 label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_label_t *this = (fts_label_t *) o;
+  fts_patcher_t *scope = (fts_patcher_t *)fts_get_object(at);
+  fts_symbol_t name = fts_name_get_unused(scope, fts_get_symbol(at + 1));
+  fts_atom_t a;
 
   fts_channel_init(&this->channel);
+
+  fts_set_object(&a, o);
+  fts_name_set_value(scope, name, &a);
+
+  this->scope = scope;
+  this->name = name;
+}
+
+static void
+label_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_label_t *this = (fts_label_t *) o;
+
+  fts_name_reset(this->scope, this->name);
 }
 
 static void
@@ -226,7 +215,7 @@ label_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 static void
 label_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_label_t), label_init, 0);
+  fts_class_init(cl, sizeof(fts_label_t), label_init, label_delete);
 
   fts_class_message_varargs(cl, fts_s_propagate_input, label_propagate_input);
   fts_class_message_varargs(cl, fts_s_find_friends, label_find_friends);

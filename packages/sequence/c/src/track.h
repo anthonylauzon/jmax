@@ -38,6 +38,8 @@ struct _track_
 { 
   fts_object_t o;
 
+  int persistence;
+
   struct _sequence_ *sequence; /* sequence of track */
   track_t *next; /* list of tracks in sequence */
 
@@ -48,7 +50,6 @@ struct _track_
   event_t *first; /* pointer to first event */
   event_t *last; /* pointer to last event */
   int size; /* # of events in track */
-  fts_symbol_t keep;
 };
 
 #define track_set_sequence(t, s) ((t)->sequence = (s))

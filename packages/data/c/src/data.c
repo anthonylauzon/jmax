@@ -40,29 +40,52 @@ extern void getrange_config(void);
 extern void dumpfile_config(void);
 
 void 
+data_object_init(fts_object_t *o)
+{
+  data_object_t *this = (data_object_t *)o;
+  
+  this->persistence = data_object_persistence_no;
+}
+
+void 
 data_object_set_dirty(fts_object_t *o)
 {
+  data_object_t *this = (data_object_t *)o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
   
-  if(patcher != NULL && data_object_get_keep((data_object_t *)o) == fts_s_yes)
+  if(patcher != NULL && data_object_is_persistent(o))
     fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 void
-data_object_daemon_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  data_object_t *this = (data_object_t *)obj;
+  data_object_t *this = (data_object_t *)o;
 
-  if(fts_is_symbol(value) && this->keep != fts_s_args)
-    this->keep = fts_get_symbol(value);
+  if(ac > 0)
+    {
+      /* set persistence flag (if its not set to args) */
+      if(fts_is_number(at) && this->persistence > data_object_persistence_args)
+	this->persistence = (fts_get_number_int(at) != 0);
+    }
+  else
+    {
+      /* return persistence flag */
+      fts_atom_t a;
+
+      fts_set_int(&a, this->persistence);
+      fts_return(&a);
+    }
 }
 
 void
-data_object_daemon_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  data_object_t *this = (data_object_t *)obj;
+  data_object_t *this = (data_object_t *)o;
+  fts_atom_t a;
 
-  fts_set_symbol(value, this->keep);
+  fts_set_int(&a, (this->persistence > data_object_persistence_no));
+  fts_client_send_message(o, fts_s_persistence, 1, &a);
 }
 
 void

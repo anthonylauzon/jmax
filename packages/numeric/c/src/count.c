@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell.
  *
  */
 
@@ -255,19 +255,6 @@ count_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-count_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  if(fts_is_tuple(value))
-    {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(value);
-
-      count_set(o, 0, 0, fts_tuple_get_size(tuple), fts_tuple_get_atoms(tuple));
-    }
-  else if(fts_is_number(value))
-    count_set_value(o, 0, 0, 1, value);
-}
-
-static void
 count_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   count_t *this = (count_t *)o;
@@ -276,34 +263,54 @@ count_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-count_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_mode_clip(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_t *this = (count_t *)o;
-  fts_symbol_t mode = fts_get_symbol(at);
   double step = (this->begin < this->end)? this->step: -this->step;
 
   this->value -= step * this->reverse;
 
-  if(mode == sym_clip)
-    {
-      this->mode = mode_clip;
-      this->reverse = 1.0;
-    }
-  else if(mode == sym_wrap)
-    {
-      this->mode = mode_wrap;
-      this->reverse = 1.0;
-    }
-  else if(mode == sym_reverse)
-    this->mode = mode_reverse;
+  this->mode = mode_clip;
+  this->reverse = 1.0;  
 
   this->value += step * this->reverse;
 }
 
 static void
-count_set_mode_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+count_mode_wrap(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  count_set_mode(o, 0, 0, 1, value);
+  count_t *this = (count_t *)o;
+  double step = (this->begin < this->end)? this->step: -this->step;
+
+  this->value -= step * this->reverse;
+
+  this->mode = mode_wrap;
+  this->reverse = 1.0;  
+
+  this->value += step * this->reverse;
+}
+
+static void
+count_mode_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  count_t *this = (count_t *)o;
+  double step = (this->begin < this->end)? this->step: -this->step;
+
+  this->mode = mode_reverse;
+}
+
+static void
+count_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  count_t *this = (count_t *)o;
+  fts_symbol_t mode = fts_get_symbol(at);
+
+  if(mode == sym_clip)
+    count_mode_clip(o, 0, 0, 0, 0);
+  else if(mode == sym_wrap)
+    count_mode_clip(o, 0, 0, 0, 0);
+  else if(mode == sym_reverse)
+    this->mode = mode_reverse;
 }
 
 /************************************************************
@@ -327,7 +334,7 @@ count_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->value = 0.0;
   this->begin = 0.0;
   this->end = 0.5 * DBL_MAX;
-  this->step = 0.01;
+  this->step = 1.0;
   this->reverse = 1.0;
   this->is_int = is_int;
 
@@ -340,11 +347,11 @@ count_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(count_t), count_init, 0);
   
-  fts_class_message_varargs(cl, fts_new_symbol("mode"), count_set_mode);
-  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), count_set_mode_prop);
-  
+  fts_class_message_varargs(cl, fts_new_symbol("mode"), count_set_mode);  
+  fts_class_message_varargs(cl, fts_new_symbol("wrap"), count_mode_wrap);
+  fts_class_message_varargs(cl, fts_new_symbol("clip"), count_mode_clip);
+  fts_class_message_varargs(cl, fts_new_symbol("reverse"), count_mode_reverse);
   fts_class_message_varargs(cl, fts_s_set, count_set);
-  
   fts_class_message_varargs(cl, fts_new_symbol("reset"), count_reset);
   fts_class_message_varargs(cl, fts_s_bang, count_step);
   

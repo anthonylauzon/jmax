@@ -91,7 +91,7 @@ tup_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_atom_assign(output + i, a + i);
     }
 
-  fts_outlet_send(o, 0, fts_s_list, n, output);
+  fts_outlet_varargs(o, 0, n, output);
 
   for(i=0; i<n; i++)
     fts_atom_void(output + i);

@@ -153,8 +153,9 @@ public class Guiobj implements JMaxPackage {
 
     JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_cursor.gif", "standard", this);
     JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_cursor.gif", "patcher", this);
-    JMaxClassMap.put( "receive", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", "receive", this);
-    JMaxClassMap.put( "send", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", "send", this);
+    JMaxClassMap.put( "receive", inletCreator, "/icons/inlet.gif", "/icons/inlet_cursor.gif", "inlet label", this);
+    JMaxClassMap.put( "send", outletCreator, "/icons/outlet.gif", "/icons/outlet_cursor.gif", "outlet label", this);
+    JMaxClassMap.put( "define", defineCreator, "/icons/define.gif", "/icons/define_cursor.gif", "define", this);
     JMaxClassMap.put( "fork", forkCreator, "/icons/fork.gif", "/icons/fork_cursor.gif", "fork", this);
     JMaxClassMap.put( "jcomment", jcommentCreator, "/icons/jcomment.gif", "/icons/jcomment_cursor.gif", "comment", this);
     JMaxClassMap.put( "messconst", messconstCreator, "/icons/messconst.gif", "/icons/messconst_cursor.gif", "message",this);
@@ -165,7 +166,6 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "intbox", intboxCreator, "/icons/intbox.gif", "/icons/intbox_cursor.gif", "integer", this);
     JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", "float", this);
     JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", "generic display", this);
-    JMaxClassMap.put( "define", defineCreator, "/icons/define.gif", "/icons/define_cursor.gif", "define", this);
     JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", "vector display", this);
     JMaxClassMap.put( "matdisplay", matdisplayCreator, "/icons/matdisplay.gif", "/icons/matdisplay_cursor.gif", "matrix display", this);
     JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", "oscilloscope", this);

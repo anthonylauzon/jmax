@@ -237,52 +237,62 @@ static void
 dict_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_hashtable_t *hash[2] = {&this->table_int, &this->table_symbol};
-  int tab;
 
-  for(tab=0; tab<2; tab++)
+  if(data_object_is_persistent(o))
     {
-      fts_iterator_t key_iterator, value_iterator;
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+      fts_hashtable_t *hash[2] = {&this->table_int, &this->table_symbol};
+      fts_message_t *dump_mess;
+      int tab;
+      
+      /* save persistence flag */
+      dump_mess = fts_dumper_message_new(dumper, fts_s_persistence);
+      fts_message_append_int(dump_mess, 1);
+      fts_dumper_message_send(dumper, dump_mess);
 
-      fts_hashtable_get_keys(hash[tab], &key_iterator);
-      fts_hashtable_get_values(hash[tab], &value_iterator);
-
-      while(fts_iterator_has_more(&key_iterator))
+      for(tab=0; tab<2; tab++)
 	{
-	  fts_atom_t key, value;
+	  fts_iterator_t key_iterator, value_iterator;
 	  
-	  fts_iterator_next(&key_iterator, &key);
-	  fts_iterator_next(&value_iterator, &value);
-
-	  if(fts_is_tuple(&value))
+	  fts_hashtable_get_keys(hash[tab], &key_iterator);
+	  fts_hashtable_get_values(hash[tab], &value_iterator);
+	  
+	  while(fts_iterator_has_more(&key_iterator))
 	    {
-	      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
-	      int size = fts_tuple_get_size(tuple);
-	      const fts_atom_t *atoms = fts_tuple_get_atoms(tuple);
-	      fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
+	      fts_atom_t key, value;
 	      
-	      /* dump key */
-	      fts_message_append(dump_mess, 1, &key);	      
-
-	      /* dump tuple */
-	      fts_message_append(dump_mess, size, atoms);
-	      fts_dumper_message_send(dumper, dump_mess);
-	    }
-	  else if(fts_is_object(&value))
-	    {
-	      /* don't now how to do yet */
-	    }
-	  else
-	    {
-	      fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
-
-	      /* dump key */
-	      fts_message_append(dump_mess, 1, &key);
+	      fts_iterator_next(&key_iterator, &key);
+	      fts_iterator_next(&value_iterator, &value);
 	      
-	      /* dump value */
-	      fts_message_append(dump_mess, 1, &value);
-	      fts_dumper_message_send(dumper, dump_mess);
+	      if(fts_is_tuple(&value))
+		{
+		  fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
+		  int size = fts_tuple_get_size(tuple);
+		  const fts_atom_t *atoms = fts_tuple_get_atoms(tuple);
+		  dump_mess = fts_dumper_message_new(dumper, fts_s_set);
+		  
+		  /* dump key */
+		  fts_message_append(dump_mess, 1, &key);	      
+		  
+		  /* dump tuple */
+		  fts_message_append(dump_mess, size, atoms);
+		  fts_dumper_message_send(dumper, dump_mess);
+		}
+	      else if(fts_is_object(&value))
+		{
+		  /* don't now how to do yet */
+		}
+	      else
+		{
+		  fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
+		  
+		  /* dump key */
+		  fts_message_append(dump_mess, 1, &key);
+		  
+		  /* dump value */
+		  fts_message_append(dump_mess, 1, &value);
+		  fts_dumper_message_send(dumper, dump_mess);
+		}
 	    }
 	}
     }
@@ -630,10 +640,10 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   ac &= -2;
 
+  data_object_init(o);
+
   fts_hashtable_init(&this->table_int, fts_int_class, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->table_symbol, fts_symbol_class, FTS_HASHTABLE_SMALL);
-
-  data_object_set_keep((data_object_t *)o, fts_s_no);
 
   for(i=0; i<ac; i+=2)
     {
@@ -645,7 +655,7 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  fts_object_set_error(o, "wrong key type in initialization");
 	}
 
-      data_object_set_keep((data_object_t *)o, fts_s_args);
+      data_object_persistence_args(o);
     }
 }
 
@@ -662,15 +672,16 @@ dict_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dict_t), dict_init, dict_delete);
   
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
+  fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+
   fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_instance);
   fts_class_message_varargs(cl, fts_s_get_array, dict_get_array);
   fts_class_message_varargs(cl, fts_s_dump, dict_dump);
 
   fts_class_message_varargs(cl, fts_s_post, dict_post);
   fts_class_message_varargs(cl, fts_s_print, dict_print);
-
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   
   fts_class_message_varargs(cl, fts_s_import, dict_import);
   fts_class_message_varargs(cl, fts_s_export, dict_export);

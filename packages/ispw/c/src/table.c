@@ -181,11 +181,11 @@ table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-table_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
   
-  fts_send_message((fts_object_t *)this->vec, fts_s_save, ac, at);
+  fts_send_message((fts_object_t *)this->vec, fts_s_dump, ac, at);
 }
 
 static int 
@@ -322,8 +322,8 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   ivec_set_size(this->vec, size);
 
-  fts_set_symbol(&a, fts_s_yes);
-  fts_object_put_prop((fts_object_t *)this->vec, fts_s_keep, &a);
+  fts_set_int(&a, 1);
+  data_object_persistence((fts_object_t *)this->vec, 0, 0, 1, &a);
 
   if(this->name != NULL)
     ispw_register_named_object((fts_object_t *)this->vec, this->name);
@@ -354,16 +354,13 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 table_instantiate(fts_class_t *cl)
 {
-  /* table [int] */
   fts_class_init(cl, sizeof(table_t), table_init, table_delete);
   
   fts_class_message_varargs(cl, fts_s_openEditor, table_open_editor);
   
-  /* save/load bmax file if not instantiated with reference */
-  fts_class_message_varargs(cl, fts_s_save, table_save);  
+  fts_class_message_varargs(cl, fts_s_dump, table_dump);  
   fts_class_message_varargs(cl, fts_s_save_dotpat, table_save_dotpat); 
   
-  /* user methods */
   fts_class_message_varargs(cl, fts_s_set, table_set_with_onset_from_atoms);
   
   fts_class_message_varargs(cl, fts_new_symbol("const"), table_const);

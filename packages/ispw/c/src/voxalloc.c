@@ -193,7 +193,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     while (iArg--) list_store[iArg] = at[iArg];
 	
     if(label)
-      fts_label_send(label, fts_s_list, n_args, list_store);
+      fts_label_send(label, NULL, n_args, list_store);
   }
 
   idx++;
@@ -206,7 +206,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 voxalloc_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  voxalloc_list(o, winlet, fts_s_list, 0, 0);	
+  voxalloc_list(o, winlet, 0, 0, 0);	
 }
 
 

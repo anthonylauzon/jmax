@@ -36,17 +36,22 @@
 typedef struct _data_object
 {
   fts_object_t o;
-  fts_symbol_t keep;
+  int persistence;
 } data_object_t;
 
-#define data_object_set_keep(o, k) ((o)->keep = (k))
-#define data_object_get_keep(o) ((o)->keep)
+enum data_object_persistence {data_object_persistence_args = -1, data_object_persistence_no = 0, data_object_persistence_yes = 1};
 
-DATA_API void data_object_daemon_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
-DATA_API void data_object_daemon_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+#define data_object_persistence_args(o) (((data_object_t *)o)->persistence = data_object_persistence_args)
+
+#define data_object_is_persistent(o) (((data_object_t *)o)->persistence == data_object_persistence_yes)
+
+DATA_API void data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+DATA_API void data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 DATA_API void data_object_set_dirty(fts_object_t *o);
 
-DATA_API void
-data_config(void);
+DATA_API void data_object_init(fts_object_t *o);
+
+DATA_API void data_config(void);
 
 #endif /* _DATA_H */

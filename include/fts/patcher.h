@@ -26,6 +26,9 @@ struct fts_patcher
 {
   fts_object_t o;
 
+  int description_ac;
+  fts_atom_t *description_at;
+
   patcher_inout_t **inlets; /* the patcher inlet array */
   patcher_inout_t **outlets; /* the patcher outlet array */
 

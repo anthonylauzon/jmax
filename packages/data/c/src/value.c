@@ -38,8 +38,15 @@ static void
 value_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
-  
-  fts_outlet_varargs(o, 0, 1, &this->a);
+
+  if(!fts_is_void(&this->a))
+    {
+      fts_atom_t a = this->a;
+      
+      fts_atom_refer(&a);
+      fts_outlet_varargs(o, 0, 1, &a);
+      fts_atom_release(&a);
+    }
 }
 
 static void
@@ -111,15 +118,6 @@ value_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_atom_assign(&this->a, &in->a);
 }
 
-static void
-value_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  value_t *this = (value_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-
-  fts_dumper_send(dumper, fts_s_set, 1, &this->a);
-}
-
 /********************************************************************
  *
  *   class
@@ -131,14 +129,11 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   value_t *this = (value_t *)o;
 
+  data_object_init(o);
   fts_set_void(&this->a);
-  data_object_set_keep((data_object_t *)o, fts_s_no);
 
   if(ac > 0)
-    {
-      value_set_atom(o, 0, 0, 1, at);
-      data_object_set_keep((data_object_t *)o, fts_s_args);
-    }
+    value_set_atom(o, 0, 0, 1, at);
 }
 
 static void
@@ -146,7 +141,7 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   value_t *this = (value_t *) o;
 
-  fts_set_void(&this->a);
+  fts_atom_void(&this->a);
 }
 
 static void
@@ -154,17 +149,15 @@ value_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(value_t), value_init, value_delete);
 
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+
   fts_class_message_varargs(cl, fts_s_post, value_post);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, value_set_from_instance);
-  fts_class_message_varargs(cl, fts_s_dump, value_dump);
 
   fts_class_message_varargs(cl, fts_s_get_array, value_get_array);
   fts_class_message_varargs(cl, fts_s_set_from_array, value_set_from_array);
   
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
-
   fts_class_message_varargs(cl, fts_s_bang, value_output);
   fts_class_message_varargs(cl, fts_s_set, value_set_atom);
 

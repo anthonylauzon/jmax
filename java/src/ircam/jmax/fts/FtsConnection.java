@@ -81,6 +81,16 @@ public class FtsConnection extends FtsObject
       this(server, patcher, id, from, outlet, to, inlet, fts_connection_anything);
   }
 
+  static
+  {
+    FtsObject.registerMessageHandler( FtsConnection.class, FtsSymbol.get("setType"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsConnection)obj).setType(args.getInt( 0));
+	}
+      });
+  }
+
   /** Set the unique object listener */
   public void setConnectionListener(FtsConnectionListener obj)
   {
@@ -93,16 +103,15 @@ public class FtsConnection extends FtsObject
     return listener;
   }
 
-  void redefine(FtsGraphicObject from, int outlet, FtsGraphicObject to, int inlet, int type)
+  public void setType(int type)
   {
-    this.from   = from;
-    this.outlet = outlet;
-    this.to     = to;
-    this.inlet  = inlet;
-    this.type   = type;
-
-    if(listener!=null)
-	listener.typeChanged(type);
+    if(type != this.type)
+      {
+	this.type = type;
+	
+	if(listener != null)
+	  listener.typeChanged(type);
+      }
   }
 
   /**

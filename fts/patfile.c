@@ -792,13 +792,13 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 	      fts_patlex_push_back(in);
 
-	      fts_set_symbol(&description[0], fts_s_patcher);
+	      fts_set_symbol(&description[0], fts_s_jpatcher);
 
 	      lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
 	      fts_patparse_parse_patcher(lastNObject, in);
 
-	      lastNObjectType = fts_s_patcher;
+	      lastNObjectType = fts_s_jpatcher;
 	    }
 	  else if (token_sym_equals(in, patlex_sym_qlist))
 	    {
@@ -1178,7 +1178,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       /* Check if it is the patcher, otherwise just skip it */
 
       if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_old_patcher ) &&
-	  (lastNObjectType == fts_s_patcher))
+	  (lastNObjectType == fts_s_jpatcher))
 	{
 	  /* add the two ninlet and noutlet and the arguments to description */
 
@@ -1191,12 +1191,12 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 	      fts_patcher_order_inoutlets_regarding_position((fts_patcher_t *)lastNObject);
 
-	      fts_set_symbol(&new_args[0], fts_s_patcher);
+	      fts_set_symbol(&new_args[0], fts_s_jpatcher);
 
 	      for (i = 1; (i < argc) && (i < 512); i++)
 		new_args[i] = args[i];
 
-	      fts_patcher_redefine((fts_patcher_t *)lastNObject, argc, new_args);
+	      /*fts_patcher_redefine((fts_patcher_t *)lastNObject, argc, new_args);*/
 	    }
 	  else
 	    fts_patcher_order_inoutlets_regarding_position((fts_patcher_t *)lastNObject);
@@ -1214,8 +1214,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == patlex_sym_explode) &&
 	       (lastNObjectType == patlex_sym_explode))
 	{
-	  /* First, look if we have a name there */
-
+	  /* first, look if we have a name there */
 	  if (argc >= 2)
 	    fts_object_put_prop(lastNObject, fts_s_name, &args[1]);
 
@@ -1477,7 +1476,7 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
       fts_atom_t description[1];
       fts_object_t *patcher;
 
-      fts_set_symbol(&description[0], fts_s_patcher);
+      fts_set_symbol(&description[0], fts_s_jpatcher);
       patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_parse_patlex(patcher, in);

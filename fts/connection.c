@@ -31,6 +31,7 @@
 /* #define TRACE_DEBUG */
 
 fts_class_t *fts_connection_class = 0;
+fts_symbol_t sym_setType = 0;
 
 static int
 connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
@@ -339,8 +340,13 @@ fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type
     {
       connection->type = type;
       
-      if ( fts_object_has_id( (fts_object_t *)connection))
-	fts_patcher_redefine_connection((fts_object_t *)connection->src->patcher, connection);
+      if(fts_object_has_id( (fts_object_t *)connection))
+	{
+	  fts_atom_t a;
+
+	  fts_set_int(&a, type);
+	  fts_client_send_message((fts_object_t *)connection, sym_setType, 1, &a);
+	}
     }
 }
 
@@ -359,5 +365,7 @@ connection_instantiate(fts_class_t *cl)
 void fts_kernel_connection_init()
 {
   fts_connection_class = fts_class_install(fts_s_connection, connection_instantiate);
+
+  sym_setType = fts_new_symbol("setType");
 }
 

@@ -811,6 +811,37 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 }
 
+static void
+track_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  if(ac > 0)
+    {
+      /* set persistence flag */
+      if(fts_is_number(at) && this->persistence >= 0)
+	this->persistence = (fts_get_number_int(at) != 0);
+    }
+  else
+    {
+      /* return persistence flag */
+      fts_atom_t a;
+
+      fts_set_int(&a, this->persistence);
+      fts_return(&a);
+    }
+}
+
+static void
+track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  fts_atom_t a;
+
+  fts_set_int(&a, (this->persistence > 0));
+  fts_client_send_message(o, fts_s_persistence, 1, &a);
+}
+
 /******************************************************
  *
  *  MIDI files
@@ -948,14 +979,18 @@ void
 track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);  
-  event_t *event = track_get_first(this);
 
-  while(event)
+  if(this->persistence == 1)
     {
-      event_dump(event, dumper);
-      event = event_get_next(event);
-    }  
+      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);  
+      event_t *event = track_get_first(this);
+      
+      while(event)
+	{
+	  event_dump(event, dumper);
+	  event = event_get_next(event);
+	}  
+    }
 }
 
 void
@@ -978,32 +1013,6 @@ track_add_event_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 /******************************************************
  *
- *  properties
- * 
- */
-
-static void
-track_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  track_t *this = (track_t *)obj;
-
-  if(this->keep != fts_s_args && fts_is_symbol(value))
-    this->keep = fts_get_symbol(value);
-}
-
-static void
-track_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  track_t *this = (track_t *)obj;
-
-  if(this->sequence)
-    fts_set_symbol(value, sequence_get_keep(this->sequence));
-  else
-    fts_set_symbol(value, this->keep);
-}
-
-/******************************************************
- *
  *  class
  * 
  */
@@ -1012,6 +1021,8 @@ void
 track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
+
+  this->persistence = 0;
 
   this->sequence = 0;
   this->next = 0;
@@ -1024,8 +1035,6 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->size = 0;
   this->type = fts_s_void;
   
-  this->keep = fts_s_no;
-
   if(ac > 0)
     {
       if(fts_is_symbol(at))
@@ -1048,6 +1057,10 @@ track_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(track_t), track_init, track_delete);
 
+  fts_class_message_varargs(cl, fts_s_set_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_persistence, track_persistence);
+  fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui); 
+
   fts_class_message_varargs(cl, fts_s_dump, track_dump);
   fts_class_message_varargs(cl, seqsym_add_event, track_add_event_from_array);
 
@@ -1068,9 +1081,6 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_by_client_request);
 
   fts_class_message_varargs(cl, seqsym_active, track_active);
-
-  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, track_set_keep);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, track_get_keep);
 
   fts_class_message_varargs(cl, fts_s_clear, track_clear_method);
   fts_class_message_varargs(cl, seqsym_insert, track_insert);

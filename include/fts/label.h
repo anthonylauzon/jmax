@@ -63,7 +63,9 @@ FTS_API fts_class_t *fts_label_class;
 
 typedef struct _fts_label_
 {
-  fts_object_t head;
+  fts_object_t head; 
+  fts_patcher_t *scope;
+  fts_symbol_t name;
   fts_channel_t channel;
 } fts_label_t;
 

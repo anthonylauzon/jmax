@@ -22,8 +22,8 @@
 
 typedef struct fts_definition fts_definition_t;
 
-FTS_API void fts_name_define(fts_patcher_t *patcher, fts_symbol_t name, fts_atom_t *value);
-FTS_API void fts_name_undefine(fts_patcher_t *patcher, fts_symbol_t name);
+FTS_API void fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *value);
+#define fts_name_reset(p, n) fts_name_set_value((p), (n), fts_null)
 
 FTS_API void fts_name_add_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj);
 FTS_API void fts_name_remove_listener(fts_patcher_t *patcher, fts_symbol_t name, fts_object_t *obj);
@@ -32,4 +32,5 @@ FTS_API fts_atom_t *fts_name_get_value(fts_patcher_t *patcher, fts_symbol_t name
 
 FTS_API fts_symbol_t fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name);
 
+FTS_API void fts_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 

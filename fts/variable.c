@@ -31,6 +31,7 @@
 #include <ftsprivate/variable.h>
 
 fts_heap_t *definition_heap = NULL;
+fts_heap_t *definition_listener_heap = NULL;
 
 /****************************************************************************
  *
@@ -38,20 +39,20 @@ fts_heap_t *definition_heap = NULL;
  *
  */
 
+struct fts_definition_listener
+{
+  fts_object_t *object;
+  fts_definition_listener_t *next;
+};
 
 static fts_definition_t *
 fts_definition_new(fts_symbol_t name)
 {
-  fts_definition_t *def = NULL;
-
-  if(definition_heap == NULL)
-    definition_heap = fts_heap_new(sizeof(fts_definition_t));
-
-  def = (fts_definition_t *)fts_heap_zalloc(definition_heap);
+  fts_definition_t *def = (fts_definition_t *)fts_heap_zalloc(definition_heap);
   
   def->name = name;
   fts_set_void(&def->value);
-  fts_objectlist_init(&def->listeners);
+  def->listeners = NULL;
 
   return def;
 }
@@ -95,29 +96,71 @@ fts_definition_get(fts_patcher_t *scope, fts_symbol_t name)
 void 
 fts_definition_add_listener(fts_definition_t *def, fts_object_t *obj)
 {
-  fts_objectlist_insert(&def->listeners, obj);
+  fts_definition_listener_t *l;
+
+  /* make sure that we don't add the same listener twice */
+  for(l = def->listeners; l != NULL; l = l->next)
+    {
+      if (l->object == obj)
+	return;
+    }
+
+  /* create new list entry */
+  l = (fts_definition_listener_t *)fts_heap_alloc(definition_listener_heap);
+
+  /* add it to the beginning of the list of the definition */
+  l->object = obj;
+  l->next = def->listeners;
+  def->listeners = l;
 }
 
 void 
 fts_definition_remove_listener(fts_definition_t *def, fts_object_t *obj)
 {
-  fts_objectlist_remove(&def->listeners, obj);
+  fts_definition_listener_t *l;
+
+  /* search for listener at the definition */
+  for(l = def->listeners; l != NULL; l = l->next)
+    {
+      /* just set it to NULL */
+      if (l->object == obj)
+	{
+	  l->object = NULL;
+	  return;
+	}
+    }
 }
 
-void 
-fts_definition_recompute_listeners(fts_definition_t *def)
+static void 
+definition_recompute_listeners(fts_definition_t *def)
 {
-  fts_objectlist_cell_t *p;
-  
-  for(p = fts_objectlist_get_head( &def->listeners); p; p = fts_objectlist_get_next(p))
-    fts_object_recompute(fts_objectlist_get_object(p));
+  fts_definition_listener_t **p = &def->listeners;
+
+  while(*p != NULL)
+    {
+      fts_object_t *obj = (*p)->object;
+
+      if (obj != NULL)
+	{
+	  fts_object_recompute(obj);
+	  p = &(*p)->next;
+	}
+      else
+	{
+	  fts_definition_listener_t *remove = *p;
+
+	  /* remove empty listener entry */
+	  *p = remove->next;
+	  fts_heap_free(remove, definition_listener_heap);
+	}
+    }
 }
 
 void
-fts_definition_update(fts_definition_t *def, const fts_atom_t *a)
+fts_definition_update(fts_definition_t *def, const fts_atom_t *value)
 {
-  fts_definition_set_value(def, a);
-  fts_definition_recompute_listeners(def);  
+  fts_definition_set_value(def, value);
+  definition_recompute_listeners(def);  
 }
 
 /*************************************************************
@@ -127,33 +170,13 @@ fts_definition_update(fts_definition_t *def, const fts_atom_t *a)
  *
  */
 void
-fts_name_define(fts_patcher_t *patcher, fts_symbol_t name, fts_atom_t *value)
+fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *value)
 {
   fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
   fts_definition_t *def = fts_definition_get(scope, name);
 
   if(!fts_atom_equals(value, &def->value))
-    {
-      fts_definition_set_value(def, value);
-      fts_definition_recompute_listeners(def);
-    }
-}
-
-void
-fts_name_undefine(fts_patcher_t *patcher, fts_symbol_t name)
-{
-  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
-  fts_definition_t *def = fts_definition_get(scope, name);
-
-  if(!fts_is_void(&def->value))
-    {
-      fts_objectlist_cell_t *p;
-
-      fts_atom_void(&def->value);
-      
-      for(p = fts_objectlist_get_head( &def->listeners); p; p = fts_objectlist_get_next(p))
-	fts_object_recompute(fts_objectlist_get_object(p));
-    }
+    fts_definition_update(def, value);
 }
 
 void
@@ -196,7 +219,7 @@ fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
 
   fts_set_symbol(&k, name);
 
-  if(fts_hashtable_get(hash, &k, &a))
+  if(hash != NULL && fts_hashtable_get(hash, &k, &a))
     {
       fts_definition_t *def = fts_get_pointer(&a);
 	      
@@ -242,6 +265,16 @@ fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
   return name;
 }
 
+void
+fts_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if(ac > 0 && fts_is_symbol(at) && fts_object_get_patcher(o) != NULL)
+    {
+      fts_object_set_name(o, fts_get_symbol(at));
+      fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+    }
+}
+
 /****************************************************************************
  *
  * "define" object
@@ -264,7 +297,7 @@ define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_patcher_t *patcher = fts_object_get_patcher(o);
       fts_symbol_t name = fts_name_get_unused(patcher, fts_get_symbol(at));
 
-      fts_name_define(patcher, name, (fts_atom_t *)(at + 1));
+      fts_name_set_value(patcher, name, (fts_atom_t *)(at + 1));
       this->name = name;
     }
   else
@@ -276,7 +309,7 @@ define_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   define_t *this = (define_t *) o;  
 
-  fts_name_undefine(fts_object_get_patcher( o), this->name);
+  fts_name_reset(fts_object_get_patcher( o), this->name);
 }
 
 static void
@@ -352,4 +385,7 @@ fts_kernel_variable_init(void)
 {
   fts_class_install( fts_s_define, define_instantiate);
   /*fts_class_install( fts_s_args, args_instantiate);*/
+
+  definition_heap = fts_heap_new(sizeof(fts_definition_t));
+  definition_listener_heap = fts_heap_new(sizeof(fts_definition_listener_t));
 }
