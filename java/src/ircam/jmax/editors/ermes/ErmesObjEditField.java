@@ -70,14 +70,14 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     if (itsOwner.itsFtsObject != null){
       itsOwner.itsArgs = aTextString;
 
-      ParseText(aTextString);
+      itsOwner.ParseText(aTextString);
 
       itsOwner.redefineFtsObject();
     }
     else {
       itsOwner.itsArgs = aTextString;
       
-      ParseText(aTextString);
+      itsOwner.ParseText(aTextString);
 
       itsOwner.makeFtsObject();
     }
@@ -113,35 +113,11 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     //itsSketchPad.repaint();//?????
     itsOwner = null;
 
-    setRows(1);
+    setRows(2);
     setColumns(20);
     return true;       
   }
 	
-  private void ParseText(String theString){
-    int aIndex = theString.indexOf("\n");
-    int aOldIndex = -1;
-    int aLastIndex = theString.lastIndexOf("\n");
-    String aString;
-    int length = 0;
-    int i = 0;
-    while(aIndex!=-1){
-      aString = theString.substring(aOldIndex+1, aIndex);
-      length = getFontMetrics(getFont()).stringWidth(aString);
-      if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
-	itsOwner.itsMaxString = aString;
-      itsOwner.itsParsedTextVector.addElement(aString);
-      aOldIndex = aIndex;
-      aIndex = theString.indexOf("\n", aOldIndex+1);
-      i++;
-    }
-    aString = theString.substring(aOldIndex+1);
-    length = getFontMetrics(getFont()).stringWidth(aString);
-    if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
-      itsOwner.itsMaxString = aString;
-    itsOwner.itsParsedTextVector.addElement(aString);
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e){

@@ -70,7 +70,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     
     if (itsOwner == null) return false; //this happens when the instatiation fails
     itsOwner.itsArgs = aTextString;
-    ParseText(aTextString);
+    itsOwner.ParseText(aTextString);
     
     ///qui accorcia se il testo e' piu' corto dell'oggetto
     //dovrebbe farlo anche per l'altezza...
@@ -103,30 +103,6 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     return true;       
   }
 	
-  private void ParseText(String theString){
-    int aIndex = theString.indexOf("\n");
-    int aOldIndex = -1;
-    int aLastIndex = theString.lastIndexOf("\n");
-    String aString;
-    int length = 0;
-    int i = 0;
-    while(aIndex!=-1){
-      aString = theString.substring(aOldIndex+1, aIndex);
-      length = getFontMetrics(getFont()).stringWidth(aString);
-      if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
-	itsOwner.itsMaxString = aString;
-      itsOwner.itsParsedTextVector.addElement(aString);
-      aOldIndex = aIndex;
-      aIndex = theString.indexOf("\n", aOldIndex+1);
-      i++;
-    }
-    aString = theString.substring(aOldIndex+1);
-    length = getFontMetrics(getFont()).stringWidth(aString);
-    if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
-      itsOwner.itsMaxString = aString;
-    itsOwner.itsParsedTextVector.addElement(aString);
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
   public void focusGained(FocusEvent e){

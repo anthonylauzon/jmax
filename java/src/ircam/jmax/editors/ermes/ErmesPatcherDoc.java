@@ -183,13 +183,14 @@ public class ErmesPatcherDoc implements MaxDocument {
 	if((fd.getFile()==null)||(fd.getDirectory()==null)) return false;
       
 	itsTitle = fd.getFile();
-	itsFile = new File(fd.getFile(), fd.getDirectory());
+	itsFile = new File(fd.getDirectory(),fd.getFile());
       }
     
     try {
+      System.out.println(itsFile);
       fs = new FileOutputStream(itsFile);
     }
-    catch(IOException e) {
+    catch(Exception e) {
       System.out.println("ERROR while opening " + itsFile);
       e.printStackTrace(); // temporary, MDC
       return false;
