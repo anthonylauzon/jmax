@@ -30,6 +30,8 @@ fts_symbol_t scope_symbol = 0;
 fts_symbol_t sym_display = 0;
 fts_symbol_t sym_auto = 0;
 fts_symbol_t sym_off = 0;
+fts_symbol_t sym_set_period = 0;
+fts_symbol_t sym_set_threshold = 0;
 
 #define MIN_FLOAT -68719476736.
 #define SCOPE_BUFFER_SIZE 1024
@@ -86,6 +88,7 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
   double duration = 1000. * data->size / this->sr;
   double period_msec = fts_get_number_float(at);
+  fts_atom_t a[1];
 
   if(period_msec < duration)
     period_msec = duration;
@@ -94,14 +97,18 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   data->period = 0.001 * period_msec * this->sr;
 
   scope_reset(data);
+
+  fts_set_float(a, this->period_msec);
+  fts_client_send_message(o, sym_set_period, 1, a);
 }
 
-static void 
+static void
 scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-
+  fts_atom_t a[1];
+      
   if(fts_is_number(at))
     {
       float f = fts_get_number_float(at);
@@ -109,7 +116,7 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       data->trigger = scope_threshold;
       data->threshold = f;
 
-      scope_reset(data);
+      fts_set_float(a, f);
     }
   else if(fts_is_symbol(at))
     {
@@ -118,14 +125,20 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       if(s == sym_auto)
 	{
 	  data->trigger = scope_auto;
-	  scope_reset(data);
+
+	  fts_set_symbol(a, sym_auto);
 	}
       else if(s == sym_off)
 	{
 	  data->trigger = scope_threshold;
-	  scope_reset(data);
+
+	  fts_set_symbol(a, sym_off);
 	}
     }
+
+  scope_reset(data);
+  
+  fts_client_send_message(o, sym_set_threshold, 1, a);
 }
 
 static void 
@@ -421,6 +434,29 @@ scope_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   scope_t *this = (scope_t *)o;
   fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);
+  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
+  fts_atom_t a[1];
+
+  fts_set_float(a, this->period_msec);
+  fts_bmax_save_message(file, sym_set_period, 1, a);
+
+  fts_set_float(a, data->threshold);
+  fts_bmax_save_message(file, sym_set_threshold, 1, a);
+}
+
+static void 
+scope_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scope_t *this = (scope_t *)o;
+  fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);
+  scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
+  fts_atom_t a[1];
+
+  fts_set_float(a, this->period_msec);
+  fts_client_send_message(o, sym_set_period, 1, a);
+
+  fts_set_float(a, data->threshold);
+  fts_client_send_message(o, sym_set_threshold, 1, a);
 }
 
 static void
@@ -428,6 +464,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data;
+  fts_atom_t a[1];
   int i;
 
   ac--;
@@ -486,9 +523,12 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("size"), scope_set_size_by_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), scope_set_range_by_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("period"), scope_set_period);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("threshold"), scope_set_threshold);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_set_period, scope_set_period);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_set_threshold, scope_set_threshold);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("onset"), scope_set_pre_delay);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, scope_save_bmax); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, scope_upload); 
 
   dsp_sig_inlet(cl, 0);
 
@@ -502,6 +542,8 @@ scope_config(void)
   sym_display = fts_new_symbol("display");
   sym_auto = fts_new_symbol("auto");
   sym_off = fts_new_symbol("off");
+  sym_set_period = fts_new_symbol("setPeriod");
+  sym_set_threshold = fts_new_symbol("setThreshold");
 
   dsp_declare_function(scope_symbol, scope_ftl);  
   fts_class_install(scope_symbol, scope_instantiate);
