@@ -192,20 +192,31 @@ void
 seqobj_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  track_t *track = sequence_get_first_track(this);
+  fts_symbol_t track_name = fts_get_symbol_arg(ac, at, 0, 0);
   int i = 0;
 
   post("sequence: %d track(s)\n", sequence_get_size(this));
-  
-  while(track)
+
+  if(track_name)
     {
-      fts_symbol_t track_name = track_get_name(track);
-      fts_symbol_t class_name = fts_object_get_class_name((fts_object_t *)track);
-      
-      post("track %d: \"%s\": ", i, fts_symbol_name(track_name));
+      track_t *track = sequence_get_track_by_name(this, track_name);
+
+      post("track: \"%s\" ", fts_symbol_name(track_name));
       fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
-      track = track_get_next(track);
-      i++;
+    }
+  else
+    {  
+      track_t *track = sequence_get_first_track(this);
+
+      while(track)
+	{
+	  fts_symbol_t track_name = track_get_name(track);
+	  fts_symbol_t class_name = fts_object_get_class_name((fts_object_t *)track);
+	  
+	  post("track %d: \"%s\"\n", i, fts_symbol_name(track_name));
+	  track = track_get_next(track);
+	  i++;
+	}
     }
 }
 

@@ -55,5 +55,6 @@ extern void sequence_init(sequence_t *sequence);
 
 extern void sequence_add_track(sequence_t *sequence, track_t *track);
 extern void sequence_remove_track(track_t *track);
+extern track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
 
 #endif

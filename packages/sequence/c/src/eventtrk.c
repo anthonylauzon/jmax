@@ -354,8 +354,6 @@ eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   post("%d event(s)\n", eventtrk_get_size(this));
 
-  return;
-
   while(event)
     {
       fts_symbol_t track_name = track_get_name(&this->head);

@@ -109,7 +109,7 @@ public class AmbitusValue extends AbstractEventValue
     public static final int DEFAULT_MAX_PITCH = 127;
     public static final int DEFAULT_MIN_PITCH = 0;
     public static final String fs = File.separator;
-    public static final String AMBITUS_NAME = "ambitus";
+    public static final String AMBITUS_NAME = "noteevt";
     static String path;
     public static ImageIcon AMBITUS_ICON;
     public static AmbitusValueInfo info = new AmbitusValueInfo();
@@ -130,8 +130,3 @@ public class AmbitusValue extends AbstractEventValue
     static String nameArray[] = {"pitch", "duration"};
     static int propertyCount = 2;
 }
-
-
-
-
-

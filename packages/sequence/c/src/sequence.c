@@ -86,7 +86,7 @@ sequence_remove_track(track_t *track)
   else
     {
       track_t *prev = sequence->tracks;
-      track_t *this = sequence->tracks->next;
+      track_t *this = track_get_next(prev);
 
       while(this && this != track)
 	{
@@ -100,4 +100,15 @@ sequence_remove_track(track_t *track)
 	  sequence->size--;	  
 	}
     }
+}
+
+track_t *
+sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name)
+{
+  track_t *track = sequence->tracks;
+
+  while(track && track_get_name(track) != name)
+    track = track_get_next(track);
+
+  return track;
 }

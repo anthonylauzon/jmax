@@ -145,7 +145,7 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 noteevt_config(void)
 {
-  noteevt_symbol = fts_new_symbol("ambitus");
+  noteevt_symbol = fts_new_symbol("noteevt");
 
   fts_class_install(noteevt_symbol, noteevt_instantiate);
 }
