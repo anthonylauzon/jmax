@@ -114,7 +114,9 @@ fts_label_t *
 fts_label_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
 {
   fts_atom_t *value = fts_name_get_value(patcher, name);
-  
+  fts_atom_t a;
+  fts_label_t* label;
+
   if(fts_is_object(value))
   {
     fts_object_t *obj = fts_get_object(value);
@@ -124,8 +126,8 @@ fts_label_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
   }
 
   /* create new label */
-  fts_label_t *label = (fts_label_t *)fts_object_create(fts_label_class, 0, 0);
-  fts_atom_t a;
+  label = (fts_label_t *)fts_object_create(fts_label_class, 0, 0);
+
   
   /* name the label */
   fts_set_object(&a, (fts_object_t *)label);
