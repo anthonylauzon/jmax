@@ -794,7 +794,6 @@ public class DisplayList
     applyToConnections(connectionSelecter);
   }
 
-
   ObjectAction allObjectSelecter =
   new ObjectAction()
   {

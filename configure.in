@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.93 2002/09/10 12:57:26 tisseran Exp $
+dnl $Id: configure.in,v 1.94 2002/09/17 19:09:10 tisseran Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.94  2002/09/17 19:09:10  tisseran
+dnl First integration of threaded direct to disk (package dtd)
+dnl
 dnl Revision 1.93  2002/09/10 12:57:26  tisseran
 dnl Change package file hierarchy (see ChangeLog)
 dnl
@@ -396,7 +399,6 @@ packages/data/java/ircam/jmax/editors/bpf/Makefile
 packages/data/java/ircam/jmax/editors/bpf/renderers/Makefile
 packages/data/java/ircam/jmax/editors/bpf/tools/Makefile
 packages/data/java/ircam/jmax/editors/table/Makefile
-packages/data/java/ircam/jmax/editors/table/actions/Makefile
 packages/data/java/ircam/jmax/editors/table/menus/Makefile
 packages/data/java/ircam/jmax/editors/table/renderers/Makefile
 packages/data/java/ircam/jmax/editors/table/tools/Makefile

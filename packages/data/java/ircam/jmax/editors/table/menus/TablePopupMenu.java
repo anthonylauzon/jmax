@@ -35,7 +35,6 @@ import javax.swing.event.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 import ircam.jmax.editors.table.*;
-import ircam.jmax.editors.table.actions.*;
 
 //
 // The graphic pop-up menu used to change the number of an inlet or an outlet in a subpatcher.
@@ -70,13 +69,12 @@ public class TablePopupMenu extends JPopupMenu
 
     item = new JMenuItem("Change Range");
     item.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e)
-	    {
-		ChangeRangeDialog.changeRange(target.getGraphicContext().getFrame(),	
-					      target.getGraphicContext(), 
-					      SwingUtilities.convertPoint(target, x, y,
-									  target.getGraphicContext().getFrame()),
-					      target.panel);
+	public void actionPerformed(ActionEvent e)
+	{
+	  ChangeRangeDialog.changeRange(target.getGraphicContext().getFrame(),	
+					target.getGraphicContext(), 
+					SwingUtilities.convertPoint(target, x, y,
+								    target.getGraphicContext().getFrame()), target.panel);
 	    }
 	});
     add(item);

@@ -31,7 +31,7 @@ import ircam.jmax.editors.patcher.objects.*;
  * where value is a float.
  */
 
-public interface ObjectControlPanel
+public interface ObjectControlPanel 
 {
   public void update(GraphicObject obj);
   public void done();

@@ -46,7 +46,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   public TableRenderer(TableGraphicContext theGc) 
   {  
     gc = theGc;
-    setMode(HOLLOW);//the default
+    setMode(SOLID);//the default
     addLayer(this);
     addLayer( new TopLayer( theGc));
     addLayer( new SelectionLayer( theGc));

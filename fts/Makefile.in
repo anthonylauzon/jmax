@@ -152,6 +152,7 @@ sigconn.c \
 stack.c \
 symbol.c \
 template.c \
+thread.c \
 time.c \
 tuple.c \
 update.c \
@@ -188,8 +189,9 @@ dsp.lo dspgraph.lo errobj.lo expression.lo fifo.lo file.lo fpe.lo \
 ftl.lo ftlmem.lo fts.lo hashtable.lo label.lo list.lo mem.lo message.lo \
 midi.lo midifile.lo object.lo objectlist.lo objectset.lo package.lo \
 param.lo patcher.lo patfile.lo post.lo project.lo property.lo sched.lo \
-selection.lo sigconn.lo stack.lo symbol.lo template.lo time.lo tuple.lo \
-update.lo variable.lo version.lo parser.lo tokenizer.lo
+selection.lo sigconn.lo stack.lo symbol.lo template.lo thread.lo \
+time.lo tuple.lo update.lo variable.lo version.lo parser.lo \
+tokenizer.lo
 bin_PROGRAMS =  fts$(EXEEXT)
 PROGRAMS =  $(bin_PROGRAMS)
 
@@ -222,8 +224,8 @@ DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDexpression.P \
 .deps/param.P .deps/parser.P .deps/patcher.P .deps/patfile.P \
 .deps/post.P .deps/project.P .deps/property.P .deps/sched.P \
 .deps/selection.P .deps/sigconn.P .deps/stack.P .deps/symbol.P \
-.deps/template.P .deps/time.P .deps/tokenizer.P .deps/tuple.P \
-.deps/update.P .deps/variable.P .deps/version.P
+.deps/template.P .deps/thread.P .deps/time.P .deps/tokenizer.P \
+.deps/tuple.P .deps/update.P .deps/variable.P .deps/version.P
 SOURCES = $(libfts_la_SOURCES) $(fts_SOURCES)
 OBJECTS = $(libfts_la_OBJECTS) $(fts_OBJECTS)
 
