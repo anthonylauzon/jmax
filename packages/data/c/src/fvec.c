@@ -687,15 +687,17 @@ fvec_add_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *l, *r;
   int l_size, r_size;
   int l_stride, r_stride;
-  int size = l_size;
+  int size;
   int i;
   
   fvec_get_vector(self, &l, &l_size, &l_stride);
   fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-  if(size > r_size)
+  if(l_size < r_size)
+    size = l_size;
+  else
     size = r_size;
-  
+    
   for(i=0; i<size; i++)
     l[i * l_stride] += r[i * r_stride];
   
@@ -727,13 +729,15 @@ fvec_sub_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *l, *r;
   int l_size, r_size;
   int l_stride, r_stride;
-  int size = l_size;
+  int size;
   int i;
   
   fvec_get_vector(self, &l, &l_size, &l_stride);
   fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-  if(size > r_size)
+  if(l_size < r_size)
+    size = l_size;
+  else
     size = r_size;
   
   for(i=0; i<size; i++)
@@ -767,13 +771,15 @@ fvec_mul_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *l, *r;
   int l_size, r_size;
   int l_stride, r_stride;
-  int size = l_size;
+  int size;
   int i;
   
   fvec_get_vector(self, &l, &l_size, &l_stride);
   fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-  if(size > r_size)
+  if(l_size < r_size)
+    size = l_size;
+  else
     size = r_size;
   
   for(i=0; i<size; i++)
@@ -807,13 +813,15 @@ fvec_div_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *l, *r;
   int l_size, r_size;
   int l_stride, r_stride;
-  int size = l_size;
+  int size;
   int i;
   
   fvec_get_vector(self, &l, &l_size, &l_stride);
   fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-  if(size > r_size)
+  if(l_size < r_size)
+    size = l_size;
+  else
     size = r_size;
   
   for(i=0; i<size; i++)
@@ -847,13 +855,15 @@ fvec_bus_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *l, *r;
   int l_size, r_size;
   int l_stride, r_stride;
-  int size = l_size;
+  int size;
   int i;
   
   fvec_get_vector(self, &l, &l_size, &l_stride);
   fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-  if(size > r_size)
+  if(l_size < r_size)
+    size = l_size;
+  else
     size = r_size;
   
   for(i=0; i<size; i++)
@@ -887,13 +897,15 @@ fvec_vid_fvec(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *l, *r;
   int l_size, r_size;
   int l_stride, r_stride;
-  int size = l_size;
+  int size;
   int i;
   
   fvec_get_vector(self, &l, &l_size, &l_stride);
   fmat_or_slice_vector(right, &r, &r_size, &r_stride);
   
-  if(size > r_size)
+  if(l_size < r_size)
+    size = l_size;
+  else
     size = r_size;
   
   for(i=0; i<size; i++)
