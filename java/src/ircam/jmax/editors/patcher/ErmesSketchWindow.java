@@ -97,6 +97,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     {	
 	FtsPatcherData data = (FtsPatcherData)(Mda.getDocumentTypeByName( "patcher").newDocument(fts)).getRootData();
 	ErmesSketchWindow win = new ErmesSketchWindow(data);
+	MaxWindowManager.getWindowManager().removeWindow(win);
+	win.itsSketchPad.Close(false);
 	win.dispose();
     }
 

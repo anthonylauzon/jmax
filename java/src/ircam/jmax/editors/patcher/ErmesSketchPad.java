@@ -962,9 +962,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   {
     GraphicObject object = makeObject(newObjectDescription, x, y);
 
-    //if (object instanceof Standard)
-    //((Standard)object).setIgnoreError(true);
-
     if (edit && newObjectEdit && (object instanceof Editable))
       {
 	// The EditField is not really ready until the control
