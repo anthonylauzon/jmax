@@ -735,6 +735,7 @@
 				F844694F028BCB2301664092,
 				F8446950028BCB2301664092,
 				F820646902AE1EDE01664092,
+				F8BB0B2A02E7391101664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -851,6 +852,7 @@
 				F8446968028BCB2401664092,
 				F8446969028BCB2401664092,
 				F820646A02AE1EDE01664092,
+				F8BB0B2B02E7391101664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -6309,6 +6311,8 @@
 				F851228D028BDFF301664092,
 				F851228E028BDFF301664092,
 				F851228F028BDFF301664092,
+				F8BB0B2402E7389801664092,
+				F8BB0B2502E7389801664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -6508,6 +6512,8 @@
 				F85122A2028BDFF401664092,
 				F85122A3028BDFF401664092,
 				F85122A4028BDFF401664092,
+				F8BB0B2802E738BA01664092,
+				F8BB0B2902E738BB01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -11625,7 +11631,6 @@
 			children = (
 				F8A9635302D36AC001664092,
 				F88000010283043C01664092,
-				F880002D0283043C01664092,
 				F880002F0283043C01664092,
 				F8F01109028D91E301664092,
 				F854950002D2514001664092,
@@ -11943,12 +11948,6 @@
 			path = ../../images/tux.gif;
 			refType = 2;
 		};
-		F880002D0283043C01664092 = {
-			isa = PBXFileReference;
-			name = fts.wrapper;
-			path = ../../bin/fts.wrapper;
-			refType = 2;
-		};
 		F880002F0283043C01664092 = {
 			isa = PBXFileReference;
 			name = jmax.icns;
@@ -11977,7 +11976,6 @@
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010F7028D890E01664092,
-				F88000380283051101664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 		};
@@ -12032,12 +12030,6 @@
 				F86A050102B4AE0201664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
-		};
-		F88000380283051101664092 = {
-			fileRef = F880002D0283043C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F88000390283051101664092 = {
 			fileRef = F88000020283043C01664092;
@@ -19967,6 +19959,42 @@
 			);
 			isa = PBXFrameworksBuildPhase;
 		};
+		F8BB0B2402E7389801664092 = {
+			isa = PBXFileReference;
+			name = fifo.c;
+			path = ../../packages/control/c/src/fifo.c;
+			refType = 2;
+		};
+		F8BB0B2502E7389801664092 = {
+			isa = PBXFileReference;
+			name = stack.c;
+			path = ../../packages/control/c/src/stack.c;
+			refType = 2;
+		};
+		F8BB0B2802E738BA01664092 = {
+			fileRef = F8BB0B2402E7389801664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F8BB0B2902E738BB01664092 = {
+			fileRef = F8BB0B2502E7389801664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F8BB0B2A02E7391101664092 = {
+			isa = PBXFileReference;
+			name = env.c;
+			path = ../../packages/signal/c/src/env.c;
+			refType = 2;
+		};
+		F8BB0B2B02E7391101664092 = {
+			fileRef = F8BB0B2A02E7391101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F8D6E22B02CE2D9701664092 = {
 			isa = PBXFileReference;
 			name = main.c;
@@ -20832,7 +20860,7 @@
 			neededFileNames = (
 			);
 			shellPath = /bin/sh;
-			shellScript = "chmod a+x build/jMax.app/Contents/Resources/bin/fts.wrapper\nmv build/jMax.app/Contents/Resources/share/jmax/config_macosx.jprj build/jMax.app/Contents/Resources/share/jmax/config.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/config.jprj";
+			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/config_macosx.jprj build/jMax.app/Contents/Resources/share/jmax/config.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/config.jprj";
 		};
 		F8DC5EF40286A1FA01664092 = {
 			children = (

@@ -102,6 +102,7 @@ libsignal_la_SOURCES = \
 binop.c \
 cut.c \
 delay.c \
+env.c \
 harmtap.c \
 matrix.c \
 osc.c \
@@ -119,7 +120,7 @@ wave_ieeewrap.c \
 white.c
 
 
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src -I$(top_srcdir)/packages/ispw/c/src
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src -I$(top_srcdir)/packages/utils/c/src
 
 noinst_HEADERS = \
 delay.h \
@@ -141,9 +142,10 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libsignal_la_LIBADD = 
-libsignal_la_OBJECTS =  binop.lo cut.lo delay.lo harmtap.lo matrix.lo \
-osc.lo osc_ieeewrap.lo paste.lo pick.lo pink.lo playfvec.lo recfvec.lo \
-samplepool.lo signal.lo tilda.lo wave.lo wave_ieeewrap.lo white.lo
+libsignal_la_OBJECTS =  binop.lo cut.lo delay.lo env.lo harmtap.lo \
+matrix.lo osc.lo osc_ieeewrap.lo paste.lo pick.lo pink.lo playfvec.lo \
+recfvec.lo samplepool.lo signal.lo tilda.lo wave.lo wave_ieeewrap.lo \
+white.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -158,11 +160,11 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/binop.P .deps/cut.P .deps/delay.P .deps/harmtap.P \
-.deps/matrix.P .deps/osc.P .deps/osc_ieeewrap.P .deps/paste.P \
-.deps/pick.P .deps/pink.P .deps/playfvec.P .deps/recfvec.P \
-.deps/samplepool.P .deps/signal.P .deps/tilda.P .deps/wave.P \
-.deps/wave_ieeewrap.P .deps/white.P
+DEP_FILES =  .deps/binop.P .deps/cut.P .deps/delay.P .deps/env.P \
+.deps/harmtap.P .deps/matrix.P .deps/osc.P .deps/osc_ieeewrap.P \
+.deps/paste.P .deps/pick.P .deps/pink.P .deps/playfvec.P \
+.deps/recfvec.P .deps/samplepool.P .deps/signal.P .deps/tilda.P \
+.deps/wave.P .deps/wave_ieeewrap.P .deps/white.P
 SOURCES = $(libsignal_la_SOURCES)
 OBJECTS = $(libsignal_la_OBJECTS)
 
