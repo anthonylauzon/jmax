@@ -1234,15 +1234,6 @@ patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       
       fts_client_done_message( o);
       
-      /* set name */
-      if (fts_object_get_definition(obj) != NULL)
-	{
-	  fts_atom_t a_name;
-
-	  fts_set_symbol(&a_name, fts_object_get_name(obj));
-	  fts_client_send_message(obj, fts_s_name, 1, &a_name);
-	}
-
       fts_object_get_prop(obj, fts_s_font, a_font + 0);
       
       if(fts_get_symbol(a_font))

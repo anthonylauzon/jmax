@@ -843,6 +843,8 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_set_int(&a, (this->persistence > 0));
   fts_client_send_message(o, fts_s_persistence, 1, &a);
+
+  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 /******************************************************
@@ -994,6 +996,8 @@ track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  event = event_get_next(event);
 	}  
     }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 void
@@ -1060,11 +1064,11 @@ track_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(track_t), track_init, track_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, track_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui); 
-
   fts_class_message_varargs(cl, fts_s_dump, track_dump);
+
   fts_class_message_varargs(cl, seqsym_add_event, track_add_event_from_array);
 
   fts_class_message_varargs(cl, fts_s_upload, track_upload);

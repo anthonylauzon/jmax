@@ -159,41 +159,6 @@ sequence_move_track(sequence_t *sequence, track_t *track, int index)
     }
 }
 
-static void
-sequence_tuple_update(sequence_t *this)
-{
-  track_t *track = sequence_get_first_track(this);
-  
-  fts_tuple_set_size(this->tuple, 0);
-
-  while(track)
-    {
-      fts_atom_t a;
-
-      fts_set_object(&a, (fts_object_t *)track);
-      fts_tuple_append(this->tuple, 1, &a);
-
-      track = track_get_next(track);
-    }
-
-#if 0
-  fts_object_redefine_variable((fts_object_t *)this);
-#endif
-}
-
-static void
-sequence_tuple_append(sequence_t *this, track_t *track)
-{
-  fts_atom_t a;
-
-  fts_set_object(&a, (fts_object_t *)track);
-  fts_tuple_append(this->tuple, 1, &a);
-
-#if 0
-  fts_object_redefine_variable((fts_object_t *)this);
-#endif
-}
-
 /******************************************************
  *
  *  system methods
@@ -314,7 +279,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	  if(sequence_editor_is_open(this))
 	    sequence_upload(o, 0, 0, 0, 0);
 	  
-	  sequence_tuple_update(this);
+	  fts_object_update_name(o);
 	}
       else
 	fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", name);
@@ -450,7 +415,7 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  track = sequence_get_first_track(this);
 	}    
 
-      sequence_tuple_update(this);
+      fts_object_update_name(o);
     }
   else if(ac && fts_is_number(at))
     {
@@ -459,6 +424,26 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       
       if(track)
 	fts_send_message((fts_object_t *)track, fts_s_clear, 0, 0);
+    }
+}
+
+static void
+sequence_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(ac > 0 && fts_is_number(at))
+    {
+      int index = fts_get_number_int(at);
+      
+      if(index >= 0 && index < sequence_get_size(this))
+	{
+	  track_t *track = sequence_get_track_by_index(this, index);
+	  fts_atom_t a;
+
+	  fts_set_object( &a, track);
+	  fts_return( &a);
+	}
     }
 }
 
@@ -577,6 +562,8 @@ sequence_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   fts_set_int(&a, (this->persistence > 0));
   fts_client_send_message(o, fts_s_persistence, 1, &a);
+
+  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 /******************************************************
@@ -601,8 +588,6 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   this->last_track = track;
 
-  sequence_tuple_append(this, track);
-
   if(sequence_editor_is_open(this))
     {
       sequence_add_track_at_client(this, track);
@@ -625,8 +610,6 @@ sequence_add_track_without_update(fts_object_t *o, int winlet, fts_symbol_t s, i
     track_set_name(track, fts_get_symbol(at + 1));
 
   this->last_track = track;
-
-  sequence_tuple_append(this, track);
 }
 
 /* remove track by client request */
@@ -641,8 +624,7 @@ sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, in
   if(fts_object_has_id((fts_object_t *)track))
     fts_client_send_message(o, seqsym_removeTracks, 1, at);
 
-  sequence_tuple_update(this);
-
+  fts_object_update_name(o);
   sequence_set_dirty( this);
 }
 
@@ -658,8 +640,7 @@ sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int 
   if(fts_object_has_id((fts_object_t *)track))
     fts_client_send_message(o, seqsym_moveTrack, 2, at);
 
-  sequence_tuple_update(this);
-
+  fts_object_update_name(o);
   sequence_set_dirty( this);
 }
 
@@ -698,6 +679,8 @@ sequence_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  track = track_get_next(track);
 	}
     }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 /******************************************************
@@ -715,8 +698,6 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->tracks = 0;
   this->size = 0;
   this->open = 0;  
-
-  this->tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, 0, 0);
 
   if(ac == 1 && fts_is_int(at))
     {
@@ -737,7 +718,6 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	  /* add it to the sequence */
 	  sequence_add_track(this, track);
-	  sequence_tuple_append(this, track);
 	}
       
       this->persistence = -1;
@@ -758,7 +738,6 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 		{
 		  /* add it to the sequence */
 		  sequence_add_track(this, track);
-		  sequence_tuple_append(this, track);
 		}
 	      else
 		fts_object_set_error(o, "cannot create track of type %s", type);
@@ -784,8 +763,6 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       track = sequence_get_first_track(this);
     }    
 
-  fts_object_destroy((fts_object_t *)this->tuple);
-  
   fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 }
 
@@ -794,9 +771,10 @@ sequence_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sequence_t), sequence_init, sequence_delete); 
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, sequence_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, sequence_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump, sequence_dump);
 
   fts_class_message_varargs(cl, fts_s_upload_child, sequence_upload_child);
   fts_class_message_varargs(cl, fts_s_upload, sequence_upload);
@@ -806,9 +784,10 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_move_track, sequence_move_track_and_update);
   fts_class_message_varargs(cl, seqsym_add_event, sequence_add_event_to_last_track);
   
-  fts_class_message_varargs(cl, fts_s_dump, sequence_dump);
   fts_class_message_varargs(cl, fts_s_post, sequence_post);
   fts_class_message_varargs(cl, fts_s_print, sequence_print);
+
+  fts_class_message_varargs(cl, fts_s_get_element, sequence_get_element);
 
   /* MIDI files */
   fts_class_message_varargs(cl, seqsym_import_midifile_dialog, sequence_import_midifile_dialog);

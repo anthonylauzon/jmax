@@ -244,12 +244,11 @@ static void
 param_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_atom_t a;
 
   if(this->persistence == 1)
     {
-      fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-      fts_atom_t a;
-
       /* save persistence flag */
       fts_set_int(&a, 1);
       fts_dumper_send(dumper, fts_s_persistence, 1, &a);
@@ -265,20 +264,23 @@ param_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       else if(!fts_is_void(&this->value))
 	fts_dumper_send(dumper, fts_s_set, 1, &this->value);    
     }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 static void
 param_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
+  fts_atom_t a;    
 
   if(this->persistence >= 0)
     {
-      fts_atom_t a;
-      
       fts_set_int(&a, this->persistence);
       fts_client_send_message(o, fts_s_persistence, 1, &a);
     }
+
+  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 static void
@@ -327,15 +329,15 @@ param_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_param_t), param_init, param_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, param_set_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, param_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump, param_dump);
 
   fts_class_message_varargs(cl, fts_s_post, param_post);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
   fts_class_message_varargs(cl, fts_s_set, param_set_varargs);
-  fts_class_message_varargs(cl, fts_s_dump, param_dump);
 
   fts_class_message_varargs(cl, fts_s_get_array, param_get_array);
   fts_class_message_varargs(cl, fts_s_set_from_array, param_set_varargs);

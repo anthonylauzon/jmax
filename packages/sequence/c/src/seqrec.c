@@ -223,7 +223,7 @@ seqrec_instantiate(fts_class_t *cl)
   fts_class_inlet_varargs(cl, 0, seqrec_record_atoms);
   
   fts_class_inlet(cl, 1, track_type, seqrec_set_reference);
-  }
+}
 
 void
 seqrec_config(void)

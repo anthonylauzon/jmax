@@ -41,12 +41,7 @@ static void
 midiout_send_event(midiout_t *this, fts_midievent_t *event, double time)
 {
   fts_object_refer((fts_object_t *)event);
-
-  if(this->port != NULL)
-    fts_midiport_output(this->port, event, time);
-  else
-    fts_outlet_object((fts_object_t *)this, 0, (fts_object_t *)event);
-
+  fts_midiport_output(this->port, event, time);
   fts_object_release((fts_object_t *)event);
 }
 
@@ -84,7 +79,7 @@ midiout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   midiout_t *this = (midiout_t *)o;
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
-  fts_midiport_output(this->port, event, 0.0);
+  midiout_send_event(this, event, 0.0);
 }
 
 static void
@@ -94,7 +89,7 @@ midiout_panic(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int i;
   
   for(i=0; i<n_midi_channels; i++)
-    fts_midiport_output(this->port, fts_midievent_control_change_new(i, 120, 0), 0.0);
+    midiout_send_event(this, fts_midievent_control_change_new(i, 120, 0), 0.0);
 }
 
 static void
@@ -102,7 +97,7 @@ midiout_general_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 { 
   midiout_t *this = (midiout_t *)o;
 
-  fts_midiport_output(this->port, midievent_general_midi, 0.0);
+  midiout_send_event(this, midievent_general_midi, 0.0);
 }
 
 static void
@@ -400,20 +395,11 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->number = 0;
 
   if(ac > 0 && fts_is_symbol(at)) 
-    {
-      fts_symbol_t label = fts_get_symbol(at);
-
-      if(label != fts_s_minus)
-	{
-	  this->port = fts_midiconfig_get_output(label);      
-	  midiout_get_number_and_channel(o, ac - 1, at + 1);
-	}
-    }
+    this->port = fts_midiconfig_get_output(fts_get_symbol(at));      
   else
-    {
-      this->port = fts_midiconfig_get_output(fts_s_default);
-      midiout_get_number_and_channel(o, ac, at);
-    }
+    this->port = fts_midiconfig_get_output(fts_s_default);
+
+  midiout_get_number_and_channel(o, ac, at);
   
   if(this->port)
     fts_midiconfig_add_listener(o);
@@ -428,7 +414,7 @@ midiout_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("GM"), midiout_general_midi);
   fts_class_message_varargs(cl, fts_new_symbol("gm"), midiout_general_midi);
 
-  fts_class_message_varargs(cl, fts_s_midievent, midiout_send);
+  fts_class_inlet(cl, 0, fts_midievent_type, midiout_send);
 }
 
 static void

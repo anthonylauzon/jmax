@@ -58,7 +58,7 @@ static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleav
 #define DEFAULT_FORMAT s_s32_le
 #define DEFAULT_ACCESS s_rw_interleaved
 #define DEFAULT_SAMPLING_RATE (44100.)
-#define DEFAULT_FIFO_SIZE 8192
+#define DEFAULT_FIFO_SIZE 256
 #define DEFAULT_INPUT_CHANNELS 26
 #define DEFAULT_OUTPUT_CHANNELS 26
 

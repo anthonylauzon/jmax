@@ -61,7 +61,6 @@ error_object_instantiate(fts_class_t *cl)
   fts_class_outlet_anything(cl, 0);
 
   fts_dsp_declare_inlet(cl, 0);
-  fts_dsp_declare_outlet(cl, 0);  
 }
 
 fts_class_t *

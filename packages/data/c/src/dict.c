@@ -296,6 +296,8 @@ dict_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    }
 	}
     }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 /**********************************************************
@@ -672,13 +674,13 @@ dict_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dict_t), dict_init, dict_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump, dict_dump);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_instance);
   fts_class_message_varargs(cl, fts_s_get_array, dict_get_array);
-  fts_class_message_varargs(cl, fts_s_dump, dict_dump);
 
   fts_class_message_varargs(cl, fts_s_post, dict_post);
   fts_class_message_varargs(cl, fts_s_print, dict_print);

@@ -170,7 +170,7 @@ print_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t argv[3];
-  
+
   fts_set_object(argv + 0, o);
   fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(argv + 2, n_tick);
@@ -190,6 +190,7 @@ print_tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->size = size;
   this->alloc = size;
   this->cols = 4;
+  this->index = size;  
 
   if(ac > 0 && fts_is_symbol(at))
     {

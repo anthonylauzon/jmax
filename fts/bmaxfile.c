@@ -1634,14 +1634,6 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   /* send a dump message to the object to give it the opportunity to save its data */
   fts_set_object(&a, (fts_object_t *)saver_dumper);
   fts_send_message(obj, fts_s_dump, 1, &a);
-
-  /* save name */
-  if (fts_object_get_definition(obj) != NULL)
-    {
-      fts_bmax_code_push_symbol(f, fts_object_get_name(obj));
-      fts_bmax_code_obj_mess(f, fts_s_name, 1);
-      fts_bmax_code_pop_args(f, 1);
-    }
 }
 
 

@@ -202,8 +202,11 @@ delayline_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delayline_t), delayline_init, delayline_delete);
 
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
+  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method);
+  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
+
   fts_class_message_varargs(cl, fts_s_put_epilogue, delayline_put);
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
 
   fts_class_inlet_anything(cl, 0);
 }

@@ -38,15 +38,11 @@ static void
 value_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
-
-  if(!fts_is_void(&this->a))
-    {
-      fts_atom_t a = this->a;
-      
-      fts_atom_refer(&a);
-      fts_outlet_varargs(o, 0, 1, &a);
-      fts_atom_release(&a);
-    }
+  fts_atom_t a = this->a;
+  
+  fts_atom_refer(&a);
+  fts_outlet_varargs(o, 0, 1, &a);
+  fts_atom_release(&a);
 }
 
 static void
@@ -130,7 +126,8 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   value_t *this = (value_t *)o;
 
   data_object_init(o);
-  fts_set_void(&this->a);
+
+  fts_set_int(&this->a, 0);
 
   if(ac > 0)
     value_set_atom(o, 0, 0, 1, at);
@@ -141,7 +138,7 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   value_t *this = (value_t *) o;
 
-  fts_atom_void(&this->a);
+  fts_atom_release(&this->a);
 }
 
 static void
@@ -149,7 +146,9 @@ value_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(value_t), value_init, value_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
+  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method);
+  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
 
   fts_class_message_varargs(cl, fts_s_post, value_post);
 

@@ -266,13 +266,36 @@ fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
 }
 
 void
-fts_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_name_set_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(ac > 0 && fts_is_symbol(at) && fts_object_get_patcher(o) != NULL)
     {
       fts_object_set_name(o, fts_get_symbol(at));
       /*fts_patcher_set_dirty(fts_object_get_patcher(o), 1);*/
     }
+}
+
+void
+fts_name_dump_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_symbol_t name = fts_object_get_name(o);
+  fts_atom_t a;
+
+  if(name != fts_s_empty_string)
+    {
+      fts_set_symbol(&a, name);
+      fts_dumper_send(dumper, fts_s_name, 1, &a);
+    }
+}
+
+void
+fts_name_gui_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t a;
+
+  fts_set_symbol(&a, fts_object_get_name(o));
+  fts_client_send_message(o, fts_s_name, 1, &a);
 }
 
 /****************************************************************************

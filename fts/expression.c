@@ -39,27 +39,27 @@ struct _fts_expression_t {
 };
 
 static fts_status_description_t empty_expression_error_description = {
-  "Empty expression"
+  "empty expression"
 };
 static fts_status_t empty_expression_error = &empty_expression_error_description;
 
 static fts_status_description_t undefined_variable_error_description = {
-  "Undefined variable"
+  "undefined variable"
 };
 static fts_status_t undefined_variable_error = &undefined_variable_error_description;
 
 static fts_status_description_t operand_type_mismatch_error_description = {
-  "Operand type mismatch"
+  "operand type mismatch"
 };
 static fts_status_t operand_type_mismatch_error = &operand_type_mismatch_error_description;
 
 static fts_status_description_t array_access_error_description = {
-  "Array access error"
+  "array access error"
 };
 static fts_status_t array_access_error = &array_access_error_description;
 
 static fts_status_description_t invalid_environment_variable_error_description = {
-  "Invalid environment variable"
+  "invalid environment variable"
 };
 static fts_status_t invalid_environment_variable_error = &invalid_environment_variable_error_description;
 
@@ -423,10 +423,18 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     {
       fts_method_t mth = fts_class_get_method( fts_get_class( at), fts_s_get_element);
       if (mth)
-	(*mth)( fts_get_object( at), fts_system_inlet, fts_s_get_element, ac-1, at+1);
+	{
+	  fts_set_void( fts_get_return_value());
+	  (*mth)( fts_get_object( at), fts_system_inlet, fts_s_get_element, ac-1, at+1);
+
+	  if (fts_is_void( fts_get_return_value()))
+	    return array_access_error;
+	}
       else
 	return array_access_error;
     }
+
+    fts_atom_refer(fts_get_return_value());
 
     expression_stack_pop_frame( exp);
     expression_stack_push( exp, fts_get_return_value());
@@ -510,6 +518,8 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       else
 	return invalid_selector_error;
     }
+
+    fts_atom_refer(fts_get_return_value());
 
     expression_stack_pop_frame( exp);
     if (!fts_is_void( fts_get_return_value()))

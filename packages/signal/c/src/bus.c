@@ -177,9 +177,11 @@ bus_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(bus_t), bus_init, bus_delete);
 
-  fts_class_message_varargs(cl, fts_s_put_epilogue, bus_put_epilogue);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
+  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method);
+  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_put_epilogue, bus_put_epilogue);
 
   fts_class_inlet_anything(cl, 0);
 }

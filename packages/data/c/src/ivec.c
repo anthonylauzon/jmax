@@ -1005,6 +1005,8 @@ ivec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       if(fts_message_get_ac(mess) > 1) 
 	fts_dumper_message_send(dumper, mess);
     }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 static void
@@ -1106,9 +1108,10 @@ ivec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(ivec_t), ivec_init, ivec_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump, ivec_dump);
 
   fts_class_message_varargs(cl, fts_s_post, ivec_post); 
   fts_class_message_varargs(cl, fts_s_print, ivec_print); 
@@ -1117,7 +1120,6 @@ ivec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set_from_array, ivec_set_from_array);
 
   fts_class_message_varargs(cl, fts_s_get_array, ivec_get_array);
-  fts_class_message_varargs(cl, fts_s_dump, ivec_dump);
 
   /* graphical editor */
   fts_class_message_varargs(cl, fts_s_openEditor, ivec_open_editor);

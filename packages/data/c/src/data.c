@@ -89,6 +89,8 @@ data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   fts_set_int(&a, (this->persistence > data_object_persistence_no));
   fts_client_send_message(o, fts_s_persistence, 1, &a);
+
+  fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
 void

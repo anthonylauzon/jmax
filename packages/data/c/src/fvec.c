@@ -1409,6 +1409,8 @@ fvec_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       if(fts_message_get_ac(mess) > 1) 
 	fts_dumper_message_send(dumper, mess);
     }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 static void
@@ -1436,7 +1438,7 @@ fvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-fvec_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
   int index = fts_get_int_arg( ac, at, 0, -1);
@@ -1447,7 +1449,6 @@ fvec_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_set_float( &a, fvec_get_element(this, index));
       fts_return( &a);
     }
-    
 }
 
 /*********************************************************
@@ -1524,9 +1525,10 @@ fvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fvec_t), fvec_init, fvec_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump, fvec_dump);
 
   fts_class_message_varargs(cl, fts_s_post, fvec_post); 
   fts_class_message_varargs(cl, fts_s_print, fvec_print); 
@@ -1535,7 +1537,6 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set_from_array, fvec_set_from_array);
 
   fts_class_message_varargs(cl, fts_s_get_array, fvec_get_array);
-  fts_class_message_varargs(cl, fts_s_dump, fvec_dump);
 
   fts_class_message_varargs(cl, fts_s_fill, fvec_fill);
   fts_class_message_varargs(cl, fts_s_set, fvec_set_elements);
@@ -1574,7 +1575,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_load, fvec_load);
   fts_class_message_varargs(cl, fts_s_save, fvec_save_soundfile);
 
-  fts_class_message_varargs(cl, fts_s_get_element, fvec_element);
+  fts_class_message_varargs(cl, fts_s_get_element, fvec_get_element);
 
   fts_class_inlet_anything(cl, 0);
 }

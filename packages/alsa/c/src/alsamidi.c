@@ -134,7 +134,6 @@ alsamidi_get_midiport(alsamidi_t *this, fts_symbol_t name)
 	port = (fts_midiport_t *)fts_get_object(&a);
       else if(fts_is_symbol(&a))
 	{
-	  fts_object_t *obj = NULL;
 	  fts_symbol_t hw_name = fts_get_symbol(&a);
 	  fts_atom_t args[3];
 
@@ -142,12 +141,7 @@ alsamidi_get_midiport(alsamidi_t *this, fts_symbol_t name)
 	  fts_set_object(args + 0, (fts_object_t *)this);
 	  fts_set_symbol(args + 1, name);
 	  fts_set_symbol(args + 2, hw_name);
-	  obj = fts_object_create(alsarawmidiport_type, NULL, 3, args);
-	  
-	  if(obj == NULL)
-	    port = (fts_midiport_t *)obj;
-	  else 
-	    fts_object_destroy(obj);
+	  port = (fts_midiport_t *)fts_object_create(alsarawmidiport_type, NULL, 3, args);
 	}
     }
 

@@ -94,25 +94,17 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public void setCurrentName( String name)
   {
-    if( varName == null)
+    if( name.equals(""))
+      {
+	varName = null;
+	varWidth = 0;
+      }
+    else
       {
 	varName = name;	
 	varWidth = getFontMetrics().stringWidth( varName) + 6;
       }
-    else
-      if( name.equals(""))
-	{
-	  varName = null;
-	  int oldw = getWidth() - varWidth;	  
-	  varWidth = 0;
-	}
-      else
-	if( !varName.equals( name))
-	  {
-	    varName = name;
-	    int oldw = getWidth() - varWidth;
-	    varWidth = getFontMetrics().stringWidth( varName) + 6;
-	  }
+
     redraw();
   }
 

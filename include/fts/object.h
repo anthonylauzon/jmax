@@ -77,6 +77,7 @@ FTS_API void fts_object_destroy(fts_object_t *obj);
 
 FTS_API void fts_object_set_name(fts_object_t *obj, fts_symbol_t sym);
 FTS_API fts_symbol_t fts_object_get_name(fts_object_t *obj);
+FTS_API void fts_object_update_name(fts_object_t *obj);
 
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 

@@ -348,6 +348,15 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
     }
 }
 
+void
+fts_object_update_name(fts_object_t *obj)
+{
+  fts_definition_t *def = fts_object_get_definition(obj);
+
+  if(def)
+    fts_definition_update(def, &def->value);
+}
+
 fts_symbol_t 
 fts_object_get_name(fts_object_t *obj)
 {
@@ -356,7 +365,7 @@ fts_object_get_name(fts_object_t *obj)
   if(def)
     return fts_definition_get_name(def);
 
-  return NULL;
+  return fts_s_empty_string;
 }
 
 /****************************************************************
@@ -438,9 +447,9 @@ fts_object_unclient(fts_object_t *obj)
 void 
 fts_object_unpatch(fts_object_t *obj)
 {
+  fts_object_unconnect(obj);
   fts_object_unbind(obj);
   fts_object_unname(obj);
-  fts_object_unclient(obj);
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
@@ -524,7 +533,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       fts_object_move_connections(old, new);
       
       /* set name of new object */
-      if(name != NULL)
+      if(name != fts_s_empty_string)
 	{
 	  fts_atom_t a;
 

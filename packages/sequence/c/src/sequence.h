@@ -57,8 +57,6 @@ typedef struct _sequence_
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
 
-  fts_tuple_t *tuple;
-
   int open; /* flag: is 1 if sequence editor is open */
   track_t *last_track; /* last created track */
 } sequence_t;

@@ -587,6 +587,8 @@ mat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    fts_dumper_message_send(dumper, mess);
 	}
     }
+
+  fts_name_dump_method(o, 0, 0, ac, at);
 }
 
 static void
@@ -703,15 +705,15 @@ mat_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(mat_t), mat_init, mat_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_method);
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_persistence, data_object_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, data_object_update_gui); 
+  fts_class_message_varargs(cl, fts_s_dump, mat_dump);
 
   fts_class_message_varargs(cl, fts_s_post, mat_post); 
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
-  fts_class_message_varargs(cl, fts_s_dump, mat_dump);
   
   fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
