@@ -15,3 +15,5 @@ ivec.c \
 mat.c \
 value.c \
 vec.c 
+
+INCLUDES=-I@top_srcdir@/packages/utils/c/src

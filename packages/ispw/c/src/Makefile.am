@@ -1,6 +1,15 @@
 packagedir=$(prefix)/jmax/packages/ispw/c
 package_LTLIBRARIES=libispw.la
+
+# The following are architecture dependant and must be determined by configure script
+#osc_ieeewrap.c \
+#osc_intphase.c \
+#phasor_ieeewrap.c \
+#phasor_intphase.c \
+
 libispw_la_SOURCES= \
+osc_ieeewrap.c \
+phasor_ieeewrap.c \
 Rreceive.c \
 Rsend.c \
 abs.c \
@@ -56,13 +65,9 @@ naming.c \
 nbangs.c \
 noise.c \
 osc.c \
-osc_ieeewrap.c \
-osc_intphase.c \
 pack.c \
 pbank.c \
 phasor.c \
-phasor_ieeewrap.c \
-phasor_intphase.c \
 pipe.c \
 pitch.c \
 poly.c \
@@ -121,3 +126,5 @@ voxalloc.c \
 wahwah.c \
 wavetab.c \
 zerocross.c 
+
+INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src

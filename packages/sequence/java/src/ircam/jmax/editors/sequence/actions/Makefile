@@ -80,8 +80,8 @@ package_SOURCES =  Actions.java CopyAction.java CutAction.java DuplicateAction.j
 
 
 JAVACX = javac
-JAVAROOTX = ../../../../../../../../../java/src
-CLASSPATH_ENVX = CLASSPATH=../../../../../../../../../java/src:../../../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../../../java/lib/jacl/tcljava.jar
+JAVAROOTX = ../../../../../../../../../packages/sequence/java/src
+CLASSPATH_ENVX = CLASSPATH=../../../../../../../../../java/src:../../../../../../../../../packages/sequence/java/src:../../../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../../../java/lib/jacl/tcljava.jar
 
 SUFFIXES = .java .class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

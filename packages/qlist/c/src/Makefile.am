@@ -1,5 +1,6 @@
 packagedir=$(prefix)/jmax/packages/qlist/c
 package_LTLIBRARIES=libqlist.la
 libqlist_la_SOURCES= \
-module.c \
 qlist.c 
+
+INCLUDES=-I@top_srcdir@/packages/ispw/c/src

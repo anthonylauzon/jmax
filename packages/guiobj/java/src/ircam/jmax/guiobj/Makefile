@@ -78,8 +78,8 @@ package_SOURCES =  Bang.java BangControlPanel.java Comment.java Display.java Flo
 
 
 JAVACX = javac
-JAVAROOTX = ../../../../../../../java/src
-CLASSPATH_ENVX = CLASSPATH=../../../../../../../java/src:../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../java/lib/jacl/tcljava.jar
+JAVAROOTX = ../../../../../../../packages/guiobj/java/src
+CLASSPATH_ENVX = CLASSPATH=../../../../../../../java/src:../../../../../../../packages/guiobj/java/src:../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../java/lib/jacl/tcljava.jar
 
 SUFFIXES = .java .class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

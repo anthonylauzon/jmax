@@ -6,8 +6,8 @@ ISPWExtension.java \
 Message.java 
 
 JAVACX = @JAVACX@
-JAVAROOTX=@top_srcdir@/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+JAVAROOTX=@top_srcdir@/packages/ispw/java/src
+CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/packages/ispw/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
 
 SUFFIXES = .java .class
 

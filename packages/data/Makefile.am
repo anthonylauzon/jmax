@@ -1,2 +1,5 @@
-SUBDIRS=c java
+SUBDIRS=c 
+
+# java does not compile yet
+
 

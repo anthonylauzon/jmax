@@ -80,8 +80,8 @@ package_SOURCES =  FtsQListObject.java KeyConsumer.java QList.java QListExtensio
 
 
 JAVACX = javac
-JAVAROOTX = ../../../../../../../../java/src
-CLASSPATH_ENVX = CLASSPATH=../../../../../../../../java/src:../../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../../java/lib/jacl/tcljava.jar
+JAVAROOTX = ../../../../../../../../packages/qlist/java/src
+CLASSPATH_ENVX = CLASSPATH=../../../../../../../../java/src:../../../../../../../../packages/qlist/java/src:../../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../../java/lib/jacl/tcljava.jar
 
 SUFFIXES = .java .class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

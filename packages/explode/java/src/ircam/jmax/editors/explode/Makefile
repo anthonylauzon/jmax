@@ -80,8 +80,8 @@ package_SOURCES =  AAAReadme.java Adapter.java ArrowTool.java ChannelMapper.java
 
 
 JAVACX = javac
-JAVAROOTX = ../../../../../../../../java/src
-CLASSPATH_ENVX = CLASSPATH=../../../../../../../../java/src:../../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../../java/lib/jacl/tcljava.jar
+JAVAROOTX = ../../../../../../../../packages/explode/java/src
+CLASSPATH_ENVX = CLASSPATH=../../../../../../../../java/src:../../../../../../../../packages/explode/java/src:../../../../../../../../java/lib/jacl/jacl.jar:../../../../../../../../java/lib/jacl/tcljava.jar
 
 SUFFIXES = .java .class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

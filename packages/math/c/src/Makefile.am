@@ -6,3 +6,5 @@ binop_fvec.c \
 binop_ivec.c \
 binop_number.c \
 math.c 
+
+INCLUDES=-I@top_srcdir@/packages/data/c/src

@@ -11,6 +11,4 @@ out.c \
 profileaudioport.c \
 serial.c \
 udp.c \
-udpreceive.c \
-udpsend.c \
 wacom.c 

@@ -1,7 +1,6 @@
 packagedir=$(prefix)/jmax/packages/system/c
 package_LTLIBRARIES=libsystem.la
 libsystem_la_SOURCES= \
-arch.c \
 argument.c \
 blip.c \
 bus.c \
