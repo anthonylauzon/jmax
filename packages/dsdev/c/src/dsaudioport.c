@@ -200,7 +200,7 @@ dsaudioport_output(fts_audioport_t* port, float** buffers, int buffsize)
   dsaudioport_t *dev;
   short *buf1, *buf2;
   DWORD bytes1, bytes2;    
-  int boffset, soffset, n, channels, ch, i, j;
+  int boffset, soffset, channels, ch, i, j;
 
   dev = (dsaudioport_t *)port;
   if (dev->state != dsaudioport_running) 
@@ -1056,7 +1056,6 @@ void
 dsaudioport_config(void)
 {
   fts_symbol_t dsaudioport_symbol;
-  fts_object_t* default_dev;
 
   /* make sure we have a valid instance handle */
   if (dsdev_instance == NULL) 
