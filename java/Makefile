@@ -34,6 +34,7 @@ clean:
 
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)java
-	( cd classes ; $(MAKE) $@ )
+	$(INSTALL_DIR) $(lib_install_dir)java/classes
+	( cd classes ; $(INSTALL_DATA) jmax.jar $(lib_install_dir)java/classes )
 	( cd lib ; $(MAKE) $@ )
 .PHONY: install-exec
