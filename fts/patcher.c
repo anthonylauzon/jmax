@@ -164,10 +164,10 @@ fts_patcher_set_dirty(fts_patcher_t *self, int is_dirty)
 }
 
 void
-fts_patcher_set_template( fts_patcher_t *self, fts_template_t *template)
+fts_patcher_set_template( fts_patcher_t *self, fts_template_t *template_definition)
 {
   self->type = fts_p_template;
-  self->template = template;
+  self->template_definition = template_definition;
 }
 
 /*************************************************************
