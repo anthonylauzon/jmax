@@ -20,7 +20,6 @@ hot.gif \
 info.gif \
 ircam.gif \
 jmax_app.gif \
-jmax.icns \
 jmax_icon.gif \
 jmax_logo_small.gif \
 jmax_logo_small_transp.gif \
