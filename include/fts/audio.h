@@ -28,6 +28,7 @@
  * @defgroup audio audio
  */
 
+
 #define FTS_AUDIO_INPUT 0
 #define FTS_AUDIO_OUTPUT 1
 
@@ -61,7 +62,6 @@ typedef struct fts_audioport fts_audioport_t;
  * The audioport I/O function calls the native audio layer to read/write the samples buffers
  * in the native format.
  *
- * @fn void (*fts_audioport_io_fun_t)( fts_audioport_t *port, float **buffers, int buffsize)
  * @param port the audioport
  * @param buffers an array of buffers to samples
  * @param buffsize the size of the buffers to be read/written
@@ -91,14 +91,47 @@ struct fts_audioport {
   int (*xrun_function)( struct fts_audioport *port);
 };
 
+
+/** 
+ * Init an audioport
+ * 
+ * @param port the port
+ * @ingroup audio
+ */
 FTS_API void fts_audioport_init( fts_audioport_t *port);
+
+/** 
+ * Delete an audioport
+ * 
+ * @param port the port
+ * @ingroup audio
+ */
 FTS_API void fts_audioport_delete( fts_audioport_t *port);
+
 
 #define fts_audioport_get_channels( port, direction) \
   ((port)->inout[(direction)].channels)
 
+/** 
+ * Set number of channels of an audioport
+ * 
+ * @param port the audioport
+ * @param direction the direction
+ * @param channels the number of channels
+ * @ingroup audio
+ */
 FTS_API void fts_audioport_set_channels( fts_audioport_t *port, int direction, int channels);
 
+
+/** 
+ * Test if audioport have given channel used
+ * 
+ * @param port the audioport
+ * @param direction the direction
+ * @param channel the channel
+ * @return 1 if channel is used, 0 if not
+ * @ingroup audio
+ */
 FTS_API int fts_audioport_is_channel_used( fts_audioport_t *port, int direction, int channel);
 
 #define fts_audioport_set_valid(port, direction) \
@@ -151,9 +184,34 @@ struct fts_audiolabel {
 #define fts_audiolabel_get_port( label, direction) ((label)->inout[(direction)].port)
 #define fts_audiolabel_get_channel( label, direction) ((label)->inout[(direction)].channel)
 
+
+/** 
+ * Find an audiolabel by name
+ * 
+ * @param name the name of the wanted audiolabel
+ * @return an audiolabel, or NULL if there is no audiolabel with a such name
+ * @ingroup audio
+ */
 FTS_API fts_audiolabel_t *fts_audiolabel_get( fts_symbol_t name);
 
+/** 
+ * Copy input buffer of an audiolabel to given buffer
+ * 
+ * @param label the label
+ * @param buff the buffer to fill
+ * @param buffsize the buffer size
+ * @ingroup audio
+ */
 FTS_API void fts_audiolabel_input( fts_audiolabel_t *label, float *buff, int buffsize);
+
+/** 
+ * Copy given buffer to output of an audiolabel
+ * 
+ * @param label the label
+ * @param buff the buffer to copy
+ * @param buffsize the buffer size
+ * @ingroup audio
+ */
 FTS_API void fts_audiolabel_output( fts_audiolabel_t *label, float *buff, int buffsize);
 
 /**
@@ -161,7 +219,22 @@ FTS_API void fts_audiolabel_output( fts_audiolabel_t *label, float *buff, int bu
  * The native audio packages can use these listeners to be informed when labels are created and
  * create new audioports. 
  */
+/** 
+ * Add a listener of label addition and label suppression
+ * 
+ * @param listener the listener object
+ * @param label_added the method called when a label is added
+ * @param label_removed the method called when a lebel is removed
+ * @ingroup audio
+ */
 FTS_API void fts_audiolabel_add_listener( fts_object_t *listener, fts_method_t label_added, fts_method_t label_removed);
+
+/** 
+ * Remove a listener of label addition and label suppression 
+ * 
+ * @param listener the listener object
+ * @ingroup audio
+ */
 FTS_API void fts_audiolabel_remove_listener( fts_object_t *listener);
 
 
@@ -170,12 +243,13 @@ FTS_API void fts_audiolabel_remove_listener( fts_object_t *listener);
  *
  * Maintains the list of audio port names
  *
- * @ingroup audio
  */
 
 /**
  * Get an audioport by name.
  *
+ * @param name the name of the audioport
+ * @return the audioport, or NULL if there is no audioport with a such name
  * @ingroup audio
  */
 FTS_API fts_audioport_t *fts_audiomanager_get_port( fts_symbol_t name);
@@ -183,6 +257,8 @@ FTS_API fts_audioport_t *fts_audiomanager_get_port( fts_symbol_t name);
 /**
  * Register a new audioport.
  *
+ * @param name the registered name  the audioport
+ * @param port the audioport
  * @ingroup audio
  */
 FTS_API void fts_audiomanager_put_port( fts_symbol_t name, fts_audioport_t *port);
@@ -190,6 +266,7 @@ FTS_API void fts_audiomanager_put_port( fts_symbol_t name, fts_audioport_t *port
 /**
  * Remove an audioport that was already registered using fts_audiomanager_put_port()
  *
+ * @param name the name of the audioport to unregister
  * @ingroup audio
  */
 FTS_API void fts_audiomanager_remove_port( fts_symbol_t name);
