@@ -36,78 +36,67 @@ import java.io.*;
  */
 public class FtsQListObject extends FtsObjectWithEditor {
 
-    static{
-	FtsObject.registerMessageHandler( FtsQListObject.class, FtsSymbol.get("setAtomList"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-		{
-		    ((FtsQListObject)obj).setAtomList((FtsAtomList)argv[0].objectValue);
-		}
-	    });
-     }
+  static{
+    FtsObject.registerMessageHandler( FtsQListObject.class, FtsSymbol.get("setAtomList"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsQListObject)obj).setAtomList( (FtsAtomList)args.getObject( 0));
+	}
+      });
+  }
 
   /**
    * constructor.
    */
-    public FtsQListObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
-    {
-	super(server, parent, classname, nArgs, args, id);		
+  public FtsQListObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
+  {
+    super(server, parent, classname, nArgs, args, id);		
+  }
+
+  public void requestOpenEditor()
+  {
+    requestUpload();
+    super.requestOpenEditor();
+  }
+
+  public void requestUpload()
+  {
+    try{
+      send(FtsSymbol.get("upload"));
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsQlistObject: I/O Error sending upload Message!");
+	e.printStackTrace(); 
+      }
+  }
 
-    public void requestOpenEditor()
-    {
-	requestUpload();
-	super.requestOpenEditor();
-    }
+  //////////////////////////////////////////////////////////////////////////////////////
+  //// MESSAGES called from fts.
+  //////////////////////////////////////////////////////////////////////////////////////
 
-    public void requestUpload()
-    {
-	try{
-	    send(FtsSymbol.get("upload"));
-	}
-	catch(IOException e)
-	    {
-		System.err.println("FtsQlistObject: I/O Error sending upload Message!");
-		e.printStackTrace(); 
-	    }
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    //// MESSAGES called from fts.
-    //////////////////////////////////////////////////////////////////////////////////////
-
-    public void openEditor(int argc, FtsAtom[] argv)
-    {
-	if(getEditorFrame() == null)	    
-	    setEditorFrame( new QListWindow(this));
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    if(getEditorFrame() == null)	    
+      setEditorFrame( new QListWindow(this));
 	
-	showEditor();
-    }
+    showEditor();
+  }
 
-    public void destroyEditor()
-    {
-	disposeEditor();
-    }
+  public void destroyEditor()
+  {
+    disposeEditor();
+  }
 
-    public void setAtomList(FtsAtomList list)
-    {
-      this.list = list;
-    }
+  public void setAtomList(FtsAtomList list)
+  {
+    this.list = list;
+  }
 
-    public FtsAtomList getAtomList()
-    {
-	return list;
-    }
+  public FtsAtomList getAtomList()
+  {
+    return list;
+  }
 
-    FtsAtomList list;
+  FtsAtomList list;
 }
-
-
-
-
-
-
-
-
-
-
-

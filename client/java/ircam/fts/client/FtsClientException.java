@@ -19,13 +19,15 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 /**
- *
+ * Fts client exception
  */
-
-public interface FtsMessageHandler {
-  public void invoke( FtsObject obj, int argc, FtsAtom[] argv);
+public class FtsClientException extends Exception {
+  public FtsClientException( String message)
+  {
+    super( message);
+  }
 }
 

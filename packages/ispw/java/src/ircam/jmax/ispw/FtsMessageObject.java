@@ -45,7 +45,7 @@ public class FtsMessageObject extends FtsIntValueObject
     static
     {
 	FtsObject.registerMessageHandler( FtsMessageObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		public void invoke( FtsObject obj, FtsArgs args)
 		{
 		    ((FtsMessageObject)obj).setCurrentMessage(argc, argv);
 		}

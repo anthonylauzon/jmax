@@ -45,25 +45,25 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
  static
   {
       FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("addTracks"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsSequenceObject)obj).addTracks(argc, argv);
 	      }
       });
       FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("removeTracks"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsSequenceObject)obj).removeTracks(argc, argv);
 	      }
       });
       FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("moveTrack"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsSequenceObject)obj).moveTrack((FtsTrackObject)argv[0].objectValue, argv[1].intValue);
 	      }
       });
       FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsSequenceObject)obj).setName(argv[0].stringValue);
 	      }

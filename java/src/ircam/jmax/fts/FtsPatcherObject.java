@@ -81,49 +81,49 @@ public class FtsPatcherObject extends FtsObjectWithEditor
    * object in FTS
    */
 
-    static FtsGraphicObject makeFtsObjectFromServer(FtsServer server, FtsObject parent, int objId, String className, 
-						    int nArgs, FtsAtom args[])
-    {
-	FtsGraphicObject obj = null;
+  static FtsGraphicObject makeFtsObjectFromServer(FtsServer server, FtsObject parent, int objId, String className, 
+						  int nArgs, FtsAtom args[])
+  {
+    FtsGraphicObject obj = null;
 
-	if (className != null)
-	    {
-		Class theClass = ObjectCreatorManager.getFtsClass(className);
-		if(theClass != null)
-		    {
-			Object[] arg = new Object[] {server, parent, FtsSymbol.get(className), new Integer(nArgs), 
-						     args, new Integer(objId)};
-			Class[] cls = new Class[] { ircam.ftsclient.FtsServer.class, ircam.ftsclient.FtsObject.class, 
-						    ircam.ftsclient.FtsSymbol.class, java.lang.Integer.TYPE, 
-						    ircam.ftsclient.FtsAtom[].class, java.lang.Integer.TYPE};
-			try{
-			    Constructor constr = theClass.getConstructor(cls);
+    if (className != null)
+      {
+	Class theClass = ObjectCreatorManager.getFtsClass(className);
+	if(theClass != null)
+	  {
+	    Object[] arg = new Object[] {server, parent, FtsSymbol.get(className), new Integer(nArgs), 
+					 args, new Integer(objId)};
+	    Class[] cls = new Class[] { ircam.ftsclient.FtsServer.class, ircam.ftsclient.FtsObject.class, 
+					ircam.ftsclient.FtsSymbol.class, java.lang.Integer.TYPE, 
+					ircam.ftsclient.FtsAtom[].class, java.lang.Integer.TYPE};
+	    try{
+	      Constructor constr = theClass.getConstructor(cls);
 
-			    if(constr != null)
-				obj = (FtsGraphicObject)(constr.newInstance(arg));
+	      if(constr != null)
+		obj = (FtsGraphicObject)(constr.newInstance(arg));
 
-			} catch (NoSuchMethodException e) {
-			    System.out.println(e);
-			} catch (InstantiationException e) {
-			    System.out.println(e);
-			} catch (IllegalAccessException e) {
-			    System.out.println(e);
-			} catch (InvocationTargetException e) {
-			    System.out.println(e);
-			    e.printStackTrace();
-			} 
-		    }
-		else if (className == "jpatcher")
-		    obj =  new FtsPatcherObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
-		else if (className == "inlet")
-		    obj =  new FtsInletObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
-		else if (className == "outlet")
-		    obj =  new FtsOutletObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
-		else
-		    obj = new FtsGraphicObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
-	    }
+	    } catch (NoSuchMethodException e) {
+	      System.out.println(e);
+	    } catch (InstantiationException e) {
+	      System.out.println(e);
+	    } catch (IllegalAccessException e) {
+	      System.out.println(e);
+	    } catch (InvocationTargetException e) {
+	      System.out.println(e);
+	      e.printStackTrace();
+	    } 
+	  }
+	else if (className == "jpatcher")
+	  obj =  new FtsPatcherObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
+	else if (className == "inlet")
+	  obj =  new FtsInletObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
+	else if (className == "outlet")
+	  obj =  new FtsOutletObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
 	else
-	    obj = new FtsGraphicObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
+	  obj = new FtsGraphicObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
+      }
+    else
+      obj = new FtsGraphicObject(server, parent, FtsSymbol.get(className), nArgs, args, objId);
 
     return obj;
   }
@@ -137,139 +137,139 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   static
   {
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addObject"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  System.err.println("[FtsPatcherObject] : invoke addObject ");
-	  ((FtsPatcherObject)obj).addObject(argc, argv);
+	  ((FtsPatcherObject)obj).addObject( args);
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineObject"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPatcherObject)obj).redefineObject(argc, argv);
+	  ((FtsPatcherObject)obj).redefineObject( args);
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineTemplateObject"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	    ((FtsPatcherObject)obj).redefineTemplateObject(argc, argv);
+	  ((FtsPatcherObject)obj).redefineTemplateObject( args);
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addConnection"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPatcherObject)obj).addConnection(argc, argv);
+	  ((FtsPatcherObject)obj).addConnection( args);
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("objectRedefined"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPatcherObject)obj).objectRedefined((FtsGraphicObject)argv[0].objectValue);
+	  ((FtsPatcherObject)obj).objectRedefined( (FtsGraphicObject)args.getObject(0));
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("stopWaiting"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	    {
-		((FtsPatcherObject)obj).stopWaiting();
-	    }
-	});
-    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("showObject"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	    {
-		((FtsPatcherObject)obj).showObject((FtsGraphicObject)argv[0].objectValue);
-	    }
-      });
-    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineStart"), new FtsMessageHandler(){
-	     public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	    {
-		((FtsPatcherObject)obj).redefineStart();
-	    }
-      });
-     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setRedefined"), new FtsMessageHandler(){
-	     public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	    {
-		((FtsPatcherObject)obj).firePatcherChanged();
-	    }
-      });
-     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setDescription"), new FtsMessageHandler(){
-	public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	    ((FtsPatcherObject)obj).setDescription(argc, argv);
+	  ((FtsPatcherObject)obj).stopWaiting();
 	}
       });
-     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWX"), new FtsMessageHandler(){
-	     public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	     {
-		 ((FtsPatcherObject)obj).setWX(argv[0].intValue);
-	     }
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("showObject"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).showObject( (FtsGraphicObject)args.getObject( 0));
+	}
       });
-      FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWY"), new FtsMessageHandler(){
-	     public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	     {
-		 ((FtsPatcherObject)obj).setWY(argv[0].intValue);
-	     }
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("redefineStart"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).redefineStart();
+	}
       });
-      FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWW"), new FtsMessageHandler(){
-	     public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	     {
-		 ((FtsPatcherObject)obj).setWW(argv[0].intValue);
-	     }
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setRedefined"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).firePatcherChanged();
+	}
       });
-      FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWH"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	      {
-		  ((FtsPatcherObject)obj).setWH(argv[0].intValue);
-	      }
-	  });
-      FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setMessage"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	      {
-		  ((FtsPatcherObject)obj).setMessage(argv[0].stringValue);
-	      }
-	  });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setDescription"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setDescription( args);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWX"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setWX( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWY"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setWY( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWW"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setWW( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setWH"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setWH( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("setMessage"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPatcherObject)obj).setMessage( args.getString( 0));
+	}
+      });
   }
 
   /*****************************************************************************************/
   /*                                 Global Edit Listening                                 */
   /*****************************************************************************************/
 
-    static MaxVector editListeners = new MaxVector();
+  static MaxVector editListeners = new MaxVector();
 
-    static public void addGlobalEditListener(FtsEditListener listener)
-    {
-	editListeners.addElement(listener);
-    }
+  static public void addGlobalEditListener(FtsEditListener listener)
+  {
+    editListeners.addElement(listener);
+  }
     
-    static public void removeGlobalEditListener(FtsEditListener listener)
-    {
-	editListeners.removeElement(listener);
-    }
+  static public void removeGlobalEditListener(FtsEditListener listener)
+  {
+    editListeners.removeElement(listener);
+  }
     
-    static public void fireGlobalObjectRemoved(FtsGraphicObject object)
-    {
-	for (int i = 0; i < editListeners.size(); i++)
-	    ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
-    }
-    static public void fireGlobalObjectAdded(FtsGraphicObject object)
-    {
-	for (int i = 0; i < editListeners.size(); i++)
-	    ((FtsEditListener) editListeners.elementAt(i)).objectAdded(object);
-    }
-    static public void fireGlobalConnectionAdded(FtsConnection connection)
-    {
-	for (int i = 0; i < editListeners.size(); i++)
-	    ((FtsEditListener) editListeners.elementAt(i)).connectionAdded(connection);
-    }
-    static public void fireGlobalConnectionRemoved(FtsConnection connection)
-    {
-	for (int i = 0; i < editListeners.size(); i++)
-	    ((FtsEditListener) editListeners.elementAt(i)).connectionRemoved(connection);
-    }
-    static public void fireGlobalAtomicAction(boolean active)
-    {
-	for (int i = 0; i < editListeners.size(); i++)
-	    ((FtsEditListener) editListeners.elementAt(i)).atomicAction(active);
-    }
+  static public void fireGlobalObjectRemoved(FtsGraphicObject object)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
+  }
+  static public void fireGlobalObjectAdded(FtsGraphicObject object)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).objectAdded(object);
+  }
+  static public void fireGlobalConnectionAdded(FtsConnection connection)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).connectionAdded(connection);
+  }
+  static public void fireGlobalConnectionRemoved(FtsConnection connection)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).connectionRemoved(connection);
+  }
+  static public void fireGlobalAtomicAction(boolean active)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsEditListener) editListeners.elementAt(i)).atomicAction(active);
+  }
 
   /*****************************************************************************/
   /*                                                                           */
@@ -283,19 +283,19 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public FtsPatcherObject(FtsServer server, FtsObject parent, FtsSymbol className, FtsArgs args) throws IOException
   {
-      super(server, parent, className, args);
+    super(server, parent, className, args);
   }
   public FtsPatcherObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
   {
-      super(server, parent, className);
+    super(server, parent, className);
   }
   public FtsPatcherObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom[] args, int id)
   {
-      super(server, parent, className, nArgs, args, id);
+    super(server, parent, className, nArgs, args, id);
   }
   public FtsPatcherObject() throws IOException
   {
-      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("jpatcher"));
+    super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("jpatcher"));
   }
   /** Get all the objects in this patcherdata */
 
@@ -327,13 +327,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	args.add(windowX);
       
 	try{
-	    send( FtsSymbol.get("set_wx"), args);
+	  send( FtsSymbol.get("set_wx"), args);
 	}
 	catch(IOException e)
-	    {
-		System.err.println("FtsPatcherObject: I/O Error sending set_wx Message!");
-		e.printStackTrace(); 
-	    }
+	  {
+	    System.err.println("FtsPatcherObject: I/O Error sending set_wx Message!");
+	    e.printStackTrace(); 
+	  }
       }
   }
   public final int getWindowY()
@@ -349,13 +349,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	args.add(windowY);
       
 	try{
-	    send( FtsSymbol.get("set_wy"), args);
+	  send( FtsSymbol.get("set_wy"), args);
 	}
 	catch(IOException e)
-	    {
-		System.err.println("FtsPatcherObject: I/O Error sending set_wy Message!");
-		e.printStackTrace(); 
-	    }
+	  {
+	    System.err.println("FtsPatcherObject: I/O Error sending set_wy Message!");
+	    e.printStackTrace(); 
+	  }
       }
   }
   public final int getWindowHeight()
@@ -372,13 +372,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	args.add(windowHeight);
       
 	try{
-	    send( FtsSymbol.get("set_wh"), args);
+	  send( FtsSymbol.get("set_wh"), args);
 	}
 	catch(IOException e)
-	    {
-		System.err.println("FtsPatcherObject: I/O Error sending set_wh Message!");
-		e.printStackTrace(); 
-	    }
+	  {
+	    System.err.println("FtsPatcherObject: I/O Error sending set_wh Message!");
+	    e.printStackTrace(); 
+	  }
 	
 	setDirty();
       }
@@ -397,13 +397,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	args.add(windowWidth);
       
 	try{
-	    send( FtsSymbol.get("set_ww"), args);
+	  send( FtsSymbol.get("set_ww"), args);
 	}
 	catch(IOException e)
-	    {
-		System.err.println("FtsPatcherObject: I/O Error sending set_ww Message!");
-		e.printStackTrace(); 
-	    }
+	  {
+	    System.err.println("FtsPatcherObject: I/O Error sending set_ww Message!");
+	    e.printStackTrace(); 
+	  }
 	
 	setDirty();
       }
@@ -434,7 +434,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       {
 	if (getParent() != null)
 	  if (getParent() instanceof FtsPatcherObject)
-	      return ((FtsPatcherObject) getParent()).getRecursiveEditMode();
+	    return ((FtsPatcherObject) getParent()).getRecursiveEditMode();
 
 	return UNKNOWN_MODE;
       }
@@ -501,59 +501,59 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
     args.clear();
     for(int i=0; i<vec.size(); i++)
-        args.add(vec.elementAt(i));
+      args.add(vec.elementAt(i));
       
     try{
-	send( FtsSymbol.get("redefine_patcher"), args);
+      send( FtsSymbol.get("redefine_patcher"), args);
     }
     catch(IOException e)
-	{
-	    System.err.println("FtsPatcherObject: I/O Error sending redefine_patcher Message!");
-	    e.printStackTrace(); 
-	}
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending redefine_patcher Message!");
+	e.printStackTrace(); 
+      }
   }
 
   public void requestShowObject(FtsGraphicObject obj)
   {
-      args.clear();
-      args.add(obj);
+    args.clear();
+    args.add(obj);
       
-      try{
-	  send( FtsSymbol.get("show_object"), args);
+    try{
+      send( FtsSymbol.get("show_object"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending show_object Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsPatcherObject: I/O Error sending show_object Message!");
-	      e.printStackTrace(); 
-	  }
   }
     
   FtsActionListener waitingListener;
   public void requestStopWaiting(FtsActionListener l)
   {
-      waitingListener = l;
-      try{
-	  send( FtsSymbol.get("stop_waiting"));
+    waitingListener = l;
+    try{
+      send( FtsSymbol.get("stop_waiting"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending stop_waiting Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsPatcherObject: I/O Error sending stop_waiting Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   /**  Ask fts to update the patcher; usefull after a paste */
 
   public void update()
   {
-      try{
-	  send( FtsSymbol.get("patcher_update"));
+    try{
+      send( FtsSymbol.get("patcher_update"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending patcher_update Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsPatcherObject: I/O Error sending patcher_update Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   //
@@ -566,14 +566,14 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public final void startUpdates()
   {
-      try{
-	  send( FtsSymbol.get("start_updates"));
+    try{
+      send( FtsSymbol.get("start_updates"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending start_updates Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsPatcherObject: I/O Error sending start_updates Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
 
@@ -583,14 +583,14 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public final void stopUpdates()
   {
-      try{
-	  send( FtsSymbol.get("stop_updates"));
+    try{
+      send( FtsSymbol.get("stop_updates"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending stop_updates Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsPatcherObject: I/O Error sending stop_updates Message!");
-	      e.printStackTrace(); 
-	  }
   }
   
   /***************************************************************/
@@ -598,49 +598,49 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   
   public void requestAddObject(String description, int x, int y, boolean doedit)
   {
-     MaxVector vec = new MaxVector();
-     FtsParse.parseAtoms(description, vec);
+    MaxVector vec = new MaxVector();
+    FtsParse.parseAtoms(description, vec);
 
-     args.clear();
-     args.add(x);
-     args.add(y);
-     //args.add(doEdit);//????????????????????
+    args.clear();
+    args.add(x);
+    args.add(y);
+    //args.add(doEdit);//????????????????????
 
-     for(int i=0; i<vec.size(); i++)
-        args.add(vec.elementAt(i));
+    for(int i=0; i<vec.size(); i++)
+      args.add(vec.elementAt(i));
       
-     try{
-	 send( FtsSymbol.get("add_object"), args);
-     }
-     catch(IOException e)
-       {
-	 System.err.println("FtsPatcherObject: I/O Error sending add_object Message!");
-	 e.printStackTrace(); 
-       }
+    try{
+      send( FtsSymbol.get("add_object"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending add_object Message!");
+	e.printStackTrace(); 
+      }
   }
 
- public void requestRedefineObject(FtsGraphicObject oldObject, String description)
+  public void requestRedefineObject(FtsGraphicObject oldObject, String description)
   {
-     MaxVector vec = new MaxVector();
-     FtsParse.parseAtoms(description, vec);
+    MaxVector vec = new MaxVector();
+    FtsParse.parseAtoms(description, vec);
      
-     args.clear();
-     args.add(oldObject);
-     args.add(getServer().getNewObjectID());
+    args.clear();
+    args.add(oldObject);
+    args.add(getServer().getNewObjectID());
 
-     for(int i=0; i<vec.size(); i++)
-       args.add(vec.elementAt(i));
+    for(int i=0; i<vec.size(); i++)
+      args.add(vec.elementAt(i));
       
-     try{
-       send( FtsSymbol.get("redefine_object"), args);
-     }
-     catch(IOException e)
-       {
-	 System.err.println("FtsPatcherObject: I/O Error sending redefine_object Message!");
-	 e.printStackTrace(); 
-       }
+    try{
+      send( FtsSymbol.get("redefine_object"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsPatcherObject: I/O Error sending redefine_object Message!");
+	e.printStackTrace(); 
+      }
   
-     removeObject(oldObject);
+    removeObject(oldObject);
   }
 
   public void requestAddConnection(FtsGraphicObject from, int outlet, FtsGraphicObject to, int inlet)
@@ -653,8 +653,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     args.add(inlet);
 
     try{
-       send( FtsSymbol.get("add_connection"), args);
-     }
+      send( FtsSymbol.get("add_connection"), args);
+    }
     catch(IOException e)
       {
 	System.err.println("FtsPatcherObject: I/O Error sending add_connection Message!");
@@ -682,173 +682,173 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   {
     System.err.println("[FtsPatcherObject]: addObject nArgs "+nArgs);
 
-      if((nArgs==1)&&(args[0].isObject()))
-	  addObject((FtsGraphicObject)args[0].objectValue);
-      else
+    if((nArgs==1)&&(args[0].isObject()))
+      addObject((FtsGraphicObject)args[0].objectValue);
+    else
+      {
+	int objId = args[0].intValue;
+	int x = args[1].intValue;
+	int y = args[2].intValue;
+	      
+	System.err.println("[FtsPatcherObject]: addObject id "+objId+" x "+x+" y "+y);
+
+	String className = null;
+	//doedit = false;
+	int startIndex, numArgs = 0;
+	FtsAtom[] arguments = null;
+	if(nArgs>3)
 	  {
-	      int objId = args[0].intValue;
-	      int x = args[1].intValue;
-	      int y = args[2].intValue;
-	      
-	      System.err.println("[FtsPatcherObject]: addObject id "+objId+" x "+x+" y "+y);
-
-	      String className = null;
-	      //doedit = false;
-	      int startIndex, numArgs = 0;
-	      FtsAtom[] arguments = null;
-	      if(nArgs>3)
-		  {
-		    //if(args[3].isString()) 
-		    if(args[3].isSymbol()) 
-			  {
-			    //className = args[3].stringValue;
-			    className = args[3].symbolValue.toString();
-			    numArgs = nArgs-4;
-			    startIndex = 4; 
-			  }
-			  else
-			      { 
-				  numArgs = nArgs-3;
-				  startIndex = 3;
-			      }
+	    //if(args[3].isString()) 
+	    if(args[3].isSymbol()) 
+	      {
+		//className = args[3].stringValue;
+		className = args[3].symbolValue.toString();
+		numArgs = nArgs-4;
+		startIndex = 4; 
+	      }
+	    else
+	      { 
+		numArgs = nArgs-3;
+		startIndex = 3;
+	      }
 		      
-		      arguments = new FtsAtom[numArgs];
-		      for(int i=0; i<numArgs; i++)
-			  arguments[i] = args[startIndex+i];
-		  }
-	      
-	      System.err.println("[FtsPatcherObject]: addObject className "+className+" numArgs "+numArgs);
-
-	      FtsGraphicObject newObj = makeFtsObjectFromServer(getServer(), this, objId, className, numArgs, arguments);
-	      
-	      newObj.setX(x);
-	      newObj.setY(y);
-	      
-	      addObject(newObj);
+	    arguments = new FtsAtom[numArgs];
+	    for(int i=0; i<numArgs; i++)
+	      arguments[i] = args[startIndex+i];
 	  }
+	      
+	System.err.println("[FtsPatcherObject]: addObject className "+className+" numArgs "+numArgs);
+
+	FtsGraphicObject newObj = makeFtsObjectFromServer(getServer(), this, objId, className, numArgs, arguments);
+	      
+	newObj.setX(x);
+	newObj.setY(y);
+	      
+	addObject(newObj);
+      }
   }
 
   public void redefineObject(int nArgs , FtsAtom args[]) 
   {
-      String className = null;
-      String variable = null;
-      int startIndex, numArgs;
-      //boolean defVar = (args[0].intValue==1)? true : false;
-      int newObjId = args[0].intValue;
+    String className = null;
+    String variable = null;
+    int startIndex, numArgs;
+    //boolean defVar = (args[0].intValue==1)? true : false;
+    int newObjId = args[0].intValue;
       
-      if(args[1].isString()) 
-	  {
-	      className = args[1].stringValue;
-	      numArgs = nArgs-2;
-	      startIndex = 2;
-	  }
-      else
-	  { 
-	      numArgs = nArgs-1;
-	      startIndex = 1;
-	  }
+    if(args[1].isString()) 
+      {
+	className = args[1].stringValue;
+	numArgs = nArgs-2;
+	startIndex = 2;
+      }
+    else
+      { 
+	numArgs = nArgs-1;
+	startIndex = 1;
+      }
       
-      FtsAtom[] arguments = new FtsAtom[numArgs];
-      for(int i=0; i<numArgs; i++)
-	  arguments[i] = args[startIndex+i];
+    FtsAtom[] arguments = new FtsAtom[numArgs];
+    for(int i=0; i<numArgs; i++)
+      arguments[i] = args[startIndex+i];
 	
-      FtsGraphicObject newObj = makeFtsObjectFromServer(getServer(), this, newObjId, className, numArgs, arguments);
+    FtsGraphicObject newObj = makeFtsObjectFromServer(getServer(), this, newObjId, className, numArgs, arguments);
       
-      addObject(newObj);
+    addObject(newObj);
   }
 
   public void redefineTemplateObject(int nArgs , FtsAtom args[]) 
   {
-      String className = null;
-      String variable = null;
-      int startIndex, numArgs;
-      //boolean defVar = (args[0].getInt()==1)? true : false;
-      int newObjId = args[0].intValue;
+    String className = null;
+    String variable = null;
+    int startIndex, numArgs;
+    //boolean defVar = (args[0].getInt()==1)? true : false;
+    int newObjId = args[0].intValue;
     
-      if(args[1].isString()) 
-	  {
-	      className = args[1].stringValue;
-	      numArgs = nArgs-2;
-	      startIndex = 2;
-	  }
-      else
-	  { 
-	      numArgs = nArgs-1;
-	      startIndex = 1;
-	  }
+    if(args[1].isString()) 
+      {
+	className = args[1].stringValue;
+	numArgs = nArgs-2;
+	startIndex = 2;
+      }
+    else
+      { 
+	numArgs = nArgs-1;
+	startIndex = 1;
+      }
 	
-      FtsAtom[] arguments = new FtsAtom[numArgs];
-      for(int i=0; i<numArgs; i++)
-	  arguments[i] = args[startIndex+i];
+    FtsAtom[] arguments = new FtsAtom[numArgs];
+    for(int i=0; i<numArgs; i++)
+      arguments[i] = args[startIndex+i];
 	
-      FtsGraphicObject newObj = new FtsTemplateObject(getServer(), this, FtsSymbol.get(className), numArgs, arguments, newObjId);
+    FtsGraphicObject newObj = new FtsTemplateObject(getServer(), this, FtsSymbol.get(className), numArgs, arguments, newObjId);
       
-      addObject(newObj);
+    addObject(newObj);
   }
 
   public void addConnection(int nArgs , FtsAtom args[])
   {
-      if(nArgs==1)
-	  addConnection((FtsConnection)args[0].objectValue);
-      else
-	  if(nArgs==6)
-	      addConnection(new FtsConnection(getServer(), this, args[0].intValue, 
-					      (FtsGraphicObject)args[1].objectValue, args[2].intValue, 
-					      (FtsGraphicObject)args[3].objectValue, args[4].intValue, args[5].intValue));
-      setDirty();
+    if(nArgs==1)
+      addConnection((FtsConnection)args[0].objectValue);
+    else
+      if(nArgs==6)
+	addConnection(new FtsConnection(getServer(), this, args[0].intValue, 
+					(FtsGraphicObject)args[1].objectValue, args[2].intValue, 
+					(FtsGraphicObject)args[3].objectValue, args[4].intValue, args[5].intValue));
+    setDirty();
   }
 
   public void objectRedefined(FtsGraphicObject obj)
   {
-      ((FtsGraphicObject)obj).setDefaults();
-      fireObjectRedefined(obj);
+    ((FtsGraphicObject)obj).setDefaults();
+    fireObjectRedefined(obj);
   }
 
   /**************************************************************/
   /**************************************************************/
 
- /**
+  /**
   * Fts callback: open the editor associated with this FtsSequenceObject.
   * If not exist create them else show them.
   */
   public void openEditor(int argc, FtsAtom[] argv)
   {
-       if(getEditorFrame() == null) 
-	  {
-	      SwingUtilities.invokeLater(new Runnable() {
-		      public void run() {
-			  setEditorFrame(new ErmesSketchWindow(FtsPatcherObject.this));
-			  showEditor();
-		      }
-		  });
-	  }
-      else
-	  showEditor();
+    if(getEditorFrame() == null) 
+      {
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      setEditorFrame(new ErmesSketchWindow(FtsPatcherObject.this));
+	      showEditor();
+	    }
+	  });
+      }
+    else
+      showEditor();
   }
 
   public void stopWaiting()
   {
-      if(waitingListener != null)
-	  { 
-	      waitingListener.ftsActionDone();
-	      waitingListener = null;
-	  }      
-      else
-	  if(getEditorFrame()!=null)
-	      ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.stopWaiting();
+    if(waitingListener != null)
+      { 
+	waitingListener.ftsActionDone();
+	waitingListener = null;
+      }      
+    else
+      if(getEditorFrame()!=null)
+	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.stopWaiting();
   }
   /**
    * Fts callback: destroy the editor associated with this FtsSequenceObject.
    */
   public void destroyEditor()
   {
-      disposeEditor();
+    disposeEditor();
   }
 
   public void showObject(FtsGraphicObject obj)
   {
-      if(getEditorFrame() != null)	    
-	  ((ErmesSketchPad)((ErmesSketchWindow)getEditorFrame()).getEditor()).showObject(obj);	      
+    if(getEditorFrame() != null)	    
+      ((ErmesSketchPad)((ErmesSketchWindow)getEditorFrame()).getEditor()).showObject(obj);	      
   }
   public void redefineStart()
   {

@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 import java.io.*;
 import java.net.*;
@@ -28,11 +28,36 @@ import java.util.*;
 /**
  *
  */
-
 public class FtsServer {
 
+  class ReceiveThread extends Thread {
+    ReceiveThread()
+    {
+      inputBuffer = new byte[0x10000];
+    }
 
-  public FtsServer( FtsServerConnection connection)
+    public void run()
+    {
+      try
+	{
+	  while ( true)
+	    {
+	      int len = connection.read( inputBuffer, 0, inputBuffer.length);
+	      decoder.decode( inputBuffer, 0, len);
+	    }
+	}
+      catch (Exception e)
+	{
+	  System.err.println( "ReceiveThread: got exception " + e);
+	  e.printStackTrace();
+	  return;
+	}
+    }
+
+    private byte[] inputBuffer;
+  }
+
+  public FtsServer( FtsServerConnection connection, FtsObject client)
   {
     this.connection = connection;
 
@@ -43,18 +68,25 @@ public class FtsServer {
     decoder = new FtsBinaryProtocolDecoder( this);
 
     root = new FtsObject( this, null, 0);
-    remote = new FtsObject( this, root, 1);
 
-    receiveThread = new Thread() {
-	public void run()
-	{
-	  decoder.run();
-	}
-      };
+    if (client != null)
+      {
+	this.client = client;
+	putObject( 1, client);
+      }
+    else
+      {
+	client = new FtsObject( this, root, 1);
+      }
 
+    receiveThread = new ReceiveThread();
     receiveThread.start();
   }
 
+  public FtsServer( FtsServerConnection connection)
+  {
+    this( connection, null);
+  }
 
   /**
    * Close the connection.
@@ -119,7 +151,7 @@ public class FtsServer {
 
   // Proxies of remote root and client
   FtsObject root;
-  FtsObject remote;
+  FtsObject client;
 
   // Objects ID handling
   private int newObjectID;

@@ -44,119 +44,117 @@ public class FtsRuntimeErrors extends FtsObject implements ListModel
 
   static
   {
-      FtsObject.registerMessageHandler( FtsRuntimeErrors.class, FtsSymbol.get("postError"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsRuntimeErrors)obj).postError((FtsGraphicObject)argv[0].objectValue, argv[1].stringValue);
-	  }
-	});
+    FtsObject.registerMessageHandler( FtsRuntimeErrors.class, FtsSymbol.get("postError"), new FtsMessageHandler() {
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsRuntimeErrors)obj).postError( (FtsGraphicObject)args.getObject( 0), args.getString( 1));
+	}
+      });
   }
 
   public FtsRuntimeErrors() throws IOException
   {
-      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__runtimeerrors"));
+    super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__runtimeerrors"));
       
-      list = new Vector();
-      dataListeners = new Vector();
+    list = new Vector();
+    dataListeners = new Vector();
   
-      FtsPatcherObject.addGlobalEditListener(new FtsEditListener()
-	  {
-	      public void objectAdded(FtsObject object){}
-	      public void objectRemoved(FtsObject object)
-	      {
-		  removeErrorsOf(object);
-		  fireListChanged();
-	      }
-	      public void connectionAdded(FtsConnection connection){}
-	      public void connectionRemoved(FtsConnection connection){}
-	      public void atomicAction(boolean active){}    
-	  });
+    FtsPatcherObject.addGlobalEditListener(new FtsEditListener()
+      {
+	public void objectAdded(FtsObject object){}
+	public void objectRemoved(FtsObject object)
+	{
+	  removeErrorsOf(object);
+	  fireListChanged();
+	}
+	public void connectionAdded(FtsConnection connection){}
+	public void connectionRemoved(FtsConnection connection){}
+	public void atomicAction(boolean active){}    
+      });
   }
   
   public void postError(FtsGraphicObject obj, String description)
   {
-      RuntimeError err = new RuntimeError(obj, description);
+    RuntimeError err = new RuntimeError(obj, description);
       
-      RuntimeError oldErr = getSamePostedError(err);
-      if(oldErr!=null)
-	  {
-	      list.removeElement(oldErr);
-	      err.setCounter(oldErr.getCount());
-	  }
+    RuntimeError oldErr = getSamePostedError(err);
+    if(oldErr!=null)
+      {
+	list.removeElement(oldErr);
+	err.setCounter(oldErr.getCount());
+      }
       
-      err.incrementCounter();
-      list.addElement(err);
-      fireListChanged();
+    err.incrementCounter();
+    list.addElement(err);
+    fireListChanged();
   }
   
   public void removeErrors(int[] ids)
   {
-      if(ids.length>0)
-	  {
-	      for(int i = ids.length-1; i>=0; i--)
-		  list.removeElementAt(ids[i]);
+    if(ids.length>0)
+      {
+	for(int i = ids.length-1; i>=0; i--)
+	  list.removeElementAt(ids[i]);
 	      
-	      fireListChanged();
-	  }
+	fireListChanged();
+      }
   }
  
   public boolean errorPosted(RuntimeError err)
   {
-      for(Enumeration e = list.elements(); e.hasMoreElements();)
-	  if(((RuntimeError)e.nextElement()).equals(err))
-	      return true;
-      return false;
+    for(Enumeration e = list.elements(); e.hasMoreElements();)
+      if(((RuntimeError)e.nextElement()).equals(err))
+	return true;
+    return false;
   }
   public void removeErrorsOf(FtsObject obj)
   {
-      RuntimeError err;
-      for(int i=list.size()-1; i >= 0; i--)
+    RuntimeError err;
+    for(int i=list.size()-1; i >= 0; i--)
       {
-	  err = (RuntimeError)list.elementAt(i);
-	  if(err.getObject()==obj)
-	      list.removeElementAt(i);
+	err = (RuntimeError)list.elementAt(i);
+	if(err.getObject()==obj)
+	  list.removeElementAt(i);
       }	  
   }
 
   public RuntimeError getSamePostedError(RuntimeError err)
   {
-      RuntimeError runerr;
-      for(Enumeration e = list.elements(); e.hasMoreElements();)
+    RuntimeError runerr;
+    for(Enumeration e = list.elements(); e.hasMoreElements();)
       {
-	  runerr = (RuntimeError)e.nextElement();
-	  if(runerr.equals(err))
-	      return runerr;
+	runerr = (RuntimeError)e.nextElement();
+	if(runerr.equals(err))
+	  return runerr;
       }
-      return null;
+    return null;
   }
 
   /** listmodel interface */
   public Object getElementAt(int index)
   {
-      return list.elementAt(index);
+    return list.elementAt(index);
   }
+
   public int getSize()
   {
-      return list.size();
+    return list.size();
   }
+
   public void addListDataListener(ListDataListener l)
   {
-      dataListeners.addElement(l);
+    dataListeners.addElement(l);
   }
+
   public void removeListDataListener(ListDataListener l)
   {
-      dataListeners.removeElement(l);
+    dataListeners.removeElement(l);
   }
+
   private void fireListChanged()
   {
-      ListDataEvent evt = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
-      for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
-	  ((ListDataListener)e.nextElement()).contentsChanged(evt);
+    ListDataEvent evt = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
+    for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
+      ((ListDataListener)e.nextElement()).contentsChanged(evt);
   } 
 }
-
-
-
-
-
-

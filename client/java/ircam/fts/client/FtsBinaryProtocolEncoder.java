@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 import java.io.*;
 
@@ -72,8 +72,9 @@ class FtsBinaryProtocolEncoder extends FtsProtocolEncoder {
 
   FtsBinaryProtocolEncoder( FtsServer server)
   {
+    super( server);
+
     outputBuffer = new OutputBuffer();
-    connection = server.getConnection();
     symbolCache = new FtsSymbol[512];
   }
 
@@ -150,7 +151,6 @@ class FtsBinaryProtocolEncoder extends FtsProtocolEncoder {
   }
 
   private OutputBuffer outputBuffer;
-  private FtsServerConnection connection;
   private FtsSymbol[] symbolCache;
 }
 

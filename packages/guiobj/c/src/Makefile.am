@@ -5,7 +5,6 @@ button.c \
 comment.c \
 comment_doctor.c \
 console.c \
-#display.c \
 dspcontrol.c\
 errorfinder.c \
 runtimeerrors.c \
@@ -18,10 +17,12 @@ key.c \
 keyserver.c \
 messconst.c \
 panel.c \
-#scope.c \
 slider.c \
 toggle.c 
 
+# These objects are not compiled yet
+#display.c \
+#scope.c \
 #vecdisplay.c\
 
 INCLUDES=-I@top_srcdir@/packages/data/c/src

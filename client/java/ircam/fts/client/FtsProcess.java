@@ -19,33 +19,59 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 import java.io.*;
 
-public class FtsPipeConnection extends FtsServerConnection {
-  public FtsPipeConnection( Process fts)
+public class FtsProcess extends Process {
+
+  public FtsProcess( int argc, String[] argv) throws IOException
   {
-    in = fts.getInputStream();
-    out = fts.getOutputStream();
+    String[] cmd = new String[argc];
+
+    System.arraycopy( argv, 0, cmd, 0, argc);
+
+    process = Runtime.getRuntime().exec( cmd);
   }
 
-  public void close() throws IOException
+  public FtsProcess( String path) throws IOException
   {
+    String[] cmd = new String[1];
+
+    cmd[0] = path;
+
+    process = Runtime.getRuntime().exec( cmd);
   }
 
-  public int read( byte[] b, int off, int len) throws IOException
+  public void destroy()
   {
-    return in.read( b, off, len);
+    process.destroy();
   }
 
-  public void write( byte[] b, int off, int len) throws IOException
+  public int exitValue()
   {
-    out.write( b, off, len);
-    out.flush();
+    return process.exitValue();
   }
 
-  private InputStream in;
-  private OutputStream out;
+  public InputStream getErrorStream()
+  {
+    return null;
+  }
+
+  public InputStream getInputStream()
+  {
+    return process.getInputStream();
+  }
+
+  public OutputStream getOutputStream()
+  {
+    return process.getOutputStream();
+  }
+
+  public int waitFor() throws InterruptedException
+  {
+    return process.waitFor();
+  }
+
+  private Process process;
 }
-

@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 /**
  * A FtsAtom is a typed 'union', holding the values transmitted other the client protocol
@@ -98,13 +98,14 @@ public class FtsAtom {
   }
 
   /**
-   * Tests if atom contains a FtsObject
+   * Tests if atom contains a FtsObject or an instance of a derived class
    * 
-   * @return true if atom type is FtsObject
+   * @return true if atom type is FtsObject or a derived class of FtsObject
    */
   public final boolean isObject()
   {
-    return type == FtsObject.class;
+    // return true if the class of the contained object is a derived class of FtsObject
+    return FtsObject.class.isAssignableFrom( type); 
   }
 
   /**
@@ -112,7 +113,7 @@ public class FtsAtom {
    * 
    * @param i the value
    */
-  public final void set( int i)
+  public final void setInt( int i)
   {
     type = Integer.TYPE;
     intValue = i;
@@ -123,7 +124,7 @@ public class FtsAtom {
    * 
    * @param f the value
    */
-  public final void set( float f)
+  public final void setFloat( float f)
   {
     type = Float.TYPE;
     floatValue = f;
@@ -134,7 +135,7 @@ public class FtsAtom {
    * 
    * @param s the value
    */
-  public final void set( FtsSymbol s)
+  public final void setSymbol( FtsSymbol s)
   {
     type = FtsSymbol.class;
     symbolValue = s;
@@ -145,7 +146,7 @@ public class FtsAtom {
    * 
    * @param s the value
    */
-  public final void set( String s)
+  public final void setString( String s)
   {
     type = String.class;
     stringValue = s;
@@ -156,28 +157,42 @@ public class FtsAtom {
    * 
    * @param o the value
    */
-  public final void set( FtsObject o)
+  public final void setObject( FtsObject o)
   {
-    type = FtsObject.class;
+    type = o.getClass();
     objectValue = o;
   }
 
   public final Object getValue()
   {
-      if(isVoid())
-	  return null;
-      else if(isInt())
-	  return new Integer( intValue);
-      else if(isFloat())
-	  return new Float( floatValue);
-      else if(isString())
-	  return stringValue;
-      else if(isSymbol())
-	  return symbolValue;
-      else if(isObject())
-	  return objectValue;
-
+    if ( isVoid())
       return null;
+    else if ( isInt())
+      return new Integer( intValue);
+    else if ( isFloat())
+      return new Float( floatValue);
+    else if ( isString())
+      return stringValue;
+    else if ( isSymbol())
+      return symbolValue;
+    else if ( isObject())
+      return objectValue;
+
+    return null;
+  }
+
+  public final void setValue( Object value)
+  {
+    if ( value instanceof Integer)
+      setInt( ((Integer)value).intValue());
+    else if ( value instanceof Float)
+      setFloat( ((Float)value).floatValue());
+    else if ( value instanceof FtsSymbol)
+      setSymbol((FtsSymbol)value);
+    else if ( value instanceof String)
+      setString( (String)value);
+    else if ( value instanceof FtsObject)
+      setObject( (FtsObject)value);
   }
 
   private Class type;

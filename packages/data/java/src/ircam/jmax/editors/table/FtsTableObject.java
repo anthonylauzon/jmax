@@ -44,49 +44,49 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
   static
   {
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setSize"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).setSize(argv[0].intValue);
 	      }
       });
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setVisibles"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).setVisibles(argc, argv);
 	      }
       });
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendVisibles"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).appendVisibles(argc, argv);
 	      }
       });
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("startEdit"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).startEdit();
 	      }
       });
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("endEdit"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).endEdit();
 	      }
       });
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setPixels"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).setPixels(argc, argv);
 	      }
       });
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendPixels"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).appendPixels(argc, argv);
 	      }
       });
       FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("addPixels"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsTableObject)obj).addPixels(argc, argv);
 	      }

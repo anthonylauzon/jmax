@@ -39,18 +39,18 @@ public class FtsAtomList extends FtsObject
 {
   static
   {
-      FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setValues"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	      {
-		  ((FtsAtomList)obj).setValues(argc, argv);
-	      }
-	  });
-      FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	      {
-		  ((FtsAtomList)obj).setName(argv[0].stringValue);
-	      }
-	  });
+    FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setValues"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsAtomList)obj).setValues( args);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsAtomList)obj).setName( args.getString( 0));
+	}
+      });
   }
 
   String name; // the list name (read only)
@@ -110,14 +110,14 @@ public class FtsAtomList extends FtsObject
 
   public void forceUpdate()
   {
-      try{
-	  send( FtsSymbol.get("atomlist_update"));
+    try{
+      send( FtsSymbol.get("atomlist_update"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsAtomList: I/O Error sending update Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsAtomList: I/O Error sending update Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
 
@@ -127,18 +127,18 @@ public class FtsAtomList extends FtsObject
 
   public void changed()
   {
-      args.clear();
-      for(int i = 0; i < values.size(); i++)
-	  args.add(values.elementAt(i));
+    args.clear();
+    for(int i = 0; i < values.size(); i++)
+      args.add(values.elementAt(i));
       
-      try{
-	  send( FtsSymbol.get("atomlist_set"), args);
+    try{
+      send( FtsSymbol.get("atomlist_set"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsAtomList: I/O Error sending set Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	     System.err.println("FtsAtomList: I/O Error sending set Message!");
-	     e.printStackTrace(); 
-	  }
   }
 
   /* Server call-back */
@@ -148,27 +148,27 @@ public class FtsAtomList extends FtsObject
     values.removeAllElements();
     
     for(int i = 0; i < nArgs; i++)	
-	values.addElement(args[i].getValue());
+      values.addElement(args[i].getValue());
 
     fireContentChanged();
   }
   public void setName(String newName)
   {
-      name = newName;
+    name = newName;
   }
     
   void fireContentChanged()
   {
-      for(Enumeration e = listeners.elements(); e.hasMoreElements();)
-	  ((FtsAtomListListener)e.nextElement()).contentChanged();
+    for(Enumeration e = listeners.elements(); e.hasMoreElements();)
+      ((FtsAtomListListener)e.nextElement()).contentChanged();
   }
   public void addFtsAtomListListener(FtsAtomListListener listener)
   {
-      listeners.addElement(listener);
+    listeners.addElement(listener);
   }
   public void removeFtsAtomListListener(FtsAtomListListener listener)
   {
-      listeners.removeElement(listener);
+    listeners.removeElement(listener);
   }
 }
 

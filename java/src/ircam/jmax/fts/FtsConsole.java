@@ -43,12 +43,12 @@ public class FtsConsole extends FtsObject
 {
   static
   {
-      FtsObject.registerMessageHandler( FtsConsole.class, FtsSymbol.get("print_line"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	    ConsoleWindow.append(argv[0].stringValue); 
-	  }
-	});
+    FtsObject.registerMessageHandler( FtsConsole.class, FtsSymbol.get("print_line"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ConsoleWindow.append( args.getString(0)); 
+	}
+      });
   }
     
   public FtsConsole(FtsArgs args) throws IOException

@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 import java.io.*;
 import java.util.*;
@@ -59,7 +59,7 @@ public class FtsObject {
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    encoder.writeObject( server.remote);
+    encoder.writeObject( server.client);
     encoder.writeSymbol( FtsSymbol.get( "new_object"));
     encoder.writeObject( parent);
     encoder.writeInt( id);
@@ -76,7 +76,7 @@ public class FtsObject {
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    encoder.writeObject( server.remote);
+    encoder.writeObject( server.client);
     encoder.writeSymbol( FtsSymbol.get("new_object"));
     encoder.writeObject( parent);
     encoder.writeInt( id);
@@ -147,7 +147,7 @@ public class FtsObject {
   {
     if (selector == obj.selectorCache)
       {
-	obj.messageHandlerCache.invoke( obj, args.getLength(), args.getAtoms());
+	obj.messageHandlerCache.invoke( obj, args);
 	return;
       }
 
@@ -165,7 +165,7 @@ public class FtsObject {
 	  {
 	    obj.selectorCache = selector;
 	    obj.messageHandlerCache = messageHandler;
-	    obj.messageHandlerCache.invoke( obj, args.getLength(), args.getAtoms());
+	    obj.messageHandlerCache.invoke( obj, args);
 	    return;
 	  }
 
@@ -187,11 +187,6 @@ public class FtsObject {
   public FtsObject getParent()
   {
     return parent;
-  }
-
-  public void setParent(FtsObject parent)
-  {
-    this.parent = parent;
   }
 
   public boolean isARootPatcher()

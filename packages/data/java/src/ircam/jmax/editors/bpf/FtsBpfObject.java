@@ -44,43 +44,43 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   static
   {
       FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("addPoint"), new FtsMessageHandler(){
-	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      public void invoke( FtsObject obj, FtsArgs args)
 	      {
 		  ((FtsBpfObject)obj).addPoint(argv[0].intValue, argv[1].floatValue, argv[2].floatValue);
 	      }
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("removePoints"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    public void invoke( FtsObject obj, FtsArgs args)
 	    {
 		((FtsBpfObject)obj).removePoints(argc, argv);
 	    }
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("setPoint"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    public void invoke( FtsObject obj, FtsArgs args)
 	    {
 		((FtsBpfObject)obj).setPoint(argv[0].intValue, argv[1].floatValue, argv[2].floatValue);
 	    }
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("setPoints"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    public void invoke( FtsObject obj, FtsArgs args)
 	    {
 		((FtsBpfObject)obj).setPoints(argc, argv);
 	    }
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    public void invoke( FtsObject obj, FtsArgs args)
 	    {
 		((FtsBpfObject)obj).clear();
 	    }
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    public void invoke( FtsObject obj, FtsArgs args)
 	    {
 		((FtsBpfObject)obj).set(argc, argv);
 	    }
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("append"), new FtsMessageHandler(){
-	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    public void invoke( FtsObject obj, FtsArgs args)
 	    {
 		((FtsBpfObject)obj).append(argc, argv);
 	    }

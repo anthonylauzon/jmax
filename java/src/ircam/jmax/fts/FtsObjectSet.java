@@ -57,87 +57,85 @@ public class FtsObjectSet extends FtsObject implements ListModel
 
   static
   {
-      FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsObjectSet)obj).clear();
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("append"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsObjectSet)obj).append(argc, argv);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsObjectSet)obj).removeObject(argv[0].objectValue);
-	  }
-	});
+    FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsObjectSet)obj).clear();
+	}
+      });
+    FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("append"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsObjectSet)obj).append( args);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsObjectSet)obj).removeObject( args.getObject( 0));
+	}
+      });
   }
 
 
   public FtsObjectSet() throws IOException
   {
-      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__objectset"));
+    super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__objectset"));
 
-      list = new MaxVector();
-      dataListeners = new MaxVector();
+    list = new MaxVector();
+    dataListeners = new MaxVector();
       
-      editListener = new ObjectSetEditListener();
-      FtsPatcherObject.addGlobalEditListener(editListener);
+    editListener = new ObjectSetEditListener();
+    FtsPatcherObject.addGlobalEditListener(editListener);
   }
   
   public void release()
   {
-      FtsPatcherObject.removeGlobalEditListener(editListener);
+    FtsPatcherObject.removeGlobalEditListener(editListener);
   }
 
   public void append(int nArgs, FtsAtom[] args)
   {
-      for(int i=0; i<nArgs; i++)
-	  list.addElement(args[i].objectValue);
+    for(int i=0; i<nArgs; i++)
+      list.addElement(args[i].objectValue);
 
-      fireListChanged();
+    fireListChanged();
   }
 
   public void clear()
   {
-      list.removeAllElements();
-      fireListChanged();
+    list.removeAllElements();
+    fireListChanged();
   }
 
   public void removeObject(FtsObject obj)
   {
-      list.removeElement(obj);
-      fireListChanged();
+    list.removeElement(obj);
+    fireListChanged();
   }
 
   /** listmodel interface */
   public Object getElementAt(int index)
   {
-      return list.elementAt(index);
+    return list.elementAt(index);
   }
   public int getSize()
   {
-      return list.size();
+    return list.size();
   }
   public void addListDataListener(ListDataListener l)
   {
-      dataListeners.addElement(l);
+    dataListeners.addElement(l);
   }
   public void removeListDataListener(ListDataListener l)
   {
-      dataListeners.removeElement(l);
+    dataListeners.removeElement(l);
   }
   private void fireListChanged()
   {
-	ListDataEvent evt = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
-	for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
-	    ((ListDataListener)e.nextElement()).contentsChanged(evt);
-    }
+    ListDataEvent evt = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, getSize());
+    for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
+      ((ListDataListener)e.nextElement()).contentsChanged(evt);
+  }
 }
-
-
 

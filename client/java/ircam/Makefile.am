@@ -1,1 +1,1 @@
-SUBDIRS=ftsclient
+SUBDIRS=fts

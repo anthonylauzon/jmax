@@ -57,54 +57,54 @@ public class FtsDspControl extends FtsObject
 
   static
   {
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDspOnState"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setDspOn((argv[0].intValue == 0) ? false : true);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setFifoSize"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setFifoSize(argv[0].intValue);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setSamplingRate"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setSamplingRate(argv[0].intValue);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDACSlipState"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setDacSlip(argv[0].intValue);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setInvalidFpeState"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setInvalidFpe(argv[0].intValue);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDivideByZeroFpeState"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setDivideByZeroFpe(argv[0].intValue);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setOverflowFpeState"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setOverflowFpe(argv[0].intValue);
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDenormalizeFpeState"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-	  {
-	      ((FtsDspControl)obj).setDenormalizedFpe(argv[0].intValue);
-	  }
-	});
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDspOnState"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setDspOn( ( args.getInt( 0) == 0) ? false : true);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setFifoSize"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setFifoSize( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setSamplingRate"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setSamplingRate( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDACSlipState"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setDacSlip( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setInvalidFpeState"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setInvalidFpe( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDivideByZeroFpeState"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setDivideByZeroFpe( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setOverflowFpeState"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setOverflowFpe( args.getInt( 0));
+	}
+      });
+    FtsObject.registerMessageHandler( FtsDspControl.class, FtsSymbol.get("setDenormalizeFpeState"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsDspControl)obj).setDenormalizedFpe( args.getInt( 0));
+	}
+      });
   }
     
   public FtsDspControl() throws IOException
@@ -123,22 +123,22 @@ public class FtsDspControl extends FtsObject
     listeners = new PropertyChangeSupport(this);
 
     FtsPatcherObject.addGlobalEditListener(new FtsEditListener(){	    
-	    public void objectAdded(FtsObject object)
-	    {
-		if(!atomic && dspOn) restart();
-	    };
-	    public void objectRemoved(FtsObject object){};
-	    public void connectionAdded(FtsConnection connection)
-	    {
-		if(!atomic && dspOn) restart();
-	    };
-	    public void connectionRemoved(FtsConnection connection){};
-	    public void atomicAction(boolean active)
-	    {
-		atomic = active;
-		if(!atomic && dspOn) restart();
-	    };
-	});
+	public void objectAdded(FtsObject object)
+	{
+	  if(!atomic && dspOn) restart();
+	};
+	public void objectRemoved(FtsObject object){};
+	public void connectionAdded(FtsConnection connection)
+	{
+	  if(!atomic && dspOn) restart();
+	};
+	public void connectionRemoved(FtsConnection connection){};
+	public void atomicAction(boolean active)
+	{
+	  atomic = active;
+	  if(!atomic && dspOn) restart();
+	};
+      });
   }
 
   /* Accessors for fields */
@@ -243,88 +243,88 @@ public class FtsDspControl extends FtsObject
 
   public void requestSetDspOn(boolean value)
   {
-      args.clear();
-      args.add(value ? 1 : 0);
+    args.clear();
+    args.add(value ? 1 : 0);
       
-      try{
-	  send( FtsSymbol.get("dsp_on"), args);
+    try{
+      send( FtsSymbol.get("dsp_on"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsDspControl: I/O Error sending dspOn Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	     System.err.println("FtsDspControl: I/O Error sending dspOn Message!");
-	     e.printStackTrace(); 
-	  }
   }
 
   public void dspPrint()
   {
-      try{
-	  send( FtsSymbol.get("dsp_print"));
+    try{
+      send( FtsSymbol.get("dsp_print"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsDspControl: I/O Error sending dsp_print Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsDspControl: I/O Error sending dsp_print Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   public void restart()
   {
-      try{
-	  send( FtsSymbol.get("dsp_restart"));
+    try{
+      send( FtsSymbol.get("dsp_restart"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsDspControl: I/O Error sending dsp_restart Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsDspControl: I/O Error sending dsp_restart Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   /* Fpe support */
 
   public void startFpeCollecting(FtsObjectSet set)
   {
-      args.clear();
-      args.add(set);
+    args.clear();
+    args.add(set);
       
-      try{
-	  send( FtsSymbol.get("fpe_start_collect"), args);
+    try{
+      send( FtsSymbol.get("fpe_start_collect"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsDspControl: I/O Error sending fpe_start_collect Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsDspControl: I/O Error sending fpe_start_collect Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   public void stopFpeCollecting()
   {
-      try{
-	  send( FtsSymbol.get("fpe_stop_collecting"));
+    try{
+      send( FtsSymbol.get("fpe_stop_collecting"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsDspControl: I/O Error sending fpe_stop_collect Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsDspControl: I/O Error sending fpe_stop_collect Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   public void clearFpeCollecting()
   {
-      try{
-	  send( FtsSymbol.get("fpe_clear_collecting"));
+    try{
+      send( FtsSymbol.get("fpe_clear_collecting"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsDspControl: I/O Error sending fpe_clear_collecting Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsDspControl: I/O Error sending fpe_clear_collecting Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
   public void setCheckNan( boolean checkNan)
   {
-      /*sendArgs[0].setInt(checkNan ? 1 : 0);
-	sendMessage(FtsObject.systemInlet, "set_check_nan", 1, sendArgs);*/
+    /*sendArgs[0].setInt(checkNan ? 1 : 0);
+      sendMessage(FtsObject.systemInlet, "set_check_nan", 1, sendArgs);*/
   }
 
   /* Listeners support */
@@ -339,14 +339,4 @@ public class FtsDspControl extends FtsObject
     listeners.removePropertyChangeListener(listener);
   }
 }
-
-
-
-
-
-
-
-
-
-
 

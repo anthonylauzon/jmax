@@ -1,3 +1,13 @@
+2002-02-13  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed the java Makefiles in client/ and java/ for compiling under
+	recent version of automake
+
+	* moved client/java/ircam/ftsclient to client/java/ircam/fts/client
+
+	* changed the MessageHandler interface, changed accordingly FtsArgs
+	and FtsAtom
+
 2002-02-08  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* changed the atoms implementation. The tag was a symbol, it is now a hacked

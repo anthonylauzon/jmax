@@ -55,13 +55,21 @@ Changing JAVA GUI to FTS client library:
 </p>
 
 <p>
+FTS data models:
+<ul>
+<li> package ircam.fts.data contains a collection of data models interfaces and a partial implementation
+of these interfaces using FtsObject (as in BoundedRangeModel and DefaultBoundedRangeModel)
+<li> objects that are used by the Java GUI delegate the model handling to a support class coming from ircam.fts.data (they do not derive from DefaultBlabalModel because they must also derive from GraphicObject where the graphic properties are managed)
+</ul>
+</p>
+
+<p>
 FTS client library:
 <ul>
-<li> implement string cache on both sides (to avoid allocation on callback):
-<li> add protocol tags: SYMBOL (caractères+), SYMBOL_TO_CACHE (index,caractères+) : stringCache[index] = string.intern(), SYMBOL_CACHED (index) args.add( stringCache[index])
-<li> transform the protocol encoder/decoder in an interface and implement classes FtsBinaryProtocolEncoder and FtsBinaryProtocolDecoder
 <li> finish C++ reorganisation: split FtsServer into several classes (protocol encoder, decoder),
 remove as much references as possible, FtsValue -> FtsAtom, rewrite protocol decoder as in Java
+<li> add a protocol header that describes the protocol used, its version, gives the UDP port number,
+etc (as in HTTP, header ends with an empty line)
 </ul>
 </p>
 
@@ -327,6 +335,16 @@ previous versions did not)
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>User interface</h3>
+
+<p>
+Change objects implementation so that:
+<ul>
+<li> they are passed a Graphics that is translated to their upper left corner
+and clipped by their width and height
+<li> the text field is in each text object (slower at creation but faster in
+edition and much simpler in the code)
+</ul>
+</p>
   
 <p>
  Unique menu for all editors (fits better in Mac OS X L&amp;F):

@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 interface TransitionAction {
   public void fire( int input);
@@ -162,7 +162,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  ival = ival << 8 | input;
 
 	  if (argsCount >= 2)
-	    args.add( ival);
+	    args.addInt( ival);
 	  argsCount++;
 	}
       };
@@ -173,7 +173,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  ival = ival << 8 | input;
 
 	  if (argsCount >= 2)
-	    args.add( Float.intBitsToFloat(ival) );
+	    args.addFloat( Float.intBitsToFloat(ival) );
 	  argsCount++;
 	}
       };
@@ -188,7 +188,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  if (argsCount == 1)
 	    selector = s;
 	  else
-	    args.add( s);
+	    args.addSymbol( s);
 
 	  argsCount++;
 	}
@@ -204,7 +204,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  if (argsCount == 1)
 	    selector = s;
 	  else
-	    args.add( s);
+	    args.addSymbol( s);
 
 	  argsCount++;
 	}
@@ -214,7 +214,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	public void fire( int input)
 	{
 	  if (argsCount >= 2)
-	    args.add( buffer.toString());
+	    args.addString( buffer.toString());
 	  argsCount++;
 	}
       };
@@ -229,7 +229,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
 	  if (argsCount == 0)
 	    target = obj;
 	  else
-	    args.add( obj);
+	    args.addObject( obj);
 
 	  argsCount++;
 	}
@@ -334,7 +334,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       {
 	int c = data[i];
 
-	if(c < 0)
+	if ( c < 0)
 	  c += 256;
 
 	currentState = currentState.next( c);

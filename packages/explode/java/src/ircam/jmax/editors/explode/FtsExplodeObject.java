@@ -56,41 +56,41 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
   // and FTS that is not based on indexes. See also the implementation notes
   // in ExplodeSelection.java
   
-    static{
-	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadStart"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-		{
-		    ((FtsExplodeObject)obj).loadStart();
-		}
-	    });
-	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadAppend"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-		{
-		    ((FtsExplodeObject)obj).loadAppend(argv[0].intValue, argv[1].intValue, 
-						       argv[2].intValue, argv[3].intValue, argv[4].intValue);
-		}
-	    });
-	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadEnd"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-		{
-		    ((FtsExplodeObject)obj).loadEnd();
-		}
+  static{
+    FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadStart"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsExplodeObject)obj).loadStart();
+	}
+      });
+    FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadAppend"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsExplodeObject)obj).loadAppend(argv[0].intValue, argv[1].intValue, 
+					     argv[2].intValue, argv[3].intValue, argv[4].intValue);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadEnd"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsExplodeObject)obj).loadEnd();
+	}
 	    });
 	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("clean"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		public void invoke( FtsObject obj, FtsArgs args)
 		{
 		    ((FtsExplodeObject)obj).clean();
 		}
 	    });
 	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("append"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		public void invoke( FtsObject obj, FtsArgs args)
 		{
 		    ((FtsExplodeObject)obj).append(argv[0].intValue, argv[1].intValue, 
 						   argv[2].intValue, argv[3].intValue, argv[4].intValue);
 		}
 	    });
 	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		public void invoke( FtsObject obj, FtsArgs args)
 		{
 		    ((FtsExplodeObject)obj).setName(argv[0].stringValue);
 		}

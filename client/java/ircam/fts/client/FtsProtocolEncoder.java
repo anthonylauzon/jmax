@@ -19,11 +19,18 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
 import java.io.*;
 
 abstract class FtsProtocolEncoder {
+
+  FtsProtocolEncoder( FtsServer server)
+  {
+    this.server = server;
+    connection = server.getConnection();
+  }
+
   abstract void writeInt( int v) throws IOException;
   abstract void writeFloat( float v) throws IOException;
   abstract void writeSymbol( FtsSymbol v) throws IOException;
@@ -53,5 +60,8 @@ abstract class FtsProtocolEncoder {
   }
 
   abstract void flush() throws IOException;
+
+  protected FtsServer server;
+  protected FtsServerConnection connection;
 }
 

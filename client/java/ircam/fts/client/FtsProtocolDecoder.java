@@ -19,15 +19,18 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
-interface FtsProtocol {
-  public static final byte INT               = (byte)0x01;
-  public static final byte FLOAT             = (byte)0x02;
-  public static final byte SYMBOL_INDEX      = (byte)0x03;
-  public static final byte SYMBOL_CACHE      = (byte)0x04;
-  public static final byte STRING            = (byte)0x05;
-  public static final byte OBJECT            = (byte)0x06;
-  public static final byte END_OF_MESSAGE    = (byte)0x0F;
+abstract class FtsProtocolDecoder {
+
+  FtsProtocolDecoder( FtsServer server)
+  {
+    this.server = server;
+    connection = server.getConnection();
+  }
+
+  abstract void decode( byte[] data, int offset, int length) throws FtsClientException;
+
+  protected FtsServer server;
+  protected FtsServerConnection connection;
 }
-

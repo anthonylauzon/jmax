@@ -25,10 +25,10 @@ import java.io.*;
 public class Test {
 
   class MyCallback implements FtsMessageHandler {
-    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+    public void invoke( FtsObject obj, FtsArgs args)
     {
-      if (argc == 1 && argv[0].isInt())
-	System.out.println( "Callback (1) " + argv[0].intValue);
+      if (argc == 1 && args.isInt(0))
+	System.out.println( "Callback (1) " + args.getInt( 0));
     }
   }
 

@@ -19,36 +19,26 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.ftsclient;
+package ircam.fts.client;
 
-import java.util.*;
+import java.io.*;
 
-public class FtsSymbol {
+public abstract class FtsServerConnection {
 
-  public static FtsSymbol get( String s)
+  public abstract void close() throws IOException;
+
+  public int read( byte[] b) throws IOException
   {
-    FtsSymbol symbol = (FtsSymbol)symbolTable.get( s);
-
-    if (symbol != null)
-      return symbol;
-
-    symbol = new FtsSymbol( s);
-    symbolTable.put( s, symbol);
-
-    return symbol;
+    return read( b, 0, b.length);
   }
 
-  private FtsSymbol( String s)
+  public abstract int read( byte[] b, int off, int len) throws IOException;
+
+  public void write( byte[] b) throws IOException
   {
-    this.s = s;
+    write( b, 0, b.length);
   }
 
-  public String toString()
-  {
-    return s;
-  }
-
-  private static HashMap symbolTable = new HashMap();
-
-  private String s;
+  public abstract void write( byte[] b, int off, int len) throws IOException;
 }
+

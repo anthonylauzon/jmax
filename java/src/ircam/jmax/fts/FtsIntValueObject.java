@@ -41,15 +41,15 @@ import ircam.jmax.editors.patcher.objects.NumberBox;
 
 public class FtsIntValueObject extends FtsGraphicObject
 {
-    static
-    {
-	FtsObject.registerMessageHandler( FtsIntValueObject.class, FtsSymbol.get("setValue"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
-		{
-		    ((FtsIntValueObject)obj).setCurrentValue(argv[0].intValue);
-		}
-	    });
-    }
+  static
+  {
+    FtsObject.registerMessageHandler( FtsIntValueObject.class, FtsSymbol.get("setValue"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsIntValueObject)obj).setCurrentValue( args.getInt( 0));
+	}
+      });
+  }
 
 
   /*****************************************************************************/
@@ -63,71 +63,64 @@ public class FtsIntValueObject extends FtsGraphicObject
 
   public FtsIntValueObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
   {
-      super(server, parent, className, nArgs, args, id);
+    super(server, parent, className, nArgs, args, id);
   }
 
   public void setValue(int value)
   {
-      this.value = value;
-      args.clear();
-      args.add(value);
-      try{
-	  send( FtsSymbol.get("setValue"), args);
+    this.value = value;
+    args.clear();
+    args.add(value);
+    try{
+      send( FtsSymbol.get("setValue"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsIntValueObject: I/O Error sending setValue Message!");
+	e.printStackTrace(); 
       }
-      catch(IOException e)
-	  {
-	      System.err.println("FtsIntValueObject: I/O Error sending setValue Message!");
-	      e.printStackTrace(); 
-	  }
   }
 
-    /** Get the current value */
+  /** Get the current value */
 
-    public int getValue()
-    {
-	return value;
+  public int getValue()
+  {
+    return value;
+  }
+
+  /** Ask the server for the latest value */
+
+  public void updateValue()
+  {
+    try{
+      send(FtsSymbol.get("getValue"));
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsIntValueObject: I/O Error sending getValue Message!");
+	e.printStackTrace(); 
+      }
+  }
 
-    /** Ask the server for the latest value */
-
-    public void updateValue()
-    {
-	try{
-	    send(FtsSymbol.get("getValue"));
-	}
-	catch(IOException e)
-	    {
-		System.err.println("FtsIntValueObject: I/O Error sending getValue Message!");
-		e.printStackTrace(); 
-	    }
+  public void sendBang()
+  {
+    try{
+      send(FtsSymbol.get("bang"));
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsIntValueObject: I/O Error sending bang Message!");
+	e.printStackTrace(); 
+      }
+  }
+  /* Over write the localPut message to handle value changes;
+   */
 
-    public void sendBang()
-    {
-	try{
-	    send(FtsSymbol.get("bang"));
-	}
-	catch(IOException e)
-	    {
-		System.err.println("FtsIntValueObject: I/O Error sending bang Message!");
-		e.printStackTrace(); 
-	    }
-    }
-    /* Over write the localPut message to handle value changes;
-     */
-
-    void setCurrentValue(int newValue)
-    {
-	value = newValue;
+  void setCurrentValue(int newValue)
+  {
+    value = newValue;
       
-	if (listener instanceof FtsIntValueListener)
-	    ((FtsIntValueListener) listener).valueChanged(newValue);
-    }
+    if (listener instanceof FtsIntValueListener)
+      ((FtsIntValueListener) listener).valueChanged(newValue);
+  }
 }
-
-
-
-
-
-
-
