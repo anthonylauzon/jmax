@@ -5,13 +5,14 @@ import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
 import javax.swing.*;
+import ircam.jmax.toolkit.*;
 import ircam.jmax.MaxApplication;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.editors.sequence.renderers.*;
 /**
  **/
-public class ToggleBar extends PopupToolbarPanel
+public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel
 {
     public ToggleBar(TrackEditor trkEd)
     {
