@@ -209,6 +209,18 @@
 			settings = {
 			};
 		};
+		F59A8459033F11C901664092 = {
+			isa = PBXFileReference;
+			name = TableToolManager.java;
+			path = ../../packages/data/java/ircam/jmax/editors/table/TableToolManager.java;
+			refType = 2;
+		};
+		F59A845A033F11C901664092 = {
+			fileRef = F59A8459033F11C901664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5A37B8F0327C67501664092 = {
 			fileRef = F8F010EB028D890E01664092;
 			isa = PBXBuildFile;
@@ -17326,7 +17338,6 @@
 				F8B8E49902867E1C01664092,
 				F8B8E49B02867E1C01664092,
 				F8B8E49C02867E1C01664092,
-				F8B8E49D02867E1C01664092,
 				F8B8E49E02867E1C01664092,
 				F8B8E4A002867E1C01664092,
 				F8B8E4A102867E1C01664092,
@@ -17407,12 +17418,6 @@
 			isa = PBXFileReference;
 			name = getsize.c;
 			path = ../../packages/data/c/src/getsize.c;
-			refType = 2;
-		};
-		F8B8E49D02867E1C01664092 = {
-			isa = PBXFileReference;
-			name = getval.c;
-			path = ../../packages/data/c/src/getval.c;
 			refType = 2;
 		};
 		F8B8E49E02867E1C01664092 = {
@@ -17628,7 +17633,6 @@
 				F8B8E4CA02867E1C01664092,
 				F8B8E4CC02867E1C01664092,
 				F8B8E4CD02867E1C01664092,
-				F8B8E4CE02867E1C01664092,
 				F8B8E4CF02867E1C01664092,
 				F8B8E4D002867E1C01664092,
 				F8B8E4D302867E1C01664092,
@@ -17695,12 +17699,6 @@
 		};
 		F8B8E4CD02867E1C01664092 = {
 			fileRef = F8B8E49C02867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E4CE02867E1C01664092 = {
-			fileRef = F8B8E49D02867E1C01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -17814,7 +17812,6 @@
 				F8B8E546028680BC01664092,
 				F8B8E547028680BC01664092,
 				F8B8E548028680BC01664092,
-				F8B8E549028680BC01664092,
 				F8B8E54A028680BC01664092,
 				F8B8E54B028680BC01664092,
 				F8B8E54C028680BC01664092,
@@ -17847,6 +17844,7 @@
 				F8B8E571028680BC01664092,
 				F8B8E572028680BC01664092,
 				F56C3E190338D3DC01664092,
+				F59A845A033F11C901664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18091,7 +18089,6 @@
 				F8B8E509028680BB01664092,
 				F8B8E50D028680BB01664092,
 				F8B8E511028680BB01664092,
-				F8B8E518028680BB01664092,
 				F8B8E519028680BB01664092,
 				F8B8E51A028680BB01664092,
 				F8B8E51B028680BB01664092,
@@ -18112,6 +18109,7 @@
 				F8B8E52A028680BB01664092,
 				F8B8E52B028680BB01664092,
 				F56C3E180338D3DC01664092,
+				F59A8459033F11C901664092,
 			);
 			isa = PBXGroup;
 			name = table;
@@ -18220,12 +18218,6 @@
 			isa = PBXFileReference;
 			name = ZoomTool.java;
 			path = ../../packages/data/java/ircam/jmax/editors/table/tools/ZoomTool.java;
-			refType = 2;
-		};
-		F8B8E518028680BB01664092 = {
-			isa = PBXFileReference;
-			name = ChangeRangeDialog.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/ChangeRangeDialog.java;
 			refType = 2;
 		};
 		F8B8E519028680BB01664092 = {
@@ -18512,12 +18504,6 @@
 		};
 		F8B8E548028680BC01664092 = {
 			fileRef = F8B8E4E9028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E549028680BC01664092 = {
-			fileRef = F8B8E518028680BB01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
