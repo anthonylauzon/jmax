@@ -128,7 +128,11 @@ public class MaxFileChooser
 
     File currentFile = fd.getSelectedFile();
 
-    String name = currentFile.getName();
+    String name;
+    if(currentFile!=null)
+	name = currentFile.getName();
+    else
+	name = "untitled.jmax";
     String suffix = "";
 
     if (saveType == SAVE_JMAX_TYPE)
