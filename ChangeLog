@@ -1,3 +1,10 @@
+2003-04-02  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/fts.c (fts_kernel_init): added call to fts_kernel_socketstream_init
+
+	* fts/bytestream.c, fts/socketstream.c: added socketstream.c to CVS repository.
+	moved fts_socketstream and fts_udpstream objects from bytestream.c to socketstream.c
+
 2003-04-01  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/io: added missing in~/out~ help patch, fixed in/out help patch
