@@ -204,7 +204,7 @@ public class InputPort extends SchemeUtils {
 	try { return new Integer(buff.toString()); }
 	catch (NumberFormatException e) {
 	    try { return new Float(buff.toString()); }
-	    catch (NumberFormatException e) { ; }
+	    catch (NumberFormatException e1) { ; }
 	}
       }
       return buff.toString().toLowerCase().intern();
