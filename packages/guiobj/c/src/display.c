@@ -108,6 +108,8 @@ append_blank_and_atom(char *str, const fts_atom_t *a)
     snprintf(s, STRING_SIZE - n, " <%s>", fts_get_class(a)->name);
 }
 
+static void append_atoms(char *str, int ac, const fts_atom_t *at);
+
 static void
 append_atom(char *str, const fts_atom_t *a)
 {
@@ -129,8 +131,30 @@ append_atom(char *str, const fts_atom_t *a)
       else
 	snprintf(s, STRING_SIZE - n, "%s", sym);
     }
+  else if(fts_is_tuple(a))
+    {
+      fts_tuple_t *t = fts_get_tuple(a);
+      int size = fts_tuple_get_size(t);
+      fts_atom_t *atoms = fts_tuple_get_atoms(t);
+
+      append_char(str, '(');
+      append_atoms(s, size, atoms);
+      append_char(str, ')');
+    }
   else
     snprintf(s, STRING_SIZE - n, "<%s>", fts_get_class(a)->name);
+}
+
+static void
+append_atoms(char *str, int ac, const fts_atom_t *at)
+{
+  int i;
+
+  append_atom(str, at);
+  
+  for(i=1; i<ac; i++)
+    append_blank_and_atom(str, at + i);
+  
 }
 
 /************************************************************
@@ -285,29 +309,23 @@ display_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-display_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
   
   if(ac == 0)
     {
-      /* empty list */
-      this->string[0] = '{';
-      this->string[1] = '}';
+      /* empty tuple (shouldn't happen!!!) */
+      this->string[0] = '(';
+      this->string[1] = ')';
       this->string[2] = '\0';
     }
   else
     {
-      int i;
-      
-      this->string[0] = '{';
+      this->string[0] = '(';
       this->string[1] = '\0';
-      append_atom(this->string, at);
-      
-      for(i=1; i<ac; i++)
-	append_blank_and_atom(this->string, at + i);
-      
-      append_char(this->string, '}');
+      append_atoms(this->string, ac, at);
+      append_char(this->string, ')');
     }
 
   display_deliver(this);
@@ -378,7 +396,7 @@ display_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, display_int);
   fts_method_define_varargs(cl, 0, fts_s_float, display_float);
   fts_method_define_varargs(cl, 0, fts_s_symbol, display_symbol);
-  fts_method_define_varargs(cl, 0, fts_s_list, display_list);
+  fts_method_define_varargs(cl, 0, fts_s_list, display_tuple);
   fts_method_define_varargs(cl, 0, fts_s_anything, display_anything);
 
   fts_dsp_declare_inlet(cl, 0);
