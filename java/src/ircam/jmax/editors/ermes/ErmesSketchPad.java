@@ -55,7 +55,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   int SKETCH_WIDTH = 1200/*800*/;
   int SKETCH_HEIGHT = 1200/*800*/;
 
-  int itsJustificationMode = CENTER_JUSTIFICATION;
+  int itsJustificationMode = LEFT_JUSTIFICATION;
   int itsResizeMode = BOTH_RESIZING;
 
   int inCount = 0;   //ref count of ErmesObjIn objects (used if this is a subpatcher)

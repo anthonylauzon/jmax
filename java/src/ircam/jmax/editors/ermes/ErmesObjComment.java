@@ -235,8 +235,12 @@ class ErmesObjComment extends ErmesObject {
       }
     }
   }
-  
 
+  void putOtherProperties(FtsObject theFObject){
+    if (itsJustification != itsSketchPad.itsJustificationMode)
+      theFObject.put("jsf", itsJustification);
+  }
+  
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------

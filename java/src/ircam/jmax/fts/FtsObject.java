@@ -47,7 +47,8 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     FtsPropertyDescriptor.setPersistent("font", true);
     FtsPropertyDescriptor.setPersistent("fs", true);
-    FtsPropertyDescriptor.setDefaultValue("fs", new Integer(12));
+    FtsPropertyDescriptor.setPersistent("jsf", true);//justification
+    //FtsPropertyDescriptor.setDefaultValue("fs", new Integer(10));
   }
 
   /******************************************************************************/

@@ -99,7 +99,7 @@ import ircam.jmax.fts.*;
     preferredSize = new Dimension(lenght+2*WIDTH_DIFF, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
     super.Init(theSketchPad, theFtsObject);
     itsInEdit = false;
-    ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
+    //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
     return true;
   }
 
@@ -261,6 +261,11 @@ import ircam.jmax.fts.*;
       aOutlet.MoveTo(aOutlet.itsX, itsY+currentRect.height);
       ReroutingConnections(aOutlet);
     }
+  }
+
+  void putOtherProperties(FtsObject theFObject){
+    if (itsJustification != itsSketchPad.itsJustificationMode)
+      theFObject.put("jsf", itsJustification);
   }
 
   //--------------------------------------------------------
