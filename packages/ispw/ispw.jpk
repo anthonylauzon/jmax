@@ -19,10 +19,10 @@ abstractionDirectory $dir/abs/compatibility
 ## set path for wave tables
 dataDirectory $dir/snd
 
-## load the help patch data base
-sourceFile $dir/help/control/control.help.index.tcl
-sourceFile $dir/help/jimmies/jimmies.help.index.tcl
-sourceFile $dir/help/signal/signal.help.index.tcl
+## load the help patch tables
+#sourceFile $dir/help/control/control.help.index.tcl
+#sourceFile $dir/help/jimmies/jimmies.help.index.tcl
+#sourceFile $dir/help/signal/signal.help.index.tcl
 
 ## load the reference manual data base
 #sourceFile $dir/doc/reference.tcl
