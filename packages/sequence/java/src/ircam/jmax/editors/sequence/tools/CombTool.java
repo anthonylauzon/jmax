@@ -116,6 +116,8 @@ public class CombTool extends Tool implements CombListener{
     //with Shift add to selection
     if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
 
+    egc.getTrack().getFtsTrack().beginUpdate(); //combing is undoable
+
     if(egc.getAdapter().isDrawable())    
 	comb(x, y, modifiers);    
   }
@@ -129,8 +131,6 @@ public class CombTool extends Tool implements CombListener{
     PartitionAdapter a = (PartitionAdapter)egc.getAdapter();
     TrackEvent aEvent;
 
-    egc.getTrack().getFtsTrack().beginUpdate(); //combing is undoable
-    
     int yZero = a.getY(0);
     
     for (Enumeration e = gc.getRenderManager().
@@ -161,13 +161,13 @@ public class CombTool extends Tool implements CombListener{
 				a.YMapper.set(aEvent, 0);
 			}
 	}
-    egc.getTrack().getFtsTrack().endUpdate();    
   }
 
   public void combEnd(int x, int y, int modifiers) 
   {
       comb(x, y, modifiers);
       gc.getGraphicDestination().repaint();
+      ((SequenceGraphicContext)gc).getTrack().getFtsTrack().endUpdate();    	  
   }
 
   public void setRay(int ray)

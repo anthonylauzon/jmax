@@ -133,7 +133,6 @@ public class LinerTool extends Tool implements LineListener{
   {
       SequenceGraphicContext egc = (SequenceGraphicContext)gc;
       drawLine(startingPoint.x, startingPoint.y, x, y);
-      egc.getTrack().getFtsTrack().endUpdate();
   }
 
   /**

@@ -143,9 +143,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     int removeIndex;
     TrackEvent event = null;
 
-    // starts an undoable transition	
-    beginUpdate();
-
     for(int i=0; i<nArgs; i++)
       {
 	event = (TrackEvent)(args[i].getObject());

@@ -81,7 +81,7 @@ public class DeleteTool extends Tool implements PositionListener {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
 	// starts an undoable transition	
-	//((UndoableData) egc.getDataModel()).beginUpdate();
+	((UndoableData) egc.getDataModel()).beginUpdate();
 
 	if( egc.getSelection().isInSelection(aEvent))
 	    egc.getSelection().deleteAll();
