@@ -110,8 +110,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 		{
 		    TrackEvent temp;
 		    boolean first = true;
-		    Rectangle clipRect = gc.getTrackClip();
-		    Graphics g = itsScore.getGraphics();
+		    
+		    Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
+		    Graphics g = itsScore.getGraphics();  
 		    g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 		    
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 

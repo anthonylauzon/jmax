@@ -590,6 +590,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     {
 	itsTimeScrollbar.setValue(value);
     }
+    public Rectangle getViewRectangle()
+    {
+	return scrollTracks.getViewport().getViewRect();
+    }
 }
 
 
