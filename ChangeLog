@@ -1,5 +1,10 @@
 2003-07-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/jack/c/src/jackaudioport.c (jackaudioport_open_input, jackaudioport_open_output): 
+	  - started to clean jMax jack support connfiguration madness.
+	  - changed name of jack port created by jMax, now we use jMax:jack_port_name_connected. I have done this change to make understanding of jack configuration in jMax easier. With previous version you can have a configuration with the following label {foo, toto} but qjackconnect or jack_lspshowed something like jMax:bill_out and jMax:bob_out.  Now if you connect jMax to alsa_pcm:playback1, you will see in jack_lsp or qjackconnect: jMax:alsa_pcm:playback_1.
+	  - TODO: add support for several unconnected jMax jack audio port.
+
 	* packages/signal/c/src/biquad.c: fixed initialization of biquad~ coefficient.
 	added error message if biquad~ arguments are not numbers.
 
