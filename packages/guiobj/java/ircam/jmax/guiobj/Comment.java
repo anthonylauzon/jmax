@@ -291,16 +291,17 @@ public class Comment extends Editable
   /**************  popup interaction ********************/ 
   public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
-    super.popUpUpdate(onInlet, onOutlet, area);
     getControlPanel().update(this);
     ObjectPopUp.getInstance().add((JPanel)getControlPanel());
     ObjectPopUp.getInstance().revalidate();
     ObjectPopUp.getInstance().pack();
+    super.popUpUpdate(onInlet, onOutlet, area);
   }
   public void popUpReset()
   {
-    super.popUpReset();
+    getControlPanel().done();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
+    super.popUpReset(); 
   }
 
   private transient Color color, selectedColor, selectedOpaqueColor, opaqueColor, editColor, editSelectedColor;

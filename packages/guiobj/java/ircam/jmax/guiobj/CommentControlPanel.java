@@ -121,6 +121,8 @@ public class CommentControlPanel extends JPanel implements ObjectControlPanel
 
     add(transpPanel);
 
+    add( new JSeparator());
+
     validate();
     transpPanel.validate();//???
   }
