@@ -480,6 +480,29 @@ _bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
+_bpf_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+  
+  if(ac > 1)
+  {
+    int i;
+    
+    for(i=0; i<ac-1; i+=2)
+    {
+      double time = fts_get_float(at + i);
+      double value = fts_get_float(at + i + 1);
+      
+      bpf_insert_point(this, time, value);
+    }
+    
+    bpf_set_client(this);
+    fts_object_set_state_dirty(o);
+    fts_return_object(o);
+  }
+}
+
+static void
 _bpf_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
@@ -806,6 +829,7 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_clear, _bpf_clear);
   fts_class_message_varargs(cl, fts_s_set, _bpf_set);
   fts_class_message_varargs(cl, fts_s_append, _bpf_append);
+  fts_class_message_varargs(cl, fts_s_insert, _bpf_insert);
   fts_class_message(cl, fts_s_set, bpf_type, _bpf_set_from_bpf);
   fts_class_message(cl, fts_s_set, fmat_class, _bpf_set_from_fmat);
   
@@ -821,10 +845,16 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
   
-  fts_class_doc(cl, bpf_symbol, "", "bpf of time tagged points");
+  fts_class_doc(cl, bpf_symbol, "<num: time> <num: value> ...", "bpf of time tagged points");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all points");
-  fts_class_doc(cl, fts_s_set, "<int: time> <value: float> ...", "set list of time-value points as bpf content");
-	fts_class_doc(cl, fts_s_append, "<int: time> <value: float> ...", "append list of time-value points to the bpf content");
+  fts_class_doc(cl, fts_s_set, "<num: time> <num: value> ...", "set bpf from a list of points");
+  fts_class_doc(cl, fts_s_set, "<bpf: bpf>", "set bpf from another bpf");
+  fts_class_doc(cl, fts_s_set, "[<num: value>] <fmat: fmat>", "set bpf from an fmat");
+	fts_class_doc(cl, fts_s_append, "[<num: value>] <num: time> <num: value> ...", "append list of points to the bpf");
+	fts_class_doc(cl, fts_s_insert, "<num: time> <num: value> ...", "insert list of points to the bpf");
+	fts_class_doc(cl, fts_new_symbol("duration"), NULL, "get the duration of the bpf");
+	fts_class_doc(cl, fts_new_symbol("duration"), "<num: duration>", "set the duration of the bpf by rescaling the time axis");
+	fts_class_doc(cl, fts_s_size, NULL, "get number of points");
 	fts_class_doc(cl, fts_s_print, NULL, "print list of points");
 }
 

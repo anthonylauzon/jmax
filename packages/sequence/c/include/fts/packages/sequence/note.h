@@ -48,6 +48,13 @@ enum scoob_type_enum
   scoob_unvoiced
 };
 
+
+enum scoob_propidx_enum
+{
+  scoob_propidx_velocity = 0,
+  scoob_propidx_channel
+};
+
 extern fts_class_t *scoob_class;
 extern enumeration_t *scoob_type_enumeration;
 
@@ -105,36 +112,43 @@ typedef struct
 
 enum scomark_type_enum
 {
-  scomark_tempo = 0,
-  scomark_cue,
-  scomark_bar,
-  scomark_end,
-  scomark_double
+  scomark_bar = 0,
+  scomark_marker
+};
+
+enum scomark_propidx_enum
+{
+  scomark_propidx_tempo = 0,
+  scomark_propidx_cue,
+  scomark_propidx_label,
+  scomark_propidx_bar_num,
+  scomark_propidx_meter
 };
 
 extern fts_class_t *scomark_class;
 extern enumeration_t *scomark_type_enumeration;
 
-#define scomark_is_bar(s) ((s)->type == seqsym_bar || (s)->type == seqsym_double || (s)->type == seqsym_end)
-
-#define scomark_set_bar_num(s, n) ((s)->bar_num = (n))
-#define scomark_get_bar_num(s) ((s)->bar_num)
-
-#define scomark_set_cue(s, c) ((s)->cue = (c))
-#define scomark_get_cue(s) ((s)->cue)
-
-#define scomark_set_type(s, t) ((s)->type = (t))
 #define scomark_get_type(s) ((s)->type)
+#define scomark_set_type(s, t) ((s)->type = (t))
+#define scomark_is_bar(s) ((s)->type == seqsym_bar)
 
-#define scomark_set_tempo(s, t) ((s)->tempo = (t))
-#define scomark_get_tempo(s) ((s)->tempo)
+extern int scomark_meter_symbol_get_quotient(fts_symbol_t sym, int *meter_num, int *meter_den);
+extern fts_symbol_t scomark_meter_quotient_get_symbol(int meter_num, int meter_den);
 
-#define scomark_set_meter_num(s, b) ((s)->meter_num = (b))
-#define scomark_get_meter_num(s) ((s)->meter_num)
+extern void scomark_set_tempo(scomark_t *scomark, double tempo);
+extern double scomark_get_tempo(scomark_t *scomark);
+extern void scomark_set_cue(scomark_t *scomark, int cue);
+extern int scomark_get_cue(scomark_t *scomark);
+extern fts_symbol_t scomark_get_label(scomark_t *self);
+extern void scomark_set_label(scomark_t *self, fts_symbol_t label);
 
-#define scomark_get_meter_den(s) ((s)->meter_den)
-#define scomark_set_meter_den(s, b) ((s)->meter_den = (b))
+extern int scomark_bar_get_number(scomark_t *self);
+extern void scomark_bar_set_number(scomark_t *self, int num);
+extern void scomark_bar_set_meter_from_quotient(scomark_t *scomark, int meter_num, int meter_den);
+extern void scomark_bar_set_meter(scomark_t *scomark, fts_symbol_t meter_sym);
+extern fts_symbol_t scomark_bar_get_meter(scomark_t *self);
+extern void scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den);
 
-void scomark_post(fts_object_t *o, fts_bytestream_t *stream);
+extern void scomark_spost(fts_object_t *o, fts_bytestream_t *stream);
 
 #endif

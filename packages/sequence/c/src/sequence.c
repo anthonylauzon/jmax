@@ -38,26 +38,44 @@ sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name)
 {
   track_t *track = sequence->tracks;
 
-  while(track && track_get_name(track) != name)
+  while(track != NULL)
+  {
+    if(sequence_track_get_name(track) == name)
+      return track;
+    
     track = sequence_track_get_next(track);
-
-  return track;
+  }
+  
+  return NULL;
 }
 
 track_t *
 sequence_get_track_by_index(sequence_t *sequence, int index)
 {
-  track_t *track = 0;
+  track_t *track = NULL;
 
   if(index >= 0)
   {
     track = sequence->tracks;
 
-    while(track && index--)
+    while(track != NULL && index > 0)
+    {
       track = sequence_track_get_next(track);
+      index--;
+    }
   }
 
   return track;
+}
+
+void
+sequence_track_set_name(track_t *track, fts_symbol_t name)
+{
+  sequence_context_t *context = (sequence_context_t *)fts_object_get_context((fts_object_t *)track);
+  sequence_t *sequence = context->container;
+  
+  if(sequence_get_track_by_name(sequence, name) == NULL)
+    context->name = name;
 }
 
 /*********************************************************
@@ -201,12 +219,7 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
     fts_client_register_object((fts_object_t *)track, fts_object_get_client_id((fts_object_t *)this));
 
 		fts_set_int(a, fts_object_get_id((fts_object_t *)track));
-    
-    if(track_type != NULL)
-      fts_set_symbol(a + 1, fts_class_get_name(track_type));
-    else
-      fts_set_symbol(a + 1, fts_s_void);     
-
+    fts_set_symbol(a + 1, fts_class_get_name(track_type));
     fts_client_send_message( (fts_object_t *)this, seqsym_addTracks, 2, a);		
   }
 }
@@ -449,24 +462,33 @@ static void
 sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  track_t *track = (track_t *)fts_object_create(track_class, 1, at);
-
-  /* add it to the sequence */
-  sequence_add_track(this, track);
-
-  /* set name */
-  if(ac > 1 && fts_is_symbol(at + 1))
-    track_set_name(track, fts_get_symbol(at + 1));
-
-  this->last_track = track;
-
-  if(sequence_editor_is_open(this))
+  
+  if(ac > 0)
   {
-    track_set_editor_open(track);
-    sequence_add_track_at_client(this, track);
-    fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
-		fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
-    fts_object_set_state_dirty(o);
+    track_t *track = NULL;
+    
+    if(fts_is_a(at, track_class))
+      track = (track_t *)fts_get_object(at);
+    else if(fts_is_symbol(at))
+      track = (track_t *)fts_object_create(track_class, 1, at);
+    
+    if(track != NULL)
+    {
+      sequence_add_track(this, track);
+      
+      /* set name */
+      if(ac > 1 && fts_is_symbol(at + 1))
+        sequence_track_set_name(track, fts_get_symbol(at + 1));
+
+      if(sequence_editor_is_open(this))
+      {
+        track_set_editor_open(track);
+        sequence_add_track_at_client(this, track);
+        fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
+        fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
+        fts_object_set_state_dirty(o);
+      }
+    }
   }
 }
 
@@ -499,22 +521,6 @@ sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
-sequence_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-
-  track_add_event_from_file((fts_object_t *)this->last_track, 0, 0, ac, at);
-}
-
-static void
-sequence_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-
-  track_event_dump_mess((fts_object_t *)this->last_track, 0, 0, ac, at);
-}
-
-static void
 sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -527,10 +533,7 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     fts_class_t *type = track_get_type(track);
     fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_track);
     
-    if(type != NULL)
-      fts_message_append_symbol(mess, fts_class_get_name(type));
-    else
-      fts_message_append_symbol(mess, fts_s_void);
+    fts_message_append_symbol(mess, fts_class_get_name(type));
     
     if(name)
       fts_message_append_symbol(mess, name);
@@ -624,19 +627,12 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, sequence_dump_state);
 
-  /* old sequence bmax files */
-  fts_class_message_varargs(cl, fts_new_symbol("bmax_add_track"), sequence_add_track_and_update);
-  fts_class_message_varargs(cl, fts_new_symbol("bmax_add_event"), sequence_add_event_from_file);
-
   fts_class_message_varargs(cl, fts_s_member_upload, sequence_member_upload);
   fts_class_message_varargs(cl, fts_s_upload, sequence_upload);
 
   fts_class_message_varargs(cl, seqsym_add_track, sequence_add_track_and_update);
   fts_class_message_varargs(cl, seqsym_remove_track, sequence_remove_track_and_update);
   fts_class_message_varargs(cl, seqsym_move_track, sequence_move_track_and_update);
-
-  fts_class_message_varargs(cl, seqsym_add_event, sequence_add_event_from_file);
-  fts_class_message_varargs(cl, seqsym_dump_mess, sequence_event_dump_mess);
 
   fts_class_message_varargs(cl, fts_s_print, sequence_print);
 

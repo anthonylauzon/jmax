@@ -20,6 +20,7 @@
  *
  */
 
+#include <alloca.h>
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #include <fts/packages/data/data.h>
@@ -67,39 +68,58 @@ track_editor_upload(track_editor_t *this)
 void 
 track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
 {
-	fts_atom_t *atoms = fts_array_get_atoms(&this->columns);
-	int size = fts_array_get_size(&this->columns);
-  fts_atom_t a[64];
+  fts_atom_t a[5];
 
-  fts_set_int(a, this->win_x);
-  fts_set_int(a + 1, this->win_y);
-  fts_set_int(a + 2, this->win_w);
-  fts_set_int(a + 3, this->win_h);
-  fts_dumper_send(dumper, seqsym_window, 4, a);
+  /* ones for all */
+  fts_set_symbol(a, seqsym_window);
+  fts_set_int(a + 1, this->win_x);
+  fts_set_int(a + 2, this->win_y);
+  fts_set_int(a + 3, this->win_w);
+  fts_set_int(a + 4, this->win_h);
+  fts_dumper_send(dumper, seqsym_editor, 5, a);
 
-  fts_set_symbol(a, this->label);
-  fts_dumper_send(dumper, seqsym_label, 1, a);
+  fts_set_symbol(a, seqsym_label);
+  fts_set_symbol(a + 1, this->label);
+  fts_dumper_send(dumper, seqsym_editor, 2, a);
 
-  fts_set_float(a, this->zoom);
-  fts_dumper_send(dumper, seqsym_zoom, 1, a);
+  fts_set_symbol(a, seqsym_zoom);
+  fts_set_float(a + 1, this->zoom);
+  fts_dumper_send(dumper, seqsym_editor, 2, a);
 
-  fts_set_int(a, this->transp);
-  fts_dumper_send(dumper, seqsym_transp, 1, a);
+  fts_set_symbol(a, seqsym_transp);
+  fts_set_int(a + 1, this->transp);
+  fts_dumper_send(dumper, seqsym_editor, 2, a);
 	
-	fts_set_int(a, this->view);
-  fts_dumper_send(dumper, seqsym_view, 1, a);
+  fts_set_symbol(a, seqsym_view);
+	fts_set_int(a + 1, this->view);
+  fts_dumper_send(dumper, seqsym_editor, 2, a);
 	
-	fts_set_int(a, this->range_mode);
-  fts_dumper_send(dumper, seqsym_range_mode, 1, a);
+  fts_set_symbol(a, seqsym_range_mode);
+	fts_set_int(a + 1, this->range_mode);
+  fts_dumper_send(dumper, seqsym_editor, 2, a);
 		
 	if(this->tab_w != -1 && this->tab_h != -1)
 	{
-		fts_set_int(a, this->tab_w);
-		fts_set_int(a+1, this->tab_h);
-		fts_dumper_send(dumper, seqsym_table_size, 2, a);
+    fts_set_symbol(a, seqsym_table_size);
+		fts_set_int(a + 1, this->tab_w);
+		fts_set_int(a + 2, this->tab_h);
+		fts_dumper_send(dumper, seqsym_editor, 3, a);
 	}
-	if(size > 0)
-		fts_dumper_send(dumper, seqsym_columns, size, atoms);
+  
+	if(fts_array_get_size(&this->columns) > 0)
+  {
+    fts_atom_t *cols = fts_array_get_atoms(&this->columns);
+    int n_cols = fts_array_get_size(&this->columns);
+    fts_atom_t *b = alloca(sizeof(fts_atom_t) * (n_cols + 1));
+    int i;
+    
+    fts_set_symbol(b, seqsym_columns);
+
+    for(i=0; i<n_cols; i++)
+      b[i + 1] = cols[i];
+      
+		fts_dumper_send(dumper, seqsym_editor, n_cols + 1, b);
+  }
 }
 
 

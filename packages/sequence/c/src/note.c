@@ -210,7 +210,7 @@ scoob_set_velocity(scoob_t *self, int velocity)
   fts_atom_t a;
   
   fts_set_int(&a, velocity);
-  scoob_property_set_by_index(self, 0, &a);
+  scoob_property_set_by_index(self, scoob_propidx_velocity, &a);
 }
 
 int
@@ -219,12 +219,12 @@ scoob_get_velocity(scoob_t *self)
   fts_atom_t a;
   
   fts_set_void(&a);
-  scoob_property_get_by_index(self, 0, &a);
+  scoob_property_get_by_index(self, scoob_propidx_velocity, &a);
   
-  if(!fts_is_void(&a))
+  if(fts_is_int(&a))
     return fts_get_int(&a);
   else
-    return 0;
+    return -1;
 }
 
 void
@@ -233,7 +233,7 @@ scoob_set_channel(scoob_t *self, int channel)
   fts_atom_t a;
   
   fts_set_int(&a, channel);
-  scoob_property_set_by_index(self, 1, &a);
+  scoob_property_set_by_index(self, scoob_propidx_channel, &a);
 }
 
 int
@@ -242,28 +242,12 @@ scoob_get_channel(scoob_t *self)
   fts_atom_t a;
   
   fts_set_void(&a);
-  scoob_property_get_by_index(self, 1, &a);
+  scoob_property_get_by_index(self, scoob_propidx_channel, &a);
   
-  if(!fts_is_void(&a))
+  if(fts_is_int(&a))
     return fts_get_int(&a);
   else
-    return 0;
-}
-
-static void
-scoob_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scoob_t *self = (scoob_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_set);
-  
-  fts_message_append_symbol(mess, self->type);
-  fts_message_append_float(mess, self->pitch);
-  fts_message_append_float(mess, self->interval);
-  fts_message_append_float(mess, self->duration);
-  fts_dumper_message_send(dumper, mess);
-  
-  propobj_dump_properties(o, 0, NULL, ac, at);  
+    return -1;
 }
 
 static void
@@ -347,8 +331,8 @@ scoob_instantiate(fts_class_t *cl)
   /* types and properties */
   propobj_class_init(cl);
   
-  propobj_class_add_int_property(cl, seqsym_velocity);
-  propobj_class_add_int_property(cl, seqsym_channel);
+  propobj_class_add_int_property(cl, seqsym_velocity); /* scoob_propidx_velocity = 0 */
+  propobj_class_add_int_property(cl, seqsym_channel); /* scoob_propidx_channel = 1 */
   propobj_class_add_int_property(cl, seqsym_cue);
   propobj_class_add_float_property(cl, seqsym_offset);
   
@@ -361,8 +345,6 @@ scoob_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, seqsym_get_property_list, scoob_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, scoob_append_properties);
-  
-  fts_class_message_varargs(cl, fts_s_dump_state, scoob_dump_state);
   
   fts_class_message_symbol(cl, seqsym_type, _scoob_set_type);
   fts_class_message_void(cl, seqsym_type, _scoob_get_type);
@@ -399,104 +381,17 @@ fts_class_t *scomark_class = 0;
 enumeration_t *scomark_type_enumeration = NULL;
 
 void 
-scomark_post(fts_object_t *o, fts_bytestream_t *stream)
+scomark_spost(fts_object_t *o, fts_bytestream_t *stream)
 {
   scomark_t *self = (scomark_t *)o;
   
-  fts_spost(stream, "scoomark %s", fts_symbol_name(self->type));
-  
-  if(self->meter_num > 0)
-    fts_spost(stream, " %d/%d", self->meter_num, self->meter_den);
-  
-  if(self->tempo > 0.0)
-    fts_spost(stream, " (MM 1/4 = %g)", self->tempo);
+  fts_spost(stream, "%s ", fts_symbol_name(self->type));
   
   propobj_post_properties((propobj_t *)self, stream);
 }
 
-static void
-_scomark_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  fts_symbol_t type = fts_get_symbol(at);
-  
-  if(scomark_get_tempo(self) > 0.0 || type != seqsym_tempo)
-  {  
-    if(enumeration_get_index(scomark_type_enumeration, type) >= 0)
-      self->type = type;
-    
-    if(self->type == seqsym_tempo)
-    {
-      self->meter_num = 0;
-      self->meter_den = 0;
-    }
-  }
-}
-
-static void
-_scomark_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  
-  fts_return_symbol(self->type);
-}
-
-static void
-_scomark_set_tempo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;  
-  double tempo = fts_get_number_float(at);
-  
-  if(tempo > 0.0 && (scomark_is_bar(self) || scomark_get_type(self) == seqsym_tempo))
-    self->tempo = tempo;  
-}
-
-static void
-_scomark_get_tempo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  
-  fts_return_float(self->tempo);
-}
-
-static void
-_scomark_set_bar_num(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;  
-  double bar_num = fts_get_number_int(at);
-  
-  if(bar_num >= 0 && scomark_is_bar(self))
-    self->bar_num = bar_num;
-}
-
-static void
-_scomark_get_bar_num(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  
-  fts_return_int(self->bar_num);
-}
-
-static void
-_scomark_set_cue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;  
-  double cue = fts_get_number_int(at);
-  
-  if(cue >= 0 && (scomark_is_bar(self) || scomark_get_type(self) == seqsym_cue))
-    self->cue = cue;
-}
-
-static void
-_scomark_get_cue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  
-  fts_return_int(self->cue);
-}
-
-static int
-symbol_get_meter(fts_symbol_t sym, int *meter_num, int *meter_den)
+int
+scomark_meter_symbol_get_quotient(fts_symbol_t sym, int *meter_num, int *meter_den)
 {
   const char *str = fts_symbol_name(sym);
   int slash = 0;
@@ -544,8 +439,8 @@ symbol_get_meter(fts_symbol_t sym, int *meter_num, int *meter_den)
   return 1;
 }
 
-static fts_symbol_t
-meter_get_symbol(int meter_num, int meter_den)
+fts_symbol_t
+scomark_meter_quotient_get_symbol(int meter_num, int meter_den)
 {
   if(meter_num > 0 && meter_den > 0)
   {
@@ -569,69 +464,158 @@ meter_get_symbol(int meter_num, int meter_den)
   return NULL;
 }
 
-static void
-_scomark_set_meter(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+void
+scomark_set_tempo(scomark_t *self, double tempo)
 {
-  scomark_t *self = (scomark_t *)o;  
-  fts_symbol_t sym = fts_get_symbol(at);
-  
-  if(self->type != seqsym_tempo)
-    symbol_get_meter(sym, &self->meter_num, &self->meter_den);  
-}
-
-static void
-_scomark_get_meter(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  fts_symbol_t sym = meter_get_symbol(self->meter_num, self->meter_den);  
-  
-  if(sym != NULL)
-    fts_return_symbol(sym);
-}
-
-static void
-scomark_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scomark_t *self = (scomark_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_symbol_t meter = meter_get_symbol(self->meter_num, self->meter_den);  
   fts_atom_t a;
   
-  fts_set_symbol(&a, self->type);
-  fts_dumper_send(dumper, seqsym_type, 1, &a);
+  if(tempo < 0.0)
+    tempo = 0.0;
+  
+  fts_set_float(&a, tempo);
+  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);
+}
+
+double
+scomark_get_tempo(scomark_t *self)
+{
+  fts_atom_t a;
+  
+  fts_set_void(&a);
+  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);
+  
+  if(fts_is_float(&a))
+    return fts_get_float(&a);
+  else
+    return -1.0;
+}
+
+void
+scomark_set_cue(scomark_t *self, int cue)
+{
+  fts_atom_t a;
+  
+  if(cue < 0)
+    cue = 0;
+  
+  fts_set_int(&a, cue);
+  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_cue, &a);
+}
+
+int
+scomark_get_cue(scomark_t *self)
+{
+  fts_atom_t a;
+  
+  fts_set_void(&a);
+  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_cue, &a);
+  
+  if(fts_is_int(&a))
+    return fts_get_int(&a);
+  else
+    return -1;
+}
+
+void
+scomark_set_label(scomark_t *self, fts_symbol_t label)
+{
+  fts_atom_t a;
+  
+  fts_set_symbol(&a, label);
+  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_label, &a);
+}
+
+fts_symbol_t
+scomark_get_label(scomark_t *self)
+{
+  fts_atom_t a;
+  
+  fts_set_void(&a);
+  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_label, &a);
+  
+  if(fts_is_symbol(&a))
+    return fts_get_symbol(&a);
+  else
+    return NULL;
+}
+
+void
+scomark_bar_set_number(scomark_t *self, int num)
+{
+  fts_atom_t a;
+  
+  if(num < 0)
+    num = 0;
+  
+  fts_set_int(&a, num);
+  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_bar_num, &a);
+}
+
+int
+scomark_bar_get_number(scomark_t *self)
+{
+  fts_atom_t a;
+  
+  fts_set_void(&a);
+  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_bar_num, &a);
+  
+  if(fts_is_int(&a))
+    return fts_get_int(&a);
+  else
+    return -1;
+}
+
+void 
+scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym)
+{
+  fts_atom_t a;
+  
+  fts_set_symbol(&a, meter_sym);
+  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_meter, &a);    
+}
+
+void 
+scomark_bar_set_meter_from_quotient(scomark_t *self, int meter_num, int meter_den)
+{
+  if(meter_num > 0 && meter_den > 0)
+    scomark_bar_set_meter(self, scomark_meter_quotient_get_symbol(meter_num, meter_den));
+}
+
+fts_symbol_t
+scomark_bar_get_meter(scomark_t *self)
+{
+  fts_atom_t a;
+  
+  fts_set_void(&a);
+  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_meter, &a);
+  
+  if(fts_is_symbol(&a))
+    return fts_get_symbol(&a);
+  else
+    return NULL;
+}
+
+void 
+scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den)
+{
+  fts_symbol_t meter = scomark_bar_get_meter(self);
   
   if(meter != NULL)
-  {
-    fts_set_symbol(&a, meter);
-		fts_dumper_send(dumper, seqsym_meter, 1, &a);
-  }
-  
-  if(self->tempo > 0)
-  {
-    fts_set_float(&a, self->tempo);
-		fts_dumper_send(dumper, seqsym_tempo, 1, &a);
-  }
-  
-  propobj_dump_properties(o, 0, NULL, ac, at);  
+    scomark_meter_symbol_get_quotient(meter, meter_num, meter_den);
+  else
+    *meter_num = *meter_den = 0;
 }
 
 static void
-scomark_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_scomark_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scomark_t *self = (scomark_t *)o;
-  fts_symbol_t prop = fts_get_symbol(at);
   
-  if(prop == seqsym_meter)
-  {
-    self->meter_num = 0;
-    self->meter_den = 0;
-  }
-  else
-    propobj_remove_property(o, 0, NULL, ac, at);
+  propobj_remove_property(o, 0, NULL, ac, at);
 }
 
 static void
-scomark_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_scomark_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_array_t *array = fts_get_pointer(at);
   int n_types = enumeration_get_size(scomark_type_enumeration);
@@ -645,55 +629,44 @@ scomark_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     fts_array_append_symbol(array, enumeration_get_name(scomark_type_enumeration, i));      
     
   propobj_class_append_properties(scomark_class, array);
-  
-  fts_array_append_symbol(array, seqsym_cue);
-  fts_array_append_symbol(array, fts_s_int);
-
-  fts_array_append_symbol(array, seqsym_tempo);
-  fts_array_append_symbol(array, fts_s_float);
-  
-  fts_array_append_symbol(array, seqsym_meter);
-  fts_array_append_symbol(array, fts_s_symbol);
-  
-  fts_array_append_symbol(array, seqsym_bar_num);
-  fts_array_append_symbol(array, fts_s_int);
 }
 
 static void
-scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scomark_t *self = (scomark_t *)o;
   fts_array_t *array = fts_get_pointer(at);
-  fts_symbol_t meter = meter_get_symbol(self->meter_num, self->meter_den);  
     
   fts_array_append_symbol(array, seqsym_type);
   fts_array_append_symbol(array, self->type);
   
   propobj_append_properties((propobj_t *)self, array);
-  
-  if(self->cue > 0)
-  {
-    fts_array_append_symbol(array, seqsym_cue);
-    fts_array_append_int(array, self->cue);
-  }  
+}
 
-  if(self->tempo > 0.0)
-  {
-    fts_array_append_symbol(array, seqsym_tempo);
-    fts_array_append_float(array, self->tempo);
-  }
+static void 
+scomark_array_function(fts_object_t *o, fts_array_t *array)
+{
+  scomark_t *self = (scomark_t *)o;
   
-  if(meter != NULL)
-  {
-    fts_array_append_symbol(array, seqsym_meter);
-    fts_array_append_symbol(array, meter);
-  }
+  fts_array_append_symbol(array, self->type);
+  propobj_append_properties((propobj_t *)self, array);
+}
+
+static void 
+scomark_description_function(fts_object_t *o, fts_array_t *array)
+{
+  scomark_t *self = (scomark_t *)o;
   
-  if(self->bar_num > 0)
-  {
-    fts_array_append_symbol(array, seqsym_bar_num);
-    fts_array_append_int(array, self->bar_num);
-  }  
+  fts_array_append_symbol(array, seqsym_scomark);
+  scomark_array_function(o, array);
+}
+
+static void
+_scomark_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scomark_t *self = (scomark_t *)o;
+  
+  fts_return_symbol(self->type);
 }
 
 static void
@@ -701,17 +674,16 @@ scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   scomark_t *self = (scomark_t *)o;
   
-  propobj_init(o);
-  
-  self->type = seqsym_tempo;
-  self->bar_num = -1;
-  self->cue = -1;
-  self->tempo = 0.0;
-  self->meter_num = 0;
-  self->meter_den = 0;
+  propobj_init(o);  
+  self->type = seqsym_marker;
   
   if(ac > 0 && fts_is_symbol(at))
-    _scomark_set_type(o, 0, NULL, ac, at);
+  {
+    fts_symbol_t type = fts_get_symbol(at);
+    
+    if(enumeration_get_index(scomark_type_enumeration, type) >= 0)
+      self->type = type;
+  }
 }
 
 static void
@@ -725,31 +697,27 @@ scomark_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(scomark_t), scomark_init, scomark_delete);
   
-  /* types and properties */
+  /* object with properties class */
   propobj_class_init(cl);
-  propobj_class_add_symbol_property(cl, fts_s_label);
   
-  fts_class_message_symbol(cl, fts_s_remove, scomark_remove_property);
+  /* properties of any marker */
+  propobj_class_add_float_property(cl, seqsym_tempo); /* scomark_propidx_tempo = 0 */
+  propobj_class_add_int_property(cl, seqsym_cue); /* scomark_propidx_cue = 1 */
+  propobj_class_add_symbol_property(cl, fts_s_label); /* scomark_propidx_label = 2 */
+  
+  /* properties for bars only */
+  propobj_class_add_int_property(cl, seqsym_bar_num); /* scomark_propidx_bar_num = 3 */
+  propobj_class_add_symbol_property(cl, seqsym_meter); /* scomark_propidx_meter = 4 */
+  
+  fts_class_set_array_function(cl, scomark_array_function);
+  fts_class_set_description_function(cl, scomark_description_function);
 
-  fts_class_message_varargs(cl, seqsym_get_property_list, scomark_get_property_list);
-  fts_class_message_varargs(cl, seqsym_append_properties, scomark_append_properties);
-  
-  fts_class_message_varargs(cl, fts_s_dump_state, scomark_dump_state);
-  
-  fts_class_message_symbol(cl, seqsym_type, _scomark_set_type);
+  fts_class_message_symbol(cl, fts_s_remove, _scomark_remove_property);
+
+  fts_class_message_varargs(cl, seqsym_get_property_list, _scomark_get_property_list);
+  fts_class_message_varargs(cl, seqsym_append_properties, _scomark_append_properties);
+    
   fts_class_message_void(cl, seqsym_type, _scomark_get_type);
-  
-  fts_class_message_number(cl, seqsym_bar_num, _scomark_set_bar_num);
-  fts_class_message_void(cl, seqsym_bar_num, _scomark_get_bar_num);
-  
-  fts_class_message_number(cl, seqsym_tempo, _scomark_set_tempo);
-  fts_class_message_void(cl, seqsym_tempo, _scomark_get_tempo);
-  
-  fts_class_message_number(cl, seqsym_cue, _scomark_set_cue);
-  fts_class_message_void(cl, seqsym_cue, _scomark_get_cue);
-  
-  fts_class_message_symbol(cl, seqsym_meter, _scomark_set_meter);
-  fts_class_message_void(cl, seqsym_meter, _scomark_get_meter);
 }
 
 void
@@ -764,11 +732,8 @@ scoob_config(void)
   enumeration_add_name(scoob_type_enumeration, seqsym_trill);
   enumeration_add_name(scoob_type_enumeration, seqsym_unvoiced);
   
-  enumeration_add_name(scomark_type_enumeration, seqsym_tempo);
-  enumeration_add_name(scomark_type_enumeration, seqsym_cue);
   enumeration_add_name(scomark_type_enumeration, seqsym_bar);
-  enumeration_add_name(scomark_type_enumeration, seqsym_end);
-  enumeration_add_name(scomark_type_enumeration, seqsym_double);
+  enumeration_add_name(scomark_type_enumeration, seqsym_marker);
   
   sym_meter_2_4 = fts_new_symbol("2/4");
   sym_meter_3_4 = fts_new_symbol("3/4");

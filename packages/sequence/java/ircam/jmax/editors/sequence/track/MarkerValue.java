@@ -62,10 +62,7 @@ public void setProperty(String name, Object value)
 	else if(name.equals("tempo"))
 		tempo = value;
 	else if(name.equals("meter"))
-	{
 		meter = value;	
-	  parseMeter((String)meter);
-	}
 	else
 		super.setProperty(name, value);	
 }
@@ -87,25 +84,6 @@ public Object getProperty(String name)
 public ValueInfo getValueInfo()
 {
 	return info;
-}
-
-String meterValue = null;
-public String getMeterValue()
-{
-	return meterValue;
-} 
-String meterType = null;
-public String getMeterType()
-{
-	return meterType;
-} 
-
-void parseMeter(String met)
-{
-	String m = met.trim();
-	int idx = m.indexOf('/');
-	meterValue = m.substring(0, idx);
-	meterType = m.substring(idx+1);
 }
 
 static class MarkerValueInfo extends AbstractValueInfo {

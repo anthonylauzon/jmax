@@ -189,7 +189,6 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   else if(fts_midievent_is_poly_pressure(midievt))
   {
     int channel = fts_midievent_channel_message_get_channel(midievt);
-    int pitch = fts_midievent_channel_message_get_first(midievt);
     int value = fts_midievent_channel_message_get_second(midievt);
     
     if(data->last)
@@ -204,7 +203,6 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   else if(fts_midievent_is_program_change(midievt))
   {
     /* set cue = 100 * cue + program */
-    int channel = fts_midievent_channel_message_get_channel(midievt);
     int number = fts_midievent_channel_message_get_first(midievt);
     
     if(data->last)
@@ -231,7 +229,6 @@ static void
 scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-  track_t *track = data->track;
   double time = fts_midifile_get_time(file);
   scomark_t *scomark = data->last_marker;
   
@@ -248,7 +245,6 @@ static void
 scoobtrack_read_time_signature(fts_midifile_t *file, int numerator, int denominator, int clocks_per_metronome_click, int heals_per_quarter_note)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
-  track_t *track = data->track;
   double time = fts_midifile_get_time(file);
   scomark_t *scomark = data->last_marker;
   
@@ -257,8 +253,7 @@ scoobtrack_read_time_signature(fts_midifile_t *file, int numerator, int denomina
   else
     scomark_set_type(scomark, seqsym_bar);
   
-  scomark_set_meter_num(scomark, numerator);
-  scomark_set_meter_den(scomark, denominator);
+  scomark_bar_set_meter_from_quotient(scomark, numerator, denominator);
   
   data->last_marker = scomark;
   data->last_marker_time = time;
@@ -462,10 +457,10 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, scoob_t *scoob)
   double off_time = time + scoob_get_duration(scoob);
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);
   
-  if(channel == 0)
+  if(channel <= 0)
     channel = 1;
   
-  if(velocity == 0)
+  if(velocity <= 0)
     velocity = 64;
   
   fts_midifile_write_channel_message(file, time_in_ticks, midi_note, channel, pitch, velocity);

@@ -46,6 +46,7 @@ extern fts_symbol_t seqsym_unvoiced;
 extern fts_symbol_t seqsym_midi;
 extern fts_symbol_t seqsym_seqmess;
 extern fts_symbol_t seqsym_bar;
+extern fts_symbol_t seqsym_marker;
 extern fts_symbol_t seqsym_bar_num;
 extern fts_symbol_t seqsym_end;
 extern fts_symbol_t seqsym_double;

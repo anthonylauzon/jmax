@@ -46,7 +46,6 @@ typedef struct _sequence_
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
   int open; /* flag: is 1 if sequence editor is open */
-  track_t *last_track; /* last created track */
 } sequence_t;
 
 #include <fts/packages/sequence/seqsym.h>
@@ -68,6 +67,7 @@ typedef struct
 {
 	sequence_t *container;
   track_t *next; /* list of tracks in sequence */
+  fts_symbol_t name; /* track name */
 } sequence_context_t;
 
 #define sequence_track_get_container(t) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->container)
@@ -75,6 +75,9 @@ typedef struct
 
 #define sequence_track_get_next(t) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->next)
 #define sequence_track_set_next(t, n) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->next = (n))
+
+#define sequence_track_get_name(t) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->name)
+SEQUENCE_API void sequence_track_set_name(track_t *track, fts_symbol_t name);
 
 SEQUENCE_API void sequence_add_track(sequence_t *sequence, track_t *track);
 SEQUENCE_API void sequence_remove_track(sequence_t *sequence, track_t *track);
