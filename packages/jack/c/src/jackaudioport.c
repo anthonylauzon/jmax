@@ -36,37 +36,9 @@
 
 static int nframes = 0;
 
-/**
- * The audioport IO function calls the native audio layer to read/write a buffer
- * of samples in the native format.
- * Its argument is the audioport. Buffers are allocated by the port.
- */
-static void
-jackaudioport_input_fun(fts_audioport_t* port)
-{
-  jackaudioport_t* self = (jackaudioport_t*)port;
-  /* Get JACK input port buffer pointer */
-  jack_default_audio_sample_t* in;
 
-  in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, get_jack_process_nframes());  
-}
-
-static void
-jackaudioport_output_fun(fts_audioport_t* port)
-{
-  jackaudioport_t* self = (jackaudioport_t*)port;
-  /* Get JACK input port buffer pointer */
-  jack_default_audio_sample_t* out;
-
-  out = (jack_default_audio_sample_t*)jack_port_get_buffer(self->output_port, get_jack_process_nframes());
-}
-
-/** 
- * The audioport copy function copies the samples in the native format to a float buffer
- * for a given channel.
- */
 static void 
-jackaudioport_input_copy_fun( fts_audioport_t *port, float *buff, int buffsize, int channel)
+jackaudioport_input_fun( fts_audioport_t* port, float** buffers, int buffsize)
 {
   jackaudioport_t* self = (jackaudioport_t*)port;
   /* Get JACK input port buffer pointer */
@@ -74,16 +46,17 @@ jackaudioport_input_copy_fun( fts_audioport_t *port, float *buff, int buffsize, 
   int i;
   int nsample_consumed = get_jack_process_consumed();
 
-  in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, get_jack_process_nframes());  
+  in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, nsample_consumed);  
 
   for (i = 0; i < buffsize; ++i)
   {
-    buff[i] = in[i + nsample_consumed];
+    /* only one channel */
+    buffers[0][i] = in[i + nsample_consumed];
   }
 }
 
 static void 
-jackaudioport_output_copy_fun( fts_audioport_t *port, float *buff, int buffsize, int channel)
+jackaudioport_output_fun( fts_audioport_t* port, float** buffers, int buffsize)
 {
   jackaudioport_t* self = (jackaudioport_t*)port;
   /* Get JACK input port buffer pointer */
@@ -91,11 +64,12 @@ jackaudioport_output_copy_fun( fts_audioport_t *port, float *buff, int buffsize,
   int i;
   int nsample_consumed = get_jack_process_consumed();
 
-  out = (jack_default_audio_sample_t*)jack_port_get_buffer(self->output_port, get_jack_process_nframes());
+  out = (jack_default_audio_sample_t*)jack_port_get_buffer(self->output_port, nsample_consumed);
 
   for (i = 0; i < buffsize; ++i)
   {
-    out[i + nsample_consumed] = buff[i];
+    /* only one channel */
+    out[i + nsample_consumed] = buffers[0][i];
   }
 
 }
@@ -141,6 +115,7 @@ jackaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   strncpy(port_name + strlen(label_name), "_out", strlen("_out"));
   port_name[port_name_length - 1] = 0;        
   
+  fts_log("[jackaudioport_open_output] port : %p \n", o);
   jackaudiomanager_open_port(o, fts_new_symbol(port_name), port_flag);
 
   fts_free(port_name);
@@ -168,6 +143,7 @@ jackaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 
   fts_audioport_unset_open(port, FTS_AUDIO_OUTPUT);
 
+  fts_log("[jackaudioport_close_output] port : %p \n", o);
   jackaudiomanager_close_port(o, port_flag);
   post("[jackaudioport] jackaudioport_close_output \n");
 }
@@ -218,14 +194,10 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, jackaudioport_input_fun);
   fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, jackaudioport_output_fun);
-    
-  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, jackaudioport_input_copy_fun);
-  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, jackaudioport_output_copy_fun);
-
-  fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, 1);
-  fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, 1);
-
-
+  
+  fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, 1);
+  fts_audioport_set_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, 1);
+  
   /* 
      If port is a jack output port => this a jmax input port
      If port is a jack input port => this a jmax output port
