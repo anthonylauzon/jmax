@@ -167,10 +167,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 		//deve anche controllare che l'evento piu' lontano sia ancora visibile
 		TrackEvent lastEvent = sequenceData.getLastEvent();
 		if(lastEvent!=null)
-		    /*resizePanelToTimeWithoutScroll((int)lastEvent.getTime()+
-		      ((Integer)lastEvent.getProperty("duration")).intValue());*/
-		    resizePanelToTimeWithoutScroll((int) (lastEvent.getTime()+
-							  ((Double)lastEvent.getProperty("duration")).doubleValue()));//*@*//
+		    {
+			int duration = 3;
+		    	Object dur = lastEvent.getProperty("duration");
+			if((dur!=null)&&(dur instanceof Double))
+			    duration = ((Double)dur).intValue();
+			resizePanelToTimeWithoutScroll((int) (lastEvent.getTime()+duration));//*@*//
+		    }
 	    }
     });
 
@@ -310,8 +313,11 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     //controll if the object is in the actual scrollable area. if not extend the area
     private void resizePanelToEventTime(TrackEvent evt)
     {
-	//int evtTime = (int)(evt.getTime()) + ((Integer)evt.getProperty("duration")).intValue();
-	int evtTime = (int)(evt.getTime()) +(int)((Double)evt.getProperty("duration")).doubleValue();//*@*//
+	int duration = 3;
+	Object dur = evt.getProperty("duration");
+	if((dur!=null)&&(dur instanceof Double))
+	    duration =((Double)dur).intValue();
+	int evtTime = (int)(evt.getTime()) +duration;//*@*//
 	resizePanelToTime(evtTime);
     }
 
@@ -450,11 +456,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public boolean eventIsVisible(Event evt)
     {
 	int time = (int)evt.getTime();
-	//int dur = ((Integer)evt.getProperty("duration")).intValue();
-	int dur = (int) ((Double)evt.getProperty("duration")).doubleValue();//*@*//
+	int duration = 3;
+	Object dur = evt.getProperty("duration");
+	if((dur!=null)&&(dur instanceof Double))
+	    duration = ((Double)dur).intValue();
 	int startTime = -geometry.getXTransposition(); 
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-	return ((time>startTime)&&(time+dur<endTime));
+	return ((time>startTime)&&(time+duration<endTime));
     }
     
     ///////AUTOMATIC SCROLLING  
@@ -496,8 +504,12 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public void makeVisible(TrackEvent evt)
     {
 	int time = (int)evt.getTime();
+	int duration = 3;
 	//int duration = ((Integer)evt.getProperty("duration")).intValue();
-	int duration = (int) ((Double)evt.getProperty("duration")).doubleValue();//*@*//
+	Object dur = evt.getProperty("duration");
+	if((dur!=null)&&(dur instanceof Double))
+	    duration = (int) ((Double)dur).doubleValue();//*@*//
+
 	int startTime = -geometry.getXTransposition(); 
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	
