@@ -550,7 +550,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void inspect() 
   {
-      InspectDialog.inspect(this);
+      //InspectDialog.inspect(this);
   }
 
   // Add one to cope with the inlet/outlets
