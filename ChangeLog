@@ -1,3 +1,8 @@
+2003-01-03  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* update input~ object to use new audiolabel/audioport API
+	* audio in works with jack
+
 2002-12-31  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 
 	* removed patcher from fts_object_create()
