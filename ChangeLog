@@ -1,5 +1,15 @@
-2002-07-24  Patrice Tisserand  <tisseran@lithium.ircam.fr>
+2002-07-25  Patrice Tisserand  <tisseran@lithium.ircam.fr>
 
+	* first integration of ALSA sequencer objects.
+	These objects will provide MIDI port connected with ALSA sequencer server,
+	so these ports will be available for read/write to others ALSA sequencer clients.
+	The following files were added:
+	        packages/alsa/c/src/alsaseqmidi.h
+		packages/alsa/c/src/alsaseqmidi.c
+		packages/alsa/c/src/alsaseqmidiport.c
+	
+2002-07-24  Patrice Tisserand  <tisseran@lithium.ircam.fr>
+	
 	* clean documentation directory.
 	Add rules to Makefile.am to generate documentation with doxygen.
 	Add creation of Makefile in doc directory in configure.in
