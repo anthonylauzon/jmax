@@ -39,14 +39,17 @@ class ErmesToolButton extends JToggleButton
   boolean state = false;
 
   static ChangeListener listener = new ChangeListener(){
-    public void stateChanged(ChangeEvent e){
+    public void stateChanged(ChangeEvent e)
+    {
       ErmesToolButton button = (ErmesToolButton)e.getSource();
-      if(button.state!=button.isSelected()){	
-	button.state = !button.state;
-	button.toolBar.buttonChanged(button);
+
+      if ( button.state != button.isSelected() )
+      { 
+	button.state = ! button.state;
+	button.toolBar.buttonChanged( button);
       }
       else
-	button.setSelected(!button.state);
+      button.setSelected(!button.state);
     }
   };
 
