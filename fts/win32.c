@@ -283,7 +283,7 @@ fts_get_system_config( void)
   /* check the config file in the root directory */
   root = fts_get_default_root_directory();
 
-  fts_make_absolute_path(fts_symbol_name(root), "config\\config.jmax", path, _MAX_PATH);
+  fts_make_absolute_path(fts_symbol_name(root), "config.jmax", path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol_copy(path);
   }

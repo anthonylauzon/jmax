@@ -28,24 +28,19 @@ static fts_package_t* fts_project = NULL;
 static fts_symbol_t sym_project = NULL;
 
 fts_package_t* 
-fts_open_project(char* filename)
+fts_project_open(const char* filename)
 {
   if (fts_project != NULL) {
-    fts_close_project();
+    fts_project_close();
+  }
+  
+  if (sym_project == NULL) {
+    sym_project = fts_new_symbol("project");
   }
 
-  if (sym_project == NULL) {
-    sym_project = fts_new_symbol("_project_");
-  }
+  fprintf(stderr, "opening project %s\n", filename);
   
-  fts_project = fts_package_new(sym_project);
-  if (fts_project == NULL) {
-    return NULL;
-  }
-  
-  if (filename != NULL) {
-    /* FIXME: explicitely set the definition file and diretory */
-  }
+  fts_package_load_from_file(sym_project, filename);
 
   /* make the project the current package context */
   fts_package_push(fts_project);
@@ -54,7 +49,7 @@ fts_open_project(char* filename)
 }
 
 int 
-fts_close_project(void)
+fts_project_close(void)
 {
   if (fts_project == NULL) {
     post("Error: can't close non-existing project");
@@ -77,8 +72,19 @@ fts_close_project(void)
   return 0;
 }
 
+void
+fts_project_set(fts_package_t* p)
+{
+  if (fts_project != NULL) {
+    fts_project_close();
+  }
+
+  /* make the project the current package context */
+  fts_package_push(fts_project);  
+}
+
 fts_package_t* 
-fts_get_project(void)
+fts_project_get(void)
 {
   return fts_project;
 }

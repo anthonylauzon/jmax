@@ -69,7 +69,7 @@ fts_atom_file_open(const char *name, const char *mode)
       f->read = 0;
     }
 
-  if (f->fd == -1)
+  if (f->fd == NULL)
     return 0;
   else
     return f;

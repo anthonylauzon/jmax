@@ -38,7 +38,7 @@ pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 
-top_builddir = ../../..
+top_builddir = ..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -75,13 +75,12 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-imgdir = $(pkgdatadir)/packages/guiobj/images
-img_DATA =   button.gif  button_cursor.gif  display.gif  display_cursor.gif  floatbox.gif  floatbox_cursor.gif  fork.gif  fork_cursor.gif  intbox.gif  intbox_cursor.gif  jcomment.gif  jcomment_cursor.gif  messconst.gif  messconst_cursor.gif  scope.gif  scope_cursor.gif  slider.gif  slider_cursor.gif  toggle.gif  toggle_cursor.gif  vecdisplay.gif  vecdisplay_cursor.gif 
-
+configdir = $(pkgdatadir)
+config_DATA = config.jmax
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = ../../../include/ftsconfig-ac.h
+CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
-DATA =  $(img_DATA)
+DATA =  $(config_DATA)
 
 DIST_COMMON =  Makefile.am Makefile.in
 
@@ -93,30 +92,30 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu packages/guiobj/images/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu config/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-install-imgDATA: $(img_DATA)
+install-configDATA: $(config_DATA)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(imgdir)
-	@list='$(img_DATA)'; for p in $$list; do \
+	$(mkinstalldirs) $(DESTDIR)$(configdir)
+	@list='$(config_DATA)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(imgdir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(imgdir)/$$p; \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(configdir)/$$p"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(configdir)/$$p; \
 	  else if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(imgdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(imgdir)/$$p; \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(configdir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(configdir)/$$p; \
 	  fi; fi; \
 	done
 
-uninstall-imgDATA:
+uninstall-configDATA:
 	@$(NORMAL_UNINSTALL)
-	list='$(img_DATA)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(imgdir)/$$p; \
+	list='$(config_DATA)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(configdir)/$$p; \
 	done
 tags: TAGS
 TAGS:
@@ -124,14 +123,14 @@ TAGS:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = packages/guiobj/images
+subdir = config
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu packages/guiobj/images/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu config/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -153,20 +152,20 @@ installcheck: installcheck-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-imgDATA
+install-data-am: install-configDATA
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-imgDATA
+uninstall-am: uninstall-configDATA
 uninstall: uninstall-am
 all-am: Makefile $(DATA)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(imgdir)
+	$(mkinstalldirs)  $(DESTDIR)$(configdir)
 
 
 mostlyclean-generic:
@@ -197,10 +196,10 @@ maintainer-clean-am:  maintainer-clean-generic distclean-am
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: uninstall-imgDATA install-imgDATA tags distdir info-am info \
-dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
-install-exec install-data-am install-data install-am install \
-uninstall-am uninstall all-redirect all-am all installdirs \
+.PHONY: uninstall-configDATA install-configDATA tags distdir info-am \
+info dvi-am dvi check check-am installcheck-am installcheck \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 

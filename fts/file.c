@@ -48,6 +48,8 @@
 #include <direct.h>
 #endif
 
+#include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -270,12 +272,6 @@ fts_symbol_t
 fts_get_search_path()
 {
   return fts_search_path;
-}
-
-void
-fts_set_project_dir(fts_symbol_t project_dir)
-{
-  fts_project_dir = project_dir;
 }
 
 fts_symbol_t

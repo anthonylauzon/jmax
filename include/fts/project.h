@@ -23,14 +23,16 @@
 #ifndef _FTS_PROJECT_H_
 #define _FTS_PROJECT_H_
 
-FTS_API fts_package_t *fts_open_project(char* filename);
+FTS_API fts_package_t *fts_project_open(const char* filename);
 
 /**
  *
  * @return 0 if no error occured, -1 if an error occured
  */
-FTS_API int fts_close_project(void);
+FTS_API int fts_project_close(void);
 
-FTS_API fts_package_t *fts_get_project(void);
+FTS_API fts_package_t *fts_project_get(void);
+
+FTS_API void fts_project_set(fts_package_t *project);
 
 #endif /* _FTS_PROJECT_H_ */

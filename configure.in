@@ -85,6 +85,7 @@ fts/version.c
 bin/Makefile
 bin/jmax
 tcl/Makefile
+config/Makefile
 images/Makefile
 tutorials/Makefile
 tutorials/basics/Makefile

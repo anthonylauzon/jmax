@@ -131,7 +131,4 @@ FTS_API void fts_file_get_write_path(const char *path, char *full_path);
 FTS_API int fts_file_get_read_path(const char *name, char *pathname);
 
 
-FTS_API void fts_set_project_dir(fts_symbol_t project_dir);
-FTS_API fts_symbol_t fts_get_project_dir(void);
-
 #endif

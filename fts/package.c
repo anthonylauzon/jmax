@@ -200,11 +200,10 @@ fts_package_load(fts_symbol_t name)
   } else {
     pkg = fts_package_new(name);
     pkg->state = fts_package_defined;
+    pkg->name = name;
+    pkg->dir = fts_new_symbol_copy(path);
   }
   
-  pkg->name = name;
-  pkg->dir = fts_new_symbol_copy(path);
-
   /* load the default files */
   fts_package_load_default_files(pkg);
   
@@ -214,6 +213,7 @@ fts_package_load(fts_symbol_t name)
 fts_package_t*
 fts_package_load_from_file(fts_symbol_t name, const char* filename)
 {
+  char dir[MAXPATHLEN];
   fts_object_t* obj;
   fts_package_t* pkg = NULL;
 
@@ -243,6 +243,12 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   pkg = (fts_package_t*) obj;
 
  gracefull_exit:
+
+  pkg->name = name;
+
+  fts_dirname(filename, dir, MAXPATHLEN);
+  pkg->dir = fts_new_symbol_copy(dir);
+
   fts_package_pop();
   return pkg;
 }

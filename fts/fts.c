@@ -172,47 +172,38 @@ fts_symbol_t fts_get_root_directory( void)
   return fts_get_default_root_directory();
 }
 
-void fts_load_config( void)
+void fts_load_project( void)
 {
-  fts_symbol_t config;
-  fts_symbol_t config_file;
+  fts_symbol_t project_symbol;
+  fts_symbol_t project_file;
   fts_package_t* project = NULL;
 
-  config = fts_new_symbol( "config");
+  project_symbol = fts_new_symbol( "project");
 
-  /* check if the user specified a config file on the command line  */
-  config_file = fts_cmd_args_get( config);
-  if (config_file != NULL) {
-    project = fts_package_load_from_file(config, fts_symbol_name( config_file));
+  /* check if the user specified a project file on the command line  */
+  project_file = fts_cmd_args_get( project_symbol);
+
+  /* check if the user has a project file in the home directory  */
+  if (project_file == NULL) {
+    project_file = fts_get_user_config();
   }
 
-  /* check if the user has a config file in the home directory  */
-  if (project == NULL) {
-    config_file = fts_get_user_config();
-    if (config_file != NULL) {
-      project = fts_package_load_from_file(config, fts_symbol_name( config_file));
-    }
-  }
-
-  /* check if there's a system wide config */
-  if (project == NULL) {
-    config_file = fts_get_system_config();
-    if (config_file != NULL) {
-      project = fts_package_load_from_file(config, fts_symbol_name( config_file));
-    }
+  /* check if there's a system wide project */
+  if (project_file == NULL) {
+    project_file = fts_get_system_config();
   }
 
   /* create an empty project */
-  if (project == NULL) {
+  if (project_file == NULL) {
     fprintf(stderr, 
 	    "starting fts with an empty project. "
 	    "this is probably not what you want. "
-	    "make sure you have a valid config file.");
-    project = fts_package_new(config);
+	    "make sure you have a valid project file.");
+    project = fts_package_new(project_symbol);
+    fts_project_set(project);
+  } else {
+    project = fts_project_open(fts_symbol_name( project_file));
   }
-
-  /* make the project the current package context */
-  fts_package_push(project);
 }
 
 /***********************************************************************
@@ -307,42 +298,7 @@ void fts_init( int argc, char **argv)
 
   fts_platform_init();
 
-  fts_load_config();
-
-#if 0
-  {
-    fts_package_t* project;
-
-    project = fts_open_project(NULL);
-    
-    /* FIXME: hack [pH07] */
-    fts_package_set_state(project, fts_package_loaded);
-
-    /* register all the current packages as required packages */
-    fts_package_require(project, fts_new_symbol("utils"));
-    fts_package_require(project, fts_new_symbol("system"));
-    fts_package_require(project, fts_new_symbol("data"));
-    fts_package_require(project, fts_new_symbol("mess"));
-    fts_package_require(project, fts_new_symbol("guiobj"));
-    fts_package_require(project, fts_new_symbol("control"));
-    fts_package_require(project, fts_new_symbol("numeric"));
-    fts_package_require(project, fts_new_symbol("math"));
-    fts_package_require(project, fts_new_symbol("ispw"));
-    fts_package_require(project, fts_new_symbol("lists"));
-    fts_package_require(project, fts_new_symbol("midi"));
-    fts_package_require(project, fts_new_symbol("sequence"));
-    fts_package_require(project, fts_new_symbol("signal"));
-    fts_package_require(project, fts_new_symbol("ispwmath"));
-    fts_package_require(project, fts_new_symbol("qlist"));
-    fts_package_require(project, fts_new_symbol("explode"));
-    fts_package_require(project, fts_new_symbol("io"));
-#ifdef WIN32
-    fts_package_require(project, fts_new_symbol("dsdev"));
-    fts_package_require(project, fts_new_symbol("winmidi"));
-#else
-#endif
-  }
-#endif
+  fts_load_project();
 
   fts_oldclient_start();
 }

@@ -304,15 +304,6 @@ fts_ucs_lib_set_path(int argc, const fts_atom_t *argv)
 }
 
 static fts_status_t
-fts_ucs_lib_set_project_dir(int argc, const fts_atom_t *argv)
-{
-  if ((argc >= 1) && fts_is_symbol(argv))
-    fts_set_project_dir(fts_get_symbol(argv));
-
-  return fts_Success;
-}
-
-static fts_status_t
 fts_ucs_set_updates_per_ticks(int argc, const fts_atom_t *argv)
 {
   if ((argc == 1) && fts_is_int(&argv[0]))
@@ -486,9 +477,6 @@ fts_ucs_install_commands()
 
   fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("defaultpath"), fts_ucs_lib_set_path,
 			 "set defaultpath <path>", "system command");
-
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("projectdir"), fts_ucs_lib_set_project_dir,
-			 "set projectdir <path>", "system command");
 
   fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("updates_per_ticks"),
 			 fts_ucs_set_updates_per_ticks,

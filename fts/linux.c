@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/param.h>
 #include <errno.h>
 
 #include <fts/fts.h>
@@ -64,9 +65,9 @@ fts_get_user_config( void)
   char path[MAXPATHLEN];
 
   home = getenv("HOME");
-  fts_make_absolute_path(home, ".jmaxcf", path, _MAX_PATH);
+  fts_make_absolute_path(home, ".jmaxcf", path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
-    return new_fts_symbol_copy(path);
+    return fts_new_symbol_copy(path);
   }
 
   return NULL;
@@ -77,9 +78,9 @@ fts_get_system_config( void)
 {
   char path[MAXPATHLEN];
 
-  fts_make_absolute_path(DEFAULT_ROOT, "config/config.jmax", path, _MAX_PATH);
+  fts_make_absolute_path(DEFAULT_ROOT, "config.jmax", path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
-    return new_fts_symbol_copy(path);
+    return fts_new_symbol_copy(path);
   }
 
   return NULL;  
