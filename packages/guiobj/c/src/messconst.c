@@ -29,6 +29,7 @@
  *  messconst
  *
  */
+fts_symbol_t s_messconst = 0;
  
 typedef struct {
   fts_object_t o;
@@ -108,7 +109,7 @@ static int count_inlets( messconst_t *this)
 static void messconst_redefine_number_of_inlets( fts_object_t *this, int new_ninlets)
 {
   int old_ninlets, i;
-  fts_atom_t a[1];
+  fts_atom_t a[4];
   fts_connection_t **new_in_conn;
 
   old_ninlets = fts_object_get_inlets_number( this);
@@ -132,8 +133,12 @@ static void messconst_redefine_number_of_inlets( fts_object_t *this, int new_nin
   this->in_conn = new_in_conn;
 
   /* change the object class */
-  fts_set_int(a, new_ninlets);
-  this->head.cl = fts_class_instantiate( messconst_metaclass, 1, a);
+  fts_set_symbol( a, s_messconst);
+  fts_set_symbol( a+1, fts_s_ninlets);
+  fts_set_int(a+2, new_ninlets);
+  fts_set_symbol( a+3, fts_s_noutlets);
+  fts_set_int(a+4, 1); /* outlets */
+  this->head.cl = fts_class_instantiate( messconst_metaclass, 5, a);
 
   if (fts_object_has_id( this))
     {
@@ -366,6 +371,7 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 messconst_config(void)
 {
-  messconst_metaclass = fts_metaclass_install( fts_new_symbol("messconst"), messconst_instantiate, fts_arg_equiv);
+  s_messconst = fts_new_symbol("messconst");
+  messconst_metaclass = fts_metaclass_install( s_messconst, messconst_instantiate, fts_arg_equiv);
   fts_class_install( fts_new_symbol("messconst"), messconst_instantiate);
 }

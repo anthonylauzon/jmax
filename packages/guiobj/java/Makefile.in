@@ -313,6 +313,8 @@ install-exec-am:
 install-exec: install-exec-recursive
 
 install-data-am: install-packageJAVA install-jarDATA
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 install-data: install-data-recursive
 
 install-am: all-am
@@ -383,6 +385,9 @@ $(JARFILE): $(JAR_DEP)
 	else \
 		jar -cvf $(JARFILE) `find . -name "*.class"` `find . -name "*.gif"` ; \
 	fi
+
+install-data-hook:
+	cd $(DESTDIR)$(jardir); find . -name "*.class" -exec rm {} \;
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
