@@ -21,21 +21,10 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+#
 
+JMAXDISTDIR= ../../..
+PACKAGEROOT = ..
+PACKAGELIB=$(LIBDIR)/libossdev.so
 
-ROOTDIR = ../../../../../../..
-PACKAGE_DIR = ircam/jmax/editors/patcher/tcl
-
-include $(ROOTDIR)/java/Makefiles/Makefile.common
-
-all: $(CLASSES)
-.PHONY: all
-
-clean: local_clean
-.PHONY: clean
-
-include $(ROOTDIR)/java/Makefiles/Makefile.misc
-
-
-
-
+include $(JMAXDISTDIR)/Makefiles/Makefile.package

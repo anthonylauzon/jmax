@@ -23,19 +23,11 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-	AbstractMaxDataEditor.java \
-	MaxContext.java \
-	MaxData.java \
-	MaxDataEditor.java \
-	MaxDataEditorFactory.java \
-	MaxDataEditorReadyListener.java \
-	MaxDocument.java \
-	MaxDocumentException.java \
-	MaxDocumentHandler.java \
-	MaxDocumentType.java \
-	MaxEnv.java \
-	MaxScriptDocument.java \
-	MaxExecutedScriptDocument.java \
-	Mda.java \
-	MdaModule.java 
+JMAXDISTDIR=../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+
+install:
+	$(INSTALL_DIR) $(doc_install_dir)/user
+	for f in *.html ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user ; done
+.PHONY: install
+
