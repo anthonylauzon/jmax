@@ -3,4 +3,4 @@ Name=jMax
 Exec=jmax
 Terminal=0
 Type=Application
-
+Icon=jmax_icon.png
