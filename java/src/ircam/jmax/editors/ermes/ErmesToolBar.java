@@ -63,7 +63,10 @@ public class ErmesToolBar extends Panel {
   //--------------------------------------------------------
   public void RunModeSetted(boolean theRunMode) {
     ErmesToggleButton aToggleButton;
-    if(theRunMode) setBackground(Color.white);
+    if(theRunMode){
+      setBackground(Color.white);
+      Unlock();
+    }
     else setBackground(Color.lightGray);
     for (int i=0; i<NUM_BUTTONS; i++) {
       aToggleButton = (ErmesToggleButton) getComponent(i);
@@ -103,6 +106,12 @@ public class ErmesToolBar extends Panel {
   public void Lock(){
     locked = true;
   }
+
+  public void Unlock(){
+    locked = false;
+    Deselect();
+  }
+
   
   //--------------------------------------------------------
   //	ButtonDepressed
@@ -177,6 +186,9 @@ public class ErmesToolBar extends Panel {
     add(new ErmesToggleButton(aImage21, aImage22, this, 10));
   }
 }
+
+
+
 
 
 

@@ -340,6 +340,8 @@ class ErmesSketchHelper extends Object{
     if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
       itsSketchPad.GetEditField().LostFocus();
     }
+
+    //itsSketchPad.itsToolBar.Unlock();
     
     DeselectInOutlet();
 

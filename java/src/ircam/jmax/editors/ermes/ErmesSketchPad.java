@@ -1055,6 +1055,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
     ///if we are in a InOutLet
     if(itsHelper.IsInInOutLet(x,y)){
+      if(itsToolBar.locked) itsToolBar.Unlock();
       itsHelper.DeselectObjAndConn();
       if (e.isShiftDown()){
 	MultiConnect(itsCurrentInOutlet);
@@ -1071,12 +1072,14 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
     ///if we are in a Object
     if(itsHelper.IsInObject(x,y)){
+      if(itsToolBar.locked) itsToolBar.Unlock();
       itsCurrentObject.MouseDown(e,x,y);
       return;
     }
     
     ///if we are in a Connection
     if(itsHelper.IsInConnection(x,y)) {
+      if(itsToolBar.locked) itsToolBar.Unlock();
       itsCurrentConnection.MouseDown(e,x,y);
       return;
     }

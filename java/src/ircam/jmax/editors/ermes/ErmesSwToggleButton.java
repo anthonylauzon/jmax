@@ -21,5 +21,10 @@ class ErmesSwToggleButton extends JToggleButton {
 
   public void setName(String theName) {
     itsName = theName;
-  }
+  }  
 }
+
+
+
+
+
