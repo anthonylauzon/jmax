@@ -1,5 +1,0 @@
-Special debug objects.
-Internal use only; do not distribute;
-need "package require debug" in your
-.jmaxrc
-
