@@ -6,3 +6,4 @@ jmax.jar.root:
 	echo "root" > $@
 
 
+DISTCLEANFILES = jmax.jar.root
