@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.69 $ IRCAM $Date: 1997/07/11 14:37:39 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:50:42 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -123,6 +123,9 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   if (status != fts_Success && status != &fts_MethodNotFound)
     {
+      if (patcher)
+	fts_patcher_remove_object(patcher, obj);
+
       if (obj->out_conn)
 	{
 	  fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
@@ -137,10 +140,6 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
       fts_block_free((char *)obj, obj->cl->size);
 
-      /* the test is only usefull during the root patcher building  */
-
-      if (patcher)
-	fts_patcher_remove_object(patcher, obj);
 
       fts_object_table_remove(id);
 

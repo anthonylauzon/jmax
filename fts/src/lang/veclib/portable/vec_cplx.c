@@ -20,3 +20,4 @@ DEFINE_FTL_VEC_CFUN(crect, complex, complex, FUN_crect)
 DEFINE_FTL_VEC_CFUN(cabsf, complex, float, FUN_cabsf)
 DEFINE_FTL_VEC_CFUN(csqrf, complex, float, FUN_csqrf)
 
+

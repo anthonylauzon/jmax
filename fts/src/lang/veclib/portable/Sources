@@ -1,13 +1,20 @@
 STRANGE_SOURCES = vecx_scl_cfmul.c vecx_scl_icmp.c vecx_sqrt.c vecx_trigon.c
 
-SOURCES = $(STRANGE_SOURCES)    \
+ifeq ($(VENDOR),gnu)
+NOT_FOR_PGCC = 
+else
+NOT_FOR_PGCC = vec_cplx.c
+endif
+
+
+SOURCES = $(NOT_FOR_PGCC)    \
+        $(STRANGE_SOURCES)    \
 	cfft.c			\
 	rfft_shuffle.c		\
 	vec_bit.c		\
 	vec_carith.c		\
 	vec_cfmul.c		\
 	vec_cmerge.c		\
-	vec_cplx.c		\
 	vec_cpy.c		\
 	vec_csplit.c		\
 	vec_csum.c		\

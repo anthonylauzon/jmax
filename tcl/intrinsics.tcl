@@ -46,3 +46,26 @@ proc help {} {
     browse "file:$root/doc/help.html"
 }
 
+
+##
+## abstractionDirectory check if in the directory given as argument
+## there is a abstractions.tcl file, and load it if there, with sourceFile
+## Otherwise, give an error message, asking to build the index file
+##
+
+proc abstractionDirectory { dir } {
+    if {[file exists "$dir/abstractions.tcl"]} then {
+	sourceFile $dir/abstractions.tcl
+    } else {
+	puts "No abstraction index file in $dir"
+	puts "Please, build one using the jmax-make-abstraction-index shell script"
+    }
+}
+    
+
+
+
+
+
+
+
