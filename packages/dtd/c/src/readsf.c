@@ -104,8 +104,13 @@ static void delete_reader_thread(readsf_t* self)
 
 static void readsf_eof_alarm(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
+  readsf_t* self = (readsf_t*)o;
   /* set bang to last outlet */
   fts_outlet_bang(o, fts_object_get_outlets_number(o) - 1);
+  /* seek the file */
+  fts_audiofile_seek(self->sf, 0);
+  /* reset end of file */
+  self->is_eof = 0;
 }
 
 static void readsf_dsp( fts_word_t *argv)
@@ -145,7 +150,6 @@ static void readsf_dsp( fts_word_t *argv)
       && (self->com_buffer[1].full == 0)
     )
   {
-    fts_post ("[readsf~] end of file\n");
     self->is_started = 0;
     /* add callback  eof file method */
     fts_timebase_add_call(fts_get_timebase(),(fts_object_t*)self, readsf_eof_alarm, NULL, 0.0);
@@ -307,7 +311,6 @@ static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   readsf_t* self = (readsf_t*)o;
 
-  fts_post("[readsf~] start \n");
   self->is_started = 1;
 }
 
@@ -316,17 +319,14 @@ static void readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   readsf_t* self = (readsf_t*)o;
 
-  fts_post("[readsf~] stop \n");
   self->is_started = 0;
   self->read_index = 0;
-
 }
 
 static void readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t* self = (readsf_t*)o;
 
-  fts_post("[readsf~] pause \n");
   self->is_started += 1;
   self->is_started = self->is_started % 2;
 
