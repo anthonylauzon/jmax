@@ -27,6 +27,9 @@ extern fts_symbol_t fts_get_default_root_directory( void);
 extern fts_symbol_t fts_get_user_project( void);
 extern fts_symbol_t fts_get_system_project( void);
 
+extern fts_symbol_t fts_get_user_configuration(void);
+extern fts_symbol_t fts_get_system_configuration(void);
+
 extern fts_status_t fts_load_library( const char *filename, const char *symbol);
 
 extern int fts_unlock_memory( void);
