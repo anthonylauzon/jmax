@@ -46,10 +46,6 @@
    to catch memory problems without purify
 */
 
-#ifdef DEBUG
-/* #define HELP_PURIFY  */
-#endif
-
 /* #include "smem.h" */
 
 

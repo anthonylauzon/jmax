@@ -1,3 +1,8 @@
+2000-05-02  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	*  fts: added stuff for running fts under purify (ENABLE_PURIFY=yes on make command 
+	line). See doc/running.html for further indications.
+
 2000-04-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	*  Merged all ChangeLog files in subdirectories.

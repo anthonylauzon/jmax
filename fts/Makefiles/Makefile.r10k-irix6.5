@@ -70,7 +70,14 @@ ARCH_DEBUG_CFLAGS := -LANG:restrict
 ## FTS specific declarations
 ##
 
+## This is to help Purify, that currently does not work with pthreads
+
+ifeq ($(ENABLE_PURIFY),yes)
+ARCH_CFLAGS := $(ARCH_CFLAGS) -DHELP_PURIFY
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe
+else
 FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe -lpthread
+endif
 
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 FTS_USER_LIBS_FLAGS = -all

@@ -5,6 +5,7 @@
 
 # Defaults
 DEFAULT_BUILD_DIR=/data/jmax-build/src
+DEFAULT_MAKE=/usr/freeware/bin/gmake
 
 # Constants
 
@@ -21,7 +22,7 @@ help ()
 {
     cat <<EOF
 Usage:
- buildpkg [-a|--arch ARCH] [-b|--builddir DIR]
+ buildpkg [-a|--arch ARCH] [-b|--builddir DIR] [-m|--make MAKE]
 
 Builds a SGI package
 
@@ -35,6 +36,10 @@ Options and arguments:
     Specifies the building directory
     Defaults to $DEFAULT_BUILD_DIR
 
+ -m | --make MAKE
+    Specifies which make command to use.
+    Defaults to $DEFAULT_MAKE
+
 EOF
 }
 
@@ -44,13 +49,14 @@ decrypt_options ()
     opt="none"
     BUILD_DIR=$DEFAULT_BUILD_DIR
     ARCH=
+    MAKE=$DEFAULT_MAKE
 
     for arg in $@
     do
 	if [ $opt = "none" ]
 	then
 	    case $arg in
-	    \-b | \-\-builddir | \-a | \-\-arch )
+	    \-b | \-\-builddir | \-a | \-\-arch | \-m | \-\-make )
 		opt=$arg ;;
 	    \-help | \-h | \-\? )
 		help ;
@@ -64,6 +70,8 @@ decrypt_options ()
 		BUILD_DIR=$arg ;;
 	    \-a | \-\-arch)
 		ARCH=$arg ;;
+	    \-m | \-\-make)
+		MAKE=$arg ;;
 	    esac
 	    opt="none";
 	fi
@@ -99,11 +107,11 @@ build_it ()
 
     ( 
 	cd $BUILD_DIR/jmax-$VERSION
-	gmake ARCH=$ARCH all
+	$MAKE ARCH=$ARCH all
 
 	RAWIDB=/tmp/$$.idb
 	export RAWIDB
-	gmake ARCH=$ARCH INSTALL="install -idb ALL" install
+	$MAKE ARCH=$ARCH INSTALL="install -idb ALL" install
 	sort +4u -6 < $RAWIDB | awk '{ printf( "%s %s %s %s %c%s%c %c%s%c %s\n", $1, $2, $3, $4, 39, $5, 39, 39, $6, 39, $7); }' > $TMP_IDB_SORTED
 	/usr/sbin/gendist -root .. -sbase .. -dist .. -idb $TMP_IDB_SORTED -spec $TMP_SPEC
 	/bin/rm -f $RAWIDB $TMP_IDB_SORTED $TMP_SPEC

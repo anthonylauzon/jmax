@@ -63,6 +63,7 @@
   <li><a href="#arguments">Command Line Arguments</a>
   <li><a href="#.jmaxrc">The file <TT>.jmaxrc</TT></a>
   <li><a href="#running FTS under the debugger">Running <code>FTS</code> under the debugger</a>
+  <li><a href="#running FTS with Purify">Running <code>FTS</code> with Purify</a>
 </ul>
 
 <p>
@@ -276,7 +277,7 @@ $ gdb fts
 run udp MY_MACHINE:MY_PORT_NUMBER
 </pre>
 where:<br>
-&nbsp; <code>MY_MACHINE</code> is the name of the host running FTS (can be 127.0.0.1)
+&nbsp; <code>MY_MACHINE</code> is the name of the host running FTS (can be 127.0.0.1)<br>
 &nbsp; <code>MY_PORT_NUMBER</code> is the port number that you gave to 
 the -jmaxPort option when starting jmax.
 
@@ -285,6 +286,58 @@ The console window should now be filled with normal startup messages. You can
 then stop fts under the debugger, put breakpoints, continue, as usual in
 a debugger session.
 
+</dl>
+
+
+<p>
+<a name="running FTS with Purify">
+ <hr>
+ <h2>Running <b><tt>FTS</tt></b> with Purify</h2>
+</a>
+
+<p>
+In order to run FTS under Purify (for finding memory allocation bugs on
+SGI platforms), the following must be done:
+
+<dl>
+
+<dt>a) recompile FTS
+
+<p>
+<dd> FTS must be recompiled with ENABLE_PURIFY=yes:
+<pre>
+make r10k-irix6.5 ENABLE_PURIFY=yes all_c
+</pre> 
+
+<dt>b) start JAVA
+
+<p>
+<dd> the following options must be used:<br>
+<pre>
+jmax -jmaxConnection udpclient -jmaxPort <MY_PORT_NUMBER> -jmaxHostType origin-purify
+</pre>
+The console window should appear, but remains almost empty.
+
+<p>
+Note: the <code>-jmaxHostType origin-purify</code> differs from host type <code>origin</code>
+by the <code>pdtddev</code> package that is not loaded
+
+<p>
+<dt>c) start Purified FTS server
+
+<p>
+<dd> the following options must be passed to FTS:
+<pre>
+fts.pure udp MY_MACHINE:MY_PORT_NUMBER
+</pre>
+where:<br>
+&nbsp; <code>MY_MACHINE</code> is the name of the host running FTS (can be 127.0.0.1)<br>
+&nbsp; <code>MY_PORT_NUMBER</code> is the port number that you gave to 
+the -jmaxPort option when starting jmax.
+
+<p>
+The Purify console should open and the server start.
+ 
 </dl>
 
 <!-- ---------------------------------------------------------------------- -->
