@@ -263,9 +263,9 @@ eventtrk_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
 }
 
-/* create new event by client request */
+/* create new event and upload by client request */
 void
-eventtrk_event_new_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+eventtrk_event_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
   double time = fts_get_float(at + 0);
@@ -284,6 +284,25 @@ eventtrk_event_new_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
   /* add event to track at client */
   fts_set_object(a, event);    
   fts_client_send_message((fts_object_t *)this, sym_addEvents, 1, a);
+}
+
+/* create new event by client request without uploading */
+void
+eventtrk_event_new_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+  double time = fts_get_float(at + 0);
+  fts_object_t *event;
+  fts_atom_t a[1];
+
+  /* make new event object */
+  fts_object_new(0, ac - 1, at + 1, &event);
+
+  /* add event to track */
+  eventtrk_add_event(this, time, (event_t *)event);
+
+  /* create event at client (short cut: could also send upload message to event object) */
+  fts_client_upload(event, event_symbol, ac, at);  
 }
 
 /* delete event by client request */
@@ -375,6 +394,7 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_print);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_new"), eventtrk_event_new_by_client_request);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_add"), eventtrk_event_add_by_client_request);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_remove"), eventtrk_event_remove_by_client_request);
   
   return fts_Success;
@@ -388,3 +408,16 @@ eventtrk_config(void)
 
   fts_class_install(fts_new_symbol("eventtrk"), eventtrk_instantiate);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
