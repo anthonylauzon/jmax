@@ -66,6 +66,7 @@ typedef int (*fts_audioport_xrun_fun_t)( fts_audioport_t *port);
 
 struct fts_audioport_direction {
   int valid;
+  int open;
   fts_audioport_io_fun_t io_fun;
   fts_audioport_copy_fun_t copy_fun;
   fts_audioport_mute_fun_t mute_fun;
@@ -90,11 +91,18 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
 
 #define fts_audioport_get_max_channels( port, direction) \
   ((port)->inout[(direction)].max_channels)
-#define fts_audioport_set_max_channels( port, direction, max_channels) \
-  ((port)->inout[(direction)].max_channels = (max_channels))
+#define fts_audioport_set_max_channels( port, direction, m) \
+  ((port)->inout[(direction)].max_channels = (m))
 
 #define fts_audioport_set_valid(port, direction) \
   ((port)->inout[(direction)].valid = 1)
+#define fts_audioport_unset_valid(port, direction) \
+  ((port)->inout[(direction)].valid = 0)
+
+#define fts_audioport_set_open(port, direction) \
+  ((port)->inout[direction].open = 1)
+#define fts_audioport_unset_open(port, direction) \
+  ((port)->inout[direction].open = 0)
 
 #define fts_audioport_set_io_fun( port, direction, fun) \
   ((port)->inout[(direction)].io_fun = (fun))
@@ -188,3 +196,9 @@ FTS_API void fts_audiomanager_put_port( fts_symbol_t name, fts_audioport_t *port
 FTS_API void fts_audiomanager_remove_port( fts_symbol_t name);
 
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
