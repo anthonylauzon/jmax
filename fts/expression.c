@@ -499,13 +499,14 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       return status;
     }
     else if (ac > 1 && fts_is_object( at) && fts_is_symbol( at+1))
-    {
+    {      
       /* it is a method invocation */
       fts_object_t *obj = fts_get_object(at);
       fts_symbol_t selector = fts_get_symbol(at + 1);
       
-      fts_set_void( fts_get_return_value());
       fts_object_refer(obj);
+      
+      fts_set_void( fts_get_return_value());
       
       if(!fts_send_message(obj, selector, ac - 2, at + 2))
       {
@@ -524,11 +525,9 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
         /* push return value */
         expression_stack_push( exp, fts_get_return_value());
         fts_atom_refer(fts_get_return_value());
-        
-        fts_object_release(obj);
       }
-      else
-        expression_stack_push( exp, at); /*  return object */
+      
+      fts_object_release(obj);
     }
     else if (ac == 1)
     {

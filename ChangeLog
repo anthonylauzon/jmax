@@ -1,3 +1,9 @@
+2004-05-18  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* expression.c: removed default return of object for method invocation without return value
+	* (package data) fmat.c: added fts_return_object() to many many methods
+	* (package data) fmat.c/fvec.c: further extensions (new methods) of fmat and fslice
+
 2004-05-14  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* (package data) fmat.c: added new methods to fmat class

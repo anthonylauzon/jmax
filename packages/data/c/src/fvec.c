@@ -602,6 +602,137 @@ fslice_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const ft
 
 /******************************************************************************
  *
+ *  misc math funs
+ *
+ */
+static void
+fslice_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+
+  if(fslice_check_index(self))
+  {
+    float *ptr = fslice_get_ptr(self);
+    int stride = fslice_get_stride(self);
+    int size = fslice_get_size(self);
+    int i;
+    
+    for(i=0; i<size*stride; i+=stride)
+      ptr[i] = fabsf(ptr[i]);
+    
+    fts_return_object(o);
+  }
+  else
+    fslice_error_index(self, NULL, "abs");
+}
+
+static void
+fslice_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+
+  if(fslice_check_index(self))
+  {
+    float *ptr = fslice_get_ptr(self);
+    int stride = fslice_get_stride(self);
+    int size = fslice_get_size(self);
+    int i;
+    
+    for(i=0; i<size*stride; i+=stride)
+      ptr[i] = logf(fabsf(ptr[i]));
+    
+    fts_return_object(o);
+  }
+  else
+    fslice_error_index(self, NULL, "logabs");
+}
+
+static void
+fslice_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+
+  if(fslice_check_index(self))
+  {
+    float *ptr = fslice_get_ptr(self);
+    int stride = fslice_get_stride(self);
+    int size = fslice_get_size(self);
+    int i;
+    
+    for(i=0; i<size*stride; i+=stride)
+      ptr[i] = logf(ptr[i]);
+    
+    fts_return_object(o);
+  }
+  else
+    fslice_error_index(self, NULL, "log");
+}
+
+static void
+fslice_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+
+  if(fslice_check_index(self))
+  {
+    float *ptr = fslice_get_ptr(self);
+    int stride = fslice_get_stride(self);
+    int size = fslice_get_size(self);
+    int i;
+    
+    for(i=0; i<size*stride; i+=stride)
+      ptr[i] = expf(ptr[i]);
+    
+    fts_return_object(o);
+  }
+  else
+    fslice_error_index(self, NULL, "exp");
+}
+
+static void
+fslice_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+
+  if(fslice_check_index(self))
+  {
+    float *ptr = fslice_get_ptr(self);
+    int stride = fslice_get_stride(self);
+    int size = fslice_get_size(self);
+    int i;
+    
+    for(i=0; i<size*stride; i+=stride)
+      ptr[i] *= ptr[i];
+    
+    fts_return_object(o);
+  }
+  else
+    fslice_error_index(self, NULL, "sqrabs");
+}
+
+static void
+fslice_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+
+  if(fslice_check_index(self))
+  {
+    float *ptr = fslice_get_ptr(self);
+    int stride = fslice_get_stride(self);
+    int size = fslice_get_size(self);
+    int i;
+    
+    for(i=0; i<size*stride; i+=stride)
+      ptr[i] = sqrtf(ptr[i]);
+    
+    fts_return_object(o);
+  }
+  else
+    fslice_error_index(self, NULL, "sqtr");
+}
+
+/******************************************************************************
+ *
  *  min, max & co
  *
  */
@@ -960,6 +1091,13 @@ fslice_instantiate(fts_class_t *cl)
   fslice_message(cl, fts_new_symbol("bus"), fslice_bus_fslice, fslice_bus_number);
   fslice_message(cl, fts_new_symbol("vid"), fslice_vid_fslice, fslice_vid_number);
 
+  fts_class_message_void(cl, fts_new_symbol("abs"), fslice_abs);
+  fts_class_message_void(cl, fts_new_symbol("logabs"), fslice_logabs);
+  fts_class_message_void(cl, fts_new_symbol("log"), fslice_log);
+  fts_class_message_void(cl, fts_new_symbol("exp"), fslice_exp);
+  fts_class_message_void(cl, fts_new_symbol("sqrabs"), fslice_sqrabs);
+  fts_class_message_void(cl, fts_new_symbol("sqrt"), fslice_sqrt);
+
   fts_class_message_void(cl, fts_new_symbol("min"), fslice_get_min);
   fts_class_message_void(cl, fts_new_symbol("max"), fslice_get_max);
   fts_class_message_void(cl, fts_new_symbol("mini"), fslice_get_min_index);
@@ -988,6 +1126,15 @@ fslice_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("div"), "<num|fcol|frow: operand>", "divide current values by given scalar, fcol or frow (element by element)");
   fts_class_doc(cl, fts_new_symbol("bus"), "<num|fcol|frow: operand>", "subtract current values from given scalar, fcol or frow (element by element)");  
   fts_class_doc(cl, fts_new_symbol("vid"), "<num|fcol|frow: operand>", "divide given scalar, fcol or frow (element by element) by current values");
+
+  fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("log"), NULL, "calulate lograrithm of current values");
+  fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
+  fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT of real or complex vector (vec or rect format)");
+  fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real IFFT of complex vector (rect format)");
 
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("mini"), NULL, "get index of minimum value");

@@ -2255,7 +2255,7 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_rect:
-      for(i=0; i<m; i++)
+      for(i=0; i<m; i+=2)
       {
         float re = ptr[i];
         float im = ptr[i + 1];
@@ -2266,7 +2266,7 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_polar:
-      for(i=0; i<m; i++)
+      for(i=0; i<m; i+=2)
       {
         float re = logf(ptr[i]);
         float im = ptr[i + 1];
@@ -2303,7 +2303,7 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_rect:
-      for(i=0; i<m; i++)
+      for(i=0; i<m; i+=2)
       {
         float mag = expf(ptr[i]);
         float arg = ptr[i + 1];
@@ -2314,7 +2314,7 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
       
     case fmat_format_id_polar:
-      for(i=0; i<m; i++)
+      for(i=0; i<m; i+=2)
       {
         float mag = ptr[i];
         float arg = ptr[i + 1];
@@ -2372,6 +2372,59 @@ fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     default:
       for(i=0; i<m*n; i++)
         ptr[i] *= ptr[i];
+      break;
+  }
+  
+  fts_return_object(o);
+}
+
+static void
+fmat_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int id = fmat_format_get_id(self->format);
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
+  switch(id)
+  {
+    case fmat_format_id_vec:
+      for(i=0; i<m; i++)
+        ptr[i] = sqrtf(ptr[i]);
+      break;
+      
+    case fmat_format_id_rect:
+      for(i=0; i<m; i+=2)
+      {
+        float re = ptr[i];
+        float im = ptr[i + 1];
+        float mag = sqrtf(re * re + im * im);
+        float arg = atan2f(im, re);
+        
+        mag = sqrtf(mag);
+        arg *= 0.5;
+            
+        ptr[i] = mag * cosf(arg);
+        ptr[i + 1] = mag * sinf(arg);
+      }
+      break;
+      
+    case fmat_format_id_polar:
+      for(i=0; i<m; i+=2)
+      {
+        float mag = ptr[i];
+        float arg = ptr[i + 1];
+        
+        ptr[i] = sqrtf(mag * cosf(arg));
+        ptr[i + 1] = 0.5 * mag * sinf(arg);
+      }
+      break;
+      
+    default:
+      for(i=0; i<m*n; i++)
+        ptr[i] = sqrtf(ptr[i]);
       break;
   }
   
@@ -3629,11 +3682,11 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("dot"), fmat_class, fmat_get_dot);
   
   fts_class_message_void(cl, fts_new_symbol("abs"), fmat_abs);
-  fts_class_message_void(cl, fts_new_symbol("sqrabs"), fmat_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("logabs"), fmat_logabs);
   fts_class_message_void(cl, fts_new_symbol("log"), fmat_log);
   fts_class_message_void(cl, fts_new_symbol("exp"), fmat_exp);
-  /*fts_class_message_void(cl, fts_new_symbol("sqrt"), fmat_sqrt);*/
+  fts_class_message_void(cl, fts_new_symbol("sqrabs"), fmat_sqrabs);
+  fts_class_message_void(cl, fts_new_symbol("sqrt"), fmat_sqrt);
   
   fts_class_message_void(cl, fts_new_symbol("fft"), fmat_fft);
   fts_class_message_void(cl, fts_new_symbol("rifft"), fmat_rifft);  
@@ -3703,7 +3756,7 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
-  fts_class_doc(cl, fts_new_symbol("  bsmax"), NULL, "get maximum absolute value");
+  fts_class_doc(cl, fts_new_symbol("absmax"), NULL, "get maximum absolute value");
   fts_class_doc(cl, fts_new_symbol("sum"), NULL, "get sum of all values");
   fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
   fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");
@@ -3728,10 +3781,11 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("dot"), "<fmat: operand>", "get dot product of column vector with given vector");
 
   fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
-  fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("log"), NULL, "calulate lograrithm of current values");
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
+  fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("fft"), NULL, "calulate inplace FFT of real or complex vector (vec or rect format)");
   fts_class_doc(cl, fts_new_symbol("rifft"), NULL, "calulate inplace real IFFT of complex vector (rect format)");
 
