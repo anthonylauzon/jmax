@@ -49,13 +49,28 @@ tabpeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   tabpeek_t *this = (tabpeek_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
   sampbuf_t *null = 0;
+
+  ac--;
+  at++;
+
+  this->tab_name = 0;
+  this->ftl_data = 0;
   
-  this->tab_name = tab_name;
+  if(ac > 0 && fts_is_symbol(at))
+    {
+      sampbuf_t **data;
 
-  this->ftl_data = ftl_data_new(sampbuf_t *);
-  ftl_data_copy(sampbuf_t *, this->ftl_data, &null);
+      this->tab_name = tab_name;
+      
+      this->ftl_data = ftl_data_alloc(sizeof(sampbuf_t *));
+      data = (sampbuf_t **)ftl_data_get_ptr(this->ftl_data);
 
-  dsp_list_insert(o); /* just put object in list */
+      *data = 0;
+
+      dsp_list_insert(o); /* just put object in list */
+    }
+  else
+    fts_object_set_error(o, "Argument (name of table~) required");
 }
 
 
@@ -64,8 +79,11 @@ tabpeek_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   tabpeek_t *this = (tabpeek_t *)o;
 
-  ftl_data_free(this->ftl_data);
-  dsp_list_remove(o);
+  if(this->ftl_data)
+    {
+      ftl_data_free(this->ftl_data);
+      dsp_list_remove(o);
+    }
 }
 
 
@@ -81,19 +99,27 @@ tabpeek_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   tabpeek_t *this = (tabpeek_t *)o;
   fts_atom_t argv[4];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-  sampbuf_t *buf = sampbuf_get(this->tab_name);
-
-  if (buf)
+  sampbuf_t **data = (sampbuf_t **)ftl_data_get_ptr(this->ftl_data);
+  
+  if(this->tab_name)
     {
-      ftl_data_copy(sampbuf_t *, this->ftl_data, &buf);
-      fts_set_ftl_data(argv + 0, this->ftl_data);
-      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-      fts_set_long(argv + 3, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(dsp_symbol, 4, argv);
+      sampbuf_t *buf = sampbuf_get(this->tab_name);
+
+      if(buf)
+	{
+	  *data = buf;
+      
+	  fts_set_ftl_data(argv + 0, this->ftl_data);
+	  fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
+	  dsp_add_funcall(dsp_symbol, 4, argv);
+
+	  return;
+	}
+
+      post("tabpeek: can't find table~: %s\n", fts_symbol_name(this->tab_name));
     }
-  else
-    post("tabpeek: can't find table~: %s\n", fts_symbol_name(this->tab_name));
 }
 
 static void
@@ -102,25 +128,30 @@ ftl_tabpeek(fts_word_t *argv)
   sampbuf_t **data = (sampbuf_t **)fts_word_get_ptr(argv + 0);
   float *in = (float *)fts_word_get_ptr(argv + 1);
   float *out = (float *)fts_word_get_ptr(argv + 2);
-  long n = fts_word_get_long(argv + 3);
+  int n = fts_word_get_int(argv + 3);
   sampbuf_t *buf = *data;
   float *tab = buf->samples;
-  long tabend = buf->size - 1;
+  int size = buf->size;
   int i;
 
-  if (buf)
-    for (i = 0; i < n; i++)
-      {
-	long idx;
+  if(tab)
+    {
+      for(i=0; i<n; i++)
+	{
+	  int idx = (int)in[i];
 
-	idx = (long) in[i];
-
-	out[i] = tab[idx >= 0 ? (idx < tabend ? idx : tabend) : 0];
-      }
+	  if(idx >= size)
+	    out[i] = tab[size - 1];
+	  else if(idx < 0)
+	    out[i] = tab[0];
+	  else
+	    out[i] = tab[idx];
+	}
+    }
   else
-    {   
-      for (i = 0; i < n; i++)
-	out[i] = 0.0f;
+    {
+      for(i=0; i<n; i++)
+	out[i] = 0.0;
     }
 }
 
@@ -135,16 +166,22 @@ static void
 tabpeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabpeek_t *this = (tabpeek_t *)o;
-  fts_symbol_t tab_name = fts_get_symbol(at);
-  sampbuf_t *buf = sampbuf_get(tab_name);
-
-  if (buf)
+  
+  if(fts_is_symbol(at))
     {
-      this->tab_name = tab_name;
-      ftl_data_copy(sampbuf_t *, this->ftl_data, &buf);
+      fts_symbol_t tab_name = fts_get_symbol(at);
+      sampbuf_t *buf = sampbuf_get(tab_name);
+      
+      if (buf)
+	{
+	  sampbuf_t **data = (sampbuf_t **)ftl_data_get_ptr(this->ftl_data);
+
+	  *data = buf;
+	  this->tab_name = tab_name;
+	}
+      else
+	post("tabpeek: can't find table~: %s\n", fts_symbol_name(tab_name));
     }
-  else
-    post("tabpeek: can't find table~: %s\n", fts_symbol_name(tab_name));
 }
 
 static void
@@ -155,14 +192,16 @@ tabpeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const f
   fts_symbol_t tab_name;
   sampbuf_t *buf;
  
-  gensampname(name_str, "sample", fts_get_long(at));
+  gensampname(name_str, "sample", fts_get_int(at));
   tab_name = fts_new_symbol_copy(name_str);  
   buf = sampbuf_get(tab_name);
 
   if (buf)
     {
+      sampbuf_t **data = (sampbuf_t **)ftl_data_get_ptr(this->ftl_data);
+      
+      *data = buf;
       this->tab_name = tab_name;
-      ftl_data_copy(sampbuf_t *, this->ftl_data, &buf);
     }
   else
     post("tabpeek: can't find table~: %s\n", fts_symbol_name(tab_name));
@@ -186,22 +225,15 @@ tabpeek_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(tabpeek_t), 1, 1, 0); 
 
   /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, tabpeek_init, 2, a);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, tabpeek_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tabpeek_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tabpeek_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, tabpeek_put);
 
   /* tabpeek user methods */
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_new_symbol("set"), tabpeek_set, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, tabpeek_set_by_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), tabpeek_set);
+  fts_method_define_varargs(cl, 0, fts_s_int, tabpeek_set_by_int);
 
   /* Type the outlet */
 
@@ -219,9 +251,3 @@ tabpeek_config(void)
 {
   fts_class_install(fts_new_symbol("tabpeek~"), tabpeek_instantiate);
 }
-
-
-
-
-
-

@@ -1,3 +1,10 @@
+2001-03-27  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* packages/ispw/src/sampling/tabpeek.c (ftl_tabpeek): fixed ugly
+	bug crashing on DSP on while ISPW signal help summary patch is open
+
+	* doc/ReleaseNotes.html : added summary of the latest updates to the release notes
+
 2001-03-22  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed: hack for default MIDI port.

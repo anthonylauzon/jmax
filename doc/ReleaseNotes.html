@@ -56,16 +56,17 @@
 
 <p>
 jMax is now fully Java 2 compliant: to run or compile it, you must use a Java 2
-virtual machine (recommanded are IBM, Sun or Blackdown JDK 1.3 or higher).
+virtual machine (recommended are IBM, Sun or Blackdown JDK 1.3 or higher).
 
 <h3>Makefiles</h3>
 
 <p>
-The Makefiles have changed in order to be simpler for developping objects.
+The Makefiles have changed in order to be simpler for developing objects.
 
 <p>
 A typical Makefile for a package is:
-<table border=1><tr><td>
+<p>
+<table border=1 cellspacing=0 cellpadding=10><tr><td>
 <pre>
 JMAXDISTDIR= ../../..
 PACKAGEROOT = ..
@@ -89,7 +90,7 @@ package inside or outside the jMax source tree. Now, an object must do:
 <h3>Audio and MIDI ports</h3>
 
 <p>
-Audio and MIDI I/O are now handled by "ports" objects. These objects are documented
+Audio and MIDI I/O are now handled by "port" objects. These classes are documented
 by their help patches that you can find in the summary of their respective packages
 (oss, alsa, sgi, midi).
 
@@ -98,12 +99,160 @@ Corresponding Tcl commands have been added to set the default audio and MIDI por
 These commands are <tt>defaultAudio</tt> and <tt>defaultMidi</tt> and are documented
 in <a href="configuration.html">Configuration documentation</a>.
 
-<h3>Documentation updates</h3>
+
+<h3>Font appearance and rescaling of the patcher window</h3>
+Since the available Java environments have different scalings for certain fonts, patches
+created with former version of jMax or different environments might appear scrambled in 
+the patcher window.
+In order to reproduce the original appearance of the patchers on the used platform, 
+jMax allows to set a scaling factor in the system setup (.jmaxrc) via TCL commands:
+
+<blockquote><tt>setGraphicScaling &lt;x factor&gt; &lt;y factor&gt;</tt></blockquote>
 
 <p>
-Documentation has been updated to reflect changes. See 
-<a href="index.html">Documentation index</a> for further information and in
-particular <a href="patcher.html">Patcher documentation</a>.
+The size of all patchers (position and size of the objects and the patcher windows) 
+will be multiplied by the given factors. The scaling is applied to the graphical appearance
+only and doesn't affect the actual parameters stored in the file.
+
+<p>
+The reference Java platform is the IBM 1.3. All system and help patches are created with
+this environment. Please adjust the scaling factors for your platform until the help patches
+appear correct on your system.
+
+<p>
+In order to adjust the appearance of older patches, jMax provides a rescaling functionality
+which is accessible via the dialog "Rescale Window" in the "Edit" menu. The given factors
+are applied to the current window. In this case the graphical parameters of all objects are
+actually changed (and will be saved with the file).
+
+<p>
+(Note that the "Rescaling Window" function is applied in addition to the global scaling
+factors given in the system setup.)
+
+
+<h3>Control Panel</h3>
+
+The control panel has been simplified and attached to the console window. Nevertheless
+is can be detached from it by dragging the handle at its left border
+out of the window. This way the control panel will appear as a
+separate window. Closing the control panel window or dragging it back
+to its original position will re-attach it to the console window.
+
+
+<h3>Signal connections</h3>
+
+From all jMax signal object accepts and adds multiple connections to their
+inlets.  The output of the connected objects is added before being fed
+to a given inlet.
+
+<p>
+Active signal connections (DSP on) are appearing as a zigzag line.
+
+<p>
+(Note that it was always possible to connect multiple signal outlets
+to an inlet.  In former versions of jMax only one of multiple signal
+output to the same inlet was taken into account.)
+
+
+<h3>Labels</h3>
+
+The set of basic classes of jMax has been modified and extended. 
+In general you should have a look to the updated summary and help patches.
+
+<p>
+The inlet and outlet class has been merged with the functionalities of
+the former send and receive objects.  Inlet and Receive as well as
+outlet and send share the same graphical appearance.
+
+<p>
+The objects (see in the tool-bar) represent a new system feature called
+"labels".  Numbered labels refer to the inlets and outlets of the
+current patcher.  Named labels can be either undefined - in which
+case they have a global scope - or defined. Labels are defined as
+variables using the "label" class. The usual rules for variable scopes
+(variables of a name starting with a capital letter are global) apply
+as well to label.
+
+<p>
+(Note that the former send and receive are deprecated but for now work
+exactly as the label classes.)
+
+<p>
+See the help summary of the system package.
+
+
+<h3>Messages</h3>
+
+The ISPW message box object (2nd in the object palette of the tool bar
+in the patcher window) doesn't share the same syntax as the other objects
+and will be hopefully soon replaced by a more powerful class.
+
+<p>
+In order to provide the possibility to express at least a single
+message or constant (or list) using all syntactical possibilities of
+jMax' constant expressions as the other objects (functions, variables,
+symbol concatenation) a class was added to the palette (3rd
+position). Please refer to its help patch.
+
+
+<h3>Display</h3> 
+
+A simple display class was added to jMax which can display any
+message, various data and signals in text form. The object resizes
+automatically in order to display its input as a single line of text.
+
+<p>
+Messages and control data are displayed with a limited rate
+corresponding to a given display period (not yet variable). Signals
+are displayed as their maximal absolute value over this period.
+
+
+<h3>Busses</h3> 
+
+This version of jMax implements busses for Messages and control data
+as well as for signals. While connections via labels are static the
+source as well as the target of a connection via an bus is variable
+and can be changed at run time via an extra inlet of the throw or
+catch object.
+
+<p>
+Please refer to the help patches of the objects bus (with throw and
+catch) and bus~ (with throw~ and catch~).
+
+(Note that signal busses systematically introduce a delay of one jMax
+scheduler tick = <signal vector size> / <sample rate>, typically: 64 / 44100 = 1.49 msec.)
+
+
+<h3>Signal Package</h3> 
+
+The new signal package replaces successively the old ISPW signal
+classes by a new set of classes. These classes use the variable
+mechanism and reference data types (fvec) of jMax. The package is not
+complete yet.
+
+<p>
+Please refer to the summary and help patches of the signal package.
+
+
+<h3>Fonts</h3>
+
+jMax' font sizes have from now on symbolic names (normal, small, large, ...).
+It provides from now on two system fonts of variable and fixed size.
+
+<p>
+The rich set of platform dependent Java fonts and sizes stays
+accessible via separate menus.
+
+<p>
+We hope this way to provide a better compatibility between different Java platforms
+and releases.
+
+
+<h3>Documentation updates</h3> 
+
+Documentation has been updated to reflect changes.
+See <a href="index.html">Documentation index</a> for further information and in 
+particular the doc of the <a href="patcher.html">Console and Patcher Window</a>.
 
 
 <h3>jMax tutorials</h3>
@@ -111,13 +260,17 @@ particular <a href="patcher.html">Patcher documentation</a>.
 <p>
 Thanks to Fabrice Medio and Norbert Schnell, a jMax tutorial is under development.
 It is currently available via cvs:
-<table border=1><tr><td><pre>
+
+<p>
+<table border=1 cellspacing=0 cellpadding=10>
+<tr><td><pre>
 cvs -d :pserver:anonymous@cvs.ircam.fr:/jmax login
 &lt;type "cvs" as password&gt;
 cvs checkout jmax-tutorial
-</pre></td></tr></table>
+</pre></td></tr>
+</table>
 
-
+<p>
 <!------------------------------------------------------------------------------->
 <br>
 <hr>
@@ -128,11 +281,11 @@ cvs checkout jmax-tutorial
 
 <strong>
 In this release, the MIDI objects are temporarily non-available on the Linux
-platform, because of a reimplementation in progress. 
+platform, because of a re-implementation in progress. 
 </strong>
 
 <p>
-new MidiShare connection, via a <code>midishareport</code> objet
+new MidiShare connection, via a <code>midishareport</code> object
 
 <p>
 Hammerfall ALSA 0.6.x device:<br>
@@ -143,6 +296,7 @@ Note: it must be compiled by hand (in packages/alsa0.6dev) and added to the
 <code>key</code> object
 
 
+<p>
 <!------------------------------------------------------------------------------->
 <br>
 <hr>
@@ -151,7 +305,7 @@ Note: it must be compiled by hand (in packages/alsa0.6dev) and added to the
 
 <strong>
 In this release, the MIDI objects are temporarily non-available on the Linux
-platform, because of a reimplementation in progress.
+platform, because of a re-implementation in progress.
 </strong>
 
 <h3>Features</h3>
@@ -160,6 +314,7 @@ platform, because of a reimplementation in progress.
 new udpsend and udpreceive objects (see Help->I/O summary)
 
 
+<p>
 <!------------------------------------------------------------------------------->
 <br>
 <hr>
@@ -169,7 +324,7 @@ new udpsend and udpreceive objects (see Help->I/O summary)
 
 <strong>
 In this release, the MIDI objects are temporarily non-available on the Linux
-platform, because of a reimplementation in progress.
+platform, because of a re-implementation in progress.
 </strong>
 
 
@@ -179,7 +334,7 @@ platform, because of a reimplementation in progress.
 <h4>Automatic selection of isolated processor (SGI platform)</h4>
 
 <p>
-On SGI platform, the default behaviour is that FTS automatically runs on an isolated processor 
+On SGI platform, the default behavior is that FTS automatically runs on an isolated processor 
 if there is one
 processor that is isolated, thus taking advantage of multi-processors machines 
 for better audio latency.
@@ -187,7 +342,7 @@ for better audio latency.
 <p>
 In order to be able to select by hand the processor on which FTS will run,
 the option <code>--cpu=N</code> has been added to FTS, where N is the selected
-processor numbered starting at 0. This option is only meaningfull on SGI platform.
+processor numbered starting at 0. This option is only meaningful on SGI platform.
 
 <p>
 The jMax property <code>jmaxServerOptions</code> is used to pass options to 
@@ -207,11 +362,11 @@ is both isolated and non-preemptive. Isolating a processor requires a
 multi-processor system (Origin or Octane with 2 processors at least).
 
 
-<h4>Reimplementation of the direct-to-disk objects (readsf~)</h4>
+<h4>Re-implementation of the direct-to-disk objects (readsf~)</h4>
 
 <p>
 Because of problems on SGI platform related to bad interaction between threads
-and isolated processor, the readsf~ has been reimplemented using a separate
+and isolated processor, the readsf~ has been re-implemented using a separate
 server process for reading the sound files. 
 
 <p>
@@ -219,7 +374,7 @@ The <code>readsf~</code> object now has an extra outlet that bangs when the
 sound file is finished, allowing to play a file in loop or build a play list.
 
 <p>
-The readsf~ has a slightly different behaviour as before: the <code>open</code>
+The readsf~ has a slightly different behavior as before: the <code>open</code>
 message and the <code>play</code> message can be send in the same tick without
 causing clicks and error messages. The <code>readsf~</code> object will start
 playing the file as soon as the server process has opened the file and preloaded
@@ -227,6 +382,7 @@ the first blocks. This gives usually a delay that is below 20 milliseconds.
 To get really a precise start time, a delay can be inserted between sending
 the <code>open</code> message and the <code>play</code> message.
 
+<p>
 <!------------------------------------------------------------------------------->
 <br>
 <hr>
@@ -306,8 +462,8 @@ Thanks to Winfried Ritsch, the "serial" object is back (in the io package). It h
 to take advantage of the scheduler single select() call.
 
 <p> 
-There is a new graphical object in the toolbar (called "fork"), which changes it's number of outlets 
-when ones drags it on the right border. It repeats it's input from all outletss in right to left order
+There is a new graphical object in the tool-bar (called "fork"), which changes it's number of outlets 
+when ones drags it on the right border. It repeats it's input from all outlets in right to left order
 (replaces "trigger t t t t t ..." and "bangbang").
 
 <h3>Notes</h3>
@@ -339,6 +495,7 @@ devices) are now in <code>packages/</code>
 
 
 
+<p>
 <!------------------------------------------------------------------------------->
 <br>
 <hr>
@@ -424,6 +581,7 @@ openDefaultMidi midi "mode w"
 </pre>
 
 
+<p>
 <!------------------------------------------------------------------------------->
 <p>
 <hr>

@@ -92,7 +92,7 @@ void
 sampbuf_realloc(sampbuf_t *buf, long size)
 {
   /* very lazy */
-  if(size <= buf->alloc_size)
+  if(size && size <= buf->alloc_size)
     buf->size = size;
   else
     {
