@@ -837,6 +837,8 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       next_bar_time += ((double)numerator * 240000.0) / (tempo * (double)denominator);
     }      
     
+    marker_track_renumber_bars(markers, track_get_first(markers), 0);
+    
     if(track_editor_is_open(self))
       fts_send_message((fts_object_t *)self->markers, fts_s_upload, 0, NULL);
   }
@@ -1731,6 +1733,9 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       if (!error && size > 0)	/* set return value: sucess */
       {
 	      fts_set_int(&ret, size);
+        
+        if(self->markers)
+          marker_track_renumber_bars(self->markers, track_get_first(self->markers), 0);
         
 	      track_update_editor(self);
       }

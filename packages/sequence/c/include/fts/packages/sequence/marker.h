@@ -85,7 +85,7 @@ extern void scomark_spost(fts_object_t *o, fts_bytestream_t *stream);
 
 extern void marker_track_dump_state(track_t *self, fts_dumper_t *dumper);
 extern void marker_track_unset_tempo_on_selection(track_t *marker_track, int ac, const fts_atom_t *at);
-extern scomark_t *marker_track_append_marker(track_t *track, double time, int ac, const fts_atom_t *at, event_t **event);
-extern scomark_t *marker_track_insert_marker(track_t *track, double time, fts_symbol_t type, event_t **event);
-
+extern scomark_t *marker_track_append_marker(track_t *marker_track, double time, int ac, const fts_atom_t *at, event_t **event);
+extern scomark_t *marker_track_insert_marker(track_t *marker_track, double time, fts_symbol_t type, event_t **event);
+extern void marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num);
 #endif

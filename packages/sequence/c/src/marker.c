@@ -651,7 +651,7 @@ marker_track_dump_state(track_t *self, fts_dumper_t *dumper)
   
   /* save markers */
   while(event)
-  {
+  { 
     fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_marker);
     fts_atom_t *value = event_get_value(event);
     fts_object_t *marker = fts_get_object(value);
@@ -708,6 +708,21 @@ marker_track_insert_marker(track_t *marker_track, double time, fts_symbol_t type
   track_add_event(marker_track, time, *event);
   
   return scomark;
+}
+
+void 
+marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num)
+{  
+  int num = start_num;
+  event_t *event = start;
+  
+  while(event)
+  { 
+    scomark_t *marker = (scomark_t *)fts_get_object( event_get_value(event));
+    if(marker->type == seqsym_bar)
+      scomark_bar_set_number(marker, num++);
+    event = event_get_next(event);
+  }  
 }
 
 /** EMACS **
