@@ -368,6 +368,9 @@ public class JMaxApplication extends FtsClient {
 	    {
 	      JMaxApplication.reportException( e);
 	    }
+
+	  for(int i = 1; i<args.getLength(); i+=2)
+	    FtsHelpPatchTable.addSummary( args.getSymbol( i).toString(), args.getSymbol( i+1).toString());
 	}
     }
   }
@@ -398,9 +401,9 @@ public class JMaxApplication extends FtsClient {
 	FtsProcess fts = null;
 
 	if (o != null && o instanceof Boolean && ((Boolean)o).booleanValue())
-	  fts = new FtsProcess( argc, argv);
-	else
 	  System.out.println( "Attaching to FTS on host " + hostName);
+	else
+	  fts = new FtsProcess( argc, argv);
 		
 	FtsServerConnection connection;
 		
