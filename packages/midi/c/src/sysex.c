@@ -80,7 +80,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   /* add call back to midi port */
   if(this->port)
-    fts_midiport_add_listener(this->port, midi_type_system, midi_system_exclusive, midi_controller_any, o, sysexin_callback);
+    fts_midiport_add_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o, sysexin_callback);
 }
 
 static void 
@@ -89,7 +89,7 @@ sysexin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sysex_t *this = (sysex_t *)o;
 
   if(this->port)
-    fts_midiport_remove_listener(this->port, midi_type_system, midi_system_exclusive, midi_controller_any, o);
+    fts_midiport_remove_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o);
 }
 
 static fts_status_t

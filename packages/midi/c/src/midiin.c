@@ -278,7 +278,7 @@ notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ac--;
   at++;
 
-  this->type = midi_type_note;
+  this->type = midi_note;
 
   if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
@@ -300,7 +300,7 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ac--;
   at++;
 
-  this->type = midi_type_poly_pressure;
+  this->type = midi_poly_pressure;
 
   if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
@@ -321,7 +321,7 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   ac--;
   at++;
 
-  this->type = midi_type_control_change;
+  this->type = midi_control_change;
 
   if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
@@ -342,7 +342,7 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   ac--;
   at++;
 
-  this->type = midi_type_program_change;
+  this->type = midi_program_change;
 
   if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
@@ -361,7 +361,7 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   ac--;
   at++;
 
-  this->type = midi_type_channel_pressure;
+  this->type = midi_channel_pressure;
 
   if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
@@ -380,7 +380,7 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ac--;
   at++;
 
-  this->type = midi_type_pitch_bend;
+  this->type = midi_pitch_bend;
 
   if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
@@ -399,7 +399,7 @@ xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   ac--;
   at++;
 
-  this->type = midi_type_pitch_bend;
+  this->type = midi_pitch_bend;
 
   if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {

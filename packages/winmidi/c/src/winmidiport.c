@@ -173,7 +173,7 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     switch (msg_type(msg)) {
 
     case NOTEOFF:
-      event = fts_midievent_channel_message_new(midi_type_note, msg_chan(msg), msg_p1(msg), msg_p2(msg));
+      event = fts_midievent_channel_message_new(midi_note, msg_chan(msg), msg_p1(msg), msg_p2(msg));
       break;
 
     case NOTEON:
