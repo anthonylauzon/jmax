@@ -24,6 +24,7 @@
  *
  */
 #include <fts/fts.h>
+#include <ftsconfig.h>
 #include "seqsym.h"
 #include "sequence.h"
 #include "track.h"
@@ -538,7 +539,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 void
-sequence_config(void)
+_sequence_config(void)
 {
   fts_class_install(seqsym_sequence, sequence_instantiate);
 }

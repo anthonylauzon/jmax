@@ -31,13 +31,11 @@ extern void midiout_config(void);
 extern void sysex_config(void);
 extern void rawmidiport_config(void);
 
-static void
-midi_init(void)
+void
+midi_config(void)
 {
   midiin_config();
   midiout_config();
   sysex_config();
   rawmidiport_config();
 }
-
-MIDI_API fts_module_t midi_module = {"midi", "MIDI i/o classes", midi_init, 0, 0};

@@ -39,6 +39,9 @@
 #include <fts/fts.h>
 #include "track.h"
 
+SEQUENCE_API void
+sequence_config(void);
+
 /*****************************************************************
  *
  *  sequence

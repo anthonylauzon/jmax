@@ -28,11 +28,9 @@
 
 extern void math_binop_config(void);
 
-static void
-math_init(void)
+void
+math_config(void)
 {
   math_binop_config();
 }
-
-MATH_API fts_module_t math_module = {"math", "math classes", math_init, 0, 0};
 

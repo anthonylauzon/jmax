@@ -38,4 +38,7 @@
 #define NUMERIC_API extern
 #endif
 
+NUMERIC_API void
+numeric_config(void);
+
 #endif /* _NUMERIC_H */

@@ -48,6 +48,7 @@ CLEAN :
 	-@erase "$(INTDIR)\audio.obj"
 	-@erase "$(INTDIR)\autosave.obj"
 	-@erase "$(INTDIR)\buffer.obj"
+	-@erase "$(INTDIR)\bytestream.obj"
 	-@erase "$(INTDIR)\class.obj"
 	-@erase "$(INTDIR)\clipboard.obj"
 	-@erase "$(INTDIR)\connection.obj"
@@ -119,6 +120,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\audio.obj" \
 	"$(INTDIR)\autosave.obj" \
 	"$(INTDIR)\buffer.obj" \
+	"$(INTDIR)\bytestream.obj" \
 	"$(INTDIR)\class.obj" \
 	"$(INTDIR)\clipboard.obj" \
 	"$(INTDIR)\connection.obj" \
@@ -188,6 +190,7 @@ CLEAN :
 	-@erase "$(INTDIR)\audio.obj"
 	-@erase "$(INTDIR)\autosave.obj"
 	-@erase "$(INTDIR)\buffer.obj"
+	-@erase "$(INTDIR)\bytestream.obj"
 	-@erase "$(INTDIR)\class.obj"
 	-@erase "$(INTDIR)\clipboard.obj"
 	-@erase "$(INTDIR)\connection.obj"
@@ -262,6 +265,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\audio.obj" \
 	"$(INTDIR)\autosave.obj" \
 	"$(INTDIR)\buffer.obj" \
+	"$(INTDIR)\bytestream.obj" \
 	"$(INTDIR)\class.obj" \
 	"$(INTDIR)\clipboard.obj" \
 	"$(INTDIR)\connection.obj" \
@@ -397,6 +401,12 @@ SOURCE=..\fts\autosave.c
 SOURCE=..\fts\buffer.c
 
 "$(INTDIR)\buffer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\bytestream.c
+
+"$(INTDIR)\bytestream.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

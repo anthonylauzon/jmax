@@ -32,6 +32,8 @@
 #define HAVE_DIRECT_H 1
 #define HAVE_PROCESS_H 1
 #define HAVE_IO_H 1
+#define HAVE_WINDOWS_H 1
+#define HAVE_STRING_H 1
 
 /* defines for language features */
 #define restrict 

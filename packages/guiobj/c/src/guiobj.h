@@ -38,4 +38,7 @@
 #define GUIOBJ_API extern
 #endif
 
+GUIOBJ_API void
+guiobj_config(void);
+
 #endif /* _GUIOBJ_H */

@@ -28,7 +28,7 @@
 
 extern void seqsym_config(void);
 
-extern void sequence_config(void);
+extern void _sequence_config(void);
 extern void eventtrk_config(void);
 extern void event_config(void);
 
@@ -41,12 +41,12 @@ extern void seqstep_config(void);
 extern void seqplay_config(void);
 extern void seqrec_config(void);
 
-static void
-sequence_module_init(void)
+void
+sequence_config(void)
 {
   seqsym_config();
 
-  sequence_config();
+  _sequence_config();
   eventtrk_config();
   event_config();
 
@@ -59,5 +59,3 @@ sequence_module_init(void)
   seqplay_config();
   seqrec_config();
 }
-
-SEQUENCE_API fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};

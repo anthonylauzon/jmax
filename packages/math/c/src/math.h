@@ -38,4 +38,7 @@
 #define MATH_API extern
 #endif
 
+MATH_API void
+math_config(void);
+
 #endif /* _MATH_H */

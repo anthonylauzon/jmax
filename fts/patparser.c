@@ -58,7 +58,7 @@ fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
   fts_patlex_t *this;
   FILE *file;
 
-  file  = fopen(filename, "r");
+  file  = fopen(filename, "rb");
 
   if (file == 0)
     return 0;

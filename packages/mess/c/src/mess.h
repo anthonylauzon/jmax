@@ -38,4 +38,7 @@
 #define MESS_API extern
 #endif
 
+MESS_API void
+mess_config(void);
+
 #endif /* _MESS_H */

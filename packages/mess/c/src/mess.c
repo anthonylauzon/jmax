@@ -25,12 +25,10 @@
 extern void message_config(void);
 extern void messtab_config(void);
 
-static void
-mess_init(void)
+void
+mess_config(void)
 {
   message_config();
   messtab_config();
 }
-
-MESS_API fts_module_t mess_module = {"mess", "message classes", mess_init, 0, 0};
 

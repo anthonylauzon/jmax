@@ -17,17 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #ifndef _PT_OBJ_H_
 #define _PT_OBJ_H_
 
 #include <fts/fts.h>
+#include <utils.h>
 
 /* filter bands */
 #define pt_common_CHANNELS_PER_OCTAVE 24

@@ -28,11 +28,9 @@
 
 extern void binop_config(void);
 
-static void
-ispwmath_init(void)
+void
+ispwmath_config(void)
 {
   binop_config();
 }
-
-ISPWMATH_API fts_module_t ispwmath_module = {"ispwmath", "ISPW math classes", ispwmath_init, 0, 0};
 

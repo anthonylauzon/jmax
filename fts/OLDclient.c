@@ -25,14 +25,25 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+#if HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
+#if HAVE_NETDB_H
 #include <netdb.h>
+#endif
 #include <errno.h>
 #include <string.h>
 #if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+#if HAVE_WINDOWS_H
+#include <windows.h>
 #endif
 
 #include <fts/fts.h>
@@ -79,7 +90,11 @@ static void fts_client_parse_char( char c);
 typedef struct _oldclient_t {
   fts_object_t head;
   /* Socket */
+#ifdef WIN32
+  SOCKET socket;
+#else
   int socket;
+#endif
   struct sockaddr_in client_addr;
   /* Input */
   char input_buffer[UDP_PACKET_SIZE];
@@ -186,7 +201,25 @@ oldclient_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   oldclient_t *this = (oldclient_t *)o;
 
   fts_sched_remove( (fts_object_t *)this);
+
+#ifdef WIN32
+  if (this->socket != INVALID_SOCKET) {
+    int r;
+    char buf[1024];
+
+    /* call WSAAsyncSelect ??? */
+    shutdown(this->socket, 0x02);
+    while (1) {
+      r = recv(this->socket, buf, 1024, 0);
+      if ((r == 0) || (r == SOCKET_ERROR)) {
+	break;
+      }
+    }
+    closesocket(this->socket);
+  }
+#else
   close( this->socket);
+#endif
 }
 
 static fts_status_t oldclient_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)

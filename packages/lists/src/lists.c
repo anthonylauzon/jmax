@@ -39,8 +39,8 @@ extern void listreverse_config(void);
 extern void listsublist_config(void);
 extern void listtail_config(void);
 
-static void
-lists_module_init(void)
+void
+lists_config(void)
 {
   list_config();
   listarith_config();
@@ -53,5 +53,3 @@ lists_module_init(void)
   listsublist_config();
   listtail_config();
 }
-
-LISTS_API fts_module_t lists_module = {"lists", "basic list handling classes", lists_module_init, 0, 0};

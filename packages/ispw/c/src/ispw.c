@@ -17,11 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #include "ispw.h"
@@ -146,8 +141,8 @@ extern void sigsamphold_config(void);
 
 
 
-static void
-ispw_module_init(void)
+void
+ispw_config(void)
 {
   /* control init */
   ispw_naming_init();
@@ -275,7 +270,5 @@ ispw_module_init(void)
   sigsamphold_config();
 
 }
-
-ISPW_API fts_module_t ispw_module = {"ISPW", "ISPW classes", ispw_module_init, 0, 0};
 
 

@@ -38,4 +38,7 @@
 #define MIDI_API extern
 #endif
 
+MIDI_API void
+midi_config(void);
+
 #endif /* _MIDI_H */

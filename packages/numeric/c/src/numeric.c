@@ -29,12 +29,10 @@
 extern void wrap_config(void);
 extern void rewrap_config(void);
 
-static void
-numeric_init(void)
+void
+numeric_config(void)
 {
   wrap_config();
   rewrap_config();
 }
-
-NUMERIC_API fts_module_t numeric_module = {"numeric", "numeric classes", numeric_init, 0, 0};
 

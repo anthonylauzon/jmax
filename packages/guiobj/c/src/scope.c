@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
 fts_symbol_t scope_symbol = 0;
 fts_symbol_t sym_display = 0;

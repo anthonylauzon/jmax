@@ -5,7 +5,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -30,9 +32,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\errobj.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\patparser.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -41,6 +40,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\patparser.h"\
 	
 
 ..\fts\array.c : \
@@ -48,7 +50,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -88,7 +92,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -113,8 +119,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\oldftsdata.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -123,15 +127,18 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\oldftsdata.h"\
 	
 
 ..\fts\atomfile.c : \
-	"..\fts\config-win32.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -164,16 +171,19 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
 	
 
 ..\fts\audio.c : \
 	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
-	"..\fts\config-win32.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -198,7 +208,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\connection.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -207,6 +216,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\connection.h"\
 	
 
 ..\fts\autosave.c : \
@@ -214,7 +226,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -239,7 +253,49 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\saver.h"\
+	"..\include\fts\property.h"\
+	"..\include\fts\saver.h"\
+	"..\include\fts\sched.h"\
+	"..\include\fts\soundfile.h"\
+	"..\include\fts\status.h"\
+	"..\include\fts\symbol.h"\
+	"..\include\fts\variable.h"\
+	"..\include\fts\word.h"\
+	"..\include\ftsprivate\saver.h"\
+	
+
+..\fts\buffer.c : \
+	"..\include\fts\array.h"\
+	"..\include\fts\atom.h"\
+	"..\include\fts\atomfile.h"\
+	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
+	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
+	"..\include\fts\connection.h"\
+	"..\include\fts\doctor.h"\
+	"..\include\fts\dsp.h"\
+	"..\include\fts\errobj.h"\
+	"..\include\fts\expression.h"\
+	"..\include\fts\file.h"\
+	"..\include\fts\fpe.h"\
+	"..\include\fts\ftl.h"\
+	"..\include\fts\ftlmem.h"\
+	"..\include\fts\fts.h"\
+	"..\include\fts\hashtable.h"\
+	"..\include\fts\inout.h"\
+	"..\include\fts\iterator.h"\
+	"..\include\fts\mem.h"\
+	"..\include\fts\message.h"\
+	"..\include\fts\midi.h"\
+	"..\include\fts\midifile.h"\
+	"..\include\fts\object.h"\
+	"..\include\fts\objectlist.h"\
+	"..\include\fts\objectset.h"\
+	"..\include\fts\param.h"\
+	"..\include\fts\patcher.h"\
+	"..\include\fts\post.h"\
+	"..\include\fts\predefsymbols.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -250,12 +306,14 @@
 	"..\include\fts\word.h"\
 	
 
-..\fts\buffer.c : \
+..\fts\bytestream.c : \
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -295,7 +353,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -320,7 +380,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\class.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -329,15 +388,17 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\class.h"\
 	
 
 ..\fts\clipboard.c : \
-	"..\fts\config-win32.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -362,8 +423,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\loader.h"\
-	"..\include\fts\private\saver.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -372,6 +431,10 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\loader.h"\
+	"..\include\ftsprivate\saver.h"\
 	
 
 ..\fts\connection.c : \
@@ -379,7 +442,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -404,13 +469,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\class.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\errobj.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\objtable.h"\
-	"..\include\fts\private\oldclient.h"\
-	"..\include\fts\private\patcher.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -419,6 +477,13 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\objtable.h"\
+	"..\include\ftsprivate\oldclient.h"\
+	"..\include\ftsprivate\patcher.h"\
 	
 
 ..\fts\doctor.c : \
@@ -426,7 +491,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -466,7 +533,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -491,11 +560,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\audio.h"\
-	"..\include\fts\private\class.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\dspgraph.h"\
-	"..\include\fts\private\sigconn.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -504,6 +568,11 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\audio.h"\
+	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\dspgraph.h"\
+	"..\include\ftsprivate\sigconn.h"\
 	
 
 ..\fts\dspgraph.c : \
@@ -511,7 +580,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -536,10 +607,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\class.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\dspgraph.h"\
-	"..\include\fts\private\sigconn.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -548,6 +615,10 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\dspgraph.h"\
+	"..\include\ftsprivate\sigconn.h"\
 	
 
 ..\fts\errobj.c : \
@@ -555,7 +626,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -580,8 +653,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\patcher.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -590,6 +661,8 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\patcher.h"\
 	
 
 ..\fts\expression.c : \
@@ -597,7 +670,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -622,9 +697,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\expression.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\symbol.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -633,15 +705,19 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\expression.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\symbol.h"\
 	
 
 ..\fts\file.c : \
-	"..\fts\config-win32.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -674,6 +750,8 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
 	
 
 ..\fts\fpe.c : \
@@ -681,7 +759,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -706,7 +786,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\fpe.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -715,6 +794,7 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\fpe.h"\
 	
 
 ..\fts\ftl.c : \
@@ -722,7 +802,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -762,7 +844,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -802,7 +886,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -842,7 +928,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -882,7 +970,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -907,8 +997,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\inout.h"\
-	"..\include\fts\private\patcher.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -917,6 +1005,8 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\inout.h"\
+	"..\include\ftsprivate\patcher.h"\
 	
 
 ..\fts\loader.c : \
@@ -924,7 +1014,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -949,9 +1041,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\bmaxhdr.h"\
-	"..\include\fts\private\loader.h"\
-	"..\include\fts\private\vm.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -960,6 +1049,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\bmaxhdr.h"\
+	"..\include\ftsprivate\loader.h"\
+	"..\include\ftsprivate\vm.h"\
 	
 
 ..\fts\mem.c : \
@@ -967,7 +1059,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -992,7 +1086,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\platform.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1001,6 +1094,7 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\platform.h"\
 	
 
 ..\fts\message.c : \
@@ -1008,7 +1102,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1033,7 +1129,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\class.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1042,6 +1137,7 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\class.h"\
 	
 
 ..\fts\midi.c : \
@@ -1049,7 +1145,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1089,7 +1187,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1129,7 +1229,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1154,20 +1256,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\abstraction.h"\
-	"..\include\fts\private\class.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\doctor.h"\
-	"..\include\fts\private\errobj.h"\
-	"..\include\fts\private\expression.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\objtable.h"\
-	"..\include\fts\private\oldclient.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\property.h"\
-	"..\include\fts\private\template.h"\
-	"..\include\fts\private\variable.h"\
-	"..\include\fts\private\vm.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1176,6 +1264,20 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\abstraction.h"\
+	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\doctor.h"\
+	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\expression.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\objtable.h"\
+	"..\include\ftsprivate\oldclient.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\property.h"\
+	"..\include\ftsprivate\template.h"\
+	"..\include\ftsprivate\variable.h"\
+	"..\include\ftsprivate\vm.h"\
 	
 
 ..\fts\objectlist.c : \
@@ -1183,7 +1285,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1223,7 +1327,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1263,7 +1369,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1288,7 +1396,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\objtable.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1297,14 +1404,18 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\objtable.h"\
 	
 
 ..\fts\OLDclient.c : \
+	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1329,19 +1440,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\abstraction.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\errobj.h"\
-	"..\include\fts\private\loader.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\objtable.h"\
-	"..\include\fts\private\oldclient.h"\
-	"..\include\fts\private\oldftsdata.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\patparser.h"\
-	"..\include\fts\private\saver.h"\
-	"..\include\fts\private\symbol.h"\
-	"..\include\fts\private\template.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1350,6 +1448,21 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\abstraction.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\loader.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\objtable.h"\
+	"..\include\ftsprivate\oldclient.h"\
+	"..\include\ftsprivate\oldftsdata.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\patparser.h"\
+	"..\include\ftsprivate\saver.h"\
+	"..\include\ftsprivate\symbol.h"\
+	"..\include\ftsprivate\template.h"\
 	
 
 ..\fts\OLDftsdata.c : \
@@ -1357,7 +1470,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1382,8 +1497,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\oldclient.h"\
-	"..\include\fts\private\oldftsdata.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1392,6 +1505,8 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\oldclient.h"\
+	"..\include\ftsprivate\oldftsdata.h"\
 	
 
 ..\fts\OLDpatcherdata.c : \
@@ -1399,7 +1514,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1424,9 +1541,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\oldclient.h"\
-	"..\include\fts\private\oldftsdata.h"\
-	"..\include\fts\private\oldpatcherdata.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1435,6 +1549,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\oldclient.h"\
+	"..\include\ftsprivate\oldftsdata.h"\
+	"..\include\ftsprivate\oldpatcherdata.h"\
 	
 
 ..\fts\OLDucs.c : \
@@ -1442,7 +1559,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1467,9 +1586,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\oldclient.h"\
-	"..\include\fts\private\patparser.h"\
-	"..\include\fts\private\platform.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1478,6 +1594,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\oldclient.h"\
+	"..\include\ftsprivate\patparser.h"\
+	"..\include\ftsprivate\platform.h"\
 	
 
 ..\fts\param.c : \
@@ -1485,7 +1604,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1525,7 +1646,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1550,17 +1673,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\class.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\errobj.h"\
-	"..\include\fts\private\expression.h"\
-	"..\include\fts\private\inout.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\oldclient.h"\
-	"..\include\fts\private\oldpatcherdata.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\template.h"\
-	"..\include\fts\private\variable.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1569,6 +1681,17 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\class.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\expression.h"\
+	"..\include\ftsprivate\inout.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\oldclient.h"\
+	"..\include\ftsprivate\oldpatcherdata.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\template.h"\
+	"..\include\ftsprivate\variable.h"\
 	
 
 ..\fts\patparser.c : \
@@ -1576,7 +1699,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1601,9 +1726,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\patparser.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1612,6 +1734,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\patparser.h"\
 	
 
 ..\fts\post.c : \
@@ -1619,7 +1744,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1644,7 +1771,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\oldclient.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1653,6 +1779,7 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\oldclient.h"\
 	
 
 ..\fts\property.c : \
@@ -1660,7 +1787,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1700,7 +1829,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1725,12 +1856,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\bmaxhdr.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\selection.h"\
-	"..\include\fts\private\template.h"\
-	"..\include\fts\private\vm.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1739,6 +1864,14 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\bmaxhdr.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\selection.h"\
+	"..\include\ftsprivate\template.h"\
+	"..\include\ftsprivate\vm.h"\
 	
 
 ..\fts\sched.c : \
@@ -1747,7 +1880,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1780,6 +1915,8 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
 	
 
 ..\fts\selection.c : \
@@ -1787,7 +1924,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1812,7 +1951,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\selection.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1821,6 +1959,7 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\selection.h"\
 	
 
 ..\fts\sigconn.c : \
@@ -1828,7 +1967,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1853,8 +1994,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\sigconn.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1863,6 +2002,8 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\sigconn.h"\
 	
 
 ..\fts\soundfile.c : \
@@ -1870,7 +2011,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1910,7 +2053,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1946,12 +2091,13 @@
 	
 
 ..\fts\srconv.c : \
-	"..\fts\config-win32.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -1976,7 +2122,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\srconv.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -1985,6 +2130,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\srconv.h"\
 	
 
 ..\fts\symbol.c : \
@@ -1992,7 +2140,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -2028,12 +2178,13 @@
 	
 
 ..\fts\template.c : \
-	"..\fts\config-win32.h"\
 	"..\include\fts\array.h"\
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -2058,11 +2209,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\errobj.h"\
-	"..\include\fts\private\loader.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\vm.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -2071,6 +2217,13 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsconfig-win32.h"\
+	"..\include\ftsconfig.h"\
+	"..\include\ftsprivate\errobj.h"\
+	"..\include\ftsprivate\loader.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\vm.h"\
 	
 
 ..\fts\time.c : \
@@ -2078,7 +2231,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -2118,7 +2273,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -2143,9 +2300,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\object.h"\
-	"..\include\fts\private\patcher.h"\
-	"..\include\fts\private\variable.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -2154,6 +2308,9 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\object.h"\
+	"..\include\ftsprivate\patcher.h"\
+	"..\include\ftsprivate\variable.h"\
 	
 
 ..\fts\vm.c : \
@@ -2161,7 +2318,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\
@@ -2186,9 +2345,6 @@
 	"..\include\fts\patcher.h"\
 	"..\include\fts\post.h"\
 	"..\include\fts\predefsymbols.h"\
-	"..\include\fts\private\connection.h"\
-	"..\include\fts\private\expression.h"\
-	"..\include\fts\private\vm.h"\
 	"..\include\fts\property.h"\
 	"..\include\fts\saver.h"\
 	"..\include\fts\sched.h"\
@@ -2197,9 +2353,12 @@
 	"..\include\fts\symbol.h"\
 	"..\include\fts\variable.h"\
 	"..\include\fts\word.h"\
+	"..\include\ftsprivate\connection.h"\
+	"..\include\ftsprivate\expression.h"\
+	"..\include\ftsprivate\vm.h"\
 	
 
 ..\fts\win32.c : \
 	"..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
-	"..\fts\config-win32.h"\
+	"..\include\ftsconfig-win32.h"\
 	

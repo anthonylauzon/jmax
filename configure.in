@@ -44,7 +44,7 @@ AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_HAVE_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h)
+AC_HAVE_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h arpa/inet.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

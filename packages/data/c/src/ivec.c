@@ -25,6 +25,7 @@
  */
 
 #include <fts/fts.h>
+#include <utils.h>
 #include "ivec.h"
 
 #include <stdlib.h>

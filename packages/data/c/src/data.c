@@ -44,8 +44,8 @@ extern void copy_config(void);
 
 extern void bpf_config(void);
 
-static void
-data_init(void)
+DATA_API void
+data_config(void)
 {
   value_config();
 
@@ -66,4 +66,3 @@ data_init(void)
   bpf_config();
 }
 
-DATA_API fts_module_t data_module = {"data", "data structures", data_init, 0, 0};

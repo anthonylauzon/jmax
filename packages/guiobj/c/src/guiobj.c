@@ -42,8 +42,8 @@ extern void display_config(void);
 extern void vecdisplay_config(void);
 extern void scope_config(void);
 
-static void
-fts_guiobj_init(void)
+void
+guiobj_config(void)
 {
   toggle_config();
   messconst_config();
@@ -61,5 +61,3 @@ fts_guiobj_init(void)
   vecdisplay_config();
   scope_config();
 }
-
-GUIOBJ_API fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init, 0, 0};

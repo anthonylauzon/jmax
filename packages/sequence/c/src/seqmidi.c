@@ -26,6 +26,10 @@
 #include <ctype.h>
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 #include "seqsym.h"
 #include "sequence.h"
 #include "track.h"

@@ -117,6 +117,10 @@ SOURCE=..\fts\buffer.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\bytestream.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\class.c
 # End Source File
 # Begin Source File

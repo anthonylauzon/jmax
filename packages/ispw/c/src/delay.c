@@ -17,11 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Miller Puckette.
- *
  */
 
 /* delay class: delay a bang for a given amount of time. */
@@ -128,8 +123,7 @@ delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   a[0] = fts_s_float;
   fts_method_define(cl, 1, fts_s_float, delay_number_1, 1, a);
-
-  /* Type the outlet */
+/* Type the outlet */
 
   fts_outlet_type_define(cl, 0,	fts_s_bang, 0, 0);
 

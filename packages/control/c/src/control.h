@@ -38,4 +38,7 @@
 #define CONTROL_API extern
 #endif
 
+CONTROL_API void
+control_config(void);
+
 #endif /* _CONTROL_H */

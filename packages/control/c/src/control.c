@@ -33,8 +33,8 @@ extern void for_config(void);
 extern void count_config(void);
 extern void range_config(void);
 
-static void
-control_init(void)
+void
+control_config(void)
 {
   switch_config();
   oneshot_config();
@@ -43,5 +43,3 @@ control_init(void)
   count_config();
   range_config();
 }
-
-CONTROL_API fts_module_t control_module = {"control", "control classes", control_init, 0, 0};

@@ -5,7 +5,9 @@
 	"..\include\fts\atom.h"\
 	"..\include\fts\atomfile.h"\
 	"..\include\fts\audio.h"\
+	"..\include\fts\bytestream.h"\
 	"..\include\fts\class.h"\
+	"..\include\fts\client.h"\
 	"..\include\fts\connection.h"\
 	"..\include\fts\doctor.h"\
 	"..\include\fts\dsp.h"\

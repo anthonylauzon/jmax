@@ -38,4 +38,7 @@
 #define LISTS_API extern
 #endif
 
+LISTS_API void
+lists_config(void);
+
 #endif /* _LISTS_H */
