@@ -420,6 +420,11 @@ public class ConfigPackagePanel extends JPanel implements Editor
     revalidate();
   }
 
+    public void setErrorAt(int index)
+    {
+	requiresModel.setErrorAt(index);
+    }
+
   void chooseAndAddPath( DefaultListModel model, String message, int index)
   {
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -549,7 +554,8 @@ public class ConfigPackagePanel extends JPanel implements Editor
 
     public boolean isCellEditable(int row, int col)
     {
-      return (col == 0);
+	// only row, col==1  with error are editable 
+ 	return ((col == 0) || (getValueAt(row, col) == Boolean.FALSE));
     }
 
     public String getColumnName(int col)
@@ -645,10 +651,18 @@ public class ConfigPackagePanel extends JPanel implements Editor
     
       if( ftsPackage != null)
 	{
-	  if(( col==0) && ( data[row][0] != null))
-	    ftsPackage.set( "require", getRequires());
+	    if ( data[row][0] != null)
+		ftsPackage.set( "require", getRequires());
 	}
     }
+
+      public void setErrorAt(int row)
+      {
+	  if (row > size)
+	      return;
+	  data[row][1] = Boolean.FALSE;
+	  fireTableCellUpdated(row, 1);
+      }
 
     public String[] getRequires() 
     { 
