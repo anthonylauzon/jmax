@@ -1,3 +1,20 @@
+2004-02-18  Diemo Schwarz  <schwarz@ircam.fr>
+
+	* package data: 
+	  - dict set message now has same semantics as init arguments:
+	    store list of key-value pairs
+	  - all user(!) methods that change the dict call 
+	    data_object_set_dirty
+	    -> don't use user method dict_clean but dict_remove_all
+
+	* jmax/include/fts/predefsymbols.h:
+	  - (re)changed system dump message to _dump to free this symbol 
+	    for jmax-sdif.
+
+	* jmax/fts/tuple.c:
+	  - Adding a size (user) method for tuple (read-only).
+
+	
 2004-02-13  Alexandre Pages  <Alexandre.Pages@ircam.fr>
 
 	* packages/control/c/src/sync.c: raised the maximum inlet number to 32	
