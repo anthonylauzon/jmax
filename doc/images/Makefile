@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR=..
+JMAXDISTDIR=../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 install:
