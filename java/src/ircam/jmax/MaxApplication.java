@@ -591,13 +591,6 @@ public class MaxApplication extends Object
 
     static MaxApplication itsMaxApplication = new MaxApplication();
 
-    /** Returns the script menu for a given document type, or null if
-     *  non is avaible. */
-    public static Menu getScriptMenu(String type)
-    {
-	return itsInterp.getScriptMenu(type);	
-    }
-
     /** Retreive application property */
 
     public String getSystemProperty(String name) 

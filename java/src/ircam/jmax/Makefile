@@ -36,6 +36,7 @@ all: local_all
 	(cd toolkit ; $(MAKE) all)
 	(cd utils ; $(MAKE) all)
 	(cd widgets ; $(MAKE) all)
+	(cd dialogs ; $(MAKE) all)
 .PHONY: all
 
 local_all: MaxVersion.java $(CLASSES) 
