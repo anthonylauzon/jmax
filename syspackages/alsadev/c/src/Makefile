@@ -31,6 +31,8 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
+MORESOLIBS=-lasound
+
 PACKAGELIB=$(LIBDIR)/libalsadev.so
 
 all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
