@@ -316,8 +316,9 @@ macosxaudioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int 
 {  
   int dummy = 0;
   
-  if (!fts_sched_is_running)
+  if (!fts_sched_is_running())
   {
+    fts_log("try  to restart FTS scheduler main\n");
     /* restart FTS scheduler */
     write(sched_pipe_des[1], &dummy, sizeof(int));
     /* @@@@@ delete audio port  @@@@ */
@@ -371,7 +372,7 @@ static void macosxaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, 
       return;
     }
 
-  fts_sched_running_remove_listener(o, macosxaudioport_sched_listener);
+  fts_sched_running_remove_listener(o);
 }
 
 static void macosxaudioport_instantiate(fts_class_t *cl)
