@@ -87,6 +87,7 @@ FTS_API void fts_spost_complex(fts_bytestream_t *stream, double re, double im);
  * @param obj the object to print
  * @ingroup post
  */
+FTS_API void fts_spost_object( fts_bytestream_t *stream, fts_object_t *obj);
 FTS_API void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj);
 FTS_API void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t *at);
 
