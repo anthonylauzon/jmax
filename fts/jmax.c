@@ -50,7 +50,7 @@ static void jmax_get_default_jvm(char* buffer, int size);
 static void jmax_append_jvm(char* path);
 static void jmax_free_available_jvm(void);
 static char* jmax_get_jvm(int i);
-static char* jmax_get_classpath(char* path);
+static char* jmax_get_classpath();
 static int jmax_log(const char *format, ...);
 jint JNICALL jmax_vfprintf(FILE *fp, const char *format, va_list args);
 
@@ -144,7 +144,8 @@ int jmax_run(int argc, char** argv)
   vm_args_v12.nOptions = 2;
   vm_args_v12.ignoreUnrecognized = TRUE;
 
-  snprintf(classpath_v12, 2048, "-Djava.class.path=%s", jmax_get_classpath("dummy"));
+  jmax_log("classpath=%s\n", jmax_get_classpath());
+  snprintf(classpath_v12, 2048, "-Djava.class.path=%s", jmax_get_classpath());
 
   options[0].optionString = classpath_v12;
   options[1].optionString = "vfprintf";
@@ -197,7 +198,7 @@ int jmax_run(int argc, char** argv)
 } 
 
 static char* 
-jmax_get_classpath(char* path)
+jmax_get_classpath()
 {
   char* root;
 
@@ -210,13 +211,12 @@ jmax_get_classpath(char* path)
     return NULL;
   }
 
-  jmax_classpath = (char*) malloc(strlen(path) + 1 + 3 * (strlen(root) + 24));
+  jmax_classpath = (char*) malloc(3 * (strlen(root) + 32));
   if (jmax_classpath == NULL) {
     return NULL;
   }
 
-  sprintf(jmax_classpath, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s", 
-	  path, PATH_SEPARATOR,
+  sprintf(jmax_classpath, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s", 
 	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "jmax.jar", PATH_SEPARATOR,
 	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "jacl.jar", PATH_SEPARATOR,
 	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "tcljava.jar");

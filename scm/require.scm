@@ -46,3 +46,5 @@
 
 ; I/O package
 (require-package "io" "0.0.0")
+
+(require-package "dtd" "0.0.0")

@@ -155,7 +155,7 @@ fts_project_open(const char* filename)
     project = fts_project_new(fts_s_project);
     project->package.state = fts_package_corrupt;
 
-#if 1
+#if 0
     /* FIXME bootstrapping code to create the first project (ever!)  */
     fts_package_require_package((fts_package_t*) project, fts_new_symbol("utils"));
     fts_package_require_package((fts_package_t*) project, fts_new_symbol("system"));

@@ -288,16 +288,22 @@ dsaudioport_enum_callback(LPGUID guid, LPCSTR description,
 {
   dsaudioport_t *dev = (dsaudioport_t *) context;
 
-  fts_log("[dsaudioport]: audio device \"%s\"\n", description);
+  if (description != NULL) {
+    fts_log("[dsaudioport]: audio device \"%s\"\n", description);
 
-  if ((dev->device != NULL) && (strcmp(fts_symbol_name(dev->device), description) == 0)) {
-    fts_log("[dsaudioport]: found default audio device\n");
-    dev->guid = guid;
+    if ((dev->device != NULL) && (strcmp(fts_symbol_name(dev->device), description) == 0)) {
+      fts_log("[dsaudioport]: found default audio device\n");
+      dev->guid = guid;
+    }
   }
 
   if ((dev->device == fts_s_default) && (dev->guid == NULL)) {
     dev->guid = guid;
-    dev->device = fts_new_symbol_copy(description);
+    if (description != NULL) {
+      dev->device = fts_new_symbol_copy(description);
+    } else {
+      dev->device = fts_new_symbol_copy("device without a name");
+    }
   }
 
   return 1;
@@ -445,9 +451,9 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     hr = IDirectSound_GetCaps(dev->direct_sound, &caps);
     if (hr == DS_OK) {
       if (caps.dwFlags & DSCAPS_EMULDRIVER) {
-	fts_log("[dsdev]: The audio driver runs in emulated mode. Just thought I'd let you know.\n");
+	fts_log("[dsdev]: The DirectSound driver runs in emulated mode (MME)\n");
       } else {
-	fts_log("[dsdev]: Cool, you have a native DirectSound driver installed\n");
+	fts_log("[dsdev]: You have a native DirectSound driver installed\n");
       }
     }
 
