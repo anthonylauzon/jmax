@@ -70,7 +70,7 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
   /**
    * called by the selecter UI module at mouseUp.
    */
-  public void selectionChoosen(int x, int y, int w, int h) 
+  public void selectionChoosen(int x, int y, int w, int h, int modifiers) 
   {
     TableAdapter a = getGc().getAdapter();
 

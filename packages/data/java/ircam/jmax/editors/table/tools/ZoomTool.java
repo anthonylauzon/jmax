@@ -153,7 +153,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
    * GraphicSelectionListener interface
    */
   public void selectionPointChoosen(int x, int y, int modifiers){}
-  public void selectionChoosen(int x, int y, int w, int h) 
+  public void selectionChoosen(int x, int y, int w, int h, int modifiers) 
   {
     if( w != 0)
     {

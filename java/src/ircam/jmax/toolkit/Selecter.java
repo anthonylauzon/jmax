@@ -101,7 +101,7 @@ public class Selecter extends InteractionModule implements XORPainter {
     tempRect.setBounds(startSelection.x, startSelection.y, x-startSelection.x, y-startSelection.y);
     normalizeRectangle(tempRect);
         
-    itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+    itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height, e.getModifiers());
     active = false;
     itsRunningG.dispose();
     InteractionSemaphore.unlock();

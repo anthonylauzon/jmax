@@ -96,7 +96,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   /**
    * called by the selecter UI module
    */
-  public void selectionChoosen(int x, int y, int w, int h) 
+  public void selectionChoosen(int x, int y, int w, int h, int modifiers) 
   {
     if (w ==0) w=1;// at least 1 pixel wide
     if (h==0) h=1;

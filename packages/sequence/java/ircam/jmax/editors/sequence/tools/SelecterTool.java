@@ -150,7 +150,7 @@ public void selectionPointDoubleClicked(int x, int y, int modifiers)
 /**
 * called by the selecter UI module
  */
-public void selectionChoosen(int x, int y, int w, int h) 
+public void selectionChoosen(int x, int y, int w, int h, int modifiers) 
 {
 	if(((SequenceGraphicContext)gc).getDataModel().isLocked()) return;
 	
@@ -159,20 +159,24 @@ public void selectionChoosen(int x, int y, int w, int h)
 	if (w ==0) w=1;// at least 1 pixel wide
 	if (h==0) h=1;
 			
-	selectArea(x, y, w, h);
+	selectArea(x, y, w, h, modifiers);
 			
 	multipleObjectSelected();
 }
 
 /**
-* Selects all the objects in a given rectangle
+ * Selects all the objects in a given rectangle: with ALT pressed select markers only;
+ * else notes only;
  */
-void selectArea(int x, int y, int w, int h) 
+void selectArea(int x, int y, int w, int h, int modifiers) 
 { 
 	SequenceGraphicContext egc = (SequenceGraphicContext)gc;
-	selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
-	if( egc.getMarkersSelection() != null)
-		egc.getMarkersSelection().select( ((AbstractTrackRenderer)egc.getRenderManager()).markersIntersecting(x, y, w, h));
+	
+	if((modifiers & MouseEvent.ALT_MASK) == 0)
+		selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
+	else
+		if( egc.getMarkersSelection() != null)
+			egc.getMarkersSelection().select( ((AbstractTrackRenderer)egc.getRenderManager()).markersIntersecting(x, y, w, h));
 }
 
 
