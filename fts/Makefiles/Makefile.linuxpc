@@ -7,30 +7,30 @@
 VENDOR := gnu
 AUDIO_LIBRARY := oss
 OS_TYPE := unix
-#CC := gcc
-#LD := gcc
-CC := pgcc
-LD := pgcc
+CC := gcc
+LD := gcc
+#CC := pgcc
+#LD := pgcc
 
-#ARCH_CFLAGS := -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
-#ARCH_LDFLAGS := -rdynamic  
-#LD_ALL_FLAG := --whole-archive
-#LD_NONE_FLAG := --no-whole-archive
-#CC_ALL_FLAG := -Xlinker --whole-archive
-#CC_NONE_FLAG := -Xlinker --no-whole-archive
+ARCH_CFLAGS := -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
+ARCH_LDFLAGS := -rdynamic  
+LD_ALL_FLAG := --whole-archive
+LD_NONE_FLAG := --no-whole-archive
+CC_ALL_FLAG := -Xlinker --whole-archive
+CC_NONE_FLAG := -Xlinker --no-whole-archive
 
-ARCH_CFLAGS := -DLINUX -DLINUXPC
+#ARCH_CFLAGS := -DLINUX -DLINUXPC
 
 # Pentium gcc special options; you need the compiler on linotte do use this !!!
-#ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-loops
-#ARCH_OPT_CFLAGS := -O6 -mpentiumpro 
+#ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
+ARCH_OPT_CFLAGS := -O0
 #ARCH_OPT_CFLAGS := -O6 -mpentium
-ARCH_OPT_CFLAGS := -O2 -Munroll
+#ARCH_OPT_CFLAGS := -v -O2 -Munroll -tp p6 -Mnoframe  -Muchar -pc 64 
 
+#ARCH_OPT_LDFLAGS := -v
 ARCH_OPT_LDFLAGS := 
 
-#FTS_SYS_LIBS = -lm -ldl
-FTS_SYS_LIBS = -lm /lib/libdl.so
+FTS_SYS_LIBS = -lm -ldl
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 
