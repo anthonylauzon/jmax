@@ -72,6 +72,7 @@ public class ErmesConnection {
   public Vector GetVSegmentList() {return itsVSegmentList;}
   public Vector GetPointList() {return itsPoints;}
   public Point GetStartPoint() {return itsStartPoint;}
+  public Point GetEndPoint() {return itsEndPoint;}
   public ErmesSketchPad GetSketchPad(){return itsSketchPad;}
   public boolean GetErrorState() {return itsErrorState;}
   public ErmesConnectionSet GetConnectionSet() {return (itsConnectionSet);}
