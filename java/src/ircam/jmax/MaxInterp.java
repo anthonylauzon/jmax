@@ -20,7 +20,7 @@ public class MaxInterp extends Interp {
 		super(args, con);
 	}
   
-  ErmesObject getErmesObject(int id) {
+  public ErmesObject getErmesObject(int id) {
 	  ErmesObject aObject= null;
 	  
 	  if (MaxApplication.getApplication().itsSketchWindow == null) return null;

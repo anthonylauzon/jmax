@@ -22,6 +22,7 @@ import java.lang.*;
 import java.io.*;
 import java.util.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.ermes.*;
 
 

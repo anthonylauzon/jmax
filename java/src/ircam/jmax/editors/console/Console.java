@@ -7,7 +7,7 @@ import java.util.*;
   The (new) TCL console, integrated with the jmax window.
   This class is essentially a thread that opens a window,
   puts a text area into it, and starts the interaction with the user.
-  This console also provide a PrintStream, to be used by other parts
+  This console also provides a PrintWriter, to be used by other parts
   of the system (es. FTS)
   */
 
@@ -131,6 +131,9 @@ public class Console extends Thread implements MaxWindow{
   
   //----------- implementation of the MaxWindow interface -----------//
   
+  /**
+   *"deprecated"
+   */
   public MaxDocument GetDocument(){
     return null;
   }

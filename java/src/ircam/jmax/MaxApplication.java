@@ -124,7 +124,7 @@ public class MaxApplication extends Object {
     ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage(itsInterp);
 
     itsConsole = new Console(itsInterp, 40, 40);//e.m.
-    itsConsole.getFrame().resize(150, 300);//e.m.
+    itsConsole.getFrame().pack()/*resize(200, 300)*/;//e.m.
     itsConsole.start();
     itsConsole.getFrame().setVisible(true);
     itsPrintWriter = itsConsole.getPrintWriter();
