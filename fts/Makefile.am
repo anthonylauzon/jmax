@@ -53,7 +53,6 @@ pipestream.c \
 post.c \
 preset.c \
 project.c \
-property.c \
 sched.c \
 selection.c \
 sigconn.c \
