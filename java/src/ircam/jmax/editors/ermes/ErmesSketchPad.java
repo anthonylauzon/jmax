@@ -8,6 +8,7 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
+import ircam.jmax.*;//this is going to desappear
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
@@ -1119,6 +1120,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     //(opt.) resetting the "firstclick" flag if safer but heavy 
     //(a repaint foreach mouseup...)
     //itsFirstClick = true;
+    MaxApplication.itsSketchWindow = itsSketchWindow;
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode) {
