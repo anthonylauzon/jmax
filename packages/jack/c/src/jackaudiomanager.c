@@ -990,7 +990,7 @@ void jackaudiomanager_config( void)
   if (-1 == create_jack_manager_client())
   {
     fts_log("[jackaudiomanager] cannot connect to jack server, so no jackaudioport available \n");
-    post("[jackaudiomanager] cannot connect to jack server, so no jackaudiopoprt available \n");
+    post("[jackaudiomanager] cannot connect to jack server, so no jackaudioport available \n");
     return;
   }
 
