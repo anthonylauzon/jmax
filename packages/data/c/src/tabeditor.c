@@ -365,6 +365,8 @@ tabeditor_paste_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
   
       if(this->zoom < 0.5) tabeditor_send_pixels( this);
       tabeditor_send_visibles( this);
+    
+      data_object_set_dirty( this->vec);
     }  
 }
 
@@ -401,6 +403,8 @@ tabeditor_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
   
       if( this->zoom < 0.5) tabeditor_send_pixels( this);
       tabeditor_send_visibles(this);
+    
+      data_object_set_dirty( this->vec);
     }
 }
 
@@ -426,6 +430,8 @@ tabeditor_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 	  
 	  if( ivec_editor_is_open( (ivec_t *)this->vec))
 	    tabeditor_insert_append( this, onset, ac, at);
+	
+	  data_object_set_dirty( this->vec);
 	}
     }
 }

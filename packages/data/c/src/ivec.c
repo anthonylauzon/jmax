@@ -303,6 +303,8 @@ ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if( ivec_editor_is_open( this))
     tabeditor_send( (tabeditor_t *)this->editor);
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -321,6 +323,8 @@ ivec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  
 	  if(ivec_editor_is_open( this))
 	    tabeditor_insert_append( (tabeditor_t *)this->editor, onset, ac, at);
+	
+	  data_object_set_dirty( o);
 	}
     }
 }
@@ -340,7 +344,8 @@ ivec_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       ptr[i] = ptr[j];
       ptr[j] = f;
     }
-  
+
+  data_object_set_dirty( o);
 }
 
 static int 
@@ -359,6 +364,8 @@ ivec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   int *ptr = ivec_get_ptr(this);
 
   qsort((void *)ptr, ivec_get_size(this), sizeof(int), ivec_element_compare);
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -380,6 +387,8 @@ ivec_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       range -= 1.0;
     }
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -461,6 +470,8 @@ ivec_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 		}
 	    }
 	}
+
+      data_object_set_dirty( o);
     }
 }
 
@@ -527,6 +538,8 @@ ivec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   
       if( ivec_editor_is_open(this))
 	fts_client_send_message( this->editor, fts_s_size, ac, at);
+
+      data_object_set_dirty( o);
     }
 }
 
@@ -551,7 +564,9 @@ ivec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       
       if(size <= 0)
 	post("ivec: can't import from text file \"%s\"\n", file_name);
-    }
+      else
+	data_object_set_dirty( o);
+   }
   else
     post("ivec: unknown import file format \"%s\"\n", file_format);
 }
@@ -660,6 +675,8 @@ ivec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   ivec_t *set = (ivec_t *)fts_get_object(at);
 
   ivec_copy(set, this);
+
+  data_object_set_dirty( o);
 }
 
 static void
@@ -863,3 +880,8 @@ ivec_config(void)
 
   ivec_type = fts_class_install(ivec_symbol, ivec_instantiate);
 }
+
+
+
+
+
