@@ -24,7 +24,7 @@ import com.sun.java.swing.*;
  * It handles all the sketch menus, it knows how to load from a fospatcher.
  */
 
-public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler {
+public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler, ComponentListener{
 
   public void propertyChanged(FtsObject object, String name, Object value)
   {
@@ -64,6 +64,22 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     if (!pasting) itsSketchPad.paintDirtyList();
   }
 
+  public void componentResized(ComponentEvent e) {
+    if (itsPatcher == null) System.err.println("internal warning: patcher resized while FtsPatcher is null");     
+    else {
+      itsPatcher.put("ww", getSize().width);
+      itsPatcher.put("wh", getSize().height);
+    }
+  }
+  public void componentMoved(ComponentEvent e) {
+    if (itsPatcher == null) System.err.println("internal warning: patcher moved while FtsPatcher is null");    
+    else {
+      itsPatcher.put("wx", getLocation().x);
+      itsPatcher.put("wy", getLocation().y);
+    }
+  }
+  public void componentShown(ComponentEvent e) {}
+  public void componentHidden(ComponentEvent e){}
   
   FtsSelection itsSelection;
   Vector ftsObjectsPasted = new Vector();
@@ -130,7 +146,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public void syncData()
   {
-    CreateFtsGraphics(this);
+    //2705 CreateFtsGraphics(this);
   }
 
   /** Tell the editor the data has changed; it pass a sigle Java
@@ -174,6 +190,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
     itsPatcher.watch("ins", this);
     itsPatcher.watch("outs", this);
+    addComponentListener(this);
   }
 
   // For the MaxDataEditor interface
@@ -317,7 +334,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     Cursor temp = getCursor();
 
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    CreateFtsGraphics(this);
+    //2705 CreateFtsGraphics(this);
     itsSketchPad.ftsClipboard.copy(Fts.getSelection());
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     itsSketchPad.itsHelper.DeleteSelected();
@@ -329,7 +346,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     Cursor temp = getCursor();
 
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    CreateFtsGraphics(this);
+    //2705 CreateFtsGraphics(this);
     itsSketchPad.ftsClipboard.copy(Fts.getSelection());
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     setCursor(temp);
@@ -359,10 +376,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsPatcher.removeWatch("newConnection", this);    
     pasting = false;
     // make the sketch do the graphic job
-    itsSketchPad.PasteObjects(ftsObjectsPasted, ftsConnectionsPasted);
-    ErmesSketchPad.RequestOffScreen(itsSketchPad);
-    itsSketchPad.repaint();
-
+    if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty()) {
+      itsSketchPad.PasteObjects(ftsObjectsPasted, ftsConnectionsPasted);
+      ErmesSketchPad.RequestOffScreen(itsSketchPad);
+      itsSketchPad.repaint();
+    }
     setCursor(temp);
   }
 
@@ -799,7 +817,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     setVisible(false);
     setTitle(itsDocument.getDocumentFile().toString()); 
     setVisible(true);
-    CreateFtsGraphics(this);
+    //2705 CreateFtsGraphics(this);
 
     try
       {
@@ -1102,52 +1120,44 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       return preferredsize;
   }
 
-  public void CreateFtsGraphics(ErmesSketchWindow theSketchWindow)
-  {
+  /*2705 public void CreateFtsGraphics(ErmesSketchWindow theSketchWindow)
+    {
     //create the graphic descriptions for the FtsObjects, before saving them
     ErmesObject aErmesObject = null;
     FtsObject aFObject = null;
     Rectangle aRect = theSketchWindow.getBounds();
     Rectangle aRect1 = theSketchWindow.getContentPane().getBounds();//e.m.1103
-      //String ermesInfo = new String();
-    
-    /*System.err.println("sketchW: "+getBounds());
-      System.err.println("sketchW.contentPane: "+getContentPane().getBounds());*/
+    //String ermesInfo = new String();
     theSketchWindow.itsPatcher.put("wx", aRect.x);
     theSketchWindow.itsPatcher.put("wy", aRect.y);
     theSketchWindow.itsPatcher.put("ww", aRect.width-horizontalOffset());//e.m.1103
     theSketchWindow.itsPatcher.put("wh", aRect.height-verticalOffset());//e.m.1103
-
-    /*if (theSketchWindow.itsSketchPad.doAutorouting) theSketchWindow.itsPatcher.put("autorouting", "on");
-    else theSketchWindow.itsPatcher.put("autorouting", "off");*/
-
-    for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-      aErmesObject = (ErmesObject) e.nextElement();
-      aFObject = aErmesObject.itsFtsObject;
-      if (aFObject == null) continue; //security check!           
-      // Set geometrical properties
       
-      aFObject.put("x", aErmesObject.getItsX());
-      aFObject.put("y", aErmesObject.getItsY());
-      aFObject.put("w", aErmesObject.getItsWidth());
-      aFObject.put("h", aErmesObject.getItsHeight());
-
-      // Set the font properties
-      if (!aErmesObject.getFont().getName().equals(theSketchWindow.itsSketchPad.sketchFont.getName()))
-	aFObject.put("font", aErmesObject.getFont().getName());
-
-      if (aErmesObject.getFont().getSize() != theSketchWindow.itsSketchPad.sketchFont.getSize())
-	aFObject.put("fs", aErmesObject.getFont().getSize());
-
-      /*#@!if(aErmesObject.itsResized) aFObject.put("resized", "on");
-      else aFObject.put("resized", "off");*/
+    for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
+    aErmesObject = (ErmesObject) e.nextElement();
+    aFObject = aErmesObject.itsFtsObject;
+    if (aFObject == null) continue; //security check!           
+    // Set geometrical properties
+    
+    aFObject.put("x", aErmesObject.getItsX());
+    aFObject.put("y", aErmesObject.getItsY());
+    aFObject.put("w", aErmesObject.getItsWidth());
+    aFObject.put("h", aErmesObject.getItsHeight());
+    
+    // Set the font properties
+    if (!aErmesObject.getFont().getName().equals(theSketchWindow.itsSketchPad.sketchFont.getName()))
+    aFObject.put("font", aErmesObject.getFont().getName());
+    
+    if (aErmesObject.getFont().getSize() != theSketchWindow.itsSketchPad.sketchFont.getSize())
+      aFObject.put("fs", aErmesObject.getFont().getSize());
+      
+      
       // if (aErmesObject.itsJustification != itsSketchPad.itsJustificationMode)
       //aFObject.put("jsf", aErmesObject.itsJustification);
       //moved to putOtherProperties
-
+      
       aErmesObject.putOtherProperties(aFObject);
-    }
-  }
+      }*/
 }
 
 

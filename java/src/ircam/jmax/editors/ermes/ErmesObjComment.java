@@ -9,7 +9,7 @@ import ircam.jmax.fts.*;
  * The "comment" graphic object
  */
 class ErmesObjComment extends ErmesObject {
-  Dimension preferredSize = null;	
+  Dimension preferredSize = new Dimension(100, 100); //hu-hu	
   String itsArgs = " ";
   Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
@@ -22,33 +22,24 @@ class ErmesObjComment extends ErmesObject {
   }
 	
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    itsSketchPad = theSketchPad;
-    setFont(theSketchPad.sketchFont);			
-    itsFontMetrics = theSketchPad.getFontMetrics(getFont());
-    setItsX(x); setItsY(y);
-    if (!theString.equals("")) {//we have arguments (are you creating me from a script?)
-      itsArgs = theString;
-      preferredSize = new Dimension(70, itsFontMetrics.getHeight()*5);
-      super.Init(theSketchPad, x, y, theString);
-      return true;
-    }
-    itsFontMetrics = itsSketchPad.GetTextArea().getFontMetrics(getFont());
+    super.Init(theSketchPad, x, y, theString);
+
     FIELD_HEIGHT = itsFontMetrics.getHeight();
     preferredSize = new Dimension(70,FIELD_HEIGHT*5);
+
     itsSketchPad.GetTextArea().setFont(getFont());
     itsSketchPad.GetTextArea().setBackground(Color.white);
     itsSketchPad.GetTextArea().setText("");
-    itsJustification = itsSketchPad.itsJustificationMode;
+    setJustification(itsSketchPad.itsJustificationMode);
     
     itsSketchPad.GetTextArea().itsOwner = this; //redirect the only editable field to point here...
     makeCurrentRect(x, y);
-        
+    
     itsSketchPad.GetTextArea().setBounds(getItsX(),getItsY(),getItsWidth(),getItsHeight());
     itsSketchPad.validate();
     itsSketchPad.editStatus = itsSketchPad.EDITING_COMMENT;
     itsSketchPad.GetTextArea().setVisible(true);
     itsSketchPad.GetTextArea().requestFocus();
-    itsFtsPatcher = itsSketchPad.GetSketchWindow().itsPatcher;
     return true;
   }
 
@@ -64,8 +55,8 @@ class ErmesObjComment extends ErmesObject {
     super.Init(theSketchPad,  theFtsObject);
     
     Integer aJustification = (Integer)theFtsObject.get("jsf");
-    if(aJustification == null) itsJustification = itsSketchPad.itsJustificationMode;
-      else itsJustification = aJustification.intValue();
+    if(aJustification == null) setJustification(itsSketchPad.itsJustificationMode);
+      else setJustification(aJustification.intValue());
 
     itsSketchPad.GetTextArea().setBackground(Color.white);
     
@@ -138,13 +129,10 @@ class ErmesObjComment extends ErmesObject {
   }
 
   
-  void ResizeToNewFont(Font theFont) {
-    //#@!if(!itsResized){
-    //#@!  Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET - currentRect.width,
-    //#@!    itsFontMetrics.getHeight()*itsParsedTextVector.size()- currentRect.height);
-      //#@!}
-    /*#@!else*/ ResizeToText(0,0);
-  }
+  /*void ResizeToNewFont(Font theFont) {
+    ResizeToText(0,0);
+    }
+    */
 
 
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -211,21 +199,21 @@ class ErmesObjComment extends ErmesObject {
     String aString;
     int i=0;
     int insetY =(getItsHeight()-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
-    if(itsJustification == itsSketchPad.CENTER_JUSTIFICATION){
+    if(getJustification() == itsSketchPad.CENTER_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
 	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))/2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }    
-    else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
+    else if(getJustification() == itsSketchPad.LEFT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
 	theGraphics.drawString(aString, getItsX()+2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
-    else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
+    else if(getJustification() == itsSketchPad.RIGHT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
 	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
@@ -234,10 +222,10 @@ class ErmesObjComment extends ErmesObject {
     }
   }
 
-  void putOtherProperties(FtsObject theFObject){
-    if (itsJustification != itsSketchPad.itsJustificationMode)
-      theFObject.put("jsf", itsJustification);
-  }
+  /*  void putOtherProperties(FtsObject theFObject){
+    if (getJustification() != itsSketchPad.itsJustificationMode)
+      theFObject.put("jsf", getJustification());
+  }*/
   
   //--------------------------------------------------------
   // minimumSize()

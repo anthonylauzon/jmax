@@ -363,7 +363,7 @@ Rectangle previousResizeRect = new Rectangle();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
 	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)||
 	 (aObject instanceof ErmesObjIn)||(aObject instanceof ErmesObjOut)){
-	aFont = new Font(theFontName, sketchFont.getStyle(), aObject.GetFont().getSize());
+	aFont = new Font(theFontName, sketchFont.getStyle(), aObject.getFont().getSize());
 	try {
 	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
 	  setFont(aFont);   
@@ -375,7 +375,7 @@ Rectangle previousResizeRect = new Rectangle();
 	  return;
 	}
        
-	aObject.ChangeFont(aFont);
+	aObject.setFont(aFont);
       }
     }
     repaint();
@@ -389,7 +389,7 @@ Rectangle previousResizeRect = new Rectangle();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
 	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)||
 	 (aObject instanceof ErmesObjIn)||(aObject instanceof ErmesObjOut)){
-	aFont = new Font(aObject.GetFont().getName(), sketchFont.getStyle(), fontSize);
+	aFont = new Font(aObject.getFont().getName(), sketchFont.getStyle(), fontSize);
 	try {
 	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
 	  setFont(aFont);   
@@ -401,7 +401,7 @@ Rectangle previousResizeRect = new Rectangle();
 	  return;
 	}
 	
-	aObject.ChangeFont(aFont);
+	aObject.setFont(aFont);
       }
     }
     repaint();
@@ -419,7 +419,7 @@ Rectangle previousResizeRect = new Rectangle();
     for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment))
-	aObject.ChangeJustification(aJustificationMode);
+	aObject.setJustification(aJustificationMode);
     }
     repaint();
   }
@@ -911,9 +911,9 @@ Rectangle previousResizeRect = new Rectangle();
       aObject = (ErmesObject)en.nextElement();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
 	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)){
-	aFontName = aObject.GetFont().getName().toLowerCase();
-	aSize = new Integer(aObject.GetFont().getSize());
-	aJustification = new Integer(aObject.GetJustification());
+	aFontName = aObject.getFont().getName().toLowerCase();
+	aSize = new Integer(aObject.getFont().getSize());
+	aJustification = new Integer(aObject.getJustification());
 	if(!aUsedFontVector.contains(aFontName)) aUsedFontVector.addElement(aFontName);
 	if(!aUsedSizeVector.contains(aSize)) aUsedSizeVector.addElement(aSize);
 	if(!aUsedJustificationVector.contains(aJustification)) 

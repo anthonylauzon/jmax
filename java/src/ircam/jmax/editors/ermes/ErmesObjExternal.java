@@ -35,19 +35,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
     else super.Init(theSketchPad, x, y, theString); //OK, we have the args
     return true;
-    /*old itsSelected = false;
-      itsSketchPad = theSketchPad;	
-      laidOut = false;				
-      setItsX(x);						
-      setItsY(y);						
-      itsArgs = theString;			
-      if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
-      else super.Init(theSketchPad, x, y, theString); //OK, we have the args
-      itsFtsPatcher = GetSketchWindow().itsPatcher;
-      
-      //(new Throwable()).printStackTrace();
-      ParseText(itsArgs);
-      return true;*/
   }
   
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
@@ -151,11 +138,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
    }
 
   public void RestartEditing() {
-    // if((iAmPatcher)&&(itsSubWindow != null)){
-    // GetSketchWindow().CreateFtsGraphics(itsSubWindow);
-    // //itsSubWindow.dispose();
-    // //itsSubWindow = null;
-    // }
     super.RestartEditing();
   }
   
@@ -190,50 +172,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     g.setFont(getFont());
     DrawParsedString(g);
   }
-	
-  private void DrawParsedString(Graphics theGraphics){
-    String aString;
-    int i=0;
-    int insetY =(getItsHeight()-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
 
-    if(itsJustification == itsSketchPad.CENTER_JUSTIFICATION){
-      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))/2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-	i++;
-      }
-    }    
-    else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
-      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+WIDTH_DIFF/*-4*/, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-	i++;
-      }
-    }
-    else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
-      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-4*/), getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-	i++;
-      }
-    }
-  }
-
-  //--------------------------------------------------------
-  // resize
-  //--------------------------------------------------------
-  /*public void setSize(int theH, int theV) {
-    Dimension d = new Dimension(theH, theV);
-    super.Resize1(d.width, d.height);
-    currentRect.setSize(d.width, d.height);
-    d.width -= WIDTH_DIFF;		
-    d.height -= HEIGHT_DIFF;
-    if (itsSketchPad != null) itsSketchPad.repaint();
-  }*/
-  
-  /*public void setSize(Dimension d) {
-    setSize(d.width, d.height);
-  }*/
 }
 
 

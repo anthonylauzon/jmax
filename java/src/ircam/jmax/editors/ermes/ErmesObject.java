@@ -26,7 +26,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   int itsInitX, itsInitY;
   public boolean itsSelected = false;
   boolean laidOut;
-  private Rectangle currentRect;
+  private Rectangle currentRect = new Rectangle();
   public ErmesSketchPad	itsSketchPad;
   FtsContainerObject 	itsFtsPatcher;
   public FtsObject	itsFtsObject = null;
@@ -39,7 +39,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   boolean itsDragging = false;
   private Font itsFont = null;
   FontMetrics itsFontMetrics = null;
-  int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
+  private int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
   //#@!boolean itsResized = false;
   static Color itsUINormalColor = new Color(153, 204, 255);
   static Color itsUISelectedColor = new Color(51, 153, 204);
@@ -62,6 +62,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
 
   public void setItsX(int theX) {
+    if (theX == 0) (new Throwable()).printStackTrace();
     itsX = theX;
     itsFtsObject.put("x", itsX);
   }
@@ -101,7 +102,10 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
 
   public void setFont(Font theFont) {
+
     itsFont = theFont;
+    itsFontMetrics =itsSketchPad.getFontMetrics(theFont);
+    ResizeToNewFont(itsFont);
     itsFtsObject.put("font", itsFont.getName());
     itsFtsObject.put("fs", itsFont.getSize());
   }
@@ -155,17 +159,11 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   
   protected void Paint_specific(Graphics g) {}  
   public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
-  public void ChangeFont(Font theFont) {
-    itsFont = theFont;
-    itsFontMetrics =itsSketchPad.getFontMetrics(theFont);
-    ResizeToNewFont(itsFont);
-  }
-  
-  public void ChangeJustification(int theJustification) {
+  public void setJustification(int theJustification) {
     itsJustification = theJustification;
   }
 
-  public int GetJustification(){
+  public int getJustification(){
     return itsJustification;
   }
 
@@ -261,8 +259,6 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     
     Rectangle aRect = currentRect;
     int maxPads = (n_outlts > n_inlts) ? n_outlts : n_inlts;
-
-
 
     itsFtsObject.setRepresentation(this);
     if (maxPads * PADS_DISTANCE > aRect.width) { //the pads are longer then the element
@@ -370,13 +366,13 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     makeFtsObject();//added
     itsSelected = false;
     itsSketchPad = theSketchPad;
-    itsFont = itsSketchPad.sketchFont;
+    setFont(itsSketchPad.sketchFont);
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     //laidOut = false;
     setItsX(x);
     setItsY(y);
 		
-    if (currentRect == null) makeCurrentRect(x, y);
+    /*if (currentRect == null)*/ makeCurrentRect(x, y);
 
     Reshape(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
     
@@ -402,16 +398,16 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     int aIntSize;
     
     itsFtsObject = theFtsObject;
-    if((aFont == null)&&(aSize == null)) itsFont = itsSketchPad.sketchFont;
+    if((aFont == null)&&(aSize == null)) setFont(itsSketchPad.sketchFont);
     else{
       if(aFont == null) aFont = itsSketchPad.sketchFont.getName();
       if(aSize == null) aIntSize = itsSketchPad.sketchFont.getSize();
       else aIntSize = aSize.intValue();
-      itsFont = new Font(aFont,itsSketchPad.sketchFont.getStyle(), aIntSize);
+      setFont(new Font(aFont,itsSketchPad.sketchFont.getStyle(), aIntSize));
     }
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     
-    if (currentRect == null) makeCurrentRect(theFtsObject);
+    makeCurrentRect(theFtsObject);
     
     laidOut = false; //??
     
@@ -479,9 +475,9 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     return itsFtsObject;
   }
 
-  public Font GetFont(){
+  /*  public Font GetFont(){
     return itsFont;
-  }
+  }*/
 
   public Vector GetOutletList(){
     return itsOutletList;

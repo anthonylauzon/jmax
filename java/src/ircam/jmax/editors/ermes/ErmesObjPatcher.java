@@ -33,18 +33,22 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    itsSelected = false;			//this was in ErmesObject
-    itsSketchPad = theSketchPad;	
-    laidOut = false;				
-    setItsX(x);						
-    setItsY(y);						
-    itsArgs = theString;			
-    if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
-    else super.Init(theSketchPad, x, y, theString); //OK, we have the args
-    itsFtsPatcher = GetSketchWindow().itsPatcher;
-    
-    ParseText(itsArgs);
+    if (theString.equals("")) super.Init(theSketchPad, x, y);
+    else super.Init(theSketchPad, x, y, theString);
     return true;
+    /*old
+      itsSelected = false;			//this was in ErmesObject
+      itsSketchPad = theSketchPad;	
+      laidOut = false;				
+      setItsX(x);						
+      setItsY(y);						
+      itsArgs = theString;			
+      if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
+      else super.Init(theSketchPad, x, y, theString); //OK, we have the args
+      itsFtsPatcher = GetSketchWindow().itsPatcher;
+    
+      ParseText(itsArgs);
+      return true;*/
   }
   
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
@@ -77,6 +81,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     try
       {
 	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
+	if (itsFtsObject == null) System.err.println("AAAAAAAAAAAHHHHHHHHH");
 	((FtsContainerObject) itsFtsObject).setDownloaded();
       }
     catch (FtsException e)
@@ -254,7 +259,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     //--------------------------------------------------------
   // resize
   //--------------------------------------------------------
-  public void setSize(int theH, int theV) {
+  /*public void setSize(int theH, int theV) {
     
     Resize1(theH, theV);
     if (itsSketchPad != null) itsSketchPad.repaint();
@@ -262,7 +267,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   
   public void setSize(Dimension d) {
     setSize(d.width, d.height);
-  }
+  }*/
  
 }
 

@@ -4,12 +4,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
-//import com.sun.java.swing.Timer;
 
 /**
  * The "message box" graphic object.
  */
-class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionListener*/{
+class ErmesObjMessage extends ErmesObjEditableObject {
   boolean itsFlashing = false;
   //--------------------------------------------------------
   // CONSTRUCTOR
@@ -26,19 +25,6 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
     else super.Init(theSketchPad, x, y, theString);//OK, we have the args
     return true;
-    /*newold itsFtsPatcher = theSketchPad.GetSketchWindow().itsPatcher;//added
-      makeFtsObject();*/
-    /*old
-      itsSelected = false;			
-      itsSketchPad = theSketchPad;    
-      setItsX(x);					       
-      setItsY(y);					       
-      itsArgs = theString;			
-      if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
-      else super.Init(theSketchPad, x, y, theString);//OK, we have the args
-      itsFtsPatcher = GetSketchWindow().itsPatcher;
-      return true;
-      */
   }
 
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
@@ -97,6 +83,10 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     return true;
   }
 
+  public boolean isUIController() {
+    return true;
+  }
+
   public boolean MouseUp_specific(MouseEvent e, int x, int y){
     if (!itsSketchPad.itsRunMode && !e.isControlDown()) return false;
     else {
@@ -125,22 +115,6 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   }
 
   //--------------------------------------------------------
-  // resize
-  //--------------------------------------------------------
-  /*public void setSize(int theH, int theV) {
-    Dimension d = new Dimension(theH, theV);
-    super.Resize1(d.width, d.height);
-    currentRect.setSize(d.width, d.height);
-    d.width -= (WIDTH_DIFF-6);		
-    d.height -= HEIGHT_DIFF;
-    if (itsSketchPad != null) itsSketchPad.repaint();
-  }*/
-  
-  /*public void setSize(Dimension d) {
-    setSize(d.width, d.height);
-  }*/
-  
-  //--------------------------------------------------------
   // paint
   //--------------------------------------------------------
   public void Paint_specific(Graphics g) {
@@ -153,7 +127,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     else g.setColor(itsUINormalColor);
  
     g.fillRect(getItsX()+1,getItsY()+1,getItsWidth()-2, getItsHeight()-2);
-    g.fill3DRect(getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
+    //g.fill3DRect(getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
     
     if (!itsSketchPad.itsRunMode) {
       if(itsFlashing) g.setColor(itsLangSelectedColor);
@@ -179,32 +153,6 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     DrawParsedString(g);
   }
 
-  private void DrawParsedString(Graphics theGraphics){
-    String aString;
-    int i=0;
-    int insetY =(getItsHeight()-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
-    if(itsJustification == itsSketchPad.CENTER_JUSTIFICATION){
-      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))/2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-	i++;
-      }
-    }    
-    else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
-      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+(WIDTH_DIFF-/*6*/2), getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-	i++;
-      }
-    }
-    else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
-      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-6*/-2), getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-	i++;
-      }
-    }
-  }
 }
 
 

@@ -18,7 +18,7 @@ import ircam.jmax.fts.*;
   protected int FIELD_HEIGHT;
   protected int FIELD_WIDTH;
   Dimension preferredSize = new Dimension(100, 25);//hu-hu 
-  Dimension currentMinimumSize = null;
+  Dimension currentMinimumSize = new Dimension();
   String 	  itsArgs = new String();
   public Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
@@ -40,24 +40,19 @@ import ircam.jmax.fts.*;
   //this 'glue' method is called when the external (or the message) have not their arguments yet
   //and we have to create also the (static) ErmesObjEditableField 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y) {
-
     super.Init(theSketchPad, x, y, "");
-    //old setItsX(x); setItsY(y);
-    itsSketchPad = theSketchPad;
-    setFont(itsSketchPad.sketchFont);
-
-    itsFontMetrics = itsSketchPad.getFontMetrics(getFont());
+    
     FIELD_HEIGHT = itsFontMetrics.getHeight();
     FIELD_WIDTH = itsFontMetrics.stringWidth("0");
     preferredSize = new Dimension(70/*FIELD_WIDTH+2*WIDTH_DIFF*/,FIELD_HEIGHT+2*HEIGHT_DIFF);
     itsSketchPad.GetEditField().setFont(getFont());
     itsSketchPad.GetEditField().setText("");
     itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-    itsJustification = itsSketchPad.itsJustificationMode;
-    makeCurrentRect(x,y);
+    setJustification(itsSketchPad.itsJustificationMode);
+    makeCurrentRect(x,y); //redo it..
     
     itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);
-    DoublePaint();
+    //DoublePaint();
     itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
     
     itsSketchPad.GetEditField().setVisible(true);
@@ -103,8 +98,8 @@ import ircam.jmax.fts.*;
     super.Init(theSketchPad, theFtsObject);
     
     Integer aJustification = (Integer)theFtsObject.get("jsf");
-    if(aJustification == null) itsJustification = itsSketchPad.itsJustificationMode;
-    else itsJustification = aJustification.intValue();
+    if(aJustification == null) setJustification(itsSketchPad.itsJustificationMode);
+    else setJustification(aJustification.intValue());
 
     itsInEdit = false;
     //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
@@ -278,8 +273,36 @@ import ircam.jmax.fts.*;
   }
 
   void putOtherProperties(FtsObject theFObject){
-    if (itsJustification != itsSketchPad.itsJustificationMode)
-      theFObject.put("jsf", itsJustification);
+    if (getJustification() != itsSketchPad.itsJustificationMode)
+      theFObject.put("jsf", getJustification());
+  }
+
+  protected void DrawParsedString(Graphics theGraphics){
+    String aString;
+    int i=0;
+    int insetY =(getItsHeight()-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
+
+    if(getJustification() == itsSketchPad.CENTER_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))/2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
+    }    
+    else if(getJustification() == itsSketchPad.LEFT_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, getItsX()+WIDTH_DIFF/*-4*/, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
+    }
+    else if(getJustification() == itsSketchPad.RIGHT_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-4*/), getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
+    }
   }
 
   //--------------------------------------------------------
