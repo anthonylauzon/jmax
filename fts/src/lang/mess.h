@@ -33,6 +33,7 @@ extern fts_module_t fts_mess_module;
 #include "mess/symbols.h"
 #include "mess/words.h"
 #include "mess/atoms.h"
+#include "mess/atomarray.h"
 #include "mess/params.h"
 #include "mess/ftsdata.h"
 #include "mess/ftsdataid.h"
