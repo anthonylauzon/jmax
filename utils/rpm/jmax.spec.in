@@ -27,14 +27,32 @@ Header files for jMax
 %package java
 Summary: Java gui for jMax
 Group: Applications/Multimedia
+Requires: %{name} = %{version}
 %description java
 Java Graphical User Interface for jMax
+
+%package client
+Summary: Client for jMax
+Group: Applications/Multimedia
+%description client
+Contains C++ and Python client for jMax
+
+# %package jack
+# Summary: Jack Audio Connection Kit support for jMax
+# Group: Applications/Multimedia
+# Requires: jack-audio-connection-kit
+# %description jack
+# Jack Audio Connection Kit support for jMax
+# build jack
+# ./configure --with-java=java --with-javac=javac --enable-jack
+# make 
 
 %prep
 %setup -n jmax-%{version}
 %build
-./configure
+./configure --with-java=java --with-javac=javac
 make
+
 
 %install
 rm -f /var/tmp/rpm.jmax.common.list
@@ -42,13 +60,13 @@ rm -f /var/tmp/rpm.jmax.java.list
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 # library files for common rpm 
-find $RPM_BUILD_ROOT/usr/share/jmax/packages -name "lib*.so" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "lib*.so" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 # jpkg files for common rpm
-find $RPM_BUILD_ROOT/usr/share/jmax/packages -name "*.jpkg" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -name "*.jpkg" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 # help files for common rpm
-find $RPM_BUILD_ROOT/usr/share/jmax/packages -type d -name "help" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
+find $RPM_BUILD_ROOT%{_datadir}/jmax/packages -type d -name "help" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 # for java rpm
-find $RPM_BUILD_ROOT/usr/share/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
+find $RPM_BUILD_ROOT%{_datadir}/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -62,7 +80,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
-/usr/share/jmax
+%{_datadir}/jmax
 
 %files common -f /var/tmp/rpm.jmax.common.list
 %defattr(-,root,root)
@@ -81,7 +99,16 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_bindir}/jmax
 
+%files client
+%defattr(-,root,root)
+%{_libdir}/libftsclient.so.0.0.0
+%{_libdir}/libftsclient.so.0
+%{_libdir}/libftsclient.so
+%{_datadir}/jmax/client/python
+
 %changelog
+* Thu Feb  6 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- add building of client sub package
 * Thu Nov 21 2002 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - first set up for multi rpm building
 
