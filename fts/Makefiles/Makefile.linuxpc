@@ -25,9 +25,6 @@ CC_NONE_FLAG := -Xlinker --no-whole-archive
 #ARCH_OPT_CFLAGS := -O1
 ARCH_OPT_CFLAGS := -O0
 
-# gcc standard
-#ARCH_OPT_CFLAGS := -O3
-
 ARCH_OPT_LDFLAGS := 
 
 FTS_SYS_LIBS = -lm -ldl
