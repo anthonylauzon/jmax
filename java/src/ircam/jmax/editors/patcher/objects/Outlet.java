@@ -39,6 +39,8 @@ import ircam.jmax.editors.patcher.*;
 
 public class Outlet extends InOutlet
 {
+  InOutletPopUpMenu inoutletMenu;
+
   public Outlet(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject, ((FtsOutletObject) theFtsObject).getPosition());
@@ -81,15 +83,21 @@ public class Outlet extends InOutlet
     super.paint( g);
   }
 
-  public void popUpEdit(Point p)
+  //popup interaction 
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
-    ircam.jmax.utils.ChooseNumberPopUp.choose(itsSketchPad,
-			     new NumberChoosenListener()
-			     {
-			       public void numberChoosen(int v) { changeNo(v);}
-			     },
-			       0,
-			       itsSketchPad.getFtsPatcher().getNumberOfOutlets() + 4,
-			       p);
+    super.popUpUpdate(onInlet, onOutlet, area);
+    inoutletMenu = new InOutletPopUpMenu( new NumberChoosenListener()
+					  {
+					      public void numberChoosen(int v) { changeNo(v);}
+					  }, 
+					  0, itsSketchPad.getFtsPatcher().getNumberOfOutlets() + 4);
+    ObjectPopUp.addMenu(inoutletMenu);
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    ObjectPopUp.removeMenu(inoutletMenu);
+    inoutletMenu=null;
   }
 }
