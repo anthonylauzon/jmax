@@ -148,7 +148,7 @@ void fts_free(void *p)
   unsigned int reserved_blocks;
 };*/
 
-static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long)];
+static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long) + 1];/* added +1 : Max/MSP atom_t is NOT MULTIPLE of sizeof(long)*/
 
 static void fts_heap_grow(fts_heap_t *p)
 {
@@ -195,8 +195,7 @@ fts_heap_t *fts_heap_new(unsigned int block_size)
       /* shared heap */
 
       int idx;
-
-      idx = (block_size / sizeof(long)) - 1;
+      idx = (block_size / sizeof(long)) /*- 1*/;/* removed -1 : Max/MSP atom_t is NOT MULTIPLE of sizeof(long)*/
 
       if (fts_heaps[idx])
 	return fts_heaps[idx];
