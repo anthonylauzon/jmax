@@ -5,6 +5,7 @@ atom.h \
 atomfile.h \
 audio.h \
 audiofile.h \
+binaryprotocol.h \
 bytestream.h \
 class.h \
 client.h \
