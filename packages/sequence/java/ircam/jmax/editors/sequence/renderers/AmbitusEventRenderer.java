@@ -225,7 +225,7 @@ public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContex
 	{
 		int cuex = 7;
 		g.drawLine( x, 2, x, g.getClipBounds().height-2);
-		g.drawLine( x, 2, x-CUE_WIDTH, 2);
+		g.drawLine( x-CUE_WIDTH, 2, x, 2);
 	}	
 		
 }
