@@ -42,49 +42,29 @@
 #define FTS_ARCH_NAME "Linux (Intel and compatible processors)"
 #define restrict
 #define HAS_UNIX
-#define HAS_DTD /* direct to disk support */
 #define HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
 #define USE_FP_ONSET
 #define USE_IEEE_WRAP
 
-/* This macro is defined here because not all platforms have a isnanf macro (or function */
-
-#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
-			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
-
-
 #elif defined(LINUXPPC)
 
 #define FTS_ARCH_NAME "Linux (Power-PC processor)"
 #define restrict
 #define HAS_UNIX
-#define HAS_DTD /* direct to disk support */
 #define HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_BIG_ENDIAN
-
-/* This macro is defined here because not all platforms have a isnanf macro (or function */
-
-#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
-			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
-
 
 #elif defined(MACOSX)
 
 #define FTS_ARCH_NAME "MacOS-X"
 #define restrict
 #define HAS_UNIX
-#undef HAS_DTD /* direct to disk support */
 #undef HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_BIG_ENDIAN
-
-/* This macro is defined here because not all platforms have a isnanf macro (or function */
-
-#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
-			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
 
 
 /*********************************************************************
@@ -97,18 +77,10 @@
 #define FTS_ARCH_NAME "SGI"
 
 #define HAVE_AF_VIRTUAL_PARAMETERS
-#define HAS_DTD /* direct to disk support */
 #define HAS_UNIX
 #define HAS_PTHREADS
-/* #define HAS_TTY_DEV */ /* don't commit with this on until ttydev is fixed */
 #define VECLIB_LOOP_UNROLL 4
 #define FTS_HAS_BIG_ENDIAN
-
-/* This macro is defined here because not all platforms have a isnanf macro (or function */
-
-#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
-			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
-
 
 /*********************************************************************
  *
@@ -119,14 +91,8 @@
 
 #define FTS_ARCH_NAME "Solaris-2"
 #define restrict /* needed for compatibility with the newer restrict keyword */
-#define HAS_DTD
 #define HAS_UNIX
 #define FTS_HAS_BIG_ENDIAN
-
-/* This macro is defined here because not all platforms have a isnanf macro (or function */
-
-#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
-			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
 
 /*********************************************************************
  *
@@ -139,17 +105,11 @@
 #define FTS_ARCH_NAME "Win32 (Intel and compatible processors)"
 #define restrict
 #define HAS_UNIX
-/*define HAS_DTD direct to disk support */
 #define HAS_PTHREADS
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
 #define USE_FP_ONSET
 #define USE_IEEE_WRAP
-
-/* This macro is defined here because not all platforms have a isnanf macro (or function */
-
-#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
-			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
 
 /* This is included for the null device only (null.c) */
 struct timespec {

@@ -20,22 +20,23 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle.
  *
  */
 
+#ifndef _FTS_DTDSERVER_H_
+#define _FTS_DTDSERVER_H_
 
-#include "fts.h"
+#include "dtdfifo.h"
 
-extern void dac_config(void);
-extern void adc_config(void);
-extern void dac_doctor_init(void);
+extern void dtdserver_init( void);
 
-static void ispw_io_module_init(void)
-{
-  dac_config();
-  adc_config();
-  dac_doctor_init();
-}
+extern dtdfifo_t *dtdserver_new( int n_channels);
 
-fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init, 0, 0};
+extern void dtdserver_free( dtdfifo_t *fifo);
+
+extern void dtdserver_open( dtdfifo_t *fifo, const char *filename);
+
+extern void dtdserver_close( dtdfifo_t *fifo);
+
+#endif

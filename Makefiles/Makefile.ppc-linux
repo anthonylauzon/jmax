@@ -25,5 +25,5 @@
 
 include $(DISTDIR)/Makefiles/Makefile.linux
 
-ARCH_PACKAGES=ossdev pdtddev
+ARCH_PACKAGES=ossdev unixdtd
 

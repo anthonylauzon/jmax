@@ -1,3 +1,11 @@
+2000-06-07  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* packages/unixdtd: new (?) implementation of Direct-To-Disk objects, using
+	a separate process (the thread implementation leaded to real-time problems
+	on IRIX)
+	* packages/unixdtd/src/readsf.c: readsf~ has an extra outlet that bangs when 
+	file is finished.
+
 2000-06-06  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* packages/ispw/src/data/table.c: fixed name table bug

@@ -23,7 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-include $(DISTDIR)/Makefiles/Makefile.sgi
-
-ARCH_PACKAGES=sgidev unixdtd
+SOURCES= \
+dtdmodule.c	\
+dtdfifo.c	\
+dtdserver.c	\
+readsf.c	\
 

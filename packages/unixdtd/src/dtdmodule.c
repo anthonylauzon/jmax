@@ -20,22 +20,26 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle.
  *
  */
 
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 #include "fts.h"
+#include "dtdserver.h"
 
-extern void dac_config(void);
-extern void adc_config(void);
-extern void dac_doctor_init(void);
+extern void dtdtest_config(void);
 
-static void ispw_io_module_init(void)
+static void unixdtd_init(void)
 {
-  dac_config();
-  adc_config();
-  dac_doctor_init();
+  dtdserver_init();
+  dtdtest_config();
 }
 
-fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init, 0, 0};
+fts_module_t unixdtd_module = { "unixdtd", "Direct-To-Disk objects (Unix version)", unixdtd_init, 0, 0};
+

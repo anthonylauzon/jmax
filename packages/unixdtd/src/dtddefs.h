@@ -20,22 +20,22 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle.
  *
  */
 
+#ifndef _FTS_DTDDEFS_H_
+#define _FTS_DTDDEFS_H_
 
-#include "fts.h"
+#define N_FIFOS 4
 
-extern void dac_config(void);
-extern void adc_config(void);
-extern void dac_doctor_init(void);
+#define BLOCK_FRAMES  65536
+#define BLOCK_MAX_CHANNELS  8
+#define BLOCKS_PER_FIFO 8
 
-static void ispw_io_module_init(void)
-{
-  dac_config();
-  adc_config();
-  dac_doctor_init();
-}
+#define PRELOAD_BLOCK_FRAMES  1024
 
-fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init, 0, 0};
+#define DTD_SERVER_SELECT_TIMEOUT_SEC 0
+#define DTD_SERVER_SELECT_TIMEOUT_USEC 250000
+
+#endif

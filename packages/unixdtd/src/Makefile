@@ -23,7 +23,30 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-include $(DISTDIR)/Makefiles/Makefile.sgi
+JMAXROOTDIR= ../../..
+DISTDIR= $(JMAXROOTDIR)/fts
 
-ARCH_PACKAGES=sgidev unixdtd
+PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
+SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o
+
+# Note: some $(SERVER_OBJECTS) are not in the SOURCES because they are not added to the .so library
+
+PACKAGELIB=$(LIBDIR)/libunixdtd.so
+DTD_BIN = $(BINDIR)/dtd
+
+all: $(LIBDIR) $(OBJDIR) $(BINDIR) $(PACKAGELIB) $(DTD_BIN)
+
+$(DTD_BIN): $(SERVER_OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^ -laudiofile
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
+TOCLEAN=$(SERVER_OBJECTS) $(PACKAGE_LIB) $(DTD_BIN)  
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
 

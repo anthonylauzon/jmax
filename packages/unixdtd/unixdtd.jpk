@@ -20,10 +20,14 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+# Authors: Francois Dechelle.
 #
 
-include $(DISTDIR)/Makefiles/Makefile.sgi
+## package declaration
+package provide unixdtd
 
-ARCH_PACKAGES=sgidev unixdtd
+# load dynamic libraries into the server
+global jmaxArch jmaxMode
+ucs load module unixdtd $dir/lib/$jmaxArch/$jmaxMode/libunixdtd.so
 
+post "package: unixdtd (Direct-To-Disk devices, Unix version)"

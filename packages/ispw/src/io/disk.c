@@ -98,7 +98,6 @@ typedef struct
 /* Service functions */
 static void readsf_file_open(readsf_t *this)
 {
-  fts_status_t ret;
   fts_atom_t a[3];
   char file_path[1024];
 

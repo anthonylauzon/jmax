@@ -23,7 +23,26 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-include $(DISTDIR)/Makefiles/Makefile.sgi
+all:
+	(cd src; $(MAKE) $@)
+.PHONY: all
 
-ARCH_PACKAGES=sgidev unixdtd
+clean:
+	(cd src; $(MAKE) $@)
+.PHONY: clean
+
+install:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd
+	$(INSTALL_DATA) unixdtd.jpk $(lib_install_dir)/packages/unixdtd/unixdtd.jpk
+	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd/lib/$(ARCH)/opt
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libunixdtd.so $(lib_install_dir)/packages/unixdtd/lib/$(ARCH)/opt/libunixdtd.so ; \
+	)
+	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd/bin/$(ARCH)/opt
+	( \
+		cd bin/$(ARCH)/opt ; \
+		$(INSTALL_PROGRAM) dtd $(lib_install_dir)/packages/unixdtd/bin/$(ARCH)/opt/dtd ; \
+	)
+.PHONY: install
 

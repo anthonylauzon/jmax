@@ -26,8 +26,8 @@
 include $(DISTDIR)/Makefiles/Makefile.linux
 
 ifeq ($(ENABLE_ALSA),yes)
-ARCH_PACKAGES=ossdev alsadev pdtddev
+ARCH_PACKAGES=ossdev alsadev unixdtd
 else
-ARCH_PACKAGES=ossdev pdtddev
+ARCH_PACKAGES=ossdev unixdtd
 endif
 

@@ -123,9 +123,6 @@ struct _ftl_program_t {
 
   /* Stack of subroutines calls */
   ftl_subroutine_t *subroutine_tos;
-
-  /* NaN checking */
-  int check_nan;
 };
 
 static fts_hash_table_t *ftl_functions_table = 0;
@@ -437,7 +434,6 @@ void ftl_program_init( ftl_program_t *prog)
   prog->current_subroutine = 0;
   prog->main = 0;
   prog->subroutine_tos = 0;
-  prog->check_nan = 0;
 
   fts_hash_table_init( &(prog->symbol_table) );
 }
@@ -1101,27 +1097,6 @@ void ftl_program_post_bytecode( const ftl_program_t *prog)
 /* Run functions                                                          */
 /* ********************************************************************** */
 
-static int ftl_check_nan_buffers( int n, struct buffer_info *infos)
-{
-  int i, j;
-  float *vector;
-
-  for ( i = 0; i < n; i++)
-    {
-      vector = infos[i].buffer;
-
-      for ( j = 0; j < infos[i].size; j++)
-	if (fts_isnanf( vector[j]))
-	  {
-	    post_vector(infos[i].size, vector);
-	    
-	    return 1;
-	  }
-    }
-
-  return 0;
-}
-
 void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr)
 {
   fts_word_t *bytecode;
@@ -1130,51 +1105,18 @@ void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr)
   prog->subroutine_tos = subr;
 
   bytecode = subr->bytecode;
-  if ( prog->check_nan)
+  subr->pc = 0;
+
+  while (fts_word_get_long(bytecode))
     {
-      int nan_detected = 0;
-
-      subr->pc = 0;
-
-      while (fts_word_get_long(bytecode))
-	{
-	  ftl_wrapper_t w;
-	  int argc;
-	  ftl_instruction_info_t *instr_info;
+      ftl_wrapper_t w;
+      int argc;
       
-	  w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
-	  argc = fts_word_get_long( bytecode+1);
-	  (*w)(bytecode+2);
-
-	  if ( !nan_detected)
-	    {
-	      instr_info = &(subr->info_table.info[ subr->pc]);
-	      if (ftl_check_nan_buffers( instr_info->noutputs, instr_info->output_infos))
-		{
-		  fts_fpe_add_object( instr_info->object);
-		  nan_detected = 1;
-		}
-	    }
-
-	  bytecode += (argc + 2);
-	  subr->pc++;
-	}
-    }
-  else
-    {
-      subr->pc = 0;
-
-      while (fts_word_get_long(bytecode))
-	{
-	  ftl_wrapper_t w;
-	  int argc;
-      
-	  w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
-	  argc = fts_word_get_long( bytecode+1);
-	  (*w)(bytecode+2);
-	  bytecode += (argc + 2);
-	  subr->pc++;
-	}
+      w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
+      argc = fts_word_get_long( bytecode+1);
+      (*w)(bytecode+2);
+      bytecode += (argc + 2);
+      subr->pc++;
     }
 
   subr->pc = -1;
@@ -1213,5 +1155,4 @@ fts_object_t *ftl_program_get_current_object( ftl_program_t *prog)
 
 void ftl_program_set_check_nan( ftl_program_t *prog, int check_nan)
 {
-  prog->check_nan = check_nan;
 }
