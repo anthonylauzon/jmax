@@ -748,7 +748,8 @@ static void oss_adc_get( fts_word_t *argv)
 
 static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
 {
-  fts_symbol_t name;
+  fts_symbol_t name, mode;
+  int open_flag;
   fd_dev_data_t *p;
   int fd;
 
@@ -756,6 +757,9 @@ static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
   fts_dev_set_device_data( dev, (void *) p);
 
   name = fts_get_symbol_by_name( ac, av, fts_new_symbol("device"), fts_new_symbol( "/dev/midi00"));
+
+  mode = fts_get_symbol_by_name( ac, av, fts_new_symbol("mode"), fts_new_symbol( "rw"));
+  
   fd = open( fts_symbol_name( name), O_RDWR);
 
   if (fd < 0)
