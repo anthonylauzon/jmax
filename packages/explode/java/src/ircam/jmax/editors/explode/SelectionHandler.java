@@ -27,6 +27,12 @@ public interface SelectionHandler {
    */
   public abstract Enumeration getSelected();
   
+
+  /**
+   * returns the number of objects in the selection
+   */
+  public abstract int size();
+
   /**
    * selects all the objects. This method can be overriden to actually
    * select all the objects in a model.

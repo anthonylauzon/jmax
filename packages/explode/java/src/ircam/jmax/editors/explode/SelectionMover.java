@@ -19,7 +19,7 @@ public class SelectionMover extends InteractionModule implements XORPainter {
     super();
     
     itsListener = theListener;
-    itsXORHandler = new XORHandler(this);
+    itsXORHandler = new XORHandler(this, XORHandler.ABSOLUTE);
     itsStartingPoint = new Point();
 
     itsMovements = theMovement;
@@ -129,7 +129,7 @@ public class SelectionMover extends InteractionModule implements XORPainter {
    */
   public void XORErase() 
   {
-    XORDraw(0, 0);
+    XORDraw(previousX, previousY);
   }
 
 
@@ -138,27 +138,62 @@ public class SelectionMover extends InteractionModule implements XORPainter {
    */
   public void XORDraw(int dx, int dy) 
   {
+
     Graphics g = gc.getGraphicDestination().getGraphics();
     g.setColor(Color.gray);
     g.setXORMode(Color.white); //there's an assumption here on the color of the background.
+
+    if (ExplodeSelection.getSelection().size() > 20) {
+      // if there are more then 20 elements to move, move the enclosing rect
     if ((itsMovements & MoverTool.HORIZONTAL_MOVEMENT) != 0) 
-      enclosingRect.x += dx;
+      enclosingRect.x += dx-previousX;
 
     if ((itsMovements & MoverTool.VERTICAL_MOVEMENT) != 0) 
-      enclosingRect.y += dy;
+      enclosingRect.y += dy-previousY;
 
     g.drawRect(enclosingRect.x,enclosingRect.y, enclosingRect.width, enclosingRect.height);
+    }
+    else // move every element
+      {
+	ScrEvent aScrEvent;
+	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	  {
+	    aScrEvent = (ScrEvent) e.nextElement();
+	    
+	    if ((itsMovements & MoverTool.HORIZONTAL_MOVEMENT) != 0) 
+	      gc.getAdapter().setX(tempEvent, gc.getAdapter().getX(aScrEvent)+dx);
+	    else   
+	      gc.getAdapter().setX(tempEvent, gc.getAdapter().getX(aScrEvent));
+	    
+	    if ((itsMovements & MoverTool.VERTICAL_MOVEMENT) != 0) 
+	      gc.getAdapter().setY(tempEvent, gc.getAdapter().getY(aScrEvent)+dy);
+	    else
+	      gc.getAdapter().setY(tempEvent, gc.getAdapter().getY(aScrEvent));
+	    
+	    gc.getAdapter().setLenght(tempEvent, gc.getAdapter().getLenght(aScrEvent));
+	    
+	    gc.getRenderer().getEventRenderer().render(tempEvent, g, true);
+	  }
+      }
 
     g.setPaintMode();
     g.setColor(Color.black);
+
+    previousX = dx;
+    previousY = dy;
+
   }
 
   //---- Fields
   DragListener itsListener;
   XORHandler itsXORHandler;  
+  int previousX;
+  int previousY;
 
   Rectangle enclosingRect = new Rectangle();
 
   Point itsStartingPoint;
   int itsMovements;
+
+  ScrEvent tempEvent = new ScrEvent(null);
 }

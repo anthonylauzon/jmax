@@ -55,6 +55,10 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
     return selected.elements();
   }
 
+  public int size()
+  {
+    return selected.size();
+  }
 
   /**
    * deselects all the objects
