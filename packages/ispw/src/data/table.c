@@ -405,6 +405,7 @@ static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   vec = this->vector;
   count = 0;
+
   for( i = 0; i < size; i++)
     {
       if ( count == 0)
@@ -431,7 +432,12 @@ static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   w = fts_get_int( &a);
   font_index = 1;
 
-  fprintf( file, "#P newobj %d %d %d %d table;\n", x, y, w, font_index);
+  fprintf( file, "#P newobj %d %d %d %d table", x, y, w, font_index);
+
+  if ( this->name)
+    fprintf( file, " %s", fts_symbol_name( this->name)); 
+
+  fprintf( file, ";\n");
 }
 
 /********************************************************************
