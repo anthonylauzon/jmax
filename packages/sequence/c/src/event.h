@@ -39,25 +39,41 @@ typedef struct _event_ event_t;
 struct _event_
 {
   fts_object_t o;
-
-  /* list of events in sequence */
-  event_t *prev;
-  event_t *next;
-
-  struct _eventtrk_ *track; /* track of event */
-
   double time; /* time tag */
+  fts_atom_t value; /* value */
+  struct _eventtrk_ *track; /* event track */
+  event_t *prev; /* previous in track */
+  event_t *next; /* next in track */
 };
-
-extern void event_init(event_t *event);
 
 #define event_set_time(e, t) ((e)->time = (t))
 #define event_get_time(e) ((e)->time)
+
+#define event_set_value(e, v) ((e)->value = (*v))
+#define event_get_value(e) (&(e)->value)
 
 #define event_set_track(e, t) ((e)->track = (t))
 #define event_get_track(e) ((e)->track)
 
 #define event_get_prev(e) ((e)->prev)
 #define event_get_next(e) ((e)->next)
+
+#define event_get_type(e) (fts_get_type(&(e)->value))
+
+#define event_set_int(e, i) fts_set_int(&(e)->value, i)
+#define event_set_float(e, f) fts_set_float(&(e)->value, f)
+#define event_set_object(e, o) fts_set_object(&(e)->value, o)
+
+#define event_get_int(e) fts_get_int(&(e)->value)
+#define event_get_float(e) fts_get_float(&(e)->value)
+#define event_get_object(e) fts_get_object(&(e)->value)
+
+extern void event_print(event_t *event);
+extern void event_upload(event_t *event);
+extern void event_save_bmax(fts_bmax_file_t *file, event_t *event);
+extern event_t *event_new(const fts_atom_t *value);
+
+/* create event value and make a new event */
+extern event_t *event_create(int ac, const fts_atom_t *at);
 
 #endif

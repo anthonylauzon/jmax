@@ -23,36 +23,36 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _NOTEEVT_H_
-#define _NOTEEVT_H_
+#ifndef _NOTE_H_
+#define _NOTE_H_
 
 #include "fts.h"
 #include "event.h"
 
-typedef struct _noteevt_
+typedef struct _note_
 {
-  event_t head;
+  fts_object_t head;
   int pitch;
   double duration;
-  int midi_channel; /* optinal property for MIDI notes (will get fts property */
-  int midi_velocity; /* optinal property for MIDI notes (will get fts property */
-} noteevt_t;
+  int midi_channel; /* optinal property for MIDI notes (will get an fts property) */
+  int midi_velocity; /* optinal property for MIDI notes (will get an fts property) */
+} note_t;
 
-#define NOTEEVT_DEF_PITCH 64
-#define NOTEEVT_DEF_DURATION 400
-#define NOTEEVT_DEF_MIDI_CHANNEL 1
-#define NOTEEVT_DEF_MIDI_VELOCITY 64
+#define NOTE_DEF_PITCH 64
+#define NOTE_DEF_DURATION 400
+#define NOTE_DEF_MIDI_CHANNEL 1
+#define NOTE_DEF_MIDI_VELOCITY 64
 
-#define noteevt_set_pitch(n, x) ((n)->pitch = (x))
-#define noteevt_get_pitch(n) ((n)->pitch)
+#define note_set_pitch(n, x) ((n)->pitch = (x))
+#define note_get_pitch(n) ((n)->pitch)
 
-#define noteevt_set_duration(n, x) ((n)->duration = (x))
-#define noteevt_get_duration(n) ((n)->duration)
+#define note_set_duration(n, x) ((n)->duration = (x))
+#define note_get_duration(n) ((n)->duration)
 
-#define noteevt_set_midi_channel(n, x) ((n)->midi_channel = (x))
-#define noteevt_get_midi_channel(n) (((n)->midi_channel >= 0)? (n)->midi_channel: NOTEEVT_DEF_MIDI_CHANNEL)
+#define note_set_midi_channel(n, x) ((n)->midi_channel = (x))
+#define note_get_midi_channel(n) (((n)->midi_channel >= 0)? (n)->midi_channel: NOTE_DEF_MIDI_CHANNEL)
 
-#define noteevt_set_midi_velocity(n, x) ((n)->midi_velocity = (x))
-#define noteevt_get_midi_velocity(n) (((n)->midi_velocity >= 0)? (n)->midi_velocity: NOTEEVT_DEF_MIDI_VELOCITY)
+#define note_set_midi_velocity(n, x) ((n)->midi_velocity = (x))
+#define note_get_midi_velocity(n) (((n)->midi_velocity >= 0)? (n)->midi_velocity: NOTE_DEF_MIDI_VELOCITY)
 
 #endif

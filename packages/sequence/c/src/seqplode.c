@@ -28,7 +28,7 @@
 #include "seqsym.h"
 #include "sequence.h"
 #include "eventtrk.h"
-#include "noteevt.h"
+#include "note.h"
 
 static fts_heap_t *seqplode_skip_heap = 0;
 
@@ -38,7 +38,7 @@ static fts_heap_t *seqplode_skip_heap = 0;
 
 typedef struct _skip
 {
-  noteevt_t *evt;
+  event_t *evt;
   struct _skip *next;
 } skip_t;
 
@@ -48,7 +48,7 @@ typedef struct
   sequence_t *sequence;
   int index;
   eventtrk_t *track;
-  noteevt_t *event; /* current event */
+  event_t *event; /* current event */
 
   int matchscoretime;
   char oct;
@@ -87,12 +87,12 @@ static void
 seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqplode_t *this = (seqplode_t *)o;
-  noteevt_t *evtwas = this->event;
+  event_t *evtwas = this->event;
   int tquit = 0x7fffffff;
   int count = 0, gotem = 0;
   skip_t newskip, *sp, *sp2;
   int eat = 0;
-  noteevt_t *e;
+  event_t *e;
   int pitch = fts_get_number_int(at);
   
   if(pitch < 0)
@@ -103,8 +103,10 @@ seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   /* check against skip array */
   for(sp=&newskip; (sp2=sp->next);)
     {
+      event_t *event = sp2->evt;
+      note_t *note = (note_t *)event_get_object(event);
+      int pit = note_get_pitch(note);
       int drop = 0;
-      int pit = noteevt_get_pitch(sp2->evt);
 
       /* if a skip is too old (score time skipped  >= FTIME) then kill it */
       if (this->matchscoretime - event_get_time((event_t *)sp2->evt) >= this->ftime)
@@ -145,8 +147,10 @@ seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     return;
 
   /* search forward in list for matching note */
-  for (; ; this->event=(noteevt_t *)event_get_next((event_t *)e))
+  for (; ; this->event=event_get_next(e))
     {
+      note_t *note;
+
       e = this->event;
 
       /* if at end of score no match */
@@ -160,7 +164,7 @@ seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(gotem)	
 	{
 	  /* and if, past that, you ate ftime into the future */
-	  if (event_get_time((event_t *)e) > tquit)
+	  if (event_get_time(e) > tquit)
 	    {
 	      /* then there is no match. */
 	      this->event = evtwas;
@@ -168,23 +172,25 @@ seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	    }
 	}
 
+      note = (note_t *)event_get_object(e);
+
       /* break if got the good note */
-      if(noteevt_get_pitch(e) == pitch || (this->oct && (noteevt_get_pitch(e) == pitch + 12 || noteevt_get_pitch(e) == pitch - 12)))
+      if(note_get_pitch(note) == pitch || (this->oct && (note_get_pitch(note) == pitch + 12 || note_get_pitch(note) == pitch - 12)))
 	break;
 
       /* if you got NFWD notes already */
       if(!gotem && ++count > this->nfwd)
 	{
 	  gotem = 1;
-	  tquit = event_get_time((event_t *)e) + this->ftime;
+	  tquit = event_get_time(e) + this->ftime;
 	}
     }
 
   /* If you break out here, it means you just matched x->event. */
-  this->matchscoretime = event_get_time((event_t *)this->event);
+  this->matchscoretime = event_get_time(this->event);
 
   /* put skipped notes into skip list; output any notes in other channels we have jumped get output */
-  for(e=evtwas; e!=this->event; e=(noteevt_t *)event_get_next((event_t *)e))
+  for(e=evtwas; e!=this->event; e=event_get_next(e))
     {
       sp = (skip_t *) fts_heap_alloc(seqplode_skip_heap);
       sp->evt = e;
@@ -204,7 +210,7 @@ seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)this->event));
 
   /* and set pointer to the note after that */
-  this->event = (noteevt_t *)event_get_next((event_t *)this->event);
+  this->event = event_get_next(this->event);
 }
 
 static void
@@ -250,14 +256,14 @@ seqplode_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_index(this->sequence, this->index);
       
-      if(track && eventtrk_get_type(track) == seqsym_noteevt)
+      if(track && eventtrk_get_type(track) == seqsym_note)
 	{
-	  noteevt_t *event = (noteevt_t *)eventtrk_get_event_by_time(track, locate);
+	  event_t *event = eventtrk_get_event_by_time(track, locate);
 	  
 	  if(event)
 	    {
 	      track_lock((track_t *)this->track);
-	      fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)event));
+	      fts_outlet_float((fts_object_t *)this, 0, event_get_time(event));
 	  
 	      this->track = track;
 	      this->event = event;

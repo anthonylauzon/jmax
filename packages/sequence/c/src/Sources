@@ -31,12 +31,8 @@ track.c \
 event.c \
 seqmidi.c \
 eventtrk.c \
-intevt.c \
-noteevt.c \
-messevt.c \
-floatevt.c \
+note.c \
+message.c \
 seqplay.c \
 seqplode.c \
 seqf9.c \
-
-

@@ -24,19 +24,228 @@
  *
  */
 #include "fts.h"
+#include "seqsym.h"
 #include "event.h"
 
-/*********************************************************
+/**************************************************************
  *
- *  sequence event
+ *  generic event functions
  *
  */
 
 void
-event_init(event_t *event)
+event_print(event_t *event)
 {
-  event->prev = 0;
-  event->next = 0;
-  event->track = 0;
-  event->time = 0.0;
+  post("  @%lf: ", event_get_time(event));
+
+  if(fts_is_object(&event->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
+      fts_atom_t a[2];
+      fts_atom_t atoms[64];
+      int n_atoms;
+
+      fts_set_ptr(a, &n_atoms);
+      fts_set_ptr(a + 1, atoms);
+      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, a);
+
+      post("<%s> ", fts_symbol_name(fts_object_get_class_name(obj)));
+      post_atoms(n_atoms, atoms);
+    }
+  else
+    {
+      post("<%s> ", fts_symbol_name(fts_type_get_selector(fts_get_type(&event->value))));
+      post_atoms(1, &event->value);
+    }
+
+  post("\n");
+}
+
+void
+event_upload(event_t *event)
+{
+  if(fts_is_object(&event->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
+      fts_atom_t a[2];
+      fts_atom_t atoms[64];
+      int n_atoms;
+
+      fts_set_float(atoms + 0, event->time);
+      fts_set_symbol(atoms + 1, fts_object_get_class_name(obj));
+
+      fts_set_ptr(a, &n_atoms);
+      fts_set_ptr(a + 1, atoms + 2);
+      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, a);
+
+      fts_client_upload((fts_object_t *)event, seqsym_event, n_atoms + 2, atoms);
+    }
+  else
+    { 
+      fts_atom_t atoms[3];
+     
+      fts_set_float(atoms + 0, event->time);
+      fts_set_symbol(atoms + 1, fts_type_get_selector(fts_get_type(&event->value)));
+      atoms[2] = event->value;
+
+      fts_client_upload((fts_object_t *)event, seqsym_event, 3, atoms);
+    }
+}
+
+void
+event_save_bmax(fts_bmax_file_t *file, event_t *event)
+{
+  if(fts_is_object(&event->value))
+    {
+      fts_object_t *obj = fts_get_object(&event->value);
+      fts_atom_t a[2];
+      fts_atom_t atoms[64];
+      int n_atoms;
+
+      fts_set_float(atoms + 0, event->time);
+      fts_set_symbol(atoms + 1, fts_object_get_class_name(obj));
+
+      fts_set_ptr(a, &n_atoms);
+      fts_set_ptr(a + 1, atoms + 2);
+      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, a);
+
+      fts_bmax_save_message(file, seqsym_bmax_add_event, n_atoms + 2, atoms);
+    }
+  else
+    { 
+      fts_atom_t atoms[3];
+     
+      fts_set_float(atoms + 0, event->time);
+      fts_set_symbol(atoms + 1, fts_type_get_selector(fts_get_type(&event->value)));
+      atoms[2] = event->value;
+
+      fts_bmax_save_message(file, seqsym_bmax_add_event, 3, atoms);
+    }
+}
+
+/**************************************************************
+ *
+ *  generic event methods
+ *
+ */
+static void
+event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_t *this = (event_t *)o;
+
+  if(fts_is_object(&this->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
+
+      fts_send_message(obj, fts_SystemInlet, seqsym_set, ac, at);
+    }
+  else
+    this->value = at[0];
+}
+
+static void 
+event_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_t *this = (event_t *)o;
+
+  if(fts_is_object(&this->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
+
+      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, at);
+    }
+  else
+    {
+      int *n_atoms = fts_get_ptr(at);
+      fts_atom_t *atoms = fts_get_ptr(at + 1);
+
+      *n_atoms = 1;
+      *atoms = this->value;
+    }
+}
+
+/**************************************************************
+ *
+ *  class
+ *
+ */
+static void
+event_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_t *this = (event_t *)o;  
+
+  this->value = at[1];
+  this->time = 0.0;
+  this->track = 0;
+  this->prev = 0;
+  this->next = 0;
+}
+
+static void
+event_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  event_t *this = (event_t *)o;  
+
+  if(fts_is_object(&this->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
+      fts_object_delete(obj);
+    }
+}
+
+static fts_status_t
+event_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(event_t), 0, 0, 0); 
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, event_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, event_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_set, event_set);
+  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_get_atoms, event_get_atoms);
+
+  return fts_Success;
+}
+
+void
+event_config(void)
+{
+  fts_class_install(seqsym_event, event_instantiate);
+}
+
+event_t *
+event_new(const fts_atom_t *value)
+{
+  event_t *event;
+  fts_atom_t a[2];
+
+  fts_set_symbol(a + 0, seqsym_event);
+  a[1] = *value;
+  fts_object_new(0, 2, a, (fts_object_t **)&event);
+
+  return event;
+}
+
+event_t *
+event_create(int ac, const fts_atom_t *at)
+{
+  fts_symbol_t type = fts_get_symbol(at);
+  fts_atom_t a[2];
+
+  if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
+    return event_new(at + 1);
+  else
+    {
+      fts_object_t *obj;
+      fts_atom_t a[1];
+
+      /* create value object */
+      fts_object_new(0, ac, at, &obj);
+
+      if(obj)
+	fts_set_object(a, obj);
+      else
+	fts_set_void(a);
+
+      return event_new(a);
+    }
 }

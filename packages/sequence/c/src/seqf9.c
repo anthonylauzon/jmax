@@ -17,16 +17,17 @@
 #include "seqsym.h"
 #include "sequence.h"
 #include "eventtrk.h"
-#include "noteevt.h"
+#include "event.h"
+#include "note.h"
 
 #define NNOTES 32
 
 typedef struct _note
 {
-  noteevt_t *n_evt;
+  event_t *n_evt;
   struct _note *n_next;
   float n_value;
-} note_t;
+} f9_note_t;
 
 typedef struct _seqf9
 {
@@ -38,11 +39,11 @@ typedef struct _seqf9
   char running; /* true if we're turned on */
   char atend; /* true if we've seen the last event */
   char spoofed; /* true if we've output a speculative event */
-  note_t notes[NNOTES];
-  note_t *tail;
-  note_t *head;
-  noteevt_t *firstev;
-  note_t *lastoutput; /* last event that has been output */
+  f9_note_t notes[NNOTES];
+  f9_note_t *tail;
+  f9_note_t *head;
+  event_t *firstev;
+  f9_note_t *lastoutput; /* last event that has been output */
   float hit_score_in_tune; /* parameters */
   float pitch_accuracy;
 } seqf9_t;
@@ -57,19 +58,21 @@ static void seqf9_refill(seqf9_t *this)
 {
   if(!this->atend)
     {
-      note_t *note = this->head->n_next;
+      f9_note_t *note = this->head->n_next;
       float value = this->head->n_value;
-      noteevt_t *e = (noteevt_t *)event_get_next((event_t *)this->head->n_evt);
+      event_t *e = event_get_next(this->head->n_evt);
       
       while (e && note != this->tail)
 	{
-	  value -= noteevt_get_midi_velocity(e);
+	  note_t *evt_note = (note_t *)event_get_object(e);
+
+	  value -= note_get_midi_velocity(evt_note);
 	  note->n_evt = e;
 	  note->n_value = value;
 	  this->head = note;
 	  note = note->n_next;
 	  
-	  e = (noteevt_t *)event_get_next((event_t *)e);
+	  e = event_get_next(e);
 	}
       
       if(!e) 
@@ -79,10 +82,10 @@ static void seqf9_refill(seqf9_t *this)
 
 /* advance to note pointed to by "newnote" */ 
 static void 
-seqf9_advanceto(seqf9_t *this, note_t *newnote)
+seqf9_advanceto(seqf9_t *this, f9_note_t *newnote)
 {
-  noteevt_t *e;
-  note_t *wanttail;
+  event_t *e;
+  f9_note_t *wanttail;
 
   if(sequence_editor_is_open(this->sequence))
     {
@@ -181,12 +184,13 @@ seqf9_stable_note(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       float MATCHVALUE = this->hit_score_in_tune;
       float EXTRAVALUE = -extra_note_penalty_in_tune;
       float EXTRADETUNE = (extra_note_penalty_in_tune - extra_note_penalty_out_of_tune) * recip;
-      note_t *bestnote = 0;
-      note_t *current, *end;
+      f9_note_t *bestnote = 0;
+      f9_note_t *current, *end;
       
       for(current = this->tail, end = this->head; 1; current = current->n_next)
 	{
-	  float deviation = pitch - noteevt_get_pitch(current->n_evt);
+	  note_t *evt_note = (note_t *)event_get_object(current->n_evt);
+	  float deviation = pitch - note_get_pitch(evt_note);
 	  float v1, v2, v3;
 
 	  if (deviation < 0) 
@@ -196,8 +200,8 @@ seqf9_stable_note(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	    deviation = ACCURACY;
 
 	  v1 = current->n_value + EXTRAVALUE + EXTRADETUNE * deviation;
-	  v2 =  lastvaluebefore + MATCHVALUE - (noteevt_get_midi_velocity(current->n_evt) + MATCHVALUE) * deviation * recip;
-	  v3 = lastvalueafter - noteevt_get_midi_velocity(current->n_evt);
+	  v2 =  lastvaluebefore + MATCHVALUE - (note_get_midi_velocity(evt_note) + MATCHVALUE) * deviation * recip;
+	  v3 = lastvalueafter - note_get_midi_velocity(evt_note);
       
 	  lastvaluebefore = current->n_value;
 	  lastvalueafter = v1;
@@ -242,8 +246,9 @@ seqf9_continuous_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   if(this->running && !this->spoofed && this->lastoutput != this->head) 
     {
       float f = fts_get_number_float(at);
-      note_t *note = (this->lastoutput ? this->lastoutput->n_next : this->tail);
-      double deviation = noteevt_get_pitch(note->n_evt) - f;
+      f9_note_t *note = (this->lastoutput ? this->lastoutput->n_next : this->tail);
+      note_t *evt_note = (note_t *)event_get_object(note->n_evt);
+      double deviation = note_get_pitch(evt_note) - f;
       
       if (deviation < 0.) 
 	deviation = -deviation;
@@ -272,12 +277,14 @@ seqf9_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_index(this->sequence, this->index);
 
-      if(track && eventtrk_get_type(track) == seqsym_noteevt)
+      if(track && eventtrk_get_type(track) == seqsym_note)
 	{
-	  noteevt_t *event = (noteevt_t *)eventtrk_get_event_by_time(track, locate);
+	  event_t *event = eventtrk_get_event_by_time(track, locate);
 	  
 	  if(event)
 	    {
+	      note_t *evt_note = (note_t *)event_get_object(event);
+
 	      track_lock((track_t *)track);
 
 	      if(sequence_editor_is_open(this->sequence))
@@ -300,7 +307,7 @@ seqf9_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 	      /* reset notes */
 	      this->notes[0].n_evt = event;
-	      this->notes[0].n_value = -noteevt_get_midi_velocity(event);
+	      this->notes[0].n_value = -note_get_midi_velocity(evt_note);
 	      this->head = this->tail = this->notes;
 	      seqf9_refill(this);
 
@@ -322,7 +329,7 @@ seqf9_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   seqf9_t *this = (seqf9_t *)o;
   fts_object_t *seqobj = fts_get_object(at + 1);
   int index = fts_get_int(at + 2);
-  note_t *n;
+  f9_note_t *n;
   int i;
 
   if(fts_object_get_class_name(seqobj) == seqsym_sequence)

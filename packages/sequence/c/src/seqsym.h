@@ -35,16 +35,18 @@ extern fts_symbol_t seqsym_eventtrk;
 extern fts_symbol_t seqsym_event;
 
 /* events */
-extern fts_symbol_t seqsym_noteevt;
-extern fts_symbol_t seqsym_floatevt;
-extern fts_symbol_t seqsym_intevt;
-extern fts_symbol_t seqsym_messevt;
+extern fts_symbol_t seqsym_float;
+extern fts_symbol_t seqsym_int;
+extern fts_symbol_t seqsym_symbol;
+extern fts_symbol_t seqsym_note;
+extern fts_symbol_t seqsym_message;
 
 /* properties */
 extern fts_symbol_t seqsym_midi_channel;
 extern fts_symbol_t seqsym_midi_velocity;
 
 /* messages */
+extern fts_symbol_t seqsym_set;
 extern fts_symbol_t seqsym_get_atoms;
 extern fts_symbol_t seqsym_export_midi;
 extern fts_symbol_t seqsym_export_midi_dialog;

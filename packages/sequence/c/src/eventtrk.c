@@ -289,20 +289,20 @@ eventtrk_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
   if(!track_is_locked(&this->head))
     {
       double time = fts_get_float(at + 0);
-      fts_object_t *event;
+      event_t *event;
       fts_atom_t a[1];
 
       /* make new event object */
-      fts_object_new(0, ac - 1, at + 1, &event);
-
+      event = event_create(ac - 1, at + 1);
+      
       /* add event to track */
-      eventtrk_add_event(this, time, (event_t *)event);
+      eventtrk_add_event(this, time, event);
 
       /* create event at client (short cut: could also send upload message to event object) */
-      fts_client_upload(event, seqsym_event, ac, at);
+      fts_client_upload((fts_object_t *)event, seqsym_event, ac, at);
 
       /* add event to track at client */
-      fts_set_object(a, event);    
+      fts_set_object(a, (fts_object_t *)event);    
       fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 1, a);
     }
 }
@@ -316,14 +316,13 @@ eventtrk_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
   if(!track_is_locked(&this->head))
     {
       double time = fts_get_float(at + 0);
-      fts_object_t *event;
-      fts_atom_t a[1];
+      event_t *event;
 
       /* make new event object */
-      fts_object_new(0, ac - 1, at + 1, &event);
+      event = event_create(ac - 1, at + 1);
 
       /* add event to track */
-      eventtrk_add_event(this, time, (event_t *)event);
+      eventtrk_add_event(this, time, event);
     }
 }
 
@@ -358,7 +357,7 @@ eventtrk_move_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
 
   if(!track_is_locked(&this->head))
     {
-      fts_object_t *event = fts_get_object(at + 0);
+      event_t *event = (event_t *)fts_get_object(at + 0);
       float time = fts_get_float(at + 1);
 	  
       eventtrk_move_event(this, (event_t *)event, time);
@@ -373,18 +372,21 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   event_t *event = eventtrk_get_first(this);
   fts_atom_t a[EVENTTRK_ADD_BLOCK_SIZE];
   int n = 0;
+
   
   if(!fts_object_has_id((fts_object_t *)this))
     {
-      fts_symbol_t name = track_get_name(&this->head);
-      fts_atom_t a[1];
-      
-      /* create track at client (name uploading is not very elegant %!#%^!#)$) */
+      fts_symbol_t name = track_get_name(&this->head); 
+     
+      /* create track at client */
       fts_set_symbol(a, eventtrk_get_type(this));
       fts_client_upload((fts_object_t *)this, seqsym_track, 1, a);
 
       if(name)
-	fts_client_send_message(o, seqsym_setName, 1, at + 1);
+	{
+	  fts_set_symbol(a, name);
+	  fts_client_send_message(o, seqsym_setName, 1, a);
+	}
     }
 
   while(event)
@@ -392,7 +394,7 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(!fts_object_has_id((fts_object_t *)event))
 	{
 	  /* create event at client */
-	  fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_upload, 0, 0);
+	  event_upload(event);
 
 	  fts_set_object(a + n, (fts_object_t *)event);
 	  
@@ -423,10 +425,7 @@ eventtrk_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   while(event)
     {
-      fts_symbol_t class_name = fts_object_get_class_name((fts_object_t *)event);
-      
-      post("  @%lf: <%s> ", event_get_time(event), fts_symbol_name(class_name));
-      fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_print, 0, 0);
+      event_print(event);
       event = event_get_next(event);
     }  
 }
@@ -437,7 +436,8 @@ eventtrk_export_to_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   eventtrk_t *this = (eventtrk_t *)o;
   fts_symbol_t file_name = fts_get_symbol(at);
 
-  seqmidi_write_midifile_from_event_track(this, file_name);
+  if(eventtrk_get_type(this) == seqsym_note)
+    seqmidi_write_midifile_from_note_track(this, file_name);
 }
 
 static void 
@@ -464,16 +464,16 @@ eventtrk_add_event_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 {
   eventtrk_t *this = (eventtrk_t *)o;
   double time = fts_get_float(at + 0);
-  fts_object_t *event;
+  event_t *event;
   
   /* make new event object */
-  fts_object_new(0, ac - 1, at + 1, &event);
+  event = event_create(ac - 1, at + 1);
   
   /* add event to track */
-  eventtrk_append_event(this, (event_t *)event);
+  eventtrk_append_event(this, event);
 
-  event_set_track((event_t *)event, this);
-  event_set_time((event_t *)event, time);
+  event_set_track(event, this);
+  event_set_time(event, time);
 }
 
 static void 
@@ -483,7 +483,6 @@ eventtrk_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
   event_t *event = eventtrk_get_first(this);
   fts_symbol_t name = track_get_name(&this->head);
-
 
   if(name)
     {
@@ -503,7 +502,7 @@ eventtrk_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   while(event)
     {
-      fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_save_bmax, ac, at);
+      event_save_bmax(file, event);
       event = event_get_next(event);
     }  
 }
@@ -539,4 +538,17 @@ void
 eventtrk_config(void)
 {
   fts_class_install(seqsym_eventtrk, eventtrk_instantiate);
+}
+
+eventtrk_t *
+eventtrk_new(fts_symbol_t type)
+{
+  eventtrk_t *track;
+  fts_atom_t a[2];
+
+  fts_set_symbol(a + 0, seqsym_eventtrk);
+  fts_set_symbol(a + 1, type);
+  fts_object_new(0, 2, a, (fts_object_t **)&track);
+
+  return track;
 }

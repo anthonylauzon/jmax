@@ -179,18 +179,17 @@ sequence_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
 {
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t type = fts_get_symbol(at);
-  fts_object_t *track;
-  fts_atom_t a[2];
-  
-  fts_set_symbol(a + 0, seqsym_eventtrk);
-  fts_set_symbol(a + 1, type);
-  fts_object_new(0, 2, a, &track);  
-      
+  track_t *track;
+  fts_atom_t a[1];
+
+  /* create new track (for now anyway just event tracks!!! - later to be changed) */
+  track = (track_t *)eventtrk_new(type);
+
   /* add it to the sequence */
   sequence_add_track(this, (track_t *)track);
       
   /* create track at client */
-  fts_client_upload(track, seqsym_track, 1, at);
+  fts_client_upload((fts_object_t *)track, seqsym_track, 1, at);
       
   /* add track to sequence at client */
   fts_set_object(a + 0, (fts_object_t *)track);	    
@@ -322,11 +321,11 @@ sequence_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 void
-sequence_export_track_by_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sequence_export_track_by_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  fts_symbol_t track_name = fts_get_symbol_arg(ac, at, 0, 0);
-  track_t *track = sequence_get_track_by_name(this, track_name);
+  int index = fts_get_int_arg(ac, at, 0, 0);
+  track_t *track = sequence_get_track_by_index(this, index);
 
   if(track)
     {
@@ -381,23 +380,22 @@ sequence_add_track_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 {
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t type = fts_get_symbol(at + 0);
-  fts_object_t *track;
+  track_t *track;
   fts_atom_t a[3];
   
-  fts_set_symbol(a + 0, seqsym_eventtrk);
-  fts_set_symbol(a + 1, type);
-  fts_object_new(0, 2, a, &track);  
+  /* create new track (for now anyway just event tracks!!! - later to be changed) */
+  track = (track_t *)eventtrk_new(type);
 
   /* add it to the sequence */
-  sequence_add_track(this, (track_t *)track);
+  sequence_add_track(this, track);
 
   if(ac > 1)
     {
       fts_symbol_t name = fts_get_symbol(at + 1);
-      track_set_name((track_t *)track, name);
+      track_set_name(track, name);
     }
 
-  this->currently_loaded_event_track = (track_t *)track;
+  this->currently_loaded_event_track = track;
 }
 
 static void
@@ -453,7 +451,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 0, fts_s_print, sequence_print);
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), sequence_import);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), sequence_export_track_by_name);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), sequence_export_track_by_index);
       /*******************/
       fts_method_define_varargs(cl, 0, fts_new_symbol("open"), sequence_open_editor);
       /******************/

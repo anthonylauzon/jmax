@@ -33,10 +33,11 @@ fts_symbol_t seqsym_eventtrk = 0;
 fts_symbol_t seqsym_event = 0;
 
 /* events */
-fts_symbol_t seqsym_noteevt = 0;
-fts_symbol_t seqsym_floatevt = 0;
-fts_symbol_t seqsym_intevt = 0;
-fts_symbol_t seqsym_messevt = 0;
+fts_symbol_t seqsym_int = 0;
+fts_symbol_t seqsym_float = 0;
+fts_symbol_t seqsym_symbol = 0;
+fts_symbol_t seqsym_note = 0;
+fts_symbol_t seqsym_message = 0;
 
 /* properties */
 fts_symbol_t seqsym_midi_channel = 0;
@@ -44,6 +45,7 @@ fts_symbol_t seqsym_midi_velocity = 0;
 
 /* messages */
 fts_symbol_t seqsym_get_atoms = 0;
+fts_symbol_t seqsym_set = 0;
 fts_symbol_t seqsym_export_midi = 0;
 fts_symbol_t seqsym_export_midi_dialog = 0;
 fts_symbol_t seqsym_import_midi = 0;
@@ -75,17 +77,19 @@ seqsym_config(void)
   seqsym_eventtrk = fts_new_symbol("eventtrk");
   seqsym_event = fts_new_symbol("event");
 
-  /* events */
-  seqsym_noteevt = fts_new_symbol("noteevt");
-  seqsym_floatevt = fts_new_symbol("floatevt");
-  seqsym_intevt = fts_new_symbol("intevt");
-  seqsym_messevt = fts_new_symbol("messevt");
+  /* event types */
+  seqsym_int = fts_new_symbol("int");
+  seqsym_float = fts_new_symbol("float");
+  seqsym_symbol = fts_new_symbol("symbol");
+  seqsym_note = fts_new_symbol("note");
+  seqsym_message = fts_new_symbol("message");
   
   /* properties */
   seqsym_midi_channel = fts_new_symbol("midi_channel");
   seqsym_midi_velocity = fts_new_symbol("midi_velocity");
 
   /* messages */
+  seqsym_set = fts_new_symbol("set");
   seqsym_get_atoms = fts_new_symbol("get_atoms");
   seqsym_export_midi = fts_new_symbol("export_midi");
   seqsym_export_midi_dialog = fts_new_symbol("export_midi_dialog");
@@ -109,10 +113,3 @@ seqsym_config(void)
   seqsym_lock = fts_new_symbol("lock");
   seqsym_unlock = fts_new_symbol("unlock");
 }
-
-
-
-
-
-
-
