@@ -18,5 +18,4 @@ SOURCES := \
 	$(INCLUDE_PATH)/RunCtrlInteraction.java \
 	$(INCLUDE_PATH)/Squeack.java \
 	$(INCLUDE_PATH)/SubInteraction.java \
-	$(INCLUDE_PATH)/ToggleSelect.java \
 	$(INCLUDE_PATH)/VResizeInteraction.java \

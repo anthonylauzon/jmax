@@ -29,6 +29,7 @@ class IdleEditInteraction extends Interaction
   Interaction moveInteraction;
   Interaction connectionSelectInteraction;
   Interaction connectionToggleSelectInteraction;
+  Interaction doubleClickEditInteraction;
 
   IdleEditInteraction(InteractionEngine engine)
   {
@@ -45,6 +46,7 @@ class IdleEditInteraction extends Interaction
     moveInteraction       = new MoveInteraction(engine, this);
     connectionSelectInteraction = new ConnectionSelectInteraction(engine, this);
     connectionToggleSelectInteraction = new ConnectionToggleSelectInteraction(engine, this);
+    doubleClickEditInteraction = new DoubleClickEditInteraction(engine, this);
   }
 
   void configureInputFilter(InputFilter filter)
@@ -112,6 +114,11 @@ class IdleEditInteraction extends Interaction
       case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):
 	// Help
 	engine.setInteraction(helpInteraction);
+	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
+	break;
+      case (Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+	// Edit Content 
+	engine.setInteraction(doubleClickEditInteraction);
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
 	break;
       }

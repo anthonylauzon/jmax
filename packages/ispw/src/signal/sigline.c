@@ -36,18 +36,7 @@ typedef struct
   ftl_data_t ftl_data;
 } sigline_t;
 
-static void post_line(sigline_t *this)
-{
-  post("line %lx: time %f, set %d, vecsize %d, srate %f, ftl_data %lx, ftl_data ptr %lx\n",
-       (unsigned long) this, this->time, this->set, this->vecsize, this->srate,
-       (unsigned long) this->ftl_data, (unsigned long) ftl_data_get_ptr(this->ftl_data));
-}
 
-static void post_line_ctl(line_control_t *ctl)
-{
-  post("line_control %lx: value %f, incr %f, target %f, steps %d\n",
-       (unsigned long) ctl, ctl->value, ctl->incr, ctl->target, ctl->steps);
-}
 
 static void ftl_line(fts_word_t *argv)
 {
@@ -192,10 +181,6 @@ sigline_set_target(sigline_t *this, float target)
       ctl->target = target;
       ctl->incr = (target - ctl->value) / steps; 
       ctl->steps = steps;
-
-      post("Steps %f\n", this->time);
-      post_line(this);
-      post_line_ctl(ctl);
     }
   else
     {
@@ -203,10 +188,6 @@ sigline_set_target(sigline_t *this, float target)
       ctl->target = target;
       ctl->incr = 0.0;
       ctl->steps = 0;
-
-      post("No Steps %f\n", this->time);
-      post_line(this);
-      post_line_ctl(ctl);
     }
 
   this->time = 0.0;

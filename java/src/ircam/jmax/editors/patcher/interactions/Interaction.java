@@ -28,8 +28,6 @@ abstract class Interaction
 
   void configureInputFilter(InputFilter filter)
   {
-    filter.setFollowingMoves(false);
-    filter.setFollowingLocations(false);
   }
 
   // This method is also called by the interaction engine

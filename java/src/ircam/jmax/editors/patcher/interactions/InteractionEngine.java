@@ -81,6 +81,10 @@ final public class InteractionEngine
   {
     this.interaction = interaction;
 
+    filter.setFollowingMoves(false);
+    filter.setFollowingLocations(false);
+    filter.setAutoScrolling(false);
+
     interaction.configureInputFilter(filter);
     interaction.reset();
   }

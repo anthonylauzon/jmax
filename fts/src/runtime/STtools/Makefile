@@ -21,7 +21,6 @@ all: $(LIBDIR)/libSTtools.a
 
 $(LIBDIR)/libSTtools.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libSTtools.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libSTtools.a
 
 TOCLEAN = $(LIBDIR)/libSTtools.a
 

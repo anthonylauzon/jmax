@@ -24,12 +24,7 @@ class RunCtrlInteraction extends SubInteraction
 
   void configureInputFilter(InputFilter filter)
   {
-    // Note that following locations is false because
-    // the first event is not handled by this filter,
-    // but by the master interaction filter.
-
-    filter.setFollowingMoves(true); // need the drag
-    filter.setFollowingLocations(false);
+    filter.setFollowingMoves(true);
   }
 
   void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)

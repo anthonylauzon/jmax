@@ -24,7 +24,6 @@ class AddObjectInteraction extends Interaction
   void configureInputFilter(InputFilter filter)
   {
     filter.setFollowingMoves(true);
-    filter.setFollowingLocations(false);
   }
 
   void gotSqueack(int squeack, DisplayObject object, Point mouse, Point oldMouse)

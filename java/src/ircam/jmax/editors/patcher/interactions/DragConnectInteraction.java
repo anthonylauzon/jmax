@@ -31,6 +31,7 @@ class DragConnectInteraction extends SubInteraction
   {
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingLocations(true);
+    filter.setAutoScrolling(true);
   }
 
 

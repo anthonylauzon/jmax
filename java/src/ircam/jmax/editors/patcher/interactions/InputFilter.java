@@ -3,6 +3,8 @@ package ircam.jmax.editors.patcher.interactions;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -43,6 +45,7 @@ final class InputFilter implements MouseMotionListener, MouseListener
 
     sketch = engine.getSketch();
     displayList = sketch.getDisplayList();
+    initAutoScroll();
   }
   
   void dispose()
@@ -137,6 +140,7 @@ final class InputFilter implements MouseMotionListener, MouseListener
       return Squeack.UNKNOWN;
   }
 
+
   final private void processEvent(int squeack, MouseEvent e)
   {
     DisplayObject object = null;
@@ -152,7 +156,98 @@ final class InputFilter implements MouseMotionListener, MouseListener
 	squeack |= getLocationBits(object);
       }
 
+    autoScrollIfNeeded(squeack, mouse, oldMouse);
+
     engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
+  }
+
+  // Scroll handling
+  // The input filter handle automatic smooth scrolling
+  // the autoresize is handled by the sketch and by the
+  // semantic action directly.
+    
+  Timer scrollTimer;
+  ScrollDragAction scroller;
+  boolean autoScroll = false;
+
+  private void initAutoScroll()
+  {
+    scroller    = new ScrollDragAction();
+    scrollTimer = new Timer(50, scroller);
+    scrollTimer.setCoalesce(true);
+    scrollTimer.setRepeats(true);
+  }
+
+  void setAutoScrolling(boolean v)
+  {
+    autoScroll = v;
+  }
+
+  boolean isAutoScrolling()
+  {
+    return autoScroll;
+  }
+
+  class ScrollDragAction implements ActionListener
+  {
+    int squeack;
+    Point timerMouse = new Point();
+    Point oldTimerMouse = new Point();
+    
+    public void actionPerformed(ActionEvent evt)
+    {
+      // Scroll slowly, 5 points toward mouse
+
+      sketch.scrollToward(timerMouse, 5);
+
+      // Deliver a syntetic event to the interaction
+
+      engine.getInteraction().gotSqueack(squeack, null, timerMouse, oldTimerMouse);
+
+      // Add the current point to the mouse history
+
+      addPoint(timerMouse);
+    }
+
+    void setSqueack(int squeack)
+    {
+      this.squeack = squeack;
+    }
+
+    void addPoint(Point mouse)
+    {
+      oldTimerMouse.setLocation(timerMouse);
+      timerMouse.setLocation(mouse);
+    }
+  }
+
+  void autoScrollIfNeeded(int squeack, Point mouse, Point oldMouse)
+  {
+    // Handle the auto scrolling and autoresizing
+
+    if (isAutoScrolling() && Squeack.isDrag(squeack) && (! sketch.pointIsVisible(mouse)))
+      {
+	if (scrollTimer.isRunning())
+	  {
+	    scroller.addPoint(mouse);
+	  }
+	else
+	  {
+	    scroller.setSqueack(squeack);
+	    scroller.addPoint(oldMouse);
+	    scroller.addPoint(mouse);
+	    scrollTimer.start();
+	    System.err.println("Started Timer");
+	  }
+      }
+    else 
+      {
+	if (scrollTimer.isRunning())
+	  {
+	    scrollTimer.stop();
+	    System.err.println("Stopped Timer");
+	  }
+      }
   }
 
   // Methods following the mouse

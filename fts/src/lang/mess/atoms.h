@@ -43,7 +43,9 @@
    branch of an if ...
  */
 
-#define fts_null {(fts_symbol_t)0, 0}
+#define FTS_NULL {(fts_symbol_t)0, 0}
+
+extern fts_atom_t fts_null;
 
 /* Macros to deal with any type */
 

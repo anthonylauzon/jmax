@@ -22,12 +22,7 @@ class MoveInteraction extends SubInteraction
 
   void configureInputFilter(InputFilter filter)
   {
-    // Note that following locations is false because
-    // the first event is not handled by this filter,
-    // but by the master interaction filter.
-
-    filter.setFollowingMoves(true); // need the move
-    filter.setFollowingLocations(false);
+    filter.setFollowingMoves(true);
   }
 
 

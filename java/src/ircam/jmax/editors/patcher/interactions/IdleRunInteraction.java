@@ -21,6 +21,7 @@ class IdleRunInteraction extends Interaction
 
   Interaction helpInteraction;
   Interaction runCtrlInteraction;
+  Interaction doubleClickEditInteraction;
 
   IdleRunInteraction(InteractionEngine engine)
   {
@@ -28,11 +29,11 @@ class IdleRunInteraction extends Interaction
 
     helpInteraction    = new HelpInteraction(engine, this);
     runCtrlInteraction = new RunCtrlInteraction(engine, this);
+    doubleClickEditInteraction = new DoubleClickEditInteraction(engine, this);
   }
 
   void configureInputFilter(InputFilter filter)
   {
-    filter.setFollowingMoves(false);
     filter.setFollowingLocations(true);
   }
 
@@ -48,6 +49,11 @@ class IdleRunInteraction extends Interaction
       case (Squeack.DOWN | Squeack.OBJECT):
 	// Normal controller operations
 	engine.setInteraction(runCtrlInteraction);
+	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
+	break;
+      case (Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+	// Edit Content 
+	engine.setInteraction(doubleClickEditInteraction);
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
 	break;
       }

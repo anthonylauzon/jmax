@@ -306,6 +306,8 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     addKeyListener( interaction);
 
     InitFromFtsContainer( itsPatcherData);
+
+    fixSize();
     
     PrepareInChoice(); 
     PrepareOutChoice();
@@ -367,13 +369,52 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	  preferredSize.width = 20;
 
 	setPreferredSize(preferredSize);
-
-	revalidate(); // ???
       }
+  }
 
-    // Finally, if the selection is outside the current visible 
-    // area, rescroll
 
+  public boolean pointIsVisible(Point point)
+  {
+    Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+
+    return ((point.x >= r.x) && (point.x < r.x + r.width) &&
+	    (point.y >= r.y) && (point.y < r.y + r.height));
+  }
+
+  public void scrollToward(Point point, int howMuch)
+  {
+    Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+    int dx = 0;
+    int dy = 0;
+
+    System.err.println("scrollToward point " + point + " viewrect " + r);
+    // Vertical dimension
+
+    if (point.x < r.x)
+      dx = (-1) * howMuch;
+    else if (point.x > r.x + r.width)
+      dx = howMuch;
+
+    if (point.y < r.y)
+      dy = (-1) * howMuch;
+    else if (point.y > r.y + r.height)
+      dy = howMuch;
+
+    r.x = r.x + dx;
+    r.y = r.y + dy;
+
+    scrollRectToVisible(r);
+
+    revalidate(); // ???
+
+    System.err.println("Scrolled dx " + dx + " dy " + dy);
+  }
+
+  // if the selection is outside the current visible 
+  // area, rescroll to show it
+
+  void showSelection()
+  {
     Rectangle selectionBounds = ErmesSelection.patcherSelection.getBounds();
     Rectangle visibleRectangle = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
 
@@ -385,9 +426,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	    revalidate(); // ???
 	  }
       }
-
-    if (redraw)
-      redraw();
   }
 
 
@@ -454,6 +492,8 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 		ErmesSelection.patcherSelection.select( object);
 		object.redraw();
 	      }
+
+	    showSelection();
 	  }
       }
   }

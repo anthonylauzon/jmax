@@ -25,13 +25,15 @@ OS_TYPE := unix
 # Standard gcc
 
 CC := gcc
+
 # These flags are quite strict and give a lot of warning. But they are safe
 #ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused -DLINUX -DLINUXPC 
 # For now, we use
 ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC 
-ARCH_OPT_CFLAGS := -O2
+ARCH_OPT_CFLAGS := -O6
+
 LD := gcc
-ARCH_LDFLAGS := -rdynamic  
+ARCH_LDFLAGS := -rdynamic 
 
 
 # Pentium gcc

@@ -557,11 +557,11 @@ fdiv_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->value = (float) fts_get_number(at);
 
-  if (this->operator == 0.)
+  /*  if (this->operator == 0.)
     {
       fts_outlet_float(o, 0, 0.);
     }
-  else
+  else */
     fts_outlet_float(o, 0, this->value / this->operator);
 }
 
