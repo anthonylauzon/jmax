@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.111 2003/03/19 14:05:28 dechelle Exp $
+dnl $Id: configure.in,v 1.112 2003/04/01 14:26:01 borghesi Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.112  2003/04/01 14:26:01  borghesi
+dnl *** empty log message ***
+dnl
 dnl Revision 1.111  2003/03/19 14:05:28  dechelle
 dnl - fixed declaration of alloca(): see ChangeLog
 dnl - cleaned code for printing patches
@@ -167,6 +170,7 @@ AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h n
 dnl Checks for library functions.
 AC_CHECK_FUNCS(socket)
 AC_CHECK_FUNCS(signal)
+AC_CHECK_FUNCS(realpath)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
