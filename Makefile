@@ -152,7 +152,7 @@ spec-files:
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-dist:
+dist: cvs-tag
 	( \
 		umask 22 ; \
 		mkdir .$$$$ ; \
