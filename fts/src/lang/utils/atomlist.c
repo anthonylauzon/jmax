@@ -50,9 +50,6 @@ fts_atom_list_init( fts_atom_list_t *list)
 {
   list->head = 0;
   list->tail = 0;
-
-  /* update support */
-  list->changed = 0;
 }
 
 fts_atom_list_t *
@@ -77,9 +74,6 @@ void
 fts_atom_list_destroy( fts_atom_list_t *list)
 {
   fts_atom_list_cell *cell, *next;
-
-  if (list->head)
-      list->changed  = 1;
 
   for( cell = list->head; cell; cell = next)
     {
@@ -128,9 +122,6 @@ fts_atom_list_append( fts_atom_list_t *list, int ac, const fts_atom_t *atom)
 
   for (i = 0; i < ac; i++)
     fts_atom_list_append_one(list, atom + i);
-
-  if (ac)
-    list->changed  = 1;
 }
 
 
@@ -139,7 +130,6 @@ fts_atom_list_set( fts_atom_list_t *list, int ac, const fts_atom_t *atom)
 {
   fts_atom_list_destroy( list);
   fts_atom_list_append(list, ac, atom);
-  list->changed  = 1;
 }
 
 /* Iterators */

@@ -242,7 +242,7 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, int id, fts_symbol_t
 
       /* activate the post-load init, like loadbangs */
 
-      fts_message_send(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
+      fts_send_message(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
 
       return patcher;
     }
@@ -466,7 +466,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 	      argc = fts_patparse_read_object_arguments(args, in);
 
-	      fts_message_send(lastNObject, 0, fts_s__set, argc, args);
+	      fts_send_message(lastNObject, 0, fts_s__set, argc, args);
 
 	      fts_patlex_next_token(in);/* skip ';' ?? */
 	    }
@@ -490,7 +490,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 	      argc = fts_patparse_read_object_arguments(args, in);
 
-	      fts_message_send(lastNObject, 0, selector, argc, args);
+	      fts_send_message(lastNObject, 0, selector, argc, args);
 	      
 	      fts_patlex_next_token(in);/* skip ';' ?? */
 	    }
@@ -506,7 +506,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 		  selector = fts_get_symbol(&(in->val));
 
-		  fts_message_send(lastNObject, 0, selector, 0, 0);
+		  fts_send_message(lastNObject, 0, selector, 0, 0);
 		}
 	      else
 		{
@@ -518,7 +518,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 		  fts_patlex_push_back(in);
 
 		  argc = fts_patparse_read_object_arguments(args, in);
-		  fts_message_send(lastNObject, 0, fts_s_append, argc, args);
+		  fts_send_message(lastNObject, 0, fts_s_append, argc, args);
 		}
 
 	      fts_patlex_next_token(in); /* skip ';' ?? */
@@ -855,8 +855,8 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       fts_patparse_set_normal_mode(in);
 
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
-      fts_message_send(obj, fts_SystemInlet, fts_s_clear, 0, 0);
-      fts_message_send(obj, fts_SystemInlet, fts_s_append, argc, description + 1);
+      fts_send_message(obj, fts_SystemInlet, fts_s_clear, 0, 0);
+      fts_send_message(obj, fts_SystemInlet, fts_s_append, argc, description + 1);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }

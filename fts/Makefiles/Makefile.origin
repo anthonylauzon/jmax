@@ -11,7 +11,7 @@ SYSTEM_LDFLAGS :=  -mips4 -n32 -lmalloc
 SYSTEM_SOFLAGS := -mips4 -n32
 
 SYSTEM_OPT_CFLAGS := -Ofast=ip27 -IPA -OPT:roundoff=3 -OPT:IEEE_arithmetic=3 
-SYSTEM_OPT_LDFLAGS = -Ofast=ip27  -IPA  -Wl,-exports_file,$(EXPORTS_FILE) -show
+SYSTEM_OPT_LDFLAGS = -Ofast=ip27  -IPA  -Wl,-exports_file,$(EXPORTS_FILE) 
 SYSTEM_OPT_SOFLAGS = -IPA
 
 

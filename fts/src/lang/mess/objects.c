@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.25 $ IRCAM $Date: 1998/06/02 10:06:54 $
+ *      $Revision: 1.26 $ IRCAM $Date: 1998/06/03 11:42:22 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -165,6 +165,7 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
   fts_metaclass_t *mcl;
   fts_symbol_t  var;
 #ifdef DO_EXPRESSIONS
+  fts_expression_state_t *e;
   int ac;
   fts_atom_t at[1024]; /* Actually, the evaluated atom vector
 			   should be the copy for the object,
@@ -194,17 +195,21 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
 
 	  /* Compute the expressions with the correct offset */
 
-	  ac = fts_expression_eval((fts_object_t *)patcher, aoc - 2, aot + 2, 1024, at);
+	  e = fts_expression_eval((fts_object_t *)patcher, aoc - 2, aot + 2, 1024, at);
+	  ac = fts_expression_get_count(e);
 	}
       else
 	{
 	  /* variable less syntax, consider everything as expressions */
 	  var = 0;
-	  ac = fts_expression_eval((fts_object_t *)patcher, aoc, aot, 1024, at);
+	  e = fts_expression_eval((fts_object_t *)patcher, aoc, aot, 1024, at);
+
 	}
 
       if (ac == -1)
 	obj = fts_error_object_new(patcher, id, aoc, aot);
+
+      ac = fts_expression_get_count(e);
     }
 #endif
 
@@ -230,48 +235,61 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
       mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
 
       if (mcl != 0)
-	obj =  fts_make_object(patcher, id, ac, at);
+	{
+	  /* We have a metaclass: this prevent looking for 
+	     further abstractions */
 
-      if (!obj)
-	obj = fts_error_object_new(patcher, id, aoc, aot);
+	  obj =  fts_make_object(patcher, id, ac, at);
+
+	  /* No object yet, Try with an object doctor */
+
+	  if (! obj)
+	    obj = fts_call_object_doctor(patcher, id, ac, at);
+	}
+      else
+	{
+	  /* no metaclass; try with a  path abstraction */
+
+	  if (! obj)
+	    obj = fts_abstraction_new_search(patcher, id, ac, at);
+
+	  /* No object yet, Try with an object doctor */
+
+	  if (! obj)
+	    obj = fts_call_object_doctor(patcher, id, ac, at);
+	}
     }
 
-  /* NO object yet; try with a  path abstraction */
-
-  if (! obj)
-    obj = fts_abstraction_new_search(patcher, id, ac, at);
-
-  /* No object yet, Try with an object doctor */
-
-  if (! obj)
-    obj = fts_call_object_doctor(patcher, id, ac, at);
-
-  /* if an obj */
-
-  if (! obj)
+  if (!obj)
     obj = fts_error_object_new(patcher, id, aoc, aot);
 
-  if (obj)
-    {
-      /* Object created: do the last operations, like setting 
-	 the object description, variables and properties;
-	 We check if the argv exists already; a doctor may have
-	 changed the object definition, for persistent fixes !!
-	 */
+  /* Object created (at worst, a error object) do the last operations, like setting 
+     the object description, variables and properties;
+     We check if the argv exists already; a doctor may have
+     changed the object definition, for persistent fixes !!
+     */
 
-      if (! obj->argv)
-	fts_object_set_description(obj, aoc, aot);
+  if (! obj->argv)
+    fts_object_set_description(obj, aoc, aot);
 
 #ifdef DO_EXPRESSIONS
-      if (! fts_object_is_error(obj))
+  if (! fts_object_is_error(obj))
+    {
+      /* First, assign all the expression properties to the object */
+      
+      fts_expression_assign_properties(e, obj);
+
+      /* then, assign it to the variable if any */
+
+      if (var != 0)
 	{
 	  fts_atom_t a;
-	  
+	  	    
 	  fts_set_object(&a, obj);
 	  fts_variable_define(obj, var, &a);
 	}
-#endif
     }
+#endif
 
   return obj;
 }
@@ -417,7 +435,7 @@ fts_object_delete(fts_object_t *obj)
 
   /* tell the object we are going to delete him */
 
-  fts_message_send(obj, fts_SystemInlet, fts_s_delete, 0, 0);
+  fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
 
   /* take it away from the update queue, if there */
 
@@ -720,7 +738,7 @@ fts_mess_set_run_time_check(int flag)
 }
 
 fts_status_t
-fts_message_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_status_t status;
 
@@ -772,7 +790,7 @@ fts_message_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 fts_status_t
-fts_message_send_cache(fts_object_t *o, int winlet, fts_symbol_t s,
+fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
 		 int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache)
 {
   fts_status_t status;
@@ -925,7 +943,7 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 	  (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
 	}
       else
-	fts_message_send_cache(conn->dst, conn->winlet, s, ac, at, &conn->symb, &conn->mth);
+	fts_send_message_cache(conn->dst, conn->winlet, s, ac, at, &conn->symb, &conn->mth);
 
       conn = conn->next_same_src;
     }
@@ -955,7 +973,7 @@ fts_outlet_int(fts_object_t *o, int woutlet, int n)
 
   while(conn)
     {
-      fts_message_send(conn->dst, conn->winlet, fts_s_int, 1, &atom); 
+      fts_send_message(conn->dst, conn->winlet, fts_s_int, 1, &atom); 
 
       conn = conn->next_same_src;
     }
@@ -973,7 +991,7 @@ fts_outlet_float(fts_object_t *o, int woutlet, float f)
 
   while(conn)
     {
-      fts_message_send(conn->dst, conn->winlet, fts_s_float, 1, &atom); 
+      fts_send_message(conn->dst, conn->winlet, fts_s_float, 1, &atom); 
 
       conn = conn->next_same_src;
     }
@@ -991,7 +1009,7 @@ fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
 
   while(conn)
     {
-      fts_message_send(conn->dst, conn->winlet, fts_s_symbol, 1, &atom); 
+      fts_send_message(conn->dst, conn->winlet, fts_s_symbol, 1, &atom); 
 
       conn = conn->next_same_src;
     }
@@ -1006,7 +1024,7 @@ fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
 
   while(conn)
     {
-      fts_message_send(conn->dst, conn->winlet, fts_s_list, ac, at); 
+      fts_send_message(conn->dst, conn->winlet, fts_s_list, ac, at); 
 
       conn = conn->next_same_src;
     }
@@ -1020,7 +1038,7 @@ fts_outlet_bang(fts_object_t *o, int woutlet)
 
   while(conn)
     {
-      fts_message_send(conn->dst, conn->winlet, fts_s_bang, 0, 0); 
+      fts_send_message(conn->dst, conn->winlet, fts_s_bang, 0, 0); 
 
       conn = conn->next_same_src;
     }

@@ -106,6 +106,7 @@ fts_s_smaller
 fts_s_smaller_equal
 fts_s_conditional
 fts_s_else
+fts_s_assign
 fts_ClassAlreadyInitialized
 fts_InletOutOfRange
 fts_OutletOutOfRange
@@ -145,8 +146,8 @@ fts_object_connect_perform
 fts_object_connect_outlet
 fts_object_disconnect_perform
 fts_object_disconnect_outlet
-fts_message_send
-fts_message_send_cache
+fts_send_message
+fts_send_message_cache
 fts_outlet_send
 fts_get_int_by_name
 fts_get_float_by_name

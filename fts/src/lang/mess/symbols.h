@@ -126,6 +126,7 @@ extern fts_symbol_t fts_s_smaller;
 extern fts_symbol_t fts_s_smaller_equal;
 extern fts_symbol_t fts_s_conditional;
 extern fts_symbol_t fts_s_else;
+extern fts_symbol_t fts_s_assign;
 
 #endif
 

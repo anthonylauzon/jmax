@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.8 $ IRCAM $Date: 1998/05/22 11:55:27 $
+ *      $Revision: 1.9 $ IRCAM $Date: 1998/06/02 10:06:55 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -51,11 +51,12 @@ extern void fts_object_disconnect(fts_connection_t *conn);
 
 /* Messaging */
 
-extern fts_status_t fts_message_send(fts_object_t *, int winlet, fts_symbol_t , int,  const fts_atom_t *);
+#define fts_message_send  fts_send_message
+extern fts_status_t fts_send_message(fts_object_t *, int winlet, fts_symbol_t , int,  const fts_atom_t *);
 
 /* NOt to be used by users, but called by the optimized macros ... */
 
-extern fts_status_t fts_message_send_cache(fts_object_t *o, int winlet, fts_symbol_t s,
+extern fts_status_t fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
 					   int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache);
 
 
@@ -98,7 +99,7 @@ while((CONN)) \
     if (((CONN)->symb == (S)) || (!(CONN)->symb && (CONN)->mth)) \
        (*(CONN)->mth)((CONN)->dst, (CONN)->winlet, (S), (AC), (AT)); \
     else \
-       fts_message_send_cache((CONN)->dst, (CONN)->winlet, (S), (AC), (AT), &((CONN)->symb), &((CONN)->mth)); \
+       fts_send_message_cache((CONN)->dst, (CONN)->winlet, (S), (AC), (AT), &((CONN)->symb), &((CONN)->mth)); \
  \
     (CONN) = (CONN)->next_same_src; \
   }

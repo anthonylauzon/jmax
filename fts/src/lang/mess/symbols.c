@@ -107,6 +107,7 @@ fts_symbol_t fts_s_smaller;
 fts_symbol_t fts_s_smaller_equal;
 fts_symbol_t fts_s_conditional;
 fts_symbol_t fts_s_else;
+fts_symbol_t fts_s_assign;
 
 static void
 fts_predefine_symbols(void)
@@ -242,8 +243,9 @@ fts_predefine_symbols(void)
   fts_s_smaller_equal = fts_new_builtin_symbol("<=", 81);
   fts_s_conditional = fts_new_builtin_symbol("?", 82);
   fts_s_else        = fts_new_builtin_symbol(":", 83);
+  fts_s_assign      = fts_new_builtin_symbol("=", 84);
 
-  /* Last number user: 83 (max, 255 predefined symbols !! ) */
+  /* Last number user: 84 (max, 255 predefined symbols !! ) */
   /* WARNING: read the warning at the beginning of the function */
 }
 

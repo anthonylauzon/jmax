@@ -124,7 +124,7 @@ fts_event(fts_symbol_t s, int ac, const fts_atom_t *at)
   /* First, we look in the stack; first handler found executed */
 
   while (hnd)
-    if (fts_message_send(hnd->handler, fts_SystemInlet, s, ac, at) == fts_Success)
+    if (fts_send_message(hnd->handler, fts_SystemInlet, s, ac, at) == fts_Success)
       return;
     else
       hnd = hnd->next;
@@ -135,7 +135,7 @@ fts_event(fts_symbol_t s, int ac, const fts_atom_t *at)
   
   while (hnd)
     {
-      if (fts_message_send(hnd->handler, fts_SystemInlet, s, ac, at) == fts_Success)
+      if (fts_send_message(hnd->handler, fts_SystemInlet, s, ac, at) == fts_Success)
 	global_found = 1;
       hnd = hnd->next;
     }
@@ -152,7 +152,7 @@ fts_event(fts_symbol_t s, int ac, const fts_atom_t *at)
   
       while (hnd)
 	{
-	  if (fts_message_send(hnd->handler, fts_SystemInlet, s, ac, at) == fts_Success)
+	  if (fts_send_message(hnd->handler, fts_SystemInlet, s, ac, at) == fts_Success)
 	    found = 1;
 
 	  hnd = hnd->next;

@@ -1,7 +1,7 @@
 #ifndef _ATOMLIST_H_
 #define _ATOMLIST_H_
 
-#define FTS_ATOM_LIST_CELL_MAX_ATOMS 5 /* was 16 */
+#define FTS_ATOM_LIST_CELL_MAX_ATOMS 16
 
 typedef struct fts_atom_list_cell {
   int n;
@@ -18,7 +18,6 @@ extern void fts_atom_list_cell_free( fts_atom_list_cell *cell);
 typedef struct fts_atom_list
 {
   fts_atom_list_cell *head, *tail;
-  int changed;			/* changed flag for update, is the only update related field needed here */
 } fts_atom_list_t;
 
 extern void fts_atom_list_init( fts_atom_list_t *list);

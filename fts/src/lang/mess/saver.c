@@ -799,7 +799,7 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 
   fts_set_ptr(&a, f);
 
-  fts_message_send(obj, fts_SystemInlet, fts_s_save_bmax, 1, &a);
+  fts_send_message(obj, fts_SystemInlet, fts_s_save_bmax, 1, &a);
 }
 
 

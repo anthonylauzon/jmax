@@ -728,7 +728,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    fprintf(stderr, "OBJ_MESS %d %s %d\n", inlet, fts_symbol_name(sel), nargs);
 #endif
 
-	    fts_message_send(*object_tos, inlet, sel, nargs, eval_tos);
+	    fts_send_message(*object_tos, inlet, sel, nargs, eval_tos);
 	  }
 	break;
 
@@ -751,7 +751,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	    fprintf(stderr, "OBJ_BUILTIN_MESS %d %s %d\n", inlet, fts_symbol_name(sel), nargs);
 #endif
 
-	    fts_message_send(*object_tos, inlet, sel, nargs, eval_tos);
+	    fts_send_message(*object_tos, inlet, sel, nargs, eval_tos);
 	  }
 	break;
 
