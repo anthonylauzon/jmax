@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,21 +23,35 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.console.actions;
+package ircam.jmax.editors.console;
 
+import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
+
+import ircam.jmax.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
-/** This class define a set of static variables 
- *  containing all the standard actions used for the
- *  patcher editor; please notes that actions objects are
- *  shared between all the editor instances.
- */
-
-public class Actions
+public class PrintAction extends EditorAction
 {
-  public static EditorAction printAction     = new PrintAction();
+  public void doAction(EditorContainer container)
+  {
+      PrinterJob printJob = PrinterJob.getPrinterJob();
+      PageFormat format = printJob.pageDialog(printJob.defaultPage());    
+      printJob.setPrintable((ConsoleWindow)container, format);
+      
+      if (printJob.printDialog()) {
+	  try {
+	      printJob.print();
+	  } catch (Exception ex) {
+	      ex.printStackTrace();
+	  }
+      }
+  }
 }
+

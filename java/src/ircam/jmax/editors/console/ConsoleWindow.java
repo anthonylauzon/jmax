@@ -41,7 +41,6 @@ import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
-import ircam.jmax.editors.console.menus.*;
 import ircam.jmax.widgets.ConsoleArea;
 
 /**
@@ -54,7 +53,6 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
   private ConsoleArea consoleArea;
   private boolean noConsole;
-  private ConsoleDocument document;
   private ControlPanel controlPanel;
   private DefaultHelpMenu helpMenu;
 
@@ -148,8 +146,6 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     setLocation(0,0);
     setSize( 500, 600);
 
-    document = new ConsoleDocument(MaxApplication.getFts());
-
     setVisible( true);
   }
   
@@ -159,12 +155,6 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
     // File menu    
     mb.add( new FileMenu()); 
-
-    // Edit menu
-    //mb.add( new EditMenu( this));
-    
-    // Tool menu 
-    //mb.add( new ircam.jmax.toolkit.menus.MaxToolsJMenu( "Tools"));
 
     // Windows Menu
     mb.add( new ircam.jmax.toolkit.menus.MaxWindowJMenu( "Windows", this));
@@ -199,7 +189,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
   }
 
   public MaxDocument getDocument(){
-    return document;
+      return null;
   }
 
   // Methods from interface EditorContainer

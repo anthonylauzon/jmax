@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,19 +23,27 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.console.menus;
+package ircam.jmax.editors.console;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
-public class EditMenu extends EditorMenu
+/** Implement the console editor File Menu */
+
+public class FileMenu extends DefaultFileMenu
 {
-  public EditMenu( EditorContainer container)
+  public FileMenu()
   {
-    super("Edit");
+    super();
+    insert(new PrintAction(), "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 3);
+
+    remove(4);
   }
 }
-
-
-
 

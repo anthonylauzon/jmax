@@ -1,14 +1,12 @@
-SUBDIRS=actions menus
-
 EXTRA_DIST= package.html
 noinst_PROGRAMS = package
 package_SOURCES = \
-ConsoleDocument.java\
-ConsoleDocumentType.java\
 ConsoleModule.java\
 ConsoleOutputStream.java\
 ConsoleWindow.java\
-ControlPanel.java
+ControlPanel.java\
+PrintAction.java\
+FileMenu.java
 
 JAVACX=@JAVACX@
 JAVAROOTX=@top_srcdir@/java/src

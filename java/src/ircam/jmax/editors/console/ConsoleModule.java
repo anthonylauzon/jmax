@@ -33,14 +33,7 @@ import ircam.jmax.fts.*;
 
 public class ConsoleModule
 {
-  static public void initModule()
-  {    
-    // Install the DspModule remote data
-
-      /*Fts.registerRemoteDataClass("dspcontrol_data", ircam.jmax.fts.FtsDspControl.class);*/
-
-    Mda.installDocumentType( new ConsoleDocumentType());
-  }
+  static public void initModule(){}
 }
 
 
