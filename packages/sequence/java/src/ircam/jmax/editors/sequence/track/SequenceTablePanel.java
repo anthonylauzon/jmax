@@ -47,6 +47,9 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     table = new JTable(tmodel);
     table.setPreferredScrollableViewportSize(new Dimension(600, 300));
     table.setRowHeight(17);
+    table.getColumnModel().getColumn(0).setPreferredWidth(50);
+    table.getColumnModel().getColumn(0).setMaxWidth(50);
+
     scrollPane = new JScrollPane(table);
 
     setUpEditors();
