@@ -443,7 +443,7 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
   fts_symbol_t devname;
   char msg[256];
   int in_num = -1;
-  int out_num = MIDI_MAPPER;
+  int out_num = -1;
   int input = 1;
   fts_symbol_t mode;
 
@@ -505,21 +505,38 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 
     } else {
 
-      /* search the id of the default midi out (print out the list to the log for debugging) */
+      /* search the id of the default midi out (print out the list to
+         the log for debugging) */
+
       for (i = 0; i < num; i++) {
+
 	res = midiOutGetDevCaps(i, &out_caps, sizeof(MIDIOUTCAPS));
+
 	if (res == MMSYSERR_NOERROR) {
 	  fts_log("[winmidiport]: midi out port %d: \"%s\"\n", i, out_caps.szPname); 
+
+	  fts_log("[winmidiport]: Mid=%d, Pid=%d\n", out_caps.wMid, out_caps.wPid); 
+	  if ((out_caps.wMid != MM_MICROSOFT) || (out_caps.wPid != MM_MIDI_MAPPER)) {
+	    fts_log("[winmidiport]: It's MicroSoft SW Synth!\n"); 
+	  }
 
 	  if (strcmp(out_caps.szPname, fts_symbol_name(devname)) == 0) {
 	    out_num = i;
 	    fts_log("[winmidiport]: Found default midi out port in device list\n");
 	  }
+
+	  /* if the user specified the "default" midi device, take the
+             first non-microsoft synth in the list */
+	  if ((devname == fts_s_default) && (out_num < 0) && 
+	      ((out_caps.wMid != MM_MICROSOFT) || (out_caps.wPid != MM_MIDI_MAPPER))) {
+	    out_num = i;
+	    fts_log("[winmidiport]: Using midi out port \"%s\" as default device\n", out_caps.szPname);
+	  }
 	}
       }
 
       /* I am being tough here. But I think it's for the best. */
-      if ((out_num == MIDI_MAPPER) && (devname != fts_s_default)) {
+      if (out_num == -1) {
 	post("Warning: winmidiport: Invalid MIDI out device (%s)\n", fts_symbol_name(devname));
 	fts_log("[winmidiport]: Invalid MIDI out device (%s)\n", fts_symbol_name(devname));
 	goto open_midiin;
@@ -542,14 +559,13 @@ winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 
 	 */
 
-	if ((strstr(out_caps.szPname, "Microsoft") != NULL) && 
-	    (strstr(out_caps.szPname, "Map") == NULL)) {  /* No message for "Mappeur MIDI Microsoft" */
+	if ((out_caps.wMid == MM_MICROSOFT) && (out_caps.wPid == MM_MIDI_MAPPER)) {
 	  if (MessageBox(NULL, "The Microsoft Soft Synth is not supported by FTS and \n"
 			 "might cause FTS to crash. If you have any problems, please \n"
 			 "select an other MIDI device in the Windows Configuration Panels \n"
 			 "and restart FTS. Do you want to continue?", 
 			 "jMax - Warning", 
-			 MB_YESNO | MB_ICONSTOP | MB_APPLMODAL) == IDNO) {
+			 MB_YESNO | MB_ICONSTOP | MB_SYSTEMMODAL | MB_SETFOREGROUND) == IDNO) {
 	    
 	    post("Open MIDI out cancelled\n");
 	    fts_log("[winmidiport]: Open MIDI out cancelled\n");
