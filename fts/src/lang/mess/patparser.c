@@ -81,7 +81,7 @@ typedef struct fts_graphic_description
 
 
 static void fts_patparse_graphic_description_init(fts_graphic_description_t *this);
-/*static*/ void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in);
+static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in);
 static fts_object_t *fts_get_child(fts_object_t *obj, int idx);
 static void fts_patparse_parse_connection(fts_object_t *parent, fts_patlex_t *in);
 static int fts_patparse_read_object_arguments(fts_atom_t *args, fts_patlex_t *in);
@@ -298,7 +298,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
  *
  */
 
-/*static*/ void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in) 
+static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in) 
 {
   fts_object_t *lastNObject = 0;
   fts_symbol_t  lastNObjectType = 0;
@@ -528,7 +528,10 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 	}
       else
 	{
-	  post("Format not supported (#%c)\n", (char) in->ttype);
+	  if ( in->ttype != FTS_LEX_SYMBOL)
+	    post( "[%d] Expecting symbol, got %d\n", in->line_number, in->ttype);
+	  else
+	    post("[%d] Format not supported (%s)\n", in->line_number, fts_symbol_name( fts_get_symbol( &in->val)));
 	  
 	  /* skip until the next ';' */
 
@@ -947,43 +950,45 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
 
 static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patlex_t *in)
 {
-  int x_top_left, y_top_left, x_bottom_right, y_bottom_right;
+  int x_left, y_top, x_right, y_bottom;
   fts_atom_t x, y, height, width;
 
   fts_patlex_next_token(in);
-  x_top_left = fts_get_int(&(in->val));
+  x_left = fts_get_int(&(in->val));
     
   fts_patlex_next_token(in);
-  y_top_left = fts_get_int(&(in->val));
+  y_top = fts_get_int(&(in->val));
 
   fts_patlex_next_token(in);
-  x_bottom_right = fts_get_int(&(in->val));
+  x_right = fts_get_int(&(in->val));
 
   fts_patlex_next_token(in);
-  y_bottom_right = fts_get_int(&(in->val));
+  y_bottom = fts_get_int(&(in->val));
 
   /* If patcher window has big negative coordinates */
-  if (x_top_left < -10000 || y_top_left < -10000)
+  if (x_left < -10000 || y_top < -10000)
     {
       fts_atom_t a;
 
       fts_set_int( &a, 1);
       fts_object_put_prop( parent, fts_new_symbol( "no_upload"), &a);
 
-      x_top_left = -x_top_left;
-      y_top_left = -y_top_left;
+      x_left = -x_left;
+      y_top = -y_top;
 
       return;
     }
 
-  fts_set_int( &x, x_top_left);
-  fts_set_int( &y, y_top_left);
-  fts_set_int( &width, (x_bottom_right - x_top_left) );
-  fts_set_int( &height, (y_bottom_right - y_top_left) );
-
+  fts_set_int( &x, x_left);
   fts_object_put_prop(parent, fts_s_wx, &x);
+
+  fts_set_int( &y, y_top);
   fts_object_put_prop(parent, fts_s_wy, &y);
+
+  fts_set_int( &width, (x_right - x_left) );
   fts_object_put_prop(parent, fts_s_ww, &width);
+
+  fts_set_int( &height, (y_bottom - y_top) );
   fts_object_put_prop(parent, fts_s_wh, &height);
 }
 

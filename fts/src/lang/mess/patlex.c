@@ -72,6 +72,7 @@ fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
 
   this = (fts_patlex_t *) fts_malloc(sizeof(fts_patlex_t));
   this->fd = file;
+  this->line_number = 0;
   this->env_argc = env_argc;
   this->env_argv = env_argv;
   this->unique_var = unique_count++; /* the unique number used in variable  0 substitution */
@@ -200,6 +201,9 @@ void fts_patlex_next_token(fts_patlex_t *this)
 		}
 	      else if (fts_patlex_is_blank(c))
 		{
+		  if (c == '\n' || c == '\r')
+		    this->line_number++;
+
 		  status = tt_waiting;
 		}
 	      else

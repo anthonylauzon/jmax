@@ -46,6 +46,7 @@ typedef struct fts_patlex
   int env_argc;
 
   FILE *fd;
+  int line_number;
 
   int pushedBack;
   int lookahead_valid;

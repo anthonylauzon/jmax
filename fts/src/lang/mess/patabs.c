@@ -161,7 +161,6 @@ static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
 
 static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
 {
-  char buf[1024];
   int i;
   FILE *file;
   struct stat statbuf;
@@ -177,39 +176,21 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
   for (i = 0; i < search_path_fill ; i++)
     {
       fts_symbol_t filename = search_path_table[i];
-	  
-      /* Try Nature */
+      char *extensions[] = { "", ".abs", ".pat" };
+      char buf[1024];
+      int k;
 
-      sprintf(buf, "%s/%s", fts_symbol_name(filename), fts_symbol_name(name));
+      file = 0;
 
-      /* If the file is there and it is a regular file and not a directory , open it */
-
-      if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
-	file = fopen(buf, "r");
-      else
-	file = 0;
-
-      if (! file)
+      for ( k = 0; k < sizeof( extensions)/sizeof( char *); k++)
 	{
-	  /* Try .abs */
+	  sprintf(buf, "%s/%s%s", fts_symbol_name(filename), fts_symbol_name(name), extensions[k]);
 
-	  sprintf(buf, "%s/%s.abs", fts_symbol_name(filename), fts_symbol_name(name));
-
+	  /* If the file is there and it is a regular file and not a directory , open it */
 	  if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
-	    file = fopen(buf, "r");
-	  else
-	    file = 0;
-	      
-	  if (! file)
 	    {
-	      /* Try .pat */
-
-	      sprintf(buf, "%s/%s.pat", fts_symbol_name(filename), fts_symbol_name(name));
-
-	      if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
-		file = fopen(buf, "r");
-	      else
-		file = 0;
+	      file = fopen( buf, "r");
+	      break;
 	    }
 	}
 
@@ -276,34 +257,37 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
   return obj;
 }
 
+static fts_symbol_t get_name_without_extension( fts_symbol_t name)
+{
+  char *pname, *pdot;
+
+  pname = fts_symbol_name( name);
+  pdot = strrchr( pname, '.');
+
+  if ( pdot && ( !strcmp( pdot, ".abs") || !strcmp( pdot, ".pat")) )
+    {
+      char buff[1024];
+
+      /* .pat or .abs Extension used, generate a new name symbol */
+
+      strcpy( buff, pname);
+
+      buff[ pdot - pname]  = '\0';
+
+      return fts_new_symbol_copy( buff);
+    }
+
+  return name;
+}
+
 
 fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj;
   fts_symbol_t name;
-  char name_buf[1024];
-  char *p;
   FILE *file;
 
-  strcpy(name_buf, fts_symbol_name(fts_get_symbol(&at[0])));
-
-  p = strrchr(name_buf, '.');
-
-  if (p && ((! strcmp(p, ".abs")) || (! strcmp(p, ".pat"))))
-    {
-      /* .pat or .abs Extension used, generate a new name symbol */
-
-      *p = '\0';
-      name = fts_new_symbol_copy(name_buf);
-    }
-  else
-    {
-      /* No extension used, use the provided symbol directly */
-
-      name = fts_get_symbol(&at[0]);
-    }
-
-  file = fts_abstraction_find_declared_file(name);
+  name = get_name_without_extension( fts_get_symbol( at));
+  file = fts_abstraction_find_declared_file( name);
 
   if (file)
     return fts_make_abstraction(file, patcher, ac, at);
@@ -314,30 +298,10 @@ fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int ac, const
 
 fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj;
   fts_symbol_t name;
-  char name_buf[1024];
-  char *p;
   FILE *file;
 
-  strcpy(name_buf, fts_symbol_name(fts_get_symbol(&at[0])));
-
-  p = strrchr(name_buf, '.');
-
-  if (p && ((! strcmp(p, ".abs")) || (! strcmp(p, ".pat"))))
-    {
-      /* .pat or .abs Extension used, generate a new name symbol */
-
-      *p = '\0';
-      name = fts_new_symbol_copy(name_buf);
-    }
-  else
-    {
-      /* No extension used, use the provided symbol directly */
-
-      name = fts_get_symbol(&at[0]);
-    }
-
+  name = get_name_without_extension( fts_get_symbol( at));
   file = fts_abstraction_find_path_file(name);
 
   if (file)
