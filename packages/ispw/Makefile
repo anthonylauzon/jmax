@@ -27,11 +27,21 @@ JMAXDISTDIR=../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 all:
+	(cd java ; $(MAKE) all)	
 	(cd src; $(MAKE) -k all)
 .PHONY: all
 
 clean:
+	(cd java ; $(MAKE) clean)	
 	(cd src; $(MAKE) clean)
+.PHONY: clean
+
+all_java:
+	(cd java ; $(MAKE) all)
+.PHONY: all
+
+clean_java:
+	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
 install:
@@ -42,6 +52,7 @@ install:
 	( cd help; $(MAKE) $@)
 	( cd sounds; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
+	( cd java; $(MAKE) $@)
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt
 	( \
 		cd lib/$(ARCH)/opt ; \

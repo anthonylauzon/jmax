@@ -52,23 +52,27 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
      * Create an AbstractSequence and initialize the type vector
      * with the given type.
      */
-    public FtsTrackObject(Fts fts, String name, ValueInfo info)
-    {
-	super(fts, null, null, "seqtrack", "seqtrack");
+    //public FtsTrackObject(Fts fts, String name, ValueInfo info)
+  public FtsTrackObject(Fts fts, FtsObject parent, String variableName, String className, int nArgs, FtsAtom args[])
+  {
+      super(fts, null, null, "seqtrack", "seqtrack");
 	
-	listeners = new MaxVector();
-	hhListeners = new MaxVector();
-	lockListeners = new MaxVector();
+      this.info = ValueInfoTable.getValueInfo(args[0].getString());
 
-	this.trackName = name;
-	
-	/* prepare the flavors for the clipboard */
-	if (flavors == null)
-	    flavors = new DataFlavor[1];
-	flavors[0] = sequenceFlavor;
+      if(nArgs>1)
+	  this.trackName = args[1].getString();
+      else
+	 this.trackName  = "untitled";
 
-	this.info = info;
-    }
+      listeners = new MaxVector();
+      hhListeners = new MaxVector();
+      lockListeners = new MaxVector();
+
+      /* prepare the flavors for the clipboard */
+      if (flavors == null)
+	  flavors = new DataFlavor[1];
+      flavors[0] = sequenceFlavor;
+  }
 
     public void setUntitled()
     {

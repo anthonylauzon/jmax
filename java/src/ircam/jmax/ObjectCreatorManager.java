@@ -34,30 +34,39 @@ public class ObjectCreatorManager
 
   /****************************************************************************/
 
-  public static void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
+  public static void registerFtsClass(String nameclass, Class theClass)
   {
-      creatorManager.ftsCreators.put(nameclass, creator);
+     creatorManager.ftsClasses.put(nameclass, theClass);
   }
-  public static void registerGraphicObjectCreator(String nameclass, GraphicObjectCreator creator)
+  public static void registerGraphicClass(String nameclass, Class theClass, String pkgName)
   {
-      //Icons.loadIcon(nameclass, creator.getIconName());
-      creatorManager.graphicCreators.put(nameclass, creator);
+      creatorManager.graphicClasses.put(nameclass, theClass);
+      creatorManager.packageNames.put(nameclass, pkgName);
   }
-  static public FtsObjectCreator getFtsObjectCreator(String nameclass)
+  static public Class getFtsClass(String nameclass)
   {
-    return ((FtsObjectCreator)creatorManager.ftsCreators.get(nameclass));
+      return ((Class)creatorManager.ftsClasses.get(nameclass));
   }
-  static public GraphicObjectCreator getGraphicObjectCreator(String nameclass)
+  static public Class getGraphicClass(String nameclass)
   {
-    return ((GraphicObjectCreator)creatorManager.graphicCreators.get(nameclass));
-  }
-  static public Enumeration getGraphicCreators()
+    return ((Class)creatorManager.graphicClasses.get(nameclass));
+  } 
+  static public String getPackageName(String nameclass)
   {
-      return creatorManager.graphicCreators.elements();
+    return ((String)creatorManager.packageNames.get(nameclass));
   }
+  static public Enumeration getGraphicClasses()
+  {
+      return creatorManager.graphicClasses.elements();
+  }
+  static public Enumeration getClassNames()
+  {
+      return creatorManager.graphicClasses.keys();
+  }  
 
-  private Hashtable ftsCreators = new Hashtable();
-  private Hashtable graphicCreators = new Hashtable();
+  private Hashtable ftsClasses = new Hashtable();
+  private Hashtable graphicClasses = new Hashtable();
+  private Hashtable packageNames = new Hashtable();
 }
 
 

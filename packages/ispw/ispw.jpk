@@ -39,6 +39,9 @@ ucs load module ispw_sampling $dir/lib/$jmaxArch/$jmaxMode/libsampling.so
 ucs load module ispw_pitch $dir/lib/$jmaxArch/$jmaxMode/libpitch.so
 ucs load module ispw_signal $dir/lib/$jmaxArch/$jmaxMode/libsignal.so
 
+# load client java class
+java::load -classpath "$dir/java/classes" ircam.jmax.ispw.ISPWExtension
+
 ## set path for abstractions
 abstractionDirectory $dir/abs/compatibility
 templateDirectory $dir/templates/compatibility

@@ -202,21 +202,32 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     bGroup.add( button);
   }
 
-    /*private void addButton(GraphicObjectCreator crt)
-      {
-      JToggleButton button = new ErmesToolButton(this, crt.getClassName(),  crt.getIcon(), crt.getCursorName(), crt.getMessage());
-      toolBar.add( button);
-      if(!AddPopUp.initDone)
-      AddPopUp.addAbbreviation(crt, true);
-      
-      bGroup.add( button);
-      }*/
+    private void addButton(String className, String pname)
+    {
+	String path;
+	try{
+	    path = MaxApplication.getPackageHandler().locatePackage(pname).getPath();	 
+	}
+	catch(FileNotFoundException e){
+	    path = MaxApplication.getProperty(pname+"PackageDir");    
+	}
+	if(path != null) path = path+File.separator+"images"+File.separator;
+
+	ImageIcon icon = new ImageIcon(path+className+".gif");
+	JToggleButton button = new ErmesToolButton(this, className, icon, path+className+"_cursor.gif",
+						   "Adding New "+className+" Object");
+	toolBar.add( button);
+	if(!AddPopUp.initDone)
+	    AddPopUp.addAbbreviation(className, icon, true);
+	
+	bGroup.add( button);
+    }
   private void insertButtons()
   {
     String path = MaxApplication.getProperty("jmaxRoot")+File.separator+"images"+File.separator;
 
     addButton( "", "_object_", path+"cursor_standard.gif", "Adding New Object");
-    addButton( "messbox", "_message_box_", path+"cursor_message.gif", "Adding New Message Box");
+    /*addButton( "messbox", "_message_box_", path+"cursor_message.gif", "Adding New Message Box");*/
     addButton( "messconst", "_messconst_", path+"cursor_messconst.gif", "Adding New Message or Constant");
     addButton( "jpatcher", "_patcher_", path+"cursor_patcher.gif", "Adding New Patcher");
     addButton( "inlet -1", "_inlet_", path+"cursor_in.gif", "Adding New Inlet");
@@ -231,9 +242,12 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     addButton( "display", "_display_", path+"cursor_display.gif", "Adding New Display Object");
     addButton( "vecdisplay", "_vecdisplay_", path+"cursor_vecdisplay.gif", "Adding New Vector Display Object");
 
-    /*for(Enumeration en = ObjectCreatorManager.getGraphicCreators(); en.hasMoreElements();)
-      addButton(((GraphicObjectCreator)en.nextElement()));*/
-
+    String cname;
+    for(Enumeration en = ObjectCreatorManager.getClassNames(); en.hasMoreElements();)
+	{
+	    cname = (String)en.nextElement();
+	    addButton(cname, ObjectCreatorManager.getPackageName(cname));
+	}
     AddPopUp.initDone();//????
   }
 
@@ -250,3 +264,10 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
       }
   }
 }
+
+
+
+
+
+
+

@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.ispw;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,13 +31,14 @@ import java.util.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The "message box" graphic object.
 //
 
-class Message extends Editable implements FtsMessageListener, FtsIntValueListener
+public class Message extends Editable implements FtsMessageListener, FtsIntValueListener
 {
   boolean isFlashing = false;
 

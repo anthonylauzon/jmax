@@ -26,6 +26,7 @@
 package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
+import java.lang.reflect.*;
 import java.awt.event.*;
 import java.util.*;
 
@@ -158,26 +159,30 @@ abstract public class GraphicObject implements DisplayObject
   public static final int ON_OUTLET = 1;
   public static final int ON_OBJECT = 2;
 
-    /*private static Hashtable creators = new Hashtable();
-      static public void registerGraphicObjectCreator(String nameclass, GraphicObjectCreator creator)
-      {
-      creators.put(nameclass, creator);
-      }*/
-
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
 
   static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsObject object) 
   {
-    GraphicObject gobj;
+    GraphicObject gobj = null;
     String theName = object.getClassName();
 
-    GraphicObjectCreator ctr = ObjectCreatorManager.getGraphicObjectCreator(theName);
-	
-    if(ctr != null)
-	gobj = ctr.createInstance(sketch, object);
-    /*else if (theName.equals( "messbox"))
-      gobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);*/
+    Class aClass = ObjectCreatorManager.getGraphicClass(theName);
+    if(aClass != null)
+	{
+	    Object[] arg = new Object[] {sketch, object};
+	    try{
+		Constructor constr = aClass.getConstructors()[0];
+		if(constr != null)
+		    gobj = (GraphicObject)(constr.newInstance(arg));
+	    } catch (InstantiationException e) {
+		System.out.println(e);
+	    } catch (IllegalAccessException e) {
+		System.out.println(e);
+	    } catch (InvocationTargetException e) {
+		System.out.println(e);
+	    } 
+	}
     else if (theName.equals( "messconst"))
       gobj = new ircam.jmax.editors.patcher.objects.MessConst( sketch, object);
     else if (theName.equals( "display"))
@@ -207,7 +212,8 @@ abstract public class GraphicObject implements DisplayObject
     else
       gobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
 
-    object.setObjectListener(gobj);
+    if(gobj!=null)
+	object.setObjectListener(gobj);
 
     return gobj;
   }

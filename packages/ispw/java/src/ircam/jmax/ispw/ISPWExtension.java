@@ -23,25 +23,37 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.ispw;
+
+import ircam.jmax.script.pkg.*;
+import ircam.jmax.script.*;
+import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.*;
+import ircam.jmax.mda.*;
+
+import java.io.*;
+
 /**
- * A specialized listener that is called when 
- * a new data value is available for an object
- * New  Data Listener are installed and remove locally 
- * in the Fts class; these listeners are private to the fts
- * package
+ * The table extension; install the table data type
+ * and the table file data handler
  */
-import ircam.jmax.editors.patcher.*;
-import ircam.jmax.fts.*;
-import javax.swing.*;
-public interface GraphicObjectCreator
+public class ISPWExtension extends tcl.lang.Extension implements JavaExtension
 {
-    public GraphicObject createInstance(ErmesSketchPad sketch, FtsObject object);
-    public void init(String className, String iconName, String cursorName, String message);
-    public String getClassName();
-    public String getIconName();
-    public ImageIcon getIcon();
-    public String getCursorName();
-    public String getMessage();
-    public String getPackagePath();
+  public void init(Interpreter interp)
+  {
+      ObjectCreatorManager.registerFtsClass("messbox", ircam.jmax.ispw.FtsMessageObject.class);
+      ObjectCreatorManager.registerGraphicClass("messbox", ircam.jmax.ispw.Message.class, "ispw");
+  }
+
+    /* this method should be removed as soon as jacl is completely forgotten about */
+  public void init(tcl.lang.Interp interp)
+  {
+      ObjectCreatorManager.registerFtsClass("messbox", ircam.jmax.ispw.FtsMessageObject.class);
+      ObjectCreatorManager.registerGraphicClass("messbox", ircam.jmax.ispw.Message.class, "ispw");
+  }
 }
+
+
+
+
+

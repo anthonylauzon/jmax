@@ -40,24 +40,18 @@ import ircam.jmax.editors.sequence.renderers.*;
 public class SequenceExtension extends tcl.lang.Extension implements JavaExtension
 {
  public void init(ircam.jmax.script.Interpreter interp)
-  {
-      /*FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-	FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
-	FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());*/
-      ObjectCreatorManager.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-      ObjectCreatorManager.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
-      ObjectCreatorManager.registerFtsObjectCreator("event", new FtsEventObjectCreator());
-  }
+ {
+    ObjectCreatorManager.registerFtsClass("sequence", ircam.jmax.editors.sequence.FtsSequenceObject.class);
+    ObjectCreatorManager.registerFtsClass("track", ircam.jmax.editors.sequence.FtsTrackObject.class);
+    ObjectCreatorManager.registerFtsClass("event", ircam.jmax.editors.sequence.track.TrackEvent.class);
+ }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
-      /*FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-	FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
-	FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());*/
-      ObjectCreatorManager.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-      ObjectCreatorManager.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
-      ObjectCreatorManager.registerFtsObjectCreator("event", new FtsEventObjectCreator());
+      ObjectCreatorManager.registerFtsClass("sequence", ircam.jmax.editors.sequence.FtsSequenceObject.class);
+      ObjectCreatorManager.registerFtsClass("track", ircam.jmax.editors.sequence.FtsTrackObject.class);
+      ObjectCreatorManager.registerFtsClass("event", ircam.jmax.editors.sequence.track.TrackEvent.class);
   }
 }
 

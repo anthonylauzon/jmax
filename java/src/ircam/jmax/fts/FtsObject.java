@@ -43,7 +43,7 @@ import java.awt.*;
  * FTS instantiation 
  */
 
-public class FtsObject 
+public class FtsObject /*extends Object*/
 {
   static final public int systemInlet = -1;
   
@@ -56,6 +56,7 @@ public class FtsObject
   static Object[] methodArgs2 = new Object[2];
   static Object[] methodArgs3 = new Object[2];
   static Method methodCache = null;
+  static String classNameCache = null;
   static String selectorCache = null;
 
   static {
@@ -67,11 +68,6 @@ public class FtsObject
     methodArgs2[0] = new Integer(2);    
     methodArgs3[0] = new Integer(3);    
   }
-
-    /*static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
-      {
-      creators.put(nameclass, creator);
-      }*/
 
   /******************************************************************************/
   /*                                                                            */
@@ -102,7 +98,7 @@ public class FtsObject
     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
     Object creator;
-    FtsObject obj;
+    FtsObject obj = null;
     StringBuffer description;
 
     /* Note that we do the unparsing relative to ':' and variables
@@ -114,12 +110,22 @@ public class FtsObject
     
     if (className != null)
       {
-	//Object ctr = creators.get(className);
-	FtsObjectCreator ctr = ObjectCreatorManager.getFtsObjectCreator(className);
-	
-	if(ctr != null)
-	    obj = ctr.createInstance(fts, parent, variableName, className, nArgs, args);
-	    //obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, variableName, className, nArgs, args);
+	  Class theClass = ObjectCreatorManager.getFtsClass(className);
+	  if(theClass != null)
+	      {
+		  Object[] arg = new Object[] {fts, parent, variableName, className, new Integer(nArgs), args};
+		  try{
+		      Constructor constr = theClass.getConstructors()[0];
+		      if(constr != null)
+			  obj = (FtsObject)(constr.newInstance(arg));
+		  } catch (InstantiationException e) {
+		      System.out.println(e);
+		  } catch (IllegalAccessException e) {
+		      System.out.println(e);
+		  } catch (InvocationTargetException e) {
+		      System.out.println(e);
+		  } 
+	      }
 	else if (className == "jpatcher")
 	  obj =  new FtsPatcherObject(fts, parent, variableName, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "inlet")
@@ -130,8 +136,6 @@ public class FtsObject
 	  obj =  new FtsForkObject(fts, parent, args[0].intValue);
 	else if (className == "jcomment")
 	  obj =  new FtsCommentObject(fts, parent);
-	/*else if (className == "messbox")
-	  obj =  new FtsMessageObject(fts, parent, FtsParse.unparseArguments(nArgs, args));*/
 	else if (className == "messconst")
 	  obj =  new FtsMessConstObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	else if (className == "display")
@@ -901,10 +905,12 @@ public class FtsObject
   {
     try
       {
-	if(selector != selectorCache)
+	  String cname = getClass().getName();
+	  if((selector != selectorCache)||(!cname.equals(classNameCache)))
 	  {
 	    selectorCache = selector;
 	    methodCache = getClass().getMethod(selector, parameterTypes);
+	    classNameCache = cname;
 	  }
 
 	switch(nArgs)

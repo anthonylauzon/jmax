@@ -57,7 +57,7 @@ public class ObjectSetViewer extends JPanel {
       objectIcon  = Icons.get("_object_");
       errorIcon   = Icons.get("_error_object_");
       commentIcon = Icons.get("_comment_");
-      //messageIcon = Icons.get("_message_box_");
+      messageIcon = Icons.get("_message_box_");
       messconstIcon = Icons.get("_messconst_");
       inletIcon = Icons.get("_inlet_");
       outletIcon = Icons.get("_outlet_");
@@ -91,11 +91,11 @@ public class ObjectSetViewer extends JPanel {
 	      setText( ((FtsObject) obj).getDescription());
 	      setIcon( patcherIcon);
 	    }
-	  /*else if (obj instanceof FtsMessageObject)
-	    {
-	      setText( ((FtsMessageObject) obj).getMessage());
-	      setIcon( messageIcon);
-	      }*/
+	  else if (obj instanceof FtsMessageObject)
+	      {
+		  setText( ((FtsMessageObject) obj).getMessage());
+		  setIcon( messageIcon);
+	      }
 	  else if (obj instanceof FtsMessConstObject)
 	    {
 	      setText( ((FtsObject) obj).getDescription());

@@ -125,11 +125,11 @@ public class AddPopUp extends JPopupMenu
     popup.pack();
   }
 
-  static public void addAbbreviation(GraphicObjectCreator crt, boolean edit)
+  static public void addAbbreviation(String className, ImageIcon icon, boolean edit)
   {
-    JMenuItem item = new JMenuItem(crt.getIcon());
+    JMenuItem item = new JMenuItem(icon);
 
-    item.addActionListener(new AddPopUpListener(crt.getClassName(), crt.getMessage(), edit));
+    item.addActionListener(new AddPopUpListener(className, "Adding New "+className+" Object", edit));
     popup.add(item);
     popup.pack();
   }
