@@ -25,8 +25,13 @@
 
 extern void fts_fpe_add_object( fts_object_t *object);
 extern void fts_fpe_handler( int which);
-extern void fts_fpe_start_collect( fts_objectset_t *set);
-extern void fts_fpe_stop_collect( void);
-extern void fts_fpe_empty_collection( void);
+
+/* Commented by : alex_p (16/01/04)
+   Reason : these 3 methods are allready in 'include\fts\fpe.h'
+
+   extern void fts_fpe_start_collect( fts_objectset_t *set);
+   extern void fts_fpe_stop_collect( void);
+   extern void fts_fpe_empty_collection( void);
+*/
 
 #endif
