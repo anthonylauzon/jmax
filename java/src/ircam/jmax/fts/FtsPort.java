@@ -138,13 +138,6 @@ abstract class FtsPort implements Runnable
 
   abstract void setParameter(String property, Object value);
 
-  /**
-   * Start should start the server.
-   * If the subclass do not start the server at init time,
-   * should start in the implementation of the start method.
-   */
-
-  abstract void start();
 
   /******************************************************************************/
   /*                                                                            */

@@ -276,9 +276,12 @@ public class FtsObject
 
   public final void setX(int x)
   {
-    Fts.getServer().putObjectProperty(this, "x", x);
-    this.x = x;
-    setDirty();
+    if (this.x != x)
+      {
+	Fts.getServer().putObjectProperty(this, "x", x);
+	this.x = x;
+	setDirty();
+      }
   }
 
   public final int getY()
@@ -288,9 +291,12 @@ public class FtsObject
 
   public final void setY(int y)
   {
-    Fts.getServer().putObjectProperty(this, "y", y);
-    this.y = y;
-    setDirty();
+    if (this.y != y)
+      {
+	Fts.getServer().putObjectProperty(this, "y", y);
+	this.y = y;
+	setDirty();
+      }
   }
 
   public final int getWidth()
@@ -300,9 +306,12 @@ public class FtsObject
 
   public final void setWidth(int w)
   {
-    Fts.getServer().putObjectProperty(this, "w", w);
-    this.width = w;
-    setDirty();
+    if (this.width != w)
+      {
+	Fts.getServer().putObjectProperty(this, "w", w);
+	this.width = w;
+	setDirty();
+      }
   }
 
   public final int getHeight()
@@ -312,9 +321,12 @@ public class FtsObject
 
   public final void setHeight(int h)
   {
-    Fts.getServer().putObjectProperty(this, "h", h);
-    this.height = h;
-    setDirty();
+    if (this.height != h)
+      {
+	Fts.getServer().putObjectProperty(this, "h", h);
+	this.height = h;
+	setDirty();
+      }
   }
 
   // Is Error is read only
@@ -342,9 +354,12 @@ public class FtsObject
 
   public final void setFont(String font)
   {
-    Fts.getServer().putObjectProperty(this, "font", font);
-    this.font = font;
-    setDirty();
+    if ((this.font == null) || (! this.font.equals(font)))
+      {
+	Fts.getServer().putObjectProperty(this, "font", font);
+	this.font = font;
+	setDirty();
+      }
   }
 
   public final int getFontSize()
@@ -354,9 +369,12 @@ public class FtsObject
 
   public final void setFontSize(int fontSize)
   {
-    Fts.getServer().putObjectProperty(this, "fs", fontSize);
-    this.fontSize = fontSize;
-    setDirty();
+    if (this.fontSize != fontSize)
+      {
+	Fts.getServer().putObjectProperty(this, "fs", fontSize);
+	this.fontSize = fontSize;
+	setDirty();
+      }
   }
 
   public MaxData getData()
@@ -477,7 +495,9 @@ public class FtsObject
     document = getDocument();
 
     if (document != null)
-      document.setSaved(false);
+      {
+	document.setSaved(false);
+      }
   }
 
   /** Get the complete textual description of the object. */

@@ -29,15 +29,18 @@ public class MaxFileChooser
   {
     fd = new JFileChooser(MaxApplication.getProperty("user.dir"));
 
-    fd.setFileFilter(Mda.getAllDocumentsFileFilter());
+    if (MaxApplication.getProperty("jmaxFastFileBox") == null)
+      {
+	fd.setFileFilter(Mda.getAllDocumentsFileFilter());
 
-    Enumeration e = Mda.getDocumentFileFilters();
-    while (e.hasMoreElements())
-      fd.addChoosableFileFilter((FileFilter) e.nextElement());
+	Enumeration e = Mda.getDocumentFileFilters();
+	while (e.hasMoreElements())
+	  fd.addChoosableFileFilter((FileFilter) e.nextElement());
 
-    fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
+	fd.addChoosableFileFilter(fd.getAcceptAllFileFilter());
 
-    fd.setFileView(Mda.getFileView());
+	fd.setFileView(Mda.getFileView());
+      }
   }
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */

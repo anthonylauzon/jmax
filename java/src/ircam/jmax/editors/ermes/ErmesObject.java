@@ -561,19 +561,22 @@ abstract class ErmesObject implements ErmesDrawable {
 	Fts.sync();
 	annotation = itsFtsObject.getErrorDescription();
 
-	ax = itsRectangle.x + itsRectangle.width / 2;
-	ay = itsRectangle.y + itsRectangle.height / 2;
-	aw = itsFontMetrics.stringWidth( annotation);
-	ah = itsFontMetrics.getHeight();
+	if (annotation != null)
+	  {
+	    ax = itsRectangle.x + itsRectangle.width / 2;
+	    ay = itsRectangle.y + itsRectangle.height / 2;
+	    aw = itsFontMetrics.stringWidth( annotation);
+	    ah = itsFontMetrics.getHeight();
 
-	g = itsSketchPad.getGraphics();
+	    g = itsSketchPad.getGraphics();
 
-	g.setColor( Color.white);
-	g.fillRect( ax - 1 , ay - ah - 1, aw + 2, ah + 2);
+	    g.setColor( Color.white);
+	    g.fillRect( ax - 1 , ay - ah - 1, aw + 2, ah + 2);
 
-	g.setColor( Color.black);
-	g.drawRect( ax - 1, ay - ah - 1, aw + 2, ah + 2);
-	g.drawString( annotation, ax, ay);
+	    g.setColor( Color.black);
+	    g.drawRect( ax - 1, ay - ah - 1, aw + 2, ah + 2);
+	    g.drawString( annotation, ax, ay);
+	  }
       }
   }
 }

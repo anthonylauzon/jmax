@@ -84,13 +84,20 @@ public class FtsServer
 
   public void start()
   {
-    port.start();
+    port.open();
 
-    // Build the root patcher, by mapping directly to object id 1 on FTS
-    // (this is guaranteed)
+    if (! syncToFts(5000))
+      {
+	System.err.println("Connection to FTS failed !!!");
+      }
+    else
+      {
+	// Build the root patcher, by mapping directly to object id 1 on FTS
+	// (this is guaranteed)
 
-    root = new FtsPatcherObject(null, null, "", 1);
-    registerObject(root);
+	root = new FtsPatcherObject(null, null, "", 1);
+	registerObject(root);
+      }
   }
 
   /** Stop the server. */
@@ -1094,12 +1101,15 @@ public class FtsServer
    * and all the values are consistents with the FTS counterpart.
    * Note that now a eom always imply a flush, so no explicit flush
    * are needed anymore in sync.
+   *
+   * Return true if the sync was ok, return false if there was a server
+   * timeout
    */
 
-  final public synchronized void syncToFts()
+  final public synchronized boolean syncToFts()
   {
     if (! connected)
-      return;
+      return false;
 
     if (FtsServer.debug)
       System.err.println("syncToFts()");
@@ -1114,7 +1124,36 @@ public class FtsServer
       {
       }
 
-    waitForPong();
+    if (timeoutOnSync)
+      return waitForPong(10000);
+    else
+      return waitForPong(0);
+  }
+
+  /* Version with a timeout, to check if FTS is still alive 
+   * Return true if the sync was ok, return false if there was a server
+   * timeout
+   */
+
+  final public synchronized boolean syncToFts(int timeOut)
+  {
+    if (! connected)
+      return false;
+
+    if (FtsServer.debug)
+      System.err.println("syncToFts(" + timeOut + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.sync_cmd);
+	port.sendEom();
+      }
+
+    catch (java.io.IOException e)
+      {
+      }
+
+    return waitForPong(timeOut);
   }
 
 
@@ -1376,7 +1415,7 @@ public class FtsServer
 
   /** Synchronization primitive for the Ping/Pong protocol. */
 
-  private synchronized void waitForPong()
+  private synchronized boolean waitForPong(int timeOut)
   {
     // If FTS quitted, just return 
 
@@ -1390,24 +1429,37 @@ public class FtsServer
 
 	    waiting = true;
 
-	    if (timeoutOnSync)
-	      wait(10000);
+	    if (timeOut != 0)
+	      wait(timeOut);
 	    else
 	      wait();
 
-	    waiting = false;
+	    if (waiting)
+	      {
+		// Timeout exit
+
+		connected = false;
+		return false;
+	      }
+	    else
+	      return true;
 	  }
 	catch (java.lang.InterruptedException e)
 	  {
 	    // ignore iand continue
+
+	    return true;
 	  }
       }
+    else
+      return false;
   }
 
   /** Synchronization primitive for the Ping/Pong protocol. */
 
   private synchronized void deliverPong()
   {
+    waiting = false;
     notifyAll();
   }
 

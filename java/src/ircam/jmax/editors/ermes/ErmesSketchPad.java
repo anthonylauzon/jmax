@@ -565,19 +565,19 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     Dimension d = getPreferredSize();
     
     //Create the offscreen graphics context, if no good one exists.
-    if ( (offGraphics == null))
+    if (offGraphics == null)
       {
 	//first sketch created, allocate the offscreen buffer
 	offDimension = d;
 	offImage = createImage( d.width, d.height);
 
 	if (offImage == null)
-	  System.err.print( "No offImage !!");
+	  System.err.println( "No offImage !! (1)");
 
 	offGraphics = offImage.getGraphics();
       }
-    else 
-      RequestOffScreen(); //we already created an offscreen. To who it belongs?
+
+    RequestOffScreen(); 
 
     if ( (d.width != offDimension.width) || ( d.height != offDimension.height))
       {
@@ -588,7 +588,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	Image oldOffImage = offImage;
 	offImage = createImage( d.width, d.height);
 	if ( offImage == null)
-	  System.err.print( "No offImage !!");
+	  System.err.println( "No offImage !! (2)");
 	offGraphics = offImage.getGraphics();
 	offGraphics.drawImage( oldOffImage, 0, 0, this);
       }
@@ -597,26 +597,22 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     offGraphics.setColor( getBackground());
     offGraphics.fillRect( 0, 0, d.width, d.height);	//prepare the offscreen to be used by me
     offGraphics.setColor( Color.black);
-
+    
     // Draw objects and connections
 
-    // Run mode: connections BEFORE objects
     if (isLocked())
-      paintList( itsConnections, offGraphics); 
-
-    Object[] objects = itsElements.getObjectArray();
-    int size = itsElements.size();
-
-    for ( int i = 0; i < size; i++)
       {
-	ErmesObject aObject = (ErmesObject) objects[i];
-
-	aObject.Paint( offGraphics);
+	// Locked mode: connections BEFORE objects
+	paintList( itsConnections, offGraphics);
+	paintList( itsElements, offGraphics);
       }
+    else
+      {
+	// Edit mode: objects BEFORE connections
 
-    // Edit mode: objects BEFORE connections
-    if ( !isLocked())
-      paintList( itsConnections, offGraphics); 
+	paintList( itsElements, offGraphics);
+	paintList( itsConnections, offGraphics);
+      }
 
     CopyTheOffScreen( g);
   }
@@ -633,7 +629,9 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	offImage = createImage( preferredSize.width, preferredSize.height);
 
 	if (offImage == null)
-	  System.err.print( "No offImage !!");
+	  {
+	     System.err.println( "No offImage !! (3)");
+	  }
 
 	if (offImage != null)
 	  {
@@ -709,12 +707,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	objectX = fo.getX();
 	objectY = fo.getY();
 
-	// System.err.println("Pasting object " + fo + " at position (" + objectX + "," + objectY + ")");
-
 	int newPosX = objectX - minX + itsCurrentScrollingX + pasteDelta.x + numberOfPaste*incrementalPasteOffsetX;
 	int newPosY = objectY - minY + itsCurrentScrollingY + pasteDelta.y + numberOfPaste*incrementalPasteOffsetY;
-
-	// System.err.println("Moved object " + fo + " at position (" + newPosX + "," + newPosY + ")");
 
 	fo.setX( newPosX);     
 	fo.setY( newPosY);
@@ -1781,7 +1775,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsOutPop.Redefine( itsPatcher.getNumberOfOutlets());
   }
 
-  static int paintCount = 0;
   public void paint( Graphics g)
   {
     if (deleted) //should be kept?
@@ -1814,7 +1807,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	DrawOffScreen( g);
       }
 
-    theToolkit.sync(); // @@@@
+    // Needed in very heavy charge situations
+    theToolkit.sync();
   }		
   
   void SetResizeState( ErmesObject theResizingObject, int newStatus)
@@ -2591,7 +2585,12 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     if (locked)
       {
 	setBackground( Settings.sharedInstance().getLockBackgroundColor());
-	deselectAll( true);
+
+	// This test is important at startup ..
+
+	if ((currentSelection.itsObjects.size() > 0) &&
+	    (currentSelection.itsConnections.size() > 0))
+	  deselectAll( true);
       }
     else
       setBackground( Settings.sharedInstance().getEditBackgroundColor());

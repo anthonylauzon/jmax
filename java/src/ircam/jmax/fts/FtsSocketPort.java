@@ -22,8 +22,6 @@ class FtsSocketPort extends FtsPort
     super(host+":"+port);
     this.host = host;
     this.port = port;
-
-    open(); // the socket open immediately the connection
   }
 
   void open()
@@ -71,10 +69,6 @@ class FtsSocketPort extends FtsPort
   void setParameter(String property, Object value)
   {
     // no parameter to set.
-  }
-
-  void start()
-  {
   }
 
   /** Method to send a char; since we can use datagram sockets or other

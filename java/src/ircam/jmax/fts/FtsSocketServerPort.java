@@ -150,11 +150,6 @@ class FtsSocketServerPort extends FtsPort
       }
   }
 
-  void start()
-  {
-    open();
-  }
-
   /** Method to send a char; since we can use datagram sockets or other
     means I/O is not necessarly done thru streams */
 

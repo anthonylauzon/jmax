@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/18 11:56:51 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/25 17:36:12 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -70,7 +70,9 @@ static void
 forget_explode(explode_t *this, fts_symbol_t name)
 {
   if (name)
-    fts_hash_table_remove(&explode_table, name);
+    {
+      fts_hash_table_remove(&explode_table, name);
+    }
 }
 
 static void
@@ -1171,7 +1173,7 @@ explode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, 0, fts_s_clear, explode_clear_mth, 0, 0);
   fts_method_define(cl, 0, fts_s_start, explode_start_mth, 0, 0);
-  fts_method_define(cl, 0, fts_s_restore, explode_record_mth, 0, 0); 
+  fts_method_define(cl, 0, fts_new_symbol("record"), explode_record_mth, 0, 0); 
   fts_method_define(cl, 0, fts_s_stop, explode_stop_mth, 0, 0);
 
   a[0] = fts_s_int;

@@ -4,6 +4,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.toolkit.*;
 import com.sun.java.swing.*;
 
 /** An instance of this document handler can load MaxDocument from
@@ -14,7 +15,7 @@ import com.sun.java.swing.*;
 
 public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 {
-  private ImageIcon PatDocumentIcon;
+  private ImageIcon patDocumentIcon;
 
   public FtsDotPatRemoteDocumentHandler()
   {
@@ -26,7 +27,7 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 		File.separator +
 		"mini_icon_pat.gif");
 
-    PatDocumentIcon = new ImageIcon(iconName);
+    patDocumentIcon = IconCache.getIcon(iconName);
   }
 
   /** We can load from a file start with the "max v2" string*/
@@ -130,7 +131,7 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   public Icon getIcon()
   {
-    return PatDocumentIcon;
+    return patDocumentIcon;
   }
 }
 

@@ -4,6 +4,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.toolkit.*;
 import com.sun.java.swing.*;
 
 /** An instance of this document handler can load MaxDocument from
@@ -24,7 +25,7 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 		File.separator +
 		"mini_icon_jmax.gif");
 
-    jMaxDocumentIcon = new ImageIcon(iconName);
+    jMaxDocumentIcon = IconCache.getIcon(iconName);
   }
 
   /** We can load from a file start with the "bmax" or the "mbxa" string (??) */

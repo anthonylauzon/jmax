@@ -108,8 +108,14 @@ public class FtsPatcherData extends FtsRemoteData
 
   public final void setWindowX(int value)
   {
-    windowX = value;
-    remoteCall(REMOTE_SET_WX, value);
+    // Not that changing the position do
+    // not mark the file as dirty.
+
+    if (windowX != value)
+      {
+	windowX = value;
+	remoteCall(REMOTE_SET_WX, value);
+      }
   }
 
   public final int getWindowY()
@@ -123,8 +129,11 @@ public class FtsPatcherData extends FtsRemoteData
     // Not that changing the position do
     // not mark the file as dirty.
 
-    windowY = value;
-    remoteCall(REMOTE_SET_WY, value);
+    if (windowY != value)
+      {
+	windowY = value;
+	remoteCall(REMOTE_SET_WY, value);
+      }
   }
 
   public final int getWindowHeight()
@@ -134,9 +143,12 @@ public class FtsPatcherData extends FtsRemoteData
 
   public final void setWindowHeight(int value)
   {
-    windowHeight = value;
-    remoteCall(REMOTE_SET_WH, value);
-    container.setDirty();
+    if (windowHeight != value)
+      {
+	windowHeight = value;
+	remoteCall(REMOTE_SET_WH, value);
+	container.setDirty();
+      }
   }
 
 
@@ -147,9 +159,12 @@ public class FtsPatcherData extends FtsRemoteData
 
   public final void setWindowWidth(int value)
   {
-    windowWidth = value;
-    remoteCall(REMOTE_SET_WW, value);
-    container.setDirty();
+    if (windowWidth != value)
+      {
+	windowWidth = value;
+	remoteCall(REMOTE_SET_WW, value);
+	container.setDirty();
+      }
   }
 
   public final int getEditMode()

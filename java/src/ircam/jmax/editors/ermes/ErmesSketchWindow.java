@@ -126,7 +126,6 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     itsScrollerView.getHAdjustable().addAdjustmentListener( itsSketchPad); 
     itsScrollerView.getVAdjustable().addAdjustmentListener( itsSketchPad); 
     
-
     Init(); // MaxEditor base class init (standard menu handling)
 
     itsSketchPad.SetToolBar( itsToolBar);	// inform the Sketch of the ToolBar to 
@@ -143,8 +142,6 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
     validate();
 
-    setVisible( true);
-
     addComponentListener( this); 
     
     // To set the initial state: set to edit mode only if the
@@ -159,6 +156,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     // Finally, activate the updates
 
     itsPatcherData.startUpdates();
+
+    // Make it visible, at the end
+
+    setVisible( true);
   }
 
   private final void makeTitle()

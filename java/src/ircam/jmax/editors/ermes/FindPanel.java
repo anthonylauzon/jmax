@@ -122,6 +122,7 @@ class FindPanel extends JFrame {
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+    textField.setText("");
     set.findErrors(Fts.getRootObject());
     setCursor(temp);
   }
@@ -131,6 +132,7 @@ class FindPanel extends JFrame {
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+    textField.setText("");
     set.findFriends( object);
     setCursor(temp);
   }

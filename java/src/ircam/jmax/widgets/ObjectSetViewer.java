@@ -3,10 +3,12 @@ package ircam.jmax.widgets;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import com.sun.java.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.toolkit.*;
 
 public class ObjectSetViewer extends JPanel {
 
@@ -25,11 +27,11 @@ public class ObjectSetViewer extends JPanel {
       String fs = File.separator;
       String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
 
-      patcherIcon = new ImageIcon( path + "tool_patcher.gif");
-      objectIcon = new ImageIcon( path + "tool_ext.gif");
-      errorIcon = new ImageIcon( path + "tool_err.gif");
-      commentIcon = new ImageIcon( path + "tool_text.gif");
-      messageIcon = new ImageIcon( path + "tool_mess.gif");
+      patcherIcon = IconCache.getIcon( path + "tool_patcher.gif");
+      objectIcon  = IconCache.getIcon( path + "tool_ext.gif");
+      errorIcon   = IconCache.getIcon( path + "tool_err.gif");
+      commentIcon = IconCache.getIcon( path + "tool_text.gif");
+      messageIcon = IconCache.getIcon( path + "tool_mess.gif");
     }
 
     public ObjectCellRenderer() 
@@ -93,7 +95,7 @@ public class ObjectSetViewer extends JPanel {
 	{
 	  int index = jList.locationToIndex(e.getPoint());
 	  
-	  if (index < jList.getModel().getSize())
+	  if ((index >= 0) && (index < jList.getModel().getSize()))
 	    {
 	      if (objectSelectedListener != null)
 		{
@@ -101,12 +103,6 @@ public class ObjectSetViewer extends JPanel {
 
 		  objectSelectedListener.objectSelected(object);
 		}
-	    }
-	  else
-	    {
-	      System.err.println("Problem in ObjectSetViewer " + ObjectSetViewer.this);
-	      System.err.println(" point " + e.getPoint() + " index " + index);
-	      System.err.println(" listener " + objectSelectedListener);
 	    }
 	}
     }
