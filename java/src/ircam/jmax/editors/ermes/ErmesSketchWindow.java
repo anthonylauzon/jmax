@@ -97,13 +97,17 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
   public FtsContainerObject itsPatcher;
   private Menu itsJustificationMenu;
-  private Menu itsResizeObjectMenu;
+
+  // (fd) Made local in SetupMenu, as it was used only there 
+  //private Menu itsResizeObjectMenu;
+  //private Menu itsTextMenu;	
+  //private Menu itsGraphicsMenu;
+
   private Menu itsAlignObjectMenu;
-  private Menu itsTextMenu;	
   private Menu itsSizesMenu;	
   private Menu itsFontsMenu;
   private Menu itsExecutionMenu;
-  private Menu itsGraphicsMenu;
+
   CheckboxMenuItem itsSelectedSizeMenu;//the Selected objects size MenuItem
   CheckboxMenuItem itsSketchSizeMenu;//the SketchPad size MenuItem
   CheckboxMenuItem itsSketchFontMenu;//the SketchPad font MenuItem
@@ -299,54 +303,76 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     validate();
   }
   
-  public void SetupMenu(){
-    
-    itsGraphicsMenu = new Menu("Graphics");
-    getMenuBar().add(itsGraphicsMenu);
-    FillGraphicsMenu(itsGraphicsMenu);
-    
-    itsTextMenu = new Menu("Text");
-    getMenuBar().add(itsTextMenu);
-    FillTextMenu(itsTextMenu);
-    CheckDefaultSizeFontMenuItem();
-    CheckDefaultFontItem();
-    
-    itsSelectAllMenuItem = new MenuItem("Select All  Ctrl+A");
-    GetEditMenu().add(itsSelectAllMenuItem);
-    itsSelectAllMenuItem.addActionListener(new ActionListener() {
-    public  void actionPerformed(ActionEvent e)
-      { GetSketchPad().SelectAll();}});
+  public void SetupMenu()
+  {
+    MenuBar menuBar = getMenuBar();
 
-    GetEditMenu().add(new MenuItem("-"));
+    Menu editMenu = GetEditMenu();
 
-    MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
-    GetEditMenu().add(inspectMenuItem);
+    // Customize the edit menu
+    // (fd) As the clear is not implemented, it is not there
+    editMenu.remove( GetClearMenu());
 
-    inspectMenuItem.addActionListener(new ActionListener() {
-      
-      public void actionPerformed(ActionEvent e) {
-	inspectAction();
-      }});
-    
-    GetEditMenu().add(new MenuItem("-"));
-    
-    itsResizeObjectMenu =  new Menu("Resize Object");
-    GetEditMenu().add(itsResizeObjectMenu);
-    FillResizeObjectMenu(itsResizeObjectMenu);
+    editMenu.add(new MenuItem("-"));
 
+    itsSelectAllMenuItem = new MenuItem( "Select All  Ctrl+A");
+    editMenu.add( itsSelectAllMenuItem);
+    itsSelectAllMenuItem.addActionListener( new ActionListener() {
+      public  void actionPerformed(ActionEvent e)
+	{
+	  GetSketchPad().SelectAll();
+	}
+    });
 
-    itsAlignObjectMenu =  new Menu("Align Objects");
-    GetEditMenu().add(itsAlignObjectMenu);
-    FillAlignObjectsMenu(itsAlignObjectMenu);
-    
-    itsExecutionMenu = new Menu("Execution");
-    getMenuBar().add(itsExecutionMenu);
-    FillExecutionMenu(itsExecutionMenu);
+     editMenu.add(new MenuItem("-"));
 
+     MenuItem findMenuItem = new MenuItem( "Find");
+     editMenu.add( findMenuItem);
+     findMenuItem.addActionListener( new ActionListener() {
+       public void actionPerformed( ActionEvent e)
+ 	{
+	  FindPanel.open().setPatcher( itsPatcher);
+ 	}
+     });
+
+    // (fd) {
+    // As the inspector is not ready yet, the menu is not there.
+    // The correct order is :
+    // 1) implement an inspector for the object
+    // 2) add a command in a menu that calls the inspector
+    // and not the contrary...
+//     MenuItem inspectMenuItem = new MenuItem("Inspect Ctrl+I");
+//     editMenu.add(inspectMenuItem);
+
+//     inspectMenuItem.addActionListener( new ActionListener() {
+//       public void actionPerformed(ActionEvent e) 
+// 	{
+// 	  inspectAction();
+// 	}
+//     });
+//     editMenu.add(new MenuItem("-"));
+    // } (fd)
     GetCutMenu().setEnabled(true);
     GetCopyMenu().setEnabled(true);
     GetPasteMenu().setEnabled(true);
-    GetClearMenu().setEnabled(false);
+    //GetClearMenu().setEnabled(false);
+    
+    // Add the Graphics menu
+    Menu itsGraphicsMenu = new Menu( "Graphics");
+    menuBar.add( itsGraphicsMenu);
+    FillGraphicsMenu( itsGraphicsMenu);
+
+    // Add the Text menu
+    Menu itsTextMenu = new Menu( "Text");
+    menuBar.add( itsTextMenu);
+    FillTextMenu( itsTextMenu);
+    CheckDefaultSizeFontMenuItem();
+    CheckDefaultFontItem();
+
+    // Add the Execution menu
+    itsExecutionMenu = new Menu("Execution");
+    menuBar.add(itsExecutionMenu);
+    FillExecutionMenu(itsExecutionMenu);
   }
 
   protected void Cut(){
@@ -410,14 +436,17 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     setCursor(temp);
   }
 
-  
-  private void FillGraphicsMenu(Menu theGraphicsMenu){
-    itsAutoroutingMenu = new CheckboxMenuItem("Autorouting", true);
-    theGraphicsMenu.add(itsAutoroutingMenu);
-    itsAutoroutingMenu.setEnabled(false);//still there, but inactive
-    itsAutoroutingMenu.addItemListener(new ItemListener() {
-      public  void itemStateChanged(ItemEvent e)
-	{ /*SetAutorouting(itsAutoroutingMenu.getState());*/}});
+ 
+  private void FillGraphicsMenu( Menu graphicsMenu)
+  {
+    Menu resizeObjectMenu =  new Menu( "Resize Object");
+    graphicsMenu.add( resizeObjectMenu);
+    FillResizeObjectMenu( resizeObjectMenu);
+
+    itsAlignObjectMenu =  new Menu("Align Objects");
+    graphicsMenu.add(itsAlignObjectMenu);
+    FillAlignObjectsMenu(itsAlignObjectMenu);
+    
   }
 
 
@@ -426,35 +455,35 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     CheckboxMenuItem item;
     String resize;
 
-    ResizeMenuAdapter(CheckboxMenuItem item,  String resize)
+    ResizeMenuAdapter( CheckboxMenuItem item, String resize)
     {
       this.item = item;
       this.resize = resize;
     }
 
-    public  void itemStateChanged(ItemEvent e)
+    public  void itemStateChanged( ItemEvent e)
     {
-      ResizeObjectMenuAction(item, resize);
+      ResizeObjectMenuAction( item, resize);
     }
   }
 
-  private void FillResizeObjectMenu(Menu theResizeObjectMenu)
+  private void FillResizeObjectMenu( Menu resizeObjectMenu)
   {
     CheckboxMenuItem aCheckItem;
 
-    aCheckItem = new CheckboxMenuItem("Both");
-    theResizeObjectMenu.add(aCheckItem);
-    aCheckItem.setState(true);
-    aCheckItem.addItemListener(new ResizeMenuAdapter(aCheckItem, "Both"));
+    aCheckItem = new CheckboxMenuItem( "Both");
+    resizeObjectMenu.add( aCheckItem);
+    aCheckItem.setState( true);
+    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, "Both"));
     itsCurrentResizeMenu = aCheckItem;
 
-    aCheckItem = new CheckboxMenuItem("Horizontal");
-    theResizeObjectMenu.add(aCheckItem);
-    aCheckItem.addItemListener(new ResizeMenuAdapter(aCheckItem, "Both"));
+    aCheckItem = new CheckboxMenuItem( "Horizontal");
+    resizeObjectMenu.add( aCheckItem);
+    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, "Both"));
 
-    aCheckItem = new CheckboxMenuItem("Vertical");
-    theResizeObjectMenu.add(aCheckItem);
-    aCheckItem.addItemListener(new ResizeMenuAdapter(aCheckItem, "Both"));
+    aCheckItem = new CheckboxMenuItem( "Vertical");
+    resizeObjectMenu.add( aCheckItem);
+    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, "Both"));
   }
   
   class AlignMenuAdapter implements ActionListener

@@ -41,7 +41,9 @@ SSOURCES = \
 	  ErmesDrawable.java \
           ErmesSelection.java \
 	  ErmesArea.java	\
-	FontCache.java
+	FindPanel.java		\
+	FontCache.java		\
+
 
 SOURCES = $(SSOURCES) $(DSOURCES) 
 
