@@ -130,17 +130,17 @@ public class LineDrawer extends TableInteractionModule implements XORPainter{
    */
   public void XORDraw(int dx, int dy) 
   {
-      Graphics g = gc.getGraphicDestination().getGraphics();
+    Graphics g = gc.getGraphicDestination().getGraphics();
 
-      g.setColor(Color.gray);
-      g.setXORMode(Color.white); //there's an assumption here on the color of the background.
+    g.setColor( Color.red);
+    g.setXORMode( Color.white); //there's an assumption here on the color of the background.
       
-      movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy);
-      
-      g.drawLine(startSelection.x, startSelection.y, movingPoint.x, movingPoint.y);
-      g.setPaintMode();
-      g.setColor(Color.black);
-      g.dispose();
+    movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy);
+    
+    g.drawLine(startSelection.x, startSelection.y, movingPoint.x, movingPoint.y);
+    g.setColor( Color.black);
+    g.setPaintMode();
+    g.dispose();
   }
 
 

@@ -154,7 +154,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     notifySizeChanged(size);
 
     if((size <= lastIndex)||(visibleSize <= lastIndex))
-	notifySet();
+      notifySet();
   }
   public int getLastUpdatedIndex()
   {
@@ -177,9 +177,9 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	  visibles[startIndex+i] = args[i+1].intValue;
     
     if(startIndex+i > lastIndex)
-	lastIndex = startIndex+i;
+      lastIndex = startIndex+i;
     
-    notifySet();
+    notifyValueChanged( startIndex, startIndex+i-1);
   }  
   
   public void startEdit()
@@ -208,7 +208,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 
     for(i = 0; i<nArgs-1; i++)
       pixels[i] = args[i+1].intValue;
-    
+
     if(pixelsSize <= nArgs-1)
       notifySet();
   }
@@ -222,7 +222,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       pixels[startIndex+i] = args[i+1].intValue;
 
     if(pixelsSize <= startIndex+nArgs-1)
-      notifySet();
+      notifyPixelsChanged( startIndex, startIndex+i-1);
   }
 
   public void addPixels(int nArgs , FtsAtom args[])
@@ -576,16 +576,16 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       ((TableDataListener) e.nextElement()).tableSetted();
   }
 
-  private void notifyValueChanged( int i)
-  {
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((TableDataListener) e.nextElement()).valueChanged( i);
-  }
-
   private void notifyValueChanged( int start, int end)
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((TableDataListener) e.nextElement()).valueChanged( start, end);
+  }
+
+  private void notifyPixelsChanged( int start, int end)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((TableDataListener) e.nextElement()).pixelsChanged( start, end);
   }
 
   private void notifyClear()

@@ -88,47 +88,46 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   {    
     g.setColor( backColor);
     g.fillRect(r.x, r.y, r.width, r.height);
-   
+
+    if(r.height == 15) return;
+
     g.setColor( foreColor);
     
-    if(gc.getAdapter().getXZoom()>0.5)
+    int zero = gc.getAdapter().getY(0);
+    if(gc.getAdapter().getXZoom() >= 0.5)
       {
 	if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
-	int index = gc.getFirstVisibleIndex();
-	int visibleSize = gc.getVisibleHorizontalScope();
+	int index = gc.getAdapter().getInvX( r.x);
+	int visibleSize = gc.getAdapter().getInvX( r.x+r.width);
+	
 	int tableSize = gc.getFtsObject().getSize();
+	
+	int firstVisible = gc.getFirstVisibleIndex();
+	int visibleScope = gc.getVisibleHorizontalScope();
 
 	if( itsMode == SOLID)
-	  {
-	    int zero = gc.getAdapter().getY(0);
-	    for (int i = 0; (i < visibleSize)&&(index+i<tableSize); i++)
-	      drawSolidPoint(g, (int)(i*gc.getAdapter().getXZoom()), 
-			     gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(index+i)), zero);
-	  }
+	  for (int i = index; (i < visibleSize)&&(i<tableSize); i++)
+	    drawSolidPoint(g, gc.getAdapter().getX(i), 
+			   gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)), zero);	    
 	else
-	  for (int i = 0; (i < visibleSize)&&(index+i<tableSize); i++)
-	    drawHollowPoint(g, (int)(i*gc.getAdapter().getXZoom()), 
-			    gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(index+i)));
+	  for (int i = index; (i < visibleSize)&&(i<tableSize); i++)
+	    drawHollowPoint(g, gc.getAdapter().getX(i), 
+			    gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)));
       }
     else
       {
 	int pixSize = gc.getFtsObject().getPixelsSize();	      
 	if( itsMode == SOLID)
-	  {
-	    int zero = gc.getAdapter().getY(0);
-	    for (int i = 0; i < pixSize; i++)
-	      drawSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), zero);
-	  }
+	  for (int i = 0 ; i < pixSize; i++)
+	    drawSolidPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)), zero);
 	else
 	  for (int i = 0; i < pixSize; i++)
-	    drawHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));
+	    drawHollowPoint( g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));	
       }
     
     g.setColor( Color.red);
-    g.drawLine( 0, gc.getAdapter().getY(0), r.width, gc.getAdapter().getY(0));
+    g.drawLine( r.x, zero, r.x + r.width, zero);
   }
-
-
 
   /**
    * set the HOLLOW or SOLID mode */

@@ -34,9 +34,8 @@ public interface TableDataListener {
   /**
    * The data between the two indexes (included) have changed. */
   abstract public void valueChanged(int index1, int index2);
+  abstract public void pixelsChanged(int index1, int index2);
 
-  /** The data at the given index has changed */
-  abstract public void valueChanged(int index);
   abstract public void tableSetted();
   abstract public void tableCleared();
   abstract public void sizeChanged(int size);
