@@ -85,10 +85,10 @@ seqobj_track_add_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_symbol_t type = fts_get_symbol(at + 0);
   fts_symbol_t track_class;
 
-  if(type == noteevt_symbol)
-    track_class = eventtrk_symbol;
-  else
-    track_class = 0;
+  /*if(type == noteevt_symbol)*/
+  track_class = eventtrk_symbol;
+  /*else
+    track_class = 0;*/
 
   if(track_class)
     {

@@ -324,10 +324,8 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(!fts_object_has_id((fts_object_t *)event))
 	{
 	  /* create event at client */
-	  /*fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_upload, 0, 0);*/
+	  fts_send_message((fts_object_t *)event, fts_SystemInlet, fts_s_upload, 0, 0);
 
-	  noteevt_upload((fts_object_t *)event, 0, 0, 0, 0);
-	  
 	  fts_set_object(a + n, (fts_object_t *)event);
 	  
 	  n++;
