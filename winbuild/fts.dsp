@@ -84,7 +84,7 @@ LINK32=link.exe
 # Name "fts - Win32 Debug"
 # Begin Source File
 
-SOURCE=..\fts\src\tiles\main.c
+SOURCE=..\fts\main.c
 # End Source File
 # End Target
 # End Project

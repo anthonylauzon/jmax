@@ -89,415 +89,219 @@ LINK32=link.exe
 # Name "ftsdll - Win32 Debug"
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\atomarray.c
+SOURCE=..\fts\abstraction.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\files\atomfiles.c
+SOURCE=..\fts\array.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\datalib\atomlist.c
+SOURCE=..\fts\atom.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\atoms.c
+SOURCE=..\fts\atomfile.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\audio\audio.c
+SOURCE=..\fts\audio.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\audio\audioport.c
+SOURCE=..\fts\autosave.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\autosave.c
+SOURCE=..\fts\buffer.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\devices\bytestream.c
+SOURCE=..\fts\class.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\veclib\cfft.c
+SOURCE=..\fts\clipboard.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\channel.c
+SOURCE=..\fts\connection.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\classes.c
+SOURCE=..\fts\doctor.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\client\client.c
+SOURCE=..\fts\dsp.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\clipboard.c
+SOURCE=..\fts\dspgraph.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\clipboard.h
+SOURCE=..\fts\errobj.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\veclib\complex.c
+SOURCE=..\fts\expression.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\connections.c
+SOURCE=..\fts\file.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\utils\cubic.c
+SOURCE=..\fts\fpe.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\datalib\datalib.c
+SOURCE=..\fts\ftl.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\devices\devconf.c
+SOURCE=..\fts\ftlmem.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\devices\devconf.h
+SOURCE=..\fts\fts.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\devices\devices.c
+SOURCE=..\fts\hashtable.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\files\directories.c
+SOURCE=..\fts\inout.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\doctor.c
+SOURCE=..\fts\loader.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\dsp\dsp.c
+SOURCE=..\fts\mem.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\dsp\dspcontrol.c
+SOURCE=..\fts\message.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\dsp\dspgraph.c
+SOURCE=..\fts\midi.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\errobj.c
+SOURCE=..\fts\midifile.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\expressions.c
+SOURCE=..\fts\object.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\files\files.c
+SOURCE=..\fts\objectlist.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\utils\floatfuns.c
+SOURCE=..\fts\objectset.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\fpe.c
+SOURCE=..\fts\objtable.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\fpe.h
+SOURCE=..\fts\OLDclient.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\ftl\ftl.c
+SOURCE=..\fts\OLDftsdata.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\ftl\ftlmem.c
+SOURCE=..\fts\OLDpatcherdata.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\ftl\ftlutils.c
+SOURCE=..\fts\OLDucs.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\ftsdata.c
+SOURCE=..\fts\param.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\ftsdataid.c
+SOURCE=..\fts\patcher.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\dsp\gphiter.c
+SOURCE=..\fts\patparser.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\dsp\gphiter.h
+SOURCE=..\fts\post.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\utils\hashtable.c
+SOURCE=..\fts\property.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\client\incoming.c
+SOURCE=..\fts\saver.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\inout.c
+SOURCE=..\fts\sched.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\label.c
+SOURCE=..\fts\selection.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\loader.c
+SOURCE=..\fts\sigconn.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\sys\mem.c
+SOURCE=..\fts\soundfile.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\mess.c
+SOURCE=..\fts\soundfile_def.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\messages.c
+SOURCE=..\fts\srconv.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\lang\mess\messP.h
+SOURCE=..\fts\symbol.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\tiles\messtile.c
+SOURCE=..\fts\template.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\tiles\messtile.h
+SOURCE=..\fts\time.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\midi\midi.c
+SOURCE=..\fts\variable.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\files\midifiles.c
+SOURCE=..\fts\version.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\midi\midiparser.c
+SOURCE=..\fts\vm.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\src\runtime\midi\midiport.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\sys\modules.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\audio\nullaudioport.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\utils\objectlist.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\objects.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\datalib\objectset.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\objtable.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\client\outgoing.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\params.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\files\parser.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\patabs.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\patcher.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\patcherdata.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\patlex.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\patparser.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\files\post.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\properties.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\client\protocol.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\utils\ramp_vectors.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\utils\ramps.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\utils\random.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\rfft_shuffle.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\saver.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\sched\sched.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\selection.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\dsp\sigbus.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\dsp\sigconn.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\dsp\sigconn.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\dsp\signal.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\sys\smem.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\sys\smem.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\files\soundfiles.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\files\soundformats.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\utils\srconv.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\tiles\startup.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\sys\status.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\symbols.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\client\sync.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\templates.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\time\time.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\tiles\ucs.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\tiles\ucs.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\client\updates.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\utils\utils.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\variables.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\veclib\vec_fft.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\sys\version.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\lang\mess\vm.c
-# End Source File
-# Begin Source File
-
-SOURCE="..\fts\src\non-portable\win32.c"
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\src\runtime\devices\windev.c
+SOURCE=..\fts\win32.c
 # End Source File
 # End Target
 # End Project

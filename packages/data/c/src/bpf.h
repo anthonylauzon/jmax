@@ -55,7 +55,6 @@ typedef struct _bpf_
   int opened; /* non zero if editor open */
 } bpf_t;
 
-DATA_API fts_data_class_t *bpf_data_class;
 DATA_API fts_symbol_t bpf_symbol;
 DATA_API fts_type_t bpf_type;
 

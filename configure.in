@@ -12,7 +12,7 @@ AC_SUBST(JMAX_VERSION)
 
 AM_INIT_AUTOMAKE(jmax,${JMAX_VERSION})
 
-AM_CONFIG_HEADER(fts/config.h)
+AM_CONFIG_HEADER(include/ftsconfig-ac.h)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -24,7 +24,7 @@ AC_PROG_INSTALL
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
 
-CFLAGS="-DFTS_API=extern -Wall -Wno-unused"
+CFLAGS="-Wall -Wno-unused"
 
 dnl Checks for libraries.
 

@@ -59,6 +59,16 @@
 extern "C" {
 #endif
 
+#ifdef WIN32
+#if defined(FTSDLL_EXPORTS)
+#define FTS_API __declspec(dllexport)
+#else
+#define FTS_API __declspec(dllimport)
+#endif
+#else
+#define FTS_API extern
+#endif
+
 /* *** The inclusion order is important *** */
 #include <fts/types.h>
 #include <fts/status.h>

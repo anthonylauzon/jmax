@@ -17,27 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
-#ifndef _DATA_H
-#define _DATA_H
-
-#include <fts/fts.h>
 
 #ifdef WIN32
-#if defined(DATA_EXPORTS)
-#define DATA_API __declspec(dllexport)
+#include "ftsconfig-win32.h"
 #else
-#define DATA_API __declspec(dllimport)
-#endif
-#else
-#define DATA_API extern
+#include "ftsconfig-ac.h"
 #endif
 
-#define restrict
-
-#endif /* _DATA_H */
