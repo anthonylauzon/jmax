@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import java.awt.event.*;
+import ircam.jmax.*;
 
 /**
  * This is a convenience class used to factorize the code needed
@@ -54,16 +55,20 @@ public class PopupToolbarPanel extends JPanel implements PopupProvider{
 
     protected void processMouseEvent(MouseEvent e)
     {
-	if (e.isPopupTrigger()) 
-	    {
-		if (provider != null)
-		    provider.getMenu().show (e.getComponent(), e.getX()-10, e.getY()-10);
-		else getMenu().show (e.getComponent(), e.getX()-10, e.getY()-10);
-	    }
-	else 
-	    {
-		super.processMouseEvent(e);
-	    }
+      boolean isPopup;
+      if( JMaxApplication.getProperty("macosx") != null)
+	isPopup = e.isPopupTrigger() && e.isControlDown();
+      else
+	isPopup = e.isPopupTrigger();
+
+      if ( isPopup) 
+	{
+	  if (provider != null)
+	    provider.getMenu().show (e.getComponent(), e.getX()-10, e.getY()-10);
+	  else getMenu().show (e.getComponent(), e.getX()-10, e.getY()-10);
+	}
+      else 
+	super.processMouseEvent(e);
     }
 
     public JPopupMenu getMenu()
