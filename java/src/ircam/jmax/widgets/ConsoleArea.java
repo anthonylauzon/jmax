@@ -18,7 +18,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Author: Francois Dechelle.
 // 
 
 package ircam.jmax.widgets;
@@ -42,7 +41,6 @@ import ircam.jmax.editors.patcher.*;
  * A <code>ConsoleArea</code> Swing component is a component for
  * fast display of text lines.
  * It is read-only and cannot be used for copying text.
- * @author	Francois Dechelle
  * @since	2.4.9
  */
 
