@@ -44,6 +44,19 @@ list_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_free(this->list);
 }
 
+static void
+list_resize_buffer(list_t *this, int size)
+{
+  if(size > this->alloc)
+    {
+      fts_free(this->list);
+      this->list = (fts_atom_t *) fts_malloc(size * sizeof(fts_atom_t));
+      this->alloc = size;
+    }
+
+  this->size = size;
+}
+
 /************************************************
  *
  *  user methods
@@ -64,14 +77,7 @@ list_list_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   list_t *this = (list_t *)o;
   int i;
 
-  if(ac > this->alloc)
-    {
-      fts_free(this->list);
-      this->list = (fts_atom_t *) fts_malloc(ac * sizeof(fts_atom_t));
-      this->alloc = ac;
-    }
-
-  this->size = ac;
+  list_resize_buffer(this, ac);
 
   for(i=0; i<ac; i++)
     this->list[i] = at[i];
@@ -87,32 +93,22 @@ list_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-list_float_vector_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+list_data_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   list_t *this = (list_t *)o;
-  fts_float_vector_t *vector = fts_get_ptr(at);
-  long size = vector->size;
-  int i;
+  fts_data_t *data = fts_get_data(at);
+  long size = fts_data_get_size(data);
 
-  if(size > this->alloc)
-    {
-      fts_free(this->list);
-      this->list = (fts_atom_t *) fts_malloc(size * sizeof(fts_atom_t));
-      this->alloc = size;
-    }
-
-  this->size = size;
-
-  for(i=0; i<size; i++)
-    fts_set_float(&this->list[i], fts_float_vector_get_element(vector, i));
+  list_resize_buffer(this, size);
+  fts_data_get_atoms(data, size, this->list);
 }
 
 static void
-list_float_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+list_data(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   list_t *this = (list_t *)o;
 
-  list_float_vector_store(o, 0, 0, ac, at);
+  list_data_store(o, 0, 0, ac, at);
   list_bang(o, 0, 0, 0, 0);
 }
 
@@ -144,9 +140,8 @@ list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, list_list);
   fts_method_define_varargs(cl, 1, fts_s_list, list_list_store);
 
-  a[0] = fts_s_float_vector;
-  fts_method_define(cl, 0, fts_s_float_vector, list_float_vector, 1, a);
-  fts_method_define(cl, 1, fts_s_float_vector, list_float_vector_store, 1, a);
+  fts_method_define_data(cl, 0, list_data);
+  fts_method_define_data(cl, 1, list_data_store);
 
   /* type the outlet */
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
@@ -159,10 +154,3 @@ list_config(void)
 {
   fts_metaclass_create(fts_new_symbol("list"), list_instantiate, fts_always_equiv);
 }
-
-
-
-
-
-
-

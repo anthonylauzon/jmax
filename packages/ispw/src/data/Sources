@@ -10,20 +10,22 @@
 #  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
 #  for DISCLAIMER OF WARRANTY.
 #  
-SOURCES = accum.c \
-	  bag.c \
-	  data.c \
-	  float.c \
-	  symbol.c \
-	  const.c \
-	  funbuff.c \
-	  integer.c \
-	  pbank.c \
-	  table.c \
-	  value.c \
-	  vexp.c \
-	  vexp_fun.c \
-	  vexp_if.c \
-	  vexp_util.c \
- 	  argument.c  \
-	  expr_doctor.c 
+SOURCES = \
+  accum.c \
+  bag.c \
+  data.c \
+  float.c \
+  symbol.c \
+  const.c \
+  var.c \
+  funbuff.c \
+  integer.c \
+  pbank.c \
+  table.c \
+  value.c \
+  vexp.c \
+  vexp_fun.c \
+  vexp_if.c \
+  vexp_util.c \
+  argument.c \
+  expr_doctor.c 

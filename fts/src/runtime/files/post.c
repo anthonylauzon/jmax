@@ -50,13 +50,15 @@ post_vector(int n, float *fp)
   post("\n");
 }
 
+#define MAX_POST_DATA_ATOMS 1024
 
 void
 post_atoms(int ac, const fts_atom_t *at)
 {
+  fts_atom_t a[MAX_POST_DATA_ATOMS];
   int i;
 
-  for (i = 0; i < ac; i++)
+  for(i=0; i<ac; i++)
     {
       char *ps;
 
@@ -73,15 +75,29 @@ post_atoms(int ac, const fts_atom_t *at)
 	post("%f%s", fts_get_float(&at[i]), ps);
       else if (fts_is_ptr(&at[i]) )
 	post("%lx%s", (unsigned long) fts_get_ptr( &at[i]), ps);
+      else if (fts_is_data(&at[i]) )
+	{
+	  fts_data_t *data = fts_get_data(&at[i]);
+	  int size = fts_data_get_atoms(data, MAX_POST_DATA_ATOMS, a);
+
+	  if(fts_data_is_const(data))
+	    post("(const)");
+	  post("%s*{", fts_symbol_name(fts_data_get_class_name(data)));
+
+	  if(size <= MAX_POST_DATA_ATOMS)
+	    {
+	      post_atoms(size, a);
+	    }
+	  else
+	    {
+	      post_atoms(MAX_POST_DATA_ATOMS, a);
+	      post(" ... ");
+	    }
+
+	  post("}%s", ps);
+	}
       else if (fts_is_void(&at[i]))
 	post("(void)%s", ps);
-      else if (fts_is_atom_array(&at[i]))
-	{
-	  fts_atom_array_t *v;
-
-	  v = fts_get_atom_array(&at[i]);
-	  post("<ARRAY %lx %d>%s", v, fts_atom_array_get_size(v), ps);
-	}
       else
 	post("<%s>%s", fts_symbol_name(fts_get_type(&at[i])), ps);
     }

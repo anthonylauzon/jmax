@@ -1,5 +1,5 @@
 //
-// jMax
+//  jMax
 //  
 //  Copyright (C) 1999 by IRCAM
 //  All rights reserved.

@@ -26,12 +26,31 @@ typedef struct {
   fts_symbol_t prompt;
 } print_t;
 
-
 static fts_symbol_t sym_print = 0;
 
+/**********************************************************************
+ *
+ *  object
+ *
+ */
 
 static void
-print_bang_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  print_t *this = (print_t *)o;
+
+  this->prompt = fts_get_symbol_arg(ac, at, 1, fts_new_symbol("print"));
+}
+
+
+/**********************************************************************
+ *
+ *  user methods
+ *
+ */
+
+static void
+print_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
@@ -40,7 +59,7 @@ print_bang_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-print_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
@@ -50,7 +69,7 @@ print_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-print_atoms_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
@@ -61,7 +80,7 @@ print_atoms_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 
 static void
-print_anything_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
@@ -77,14 +96,11 @@ print_anything_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     post("%s\n", fts_symbol_name(s));
 }
 
-static void
-print_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-
-  this->prompt      = fts_get_symbol_arg(ac, at, 1, fts_new_symbol("print"));
-}
-
+/**********************************************************************
+ *
+ *  class
+ *
+ */
 
 static fts_status_t
 print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
@@ -95,22 +111,15 @@ print_instantiate(fts_class_t *cl, int ac, const fts_atom_t *aat)
 
   a[0] = fts_s_symbol;
   a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, print_init_mth, 2, a, 1);
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, print_init, 2, a, 1);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, print_atoms_mth, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, print_atoms_mth, 1, a);
-
-  fts_method_define(cl, 0, fts_s_bang, print_bang_mth, 0, 0);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, print_atoms_mth, 1, a);
-
-  fts_method_define_varargs(cl, 0, fts_s_list, print_list_mth);
-
-  fts_method_define_varargs(cl, 0, fts_s_anything, print_anything_mth);
+  fts_method_define_bang(cl, 0, print_bang);
+  fts_method_define_int(cl, 0, print_atoms);
+  fts_method_define_float(cl, 0, print_atoms);
+  fts_method_define_symbol(cl, 0, print_atoms);
+  fts_method_define_list(cl, 0, print_list);
+  fts_method_define_data(cl, 0, print_atoms);
+  fts_method_define_anything(cl, 0, print_anything);
 
   return fts_Success;
 }

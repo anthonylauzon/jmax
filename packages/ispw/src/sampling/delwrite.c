@@ -141,7 +141,7 @@ delwrite_realloc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if(!this->name) return;
 
-  delbuf_set_size(&this->buf, size, this->unit);
+  delbuf_set_size(this->buf, size, this->unit);
 }
 
 

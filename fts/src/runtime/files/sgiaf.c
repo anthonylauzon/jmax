@@ -158,7 +158,7 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
   AFfilehandle af_handle;
 
   /* find file in all possible locations */
-  if(! fts_file_get_read_path(path, full_path))
+  if(!fts_file_get_read_path(path, full_path))
      return 0;
 
   if(format)

@@ -315,13 +315,16 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *buf = this->buf.samples;
   long n_save;
 
+  if(sr <= 0.0f)
+    sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
+
   if(save_size > 0)
     n_save = fts_unit_convert_to_base(this->unit, save_size, &sr);
   else
     n_save = size;
 
-  if(sr <= 0.0f)
-    sr = fts_param_get_float(fts_s_sampling_rate, 44100.0f);
+  if(n_save > size)
+    n_save = size;
 
   if(file_name)
     {

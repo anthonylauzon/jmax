@@ -17,6 +17,7 @@
 
 extern void list_config(void);
 extern void listarith_config(void);
+extern void listsum_config(void);
 extern void listelement_config(void);
 extern void listhead_config(void);
 extern void listjoin_config(void);
@@ -30,6 +31,7 @@ lists_module_init(void)
 {
   list_config();
   listarith_config();
+  listsum_config();
   listelement_config();
   listhead_config();
   listjoin_config();

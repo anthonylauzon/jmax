@@ -18,6 +18,7 @@ extern void bag_config(void);
 extern void float_config(void);
 extern void symbol_obj_config(void);
 extern void const_obj_config(void);
+extern void var_config(void);
 extern void funbuff_config(void);
 extern void integer_config(void);
 extern void pbank_config(void);
@@ -53,6 +54,7 @@ data_module_init(void)
      with const */
 
   const_obj_config();
+  var_config();
   argument_init();
 }
 
