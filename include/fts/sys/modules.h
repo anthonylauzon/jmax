@@ -74,10 +74,10 @@ typedef struct _fts_module
   struct _fts_module *next;	/* pointer for list handling */
 } fts_module_t;
 
-extern FTS_API void fts_install_module(fts_module_t *s);
-extern FTS_API void fts_modules_init(void);
-extern FTS_API void fts_modules_shutdown(void);
+FTS_API void fts_install_module(fts_module_t *s);
+FTS_API void fts_modules_init(void);
+FTS_API void fts_modules_shutdown(void);
 
-extern FTS_API fts_status_t fts_module_load(const char *name, const char *filename);
+FTS_API fts_status_t fts_module_load(const char *name, const char *filename);
 
 #endif

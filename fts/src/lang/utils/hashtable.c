@@ -289,7 +289,7 @@ int fts_hashtable_put( fts_hashtable_t *h, fts_atom_t *key, fts_atom_t *value)
 
 int fts_hashtable_remove( fts_hashtable_t *h, fts_atom_t *key)
 {
-  fts_hashtable_cell_t **c;
+  fts_hashtable_cell_t **c = lookup_cell( h, key);
 
   if (*c)
     {
