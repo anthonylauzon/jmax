@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -201,26 +201,18 @@ abstract class ErmesObject implements ErmesDrawable {
 
   void UpdateOnly( Graphics g) 
   {
-    if ( !itsSketchPad.itsGraphicsOn)
-      return;
-
     g.setColor( itsSketchPad.getBackground());
     g.fillRect( itsRectangle.x, itsRectangle.y, itsRectangle.width, itsRectangle.height);
   }
 
   public void Paint( Graphics g)  // (fd) public, because public in ErmesDrawable...
   {
-    if ( ! itsSketchPad.itsGraphicsOn)
-      return;
+    Paint_specific( g);
+  }
 
-    if ( itsSketchPad.isInGroup) 
-      {
-	//emergency situation: ignore the Graphics and paint offScreen
-	Paint_specific( itsSketchPad.GetOffGraphics());
-	itsSketchPad.drawPending = true;
-      } 
-    else
-      Paint_specific( g);
+  public void Repaint()
+  {
+    itsSketchPad.repaint( itsRectangle.x, itsRectangle.y, itsRectangle.width, itsRectangle.height);
   }
 
   protected void DoublePaint() 
@@ -232,9 +224,6 @@ abstract class ErmesObject implements ErmesDrawable {
       {
 	Paint( aGraphics);
       }
-
-    if ( itsSketchPad.offScreenPresent && !itsSketchPad.itsRunMode)
-      Paint( itsSketchPad.GetOffGraphics());
   }
 
   void updateInOutlets()
@@ -277,7 +266,6 @@ abstract class ErmesObject implements ErmesDrawable {
 	      {
 		aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt( i);
 		aErmesObjInlet.MoveTo( itsRectangle.x + 2 + i*in_local_distance, aErmesObjInlet.itsY);
-		itsSketchPad.markSketchAsDirty();
 	      } 
 	    else 
 	      {
@@ -285,7 +273,6 @@ abstract class ErmesObject implements ErmesDrawable {
 
 		itsInletList.addElement( aErmesObjInlet);
 		itsSketchPad.AddInlet( aErmesObjInlet);
-		itsSketchPad.addToDirtyInOutlets( aErmesObjInlet);
 	      }
 	  }
       } 
@@ -302,14 +289,12 @@ abstract class ErmesObject implements ErmesDrawable {
 	      {
 		aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt( i);
 		aErmesObjInlet.MoveTo( itsRectangle.x + 2 + i*aHDist, aErmesObjInlet.itsY);
-		itsSketchPad.markSketchAsDirty();
 	      } else 
 		{
 		  //erase the inlet, and the associated connections
 		  aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt( itsInletList.size() - 1);
 		  itsInletList.removeElementAt( itsInletList.size() - 1);
 		  itsSketchPad.RemoveInlet( aErmesObjInlet);
-		  itsSketchPad.markSketchAsDirty();
                 }
 	  }
       }
@@ -326,15 +311,12 @@ abstract class ErmesObject implements ErmesDrawable {
 	    aErmesObjOutlet = new ErmesObjOutlet( i, this, itsRectangle.x, itsRectangle.y);
 	    itsOutletList.addElement( aErmesObjOutlet);
 	    itsSketchPad.AddOutlet( aErmesObjOutlet);
-	    itsSketchPad.addToDirtyInOutlets( aErmesObjOutlet);
 	  }
 
 	for ( i = 0; i < itsOutletList.size(); i++) 
 	  {
 	    aErmesObjOutlet = (ErmesObjOutlet)itsOutletList.elementAt( i);
 	    aErmesObjOutlet.MoveTo( itsRectangle.x + 2 + i*aHDist, aErmesObjOutlet.itsY);
-	    if (old_noutlts > 0 && old_noutlts != n_outlts)
-	      itsSketchPad.markSketchAsDirty();
 	  }
       }
     else if (n_outlts <= old_noutlts) 
@@ -346,7 +328,6 @@ abstract class ErmesObject implements ErmesDrawable {
 	    itsOutletList.removeElementAt( size);
 	    itsSketchPad.RemoveOutlet( aErmesObjOutlet);
 	    size--;
-	    itsSketchPad.markSketchAsDirty();
 	  }
 	if (n_outlts>1)
 	  aHDist = (itsRectangle.width-10)/(n_outlts-1);
@@ -357,7 +338,6 @@ abstract class ErmesObject implements ErmesDrawable {
 	  {
 	    aErmesObjOutlet = (ErmesObjOutlet)itsOutletList.elementAt( i);
 	    aErmesObjOutlet.MoveTo( itsRectangle.x + 2 + i*aHDist, aErmesObjOutlet.itsY);
-	    itsSketchPad.markSketchAsDirty();
 	  }
       }
   }
@@ -373,29 +353,16 @@ abstract class ErmesObject implements ErmesDrawable {
   {
   }
 
-  void Select( boolean paintNow) 
+  void Select()
   {
     if ( !itsSelected) 
-      {
-	itsSelected = true;
-
-	if (paintNow)
-	  DoublePaint();
-	else
-	  itsSketchPad.addToDirtyObjects( this);
-      }
+      itsSelected = true;
   }
 
-  void Deselect( boolean PaintNow) 
+  void Deselect() 
   {
     if (itsSelected) 
-      {
-	itsSelected = false;
-	if (PaintNow)
-	  DoublePaint();
-	else
-	  itsSketchPad.addToDirtyObjects( this);
-      }
+      itsSelected = false;
   }
 
   FtsObject GetFtsObject() 
@@ -427,7 +394,7 @@ abstract class ErmesObject implements ErmesDrawable {
       itsSketchPad.InletConnect( this, theRequester); // then, is it's an inlet
   }
 
-  boolean ConnectionAbort( ErmesObjInOutlet theRequester, boolean paintNow) 
+  boolean ConnectionAbort( ErmesObjInOutlet theRequester) 
   {
     // HERE the checking: is the type of connection abort allowed?
     // ( for now always allowed)
@@ -477,7 +444,8 @@ abstract class ErmesObject implements ErmesDrawable {
       {
 	if ( (e.getClickCount() > 1) && e.isShiftDown() ) 
 	  {
-	    RestoreDimensions( true);
+	    RestoreDimensions();
+	    Repaint();
 	  } 
 	else if ( itsSelected)
 	  itsSketchPad.clickHappenedOnAnAlreadySelected = true;
@@ -508,14 +476,11 @@ abstract class ErmesObject implements ErmesDrawable {
       MouseUp_specific( e, x, y);
   }
 
-  void RestoreDimensions( boolean paintNow) 
+  void RestoreDimensions( ) 
   {
     //possible optimization: don't repaint if nothing changes
+
     resizeBy( getMinimumSize().width - itsRectangle.width, getMinimumSize().height - itsRectangle.height);
-    if ( paintNow)
-      itsSketchPad.repaint();
-    else
-      itsSketchPad.addToDirtyObjects( this);
   }
 
   void ResizeToText( int theDeltaX, int theDeltaY) 

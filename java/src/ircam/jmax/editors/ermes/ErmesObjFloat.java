@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -55,7 +55,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     itsFloat = theFloat;
 
     itsFtsObject.put("value", theFloat);
-    DoublePaint();
+    Repaint();
   }
 
   void ResizeToNewFont(Font theFont) 
@@ -116,8 +116,6 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
 	itsStartingValue = itsFloat;
 
 	itsFtsObject.put( "value", itsFloat);
-
-	DoublePaint();
       } 
     else
       itsSketchPad.ClickOnObject(this, evt, x, y);
@@ -138,7 +136,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
       {
 	itsFtsObject.ask("value");
 	Fts.sync();
-	DoublePaint();
+	Repaint();
 	return;
       } 
 
@@ -170,7 +168,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
 	itsFloat += increment;
 
 	itsFtsObject.put("value", new Float(itsFloat));
-	DoublePaint();
+	Repaint();
 
 	return true;
       } 

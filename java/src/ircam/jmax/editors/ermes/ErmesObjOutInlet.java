@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.util.*;
@@ -14,9 +14,6 @@ class ErmesObjOutInlet extends ErmesObjInlet {
 
   public void Paint_specific( Graphics g) 
   {
-    if ( !itsOwner.itsSketchPad.itsGraphicsOn) 
-      return;
-
     g.setColor( Color.black);
 
     if (selected)

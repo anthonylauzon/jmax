@@ -1,5 +1,5 @@
 
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.util.*;
 

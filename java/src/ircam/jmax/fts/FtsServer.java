@@ -1061,6 +1061,25 @@ public class FtsServer
       }
   }
 
+  final void sendRecomputeErrorObjects()
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println("recomputeErrorObjects()");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_recompute_error_objects_cmd);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer.recomputeErrorObjects()");
+      }
+  }
+
   final void sendShutdown()
   {
     if (! connected)

@@ -992,6 +992,50 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
     }
 }
 
+/* Support for dynamic object redefinition:
+   Since the variable dependency tracking system can 
+   re-instantiate objects, we may end up with pointers
+   to invalid objects in the vm status; for this reason,
+   this function will look for the old and new object
+   in the whole vm state and substitute it.
+   Probabily, there is a more efficent way to do it,
+   but the vm state dimention is proportional to the depth
+   of the patch, not to the number of objects, so it is never
+   enormous.
+
+   Note also that the vm state is changed across vm invocations,
+   i.e. across patchers and templates/abstractions, because dependecy
+   are across file barriers.
+   */
+
+void fts_vm_substitute_object(fts_object_t *old, fts_object_t *new)
+{
+  int i;
+
+  /* First, the object stack */
+
+  for (i = object_tos ; i < OBJECT_STACK_DEPTH; i++)
+    if (object_stack[i] == old)
+      object_stack[i] = new;
+
+  /* Second, the object table stack */
+
+  for (i = object_table_tos ; i < OBJECT_TABLE_STACK_DEPTH; i++)
+    {
+      int j;
+      fts_object_t **table;
+
+      table = object_table_stack[i];
+
+      for (j = 0; j < object_table_size_stack[i]; j++)
+	if (table[j] == old)
+	  table[j] = new;
+    }
+}
+
+
+
+
 
 /* Backward compatibility builtin symbol support.
    Will go away soon.

@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 //
 // The graphic outlet on the bottom of the objects.

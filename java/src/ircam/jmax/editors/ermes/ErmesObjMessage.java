@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -21,9 +21,6 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     itsText.setText( getArgs());
     itsText.setWidth( getWidth());
     itsText.setFontMetrics( itsFontMetrics);
-
-//     if( !canResizeBy( 0, 0)) 
-//       RestoreDimensions( false);
   }
 
   // ----------------------------------------
@@ -116,6 +113,8 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     if (itsFlashing) 
       {
 	itsFlashing = false;
+
+	// Should use a repaint with its rectangle
 
 	Graphics g = itsSketchPad.getGraphics();
 	Paint_specific( g);

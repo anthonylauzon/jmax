@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -49,15 +49,15 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
       }
     else if (name == "deletedObject") 
       {
-	itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor((FtsObject)value), false);
+	itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor((FtsObject)value));
       }
     else if (name == "deletedConnection") 
       {
-	itsSketchPad.DeleteGraphicConnection(itsSketchPad.getErmesConnectionFor((FtsConnection)value), false);
+	itsSketchPad.DeleteGraphicConnection(itsSketchPad.getErmesConnectionFor((FtsConnection)value));
       }
 
     if (!pasting)
-      itsSketchPad.paintDirtyList();
+      itsSketchPad.repaint();
   }
 
   public void componentResized( ComponentEvent e) 
@@ -417,7 +417,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     if (!ftsObjectsPasted.isEmpty() || ! ftsConnectionsPasted.isEmpty())
       {
 	itsSketchPad.PasteObjects( ftsObjectsPasted, ftsConnectionsPasted);
-	itsSketchPad.RequestOffScreen();
 	itsSketchPad.repaint();
       }
     setCursor( temp);
@@ -1021,15 +1020,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
   public void focusGained( FocusEvent e)
   {
-    itsSketchPad.RequestOffScreen();
-
-    Graphics g = getGraphics();
-
-    if (g != null)
-      {
-	itsSketchPad.update( g);
-	g.dispose();
-      }
+    // ??? 
   } 
 
   public void focusLost( FocusEvent e)

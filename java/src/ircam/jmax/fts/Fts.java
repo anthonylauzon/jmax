@@ -314,6 +314,16 @@ public class Fts
     return server.getRootObject();
   }
 
+  /* Ask FTS to recompute error objects.
+     Error objects actually need to be recomputed only 
+     after changing the environment */
+
+  public static void recomputeErrorObjects()
+  {
+    server.sendRecomputeErrorObjects();
+  }
+
+
   /* Utility function: get a Data that is a value of an object property,
      and call and editor on it; but do it asynchroniously;
      the asynchronicity is actually in two places:

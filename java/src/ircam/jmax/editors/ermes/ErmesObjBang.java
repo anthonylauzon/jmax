@@ -1,11 +1,11 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.editors.ermes.*;
+import ircam.jmax.editors.frobber.*;
 
 //
 // The "bang" graphic object.

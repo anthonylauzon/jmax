@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.43 $ IRCAM $Date: 1998/10/12 17:13:19 $
+ *      $Revision: 1.44 $ IRCAM $Date: 1998/10/13 17:11:52 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -599,6 +599,10 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   
   if (do_client)
     fts_client_upload_object(new);
+
+  /* Update the loading vm */
+
+  fts_vm_substitute_object(old, new);
 
   /* If new is an error object, assure that there are enough inlets
    and outlets for the connections */

@@ -1,6 +1,7 @@
 
 package ircam.jmax.editors.console;
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import java.io.*;
 import java.util.*;
 import com.sun.java.swing.*;
@@ -109,6 +110,12 @@ public class Console extends JPanel{
       
       try {
 	itsInterp.eval(s);
+
+	// Ask FTS to recompute the error objects if needed
+	// A command can change the configuration.
+
+	Fts.recomputeErrorObjects();
+
 	String result = itsInterp.getResult().toString();
 	if (result.length() > 0) {
 	  PutLine(result);

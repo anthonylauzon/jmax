@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -39,21 +39,11 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 
     itsFtsObject.watch( "value", this);
 
-    Object value;
+    Integer aInteger = (Integer)itsFtsObject.get( "minValue");
+    itsRangeMin = aInteger.intValue();
 
-    value = itsFtsObject.get( "minValue");
-
-    if (value instanceof Integer)
-      itsRangeMin = ((Integer) value).intValue();
-    else
-      itsRangeMin = 0;
-
-    value = itsFtsObject.get( "maxValue");
-
-    if (value instanceof Integer)
-      itsRangeMax = ((Integer) value).intValue();
-    else
-      itsRangeMax = 128;
+    aInteger = (Integer)itsFtsObject.get( "maxValue");
+    itsRangeMax = aInteger.intValue();
 
     itsRange = itsRangeMax - itsRangeMin;
     itsStep = ( float)itsRange/itsPixelRange;

@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -53,12 +53,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
     else
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
 
-    if ( itsSketchPad != null)
-      itsOwner.Paint( itsSketchPad.GetOffGraphics());
-
-    Graphics g = itsSketchPad.getGraphics();
-    itsSketchPad.CopyTheOffScreen( g);
-    g.dispose();
+    itsSketchPad.repaint();
 
     itsOwner = null;  
   }
@@ -78,8 +73,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
       {
 	itsOwner.redefine( aTextString);
 
-	itsSketchPad.markSketchAsDirty();
-	itsSketchPad.paintDirtyList();
+	itsSketchPad.repaint();
       }
 
     setRows( 5);

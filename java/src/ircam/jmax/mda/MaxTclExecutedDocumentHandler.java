@@ -4,6 +4,7 @@ import java.io.*;
 import tcl.lang.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 
 /** An instance of this document handler can load MaxDocument from
@@ -27,7 +28,8 @@ public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
   {
     if (super.canLoadFrom(file))
       {
-	return file.getName().endsWith(".tcl");
+	return (file.getName().endsWith(".tcl") ||
+		file.getName().endsWith(".env"));
       }
     else
       return false;
@@ -52,6 +54,10 @@ public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
 
     document.setDocumentFile(file);
     document.setDocumentHandler(this);
+
+    // Ask FTS to recompute the error objects if needed
+
+    Fts.recomputeErrorObjects();
 
     return document;
   }

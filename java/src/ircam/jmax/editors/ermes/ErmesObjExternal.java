@@ -1,4 +1,4 @@
-package ircam.jmax.editors.ermes;
+package ircam.jmax.editors.frobber;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -44,8 +44,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	if ((value != null) && (value instanceof Integer)) 
 	  {
 	    isError = ((Integer)value).intValue();
-	    DoublePaint();
-	    itsSketchPad.repaint();// ??? 
+	    Repaint();
 	  }
       } 
     else
@@ -70,6 +69,9 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	itsFtsObject.watch("outs", this);
 	itsFtsObject.watch("error", this);
 	isError = -1;
+
+	System.err.println("In redefinition, putting isError to -1, but its value is " +
+			   itsFtsObject.get("error"));
       } 
     catch (FtsException e) 
       {

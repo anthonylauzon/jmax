@@ -102,6 +102,8 @@ extern fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 				     int ac, const fts_atom_t *at,
 				     fts_expression_state_t *e);
 
+extern void fts_vm_substitute_object(fts_object_t *old, fts_object_t *new);
+
 extern void fts_vm_init();
 #endif
 

@@ -127,8 +127,9 @@ class FtsClientProtocol
 
   static final int fts_update_group_start_cmd = '{';
   static final int fts_update_group_end_cmd = '}';
-
+  static final int fts_recompute_error_objects_cmd = 'e';
   static final int fts_shutdown_cmd = 's';
+
 
   static public String getCommandName(int command)
   {

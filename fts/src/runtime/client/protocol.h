@@ -14,7 +14,7 @@
  * Forbidden values : 0x00 (easy message as string in C)
  * Low values: 0x01 0x02 0x03
  * Symbols   : - { } > < \
- * Lowercase : a b c d f g h i l m n o p q s u x y w z  
+ * Lowercase : a b c d e f g h i l m n o p q s u x y w z  
  * Uppercase : A B C D E F G H L M N O P Q R S U X Y Z 
  * 
  */
@@ -84,6 +84,7 @@
 #define UPDATE_GROUP_START_CODE  '{'
 #define UPDATE_GROUP_END_CODE    '}'
 
+#define RECOMPUTE_ERRORS_CODE    'e'
 #define FTS_SHUTDOWN_CODE       's'
 /* Sincronization code */
 
