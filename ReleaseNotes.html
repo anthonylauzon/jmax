@@ -71,6 +71,18 @@
  <h1> Release notes for <i>j</i>Max 2.4.13 </h1>
 </a>
 
+
+<strong>
+The release 2.4.13 is not finalized yet, is still under development
+and is only available via CVS. The current state of the CVS version
+is the following:
+<ul>
+<li> the new implementation of readsf~ and writesf~ is not finished yet:
+readsf~ has still some bugs on big audio files, writesf~ is not yet implemented
+</ul>
+</strong>
+
+
 <h3>Features</h3>
 
 
@@ -86,6 +98,7 @@ To find what is an isolated processor and how to isolate a processor, check the
 <i>mpadmin</i> man page. The better latency will be obtained when the processor
 is both isolated and non-preemptive. Isolating a processor requires a
 multi-processor system (Origin or Octane with 2 processors at least).
+
 
 <h4>Reimplementation of the direct-to-disk objects (readsf~)</h4>
 

@@ -20,42 +20,11 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-all:
-	(cd java ; $(MAKE) all)
-	(cd c ; $(MAKE) all)
-.PHONY: all
-
-clean:
-	(cd java ; $(MAKE) clean)
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
-
-all_c:
-	(cd c ; $(MAKE) all)
-.PHONY: all
-
-clean_c:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
-
-all_java:
-	(cd java ; $(MAKE) all)
-.PHONY: all
-
-clean_java:
-	(cd java ; $(MAKE) clean)
-.PHONY: clean
-
 install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence
-	$(INSTALL_DATA) sequence.jpk $(lib_install_dir)/packages/sequence/sequence.jpk
-	( cd c ; $(MAKE) $@)
-	( cd help; $(MAKE) $@)
-	( cd images; $(MAKE) $@)
-	( cd java; $(MAKE) $@)
+	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence/help
+	for f in *.jmax *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/sequence/help/$$f ; done
 .PHONY: install
 
 

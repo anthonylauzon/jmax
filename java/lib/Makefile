@@ -30,6 +30,6 @@ install:
 		( cd swing ; for f in CHANGES.txt LICENSE.txt README.html README.txt swingall.jar ; do $(INSTALL_DATA) $$f $(lib_install_dir)/java/lib/swing/$$f ; done ) ; \
 	fi
 	$(INSTALL_DIR) $(lib_install_dir)/java/lib/jacl
-	( cd jacl ; for f in jacl.jar README license.terms ; do $(INSTALL_DATA) $$f $(lib_install_dir)/java/lib/jacl/$$f ; done )
+	( cd jacl ; for f in jacl.jar tcljava.jar README license.terms ; do $(INSTALL_DATA) $$f $(lib_install_dir)/java/lib/jacl/$$f ; done )
 .PHONY: install
 
