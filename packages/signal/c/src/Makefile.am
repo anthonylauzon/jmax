@@ -7,8 +7,6 @@ matrix.c \
 osc.c \
 osc_ieeewrap.c \
 pink.c \
-play.c \
-playbpf.c \
 playfvec.c \
 recfvec.c \
 samplepool.c \
