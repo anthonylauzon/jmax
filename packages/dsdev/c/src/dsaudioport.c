@@ -390,6 +390,11 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   channels = fts_get_int_arg(ac, at, 2, DEFAULT_CHANNELS);
   dev->num_fragments = fts_get_int_arg(ac, at, 3, DEFAULT_NUM_FRAGMENTS);
 
+  fts_log("[dsdev]: device=\"%s\", mode=%s, channels=%d, fragments=%d, fifo_size=%d, sample_rate=%d\n", 
+	  fts_symbol_name(dev->device), fts_symbol_name(dev->mode),
+	  channels, dev->num_fragments, fifo_size, sample_rate);
+  
+
   if ((dev->mode != fts_s_read_write) 
       && (dev->mode != fts_s_read) 
       && (dev->mode != fts_s_write) ) {
