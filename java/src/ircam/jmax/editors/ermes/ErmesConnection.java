@@ -79,8 +79,8 @@ public class ErmesConnection {
   public ErmesObjInlet GetInlet() {return itsInlet;}
   public ErmesObjOutlet GetOutlet() {return itsOutlet;}
   public boolean GetSelected() {return itsSelected;}
-  
-	
+  public ErmesObject GetSourceObject(){return itsOutlet.GetOwner();}
+  public ErmesObject GetDestObject(){return itsInlet.GetOwner();}
 
   //--------------------------------------------------------
   //	CONSTRUCTOR

@@ -1115,16 +1115,17 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	  }
 	}	
 	CheckCurrentFont();
-
-	for (Enumeration en = itsConnections.elements() ; en.hasMoreElements() ;) {
+	
+	SelectConnections();
+	/*for (Enumeration en = itsConnections.elements() ; en.hasMoreElements() ;) {
 	  ErmesConnection aConnection = (ErmesConnection) en.nextElement();
 	  if(aRect.contains(aConnection.GetStartPoint())&&(aRect.contains(aConnection.GetEndPoint()))) {
-	    aConnection.Select();
-	    aConnection.Paint(offGraphics);
-	    itsSelectedConnections.addElement(aConnection);
-	    itsSketchWindow.UpdateRoutingMenuWithSelection();
+	  aConnection.Select();
+	  aConnection.Paint(offGraphics);
+	  itsSelectedConnections.addElement(aConnection);
+	  itsSketchWindow.UpdateRoutingMenuWithSelection();
 	  }
-	}	
+	  }*/
 
 	if (offScreenPresent) {
 	  CopyTheOffScreen(getGraphics());
@@ -1208,7 +1209,21 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   //////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////mouseListener--fine
-  
+  public void SelectConnections(){
+    ErmesConnection aConnection;
+    for (Enumeration en = itsConnections.elements() ; en.hasMoreElements() ;) {
+      aConnection = (ErmesConnection) en.nextElement();
+      if((aConnection.GetSourceObject().itsSelected)&&(aConnection.GetDestObject().itsSelected)){	
+	aConnection.Select();
+	aConnection.Paint(offGraphics);
+	itsSelectedConnections.addElement(aConnection);
+	itsSketchWindow.UpdateRoutingMenuWithSelection();
+      }
+    }	
+  }
+
+
+
   public boolean DynamicScrolling(int theX, int theY){
     Adjustable aHAdjustable =itsSketchWindow.itsScrollerView.getHAdjustable();
     Adjustable aVAdjustable =itsSketchWindow.itsScrollerView.getVAdjustable();

@@ -1231,11 +1231,11 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
       // Set the font properties
 
-      if (! aErmesObject.itsFont.getName().equals(aErmesObject.itsSketchPad.sketchFont.getName()))
-	aFObject.put("font", aErmesObject.itsFont.getName());
+      //if (!aErmesObject.itsFont.getName().equals(aErmesObject.itsSketchPad.sketchFont.getName()))
+      aFObject.put("font", aErmesObject.itsFont.getName());
 
-      if (aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize())
-	aFObject.put("fs", aErmesObject.itsFont.getSize());
+      //if (aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize())
+      aFObject.put("fs", aErmesObject.itsFont.getSize());
 
       aErmesObject.putOtherProperties(aFObject);
       if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjExternal &&
@@ -1247,6 +1247,13 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     }
   }
 }
+
+
+
+
+
+
+
 
 
 

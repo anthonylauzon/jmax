@@ -280,6 +280,7 @@ public class ErmesObject implements FtsPropertyHandler {
 
   //to be redefinded if needed.
   void putOtherProperties(FtsObject theFObject){}
+  
 
 // This init method is only called in "from skratch" initializations
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
@@ -310,8 +311,16 @@ public class ErmesObject implements FtsPropertyHandler {
     int width = 0, height = 0;
     itsSelected = false;
     itsSketchPad = theSketchPad;
-    itsFont = itsSketchPad.sketchFont;
+    String aFont = (String)theFtsObject.get("font");
+    Integer  aSize = (Integer)theFtsObject.get("fs");
+    System.out.println("font + size = "+aFont+" "+aSize);
+    if(aFont == null) itsFont = itsSketchPad.sketchFont;
+    else{
+      if(aSize == null) itsFont = new Font(aFont,itsSketchPad.sketchFont.getStyle(), itsSketchPad.sketchFont.getSize());
+      else itsFont = new Font(aFont,itsSketchPad.sketchFont.getStyle(), aSize.intValue());
+    }
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
+
     laidOut = false;
     itsX = ((Integer)theFtsObject.get("x")).intValue();
     itsY = ((Integer)theFtsObject.get("y")).intValue();

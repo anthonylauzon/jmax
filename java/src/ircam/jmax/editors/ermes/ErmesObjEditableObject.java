@@ -102,7 +102,7 @@ import ircam.jmax.fts.*;
     ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
     return true;
   }
-	
+
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
