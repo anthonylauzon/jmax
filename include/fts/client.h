@@ -20,13 +20,26 @@
  * 
  */
 
+/*
+ * The object and client parts of the object ids
+ */
+#define OBJECT_ID_BITS  24
+#define OBJECT_ID_CLIENT_MASK  (~0<<OBJECT_ID_BITS)
+#define OBJECT_ID_OBJ_MASK  (~OBJECT_ID_CLIENT_MASK)
+#define OBJECT_ID_OBJ(id) ((id)&OBJECT_ID_OBJ_MASK)
+#define OBJECT_ID_CLIENT(id) (((id)&OBJECT_ID_CLIENT_MASK)>>OBJECT_ID_BITS)
+#define OBJECT_ID(o,c) ((c)<<OBJECT_ID_BITS|(o))
+
+#define fts_get_client_id(O) OBJECT_ID_CLIENT(fts_object_get_id(O))
+#define fts_get_object_id(O) OBJECT_ID_OBJ(fts_object_get_id(O))
+
 /**
  * Client communication
  *
  * @defgroup client client
  */
 
-/**
+ /**
  * Send a message to the client mirror of an object
  *
  * @fn void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)

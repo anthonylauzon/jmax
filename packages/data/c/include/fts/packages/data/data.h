@@ -39,6 +39,7 @@ typedef struct _data_object
   int persistence;
 } data_object_t;
 
+
 enum data_object_persistence {data_object_persistence_args = -1, data_object_persistence_no = 0, data_object_persistence_yes = 1};
 
 #define data_object_persistence_args(o) (((data_object_t *)o)->persistence = data_object_persistence_args)
@@ -52,6 +53,15 @@ DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, in
 DATA_API void data_object_set_dirty(fts_object_t *o);
 
 DATA_API void data_object_init(fts_object_t *o);
+
+#include <fts/packages/data/mat.h>
+#include <fts/packages/data/vec.h>
+#include <fts/packages/data/ivec.h>
+#include <fts/packages/data/fmat.h>
+#include <fts/packages/data/fvec.h>
+#include <fts/packages/data/cvec.h>
+#include <fts/packages/data/dict.h>
+#include <fts/packages/data/bpf.h>
 
 DATA_API void data_config(void);
 

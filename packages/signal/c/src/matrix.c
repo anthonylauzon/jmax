@@ -20,7 +20,7 @@
  *
  */
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
+#include <fts/packages/utils/utils.h>
 
 static fts_symbol_t matrix_copy_in_ftl_symbol = 0;
 static fts_symbol_t matrix_copy_out_ftl_symbol = 0;

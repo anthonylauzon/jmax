@@ -21,8 +21,8 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
-#include <utils/c/include/utils.h>
-#include <data/c/include/fvec.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
 #include "delay.h"
 
 /********************************************************

@@ -7,15 +7,12 @@ cvec.c \
 data.c \
 fmat.c \
 fvec.c \
-getinter.c \
 getrange.c \
-getsize.c \
 ivec.c \
 mat.c \
 dict.c \
 row.c \
 tabeditor.c \
-value.c \
 vec.c \
 dumpfile.c
 
@@ -26,7 +23,6 @@ col.h \
 mat.h \
 dict.h \
 row.h \
-value.h \
 vec.h
 
 libdata_la_LDFLAGS=-module

@@ -21,7 +21,7 @@
  */
 
 #include <fts/fts.h>
-#include "dict.h"
+#include <fts/packages/data/data.h>
 
 fts_symbol_t dict_symbol = 0;
 fts_class_t *dict_type = 0;

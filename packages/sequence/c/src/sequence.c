@@ -20,16 +20,12 @@
  *
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell, Riccardo Borghesi.
  *
  */
 #include <fts/fts.h>
-#include <ftsprivate/client.h>
-#include <ftsprivate/patcher.h>
 #include <ftsconfig.h>
-#include <sequence.h>
-#include <track.h>
-#include <seqsym.h>
+#include <fts/packages/sequence/sequence.h>
 #include "seqmidi.h"
 
 #define SEQUENCE_ADD_BLOCK_SIZE 64

@@ -24,10 +24,10 @@
  *
  */
 #include <fts/fts.h>
-#include <sequence.h>
-#include <track.h>
-#include <note.h>
-#include <seqsym.h>
+#include <fts/packages/sequence/sequence.h>
+#include <fts/packages/sequence/track.h>
+#include <fts/packages/sequence/note.h>
+#include <fts/packages/sequence/seqsym.h>
 
 fts_class_t *note_type = 0;
 

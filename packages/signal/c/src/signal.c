@@ -25,7 +25,6 @@
  */
 
 #include "signal.h"
-#include <utils/c/include/utils.h>
 
 extern void signal_bus_config(void);
 

@@ -25,8 +25,7 @@
 #ifndef _DATA_ROW_H_
 #define _DATA_ROW_H_
 
-#include <data/c/include/data.h>
-#include "mat.h"
+#include <fts/packages/data/data.h>
 
 DATA_API fts_symbol_t row_symbol;
 DATA_API fts_class_t *row_type;

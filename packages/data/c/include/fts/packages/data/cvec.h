@@ -25,9 +25,8 @@
 #ifndef _DATA_CVEC_H_
 #define _DATA_CVEC_H_
 
-#include "data.h"
-#include "fmat.h"
-#include <utils/c/include/utils.h>
+#include <fts/packages/data/data.h>
+#include <fts/packages/utils/utils.h>
 
 typedef fmat_t cvec_t;
 

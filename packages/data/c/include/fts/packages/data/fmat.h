@@ -25,7 +25,7 @@
 #ifndef _DATA_FMAT_H_
 #define _DATA_FMAT_H_
 
-#include "data.h"
+#include <fts/packages/data/data.h>
 
 typedef struct _fmat_
 {

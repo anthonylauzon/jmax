@@ -24,9 +24,9 @@
  *
  */
 #include <fts/fts.h>
-#include <sequence.h>
-#include <track.h>
-#include <seqsym.h>
+#include <fts/packages/sequence/sequence.h>
+#include <fts/packages/sequence/track.h>
+#include <fts/packages/sequence/seqsym.h>
 #include "seqmess.h"
 
 /**************************************************************

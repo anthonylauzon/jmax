@@ -20,17 +20,15 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell, Riccardo Borghesi.
  *
  */
 
 #include <math.h>
 #include <string.h>
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
-#include <data/c/include/ivec.h>
-#include <data/c/include/fvec.h>
-#include <data/c/include/cvec.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
 
 typedef struct 
 {

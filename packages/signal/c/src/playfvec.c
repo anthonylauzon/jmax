@@ -26,8 +26,8 @@
 
 #include <float.h>
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
-#include <data/c/include/fvec.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
 
 static fts_symbol_t play_symbol = 0;
 

@@ -26,7 +26,7 @@
 #include <math.h>
 
 #ifdef WIN32
-#if defined(UTILS_EXPORTS)
+#if defined(DATA_EXPORTS)
 #define UTILS_API __declspec(dllexport)
 #else
 #define UTILS_API __declspec(dllimport)
@@ -35,19 +35,14 @@
 #define UTILS_API extern
 #endif
 
-
-#define FTS_RANDOM_MAX (0x7fffffffL)
-#define FTS_RANDOM_RANGE (2147483648.)
-
-
-UTILS_API void utils_config(void);
-
-
 /***************************************************************************************
  *
  *  random
  *
  */
+
+#define FTS_RANDOM_MAX (0x7fffffffL)
+#define FTS_RANDOM_RANGE (2147483648.)
 
 /* 31 bit random number generator */
 UTILS_API void fts_random_set_seed(unsigned int ul);
@@ -58,8 +53,6 @@ UTILS_API unsigned int fts_random(void);
 UTILS_API float fts_random_float(void);
 
 #define fts_random_range(min, max) ((min) + (((max) - (min)) * fts_random() / (double)FTS_RANDOM_MAX))
-
-
 
 
 /***************************************************************************************

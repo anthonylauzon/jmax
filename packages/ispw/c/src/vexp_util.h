@@ -25,7 +25,7 @@
  */
 
 
-#include <data/c/include/ivec.h>
+#include <fts/packages/data/data.h>
 
 #define	MAXBUF	256
 

@@ -1,4 +1,4 @@
-/*
+   /*
  * jMax
  * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
@@ -20,10 +20,9 @@
  */
 
 #include <fts/fts.h>
-#include <ftsprivate/client.h>
-#include <utils/c/include/utils.h>
-#include <data/c/include/ivec.h>
-#include <data/c/include/tabeditor.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
+#include "tabeditor.h"
 
 #include <stdlib.h>
 

@@ -25,8 +25,7 @@
 #ifndef _DATA_FVEC_H_
 #define _DATA_FVEC_H_
 
-#include "data.h"
-#include "fmat.h"
+#include <fts/packages/data/data.h>
 
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_type;

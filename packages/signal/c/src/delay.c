@@ -25,7 +25,7 @@
  */
 
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
+#include <fts/packages/utils/utils.h>
 #include "delay.h"
 
 static fts_symbol_t sym_delayline = 0;

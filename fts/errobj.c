@@ -20,7 +20,6 @@
  * 
  */
 
-
 #include <stdarg.h>
 
 #include <fts/fts.h>

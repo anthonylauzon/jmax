@@ -24,7 +24,7 @@
 
 #include <fts/fts.h>
 #include <float.h>
-#include <data/c/include/bpf.h>
+#include <fts/packages/data/data.h>
 
 fts_symbol_t bpf_symbol = 0;
 fts_class_t *bpf_type = 0;

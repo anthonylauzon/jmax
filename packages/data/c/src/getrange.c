@@ -24,10 +24,7 @@
 #include <float.h>
 #include <fts/fts.h>
 
-#include "vec.h"
-#include <data/c/include/ivec.h>
-#include <data/c/include/fvec.h>
-#include "mat.h"
+#include <fts/packages/data/data.h>
 
 /******************************************************
  *

@@ -31,7 +31,7 @@
 #define WAVE_TABLE_SIZE 512
 
 #include <fts/fts.h>
-#include <data/c/include/fvec.h>
+#include <fts/packages/data/data.h>
 
 struct wave_ftl_symbols
 {

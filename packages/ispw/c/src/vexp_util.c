@@ -27,9 +27,9 @@
 
 #include <stdio.h>		/* for sprintf */
 #include <fts/fts.h>
+#include <fts/packages/data/data.h>
 #include "vexp.h"
 #include "vexp_util.h"
-#include <data/c/include/ivec.h>
 #include "naming.h"
 
 #define	MAXBUF	256

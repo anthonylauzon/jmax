@@ -25,10 +25,7 @@
  */
 
 #include <fts/fts.h>
-#include <sequence.h>
-#include <track.h>
-#include <event.h>
-#include <seqsym.h>
+#include <fts/packages/sequence/sequence.h>
 
 typedef struct _seqfind_
 {

@@ -27,20 +27,7 @@ typedef struct _client_t client_t;
 
 #define FTS_CLIENT_DEFAULT_PORT 2023
 
-/*
- * The object and client parts of the object ids
- */
-#define OBJECT_ID_BITS  24
-#define OBJECT_ID_CLIENT_MASK  (~0<<OBJECT_ID_BITS)
-#define OBJECT_ID_OBJ_MASK  (~OBJECT_ID_CLIENT_MASK)
-#define OBJECT_ID_OBJ(id) ((id)&OBJECT_ID_OBJ_MASK)
-#define OBJECT_ID_CLIENT(id) (((id)&OBJECT_ID_CLIENT_MASK)>>OBJECT_ID_BITS)
-#define OBJECT_ID(o,c) ((c)<<OBJECT_ID_BITS|(o))
-
 #define MAX_CLIENTS (1<<(32-OBJECT_ID_BITS))
-
-#define fts_get_client_id(O) OBJECT_ID_CLIENT(fts_object_get_id(O))
-#define fts_get_object_id(O) OBJECT_ID_OBJ(fts_object_get_id(O))
 
 /**
  * Load a patcher from file

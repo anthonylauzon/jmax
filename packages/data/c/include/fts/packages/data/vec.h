@@ -26,7 +26,6 @@
 #define _DATA_VEC_H_
 
 #include <fts/packages/data/data.h>
-#include "mat.h"
 
 DATA_API fts_class_t *vec_type;
 DATA_API fts_symbol_t vec_symbol;

@@ -22,7 +22,7 @@
 #ifndef _CFFT_H_
 #define _CFFT_H_
 
-#include <utils/c/include/utils.h>
+#include <fts/packages/utils/utils.h>
 
 /*********************************************************************************
  *

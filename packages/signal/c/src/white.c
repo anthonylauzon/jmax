@@ -25,7 +25,7 @@
  */
 
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
+#include <fts/packages/utils/utils.h>
 
 typedef struct 
 {

@@ -23,7 +23,7 @@
  */
 
 #include <fts/fts.h>
-#include <data/c/include/fmat.h>
+#include <fts/packages/data/data.h>
 
 fts_symbol_t fmat_symbol = 0;
 fts_class_t *fmat_type = 0;

@@ -23,8 +23,8 @@
 #define _GPOOL_H_
 
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
-#include <data/c/include/fvec.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
 
 typedef struct _sample
 {

@@ -20,9 +20,8 @@
  */
 
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
-#include <fts/packages/data/ivec.h>
-#include <fts/packages/data/fvec.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
 #include "tabeditor.h"
 
 #include <stdlib.h>
@@ -601,7 +600,7 @@ static void
 tabeditor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tabeditor_t *this = (tabeditor_t *)o;
-  
+
   if(fts_object_has_id(o))
     fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 

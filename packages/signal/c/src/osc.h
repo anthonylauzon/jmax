@@ -31,7 +31,7 @@
 #define OSC_TABLE_SIZE 512
 
 #include <fts/fts.h>
-#include <data/c/include/fvec.h>
+#include <fts/packages/data/data.h>
 
 struct osc_ftl_symbols
 {

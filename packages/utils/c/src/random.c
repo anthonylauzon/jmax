@@ -39,8 +39,7 @@
 /* just another one to remind: seed = 1664525 * seed + 1013904223; */
 
 #include <sys/time.h>
-#include <utils/c/include/utils.h>
-
+#include <fts/packages/utils/utils.h>
 
 #define RA 16807 /* multiplier */
 #define RM 2147483647L /* 2**31 - 1 */

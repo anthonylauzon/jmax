@@ -27,8 +27,7 @@
 #ifndef _SEQMIDI_H_
 #define _SEQMIDI_H_
 
-#include <sequence.h>
-#include <track.h>
+#include <fts/packages/sequence/sequence.h>
 
 extern int track_import_from_midifile(track_t *track, fts_midifile_t *file);
 extern int track_export_to_midifile(track_t *track, fts_midifile_t *file);

@@ -27,7 +27,7 @@
 #include <stdlib.h>
 
 #include <fts/fts.h>
-#include <data/c/include/ivec.h>
+#include <fts/packages/data/data.h>
 #include "naming.h"
 
 #define FTS_TABLE_DEFAULT_SIZE 128

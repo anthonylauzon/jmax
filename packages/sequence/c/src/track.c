@@ -24,13 +24,8 @@
  *
  */
 #include <fts/fts.h>
-#include <ftsprivate/client.h>
-#include <ftsprivate/patcher.h>
 #include <ftsconfig.h>
-#include <note.h>
-#include <event.h>
-#include <track.h>
-#include <seqsym.h>
+#include <fts/packages/sequence/sequence.h>
 #include "seqmidi.h"
 #include "seqmess.h"
 
@@ -910,8 +905,8 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if(this->type != NULL)
   {
-      fts_set_symbol(&a, fts_class_get_name(this->type));
-      fts_client_send_message(o, fts_s_type, 1, &a);
+    fts_set_symbol(&a, fts_class_get_name(this->type));
+    fts_client_send_message(o, fts_s_type, 1, &a);
   }
 
   fts_set_int(&a, (this->persistence > 0));

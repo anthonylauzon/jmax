@@ -23,8 +23,7 @@
  */
 
 #include <fts/fts.h>
-#include "mat.h"
-#include "vec.h"
+#include <fts/packages/data/data.h>
 
 fts_symbol_t vec_symbol = 0;
 fts_class_t *vec_type = 0;

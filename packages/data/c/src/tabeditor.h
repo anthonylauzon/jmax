@@ -17,8 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ * Based on Max/ISPW by Miller Puckette.
  *
  */
-#include <fts/fts.h>
-#include <track.h>
-#include <seqsym.h>
+
+#ifndef _DATA_TABEDITOR_H_
+#define _DATA_TABEDITOR_H_
+
+#include <fts/packages/data/data.h>
+
+typedef struct _tabeditor_
+{
+  fts_object_t o;
+
+  int type;
+  
+  int opened; /* non zero if editor open */
+  int vsize; /* visible points */
+  int vindex; /* first visible point */
+  float zoom; /* current zoom */
+  int pixsize; /* visible pixels size */
+
+  fts_object_t *vec;
+  fts_object_t *copy;
+
+} tabeditor_t;
+
+DATA_API fts_symbol_t tabeditor_symbol;
+DATA_API fts_class_t *tabeditor_type;
+
+DATA_API void tabeditor_insert_append(tabeditor_t *tabeditor, int onset, int ac, const fts_atom_t *at);
+DATA_API void tabeditor_send( tabeditor_t *tabeditor);
+
+#endif

@@ -26,10 +26,7 @@
 #include <math.h>
 #include <string.h>
 #include <fts/fts.h>
-#include <data/c/include/ivec.h>
-#include <data/c/include/fvec.h>
-#include <data/c/include/cvec.h>
-#include <data/c/include/fmat.h>
+#include <fts/packages/data/data.h>
 
 typedef struct 
 {

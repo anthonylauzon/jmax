@@ -20,12 +20,9 @@
  */
 
 #include <fts/fts.h>
-#include <ftsprivate/client.h>
-#include <utils/c/include/utils.h>
-#include <data/c/include/fvec.h>
-#include <data/c/include/cvec.h>
-#include <data/c/include/ivec.h>
-#include <data/c/include/tabeditor.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
+#include "tabeditor.h"
 
 #include <stdlib.h>
 #include <ctype.h>

@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.13 2002/12/03 14:09:14 p_tisserand Exp $
+# $Id: Makefile.am,v 1.14 2002/12/09 14:58:16 borghesi Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.14  2002/12/09 14:58:16  borghesi
+# fix on previous Norbert's commit
+#
 # Revision 1.13  2002/12/03 14:09:14  p_tisserand
 # Add missing seqsym.h in noinst_HEADERS
 #
@@ -29,7 +32,6 @@ packagedir=$(pkgdatadir)/packages/sequence/c
 package_LTLIBRARIES=libsequence.la
 libsequence_la_SOURCES= \
 event.c \
-getdur.c \
 locate.c \
 module.c \
 note.c \

@@ -23,7 +23,7 @@
  */
 
 #include <fts/fts.h>
-#include "mat.h"
+#include <fts/packages/data/data.h>
 
 fts_symbol_t mat_symbol = 0;
 fts_class_t *mat_type = 0;

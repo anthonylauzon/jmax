@@ -19,14 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <fts/fts.h>
-#include <utils/c/include/utils.h>
-#include <data/c/include/cvec.h>
-#include <data/c/include/fvec.h>
-#include <data/c/include/ivec.h>
-
 #include <stdlib.h>
 #include <ctype.h>
+#include <fts/fts.h>
+#include <fts/packages/utils/utils.h>
+#include <fts/packages/data/data.h>
 
 fts_symbol_t cvec_symbol = 0;
 fts_class_t *cvec_type = 0;

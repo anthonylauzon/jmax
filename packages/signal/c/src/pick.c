@@ -21,7 +21,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
-#include <data/c/include/fvec.h>
+#include <fts/packages/data/data.h>
 
 fts_symbol_t pick_symbol = 0;
 

@@ -23,7 +23,7 @@
 #define _PT_OBJ_H_
 
 #include <fts/fts.h>
-#include <utils/c/include/utils.h>
+#include <fts/packages/utils/utils.h>
 
 /* filter bands */
 #define pt_common_CHANNELS_PER_OCTAVE 24

@@ -25,7 +25,7 @@
  */
 
 #include <fts/fts.h>
-#include <data/c/include/fvec.h>
+#include <fts/packages/data/data.h>
 
 #define MAX_INT 2147483647
 

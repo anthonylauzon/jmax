@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <data/c/include/data.h>
+#include <fts/packages/data/data.h>
 
 extern void vec_config(void);
 extern void ivec_config(void);
