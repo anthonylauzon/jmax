@@ -520,13 +520,20 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   public void keyReleased(KeyEvent e)
   {}
 
+
   public void keyPressed(KeyEvent e)
   {
+    // (e.m.) note on the shortcut handling:
+    // the class MenuShortcut should be used to associate a
+    // key combination to a MenuItem, instead of checking the
+    // keycode in this function.
+    // For an example, see the creation of the undo menu later
+    // in this file, in CreateEditMenu() method.
+    // A menu shortcut have precedence over all the other key listeners,
+    // so that one can invoke, say,  "CTRL-N" (new patcher) while editing an object.
     int aInt = e.getKeyCode();
     if (e.isControlDown())
       {
-	//if (aInt == 85) Undo(); //u
-	//else if (aInt == 82) Redo(); //r
 	if (aInt == 67) Copy();//c
 	else if (aInt == 78)
 	  {
