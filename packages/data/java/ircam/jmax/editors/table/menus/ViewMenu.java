@@ -40,7 +40,7 @@ import ircam.jmax.toolkit.menus.*;
 
 public class ViewMenu extends EditorMenu
 {
-  JMenuItem hollowItem, solidItem, boundedItem;
+  JMenuItem pointsItem, filledItem, linesItem;
 
   EditorContainer container;
   
@@ -52,9 +52,9 @@ public class ViewMenu extends EditorMenu
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    hollowItem   = add(Actions.hollowAction, "Hollow");
-    solidItem    = add(Actions.solidAction, "Solid");
-    boundedItem  = add(Actions.boundedAction, "Bounded");
+    pointsItem   = add(Actions.pointsViewAction, "Points");
+    filledItem    = add(Actions.filledViewAction, "Filled");
+    linesItem  = add(Actions.linesViewAction, "Lines");
 
     addSeparator();
     

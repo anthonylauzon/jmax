@@ -77,22 +77,22 @@ public class Actions
 	((TablePanel)container.getEditor()).Refresh();
       }
     };
-  public static EditorAction hollowAction = new EditorAction(){
+  public static EditorAction pointsViewAction = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	((TablePanel)container.getEditor()).hollow();
+	((TablePanel)container.getEditor()).setPointsView();
       }
     };
-  public static EditorAction solidAction = new EditorAction(){
+  public static EditorAction filledViewAction = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	((TablePanel)container.getEditor()).solid();
+	((TablePanel)container.getEditor()).setFilledView();
       }
     };
-  public static EditorAction boundedAction = new EditorAction(){
+  public static EditorAction linesViewAction = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	((TablePanel)container.getEditor()).bounded();
+	((TablePanel)container.getEditor()).setLinesView();
       }
     };
   public static EditorAction backColorAction = new EditorAction(){

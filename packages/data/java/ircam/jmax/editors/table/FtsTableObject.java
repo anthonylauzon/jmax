@@ -270,7 +270,7 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 	{
 	  t_pixels[startIndex+j] = args[i+1].doubleValue;
 	  b_pixels[startIndex+j] = args[i+2].doubleValue;
-	  j++;
+          j++;
 	}
     if(pixelsSize <= startIndex+nArgs-1)
       notifyPixelsChanged( startIndex, startIndex+j-1);
@@ -363,8 +363,10 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     args.addInt( startIndex);
     
     if( isIvec())
+    {
       for(int i=0; i < size; i++)
 	args.addInt( (int)values[i]);
+    }
     else
       for(int i=0; i < size; i++)
 	args.addDouble( values[i]);
@@ -633,6 +635,34 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
     
     requestSetValues(buffer, start, end-start);
   }
+
+  public void interpolateAndCut(int start, int end, double startValue, double endValue, double max, double min)
+  {    
+    double coeff;
+   
+    if (startValue != endValue) 
+      coeff = ((double)(startValue - endValue))/(end - start);
+    else coeff = 0;
+    
+    prepareBuffer(end-start+1);
+    
+    if (end >= getSize()) 
+      end = getSize()-1;
+    
+    for (int i = start; i < end; i+=1)
+      buffer[i-start] = cutToBounds( (double)(startValue-Math.abs(i-start)*coeff), max, min);
+    
+    requestSetValues(buffer, start, end-start);
+  }
+  
+  double cutToBounds( double y, double max, double min)
+  {
+    if( y >  max) return max;
+    else if( y < min) return min;
+    
+    return y;
+  }
+  
   /**
    * Utility private function to allocate a buffer used during the interpolate operations.
    * The computation is done in a private vector that is stored in one shot. */  

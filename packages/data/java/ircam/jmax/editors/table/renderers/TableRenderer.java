@@ -42,7 +42,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   public TableRenderer(TableGraphicContext theGc) 
   {  
     gc = theGc;
-    setMode(SOLID);//the default
+    setMode(FILLED);//the default
     addLayer(this);
     addLayer( new TopLayer( theGc));
     addLayer( new SelectionLayer( theGc));
@@ -152,7 +152,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     g.setColor( foreColor);
     
     int zero = gc.getAdapter().getY(0);
-    if(gc.getAdapter().getXZoom() >= 0.5)
+    if(gc.getAdapter().getXZoom() > 0.501)
       {
 	if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
 	
@@ -164,17 +164,17 @@ public class TableRenderer extends AbstractRenderer implements Layer{
 	int firstVisible = gc.getFirstVisibleIndex();
 	int visibleScope = gc.getVisibleHorizontalScope();
 
-	if( itsMode == SOLID)
+	if( itsMode == FILLED)
 	  for (int i = index; (i < visibleSize)&&(i<tableSize); i++)
 	    drawSolidPoint(g, gc.getAdapter().getX(i), 
 			   gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)), zero);	    
 	else 
-	  if( itsMode == HOLLOW)
+	  if( itsMode == POINTS)
 	    for (int i = index; (i < visibleSize)&&(i<tableSize); i++)
 	      drawHollowPoint(g, gc.getAdapter().getX(i), 
 			      gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)));
 	  else
-	    {//Bounded
+	    {//LINES
 	      int i;              
               if(index>0)
                 drawBoundPoint(g, gc.getAdapter().getX(index-1), 
@@ -198,16 +198,16 @@ public class TableRenderer extends AbstractRenderer implements Layer{
     else
       {
 	int pixSize = gc.getFtsObject().getPixelsSize();	      
-	if( itsMode == SOLID)
+	if( itsMode == FILLED)
             for (int i = 0 ; i < pixSize-1; i++)
                 drawPixSolidPoint( g, i, gc.getFtsObject().getTopPixel(i), 
                                    gc.getFtsObject().getBottomPixel(i), zero);
         else
-            if( itsMode == HOLLOW)
+            if( itsMode == POINTS)
                 for (int i = 0; i < pixSize-1; i++)
                     drawPixHollowPoint( g, i, gc.getFtsObject().getTopPixel(i), 
                                         gc.getFtsObject().getBottomPixel(i));
-            else//Bounded
+            else//LINES
             {
 	      for (int i = 0; i < pixSize-2; i++)
 		 drawPixBoundPoint(g, i, 
@@ -231,7 +231,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   }
 
   /**
-   * set the HOLLOW or SOLID mode */
+   * set the POINTS, FILLED or LINES mode */
   public void setMode(int mode)
   {
     itsMode = mode;
@@ -264,14 +264,14 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   int itsMode;
 
   TopLayer itsTopLayer;
-  public final static int HOLLOW = 0;
-  public final static int SOLID = 1;
-  public final static int BOUNDED = 2;
+  public final static int POINTS = 0;
+  public final static int FILLED = 1;
+  public final static int LINES = 2;
   
-  Color backColor = new Color(247, 247, 247);
-  Color borderRangeColor = new Color(229, 229, 229);
+  Color backColor = new Color(220, 220, 255);
+  Color borderRangeColor = new Color(200, 200, 255);
   Color outRangeColor = new Color(237, 237, 237);
-  Color foreColor = Color.lightGray;
+  Color foreColor = new Color(101, 153, 255);
 }
 
 

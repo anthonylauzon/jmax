@@ -166,8 +166,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     add(itsCenterPanel, BorderLayout.CENTER);
     validate();
   }
-
-  private void prepareGraphicContext()
+    private void prepareGraphicContext()
   { 
     //prepares the graphic context
     gc = new TableGraphicContext(tableData);
@@ -406,23 +405,23 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
   /**
    * Sets the "hollow" representation mode */
-  public void hollow()
+  public void setPointsView()
   {
-    itsTableRenderer.setMode(TableRenderer.HOLLOW);
+    itsTableRenderer.setMode(TableRenderer.POINTS);
     repaint();
   }
 
   /** 
    * Sets the "solid" representation mode */
-  public void solid()
+  public void setFilledView()
   {
-    itsTableRenderer.setMode(TableRenderer.SOLID);
+    itsTableRenderer.setMode(TableRenderer.FILLED);
     repaint();
   }
 
-  public void bounded()
+  public void setLinesView()
   {
-    itsTableRenderer.setMode(TableRenderer.BOUNDED);
+    itsTableRenderer.setMode(TableRenderer.LINES);
     repaint();
   }
 

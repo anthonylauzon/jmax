@@ -99,7 +99,16 @@ public class PencilTool extends TableTool implements DynamicDragListener {
     int start = ta.getInvX(x1); 
     int end = ta.getInvX(x2);
 
-    getGc().getFtsObject().interpolate(start, end, ta.getInvY(y1), ta.getInvY(y2));
+    double startY = ta.getInvY(y1);
+    double endY = ta.getInvY(y2);
+    double max = getGc().getVerticalMaxValue();
+    double min = getGc().getVerticalMinValue();
+    if( startY >  max) startY = max;
+    else if( startY < min) startY = min;
+    if( endY >  max) endY = max;
+    else if( endY < min) endY = min;
+
+    getGc().getFtsObject().interpolate(start, end, startY, endY);
 
     previousX = x;
     previousY = y;
@@ -118,7 +127,13 @@ public class PencilTool extends TableTool implements DynamicDragListener {
   /** set the value of a point in the model */
   private void setPoint(int x, int y)
   {
-    getGc().getFtsObject().requestSetValue(getGc().getAdapter().getInvX(x), getGc().getAdapter().getInvY(y));
+    double Y = getGc().getAdapter().getInvY(y);
+    double max = getGc().getVerticalMaxValue();
+    double min = getGc().getVerticalMinValue();
+    if( Y >  max) Y = max;
+    else if( Y < min) Y = min;
+  
+    getGc().getFtsObject().requestSetValue(getGc().getAdapter().getInvX(x), Y);
   }
 
   //-------------- Fields

@@ -105,7 +105,7 @@ public class LinerTool extends TableTool implements LineListener{
     int start = ta.getInvX(x1); 
     int end = ta.getInvX(x2);
 
-    getGc().getDataModel().interpolate(start, end, ta.getInvY(y1), ta.getInvY(y2));
+    getGc().getFtsObject().interpolateAndCut(start, end, ta.getInvY(y1), ta.getInvY(y2), getGc().getVerticalMaxValue(), getGc().getVerticalMinValue());
   }
 
   //--- Fields

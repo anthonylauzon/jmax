@@ -44,7 +44,7 @@ public class TablePopupMenu extends JPopupMenu
   int x;
   int y;
   TableDisplay target = null;     
-  JMenuItem solidItem, hollowItem, boundedItem;
+  JMenuItem filledItem, pointsItem, linesItem;
 
   public TablePopupMenu(TableDisplay editor)
   {
@@ -73,20 +73,20 @@ public class TablePopupMenu extends JPopupMenu
     /////////////////////// View Menu /////////////////////////////
     ButtonGroup viewGroup = new ButtonGroup();
 
-    solidItem = new JRadioButtonMenuItem( "Solid view");
-    solidItem.addActionListener( Actions.solidAction);
-    viewGroup.add( solidItem);
-    add( solidItem);
+    filledItem = new JRadioButtonMenuItem( "Filled view");
+    filledItem.addActionListener( Actions.filledViewAction);
+    viewGroup.add( filledItem);
+    add( filledItem);
 
-    hollowItem = new JRadioButtonMenuItem( "Hollow view");
-    hollowItem.addActionListener( Actions.hollowAction);
-    viewGroup.add( hollowItem);
-    add( hollowItem);    
+    pointsItem = new JRadioButtonMenuItem( "Points view");
+    pointsItem.addActionListener( Actions.pointsViewAction);
+    viewGroup.add( pointsItem);
+    add( pointsItem);    
 
-    boundedItem = new JRadioButtonMenuItem( "Bounded view");
-    boundedItem.addActionListener( Actions.boundedAction);
-    viewGroup.add( boundedItem);
-    add( boundedItem);    
+    linesItem = new JRadioButtonMenuItem( "Lines view");
+    linesItem.addActionListener( Actions.linesViewAction);
+    viewGroup.add( linesItem);
+    add( linesItem);    
 
     addSeparator();
     
@@ -115,13 +115,13 @@ public class TablePopupMenu extends JPopupMenu
   public void update()
   {
     int dm = target.getDisplayMode();
-    if( dm == TableRenderer.SOLID) 
-        solidItem.setSelected( true);
+    if( dm == TableRenderer.FILLED) 
+        filledItem.setSelected( true);
     else 
-        if( dm == TableRenderer.HOLLOW) 
-            hollowItem.setSelected( true);    
+        if( dm == TableRenderer.POINTS) 
+            pointsItem.setSelected( true);    
         else
-            boundedItem.setSelected( true);    
+            linesItem.setSelected( true);    
     revalidate();
   }
 }

@@ -188,6 +188,13 @@ public class TableGraphicContext extends GraphicContext{
   {
     return itsVerticalMaximum;
   }
+  public double getVerticalMaxValue()
+  {
+    if( isIvec())
+      return (double)itsVerticalMaximum;
+    else
+      return (double)(itsVerticalMaximum/100);
+  }
   public void setVerticalMaximum(int max)
   {
     if( isIvec())
@@ -198,6 +205,13 @@ public class TableGraphicContext extends GraphicContext{
   public int getVerticalMinimum()
   {
     return itsVerticalMinimum;
+  }
+  public double getVerticalMinValue()
+  {
+    if( isIvec())
+      return (double)itsVerticalMinimum;
+    else
+      return (double)(itsVerticalMinimum/100);
   }
   public void setVerticalMinimum(int min)
   {
