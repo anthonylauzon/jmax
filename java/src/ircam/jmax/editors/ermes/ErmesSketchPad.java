@@ -1203,9 +1203,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       editStatus = START_SELECT;
       repaint();
     }
-    else if(editStatus == START_ADD){//?????????????????????
-      AddingObject(x,y);
-    }
     else if(editStatus == DOING_NOTHING) return;
   }
 
