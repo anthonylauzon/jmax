@@ -65,6 +65,14 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 
 	  for (int j = i + 1; j < itsElementsNextFree; j++)
 	    itsElements[j - 1] = itsElements[j];
+	  
+	  // Clean up the last element (so it is GCed)
+
+	  itsElements[itsElementsNextFree] = null;
+
+	  // update the fill pointer
+
+	  itsElementsNextFree--;
 
 	  return;
 	}
@@ -2206,6 +2214,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   //	DeleteSelected
   //	delete routine
   //--------------------------------------------------------
+
   void DeleteSelected() {
     ErmesObject aObject;
     ErmesConnection aConnection;

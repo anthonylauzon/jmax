@@ -847,11 +847,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     else if ( ( aInt == ircam.jmax.utils.Platform.DELETE_KEY)
 	     || ( aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY) )
       {
-	if(itsSketchPad.GetEditField()!=null)
-	  {
-	    if(!itsSketchPad.GetEditField().HasFocus())
-	      itsSketchPad.DeleteSelected();
-	  }
+	if (! itsSketchPad.GetEditField().HasFocus())
+	  itsSketchPad.DeleteSelected();
       }
     // } (fd)
     else

@@ -362,7 +362,6 @@ public class MaxApplication extends Object
     
     ListModel types = Mda.getDocumentTypes();
 
-    
   search: for (int i = 0; i < types.getSize(); i++)
     {
       MaxDocumentType type = (MaxDocumentType) types.getElementAt(i);
@@ -459,10 +458,8 @@ public class MaxApplication extends Object
 	ConsoleWindow.getConsoleWindow().dispose();
       }
 
-
     if (Fts.getServer() != null)
       Fts.getServer().stop();
-
 
     Runtime.getRuntime().exit(0);
   }

@@ -30,7 +30,7 @@ class FtsSubProcessPort extends FtsPort
 	out_stream = proc.getOutputStream();
 	in_stream  = proc.getInputStream();
 
-	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream());
+	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream(), server);
       }
     catch (IOException e)
       {

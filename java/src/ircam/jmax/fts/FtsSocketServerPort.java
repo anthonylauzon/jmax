@@ -96,7 +96,7 @@ class FtsSocketServerPort extends FtsPort
 	out_stream = new BufferedOutputStream(socket.getOutputStream(), 1024);
 	in_stream  = new BufferedInputStream(socket.getInputStream(), 1024);
 
-	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream());
+	FtsErrorStreamer.startFtsErrorStreamer(proc.getErrorStream(), server);
       }
     catch (IOException e)
       {

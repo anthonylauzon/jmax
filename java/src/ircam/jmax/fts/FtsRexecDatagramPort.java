@@ -92,7 +92,7 @@ class FtsRexecDatagramPort extends FtsPort
 
     try
       {
-	FtsErrorStreamer.startFtsErrorStreamer(rexec.getErrorStream());
+	FtsErrorStreamer.startFtsErrorStreamer(rexec.getErrorStream(), server);
 	in_packet  = new DatagramPacket(in_data , in_data.length);
 	socket.receive(in_packet);
 	out_packet.setAddress(in_packet.getAddress());

@@ -107,7 +107,6 @@ abstract class FtsPort implements Runnable
 	  }
 	catch (FtsQuittedException e)
 	  {
-	    System.err.println("Whob Whob, FTS Quitted ");
 	    server.ftsQuitted();
 	    running = false;
 	  }
