@@ -44,6 +44,7 @@ typedef struct
   int m; /* # of rows */
   int n; /* # of columns */
   int alloc; /* current alloc size for lazy allocation */
+  int opened; /* non zero if editor open */
 } mat_t;
 
 DATA_API void mat_set_size(mat_t *mat, int m, int n);

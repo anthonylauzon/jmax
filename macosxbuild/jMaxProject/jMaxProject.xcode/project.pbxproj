@@ -5,6 +5,80 @@
 	};
 	objectVersion = 39;
 	objects = {
+		3B513E2806A4274500F1664A = {
+			children = (
+				3B513E2906A4277B00F1664A,
+				3B513E2D06A4299A00F1664A,
+				3B513E2E06A4299A00F1664A,
+				3BA405E106A572AD0097A99B,
+				3BB5F25C06A696CD00739298,
+				3B513E2F06A4299A00F1664A,
+			);
+			isa = PBXGroup;
+			name = mat;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		3B513E2906A4277B00F1664A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FtsMatObject.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B513E2A06A4277B00F1664A = {
+			fileRef = 3B513E2906A4277B00F1664A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B513E2D06A4299A00F1664A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MatDataListener.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/MatDataListener.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B513E2E06A4299A00F1664A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MatDataModel.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/MatDataModel.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B513E2F06A4299A00F1664A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MatWindow.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/MatWindow.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B513E3006A4299A00F1664A = {
+			fileRef = 3B513E2D06A4299A00F1664A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B513E3106A4299A00F1664A = {
+			fileRef = 3B513E2E06A4299A00F1664A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B513E3206A4299A00F1664A = {
+			fileRef = 3B513E2F06A4299A00F1664A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B55A6740626F711004953A4 = {
 			containerPortal = F880FCE90282F7CE01664092;
 			isa = PBXContainerItemProxy;
@@ -126,6 +200,70 @@
 			settings = {
 			};
 		};
+		3BA405E106A572AD0097A99B = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MatPanel.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/MatPanel.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BA405E206A572AD0097A99B = {
+			fileRef = 3BA405E106A572AD0097A99B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3BA4061106A57AAD0097A99B = {
+			buildPhases = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Development;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+				3BA4061906A57ADA0097A99B,
+				3BA4061706A57AD10097A99B,
+				3BA4061406A57AAD0097A99B,
+			);
+			isa = PBXAggregateTarget;
+			name = "Mat-Dev";
+			productName = Development;
+		};
+		3BA4061406A57AAD0097A99B = {
+			isa = PBXTargetDependency;
+			target = 5C54253A05AB0B8A0042B7A2;
+			targetProxy = 3BCA10FC06240705008FC824;
+		};
+		3BA4061606A57AD10097A99B = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C5429C505AB0B990042B7A2;
+			remoteInfo = data.jar;
+		};
+		3BA4061706A57AD10097A99B = {
+			isa = PBXTargetDependency;
+			target = 5C5429C505AB0B990042B7A2;
+			targetProxy = 3BA4061606A57AD10097A99B;
+		};
+		3BA4061806A57ADA0097A99B = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C54272F05AB0B8B0042B7A2;
+			remoteInfo = libdata.bundle;
+		};
+		3BA4061906A57ADA0097A99B = {
+			isa = PBXTargetDependency;
+			target = 5C54272F05AB0B8B0042B7A2;
+			targetProxy = 3BA4061806A57ADA0097A99B;
+		};
 		3BA5DEB606789BC90010BF0D = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -137,6 +275,21 @@
 		};
 		3BA5DEB706789BC90010BF0D = {
 			fileRef = 3BA5DEB606789BC90010BF0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3BB5F25C06A696CD00739298 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MatTableModel.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/MatTableModel.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BB5F25D06A696CD00739298 = {
+			fileRef = 3BB5F25C06A696CD00739298;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -158,7 +311,7 @@
 				3BCA10FD06240705008FC824,
 			);
 			isa = PBXAggregateTarget;
-			name = Development;
+			name = "Seq-Dev";
 			productName = Development;
 		};
 		3BCA10FA062406FF008FC824 = {
@@ -9081,6 +9234,12 @@
 				5C542A0105AB0B990042B7A2,
 				5C542A0205AB0B990042B7A2,
 				5C542A0305AB0B990042B7A2,
+				3B513E2A06A4277B00F1664A,
+				3B513E3006A4299A00F1664A,
+				3B513E3106A4299A00F1664A,
+				3B513E3206A4299A00F1664A,
+				3BA405E206A572AD0097A99B,
+				3BB5F25D06A696CD00739298,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -20630,6 +20789,7 @@
 				5C54288505AB0B950042B7A2,
 				5C542B3105AB0BA00042B7A2,
 				3BCA10F6062406F7008FC824,
+				3BA4061106A57AAD0097A99B,
 			);
 		};
 		F880FCEA0282F7CE01664092 = {
@@ -24286,6 +24446,7 @@
 		F8B8E4DE028680BB01664092 = {
 			children = (
 				F8B8E4DF028680BB01664092,
+				3B513E2806A4274500F1664A,
 				F8B8E4FD028680BB01664092,
 			);
 			isa = PBXGroup;

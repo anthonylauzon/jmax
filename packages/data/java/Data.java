@@ -24,6 +24,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.bpf.*;
 import ircam.jmax.editors.table.*;
+import ircam.jmax.editors.mat.*;
 import ircam.fts.client.*;
 
 // debug
@@ -32,31 +33,40 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
-public class Data implements JMaxPackage {
-
+public class Data implements JMaxPackage 
+{
+  
   public void load()
-  {    
+{    
     JMaxObjectCreator bpfCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsBpfObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsBpfObject( server, parent, objId, className, args, offset, length));
+    }
+    }; 
     JMaxObjectCreator ivecCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsIvecObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsIvecObject( server, parent, objId, className, args, offset, length));
+    }
+    }; 
     JMaxObjectCreator fvecCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsFvecObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
-
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsFvecObject( server, parent, objId, className, args, offset, length));
+    }
+    }; 
+    JMaxObjectCreator matCreator = new JMaxObjectCreator() {
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsMatObject( server, parent, objId, className, args, offset, length));
+    }
+    }; 
+    
+    
     JMaxClassMap.put( "bpf", bpfCreator, null, null, "bpf", this);
     JMaxClassMap.put( "ivec", ivecCreator, null, null, "ivec", this);
     JMaxClassMap.put( "fvec", fvecCreator, null, null, "fvec", this);
-  }
+    JMaxClassMap.put( "mat", matCreator, null, null, "mat", this);
+}
 }

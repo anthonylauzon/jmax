@@ -1,2 +1,2 @@
-SUBDIRS=bpf table
+SUBDIRS=bpf mat table
 
