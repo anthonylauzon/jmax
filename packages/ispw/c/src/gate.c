@@ -37,10 +37,10 @@ gate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(winlet == 1)
     {
-      if(this->opened && winlet == 1)
+      if(this->opened)
 	fts_outlet_send(o, 0, s, ac, at);
     }
-  else if(s == NULL && ac > 1 && fts_is_number(at))
+  else if(s == NULL && ac > 0 && fts_is_number(at))
     this->opened = fts_get_number_int(at);
   else
     fts_object_error(o, "bad input at inlet 0");
