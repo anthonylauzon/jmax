@@ -21,19 +21,37 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-SOURCES = $(INCLUDE_PATH)/MaxFtsConnectCmd.java\
-	  $(INCLUDE_PATH)/MaxOpenCmd.java     \
-          $(INCLUDE_PATH)/MaxQuitCmd.java      \
-          $(INCLUDE_PATH)/MaxRunHooksCmd.java  \
-          $(INCLUDE_PATH)/MaxSystemPropertyCmd.java \
-          $(INCLUDE_PATH)/MaxSetSystemPropertyCmd.java \
-          $(INCLUDE_PATH)/MaxWhenCmd.java           \
-	  $(INCLUDE_PATH)/MaxSourceCmd.java      \
-	  $(INCLUDE_PATH)/MaxSysSourceCmd.java      \
-	  $(INCLUDE_PATH)/MaxSplashCmd.java    \
-	  $(INCLUDE_PATH)/MaxGetMaxVersionCmd.java \
-          $(INCLUDE_PATH)/MaxDeclareIconCmd.java   \
-	  $(INCLUDE_PATH)/TclMaxPackage.java
+##
+## Flags for an O2 with r5k
+##
+
+VENDOR := sgi
+OS_TYPE := unix
+
+SYSTEM_CFLAGS := -mips4 -n32 -r5000 -LANG:restrict
+SYSTEM_LDFLAGS := -mips4 -n32 
+SYSTEM_SOFLAGS := -mips4 -n32 
+
+SYSTEM_OPT_CFLAGS := -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:fast_io=ON:Olimit=0 -TARG:platform=ip32_5k:processor=r5000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1 
+SYSTEM_OPT_LDFLAGS = -O3
+SYSTEM_OPT_SOFLAGS = 
+
+
+ARCH_CFLAGS := $(SYSTEM_CFLAGS) -DSGI -DIRIX6_3
+ARCH_LDFLAGS := $(SYSTEM_LDFLAGS)
+ARCH_SOFLAGS := $(SYSTEM_SOFLAGS)
+
+ARCH_OPT_CFLAGS := $(SYSTEM_OPT_CFLAGS)
+ARCH_OPT_LDFLAGS = $(SYSTEM_OPT_LDFLAGS)
+ARCH_OPT_SOFLAGS = $(SYSTEM_OPT_SOFLAGS)
+
+##
+## FTS specific declarations
+##
+
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe -lpthread
+FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
+FTS_USER_LIBS_FLAGS = -all
+
 
