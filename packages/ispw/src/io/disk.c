@@ -23,10 +23,6 @@
 
 #include <string.h>
 
-/* The DSP function name */
-
-static fts_symbol_t readsf_function = 0;
-
 /* utility function to find the real path */
 
 
@@ -116,7 +112,7 @@ static void readsf_file_open(readsf_t *this)
 
       /* Build the open arg list: current version, use the default device fifosize and fileblock size */
 
-      fts_set_symbol(&a[0], fts_new_symbol( get_readsf_path( this->filename)));
+      fts_set_symbol(&a[0], fts_new_symbol_copy( get_readsf_path( this->filename)));
       fts_set_symbol(&a[1], fts_new_symbol("channels"));
       fts_set_int(&a[2],    this->nchans);
 
@@ -430,7 +426,7 @@ static void writesf_file_open(writesf_t *this, fts_symbol_t format)
       filename = get_writesf_path(this->filename);
 
       ac = 0;
-      fts_set_symbol(&a[ac], fts_new_symbol(filename)); ac++;
+      fts_set_symbol(&a[ac], fts_new_symbol_copy(filename)); ac++;
       fts_set_symbol(&a[ac], fts_new_symbol("channels")); ac++;
       fts_set_int(&a[ac],    this->nchans); ac++;
       fts_set_symbol(&a[ac], fts_s_sampling_rate);  ac++;
