@@ -567,7 +567,7 @@ Rectangle previousResizeRect = new Rectangle();
       if (isInGroup || copyPending) {
 	copyPending = true;
       }
-      else g.drawImage(offImage,0,0, this);	
+      else g.drawImage(offImage,0,0, this);
     }
   }
 
@@ -1462,6 +1462,8 @@ Rectangle previousResizeRect = new Rectangle();
     for (Enumeration e = itsSelectedList.elements() ; e.hasMoreElements() ;) {
       aObject = (ErmesObject) e.nextElement();
       aRect = aObject.Bounds();
+      aRect.width -= 1;
+      aRect.height -=1; 
       itsMovingRectangles.addElement(aRect);
     }
   }
@@ -1940,10 +1942,6 @@ Rectangle previousResizeRect = new Rectangle();
       g.drawRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
       previousRect.setBounds(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
       erased = false;
-      /*//old code
-	g.drawImage(offImage,0,0, this);
-	g.setColor(Color.black);
-	g.drawRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);*/
 	     
     }
     else if (editStatus == RESIZING_OBJECT) {
@@ -1958,11 +1956,7 @@ Rectangle previousResizeRect = new Rectangle();
       g.drawRect(currentResizeRect.x, currentResizeRect.y, currentResizeRect.width, currentResizeRect.height);
       previousResizeRect.setBounds(currentResizeRect.x, currentResizeRect.y, currentResizeRect.width, currentResizeRect.height);
       erased = false;
-      /*old code
-	int x, y, w, h;
-	g.drawImage(offImage,0,0, this);
-	g.setColor(Color.black);
-	g.drawRect(currentResizeRect.x, currentResizeRect.y, currentResizeRect.width, currentResizeRect.height);*/
+
     }
     else if (editStatus == MOVING){
       //faster version
