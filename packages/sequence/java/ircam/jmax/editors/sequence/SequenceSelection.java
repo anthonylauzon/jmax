@@ -405,9 +405,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     pasting = false;
     select( pastedObjects.elements());
     pastedObjects.removeAllElements();
-  }
-  public void trackNameChanged(String oldName, String newName){}
-	
+  }	
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 
   {

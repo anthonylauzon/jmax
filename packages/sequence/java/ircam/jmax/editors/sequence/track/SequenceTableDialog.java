@@ -37,7 +37,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
     
   SequenceTableDialog(Track trk, Frame frame, SequenceGraphicContext gc)
   {
-    super(frame, "table dialog: track <"+trk.getName()+">", false);
+    super(frame, false);
     this.frame = frame;
     this.track = trk;
     this.sgc = gc;
@@ -68,7 +68,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 					if( sgc.getMarkersTrack()!=null)
 						addMarkersAndSplit();
 				}
-        public void ftsNameChanged(String name){}
+        public void ftsNameChanged(String name){setDialogTitle();}
 			});		
 		
     track.getTrackDataModel().addListener( new TrackDataListener() {
@@ -95,7 +95,6 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 			}
 			public void startPaste(){}
 			public void endPaste(){}
-			public void trackNameChanged(String oldName, String newName) {}
     });
 		
     setLocation(200, 200);
@@ -122,8 +121,21 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 		int tab_h = ((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_h;
 		if( tab_w != -1 && tab_h != -1)
 			setSize(tab_w, tab_h);
-	}
+	
+    setDialogTitle();
+  }
 
+  public void setDialogTitle()
+  {
+    if( track.getTrackDataModel().isInSequence())
+    {
+      SequenceDataModel seq = ((SequenceDataModel)((FtsTrackObject)track.getTrackDataModel()).getParent());
+      setTitle("table track n."+seq.getTrackIndex(track)+" in sequence "+seq.getFtsName());
+    }
+    else
+      setTitle("table track "+track.getTrackDataModel().getFtsName());    
+  }
+  
 	private void addMarkersAndSplit()
 	{
 		FtsTrackObject markersTrack = sgc.getMarkersTrack();
@@ -198,7 +210,6 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
   public void endPaste(){}    
   public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
-  public void trackNameChanged(String oldName, String newName){};
 
 	public SequenceTablePanel getPanel()
 	{

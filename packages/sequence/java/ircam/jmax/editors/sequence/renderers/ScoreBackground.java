@@ -160,12 +160,6 @@ private void drawHorizontalGrid(Graphics g)
 		g.drawString(""+(j*BLACK_STEP)/3, 10 , positionY+3-transp);
 	}
 	g.drawString(""+maxPitch, 10, maxPitchY+2-transp);
-	/********** Track Name ********************************************************/
-	if( gc.isInSequence())
-	{
-		g.setFont(backFont);
-		g.drawString(gc.getTrack().getName(), 2, d.height - 2);
-	}
 	/********** Piano Keys *********************************************************/
 	for (int i = minPitch; i <= maxPitch; i++)
 	{

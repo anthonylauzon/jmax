@@ -32,11 +32,11 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.editors.sequence.renderers.*;
 /**
- **/
+**/
 public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements PropertyChangeListener
 {
   public ToggleBar(TrackEditor trkEd, int index)
-  {
+{
     super();
     trackEditor = trkEd;
     track = trackEditor.getTrack();
@@ -48,7 +48,7 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
     openButton.setPreferredSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
     openButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
     openButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
-
+    
     activeButton = new JButton(SequenceImages.getImageIcon("unmute"));
     activeButton.setToolTipText("active/inactive");
     activeButton.setPreferredSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
@@ -60,116 +60,112 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
     barButton.setForeground(Color.darkGray);
     barButton.setMargin(new Insets(0, 7, 0, 100));
     barButton.setFont(toggleBarFont);
-    barButton.setText(trackIndex+" - "+track.getName());
+    barButton.setText("track n."+trackIndex);
     barButton.setToolTipText("open");
     barButton.setPreferredSize(new Dimension(TOGGLEBAR_DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT));
-
+    
     add(openButton);
     add(activeButton);
     add(barButton);
     
     barButton.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  track.setProperty("opened", Boolean.TRUE);
-	  track.setProperty("selected", Boolean.TRUE);
-	}
-      });
+      public void actionPerformed(ActionEvent e)
+    {
+        track.setProperty("opened", Boolean.TRUE);
+        track.setProperty("selected", Boolean.TRUE);
+    }
+    });
     openButton.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  track.setProperty("opened", Boolean.TRUE);
-	  track.setProperty("selected", Boolean.TRUE);
-	}
-      });
+      public void actionPerformed(ActionEvent e)
+    {
+        track.setProperty("opened", Boolean.TRUE);
+        track.setProperty("selected", Boolean.TRUE);
+    }
+    });
     
     activeButton.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  track.getFtsTrack().requestSetActive(!active);
-	}
-      });
-
+      public void actionPerformed(ActionEvent e)
+    {
+        track.getFtsTrack().requestSetActive(!active);
+    }
+    });
+    
     barButton.addMouseListener(new MouseListener(){
-	public void mousePressed(MouseEvent e)
-	{
-	  if (e.isPopupTrigger()) 
-	    {
-	      ToggleBar.this.doPopup(e);
-	    }
-	}
-	public void mouseClicked(MouseEvent e){}
-	public void mouseReleased(MouseEvent e){}
-	public void mouseEntered(MouseEvent e){}
-	public void mouseExited(MouseEvent e){}
-      });
-
+      public void mousePressed(MouseEvent e)
+    {
+        if (e.isPopupTrigger()) 
+        {
+          ToggleBar.this.doPopup(e);
+        }
+    }
+      public void mouseClicked(MouseEvent e){}
+      public void mouseReleased(MouseEvent e){}
+      public void mouseEntered(MouseEvent e){}
+      public void mouseExited(MouseEvent e){}
+    });
+    
     validate();
     
     track.getTrackDataModel().addListener(new TrackDataListener(){
-	public void objectChanged(Object spec, String propName, Object propValue) {}
-	public void objectAdded(Object spec, int index){}
-	public void objectsAdded(int maxTime){}
-	public void objectDeleted(Object whichObject, int index){}
-	public void trackCleared(){}
-	public void startTrackUpload( TrackDataModel track, int size){}
-	public void endTrackUpload( TrackDataModel track){}
-	public void startPaste(){}
-	public void endPaste(){}
-	public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-	public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
-	public void trackNameChanged(String oldName, String newName)
-	{
-	  barButton.setText(trackIndex+" - "+newName);
-	}
-      });
-  }
+      public void objectChanged(Object spec, String propName, Object propValue) {}
+      public void objectAdded(Object spec, int index){}
+      public void objectsAdded(int maxTime){}
+      public void objectDeleted(Object whichObject, int index){}
+      public void trackCleared(){}
+      public void startTrackUpload( TrackDataModel track, int size){}
+      public void endTrackUpload( TrackDataModel track){}
+      public void startPaste(){}
+      public void endPaste(){}
+      public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+      public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
+    });
+}
 
-  void doPopup(MouseEvent e)
-  {
-    processMouseEvent(e);
-  }
+void doPopup(MouseEvent e)
+{
+  processMouseEvent(e);
+}
 
-  public Dimension getPreferredSize()
-  {
-    return new Dimension(TOGGLEBAR_DEFAULT_WIDTH, TOGGLEBAR_HEIGHT);
-  }
+public Dimension getPreferredSize()
+{
+  return new Dimension(TOGGLEBAR_DEFAULT_WIDTH, TOGGLEBAR_HEIGHT);
+}
 
-  public JPopupMenu getMenu()
-  {
-    ClosedTrackPopupMenu.getInstance().update(trackEditor);
-    return ClosedTrackPopupMenu.getInstance();
-  }
+public JPopupMenu getMenu()
+{
+  ClosedTrackPopupMenu.getInstance().update(trackEditor);
+  return ClosedTrackPopupMenu.getInstance();
+}
 
-  public void changeIndex(int index)
-  {
-    trackIndex = index;
-    barButton.setText(trackIndex+" - "+track.getName());
-  }
+public void changeIndex(int index)
+{
+  trackIndex = index;
+  barButton.setText("track n."+trackIndex);
+}
 
-  // propertyChangeListener interface
-  public void propertyChange(PropertyChangeEvent evt)
+// propertyChangeListener interface
+public void propertyChange(PropertyChangeEvent evt)
+{
+  String name = evt.getPropertyName();
+  
+  if(name.equals("active"))
   {
-    String name = evt.getPropertyName();
-      
-    if(name.equals("active"))
-      {
-	active = ((Boolean) evt.getNewValue()).booleanValue();
-	if(active)
-	  activeButton.setIcon(SequenceImages.getImageIcon("unmute"));
-	else
-	  activeButton.setIcon(SequenceImages.getImageIcon("mute"));
-      }
+    active = ((Boolean) evt.getNewValue()).booleanValue();
+    if(active)
+      activeButton.setIcon(SequenceImages.getImageIcon("unmute"));
+    else
+      activeButton.setIcon(SequenceImages.getImageIcon("mute"));
   }
-  public static Font toggleBarFont = new Font("monospaced", Font.PLAIN, 10);
-  boolean opened = true;
-  boolean active = true;
-  JButton openButton, barButton, activeButton;
-  public static int TOGGLEBAR_HEIGHT = 14; 
-  public static int TOGGLEBAR_DEFAULT_WIDTH = 1500; 
-  int trackIndex;
-  Track track;
-  TrackEditor trackEditor;
+}
+public static Font toggleBarFont = new Font("monospaced", Font.PLAIN, 10);
+boolean opened = true;
+boolean active = true;
+JButton openButton, barButton, activeButton;
+public static int TOGGLEBAR_HEIGHT = 14; 
+public static int TOGGLEBAR_DEFAULT_WIDTH = 1500; 
+int trackIndex;
+Track track;
+TrackEditor trackEditor;
 }
 
 

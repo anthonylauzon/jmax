@@ -61,7 +61,6 @@ public class MidiTrackEditor extends TrackBaseEditor
     track.setProperty("maximumPitch", new Integer(SequenceDefaults.DEFAULT_MAX_PITCH));
     track.setProperty("minimumPitch", new Integer(SequenceDefaults.DEFAULT_MIN_PITCH));
     setViewMode(PIANOROLL_VIEW);		
-    ((FtsTrackObject)track.getTrackDataModel()).setUntitled();
   }
   
   void createPopupMenu()

@@ -7,7 +7,6 @@ AnythingTrackEditor.java\
 AnythingValue.java\
 ArrayEnumeration.java \
 ChangeRangeDialog.java \
-ChangeTrackNameDialog.java \
 Drawable.java \
 Editable.java \
 Event.java \

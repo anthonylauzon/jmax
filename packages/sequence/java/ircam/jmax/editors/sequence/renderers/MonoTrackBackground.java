@@ -110,15 +110,7 @@ private void drawHorizontalLine(Graphics g, int w, int h)
 		g.setColor(ScoreBackground.OUT_RANGE_COLOR);
 	
 	g.fillRect(0, 0, w, h);
-	
-	// the track name
-	if( gc.getFtsObject() instanceof FtsSequenceObject)
-	{
-		g.setColor( Color.gray);
-		g.setFont( ToggleBar.toggleBarFont);
-		g.drawString( gc.getTrack().getName(), 2, h-17);
-	}
-	
+		
 	Image image = gc.getTrack().getTrackDataModel().getType().getIcon().getImage();    
 	g.drawImage(image , 2, h-15, this);
 	

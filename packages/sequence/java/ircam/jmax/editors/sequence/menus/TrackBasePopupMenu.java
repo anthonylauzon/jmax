@@ -92,20 +92,7 @@ public class TrackBasePopupMenu extends JPopupMenu
     if(isInSequence)
 		{
 			addSeparator();
-			
-			nameItem = new JMenuItem("Name");
-			nameItem.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e)
-	      {
-					ChangeTrackNameDialog.changeName(target.getTrack(),  
-																					 target.getGraphicContext().getFrame(),
-																					 SwingUtilities.convertPoint(target, x, y,
-																																			 target.getGraphicContext().getFrame()));
-				}
-			});
-			
-			add(nameItem);
-
+    
 			moveToAction = new MoveTrackToAction(target);
 			moveMenu = new JMenu("Move to Position");
 			item = new JMenuItem(""+trackCount);

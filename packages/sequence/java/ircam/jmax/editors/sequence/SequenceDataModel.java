@@ -43,7 +43,7 @@ public interface SequenceDataModel {
      * Returns the i-th track */
   public abstract Track getTrackAt(int i);
 
-    //public abstract Track getTrackByName(String name);
+  public abstract int getTrackIndex(Track track);
 
   public abstract Enumeration getTracks();
   /**

@@ -71,12 +71,6 @@ public interface Track {
      * track.getPropertySupport().addChangeListener(myChangeListener); .*/
     public PropertyChangeSupport getPropertySupport();
 
-     /**
-     * Set the unique name of this track.*/
-    public void setName(String name);
-    /**
-     * Returns the unique name of this track.*/
-    public String getName();
     /**
      * Returns true if the track can edit this type.*/
     public boolean canEditType(ValueInfo info);

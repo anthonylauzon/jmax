@@ -10233,7 +10233,6 @@
 				5C542AA005AB0B9C0042B7A2,
 				5C542AA105AB0B9C0042B7A2,
 				5C542AA205AB0B9C0042B7A2,
-				5C542AA305AB0B9C0042B7A2,
 				5C542AA405AB0B9C0042B7A2,
 				5C542AA505AB0B9C0042B7A2,
 				5C542AA605AB0B9C0042B7A2,
@@ -10873,12 +10872,6 @@
 		};
 		5C542AA205AB0B9C0042B7A2 = {
 			fileRef = F851248B028BEBB201664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C542AA305AB0B9C0042B7A2 = {
-			fileRef = F851248C028BEBB201664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -18835,7 +18828,6 @@
 				F8512489028BEBB201664092,
 				F851248A028BEBB201664092,
 				F851248B028BEBB201664092,
-				F851248C028BEBB201664092,
 				F851248D028BEBB201664092,
 				F851248E028BEBB201664092,
 				F851248F028BEBB201664092,
@@ -19443,15 +19435,6 @@
 			lastKnownFileType = sourcecode.java;
 			name = ChangeRangeDialog.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ChangeRangeDialog.java;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F851248C028BEBB201664092 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.java;
-			name = ChangeTrackNameDialog.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ChangeTrackNameDialog.java;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};

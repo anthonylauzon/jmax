@@ -92,17 +92,7 @@ public int getMaximumTime()
 	return (int)model.getMaximumTime();
 }
 
-public String getName()
-{
-	return model.getName();
-}
-public void setName(String name)
-{
-	//this.name = name;
-}
-
 public boolean canEditType(ValueInfo info){
-	//return model.containsType(info);
 	return (model.getType() == info);
 }
 
@@ -110,8 +100,6 @@ public boolean canEditType(ValueInfo info){
 Hashtable properties = new Hashtable();
 transient PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
 TrackDataModel model;
-//private int id;
-private String name = "";
 }
 
 

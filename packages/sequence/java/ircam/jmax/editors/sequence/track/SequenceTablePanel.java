@@ -130,7 +130,6 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 			}
 			public void startPaste(){}
 			public void endPaste(){}
-			public void trackNameChanged(String oldName, String newName) {}
     });
 		
 		table.getColumnModel().addColumnModelListener(new TableColumnModelListener(){

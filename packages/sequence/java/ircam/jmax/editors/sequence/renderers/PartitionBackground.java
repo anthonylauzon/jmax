@@ -214,14 +214,6 @@ private void drawHorizontalGrid(Graphics g)
 	else
 		g.setColor(ScoreBackground.OUT_RANGE_COLOR);
 	g.fillRect(0, 0, d.width, d.height);
-	
-	/********** Track Name ***************************************************/
-	if( gc.isInSequence())
-	{
-		g.setColor(Color.gray);
-		g.setFont(ToggleBar.toggleBarFont);	
-		g.drawString(gc.getTrack().getName(), 2, d.height - 2);
-	}
 	/********* First Bass Line ***********************************************/
 	if(staffIsDrawable(2, maxPitch, minPitch))
 		drawGrayStaff( g, 5);

@@ -419,7 +419,6 @@ public void startTrackUpload( TrackDataModel track, int size){}
 public void endTrackUpload( TrackDataModel track){ initPropertiesToDraw();}
 public void startPaste(){}
 public void endPaste(){}
-public void trackNameChanged(String oldName, String newName) {}
 //==================== ListSelectionListener interface =====================
 
 public void valueChanged(ListSelectionEvent e){repaint();}

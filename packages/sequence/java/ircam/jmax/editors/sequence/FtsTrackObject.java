@@ -73,16 +73,6 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       ((FtsTrackObject)obj).moveEvents( args.getLength(), args.getAtoms());
   }
   });
-  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
-    public void invoke( FtsObject obj, FtsArgs args)
-  {
-      String name = null;
-      if (args.getLength() > 0)
-        name = args.getSymbol(0).toString();
-
-      ((FtsTrackObject)obj).setName( name);
-  }
-  });
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("lock"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
@@ -185,11 +175,6 @@ public FtsTrackObject(FtsServer server, FtsObject parent, int objId, String clas
   else
 		this.info = AnythingValue.info;
 
-  if(length > offset+1)
-    this.trackName = args[offset+1].symbolValue.toString();
-  else
-    this.trackName  = "untitled";
-
   listeners = new MaxVector();
   hhListeners = new MaxVector();
   stateListeners = new MaxVector();
@@ -212,11 +197,6 @@ public boolean isInSequence()
 void setType( String type)
 {
   this.info = ValueInfoTable.getValueInfo( type);
-}
-
-public void setUntitled()
-{
-  trackName = "untitled";
 }
 
 public void setTrackProperties( int nArgs, FtsAtom args[])
@@ -378,14 +358,6 @@ public void moveEvents(int nArgs , FtsAtom args[])
   endUpdate();
 }
 
-public void setName(String name)
-{
-  String old = trackName;
-  trackName = name;
-
-  notifyTrackNameChanged(old, trackName);
-}
-
 public void nameChanged( String name)
 {
   super.nameChanged( name);
@@ -432,21 +404,6 @@ public void highlightEventsAndTime(int nArgs, FtsAtom args[])
       events.addElement((TrackEvent)(args[i].objectValue));
 
   notifyHighlighting(events, time);
-}
-
-public void requestChangeTrackName(String newName)
-{
-  args.clear();
-  args.addSymbol( FtsSymbol.get( newName));
-
-  try{
-    send( FtsSymbol.get("setName"), args);
-  }
-  catch(IOException e)
-  {
-    System.err.println("FtsTrackObject: I/O Error sending setName Message!");
-    e.printStackTrace();
-  }
 }
 
 public void requestClearTrack()
@@ -1032,11 +989,6 @@ private void notifyObjectChanged(Object spec, String propName, Object propValue)
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
     ((TrackDataListener) e.nextElement()).objectChanged(spec, propName, propValue);
 }
-private void notifyTrackNameChanged(String oldName, String newName)
-{
-  for (Enumeration e = listeners.elements(); e.hasMoreElements();)
-    ((TrackDataListener) e.nextElement()).trackNameChanged(oldName, newName);
-}
 void notifyFtsNameChanged(String name)
 {
   for (Enumeration e = stateListeners.elements(); e.hasMoreElements();)
@@ -1507,11 +1459,6 @@ public ValueInfo getType()
   return info;
 }
 
-public String getName()
-{
-  return trackName;
-}
-
 public String getFtsName()
 {
   return super.getVariableName();
@@ -1687,7 +1634,6 @@ private transient MaxVector tempVector = new MaxVector();
 private MaxVector propertyTypes, propertyNames, propertyClasses;
 private Vector eventTypesEnum = new Vector();
 
-private String trackName;
 public transient DataFlavor flavors[];
 
 public FtsTrackEditorObject editorObject = null;

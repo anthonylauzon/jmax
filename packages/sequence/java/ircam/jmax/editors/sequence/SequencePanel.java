@@ -443,9 +443,7 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
   {
     resizePanelToEventTime((TrackEvent)whichObject);
-  }
-  public void trackNameChanged(String oldName, String newName){}
-	
+  }	
   //controll if the object is in the actual scrollable area. if not extend the area
   private void resizePanelToEventTime(TrackEvent evt)
   {
