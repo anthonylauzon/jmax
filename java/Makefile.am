@@ -22,13 +22,20 @@ JAR_DEP=\
 
 CLEANFILES=$(JARFILE)
 
+JAR=@JAR@
+JAR_SUPPORT_UPDATE=@JAR_SUPPORT_UPDATE@
+
 $(JARFILE): $(JAR_DEP)
-	if test -f $(JARFILE); then \
-		cd src ; jar -uvf ../$(JARFILE) jmax.jar.root `find . -name "*.class" -newer ../$(JARFILE)` ; \
+	if test "$(JAR_SUPPORT_UPDATE)" = "yes"; then \
+		if test -f $(JARFILE); then \
+			cd src ; $(JAR) -uvf ../$(JARFILE) jmax.jar.root `find . -name "*.class" -newer ../$(JARFILE)` ; \
+		else \
+			cd src ; $(JAR) -cvf ../$(JARFILE) jmax.jar.root `find . -name "*.class"`; \
+		fi \
 	else \
-		cd src ; jar -cvf ../$(JARFILE) jmax.jar.root `find . -name "*.class"`; \
+			cd src ; $(JAR) -cvf ../$(JARFILE) jmax.jar.root `find . -name "*.class"`; \
 	fi
-#	jar -i $(JARFILE)
+
 
 
 install-data-hook:

@@ -95,6 +95,27 @@ case "$with_debug" in
 esac
 AC_SUBST(JAVACFLAGSX)
 
+AC_ARG_WITH(jar,
+  [  --with-jar=JAR	      give jar executable (optional)],
+  [ JAR="$withval"],
+  [ JAR="jar"])	
+AC_SUBST(JAR)
+
+dnl Test if jar is in path
+AC_PROG_JAR
+
+dnl Check if jar support "-u" flag
+AC_PROG_JAR_UPDATE
+if test "$ac_cv_prog_jar_update" = "yes"; then
+   JAR_SUPPORT_UPDATE="yes"
+else
+   AC_MSG_WARN("$JAR doesn't support update flag")
+   JAR_SUPPORT_UPDATE="no"
+fi
+
+AC_SUBST(JAR_SUPPORT_UPDATE)
+
+
 TOP_DIR_PATH=`pwd`
 AC_SUBST(TOP_DIR_PATH)
 
