@@ -75,11 +75,11 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     itsModel = model;
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) ;
     initDataFlavors();
-
+    
     // make this selection a listener of its own data model
     model.addListener(this);
   }
-   
+  
   public SequenceSelection()
   {
     if (flavors == null)
@@ -88,16 +88,16 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   }
 
   void initDataFlavors()
-    {
-	if (flavors == null)
-	    flavors = new DataFlavor[1];
-	flavors[0] = SequenceDataFlavor.getInstance();
+  {
+    if (flavors == null)
+      flavors = new DataFlavor[1];
+    flavors[0] = SequenceDataFlavor.getInstance();
 	
-	DataFlavor[] trackFlavors = ((FtsTrackObject)itsModel).getDataFlavors();
-	for(int i=0; i<trackFlavors.length;i++)
-	    addFlavor(trackFlavors[i]);
-    }
-
+    DataFlavor[] trackFlavors = ((FtsTrackObject)itsModel).getDataFlavors();
+    for(int i=0; i<trackFlavors.length;i++)
+      addFlavor(trackFlavors[i]);
+  }
+  
   public void addSelectionInterval(int index1, int index2)
   {
     super.addSelectionInterval(index1, index2);
@@ -174,14 +174,14 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
    */
   public void select(Enumeration e)
   {
-      TrackEvent event;
-      setValueIsAdjusting(true);
-      while(e.hasMoreElements())
-	  {
-	      event = (TrackEvent)e.nextElement();
-	      select(event);
-	  }
-      setValueIsAdjusting(false);
+    TrackEvent event;
+    setValueIsAdjusting(true);
+    while(e.hasMoreElements())
+      {
+	event = (TrackEvent)e.nextElement();
+	select(event);
+      }
+    setValueIsAdjusting(false);
   }
 
   /** remove the given object from the selection
@@ -249,13 +249,13 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   }
 
   public TrackEvent getLastSelectedEvent()
-    {
-	return lastSelectedEvent;
-    }
+  {
+    return lastSelectedEvent;
+  }
   public void setLastSelectedEvent(TrackEvent last)
-    {
-	lastSelectedEvent = last;
-    }
+  {
+    lastSelectedEvent = last;
+  }
 
   /** selects all the objects. 
    */
@@ -268,8 +268,8 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
    */
   public  void deselectAll()
   {
-      lastSelectedEvent = null;
-      clearSelection();
+    lastSelectedEvent = null;
+    clearSelection();
   }
 
 
@@ -290,18 +290,24 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
   public void objectAdded(Object spec, int index) 
   {
-    /*int i;
-      
-      if (index > getMaxSelectionIndex()) return;
-      for (i = index+1; i >  getMinSelectionIndex(); i--)
-      {
-      if (isSelectedIndex(i-1))
-      addSelectionInterval(i, i);
-      else removeSelectionInterval(i, i);
-      }*/
-    //deselectAll();
+    int i;
+
+    /* during upload don't select */
     if( !uploading)
-      {
+      {    
+	/* shift to right already selected indexes */
+	if ( index <= getMaxSelectionIndex())
+	  {
+	    for ( i = getMaxSelectionIndex(); i >= index ; i--)
+	      {
+		if ( isSelectedIndex( i))
+		  {
+		    addSelectionInterval( i+1, i+1);
+		    removeSelectionInterval( i, i);
+		  }
+	      }
+	  }
+	
 	select(spec);    
 
 	if( pasting)
