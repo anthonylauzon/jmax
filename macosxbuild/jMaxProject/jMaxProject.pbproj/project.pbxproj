@@ -11463,6 +11463,90 @@
 			isa = PBXTargetDependency;
 			target = F85C87900290238D01664092;
 		};
+		F86A04F302B4AD8401664092 = {
+			isa = PBXFileReference;
+			name = FtsPackage.java;
+			path = ../../java/src/ircam/jmax/fts/FtsPackage.java;
+			refType = 2;
+		};
+		F86A04F402B4AD8401664092 = {
+			fileRef = F86A04F302B4AD8401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86A04F502B4ADAB01664092 = {
+			isa = PBXFileReference;
+			name = ConfigTableModel.java;
+			path = ../../java/src/ircam/jmax/ConfigTableModel.java;
+			refType = 2;
+		};
+		F86A04F602B4ADAB01664092 = {
+			isa = PBXFileReference;
+			name = ConfigTablePanel.java;
+			path = ../../java/src/ircam/jmax/ConfigTablePanel.java;
+			refType = 2;
+		};
+		F86A04F702B4ADAB01664092 = {
+			isa = PBXFileReference;
+			name = ConfigTreeModel.java;
+			path = ../../java/src/ircam/jmax/ConfigTreeModel.java;
+			refType = 2;
+		};
+		F86A04F802B4ADAB01664092 = {
+			isa = PBXFileReference;
+			name = ConfigTreePanel.java;
+			path = ../../java/src/ircam/jmax/ConfigTreePanel.java;
+			refType = 2;
+		};
+		F86A04F902B4ADAB01664092 = {
+			isa = PBXFileReference;
+			name = ProjectEditor.java;
+			path = ../../java/src/ircam/jmax/ProjectEditor.java;
+			refType = 2;
+		};
+		F86A04FA02B4ADAB01664092 = {
+			fileRef = F86A04F502B4ADAB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86A04FB02B4ADAB01664092 = {
+			fileRef = F86A04F602B4ADAB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86A04FC02B4ADAB01664092 = {
+			fileRef = F86A04F702B4ADAB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86A04FD02B4ADAB01664092 = {
+			fileRef = F86A04F802B4ADAB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86A04FE02B4ADAB01664092 = {
+			fileRef = F86A04F902B4ADAB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F86A04FF02B4ADF501664092 = {
+			isa = PBXFileReference;
+			name = project_root.gif;
+			path = ../../images/project_root.gif;
+			refType = 2;
+		};
+		F86A050102B4AE0201664092 = {
+			fileRef = F86A04FF02B4ADF501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F86E9E9002A5326501664092 = {
 			isa = PBXFileReference;
 			name = FtsMatDisplayObject.java;
@@ -11592,6 +11676,7 @@
 				F880002A0283043C01664092,
 				F880002B0283043C01664092,
 				F880002C0283043C01664092,
+				F86A04FF02B4ADF501664092,
 			);
 			isa = PBXGroup;
 			name = images;
@@ -11941,6 +12026,7 @@
 				F88000610283051101664092,
 				F88000620283051101664092,
 				F88000630283051101664092,
+				F86A050102B4AE0201664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 		};
@@ -13497,6 +13583,11 @@
 				F880FEDA0283013E01664092,
 				F880FEDB0283013E01664092,
 				F880FEDC0283013E01664092,
+				F86A04F502B4ADAB01664092,
+				F86A04F602B4ADAB01664092,
+				F86A04F702B4ADAB01664092,
+				F86A04F802B4ADAB01664092,
+				F86A04F902B4ADAB01664092,
 			);
 			isa = PBXGroup;
 			name = java;
@@ -14570,6 +14661,7 @@
 				F880FE7A0283013E01664092,
 				F848668302A2745401664092,
 				F848668402A2745401664092,
+				F86A04F302B4AD8401664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -15724,6 +15816,12 @@
 				F880FFE90283013F01664092,
 				F848668602A2745401664092,
 				F848668702A2745401664092,
+				F86A04F402B4AD8401664092,
+				F86A04FA02B4ADAB01664092,
+				F86A04FB02B4ADAB01664092,
+				F86A04FC02B4ADAB01664092,
+				F86A04FD02B4ADAB01664092,
+				F86A04FE02B4ADAB01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
