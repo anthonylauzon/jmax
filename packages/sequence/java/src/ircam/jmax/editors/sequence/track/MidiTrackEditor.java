@@ -1,0 +1,248 @@
+//
+// jMax
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+// 
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// See file LICENSE for further informations on licensing terms.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
+
+
+package ircam.jmax.editors.sequence.track;
+
+import ircam.jmax.editors.sequence.*;
+import ircam.jmax.toolkit.*;
+import java.awt.*;
+import java.beans.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+
+/**
+ * A view for a Midi sequence (sequence composed of events whose Value field is
+ * a Midi value) */
+public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSelectionListener, PopupProvider, TrackEditor
+{
+    public MidiTrackEditor(Geometry geometry, Track track)
+    {
+
+	setLayout(new BorderLayout());
+	setBackground(Color.white);
+
+	setOpaque(false);
+
+	this.track = track;
+	this.geometry = geometry;
+
+
+	//-- prepares the CENTER panel (the score)
+	// a simple panel, that just uses a Renderer as its paint method...
+	// it takes care of the popup showing.
+	itsScore = new PopupToolbarPanel(this) {
+	    
+	    public void paint(Graphics g) 
+	    {
+		Rectangle r = g.getClipBounds();
+		renderer.render(g, r); //et c'est tout	
+	    }
+
+	};
+	
+	gc = prepareGraphicContext(geometry, track);
+
+	add(itsScore, BorderLayout.CENTER);
+
+	//---- simple things for simple minds
+
+	geometry.addTranspositionListener(new TranspositionListener() {
+	    public void transpositionChanged(int newTranspose)
+		{
+		    itsScore.repaint();
+		}
+	});
+
+
+
+	// make this panel repaint when the selection status change
+	// either in content or in ownership.
+	selection.addListSelectionListener(this);
+
+	selection.setOwner(new SelectionOwner() {
+	    public void selectionDisactivated()
+		{
+		    itsScore.repaint();
+		}
+	    public void selectionActivated()
+		{
+		    itsScore.repaint();
+		}
+	});
+	
+	track.getTrackDataModel().addListener(this);
+	component = this;
+    }
+
+    public JPopupMenu getMenu()
+    {
+	return gc.getToolbar().itsPopupMenu;
+    }
+
+    private SequenceGraphicContext prepareGraphicContext(Geometry geometry, Track track)
+    {
+	selection = new SequenceSelection(track.getTrackDataModel());
+
+	//--- make this selection the current one when the track is activated
+	track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+	    public void propertyChange(PropertyChangeEvent e)
+		{
+
+		    if (e.getPropertyName().equals("active") && e.getNewValue().equals(Boolean.TRUE))
+			SequenceSelection.setCurrent(selection);
+		}
+	});
+
+	gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, track); //loopback?
+	gc.setGraphicSource(itsScore);
+	gc.setGraphicDestination(itsScore);
+	gc.setAdapter(new PartitionAdapter(geometry));
+	
+	renderer = new ScoreRenderer(gc);
+	
+	return gc;
+    }
+
+    /**
+     * Callback from the toolbar when a new tool have been
+     * selected by the user
+     */ 
+    public void toolChanged(ToolChangeEvent e) 
+    {
+	//SUSPENDED: requires knowledge of the status bar
+	/*if (e.getTool() != null) 
+	  {
+	  itsStatusBar.post(e.getTool(), "");
+	  }*/
+	
+    }
+    
+    /**
+     * called when the database is changed
+     */
+    
+    public void objectChanged(Object spec) 
+    {
+	repaint();
+    }
+    
+    public void objectAdded(Object spec, int index) 
+    {
+	repaint();
+    }
+    
+    public void objectDeleted(Object whichObject, int index) 
+    {
+	repaint();
+    }
+    
+    public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
+    {
+	repaint();
+    }
+    
+    /**
+     * ListSelectionListener interface
+     */
+    
+    public void valueChanged(ListSelectionEvent e)
+    {
+	repaint();
+    }
+    
+    
+    /* avoid to paint the white background twice*/   
+    public void update(Graphics g) {}
+    
+    
+    /**
+     * get the lenght (in milliseconds) of the window
+     */
+    int windowTimeWidth() 
+    {
+	return gc.getAdapter().getInvX(itsScore.getSize().width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND) - 1;
+	
+    }
+
+
+  /**
+   * from the StatusBarClient interface
+   */
+  public String getName() 
+  {
+    return "";
+  }
+
+
+  /**
+   * from the StatusBarClient interface
+   */
+  public ImageIcon getIcon() 
+  {
+    return null;
+  }
+
+
+    public Component getComponent()
+    {
+	return component;
+    }
+
+    public void setComponent(Component c)
+    {
+	component = c;
+    }
+
+    public SequenceGraphicContext getGraphicContext()
+    {
+	return gc;
+    }
+
+    // good old f*****g HTML-style...
+
+    public Dimension getPreferredSize()
+    {
+	return new Dimension(800, 450);
+    }
+
+    public Dimension getMinimumSize()
+    {
+	return new Dimension(800, 250);
+    }
+
+    //--- MidiTrack fields
+    Geometry geometry;
+    SequenceGraphicContext gc;
+    Track track;
+    ScoreRenderer renderer;
+    Component component;
+    SequenceSelection selection;
+    
+    JPanel itsScore;
+}

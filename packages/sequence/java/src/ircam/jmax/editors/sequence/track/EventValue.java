@@ -1,0 +1,53 @@
+
+package ircam.jmax.editors.sequence.track;
+
+import ircam.jmax.fts.*;
+import ircam.jmax.toolkit.*;
+import java.util.*;
+
+/**
+ * The interface of the objects that can be values of events in a sequence.
+ * The needed functionalities are generic property handling, without assumptions
+ * on the actual properties that the implementations of this interface can handle.
+ * For example, a LogicValue can handle expressions, AmbitusValue can handle ambitus,
+ * and so on. The method getPropertyNames() returns an enumeration of the names of the 
+ * properties known by this EventValue 
+ * @see ircam.jmax.editors.sequence.track.Event
+ * @see ircam.jmax.editors.sequence.track.TrackEvent 
+ */
+public interface EventValue
+{
+   /**
+     * Set the named property */
+    public abstract void setProperty(String name, Object value);
+
+    /**
+     * Get the given property */
+    public abstract Object getProperty(String name);
+
+    /** 
+     * Returns the ValueInfo object for this EventValue */
+    public abstract ValueInfo getValueInfo();
+
+    /**
+     * Returns the ObjectRenderer for this object */
+    public abstract ObjectRenderer getRenderer();
+    
+    /**
+     * Returns an Enumeration of all the property names known by this
+     * EventValue */
+    public abstract Enumeration getPropertyNames();
+
+    /**
+     * getProperty on an unknown property should return this value */
+    public static Object UNKNOWN_PROPERTY = new Integer(Integer.MAX_VALUE);
+ 
+    /**
+     * The defaut value of a property, when it is not known.
+     * This is a situation in which we have no choices: the value
+     * here is suited to be represented in Renderer that handle (at least) midi-like
+     * values */
+    public Object DEFAULT_PROPERTY = new Integer(64);
+}
+
+

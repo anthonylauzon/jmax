@@ -1,0 +1,94 @@
+
+package ircam.jmax.editors.sequence.track;
+
+import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.sequence.*;
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.util.*;
+
+/**
+ * The EventValue object that represents a midi-like note with "ambitus" information */
+public class AmbitusValue extends AbstractEventValue
+{
+    public AmbitusValue()
+    {
+	super();
+
+	setDefaultProperties();
+    }
+
+    private void setDefaultProperties()
+    {
+	for (Enumeration e = getPropertyNames(); e.hasMoreElements();)
+	    {
+		properties.put((String) e.nextElement(), DEFAULT_PROPERTY);
+	    }
+
+	properties.put("ambitus", new Integer(0));
+    }
+    
+    public ValueInfo getValueInfo()
+    {
+	return info;
+    }
+
+    static class AmbitusValueInfo extends AbstractValueInfo {
+	/**
+	 * Returns the name of this value object */
+	public String getName()
+	{
+	    return AMBITUS_NAME;
+	}
+
+
+	public ImageIcon getIcon()
+	{
+	    return AMBITUS_ICON;
+	}
+
+	/**
+	 * Create an instance of the associated EventValue */
+	public Object newInstance()
+	{
+	    return new AmbitusValue();
+	}
+
+	/**
+	 * Create a new Widget for the associated Value */ 
+	public Component newWidget(SequenceGraphicContext gc)
+	{
+	    ScrEventWidget widget = new ScrEventWidget(BoxLayout.Y_AXIS, gc);
+	    return widget;
+	}
+
+    }
+
+    /**
+     * Returns its specialized renderer (an AmbitusEventRenderer) */
+    public ObjectRenderer getRenderer()
+    {
+	return AmbitusEventRenderer.getRenderer();
+    }
+  
+    public Enumeration getPropertyNames()
+    {
+	return new ArrayEnumeration(nameArray);
+    }
+
+
+    //--- Fields
+
+    static String path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images" +File.separator;
+    public static final String AMBITUS_NAME = "ambitus";
+    public static final ImageIcon AMBITUS_ICON = new ImageIcon(path+"ambitusAdder.gif");
+
+    static String nameArray[] = {"pitch", "velocity", "channel", "ambitus"};
+
+    //--- AmbitusValueInfo 
+    public static AmbitusValueInfo info = new AmbitusValueInfo();
+}
+

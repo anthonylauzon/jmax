@@ -1,0 +1,12 @@
+
+package ircam.jmax.editors.sequence.track;
+
+import java.awt.event.*;
+
+/**
+ * Notify the adding/removing of tracks into a sequencer */
+public interface TrackListener
+{
+    public abstract void trackAdded(Track track);   
+    public abstract void trackRemoved(Track track);   
+}
