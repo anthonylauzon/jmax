@@ -901,6 +901,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   }
 	
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {
+    if (lastSketchWithOffScreen == theSketchPad) return;
     if (lastSketchWithOffScreen!=null)
       lastSketchWithOffScreen.offScreenPresent = false;
     theSketchPad.offScreenPresent = true;
@@ -1107,6 +1108,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
       if (itsStartDragObject != null) itsStartDragObject.MouseUp(e, x, y);
       itsStartDragObject = null;
+      return;//why not?
     }
     if (editStatus == AREA_SELECT) {
       

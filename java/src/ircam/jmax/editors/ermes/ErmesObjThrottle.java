@@ -12,13 +12,14 @@ class ErmesObjThrottle{
   final int LATERAL_OFFSET = 2;
   final int THROTTLE_HEIGHT = /*6*/5;
   
-  ErmesObjThrottle(ErmesObjSlider theSlider) {
+  public ErmesObjThrottle(ErmesObjSlider theSlider, int x, int y) {
     itsSlider = theSlider;
-    itsX = itsSlider.itsX+LATERAL_OFFSET;
-    itsY = itsSlider.itsY+itsSlider.currentRect.height-itsSlider.BOTTOM_OFFSET-2;
-    preferredSize = new Dimension(itsSlider.currentRect.width-2*LATERAL_OFFSET,THROTTLE_HEIGHT);
+    itsX = x+LATERAL_OFFSET;
+    itsY = y+theSlider.currentRect.height-theSlider.BOTTOM_OFFSET-2;
+    preferredSize = new Dimension(theSlider.currentRect.width-2*LATERAL_OFFSET,THROTTLE_HEIGHT);
   }
-	
+
+  
   int AbsoluteToSlider(int theAbsoluteY) { //coordinate conversion, not inverted and clipped
     if (theAbsoluteY >= itsSlider.itsY)
       if (theAbsoluteY <= itsSlider.itsY+itsSlider.currentRect.height) 

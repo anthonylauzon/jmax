@@ -162,12 +162,11 @@ public class ErmesObject implements FtsPropertyHandler {
     
     // retrieve the inlet, outlet informations
     if (theFtsObject == null) {
-      //this case have been seen during the intentiation of an external
+      //this case have been seen during the instantiation of an external
       //"patcher <name> <nin> <nout>"
       return;
-      //error? exception? delete the object?
     }
-    itsFtsObject = theFtsObject;//cosi', a occhio
+    itsFtsObject = theFtsObject;
     int n_inlts = theFtsObject.getNumberOfInlets();
     int n_outlts = theFtsObject.getNumberOfOutlets();
     int in_local_distance = PADS_DISTANCE;
@@ -205,9 +204,9 @@ public class ErmesObject implements FtsPropertyHandler {
 	  else aErmesObjInlet = new ErmesObjInlet(i, this, itsX+2+(i)*in_local_distance, itsY);
 	  itsInletList.addElement(aErmesObjInlet);
 	}
-	if (offGraphics!= null) aErmesObjInlet.Repaint();
+	//2303if (offGraphics!= null) aErmesObjInlet.Repaint();
       }
-      itsSketchPad.CopyTheOffScreen(g);//e.m.
+      //2303itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     else if (n_inlts <= old_ninlts) { //we reduced the number of inlets...
       if(n_inlts>1) aHDist = (currentRect.width-10)/(n_inlts-1);
@@ -225,7 +224,7 @@ public class ErmesObject implements FtsPropertyHandler {
 	  //we should remove the connections. How?
 	}
       }
-      itsSketchPad.CopyTheOffScreen(g);//e.m.
+      //2303itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     
 /////////    
@@ -242,9 +241,9 @@ public class ErmesObject implements FtsPropertyHandler {
        aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
        aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
        ReroutingConnections(aErmesObjOutlet);
-       if(offGraphics!= null) aErmesObjOutlet.Repaint();
+       //2303if(offGraphics!= null) aErmesObjOutlet.Repaint();
      }
-     itsSketchPad.CopyTheOffScreen(g);//e.m.
+     //2303itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     else if (n_outlts <= old_noutlts) { //we reduced the number of outlets
       int size = itsOutletList.size()-1;
@@ -258,16 +257,17 @@ public class ErmesObject implements FtsPropertyHandler {
 	aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
 	aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
 	ReroutingConnections(aErmesObjOutlet);
-	if(offGraphics!= null) aErmesObjOutlet.Repaint();
+	//2303if(offGraphics!= null) aErmesObjOutlet.Repaint();
       }
-      itsSketchPad.CopyTheOffScreen(g);//e.m.
+      //2303itsSketchPad.CopyTheOffScreen(g);//e.m.
     }
     
     //prepare to be waked up when values change
     if(NeedPropertyHandler()){
       itsFtsObject.watch("value", this);
     }
-    if(offGraphics!= null) itsSketchPad.repaint();//???????
+    //2203if(offGraphics!= null) itsSketchPad.repaint();//???????
+    if (offGraphics!=null) PaintComplete();
   }
   
   public boolean NeedPropertyHandler(){
@@ -288,9 +288,9 @@ public class ErmesObject implements FtsPropertyHandler {
     itsX = x;
     itsY = y;
 		
-    Dimension d = getPreferredSize();
-    currentRect = new Rectangle(x, y, d.width, d.height);
-    Reshape(itsX, itsY, d.width, d.height);
+    if (currentRect == null) makeCurrentRect(x, y);
+
+    Reshape(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
     
     itsFtsPatcher = itsSketchPad.GetSketchWindow().itsPatcher;
     makeFtsObject();
@@ -324,15 +324,32 @@ public class ErmesObject implements FtsPropertyHandler {
     else itsResized = true;
 
     laidOut = false;
+    
+    if (currentRect == null) makeCurrentRect(theFtsObject);
+
+    itsFtsObject = theFtsObject;
+    update(itsFtsObject);
+    itsFtsPatcher = GetSketchWindow().itsPatcher;
+    return true;
+  }
+  
+  protected void makeCurrentRect(int x, int y) {
+    Dimension d = getPreferredSize();
+    currentRect = new Rectangle(x, y, d.width, d.height);
+  }
+
+  protected void makeCurrentRect(FtsObject theFtsObject) {
+    int width=0;
+    int  height=0;
+
     itsX = ((Integer)theFtsObject.get("x")).intValue();
     itsY = ((Integer)theFtsObject.get("y")).intValue();
-    
     {
       Integer widthInt = (Integer) theFtsObject.get("w");
       if (widthInt != null)
 	width  = widthInt.intValue();
     }
-
+    
     {
       Integer heightInt = (Integer)theFtsObject.get("h");
       if (heightInt != null)
@@ -348,13 +365,8 @@ public class ErmesObject implements FtsPropertyHandler {
       //itsResized = true;
     }
     currentRect = new Rectangle(itsX, itsY, width, height);
-
-    itsFtsObject = theFtsObject;
-    update(itsFtsObject);
-    itsFtsPatcher = GetSketchWindow().itsPatcher;
-    return true;
   }
-  
+
   public boolean Select()
   {
     itsSelected = true;

@@ -4,66 +4,40 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import ircam.jmax.MaxApplication; //using the global probe...
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.ermes.*;
+import com.sun.java.swing.Timer;
 
 /**
  * The "bang" graphic object.
  */
-class ErmesObjBang extends ErmesObject {
-
-  class FlashingThread extends Thread {
-
-    public FlashingThread(String str) {
-      super(str);
-    }
-    
-    public void run() {
-      while (true) {//make a first flash, then suspend itself, waiting for successive resume()
-	Graphics aGraphics = ErmesObjBang.this.GetSketchPad().getGraphics();
-	if (aGraphics != null) {
-	  ErmesObjBang.this.itsFlashing = true;
-	  ErmesObjBang.this.Paint(aGraphics);
-	  try {
-	    sleep(100);
-	  } catch (InterruptedException e) {}
-	  ErmesObjBang.this.itsFlashing = false;
-	  ErmesObjBang.this.Paint(aGraphics);
-	}	
-	suspend();
-      }
-    }
-  }
+class ErmesObjBang extends ErmesObject implements ActionListener {
 
   boolean itsFlashing = false;
-  FlashingThread	itsFlashingThread;
+  //FlashingThread	itsFlashingThread;
   static Dimension preferredSize = new Dimension(20,20);
-  
-  // there was a try to make an offscreen drawing for every object:
-  // it worked, but we didn't get too much performance gain. The doubt is that the Image class
-  // in AWT is just a "recorder" of graphics operations, and not a simple bitmap. 
-  //Graphics offScreenGraphics = null;
-  //Dimension offScreenDimension;
-  //Image offScreenImage;
-  //boolean firstPaint = true;
-  
+  Timer itsTimer = new Timer(100, this);
+
   public ErmesObjBang(){
     super();
-    //setLayout(null);
   }
 
+  public void actionPerformed(ActionEvent e) {
+    itsFlashing = false;
+    Paint_specific(itsSketchPad.getGraphics());
+    itsTimer.stop();
+  }
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-    itsFlashingThread = new FlashingThread("aFlash");
+    //itsFlashingThread = new FlashingThread("aFlash");
     return true;
   }
 
-  //The "fts_related" Init is reimplemented here because we need to create the flashing thread
-  //also when we are loading from a file
   public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
     super.Init(theSketchPad, theFtsObject);
-    itsFlashingThread = new FlashingThread("aFlash");
+    //itsFlashingThread = new FlashingThread("aFlash");
     return true;
   }
 
@@ -85,10 +59,11 @@ class ErmesObjBang extends ErmesObject {
   }
     
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
+
     if (itsSketchPad.itsRunMode) {
       //itsFtsObject.put("value", new Integer(1));//?????
       itsFtsObject.sendMessage(0, "bang", null);
-      DoublePaint();
+      //DoublePaint();
     }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
@@ -96,9 +71,11 @@ class ErmesObjBang extends ErmesObject {
   }
 
   protected void FtsValueChanged(Object value) {
-    //1. new EObjFlashingThread(this, "aFlash").start();
-    if (itsFlashingThread.isAlive()) itsFlashingThread.resume();
-    else itsFlashingThread.start();
+
+    itsFlashing = true;
+    Paint_specific(itsSketchPad.getGraphics());
+    itsTimer.setRepeats(false);
+    itsTimer.start(); //end of flash will be done in actionPerformed
   }
 	
   public boolean NeedPropertyHandler(){
@@ -123,7 +100,6 @@ class ErmesObjBang extends ErmesObject {
   }
   
   public void Paint_specific(Graphics g) { 
-    
     if(!itsSelected) g.setColor(itsUINormalColor);
     else g.setColor(itsUISelectedColor);
     if(itsFlashing) {	//only a simulation for now

@@ -15,7 +15,7 @@ abstract public class ErmesObjInOutlet {
   ErmesObject itsOwner;
   boolean laidOut = false;
   public Vector itsConnections;
-  Dimension preferredSize;
+  static Dimension preferredSize;
   int itsAnchorX, itsAnchorY; 
   boolean itsAlreadyMoveIn = false;
   
@@ -31,7 +31,7 @@ abstract public class ErmesObjInOutlet {
     itsOwner = theOwner;
     selected = false;
     connected = false;
-    preferredSize = new Dimension(7,9);
+    if (preferredSize == null) preferredSize = new Dimension(7,9);
     if (IsInlet()) itsY-=9;
     else itsY+= itsOwner.currentRect.height;
   }

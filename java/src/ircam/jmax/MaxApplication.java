@@ -107,10 +107,8 @@ public class MaxApplication extends Object {
 
     try
       {
-	//itsProbe.silentMark();
     	ourData = type.newInstance();
 	ourEditor = ourData.edit();
-	//itsProbe.mark("editortime");
       }
     catch (MaxDataException e)
       {
@@ -546,9 +544,9 @@ public class MaxApplication extends Object {
     boolean someOneNeedSave = false;
     boolean doTheSave = false;
 
-    itsProbe.stop();
-    //itsProbe.reportToFile("/u/worksta/maggi/editortime");
-    //itsProbe.report();
+    /*itsProbe.stop();
+      itsProbe.reportToFile("proberesult");
+      itsProbe.report();*/
 
     // First, search if there is anything to save,
 

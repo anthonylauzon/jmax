@@ -25,12 +25,12 @@ class ErmesObjIn extends ErmesObject {
 
     // warning.. it seems that when the height is 0, 
     // the value is null, instead of new Integer(0)
-    Integer aInteger = ((Integer)theFtsObject.get("h"));
-    currentRect = new Rectangle(((Integer)theFtsObject.get("x")).intValue(),
-				((Integer)theFtsObject.get("y")).intValue(),
-				((Integer)theFtsObject.get("w")).intValue(),
-				(aInteger == null)?preferredSize.height:
-				((Integer)theFtsObject.get("h")).intValue());
+    /*Integer aInteger = ((Integer)theFtsObject.get("h"));
+      currentRect = new Rectangle(((Integer)theFtsObject.get("x")).intValue(),
+      ((Integer)theFtsObject.get("y")).intValue(),
+      ((Integer)theFtsObject.get("w")).intValue(),
+      (aInteger == null)?preferredSize.height:
+      ((Integer)theFtsObject.get("h")).intValue());*/
     
     //currentRect = new Rectangle(x, y, d.width, d.height);
     itsId = ((FtsInletObject) theFtsObject).getPosition();
