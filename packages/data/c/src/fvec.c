@@ -1383,7 +1383,107 @@ fvec_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 
-/**************************************************************************************
+
+
+
+/******************************************************************************
+ *
+ * functions, i.e. methods that return a value but don't change the object
+ *
+ * todo: to be called in functional syntax, e.g. (.max $myfvec)
+ */
+
+static void
+fvec_getmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    const fvec_t *this = (fvec_t *) o;
+    const int	  size = fvec_get_size(this);
+    const float  *p    = fvec_get_ptr(this);
+    float	  max  = p[0];	/* start with first element */
+    int		  i;
+
+    if (size == 0)
+	return;			/* no output (void) for empty vector */
+
+    for (i = 1; i < size; i++)
+	if (p[i] > max)
+	    max = p[i];
+
+    fts_return_float(max);
+}
+
+
+static void
+fvec_getmaxindex(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    const fvec_t *this = (fvec_t *) o;
+    const int	  size = fvec_get_size(this);
+    const float  *p    = fvec_get_ptr(this);
+    float	  max  = p[0];	/* start with first element */
+    int		  maxi = 0;
+    int		  i;
+
+    if (size == 0)
+	return;			/* no output (void) for empty vector */
+
+    for (i = 1; i < size; i++)
+	if (p[i] > max)
+	{
+	    max  = p[i];
+	    maxi = i;
+	}
+
+    fts_return_int(maxi);
+}
+
+
+static void
+fvec_getmin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    const fvec_t *this = (fvec_t *) o;
+    const int	  size = fvec_get_size(this);
+    const float  *p    = fvec_get_ptr(this);
+    float	  min  = p[0];	/* start with first element */
+    int		  i;
+
+    if (size == 0)
+	return;			/* no output (void) for empty vector */
+
+    for (i = 1; i < size; i++)
+	if (p[i] < min)
+	    min = p[i];
+
+    fts_return_float(min);
+}
+
+
+static void
+fvec_getminindex(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+    const fvec_t *this = (fvec_t *) o;
+    const int	  size = fvec_get_size(this);
+    const float  *p    = fvec_get_ptr(this);
+    float	  min  = p[0];	/* start with first element */
+    int		  mini = 0;
+    int		  i;
+
+    if (size == 0)
+	return;			/* no output (void) for empty vector */
+
+    for (i = 1; i < size; i++)
+	if (p[i] < min)
+	{
+	    min  = p[i];
+	    mini = i;
+	}
+
+    fts_return_int(mini);
+}
+
+
+
+
+/*******************************************************************************
  *
  *  load, save, import, export
  *
@@ -1933,6 +2033,11 @@ fvec_instantiate(fts_class_t *cl)
   
   fts_class_message(cl, fts_new_symbol("max"), cl, fvec_max_fvec);
   fts_class_message_number(cl, fts_new_symbol("max"), fvec_max_number);
+
+  fts_class_message_void(cl, fts_new_symbol("getmax"),      fvec_getmax);
+  fts_class_message_void(cl, fts_new_symbol("getmaxindex"), fvec_getmaxindex);
+  fts_class_message_void(cl, fts_new_symbol("getmin"),      fvec_getmin);
+  fts_class_message_void(cl, fts_new_symbol("getminindex"), fvec_getminindex);
 
   fts_class_message_void(cl, fts_new_symbol("abs"), fvec_abs);
   fts_class_message(cl, fts_new_symbol("abs"), cvec_type, fvec_abs);

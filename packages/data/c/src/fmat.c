@@ -539,7 +539,7 @@ fmat_get_slice(fts_object_t *o, int winlet, fts_symbol_t s,
 	    pos    = j;
 	    stride = cols;
 	}
-	else
+	else /* s == sym_getrow */
 	{
 	    max    = rows;
 	    size   = cols;
@@ -552,10 +552,10 @@ fmat_get_slice(fts_object_t *o, int winlet, fts_symbol_t s,
 	    fvec_t *    myfvec;
 	    int		myown;
 	    int		i;
-	    fts_atom_t  ret;
 
+	    /* decide whether to create our own return-fvec */
 	    if (ac > 1  &&  fts_is_a(at+1, fvec_type))
-	    {
+	    {	/* if an fvec is given as second arg, write slice there */
 		myfvec = (fvec_t *) fts_get_object(at+1);
 		myown  = 0;
 	    }
@@ -567,25 +567,20 @@ fmat_get_slice(fts_object_t *o, int winlet, fts_symbol_t s,
 
 	    fvec_set_size(myfvec, size);
     
-	    /* copy values (elem index is i * n + col) */
+	    /* copy values (source elem index is row * cols + col) */
 	    for (i = 0; i < size; i++)
 	    {
 		fvec_set_element(myfvec, i, this->values[pos]);
 		pos += stride;
 	    }
 
-	    /* return fvec, destroy if unused */
-	    if (myown)
-		fts_object_refer(myfvec);
-
-	    fts_set_object(&ret, (fts_object_t *) myfvec);
-	    fts_return(&ret);
-
-	    if (myown)
-		fts_object_release(myfvec);
-	    else /* if a given fvec was used, see if we have to update
-		    the editor (same as fvec_fill), and set data dirty */
+	    if (!myown)
+	        /* if the fvec was given, see if we have to update
+		   the editor (same as fvec_fill), and set data dirty */
 		fvec_changed(myfvec);
+
+	    /* set return value to fvec */
+	    fts_return_object((fts_object_t *) myfvec);
 	}
     }
 }
