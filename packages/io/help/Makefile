@@ -23,19 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-all:
-	(cd c; $(MAKE) -k all)
-.PHONY: all
-
-clean:
-	(cd c; $(MAKE) clean)
-.PHONY: clean
-
 install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/io
-	$(INSTALL_DATA) io.jpk $(lib_install_dir)/packages/io/io.jpk
-	$(INSTALL_DATA) io.scm $(lib_install_dir)/packages/io/io.scm
-	( cd help; $(MAKE) $@)
-	( cd c; $(MAKE) $@)
+	$(INSTALL_DIR) $(lib_install_dir)/packages/io/help
+	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/io/help/$$f ; done
 .PHONY: install
+
 
