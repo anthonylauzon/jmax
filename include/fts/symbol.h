@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_SYMBOL_H_
-#define _FTS_SYMBOL_H_
 
 /**
  * Symbols are canonical representations of C strings that can be 
@@ -68,7 +66,7 @@ FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
 
 /*
  * Compatibility
-*/
+ */
 FTS_API const char *__OLD_fts_symbol_name( const char *file, int line, fts_symbol_t symbol);
 #define fts_symbol_name(symbol) __OLD_fts_symbol_name(__FILE__, __LINE__, (symbol))
 
@@ -79,26 +77,7 @@ FTS_API const char *__OLD_fts_symbol_name( const char *file, int line, fts_symbo
 #define PREDEF_SYMBOL(V,S) FTS_API fts_symbol_t V;
 #include <fts/predefsymbols.h>
 
-/* 
- * fts_type_t equivalent of symbols
- */
-#define fts_t_anything fts_s_anything
-#define fts_t_void fts_s_void
-#define fts_t_float fts_s_float
-#define fts_t_int fts_s_int
-#define fts_t_number fts_s_number
-#define fts_t_ptr fts_s_ptr
-#define fts_t_fun fts_s_fun
-#define fts_t_string fts_s_string
-#define fts_t_symbol fts_s_symbol
-#define fts_t_object fts_s_object
-#define fts_t_connection fts_s_connection
-#define fts_t_true fts_s_true
-#define fts_t_false fts_s_false
-/*#define fts_t_data fts_s_data*/
-#define fts_t_list fts_s_list
 
-#endif
 
 
 

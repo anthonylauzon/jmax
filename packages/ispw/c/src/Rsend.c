@@ -28,7 +28,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <fts/fts.h>
-#include <ftsconfig.h>
 #include "Rsend.h"
 
 typedef struct 

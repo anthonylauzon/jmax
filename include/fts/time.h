@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef _FTS_TIME_H
-#define _FTS_TIME_H
 
 /**
  * The FTS timing system
@@ -161,4 +159,3 @@ FTS_API double fts_systime(void);
 
 /*@}*/ /* logical time */
 
-#endif

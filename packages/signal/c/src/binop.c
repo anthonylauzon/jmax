@@ -20,7 +20,6 @@
  */
 
 #include <fts/fts.h>
-#include <ftsconfig.h>
 
 typedef struct
 {
@@ -78,9 +77,9 @@ static fts_symbol_t sym_vid_const_inplace;
 static void 
 ftl_add(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -91,9 +90,9 @@ ftl_add(fts_word_t *argv)
 static void 
 ftl_sub(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -104,9 +103,9 @@ ftl_sub(fts_word_t *argv)
 static void 
 ftl_mul(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -117,9 +116,9 @@ ftl_mul(fts_word_t *argv)
 static void 
 ftl_div(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -130,9 +129,9 @@ ftl_div(fts_word_t *argv)
 static void 
 ftl_bus(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -143,9 +142,9 @@ ftl_bus(fts_word_t *argv)
 static void 
 ftl_vid(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -157,9 +156,9 @@ ftl_vid(fts_word_t *argv)
 static void 
 ftl_ee(fts_word_t *argv ) 
 { 
-  float *in0 = (float *)fts_word_get_ptr(argv + 0); 
-  float *in1 = (float *)fts_word_get_ptr(argv + 1); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in0 = (float *)fts_word_get_pointer(argv + 0); 
+  float *in1 = (float *)fts_word_get_pointer(argv + 1); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -170,9 +169,9 @@ ftl_ee(fts_word_t *argv )
 static void 
 ftl_ne(fts_word_t *argv ) 
 { 
-  float *in0 = (float *)fts_word_get_ptr(argv + 0); 
-  float *in1 = (float *)fts_word_get_ptr(argv + 1); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in0 = (float *)fts_word_get_pointer(argv + 0); 
+  float *in1 = (float *)fts_word_get_pointer(argv + 1); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -183,9 +182,9 @@ ftl_ne(fts_word_t *argv )
 static void 
 ftl_le(fts_word_t *argv ) 
 { 
-  float *in0 = (float *)fts_word_get_ptr(argv + 0); 
-  float *in1 = (float *)fts_word_get_ptr(argv + 1); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in0 = (float *)fts_word_get_pointer(argv + 0); 
+  float *in1 = (float *)fts_word_get_pointer(argv + 1); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -196,9 +195,9 @@ ftl_le(fts_word_t *argv )
 static void 
 ftl_ge(fts_word_t *argv ) 
 { 
-  float *in0 = (float *)fts_word_get_ptr(argv + 0); 
-  float *in1 = (float *)fts_word_get_ptr(argv + 1); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in0 = (float *)fts_word_get_pointer(argv + 0); 
+  float *in1 = (float *)fts_word_get_pointer(argv + 1); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -209,9 +208,9 @@ ftl_ge(fts_word_t *argv )
 static void 
 ftl_lt(fts_word_t *argv ) 
 { 
-  float *in0 = (float *)fts_word_get_ptr(argv + 0); 
-  float *in1 = (float *)fts_word_get_ptr(argv + 1); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in0 = (float *)fts_word_get_pointer(argv + 0); 
+  float *in1 = (float *)fts_word_get_pointer(argv + 1); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -222,9 +221,9 @@ ftl_lt(fts_word_t *argv )
 static void 
 ftl_gt(fts_word_t *argv ) 
 { 
-  float *in0 = (float *)fts_word_get_ptr(argv + 0); 
-  float *in1 = (float *)fts_word_get_ptr(argv + 1); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in0 = (float *)fts_word_get_pointer(argv + 0); 
+  float *in1 = (float *)fts_word_get_pointer(argv + 1); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -240,9 +239,9 @@ ftl_gt(fts_word_t *argv )
 
 static void ftl_add_64(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -251,9 +250,9 @@ static void ftl_add_64(fts_word_t *argv)
 
 static void ftl_mul_64(fts_word_t *argv)
 {
-  float * restrict in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float * restrict in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -268,8 +267,8 @@ static void ftl_mul_64(fts_word_t *argv)
 
 static void ftl_add_inplace(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -279,8 +278,8 @@ static void ftl_add_inplace(fts_word_t *argv)
 
 static void ftl_mul_inplace(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -290,8 +289,8 @@ static void ftl_mul_inplace(fts_word_t *argv)
 
 static void ftl_add_inplace_64(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -300,8 +299,8 @@ static void ftl_add_inplace_64(fts_word_t *argv)
 
 static void ftl_mul_inplace_64(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -316,7 +315,7 @@ static void ftl_mul_inplace_64(fts_word_t *argv)
 
 static void ftl_add_self(fts_word_t *argv)
 {
-  float * restrict v = (float *)fts_word_get_ptr(argv + 0);
+  float * restrict v = (float *)fts_word_get_pointer(argv + 0);
   int n = fts_word_get_int(argv + 1);
   int i;
 
@@ -326,7 +325,7 @@ static void ftl_add_self(fts_word_t *argv)
 
 static void ftl_mul_self(fts_word_t *argv)
 {
-  float * restrict v = (float *)fts_word_get_ptr(argv + 0);
+  float * restrict v = (float *)fts_word_get_pointer(argv + 0);
   int n = fts_word_get_int(argv + 1);
   int i;
 
@@ -336,7 +335,7 @@ static void ftl_mul_self(fts_word_t *argv)
 
 static void ftl_add_self_64(fts_word_t *argv)
 {
-  float * restrict v = (float *)fts_word_get_ptr(argv + 0);
+  float * restrict v = (float *)fts_word_get_pointer(argv + 0);
   int n = fts_word_get_int(argv + 1);
   int i;
 
@@ -346,7 +345,7 @@ static void ftl_add_self_64(fts_word_t *argv)
 
 static void ftl_mul_self_64(fts_word_t *argv)
 {
-  float * restrict v = (float *)fts_word_get_ptr(argv + 0);
+  float * restrict v = (float *)fts_word_get_pointer(argv + 0);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -363,9 +362,9 @@ static void ftl_mul_self_64(fts_word_t *argv)
 static void 
 ftl_add_const(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -376,9 +375,9 @@ ftl_add_const(fts_word_t *argv)
 static void 
 ftl_sub_const(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -389,9 +388,9 @@ ftl_sub_const(fts_word_t *argv)
 static void 
 ftl_mul_const(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -402,9 +401,9 @@ ftl_mul_const(fts_word_t *argv)
 static void 
 ftl_div_const(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -415,9 +414,9 @@ ftl_div_const(fts_word_t *argv)
 static void 
 ftl_bus_const(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -428,9 +427,9 @@ ftl_bus_const(fts_word_t *argv)
 static void 
 ftl_vid_const(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict in = (float *)fts_word_get_ptr(argv + 1);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 2);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict in = (float *)fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 
@@ -441,9 +440,9 @@ ftl_vid_const(fts_word_t *argv)
 static void 
 ftl_ee_const (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -455,9 +454,9 @@ ftl_ee_const (fts_word_t *argv )
 static void 
 ftl_ne_const (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -468,9 +467,9 @@ ftl_ne_const (fts_word_t *argv )
 static void 
 ftl_le_const (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -481,9 +480,9 @@ ftl_le_const (fts_word_t *argv )
 static void 
 ftl_ge_const (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -494,9 +493,9 @@ ftl_ge_const (fts_word_t *argv )
 static void 
 ftl_lt_const (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -507,9 +506,9 @@ ftl_lt_const (fts_word_t *argv )
 static void 
 ftl_gt_const (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -526,8 +525,8 @@ ftl_gt_const (fts_word_t *argv )
 static void 
 ftl_add_const_inplace(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict sig = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -538,8 +537,8 @@ ftl_add_const_inplace(fts_word_t *argv)
 static void 
 ftl_sub_const_inplace(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict sig = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -550,8 +549,8 @@ ftl_sub_const_inplace(fts_word_t *argv)
 static void 
 ftl_mul_const_inplace(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict sig = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -562,8 +561,8 @@ ftl_mul_const_inplace(fts_word_t *argv)
 static void 
 ftl_div_const_inplace(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict sig = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -574,8 +573,8 @@ ftl_div_const_inplace(fts_word_t *argv)
 static void 
 ftl_bus_const_inplace(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict sig = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -586,8 +585,8 @@ ftl_bus_const_inplace(fts_word_t *argv)
 static void 
 ftl_vid_const_inplace(fts_word_t *argv)
 {
-  float c = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict sig = (float *)fts_word_get_ptr(argv + 1);
+  float c = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict sig = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -618,7 +617,7 @@ static void
 binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t argv[4];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 
   if (fts_dsp_is_input_null(dsp, 0))
     {
@@ -722,14 +721,14 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 binop_put_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_sub);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_sub);
 }
 
 static void
 binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t argv[4];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 
   if (fts_dsp_is_input_null(dsp, 0))
     {
@@ -833,19 +832,19 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void 
 binop_put_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_div);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_div);
 }
 
 static void 
 binop_put_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_bus);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_bus);
 }
 
 static void 
 binop_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_vid);
+  binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_vid);
 }
 
 /************************************************
@@ -883,37 +882,37 @@ binop_const_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_sym
 static void 
 binop_const_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_add_const, sym_add_const_inplace);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_add_const, sym_add_const_inplace);
 }
 
 static void 
 binop_const_put_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_sub_const, sym_sub_const_inplace);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_sub_const, sym_sub_const_inplace);
 }
 
 static void 
 binop_const_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_mul_const, sym_mul_const_inplace);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_mul_const, sym_mul_const_inplace);
 }
 
 static void 
 binop_const_put_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_div_const, sym_div_const_inplace);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_div_const, sym_div_const_inplace);
 }
 
 static void 
 binop_const_put_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_bus_const, sym_bus_const_inplace);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_bus_const, sym_bus_const_inplace);
 }
 
 static void 
 binop_const_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  binop_const_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sym_vid_const, sym_vid_const_inplace);
+  binop_const_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sym_vid_const, sym_vid_const_inplace);
 }
 
 /************************************************

@@ -49,8 +49,6 @@
    to, and the others should specify better.
  */
 
-#ifndef _FTS_PROPERTY_H_
-#define _FTS_PROPERTY_H_
 
 typedef struct fts_plist fts_plist_t;
 
@@ -102,4 +100,3 @@ FTS_API void fts_class_remove_daemon(fts_class_t *cl,
 				    fts_symbol_t        property,
 				    fts_property_daemon_t daemon);
 
-#endif

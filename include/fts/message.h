@@ -21,8 +21,6 @@
  */
 
 
-#ifndef _FTS_MESSAGE_H_
-#define _FTS_MESSAGE_H_
 
 /************************************************
  *
@@ -144,7 +142,7 @@ FTS_API fts_status_t fts_outlet_send(fts_object_t *, int woutlet, fts_symbol_t ,
 /* argument macros and functions */
 #define fts_get_symbol_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_symbol(&(AT)[N]) : (DEF))
 #define fts_get_string_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_string(&(AT)[N]) : (DEF))
-#define fts_get_ptr_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_ptr(&(AT)[N]) : (DEF))
+#define fts_get_pointer_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_pointer(&(AT)[N]) : (DEF))
 #define fts_get_object_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_object(&(AT)[N]) : (DEF))
 
 #define fts_get_int_arg(AC, AT, N, DEF) \
@@ -154,10 +152,6 @@ FTS_API fts_status_t fts_outlet_send(fts_object_t *, int woutlet, fts_symbol_t ,
 #define fts_get_float_arg(AC, AT, N, DEF) \
 ((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (float) fts_get_int(&(AT)[N]) : \
 	      (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
-
-#define fts_get_double_arg(AC, AT, N, DEF) \
-((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (double) fts_get_int(&(AT)[N]) : \
-	      (fts_is_float(&(AT)[N]) ? (double) fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
 /* inlined macros for message sending (active only if compiled optimized */
 #ifdef OPTIMIZE
@@ -260,4 +254,3 @@ FTS_API void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_ato
 
 #endif
 
-#endif

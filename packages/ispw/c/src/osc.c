@@ -64,14 +64,14 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
       fts_set_symbol( &k, name);
       if (fts_hashtable_get( sigtab1_ht, &k, &data))
 	{
-	  this->wavetab = (wavetab_t *)fts_get_ptr(&data);
+	  this->wavetab = (wavetab_t *)fts_get_pointer(&data);
 	  this->wavetab->refcnt++;
 	}
       else
 	{
 	  this->wavetab = wavetable_new(name, wrap_mode);
 	  
-	  fts_set_ptr(&data, this->wavetab);
+	  fts_set_pointer(&data, this->wavetab);
 	  fts_hashtable_put(sigtab1_ht, &k, &data);
 	}
     }
@@ -168,7 +168,7 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 {
   osc_t *this = (osc_t *)o;
   fts_atom_t argv[5];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   double f;
   fts_atom_t data, k;
 
@@ -180,7 +180,7 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
       if (fts_hashtable_get(sigtab1_ht, &k, &data))
 	{
-	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
+	  wavetab_t *wavetab = (wavetab_t *) fts_get_pointer(&data);
 	  osc_ftl_data_set_table(this->ftl_data, wavetab->table);
 	}
       else
@@ -229,7 +229,7 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
 
       if (fts_hashtable_get(sigtab1_ht, &k, &data))
 	{
-	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
+	  wavetab_t *wavetab = (wavetab_t *) fts_get_pointer(&data);
 	  
 	  osc_ftl_data_set_table(this->ftl_data, (void *)wavetab->table);
 	}

@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_PROJECT_H_
-#define _FTS_PROJECT_H_
 
 FTS_API fts_package_t *fts_project_open(const char* filename);
 
@@ -37,4 +35,3 @@ FTS_API void fts_project_set(fts_package_t *project);
 
 FTS_API fts_symbol_t fts_project_get_dir(void);
 
-#endif /* _FTS_PROJECT_H_ */

@@ -20,16 +20,15 @@
  * 
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
+#include <stdio.h>
+#include <string.h>
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#include <stdio.h>
-#include <string.h>
-
-#include <fts/fts.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/object.h>

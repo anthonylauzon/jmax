@@ -283,7 +283,7 @@ static void clear_outputs( int n, int n_channels, fts_word_t *outputs)
 
   for ( channel = 0; channel < n_channels; channel++)
     {
-      out = (float *)fts_word_get_ptr( outputs + channel);
+      out = (float *)fts_word_get_pointer( outputs + channel);
 
       for ( i = 0; i < n; i++)
 	out[i] = 0.0;
@@ -302,7 +302,7 @@ static void read_fifo( int n, int n_channels, dtdfifo_t *fifo, fts_word_t *outpu
       float *out;
       int i, j;
 
-      out = (float *)fts_word_get_ptr( outputs + channel);
+      out = (float *)fts_word_get_pointer( outputs + channel);
       j = channel;
 
       for ( i = 0; i < n; i++)
@@ -321,7 +321,7 @@ static void readsf_dsp( fts_word_t *argv)
   int n, n_channels, read_size;
   fts_word_t *outputs;
 
-  this = (readsf_t *)fts_word_get_ptr( argv + 0);
+  this = (readsf_t *)fts_word_get_pointer( argv + 0);
   n = fts_word_get_int( argv + 1);
   outputs = argv + 2;
 
@@ -383,11 +383,11 @@ static void readsf_dsp( fts_word_t *argv)
 static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   fts_atom_t argv[32];
   int i;
 
-  fts_set_ptr( argv + 0, this);
+  fts_set_pointer( argv + 0, this);
   fts_set_int( argv + 1, fts_dsp_get_output_size( dsp, 0));
 
   for ( i = 0; i < this->n_channels; i++)
@@ -618,7 +618,7 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(ac == 2 && fts_is_symbol( at + 1))
     this->filename = fts_get_symbol( at + 1);
 
-  this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 1, dtdserver_get_default_instance());
+  this->server = (dtdserver_t *)fts_get_pointer_arg(ac, at, 1, dtdserver_get_default_instance());
 
   if (!this->server)
     {
@@ -659,7 +659,7 @@ static void write_fifo( int n, int n_channels, dtdfifo_t *fifo, fts_word_t *inpu
       float *in;
       int i, j;
 
-      in = (float *)fts_word_get_ptr( inputs + channel);
+      in = (float *)fts_word_get_pointer( inputs + channel);
       j = channel;
 
       for ( i = 0; i < n; i++)
@@ -678,7 +678,7 @@ static void writesf_dsp( fts_word_t *argv)
   int n, n_channels, write_size;
   fts_word_t *inputs;
 
-  this = (writesf_t *)fts_word_get_ptr( argv + 0);
+  this = (writesf_t *)fts_word_get_pointer( argv + 0);
   n = fts_word_get_int( argv + 1);
   inputs = argv + 2;
 
@@ -714,11 +714,11 @@ static void writesf_dsp( fts_word_t *argv)
 static void writesf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   fts_atom_t argv[32];
   int i;
 
-  fts_set_ptr( argv + 0, this);
+  fts_set_pointer( argv + 0, this);
   fts_set_int( argv + 1, fts_dsp_get_input_size( dsp, 0));
 
   for ( i = 0; i < this->n_channels; i++)

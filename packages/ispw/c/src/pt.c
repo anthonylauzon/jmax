@@ -257,7 +257,7 @@ static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   fts_atom_t a[4];
 	
   pt_common_dsp_fun_put(&x->pt, dsp);
@@ -269,8 +269,8 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_set_int(a+1, x->ctl.reattack_time);
   pt_reattack(o, 0, 0, 2, a);
 	
-  fts_set_ptr(a, (void *)o);
-  fts_set_fun(a+1, (void (*)(void))analysis);
+  fts_set_pointer(a, (void *)o);
+  fts_set_pointer(a+1, analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a+3, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(dsp_symbol, 4, a);

@@ -24,7 +24,6 @@
  *
  */
 #include <fts/fts.h>
-#include <ftsconfig.h>
 #include "seqsym.h"
 #include "event.h"
 #include "track.h"

@@ -45,10 +45,10 @@ ftl_fir_1(fts_word_t *argv)
   float xnm1, xnp0, xnp1, xnp2, xnp3;
   long n;
 
-  x = (float *)fts_word_get_ptr(argv); /* in0 */
-  y = (float *)fts_word_get_ptr(argv+1); /* out0 */
-  state = (float *)fts_word_get_ptr(argv+2);
-  coefs = (float *)fts_word_get_ptr(argv+3);
+  x = (float *)fts_word_get_pointer(argv); /* in0 */
+  y = (float *)fts_word_get_pointer(argv+1); /* out0 */
+  state = (float *)fts_word_get_pointer(argv+2);
+  coefs = (float *)fts_word_get_pointer(argv+3);
   n_tick = fts_word_get_int(argv+4);
 
   xnm1 = state[0]; /* x(n-1) */
@@ -101,10 +101,10 @@ ftl_fir_2(fts_word_t *argv)
   float xnp0, xnp1, xnp2, xnp3;
   long n;
 
-  x = (float *)fts_word_get_ptr(argv); /* in0 */
-  y = (float *)fts_word_get_ptr(argv+1); /* out0 */
-  state = (float *)fts_word_get_ptr(argv+2);
-  coefs = (float *)fts_word_get_ptr(argv+3);
+  x = (float *)fts_word_get_pointer(argv); /* in0 */
+  y = (float *)fts_word_get_pointer(argv+1); /* out0 */
+  state = (float *)fts_word_get_pointer(argv+2);
+  coefs = (float *)fts_word_get_pointer(argv+3);
   n_tick = fts_word_get_int(argv+4);
 
   xnm2 = state[0]; /* x(n-2) */

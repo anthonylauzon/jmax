@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include <fts/fts.h>
+#include <ftsprivate/atom.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/package.h>
 
@@ -105,27 +106,28 @@ fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_
   mcl->name = name;
   mcl->instantiate_fun = instantiate_fun;
   mcl->equiv_fun = equiv_fun;
+  mcl->selector = name;
   mcl->package = 0;
 
   return mcl;
 }
 
-fts_status_t 
-fts_metaclass_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
+fts_metaclass_t *fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
 {
   fts_metaclass_t *mcl =  fts_metaclass_new(name, instantiate_fun, equiv_fun);
 
-  return fts_package_add_metaclass(fts_get_current_package(), mcl);
+  if ( fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_Success)
+    return 0;
+
+  return mcl;
 }
 
-fts_status_t 
-fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
+fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
   return fts_metaclass_install( name, instantiate_fun, fts_always_equiv);
 }
 
-void 
-fts_alias_install( fts_symbol_t alias_name, fts_symbol_t class_name)
+void fts_alias_install( fts_symbol_t alias_name, fts_symbol_t class_name)
 {
   fts_package_add_alias(fts_get_current_package(), alias_name, class_name);
 }
@@ -199,7 +201,16 @@ static void fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *
       store[i] = at[i];
 
       if(fts_is_object(at + i))
-	fts_word_set_object(fts_atom_value(store + i), 0);
+	{
+	  /* NOTE: here we access the atom structure fields directly,
+	     without using the macros, because the macro fts_set_object does not
+	     accept to set the atom to type object and null value.
+	     However, this is related to metaclass mechanism, which we hope to
+	     remove soon.
+	  */
+	  store[i].typeid = fts_get_type( at+i);
+	  fts_word_set_object( &store[i].value, 0);
+	}
     }
 
   cl->next = mcl->inst_list;
@@ -542,8 +553,8 @@ fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s)
  *  The called method will declare one by one the outlets to which the input 
  *  is propagated using the received function and context (structure).
  *    
- *     fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
- *     void *propagate_context = (fts_dspgraph_t *)fts_get_ptr(at + 1);
+ *     fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+ *     void *propagate_context = (fts_dspgraph_t *)fts_get_pointer(at + 1);
  *
  *     propagate_fun(propagate_context, <object>, <outlet>);
  *
@@ -581,7 +592,7 @@ fts_arg_type_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *a
     return 0;
 
   for (n = 0; n < ac0; n++, at0++, at1++)
-    if (fts_get_type(at0) != fts_get_type(at1))
+    if ( !fts_atom_same_type(at0, at1))
       return 0;
 
   return 1;
@@ -596,7 +607,7 @@ int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1
 
   for (n = 0; n < ac0; n++, at0++, at1++)
     {
-      if (fts_get_type(at0) != fts_get_type(at1))
+      if ( !fts_atom_same_type( at0, at1))
 	return 0;
 
       if (fts_is_int(at0))
@@ -619,9 +630,9 @@ int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1
 	  if (strcmp(fts_get_string(at0), fts_get_string(at1)))
 	    return 0;
 	}
-      else if (fts_is_ptr(at0))
+      else if (fts_is_pointer(at0))
 	{
-	  if (fts_get_ptr(at0) != fts_get_ptr(at1))
+	  if (fts_get_pointer(at0) != fts_get_pointer(at1))
 	    return 0;
 	}
     }
@@ -644,7 +655,7 @@ fts_arg_equiv_or_float(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_
 
   for (n = 0; n < ac0; n++, at0++, at1++)
     {
-      if (fts_get_type(at0) != fts_get_type(at1))
+      if ( !fts_atom_same_type( at0, at1))
 	return 0;
 
       if (fts_is_int(at0))
@@ -667,9 +678,9 @@ fts_arg_equiv_or_float(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_
 	  if (strcmp(fts_get_string(at0), fts_get_string(at1)))
 	    return 0;
 	}
-      else if (fts_is_ptr(at0))
+      else if (fts_is_pointer(at0))
 	{
-	  if (fts_get_ptr(at0) != fts_get_ptr(at1))
+	  if (fts_get_pointer(at0) != fts_get_pointer(at1))
 	    return 0;
 	}
     }
@@ -688,7 +699,7 @@ fts_first_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *a
       at0++;
       at1++;
 
-      if (fts_get_type(at0) == fts_get_type(at1))
+      if ( !fts_atom_same_type( at0, at1))
 	{
 	  if (fts_is_int(at0))
 	    {
@@ -710,9 +721,9 @@ fts_first_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *a
 	      if (! strcmp(fts_get_string(at0), fts_get_string(at1)))
 		return 1;
 	    }
-	  else if (fts_is_ptr(at0))
+	  else if (fts_is_pointer(at0))
 	    {
-	      if (fts_get_ptr(at0) == fts_get_ptr(at1))
+	      if (fts_get_pointer(at0) == fts_get_pointer(at1))
 		return 1;
 	    }
 	}

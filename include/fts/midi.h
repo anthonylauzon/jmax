@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _FTS_MIDI_H_
-#define _FTS_MIDI_H_
 
 /****************************************************
  *
@@ -686,4 +684,3 @@ FTS_API void fts_midiparser_init(fts_midiparser_t *parser);
 FTS_API void fts_midiparser_reset(fts_midiparser_t *parser);
 FTS_API void fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
 
-#endif

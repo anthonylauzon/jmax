@@ -67,7 +67,7 @@ delay_table_get_entry(fts_symbol_t delay_name)
   fts_set_symbol( &k, delay_name);
 
   if (fts_hashtable_get(&delay_table, &k, &data))
-    return (delay_entry_t *) fts_get_ptr(&data);
+    return (delay_entry_t *) fts_get_pointer(&data);
   else
     {
       delay_entry_t *p;
@@ -83,7 +83,7 @@ delay_table_get_entry(fts_symbol_t delay_name)
       p->delwrite = 0;
       p->first_delreader = 0;
 
-      fts_set_ptr(&data, p);
+      fts_set_pointer(&data, p);
       fts_hashtable_put(&delay_table, &k, &data);
       
       return p;

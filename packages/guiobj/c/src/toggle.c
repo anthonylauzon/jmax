@@ -100,7 +100,7 @@ toggle_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   FILE *file;
   fts_atom_t xa, ya, wa;
 
-  file = (FILE *)fts_get_ptr( at);
+  file = (FILE *)fts_get_pointer( at);
 
   fts_object_get_prop( o, fts_s_x, &xa);
   fts_object_get_prop( o, fts_s_y, &ya);

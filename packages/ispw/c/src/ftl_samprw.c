@@ -21,6 +21,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+
 #include "fourpoint.h"
 #include "sampbuf.h"
 #include "sampwrite.h"
@@ -28,8 +29,8 @@
 
 void ftl_sampwrite(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv + 0);
-  sampwrite_ctl_t *ctl = (sampwrite_ctl_t *)fts_word_get_ptr(argv + 1);
+  float *in = (float *)fts_word_get_pointer(argv + 0);
+  sampwrite_ctl_t *ctl = (sampwrite_ctl_t *)fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   int onset = ctl->onset;
   sampbuf_t *buf = ctl->buf;
@@ -52,9 +53,9 @@ void ftl_sampwrite(fts_word_t *argv)
 
 void ftl_sampread(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv);
-  float *out = (float *)fts_word_get_ptr(argv + 1);
-  sampread_ctl_t * restrict ctl = (sampread_ctl_t *)fts_word_get_ptr(argv + 2);
+  float *in = (float *)fts_word_get_pointer(argv);
+  float *out = (float *)fts_word_get_pointer(argv + 1);
+  sampread_ctl_t * restrict ctl = (sampread_ctl_t *)fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
   sampbuf_t *buf = ctl->buf;
   float begin, end, length;

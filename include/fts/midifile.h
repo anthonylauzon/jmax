@@ -20,8 +20,6 @@
  *
  */
 
-#ifndef _FTS_MIDIFILE_H_
-#define _FTS_MIDIFILE_H_
 
 typedef struct _fts_midifile_ fts_midifile_t;
 
@@ -113,4 +111,3 @@ FTS_API int fts_midifile_write_meta_event(fts_midifile_t *file, int ticks, int t
 FTS_API void fts_midifile_write_tempo(fts_midifile_t *file, int tempo);
 
 
-#endif

@@ -121,12 +121,12 @@ ftl_fft_init(void)
 void
 ftl_fft_complex(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
-  float *out1 = (float *)fts_word_get_ptr(argv + 5);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
+  float *out1 = (float *)fts_word_get_pointer(argv + 5);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -178,12 +178,12 @@ ftl_fft_complex(fts_word_t *argv)
 void
 ftl_ifft_complex(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
-  float *out1 = (float *)fts_word_get_ptr(argv + 5);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
+  float *out1 = (float *)fts_word_get_pointer(argv + 5);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -236,11 +236,11 @@ ftl_ifft_complex(fts_word_t *argv)
 void
 ftl_fft_real(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *out0 = (float *)fts_word_get_ptr(argv + 3);
-  float *out1 = (float *)fts_word_get_ptr(argv + 4);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *out0 = (float *)fts_word_get_pointer(argv + 3);
+  float *out1 = (float *)fts_word_get_pointer(argv + 4);
   float *buf = (float *)(ctl->buf);
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -289,11 +289,11 @@ ftl_fft_real(fts_word_t *argv)
 void
 ftl_ifft_real(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -341,11 +341,11 @@ ftl_ifft_real(fts_word_t *argv)
 void
 ftl_fft_real_half(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *out0 = (float *)fts_word_get_ptr(argv + 3);
-  float *out1 = (float *)fts_word_get_ptr(argv + 4);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *out0 = (float *)fts_word_get_pointer(argv + 3);
+  float *out1 = (float *)fts_word_get_pointer(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -396,11 +396,11 @@ ftl_fft_real_half(fts_word_t *argv)
 void
 ftl_ifft_real_half(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -453,14 +453,14 @@ ftl_ifft_real_half(fts_word_t *argv)
 void
 ftl_fft_tandem(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
-  float *out1 = (float *)fts_word_get_ptr(argv + 5);
-  float *out2 = (float *)fts_word_get_ptr(argv + 6);
-  float *out3 = (float *)fts_word_get_ptr(argv + 7);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
+  float *out1 = (float *)fts_word_get_pointer(argv + 5);
+  float *out2 = (float *)fts_word_get_pointer(argv + 6);
+  float *out3 = (float *)fts_word_get_pointer(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -514,14 +514,14 @@ ftl_fft_tandem(fts_word_t *argv)
 void
 ftl_ifft_tandem(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *in2 = (float *)fts_word_get_ptr(argv + 4);
-  float *in3 = (float *)fts_word_get_ptr(argv + 5);
-  float *out0 = (float *)fts_word_get_ptr(argv + 6);
-  float *out1 = (float *)fts_word_get_ptr(argv + 7);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *in2 = (float *)fts_word_get_pointer(argv + 4);
+  float *in3 = (float *)fts_word_get_pointer(argv + 5);
+  float *out0 = (float *)fts_word_get_pointer(argv + 6);
+  float *out1 = (float *)fts_word_get_pointer(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -575,14 +575,14 @@ ftl_ifft_tandem(fts_word_t *argv)
 void
 ftl_fft_tandem_half(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
-  float *out1 = (float *)fts_word_get_ptr(argv + 5);
-  float *out2 = (float *)fts_word_get_ptr(argv + 6);
-  float *out3 = (float *)fts_word_get_ptr(argv + 7);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
+  float *out1 = (float *)fts_word_get_pointer(argv + 5);
+  float *out2 = (float *)fts_word_get_pointer(argv + 6);
+  float *out3 = (float *)fts_word_get_pointer(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -638,14 +638,14 @@ ftl_fft_tandem_half(fts_word_t *argv)
 void
 ftl_ifft_tandem_half(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *in2 = (float *)fts_word_get_ptr(argv + 4);
-  float *in3 = (float *)fts_word_get_ptr(argv + 5);
-  float *out0 = (float *)fts_word_get_ptr(argv + 6);
-  float *out1 = (float *)fts_word_get_ptr(argv + 7);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *in2 = (float *)fts_word_get_pointer(argv + 4);
+  float *in3 = (float *)fts_word_get_pointer(argv + 5);
+  float *out0 = (float *)fts_word_get_pointer(argv + 6);
+  float *out1 = (float *)fts_word_get_pointer(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -705,11 +705,11 @@ ftl_ifft_tandem_half(fts_word_t *argv)
 void
 ftl_fft_real_miller(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *out0 = (float *)fts_word_get_ptr(argv + 3);
-  float *out1 = (float *)fts_word_get_ptr(argv + 4);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *out0 = (float *)fts_word_get_pointer(argv + 3);
+  float *out1 = (float *)fts_word_get_pointer(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -758,11 +758,11 @@ ftl_fft_real_miller(fts_word_t *argv)
 void
 ftl_ifft_real_miller(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
   float *buf = (float *)ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -814,14 +814,14 @@ ftl_ifft_real_miller(fts_word_t *argv)
 void
 ftl_fft_tandem_miller(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *out0 = (float *)fts_word_get_ptr(argv + 4);
-  float *out1 = (float *)fts_word_get_ptr(argv + 5);
-  float *out2 = (float *)fts_word_get_ptr(argv + 6);
-  float *out3 = (float *)fts_word_get_ptr(argv + 7);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *out0 = (float *)fts_word_get_pointer(argv + 4);
+  float *out1 = (float *)fts_word_get_pointer(argv + 5);
+  float *out2 = (float *)fts_word_get_pointer(argv + 6);
+  float *out3 = (float *)fts_word_get_pointer(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;
@@ -876,14 +876,14 @@ ftl_fft_tandem_miller(fts_word_t *argv)
 void
 ftl_ifft_tandem_miller(fts_word_t *argv)
 {
-  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_ptr(argv + 0);
+  fft_ctl_t *ctl = (fft_ctl_t *)fts_word_get_pointer(argv + 0);
   int n_tick = (int)fts_word_get_int(argv + 1);
-  float *in0 = (float *)fts_word_get_ptr(argv + 2);
-  float *in1 = (float *)fts_word_get_ptr(argv + 3);
-  float *in2 = (float *)fts_word_get_ptr(argv + 4);
-  float *in3 = (float *)fts_word_get_ptr(argv + 5);
-  float *out0 = (float *)fts_word_get_ptr(argv + 6);
-  float *out1 = (float *)fts_word_get_ptr(argv + 7);
+  float *in0 = (float *)fts_word_get_pointer(argv + 2);
+  float *in1 = (float *)fts_word_get_pointer(argv + 3);
+  float *in2 = (float *)fts_word_get_pointer(argv + 4);
+  float *in3 = (float *)fts_word_get_pointer(argv + 5);
+  float *out0 = (float *)fts_word_get_pointer(argv + 6);
+  float *out1 = (float *)fts_word_get_pointer(argv + 7);
   complex *buf = ctl->buf;
   complex *spec = ctl->spec;
   int out_idx = ctl->out_idx;

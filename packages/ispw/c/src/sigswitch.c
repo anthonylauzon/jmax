@@ -49,9 +49,9 @@ typedef struct {
 static void
 call_ftl_subr_cond( fts_word_t *argv)
 {
-  int *x = (int *)fts_word_get_ptr(argv);
-  ftl_program_t *dsp_chain = (ftl_program_t *)fts_word_get_ptr(argv+1);
-  ftl_subroutine_t *subr = (ftl_subroutine_t *)fts_word_get_ptr(argv+2);
+  int *x = (int *)fts_word_get_pointer(argv);
+  ftl_program_t *dsp_chain = (ftl_program_t *)fts_word_get_pointer(argv+1);
+  ftl_subroutine_t *subr = (ftl_subroutine_t *)fts_word_get_pointer(argv+2);
 
   if (*x)
     ftl_program_call_subr( dsp_chain, subr);
@@ -63,7 +63,7 @@ sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sigswitch_t *this = (sigswitch_t *)o;
   fts_atom_t argv[3];
   char tmp[64];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
 
   sprintf( tmp, "switch_%d", switch_count);
   switch_count++;
@@ -72,8 +72,8 @@ sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   /* Add the call FTL subroutine conditionnally function */
   fts_set_ftl_data( argv, this->switch_ftl_data);
-  fts_set_ptr( argv+1, dsp_get_current_dsp_chain());
-  fts_set_ptr( argv+2, this->current);
+  fts_set_pointer( argv+1, dsp_get_current_dsp_chain());
+  fts_set_pointer( argv+2, this->current);
   dsp_add_funcall( switch_function, 3, argv);
 
   this->previous = ftl_program_set_current_subroutine( dsp_get_current_dsp_chain(), this->current);

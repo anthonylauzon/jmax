@@ -28,14 +28,14 @@
  * 
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mach-o/dyld.h> 
 
-#include <fts/fts.h>
 #include <ftsprivate/fpe.h>
 #include <ftsprivate/platform.h>
 

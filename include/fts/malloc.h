@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_MEM_H
-#define _FTS_MEM_H
 /* 
    This file include all the memory allocation tools provided by FTS.
 */
@@ -48,7 +46,6 @@ FTS_API void  fts_heap_free( void *p, fts_heap_t *heap);
 #define fts_heap_zalloc fts_heap_calloc
 
 
-#endif
 
 
 

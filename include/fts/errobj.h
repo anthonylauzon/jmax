@@ -20,9 +20,6 @@
  * 
  */
 
-#ifndef _FTS_ERROBJ_H_
-#define _FTS_ERROBJ_H_
-
 
 FTS_API fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at, const char *format, ...);
 
@@ -40,4 +37,3 @@ FTS_API void fts_runtime_error_handler_remove(fts_object_t *obj);
 
 FTS_API fts_object_t *runtime_error_handler;
 
-#endif

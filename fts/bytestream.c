@@ -20,7 +20,10 @@
  * 
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
+
+#include <string.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -80,8 +83,6 @@ typedef int socket_t;
 
 #endif
 
-#include <string.h>
-#include <fts/fts.h>
 
 /***********************************************************************
  *
@@ -483,10 +484,10 @@ static void fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_bytestream_set_output((fts_bytestream_t *) this, fts_pipestream_output, fts_pipestream_output_char, fts_pipestream_flush);
 
 #ifdef WIN32
-  if (ac == 2 && fts_is_ptr( at) && fts_is_ptr( at+1))
+  if (ac == 2 && fts_is_pointer( at) && fts_is_pointer( at+1))
     {
-      this->in = (HANDLE)fts_get_ptr( at);
-      this->out = (HANDLE)fts_get_ptr( at+1);
+      this->in = (HANDLE)fts_get_pointer( at);
+      this->out = (HANDLE)fts_get_pointer( at+1);
     }
   else
     {

@@ -111,7 +111,7 @@ dsaudioport_input( fts_word_t *argv)
 #endif
 
  
-  dev = (dsaudioport_t *) fts_word_get_ptr(argv+0);
+  dev = (dsaudioport_t *) fts_word_get_pointer(argv+0);
   if (dev->state != dsaudioport_running) {
     /* FIXME */
     return;
@@ -144,7 +144,7 @@ dsaudioport_input( fts_word_t *argv)
 				      (void*) &buf1, &bytes1, (void*) &buf2, &bytes2, 0);
 
   for (ch = 0; ch < channels; ch++) {
-    float *out = (float *) fts_word_get_ptr(argv + 2 + ch);
+    float *out = (float *) fts_word_get_pointer(argv + 2 + ch);
     
     for (i = 0, j = ch; i < n; i++, j += channels) {
       out[i] = (float) buf1[j] / 32767.0f;
@@ -165,7 +165,7 @@ dsaudioport_input( fts_word_t *argv)
 #else
 
   for (ch = 0; ch < channels; ch++) {
-    float *out = (float *) fts_word_get_ptr(argv + 2 + ch);
+    float *out = (float *) fts_word_get_pointer(argv + 2 + ch);
     
     for (i = 0, j = ch; i < n; i++, j += channels) {
       out[i] = 0.0f;
@@ -187,7 +187,7 @@ dsaudioport_output(fts_word_t *argv)
   DWORD bytes1, bytes2;    
   int boffset, soffset, n, channels, ch, i, j;
 
-  dev = (dsaudioport_t *) fts_word_get_ptr(argv+0);
+  dev = (dsaudioport_t *) fts_word_get_pointer(argv+0);
   if (dev->state != dsaudioport_running) {
     /* FIXME */
     return;
@@ -214,7 +214,7 @@ dsaudioport_output(fts_word_t *argv)
 
   /* Interleave the sample buffer into the output buffer */
   for (ch = 0; ch < channels; ch++) {
-    float *in = (float *) fts_word_get_ptr(argv + 2 + ch);
+    float *in = (float *) fts_word_get_pointer(argv + 2 + ch);
 
     for (i = 0, j = ch; i < n; i++, j += channels) {
       buf1[j] = (short) (32767.0f * in[i]);

@@ -402,7 +402,7 @@ static void alsa_input_32_mmap_ardour( fts_word_t *argv)
   alsaaudioport_t *port;
   int n, channels, ch, i;
   
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);
+  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);
   n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_input_channels( port);
 
@@ -411,7 +411,7 @@ static void alsa_input_32_mmap_ardour( fts_word_t *argv)
 
   for ( ch = 0; ch < channels; ch++)
     {
-      float *out = (float *) fts_word_get_ptr( argv + 2 + ch);
+      float *out = (float *) fts_word_get_pointer( argv + 2 + ch);
       long *mmap_buffer = (long *)port->capture.addr[ch][port->capture.current_period] + port->capture.count;
 
 #define DIV ((float)((1<<23) - 1))
@@ -427,7 +427,7 @@ static void alsa_output_32_mmap_ardour( fts_word_t *argv)
   alsaaudioport_t *port;
   int n, channels, ch, i;
   
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);
+  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);
   n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels( port);
 
@@ -436,7 +436,7 @@ static void alsa_output_32_mmap_ardour( fts_word_t *argv)
 
   for ( ch = 0; ch < channels; ch++)
     {
-      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);
+      float *in = (float *) fts_word_get_pointer( argv + 2 + ch);
       long *mmap_buffer = (long *)port->playback.addr[ch][port->playback.current_period] + port->playback.count;
 
       for ( i = 0; i < n; i++)
@@ -481,7 +481,7 @@ static void FUN_NAME( fts_word_t *argv)					\
   u_char *data;								\
   TYPE *buffer;								\
 									\
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);			\
+  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);			\
   n = fts_word_get_int(argv + 1);					\
   channels = fts_audioport_get_input_channels( port);			\
   buffer = (TYPE *)port->input_buffer;					\
@@ -508,7 +508,7 @@ static void FUN_NAME( fts_word_t *argv)					\
 									\
   for ( ch = 0; ch < channels; ch++)					\
     {									\
-      float *out = (float *) fts_word_get_ptr( argv + 2 + ch);		\
+      float *out = (float *) fts_word_get_pointer( argv + 2 + ch);		\
 									\
       j = ch;								\
       for ( i = 0; i < n; i++)						\
@@ -530,14 +530,14 @@ static void FUN_NAME( fts_word_t *argv)					\
   u_char *data;								\
   TYPE *buffer;								\
 									\
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);			\
+  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);			\
   n = fts_word_get_int(argv + 1);					\
   channels = fts_audioport_get_output_channels( port);			\
   buffer = (TYPE *)port->output_buffer;					\
 									\
   for ( ch = 0; ch < channels; ch++)					\
     {									\
-      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);		\
+      float *in = (float *) fts_word_get_pointer( argv + 2 + ch);		\
 									\
       j = ch;								\
       for ( i = 0; i < n; i++)						\
@@ -578,7 +578,7 @@ static void FUN_NAME( fts_word_t *argv)									\
   size_t count, result;											\
   u_char **buffers;											\
 													\
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);							\
+  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);							\
   n = fts_word_get_int(argv + 1);									\
   channels = fts_audioport_get_input_channels( port);							\
 													\
@@ -609,7 +609,7 @@ static void FUN_NAME( fts_word_t *argv)									\
   for ( ch = 0; ch < channels; ch++)									\
     {													\
       TYPE *buffer = ((TYPE **)port->input_buffer)[ch];							\
-      float *out = (float *) fts_word_get_ptr( argv + 2 + ch);						\
+      float *out = (float *) fts_word_get_pointer( argv + 2 + ch);						\
 													\
       for ( i = 0; i < n; i++)										\
         out[i] = (buffer[i] >> SHIFT) / CONV;								\
@@ -625,14 +625,14 @@ static void FUN_NAME( fts_word_t *argv)									\
   size_t count, result;											\
   u_char **buffers;											\
 													\
-  port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);							\
+  port = (alsaaudioport_t *)fts_word_get_pointer( argv+0);							\
   n = fts_word_get_int(argv + 1);									\
   channels = fts_audioport_get_output_channels( port);							\
 													\
   for ( ch = 0; ch < channels; ch++)									\
     {													\
       TYPE *buffer = ((TYPE **)port->output_buffer)[ch];						\
-      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);						\
+      float *in = (float *) fts_word_get_pointer( argv + 2 + ch);						\
 													\
       for ( i = 0; i < n; i++)										\
 	buffer[i] = ((TYPE) (CONV * in[i])) << SHIFT;							\

@@ -44,7 +44,7 @@ static fts_symbol_t symbol_new_aux( const char *s, int copy)
   /* Lookup symbol in the hash table */
   fts_set_string( &k, (char *)s);
   if ( fts_hashtable_get( &symbol_table, &k, &v))
-    return (fts_symbol_t)fts_get_ptr( &v);
+    return (fts_symbol_t)fts_get_pointer( &v);
 
   /* Symbol do not exist: copy the string if needed */
   if (copy)
@@ -53,8 +53,8 @@ static fts_symbol_t symbol_new_aux( const char *s, int copy)
     p = s;
 
   /* Add the new symbol in the hash table */
-  fts_set_ptr( &k, (char *)p);
-  fts_set_ptr( &v, (char *)p);
+  fts_set_pointer( &k, (char *)p);
+  fts_set_pointer( &v, (char *)p);
   fts_hashtable_put( &symbol_table, &k, &v);
 
   return (fts_symbol_t)p;

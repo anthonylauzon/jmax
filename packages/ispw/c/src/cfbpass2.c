@@ -225,7 +225,7 @@ static void
 sigcoef_bpass2_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
 
   this->srate = fts_dsp_get_input_srate(dsp, 0); /* get current srate at DSP 'on' time */
 

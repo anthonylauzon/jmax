@@ -45,10 +45,10 @@ static fts_symbol_t sym_clip = 0;
 static void
 ftl_clip(fts_word_t *argv)
 {
-  float min = *((float *)fts_word_get_ptr(argv + 0));
-  float max = *((float *)fts_word_get_ptr(argv + 1));
-  float *in = (float *)fts_word_get_ptr(argv + 2);
-  float *out = (float *)fts_word_get_ptr(argv + 3);
+  float min = *((float *)fts_word_get_pointer(argv + 0));
+  float max = *((float *)fts_word_get_pointer(argv + 1));
+  float *in = (float *)fts_word_get_pointer(argv + 2);
+  float *out = (float *)fts_word_get_pointer(argv + 3);
   int n_tick = fts_word_get_int(argv + 4);
   int i;
 
@@ -69,7 +69,7 @@ static void
 sigclip_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigclip_t *this = (sigclip_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[5];
 
   fts_set_ftl_data(argv + 0, this->ftl_data_min);

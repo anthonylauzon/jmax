@@ -52,7 +52,7 @@ get_keeper(fts_symbol_t s)
   fts_set_symbol( &k, s);
 
   if (fts_hashtable_get(&value_table, &k, &data))
-    v = (struct value_keeper *)fts_get_ptr(&data);
+    v = (struct value_keeper *)fts_get_pointer(&data);
   else
     {
       v = (struct value_keeper *) fts_malloc(sizeof(struct value_keeper));
@@ -60,7 +60,7 @@ get_keeper(fts_symbol_t s)
       v->count = 0;
       fts_set_int(&(v->atom), 0);
 
-      fts_set_ptr(&data, v);
+      fts_set_pointer(&data, v);
       fts_hashtable_put(&value_table, &k, &data);
     }
 

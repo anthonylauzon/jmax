@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_PACKAGE_H_
-#define _FTS_PACKAGE_H_
 
 /***********************************************
  *
@@ -128,6 +126,5 @@ FTS_API char* fts_package_get_error(fts_package_t* pkg);
  * @ingroup package */
 FTS_API void fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_t* iter);
 
-#endif /* _FTS_PACKAGE_H_ */
 
 

@@ -94,7 +94,7 @@ fts_list_remove(fts_list_t *list, const fts_atom_t *data)
   tmp = list;
 
   while (tmp) {
-    if (fts_atom_are_equals(&tmp->data, data)) {
+    if (fts_atom_equals(&tmp->data, data)) {
       if (prev) {
 	prev->next = tmp->next;
       }

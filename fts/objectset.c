@@ -59,7 +59,7 @@ fts_objectset_add( fts_objectset_t *set, fts_object_t *object)
   int exits_already;
   fts_atom_t a[1];
 
-  fts_set_ptr( &k, object);
+  fts_set_pointer( &k, object);
   fts_set_void( &v);
   exits_already = fts_hashtable_put( &set->hashtable, &k, &v);
 
@@ -80,7 +80,7 @@ fts_objectset_remove( fts_objectset_t *set, fts_object_t *object)
   fts_atom_t k;
   fts_atom_t a[1];
 
-  fts_set_ptr( &k, object);
+  fts_set_pointer( &k, object);
   fts_hashtable_remove( &set->hashtable, &k);
   
   fts_set_object(&a[0], object);

@@ -122,7 +122,7 @@ preset_remove(preset_t *this, const fts_atom_t *key)
 
   if(fts_hashtable_get(&this->hash, key, &value))
     {
-      fts_object_t **clones = (fts_object_t **)fts_get_ptr(&value);
+      fts_object_t **clones = (fts_object_t **)fts_get_pointer(&value);
       int i;
 
       for(i=0; i<this->n_objects; i++)
@@ -143,7 +143,7 @@ preset_get_or_add(preset_t *this, const fts_atom_t *key)
     {
       int i;
 
-      clones = (fts_object_t **)fts_get_ptr(&value);
+      clones = (fts_object_t **)fts_get_pointer(&value);
 
       for(i=0; i<this->n_objects; i++)
 	{
@@ -160,7 +160,7 @@ preset_get_or_add(preset_t *this, const fts_atom_t *key)
       for(i=0; i<this->n_objects; i++)
 	clones[i] = 0;
 
-      fts_set_ptr(&value, (void *)clones);
+      fts_set_pointer(&value, (void *)clones);
       fts_hashtable_put(&this->hash, key, &value);
     }
 
@@ -234,7 +234,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if(fts_hashtable_get(&this->hash, at, &a))
 	{
 	  /* overwrite existing preset */
-	  clones = (fts_object_t **)fts_get_ptr(&a);
+	  clones = (fts_object_t **)fts_get_pointer(&a);
 	  
 	  for(i=0; i<this->n_objects; i++)
 	    {
@@ -271,7 +271,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    }
 
 	  /* store new preset */
-	  fts_set_ptr(&a, (void *)clones);
+	  fts_set_pointer(&a, (void *)clones);
 	  fts_hashtable_put(&this->hash, at, &a);
 	}
     }
@@ -288,7 +288,7 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       if(fts_hashtable_get(&this->hash, at, &a))
 	{
-	  fts_object_t **clones = fts_get_ptr(&a);
+	  fts_object_t **clones = fts_get_pointer(&a);
 	  int i, j;
 	  
 	  for(i=0; i<this->n_objects; i++)
@@ -355,7 +355,7 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_iterator_next( &iterator, &key);
       fts_hashtable_get(&this->hash, &key, &a);
       
-      clones = (fts_object_t **)fts_get_ptr(&a);
+      clones = (fts_object_t **)fts_get_pointer(&a);
       
       /* dump preset message */
       fts_dumper_send(dumper, sym_new_preset, 1, &key);

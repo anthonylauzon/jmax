@@ -85,7 +85,7 @@ void
 tilda_put_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   tilda_t *this = (tilda_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   float cr = fts_dsp_get_output_srate(dsp, 0) / n_tick;
   fts_atom_t a[3];
@@ -102,7 +102,7 @@ tilda_put_ramp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   tilda_t *this = (tilda_t *)o;
   fts_ramp_t *ramp = (fts_ramp_t *)ftl_data_get_ptr(this->data);  
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   float cr = fts_dsp_get_output_srate(dsp, 0) / n_tick;
   fts_atom_t a[3];
@@ -120,8 +120,8 @@ tilda_put_ramp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 tilda_ftl_const(fts_word_t *argv)
 {
-  float *c = (float *)fts_word_get_ptr(argv + 0);
-  float *out = (float *) fts_word_get_ptr(argv + 1);
+  float *c = (float *)fts_word_get_pointer(argv + 0);
+  float *out = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   int i;
   
@@ -132,8 +132,8 @@ tilda_ftl_const(fts_word_t *argv)
 static void
 tilda_ftl_ramp(fts_word_t *argv)
 {
-  fts_ramp_t *ramp = (fts_ramp_t *) fts_word_get_ptr(argv + 0);
-  float *out = (float *) fts_word_get_ptr(argv + 1);
+  fts_ramp_t *ramp = (fts_ramp_t *) fts_word_get_pointer(argv + 0);
+  float *out = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   int i;
   

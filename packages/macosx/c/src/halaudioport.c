@@ -129,7 +129,7 @@ static void halaudioport_output( fts_word_t *argv)
   halaudioport_t *this;
   int n, channels, ch, i, j;
 
-  this = (halaudioport_t *)fts_word_get_ptr( argv+0);
+  this = (halaudioport_t *)fts_word_get_pointer( argv+0);
   n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels( (fts_audioport_t *)this);
 
@@ -145,7 +145,7 @@ static void halaudioport_output( fts_word_t *argv)
   /* then store the data and increment the write pointer */
   for ( ch = 0; ch < channels; ch++)
     {
-      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);
+      float *in = (float *) fts_word_get_pointer( argv + 2 + ch);
     
       j = this->fifo->write_index + ch;
       for ( i = 0; i < n; i++)

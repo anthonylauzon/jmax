@@ -63,14 +63,14 @@ static void
 play_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_fvec_t *this = (play_fvec_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   double sr = fts_dsp_get_output_srate(dsp, 0);
   fts_atom_t a[3];
 
   play_fvec_reset(this, n_tick, sr);
 
-  fts_set_ptr(a + 0, &this->play);
+  fts_set_pointer(a + 0, &this->play);
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
@@ -80,8 +80,8 @@ play_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 play_fvec_ftl(fts_word_t *argv)
 {
-  signal_play_t *this = (signal_play_t *) fts_word_get_ptr(argv + 0);
-  float *out = (float *) fts_word_get_ptr(argv + 1);
+  signal_play_t *this = (signal_play_t *) fts_word_get_pointer(argv + 0);
+  float *out = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   fvec_t *fvec = (fvec_t *)this->object;
   float *buf = fvec_get_ptr(fvec);

@@ -314,9 +314,9 @@ void pt_common_dsp_fun_put(pt_common_obj_t *x, fts_dsp_descr_t *dsp) /* to set p
 
 void pt_common_dsp_function(fts_word_t *a)
 {
-  pt_common_obj_t *x = (pt_common_obj_t *)fts_word_get_ptr(a);
-  analysis_t analysis = (analysis_t)fts_word_get_fun(a+1);
-  float *in = (float *)fts_word_get_ptr(a+2);
+  pt_common_obj_t *x = (pt_common_obj_t *)fts_word_get_pointer(a);
+  analysis_t analysis = (analysis_t)fts_word_get_pointer(a+1);
+  float *in = (float *)fts_word_get_pointer(a+2);
   long n = fts_word_get_int(a+3);
   int i;
 

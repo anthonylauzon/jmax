@@ -20,12 +20,8 @@
  * 
  */
 
-#ifndef _FTS_PARAM_H_
-#define _FTS_PARAM_H_
-
 typedef void (* fts_param_listener_fun_t) (void *listener, fts_symbol_t name,
 					   const fts_atom_t *value);
-
 
 FTS_API void fts_param_set(fts_symbol_t name, const fts_atom_t *value);
 FTS_API void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *author);
@@ -47,4 +43,3 @@ FTS_API void fts_param_set_int_by(fts_symbol_t name,    int value, void *author)
 FTS_API void fts_param_set_symbol(fts_symbol_t name, fts_symbol_t value);
 FTS_API void fts_param_set_symbol_by(fts_symbol_t name, fts_symbol_t value, void *author);
 
-#endif

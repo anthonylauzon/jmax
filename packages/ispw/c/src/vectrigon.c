@@ -48,8 +48,8 @@ typedef struct
 static void
 ftl_sin (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -60,8 +60,8 @@ ftl_sin (fts_word_t *argv )
 static void
 ftl_cos (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -72,8 +72,8 @@ ftl_cos (fts_word_t *argv )
 static void
 ftl_tan (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -84,8 +84,8 @@ ftl_tan (fts_word_t *argv )
 static void
 ftl_asin (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -96,8 +96,8 @@ ftl_asin (fts_word_t *argv )
 static void
 ftl_acos (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -108,8 +108,8 @@ ftl_acos (fts_word_t *argv )
 static void
 ftl_atan (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -120,8 +120,8 @@ ftl_atan (fts_word_t *argv )
 static void
 ftl_sinh (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -132,8 +132,8 @@ ftl_sinh (fts_word_t *argv )
 static void
 ftl_cosh (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -144,8 +144,8 @@ ftl_cosh (fts_word_t *argv )
 static void
 ftl_tanh (fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -167,55 +167,55 @@ vectrigon_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 static void 
 sin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sin_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sin_symbol);
 }
 
 static void 
 cos_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), cos_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), cos_symbol);
 }
 
 static void 
 tan_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), tan_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), tan_symbol);
 }
 
 static void 
 asin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), asin_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), asin_symbol);
 }
 
 static void 
 acos_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), acos_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), acos_symbol);
 }
 
 static void 
 atan_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), atan_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), atan_symbol);
 }
 
 static void 
 sinh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), sinh_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sinh_symbol);
 }
 
 static void 
 cosh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), cosh_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), cosh_symbol);
 }
 
 static void 
 tanh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), tanh_symbol);
+  vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), tanh_symbol);
 }
 
 /************************************************

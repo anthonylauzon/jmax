@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_FPE_H_
-#define _FTS_FPE_H_
 
 FTS_API void fts_enable_fpe_traps( void);
 FTS_API void fts_disable_fpe_traps( void);
@@ -42,4 +40,3 @@ FTS_API void fts_fpe_start_collect(fts_objectset_t *set);
 FTS_API void fts_fpe_stop_collect(void);
 FTS_API void fts_fpe_empty_collection(void);
 
-#endif

@@ -145,7 +145,7 @@ static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
   fts_set_symbol( &k, name);
   if (fts_hashtable_get(&abstraction_table, &k, &a))
     {
-      fts_abstraction_t *abs = (fts_abstraction_t *) fts_get_ptr(&a);
+      fts_abstraction_t *abs = (fts_abstraction_t *) fts_get_pointer(&a);
 
       file = fopen(fts_symbol_name(abs->filename), "rb");
 

@@ -217,7 +217,7 @@ pbank_data_get(fts_symbol_t name, int n, int m)
   if (name && fts_hashtable_get(&pbank_data_table, &k, &atom))
     {
       /* data found by name , check its dimension and reference it */
-      pbank_data_t *data = (pbank_data_t *) fts_get_ptr(&atom);
+      pbank_data_t *data = (pbank_data_t *) fts_get_pointer(&atom);
 
       if(data->n != n || data->m != m)
 	{
@@ -270,7 +270,7 @@ pbank_data_get(fts_symbol_t name, int n, int m)
 
 	  /* record in name table */
 	  fts_set_symbol( &k, name);
-	  fts_set_ptr(&atom, data);
+	  fts_set_pointer(&atom, data);
 	  fts_hashtable_put(&pbank_data_table, &k, &atom);
 
 	  /* read in data from file (at least try it) */

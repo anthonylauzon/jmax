@@ -74,7 +74,7 @@ static void
 timebase_entry_free(timebase_entry_t *entry)
 {
   fts_object_release(entry->object);
-  fts_atom_void(&entry->atom);
+  fts_atom_assign( &entry->atom, fts_null);
   fts_heap_free(entry, timebase_entry_heap);
 }
 

@@ -273,7 +273,7 @@ signal_play_class_register(fts_symbol_t name, fts_instantiate_fun_t fun)
   fts_atom_t k, v;
 
   fts_set_symbol( &k, name);
-  fts_set_fun(&v, (fts_fun_t)fun);
+  fts_set_pointer(&v, fun);
   fts_hashtable_put(&signal_play_class_table, &k, &v);
 }
 
@@ -327,7 +327,7 @@ signal_play_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_set_symbol( &k, name);
   if(fts_hashtable_get( &signal_play_class_table, &k, &a))
     {
-      fts_instantiate_fun_t fun = (fts_instantiate_fun_t)fts_get_fun(&a);
+      fts_instantiate_fun_t fun = (fts_instantiate_fun_t)fts_get_pointer(&a);
       
       return fun(cl, ac, at);
     }

@@ -154,7 +154,7 @@ static void
 throw_tilda_bus_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   access_tilda_bus_t *this = (access_tilda_bus_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_signal_bus_t *bus = *((fts_signal_bus_t **)ftl_data_get_ptr(this->bus));
   int n_channels = this->n_channels;
@@ -198,8 +198,8 @@ throw_tilda_bus_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 throw_tilda_write_to_bus(fts_word_t *a)
 {
-  fts_signal_bus_t *bus = *((fts_signal_bus_t **)fts_word_get_ptr(a + 0));
-  int toggle = *((int *)fts_word_get_ptr(a + 1));
+  fts_signal_bus_t *bus = *((fts_signal_bus_t **)fts_word_get_pointer(a + 0));
+  int toggle = *((int *)fts_word_get_pointer(a + 1));
   int first_connection = fts_word_get_int(a + 2);
   int last_connection = fts_word_get_int(a + 3);
   int n_tick = fts_word_get_int(a + 4);
@@ -212,7 +212,7 @@ throw_tilda_write_to_bus(fts_word_t *a)
   
   for(i=first_connection; i<=last_connection; i++)
     {
-      float *input = (float *)fts_word_get_ptr(a + 5 + i);
+      float *input = (float *)fts_word_get_pointer(a + 5 + i);
       float *write = buffer + i * n_tick;
 
       for(j=0; j<n_tick; j++)
@@ -224,7 +224,7 @@ static void
 throw_tilda_channel_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   access_tilda_channel_t *this = (access_tilda_channel_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[7];
 
@@ -245,12 +245,12 @@ throw_tilda_channel_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void
 throw_tilda_write_to_channel(fts_word_t *a)
 {
-  int toggle = *((int *)fts_word_get_ptr(a + 2));
-  int channel = *((int *)fts_word_get_ptr(a + 3));
+  int toggle = *((int *)fts_word_get_pointer(a + 2));
+  int channel = *((int *)fts_word_get_pointer(a + 3));
   int n_channels = fts_word_get_int(a + 4);
   int n_tick = fts_word_get_int(a + 5);
-  float *input = (float *)fts_word_get_ptr(a + 6);
-  float *buffer = (float *)fts_word_get_ptr(a + toggle);
+  float *input = (float *)fts_word_get_pointer(a + 6);
+  float *buffer = (float *)fts_word_get_pointer(a + toggle);
   float *write = buffer + channel * n_tick;
   int i;
 
@@ -316,7 +316,7 @@ static void
 catch_tilda_bus_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   access_tilda_bus_t *this = (access_tilda_bus_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   fts_signal_bus_t *bus = *((fts_signal_bus_t **)ftl_data_get_ptr(this->bus));
   int n_channels = this->n_channels;
@@ -339,8 +339,8 @@ catch_tilda_bus_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 catch_tilda_read_from_bus(fts_word_t *a)
 {
-  fts_signal_bus_t *bus = *((fts_signal_bus_t **)fts_word_get_ptr(a + 0));
-  int toggle = *((int *)fts_word_get_ptr(a + 1));
+  fts_signal_bus_t *bus = *((fts_signal_bus_t **)fts_word_get_pointer(a + 0));
+  int toggle = *((int *)fts_word_get_pointer(a + 1));
   int n_channels = fts_word_get_int(a + 2);
   int n_tick = fts_word_get_int(a + 3);
   float *buffer = fts_signal_bus_get_buffer(bus, 1 - toggle);
@@ -351,7 +351,7 @@ catch_tilda_read_from_bus(fts_word_t *a)
     {
       for(i=0; i<n_channels; i++)
 	{
-	  float *output = (float *)fts_word_get_ptr(a + 4 + i);
+	  float *output = (float *)fts_word_get_pointer(a + 4 + i);
 	  float *read = buffer + i * n_tick;
 	  
 	  for(j=0; j<n_tick; j++)
@@ -362,7 +362,7 @@ catch_tilda_read_from_bus(fts_word_t *a)
     {
       for(i=0; i<bus_channels; i++)
 	{
-	  float *output = (float *)fts_word_get_ptr(a + 4 + i);
+	  float *output = (float *)fts_word_get_pointer(a + 4 + i);
 	  float *read = buffer + i * n_tick;
 	  
 	  for(j=0; j<n_tick; j++)
@@ -371,7 +371,7 @@ catch_tilda_read_from_bus(fts_word_t *a)
 
       for(; i<n_channels; i++)
 	{
-	  float *output = (float *)fts_word_get_ptr(a + 4 + i);
+	  float *output = (float *)fts_word_get_pointer(a + 4 + i);
 	  
 	  for(j=0; j<n_tick; j++)
 	    output[j] = 0.0;
@@ -383,7 +383,7 @@ static void
 catch_tilda_channel_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   access_tilda_channel_t *this = (access_tilda_channel_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   int n_channels = fts_signal_bus_get_size(this->bus);
   fts_atom_t a[7];
@@ -402,12 +402,12 @@ catch_tilda_channel_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void
 catch_tilda_read_from_channel(fts_word_t *a)
 {
-  int toggle = *((int *)fts_word_get_ptr(a + 2));
-  int channel = *((int *)fts_word_get_ptr(a + 3));
+  int toggle = *((int *)fts_word_get_pointer(a + 2));
+  int channel = *((int *)fts_word_get_pointer(a + 3));
   int n_channels = fts_word_get_int(a + 4);
   int n_tick = fts_word_get_int(a + 5);
-  float *output = (float *)fts_word_get_ptr(a + 6);
-  float *buffer = (float *)fts_word_get_ptr(a + 1 - toggle);
+  float *output = (float *)fts_word_get_pointer(a + 6);
+  float *buffer = (float *)fts_word_get_pointer(a + 1 - toggle);
   float *read = buffer + channel * n_tick;
   int i;
 
@@ -483,7 +483,7 @@ static void
 bus_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bus_tilda_t *this = (bus_tilda_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   int n_channels = fts_signal_bus_get_size(this->bus);
   int write_read = 0;
@@ -533,16 +533,16 @@ bus_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 bus_tilda_write(fts_word_t *a)
 {
-  int toggle = *((int *)fts_word_get_ptr(a + 2));
+  int toggle = *((int *)fts_word_get_pointer(a + 2));
   int n_channels = fts_word_get_int(a + 3);
   int n_tick = fts_word_get_int(a + 4);
-  float *write_buffer = (float *)fts_word_get_ptr(a + toggle);
+  float *write_buffer = (float *)fts_word_get_pointer(a + toggle);
   fts_word_t *ins = a + 5;
   int i, j;
 
   for(i=0; i<n_channels; i++)
     {
-      float *input = (float *)fts_word_get_ptr(ins + i);
+      float *input = (float *)fts_word_get_pointer(ins + i);
       float *write = write_buffer + i * n_tick;
 
       for(j=0; j<n_tick; j++)
@@ -553,16 +553,16 @@ bus_tilda_write(fts_word_t *a)
 static void
 bus_tilda_read(fts_word_t *a)
 {
-  int toggle = *((int *)fts_word_get_ptr(a + 2));
+  int toggle = *((int *)fts_word_get_pointer(a + 2));
   int n_channels = fts_word_get_int(a + 3);
   int n_tick = fts_word_get_int(a + 4);
-  float *read_buffer = (float *)fts_word_get_ptr(a + 1 - toggle);
+  float *read_buffer = (float *)fts_word_get_pointer(a + 1 - toggle);
   fts_word_t *outs = a + 5;
   int i, j;
 
   for(i=0; i<n_channels; i++)
     {
-      float *output = (float *)fts_word_get_ptr(outs + i);
+      float *output = (float *)fts_word_get_pointer(outs + i);
       float *read = read_buffer + i * n_tick;
 
       for(j=0; j<n_tick; j++)
@@ -573,18 +573,18 @@ bus_tilda_read(fts_word_t *a)
 static void
 bus_tilda_write_and_read(fts_word_t *a)
 {
-  int toggle = *((int *)fts_word_get_ptr(a + 2));
+  int toggle = *((int *)fts_word_get_pointer(a + 2));
   int n_channels = fts_word_get_int(a + 3);
   int n_tick = fts_word_get_int(a + 4);
-  float *write_buffer = (float *)fts_word_get_ptr(a + toggle);
-  float *read_buffer = (float *)fts_word_get_ptr(a + 1 - toggle);
+  float *write_buffer = (float *)fts_word_get_pointer(a + toggle);
+  float *read_buffer = (float *)fts_word_get_pointer(a + 1 - toggle);
   fts_word_t *ins = a + 5;
   fts_word_t *outs = a + 5 + n_channels;
   int i, j;
 
   for(i=0; i<n_channels; i++)
     {
-      float *input = (float *)fts_word_get_ptr(ins + i);
+      float *input = (float *)fts_word_get_pointer(ins + i);
       float *write = write_buffer + i * n_tick;
 
       for(j=0; j<n_tick; j++)
@@ -593,7 +593,7 @@ bus_tilda_write_and_read(fts_word_t *a)
 
   for(i=0; i<n_channels; i++)
     {
-      float *output = (float *)fts_word_get_ptr(outs + i);
+      float *output = (float *)fts_word_get_pointer(outs + i);
       float *read = read_buffer + i * n_tick;
 
       for(j=0; j<n_tick; j++)

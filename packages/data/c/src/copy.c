@@ -19,8 +19,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-#include <ftsconfig.h>
 #include <fts/fts.h>
+#include <ftsconfig.h>
+
 #include "vec.h"
 #include "ivec.h"
 #include "fvec.h"

@@ -47,7 +47,7 @@ sampbuf_get(fts_symbol_t name)
   
   fts_set_symbol( &k, name);
   if(fts_hashtable_get( &the_sampbuf_hashtable, &k, &data))
-    return (sampbuf_t *) fts_get_ptr(&data);
+    return (sampbuf_t *) fts_get_pointer(&data);
   else
     return 0;
 }
@@ -67,7 +67,7 @@ sampbuf_add(fts_symbol_t name, sampbuf_t *buf)
   fts_atom_t data, k;
 
   fts_set_symbol( &k, name);
-  fts_set_ptr(&data, buf);
+  fts_set_pointer(&data, buf);
   fts_hashtable_put(&the_sampbuf_hashtable, &k, &data);
 }
 

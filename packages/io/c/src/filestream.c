@@ -24,11 +24,6 @@
  *
  */
 #include <fts/fts.h>
-#include <ftsconfig.h>
-
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 #include <string.h>
 #include <fcntl.h>

@@ -20,9 +20,6 @@
  *
  */
 
-#ifndef _FTS_POST_H_
-#define _FTS_POST_H_
-
 /* definition file for logging functions (post and co) */
 
 FTS_API void post_vector(int n, float *fp);
@@ -35,7 +32,6 @@ FTS_API void post_error(fts_object_t *obj, const char *format , ...);
 FTS_API void fts_log(char* fmt, ...);
 FTS_API void fts_log_atoms( int ac, const fts_atom_t *at);
 
-#endif
 
 
 

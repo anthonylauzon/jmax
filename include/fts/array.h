@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_ARRAY_H_
-#define _FTS_ARRAY_H_
 
 /**
  * Array
@@ -199,4 +197,12 @@ FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at
 #define fts_array_check_index(array, index)  (((index) >= 0) && ((index) < (array)->size))
 
 
-#endif
+/* ??? */
+#define fts_set_array(p, x) \
+  do {fts_atom_type(p) = FTS_T_ARRAY; fts_word_set_object(fts_atom_value(p), (fts_object_t *)(x));} while (0)
+#define fts_get_array(p) ((fts_array_t *)fts_word_get_object(fts_atom_value(p)))
+#define fts_is_array(p) (fts_is_a(p, fts_s_array))
+
+
+
+

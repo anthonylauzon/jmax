@@ -74,8 +74,8 @@ static void cheese_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
 static void ftl_cheese(fts_word_t *argv)
 {
-  float *in      = (float *)fts_word_get_ptr(argv);
-  cheese_t *this = (cheese_t *)fts_word_get_ptr(argv + 1);
+  float *in      = (float *)fts_word_get_pointer(argv);
+  cheese_t *this = (cheese_t *)fts_word_get_pointer(argv + 1);
   long vs        = fts_word_get_int(argv + 2);
   int i;
 
@@ -98,11 +98,11 @@ static void cheese_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   cheese_t *this = ((cheese_t *)o);
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   int vs = fts_dsp_get_input_size(dsp, 0);
   
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-  fts_set_ptr(argv + 1, o);
+  fts_set_pointer(argv + 1, o);
   fts_set_long(argv + 2, vs);
   dsp_add_funcall(cheese_dsp_function, 3, argv);
 }

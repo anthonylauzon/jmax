@@ -56,7 +56,7 @@ static fts_ffun_t *ffun_get_by_name( fts_symbol_t name)
 
   fts_set_symbol( &n, name);
   if ( fts_hashtable_get( &the_fts_ffun_hashtable, &n, &a))
-    return fts_get_ptr( &a);
+    return fts_get_pointer( &a);
   else
     return 0;
 }
@@ -113,7 +113,7 @@ void fts_ffun_new( fts_symbol_t name, float (*function)(float))
   ffun->tables = 0;
       
   fts_set_symbol( &n, name);
-  fts_set_ptr( &a, ffun);
+  fts_set_pointer( &a, ffun);
   fts_hashtable_put( &the_fts_ffun_hashtable, &n, &a);
 }
 

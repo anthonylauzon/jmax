@@ -20,9 +20,6 @@
  * 
  */
 
-#ifndef _FTS_HASHTABLE_H_
-#define _FTS_HASHTABLE_H_
-
 /**
  * Hashtable
  *
@@ -175,4 +172,3 @@ FTS_API void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i
  */
 FTS_API void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i);
 
-#endif

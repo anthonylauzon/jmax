@@ -98,7 +98,7 @@ tabpeek_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   tabpeek_t *this = (tabpeek_t *)o;
   fts_atom_t argv[4];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   sampbuf_t **data = (sampbuf_t **)ftl_data_get_ptr(this->ftl_data);
   
   if(this->tab_name)
@@ -125,9 +125,9 @@ tabpeek_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 ftl_tabpeek(fts_word_t *argv)
 {
-  sampbuf_t **data = (sampbuf_t **)fts_word_get_ptr(argv + 0);
-  float *in = (float *)fts_word_get_ptr(argv + 1);
-  float *out = (float *)fts_word_get_ptr(argv + 2);
+  sampbuf_t **data = (sampbuf_t **)fts_word_get_pointer(argv + 0);
+  float *in = (float *)fts_word_get_pointer(argv + 1);
+  float *out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   sampbuf_t *buf = *data;
   float *tab = buf->samples;

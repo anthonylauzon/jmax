@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+
 #include "vec.h"
 #include "ivec.h"
 #include "fvec.h"

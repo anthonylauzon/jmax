@@ -31,7 +31,7 @@ static fts_symbol_t noise_dsp_symbol = 0;
 static void
 noise_dsp_function(fts_word_t *argv)
 {
-  float *out = (float *)fts_word_get_ptr(argv);
+  float *out = (float *)fts_word_get_pointer(argv);
   long int n = fts_word_get_int(argv+1);
   int i;
 
@@ -44,7 +44,7 @@ noise_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   noise_t *this = (noise_t *) o;
   fts_atom_t argv[2];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
 
   fts_set_symbol (argv,   fts_dsp_get_output_name(dsp, 0));
   fts_set_int   (argv+1, fts_dsp_get_input_size(dsp, 0));

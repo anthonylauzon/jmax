@@ -20,11 +20,8 @@
  * 
  */
 
-#ifndef _FTS_STATUS_H_
-#define _FTS_STATUS_H_
-
 /* General status return values for FTS. */
-struct _fts_status_description_t {
+struct fts_status_description {
   const char *description;
 };
 
@@ -32,4 +29,3 @@ struct _fts_status_description_t {
 
 #define fts_status_get_description(s) ((s)->description)
 
-#endif

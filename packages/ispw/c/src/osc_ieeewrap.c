@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+
 #include <utils.h>
 #include "wavetab.h"
 #include "osc.h"
@@ -155,9 +156,9 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 static void
 osc_ftl_fun_phase(fts_word_t *argv)
 {
-  float * restrict phase = (float *) fts_word_get_ptr(argv + 0);
-  float * restrict out   = (float *) fts_word_get_ptr(argv + 1);
-  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_ptr(argv + 2);
+  float * restrict phase = (float *) fts_word_get_pointer(argv + 0);
+  float * restrict out   = (float *) fts_word_get_pointer(argv + 1);
+  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   wavetab_samp_t * restrict tab;
   int i;
@@ -185,8 +186,8 @@ osc_ftl_fun_phase(fts_word_t *argv)
 static void
 osc_ftl_fun_phase_inplace(fts_word_t *argv)
 {
-  float * restrict sig = (float *) fts_word_get_ptr(argv + 0);
-  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_ptr(argv + 1);
+  float * restrict sig = (float *) fts_word_get_pointer(argv + 0);
+  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   wavetab_samp_t * restrict tab;
   int i;
@@ -216,9 +217,9 @@ osc_ftl_fun_phase_inplace(fts_word_t *argv)
 static void
 osc_ftl_fun_phase_64(fts_word_t *argv)
 {
-  float * restrict phase = (float *) fts_word_get_ptr(argv + 0);
-  float * restrict out   = (float *) fts_word_get_ptr(argv + 1);
-  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_ptr(argv + 2);
+  float * restrict phase = (float *) fts_word_get_pointer(argv + 0);
+  float * restrict out   = (float *) fts_word_get_pointer(argv + 1);
+  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_pointer(argv + 2);
   wavetab_samp_t * restrict tab;
   int i;
 
@@ -245,8 +246,8 @@ osc_ftl_fun_phase_64(fts_word_t *argv)
 static void
 osc_ftl_fun_phase_64_inplace(fts_word_t *argv)
 {
-  float * restrict sig = (float *) fts_word_get_ptr(argv + 0);
-  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_ptr(argv + 1);
+  float * restrict sig = (float *) fts_word_get_pointer(argv + 0);
+  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_pointer(argv + 1);
   wavetab_samp_t * restrict tab;
   int i;
 
@@ -272,9 +273,9 @@ osc_ftl_fun_phase_64_inplace(fts_word_t *argv)
 static void
 osc_ftl_fun_freq(fts_word_t *argv)
 {
-  float * restrict freq = (float *) fts_word_get_ptr(argv + 0);
-  float * restrict out  = (float *) fts_word_get_ptr(argv + 1);
-  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_ptr(argv + 2);
+  float * restrict freq = (float *) fts_word_get_pointer(argv + 0);
+  float * restrict out  = (float *) fts_word_get_pointer(argv + 1);
+  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   wavetab_samp_t * restrict tab = this->table;
   fts_wrapper_t phi;
@@ -304,8 +305,8 @@ osc_ftl_fun_freq(fts_word_t *argv)
 static void
 osc_ftl_fun_freq_inplace(fts_word_t *argv)
 {
-  float * restrict inout = (float *) fts_word_get_ptr(argv + 0);
-  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_ptr(argv + 1);
+  float * restrict inout = (float *) fts_word_get_pointer(argv + 0);
+  osc_ftl_t * restrict this = (osc_ftl_t *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   wavetab_samp_t * restrict  tab = this->table;
   fts_wrapper_t phi;
@@ -335,10 +336,10 @@ osc_ftl_fun_freq_inplace(fts_word_t *argv)
 static void
 osc_ftl_fun(fts_word_t *argv)
 {
-  float *freq  = (float *) fts_word_get_ptr(argv + 0);
-  float *phase = (float *) fts_word_get_ptr(argv + 1);
-  float *out   = (float *) fts_word_get_ptr(argv + 2);
-  osc_ftl_t *this = (osc_ftl_t *)fts_word_get_ptr(argv + 3);
+  float *freq  = (float *) fts_word_get_pointer(argv + 0);
+  float *phase = (float *) fts_word_get_pointer(argv + 1);
+  float *out   = (float *) fts_word_get_pointer(argv + 2);
+  osc_ftl_t *this = (osc_ftl_t *)fts_word_get_pointer(argv + 3);
   int n = fts_word_get_int(argv + 4);
   wavetab_samp_t *tab = this->table;
   fts_wrapper_t phi;

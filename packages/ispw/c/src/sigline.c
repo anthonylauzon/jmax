@@ -46,8 +46,8 @@ typedef struct
 
 static void ftl_line(fts_word_t *argv)
 {
-  float * restrict fp = (float *)fts_word_get_ptr(argv);
-  line_control_t * restrict lctl = (line_control_t *)fts_word_get_ptr(argv+1);
+  float * restrict fp = (float *)fts_word_get_pointer(argv);
+  line_control_t * restrict lctl = (line_control_t *)fts_word_get_pointer(argv+1);
   long int n = fts_word_get_int(argv+2);
 
   if (lctl->steps > 0)
@@ -80,8 +80,8 @@ static void ftl_line(fts_word_t *argv)
 
 static void ftl_line_64(fts_word_t *argv)
 {
-  float * restrict fp = (float *)fts_word_get_ptr(argv);
-  line_control_t * restrict lctl = (line_control_t *)fts_word_get_ptr(argv+1);
+  float * restrict fp = (float *)fts_word_get_pointer(argv);
+  line_control_t * restrict lctl = (line_control_t *)fts_word_get_pointer(argv+1);
   
   if (lctl->steps > 0)
     {
@@ -115,7 +115,7 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   sigline_t *this = (sigline_t *)o;
   line_control_t* ctl = ftl_data_get_ptr(this->ftl_data);
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   fts_atom_t argv[3];
 
   this->srate = fts_dsp_get_output_srate(dsp, 0);

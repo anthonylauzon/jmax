@@ -26,7 +26,6 @@
 
 
 #include <stdio.h>
-#include <ftsconfig.h>
 #include "explode.h"
 
 static long explode_nextserial;
@@ -56,7 +55,7 @@ explode_get_by_name(fts_symbol_t name)
 
   fts_set_symbol( &k, name);
   if (fts_hashtable_get(&explode_table, &k, &data))
-    return (explode_t *) fts_get_ptr(&data);
+    return (explode_t *) fts_get_pointer(&data);
   else
     return 0;
 }
@@ -73,7 +72,7 @@ register_explode(explode_t *this, fts_symbol_t name)
     return 0;
   else
     {
-      fts_set_ptr( &data, this);
+      fts_set_pointer( &data, this);
       fts_hashtable_put( &explode_table, &k, &data);
       return 1;
     }
@@ -1136,7 +1135,7 @@ static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_atom_t a;
   long prevtime;
 
-  file = (FILE *)fts_get_ptr( at);
+  file = (FILE *)fts_get_pointer( at);
 
   fprintf( file, "#N explode");
 

@@ -21,8 +21,6 @@
  */
 
 #include <fts/fts.h>
-#include <fts/project.h>
-#include <ftsprivate/package.h>
 #include <ftsconfig.h>
 
 #if HAVE_DIRECT_H
@@ -32,6 +30,8 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#include <ftsprivate/package.h>
 
 static fts_package_t* fts_project = NULL;
 static fts_symbol_t sym_project = NULL;

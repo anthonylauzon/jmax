@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_OBJECTLIST_H_
-#define _FTS_OBJECTLIST_H_
 
 typedef struct _fts_objectlist_cell_t {
   fts_object_t *object;
@@ -47,4 +45,3 @@ FTS_API void fts_objectlist_remove( fts_objectlist_t *list, fts_object_t *object
 
 #define fts_objectlist_is_empty(L) (!(L)->head)
 
-#endif

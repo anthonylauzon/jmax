@@ -273,7 +273,7 @@ scope_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   float sr_in_KHz = 0.001 * fts_dsp_get_input_srate(dsp, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[3];
@@ -293,8 +293,8 @@ scope_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 scope_ftl(fts_word_t *argv)
 {
-  scope_ftl_t *data = (scope_ftl_t *)fts_word_get_ptr(argv + 0);
-  float * restrict in = (float *) fts_word_get_ptr(argv + 1);
+  scope_ftl_t *data = (scope_ftl_t *)fts_word_get_pointer(argv + 0);
+  float * restrict in = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   float last = data->last;
   float max = data->max;

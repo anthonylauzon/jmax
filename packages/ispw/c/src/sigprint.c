@@ -94,8 +94,8 @@ sigprint_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 static void ftl_sigprint(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv);
-  sigprint_t *x = (sigprint_t *)fts_word_get_ptr(argv + 1);
+  float *in = (float *)fts_word_get_pointer(argv);
+  sigprint_t *x = (sigprint_t *)fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   int index = x->index;
   int i;
@@ -121,7 +121,7 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   sigprint_t *x = ((sigprint_t *)o);
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   int size = x->init;
 
@@ -142,7 +142,7 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   x->index = 0;
   
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-  fts_set_ptr(argv + 1, o);
+  fts_set_pointer(argv + 1, o);
   fts_set_int(argv + 2, n_tick);
   dsp_add_funcall(fts_s_print, 3, argv);
 }

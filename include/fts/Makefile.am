@@ -9,6 +9,7 @@ audiofile.h \
 bytestream.h \
 class.h \
 client.h \
+config.h \
 connection.h \
 doctor.h \
 dsp.h \
@@ -23,7 +24,7 @@ hashtable.h \
 iterator.h \
 label.h \
 list.h \
-mem.h \
+malloc.h \
 message.h \
 midi.h \
 midifile.h \

@@ -69,13 +69,13 @@ void fts_register_object_doctor(fts_symbol_t class_name,
   if (fts_hashtable_get(&fts_doctor_table, &k, &data))
     {
       fts_hashtable_remove(&fts_doctor_table, &k);
-      fts_free(fts_get_ptr(&data));
+      fts_free(fts_get_pointer(&data));
     }
 
   d = (fts_object_doctor_t *) fts_malloc(sizeof(fts_object_doctor_t));
   d->fun = fun;
 
-  fts_set_ptr(&data, d);
+  fts_set_pointer(&data, d);
   fts_hashtable_put(&fts_doctor_table, &k, &data);
 
 }
@@ -95,7 +95,7 @@ fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, int ac, const fts_a
   fts_set_symbol( &k, fts_get_symbol(at));
   if (fts_hashtable_get(&fts_doctor_table, &k, &data))
     {
-      fts_object_doctor_t *d = (fts_object_doctor_t *) fts_get_ptr(&data);
+      fts_object_doctor_t *d = (fts_object_doctor_t *) fts_get_pointer(&data);
 
       return (* d->fun)(patcher, ac, at);
     }

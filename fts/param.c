@@ -83,7 +83,7 @@ void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *au
   for (p = param_list; p ; p = p->next)
     if (p->name == name)
       {
-	value_not_changed = fts_atom_are_equals( &p->value, value);
+	value_not_changed = fts_atom_equals( &p->value, value);
 	p->value = *value;
 	break;
       }

@@ -58,7 +58,7 @@ osc_ctl_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   osc_ctl_t *this = (osc_ctl_t *)o;
   osc_ctl_data_t *data = (osc_ctl_data_t *)ftl_data_get_ptr(this->data);
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   float sr = fts_dsp_get_output_srate(dsp, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   fts_atom_t a[3];
@@ -77,8 +77,8 @@ osc_ctl_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 osc_ctl_ftl(fts_word_t *argv)
 {
-  osc_ctl_data_t *data = (osc_ctl_data_t *)fts_word_get_ptr(argv + 0);
-  float *out = (float *) fts_word_get_ptr(argv + 1);
+  osc_ctl_data_t *data = (osc_ctl_data_t *)fts_word_get_pointer(argv + 0);
+  float *out = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   fvec_t *fvec = data->fvec;
   fts_intphase_t phi = data->phase;
@@ -218,7 +218,7 @@ osc_sig_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   osc_sig_t *this = (osc_sig_t *)o;
   osc_sig_data_t *data = (osc_sig_data_t *)ftl_data_get_ptr(this->data);
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   float sr = fts_dsp_get_output_srate(dsp, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   fts_atom_t a[4];
@@ -238,9 +238,9 @@ osc_sig_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 osc_sig_ftl(fts_word_t *argv)
 {
-  osc_sig_data_t *data = (osc_sig_data_t *)fts_word_get_ptr(argv + 0);
-  float *in = (float *) fts_word_get_ptr(argv + 1);
-  float *out = (float *) fts_word_get_ptr(argv + 2);
+  osc_sig_data_t *data = (osc_sig_data_t *)fts_word_get_pointer(argv + 0);
+  float *in = (float *) fts_word_get_pointer(argv + 1);
+  float *out = (float *) fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv + 3);
   fvec_t *fvec = data->fvec;
   fts_intphase_t phi = data->phase;

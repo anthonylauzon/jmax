@@ -158,8 +158,8 @@ graph_iterator_step( graph_iterator_t *iter)
       fts_status_t stat;
 
       /* try to get successor of eventual "thru" object */
-      fts_set_fun(a + 0, (fts_fun_t)graph_iterator_push);
-      fts_set_ptr(a + 1, iter);
+      fts_set_pointer(a + 0, graph_iterator_push);
+      fts_set_pointer(a + 1, iter);
       fts_set_int(a + 2, iter->top->connection->winlet);
       stat = fts_send_message(dest, fts_SystemInlet, fts_s_propagate_input, 3, a);
 
@@ -437,7 +437,7 @@ dsp_list_lookup(fts_object_t *o)
   _fts_object_get_prop(o, fts_s_dsp_descr, &a);
 
   if (! fts_is_void(&a))
-    return (fts_dsp_node_t *) fts_get_ptr(&a);
+    return (fts_dsp_node_t *) fts_get_pointer(&a);
   else
     return 0;
 }
@@ -569,7 +569,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
 	debugging info of the DSP chain
       */
 
-      fts_set_ptr(&a, node->descr);
+      fts_set_pointer(&a, node->descr);
       fts_send_message(node->o, fts_SystemInlet, fts_s_put, 1, &a);
 
       {
@@ -947,7 +947,7 @@ fts_dsp_graph_add_object(fts_dsp_graph_t *graph, fts_object_t *o)
 
   node->o = o;
 
-  fts_set_ptr(&v, (void *)node);
+  fts_set_pointer(&v, (void *)node);
   _fts_object_put_prop(o, fts_s_dsp_descr, &v);
 
   node->descr = 0;
@@ -1002,9 +1002,9 @@ fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o)
 static void 
 dsp_graph_builtin_add(fts_word_t *argv)
 {
-  float * in1 = (float *)fts_word_get_ptr(argv + 0);
-  float * in2 = (float *)fts_word_get_ptr(argv + 1);
-  float * out = (float *)fts_word_get_ptr(argv + 2);
+  float * in1 = (float *)fts_word_get_pointer(argv + 0);
+  float * in2 = (float *)fts_word_get_pointer(argv + 1);
+  float * out = (float *)fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   int i;
 

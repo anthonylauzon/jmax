@@ -69,25 +69,22 @@ extern "C" {
 #define FTS_API extern
 #endif
 
+#include <fts/config.h>
+
 /* *** The inclusion order is important *** */
 #include <fts/types.h>
 #include <fts/status.h>
-
-#include <fts/mem.h>
-#include <fts/word.h>
-#include <fts/atom.h>
+#include <fts/malloc.h>
 #include <fts/symbol.h>
-
 #include <fts/stack.h>
-
 #include <fts/property.h>
 #include <fts/iterator.h>
 #include <fts/hashtable.h>
 #include <fts/list.h>
 #include <fts/objectlist.h>
 #include <fts/variable.h>
-
 #include <fts/class.h>
+#include <fts/atom.h>
 #include <fts/object.h>
 #include <fts/connection.h>
 #include <fts/expression.h>

@@ -27,7 +27,8 @@
  *  - FPU settings
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <string.h>
 #include <dlfcn.h>
@@ -44,7 +45,6 @@
 #include <sys/mman.h>
 #include <sched.h>
 
-#include <fts/fts.h>
 #include <ftsprivate/fpe.h>
 #include <ftsprivate/platform.h>
 

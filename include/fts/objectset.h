@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_OBJECTSET_H_
-#define _FTS_OBJECTSET_H_
 
 
 /**
@@ -117,7 +115,6 @@ FTS_API void fts_objectset_remove( fts_objectset_t *set, fts_object_t *object);
  */
 FTS_API void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i);
 
-#endif
 
 
 

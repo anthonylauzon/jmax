@@ -25,34 +25,28 @@
  */
 
 #include <fts/fts.h>
-
 #include <ftsconfig.h>
-
-#if HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#if HAVE_IO_H
-#include <io.h>
-#endif
-
-#if HAVE_WINDOWS_H
-#include <windows.h>
-#endif
-
-#if HAVE_DIRECT_H
-#include <direct.h>
-#endif
 
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#if HAVE_IO_H
+#include <io.h>
+#endif
+#if HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+#if HAVE_DIRECT_H
+#include <direct.h>
+#endif
 
 #ifdef WIN32
 

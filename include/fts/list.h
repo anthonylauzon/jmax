@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_LIST_H_
-#define _FTS_LIST_H_
 
 /**
  * Lists
@@ -164,4 +162,3 @@ FTS_API void fts_list_delete( fts_list_t *list);
 FTS_API void fts_list_get_values( const fts_list_t *list, fts_iterator_t *i );
 
 
-#endif /* _FTS_LIST_H */

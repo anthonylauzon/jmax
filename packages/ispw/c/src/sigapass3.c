@@ -88,7 +88,7 @@ sigapass3_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   sigapass3_t *this = (sigapass3_t *)o;
   fts_atom_t argv[8];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   float conv;
   float zero = 0.0;
 
@@ -115,12 +115,12 @@ static void
 ftl_apass3(fts_word_t *argv)
 {
   fts_word_t biquad_args[5];
-  float *in_sig = (float *)fts_word_get_ptr(argv + 0);
-  float *in_freq = (float *)fts_word_get_ptr(argv + 1);
-  float *in_q = (float *)fts_word_get_ptr(argv + 2);
-  float *out_sig = (float *)fts_word_get_ptr(argv + 3);
-  biquad_state_t *biquad_state = (biquad_state_t *)fts_word_get_ptr(argv + 4);
-  biquad_coefs_t *biquad_coefs = (biquad_coefs_t *)fts_word_get_ptr(argv + 5);
+  float *in_sig = (float *)fts_word_get_pointer(argv + 0);
+  float *in_freq = (float *)fts_word_get_pointer(argv + 1);
+  float *in_q = (float *)fts_word_get_pointer(argv + 2);
+  float *out_sig = (float *)fts_word_get_pointer(argv + 3);
+  biquad_state_t *biquad_state = (biquad_state_t *)fts_word_get_pointer(argv + 4);
+  biquad_coefs_t *biquad_coefs = (biquad_coefs_t *)fts_word_get_pointer(argv + 5);
   float conv = fts_word_get_float(argv + 6);
   long n_tick = fts_word_get_int(argv + 7);
 
@@ -143,10 +143,10 @@ ftl_apass3(fts_word_t *argv)
   biquad_coefs->a1 = biquad_coefs->b1 = -2.0f * cos_theta * exp_theta;
 	
   /* compute first half of vector */
-  fts_word_set_ptr(biquad_args + 0, in_sig);
-  fts_word_set_ptr(biquad_args + 1, out_sig);
-  fts_word_set_ptr(biquad_args + 2, biquad_state);
-  fts_word_set_ptr(biquad_args + 3, biquad_coefs);
+  fts_word_set_pointer(biquad_args + 0, in_sig);
+  fts_word_set_pointer(biquad_args + 1, out_sig);
+  fts_word_set_pointer(biquad_args + 2, biquad_state);
+  fts_word_set_pointer(biquad_args + 3, biquad_coefs);
   fts_word_set_int(biquad_args + 4, n_tick_half);
   ftl_biquad(biquad_args);
  
@@ -166,10 +166,10 @@ ftl_apass3(fts_word_t *argv)
   biquad_coefs->a1 = biquad_coefs->b1 = -2.0f * cos_theta * exp_theta;
 	
   /* compute second half of vector */
-  fts_word_set_ptr(biquad_args + 0, in_sig + n_tick_half);
-  fts_word_set_ptr(biquad_args + 1, out_sig + n_tick_half);
-  /* fts_word_set_ptr(biquad_args + 2, biquad_state); */
-  /* fts_word_set_ptr(biquad_args + 3, biquad_coefs); */
+  fts_word_set_pointer(biquad_args + 0, in_sig + n_tick_half);
+  fts_word_set_pointer(biquad_args + 1, out_sig + n_tick_half);
+  /* fts_word_set_pointer(biquad_args + 2, biquad_state); */
+  /* fts_word_set_pointer(biquad_args + 3, biquad_coefs); */
   /* fts_word_set_long(biquad_args + 4, n_tick_half); */
   ftl_biquad(biquad_args);
 }		

@@ -177,8 +177,8 @@ sigthres_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 sigthres_dsp(fts_word_t *argv)
 {
-  sigthres_state_t *ctl = (sigthres_state_t *)fts_word_get_ptr(argv + 0);
-  float *in0 = (float *)fts_word_get_ptr(argv + 1);
+  sigthres_state_t *ctl = (sigthres_state_t *)fts_word_get_pointer(argv + 0);
+  float *in0 = (float *)fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   
   if (ctl->wait)
@@ -211,14 +211,14 @@ static void
 sigthres_put_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigthres_t *this = (sigthres_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   double sr = fts_dsp_get_input_srate(dsp, 0);
   int size = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t argv[3];
   
   sigthres_reset(this, sr, size);
   
-  fts_set_ptr(argv + 0, &(this->ctl));
+  fts_set_pointer(argv + 0, &(this->ctl));
   fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(sigthres_symbol, 3, argv);

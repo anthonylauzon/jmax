@@ -42,7 +42,7 @@ static void
 pipe_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pipe_t *this = (pipe_t *)o;
-  fts_atom_t *atoms = (fts_atom_t *)fts_get_ptr(at);
+  fts_atom_t *atoms = (fts_atom_t *)fts_get_pointer(at);
   int i;
 
   /* output single atoms of current list */
@@ -68,7 +68,7 @@ pipe_delay_list(pipe_t *this)
       fts_atom_assign(atoms + i, this->at + i);
     }
 
-  fts_set_ptr(&a, atoms);
+  fts_set_pointer(&a, atoms);
   fts_timebase_add_call(fts_get_timebase(), (fts_object_t *)this, pipe_output, &a, this->delay);
 }
 

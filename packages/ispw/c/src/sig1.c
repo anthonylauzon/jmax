@@ -22,7 +22,7 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
-/* Don't call thjios tyep sig_t, it conflict with system
+/* Don't call this type sig_t, it conflict with system
    types in a lot of systems
 */
 
@@ -84,8 +84,8 @@ sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 static void ftl_sig(fts_word_t *argv)
 {
-  float f = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  float f = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
   long int n = fts_word_get_int(argv + 2);
   int i;
 
@@ -95,8 +95,8 @@ static void ftl_sig(fts_word_t *argv)
 
 static void ftl_sig_64(fts_word_t *argv)
 {
-  float f = *((float *)fts_word_get_ptr(argv + 0));
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
+  float f = *((float *)fts_word_get_pointer(argv + 0));
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -110,7 +110,7 @@ sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   sigobj_t *this = (sigobj_t *)o;
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
 
   if (fts_dsp_get_output_size(dsp, 0) == 64)
     {

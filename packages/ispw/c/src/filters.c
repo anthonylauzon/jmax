@@ -59,9 +59,9 @@ typedef struct
 void
 ftl_2p2z(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv + 0);
-  float *out = (float *)fts_word_get_ptr(argv + 1);
-  ctlf2p2z_t *x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 2);
+  float *in = (float *)fts_word_get_pointer(argv + 0);
+  float *out = (float *)fts_word_get_pointer(argv + 1);
+  ctlf2p2z_t *x = (ctlf2p2z_t *)fts_word_get_pointer(argv + 2);
   long int n = fts_word_get_int(argv + 3);
   int i;
   float ym1, ym2, ym0;
@@ -94,9 +94,9 @@ ftl_2p2z(fts_word_t *argv)
 
 static void ftl_64_2p2z(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
-  ctlf2p2z_t *x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 2);
+  float * restrict in = (float *)fts_word_get_pointer(argv + 0);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
+  ctlf2p2z_t *x = (ctlf2p2z_t *)fts_word_get_pointer(argv + 2);
   int i;
   float ym1, ym2, ym0;
   float a, b, g;
@@ -127,8 +127,8 @@ static void ftl_64_2p2z(fts_word_t *argv)
 
 static void ftl_64_1ops_2p2z(fts_word_t *argv)
 {
-  float * restrict vec = (float *)fts_word_get_ptr(argv + 0);
-  ctlf2p2z_t * restrict x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 1);
+  float * restrict vec = (float *)fts_word_get_pointer(argv + 0);
+  ctlf2p2z_t * restrict x = (ctlf2p2z_t *)fts_word_get_pointer(argv + 1);
   int i;
   float ym1, ym2, ym0;
   float a, b, g;
@@ -163,7 +163,7 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   fts_atom_t argv[4];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   sig2p2z_state_clear(o, 0, 0, 0, 0);
 
   if (fts_dsp_get_input_size(dsp, 0) == 64)

@@ -25,14 +25,15 @@
    (client printing) functions.
 */
 
+#include <fts/fts.h>
+#include <ftsconfig.h>
+
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include <fts/fts.h>
 #include <ftsprivate/OLDclient.h>
-#include <ftsconfig.h>
 
 
 /******************************************************************************/
@@ -112,7 +113,7 @@ post_atoms(int ac, const fts_atom_t *at)
       else if (fts_is_void(at + i))
 	post("<void>%s", ps);
       else
-	post("<%s>%s", fts_symbol_name(fts_get_type(at + i)), ps);
+	post("<%s>%s", fts_atom_get_printable_typeid(at + i), ps);
     }
 }
 

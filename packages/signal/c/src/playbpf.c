@@ -83,14 +83,14 @@ static void
 play_bpf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_bpf_t *this = (play_bpf_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   double sr = fts_dsp_get_output_srate(dsp, 0);
   fts_atom_t a[3];
 
   play_bpf_reset(this, n_tick, sr);
 
-  fts_set_ptr(a + 0, this);
+  fts_set_pointer(a + 0, this);
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
@@ -100,8 +100,8 @@ play_bpf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 play_bpf_ftl(fts_word_t *argv)
 {
-  play_bpf_t *this = (play_bpf_t *)fts_word_get_ptr(argv + 0);
-  float *out = (float *) fts_word_get_ptr(argv + 1);
+  play_bpf_t *this = (play_bpf_t *)fts_word_get_pointer(argv + 0);
+  float *out = (float *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   signal_play_t *play = &this->play;
   bpf_t *bpf = (bpf_t *)play->object;

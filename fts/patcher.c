@@ -166,7 +166,7 @@ inlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   FILE *file;
   fts_atom_t xa, ya, wa;
 
-  file = (FILE *)fts_get_ptr( at);
+  file = (FILE *)fts_get_pointer( at);
 
   fts_object_get_prop( o, fts_s_x, &xa);
   fts_object_get_prop( o, fts_s_y, &ya);
@@ -283,7 +283,7 @@ outlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   FILE *file;
   fts_atom_t xa, ya, wa;
 
-  file = (FILE *)fts_get_ptr( at);
+  file = (FILE *)fts_get_pointer( at);
 
   fts_object_get_prop( o, fts_s_x, &xa);
   fts_object_get_prop( o, fts_s_y, &ya);
@@ -296,8 +296,8 @@ static void
 outlet_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_t *this  = (fts_outlet_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
-  void *propagate_context = fts_get_ptr(at + 1);
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+  void *propagate_context = fts_get_pointer(at + 1);
   fts_patcher_t *patcher;
 
   patcher = fts_object_get_patcher(this);
@@ -650,12 +650,12 @@ fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t
   int i,j;
 
   for (i = 0; i < (ac - sac + 1); i++)
-    if (fts_atom_are_equals(&sav[0], &av[i]))
+    if (fts_atom_equals(&sav[0], &av[i]))
       {
 	/* Found the beginning, test the rest */
 	
 	for (j = 1; j < sac; j++)
-	  if (! fts_atom_are_equals(&sav[j], &av[j + i]))
+	  if (! fts_atom_equals(&sav[j], &av[j + i]))
 	    return 0;
 
 	return 1;
@@ -758,8 +758,8 @@ static void
 patcher_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
-  void *propagate_context = fts_get_ptr(at + 1);
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+  void *propagate_context = fts_get_pointer(at + 1);
   int n = fts_get_int(at + 2);
   fts_inlet_t *inlet;
 
@@ -1050,7 +1050,7 @@ patcher_save_objects( FILE *file, fts_object_t *object)
 	{
  	  fts_atom_t a;
 
-	  fts_set_ptr( &a, file);
+	  fts_set_pointer( &a, file);
 	  fts_send_message( object, fts_SystemInlet, fts_s_save_dotpat, 1, &a);
 	}
       else

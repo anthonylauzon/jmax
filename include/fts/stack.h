@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_STACK_H_
-#define _FTS_STACK_H_
 
 /**
  * Stack
@@ -125,4 +123,3 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  */
 #define fts_stack_get_top(B) ((B)->top)
 
-#endif

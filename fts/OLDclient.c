@@ -20,7 +20,8 @@
  * 
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -48,7 +49,6 @@
 #include <windows.h>
 #endif
 
-#include <fts/fts.h>
 #include <ftsprivate/OLDclient.h>
 #include <ftsprivate/objtable.h>
 #include <ftsprivate/abstraction.h>
@@ -783,10 +783,8 @@ fts_client_add_atom(const fts_atom_t *atom)
     fts_client_add_string( fts_get_string(atom));
   else  if (fts_is_object( atom))
     fts_client_add_object( fts_get_object(atom));
-  /*else  if (fts_is_data( atom))
-    fts_client_add_data( fts_get_data( atom) );*/
   else
-    fprintf(stderr, "Wrong atom type in fts_client_add_atoms: %lx\n", (unsigned long) fts_get_type(atom));
+    fprintf(stderr, "Wrong atom type in fts_client_add_atoms: %s\n", fts_atom_get_printable_typeid(atom));
 }
 
 void 
@@ -1036,19 +1034,6 @@ static void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
     {
       fts_object_get_prop(obj, name, &a);
 
-      /*if (fts_is_data(&a))
-	{
-	  // If the property value is an fts_data, we
-	  //  export the data needed 
-
-	  fts_data_t *d;
-	  
-	  d = fts_get_data(&a);
-
-	  if (! fts_data_is_exported(d))
-	  fts_data_export(d);
-	}
-	else*/
       if (fts_is_object(&a))
 	{
 	  /* If the property is an fts_object and is not 
@@ -1892,34 +1877,6 @@ fts_mess_client_get_all_prop(int ac, const fts_atom_t *av)
   else
     printf_mess("System Error in FOS message GETPROP: bad args", ac, av);
 }
-
-/*
-  REMOTE_CALL <key> <args> * 
-
-   Get a fts data function call .
-   */
-
-
-/*static void 
-  fts_mess_client_remote_call(int ac, const fts_atom_t *av)
-  {
-  trace_mess("Received remote call", ac, av);
-
-  if ((ac >= 2) &&
-    fts_is_data(&av[0]) &&
-    fts_is_int(&av[1]))
-    {
-    fts_data_t *data;
-    int key;
-    
-    data = fts_get_data(&av[0]);
-    key  = fts_get_int(&av[1]);
-    
-    fts_data_call(data, key, ac - 2, av + 2);
-    }
-    else
-    printf_mess("System Error in FOS message REMOTE_CALL: bad args", ac, av);
-    }*/
 
 /*
   RECOMPUTE_ERRORS

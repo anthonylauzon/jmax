@@ -26,14 +26,11 @@
  */
 
 #include <fts/fts.h>
-#include <ftsconfig.h>
-
-#if HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
 
 #if HAVE_WINDOWS_H
 #include <windows.h>
+#else
+#include <sys/time.h>
 #endif
 
 
@@ -56,7 +53,7 @@ static void profileaudioport_output_estimation( fts_object_t *o, int winlet, fts
 
 static void profileaudioport_output( fts_word_t *argv)
 {
-  profileaudioport_t *this = (profileaudioport_t *)fts_word_get_ptr( argv+0);
+  profileaudioport_t *this = (profileaudioport_t *)fts_word_get_pointer( argv+0);
   int n = fts_word_get_int(argv + 1);
 
   this->samples_count += n;

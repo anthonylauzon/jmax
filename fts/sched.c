@@ -19,20 +19,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include "ftsconfig.h"
-
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
 
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-
-#include <sys/types.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>

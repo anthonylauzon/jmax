@@ -20,8 +20,6 @@
  *
  */
 
-#ifndef _FTS_SOUNDFILE_H_
-#define _FTS_SOUNDFILE_H_
 
 
 typedef struct fts_soundfile_format
@@ -106,4 +104,3 @@ FTS_API double fts_soundfile_get_samplerate(fts_soundfile_t *soundfile);
 FTS_API int fts_soundfile_get_n_channels(fts_soundfile_t *soundfile);
 
 
-#endif

@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _FTS_SCHED_H_
-#define _FTS_SCHED_H_
 
 /**
  * The FTS scheduler abstraction
@@ -104,4 +102,3 @@ FTS_API void fts_sched_halt(void);
 
 FTS_API void fts_sleep(void);
 
-#endif

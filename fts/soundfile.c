@@ -76,7 +76,7 @@ fts_soundfile_format_get_by_name(fts_symbol_t name)
   
   fts_set_symbol( &k, name);
   if(fts_hashtable_get(&the_fts_soundfile_standard_formats_hashtable, &k, &data))
-    return (fts_soundfile_format_t *) fts_get_ptr(&data);
+    return (fts_soundfile_format_t *) fts_get_pointer(&data);
   else
     return 0;
 }
@@ -96,7 +96,7 @@ fts_soundfile_format_add(fts_symbol_t name, fts_soundfile_format_t *format)
   fts_atom_t data, k;
 
   fts_set_symbol( &k, name);
-  fts_set_ptr(&data, format);
+  fts_set_pointer(&data, format);
   fts_hashtable_put(&the_fts_soundfile_standard_formats_hashtable, &k, &data);
 }
 

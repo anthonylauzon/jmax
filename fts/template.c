@@ -41,7 +41,8 @@
  * to all the instances, to allow dynamic redefinition
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -54,7 +55,6 @@
 #include <unistd.h>
 #endif
 
-#include <fts/fts.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/vm.h>
 #include <ftsprivate/object.h>
@@ -287,7 +287,7 @@ fts_template_file_modified(fts_symbol_t filename)
   while ( fts_iterator_has_more( &pkg_iter)) {
 
     fts_iterator_next( &pkg_iter, &pkg_atom);
-    pkg = fts_get_ptr(&pkg_atom);
+    pkg = fts_get_pointer(&pkg_atom);
 
     template = fts_package_get_template_from_file(pkg, filename);
 

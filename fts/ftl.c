@@ -378,7 +378,7 @@ int ftl_program_add_signal( ftl_program_t *prog, fts_symbol_t name, int size)
   fts_atom_t k, v;
 
   fts_set_symbol( &k, name);
-  fts_set_ptr(&v, ftl_memory_declaration_new( size));
+  fts_set_pointer(&v, ftl_memory_declaration_new( size));
 
   prog->signals_count++;
 
@@ -391,7 +391,7 @@ int ftl_declare_function( fts_symbol_t name, ftl_wrapper_t wrapper)
   fts_atom_t k, v;
 
   fts_set_symbol( &k, name);
-  fts_set_fun(&v, (fts_fun_t)wrapper);
+  fts_set_pointer(&v, wrapper);
 
   return fts_hashtable_put( &ftl_functions_table, &k, &v);
 }
@@ -456,7 +456,7 @@ void ftl_program_destroy( ftl_program_t *prog)
       fts_atom_t a;
 
       fts_iterator_next( &iter, &a);
-      fts_free( fts_get_ptr( &a));
+      fts_free( fts_get_pointer( &a));
     }
 
   fts_hashtable_destroy( &(prog->symbol_table) );
@@ -581,7 +581,7 @@ static void ftl_program_update_instruction_infos( ftl_program_t *prog)
 	      s = info->input_infos[n].name;
 	      fts_set_symbol( &k, s);
 	      fts_hashtable_get( &(prog->symbol_table), &k, &data);
-	      mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
+	      mdecl = (ftl_memory_declaration *)fts_get_pointer(&data);
 	      info->input_infos[n].buffer = mdecl->address;
 	    }
 
@@ -595,7 +595,7 @@ static void ftl_program_update_instruction_infos( ftl_program_t *prog)
 
 	      fts_set_symbol( &k, s);
 	      fts_hashtable_get( &(prog->symbol_table), &k, &data);
-	      mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
+	      mdecl = (ftl_memory_declaration *)fts_get_pointer(&data);
 	      info->output_infos[n].buffer = mdecl->address;
 	    }
 		      
@@ -619,7 +619,7 @@ static int ftl_program_allocate_signals( ftl_program_t *prog)
       ftl_memory_declaration *m;
 
       fts_iterator_next( &iter, &a);
-      m = (ftl_memory_declaration *)fts_get_ptr( &a);
+      m = (ftl_memory_declaration *)fts_get_pointer( &a);
       total_size = total_size + m->size;
     }
 
@@ -647,7 +647,7 @@ static int ftl_program_allocate_signals( ftl_program_t *prog)
       ftl_memory_declaration *m;
 
       fts_iterator_next( &iter, &a);
-      m = (ftl_memory_declaration *)fts_get_ptr( &a);
+      m = (ftl_memory_declaration *)fts_get_pointer( &a);
       m->address = p;
       p = p + m->size;
     }
@@ -683,7 +683,7 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
 
       fts_set_symbol( &k, fts_get_symbol(a));
       fts_hashtable_get( &ftl_functions_table, &k, &data);
-      fts_word_set_fun( bytecode, fts_get_fun( &data));
+      fts_word_set_pointer( bytecode, fts_get_pointer( &data));
       bytecode++;
     }
     break;
@@ -699,8 +699,8 @@ static fts_status_t compile_portable_state_fun( int state, int newstate, fts_ato
 	
 	fts_set_symbol( &k, fts_get_symbol(a));
 	fts_hashtable_get( &(info->prog->symbol_table), &k, &data);
-	mdecl = (ftl_memory_declaration *)fts_get_ptr(&data);
-	fts_word_set_ptr( bytecode, mdecl->address);
+	mdecl = (ftl_memory_declaration *)fts_get_pointer(&data);
+	fts_word_set_pointer( bytecode, mdecl->address);
 	bytecode++;
       }
     else
@@ -783,8 +783,8 @@ static void ftl_print_atom( char *s, const fts_atom_t *a)
     sprintf( s, "%f", fts_get_float(a));
   else if (fts_is_symbol(a))
     sprintf( s, "%s", fts_get_symbol(a));
-  else if (fts_is_ptr(a))
-    sprintf( s, "0x%x", (unsigned int ) fts_get_ptr(a));
+  else if (fts_is_pointer(a))
+    sprintf( s, "0x%x", (unsigned int ) fts_get_pointer(a));
   else
     sprintf( s, "?");
 }
@@ -807,7 +807,7 @@ void ftl_program_post_signals( const ftl_program_t *prog)
       fts_iterator_next( &keys, &k);
       fts_iterator_next( &values, &v);
 
-      m = (ftl_memory_declaration *)fts_get_ptr( &v);
+      m = (ftl_memory_declaration *)fts_get_pointer( &v);
       s = fts_get_symbol( &k);
       post( "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s), m->size, m->address);
     }
@@ -832,7 +832,7 @@ void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog)
       fts_iterator_next( &keys, &k);
       fts_iterator_next( &values, &v);
 
-      m = (ftl_memory_declaration *)fts_get_ptr( &k);
+      m = (ftl_memory_declaration *)fts_get_pointer( &k);
       s = fts_get_symbol( &k);
       fprintf(f, "float %s[%d];  /* adress 0x%x */\n", s,
 	      m->size, (unsigned int) m->address);
@@ -880,8 +880,8 @@ static fts_status_t post_state_fun( int state, int newstate, fts_atom_t *a, void
     sprintf( info->line, "/* %5d */   %s( ", pc, fts_get_symbol(a));
     break;
   case ST_CALL_ARGV:
-    if (fts_is_ptr(a))
-      sprintf( buffer, "(void *)0x%x", (unsigned int) fts_get_ptr(a));
+    if (fts_is_pointer(a))
+      sprintf( buffer, "(void *)0x%x", (unsigned int) fts_get_pointer(a));
     else
       ftl_print_atom( buffer, a);
     strcat( info->line, buffer);
@@ -959,8 +959,8 @@ static fts_status_t fprint_state_fun( int state, int newstate, fts_atom_t *a, vo
     sprintf( info->line, "/* %5d */   %s( ", pc, fts_symbol_name(fts_get_symbol(a)));
     break;
   case ST_CALL_ARGV:
-    if (fts_is_ptr(a))
-      sprintf( buffer, "(void *)0x%x", (unsigned int) fts_get_ptr(a));
+    if (fts_is_pointer(a))
+      sprintf( buffer, "(void *)0x%x", (unsigned int) fts_get_pointer(a));
     else
       ftl_print_atom( buffer, a);
     strcat( info->line, buffer);
@@ -1046,7 +1046,7 @@ void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr)
       ftl_wrapper_t w;
       int argc;
       
-      w = (ftl_wrapper_t) fts_word_get_fun( bytecode);
+      w = (ftl_wrapper_t) fts_word_get_pointer( bytecode);
       argc = fts_word_get_int( bytecode+1);
       (*w)(bytecode+2);
       bytecode += (argc + 2);

@@ -21,6 +21,14 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
+
+#include <stdlib.h> 
+
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
 #include <ftsprivate/package.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/abstraction.h>
@@ -30,12 +38,6 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>
-#include <ftsconfig.h>
-#include <stdlib.h> 
-
-#if HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
 
 #define PACKAGE_STACK_SIZE    32
 
@@ -160,7 +162,7 @@ fts_package_load(fts_symbol_t name)
   /* avoid loading the package twice */
   fts_set_symbol(&n, name);
   if (fts_hashtable_get(&fts_packages, &n, &p)) {
-    return fts_get_ptr(&p);
+    return fts_get_pointer(&p);
   }
 
   /* locate the directory of the package */
@@ -192,7 +194,7 @@ fts_package_load(fts_symbol_t name)
 
   /* put the package in the hashtable */
   fts_set_symbol(&n, name);
-  fts_set_ptr(&p, pkg);
+  fts_set_pointer(&p, pkg);
   fts_hashtable_put(&fts_packages, &n, &p);    
 
   return pkg;
@@ -207,7 +209,7 @@ fts_package_get(fts_symbol_t name)
   fts_set_symbol(&n, name);
 
   if (fts_hashtable_get(&fts_packages, &n, &p)) {
-    return fts_get_ptr(&p);
+    return fts_get_pointer(&p);
   } else {
     /* try to load it */
     pkg = fts_package_load(name);
@@ -355,7 +357,7 @@ fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t fil
       template = fts_template_new(name, NULL, file);
 
       fts_set_symbol(&n, name);
-      fts_set_ptr(&p, template);
+      fts_set_pointer(&p, template);
       fts_hashtable_put(pkg->declared_templates, &n, &p);
 
       fts_template_set_package(template, pkg);
@@ -381,7 +383,7 @@ fts_package_get_declared_template(fts_package_t* pkg, fts_symbol_t name)
 
   if ((pkg->declared_templates != NULL) && fts_hashtable_get(pkg->declared_templates, &k, &a)) 
     {
-      fts_template_t *template = (fts_template_t *) fts_get_ptr(&a);
+      fts_template_t *template = (fts_template_t *) fts_get_pointer(&a);
       
       if (fts_template_get_filename(template) == NULL) 
 	{
@@ -403,7 +405,7 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
   fts_set_symbol( &k, name);
 
   if ((pkg->templates_in_path != NULL) && fts_hashtable_get(pkg->templates_in_path, &k, &a)) 
-    return (fts_template_t *) fts_get_ptr(&a);
+    return (fts_template_t *) fts_get_pointer(&a);
   else
     {
       char filename[MAXPATHLEN];
@@ -430,7 +432,7 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
 	}
       
       fts_set_symbol(&n, name);
-      fts_set_ptr(&p, template);
+      fts_set_pointer(&p, template);
       fts_hashtable_put(pkg->templates_in_path, &n, &p);  
 
       fts_template_set_package(template, pkg);
@@ -455,7 +457,7 @@ fts_package_get_template_from_file(fts_package_t* pkg, fts_symbol_t filename)
 
   while ( fts_iterator_has_more( &iter)) {
     fts_iterator_next( &iter, &tmpl_atom);
-    template = fts_get_ptr(&tmpl_atom);
+    template = fts_get_pointer(&tmpl_atom);
     if (fts_template_get_filename(template) == filename) {
       return template;
     }
@@ -469,7 +471,7 @@ fts_package_get_template_from_file(fts_package_t* pkg, fts_symbol_t filename)
 
   while ( fts_iterator_has_more( &iter)) {
     fts_iterator_next( &iter, &tmpl_atom);
-    template = fts_get_ptr(&tmpl_atom);
+    template = fts_get_pointer(&tmpl_atom);
     if (fts_template_get_filename(template) == filename) {
       return template;
     }
@@ -511,7 +513,7 @@ fts_package_add_abstraction(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t 
     /* Register the abstraction */
     abstraction = fts_abstraction_new(name, NULL, file);
     fts_set_symbol(&n, name);
-    fts_set_ptr(&p, abstraction);
+    fts_set_pointer(&p, abstraction);
     fts_hashtable_put(pkg->declared_abstractions, &n, &p);  
   }
 }
@@ -534,7 +536,7 @@ fts_package_get_declared_abstraction(fts_package_t* pkg, fts_symbol_t name)
   fts_set_symbol( &k, name);
   if ((pkg->declared_abstractions != NULL) 
       && fts_hashtable_get(pkg->declared_abstractions, &k, &a)) {
-    abstraction = (fts_abstraction_t *) fts_get_ptr(&a);
+    abstraction = (fts_abstraction_t *) fts_get_pointer(&a);
 
     if (fts_abstraction_get_filename(abstraction) == NULL) {
       fts_make_absolute_path(fts_symbol_name(pkg->dir), 
@@ -558,7 +560,7 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
 
   if ((pkg->abstractions_in_path != NULL) 
       && fts_hashtable_get(pkg->abstractions_in_path, &k, &a)) {
-    return (fts_abstraction_t *) fts_get_ptr(&a);
+    return (fts_abstraction_t *) fts_get_pointer(&a);
   } else {
     char filename[MAXPATHLEN];
     char path[MAXPATHLEN];
@@ -583,7 +585,7 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
     }
 
     fts_set_symbol(&n, name);
-    fts_set_ptr(&p, t);
+    fts_set_pointer(&p, t);
     fts_hashtable_put(pkg->abstractions_in_path, &n, &p);  
 
     return t;
@@ -614,7 +616,7 @@ fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl)
     return &fts_DuplicatedMetaclass;
   else
     {
-      fts_set_ptr(&data, mcl);
+      fts_set_pointer(&data, mcl);
       fts_hashtable_put(pkg->classes, &k, &data);
     }
 
@@ -631,7 +633,7 @@ fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name)
   fts_set_symbol( &k, name);
   
   if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data)) {
-    return fts_get_ptr(&data);
+    return fts_get_pointer(&data);
   } else {
     return NULL;
   }
@@ -650,7 +652,7 @@ fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
     return &fts_DuplicatedMetaclass;
   else
     {
-      fts_set_ptr(&data, mcl);
+      fts_set_pointer(&data, mcl);
       fts_hashtable_put(pkg->classes, &k, &data);
     }
   
@@ -707,7 +709,7 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
 static void 
 fun_template( fts_atom_t *a)
 {
-  fts_template_t *template = (fts_template_t *)fts_get_ptr( a);
+  fts_template_t *template = (fts_template_t *)fts_get_pointer( a);
 
   fts_set_symbol( a, fts_template_get_original_filename( template));
 }
@@ -715,7 +717,7 @@ fun_template( fts_atom_t *a)
 static void 
 fun_abstraction( fts_atom_t *a)
 {
-  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_ptr( a);
+  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_pointer( a);
 
   /* Must be done the same way as in templates */
 /*    fts_set_symbol( a, fts_abstraction_get_original_filename( template)); */
@@ -1220,7 +1222,7 @@ fts_kernel_package_init(void)
   __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 1, &a); 
   fts_package_set_state(fts_system_package, fts_package_loaded); 
 
-  fts_set_ptr(&p, fts_system_package);
+  fts_set_pointer(&p, fts_system_package);
   fts_hashtable_put(&fts_packages, &a, &p);
 
   fts_package_push(fts_system_package);

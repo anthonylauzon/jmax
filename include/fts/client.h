@@ -20,9 +20,6 @@
  * 
  */
 
-#ifndef _FTS_CLIENT_H_
-#define _FTS_CLIENT_H_
-
 /**
  * Client communication
  *
@@ -42,4 +39,3 @@
  */
 FTS_API void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
 
-#endif

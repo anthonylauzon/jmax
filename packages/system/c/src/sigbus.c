@@ -70,14 +70,14 @@ fts_signal_bus_put_prologue(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 static void
 fts_signal_bus_toggle_and_zero(fts_word_t *a)
 {
-  int *toggle = (int *)fts_word_get_ptr(a + 2);
+  int *toggle = (int *)fts_word_get_pointer(a + 2);
   int n = fts_word_get_int(a + 3);
   float *write;
   int i;
 
   *toggle = 1 - *toggle;
 
-  write = (float *)fts_word_get_ptr(a + *toggle);
+  write = (float *)fts_word_get_pointer(a + *toggle);
 
   for(i=0; i<n; i++)
     write[i] = 0.0;

@@ -20,8 +20,6 @@
  *
  */
 
-#ifndef _FTS_FILE_H_
-#define _FTS_FILE_H_
 
 FTS_API int fts_file_exists(const char *name);
 
@@ -130,4 +128,3 @@ FTS_API void fts_file_get_write_path(const char *path, char *full_path);
 FTS_API int fts_file_get_read_path(const char *name, char *pathname);
 
 
-#endif

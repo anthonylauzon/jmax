@@ -114,7 +114,7 @@ iir_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 {
   iir_t *this = (iir_t *)o;
   fts_atom_t argv[6];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
 
   iir_clear(o, 0, 0, 0, 0);
 

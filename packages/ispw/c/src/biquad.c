@@ -139,10 +139,10 @@ biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 void 
 ftl_biquad(fts_word_t *argv)
 {
-  float *x = (float *)fts_word_get_ptr(argv); /* input */
-  float *y = (float *)fts_word_get_ptr(argv + 1); /* output */
-  biquad_state_t *state = (biquad_state_t *)fts_word_get_ptr(argv + 2);
-  biquad_coefs_t *coefs = (biquad_coefs_t *)fts_word_get_ptr(argv + 3);
+  float *x = (float *)fts_word_get_pointer(argv); /* input */
+  float *y = (float *)fts_word_get_pointer(argv + 1); /* output */
+  biquad_state_t *state = (biquad_state_t *)fts_word_get_pointer(argv + 2);
+  biquad_coefs_t *coefs = (biquad_coefs_t *)fts_word_get_pointer(argv + 3);
   int n_tick = fts_word_get_int(argv + 4);
   float xnm1 = state->xnm1; /* x(n-1) */
   float xnm2 = state->xnm2; /* x(n-2) */
@@ -178,9 +178,9 @@ ftl_biquad(fts_word_t *argv)
 void 
 ftl_biquad_inplace(fts_word_t *argv)
 {
-  float *xy = (float *)fts_word_get_ptr(argv + 0);
-  biquad_state_t *state = (biquad_state_t *)fts_word_get_ptr(argv + 1);
-  biquad_coefs_t *coefs = (biquad_coefs_t *)fts_word_get_ptr(argv + 2);
+  float *xy = (float *)fts_word_get_pointer(argv + 0);
+  biquad_state_t *state = (biquad_state_t *)fts_word_get_pointer(argv + 1);
+  biquad_coefs_t *coefs = (biquad_coefs_t *)fts_word_get_pointer(argv + 2);
   int n_tick = fts_word_get_int(argv+3);
   float xnm1 = state->xnm1; /* x(n-1) */
   float xnm2 = state->xnm2; /* x(n-2) */
@@ -216,7 +216,7 @@ static void
 biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   biquad_t *this = (biquad_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[5];
 
 

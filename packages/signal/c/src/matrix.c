@@ -119,7 +119,7 @@ static void
 matrix_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matrix_t *this = (matrix_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   float sr = fts_dsp_get_input_srate(dsp, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
@@ -154,7 +154,7 @@ matrix_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   fts_set_int(a + 0, n_ins);
   fts_set_int(a + 1, n_outs);
-  fts_set_ptr(a + 2, this->bufs);
+  fts_set_pointer(a + 2, this->bufs);
   fts_set_ftl_data(a + 3, this->ramps);
   fts_set_int(a + 4, n_tick);
 
@@ -177,8 +177,8 @@ ftl_matrix_copy_out(fts_word_t *a)
 {
   int n_ins = fts_word_get_int(a + 0);
   int n_outs = fts_word_get_int(a + 1);
-  float ** restrict bufs = (float **)fts_word_get_ptr(a + 2);
-  fts_ramp_t * restrict ramps = (fts_ramp_t *)fts_word_get_ptr(a + 3);
+  float ** restrict bufs = (float **)fts_word_get_pointer(a + 2);
+  fts_ramp_t * restrict ramps = (fts_ramp_t *)fts_word_get_pointer(a + 3);
   int n_tick = fts_word_get_int(a + 4);
   int in, out;
   int i;
@@ -193,7 +193,7 @@ ftl_matrix_copy_out(fts_word_t *a)
       
       for(in=0; in<n_ins; in++)
 	{
-	  float * restrict input = (float *)fts_word_get_ptr(a + 5 + in);
+	  float * restrict input = (float *)fts_word_get_pointer(a + 5 + in);
 	  fts_ramp_t * restrict ramp = out_ramps + in;
 	  
 	  fts_ramp_vec_mul_add(ramp, input, out_buf, n_tick);
@@ -203,7 +203,7 @@ ftl_matrix_copy_out(fts_word_t *a)
   for(out=0; out<n_outs; out++)
     {
       float * restrict out_buf = bufs[out];
-      float * restrict out_sig = (float *)fts_word_get_ptr(a + 5 + n_ins + out);
+      float * restrict out_sig = (float *)fts_word_get_pointer(a + 5 + n_ins + out);
       
       for(i=0; i<n_tick; i++)
 	out_sig[i] = out_buf[i];
@@ -215,8 +215,8 @@ ftl_matrix_copy_in(fts_word_t *a)
 {
   int n_ins = fts_word_get_int(a + 0);
   int n_outs = fts_word_get_int(a + 1);
-  float ** restrict bufs = (float **)fts_word_get_ptr(a + 2);
-  fts_ramp_t * restrict ramps = (fts_ramp_t *)fts_word_get_ptr(a + 3);
+  float ** restrict bufs = (float **)fts_word_get_pointer(a + 2);
+  fts_ramp_t * restrict ramps = (fts_ramp_t *)fts_word_get_pointer(a + 3);
   int n_tick = fts_word_get_int(a + 4);
   int in, out;
   int i;
@@ -224,7 +224,7 @@ ftl_matrix_copy_in(fts_word_t *a)
   for(in=0; in<n_ins; in++)
     {
       float * restrict in_buf = bufs[in];
-      float * restrict in_sig = (float *)fts_word_get_ptr(a + 5 + in);
+      float * restrict in_sig = (float *)fts_word_get_pointer(a + 5 + in);
       
       for(i=0; i<n_tick; i++)
 	in_buf[i] = in_sig[i];
@@ -232,7 +232,7 @@ ftl_matrix_copy_in(fts_word_t *a)
 
   for(out=0; out<n_outs; out++)
     {
-      float * restrict output = (float *)fts_word_get_ptr(a + 5 + n_ins + out);
+      float * restrict output = (float *)fts_word_get_pointer(a + 5 + n_ins + out);
       fts_ramp_t * restrict out_ramps = ramps + out * n_ins;
       
       for(i=0; i<n_tick; i++)

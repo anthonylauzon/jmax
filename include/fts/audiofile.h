@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_AUDIOFILE_H_
-#define _FTS_AUDIOFILE_H_
 
 /***********************************************
  *
@@ -100,4 +98,3 @@ FTS_API fts_audiofile_t* fts_audiofile_open_read(char* filename);
 #define fts_audiofile_set_num_frames(_f,_v)   { (_f)->frames = _v; }
 #define fts_audiofile_set_handle(_f,_v)       { (_f)->handle = _v; }
 
-#endif

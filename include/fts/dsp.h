@@ -24,8 +24,6 @@
  *
  */
 
-#ifndef _FTS_DSP_H_
-#define _FTS_DSP_H_
 
 /**
  * The FTS DSP subsystem
@@ -59,14 +57,14 @@
  * my_dsp_object_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
  * { 
  *    my_dsp_object_t *this = (my_dsp_object_t *)o;
- *    fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+ *    fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
  *    double sr = fts_dsp_get_output_srate(dsp, 0);
  *    int n_tick = fts_dsp_get_output_size(dsp, 0);
  *    fts_atom_t a[4];
  *
  *    my_dsp_object_reset(this, n_tick, sr);
  *
- *    fts_set_ptr(a + 0, this->params);
+ *    fts_set_pointer(a + 0, this->params);
  *    fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
  *    fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
  *    fts_set_int(a + 3, n_tick);
@@ -82,9 +80,9 @@
  * static void
  * my_dsp_object_dsp_function(fts_word_t *argv)
  * {
- *   my_dsp_params_t *params = (my_dsp_params_t *)fts_word_get_ptr(argv + 0);
- *   float *in = (float *)fts_word_get_ptr(argv + 1);
- *   float *out = (float *)fts_word_get_ptr(argv + 2);
+ *   my_dsp_params_t *params = (my_dsp_params_t *)fts_word_get_pointer(argv + 0);
+ *   float *in = (float *)fts_word_get_pointer(argv + 1);
+ *   float *out = (float *)fts_word_get_pointer(argv + 2);
  *   int n_tick = fts_word_get_int(argv + 3);
  *   int i;
  *
@@ -431,4 +429,3 @@ FTS_API void fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int si
 #define dsp_declare_function(n, f) fts_dsp_declare_function((n), (f))
 #define dsp_add_funcall(s, n, a) fts_dsp_add_function((s), (n), (a))
 
-#endif

@@ -28,7 +28,8 @@
  * 
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -42,7 +43,6 @@
 #include <sys/param.h>
 #include <errno.h>
 
-#include <fts/fts.h>
 #include <ftsprivate/fpe.h>
 #include <ftsprivate/platform.h>
 

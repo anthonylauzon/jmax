@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_PATCHER_H_
-#define _FTS_PATCHER_H_
 
 struct fts_patcher
 {
@@ -52,5 +50,4 @@ struct fts_patcher
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
 
-#endif
 

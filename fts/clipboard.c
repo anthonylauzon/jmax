@@ -31,7 +31,8 @@
    to the object itself.
 */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <stdlib.h>
 #if HAVE_UNISTD_H
@@ -41,7 +42,6 @@
 #include <process.h>
 #endif
 
-#include <fts/fts.h>
 #include <ftsprivate/loader.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>

@@ -20,6 +20,8 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
+
 #include <utils.h>
 
 typedef struct 
@@ -54,9 +56,9 @@ phasor_ftl_set_phase(ftl_data_t ftl_data, float phi)
 void 
 phasor_ftl(fts_word_t *argv)
 {
-  float * restrict freq = (float *)  fts_word_get_ptr(argv + 0);
-  float * restrict out  = (float *)  fts_word_get_ptr(argv + 1);
-  phasor_ftl_t * restrict state = (phasor_ftl_t *) fts_word_get_ptr(argv + 2);
+  float * restrict freq = (float *)  fts_word_get_pointer(argv + 0);
+  float * restrict out  = (float *)  fts_word_get_pointer(argv + 1);
+  phasor_ftl_t * restrict state = (phasor_ftl_t *) fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   double incr = state->incr;
   fts_wrapper_t phi = state->phase;
@@ -75,8 +77,8 @@ phasor_ftl(fts_word_t *argv)
 void 
 phasor_ftl_inplace(fts_word_t *argv)
 {
-  float * restrict sig = (float *)  fts_word_get_ptr(argv + 0);
-  phasor_ftl_t * restrict state = (phasor_ftl_t *) fts_word_get_ptr(argv + 1);
+  float * restrict sig = (float *)  fts_word_get_pointer(argv + 0);
+  phasor_ftl_t * restrict state = (phasor_ftl_t *) fts_word_get_pointer(argv + 1);
   long int n = fts_word_get_int(argv + 2);
   double incr = state->incr;
   fts_wrapper_t phi = state->phase;

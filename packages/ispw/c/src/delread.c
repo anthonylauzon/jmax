@@ -119,7 +119,7 @@ static void
 delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delread_t *this = (delread_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   long n_tick = fts_dsp_get_input_size(dsp, 0);
   float sr = fts_dsp_get_input_srate(dsp, 0);
   del_buf_t *buf;
@@ -157,7 +157,7 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   delread_set_delay(this);
   
   fts_set_symbol(argv, fts_dsp_get_output_name(dsp, 0));
-  fts_set_ptr(argv + 1, buf);
+  fts_set_pointer(argv + 1, buf);
   fts_set_int(argv + 2, n_tick);
   fts_set_ftl_data(argv + 3, this->ftl_deltime);
   dsp_add_funcall(delread_function_symbol, 4, argv);

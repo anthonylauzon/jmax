@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_LABEL_H_
-#define _FTS_LABEL_H_
 
 /**
  *
@@ -71,4 +69,3 @@ typedef struct _fts_label_
 FTS_API fts_label_t *fts_label_get(fts_patcher_t *patcher, fts_symbol_t name);
 #define fts_label_send(l, s, n, a) fts_channel_send( fts_label_get_channel(l), 0, (s), (n), (a))
 
-#endif

@@ -57,7 +57,7 @@ static void sgiaudioport_input( fts_word_t *argv)
   sgiaudioport_t *port;
   int n, channels, ch, i, j;
 
-  port = (sgiaudioport_t *)fts_word_get_ptr( argv+0);
+  port = (sgiaudioport_t *)fts_word_get_pointer( argv+0);
   n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_input_channels( port);
 
@@ -65,7 +65,7 @@ static void sgiaudioport_input( fts_word_t *argv)
 
   for ( ch = 0; ch < channels; ch++)
     {
-      float *out = (float *) fts_word_get_ptr( argv + 2 + ch);
+      float *out = (float *) fts_word_get_pointer( argv + 2 + ch);
 
       j = ch;
       for ( i = 0; i < n; i++)
@@ -81,7 +81,7 @@ static void sgiaudioport_output( fts_word_t *argv)
   sgiaudioport_t *port;
   int n, channels, ch, i, j;
 
-  port = (sgiaudioport_t *)fts_word_get_ptr( argv+0);
+  port = (sgiaudioport_t *)fts_word_get_pointer( argv+0);
   n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels( port);
 
@@ -89,7 +89,7 @@ static void sgiaudioport_output( fts_word_t *argv)
 
   for ( ch = 0; ch < channels; ch++)
     {
-      float *in = (float *) fts_word_get_ptr( argv + 2 + ch);
+      float *in = (float *) fts_word_get_pointer( argv + 2 + ch);
 
       j = ch;
       for ( i = 0; i < n; i++)

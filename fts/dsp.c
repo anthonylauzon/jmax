@@ -316,7 +316,7 @@ dsp_get_current_dsp_chain( void)
 static void
 dsp_zero_fun(fts_word_t *argv)
 {
-  float *out = (float *)fts_word_get_ptr(argv + 0);
+  float *out = (float *)fts_word_get_pointer(argv + 0);
   int n = fts_word_get_int(argv + 1);
   int i;
 
@@ -327,8 +327,8 @@ dsp_zero_fun(fts_word_t *argv)
 static void
 dsp_copy_fun(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv + 0);
-  float *out = (float *)fts_word_get_ptr(argv + 1);
+  float *in = (float *)fts_word_get_pointer(argv + 0);
+  float *out = (float *)fts_word_get_pointer(argv + 1);
   int n = fts_word_get_int(argv + 2);
   int i;
 

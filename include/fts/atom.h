@@ -21,126 +21,389 @@
  */
 
 
-#ifndef _FTS_ATOM_H_
-#define _FTS_ATOM_H_
-
-/* For FILE * */
 #include <stdio.h>
 
-/* Macros for dealing with atoms: note the use of the 
-
-   do {<macro-body} while (0) 
-
-   trick, to be able to put the macro in a single statement "then"
-   branch of an if ... 
-   
+/**
+ * Atom accessors and helper functions
+ *
+ * @defgroup atom atom
  */
 
+/*
+ * Definition of type ids and predefined values
+ *
+ * The type id of an atom is a pointer to a metaclass. The lower bit of the
+ * pointer is used to separate primitive types from object types.
+ *
+ */
+
+/**
+ * Get the type of the atom
+ * 
+ * @fn fts_metaclass_t *fts_get_type( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the type of the atom as a fts_metaclass_t *
+ * @ingroup atom
+ */
+#define fts_get_type(p) ((fts_metaclass_t *)UINT_TO_POINTER(POINTER_TO_UINT((p)->typeid) & ~1))
+
+/**
+ * Get the selector associated with the type of the atom.
+ * This selector will be used when sending this atom in a message.
+ * 
+ * @fn fts_symbol_t fts_get_selector( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the selector
+ * @ingroup atom
+ */
+#define fts_get_selector(p) fts_metaclass_get_selector( fts_get_type(p))
+
+/* 
+ * Primitive types
+ */
+FTS_API fts_metaclass_t *fts_t_void;
+FTS_API fts_metaclass_t *fts_t_int;
+FTS_API fts_metaclass_t *fts_t_float;
+FTS_API fts_metaclass_t *fts_t_symbol;
+FTS_API fts_metaclass_t *fts_t_pointer;
+FTS_API fts_metaclass_t *fts_t_string;
+/* To be removed */
+FTS_API fts_metaclass_t *fts_t_connection;
+
+/*
+ * fts_word_t accessors
+ */
+
+#define fts_word_set_int(p, v)         ((p)->fts_int = (v))
+#define fts_word_set_float(p, v)       ((p)->fts_float = (v))
+#define fts_word_set_symbol(p, v)      ((p)->fts_symbol = (v))
+#define fts_word_set_object(p, v)      ((p)->fts_object = (v))
+#define fts_word_set_pointer(p, v)     ((p)->fts_pointer = (v))
+#define fts_word_set_string(p, v)      ((p)->fts_string = (v))
+
+#define fts_word_get_int(p)            ((p)->fts_int)
+#define fts_word_get_float(p)          ((p)->fts_float)
+#define fts_word_get_symbol(p)         ((p)->fts_symbol)
+#define fts_word_get_object(p)         ((p)->fts_object)
+#define fts_word_get_pointer(p)        ((p)->fts_pointer)
+#define fts_word_get_string(p)         ((p)->fts_string)
+
+/* Word values to be removed */
+#define fts_word_set_connection(p, v)  ((p)->fts_connection = (v))
+#define fts_word_get_connection(p)     ((p)->fts_connection)
+
+
+/**
+ * Set the atom to void
+ * 
+ * @fn fts_set_void( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @ingroup atom
+ */
+#define fts_set_void(p) ((p)->typeid = fts_t_void)
+
+/**
+ * Set the integer value
+ * 
+ * @fn fts_set_int( const fts_atom_t *p, int v)
+ * @param p pointer to the atom
+ * @param v the value
+ * @ingroup atom
+ */
+#define fts_set_int(p, v) ((p)->typeid = fts_t_int, fts_word_set_int( &(p)->value, (v)))
+
+/**
+ * Set the integer value
+ * 
+ * @fn fts_set_float( const fts_atom_t *p, float v)
+ * @param p pointer to the atom
+ * @param v the value
+ * @ingroup atom
+ */
+#define fts_set_float(p, v) ((p)->typeid = fts_t_float, fts_word_set_float( &(p)->value, (v)))
+
+/**
+ * Set the symbol value
+ * 
+ * @fn fts_set_symbol( const fts_atom_t *p, fts_symbol_t v)
+ * @param p pointer to the atom
+ * @param v the value
+ * @ingroup atom
+ */
+#define fts_set_symbol(p, v) ((p)->typeid = fts_t_symbol, fts_word_set_symbol( &(p)->value, (v)))
+
+/**
+ * Set the object value
+ * 
+ * @fn fts_set_object( const fts_atom_t *p, fts_object_t v)
+ * @param p pointer to the atom
+ * @param v the value
+ * @ingroup atom
+ */
+#define fts_set_object(p, v) ((p)->typeid = fts_object_get_metaclass(v), fts_word_set_object( &(p)->value, (v)))
+
+/**
+ * Set the pointer value
+ * 
+ * @fn fts_set_pointer( const fts_atom_t *p, void *v)
+ * @param p pointer to the atom
+ * @param v the value
+ * @ingroup atom
+ */
+#define fts_set_pointer(p, v) ((p)->typeid = fts_t_pointer, fts_word_set_pointer( &(p)->value, (v)))
+
+/**
+ * Set the string value
+ * 
+ * @fn fts_set_string( const fts_atom_t *p, const char *v)
+ * @param p pointer to the atom
+ * @param v the value
+ * @ingroup atom
+ */
+#define fts_set_string(p, v) ((p)->typeid = fts_t_string, fts_word_set_string( &(p)->value, (v)))
+
+/* To be removed */
+#define fts_set_connection(p, v) ((p)->typeid = fts_t_connection, fts_word_set_connection( &(p)->value, (v)))
+
+/**
+ * Tests if atom is void
+ * 
+ * @fn int fts_is_void( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is void
+ * @ingroup atom
+ */
+#define fts_is_void(p) ((p)->typeid == fts_t_void)
+
+/**
+ * Tests if atom contains an integer
+ * 
+ * @fn int fts_is_int( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is integer
+ * @ingroup atom
+ */
+#define fts_is_int(p) ((p)->typeid == fts_t_int)
+
+/**
+ * Tests if atom contains a float
+ * 
+ * @fn int fts_is_float( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is float
+ * @ingroup atom
+ */
+#define fts_is_float(p) ((p)->typeid == fts_t_float) 
+
+/**
+ * Tests if atom contains a number (int or float)
+ * 
+ * @fn int fts_is_number( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is number (int or float)
+ * @ingroup atom
+ */
+#define fts_is_number(p) ((p)->typeid == fts_t_int || (p)->typeid == fts_t_float) 
+
+/**
+ * Tests if atom contains a symbol
+ * 
+ * @fn int fts_is_symbol( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is symbol
+ * @ingroup atom
+ */
+#define fts_is_symbol(p) ((p)->typeid == fts_t_symbol)
+
+/**
+ * Tests if atom contains an object
+ * 
+ * @fn int fts_is_object( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is object
+ * @ingroup atom
+ */
+#define fts_is_object(p) ( !( POINTER_TO_UINT((p)->typeid) & 1) )
+
+/**
+ * Tests if atom contains a pointer
+ * 
+ * @fn int fts_is_pointer( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is pointer
+ * @ingroup atom
+ */
+#define fts_is_pointer(p) ((p)->typeid == fts_t_pointer)
+
+/**
+ * Tests if atom contains a string
+ * 
+ * @fn int fts_is_string( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return 1 if atom type is string
+ * @ingroup atom
+ */
+#define fts_is_string(p) ((p)->typeid == fts_t_string)
+
+/* To be removed */
+#define fts_is_connection(p) ((p)->typeid == fts_t_connection)
+
+/**
+ * Get the integer value
+ * 
+ * @fn int fts_get_int( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the integer value of the atom
+ * @ingroup atom
+ */
+#define fts_get_int(p) fts_word_get_int( &(p)->value)
+
+/**
+ * Get the float value
+ * 
+ * @fn float fts_get_float( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the float value of the atom
+ * @ingroup atom
+ */
+#define fts_get_float(p) fts_word_get_float( &(p)->value)
+
+/**
+ * Get the number value as integer
+ * 
+ * @fn int fts_get_number_int( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the integer value of the atom if atom is integer, the float value converted to an int
+ * if atom is float
+ * @ingroup atom
+ */
+#define fts_get_number_int(p) (fts_is_int(p) ? fts_get_int(p) : (int)fts_get_float(p))
+
+/**
+ * Get the number value as float
+ * 
+ * @fn float fts_get_number_float( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the float value of the atom if atom is float, the integer value converted to a float
+ * if atom is integer
+ * @ingroup atom
+ */
+#define fts_get_number_float(p) (fts_is_float(p) ? fts_get_float(p) : (float)fts_get_int(p))
+
+/**
+ * Get the symbol value
+ * 
+ * @fn fts_symbol_t fts_get_symbol( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the symbol value of the atom
+ * @ingroup atom
+ */
+#define fts_get_symbol(p) fts_word_get_symbol( &(p)->value)
+
+/**
+ * Get the object value
+ * 
+ * @fn fts_object_t *fts_get_object( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the object value of the atom
+ * @ingroup atom
+ */
+#define fts_get_object(p) fts_word_get_object( &(p)->value)
+
+/**
+ * Get the pointer value
+ * 
+ * @fn void *fts_get_pointer( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the pointer value of the atom
+ * @ingroup atom
+ */
+#define fts_get_pointer(p) fts_word_get_pointer( &(p)->value)
+
+/**
+ * Get the string value
+ * 
+ * @fn const char *fts_get_string( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @return the string value of the atom
+ * @ingroup atom
+ */
+#define fts_get_string(p) fts_word_get_string( &(p)->value)
+
+/* To be removed */
+#define fts_get_connection(p) fts_word_get_connection( &(p)->value)
+
+/**
+ * Increments object reference count if atom contains an object
+ *
+ * @fn void fts_atom_refer( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @ingroup atom
+ */
+#define fts_atom_refer(p) do {if(fts_is_object(p)) fts_object_refer(fts_get_object(p));} while(0)
+
+/**
+ * Decrements object reference count if atom contains an object
+ *
+ * @fn void fts_atom_release( const fts_atom_t *p)
+ * @param p pointer to the atom
+ * @ingroup atom
+ */
+#define fts_atom_release(p) do {if(fts_is_object(p)) fts_object_release(fts_get_object(p));} while(0)
+
+/**
+ * Assignment between atoms.<br>
+ * This macro takes care of dereferencing the destination if it was an object
+ * and referencing the source if it was an object.
+ *
+ * @fn void fts_atom_assign( fts_atom_t *dest, const fts_atom_t *src)
+ * @param dest pointer to the destination atom
+ * @param src pointer to the source atom
+ * @ingroup atom
+ */
+#define fts_atom_assign(dest, src)		\
+  do						\
+    {						\
+      if(fts_is_object(dest))			\
+	fts_atom_release(dest);			\
+      *(dest) = *(src);				\
+      if (fts_is_object(src))			\
+	fts_atom_refer(src);			\
+    }						\
+  while(0)
+
+/**
+ * Checks if atoms are of the same type
+ *
+ * @fn int fts_atom_same_type( const fts_atom_t *p1, const fts_atom_t *p2))
+ * @param p1 pointer to atom
+ * @param p2 pointer to atom
+ * @return 1 if atoms are of the same type, 0 if not
+ * @ingroup atom
+ */
+#define fts_atom_same_type(p1, p2) ((p1)->typeid == (p2)->typeid)
+
+/**
+ * Checks if atoms are equals
+ *
+ * @fn int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2))
+ * @param p1 pointer to atom
+ * @param p2 pointer to atom
+ * @return 1 if atoms are equals, 0 if not
+ * @ingroup atom
+ */
+FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
+
+/*
+ * Print function for debug
+ * Not documented
+ */
+FTS_API void fprintf_atoms( FILE *f, int ac, const fts_atom_t *at);
+
+FTS_API const char *fts_atom_get_printable_typeid( const fts_atom_t *p);
+
 /* An initializer for empty atoms */
-#define FTS_NULL {(fts_symbol_t)0, {0}}
+#define FTS_NULL { 0, {0}}
 
-FTS_API void fts_atom_type_register(fts_symbol_t name, fts_class_t *cl);
-FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
+extern const fts_atom_t fts_null[];
 
-/* Macros to deal with any type */
-#define fts_set_type(ap, t) (((ap)->type) = (t))
-#define fts_set_object_type(ap, t) (((ap)->type) = ((fts_symbol_t)((unsigned int)(t) | 1)))
-
-#define fts_get_type(ap) ((fts_type_t)((unsigned int)((ap)->type) & ~1))
-
-#define fts_is_a(ap, t) (fts_get_type(ap) == (t))
-
-#define fts_get_selector(ap) (fts_type_get_selector(fts_get_type(ap)))
-
-/* Return a pointer; i.e. you can write "*(fts_atom_value(a)).fts_symbol = fts_s_int;" for example */
-#define fts_atom_value(ap) (&((ap)->value))
-
-/* set object of any type */
-#define fts_set_object_with_type(ap, x, t) \
-     do {fts_set_object_type(ap, t); fts_word_set_object(fts_atom_value(ap), ((fts_object_t *)x));} while (0)
-
-/* set atoms of predefined types */
-#define fts_set_symbol(ap, x) \
-        do {fts_set_type(ap, fts_s_symbol); fts_word_set_symbol(fts_atom_value(ap), (x));} while (0)
-#define fts_set_string(ap, x) \
-        do {fts_set_type(ap, fts_s_string); fts_word_set_string(fts_atom_value(ap), (x));} while (0)
-#define fts_set_ptr(ap, x) \
-        do {fts_set_type(ap, fts_s_ptr); fts_word_set_ptr(fts_atom_value(ap), (x));} while (0)
-#define fts_set_fun(ap, x) \
-        do {fts_set_type(ap, fts_s_fun); fts_word_set_fun(fts_atom_value(ap), (x));} while (0)
-#define fts_set_int(ap, x) \
-     do {fts_set_type(ap, fts_s_int); fts_word_set_int(fts_atom_value(ap), (x));} while (0)
-#define fts_set_float(ap, x) \
-     do {fts_set_type(ap, fts_s_float); fts_word_set_float(fts_atom_value(ap), (x));} while (0)
-#define fts_set_array(ap, x) \
-     do {fts_set_type(ap, fts_s_array); fts_word_set_object(fts_atom_value(ap), (fts_object_t *)(x));} while (0)
-#define fts_set_message(ap, x) \
-     do {fts_set_type(ap, fts_s_message); fts_word_set_object(fts_atom_value(ap), (fts_object_t *)(x));} while (0)
-#define fts_set_object(ap, x) \
-     do {fts_set_object_type(ap, fts_s_object); fts_word_set_object(fts_atom_value(ap), (x));} while (0)
-#define fts_set_connection(ap, x)       \
-     do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_atom_value(ap), (x));} while (0)
-
-#define fts_set_void(ap) (fts_set_type(ap, fts_s_void))
-#define fts_set_error(ap) (fts_set_type(ap, fts_s_error))
-
-/* get values of atoms of predefined types */
-#define fts_get_int(ap) (fts_word_get_int(fts_atom_value(ap)))
-#define fts_get_float(ap) (fts_word_get_float(fts_atom_value(ap)))
-#define fts_get_number_int(ap) (fts_is_a(ap, fts_s_float) ? (int)fts_get_float(ap) : fts_get_int(ap))
-#define fts_get_number_float(ap) (fts_is_a(ap, fts_s_float) ? fts_get_float(ap) : (float)fts_get_int(ap))
-#define fts_get_double(ap) (fts_is_a(ap, fts_s_float) ? (double) fts_get_float(ap) : (double)fts_get_int(ap))
-#define fts_get_symbol(ap) (fts_word_get_symbol(fts_atom_value(ap)))
-#define fts_get_string(ap) (fts_word_get_string(fts_atom_value(ap)))
-#define fts_get_ptr(ap) (fts_word_get_ptr(fts_atom_value(ap)))
-#define fts_get_fun(ap) (fts_word_get_fun(fts_atom_value(ap)))
-#define fts_get_array(ap) ((fts_array_t *)fts_word_get_object(fts_atom_value(ap)))
-#define fts_get_message(ap) ((fts_message_t *)fts_word_get_object(fts_atom_value(ap)))
-#define fts_get_object(ap) (fts_word_get_object(fts_atom_value(ap)))
-#define fts_get_connection(ap) (fts_word_get_connection(fts_atom_value(ap)))
-
-/* check atoms for predefined types */
-#define fts_is_int(ap) fts_is_a(ap, fts_s_int)
-#define fts_is_float(ap) fts_is_a(ap, fts_s_float)
-#define fts_is_number(ap) (fts_is_a(ap, fts_s_int) || fts_is_a(ap, fts_s_float))
-#define fts_is_symbol(ap) fts_is_a(ap, fts_s_symbol)
-#define fts_is_string(ap) fts_is_a(ap, fts_s_string)
-#define fts_is_ptr(ap) fts_is_a(ap, fts_s_ptr)
-#define fts_is_fun(ap) fts_is_a(ap, fts_s_fun)
-#define fts_is_void(ap) fts_is_a(ap, fts_s_void)
-#define fts_is_error(ap) fts_is_a(ap, fts_s_error)
-#define fts_is_array(ap) (fts_is_a(ap, fts_s_array))
-#define fts_is_message(ap) (fts_is_a(ap, fts_s_message))
-#define fts_is_object(ap) ((unsigned int)((ap)->type) & 1)
-#define fts_is_connection(ap) fts_is_a(ap, fts_s_connection)
-
-/* atom that can be objects */
-#define fts_atom_refer(ap) do {if(fts_is_object(ap)) fts_object_refer(fts_get_object(ap));} while(0)
-#define fts_atom_release(ap) do {if(fts_is_object(ap)) fts_object_release(fts_get_object(ap));} while(0)
-
-#define fts_atom_assign_object(ap, o) \
-        do {if(fts_is_object(ap)) fts_atom_release(ap); \
-        fts_set_object((ap), o); fts_object_refer(o);} while(0)
-
-#define fts_atom_assign(a1p, a2p) \
-        do {if(fts_is_object(a1p)) fts_atom_release(a1p); \
-        *(a1p) = *(a2p); \
-        if(fts_is_object(a2p)) fts_atom_refer(a2p);} while(0)
-
-#define fts_atom_void(ap) \
-        do {if(fts_is_object(ap)) fts_atom_release(ap); fts_set_void(ap);} while(0)
-
-/* Convenience macros to deal with type and atom algebra */
-#define fts_same_types(ap1, ap2) (((ap1)->type) == (ap2)->type)
-
-/* equality test between two atoms */
-FTS_API int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2);
-
-/* null test: a null content can be a null pointer or a zero value */
-FTS_API int fts_atom_is_null(const fts_atom_t *a);
-
-/* Atom printing function, usually for debug */
-FTS_API void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at);
-FTS_API void sprintf_atoms(char *s, int ac, const fts_atom_t *at);
-
-#endif

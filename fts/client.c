@@ -22,7 +22,11 @@
 
 #define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
+
+#include <string.h>
+#include <stdlib.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -84,10 +88,6 @@ typedef int socket_t;
 
 #define client_error(mess)  post("%s (error %d)\n", mess, SOCKET_ERROR_MESSAGE)
 
-#include <string.h>
-#include <stdlib.h>
-
-#include <fts/fts.h>
 #include "ftsprivate/connection.h"
 #include "ftsprivate/patcher.h"
 #include "ftsprivate/client.h"
@@ -1063,7 +1063,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
       fts_atom_t a[3];
 
       fts_set_symbol( a, fts_new_symbol( "catch"));
-      fts_set_object_with_type( a+1, target, target_class_name);
+      fts_set_object( a+1, target);
       fts_set_int( a+2, channel_number);
       fts_object_new_to_patcher( fts_object_get_patcher( (fts_object_t *)this), 3, a, &from);
 
@@ -1075,7 +1075,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
       fts_atom_t a[2];
 
       fts_set_symbol( a, fts_new_symbol( "inlet"));
-      fts_set_object_with_type( a+1, target, target_class_name);
+      fts_set_object( a+1, target);
       fts_object_new_to_patcher( fts_object_get_patcher( (fts_object_t *)this), 2, a, &from);
 
       fts_set_symbol( a, fts_new_symbol( "outlet"));

@@ -25,8 +25,6 @@
  */
 
 
-#ifndef _FTS_FTLMEM_H_
-#define _FTS_FTLMEM_H_
 
 /* 
 
@@ -107,7 +105,7 @@ but are more than symbols.
 */
 
 
-#define fts_set_ftl_data(A, H)   fts_set_ptr((A), ftl_data_relocate_and_get(H))
+#define fts_set_ftl_data(A, H)   fts_set_pointer((A), ftl_data_relocate_and_get(H))
 
 
 /* Private definition for the dsp module: don't use */
@@ -116,4 +114,3 @@ FTS_API void ftl_mem_start_memory_relocation(void);
 FTS_API void ftl_mem_end_memory_relocation(void);
 FTS_API void *ftl_data_relocate_and_get(struct ftl_data_handle *h);
 
-#endif

@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_FTL_H_
-#define _FTS_FTL_H_
 
 typedef void (*ftl_wrapper_t)(fts_word_t *);
 
@@ -89,4 +87,3 @@ FTS_API void ftl_program_run( ftl_program_t *prog );
 
 FTS_API fts_object_t *ftl_program_get_current_object( ftl_program_t *prog);
 
-#endif

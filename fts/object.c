@@ -394,7 +394,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
     }
 
   if (fts_object_is_error(obj))
-    fts_set_error(&state);
+    fts_set_void(&state);
 
   /* Object created (at worst, a error object) do the last operations, like setting 
      the object description, variables and properties;

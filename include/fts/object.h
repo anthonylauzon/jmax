@@ -21,8 +21,6 @@
  */
 
 
-#ifndef _FTS_OBJECT_H_
-#define _FTS_OBJECT_H_
 
 #define FTS_NO_ID -1
 
@@ -124,4 +122,3 @@ FTS_API void post_object(fts_object_t *obj);
 #define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
 #define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)
 
-#endif

@@ -203,8 +203,33 @@ struct fts_expression_state
   fts_expr_var_ref_t *var_refs;	/* list of variable names referred  in the expression */
 };
 
-/* Error utility */
+/* 
+ * utility function to check nullity of an atom:
+ * a null content can be a null pointer or a zero value 
+ */
+static int atom_is_null( const fts_atom_t *a)
+{
+  if (fts_is_void(a))
+    return 1;
+  else if (fts_is_symbol(a))
+    return fts_get_symbol(a) == 0;
+  else if (fts_is_string(a))
+    return fts_get_string(a) == 0;
+  else if (fts_is_pointer(a))
+    return fts_get_pointer(a) == 0;
+  else if (fts_is_int(a))
+    return fts_get_int(a) == 0;
+  else if (fts_is_float(a))
+    return fts_get_float(a) == 0.0;
+  else if (fts_is_object(a))
+    return fts_get_object(a) == 0;
+  else if (fts_is_connection(a))
+    return fts_get_connection(a) == 0;
+  else
+    return 0;
+}
 
+/* Error utility */
 static int expression_error(fts_expression_state_t *e, int err, const char *msg, const char *arg)
 {
   e->msg = msg;
@@ -333,7 +358,7 @@ static fts_expression_fun_t get_expression_fun(fts_symbol_t name)
 
   fts_set_symbol( &k, name);
   if (fts_hashtable_get(&fts_expression_fun_table, &k, &data))
-    return (fts_expression_fun_t) fts_get_fun(&data);
+    return (fts_expression_fun_t) fts_get_pointer(&data);
   else
     return (fts_expression_fun_t) 0;
 }
@@ -343,7 +368,7 @@ void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f)
   fts_atom_t k, v;
 
   fts_set_symbol( &k, name);
-  fts_set_fun(&v, (void (*)(void))f);
+  fts_set_pointer(&v, f);
   fts_hashtable_put(&fts_expression_fun_table, &k, &v);
 }
 
@@ -948,10 +973,6 @@ static int fts_op_eval(fts_expression_state_t *e)
 		  if (fts_is_void(value))
 		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
 					    fts_symbol_name(varname));
-		  else if (fts_is_error(value))
-		    return expression_error(e, FTS_EXPRESSION_ERROR_OBJECT_REFERENCE,
-					    "Variable %s value is an error object, cannot be used",
-					    fts_symbol_name(varname));
 		  else
 		    *tos = *value;
 		}
@@ -1223,7 +1244,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_EQUAL:
-	  if (fts_atom_are_equals(tos, ptos))
+	  if (fts_atom_equals(tos, ptos))
 	    fts_set_int(ptos, 1);
 	  else
 	    fts_set_int(ptos, 0);
@@ -1231,7 +1252,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_NOT_EQUAL:
-	  if (fts_atom_are_equals(tos, ptos))
+	  if (fts_atom_equals(tos, ptos))
 	    fts_set_int(ptos, 0);
 	  else
 	    fts_set_int(ptos, 1);
@@ -1337,7 +1358,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	      op_stack_pop(e); /* Pop one operator more, the conditional 
 				  eat two operators */
 
-	      if (fts_atom_is_null(value_stack_top(e)))
+	      if (atom_is_null(value_stack_top(e)))
 		*value_stack_top(e) = *tos;
 	      else
 		*value_stack_top(e) = *ptos;
@@ -1584,6 +1605,7 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 }
 
 
+
 /***********************************************************************
  * Compatibility:
  * fts_symbol_set_operator  
@@ -1637,16 +1659,6 @@ void fts_kernel_expression_init(void)
 
   /* function installation */
   fts_expression_declare_fun(fts_new_symbol("unique"), unique);
-
-  /* register pseudo constructors for primitive types */
-  fts_atom_type_register(fts_s_int, 0);
-  fts_atom_type_register(fts_s_float, 0);
-  fts_atom_type_register(fts_s_symbol, 0);
-  fts_atom_type_register(fts_s_ptr, 0);
-  fts_atom_type_register(fts_s_fun, 0);
-  fts_atom_type_register(fts_s_string, 0);
-  fts_atom_type_register(fts_s_object, 0);
-  fts_atom_type_register(fts_s_list, 0);
 
   /* operator declarations  */
   fts_hashtable_init( &operator_table, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);

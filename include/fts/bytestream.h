@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_BYTESTREAM_H_
-#define _FTS_BYTESTREAM_H_
 
 /**
  * The byte stream abstraction (fts_bytestream_t()).
@@ -390,4 +388,3 @@ FTS_API void fts_bytestream_flush(fts_bytestream_t *stream);
 #define fts_bytestream_output_char(s, c) ((s)->output_char((s), (c)))
 #define fts_bytestream_flush(s) {if((s)->flush) (s)->flush(s);}
 
-#endif

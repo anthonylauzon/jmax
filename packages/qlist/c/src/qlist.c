@@ -327,7 +327,7 @@ static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fts_atom_list_iterator_t *iterator;
   int count;
 
-  file = (FILE *)fts_get_ptr( at);
+  file = (FILE *)fts_get_pointer( at);
 
   if ( o->argc > 1)
     fprintf( file, "#N qlist %s;\n", fts_symbol_name( fts_get_symbol( o->argv + 1)));

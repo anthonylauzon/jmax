@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_ITERATOR_H_
-#define _FTS_ITERATOR_H_
 
 /**
  * Iterator
@@ -99,4 +97,3 @@ struct _fts_iterator_t {
  */
 #define fts_iterator_next(I,A) ((*(I)->next)( I, A))
 
-#endif

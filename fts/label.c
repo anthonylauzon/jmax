@@ -207,7 +207,7 @@ label_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 label_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object_with_type(value, obj, fts_s_label);
+  fts_set_object( value, obj);
 }
 
 static void
@@ -231,8 +231,8 @@ static void
 label_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_label_t *this = (fts_label_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
-  void *propagate_context = fts_get_ptr(at + 1);
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+  void *propagate_context = fts_get_pointer(at + 1);
 
   fts_channel_propagate_input( &this->channel, propagate_fun, propagate_context, 0);
 }
@@ -331,8 +331,8 @@ static void
 send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   send_t *this = (send_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
-  void *propagate_context = fts_get_ptr(at + 1);
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+  void *propagate_context = fts_get_pointer(at + 1);
 
   fts_channel_propagate_input( this->channel, propagate_fun, propagate_context, 0);
 }

@@ -21,14 +21,15 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+
 #include "delbuf.h"
 #include "vd.h"
 
 void 
 ftl_delwrite(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
-  del_buf_t * restrict buf = (del_buf_t *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_pointer(argv + 0);
+  del_buf_t * restrict buf = (del_buf_t *)fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   int i;
   int phase = buf->phase;
@@ -50,10 +51,10 @@ ftl_delwrite(fts_word_t *argv)
 void 
 ftl_delread(fts_word_t *argv)
 {
-  float * restrict out = (float *) fts_word_get_ptr(argv + 0);
-  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 1);
+  float * restrict out = (float *) fts_word_get_pointer(argv + 0);
+  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
-  int *del_time = (int *)fts_word_get_ptr(argv + 3);
+  int *del_time = (int *)fts_word_get_pointer(argv + 3);
   int del = *del_time; 
   int i;
 
@@ -82,10 +83,10 @@ ftl_delread(fts_word_t *argv)
 
 void ftl_vd(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv);
-  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
-  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 2);
-  ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_ptr(argv + 3);
+  float * restrict in = (float *)fts_word_get_pointer(argv);
+  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
+  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_pointer(argv + 2);
+  ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_pointer(argv + 3);
   int n = fts_word_get_int(argv + 4);
   float read_tick = n;
   float conv = ftl->conv;
@@ -178,9 +179,9 @@ void ftl_vd(fts_word_t *argv)
 
 void ftl_vd_inplace(fts_word_t *argv)
 {
-  float * restrict inout = (float *)fts_word_get_ptr(argv);
-  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 1);
-  ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_ptr(argv + 2);
+  float * restrict inout = (float *)fts_word_get_pointer(argv);
+  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_pointer(argv + 1);
+  ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_pointer(argv + 2);
   int n = fts_word_get_int(argv + 3);
   float read_tick = n;
   float conv = ftl->conv;
@@ -272,10 +273,10 @@ void ftl_vd_inplace(fts_word_t *argv)
 void
 ftl_vd_miller(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv);
-  float *out = (float *)fts_word_get_ptr(argv + 1);
-  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 2);
-  ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_ptr(argv + 3);
+  float *in = (float *)fts_word_get_pointer(argv);
+  float *out = (float *)fts_word_get_pointer(argv + 1);
+  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_pointer(argv + 2);
+  ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_pointer(argv + 3);
   int n = fts_word_get_int(argv + 4);
   float write_tick = fts_word_get_float(argv + 5);
   float conv = ftl->conv;

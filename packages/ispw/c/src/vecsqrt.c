@@ -39,8 +39,8 @@ typedef struct
 void 
 ftl_sqrt(fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -51,8 +51,8 @@ ftl_sqrt(fts_word_t *argv )
 void 
 ftl_rsqrt(fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -64,7 +64,7 @@ static void
 sqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecsqrt_t *obj = (vecsqrt_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
@@ -77,7 +77,7 @@ static void
 rsqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecsqrt_t *obj = (vecsqrt_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));

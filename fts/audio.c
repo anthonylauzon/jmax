@@ -20,7 +20,8 @@
  * 
  */
 
-#include "ftsconfig.h"
+#include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,11 +38,10 @@
 #include <unistd.h>
 #endif
 
-#include <fts/fts.h>
 #include <ftsprivate/connection.h>
 
 
-#define AUDIOPORT_DEFAULT_IDLE ((void (*)( struct _fts_audioport_t *port))-1)
+#define AUDIOPORT_DEFAULT_IDLE ((void (*)(fts_audioport_t *port))-1)
 
 static fts_audioport_t *audioport_list = 0;
 
@@ -200,10 +200,10 @@ static void audioport_call_io_fun( fts_audioport_t *port, ftl_wrapper_t fun, int
 
   at = (fts_word_t *)alloca( (channels+2) * sizeof( fts_word_t));
 
-  fts_word_set_ptr( at+0, port);
+  fts_word_set_pointer( at+0, port);
   fts_word_set_int( at+1, len);
   for ( i = 0; i < channels; i++)
-    fts_word_set_ptr( at+2+i, sig);
+    fts_word_set_pointer( at+2+i, sig);
 
   (*fun)( at);
 }
@@ -373,9 +373,9 @@ static void audioportin_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   channels = fts_audioport_get_input_channels( this->port);
   args = (fts_atom_t *)alloca( (channels+2) * sizeof( fts_atom_t));
-  dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 
-  fts_set_ptr( args+0, this->port);
+  fts_set_pointer( args+0, this->port);
   fts_set_int( args+1, fts_dsp_get_output_size(dsp, 0));
   for ( i = 0; i < channels; i++)
     fts_set_symbol( args+2+i, fts_dsp_get_output_name( dsp, i));
@@ -430,8 +430,8 @@ static void indispatcher_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 static void indispatcher_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   indispatcher_t *this  = (indispatcher_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
-  void *propagate_context = fts_get_ptr(at + 1);
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
+  void *propagate_context = fts_get_pointer(at + 1);
   int inlet = fts_get_int( at+2);
 
   fts_channel_propagate_input( &this->channel_objects[inlet], propagate_fun, propagate_context, inlet);
@@ -540,9 +540,9 @@ static void audioportout_put( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   channels = fts_audioport_get_output_channels( this->port);
   args = (fts_atom_t *)alloca( (channels+2) * sizeof( fts_atom_t));
-  dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 
-  fts_set_ptr( args+0, this->port);
+  fts_set_pointer( args+0, this->port);
   fts_set_int( args+1, fts_dsp_get_input_size(dsp, 0));
   for ( i = 0; i < channels; i++)
     fts_set_symbol( args+2+i, fts_dsp_get_input_name( dsp, i));

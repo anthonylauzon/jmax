@@ -76,7 +76,7 @@ fts_package_t* fts_package_load_from_file(fts_symbol_t name, const char* filenam
  *  Package
  */
 
-struct _fts_package_t {
+struct fts_package {
   fts_object_t object;
 
   fts_symbol_t name;

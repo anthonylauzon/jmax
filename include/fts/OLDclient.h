@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_OLDCLIENT_H_
-#define _FTS_OLDCLIENT_H_
 
 FTS_API void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
 FTS_API void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
@@ -34,5 +32,4 @@ FTS_API void fts_client_add_object(fts_object_t *obj);
 FTS_API void fts_client_add_atoms(int ac, const fts_atom_t *args);
 FTS_API void fts_client_done_msg(void);
 
-#endif
 

@@ -22,10 +22,10 @@
 
 /* resample.c */
 
-#include <string.h>
-
 #include <fts/fts.h>
 #include <ftsconfig.h>
+
+#include <string.h>
 
 
 /* ------------------------------ sigup~ ------------------------------- */
@@ -47,9 +47,9 @@ typedef struct up
 static void
 ftl_up(fts_word_t *argv)
 {
-  float * restrict in  = (float *)fts_word_get_ptr(argv);
-  float * restrict out = (float *)fts_word_get_ptr(argv+1);
-  up_state_t *x = (up_state_t *)fts_word_get_ptr(argv+2);
+  float * restrict in  = (float *)fts_word_get_pointer(argv);
+  float * restrict out = (float *)fts_word_get_pointer(argv+1);
+  up_state_t *x = (up_state_t *)fts_word_get_pointer(argv+2);
   int n = fts_word_get_int(argv+3);
   int i, j;
   float x0;
@@ -78,7 +78,7 @@ sigup_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   sigup_t *this = (sigup_t *)o;
   fts_atom_t argv[4];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   const float zero = 0.0f;
 
   ftl_data_set(up_state_t, this->up_ftl_data, last[0], &zero);
@@ -153,8 +153,8 @@ typedef struct down
 static void
 ftl_down(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv);
-  float * restrict out = (float *)fts_word_get_ptr(argv+1);
+  float * restrict in = (float *)fts_word_get_pointer(argv);
+  float * restrict out = (float *)fts_word_get_pointer(argv+1);
   long int n = fts_word_get_int(argv+2);
   int i, j;
 
@@ -167,7 +167,7 @@ static void
 sigdown_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
 
   fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));

@@ -20,15 +20,11 @@
  * 
  */
 
-#ifndef _FTS_EXPRESSION_H_
-#define _FTS_EXPRESSION_H_
-
 typedef struct fts_expression_state fts_expression_state_t;
 typedef struct fts_expression_assignement fts_expression_assignement_t;
 typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
 
-FTS_API fts_expression_state_t *
-fts_expression_eval(fts_patcher_t *scope, int expr_size, const fts_atom_t *expr, int result_size, fts_atom_t *result);
+FTS_API fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope, int expr_size, const fts_atom_t *expr, int result_size, fts_atom_t *result);
 
 FTS_API void fts_expression_state_free(fts_expression_state_t *e);
 
@@ -45,4 +41,3 @@ FTS_API int fts_expression_get_status(fts_expression_state_t *e);
 
 FTS_API void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f);
 
-#endif

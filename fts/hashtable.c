@@ -61,12 +61,12 @@ static int equals_int( const fts_atom_t *a, const fts_atom_t *b)
 
 static unsigned int hash_ptr( const fts_atom_t *a)
 {
-  return (unsigned int)fts_get_ptr( a) >> 3;
+  return (unsigned int)fts_get_pointer( a) >> 3;
 }
 
 static int equals_ptr( const fts_atom_t *a, const fts_atom_t *b)
 {
-  return fts_get_ptr( a) == fts_get_ptr( b);
+  return fts_get_pointer( a) == fts_get_pointer( b);
 }
 
 static unsigned int hash_string( const fts_atom_t *a)

@@ -21,6 +21,7 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+
 #include <string.h>
 
 /*****************************************************************************
@@ -66,7 +67,7 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 	}
       else
 	{
-	  fts_set_ptr(&a, this);
+	  fts_set_pointer(&a, this);
 	  fts_hashtable_put(&catch_table, &k, &a);
 	  
 	  this->name = name;
@@ -104,8 +105,8 @@ sigcatch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
 static void
 sigcatch_64_dsp_fun(fts_word_t *argv)
 {
-  float * restrict out = (float *)fts_word_get_ptr(argv);
-  float * restrict buf = (float *)fts_word_get_ptr(argv+1);
+  float * restrict out = (float *)fts_word_get_pointer(argv);
+  float * restrict buf = (float *)fts_word_get_pointer(argv+1);
   int i;
 
   for (i = 0; i < 64; i++)
@@ -119,8 +120,8 @@ sigcatch_64_dsp_fun(fts_word_t *argv)
 static void
 sigcatch_dsp_fun(fts_word_t *argv)
 {
-  float * restrict out = (float *)fts_word_get_ptr(argv);
-  float * restrict buf = (float *)fts_word_get_ptr(argv+1);
+  float * restrict out = (float *)fts_word_get_pointer(argv);
+  float * restrict buf = (float *)fts_word_get_pointer(argv+1);
   int n = fts_word_get_int(argv+2);
   int i;
 
@@ -136,7 +137,7 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   sigcatch_t *this = (sigcatch_t *)o;
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   int i;
  
@@ -157,14 +158,14 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if (n_tick == 64)
     {
       fts_set_symbol(argv, fts_dsp_get_output_name(dsp, 0));
-      fts_set_ptr(argv+1, this->buf);
+      fts_set_pointer(argv+1, this->buf);
 
       dsp_add_funcall(sigcatch_64_function, 2, argv);
     }
   else
     {
       fts_set_symbol(argv, fts_dsp_get_output_name(dsp, 0));
-      fts_set_ptr(argv+1, this->buf);
+      fts_set_pointer(argv+1, this->buf);
       fts_set_int(argv+2, n_tick);
 
       dsp_add_funcall(sigcatch_function, 3, argv);
@@ -247,8 +248,8 @@ sigthrow_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
 static void
 sigthrow_dsp_fun(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv);
-  float * restrict p = *((float **)fts_word_get_ptr(argv + 1));
+  float * restrict in = (float *)fts_word_get_pointer(argv);
+  float * restrict p = *((float **)fts_word_get_pointer(argv + 1));
   int n = fts_word_get_int(argv + 2);
 
   if(p)
@@ -263,8 +264,8 @@ sigthrow_dsp_fun(fts_word_t *argv)
 static void
 sigthrow_dsp_64_fun(fts_word_t *argv)
 {
-  float * restrict in = (float *)fts_word_get_ptr(argv);
-  float * restrict p = *((float **)fts_word_get_ptr(argv + 1));
+  float * restrict in = (float *)fts_word_get_pointer(argv);
+  float * restrict p = *((float **)fts_word_get_pointer(argv + 1));
 
   if(p)
     {
@@ -280,7 +281,7 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   sigthrow_t *this = (sigthrow_t *)o;
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   float **bufp = ftl_data_get_ptr(this->bufp);
   fts_atom_t a, k;
@@ -291,7 +292,7 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_symbol( &k, this->name);
   if (fts_hashtable_get( &catch_table, &k, &a))
     {
-      sigcatch_t *sigcatch = (sigcatch_t *)fts_get_ptr(&a);
+      sigcatch_t *sigcatch = (sigcatch_t *)fts_get_pointer(&a);
 
       if(sigcatch->n_tick == 0)
 	{
@@ -341,7 +342,7 @@ sigthrow_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   fts_set_symbol( &k, this->name);
   if(this->name && fts_hashtable_get(&catch_table, &k, &a))
     {
-      sigcatch_t *sigcatch = (sigcatch_t *)fts_get_ptr(&a);
+      sigcatch_t *sigcatch = (sigcatch_t *)fts_get_pointer(&a);
 
       if(sigcatch->n_tick != 0 && sigcatch->n_tick != this->n_tick)
 	{

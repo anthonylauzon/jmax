@@ -212,7 +212,7 @@ static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
   int i, count;
   ivec_t *vec;
 
-  file = (FILE *)fts_get_ptr( at);
+  file = (FILE *)fts_get_pointer( at);
 
   size = ivec_get_size( this->vec);
 

@@ -65,7 +65,7 @@ static void
 wahwah_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wahwah_t *this = (wahwah_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   double sr = fts_dsp_get_input_srate(dsp, 0);
   float *state = (float *)ftl_data_get_ptr(this->state);
@@ -89,11 +89,11 @@ wahwah_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 ftl_wahwah(fts_word_t *argv)
 {
-  float *x = (float *)fts_word_get_ptr(argv + 0);
-  float *in_freq = (float *)fts_word_get_ptr(argv + 1);
-  float *in_q = (float *)fts_word_get_ptr(argv + 2);
-  float *y = (float *)fts_word_get_ptr(argv + 3);
-  float *state = (float *)fts_word_get_ptr(argv + 4);
+  float *x = (float *)fts_word_get_pointer(argv + 0);
+  float *in_freq = (float *)fts_word_get_pointer(argv + 1);
+  float *in_q = (float *)fts_word_get_pointer(argv + 2);
+  float *y = (float *)fts_word_get_pointer(argv + 3);
+  float *state = (float *)fts_word_get_pointer(argv + 4);
   float conv = fts_word_get_float(argv + 5);
   long n_tick = fts_word_get_int(argv + 6);
   float theta, cos_theta, sin_theta, q, r;

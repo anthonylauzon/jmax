@@ -100,8 +100,8 @@ tabcycle_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 tabcycle_dsp_function(fts_word_t *argv)
 {
-  float *out = (float *)fts_word_get_ptr(argv);
-  tabcycle_ctl_t *ctl = (tabcycle_ctl_t *)fts_word_get_ptr(argv + 1);
+  float *out = (float *)fts_word_get_pointer(argv);
+  tabcycle_ctl_t *ctl = (tabcycle_ctl_t *)fts_word_get_pointer(argv + 1);
   int n_tick = fts_word_get_int(argv + 2);
   int offset;
   int i;
@@ -119,7 +119,7 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   tabcycle_t *this = (tabcycle_t *)o;
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
   sampbuf_t *buf;
   int n_tick;
   int l;

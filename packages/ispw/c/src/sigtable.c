@@ -19,10 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <sys/types.h>
-#include <string.h>
 #include <fts/fts.h>
 #include <ftsconfig.h>
+
+#include <sys/types.h>
+#include <string.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>

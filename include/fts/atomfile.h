@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _FTS_ATOMFILES_H_
-#define _FTS_ATOMFILES_H_
 
 /* 
    Functions to read and write an atom from a file; should go in parser.c,
@@ -49,8 +47,7 @@
    
 */
 
-struct _fts_atom_file_t_;
-typedef struct _fts_atom_file_t_ fts_atom_file_t;
+typedef struct fts_atom_file fts_atom_file_t;
 
 FTS_API fts_atom_file_t *fts_atom_file_open(const char *name, const char *mode);
 FTS_API void fts_atom_file_close(fts_atom_file_t *f);
@@ -58,4 +55,3 @@ FTS_API void fts_atom_file_close(fts_atom_file_t *f);
 FTS_API int fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator);
 FTS_API int fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator);
 
-#endif

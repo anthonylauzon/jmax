@@ -20,29 +20,29 @@
  * 
  */
 
-
-#ifndef _FTS_CLASS_H_
-#define _FTS_CLASS_H_
-
 typedef fts_status_t (*fts_instantiate_fun_t)(fts_class_t *, int, const fts_atom_t *);
 typedef int (*fts_equiv_fun_t)(int, const fts_atom_t *, int, const fts_atom_t *);
 
 typedef struct fts_inlet_decl fts_inlet_decl_t;
 typedef struct fts_outlet_decl fts_outlet_decl_t;
 
-struct fts_metaclass
-{
+struct fts_metaclass {
   fts_symbol_t name; /* name of the metaclass, i.e. the first name used to register it */
+
+  /* Selector used if an instance of this class is send in a message.
+     Defaults to class name.
+     Set only for metaclasses representing primitive types.
+  */
+  fts_symbol_t selector; 
 
   fts_instantiate_fun_t instantiate_fun;
   fts_equiv_fun_t equiv_fun;
   fts_class_t *inst_list; /* instance data base */
-
+  
   fts_package_t *package; /* home package of the metaclass */
 };
 
-struct fts_class
-{
+struct fts_class {
   /* Object management */
   fts_metaclass_t *mcl;
   fts_inlet_decl_t *sysinlet;
@@ -84,17 +84,20 @@ FTS_API fts_status_description_t fts_CannotInstantiate;
 
 /* Meta classes functions */
 
-FTS_API fts_status_t fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun);
-FTS_API fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
+FTS_API fts_metaclass_t *fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun);
+FTS_API fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 
 FTS_API void fts_alias_install(fts_symbol_t alias_name, fts_symbol_t class_name);
+
+#define fts_metaclass_get_selector(MCL) ((MCL)->selector ? (MCL)->selector : (MCL)->name)
 
 /* Class functions  and macros */
 #define FTS_VAR_ARGS  -1
 
-FTS_API fts_status_t fts_class_init(fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
-FTS_API fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at);
-FTS_API fts_class_t *fts_class_get_by_name(fts_symbol_t name);
+FTS_API fts_status_t fts_class_init( fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
+FTS_API fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at);
+FTS_API fts_class_t *fts_class_get_by_name( fts_symbol_t name);
+FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t name);
 
 /* method definition */
 
@@ -175,4 +178,3 @@ FTS_API int fts_never_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_
 FTS_API int fts_always_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 FTS_API int fts_arg_type_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 
-#endif

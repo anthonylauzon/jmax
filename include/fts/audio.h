@@ -20,8 +20,6 @@
  * 
  */
 
-#ifndef _FTS_AUDIO_H_
-#define _FTS_AUDIO_H_
 
 /**
  * The FTS audio port structure.
@@ -43,7 +41,7 @@
  *
  * @ingroup audioport
  */
-struct _fts_audioport_direction {
+struct fts_audioport_direction {
   int channels;
   fts_symbol_t io_function_name;
   ftl_wrapper_t io_function;
@@ -52,13 +50,13 @@ struct _fts_audioport_direction {
 };
   
   
-typedef struct _fts_audioport_t {
+typedef struct fts_audioport {
   fts_object_t head;
-  struct _fts_audioport_t *next;
-  struct _fts_audioport_direction input;
-  struct _fts_audioport_direction output;
-  void (*idle_function)( struct _fts_audioport_t *port);
-  int (*xrun_function)( struct _fts_audioport_t *port);
+  struct fts_audioport *next;
+  struct fts_audioport_direction input;
+  struct fts_audioport_direction output;
+  void (*idle_function)( struct fts_audioport *port);
+  int (*xrun_function)( struct fts_audioport *port);
 } fts_audioport_t;
 
 FTS_API void fts_audioport_init( fts_audioport_t *port);
@@ -105,4 +103,3 @@ FTS_API int fts_audioport_report_xrun( void);
 FTS_API fts_audioport_t *fts_audioport_get_default( fts_object_t *obj);
 FTS_API void fts_audioport_set_default_class( fts_symbol_t name);
 
-#endif

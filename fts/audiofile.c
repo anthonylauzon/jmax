@@ -20,8 +20,8 @@
  * 
  */
 
-#include "ftsconfig.h"
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
 #define fts_audiofile_loader_open_write(_f)      (*fts_audiofile_loader->open_write)(_f)
 #define fts_audiofile_loader_open_read(_f)       (*fts_audiofile_loader->open_read)(_f)
@@ -259,11 +259,11 @@ fts_audiofile_delete(fts_audiofile_t* aufile)
 void
 fts_audiofile_put_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t a[2 + NUM_CHAN];
   int i;
 
-  fts_set_ptr(a + 0, o);
+  fts_set_pointer(a + 0, o);
   fts_set_int(a + 1, fts_dsp_get_output_size(dsp, 0));
 
   for (i = 0; i < NUM_CHAN; i++) {
@@ -276,11 +276,11 @@ fts_audiofile_put_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 void
 fts_audiofile_put_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t a[2 + NUM_CHAN];
   int i;
 
-  fts_set_ptr(a + 0, o);
+  fts_set_pointer(a + 0, o);
   fts_set_int(a + 1, fts_dsp_get_input_size(dsp, 0));
 
   for (i = 0; i < NUM_CHAN; i++) {
@@ -298,13 +298,13 @@ fts_audiofile_put_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void
 fts_audiofile_ftl_read(fts_word_t *argv)
 {
-  fts_audiofile_t *this = (fts_audiofile_t *)fts_word_get_ptr(argv + 0);
+  fts_audiofile_t *this = (fts_audiofile_t *)fts_word_get_pointer(argv + 0);
   int n = fts_word_get_int(argv + 1);
   float* buf[NUM_CHAN];
   int i;
 
   for (i = 0; i < NUM_CHAN; i++) {
-    buf[i] = (float *)fts_word_get_ptr(argv + 2 + i);
+    buf[i] = (float *)fts_word_get_pointer(argv + 2 + i);
   }
 
   fts_audiofile_read(this, &buf[0], NUM_CHAN, n); 
@@ -313,13 +313,13 @@ fts_audiofile_ftl_read(fts_word_t *argv)
 static void
 fts_audiofile_ftl_write(fts_word_t *argv)
 {
-  fts_audiofile_t *this = (fts_audiofile_t *)fts_word_get_ptr(argv + 0);
+  fts_audiofile_t *this = (fts_audiofile_t *)fts_word_get_pointer(argv + 0);
   int n = fts_word_get_int(argv + 1);
   float* buf[NUM_CHAN];
   int i;
 
   for (i = 0; i < NUM_CHAN; i++) {
-    buf[i] = (float *)fts_word_get_ptr(argv + 2 + i);
+    buf[i] = (float *)fts_word_get_pointer(argv + 2 + i);
   }
 
   fts_audiofile_write(this, &buf[0], NUM_CHAN, n); 

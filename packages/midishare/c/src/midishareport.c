@@ -83,7 +83,7 @@ midishare_reference_hash(fts_symbol_t name)
 
   fts_set_symbol( &k, name);
   if(fts_hashtable_get( &midishare_reference_table, &k, &atom))
-    return (midishare_reference_t *)fts_get_ptr(&atom);
+    return (midishare_reference_t *)fts_get_pointer(&atom);
   else
     return 0;
 }
@@ -116,7 +116,7 @@ midishare_reference_new(fts_symbol_t name)
   
   /* insert reference to hashtable */
   fts_set_symbol( &k, name);
-  fts_set_ptr(&atom, ref);
+  fts_set_pointer(&atom, ref);
   fts_hashtable_put(&midishare_reference_table, &k, &atom);
 
   return ref;
@@ -526,7 +526,7 @@ midishareport_cleanup(void)
 
       fts_iterator_next( &i, &v);
 
-      ref = (midishare_reference_t *)fts_get_ptr( &v);
+      ref = (midishare_reference_t *)fts_get_pointer( &v);
       
       /* close MidiShare application */
       MidiClose(ref->number);

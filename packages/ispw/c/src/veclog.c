@@ -48,8 +48,8 @@ typedef struct
 void 
 ftl_exp(fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -60,8 +60,8 @@ ftl_exp(fts_word_t *argv )
 void 
 ftl_log(fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -72,8 +72,8 @@ ftl_log(fts_word_t *argv )
 void 
 ftl_log10(fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float *out = (float *)fts_word_get_ptr(argv + 1); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float *out = (float *)fts_word_get_pointer(argv + 1); 
   int size = fts_word_get_int(argv + 2); 
   int i; 
 
@@ -84,9 +84,9 @@ ftl_log10(fts_word_t *argv )
 void 
 ftl_expb(fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -97,9 +97,9 @@ ftl_expb(fts_word_t *argv )
 void 
 ftl_logb(fts_word_t *argv ) 
 { 
-  float *in = (float *)fts_word_get_ptr(argv + 0); 
-  float scl = *((float *)fts_word_get_ptr(argv + 1 )); 
-  float *out = (float *)fts_word_get_ptr(argv + 2); 
+  float *in = (float *)fts_word_get_pointer(argv + 0); 
+  float scl = *((float *)fts_word_get_pointer(argv + 1 )); 
+  float *out = (float *)fts_word_get_pointer(argv + 2); 
   int size = fts_word_get_int(argv + 3); 
   int i; 
 
@@ -126,7 +126,7 @@ veclog_put_scl(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
   fts_atom_t argv[4];
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-  fts_set_ptr(argv + 1, &this->scl);
+  fts_set_pointer(argv + 1, &this->scl);
   fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(name, 4, argv);
@@ -135,31 +135,31 @@ veclog_put_scl(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 static void 
 exp_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  veclog_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), exp_symbol);
+  veclog_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), exp_symbol);
 }
 
 static void 
 log_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  veclog_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), log_symbol);
+  veclog_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), log_symbol);
 }
 
 static void 
 log10_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  veclog_put(o, (fts_dsp_descr_t *)fts_get_ptr(at), log10_symbol);
+  veclog_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), log10_symbol);
 }
 
 static void 
 expb_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_ptr(at), expb_symbol);
+  veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_pointer(at), expb_symbol);
 }
 
 static void 
 logb_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_ptr(at), logb_symbol);
+  veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_pointer(at), logb_symbol);
 }
 
 /************************************************

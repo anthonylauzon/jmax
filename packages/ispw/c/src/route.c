@@ -263,7 +263,7 @@ route_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     }
 
   for (n = 1, tat = at+1; n < ac; n++, tat++)
-    if (!fts_same_types(at, tat))
+    if (!fts_atom_same_type(at, tat))
       {
 	post( "route: argument types don't match\n");
 	return &fts_ArgumentTypeMismatch;

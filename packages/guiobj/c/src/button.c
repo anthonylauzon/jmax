@@ -157,7 +157,7 @@ button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int x, y, w;
   fts_atom_t a;
 
-  file = (FILE *)fts_get_ptr( at);
+  file = (FILE *)fts_get_pointer( at);
 
   fts_object_get_prop( o, fts_s_x, &a);
   x = fts_get_int( &a);

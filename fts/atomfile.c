@@ -18,23 +18,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 #include <fts/fts.h>
+#include <ftsconfig.h>
 
 #include <string.h>
-
-#include "ftsconfig.h"
-
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-
 #if HAVE_IO_H
 #include <io.h>
 #endif
 
 #define ATOM_FILE_BUF_SIZE 512
 
-struct _fts_atom_file_t_
+struct fts_atom_file
 {
   FILE* fd;
   char mode;			/* "r" for read, "w" for write */

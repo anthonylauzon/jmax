@@ -38,7 +38,7 @@ void
 white_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   white_t *this = (white_t *)o;
-  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_ptr(at);
+  fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t a[2];
   
   fts_set_symbol(a + 0, fts_dsp_get_output_name(dsp, 0));
@@ -50,7 +50,7 @@ white_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 white_ftl(fts_word_t *argv)
 {
-  float *out = (float *) fts_word_get_ptr(argv + 0);
+  float *out = (float *) fts_word_get_pointer(argv + 0);
   int n = fts_word_get_int(argv + 1);
   int i;
   
