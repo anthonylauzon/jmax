@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install
+install:
 	$(INSTALL_DIR) $(doc_install_dir)/images
 	for f in *.gif ; do $(INSTALL_DATA) $$f $(doc_install_dir)/images ; done
 .PHONY: install
