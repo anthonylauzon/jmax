@@ -325,7 +325,6 @@ static void fts_socketstream_instantiate(fts_class_t *cl)
  *
  */
 #define FTS_UDP_DEFAULT_PORT 2023
-#define FTS_UDP_DEFAULT_CONNECT_PORT 2024
 
 struct _fts_udpstream_t 
 {
@@ -395,7 +394,35 @@ void fts_udpstream_connect(fts_udpstream_t* stream, int connected_port)
     return;
   }
 
+  /* if connected set output method */
+  fts_bytestream_set_output((fts_bytestream_t *) stream, 
+			    fts_udpstream_output,
+			    fts_udpstream_output_char,
+			    fts_udpstream_flush);
+
   stream->connected_port = connected_port;
+}
+
+void fts_udpstream_disconnect(fts_udpstream_t* stream)
+{
+  struct sockaddr addr;
+  
+  memset((char*)&addr, 0, sizeof(struct sockaddr_in));
+  
+  addr.sa_family = AF_UNSPEC;
+  if (connect(stream->socket, (const struct sockaddr*)&addr, sizeof(struct sockaddr)) == SOCKET_ERROR)
+  {
+    fts_object_error((fts_object_t*)stream, "Cannot disconnect socket");
+    return;
+  }
+
+  /* if not connected clear output method */
+  fts_bytestream_set_output((fts_bytestream_t *) stream, 
+			    0,
+			    0,
+			    0);
+
+  stream->connected_port = -1;
 }
 
 static void fts_udpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -410,7 +437,7 @@ static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int 
   fts_atom_t a;
 
   self->port = fts_get_int_arg(ac, at, 0, FTS_UDP_DEFAULT_PORT);
-  self->connected_port = fts_get_int_arg(ac, at, 1, FTS_UDP_DEFAULT_CONNECT_PORT);  
+  self->connected_port = -1;
     
   self->socket = socket(AF_INET, SOCK_DGRAM, 0);
   if (self->socket == INVALID_SOCKET)
@@ -430,15 +457,20 @@ static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int 
     CLOSESOCKET(self->socket);
     return;
   }
-
-  fts_udpstream_connect(self, self->connected_port);
   fts_bytestream_set_input((fts_bytestream_t*)self);
+
+  /* create a connection with 2 arguments are given to constructor */
+  if (ac == 2 && fts_is_int(at + 1))
+  {
+    self->connected_port = fts_get_int(at + 1);  
+    fts_udpstream_connect(self, self->connected_port);
+
   
-  fts_bytestream_set_output((fts_bytestream_t *) self, 
-			    fts_udpstream_output,
-			    fts_udpstream_output_char,
-			    fts_udpstream_flush);
-  
+    fts_bytestream_set_output((fts_bytestream_t *) self, 
+			      fts_udpstream_output,
+			      fts_udpstream_output_char,
+			      fts_udpstream_flush);
+  }
 
   fts_sched_add( (fts_object_t *)self, FTS_SCHED_READ, self->socket);
 
