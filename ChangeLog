@@ -1,3 +1,9 @@
+2003-02-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* add "Open Configuration" menu implementation
+
+	* add "Save As Default Configuration" menu implementation
+	
 2003-02-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* cleaned exceptions report code in JMaxApplication.
