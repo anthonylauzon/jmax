@@ -349,6 +349,11 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_bang, tup_output);
   fts_method_define_varargs(cl, 0, fts_s_set, tup_set);
+  fts_method_define_varargs(cl, 0, fts_s_int, tup_input_primitive);
+  fts_method_define_varargs(cl, 0, fts_s_float, tup_input_primitive);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, tup_input_primitive);
+  fts_method_define_varargs(cl, 0, fts_s_list, tup_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_anything, tup_input_anything);
 
   fts_method_define_varargs(cl, 1, fts_s_int, tup_input_primitive);
   fts_method_define_varargs(cl, 1, fts_s_float, tup_input_primitive);

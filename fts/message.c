@@ -232,7 +232,7 @@ message_outlet(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_a
 		  FTS_OBJSTACK_POP(o);
 		}
 	      else
-		fts_object_signal_runtime_error(o, "Received unknown message %s at inlet %d", s, conn->winlet);
+		fts_object_signal_runtime_error(conn->dst, "Received unknown message %s at inlet %d", s, conn->winlet);
 	    }
 	  
 	  conn = conn->next_same_src;
