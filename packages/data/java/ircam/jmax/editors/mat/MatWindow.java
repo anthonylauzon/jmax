@@ -119,7 +119,11 @@ public class MatWindow extends JFrame implements EditorContainer{
   
   public void setWindowName(String name)
   {
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType() +"  "+name));
+    if(name != null)
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType() +"  "+name));
+    else
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(matData.getType()));
+    
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
   

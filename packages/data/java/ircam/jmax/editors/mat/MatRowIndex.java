@@ -50,6 +50,7 @@ public class MatRowIndex extends PopupToolbarPanel
 			public void mousePressed(MouseEvent e)
       {
         int rowId = getRowIndex(e.getY());         
+        if(rowId < 0) return;
         if((e.getModifiers() & InputEvent.SHIFT_MASK) == 0)
         {
           matPanel.table.getSelectionModel().clearSelection();
@@ -61,7 +62,7 @@ public class MatRowIndex extends PopupToolbarPanel
             matPanel.table.removeRowSelectionInterval(rowId, rowId);
           else
             matPanel.table.addRowSelectionInterval(rowId, rowId);
-        }        
+        }       
       }
 		});
     
