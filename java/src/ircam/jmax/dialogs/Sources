@@ -2,6 +2,7 @@ SOURCES = \
            ConnectionDialog.java \
            ErrorDialog.java \
            FileNotSavedDialog.java \
+	   QuitDialog.java \
            SplashDialog.java \
 	   MaxFileChooser.java \
            StatisticsDialog.java \

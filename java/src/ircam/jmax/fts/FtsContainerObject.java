@@ -172,7 +172,6 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   public final void open()
   {
-    System.err.println("Patcher " + this + " opened ");
     open = true;
     FtsServer.getServer().openPatcher(this);
     FtsServer.getServer().syncToFts();
@@ -182,7 +181,6 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   public final void close()
   {
-    System.err.println("Patcher " + this + " closed ");
     open = false;
 
     FtsServer.getServer().closePatcher(this);

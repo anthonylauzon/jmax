@@ -44,35 +44,21 @@ public class MaxApplication extends Object {
   static Interp itsInterp;//e.m.
   public static Vector itsSketchWindowList;
   public static Vector itsEditorsFrameList;
-  //  private static HashTable editorFactories; //association between MaxDataTypes and MaxDataEditorFactories
   static ConnectionDialog itsConnDialog;
   public static boolean doAutorouting = true; // Should become a static in the Patcher editor
-  //e.m.public static ConsShell itsShell;
 
   public static Properties jmaxProperties;
 
   public static ErmesSketchWindow itsSketchWindow;
-  public static MaxWindow itsWindow;
+  public static MaxEditor itsWindow;
 
   static MaxWhenHookTable  itsHookTable;
-  public final static int SNAP_TO_GRID = 5;
-  public final static int NEW_PROJECT = 6;
-  //public final static int CLOSE_WINDOW = 7;
-  public final static int OPEN_COMMAND = 9;
-  public final static int SAVE_COMMAND = 10;
-  public final static int SAVEAS_COMMAND = 11;
-  public final static int ADD_WINDOW = 13;
-  public final static int REMOVE_FILES = 15;
-  public final static int OPEN_WITH_AUTO_ROUTING = 17;
-  public final static int PRINT_WINDOW = 19;
 
   static ConsoleWindow itsConsoleWindow = null;
 
   static final int SCREENVERT = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
   static final int SCREENHOR = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
 
-
-  // Data handling
 
   /** Method to create a new MaxData of a named type */
 
@@ -176,7 +162,7 @@ public class MaxApplication extends Object {
 
   static public void AddThisWindowToMenus(ErmesSketchWindow theSketchWindow){
     ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
+    MaxEditor aWindow;
     if(!theSketchWindow.isSubPatcher){
       for(int i=0;i<itsSketchWindowList.size();i++){
 	aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
@@ -184,7 +170,7 @@ public class MaxApplication extends Object {
 	  aSketchWindow.AddWindowToMenu(theSketchWindow.getTitle());
       }
       for(int i=0;i<itsEditorsFrameList.size();i++){
-	aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
+	aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
 	aWindow.AddWindowToMenu(theSketchWindow.getTitle());
       }
 
@@ -195,13 +181,13 @@ public class MaxApplication extends Object {
 
   static public void AddThisFrameToMenus(String theName){
     ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
+    MaxEditor aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
       aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
       aSketchWindow.AddWindowToMenu(theName);
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
+      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
 	if(!theName.equals(aWindow.GetTitle()))
 	  aWindow.AddWindowToMenu(theName);
     }
@@ -212,14 +198,14 @@ public class MaxApplication extends Object {
 
   public static void AddToSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theFirstItem){
     ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
+    MaxEditor aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
       aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
       if(aSketchWindow != theTopWindow) 
 	aSketchWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
+      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
       aWindow.AddToSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theFirstItem);
     }
 
@@ -229,14 +215,14 @@ public class MaxApplication extends Object {
 
    public static void RemoveFromSubWindowsList(ErmesSketchWindow theTopWindow,ErmesSketchWindow theSubWindow, boolean theLastItem){
     ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
+    MaxEditor aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
       aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
       if(aSketchWindow != theTopWindow) 
 	aSketchWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(),theSubWindow.getTitle(),theLastItem);
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
+      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
       aWindow.RemoveFromSubWindowsMenu(theTopWindow.getTitle(), theSubWindow.getTitle(), theLastItem);
     }
 
@@ -247,16 +233,16 @@ public class MaxApplication extends Object {
   }
 
 
-  public static void RemoveThisWindowFromMenus(MaxWindow theWindow){
+  public static void RemoveThisWindowFromMenus(MaxEditor theWindow){
     ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
+    MaxEditor aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
       aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
       if(aSketchWindow != theWindow) 
 	aSketchWindow.RemoveWindowFromMenu(theWindow.GetTitle());
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
+      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
       if(aWindow != theWindow)
 	aWindow.RemoveWindowFromMenu(theWindow.GetTitle());
     }
@@ -266,13 +252,13 @@ public class MaxApplication extends Object {
   
   public static void ChangeWinNameMenus(String theOldName, String theNewName){
     ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
+    MaxEditor aWindow;
     for(int i=0;i<itsSketchWindowList.size();i++){
       aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i); 
       aSketchWindow.ChangeWinNameMenu(theOldName,theNewName);
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
-      aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
+      aWindow = (MaxEditor)itsEditorsFrameList.elementAt(i);
       aWindow.ChangeWinNameMenu(theOldName,theNewName);
     }
 
@@ -281,29 +267,6 @@ public class MaxApplication extends Object {
   }
   
 
-  public static void ObeyCommand(int command) {
-    ErmesSketchWindow aSketchWindow;
-    switch (command) {
-    case OPEN_WITH_AUTO_ROUTING:
-      doAutorouting = !doAutorouting;
-      break;
-    case SNAP_TO_GRID:
-      for (int k=0; k<itsSketchWindowList.size(); k++) {
-	aSketchWindow = (ErmesSketchWindow) itsSketchWindowList.elementAt(k);
-	aSketchWindow.SetSnapToGrid();
-      }
-      break;
-    case PRINT_WINDOW: 
-      PrintJob aPrintJob = Toolkit.getDefaultToolkit().getPrintJob(itsSketchWindow, "print1", null);
-      Graphics aPrintGraphics = aPrintJob.getGraphics();
-	
-      itsSketchWindow.itsSketchPad.paint(aPrintGraphics);
-      aPrintGraphics.dispose();
-      aPrintJob.end();
-      break;
-    }	
-  }
-  
   public static void TileVerticalWindows(){
     Rectangle aRect = new Rectangle();
     Frame aWindow;
@@ -414,7 +377,7 @@ public class MaxApplication extends Object {
 
 
 
-  public static void SetCurrentWindow(MaxWindow theWindow){
+  public static void SetCurrentWindow(MaxEditor theWindow){
     if(theWindow instanceof ErmesSketchWindow)itsSketchWindow = (ErmesSketchWindow)theWindow;
     itsWindow = theWindow;
   }
@@ -574,21 +537,74 @@ public class MaxApplication extends Object {
 
   public static void Quit()
   {
-    MaxWindow aWindow;
+    MaxEditor aWindow;
     ErmesSketchWindow aSketchWindow;
+    boolean someOneNeedSave = false;
+    boolean doTheSave = false;
+
+    // First, search if there is anything to save,
 
     for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
       aSketchWindow = (ErmesSketchWindow)e.nextElement();
-      if (! aSketchWindow.Close())
-	return;
+      if (aSketchWindow.ShouldSave())
+	someOneNeedSave = true;
     }
 
     for(Enumeration e=itsEditorsFrameList.elements(); e.hasMoreElements();){
-      aWindow = (MaxWindow)e.nextElement();
-      if(!aWindow.Close()) return;
+      aWindow = (MaxEditor)e.nextElement();
+      if (aWindow.ShouldSave())
+	someOneNeedSave = true;
     }
 
-    runHooks("exit");// run the exit hooks
+    // in such case, should give the offer to cancel the quit.
+
+    if (someOneNeedSave)
+      {
+	QuitDialog quitDialog = new QuitDialog(itsConsoleWindow);
+
+	switch (quitDialog.getAnswer())
+	  {
+	  case QuitDialog.JUST_QUIT:
+	    doTheSave = false;
+	    break;
+	  case QuitDialog.REVIEW_AND_QUIT:
+	    doTheSave = true;
+	    break;
+	  case QuitDialog.CANCEL:
+	    return;
+	  }
+
+	quitDialog.dispose();
+      }
+
+    // Now, the quit is sure, we execute the exit hooks
+
+    runHooks("exit");
+
+    // Then, do the close.
+    // At the moment, the close is responsible for handling 
+    // the save; this should really be done here, so that we
+    // can implement a "SaveAll" option.
+    // Also, this force us to skip the clean close in case
+    // or a real quit; this is no good, there should be
+    // a way to do a Close without being asked for the save !!
+    // Another problem, since the semantic "Close" action is
+    // mixed with the "user interface" Close action, we cannot
+    // take away the "Cancel" from the dialogs here, having
+    // as a result a "Cancel" button that do no means anything.
+
+    if (doTheSave)
+      {
+	for(Enumeration e=itsSketchWindowList.elements(); e.hasMoreElements();){
+	  aSketchWindow = (ErmesSketchWindow)e.nextElement();
+	  aSketchWindow.Close();
+	}
+
+	for(Enumeration e=itsEditorsFrameList.elements(); e.hasMoreElements();){
+	  aWindow = (MaxEditor)e.nextElement();
+	  aWindow.Close();
+	}
+      }
 
     if (itsConsoleWindow != null)
       {

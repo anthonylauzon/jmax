@@ -22,6 +22,7 @@ import com.sun.java.swing.*;
  * it is showing, and the fospatcher to which it is associated.
  * It handles all the sketch menus, it knows how to load from a fospatcher.
  */
+
 public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPropertyHandler {
 
   public void propertyChanged(FtsObject object, String name, Object value) {
@@ -54,7 +55,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   Vector ftsObjectsPasted = new Vector();
   Vector ftsConnectionsPasted = new Vector();
   public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
-  public boolean inAnApplet = false;
   public boolean isSubPatcher = false;
   //  public ErmesObject itsOwner;//in case this is a subpatcher
   public boolean isAbstraction = false;
@@ -93,40 +93,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   boolean itsChangingRunEditMode = false;
   public Vector itsSubWindowList;
   Vector itsWindowMenuList;
-  public boolean alreadySaved =true;
+  private boolean alreadySaved =true;
   boolean neverSaved =true;
   //public String itsTitle;
   public MaxData itsData;
   static int untitledCounter = 1;
-
-  public boolean CustomMenuActionPerformed(MenuItem theMenuItem, String itemName){
-
-    if(IsInCustomEditMenu(itemName)) 
-      CustomEditMenuAction(theMenuItem, itemName);
-    if(IsInAlignObjectsMenu(itemName)) 
-      AlignObjectsMenuAction(theMenuItem, itemName);
-    if(IsInExecutionMenu(itemName)) 
-      ExecutionMenuAction(theMenuItem, itemName);
-    
-    return true;
-  }
-
-  
-  
-  public boolean CustomMenuItemStateChanged(CheckboxMenuItem theCheckItem, String itemName){
-    if (IsInGraphicsMenu(itemName)) 
-      GraphicsItemStateChanged(theCheckItem, itemName);
-    if (IsInFontsMenu(itemName)) 
-      FontsMenuAction(theCheckItem, itemName);
-    if (IsInSizesMenu(itemName)) 
-      SizesMenuAction(theCheckItem, itemName);
-    if(IsInJustificationMenu(itemName)) 
-      JustificationMenuAction(theCheckItem, itemName);
-    if(IsInResizeObjectMenu(itemName)) 
-      ResizeObjectMenuAction(theCheckItem, itemName);
-    return true;
-  }
-
 
   // the MaxDataEditor interface
 
@@ -212,7 +183,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     //repaint();
     MaxApplication.itsWindow = this;
     InitFromContainer(itsPatcher);
-    inAnApplet = false;
     //aPatcherDoc.SetWindow(itsSketchWindow);
     setVisible(true);
   }
@@ -229,7 +199,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     //	CONSTRUCTOR
     //
     //--------------------------------------------------------    
-public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow, boolean theIsAbstraction)
+  public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow, boolean theIsAbstraction)
   {
     super();
     isSubPatcher = theIsSubPatcher;
@@ -322,24 +292,38 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   
   public void SetupMenu(){
     
-    itsGraphicsMenu = AddMenu("Graphics");
+    itsGraphicsMenu = new Menu("Graphics");
+    getMenuBar().add(itsGraphicsMenu);
     FillGraphicsMenu(itsGraphicsMenu);
     
-    itsTextMenu = AddMenu("Text");
+    itsTextMenu = new Menu("Text");
+    getMenuBar().add(itsTextMenu);
     FillTextMenu(itsTextMenu);
     CheckDefaultSizeFontMenuItem();
     CheckDefaultFontItem();
     
     itsSubWindowsMenu = new Menu("SubWindows");
-    itsSelectAllMenuItem = AddMenuItem(GetEditMenu(),"Select All  Ctrl+A");
-    AddMenuSeparator(GetEditMenu());
-    itsResizeObjectMenu =  AddSubMenu(GetEditMenu(),"Resize Object");
+
+    itsSelectAllMenuItem = new MenuItem("Select All  Ctrl+A");
+    GetEditMenu().add(itsSelectAllMenuItem);
+    itsSelectAllMenuItem.addActionListener(new ActionListener() {
+    public  void actionPerformed(ActionEvent e)
+      { GetSketchPad().SelectAll();}});
+
+    GetEditMenu().add(new MenuItem("-"));
+
+    itsResizeObjectMenu =  new Menu("Resize Object");
+    GetEditMenu().add(itsResizeObjectMenu);
     FillResizeObjectMenu(itsResizeObjectMenu);
-    AddMenuSeparator(GetEditMenu());
-    itsAlignObjectMenu =  AddSubMenu(GetEditMenu(),"Align Objects");
+
+    GetEditMenu().add(new MenuItem("-"));
+
+    itsAlignObjectMenu =  new Menu("Align Objects");
+    GetEditMenu().add(itsAlignObjectMenu);
     FillAlignObjectsMenu(itsAlignObjectMenu);
     
-    itsExecutionMenu = AddMenu("Execution");
+    itsExecutionMenu = new Menu("Execution");
+    getMenuBar().add(itsExecutionMenu);
     FillExecutionMenu(itsExecutionMenu);
 
     GetCutMenu().setEnabled(true);
@@ -348,14 +332,13 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     GetClearMenu().setEnabled(false);
   }
 
-  protected boolean Cut(){
-    boolean temp = Copy();
+  protected void Cut(){
+    Copy();
     itsSketchPad.itsHelper.DeleteSelected();
-    return temp;
   }
 
   // clipboard handling
-  protected boolean Copy() {
+  protected void Copy() {
     CreateFtsGraphics(this);
     itsSelection.clean();
     //fill the Fts selection
@@ -373,17 +356,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsClipboardProvider.addSelection(itsSelection);
 
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
-    return true;
   }
 
 
 
-  protected boolean Paste() {
+  protected void Paste() {
     String tclScriptToExecute = null;
     
     // take the objects list from the clipboard, if any. Only tclGroups for now
     Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
-    if ((aTransferable == null) || !aTransferable.isDataFlavorSupported(ErmesClipboardProvider.tclGroupFlavor))  return false;
+    if ((aTransferable == null) || !aTransferable.isDataFlavorSupported(ErmesClipboardProvider.tclGroupFlavor))
+      return;
 
     try {
       tclScriptToExecute = (String) aTransferable.getTransferData(ErmesClipboardProvider.tclGroupFlavor);
@@ -412,75 +395,100 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsSketchPad.PasteObjects(ftsObjectsPasted, ftsConnectionsPasted);
     ErmesSketchPad.RequestOffScreen(itsSketchPad);
     itsSketchPad.repaint();
-    return true;
   }
 
-  private boolean IsInSizesMenu(String theName) {
-    return(theName.equals("8")|| theName.equals("9")||theName.equals("10")||theName.equals("12")||theName.equals("14")||theName.equals("18")||theName.equals("24")||theName.equals("36")||theName.equals("48"));
-  }
-
-  private boolean IsInCustomEditMenu(String theName) {
-    return(theName.equals("Select All  Ctrl+A"));
-  }
-
-  private boolean IsInJustificationMenu(String theName) {
-    return(theName.equals("Left")|| theName.equals("Center")||theName.equals("Right"));
-  }
-  
-  private boolean IsInGraphicsMenu(String theName) {
-    return(theName.equals("Autorouting"));
-  }
   
   private void FillGraphicsMenu(Menu theGraphicsMenu){
-    CheckboxMenuItem aCheckItem;
-    theGraphicsMenu.add(itsAutoroutingMenu = new CheckboxMenuItem("Autorouting", true));
-    itsAutoroutingMenu.addItemListener(this); 
-
+    itsAutoroutingMenu = new CheckboxMenuItem("Autorouting", true);
+    theGraphicsMenu.add(itsAutoroutingMenu);
+    itsAutoroutingMenu.addItemListener(new ItemListener() {
+      public  void itemStateChanged(ItemEvent e)
+	{ SetAutorouting(itsAutoroutingMenu.getState());}});
   }
 
 
-  private void FillResizeObjectMenu(Menu theResizeObjectMenu){
+  class ResizeMenuAdapter implements ItemListener
+  {
+    CheckboxMenuItem item;
+    String resize;
+
+    ResizeMenuAdapter(CheckboxMenuItem item,  String resize)
+    {
+      this.item = item;
+      this.resize = resize;
+    }
+
+    public  void itemStateChanged(ItemEvent e)
+    {
+      ResizeObjectMenuAction(item, resize);
+    }
+  }
+
+  private void FillResizeObjectMenu(Menu theResizeObjectMenu)
+  {
     CheckboxMenuItem aCheckItem;
-    theResizeObjectMenu.add(aCheckItem = new CheckboxMenuItem("Both"));
-    aCheckItem.addItemListener(this);	   
+
+    aCheckItem = new CheckboxMenuItem("Both");
+    theResizeObjectMenu.add(aCheckItem);
     aCheckItem.setState(true);
+    aCheckItem.addItemListener(new ResizeMenuAdapter(aCheckItem, "Both"));
     itsCurrentResizeMenu = aCheckItem;
-    theResizeObjectMenu.add(aCheckItem = new CheckboxMenuItem("Horizontal"));
-    aCheckItem.addItemListener(this);	
-    theResizeObjectMenu.add(aCheckItem = new CheckboxMenuItem("Vertical"));
-    aCheckItem.addItemListener(this);   
+
+    aCheckItem = new CheckboxMenuItem("Horizontal");
+    theResizeObjectMenu.add(aCheckItem);
+    aCheckItem.addItemListener(new ResizeMenuAdapter(aCheckItem, "Both"));
+
+    aCheckItem = new CheckboxMenuItem("Vertical");
+    theResizeObjectMenu.add(aCheckItem);
+    aCheckItem.addItemListener(new ResizeMenuAdapter(aCheckItem, "Both"));
   }
   
-  private void FillAlignObjectsMenu(Menu theAlignObjectMenu){
-    MenuItem aMenuItem;
-    theAlignObjectMenu.add(aMenuItem = new MenuItem("Align Top"));
-    aMenuItem.addActionListener(this);
-    theAlignObjectMenu.add(aMenuItem = new MenuItem("Align Left"));
-    aMenuItem.addActionListener(this);
-    theAlignObjectMenu.add(aMenuItem = new MenuItem("Align Bottom"));
-    aMenuItem.addActionListener(this);
-    theAlignObjectMenu.add(aMenuItem = new MenuItem("Align Right"));
-    aMenuItem.addActionListener(this);
+  class AlignMenuAdapter implements ActionListener
+  {
+    String align;
 
+    AlignMenuAdapter(String align)
+    {
+      this.align = align;
+    }
+
+    public  void actionPerformed(ActionEvent e)
+    {
+      itsSketchPad.AlignSelectedObjects(align);
+    }
+  }
+
+  private void FillAlignObjectsMenu(Menu theAlignObjectMenu)
+  {
+    MenuItem aMenuItem;
+
+    aMenuItem = new MenuItem("Align Top");
+    theAlignObjectMenu.add(aMenuItem);
+    aMenuItem.addActionListener(new AlignMenuAdapter("Top"));
+
+    aMenuItem = new MenuItem("Align Left");
+    theAlignObjectMenu.add(aMenuItem);
+    aMenuItem.addActionListener(new AlignMenuAdapter("Left"));
+
+    aMenuItem = new MenuItem("Align Bottom");
+    theAlignObjectMenu.add(aMenuItem);
+    aMenuItem.addActionListener(new AlignMenuAdapter("Bottom"));
+
+    aMenuItem = new MenuItem("Align Right");
+    theAlignObjectMenu.add(aMenuItem);
+    aMenuItem.addActionListener(new AlignMenuAdapter("Right"));
   }
 
   private void FillExecutionMenu(Menu theExecutionMenu){
- 
-    theExecutionMenu.add(itsRunModeMenuItem = new MenuItem("Run Mode Ctrl+E"));
-    itsRunModeMenuItem.addActionListener(this);
-  }
+    itsRunModeMenuItem = new MenuItem("Run Mode Ctrl+E");
+    theExecutionMenu.add(itsRunModeMenuItem);
 
-  private boolean IsInResizeObjectMenu(String theName) {
-    return(theName.equals("Both") || theName.equals("Horizontal") || theName.equals("Vertical"));
-  }
-  
-  private boolean IsInAlignObjectsMenu(String theName) {
-    return(theName.equals("Align Top") || theName.equals("Align Left") || 
-	   theName.equals("Align Right")||theName.equals("Align Bottom"));
-  }
-
-  private boolean IsInExecutionMenu(String theName) {
-    return(theName.equals("Edit Mode Ctrl+E") || theName.equals("Run Mode Ctrl+E"));
+    itsRunModeMenuItem.addActionListener(new ActionListener() {
+      public  void actionPerformed(ActionEvent e)
+	{
+	  setRunMode(! itsSketchPad.itsRunMode);
+	}
+    });
   }
 
   private void FillTextMenu(Menu theTextMenu) {
@@ -505,62 +513,114 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsJustificationMenu = new Menu("Justification");
     FillJustificationMenu(itsJustificationMenu);
     theTextMenu.add(itsJustificationMenu);
-
   }
 
-  private void FillSizesMenu(Menu theSizesMenu) {
+  class SizesMenuAdapter implements ItemListener
+  {
+    CheckboxMenuItem item;
+    int size;
+
+    SizesMenuAdapter(CheckboxMenuItem item, int size)
+    {
+      this.item = item;
+      this.size = size;
+    }
+
+    public  void itemStateChanged(ItemEvent e)
+    {
+      SizesMenuAction(item, size);
+    }
+  }
+
+  private void FillSizesMenu(Menu theSizesMenu)
+  {
     CheckboxMenuItem aCheckItem;
 
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("8"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 8));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("9"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 9));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("10"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 10));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("12"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 12));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("14"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 14));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("18"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 18));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("24"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 24));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("36"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 36));
     theSizesMenu.add(aCheckItem = new CheckboxMenuItem("48"));
-    aCheckItem.addItemListener(this);
+    aCheckItem.addItemListener(new SizesMenuAdapter(aCheckItem, 48));
   }
 
-  private void FillFontMenu(Menu theFontMenu) {
+  class FontMenuAdapter implements ItemListener
+  {
+    CheckboxMenuItem item;
+    String font;
+
+    FontMenuAdapter(CheckboxMenuItem item, String font)
+    {
+      this.item = item;
+      this.font = font;
+    }
+
+    public  void itemStateChanged(ItemEvent e)
+    {
+      FontsMenuAction(item, font);
+    }
+  }
+
+  private void FillFontMenu(Menu theFontMenu)
+  {
     CheckboxMenuItem aCheckItem;
     String aString;
 
     for(int i = 0;i<itsFontList.length;i++){
       aString = (String) itsFontList[i];
       theFontMenu.add(aCheckItem = new CheckboxMenuItem(aString));
-      aCheckItem.addItemListener(this);
+      aCheckItem.addItemListener(new FontMenuAdapter(aCheckItem, aString));
     }
   }
 
-  private void FillJustificationMenu(Menu theJustificationMenu) {
+
+  class JustificationMenuAdapter implements ItemListener
+  {
+    CheckboxMenuItem item;
+    String justification;
+
+    JustificationMenuAdapter(CheckboxMenuItem item,  String justification)
+    {
+      this.item = item;
+      this.justification = justification;
+    }
+
+    public  void itemStateChanged(ItemEvent e)
+    {
+      JustificationMenuAction(item, justification);
+    }
+  }
+
+  private void FillJustificationMenu(Menu theJustificationMenu)
+  {
     CheckboxMenuItem aCheckItem;
 
-    theJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Left"));
-    aCheckItem.addItemListener(this);	     
-    theJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Center"));
-    aCheckItem.addItemListener(this);	
+    aCheckItem = new CheckboxMenuItem("Left");
+    theJustificationMenu.add(aCheckItem);
+    aCheckItem.addItemListener(new JustificationMenuAdapter(aCheckItem, "Left"));
+
+    aCheckItem = new CheckboxMenuItem("Center");
+    theJustificationMenu.add(aCheckItem);
+    aCheckItem.addItemListener(new JustificationMenuAdapter(aCheckItem, "Center"));
     aCheckItem.setState(true);
     itsSelectedJustificationMenu = aCheckItem;
     itsSketchJustificationMenu = itsSelectedJustificationMenu;
-    theJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Right"));
-    aCheckItem.addItemListener(this);	   
-  }
 
-  private boolean IsInFontsMenu(String theName) {
-    for (int i = 0;i<itsFontList.length;i++) {
-      if (theName.equals(itsFontList[i])) return true;
-    }
-    return false;
+    aCheckItem = new CheckboxMenuItem("Right");
+    theJustificationMenu.add(aCheckItem);
+    aCheckItem.addItemListener(new JustificationMenuAdapter(aCheckItem, "Right"));
   }
 
   private void CheckDefaultSizeFontMenuItem(){
@@ -656,28 +716,12 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
   public void keyReleased(KeyEvent e){}
 
+  // Modified to use inheritance and call the MaxEditor method
+  // for all the standard key bindings
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
     if(e.isControlDown()){
-      if(aInt == 74) MaxApplication.GetConsoleWindow().ToFront();//j
-      else if(aInt == 65) itsSketchPad.SelectAll();//a
-      else if(aInt == 67) Copy();//c
-      else if(aInt == 78) MaxApplication.GetConsoleWindow().New();//n
-      else if(aInt == 79) MaxApplication.GetConsoleWindow().Open();//o
-      else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
-      else if(aInt == 81) MaxApplication.Quit(); //q
-      else if(aInt == 83)Save();//s
-      else if(aInt == 86) Paste();//v
-      else if(aInt == 88) Cut();//x
-      else if(aInt == 87) {//w
-	if (isSubPatcher){
-	  setVisible(false);
-	  itsTopWindow.RemoveFromSubWindowList(this);
-	}
-	else {
-	  Close();
-	}
-      }       
+      if(aInt == 65) itsSketchPad.SelectAll();//a
       else if(aInt == 69){//e
 	if (itsSketchPad.GetRunMode()) setRunMode(false);
 	else setRunMode(true);
@@ -734,23 +778,33 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	if (fileToOpen != null)
 	  MaxApplication.OpenFile(MaxDataSource.makeDataSource(fileToOpen));
       }
+    } else {
+      // Finally, if we don't redefine the key, call the superclass method
+      // that define the standard things.
+      super.keyPressed(e);
     }
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
-  public boolean Close(){
-    if(isSubPatcher) return Close(false);
-    else return Close(true);
+  public void Close(){
+    if (isSubPatcher){
+      setVisible(false);
+      itsTopWindow.RemoveFromSubWindowList(this);
+    }
+    else {
+      Close(true);
+    }
   }
 
-  public boolean Close(boolean deleteOnFts){
+  public void Close(boolean deleteOnFts){
+
     itsClosing = true;
     /*if (deleteOnFts)*/ itsPatcher.close();
-    if(!(alreadySaved || isSubPatcher)){
+    if (ShouldSave()) {
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsData);
       aDialog.setLocation(300, 300);
       aDialog.setVisible(true);
-      if(aDialog.GetNothingToDoFlag()) return false;
+      if(aDialog.GetNothingToDoFlag()) return;
       if(aDialog.GetToSaveFlag()){
 	Save();
       }
@@ -767,18 +821,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       //}
     //}
     CloseAllSubWindows();//?????
-
     MaxApplication.RemoveThisWindowFromMenus(this);
     MaxApplication.itsSketchWindowList.removeElement(this);
     if (deleteOnFts) itsPatcher.delete();
     itsClosing = false;
     setVisible(false);
     if (deleteOnFts) dispose();
-    return true;
+    return;
   }
 
   public boolean ShouldSave() {
-    return !alreadySaved;
+    return (!(alreadySaved || isSubPatcher));
   }
 
   private boolean SaveBody(){
@@ -800,14 +853,12 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	return false;
       }
 
-
-
     alreadySaved = true;
     neverSaved = false;
     return true;
   }
 
-  public boolean Save() {
+  public void Save() {
     // first, tentative implementation:
     // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
     // we should RECEIVE this FILE, or contruct it when we load this document
@@ -816,30 +867,24 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     // i.e. if it have a data source, and if we can write to its data source
 
     if (itsData.canSave())
-      {
-	if(!SaveBody()) return false;
-	alreadySaved = true;
-	return true;
-      }
+      SaveBody();
     else
-      return SaveAs();
+      SaveAs();
   }
 
-  public boolean SaveAs() {
+  public void SaveAs() {
     String oldTitle = getTitle();
     MaxDataSource source;
 
     source  = MaxFileChooser.chooseFileToSave(this, "Save As", itsData.getDataSource());
 
     if (source == null)
-      return false;
+      return;
     else
       itsData.setDataSource(source);
     
-    if(!SaveBody()) return false;
-
-    MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
-    return true;
+    if(SaveBody())
+      MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
   }
 
 
@@ -884,35 +929,6 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       aPrintjob.end();
     }
   }
-
-
-
-  private void CustomEditMenuAction(MenuItem theMenuItem, String theString) {
-
-    //try on (13-03) to be removed before (20-03)
-    //Tabler aTable = new Tabler("pizza");
-    //aTable.Init();
-    //aTable.setLocation(0,0);
-    //aTable.pack();
-    //aTable.setVisible(true);
-    if (theString.equals("Select All  Ctrl+A")) GetSketchPad().SelectAll();
-  }
-
-
-  private void GraphicsItemStateChanged(MenuItem theMenuItem, String theString){
-    if (theString.equals("Autorouting")) {
-      SetAutorouting(((CheckboxMenuItem) theMenuItem).getState());
-    }
-  }
-  
-
-  private void AlignObjectsMenuAction(MenuItem theMenuItem, String theString){
-    if (theString.equals("Align Top")) itsSketchPad.AlignSelectedObjects("Top");
-    else if (theString.equals("Align Left")) itsSketchPad.AlignSelectedObjects("Left");
-    else if (theString.equals("Align Right")) itsSketchPad.AlignSelectedObjects("Right");
-    else if (theString.equals("Align Bottom")) itsSketchPad.AlignSelectedObjects("Bottom");
-  }
-
 
   private void FontsMenuAction(MenuItem theMenuItem, String theString) {
     
@@ -1040,25 +1056,24 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     }
   }
   
-  private boolean SizesMenuAction(MenuItem theMenuItem, String theString) {
-    //if we are here, a font size have been choosen from the FONT menu
-    if(itsSelectedSizeMenu!=null) itsSelectedSizeMenu.setState(false);
+  private boolean SizesMenuAction(CheckboxMenuItem theMenuItem, int theFontSize) {
+    // UI action
 
-    int fontSize = itsSketchPad.sketchFontSize;
-    try {
-      fontSize = Integer.parseInt(theString);
-    } catch (NumberFormatException e) {}
-    
-    if(itsSketchPad.GetSelectedList().size()==0) itsSketchSizeMenu = (CheckboxMenuItem)theMenuItem;
-    itsSelectedSizeMenu = (CheckboxMenuItem)theMenuItem;
-    
+    if(itsSelectedSizeMenu != null)
+      itsSelectedSizeMenu.setState(false);
+
+    itsSelectedSizeMenu = theMenuItem;
     itsSelectedSizeMenu.setState(true);
+
+    //if we are here, a font size have been choosen from the FONT menu
+
+    if(itsSketchPad.GetSelectedList().size()==0) itsSketchSizeMenu = (CheckboxMenuItem)theMenuItem;
     
     if(itsSketchPad.GetSelectedList().size()==0) {
-      itsSketchPad.sketchFontSize = fontSize;
-      itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), fontSize));
+      itsSketchPad.sketchFontSize = theFontSize;
+      itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), theFontSize));
     }
-    else itsSketchPad.ChangeSizeFont(fontSize);
+    else itsSketchPad.ChangeSizeFont(theFontSize);
     return true;
   }
 
@@ -1103,20 +1118,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --inizio  
-  public void windowClosing(WindowEvent e){
-    if (inAnApplet) {
-      dispose();
-    } else {
-      Close();
-      /*try{
-	System.out.println("evento = "+Toolkit.getDefaultToolkit().getSystemEventQueue().getNextEvent());
-	}catch(Exception emammete){}*/
-    }
-  }
-  public void windowOpened(WindowEvent e){}
-  public void windowClosed(WindowEvent e){}
-  public void windowIconified(WindowEvent e){}       
-  public void windowDeiconified(WindowEvent e){}
+
   public void windowActivated(WindowEvent e){
     requestFocus();
     if(!itsClosing){
@@ -1126,7 +1128,6 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 	itsSketchPad.update(itsSketchPad.getGraphics());
     }
   }
-  public void windowDeactivated(WindowEvent e){}  
 
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --fine
@@ -1162,8 +1163,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     return itsSelectAllMenuItem;
   }
 
+
   public void setRunMode(boolean theRunMode) {
     ErmesObject aObject;
+
     itsChangingRunEditMode = true;
     MenuItem aRunEditItem = getRunModeMenuItem();
     MenuItem aSelectAllItem = getSelectAllMenuItem();
@@ -1177,17 +1180,12 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       aObject.RunModeSetted();
     }
     itsToolBar.setRunMode(theRunMode);
-    if (theRunMode)
-      aRunEditItem.setLabel("Edit Mode Ctrl+E");
-    else aRunEditItem.setLabel("Run Mode Ctrl+E");
     aSelectAllItem.setEnabled(!theRunMode);
+
+    itsRunModeMenuItem.setLabel(theRunMode ? "Edit Mode Ctrl+E" : "Run Mode Ctrl+E");
     requestFocus();
   }
 
-  public void ToFront(){
-    toFront();
-  }
-  
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------
@@ -1254,6 +1252,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     }
   }
 }
+
 
 
 

@@ -69,7 +69,6 @@ class FtsDotPatTokenizer
   
   void registerInHistory(char c)
   {
-    // System.err.println(">" + (char)c + "<");
   }
 
   void pushBack()

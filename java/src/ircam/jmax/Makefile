@@ -26,25 +26,9 @@ MaxApplication:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxApplication.java)
 .PHONY: MaxApplication
 
-MaxDocument:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocument.java)
-.PHONY: MaxDocument
-
 MaxEditor:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxEditor.java)
 .PHONY: MaxEditor
-
-MaxInterp:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxInterp.java)
-.PHONY: MaxInterp
-
-MaxResourceId:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxResourceId.java)
-.PHONY: MaxResourceId
-
-MaxWindow:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWindow.java)
-.PHONY: MaxWindow
 
 MaxWhenHookTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWhenHookTable.java)

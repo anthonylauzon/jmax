@@ -63,6 +63,9 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
 
     //Initialize this dialog to its preferred size.
     pack();  
+
+    setLocation(100, 100);
+    setVisible(true);
   }
 
   public void actionPerformed(ActionEvent e){    

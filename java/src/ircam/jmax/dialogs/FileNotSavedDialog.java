@@ -7,7 +7,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
 /**
- * A generic "file not saved" dialog
+ * A generic "file not saved" dialog.
  */
 public class FileNotSavedDialog extends Dialog implements ActionListener, KeyListener{
   String itsMessage;

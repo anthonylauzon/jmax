@@ -3,7 +3,7 @@
 */
 
 #ifdef DEBUG
-/* #define MESS_DEBUG  */
+/*#define MESS_DEBUG */
 #endif
 
 #include <string.h>

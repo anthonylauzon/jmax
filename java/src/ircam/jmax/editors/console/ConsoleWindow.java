@@ -70,14 +70,15 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
   }
   //end
 
-  protected boolean Copy() {
-    if (itsConsole.itsTextArea.getSelectedText().equals("")) return true;
-    MaxApplication.systemClipboard.setContents(this, this);
-    itsCopiedText = itsConsole.itsTextArea.getSelectedText();//tout simplement
-    return true;
+  protected void Copy() {
+    if (! itsConsole.itsTextArea.getSelectedText().equals(""))
+      {
+	MaxApplication.systemClipboard.setContents(this, this);
+	itsCopiedText = itsConsole.itsTextArea.getSelectedText();//tout simplement
+      }
   }
 
-  protected boolean Paste(){
+  protected void Paste(){
     String aPastingString = new String();
     Transferable aTransferable = MaxApplication.systemClipboard.getContents(this);
 
@@ -87,14 +88,10 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     }
 
     itsConsole.PutInKeyboardBuffer(aPastingString);
-
-    return true;
   }
 
   //redefini parce-que la console ne doit pas se fermer sans quitter
-  public boolean Close(){
-    return false;
-  }
+  public void Close(){}
 
   public void Print(){
     PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Console", MaxApplication.jmaxProperties);
@@ -107,14 +104,6 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
       }
       aPrintjob.end();
     }
-  }
-
-  public boolean CustomMenuActionPerformed(MenuItem theMenuItem, String theString){
-    return true;
-  }
-
-  public boolean CustomMenuItemStateChanged(CheckboxMenuItem theMenuItem, String theString){
-    return true;
   }
 }
 

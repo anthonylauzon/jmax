@@ -1,3 +1,23 @@
+Thu Mar 19 12:03:22 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Changed the menu handler part of ErmesSketchWindow, using
+	  specialized inner classes as listener; this in order to 
+	  delete the String based handling of menu in MaxEditor;
+	  left to do, the window menu management.
+
+	* Removed the interface MaxWindow; it is not enough for most
+	  of the purposes (see the Close problem: MaxWindow had close, but
+	  had no ShouldSave, so the right check before close could not be done);
+	  on the other side, it was too much; window management should just assume
+	  awt Frames, no more; it will be changed ASAP, for the moment it use
+	  MaxEditors as type.
+	  
+
+	* Changed the Menus in MaxEditor to use ActionListeners implemented
+	  as anonymous inner classes; soon also the ErmesWindow editor
+	  will be changed to this, in order to dismount the string based
+	  dispatching in MaxEditor.
+
 Tue Mar 10 11:38:04 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Removed the MaxDocument interface, and removed the related functions

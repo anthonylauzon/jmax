@@ -34,6 +34,10 @@ FileNotSavedDialog:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FileNotSavedDialog.java)
 .PHONY: FileNotSavedDialog.java
 
+QuitDialog:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) QuitDialog.java)
+.PHONY: QuitDialog.java
+
 SplashDialog:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) SplashDialog.java)
 .PHONY: SplashDialog.java
