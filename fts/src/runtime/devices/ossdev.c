@@ -93,7 +93,11 @@ static void oss_audio_set_parameters()
   fragparam = (oss_audio_data.max_fragments<<16) | (i);
 
   if (ioctl( oss_audio_data.fd, SNDCTL_DSP_SETFRAGMENT, &fragparam))
-    post( "Error in ioctl(SNDCTL_DSP_SETFRAGMENT)\n");
+    {
+      post( "Error in ioctl(SNDCTL_DSP_SETFRAGMENT)\n");
+      perror( "oss");
+      return;
+    }
 
 #ifdef OSSDEV_DEBUG
   {
@@ -145,9 +149,10 @@ static void oss_audio_set_parameters()
   */
 
 
-static int
-oss_audiodev_update_device()
+static int oss_audiodev_update_device()
 {
+  int fd;
+
   if (oss_audio_data.device_opened)
     {
       close(oss_audio_data.fd);
@@ -156,63 +161,28 @@ oss_audiodev_update_device()
 
   if (oss_audio_data.dac_opened && oss_audio_data.adc_opened)
     {
-      int fd;
-
       fd = open(AUDIO_DEVICE, O_RDWR, 0);
+    }
+  else if (oss_audio_data.dac_opened)
+    {
+      fd = open(AUDIO_DEVICE, O_WRONLY, 0);
+    }
+  else if (oss_audio_data.adc_opened)
+    {
+      fd = open(AUDIO_DEVICE, O_RDONLY, 0);
+    }
 
-      if (fd >= 0)
-	{
-	  oss_audio_data.fd = fd;
-	  oss_audio_set_parameters();
-	  oss_audio_data.device_opened = 1;
-	  return 0;
-	}
-      else
-	{
-	  fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
-	  return -1;
-	}
+  if ( fd >= 0 )
+    {
+      oss_audio_data.fd = fd;
+      oss_audio_set_parameters();
+      oss_audio_data.device_opened = 1;
+      return 0;
     }
   else
     {
-      if (oss_audio_data.dac_opened)
-	{
-	  int fd;
-
-	  fd = open(AUDIO_DEVICE, O_RDWR, 0);
-
-	  if (fd >= 0)
-	    {
-	      oss_audio_data.fd = open(AUDIO_DEVICE, O_WRONLY, 0);
-	      oss_audio_set_parameters();
-	      oss_audio_data.device_opened = 1;
-	      return 0;
-	    }
-	  else
-	    {
-	      fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
-	      return -1;
-	    }
-	}
-      else if (oss_audio_data.adc_opened)
-	{
-	  int fd;
-
-	  fd = open(AUDIO_DEVICE, O_RDWR, 0);
-
-	  if (fd >= 0)
-	    {
-	      oss_audio_data.fd = open(AUDIO_DEVICE, O_RDONLY, 0);
-	      oss_audio_set_parameters();
-	      oss_audio_data.device_opened = 1;
-	      return 0;
-	    }
-	  else
-	    {
-	      fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
-	      return -1;
-	    }
-	}
+      fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
+      return -1;
     }
 }
 
