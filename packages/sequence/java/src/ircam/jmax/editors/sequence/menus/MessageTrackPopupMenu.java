@@ -69,6 +69,23 @@ public class MessageTrackPopupMenu extends JPopupMenu
     add(moveMenu);
 
     addSeparator();
+
+    item = new JMenuItem("Change Name");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    ChangeTrackNameDialog.changeName(MessageTrackPopupMenu.getPopupTarget().getTrack(),  
+					     MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
+					     SwingUtilities.convertPoint(MessageTrackPopupMenu.getPopupTarget(), 
+									 MessageTrackPopupMenu.getPopupX(),
+									 MessageTrackPopupMenu.getPopupY(),
+									 MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
+	}
+    });
+    add(item);
+
+    addSeparator();
+
     ///////////////////// View Menu //////////////////////////
     item = new JMenuItem("View as list");
     item.addActionListener(new ActionListener(){
@@ -171,6 +188,22 @@ public class MessageTrackPopupMenu extends JPopupMenu
 		trackCount = count;
 	    }
     }
+
+    public void show(Component invoker, int x, int y)
+    {
+	this.x = x;
+	this.y = y;
+      
+	super.show(invoker, x, y);
+    }
+    static public int getPopupX()
+    {
+	return popup.x;
+    }
+    static public int getPopupY()
+    {
+	return popup.y;
+    } 
 }
 
 

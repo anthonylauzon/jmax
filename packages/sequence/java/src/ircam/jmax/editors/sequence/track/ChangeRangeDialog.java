@@ -92,7 +92,7 @@ public class ChangeRangeDialog extends JDialog {
 	validate();
 	pack();
 
-	setLocation(200, 200);
+	//setLocation(200, 200);
 	Dimension dim = panel.getSize();
 	if(dim.height+30>700) dim.height = 700;
 	else dim.height += 30;
@@ -102,10 +102,11 @@ public class ChangeRangeDialog extends JDialog {
 	minimumField.setText(""+((Integer)track.getProperty("minimumValue")).intValue());
     }
 
-    public static void changeRange(Track track, Frame frame)
+    public static void changeRange(Track track, Frame frame, Point position)
     {
 	ChangeRangeDialog dialog = new ChangeRangeDialog(track, frame);
-	dialog.requestFocus();//????
+	dialog.setLocation(frame.getLocation().x + position.x, frame.getLocation().y + position.y);
+	dialog.requestFocus();
 	dialog.setVisible(true);
     }
 }

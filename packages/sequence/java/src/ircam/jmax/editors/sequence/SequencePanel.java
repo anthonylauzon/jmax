@@ -204,6 +204,9 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
      * as a result of a merge */
     public void trackAdded(Track track)
     {
+	if(track.getName().equals("untitled"))
+	    track.getFtsTrack().requestSetName("untitled"+getCurrentUntitledTrackIndex());
+
 	TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
 	teditor.getGraphicContext().setToolManager(manager);
 	teditor.getGraphicContext().setFrame(itsContainer.getFrame());
@@ -252,6 +255,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//updates events in track
 	for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
 	  teditor.updateNewObject((TrackEvent)e.nextElement());
+    }
+
+    public int getCurrentUntitledTrackIndex()
+    {
+	int index = 0;	
+	while(sequenceData.getTrackByName("untitled"+index) != null)
+	    index++;
+
+	return index;
     }
 
     public void tracksAdded(int maxTime)
@@ -325,6 +337,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
 	track.setProperty("active", Boolean.TRUE);
     }
+
    /**
      * called when the database is changed: DataTrackListener interface
      */
@@ -388,7 +401,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	resizePanelToTimeWithoutScroll(evtTime);
     }
 
-    
   ////////////////////////////////////////////////////////////
   public void Copy()
   {
@@ -551,11 +563,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	int duration = ((Double)evt.getProperty("duration")).intValue();
 	int startTime = -geometry.getXTransposition(); 
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-	
-	/*if(time<startTime)
-	  itsTimeScrollbar.setValue(time);
-	  else if(time>endTime)
-	  itsTimeScrollbar.setValue(time-endTime+startTime+duration+10);*/
 	
 	if((time<startTime)||(time+duration>endTime))
 	    itsTimeScrollbar.setValue(time);

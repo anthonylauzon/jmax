@@ -78,6 +78,18 @@ public class ToggleBar extends PopupToolbarPanel
 	});
 
 	validate();
+
+	track.getTrackDataModel().addListener(new TrackDataListener(){
+		public void objectChanged(Object spec, String propName, Object propValue) {}
+		public void objectAdded(Object spec, int index){}
+		public void objectsAdded(int maxTime){}
+		public void objectDeleted(Object whichObject, int index){}
+		public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+		public void trackNameChanged(String oldName, String newName)
+		{
+		    barButton.setText(newName);
+		}
+	    });
     }
 
     void doPopup(MouseEvent e)

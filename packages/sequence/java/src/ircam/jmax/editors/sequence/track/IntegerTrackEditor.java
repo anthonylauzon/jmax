@@ -67,8 +67,8 @@ public class IntegerTrackEditor extends MonoTrackEditor
 	int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
 	int value = ((Integer)((TrackEvent)obj).getProperty("integer")).intValue();
     
-	if(value>max) track.setProperty("maximumValue", new Integer(value));
-	if(value<min) track.setProperty("minimumValue", new Integer(value));
+	if(value>max) itsTrack.setProperty("maximumValue", new Integer(value));
+	if(value<min) itsTrack.setProperty("minimumValue", new Integer(value));
     }
 
     int viewMode = PEAKS_VIEW;

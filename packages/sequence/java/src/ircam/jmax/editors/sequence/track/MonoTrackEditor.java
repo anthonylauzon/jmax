@@ -51,9 +51,9 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	super();
 
 	this.geometry = g;
-	this.track = track;
+	this.itsTrack = track;
 
-	track.getTrackDataModel().addListener(new TrackDataListener() {
+	itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
 	    public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
 	    public void objectAdded(Object whichObject, int index) {
 		updateNewObject(whichObject);
@@ -72,11 +72,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 		MonoTrackEditor.this.repaint();
 	    }
 	    public void trackNameChanged(String oldName, String newName) {
-		MonoTrackEditor.this.repaint();
+		itsTrack.setProperty("trackName", newName);
 	    }
 	});
 
-	track.getTrackDataModel().addHighlightListener(new HighlightListener(){
+	itsTrack.getTrackDataModel().addHighlightListener(new HighlightListener(){
 		public void highlight(Enumeration elements, double time)
 		{
 		    TrackEvent temp;
@@ -110,11 +110,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 		}
 	});
 
-	createGraphicContext(geometry, track.getTrackDataModel());
+	createGraphicContext(geometry, itsTrack.getTrackDataModel());
 
 	//--- make this track's selection the current 
 	// one when the track is activated
-	track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+	itsTrack.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 	    public void propertyChange(PropertyChangeEvent e)
 		{
 
@@ -168,11 +168,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	selection = new SequenceSelection(model);
 
-	gc = new SequenceGraphicContext(model, selection, track); //loopback?
+	gc = new SequenceGraphicContext(model, selection, itsTrack); //loopback?
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
 	ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
-	track.getPropertySupport().addPropertyChangeListener(ad);
+	itsTrack.getPropertySupport().addPropertyChangeListener(ad);
 	gc.setAdapter(ad);
 
 	renderer = new MonoTrackRenderer(gc);
@@ -181,8 +181,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     public void setAdapter(MonoDimensionalAdapter adapter)
     {
-	track.getPropertySupport().removePropertyChangeListener(ad);	
-	track.getPropertySupport().addPropertyChangeListener(adapter);
+	itsTrack.getPropertySupport().removePropertyChangeListener(ad);	
+	itsTrack.getPropertySupport().addPropertyChangeListener(adapter);
 	gc.setAdapter(adapter);	
 	ad = adapter;
     }
@@ -207,7 +207,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	if(viewMode!=viewType)
 	    {
 		viewMode=viewType;
-		track.setProperty("viewMode", new Integer(viewType));
+		itsTrack.setProperty("viewMode", new Integer(viewType));
 		repaint();
 	    }    
     }
@@ -229,8 +229,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	/*****************/
 	//list-->table//
-	//listDialog = new ListDialog(track, gc.getFrame(), gc);
-	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+	//listDialog = new ListDialog(itsTrack, gc.getFrame(), gc);
+	listDialog = new SequenceTableDialog(itsTrack, gc.getFrame(), gc);
 	/*****************/
     }
 
@@ -275,7 +275,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     public Track getTrack()
     {
-	return track;
+	return itsTrack;
     }
 
 
@@ -283,7 +283,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	if(SequenceTextArea.isDeleteKey(e))
 	    {
-		((UndoableData)track.getTrackDataModel()).beginUpdate();
+		((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
 		selection.deleteAll();
 	    }
 	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
@@ -305,7 +305,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     MonoTrackRenderer renderer;
     MonoDimensionalAdapter ad;
 
-    Track track;
+    Track itsTrack;
     
     MaxVector oldElements = new MaxVector();
     /*****************/

@@ -76,9 +76,28 @@ public class MonoTrackPopupMenu extends JPopupMenu
 	public void actionPerformed(ActionEvent e)
 	{
 	    ChangeRangeDialog.changeRange(MonoTrackPopupMenu.getPopupTarget().getTrack(), 
-					  MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame());
+					  MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
+					  SwingUtilities.convertPoint(MonoTrackPopupMenu.getPopupTarget(), 
+								      MonoTrackPopupMenu.getPopupX(),
+								      MonoTrackPopupMenu.getPopupY(),
+								      MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
 	}
-    });
+	});
+    add(item);
+
+    item = new JMenuItem("Change Name");
+    item.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e)
+      {
+	  ChangeTrackNameDialog.changeName(MonoTrackPopupMenu.getPopupTarget().getTrack(),  
+					   MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
+					   SwingUtilities.convertPoint(MonoTrackPopupMenu.getPopupTarget(), 
+								       MonoTrackPopupMenu.getPopupX(),
+								       MonoTrackPopupMenu.getPopupY(),
+								       MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
+      }
+      });
+    
     add(item);
 
     addSeparator();
@@ -210,7 +229,23 @@ public class MonoTrackPopupMenu extends JPopupMenu
 	}
 	
 	int viewType;    
-    }  
+    }
+    
+    public void show(Component invoker, int x, int y)
+    {
+	this.x = x;
+	this.y = y;
+      
+	super.show(invoker, x, y);
+    }
+    static public int getPopupX()
+    {
+	return popup.x;
+    }
+    static public int getPopupY()
+    {
+	return popup.y;
+    }
 }
 
 

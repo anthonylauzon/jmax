@@ -56,7 +56,7 @@ public class ChangeTrackNameDialog extends JDialog {
 	validate();
 	pack();
 
-	setLocation(200, 200);
+	//setLocation(200, 200);
 	Dimension dim = namePanel.getSize();
 	if(dim.height+30>700) dim.height = 700;
 	else dim.height += 30;
@@ -65,10 +65,11 @@ public class ChangeTrackNameDialog extends JDialog {
 	nameField.setText(track.getName());
     }
 
-    public static void changeName(Track track, Frame frame)
+    public static void changeName(Track track, Frame frame, Point position)
     {
 	ChangeTrackNameDialog dialog = new ChangeTrackNameDialog(track, frame);
-	dialog.requestFocus();//????
+	dialog.setLocation(frame.getLocation().x + position.x, frame.getLocation().y + position.y);
+	dialog.requestFocus();
 	dialog.setVisible(true);
     }
 }

@@ -144,7 +144,11 @@ public class MidiTrackPopupMenu extends JPopupMenu
 	public void actionPerformed(ActionEvent e)
 	{
 	    ChangeTrackNameDialog.changeName(MidiTrackPopupMenu.getPopupTarget().getTrack(),  
-					     MidiTrackPopupMenu.getPopupTarget().getGc().getFrame());
+					     MidiTrackPopupMenu.getPopupTarget().getGc().getFrame(),
+					     SwingUtilities.convertPoint(MidiTrackPopupMenu.getPopupTarget(), 
+									 MidiTrackPopupMenu.getPopupX(),
+									 MidiTrackPopupMenu.getPopupY(),
+									 MidiTrackPopupMenu.getPopupTarget().getGc().getFrame()));
 	}
     });
 
@@ -298,6 +302,24 @@ public class MidiTrackPopupMenu extends JPopupMenu
 	
     int viewType;    
   }  
+
+  public void show(Component invoker, int x, int y)
+  {
+      this.x = x;
+      this.y = y;
+      
+      super.show(invoker, x, y);
+  }
+  static public int getPopupX()
+  {
+      return popup.x;
+  }
+  static public int getPopupY()
+  {
+      return popup.y;
+  }
+    
+
 }
 
 

@@ -112,8 +112,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     {
 	TrackEvent evt = (TrackEvent)(args[0].getObject());
 
-	// starts an undoable transition
-	//beginUpdate();//is called in adderTool
+	// beginUpdate is called in adderTool
     
 	addEvent(evt);
     
@@ -128,8 +127,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	int evtTime;
 	int index = -1;
 
-	// starts an undoable transition
-	//beginUpdate();
 	//begin update is called in adderTool 
 
 	for(int i=0; i<nArgs; i++)
