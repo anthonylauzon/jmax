@@ -433,7 +433,7 @@ fvec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   fvec_set_const(this, fts_get_number_float(at));
 
-  if( fvec_editor_is_open( this))
+  if( this->editor)
     tabeditor_send( (tabeditor_t *)this->editor);
 
   data_object_set_dirty( o);
@@ -453,7 +453,7 @@ fvec_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	{
 	  fvec_set_with_onset_from_atoms(this, offset, ac - 1, at + 1);
 	
-	  if(fvec_editor_is_open( this))
+	  if( this->editor)
 	    tabeditor_insert_append( (tabeditor_t *)this->editor, offset, ac, at);
 	
 	  data_object_set_dirty( o);
@@ -670,7 +670,7 @@ fvec_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     for(i=old_size; i<size; i++)
       this->values[i] = 0.0;
  
-    if( fvec_editor_is_open(this))
+    if( this->editor)
       {
 	fts_client_send_message( this->editor, fts_s_size, ac, at);
 	data_object_set_dirty( o);
@@ -1449,7 +1449,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       else
 	size = fvec_load_audiofile(this, file_name, onset, n_read);
     
-      if( fvec_editor_is_open( this))
+      if( this->editor)
 	tabeditor_send( (tabeditor_t *)this->editor);
 
       data_object_set_dirty( o);

@@ -80,7 +80,7 @@ public class Tabler extends JFrame implements EditorContainer {
 	    public void windowClosed(WindowEvent e){}
 	    public void windowClosing(WindowEvent e)
 	    {
-		MaxWindowManager.getWindowManager().removeWindow(getFrame());
+		itsPanel.close( false);
 	    }
 	    public void windowDeiconified(WindowEvent e){}
 	    public void windowIconified(WindowEvent e){}
