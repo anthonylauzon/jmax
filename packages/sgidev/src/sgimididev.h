@@ -24,4 +24,4 @@
  *
  */
 
-extern void sgi_audio_init( void);
+extern void sgi_midi_init( void);

@@ -26,6 +26,7 @@
 
 #include "fts.h"
 #include "sgiaudiodev.h"
+#include "sgimididev.h"
 #include "shmdev.h"
 
 /******************************************************************************/
@@ -38,17 +39,10 @@ static void sgidev_init(void);
 
 fts_module_t sgidev_module = {"sgidev", "SGI devices", sgidev_init, 0, 0};
 
-extern void shmdev_init( void);
-
 static void sgidev_init( void)
 {
-  sgi_dac_init();
-  sgi_adc_init();
-
+  sgi_audio_init();
   sgi_midi_init();
-
-  sgi_soundfile_init();
-
   shmdev_init();
 }
 

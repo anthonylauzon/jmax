@@ -24,9 +24,4 @@
  *
  */
 
-#ifndef _SHMDEV_H_
-#define _SHMDEV_H_
-
 extern void shmdev_init( void);
-
-#endif
