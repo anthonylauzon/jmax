@@ -36,7 +36,6 @@ typedef struct _seqrec_
   fts_object_t head; /* sequence reference object */
   fts_timebase_t *timebase;
   track_t *track;
-  fts_class_t *class;
   track_t *recording; /* recording track */
 
   /* status */
