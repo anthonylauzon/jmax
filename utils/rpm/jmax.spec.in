@@ -3,6 +3,57 @@
 %define ifdef() %if %{expand:%%{?%{1}:1}%%{!?%{1}:0}}
 %define ifndef() %if %{expand:%%{?%{1}:0}%%{!?%{1}:1}}
 
+# gnome and kde menu
+%define _pixmaps_dir /usr/share/pixmaps
+%define desktop_utils   %(if which desktop-file-install 2>&1 >/dev/null ; then echo "yes" ; fi)
+%define vendor_name ircam
+
+##################################################
+# RPM MACRO SETTINGS
+##################################################
+# Please use these macros to set name of 
+# required external packages
+# 
+# For example:
+# define compat_audiofile audiofile # for RedHat
+# define compat_audiofile libnaudiofile # for Mandrake
+
+##################################################
+# These setting are for RedHat 9 + PlanetCCRMA
+##################################################
+# compat_alsa_lib 
+# is package containing ALSA runtime library.
+%ifndef compat_alsa_lib
+%define compat_alsa_lib alsa-lib
+%endif
+# compat_alsa_lib_devel 
+# is package containing ALSA development libraries
+%ifndef compat_alsa_lib_devel
+%define compat_alsa_lib_devel alsa-lib-devel
+%endif
+# compat_audiofile 
+# is package containing libaudiofile.so
+%ifndef compat_audiofile
+%define compat_audiofile audiofile
+%endif
+# compat_audiofile_devel 
+# is package containing audiofile development libraries
+%ifndef compat_audiofile_devel
+%define compat_audiofile_devel audiofile-devel
+%endif
+# compat_jack_audio_connection_kit 
+# is package containing jack-audio-connection-kit libraries
+%ifndef compat_jack_audio_connection_kit
+%define compat_jack_audio_connection_kit jack-audio-connection-kit
+%endif
+# compat_jack_audio_connection_kit_devel 
+# is package containing jack-audio-connection-kit development files
+%ifndef compat_jack_audio_connection_kit_devel
+%define compat_jack_audio_connection_kit_devel jack-audio-connection-kit-devel
+%endif
+
+
+
 ##################################################
 # JAVA SETTINGS
 ##################################################
@@ -39,8 +90,14 @@
 %define fullname jmax-agnula
 %endif
 
+##################################################
+# jMax package
+##################################################
+#
+#
 Name: %{fullname}
 Summary: a visual programming environment for real-time, interactive multimedia applications
+Summary(fr): un environement de programmation visuel pour le temps-réel et les applications multimédia interactive.
 Version: @VERSION@
 Release: 1
 Copyright: LGPL
@@ -48,15 +105,10 @@ Group: Applications/Multimedia
 Source: ftp://freesoftware.ircam.fr/pub/jmax/releases/%{version}/jmax-%{version}.tar.gz
 BuildRoot: /var/tmp/jmax-%{version}-root
 Provides: %{name}-common = %{version}, %{name}-java = %{version}
-
 %if  %{agnula} == 1
 Provides: %{jmax_name}-common = %{version}, %{jmax_name}-java = %{version}
 %endif
-
-# gnome and kde menu
-%define _pixmaps_dir /usr/share/pixmaps
-%define desktop_utils   %(if which desktop-file-install 2>&1 >/dev/null ; then echo "yes" ; fi)
-%define vendor_name ircam
+Requires: %{compat_alsa_lib}, %{compat_audiofile}
 
 %description
 jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
@@ -82,17 +134,33 @@ the efforts to finally Free Java are available at
 #======================================================================
 %endif
 
+##################################################
+# jMax common package
+##################################################
+#
+#
+#
 %package common
-Summary: Kernel of JMax
+Summary: Kernel of jMax and standard packages
+Summary(fr): Noyau de jMax et packages standards.
 Group: Application/Multimedia
 %if %{agnula} == 1
 Provides: %{jmax_name}-common = %{version}
 %endif
+Requires: %{compat_alsa_lib}, %{compat_audiofile}
+BuildRequires: %{compat_alsa_lib_devel}, %{compat_audiofile_devel}
 %description common
 jMax FTS kernel
 
+##################################################
+# jMax devel package
+##################################################
+#
+#
+#
 %package devel
-Summary: Header files for jMax
+Summary: Header files for jMax.
+Summary(fr): Fichiers de développement pour jMax.
 Group: Development/Libraries
 Requires: %{name}-common = %{version} 
 %if %{agnula} == 1
@@ -101,8 +169,15 @@ Provides: %{jmax_name}-devel = %{version}
 %description devel
 Header files for jMax
 
+##################################################
+# jMax java package
+##################################################
+#
+#
+#
 %package java
 Summary: Java gui for jMax
+Summary(fr): Interface graphique Java de jMax.
 Group: Applications/Multimedia
 Requires: %{name}-common = %{version}
 %if %{agnula} == 1
@@ -132,8 +207,16 @@ the efforts to finally Free Java are available at
 #======================================================================
 %endif
 
+
+##################################################
+# jMax client package
+##################################################
+#
+#
+#
 %package client
 Summary: Client for jMax
+Summary: Bibliothèques clientes pour jMax.
 Group: Applications/Multimedia
 %if %{agnula} == 1
 Provides: %{jmax_name}-client = %{version}
@@ -141,16 +224,25 @@ Provides: %{jmax_name}-client = %{version}
 %description client
 Contains C++ and Python client for jMax
 
+##################################################
+# jMax jack package
+##################################################
+#
+#
+#
 %package jack
 Summary: Jack Audio Connection Kit support for jMax
+Summary(fr): Support du Jack Audio Connection Kit pour jMax.
 Group: Applications/Multimedia
-Requires: jack-audio-connection-kit, %{name}-common = %{version}
-BuildRequires: jack-audio-connection-kit-devel
+Requires: %{name}-common = %{version}
+Requires: %{compat_jack_audio_connection_kit}
+BuildRequires: %{compat_jack_audio_connection_kit_devel}
 %if %{agnula} == 1
 Provides: %{jmax_name}-jack = %{version}
 %endif
 %description jack
 Jack Audio Connection Kit support for jMax
+
 
 %prep
 %setup -n jmax-%{version}
@@ -258,6 +350,8 @@ fi
 %attr(4755, root, root) %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
+%{_libdir}/libftsclient-%{version}.so
+%{_libdir}/libftsclient.so
 %if "%{desktop_utils}" == "yes"
 %{_datadir}/applications/%{vendor_name}-%{name}.desktop
 %else
@@ -272,7 +366,6 @@ fi
 %attr(4755, root, root) %{_bindir}/fts
 %{_libdir}/libfts-%{version}.so
 %{_libdir}/libfts.so
-
 
 %files devel
 %defattr(-,root,root)
@@ -298,6 +391,13 @@ fi
 %{_libdir}/jmax/packages/jack
 
 %changelog
+* Thu Jan  8 2004 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- started french translation.
+- made some cosmetics changes.
+- added custom variable for setting the dependency with external packages.
+I hope that can be used by other RPM based distro packagers.
+- added missing libftsclient* in jmax package.
+- added dependencies with external packages.
 * Mon Oct 13 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - added java warning in description when building for AGNULA.
 - added dialog display when installing AGNULA version of jmax-java.
