@@ -15,7 +15,7 @@ public class JMaxWrapper {
 
  static File toOpenFile = null;
  public static void main( String args[]) 
-  {
+  {            
     initMacOSXApplication();    
     JMaxApplication.main( args);
     
@@ -33,7 +33,7 @@ public class JMaxWrapper {
     });
     MRJApplicationUtils.registerOpenDocumentHandler( new MRJOpenDocumentHandler(){
         public void handleOpenFile( File file)
-        {
+        {        
             if( JMaxApplication.getFtsServer() == null)
                 toOpenFile = file;
             else
