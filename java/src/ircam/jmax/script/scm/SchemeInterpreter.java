@@ -44,15 +44,21 @@ public abstract class SchemeInterpreter implements Interpreter
 { 
     public void addScriptMenu(String type, Script script, String name, Object key)
     {
-	KeyStroke stroke = (KeyStroke) key;
+	int modifiers = 0;
+	int keycode = 0;
+	if (key instanceof KeyStroke) {
+	    KeyStroke stroke = (KeyStroke) key;
+	    modifiers = stroke.getModifiers();
+	    keycode = stroke.getKeyCode();
+	}
 	if (type.equals("all")) {
-	    MaxDocumentType.addGlobalScript(new ScriptAction(script, name, stroke.getModifiers(), stroke.getKeyCode()));
+	    MaxDocumentType.addGlobalScript(new ScriptAction(script, name, modifiers, keycode));
 	} else {
 	    MaxDocumentType doctype = Mda.getDocumentTypeByName(type);
 	    if (doctype == null) {
 		System.out.println("Document type " + type + " is not defined");
 	    } else {
-		doctype.addScript(new ScriptAction(script, name, stroke.getModifiers(), stroke.getKeyCode()));
+		doctype.addScript(new ScriptAction(script, name, modifiers, keycode));
 	    }
 	}
     }
@@ -184,3 +190,7 @@ public abstract class SchemeInterpreter implements Interpreter
 	}
     }
 }
+
+
+
+
