@@ -80,7 +80,25 @@ public class Comment extends Editable
 
   public void setWidth( int w)
   {
-    super.forceWidth( w);
+    int width, height;
+    if( w <= 0)
+      {
+	width = getMinimumWidth();
+	height = renderer.getHeight() + getTextHeightOffset();
+      }    
+    else
+      if (renderer.canResizeWidthTo(w - getTextWidthOffset()))
+	{
+	  width = w;
+	  height = renderer.getHeight() + getTextHeightOffset();
+	}
+      else{
+	width = getMinimumWidth();
+	height = renderer.getHeight() + getTextHeightOffset();
+      } 
+
+    super.forceWidth( width);
+    if( getHeight() < height) super.forceHeight( height);
   }
 
   // ----------------------------------------

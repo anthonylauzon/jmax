@@ -65,42 +65,12 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     updateRedraw();
   }
   
-//    public void setWidth(int w) 
-//    {
-//      if( w <= 0)
-//        w = getDefaultWidth();
-//      else
-//        if(w < minWidth)
-//  	w = minWidth;
-    
-//      super.setWidth(w);
-    
-//      if(w < cornerSizeMax)
-//        cornerSize = w;
-//      else
-//        cornerSize = cornerSizeMax;
-
-//      redraw();
-//      fitToText();
-//    }
-
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {          
     // Send a bang message to the system inlet
     if (Squeack.isDown(squeack))
 	((FtsMessConstObject)ftsObject).sendBang();
   }
-
-//    // redefined from base class
-//    public void setFont( Font theFont)
-//    {
-//      super.setFont( theFont);
-
-//      cornerSizeMax = getFontMetrics().stringWidth("x");
-
-//      setWidth(getWidth());
-//      redraw();
-//    }
 
   public void redefine( String text) 
   {
