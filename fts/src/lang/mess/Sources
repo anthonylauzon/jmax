@@ -8,5 +8,6 @@ SOURCES = class.c      \
 	  properties.c \
 	  symbols.c    \
 	  atoms.c     \
-	  compatibility.c
+	  compatibility.c \
+	  vm.c
 

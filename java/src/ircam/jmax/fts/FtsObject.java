@@ -744,14 +744,14 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   /** Get the number of inlets of the object */
 
-  public final int getNumberOfInlets()
+  public int getNumberOfInlets()
   {
     return ninlets;
   }
 
   /** Get the number of outlets of the object */
 
-  public final int getNumberOfOutlets()
+  public int getNumberOfOutlets()
   {
     return noutlets;
   }

@@ -119,7 +119,7 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(fts_inlet_t),  0, 1, 0);
+  fts_class_init(cl, sizeof(fts_inlet_t),  1, 1, 0);
 
   /* define the system methods */
 
@@ -131,14 +131,13 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* Dsp for outlets/inlets is now handled by the compiler directly */
 
-  /*   a[0] = fts_s_ptr; 
+  a[0] = fts_s_ptr; 
   fts_method_define(cl, fts_SystemInlet, fts_s_put, inlet_put, 1, a);
-  */
 
 
   /* signal inlet (outlet is included to anything) */
 
-  /* dsp_sig_inlet(cl, 0); */
+  dsp_sig_inlet(cl, 0);
 
   return fts_Success;
 }
@@ -235,7 +234,7 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(fts_outlet_t), 1, 0, 0);
+  fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
 
   /* define the init system method */
 
@@ -248,10 +247,9 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_anything, outlet_anything);
 
   /* Dsp for outlets/inlets is now handled by the compiler directly */
-  /*
-    a[0] = fts_s_ptr; 
-    fts_method_define(cl, fts_SystemInlet, fts_s_put, outlet_put, 1, a);
-    */
+
+  a[0] = fts_s_ptr; 
+  fts_method_define(cl, fts_SystemInlet, fts_s_put, outlet_put, 1, a);
 
   /* signal inlet (inlet is included to anything) */
 

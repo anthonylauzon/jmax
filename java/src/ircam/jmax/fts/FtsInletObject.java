@@ -75,6 +75,17 @@ public class FtsInletObject  extends FtsObject
     parent.removeInlet(this, position);
   }
 
+  /** Get the number of inlets of the object 
+    Overwrite the FtsObject method because inlets
+    do not believe to FTS, when it say inlets have
+    inlets.
+   */
+
+  public int getNumberOfInlets()
+  {
+    return 0;
+  }
+
   /** Save the object to a TCL stream. */
 
   public void saveAsTcl(PrintWriter writer)

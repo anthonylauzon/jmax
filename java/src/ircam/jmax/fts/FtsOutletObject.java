@@ -75,6 +75,19 @@ public class FtsOutletObject  extends FtsObject
     parent.removeOutlet(this, position);
   }
 
+  /** Get the number of outlets of the object 
+    Overwrite the FtsObject method because inlets
+    do not believe to FTS, when it say outlets have
+    outlets.
+    */
+
+
+  public int getNumberOfOutlets()
+  {
+    return 0;
+  }
+
+
   /** Save the object to a TCL stream. */
 
   public void saveAsTcl(PrintWriter writer)
