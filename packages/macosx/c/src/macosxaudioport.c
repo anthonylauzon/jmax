@@ -54,7 +54,6 @@
 */
 #define ONLY_DEFAULT_OUTPUT_DEVICE
 
-#include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
 #include <unistd.h>
 #include <stdio.h>

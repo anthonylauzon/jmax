@@ -444,7 +444,7 @@
 		5C43B8F205ABFF6900E7FB5C = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libfunctions-info.plist";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
@@ -3442,7 +3442,7 @@
 		};
 		5C5426BB05AB0B8A0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "version-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -3491,7 +3491,7 @@
 		};
 		5C5426C005AB0B8A0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "parser-tokenizer-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -4071,7 +4071,7 @@
 		};
 		5C54271005AB0B8B0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libfts-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -4298,7 +4298,7 @@
 		};
 		5C54272D05AB0B8B0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libutils-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -4448,7 +4448,7 @@
 		};
 		5C54274305AB0B8B0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libdata-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -4506,7 +4506,7 @@
 		};
 		5C54275205AB0B8C0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libsystem-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -4734,7 +4734,7 @@
 		};
 		5C54277605AB0B8C0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libguiobj-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -4917,7 +4917,7 @@
 		};
 		5C54279205AB0B8D0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libcontrol-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -5066,7 +5066,7 @@
 		};
 		5C5427AA05AB0B8E0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libnumeric-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -5335,7 +5335,7 @@
 		};
 		5C5427D405AB0B8E0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libsignal-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -5448,7 +5448,7 @@
 		};
 		5C5427E605AB0B8F0042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libio-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -5554,7 +5554,7 @@
 		};
 		5C5427F705AB0B900042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libmidi-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -5696,7 +5696,7 @@
 		};
 		5C54280D05AB0B910042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libsequence-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -6329,7 +6329,7 @@
 		};
 		5C54286B05AB0B920042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libispw-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -6393,7 +6393,7 @@
 		};
 		5C54287605AB0B930042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libispwmath-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -6471,7 +6471,7 @@
 		};
 		5C54288305AB0B940042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libdtd-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -6585,7 +6585,7 @@
 		};
 		5C54289405AB0B960042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "libmacosx-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -11409,7 +11409,7 @@
 		};
 		5C542B3805AB0BA20042B7A2 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.plist;
 			path = "SDK-info.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -11579,9 +11579,9 @@
 			targetProxy = 5C542B7A05AB0BA30042B7A2;
 		};
 		5C542BF905AB12FC0042B7A2 = {
-			explicitFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = functions.c;
 			path = ../../packages/functions/c/src/functions.c;
 			refType = 2;
