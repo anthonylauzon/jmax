@@ -106,5 +106,16 @@ FTS_API fts_package_t *fts_object_get_package(fts_object_t *obj);
 /* graphic properties (exported for .pat saving in packages) */
 FTS_API void fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
 
+/* name of object in patcher */
+FTS_API void fts_patcher_object_set_name(fts_object_t *obj, fts_symbol_t sym, int global);
+FTS_API fts_symbol_t fts_patcher_object_get_name(fts_object_t *obj);
+FTS_API int fts_patcher_object_is_global(fts_object_t *obj);
+
+/* persistence */
+FTS_API void fts_patcher_object_set_state_persistence(fts_object_t *obj, int persistence);
+FTS_API void fts_patcher_object_set_state_dirty(fts_object_t *obj);
+FTS_API void fts_patcher_object_set_dirty(fts_object_t *obj);
+FTS_API int fts_patcher_object_is_persistent(fts_object_t *obj);
+
 #endif
 

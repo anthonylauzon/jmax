@@ -39,7 +39,7 @@
  * @param ret pointer to returned object
  * @return a fts_status_t equals to fts_ok if load succeeded or to an error description if failed.
  */
-extern fts_status_t fts_file_load( fts_symbol_t filename, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret);
+FTS_API fts_status_t fts_file_load( fts_symbol_t filename, fts_object_t *parent, int ac, const fts_atom_t *at, fts_object_t **ret);
 
 /**
  * Status values returned by fts_file_load()

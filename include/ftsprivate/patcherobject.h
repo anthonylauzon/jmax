@@ -53,15 +53,5 @@ extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_at
 
 extern void fts_object_add_binding(fts_object_t *obj, fts_patcher_t *scope, fts_symbol_t name);
 
-/* name of object in patcher */
-extern void fts_patcher_object_set_name(fts_object_t *obj, fts_symbol_t sym, int global);
-extern fts_symbol_t fts_patcher_object_get_name(fts_object_t *obj);
-extern int fts_patcher_object_is_global(fts_object_t *obj);
-
-/* persistence */
-extern void fts_patcher_object_set_state_persistence(fts_object_t *obj, int persistence);
-extern void fts_patcher_object_set_state_dirty(fts_object_t *obj);
-extern void fts_patcher_object_set_dirty(fts_object_t *obj);
-extern int fts_patcher_object_is_persistent(fts_object_t *obj);
 
 #endif
