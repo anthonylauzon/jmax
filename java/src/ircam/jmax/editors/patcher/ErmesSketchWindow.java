@@ -296,7 +296,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   public void Destroy()
   {
-    Hide();
+    /*Hide();
 
     removeComponentListener( this);
     removeWindowListener(this);
@@ -304,6 +304,20 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     if(itsSketchPad.getFtsPatcher() instanceof FtsPatcherObject)
 	((FtsPatcherObject)itsSketchPad.getFtsPatcher()).setEditorFrame(null);
 
+    itsSketchPad.cleanAll();
+
+    itsSketchPad = null;
+    itsScrollerView = null;
+
+    dispose();*/
+
+    if(itsSketchPad.getFtsPatcher() instanceof FtsPatcherObject)
+      ((FtsPatcherObject)itsSketchPad.getFtsPatcher()).destroyEditor();
+    else
+      Hide();
+    
+    removeComponentListener( this);
+    removeWindowListener(this);
     itsSketchPad.cleanAll();
 
     itsSketchPad = null;

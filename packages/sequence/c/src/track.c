@@ -845,7 +845,10 @@ track_upload_property_list(track_t *this, fts_array_t *temp_array)
     }
     else
     {
-      fts_method_t method_get_property_list = fts_class_get_method_varargs(type, seqsym_get_property_list);
+      fts_method_t method_get_property_list;
+
+      fts_class_instantiate(type);
+      method_get_property_list = fts_class_get_method_varargs(type, seqsym_get_property_list);
 
       /* get property list from class by method */
       if(method_get_property_list)
@@ -1380,7 +1383,14 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
       if(class_name != fts_s_void)
       {
-	this->type = fts_class_get_by_name(NULL, class_name);
+        if(class_name == fts_s_int)
+          this->type = fts_int_class;
+        else if(class_name == fts_s_float)
+          this->type = fts_float_class;
+        else if(class_name == fts_s_symbol)
+          this->type = fts_symbol_class;
+        else
+          this->type = fts_class_get_by_name(NULL, class_name);
 
 	if(this->type == NULL)
 	  fts_object_error(o, "cannot create track of %s", class_name);

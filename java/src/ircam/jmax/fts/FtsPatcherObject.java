@@ -175,6 +175,12 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  //((FtsPatcherObject)obj).firePatcherChanged();
 	}
       });
+    FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("startUpload"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((FtsPatcherObject)obj).startUpload();
+    }
+    });    
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -297,7 +303,9 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   static public void fireGlobalAtomicAction(boolean active)
   {
     for (int i = 0; i < editListeners.size(); i++)
+    {
       ((FtsEditListener) editListeners.elementAt(i)).atomicAction(active);
+    }
   }
 
   /*****************************************************************************/
@@ -333,11 +341,18 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     return connections;
   }
 
+  private void startUpload()
+  {
+    fireGlobalAtomicAction(true);
+  }
+  
   private void endUpload()
   {
     this.canSave = true;
     this.dirty = false;
 
+    fireGlobalAtomicAction(false);
+    
     if( getEditorFrame() != null)
       {
 	ErmesSketchPad sketch = ((ErmesSketchWindow)getEditorFrame()).itsSketchPad;
@@ -1002,6 +1017,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   public void destroyEditor()
   {
     disposeEditor();
+    fireGlobalAtomicAction( false);
   }
 
   public void showObject(FtsGraphicObject obj)

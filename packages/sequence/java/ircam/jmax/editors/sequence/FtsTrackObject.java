@@ -137,6 +137,13 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	((FtsTrackObject)obj).endPaste();		  
       }
     });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("properties"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+   {
+      ((FtsTrackObject)obj).setTrackProperties( args.getLength(), args.getAtoms());
+   }
+  });
+  
   }
 
   /**
@@ -164,6 +171,9 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     hhListeners = new MaxVector();
     stateListeners = new MaxVector();
 
+    propertyNames = new MaxVector();
+    propertyTypes = new MaxVector();
+    
     /* prepare the flavors for the clipboard */
     if (flavors == null)
       flavors = new DataFlavor[1];
@@ -172,6 +182,8 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
   void setType( String type)
   {
+    System.err.println("setType type "+type);
+    
     this.info = ValueInfoTable.getValueInfo( type);
   }
 
@@ -180,6 +192,14 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     trackName = "untitled";
   }
 
+  public void setTrackProperties( int nArgs, FtsAtom args[])
+  {
+    for(int i = 0; i < nArgs-1 ; i+=2)
+    {
+      propertyNames.addElement( args[i].symbolValue.toString());
+      propertyTypes.addElement( args[i+1].symbolValue.toString());
+    }
+  }
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from fts.
   //////////////////////////////////////////////////////////////////////////////////////
@@ -1452,6 +1472,8 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   private MaxVector hhListeners;
   private MaxVector stateListeners;
   private MaxVector tempVector = new MaxVector();
+  private MaxVector propertyTypes, propertyNames;
+  
   private String trackName;
   public DataFlavor flavors[];
 
