@@ -42,9 +42,10 @@ FTS_API void fts_project_destroy(fts_project_t* pkg);
 /** Opens the project associated with a file.
  *
  * @param filename the name of the file to be opened
+ * @param force_work_directory if not NULL, changes the directory used to load templates (and so on). By default this directory is the directory of filename. 
  * @ingroup project 
  */
-FTS_API fts_project_t *fts_project_open(const char* filename);
+FTS_API fts_project_t *fts_project_open(const char* filename, const char *force_work_directory);
 
 /** Closes the current project. The current project will also be
  * destroyed.
