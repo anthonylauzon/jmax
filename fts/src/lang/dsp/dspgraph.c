@@ -5,8 +5,6 @@
 
 #include <stdio.h>
 
-#define DEBUG_DSP_COMPILER
-
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
 
@@ -41,6 +39,8 @@ static ftl_program_t *dsp_chain = 0;
 static dsp_signal *sig_zero;
 static int graph_obj_count;
 
+static int verbose = 0;
+static int depth = 0;
 
 /* The dsp_node structure */
 typedef struct dsp_node_t dsp_node_t;
@@ -60,7 +60,79 @@ typedef void (*edge_fun_t)(dsp_node_t *src, int woutlet,
 
 static dsp_node_t *dsp_graph;
 
-static void dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr);
+static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr);
+
+
+/* ******************** DEBUG code ******************** */
+static void expand_patcher( fts_patcher_t *p, char *s)
+{
+  if (p)
+    {
+      expand_patcher( p->o.patcher, s);
+      strcat( s, fts_symbol_name( p->name));
+      strcat( s, ".");
+    }
+}
+
+static char *full_name( fts_object_t *o)
+{
+  static char buffer[1024];
+
+  buffer[0] = '\0';
+  expand_patcher( o->patcher, buffer);
+  strcat( buffer, fts_symbol_name( fts_object_get_class_name(o)));
+
+  return buffer;
+}
+
+static void cat_sig_name( char *s, dsp_signal *sig)
+{
+  char tmp[64];
+
+  if (sig)
+    {
+      strcat( s, fts_symbol_name( sig->name));
+      sprintf( tmp, "[%d]", sig->length);
+      strcat( s, tmp);
+    }
+  else
+    strcat( s, "nil");
+}
+
+static void append_sigs( char *s, dsp_signal **sig, int n)
+{
+  int i;
+
+  s[0] = '\0';
+
+  if (n > 0)
+    cat_sig_name( s, sig[0]);
+
+  for ( i = 1; i < n; i++)
+    {
+      strcat( s, ",");
+      cat_sig_name( s, sig[i]);
+    }
+}
+
+static char *inputs_name( fts_dsp_descr_t *descr)
+{
+  static char buffer[256];
+
+  append_sigs( buffer, descr->in, descr->ninputs);
+
+  return buffer;
+}
+
+static char *outputs_name( fts_dsp_descr_t *descr)
+{
+  static char buffer[256];
+
+  append_sigs( buffer, descr->out, descr->noutputs);
+
+  return buffer;
+}
+/* **************************************************** */
 
 
 static int
@@ -219,7 +291,10 @@ is_connected_to_dsp_objects( fts_object_t *object)
 		  if (is_connected_to_dsp_objects(c->dst))
 		    return 1;
 		}
-	      else if ( dsp_list_lookup( c->dst))
+	      /* Tried (fd) for the *~ with scalar 
+		 else if ( dsp_list_lookup( c->dst) && fts_object_handle_message( c->dst, c->winlet, fts_s_sig) ) 
+		 */
+	      else if ( dsp_list_lookup( c->dst)) 
 		return 1;
 	    }
 	}
@@ -348,11 +423,10 @@ dec_pred_inc_refcnt(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, 
       dsp_signal *previous_sig;
 
       if (! dest->descr->in)
-		  dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * ninputs);
+	/* (fd) to avoid writing past the end of the dsp_descr... */
+	dest->descr->in = (dsp_signal **)fts_block_zalloc(sizeof(dsp_signal *) * fts_object_get_inlets_number(dest->o));
 
       nin = dsp_input_get(dest->o, winlet);
-
-      ASSERT( nin < ninputs);
 
       previous_sig = dest->descr->in[nin];
       if ((! previous_sig) || (previous_sig == sig_zero))
@@ -435,7 +509,6 @@ dsp_chain_create_end(void)
   fts_audio_activate_devices();
 }
 
-
 static void dsp_object_schedule(dsp_node_t *g)
 {
   dsp_signal **sig;
@@ -486,10 +559,21 @@ static void dsp_object_schedule(dsp_node_t *g)
    */
   if (!dead_code)
     {
-      dsp_gen_outputs(g->o, g->descr);
+      if ( dsp_gen_outputs(g->o, g->descr))
+	{
+	  if ( verbose)
+	    post( "DSP [%d] scheduling %s %s->%s\n", depth, full_name( g->o), 
+		  inputs_name( g->descr), outputs_name( g->descr));
 
-      fts_set_ptr(&a, g->descr);
-      fts_message_send(g->o, fts_SystemInlet, fts_s_put, 1, &a);
+	  fts_set_ptr(&a, g->descr);
+	  fts_message_send(g->o, fts_SystemInlet, fts_s_put, 1, &a);
+	}
+    }
+  else
+    {
+      if ( verbose)
+	post( "DSP [%d] removing %s %s->%s\n", depth, full_name( g->o), 
+	      inputs_name( g->descr), outputs_name( g->descr));
     }
 
   g->pred_cnt = IS_SCHEDULED;
@@ -522,7 +606,9 @@ dsp_schedule_depth(dsp_node_t *src, int woutlet, dsp_node_t *dest, int winlet, d
     {
       dsp_object_schedule( dest);
 
+      depth++;
       dsp_succ_realize( dest, dsp_schedule_depth);
+      depth--;
 
       fts_message_send( dest->o, fts_SystemInlet, fts_new_symbol("put_after_successors"), 0, 0);
     }
@@ -542,6 +628,7 @@ dsp_chain_create(int vs)
 
   dsp_chain_create_start(vs);
 
+  depth = 0;
   /* schedule all nodes without predecessors */
   for( node = dsp_graph; node; node = node->next)
     if ( node->pred_cnt == 0)
@@ -581,7 +668,7 @@ dsp_chain_delete(void)
 
 
 
-static void
+static int
 dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 {
   int i, invs = -1;
@@ -610,8 +697,8 @@ dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
   vector sizes at different inputs
   or not and what to do??"
 */
-	    post("inputs don't match (guess where...;-)\n");
-	    return;
+	    post("DSP [%d] inputs don't match for object %s\n", depth, full_name( o));
+	    return 0;
 	  }
       }
 
@@ -656,6 +743,8 @@ dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
     sig_zero->length = invs;
 
   sig_zero->srate = fts_dsp_get_sampling_rate() / (double)(DEFAULTVS/size);
+
+  return 1;
 }
 
 void
@@ -833,5 +922,10 @@ dsp_print(fts_object_t *o, fts_dsp_descr_t *descr)
 }
 #endif
 
+void
+fts_dsp_set_compiler_verbose( int v)
+{
+  verbose = v;
+}
 
 
