@@ -93,4 +93,16 @@ public class Actions
 	((TablePanel)container.getEditor()).solid();
       }
     };
+  public static EditorAction backColorAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((TablePanel)container.getEditor()).changeBackgroundColor();
+      }
+    };
+  public static EditorAction foreColorAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((TablePanel)container.getEditor()).changeForegroundColor();
+      }
+    };
 }

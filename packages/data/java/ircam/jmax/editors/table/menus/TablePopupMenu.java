@@ -87,6 +87,17 @@ public class TablePopupMenu extends JPopupMenu
     viewGroup.add( hollowItem);
     add( hollowItem);    
 
+    addSeparator();
+    
+    /* Color */
+    JMenuItem item = new JMenuItem( "Background Color...");
+    item.addActionListener( Actions.backColorAction);
+    add( item);
+    
+    item = new JMenuItem( "Foreground Color...");
+    item.addActionListener( Actions.foreColorAction);
+    add( item);
+
     validate();
     pack();
   }

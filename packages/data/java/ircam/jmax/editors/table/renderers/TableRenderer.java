@@ -146,6 +146,23 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   {
     return itsMode;
   }
+
+  public void setBackColor(Color bc)
+  {
+    backColor = bc;
+  }
+  public Color getBackColor()
+  {
+    return backColor;
+  }
+  public void setForeColor(Color fc)
+  {
+    foreColor = fc;
+  }
+  public Color getForeColor()
+  {
+    return foreColor;
+  }
   
   //--- Fields
 

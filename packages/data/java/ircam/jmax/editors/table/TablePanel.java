@@ -412,6 +412,26 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     repaint();
   }
 
+  public void changeBackgroundColor()
+  {
+    Color newColor = JColorChooser.showDialog(null,"Choose Background Color", itsTableRenderer.getBackColor());
+	  
+    if(newColor != null){
+      itsTableRenderer.setBackColor( newColor);
+      repaint();
+    }
+  }
+
+  public void changeForegroundColor()
+  {
+    Color newColor = JColorChooser.showDialog(null,"Choose Foreground Color", itsTableRenderer.getForeColor());
+	  
+    if(newColor != null){
+      itsTableRenderer.setForeColor( newColor);
+      repaint();
+    }
+  }
+
   public void Refresh(){
     repaint();
   }

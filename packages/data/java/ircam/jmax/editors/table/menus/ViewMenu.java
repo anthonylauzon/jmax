@@ -59,6 +59,11 @@ public class ViewMenu extends EditorMenu
 
     hollowItem   = add(Actions.hollowAction, "Hollow");
     solidItem    = add(Actions.solidAction, "Solid");
+
+    addSeparator();
+    
+    add(Actions.backColorAction, "Background Color");
+    add(Actions.foreColorAction, "Foreground Color");
   }
 }
 
