@@ -132,40 +132,6 @@ public class ControlPanel extends JPanel
 
     add( Box.createHorizontalGlue());
 
-    /*JPanel samplingRatePanel = new JPanel();
-
-      samplingRatePanel.setLayout( new BorderLayout());
-      samplingRatePanel.setOpaque( false);
-
-      JLabel samplingRateLabel = new JLabel("Sampling Rate: ");
-      samplingRateLabel.setHorizontalTextPosition(samplingRateLabel.RIGHT);
-      samplingRateLabel.setToolTipText("The current global sampling rate");
-
-      JLabel samplingRateText = new JLabel(control.getSamplingRate().toString());
-      samplingRateText.setHorizontalTextPosition(samplingRateText.RIGHT);
-
-      samplingRatePanel.add("West", samplingRateLabel);
-      samplingRatePanel.add("East", samplingRateText);
-
-      dspPanel.add(samplingRatePanel);
-      
-      JPanel fifoSizePanel = new JPanel();
-
-      fifoSizePanel.setLayout( new BorderLayout());
-      fifoSizePanel.setOpaque( false);
-
-      JLabel fifoSizeLabel = new JLabel("Audio Buffer: ");
-      fifoSizeLabel.setHorizontalTextPosition(fifoSizeLabel.RIGHT);
-      fifoSizeLabel.setToolTipText("The current audio buffer size (latency), in samples");
-
-      JLabel fifoSizeText = new JLabel(control.getFifoSize().toString());
-      fifoSizeText.setHorizontalTextPosition(fifoSizeText.RIGHT);
-
-      fifoSizePanel.add("West", fifoSizeLabel);
-      fifoSizePanel.add("East", fifoSizeText);
-
-      dspPanel.add(fifoSizePanel);
-      dspPanel.add( Box.createVerticalGlue());*/
     JLabel dspLabel = new JLabel("DSP");
     dspLabel.setPreferredSize(new Dimension(35, 20));   
     dspLabel.setMaximumSize(new Dimension(35, 20));   

@@ -27,32 +27,40 @@ package ircam.jmax.script.tcl;
 
 import tcl.lang.*;
 
-import java.lang.*;
-import java.io.*;
-import java.util.*;
-
 import ircam.jmax.*;
+import ircam.jmax.editors.patcher.*;
+
 
 /**
- * The Ermes package (as a set of TCL/ready commands).
+ * The  "splash <filename>" TCL command.
  */
 
-
-public class TclErmesPackage 
+class DefineScaleFactorCmd implements Command
 {
-  static public void installPackage(TclInterpreter interp)
+  /**
+   * This procedure is invoked to open a "splash" screen
+   * It is used by jmax itself, but can be used by single packages also
+   */
+  
+  public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-      //Interp interp = MaxApplication.getTclInterp();
-
-    /* TCL generic */
-
-      interp.createCommand("patcherMenu", new AbbreviationCmd());
+    float  xfactor, yfactor;
+    
+    if (argv.length == 3) 
+	{
+	    xfactor = Float.parseFloat( argv[1].toString());
+	    yfactor = Float.parseFloat( argv[2].toString());
+	    //xfactor = Integer.parseInt( argv[1].toString());
+	    //yfactor = Integer.parseInt( argv[2].toString());
+	}
+    else
+	{
+	    throw new TclNumArgsException(interp, 2, argv, "<float x scale factor> <float y scale factor>");
+	}
+    
+    ScaleTransform.createScaleTransform(xfactor, yfactor);
   }
 }
-
-
-
-
 
 
 

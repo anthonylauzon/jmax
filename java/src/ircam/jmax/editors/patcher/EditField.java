@@ -165,6 +165,7 @@ public class EditField extends JTextArea implements FocusListener
     owner = obj;
     owner.setEditing(true);
     setFont(owner.getFont());
+
     setText(owner.getArgs());
 
     setBackground(owner.getTextBackground());

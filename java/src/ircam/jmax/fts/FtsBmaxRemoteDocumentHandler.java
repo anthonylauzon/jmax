@@ -102,13 +102,11 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
       return null;
 
     Fts fts = (Fts) context;
-
     // Load the environment file if needed 
 
     MaxEnv.loadEnvFileFor(context, file);
 
     // ask fts to load the file 
-
     patcher = fts.loadJMaxFile(file);
 
     if (patcher != null)

@@ -74,7 +74,7 @@ class MoveInteraction extends Interaction
       }
     else if (Squeack.isDrag(squeack))
       {
-	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
+	  ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
 	editor.fixSize(); 
       }
     else if (Squeack.isUp(squeack))

@@ -1147,15 +1147,17 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void resizeToWindow(int width, int height){
     if (itsPatcher != null) {
-      itsPatcherData.setWindowWidth(width);
-      itsPatcherData.setWindowHeight(height);
+      itsPatcherData.setWindowWidth(Math.round(ScaleTransform.getInstance().invScaleX(width)));
+      itsPatcherData.setWindowHeight(Math.round(ScaleTransform.getInstance().invScaleY(height)));
       fixSize();
     }
   }
   public void relocateToWindow(int x, int y){
     if (itsPatcher != null) {
-      itsPatcherData.setWindowX(x);
-      itsPatcherData.setWindowY(y);
+	//itsPatcherData.setWindowX(Math.round(ScaleTransform.getInstance().invScaleX(x)));
+	//itsPatcherData.setWindowY(Math.round(ScaleTransform.getInstance().invScaleY(y)));
+	itsPatcherData.setWindowX(x);
+	itsPatcherData.setWindowY(y);
     }
   }
 

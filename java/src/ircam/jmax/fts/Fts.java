@@ -593,7 +593,6 @@ public class Fts implements MaxContext
     server.loadPatcherBmax(server.getRootObject(), id, file.getAbsolutePath());
     server.sendDownloadObject(id);
     server.syncToFts();    
-
     return server.getObjectByFtsId(id);
   }
 

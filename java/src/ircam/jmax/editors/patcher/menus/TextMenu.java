@@ -64,6 +64,10 @@ public class TextMenu extends EditorMenu
   private ButtonGroup itsStylesMenuGroup;
   JRadioButtonMenuItem fakeStylesButton;
 
+    /*private JMenu itsBaseSizesMenu;
+      private ButtonGroup itsBaseSizesMenuGroup;
+      JRadioButtonMenuItem fakeBaseSizeButton;  */
+
   ErmesSketchPad sketch;
 
   class TextMenuListener implements MenuListener
@@ -104,6 +108,12 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
+    /*itsBaseSizesMenu = new JMenu("Change Base Size");
+      FillBaseSizesMenu( itsBaseSizesMenu);    
+      add(itsBaseSizesMenu);
+
+      addSeparator();*/
+
     itsSizesMenu = new JMenu("Sizes");
 
     FillSizesMenu( itsSizesMenu);    
@@ -121,6 +131,24 @@ public class TextMenu extends EditorMenu
 
     addMenuListener(new TextMenuListener());
   }
+
+    /*private void FillBaseSizesMenu( JMenu menu)
+      {
+      int sizes[] = {8, 10, 12, 14, 18, 24};
+      JRadioButtonMenuItem item; 
+      itsBaseSizesMenuGroup = new ButtonGroup();
+
+      fakeBaseSizeButton = new JRadioButtonMenuItem( "fake");
+      itsBaseSizesMenuGroup.add(fakeBaseSizeButton);
+
+      for (int i = 0; i < sizes.length; i++)
+      {
+      item = new JRadioButtonMenuItem(Integer.toString(sizes[i]));
+      menu.add(item);
+      item.addActionListener(Actions.fontBaseSizesAction);
+	  itsBaseSizesMenuGroup.add(item);
+	  }
+	  }*/
 
   private void FillSizesMenu( JMenu menu)
   {
@@ -318,6 +346,18 @@ public class TextMenu extends EditorMenu
 	default:
 	    itsStylesMenu.getItem(0).setSelected(true);
 	}
+
+    /*for ( int i = 0; i < itsBaseSizesMenu.getItemCount(); i++)
+      {
+      item = (JRadioButtonMenuItem)itsBaseSizesMenu.getItem( i);
+      
+      if (Integer.parseInt(item.getText()) == ScaleTransform.getInstance().baseSize)
+      {
+      item.setSelected(true);
+      break;
+      }
+      }*/
+
   }
 }
 

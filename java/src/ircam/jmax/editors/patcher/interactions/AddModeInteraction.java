@@ -49,15 +49,17 @@ class AddModeInteraction extends Interaction
   }
 
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
-  {
+  {     
     switch (squeack)
       {
       case (Squeack.DOWN | Squeack.SHIFT):
-	editor.makeAddModeObject(mouse.x, mouse.y, false);
+	  editor.makeAddModeObject((int)ScaleTransform.getInstance().invScaleX(mouse.x),
+				   (int)ScaleTransform.getInstance().invScaleY(mouse.y),false);
 	break;
 
       case Squeack.DOWN:
-	editor.makeAddModeObject(mouse.x, mouse.y, true);
+	  editor.makeAddModeObject((int)ScaleTransform.getInstance().invScaleX(mouse.x),
+				   (int)ScaleTransform.getInstance().invScaleY(mouse.y), true);
 	editor.resetAdding();
 	break;
 

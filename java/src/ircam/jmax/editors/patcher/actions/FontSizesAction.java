@@ -71,7 +71,7 @@ public class FontSizesAction extends EditorAction
 	    {
 	      object.redraw();
 	      object.redrawConnections();
-	      object.setFontSize(size);
+	      object.setFontSize(size);	      
 	      object.redraw();
 	      object.redrawConnections();
 	    }});

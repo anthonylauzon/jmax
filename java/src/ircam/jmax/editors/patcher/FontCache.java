@@ -74,7 +74,6 @@ public class FontCache {
       {
 	// Not found, make and store a new one
 
-	  //Font font = new Font( fontName, Font.PLAIN, fontSize);
 	Font font = new Font( fontName, fontStyle, fontSize);
 
 	fontTable.addElement(font);

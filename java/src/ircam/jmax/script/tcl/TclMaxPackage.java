@@ -71,6 +71,8 @@ public class TclMaxPackage
 
     interp.createCommand("getMaxVersion", new MaxGetMaxVersionCmd());
     interp.createCommand("quit", new MaxQuitCmd());
+
+    interp.createCommand("setGraphicScaling", new DefineScaleFactorCmd());
   }
 }
 

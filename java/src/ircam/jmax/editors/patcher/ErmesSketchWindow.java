@@ -48,6 +48,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   JScrollPane  itsScrollerView;
   ErmesToolBar itsToolBar;
   JLabel       itsMessageLabel;
+  FtsPatcherData itsPatcherData;
 
   private FileMenu itsFileMenu;
   private EditMenu itsEditMenu;	
@@ -113,6 +114,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   public ErmesSketchWindow( FtsPatcherData patcherData) 
   {
     super("");
+
+    itsPatcherData = patcherData;
 
     MaxWindowManager.getWindowManager().addWindow(this);
 
@@ -232,16 +235,29 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
       
     x = patcherData.getWindowX();
     y = patcherData.getWindowY();
-    width = patcherData.getWindowWidth();
-    height = patcherData.getWindowHeight();
+    width = ScaleTransform.getInstance().scaleX(patcherData.getWindowWidth());
+    height = ScaleTransform.getInstance().scaleY(patcherData.getWindowHeight());
 
     if (width <= 0)
-      width = 480;
+      width = ScaleTransform.getInstance().scaleX(480);
 
     if (height <= 0)
-      height = 500;
+      height =  ScaleTransform.getInstance().scaleY(500);
 
     setBounds( x, y, width + horizontalOffset(), height + verticalOffset());
+  }
+
+  public void fontBaseChanged(int newFontBase)
+  {
+      int x;
+      int y;
+      int width;
+      int height;
+
+      width = ScaleTransform.getInstance().scaleX(itsPatcherData.getWindowWidth());
+      height = ScaleTransform.getInstance().scaleY(itsPatcherData.getWindowHeight());
+  
+      setSize( width + horizontalOffset(), height + verticalOffset());
   }
 
   public void Destroy()

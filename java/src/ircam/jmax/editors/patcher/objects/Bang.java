@@ -92,6 +92,11 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     {
     }
 
+    public boolean isSquare()
+    {
+	return true;
+    }
+
     public void gotSqueack(int squeack, Point mouse, Point oldMouse)
     {
 	if (Squeack.isDown(squeack))

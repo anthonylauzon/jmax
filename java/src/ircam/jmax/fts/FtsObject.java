@@ -35,6 +35,7 @@ import ircam.jmax.mda.*;
 import javax.swing.*;
 import javax.swing.filechooser.*; // tmp !!
 import java.awt.*;
+
 /**
  * Class implementing the proxy of an FTS object.
  * It deals with: Object creation/deletion, connections
@@ -188,7 +189,6 @@ public class FtsObject
    * the listener is fired on a given event if it implements the correct interface
    * for handling the event.
    */
-
   protected void localPut(String name, int value)
   {
     if (name == "ins")
@@ -213,19 +213,19 @@ public class FtsObject
       }
     else if (name == "x")
       {
-	x = value;
+	  x = (float)value;
       }
     else if (name == "y")
       {
-	y = value;
+	  y = (float)value;	  
       }
     else if (name == "w")
       {
-	width = value;
+	  width = (float)value;
       }
     else if (name == "h")
       {
-	height = value;
+	  height = (float)value;
       }
     else if (name == "error")
       {
@@ -359,10 +359,10 @@ public class FtsObject
   /** x, y, width and height cache locally the geometrical properties, to speed
       up access; also, to prepare transition to beans model */
 
-  protected int x = -1; 
-  protected int y = -1 ;
-  protected int width = -1;
-  protected int height = -1;
+  protected float x = (float)-1; 
+  protected float y = (float)-1 ;
+  protected float width = (float)-1;
+  protected float height = (float)-1;
   protected boolean isError = false;
   protected String  errorDescription;
   protected String font = null;
@@ -378,82 +378,82 @@ public class FtsObject
 
   /** Get the X property */
 
-  public final int getX()
+  public final float getX()
   {
-    return x;
+      return x;
   }
 
 
   /** Set the X property. Tell it to the server, too. */
 
-  public final void setX(int x)
-  {
-    if (this.x != x)
-      {
-	fts.getServer().putObjectProperty(this, "x", x);
-	this.x = x;
-	setDirty();
-      }
+    public final void setX(float x)
+    {
+	if (this.x != x)
+	    {
+		fts.getServer().putObjectProperty(this, "x", (int)x);
+		this.x = x;
+		setDirty();
+	    }
   }
 
   /** Get the Y property */
 
-  public final int getY()
-  {
-    return y;
-  }
+    public final float getY()
+    {
+	return y;
+    }
 
   /** Set the Y property. Tell it to the server, too. */
 
-  public final void setY(int y)
-  {
-    if (this.y != y)
-      {
-	fts.getServer().putObjectProperty(this, "y", y);
-	this.y = y;
-	setDirty();
-      }
-  }
+    public final void setY(float y)
+    {
+	if (this.y != y)
+	    {
+		fts.getServer().putObjectProperty(this, "y", (int)y);
+		this.y = y;
+		setDirty();
+	    }
+    }
 
   /** Get the Width property */
 
-  public final int getWidth()
-  {
-    return width;
-  }
+    public final float getWidth()
+    {
+	return width;
+    }
 
 
   /** Set the Width property. Tell it to the server, too. */
 
-    public /*final*/ void setWidth(int w)
+    public /*final*/ void setWidth(float w)
   {
-    if (this.width != w)
-      {
-	fts.getServer().putObjectProperty(this, "w", w);
-	this.width = w;
-	setDirty();
-      }
+      if (this.width != w)
+	  {
+	      fts.getServer().putObjectProperty(this, "w", (int)w);
+	      this.width = w;
+	      setDirty();
+	  }
   }
 
-  /** Get the Height property */
+    /** Get the Height property */
 
-  public final int getHeight()
-  {
-    return height;
-  }
+    public final float getHeight()
+    {
+	return height;
+    }
 
 
   /** Set the Height property. Tell it to the server, too. */
 
-  public final void setHeight(int h)
-  {
-    if (this.height != h)
-      {
-	fts.getServer().putObjectProperty(this, "h", h);
-	this.height = h;
-	setDirty();
-      }
-  }
+    public final void setHeight(float h)
+    {
+	if (this.height != h)
+	    {
+		fts.getServer().putObjectProperty(this, "h", (int)h);
+		this.height = h;
+		setDirty();
+	    }
+    }
 
 
   /** Get the Error property. Error is a read only property. */

@@ -27,6 +27,7 @@ package ircam.jmax.editors.patcher;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -103,7 +104,12 @@ public class TextRenderer implements ObjectRenderer
 		     owner.getWidth() - owner.getTextWidthOffset(),
 		     5);
     
-    area.setFont(owner.getFont());
+    /*AffineTransform at = new AffineTransform();
+      at.scale(0.88, 1.0);
+      Font scaledFont = owner.getFont().deriveFont(at);
+      area.setFont(scaledFont);*/
+   
+    area.setFont(owner.getFont());    
     area.setText(owner.getArgs()); 
   }
 
@@ -189,9 +195,12 @@ public class TextRenderer implements ObjectRenderer
   public void render(Graphics g, int x, int y, int w, int h)
   {
       ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
+      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);	
+      //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);	
       SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
+
 
 
 

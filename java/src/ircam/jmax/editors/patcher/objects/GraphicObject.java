@@ -248,36 +248,36 @@ abstract public class GraphicObject implements DisplayObject
   
   public final int getX() 
   {
-    return ftsObject.getX();
+      return ScaleTransform.getInstance().scaleX(ftsObject.getX());
   }
 
   protected void setX( int x) 
   {
-    ftsObject.setX(x);
+    ftsObject.setX(ScaleTransform.getInstance().invScaleX(x));
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getY() 
   {
-    return ftsObject.getY();
+    return ScaleTransform.getInstance().scaleY(ftsObject.getY());
   }
 
   protected void setY( int y) 
   {
-    ftsObject.setY(y);
+    ftsObject.setY(ScaleTransform.getInstance().invScaleY(y));
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public final int getWidth() 
   {
-    return ftsObject.getWidth();
+      return ScaleTransform.getInstance().scaleX(ftsObject.getWidth());
   }
 
   public void setWidth( int w) 
   {
     if (w > 0)
       {
-	ftsObject.setWidth(w);
+	ftsObject.setWidth(ScaleTransform.getInstance().invScaleX(w));
 	updateInOutlets();
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
@@ -288,16 +288,27 @@ abstract public class GraphicObject implements DisplayObject
   }
   public final int getHeight() 
   {
-    return ftsObject.getHeight();
+      if(isSquare())
+	  return ScaleTransform.getInstance().scaleX(ftsObject.getHeight());
+      else
+	  return ScaleTransform.getInstance().scaleY(ftsObject.getHeight());
   }
 
   public void setHeight( int h) 
   {
     if (h > 0)
       {
-	ftsObject.setHeight(h);
+	  if(isSquare())
+	      ftsObject.setHeight(ScaleTransform.getInstance().invScaleX(h));
+	  else
+	      ftsObject.setHeight(ScaleTransform.getInstance().invScaleY(h));
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
+  }
+
+  public boolean isSquare()
+  {
+    return false;
   }
 
   // Special version that do not update the connections.
@@ -306,7 +317,7 @@ abstract public class GraphicObject implements DisplayObject
   {
     if (h > 0)
       {
-	ftsObject.setHeight(h);
+	setHeight(h);
       }
   }
 
@@ -378,6 +389,8 @@ abstract public class GraphicObject implements DisplayObject
     ftsObject.setFont(itsFont.getName());
     ftsObject.setFontSize(itsFont.getSize());
     ftsObject.setFontStyle(itsFont.getStyle());
+
+    //if(itsSketchPad.isAutomaticFitToText()) fitToText();
   }
 
   public void fitToText()
@@ -493,24 +506,24 @@ abstract public class GraphicObject implements DisplayObject
 
   public void redraw()
   {
-    itsSketchPad.repaint(ftsObject.getX(),
-			 ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
-			 ftsObject.getWidth(),
-			 ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-			 ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-			 ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 2);
+      itsSketchPad.repaint(getX(),
+			   getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+			   ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1,
+			   getWidth(),
+			   getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+			   ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+			   ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 2);
   }
 
   public void updateRedraw()
   {
-    itsSketchPad.paintAtUpdateEnd(this, ftsObject.getX(),
-				  ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-				  ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
-				  ftsObject.getWidth(),
-				  ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-				  ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-				  ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+      itsSketchPad.paintAtUpdateEnd(this, getX(),
+				    getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+				    ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+				    getWidth(),
+				    getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+				    ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+				    ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   public void redrawConnections()
@@ -603,10 +616,10 @@ abstract public class GraphicObject implements DisplayObject
   SensibilityArea getMouseMovingSensibilityAreaAt( int mouseX, int mouseY)
   {
     SensibilityArea area = null;
-    final int x = ftsObject.getX();
-    final int y = ftsObject.getY();
-    final int w = ftsObject.getWidth();
-    final int h = ftsObject.getHeight();
+    final int x = getX();
+    final int y = getY();
+    final int w = getWidth();
+    final int h = getHeight();
     final int verticalInOutletSensibility;
     final int horizontalInletSensibility;
     final int horizontalOutletSensibility;
@@ -969,11 +982,10 @@ abstract public class GraphicObject implements DisplayObject
 
   public void moveBy( int dx, int dy) 
   {
-    if (dx != 0)
-      setX( ftsObject.getX() + dx);
-
-    if (dy != 0)
-      setY( ftsObject.getY() + dy);
+      if (dx != 0)
+	  setX( getX() + dx);
+      if (dy != 0)
+	  setY( getY() + dy);
   }
 
   public void resizing(boolean isResizing){}
@@ -982,13 +994,13 @@ abstract public class GraphicObject implements DisplayObject
 
   public void getBounds(Rectangle bounds) 
   {
-    bounds.x = ftsObject.getX();
-    bounds.y = (ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+      bounds.x = getX();
+      bounds.y = (getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
 		ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP);
-    bounds.width  = ftsObject.getWidth();
-    bounds.height = (ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
-		     ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
-		     ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+      bounds.width  = getWidth();
+      bounds.height = (getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+		       ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+		       ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   // There are two intersect function: one cover the paint needs, and include all
@@ -998,35 +1010,33 @@ abstract public class GraphicObject implements DisplayObject
 
   public final boolean intersects(Rectangle r)
   {
-    return !((r.x + r.width <= ftsObject.getX()) ||
-	     (r.y + r.height <= (ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+      return !((r.x + r.width <= getX()) ||
+	       (r.y + r.height <= (getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
 				 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1)) ||
-	     (r.x >= ftsObject.getX() + ftsObject.getWidth()) ||
-	     (r.y >= (ftsObject.getY() + ftsObject.getHeight() + ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT -
+	       (r.x >= getX() + getWidth()) ||
+	       (r.y >= (getY() + getHeight() + ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT -
 		      ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 1)));
   }
 
 
   public final boolean coreIntersects(Rectangle r)
   {
-    return !((r.x + r.width <= ftsObject.getX()) ||
-	     (r.y + r.height <= ftsObject.getY()) ||
-	     (r.x >= ftsObject.getX() + ftsObject.getWidth()) ||
-	     (r.y >= (ftsObject.getY() + ftsObject.getHeight())));
+      return !((r.x + r.width <= getX()) ||
+	       (r.y + r.height <= getY()) ||
+	       (r.x >= getX() + getWidth()) ||
+	       (r.y >= (getY() + getHeight())));
   }
 
   public boolean pointInObject(int px, int py)
   {
-    int x = ftsObject.getX();
-    int y = ftsObject.getY();
-    return ((px>=x)&&(px<=x+ftsObject.getWidth())&&
-	    (py>=y)&&(py<=y+ftsObject.getHeight()));
+      int x = getX();
+      int y = getY();
+    return ((px>=x)&&(px<=x+getWidth())&&(py>=y)&&(py<=y+getHeight()));
   }
 
   public void rectangleUnion(Rectangle r)
   {
-    SwingUtilities.computeUnion(ftsObject.getX(), ftsObject.getY(),
-				ftsObject.getWidth(), ftsObject.getHeight(), r);
+      SwingUtilities.computeUnion(getX(), getY(), getWidth(), getHeight(), r);
   }
 
   final public void setLayer(int v)
@@ -1070,8 +1080,8 @@ abstract public class GraphicObject implements DisplayObject
 	      
 	    aw = itsSketchPad.getFontMetrics(errorFont).stringWidth( annotation) + 1;
 	    ah = itsSketchPad.getFontMetrics(errorFont).getHeight();
-	    ax = ftsObject.getX() + ERROR_MESSAGE_DISPLAY_PAD;
-	    ay = ftsObject.getY() + ah / 4;
+	    ax = getX() + ERROR_MESSAGE_DISPLAY_PAD;
+	    ay = getY() + ah / 4;
 	      
 	    g.setFont(errorFont);
 	      

@@ -154,7 +154,6 @@ public class FtsPatcherData extends FtsRemoteData
   {
     // Not that changing the position do
     // not mark the file as dirty.
-
     if (windowX != value)
       {
 	windowX = value;
@@ -177,7 +176,6 @@ public class FtsPatcherData extends FtsRemoteData
   {
     // Not that changing the position do
     // not mark the file as dirty.
-
     if (windowY != value)
       {
 	windowY = value;
@@ -449,25 +447,26 @@ public class FtsPatcherData extends FtsRemoteData
 	break;
 
       case REMOTE_SET_WX:
-	windowX = msg.getNextIntArgument();
-	break;
+	  windowX = msg.getNextIntArgument();
+	  break;
       case REMOTE_SET_WY:
-	windowY = msg.getNextIntArgument();
-	break;
-      case REMOTE_SET_WW:
-	windowWidth = msg.getNextIntArgument();
-	break;
+	  windowY = msg.getNextIntArgument();
+	  break;
+      case REMOTE_SET_WW:	  
+	  windowWidth = msg.getNextIntArgument();
+	  break;
       case REMOTE_SET_WH:
-	windowHeight = msg.getNextIntArgument();
-	break;
+	  windowHeight = msg.getNextIntArgument();
+	  break;
       case REMOTE_MESSAGE:
-	firePatcherHaveMessage(msg.getNextStringArgument());
-	break;
+	  firePatcherHaveMessage(msg.getNextStringArgument());
+	  break;
       default:
-	break;
+	  break;
       }
   }
 }
+
 
 
 

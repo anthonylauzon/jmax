@@ -999,8 +999,8 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
       /* save and restore to/from bmax file */
-      /* fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); */
-      /* fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set); */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); 
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set); 
 
       /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);

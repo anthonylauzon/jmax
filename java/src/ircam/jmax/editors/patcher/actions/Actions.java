@@ -82,6 +82,7 @@ public class Actions
   public static EditorAction fontAction            = new FontAction();
   public static EditorAction setAutomaticFitAction = new SetAutomaticFitAction();
   public static EditorAction fitToTextAction       = new FitToTextAction();
+    //public static EditorAction fontBaseSizesAction   = new FontBaseSizesAction();
 
   public static EditorAction cutAction       = new CutAction();
   public static EditorAction copyAction      = new CopyAction();

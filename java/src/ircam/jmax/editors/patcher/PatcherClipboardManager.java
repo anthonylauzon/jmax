@@ -236,15 +236,15 @@ public class PatcherClipboardManager implements ClipboardOwner
 	sketch.setIncrementalPasteOffsets(20, 20);
       }
     else if (pasteNum == 2) 
-      sketch.setIncrementalPasteOffsets(sketch.getOldPastedObject().getX() - fo.getX(),
-					sketch.getOldPastedObject().getY() - fo.getY());
+      sketch.setIncrementalPasteOffsets((int)(sketch.getOldPastedObject().getX() - fo.getX()),
+					(int)(sketch.getOldPastedObject().getY() - fo.getY()));
 
     for ( Enumeration e = ftsObjectsPasted.elements(); e.hasMoreElements();) 
       {
 	fo = (FtsObject)e.nextElement();
 
-	int newPosX = fo.getX() + pasteNum*sketch.getPasteOffsetX();
-	int newPosY = fo.getY() + pasteNum*sketch.getPasteOffsetY();
+	float newPosX = fo.getX() + pasteNum*sketch.getPasteOffsetX();
+	float newPosY = fo.getY() + pasteNum*sketch.getPasteOffsetY();
 	
 	fo.setX( newPosX);
 	fo.setY( newPosY);

@@ -82,14 +82,15 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     JPanel pValues = new JPanel();
     pValues.setLayout(new BoxLayout(pValues, BoxLayout.Y_AXIS));
-    pValues.setPreferredSize(new Dimension(130, 75));
+    pValues.setPreferredSize(new Dimension(150, 75));
     
     JLabel value1 = new JLabel(MaxApplication.getProperty("jmaxVersion"));
     pValues.add(value1);
     JLabel value2 = new JLabel((String)(System.getProperties().getProperty("os.name"))+" "+
 			       (String)(System.getProperties().getProperty("os.arch")));
     pValues.add(value2);
-    JLabel value3 = new JLabel((String)(System.getProperties().getProperty("java.version")));
+    JLabel value3 = new JLabel((String)(System.getProperties().getProperty("java.version")+" "+
+					System.getProperties().getProperty("java.vendor")));
     pValues.add(value3);
     JLabel value4 = new JLabel("" + Runtime.getRuntime().totalMemory());
     pValues.add(value4);
@@ -119,7 +120,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     JPanel pValues2 = new JPanel();
     pValues2.setLayout(new BoxLayout(pValues2, BoxLayout.Y_AXIS));
-    pValues2.setPreferredSize(new Dimension(130, 25));
+    pValues2.setPreferredSize(new Dimension(150, 25));
     JLabel value6 = new JLabel(control.getSamplingRate().toString());
     pValues2.add(value6);
     JLabel value7 = new JLabel(control.getFifoSize().toString());

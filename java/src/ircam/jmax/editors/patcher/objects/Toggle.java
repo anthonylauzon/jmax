@@ -77,6 +77,11 @@ class Toggle extends GraphicObject implements FtsIntValueListener
   {
   }
 
+    public boolean isSquare()
+    {
+	return true;
+    }
+
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
