@@ -21,6 +21,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <jack/jack.h>
 #include <fts/fts.h>
@@ -33,6 +34,8 @@
 #define DEFAULT_THREAD_FIFO_SIZE 40
 
 #define FTS_JACK_CREATE_THREAD 1
+
+/* #define JACK_AUDIO_MANAGER_DEBUG 1 */
 
 typedef struct _jackaudiomanager_thread_t
 {
@@ -84,6 +87,10 @@ static fts_symbol_t s_disconnect;
 static fts_symbol_t s_register;
 static fts_symbol_t s_unregister;
 
+static int nb_jack_audio_port = 0;
+
+static int jack_process_nframes = 0;
+
 /**************************************************
  *
  * jack jmax client 
@@ -97,9 +104,12 @@ static int jack_count = 0;
 static fts_class_t* jackaudiomanager_type = NULL;
 static fts_object_t* jackaudiomanager_object = NULL;
 
-static jack_port_t* input_port;
-static jack_port_t* output_port;
 
+
+int get_jack_process_nframes()
+{
+  return jack_process_nframes;
+}
 
 fts_object_t* jackaudiomanager_get_manager_object()
 {
@@ -114,16 +124,16 @@ static
 int jackaudiomanager_process(jack_nframes_t nframes, void* arg)
 {
 
-/*   jackaudioport_t* self = (jackaudioport_t*)arg; */
-  /* Get JACK output port buffer pointer */
-  jack_default_audio_sample_t* in = (jack_default_audio_sample_t*)jack_port_get_buffer(input_port, nframes);
-  /* Get JACK input port buffer pointer */
-  jack_default_audio_sample_t* out = (jack_default_audio_sample_t*)jack_port_get_buffer(output_port, nframes);
+/* /\*   jackaudioport_t* self = (jackaudioport_t*)arg; *\/ */
+/*   /\* Get JACK output port buffer pointer *\/ */
+/*   jack_default_audio_sample_t* in = (jack_default_audio_sample_t*)jack_port_get_buffer(input_port, nframes); */
+/*   /\* Get JACK input port buffer pointer *\/ */
+/*   jack_default_audio_sample_t* out = (jack_default_audio_sample_t*)jack_port_get_buffer(output_port, nframes); */
     
   int n = 0;
   /* get number of samples of a FTS tick */
   int samples_per_tick = fts_dsp_get_tick_size();
-
+  jack_process_nframes = nframes;
 
 /*   /\* TODO:  */
 /*      Check if in/out are valid pointer  */
@@ -207,11 +217,13 @@ fts_class_t* jackaudiomanager_thread_type = NULL;
 static void
 jackaudiomanager_thread_connect(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  static fts_symbol_t src_port;
-  static fts_symbol_t dest_port;
-  jackaudiomanager_thread_t* self = (jackaudiomanager_thread_t*)o;
 
-/*   fts_log("[connect thread is running \n] ... ");   */
+  static fts_symbol_t port_to_connect;
+  static jackaudioport_t* audio_port;
+
+  jackaudiomanager_thread_t* self = (jackaudiomanager_thread_t*)o;
+  fts_symbol_t connection_flag;
+
   /* empty fifo */
   while (fts_fifo_read_level(&self->connect_fifo) >= sizeof(fts_atom_t))
   {
@@ -222,15 +234,45 @@ jackaudiomanager_thread_connect(fts_object_t* o, int winlet, fts_symbol_t s, int
     switch(self->connect_state)
     {
     case 0:
-      src_port = fts_get_symbol(atom);
+      audio_port = (jackaudioport_t*)fts_get_object(atom);
+#ifdef JACK_AUDIO_MANAGER_DEBUG
+      fts_log("[jackaudiomanager_thread_connect] receive audio port object \n");
+#endif /* JACK_AUDIO_MANAGER_DEBUG */
       self->connect_state++;
       break;
+
     case 1:
-      dest_port = fts_get_symbol(atom);
-      /* call jack_connect */
-      jack_connect(manager_jack_client, src_port, dest_port);
+      connection_flag = fts_get_symbol(atom);
+#ifdef JACK_AUDIO_MANAGER_DEBUG
+      fts_log("[jackaudiomanager_thread_connect] receive connection flag %s \n", connection_flag);
+#endif /* JACK_AUDIO_MANAGER_DEBUG */
+      if (fts_s_input == connection_flag)
+      {
+	while (NULL == audio_port->input_port)
+	{
+	  /* waiting for port to be registered */
+	}
+	fts_log("[jackaudiomanager] try to make an input connection \n");
+	jack_connect(manager_jack_client, audio_port->port_name, jack_port_name(audio_port->input_port));
+	fts_log("[jackaudiomanager] connect %s to %s \n", 
+		audio_port->port_name, 
+		jack_port_name(audio_port->input_port));
+	fts_audioport_set_open((fts_audioport_t*)audio_port, FTS_AUDIO_INPUT);
+      }
+      else
+      {
+	while (NULL == audio_port->output_port)
+	{
+	  /* waiting for port to be registered */
+	}
+	fts_log("[jackaudiomanager] try to make an output connection \n");
+	jack_connect(manager_jack_client, jack_port_name(audio_port->output_port), audio_port->port_name);	
+	fts_log("[jackaudiomanager] connect %s to %s \n", 
+		jack_port_name(audio_port->output_port), 
+		audio_port->port_name);
+	fts_audioport_set_open((fts_audioport_t*)audio_port, FTS_AUDIO_OUTPUT);
+      }
       self->connect_state = 0;
-      break;
       
     default:
       /* unreachable case ... */
@@ -304,15 +346,30 @@ jackaudiomanager_thread_register(fts_object_t* o, int winlet, fts_symbol_t s, in
       if (fts_s_input == port_flags)
       {
 	/* call jack_port_register */
-	port->input_port = jack_port_register(manager_jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
-	fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_INPUT);
-
+	port->input_port = jack_port_register(manager_jack_client, 
+					      port_name, 
+					      JACK_DEFAULT_AUDIO_TYPE, 
+					      JackPortIsInput, 
+					      0);
+	if (port->input_port != NULL)
+	{
+	  fts_log("[jackaudiomanager] jack input port %s registered \n", port_name);
+	  fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_INPUT);
+	}
       }
       else
       {
 	/* call jack_port_register */
-	port->output_port = jack_port_register(manager_jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-	fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_OUTPUT);
+	port->output_port = jack_port_register(manager_jack_client, 
+					       port_name, 
+					       JACK_DEFAULT_AUDIO_TYPE, 
+					       JackPortIsOutput, 
+					       0);
+	if (port->output_port != NULL)
+	{
+	  fts_log("[jackaudiomanager] jack output port %s registered \n", port_name);
+	  fts_audioport_set_open((fts_audioport_t*)port, FTS_AUDIO_OUTPUT);
+	}
       }
       self->register_state = 0;
       break;
@@ -535,6 +592,26 @@ delete_unregister_thread(jackaudiomanager_t* self)
 }
 
 static int
+add_object_to_fifo(fts_fifo_t* fifo, fts_object_t* obj)
+{
+  fts_atom_t new_object;
+  fts_atom_t* write_atom;
+
+  if (fts_fifo_write_level(fifo) < sizeof(fts_atom_t))
+  {
+    fts_log("[jackaudiomanager] add_symbol_to_fifo: not enough space to add symbol in fifo \n");
+    return -1;
+  }
+  
+  fts_set_object(&new_object, obj);
+  write_atom = (fts_atom_t*)fts_fifo_write_pointer(fifo);
+  fts_atom_assign(write_atom, &new_object);
+  fts_fifo_incr_write(fifo, sizeof(fts_atom_t));
+
+  return 0;
+}
+
+static int
 add_symbol_to_fifo(fts_fifo_t* fifo, fts_symbol_t s)
 {
   fts_atom_t new_symbol;
@@ -561,6 +638,8 @@ jackaudiomanager_scan_ports(fts_array_t* array, int flags)
   int i;
   fts_symbol_t cur_sym;
   fts_audioport_t* port;
+  fts_atom_t at[2];
+
   ports = jack_get_ports(manager_jack_client, 
 			 NULL, /* no pattern on port name NULL */
 			 NULL, /* no pattern on type */
@@ -569,7 +648,6 @@ jackaudiomanager_scan_ports(fts_array_t* array, int flags)
   i = 0;
   while(NULL != ports[i])
   {
-    fts_atom_t at[2];
     cur_sym = fts_new_symbol(ports[i]);
     fts_array_append_symbol(array, cur_sym);
     fts_log("[jackaudiomanager] append symbol : %s\n", ports[i]);
@@ -579,6 +657,7 @@ jackaudiomanager_scan_ports(fts_array_t* array, int flags)
     fts_audiomanager_put_port(cur_sym, port);
     ++i;
   }
+
 }
 
 
@@ -634,29 +713,25 @@ static void
 jackaudiomanager_connect(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
-  fts_symbol_t src_port;
-  fts_symbol_t dest_port;
+  fts_object_t* audio_port = fts_get_object(at);
+  fts_symbol_t connection_flag = fts_get_symbol(at + 1);
   jackaudiomanager_thread_t* manager_object;
   fts_fifo_t* connect_fifo;
 
-  src_port = fts_get_symbol(at);
-  dest_port = fts_get_symbol(at + 1);
-  fts_log("[jackaudiomanager:] connection between %s and %s\n", src_port, dest_port);
-  
   /* add src and dest symbol to thread fifo */
   manager_object = (jackaudiomanager_thread_t*)self->jack_communication;
   connect_fifo = &manager_object->connect_fifo;
 
-  if (0 != add_symbol_to_fifo(connect_fifo, src_port))
+  if (0 != add_object_to_fifo(connect_fifo, audio_port))
   {
     /* error occur */
-    fts_log("[jackaudiomanager] cannot add src port symbol in connect FIFO \n");
+    fts_log("[jackaudiomanager] cannot add audioport object connect FIFO \n");
     return;
   }
-  if (0 != add_symbol_to_fifo(connect_fifo, dest_port))
+  if (0 != add_symbol_to_fifo(connect_fifo, connection_flag))
   {
     /* error occur */
-    fts_log("[jackaudiomanager] cannot add dest port symbol in connect FIFO \n");
+    fts_log("[jackaudiomanager] cannot add connection flag in connect FIFO \n");
     return;
   }
   
@@ -698,8 +773,10 @@ static void
 jackaudiomanager_register(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
-  fts_symbol_t port_name = fts_get_symbol(at);
-  fts_symbol_t port_flags = fts_get_symbol(at + 1);
+  fts_object_t* port = fts_get_object(at);
+  fts_symbol_t port_name = fts_get_symbol(at + 1);
+  fts_symbol_t port_flags = fts_get_symbol(at + 2);
+
   jackaudiomanager_thread_t* manager_object;
   fts_fifo_t* register_fifo;
 
@@ -707,16 +784,22 @@ jackaudiomanager_register(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   manager_object = (jackaudiomanager_thread_t*)self->jack_communication;
   register_fifo = &manager_object->register_fifo;
 
+  if (0 != add_object_to_fifo(register_fifo, port))
+  {
+    /* error occur */
+    fts_log("[jackaudiomanager] cannot add port object in register FIFO \n");
+    return;
+  }
   if (0 != add_symbol_to_fifo(register_fifo, port_name))
   {
     /* error occur */
-    fts_log("[jackaudiomanager] cannot add src port symbol in disconnect FIFO \n");
+    fts_log("[jackaudiomanager] cannot add src port symbol in register FIFO \n");
     return;
   }
   if (0 != add_symbol_to_fifo(register_fifo, port_flags))
   {
     /* error occur */
-    fts_log("[jackaudiomanager] cannot add dest port symbol in disconnect FIFO \n");
+    fts_log("[jackaudiomanager] cannot add dest port symbol in register FIFO \n");
     return;
   }
 
@@ -741,8 +824,15 @@ jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   jack_client_t* client = jackaudiomanager_get_jack_client();
   /* Remove object of FTS scheduler */
   fts_sched_remove(o);
-  fts_log("[jackaudioport] jackaudioport removed from scheduler \n");
+  fts_log("[jackaudiomanager] jackaudiomanager removed from scheduler \n");
 
+  /* JACK client process callback setting */
+  jack_set_process_callback(client,
+			    jackaudiomanager_process, /* callback function */
+			    (void*)self);          /* we need to have our object
+						      in our callback function
+						   */
+  fts_log("[jackaudiomanager] set jackaudiomanager process callback \n");
     
   /* Activate jack client */    
   if (jack_activate(client) == -1)
@@ -772,22 +862,87 @@ jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 
 
 static void
+jackaudiomanager_open(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  jackaudiomanager_t* self = (jackaudiomanager_t*)o;
+  fts_object_t* port_object = fts_get_object(at);
+  fts_atom_t at_m[3];
+  fts_symbol_t port_flags;
+  jackaudioport_t* audio_port = (jackaudioport_t*)port_object;
+  
+  fts_symbol_t label_name = fts_get_symbol(at + 1);
+  char* port_name;
+  int port_name_length = 0;
+  int char_written = 0;
+
+  /* Check if a jackaudioport is alreay open */
+  if (0 == nb_jack_audio_port)
+  {    
+    fts_log("[jackaudiomanager] open a new jack audio port \n");
+    /* 
+       set process callback
+       activate jack client
+       halt scheduler 
+       DONE in jackaudiomanager_halt
+    */
+    /* call jackaudiomanager_halt in next tick */
+    fts_sched_add(o, FTS_SCHED_ALWAYS);
+    ++nb_jack_audio_port;
+  }
+
+  if (fts_s_open_input == s)
+  {
+    port_flags = fts_s_input;
+    port_name_length = strlen(label_name) + strlen("_in") + 1;
+    port_name = fts_malloc(sizeof(char) * port_name_length);
+    strncpy(port_name, label_name, strlen(label_name));
+    strncpy(port_name + strlen(label_name), "_in", strlen("_in"));
+    port_name[port_name_length - 1] = 0;
+  }
+  else
+  {
+    port_flags = fts_s_output;
+    port_name_length = strlen(label_name) + strlen("_out") + 1;
+    port_name = fts_malloc(sizeof(char) * port_name_length);
+    strncpy(port_name, label_name, strlen(label_name));
+    strncpy(port_name + strlen(label_name), "_out", strlen("_out"));
+    port_name[port_name_length - 1] = 0;        
+  }
+
+  fts_log("[jackaudiomanager] port name = %s\n", port_name);
+
+  /* register jackaudioport */
+  fts_set_object(at_m, port_object);
+  fts_set_symbol(at_m + 1, fts_new_symbol(port_name));
+  fts_set_symbol(at_m + 2, port_flags);
+  fts_send_message(o, s_register, 3, at_m);
+
+  /* connect jackaudioport */
+  fts_set_object(at_m, port_object);
+  fts_set_symbol(at_m + 1, port_flags);
+  fts_send_message(o, s_connect, 2, at_m);
+
+  fts_free(port_name);
+}
+
+static void
+jackaudiomanager_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+
+  /* disconnect jack audio port */
+  
+  /* unregister jack audio port */
+
+  /* decrement jackaudioport counter */
+
+}
+
+static void
 jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
   jackaudiomanager_set_jack_client(self);
 
-  input_port = jack_port_register(jackaudiomanager_get_jack_client(),
-				  "toto",
-				  JACK_DEFAULT_AUDIO_TYPE,
-				  JackPortIsInput,
-				  0);
-
-  output_port = jack_port_register(jackaudiomanager_get_jack_client(),
-				  "toto",
-				  JACK_DEFAULT_AUDIO_TYPE,
-				  JackPortIsOutput,
-				  0);
 
 #ifdef FTS_JACK_CREATE_THREAD
   /* start the fts thread manager */
@@ -806,22 +961,15 @@ jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 /*   create_unregister_thread(self); */
 #endif
 
-  /* JACK client process callback setting */
-  jack_set_process_callback(jackaudiomanager_get_jack_client(),
-			    jackaudiomanager_process, /* callback function */
-			    (void*)self);          /* we need to have our object
-						      in our callback function
-						   */
-  fts_log("[jackaudioport] set jackaudioport process callback \n");
 
-  fts_sched_add(o, FTS_SCHED_ALWAYS);
+
+/*   fts_sched_add(o, FTS_SCHED_ALWAYS); */
 }
 
 static void
 jackaudiomanager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
-  jackaudiomanager_unset_jack_client(self);
 
 #ifdef FTS_JACK_CREATE_THREAD
   delete_connect_thread(self);
@@ -830,6 +978,15 @@ jackaudiomanager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   delete_register_thread(self);
 /*   delete_unregister_thread(self); */
 #endif
+
+  /* if process callback is set and client is activate */
+  if (0 != nb_jack_audio_port)
+  {
+    jack_deactivate(manager_jack_client);
+    --nb_jack_audio_port;
+  }
+
+  jackaudiomanager_unset_jack_client(self);  
 }
 
 static void 
@@ -846,7 +1003,25 @@ jackaudiomanager_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, s_register, jackaudiomanager_register);
   fts_class_message_varargs(cl, s_unregister, jackaudiomanager_unregister);
 
+  fts_class_message_varargs(cl, fts_s_open_input, jackaudiomanager_open);
+  fts_class_message_varargs(cl, fts_s_open_output, jackaudiomanager_open);
+
+  fts_class_message_varargs(cl, fts_s_close_input, jackaudiomanager_close);
+  fts_class_message_varargs(cl, fts_s_close_output, jackaudiomanager_close);
+
   fts_class_message_varargs(cl, fts_s_sched_ready, jackaudiomanager_halt);
+}
+
+
+void
+jackaudiomanager_at_exit(void)
+{
+  /* if process callback is set and client is activate */
+  if (0 != nb_jack_audio_port)
+  {
+    jack_deactivate(manager_jack_client);
+  }
+  destroy_jack_manager_client();
 }
 
 /***********************************************************************
@@ -885,6 +1060,10 @@ void jackaudiomanager_config( void)
 							   jackaudiomanager_thread_instantiate);
 
   jackaudiomanager_object = fts_object_create(jackaudiomanager_type, NULL, 0, NULL);
+
+  /* in case of fts quit */
+  atexit(jackaudiomanager_at_exit);
+
 }
 
 
