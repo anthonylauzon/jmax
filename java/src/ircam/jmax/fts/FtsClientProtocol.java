@@ -16,6 +16,7 @@ class FtsClientProtocol
   static final int float_type_code    = 'z';
   static final int object_type_code   = 'o';
   static final int connection_type_code   = 'x';
+  static final int data_type_code       = 0x05;
   static final int string_start_code = 0x01;
   static final int string_end_code   = 0x02;
   static final int end_of_message_code = 0x03;
@@ -28,6 +29,8 @@ class FtsClientProtocol
 	    (c == int_type_code) ||
 	    (c == float_type_code)   ||
 	    (c == object_type_code)   ||
+	    //	    (c == connection_type_code) || // (fd) was missing... Is it intentionnal ?
+	    (c == data_type_code)   ||
 	    (c == string_start_code) ||
 	    (c == end_of_message_code) ||
 	    isBlank(c)
@@ -71,6 +74,8 @@ class FtsClientProtocol
   static final int sync_cmd = '>';
   static final int sync_done_cmd = '<';
   static final int post_cmd = 'h';
+
+  static final int remote_call_code = '!';
 
   static final int fts_save_patcher_bmax_cmd = 'S';
   static final int fts_save_patcher_tpat_cmd = 'T';
@@ -187,6 +192,8 @@ class FtsClientProtocol
 	return "fts_update_group_start";
       case '}':
 	return "fts_update_group_end";
+      case '!':
+	return "fts_remote_call";
       default:
 	return "(unknown command)";
       }

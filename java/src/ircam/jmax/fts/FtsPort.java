@@ -334,6 +334,24 @@ abstract class FtsPort implements Runnable
   }
 
 
+  final void sendRemoteData( FtsRemoteData data) throws java.io.IOException 
+  {
+    int value;
+    String s;
+
+    if ( data != null)
+      value = data.getId();
+    else
+      value = 0;
+
+    write( FtsClientProtocol.data_type_code);
+    s = Integer.toString(value);
+		
+    for (int i = 0; i < s.length(); i++)
+      write(s.charAt(i));
+  }
+
+
   final void sendValue(Object o) throws java.io.IOException 
   {
     if (o instanceof Integer)
@@ -351,6 +369,14 @@ abstract class FtsPort implements Runnable
     else if (o instanceof String)
       {
 	sendString((String)o);
+      }
+    else if (o instanceof FtsRemoteData)
+      {
+	sendRemoteData((FtsRemoteData) o);
+      }
+    else
+      {
+	// (fd) May be should say something ???
       }
   }
   
@@ -406,8 +432,7 @@ abstract class FtsPort implements Runnable
       }
     catch (java.io.IOException	e)
       {
-	/* Should implement a decent expection system
-	   for the client library */
+	// Should implement a decent exception system for the client library
       }
   }
 
@@ -425,6 +450,7 @@ abstract class FtsPort implements Runnable
   private static final int float_token   = 3;
   private static final int object_token  = 4;
   private static final int connection_token  = 5;
+  private static final int data_token  = 8;
   private static final int string_token  = 6;
   private static final int end_token     = 7;
 
@@ -438,6 +464,8 @@ abstract class FtsPort implements Runnable
       return object_token;
     else if (c == FtsClientProtocol.connection_type_code)
       return connection_token;
+    else if (c == FtsClientProtocol.data_type_code)
+      return data_token;
     else if (c == FtsClientProtocol.string_start_code)
       return string_token;
     else if (FtsClientProtocol.isBlank(c))
@@ -565,6 +593,25 @@ abstract class FtsPort implements Runnable
 		connection = server.getConnectionByFtsId(Integer.parseInt(s.toString()));
 		
 		portMsg.addArgument(connection);
+		s.setLength(0);
+	      }
+	    else
+	      s.append((char)c);
+	    break;
+
+	    /*------------------*/
+
+	  case data_token:
+
+	    if (FtsClientProtocol.tokenStartingChar(c))
+	      {
+		FtsRemoteData data;
+
+		status = tokenCode(c);
+
+		data = FtsRemoteDataID.get( Integer.parseInt(s.toString()));
+		
+		portMsg.addArgument( data);
 		s.setLength(0);
 	      }
 	    else

@@ -91,7 +91,7 @@ public class FtsAtomList implements FtsDataObject
     changed();
   }
 
-  /** Get the whole content  of the list from FST */
+  /** Get the whole content  of the list from FTS */
 
   public void forceUpdate()
   {

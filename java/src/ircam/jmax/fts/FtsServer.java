@@ -788,6 +788,29 @@ public class FtsServer
       }
   }
 
+  /** Send a "remote call" message to FTS. */
+
+  final void remoteCall( FtsRemoteData data, int key, Object args[])
+  {
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + ", ...)");
+
+    try
+      {
+	port.sendCmd( FtsClientProtocol.remote_call_code);
+	port.sendRemoteData( data);
+	port.sendInt( key);
+
+	port.sendArray( args);
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
   /**
    * Sync point with FTS.
    * Send a ping message, and sychroniuosly
@@ -987,6 +1010,36 @@ public class FtsServer
 	    System.err.println("New Connection #" + id + " " + from + "." + outlet + " -> " + to + "." + inlet);
 	}
 	break;
+
+      case FtsClientProtocol.remote_call_code:
+	{
+	  if (msg.getNumberOfArguments() < 2)
+	    {
+	      System.err.println( "Wrong remote call message " + msg);
+	      break;
+	    }
+
+	  int id = ((Integer) msg.getArgument(0)).intValue();
+
+	  FtsRemoteData data = FtsRemoteDataID.get( id);
+
+	  if (data == null)
+	    {
+	      System.err.println( "Unknown data " + id);
+	      return;
+	    }
+
+	  int key = ((Integer)  msg.getArgument(1)).intValue();
+
+	  Object args[] = new Object[ msg.getNumberOfArguments() - 2];
+
+	  for ( int i = 2; i < msg.getNumberOfArguments(); i++)
+	    args[i-2] = msg.getArgument(i);
+
+	  data.call( key, args);
+
+	  break;
+	}
 
       default:
 	break;

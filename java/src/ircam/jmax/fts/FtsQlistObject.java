@@ -49,6 +49,8 @@ public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
   public MaxData getData()
   {
     this.list.forceUpdate();
+
+    // (fd) already done in FtsAtomList::forceUpdate, but twice is better than once...
     Fts.getServer().syncToFts();
 
     return list;

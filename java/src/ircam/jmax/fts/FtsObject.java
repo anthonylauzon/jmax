@@ -19,6 +19,10 @@ import ircam.jmax.mda.*;
 
 abstract public class FtsObject implements MaxTclInterpreter
 {
+
+  // (fd) hash table to register objects with remote datas
+  static private Hashtable remoteDataClassNames;
+
   static private NumberFormat numberFormat;
 
   /* code to set generic properties meta-properties */
@@ -60,6 +64,9 @@ abstract public class FtsObject implements MaxTclInterpreter
     numberFormat.setMaximumFractionDigits(6);
     numberFormat.setMinimumFractionDigits(1);
     numberFormat.setGroupingUsed(false);
+
+    // (fd) 
+    remoteDataClassNames = new Hashtable();
   }
 
   /******************************************************************************/
@@ -169,6 +176,9 @@ abstract public class FtsObject implements MaxTclInterpreter
       return new FtsSelection(parent, className, "__selection", objId);
     else if (className.equals("__clipboard"))
       return new FtsClipboard(parent, className, "__clipboard", objId);
+    // (fd)
+    else if ( isRegisteredRemoteDataObjectClass( className))
+      return new FtsRemoteDataObject(parent, className, makeDescription(2, msg), objId);
     else
       return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
   }
@@ -188,6 +198,18 @@ abstract public class FtsObject implements MaxTclInterpreter
     /* if the object has been succesfully created, set the parent dirty */
 
     return new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
+  }
+
+  // (fd)
+  static boolean isRegisteredRemoteDataObjectClass( String className)
+  {
+    return remoteDataClassNames.containsKey( className);
+  }
+
+  // (fd)
+  public static void registerRemoteDataObjectClass( String className)
+  {
+    remoteDataClassNames.put( className, new Boolean( true));
   }
 
   /******************************************************************************/
