@@ -57,10 +57,11 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
     if (theFtsObject instanceof FtsContainerObject)
       this.YouArePatcher(true);
-    
     ParseText(itsArgs);
-    if(!IsResizeTextCompat(0,0)) RestoreDimensions();
-
+    Resize(0, itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height);
+    if(!itsResized){
+      if(!IsResizeTextCompat(0,0)) RestoreDimensions();
+    }
     return true;		// Why this method return a value ????
   }
 

@@ -46,6 +46,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     
     super.Init(theSketchPad,  theFtsObject);
     ParseText(itsArgs);
+    Resize(0, itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height);
     if(!itsResized){
       if(!IsResizeTextCompat(0,0)) RestoreDimensions();
     }
@@ -88,24 +89,12 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
 	itsFtsObject.sendMessage(0, "bang", null);
 	itsFlashing = true;
 	Paint_specific(itsSketchPad.getGraphics());
-	/*2003itsTimer.setRepeats(false);
-	itsTimer.start();*/
-	/*2003ErmesObjMessThread aMessThread = itsSketchPad.GetMessThread();
-	  aMessThread.SetMessage(this);
-	  if(aMessThread.isAlive())aMessThread.resume();
-	  else aMessThread.start();*/
       }
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
     
   }
-
-  /*2203  public void actionPerformed(ActionEvent e) {
-    itsFlashing = false;
-    Paint_specific(itsSketchPad.getGraphics());
-    itsTimer.stop();
-    }*/
 
   //--------------------------------------------------------
   // resize
