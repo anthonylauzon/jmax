@@ -70,6 +70,12 @@ public class AdderTool extends Tool implements PositionListener {
 
     int remember_x; 
     int remember_y;
+
+    public Cursor getCursor()
+    {
+	return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+    }
+
     /**
      *PositionListener interface
      */
@@ -80,7 +86,7 @@ public class AdderTool extends Tool implements PositionListener {
 	//endUpdate is called in addEvents in dataModel
 
 	//with Shift add to selection
-	if((modifiers & InputEvent.SHIFT_MASK) == 0) BpfSelection.getCurrent().deselectAll();
+	if((modifiers & InputEvent.SHIFT_MASK) == 0) ((BpfGraphicContext)gc).getSelection().deselectAll();
 	       
 	addPoint(x, y);
     }

@@ -46,9 +46,6 @@ import ircam.jmax.editors.bpf.tools.*;
    */
 public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSelectionListener, ScrollManager {
     
-    /*EditorToolbar toolbar;
-      public InfoPanel statusBar;*/
-
     FtsBpfObject bpfData;
     EditorContainer itsContainer;
 
@@ -92,66 +89,28 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     ruler = new BpfRuler(geometry, this);
 
     //-------------------------------------------------
-    //-- Tools, toolbar and status bar:
     //- Create the ToolManager with the needed tools
-    //- Create a toolbar associated to this ToolManager
-    //- Create a status bar containing the toolbar
-    
     manager = new BpfToolManager(BpfTools.instance);    
-
-    /*toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-      toolbar.setSize(180, 25);    
-      toolbar.setPreferredSize(new Dimension(180, 25));*/    
     Tool arrow = manager.getToolByName("arrow");     
     manager.activate(arrow, null); //we do not have a gc yet...
     
     setLayout(new BorderLayout());
 
-    BpfSelection.createSelection(bpfData);
-
     ///prepare the bpfEditor
     JPanel container_panel = new JPanel();
     container_panel.setLayout(new BorderLayout());
 
-    editor = new BpfEditor(geometry, bpfData);
+    editor = new BpfEditor(geometry, bpfData, manager);
     editor.setBorder(new EtchedBorder());
-    editor.getGraphicContext().setToolManager(manager);
     editor.getGraphicContext().setFrame(itsContainer.getFrame());
     editor.getGraphicContext().setScrollManager(this);
     container_panel.add(editor, BorderLayout.CENTER);
 
     manager.addContextSwitcher(new WindowContextSwitcher(editor.getGraphicContext().getFrame(), editor.getGraphicContext()));
 
-    BpfSelection.getCurrent().addListSelectionListener(this);
-
-    //------------------ prepares the Status bar    
+    editor.getGraphicContext().getSelection().addListSelectionListener(this);
+    //------------------     
     Box northSection = new Box(BoxLayout.Y_AXIS);
-    
-    /*statusBar = new InfoPanel();
-      
-      manager.addToolListener(new ToolListener() {
-      public void toolChanged(ToolChangeEvent e) 
-      {
-		
-      if (e.getTool() != null) 
-      {
-      statusBar.post(e.getTool(), "");
-      }
-      }
-      });
-    
-      statusBar.setSize(300, 30);
-
-      JPanel toolbarPanel = new JPanel();
-      toolbarPanel.setSize(228, 25);
-      toolbarPanel.setPreferredSize(new Dimension(228, 25));
-      toolbarPanel.setLayout(new BorderLayout());
-      toolbarPanel.add(toolbar, BorderLayout.CENTER);
-      toolbarPanel.validate();
-      statusBar.addWidgetAt(toolbarPanel, 2);
-      statusBar.validate();
-
-      northSection.add(statusBar);*/
 
     ruler.setSize(300, 20);
     northSection.add(ruler);	
@@ -166,7 +125,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom)
 	    {
-		//statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
 		BpfPoint lastPoint = bpfData.getLastPoint();
 		if(lastPoint!=null)
@@ -298,11 +256,12 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
      */    
     public void valueChanged(ListSelectionEvent e)
     {
-	if (BpfSelection.getCurrent().size()==1)
-      {
-	  BpfPoint pt = (BpfPoint)BpfSelection.getCurrent().getSelected().nextElement();
-	  makeVisible(pt);
-      }
+	BpfSelection sel = editor.getGraphicContext().getSelection();
+	if (sel.size()==1)
+	    {
+		BpfPoint pt = (BpfPoint)sel.getSelected().nextElement();
+		makeVisible(pt);
+	    }
     }
     
     public boolean pointIsVisible(BpfPoint point)
@@ -386,7 +345,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     }
     public Rectangle getViewRectangle()
     {
-	return getBpfEditor().getBounds();//???????????????????????no
+	return getBpfEditor().getBounds();
     }
 }
 

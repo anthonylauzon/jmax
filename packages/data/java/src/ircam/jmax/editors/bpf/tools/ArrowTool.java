@@ -68,7 +68,7 @@ public class ArrowTool extends SelecterTool implements DragListener{
    * overrides the abstract SelecterTool.singleObjectSelected */
   void singleObjectSelected(int x, int y, int modifiers)
   {
-    mountIModule(itsSelectionMover, startingPoint.x, startingPoint.y);
+      mountIModule(itsSelectionMover, startingPoint.x, startingPoint.y);
   }
 
   /** 
@@ -78,6 +78,27 @@ public class ArrowTool extends SelecterTool implements DragListener{
   {
   }
 
+    /*
+     * click on the editor with CTRL key pressed add a point 
+     */
+  public void controlAction(int x, int y, int modifiers)
+  {
+      mountIModule(itsSelectionMover);
+      
+      BpfGraphicContext bgc = (BpfGraphicContext) gc;
+      ((UndoableData) ((BpfGraphicContext)gc).getDataModel()).beginUpdate();
+
+      //with Shift add to selection
+      if((modifiers & InputEvent.SHIFT_MASK) == 0) ((BpfGraphicContext)gc).getSelection().deselectAll();
+	       
+      float time = bgc.getAdapter().getInvX(x);
+      float value = bgc.getAdapter().getInvY(y);
+      int index = bgc.getFtsObject().getPreviousPointIndex(time)+1;
+
+      bgc.getFtsObject().requestPointCreation(index, time, value); 
+  
+      mountIModule(itsSelecter);
+  }
   /**
    * drag listener called by the SelectionMover UI module,
    * at the end of its interaction.

@@ -41,8 +41,6 @@ import ircam.jmax.toolkit.actions.*;
 
 public class BpfPopupMenu extends JPopupMenu 
 {
-  static private BpfPopupMenu popup = new BpfPopupMenu();
-
   int x;
   int y;
   BpfEditor target = null;    
@@ -50,10 +48,15 @@ public class BpfPopupMenu extends JPopupMenu
   JMenu moveMenu;
   int trackCount = 1;
 
-  public BpfPopupMenu()
+  public BpfPopupMenu(BpfEditor editor)
   {
     super();
+    
+    target = editor;
+
     JMenuItem item;
+
+    add(target.getToolsMenu());
 
     addSeparator();
     
@@ -62,12 +65,10 @@ public class BpfPopupMenu extends JPopupMenu
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    ChangeRangeDialog.changeRange(BpfPopupMenu.getPopupTarget().getGraphicContext().getFrame(),	
-					  BpfPopupMenu.getPopupTarget().getGraphicContext(), 
-					  SwingUtilities.convertPoint(BpfPopupMenu.getPopupTarget(), 
-								      BpfPopupMenu.getPopupX(),
-								      BpfPopupMenu.getPopupY(),
-								      BpfPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
+	    ChangeRangeDialog.changeRange(target.getGraphicContext().getFrame(),	
+					  target.getGraphicContext(), 
+					  SwingUtilities.convertPoint(target, x, y,
+								      target.getGraphicContext().getFrame()));
 	}
 	});
     add(item);
@@ -78,7 +79,7 @@ public class BpfPopupMenu extends JPopupMenu
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	    {
-		BpfPopupMenu.getPopupTarget().showListDialog();
+		target.showListDialog();
 	    }
     });
     add(item);
@@ -89,50 +90,21 @@ public class BpfPopupMenu extends JPopupMenu
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    BpfSelection.getCurrent().selectAll();
-	    BpfPopupMenu.getPopupTarget().getGraphicContext().getGraphicDestination().requestFocus();
+	    target.getGraphicContext().getSelection().selectAll();
+	    target.getGraphicContext().getGraphicDestination().requestFocus();
 	}
     });
     add(item);
-
     pack();
   }
 
-  static public BpfPopupMenu getInstance()
+  public void show(Component invoker, int x, int y)
   {
-    return popup;
-  }
-
-  static public BpfEditor getPopupTarget(){
-    return popup.target;
-  }
-
-  static public void update(BpfEditor editor)
-  {
-      if(!popup.added) 
-      {
-	popup.insert(editor.getToolsMenu(), 0);
-        popup.target = editor;
-	popup.added=true;
-	popup.pack();
-      }
-  }
-
-    public void show(Component invoker, int x, int y)
-    {
-	this.x = x;
-	this.y = y;
+      this.x = x;
+      this.y = y;
       
-	super.show(invoker, x, y);
-    }
-    static public int getPopupX()
-    {
-	return popup.x;
-    }
-    static public int getPopupY()
-    {
-	return popup.y;
-    }
+      super.show(invoker, x, y);
+  }
 }
 
 

@@ -71,9 +71,9 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 	    updateStart(-delta, 0);
 	    getListener().updateStartingPoint(-delta, 0);
 
-	    BpfAdapter a = getGc().getAdapter();
-	    getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(),
-					" time "+a.getInvX(x));
+	    /*BpfAdapter a = getGc().getAdapter();
+	      getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(),
+	      " time "+a.getInvX(x));*/
 	}
 	void setEditor(BpfPanel editor)
 	{
@@ -117,7 +117,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     if (gc == null)
       System.err.println("-------------- GC NULL");
 
-    if (BpfSelection.getCurrent().size() > 20) 
+    if (((BpfGraphicContext)gc).getSelection().size() > 20) 
 	{
 	    dragMode = RECT_DRAG;
 	    previousX=0;previousY=0;
@@ -203,10 +203,11 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
   {
     BpfPoint movPoint;
     Graphics g = gc.getGraphicDestination().getGraphics();
+    BpfGraphicContext bgc = (BpfGraphicContext)gc;
     
     Rectangle tempr, clip; 
     tempr = (Rectangle) g.getClip();
-    clip = ((BpfGraphicContext)gc).getEditorClip();
+    clip = bgc.getEditorClip();
 
     g.clipRect(clip.x, clip.y, clip.width, clip.height);
     
@@ -228,12 +229,12 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
       {
 	g.setXORMode(Color.gray); 
 
-	BpfAdapter a = ((BpfGraphicContext) gc).getAdapter();
-	boolean singleObject = BpfSelection.getCurrent().size()==1;
+	BpfAdapter a = bgc.getAdapter();
+	boolean singleObject = bgc.getSelection().size()==1;
 	
-	BpfPoint last = BpfSelection.getCurrent().getLastSelectedPoint();
+	BpfPoint last = bgc.getSelection().getLastSelectedPoint();
 
-	for (Enumeration e = BpfSelection.getCurrent().getSelected(); e.hasMoreElements();)
+	for (Enumeration e = bgc.getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    movPoint = (BpfPoint) e.nextElement();
 
@@ -247,7 +248,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 		{ 
 		    int prevX = 0;
 		    int nextX = 0;
-		    FtsBpfObject ftsObj = ((BpfGraphicContext)gc).getFtsObject();
+		    FtsBpfObject ftsObj = bgc.getFtsObject();
 		    BpfPoint next = ftsObj.getNextPoint(movPoint);
 		    if(next!=null)
 			nextX = a.getX(next)-1;
@@ -269,7 +270,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 
 	    tempPoint.setDeltaX(dx);
 
-	    PointRenderer.getRenderer().render(tempPoint, g, true, gc);
+	    PointRenderer.getRenderer().render(tempPoint, g, true, bgc);
 	  }
       }
     

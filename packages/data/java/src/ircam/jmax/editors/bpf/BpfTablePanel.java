@@ -55,7 +55,7 @@ class BpfTablePanel extends JPanel implements ListSelectionListener {
     setLayout(new BorderLayout());
     add(BorderLayout.CENTER, scrollPane);
 
-    table.setSelectionModel(BpfSelection.getCurrent());
+    table.setSelectionModel(gc.getSelection());
     gc.getSelection().addListSelectionListener(this);
 
     BpfDataModel bpfModel = tmodel.getDataModel();

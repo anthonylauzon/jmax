@@ -66,6 +66,10 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
   {
   }
 
+  public Cursor getCursor()
+  {
+    return Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+  }  
   
   /**
    * DynamicDragListener interface
@@ -82,28 +86,8 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
 	BpfGraphicContext bgc = (BpfGraphicContext) gc;
 	Geometry geometry = bgc.getAdapter().getGeometry();
 
-	/*if(egc.getAdapter().isVerticalScrollable())
-	{
-	    if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
-	    {
-		int transp = geometry.getXTransposition()+egc.getAdapter().getInvWidth(deltaX);
-		egc.getScrollManager().scrollToValue(-transp);
-	    }	
-	    else
-		if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
-		    {
-			//vertical scroll
-			((VerticalScrollable)egc.getAdapter()).incrYTransp(deltaY);
-			rep = (!rep);
-			//egc.getTrack().setProperty("repaint", new Boolean(rep));
-			egc.getGraphicDestination().repaint();
-		    }
-	}
-	else
-	{*/
 	int transp = geometry.getXTransposition()+bgc.getAdapter().getInvWidth(deltaX);
 	bgc.getScrollManager().scrollToValue(-transp);
-	//    }	
     }
     public void dragEnd(int x, int y){}
     public void updateStartingPoint(int deltaX, int deltaY){}

@@ -83,20 +83,14 @@ public class BpfBackground implements Layer, ImageObserver{
 
   private void drawHorizontalLine(Graphics g, int w, int h)
   {
-      g.setColor(Color.white);
-      
-      g.fillRect(0, 0, w, h);
-      
-      /*g.setColor(Color.lightGray);
-
-	int y0 = ((BpfAdapter)gc.getAdapter()).getY(0); 
-	g.drawLine(0, y0, w, y0);*/
+      g.setColor(Color.white);      
+      g.fillRect(0, 0, w, h);      
   }
 
   private void drawVerticalGrid(Graphics g, int w, int h)
   {
       int windowTime = (int)(gc.getAdapter().getInvX(w)) - 1 ;    
-      int logicalTime = -gc.getAdapter().getGeometry().getXTransposition();      
+      int logicalTime = gc.getLogicalTime();      
       int timeStep = findBestTimeStep(windowTime-logicalTime);
     
       g.setColor(Color.lightGray);
@@ -104,7 +98,7 @@ public class BpfBackground implements Layer, ImageObserver{
       int xPosition;
       int snappedTime;
     
-      for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
+      for (int i=logicalTime+timeStep; i<windowTime+timeStep; i+=timeStep) 
 	  {
 	      snappedTime = (i/timeStep)*timeStep;
 	      xPosition = gc.getAdapter().getX(snappedTime);
@@ -112,15 +106,6 @@ public class BpfBackground implements Layer, ImageObserver{
 	  }
 
       int y0 = (gc.getAdapter()).getY((float)0.0); 
-      /*String maxString, minString;
-	maxString = ""+numberFormat.format(gc.getAdapter().getInvY(0));
-	minString = ""+numberFormat.format(gc.getAdapter().getInvY(gc.getGraphicDestination().getSize().height));  
-
-	g.setColor(Color.gray);
-	g.setFont(BpfPanel.rulerFont);
-	g.drawString(maxString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, maxString)-2, 10);
-	g.drawString(minString, PartitionBackground.KEYEND - SwingUtilities.computeStringWidth(fm, minString)-2, h-2);   
-      */
       g.setColor(Color.black);
       g.drawLine(0, y0, w, y0);
   }

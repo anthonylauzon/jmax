@@ -44,7 +44,7 @@ import java.beans.*;
  * and settings of y are simply ignored. */
 public class BpfEditor extends PopupToolbarPanel implements ListSelectionListener
 {
-    public BpfEditor(Geometry g, FtsBpfObject model)
+    public BpfEditor(Geometry g, FtsBpfObject model, BpfToolManager manager)
     {
 	super();
 
@@ -69,14 +69,23 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		}
 	    });
 
-	createGraphicContext(geometry, model);
+	createGraphicContext(geometry, model, manager);
 
-	BpfSelection.getCurrent().addListSelectionListener(this);
+	gc.getSelection().addListSelectionListener(this);
 
 	setBackground(Color.white);
 
 	setOpaque(false);
 
+	bpfPopupMenu = new BpfPopupMenu(this);
+
+	manager.addToolListener(new ToolListener() {
+		public void toolChanged(ToolChangeEvent e) 
+		{		
+		    if (e.getTool() != null) 
+			setCursor(e.getTool().getCursor());
+		}
+	    });
     }
 
     public void reinit(){}
@@ -88,19 +97,18 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     
     public JPopupMenu getMenu()
     {
-	BpfPopupMenu.getInstance().update(this);
-	return BpfPopupMenu.getInstance();
+	return bpfPopupMenu;
     }
 
     public void paintComponent(Graphics g) 
     {
 	Rectangle r = g.getClipBounds();
-	renderer.render(g, r); //et c'est tout	
+	renderer.render(g, r);	
     }
 
-    private void createGraphicContext(Geometry geometry, FtsBpfObject model)
+    private void createGraphicContext(Geometry geometry, FtsBpfObject model, BpfToolManager manager)
     {
-	gc = new BpfGraphicContext(model, BpfSelection.getCurrent()); //loopback?
+	gc = new BpfGraphicContext(model, new BpfSelection(model)); //loopback?
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
 	ad = new BpfAdapter(geometry, gc);
@@ -108,6 +116,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
 	renderer = new BpfRenderer(gc);
 	gc.setRenderManager(renderer);
+	gc.setToolManager(manager);
     }
 
     public void setAdapter(BpfAdapter adapter)
@@ -184,14 +193,14 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		if(e.getID()==KeyEvent.KEY_PRESSED)
 		    {
 			((UndoableData)model).beginUpdate();
-			BpfSelection.getCurrent().deleteAll();
+			gc.getSelection().deleteAll();
 		    }
 	    }
 	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
 	    if(e.isControlDown())
-		BpfSelection.getCurrent().selectPrevious();
+		gc.getSelection().selectPrevious();
 	    else
-		BpfSelection.getCurrent().selectNext();
+		gc.getSelection().selectNext();
 	  
 	super.processKeyEvent(e);
 	requestFocus();
@@ -206,6 +215,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     Geometry geometry;
     BpfGraphicContext gc;
     FtsBpfObject model;
+    BpfPopupMenu bpfPopupMenu;
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
     static public int DEFAULT_HEIGHT = 127;
     BpfRenderer renderer;

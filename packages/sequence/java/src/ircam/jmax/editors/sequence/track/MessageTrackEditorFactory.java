@@ -4,7 +4,7 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.editors.sequence.*;
 import java.util.*;
 import javax.swing.*;
-
+import ircam.jmax.toolkit.*;
 /**
  * Creates new MidiTrack editors. */
 public class MessageTrackEditorFactory implements TrackEditorFactory {

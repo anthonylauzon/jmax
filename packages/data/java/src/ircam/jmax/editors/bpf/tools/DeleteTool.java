@@ -31,7 +31,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.utils.*;
 
 import java.util.*;
-import java.awt.Component;
+import java.awt.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.undo.*;
@@ -66,6 +66,10 @@ public class DeleteTool extends Tool implements PositionListener {
    */
   public void deactivate() {}
 
+  public Cursor getCursor()
+  {
+    return Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR);
+  }
   
   /**
    * called by the MouseTracker
@@ -81,12 +85,12 @@ public class DeleteTool extends Tool implements PositionListener {
 		// starts an undoable transition	
 		((UndoableData) bgc.getDataModel()).beginUpdate();
 
-		if( BpfSelection.getCurrent().isInSelection(point))
-		    BpfSelection.getCurrent().deleteAll();
+		if( bgc.getSelection().isInSelection(point))
+		    bgc.getSelection().deleteAll();
 		else
 		    {
 			bgc.getFtsObject().requestPointRemove(bgc.getDataModel().indexOf(point));		
-			BpfSelection.getCurrent().deselectAll();
+			bgc.getSelection().deselectAll();
 		    }
 	    }
     } 

@@ -3,7 +3,7 @@ package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
 import java.util.*;
-
+import ircam.jmax.toolkit.*;
 /**
  * A class used to register new TrackEditorFactories */
 

@@ -47,7 +47,7 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 
   
   //--- Fields
-  private static BpfSelection current;
+    //private static BpfSelection current;
 
   public DataFlavor flavors[];
 
@@ -68,29 +68,10 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
   {
     itsModel = model;
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION) ;
-    //initDataFlavors();
-
-    // make this selection a listener of its own data model
     model.addBpfListener(this);
   }
    
-  public BpfSelection()
-  {
-      /*if (flavors == null)
-	flavors = new DataFlavor[1];
-	flavors[0] = SequenceDataFlavor.getInstance();*/
-  }
-
-    /*void initDataFlavors()
-      {
-      if (flavors == null)
-      flavors = new DataFlavor[1];
-      flavors[0] = SequenceDataFlavor.getInstance();
-	
-      DataFlavor[] trackFlavors = ((FtsTrackObject)itsModel).getDataFlavors();
-      for(int i=0; i<trackFlavors.length;i++)
-      addFlavor(trackFlavors[i]);
-      }*/
+  public BpfSelection(){}
 
   public void addSelectionInterval(int index1, int index2)
   {
@@ -98,56 +79,11 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
   }
 
   /**
-   * Ownership handling
-   */
-    /*public void setOwner(SelectionOwner so)
-      {
-      itsOwner = so;
-      }*/
-
-  /**
-   * Ownership handling
-   */
-    /*public SelectionOwner getOwner()
-      {
-      return itsOwner;
-      }*/
-
-  /**
    * Returns the SequenceDataModel this selection refers to */
   public BpfDataModel getModel()
   {
     return itsModel;
   }
-
-  /**
-   * Sets the TrackDataModel this selection refers to
-  public void setModel(TrackDataModel m)
-  {
-      if (itsModel != m)
-	  deselectAll();
-      if (itsModel != null)
-	  itsModel.removeListener(this);
-      itsModel = m;
-      if (m != null) 
-	  m.addBpfListener(this);
-	  }*/
-
-  /**
-   * Sets the current active selection. This will send a 
-   * selectionActivated message to that selection's owner, and a 
-   * selectionDisactivated to the old selection's owner */
-    /*public static void setCurrent(SequenceSelection s)
-      {
-      if (current != null && current.itsOwner != null)
-      current.itsOwner.selectionDisactivated();
-
-      current = s;
-      
-      if (s != null && s.itsOwner != null)
-      s.itsOwner.selectionActivated();
-      
-      }*/
 
   /** select the given object 
    */
@@ -273,19 +209,6 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
   {
       lastSelectedPoint = null;
       clearSelection();
-  }
-
-  /**
-   * returns the (unique) selection
-   */
-  public static BpfSelection getCurrent()
-  {
-    return current;
-  }  
-
-  public static void createSelection(BpfDataModel model)
-  {
-      current = new BpfSelection(model);
   }
 
   /** BpfDataListener interface*/

@@ -64,8 +64,9 @@ public class PointRenderer implements ObjectRenderer {
     public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
     {
 	BpfPoint point = (BpfPoint) obj;
-	BpfAdapter adapter = ((BpfGraphicContext) theGc).getAdapter();
-	BpfDataModel model = ((BpfGraphicContext) theGc).getDataModel();
+	BpfGraphicContext bgc = (BpfGraphicContext) theGc;
+	BpfAdapter adapter = bgc.getAdapter();
+	BpfDataModel model = bgc.getDataModel();
 
 	int x = adapter.getX(point);
 	int y = adapter.getY(point);    
@@ -90,14 +91,14 @@ public class PointRenderer implements ObjectRenderer {
 		if(prev == original)
 		    prev = model.getPreviousPoint(original.getTime());
 		
-		if((prev != null)&&(!BpfSelection.getCurrent().isInSelection(prev)))
+		if((prev != null)&&(!bgc.getSelection().isInSelection(prev)))
 		    g.drawLine(adapter.getX(prev), adapter.getY(prev), x, y);
 
 		if(next == original)
 		    next = model.getNextPoint(original);
 		  
 		if(next != null)
-		    if (!BpfSelection.getCurrent().isInSelection(next))
+		    if (!bgc.getSelection().isInSelection(next))
 			g.drawLine(x, y, adapter.getX(next), adapter.getY(next));
 		    else
 			{//qui anche il next e' selezionato
@@ -115,7 +116,7 @@ public class PointRenderer implements ObjectRenderer {
 			}
 
 		//draw the cross and the current values
-		if(BpfSelection.getCurrent().size()==1)
+		if(bgc.getSelection().size()==1)
 		    {
 			g.drawLine(x, y-20, x, y+20);
 			g.drawLine(x-20, y, x+20, y);

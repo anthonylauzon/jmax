@@ -123,20 +123,10 @@ public class BpfGraphicContext extends GraphicContext {
     return itsSelection;
   }
 
-    /*public StatusBar getStatusBar()
-      {
-      return ((Bpf) getFrame()).itsBpfPanel.statusBar;
-      }*/
-
-    public FtsBpfObject getFtsObject()
-    {
-	return ((Bpf) getFrame()).bpfData;
-    }
-
-    /*public  EditorToolbar getToolbar()
-      {
-      return ((Bpf) getFrame()).itsBpfPanel.toolbar;
-      }*/
+  public FtsBpfObject getFtsObject()
+  {
+      return ((Bpf) getFrame()).bpfData;
+  }
 
     public void setScrollManager(ScrollManager manager)
     {

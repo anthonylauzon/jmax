@@ -33,6 +33,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import ircam.jmax.toolkit.*;
 /**
  * A dialog used to specify a set of tracks to be merged/unmerged */
 public class MergeDialog extends JDialog {

@@ -48,11 +48,6 @@ import ircam.jmax.toolkit.*;
 
 public class BpfToolManager extends ToolManager implements ActionListener{
   
-  /**
-   * constructor. It inserts the tools provided by the given
-   * ToolManager. The direction parameter specify if the
-   * toolbar should be HORIZONTAL or VERTICAL. 
-   */
   public BpfToolManager()
   {
     super();
@@ -65,7 +60,7 @@ public class BpfToolManager extends ToolManager implements ActionListener{
   }
     
   /**
-   * add a new tool in the toolbar (and in the popupMenu)
+   * add a new tool in the popupMenu
    */ 
   public void addTool(Tool theTool) 
   {

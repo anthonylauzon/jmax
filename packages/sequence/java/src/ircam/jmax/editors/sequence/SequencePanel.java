@@ -43,6 +43,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.Geometry;
 
   /**
    * The graphic component containing the tracks of a Sequence.

@@ -23,9 +23,13 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.bpf;
+package ircam.jmax.toolkit;
 
 public interface TranspositionListener
 {
   public abstract void transpositionChanged(int newTranspose);
 }
+
+
+
+

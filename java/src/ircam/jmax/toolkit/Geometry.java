@@ -1,7 +1,6 @@
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.toolkit;
 
-import ircam.jmax.toolkit.*;
 import java.util.*;
 
 /**
@@ -135,9 +134,7 @@ public class Geometry
     {
 	yInvertion = b;
     }
-    
-    
-    
+        
     /**
      * called by objects that will be informed when the zoom factor changes
      */
@@ -194,15 +191,13 @@ public class Geometry
 	    }
     }
     
-    static int sizeToMsec(Geometry geometry, int size)
+    /*static*/public int sizeToMsec(Geometry geometry, int size)
     {
 	if (geometry.getXInvertion()) return (int) (geometry.getXTransposition() -(size)/geometry.getXZoom());
 	
 	else return (int) ((size)/geometry.getXZoom() - geometry.getXTransposition());
     
     }
-
-    
     
     //-------  Geometry fields
     float xZoomFactor;

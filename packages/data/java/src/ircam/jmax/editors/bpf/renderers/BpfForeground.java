@@ -65,7 +65,7 @@ public class BpfForeground implements Layer {
 	       objectsIntersecting( r.x, 0, r.width, d.height); e.hasMoreElements();) 
 	  {
 	      temp = (BpfPoint) e.nextElement();
-	      PointRenderer.getRenderer().render( temp, g, BpfSelection.getCurrent().isInSelection(temp), gc);
+	      PointRenderer.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
 	  }
 
       //draw the first object out of rectangle left bound  

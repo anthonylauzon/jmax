@@ -66,8 +66,6 @@ public class Bpf extends JFrame implements EditorContainer{
 
 	makeTitle();
 
-	//bpfData.requestSequenceName();
-
 	// Build The Menus and Menu Bar
 	makeMenuBar();
 
@@ -134,7 +132,7 @@ public class Bpf extends JFrame implements EditorContainer{
 	return getLocation();
     }
     public Rectangle getViewRectangle(){
-	return itsBpfPanel.getViewRectangle()/*scrollTracks.getViewport().getViewRect()*/;
+	return itsBpfPanel.getViewRectangle();
     }
 }
 

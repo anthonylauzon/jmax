@@ -26,6 +26,7 @@
 package ircam.jmax.toolkit;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * The base class for tools: it handles the name and the icon,
@@ -112,7 +113,6 @@ abstract public class Tool implements StatusBarClient{
     itsIcon = theIcon;
   }
 
-
   /**
    * gets the icon
    */
@@ -124,6 +124,11 @@ abstract public class Tool implements StatusBarClient{
   public JPopupMenu getMenu()
   {
     return null;
+  }
+
+  public Cursor getCursor()
+  {
+    return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
   }
 
   //---- Fields

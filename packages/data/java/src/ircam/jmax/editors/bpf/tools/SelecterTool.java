@@ -74,34 +74,45 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public void selectionPointChoosen(int x, int y, int modifiers) 
   {
-      gc.getGraphicDestination().requestFocus();//???
+      if((modifiers & InputEvent.CTRL_MASK)!=0)
+	  controlAction(x, y, modifiers);
+      else
+	  {
+	      BpfSelection selection = ((BpfGraphicContext)gc).getSelection();
+	      gc.getGraphicDestination().requestFocus();//???
 
-      BpfPoint point = (BpfPoint) gc.getRenderManager().firstObjectContaining(x, y);
-      if (point != null) 
-	  { //click on event
-	      startingPoint.setLocation(x,y);
+	      BpfPoint point = (BpfPoint) gc.getRenderManager().firstObjectContaining(x, y);
+	      if (point != null) 
+		  { //click on event
+		      startingPoint.setLocation(x,y);
 
-	      if (!BpfSelection.getCurrent().isInSelection(point)) 
-		  {
-		      if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
-			  BpfSelection.getCurrent().deselectAll();
+		      if (!selection.isInSelection(point)) 
+			  {
+			      if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+				  selection.deselectAll();
 
-		      BpfSelection.getCurrent().select(point);
-		  }
-	      else
-		  BpfSelection.getCurrent().setLastSelectedPoint(point);
+			      selection.select(point);
+			  }
+		      else
+			  selection.setLastSelectedPoint(point);
 	      
-	      singleObjectSelected(x, y, modifiers);
+		      singleObjectSelected(x, y, modifiers);
+		  }
+	      else //click on empty
+		  if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+		      if (!selection.isSelectionEmpty())
+			  selection.deselectAll(); 
 	  }
-      else //click on empty
-	  if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-	      if (!BpfSelection.getCurrent().isSelectionEmpty())
-		  BpfSelection.getCurrent().deselectAll(); 
   }
 
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
     {
 	edit(x, y, modifiers);
+    }
+
+  public void controlAction(int x, int y, int modifiers) 
+    {
+	//
     }
 
   /**
@@ -125,7 +136,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   void selectArea(int x, int y, int w, int h) 
   { 
       BpfGraphicContext bgc = (BpfGraphicContext)gc;
-      selectArea(bgc.getRenderManager(), BpfSelection.getCurrent(), x, y,  w,  h);
+      selectArea(bgc.getRenderManager(), bgc.getSelection(), x, y,  w,  h);
   }
 
   
