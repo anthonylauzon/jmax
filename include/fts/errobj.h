@@ -23,6 +23,9 @@
 #ifndef _FTS_ERROBJ_H_
 #define _FTS_ERROBJ_H_
 
+
+FTS_API fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at, const char *format, ...);
+
 FTS_API void fts_object_set_error(fts_object_t *obj, const char *format, ...);
 FTS_API void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...);
 
