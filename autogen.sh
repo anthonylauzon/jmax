@@ -2,7 +2,7 @@
 aclocal -I m4
 autoconf
 automake --foreign
-./configure --prefix=`pwd`-install $*
+./configure --prefix=`echo $PWD`-install $*
 
 
 
