@@ -359,6 +359,7 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	    }
 	  else if (token_sym_equals(in, fts_s_vtable))
 	    {
+	      int haveName = 0;
 	      int argc;
 	      fts_atom_t vargs[10];
 	      fts_atom_t description[10];
@@ -376,9 +377,11 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	      fts_set_symbol(&description[0], fts_s_table);
 
 	      if (argc >= 8)
-		description[1] = vargs[7];
-	      else
-		fts_set_symbol(&description[1], fts_s_table);
+		{
+		  description[1] = vargs[7];
+		  haveName = 1;
+		}
+
 
 	      /* get the size */
 
@@ -386,7 +389,11 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 
 	      /* Make the table */
 
-	      lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 3, description);
+	      if (haveName)
+		lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 3, description);
+	      else
+		lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 2, description);
+
 	      lastNObjectType = fts_s_table;
 
 	      /* skip the ';' */
