@@ -68,7 +68,7 @@ class ErmesObjIn extends ErmesObjInOut {
 
   public void MouseDown_specific(MouseEvent evt, int x, int y) 
   {
-    if (itsSketchPad.itsRunMode || evt.getClickCount() == 1) 
+    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.getClickCount() == 1) 
       {
 	itsSketchPad.ClickOnObject(this, evt, x, y);
       } else 

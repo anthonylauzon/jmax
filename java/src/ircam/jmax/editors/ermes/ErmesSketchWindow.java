@@ -78,24 +78,20 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   public FtsObject itsPatcher;
   public FtsPatcherData itsPatcherData;
 
-  private Menu itsAlignObjectMenu;
+  private Menu itsObjectsMenu;
+  private Menu itsAlignMenu;
   private Menu itsSizesMenu;
   private Menu itsFontsMenu;
-  private Menu itsExecutionMenu;
-  private Menu itsTextMenu;
-  private Menu itsGraphicsMenu;
 
   CheckboxMenuItem itsSelectedSizeMenu;   //the Selected objects size MenuItem
   CheckboxMenuItem itsSketchSizeMenu;     //the SketchPad size MenuItem
   CheckboxMenuItem itsSketchFontMenu;     //the SketchPad font MenuItem
   CheckboxMenuItem itsSelectedFontMenu;   //the Selected objects font MenuItem
 
-  MenuItem itsRunModeMenuItem;
+  MenuItem itsModeMenuItem;
   MenuItem itsSelectAllMenuItem;
 
-  boolean itsChangingRunEditMode = false;
   public MaxDocument itsDocument;
-
 
   public void showObject( Object obj)
   {
@@ -157,9 +153,9 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     // to something different than "run" (usually, "edit" :)
 
     if (itsPatcherData.getRecursiveEditMode() == FtsPatcherData.EDIT_MODE)
-      setRunMode(false);
+      setLockMode(false);
     else
-      setRunMode(true);
+      setLockMode(true);
 
     // Finally, activate the updates
 
@@ -276,25 +272,25 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     GetCutMenu().setEnabled( true);
     GetCopyMenu().setEnabled( true);
     GetPasteMenu().setEnabled( true);
-    //GetClearMenu().setEnabled(false);
     
-    // Add the Graphics menu
-    itsGraphicsMenu = new Menu( "Graphics");
-    menuBar.add( itsGraphicsMenu);
-    FillGraphicsMenu( itsGraphicsMenu);
+    // Add the Objects menu
+    itsObjectsMenu = new Menu( "Objects");
+    menuBar.add( itsObjectsMenu);
 
-    // Add the Text menu
-    itsTextMenu = new Menu( "Text");
-    menuBar.add( itsTextMenu);
-    FillTextMenu( itsTextMenu);
+    itsSizesMenu = new Menu( "Sizes");
+    FillSizesMenu( itsSizesMenu);
+    itsObjectsMenu.add( itsSizesMenu);
+
+    itsFontsMenu =  new Menu( "Fonts");
+    FillFontMenu( itsFontsMenu);
+    itsObjectsMenu.add( itsFontsMenu);
+
+    itsAlignMenu =  new Menu( "Align");
+    FillAlignMenu( itsAlignMenu);
+    itsObjectsMenu.add( itsAlignMenu);
 
     CheckDefaultSizeFontMenuItem(); 
     CheckDefaultFontItem(); 
-
-    // Add the Execution menu
-    itsExecutionMenu = new Menu( "Execution");
-    menuBar.add( itsExecutionMenu);
-    FillExecutionMenu( itsExecutionMenu);
   }
 
   public void inspectAction()
@@ -330,7 +326,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
   protected void Paste()
   {
-    if (itsSketchPad.itsRunMode)
+    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE)
       return;
 
     Cursor temp = getCursor();
@@ -404,80 +400,45 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   }
 
 
-
-  private void FillGraphicsMenu( Menu graphicsMenu)
-  {
-    itsAlignObjectMenu =  new Menu( "Align Objects");
-    graphicsMenu.add( itsAlignObjectMenu);
-    FillAlignObjectsMenu( itsAlignObjectMenu);
-  }
-
-  class AlignMenuAdapter extends MaxActionListener
-  {
-    String align;
-
-    AlignMenuAdapter( MenuItem item, String align)
-    {
-      super(item);
-      this.align = align;
-    }
-
-    public  void actionPerformed( ActionEvent e)
-    {
-      itsSketchPad.AlignSelectedObjects( align);
-    }
-  }
-
-  private void FillAlignObjectsMenu( Menu theAlignObjectMenu)
+  private void FillAlignMenu( Menu theAlignObjectMenu)
   {
     MenuItem aMenuItem;
 
-    aMenuItem = new MenuItem( "Align Top");
+    aMenuItem = new MenuItem( "Top");
     theAlignObjectMenu.add( aMenuItem);
-    aMenuItem.addActionListener(new AlignMenuAdapter(aMenuItem,  "Top"));
-
-    aMenuItem = new MenuItem( "Align Left");
-    theAlignObjectMenu.add( aMenuItem);
-    aMenuItem.addActionListener( new AlignMenuAdapter(aMenuItem,  "Left"));
-
-    aMenuItem = new MenuItem( "Align Bottom");
-    theAlignObjectMenu.add( aMenuItem);
-    aMenuItem.addActionListener( new AlignMenuAdapter(aMenuItem,  "Bottom"));
-
-    aMenuItem = new MenuItem( "Align Right");
-    theAlignObjectMenu.add( aMenuItem);
-    aMenuItem.addActionListener( new AlignMenuAdapter(aMenuItem,  "Right"));
-  }
-
-  private void FillExecutionMenu( Menu theExecutionMenu)
-  {
-    itsRunModeMenuItem = new MenuItem( "Run Mode Ctrl+E");
-    theExecutionMenu.add( itsRunModeMenuItem);
-
-    itsRunModeMenuItem.addActionListener( new MaxActionListener(itsRunModeMenuItem) {
+    aMenuItem.addActionListener( new MaxActionListener(aMenuItem) {
       public  void actionPerformed( ActionEvent e)
 	{
-	  setRunMode( ! itsSketchPad.itsRunMode);
+	  itsSketchPad.AlignSelectedObjects( ((MenuItem)e.getSource()).getLabel());
 	}
     });
-  }
 
-  private void FillTextMenu( Menu theTextMenu)
-  {
-    String aString;
-    CheckboxMenuItem aCheckItem;
+    aMenuItem = new MenuItem( "Left");
+    theAlignObjectMenu.add( aMenuItem);
+    aMenuItem.addActionListener( new MaxActionListener(aMenuItem) {
+      public  void actionPerformed( ActionEvent e)
+	{
+	  itsSketchPad.AlignSelectedObjects( ((MenuItem)e.getSource()).getLabel());
+	}
+    });
 
-    //-- fonts
-    itsFontsMenu =  new Menu( "Fonts");
-    FillFontMenu( itsFontsMenu);
-    theTextMenu.add( itsFontsMenu);
+    aMenuItem = new MenuItem( "Bottom");
+    theAlignObjectMenu.add( aMenuItem);
+    aMenuItem.addActionListener( new MaxActionListener(aMenuItem) {
+      public  void actionPerformed( ActionEvent e)
+	{
+	  itsSketchPad.AlignSelectedObjects( ((MenuItem)e.getSource()).getLabel());
+	}
+    });
 
-    theTextMenu.add( new MenuItem( "-"));
-
-    //-- sizes
-    itsSizesMenu = new Menu( "Sizes");
-    FillSizesMenu( itsSizesMenu);
-    theTextMenu.add( itsSizesMenu);
+    aMenuItem = new MenuItem( "Right");
+    theAlignObjectMenu.add( aMenuItem);
+    aMenuItem.addActionListener( new MaxActionListener(aMenuItem) {
+      public  void actionPerformed( ActionEvent e)
+	{
+	  itsSketchPad.AlignSelectedObjects( ((MenuItem)e.getSource()).getLabel());
+	}
+    });
   }
 
   class SizesMenuAdapter extends MaxItemListener
@@ -659,10 +620,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	  itsSketchPad.SelectAll();//a
 	else if (aInt == 69)
 	  {//e
-	    if (itsSketchPad.GetRunMode()) 
-	      setRunMode( false);
+	    if (itsSketchPad.itsMode == itsSketchPad.LOCKMODE) 
+	      setLockMode( false);
 	    else 
-	      setRunMode( true);
+	      setLockMode( true);
 	  }
 	else if (aInt == 47)
 	  {
@@ -774,12 +735,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     itsPatcherData.resetPatcherListener();
     removeComponentListener( this);
 
-    itsGraphicsMenu.remove(itsAlignObjectMenu);
-    itsTextMenu.remove(itsSizesMenu);
-    itsTextMenu.remove(itsFontsMenu);
-    getMenuBar().remove(itsExecutionMenu);
-    getMenuBar().remove(itsTextMenu);
-    getMenuBar().remove(itsGraphicsMenu);
+    itsObjectsMenu.remove(itsAlignMenu);
+    itsObjectsMenu.remove(itsSizesMenu);
+    itsObjectsMenu.remove(itsFontsMenu);
+    getMenuBar().remove(itsObjectsMenu);
 
     itsScrollerView.getHAdjustable().removeAdjustmentListener( itsSketchPad);
     itsScrollerView.getVAdjustable().removeAdjustmentListener( itsSketchPad);
@@ -1036,47 +995,27 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     requestFocus();
   }
 
-
-  private MenuItem getRunModeMenuItem() 
-  {
-    return itsRunModeMenuItem;
-  }
-
   private MenuItem getSelectAllMenuItem() 
   {
     return itsSelectAllMenuItem;
   }
 
-  public void setRunMode( boolean theRunMode)
+  private void setLockMode( boolean theLockMode)
   {
-    ErmesObject aObject;
-
     // Store the mode in a non persistent, property of 
     // the patch, so that subpatcher can use it as their initial mode
 
-    if (theRunMode)
+    if (theLockMode)
       itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
     else
       itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
 
+    itsSketchPad.itsMode = theLockMode ? ErmesSketchPad.LOCKMODE : ErmesSketchPad.EDITMODE;
 
-    itsChangingRunEditMode = true;
+    itsToolBar.setLockMode( theLockMode);
 
-    MenuItem aRunEditItem = getRunModeMenuItem();
-    MenuItem aSelectAllItem = getSelectAllMenuItem();
+    getSelectAllMenuItem().setEnabled( !theLockMode);
 
-// (fd) probably useless
-//     if (theRunMode)  
-//       setBackground( Color.white);
-//     else
-//       setBackground( ErmesSketchPad.sketchColor);
-    
-    itsSketchPad.SetRunMode( theRunMode);
-    
-    itsToolBar.setRunMode( theRunMode);
-    aSelectAllItem.setEnabled( !theRunMode);
-
-    itsRunModeMenuItem.setLabel( theRunMode ? "Edit Mode Ctrl+E" : "Run Mode Ctrl+E");
     setKeyEventClient( null); //when changing mode, always remove key listeners
     requestFocus();
   }

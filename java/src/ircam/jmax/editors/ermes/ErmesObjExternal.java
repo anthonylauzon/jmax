@@ -77,7 +77,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
 	    {itsSketchPad.stopWaiting();}
 	});
       }
-    else if ( !itsSketchPad.itsRunMode) 
+    else if ( itsSketchPad.itsMode == ErmesSketchPad.EDITMODE) 
       itsSketchPad.ClickOnObject( this, evt, x, y);
   }
 

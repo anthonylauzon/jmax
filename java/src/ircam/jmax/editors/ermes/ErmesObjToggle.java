@@ -52,7 +52,7 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
 
   public void MouseDown_specific( MouseEvent evt,int x, int y) 
   {
-    if ( itsSketchPad.itsRunMode || evt.isControlDown()) 
+    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown()) 
       {
 	itsToggled = !itsToggled;
 

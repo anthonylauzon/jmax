@@ -71,7 +71,7 @@ class ErmesObjComment extends ErmesObjEditableObject {
 
   public void Paint_specific(Graphics g) 
   {
-    if (!itsSketchPad.itsRunMode) 
+    if (itsSketchPad.itsMode == ErmesSketchPad.EDITMODE)
       {
 	if (itsSelected)
 	  g.setColor(Color.gray);
@@ -79,13 +79,6 @@ class ErmesObjComment extends ErmesObjEditableObject {
 	  g.setColor(itsSketchPad.getBackground());
 
 	g.fill3DRect( getX(), getY(), getWidth(), getHeight(), true);
-
-	//drag box
-	if (itsSelected) 
-	  {
-	    g.setColor(Color.gray.darker());
-	    g.fillRect( getX() + getWidth() - DRAG_DIMENSION, getY() + getHeight() - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-	  }
       }
 
     //text

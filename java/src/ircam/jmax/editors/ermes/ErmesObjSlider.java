@@ -129,7 +129,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
 	Graphics g = itsSketchPad.getGraphics();
 
-	if ( itsSketchPad.itsRunMode)
+	if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE)
 	  Paint_movedThrottle( g);
 	else
 	  Paint_specific( g);
@@ -151,7 +151,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   public void MouseDown_specific( MouseEvent evt, int x, int y)
   {
-    if( itsSketchPad.itsRunMode || evt.isControlDown())
+    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown())
       {
 	if( IsInThrottle( x,y))
 	  {
@@ -189,7 +189,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   public void MouseDrag_specific( MouseEvent evt,int x, int y)
   {
-    if( (itsSketchPad.itsRunMode || evt.isControlDown()) && itsMovingThrottle )
+    if( (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown()) && itsMovingThrottle )
       {
 	if( getY() + getHeight() - BOTTOM_OFFSET >= y && getY() + UP_OFFSET <=y )
 	  {
@@ -234,7 +234,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   void MouseUp( MouseEvent evt,int x, int y)
   {
-    if( itsSketchPad.itsRunMode || evt.isControlDown() || itsMovingThrottle)
+    if (itsSketchPad.itsMode == ErmesSketchPad.LOCKMODE || evt.isControlDown() || itsMovingThrottle)
       {
 	itsMovingThrottle = false;
 	((FtsSliderObject)itsFtsObject).updateValue();

@@ -107,8 +107,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   ErmesObjInOutPop itsInPop = null;
   ErmesObjInOutPop itsOutPop = null;
-		
-  boolean itsRunMode = false;
+
+  protected final static int EDITMODE = 0;
+  protected final static int LOCKMODE = 1;
+  protected int itsMode = EDITMODE;
 
   private boolean paintForTheFirstTime = true;
   
@@ -240,7 +242,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	return;
       }
 
-    if ( !itsRunMode) 
+    if ( itsMode == EDITMODE) 
       { //objects UNDER connections 
 
 	if ( dirtyObjects != null)
@@ -457,7 +459,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   void ClickOnObject( ErmesObject theObject, MouseEvent evt, int theX, int theY)
   {
-    if ( !itsRunMode)
+    if (itsMode == EDITMODE)
       {
 	switch( editStatus) {
 	case START_ADD:
@@ -603,7 +605,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     // Draw objects and connections
 
     // Run mode: connections BEFORE objects
-    if ( itsRunMode)
+    if (itsMode == LOCKMODE)
       paintList( itsConnections, offGraphics); 
 
     Object[] objects = itsElements.getObjectArray();
@@ -617,7 +619,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       }
 
     // Edit mode: objects BEFORE connections
-    if (! itsRunMode)
+    if (itsMode == EDITMODE)
       paintList( itsConnections, offGraphics); 
 
     CopyTheOffScreen( g);
@@ -828,7 +830,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     if (lastSketchWithOffScreen != null) 
       {
-	if (!lastSketchWithOffScreen.itsRunMode)
+	if (lastSketchWithOffScreen.itsMode == EDITMODE)
 	  lastSketchWithOffScreen.deselectAll( true);
 	lastSketchWithOffScreen.offScreenPresent = false;
       }
@@ -1146,7 +1148,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   {
     cleanAnnotations(); // MDC
 
-    if (itsRunMode)
+    if (itsMode == LOCKMODE)
       return;
 
     int x = e.getX();
@@ -1230,7 +1232,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     cleanAnnotations(); // MDC
     
-    if ( itsRunMode || e.isControlDown())
+    if ( itsMode == LOCKMODE || e.isControlDown())
       {
 	if ( itsStartDragObject != null)
 	  itsStartDragObject.MouseDrag( e, x, y);
@@ -1370,7 +1372,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	g.dispose();
       }
     
-    if ( itsRunMode || e.isControlDown()) 
+    if ( itsMode == LOCKMODE || e.isControlDown()) 
       {
 	itsSketchWindow.setKeyEventClient( null);
 
@@ -1487,7 +1489,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     if ( duringScrolling)
       duringScrolling=false;
 
-    if (itsRunMode || e.isControlDown())
+    if (itsMode == LOCKMODE || e.isControlDown())
       {
 	if (itsStartDragObject != null) 
 	  itsStartDragObject.MouseUp( e, x, y);
@@ -1498,7 +1500,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	//Optimization: use the dirty lists. Try to avoid to repaint in case
 	//of CTRL click on the sketch when nothing was changed "pseudo run mode" 
 
-	if (!itsRunMode)
+	if (itsMode == EDITMODE)
 	  repaint();
       }
     else if (editStatus == START_CONNECT)
@@ -1712,7 +1714,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   void SelectAll()
   {
-    if (itsRunMode) return;
+    if (itsMode == LOCKMODE)
+      return;
 
     Object objects[] = itsElements.getObjectArray();
     int size = itsElements.size();
@@ -1829,24 +1832,19 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     previousResizeRect.setBounds( currentResizeRect);
   }
   
-  void SetRunMode( boolean theMode)
+  void SetMode( int theMode)
   {
-    itsRunMode = theMode;
+    itsMode = theMode;
 
-    if (theMode)
-      setBackground( Settings.sharedInstance().getLockBackgroundColor());
+    if (itsMode == LOCKMODE)
+      {
+	setBackground( Settings.sharedInstance().getLockBackgroundColor());
+	deselectAll( true);
+      }
     else
       setBackground( Settings.sharedInstance().getEditBackgroundColor());
-
-    if ( theMode)
-      deselectAll( true);
   }
     
-  final boolean GetRunMode()
-  {
-    return itsRunMode;
-  }
-
   final void SetStartSelect()
   {
     editStatus = START_SELECT;
@@ -1869,7 +1867,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   public void update( Graphics g)
   {
-    if (deleted || itsRunMode)
+    if (deleted || itsMode == LOCKMODE)
       return;
 
     if (editStatus == START_CONNECT) 
@@ -2214,7 +2212,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	DeleteObject( aObject, false);
       }
       
-
     GetSketchWindow().DeselectionUpdateMenu();
     paintDirtyList();
   }

@@ -118,7 +118,7 @@ class ErmesConnection implements ErmesDrawable {
 
   void MouseDown( MouseEvent evt, int x, int y) 
     {
-      if ( !itsSketchPad.itsRunMode) 
+      if ( itsSketchPad.itsMode == ErmesSketchPad.EDITMODE)
 	{
 	  itsSketchPad.ClickOnConnection( this, evt, x, y);
 	}

@@ -6,89 +6,72 @@ import java.util.*;
 import java.io.*;
 
 import com.sun.java.swing.*;
+import com.sun.java.swing.border.*;
 import com.sun.java.swing.plaf.*;
 import com.sun.java.swing.plaf.motif.*;
 
-import ircam.jmax.utils.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
+import ircam.jmax.utils.*;
+import ircam.jmax.toolkit.*;
 
 public class ErmesSwToolbar extends JPanel implements MouseListener {
-  ErmesSketchPad itsSketchPad;
 
-  int itsPressedButton = -1;
+  ErmesSketchPad itsSketchPad;
 
   boolean locked = false;
   boolean pressed = false;
 
-  CardLayout layout;
-
+  CardLayout cardLayout;
   JPanel cards;
-  JPanel tools;
-  JPanel empty;
+  JToggleButton lockEditButton;
 
-  JToolBar itsSwToolbar;
   JToggleButton itsLastPressed;
 
-  // try to minimize the gif file loading...
-  static Hashtable itsImages = new Hashtable();
-  final static int NUM_BUTTONS = 11;  
-
-  // This static method preload all the tipical images in the hashtable, and is called
-  // during application startup; this will reduce the first patcher opening time,
-  // while slowing down the application startup 
-
-  static void loadToolBarImages()
+  public ErmesSwToolbar( ErmesSketchPad theSketchPad)
   {
-    String images[] = { "tool_ext.gif",
-			"tool_mess.gif", 
-			"tool_patcher.gif",
-			"tool_in.gif", 
-			"tool_out.gif",
-			"tool_text.gif", 
-			"tool_bang.gif",
-			"tool_toggle.gif", 
-			"tool_slider.gif",
-			"tool_int.gif", 
-			"tool_float.gif" };
-
-    String fs = File.separator;
-    String path = MaxApplication.getProperty( "root") + fs + "images" + fs;
-
-    for ( int i = 0; i < images.length; i++)
-      {
-	String gifFilePath = path + images[i];
-
-	itsImages.put( gifFilePath, new ImageIcon( gifFilePath));
-      }
-  }
-
-  public ErmesSwToolbar(ErmesSketchPad theSketchPad)
-  {
-    setDoubleBuffered( false);
     itsSketchPad = theSketchPad;
+
+    setDoubleBuffered( false);
+
     setLayout( new BorderLayout());    
 
+    String path = MaxApplication.getProperty( "root" ) + File.separator + "images" + File.separator;
+    lockEditButton = new JToggleButton( IconCache.getIcon( path + "tool_lock.gif"));
+    lockEditButton.setDoubleBuffered( false);
+    lockEditButton.setMargin( new Insets(0,0,0,0));
+    lockEditButton.setSelectedIcon( IconCache.getIcon( path + "tool_lock_open.gif"));
+    lockEditButton.setFocusPainted( false);
+    lockEditButton.addItemListener( new ItemListener() {
+      public void itemStateChanged(ItemEvent e)
+	{
+	  if (e.getStateChange() == ItemEvent.SELECTED)
+	    setLockMode( false);
+	  else
+	    setLockMode( true);
+	}
+    });
+
+    add( lockEditButton, BorderLayout.WEST);
+
     cards = new JPanel();
-    add( cards, BorderLayout.WEST);
+    cards.setBorder( new EmptyBorder( 0, 0, 0, 0));
 
-    layout = new CardLayout();    
-    cards.setLayout( layout);    
+    cardLayout = new CardLayout();    
+    cards.setLayout( cardLayout);    
 
-    tools = new JPanel();
-    cards.add( "edit", tools);
-    tools.setLayout( new BorderLayout());    
+    add( cards, BorderLayout.CENTER);
 
-    empty = new JPanel();
-    cards.add( "run", empty);
+    JPanel empty = new JPanel();
+    cards.add( "lock", empty);
+    cards.setBorder( new EmptyBorder( 0, 0, 0, 0));
 
-    itsSwToolbar = new JToolBar();
-    itsSwToolbar.setFloatable( false);
-    InsertButtons();
-    itsSwToolbar.addSeparator();
-    tools.add( itsSwToolbar, BorderLayout.WEST);
+    JPanel toolbar = new JPanel();
+    toolbar.setBorder( new EmptyBorder( 0, 0, 0, 0));
+    toolbar.setLayout( new BoxLayout( toolbar, BoxLayout.X_AXIS));
+    insertButtons( toolbar);
 
-    layout.show( cards, "run");
+    cards.add( "edit", toolbar);
   }
 
   public void removeNotify()
@@ -96,33 +79,6 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     itsSketchPad = null;
   }
 
-  //
-  // Add a button to the toolbar, trying not to load already loaded
-  // gif files (case of multiple windows with same palette).
-  //
-  void AddButton( String descr, String gifFilePath)
-  {
-    ErmesSwToggleButton aToggleButton;
-    ImageIcon aImageIcon = getIcon( gifFilePath);
-    
-    aToggleButton = new ErmesSwToggleButton( descr, aImageIcon);
-    itsSwToolbar.add( aToggleButton);
-    aToggleButton.addMouseListener( this);
-  }
-
-  static ImageIcon getIcon(String gifFilePath)
-  {
-    ImageIcon aImageIcon = (ImageIcon) itsImages.get(gifFilePath);
-
-    if (aImageIcon == null)
-      {
-	aImageIcon =  new ImageIcon( gifFilePath);
-	itsImages.put( gifFilePath, aImageIcon);
-      }
-
-    return aImageIcon;
-  }
-  
   void SelectAButton(ErmesSwToggleButton theButton)
   {
     theButton.setSelected(true);
@@ -206,12 +162,23 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     pressed = false;
   }
 
-  public void setRunMode(boolean theRunMode)
+  protected void setLockMode( boolean theLockMode)
   {
     if (pressed)
       Unlock();
 
-    layout.show( cards, theRunMode ? "run" : "edit");
+    if (theLockMode)
+      {
+	if (lockEditButton.isSelected())
+	  lockEditButton.setSelected( false);
+      }
+    else
+      {
+	if ( !lockEditButton.isSelected())
+	  lockEditButton.setSelected( true);
+      }
+
+    cardLayout.show( cards, theLockMode ? "lock" : "edit");
   }
  
   public void Lock()
@@ -226,28 +193,30 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     pressed = false;
   }
 
-  private void InsertButtons()
+  private void addButton( Container toolbar,String descr, String gifFilePath)
+  {
+    ErmesSwToggleButton aToggleButton;
+    
+    aToggleButton = new ErmesSwToggleButton( descr, IconCache.getIcon( gifFilePath) );
+    toolbar.add( aToggleButton);
+    aToggleButton.addMouseListener( this);
+  }
+
+  private void insertButtons( Container toolbar)
   {
     String fs = File.separator;
     String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
 
-    AddButton( "", path + "tool_ext.gif");
-    AddButton( "messbox", path + "tool_mess.gif");
-    AddButton( "jpatcher",  path + "tool_patcher.gif");
-    AddButton( "inlet -1", path + "tool_in.gif");
-    AddButton( "outlet -1", path + "tool_out.gif");
-    AddButton( "comment", path + "tool_text.gif");
-    AddButton( "button", path + "tool_bang.gif");
-    AddButton( "toggle", path + "tool_toggle.gif");
-    AddButton( "slider", path + "tool_slider.gif");
-    AddButton( "intbox", path + "tool_int.gif");
-    AddButton( "floatbox", path + "tool_float.gif");
+    addButton( toolbar, "", path + "tool_ext.gif");
+    addButton( toolbar, "messbox", path + "tool_mess.gif");
+    addButton( toolbar, "jpatcher",  path + "tool_patcher.gif");
+    addButton( toolbar, "inlet -1", path + "tool_in.gif");
+    addButton( toolbar, "outlet -1", path + "tool_out.gif");
+    addButton( toolbar, "comment", path + "tool_text.gif");
+    addButton( toolbar, "button", path + "tool_bang.gif");
+    addButton( toolbar, "toggle", path + "tool_toggle.gif");
+    addButton( toolbar, "slider", path + "tool_slider.gif");
+    addButton( toolbar, "intbox", path + "tool_int.gif");
+    addButton( toolbar, "floatbox", path + "tool_float.gif");
   }
 }
-
-
-
-
-
-
-
