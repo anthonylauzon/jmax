@@ -54,18 +54,12 @@ struct _fts_expression_t {
 static fts_status_description_t invalid_expression_error_description = {
   "invalid expression"
 };
-
 static fts_status_t invalid_expression_error = &invalid_expression_error_description;
 
 static fts_status_description_t operand_type_mismatch_error_description = {
   "operand type mismatch"
 };
 static fts_status_t operand_type_mismatch_error = &operand_type_mismatch_error_description;
-
-static fts_status_description_t element_access_error_description = {
-  "invalid element access"
-};
-static fts_status_t element_access_error = &element_access_error_description;
 
 static fts_status_description_t invalid_environment_variable_error_description = {
   "invalid environment variable"
@@ -436,20 +430,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
     fts_set_void( fts_get_return_value());
 
     if(fts_send_message(fts_get_object( at), fts_s_get_element, ac - 1, at + 1) == NULL || fts_is_void( fts_get_return_value()))
-    {
-      fts_object_t *obj = fts_get_object( at);
-      fts_symbol_t class_name = fts_object_get_class_name(obj);
-      const char *str = (class_name != NULL)? fts_symbol_name(class_name): "";
-      
-      if(ac == 2 && fts_is_number(at + 1))
-        return fts_status_format("element %g not defined for %s object", fts_get_number_float(at + 1), str);
-      else if(ac == 3 && fts_is_number(at + 1) && fts_is_number(at + 2))
-        return fts_status_format("element %g %g not defined for %s object", fts_get_number_float(at + 1), fts_get_number_float(at + 2), str);
-      else if(ac == 2 && fts_is_symbol(at + 1))
-        return fts_status_format("element %s not defined for %s object", fts_get_symbol(at + 1), str);
-      else
-        return element_access_error;
-    }
+      return fts_ignore;
       
     fts_atom_refer(fts_get_return_value());
 

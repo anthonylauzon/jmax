@@ -158,24 +158,24 @@ fts_atom_compare (const fts_atom_t *a, const fts_atom_t *b)
 void
 fts_atom_copy (const fts_atom_t *from, fts_atom_t *to)
 {
-    fts_atom_release(to);	/* free if target contained an object */
-
-    if (fts_is_object(from))
-    {
-	fts_object_t *obj_from = fts_get_object(from);
-	fts_class_t  *cls_from = fts_object_get_class(obj_from);
-	fts_object_t *obj_to   = fts_object_create(cls_from, 0, 0);    
-	fts_class_copy_function_t copy = fts_class_get_copy_function(cls_from);
-
-	if (copy != NULL)
+  fts_atom_release(to);	/* free if target contained an object */
+  
+  if (fts_is_object(from))
+  {
+    fts_object_t *obj_from = fts_get_object(from);
+    fts_class_t *cl_from = fts_object_get_class(obj_from);
+    fts_object_t *obj_to = fts_object_create(cl_from, 0, 0);    
+    fts_class_copy_function_t copy = fts_class_get_copy_function(cl_from);
+    
+    if (copy != NULL)
 	    (*copy)(obj_from, obj_to);
-	/* else: class can not be copied: leave empty object */
-	/* alternative: fts_set_void(to); ? */
-
-	fts_object_refer(obj_to);  /* lock new object */
-    }
-    else /* binary atom copy for non-objects */
-	*to = *from;
+    /* else: class can not be copied: leave empty object */
+    /* alternative: fts_set_void(to); ? */
+    
+    fts_object_refer(obj_to);  /* lock new object */
+  }
+  else /* binary atom copy for non-objects */
+    *to = *from;
 }
 
 

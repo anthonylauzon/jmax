@@ -40,7 +40,7 @@ static fts_symbol_t sym_remove_entries = 0;
 
 /* store one key-value pair */
 void
-dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom)
+dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *value)
 {
   fts_atom_t a;
   
@@ -48,12 +48,14 @@ dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom)
   if(fts_hashtable_get(&dict->hash, key, &a))
     fts_atom_void(&a);  
   else
+  {
     fts_set_void(&a);
-  
-  fts_atom_assign(&a, atom);
-  
+    fts_atom_refer(key);
+  }
+    
   /* insert atom to hashtable */
-  fts_hashtable_put(&dict->hash, key, &a);
+  fts_atom_refer(value);
+  fts_hashtable_put(&dict->hash, key, (fts_atom_t *)value);
 }
 
 
@@ -82,13 +84,8 @@ dict_store_list (dict_t *dict, int ac, const fts_atom_t *at)
   
   ac &= -2;	/* round down to even number (drop last bit) */
   
-  for (i = 0; i < ac; i += 2)
-  {
-    if (fts_is_int(at + i)  ||  fts_is_symbol(at + i))
-      dict_store(dict, at + i, at + i + 1);
-    else
-      fts_object_error((fts_object_t *) dict, "set: wrong key type for arg %d", i);
-  }
+  for (i=0; i<ac; i+=2)
+    dict_store(dict, at + i, at + i + 1);
 }
 
 void 
@@ -105,7 +102,8 @@ dict_remove(dict_t *dict, const fts_atom_t *key)
   
   if(fts_hashtable_get(&dict->hash, key, &value))
   {
-    fts_atom_void(&value);      
+    fts_atom_release(key);
+    fts_atom_release(&value);
     fts_hashtable_remove(&dict->hash, key);
   }
 }
@@ -113,16 +111,21 @@ dict_remove(dict_t *dict, const fts_atom_t *key)
 static void
 dict_remove_all(dict_t *dict)
 {
-  fts_iterator_t iterator;
+  fts_iterator_t key_iterator;
+  fts_iterator_t value_iterator;
   
-  fts_hashtable_get_values(&dict->hash, &iterator);
+  fts_hashtable_get_keys(&dict->hash, &key_iterator);
+  fts_hashtable_get_values(&dict->hash, &value_iterator);
   
-  while(fts_iterator_has_more(&iterator))
+  while(fts_iterator_has_more(&key_iterator))
   {
-    fts_atom_t value;
+    fts_atom_t key, value;
     
-    fts_iterator_next(&iterator, &value);
-    fts_atom_void(&value);
+    fts_iterator_next(&key_iterator, &key);
+    fts_iterator_next(&value_iterator, &value);
+
+    fts_atom_release(&key);
+    fts_atom_release(&value);
   }
   
   fts_hashtable_clear(&dict->hash);
@@ -153,8 +156,9 @@ dict_copy(dict_t *org, dict_t *copy)
     /* copy entry */
     fts_set_void(&value_copy);
     fts_atom_copy(&value, &value_copy);
-    
+        
     /* store entry to copy hash table */
+    fts_atom_refer(&key);
     fts_hashtable_put(&copy->hash, &key, &value_copy);
   }
 }
@@ -288,7 +292,7 @@ dict_upload(dict_t *self)
 */
 
 static void
-dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *self = (dict_t *)o;
   
@@ -300,11 +304,15 @@ dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *self = (dict_t *)o;
   
-  dict_store_list(self, ac, at);
+  if(ac > 1)
+    dict_store_list(self, ac, at);
+  else
+    dict_remove(self, at);    
+    
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
   
   if(dict_editor_is_open(self))
@@ -312,25 +320,13 @@ dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-dict_remove_entry(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_dict_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *self = (dict_t *)o;
+  int i;
   
-  dict_remove(self, at);
-  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
-  
-  if(dict_editor_is_open(self))
-    dict_upload(self);
-}
-
-static void
-dict_remove_entries(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dict_t *self = (dict_t *)o;
-  int i = 0;
-  
-  for(i = 0; i<ac; i++)
-    dict_remove(self, at+i);
+  for(i=0; i<ac; i++)
+    dict_remove(self, at + i);
   
   fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
   
@@ -342,18 +338,18 @@ static void
 _dict_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *self = (dict_t *)o;
-  fts_atom_t a;
   
-  if(fts_hashtable_get(&self->hash, at, &a))
-    fts_return(&a);
-  else if(fts_is_symbol(at))
-    fts_object_error(o, "no entry for %s", fts_symbol_name(fts_get_symbol(at)));
-  else if(fts_is_int(at))
-    fts_object_error(o, "no entry for %d", fts_get_int(at));
+  if(ac > 0)
+  {
+    fts_atom_t a;
+    
+    if(fts_hashtable_get(&self->hash, at, &a))
+      fts_return(&a);
+  }
 }
 
 static void
-dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *self = (dict_t *)o;
   
@@ -443,13 +439,8 @@ dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
     {
       case read_key:
       {
-        if(fts_is_symbol(&a) || fts_is_int(&a))
-	      {
-          key = a;
-          state = read_comma;
-	      }
-        else
-          error = "wrong key type";	      
+        key = a;
+        state = read_comma;
       }
         
         break;
@@ -654,7 +645,7 @@ dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 }
 
 static void
-dict_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+_dict_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *self = (dict_t *)o;
   fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
@@ -802,26 +793,22 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, dict_dump_state);
   
-  fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_dict);
-  fts_class_message_varargs(cl, fts_new_symbol("keys"), dict_get_keys);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, _dict_set_from_dict);
+  fts_class_message_varargs(cl, fts_new_symbol("keys"), _dict_get_keys);
   
   fts_class_message_varargs(cl, fts_s_print, dict_print);
   
   fts_class_message_varargs(cl, fts_s_import, dict_import);
   fts_class_message_varargs(cl, fts_s_export, dict_export);
   
-  fts_class_message_void(cl, fts_s_clear, dict_clear);
+  fts_class_message_void(cl, fts_s_clear, _dict_clear);
   
-  fts_class_message_varargs(cl, fts_s_set, dict_set);
-  fts_class_message_number(cl, fts_s_set, dict_remove_entry);
-  fts_class_message_symbol(cl, fts_s_set, dict_remove_entry);
+  fts_class_message_varargs(cl, fts_s_set, _dict_set);
   
-  fts_class_message_number(cl, fts_s_remove, dict_remove_entry);
-  fts_class_message_symbol(cl, fts_s_remove, dict_remove_entry);
-  fts_class_message_varargs(cl, sym_remove_entries, dict_remove_entries);
+  fts_class_message_varargs(cl, fts_s_remove, _dict_remove);
+  fts_class_message_varargs(cl, sym_remove_entries, _dict_remove);
 
-  fts_class_message_number(cl, fts_s_get_element, _dict_get_element);
-  fts_class_message_symbol(cl, fts_s_get_element, _dict_get_element);
+  fts_class_message_varargs(cl, fts_s_get_element, _dict_get_element);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
   
@@ -834,9 +821,8 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_doc(cl, dict_symbol, "[<sym|int: key> <any: value> ...]", "dictionary");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all entries");
-  fts_class_doc(cl, fts_s_set, "<sym|int: key> <any: value> ...", 
-                "set list of key-value pairs");
-  fts_class_doc(cl, fts_s_remove, "<sym|int: key>", "remove entry");
+  fts_class_doc(cl, fts_s_set, "<any: key> <any: value> ...", "set list of key-value pairs");
+  fts_class_doc(cl, fts_s_remove, "<any: key> ...", "remove entries");
   fts_class_doc(cl, fts_s_print, NULL, "print list of entries");
 }
 

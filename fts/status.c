@@ -22,6 +22,9 @@
 
 #include <fts/fts.h>
 
+static fts_status_description_t fts_ignore_description = {""};
+fts_status_t fts_ignore = &fts_ignore_description;
+
 fts_status_t
 fts_status_new(fts_symbol_t description)
 {

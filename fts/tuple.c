@@ -24,6 +24,31 @@
 
 fts_class_t *fts_tuple_class = 0;
 
+static unsigned int
+tuple_hash_function(const fts_atom_t *p)
+{
+  fts_tuple_t *self = (fts_tuple_t *)fts_get_object(p);
+  int size = fts_tuple_get_size(self);
+  fts_atom_t *atoms = fts_tuple_get_atoms(self);
+  unsigned int sum = 0;
+  int i;
+  
+  for(i=0; i<size; i++)
+  {
+    if(fts_is_int(atoms + i))
+    {
+      sum <<= 8;
+      sum += fts_get_int(atoms + i);
+    }
+    else if(fts_get_float(atoms + i))
+      sum += (unsigned int)(1000.0 * fts_get_float(atoms + i));
+    else
+      sum += (unsigned int)fts_get_pointer(atoms + i) >> 3;
+  }
+  
+  return sum;
+}
+
 static int
 tuple_equals_function(const fts_object_t *a, const fts_object_t *b)
 {
@@ -181,6 +206,7 @@ tuple_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("second"), tuple_second);
   fts_class_message_void(cl, fts_new_symbol("third"), tuple_third);
   
+  fts_class_set_hash_function(cl, tuple_hash_function);
   fts_class_set_equals_function(cl, tuple_equals_function);
   fts_class_set_copy_function(cl, tuple_copy_function);
   fts_class_set_array_function(cl, tuple_array_function);

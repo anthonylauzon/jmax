@@ -44,12 +44,9 @@ scoob_copy_function(const fts_object_t *from, fts_object_t *to)
 }
 
 static int
-scoob_equals_function(const fts_object_t *a, const fts_object_t *b)
+scoob_equals(const scoob_t *a, const scoob_t *b)
 {
-  scoob_t *o = (scoob_t *)a;
-  scoob_t *p = (scoob_t *)b;
-  
-  if(o->type == p->type && o->pitch == p->pitch && o->interval == p->pitch && o->duration == p->duration)
+  if(a->type == b->type && a->pitch == b->pitch && a->interval == b->pitch && a->duration == b->duration)
     return propobj_equals((propobj_t *)a, (propobj_t *)b);
   
   return 0;
@@ -370,7 +367,6 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_message_symbol(cl, fts_s_remove, propobj_remove_property);
   
   fts_class_set_copy_function(cl, scoob_copy_function);
-  fts_class_set_equals_function(cl, scoob_equals_function);
   fts_class_set_array_function(cl, scoob_array_function);
   fts_class_set_description_function(cl, scoob_description_function);
   

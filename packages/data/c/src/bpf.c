@@ -245,21 +245,19 @@ bpf_copy_function(const fts_object_t *from, fts_object_t *to)
 }
 
 static int
-bpf_equals_function(const fts_object_t *a, const fts_object_t *b)
+bpf_equals(bpf_t *a, bpf_t *b)
 {
-  bpf_t *o = (bpf_t *)a;
-  bpf_t *p = (bpf_t *)b;
-  int o_n = bpf_get_size(o);
-  int p_n = bpf_get_size(p);
+  int a_n = bpf_get_size(a);
+  int b_n = bpf_get_size(b);
   
-  if(o_n == p_n)
+  if(a_n == b_n)
   {
     int i;
     
-    for(i=0; i<o_n; i++)
+    for(i=0; i<a_n; i++)
     {
-      if(!data_float_equals(bpf_get_time(o, i), bpf_get_time(p, i)) ||
-         !data_float_equals(bpf_get_value(o, i), bpf_get_time(p, i)))
+      if(!data_float_equals(bpf_get_time(a, i), bpf_get_time(b, i)) ||
+         !data_float_equals(bpf_get_value(a, i), bpf_get_time(b, i)))
         return 0;
     }
     
@@ -809,7 +807,6 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(bpf_t), bpf_init, bpf_delete);  
   
   fts_class_set_copy_function(cl, bpf_copy_function);
-  fts_class_set_equals_function(cl, bpf_equals_function);
   fts_class_set_array_function(cl, bpf_array_function);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);

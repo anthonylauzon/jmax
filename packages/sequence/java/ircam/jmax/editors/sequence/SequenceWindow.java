@@ -119,9 +119,9 @@ public class SequenceWindow extends JMaxEditor {
   public void setWindowName(String name)
   {
     if(name != null && !name.equals(""))
-      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("sequence " + name));
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("MultiTrack " + name));
     else
-      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("sequence #"+((FtsGraphicObject)sequenceData).getObjectID()));
+      setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("MultiTrack #"+((FtsGraphicObject)sequenceData).getObjectID()));
 
     MaxWindowManager.getWindowManager().windowChanged(this);
   }

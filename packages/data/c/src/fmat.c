@@ -343,20 +343,17 @@ fmat_copy_function(const fts_object_t *from, fts_object_t *to)
 }
 
 static int
-fmat_equals_function(const fts_object_t *a, const fts_object_t *b)
+fmat_equals(const fmat_t *a, const fmat_t *b)
 {
-  fmat_t *o = (fmat_t *)a;
-  fmat_t *p = (fmat_t *)b;
-  
-  if(fmat_get_m(o) == fmat_get_m(p) && fmat_get_n(o) == fmat_get_n(p))
+  if(fmat_get_m(a) == fmat_get_m(b) && fmat_get_n(a) == fmat_get_n(b))
   {
-    int size = fmat_get_m(o) * fmat_get_n(o);
-    float *o_ptr = fmat_get_ptr(o);
-    float *p_ptr = fmat_get_ptr(p);
+    int size = fmat_get_m(a) * fmat_get_n(a);
+    float *a_ptr = fmat_get_ptr(a);
+    float *b_ptr = fmat_get_ptr(b);
     int i;
     
     for(i=0; i<size; i++)
-      if(!data_float_equals(o_ptr[i], p_ptr[i]))
+      if(!data_float_equals(a_ptr[i], b_ptr[i]))
         return 0;
     
     return 1;
@@ -3669,7 +3666,7 @@ fmat_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 static void
 fmat_import_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fts_object_open_dialog(o, fts_s_import, fts_new_symbol("import file"));
+  fts_object_open_dialog(o, fts_s_import, fts_new_symbol("import file"), ac, at);
 }
 
 static void
@@ -3697,7 +3694,7 @@ fmat_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 static void
 fmat_export_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  fts_object_save_dialog(o, fts_s_export, fts_new_symbol("export fmat"), fts_project_get_dir(), fts_new_symbol(".aiff"));
+  fts_object_save_dialog(o, fts_s_export, fts_new_symbol("export fmat"), fts_project_get_dir(), fts_new_symbol(".aiff"), ac, at);
 }
 
 /*********************************************************
@@ -3913,7 +3910,6 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fmat_t), fmat_init, fmat_delete);
   
   fts_class_set_copy_function(cl, fmat_copy_function);
-  fts_class_set_equals_function(cl, fmat_equals_function);
   fts_class_set_array_function(cl, fmat_array_function);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
@@ -3931,6 +3927,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_s_set, fvec_class, fmat_set_from_fvec);
   fts_class_message(cl, fts_s_set, bpf_type, fmat_set_from_bpf);
   fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
+  
+  fts_class_message_varargs(cl, fts_new_symbol("pick"), fmat_pick_fmat);
   
   fts_class_message_number(cl, fts_s_col, fmat_get_col);
   fts_class_message_number(cl, fts_s_row, fmat_get_row);

@@ -50,40 +50,42 @@ static fts_heap_t *hashtable_heap = 0;
 static fts_heap_t *cell_heap = 0;
 static fts_heap_t *iterator_heap = 0;
 
-static unsigned int hash( const fts_atom_t *p)
+static unsigned int 
+hash( const fts_atom_t *p)
 {
   switch( fts_class_get_typeid( fts_get_class( p)) ) {
-  case FTS_TYPEID_VOID:
-    return 0;
-  case FTS_TYPEID_INT:
-    return (unsigned int)fts_get_int( p);
-  case FTS_TYPEID_FLOAT:
-    return (unsigned int)fts_get_float( p);
-  case FTS_TYPEID_SYMBOL:
-    return (unsigned int)fts_get_symbol( p) >> 3;
-  case FTS_TYPEID_POINTER:
-    return (unsigned int)fts_get_pointer( p) >> 3;
-  case FTS_TYPEID_STRING :
+    case FTS_TYPEID_VOID:
+      return 0;
+    case FTS_TYPEID_INT:
+      return (unsigned int)fts_get_int( p);
+    case FTS_TYPEID_FLOAT:
+      return (unsigned int)fts_get_float( p);
+    case FTS_TYPEID_SYMBOL:
+      return (unsigned int)fts_get_symbol( p) >> 3;
+    case FTS_TYPEID_POINTER:
+      return (unsigned int)fts_get_pointer( p) >> 3;
+    case FTS_TYPEID_STRING :
     {
       char *s = fts_get_string( p);
       unsigned int h = 0;
-
-      while( *s)
-	{
-	  h = (h<<1) + *s;
-	  s++;
-	}
-
+      
+      while(*s)
+      {
+        h = (h << 1) + *s;
+        s++;
+      }
+      
       return h;
     }
-  default:
-    return (*fts_class_get_hash_function( fts_get_class(p)))(p);
+    default:
+      return (*fts_class_get_hash_function(fts_get_class(p)))(p);
   }
-
+  
   return 0;
 }
 
-static int equals( const fts_atom_t *p1, const fts_atom_t *p2)
+static int 
+equals( const fts_atom_t *p1, const fts_atom_t *p2)
 {
   if ( !fts_atom_same_type( p1, p2))
     return 0;
@@ -108,7 +110,8 @@ static int equals( const fts_atom_t *p1, const fts_atom_t *p2)
   return 0;
 }
 
-void fts_hashtable_init( fts_hashtable_t *h, int initial_capacity)
+void 
+fts_hashtable_init( fts_hashtable_t *h, int initial_capacity)
 {
   switch (initial_capacity) {
   case FTS_HASHTABLE_SMALL:
@@ -131,7 +134,8 @@ void fts_hashtable_init( fts_hashtable_t *h, int initial_capacity)
   h->table = (fts_hashtable_cell_t **) fts_zalloc( h->length * sizeof( fts_hashtable_cell_t *));
 }
 
-fts_hashtable_t *fts_hashtable_new( int initial_capacity)
+fts_hashtable_t *
+fts_hashtable_new( int initial_capacity)
 {
   fts_hashtable_t *h = (fts_hashtable_t *)fts_heap_alloc( hashtable_heap);
 
@@ -140,19 +144,22 @@ fts_hashtable_t *fts_hashtable_new( int initial_capacity)
   return h;
 }
 
-void fts_hashtable_destroy( fts_hashtable_t *h)
+void 
+fts_hashtable_destroy( fts_hashtable_t *h)
 {
   fts_hashtable_clear( h);
   fts_free( h->table);
 }
 
-void fts_hashtable_free( fts_hashtable_t *h)
+void 
+fts_hashtable_free( fts_hashtable_t *h)
 {
   fts_hashtable_destroy( h);
   fts_heap_free( h, hashtable_heap);
 }
 
-void fts_hashtable_clear( fts_hashtable_t *h)
+void 
+fts_hashtable_clear( fts_hashtable_t *h)
 {
   unsigned int i;
 
@@ -172,28 +179,28 @@ void fts_hashtable_clear( fts_hashtable_t *h)
   h->count = 0;
 }
 
-static fts_hashtable_cell_t **lookup_cell( const fts_hashtable_t *h, const fts_atom_t *key)
+static fts_hashtable_cell_t **
+lookup_cell( const fts_hashtable_t *h, const fts_atom_t *key)
 {
-  fts_hashtable_cell_t **c;
+  fts_hashtable_cell_t **c = &h->table[hash( key) % h->length];
 
-  c = &h->table[ hash( key) % h->length];
-
-  while (*c && !equals( &(*c)->key, key))
+  while(*c && !equals( &(*c)->key, key))
     c = &(*c)->next;
 
   return c;
 }
 
-int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
+int 
+fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
 {
   fts_hashtable_cell_t **c = lookup_cell( h, key);
-
-  if (*c)
-    {
-      *value = (*c)->value;
-      return 1;
-    }
-
+  
+  if(*c)
+  {
+    *value = (*c)->value;
+    return 1;
+  }
+  
   return 0;
 }
 
@@ -223,7 +230,8 @@ static const unsigned int primes_suite[] = {
   33554467,
 };
 
-static unsigned int new_length( unsigned int length)
+static unsigned int 
+new_length( unsigned int length)
 {
   unsigned int i;
 
@@ -234,36 +242,38 @@ static unsigned int new_length( unsigned int length)
   return primes_suite[i-1];
 }
 
-static void rehash( fts_hashtable_t *h)
+static void 
+rehash( fts_hashtable_t *h)
 {
   unsigned int old_length, i;
   fts_hashtable_cell_t **old_table;
-
+  
   old_length = h->length;
   h->length = new_length( h->length);
   h->rehash_count = (int)(h->length * FTS_HASHTABLE_STANDARD_LOAD_FACTOR);
-
+  
   old_table = h->table;
   h->table = (fts_hashtable_cell_t **) fts_zalloc( h->length * sizeof( fts_hashtable_cell_t *));
-
+  
   for ( i = 0; i < old_length; i++)
+  {
+    fts_hashtable_cell_t *c, *next;
+    
+    for ( c = old_table[i]; c; c = next)
     {
-      fts_hashtable_cell_t *c, *next;
-
-      for ( c = old_table[i]; c; c = next)
-	{
-	  int index = hash( &c->key) % h->length;
-
-	  next = c->next;
-	  c->next = h->table[index];
-	  h->table[index] = c;
-	}
+      int index = hash( &c->key) % h->length;
+      
+      next = c->next;
+      c->next = h->table[index];
+      h->table[index] = c;
     }
-
+  }
+  
   fts_free( old_table);
 }
 
-int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
+int 
+fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
 {
   fts_hashtable_cell_t **c = lookup_cell( h, key);
 
@@ -285,7 +295,8 @@ int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *va
   return 0;
 }
 
-int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key)
+int 
+fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key)
 {
   fts_hashtable_cell_t **c = lookup_cell( h, key);
 
@@ -303,7 +314,8 @@ int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key)
   return 0;
 }
 
-void fts_hashtable_stats( fts_hashtable_t *h)
+void 
+fts_hashtable_stats( fts_hashtable_t *h)
 {
   unsigned int min_keys = 38928392, max_keys = 0, i;
 
@@ -339,29 +351,29 @@ static void
 fts_hashtable_log( fts_hashtable_t *h)
 {
   unsigned int i;
-
+  
   fts_log( "Hashtable: length = %d count = %d rehash = %d\n", h->length, h->count, h->rehash_count);
-
+  
   for ( i = 0; i < h->length; i++)
+  {
+    fts_hashtable_cell_t *c;
+    
+    if (!h->table[i])
+      continue;
+    
+    fts_log( "[%d] ", i);
+    
+    for ( c = h->table[i]; c; c = c->next)
     {
-      fts_hashtable_cell_t *c;
-
-      if (!h->table[i])
-	continue;
-
-      fts_log( "[%d] ", i);
-
-      for ( c = h->table[i]; c; c = c->next)
-	{
-	  fts_log( "(");
-	  fts_log_atoms( 1, &c->key);
-	  fts_log( ",");
-	  fts_log_atoms( 1, &c->value);
-	  fts_log( ") ");
-	}
-
-      fts_log( "\n");
+      fts_log( "(");
+      fts_log_atoms( 1, &c->key);
+      fts_log( ",");
+      fts_log_atoms( 1, &c->value);
+      fts_log( ") ");
     }
+    
+    fts_log( "\n");
+  }
 }
 
 /* **********************************************************************

@@ -211,19 +211,17 @@ ivec_copy_function(const fts_object_t *from, fts_object_t *to)
 }
 
 static int
-ivec_equals_function(const fts_object_t *a, const fts_object_t *b)
+ivec_equals(const ivec_t *a, const ivec_t *b)
 {
-  ivec_t *o = (ivec_t *)a;
-  ivec_t *p = (ivec_t *)b;
-  int o_n = ivec_get_size(o);
-  int p_n = ivec_get_size(p);
+  int a_n = ivec_get_size(a);
+  int b_n = ivec_get_size(b);
   
-  if(o_n == p_n)
+  if(a_n == b_n)
   {
     int i;
     
-    for(i=0; i<o_n; i++)
-      if(ivec_get_element(o, i) != ivec_get_element(p, i))
+    for(i=0; i<a_n; i++)
+      if(ivec_get_element(a, i) != ivec_get_element(b, i))
         return 0;
     
     return 1;
@@ -847,7 +845,6 @@ ivec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(ivec_t), ivec_init, ivec_delete);
   
-  fts_class_set_equals_function(cl, ivec_equals_function);
   fts_class_set_copy_function(cl, ivec_copy_function);
   fts_class_set_array_function(cl, ivec_array_function);
   

@@ -50,7 +50,7 @@ public class SequenceSimpleMenu extends EditorMenu
 
   public SequenceSimpleMenu(EditorContainer container)
   {
-    super("Sequence");
+    super("MultiTrack");
 
     this.container = container;
 

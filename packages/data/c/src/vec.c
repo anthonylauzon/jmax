@@ -29,21 +29,19 @@ fts_class_t *vec_type = 0;
 static fts_symbol_t sym_text = 0;
 
 static int
-vec_equals_function(const fts_object_t *a, const fts_object_t *b)
+vec_equals(vec_t *a, vec_t *b)
 {
-  vec_t *o = (vec_t *)a;
-  vec_t *p = (vec_t *)b;
-  int o_n = vec_get_size(o);
-  int p_n = vec_get_size(p);
+  int a_n = vec_get_size(a);
+  int b_n = vec_get_size(b);
   
-  if(o_n == p_n)
+  if(a_n == b_n)
   {
-    fts_atom_t *o_ptr = vec_get_ptr(o);
-    fts_atom_t *p_ptr = vec_get_ptr(p);
+    fts_atom_t *a_ptr = vec_get_ptr(a);
+    fts_atom_t *b_ptr = vec_get_ptr(b);
     int i;
     
-    for(i=0; i<o_n; i++)
-      if(!fts_atom_equals(o_ptr + i, p_ptr + i))
+    for(i=0; i<a_n; i++)
+      if(!fts_atom_equals(a_ptr + i, b_ptr + i))
         return 0;
     
     return 1;
@@ -404,7 +402,6 @@ vec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, vec_dump_state);
 
-  fts_class_set_equals_function(cl, vec_equals_function);
   fts_class_set_array_function(cl, vec_array_function);
 
   fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);

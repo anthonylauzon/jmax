@@ -1242,7 +1242,6 @@ mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   }
 }
 
-
 /* class copy method compatible wrapper around copy function */
 static void
 mat_copy_function(const fts_object_t *from, fts_object_t *to)
@@ -1254,22 +1253,18 @@ mat_copy_function(const fts_object_t *from, fts_object_t *to)
     mat_upload(dest);
 }
 
-
 static int
-mat_equals_function(const fts_object_t *a, const fts_object_t *b)
+mat_equals(const mat_t *a, const mat_t *b)
 {
-  mat_t *o = (mat_t *)a;
-  mat_t *p = (mat_t *)b;
-  
-  if(mat_get_m(o) == mat_get_m(p) && mat_get_n(o) == mat_get_n(p))
+  if(mat_get_m(a) == mat_get_m(b) && mat_get_n(a) == mat_get_n(b))
   {
-    int size = mat_get_m(o) * mat_get_n(o);
-    fts_atom_t *o_ptr = mat_get_ptr(o);
-    fts_atom_t *p_ptr = mat_get_ptr(p);
+    int size = mat_get_m(a) * mat_get_n(a);
+    fts_atom_t *a_ptr = mat_get_ptr(a);
+    fts_atom_t *b_ptr = mat_get_ptr(b);
     int i;
     
     for(i=0; i<size; i++)
-      if(!fts_atom_equals(o_ptr + i, p_ptr + i))
+      if(!fts_atom_equals(a_ptr + i, b_ptr + i))
         return 0;
     
     return 1;
@@ -1398,10 +1393,9 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
   
   fts_class_set_copy_function(cl, mat_copy_function);
-  fts_class_set_equals_function(cl, mat_equals_function);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
-  fts_class_message        (cl, fts_s_set, mat_type,     mat_set_from_instance);
+  fts_class_message(cl, fts_s_set, mat_type, mat_set_from_instance);
   
   fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
@@ -1411,12 +1405,12 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_delete, _mat_delete_rows);
   fts_class_message_varargs(cl, sym_insert_cols, mat_insert_columns);
   fts_class_message_varargs(cl, sym_delete_cols, mat_delete_columns);
-  fts_class_message_void   (cl, fts_s_sort,      mat_sort);
-  fts_class_message_number (cl, fts_s_sort,      mat_sort);
-  fts_class_message_void   (cl, fts_s_sortrev,   mat_sort);
-  fts_class_message_number (cl, fts_s_sortrev,   mat_sort);
-  fts_class_message_void   (cl, fts_s_unique,    mat_unique);
-  fts_class_message_number (cl, fts_s_unique,    mat_unique);
+  fts_class_message_void(cl, fts_s_sort, mat_sort);
+  fts_class_message_number(cl, fts_s_sort, mat_sort);
+  fts_class_message_void(cl, fts_s_sortrev, mat_sort);
+  fts_class_message_number(cl, fts_s_sortrev, mat_sort);
+  fts_class_message_void(cl, fts_s_unique, mat_unique);
+  fts_class_message_number(cl, fts_s_unique, mat_unique);
   
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export);

@@ -342,7 +342,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 static void
 sequence_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Import standard MIDI file"));
+	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Import standard MIDI file"), ac, at);
 }
 
 static void
@@ -646,7 +646,7 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_remove_track, sequence_remove_track_and_update);
   fts_class_message_varargs(cl, seqsym_move_track, sequence_move_track_and_update);
   
-  fts_class_message_varargs(cl, fts_s_append, sequence_append_event_at_last_loaded_track);  
+  fts_class_message_varargs(cl, fts_s_append, sequence_append_event_at_last_loaded_track);
 
   fts_class_message_varargs(cl, fts_s_print, sequence_print);
 
@@ -670,5 +670,6 @@ sequence_instantiate(fts_class_t *cl)
 void
 sequence_class_config(void)
 {
-  fts_class_install(seqsym_sequence, sequence_instantiate);
+  fts_class_t *multitrack_class = fts_class_install(seqsym_multitrack, sequence_instantiate);
+  fts_class_alias(multitrack_class, seqsym_sequence);
 }

@@ -24,6 +24,7 @@
 
 /* sequence components */
 fts_symbol_t seqsym_sequence = 0;
+fts_symbol_t seqsym_multitrack = 0;
 fts_symbol_t seqsym_track = 0;
 fts_symbol_t seqsym_track_editor = 0;
 fts_symbol_t seqsym_miditrack = 0;
@@ -119,6 +120,7 @@ seqsym_config(void)
 {
   /* sequence components */
   seqsym_sequence = fts_new_symbol("sequence");
+  seqsym_multitrack = fts_new_symbol("multitrack");
   seqsym_miditrack = fts_new_symbol("miditrack");
   seqsym_track = fts_new_symbol("track");
   seqsym_track_editor = fts_new_symbol("track_editor");

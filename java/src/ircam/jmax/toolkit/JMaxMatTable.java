@@ -136,14 +136,23 @@ public class JMaxMatTable extends JTable
       if(value instanceof FtsGraphicObject)
       {
         String name = ((FtsGraphicObject)value).getVariableName();
+        String description = ((FtsGraphicObject)value).getDescription();
       
-        if( name != null && !name.equals(""))
-          setText(((FtsGraphicObject)value).getDescription()+" #"+name);
+        if(name != null && !name.equals(""))
+          setText(description + " [" + name + "]");
         else
-          setText(((FtsGraphicObject)value).getDescription()+" #"+((FtsGraphicObject)value).getObjectID());
+          setText(description + " [#" + ((FtsGraphicObject)value).getObjectID() + "]");
       }
-      else
-        setText(((FtsObject)value).getDescription()+" #"+((FtsObject)value).getID());
+      else 
+      {
+        String description = ((FtsObject)value).getDescription();
+        
+        if(description.charAt(0) != '{')
+          setText(description + " [#" + ((FtsObject)value).getID() + "]");
+        else
+          setText(description);
+      }
+      
       setHorizontalTextPosition( SwingConstants.CENTER);
       return this;
     }

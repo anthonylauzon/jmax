@@ -55,6 +55,7 @@ struct _fts_midifile_
   
   int format;
   int n_tracks;
+  int i_track; /* limit reading to one track of format 1 or 2 files */
   int division;
   int tempo;
 
@@ -86,6 +87,8 @@ struct _fts_midifile_
 #define fts_midifile_get_error(f) ((f)->error)
 
 #define fts_midifile_get_time(f) ((f)->time)
+
+#define fts_midifile_set_track(f, x) ((f)->i_track = (x))
 
 #define fts_midifile_set_user_data(f, p) ((f)->user = (void *)(p))
 #define fts_midifile_get_user_data(f) ((f)->user)

@@ -63,6 +63,7 @@
 #define MTrk 0x4d54726b
 
 #define FTS_MIDIFILE_DEFAULT_TEMPO 500000
+#define FTS_MIDIFILE_ALL_TRACKS -1
 
 /*************************************************************
 *
@@ -648,6 +649,35 @@ midifile_read_track(fts_midifile_t *midifile)
     (*midifile->read->track_end)(midifile);
 }
 
+static void
+midifile_skip_track(fts_midifile_t *midifile)
+{
+  int sysex_continue = 0;
+  int status = 0;
+  int channel = 0;
+  
+  if (midifile_read_mt(midifile, "MTrk") == 0)
+  {
+    mferror(midifile, "exspected beginning of track (didn't find 'MTrk' tag)");
+    return;
+  }
+ 
+  midifile->bytes = read32bit(midifile);
+  
+  /* time starts at zero */
+  midifile->ticks = 0;
+  midifile->time = 0.0;
+  midifile->tempo_map_pointer = midifile->tempo_map;
+    
+  while(!midifile->error && midifile->bytes > 0)
+  {
+    int byte = readbyte(midifile);
+    
+    if(byte == EOF)
+      break;
+  } 
+}
+
 /*************************************************************
 *
 *  write utilities
@@ -979,6 +1009,7 @@ fts_midifile_init(fts_midifile_t *midifile, FILE *fp, fts_symbol_t name)
   
   midifile->format = 0;
   midifile->n_tracks = 0;
+  midifile->i_track = FTS_MIDIFILE_ALL_TRACKS;
   midifile->division = 0;
   midifile->tempo = FTS_MIDIFILE_DEFAULT_TEMPO;
   
@@ -1058,14 +1089,22 @@ fts_midifile_close(fts_midifile_t *midifile)
 int
 fts_midifile_read(fts_midifile_t *midifile)
 {
-  int size;
+  int size = midifile_read_header(midifile);
   int i;
-  
-  size = midifile_read_header(midifile);
   
   for(i=0; i<size; i++)
   {
-    midifile_read_track(midifile);
+    if(midifile->i_track >= 0 && i > 0)
+    {
+      if(i < midifile->i_track)
+        midifile_skip_track(midifile);
+      else if(i == midifile->i_track)
+        midifile_read_track(midifile);
+      else
+        break;
+    }
+    else
+      midifile_read_track(midifile);
     
     if(midifile->error != 0)
       break;

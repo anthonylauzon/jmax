@@ -27,6 +27,7 @@
 
 /* sequence components */
 FTS_API fts_symbol_t seqsym_sequence;
+FTS_API fts_symbol_t seqsym_multitrack;
 FTS_API fts_symbol_t seqsym_miditrack;
 FTS_API fts_symbol_t seqsym_track;
 FTS_API fts_symbol_t seqsym_track_editor;
