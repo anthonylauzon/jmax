@@ -607,7 +607,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 	      if (fts_audiofile_seek(sf, onset) != 0) 
 		{
-		  post("fvec: can't seek position in file \"%s\"\n", fts_symbol_name(file_name));
+		  fts_object_signal_runtime_error(o, "fvec: can't seek position in file \"%s\"\n", fts_symbol_name(file_name));
 		  fts_audiofile_delete(sf);
 		  return;		  
 		}

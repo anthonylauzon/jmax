@@ -137,9 +137,13 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   at++;
 
   fts_set_void(&this->a);
+  this->keep = fts_s_no;
 
   if(ac > 0)
-    value_set_value(o, 0, 0, 1, at);
+    {
+      value_set_value(o, 0, 0, 1, at);
+      this->keep = fts_s_args;
+    }
 }
 
 static void
@@ -148,6 +152,23 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   value_t *this = (value_t *) o;
 
   value_clear(o, 0, 0, 0, 0);
+}
+
+static void
+value_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  value_t *this = (value_t *)obj;
+
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
+}
+
+static void
+value_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  value_t *this = (value_t *)obj;
+
+  fts_set_symbol(value, this->keep);
 }
 
 static void
@@ -183,6 +204,8 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 1, fts_s_anything, value_set_value);
 
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, value_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, value_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, value_get_state);
   
   return fts_Success;

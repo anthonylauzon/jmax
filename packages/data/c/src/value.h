@@ -32,7 +32,8 @@
 typedef struct _value_
 {
   fts_object_t o;
-  fts_atom_t a;		
+  fts_atom_t a;
+  fts_symbol_t keep;  
 } value_t;
 
 DATA_API fts_class_t *value_class;
