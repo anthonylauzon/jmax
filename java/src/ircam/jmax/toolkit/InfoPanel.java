@@ -73,8 +73,8 @@ public class InfoPanel extends JPanel implements StatusBar{
    * The size of the controller will be adjusted to fit into the standard height */
   public void addWidget(Component theWidget)
   {
-    if (theWidget.getSize().height > INFO_HEIGHT-8)
-      theWidget.setSize(theWidget.getSize().width, INFO_HEIGHT-8);
+    if (theWidget.getSize().height > INFO_HEIGHT-6)
+      theWidget.setSize(theWidget.getSize().width, INFO_HEIGHT-6);
 
     theWidget.setLocation(availablePosition, (INFO_HEIGHT-theWidget.getSize().height)/2);
 
@@ -102,7 +102,7 @@ public class InfoPanel extends JPanel implements StatusBar{
     theWidget.setLocation(xposition, 4);
 
     if (theWidget.getSize().height > INFO_HEIGHT-8)
-      theWidget.setSize(theWidget.getSize().width, INFO_HEIGHT-8);
+	theWidget.setSize(theWidget.getSize().width, INFO_HEIGHT-8);
 
     add(theWidget);
 
