@@ -99,17 +99,26 @@ public class Input extends GraphicObject implements FtsIntValueListener
     
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
-    int ix = x + (w - JMaxIcons.audioin_on.getIconWidth())/2;
-    int iy = y + (h - JMaxIcons.audioin_on.getIconHeight())/2;
-
+    int ix, iy;
     if( ftsObject.isError())
-      g.drawImage(JMaxIcons.no_audioin.getImage(), ix, iy, JMaxIcons.no_audioin.getImageObserver());
+      {
+	ix = x + (w - JMaxIcons.no_audioin.getIconWidth())/2;
+	iy = y + (h - JMaxIcons.no_audioin.getIconHeight())/2;
+	g.drawImage(JMaxIcons.no_audioin.getImage(), ix, iy, JMaxIcons.no_audioin.getImageObserver());
+      }    
     else 
       if(isOn)
-	g.drawImage(JMaxIcons.audioin_on.getImage(), ix, iy, JMaxIcons.audioin_on.getImageObserver());
+	{
+	  ix = x + (w - JMaxIcons.audioin_on.getIconWidth())/2;
+	  iy = y + (h - JMaxIcons.audioin_on.getIconHeight())/2;
+	  g.drawImage(JMaxIcons.audioin_on.getImage(), ix, iy, JMaxIcons.audioin_on.getImageObserver());
+	}      
       else
-	g.drawImage(JMaxIcons.audioin_off.getImage(), ix, iy, JMaxIcons.audioin_off.getImageObserver());
-
+	{
+	  ix = x + (w - JMaxIcons.audioin_off.getIconWidth())/2;
+	  iy = y + (h - JMaxIcons.audioin_off.getIconHeight())/2;
+	  g.drawImage(JMaxIcons.audioin_off.getImage(), ix, iy, JMaxIcons.audioin_off.getImageObserver());
+	}
     super.paint( g);
   }
 
