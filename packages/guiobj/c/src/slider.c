@@ -45,16 +45,16 @@ slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_atom_t a;
 
   fts_set_int(&a, self->orientation);
-  fts_client_send_message(o, sym_setOrientation, 1, &a);
+  fts_object_update_gui_property(o, sym_setOrientation, &a);
 
   fts_set_int(&a, self->min);
-  fts_client_send_message(o, sym_setMinValue, 1, &a);
+  fts_object_update_gui_property(o, sym_setMinValue, &a);
 
   fts_set_int(&a, self->max);
-  fts_client_send_message(o, sym_setMaxValue, 1, &a);
+  fts_object_update_gui_property(o, sym_setMaxValue, &a);
 
   fts_set_int(&a, self->persistence);
-  fts_client_send_message(o, fts_s_persistence, 1, &a);
+  fts_object_update_gui_property(o, fts_s_persistence, &a);
 
   fts_name_gui_method(o, 0, 0, 0, 0);
 }
@@ -152,7 +152,7 @@ slider_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   self->min = fts_get_number_int(at);
 
   fts_set_int(&a, self->min);
-  fts_client_send_message(o, sym_setMinValue, 1, &a);
+  fts_object_update_gui_property(o, sym_setMinValue, &a);  
 }
 
 static void
@@ -164,7 +164,7 @@ slider_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   self->max = fts_get_number_int(at);
 
   fts_set_int(&a, self->max);
-  fts_client_send_message(o, sym_setMaxValue, 1, &a);
+  fts_object_update_gui_property(o, sym_setMaxValue, &a);
 }
 
 static void
@@ -186,10 +186,10 @@ slider_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     self->max = fts_get_number_int(at);
 
   fts_set_int(&a, self->min);
-  fts_client_send_message(o, sym_setMinValue, 1, &a);
+  fts_object_update_gui_property(o, sym_setMinValue, &a);
 
   fts_set_int(&a, self->max);
-  fts_client_send_message(o, sym_setMaxValue, 1, &a);
+  fts_object_update_gui_property(o, sym_setMaxValue, &a);
 }
 
 static void
@@ -211,7 +211,7 @@ slider_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       if(fts_is_number(at))
 	{
 	  self->persistence = (fts_get_number_int(at) != 0);
-	  fts_client_send_message(o, fts_s_persistence, 1, at);
+	  fts_object_update_gui_property(o, fts_s_persistence, at);
 	}
     }
   else
@@ -250,10 +250,10 @@ slider_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     fts_atom_t a;
     
     fts_set_int(&a, self->min);
-    fts_client_send_message(o, sym_setMinValue, 1, &a);
+	fts_object_update_gui_property(o, sym_setMinValue, &a);
 
     fts_set_int(&a, self->max);
-    fts_client_send_message(o, sym_setMaxValue, 1, &a);
+	fts_object_update_gui_property(o, sym_setMaxValue, &a);
 
     fts_update_request(o);
   }

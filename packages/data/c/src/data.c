@@ -67,7 +67,9 @@ data_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
       if(fts_is_number(at) && this->persistence > data_object_persistence_args)
 	{
 	  this->persistence = (fts_get_number_int(at) != 0);
-	  fts_client_send_message(o, fts_s_persistence, 1, at);
+	  fts_object_update_gui_property(o, fts_s_persistence, at);
+	  
+	  fts_object_set_dirty(o);
 	}
     }
   else
@@ -87,7 +89,7 @@ data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   fts_atom_t a;
 
   fts_set_int(&a, (this->persistence > data_object_persistence_no));
-  fts_client_send_message(o, fts_s_persistence, 1, &a);
+  fts_object_update_gui_property(o, fts_s_persistence, &a);
 
   fts_name_gui_method(o, 0, 0, 0, 0);
 }

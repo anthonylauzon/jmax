@@ -294,7 +294,7 @@ fts_name_gui_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_atom_t a;
 
   fts_set_symbol(&a, fts_object_get_name(o));
-  fts_client_send_message(o, fts_s_name, 1, &a);
+  fts_object_update_gui_property(o, fts_s_name, &a);
 }
 
 void

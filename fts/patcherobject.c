@@ -986,6 +986,16 @@ fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prom
 	fts_client_send_message(o, fts_s_openFileDialog, 4, a);
 }
 
+/*************************************************************************************
+*
+*  gui properties
+*
+*/
+void
+fts_object_update_gui_property(fts_object_t *o, fts_symbol_t property, const fts_atom_t *value)
+{
+  fts_client_send_message(o, property, 1, value);
+}
 
 /*********************************************************************************
 *

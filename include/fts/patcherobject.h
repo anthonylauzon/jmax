@@ -96,6 +96,9 @@ FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 FTS_API void fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t path, fts_symbol_t default_name);
 FTS_API void fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt);
 
+/* gui properties */
+FTS_API void fts_object_update_gui_property(fts_object_t *o, fts_symbol_t property, const fts_atom_t *value);
+
 /* package */
 FTS_API fts_package_t *fts_object_get_package(fts_object_t *obj);
 

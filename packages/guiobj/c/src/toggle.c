@@ -135,7 +135,7 @@ toggle_persistence(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
     if (fts_is_number(at))
     {
       self->persistence = (fts_get_number_int(at) != 0);
-      fts_client_send_message(o, fts_s_persistence, 1, at);
+	  fts_object_update_gui_property(o, fts_s_persistence, at);
     }
   }
   else
@@ -154,7 +154,7 @@ toggle_update_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   fts_atom_t a;
   
   fts_set_int(&a, self->persistence);
-  fts_client_send_message(o, fts_s_persistence, 1, &a);
+  fts_object_update_gui_property(o, fts_s_persistence, &a);
 
   fts_set_int( &a, self->value);  
   fts_client_send_message_real_time(o, fts_s_value, 1, &a);

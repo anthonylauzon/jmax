@@ -446,7 +446,7 @@ sequence_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     if(fts_is_number(at) && this->persistence >= 0)
     {
       this->persistence = fts_get_number_int(at);
-      fts_client_send_message((fts_object_t *)this, fts_s_persistence, 1, at);
+	  fts_object_update_gui_property((fts_object_t *)this, fts_s_persistence, at);
     }
   }
   else
@@ -466,7 +466,7 @@ sequence_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_atom_t a;
 
   fts_set_int(&a, (this->persistence > 0));
-  fts_client_send_message(o, fts_s_persistence, 1, &a);
+  fts_object_update_gui_property((fts_object_t *)this, fts_s_persistence, &a);
 
   fts_name_gui_method(o, 0, 0, 0, 0);
 }

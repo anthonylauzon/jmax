@@ -411,7 +411,7 @@ preset_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       if(fts_is_number(at))
 	{
 	  this->persistence = (fts_get_number_int(at) != 0);
-	  fts_client_send_message(o, fts_s_persistence, 1, at);
+	  fts_object_update_gui_property(o, fts_s_persistence, at);
 	}
     }
   else
@@ -432,7 +432,7 @@ preset_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if(this->persistence >= 0)
     {
       fts_set_int(&a, this->persistence);
-      fts_client_send_message(o, fts_s_persistence, 1, &a);
+	  fts_object_update_gui_property(o, fts_s_persistence, &a);
     }
 
   fts_name_gui_method(o, 0, 0, 0, 0);
