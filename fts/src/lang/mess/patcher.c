@@ -54,10 +54,6 @@ fts_metaclass_t *outlet_metaclass;
    by the patcher object on its outlet; for the DSP, they are like through.
 */
 
-/* function and method to reposition an inlet, without using redefinition (bad
-   for properties !!)
-   */
-
 
 static void fts_inlet_remove_from_patcher(fts_inlet_t *this, fts_patcher_t *patcher)
 {
@@ -954,7 +950,10 @@ void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *dat
 {
   fts_patcher_t *this = (fts_patcher_t *)data;
 
-  fts_variable_assign(this, name, value);
+  if (! fts_variable_is_suspended(this, name))
+    fts_variable_define(this, name);
+
+  fts_variable_restore(this, name, value, (fts_object_t *)this);
 }
 
 
@@ -1068,7 +1067,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
   /* eval the expression */
 
   e = fts_expression_eval(obj->patcher, rac, rat, 1024, at);
-  ac = fts_expression_get_count(e);
+  ac = fts_expression_get_result_count(e);
 
   if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
     {
@@ -1633,7 +1632,7 @@ void fts_create_root_patcher()
   fts_set_symbol(&description[0], fts_s_patcher);
   fts_set_symbol(&description[1], fts_new_symbol("root"));
 
-  fts_root_patcher = (fts_patcher_t *) fts_object_new((fts_patcher_t *)0, 2, description);
+  fts_root_patcher = (fts_patcher_t *) fts_eval_object_description((fts_patcher_t *)0, 2, description);
 
   fts_object_set_id((fts_object_t *)fts_root_patcher, 1);
 }
@@ -1660,7 +1659,7 @@ static fts_object_t *patcher_doctor(fts_patcher_t *patcher, int ac, const fts_at
   if (ac >= 2)
     {
       a[1] = at[1];
-      fts_make_object(patcher, 2, a, &obj);
+      fts_object_new(patcher, 2, a, &obj);
       fts_object_set_description(obj, 2, a);
 
       if (ac >= 3)
@@ -1670,7 +1669,7 @@ static fts_object_t *patcher_doctor(fts_patcher_t *patcher, int ac, const fts_at
 	fts_object_put_prop(obj, fts_s_noutlets, &at[3]);
     }
   else
-    fts_make_object(patcher, 1, at , &obj);
+    fts_object_new(patcher, 1, at , &obj);
 
   return obj;
 }

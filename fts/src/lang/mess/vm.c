@@ -662,7 +662,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_OBJ_B %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 #ifdef VM_DEBUG
 	    fprintf(stderr, "\t");
@@ -689,7 +689,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_OBJ_S %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 
@@ -711,7 +711,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 
@@ -732,7 +732,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_TOP_OBJ_B %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
+	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
 				  &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
@@ -754,7 +754,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    fprintf(stderr, "MAKE_TOP_OBJ_S %d\n", nargs);
 #endif
 
-	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
+	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
 				  &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
@@ -776,7 +776,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 #ifdef VM_DEBUG
 	    fprintf(stderr, "MAKE_OBJ_L %d\n", nargs);
 #endif
-	    new  = fts_object_new((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
+	    new  = fts_eval_object_description((fts_patcher_t *) object_stack[object_tos], nargs + lambda,
 				  &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */

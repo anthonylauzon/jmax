@@ -13,8 +13,7 @@
  */
 
 /*
- * Handling of looking up for new templates; the handling it is probabily
- * temporary.
+ * Handling of looking up for new templates.
  * 
  * We handle a table of direct declarations (name --> file)
  * and a table of search directory.

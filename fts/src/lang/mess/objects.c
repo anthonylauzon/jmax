@@ -56,7 +56,7 @@ static fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate cla
 /* A static function making the real FTS object if possible. */
 
 fts_status_t 
-fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
+fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
   fts_status_t   status;
   fts_class_t   *cl;
@@ -164,7 +164,7 @@ static void fts_object_assign_property(fts_symbol_t name, fts_atom_t *value, voi
  */
 
 
-fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
+fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 {
   fts_object_t  *obj = 0;
   fts_metaclass_t *mcl;
@@ -312,7 +312,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
       else
 	{
 	  at = new_args;
-	  ac = fts_expression_get_count(e);
+	  ac = fts_expression_get_result_count(e);
 	}
     }
 
@@ -361,7 +361,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 
       fts_status_t ret;
 
-      ret = fts_make_object(patcher, ac, at, &obj);
+      ret = fts_object_new(patcher, ac, at, &obj);
 
       if (ret != fts_Success)
 	{
@@ -400,7 +400,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 				 "Object or template %s not found", fts_symbol_name(fts_get_symbol(at)));
     }
 
-  /* 10 - check if we are defining a variable *and* we have a state;
+  /* Check if we are defining a variable *and* we have a state;
    * If yes, just store the state in the variable state for later use.
    * if not, destroy the current object, and substitute it with an error object
    * and store an error value in the variable state.
@@ -596,7 +596,7 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
 	    
   /* Make the new object  */
 
-  new = fts_object_new(fts_object_get_patcher(old), ac, at);
+  new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
   fts_object_set_id(new, new_id);
   
   /* Update the loading vm */
@@ -641,7 +641,13 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   if (do_client)
     fts_client_upload_object(new);
 
+  /* Move the connections from the old to the new object,
+     tell the client if needed */
+
   fts_object_move_connections(old, new, do_client);
+
+  /* Take the object away from the update queue (if there)
+     and free it */
 
   fts_object_reset_changed(old);
   fts_object_free(old, do_client);
@@ -653,7 +659,7 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
  * .pat loading, where not all the information is available 
  *    at the right place; used currently explode in the fts1.5 package.
  * WARNING: user object should never call this function, otherwise they risk
- * to loose the expressions definition.
+ * to loose the expressions definition; but it is very usefull for doctors.
  */
 
 void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
@@ -735,7 +741,7 @@ void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_
 
 /* This function delete the object description; it is intended to be used
    in object doctor that convert the object to something else *including*
-   expressions, so must use fts_object_new for the whole thing,
+   expressions, so must use fts_eval_object_description for the whole thing,
    but want to keep the original description, so after creating the object,
    they reset the description, so that the original one is used.
    */
@@ -754,11 +760,11 @@ void fts_object_reset_description(fts_object_t *obj)
     }
 }
 
+
 /* 
    Add the id to the object.
    Called when we know the id, usually in messtiles.c
    */
-
 
 void fts_object_set_id(fts_object_t *obj, int id)
 {
@@ -783,6 +789,8 @@ void fts_object_delete(fts_object_t *obj)
   fts_object_reset_changed(obj);
   fts_object_free(obj, 1);
 }
+
+/* Delete an object without telling the client */
 
 static void fts_object_delete_no_release(fts_object_t *obj)
 {
@@ -814,7 +822,7 @@ static void fts_object_reset(fts_object_t *obj)
 }
 
 
-/* Delete phase 3: actually free the object and its system structures;
+/* Delete phase 2: actually free the object and its system structures;
    if the release flag is set to one, release the client representation
    of the object; sometimes, the client representation can be reused for
    an other object */
@@ -952,7 +960,8 @@ int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
 
 /* 
    All this should be somehow reviewed .... it is not completely satisfying,
-   and should be more modular 
+   and should be more modular: property names are hardwired in this code,
+   this is a bad thing.
    */
 
 void
@@ -1069,6 +1078,8 @@ static void fts_object_move_properties(fts_object_t *old, fts_object_t *new)
   fts_move_property(old, new, fts_s_fontSize);
 }
 
+/* Send a blip for an object, i.e. a message that will be shown
+   in a context dependent place, tipically the status line */
 
 void fts_object_blip(fts_object_t *obj, const char *format , ...)
 {

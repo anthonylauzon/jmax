@@ -11,23 +11,25 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
+
 #ifndef _ATOMS_H_
 #define _ATOMS_H_
 
 /*
  * Atoms are type-tagged words; i.e. an atom include a type tag,
  * and a fts_word_t value.
- * They are used everywhere in FTS as self described datums, like
+ * They are used everywhere in FTS as self described data items, like
  * in object messages and so on.
  * See mess_types.h for the typedefs.
  * 
  * The types tag is a symbols; to each basic type correspond 
- * a library symbol
+ * to a symbol predefined in symbol.h; basic types are supported by
+ * means of a group of dedicated get/set macros, but the atoms are not limited
+ * to basic types; the symbol can be set freely; the C type of the value part
+ * should be considered as the representational type; it make sense for example
+ * to have a type like "socket" that use for its representation the int C type.
  *
- * The special
- * symbol fts_s_void means a void value, while fts_s_anything
- * means any type (but cannot be used as type tag, is just used
- * in type checking)
+ * The special  symbol fts_s_void means a void value.
  * 
  * The special symbol fts_s_error means an error value, i.e. a value
  * that should generate an error each time somebody try to use it.
@@ -40,10 +42,16 @@
    do {<macro-body} while (0) 
 
    trick, to be able to put the macro in a single statement "then"
-   branch of an if ...
+   branch of an if ... tricky hack, shitty language.
+   
  */
 
+/* An initializer for empty atoms */
+
 #define FTS_NULL {(fts_symbol_t)0, {0}}
+
+/* A variable initialized to an empty atom */
+
 extern const fts_atom_t fts_null;
 
 /* Macros to deal with any type */
@@ -51,42 +59,45 @@ extern const fts_atom_t fts_null;
 #define fts_set_type(ap, ttype)    (((ap)->type) = (ttype))
 #define fts_get_type(ap)           ((ap)->type)
 #define fts_is_a(ap, ttype)        (((ap)->type) == (ttype))
-#define fts_get_value(ap)          (&((ap)->value))
+
+/* Return a pointer; i.e. you can write "*(fts_atom_value(a)).fts_symbol = fts_s_int;" for example */
+
+#define fts_atom_value(ap)          (&((ap)->value))
 
 
-/* specialized macros for predefined symbols */
+/* specialized macros for predefined types */
 
 #define fts_set_symbol(ap, x)       \
-        do {fts_set_type(ap, fts_s_symbol); fts_word_set_symbol(fts_get_value(ap), (x));} while (0)
+        do {fts_set_type(ap, fts_s_symbol); fts_word_set_symbol(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_string(ap, x)       \
-        do {fts_set_type(ap, fts_s_string); fts_word_set_string(fts_get_value(ap), (x));} while (0)
+        do {fts_set_type(ap, fts_s_string); fts_word_set_string(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_ptr(ap, x)         \
-        do {fts_set_type(ap, fts_s_ptr); fts_word_set_ptr(fts_get_value(ap), (x));} while (0)
+        do {fts_set_type(ap, fts_s_ptr); fts_word_set_ptr(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_fun(ap, x)         \
-        do {fts_set_type(ap, fts_s_fun); fts_word_set_fun(fts_get_value(ap), (x));} while (0)
+        do {fts_set_type(ap, fts_s_fun); fts_word_set_fun(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_int(ap, x)         \
-     do {fts_set_type(ap, fts_s_int); fts_word_set_int(fts_get_value(ap), (x));} while (0)
+     do {fts_set_type(ap, fts_s_int); fts_word_set_int(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_long(ap, x)        fts_set_int(ap, x)
 
 #define fts_set_float(ap, x)       \
-     do {fts_set_type(ap, fts_s_float); fts_word_set_float(fts_get_value(ap), (x));} while (0)
+     do {fts_set_type(ap, fts_s_float); fts_word_set_float(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_object(ap, x)       \
-     do {fts_set_type(ap, fts_s_object); fts_word_set_object(fts_get_value(ap), (x));} while (0)
+     do {fts_set_type(ap, fts_s_object); fts_word_set_object(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_connection(ap, x)       \
-     do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_get_value(ap), (x));} while (0)
+     do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_data(ap, x)       \
-     do {fts_set_type(ap, fts_s_data); fts_word_set_data( fts_get_value(ap), (x));} while (0)
+     do {fts_set_type(ap, fts_s_data); fts_word_set_data( fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_atom_array(ap, x)       \
-     do {fts_set_type(ap, fts_s_atom_array); fts_word_set_atom_array( fts_get_value(ap), (x));} while (0)
+     do {fts_set_type(ap, fts_s_atom_array); fts_word_set_atom_array( fts_atom_value(ap), (x));} while (0)
 
 #define fts_set_void(ap)           (fts_set_type(ap, fts_s_void))
 #define fts_set_error(ap)           (fts_set_type(ap, fts_s_error))
@@ -95,13 +106,13 @@ extern const fts_atom_t fts_null;
 #define fts_set_false(ap)          (fts_set_type(ap, fts_s_false))
 
 
-#define fts_get_symbol(ap)         (fts_word_get_symbol(fts_get_value(ap)))
-#define fts_get_string(ap)         (fts_word_get_string(fts_get_value(ap)))
-#define fts_get_ptr(ap)            (fts_word_get_ptr(fts_get_value(ap)))
-#define fts_get_fun(ap)            (fts_word_get_fun(fts_get_value(ap)))
-#define fts_get_int(ap)            (fts_word_get_int(fts_get_value(ap)))
+#define fts_get_symbol(ap)         (fts_word_get_symbol(fts_atom_value(ap)))
+#define fts_get_string(ap)         (fts_word_get_string(fts_atom_value(ap)))
+#define fts_get_ptr(ap)            (fts_word_get_ptr(fts_atom_value(ap)))
+#define fts_get_fun(ap)            (fts_word_get_fun(fts_atom_value(ap)))
+#define fts_get_int(ap)            (fts_word_get_int(fts_atom_value(ap)))
 #define fts_get_long(ap)           fts_get_int(ap)
-#define fts_get_float(ap)          (fts_word_get_float(fts_get_value(ap)))
+#define fts_get_float(ap)          (fts_word_get_float(fts_atom_value(ap)))
 #define fts_get_number(ap)         (fts_is_a(ap, fts_s_float) ? fts_get_float(ap) : fts_get_int(ap))
 #define fts_get_number_int(ap)     (fts_is_a(ap, fts_s_float) ? (int)fts_get_float(ap) : fts_get_int(ap))
 #define fts_get_number_float(ap)   (fts_is_a(ap, fts_s_float) ? fts_get_float(ap) : (float)fts_get_int(ap))
@@ -109,13 +120,13 @@ extern const fts_atom_t fts_null;
 
 #define fts_get_double(ap)         (fts_is_a(ap, fts_s_float) ? (double) fts_get_float(ap) : (double)fts_get_int(ap))
 
-#define fts_get_object(ap)         (fts_word_get_object(fts_get_value(ap)))
-#define fts_get_connection(ap)     (fts_word_get_connection(fts_get_value(ap)))
-#define fts_get_data(ap)           (fts_word_get_data(fts_get_value(ap)))
-#define fts_get_atom_array(ap)     (fts_word_get_atom_array(fts_get_value(ap)))
+#define fts_get_object(ap)         (fts_word_get_object(fts_atom_value(ap)))
+#define fts_get_connection(ap)     (fts_word_get_connection(fts_atom_value(ap)))
+#define fts_get_data(ap)           (fts_word_get_data(fts_atom_value(ap)))
+#define fts_get_atom_array(ap)     (fts_word_get_atom_array(fts_atom_value(ap)))
 
 #define fts_is_void(ap)            fts_is_a(ap, fts_s_void)
-#define fts_is_error(ap)            fts_is_a(ap, fts_s_error)
+#define fts_is_error(ap)           fts_is_a(ap, fts_s_error)
 #define fts_is_symbol(ap)          fts_is_a(ap, fts_s_symbol)
 #define fts_is_string(ap)          fts_is_a(ap, fts_s_string)
 #define fts_is_ptr(ap)             fts_is_a(ap, fts_s_ptr)
@@ -143,11 +154,8 @@ extern int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2);
 extern int fts_atom_is_null(const fts_atom_t *a);
 
 /* Subsequence  testing */
-extern int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av);
 
-/* Convenience macro for symbols */
-#define fts_is_operator(a)        (fts_is_symbol((a)) && fts_symbol_is_operator(fts_get_symbol(a)))
-#define fts_get_operator(a)        (fts_symbol_get_operator(fts_get_symbol(a)))
+extern int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av);
 
 /* Atom printing function, usually for debug */
 

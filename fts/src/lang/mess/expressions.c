@@ -47,7 +47,7 @@
 
 /*
   EXPRESSION_TRACE_DEBUG, if defined, cause some debug printouts
-  before while and after evalutating an expression
+  before, while and after evaluating an expression
   */
 
 /* #define EXPRESSION_TRACE_DEBUG */
@@ -57,7 +57,11 @@
 #include "lang/mess/messP.h"
 #include "lang/utils.h"
 
-/* Operator codes */
+/* Operator codes: symbols can store a special operator code,
+   to identify them as operators, and to do direct access to some
+   system table; the constant are defined here, and are put in the
+   symbol in the expression init function.
+ */
 
 #define FTS_OP_PLUS          1
 #define FTS_OP_MINUS         2
@@ -87,6 +91,7 @@
 #define FTS_OP_ARRAY_REF     26
 #define FTS_OP_FIRST_UNUSED  28
 
+/* Codes to identify unary and binary operators in the operator stack */
 
 #define FTS_BINARY_OP_TYPE 0
 #define FTS_UNARY_OP_TYPE  1
@@ -97,20 +102,28 @@
 
 #define FTS_EXPR_MAX_DEPTH 32
 
-/* Operator priority */
+/* Operator priority and type: direct access tables giving 
+   priority and type of operators.
+ */
 
 static int op_priority[FTS_OP_FIRST_UNUSED];
 static int op_unary[FTS_OP_FIRST_UNUSED];
 static int op_binary[FTS_OP_FIRST_UNUSED];
 
+
+
+/* Convenience macro for checking symbol atoms  */
+
+#define fts_is_operator(a)        (fts_is_symbol((a)) && fts_symbol_is_operator(fts_get_symbol(a)))
+#define fts_get_operator(a)        (fts_symbol_get_operator(fts_get_symbol(a)))
+
+/* Operator type and priority */
+
 #define fts_op_before(op1, op2)   (op_priority[(op1)] >= op_priority[(op2)]) 
-
-/* Operator type */
-
 #define fts_op_can_be_unary(op)  (op_unary[(op)])
 #define fts_op_can_be_binary(op) (op_binary[(op)])
 
-/* Parentesys check */
+/* Utility macros */
 
 #define fts_is_open_par(a)       (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_open_par))
 #define fts_is_closed_par(a)     (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_closed_par))
@@ -128,7 +141,7 @@ static int op_binary[FTS_OP_FIRST_UNUSED];
 
 static fts_hash_table_t fts_expression_fun_table;
 
-/* Storing assignement set in expressions for future created objects */
+/* Structure used to store  assignements in expression states */
 
 struct fts_expression_assignement
 {
@@ -138,6 +151,8 @@ struct fts_expression_assignement
 };
 
 static fts_heap_t *expr_prop_heap;
+
+/* Structure used to store  reference to variables in expression states */
 
 typedef struct fts_expr_var_ref
 {
@@ -189,7 +204,7 @@ static int expression_error(fts_expression_state_t *e, int err, const char *msg,
   return err;
 }
 
-/* OP stack manipulation */
+/* operator stack manipulation */
 
 static void op_stack_push(fts_expression_state_t *e, int op, int op_type)
 {
@@ -300,6 +315,7 @@ static int more_in(fts_expression_state_t *e)
 {
   return (e->in < e->expr_size);
 }
+
 /* expression function related functions */
 
 static fts_expression_fun_t get_expression_fun(fts_symbol_t name)
@@ -320,13 +336,15 @@ void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f)
   fts_hash_table_insert(&fts_expression_fun_table, name, &a);
 }
 
-/* Return 1 in case of error, 0 otherwise */
 
 static int fts_op_eval(fts_expression_state_t *e);
 static void fts_expression_add_assignement(fts_expression_state_t *e, fts_symbol_t name, fts_atom_t *value);
 static void fts_expression_add_var_ref(fts_expression_state_t *e, fts_patcher_t *scope, fts_symbol_t name);
 
 static fts_heap_t *expr_state_heap;
+
+
+/* Create a new initiaized expression state */
 
 static fts_expression_state_t *fts_expression_state_new(fts_patcher_t *scope,
 							int expr_size, const fts_atom_t *expr)
@@ -349,7 +367,7 @@ static fts_expression_state_t *fts_expression_state_new(fts_patcher_t *scope,
   return expr_state;
 }
 
-/* Must be called to free the expression state */
+/* Free the expression state */
 
 void fts_expression_state_free(fts_expression_state_t *e)
 {
@@ -440,7 +458,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	    }
 	  else  if (fts_is_quote(current_in(e)))
 	    {
-	      fprintf(stderr, "In quotes\n");
+	      /* Quoted value, eval to the value itself */
 
 	      next_in(e);
 
@@ -448,9 +466,6 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		{
 		  value_stack_push(e, current_in(e));
 
-		  fprintf(stderr, "Pushing");
-		  fprintf_atoms(stderr, 1, current_in(e));
-		  fprintf(stderr, "\n");
 		  /* next_in(e); */
 
 		  status = waiting_op;
@@ -536,7 +551,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 
 	  if (fts_is_open_sqpar(current_in(e)))
 	    {
-	      /* Array access */
+	      /* Array indexing operator */
 
 	      next_in(e);
 
@@ -904,7 +919,17 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 
 #define fts_get_float_num(a)   (fts_is_float((a)) ? fts_get_float((a)) : (float) fts_get_int((a)))
 
-/* pop is the previous operator; used only for ?: checking */
+/* Apply the top of the stack operator to the top of the stacks values.
+   Do type promotion. 
+
+   Note that the interpretation of the operator is made using a switch;
+   since the operator indexes are contiguous, is very likely that this code
+   generate a jump table, and it is surely faster and more efficent than
+   to call a function thru a pointer table 
+
+   The negative part is that type promotion is done for each operator;
+   code should be factorized here.
+*/
 
 static int fts_op_eval(fts_expression_state_t *e)
 {
@@ -1353,29 +1378,6 @@ static int fts_op_eval(fts_expression_state_t *e)
 	      fts_atom_array_t *aa = (fts_atom_array_t *)data;
 	      int idx = fts_get_int(tos);
 	      
-#ifdef EXPRESSION_TRACE_DEBUG
-	      fprintf(stderr, "Accessing array ");
-	      fprintf_atom_array(stderr, aa);
-	      fprintf(stderr, " Position %d ", idx);	      
-	      
-	      if(fts_data_is_const(data))
-		{
-		  if (fts_atom_array_check_index(aa, idx))
-		    {
-		      fts_atom_t a;
-		      
-		      fprintf(stderr, " value ");
-		      a = fts_atom_array_get_element(aa, idx);
-		      fprintf_atoms(stderr, 1, &a);
-		      fprintf(stderr, "\n");
-		    }
-		  else
-		    fprintf(stderr, "(Array index out of bound)\n");
-		}
-	      else
-		fprintf(stderr, "(Array not constant)\n");
-
-#endif
 	      if(fts_data_is_const(data))
 		{
 		  if (fts_atom_array_check_index(aa, idx))
@@ -1401,7 +1403,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 
 /* Post-evaluation Functions */
 
-int fts_expression_get_count(fts_expression_state_t *e)
+int fts_expression_get_result_count(fts_expression_state_t *e)
 {
   return e->count;
 }
@@ -1520,6 +1522,9 @@ void fts_expression_printf_assignements(fts_expression_state_t *e)
 #endif
 
 
+/* Eval all the expressions found in the expr list of arguments,
+   put the result is result */
+
 fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,
 					    int expr_size, const fts_atom_t *expr,
 					    int result_size, fts_atom_t *result)
@@ -1600,7 +1605,8 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
     return FTS_EXPRESSION_SYNTAX_ERROR;
 }
   
-/* Init function  */
+/* Init function: configure all the tables  */
+
 void
 fts_expressions_init(void)
 {
@@ -1723,3 +1729,8 @@ fts_expressions_init(void)
   op_binary[FTS_OP_ASSIGN] = 1;
   op_binary[FTS_OP_ARRAY_REF] = 1;
 }
+
+
+
+
+

@@ -59,7 +59,7 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
   if (fts_object_is_error(in))
     fts_error_object_fit_inlet(in, winlet);
 
-  /* check the range */
+  /* check the outlet range */
 
   if (woutlet >= out->cl->noutlets || woutlet < 0)
     {
@@ -420,6 +420,9 @@ void fprintf_connection(FILE *f, fts_connection_t *conn)
   else
     fprintf(f, "<CONNECTION null>");
 }
+
+
+
 
 
 

@@ -17,17 +17,22 @@
 #include "sys.h"
 #include "lang/mess.h"
 
-/* Implement autosave functions; autosave is temporarly implemented
+/* Implement autosave functions; autosave is implemented
    only for catastrophic situations, but can be easily implemented 
-   in automatic style, of course; not that in the current implementation,
-   it save  only top level patchers.
-   */
+   in automatic style, of course; note that in the current implementation,
+   it save only top level patchers that have the fts_s_filename property
+   explicitly set; this property is set by the patcher loader, usually.
 
-/* fts_autosave save all the files adding "postfix" at the end;
-   please note that fts_autosave do *NO* malloc/free, including symbol
+   fts_autosave save all the files adding "postfix" at the end;
+   fts_autosave try to don't call malloc/free, including symbol
    allocations; it is important in order to try to work with a memory
    corruption situation; also, please do never use daemon for the fts_s_filename
    property, for the same reason.
+
+   Note that the current implementation stop any core dump from being
+   done; this is not very good in debugging situation; for this reason
+   autosave is disabled when compiling in debug mode; a more 
+   sophisticated signal handler should be written.
    */
 
 
@@ -82,4 +87,8 @@ void fts_autosave_init( void)
   signal(SIGPWR, autosave_signal_handler);
 #endif
 }
+
+
+
+
 

@@ -27,10 +27,13 @@
 
 /*
  * The error object; actually, error object are patchers, marked as errors,
- * because they can change dinamically their number of inlets and outs
+ * because they can change dinamically their number of inlets and outs.
  *
  */
 
+/* Make an error object, with a description given as an array of atoms, 
+   and a textual error description given in the printf format (format string
+   plus a variable number of arguments) */
 
 fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at, const char *format, ...)
 {
@@ -43,7 +46,7 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom
 
   fts_set_symbol(&description[0], fts_s_patcher);
 
-  fts_make_object(parent, 1, description, &obj);
+  fts_object_new(parent, 1, description, &obj);
 
   /* flag the patcher as error */
 
@@ -62,7 +65,6 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom
 
   return obj;
 }
-
 
 void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet)
 {
@@ -89,8 +91,12 @@ void fts_recompute_errors()
 
 /*
   Try to recompute all the error objects; to be called after
-  an "env" change.
-   */
+  an "env" change; do something only if we know (with fts_recompute_errors)
+  that some change happened in the environment; called directly from
+  the client; this double mechanism is needed to avoid trying to recompute
+  all errors at every small declaration, that can be catastrophic for example
+  if a library declare its templates with explicit declarations.
+  */
 
 void fts_do_recompute_errors(void)
 {
@@ -130,7 +136,9 @@ void fts_do_recompute_errors(void)
 }
 
 
-/* Set the error state of an object; can be enterly done with properties */
+/* Convenience function to set the error state of an object, providing 
+   also a textual description of the error as a printf like set of arguments
+   */
 
 void fts_object_set_error(fts_object_t *obj, const char *format, ...)
 {

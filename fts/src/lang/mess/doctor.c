@@ -15,12 +15,12 @@
 /*
   Object doctor.
 
-  When an object instantiation in fts_object_new fail,
+  When an object instantiation in fts_eval_object_description fail,
   we try a doctor for it; a doctor is a function registered on the
-  class name, and called with the same arguments as fts_object_new.
+  class name, and called with the same arguments as fts_eval_object_description.
   
   It should return an FTS object, made in any possible way; it can
-  call recursively fts_object_new.
+  call recursively fts_eval_object_description.
 
   Doctors are used to fix small changes in the object arguments
   without adding compatibility code to the object themselves,

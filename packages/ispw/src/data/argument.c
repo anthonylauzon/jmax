@@ -34,7 +34,7 @@ static fts_object_t *argument_doctor(fts_patcher_t *patcher, int ac, const fts_a
       a[4] = at[1];
       fts_set_symbol(&a[5], fts_s_closed_sqpar);
 
-      obj = fts_object_new(patcher, 6, a);
+      obj = fts_eval_object_description(patcher, 6, a);
       fts_object_reset_description(obj);
       return obj;
     }
@@ -65,7 +65,7 @@ static fts_object_t *argument_doctor(fts_patcher_t *patcher, int ac, const fts_a
       fts_set_symbol(&a[11 + (ac - 2)], fts_s_closed_par);
       fts_set_symbol(&a[12 + (ac - 2)], fts_s_closed_par);
 
-      obj = fts_object_new(patcher, 12 + (ac - 2), a);
+      obj = fts_eval_object_description(patcher, 12 + (ac - 2), a);
       fts_object_reset_description(obj);
       return obj;
     }

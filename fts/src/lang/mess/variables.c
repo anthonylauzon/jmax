@@ -33,32 +33,6 @@
 
 /* #define TRACE_DEBUG */
 
-static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object);
-
-/* Errors */
-
-static fts_status_description_t fts_redefinedVariable = {"Redefined variable"};
-
-/* DEBUG */
-
-
-static void fts_object_list_describe(fts_object_list_t *u, const char *msg)
-{
-  int i;
-
-  fprintf(stderr, "Object list %s:\n", msg);
-
-  while (u)
-    {
-      fprintf(stderr, "Object %lx, Next %lx\n", (unsigned long) u->obj, (unsigned long) u->next);
-      u = u->next;
-    }
-
-  fprintf(stderr, "Done.\n");
-}
-     
-
-  
 /****************************************************************************/
 /*                                                                          */
 /*  Binding direct Manipulation                                             */
@@ -68,6 +42,8 @@ static void fts_object_list_describe(fts_object_list_t *u, const char *msg)
 static fts_heap_t *bindings_heap;
 static fts_heap_t *objlist_heap;
 static fts_heap_t *var_refs_heap;
+
+/* Create a new binding in the given environment */
 
 static fts_binding_t *fts_binding_new(fts_env_t *env, fts_symbol_t name, fts_atom_t *value)
 {
@@ -93,6 +69,10 @@ static fts_binding_t *fts_binding_new(fts_env_t *env, fts_symbol_t name, fts_ato
 
   return v;
 }
+
+/* Delete a new binding in the given environment.
+   Recompute all the object referring this binding.
+   */
 
 
 static void fts_binding_delete(fts_binding_t *var)
@@ -148,6 +128,10 @@ static void fts_binding_delete(fts_binding_t *var)
 }
 
 
+/* Suspend the binding; recursively suspend all the variables
+   defined by objects referring this binding.
+   */
+
 static void fts_binding_suspend(fts_binding_t *var)
 {
   fts_object_list_t   *u;
@@ -170,7 +154,6 @@ static void fts_binding_suspend(fts_binding_t *var)
 	fprintf_object(stderr, u->obj);
 	fprintf(stderr, "\n");
 #endif
-
 	fts_variable_suspend(u->obj->patcher, fts_object_get_variable(u->obj));
       }
 
@@ -180,19 +163,13 @@ static void fts_binding_suspend(fts_binding_t *var)
 }
 
 /*
- * NOTE: If an variable had an error or void value, and is restored to an error or
- * void value, it do no propagation; this to stop loop propagation.
+ * Restore a binding: assign a final value to it, and recompute all the objects
+ * referring to this binding.
  */
 
 static void fts_binding_restore(fts_binding_t *var, fts_atom_t *value)
 {
-  int do_propagation;
-
-  if (fts_is_object(&(var->value)) && fts_object_is_error(fts_get_object(&(var->value))) &&
-      fts_is_object(value) && fts_object_is_error(fts_get_object(value)))
-    do_propagation = 0;
-  else
-    do_propagation = 1;
+  fts_object_list_t *u;
 
   var->suspended = 0;
   var->value = *value;
@@ -206,54 +183,53 @@ static void fts_binding_restore(fts_binding_t *var, fts_atom_t *value)
   /* Recursive calls to recover all the variables bind to users of this
      binding, and redefine the objects */
 
-  if (do_propagation)
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Recomputing: \n");
+#endif
+
+  /* this loop remove objects from the users list, while indirectly
+     the calls will add objects to the user list; what we do then
+     is to remove the user list from the binding, and loop
+     on it; the redefinition will implicitly re-add the users to the
+     user list; we free the old user list during the loop */
+
+  u = var->users;
+  var->users = 0;
+
+  while (u)
     {
-      fts_object_list_t *u;
+      fts_object_t *obj;
+      fts_object_list_t *tmp;
 
-#ifdef TRACE_DEBUG
-      fprintf(stderr, "Recomputing: \n");
-#endif
-      /* this loop remove objects from the users list, while indirectly
-	 the calls will add objects to the user list; what we do then
-	 is to remove the user list from the binding, and loop
-	 on it; the redefinition will implicitly re-add the users to the
-	 user list; we free the old user list during the loop */
-
-      u = var->users;
-      var->users = 0;
-
-      while (u)
-	{
-	  fts_object_t *obj;
-	  fts_object_list_t *tmp;
-
-	  tmp = u;
-	  u = u->next;
+      tmp = u;
+      u = u->next;
 	  
-	  obj = tmp->obj;
+      obj = tmp->obj;
 	  
-	  fts_heap_free((char *)tmp, objlist_heap);
+      fts_heap_free((char *)tmp, objlist_heap);
 
 #ifdef TRACE_DEBUG
-	  fprintf(stderr, "\t");
-	  fprintf_object(stderr, obj);
-	  fprintf(stderr, "\n");
+      fprintf(stderr, "\t");
+      fprintf_object(stderr, obj);
+      fprintf(stderr, "\n");
 #endif
-	  fts_object_recompute(obj);
-	}
-
-#ifdef TRACE_DEBUG
-      fprintf(stderr, "Done.\n");
-#endif
+      fts_object_recompute(obj);
     }
+
+#ifdef TRACE_DEBUG
+  fprintf(stderr, "Done.\n");
+#endif
 }
 
+
+/* Check if a binding is currently suspended */
 
 static int fts_binding_is_suspended(fts_binding_t *var)
 {
   return var->suspended;
 }
 
+/* Add a user to a binding, i.e. an object that is referring the binding in its description */
 
 static void fts_binding_add_user(fts_binding_t *var, fts_object_t *object)
 {
@@ -279,9 +255,9 @@ static void fts_binding_add_user(fts_binding_t *var, fts_object_t *object)
   fprintf_object(stderr, object);
   fprintf(stderr, " for variable %s \n", fts_symbol_name(var->name));
 #endif
-
 }
 
+/* Remove  a user to a binding, i.e. an object that is referring the binding in its description */
 
 void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 {
@@ -326,6 +302,9 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 }
 
 
+/* Add all the users of a binding to the given object set.
+   Used for the find friends of an object defining a variable */
+
 static void fts_binding_add_users_to_set(fts_binding_t *var, fts_object_set_t *set)
 {
   fts_object_list_t  *u;	
@@ -334,6 +313,8 @@ static void fts_binding_add_users_to_set(fts_binding_t *var, fts_object_set_t *s
     fts_object_set_add(set, u->obj);
 }
 
+
+/* Check if a binding is defined by a given object */
 
 static int fts_binding_defined_by(fts_binding_t *var, fts_object_t *object)
 {
@@ -348,6 +329,9 @@ static int fts_binding_defined_by(fts_binding_t *var, fts_object_t *object)
   return 0;
 }
 
+/* Check if a binding is defined by a given object, and
+   only by the given object, i.e. the binding is not a doubly
+   defined variable */
 
 static int fts_binding_defined_only_by(fts_binding_t *var, fts_object_t *object)
 {
@@ -357,13 +341,18 @@ static int fts_binding_defined_only_by(fts_binding_t *var, fts_object_t *object)
     return 0;
 }
 
+
+/* Add a definition to a binding; if there is already a definition, and
+   only one, recompute it, to make it an error.
+   */
+
 static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object)
 {
   fts_object_t *owner = 0;
   fts_object_list_t *d;
 
   /* First, check if the owner is already in the definition  list,
-     in this case just return (really needed ?) */
+     in this case just return  */
 
   for (d = var->definitions; d; d = d->next)
     {
@@ -402,12 +391,12 @@ static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object)
     }
 }
 
+/* Remove a definition from a binding; if only one definition is left,
+   recompute it, so to reinstantiate the good object */
 
 static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *object)
 {
-  fts_object_list_t   **d;	/* indirect precursor */
-  fts_object_list_t  *p;	/* DEBUG */
-
+  fts_object_list_t  **d;	/* indirect precursor */
 
 #ifdef TRACE_DEBUG 
   fprintf(stderr, "Remove Definition ");
@@ -442,17 +431,34 @@ static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *obje
     }
 }
 
+/* Add all the definitions of a binding to the given object set.
+   Used for the find friends of an object defining a variable */
+
+static void fts_binding_add_definitions_to_set(fts_binding_t *var, fts_object_set_t *set)
+{
+  fts_object_list_t  *u;	
+
+  for (u = var->definitions; u; u = u->next)
+    fts_object_set_add(set, u->obj);
+}
+
+
 /****************************************************************************/
 /*                                                                          */
 /*  Environent Manipulation                                                 */
 /*                                                                          */
 /****************************************************************************/
 
+/* Initialize an environment, i.e. the list of bindings of a patcher */
+
 void fts_env_init(fts_env_t *env, fts_object_t *patcher)
 {
   env->first = 0;
   env->patcher = patcher;
 }
+
+
+/* Add a binding to an environment */
 
 static fts_binding_t *fts_env_add_binding(fts_env_t *env, fts_symbol_t name, fts_atom_t *value)
 {
@@ -466,6 +472,8 @@ static fts_binding_t *fts_env_add_binding(fts_env_t *env, fts_symbol_t name, fts
   return var;
 }
 
+
+/* Remove a binding from an environment */
 
 static void fts_env_remove_bindings(fts_env_t *env, fts_object_t *owner)
 {
@@ -495,6 +503,10 @@ static void fts_env_remove_bindings(fts_env_t *env, fts_object_t *owner)
 }
 
 
+/* Remove all the bindings of an environment that are suspended and
+   that have the owner argument as unique definitions; used for patchers */
+
+
 static void fts_env_remove_suspended_bindings(fts_env_t *env, fts_object_t *owner)
 {
   fts_binding_t **p;		/* indirect precursor */
@@ -517,6 +529,9 @@ static void fts_env_remove_suspended_bindings(fts_env_t *env, fts_object_t *owne
 }
 
 
+/* Suspend all the bindings in an environment that have the owner argument as
+   unique definitions; used for patchers */
+
 static void fts_env_suspend_bindings(fts_env_t *env, fts_object_t *owner)
 {
   fts_binding_t *var = 0;
@@ -532,6 +547,9 @@ static void fts_env_suspend_bindings(fts_env_t *env, fts_object_t *owner)
     }
 }
 
+
+/* Look in the environment for a binding for a given
+   variable name */
 
 static fts_binding_t *fts_env_get_binding(fts_env_t *env, fts_symbol_t name)
 {
@@ -552,6 +570,9 @@ static fts_binding_t *fts_env_get_binding(fts_env_t *env, fts_symbol_t name)
 /*                                                                          */
 /****************************************************************************/
 
+/* Get a binding in a given scope for a given variable name.
+   Search iteratively in the containing patchers ..
+   */
 
 static fts_binding_t *fts_variable_get_binding(fts_patcher_t *scope, fts_symbol_t name)
 {
@@ -576,6 +597,7 @@ static fts_binding_t *fts_variable_get_binding(fts_patcher_t *scope, fts_symbol_
   return 0;
 }
 
+
 /*
   Define a suspended variable in the inner scope corresponding to the
   passed object ; cause automatic stealing of any object
@@ -583,7 +605,6 @@ static fts_binding_t *fts_variable_get_binding(fts_patcher_t *scope, fts_symbol_
   name; the actual redefinition will be made at "restore" time.
 
  */
-
 
 void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
 {
@@ -657,7 +678,6 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
 }
 
 
-
 /* Verify if a fts_variable_define can be issued in the passed scope.
    Note that this is not like testing if a variable is bound; the binding can be 
    inherited from a surrounding patcher.
@@ -676,6 +696,7 @@ int fts_variable_can_define(fts_patcher_t *scope, fts_symbol_t name)
   else
     return 0;
 }
+
 
 /* Return 1 if the variable exists *and* it is suspended */
 
@@ -709,6 +730,7 @@ void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
     fts_binding_remove_definition(var, owner);
 }
 
+
 /*
   Like fts_variable_undefine, but act on all the variables in the current scope defined
   by 'owner'
@@ -719,6 +741,7 @@ void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner)
   fts_env_remove_bindings(fts_patcher_get_env(scope), owner);
 }
 
+
 /*
   Suspend  the variable bound to the name in the scope represented by the object;
   To suspend means to keep the dependency structure and value, but don't consider
@@ -728,7 +751,6 @@ void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner)
   Note that a variable should be suspended only temporarly; i.e. variables are
   never suspended between two user level atomic operations.
   */
-
 
 void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name)
 {
@@ -746,11 +768,16 @@ void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name)
   by 'owner'
   */
 
-
 void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner)
 {
   fts_env_suspend_bindings(fts_patcher_get_env(scope), owner);
 }
+
+
+/*
+  Like fts_variable_suspend, but act on all the variables in the current scope defined
+  by 'owner' and suspended.
+  */
 
 void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner)
 {
@@ -763,7 +790,7 @@ void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner)
  *
  * All the recursively dependent objects are redefined, and their
  * bindings recursively redefined.
- * A variable may be restored by a different owner in case of object ridefinition.
+ * A variable may be restored by a different owner in case of object redefinition.
  *
  */
 
@@ -782,7 +809,7 @@ void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *v
 }
 
 
-/* Access the value of a variable in the scope represented by an object */
+/* Access the value of a variable in the given scope  */
 
 fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name)
 {
@@ -825,8 +852,7 @@ void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
 }
 
 
-
-/* Support for find  */
+/* Support for find: find all the users and definitions of a variable visible in the given scope */
 
 void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_object_set_t *set)
 {
@@ -835,16 +861,12 @@ void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_object
   b = fts_variable_get_binding(scope, name);
 
   if (b)
-    fts_binding_add_users_to_set(b, set);
+    {
+      fts_binding_add_users_to_set(b, set);
+      fts_binding_add_definitions_to_set(b, set);
+    }
 }
 
-void fts_variable_assign(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value)
-{
-  if (! fts_variable_is_suspended(scope, name))
-    fts_variable_define(scope, name);
-
-  fts_variable_restore(scope, name, value, (fts_object_t *)scope);
-}
 
 /* Module init function */
 

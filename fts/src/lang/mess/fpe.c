@@ -13,7 +13,9 @@
  */
 
 /*
- * This code include support for fpe exceptions handling and reporting;
+ * This code include support for fpe exceptions handling and reporting
+ * in control computation; it keep an object set of objects that had
+ * floating point exceptions.
  */
 
 #include <stdio.h>

@@ -222,7 +222,7 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filenam
 
       fts_set_symbol(&description[0], fts_s_patcher);
 
-      patcher = fts_object_new((fts_patcher_t *)parent, 1, description);
+      patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_parse_patlex(patcher, in);
 
@@ -325,7 +325,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 
 	      fts_set_symbol(&description[0], fts_s_patcher);
 
-	      lastNObject = fts_object_new((fts_patcher_t *)parent, 1, description);
+	      lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
 	      fts_patparse_parse_patcher(lastNObject, in);
 
@@ -336,7 +336,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 	      fts_atom_t description[1];
 
 	      fts_set_symbol(&description[0], fts_s_qlist);
-	      lastNObject = fts_object_new((fts_patcher_t *)parent, 1, description);
+	      lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 	      lastNObjectType = fts_s_qlist;
 
 	      /* skip the rest of the command: #N qlist argument are ignored */
@@ -377,14 +377,14 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 		  /* get the size */
 
 		  description[2] = vargs[0];
-		  lastNObject = fts_object_new((fts_patcher_t *)parent, 3, description);
+		  lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 3, description);
 		}
 	      else
 		{
 		  /* get the size */
 
 		  description[1] = vargs[0];
-		  lastNObject = fts_object_new((fts_patcher_t *)parent, 2, description);
+		  lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 2, description);
 		}
 
 	      lastNObjectType = fts_s_table;
@@ -399,7 +399,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 
 	      fts_set_symbol(&description[0], fts_s_explode);
 
-	      lastNObject = fts_object_new((fts_patcher_t *)parent, 1, description);
+	      lastNObject = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 	      lastNObjectType = fts_s_explode;
 
 	      /* skip the rest of the command */
@@ -647,7 +647,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_set_symbol(&description[0], fts_s_slider);
 
-      obj = fts_object_new((fts_patcher_t *)parent, 1, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
       fts_patparse_set_slider_graphic_properties(graphicDescr, obj);
     }
   else if (objclass == fts_s_newex)
@@ -659,7 +659,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_patlex_next_token(in);/* get the object name */
 
-      /* Abstraction are handled directly by the fts_object_new function */
+      /* Abstraction are handled directly by the fts_eval_object_description function */
 
       if (in->ttype == FTS_LEX_EOC)
 	{
@@ -670,7 +670,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 	  fts_patlex_push_back(in);
 
-	  obj = fts_object_new((fts_patcher_t *) parent, 0, 0);
+	  obj = fts_eval_object_description((fts_patcher_t *) parent, 0, 0);
 
 	  fts_patparse_set_text_graphic_properties(graphicDescr, obj);
 
@@ -692,7 +692,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       argc = fts_patparse_read_object_arguments(description + 1, in);
 
-      obj = fts_object_new((fts_patcher_t *)parent, argc + 1 , description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, argc + 1 , description);
 
       if (obj)
 	fts_patparse_set_text_graphic_properties(graphicDescr, obj);
@@ -778,7 +778,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_set_symbol(&description[0], fts_s_inlet);
       fts_set_int(&description[1], -2); 
-      obj = fts_object_new((fts_patcher_t *)parent, 2, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }
@@ -797,7 +797,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_set_symbol(&description[0], fts_s_outlet);
       fts_set_int(&description[1], -2); 
-      obj = fts_object_new((fts_patcher_t *)parent, 2, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 2, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }
@@ -808,7 +808,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       fts_patparse_set_font_index(graphicDescr, in);
 
       fts_set_symbol(&description[0], fts_s_intbox);
-      obj = fts_object_new((fts_patcher_t *)parent, 1, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
@@ -819,7 +819,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       fts_patparse_set_font_index(graphicDescr, in);
 
       fts_set_symbol(&description[0], fts_s_floatbox);
-      obj = fts_object_new((fts_patcher_t *)parent, 1, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }
@@ -828,7 +828,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       fts_atom_t description[1];
 
       fts_set_symbol(&description[0], fts_s_button);
-      obj = fts_object_new((fts_patcher_t *)parent, 1, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }
@@ -838,7 +838,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       fts_set_symbol(&description[0], fts_s_toggle);
 
-      obj = fts_object_new((fts_patcher_t *)parent, 1, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
 
       fts_patparse_set_square_graphic_properties(graphicDescr, obj);
     }
@@ -855,7 +855,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       argc = fts_patparse_read_object_arguments(description + 1, in);
       fts_patparse_set_normal_mode(in);
 
-      obj = fts_object_new((fts_patcher_t *)parent, 1, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
       fts_send_message(obj, fts_SystemInlet, fts_s_clear, 0, 0);
       fts_send_message(obj, fts_SystemInlet, fts_s_append, argc, description + 1);
 
@@ -872,7 +872,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
       argc = fts_patparse_read_object_arguments(description + 1, in);
 
-      obj = fts_object_new((fts_patcher_t *)parent, argc + 1, description);
+      obj = fts_eval_object_description((fts_patcher_t *)parent, argc + 1, description);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }

@@ -19,7 +19,12 @@
 #include "sys.h"
 #include "lang/mess.h"
 
+/* An empty atom */
+
 const fts_atom_t fts_null = FTS_NULL;
+
+/* Currently, there is no way to extend this function when adding
+   new atom types */
 
 void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 {
@@ -82,6 +87,8 @@ void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
     }
 }
 
+/* Currently, there is no way to extend this function when adding
+   new atom types */
 
 void sprintf_atoms(char *s, int ac, const fts_atom_t *at)
 {
@@ -119,6 +126,8 @@ void sprintf_atoms(char *s, int ac, const fts_atom_t *at)
     }
 }
 
+/* Currently, there is no way to extend this function when adding
+   new atom types */
 
 int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
 {
@@ -182,6 +191,7 @@ int fts_atom_is_null(const fts_atom_t *a)
 }
 
 /* Functions to compare list of atoms */
+
 int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av)
 {
   int i,j;
@@ -200,6 +210,12 @@ int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_at
 
   return 0;
 }
+
+
+
+
+
+
 
 
 

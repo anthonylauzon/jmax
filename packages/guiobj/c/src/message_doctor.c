@@ -28,7 +28,7 @@ static fts_object_t *message_doctor(fts_patcher_t *patcher, int ac, const fts_at
     {
       fts_object_t *obj;
 
-      fts_make_object(patcher, 1, at, &obj);
+      fts_object_new(patcher, 1, at, &obj);
 
       if (ac > 1)
 	{

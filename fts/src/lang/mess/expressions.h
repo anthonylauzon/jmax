@@ -28,7 +28,7 @@ extern fts_expression_state_t *fts_expression_eval(fts_patcher_t *scope,
 
 extern void fts_expression_state_free(fts_expression_state_t *e);
 
-extern int fts_expression_get_count(fts_expression_state_t *e);
+extern int fts_expression_get_result_count(fts_expression_state_t *e);
 
 typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
 
@@ -55,5 +55,8 @@ extern int fts_expression_map_to_assignements(fts_expression_state_t *e,
 				       void *data);
 
 #endif
+
+
+
 
 

@@ -259,12 +259,6 @@ static fts_class_t *fts_class_get( fts_metaclass_t *mcl, int ac, const fts_atom_
   return 0;
 }
 
-/* Note that the generity discrimination is made procedurally
-   by the class instantiation functions, that should return
-   an error if the arguments are not ok.
-   *We cannot use init arguments because the classes do not exists yet*.
- */
-
 fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at)
 {
   fts_metaclass_t *mcl;
@@ -336,6 +330,7 @@ fts_status_t fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, in
 
   return fts_Success;
 }
+
 
 
 fts_status_t fts_method_define_optargs( fts_class_t *cl, int winlet, fts_symbol_t s,

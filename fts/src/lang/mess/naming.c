@@ -20,7 +20,8 @@
 /*
  * Basic naming services; for now, just provide global names,
  * Only for compatibility with the ISPW Object set; don't use for new objects.
- * Now, it handle only named fts_object_t .
+ * It handle only named fts_object_t; used by the message box to send messages
+ * to tables and table~s
  */
 
 static fts_hash_table_t global_name_table; /* the name binding table */

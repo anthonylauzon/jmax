@@ -23,7 +23,7 @@
 
 /* Converted by MDC to use FILE * instead of file,
    in order to integrate it better with the loader;
-   in particular, the clipboard will become an unlinked
+   in particular, the clipboard will is now an unlinked, invisible
    file, never closed until exit, with fseek/fread/fwrite
    operations on it (to avoid leaving .clipboard file arounds)
    */

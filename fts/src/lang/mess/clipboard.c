@@ -14,11 +14,14 @@
 
 /* 
    The clipboard; it have no methods, no inlets, not outlets;
-   it is created by the patparser when it cannot find 
-   an object, in order to mantain the consistency of the
-   parsing (inlet and outlets are relative to the position).
+   keep a reference to an unlinked file storing the clipboard content.
+   Only one file is created during the session, never closed until
+   the quit.
 
-   It should not be an object !!!!
+   It is manipulated directly by the user interface by means of messages
+   to the object itself.
+
+   It should  not be an object, but a specialized fts_data_t.
 */
 
 #include <stdlib.h>
@@ -61,7 +64,7 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->file = fopen(buf, "w+");
 
   /* Note that according to the UNIX file semantic, the file
-     will not be removed by the next command, just its name
+     will not be removed by the next call, just its name
      is removed; the file will be automatically destroyed after
      the fclose, at the object destruction, or in case of FTS crash/quit.
      Note that this will not work on Windows :-> (but who care, anyway) */

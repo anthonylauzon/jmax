@@ -114,25 +114,10 @@ extern fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t nam
 
 extern void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
 
-/*
-  A variable wannabe is an object that want to redefine that variable.
-  If the original definer of the variable is delete, one wannabe
-  should be selected to become the new variable definer.
-  */
 
-extern void fts_variable_add_wannabe(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *wannabe);
-extern void fts_variable_remove_wannabe(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *wannabe);
-
-
-/* 
- * Convenience function to assign a value to a variable in a patcher.
- * The owner is the patch itself; the function is to be used for predefined
- * variables, created at the init time for the patcher.
- * 
- */
-
-extern void fts_variable_assign(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value);
 
 
 #endif
+
+
 

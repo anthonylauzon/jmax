@@ -25,7 +25,7 @@ extern void fts_objects_init(void);
 
 #define FTS_NO_ID  -1
 
-extern fts_object_t *fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+extern fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 extern void          fts_object_set_id(fts_object_t *obj, int id);
 extern void          fts_object_delete(fts_object_t *);
 extern void          fts_object_send_properties(fts_object_t *obj);
@@ -33,7 +33,7 @@ extern void          fts_object_send_ui_properties(fts_object_t *obj);
 
 /* This is only for object doctors (macros) */
 
-fts_status_t fts_make_object(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
+fts_status_t fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
 
 /* Change the object description; more "system" oriented */
 

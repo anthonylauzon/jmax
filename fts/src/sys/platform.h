@@ -35,6 +35,12 @@
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
 
+/* This macro is defined here because not all platforms have a isnanf macro (or function */
+
+#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
+			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
+
+
 /*********************************************************************
  *
  *  different SGI platforms
@@ -52,6 +58,12 @@
 #define VECLIB_LOOP_UNROLL 4
 #define FTS_HAS_BIG_ENDIAN
 
+/* This macro is defined here because not all platforms have a isnanf macro (or function */
+
+#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
+			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
+
+
 /*********************************************************************
  *
  *  SUN workstations solaris 2
@@ -64,6 +76,11 @@
 #define HAS_DTD
 #define HAS_UNIX
 #define FTS_HAS_BIG_ENDIAN
+
+/* This macro is defined here because not all platforms have a isnanf macro (or function */
+
+#define fts_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L)&& \
+			 ((*(long *)&(x) & 0x007fffffL)!=0x00000000L) )
 
 #else
 

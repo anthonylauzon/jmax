@@ -489,7 +489,7 @@ bus_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
 {
   bus_t *this = (bus_t *) obj;
 
-  fts_word_set_ptr(fts_get_value(value), (void *) this->bus);
+  fts_word_set_ptr(fts_atom_value(value), (void *) this->bus);
   fts_set_type(value, fts_s_bus);
 }
 

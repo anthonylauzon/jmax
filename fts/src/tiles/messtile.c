@@ -423,7 +423,7 @@ fts_mess_client_download_connection(int ac, const fts_atom_t *av)
       local id new-lid, and description args.
 
       Now new accept an empty argument list; in this case
-      fts_object_new produce an error object.
+      fts_eval_object_description produce an error object.
  */
 
 static void
@@ -447,7 +447,7 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
       
       id  = fts_get_int(&av[1]);
 
-      obj = fts_object_new(parent, ac - 2, av + 2);
+      obj = fts_eval_object_description(parent, ac - 2, av + 2);
       fts_object_set_id(obj, id);
     }
   else
