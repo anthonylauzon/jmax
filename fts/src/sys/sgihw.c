@@ -95,8 +95,10 @@ fts_platform_init(void)
       struct sched_param param;
   
       /* raise priority to a high value */
+      /* (fd) This priority value is not compliant with man(realtime) */
+      /* param.sched_priority  = sched_get_priority_max(SCHED_FIFO); */
 
-      param.sched_priority  = sched_get_priority_max(SCHED_FIFO);
+      param.sched_priority  = 199;
 
       if (sched_setscheduler(0, SCHED_FIFO, &param) < 0)
 	{
