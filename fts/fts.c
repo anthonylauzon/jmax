@@ -148,7 +148,10 @@ fts_load_project( void)
 
   /* check if the user specified a project file on the command line  */
   project_file = fts_cmd_args_get( fts_s_project);
-  project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+  if (project_file != NULL)
+  {
+    project_found = fts_file_exists( project_file) && fts_is_file( project_file);
+  }
 
   /* check if the user has a project file in the home directory  */
   if (!project_found)
