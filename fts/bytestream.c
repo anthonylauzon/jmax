@@ -94,6 +94,9 @@ static fts_symbol_t fts_s__superclass = 0;
 static fts_symbol_t fts_s_bytestream = 0;
 
 fts_class_t *fts_socketstream_class = 0;
+fts_class_t *fts_tcpstream_class = 0;
+fts_class_t *fts_udpstream_class = 0;
+
 fts_class_t *fts_pipestream_class = 0;
 fts_class_t *fts_memorystream_class = 0;
 
@@ -312,6 +315,171 @@ static void fts_socketstream_instantiate(fts_class_t *cl)
   fts_bytestream_class_init(cl);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, fts_socketstream_receive);
+}
+
+
+/***********************************************************************
+ *
+ * UDP bytestream
+ * (the object that implements a bidirectional byte stream over a TCP/IP socket) 
+ *
+ */
+#define FTS_UDP_DEFAULT_PORT 2023
+
+typedef struct _fts_udpstream_t 
+{
+  fts_socketstream_t socket_stream;
+  int port;
+} fts_udpstream_t;
+
+
+static void fts_udpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_socketstream_delete(o, winlet, s, ac, at);
+}
+
+static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_udpstream_t* self = (fts_udpstream_t*)o;
+  struct sockaddr_in addr;
+  int my_socket;
+  fts_atom_t a;
+
+  self->port = fts_get_int_arg(ac, at, 0, FTS_UDP_DEFAULT_PORT);
+  
+  my_socket = socket(AF_INET, SOCK_DGRAM, 0);
+  if (my_socket == INVALID_SOCKET)
+  {
+    fts_object_error(o, "Cannot create socket");
+    return;
+  }
+  
+  memset((char*)&addr, 0, sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_port = htons(self->port);
+  
+  if (bind(my_socket, (const struct sockaddr*)&addr, sizeof(struct sockaddr_in)) == SOCKET_ERROR)
+  {
+    fts_object_error(o, "Cannot bind socket");
+    CLOSESOCKET(my_socket);
+    return;
+  }
+
+  fts_set_int(&a, my_socket);
+  fts_socketstream_init(o, -1, 0, 1, &a);
+  fts_log( "[udpstream]:  on port %d\n", self->port);
+}
+
+
+static void fts_udpstream_instantiate(fts_class_t* cl)
+{
+  fts_class_init(cl, sizeof(fts_udpstream_t), fts_udpstream_init, fts_udpstream_delete);
+  fts_bytestream_class_init(cl);
+
+  fts_class_message_varargs(cl, fts_s_sched_ready, fts_socketstream_receive);
+}
+
+
+/***********************************************************************
+ *
+ * TCP bytestream
+ * (the object that implements a bidirectional byte stream over a TCP/IP socket) 
+ *
+ */
+#define FTS_TCP_DEFAULT_PORT 2023
+#define FTS_TCP_MAX_CLIENTS (1<<(32-OBJECT_ID_BITS))
+
+typedef struct _fts_tcpstream_t 
+{
+  fts_bytestream_t byte_stream;
+  fts_socketstream_t* socket_stream;
+  int port;
+  int max_clients;
+  int req_socket;
+  
+} fts_tcpstream_t;
+
+static void fts_tcpstream_select(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_tcpstream_t* self = (fts_tcpstream_t*)o;
+  int new_socket;
+  fts_atom_t a;
+  
+  new_socket = accept(self->req_socket, NULL, NULL);
+  
+  if (new_socket == INVALID_SOCKET)
+  {
+    fts_object_error(o, "Cannont accept() connection");
+    return;
+  }
+
+  /* create socketstream object */
+  fts_set_int(&a, new_socket);
+/*   self->socket_stream =  */
+  
+/*   fts_socketstream_init(o, ); */
+}
+
+static void fts_tcpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_tcpstream_t* self = (fts_tcpstream_t*)o;
+  
+  if (self->req_socket == INVALID_SOCKET)
+    return;
+
+  fts_sched_remove(o);
+  CLOSESOCKET(self->req_socket);
+}
+
+static void fts_tcpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_tcpstream_t* self = (fts_tcpstream_t*)o;
+  struct sockaddr_in addr;
+  
+  self->port = fts_get_int_arg(ac, at, 0, FTS_TCP_DEFAULT_PORT);
+  self->max_clients = fts_get_int_arg(ac, at, 1, FTS_TCP_MAX_CLIENTS);
+  
+  self->req_socket = socket(AF_INET, SOCK_STREAM, 0);
+  if (self->req_socket == INVALID_SOCKET)
+  {
+    fts_object_error(o, "Cannot create socket");
+    return;
+  }
+  
+  memset((char*)&addr, 0, sizeof(struct sockaddr_in));
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_port = htons(self->port);
+  
+  if (bind(self->req_socket, (const struct sockaddr*)&addr, sizeof(struct sockaddr_in)) == SOCKET_ERROR)
+  {
+    fts_object_error(o, "Cannot bind socket");
+    CLOSESOCKET(self->req_socket);
+    self->req_socket = INVALID_SOCKET;
+    return;
+  }
+  
+  if (listen(self->req_socket, self->max_clients) == SOCKET_ERROR)
+  {
+    fts_object_error(o, "Cannot listen on socket");
+    CLOSESOCKET(self->req_socket);
+    self->req_socket = INVALID_SOCKET;
+    return;
+  }
+  
+  fts_sched_add((fts_object_t*)self, FTS_SCHED_READ, self->req_socket);
+  
+  fts_log( "[tcpstream]: Listening on port %d\n", self->port);
+}
+
+
+static void fts_tcpstream_instantiate(fts_class_t* cl)
+{
+    fts_class_init(cl, sizeof(fts_tcpstream_t), fts_tcpstream_init, fts_tcpstream_delete);
+    fts_bytestream_class_init(cl);
+
+    fts_class_message_varargs(cl, fts_s_sched_ready, fts_tcpstream_select);
 }
 
 /***********************************************************************
@@ -620,7 +788,16 @@ void fts_kernel_bytestream_init( void)
   fts_s__superclass = fts_new_symbol("_superclass");
 
   fts_socketstream_class = fts_class_install( fts_new_symbol("socketstream"), fts_socketstream_instantiate);
+  fts_udpstream_class = fts_class_install( fts_new_symbol("udpstream"), fts_udpstream_instantiate);
+  fts_tcpstream_class = fts_class_install( fts_new_symbol("tpcstream"), fts_tcpstream_instantiate);
+
   fts_pipestream_class = fts_class_install( fts_new_symbol("pipestream"), fts_pipestream_instantiate);
   fts_memorystream_class = fts_class_install( fts_new_symbol("memorystream"), fts_memorystream_instantiate);
 }
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
