@@ -131,6 +131,13 @@ public class GraphicContext {
   {
   }
 
+    /**
+     * Called when the destination for the graphic operation is going to be
+     * closed */
+    public void destroy()
+    {
+    }
+
   /**
    * utility static function:
    * returns the Frame containing a component (why this function is not in AWT?)

@@ -55,6 +55,7 @@ public class DirectionChooser extends InteractionModule {
   {
     itsX = x;
     itsY = y;
+    InteractionSemaphore.lock();
   }
 
   //Mouse interface
@@ -69,6 +70,7 @@ public class DirectionChooser extends InteractionModule {
   public void mouseReleased(MouseEvent e)
   {
     itsListener.directionAbort();
+    InteractionSemaphore.unlock();
   }
  
   //--- Fields

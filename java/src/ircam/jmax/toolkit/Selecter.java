@@ -30,7 +30,8 @@ import java.awt.event.*;
 
 /**
  * A rubber-banding interaction module.
- * It takes care of drawing a "selection rectangle" in a 
+ * It communicates the point of selection (eventually, the double-click action), and
+ * takes care of drawing a "selection rectangle" in a 
  * component, and communicate the result to a GraphicSelectionListener
  */
 public class Selecter extends InteractionModule implements XORPainter {
@@ -56,8 +57,11 @@ public class Selecter extends InteractionModule implements XORPainter {
     int x = e.getX();
     int y = e.getY();
 
+    if (e.getClickCount() > 1) itsListener.selectionPointDoubleClicked(x, y, e.getModifiers());
     interactionBeginAt(x, y);
     itsListener.selectionPointChoosen(x, y, e.getModifiers());
+    InteractionSemaphore.lock();
+
   } 
 
 
@@ -71,6 +75,7 @@ public class Selecter extends InteractionModule implements XORPainter {
     itsXORHandler.beginAt(x, y);
     itsRunningG = gc.getGraphicDestination().getGraphics();
     active = true;
+    InteractionSemaphore.lock();
   }
 
   /**
@@ -100,6 +105,7 @@ public class Selecter extends InteractionModule implements XORPainter {
     itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
     active = false;
     itsRunningG.dispose();
+    InteractionSemaphore.unlock();
   }
 
 

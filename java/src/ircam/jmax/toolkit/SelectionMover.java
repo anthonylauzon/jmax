@@ -69,6 +69,7 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
   {
     itsStartingPoint.setLocation(x, y);
     itsXORHandler.beginAt(x, y);
+    InteractionSemaphore.lock();
   }
 
   /**
@@ -95,9 +96,9 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
       endX = e.getX();
     
     itsListener.dragEnd(endX, endY);
+    InteractionSemaphore.unlock();
   }
-
-
+    
   /**
    * from the XORPainter interface
    */

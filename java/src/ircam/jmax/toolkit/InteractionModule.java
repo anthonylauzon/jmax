@@ -146,11 +146,11 @@ public class InteractionModule implements MouseListener, MouseMotionListener, Ke
 
 
   //--------------- Fields
-  static InteractionModule currentActiveModule = null;
-  static boolean suspended = false;
+    static InteractionModule currentActiveModule = null;
+    static boolean suspended = false;
 
-  protected GraphicContext gc;
-
+    protected GraphicContext gc;
+    
 }
 
 
