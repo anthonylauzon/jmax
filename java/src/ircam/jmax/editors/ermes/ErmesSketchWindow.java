@@ -287,7 +287,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       int width=400;
       int height=400;
       Integer x1, y1, width1, height1;
-
+      String autorouting;
       //double check the existence of the window properties. If there aren't, use defaults
       
       x1 = (Integer) patcher.get("win.pos.x");
@@ -302,14 +302,15 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       height1 = (Integer) patcher.get("win.size.h");
       if (height1 == null) patcher.put("win.size.h", new Integer(height));
       else  height = height1.intValue();
-
+      
+      autorouting = (String) patcher.get("autorouting");
+      if (autorouting == null) patcher.put("autorouting", "on");
       //get the window dimension use it for: reshape to the right dimensions
 
-      setBounds(x, y, width, height+80);
+      setBounds(x, y, width, height/*+80*/);
 
       //assigning the autorouting mode.
 
-      System.err.println(patcher.get("autorouting"));
       if (((String)(patcher.get("autorouting"))).equals("on"))
 	SetAutorouting(true);
       else SetAutorouting(false);
@@ -1179,6 +1180,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   //--------------------------------------------------------
   public void SetAutorouting(boolean t){
     itsSketchPad.SetAutorouting(t);
+    itsAutoroutingMenu.setState(t);
   }
   
   private MenuItem getRunModeMenuItem() {
@@ -1241,6 +1243,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsPatcher.put("win.pos.y", aRect.y);
     itsPatcher.put("win.size.w", aRect.width);
     itsPatcher.put("win.size.h", aRect.height);
+
     if (itsSketchPad.doAutorouting) itsPatcher.put("autorouting", "on");
     else itsPatcher.put("autorouting", "off");
 
