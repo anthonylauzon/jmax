@@ -1,3 +1,7 @@
+2003-03-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* 4.0.2 released 
+
 2003-02-27  Francois Dechelle  <dechelle@mac-dechelle.ircam.fr>
 
 	* fixed Mac OS X audio port opening w.r.t. ports that are unidirectionnal.
