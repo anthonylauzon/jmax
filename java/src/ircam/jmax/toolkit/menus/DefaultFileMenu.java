@@ -59,7 +59,7 @@ public class DefaultFileMenu extends EditorMenu
 
     addSeparator();
     
-    dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_SPACE);
+    dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ENTER);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
   
     JMaxApplication.getRecentFileHistory().addListDataListener(new ListDataListener(){
