@@ -159,10 +159,11 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
     {
         TableAdapter a = ((TableGraphicContext)gc).getAdapter();
         Dimension size = gc.getGraphicDestination().getSize();
+        int X =  a.getInvX(x);
 
-        double width = Math.abs( a.getInvX(x) - a.getInvX(x+w));            
+        double width = Math.abs( X - a.getInvX(x+w));            
         a.setXZoom( a.findZoomRatioClosestTo((float)(size.width/width)));
-        ((TableGraphicContext)gc).scrollTo( a.getInvX(x));
+        ((TableGraphicContext)gc).scrollTo( X);
     }
     mountIModule(itsMouseTracker, tempX , tempY);
   }
