@@ -79,3 +79,7 @@ EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 INCLUDES=-I$(top_srcdir)/include
 AM_CFLAGS=
 
+# explicit dependency between expression.c and parser.h 
+# for first checkout
+expression.c: parser.h
+
