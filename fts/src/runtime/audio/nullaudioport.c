@@ -78,6 +78,11 @@ static void nullaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_timer_start( &this->timer);
 }
 
+static void nullaudioport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_audioport_delete( (fts_audioport_t *)o);
+}
+
 static void nullaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object( value, o);
@@ -87,6 +92,8 @@ static fts_status_t nullaudioport_instantiate(fts_class_t *cl, int ac, const fts
 {
   fts_class_init( cl, sizeof( nullaudioport_t), 0, 0, 0);
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, nullaudioport_init);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, nullaudioport_delete);
+
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, nullaudioport_get_state);
 
   return fts_Success;

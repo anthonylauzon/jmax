@@ -126,7 +126,6 @@ void fts_audioport_delete( fts_audioport_t *port)
 	    previous->next = current->next;
 	  else
 	    audioport_list = current->next;
-
 	  break;
 	}
 
@@ -215,16 +214,12 @@ static void audioportin_init( fts_object_t *o, int winlet, fts_symbol_t s, int a
   if ( ac == 1 && fts_is_ptr( at))
     this->port = (fts_audioport_t *)fts_get_ptr( at);
 
-( "Creating object audioportin for audioport \"%s\"\n", fts_symbol_name(fts_object_get_class_name( (fts_object_t *)this->port)));
-  
   fts_dsp_add_object(o);
 }
 
 static void audioportin_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_audioportin_t *this = (fts_audioportin_t *)o;
-
-  post( "Deleting object audioportin for audioport \"%s\"\n", fts_symbol_name(fts_object_get_class_name( (fts_object_t *)this->port)));
 
   fts_dsp_remove_object(o);
 }
@@ -300,16 +295,12 @@ static void audioportout_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   if ( ac == 1 && fts_is_ptr( at))
     this->port = (fts_audioport_t *)fts_get_ptr( at);
 
-  post( "Creating object audioportout for audioport \"%s\"\n", fts_symbol_name( fts_object_get_class_name( (fts_object_t *)this->port)));
-
   fts_dsp_add_object(o);
 }
 
 static void audioportout_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_audioportout_t *this = (fts_audioportout_t *)o;
-
-  post( "Deleting object audioportout for audioport \"%s\"\n", fts_symbol_name( fts_object_get_class_name( (fts_object_t *)this->port)));
 
   fts_dsp_remove_object(o);
 }
