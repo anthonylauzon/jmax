@@ -138,12 +138,17 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
         fts_client_send_message(obj, fts_s_name, 1, &a);
       }
     }
-    else if(fts_object_has_id(obj))
+    else 
     {
-      fts_atom_t a;
-
-      fts_set_symbol(&a, fts_s_empty_string);
-      fts_client_send_message(obj, fts_s_name, 1, &a);
+	/* we cleared the name since we have an empty string */
+	fts_object_remove_name(obj);
+	if(fts_object_has_id(obj))
+	{
+	    fts_atom_t a;
+	    
+	    fts_set_symbol(&a, fts_s_empty_string);
+	    fts_client_send_message(obj, fts_s_name, 1, &a);
+	}
     }
   }
 }
