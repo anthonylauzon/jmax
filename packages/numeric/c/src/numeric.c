@@ -26,14 +26,12 @@
 
 #include "fts.h"
 
-extern void range_config(void);
 extern void wrap_config(void);
 extern void rewrap_config(void);
 
 static void
 numeric_init(void)
 {
-  range_config();
   wrap_config();
   rewrap_config();
 }
