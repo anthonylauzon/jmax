@@ -11,7 +11,7 @@ JAVA_SRC_DIR=
 endif
 
 SUBDIRS=client fts include $(JAVA_SRC_DIR) packages bin images tutorials config utils help doc winbuild
-EXTRA_DIST= AUTHORS ChangeLog JMAX-VERSION LICENCE.fr LICENSE README LISEZMOI INSTALL.linux
+EXTRA_DIST= AUTHORS ChangeLog JMAX-VERSION COPYING README LISEZMOI INSTALL.linux
 
 #
 # TAGS
