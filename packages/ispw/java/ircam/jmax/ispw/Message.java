@@ -104,10 +104,15 @@ public class Message extends Editable implements FtsMessageListener, FtsIntValue
 
   public void messageChanged(String message)
   {
+      if(isEditing())
+	  itsSketchPad.abortTextEditing();
+
     redraw();
     redrawConnections();
 
-    super.redefine( message);
+    //super.redefine( message);
+    computeRenderer();
+    renderer.update();
 
     redraw();
     redrawConnections();

@@ -256,6 +256,15 @@ public class EditField extends JTextArea implements FocusListener
     owner = null;
   }
 
+  public void abortEdit() 
+  {
+    owner.setEditing(false);
+    getDocument().removeDocumentListener(listener);
+    setVisible(false);
+    owner.redraw();
+    owner.redrawConnections();
+  }
+
   /** Resize the box if needed; must be done in an invoke later,
     otherwise we get one character of error; don't ask me why
     */

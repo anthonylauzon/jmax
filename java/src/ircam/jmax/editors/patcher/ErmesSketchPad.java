@@ -591,7 +591,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 
   public void addNewObject(GraphicObject object, boolean doEdit)
   {
-    
     displayList.add( object);
 	
     if(object.getLayer() == -1)
@@ -691,6 +690,14 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   {
     if (editedObject != null)
       itsEditField.endEdit();
+
+    editedObject = null;
+  }
+
+  final public void abortTextEditing()
+  {
+    if (editedObject != null)
+      itsEditField.abortEdit();
 
     editedObject = null;
   }
