@@ -7,23 +7,24 @@ import ircam.jmax.fts.*;
 
 public class MaxWriterDataSource extends MaxDataSource
 {
-  Writer Writer;
+  Writer writer;
 
-  public MaxWriterDataSource(Writer Writer)
+
+  public MaxWriterDataSource(Writer writer)
   {
-    this.Writer = Writer;
+    this.writer = writer;
   }
 
   public Writer getWriter()
   {
-    return Writer;
+    return writer;
   }
 
   /** Return a name that can be used as document name */
 
   public String getName()
   {
-    return Writer.toString();
+    return writer.toString();
   }
 
   public boolean exists()
