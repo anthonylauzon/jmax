@@ -332,8 +332,6 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   public void sliderDown(Point mouse)
   {  
-    System.err.println("ErmesObjSlider: gotMouseDown " + mouse);
-
     int x, y;
 
     x = mouse.x;
@@ -370,8 +368,6 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   public void sliderDrag(Point mouse)
   {
-    System.err.println("ErmesObjSlider: gotMouseDrag " + mouse);
-
     int x, y;
 
     x = mouse.x;
@@ -423,18 +419,12 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    switch (squeack)
-      {
-      case Squeack.DOWN:
-	sliderDown(mouse);
-	break;
-      case Squeack.DRAG:
-	sliderDrag(mouse);
-	break;
-      case Squeack.UP:
-	sliderUp(mouse);
-	break;
-      }
+    if (Squeack.isDown(squeack))
+      sliderDown(mouse);
+    else if (Squeack.isDrag(squeack))
+      sliderDrag(mouse);
+    else if (Squeack.isUp(squeack))
+      sliderUp(mouse);
   }
 	
 

@@ -158,7 +158,8 @@ final class InputFilter implements MouseMotionListener, MouseListener
 
     autoScrollIfNeeded(squeack, mouse, oldMouse);
 
-    engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
+    if (! scrollTimer.isRunning())
+      engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
   }
 
   // Scroll handling
@@ -169,11 +170,12 @@ final class InputFilter implements MouseMotionListener, MouseListener
   Timer scrollTimer;
   ScrollDragAction scroller;
   boolean autoScroll = false;
+  final private static int scrollMargin = 5;
 
   private void initAutoScroll()
   {
     scroller    = new ScrollDragAction();
-    scrollTimer = new Timer(50, scroller);
+    scrollTimer = new Timer(10, scroller);
     scrollTimer.setCoalesce(true);
     scrollTimer.setRepeats(true);
   }
@@ -193,21 +195,32 @@ final class InputFilter implements MouseMotionListener, MouseListener
     int squeack;
     Point timerMouse = new Point();
     Point oldTimerMouse = new Point();
-    
+    Point direction  = new Point();
+
     public void actionPerformed(ActionEvent evt)
     {
-      // Scroll slowly, 5 points toward mouse
+      // Three case: inside the margin, going outside
+      // outside the window, inside the margin
+      // The third is not handled because this method
+      // is never called in this case.
 
-      sketch.scrollToward(timerMouse, 5);
+      if (! sketch.pointIsVisible(timerMouse, scrollMargin))
+	{
+	  // The point is in the margin (visible in the window,
+	  // not visible if we take out the margin
 
-      // Deliver a syntetic event to the interaction
+	  engine.getInteraction().gotSqueack(squeack, null, timerMouse, oldTimerMouse);
 
-      engine.getInteraction().gotSqueack(squeack, null, timerMouse, oldTimerMouse);
+	  sketch.whereItIs(timerMouse, direction, scrollMargin);
 
-      // Add the current point to the mouse history
+	  sketch.scrollBy(direction.x * 3, direction.y * 3);
 
-      addPoint(timerMouse);
+	  addPoint(timerMouse);
+	  timerMouse.x = timerMouse.x + direction.x * 3;
+	  timerMouse.y = timerMouse.y + direction.y * 3;
+	}
     }
+
 
     void setSqueack(int squeack)
     {
@@ -219,17 +232,24 @@ final class InputFilter implements MouseMotionListener, MouseListener
       oldTimerMouse.setLocation(timerMouse);
       timerMouse.setLocation(mouse);
     }
+
+    void addPoint(int x, int y)
+    {
+      oldTimerMouse.setLocation(timerMouse);
+      timerMouse.setLocation(x, y);
+    }
   }
 
   void autoScrollIfNeeded(int squeack, Point mouse, Point oldMouse)
   {
     // Handle the auto scrolling and autoresizing
 
-    if (isAutoScrolling() && Squeack.isDrag(squeack) && (! sketch.pointIsVisible(mouse)))
+    if (isAutoScrolling() && Squeack.isDrag(squeack) &&
+	(! sketch.pointIsVisible(mouse, scrollMargin)))
       {
 	if (scrollTimer.isRunning())
 	  {
-	    scroller.addPoint(mouse);
+	    // Ignore
 	  }
 	else
 	  {
@@ -237,7 +257,6 @@ final class InputFilter implements MouseMotionListener, MouseListener
 	    scroller.addPoint(oldMouse);
 	    scroller.addPoint(mouse);
 	    scrollTimer.start();
-	    System.err.println("Started Timer");
 	  }
       }
     else 
@@ -245,7 +264,6 @@ final class InputFilter implements MouseMotionListener, MouseListener
 	if (scrollTimer.isRunning())
 	  {
 	    scrollTimer.stop();
-	    System.err.println("Stopped Timer");
 	  }
       }
   }
@@ -289,6 +307,7 @@ final class InputFilter implements MouseMotionListener, MouseListener
   {
   }
 }
+
 
 
 

@@ -87,7 +87,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    if ((squeack & Squeack.DOWN) != 0)
+    if (Squeack.isDown(squeack))
       {
 	velocity = 0;
 	previousVelocity = 0;
@@ -100,7 +100,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	redraw();
 
       }
-    else if ((squeack & Squeack.UP) != 0)
+    else if (Squeack.isUp(squeack))
       {
 	velocity = 0;
 	previousVelocity = 0;
@@ -110,7 +110,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	Fts.sync();
 	redraw();
       }
-    else if ((squeack & Squeack.DRAG) != 0)
+    else if (Squeack.isDrag(squeack))
       {
 	previousVelocity = velocity;
 	velocity = (previousY- mouse.y);
@@ -126,7 +126,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	else
 	  increment = velocity/1000;
 
-	if (squeack & Squeack.SHIFT)
+	if (Squeack.isShift(squeack))
 	  increment*=10;
 
 	itsFloat += increment;

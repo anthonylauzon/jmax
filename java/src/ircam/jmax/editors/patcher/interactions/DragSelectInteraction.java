@@ -29,12 +29,11 @@ class DragSelectInteraction extends SubInteraction
     // but by the master interaction filter.
 
     filter.setFollowingMoves(true);
+    filter.setAutoScrolling(true);
   }
 
   void gotSqueack(int squeack, DisplayObject object, Point mouse, Point oldMouse)
   {
-    System.err.println("Drag to mouse: " + mouse);
-
     switch (squeack)
       {
       case (Squeack.DOWN | Squeack.BACKGROUND):

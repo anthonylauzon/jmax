@@ -373,32 +373,18 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   }
 
 
-  public boolean pointIsVisible(Point point)
+  public boolean pointIsVisible(Point point, int margin)
   {
     Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
 
-    return ((point.x >= r.x) && (point.x < r.x + r.width) &&
-	    (point.y >= r.y) && (point.y < r.y + r.height));
+    return ((point.x > r.x + margin) && (point.x < r.x + r.width - margin) &&
+	    (point.y > r.y + margin) && (point.y < r.y + r.height - margin));
   }
 
-  public void scrollToward(Point point, int howMuch)
+
+  public void scrollBy(int dx, int dy)
   {
     Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
-    int dx = 0;
-    int dy = 0;
-
-    System.err.println("scrollToward point " + point + " viewrect " + r);
-    // Vertical dimension
-
-    if (point.x < r.x)
-      dx = (-1) * howMuch;
-    else if (point.x > r.x + r.width)
-      dx = howMuch;
-
-    if (point.y < r.y)
-      dy = (-1) * howMuch;
-    else if (point.y > r.y + r.height)
-      dy = howMuch;
 
     r.x = r.x + dx;
     r.y = r.y + dy;
@@ -406,8 +392,28 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     scrollRectToVisible(r);
 
     revalidate(); // ???
+  }
 
-    System.err.println("Scrolled dx " + dx + " dy " + dy);
+  public Point whereItIs(Point point, Point direction, int margin)
+  {
+    Rectangle r = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+
+    direction.x = 0;
+    direction.y = 0;
+
+    // Vertical dimension
+
+    if (point.x <= r.x + margin)
+      direction.x = -1;
+    else if (point.x >= r.x + r.width - margin)
+      direction.x = 1;
+
+    if (point.y <= r.y + margin)
+      direction.y = -1;
+    else if (point.y >= r.y + r.height - margin)
+      direction.y = 1;
+
+    return direction;
   }
 
   // if the selection is outside the current visible 

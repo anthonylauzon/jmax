@@ -95,21 +95,20 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    switch (squeack)
+    if (Squeack.isDown(squeack))
       {
-      case Squeack.DOWN:
 	itsFtsObject.sendMessage( 0, "bang", null);
 	itsFlashing = true;
 	redraw();
-	break;
-      case Squeack.UP:
+      }
+    else if (Squeack.isUp(squeack))
+      {
 	if (itsFlashing) 
 	  {
 	    itsFlashing = false;
 
 	    redraw();
 	  }
-	break;
       }
   }
 

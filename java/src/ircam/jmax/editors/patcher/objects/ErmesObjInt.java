@@ -70,24 +70,23 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    switch (squeack)
+    if (Squeack.isDown(squeack))
       {
-      case Squeack.DOWN:
-	itsFirstY = mouse.x;
+	itsFirstY = mouse.y;
 	itsStartingY = itsInteger;
 	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
 	dragged = false;
-	break;
-
-      case Squeack.DRAG:
+      }
+    else if (Squeack.isDrag(squeack))
+      {
 	state = 2;
 	itsInteger = itsStartingY + (itsFirstY - mouse.y);
 	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
 	redraw();
 	dragged = true;
-	break;
-
-      case Squeack.UP:
+      }
+    else if (Squeack.isUp(squeack))
+      {
 	Fts.sync();
 
 	if (! dragged)
@@ -96,9 +95,8 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
 	    itsSketchPad.setKeyEventClient( this);
 	  }
 
-	itsFirstY = mouse.x;
+	itsFirstY = mouse.y;
 	redraw();
-	break;
       }
   }
 }

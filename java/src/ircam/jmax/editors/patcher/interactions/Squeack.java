@@ -11,13 +11,13 @@ public class Squeack
 
   // mouse action; 4 bit reserved
 
-  static final public int MOVE         = 0x1;
-  static final public int DRAG         = 0x2;
-  static final public int DOWN         = 0x3;
-  static final public int UP           = 0x4;
-  static final public int DOUBLE_CLICK = 0x5;
+  static final int MOVE         = 0x1;
+  static final int DRAG         = 0x2;
+  static final int DOWN         = 0x3;
+  static final int UP           = 0x4;
+  static final int DOUBLE_CLICK = 0x5;
 
-  static final public int MOUSE_MASK  = 0xf;
+  static final int MOUSE_MASK  = 0xf;
 
 
   static final public boolean isMove(int squeack)
@@ -47,11 +47,11 @@ public class Squeack
 
   // Modifiers, 4 bit reserved, multiple value possible, but not currently generated
 
-  static final public int SHIFT    = 0x10;
-  static final public int CTRL     = 0x20;
-  static final public int ALT      = 0x40;
+  static final int SHIFT    = 0x10;
+  static final int CTRL     = 0x20;
+  static final int ALT      = 0x40;
 
-  static final public int MODIFICATION_MASK     = 0xf0;
+  static final int MODIFICATION_MASK     = 0xf0;
 
   static final public boolean isShift(int squeack)
   {
@@ -70,16 +70,16 @@ public class Squeack
 
   // Location, 8 bit reserved
 
-  static final public int UNKNOWN    = 0x0000;
-  static final public int BACKGROUND = 0x0100;
-  static final public int OBJECT     = 0x0200;
-  static final public int CONNECTION = 0x0300;
-  static final public int HRESIZE_HANDLE = 0x0400;
-  static final public int VRESIZE_HANDLE = 0x0500;
-  static final public int INLET      = 0x0600;
-  static final public int OUTLET     = 0x0700;
+  static final int UNKNOWN    = 0x0000;
+  static final int BACKGROUND = 0x0100;
+  static final int OBJECT     = 0x0200;
+  static final int CONNECTION = 0x0300;
+  static final int HRESIZE_HANDLE = 0x0400;
+  static final int VRESIZE_HANDLE = 0x0500;
+  static final int INLET      = 0x0600;
+  static final int OUTLET     = 0x0700;
 
-  static final public int LOCATION_MASK       = 0xff00;
+  static final int LOCATION_MASK       = 0xff00;
 
   static final public boolean onUnknown(int squeack)
   {

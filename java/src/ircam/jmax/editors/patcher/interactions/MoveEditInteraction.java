@@ -55,7 +55,7 @@ class MoveEditInteraction extends SubInteraction
 
       case Squeack.DRAG:
 	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
-	//engine.getSketch().fixSize(); TMP Comment
+	engine.getSketch().fixSize(); 
 	editAtUp = false;
 	break;
 

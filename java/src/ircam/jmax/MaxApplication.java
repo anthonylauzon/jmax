@@ -255,9 +255,9 @@ public class MaxApplication extends Object
 
     ircam.jmax.editors.console.ConsoleModule.initModule();
 
-    //if (getProperty("new") != null)
-    // ircam.jmax.editors.patcher.ErmesModule.initModule();
-    // else
+    if (getProperty("new") != null)
+     ircam.jmax.editors.patcher.ErmesModule.initModule();
+    else
       ircam.jmax.editors.ermes.ErmesModule.initModule();
 
     ircam.jmax.editors.control.ControlModule.initModule();

@@ -107,7 +107,6 @@ class IdleEditInteraction extends Interaction
 	break;
       case (Squeack.DOWN | Squeack.VRESIZE_HANDLE):
 	// Vertical Resize 
-	System.err.println("gotMouseDownOnVResize area " +  object);
 	engine.setInteraction(vResizeInteraction);
 	engine.getInteraction().gotSqueack(squeack, object, mouse, oldMouse);
 	break;

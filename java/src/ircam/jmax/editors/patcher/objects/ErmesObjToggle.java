@@ -56,7 +56,7 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    if (squeack == Squeack.DOWN)
+    if (Squeack.isDown(squeack))
       {
 	itsToggled = !itsToggled;
 	((FtsIntValueObject)itsFtsObject).setValue(itsToggled ? 1 : 0);
