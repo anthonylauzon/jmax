@@ -59,7 +59,7 @@ class FtsSocketStream extends FtsStream
       }
     catch (IOException e)
       {
-	System.out.println("Couldn't get I/O for the connection to " + host + ":" + port);
+	System.out.println("Can't get I/O for the connection to " + host + ":" + port);
       }    
   }
 

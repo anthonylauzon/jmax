@@ -34,19 +34,18 @@
  * to tables and table~s
  */
 
-static fts_hash_table_t global_name_table; /* the name binding table */
+static fts_hash_table_t ispw_name_table; /* the name binding table */
 
 fts_object_t *
 ispw_get_object_by_name(fts_symbol_t name)
 {
   fts_atom_t d;
 
-  if (fts_hash_table_lookup(&global_name_table, name, &d))
+  if (fts_hash_table_lookup(&ispw_name_table, name, &d))
     return  (fts_object_t *) fts_get_object(&d);
   else
     return 0;
 }
-
 
 void 
 ispw_register_named_object(fts_object_t *obj, fts_symbol_t name)
@@ -54,60 +53,28 @@ ispw_register_named_object(fts_object_t *obj, fts_symbol_t name)
   fts_atom_t a;
 
   fts_set_object(&a, obj);
-  fts_hash_table_insert(&global_name_table, name, &a);
+  fts_hash_table_insert(&ispw_name_table, name, &a);
 }
 
 void 
 ispw_unregister_named_object(fts_object_t *obj, fts_symbol_t name)
 {
-  fts_hash_table_remove(&global_name_table, name);
+  fts_hash_table_remove(&ispw_name_table, name);
 }
 
-
-/* Return true (!= 0) if the named argument correspond to a receive or
-   to a named object */
-
-int 
-ispw_named_object_exists(fts_symbol_t name)
+fts_object_t *
+ispw_get_target(fts_patcher_t *scope, fts_symbol_t name)
 {
-  if (ispw_receive_exists(name))
-    return 1;
+  fts_label_t *label = fts_label_get(scope, name);
+  
+  if(fts_label_is_connected(label))
+    return (fts_object_t *)label;
   else
-    {
-      fts_atom_t d;
-
-      if (fts_hash_table_lookup(&global_name_table, name, &d))
-	return  1;
-      else
-	return 0;
-    }
-}
-
-/* Utility to send a message to a named object;
-   first, check if there is a receive with the good name,
-   and in that case send to it; otherwise, send to the named
-   object; messages are always sent to inlet zero.
-   */
-
-
-void 
-ispw_named_object_send(fts_symbol_t name, fts_symbol_t s, int argc, const fts_atom_t *argv)
-{
-  if (ispw_receive_exists(name))
-    ispw_send_message_to_receives(name, s, argc, argv);
-  else
-    {
-      fts_atom_t d;
-
-      if (fts_hash_table_lookup(&global_name_table, name, &d))
-	fts_message_send((fts_object_t *) fts_get_object(&d), fts_SystemInlet,  s, argc, argv);
-    }
+    return ispw_get_object_by_name(name);
 }
 
 void 
 ispw_naming_init(void)
 {
-  fts_hash_table_init(&global_name_table);
+  fts_hash_table_init(&ispw_name_table);
 }
-
-

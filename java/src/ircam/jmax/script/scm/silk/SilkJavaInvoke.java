@@ -75,7 +75,7 @@ public class SilkJavaInvoke extends Procedure {
 	    arg = listToVector(rest(rest(list)));
 	    m = dispatch(methodName, claz, arg);
 	    if (m == null) {
-		throw new RuntimeException("Couldn't find the method");
+		throw new RuntimeException("Can't find the method");
 	    }
 	    Object r = m.invoke(obj, arg);
 	    return r;

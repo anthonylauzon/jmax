@@ -317,7 +317,7 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       if(fd < 0)
 	{
-	  post("filestream: couldn't open %s (%s)\n", fts_symbol_name(name), strerror(errno));
+	  fts_object_set_error(o, "filestream: Can't open file \"%s\" (%s)\n", fts_symbol_name(name), strerror(errno));
 	  return;
 	}
 

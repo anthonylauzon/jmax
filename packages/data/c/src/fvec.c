@@ -178,10 +178,10 @@ fvec_grow(fvec_t *vec, int size)
 {
   int alloc = vec->alloc;
 
-  while(size > alloc)
+  while(!alloc || size > alloc)
     alloc += FVEC_BLOCK_SIZE;
 
-  fvec_set_size(vec, alloc);
+  set_size(vec, alloc);
 }
 
 int 
@@ -192,27 +192,28 @@ fvec_read_atom_file(fvec_t *vec, fts_symbol_t file_name)
   fts_atom_t a;
   char c;
 
-  if(!file)
-    return -1;
-  
-  while(fts_atom_file_read(file, &a, &c))
+  if(file)
     {
-      if(n >= vec->alloc)
-	fvec_grow(vec, n);
-
-      if(fts_is_number(&a))
-	fvec_set_element(vec, n, fts_get_number_float(&a));
-      else
-	fvec_set_element(vec, n, 0.0f);
-	
-      n++;
+      while(fts_atom_file_read(file, &a, &c))
+	{
+	  if(n >= vec->alloc)
+	    fvec_grow(vec, n);
+	  
+	  if(fts_is_number(&a))
+	    fvec_set_element(vec, n, fts_get_number_float(&a));
+	  else
+	    fvec_set_element(vec, n, 0.0f);
+	  
+	  n++;
+	}
+      
+      if(n > 0)
+	fvec_set_size(vec, n);
+      
+      fts_atom_file_close(file);
     }
-
-  fvec_set_size(vec, n);
   
-  fts_atom_file_close(file);
-
-  return (n);
+  return n;
 }
 
 int
@@ -319,7 +320,7 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fvec_read_atom_file(this, file_name);
       
       if(size <= 0)
-	post("fvec: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
+	post("fvec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("fvec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
@@ -341,7 +342,7 @@ fvec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fvec_write_atom_file(this, file_name);
       
       if(size < 0)
-	post("fvec: can not export to text file \"%s\"\n", fts_symbol_name(file_name));
+	post("fvec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("fvec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
@@ -380,19 +381,11 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  fts_soundfile_close(sf);
 
 	  if(size <= 0)
-	    post("fvec: can not load from soundfile \"%s\"\n", fts_symbol_name(file_name));
+	    post("fvec: can't load from soundfile \"%s\"\n", fts_symbol_name(file_name));
 	  
 	  return;
 	}
     }
-}
-
-static void
-fvec_set_file(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  fvec_t *this = (fvec_t *)o;
-
-  fvec_load(o, 0, 0, 1, value);
 }
 
 static void
@@ -426,10 +419,10 @@ fvec_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t
 	  fts_soundfile_close(sf);
 
 	  if(size <= 0)
-	    post("fvec: can not save to soundfile \"%s\"\n", fts_symbol_name(file_name));
+	    post("fvec: can't save to soundfile \"%s\"\n", fts_symbol_name(file_name));
 	}
       else
-	post("fvec: can not open soundfile to write \"%s\"\n", fts_symbol_name(file_name));
+	post("fvec: can't open soundfile to write \"%s\"\n", fts_symbol_name(file_name));
     }
 }
 
@@ -597,6 +590,10 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ac--;
   at++;
 
+  this->values = 0;
+  this->size = 0;
+  this->alloc = 0;
+
   if(ac == 0)
     fvec_alloc(this, 0);
   else if(ac == 1 && fts_is_int(at))
@@ -609,11 +606,41 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fvec_alloc(this, size);
       fvec_set_from_atom_list(this, 0, size, fts_list_get_ptr(aa));
     }
+  else if(ac == 1 && fts_is_symbol(at))
+    {
+      fts_symbol_t file_name = fts_get_symbol(at);
+      fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, 0, 0, 0);
+      int size = 0;
+      
+      if(sf) /* soundfile successfully opened */
+	{
+	  float *ptr;
+	  
+	  size = fts_soundfile_get_size(sf);
+	  
+	  fvec_set_size(this, size);
+	  ptr = fvec_get_ptr(this);
+	  
+	  size = fts_soundfile_read_float(sf, ptr, size);
+	  fvec_set_size(this, size);
+
+	  fts_soundfile_close(sf);
+	  
+	  return;
+	}
+      else
+	size = fvec_read_atom_file(this, file_name);
+
+      if(size == 0)
+	fts_object_set_error(o, "can't load from file \"%s\"", fts_symbol_name(file_name));
+    }
   else if(ac > 1)
     {
       fvec_alloc(this, ac);
       fvec_set_from_atom_list(this, 0, ac, at);
     }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void
@@ -621,56 +648,43 @@ fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fvec_t *this = (fvec_t *)o;
   
-  fts_free(this->values);
-}
-
-static int
-fvec_check(int ac, const fts_atom_t *at)
-{
-  return (ac == 0 || (ac == 1 && (fts_is_int(at) || fts_is_list(at))) || (ac > 1));
+  if(this->values)
+    fts_free(this->values);
 }
 
 static fts_status_t
 fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(fvec_check(ac - 1, at + 1))
-    {
-      fts_class_init(cl, sizeof(fvec_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fvec_t), 1, 1, 0);
   
-      /* init / delete */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fvec_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fvec_delete);
+  /* init / delete */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fvec_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fvec_delete);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fvec_print); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fvec_assist); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, fvec_print); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fvec_assist); 
+  
+  /* define variable */
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), fvec_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), fvec_fill);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fvec_set);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("size"), fvec_size);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("import"), fvec_import);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("export"), fvec_export);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("load"), fvec_load);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("save"), fvec_save);
+  
+  /* type outlet */
+  fts_outlet_type_define(cl, 0, fvec_symbol, 1, &fvec_type);      
 
-      /* define variable */
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
-
-      /* load file at init */
-      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("file"), fvec_set_file);
-
-      fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), fvec_clear);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), fvec_fill);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fvec_set);
-      
-      fts_method_define_varargs(cl, 0, fts_new_symbol("size"), fvec_size);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("import"), fvec_import);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("export"), fvec_export);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("load"), fvec_load);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("save"), fvec_save);
-      
-      /* type outlet */
-      fts_outlet_type_define(cl, 0, fvec_symbol, 1, &fvec_type);      
-
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
+  return fts_Success;
 }
 
 /********************************************************************
@@ -679,12 +693,6 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *
  */
 
-static int
-fvec_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return fvec_check(ac1 - 1, at1 + 1);
-}
-
 void 
 fvec_config(void)
 {
@@ -692,7 +700,7 @@ fvec_config(void)
   fvec_symbol = fts_new_symbol("fvec");
   fvec_type = fvec_symbol;
 
-  fts_metaclass_install(fvec_symbol, fvec_instantiate, fvec_equiv);
+  fts_class_install(fvec_symbol, fvec_instantiate);
   fvec_class = fts_class_get_by_name(fvec_symbol);
 
   fts_atom_type_register(fvec_symbol, fvec_class);

@@ -184,14 +184,15 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   time_over[idx] = now + dur - this->half_tick;
 
   {
-    fts_object_t *rec;
     int iArg = (ac <= n_args)? ac: n_args;
+    fts_label_t *label = fts_label_get(fts_object_get_patcher(o), sym_receive[idx]);
 
     while (iArg--) list_store[iArg] = at[iArg];
 	
-
-    if (! ispw_send_message_to_receives(sym_receive[idx], fts_s_list, n_args, list_store))
-      post("%s: no receive: %s\n", CLASS_name, fts_symbol_name(sym_receive[idx]));
+    if(fts_label_is_connected(label))
+      fts_label_send(label, fts_s_list, n_args, list_store);
+    else
+      post("%s: label \"%s\" not found\n", CLASS_name, fts_symbol_name(sym_receive[idx]));
   }
 
   idx++;

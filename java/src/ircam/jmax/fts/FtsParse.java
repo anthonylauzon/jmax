@@ -186,8 +186,8 @@ public class FtsParse
 	    (c == '(') || (c == ')') ||
 	    (c == '[') || (c == ']') ||
 	    (c == '{') || (c == '}') ||
-	    (c == ':') ||
-	    (c == ';') || (c == '\''));
+	    (c == ':') || (c == ';') || 
+	    (c == '=') || (c == '\''));
   }
 
   /** Identify the lexical char quote character */
@@ -296,7 +296,7 @@ public class FtsParse
     String keywords[] = { "(", ")",
 			  "[", "]", "{", "}", ",", 
 			  "::", ":", "$", ".",
-			  ";", "'"};
+			  ";", "'", "=" };
 
     tryParse();
 
@@ -680,7 +680,7 @@ public class FtsParse
     if (value.type == value.STRING)
       {
 	String keywords[] = {"+", "-", "*", "/", "%", 
-			     "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", "^",
+			     "&&", "&", "||", "|", "==", "!=", "!", ">=", "^",
 			     ">>", ">", "<<", "<=", "<", "?", "::", ":" };
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -698,7 +698,7 @@ public class FtsParse
   {
     if (value instanceof String)
       {
-	String keywords[] = {")", "[", "]", "}", ",", ";", "."};
+	String keywords[] = {")", "[", "]", "}", ",", ";", ".", "="};
 
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -715,7 +715,7 @@ public class FtsParse
   {
     if (value.type == value.STRING)
       {
-	String keywords[] = {")", "[", "]", "}", ",", ";", "."};
+	String keywords[] = {")", "[", "]", "}", ",", ";", ".", "="};
 
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -752,7 +752,7 @@ public class FtsParse
     if (value.type == value.STRING)
       {
 	String keywords[] = { "+", "-", "*", "/", "%", 
-			      ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=",
+			      ",", "&&", "&", "||", "|", "==", "!=", "!", ">=",
 			      ">>", ">", "<<", "<=", "<", "?", "::", ":", "^",
 			      ";" };
 
@@ -771,7 +771,7 @@ public class FtsParse
     if (value instanceof String)
       {
 	String keywords[] = { "(", "[", "{", 
-			      "$", "'", "." };
+			      "$", "'", "." , "=" };
 
 	for (int i = 0 ; i < keywords.length; i++)
 	  if (keywords[i].equals((String) value))
@@ -788,7 +788,7 @@ public class FtsParse
     if (value.type == value.STRING)
       {
 	String keywords[] = { "(", "[", "{", 
-			      "$", "'", "." };
+			      "$", "'", ".", "=" };
 
 	for (int i = 0 ; i < keywords.length; i++)
 	  if (keywords[i].equals(value.stringValue))
@@ -805,7 +805,7 @@ public class FtsParse
     String keywords[] = { "(", ")",
 			  "[", "]", "{", "}", ",", 
 			  "::", ":", "$", ".",
-			  ";", "'" };
+			  ";", "'", "=" };
     
     for (int i = 0 ; i < keywords.length; i++)
       if (keywords[i].equals((String) value))

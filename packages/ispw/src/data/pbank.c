@@ -60,9 +60,7 @@ typedef struct
    pbank_data can be unnamed, in such case they are not put in the table.
 */
 
-
 /* read and write pbank files */
-
 static int 
 pbank_data_read_file(pbank_data_t *data, fts_symbol_t file_name)
 {
@@ -321,6 +319,15 @@ typedef struct
 } pbank_t;
 
 static void
+pbank_send_message_to_label(pbank_t *this, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t name = this->receives[i];
+  fts_label_t *label = fts_label_get(fts_object_get_patcher((fts_object_t *)this), name);
+
+  fts_label_send(label, s, ac, at);
+}
+
+static void
 pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pbank_t *this = (pbank_t *)o;
@@ -504,7 +511,7 @@ pbank_get_row_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       fts_atom_t *atom = row + j;
 
       this->data->buffer[j] = *atom;
-      ispw_send_message_to_receives(this->receives[j], fts_get_selector(atom), 1, atom);
+      pbank_send_message_to_label(this, j, fts_get_selector(atom), 1, atom);
     }
 }
 
@@ -577,7 +584,7 @@ pbank_recall_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       fts_atom_t *atom = row + j;
 
       this->data->buffer[j] = *atom;
-      ispw_send_message_to_receives(this->receives[j], fts_get_selector(atom), 1, atom);
+      pbank_send_message_to_label(this, j, fts_get_selector(atom), 1, atom);
     }
 }
 
@@ -684,7 +691,7 @@ pbank_set_and_get_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   if(ac == 2) 
     /* read atom from matrix and send to receives */
-    ispw_send_message_to_receives(this->receives[j], fts_get_selector(atom), 1, atom);
+    pbank_send_message_to_label(this, j, fts_get_selector(atom), 1, atom);
   else
     {
       /* write atom to matrix */

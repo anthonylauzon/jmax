@@ -156,17 +156,17 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 
   enum {ev_get_dst, ev_get_first_arg, ev_get_args, ev_got_first, ev_end} ev_status; /* the ev machine  */
 
-  fts_symbol_t ev_dest_name = 0;
-  int ev_dest_is_name = 0;
-  fts_atom_t   *ev_fp;		/* frame pointer */
-  int           ev_argc;
+  int ev_dest_is_object = 0;
+  fts_atom_t *ev_fp;		/* frame pointer */
+  int ev_argc;
   fts_symbol_t ev_sym = 0;	/* the message symbol */
+  fts_object_t *target = 0;
 
   /* LOCAL MACRO for the evaluation engine */
 
 #define SEND_MESSAGE \
-  if (ev_dest_is_name) \
-    ispw_named_object_send(ev_dest_name, ev_sym, ev_argc, ev_fp); \
+  if (ev_dest_is_object) \
+    { if(target) fts_message_send((fts_object_t *)target, fts_SystemInlet, ev_sym, ev_argc, ev_fp); } \
   else \
     fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
 
@@ -378,11 +378,12 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 		    {
 		      fts_symbol_t target_name = fts_get_symbol(lex_out_value);
 
-		      ev_dest_is_name = 1;
-		      ev_dest_name = target_name;
+		      ev_dest_is_object = 1;
 		      ev_status = ev_get_first_arg;
 
-		      if (! ispw_named_object_exists(target_name))
+		      target = ispw_get_target(fts_object_get_patcher((fts_object_t *)this), target_name);
+
+		      if (!target)
 			post("messbox: invalid message destination \"%s\"\n", fts_symbol_name(target_name));
 		    }
 		  else
@@ -519,7 +520,7 @@ static int messbox_list_is_primitive(int ac, const fts_atom_t *at)
     {
       if(fts_is_object(at + i))
 	{
-	  post("messbox: can not set value of type <%s>\n", fts_symbol_name(fts_get_selector(at + i)));
+	  post("messbox: can't set value of type <%s>\n", fts_symbol_name(fts_get_selector(at + i)));
 	  return 0;
 	}
     }

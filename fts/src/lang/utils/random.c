@@ -83,6 +83,12 @@ fts_random(void)
   return seed;
 }
 
+/**********************************************************************
+ *
+ * float random between -1. and 1.
+ *
+ */
+
 #if defined(HAS_IEEE_FLOAT)
 
 typedef union

@@ -470,7 +470,7 @@ wacom_init_timeout(fts_alarm_t *alarm, void *o)
   if(this->init_trials-- > 0)
     wacom_init_start(this);
   else
-    post("wacom: couldn't init device (request timeout)\n");
+    post("wacom: can't init device (request timeout)\n");
 }
 
 /************************************************************
@@ -496,40 +496,6 @@ wacom_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  *
  */
 
-static void
-wacom_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  wacom_t *this = (wacom_t *)o;
-
-  this->stream = (fts_bytestream_t *)fts_get_object(at + 1);
-
-  this->index = 0;
-
-  this->x = 0;
-  this->y = 0;
-  this->z = 0;
-  this->tilt_x = 0;
-  this->tilt_y = 0;
-
-  this->b1 = 0;
-  this->b2 = 0;
-  this->b3 = 0;
-  this->b4 = 0;
-
-  fts_alarm_init(&this->alarm, 0, wacom_init_timeout, (void *)this);
-  this->init_trials = WACOM_INIT_TRIALS;
-  wacom_init_start(this);
-}
-
-static void
-wacom_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  wacom_t *this = (wacom_t *)o;
-
-  fts_alarm_unarm(&this->alarm);
-  fts_bytestream_remove_listener(this->stream, o);
-}
-
 static int 
 wacom_check(int ac, const fts_atom_t *at)
 {
@@ -544,32 +510,76 @@ wacom_check(int ac, const fts_atom_t *at)
   return 0;
 }
 
+static void
+wacom_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  wacom_t *this = (wacom_t *)o;
+
+  ac--;
+  at++;
+
+  this->stream = 0;
+
+  if(ac > 0 && fts_is_object(at))
+    {
+      fts_object_t *obj = fts_get_object(at);
+
+      if(fts_bytestream_check(obj) && fts_bytestream_is_output((fts_bytestream_t *)obj) && fts_bytestream_is_input((fts_bytestream_t *)obj))
+	{
+	  this->stream = (fts_bytestream_t *)obj;
+	  
+	  this->index = 0;
+	  
+	  this->x = 0;
+	  this->y = 0;
+	  this->z = 0;
+	  this->tilt_x = 0;
+	  this->tilt_y = 0;
+	  
+	  this->b1 = 0;
+	  this->b2 = 0;
+	  this->b3 = 0;
+	  this->b4 = 0;
+	  
+	  fts_alarm_init(&this->alarm, 0, wacom_init_timeout, (void *)this);
+	  this->init_trials = WACOM_INIT_TRIALS;
+	  
+	  wacom_init_start(this);
+	  
+	  return;
+	}
+    }
+
+  fts_object_set_error(o, "First argument of bidirectional bytestream required");
+}
+
+static void
+wacom_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  wacom_t *this = (wacom_t *)o;
+
+  if(this->stream)
+    {
+      fts_alarm_unarm(&this->alarm);
+      fts_bytestream_remove_listener(this->stream, o);
+    }
+}
+
 static fts_status_t
 wacom_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(wacom_check(ac, at))
-    {
-      fts_class_init(cl, sizeof(wacom_t), 1, wacom_n_outlets, 0);
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wacom_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wacom_delete);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), wacom_reset);
-
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
-}
-
-static int 
-wacom_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{ 
-  return wacom_check(ac1, at1);
+  fts_class_init(cl, sizeof(wacom_t), 1, wacom_n_outlets, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wacom_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wacom_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), wacom_reset);
+  
+  return fts_Success;
 }
 
 void
 wacom_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("wacom"), wacom_instantiate, wacom_equiv);
+  fts_class_install(fts_new_symbol("wacom"), wacom_instantiate);
 }

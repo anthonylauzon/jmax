@@ -46,7 +46,7 @@ class MaxWhenCmd implements Command {
 		  Script script = maxInterp.convert(new String(argv[2].toString())); // Aren't we too stringing here?
 		  MaxApplication.addHook(new String(argv[1].toString()), script);
 	      } catch (ScriptException e) {
-		  throw new TclException(interp, "Couldn't convert to script: " + e.getMessage());
+		  throw new TclException(interp, "Can't convert to script: " + e.getMessage());
 	      }
 	  }
       else

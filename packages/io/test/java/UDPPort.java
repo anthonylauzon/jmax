@@ -47,7 +47,7 @@ class UDPPort  {
       }
     catch (IOException e)
       {
-	System.err.println("[java] Couldn't open socket");
+	System.err.println("[java] Can't open socket");
 	System.exit(0);
       }
   }

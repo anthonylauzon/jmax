@@ -24,10 +24,50 @@
  *
  */
 
-#ifndef _SEND_H_
-#define _SEND_H_
+#include <fts/fts.h>
 
-extern int ispw_send_message_to_receives(fts_symbol_t name, fts_symbol_t selector, int ac, const fts_atom_t *at);
-extern int ispw_receive_exists(fts_symbol_t name);
+static fts_object_t *
+send_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  fts_atom_t a[2];
 
-#endif
+  if(ac == 2 && fts_is_symbol(at + 1))
+    {
+      fts_set_symbol(a + 0, fts_s_outlet);
+      a[1] = at[1];
+      fts_object_new_to_patcher(patcher, 2, a, &obj);
+
+      return obj;
+    }
+  
+  return 0;
+}
+
+static fts_object_t *
+receive_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  fts_atom_t a[2];
+
+  if(ac == 2 && fts_is_symbol(at + 1))
+    {
+      fts_set_symbol(a + 0, fts_s_inlet);
+      a[1] = at[1];
+      fts_object_new_to_patcher(patcher, 2, a, &obj);
+
+      return obj;
+    }
+  
+  return 0;
+}
+
+void
+ispwcomp_config(void)
+{
+  fts_register_object_doctor(fts_new_symbol("send"), send_doctor);
+  fts_register_object_doctor(fts_new_symbol("s"), send_doctor);
+  fts_register_object_doctor(fts_new_symbol("receive"), receive_doctor);
+  fts_register_object_doctor(fts_new_symbol("r"), receive_doctor);
+}
+

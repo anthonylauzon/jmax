@@ -57,6 +57,7 @@ Rreceive_set_atom(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const
   fts_atom_t av[MAXLEN];
   int i,ac = 0;
   long l;
+  fts_label_t *label;
   fts_symbol_t sel;
 
   if (n == 0xF0)
@@ -121,26 +122,27 @@ Rreceive_set_atom(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const
 	    }
 	}
 
-      sel = fts_new_symbol_copy(this->receiveBuff+1);
-
-      if (ispw_receive_exists(sel))
+      sel = fts_new_symbol_copy(this->receiveBuff + 1);
+      label = fts_label_get(fts_object_get_patcher(o), sel);
+      
+      if(fts_label_is_connected(label))
 	{
 	  if (fts_is_long(av))
 	    {
 	      if (ac >1)
-		ispw_send_message_to_receives(sel, fts_s_list, ac, av);
+		fts_label_send(label, fts_s_list, ac, av);
 	      else
-		ispw_send_message_to_receives(sel, fts_s_int, ac, av);
+		fts_label_send(label, fts_s_int, ac, av);
 	    }
 	  else if (fts_is_float(av))
 	    {
 	      if (ac >1)
-		ispw_send_message_to_receives(sel, fts_s_list, ac, av);
+		fts_label_send(label, fts_s_list, ac, av);
 	      else
-		ispw_send_message_to_receives(sel, fts_s_float, ac, av);
+		fts_label_send(label, fts_s_float, ac, av);
 	    }
 	  else if (fts_is_symbol(av))
-	    ispw_send_message_to_receives(sel, fts_get_symbol(av), ac - 1, av + 1);
+	    fts_label_send(label, fts_get_symbol(av), ac - 1, av + 1);
 	}
       else
 	fts_outlet_send(o, 0, sel, ac, av);

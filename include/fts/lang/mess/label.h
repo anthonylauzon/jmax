@@ -24,13 +24,24 @@
  *
  */
 
-#ifndef _NAMING_H_
-#define _NAMING_H_
+#ifndef _FTS_LABEL_H_
+#define _FTS_LABEL_H_
 
-extern fts_object_t *ispw_get_object_by_name(fts_symbol_t name);
-extern void ispw_register_named_object(fts_object_t *obj, fts_symbol_t name);
-extern void ispw_unregister_named_object(fts_object_t *obj, fts_symbol_t name);
+typedef struct _fts_label_
+{
+  fts_object_t o;
+  fts_channel_t channel;
+} fts_label_t;
 
-extern fts_object_t *ispw_get_target(fts_patcher_t *scope, fts_symbol_t name);
+extern fts_class_t *fts_label_class;
+
+#define fts_label_get_channel(l) (&(l)->channel)
+
+#define fts_object_is_label(o) (fts_object_get_class(o) == fts_label_class)
+
+#define fts_label_get(p, s) ((fts_label_t *)fts_variable_get_object_always((p), (s), fts_label_class))
+
+#define fts_label_is_connected(l) (fts_channel_has_target(fts_label_get_channel(l)))
+#define fts_label_send(l, s, n, a) fts_channel_output_message_from_targets(fts_label_get_channel(l), 0, (s), (n), (a))
 
 #endif

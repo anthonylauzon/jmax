@@ -35,7 +35,6 @@
 #define DEFAULT_BUFFER_SIZE 128
 #define DEFAULT_SERIAL_PORT_NAME "/dev/ttyS0"
 
-static fts_symbol_t sym_default_serial_port = 0;
 static fts_symbol_t sym_5bits = 0;
 static fts_symbol_t sym_6bits = 0;
 static fts_symbol_t sym_7bits = 0;
@@ -360,79 +359,87 @@ static void
 serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   serial_t *this = (serial_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  speed_t speed;
-  int i = 2; /* argument index */
-  int size = 0;
 
-  if(!name)
-    name = sym_default_serial_port;
+  ac--;
+  at++;
 
-  if(fts_is_number(at + i))
+  this->fd = -1;
+
+  if(fts_is_symbol(at))
     {
-      size = fts_get_number_int(at + i);
-      i++;
-    }
-
-  if(size <= 0)
-    size = DEFAULT_BUFFER_SIZE;
-
-  serial_set_default_termios(this);
+      fts_symbol_t name = fts_get_symbol(at);
+      speed_t speed;
+      int i = 1; /* running argument index */
+      int size = 0;
       
-  for(; i<ac; i++)
-    {
-      if(fts_is_symbol(at + i))
-	serial_set_flag(this, fts_get_symbol(at + i));
-      else
+      if(fts_is_number(at + i))
 	{
-	  post("serial: wrong argument: ");
-	  post_atoms(1, at + i);
-	  post(" (ignored)\n");
+	  size = fts_get_number_int(at + i);
+	  i++;
 	}
-    }
-
-  if(this->noread)
-    this->termios.c_cflag &= ~CREAD;
-
-  this->fd = open(fts_symbol_name(name), O_RDWR);
-
-  if(this->fd < 0)
-    {
-      post("serial: can't open %s (%s)\n", fts_symbol_name(name), strerror( errno));
-      return;
-    }
-  
-  if(tcsetattr(this->fd, TCSANOW, &this->termios) < 0)
-    {
-      post("serial: can't set configuration (%s)\n", strerror(errno));
       
-      close(this->fd);
-      return;
-    }
-  
-  fts_bytestream_init(&this->head);
-
-  if(!this->noread)
-    {
-      this->in_buf = (unsigned char *)fts_malloc(size);
+      if(size <= 0)
+	size = DEFAULT_BUFFER_SIZE;
       
-      /* add fd to FTS scheduler */
-      fts_sched_add_fd(fts_sched_get_current(), this->fd, 1, serial_read, o);
+      serial_set_default_termios(this);
       
-      /* set bytestream callback functions */
-      fts_bytestream_set_input(&this->head);
-
-      /* install default input callback */
-      fts_bytestream_add_listener(&this->head, o, serial_default_input);
+      for(; i<ac; i++)
+	{
+	  if(fts_is_symbol(at + i))
+	    serial_set_flag(this, fts_get_symbol(at + i));
+	  else
+	    {
+	      post("serial: wrong argument: ");
+	      post_atoms(1, at + i);
+	      post(" (ignored)\n");
+	    }
+	}
+      
+      if(this->noread)
+	this->termios.c_cflag &= ~CREAD;
+      
+      this->fd = open(fts_symbol_name(name), O_RDWR);
+      
+      if(this->fd < 0)
+	{
+	  fts_object_set_error(o, "can't open serial port \"%s\" (%s)\n", fts_symbol_name(name), strerror( errno));
+	  return;
+	}
+      
+      if(tcsetattr(this->fd, TCSANOW, &this->termios) < 0)
+	{
+	  fts_object_set_error(o, "can't set termios configuration (%s)\n", strerror(errno));
+	  
+	  close(this->fd);
+	  return;
+	}
+      
+      fts_bytestream_init(&this->head);
+      
+      if(!this->noread)
+	{
+	  this->in_buf = (unsigned char *)fts_malloc(size);
+	  
+	  /* add fd to FTS scheduler */
+	  fts_sched_add_fd(fts_sched_get_current(), this->fd, 1, serial_read, o);
+	  
+	  /* set bytestream callback functions */
+	  fts_bytestream_set_input(&this->head);
+	  
+	  /* install default input callback */
+	  fts_bytestream_add_listener(&this->head, o, serial_default_input);
+	}
+      
+      this->out_buf = (unsigned char *)fts_malloc(size);
+      this->out_fill = 0;
+      
+      this->size = size;
+      this->name = name;
+      
+      fts_bytestream_set_output(&this->head, serial_output, serial_output_char, serial_flush);
     }
-  
-  this->out_buf = (unsigned char *)fts_malloc(size);
-  this->out_fill = 0;
-  
-  this->size = size;
-  this->name = name;
-  
-  fts_bytestream_set_output(&this->head, serial_output, serial_output_char, serial_flush);
+  else
+    fts_object_set_error(o, "First argument of serial device name required");
 }
 
 static void 
@@ -471,7 +478,6 @@ serial_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 void serial_config( void)
 {
-  sym_default_serial_port = fts_new_symbol(DEFAULT_SERIAL_PORT_NAME);
   sym_5bits = fts_new_symbol("5bits");
   sym_6bits = fts_new_symbol("6bits");
   sym_7bits = fts_new_symbol("7bits");

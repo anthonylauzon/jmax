@@ -39,6 +39,7 @@ extern fts_module_t fts_mess_module;
 #include <fts/lang/mess/expressions.h>
 #include <fts/lang/mess/ftsdata.h>
 #include <fts/lang/mess/ftsdataid.h>
+#include <fts/lang/mess/label.h>
 #include <fts/lang/mess/loader.h>
 #include <fts/lang/mess/mess_types.h>
 #include <fts/lang/mess/messages.h>

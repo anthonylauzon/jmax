@@ -97,54 +97,42 @@ static void
 out_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   out_t *this = (out_t *)o;
-  this->stream = (fts_bytestream_t *)fts_get_object(at + 1);
-}
 
-static int 
-out_check(int ac, const fts_atom_t *at)
-{
-  if(ac > 1 && fts_is_object(at + 1))
+  ac--;
+  at++;
+
+  if(ac && fts_is_object(at))
     {
-      fts_object_t *obj = fts_get_object(at + 1);
+      fts_object_t *obj = fts_get_object(at);
 
       if(fts_bytestream_check(obj) && fts_bytestream_is_output((fts_bytestream_t *)obj))
-	return 1;
+	{
+	  this->stream = (fts_bytestream_t *)obj;
+	  return;
+	}
     }
-  
-  return 0;
+    
+  fts_object_set_error(o, "First argument of input bytestream required");
 }
 
 static fts_status_t
 out_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(out_check(ac, at))
-    {
-      fts_class_init(cl, sizeof(out_t), 2, 0, 0);
-
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, out_init);
-
-      fts_method_define_varargs(cl, 0, fts_s_bang, out_bang);
-      fts_method_define_varargs(cl, 0, fts_s_int, out_int_and_flush);
-      fts_method_define_varargs(cl, 0, fts_s_list, out_list_and_flush);
-      fts_method_define_varargs(cl, 1, fts_s_int, out_int);
-      fts_method_define_varargs(cl, 1, fts_s_list, out_list);
-
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
-}
-
-static int 
-out_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{ 
-  return out_check(ac1, at1);
+  fts_class_init(cl, sizeof(out_t), 2, 0, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, out_init);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, out_bang);
+  fts_method_define_varargs(cl, 0, fts_s_int, out_int_and_flush);
+  fts_method_define_varargs(cl, 0, fts_s_list, out_list_and_flush);
+  fts_method_define_varargs(cl, 1, fts_s_int, out_int);
+  fts_method_define_varargs(cl, 1, fts_s_list, out_list);
+  
+  return fts_Success;
 }
 
 void
 out_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("out"), out_instantiate, out_equiv);
+  fts_class_install(fts_new_symbol("out"), out_instantiate);
 }
-
-

@@ -52,8 +52,23 @@ in_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 { 
   in_t *this = (in_t *)o;
 
-  this->stream = (fts_bytestream_t *)fts_get_object(at + 1);
-  fts_bytestream_add_listener(this->stream, o, in_input);
+  ac--;
+  at++;
+
+  if(ac > 0 && fts_is_object(at))
+    {
+      fts_object_t *obj = fts_get_object(at);
+
+      if(fts_bytestream_check(obj) && fts_bytestream_is_input((fts_bytestream_t *)obj))
+	{  
+	  this->stream = (fts_bytestream_t *)obj;
+	  fts_bytestream_add_listener(this->stream, o, in_input);
+	  
+	  return;
+	}
+    }
+    
+  fts_object_set_error(o, "First argument of input bytestream required");
 }
 
 static void 
@@ -88,27 +103,16 @@ in_check(int ac, const fts_atom_t *at)
 static fts_status_t
 in_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(in_check(ac, at))
-    {
-      fts_class_init(cl, sizeof(in_t), 0, 1, 0);
-      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, in_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, in_delete);
-      
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;
-}
-
-static int 
-in_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{ 
-  return in_check(ac1, at1);
+  fts_class_init(cl, sizeof(in_t), 0, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, in_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, in_delete);
+  
+  return fts_Success;
 }
 
 void
 in_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("in"), in_instantiate, in_equiv);
+  fts_class_install(fts_new_symbol("in"), in_instantiate);
 }

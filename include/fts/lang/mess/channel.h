@@ -38,6 +38,8 @@ typedef struct _fts_channel_
   fts_access_t *origins; /* list of origins */
 } fts_channel_t;
 
+#define fts_channel_has_target(c) ((c)->targets != 0)
+
 extern void fts_channel_init(fts_channel_t *channel);
 
 extern void fts_channel_add_target(fts_channel_t *channel, fts_access_t *target);

@@ -309,10 +309,10 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 	  if(n_samples > 0)
 	    fts_outlet_int(o, 0, n_samples);
 	  else
-	    post("table~: %s: can not load samples from file \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+	    post("table~: %s: can't load samples from file \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
 	}
       else
-	post("table~: %s: can not open soundfile to read \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+	post("table~: %s: can't open soundfile to read \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
     }
 }
 
@@ -353,10 +353,10 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 	  fts_soundfile_close(sf);
 
 	  if(n_samples <= 0)
-	    post("table~: %s: could not save samples to file \"%s\"\n", fts_symbol_name(this->name) , fts_symbol_name(file_name));
+	    post("table~: %s: can't save samples to file \"%s\"\n", fts_symbol_name(this->name) , fts_symbol_name(file_name));
 	}
       else
-	post("table~: %s: can not open soundfile to write \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
+	post("table~: %s: can't open soundfile to write \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
     }
 }
 

@@ -462,7 +462,7 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   x->wind = (float *)fts_malloc(x->pt.n_points * sizeof(float));
   if(!x->wind)
     {
-      post("%s: can not allocate window: init failed\n", CLASS_NAME);
+      post("%s: can't allocate window: init failed\n", CLASS_NAME);
       return;
     } 
   else

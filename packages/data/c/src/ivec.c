@@ -193,10 +193,10 @@ ivec_grow(ivec_t *vec, int size)
 {
   int alloc = vec->alloc;
 
-  while(size > alloc)
+  while(!alloc || size > alloc)
     alloc += IVEC_BLOCK_SIZE;
 
-  ivec_set_size(vec, alloc);
+  set_size(vec, alloc);
 }
 
 int 
@@ -458,7 +458,7 @@ ivec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       int size = ivec_read_atom_file(this, file_name);
       
       if(size <= 0)
-	post("ivec: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
+	post("ivec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("ivec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
@@ -479,7 +479,7 @@ ivec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       int size = ivec_write_atom_file(this, file_name);
       
       if(size < 0)
-	post("ivec: can not export to text file \"%s\"\n", fts_symbol_name(file_name));
+	post("ivec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("ivec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
@@ -764,8 +764,8 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
       /* save and restore to/from bmax file */
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set);
+      /* fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, ivec_bmax); */
+      /* fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set); */
 
       /* define variable */
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);

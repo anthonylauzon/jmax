@@ -117,7 +117,7 @@ public abstract class SchemeInterpreter implements Interpreter
 	    // define("dir", old_dir);
 	    return result;
 	} catch (Exception e) {
-	    System.out.println("Couldn't load " + e.getMessage());
+	    System.out.println("Can't load " + e.getMessage());
 	    return null; 
 	}
     }

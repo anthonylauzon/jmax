@@ -83,7 +83,7 @@ explay_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if (! explode)
     {
-      post("explay: %s: can not find explode\n", fts_symbol_name(this->explode_name));
+      post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
       this->current = 0;
     }
   else if (! this->current)
@@ -124,7 +124,7 @@ explay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       if (! explode)
 	{
-	  post("explay: %s: can not find explode\n", fts_symbol_name(this->explode_name));
+	  post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
 	  this->current = 0;
 	}
       else
@@ -164,7 +164,7 @@ explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if (! explode)
     {
-      post("explay: %s: can not find explode\n", fts_symbol_name(this->explode_name));
+      post("explay: %s: can't find explode\n", fts_symbol_name(this->explode_name));
       this->current = 0;
     }
   else

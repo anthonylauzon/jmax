@@ -127,7 +127,7 @@ class FtsSocketServerStream extends FtsStream
       }
     catch (IOException e)
       {
-	System.out.println("Couldn't get I/O for the socket ");
+	System.out.println("Can't get I/O for the socket ");
 	return;
       }    
   }

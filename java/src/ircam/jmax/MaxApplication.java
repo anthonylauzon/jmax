@@ -262,7 +262,7 @@ public class MaxApplication extends Object
     catch (Exception e)
 	{
 	    e.printStackTrace(); // FIXME
-	    System.out.println("Couldn't create the interpreter: " + e.getMessage());
+	    System.out.println("Can't create the interpreter: " + e.getMessage());
 	    return;
 	}
 

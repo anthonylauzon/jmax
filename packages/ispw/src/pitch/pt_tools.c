@@ -377,7 +377,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   fft_buf = (complex *)fts_malloc(n_points * sizeof(complex));
   if ( !fft_buf)
     { 
-      post("pt: filter bank init: can not allocate FFT buffer!\n");
+      post("pt: filter bank init: can't allocate FFT buffer!\n");
       return(0);
     }
 
@@ -385,7 +385,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   if ( !filter_bank)
     {
       fts_free(fft_buf);
-      post("pt: filter bank init: can not allocate structure!\n");
+      post("pt: filter bank init: can't allocate structure!\n");
       return(0);
     }
 
@@ -394,7 +394,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
     {
       fts_free(fft_buf);
       fts_free(filter_bank);
-      post("pt: filter bank init: can not allocate kernels!\n");
+      post("pt: filter bank init: can't allocate kernels!\n");
       return(0);
     }
 
@@ -404,7 +404,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
       fts_free(fft_buf);
       fts_free(filter_bank);
       fts_free(kernels);
-      post("pt: filter bank init: can not allocate coefficients!\n");
+      post("pt: filter bank init: can't allocate coefficients!\n");
       return(0);
     }
 

@@ -77,7 +77,7 @@ logscale_compute_params(logscale_t *x)
   out_range = x->params[out_high] - x->params[out_low];
   if(in_range == 0. || out_range == 0.)
     {
-      post("error: logscale: high and low value can not be the same\n");
+      post("error: logscale: high and low value can't be the same\n");
       return;
     }
 

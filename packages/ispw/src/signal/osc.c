@@ -180,7 +180,7 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 	}
       else
 	{
-	  post("osc1~: %s: can not find tab1~\n", fts_symbol_name(this->sym));
+	  post("osc1~: %s: can't find tab1~\n", fts_symbol_name(this->sym));
 	  fts_set_symbol(argv + 0, fts_s_sig_zero);
 	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_long  (argv + 2, fts_dsp_get_output_size(dsp, 0));
@@ -230,7 +230,7 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
 	  osc_ftl_data_set_table(this->ftl_data, (void *)wavetab->table);
 	}
       else
-	post("osc1~: set %s: can not find table\n", fts_symbol_name(s));
+	post("osc1~: set %s: can't find table\n", fts_symbol_name(s));
     }
   else
     osc_ftl_data_set_table(this->ftl_data, (void *)cos_table);

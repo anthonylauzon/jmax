@@ -74,12 +74,8 @@
 (help-patch "select" (file-cat dir "help" "control" "select.help.jmax"))
 (help-patch "split" (file-cat dir "help" "control" "split.help.jmax"))
 (help-patch "swap" (file-cat dir "help" "control" "swap.help.jmax"))
-(help-patch "send" (file-cat dir "help" "control" "send.help.jmax"))
-(help-patch "receive" (file-cat dir "help" "control" "receive.help.jmax"))
 (help-patch "trigger" (file-cat dir "help" "control" "trigger.help.jmax"))
 ;alias
-(help-patch "s" (file-cat dir "help" "control" "send.help.jmax"))
-(help-patch "r" (file-cat dir "help" "control" "receive.help.jmax"))
 (help-patch "t" (file-cat dir "help" "control" "trigger.help.jmax"))
 
 ;; genarators (6)

@@ -46,7 +46,7 @@ wavetable_load(wavetab_t *wavetab)
 
       if(!sf)
 	{
-	  post("tab1~: %s: can not open wave table file\n", file_name);
+	  post("tab1~: %s: can't open wave table file\n", file_name);
 	  return;
 	}
       
@@ -55,7 +55,7 @@ wavetable_load(wavetab_t *wavetab)
 
       if(n_samples < WAVE_TAB_SIZE)
 	{
-	  post("tab1~: %s: can not read wave table\n", file_name);
+	  post("tab1~: %s: can't read wave table\n", file_name);
 	  return;
 	}
       

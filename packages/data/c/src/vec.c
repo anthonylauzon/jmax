@@ -128,7 +128,7 @@ vec_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       size = vec_read_atom_file(this, file_name);
 
       if(size <= 0)
-	post("vec: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
+	post("vec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("vec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
@@ -151,7 +151,7 @@ vec_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       size = vec_write_atom_file(this, file_name);
 
       if(size < 0)
-	post("vec: can not export to text file \"%s\"\n", fts_symbol_name(file_name));
+	post("vec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("vec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));

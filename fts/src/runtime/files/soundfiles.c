@@ -94,7 +94,7 @@ fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbo
 	  if(n_skip < onset)
 	    {
 	      /* *** close file */
-	      post("can not open soundfile %s with onset of %d samples\n", fts_symbol_name(file_name), onset);
+	      post("can't open soundfile %s with onset of %d samples\n", fts_symbol_name(file_name), onset);
 	      return 0;
 	    }
 	}

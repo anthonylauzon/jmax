@@ -139,7 +139,7 @@ bend_channel_callback(fts_object_t *listener, int channel, int value, double tim
  */
 
 static int 
-midiin_check(int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, int *number)
+midiin_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, int *number)
 {
   *port = 0;
   *channel = MIDIPORT_ALL_CHANNELS;
@@ -147,7 +147,7 @@ midiin_check(int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, 
 
   if(ac > 0)
     {
-      if(fts_is_object(at))
+      if(o && fts_is_object(at))
 	{
 	  fts_object_t *obj = fts_get_object(at);
 	  
@@ -162,7 +162,7 @@ midiin_check(int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, 
 	  else
 	    return 0;
 	}
-  
+
       if(ac == 2)
 	{
 	  if(fts_is_number(at))
@@ -199,14 +199,15 @@ midiin_check(int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, 
 	}
     }
 
-  /* if there is still no port just get default */
-  if(!*port)
-    *port = fts_midiport_get_default();
-  
-  if(!*port)
-    return 0;
-  
-  return 1;
+  if(o)
+    {
+      /* if there is still no port just get default */
+      if(!*port)
+	*port = fts_midiport_get_default();
+      
+      if(o && !port)
+	fts_object_set_error(o, "Default MIDI port is not defined");
+    }
 }
 
 /******************************************************
@@ -219,7 +220,7 @@ notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   midiin_t *this = (midiin_t *)o;
 
-  midiin_check(ac - 1, at + 1, &this->port, &this->channel, &this->number);
+  midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
   
   if(this->number == MIDIPORT_ALL_NUMBERS)
     {
@@ -243,7 +244,7 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   midiin_t *this = (midiin_t *)o;
 
-  midiin_check(ac - 1, at + 1, &this->port, &this->channel, &this->number);
+  midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
   
   if(this->number == MIDIPORT_ALL_NUMBERS)
     {
@@ -266,7 +267,7 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   midiin_t *this = (midiin_t *)o;
 
-  midiin_check(ac - 1, at + 1, &this->port, &this->channel, &this->number);
+  midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
   
   if(this->number == MIDIPORT_ALL_NUMBERS)
     {
@@ -289,7 +290,7 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   midiin_t *this = (midiin_t *)o;
 
-  midiin_check(ac - 1, at + 1, &this->port, &this->channel, &this->number);
+  midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
   
   if(this->channel == MIDIPORT_ALL_CHANNELS)
     fts_midiport_add_listener_program_change(this->port, this->channel, o, value_callback);
@@ -302,7 +303,7 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   midiin_t *this = (midiin_t *)o;
 
-  midiin_check(ac - 1, at + 1, &this->port, &this->channel, &this->number);
+  midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
   
   if(this->channel == MIDIPORT_ALL_CHANNELS)
     fts_midiport_add_listener_channel_pressure(this->port, this->channel, o, value_callback);
@@ -315,7 +316,7 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   midiin_t *this = (midiin_t *)o;
 
-  midiin_check(ac - 1, at + 1, &this->port, &this->channel, &this->number);
+  midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
   
   if(this->channel == MIDIPORT_ALL_CHANNELS)
     fts_midiport_add_listener_pitch_bend(this->port, this->channel, o, bend_callback);
@@ -394,7 +395,7 @@ notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == MIDIPORT_ALL_NUMBERS) + (channel == MIDIPORT_ALL_CHANNELS), 0);
@@ -412,7 +413,7 @@ polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == MIDIPORT_ALL_NUMBERS) + (channel == MIDIPORT_ALL_CHANNELS), 0);
@@ -430,7 +431,7 @@ ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == MIDIPORT_ALL_NUMBERS) + (channel == MIDIPORT_ALL_CHANNELS), 0);
@@ -448,7 +449,7 @@ pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == MIDIPORT_ALL_CHANNELS), 0);
@@ -466,7 +467,7 @@ touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == MIDIPORT_ALL_CHANNELS), 0);
@@ -484,7 +485,7 @@ bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(ac - 1, at + 1, &port, &channel, &number))
+  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
   fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == MIDIPORT_ALL_CHANNELS), 0);
@@ -502,13 +503,13 @@ midiin_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
   int channel1;
   int number1;
 
-  if(midiin_check(ac1 - 1, at1 + 1, &port1, &channel1, &number1))
+  if(midiin_check(0, ac1 - 1, at1 + 1, &port1, &channel1, &number1))
     {
       fts_midiport_t *port0;
       int channel0;
       int number0;
 
-      midiin_check(ac0 - 1, at0 + 1, &port0, &channel0, &number0);
+      midiin_check(0, ac0 - 1, at0 + 1, &port0, &channel0, &number0);
 
       if((channel0 != MIDIPORT_ALL_CHANNELS) != (channel1 != MIDIPORT_ALL_CHANNELS))
 	return 0;

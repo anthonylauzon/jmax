@@ -28,7 +28,6 @@
 #include <fts/lang.h>
 #include "messP.h"
 
-static fts_class_t *label_class = 0;
 fts_class_t *inlet_class = 0;
 fts_class_t *outlet_class = 0;
 
@@ -42,65 +41,17 @@ extern void fts_patcher_trim_number_of_outlets(fts_patcher_t *patcher);
 extern void fts_patcher_inlet_reposition(fts_object_t *o, int pos);
 extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
 
-/*************************************************************
- *
- *  label
- *
- */
-
-typedef struct _label_
-{
-  fts_object_t o;
-  fts_channel_t channel;
-} label_t;
-
 typedef struct _send_
 {
   fts_access_t access;
-  label_t *label;
+  fts_label_t *label;
 } send_t;
 
 typedef struct _receive_
 {
   fts_access_t access;
-  label_t *label;
+  fts_label_t *label;
 } receive_t;
-
-#define label_get_channel(l) (&(l)->channel)
-
-static void
-label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  label_t *this = (label_t *) o;
-
-  fts_channel_init(&this->channel);
-}
-
-static void
-label_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object_with_type(value, obj, fts_s_label);
-}
-
-static void
-label_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  label_t *this = (label_t *) o;
-
-  fts_channel_find_friends(&this->channel, ac, at);
-}
-
-static fts_status_t
-label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(label_t), 0, 0, 0);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, label_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_friends, label_find_friends);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
-
-  return fts_Success;
-}
 
 /***************************************************************************
  *
@@ -113,25 +64,24 @@ send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   send_t *this = (send_t *) o;
 
-  fts_channel_output_message_from_targets(label_get_channel(this->label), 0, s, ac, at);
+  fts_label_send(this->label, s, ac, at);
 }
 
 static void
 send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   send_t *this = (send_t *) o;
-  label_t *label = 0;
+  fts_label_t *label = 0;
 
   if(fts_is_symbol(at + 1))
     {
       fts_symbol_t name = fts_get_symbol(at + 1);
       
-      label = (label_t *)fts_variable_get_object_always(fts_object_get_patcher(o), name, label_class);
-      
+      label = fts_label_get(fts_object_get_patcher(o), name);
       fts_variable_add_user(fts_object_get_patcher(o), name, o);
     }
   else if(fts_is_a(at + 1, fts_s_label))
-    label = (label_t *)fts_get_object(at + 1);
+    label = (fts_label_t *)fts_get_object(at + 1);
   else
     {
       fts_object_set_error(o, "Wrong argument");
@@ -139,7 +89,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 
   fts_object_refer((fts_object_t *)label);
-  fts_channel_add_origin(label_get_channel(label), (fts_access_t *)this);  
+  fts_channel_add_origin(fts_label_get_channel(label), (fts_access_t *)this);  
 
   this->label = label;
 }
@@ -149,7 +99,7 @@ send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   send_t *this = (send_t *) o;
 
-  fts_channel_remove_origin(label_get_channel(this->label), (fts_access_t *)this);
+  fts_channel_remove_origin(fts_label_get_channel(this->label), (fts_access_t *)this);
   fts_object_release((fts_object_t *)this->label);
 }
 
@@ -158,7 +108,7 @@ send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   send_t *this = (send_t *)o;
 
-  fts_channel_find_friends(label_get_channel(this->label), ac, at);
+  fts_channel_find_friends(fts_label_get_channel(this->label), ac, at);
 }
 
 static fts_status_t
@@ -184,19 +134,18 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  receive_t *this = (receive_t *) o;
-  label_t *label = 0;
+  receive_t *this = (receive_t *)o;
+  fts_label_t *label = 0;
 
   if(fts_is_symbol(at + 1))
     {
       fts_symbol_t name = fts_get_symbol(at + 1);
       
-      label = (label_t *)fts_variable_get_object_always(fts_object_get_patcher(o), name, label_class);
-      
+      label = fts_label_get(fts_object_get_patcher(o), name);
       fts_variable_add_user(fts_object_get_patcher(o), name, o);
     }
   else if(fts_is_a(at + 1, fts_s_label))
-    label = (label_t *)fts_get_object(at + 1);
+    label = (fts_label_t *)fts_get_object(at + 1);
   else
     {
       fts_object_set_error(o, "Wrong argument");
@@ -204,7 +153,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
 
   fts_object_refer((fts_object_t *)label);
-  fts_channel_add_target(label_get_channel(label), (fts_access_t *)this);
+  fts_channel_add_target(fts_label_get_channel(label), (fts_access_t *)this);
 
   this->label = label;
 }
@@ -212,9 +161,9 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  receive_t *this = (receive_t *) o;
+  receive_t *this = (receive_t *)o;
 
-  fts_channel_remove_target(label_get_channel(this->label), (fts_access_t *)this);
+  fts_channel_remove_target(fts_label_get_channel(this->label), (fts_access_t *)this);
   fts_object_release((fts_object_t *)this->label);
 }
 
@@ -281,7 +230,7 @@ inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       /* OFF inlets: inlet will be redefined later (.pat parsing) */
       return;
     }
-  else if (pos == -1)
+  else if (pos < 0)
     fts_patcher_inlet_reposition(o, inlet_get_next_position(patcher, this));
   else
     fts_patcher_inlet_reposition(o, pos);
@@ -411,7 +360,7 @@ outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       /* OFF inlets: inlet will be redefined later (.pat parsing) */
       return;
     }
-  else if (pos == -1)
+  else if (pos < 0)
     fts_patcher_outlet_reposition(o, outlet_get_next_position(patcher, this));
   else
     fts_patcher_outlet_reposition(o, pos);
@@ -490,9 +439,9 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static int
 inout_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  if((ac0 == 0 || fts_is_int(at0)) && (ac1 == 0 || fts_is_int(at1)))
+  if((ac0 == 1 || fts_is_int(at0 + 1)) && (ac1 == 1 || fts_is_int(at1 + 1)))
     return 1;
-  else if(ac0 == 1 && ac1 == 1 && fts_get_type(at0) == fts_get_type(at1))
+  else if(ac0 == 2 && ac1 == 2 && fts_get_type(at0 + 1) == fts_get_type(at1 + 1))
     return 1;
   else
     return 0;
@@ -503,9 +452,7 @@ fts_inout_config(void)
 {
   fts_metaclass_install(fts_s_inlet, inlet_instantiate, inout_equiv);
   fts_metaclass_install(fts_s_outlet, outlet_instantiate, inout_equiv);
-  fts_class_install(fts_s_label, label_instantiate);
 
   inlet_class = fts_class_get_by_name(fts_s_inlet);
   outlet_class = fts_class_get_by_name(fts_s_outlet);
-  label_class = fts_class_get_by_name(fts_s_label);
 }

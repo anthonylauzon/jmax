@@ -297,7 +297,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolProvide
 	    path  = MaxApplication.getPackageHandler().locatePackage("explode").getPath()+fs+"images"+fs;
 	}
     catch(FileNotFoundException e){
-	//System.err.println("Couldn't locate explode images");
+	//System.err.println("Can't locate explode images");
 	path = MaxApplication.getProperty("explodePackageDir")+fs+"images" +fs;
     }
 

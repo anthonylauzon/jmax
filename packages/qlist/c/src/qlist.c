@@ -72,7 +72,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
   fts_atom_t av[NATOM];
   fts_atom_t *ap;
   int ac;
-  fts_symbol_t who_name = 0;
+  fts_object_t *target = 0;
   
   while (! fts_atom_list_iterator_end(this->iterator))
     {
@@ -81,7 +81,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
       av[0] = *fts_atom_list_iterator_current(this->iterator);
       fts_atom_list_iterator_next(this->iterator);
 
-      if (!who_name)
+      if (!target)
 	{
 	  if (fts_is_float(av) || fts_is_long(av))
 	    {
@@ -148,21 +148,20 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
       ap = av;
 
-      if (! who_name)
+      if (!target)
 	{
 	  if (fts_is_symbol(av)  && 
 	      (fts_get_symbol(av) != fts_s_semi) &&
 	      (fts_get_symbol(av) != fts_s_comma))
 	    {
-	      if (! ispw_named_object_exists(fts_get_symbol(av)))
+	      fts_symbol_t target_name = fts_get_symbol(av);
+
+	      target = ispw_get_target(fts_object_get_patcher(o), target_name);
+
+	      if (!target)
 		{
-		  post("qlist: %s: no such object\n",
-		       fts_symbol_name(fts_get_symbol(av)));
+		  post("qlist: %s: no such object\n", fts_symbol_name(fts_get_symbol(av)));
 		  continue;
-		}
-	      else
-		{
-		  who_name = fts_get_symbol(av);
 		}
 
 	      ap++;
@@ -180,25 +179,23 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 	  if (fts_is_long(ap))
 	    {
 	      if (ac > 1)
-		ispw_named_object_send(who_name, fts_s_list, ac, ap);
+		fts_message_send(target, fts_SystemInlet, fts_s_list, ac, ap);
 	      else 
-		ispw_named_object_send(who_name, fts_s_int, ac, ap);
+		fts_message_send(target, fts_SystemInlet, fts_s_int, ac, ap);
 	    }
 	  else if (fts_is_float(ap))
 	    {
 	      if (ac >1) 
-		ispw_named_object_send(who_name, fts_s_list, ac, ap);
+		fts_message_send(target, fts_SystemInlet, fts_s_list, ac, ap);
 	      else 
-		ispw_named_object_send(who_name, fts_s_float, ac, ap);
+		fts_message_send(target, fts_SystemInlet, fts_s_float, ac, ap);
 	    }
-	  else if (fts_is_symbol(ap)  && 
-		   (fts_get_symbol(ap) != fts_s_semi) &&
-		   (fts_get_symbol(ap) != fts_s_comma))
-	    ispw_named_object_send(who_name, fts_get_symbol(ap), ac-1, ap+1);
+	  else if (fts_is_symbol(ap) && (fts_get_symbol(ap) != fts_s_semi) && (fts_get_symbol(ap) != fts_s_comma))
+	    fts_message_send(target, fts_SystemInlet, fts_get_symbol(ap), ac - 1, ap + 1);
 	}
 
-      if (! is_comma)
-	who_name = 0;
+      if (!is_comma)
+	target = 0;
     }
 }
 

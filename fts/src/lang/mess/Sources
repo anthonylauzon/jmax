@@ -36,6 +36,7 @@ inout.c \
 templates.c \
 ftsdata.c \
 ftsdataid.c \
+label.c \
 loader.c \
 mess.c \
 objects.c \

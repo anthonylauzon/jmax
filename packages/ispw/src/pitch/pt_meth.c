@@ -244,14 +244,14 @@ int pt_common_init(pt_common_obj_t *x, long n_points, long n_period)
    x->buf.main = (float *)fts_zalloc(n_points * sizeof(float));
    if( !x->buf.main)
      {
-       post("%s: can not allocate buffers\n", CLASS_NAME);
+       post("%s: can't allocate buffers\n", CLASS_NAME);
        return(0);
      }
 
    x->buf.for_fft = (complex *)fts_zalloc(n_points * sizeof(complex));
    if( !x->buf.for_fft)
      {
-       post("%s: can not allocate buffers\n", CLASS_NAME);
+       post("%s: can't allocate buffers\n", CLASS_NAME);
        return(0);
      }
    

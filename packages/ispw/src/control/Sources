@@ -33,6 +33,7 @@ control.c \
 delay.c \
 drunk.c \
 gate.c \
+ispwcomp.c \
 line.c \
 loadbang.c \
 metro.c \
@@ -46,7 +47,6 @@ prepend.c \
 random.c \
 route.c \
 select.c \
-send.c \
 speedlim.c \
 split.c \
 time.c \

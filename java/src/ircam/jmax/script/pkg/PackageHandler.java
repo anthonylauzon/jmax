@@ -161,7 +161,7 @@ public class PackageHandler {
 	} catch (ScriptException e)  {
 	    throw new Exception(e.getMessage());
 	}
-	throw new Exception("Couldn't load package " + packageName);
+	throw new Exception("Can't load package " + packageName);
     }
 
     /** Locates a package using the package path. */

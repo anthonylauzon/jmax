@@ -614,7 +614,7 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	size = mat_read_atom_file_newline(this, file_name);
 
       if(size <= 0)
-	post("mat: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
+	post("mat: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("mat: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
@@ -641,7 +641,7 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	size = mat_write_atom_file_newline(this, file_name);
 
       if(size < 0)
-	post("mat: can not export to text file \"%s\"\n", fts_symbol_name(file_name));
+	post("mat: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
     }
   else
     post("mat: unknown export file format \"%s\"\n", fts_symbol_name(file_format));

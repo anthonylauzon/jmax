@@ -27,8 +27,18 @@
 #ifndef _FTS_RANDOM_H_
 #define _FTS_RANDOM_H_
 
+#define FTS_RANDOM_MAX (0x7fffffffL)
+#define FTS_RANDOM_RANGE (2147483648.)
+
+
+/* 31 bit random number generator */
 extern void fts_random_set_seed(unsigned long ul);
 extern unsigned long fts_random(void);
+
+/* float random between -1. and 1. */
 extern float fts_random_float(void);
+
+#define fts_random_range(min, max) ((min) + (((max) - (min)) * fts_random() / (double)FTS_RANDOM_MAX))
+
 
 #endif

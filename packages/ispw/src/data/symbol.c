@@ -73,7 +73,6 @@ void
 symbol_obj_config(void)
 {
   fts_class_install(fts_new_symbol("symbol"),symbol_obj_instantiate);
-  fts_class_alias(fts_new_symbol("s"), fts_new_symbol("symbol"));
 }
 
 /* ---------------- the metaclass instantiation function ------------------ */

@@ -40,6 +40,8 @@ typedef struct
   fts_symbol_t name;
 } table_t;
 
+
+
 static void
 table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -169,9 +171,13 @@ static void
 table_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *vec = ((table_t *)o)->vec;
-  int constant = fts_get_int(&at[0]);
 
-  ivec_set_const(vec, constant);
+  if(fts_is_number(at))
+    {
+      int constant = fts_get_int(at);
+      
+      ivec_set_const(vec, constant);
+    }
 }
 
 static void
@@ -361,7 +367,7 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_list, table_list);
       fts_method_define_varargs(cl, 0, fts_s_set, table_set_from_atom_list);
       
-      fts_method_define(cl, 0, fts_new_symbol("const"), table_const, 1, a);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("const"), table_const);
       fts_method_define(cl, 0, fts_s_clear, table_clear, 0, 0);
       
       a[0] = fts_s_int;

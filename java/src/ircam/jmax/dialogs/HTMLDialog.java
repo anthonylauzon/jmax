@@ -146,7 +146,7 @@ public class HTMLDialog extends JDialog
         URL helpURL = new URL(urlName);
 	displayURL(helpURL, editorPane);
      } catch (Exception e) {
-       System.err.println("Couldn't create help URL: " + urlName);
+       System.err.println("Can't create help URL: " + urlName);
      }
      return editorPane;
    }
@@ -165,7 +165,7 @@ public class HTMLDialog extends JDialog
 	displayURL(helpURL, editorPane);
 	setTitle(title);
     } catch (Exception e) {
-	System.err.println("Couldn't create help URL: " + urlName);
+	System.err.println("Can't create help URL: " + urlName);
     }
   }
   
