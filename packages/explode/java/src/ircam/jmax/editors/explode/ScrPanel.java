@@ -29,7 +29,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
     setBackground(Color.white);
-    setDoubleBuffered(false);
+    setDoubleBuffered(true);
 
     tools = new Vector();
 
@@ -52,7 +52,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     // being a MouseListener for this panel does not prevent the panel
     // itself (and then the current tool) to receive the same events.
     itsScore = new JPanel() {
-      public void update(Graphics g) {}
+      //public void update(Graphics g) {}
 
       public void paint(Graphics g) 
 	{
@@ -73,6 +73,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     };
 
     itsScore.setBounds(0, itsStatusBar.getSize().height, PANEL_WIDTH, PANEL_HEIGHT);
+
     add(itsScore, BorderLayout.CENTER);
 
     { //-- prepares the graphic context
@@ -290,7 +291,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   }
 
 
-  /* avoid to paint the white background twice */  
+  /* avoid to paint the white background twice*/   
   public void update(Graphics g) {}
 
 
@@ -298,12 +299,10 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    * The paint method.
    * Delegated to the current Renderer
    */
-  public void paint(Graphics g) 
+  /*public void paint(Graphics g) 
   {
-
     super.paint(g);
-
-  }
+  }*/
 
   /**
    * get the lenght (in milliseconds) of the window
@@ -381,8 +380,8 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   
 
   //------------- Fields
-  public final int PANEL_WIDTH = 800;
-  public final int PANEL_HEIGHT = 450;
+  public static final int PANEL_WIDTH = 800;
+  public static final int PANEL_HEIGHT = 450;
   
   ExplodeGraphicContext gc;
 

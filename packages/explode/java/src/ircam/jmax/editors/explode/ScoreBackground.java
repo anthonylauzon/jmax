@@ -8,11 +8,12 @@ import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.File;
 
+import com.sun.java.swing.*;
 
 /**
- * The background layer of a score. It loads the gif file for the 
+ * The background layer of a score. It builds the background Image for the 
  * piano roll representation */
-public class ScoreBackground implements Layer, ImageObserver {
+public class ScoreBackground implements Layer{
   
   /** Constructor */
   public ScoreBackground ( ExplodeGraphicContext theGc)
@@ -21,89 +22,105 @@ public class ScoreBackground implements Layer, ImageObserver {
     
     gc = theGc;
     
-    //
-    // start loading the background image (asynchronously)
-    //
+  }
 
-    String fs = File.separator;
-    String path = MaxApplication.getProperty("root")+fs+"packages/explode/images"+fs;
-    
-    if (itsImage == null) 
+  /** builds a grid representation in the given graphic port
+   * using the destination size*/
+  private void drawTheGrid(Graphics g)
+  {
+
+    g.setFont(gridSubdivisionFont);
+    Dimension d = gc.getGraphicDestination().getSize();
+
+    g.setColor(Color.white);
+    g.fillRect(0, 0, d.width, d.height);
+    int positionY;
+
+    g.setColor(horizontalGridLinesColor);
+    for (int i = 0; i < 381; i+=9)
       {
-	itsImage = Toolkit.getDefaultToolkit().getImage(path+"pianoroll2tr.gif");
-	itsImage.getWidth(this); //call any method on the image starts loading it
+	positionY = 409-i;
+	g.drawLine(31, positionY, d.width, positionY);
       }
-    
-  }
 
+    g.setColor(Color.black);
 
-
-
-  /** 
-   * the "image ready" flag keeps track of 
-   * the complete loading of the background image
-   * (insert a time out test?) */
-  public boolean  imageUpdate( Image img,
-			       int infoflags,
-			       int x,
-			       int y,
-			       int width,
-			       int height) 
-  {  
-    if ((infoflags & ALLBITS) != 0) 
+    for (int j = 0; j < 381; j+=36)
       {
-	imageReady = true;
-	
-	gc.getGraphicDestination().repaint();
-	return false;
-      } 
-    else return true;
+	positionY = 409-j;
+	g.drawLine(31, positionY, d.width, positionY);
+	g.drawString(""+j/3, 10, positionY+3);
+      }
+
+    // and the last line...
+    g.drawLine(31, 28, d.width, 28);
+    g.drawString(""+127, 10, 31);
   }
-  
+
+
   /**
    * Layer interface. Draw the background */
   public void render( Graphics g, int order)
   {
-    if (!imageReady) 
+
+    Dimension d = gc.getGraphicDestination().getSize();
+    
+    if (itsImage == null) 
       {
-	/* received a paint while loading the image... don't paint yet */
-	
-	g.drawString("PLEASE WAIT.....", 100, 100);
-	return;
+	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
+	drawTheGrid(itsImage.getGraphics());
       }
-    else 
+    else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width)
       {
-	g.setColor(Color.white);
-	g.fillRect(0, 0, 1000, 1000);
-
-	if (!g.drawImage(itsImage, 0, 18, this))
-	  System.err.println("something wrong: incomplete Image  ");
-
-	// paint the vertical grid
-	int MIN_GRID = 6;
-	int MAX_GRID = 50;
-
-	int windowTime = (int) (gc.getGraphicDestination().getSize().width / gc.getAdapter().getXZoom());
-	int timeStep;
-
+	itsImage.flush();
+	itsImage = null;
+	System.gc();
+	RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
 	
-	timeStep = findBestTimeStep(windowTime);
+	itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
+	drawTheGrid(itsImage.getGraphics());
+	rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
+      } 
+    
+    if (!g.drawImage(itsImage, 0, 0, gc.getGraphicDestination()))
+      System.err.println("something wrong: incomplete Image  ");
+    
+    // paint the vertical grid
+    int MIN_GRID = 6;
+    int MAX_GRID = 50;
+    
+    int windowTime = (int) (gc.getGraphicDestination().getSize().width / gc.getAdapter().getXZoom());
+    int timeStep;
+    
+    
+    timeStep = findBestTimeStep(windowTime);
+    
+    g.setColor(Color.lightGray);
 
-	g.setColor(Color.lightGray);
+    int xPosition;
+    int snappedTime;
 
-	int xPosition;
-	int snappedTime;
-	for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
-	  {
-	    snappedTime = (i/timeStep)*timeStep;
-	    xPosition = (int) ((snappedTime-gc.getLogicalTime()) * gc.getAdapter().getXZoom());
-
-	    g.drawLine(xPosition, 20, xPosition, 400);
-	    g.drawString(""+snappedTime, xPosition-20, 15);
-	  }
+    for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
+      {
+	snappedTime = (i/timeStep)*timeStep;
+	xPosition = (int) ((snappedTime-gc.getLogicalTime()) * gc.getAdapter().getXZoom());
+	
+	g.drawLine(xPosition, 20, xPosition, 400);
+	g.drawString(""+snappedTime, xPosition-20, 15);
       }
+      
+    //debugImage();
   }
   
+  public void debugImage()
+  {
+    Graphics g = gc.getGraphicDestination().getGraphics();
+    Dimension d = gc.getGraphicDestination().size();
+    g.setColor(Color.red);
+    g.fillRect(d.width-30, d.height-30, 10, 10);
+    Thread.dumpStack();
+  }
+
   /**
    * Layer interface. */
   public void render(Graphics g, Rectangle r, int order)
@@ -145,7 +162,10 @@ public class ScoreBackground implements Layer, ImageObserver {
   //--- Fields
   ExplodeGraphicContext gc;
   static Image itsImage;
-  static boolean imageReady = false;
+  static boolean imageReady = true/*false*/;
+  public static final Color horizontalGridLinesColor = new Color(187, 187, 187); 
+  public static final Font gridSubdivisionFont = new Font("Helvetica", Font.PLAIN, 10);
 }
+
 
 

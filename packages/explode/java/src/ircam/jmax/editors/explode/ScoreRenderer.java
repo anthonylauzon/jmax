@@ -38,6 +38,7 @@ public class ScoreRenderer implements RenderManager{
     itsForegroundLayer = new ScoreForeground(gc);
 
     itsLayers.addElement(new ScoreBackground(gc));
+    //itsLayers.addElement(new TestBackground(gc));
     itsLayers.addElement(itsForegroundLayer);
   }
   

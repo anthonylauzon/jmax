@@ -1,5 +1,5 @@
 ROOTDIR = ../../../..
-PACKAGE_DIR =  
+PACKAGE_DIR =  $(ROOTDIR)/packages/explode
 
 
 include $(ROOTDIR)/packages/explode/java/Makefiles/Makefile.common
@@ -19,7 +19,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(ROOTDIR)/packages/explode/java/classes ; /bin/rm -f explode.jar ; jar -cvf explode.jar ircam	)
+	(cd $(ROOTDIR)/packages/explode/java/classes ; /bin/rm -f explode.jar ; jar -cvf explode.jar ircam )
 .PHONY: jar
 
 
