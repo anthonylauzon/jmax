@@ -86,6 +86,7 @@ public class EditMenu extends PatcherMenu
   private void updateMenu()
   {
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
 
     if (window.isLocked())
       {
@@ -96,7 +97,8 @@ public class EditMenu extends PatcherMenu
 	duplicateItem.setEnabled(false);
 	inspectItem.setEnabled(false);
 
-	pasteItem.setEnabled(clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
+	pasteItem.setEnabled((flavors != null) &&
+			     clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
       }
     else
       {
@@ -118,7 +120,9 @@ public class EditMenu extends PatcherMenu
 	      }
 
 	    duplicateItem.setEnabled(false);
-	    pasteItem.setEnabled(clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
+
+	    pasteItem.setEnabled((flavors != null) &&
+				 clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
 	  }
 	else
 	  {
@@ -138,12 +142,13 @@ public class EditMenu extends PatcherMenu
 		copyItem.setEnabled(true);
 		duplicateItem.setEnabled(true);
 	      }
-	    pasteItem.setEnabled(clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
+
+	    pasteItem.setEnabled((flavors != null) &&
+				 clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
 	  }
 
 	inspectItem.setEnabled(true);
 	selectAllItem.setEnabled(true);
-	pasteItem.setEnabled(! ErmesSketchWindow.ftsClipboardIsEmpty());
       }
   }
 }

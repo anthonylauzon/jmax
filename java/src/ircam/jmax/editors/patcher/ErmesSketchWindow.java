@@ -314,6 +314,9 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     if (clipboardContent == null)
       return;  // Should never happen
 
+    if (clipboardContent.getTransferDataFlavors() == null)
+      return; // Should never happen, protection against system clipboard bug.
+
     if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
       {
 	if (itsSketchPad.canPasteText())
