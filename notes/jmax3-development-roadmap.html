@@ -1,0 +1,86 @@
+<html>
+<body>
+
+<h2>jMax 3 development roadmap</h2>
+
+<h3>Introduction</h3>
+
+<p>
+Targets:
+<ul>
+<li>object system
+<li>DSP engine
+<li>plug-in integration
+</ul>
+
+<h3>Multi-thread</h3>
+
+<p>
+Several threads running their own scheduler
+and communicating via message fifo (i.e. via control only)
+
+<p>
+Do an async sound file reader (based on methods callback) and reimplement Direct-to-Disk 
+using async sound file reader.
+
+
+<h3>Portability</h3>
+
+<p>
+Put fts_soundfile_t in a separate package, that can be loaded
+dynamicaly (as audio and MIDI ports)
+
+
+<h3>Configuration</h3>
+
+<p>
+Finish project/packages/config stuff
+
+
+<h3>Object system</h3>
+
+<h4>Methods</h4>
+
+<p>
+Simplify the method signature:
+<pre>
+typedef void (*fts_method_t)( fts_object_t *object, int argc, const fts_atom_t *argv);
+typedef void (*fts_anything_method_t)( fts_object_t *object, fts_symbol_t selector, int argc, const fts_atom_t *argv);
+</pre>
+Alternative:
+<pre>
+typedef void (*fts_method_t)( fts_object_t *object, const fts_atom_t *arg);
+typedef void (*fts_anything_method_t)( fts_object_t *object, fts_symbol_t selector, const fts_atom_t *arg);
+</pre>
+(where single argument can be an array (or a list) for a multiple arguments method)
+
+<p>
+
+
+
+<h4>Inlets</h4>
+
+<h4>Properties</h4>
+
+<p>
+Define properties statically by set/get method, a la JavaBeans
+
+
+<h4>Meta-classes</h4>
+
+<h4>Inheritance</h4>
+
+
+<h3>User interface</h3>
+
+<h4>Parser</h4>
+
+
+
+<h3>File formats and persistence</h3>
+
+
+
+
+</body>
+</html>
