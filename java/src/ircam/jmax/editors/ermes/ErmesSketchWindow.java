@@ -792,7 +792,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     if(!GetDocument().GetSaveFlag()){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
       aDialog.setLocation(300, 300);
-      aDialog.show();
+      aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
 	if(!GetDocument().Save()) return false;

@@ -30,6 +30,7 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
       ((BasicToolBarUI)ui).setFloatable (false);    
     InsertButtons();
     add (itsSwToolbar, BorderLayout.WEST);
+    setBackground(itsSwToolbar.getBackground());
     validate();
   }
 
@@ -118,11 +119,11 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
   }
 
   public void setRunMode(boolean theRunMode) {
-   JComponent aComponent;
-
-   setBackground(Color.white);
-   setVisible(!theRunMode);
-   itsSwToolbar.setVisible(!theRunMode);
+    JComponent aComponent;
+    if(theRunMode) setBackground(Color.white);
+    else setBackground(itsSwToolbar.getBackground());
+    //setVisible(!theRunMode);
+    itsSwToolbar.setVisible(!theRunMode);
   }
  
   public void Lock(){}//??

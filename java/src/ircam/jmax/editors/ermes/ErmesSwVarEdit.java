@@ -45,6 +45,9 @@ public class ErmesSwVarEdit extends JPanel implements ActionListener{
     addButton.addActionListener(this);
     aToolBar.add(deleteButton);
     aToolBar.setSize(300, 30);
+    ToolBarUI ui = aToolBar.getUI();
+    if (ui instanceof BasicToolBarUI)
+      ((BasicToolBarUI)ui).setFloatable(false);   
     add(aToolBar, "stick_both");
     validate();
     //-----second element; the "betweex panel"
