@@ -329,8 +329,8 @@ vecdisplay_set_bounds(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     }
 }
 
-static void 
-vecdisplay_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+vecdisplay_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
   fts_atom_t a[2];
@@ -386,8 +386,9 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vecdisplay_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, vecdisplay_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, vecdisplay_dump);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, vecdisplay_send_properties); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_size, vecdisplay_set_size_by_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), vecdisplay_set_range_by_client);
