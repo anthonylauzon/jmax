@@ -133,7 +133,7 @@ public class ErmesPatcherDoc implements MaxDocument {
   }
 
 
-  public boolean Import(File file) {
+  public void Import(File file) {
     itsTitle = file.getName();
     itsDocumentType = "patcher";
 
@@ -142,8 +142,8 @@ public class ErmesPatcherDoc implements MaxDocument {
       itsPatcher.open();
     } catch (Exception e) {
       System.out.println(e.toString() + " can't import "+ file);
-      // e.printStackTrace(); // temporary, MDC
-      return false;
+      e.printStackTrace(); // temporary, MDC
+      return;
     }
 
     // Reset the file, to avoid writing on top of .pat or other .tpa files
@@ -153,8 +153,6 @@ public class ErmesPatcherDoc implements MaxDocument {
     // This file is not already saved, beacause it do not correspond to a .tpa file !!
 
     ToSave();
-
-    return false;
   }
   
 

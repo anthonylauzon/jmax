@@ -232,7 +232,8 @@ public class MaxApplication extends Object {
       }
     catch (Exception e)
       {
-	ErrorDialog aErr = new ErrorDialog(itsProjectWindow, "Error while importing "+ file);
+	e.printStackTrace(); // temporary, MDC
+	ErrorDialog aErr = new ErrorDialog(itsProjectWindow, "Error " + e + " while importing "+ file);
 	aErr.setLocation(100, 100);
 	aErr.setVisible(true);
 	return;

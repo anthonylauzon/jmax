@@ -49,24 +49,47 @@ class ErmesSketchHelper extends Object{
       theFtsDescription.x = aPoint.x;
       theFtsDescription.y = aPoint.y;
     }
-    try {
+
+    try
+      {
       //there was an error "aObject may not have been initialized"
+      // Yes, because if the following statement raise an exception,
+      // the fi
       aObject = (ErmesObject) Class.forName(theName).newInstance();
       aObject.Init(itsSketchPad, theFtsDescription, theFtsObject);
-    } catch(ClassNotFoundException e) {}
-    catch(IllegalAccessException e) {}
-    catch(InstantiationException e) {}
-    finally {
-      itsSketchPad.itsElements.addElement(aObject);
-      if (!itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = itsSketchPad.DOING_NOTHING;	
-      aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, 
-			    aObject.currentRect.width, aObject.currentRect.height);
-      aRect.grow(3,6);
-      itsSketchPad.itsElementRgn.Add(aRect);
-      for (Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
-	aOutlet = (ErmesObjOutlet)e.nextElement();
-	itsSketchPad.itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
       }
+    catch(ClassNotFoundException e)
+      {
+	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
+			   theFtsDescription + ","  + theName + "," + theFtsObject +
+			   ") : class not found " + e);
+	return null;
+      }
+    catch(IllegalAccessException e)
+      {
+	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
+			   theFtsDescription + ","  + theName + "," + theFtsObject +
+			   ") : illegal access" + e);
+	return null;
+      }
+    catch(InstantiationException e) 
+      {
+	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
+			   theFtsDescription + ","  + theName + "," + theFtsObject +
+			   ") : instantiation exception " + e);
+	return null;
+      }
+
+    itsSketchPad.itsElements.addElement(aObject);
+    if (!itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = itsSketchPad.DOING_NOTHING;	
+    aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, 
+			  aObject.currentRect.width, aObject.currentRect.height);
+    aRect.grow(3,6);
+    itsSketchPad.itsElementRgn.Add(aRect);
+    for (Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
+      aOutlet = (ErmesObjOutlet)e.nextElement();
+      itsSketchPad.itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
+
     }
     return aObject;
   }
