@@ -181,7 +181,7 @@ static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
   if (err != noErr)
     ;
 
-  err = AudioDeviceRemoveIOProc( p->device, halaudioport_ioproc);
+  err = AudioDeviceRemoveIOProc( this->device, halaudioport_ioproc);
   if (err != noErr)
     ;
 
