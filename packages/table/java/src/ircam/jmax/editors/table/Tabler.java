@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.io.*;
+import tcl.lang.*;
 
 /** 
  A simple table editor
@@ -19,10 +20,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
   int values[];
  
   TextField itsFormula = new TextField("", 40);
-  Graphics holdGraph;
-  Graphics offGraphics = null;
-  Dimension offDimension;	   
-  Image offImage;			 
+  //Graphics holdGraph;
+  //Graphics offGraphics = null;
+  //Dimension offDimension;	   
+  //Image offImage;			 
   public MaxData itsData;
   static int untitledCounter = 1;
 
@@ -32,15 +33,29 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     else {
       setTitle(theData.getDataSource().toString()); 
     }
+
+    //if ( (offGraphics == null)){					  
+    //Dimension d = preferredSize();
+    //offDimension = preferredSize();
+    //offImage = createImage(preferredSize().width, preferredSize().height);
+    //offGraphics = offImage.getGraphics();
+    //  }
+
     itsData = theData;
-    setLayout(new BorderLayout());
+    getContentPane().setLayout(new BorderLayout());
     setBackground(Color.white);
     values = new int[N_POINTS];
-    holdGraph = getGraphics();
+    itsFormula.resize(300, 20);
+    getContentPane().add("South", itsFormula);
+    validate();
+    //holdGraph = getGraphics();
     addMouseMotionListener(this);
     addMouseListener(this);
     itsFormula.addKeyListener(this);
+    setBounds(100, 100, 300,300);
+    setVisible(true);
   }
+
  
 
   public Tabler() {
@@ -72,7 +87,10 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
   public void SetupMenu(){}
 
   public void paint(Graphics g) {
-    CopyTheOffScreen(g);
+    //CopyTheOffScreen(g);
+    for(int i = 0; i<N_POINTS;i++){
+      PaintSingle(i, g);
+    }
   }
 
   //////////////////////////////////////////////////////////////////
@@ -91,15 +109,16 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     values[x] = y;
     Interpolate(old_dragx, old_dragy, x, y);
     old_dragx = x; old_dragy = y;
-    DoublePaint(x);
+    //DoublePaint(x);
+    PaintSingle(x, getGraphics());
   }
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListenr--fine
     
-  void DoublePaint(int x) {
+  /*void DoublePaint(int x) {
     PaintSingle(x, getGraphics());
     PaintSingle(x, offGraphics);
-  }
+    }*/
   
   void Interpolate(int x1, int y1, int x2, int y2) {
     Dimension d = size();
@@ -110,13 +129,13 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     float factor = (y2-y1)/(x2-x1);
     if (x2>x1) for (int i=x1+1; i<x2; i++) {
       values[i] = (int) (values[i-1]+factor);
-      PaintSingle(i, offGraphics);
+      PaintSingle(i, /*offGraphics*/getGraphics());
     }
     else for (int i=x1-1; i>x2; i--) {
       values[i] = (int) (values[i+1]+factor);
-      PaintSingle(i, offGraphics);
+      PaintSingle(i, /*offGraphics*/getGraphics());
     }
-    CopyTheOffScreen(temp);
+    //CopyTheOffScreen(temp);
   }
 
 
@@ -166,18 +185,21 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     
     for (int i=start; i<=end; i++) {
       s = "set x " + i + "; " + "set y " + values[i] + "; " + 
-	"set z " + ((i == 0) ? values[0]:values[i-1]) + "; "+ "expr " + theFormula + "\r\n";
-      // try {
-      //values[i] = Integer.parseInt((String) GetErmesApp().itsShell.interp.Eval(s));
-      //} 	catch (cornell.Jacl.EvalException e) {
-      //itsFormula.setText("TCL error: " + e.info);
-      //return;
-      //}
-      //catch(NumberFormatException e1) {
-      //itsFormula.setText(e1.toString());
-      //return;
-      //}
-      DoublePaint(i);
+	"set z " + ((i == 0) ? values[0]:values[i-1]) + "; "+
+	"eval \" expr " + theFormula + "\"\n";
+      try {
+	MaxApplication.getTclInterp().eval(s);
+	values[i] = Integer.parseInt(MaxApplication.getTclInterp().getResult().toString());
+      } 	catch (TclException e) {
+	itsFormula.setText("TCL error: " + e);
+	return;
+      }
+      catch(NumberFormatException e1) {
+	itsFormula.setText(e1.toString());
+	return;
+      }
+      //DoublePaint(i);
+      PaintSingle(i, getGraphics());
     }
   }
   /////////////////////////////////////////////////////////////////////////////
@@ -192,7 +214,8 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     old_dragx = x;
     old_dragy = y;
     values[x] = y;
-    DoublePaint(x);
+    //DoublePaint(x);
+    PaintSingle(x, getGraphics());
   }
   public void mouseReleased(MouseEvent e){}
   public void mouseEntered(MouseEvent e){}
@@ -208,9 +231,9 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     g.drawLine(index, d.height, index, d.height-values[index]);	//paint new
   }
 
-  public void CopyTheOffScreen(Graphics g) {
+  /*public void CopyTheOffScreen(Graphics g) {
     g.drawImage(offImage, 0, 0, this);	
-  }
+    }*/
 
   public Dimension preferredSize() {
     Dimension d = new Dimension();
