@@ -264,7 +264,7 @@ line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   target = (double) fts_get_float_arg(ac, at, 1, 0.0f);
   grain =  fts_get_double_arg(ac, at, 2, 0);    
   
-  if(ac < 1 || fts_is_long(at+1))
+  if(ac < 1 || fts_is_int(at+1))
     line_tick = line_int_tick;
   else
     line_tick = line_float_tick;
@@ -313,7 +313,7 @@ line_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, 0, fts_new_symbol("stop"), line_stop, 0, 0);
 
-  if(ac <= 1  || fts_is_long(at+1))
+  if(ac <= 1  || fts_is_int(at+1))
     {
       a[0] = fts_s_int;
       fts_method_define(cl, 0, fts_s_int, line_int_number, 1, a);
@@ -361,7 +361,7 @@ static int
 line_class_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
   return(
-	 ((ac0 < 2 || fts_is_long(at0+1)) && (ac1 < 2 || fts_is_long(at1+1))) ||
+	 ((ac0 < 2 || fts_is_int(at0+1)) && (ac1 < 2 || fts_is_int(at1+1))) ||
 	 ((ac0 >= 2 && fts_is_float(at0+1)) && (ac0 >= 2 && fts_is_float(at1+1)))
 	 );
 }

@@ -162,7 +162,7 @@ static void decrypt_bang( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static void decrypt_int( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   decrypt_t *this = (decrypt_t *)o;
-  int n = fts_get_long( &at[0]);
+  int n = fts_get_int( &at[0]);
 
   if ( this->enb)
     switch(n) {
@@ -203,20 +203,20 @@ static void decrypt_format( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 	ac = M_FORMAT+1;
 
       for( i = 0; i < ac; i++)
-	if ( !fts_is_long( &at[i]))
+	if ( !fts_is_int( &at[i]))
 	  {
 	    post( "%s: arguments du message <format> non valides", NOM);
 	    return;
 	  }
 
-      n = App2( fts_get_long( &at[0]), 0, 127);
+      n = App2( fts_get_int( &at[0]), 0, 127);
 
       if ( ac > 1)
 	{
 	  this->nb_elm = ac-1;
 
 	  for( i = 1; i< ac; i++)
-	    this->Format[i-1] = App2( fts_get_long( &at[i]), FORMAT_MIN, FORMAT_MAX);
+	    this->Format[i-1] = App2( fts_get_int( &at[i]), FORMAT_MIN, FORMAT_MAX);
 	  
 	  fts_outlet_int( o, 1, n);
 	}
@@ -231,7 +231,7 @@ static void decrypt_enable( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   decrypt_t *this = (decrypt_t *)o;
 
-  this->enb = ( fts_get_long( &at[0]) > 0);
+  this->enb = ( fts_get_int( &at[0]) > 0);
 }
 
 
@@ -241,7 +241,7 @@ static void decrypt_enable( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
 static void decrypt_chn( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  Chanel2( (decrypt_t *)o, fts_get_long( &at[0]));
+  Chanel2( (decrypt_t *)o, fts_get_int( &at[0]));
 }
 
 
@@ -274,19 +274,19 @@ static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 	ac = M_FORMAT+2;
 
       for( i = 2; i < ac; i++)
-	if ( ! fts_is_long( &at[i]))
+	if ( ! fts_is_int( &at[i]))
 	  {
 	    post("%s: argument %d non valide (%s)\n", NOM, i, fts_symbol_name( fts_get_type( &at[i])));
 	    return;
 	  }
 
-      Chanel2( this, fts_get_long( &at[1]));
+      Chanel2( this, fts_get_int( &at[1]));
 
       if (ac > 2)
 	{
 	  this->nb_elm = ac-2;
 	  for( i = 2; i < ac; i++)
-	    this->Format[i-2] = App2( fts_get_long( &at[i]), FORMAT_MIN, FORMAT_MAX);
+	    this->Format[i-2] = App2( fts_get_int( &at[i]), FORMAT_MIN, FORMAT_MAX);
 	}
     }
 }

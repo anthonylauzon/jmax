@@ -51,8 +51,8 @@ bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int noutlets;
   fts_symbol_t a[1];
 
-  if ((ac >= 2)  && fts_is_long(&at[1]))
-    noutlets = fts_get_long(&at[1]);
+  if ((ac >= 2)  && fts_is_int(&at[1]))
+    noutlets = fts_get_int(&at[1]);
   else
     noutlets = 2;
 

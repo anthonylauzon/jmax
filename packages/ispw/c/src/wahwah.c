@@ -95,7 +95,7 @@ ftl_wahwah(fts_word_t *argv)
   float *y = (float *)fts_word_get_ptr(argv + 3);
   float *state = (float *)fts_word_get_ptr(argv + 4);
   float conv = fts_word_get_float(argv + 5);
-  long n_tick = fts_word_get_long(argv + 6);
+  long n_tick = fts_word_get_int(argv + 6);
   float theta, cos_theta, sin_theta, q, r;
   float c, b1, b2;
   float ynm2, ynm1;

@@ -58,7 +58,7 @@ panel_connect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   panel_t *this = (panel_t *)o;
 
-  this->tag = fts_get_long(at);
+  this->tag = fts_get_int(at);
   /* this->clientid = fts_get_clientid(); */
   /* @@@@ */
 }

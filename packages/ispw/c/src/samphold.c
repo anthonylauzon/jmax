@@ -53,7 +53,7 @@ ftl_samphold(fts_word_t *argv)
   float *in1 = (float *)fts_word_get_ptr(argv + 1);
   float *out = (float *)fts_word_get_ptr(argv + 2);
   samphold_state_t *samphold = (samphold_state_t *)fts_word_get_ptr(argv + 3);
-  long int n = fts_word_get_long(argv + 4);
+  long int n = fts_word_get_int(argv + 4);
   float last = samphold->last;
   float val = samphold->val;
   float next;

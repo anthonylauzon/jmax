@@ -103,8 +103,8 @@ expr_list_realize(struct expr *x, int argc, const fts_atom_t *argv)
 
   for (i = argc - 1; i >= 0; i--)
     {
-      if (fts_is_long(&argv[i]))
-	expr_int_realize(x, fts_get_long(&argv[i]), i);
+      if (fts_is_int(&argv[i]))
+	expr_int_realize(x, fts_get_int(&argv[i]), i);
       else if (fts_is_float(&argv[i]))
 	expr_float_realize(x, fts_get_float(&argv[i]), i);
       else if (fts_is_symbol(&argv[i]))
@@ -122,7 +122,7 @@ expr_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 expr_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  expr_int_realize((t_expr *)o, fts_get_long(at), 0);
+  expr_int_realize((t_expr *)o, fts_get_int(at), 0);
   expr_bang(o, winlet, s, ac, at);
 }
 

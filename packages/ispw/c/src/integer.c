@@ -246,7 +246,7 @@ integer_int(fts_object_t *o, int winlet, fts_symbol_t s,
 {
   integer_t *this = (integer_t *) o;
 
-  this->n = fts_get_long(at);
+  this->n = fts_get_int(at);
   fts_outlet_send(o, 0, fts_s_int, ac, at);
 }
 
@@ -296,7 +296,7 @@ integer_float_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 static void
 integer_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (fts_is_long(at))
+  if (fts_is_int(at))
     integer_int(o, winlet, fts_s_int, 1, at);
   else if (fts_is_float(at))
     integer_float(o, winlet, fts_s_float, 1, at);

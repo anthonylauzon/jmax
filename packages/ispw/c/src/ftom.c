@@ -54,7 +54,7 @@ ftom_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 ftom_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_float(o, 0, ftom((float)fts_get_long(at)));
+  fts_outlet_float(o, 0, ftom((float)fts_get_int(at)));
 }
 
 static fts_status_t

@@ -83,7 +83,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
       if (!target)
 	{
-	  if (fts_is_float(av) || fts_is_long(av))
+	  if (fts_is_float(av) || fts_is_int(av))
 	    {
 	      fts_atom_t waka[11];
 	      fts_atom_t *wp = waka+1;
@@ -94,7 +94,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		{
 		  *wp = *fts_atom_list_iterator_current(this->iterator);
 
-		  if ((! fts_is_long(wp)) && (! fts_is_float(wp)))
+		  if ((! fts_is_int(wp)) && (! fts_is_float(wp)))
 		    break;
 
 		  fts_atom_list_iterator_next(this->iterator);
@@ -117,7 +117,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 		}
 	      break;
 	    }
-	  else if (fts_is_long(av))
+	  else if (fts_is_int(av))
 	    {
 	      fts_outlet_send(o, 0, fts_s_int, 1, av);
 
@@ -176,7 +176,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 
       if (! drop)
 	{
-	  if (fts_is_long(ap))
+	  if (fts_is_int(ap))
 	    {
 	      if (ac > 1)
 		fts_message_send(target, 0, fts_s_list, ac, ap);

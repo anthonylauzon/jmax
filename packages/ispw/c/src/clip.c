@@ -40,9 +40,9 @@ clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   clip_t *x = (clip_t *)o;
 
-  if(fts_is_long(at))
+  if(fts_is_int(at))
     {
-      x->i_min = fts_get_long(at);
+      x->i_min = fts_get_int(at);
       x->f_min = (float)x->i_min;
     }
   else if(fts_is_float(at))
@@ -57,9 +57,9 @@ clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   clip_t *x = (clip_t *)o;
 
-  if(fts_is_long(at))
+  if(fts_is_int(at))
     {
-      x->i_max = fts_get_long(at);
+      x->i_max = fts_get_int(at);
       x->f_max = (float)x->i_max;
     }
   else if(fts_is_float(at))
@@ -107,7 +107,7 @@ clip_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 clip_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  long n = fts_get_long(at);
+  long n = fts_get_int(at);
   clip_t *x = (clip_t *)o;
 
   if (n > x->i_max)
@@ -133,11 +133,11 @@ clip_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   for (i = 0; i < ac; i++, at++, ap++)
     {
-      if (fts_is_long(at))
+      if (fts_is_int(at))
 	{
-	  if (fts_get_long(at) > x->i_max)
+	  if (fts_get_int(at) > x->i_max)
 	    fts_set_int(ap, x->i_max);
-	  else if (fts_get_long(at) < x->i_min)
+	  else if (fts_get_int(at) < x->i_min)
 	    fts_set_int(ap, x->i_min);
 	  else
 	    *ap = *at;

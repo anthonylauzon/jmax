@@ -228,8 +228,8 @@ zll_vecToZll(int ac, const fts_atom_t *av)
     {
       /* pick off first element */
 
-      if (fts_is_long(av))
-	current->x = fts_get_long(av);
+      if (fts_is_int(av))
+	current->x = fts_get_int(av);
       else
 	{
 	  post("zll_vecToZll: bad input for X\n");
@@ -239,8 +239,8 @@ zll_vecToZll(int ac, const fts_atom_t *av)
       count++;
       av++;
 
-      if (fts_is_long(av))
-	current->y = fts_get_long(av);
+      if (fts_is_int(av))
+	current->y = fts_get_int(av);
       else
 	{
 	  post("zll_vecToZll: bad input for Y\n");
@@ -256,8 +256,8 @@ zll_vecToZll(int ac, const fts_atom_t *av)
       current->next->prev = current;
       current = current->next;
 
-      if (fts_is_long(av))
-	current->x = fts_get_long(av);
+      if (fts_is_int(av))
+	current->x = fts_get_int(av);
       else
 	{
 	  post("zll_vecToZll: bad input for X\n");
@@ -267,8 +267,8 @@ zll_vecToZll(int ac, const fts_atom_t *av)
       count++;
       av++;
 
-      if (fts_is_long(av))
-	current->y = fts_get_long(av);
+      if (fts_is_int(av))
+	current->y = fts_get_int(av);
       else
 	{
 	  post("zll_vecToZll: bad input for Y\n");
@@ -614,7 +614,7 @@ static void
 funbuff_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
-  long int index = fts_get_long(at);
+  long int index = fts_get_int(at);
 
   if (! funbuff_first(this))
     return;
@@ -761,7 +761,7 @@ static void
 funbuff_interp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
-  long int n = fts_get_long(at);
+  long int n = fts_get_int(at);
   struct zll *z = funbuff_getElement(this,n), *z2;
 
   if (!z)
@@ -795,7 +795,7 @@ static void
 funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
-  int xn  = fts_get_long(at + 0);
+  int xn  = fts_get_int(at + 0);
   fts_symbol_t sym = fts_get_symbol(at + 1);
   struct zll *z;
   long x1, x2, tab_domain, tab_range, tab_x, tab_y;
@@ -888,7 +888,7 @@ static void
 funbuff_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   funbuff_t *this = (funbuff_t *)o;
-  long int yval   = fts_get_long(at);
+  long int yval   = fts_get_int(at);
   struct zll *list;
   
   if (! funbuff_first(this))

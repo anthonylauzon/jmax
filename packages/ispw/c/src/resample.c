@@ -54,7 +54,7 @@ ftl_up(fts_word_t *argv)
   float * restrict in  = (float *)fts_word_get_ptr(argv);
   float * restrict out = (float *)fts_word_get_ptr(argv+1);
   up_state_t *x = (up_state_t *)fts_word_get_ptr(argv+2);
-  int n = fts_word_get_long(argv+3);
+  int n = fts_word_get_int(argv+3);
   int i, j;
   float x0;
   float x1 = x->last[0];
@@ -169,7 +169,7 @@ ftl_down(fts_word_t *argv)
 {
   float * restrict in = (float *)fts_word_get_ptr(argv);
   float * restrict out = (float *)fts_word_get_ptr(argv+1);
-  long int n = fts_word_get_long(argv+2);
+  long int n = fts_word_get_int(argv+2);
   int i, j;
 
   for (i = 0, j = 0; i < n; i++, j += 2)

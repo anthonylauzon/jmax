@@ -295,8 +295,8 @@ static void audp_dac_put( fts_word_t *argv)
 
   dev = *((fts_dev_t **)fts_word_get_ptr( argv));
   data = (audp_dev_data_t *)fts_dev_get_device_data( dev);
-  n_channels = fts_word_get_long(argv + 1);
-  n = fts_word_get_long(argv + 2);
+  n_channels = fts_word_get_int(argv + 1);
+  n = fts_word_get_int(argv + 2);
  
   /* Platform specific code should go here */
 
@@ -492,8 +492,8 @@ static void audp_adc_get( fts_word_t *args)
   dev = *((fts_dev_t **)fts_word_get_ptr( args));
 
   data = (audp_dev_data_t *)fts_dev_get_device_data( dev);
-  n_channels = fts_word_get_long(args + 1);
-  n = fts_word_get_long(args + 2);
+  n_channels = fts_word_get_int(args + 1);
+  n = fts_word_get_int(args + 2);
 
   /* if(n_channels != data->handle->audp_header->channels)
     {

@@ -53,7 +53,7 @@ ftl_arctan2(fts_word_t *argv)
   float *yval = (float *)fts_word_get_ptr(argv + 0);
   float *xval = (float *)fts_word_get_ptr(argv + 1);
   float *out = (float *)fts_word_get_ptr(argv + 2);
-  long n = fts_word_get_long(argv + 3);
+  long n = fts_word_get_int(argv + 3);
   float  inval, outval, offset, where;
   float ax,ay;
   int bin;

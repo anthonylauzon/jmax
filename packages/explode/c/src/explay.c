@@ -155,9 +155,9 @@ static void
 explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explay_t *this = (explay_t *)o;
-  long n1 = fts_get_long(at + 0);
-  long n2 = fts_get_long(at + 1);
-  long n3 = fts_get_long(at + 2);
+  long n1 = fts_get_int(at + 0);
+  long n2 = fts_get_int(at + 1);
+  long n3 = fts_get_int(at + 2);
   explode_t *explode;
 
   explode = explode_get_by_name(this->explode_name); 

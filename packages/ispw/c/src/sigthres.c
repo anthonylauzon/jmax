@@ -256,7 +256,7 @@ sigthres_dsp(fts_word_t *argv)
 {
   sigthres_state_t *ctl = (sigthres_state_t *)fts_word_get_ptr(&argv[DSP_ARG_ctl]);
   float *in0 = (float *)fts_word_get_ptr(&argv[DSP_ARG_in0]);
-  long n_tick = fts_word_get_long(&argv[DSP_ARG_n_tick]);
+  long n_tick = fts_word_get_int(&argv[DSP_ARG_n_tick]);
   
   if (ctl->wait)
     ctl->wait--;

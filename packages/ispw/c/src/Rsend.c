@@ -67,7 +67,7 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int argc, const fts_
 
   for(i=0; i<argc; i++)
     {
-      if (fts_is_long(&av[i]))
+      if (fts_is_int(&av[i]))
 	{
 	  data[0] = (char) RSEND_LONG;
 	  sprintf(data + 1,"%d", fts_get_int(&av[i]));

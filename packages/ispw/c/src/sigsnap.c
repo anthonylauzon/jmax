@@ -41,7 +41,7 @@ sigsnapshot_dsp(fts_word_t *argv)
 {
   float *in = (float *) fts_word_get_ptr(argv + 0);
   float *x  = (float *) fts_word_get_ptr(argv + 1);
-  long int n =  fts_word_get_long(argv+2);
+  long int n =  fts_word_get_int(argv+2);
 
   *x = in[n - 1];
 }

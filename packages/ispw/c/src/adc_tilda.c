@@ -56,7 +56,7 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   if ( ac != 0)
     {
       for ( i = 0; i < outlets; i++)
-	fts_audioport_add_input_object( this->port, fts_get_long(at + i) - 1, (fts_object_t *)this);
+	fts_audioport_add_input_object( this->port, fts_get_int(at + i) - 1, (fts_object_t *)this);
     }
   else
     {

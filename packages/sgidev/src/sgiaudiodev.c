@@ -384,7 +384,7 @@ sgi_dac_put(fts_word_t *argv)
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
   sgi_dac_data_t *dev_data;
 
-  long n = fts_word_get_long(argv + 2);
+  long n = fts_word_get_int(argv + 2);
   int i,j;
   int off2, off3, off4;
   int nchans, ch, inc;
@@ -393,7 +393,7 @@ sgi_dac_put(fts_word_t *argv)
 
   dev_data->fts_frames += n;	/* count for the slip detection */
 
-  nchans = fts_word_get_long(argv + 1);
+  nchans = fts_word_get_int(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -683,14 +683,14 @@ sgi_adc_get(fts_word_t *argv)
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
   sgi_adc_data_t *dev_data;
 
-  long n = fts_word_get_long(argv + 2);
+  long n = fts_word_get_int(argv + 2);
   int i,j;
   int off2, off3, off4;
   int nchans, ch, inc;
 
   dev_data = fts_dev_get_device_data(dev);
 
-  nchans = fts_word_get_long(argv + 1);
+  nchans = fts_word_get_int(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -956,7 +956,7 @@ static void
 sgi_soundfile_put(fts_word_t *argv)
 {
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
-  long n = fts_word_get_long(argv + 2);
+  long n = fts_word_get_int(argv + 2);
   struct soundfile_data *dev_data;
   short *out;
   int i,j;
@@ -970,7 +970,7 @@ sgi_soundfile_put(fts_word_t *argv)
   if ((! dev_data->active) || (dev_data->active != soundfile_write_only))
     return;
 
-  nchans = fts_word_get_long(argv + 1);
+  nchans = fts_word_get_int(argv + 1);
   off2 = nchans;
   off3 = 2 * nchans;
   off4 = 3 * nchans;
@@ -1010,7 +1010,7 @@ static void
 sgi_soundfile_get(fts_word_t *argv)
 {
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
-  long n = fts_word_get_long(argv + 2);
+  long n = fts_word_get_int(argv + 2);
   struct soundfile_data *dev_data;
 
   dev_data = fts_dev_get_device_data(dev);
@@ -1025,7 +1025,7 @@ sgi_soundfile_get(fts_word_t *argv)
       int nchans, ch, inc;
       int ret;
 
-      nchans = fts_word_get_long(argv + 1);
+      nchans = fts_word_get_int(argv + 1);
       off2 = nchans;
       off3 = 2 * nchans;
       off4 = 3 * nchans;

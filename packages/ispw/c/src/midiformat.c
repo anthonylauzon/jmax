@@ -59,8 +59,8 @@ midiformat_note(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   fts_outlet_int((fts_object_t *)this, 0, this->noteon);
 
-  if (fts_is_long(at))
-    val = fts_get_long(at);
+  if (fts_is_int(at))
+    val = fts_get_int(at);
   else if (fts_is_float(at))
     val = (long)fts_get_float(at);
   else
@@ -70,8 +70,8 @@ midiformat_note(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   at++;
 
-  if (fts_is_long(at))
-    val = fts_get_long(at);
+  if (fts_is_int(at))
+    val = fts_get_int(at);
   else if (fts_is_float(at))
     val = (long)fts_get_float(at);
   else
@@ -93,8 +93,8 @@ midiformat_poly_touch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   fts_outlet_int((fts_object_t *)this, 0, this->poly);
 
-  if (fts_is_long(at))
-    val = fts_get_long(at);
+  if (fts_is_int(at))
+    val = fts_get_int(at);
   else if (fts_is_float(at))
     val = (long)fts_get_float(at);
   else
@@ -104,8 +104,8 @@ midiformat_poly_touch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   at++;
 
-  if (fts_is_long(at))
-    val = fts_get_long(at);
+  if (fts_is_int(at))
+    val = fts_get_int(at);
   else if (fts_is_float(at))
     val = (long)fts_get_float(at);
   else
@@ -127,8 +127,8 @@ midiformat_ctl_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   fts_outlet_int((fts_object_t *)this, 0, this->ctl);
 
-  if (fts_is_long(at))
-    val = fts_get_long(at);
+  if (fts_is_int(at))
+    val = fts_get_int(at);
   else if (fts_is_float(at))
     val = (long)fts_get_float(at);
   else
@@ -138,8 +138,8 @@ midiformat_ctl_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   at++;
 
-  if (fts_is_long(at))
-    val = fts_get_long(at);
+  if (fts_is_int(at))
+    val = fts_get_int(at);
   else if (fts_is_float(at))
     val = (long)fts_get_float(at);
   else

@@ -98,7 +98,7 @@ mroute_send(fts_object_t *o, int ns, int ac, const fts_atom_t *at)
     }
   else if (ac > 1 )
     s = fts_s_list;
-  else if (fts_is_long(at))
+  else if (fts_is_int(at))
     s = fts_s_int;
   else if (fts_is_float(at))
     s = fts_s_float;
@@ -164,7 +164,7 @@ iroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   for (pn = x->s_n, tat = at, n = 0; n < ac; pn++, tat++, n++)
     {
-      *pn = fts_get_long(tat);
+      *pn = fts_get_int(tat);
     }
 }
 
@@ -194,7 +194,7 @@ iroute_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  }
 	else if (ac > 1 )
 	  s = fts_s_list;
-	else if (fts_is_long(at))
+	else if (fts_is_int(at))
 	  s = fts_s_int;
 	else if (fts_is_float(at))
 	  s = fts_s_float;
@@ -269,7 +269,7 @@ route_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       return &fts_ArgumentTypeMismatch;
     }
 
-  if (!fts_is_long(at) && !fts_is_symbol(at))
+  if (!fts_is_int(at) && !fts_is_symbol(at))
     {
       post( "route: invalid type for first argument\n");
       return &fts_ArgumentTypeMismatch;

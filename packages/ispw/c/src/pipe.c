@@ -132,8 +132,8 @@ pipe_output_delayed_list(qued_list_t *out)
     {
       fts_atom_t *at = out->at + i;
 
-      if(fts_is_long(at))
-	fts_outlet_int(o, i, fts_get_long(at));
+      if(fts_is_int(at))
+	fts_outlet_int(o, i, fts_get_int(at));
       else if(fts_is_float(at))
 	fts_outlet_float(o, i, fts_get_float(at));
       else /* if fts_is_symbol(at) */
@@ -187,7 +187,7 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       this->ac = ac - 1;
       this->at = fts_malloc(this->ac * sizeof(fts_atom_t));
       memcpy((char *)(this->at), at, this->ac * sizeof(fts_atom_t));
-      if(fts_is_long(at + this->ac) || fts_is_float(at + this->ac))
+      if(fts_is_int(at + this->ac) || fts_is_float(at + this->ac))
 	this->del_time = fts_get_double_arg(ac, at, this->ac, 0);
       else
 	this->del_time = 0.0;
@@ -197,7 +197,7 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       this->ac = 1;
       this->at = fts_malloc(sizeof(fts_atom_t));
       fts_set_int(this->at, 0);
-      if(ac == 0 || fts_is_long(at) || fts_is_float(at))
+      if(ac == 0 || fts_is_int(at) || fts_is_float(at))
 	this->del_time = fts_get_double_arg(ac, at, 0, 0);
       else
 	this->del_time = 0.0;
@@ -369,7 +369,7 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* outlet */
   if(ac == 2)
     {
-      if(fts_is_long(at))
+      if(fts_is_int(at))
 	fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
       else if(fts_is_float(at))
 	fts_outlet_type_define(cl, 0, fts_s_float, 1, a);

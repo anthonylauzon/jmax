@@ -58,7 +58,7 @@ static void sgiaudioport_input( fts_word_t *argv)
   int n, channels, ch, i, j;
 
   port = (sgiaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_input_channels( port);
 
   alReadFrames( port->input_alport, port->adc_fmtbuf, n);
@@ -82,7 +82,7 @@ static void sgiaudioport_output( fts_word_t *argv)
   int n, channels, ch, i, j;
 
   port = (sgiaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels( port);
 
   port->frames += n;

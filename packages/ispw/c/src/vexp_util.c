@@ -156,7 +156,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 
   while (argc--)
     {
-      if (fts_is_long(argv))
+      if (fts_is_int(argv))
 	{
 	  sprintf(p, "%d ", fts_get_int(argv));
 	  while (*p)

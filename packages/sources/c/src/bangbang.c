@@ -78,8 +78,8 @@ static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_a
 static int bangbang_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
   if (ac0 == 1 && ac1 == 1 
-      && fts_is_long(at0) && fts_is_long(at1)
-      && fts_get_long(at0) == fts_get_long(at1))
+      && fts_is_int(at0) && fts_is_int(at1)
+      && fts_get_int(at0) == fts_get_int(at1))
     return 1;
   else
     return 0;

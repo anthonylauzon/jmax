@@ -57,7 +57,7 @@ static void profileaudioport_output( fts_word_t *argv)
   int n;
 
   this = (profileaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
 
   this->samples_count += n;
 

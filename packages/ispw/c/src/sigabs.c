@@ -40,7 +40,7 @@ static void ftl_sigabs(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_ptr(argv + 0);
   float *out = (float *)fts_word_get_ptr(argv + 1);
-  long n = fts_word_get_long(argv + 2);
+  long n = fts_word_get_int(argv + 2);
   int i;
 
   for (i = 0; i < n; i ++)

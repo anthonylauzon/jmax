@@ -39,7 +39,7 @@ typedef struct abs_t {
 static void
 abs_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_int(o, 0, abs(fts_get_long(at)));
+  fts_outlet_int(o, 0, abs(fts_get_int(at)));
 }
 
 static void

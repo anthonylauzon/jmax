@@ -130,7 +130,7 @@ static void halaudioport_output( fts_word_t *argv)
   int n, channels, ch, i, j;
 
   this = (halaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels( (fts_audioport_t *)this);
 
   /* first pthread mutex lock */

@@ -36,7 +36,7 @@ static void
 split_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   split_t *this = (split_t *)o;
-  long l = fts_get_long(at);
+  long l = fts_get_int(at);
 
   if (l <= this->int_bound[1] && l >= this->int_bound[0])
     fts_outlet_int(o, 0, l);

@@ -55,7 +55,7 @@ unpack_send(fts_object_t *o, int winlet, fts_symbol_t s,
 
       outlet_type = fts_object_get_outlet_type(o, i);
 
-      if ((outlet_type == fts_s_int) && fts_is_long(&at[i]))
+      if ((outlet_type == fts_s_int) && fts_is_int(&at[i]))
 	fts_outlet_send(o, i, outlet_type, 1, &at[i]);
       else if ((outlet_type == fts_s_int) && fts_is_float(&at[i]))
 	{
@@ -64,9 +64,9 @@ unpack_send(fts_object_t *o, int winlet, fts_symbol_t s,
 	}
       else if ((outlet_type == fts_s_float) && fts_is_float(&at[i]))
 	fts_outlet_send(o, i, outlet_type, 1, &at[i]);
-      else if ((outlet_type == fts_s_float) && fts_is_long(&at[i]))
+      else if ((outlet_type == fts_s_float) && fts_is_int(&at[i]))
 	{
-	  fts_set_float(&a, (float) fts_get_long(&at[i]));
+	  fts_set_float(&a, (float) fts_get_int(&at[i]));
 	  fts_outlet_send(o, i, outlet_type, 1, &a);
 	}
       else if ((outlet_type == fts_s_symbol) && fts_is_symbol(&at[i]))
@@ -115,7 +115,7 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  a = fts_s_float;
 	  fts_outlet_type_define(cl, i, fts_s_float, 1, &a);
 	}
-      else if (fts_is_long(&at[i]))
+      else if (fts_is_int(&at[i]))
 	{
 	  a = fts_s_int;
 	  fts_outlet_type_define(cl, i, fts_s_int, 1, &a);

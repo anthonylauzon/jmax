@@ -53,7 +53,7 @@ static void ftl_line(fts_word_t *argv)
 {
   float * restrict fp = (float *)fts_word_get_ptr(argv);
   line_control_t * restrict lctl = (line_control_t *)fts_word_get_ptr(argv+1);
-  long int n = fts_word_get_long(argv+2);
+  long int n = fts_word_get_int(argv+2);
 
   if (lctl->steps > 0)
     {

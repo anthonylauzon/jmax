@@ -36,10 +36,10 @@ static fts_symbol_t pack_s_i = 0;
 static void
 set_value_preserve_type(const fts_atom_t *src, fts_atom_t *dst)
 {
-  if (fts_is_long(dst))
+  if (fts_is_int(dst))
     {
-      if (fts_is_long(src))
-	fts_set_int(dst, fts_get_long(src));
+      if (fts_is_int(src))
+	fts_set_int(dst, fts_get_int(src));
       else if (fts_is_float(src))
 	fts_set_int(dst, (long) fts_get_float(src));
       else 
@@ -47,8 +47,8 @@ set_value_preserve_type(const fts_atom_t *src, fts_atom_t *dst)
     }
   else if (fts_is_float(dst))
     {
-      if (fts_is_long(src))
-	fts_set_float(dst, (float) fts_get_long(src));
+      if (fts_is_int(src))
+	fts_set_float(dst, (float) fts_get_int(src));
       else if (fts_is_float(src))
 	fts_set_float(dst, fts_get_float(src));
       else 
@@ -62,7 +62,7 @@ set_value_preserve_type(const fts_atom_t *src, fts_atom_t *dst)
     }
   else
     {
-      if (fts_is_long(src))
+      if (fts_is_int(src))
 	fts_set_symbol(dst, (fts_symbol_t )fts_s_int);
       else if (fts_is_float(src))
 	fts_set_symbol(dst, (fts_symbol_t ) fts_s_float);

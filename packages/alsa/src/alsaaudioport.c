@@ -403,7 +403,7 @@ static void alsa_input_32_mmap_ardour( fts_word_t *argv)
   int n, channels, ch, i;
   
   port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_input_channels( port);
 
   if (port->capture.handle && port->capture.count == 0)
@@ -428,7 +428,7 @@ static void alsa_output_32_mmap_ardour( fts_word_t *argv)
   int n, channels, ch, i;
   
   port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels( port);
 
   if (!port->capture.handle && port->playback.handle && port->playback.count == 0)
@@ -482,7 +482,7 @@ static void FUN_NAME( fts_word_t *argv)					\
   TYPE *buffer;								\
 									\
   port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);			\
-  n = fts_word_get_long(argv + 1);					\
+  n = fts_word_get_int(argv + 1);					\
   channels = fts_audioport_get_input_channels( port);			\
   buffer = (TYPE *)port->input_buffer;					\
 									\
@@ -531,7 +531,7 @@ static void FUN_NAME( fts_word_t *argv)					\
   TYPE *buffer;								\
 									\
   port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);			\
-  n = fts_word_get_long(argv + 1);					\
+  n = fts_word_get_int(argv + 1);					\
   channels = fts_audioport_get_output_channels( port);			\
   buffer = (TYPE *)port->output_buffer;					\
 									\
@@ -579,7 +579,7 @@ static void FUN_NAME( fts_word_t *argv)									\
   u_char **buffers;											\
 													\
   port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);							\
-  n = fts_word_get_long(argv + 1);									\
+  n = fts_word_get_int(argv + 1);									\
   channels = fts_audioport_get_input_channels( port);							\
 													\
   buffers = (u_char **)alloca( channels * sizeof( u_char *));						\
@@ -626,7 +626,7 @@ static void FUN_NAME( fts_word_t *argv)									\
   u_char **buffers;											\
 													\
   port = (alsaaudioport_t *)fts_word_get_ptr( argv+0);							\
-  n = fts_word_get_long(argv + 1);									\
+  n = fts_word_get_int(argv + 1);									\
   channels = fts_audioport_get_output_channels( port);							\
 													\
   for ( ch = 0; ch < channels; ch++)									\

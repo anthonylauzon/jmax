@@ -151,7 +151,7 @@ sampwrite_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const
   fts_symbol_t tab_name;
   sampbuf_t *buf;
  
-  gensampname(name_str, "sample", fts_get_long(at));
+  gensampname(name_str, "sample", fts_get_int(at));
   tab_name = fts_new_symbol_copy(name_str);  
   buf = sampbuf_get(tab_name);
   

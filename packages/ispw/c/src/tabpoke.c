@@ -67,7 +67,7 @@ tabpoke_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
   char name_str[64];
   fts_symbol_t tab_name;
   
-  if (fts_is_long(at))
+  if (fts_is_int(at))
     {
       gensampname(name_str, "sample", fts_get_long_arg(ac, at, 0, 0));
       tab_name = fts_new_symbol_copy(name_str);

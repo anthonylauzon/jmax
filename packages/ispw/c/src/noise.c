@@ -37,7 +37,7 @@ static void
 noise_dsp_function(fts_word_t *argv)
 {
   float *out = (float *)fts_word_get_ptr(argv);
-  long int n = fts_word_get_long(argv+1);
+  long int n = fts_word_get_int(argv+1);
   int i;
 
   for(i=0; i<n; i++)

@@ -122,7 +122,7 @@ ftl_apass3(fts_word_t *argv)
   biquad_df1_state_t *biquad_state = (biquad_df1_state_t *)fts_word_get_ptr(argv + 4);
   biquad_coefs_t *biquad_coefs = (biquad_coefs_t *)fts_word_get_ptr(argv + 5);
   float conv = fts_word_get_float(argv + 6);
-  long n_tick = fts_word_get_long(argv + 7);
+  long n_tick = fts_word_get_int(argv + 7);
 
   long n_tick_half = n_tick / 2;
   float theta, cos_theta, exp_theta, Q;

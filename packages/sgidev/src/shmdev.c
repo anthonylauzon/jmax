@@ -390,12 +390,12 @@ static fts_status_t shmout_close( fts_dev_t *dev)
 static void shmout_put(fts_word_t *argv)
 {
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
-  int n = fts_word_get_long(argv + 2);
+  int n = fts_word_get_int(argv + 2);
   shm_data_t *dev_data;
   int i, j, n_channels, ch;
 
   dev_data = fts_dev_get_device_data(dev);
-  n_channels = fts_word_get_long(argv + 1);
+  n_channels = fts_word_get_int(argv + 1);
 
   if ( shm_fifo_get_read_status( dev_data->fifo) == SHM_ACTIVE)
     {
@@ -478,12 +478,12 @@ static fts_status_t shmin_close( fts_dev_t *dev)
 static void shmin_get(fts_word_t *argv)
 {
   fts_dev_t *dev = *((fts_dev_t **) fts_word_get_ptr(argv));
-  int n = fts_word_get_long(argv + 2);
+  int n = fts_word_get_int(argv + 2);
   shm_data_t *dev_data;
   int i, j, n_channels, ch;
 
   dev_data = fts_dev_get_device_data(dev);
-  n_channels = fts_word_get_long(argv + 1);
+  n_channels = fts_word_get_int(argv + 1);
 
   if ( shm_fifo_get_write_status( dev_data->fifo) == SHM_ACTIVE)
     {

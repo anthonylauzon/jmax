@@ -66,7 +66,7 @@ ftl_2p2z(fts_word_t *argv)
   float *in = (float *)fts_word_get_ptr(argv + 0);
   float *out = (float *)fts_word_get_ptr(argv + 1);
   ctlf2p2z_t *x = (ctlf2p2z_t *)fts_word_get_ptr(argv + 2);
-  long int n = fts_word_get_long(argv + 3);
+  long int n = fts_word_get_int(argv + 3);
   int i;
   float ym1, ym2, ym0;
   float a, b, g;

@@ -158,10 +158,10 @@ poly_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 poly_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ((ac > 1) && (fts_is_long(at+1) || fts_is_float(at+1)))
+  if ((ac > 1) && (fts_is_int(at+1) || fts_is_float(at+1)))
     poly_number_1(o, 1, s, 1, at + 1);
 
-  if ((ac > 0) && (fts_is_long(at) || fts_is_float(at)))
+  if ((ac > 0) && (fts_is_int(at) || fts_is_float(at)))
     poly_number(o, 1, s, 1, at);
 }
 

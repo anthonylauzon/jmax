@@ -69,14 +69,14 @@ static void cheese_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   cheese_t *this = ((cheese_t *)o);
 
-  this->n_print = this->n_print + fts_get_long(at);
+  this->n_print = this->n_print + fts_get_int(at);
 }
 
 static void ftl_cheese(fts_word_t *argv)
 {
   float *in      = (float *)fts_word_get_ptr(argv);
   cheese_t *this = (cheese_t *)fts_word_get_ptr(argv + 1);
-  long vs        = fts_word_get_long(argv + 2);
+  long vs        = fts_word_get_int(argv + 2);
   int i;
 
   for (i = 0; i < vs; i++)

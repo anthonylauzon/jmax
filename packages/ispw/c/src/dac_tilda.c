@@ -50,7 +50,7 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   if ( ac != 0)
     {
       for ( i = 0; i < inlets; i++)
-	this->indexes[i] = fts_get_long(at + i) - 1;
+	this->indexes[i] = fts_get_int(at + i) - 1;
     }
   else
     {

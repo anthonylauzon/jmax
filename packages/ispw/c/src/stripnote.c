@@ -72,7 +72,7 @@ stripnote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if (ac >= 1)
     {
-      if (fts_is_long(&at[0]))
+      if (fts_is_int(&at[0]))
 	stripnote_int(o, winlet, s, 1, at);
       else
 	if (fts_is_float(&at[0]))

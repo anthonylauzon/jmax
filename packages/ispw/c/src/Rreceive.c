@@ -53,7 +53,7 @@ static void
 Rreceive_set_atom(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const fts_atom_t *at)
 {
   Rreceive_t *this = (Rreceive_t *)o;
-  long n = fts_get_long(at);
+  long n = fts_get_int(at);
   fts_atom_t av[MAXLEN];
   int i,ac = 0;
   long l;
@@ -127,7 +127,7 @@ Rreceive_set_atom(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const
       
       if(fts_label_is_connected(label))
 	{
-	  if (fts_is_long(av))
+	  if (fts_is_int(av))
 	    {
 	      if (ac >1)
 		fts_label_send(label, fts_s_list, ac, av);

@@ -27,7 +27,7 @@
 
 #include <fts/fts.h>
 
-#define is_ibinop(ac, at)    (((ac) == 1) || (((ac) == 2) && fts_is_long(&(at)[1])))
+#define is_ibinop(ac, at)    (((ac) == 1) || (((ac) == 2) && fts_is_int(&(at)[1])))
 #define is_fbinop(ac, at)    (((ac) == 2) && fts_is_float(&(at)[1]))
 #define is_sbinop(ac, at)    (((ac) == 2) && fts_is_symbol(&(at)[1]))
 
@@ -87,12 +87,12 @@ static void
 ibinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if (ac >= 2)
-    if (fts_is_long(&at[1]) || fts_is_float(&at[1]))
+    if (fts_is_int(&at[1]) || fts_is_float(&at[1]))
       ibinop_set_right(o, winlet, s, 1, at + 1);
 
   if (ac >= 1)
     {
-      if (fts_is_long(&at[0]))
+      if (fts_is_int(&at[0]))
 	fts_message_send(o, 0, fts_s_int, 1, at);
       else if (fts_is_float(&at[0]))
 	fts_message_send(o, 0, fts_s_float, 1, at);
@@ -191,12 +191,12 @@ static void
 fbinop_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if (ac >= 2)
-    if (fts_is_long(&at[1]) || fts_is_float(&at[1]))
+    if (fts_is_int(&at[1]) || fts_is_float(&at[1]))
       fbinop_set_right(o, winlet, s, 1, at + 1);
 
   if (ac >= 1)
     {
-      if (fts_is_long(&at[0]))
+      if (fts_is_int(&at[0]))
 	fts_message_send(o, 0, fts_s_int, 1, at);
       else if (fts_is_float(&at[0]))
 	fts_message_send(o, 0, fts_s_float, 1, at);

@@ -71,7 +71,7 @@ trigger_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       else if (tot == trigger_outlet_bang)
 	fts_outlet_bang(o, outlet);
       else if (tot == trigger_outlet_float)
-	fts_outlet_float(o, outlet, (float)fts_get_long(at));
+	fts_outlet_float(o, outlet, (float)fts_get_int(at));
       else if (tot == trigger_outlet_symbol)
 	fts_outlet_symbol(o, outlet, fts_new_symbol(""));	/* ???? */
       else if (tot == trigger_outlet_list)
@@ -179,7 +179,7 @@ trigger_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    {
 	    case trigger_outlet_long:
 	      {
-		if (fts_is_long(at))
+		if (fts_is_int(at))
 		  fts_outlet_send(o, outlet, fts_s_int, 1, at);
 		else if (fts_is_float(at))
 		  fts_outlet_int(o, outlet, (long) fts_get_float(at));
@@ -190,8 +190,8 @@ trigger_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 	    case trigger_outlet_float:
 	      {
-		if (fts_is_long(at))
-		  fts_outlet_float(o, outlet, (float) fts_get_long(at));
+		if (fts_is_int(at))
+		  fts_outlet_float(o, outlet, (float) fts_get_int(at));
 		else if (fts_is_float(at))
 		  fts_outlet_send(o, outlet, fts_s_float, 1, at);
 		else
@@ -318,7 +318,7 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	    all_bang = 0;
 	    all_thru = 0;
 	  }
-	else if (fts_is_long(at))
+	else if (fts_is_int(at))
 	  {
 	    trigger_outlet_table[n] = trigger_outlet_long;
 	    all_bang = 0;
@@ -463,15 +463,15 @@ trigger_atoms_conforms(const fts_atom_t *a1, const fts_atom_t *a2)
 {
   if (fts_is_float(a1))
     return (fts_is_float(a2) || (fts_is_symbol(a2) && (fts_symbol_name(fts_get_symbol(a2))[0] == 'f')));
-  else if (fts_is_long(a1))
-    return (fts_is_long(a2) || (fts_is_symbol(a2) && (fts_symbol_name(fts_get_symbol(a2))[0] == 'i')));
+  else if (fts_is_int(a1))
+    return (fts_is_int(a2) || (fts_is_symbol(a2) && (fts_symbol_name(fts_get_symbol(a2))[0] == 'i')));
   else if (fts_is_symbol(a1))
     {
       if  (fts_is_symbol(a2))
 	return ((fts_symbol_name(fts_get_symbol(a1)))[0] == (fts_symbol_name(fts_get_symbol(a2)))[0]);
       else if (fts_is_float(a2))
 	return ((fts_symbol_name(fts_get_symbol(a1)))[0] == 'f');
-      else if (fts_is_long(a2))
+      else if (fts_is_int(a2))
 	return ((fts_symbol_name(fts_get_symbol(a1)))[0] == 'i');
     }
 

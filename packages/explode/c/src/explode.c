@@ -644,11 +644,11 @@ explode_append_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   explode_t *this = (explode_t *)o;
 
   explode_doappend(this,
-		   fts_get_long(&at[0]),
-		   fts_get_long(&at[1]),
-		   fts_get_long(&at[2]),
-		   fts_get_long(&at[3]),
-		   fts_get_long(&at[4]));
+		   fts_get_int(&at[0]),
+		   fts_get_int(&at[1]),
+		   fts_get_int(&at[2]),
+		   fts_get_int(&at[3]),
+		   fts_get_int(&at[4]));
 }
 
 
@@ -736,7 +736,7 @@ explode_followat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   explode_stop(this);
   this->matchscoretime = 0;
 
-  explode_at(this, fts_get_long(at + 0), fts_get_long(at + 1), fts_get_long(at + 2));
+  explode_at(this, fts_get_int(at + 0), fts_get_int(at + 1), fts_get_int(at + 2));
 
   e = this->current;
 
@@ -756,7 +756,7 @@ explode_startat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   evt_t *e;
 
   explode_stop(this);
-  explode_at(this, fts_get_long(at + 0), fts_get_long(at + 1), fts_get_long(at + 2));
+  explode_at(this, fts_get_int(at + 0), fts_get_int(at + 1), fts_get_int(at + 2));
 
   if ((e = this->current) && e->next)
     {
@@ -793,9 +793,9 @@ explode_params_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   explode_t *this = (explode_t *)o;
 
-  this->nfwd  = fts_get_long(at + 0);
-  this->ftime = fts_get_long(at + 1);
-  this->oct   = fts_get_long(at + 2);
+  this->nfwd  = fts_get_int(at + 0);
+  this->ftime = fts_get_int(at + 1);
+  this->oct   = fts_get_int(at + 2);
 }
 
 /* "clear" methods, inlet 0.
@@ -1119,11 +1119,11 @@ explode_append_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     {
       evt_t *e = (evt_t *) fts_heap_alloc(explode_evt_heap);
 
-      e->time = fts_get_long(&at[0]);
-      e->pit  = fts_get_long(&at[1]);
-      e->vel  = fts_get_long(&at[2]);
-      e->dur  = fts_get_long(&at[3]);
-      e->chan = fts_get_long(&at[4]);
+      e->time = fts_get_int(&at[0]);
+      e->pit  = fts_get_int(&at[1]);
+      e->vel  = fts_get_int(&at[2]);
+      e->dur  = fts_get_int(&at[3]);
+      e->chan = fts_get_int(&at[4]);
 
       e->next = 0;
       this->rectime = e->time;
@@ -1268,15 +1268,15 @@ static void explode_remote_add( fts_data_t *d, int ac, const fts_atom_t *at)
   int add;
   evt_t **pe, *e;			/* indirect precursor */
 
-  add  = fts_get_long(&at[0]);	/* add index */
+  add  = fts_get_int(&at[0]);	/* add index */
 
   e = (evt_t *) fts_heap_alloc(explode_evt_heap);
 
-  e->time = fts_get_long(&at[1]);
-  e->pit  = fts_get_long(&at[2]);
-  e->vel  = fts_get_long(&at[3]);
-  e->dur  = fts_get_long(&at[4]);
-  e->chan = fts_get_long(&at[5]);
+  e->time = fts_get_int(&at[1]);
+  e->pit  = fts_get_int(&at[2]);
+  e->vel  = fts_get_int(&at[3]);
+  e->dur  = fts_get_int(&at[4]);
+  e->chan = fts_get_int(&at[5]);
 
   /* Look for the good position */
 
@@ -1310,7 +1310,7 @@ static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
    */
 
   explode_data_t *data = (explode_data_t *)d;
-  int change = fts_get_long(&at[0]);	/* change index */
+  int change = fts_get_int(&at[0]);	/* change index */
   evt_t **pe, *e;			/* indirect precursor */
 
   /* First, found the event and remote it from the list */
@@ -1326,11 +1326,11 @@ static void explode_remote_change( fts_data_t *d, int ac, const fts_atom_t *at)
 
   /* Change the event  */
 
-  e->time = fts_get_long(&at[1]);
-  e->pit  = fts_get_long(&at[2]);
-  e->vel  = fts_get_long(&at[3]);
-  e->dur  = fts_get_long(&at[4]);
-  e->chan = fts_get_long(&at[5]);
+  e->time = fts_get_int(&at[1]);
+  e->pit  = fts_get_int(&at[2]);
+  e->vel  = fts_get_int(&at[3]);
+  e->dur  = fts_get_int(&at[4]);
+  e->chan = fts_get_int(&at[5]);
 
   return;
 }
@@ -1349,7 +1349,7 @@ static void explode_remote_change_time( fts_data_t *d, int ac, const fts_atom_t 
    */
 
   explode_data_t *data = (explode_data_t *)d;
-  int change = fts_get_long(&at[0]);	/* change index */
+  int change = fts_get_int(&at[0]);	/* change index */
   evt_t **pe, *e;			/* indirect precursor */
 
   /* First, found the event and remote it from the list */
@@ -1366,11 +1366,11 @@ static void explode_remote_change_time( fts_data_t *d, int ac, const fts_atom_t 
 
   /* Change the event  */
 
-  e->time = fts_get_long(&at[1]);
-  /*e->pit  = fts_get_long(&at[2]);
-    e->vel  = fts_get_long(&at[3]);
-    e->dur  = fts_get_long(&at[4]);
-    e->chan = fts_get_long(&at[5]);*/
+  e->time = fts_get_int(&at[1]);
+  /*e->pit  = fts_get_int(&at[2]);
+    e->vel  = fts_get_int(&at[3]);
+    e->dur  = fts_get_int(&at[4]);
+    e->chan = fts_get_int(&at[5]);*/
 
   /* Find the correct new position */
 

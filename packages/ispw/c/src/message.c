@@ -261,12 +261,12 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 	case lex_eval:
 	  if (! rd_out)
 	    lex_out_type = lex_type_end;
-	  else if (fts_is_long(rd_out))
+	  else if (fts_is_int(rd_out))
 	    {
-	      if (fts_get_long(rd_out) <= env_ac)
+	      if (fts_get_int(rd_out) <= env_ac)
 		{
 		  lex_out_type = lex_type_value;
-		  lex_out_value = &env_at[fts_get_long(rd_out) - 1];
+		  lex_out_value = &env_at[fts_get_int(rd_out) - 1];
 		  lex_status = lex_list_read;
 		}
 	      else

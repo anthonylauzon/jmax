@@ -62,7 +62,7 @@ static void
 faccum_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t a;
-  ((accum_t *)o)->s_reg = (float)fts_get_long(at);
+  ((accum_t *)o)->s_reg = (float)fts_get_int(at);
   fts_set_float(&a, ((accum_t *)o)->s_reg);
   fts_outlet_send(o, 0, fts_s_float, 1, &a);
 }
@@ -142,7 +142,7 @@ accum_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_float;
   fts_method_define(cl, 2, fts_s_float, accum_float_right, 1, a);
 
-  if ((ac <= 1) || fts_is_long(at + 1))
+  if ((ac <= 1) || fts_is_int(at + 1))
     {
       a[0] = fts_s_int;
       fts_method_define(cl, 0, fts_s_int, iaccum_int, 1, a);

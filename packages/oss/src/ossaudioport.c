@@ -69,7 +69,7 @@ static void ossaudioport_input( fts_word_t *argv)
   int n, channels, ch, i, j;
 
   port = (ossaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_input_channels( port);
 
   read( port->fd, port->adc_fmtbuf, channels * n * sizeof( short));
@@ -99,7 +99,7 @@ static void ossaudioport_output( fts_word_t *argv)
   int n, channels, ch, i, j;
 
   port = (ossaudioport_t *)fts_word_get_ptr( argv+0);
-  n = fts_word_get_long(argv + 1);
+  n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels( port);
 
   port->bytes_count += (channels * n * sizeof(short));

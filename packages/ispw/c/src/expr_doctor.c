@@ -93,7 +93,7 @@ static fts_symbol_t get_expr_symbol(int argc, const fts_atom_t *argv)
 
   while (argc--)
     {
-      if (fts_is_long(argv))
+      if (fts_is_int(argv))
 	{
 	  sprintf(p, "%d ", fts_get_int(argv));
 	  while (*p)
