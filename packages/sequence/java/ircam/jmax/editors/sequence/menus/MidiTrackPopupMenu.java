@@ -83,7 +83,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 			public void actionPerformed(ActionEvent e)
 		  {
 				FtsTrackObject track = ((MidiTrackEditor)target).getTrack().getFtsTrack();
-				SequenceSelection sel = ((SequenceEditor)target).getMarkerSelection();
+				SequenceSelection sel = target.getGraphicContext().getMarkersSelection();
 				TrackEvent bar = null;
 				if(sel != null && sel.size() > 1)
 					track.collapseMarkers( sel.getSelected());

@@ -168,7 +168,7 @@ public class Actions
   {
     public CollapseMarkersAction()
 	  { 
-      super("Collapse Markers", null, KeyEvent.VK_M, KeyEvent.VK_M, true);
+      super("Collapse Markers", null, KeyEvent.VK_L, KeyEvent.VK_L, true);
 		}
     public void doAction(EditorContainer container)
 	  {
