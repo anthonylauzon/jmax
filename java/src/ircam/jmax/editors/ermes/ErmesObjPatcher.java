@@ -27,7 +27,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   //--------------------------------------------------------
   public ErmesObjPatcher(){
     super();
-    HEIGHT_DIFF = 10;
+    HEIGHT_DIFF = 4;
   }
 	
   //--------------------------------------------------------
@@ -74,8 +74,9 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public void RestartEditing() { //extends ErmesObjEditableObject.RestartEditing()
     if(itsSubWindow != null){
       GetSketchWindow().CreateFtsGraphics(itsSubWindow);
-      itsSubWindow.dispose();
-      itsSubWindow = null;
+      //itsSubWindow.dispose();
+      //itsSubWindow = null;
+      //itsSubWindow.setVisible(false);
     }
     super.RestartEditing();
   }

@@ -39,6 +39,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
   public boolean inAnApplet = false;
   public boolean isSubPatcher = false;
+  //  public ErmesObject itsOwner;//in case this is a subpatcher
   public boolean isAbstraction = false;
   final String FILEDIALOGMENUITEM = "File dialog...";
   public static int preferredWidth = 490;
@@ -147,6 +148,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
    * constructor from a MaxData AND a ftsContainer AND a father window (subpatchers editors)
    * added better window titles for patchers.
    */
+
 
   static String chooseWindowName(FtsContainerObject theFtsPatcher)
   {
@@ -789,11 +791,13 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     MaxApplication.RemoveThisWindowFromMenus(this);
     MaxApplication.itsSketchWindowList.removeElement(this);
-    itsPatcher.delete();
+    if (!isSubPatcher) itsPatcher.delete();
     //itsDocument.DelWindow();
     itsClosing = false;
+    //if (itsOwner != null)
+    //  ((ErmesObjPatcher)itsOwner).itsSubWindow = null;
     setVisible(false);
-    dispose();
+    if (!isSubPatcher) dispose();
     return true;
   }
 
