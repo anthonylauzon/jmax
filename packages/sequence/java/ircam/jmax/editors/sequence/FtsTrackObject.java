@@ -144,12 +144,11 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       }
     });
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("properties"), new FtsMessageHandler(){
-    public void invoke( FtsObject obj, FtsArgs args)
-   {
-      ((FtsTrackObject)obj).setTrackProperties( args.getLength(), args.getAtoms());
-   }
-  });
-  
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+	((FtsTrackObject)obj).setTrackProperties( args.getLength(), args.getAtoms());
+      }
+    });
   }
 
   /**
@@ -180,7 +179,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     propertyNames = new MaxVector();
     propertyTypes = new MaxVector();
     propertyClasses = new MaxVector();
-    
+
     /* prepare the flavors for the clipboard */
     if (flavors == null)
       flavors = new DataFlavor[1];
@@ -199,15 +198,25 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
   public void setTrackProperties( int nArgs, FtsAtom args[])
   {
+    String type, prop;
     propertyNames.removeAllElements();
     propertyTypes.removeAllElements();
     propertyClasses.removeAllElements();
-
+    
     for(int i = 0; i < nArgs-1 ; i+=2)
-    {
-      propertyNames.addElement( args[i].symbolValue.toString());
-      setPropertyType( args[i+1].symbolValue.toString());
-    }
+      {
+	prop = args[i].symbolValue.toString();
+	type = args[i+1].symbolValue.toString();
+	if(type.equals("enum"))
+	  {
+	    int num = args[i+2].intValue;
+	    for(int j = 1; j <= num ; j++)
+	      eventTypesEnum.addElement(args[i+2+j].symbolValue.toString());
+	    i+=num+1;
+	  }
+	propertyNames.addElement( prop);
+	setPropertyType( type);
+      }
   }
 
   void setPropertyType( String type)
@@ -221,7 +230,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       typeClass = Float.class;
     else if( type.equals("double"))
       typeClass = Double.class;
-    else //if( type.equals("string") || type.equals("symbol"))
+    else //if( type.equals("string") || type.equals("symbol") || type.equals("enum"))
       typeClass = String.class;
 
     propertyClasses.addElement( typeClass);
@@ -238,7 +247,11 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   public Class getPropertyType(int i)
   {
     return (Class) propertyClasses.elementAt( i);
-  }   
+  }
+  public Vector getEventTypes()
+  {
+    return eventTypesEnum;
+  }
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from fts.
   //////////////////////////////////////////////////////////////////////////////////////
@@ -1531,7 +1544,8 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   private transient MaxVector stateListeners;
   private transient MaxVector tempVector = new MaxVector();
   private MaxVector propertyTypes, propertyNames, propertyClasses;
-  
+  private Vector eventTypesEnum = new Vector();
+
   private String trackName;
   public transient DataFlavor flavors[];
 

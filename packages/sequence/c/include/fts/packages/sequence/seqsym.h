@@ -34,6 +34,7 @@ extern fts_symbol_t seqsym_segment;
 
 /* events */
 extern fts_symbol_t seqsym_scoob;
+extern fts_symbol_t seqsym_enum;
 extern fts_symbol_t seqsym_undefined;
 extern fts_symbol_t seqsym_note;
 extern fts_symbol_t seqsym_interval;

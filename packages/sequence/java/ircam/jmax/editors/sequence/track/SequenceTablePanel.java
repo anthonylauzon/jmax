@@ -40,7 +40,25 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
   {
     this.tmodel = model;
     this.gc = gc;
-    table = new JTable(tmodel);
+    TrackDataModel trackModel = tmodel.getTrackDataModel();
+    
+    /************/
+    JComboBox combo = new JComboBox( ((FtsTrackObject)trackModel).getEventTypes());
+    combo.setBackground(Color.white);
+    typeEditor = new ComboCellEditor( combo);
+    /***********/
+
+    table = new JTable(tmodel){
+	public TableCellEditor getCellEditor(int row, int column)
+	{
+	  if( tmodel.getColumnName(column).equals("type"))
+	    return typeEditor;
+	  else
+	    return super.getCellEditor( row, column);
+	}
+      };
+    combo.setFont(table.getFont());
+    
     table.setPreferredScrollableViewportSize(new Dimension(600, 300));
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -48,15 +66,11 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 
     scrollPane = new JScrollPane(table);
 
-    //setUpEditors();
-    
     setLayout(new BorderLayout());
     add(BorderLayout.CENTER, scrollPane);
 
     table.setSelectionModel(gc.getSelection());
     gc.getSelection().addListSelectionListener(this);
-
-    TrackDataModel trackModel = tmodel.getTrackDataModel();
 
     trackModel.addHighlightListener(new HighlightListener() {
 	public void highlight(Enumeration hhElements, double time)
@@ -145,10 +159,32 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     table.scrollRectToVisible(rect);      
   }
 
+  /*
+    CellEditor for "type" parameter
+   */
+  public class ComboCellEditor extends DefaultCellEditor
+  {
+    JComboBox combo;
+    public ComboCellEditor(JComboBox combo)
+    {
+      super(combo);
+      this.combo = combo;
+    }
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
+    {
+      combo.setSelectedItem(table.getValueAt(row, column));
+      return combo;
+    }
+    public Object getCellEditorValue() {
+      return combo.getSelectedItem();
+    }
+  }
+
   transient TrackTableModel tmodel;
   transient SequenceGraphicContext gc;
   transient JScrollPane scrollPane; 
   transient JTable table;
+  ComboCellEditor typeEditor;
 }
 
 

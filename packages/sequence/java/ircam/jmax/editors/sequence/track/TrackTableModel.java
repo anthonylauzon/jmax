@@ -31,11 +31,9 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.sequence.*;
 
 /**
- * A table model used to represent the content of an explode object
- * in a JTable. ExplodeTableModel is a swing TableModel
- * built on top of an ExplodeDataModel object. Note that the number of columns
- * is fixed and depends on the number of fields of a generic explode event 
- * in FTS.
+ * A table model used to represent the content of an track object
+ * in a JTable. TrackTableModel is a swing TableModel
+ * built on top of an TableDataModel object. 
  */
 class TrackTableModel extends AbstractTableModel{
   

@@ -31,6 +31,7 @@ fts_symbol_t seqsym_segment = 0;
 
 /* events */
 fts_symbol_t seqsym_scoob = 0;
+fts_symbol_t seqsym_enum = 0;
 fts_symbol_t seqsym_undefined = 0;
 fts_symbol_t seqsym_note = 0;
 fts_symbol_t seqsym_interval = 0;
@@ -91,6 +92,7 @@ seqsym_config(void)
 
   /* event types */
   seqsym_scoob = fts_new_symbol("scoob");
+  seqsym_enum = fts_new_symbol("enum");
   seqsym_undefined = fts_new_symbol("undefined");
   seqsym_note = fts_new_symbol("note");
   seqsym_interval = fts_new_symbol("interval");

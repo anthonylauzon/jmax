@@ -24,8 +24,7 @@
 #define _SEQUENCE_scoob_H_
 
 #include <fts/fts.h>
-#include "event.h"
-
+#include <fts/packages/sequence/event.h>
 
 /*{ 
  *  Scoob score object (generalisation of note)

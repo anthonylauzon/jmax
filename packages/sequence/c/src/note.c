@@ -22,9 +22,6 @@
 
 #include <fts/fts.h>
 #include <fts/packages/sequence/sequence.h>
-#include <fts/packages/sequence/track.h>
-#include <fts/packages/sequence/note.h>
-#include <fts/packages/sequence/seqsym.h>
 
 fts_class_t *scoob_class = 0;
 
@@ -233,7 +230,11 @@ scoob_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   int i;
 
   fts_array_append_symbol(array, seqsym_type);
-  fts_array_append_symbol(array, fts_s_symbol);
+  /*fts_array_append_symbol(array, fts_s_symbol);*/
+  fts_array_append_symbol(array, seqsym_enum);
+  fts_array_append_int(array, n_scoob_types-1);
+  for(i=0; i<n_scoob_types-1; i++)
+    fts_array_append_symbol(array, scoob_type_names[i+1]);
 
   fts_array_append_symbol(array, seqsym_pitch);
   fts_array_append_symbol(array, fts_s_float);
