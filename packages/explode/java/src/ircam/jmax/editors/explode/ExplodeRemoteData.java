@@ -472,10 +472,11 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
   /* a method inherited from FtsRemoteData */
 
-  public void call( int key, FtsMessage msg)
+  public void call( int key, FtsStream stream)
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
     {
       switch( key) {
-      case REMOTE_LOAD_CLEAN:
+      case REMOTE_LOAD_START:
 	{
 	  // Clean the explode before a new loading (Needed ?? )
 
@@ -485,6 +486,7 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	  events_fill_p = 0;
 	}
 	break;
+
       case REMOTE_LOAD_APPEND:
 	{
 	  // add events at the end; used during loading
@@ -493,13 +495,19 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 	    reallocateEvents();
 
 	  events[events_fill_p++] = new ScrEvent(this,
-						 ((Integer) msg.getNextArgument()).intValue(), 
-						 ((Integer) msg.getNextArgument()).intValue(), 
-						 ((Integer) msg.getNextArgument()).intValue(), 
-						 ((Integer) msg.getNextArgument()).intValue(), 
-						 ((Integer) msg.getNextArgument()).intValue());
+						 stream.getNextIntArgument(),
+						 stream.getNextIntArgument(),
+						 stream.getNextIntArgument(),
+						 stream.getNextIntArgument(),
+						 stream.getNextIntArgument());
 	}
 	break;
+
+      case REMOTE_LOAD_END:
+	{
+	  // Sent at the end of the initial explode loading
+	}
+      break;
 
       case REMOTE_CLEAN:
 	{
@@ -529,11 +537,11 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
 
 	  index = events_fill_p++;
 	  events[index] = new ScrEvent(this,
-				       ((Integer) msg.getNextArgument()).intValue(), 
-				       ((Integer) msg.getNextArgument()).intValue(), 
-				       ((Integer) msg.getNextArgument()).intValue(), 
-				       ((Integer) msg.getNextArgument()).intValue(), 
-				       ((Integer) msg.getNextArgument()).intValue());
+				       stream.getNextIntArgument(),
+				       stream.getNextIntArgument(),
+				       stream.getNextIntArgument(),
+				       stream.getNextIntArgument(),
+				       stream.getNextIntArgument());
 
 	  postEdit(new UndoableAdd(events[index]));
 	  endUpdate();
@@ -555,13 +563,14 @@ public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeD
   //----- Fields
   /** Key for remote call add */
 
-  static final int REMOTE_LOAD_CLEAN  = 1;
+  static final int REMOTE_LOAD_START  = 1;
   static final int REMOTE_LOAD_APPEND = 2;
-  static final int REMOTE_CLEAN  = 3;
-  static final int REMOTE_APPEND = 4;
-  static final int REMOTE_ADD    = 5;
-  static final int REMOTE_REMOVE = 6;
-  static final int REMOTE_CHANGE = 7;
+  static final int REMOTE_LOAD_END    = 3;
+  static final int REMOTE_CLEAN  = 4;
+  static final int REMOTE_APPEND = 5;
+  static final int REMOTE_ADD    = 6;
+  static final int REMOTE_REMOVE = 7;
+  static final int REMOTE_CHANGE = 8;
 
   static final int EMPTY_COLLECTION = -1;
   static final int NO_SUCH_EVENT = -2;

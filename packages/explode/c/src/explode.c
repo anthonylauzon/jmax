@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/11/09 18:52:26 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/11/12 18:10:56 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -16,6 +16,18 @@
 #include <stdio.h>
 #include "fts.h"
 #include "explode.h"
+
+/* explode data function keys */
+
+#define EXPLODE_LOAD_START    1
+#define EXPLODE_LOAD_APPEND   2
+#define EXPLODE_LOAD_END      3
+#define EXPLODE_CLEAN         4
+#define EXPLODE_APPEND        5
+#define EXPLODE_REMOTE_ADD    6
+#define EXPLODE_REMOTE_REMOVE 7
+#define EXPLODE_REMOTE_CHANGE 8
+
 
 static long explode_nextserial;
 
@@ -1072,7 +1084,7 @@ static void explode_data_export_fun(fts_data_t *d)
   evt_t *e;
   fts_atom_t args[5];
 
-  fts_data_remote_call(d, EXPLODE_LOAD_CLEAN, 0, 0);
+  fts_data_remote_call(d, EXPLODE_LOAD_START, 0, 0);
 
   for ( e = data->evt; e; e = e->next)
     {
@@ -1084,6 +1096,8 @@ static void explode_data_export_fun(fts_data_t *d)
 
       fts_data_remote_call((fts_data_t *) data, EXPLODE_LOAD_APPEND, 5, args);
     }
+
+  fts_data_remote_call(d, EXPLODE_LOAD_END, 0, 0);
 }
 
 /* Daemon for getting the property "data".
