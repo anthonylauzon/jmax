@@ -58,6 +58,13 @@ public class MaxApplication extends Object
     return jmaxProperties.getProperty(key, defaultValue);
   }
 
+  /** Method to set system wide properties, stored in jmaxProperties */
+
+  public static String setProperty(String key, String value)
+  {
+    return (String)jmaxProperties.put( key, value);
+  }
+
   public static Properties getProperties()
   {
     return jmaxProperties;
@@ -215,13 +222,21 @@ public class MaxApplication extends Object
 
     ircam.jmax.mda.MdaModule.initModule();
     ircam.jmax.fts.FtsModule.initModule();
+
     // Initialize dialogs
 
     ircam.jmax.dialogs.DialogsModule.initModule();
 
     // than the builtin editors 
 
-    ircam.jmax.editors.console.ConsoleModule.initModule();
+    // (fd) hack to try the new console
+    String useNewConsole = jmaxProperties.getProperty( "jmaxNewConsole");
+
+    if ( useNewConsole != null && useNewConsole.equals( "true"))
+      ircam.jmax.editors.newconsole.ConsoleModule.initModule();
+    else
+      ircam.jmax.editors.console.ConsoleModule.initModule();
+
     ircam.jmax.editors.ermes.ErmesModule.initModule();
     ircam.jmax.editors.control.ControlModule.initModule();
 
