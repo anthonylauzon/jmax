@@ -15,6 +15,12 @@ set jmaxRootDir [systemProperty "root"]
 source $jmaxRootDir/tcl/intrinsics.tcl
 
 ##
+## Wrapper for MDA and TclMDA
+## 
+
+source $jmaxRootDir/tcl/wrappers.tcl
+
+##
 ## Tcl implementation of the tcl package command
 ##
 

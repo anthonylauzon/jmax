@@ -100,9 +100,12 @@ void ftl_functions_init(void)
   DSP_DECLARE_ONE_TYPE_FUN(rsqr, "rsqr")
   
   DSP_DECLARE_ALL_TYPE_FUN(abs, "abs")
-  
+
+#ifndef LINUXPC  
   DSP_DECLARE_ONE_TYPE_FUN(cabsf, "cabsf");
   DSP_DECLARE_ONE_TYPE_FUN(csqrf, "csqrf");
+#endif
+
   DSP_DECLARE_ONE_TYPE_FUN(ffillre, "ffillre");
   DSP_DECLARE_ONE_TYPE_FUN(ffillim, "ffillim");
   DSP_DECLARE_ONE_TYPE_FUN(re, "re");

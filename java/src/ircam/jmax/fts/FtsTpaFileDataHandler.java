@@ -13,18 +13,8 @@ import ircam.jmax.mda.*;
 
 public class FtsTpaFileDataHandler extends MaxTclFileDataHandler
 {
-  String extension;
-  
   public FtsTpaFileDataHandler()
   {
     super(".tpa");
-  }
-
-  public void saveInstance(MaxData instance) throws MaxDataException
-  {
-    ///////////// Not yet implemented ???
-    /* Open the stream, put the "jmax" header, and then save
-       the patcher inside
-       */
   }
 }

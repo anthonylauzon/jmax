@@ -1,0 +1,4 @@
+SOURCES = \
+	InstallEditorForCmd.java \
+	TclMdaPackage.java \
+	JMaxCmd.java

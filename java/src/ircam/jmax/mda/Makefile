@@ -66,6 +66,22 @@ MaxDataEditor:
 	javac $(JFLAGS) MaxDataEditor.java
 .PHONY: MaxDataEditor
 
+MaxEditorFactory:
+	javac $(JFLAGS) MaxEditorFactory.java
+.PHONY: MaxEditorFactory
+
+MaxTclEditorFactory:
+	javac $(JFLAGS) MaxTclEditorFactory.java
+.PHONY:  MaxTclEditorFactory
+
+
+MaxTclData:
+	javac $(JFLAGS) MaxTclData.java
+.PHONY:  MaxTclData
+
+MaxTclInterpreter:
+	javac $(JFLAGS) MaxTclInterpreter.java
+.PHONY:  MaxTclInterpreter
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

@@ -39,7 +39,7 @@
 #define HAS_UNIX
 #define HAS_OSS			/* the OSS sound system */
 /* #define HAS_frexp_AND_ldexp_AND_modf*/ /* for rough math */
-#define VECLIB_LOOP_UNROLL 8
+#define VECLIB_LOOP_UNROLL 4
 
 #define FTS_USE_NAMED_PIPES
 

@@ -6,7 +6,7 @@ import ircam.jmax.mda.*;
  * It have two possible loaders, FtsTpaFileDataHandler and FtsDotPatFileDataHandler
  */
 
-class FtsPatchData extends MaxData
+class FtsPatchData extends MaxTclData
 {
   static MaxDataType patchType = null;
 
@@ -32,8 +32,23 @@ class FtsPatchData extends MaxData
     return patcher;
   }
 
+  /** Get the content (a patcher) as TCL code */
+
   public Object getContent()
   {
     return patcher;
   }
+  
+  protected Object setContent(Object content)
+  {
+    patcher = (FtsObject) content;
+  }
+
+  /** Save the content (a patcher) as TCL code */
+
+  public void saveContentAsTcl(PrintWriter pw)
+  {
+    patcher.saveAsTcl(pw);
+  }
 }
+

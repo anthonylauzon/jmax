@@ -15,45 +15,38 @@ abstract public class MaxData
   private MaxDataSource  source  = null;
   private MaxDataType    type    = null;
   private Vector editors = new Vector();
+  private String name = null; // name of the instance, for UI purposes
+  private String info = null; // comment field; store and get back, but don't use for semantic purpose
 
-  /** The constructor get only the type (mandatory) */
+  /** A constructor that get only the type */
 
   public MaxData(MaxDataType type)
   {
     this.type = type;
   }
 
+  /** A constructor that get the type and the instance name */
+
+  public MaxData(MaxDataType type, String name)
+  {
+    this.type = type;
+    this.name = name;
+  }
+
   /**
    * Adding an editor; this method 
-   * bind the editor on the data.
+   * do not bind the editor on the data, and it is private
    */
 
-  public void addEditor(MaxDataEditor editor)
+  void addEditor(MaxDataEditor editor)
   {
-    // Do first the add, so that editData can assume
-    // the housekeeping is already consistent.
-
     editors.addElement(editor);
-
-    try
-      {
-	editor.editData(this);
-      }
-    catch (MaxDataException e)
-      {
-	editors.removeElement(editor);
-	return;
-      }
   }
 
   /** Removing the editor */
 
   public void removeEditor(MaxDataEditor editor)
   {
-    // Do first the quitEdit, so that it can assume
-    // the housekeeping is still consistent.
-
-    editor.quitEdit();
     editors.removeElement(editor);
   }
 
@@ -101,6 +94,35 @@ abstract public class MaxData
     this.type = type;
   }
 
+
+  /** Getting the name */
+
+  public String getName()
+  {
+    return name;
+  }
+
+  /** Setting the name */
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  /** Getting the info */
+
+  public String getInfo()
+  {
+    return info;
+  }
+
+  /** Setting the info */
+
+  public void setInfo(String info)
+  {
+    this.info = info;
+  }
+
   /** edit: start an instance of the default editor for this type and
    * bind it to this data; it is not the only permitted way to start
    * an editor on a data instance, but it may be convenient.
@@ -108,28 +130,39 @@ abstract public class MaxData
 
   public MaxDataEditor edit() throws MaxDataException
   {
-    if (type.defaultEditorClass != null)
+    if (type.getDefaultEditorFactory() != null)
       {
-	try
-	  {
-	    MaxDataEditor editor = (MaxDataEditor) type.defaultEditorClass.newInstance();
+	MaxDataEditor editor = (MaxDataEditor) type.getDefaultEditorFactory().newEditor(this);
 	
-	    addEditor(editor);
+	addEditor(editor);
 
-	    return editor;
-	  }
-	catch (InstantiationException e)
-	  {
-	    throw new MaxDataException("Cannot instantiate default editor for " + this);
-	  }
-	catch (IllegalAccessException e)
-	  {
-	    throw new MaxDataException("Illegal Access instantiating default editor for " + this);
-	  }
+	return editor;
       }
     else
       throw new MaxDataException("No default editor for " + this);
   }
+
+  /** edit: bind a given instance of an editor to this data.
+   * it is the other possible way to start an editor on a data.
+   */
+
+  public MaxDataEditor edit(MaxDataEditor editor) throws MaxDataException
+  {
+    addEditor(editor);
+
+    try
+      {
+	editor.editData(this);
+      }
+    catch (MaxDataException e)
+      {
+	editors.removeElement(editor);
+	return null;
+      }
+
+    return editor;
+  }
+
 
   /** return true if the instance can be saved to its current
    * data source
@@ -204,4 +237,12 @@ abstract public class MaxData
    */
 
   abstract public Object getContent();
+
+
+  /** Set the MaxData content; the content is the real thing to
+   * Edit, and its type is not specified; used only during loading,
+   * by 
+   */
+
+  abstract protected Object setContent(Object content);
 }

@@ -761,6 +761,10 @@ public class MaxApplication extends Object {
     ircam.jmax.fts.tcl.TclFtsPackage.installPackage(itsInterp);
     ircam.jmax.editors.ermes.tcl.TclErmesPackage.installPackage(itsInterp);
 
+    // The MDA package; still not used, but soon !!!
+
+    ircam.jmax.mda.tcl.TclMdaPackage.installPackage(itsInterp);
+
     try
       {
 	// Load the "jmaxboot.tcl" file that will do whatever is needed to

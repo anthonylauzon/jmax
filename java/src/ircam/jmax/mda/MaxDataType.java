@@ -60,12 +60,12 @@ abstract public class MaxDataType
 
   Vector instanceList = new Vector();
 
-  /** The defaut editor class; this class should actually
-    build a "Editor Factory" that actually build the real 
+  /** The defaut editor factory; this object should actually
+    build an indirect object that actually build the real 
     editor, and keep the relationship between the real editor
     and the mda system */
 
-  Class defaultEditorClass;
+  MaxDataEditorFactory defaultEditorFactory = null;
 
   /*****************************************************************************/
   /*                                                                           */
@@ -97,25 +97,20 @@ abstract public class MaxDataType
 
   abstract public Class instanceClass();
 
-  /** Set the default editor class; throw an exception if the
-   *  class do not implement the MaxDataEditor interface
+  /** Set the default editor factory
    */
 
-  public void setDefaultEditorClass(Class editorClass) throws MaxDataException
+  public void setDefaultEditorFactory(MaxDataEditorFactory  editorFactory) 
   {
-    Class[] interfaces = editorClass.getInterfaces();
+    defaultEditorFactory = editorFactory;
+  }
 
-    
-    for (int i = 0; i < interfaces.length ; i++)
-      {
-	if (interfaces[i] == MaxDataEditor.class)
-	  {
-	    defaultEditorClass = editorClass;
-	    return;
-	  }
-      }
+  /** Get the default editor factory
+   */
 
-    throw new MaxDataException("default editor is not a MaxDataEditor");
+  public MaxDataEditorFactory getDefaultEditorFactory() 
+  {
+    return defaultEditorFactory;
   }
 
   /*****************************************************************************/

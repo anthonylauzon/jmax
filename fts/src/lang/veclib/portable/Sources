@@ -3,7 +3,7 @@ STRANGE_SOURCES = vecx_scl_cfmul.c vecx_scl_icmp.c vecx_sqrt.c vecx_trigon.c
 ifeq ($(VENDOR),gnu)
 NOT_FOR_PGCC = 
 else
-NOT_FOR_PGCC = vec_cplx.c
+NOT_FOR_PGCC = vec_cplx.c vecx_cplx.c		
 endif
 
 
@@ -50,7 +50,6 @@ SOURCES = $(NOT_FOR_PGCC)    \
 	vecx_carith.c		\
 	vecx_cfmul.c		\
 	vecx_cmerge.c		\
-	vecx_cplx.c		\
 	vecx_cpy.c		\
 	vecx_csplit.c		\
 	vecx_csum.c		\

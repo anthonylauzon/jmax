@@ -55,5 +55,40 @@ abstract public class MaxTclFileDataHandler extends MaxFileDataHandler
 	throw new MaxDataException("Format error loading file " + file);
       }
   }
+
+  /** Save: basic support for saving a tcl file in the "jmax" format 
+   * jmax <doc-type> [<version>] <name> <info> { <doc-body> }
+   * It use a "IndentOutputStream", but the data method should make
+   * sure that they can save to a normal stream, also.
+   * This version do not save a version number.
+   */
+
+  public void saveInstance(MaxData instance) throws MaxDataException
+  {
+    /* Open the stream, put the "jmax" header, and then save
+       the patcher inside
+       */
+
+    File file = ((MaxFileDataSource) instance.getDataSource()).getFile();
+
+    try
+      {
+	FileOutputStream stream  = new 	FileOutputStream(file);
+	PrintWriter pw = new PrintWriter(stream); // should be an "indent print writer"
+
+	pw.println("jmax " + instance.getDataType().getName() +
+		   " " + instance.getName() +
+		   " " + instance.getInfo() +
+		   "{");
+	
+	((MaxTclData) instance).saveContentAsTcl(pw);
+	
+	pw.println("}");
+      }
+    catch (IOException e)
+      {
+	throw new MaxDataException("I/O error saving " + instance + " to " + file);
+      }
+  }
 }
 

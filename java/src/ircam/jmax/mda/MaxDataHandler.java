@@ -33,24 +33,24 @@ abstract class MaxDataHandler
   }
 
 
-  /** Load an instance from a given data source)
+  /** Load an instance from a given data source) */
 
   public static MaxData loadDataInstance(MaxDataSource source)
   {
     MaxData newInstance;
     
-    for (i = 0; i < allHandlers.size() ; i++)
+    for (int i = 0; i < allHandlers.size() ; i++)
       {
 	MaxDataHandler dataHandler;
 
 	dataHandler = (MaxDataHandler) elementAt(i);
 
-	if (dataHandler.canLoadFrom(dataSource))
+	if (dataHandler.canLoadFrom(source))
 	  {
-	    newInstance = dataHandler.loadInstance(dataSource);
+	    newInstance = dataHandler.loadInstance(source);
 
 	    newInstance.setDataHandler(dataHandler);
-	    newInstance.setDataSource(dataSource);
+	    newInstance.setDataSource(source);
 
 	    // here, raise the new instance event  ??
 
@@ -62,14 +62,15 @@ abstract class MaxDataHandler
   }
 
 
-  /**  Constructor: just handle registration in the global
+  /**  handle registration in the global
    * table; note that Data Handlers cannot be deinstalled, once
-   * created
+   * created; handler have to be installed after the creation,
+   * before using them.
    */
 
-  MaxDataHandler()
+  static void installDataHandler(MaxDataHandler handler)
   {
-    allHandlers.addElement(this);
+    allHandlers.addElement(handler);
   }
 
   /** Return true if this Data Handler can load

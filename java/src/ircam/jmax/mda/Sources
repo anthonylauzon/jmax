@@ -10,4 +10,12 @@ SOURCES =  \
 	  MaxFtsDataSource.java \
 	  MaxURLDataHandler.java \
 	  MaxURLDataSource.java \
-	  MaxDataEditor.java
+	  MaxDataEditor.java    \
+	  MaxDataEditorFactory.java \
+	  MaxTclEditorFactory.java  \
+	  MaxTclData.java      \
+          MaxTclInterpreter.java
+
+
+
+
