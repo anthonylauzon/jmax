@@ -3,10 +3,8 @@
 
 /* A message  is conceptually made of:
  *
- * 1- a type of message (i.e. control, max message, event ...) (an int)
- * 2- the command this message represent.
- * 2- an integer giving the number of arguments
- * 3- an array of fts_values, whose interpretation depend
+ * 1- the command this message represent.
+ * 2- an array of fts_values, whose interpretation depend
  *    on the type of message
  *
  *    The size of the array is variable
@@ -83,6 +81,9 @@
 
 #define POST_CODE     'h'	/* a post request for the server */
 
+#define REMOTE_CALL_CODE    '!'
+
+
 /* Value coding */
 
 /*
@@ -99,6 +100,7 @@
 #define STRING_QUOTE_CODE '\\'
 #define OBJECT_CODE 'o'
 #define CONNECTION_CODE 'x'
+#define DATA_CODE 0x05
 
 /*
    End of message: this character cannot be changed, and cannot

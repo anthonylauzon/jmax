@@ -9,6 +9,7 @@ extern void fts_client_mess_add_long(long value);
 extern void fts_client_mess_add_float(float value);
 extern void fts_client_mess_add_sym(fts_symbol_t s);
 extern void fts_client_mess_add_object(fts_object_t *obj);
+extern void fts_client_mess_add_data( fts_data_t *data);
 extern void fts_client_mess_add_string(const char *sp);
 extern void fts_client_mess_add_atoms(int ac, const fts_atom_t *args);
 extern void fts_client_mess_send_msg(void);

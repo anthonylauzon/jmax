@@ -66,6 +66,15 @@ fts_client_mess_add_long(long value)
 
 
 void
+fts_client_mess_add_data( fts_data_t *data)
+{
+  sprintf(outbuf, "%c%ld", DATA_CODE, (data ? fts_data_get_id(data) : 0));
+
+  fts_client_send_string(outbuf);
+}
+
+
+void
 fts_client_mess_add_object(fts_object_t *obj)
 {
   sprintf(outbuf, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
@@ -129,6 +138,8 @@ fts_client_mess_add_atoms(int ac, const fts_atom_t *args)
 	fts_client_mess_add_string(fts_get_string(&args[i]));
       else  if (fts_is_object(&args[i]))
 	fts_client_mess_add_object(fts_get_object(&args[i]));
+      else  if (fts_is_data(&args[i]))
+	fts_client_mess_add_data( fts_get_data( &args[i]) );
       else
 	fprintf(stderr, "Wrong atom type in fts_client_mess_add_atoms: %lx\n",
 		(unsigned long) fts_get_type(&args[i]));
