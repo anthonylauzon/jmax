@@ -20,6 +20,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
   int values[];
  
   TextField itsFormula = new TextField("", 40);
+  Panel itsCoordinates;
   //Graphics holdGraph;
   //Graphics offGraphics = null;
   //Dimension offDimension;	   
@@ -47,6 +48,11 @@ public class Tabler extends MaxEditor implements MaxDataEditor,  MouseMotionList
     values = new int[N_POINTS];
     itsFormula.resize(300, 20);
     getContentPane().add("South", itsFormula);
+
+    itsCoordinates = new Panel();
+    itsCoordinates.resize(300, 20);
+    getContentPane().add("North", itsFormula);
+    
     validate();
     //holdGraph = getGraphics();
     addMouseMotionListener(this);
