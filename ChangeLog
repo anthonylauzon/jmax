@@ -1,3 +1,7 @@
+2004-01-29  Alexandre Pages  <Alexandre.Pages@ircam.fr>
+
+      * added sample format conversion routines in the ASIO package (sample_converters.h/c)
+
 2004-01-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in: fixed java check test failed if CLASSPATH env variable was set.
