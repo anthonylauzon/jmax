@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.5 $ IRCAM $Date: 1998/11/16 13:53:31 $
+ *      $Revision: 1.6 $ IRCAM $Date: 1998/11/18 15:05:55 $
  *
  * Explode by Miller Puckette
  * Code ported and modified by MDC
@@ -214,7 +214,7 @@ explode_clear(explode_t *this)
     }
 
   this->data.evt = 0;
-  this->data.evt = 0;
+  this->current = 0;
 }
 
 /****************************************************************************/

@@ -108,8 +108,8 @@ set jmaxArch  origin
 when start {
 jmaxSetSampleRate 44100
 jmaxSetAudioBuffer 512
-ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 fifo_size [jmaxGetAudioBuffer]
-ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8 fifo_size [jmaxGetAudioBuffer]
+ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 
+ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8 
 }
 # --- end of .jmaxrc
 </PRE>
