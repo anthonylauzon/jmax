@@ -8,7 +8,13 @@ else
 JACK_PKG_DIR=
 endif
 
-SUBDIRS=utils control data guiobj io ispw ispwmath midi numeric sequence signal system dtd @PLATFORM_PACKAGES@ $(JACK_PKG_DIR) winbuild dsdev mmio winmidi
+if COND_COMPILE_MIDISHARE
+MIDISHARE_PKG_DIR=midishare
+else
+MIDISHARE_PKG_DIR=
+endif
+
+SUBDIRS=utils control data guiobj io ispw ispwmath midi numeric sequence signal system dtd @PLATFORM_PACKAGES@ $(JACK_PKG_DIR) winbuild dsdev mmio winmidi $(MIDISHARE_PKG_DIR)
 
 
 
