@@ -1,9 +1,13 @@
 SUBDIRS= src
 
 packagedir=$(pkgdatadir)/packages/guiobj/java
-package_DATA = guiobj.jar
+JAR= guiobj.jar
+package_DATA = $(JAR)
 
-JAR_DEP=$(shell find src -name "*.java")
+JAR_DEP=src/ircam/jmax/guiobj/classpackage.stamp
 
-guiobj.jar: $(JAR_DEP)	
-	( cd src; jar -cvf ../guiobj.jar `find ircam -name "*.class"` )
+CLEANFILES=${JAR}
+
+$(JAR): $(JAR_DEP)	
+	-test -f $(JAR) || rm -f $(JAR)
+	( cd src; jar -cvf ../$(JAR) `find ircam -name "*.class"` )
