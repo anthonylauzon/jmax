@@ -166,16 +166,6 @@ void fts_package_set_error(fts_package_t* pkg, const char* s);
 void fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg);
 
 /**
- * Returns the class with the specified name. Returns NULL if this
- * package doesn't define the class.
- *
- * @fn int fts_package_get_class(fts_package_t* pkg, fts_symbol_t name)
- * @param pkg the package
- * @param name the name of the class
- * @ingroup package */
-fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
-
-/**
  * Adds a new path to the template path.
  *
  * @fn void fts_package_add_template_path(fts_package_t* pkg, fts_symbol_t path)

@@ -136,4 +136,13 @@ FTS_API void fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_
  * @ingroup package */
 FTS_API void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* iter);
 
+/**
+ * Returns the class with the specified name. Returns NULL if this
+ * package doesn't define the class.
+ *
+ * @fn fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name)
+ * @param pkg the package
+ * @param name the name of the class
+ * @ingroup package */
+fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
