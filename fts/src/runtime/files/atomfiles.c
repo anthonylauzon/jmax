@@ -111,9 +111,7 @@ fts_atom_file_close(fts_atom_file_t *f)
   fts_free(f);
 }
 
-/* Read an atom  */
-
-#define IS_SEPARATOR(c) (((c) == ' ') || ((c) == '\t') || ((c) == '\r') || ((c) == '\n') || ((c) == '\0'))
+#define IS_SEPARATOR(c) ((((c) == ' ') || ((c) == '\t') || ((c) == '\r') || ((c) == '\n') || ((c) == '\0'))? (c): 0)
 #define IS_DIGIT(c)     (('0' <= (c)) && ((c) <= '9'))
 #define IS_SIGN(c)      (((c) == '+') || ((c) == '-'))
 #define IS_POINT(c)     ('.' == (c))
@@ -130,23 +128,25 @@ fts_atom_file_read_more(fts_atom_file_t *f)
 }
 
 int
-fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
+fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
 {
   enum
     {
-      read_skipping,
+      read_begin,
       read_in_int,
       read_in_float,
       read_in_symbol,
       read_in_quoted_symbol,
+      read_separator,
       read_end
-    } status = read_skipping;
+    } status = read_begin;
 
   enum  {an_int, a_float, a_symbol} read_type;
   char buf[1024];
   int fill_p;
   unsigned char c;
   int quoted;
+  char sep = 0;
 
   if (f->read >= f->count)
     fts_atom_file_read_more(f);
@@ -166,7 +166,7 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
       else
 	switch (status)
 	  {
-	  case read_skipping:
+	  case read_begin:
 	    if (IS_EOF(c))
 	      {
 		return 0;
@@ -197,7 +197,7 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
 		  {
 		    buf[fill_p++] = '\0';
 		    read_type = a_symbol;
-		    status = read_end;
+		    status = read_separator;
 		  }
 	      }
 	    else
@@ -216,13 +216,11 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
 		read_type = an_int;
 		status = read_end;
 	      }
-	    else if (IS_SEPARATOR(c) ||
-		     (IS_DOUBLE_QUOTE(c) && (! quoted)) ||
-		     (IS_ATOM_CHAR(c) && (! quoted)))
+	    else if (IS_SEPARATOR(c) || (IS_DOUBLE_QUOTE(c) && (! quoted)) || (IS_ATOM_CHAR(c) && (! quoted)))
 	      {
 		buf[fill_p++] = '\0';
 		read_type = an_int;
-		status = read_end;
+		status = read_separator;
 		/* do not avance the read pointer */
 	      }
 	    else if (IS_DIGIT(c))
@@ -252,13 +250,11 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
 		read_type = a_float;
 		status = read_end;
 	      }
-	    else if (IS_SEPARATOR(c) ||
-		     (IS_DOUBLE_QUOTE(c) && (! quoted)) ||
-		     (IS_ATOM_CHAR(c) && (! quoted)))
+	    else if (IS_SEPARATOR(c) || (IS_DOUBLE_QUOTE(c) && (! quoted)) || (IS_ATOM_CHAR(c) && (! quoted)))
 	      {
 		buf[fill_p++] = '\0';
 		read_type = a_float;
-		status = read_end;
+		status = read_separator;
 		/* do not avance the read pointer */
 	      }
 	    else if (IS_DIGIT(c))
@@ -283,13 +279,11 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
 		read_type = a_symbol;
 		status = read_end;
 	      }
-	    else if (IS_SEPARATOR(c) ||
-		     (IS_DOUBLE_QUOTE(c) && (! quoted)) ||
-		     (IS_ATOM_CHAR(c) && (! quoted)))
+	    else if (IS_SEPARATOR(c) || (IS_DOUBLE_QUOTE(c) && (! quoted)) || (IS_ATOM_CHAR(c) && (! quoted)))
 	      {
 		buf[fill_p++] = '\0';
 		read_type = a_symbol;
-		status = read_end;
+		status = read_separator;
 		/* do not avance the read pointer */
 	      }
 	    else
@@ -312,7 +306,7 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
 		buf[fill_p++] = '\0';
 		(f->read)++;
 		read_type = a_symbol;
-		status = read_end;
+		status = read_separator;
 	      }
 	    else
 	      {
@@ -322,15 +316,52 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
 	      }
 	    break;
 
+	  case read_separator:
+	    if(IS_SEPARATOR(c))
+	      {
+		switch(sep)
+		  {  
+		  case 0:
+		    if(c == ' ')
+		      {
+			sep = ' ';	  
+			break;
+		      }
+		  case ' ':
+		    if(c == '\r')
+		      {
+			sep = '\r';
+			break;
+		      }
+		  case '\r':
+		    if(c == '\t')
+		      {
+			sep = '\t';
+			break;
+		      }
+		  case '\t':
+		    if(c == '\n')
+		      {
+			sep = '\n';
+			break;
+		      }
+		  }
+
+		(f->read)++;
+	      }
+	    else
+	      status = read_end;
+	    break;
+
 	  case read_end:
 	    break;
 	  }
-
-      if ((! IS_EOF(c)) && status != read_end)
+      
+      if(!IS_EOF(c) && status != read_end)
 	{
 	  if (f->read >= f->count)
 	    fts_atom_file_read_more(f);
-
+	  
 	  if (f->count == 0)
 	    c = 0xff;
 	  else
@@ -361,20 +392,16 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at)
       break;
     }
 
-  /* 1 is for atom found */
-
-  return 1;
+  *separator = sep;
+  return 1; /* 1 is for atom found */
 }
 
-/*
-   return zero if the atom was not writable,
+/* return zero if the atom was not writable,
    like a pointer or so.
    The separator char is added after the symbol; in must be
    a valid (IS_SEPARATOR(c)) chars, otherwise is substituted
    by a blank.
-
 */
-
 int
 fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
 {
@@ -419,7 +446,7 @@ fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator)
 	*/
     }
   else
-      return 0;
+    sprintf(buf, "()");
 
   sprintf(buf + strlen(buf), "%c", separator);
 

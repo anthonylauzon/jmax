@@ -22,6 +22,7 @@
  *
  */
 
+#include <unistd.h>
 #include "sys.h"
 #include "lang.h"
 #include "runtime/files/files.h"
