@@ -76,15 +76,17 @@
 		     // by the C function
    */
 
+/* #define VM_DEBUG */
+
 #include <stdio.h> /* DEBUG */
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/vm.h"
 
 
-#define EVAL_STACK_DEPTH   1024
-#define OBJECT_STACK_DEPTH 1024
-#define OBJECT_TABLE_STACK_DEPTH 1024
+#define EVAL_STACK_DEPTH   4096
+#define OBJECT_STACK_DEPTH 4096
+#define OBJECT_TABLE_STACK_DEPTH 4096
 
 static fts_atom_t eval_stack[EVAL_STACK_DEPTH];
 static fts_atom_t *eval_tos;
@@ -96,7 +98,7 @@ static fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
 static fts_object_t ***object_table_tos;
 static fts_object_t **object_table;
 
-/* #define VM_DEBUG   */
+
 
 
 /* The parent argument is pushed to the object stack, so to be used
@@ -207,12 +209,16 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	  {
 	    /* PUSH_BUILTIN_SYM   <idx> */
 
+	    fts_symbol_t s;
+
+	    s  = fts_get_builtin_symbol(GET_B(p));
+
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_BUILTIN_SYM %d\n", GET_B(p));
+	    fprintf(stderr, "PUSH_BUILTIN_SYM %s\n", fts_symbol_name(s));
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, fts_get_builtin_symbol(GET_B(p)));
+	    fts_set_symbol(eval_tos, s);
 	    p++;
 	  }
 	break;
@@ -222,12 +228,16 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	  {
 	    /* PUSH_SYM_B   <idx> */
 
+	    fts_symbol_t s;
+
+	    s  = symbol_table[GET_B(p)];
+
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_B %d\n", GET_B(p));
+	    fprintf(stderr, "PUSH_SYM_B %s\n", fts_symbol_name(s));
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, symbol_table[GET_B(p)]);
+	    fts_set_symbol(eval_tos, s);
 	    p++;
 	  }
 	break;
@@ -236,12 +246,16 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	  {
 	    /* PUSH_SYM_S   <idx> */
 
+	    fts_symbol_t s;
+
+	    s  = symbol_table[GET_S(p)];
+
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_S %d\n", GET_S(p));
+	    fprintf(stderr, "PUSH_SYM_S %s\n", fts_symbol_name(s));
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, symbol_table[GET_S(p)]);
+	    fts_set_symbol(eval_tos, s);
 	    p += 2;
 	  }
 	break;
@@ -250,12 +264,16 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	  {
 	    /* PUSH_SYM_L   <idx> */
 
+	    fts_symbol_t s;
+
+	    s  = symbol_table[GET_L(p)];
+
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_L %d\n", GET_L(p));
+	    fprintf(stderr, "PUSH_SYM_L %s\n", fts_symbol_name(s));
 #endif
 
 	    eval_tos--;
-	    fts_set_symbol(eval_tos, symbol_table[GET_L(p)]);
+	    fts_set_symbol(eval_tos, s);
 	    p += 4;
 	  }
 	break;
@@ -601,11 +619,12 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 
 	    fts_symbol_t prop;
 
+	    prop = symbol_table[GET_B(p)];
+
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_B %d\n", GET_B(p));
+	    fprintf(stderr, "PUT_PROP_B %s\n", fts_symbol_name(prop));
 #endif
 
-	    prop = symbol_table[GET_B(p)];
 	    fts_object_put_prop(*object_tos, prop, eval_tos);
 	    p += 1;
 	  }
@@ -617,11 +636,12 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 
 	    fts_symbol_t prop;
 
+	    prop = symbol_table[GET_S(p)];
+
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_S %d\n", GET_S(p));
+	    fprintf(stderr, "PUT_PROP_S %s\n", fts_symbol_name(prop));
 #endif
 
-	    prop = symbol_table[GET_S(p)];
 	    fts_object_put_prop(*object_tos, prop, eval_tos);
 	    p += 2;
 	  }
@@ -633,11 +653,12 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 
 	    fts_symbol_t prop;
 
+	    prop = symbol_table[GET_L(p)];
+
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_PROP_L %d\n", GET_L(p));
+	    fprintf(stderr, "PUT_PROP_S %s\n", fts_symbol_name(prop));
 #endif
 
-	    prop = symbol_table[GET_L(p)];
 	    fts_object_put_prop(*object_tos, prop, eval_tos);
 	    p += 4;
 	  }
@@ -649,10 +670,12 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 
 	    fts_symbol_t prop;
 
-#ifdef VM_DEBUG
-	    fprintf(stderr, "PUT_BUILTIN_PROP %d\n", fts_word_get_int(p));
-#endif
 	    prop = fts_get_builtin_symbol(GET_B(p++));
+
+#ifdef VM_DEBUG
+	    fprintf(stderr, "PUT_BUILTIN_PROP %s\n", fts_symbol_name(prop));
+#endif
+
 	    fts_object_put_prop(*object_tos, prop, eval_tos);
 	  }
 	break;
@@ -661,9 +684,20 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	  {
 	    /* OBJ_MESS   <inlet> <sel> <nargs> */
 
-	    int inlet = GET_L(p++);
-	    fts_symbol_t sel = symbol_table[GET_L(p++)];
-	    int nargs = GET_L(p++);
+	    int inlet;
+	    fts_symbol_t sel;
+	    int nargs;
+
+	    inlet = GET_L(p);
+	    p += 4;
+	    sel = symbol_table[GET_L(p)];
+	    p += 4;
+	    nargs = GET_L(p++);
+	    p += 4;
+
+#ifdef VM_DEBUG
+	    fprintf(stderr, "OBJ_MESS %d %s %d\n", inlet, fts_symbol_name(sel), nargs);
+#endif
 
 	    fts_message_send(*object_tos, inlet, sel, nargs, eval_tos);
 	  }
@@ -673,9 +707,20 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	  {
 	    /* OBJ_BUILTIN_MESS   <inlet> <sel> <nargs> */
 
-	    int inlet = GET_L(p++);
-	    fts_symbol_t sel = fts_get_builtin_symbol(GET_B(p++));
-	    int nargs = GET_L(p++);
+	    int inlet;
+	    fts_symbol_t sel;
+	    int nargs;
+
+	    inlet = GET_L(p);
+	    p += 4;
+	    sel = fts_get_builtin_symbol(GET_B(p));
+	    p += 1;
+	    nargs = GET_L(p);
+	    p += 4;
+
+#ifdef VM_DEBUG
+	    fprintf(stderr, "OBJ_BUILTIN_MESS %d %s %d\n", inlet, fts_symbol_name(sel), nargs);
+#endif
 
 	    fts_message_send(*object_tos, inlet, sel, nargs, eval_tos);
 	  }

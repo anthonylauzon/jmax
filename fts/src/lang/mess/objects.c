@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.17 $ IRCAM $Date: 1998/04/30 12:28:46 $
+ *      $Revision: 1.18 $ IRCAM $Date: 1998/05/11 14:46:28 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -226,7 +226,6 @@ fts_object_send_properties(fts_object_t *obj)
 
       if (fts_object_is_patcher(obj))
 	{
-	  fts_object_property_changed_urgent(obj, fts_s_autorouting);
 	  fts_object_property_changed_urgent(obj, fts_s_wx);
 	  fts_object_property_changed_urgent(obj, fts_s_wy);
 	  fts_object_property_changed_urgent(obj, fts_s_wh);

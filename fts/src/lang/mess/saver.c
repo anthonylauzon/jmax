@@ -350,12 +350,14 @@ void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
     {
       /* PUSH_SYM   <int>   */
 
+      int value;
+
 #ifdef SAVER_DEBUG
       fprintf(stderr, "\tPUSH_SYM %d (%s)\n",
 	      fts_bmax_add_symbol(f, sym),
 	      fts_symbol_name(sym));
 #endif
-      int value = fts_bmax_add_symbol(f, sym);
+      value = fts_bmax_add_symbol(f, sym);
 
       fts_bmax_write_opcode_for(f, FVM_PUSH_SYM, value );
       fts_bmax_write_int(f, value);
@@ -410,12 +412,14 @@ void fts_bmax_code_set_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
     {
       /* SET_SYM   <int>   */
 
+      int value;
+
 #ifdef SAVER_DEBUG
       fprintf(stderr, "\tSET_SYM %d (%s)\n",
 	      fts_bmax_add_symbol(f, sym),
 	      fts_symbol_name(sym));
 #endif
-      int value = fts_bmax_add_symbol(f, sym);
+      value = fts_bmax_add_symbol(f, sym);
 
       fts_bmax_write_opcode_for(f, FVM_SET_SYM, value );
       fts_bmax_write_int(f, value);
@@ -508,13 +512,15 @@ void fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
     {
       /* PUT_PROP   <sym> */
 
+      int value;
+
 #ifdef SAVER_DEBUG
       fprintf(stderr, "\tPUT_PROP %d (%s)\n",
 	      fts_bmax_add_symbol(f, sym),
 	      fts_symbol_name(sym));
 #endif
 
-      int value = fts_bmax_add_symbol(f, sym);
+      value = fts_bmax_add_symbol(f, sym);
 
       fts_bmax_write_opcode_for(f, FVM_PUT_PROP, value );
       fts_bmax_write_int(f, value);
@@ -700,7 +706,6 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 
   if (fts_object_is_patcher(obj))
     {
-      fts_bmax_code_new_property(f, obj, fts_s_autorouting);
       fts_bmax_code_new_property(f, obj, fts_s_wx);
       fts_bmax_code_new_property(f, obj, fts_s_wy);
       fts_bmax_code_new_property(f, obj, fts_s_wh);

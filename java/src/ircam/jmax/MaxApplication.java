@@ -121,6 +121,18 @@ public class MaxApplication extends Object
 
   public static void main(String args[])
   {
+    // Temporary: the look and feel must be metal, in order to use
+    // the nice file chooser !!!
+
+    try
+      {
+	UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+      }
+    catch (Exception exc)
+      {
+	System.err.println("Cannot load MotifLookAndFeel");
+      }
+
     // Initialize swing to use heavyweight components for
     // Menus'
 

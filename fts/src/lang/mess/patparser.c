@@ -242,9 +242,6 @@ fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, int id, fts_symbol_t
       fts_set_symbol(&a, name);
       fts_object_put_prop(patcher, fts_s_name, &a);
 
-      fts_set_symbol(&a, fts_s_off);
-      fts_object_put_prop(patcher, fts_s_autorouting, &a);
-
       /* activate the post-load init, like loadbangs */
 
       fts_message_send(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
@@ -344,9 +341,6 @@ static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in)
 	      fts_set_int(&description[3], 0);
 
 	      lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 4, description);
-
-	      fts_set_symbol(&a, fts_s_off);
-	      fts_object_put_prop(lastNObject, fts_s_autorouting, &a);
 
 	      fts_patparse_parse_patcher(lastNObject, in);
 

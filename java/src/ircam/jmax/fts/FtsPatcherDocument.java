@@ -46,15 +46,14 @@ public class FtsPatcherDocument extends MaxDocument implements MaxTclDocument
 
     // get the file name
 
-//     file = ((MaxFileDocumentSource) source).getFile().getAbsolutePath();
+    file = ((MaxFileDocumentSource) source).getFile().getAbsolutePath();
 
-//     if (file.lastIndexOf('.') == -1)
-//       file = file + ".bmax";
-//     else
-//       file = file.substring(0, file.lastIndexOf('.')) + ".bmax";
+    if (file.lastIndexOf('.') == -1)
+      file = file + ".bmax";
+    else
+      file = file.substring(0, file.lastIndexOf('.')) + ".bmax";
     
-//     FtsServer.getServer().savePatcherBmax((FtsObject) getRootData(), file);
-    
+    FtsServer.getServer().savePatcherBmax((FtsObject) getRootData(), file);
   }
 
 

@@ -217,9 +217,6 @@ fts_object_t *fts_abstraction_new(fts_patcher_t *patcher, int id, int ac, const 
 
       obj = fts_object_new((fts_patcher_t *)patcher, id, 4, description);
 
-      fts_set_symbol(&a, fts_s_off);
-      fts_object_put_prop(obj, fts_s_autorouting, &a);
-
       /* Change the description in the object */
 
       fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));

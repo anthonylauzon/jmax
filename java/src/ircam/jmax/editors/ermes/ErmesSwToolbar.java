@@ -24,12 +24,6 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
 
   public ErmesSwToolbar(ErmesSketchPad theSketchPad) {
 
-    try{
-      UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-    }catch (Exception exc) {
-      new ErrorDialog(theSketchPad.itsSketchWindow, "Could not load MotifLookAndFeel");
-    }
-
     /* important note for (future) developers:
        Swing uses a double buffer by default FOR EACH JComponent.
        It dows not seem, however, to handle this buffer correctly.

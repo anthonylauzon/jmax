@@ -242,11 +242,14 @@ void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_obje
 	  /* Code an "append" message for 256 values */
 
 	  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_append, ac);
-	  ac = 0;
 
 	  /* Code a pop of all the values  */
 
 	  fts_bmax_code_pop_args(f, ac);
+
+	  /* Put the arg counter to zero */
+
+	  ac = 0;
 	}
     }
 

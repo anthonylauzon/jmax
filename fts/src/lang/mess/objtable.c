@@ -189,19 +189,7 @@ fts_connection_table_get(int id)
     return 0;
 }
 
-/* for  restart */
 
-void
-fts_connection_table_delete_all(void)
-{
-  int i;
-  
-  /* first slot of the table unused */
-
-  for (i = 1; i < connection_table_size; i++)
-    if (connection_table[i])
-      fts_connection_delete(connection_table[i]);
-}
 
 
 

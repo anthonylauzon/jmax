@@ -51,6 +51,7 @@ extern fts_symbol_t fts_s_print;
 extern fts_symbol_t fts_s_clear;
 extern fts_symbol_t fts_s_stop;
 extern fts_symbol_t fts_s_start;
+extern fts_symbol_t fts_s_restore;
 extern fts_symbol_t fts_s_open;
 extern fts_symbol_t fts_s_close;
 extern fts_symbol_t fts_s_load;
@@ -80,9 +81,6 @@ extern fts_symbol_t fts_s_wh;
 extern fts_symbol_t fts_s_range;
 extern fts_symbol_t fts_s_font;
 extern fts_symbol_t fts_s_fontSize;
-extern fts_symbol_t fts_s_autorouting;
-extern fts_symbol_t fts_s_off;
-extern fts_symbol_t fts_s_on;
 
 /* Symbols related to builtin classes */
 
