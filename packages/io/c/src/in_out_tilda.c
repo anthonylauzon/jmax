@@ -45,7 +45,7 @@ static int in_out_class_check( int ac, const fts_atom_t *at, int *inoutlets)
   if (!*inoutlets)
     {
       if (!port)
-	port = fts_audioport_get_default( 0);
+	port = fts_audioport_get_default();
 
       if (port && fts_object_is_audioport( (fts_object_t *)port))
 	*inoutlets = fts_audioport_get_output_channels( port);
@@ -77,7 +77,7 @@ static int in_out_check( fts_object_t *o, int ac, const fts_atom_t *at, fts_audi
 
   if (!*port)
     {
-      *port = fts_audioport_get_default( o);
+      *port = fts_audioport_get_default();
 
       if ( !*port)
 	{
