@@ -168,13 +168,13 @@ JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl1.0/jacl.jar
 CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
 
 
-if [ -r /usr/java/lib/rt.jar ]
-then
+#if [ -r /usr/java/lib/rt.jar ]
+#then
     # Probably we are on a SGI. In this case, we must use Java option -classpath.
     # Don't ask me why...
-    CLASSPATH=/usr/java/lib/rt.jar:${CLASSPATH}
-    start_it_SGI
-else
+#    CLASSPATH=/usr/java/lib/rt.jar:${CLASSPATH}
+#    start_it_SGI
+#else
     start_it
-fi
+#fi
 
