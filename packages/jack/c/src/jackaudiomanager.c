@@ -151,14 +151,33 @@ int jackaudiomanager_process(jack_nframes_t nframes, void* arg)
 
 static void jackaudiomanager_scan_ports(fts_hashtable_t* ht, int flags);
 
+static void spost_hashtable(fts_hashtable_t* ht, fts_bytestream_t* bytestream)
+{
+  fts_iterator_t keys, values;
+  
+  fts_hashtable_get_keys(ht, &keys);
+  fts_hashtable_get_values(ht, &values);
+  while (fts_iterator_has_more(&keys))
+  {
+    fts_atom_t k,v;
+    
+    fts_iterator_next(&keys, &k);
+    fts_iterator_next(&values, &v);
+    fts_spost(bytestream, "%s\n", fts_get_symbol(&k));
+  }
+}
+
 /* jack port registration callback */
 void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, void* arg)
 {
   jack_port_t* cur_port = jack_port_by_id(manager_jack_client, port_id);
   fts_symbol_t port_name = fts_new_symbol(jack_port_name(cur_port));
   fts_atom_t k, v;
+  fts_object_t* audioconfig;
+  fts_bytestream_t* bytestream = fts_post_get_stream(0,NULL);
+
   fts_log("[jackaudiomanager] port registration callback port name: %s\n", port_name);
-  post("[jackaudiomanager] registration callback, port name: %s\n", port_name);
+  post("[jackaudiomanager] registration callback, port name: %s, flag:%d\n", port_name, n);
 
   if (0 == n)
   {
@@ -199,6 +218,14 @@ void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, 
   }
   
   /* @@@@@@ tell audio config to upload current configuration .... ?  @@@@@ */
+
+  /* @@@@@@ debug print @@@@@@@@ */
+  fts_spost(bytestream, "[jackaudiomanager] Input Ports\n");
+  spost_hashtable(&jack_port_input_ht, bytestream);
+
+  fts_spost(bytestream, "[jackaudiomanager] Output Ports\n");
+  spost_hashtable(&jack_port_output_ht, bytestream);
+  
 }
 
 static
@@ -780,30 +807,11 @@ jackaudiomanager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
   int i;
   fts_iterator_t keys, values;
 
-
   fts_spost(bytestream, "[jackaudiomanager] Input Ports\n");
-  fts_hashtable_get_keys(&jack_port_input_ht, &keys);
-  fts_hashtable_get_values(&jack_port_input_ht, &values);
-  while (fts_iterator_has_more(&keys))
-  {
-    fts_atom_t k,v;
-
-    fts_iterator_next(&keys, &k);
-    fts_iterator_next(&values, &v);
-    fts_spost(bytestream, "%s\n", fts_get_symbol(&k));
-  }
+  spost_hashtable(&jack_port_input_ht, bytestream);
 
   fts_spost(bytestream, "[jackaudiomanager] Output Ports\n");
-  fts_hashtable_get_keys(&jack_port_output_ht, &keys);
-  fts_hashtable_get_values(&jack_port_output_ht, &values);
-  while (fts_iterator_has_more(&keys))
-  {
-    fts_atom_t k,v;
-
-    fts_iterator_next(&keys, &k);
-    fts_iterator_next(&values, &v);
-    fts_spost(bytestream, "%s\n", fts_get_symbol(&k));
-  }
+  spost_hashtable(&jack_port_output_ht, bytestream);
 }
 
 
@@ -890,20 +898,27 @@ static void
 jackaudiomanager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
+  jackaudiomanager_thread_t* manager_object;
+  fts_fifo_t* run_fifo;
+  FILE* mytmp = fopen("/var/tmp/jack_exit.txt", "w");
 
-  fts_log("[jackaudiomanager] destructor called \n");
-#ifdef FTS_JACK_CREATE_THREAD
-  delete_run_thread(self);
-#endif
+  fprintf(mytmp, "[jackaudiomanager] destructor called \n");
 
-  /* if process callback is set and client is activate */
-  if (0 != nb_jack_audio_port)
+  manager_object = (jackaudiomanager_thread_t*)self->jack_communication;
+  run_fifo = &manager_object->run_fifo;
+  if (0 != add_symbol_to_fifo(run_fifo, s_deactivate))
   {
-    jack_deactivate(manager_jack_client);
-    --nb_jack_audio_port;
+    fprintf(mytmp,"[jackaudiomanager] cannot add deactivate symbol in run FIFO \n");
   }
 
+#ifdef FTS_JACK_CREATE_THREAD
+  delete_run_thread(self);
+  fprintf(mytmp, "delete_run_thread \n");
+#endif
+
   jackaudiomanager_unset_jack_client(self);  
+  fprintf(mytmp, "jackaudiomanager_unset_jack_client \n");
+  fclose(mytmp);
 }
 
 static void 
