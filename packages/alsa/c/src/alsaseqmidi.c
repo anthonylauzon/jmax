@@ -162,8 +162,6 @@ alsaseqmidi_get_default_output(fts_object_t* o, int winlet, fts_symbol_t s, int 
 {
     alsaseqmidi_t* this = (alsaseqmidi_t*)o;
     fts_symbol_t* name = (fts_symbol_t*)fts_get_pointer(at);
-    fts_atom_t a;
-    fts_atom_t k;
 
     fts_log("[alsaseqmidi] get default output call\n");
     alsaseqmidi_update_outputs(this);
@@ -232,11 +230,6 @@ alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_metaclass_t* mcl, fts_symbo
     fts_log("[alsaseqmidi] Create alsaseqmidiport label_name: %s, device_name: %s, port_address: %s\n", label_name, device_name, port_address);
     
     port = fts_object_create(mcl, 4, args);
-    if (alsaseqmidi_symbol_default_unset == this->default_input)
-    {
-	this->default_input = device_name;
-	fts_log("[alsaseqmidi] Set default_input to %s\n", device_name);
-    }
     if((port == NULL)
        || (fts_object_get_error(port) == NULL))
     {
@@ -249,21 +242,21 @@ alsaseqmidi_create_midiport(alsaseqmidi_t* this, fts_metaclass_t* mcl, fts_symbo
     }
 }
 
+
 static void
-alsaseqmidi_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_get_io(alsaseqmidi_t* this, fts_metaclass_t* alsaseqmidiport_type, const fts_atom_t* at, fts_hashtable_t* ht, fts_symbol_t* default_port)
 {
-    alsaseqmidi_t* this = (alsaseqmidi_t*)o;
     fts_midiport_t** ptr = (fts_midiport_t**)fts_get_pointer(at + 0);
     fts_symbol_t device_name = fts_get_symbol(at + 1);
-    fts_symbol_t label_name = fts_get_symbol(at + 2);
+    fts_symbol_t label_name = fts_get_symbol(at + 2);    
     fts_symbol_t port_address;
-    fts_atom_t k, a;
+    fts_atom_t k,a;
 
-    fts_log("[alsaseqmidi] alsaseqmidi_get_input: device name : %s, label name : %s\n"
-	    ,device_name, label_name);
+    fts_log("[alsaseqmidi] alsaseqmidi_get_io; device name %s, label name %s\n",
+	    device_name, label_name);
 
     fts_set_symbol(&k, device_name);
-    if (fts_hashtable_get(&this->sources, &k, &a))
+    if (fts_hashtable_get(ht, &k, &a))
     {
 	if (fts_is_object(&a))
 	{
@@ -274,17 +267,27 @@ alsaseqmidi_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 	else if (fts_is_symbol(&a))
 	{
 	    port_address = fts_get_symbol(&a);
-	    post("[alsaseqmidi] alsaseqmidi_get_input fts_is_symbol : %s\n", port_address);
-	    *ptr = alsaseqmidi_create_midiport(this, alsaseqmidiport_input_type, 
-					       device_name, label_name, port_address);
-	}	
+	    /* Create midiport */
+	    *ptr = alsaseqmidi_create_midiport(this, alsaseqmidiport_type, device_name,
+					       label_name, port_address);
 
-	if (alsaseqmidi_symbol_default_unset == this->default_input)
-	{
-	    this->default_input = device_name;
 	}
 	
     }
+    if (alsaseqmidi_symbol_default_unset == *default_port)
+    {
+	*default_port = device_name;
+    }
+}
+
+
+static void
+alsaseqmidi_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+    alsaseqmidi_t* this = (alsaseqmidi_t*)o;
+
+    fts_log("[alsaseqmidi] get input call get_io \n");
+    alsaseqmidi_get_io(this, alsaseqmidiport_input_type, at, &this->sources, &this->default_input);
 }
 
 
@@ -292,39 +295,9 @@ static void
 alsaseqmidi_get_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
     alsaseqmidi_t* this = (alsaseqmidi_t*)o;
-    fts_midiport_t** ptr = (fts_midiport_t**)fts_get_pointer(at + 0);
-    fts_symbol_t device_name = fts_get_symbol(at + 1);
-    fts_symbol_t label_name = fts_get_symbol(at + 2);
-    fts_symbol_t port_address;
-    fts_atom_t k, a;
 
-    fts_log("[alsaseqmidi] alsaseqmidi_get_output: device name : %s, label name : %s\n"
-	    , device_name, label_name);
-
-    fts_set_symbol(&k, device_name);
-    if (fts_hashtable_get(&this->destinations, &k, &a))
-    {
-	if (fts_is_object(&a))
-	{
-	    alsaseqmidiport_t* port = (alsaseqmidiport_t*)fts_get_object(&a);
-	    /* ADD a check to know if midiport is still valid */
-	    *ptr = (fts_midiport_t*)port;
-	}
-	else if (fts_is_symbol(&a))
-	{
-	    port_address = fts_get_symbol(&a);
-	    post("[alsaseqmidi] alsaseqmidi_get_output fts_is_symbol : %s\n", port_address);
-	    /* Create midiport */
-	    *ptr = alsaseqmidi_create_midiport(this, alsaseqmidiport_output_type, 
-					       device_name, label_name, port_address);
-	}	
-
-    }
-    if (alsaseqmidi_symbol_default_unset == this->default_output)
-    {
-	this->default_output = device_name;
-    }
-	
+    fts_log("[alsaseqmidi] get output call get_io\n");
+    alsaseqmidi_get_io(this, alsaseqmidiport_output_type, at, &this->destinations, &this->default_output);
 }
 
 
@@ -332,28 +305,28 @@ alsaseqmidi_get_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
 static void
 alsaseqmidi_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-alsaseqmidi_t* this = (alsaseqmidi_t*) o;
-int err;
-char client_name[NAME_SIZE];
-fts_hashtable_init(&this->inputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-fts_hashtable_init(&this->outputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-fts_hashtable_init(&this->sources, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-fts_hashtable_init(&this->destinations, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    alsaseqmidi_t* this = (alsaseqmidi_t*) o;
+    int err;
+    char client_name[NAME_SIZE];
+    fts_hashtable_init(&this->inputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&this->outputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&this->sources, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&this->destinations, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
 
-/* Open a client to sequencer */
-err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_DUPLEX, 0);
-if (err < 0)
-{
-    fts_object_set_error(o, "Cannot create ALSA sequencer client ...");
-    fts_log("[alsaseqmidi] cannot create ALSA sequencer handle\n");
-    return;
-}
-fts_log("[alsaseqmidi] ALSA sequencer handle created \n");
-
-snprintf(client_name, NAME_SIZE, "jmax_alsa::");
-snd_seq_set_client_name(this->seq, client_name);
-this->client_name = fts_new_symbol_copy(client_name);    
-fts_log("[alsaseqmidi] ALSA sequencer client name set (%s)\n", client_name);
+    /* Open a client to sequencer */
+    err = snd_seq_open(&this->seq, "default", SND_SEQ_OPEN_DUPLEX, 0);
+    if (err < 0)
+    {
+	fts_object_set_error(o, "Cannot create ALSA sequencer client ...");
+	fts_log("[alsaseqmidi] cannot create ALSA sequencer handle\n");
+	return;
+    }
+    fts_log("[alsaseqmidi] ALSA sequencer handle created \n");
+    
+    snprintf(client_name, NAME_SIZE, "jmax_alsa::");
+    snd_seq_set_client_name(this->seq, client_name);
+    this->client_name = fts_new_symbol_copy(client_name);    
+    fts_log("[alsaseqmidi] ALSA sequencer client name set (%s)\n", client_name);
     
 }
 
