@@ -1,3 +1,9 @@
+2004-01-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/signal/c/src/playfvec.c (play_ftl): fixed bug [ 872267 ] play bug with fvec starting by non 0 value. 
+	Now in stop mode, play~ outputs 0.
+	Please note that in pause mode, play~ outputs the current sample value.
+
 2004-01-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* client/python: added license information in all python source code files.
