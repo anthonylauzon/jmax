@@ -28,6 +28,7 @@ package ircam.jmax.guiobj;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
@@ -116,7 +117,13 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 
   public void redefined()
   {
-    fitToText();
+    SwingUtilities.invokeLater(new Runnable(){
+	public void run()
+	{
+	  redraw();
+	  fitToText();
+	}
+      });
   }
 
   /* Inspector */    
