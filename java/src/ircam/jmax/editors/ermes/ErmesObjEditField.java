@@ -230,7 +230,10 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       if(aOldIndex==-1) return fm.stringWidth(theString);
       else return fm.stringWidth(theString.substring(aOldIndex));
     }
-    else return fm.stringWidth(theString.substring(aOldIndex, aIndex));
+    else {
+      if(aOldIndex==-1) return fm.stringWidth(theString.substring(0,aIndex));
+      else return fm.stringWidth(theString.substring(aOldIndex, aIndex));
+    }
   }
 
    public int GetCurrentLineChars(String theString){
@@ -245,9 +248,11 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       if(aOldIndex==-1) return theString.length();
       else return theString.length()-aOldIndex;
     }
-    else return aIndex-aOldIndex;
-  }
-
+    else {
+      if(aOldIndex==-1) return aIndex;
+      else return aIndex-aOldIndex;
+    }
+   }
 
   //--------------------------------------------------------
   // paint()
