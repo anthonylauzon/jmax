@@ -1047,9 +1047,9 @@ fts_client_load_patcher(fts_symbol_t file_name, fts_object_t *parent, int id)
   dir_name = (char *)alloca( strlen( file_name) + 1);
   strcpy( dir_name, file_name);
   fts_dirname( dir_name);
-  fts_package_add_template_path( fts_project_get(), fts_new_symbol( dir_name));
-  fts_package_add_abstraction_path( fts_project_get(), fts_new_symbol( dir_name));
-  fts_package_add_data_path( fts_project_get(), fts_new_symbol( dir_name));
+  fts_package_add_template_path( fts_project_get(), fts_new_symbol_copy( dir_name));
+  fts_package_add_abstraction_path( fts_project_get(), fts_new_symbol_copy( dir_name));
+  fts_package_add_data_path( fts_project_get(), fts_new_symbol_copy( dir_name));
 
   /*
     We change the working directory so that it is the directory of the
