@@ -377,7 +377,8 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_audioport_set_output_function( (fts_audioport_t *)this, halaudioport_output);
 
   set_real_time( fts_dsp_get_sample_rate() / (buffer_size / (sizeof(float)*channels)) );
-
+  post("sample rate: %f, buffer size: %d, sizeof(float): %d, channels: %d\n", fts_dsp_get_sample_rate(), buffer_size,  sizeof(float), channels);
+  
   /* Create the fifo 
    * We make a fifo of 2 buffers. May be 3 would be better.
    */

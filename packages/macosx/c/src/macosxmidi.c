@@ -231,7 +231,7 @@ macosxmidi_get_default_input( fts_object_t *o, int winlet, fts_symbol_t s, int a
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_symbol_t *name = (fts_symbol_t *)fts_get_pointer(at);
   
-  if(*input == NULL && MIDIGetNumberOfSources() > 0)
+  if(MIDIGetNumberOfSources() > 0)
     *name = macosxmidi_insert_reference(&this->inputs, MIDIGetSource(0));
 }
 
@@ -466,7 +466,7 @@ macosxmidi_poll_fifo( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_midififo_poll(&this->fifo);
 
   if(this->acknowledge < this->notify) {
-    fts_midiconfig_update(this);
+    fts_midiconfig_update();
     this->acknowledge = this->notify;
   }
 }
@@ -517,7 +517,8 @@ macosxmidi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* FTS MIDI manager interface implementation */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_default_input, macosxmidi_get_default_input);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_default_output, macosxmidi_get_default_output);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_append_device_names, macosxmidi_append_device_names);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_append_input_names, macosxmidi_append_input_names);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_append_output_names, macosxmidi_append_output_names);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_input, macosxmidi_get_input);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_output, macosxmidi_get_output);
 
@@ -539,5 +540,5 @@ macosxmidi_config( void)
   macosxmidi_symbol_iac_midi_source = fts_new_symbol("IAC Source");
   macosxmidi_symbol_iac_midi_destination = fts_new_symbol("IAC Destination");
   
-  fts_midiconfig_add_manager((fts_midimanger_t *)fts_object_create(mc, 0, 0));
+  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, 0, 0));
 }
