@@ -41,6 +41,7 @@ public class FtsSliderObject extends FtsIntValueObject
 
   int minValue;
   int maxValue;
+  int horientation;
 
   /**
    * Create a FtsObject object;
@@ -72,6 +73,14 @@ public class FtsSliderObject extends FtsIntValueObject
     fts.getServer().putObjectProperty(this, "maxValue", maxValue);
   }
 
+  /** Set the horientation */
+
+  public void setHorientation(int hor)
+  {
+    horientation = hor;
+    fts.getServer().putObjectProperty(this, "horientation", horientation);
+  }
+
   /** Get the Min Value for the slider. */
 
   public int  getMinValue()
@@ -86,6 +95,11 @@ public class FtsSliderObject extends FtsIntValueObject
     return maxValue;
   }
 
+  public int getHorientation()
+  {
+    return horientation;
+  }
+
   /** Over write the localPut message to handle the min/max properties;
      It does *not* call the listener on max and min values.
      There is no listener for max/min changes.
@@ -93,6 +107,8 @@ public class FtsSliderObject extends FtsIntValueObject
 
   protected void localPut(String name, int value)
   {
+    System.err.println("localput "+name+"  "+value);
+
     if (name == "minValue")
       {
 	minValue = value;
@@ -100,6 +116,10 @@ public class FtsSliderObject extends FtsIntValueObject
     else if (name == "maxValue")
       {
 	maxValue = value;
+      }
+    else if (name == "horientation")
+      {
+	horientation = value;
       }
     else
       super.localPut(name, value);

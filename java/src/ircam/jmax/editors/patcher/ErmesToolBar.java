@@ -41,7 +41,7 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
 
-public class ErmesToolBar extends JPanel  {
+public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 
   ErmesSketchPad sketch;
 
@@ -53,6 +53,7 @@ public class ErmesToolBar extends JPanel  {
   JPanel cards;
   JToggleButton lockEditButton;
   JButton upButton;
+  JButton toSaveButton;
 
   ButtonGroup bGroup;
   JToggleButton noneButton;
@@ -61,6 +62,8 @@ public class ErmesToolBar extends JPanel  {
   public ErmesToolBar( ErmesSketchPad theSketchPad)
   {
     sketch = theSketchPad;
+
+    sketch.getDocument().addListener(this);
 
     setDoubleBuffered( false);
 
@@ -87,8 +90,34 @@ public class ErmesToolBar extends JPanel  {
 
     add( lockEditButton, BorderLayout.WEST);
 
+    //widgets panel
+    JPanel widgets = new JPanel();
+    widgets.setBorder( new EmptyBorder( 0, 0, 0, 0));
+    widgets.setLayout( new BoxLayout( widgets, BoxLayout.X_AXIS));
+    
+    //to save button
+    toSaveButton = new JButton(Icons.get( "_to_save_"));
+    toSaveButton.setDoubleBuffered( false);
+    toSaveButton.setMargin( new Insets(0,0,0,0));
+    toSaveButton.addActionListener( new ActionListener() {
+      public void actionPerformed( ActionEvent e)
+	{
+	  PatcherSaveManager.Save(sketch.getEditorContainer());
+	}
+    });
+    boolean enable;
+    if(sketch.isARootPatcher())
+      enable = false;
+    else
+      enable = sketch.getDocument().isSaved();
+    toSaveButton.setEnabled(enable);
+    toSaveButton.setVisible(enable);
+
+    widgets.add( toSaveButton);
+    /////////////////////
+
     if ((sketch.itsPatcher.getParent() != null) &&
-	(sketch.itsPatcher.getParent() != sketch.getFts().getRootObject()))
+	(!sketch.isARootPatcher()))
       {
 	upButton = new JButton(Icons.get( "_up_"));
 	upButton.setDoubleBuffered( false);
@@ -105,8 +134,9 @@ public class ErmesToolBar extends JPanel  {
 						});
 	    }});
 
-	add( upButton, BorderLayout.EAST);
+	widgets.add( upButton);
       }
+    add( widgets, BorderLayout.EAST);
 
     cards = new JPanel();
     cards.setBorder( new EmptyBorder( 0, 0, 0, 0));
@@ -188,4 +218,18 @@ public class ErmesToolBar extends JPanel  {
     addButton( "floatbox", "_floatbox_", "Adding New Float Box");
     AddPopUp.initDone();//????
   }
+
+  //MaxDocumentListener interface
+  boolean isSaved = true;
+  public void documentChanged(boolean saved)
+  {
+    if(isSaved!=saved)
+      {
+	toSaveButton.setEnabled(!saved);
+	toSaveButton.setVisible(!saved);
+	if(saved) repaint();
+	isSaved = saved;
+      }
+  }
 }
+

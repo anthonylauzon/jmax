@@ -49,6 +49,7 @@ abstract public class MaxDocument
   protected String name   = null; // name of the document, for UI purposes
   protected boolean saved = false;   // saved flag
 
+  protected Vector listeners = new Vector(); 
   /** A constructor that get only the type */
 
   public MaxDocument(MaxContext context, MaxDocumentType type)
@@ -76,6 +77,15 @@ abstract public class MaxDocument
   protected void addEditedData(MaxData data)
   {
     editedData.addElement(data);
+  }
+
+  public void addListener(MaxDocumentListener listener)
+  {
+    listeners.addElement(listener);
+  }
+  public void removeListener(MaxDocumentListener listener)
+  {
+    listeners.removeElement(listener);
   }
 
   /** Removing the editor */
@@ -282,6 +292,13 @@ abstract public class MaxDocument
   public void setSaved(boolean saved)
   {
     this.saved = saved;
+    notifyListeners(saved);
+  }
+
+  private void notifyListeners(boolean saved)
+  {
+    for (Enumeration e = listeners.elements() ; e.hasMoreElements(); ) 
+      ((MaxDocumentListener) e.nextElement()).documentChanged(saved);
   }
 
   /** Disposing this document;
@@ -305,6 +322,7 @@ abstract public class MaxDocument
     file = null;
   }
 }
+
 
 
 

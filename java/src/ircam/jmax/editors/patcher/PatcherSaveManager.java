@@ -46,17 +46,15 @@ public class PatcherSaveManager
 
     // Change in semantic: now Save() is active *only* on root level patchers 
     // SHOULD BECOME Gray in the others
+
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
     MaxDocument document = sketch.getDocument();
     FtsPatcherData patcherData = sketch.getFtsPatcherData();
     boolean saved = false;
-
+    
     if (! document.isRootData(patcherData))
-      {
-	new ErrorDialog( container.getFrame(), "Only root patchers can be saved");
-	return false;
-      }
+	return SaveFromSubPatcher(container, document);
 
     if (document.canSave())
       {
@@ -86,10 +84,7 @@ public class PatcherSaveManager
     boolean saved = false;
 
     if (! document.isRootData(patcherData))
-      {
-	new ErrorDialog( container.getFrame(), "Only root patchers can be saved");
-	return false;
-      }
+	return SaveAsFromSubPatcher(container , document);
 
     file = MaxFileChooser.chooseFileToSave( container.getFrame(), document.getDocumentFile(), "Save As");
 
@@ -110,6 +105,74 @@ public class PatcherSaveManager
 	new ErrorDialog( container.getFrame(), e.getMessage());
       }
     return saved;
+  }
+
+  static ErmesSketchWindow window = null;
+  static ErmesSketchPad sketch = null;
+  static boolean SaveAsFromSubPatcher(EditorContainer ec, MaxDocument document)
+  {
+    File file;
+    boolean saved = false;
+    sketch = (ErmesSketchPad)ec.getEditor();
+
+    FtsObject containerObj = ((FtsPatcherData)document.getRootData()).getContainerObject();
+
+    sketch.waiting();
+    containerObj.getFts().editPropertyValue( containerObj ,  
+					    new MaxDataEditorReadyListener()
+					    {
+					      public void editorReady(MaxDataEditor editor)
+						{
+						  window = ((ErmesDataEditor)editor).getSketchWindow();
+						  sketch.stopWaiting();
+						}
+					    });  
+
+    file = MaxFileChooser.chooseFileToSave( window, document.getDocumentFile(), "Save As");
+
+    if (file == null)
+      return false;
+    else
+      document.bindToDocumentFile( file);
+
+    window.setTitle( file.toString()); 
+
+    try
+      {
+	document.save();
+	saved = true;
+      }
+    catch ( MaxDocumentException e)
+      {
+	new ErrorDialog( window , e.getMessage());
+      }
+    return saved;
+  }
+
+  static boolean SaveFromSubPatcher(EditorContainer container, MaxDocument document)
+  {
+    boolean saved = false;
+    
+    if (document.canSave())
+      {
+	try
+	  {
+	    document.save();
+	    saved = true;
+	  }
+	catch ( MaxDocumentException e)
+	  {
+	    new ErrorDialog( container.getFrame(), e.getMessage());
+	  }
+      }
+    else
+	saved = SaveAsFromSubPatcher(container, document);
+    return saved;
+  }
+
+  static public void SaveTemplate(EditorContainer container)
+  {
+    //nothing for now
   }
 
   static public void SaveTo(EditorContainer container)

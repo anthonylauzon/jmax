@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -147,6 +147,20 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   public FtsObject getFtsPatcher()
   {
     return itsPatcher;
+  }
+
+  public boolean isARootPatcher()
+  {
+    return (getFtsPatcher().getParent() == getFts().getRootObject());
+  }
+
+  public boolean isASubPatcher()
+  {
+    return ((!itsDocument.isRootData(itsPatcherData))&&(itsPatcher instanceof FtsPatcherObject));
+  }
+  public boolean isATemplate()
+  {
+    return ((!itsDocument.isRootData(itsPatcherData))&&!(itsPatcher instanceof FtsPatcherObject));
   }
 
   FtsPatcherData itsPatcherData;

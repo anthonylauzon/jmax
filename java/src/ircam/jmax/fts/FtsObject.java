@@ -666,7 +666,7 @@ public class FtsObject
 
   /** Utility function Get the patcher data contaning the object if any */
 
-  FtsPatcherData getPatcherData()
+  public FtsPatcherData getPatcherData()
   {
     if ((parent != null) &&
 	(parent.getData() != null) &&

@@ -54,11 +54,14 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   private static final int MINIMUM_DIMENSION = 15;
   protected final static int BOTTOM_OFFSET = 5;
   protected final static int UP_OFFSET = 5;
-
+  
+  static final int VERTICAL_HOR = 0;
+  static final int HORIZONTAL_HOR = 1;
+  
   private int value = 0;
   private int rangeMax;
   private int rangeMin;
-  private boolean isVertical = true;
+  private int horientation;
 
   public Slider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
@@ -83,6 +86,10 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
     if (getHeight() < BOTTOM_OFFSET +  UP_OFFSET)
       setHeight( h);
+    
+    horientation = ((FtsSliderObject)ftsObject).getHorientation();
+    if((horientation!=HORIZONTAL_HOR)&&(horientation!=VERTICAL_HOR))
+      setHorientation(VERTICAL_HOR);
   }
 
   public void setMinValue( int theValue) 
@@ -136,6 +143,17 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     redraw();
   }
 
+  public void setHorientation(int hor)
+  {
+    horientation = hor;
+    ((FtsSliderObject)ftsObject).setHorientation(horientation);
+  }
+
+  public int getHorientation()
+  {
+    return horientation;
+  }
+
   public void valueChanged(int v) 
   {
     value = ( v < rangeMin) ? rangeMin: ((v >= rangeMax) ? rangeMax : v);
@@ -156,7 +174,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   {
     int newValue;
 
-    if(isVertical)
+    if(horientation==VERTICAL_HOR)
       newValue = ((( getY() + getHeight() - mouse.y - BOTTOM_OFFSET) * (rangeMax - rangeMin)) /
 		  (getHeight() - BOTTOM_OFFSET - UP_OFFSET-THROTTLE_HEIGHT)) + rangeMin;
     else
@@ -189,7 +207,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     /* Paint the throttle */
     g.setColor( Color.black);  
     int pixels, pos;
-    if(isVertical)
+    if(horientation==VERTICAL_HOR)
     {
       pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
       pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
@@ -220,11 +238,10 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     /* Paint the throttle */
     g.setColor( Color.black);
     int pixels, pos;
-    if(isVertical)
+    if(horientation==VERTICAL_HOR)
     {
       pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
       pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
-      //pos = y + h - BOTTOM_OFFSET - (value-rangeMin) * (h - BOTTOM_OFFSET - UP_OFFSET)/(rangeMax - rangeMin);
       g.drawRect(x + THROTTLE_LATERAL_OFFSET, pos, w - 2*THROTTLE_LATERAL_OFFSET - 1, THROTTLE_HEIGHT - 1);
     }
     else
@@ -259,7 +276,9 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public void changeOrientation()
   {
-    isVertical = !isVertical;
+    if(horientation == VERTICAL_HOR) setHorientation(HORIZONTAL_HOR);
+    else setHorientation(VERTICAL_HOR);
+    
     updateDimension();
   }
   void updateDimension()
