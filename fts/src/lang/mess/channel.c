@@ -106,10 +106,16 @@ fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at)
   fts_access_t *a; 
 
   for(a=channel->targets; a; a=a->next)
-    fts_object_set_add(set, (fts_object_t *)a);
+    {
+      if(fts_object_get_patcher((fts_object_t *)a) != 0)
+	fts_object_set_add(set, (fts_object_t *)a);
+    }
 
   for(a=channel->origins; a; a=a->next)
-    fts_object_set_add(set, (fts_object_t *)a);
+    {
+      if(fts_object_get_patcher((fts_object_t *)a) != 0)
+	fts_object_set_add(set, (fts_object_t *)a);
+    }
 }
 
 void

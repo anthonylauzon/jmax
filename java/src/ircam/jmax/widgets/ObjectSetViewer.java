@@ -44,6 +44,10 @@ public class ObjectSetViewer extends JPanel {
     private static ImageIcon errorIcon = null;
     private static ImageIcon commentIcon = null;
     private static ImageIcon messageIcon = null;
+    private static ImageIcon messconstIcon = null;
+    private static ImageIcon inletIcon = null;
+    private static ImageIcon outletIcon = null;
+    private static ImageIcon forkIcon = null;
 
     private final static Color selectedColor = new Color( 51, 153, 204);
 
@@ -54,6 +58,10 @@ public class ObjectSetViewer extends JPanel {
       errorIcon   = Icons.get("_error_object_");
       commentIcon = Icons.get("_comment_");
       messageIcon = Icons.get("_message_box_");
+      messconstIcon = Icons.get("_messconst_");
+      inletIcon = Icons.get("_inlet_");
+      outletIcon = Icons.get("_outlet_");
+      forkIcon = Icons.get("_fork_");
     }
 
     public ObjectCellRenderer() 
@@ -87,6 +95,21 @@ public class ObjectSetViewer extends JPanel {
 	    {
 	      setText( ((FtsMessageObject) obj).getMessage());
 	      setIcon( messageIcon);
+	    }
+	  else if (obj instanceof FtsMessConstObject)
+	    {
+	      setText( ((FtsObject) obj).getDescription());
+	      setIcon( messconstIcon);
+	    }
+	  else if (obj instanceof FtsInletObject)
+	    {
+	      setText( ((FtsObject) obj).getDescription());
+	      setIcon( inletIcon);
+	    }
+	  else if (obj instanceof FtsOutletObject)
+	    {
+	      setText( ((FtsObject) obj).getDescription());
+	      setIcon( outletIcon);
 	    }
 	  else if (obj instanceof FtsCommentObject)
 	    {

@@ -140,25 +140,6 @@ public class ControlPanel extends JPanel
     add( Box.createRigidArea(new Dimension(7,0)));
     add( syncLed);
 
-//      fpeIndicator = new IndicatorWithMemory("FPE", "Floating Point Exceptions");
-//      fpeIndicator.setAlignmentY( Component.CENTER_ALIGNMENT);
-//      fpeIndicator.setPreferredSize(new Dimension(200, 23));    
-//      fpeIndicator.setMaximumSize(new Dimension(200, 23));    
-//  //      indicatorsPanel.add(fpeIndicator);
-//      add(fpeIndicator);
-
-//  //      indicatorsPanel.add( Box.createRigidArea(new Dimension(10, 0)));
-
-//      dacSlipIndicator = new IndicatorWithMemory("Out of sync", "Dac Slip");
-//      dacSlipIndicator.setAlignmentY(Component.CENTER_ALIGNMENT);    
-//      dacSlipIndicator.setPreferredSize(new Dimension(100, 23));    
-//      dacSlipIndicator.setMaximumSize(new Dimension(100, 23));    
-
-//  //      indicatorsPanel.add(dacSlipIndicator);
-//      add(dacSlipIndicator);
-
-//      add( indicatorsPanel);
-
     add( Box.createHorizontalGlue());
 
     JLabel dspLabel = new JLabel("DSP");

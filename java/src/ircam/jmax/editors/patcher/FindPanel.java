@@ -165,7 +165,7 @@ public class FindPanel extends JFrame
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-    textField.setText("");
+    textField.setText("<find errors>");
     set.findErrors(fts.getRootObject());
     setCursor(temp);
   }
