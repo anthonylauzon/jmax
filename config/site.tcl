@@ -37,6 +37,7 @@ defineHost "astor.ircam.fr"      origin
 defineHost "stradivari.ircam.fr" octane
 defineHost "maggini.ircam.fr"    octane
 defineHost "amati.ircam.fr"      octane
+defineHost "guarneri.ircam.fr"   octane
 defineHost "marimba.ircam.fr"    o2r5ki63
 defineHost "libido.ircam.fr"     linuxpc
 defineHost "linotte.ircam.fr"    linuxpc
