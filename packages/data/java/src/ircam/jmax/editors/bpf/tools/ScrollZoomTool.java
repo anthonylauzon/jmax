@@ -76,6 +76,13 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
    */
     public void dragStart(int x, int y, MouseEvent e)
     {
+	if(e.getClickCount() > 1) 
+	    {
+		Geometry g = ((BpfGraphicContext)gc).getAdapter().getGeometry();
+		g.setXZoom(20);
+		g.setXTransposition(0);
+	    }
+
 	mountIModule(itsDirectionChooser, x, y);
 	tempX = x;
 	tempY = y;

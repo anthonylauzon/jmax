@@ -43,7 +43,6 @@ public class TrackContainer extends JPanel {
     this.track = t;
     this.trackEditor = trackEditor;
     
-    //activationButton = new JToggleButton(SequenceImages.getImageIcon("unselected_track"));
     trackIndex = trackEditor.getGraphicContext().getFtsSequenceObject().getTrackIndex(t);
     activationButton = new JToggleButton(""+trackIndex);
     activationButton.setMargin(new Insets(0, 0, 0, 0));
@@ -69,7 +68,6 @@ public class TrackContainer extends JPanel {
 
     buttonPanel = new JPanel();
     buttonPanel.setLayout(new BorderLayout());
-    //buttonPanel.add(openButton, BorderLayout.NORTH);
     buttonPanel.add(bp, BorderLayout.NORTH);
     buttonPanel.add(activationButton, BorderLayout.CENTER);
 
@@ -103,10 +101,6 @@ public class TrackContainer extends JPanel {
     activeButton.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	    {
-		/*if(mute)
-		  track.setProperty("mute", Boolean.FALSE);
-		  else
-		  track.setProperty("mute", Boolean.TRUE);*/
 		track.getFtsTrack().requestSetActive(!active);
 	    }
 	});
@@ -186,12 +180,9 @@ public class TrackContainer extends JPanel {
 	  if(name.equals("active"))
 	  {
 	      active = ((Boolean) evt.getNewValue()).booleanValue();
-	      //muteButton.setSelected(mute);
 	      if(active)
-		  //muteButton.setForeground(Color.red);
 		  activeButton.setIcon(SequenceImages.getImageIcon("unmute"));
 	      else
-		  //muteButton.setForeground(Color.green);
 		  activeButton.setIcon(SequenceImages.getImageIcon("mute"));
 	  }
 	  else if(name.equals("maximumPitch") || name.equals("minimumPitch"))
@@ -237,7 +228,6 @@ public class TrackContainer extends JPanel {
   Track track;
   JToggleButton activationButton;
   JButton openButton;
-  //JToggleButton muteButton;
   JButton activeButton;
   ToggleBar toggleBar;
   JPanel buttonPanel; 

@@ -129,7 +129,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 				       PointRenderer.numberFormat.format(val)+" )");	
 			}
 		    else
-			if(toolName.equals("scroll&zoom tool"))
+			if(toolName.equals("zoom&scroll tool"))
 			{
 			    int start = gc.getLogicalTime();
 			    int end = start + gc.getTimeWindow();

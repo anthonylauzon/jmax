@@ -49,7 +49,7 @@ class BpfTablePanel extends JPanel implements ListSelectionListener {
     table.getColumnModel().getColumn(0).setMaxWidth(50);
 
     scrollPane = new JScrollPane(table);
-    scrollPane.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-55));
+    scrollPane.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT/*-25*/));
 
     setUpEditors();
     

@@ -66,6 +66,8 @@ public class BpfPopupMenu extends JPopupMenu
 	    add(aMenuItem);
 	}
 
+    ((JRadioButtonMenuItem)getComponent(0)).setSelected(true);
+
     addSeparator();    
 
     /////////////////// list /////////////////////////////////////
