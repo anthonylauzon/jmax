@@ -1,5 +1,7 @@
 2001-04-25  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
+	* added packages/alsa/src/alsarawmidiport.c (that contains a ALSA raw midi port...)
+
 	* remove fts/src/runtime/devices/null.c and fts/src/runtime/devices/profdev.c: no longer used
 
 	* added profileaudioport (in package io). It outputs on its outlet

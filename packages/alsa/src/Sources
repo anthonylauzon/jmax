@@ -23,7 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES= \
-alsa.c		\
-alsaaudioport.c	\
+SOURCES=					\
+alsa.c						\
+alsaaudioport.c					\
+alsarawmidiport.c
 
