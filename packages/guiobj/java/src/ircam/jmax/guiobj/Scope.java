@@ -42,6 +42,8 @@ public class Scope extends VectorDisplay
   private static final Color scopeMarkerColor = scopeBackgroundColor.darker();
   private static final Color scopeLineColor = new Color((float)0.8196, (float)1.0, (float)0.9569);
 
+  public static ScopeControlPanel controlPanel = new ScopeControlPanel();
+  
   int onset = 0;
   int last = 0;
 
@@ -118,6 +120,18 @@ public class Scope extends VectorDisplay
   {
       ScopeRunModePopUp.update(this);
       return ScopeRunModePopUp.popup;
+  }
+
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    super.popUpUpdate(onInlet, onOutlet, area);
+    controlPanel.update(this);
+    ObjectPopUp.getInstance().add(controlPanel);
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    ObjectPopUp.getInstance().remove(controlPanel);
   }
 }
 

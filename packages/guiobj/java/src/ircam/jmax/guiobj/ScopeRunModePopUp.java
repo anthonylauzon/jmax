@@ -46,149 +46,14 @@ public class ScopeRunModePopUp extends JPopupMenu
   static public ScopeRunModePopUp popup = new ScopeRunModePopUp();
 
   GraphicObject target = null;
-  JSlider periodSlider, thresholdSlider;
-  JLabel periodLabel, thresholdLabel;
-  JRadioButton thresholdItem, autoItem, offItem;    
+  ScopeControlPanel controlPanel;    
 
   public ScopeRunModePopUp()
   {
     super();
-    
-    JLabel titleLabel = new JLabel("Period", JLabel.CENTER);
-    titleLabel.setForeground(Color.black);
-    periodLabel = new JLabel("", JLabel.CENTER);
 
-    Box labelBox = new Box(BoxLayout.X_AXIS);
-    labelBox.add(Box.createRigidArea(new Dimension(20, 0)));    
-    labelBox.add(titleLabel);    
-    labelBox.add(Box.createHorizontalGlue());    
-    labelBox.add(periodLabel);    
-    labelBox.add(Box.createRigidArea(new Dimension(20, 0)));    
-
-    periodSlider = new JSlider(JSlider.HORIZONTAL, 50, 2000, 100);
-    periodSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
-    periodSlider.addChangeListener(new ChangeListener(){
-	public void stateChanged(ChangeEvent e) {
-	  JSlider source = (JSlider)e.getSource();
-	  float period = (float)source.getValue();
-	    
-	  if(!source.getValueIsAdjusting())
-	    {
-	      if((popup.target!=null)&&(((FtsScopeObject)popup.target.getFtsObject()).getPeriod()!=period))
-		((FtsScopeObject)popup.target.getFtsObject()).requestSetPeriod(period);
-	    }
-      
-	  periodLabel.setText(""+(int)period);
-	}
-      });
-
-    JPanel periodPanel = new JPanel();
-    periodPanel.setLayout(new BoxLayout(periodPanel, BoxLayout.Y_AXIS));
-    periodPanel.add(labelBox);    
-    periodPanel.add(periodSlider);        
-    add(periodPanel);
-
-    addSeparator();
-
-    ButtonGroup thresholdButtonGroup = new ButtonGroup();
-    JPanel thresholdPanel = new JPanel();
-    thresholdPanel.setLayout(new BoxLayout(thresholdPanel, BoxLayout.Y_AXIS));
-    
-    JLabel triggerLabel = new JLabel("Trigger", JLabel.LEFT);
-    triggerLabel.setForeground(Color.black);
-    JPanel labelPanel = new JPanel();
-    labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
-    labelPanel.add(Box.createRigidArea(new Dimension(20, 0)));    
-    labelPanel.add(triggerLabel);
-    labelPanel.add(Box.createHorizontalGlue());
-    thresholdPanel.add(labelPanel);
-
-    autoItem = new JRadioButton("auto");
-    autoItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
-	    {
-		if(e.getStateChange() == ItemEvent.SELECTED)
-		    ((FtsScopeObject)popup.target.getFtsObject()).
-			requestSetThreshold(FtsScopeObject.THRESHOLD_AUTO);
-	    }
-	});
-    thresholdButtonGroup.add(autoItem);
-    JPanel autoPanel = new JPanel();
-    autoPanel.setLayout(new BoxLayout(autoPanel, BoxLayout.X_AXIS));
-    autoPanel.add(Box.createRigidArea(new Dimension(20, 0)));    
-    autoPanel.add(autoItem);
-    autoPanel.add(Box.createHorizontalGlue());
-    thresholdPanel.add(autoPanel);
-
-    offItem = new JRadioButton("off");
-    offItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
-	    {
-		if(e.getStateChange() == ItemEvent.SELECTED)
-		    ((FtsScopeObject)popup.target.getFtsObject()).
-			requestSetThreshold(FtsScopeObject.THRESHOLD_OFF);
-	    }
-	});
-    thresholdButtonGroup.add(offItem);    
-    JPanel offPanel = new JPanel();
-    offPanel.setLayout(new BoxLayout(offPanel, BoxLayout.X_AXIS));
-    offPanel.add(Box.createRigidArea(new Dimension(20, 0)));    
-    offPanel.add(offItem);
-    offPanel.add(Box.createHorizontalGlue());
-    thresholdPanel.add(offPanel);
-
-    thresholdItem = new JRadioButton("threshold");
-    thresholdItem.addItemListener(new ItemListener(){
-	    public void itemStateChanged(ItemEvent e)
-	    {
-		if(e.getStateChange() == ItemEvent.SELECTED)
-		    {
-			thresholdSlider.setEnabled(true);
-			float th = popup.thresholdSlider.getValue()/(float)100.0;
-			popup.thresholdLabel.setText(""+th);
-			((FtsScopeObject)popup.target.getFtsObject()).requestSetThreshold(th);
-		    }		
-		else
-		    {
-			thresholdSlider.setEnabled(false);
-			thresholdLabel.setText("");
-		    }
-	    }
-	});
-    thresholdButtonGroup.add(thresholdItem); 
-
-    thresholdLabel  = new JLabel("", JLabel.CENTER);
-    thresholdLabel.setPreferredSize(new Dimension(30, 15));
-    
-    JPanel thresholdBox = new JPanel();
-    thresholdBox.setPreferredSize(new Dimension(230, 15));
-    thresholdBox.setLayout(new BoxLayout(thresholdBox, BoxLayout.X_AXIS));
-    thresholdBox.add(Box.createRigidArea(new Dimension(20, 0)));    
-    thresholdBox.add(thresholdItem);    
-    thresholdBox.add(Box.createHorizontalGlue());    
-    thresholdBox.add(thresholdLabel);    
-    thresholdBox.add(Box.createRigidArea(new Dimension(20, 0)));    
-    
-    thresholdPanel.add(thresholdBox);
-
-    thresholdSlider = new JSlider(JSlider.HORIZONTAL, 1, 99, 1);
-    thresholdSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
-    thresholdSlider.addChangeListener(new ChangeListener(){
-	public void stateChanged(ChangeEvent e) {
-	  JSlider source = (JSlider)e.getSource();
-	  float th = source.getValue()/(float)100.0;
-
-	  if(!source.getValueIsAdjusting())
-	    {
-		if((popup.target!=null))
-		    ((FtsScopeObject)popup.target.getFtsObject()).requestSetThreshold(th);
-	    }      
-	  thresholdLabel.setText(""+th);
-	}
-      });
-    thresholdPanel.add(thresholdSlider);
-
-    add(thresholdPanel);
+    controlPanel = new ScopeControlPanel();
+    add(controlPanel);
 
     pack();
   }
@@ -200,20 +65,7 @@ public class ScopeRunModePopUp extends JPopupMenu
   public static void update(Scope obj)
   {
     popup.target = obj;
-    float period = ((FtsScopeObject)obj.getFtsObject()).getPeriod();
-    popup.periodSlider.setValue((int)period);
-    popup.periodLabel.setText(""+(int)period);    
-
-    float threshold = ((FtsScopeObject)obj.getFtsObject()).getThreshold();
-    if(threshold==FtsScopeObject.THRESHOLD_AUTO)
-	popup.autoItem.setSelected(true);
-    else if(threshold==FtsScopeObject.THRESHOLD_OFF)
-	popup.offItem.setSelected(true);
-    else
-	{
-	    popup.thresholdItem.setSelected(true);
-	    popup.thresholdSlider.setValue((int)(threshold*100));
-	}
+    popup.controlPanel.update(obj);    
   }
 }
 
