@@ -5,11 +5,12 @@
    parsing (inlet and outlets are relative to the position).
 */
 
-#include "sys.h"
-#include "lang/mess.h"
-
+#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "sys.h"
+#include "lang/mess.h"
 
 typedef struct 
 {
@@ -23,6 +24,7 @@ typedef struct
 static void
 clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  const char *tmp;
   const char *name;
   char buf[1024];
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
@@ -32,7 +34,13 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   else
     name = fts_symbol_name(fts_get_symbol(at));
 
-  sprintf(buf, "/tmp/jmax.%s.%d", name, getpid());
+  tmp = getenv ("JMAX_TMP");
+
+  if (tmp)
+    sprintf(buf, "%s/jmax.%s.%d", tmp, name, getpid());
+  else
+    sprintf(buf, "/tmp/jmax.%s.%d", name, getpid());
+
   this->file = fts_new_symbol_copy(buf);
 }
 

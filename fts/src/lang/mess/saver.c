@@ -4,11 +4,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
+#include <errno.h>
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/utils.h"
 #include "lang/mess/vm.h"
 #include "lang/mess/loader.h"
+
 
 
 /* #define SAVER_DEBUG */
@@ -27,16 +30,30 @@ struct fts_bmax_file
 
 
 static fts_bmax_file_t *
-fts_open_bmax_file_for_writing(fts_symbol_t file)
+fts_open_bmax_file_for_writing(fts_symbol_t file, int dobackup)
 {
   fts_bmax_file_t *f;
   const char *name;
-  char backup[PATH_MAX];
 
-  /* Get the file and backup file name */
+  /* Get the file name */
 
   name = fts_symbol_name(file);
-  sprintf(backup, "%s.backup", name);
+
+  if (dobackup)
+    {
+      char backup[PATH_MAX];
+
+      /* Get the backup file name */
+
+      sprintf(backup, "%s.backup", name);
+
+      /* if the file exists, rename the old file, to keep a backup; ignore the error,
+	 if we cannot autosave, we need anyway to try saving ! also, ignoring
+	 the error catch the case where "name" do not exists.
+	 */
+
+      rename(name, backup);
+    }
 
   /* allocate a bmax descriptor, and initialize it */
 
@@ -50,20 +67,13 @@ fts_open_bmax_file_for_writing(fts_symbol_t file)
   f->header.code_size = 0;
   f->header.n_symbols = 0;
 
-  /* if the file exists, rename the old file, to keep a backup; ignore the error,
-     if we cannot autosave, we need anyway to try saving ! also, ignoring
-     the error catch the case where "name" do not exists.
-   */
-
-  rename(name, backup);
-
   /* Open the file */
 
   f->fd = fopen(name, "w");
 
   if (f->fd == 0)
     {
-      perror("fts_open_bmax_file_for_writing: open ");
+      fprintf(stderr, "Cannot open file %s for writing: %s\n", name, strerror(errno));
       return 0;
     }
 
@@ -917,7 +927,7 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 {
   fts_bmax_file_t *f;
 
-  f = fts_open_bmax_file_for_writing(file);
+  f = fts_open_bmax_file_for_writing(file, 1);
 
   if (f)
     {
@@ -998,7 +1008,7 @@ void fts_save_selection_as_bmax(fts_symbol_t file, fts_object_t *selection)
 {
   fts_bmax_file_t *f;
 
-  f = fts_open_bmax_file_for_writing(file);
+  f = fts_open_bmax_file_for_writing(file, 0);
 
   if (f)
     {

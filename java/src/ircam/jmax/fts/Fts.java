@@ -186,6 +186,37 @@ public class Fts
 	parent.replaceInConnections(oldObject, newObject);
       }
 
+    // Move the old properties to the new object
+    // for the moment, hardcoded: x, y, w, h, font, fs
+    // Ignore the name (to be reviewed), and window properties 
+    // (you cannot redefine a patcher object
+
+    Object value;
+
+    value = oldObject.get("x");
+    if (value)
+      newObject.put("x", value); 
+
+    value = oldObject.get("y");
+    if (value)
+      newObject.put("y", value); 
+
+    value = oldObject.get("w");
+    if (value)
+      newObject.put("w", value); 
+
+    value = oldObject.get("h");
+    if (value)
+      newObject.put("h", value); 
+
+    value = oldObject.get("font");
+    if (value)
+      newObject.put("font", value); 
+
+    value = oldObject.get("fs");
+    if (value)
+      newObject.put("fs", value); 
+
     oldObject.delete();
 
     return newObject;
