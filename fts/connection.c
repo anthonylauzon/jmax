@@ -130,10 +130,15 @@ fts_connection_new(int id, fts_object_t *src, int woutlet, fts_object_t *dst, in
   conn->dst = dst;
   conn->winlet = winlet;
 
+  /* don't change hidden connections to fts_c_invalid */
   if(invalid && type > fts_c_hidden)
     conn->type = fts_c_invalid;
   else
     conn->type = type;
+
+  /* don't keep fts_c_invalid between valid objects */
+  if(!invalid && type == fts_c_invalid)
+    conn->type = fts_c_anything;
 
   ((fts_object_t *)conn)->patcher = conn->src->patcher;
 
