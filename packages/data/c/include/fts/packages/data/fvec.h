@@ -78,7 +78,16 @@ DATA_API float fvec_get_element(fvec_t *self, int i);
 DATA_API void  fvec_set_element(fvec_t *self, int i, float value);
 
 DATA_API void fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at);
-DATA_API int fvec_vector(fts_object_t *obj, float **ptr, int *size, int *stride);
+
+/** get fvec access parameters, then use ptr[i * stride] if i < size 
+    @return	true if obj is an fvec, 
+		false and size = stride = 0 otherwise */
+DATA_API int  fvec_vector     (fts_object_t *obj, 
+			       /*out*/ float **ptr, int *size, int *stride);
+
+/** like fvec_vector, no checks */
+DATA_API void fvec_get_vector (fvec_t *fvec, 
+			       /*out*/ float **ptr, int *size, int *stride);
 
 DATA_API fvec_t *fvec_create_column(fmat_t *fmat);
 DATA_API fvec_t *fvec_create_row(fmat_t *fmat);
