@@ -30,7 +30,7 @@ public interface DirectionListener {
 
   /** The user dragged the mouse in the resulting direction 
    */
-  public abstract void directionChoosen(int theDirection);
+  public abstract void directionChoosen(int theDirection, int modifiers);
 
   /** the user aborted the process (mouseReleased)
    */

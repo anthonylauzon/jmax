@@ -59,8 +59,8 @@ public class DirectionChooser extends InteractionModule {
   public void mouseDragged(MouseEvent e) 
   {  
     if (Math.abs(e.getX()-itsX) > Math.abs(e.getY()-itsY))    
-	itsListener.directionChoosen(HORIZONTAL_MOVEMENT);
-	else itsListener.directionChoosen(VERTICAL_MOVEMENT);
+      itsListener.directionChoosen(HORIZONTAL_MOVEMENT, e.getModifiers());
+    else itsListener.directionChoosen(VERTICAL_MOVEMENT, e.getModifiers());
   } 
 
   public void mouseReleased(MouseEvent e)
