@@ -207,16 +207,6 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
   {
     if (isNear(mouseX, mouseY))
       {
-	/*SensibilityArea sourceArea = from.getSensibilityAreaAt( mouseX, mouseY);
-	  SensibilityArea destArea = to.getSensibilityAreaAt( mouseX, mouseY);
-	  if( sourceArea != null && Squeack.onOutlet( sourceArea.getSqueack()))
-	  return sourceArea;
-	  
-	  if( destArea != null && Squeack.onInlet( destArea.getSqueack()))
-	  return destArea;
-	  
-	  return SensibilityArea.get(this, Squeack.CONNECTION);*/      
-      
 	SensibilityArea area = SensibilityArea.get(this, Squeack.CONNECTION);
 
 	if(!(( Math.abs(start.x - end.x) < 2*GraphicObject.ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA) &&
@@ -226,8 +216,11 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 	    SensibilityArea destArea = to.getSensibilityAreaAt( mouseX, mouseY);
 	    if(( sourceArea != null && Squeack.onOutlet( sourceArea.getSqueack())) ||
 	       ( destArea != null && Squeack.onInlet( destArea.getSqueack())))
+	      {
 		area.setTransparent( true);
-	  }	
+		area.setCost( 100);
+	      }	
+	  }
 
 	return area;
       }

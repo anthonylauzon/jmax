@@ -110,7 +110,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
     // Inlet and outlets Max
 
-    public static final int INOUTLET_MAX_SENSIBLE_AREA = /*5*/10;
+    public static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
  
     //dimension of in/outlet sensible area during connection
     
@@ -614,7 +614,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 	(mouseX > getX()+getWidth()) || (mouseY > inletsAnchorY+getHeight()))
       {
 	area.setTransparent(true);
-	//area.setTransparent(false);
 	area.setCost(xcost + Math.abs(mouseY - inletsAnchorY));
       }
 
@@ -632,7 +631,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 	(mouseY < getY()-1) || (mouseX > getX()+getWidth()))
       {
 	area.setTransparent(true);
-	//area.setTransparent(false);
 	area.setCost(xcost + Math.abs(mouseY - outletsAnchorY));
       }
 

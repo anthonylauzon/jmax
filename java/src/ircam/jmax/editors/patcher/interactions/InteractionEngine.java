@@ -250,7 +250,10 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 	    area = displayList.getObjectSensibilityAreaAt(mouse.x, mouse.y);
 	  }      
 	else
-	  {
+	  {	    
+	    /* when shift is pressed don't look for inoutlet's sensibility areas */
+	    GraphicObject.setFollowingInOutletLocations( !e.isShiftDown());
+	    /***************************/
 	    area = displayList.getSensibilityAreaAt(mouse.x, mouse.y);
 	  }
 
