@@ -26,7 +26,7 @@ extern void sequence_class_config(void);
 extern void track_config(void);
 extern void event_config(void);
 
-extern void note_config(void);
+extern void scoob_config(void);
 extern void seqmess_config(void);
 
 extern void seqfind_config(void);
@@ -44,7 +44,7 @@ sequence_config(void)
   track_config();
   event_config();
 
-  note_config();
+  scoob_config();
   seqmess_config();
 
   seqfind_config();

@@ -20,35 +20,53 @@
  * 
  */
 
-#ifndef _SEQUENCE_NOTE_H_
-#define _SEQUENCE_NOTE_H_
+#ifndef _SEQUENCE_scoob_H_
+#define _SEQUENCE_scoob_H_
 
 #include <fts/fts.h>
 #include "event.h"
 
-extern fts_class_t *note_type;
+extern fts_class_t *scoob_class;
 
-typedef struct _note_
+enum scoob_type_enum
+{
+  scoob_none = 0,
+  scoob_note,
+  scoob_interval,
+  scoob_rest,
+  scoob_trill,
+  n_scoob_types
+};
+
+typedef struct _scoob_
 {
   fts_object_t head;
-  int pitch;
+  enum scoob_type_enum type;
+  double pitch;
+  double interval;
   double duration;
   fts_array_t properties;
-} note_t;
+} scoob_t;
 
-#define NOTE_DEF_PITCH 64
-#define NOTE_DEF_DURATION 100
+#define scoob_DEF_PITCH 64
+#define scoob_DEF_DURATION 100
 
-#define note_set_pitch(n, x) ((n)->pitch = (x))
-#define note_get_pitch(n) ((n)->pitch)
+#define scoob_set_type(n, x) ((n)->type = (x))
+#define scoob_get_type(n) ((n)->type)
 
-#define note_set_duration(n, x) ((n)->duration = (x))
-#define note_get_duration(n) ((n)->duration)
+#define scoob_set_pitch(n, x) ((n)->pitch = (x))
+#define scoob_get_pitch(n) ((n)->pitch)
 
-extern void note_set_velocity(note_t *this, int velocity);
-extern int note_get_velocity(note_t *this);
+#define scoob_set_interval(n, x) ((n)->interval = (x))
+#define scoob_get_interval(n) ((n)->interval)
 
-extern void note_set_channel(note_t *this, int channel);
-extern int note_get_channel(note_t *this);
+#define scoob_set_duration(n, x) ((n)->duration = (x))
+#define scoob_get_duration(n) ((n)->duration)
+
+extern void scoob_set_velocity(scoob_t *this, int velocity);
+extern int scoob_get_velocity(scoob_t *this);
+
+extern void scoob_set_channel(scoob_t *this, int channel);
+extern int scoob_get_channel(scoob_t *this);
 
 #endif

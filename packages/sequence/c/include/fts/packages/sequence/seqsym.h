@@ -33,9 +33,15 @@ extern fts_symbol_t seqsym_event;
 extern fts_symbol_t seqsym_segment;
 
 /* events */
+extern fts_symbol_t seqsym_scoob;
+extern fts_symbol_t seqsym_undefined;
 extern fts_symbol_t seqsym_note;
+extern fts_symbol_t seqsym_interval;
+extern fts_symbol_t seqsym_rest;
+extern fts_symbol_t seqsym_trill;
 extern fts_symbol_t seqsym_midi;
 extern fts_symbol_t seqsym_seqmess;
+extern fts_symbol_t seqsym_type;
 extern fts_symbol_t seqsym_pitch;
 extern fts_symbol_t seqsym_duration;
 extern fts_symbol_t seqsym_velocity;
@@ -55,6 +61,9 @@ extern fts_symbol_t seqsym_move_track;
 extern fts_symbol_t seqsym_add_event;
 extern fts_symbol_t seqsym_active;
 extern fts_symbol_t seqsym_dump_mess;
+extern fts_symbol_t seqsym_properties;
+extern fts_symbol_t seqsym_get_property_list;
+extern fts_symbol_t seqsym_append_properties;
 
 /* messages from/to client */
 extern fts_symbol_t seqsym_addTracks;

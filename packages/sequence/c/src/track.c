@@ -609,68 +609,6 @@ track_add_event_at_client(track_t *this, event_t *event, int ac, const fts_atom_
   fts_client_done_message( (fts_object_t *)this);
 }
 
-static void
-track_event_upload(track_t *this, event_t *event)
-{
-  fts_symbol_t type = event_get_type(event);
-  fts_atom_t a[4];
-
-  if(!fts_object_has_id((fts_object_t *)event))
-    {
-      fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));    
-
-      fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
-      fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
-
-      if(fts_is_object(&event->value))
-	{
-	  if(type == seqsym_note)
-	    {
-	      note_t *note = (note_t *)fts_get_object(&event->value);
-	      
-	      fts_set_float(a + 0, (float)event_get_time(event));
-	      fts_set_symbol(a + 1, seqsym_note);
-	      fts_set_int(a + 2, note_get_pitch(note));
-	      fts_set_float(a + 3, (float)note_get_duration(note));
-	      fts_client_add_atoms( (fts_object_t *)this, 4, a);
-	      fts_client_done_message( (fts_object_t *)this);
-
-	      return;
-	    }
-	  else if(type == seqsym_seqmess)
-	    {
-	      seqmess_t *seqmess = (seqmess_t *)fts_get_object(&event->value);
-	      
-	      fts_set_float(a + 0, (float)event_get_time(event));
-	      fts_set_symbol(a + 1, seqsym_seqmess);
-	      fts_set_symbol(a + 2, seqmess_get_selector(seqmess));
-	      fts_set_int(a + 3, seqmess_get_position(seqmess));
-	      fts_client_add_atoms( (fts_object_t *)this, 4, a);
-	      fts_client_done_message( (fts_object_t *)this);
-
-	      return;
-	    }
-	}
-      else if(!fts_is_void(&event->value))
-	{ 
-	  fts_set_float(a + 0, (float)event_get_time(event));
-	  fts_set_symbol(a + 1, fts_get_class_name(&event->value));
-	  a[2] = event->value;
-	  fts_client_add_atoms( (fts_object_t *)this, 3, a);
-	  fts_client_done_message( (fts_object_t *)this);
-
-	  return;
-	}
-
-      /* anything else is uploaded as void event */
-      fts_set_float(a + 0, (float)event_get_time(event));
-      fts_set_symbol(a + 1, fts_s_void);
-      fts_set_symbol(a + 2, type);
-      fts_client_add_atoms( (fts_object_t *)this, 3, a);
-      fts_client_done_message( (fts_object_t *)this);
-    }
-}
-
 /* create new event and upload by client request */
 static void
 track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -884,38 +822,141 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
 }
 
+/******************************************************
+ *
+ *  upload
+ *
+ */
+static void
+track_upload_property_list(track_t *this, fts_array_t *temp_array)
+{
+  fts_class_t *type = track_get_type(this);
+  
+  if(type)
+  {
+    if(fts_class_is_primitive(type))
+    {
+      fts_atom_t a[2];
+
+      fts_set_symbol(a, fts_s_value);
+      fts_set_symbol(a + 1, fts_class_get_name(type));
+      
+      fts_client_send_message((fts_object_t *)this, seqsym_properties, 2, a);
+    }
+    else
+    {
+      fts_method_t method_get_property_list = fts_class_get_method_varargs(type, seqsym_get_property_list);
+
+      /* get property list from class by method */
+      if(method_get_property_list)
+      {
+        int size;
+        fts_atom_t *atoms;
+        fts_atom_t a;
+
+        fts_array_set_size(temp_array, 0);
+        fts_set_pointer(&a, (void *)temp_array);
+
+        /* get properties array from class */
+        (*method_get_property_list)((fts_object_t *)this, 0, 0, 1, &a);
+
+        size = fts_array_get_size(temp_array);
+        atoms = fts_array_get_atoms(temp_array);
+
+        /* send properties to client */
+        if(size > 0)
+          fts_client_send_message((fts_object_t *)this, seqsym_properties, size, atoms);
+      }
+    }
+  }
+}
+
+static void
+track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
+{
+  fts_class_t *type = event_get_type(event);
+  fts_atom_t a[4];
+
+  if(!fts_object_has_id((fts_object_t *)event))
+  {
+    fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));
+
+    if(fts_is_object(&event->value))
+    {
+      fts_method_t method_append_properties = fts_class_get_method_varargs(type, seqsym_append_properties);
+      int size;
+      fts_atom_t *atoms;
+
+      fts_array_set_size(temp_array, 0);
+      fts_array_append_int(temp_array, fts_get_object_id((fts_object_t *)event));
+      fts_array_append_float(temp_array, event_get_time(event));
+      fts_array_append_symbol(temp_array, fts_get_class_name(&event->value));
+
+      /* get array of properties and types from class */
+      if(method_append_properties)
+      {
+        fts_atom_t a;
+        fts_set_pointer(&a, temp_array);
+        (*method_append_properties)((fts_object_t *)this, 0, 0, 1, &a);
+      }
+
+      size = fts_array_get_size(temp_array);
+      atoms = fts_array_get_atoms(temp_array);
+
+      /* send properties to client */
+      if(size > 0)
+        fts_client_send_message((fts_object_t *)this, seqsym_addEvents, size, atoms);
+    }
+    else
+    {
+      fts_set_int(a + 0, fts_get_object_id((fts_object_t *)event));
+      fts_set_float(a + 1, event_get_time(event));
+      fts_set_symbol(a + 2, fts_get_class_name(&event->value));
+      a[3] = event->value;
+      fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 4, a);
+    }
+  }
+}
+
 static void
 track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-  fts_symbol_t name = track_get_name(this);  
+  fts_symbol_t name = track_get_name(this);
   event_t *event = track_get_first(this);
-  fts_atom_t a[TRACK_BLOCK_SIZE];
+  fts_array_t temp_array;
+  fts_atom_t a;
+
+  fts_array_init(&temp_array, 0, 0);
   
-  fts_set_int(a, track_get_size( this));
-  fts_client_send_message((fts_object_t *)this, fts_s_start_upload, 1, a);  
+  fts_set_int(&a, track_get_size( this));
+  fts_client_send_message((fts_object_t *)this, fts_s_start_upload, 1, &a);  
 
   /* set track name */
   if(name)
     {
-      fts_set_symbol(a, name);
-      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
+      fts_set_symbol(&a, name);
+      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, &a);
     }
 
-  fts_set_int(a, track_is_active(this));
-  fts_client_send_message((fts_object_t *)this, seqsym_active, 1, a);  
+  fts_set_int(&a, track_is_active(this));
+  fts_client_send_message((fts_object_t *)this, seqsym_active, 1, &a);  
 
+  /* upload array of properties and types */
+  track_upload_property_list(this, &temp_array);
+  
   while(event)
     {
+    /* create event at client */
       if(!fts_object_has_id((fts_object_t *)event))
-	{
-	  /* create event at client */
-	  track_event_upload(this, event);
-	}
+        track_upload_event(this, event, &temp_array);
 	  
       event = event_get_next(event);
     }
-  fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);  
+  
+  fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);
+  
+  fts_array_destroy(&temp_array);
 }
 
 static void
@@ -1042,15 +1083,15 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_t *this = (track_t *)o;
   fts_class_t *type = track_get_type(this);
 
-  if(type == fts_midievent_type || type == note_type || type == NULL)
-    {
-      if(ac == 0)
-	track_import_midifile_dialog(o, 0, 0, 0, 0);
-      else if(ac == 1 && fts_is_symbol(at))
-	track_import_midifile(o, 0, 0, 1, at);
-      else
-	fts_object_error(o, "import: wrong arguments");  
-    }
+  if(type == fts_midievent_type || type == scoob_class || type == NULL)
+  {
+    if(ac == 0)
+      track_import_midifile_dialog(o, 0, 0, 0, 0);
+    else if(ac == 1 && fts_is_symbol(at))
+      track_import_midifile(o, 0, 0, 1, at);
+    else
+      fts_object_error(o, "import: wrong arguments");
+  }
   else
     fts_object_error(o, "import: cannot import MIDI file to track of type %s", type);
 }

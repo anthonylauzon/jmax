@@ -116,7 +116,7 @@ miditrack_read_track_end(fts_midifile_t *file)
 }
 
 static void
-notetrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
+scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   track_t *track = data->track;
@@ -131,35 +131,35 @@ notetrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
       if(velocity == 0 && data->note_is_on[channel - 1][pitch] != 0)
 	{
 	  event_t *event = data->note_is_on[channel - 1][pitch];
-	  note_t *note = (note_t *)event_get_object(event);
+	  scoob_t *scoob = (scoob_t *)event_get_object(event);
 	  
-	  note_set_duration(note, time - event_get_time(event));
+	  scoob_set_duration(scoob, time - event_get_time(event));
 	  data->note_is_on[channel - 1][pitch] = 0;
 	}
       else if(velocity > 0)
 	{
-	  note_t *note;
+	  scoob_t *scoob;
 	  event_t *event;
 	  fts_atom_t a[3];
 
           if(data->note_is_on[channel - 1][pitch] != 0)
           {
             event_t *event = data->note_is_on[channel - 1][pitch];
-            note_t *note = (note_t *)event_get_object(event);
+            scoob_t *scoob = (scoob_t *)event_get_object(event);
 
-            note_set_duration(note, time - event_get_time(event));
+            scoob_set_duration(scoob, time - event_get_time(event));
           }          
           
-	  /* create a note */
+	  /* create a scoob */
 	  fts_set_int(a + 0, pitch);
 	  fts_set_float(a + 1, 0.0);
-	  note = (note_t *)fts_object_create(note_type, 2, a);
+	  scoob = (scoob_t *)fts_object_create(scoob_class, 2, a);
 
-          note_set_velocity(note, velocity);
-          note_set_channel(note, channel);
+          scoob_set_velocity(scoob, velocity);
+          scoob_set_channel(scoob, channel);
 	  
-	  /* create a new event with the note */
-	  fts_set_object(a, (fts_object_t *)note);
+	  /* create a new event with the scoob */
+	  fts_set_object(a, (fts_object_t *)scoob);
 	  event = (event_t *)fts_object_create(event_class, 1, a);
 	  
 	  /* add the event to track */
@@ -173,7 +173,7 @@ notetrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
 }
 
 static void
-notetrack_read_track_end(fts_midifile_t *file)
+scoobtrack_read_track_end(fts_midifile_t *file)
 {
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   double time = fts_midifile_get_time(file);
@@ -186,9 +186,9 @@ notetrack_read_track_end(fts_midifile_t *file)
 	if(data->note_is_on[i][j] != 0)
 	  {
 	    event_t *event = data->note_is_on[i][j];
-	    note_t *note = (note_t *)event_get_object(event);
+	    scoob_t *scoob = (scoob_t *)event_get_object(event);
 	    
-	    note_set_duration(note, time - event_get_time(event));
+	    scoob_set_duration(scoob, time - event_get_time(event));
 	    data->note_is_on[i][j] = 0;
 	  }
     }
@@ -280,7 +280,7 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
       read.track_end = miditrack_read_track_end;
       read.midi_event = miditrack_read_midievent;
     }
-  else if(track_get_type(track) == note_type)
+  else if(track_get_type(track) == scoob_class)
     {
       int i, j;
 
@@ -289,8 +289,8 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
 	for(j=0; j<n_midi_notes; j++)
 	  data.note_is_on[i][j] = 0;
       
-      read.track_end = notetrack_read_track_end;
-      read.midi_event = notetrack_read_midievent;
+      read.track_end = scoobtrack_read_track_end;
+      read.midi_event = scoobtrack_read_midievent;
     }
   else if(track_get_type(track) == fts_int_class)
     {
@@ -354,11 +354,11 @@ typedef struct _seqmidi_write_data_
 } seqmidi_write_data_t;
 
 static void
-seqmidi_write_note_on(fts_midifile_t *file, double time, note_t *note)
+seqmidi_write_note_on(fts_midifile_t *file, double time, scoob_t *scoob)
 {
   seqmidi_write_data_t *data = (seqmidi_write_data_t *)fts_midifile_get_user_data(file);
-  int pitch = note_get_pitch(note);
-  double off_time = time + note_get_duration(note);
+  int pitch = scoob_get_pitch(scoob);
+  double off_time = time + scoob_get_duration(scoob);
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);
   event_t *off = track_get_first(data->free_track);
 
@@ -432,7 +432,7 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
   if(track_size <= 0)
     return 0;
 
-  if(track_type == note_type)
+  if(track_type == scoob_class)
     {
       seqmidi_write_data_t data;
       event_t *event;
@@ -460,7 +460,7 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
 	  double time = event_get_time(event);
 	  
 	  seqmidi_write_note_offs(file, time);
-	  seqmidi_write_note_on(file, time, (note_t *)fts_get_object(&event->value));      
+	  seqmidi_write_note_on(file, time, (scoob_t *)fts_get_object(&event->value));      
 	  
 	  event = event_get_next(event);
 	}  

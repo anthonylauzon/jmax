@@ -57,7 +57,7 @@ struct _event_
 #define event_get_float(e) fts_get_float(&(e)->value)
 #define event_get_object(e) fts_get_object(&(e)->value)
 
-#define event_get_type(e) (fts_get_class_name(&(e)->value))
+#define event_get_type(e) (fts_get_class(&(e)->value))
 
 extern double event_get_duration(event_t *event);
 

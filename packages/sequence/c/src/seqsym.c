@@ -30,9 +30,15 @@ fts_symbol_t seqsym_event = 0;
 fts_symbol_t seqsym_segment = 0;
 
 /* events */
+fts_symbol_t seqsym_scoob = 0;
+fts_symbol_t seqsym_undefined = 0;
 fts_symbol_t seqsym_note = 0;
+fts_symbol_t seqsym_interval = 0;
+fts_symbol_t seqsym_rest = 0;
+fts_symbol_t seqsym_trill = 0;
 fts_symbol_t seqsym_midi = 0;
 fts_symbol_t seqsym_seqmess = 0;
+fts_symbol_t seqsym_type = 0;
 fts_symbol_t seqsym_pitch = 0;
 fts_symbol_t seqsym_duration = 0;
 fts_symbol_t seqsym_velocity = 0;
@@ -52,6 +58,9 @@ fts_symbol_t seqsym_move_track = 0;
 fts_symbol_t seqsym_add_event = 0;
 fts_symbol_t seqsym_active = 0;
 fts_symbol_t seqsym_dump_mess = 0;
+fts_symbol_t seqsym_properties = 0;
+fts_symbol_t seqsym_get_property_list = 0;
+fts_symbol_t seqsym_append_properties = 0;
 
 /* messages from/to client */
 fts_symbol_t seqsym_addTracks = 0;
@@ -80,9 +89,15 @@ seqsym_config(void)
   seqsym_segment = fts_new_symbol("segment");
 
   /* event types */
+  seqsym_scoob = fts_new_symbol("scoob");
+  seqsym_undefined = fts_new_symbol("undefined");
   seqsym_note = fts_new_symbol("note");
+  seqsym_interval = fts_new_symbol("interval");
+  seqsym_rest = fts_new_symbol("rest");
+  seqsym_trill = fts_new_symbol("trill");
   seqsym_midi = fts_new_symbol("midi");
   seqsym_seqmess = fts_new_symbol("seqmess");
+  seqsym_type = fts_new_symbol("type");
   seqsym_pitch = fts_new_symbol("pitch");
   seqsym_duration = fts_new_symbol("duration");
   seqsym_velocity = fts_new_symbol("velocity");
@@ -102,6 +117,9 @@ seqsym_config(void)
   seqsym_add_event = fts_new_symbol("add_event");
   seqsym_active = fts_new_symbol("active");
   seqsym_dump_mess = fts_new_symbol("dump_mess");
+  seqsym_properties = fts_new_symbol("properties");
+  seqsym_get_property_list = fts_new_symbol("get_property_list");
+  seqsym_append_properties = fts_new_symbol("append_properties");
   
   /* messages to client */
   seqsym_addTracks = fts_new_symbol("addTracks");

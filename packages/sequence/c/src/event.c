@@ -40,11 +40,11 @@ event_get_duration(event_t *event)
   fts_atom_t *value = &event->value;
   double duration = 0.0;
 
-  if(fts_is_a(value, note_type))
+  if(fts_is_a(value, scoob_class))
     {
-      note_t *note = (note_t *)fts_get_object(value);
+      scoob_t *scoob = (scoob_t *)fts_get_object(value);
 
-      duration = note_get_duration(note);
+      duration = scoob_get_duration(scoob);
     }
   else if(fts_is_object(value))
     {
