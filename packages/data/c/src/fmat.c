@@ -767,7 +767,7 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  */
 
 static void
-fmat_getmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   const fvec_t *self = (fvec_t *) o;
   const int size = self->m * self->n;
@@ -787,7 +787,7 @@ fmat_getmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-fmat_getmin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   const fvec_t *self = (fvec_t *) o;
   const int size = self->m * self->n;
@@ -803,6 +803,36 @@ fmat_getmin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       min = p[i];
   
   fts_return_float(min);
+}
+
+static void
+fmat_get_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const fvec_t *self = (fvec_t *) o;
+  const int size = self->m * self->n;
+  const float *p = fvec_get_ptr(self);
+  double sum = 0.0;
+  int i;
+  
+  for (i=0; i<size; i++)
+    sum += p[i];
+  
+  fts_return_float(sum);
+}
+
+static void
+fmat_get_mean(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  const fvec_t *self = (fvec_t *) o;
+  const int size = self->m * self->n;
+  const float *p = fvec_get_ptr(self);
+  double sum = 0.0;
+  int i;
+  
+  for (i=0; i<size; i++)
+    sum += p[i];
+  
+  fts_return_float(sum / (double)size);
 }
 
 /* copy a slice (a row or column, given in the first arg) from the
@@ -2139,8 +2169,10 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, sym_getrow, fmat_get_row);
   fts_class_message_varargs(cl, sym_getcol, fmat_get_column);
 
-  fts_class_message_void(cl, fts_new_symbol("getmax"), fmat_getmax);
-  fts_class_message_void(cl, fts_new_symbol("getmin"), fmat_getmin);
+  fts_class_message_void(cl, fts_new_symbol("max"), fmat_get_max);
+  fts_class_message_void(cl, fts_new_symbol("min"), fmat_get_min);
+  fts_class_message_void(cl, fts_new_symbol("sum"), fmat_get_sum);
+  fts_class_message_void(cl, fts_new_symbol("mean"), fmat_get_mean);
 
   fts_class_inlet_bang(cl, 0, data_object_output);
 
@@ -2148,11 +2180,6 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_outlet_thru(cl, 0);
 
   fts_class_set_copy_function(cl, fmat_copy_function);
-
-
-  /*
-   * class doc 
-   */
 
   fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (default is 1)> [<num: init values> ...]]]", "matrix of floats");
   fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "set matrix values at given index");
@@ -2165,8 +2192,10 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("columns"), "[<num: # of rows>]", "get/set # of columns");
   
   fts_class_doc(cl, fts_s_get_element, "<num: row index> <num: column index>", "get value at given index");
-  fts_class_doc(cl, fts_new_symbol("getmax"), NULL, "get maximum value");
-  fts_class_doc(cl, fts_new_symbol("getmin"), NULL, "get minimum value");
+  fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
+  fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
+  fts_class_doc(cl, fts_new_symbol("sum"), NULL, "get sum of all values");
+  fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
   
   fts_class_doc(cl, fts_new_symbol("add"), "<num|fmat: operand>", "add given scalar or fmat (element by element) to current values");
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fmat: operand>", "substract given scalar or fmat (element by element)");
