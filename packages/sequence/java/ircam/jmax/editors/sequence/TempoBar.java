@@ -371,33 +371,44 @@ public void processKeyEvent(KeyEvent e)
 //=================== MouseListener interface ===========================
 public void mouseClicked(MouseEvent e){}
 public void mousePressed(MouseEvent e)
-{
+{  
   if(markersTrack != null)
   {
     int x = e.getX();
     int y = e.getY();
-    int modifiers = e.getModifiers();    
-		TrackEvent currMark = firstMarkerContaining(x, y);
-
-    if(currMark!=null)
-    { //click on marker				
-      if ( !markersSelection.isInSelection( currMark)) 
-      {
-        if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
-         markersSelection.deselectAll();
-        
-        markersSelection.select( currMark);
-      }
+    int modifiers = e.getModifiers();
+    
+    if((modifiers & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) // add markers
+    {
+      if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+        markersSelection.deselectAll();
+      
+      markersTrack.requestInsertMarker( pa.getInvX(x));
     }
-    else	
-    {//click on empty
-      if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-      {
-        if( markersSelection != null)
-          markersSelection.deselectAll();
+    else
+    {
+      TrackEvent currMark = firstMarkerContaining(x, y);
+
+      if(currMark!=null)
+      { //click on marker				
+        if ( !markersSelection.isInSelection( currMark)) 
+        {
+          if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+            markersSelection.deselectAll();
+        
+          markersSelection.select( currMark);
+        }
       }
-      if(!isInSequence)
-        ((FtsTrackObject)ftsObj).requestNotifyGuiListeners( pa.getInvX(x), null);
+      else	
+      {//click on empty
+        if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+        {
+          if( markersSelection != null)
+            markersSelection.deselectAll();
+        }
+        if(!isInSequence)
+          ((FtsTrackObject)ftsObj).requestNotifyGuiListeners( pa.getInvX(x), null);
+      }
     }
   }
 }

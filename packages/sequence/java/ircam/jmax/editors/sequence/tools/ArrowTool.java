@@ -46,13 +46,13 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	* Constructor. 
    */
   public ArrowTool(ImageIcon theImageIcon) 
-{
+  {
     super("edit", theImageIcon);
     
     itsDirectionChooser = new DirectionChooser(this);
     itsSelectionMover = new SequenceSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
     itsSelectionResizer = new SequenceSelectionResizer(this);
-}
+  }
 
 /**
 * called when this tool is unmounted

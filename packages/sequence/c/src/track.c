@@ -458,6 +458,44 @@ track_insert_marker(track_t *track, double time, fts_symbol_t type)
   return scomark;
 }
 
+static void
+track_insert_marker_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *self = (track_t *)o;
+  fts_symbol_t tr_type = fts_class_get_name( track_get_type(self));
+  double time = fts_get_float(at);
+  fts_symbol_t sc_type = fts_get_symbol(at+1);
+  
+  if(tr_type == seqsym_scomark)
+  {
+    scomark_t *scomark;
+    event_t *event;
+    fts_atom_t a;
+    fts_array_t temp_array;
+    
+    /* create a scomark */
+    fts_set_symbol(&a, sc_type);
+    scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
+    
+    /* create a new event with the scomark */
+    fts_set_object(&a, (fts_object_t *)scomark);
+    event = (event_t *)fts_object_create(event_class, 1, &a);
+    
+    track_add_event(self, time, event);    
+    
+    /* upload the event */
+    fts_array_init(&temp_array, 0, 0);
+    track_upload_event( self, event, &temp_array);
+    fts_array_destroy(&temp_array);
+  }
+  else
+  {
+    track_insert_marker(self->markers, time, sc_type);
+    fts_send_message((fts_object_t *)self->markers, fts_s_upload, 0, NULL);
+  }
+  fts_object_set_state_dirty((fts_object_t *)self);
+}
+
 static void 
 track_upload_markers(track_t *self)
 {
@@ -1974,6 +2012,8 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_makeEvent, track_make_event_from_client);
   fts_class_message_varargs(cl, seqsym_removeEvents, track_remove_events_from_client);
   fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
+  
+  fts_class_message_varargs(cl, fts_new_symbol("insert_marker"), track_insert_marker_from_client);
   
   fts_class_set_copy_function(cl, track_copy_function);
   fts_class_set_description_function(cl, track_description_function);

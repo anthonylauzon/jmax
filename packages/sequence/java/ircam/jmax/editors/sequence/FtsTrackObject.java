@@ -622,6 +622,22 @@ public void requestSetSaveEditor(boolean save)
 	if(save && editorObject != null) 
 		editorObject.requestSetEditorState( getEditorFrame().getBounds());
 }
+
+public void requestInsertMarker(double time)
+{  
+  try{
+    args.clear();
+    args.addDouble(time);
+    args.addSymbol(FtsSymbol.get("marker"));
+    send( FtsSymbol.get("insert_marker"), args);
+  }
+  catch(IOException e)
+  {
+    System.err.println("FtsTrackObject: I/O Error sending insert_marker Message!");
+    e.printStackTrace();
+  }
+}
+
 /**
 * how many events in the database?
  */

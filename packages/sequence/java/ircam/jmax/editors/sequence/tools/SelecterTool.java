@@ -48,7 +48,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
  {
     super(theName, theImageIcon);
 		
-    //itsSelecter = new Selecter(this);
     itsSelecter = new SequenceSelecter(this);
  }
 
