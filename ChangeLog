@@ -1,3 +1,8 @@
+2002-01-18  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed client library to integrate symbol cache. Added FtsSymbol, splitted
+	the code in different classes with cleaner interfaces.
+
 2001-12-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed unixdtd package compilation errors w.r.t. API changes
