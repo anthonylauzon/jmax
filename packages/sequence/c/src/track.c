@@ -1675,15 +1675,8 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       marker_event = event_get_next(marker_event);
     }
   }
-}
-
-static void
-track_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-	
-	if(this->save_editor == 1)
+  
+  if(this->save_editor == 1)
 	{
 		fts_atom_t a;
 		fts_set_int(&a, this->save_editor);
@@ -1696,7 +1689,7 @@ track_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     content_dumper_set_dump_mess(content_dumper, seqsym_editor);
     
 		track_editor_dump_gui(this->editor, (fts_dumper_t *)content_dumper);
-  }  
+  }    
 }
 
 static void
@@ -1810,7 +1803,6 @@ track_instantiate(fts_class_t *cl)
 	fts_class_message_varargs(cl, seqsym_set_editor, track_set_editor_at_client);
   
   fts_class_message_varargs(cl, fts_s_dump_state, track_dump_state);
-  fts_class_message_varargs(cl, fts_s_dump_gui, track_dump_gui);
   
   fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui);
 	
