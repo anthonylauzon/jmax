@@ -845,25 +845,28 @@ public class FtsObject
   {
     try
       {
-	if(!selector.equals(selectorCache))
-	  methodCache = getClass().getMethod(selector, parameterTypes);
+	if(selector != selectorCache)
+	  {
+	    selectorCache = selector;
+	    methodCache = getClass().getMethod(selector, parameterTypes);
+	  }
 
 	switch(nArgs)
 	  {
 	  case 0:
-	    methodArgs0[1] = null;
+	    methodArgs0[1] = args;
 	    methodCache.invoke(this, methodArgs0);
 	    break;
 	  case 1:
-	    methodArgs0[1] = null;
+	    methodArgs1[1] = args;
 	    methodCache.invoke(this, methodArgs1);
 	    break;
 	  case 2:
-	    methodArgs0[1] = null;
+	    methodArgs2[1] = args;
 	    methodCache.invoke(this, methodArgs2);
 	    break;
 	  case 3:
-	    methodArgs0[1] = null;
+	    methodArgs3[1] = args;
 	    methodCache.invoke(this, methodArgs3);
 	    break;
 	  default:
