@@ -20,44 +20,53 @@
  * 
  */
 
+/** 
+ * Audio
+ *
+ * The FTS audio I/O handling
+ *
+ * @defgroup audio audio
+ */
 
 #define FTS_AUDIO_INPUT 0
 #define FTS_AUDIO_OUTPUT 1
 
+/* Forward declarations */
+typedef struct fts_audiolabel fts_audiolabel_t;
+typedef struct fts_audioport fts_audioport_t;
+
 /**
  * The audio port.
  *
+ * An audio port is a class that implements the native audio I/O by providing functions
+ * calling the platform native audio API.
+ * 
  * A class implementing a audio port must inherit from fts_audioport_t:
- *
  * @code
- *   typedef struct my_audioport
- *   {
+ *   typedef struct my_audioport {
  *     fts_audioport_t port;
  *     ... 
  *   } my_audioport_t;
  * @endcode
  *
+ * Audio ports for the differents platforms are implemented in packages and are loaded
+ * dynamically. FTS kernel contains no platform-dependent code for audio.
+ *
  * @typedef fts_audioport_t
  *
- * @ingroup audioport
+ * @ingroup audio
  */
-
-typedef struct fts_audiolabel fts_audiolabel_t;
-
-typedef struct fts_audioport fts_audioport_t;
 
 /**
- * The audioport IO function calls the native audio layer to read/write a buffer
- * of samples in the native format.
- * Its argument is the audioport. Buffers are allocated by the port.
+ * The audioport I/O function calls the native audio layer to read/write the samples buffers
+ * in the native format.
+ *
+ * @fn void (*fts_audioport_io_fun_t)( fts_audioport_t *port, float **buffers, int buffsize)
+ * @param port the audioport
+ * @param buffers an array of buffers to samples
+ * @param buffsize the size of the buffers to be read/written
  */
-typedef void (*fts_audioport_io_fun_t)( fts_audioport_t *port);
-
-/** 
- * The audioport copy function copies the samples in the native format to a float buffer
- * for a given channel.
- */
-typedef void (*fts_audioport_copy_fun_t)( fts_audioport_t *port, float *buff, int buffsize, int channel);
+typedef void (*fts_audioport_io_fun_t)( fts_audioport_t *port, float **buffers, int buffsize);
 
 typedef int (*fts_audioport_xrun_fun_t)( fts_audioport_t *port);
 
@@ -67,10 +76,9 @@ struct fts_audioport_direction {
   int valid;
   int open;
   fts_audioport_io_fun_t io_fun;
-  fts_audioport_copy_fun_t copy_fun;
-  int channel_used[FTS_AUDIOPORT_MAX_CHANNELS];
-  int max_channels;
-  int nlabels;
+  int channels;
+  int *channel_used;
+  float **buffers;
   fts_audiolabel_t *labels;
 };
 
@@ -79,19 +87,17 @@ struct fts_audioport {
   fts_symbol_t name;
   struct fts_audioport *next;
   struct fts_audioport_direction inout[2];
-  float *mix_buffers[FTS_AUDIOPORT_MAX_CHANNELS];
 
-  /* will probably become a method */
   int (*xrun_function)( struct fts_audioport *port);
 };
 
 FTS_API void fts_audioport_init( fts_audioport_t *port);
 FTS_API void fts_audioport_delete( fts_audioport_t *port);
 
-#define fts_audioport_get_max_channels( port, direction) \
-  ((port)->inout[(direction)].max_channels)
-#define fts_audioport_set_max_channels( port, direction, m) \
-  ((port)->inout[(direction)].max_channels = (m))
+#define fts_audioport_get_channels( port, direction) \
+  ((port)->inout[(direction)].channels)
+
+FTS_API void fts_audioport_set_channels( fts_audioport_t *port, int direction, int channels);
 
 #define fts_audioport_set_valid(port, direction) \
   ((port)->inout[(direction)].valid = 1)
@@ -108,17 +114,6 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
 #define fts_audioport_get_io_fun( port, direction) \
   ((port)->inout[(direction)].io_fun)
 
-#define fts_audioport_set_copy_fun( port, direction, fun) \
-  ((port)->inout[(direction)].copy_fun = (fun))
-#define fts_audioport_get_copy_fun( port, direction) \
-  ((port)->inout[(direction)].copy_fun)
-
-#define fts_audioport_set_mute_fun( port, direction, fun) \
-  ((port)->inout[(direction)].mute_fun = (fun))
-#define fts_audioport_get_mute_fun( port, direction) \
-  ((port)->inout[(direction)].mute_fun)
-
-
 #define fts_audioport_set_xrun_fun( port, fun) \
   ((port)->xrun_fun = (fun))
 
@@ -128,7 +123,7 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
  *
  * @typedef fts_audiolabel_t
  *
- * @ingroup audiolabel
+ * @ingroup audio
  */
 
 struct fts_audiolabel_direction {
@@ -170,27 +165,27 @@ FTS_API void fts_audiolabel_remove_listener( fts_object_t *listener);
  *
  * Maintains the list of audio port names
  *
- * @ingroup audiomanager
+ * @ingroup audio
  */
 
 /**
  * Get an audioport by name.
  *
- * @ingroup audiomanager
+ * @ingroup audio
  */
 FTS_API fts_audioport_t *fts_audiomanager_get_port( fts_symbol_t name);
 
 /**
  * Register a new audioport.
  *
- * @ingroup audiomanager
+ * @ingroup audio
  */
 FTS_API void fts_audiomanager_put_port( fts_symbol_t name, fts_audioport_t *port);
 
 /**
- * Remove an audioport.
+ * Remove an audioport that was already registered using fts_audiomanager_put_port()
  *
- * @ingroup audiomanager
+ * @ingroup audio
  */
 FTS_API void fts_audiomanager_remove_port( fts_symbol_t name);
 

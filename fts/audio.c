@@ -25,11 +25,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 #if HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
-
-#include <string.h>
 
 #include <ftsprivate/audio.h>
 #include <ftsprivate/dsp.h>
@@ -61,21 +61,6 @@ fts_audioport_init( fts_audioport_t *port)
   port->next = audioport_list;
   audioport_list = port;
 
-  /* FIXME */
-  /* should allocate later the mix_buffers */
-  for ( i = 0; i < FTS_AUDIOPORT_MAX_CHANNELS; i++)
-    {
-      int j;
-      float *buff;
-
-      buff = (float *)fts_malloc( sizeof(float) * fts_dsp_get_tick_size());
-
-      for ( j = 0; j < fts_dsp_get_tick_size(); j++)
-	buff[j] = 0.0;
-
-      port->mix_buffers[i] = buff;
-    }
-
   fts_audioport_unset_valid(port, FTS_AUDIO_INPUT);
   fts_audioport_unset_valid(port, FTS_AUDIO_OUTPUT);
 
@@ -101,13 +86,34 @@ fts_audioport_delete( fts_audioport_t *port)
   /* unset all the input/output ports for all the labels that refers to this port */
 }
 
+void fts_audioport_set_channels( fts_audioport_t *port, int direction, int channels)
+{
+  int i;
+
+  port->inout[direction].channels = channels;
+  port->inout[direction].channel_used = (int *)fts_malloc( sizeof( int));
+  port->inout[direction].buffers = (float **)fts_malloc( sizeof( float *));
+
+  for ( i = 0; i < channels; i++)
+    {
+      int j;
+      float *buff;
+
+      buff = (float *)fts_malloc( sizeof(float) * fts_dsp_get_tick_size());
+
+      for ( j = 0; j < fts_dsp_get_tick_size(); j++)
+	buff[j] = 0.0;
+
+      port->inout[direction].buffers[i] = buff;
+    }
+}
+
 void
 fts_audioport_set_channel_used( fts_audioport_t *port, int direction, int channel, int used)
 {
-  port->inout[direction].channel_used[ channel] = used;
+  assert(channel < fts_audioport_get_channels( port, direction));
 
-  if (used && direction == FTS_AUDIO_OUTPUT && port->mix_buffers[channel] == NULL)
-    port->mix_buffers[channel] = (float *)fts_malloc( sizeof(float) * fts_dsp_get_tick_size());
+  port->inout[direction].channel_used[ channel] = used;
 }
 
 int
@@ -134,20 +140,19 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
 
   if (!*p)
     {
-      fts_object_refer( (fts_object_t *)label);
-
-      *p = label;
-      (*p)->inout[direction].next_same_port = 0;
-
-      /* Increment labels count and call "open" method if count becomes 1 */
-      port->inout[direction].nlabels++;
-      if (port->inout[direction].nlabels == 1)
+      /* Call "open" method when adding first label */
+      if (*p == NULL)
       {
 	fts_atom_t a[1];
 
 	fts_set_symbol( a, fts_audiolabel_get_name( label));
 	fts_send_message( (fts_object_t *)port, selector, 1, a);
       }
+
+      fts_object_refer( (fts_object_t *)label);
+
+      *p = label;
+      (*p)->inout[direction].next_same_port = 0;
 
       /* FIXME */
       /* when do we set the channel used ??? */
@@ -163,13 +168,11 @@ fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel
 
   if (*p)
     {
+      *p = (*p)->inout[direction].next_same_port;
       fts_object_release( (fts_object_t *)label);
 
-      *p = (*p)->inout[direction].next_same_port;
-
-      /* Decrement labels count and call "close" method if count becomes 0 */
-      port->inout[direction].nlabels--;
-      if (port->inout[direction].nlabels == 0)
+      /* Call "close" method when removing last label */
+      if (*p == NULL)
 	fts_send_message( (fts_object_t *)port, selector, 0, 0);
     }
 }
@@ -485,13 +488,23 @@ fts_audiolabel_input( fts_audiolabel_t *label, float *buff, int buffsize)
 {
   fts_audioport_t *port = fts_audiolabel_get_port( label, FTS_AUDIO_INPUT);
   int channel = fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT);
+  int i;
 
   if (port)
-    (*fts_audioport_get_copy_fun(port, FTS_AUDIO_INPUT))(port, buff, buffsize, channel);
+    {
+      float *input_buffer = port->inout[FTS_AUDIO_INPUT].buffers[channel];
+
+      /* copy the buffer */
+      for ( i = 0; i < buffsize; i += 4)
+	{
+	  buff[i] = input_buffer[i];
+	  buff[i+1] = input_buffer[i+1];
+	  buff[i+2] = input_buffer[i+2];
+	  buff[i+3] = input_buffer[i+3];
+	}
+    }
   else
     {
-      int i;
-
       /* zero the buffer */
       for ( i = 0; i < buffsize; i += 4)
 	{
@@ -508,15 +521,15 @@ fts_audiolabel_output( fts_audiolabel_t *label, float *buff, int buffsize)
 {
   fts_audioport_t *port = fts_audiolabel_get_port( label, FTS_AUDIO_OUTPUT);
   int channel = fts_audiolabel_get_channel( label, FTS_AUDIO_OUTPUT);
-  float *mix_buff;
+  float *output_buff;
   int i;
 
   if (!port)
     return;
 
-  mix_buff = port->mix_buffers[channel];
+  output_buff = port->inout[FTS_AUDIO_OUTPUT].buffers[channel];
   for ( i = 0; i < buffsize; i++)
-    mix_buff[i] += buff[i];
+    output_buff[i] += buff[i];
 }
 
 
@@ -638,52 +651,49 @@ audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   tick_size = fts_dsp_get_tick_size();
 
   at_least_one_io_fun_called = 0;
+
+  /* Call the audio port input functions */
   for ( port = audioport_list; port; port = port->next)
     {
       if ( !fts_audioport_is_input( port) || !fts_audioport_is_open( port, FTS_AUDIO_INPUT))
 	continue;
 
-      (*fts_audioport_get_io_fun( port, FTS_AUDIO_INPUT))( port);
+      (*fts_audioport_get_io_fun( port, FTS_AUDIO_INPUT))( port, port->inout[FTS_AUDIO_INPUT].buffers, tick_size);
       at_least_one_io_fun_called = 1;
     }
 
+  /* Zero the output buffers */
   for ( port = audioport_list; port; port = port->next)
     {
       if ( !fts_audioport_is_output( port) || !fts_audioport_is_open( port, FTS_AUDIO_OUTPUT))
 	continue;
 
-      for ( channel = 0; channel < fts_audioport_get_max_channels( port, FTS_AUDIO_OUTPUT); channel++)
+      for ( channel = 0; channel < fts_audioport_get_channels( port, FTS_AUDIO_OUTPUT); channel++)
 	{
-	  float *mix_buff = port->mix_buffers[channel];
+	  float *output_buff;
 	  int i;
 
 	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_OUTPUT, channel))
 	    continue;
 
+	  output_buff = port->inout[FTS_AUDIO_OUTPUT].buffers[channel];
+
 	  for ( i = 0; i < tick_size; i++)
-	    mix_buff[i] = 0.0;
+	    output_buff[i] = 0.0;
 	}
     }
 
   /* Call the DSP */
   fts_dsp_run_tick();
 
+  /* Call the audio port output functions */
   for ( port = audioport_list; port; port = port->next)
     {
       if ( !fts_audioport_is_output( port) || !fts_audioport_is_open( port, FTS_AUDIO_OUTPUT))
 	continue;
 
-      for ( channel = 0; channel < fts_audioport_get_max_channels( port, FTS_AUDIO_OUTPUT); channel++)
-	{
-	  float *mix_buff = port->mix_buffers[channel];
+      (*fts_audioport_get_io_fun( port, FTS_AUDIO_OUTPUT))( port, port->inout[FTS_AUDIO_OUTPUT].buffers, tick_size);
 
-	  if (!fts_audioport_is_channel_used( port, FTS_AUDIO_OUTPUT, channel))
-	    continue;
-
-	  (*fts_audioport_get_copy_fun(port, FTS_AUDIO_OUTPUT))(port, mix_buff, tick_size, channel);
-	}
-
-      (*fts_audioport_get_io_fun( port, FTS_AUDIO_OUTPUT))( port);
       at_least_one_io_fun_called = 1;
     }
 

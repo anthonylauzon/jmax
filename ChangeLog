@@ -1,3 +1,8 @@
+2003-01-20  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* changed audio API to 1) fix the problem of unused channels not being muted
+	and 2) reduce the number of function calls by pointer
+
 2003-01-13  Francois Dechelle  <dechelle@ircam.fr>
 
 	* fixed audio on Mac OS X. Works with input and output.
