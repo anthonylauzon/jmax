@@ -2955,12 +2955,12 @@ fmat_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     rtp -= n;
     
-    for(j=0; j<n; j++)
+    /* swap rows ptr (front) and rtp (back) */
+    for (j = 0; j < n; j++)
     {
-      float f = ptr[i];
-      
-      ptr[j] = rtp[j];
-      rtp[j] = f;
+      float f = ptr[j];
+      ptr[j]  = rtp[j];
+      rtp[j]  = f;
     }
     
     ptr += n;
