@@ -64,12 +64,12 @@ abstract public class MaxDocumentHandler
       return file.canWrite();
   }
 
-  /** Load an document from a document file.
+  /** Load an document from a document file, in a given context.
     If you want to call this, probabily you really want to call
     the static loadDocument.
     */
 
-  abstract protected MaxDocument loadDocument(File file) throws MaxDocumentException;
+  abstract protected MaxDocument loadDocument(MaxContext context, File file) throws MaxDocumentException;
 
   abstract public void saveDocument(MaxDocument document, File file) throws MaxDocumentException;
 

@@ -356,7 +356,7 @@ fts_bmax_count_childs(fts_patcher_t *patcher)
 static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   unsigned int i;
-  
+
   /* First, search for the symbol in the symbol table */
 
   for (i = 0; i < f->header.n_symbols; i++)
@@ -833,7 +833,7 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * the top of the stack for properties (use set instead of push)
    */
 
-#ifdef SAVER_DEBUG
+#ifdef SAVER_DEBUG 
   fprintf(stderr, "Saving Object %lx %d: ", obj,  obj->id);
   fprintf_atoms(stderr, obj->argc, obj->argv);
   fprintf(stderr, "\n");

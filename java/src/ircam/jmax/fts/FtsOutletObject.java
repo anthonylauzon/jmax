@@ -35,9 +35,9 @@ public class FtsOutletObject  extends FtsInOutletObject
 
   int position;
 
-  public FtsOutletObject(FtsObject parent, int position, int objId)
+  public FtsOutletObject(Fts fts, FtsObject parent, int position, int objId)
   {
-    super(parent, "outlet", position, objId);
+    super(fts, parent, "outlet", position, objId);
 
     ninlets = 1;
     noutlets = 0;
@@ -47,7 +47,7 @@ public class FtsOutletObject  extends FtsInOutletObject
   {
     super.setPosition(i);
 
-    Fts.getServer().repositionOutletObject(this, i);
+    fts.getServer().repositionOutletObject(this, i);
   }
 
   /** Get the number of outlets of the object 

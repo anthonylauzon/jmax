@@ -32,25 +32,28 @@ abstract public class MaxDocument
   protected MaxDocumentHandler handler = null;
   protected File file                  = null;
   protected MaxDocumentType    type    = null;
+  protected MaxContext      context    = null;
   private   Vector editedData          = new Vector();
   protected String name   = null; // name of the document, for UI purposes
   protected boolean saved = false;   // saved flag
 
   /** A constructor that get only the type */
 
-  public MaxDocument(MaxDocumentType type)
+  public MaxDocument(MaxContext context, MaxDocumentType type)
   {
     type.registerDocument(this);
     this.type = type;
+    this.context = context;
   }
 
   /** A constructor that get the type and the document name */
 
-  public MaxDocument(MaxDocumentType type, String name)
+  public MaxDocument(MaxContext context, MaxDocumentType type, String name)
   {
     type.registerDocument(this);
     this.type = type;
     this.name = name;
+    this.context = context;
   }
 
   /**
@@ -88,6 +91,13 @@ abstract public class MaxDocument
   public File getDocumentFile()
   {
     return file;
+  }
+
+  /** Get the document context */
+
+  public MaxContext getContext()
+  {
+    return context;
   }
 
   /**

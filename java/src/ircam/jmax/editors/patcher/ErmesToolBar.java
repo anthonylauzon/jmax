@@ -56,7 +56,7 @@ public class ErmesToolBar extends JPanel  {
     add( lockEditButton, BorderLayout.WEST);
 
     if ((sketch.itsPatcher.getParent() != null) &&
-	(sketch.itsPatcher.getParent() != Fts.getRootObject()))
+	(sketch.itsPatcher.getParent() != sketch.getFts().getRootObject()))
       {
 	upButton = new JButton(Icons.get( "_up_"));
 	upButton.setDoubleBuffered( false);
@@ -65,12 +65,12 @@ public class ErmesToolBar extends JPanel  {
 	  public void actionPerformed( ActionEvent e)
 	    {
 	      sketch.waiting();
-	      Fts.editPropertyValue(sketch.itsPatcher.getParent(), sketch.itsPatcher, 
-				    new MaxDataEditorReadyListener()
-				    {
-				      public void editorReady(MaxDataEditor editor)
-					{sketch.stopWaiting();}
-				    });
+	      sketch.getFts().editPropertyValue(sketch.itsPatcher.getParent(), sketch.itsPatcher, 
+						new MaxDataEditorReadyListener()
+						{
+						  public void editorReady(MaxDataEditor editor)
+						    {sketch.stopWaiting();}
+						});
 	    }});
 
 	add( upButton, BorderLayout.EAST);

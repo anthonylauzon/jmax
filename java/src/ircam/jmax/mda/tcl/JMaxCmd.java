@@ -15,6 +15,7 @@ package ircam.jmax.mda.tcl;
 
 import tcl.lang.*;
 
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
 /**
@@ -27,6 +28,10 @@ import ircam.jmax.mda.*;
  * <code>
  *     jmax <i> doc-type [version] name info doc-body
  * </code>
+ *
+ * ^^^^ The documen is created in the default server.
+ * ^^^^ There should be a way to pass on the right server to scripting
+ * ^^^^ Commands.
  */
 
 class JMaxCmd implements Command
@@ -62,7 +67,7 @@ class JMaxCmd implements Command
 
 	// Create a new instance of the type
 
-	document = Mda.getDocumentTypeByName(docType).newDocument();
+	document = Mda.getDocumentTypeByName(docType).newDocument(MaxApplication.getFts());
 
 	if (document instanceof MaxTclDocument)
 	  {

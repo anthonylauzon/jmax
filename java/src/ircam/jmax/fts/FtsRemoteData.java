@@ -21,6 +21,18 @@ import ircam.jmax.utils.*;
 
 public abstract class FtsRemoteData implements MaxData
 {
+  Fts fts;
+
+  void setFts(Fts fts)
+  {
+    this.fts = fts;
+  }
+
+  public Fts getFts()
+  {
+    return fts;
+  }
+
   void setMaster()
   {
     master = true;
@@ -32,14 +44,14 @@ public abstract class FtsRemoteData implements MaxData
   }
 
   void setId( int id)
-    {
-      this.id = id;
-    }
+  {
+    this.id = id;
+  }
 
   public String toString()
-    {
-      return this.getClass().getName() + "." + id;
-    }
+  {
+    return this.getClass().getName() + "." + id;
+  }
 
   abstract public void call( int key, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException;
@@ -61,7 +73,7 @@ public abstract class FtsRemoteData implements MaxData
   protected void release()
   {
     Mda.dispose(this);
-    FtsRemoteDataID.release(id);
+    fts.getServer().getRemoteTable().release(id);
   }
 
 
@@ -73,47 +85,47 @@ public abstract class FtsRemoteData implements MaxData
 
   public void remoteCallStart( int key)
   {
-    Fts.getServer().remoteCallStart( this, key);
+    fts.getServer().remoteCallStart( this, key);
   }
 
   public void remoteCallAddArg( int arg)
   {
-    Fts.getServer().remoteCallAddArg( arg);
+    fts.getServer().remoteCallAddArg( arg);
   }
 
   public void remoteCallAddArg( Integer arg)
   {
-    Fts.getServer().remoteCallAddArg( arg);
+    fts.getServer().remoteCallAddArg( arg);
   }
 
   public void remoteCallAddArg( float arg)
   {
-    Fts.getServer().remoteCallAddArg( arg);
+    fts.getServer().remoteCallAddArg( arg);
   }
 
   public void remoteCallAddArg( Float arg)
   {
-    Fts.getServer().remoteCallAddArg( arg);
+    fts.getServer().remoteCallAddArg( arg);
   }
 
   public void remoteCallAddArg( FtsObject arg)
   {
-    Fts.getServer().remoteCallAddArg( arg);
+    fts.getServer().remoteCallAddArg( arg);
   }
 
   public void remoteCallAddArg( String arg)
   {
-    Fts.getServer().remoteCallAddArg( arg);
+    fts.getServer().remoteCallAddArg( arg);
   }
 
   public void remoteCallAddArg( FtsRemoteData arg)
   {
-    Fts.getServer().remoteCallAddArg( arg);
+    fts.getServer().remoteCallAddArg( arg);
   }
 
   public void remoteCallEnd()
   {
-    Fts.getServer().remoteCallEnd();
+    fts.getServer().remoteCallEnd();
   }
 
   /* We implement a family of remoteCall methods.
@@ -130,24 +142,24 @@ public abstract class FtsRemoteData implements MaxData
 
   public void remoteCall( int key)
   {
-    Fts.getServer().remoteCall( this, key, (MaxVector) null);
+    fts.getServer().remoteCall( this, key, (MaxVector) null);
   }
   
   // Single argument remote call
 
   public void remoteCall( int key, int arg)
   {
-    Fts.getServer().remoteCall( this, key, arg);
+    fts.getServer().remoteCall( this, key, arg);
   }
 
   public void remoteCall( int key, float arg)
   {
-    Fts.getServer().remoteCall( this, key, arg);
+    fts.getServer().remoteCall( this, key, arg);
   }
 
   public void remoteCall( int key, Object arg)
   {
-    Fts.getServer().remoteCall( this, key, arg);
+    fts.getServer().remoteCall( this, key, arg);
   }
 
 
@@ -155,34 +167,34 @@ public abstract class FtsRemoteData implements MaxData
 
   public void remoteCall( int key, Object args[])
   {
-    Fts.getServer().remoteCall( this, key, args);
+    fts.getServer().remoteCall( this, key, args);
   }
 
   public void remoteCall( int key, MaxVector args)
   {
-    Fts.getServer().remoteCall( this, key, args);
+    fts.getServer().remoteCall( this, key, args);
   }
 
   // Special  remote calls
 
   public void remoteCall( int key, int offset, int size, int values[])
   {
-    Fts.getServer().remoteCall( this, key, offset, size, values);
+    fts.getServer().remoteCall( this, key, offset, size, values);
   }
 
   public void remoteCall( int  key, int id, String name, Object args[])
   {
-    Fts.getServer().remoteCall(this, key, id, name, args);
+    fts.getServer().remoteCall(this, key, id, name, args);
   }
 
   public void remoteCall( int  key, FtsObject obj, Object args[])
   {
-    Fts.getServer().remoteCall(this, key, obj, args);
+    fts.getServer().remoteCall(this, key, obj, args);
   }
 
   public void remoteCall( int  key, FtsObject obj, MaxVector args)
   {
-    Fts.getServer().remoteCall(this, key, obj, args);
+    fts.getServer().remoteCall(this, key, obj, args);
   }
 
   protected int id;

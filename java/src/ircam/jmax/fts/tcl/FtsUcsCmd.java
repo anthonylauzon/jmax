@@ -63,7 +63,7 @@ class FtsUcsCmd implements Command
 	      }
 	  }
 
-	Fts.getServer().ucsMessage(args);
+	MaxApplication.getFts().ucsCommand(args);
 	interp.resetResult();
       }
     else

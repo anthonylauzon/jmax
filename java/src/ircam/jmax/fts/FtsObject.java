@@ -30,7 +30,6 @@ import ircam.jmax.mda.*;
 
 public class FtsObject 
 {
-
   /******************************************************************************/
   /*                                                                            */
   /*              STATIC FUNCTION                                               */
@@ -42,7 +41,7 @@ public class FtsObject
    *  Used also in the message box.
    */
 
-  static FtsObject makeFtsObjectFromMessage(FtsStream stream, boolean doVariable)
+  static FtsObject makeFtsObjectFromMessage(Fts fts, FtsStream stream, boolean doVariable)
      throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
     FtsPatcherData data;
@@ -63,13 +62,13 @@ public class FtsObject
     /* Check for null description object */
 
     if (stream.endOfArguments())
-      return new FtsObject(parent, "", null, "", objId);
+      return new FtsObject(fts, parent, "", null, "", objId);
 
     /* Get the class name */
 
     if (! stream.nextIsSymbol())
       {
-	obj = new FtsObject(parent, "", variable,
+	obj = new FtsObject(fts, parent, "", variable,
 			    FtsParse.unparseObjectDescription(stream), objId);
       }
     else
@@ -82,41 +81,41 @@ public class FtsObject
 	if (className == "jpatcher")
 	  {
 	    if (doVariable)
-	      obj =  new FtsPatcherObject(parent, variable,
+	      obj =  new FtsPatcherObject(fts, parent, variable,
 					  variable + " : " + FtsParse.unparseObjectDescription(stream), objId);
 	    else
-	      obj =  new FtsPatcherObject(parent, variable,
+	      obj =  new FtsPatcherObject(fts, parent, variable,
 					  FtsParse.unparseObjectDescription(stream), objId);
 	  }
 	else if (className == "inlet")
-	  obj =  new FtsInletObject(parent, stream.getNextIntArgument(), objId);
+	  obj =  new FtsInletObject(fts, parent, stream.getNextIntArgument(), objId);
 	else if (className == "outlet")
-	  obj =  new FtsOutletObject(parent, stream.getNextIntArgument(), objId);
+	  obj =  new FtsOutletObject(fts, parent, stream.getNextIntArgument(), objId);
 	else if (className == "messbox")
-	  obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(stream), objId);
+	  obj =  new FtsMessageObject(fts, parent, FtsParse.unparseObjectDescription(stream), objId);
 	else if (className == "jcomment")
-	  obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(stream), objId);
+	  obj =  new FtsCommentObject(fts, parent, FtsParse.simpleUnparseObjectDescription(stream), objId);
 	else if (className == "intbox")
-	  obj =  new FtsIntValueObject(parent, className, "intbox", objId);
+	  obj =  new FtsIntValueObject(fts, parent, className, "intbox", objId);
 	else if (className == "toggle")
-	  obj =  new FtsIntValueObject(parent, className, "toggle", objId);
+	  obj =  new FtsIntValueObject(fts, parent, className, "toggle", objId);
 	else if (className == "button")
-	  obj =  new FtsIntValueObject(parent, className, "button", objId);
+	  obj =  new FtsIntValueObject(fts, parent, className, "button", objId);
 	else if (className == "slider")
-	  obj =  new FtsSliderObject(parent, "slider", objId);
+	  obj =  new FtsSliderObject(fts, parent, "slider", objId);
 	else if (className == "floatbox")
-	  obj =  new FtsFloatValueObject(parent, className, "floatbox", objId);
+	  obj =  new FtsFloatValueObject(fts, parent, className, "floatbox", objId);
 	else if (className == "__selection")
-	  obj =  new FtsSelection(parent, className, "__selection", objId);
+	  obj =  new FtsSelection(fts, parent, className, "__selection", objId);
 	else if (className == "__clipboard")
-	  obj =  new FtsClipboard(parent, className, "__clipboard", objId);
+	  obj =  new FtsClipboard(fts, parent, className, "__clipboard", objId);
 	else
 	  {
 	    if (doVariable)
-	      obj = new FtsObject(parent, className, variable,
+	      obj = new FtsObject(fts, parent, className, variable,
 				  variable + " : " + FtsParse.unparseObjectDescription(className, stream), objId);
 	    else
-	      obj = new FtsObject(parent, className, variable,
+	      obj = new FtsObject(fts, parent, className, variable,
 				  FtsParse.unparseObjectDescription(className, stream), objId);
 	  }
       }
@@ -215,14 +214,10 @@ public class FtsObject
       {
 	font = (String) value;
       }
-    else if (name == "name")
-      {
-	setObjectName((String) value);
-      }
     else if (name == "data")
       {
 	data = (MaxData) value;
-	Fts.fireNewDataListenerOn(this, data);
+	fts.fireNewDataListenerOn(this, data);
       }
     else if (name == "comment")
       {
@@ -251,6 +246,10 @@ public class FtsObject
   /*                                                                            */
   /******************************************************************************/
 
+  /** The Fts Server this object belong to */
+
+  Fts fts;
+
   /** Fts Object ID  */
 
   private int ftsId = -1;
@@ -270,10 +269,6 @@ public class FtsObject
   /** the variable name, if any */
 
   String variableName = null;
-
-  /** The object name, if exists */
-
-  String objectName;
 
   /** The number of inlets of this object. */
 
@@ -319,7 +314,7 @@ public class FtsObject
   {
     if (this.x != x)
       {
-	Fts.getServer().putObjectProperty(this, "x", x);
+	fts.getServer().putObjectProperty(this, "x", x);
 	this.x = x;
 	setDirty();
       }
@@ -334,7 +329,7 @@ public class FtsObject
   {
     if (this.y != y)
       {
-	Fts.getServer().putObjectProperty(this, "y", y);
+	fts.getServer().putObjectProperty(this, "y", y);
 	this.y = y;
 	setDirty();
       }
@@ -349,7 +344,7 @@ public class FtsObject
   {
     if (this.width != w)
       {
-	Fts.getServer().putObjectProperty(this, "w", w);
+	fts.getServer().putObjectProperty(this, "w", w);
 	this.width = w;
 	setDirty();
       }
@@ -364,7 +359,7 @@ public class FtsObject
   {
     if (this.height != h)
       {
-	Fts.getServer().putObjectProperty(this, "h", h);
+	fts.getServer().putObjectProperty(this, "h", h);
 	this.height = h;
 	setDirty();
       }
@@ -392,7 +387,7 @@ public class FtsObject
   {
     if ((this.font == null) || (! this.font.equals(font)))
       {
-	Fts.getServer().putObjectProperty(this, "font", font);
+	fts.getServer().putObjectProperty(this, "font", font);
 	this.font = font;
 	setDirty();
       }
@@ -407,7 +402,7 @@ public class FtsObject
   {
     if (this.fontSize != fontSize)
       {
-	Fts.getServer().putObjectProperty(this, "fs", fontSize);
+	fts.getServer().putObjectProperty(this, "fs", fontSize);
 	this.fontSize = fontSize;
 	setDirty();
       }
@@ -422,7 +417,7 @@ public class FtsObject
   {
     if (this.layer != layer)
       {
-	Fts.getServer().putObjectProperty(this, "layer", layer);
+	fts.getServer().putObjectProperty(this, "layer", layer);
 	this.layer = layer;
 	setDirty();
       }
@@ -433,8 +428,13 @@ public class FtsObject
 
   public final void setColor(int color)
   {
-    Fts.getServer().putObjectProperty(this, "color", color);
+    fts.getServer().putObjectProperty(this, "color", color);
     setDirty();
+  }
+
+  public Fts getFts()
+  {
+    return fts;
   }
 
   public MaxData getData()
@@ -444,7 +444,7 @@ public class FtsObject
 
   public void updateData()
   {
-    Fts.getServer().askObjectProperty(this, "data");
+    fts.getServer().askObjectProperty(this, "data");
   }
 
   public String getComment()
@@ -455,7 +455,7 @@ public class FtsObject
   public void setComment(String v)
   {
     comment = v;
-    Fts.getServer().putObjectProperty(this, "comment", comment);
+    fts.getServer().putObjectProperty(this, "comment", comment);
   }
 
   /*****************************************************************************/
@@ -468,10 +468,11 @@ public class FtsObject
    * Create a FtsObject object.
    */
 
-  protected FtsObject(FtsObject parent, String className, String variableName, String description, int objId)
+  protected FtsObject(Fts fts, FtsObject parent, String className, String variableName, String description, int objId)
   {
     super();
 
+    this.fts       = fts;
     this.variableName = variableName;
     this.className    = className;
     this.description  = description;
@@ -514,20 +515,6 @@ public class FtsObject
   public final String getClassName()
   {
     return className;
-  }
-
-  /** Set the objectName */
-
-  void setObjectName(String name)
-  {
-    this.objectName = name;
-  }
-
-  /** Get the objectName */
-
-  public String getObjectName()
-  {
-    return objectName;
   }
 
   /** Get the MaxDocument this objects is part of;
@@ -614,9 +601,9 @@ public class FtsObject
   {
     if (! deleted)
       {
-	Fts.getSelection().removeObject(this);
+	fts.getSelection().removeObject(this);
 	parent.setDirty();
-	Fts.getServer().deleteObject(this);
+	fts.getServer().deleteObject(this);
       }
   }
 
@@ -655,7 +642,7 @@ public class FtsObject
 
     // Fire also the global edit listeners
 
-    Fts.fireObjectRemoved(this);
+    fts.fireObjectRemoved(this);
 
     // clean up to help the gc, and make the object
     // non functioning, so to catch use of the object
@@ -663,10 +650,9 @@ public class FtsObject
 
     parent = null;
     className = null;
-    objectName = null;
     description = null;
 
-    Fts.getServer().unregisterObject(this);
+    fts.getServer().unregisterObject(this);
     setObjectId(-1);
   }
 
@@ -676,7 +662,7 @@ public class FtsObject
 
   public final void sendMessage(int inlet, String selector, MaxVector args)
   {
-    Fts.getServer().sendObjectMessage(this, inlet, selector, args);
+    fts.getServer().sendObjectMessage(this, inlet, selector, args);
   }
 
   /*****************************************************************************/

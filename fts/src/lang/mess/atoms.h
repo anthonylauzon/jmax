@@ -88,9 +88,6 @@ extern const fts_atom_t fts_null;
 #define fts_set_atom_array(ap, x)       \
      do {fts_set_type(ap, fts_s_atom_array); fts_word_set_atom_array( fts_get_value(ap), (x));} while (0)
 
-#define fts_set_user_type(ap, x, type)       \
-     do {fts_set_type(ap, type); fts_word_set_ptr( fts_get_value(ap), (x));} while (0)
-
 #define fts_set_void(ap)           (fts_set_type(ap, fts_s_void))
 #define fts_set_error(ap)           (fts_set_type(ap, fts_s_error))
 
@@ -131,15 +128,16 @@ extern const fts_atom_t fts_null;
 #define fts_is_false(ap)           fts_is_a(ap, fts_s_false)
 #define fts_is_data(ap) (fts_is_a(ap, fts_s_data))
 
-#define fts_is_primitive(ap) (fts_is_number(ap) || fts_is_symbol(ap))
-
 /* Convenience macros to deal with type and atom algebra */
+
 #define fts_same_types(ap1, ap2)    (((ap1)->type) == (ap2)->type)
 
 /* equality test between two atoms */
+
 extern int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2);
 
 /* null test: a null content can be a null pointer or a zero value */
+
 extern int fts_atom_is_null(const fts_atom_t *a);
 
 /* Subsequence  testing */

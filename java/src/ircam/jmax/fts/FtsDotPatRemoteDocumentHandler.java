@@ -70,38 +70,34 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   /** Make the real document */
 
-  protected MaxDocument loadDocument(File file)
+  protected MaxDocument loadDocument(MaxContext context, File file)
   {
     FtsServer server;
     FtsObject patcher;
     int id;
 
-    // Load the environement file if needed
+    if (! (context instanceof Fts))
+      return null;
 
-    MaxEnv.loadEnvFileFor(file);
+    Fts fts = (Fts) context;
 
-    // Build an empty patcher son of root.
+    // Load the environment file if needed 
 
-    server = Fts.getServer();
-    id = server.getNewObjectId();
+    MaxEnv.loadEnvFileFor(context, file);
 
-    // ask fts to load the file within this 
-    // patcher, using a dedicated message
+    // ask fts to load the file 
 
-    server.loadPatcherDpat(server.getRootObject(), id, file.getAbsolutePath());
-    server.sendDownloadObject(id);
-    server.syncToFts();
-    patcher = server.getObjectByFtsId(id);
+    patcher = fts.loadPatFile(file);
 
     if (patcher != null)
       {
-	FtsPatcherDocument obj = new FtsPatcherDocument();
+	FtsPatcherDocument obj = new FtsPatcherDocument(context);
 
 	// Temporary hack to force the patcher uploading; really, MDA should allow for 
 	// async edit of documents ...
 
 	patcher.updateData();
-	server.syncToFts();
+	fts.sync();
 	obj.setRootData((MaxData) patcher.getData());
 	obj.setDocumentFile(file);
 	obj.setDocumentHandler(this);

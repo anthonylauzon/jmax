@@ -15,6 +15,7 @@ package ircam.jmax.fts;
 
 import java.util.*;
 import java.net.*;
+import java.io.*;
 
 import javax.swing.*;
 
@@ -28,19 +29,19 @@ import ircam.jmax.utils.*;
  * implemented by the application layer, as static methods.
  */
 
-public class Fts
+public class Fts implements MaxContext
 {
   /** The FTS server */
 
-  static FtsServer server = null;
+  FtsServer server = null;
 
-  static public FtsServer getServer()
+  FtsServer getServer()
   {
     return server;
   }
   
-  public static void connectToFts(String ftsDir, String ftsName, String mode,
-				  String serverName, String port)
+  public Fts(String ftsDir, String ftsName, String mode,
+	     String serverName, String port)
   {
     if (serverName.equals("local"))
       {
@@ -58,22 +59,25 @@ public class Fts
       ftsName = ftsName + ".ss";
 
     if (mode.equals("socket")) 
-      server = new FtsServer(serverName, new FtsSocketStream(serverName, Integer.parseInt(port)));
+      server = new FtsServer(this, serverName, new FtsSocketStream(serverName, Integer.parseInt(port)));
     else if (mode.equals("udp")) 
-      server = new FtsServer(serverName, new FtsDatagramStream(serverName, ftsDir, ftsName));
-    // else if (mode.equals("udprx")) 
-    // server = new FtsServer(serverName, new FtsRexecDatagramStream(serverName, ftsDir, ftsName));
+      server = new FtsServer(this, serverName, new FtsDatagramStream(serverName, ftsDir, ftsName));
     else if (mode.equals("udpclient")) 
-      server = new FtsServer(serverName + ":" + port,
+      server = new FtsServer(this, serverName + ":" + port,
 			     new FtsDatagramClientStream(serverName, ftsDir, ftsName, Integer.parseInt(port)));
     else if (mode.equals("client") || mode.equals("tcp"))
-      server = new FtsServer(serverName, new FtsSocketServerStream(serverName, ftsDir, ftsName));
+      server = new FtsServer(this, serverName, new FtsSocketServerStream(serverName, ftsDir, ftsName));
     else if (mode.equals("local"))
-      server = new FtsServer("fts", new FtsSubProcessStream(ftsDir, ftsName));
+      server = new FtsServer(this, "fts", new FtsSubProcessStream(ftsDir, ftsName));
     else
       System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
 
     server.start();
+
+    // Install the meta data object
+
+    FtsRemoteMetaData.install(this);
+
   }
 
   /** makeFtsObject do not create an object, but just assign an
@@ -85,7 +89,7 @@ public class Fts
      are available separately.
      */
 
-  static public FtsObject makeFtsObject(FtsObject parent, String className, String description)
+  public FtsObject makeFtsObject(FtsObject parent, String className, String description)
        throws FtsException
   {
     FtsObject obj;
@@ -118,7 +122,7 @@ public class Fts
      are available separately.
      */
 
-  static public FtsObject makeFtsObject(FtsObject parent, String description) throws FtsException
+  public FtsObject makeFtsObject(FtsObject parent, String description) throws FtsException
   {
     FtsObject obj;
     int id;
@@ -144,7 +148,7 @@ public class Fts
 
   /** makeFtsConnection work as makeFtsObject, but for connections */
 
-  static public FtsConnection makeFtsConnection(FtsObject from, int outlet, FtsObject to, int inlet)
+  public FtsConnection makeFtsConnection(FtsObject from, int outlet, FtsObject to, int inlet)
        throws FtsException
   {
     FtsConnection conn;
@@ -175,7 +179,7 @@ public class Fts
 
 
   /**
-   * Static function to redefine a FtsObject.
+   * function to redefine a FtsObject.
    * It is static, for
    * similarity with the constructors, because it can produce 
    * a different Java object from the argument, so logically they are not method of the object.
@@ -191,7 +195,7 @@ public class Fts
    * is the same
    */
 
-  public static FtsObject redefineFtsObject(FtsObject oldObject, String description) throws FtsException
+  public  FtsObject redefineFtsObject(FtsObject oldObject, String description) throws FtsException
   {
     Object listener;
     FtsObject newObject;
@@ -212,7 +216,7 @@ public class Fts
 
     // Remove the object from the selection if there
 
-    Fts.getSelection().removeObject(oldObject);
+    getSelection().removeObject(oldObject);
 
     // Get parent and ins/outs
 
@@ -252,7 +256,7 @@ public class Fts
 
   /* Data objects */
 
-  public static FtsRemoteData newRemoteData(String name, Object args[])
+  public  FtsRemoteData newRemoteData(String name, Object args[])
   {
     return FtsRemoteMetaData.getRemoteMetaData().newInstance(name, args);
   }
@@ -263,9 +267,9 @@ public class Fts
    * Get the unique FtsSelect object for this container
    */
 
-  private static FtsSelection selection = null;
+  private  FtsSelection selection = null;
 
-  static public final FtsSelection getSelection()
+  public final FtsSelection getSelection()
   {
     
     if (selection == null)
@@ -284,58 +288,25 @@ public class Fts
   }
 
 
-  /* handling of user/password */
-
-  private static String userName;
-  private static String userPassword;
-
-  static public void setUserName(String name)
-  {
-    userName = name;
-  }
-
-  static public void setUserPassword(String password)
-  {
-    userPassword = password;
-  }
-
-  static String getUserName()
-  {
-    return userName;
-  }
-
-  static String getUserPassword()
-  {
-    return userPassword;
-  }
-
-
-  // Handling of non real-time mode
-  private static boolean noRealTime = false;
-
-  public static void setNoRealTime( boolean noRealTime)
-  {
-    Fts.noRealTime = noRealTime;
-  }
-
-  public static boolean getNoRealTime()
-  {
-    return noRealTime;
-  }
-
-
   /* Sync command */
 
-  static public void sync()
+  public void sync()
   {
-    getServer().syncToFts();
+    server.syncToFts();
+  }
+
+  /* Stop command */
+
+  public void stop()
+  {
+    server.stop();
   }
 
   /* The RemoteMetaData class data base */
 
-  static private Hashtable remoteDataClassTable = new Hashtable();
+  private static Hashtable remoteDataClassTable = new Hashtable();
 
-  static public void registerRemoteDataClass(String name, Class dataClass)
+  public static void registerRemoteDataClass(String name, Class dataClass)
   {
     remoteDataClassTable.put(name, dataClass);
   }
@@ -347,38 +318,30 @@ public class Fts
 
   /* Get the root object */
 
-  public static FtsObject getRootObject()
+  public  FtsObject getRootObject()
   {
     return server.getRootObject();
   }
 
-  /* Ask FTS to recompute error objects.
-     Error objects actually need to be recomputed only 
-     after changing the environment */
-
-  public static void recomputeErrorObjects()
-  {
-    server.sendRecomputeErrorObjects();
-  }
 
   /* New Data listener support: listeners are installed on an object;
      only one listener for object.
    */
 
-  static private Hashtable newDataListeners = new Hashtable();
+  private Hashtable newDataListeners = new Hashtable();
 
 
-  static public void addNewDataListenerOn(FtsNewDataListener listener, FtsObject obj)
+  public void addNewDataListenerOn(FtsNewDataListener listener, FtsObject obj)
   {
     newDataListeners.put(obj, listener);
   }
 
-  static public void removeNewDataListenerOn(FtsObject obj)
+  public void removeNewDataListenerOn(FtsObject obj)
   {
     newDataListeners.remove(obj);
   }
 
-  static void fireNewDataListenerOn(FtsObject obj, MaxData data)
+  void fireNewDataListenerOn(FtsObject obj, MaxData data)
   {
     FtsNewDataListener listener;
 
@@ -391,14 +354,14 @@ public class Fts
   /* Utility function: get a Data that is a value of an object property,
      and call and editor on it; but do it asynchroniously;
      the asynchronicity is actually in two places:
-     1- to avoid calling Fts.sync, put a property handler on the wished property.
+     1- to avoid calling sync, put a property handler on the wished property.
 
      2- Once the property handler will be called by the input thread, a Runnable
 	starting the editor will be posted using invokeLater, so it will be
 	executed in the AWT thread.
     */
 
-  static class DelayedEditPropertyHandler implements FtsNewDataListener
+  class DelayedEditPropertyHandler implements FtsNewDataListener
   {
     MaxDataEditorReadyListener listener;
     Object where;
@@ -445,32 +408,32 @@ public class Fts
       else
 	listener.editorReady(null);
 
-      Fts.removeNewDataListenerOn(obj);
+      removeNewDataListenerOn(obj);
     }
   }
 
-  public static void editPropertyValue(FtsObject obj, MaxDataEditorReadyListener listener)
+  public  void editPropertyValue(FtsObject obj, MaxDataEditorReadyListener listener)
   {
-    Fts.addNewDataListenerOn(new DelayedEditPropertyHandler(listener), obj);
+    addNewDataListenerOn(new DelayedEditPropertyHandler(listener), obj);
     obj.updateData();
   }
 
 
-  public static void editPropertyValue(FtsObject obj, Object where,
-				       MaxDataEditorReadyListener listener)
+  public  void editPropertyValue(FtsObject obj, Object where,
+				 MaxDataEditorReadyListener listener)
   {
-    Fts.addNewDataListenerOn(new DelayedEditPropertyHandler(listener, where), obj);
+    addNewDataListenerOn(new DelayedEditPropertyHandler(listener, where), obj);
     obj.updateData();
   }
 
   /* Get the Fts Dsp Controller */ 
 
-  static FtsDspControl dspController = null;
+  FtsDspControl dspController = null;
 
-  static public FtsDspControl getDspController()
+  public FtsDspControl getDspController()
   {
     if (dspController == null)
-      dspController = (FtsDspControl) Fts.newRemoteData("dspcontrol_data", null);
+      dspController = (FtsDspControl) newRemoteData("dspcontrol_data", null);
     
     return dspController;
   }
@@ -480,19 +443,19 @@ public class Fts
    * fired.
    */
 
-  static MaxVector editListeners = new MaxVector();
+  MaxVector editListeners = new MaxVector();
 
-  public static void addEditListener(FtsEditListener listener)
+  public  void addEditListener(FtsEditListener listener)
   {
     editListeners.addElement(listener);
   }
 
-  public static void removeEditListener(FtsEditListener listener)
+  public  void removeEditListener(FtsEditListener listener)
   {
     editListeners.removeElement(listener);
   }
 
-  public static void fireObjectRemoved(FtsObject object)
+  public  void fireObjectRemoved(FtsObject object)
   {
     for (int i = 0; i < editListeners.size(); i++)
       ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
@@ -507,8 +470,89 @@ public class Fts
     patcherType = type;
   }
 
-  static public MaxDocumentType  getPatcherDocumentType()
+  public static MaxDocumentType  getPatcherDocumentType()
   {
     return patcherType;
+  }
+
+  /* Load a binary jmax file, and return its root patcher */
+
+  public FtsObject loadJMaxFile(File file)
+  {
+    int id;
+
+    id = server.getNewObjectId();
+    server.loadPatcherBmax(server.getRootObject(), id, file.getAbsolutePath());
+    server.sendDownloadObject(id);
+    server.syncToFts();    
+
+    return server.getObjectByFtsId(id);
+  }
+
+  /** Save the given patcher in the given file */
+
+  public void saveJMaxFile(FtsObject patcher, File file)
+  {
+    server.savePatcherBmax(patcher, file.getAbsolutePath());
+  }
+
+  /* Load a .pat Max 0.26 file, and return its root patcher */
+
+  public FtsObject loadPatFile(File file)
+  {
+    int id;
+
+    // Build an empty patcher son of root.
+
+    id = server.getNewObjectId();
+
+    // ask fts to load the file within this 
+    // patcher, using a dedicated message
+
+    server.loadPatcherDpat(server.getRootObject(), id, file.getAbsolutePath());
+    server.sendDownloadObject(id);
+    server.syncToFts();
+    return server.getObjectByFtsId(id);
+  }
+
+  // Support for configuration
+  
+  public void abstractionDeclare(String name, String filename)
+  {
+    server.sendAbstractionDeclare(name, filename);
+  }
+
+  public void abstractionPathDeclare(String path)
+  {
+    server.sendAbstractionDeclarePath(path);
+  }
+
+  public void templateDeclare(String name, String filename)
+  {
+    server.sendTemplateDeclare(name, filename);
+    server.sendRecomputeErrorObjects();
+  }
+
+  public void templatePathDeclare(String path)
+  {
+    server.sendTemplateDeclarePath(path);
+    server.sendRecomputeErrorObjects();
+  }
+
+  public void ucsCommand(MaxVector args)
+  {
+    server.ucsMessage(args);
+  }
+
+  // Update group listener
+
+  public void addUpdateGroupListener(FtsUpdateGroupListener listener)
+  {
+    server.addUpdateGroupListener(listener);
+  }
+
+  public void removeUpdateGroupListener(FtsUpdateGroupListener listener)
+  {
+    server.removeUpdateGroupListener(listener);
   }
 }

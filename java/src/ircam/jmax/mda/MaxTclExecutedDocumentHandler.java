@@ -26,6 +26,8 @@ import ircam.jmax.fts.*;
  * 
  * A TCL Document file is a file that start with the jmax command
  * at the *beginning* of the first line.
+ * 
+ * ^^^^ As other tcl scripting related code, do not work with multiservers.
  */
 
 public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
@@ -50,7 +52,7 @@ public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
 
   /** Make the real document */
 
-  protected MaxDocument loadDocument(File file) throws MaxDocumentException
+  protected MaxDocument loadDocument(MaxContext context, File file) throws MaxDocumentException
   {
     Interp interp = MaxApplication.getTclInterp();
 
@@ -63,14 +65,10 @@ public class MaxTclExecutedDocumentHandler extends MaxDocumentHandler
 	throw new MaxDocumentException("Tcl error: " + interp.getResult());
       }
 
-    MaxDocument document = (MaxDocument) new MaxTclExecutedDocument();
+    MaxDocument document = (MaxDocument) new MaxTclExecutedDocument(context);
 
     document.setDocumentFile(file);
     document.setDocumentHandler(this);
-
-    // Ask FTS to recompute the error objects if needed
-
-    Fts.recomputeErrorObjects();
 
     return document;
   }

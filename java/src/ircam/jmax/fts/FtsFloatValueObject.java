@@ -33,15 +33,15 @@ public class FtsFloatValueObject extends FtsObject
    * Create a FtsObject object;
    */
 
-  public FtsFloatValueObject(FtsObject parent, String className, String description, int objId)
+  public FtsFloatValueObject(Fts fts, FtsObject parent, String className, String description, int objId)
   {
-    super(parent, className, null, description, objId);
+    super(fts, parent, className, null, description, objId);
   }
 
   public void setValue(float value)
   {
     this.value = value;
-    Fts.getServer().putObjectProperty(this, "value", value);
+    fts.getServer().putObjectProperty(this, "value", value);
   }
 
   public float getValue()
@@ -51,7 +51,7 @@ public class FtsFloatValueObject extends FtsObject
 
   public void updateValue()
   {
-    Fts.getServer().askObjectProperty(this, "value");
+    fts.getServer().askObjectProperty(this, "value");
   }
        
   /* Over write the localPut message to handle value changes;

@@ -18,6 +18,10 @@ import ircam.jmax.fts.*;
 
 /** The console module; the initModule function is called at init time
  *  by jmax, and install module related things
+ *
+ * ^^^^ We have a nice problem here about the multi-server; how the tool finder
+ * ^^^^ find about the server to use ? This should be solved in the UI framework
+ * ^^^^ for multiserver jMax.
  */
 
 public class ControlModule
@@ -32,7 +36,7 @@ public class ControlModule
 
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
       public String getToolName() { return "Control Panel";}
-      public void open() { ControlPanelFrame.open();}
+      public void open() { ControlPanelFrame.open(MaxApplication.getFts());}
     });
   }
 }

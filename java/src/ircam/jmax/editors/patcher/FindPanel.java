@@ -12,30 +12,40 @@ import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.widgets.*;
 
-public class FindPanel extends JFrame {
+// ^^^^ Same thing as for the control panel; the find panel itself is
+// ^^^^ ready to be used with a specific server, but it is not clear
+// ^^^^ how to make the binding; static, dynamic, in parallel on all the server ?
+// ^^^^ The is a big user environment question to be solved before the technical one.
+
+
+public class FindPanel extends JFrame
+{
+  Fts fts;
 
   static void registerFindPanel()
   {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
       public String getToolName() { return "Find Panel";}
-      public void open() { FindPanel.open();}
+      public void open() { FindPanel.open(MaxApplication.getFts());}
     });
   }
 
-  public static FindPanel open()
+  public static FindPanel open(Fts fts)
   {
     if (findPanel == null)
-      findPanel = new FindPanel();
+      findPanel = new FindPanel(fts);
 
     findPanel.setVisible(true);
 
     return findPanel;
   }
 
-  protected FindPanel()
+  protected FindPanel(Fts f)
   {
     super( "Find Panel");
 
+    this.fts = f;
+    
     JPanel labelPanel = new JPanel();
 
     labelPanel.setBorder( new EmptyBorder( 15, 15, 15, 15));
@@ -80,7 +90,7 @@ public class FindPanel extends JFrame {
     pack();
     validate();
 
-    set = (FtsObjectSet) Fts.newRemoteData( "object_set_data", null);
+    set = (FtsObjectSet) fts.newRemoteData( "object_set_data", null);
     objectSetViewer.setModel( set.getListModel());
 
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
@@ -90,7 +100,7 @@ public class FindPanel extends JFrame {
 
 	  FindPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	  Fts.editPropertyValue(object.getParent(), object,
+	  fts.editPropertyValue(object.getParent(), object,
 				new MaxDataEditorReadyListener() {
 	    public void editorReady(MaxDataEditor editor)
 	      {	  FindPanel.this.setCursor(temp);}
@@ -113,7 +123,7 @@ public class FindPanel extends JFrame {
     query = textField.getText();
     args = new MaxVector();
     FtsParse.parseAtoms(query, args);
-    set.find(Fts.getRootObject(), args);
+    set.find(fts.getRootObject(), args);
     setCursor(temp);
   }
 
@@ -123,7 +133,7 @@ public class FindPanel extends JFrame {
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
     textField.setText("");
-    set.findErrors(Fts.getRootObject());
+    set.findErrors(fts.getRootObject());
     setCursor(temp);
   }
 

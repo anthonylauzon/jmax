@@ -265,14 +265,6 @@ _fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t 
   if (! obj->properties)
     obj->properties = fts_plist_new();
 
-  /* DEBUG */
-  if (fts_is_symbol(value) && (fts_symbol_name(fts_get_symbol(value)) == 0))
-    {
-      volatile char *p = (volatile char *)0;
-
-      fprintf(stderr, "BECCATO %s\n", p);
-    }
-  /* END DEBUG */
   fts_plist_put(obj->properties, property, value);
 }
 

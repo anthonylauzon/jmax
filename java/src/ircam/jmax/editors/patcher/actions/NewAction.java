@@ -23,7 +23,7 @@ public class NewAction extends MenuAction
     try
       {
 	frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	Fts.getPatcherDocumentType().newDocument().edit();
+	Fts.getPatcherDocumentType().newDocument(editor.getFts()).edit();
 	frame.setCursor(temp);
       }
     catch (MaxDocumentException ex)

@@ -102,6 +102,7 @@
 		     // by the C function; the stack is popped by one.
    */
 
+
 /* #define  VM_DEBUG  */
 
 #ifdef DEBUG
@@ -332,7 +333,7 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 	    s  = symbol_table[GET_B(p)];
 
 #ifdef VM_DEBUG
-	    fprintf(stderr, "PUSH_SYM_B %s\n", fts_symbol_name(s));
+	    fprintf(stderr, "PUSH_SYM_B %d (%s)\n", GET_B(p), fts_symbol_name(s));
 #endif
 
 	    eval_tos--;

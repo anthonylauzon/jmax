@@ -24,6 +24,8 @@ import java.util.*;
 
 public class FtsConnection 
 {
+  Fts  fts; // the server this connection belong to.
+
   /** to protect against double deletion.
     temporary, waiting for a more event/based editor
     */
@@ -39,10 +41,12 @@ public class FtsConnection
 
   /** Create a FTS connection.  */
 
-  FtsConnection(FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
+  FtsConnection(Fts fts,
+		FtsPatcherData data, int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
     super();
-   
+
+    this.fts    = fts;
     this.id     = id;
     this.from   = from;
     this.outlet = outlet;
@@ -86,11 +90,11 @@ public class FtsConnection
 
     deleted = true;
 
-    Fts.getSelection().removeConnection(this);
+    fts.getSelection().removeConnection(this);
 
     from.setDirty();
 	
-    Fts.getServer().deleteConnection(this);
+    fts.getServer().deleteConnection(this);
   }
 
 

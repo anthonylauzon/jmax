@@ -39,9 +39,9 @@ public class FtsMessageObject extends FtsIntValueObject
    * Create a FtsObject object;
    */
 
-  public FtsMessageObject(FtsObject parent, String description, int objId)
+  public FtsMessageObject(Fts fts, FtsObject parent, String description, int objId)
   {
-    super(parent, "messbox", description, objId);
+    super(fts, parent, "messbox", description, objId);
 
     ninlets = 1;
     noutlets = 1;
@@ -52,7 +52,7 @@ public class FtsMessageObject extends FtsIntValueObject
   public void setMessage(String message)
   {
     this.message = message;
-    Fts.getServer().sendSetMessage(this, message);
+    fts.getServer().sendSetMessage(this, message);
     setDirty();
   }
 

@@ -88,13 +88,19 @@ public class FtsObjectSet extends FtsRemoteData
 
     list = new MaxVector();
     model = new ObjectSetListModel();
+  }
+  
+  public void setFts(Fts fts)
+  {
+    super.setFts(fts);
+
     editListener = new ObjectSetEditListener();
-    Fts.addEditListener(editListener);
+    fts.addEditListener(editListener);
   }
 
   public void release()
   {
-    Fts.removeEditListener(editListener);
+    fts.removeEditListener(editListener);
     super.release();
   }
   /** Get the vector size */
@@ -141,7 +147,7 @@ public class FtsObjectSet extends FtsRemoteData
     remoteCallAddArg(name);
     remoteCallEnd();
 
-    Fts.sync();
+    fts.sync();
   }
 
 

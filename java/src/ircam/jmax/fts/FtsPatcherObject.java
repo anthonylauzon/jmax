@@ -40,9 +40,9 @@ public class FtsPatcherObject extends FtsObject
    */
 
 
-  public FtsPatcherObject(FtsObject parent, String variableName, String description, int objId)
+  public FtsPatcherObject(Fts fts, FtsObject parent, String variableName, String description, int objId)
   {
-    super(parent, "jpatcher", variableName, description, objId);
+    super(fts, parent, "jpatcher", variableName, description, objId);
   }
 
 
@@ -53,8 +53,8 @@ public class FtsPatcherObject extends FtsObject
 
   public void redefinePatcher(String description)
   {
-    Fts.getServer().redefinePatcherObject(this, description);
-    Fts.sync();
+    fts.getServer().redefinePatcherObject(this, description);
+    fts.sync();
 
     this.description = description;
 

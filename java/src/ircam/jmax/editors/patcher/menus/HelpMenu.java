@@ -54,7 +54,7 @@ public class HelpMenu extends JMenu
 	item.addActionListener( new ActionListener() {
 	  public  void actionPerformed( ActionEvent e)
 	    {
-	      FtsHelpPatchTable.openHelpSummary( str);
+	      FtsHelpPatchTable.openHelpSummary(editor.getFts(), str);
 	    }
 	});
        }

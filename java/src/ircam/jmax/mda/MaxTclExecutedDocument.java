@@ -24,9 +24,9 @@ package ircam.jmax.mda;
 
 public class MaxTclExecutedDocument extends MaxDocument 
 {
-  public MaxTclExecutedDocument()
+  public MaxTclExecutedDocument(MaxContext context)
   {
-    super(Mda.getDocumentTypeByName(".tcl"));
+    super(context, Mda.getDocumentTypeByName(".tcl"));
   }
 }
 

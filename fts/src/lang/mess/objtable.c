@@ -21,7 +21,7 @@
 
    Only one client is supported.
 
-   The data structure is direct access table, adaptively resized 
+   The data structure is a direct access table, adaptively resized 
    when needed.
 
    The 0 id map by definition to the NULL pointer.

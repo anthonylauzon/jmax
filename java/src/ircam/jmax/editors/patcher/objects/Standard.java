@@ -52,7 +52,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
     try 
       {
 	ignoreError = false;
-	ftsObject = Fts.redefineFtsObject( ftsObject, text);
+	ftsObject = ftsObject.getFts().redefineFtsObject( ftsObject, text);
 
 	if (ftsObject.isError())
 	  {
@@ -71,7 +71,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public void editContent()
   {
     itsSketchPad.waiting();
-    Fts.editPropertyValue( ftsObject, new MaxDataEditorReadyListener() {
+    ftsObject.getFts().editPropertyValue( ftsObject, new MaxDataEditorReadyListener() {
       public void editorReady(MaxDataEditor editor)
 	{itsSketchPad.stopWaiting();}
     });

@@ -16,6 +16,8 @@ package ircam.jmax.fts;
 import java.io.*;
 import java.net.*;
 
+import ircam.jmax.*;
+
 /**
  * The socket connection.
  * Implement a specialed connection using a socket (server side)
@@ -38,6 +40,12 @@ class FtsSocketServerStream extends FtsStream
   FtsSocketServerStream(String host, String path, String ftsName)
   {
     super(host);
+
+    boolean realtime = false;
+
+    if (MaxApplication.getProperty("jmaxNoRealTime") != null)
+      realtime = MaxApplication.getProperty("jmaxNoRealTime").equals("true");
+
     this.host = host;
     this.path = path;
     this.ftsName = ftsName;
@@ -60,12 +68,12 @@ class FtsSocketServerStream extends FtsStream
       {
 	if (host.equals(InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = (path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
+	    command = (path + "/" + ftsName + ( realtime ? " -norealtime" : "")
 		       + " socket " + InetAddress.getLocalHost().getHostAddress() + ":" + port) ;
 	  }
 	else
 	  {
-	    command = ("rsh " + host + " " + path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
+	    command = ("rsh " + host + " " + path + "/" + ftsName + ( realtime ? " -norealtime" : "")
 		       + " socket " + InetAddress.getLocalHost().getHostAddress() + ":" + port) ;
 	  }
 

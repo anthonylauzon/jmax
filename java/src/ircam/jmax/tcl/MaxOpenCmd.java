@@ -12,6 +12,8 @@
 // 
 //
 
+// ^^^^ As all the other tcl commands, not work with multiserver.
+
 
 package ircam.jmax.tcl;
 
@@ -53,7 +55,7 @@ class MaxOpenCmd implements Command {
 	  {
 	    MaxDocument document;
 	    
-	    document = Mda.loadDocument(file);
+	    document = Mda.loadDocument(MaxApplication.getFts(), file);
 	    document.edit();
 	  }
 	catch (MaxDocumentException e)

@@ -11,6 +11,7 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
 package ircam.jmax.mda; 
 
 import java.util.*;
@@ -102,12 +103,14 @@ abstract public class MaxDocumentType
     return true;
   }
 
-  /** Create a new empty document of the type */
+  /** Create a new empty document of the type, in the given context */
 
-  abstract public MaxDocument newDocument();
+  abstract public MaxDocument newDocument(MaxContext context);
 
 
-  /** Create a new document for the given MaxData;
+  /**
+   * Create a new document for the given MaxData; the context is not passed,
+   * because MaxData probabily leave already in a context.
    */
 
   public MaxDocument newDocument(MaxData data) throws MaxDocumentException

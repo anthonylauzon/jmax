@@ -17,6 +17,7 @@ import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 /**
@@ -47,7 +48,7 @@ class FtsAbstractionCmd implements Command
 	name = argv[1].toString();
 	filename = argv[2].toString();
 
-	Fts.getServer().sendAbstractionDeclare(name, filename);
+	MaxApplication.getFts().abstractionDeclare(name, filename);
       }
     else
       {

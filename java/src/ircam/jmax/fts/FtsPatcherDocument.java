@@ -24,9 +24,9 @@ import ircam.jmax.mda.*;
 
 public class FtsPatcherDocument extends MaxDocument 
 {
-  public FtsPatcherDocument()
+  public FtsPatcherDocument(MaxContext context)
   {
-    super(Mda.getDocumentTypeByName("patcher"));
+    super(context, Mda.getDocumentTypeByName("patcher"));
   }
 
   public void setRootData(MaxData data)

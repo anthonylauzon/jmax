@@ -182,7 +182,7 @@ public class Mda
 
   /** Load an document from a given file) */
 
-  public static MaxDocument loadDocument(File file) throws MaxDocumentException
+  public static MaxDocument loadDocument(MaxContext context, File file) throws MaxDocumentException
   {
     MaxDocument newDocument;
     
@@ -197,7 +197,7 @@ public class Mda
 	    // It is the responsability of the document Handler
 	    // to properly set the file and handler in the document
 
-	    newDocument = documentHandler.loadDocument(file);
+	    newDocument = documentHandler.loadDocument(context, file);
 	    newDocument.setSaved(true);
 
 	    return newDocument;

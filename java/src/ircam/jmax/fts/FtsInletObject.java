@@ -37,9 +37,9 @@ public class FtsInletObject  extends FtsInOutletObject
    * Create a FtsInletObject object.
    */
   
-  public FtsInletObject(FtsObject parent, int position, int objId)
+  public FtsInletObject(Fts fts, FtsObject parent, int position, int objId)
   {
-    super(parent, "inlet", position, objId);
+    super(fts, parent, "inlet", position, objId);
 
     ninlets = 0;
     noutlets = 1;
@@ -50,7 +50,7 @@ public class FtsInletObject  extends FtsInOutletObject
   {
     super.setPosition(i);
 
-    Fts.getServer().repositionInletObject(this, i);
+    fts.getServer().repositionInletObject(this, i);
   }
 
   /** Get the number of inlets of the object 

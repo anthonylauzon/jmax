@@ -64,6 +64,8 @@ fts_symbol_t fts_s_load;
 fts_symbol_t fts_s_read;
 fts_symbol_t fts_s_write;
 fts_symbol_t fts_s_save_bmax;
+fts_symbol_t fts_s_redefining;
+fts_symbol_t fts_s_release;
 fts_symbol_t fts_s_comma;
 fts_symbol_t fts_s_quote;
 fts_symbol_t fts_s_dollar;
@@ -194,6 +196,8 @@ fts_predefine_symbols(void)
   fts_s_read       = fts_new_symbol("read");
   fts_s_write      = fts_new_symbol("write");
   fts_s_save_bmax  = fts_new_symbol("save_bmax");
+  fts_s_redefining = fts_new_symbol("redefining");
+  fts_s_release    = fts_new_symbol("release");
   fts_s_find       = fts_new_symbol("find");
   fts_s_find_errors = fts_new_symbol("find_errors");
   fts_s_find_friends = fts_new_symbol("find_friends");

@@ -159,7 +159,6 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
   else
     return &fts_InletOutOfRange;
 
-
   messtable = in->messlist;
 
   if ((in->nmess == 1) && (messtable[0]->tmess.symb == fts_s_anything))
@@ -442,6 +441,9 @@ fts_get_boolean_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int d
 
   return def;
 }
+
+
+
 
 
 

@@ -11,6 +11,10 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
+// ^^^^ Probabily the Control Frame should add a field with the
+// ^^^^ name of the server
+
 package ircam.jmax.editors.control;
 
 import java.util.*;
@@ -28,10 +32,10 @@ public class ControlPanelFrame extends JFrame
 {
   static ControlPanelFrame controlPanel = null;
 
-  public static ControlPanelFrame open()
+  public static ControlPanelFrame open(Fts fts)
   {
     if (controlPanel == null)
-      controlPanel = new ControlPanelFrame();
+      controlPanel = new ControlPanelFrame(fts);
 
     controlPanel.setVisible(true);
 
@@ -103,11 +107,11 @@ public class ControlPanelFrame extends JFrame
     }
   }
 
-  public ControlPanelFrame()
+  public ControlPanelFrame(Fts fts)
   {
     super( "Control Panel");
 
-    control = Fts.getDspController();
+    control = fts.getDspController();
 
     setSize( 300, 300);
     JPanel panel = new JPanel();

@@ -12,17 +12,21 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public class FindAction extends MenuAction
 {
-  public void doAction(ErmesSketchWindow editor)
+  ErmesSketchWindow editor;
+
+  public void doAction(ErmesSketchWindow e)
   {
+    editor = e;
+
     if (ErmesSelection.patcherSelection.isSingleton())
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    { 
-	      FindPanel.open().findFriends(object.getFtsObject());
+	      FindPanel.open(editor.getFts()).findFriends(object.getFtsObject());
 	    }});
       }
     else
-      FindPanel.open();
+      FindPanel.open(editor.getFts());
   }
 }

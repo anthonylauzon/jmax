@@ -28,7 +28,7 @@ public class OpenAction extends MenuAction
 	    MaxDocument document;
 
 	    frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	    document = Mda.loadDocument(file);
+	    document = Mda.loadDocument(editor.getFts(), file);
 	
 	    try
 	      {

@@ -26,13 +26,18 @@ import ircam.jmax.fts.*;
  * This class represent the environement where a patch is loaded.
  * For the moment, it provide very trivial experimental functionalities.
  * Actually this file should be somewhere else !!! not in mda package.
+ *
+ * ^^^^ This file do not work in the multiserver configuration, as everything
+ * ^^^^ connected to TCL; in order to have it working, we need to rewrite
+ * ^^^^ all the configuration code and in general all the tcl code in order
+ * ^^^^ to keep track of the server we are using.
  */
 
 public class MaxEnv
 {
   static MaxVector loadedEnvs = new MaxVector();
 
-  static public void loadEnvFileFor(File file)
+  static public void loadEnvFileFor(MaxContext context, File file)
   {
     String dir;
     String name;
@@ -49,17 +54,17 @@ public class MaxEnv
     envFile = new File(dir, name);
 
     if (envFile.exists() && envFile.canRead())
-      loadEnvFile(envFile);
+      loadEnvFile(context, envFile);
     else
       {
 	envFile = new File(dir, "project.env");
 
 	if (envFile.exists() && envFile.canRead())
-	  loadEnvFile(envFile);
+	  loadEnvFile(context, envFile);
       }
   }
 
-  static private void loadEnvFile(File file)
+  static private void loadEnvFile(MaxContext ignore, File file)
   {
     int i;
 
@@ -73,13 +78,20 @@ public class MaxEnv
 
     try
       {
+	String dir;
 	MaxVector command = new MaxVector();
+
+
+	dir = file.getParent();
+
+	if (dir == null)
+	  dir = System.getProperty("user.dir");
 
 	command.addElement("set");
 	command.addElement("projectdir");
-	command.addElement(file.getParent());
+	command.addElement(dir);
 
-	Fts.getServer().ucsMessage(command);
+	MaxApplication.getFts().ucsCommand(command);
 	MaxApplication.getTclInterp().eval("sourceFile " + file.getPath());
 
       }

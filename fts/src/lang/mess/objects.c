@@ -32,7 +32,6 @@ extern void fts_client_upload_object(fts_object_t *obj);
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 static void fts_object_send_kernel_properties(fts_object_t *obj);
 static void fts_object_reset(fts_object_t *obj);
-static void fts_object_tell_deleted(fts_object_t *obj);
 static void fts_object_free(fts_object_t *obj, int release);
 static void fts_object_delete_no_release(fts_object_t *obj);
 
@@ -156,7 +155,7 @@ static void fts_object_assign_property(fts_symbol_t name, fts_atom_t *value, voi
 {
   fts_object_t *obj = (fts_object_t *)data;
 
-  fts_object_put_prop(obj, name, value);
+  fts_object_put_prop(obj, name, value); 
 }
 
 /*
@@ -477,7 +476,6 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
   {
     fts_atom_t a;
 
-
     if (fts_object_is_error(obj))
       fts_set_int(&a, 1);
     else
@@ -518,8 +516,6 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
     obj = (fts_object_t *) fts_patcher_redefine((fts_patcher_t *) old, old->argc, old->argv);
   else
     {
-      /* @@@ Later, here, handle the trasfer of a patcher data between two templates !! */
-
       /* If we have an object with data, data must be released,
 	 because the object will be deleted */
 
@@ -544,6 +540,7 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
 
 fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
 {
+  int do_redefining;
   int do_client;
   fts_symbol_t  var;
   fts_object_t  *new;
@@ -582,8 +579,21 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
      like the name for globally named objects like table */
 
   fts_object_reset(old);
-  fts_object_tell_deleted(old);
 
+  /* If the object define a fts_s_release method, send this now,
+     and a real delete after the redefining message; otherwise,
+     send a delete now and nothing else */
+
+  if (fts_send_message(old, fts_SystemInlet, fts_s_release, 0, 0) == fts_Success)
+    {
+      do_redefining = 1;
+    }
+  else
+    {
+      fts_send_message(old, fts_SystemInlet, fts_s_delete, 0, 0);
+      do_redefining = 0;
+    }
+	    
   /* Make the new object  */
 
   new = fts_object_new(fts_object_get_patcher(old), ac, at);
@@ -608,6 +618,25 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
      order to move the connections) */
      
   fts_object_move_properties(old, new);
+
+  /* If the object define the release method, we tell the new object
+    about the old one, so that for example persistent data can be
+    moved from one object to the other; we do it by sending a
+    fts_s_redefining message on the system inlet to the new object, as
+    the old one as first argument; errors are of course ignored, so
+    the method is not mandatory */
+
+  if (do_redefining)
+    {
+      fts_atom_t a;
+
+      fts_set_object(&a, old);
+      fts_send_message(new, fts_SystemInlet, fts_s_redefining, 1, &a);
+
+      /* Then, finally really delete the old one */
+
+      fts_send_message(old, fts_SystemInlet, fts_s_delete, 0, 0);
+    }
 
   if (do_client)
     fts_client_upload_object(new);
@@ -750,7 +779,7 @@ void fts_object_set_id(fts_object_t *obj, int id)
 void fts_object_delete(fts_object_t *obj)
 {
   fts_object_reset(obj);
-  fts_object_tell_deleted(obj);
+  fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
   fts_object_reset_changed(obj);
   fts_object_free(obj, 1);
 }
@@ -758,7 +787,7 @@ void fts_object_delete(fts_object_t *obj)
 static void fts_object_delete_no_release(fts_object_t *obj)
 {
   fts_object_reset(obj);
-  fts_object_tell_deleted(obj);
+  fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
   fts_object_reset_changed(obj);
   fts_object_free(obj, 0);
 }
@@ -784,15 +813,6 @@ static void fts_object_reset(fts_object_t *obj)
     fts_binding_remove_user(obj->var_refs->var, obj);
 }
 
-
-/* Delete phase 2: tell the object he is going to be deleted */
-     
-static void fts_object_tell_deleted(fts_object_t *obj)
-{
-  /* tell the object we are going to delete him */
-
-  fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
-}
 
 /* Delete phase 3: actually free the object and its system structures;
    if the release flag is set to one, release the client representation

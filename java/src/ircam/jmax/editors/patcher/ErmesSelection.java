@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import javax.swing.*; 
 
-
+import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
@@ -17,6 +17,8 @@ import ircam.jmax.editors.patcher.objects.*;
 // The Class implement all the operations availables on the selection.
 //
 
+// ^^^^ Since the selection is a single object, this will not work
+// ^^^^ on a multi server implementation; to be redone, in this case.
 
 public class ErmesSelection implements Transferable
 {
@@ -31,7 +33,7 @@ public class ErmesSelection implements Transferable
 
   public Object getTransferData(DataFlavor flavor)
   {
-    return Fts.getSelection();
+    return MaxApplication.getFts().getSelection();
   } 
 
   public DataFlavor[]  getTransferDataFlavors() 
@@ -61,7 +63,7 @@ public class ErmesSelection implements Transferable
     if (! objects.contains( object))
       {
 	objects.addElement( object);
-	Fts.getSelection().addObject( object.getFtsObject());
+	MaxApplication.getFts().getSelection().addObject( object.getFtsObject());
 	object.setSelected(true);
       }
   }
@@ -74,7 +76,7 @@ public class ErmesSelection implements Transferable
     if (! connections.contains( connection))
       {
 	connections.addElement( connection);
-	Fts.getSelection().addConnection( connection.getFtsConnection());
+	MaxApplication.getFts().getSelection().addConnection( connection.getFtsConnection());
 	connection.setSelected(true);
       }
   }
@@ -85,7 +87,7 @@ public class ErmesSelection implements Transferable
       {
 	object.setSelected(false);
 	objects.removeElement( object);
-	Fts.getSelection().removeObject( object.getFtsObject());
+	MaxApplication.getFts().getSelection().removeObject( object.getFtsObject());
       }
   }
 
@@ -95,7 +97,7 @@ public class ErmesSelection implements Transferable
       {
 	connection.setSelected(false);
 	connections.removeElement( connection);
-	Fts.getSelection().removeConnection( connection.getFtsConnection());
+	MaxApplication.getFts().getSelection().removeConnection( connection.getFtsConnection());
       }
   }
 
@@ -130,7 +132,7 @@ public class ErmesSelection implements Transferable
 
     objects.removeAllElements();
     connections.removeAllElements();
-    Fts.getSelection().clean();
+    MaxApplication.getFts().getSelection().clean();
   }
 
   public void redraw() 
@@ -203,7 +205,7 @@ public class ErmesSelection implements Transferable
 
     objects.removeAllElements();
     connections.removeAllElements();
-    Fts.getSelection().clean();
+    MaxApplication.getFts().getSelection().clean();
 
     if (owner != null)
       owner.getDisplayList().reassignLayers();

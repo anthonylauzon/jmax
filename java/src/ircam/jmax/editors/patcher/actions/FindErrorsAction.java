@@ -13,6 +13,6 @@ public class FindErrorsAction extends MenuAction
 {
   public void doAction(ErmesSketchWindow editor)
   {
-    FindPanel.open().findErrors();
+    FindPanel.open(editor.getFts()).findErrors();
   }
 }

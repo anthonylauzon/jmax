@@ -39,10 +39,10 @@ class DragReverseConnectInteraction extends Interaction
 	FtsConnection fc;
 	GraphicConnection connection;
 
-	fc = Fts.makeFtsConnection(src.getFtsObject(),
-				   outlet, 
-				   dst.getFtsObject(),
-				   inlet);
+	fc = editor.getFts().makeFtsConnection(src.getFtsObject(),
+					       outlet, 
+					       dst.getFtsObject(),
+					       inlet);
 		    
 	connection = new GraphicConnection(editor,
 					 src,

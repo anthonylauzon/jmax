@@ -507,7 +507,7 @@ abstract public class FtsStream
   public final FtsRemoteData getNextDataArgument()
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
-    return FtsRemoteDataID.get(getNextIntArgument());
+    return server.getRemoteTable().get(getNextIntArgument());
   }
 
 

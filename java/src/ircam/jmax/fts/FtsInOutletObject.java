@@ -39,9 +39,9 @@ public class FtsInOutletObject  extends FtsObject
    * Create a FtsInOutletObject object.
    */
   
-  public FtsInOutletObject(FtsObject parent, String className, int position, int objId)
+  public FtsInOutletObject(Fts fts, FtsObject parent, String className, int position, int objId)
   {
-    super(parent, className, null, className + " " + position, objId);
+    super(fts, parent, className, null, className + " " + position, objId);
 
     this.position = position;
   }

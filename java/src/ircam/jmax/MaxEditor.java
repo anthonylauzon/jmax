@@ -11,6 +11,10 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
+// ^^^^ This class, nested class New something, is not compatible
+// ^^^^ With the multiserver; anyway, this class should just go away.
+
 package ircam.jmax;
 
 import java.awt.*;
@@ -231,7 +235,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
       try
 	{
 	  setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	  document = type.newDocument();
+	  document = type.newDocument(MaxApplication.getFts());
 	  document.edit();
 	  setCursor(temp);
 	}
@@ -481,7 +485,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	    MaxDocument document;
 
 	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	    document = Mda.loadDocument(file);
+	    document = Mda.loadDocument(MaxApplication.getFts(), file);
 	
 	    try
 	      {

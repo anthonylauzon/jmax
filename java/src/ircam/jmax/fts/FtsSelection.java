@@ -45,9 +45,9 @@ public class FtsSelection  extends FtsObject
    * Create a Fts selection;
    */
 
-  protected  FtsSelection(FtsObject parent, String className, String description, int objId)
+  protected FtsSelection(Fts fts, FtsObject parent, String className, String description, int objId)
   {
-    super(parent, className, null, description, objId);
+    super(fts, parent, className, null, description, objId);
   }
 
   /** Add an object to this container  */
@@ -56,7 +56,7 @@ public class FtsSelection  extends FtsObject
   {
     objects.addElement(obj);
 
-    Fts.getServer().sendObjectMessage(this, -1, "add_object", obj);
+    fts.getServer().sendObjectMessage(this, -1, "add_object", obj);
   }
 
   /** Remove an object from this container. */
@@ -66,7 +66,7 @@ public class FtsSelection  extends FtsObject
     if (objects.contains(obj))
       {
 	objects.removeElement(obj);
-	Fts.getServer().sendObjectMessage(this, -1, "remove_object", obj);
+	fts.getServer().sendObjectMessage(this, -1, "remove_object", obj);
       }
   }
 
@@ -83,7 +83,7 @@ public class FtsSelection  extends FtsObject
   {
     connections.addElement(obj);
 
-    Fts.getServer().sendObjectMessage(this, -1, "add_connection", obj);
+    fts.getServer().sendObjectMessage(this, -1, "add_connection", obj);
   }
 
   /** Remove an connection from this container. */
@@ -93,7 +93,7 @@ public class FtsSelection  extends FtsObject
     if (connections.contains(obj))
       {
 	connections.removeElement(obj);
-	Fts.getServer().sendObjectMessage(this, -1, "remove_connection", obj);
+	fts.getServer().sendObjectMessage(this, -1, "remove_connection", obj);
       }
   }
 

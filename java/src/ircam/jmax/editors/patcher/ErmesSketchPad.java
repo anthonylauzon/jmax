@@ -79,6 +79,14 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   }
 
   ErmesSketchWindow itsSketchWindow;
+
+  private Fts fts;
+
+  public Fts getFts()
+  {
+    return fts;
+  }
+
   FtsObject itsPatcher;
 
   public FtsObject getFtsPatcher()
@@ -262,7 +270,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   //	CONSTRUCTOR
   //--------------------------------------------------------
 
-  ErmesSketchPad( ErmesSketchWindow theSketchWindow, FtsPatcherData thePatcherData) 
+  ErmesSketchPad(Fts fts, ErmesSketchWindow theSketchWindow, FtsPatcherData thePatcherData) 
   {
     super();
 
@@ -270,11 +278,12 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
     // Setting the local variables
 
+    this.fts  = fts;
     itsSketchWindow = theSketchWindow;
     itsPatcherData  = thePatcherData;
     itsPatcher      = thePatcherData.getContainerObject(); // ???
 
-    Fts.getServer().addUpdateGroupListener( this);
+    fts.addUpdateGroupListener( this);
 
     // Get the defaultFontName and Size
 
@@ -463,7 +472,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
     try
       {
-	fo = Fts.makeFtsObject( itsPatcher, description);
+	fo = fts.makeFtsObject( itsPatcher, description);
 
 	fo.setX( x);
 	fo.setY( y);
@@ -585,7 +594,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
 
   void cleanAll()
   {
-    Fts.getServer().removeUpdateGroupListener( this);
+    fts.removeUpdateGroupListener( this);
 
     engine.dispose();
 

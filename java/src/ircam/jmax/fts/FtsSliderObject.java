@@ -34,22 +34,22 @@ public class FtsSliderObject extends FtsIntValueObject
    * Create a FtsObject object;
    */
 
-  public FtsSliderObject(FtsObject parent, String description, int objId)
+  public FtsSliderObject(Fts fts, FtsObject parent, String description, int objId)
   {
-    super(parent, "slider", description, objId);
+    super(fts, parent, "slider", description, objId);
   }
 
 
   public void setMinValue(int value)
   {
     minValue = value;
-    Fts.getServer().putObjectProperty(this, "minValue", minValue);
+    fts.getServer().putObjectProperty(this, "minValue", minValue);
   }
 
   public void setMaxValue(int value)
   {
     maxValue = value;
-    Fts.getServer().putObjectProperty(this, "maxValue", maxValue);
+    fts.getServer().putObjectProperty(this, "maxValue", maxValue);
   }
 
   public int  getMinValue()

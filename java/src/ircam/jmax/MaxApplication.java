@@ -11,6 +11,10 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
+// MaxApplication.getProperty should disappear, and properties stored in the system
+// properties, that can *also* be loaded from a file.
+
 package ircam.jmax; 
 
 import java.awt.*;
@@ -45,6 +49,20 @@ import tcl.lang.*;
 
 public class MaxApplication extends Object
 {
+  // The global server
+
+  static Fts fts;
+
+  public static Fts getFts()
+  {
+    return fts;
+  }
+
+  public static void setFts(Fts s)
+  {
+    fts = s;
+  }
+
   // public static Clipboard systemClipboard = new Clipboard("system"); 
 
   // (em 13-01-99)  in order to use the real system clipboard
@@ -266,12 +284,6 @@ public class MaxApplication extends Object
 
     // Get optional username and password
 
-    Fts.setUserName((String) jmaxProperties.get("jmaxUserName"));
-    Fts.setUserPassword((String) jmaxProperties.get("jmaxUserPassword"));
-
-    Boolean noRealTime = new Boolean( (String)jmaxProperties.get( "jmaxNoRealTime"));
-    Fts.setNoRealTime( noRealTime.booleanValue());
-
     itsHookTable = new MaxWhenHookTable(); 
 
     ircam.jmax.utils.Platform.setValues();
@@ -322,7 +334,7 @@ public class MaxApplication extends Object
     
     //if there were no connection statements in startup.tcl, ask the user
     
-    if (Fts.getServer() == null)
+    if (fts == null)
       {
 	System.err.println("No Fts Server Specified");
 	return;
@@ -342,7 +354,7 @@ public class MaxApplication extends Object
 	
 	try
 	  {
-	    document = Mda.loadDocument(file);
+	    document = Mda.loadDocument(fts, file);
 	  }
 	catch (MaxDocumentException e)
 	  {
@@ -526,8 +538,8 @@ public class MaxApplication extends Object
 	MaxWindowManager.getTopFrame().dispose();
       }
 
-    if (Fts.getServer() != null)
-      Fts.getServer().stop();
+    if (fts != null)
+      fts.stop();
 
     Runtime.getRuntime().exit(0);
   }

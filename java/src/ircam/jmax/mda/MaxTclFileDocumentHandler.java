@@ -11,6 +11,10 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+// ^^^^ The loadDocument method should be changed to take in accout
+// ^^^^ the loading context (the Fts instance); usual scripting and multiserver
+// ^^^^ problem.
+
 package ircam.jmax.mda; 
 
 import java.io.*;
@@ -70,7 +74,7 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
 
   /** Make the real document */
 
-   protected MaxDocument loadDocument(File file) throws MaxDocumentException
+   protected MaxDocument loadDocument(MaxContext context, File file) throws MaxDocumentException
   {
     Interp interp = MaxApplication.getTclInterp();
 

@@ -199,9 +199,6 @@ fts_connection_t *fts_connection_new(int id, fts_object_t *out, int woutlet, fts
 }
 
 
-/* @@@ If the connection have an ID, we should inform the 
-   @@@ client that the connection has been deleted,
-   */
 
 static void fts_object_do_disconnect(fts_connection_t *conn, int do_client)
 { 

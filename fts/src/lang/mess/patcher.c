@@ -622,7 +622,7 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	}
     }
 
-  /* First, do the recursive calls  */
+  /* Then, do the recursive calls  */
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     {
@@ -634,7 +634,7 @@ patcher_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 /* 
-   The find engines
+   The find errors engines
    */
 
 static void
@@ -664,7 +664,7 @@ patcher_find_errors(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	}
       }
 
-  /* First, do the recursive calls  */
+  /* Last, do the recursive calls  */
 
   for (p = this->objects; p ; p = p->next_in_patcher)
     {
@@ -818,7 +818,6 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_name);
   fts_object_property_changed(o, fts_s_patcher_type);
 }
 
@@ -843,17 +842,6 @@ static void patcher_get_data(fts_daemon_action_t action, fts_object_t *obj,
     fts_set_void(value);
 }
 
-
-/* Daemon to get the name property */
-
-static void patcher_get_name(fts_daemon_action_t action, fts_object_t *obj,
-			     fts_symbol_t property, fts_atom_t *value)
-{
-  if (obj->varname)
-    fts_set_symbol(value, obj->varname);
-  else
-    fts_set_void(value);
-}
 
 /* Daemon to get the patcher_type property */
 
@@ -939,7 +927,6 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* daemon for properties */
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_data, patcher_get_data);
-  fts_class_add_daemon(cl, obj_property_get, fts_s_name, patcher_get_name);
   fts_class_add_daemon(cl, obj_property_get, fts_s_patcher_type, patcher_get_patcher_type);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, patcher_get_state);
 
@@ -1052,7 +1039,6 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 
 	      if (obj->id != FTS_NO_ID)
 		{
-		  fts_object_property_changed(obj, fts_s_name);
 		  fts_object_property_changed(obj, fts_s_error);
 		  fts_object_property_changed(obj, fts_s_error_description);
 		}
@@ -1148,7 +1134,6 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 
   if (obj->id != FTS_NO_ID)
     {
-      fts_object_property_changed(obj, fts_s_name);
       fts_object_property_changed(obj, fts_s_error);
       fts_object_property_changed(obj, fts_s_error_description);
     }

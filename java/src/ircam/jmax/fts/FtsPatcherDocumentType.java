@@ -33,23 +33,29 @@ public class FtsPatcherDocumentType extends MaxDocumentType
    * corresponding to an empty, new, patcher
    */
 
-  public MaxDocument newDocument()
+  public MaxDocument newDocument(MaxContext context)
   {
+    // Should give an error !!
+
+    if (! (context instanceof Fts))
+      return null;
+
+    Fts fts = (Fts) context;
+
     // Build a new FtsObject, a patcher 0 in 0 out
 
     FtsObject patcher;
 
     try
       {
-	patcher = Fts.makeFtsObject(Fts.getServer().getRootObject(), "jpatcher");
-
+	patcher = fts.makeFtsObject(fts.getServer().getRootObject(), "jpatcher");
 
 	// Put a new empty patch in edit mode
 
-	FtsPatcherDocument document = new FtsPatcherDocument();
+	FtsPatcherDocument document = new FtsPatcherDocument(context);
 
 	patcher.updateData();
-	Fts.sync();
+	fts.sync();
 
 	// Put some default geometrical property for the window.
 

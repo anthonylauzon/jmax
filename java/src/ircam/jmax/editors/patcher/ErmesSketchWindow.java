@@ -22,20 +22,24 @@ import ircam.jmax.editors.patcher.menus.*;
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
 //
+
+// ^^^^ Problem with the clipboard: currently the clipboard is a static,
+// ^^^^ But should move, where i don't know; copy/paste between different
+// ^^^^ servers can be tricky (very very tricky), but actually just need
+// ^^^^ to share the file; but, the implementation need to change, because the
+// ^^^^ clipboard is represented by an fts object, that so reside in a single
+// ^^^^ server.
+
 public class ErmesSketchWindow extends JFrame implements ComponentListener, WindowListener, ClipboardOwner
 {
-
-  // Primitive and fast implementation of multi-type clipboard.
-  // Enzo, forgive me ... it will be done as a clipboard provider
-  // later ..
-  
   static private FtsClipboard ftsClipboard;
   static private String       textClipboard = "";
 
   static {
     try 
       {
-	ftsClipboard = (FtsClipboard) Fts.makeFtsObject( Fts.getServer().getRootObject(), "__clipboard");
+	Fts fts = MaxApplication.getFts();
+	ftsClipboard = (FtsClipboard) fts.makeFtsObject( fts.getRootObject(), "__clipboard");
       }
     catch (FtsException e) 
       {
@@ -60,6 +64,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
 
+  private Fts fts;
+
   public MaxDocument itsDocument;
 
   public void showObject( Object obj)
@@ -77,6 +83,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     super("");
 
+    fts = patcherData.getFts();
+
     MaxWindowManager.getWindowManager().addWindow(this);
 
     // Initialize state
@@ -93,7 +101,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     // Make the content
 
-    itsSketchPad = new ErmesSketchPad( this, itsPatcherData);
+    itsSketchPad = new ErmesSketchPad(fts, this, itsPatcherData);
     itsToolBar = new ErmesToolBar( itsSketchPad);
 
     itsScrollerView = new JScrollPane();
@@ -150,8 +158,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     // getContentPane().setLayout( new BorderLayout()); // NOT NECESSARY
     
-    Fts.getSelection().clean();
-
     // setSize( new Dimension( 600, 300)); // ???
 
     itsMessageLabel = new JLabel("   ");
@@ -199,10 +205,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
       name = itsDocument.getName();
     else if (itsPatcher instanceof FtsPatcherObject)
       {
-	if (itsPatcher.getObjectName() != null)
-	  name = "patcher " + itsPatcher.getObjectName();
-	else
-	  name = "patcher " + itsPatcher.getDescription();
+	name = "patcher " + itsPatcher.getDescription();
       }
     else
       name = "template " + itsPatcher.getClassName();
@@ -246,6 +249,11 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   }
 
 
+  public Fts getFts()
+  {
+    return fts;
+  }
+
   /****************************************************************************/
   /*                                                                          */
   /*           MENU ACTIONS                                                   */
@@ -263,7 +271,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
       {
 	Cursor temp = getCursor();
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-	ftsClipboard.copy( Fts.getSelection());
+	ftsClipboard.copy( fts.getSelection());
 	lastCopyCount = ftsClipboard.getCopyCount();
 	itsSketchPad.resetPaste(0);
 	ErmesSelection.patcherSelection.redraw();
@@ -287,7 +295,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	Cursor temp = getCursor();
 	setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	ftsClipboard.copy( Fts.getSelection());
+	ftsClipboard.copy( fts.getSelection());
 	lastCopyCount = ftsClipboard.getCopyCount();
 	itsSketchPad.resetPaste(0);
 
@@ -350,7 +358,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	ftsClipboard.paste( itsPatcher);
 
 	itsPatcherData.update();
-	Fts.sync();
+	fts.sync();
 
 	pasting = false;
 

@@ -41,21 +41,21 @@ public class FtsClipboard  extends FtsObject
 
   int copyCount = 0;
 
-  protected  FtsClipboard(FtsObject parent, String className, String description, int objId)
+  protected  FtsClipboard(Fts fts, FtsObject parent, String className, String description, int objId)
   {
-    super(parent, className, null, description, objId);
+    super(fts, parent, className, null, description, objId);
   }
 
   public void copy(FtsSelection sel)
   {
     empty = false;
     copyCount++;
-    Fts.getServer().sendObjectMessage(this, -1, "copy", sel);
+    fts.getServer().sendObjectMessage(this, -1, "copy", sel);
   }
 
   public void paste(FtsObject patcher)
   {
-    Fts.getServer().sendObjectMessage(this, -1, "paste", patcher);
+    fts.getServer().sendObjectMessage(this, -1, "paste", patcher);
   }
 
   public int getCopyCount()

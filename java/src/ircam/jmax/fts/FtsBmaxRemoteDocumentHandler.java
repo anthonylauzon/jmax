@@ -22,6 +22,8 @@ import javax.swing.*;
 
 /** An instance of this document handler can load MaxDocument from
  *  a  remote binary file.
+ *
+ * This file should
  */
 
 public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
@@ -70,37 +72,33 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
   /** Make the real document */
 
-  protected MaxDocument loadDocument(File file)
+  protected MaxDocument loadDocument(MaxContext context, File file)
   {
-    FtsServer server;
     FtsObject patcher;
     int id;
-    
+
+    if (! (context instanceof Fts))
+      return null;
+
+    Fts fts = (Fts) context;
+
     // Load the environment file if needed 
 
-    MaxEnv.loadEnvFileFor(file);
+    MaxEnv.loadEnvFileFor(context, file);
 
-    server = Fts.getServer();
-    id = server.getNewObjectId();
+    // ask fts to load the file 
 
-    // ask fts to load the file within this 
-    // patcher, using a dedicated message
-
-    server.loadPatcherBmax(server.getRootObject(), id, file.getAbsolutePath());
-    server.sendDownloadObject(id);
-    server.syncToFts();
-
-    patcher = server.getObjectByFtsId(id);
+    patcher = fts.loadJMaxFile(file);
 
     if (patcher != null)
       {
-	FtsPatcherDocument obj = new FtsPatcherDocument();
+	FtsPatcherDocument obj = new FtsPatcherDocument(context);
 
 	// Temporary hack to force the patcher uploading; really, MDA should allow for 
 	// async edit of documents ...
 
 	patcher.updateData();
-	server.syncToFts();
+	fts.sync();
 
 	obj.setRootData((MaxData) patcher.getData());
 	obj.setDocumentFile(file);
@@ -114,10 +112,17 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
   public void saveDocument(MaxDocument document, File file) throws MaxDocumentException
   {
+    MaxContext context = document.getContext();
+
+    if (! (context instanceof Fts))
+      return;
+
+    Fts fts = (Fts) context;
+
     if (document instanceof FtsPatcherDocument) 
       {
-	Fts.getServer().savePatcherBmax(((FtsPatcherData) document.getRootData()).getContainerObject(),
-					file.getAbsolutePath());
+	fts.saveJMaxFile(((FtsPatcherData) document.getRootData()).getContainerObject(),
+					     file);
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");
@@ -125,10 +130,16 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
   protected void saveSubDocument(MaxDocument document, MaxData data, File file) throws MaxDocumentException
   {
+    MaxContext context = document.getContext();
+
+    if (! (context instanceof Fts))
+      return ;
+
+    Fts fts = (Fts) context;
+
     if ((document instanceof FtsPatcherDocument) && (data instanceof FtsPatcherData))
       {
-	Fts.getServer().savePatcherBmax(((FtsPatcherData) data).getContainerObject(),
-					file.getAbsolutePath());
+	fts.saveJMaxFile(((FtsPatcherData) data).getContainerObject(), file);
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");

@@ -38,6 +38,8 @@ import ircam.jmax.utils.*;
 
 public class FtsServer  implements Runnable
 {
+  Fts fts;			// back pointer to the FTS object using this server
+
   public static boolean debug = false;
 
   boolean connected = false;
@@ -67,8 +69,9 @@ public class FtsServer  implements Runnable
 
   /** Create an FTS Server. With a given stream. */
 
-  FtsServer(String name, FtsStream stream)
+  FtsServer(Fts fts, String name, FtsStream stream)
   {
+    this.fts = fts;
     this.name = name;
     this.stream = stream;
 
@@ -93,6 +96,11 @@ public class FtsServer  implements Runnable
   public FtsObject getRootObject()
   {
     return root;
+  }
+
+  public Fts getFts()
+  {
+    return fts;
   }
 
   //
@@ -1307,7 +1315,7 @@ public class FtsServer  implements Runnable
     // Build the root patcher, by mapping directly to object id 1 on FTS
     // (this is guaranteed)
 
-    root = new FtsPatcherObject(null, null, "", 1);
+    root = new FtsPatcherObject(fts, null, null, "", 1);
     registerObject(root);
   }
 
@@ -1491,7 +1499,7 @@ public class FtsServer  implements Runnable
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(stream, false);
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, stream, false);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1511,7 +1519,7 @@ public class FtsServer  implements Runnable
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(stream, true);
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, stream, true);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1540,7 +1548,7 @@ public class FtsServer  implements Runnable
 	  to     = stream.getNextObjectArgument();
 	  inlet  = stream.getNextIntArgument();
 
-	  c = new FtsConnection(data, id, from, outlet, to, inlet);
+	  c = new FtsConnection(fts, data, id, from, outlet, to, inlet);
 
 	  registerConnection(c);
 
@@ -1578,7 +1586,7 @@ public class FtsServer  implements Runnable
 	  if (FtsServer.debug) 
 	    System.err.println("< Connection Release " + c);
 
-	  Fts.getSelection().removeConnection(c);
+	  fts.getSelection().removeConnection(c);
 	  c.release();
 	  break;
 	}
@@ -1940,6 +1948,15 @@ public class FtsServer  implements Runnable
 
 	return connection;
       }
+  }
+
+  // Handle the remote table ID
+
+  FtsRemoteDataID remoteTable = new FtsRemoteDataID();
+
+  FtsRemoteDataID getRemoteTable()
+  {
+    return remoteTable;
   }
 }
 

@@ -16,6 +16,8 @@ package ircam.jmax.fts;
 import java.io.*;
 import java.net.*;
 
+import ircam.jmax.*;
+
 /**
  * The datagram socket connection.
  * Implement a specialed connection using a datagram socket 
@@ -47,6 +49,11 @@ class FtsDatagramStream extends FtsStream
 
     String command;
 
+    boolean realtime = false;
+
+    if (MaxApplication.getProperty("jmaxNoRealTime") != null)
+      realtime = MaxApplication.getProperty("jmaxNoRealTime").equals("true");
+
     this.host = host;
     this.path = path;
     this.ftsName = ftsName;
@@ -64,12 +71,12 @@ class FtsDatagramStream extends FtsStream
       {
 	if (host.equals(InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = (path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
+	    command = (path + "/" + ftsName + ( realtime ? " -norealtime" : "")
 		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
 	  }
 	else
 	  {
-	    command = ("rsh " + host + " " + path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
+	    command = ("rsh " + host + " " + path + "/" + ftsName + ( realtime ? " -norealtime" : "")
 		       + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
 	  }
       }

@@ -12,6 +12,7 @@
 #  
 SOURCES = \
 	AbstractMaxDataEditor.java \
+	MaxContext.java \
 	MaxData.java \
 	MaxDataEditor.java \
 	MaxDataEditorFactory.java \

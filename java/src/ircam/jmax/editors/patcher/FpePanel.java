@@ -25,34 +25,39 @@ import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.widgets.*;
 
+// ^^^^ Same thing as for the other panels; how we find the server ?
+// ^^^^ The panel itself is ready, the binding is missing.
+
 class FpePanel extends JFrame implements WindowListener
 {
   private static FpePanel fpePanel = null;
   private ObjectSetViewer objectSetViewer;
   private FtsObjectSet set;
+  private Fts fts;
 
   static void registerFpePanel()
   {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
       public String getToolName() { return "Fpe Panel";}
-      public void open() { FpePanel.open();}
+      public void open() { FpePanel.open(MaxApplication.getFts());}
     });
   }
 
-  public static FpePanel open()
+  public static FpePanel open(Fts fts)
   {
     if (fpePanel == null)
-      fpePanel = new FpePanel();
+      fpePanel = new FpePanel(fts);
 
     fpePanel.setVisible(true);
 
     return fpePanel;
   }
 
-  protected FpePanel()
+  protected FpePanel(Fts f)
   {
     super( "Fpe Panel");
 
+    fts = f;
     addWindowListener(this);
 
     JPanel panel = new JPanel();
@@ -68,9 +73,9 @@ class FpePanel extends JFrame implements WindowListener
       public void itemStateChanged( ItemEvent e)
 	{
 	    if (e.getStateChange() == ItemEvent.DESELECTED)
-	      Fts.getDspController().setCheckNan( false);
+	      fts.getDspController().setCheckNan( false);
 	    else  if (e.getStateChange() == ItemEvent.SELECTED)
-	      Fts.getDspController().setCheckNan( true);
+	      fts.getDspController().setCheckNan( true);
 	}
     });
     p1.add( nanCheckBox);
@@ -91,7 +96,7 @@ class FpePanel extends JFrame implements WindowListener
     clearButton.addActionListener( new ActionListener() {
       public void actionPerformed( ActionEvent e)
 	{
-	  Fts.getDspController().clearFpeCollecting();
+	  fts.getDspController().clearFpeCollecting();
 	}});
 
     p3.add( clearButton);
@@ -114,10 +119,10 @@ class FpePanel extends JFrame implements WindowListener
     pack();
     validate();
 
-    set = (FtsObjectSet) Fts.newRemoteData( "object_set_data", null);
+    set = (FtsObjectSet) fts.newRemoteData( "object_set_data", null);
     objectSetViewer.setModel( set.getListModel());
 
-    Fts.getDspController().startFpeCollecting(set);
+    fts.getDspController().startFpeCollecting(set);
 
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
       public void objectSelected(FtsObject object)
@@ -126,7 +131,7 @@ class FpePanel extends JFrame implements WindowListener
 
 	  FpePanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	  Fts.editPropertyValue(object.getParent(), object,
+	  fts.editPropertyValue(object.getParent(), object,
 				new MaxDataEditorReadyListener() {
 	    public void editorReady(MaxDataEditor editor)
 	      {	  FpePanel.this.setCursor(temp);}
@@ -142,22 +147,22 @@ class FpePanel extends JFrame implements WindowListener
 
   public void windowOpened(WindowEvent e)
   {
-    Fts.getDspController().startFpeCollecting(set);
+    fts.getDspController().startFpeCollecting(set);
   }
 
   public void windowClosed(WindowEvent e)
   {
-    Fts.getDspController().stopFpeCollecting();
+    fts.getDspController().stopFpeCollecting();
   }
 
   public void windowIconified(WindowEvent e)
   {
-    Fts.getDspController().stopFpeCollecting();
+    fts.getDspController().stopFpeCollecting();
   }
 
   public void windowDeiconified(WindowEvent e)
   {
-    Fts.getDspController().startFpeCollecting(set);
+    fts.getDspController().startFpeCollecting(set);
   }
 
   public void windowActivated(WindowEvent e)

@@ -21,10 +21,10 @@ public class MdaModule
 {
   static public void initModule()
   {
-
     // Install the local mda entities
 
     // Mda.installDocumentHandler( new MaxTclFileDocumentHandler());
+
     Mda.installDocumentHandler( new MaxTclExecutedDocumentHandler());
     Mda.installDocumentType(new MaxTclExecutedDocumentType());
 

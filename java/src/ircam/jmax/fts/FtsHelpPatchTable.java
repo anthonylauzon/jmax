@@ -70,7 +70,7 @@ public class FtsHelpPatchTable
 	    File file = new File(getHelpPatch(obj.getClassName()));
 	    MaxDocument document;
 
-	    document = Mda.loadDocument(file);
+	    document = Mda.loadDocument(obj.getFts(), file);
 	    document.edit();
 	  }
 	catch (MaxDocumentException e)
@@ -84,7 +84,7 @@ public class FtsHelpPatchTable
       return false;
   }
 
-  static public boolean openHelpSummary(String name)
+  static public boolean openHelpSummary(MaxContext context, String name)
   {
     if (summaryExists(name))
       {
@@ -93,7 +93,7 @@ public class FtsHelpPatchTable
 	    File file = new File(getHelpSummaryPatch(name));
 	    MaxDocument document;
 
-	    document = Mda.loadDocument(file);
+	    document = Mda.loadDocument(context, file);
 	    document.edit();
 	  }
 	catch (MaxDocumentException e)

@@ -68,7 +68,7 @@ public class FtsAtomList extends FtsRemoteData
   public void forceUpdate()
   {
     remoteCall(REMOTE_UPDATE);
-    Fts.sync();
+    fts.sync();
   }
 
   /** Declare that a range in the list has been changed

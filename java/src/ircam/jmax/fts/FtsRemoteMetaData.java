@@ -27,10 +27,11 @@ class FtsRemoteMetaData extends FtsRemoteData
  
   static private FtsRemoteMetaData metaData;
 
-  public static void install()
+  public static void install(Fts fts)
   {
     metaData = new FtsRemoteMetaData();
-    FtsRemoteDataID.put( 1, metaData);
+    metaData.setFts(fts);
+    fts.getServer().getRemoteTable().put( 1, metaData);
     metaData.setId(1);
   }
 
@@ -51,12 +52,14 @@ class FtsRemoteMetaData extends FtsRemoteData
     FtsRemoteData data;
     int id;
 
-    id = FtsRemoteDataID.getNewDataID();
+    id = fts.getServer().getRemoteTable().getNewDataID();
+
     remoteCall(REMOTE_NEW, id, name, args);
    
-    Fts.sync();
+    fts.sync();
 
-    data = FtsRemoteDataID.get(id);
+    data = fts.getServer().getRemoteTable().get(id);
+    data.setFts(fts);
     data.setMaster();
     return data;
   }
@@ -92,7 +95,7 @@ class FtsRemoteMetaData extends FtsRemoteData
     Class dataJavaClass;
     FtsRemoteData newRemoteData;
 
-    dataJavaClass = Fts.getRemoteDataClass(className);
+    dataJavaClass = Fts.getRemoteDataClass(className); 
 
     if (dataJavaClass == null)
       {
@@ -114,9 +117,15 @@ class FtsRemoteMetaData extends FtsRemoteData
 	System.err.println( e + " in " + dataJavaClass.getName());
 	return;
       }
+    catch (java.lang.Exception e)
+      {
+	System.err.println( e + " in " + dataJavaClass.getName());
+	return;
+      }
 
+    newRemoteData.setFts( fts);
     newRemoteData.setId( newId);
-    FtsRemoteDataID.put( newId, newRemoteData);
+    fts.getServer().getRemoteTable().put( newId, newRemoteData);
   }
 
 

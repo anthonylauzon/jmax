@@ -105,6 +105,8 @@ extern fts_symbol_t fts_s_load;
 extern fts_symbol_t fts_s_read;
 extern fts_symbol_t fts_s_write;
 extern fts_symbol_t fts_s_save_bmax;
+extern fts_symbol_t fts_s_redefining;
+extern fts_symbol_t fts_s_release;
 extern fts_symbol_t fts_s_comma;
 extern fts_symbol_t fts_s_quote;
 extern fts_symbol_t fts_s_dollar;

@@ -32,10 +32,10 @@ class MoveReverseConnectInteraction extends Interaction
 	FtsConnection fc;
 	GraphicConnection connection;
 
-	fc = Fts.makeFtsConnection(src.getFtsObject(),
-				   outlet, 
-				   dst.getFtsObject(),
-				   inlet);
+	fc = editor.getFts().makeFtsConnection(src.getFtsObject(),
+					       outlet, 
+					       dst.getFtsObject(),
+					       inlet);
 		    
 	connection = new GraphicConnection(editor,
 					 src,
@@ -115,7 +115,7 @@ class MoveReverseConnectInteraction extends Interaction
 	editor.getDisplayList().dragLine();
 	editor.getDisplayList().redrawDragLine();
 	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, 
-					    src.getOutletAnchorX(inlet), src.getOutletAnchorY(inlet));
+					    src.getOutletAnchorX(outlet), src.getOutletAnchorY(outlet));
 	editor.getDisplayList().redrawDragLine();
       }
     else if (Squeack.isMove(squeack))

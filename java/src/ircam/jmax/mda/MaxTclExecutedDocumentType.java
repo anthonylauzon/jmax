@@ -32,16 +32,12 @@ public class MaxTclExecutedDocumentType extends MaxDocumentType
     return false;
   }
 
-  /** Build an empty instance of FtsPatcherDocument, i.e. an instance
-   * corresponding to an empty, new, patcher
-   */
-
-  public MaxDocument newDocument()
+  public MaxDocument newDocument(MaxContext ignore)
   {
     return null;
   }
 
-  public boolean canMakeNewDocument()
+  public boolean canMakeNewDocument(MaxContext ignore)
   {
     return false;
   }

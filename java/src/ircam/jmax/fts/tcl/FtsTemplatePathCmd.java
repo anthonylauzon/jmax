@@ -17,6 +17,7 @@ import tcl.lang.*;
 import java.io.*;
 import java.util.*;
 
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 /**
@@ -45,8 +46,7 @@ class FtsTemplatePathCmd implements Command
 
 	path = argv[1].toString();
 
-	Fts.getServer().sendTemplateDeclarePath(path);
-	Fts.recomputeErrorObjects();
+	MaxApplication.getFts().templatePathDeclare(path);
       }
     else
       {

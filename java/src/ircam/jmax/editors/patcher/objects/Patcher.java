@@ -46,7 +46,7 @@ class Patcher extends Editable
   public void editContent()
   {
     itsSketchPad.waiting();
-    Fts.editPropertyValue(ftsObject,
+    ftsObject.getFts().editPropertyValue(ftsObject,
 			  new MaxDataEditorReadyListener() {
       public void editorReady(MaxDataEditor editor)
 	{itsSketchPad.stopWaiting();}

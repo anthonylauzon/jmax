@@ -49,13 +49,6 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
     p1.add(label3);
     Label label4 = new Label("Java version" + (String)(System.getProperties().getProperty("java.version")));
     p1.add(label4);
-    Label label5 = new Label("FTS SERVER");
-    p1.add(label5);
-    Label label6;
-    if (Fts.getServer() !=null)
-      label6 = new Label("Fts connection:" + Fts.getServer().toString());
-    else label6 = new Label("Fts connection: not connected" );
-    p1.add(label6);
     Label label8 = new Label("Total memory " + Runtime.getRuntime().totalMemory());
     p1.add(label8);
     Label label9 = new Label("Used memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));

@@ -33,7 +33,7 @@ class MoveConnectInteraction extends Interaction
 	FtsConnection fc;
 	GraphicConnection connection;
 
-	fc = Fts.makeFtsConnection(src.getFtsObject(),
+	fc = editor.getFts().makeFtsConnection(src.getFtsObject(),
 				   outlet, 
 				   dst.getFtsObject(),
 				   inlet);
