@@ -78,9 +78,6 @@ do
     fi
 done
 
-echo "This script is not complete yet. Do not use. Ask Francois..."
-exit 2
-
 # ---------------------------------------------------------------------------
 # Check that we have what we need
 if [ _"${ARCHS}"_ = __  -o  _"${TYPES}"_ = __ ]
@@ -109,26 +106,26 @@ fi
 
 # ---------------------------------------------------------------------------
 # 2) check that all files are synchronous with the CVS repository
-# if cvs -n update | egrep -s '^[UARMC] '
-# then
-#     echo "Working directory is not synchronized with repository."
-#     echo "Do \`\`cvs update'' and retry"
-#     exit 1
-# fi
+if cvs -n update | egrep -s '^[UARMC] '
+then
+    echo "Working directory is not synchronized with repository."
+    echo "Do \`\`cvs update'' and retry"
+    exit 1
+fi
 
 # ---------------------------------------------------------------------------
 # 3) check that nothing needs to be recompiled
-# for ARCH in $ARCHS
-# do
-#     if make -q ARCH=$ARCH MODE=opt all
-#     then
-# 	echo > /dev/null
-#     else
-# 	echo "$ARCH must be recompiled."
-# 	echo "Do ``make ARCH=$ARCH MODE=opt clean all'' and retry"
-# 	exit 1
-#     fi
-# done
+for ARCH in $ARCHS
+do
+    if make -q ARCH=$ARCH MODE=opt all
+    then
+	echo > /dev/null
+    else
+	echo "$ARCH must be recompiled."
+	echo "Do ``make ARCH=$ARCH MODE=opt clean all'' and retry"
+	exit 1
+    fi
+done
 
 # ---------------------------------------------------------------------------
 # Generate the version number
@@ -138,20 +135,6 @@ $1=="MINOR" {n=$2;}
 $1=="PATCH_LEVEL" {p=$2;}
 END { printf("%d.%d.%d\n",m,n,p);}
 ' VERSION`
-
-# ---------------------------------------------------------------------------
-# - for each type { for each architecture { create the distribution list} }
-for TYPE in $TYPES
-do
-    for ARCH in $ARCHS
-    do
-	TARFILE=$(TARFILES_DIR)/jmax.${TYPE}.${ARCH}.${VERSION_NUMBER}.tar.gz
-	echo "Creating tar file $TARFILE for arch $ARCH and type $TYPE"
-#	jmax-make-distrib-list -arch $ARCH -type $TYPE . | sed 's/^./\.\/max/' > /tmp/$$
-	jmax-make-distrib-list -arch $ARCH -type $TYPE -check-permission . | sed 's/^./\.\/max/'
-#	(cd .. ; tar cvf - -T /tmp/$$ | gzip > $TARFILE )
-    done
-done
 
 # ---------------------------------------------------------------------------
 # - for each type { for each architecture { create the tar file } }
@@ -165,10 +148,17 @@ do
 	    echo "File $TARFILE already exists. Not overwritten"
 	    exit 1
 	fi
+    done
+done
+
+for TYPE in $TYPES
+do
+    for ARCH in $ARCHS
+    do
+	TARFILE=$(TARFILES_DIR)/jmax.${TYPE}.${ARCH}.${VERSION_NUMBER}.tar.gz
 	echo "Creating tar file $TARFILE for arch $ARCH and type $TYPE"
-#	jmax-make-distrib-list -arch $ARCH -type $TYPE . | sed 's/^./\.\/max/' > /tmp/$$
-	jmax-make-distrib-list -arch $ARCH -type $TYPE . | sed 's/^./\.\/max/'
-#	(cd .. ; tar cvf - -T /tmp/$$ | gzip > $TARFILE )
+	jmax-make-distrib-list -arch $ARCH -type $TYPE . | sed 's/^./\.\/max/' > /tmp/$$
+	(cd .. ; tar cvf - -T /tmp/$$ | gzip > $TARFILE )
     done
 done
 
@@ -176,12 +166,12 @@ done
 # - tag the sources with a tag that contains the version number
 TAG=`echo $VERSION_NUMBER | sed -e 's/^/V_/' -e 's/\./_/g'`
 echo "... Tagging sources with tag $TAG"
-#cvs tag -F $TAG
+cvs tag -F $TAG
 
 # ---------------------------------------------------------------------------
 # - generates a new version number
 echo "... Generating new version number"
-#jmax-make-new-version -type patch -nomail
+jmax-make-new-version -type patch -nomail
 
 # ---------------------------------------------------------------------------
 # - send a mail to the development team telling that the release has been created
@@ -197,7 +187,7 @@ echo "... Sending a mail to $TEAM"
 	done
     done
 } > /tmp/$$
-#Mail -s "jMax version $VERSION_NUMBER released" $TEAM < /tmp/$$
+Mail -s "jMax version $VERSION_NUMBER released" $TEAM < /tmp/$$
 cat /tmp/$$
 
 # Done
