@@ -46,6 +46,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public Menu itsAlignObjectMenu;
   public Menu itsTextMenu;	
   public Menu itsSizesMenu;	
+  public Menu itsFontsMenu;
   public Menu itsProjectMenu;	
   public Menu itsWindowsMenu;	
   public Menu itsSubWindowsMenu;
@@ -225,7 +226,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     aMenuItem.addActionListener(this);
     editMenu.add(aMenuItem = new MenuItem("Clear"));
     aMenuItem.addActionListener(this);
-    editMenu.add(new MenuItem("-"));
     editMenu.add(aMenuItem = new MenuItem("Select All  Ctrl+A"));
     aMenuItem.addActionListener(this);
     editMenu.add(new MenuItem("-"));
@@ -278,7 +278,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   }
   
   private Menu CreateTextMenu() {
-    Menu fontMenu = new Menu("Text");
+    Menu aTextMenu = new Menu("Text");
     String aString;
     CheckboxMenuItem aCheckItem;
 
@@ -301,14 +301,16 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     aCheckItem.addItemListener(this);
     itsSizesMenu.add(aCheckItem = new CheckboxMenuItem("48"));
     aCheckItem.addItemListener(this);
-    fontMenu.add(itsSizesMenu);
-    fontMenu.add(new MenuItem("-"));
+    aTextMenu.add(itsSizesMenu);
+    aTextMenu.add(new MenuItem("-"));
+    itsFontsMenu = new Menu("Fonts");
     for(int i = 0;i<itsFontList.length;i++){
       aString = (String) itsFontList[i];
-      fontMenu.add(aCheckItem = new CheckboxMenuItem(aString));
+      itsFontsMenu.add(aCheckItem = new CheckboxMenuItem(aString));
       aCheckItem.addItemListener(this);
     }
-    fontMenu.add(new MenuItem("-"));
+    aTextMenu.add(itsFontsMenu);
+    aTextMenu.add(new MenuItem("-"));
     itsJustificationMenu = new Menu("Justification");
     itsJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Left"));
     aCheckItem.addItemListener(this);	     
@@ -318,12 +320,12 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     itsCurrentJustificationMenu = aCheckItem;
     itsJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Right"));
     aCheckItem.addItemListener(this);	   
-    fontMenu.add(itsJustificationMenu);
+    aTextMenu.add(itsJustificationMenu);
 
-    return fontMenu;
+    return aTextMenu;
   }
 
-  private boolean IsInTextMenu(String theName) {
+  private boolean IsInFontsMenu(String theName) {
     for (int i = 0;i<itsFontList.length;i++) {
       if (theName.equals(itsFontList[i])) return true;
     }
@@ -465,8 +467,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   private void CheckDefaultFontItem(){
     CheckboxMenuItem aCheckboxMenuItem;
     String aFont = itsSketchPad.getFont().getName();
-    for(int i=2; i<itsFontList.length+2; i++){
-      aCheckboxMenuItem = (CheckboxMenuItem)itsTextMenu.getItem(i);
+    for(int i=0; i<itsFontList.length; i++){
+      aCheckboxMenuItem = (CheckboxMenuItem)itsFontsMenu.getItem(i);
       if(aCheckboxMenuItem.getLabel().toLowerCase().compareTo(aFont.toLowerCase()) == 0){
 	itsCurrentFontMenu = aCheckboxMenuItem;
 	itsCurrentFontMenu.setState(true);
@@ -734,7 +736,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       String itemName = aCheckItem.getLabel();
       
       if (IsInEditMenu(itemName)) EditMenuAction(aCheckItem, itemName);
-      if (IsInTextMenu(itemName)) TextMenuAction(aCheckItem, itemName);
+      if (IsInFontsMenu(itemName)) FontsMenuAction(aCheckItem, itemName);
       if (IsInSizesMenu(itemName)) SizesMenuAction(aCheckItem, itemName);
       if (IsInJustificationMenu(itemName)) JustificationMenuAction(aCheckItem, itemName);
       if (IsInResizeObjectMenu(itemName)) ResizeObjectMenuAction(aCheckItem, itemName);
@@ -754,7 +756,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     
       if (IsInFileMenu(itemName)) FileMenuAction(aMenuItem, itemName);
       if (IsInEditMenu(itemName)) EditMenuAction(aMenuItem, itemName);
-      if (IsInTextMenu(itemName)) TextMenuAction(aMenuItem, itemName);
       if (IsInProjectMenu(itemName)) ProjectMenuAction(aMenuItem, itemName);
       if (IsInWindowsMenu(itemName)) WindowsMenuAction(aMenuItem, itemName);
       if (IsInAlignObjectsMenu(itemName)) AlignObjectsMenuAction(aMenuItem, itemName);
@@ -893,7 +894,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   }
 
 
-  private void TextMenuAction(MenuItem theMenuItem, String theString) {
+  private void FontsMenuAction(MenuItem theMenuItem, String theString) {
     //if we are here, a font name have been choosen from the menu
     itsCurrentFontMenu.setState(false);
     itsSketchPad.ChangeFont(new Font(theString, Font.PLAIN, itsSketchPad.sketchFontSize));
