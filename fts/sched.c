@@ -259,7 +259,7 @@ fts_sched_halt(void)
  *
  */
 #ifdef WIN32
-#define DEBUG_SLEEP 1
+#define DEBUG_SLEEP 0
 
 static struct _sleeper_
 {

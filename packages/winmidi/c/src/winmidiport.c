@@ -39,13 +39,13 @@
 
 static char winmidiport_error_buffer[256];
 
-#define msg_pack(_s,_c,_p1,_p2) ((DWORD) ((_s | (_c & 0x0f)) | ((_p1 & 0x7f) << 8) | ((_p2 & 0x7f) << 16)))
+#define msg_pack(_s,_p1,_p2) ((DWORD) ((_s) | (((_p1) & 0x7f) << 8) | (((_p2) & 0x7f) << 16)))
 
-#define msg_type(_m)  (_m & 0xf0)
-#define msg_chan(_m)  (_m & 0x0f)
-#define msg_p1(_m)    ((_m >> 8) & 0x7f)
-#define msg_p2(_m)    ((_m >> 16) & 0x7f)
-
+#define msg_type(_m) ((_m) & 0xf0)
+#define msg_type_enum(_m) ((((_m) & 0xf0) - 144) >> 4)
+#define msg_chan(_m) ((_m) & 0x0f)
+#define msg_p1(_m) (((_m) >> 8) & 0x7f)
+#define msg_p2(_m) (((_m) >> 16) & 0x7f)
 
 char*
 winmidi_tostring(DWORD midi, char* buf, int len)
@@ -105,6 +105,7 @@ typedef struct _winmidiport_t
 #define winmidiport_buffer_full(_this)  ((_this->head == _this->tail - 1) || ((_this->head == BUFFER_SIZE - 1) && (_this->tail == 0)))
 #define winmidiport_available(_this)  (_this->head != _this->tail)
 
+static void winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time);
 static char* winmidiport_output_error(int no);
 static char* winmidiport_input_error(int no);
 void CALLBACK winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
@@ -151,46 +152,52 @@ void
 winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   winmidiport_t *this = (winmidiport_t *)o;
+  int cur_fill, cur_send;
   int i;
   UINT err;
+  MMRESULT res;
   char msg[256];
 
   /* handle the short midi messages */
   while (winmidiport_available(this)) {
     
+    fts_midievent_t *event = NULL;
+
     DWORD msg = this->incoming[this->tail++];
     if (this->tail == BUFFER_SIZE) {
       this->tail = 0;
     }
     
+    /* we have to make a distinction between the events that have two
+       parameter values and those that take only one. */
     switch (msg_type(msg)) {
+
     case NOTEOFF:
-      fts_midiport_input_note(&this->port, msg_chan(msg) + 1, msg_p1(msg), 0, 0.0);
+      event = fts_midievent_channel_message_new(midi_type_note, msg_chan(msg), msg_p1(msg), msg_p2(msg));
       break;
+
     case NOTEON:
-      fts_midiport_input_note(&this->port, msg_chan(msg) + 1, msg_p1(msg), msg_p2(msg), 0.0);
-      break;
     case KEYPRESSURE:
-      fts_midiport_input_poly_pressure(&this->port, msg_chan(msg) + 1, msg_p1(msg), msg_p2(msg), 0.0);
-      break;
     case CONTROLCHANGE:
-      fts_midiport_input_control_change(&this->port, msg_chan(msg) + 1, msg_p1(msg), msg_p2(msg), 0.0);
-      break;
-    case PROGRAMCHANGE:
-      fts_midiport_input_program_change(&this->port, msg_chan(msg) + 1, msg_p1(msg), 0.0);
-      break;
-    case CHANNELPRESSURE:
-      fts_midiport_input_channel_pressure(&this->port, msg_chan(msg) + 1, msg_p1(msg), 0.0);
-      break;
     case PITCHBEND:
-      fts_midiport_input_pitch_bend(&this->port, msg_chan(msg) + 1, msg_p1(msg) + (msg_p2(msg) << 7), 0.0);
+      event = fts_midievent_channel_message_new(msg_type_enum(msg), msg_chan(msg), msg_p1(msg), msg_p2(msg));
       break;
+
+    case PROGRAMCHANGE:
+    case CHANNELPRESSURE:
+      event = fts_midievent_channel_message_new(msg_type_enum(msg), msg_chan(msg), msg_p1(msg), MIDI_EMPTY_BYTE);
+      break;
+
     case SYSEX:
       break;
     }
+
+    if (event != NULL) {
+      fts_midiport_input((fts_midiport_t *) this, event, 0.0);
+    }
   }
 
-  /* check for sysex messages */
+  /* check for incoming sysex messages */
   for (i = 0; i < 2; i++) {
 
     /* check for incoming messages */
@@ -198,47 +205,68 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       int size = this->inhdr[i].dwBytesRecorded;
       int j; 
 
+      /* create a new midi event and send the sysex message to the
+         midiport. start at position 1 to skip the start-of-sysex
+         byte, and skip the end-of-sysex byte */
+      if (size > 2) {
+
+	fts_midievent_t *sysex = fts_midievent_system_exclusive_new();
+
+	for (j = 1; j < size - 1; j++) {
+	  fts_midievent_system_exclusive_append(sysex, this->inhdr[i].lpData[j]);
+	}
+
+	fts_midiport_input((fts_midiport_t *) this, sysex, 0.0);
+      }
+
       /* unprepare the buffer and flag it as available */
       midiInUnprepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
       this->inhdr[i].dwFlags = 0;
 
-      /* send the sysex message thru the midiport. start at position 1
-         to skip the start-of-sysex byte, and skip the end-of-sysex
-         byte */
-      for (j = 1; j < size - 1; j++) {
-	fts_midiport_input_system_exclusive_byte(&this->port, this->inhdr[i].lpData[j]);
-      }
-      fts_midiport_input_system_exclusive_call(&this->port, 0.0);
-
       /* prepare and add the buffer to the driver */
-      if (this->inhdr[i].dwFlags == 0) {
+      err = midiInPrepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
 
-	err = midiInPrepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
-
-	if (err == MMSYSERR_NOERROR ) {
-
-	  err = midiInAddBuffer(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
-	  if (err != MMSYSERR_NOERROR ) {
-	    midiInGetErrorText(err, &msg[0], 256);
-	    post("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
-	    fts_log("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
-	  }      
-
-	} else {
+      if (err == MMSYSERR_NOERROR ) {
+	
+	err = midiInAddBuffer(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
+	if (err != MMSYSERR_NOERROR ) {
 	  midiInGetErrorText(err, &msg[0], 256);
-	  post("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
-	  fts_log("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
-	}
+	  post("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
+	  fts_log("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
+	}      
+	
+      } else {
+	midiInGetErrorText(err, &msg[0], 256);
+	post("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
+	fts_log("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
       }
     }
+  }
 
+  cur_fill = this->cur_outhdr;
+  cur_send = 1 - this->cur_outhdr;
 
-    /* check if the outgoing messages are finished */
-    if (this->outhdr[i].dwFlags & MHDR_DONE) {
-      midiOutUnprepareHeader(this->hmidiout, &this->outhdr[i], sizeof(MIDIHDR));
-      this->outhdr[i].dwFlags = 0;
-      this->outhdr[i].dwBytesRecorded = 0;
-    } 
+  /* check if the outgoing message is finished. If we have new data to
+     be send, swap the two sysex buffers. */
+  if ((this->outhdr[cur_send].dwFlags & MHDR_DONE) 
+      && (this->outhdr[cur_fill].dwBytesRecorded > 0)) {
+
+    midiOutUnprepareHeader(this->hmidiout, &this->outhdr[cur_send], sizeof(MIDIHDR));
+    this->outhdr[cur_send].dwFlags = 0;
+    this->outhdr[cur_send].dwBytesRecorded = 0;
+    this->cur_outhdr = cur_send;
+
+    res = midiOutPrepareHeader(this->hmidiout, &this->outhdr[cur_fill], sizeof(MIDIHDR));
+    if (res == MMSYSERR_NOERROR) {
+      res = midiOutLongMsg(this->hmidiout, &this->outhdr[cur_fill], sizeof(MIDIHDR));
+    }	  
+
+    if (res != MMSYSERR_NOERROR) {
+      char msg[256];
+      midiOutGetErrorText(res, &msg[0], 256);
+      post("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
+      fts_log("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
+    }
   }
 }
 
@@ -262,137 +290,80 @@ winmidiport_input_error(int no)
  *
  */
 
+
 static void
-winmidiport_send_note(fts_object_t *o, int channel, int number, int value, double time)
+winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
-  if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(NOTEON, channel - 1, number, value));  
-  }
-}
+  MMRESULT res = MMSYSERR_NOERROR;
 
-static void
-winmidiport_send_poly_pressure(fts_object_t *o, int channel, int number, int value, double time)
-{
-  winmidiport_t *this = (winmidiport_t *)o;
-  if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(KEYPRESSURE, channel - 1, number, value));  
-  }
-}
+  if (fts_midievent_is_channel_message(event)) {
+    if (fts_midievent_channel_message_has_second_byte(event)) {
+      
+      res = midiOutShortMsg(this->hmidiout, 
+			    msg_pack(fts_midievent_channel_message_get_status_byte(event),
+				     fts_midievent_channel_message_get_first(event), 
+				     fts_midievent_channel_message_get_second(event)));
 
-static void
-winmidiport_send_control_change(fts_object_t *o, int channel, int number, int value, double time)
-{
-  winmidiport_t *this = (winmidiport_t *)o;
-  if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CONTROLCHANGE, channel - 1, number, value));  
-  }
-}
-
-static void
-winmidiport_send_program_change(fts_object_t *o, int channel, int value, double time)
-{	
-  winmidiport_t *this = (winmidiport_t *)o;
-  if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PROGRAMCHANGE, channel - 1, value, 0));  
-  }
-}
-
-static void
-winmidiport_send_channel_pressure(fts_object_t *o, int channel, int value, double time)
-{
-  winmidiport_t *this = (winmidiport_t *)o;
-  if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CHANNELPRESSURE, channel - 1, value, 0));  
-  }
-}
-
-static void
-winmidiport_send_pitch_bend(fts_object_t *o, int channel, int value, double time)
-{
-  winmidiport_t *this = (winmidiport_t *)o;
-  if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PITCHBEND, channel - 1, (value & 0x7f), ((value >> 7) & 0x7f)));  
-  }
-}
-
-static void
-winmidiport_send_system_exclusive_byte(fts_object_t *o, int value)
-{
-  winmidiport_t *this = (winmidiport_t *)o;
-  int n = this->cur_outhdr;
-  int len = this->outhdr[n].dwBufferLength;
-  int bytes = this->outhdr[n].dwBytesRecorded;
-
-  if (this->outhdr[n].dwFlags != 0) {
-    return;
-  }
-
-  /* add the start of sysex status byte */
-  if (bytes == 0) {
-    this->outhdr[n].lpData[bytes++] = (char) SYSEX;
-    this->outhdr[n].dwBytesRecorded++;
-  } else if (bytes == len) {
-    char* newbuf = fts_malloc(len + SYSEX_BUFFER_SIZE);
-    memcpy(newbuf, this->outhdr[n].lpData, len);
-    fts_free(this->outhdr[n].lpData);
-    this->outhdr[n].lpData = newbuf;
-    this->outhdr[n].dwBufferLength += SYSEX_BUFFER_SIZE;
-  }
-
-  this->outhdr[n].lpData[bytes] = (char)(value & 0xff);
-  this->outhdr[n].dwBytesRecorded++;
-}
-
-static void
-winmidiport_send_system_exclusive_flush(fts_object_t *o, double time)
-{
-  winmidiport_t *this = (winmidiport_t *)o;
-  int n = this->cur_outhdr;
-  int len = this->outhdr[n].dwBufferLength;
-  int bytes = this->outhdr[n].dwBytesRecorded;
-  UINT err;
-  MMRESULT r;
-
-  if (this->outhdr[n].dwFlags != 0) {
-    return;
-  }
-
-  /* add the end of sysex status byte */
-  winmidiport_send_system_exclusive_byte(o, SYSEX_END);
-
-  err = midiOutPrepareHeader(this->hmidiout, &this->outhdr[n], sizeof(MIDIHDR));
-  if (err == MMSYSERR_NOERROR) {
-
-    err = midiOutLongMsg(this->hmidiout, &this->outhdr[n], sizeof(MIDIHDR));
-    if (err != MMSYSERR_NOERROR) {
-      char msg[256];
-      midiOutGetErrorText(err, &msg[0], 256);
-      post("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
-      fts_log("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
-      this->outhdr[n].dwBytesRecorded = 0;
+    } else {
+      
+      res = midiOutShortMsg(this->hmidiout, 
+			    msg_pack(fts_midievent_channel_message_get_status_byte(event),
+				     fts_midievent_channel_message_get_first(event), 
+				     0));
     }
-    
+
   } else {
+
+    switch(fts_midievent_system_get_type(event)) {
+      
+    case midi_system_exclusive:
+      {
+	int i;
+	int size = fts_midievent_system_exclusive_get_size(event);
+	fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
+	int cur = this->cur_outhdr;
+	int len = this->outhdr[cur].dwBufferLength;
+	unsigned char* buffer = (unsigned char*) this->outhdr[cur].lpData;
+	int n = this->outhdr[cur].dwBytesRecorded;
+
+	buffer[n++] = SYSEX;
+  	
+	for (i = 0; i < size; i++) {
+	  buffer[n++] = fts_get_int(atoms + i) & 0x7f;
+	  
+	  if (n == len) {
+	    int newlen = len + SYSEX_BUFFER_SIZE;
+	    char* newbuf = fts_malloc(newlen);
+	    memcpy(newbuf, this->outhdr[cur].lpData, newlen);
+	    fts_free(this->outhdr[cur].lpData);
+	    this->outhdr[cur].lpData = newbuf;
+	    this->outhdr[cur].dwBufferLength = newlen;
+	  }
+	}
+	
+	buffer[n++] = SYSEX_END;
+	
+	this->outhdr[cur].dwBytesRecorded = n;	
+      }
+      break;
+      
+    case midi_real_time:
+      res = midiOutShortMsg(this->hmidiout, msg_pack(fts_midievent_channel_message_get_status_byte(event), 0, 0));
+      break;
+      
+    default:
+      break;
+    }
+  }
+  
+  if (res != MMSYSERR_NOERROR) {
     char msg[256];
-    midiOutGetErrorText(err, &msg[0], 256);
-    post("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
-    fts_log("Error: winmidiport: Couldn't send sysex message: %s\n", msg);
-    this->outhdr[n].dwBytesRecorded = 0;
+    midiOutGetErrorText(res, &msg[0], 256);
+    post("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
+    fts_log("Error: winmidiport: Couldn't send MIDI message: %s\n", msg);
   }
 }
-
-static fts_midiport_output_functions_t winmidiport_output_functions =
-{
-  winmidiport_send_note,
-  winmidiport_send_poly_pressure,
-  winmidiport_send_control_change,
-  winmidiport_send_program_change,
-  winmidiport_send_channel_pressure,
-  winmidiport_send_pitch_bend,
-  winmidiport_send_system_exclusive_byte,
-  winmidiport_send_system_exclusive_flush,
-};
 
 /************************************************************
  *
@@ -425,7 +396,7 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_midiport_init(&this->port);
   fts_midiport_set_input(&this->port);
-  fts_midiport_set_output(&this->port, &winmidiport_output_functions);
+  fts_midiport_set_output(&this->port, winmidiport_output);
 
   this->head = 0;
   this->tail = 0;
@@ -506,7 +477,7 @@ winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	this->outhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
 	this->outhdr[i].dwBytesRecorded = 0;
 	this->outhdr[i].dwUser = i;
-	this->outhdr[i].dwFlags = 0;
+	this->outhdr[i].dwFlags = (i == 0)? 0 : MHDR_DONE; 
       }
     }
   }
@@ -608,18 +579,30 @@ static void
 winmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   winmidiport_t *this = (winmidiport_t *)o;
-  int i;
+  int i, cur_send;
 
   fts_log("[winmidiport]: Closing MIDI ports\n");
 
   if (this->hmidiout != NULL) {
+
+    /* make sure all sysex messages are sent */
+    i = 0;
+    cur_send = 1 - this->cur_outhdr;
+    while (this->outhdr[cur_send].dwFlags & MHDR_DONE == 0) {
+      Sleep(100);
+      if (i++ == 10) {
+	break;
+      }
+    }
+    midiOutUnprepareHeader(this->hmidiout, &this->outhdr[cur_send], sizeof(MIDIHDR));
+
     for (i = 0; i < 2; i++) {
-      midiOutUnprepareHeader(this->hmidiout, &this->outhdr[i], sizeof(MIDIHDR));
       if (this->outhdr[i].lpData != NULL) {
 	fts_free(this->outhdr[i].lpData);
 	this->outhdr[i].lpData = NULL;
       }
     }
+
     midiOutClose(this->hmidiout);
   }
 

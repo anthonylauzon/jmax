@@ -554,7 +554,6 @@ static fts_symbol_t fts_s_floatbox;
 static fts_symbol_t fts_s_messbox;
 static fts_symbol_t fts_s_button;
 static fts_symbol_t fts_s_toggle;
-static fts_symbol_t fts_s_message;
 static fts_symbol_t fts_s_connect;
 static fts_symbol_t fts_s_pop;
 static fts_symbol_t fts_s_load_init;

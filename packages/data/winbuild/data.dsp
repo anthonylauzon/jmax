@@ -118,6 +118,10 @@ SOURCE=..\c\src\data.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\dumpfile.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\fill.c
 # End Source File
 # Begin Source File

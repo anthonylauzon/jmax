@@ -370,7 +370,6 @@ static void
 listarith_set_right_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listarith_t *this = (listarith_t *)o;
-  int i;
 
   fts_array_set(&this->right_list, ac, at);
   this->right_type = fts_s_list;

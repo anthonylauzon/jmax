@@ -175,8 +175,8 @@ fts_package_load(fts_symbol_t name)
 
   if (fts_file_exists(filename)) {
     pkg = fts_package_load_from_file(name, filename);
+    fts_log("[package]: Loaded %s package definition\n", fts_symbol_name(name));
   } else {
-    fts_log("[package]: No package definition for %s package\n", fts_symbol_name(name));
     pkg = fts_package_new(name);
     pkg->state = fts_package_defined;
     pkg->name = name;

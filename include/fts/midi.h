@@ -403,7 +403,7 @@ typedef struct fts_midiport
   fts_object_t o;
   
   /* input listeners */
-  fts_midiport_listener_t **listeners[n_midi_types];
+  fts_midiport_listener_t **listeners[n_midi_types + 1];
   
   /* output function (declared by MIDI port class) */
   fts_midiport_function_t output;

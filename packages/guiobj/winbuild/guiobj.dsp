@@ -109,6 +109,14 @@ SOURCE=..\c\src\dspcontrol.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\errorfinder.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\finder.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\fork.c
 # End Source File
 # Begin Source File
@@ -146,6 +154,10 @@ SOURCE=..\c\src\messconst.c
 # Begin Source File
 
 SOURCE=..\c\src\panel.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\runtimeerrors.c
 # End Source File
 # Begin Source File
 

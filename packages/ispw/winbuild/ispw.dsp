@@ -220,10 +220,6 @@ SOURCE=..\c\src\fourpoint.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\ftl_biquad.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\ftl_delay.c
 # End Source File
 # Begin Source File

@@ -93,8 +93,8 @@ struct fts_timebase
 
 #define fts_timebase_get_master(t) ((t)->master)
 
-void fts_timebase_init(fts_timebase_t *timebase);
-void fts_timebase_reset(fts_timebase_t *timebase);
+FTS_API void fts_timebase_init(fts_timebase_t *timebase);
+FTS_API void fts_timebase_reset(fts_timebase_t *timebase);
 
 /***************************************************
  *
@@ -102,9 +102,9 @@ void fts_timebase_reset(fts_timebase_t *timebase);
  *
  */
 
-void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *o, fts_method_t m, const fts_atom_t *a, double delay);
-void fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object);
-void fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object);
+FTS_API void fts_timebase_add_call(fts_timebase_t *timebase, fts_object_t *o, fts_method_t m, const fts_atom_t *a, double delay);
+FTS_API void fts_timebase_remove_object(fts_timebase_t *timebase, fts_object_t *object);
+FTS_API void fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object);
 
 
 /*********************************************************************
@@ -113,9 +113,9 @@ void fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object);
  *
  */
 
-void fts_timebase_add_slave(fts_timebase_t *timebase, fts_timebase_t *slave);
-void fts_timebase_remove_slave(fts_timebase_t *timebase, fts_timebase_t *slave);
-void fts_timebase_advance_slaves(fts_timebase_t *timebase);
+FTS_API void fts_timebase_add_slave(fts_timebase_t *timebase, fts_timebase_t *slave);
+FTS_API void fts_timebase_remove_slave(fts_timebase_t *timebase, fts_timebase_t *slave);
+FTS_API void fts_timebase_advance_slaves(fts_timebase_t *timebase);
 
 
 /*********************************************************************
@@ -124,8 +124,8 @@ void fts_timebase_advance_slaves(fts_timebase_t *timebase);
  *
  */
 
-void fts_timebase_advance(fts_timebase_t *timebase);
-void fts_timebase_locate(fts_timebase_t *timebase);
+FTS_API void fts_timebase_advance(fts_timebase_t *timebase);
+FTS_API void fts_timebase_locate(fts_timebase_t *timebase);
 
 /** 
  * @name logical time
