@@ -163,6 +163,8 @@ class MoveConnectInteraction extends Interaction
 	      }
 	    else
 	      {
+		destinationChoosen = false;
+
 		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);

@@ -171,6 +171,8 @@ class DragReverseConnectInteraction extends Interaction
 	      }
 	    else 
 	      {
+		destinationChoosen = false;
+		
 		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);

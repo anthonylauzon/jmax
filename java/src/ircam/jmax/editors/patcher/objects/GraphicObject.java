@@ -678,11 +678,10 @@ abstract public class GraphicObject implements DisplayObject
 
     if (followingInletLocations)
       area = getDrawingLineInletSensibilityArea(mouseX , mouseY);
-    
     else 
       if (followingOutletLocations)
 	area = getDrawingLineOutletSensibilityArea(mouseX , mouseY);
-
+ 
     return area;
   }
 

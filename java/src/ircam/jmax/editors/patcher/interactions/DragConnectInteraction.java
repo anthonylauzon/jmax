@@ -151,7 +151,7 @@ class DragConnectInteraction extends Interaction
     else if (Squeack.isDrag(squeack) && Squeack.onInlet(squeack))
       {
 	dragged = true;
-	
+
 	if ((! destinationChoosen) || dst != (GraphicObject) area.getTarget() || inlet != area.getNumber())
 	  {
 	    if(!editor.getDisplayList().thisConnectionExist(src, outlet, 
@@ -163,12 +163,15 @@ class DragConnectInteraction extends Interaction
 		destinationChoosen = true;
 		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
+
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y,
 						    dst.getInletAnchorX(inlet), dst.getInletAnchorY(inlet));
 		editor.getDisplayList().redrawDragLine();
 	      }
 	    else 
 	      {
+		destinationChoosen = false;		
+
 		editor.getDisplayList().dragLine();
 		editor.getDisplayList().redrawDragLine();
 		editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);

@@ -866,7 +866,7 @@ public class DisplayList
     // Set the drag rectangle to the rectangle corresponding to
     // the line, in order to be able to use intersect with the
     // clipping area during repaint.
-    
+
     if (x < x2)
       {
 	dragRectangle.x = x;
