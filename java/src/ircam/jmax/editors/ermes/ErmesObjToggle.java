@@ -26,7 +26,7 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
     if (width == -1)
       setWidth( DEFAULT_WIDTH);
     else if (width <= MINIMUM_WIDTH)
-      setWidth( width);
+      setWidth( MINIMUM_WIDTH);
   }
 
   // redefined from base class
