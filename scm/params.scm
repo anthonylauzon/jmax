@@ -40,6 +40,7 @@
 (if (not (java-null? (get-property "jmaxPkgPath"))) (set! jmax-pkg-path (get-property "jmaxPkgPath")))
 (if (not (java-null? (get-property "jmaxSplashScreen"))) (set! jmax-splash-screen (get-property "jmaxSplashScreen")))
 (if (not (java-null? (get-property "jmaxFastFileBox"))) (set! jmax-fast-file-box (get-property "jmaxFastFileBox")))
+(if (not (java-null? (get-property "jmaxHostType")))    (set! jmax-host-type (get-property "jmaxHostType")))
 
 ;; the following is done so properties it can be accessed from Java
 ;;
@@ -48,15 +49,4 @@
 (set-property "jmaxNoConsole" jmax-no-console)
 (set-property "jmaxNoRegister" jmax-no-register)
 
-;;
-;; Special handling for host type
-;;
-
-; FIXME
-
-(if (not (java-null? (get-property "jmaxHostType")))
-    (set! jmax-host-type (get-property "jmaxHostType"))
-    (if (string? (get-host-type jmax-host))
-	(set! jmax-host-type (get-host-type jmax-host))
-	(set! jmax-host-type "linuxpc")))
 

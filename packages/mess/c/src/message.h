@@ -27,6 +27,8 @@
 #ifndef _MESS_MESSAGE_H_
 #define _MESS_MESSAGE_H_
 
+#include "mess.h"
+
 /************************************************************************
  *
  *  message object
@@ -45,12 +47,12 @@ typedef struct
   fts_atom_t *at;
 } message_t;
 
-extern fts_class_t *message_class;
-extern fts_symbol_t message_symbol;
-extern fts_type_t message_type;
+MESS_API fts_class_t *message_class;
+MESS_API fts_symbol_t message_symbol;
+MESS_API fts_type_t message_type;
 
-extern void message_clear(message_t *mess);
-extern void message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
+MESS_API void message_clear(message_t *mess);
+MESS_API void message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #define message_get_selector(m) ((m)->s)
 #define message_get_ac(m) ((m)->ac)

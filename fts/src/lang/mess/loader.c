@@ -193,7 +193,7 @@ fts_object_t *fts_binary_file_load( const char *name,
 
     /* open the file */
 
-  f = fopen( name, "r");
+  f = fopen( name, "rb");
 
   if ( f == 0)
     {

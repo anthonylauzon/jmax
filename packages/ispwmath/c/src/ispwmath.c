@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "ispwmath.h"
 
 extern void binop_config(void);
 
@@ -34,5 +34,5 @@ ispwmath_init(void)
   binop_config();
 }
 
-fts_module_t ispwmath_module = {"ispwmath", "ISPW math classes", ispwmath_init, 0, 0};
+ISPWMATH_API fts_module_t ispwmath_module = {"ispwmath", "ISPW math classes", ispwmath_init, 0, 0};
 

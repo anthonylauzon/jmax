@@ -193,7 +193,7 @@ fts_midifile_open_read(fts_symbol_t name)
   if (!fts_file_get_read_path(path, full_path))
     return 0;
 
-  fp = fopen(full_path, "r");
+  fp = fopen(full_path, "rb");
 
   if(fp != 0)
     {
@@ -217,7 +217,7 @@ fts_midifile_open_write(fts_symbol_t name)
   /* get full path of file location */
   fts_file_get_write_path(path, full_path);
 
-  fp = fopen(full_path, "w");
+  fp = fopen(full_path, "wb");
 
   if(fp != 0)
     {

@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "sequence.h"
 
 extern void seqsym_config(void);
 
@@ -60,4 +60,4 @@ sequence_module_init(void)
   seqrec_config();
 }
 
-fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};
+SEQUENCE_API fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};

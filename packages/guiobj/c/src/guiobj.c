@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "guiobj.h"
 
 extern void toggle_config(void);
 extern void messconst_config(void);
@@ -62,4 +62,4 @@ fts_guiobj_init(void)
   scope_config();
 }
 
-fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init, 0, 0};
+GUIOBJ_API fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init, 0, 0};

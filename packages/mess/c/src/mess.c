@@ -20,7 +20,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "mess.h"
 
 extern void message_config(void);
 extern void messtab_config(void);
@@ -32,5 +32,5 @@ mess_init(void)
   messtab_config();
 }
 
-fts_module_t mess_module = {"mess", "message classes", mess_init, 0, 0};
+MESS_API fts_module_t mess_module = {"mess", "message classes", mess_init, 0, 0};
 

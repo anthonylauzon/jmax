@@ -144,7 +144,7 @@ static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
     {
       fts_abstraction_t *abs = (fts_abstraction_t *) fts_get_ptr(&a);
 
-      file = fopen(fts_symbol_name(abs->filename), "r");
+      file = fopen(fts_symbol_name(abs->filename), "rb");
 
       /* Here, we should handle differently declarations that are
 	 caches, and declarations that are user declaration;
@@ -191,7 +191,7 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
 	  /* If the file is there and it is a regular file and not a directory , open it */
 	  if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
 	    {
-	      file = fopen( buf, "r");
+	      file = fopen( buf, "rb");
 	      break;
 	    }
 	}

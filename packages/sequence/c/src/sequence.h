@@ -26,6 +26,16 @@
 #ifndef _SEQUENCE_H_
 #define _SEQUENCE_H_
 
+#ifdef WIN32
+#if defined(SEQUENCE_EXPORTS)
+#define SEQUENCE_API __declspec(dllexport)
+#else
+#define SEQUENCE_API __declspec(dllimport)
+#endif
+#else
+#define SEQUENCE_API extern
+#endif
+
 #include <fts/fts.h>
 #include "track.h"
 

@@ -71,10 +71,13 @@ static void ex_tan(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_atan(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_sinh(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_cosh(long int argc, struct ex_ex *argv, struct ex_ex *optr);
+static void ex_tanh(long int argc, struct ex_ex *argv, struct ex_ex *optr);
+#ifndef WIN32
+/* asinh, acosh and atanh are not defined on win32 */
 static void ex_asinh(long argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_acosh(long argc, struct ex_ex *argv, struct ex_ex *optr);
-static void ex_tanh(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_atanh(long argc, struct ex_ex *argv, struct ex_ex *optr);
+#endif
 static void ex_atan2(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_size(long int argc, struct ex_ex *argv, struct ex_ex *optr);
 static void ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr);
@@ -109,9 +112,11 @@ t_ex_func ex_funcs[] = {
   {"tanh",	ex_tanh,	1},	/* hyperbolic tan */
   {"fact",	ex_fact,	1},	/* factorial */
   {"random",	ex_random,	2},	/* random number */
+#ifndef WIN32
   {"asinh",	ex_asinh,	1},	/* hyperbolic asin */
   {"acosh",	ex_acosh,	1},	/* hyperbolic acos */
   {"atanh",	ex_atanh,	1},	/* hyperbolic atan */
+#endif
   {"size",	ex_size,	1},	/* size of table */
   {"sum",	ex_sum,		1},	/* sum of contect of a table */
   {"Sum",	ex_Sum,		3},	/* sum with boundries */
@@ -445,6 +450,7 @@ ex_tanh(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     optr->ex_flt = (float)tanh((double)argv->ex_int);
 }
 
+#ifndef WIN32
 
 static void
 ex_asinh(long argc, struct ex_ex *argv, struct ex_ex *optr)
@@ -476,6 +482,7 @@ ex_atanh(long argc, struct ex_ex *argv, struct ex_ex *optr)
     optr->ex_flt = (float)atanh((double)argv->ex_int);
 }
 
+#endif
 
 static void
 ex_fact(long int argc, struct ex_ex *argv, struct ex_ex *optr)

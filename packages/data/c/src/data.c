@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "data.h"
 
 extern void value_config(void);
 
@@ -66,4 +66,4 @@ data_init(void)
   bpf_config();
 }
 
-fts_module_t data_module = {"data", "data structures", data_init, 0, 0};
+DATA_API fts_module_t data_module = {"data", "data structures", data_init, 0, 0};

@@ -154,7 +154,7 @@ fts_open_bmax_file_for_writing(const char *name, int dobackup)
 
   /* allocate a bmax descriptor, and initialize it */
 
-  file = fopen(name, "w");
+  file = fopen(name, "wb");
 
   if (file == 0)
     {

@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "math.h"
 
 extern void math_binop_config(void);
 
@@ -34,5 +34,5 @@ math_init(void)
   math_binop_config();
 }
 
-fts_module_t math_module = {"math", "math classes", math_init, 0, 0};
+MATH_API fts_module_t math_module = {"math", "math classes", math_init, 0, 0};
 

@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "signal.h"
 
 extern void signal_tilda_config(void);
 extern void signal_binop_config(void);
@@ -70,4 +70,4 @@ signal_init(void)
   signal_rec_fvec_config();
 }
 
-fts_module_t signal_module = {"signal", "basic signal classes", signal_init, 0, 0};
+SIGNAL_API fts_module_t signal_module = {"signal", "basic signal classes", signal_init, 0, 0};

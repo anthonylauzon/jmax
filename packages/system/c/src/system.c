@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "system.h"
 
 extern void dsp_config(void);
 extern void arch_config(void);
@@ -54,4 +54,4 @@ system_module_init(void)
   bus_tilda_config();
 }
 
-fts_module_t system_module = {"system", "Basic System Objects", system_module_init, 0, 0};
+SYSTEM_API fts_module_t system_module = {"system", "Basic System Objects", system_module_init, 0, 0};

@@ -733,7 +733,7 @@ patcher_save_dotpat_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 {
   FILE *file;
 
-  file = fopen( fts_symbol_name( fts_get_symbol( at)), "w");
+  file = fopen( fts_symbol_name( fts_get_symbol( at)), "wb");
 
   if ( file != NULL)
     {

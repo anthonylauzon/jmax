@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "numeric.h"
 
 extern void wrap_config(void);
 extern void rewrap_config(void);
@@ -36,5 +36,5 @@ numeric_init(void)
   rewrap_config();
 }
 
-fts_module_t numeric_module = {"numeric", "numeric classes", numeric_init, 0, 0};
+NUMERIC_API fts_module_t numeric_module = {"numeric", "numeric classes", numeric_init, 0, 0};
 

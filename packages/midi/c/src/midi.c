@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "midi.h"
 
 extern void midiin_config(void);
 extern void midiout_config(void);
@@ -40,4 +40,4 @@ midi_init(void)
   rawmidiport_config();
 }
 
-fts_module_t midi_module = {"midi", "MIDI i/o classes", midi_init, 0, 0};
+MIDI_API fts_module_t midi_module = {"midi", "MIDI i/o classes", midi_init, 0, 0};

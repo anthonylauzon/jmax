@@ -58,7 +58,7 @@ DATA_API void ivec_set_size(ivec_t *vector, int size);
 #define ivec_get_element(v, i) ((v)->values[i])
 #define ivec_set_element(v, i, x) ((v)->values[i] = (x))
 
-void ivec_set_const(ivec_t *vector, int c);
+DATA_API void ivec_set_const(ivec_t *vector, int c);
 #define ivec_zero(v) ivec_set_const((v), 0)
 
 DATA_API void ivec_set_from_atom_list(ivec_t *vector, int offset, int ac, const fts_atom_t *at);

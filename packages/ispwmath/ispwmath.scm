@@ -25,7 +25,7 @@
 
 (provide-package "ispwmath" "0.0.0")
 
-(ucs "load" "module" "ispwmath" (file-cat dir "c" "lib" jmax-arch jmax-mode "libispwmath.so"))
+(ucs "load" "module" "ispwmath" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "ispwmath")))
 
 ;; help
 (sshh-load (file-cat dir "help" "ispwmath.help.index.scm"))

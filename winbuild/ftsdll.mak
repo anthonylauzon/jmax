@@ -25,10 +25,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "ftsdll - Win32 Release"
 
 OUTDIR=.\Release
@@ -143,8 +139,42 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+
+.c{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
+RSC=rc.exe
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
 BSC32_SBRS= \
@@ -241,11 +271,11 @@ LINK32_OBJS= \
 	"$(INTDIR)\updates.obj" \
 	"$(INTDIR)\utils.obj" \
 	"$(INTDIR)\variables.obj" \
+	"$(INTDIR)\vec_fft.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
 	"$(INTDIR)\win32.obj" \
-	"$(INTDIR)\windev.obj" \
-	"$(INTDIR)\vec_fft.obj"
+	"$(INTDIR)\windev.obj"
 
 "$(OUTDIR)\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -254,10 +284,10 @@ LINK32_OBJS= \
 
 !ELSEIF  "$(CFG)" == "ftsdll - Win32 Debug"
 
-OUTDIR=.\..\fts\lib
-INTDIR=.\DllDebug
+OUTDIR=.\..\fts\lib\i686-win32\debug
+INTDIR=.\..\fts\lib\i686-win32\debug
 
-ALL : "..\fts\bin\fts.dll"
+ALL : "..\fts\bin\i686-win32\debug\fts.dll"
 
 
 CLEAN :
@@ -360,23 +390,54 @@ CLEAN :
 	-@erase "$(OUTDIR)\fts.exp"
 	-@erase "$(OUTDIR)\fts.lib"
 	-@erase "$(OUTDIR)\fts.pdb"
-	-@erase "..\fts\bin\fts.dll"
-	-@erase "..\fts\bin\fts.ilk"
+	-@erase "..\fts\bin\i686-win32\debug\fts.dll"
+	-@erase "..\fts\bin\i686-win32\debug\fts.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-"$(INTDIR)" :
-    if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
-
+CPP=cl.exe
 CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+
+.c{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
+RSC=rc.exe
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"..\fts\bin\fts.dll" /implib:"$(OUTDIR)\fts.lib" /pdbtype:sept 
+LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"..\fts\bin\i686-win32\debug\fts.dll" /implib:"$(OUTDIR)\fts.lib" /pdbtype:sept 
 LINK32_OBJS= \
 	"$(INTDIR)\atomarray.obj" \
 	"$(INTDIR)\atomfiles.obj" \
@@ -467,48 +528,18 @@ LINK32_OBJS= \
 	"$(INTDIR)\updates.obj" \
 	"$(INTDIR)\utils.obj" \
 	"$(INTDIR)\variables.obj" \
+	"$(INTDIR)\vec_fft.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
 	"$(INTDIR)\win32.obj" \
-	"$(INTDIR)\windev.obj" \
-	"$(INTDIR)\vec_fft.obj"
+	"$(INTDIR)\windev.obj"
 
-"..\fts\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"..\fts\bin\i686-win32\debug\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
 
 !ENDIF 
-
-.c{$(INTDIR)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(INTDIR)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(INTDIR)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
 
 
 !IF "$(NO_EXTERNAL_DEPS)" != "1"

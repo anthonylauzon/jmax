@@ -82,7 +82,7 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   else
     sprintf(buf, "/tmp/jmax.%s.%d", name, getpid());
 
-  this->file = fopen(buf, "w+");
+  this->file = fopen(buf, "w+b");
 
   /* Note that according to the UNIX file semantic, the file
      will not be removed by the next call, just its name

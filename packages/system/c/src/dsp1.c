@@ -84,7 +84,7 @@ dsp_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
       filename = fts_symbol_name(fts_get_symbol(at));
 
-      f = fopen(filename, "w");
+      f = fopen(filename, "wb");
 
       if (f)
 	dsp_chain_fprint(f);

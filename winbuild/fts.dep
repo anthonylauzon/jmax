@@ -49,22 +49,21 @@
 	"..\include\fts\lang\utils.h"\
 	"..\include\fts\lang\utils\cubic.h"\
 	"..\include\fts\lang\utils\floatfuns.h"\
-	"..\include\fts\lang\utils\hashtab.h"\
+	"..\include\fts\lang\utils\hashtable.h"\
 	"..\include\fts\lang\utils\idefix.h"\
 	"..\include\fts\lang\utils\ieeewrap.h"\
 	"..\include\fts\lang\utils\intphase.h"\
+	"..\include\fts\lang\utils\iterator.h"\
 	"..\include\fts\lang\utils\objectlist.h"\
 	"..\include\fts\lang\utils\ramp_vectors.h"\
 	"..\include\fts\lang\utils\ramps.h"\
 	"..\include\fts\lang\utils\random.h"\
 	"..\include\fts\lang\utils\srconv.h"\
 	"..\include\fts\lang\veclib.h"\
+	"..\include\fts\lang\veclib\cfft.h"\
 	"..\include\fts\lang\veclib\complex.h"\
-	"..\include\fts\lang\veclib\ftlfun.h"\
-	"..\include\fts\lang\veclib\include\declare_fts.h"\
-	"..\include\fts\lang\veclib\include\vec_fft.h"\
-	"..\include\fts\lang\veclib\include\vecftl.h"\
-	"..\include\fts\lang\veclib\include\veclib.h"\
+	"..\include\fts\lang\veclib\rfft_shuffle.h"\
+	"..\include\fts\lang\veclib\vec_fft.h"\
 	"..\include\fts\runtime.h"\
 	"..\include\fts\runtime\audio\audio.h"\
 	"..\include\fts\runtime\audio\audioport.h"\

@@ -114,7 +114,9 @@ void
 fts_list_reset(fts_list_t *list)
 {
   fts_list_set_size(list, 0);
-  fts_block_free(list->atoms, list->alloc * sizeof(fts_atom_t));
+  if (list->atoms) {
+    fts_block_free(list->atoms, list->alloc * sizeof(fts_atom_t));
+  }
 }
 
 void 

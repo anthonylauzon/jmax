@@ -24,7 +24,7 @@
  *
  */
 
-#include <fts/fts.h>
+#include "ispw.h"
 
 /* control */
 extern void ispw_naming_init(void);
@@ -276,6 +276,6 @@ ispw_module_init(void)
 
 }
 
-fts_module_t ispw_module = {"ISPW", "ISPW classes", ispw_module_init, 0, 0};
+ISPW_API fts_module_t ispw_module = {"ISPW", "ISPW classes", ispw_module_init, 0, 0};
 
 

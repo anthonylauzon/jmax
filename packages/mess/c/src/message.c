@@ -23,7 +23,6 @@
  * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
-#include <fts/fts.h>
 #include "message.h"
 
 fts_symbol_t message_symbol = 0;

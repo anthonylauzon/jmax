@@ -1,8 +1,8 @@
-;; 
+;;
 ;; jMax
 ;; Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 ;; 
-;; This program is free software; you can redistribute it and/or
+;; This program is free software; you can redistribute it and;or
 ;; modify it under the terms of the GNU General Public License
 ;; as published by the Free Software Foundation; either version 2
 ;; of the License, or (at your option) any later version.
@@ -18,19 +18,19 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ;; 
-;; Based on Max/ISPW by Miller Puckette.
-;;
+;; Based on Max;ISPW by Miller Puckette.
+;; 
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
-(provide-package "numeric" "0.0.0")
+(set! jmax-arch "i686-win32")
 
-(ucs "load" "module" "numeric" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "numeric")))
+(define (platform-start-hook)
+;  (require-package "ossdev" "0.0.0")
+;  (require-package "pdtddev" "0.0.0")
+)
+(define-hook "platform-start" platform-start-hook)
 
-(println "package: numeric (numeric classes)")
+(define (default-start-hook) )
 
-;; help
-(sshh-load (file-cat dir "help" "numeric.help.index.scm"))
-(help-summary "Numeric summary" (file-cat dir "help" "numeric.summary.jmax"))
-
-
+(define-hook "default-start" default-start-hook)

@@ -26,7 +26,7 @@
 
 
 
-#include <fts/fts.h>
+#include "lists.h"
 
 extern void list_config(void);
 extern void listarith_config(void);
@@ -54,4 +54,4 @@ lists_module_init(void)
   listtail_config();
 }
 
-fts_module_t lists_module = {"lists", "basic list handling classes", lists_module_init, 0, 0};
+LISTS_API fts_module_t lists_module = {"lists", "basic list handling classes", lists_module_init, 0, 0};
