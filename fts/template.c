@@ -43,6 +43,10 @@
 
 /* #define TEMPLATE_DEBUG */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -55,6 +59,11 @@
 #endif
 
 #include <fts/ftsnew.h>
+#include <fts/private/errobj.h>
+#include <fts/private/vm.h>
+#include <fts/private/object.h>
+#include <fts/private/patcher.h>
+#include <fts/private/loader.h>
 
 /* Template */
 
@@ -168,19 +177,22 @@ static void fts_template_recompute_instances(fts_template_t *template)
   if (template->instances)
     {
       fts_objectset_t *old_instances;
-      fts_objectset_iterator_t *iterator;
+      fts_iterator_t iterator;
 
       old_instances = template->instances;
 
-      template->instances = fts_objectset_new();
+      template->instances = (fts_objectset_t *)fts_malloc( sizeof( fts_objectset_t));
+      fts_objectset_init( template->instances);
 
-      iterator = fts_objectset_iterator_new(old_instances);
+      fts_objectset_get_objects( old_instances, &iterator);
 
-      while (! fts_objectset_iterator_end(iterator))
+      while ( fts_iterator_has_more( &iterator))
 	{
 	  fts_object_t *object;
+	  fts_atom_t a;
 
-	  object = fts_objectset_iterator_current(iterator);
+	  fts_iterator_next( &iterator, &a);
+	  object = fts_get_object( &a);
 
 #ifdef TEMPLATE_DEBUG 
 	  fprintf(stderr, "Recomputing instance:"); /* @@@ */
@@ -189,12 +201,10 @@ static void fts_template_recompute_instances(fts_template_t *template)
 #endif
 
 	  fts_object_recompute(object);
-
-	  fts_objectset_iterator_next(iterator);
 	}
 
-      fts_objectset_iterator_free(iterator);
-      fts_objectset_delete(old_instances);
+      fts_objectset_destroy(old_instances);
+      fts_free( old_instances);
     }
 #ifdef TEMPLATE_DEBUG 
   fprintf(stderr, "Done.\n");
@@ -297,7 +307,10 @@ void fts_template_add_instance(fts_template_t *template, fts_object_t *object)
 #endif
 
   if (template->instances == 0)
-    template->instances = fts_objectset_new();
+    {
+      template->instances = (fts_objectset_t *)fts_malloc( sizeof( fts_objectset_t));
+      fts_objectset_init( template->instances);
+    }
   
   fts_objectset_add(template->instances, object);
 }

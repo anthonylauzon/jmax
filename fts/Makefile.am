@@ -30,12 +30,10 @@ property.c \
 saver.c \
 selection.c \
 symbol.c \
+template.c \
 variable.c \
 version.c \
 vm.c 
-
-#needs object set plus iterator
-#templates.c \
 
 #ftl.c \
 

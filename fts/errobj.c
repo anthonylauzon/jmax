@@ -134,6 +134,8 @@ void fts_do_recompute_errors(void)
 
 	  fts_object_recompute(object);
 	}
+
+      fts_objectset_destroy( &errors);
     }
 }
 
