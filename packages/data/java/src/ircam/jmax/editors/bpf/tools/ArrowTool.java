@@ -190,22 +190,52 @@ public class ArrowTool extends SelecterTool implements DragListener{
     // starts a serie of undoable moves
     ((UndoableData) bgc.getDataModel()).beginUpdate();
 
-    //control of Jump and double points  ///////////////
+    //control of Jumps and double points  ///////////////
+    
+    boolean repeat = false; 
+    if(bgc.getSelection().size()>1)
+	{
+	    if(deltaX<0)
+		{
+		    if(first.getTime() == ftsObj.getNextPoint(first).getTime())
+			repeat = true;
+		}		   
+	    else
+		if(last.getTime() == ftsObj.getPreviousPoint(last).getTime())
+		    repeat = true;
+	}
+
     if(firstX+deltaX <= prevX)
 	{
-	  if(firstIndex == ftsObj.length() - 1 || first.getValue() == prev.getValue())
-	      {
-		  //remove the first selected index and send the rest;
-		  bgc.getSelection().deSelect(first);
-		  ftsObj.requestPointRemove(firstIndex);
-	      }
-	  else if(firstIndex == 1 || a.getInvX(firstX + deltaX) <= ftsObj.getPointAt(firstIndex - 2).getTime())
-	      {
-		  //remove prev and  send the points with index -1
-		  ftsObj.requestPointRemove(firstIndex-1);
-		  firstIndex--;
-	      }
-      }
+	    if(firstIndex == ftsObj.length() - 1 || first.getValue() == prev.getValue())
+		{
+		    //remove the first selected index and send the rest;
+		    bgc.getSelection().deSelect(first);
+		    ftsObj.requestPointRemove(firstIndex);
+		}
+	    else
+		if(firstIndex == 1 ||
+		   a.getInvX(firstX + deltaX) <= ftsObj.getPointAt(firstIndex - 2).getTime())
+		    {
+			//remove prev and send the points with index -1
+			if(repeat)
+			    {
+				//remove prev and first
+				int[] indexs = {firstIndex, firstIndex-1};
+				bgc.getSelection().deSelect(first);
+				ftsObj.requestPointsRemove(indexs);	
+			    }
+			else
+			    ftsObj.requestPointRemove(firstIndex-1);		    
+			firstIndex--;		    
+		    }
+		else
+		    if(repeat) 
+			{
+			    bgc.getSelection().deSelect(first);
+			    ftsObj.requestPointRemove(firstIndex);
+			}
+	}
     else if((lastX+deltaX == nextX) && (lastIndex < ftsObj.length() - 1 ))
 	{
 	    if(last.getValue() == next.getValue())
@@ -214,9 +244,27 @@ public class ArrowTool extends SelecterTool implements DragListener{
 		    bgc.getSelection().deSelect(last);
 		    ftsObj.requestPointRemove(lastIndex);
 		}
-	    else if(lastIndex == ftsObj.length() - 2 || a.getInvX(lastX + deltaX) >= ftsObj.getPointAt(lastIndex + 2).getTime())
-		// remove next and send all 
-		ftsObj.requestPointRemove(lastIndex+1);		    
+	    else 
+		if(lastIndex == ftsObj.length() - 2 ||
+		   a.getInvX(lastX + deltaX) >= ftsObj.getPointAt(lastIndex + 2).getTime())
+		    {
+			// remove next and send all 
+			if(repeat)
+			    {
+				//remove prev and first
+				int[] indexs = {lastIndex+1, lastIndex};
+				bgc.getSelection().deSelect(last);
+				ftsObj.requestPointsRemove(indexs);				
+			    }
+			else
+			    ftsObj.requestPointRemove(lastIndex+1);		    
+		    }
+		else
+		    if(repeat) 
+			{
+			    bgc.getSelection().deSelect(last);
+			    ftsObj.requestPointRemove(lastIndex);
+			}
 	}
     /////////////////////////////////////////
 

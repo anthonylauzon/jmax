@@ -200,6 +200,17 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	sendMessage(FtsObject.systemInlet, "remove_points", 1, sendArgs);
     }
 
+    public void requestPointsRemove(int[] indexs)
+    {
+	for(int i =0; i<indexs.length; i++)
+	    {
+		sendArgs[i].setInt(indexs[i]);
+	    }
+	bubbleSort(sendArgs, indexs.length);
+	
+	sendMessage(FtsObject.systemInlet, "remove_points", indexs.length, sendArgs);
+    }
+
     public void requestPointsRemove(Enumeration en)
     {
 	int i = 0;

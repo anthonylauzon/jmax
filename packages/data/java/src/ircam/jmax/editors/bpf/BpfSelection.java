@@ -113,14 +113,6 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
    */
   public void select(Enumeration e)
   {
-      /*BpfPoint point;
-	setValueIsAdjusting(true);
-	while(e.hasMoreElements())
-	{
-	point = (BpfPoint)e.nextElement();
-	select(point);
-	}
-	setValueIsAdjusting(false);*/
       if(!e.hasMoreElements()) return;
 
       setValueIsAdjusting(true);
@@ -149,7 +141,6 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
     if(obj == lastSelectedPoint) lastSelectedPoint = null;
     removeSelectionInterval(index, index);
   }
-
 
   /** remove the given enumeration of objects from the selection
    * When possible, use this method instead of
@@ -224,15 +215,16 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
   public  int size()
   {
     // unefficient! Alternative solutions welcome.
-    int count = 0;
-    
-    for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++) 
-      {
-	if (isSelectedIndex(i))
-	  count++;
-      }
+      int count = 0;
+	
+      for (int i = getMinSelectionIndex(); i <= getMaxSelectionIndex(); i++) 
+	  {
+	      if (isSelectedIndex(i))
+		  count++;
+	  }
 
-    return count;
+      return count;
+      //return (getMaxSelectionIndex() -  getMinSelectionIndex() + 1);
   }
 
   public BpfPoint getLastSelectedPoint()
@@ -290,7 +282,6 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 	    else
 		removeSelectionInterval(i,i);
 	  }
-
       }
     else 
       {
@@ -314,16 +305,14 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
     /** TrackDataListener interface */
     public void pointsDeleted(int[] oldIndexs) 
     {
-	// The implementation is very conservative. It does not make the 
-	// assumption that a deleted object was selected... 
-	// It could also be implemented with a simple clearSelection() call
-      
-	if(oldIndexs.length==1)
-	    for (int i = oldIndexs[0]; i<=getMaxSelectionIndex(); i++)
-		if (isSelectedIndex(i+1))
-		    addSelectionInterval(i, i);
-		else
+	for(int i =0; i<oldIndexs.length;i++)
+	    {
+		if(isSelectedIndex(oldIndexs[i]))
 		    removeSelectionInterval(i,i);
+		else
+		    if(oldIndexs[i] < getMinSelectionIndex())
+			setSelectionInterval(getMinSelectionIndex()-1, getMaxSelectionIndex()-1);
+	    }
     }
 
     public void cleared(){}

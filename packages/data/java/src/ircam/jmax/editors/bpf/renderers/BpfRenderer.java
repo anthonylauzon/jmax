@@ -79,13 +79,13 @@ public class BpfRenderer extends AbstractRenderer{
   {
       BpfPoint pt;
       BpfPoint last = null;
-		    
-      float time = gc.getAdapter().getInvX(x);
 
-      for (Enumeration e = gc.getDataModel().intersectionSearch(time -1, time +1,gc.getAdapter()); e.hasMoreElements();) 
+      float time = gc.getAdapter().getInvX(x);
+      float gap =  (float)gc.getAdapter().getInvWidth(PointRenderer.POINT_RADIUS);
+
+      for (Enumeration e = gc.getDataModel().intersectionSearch(time - gap, time + gap,gc.getAdapter()); e.hasMoreElements();) 
 	  {      
 	      pt = (BpfPoint) e.nextElement();
-	      
 	      if (PointRenderer.getRenderer().contains(pt, x, y, gc))
 		  last = pt;
 	  }
