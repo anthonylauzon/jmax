@@ -199,11 +199,18 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
     base = getFirstSelected();
     lenght = getLastSelected()-base+1;
 
-    for (int i = base; i<=getLastSelected(); i++)
+    int i;
+    for (i = base; i<=getLastSelected(); i++)
       {
 	itsCopy[i-base] =model.getValue(i); 
       }
 
+    // pad the remaining with zeros
+    int modelSize = model.getSize();
+    for (int j = i+1; j < modelSize; j++)
+      {
+	itsCopy[j-base] = 0;
+      }
   }
 
   public class TableClip {

@@ -77,7 +77,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     tm.addListener(this);
 
     // Add a listener for selection content changes
-    // (should this be in the SelectionLayer?)
     gc.getSelection().addListSelectionListener( new ListSelectionListener() {
       public void valueChanged(ListSelectionEvent e)
 	{

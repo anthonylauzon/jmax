@@ -57,6 +57,7 @@ public class Selecter extends InteractionModule implements XORPainter {
     startSelection.setLocation(x, y);
     movingPoint.setLocation(x, y);
     itsXORHandler.beginAt(x, y);
+    itsRunningG = gc.getGraphicDestination().getGraphics();
     active = true;
   }
 
@@ -67,10 +68,6 @@ public class Selecter extends InteractionModule implements XORPainter {
   {
     if (!active) return;//!!
     itsXORHandler.moveTo(e.getX(), e.getY());
-    //    gc.getStatusBar().post(ScrToolbar.getTool(), ""+
-    //			   (gc.getAdapter().getInvX(e.getX()))+
-    //			   ", "+
-    //			   (gc.getAdapter().getInvY(e.getY())));
   }
 
   /**
@@ -90,6 +87,7 @@ public class Selecter extends InteractionModule implements XORPainter {
     
     itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
     active = false;
+    itsRunningG.dispose();
   }
 
 
@@ -113,21 +111,19 @@ public class Selecter extends InteractionModule implements XORPainter {
    */
   public void XORDraw(int dx, int dy) 
   {
-    Graphics g = gc.getGraphicDestination().getGraphics();
 
-    g.setColor(Color.gray);
-    g.setXORMode(Color.white); //there's an assumption here on the color of the background.
+    itsRunningG.setColor(Color.gray);
+    itsRunningG.setXORMode(Color.white); //there's an assumption here on the color of the background.
 
     movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy);
 
     tempRect.setBounds(startSelection.x, startSelection.y, movingPoint.x-startSelection.x, movingPoint.y-startSelection.y);
     normalizeRectangle(tempRect);
 
-    g.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+    itsRunningG.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
 
-    g.setPaintMode();
-    g.setColor(Color.black);
-    g.dispose();
+    itsRunningG.setPaintMode();
+    itsRunningG.setColor(Color.black);
   }
 
 
@@ -156,7 +152,7 @@ public class Selecter extends InteractionModule implements XORPainter {
 
   boolean active = false;
   Rectangle tempRect = new Rectangle();
-
+  Graphics itsRunningG;
 }
 
 

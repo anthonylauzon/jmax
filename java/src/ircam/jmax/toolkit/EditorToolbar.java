@@ -35,7 +35,9 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
    * constructor. It inserts the tools provided by the given
    * ToolbarProvider. The direction parameter specify if the
    * toolbar should be HORIZONTAL or VERTICAL. 
-   * For now, the toolbar is private to a window (and the tools are static!)
+   * For now, the toolbar is private to a window (and the tools are static!).
+   * This constructor uses the information of the provider in order to make
+   * a set of initialisations (current tool, current graphic context)
    */
   public EditorToolbar(ToolbarProvider theProvider, int direction) 
   {
@@ -47,7 +49,6 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
 
     /** prepare the popup */
     itsPopupMenu = new JPopupMenu();
-    JMenuItem item;
 
     //install the Tools
     Tool aTool;
@@ -60,13 +61,52 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
 	}
       }
 
-    setTool(theProvider.getDefaultTool());
+    init(theProvider.getGraphicContext(), theProvider.getDefaultTool());
+  }
 
-    itsClientGc = theProvider.getGraphicContext();
-    itsClientFrame = itsClientGc.getFrame();
+  /**
+   * Alternative constructor, without a provider. The user must take
+   * care of adding the tools with direct addTool() calls.
+   * The client graphic context and the tool to be used
+   * must also be activated via the init method */
+  public EditorToolbar(int direction) 
+  {
+    super();
+    setDoubleBuffered(false);
+    
+    if (direction == VERTICAL)
+      setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+    /** prepare the popup */
+    itsPopupMenu = new JPopupMenu();
+    JMenuItem item;
+
+  }
+
+  /**
+   * Initialize the given tool on the given graphic context. */
+  public void init(GraphicContext gc, Tool t)
+  {
+    setTool(t);
+
+    itsClientGc = gc;
+    itsClientFrame = gc.getFrame();
     itsClientFrame.addWindowListener(this);  
     
-    currentTool.reActivate(itsClientGc);
+    currentTool.reActivate(gc);
+  }
+
+  /**
+   * Used to programmatically set a new tool.
+   * This method deactivates the current and re activate the new, on the same
+   * graphic context then the old. A tool change message is also
+   * sent to the listeners*/
+  public void changeTool(Tool newTool)
+  {
+    currentTool.deactivate();
+    newTool.reActivate(itsClientGc);
+    setTool(newTool);
+    
   }
 
   public void setTool(Tool t)
@@ -142,7 +182,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
 
   /**
    * From the ActionListener interface,
-   * called when a user selects a new tool.
+   * called when a user selects a new tool via the toolbar's user interface.
    * The new tool will work on the same graphic context then the old.
    */
   public void actionPerformed(ActionEvent e) 
@@ -150,11 +190,7 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
     Object aSource =  e.getSource();
     Tool aTool = (Tool) itsTools.get(aSource);
     
-    currentTool.deactivate();
-    aTool.reActivate(itsClientGc);
-
-    setTool(aTool);
-    
+    changeTool(aTool);    
   }
 
 

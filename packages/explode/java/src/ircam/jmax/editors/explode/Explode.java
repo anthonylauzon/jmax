@@ -28,7 +28,7 @@ import javax.swing.table.*;
 import javax.swing.undo.*;
 
 /**
- * the main class of the explode package.
+ * The main class of the explode package.
  * It inherits from MaxEditor, and implements the MaxDataEditor Interface.
  * This implementation builds a ScrPanel and a ExplodeTablePanel to represent the data.
  */
