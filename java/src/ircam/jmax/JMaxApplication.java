@@ -26,6 +26,7 @@ import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 import javax.swing.*;
 
@@ -266,6 +267,7 @@ public class JMaxApplication extends FtsClient {
   private void start( String[] args)
   {
     parseCommandLineOptions( args);
+    findRootDirectory();
     showSplashScreen();
     properties.put( "jmaxVersion", JMaxVersion.getVersion());
     ircam.jmax.Platform.setValues();
@@ -320,6 +322,19 @@ public class JMaxApplication extends FtsClient {
       }
   }
 
+  private void findRootDirectory()
+  {
+    if (properties.get( "jmaxRoot") != null)
+      return;
+
+    URL url = ClassLoader.getSystemResource( "jmax.jar.root");
+    String u = url.toString();
+
+    String root = u.substring( u.indexOf( '/'), u.lastIndexOf( "/Java/jmax.jar!/jmax.jar.root")) + "/jmaxRoot";
+
+    properties.put( "jmaxRoot", root);
+  }
+
   private void showSplashScreen()
   {
     if((properties.get("jmaxSplashScreen") == null)||(!properties.get("jmaxSplashScreen").equals("hide")))
@@ -360,6 +375,8 @@ public class JMaxApplication extends FtsClient {
     {
       if ( args.isSymbol( 0) )
 	{
+	  System.out.println( "package: " + args.getSymbol(0));
+
 	  try
 	    {
 	      JMaxPackageLoader.load( args.getSymbol( 0).toString());
@@ -386,12 +403,23 @@ public class JMaxApplication extends FtsClient {
 	int argc = 0;
 	String connectionType = ((String)properties.get("jmaxConnection"));
 	String hostName = (String)properties.get("jmaxHost");
-	String hostType = (String)properties.get("jmaxHostType");
 
-	System.out.println( "jMax starting server on "+hostName+" ("+hostType+") via "+connectionType+" connection"); 
-		
-	argv[argc++] = properties.get("jmaxServerDir")+File.separator+"fts";	
-	argv[argc++] = "--no-watchdog";
+	System.out.println( "jMax starting server on "
+			    + ((hostName == null) ? "localhost" : hostName)
+			    + " via "+ connectionType + " connection"); 
+
+
+	String ftsDir = (String)properties.get( "jmaxServerDir");
+
+	if (ftsDir == null)
+	  ftsDir = (String)properties.get( "jmaxRoot") + "/../bin";
+
+	String ftsName = (String)properties.get( "jmaxServerName");
+
+	if (ftsName == null)
+	  ftsName = "fts";
+
+	argv[argc++] = ftsDir + "/" + ftsName;
 		
 	if (connectionType.equals("pipe"))
 	  argv[argc++] = "--stdio";
@@ -400,7 +428,7 @@ public class JMaxApplication extends FtsClient {
 
 	FtsProcess fts = null;
 
-	if (o != null && o instanceof Boolean && ((Boolean)o).booleanValue())
+	if (o != null && ((String)o).equals( "true"))
 	  System.out.println( "Attaching to FTS on host " + hostName);
 	else
 	  fts = new FtsProcess( argc, argv);

@@ -1,2 +1,3 @@
 
-bin_SCRIPTS=jmax
+bin_SCRIPTS=jmax fts.wrapper
+

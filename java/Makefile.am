@@ -23,7 +23,10 @@ CLEANFILES=${JAR}
 
 $(JAR): $(JAR_DEP)	
 	-test -f $(JAR) || rm -f $(JAR)
-	( cd src ; jar -cvf ../$(JAR) ircam/jmax/*.class )
+	@echo "root" > jmax.jar.root
+	jar -cvf $(JAR)	jmax.jar.root
+	@rm jmax.jar.root
+	( cd src ; jar -uvf ../$(JAR) ircam/jmax/*.class )
 	( cd src ; jar -uvf ../$(JAR) ircam/jmax/dialogs/*.class )
 	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/console/*.class )
 	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/*.class )
