@@ -1,4 +1,4 @@
-all	Makefiles
-all	bin
-all     src
+all	all	Makefiles
+all	all	bin
+all	all     src
 

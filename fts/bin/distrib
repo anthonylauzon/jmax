@@ -1,6 +1,6 @@
-sgi	irix6.2
-sgi	o2r5k
-sgi	o2r10k
-sgi	origin
-origin  origin
-linuxpc linuxpc
+sgi	all	irix6.2
+sgi	all	o2r5k
+sgi	all	o2r10k
+sgi	all	origin
+origin	all	origin
+linuxpc	all	linuxpc
