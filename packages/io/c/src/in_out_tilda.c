@@ -172,7 +172,7 @@ static void out_tilda_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac
 
 static void out_tilda_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof( out_tilda_t), out_tilda_init, 0);
+  fts_class_init(cl, sizeof( out_tilda_t), out_tilda_init, out_tilda_delete);
 
   fts_class_message_varargs(cl, fts_s_put, out_tilda_put);
 
