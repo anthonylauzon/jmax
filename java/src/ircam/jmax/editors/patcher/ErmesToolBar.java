@@ -233,18 +233,9 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
     String path = MaxApplication.getProperty("jmaxRoot")+File.separator+"images"+File.separator;
 
     addButton( "", "_object_", path+"cursor_standard.gif", "Adding New Object");
-    addButton( "messconst", "_messconst_", path+"cursor_messconst.gif", "Adding New Message or Constant");
     addButton( "jpatcher", "_patcher_", path+"cursor_patcher.gif", "Adding New Patcher");
     addButton( "inlet -1", "_inlet_", path+"cursor_in.gif", "Adding New Inlet");
     addButton( "outlet -1","_outlet_", path+"cursor_out.gif", "Adding New Outlet");
-    addButton( "fork 2","_fork_", path+"cursor_fork.gif", "Adding New Fork");
-    addButton( "comment", "_comment_", path+"cursor_comment.gif","Adding New Comment");
-    addButton( "button",  "_button_", path+"cursor_bang.gif","Adding New Button");
-    addButton( "toggle",  "_toggle_", path+"cursor_toggle.gif","Adding New Toggle");
-    addButton( "slider",  "_slider_", path+"cursor_slider.gif","Adding New Slider");
-    addButton( "intbox",   "_intbox_", path+"cursor_integer.gif", "Adding New Integer Box");
-    addButton( "floatbox", "_floatbox_", path+"cursor_float.gif", "Adding New Float Box");
-    addButton( "display", "_display_", path+"cursor_display.gif", "Adding New Display Object");
 
     String cname;
     for(Enumeration en = ObjectCreatorManager.getClassNames(); en.hasMoreElements();)

@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -35,6 +35,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 //
 // The "comment" graphic object
@@ -46,7 +47,7 @@ public class Comment extends Editable
   // CONSTRUCTOR
   //--------------------------------------------------------
 
-  Comment( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Comment( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
   }
@@ -58,7 +59,6 @@ public class Comment extends Editable
   public String getArgs()
   {
     // get the correct String from the object
-
     return ftsObject.getComment();
   }
 
@@ -69,7 +69,7 @@ public class Comment extends Editable
     super.redefine(text);
   }
 
-  protected void computeRenderer()
+  public void computeRenderer()
   {
     String args = getArgs();
     Icon icon = null;
@@ -88,8 +88,8 @@ public class Comment extends Editable
   // ----------------------------------------
   // Text area offset
   // ----------------------------------------
-  private static final int TEXT_X_OFFSET = 2;
-  private static final int TEXT_Y_OFFSET = 2;
+  public static final int TEXT_X_OFFSET = 2;
+  public static final int TEXT_Y_OFFSET = 2;
 
   public int getTextXOffset()
   {
@@ -153,3 +153,4 @@ public class Comment extends Editable
     return null;
   }
 }
+

@@ -41,6 +41,7 @@ public class ObjectCreatorManager
   public static void registerGraphicClass(String nameclass, Class theClass, String pkgName)
   {
       creatorManager.graphicClasses.put(nameclass, theClass);
+      creatorManager.classNamesVector.addElement(nameclass);
       creatorManager.packageNames.put(nameclass, pkgName);
   }
   static public Class getFtsClass(String nameclass)
@@ -61,12 +62,13 @@ public class ObjectCreatorManager
   }
   static public Enumeration getClassNames()
   {
-      return creatorManager.graphicClasses.keys();
+      return creatorManager.classNamesVector.elements();
   }  
 
-  private Hashtable ftsClasses = new Hashtable();
+  private Hashtable ftsClasses     = new Hashtable();
   private Hashtable graphicClasses = new Hashtable();
-  private Hashtable packageNames = new Hashtable();
+  private Vector classNamesVector  = new Vector();
+  private Hashtable packageNames   = new Hashtable();
 }
 
 

@@ -41,6 +41,33 @@ public class GuiObjExtension extends tcl.lang.Extension implements JavaExtension
 {
   public void init(Interpreter interp)
   {
+      ObjectCreatorManager.registerFtsClass("fork", ircam.jmax.guiobj.FtsForkObject.class);
+      ObjectCreatorManager.registerGraphicClass("fork", ircam.jmax.guiobj.Fork.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("jcomment", ircam.jmax.guiobj.FtsCommentObject.class);
+      ObjectCreatorManager.registerGraphicClass("jcomment", ircam.jmax.guiobj.Comment.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("messconst", ircam.jmax.guiobj.FtsMessConstObject.class);
+      ObjectCreatorManager.registerGraphicClass("messconst", ircam.jmax.guiobj.MessConst.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("button", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("button", ircam.jmax.guiobj.Bang.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("toggle", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("toggle", ircam.jmax.guiobj.Toggle.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("slider", ircam.jmax.guiobj.FtsSliderObject.class);
+      ObjectCreatorManager.registerGraphicClass("slider", ircam.jmax.guiobj.Slider.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("intbox", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("intbox", ircam.jmax.guiobj.IntBox.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("floatbox", ircam.jmax.guiobj.FtsFloatValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("floatbox", ircam.jmax.guiobj.FloatBox.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("display", ircam.jmax.guiobj.FtsDisplayObject.class);
+      ObjectCreatorManager.registerGraphicClass("display", ircam.jmax.guiobj.Display.class, "guiobj");
+      
       ObjectCreatorManager.registerFtsClass("vecdisplay", ircam.jmax.guiobj.FtsVectorDisplayObject.class);
       ObjectCreatorManager.registerGraphicClass("vecdisplay", ircam.jmax.guiobj.VectorDisplay.class, "guiobj");
 
@@ -51,6 +78,33 @@ public class GuiObjExtension extends tcl.lang.Extension implements JavaExtension
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
+      ObjectCreatorManager.registerFtsClass("fork", ircam.jmax.guiobj.FtsForkObject.class);
+      ObjectCreatorManager.registerGraphicClass("fork", ircam.jmax.guiobj.Fork.class, "guiobj");
+	
+      ObjectCreatorManager.registerFtsClass("jcomment", ircam.jmax.guiobj.FtsCommentObject.class);
+      ObjectCreatorManager.registerGraphicClass("jcomment", ircam.jmax.guiobj.Comment.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("messconst", ircam.jmax.guiobj.FtsMessConstObject.class);
+      ObjectCreatorManager.registerGraphicClass("messconst", ircam.jmax.guiobj.MessConst.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("button", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("button", ircam.jmax.guiobj.Bang.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("toggle", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("toggle", ircam.jmax.guiobj.Toggle.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("slider", ircam.jmax.guiobj.FtsSliderObject.class);
+      ObjectCreatorManager.registerGraphicClass("slider", ircam.jmax.guiobj.Slider.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("intbox", ircam.jmax.fts.FtsIntValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("intbox", ircam.jmax.guiobj.IntBox.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("floatbox", ircam.jmax.guiobj.FtsFloatValueObject.class);
+      ObjectCreatorManager.registerGraphicClass("floatbox", ircam.jmax.guiobj.FloatBox.class, "guiobj");
+
+      ObjectCreatorManager.registerFtsClass("display", ircam.jmax.guiobj.FtsDisplayObject.class);
+      ObjectCreatorManager.registerGraphicClass("display", ircam.jmax.guiobj.Display.class, "guiobj");
+      
       ObjectCreatorManager.registerFtsClass("vecdisplay", ircam.jmax.guiobj.FtsVectorDisplayObject.class);
       ObjectCreatorManager.registerGraphicClass("vecdisplay", ircam.jmax.guiobj.VectorDisplay.class, "guiobj");
 

@@ -151,6 +151,10 @@ abstract public class GraphicObject implements DisplayObject
 
   int inletDistance; // the distance between two inlets anchor point
   int outletDistance; // the distance between two outlets anchor point
+  public int getInletDistance(){return inletDistance;}
+  public int getOutletDistance(){return outletDistance;}
+  public void setInletDistance(int dist){inletDistance=dist;}
+  public void setOutletDistance(int dist){outletDistance=dist;}
 
   protected Font itsFont = null;
   protected FontMetrics itsFontMetrics = null;
@@ -173,7 +177,7 @@ abstract public class GraphicObject implements DisplayObject
 	Object[] arg = new Object[] {sketch, object};
 	try
 	  {
-	    Constructor constr = aClass.getConstructors()[0];
+	    Constructor constr = aClass.getConstructors()[0];    
 	    if(constr != null)
 	      gobj = (GraphicObject)(constr.newInstance(arg));
 	    
@@ -191,24 +195,6 @@ abstract public class GraphicObject implements DisplayObject
 	    System.out.println(e);
 	  } 
       }
-    else if (theName.equals( "messconst"))
-      gobj = new ircam.jmax.editors.patcher.objects.MessConst( sketch, object);
-    else if (theName.equals( "display"))
-      gobj = new ircam.jmax.editors.patcher.objects.Display( sketch, object);
-    else if (theName.equals( "button"))
-      gobj = new ircam.jmax.editors.patcher.objects.Bang( sketch, object);
-    else if (theName.equals( "toggle"))
-      gobj = new ircam.jmax.editors.patcher.objects.Toggle( sketch, object);
-    else if (theName.equals( "intbox"))
-      gobj = new ircam.jmax.editors.patcher.objects.IntBox( sketch, object);
-    else if (theName.equals( "floatbox"))
-      gobj = new ircam.jmax.editors.patcher.objects.FloatBox( sketch, object);
-    else if (theName.equals( "jcomment"))
-      gobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
-    else if ( theName.equals( "slider"))
-      gobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
-    else if (theName.equals( "fork"))
-      gobj = new ircam.jmax.editors.patcher.objects.Fork( sketch, object);
     else if (theName.equals( "inlet"))
       gobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
     else if (theName.equals( "outlet"))

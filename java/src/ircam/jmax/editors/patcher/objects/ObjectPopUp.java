@@ -69,7 +69,7 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
     return popup.target;
   }
 
-  static JMenuItem getMenuItem(String name)
+  public static JMenuItem getMenuItem(String name)
   {
     return (JMenuItem) popup.items.get(name);
   }
@@ -132,7 +132,7 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
     return item;
   }
 
-  static JMenu addMenu(String name)
+  public static JMenu addMenu(String name)
   {
     JMenu menu;
 
@@ -151,20 +151,20 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
     return menu;
   }
   
-  static void addMenu(JMenu menu)
+  public static void addMenu(JMenu menu)
   {
     popup.add(menu);
     popup.pack();
     popup.subMenus.put(menu.getText(), menu);
   }
 
-  static void removeMenu(JMenu menu)
+  public static void removeMenu(JMenu menu)
   {
     popup.remove(menu);
     popup.pack();
     popup.subMenus.remove(menu.getText());
   }
-  static void removeItem(JMenuItem item)
+  public static void removeItem(JMenuItem item)
   {
     popup.remove(item);
     popup.items.remove(item.getText());

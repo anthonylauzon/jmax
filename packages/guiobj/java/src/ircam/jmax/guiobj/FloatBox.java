@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -33,6 +33,7 @@ import java.text.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
@@ -48,7 +49,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   private double valInc;  
   private int itsLastY;
 
-  FloatBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public FloatBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject, "-0123456789.");
 
@@ -75,7 +76,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     formatter.setDecimalSeparatorAlwaysShown(true);
   }
 
-  void setValueAsText(String v)
+  public void setValueAsText(String v)
   {
     try
       {
@@ -92,7 +93,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   }
 
 
-  String getValueAsText()
+  public String getValueAsText()
   {
     return formatter.format(value);
   }
@@ -169,7 +170,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	if(!dragged)
 	  {
 	    itsSketchPad.setKeyEventClient(this);
-	    valueValid = false;
+	    setValueValid(false);
 	    return;
 	  }
       }

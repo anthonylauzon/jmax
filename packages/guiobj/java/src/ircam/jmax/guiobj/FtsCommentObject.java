@@ -23,19 +23,20 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
+
+import java.io.*;
+import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 /**
- * A generic FTS object with an int value.
- * Used for intbox and sliders, for example.
- * If the listener of this object is an instance
- * of FtsIntValueListener, fire it when the we got a new value
- * from the server.
+ * The proxy of an FTS comment object.
+ * The comment is stored in the comment property.
  */
 
-public class FtsBangObject extends FtsIntValueObject
+public class FtsCommentObject extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -43,40 +44,15 @@ public class FtsBangObject extends FtsIntValueObject
   /*                                                                           */
   /*****************************************************************************/
 
-  int flashDuration;
-
-  /* for the message box */
-    public FtsBangObject(Fts fts, FtsObject parent, String className, String description)
+  /**
+   * Create a FtsObject object;
+   */
+    public FtsCommentObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
     {
-	super(fts, parent, className, description);
-    }
+	super(fts, parent, null, "jcomment", "");
 
-    public FtsBangObject(Fts fts, FtsObject parent, String className)
-    {
-	super(fts, parent, className);
-    }
-
-    public void setFlashDuration(int fd)
-    {
-	flashDuration = fd;
-	fts.getServer().putObjectProperty(this, "flash", fd);
-	setDirty();
-    }
-
-    public int getFlashDuration()
-    {
-	return flashDuration;
-    }
-
-    /* Over write the localPut message to handle value changes;
-     */
-
-    protected void localPut(String name, int newValue)
-    {
-	if (name == "flash")
-	    flashDuration = newValue;
-	else
-	    super.localPut(name, newValue);
+	ninlets = 0;
+	noutlets = 0;
     }
 }
 

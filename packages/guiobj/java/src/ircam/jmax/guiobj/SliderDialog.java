@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,10 +31,11 @@ import javax.swing.*;
 
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 /* Not static any ore */
 
-class SliderDialog extends JDialog implements ActionListener {
+public class SliderDialog extends JDialog implements ActionListener {
 
   JButton okButton, cancelButton;
   JTextField itsMaxValueField, itsMinValueField;

@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,34 +23,26 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
-import java.io.*;
-import java.util.*;
-import java.text.*;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 import ircam.jmax.*;
+import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.editors.patcher.objects.*;
 
-public class FtsDisplayObject extends FtsObject
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class InspectObjectAction extends EditorAction
 {
-  public FtsDisplayObject(Fts fts, FtsObject parent)
+  public void doAction(EditorContainer container)
   {
-    super(fts, parent, null, "display", "");
-    
-    ninlets = 1;
-    noutlets = 0;
-  }
-
-  public void handleMessage(String selector, int nArgs, FtsAtom args[])
-  {
-    StringBuffer string = new StringBuffer();
-    
-    if (listener instanceof FtsMessageListener)
-      ((FtsMessageListener) listener).messageChanged(args[0].stringValue);
+      ObjectPopUp.getPopUpTarget().inspect();
   }
 }
-
-
-
-
-

@@ -23,23 +23,20 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.ispw;
-
-import java.io.*;
-import java.util.*;
+package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 /**
- * Class implementing the proxy of a message box.
- * 
+ * A generic FTS object with an float value.
+ * Used for floatbox.
  * If the listener of this object is an instance
- * of FtsMessageListener, fire it when the we got a new message content
+ * of FtsFloatValueListener, fire it when the we got a new value
  * from the server.
  */
 
-public class FtsMessageObject extends FtsIntValueObject
+public class FtsFloatValueObject extends FtsObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -47,46 +44,52 @@ public class FtsMessageObject extends FtsIntValueObject
   /*                                                                           */
   /*****************************************************************************/
 
-  String message; // the message content
-  
-  public FtsMessageObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
-    {
-	super(fts, parent, "messbox", FtsParse.unparseArguments(nArgs, args));
-    
-	ninlets = 1;
-	noutlets = 1;
-    
-	message = FtsParse.unparseArguments(nArgs, args);
+  float value; 
+  public FtsFloatValueObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+  {
+    super(fts, parent, null, className, className);
   }
 
-  /** Set the message content. Tell the server, too */
+  /** Set the value. Tell it to the server, also */
 
-  public void setMessage(String message)
+  public void setValue(float value)
   {
-    this.message = message;
-    getFts().getServer().sendSetMessage(this, message);
-    setDirty();
+    this.value = value;
+    getFts().getServer().putObjectProperty(this, "value", value);
   }
 
-  /** Get the message content. */
+  /** Get the current value */
 
-  public String getMessage()
+  public float getValue()
   {
-    return message;
+    return value;
+  }
+
+  /** Ask the server for the latest value */
+
+  public void updateValue()
+  {
+    getFts().getServer().askObjectProperty(this, "value");
   }
        
-  /** Over write the handle message to handle message box changes. */
+  /** Over write the localPut message to handle value changes.
+   */
 
-  public void handleMessage(String selector, int nArgs, FtsAtom args[])
-       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  protected void localPut(String name, float newValue)
   {
-    this.message = FtsParse.unparseArguments(nArgs, args);
-    setDirty();
-
-    if (listener instanceof FtsMessageListener)
-      ((FtsMessageListener) listener).messageChanged(message);
+    if (name == "value")
+      {
+	value = newValue;
+	
+	if (listener instanceof FtsFloatValueListener)
+	  ((FtsFloatValueListener) listener).valueChanged(newValue);
+      }
+    else
+      super.localPut(name, newValue);
   }
 }
+
+
 
 
 

@@ -705,7 +705,7 @@ public class FtsServer implements Runnable
 
 
   /** Send a "put property" messages to FTS; version with a generic value */
-  final void putObjectProperty(FtsObject object, String name, Object value)
+  final public void putObjectProperty(FtsObject object, String name, Object value)
   {
     if (! connected)
       return;
@@ -729,7 +729,7 @@ public class FtsServer implements Runnable
 
 
   /** Send a "put property" messages to FTS; version with an int value */
-  final void putObjectProperty(FtsObject object, String name, int value)
+  final public void putObjectProperty(FtsObject object, String name, int value)
   {
     if (! connected)
       return;
@@ -753,7 +753,7 @@ public class FtsServer implements Runnable
 
 
   /** Send a "put property" messages to FTS; version with a float*/
-  final void putObjectProperty(FtsObject object, String name, float value)
+  final public void putObjectProperty(FtsObject object, String name, float value)
   {
     if (! connected)
       return;
@@ -777,7 +777,7 @@ public class FtsServer implements Runnable
 
 
   /** Send a "get property" messages to FTS. */
-  final void askObjectProperty(FtsObject object, String name)
+  final public void askObjectProperty(FtsObject object, String name)
   {
     if (! connected)
       return;

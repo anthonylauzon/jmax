@@ -23,39 +23,20 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
 import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 
-/**
- * Class implementing the proxy of a message box.
- * 
- * If the listener of this object is an instance
- * of FtsMessageListener, fire it when the we got a new message content
- * from the server.
- */
-
-public class FtsMessConstObject extends FtsIntValueObject
+public class FtsForkObject extends FtsObject
 {
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               CONSTRUCTORS                                */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  public FtsMessConstObject(Fts fts, FtsObject parent, String description)
-  {
-    super(fts, parent, "messconst", description);
-    
-    ninlets = 1;
-    noutlets = 1;
-  }
+    public FtsForkObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+    {
+	super(fts, parent, null, "fork", "");
+    }
 }
-
-
-
-
-

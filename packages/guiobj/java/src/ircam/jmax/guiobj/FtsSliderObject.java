@@ -23,9 +23,10 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 /**
  * A Proxy for FTS  sliders.
@@ -46,10 +47,9 @@ public class FtsSliderObject extends FtsIntValueObject
   /**
    * Create a FtsObject object;
    */
-
-  public FtsSliderObject(Fts fts, FtsObject parent)
+  public FtsSliderObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
   {
-      super(fts, parent, "slider", "slider");
+      super(fts, parent, variable, className, nArgs, args);
       localPut("maxValue", 127);
       localPut("minValue", 0);
   }
@@ -62,7 +62,7 @@ public class FtsSliderObject extends FtsIntValueObject
   public void setMinValue(int value)
   {
     minValue = value;
-    fts.getServer().putObjectProperty(this, "minValue", minValue);
+    getFts().getServer().putObjectProperty(this, "minValue", minValue);
   }
 
   /** Set the Max Value for the slider.
@@ -72,7 +72,7 @@ public class FtsSliderObject extends FtsIntValueObject
   public void setMaxValue(int value)
   {
     maxValue = value;
-    fts.getServer().putObjectProperty(this, "maxValue", maxValue);
+    getFts().getServer().putObjectProperty(this, "maxValue", maxValue);
   }
 
   /** Set the orientation */
@@ -80,7 +80,7 @@ public class FtsSliderObject extends FtsIntValueObject
   public void setOrientation(int or)
   {
     orientation = or;
-    fts.getServer().putObjectProperty(this, "orientation", orientation);
+    getFts().getServer().putObjectProperty(this, "orientation", orientation);
   }
 
   /** Get the Min Value for the slider. */

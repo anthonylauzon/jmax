@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -32,13 +32,14 @@ import java.util.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.menus.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The display graphic object.
 //
 
-class Display extends GraphicObject implements FtsMessageListener
+public class Display extends GraphicObject implements FtsMessageListener
 {
   String display = null; // the display content
   int minWidth = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
@@ -67,7 +68,7 @@ class Display extends GraphicObject implements FtsMessageListener
     setFont(getFont());
   }
 
-  // ----------------------------------------
+  // ---------------------------------------- 
   // ``Args'' property
   // ----------------------------------------
 

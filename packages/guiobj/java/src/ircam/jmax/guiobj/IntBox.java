@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -33,6 +33,7 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
@@ -65,7 +66,7 @@ public class IntBox extends NumberBox implements FtsIntValueListener
   // ValueAsText property
   // ----------------------------------------
 
-  void setValueAsText( String value)
+  public void setValueAsText( String value)
   {
     try
       {
@@ -79,7 +80,7 @@ public class IntBox extends NumberBox implements FtsIntValueListener
     ((FtsIntValueObject)ftsObject).setValue(itsInteger);
   }
 
-  String getValueAsText()
+  public String getValueAsText()
   {
     return String.valueOf(itsInteger);
   }
@@ -108,7 +109,7 @@ public class IntBox extends NumberBox implements FtsIntValueListener
 	if (! dragged)
 	  {
 	    itsSketchPad.setKeyEventClient( this);
-	    valueValid = false;
+	    setValueValid(false);
 	    return;
 	  }
       }

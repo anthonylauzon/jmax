@@ -23,72 +23,36 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
+
+import java.io.*;
+import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 
 /**
- * A generic FTS object with an float value.
- * Used for floatbox.
+ * Class implementing the proxy of a message box.
+ * 
  * If the listener of this object is an instance
- * of FtsFloatValueListener, fire it when the we got a new value
+ * of FtsMessageListener, fire it when the we got a new message content
  * from the server.
  */
 
-public class FtsFloatValueObject extends FtsObject
+public class FtsMessConstObject extends FtsIntValueObject
 {
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
   /*                                                                           */
-  /*****************************************************************************/
-
-  float value; 
-
-    public FtsFloatValueObject(Fts fts, FtsObject parent/*, int objId*/, String className)
-  {
-      super(fts, parent/*, objId*/, null, className, className);
-  }
-
-  /** Set the value. Tell it to the server, also */
-
-  public void setValue(float value)
-  {
-    this.value = value;
-    fts.getServer().putObjectProperty(this, "value", value);
-  }
-
-  /** Get the current value */
-
-  public float getValue()
-  {
-    return value;
-  }
-
-  /** Ask the server for the latest value */
-
-  public void updateValue()
-  {
-    fts.getServer().askObjectProperty(this, "value");
-  }
-       
-  /** Over write the localPut message to handle value changes.
-   */
-
-  protected void localPut(String name, float newValue)
-  {
-    if (name == "value")
-      {
-	value = newValue;
-	
-	if (listener instanceof FtsFloatValueListener)
-	  ((FtsFloatValueListener) listener).valueChanged(newValue);
-      }
-    else
-      super.localPut(name, newValue);
-  }
+    /*****************************************************************************/
+    public FtsMessConstObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+    {
+	super(fts, parent, "messconst", FtsParse.unparseArguments(nArgs, args));
+	ninlets = 1;
+	noutlets = 1;
+    }
 }
-
 
 
 

@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -34,13 +34,14 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The "toggle" graphic object.
 //
 
-class Toggle extends GraphicObject implements FtsIntValueListener
+public class Toggle extends GraphicObject implements FtsIntValueListener
 {
   private static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 15;

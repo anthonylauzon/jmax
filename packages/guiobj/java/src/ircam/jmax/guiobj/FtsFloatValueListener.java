@@ -23,41 +23,14 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
-
-import java.io.*;
-import java.util.*;
-
-import ircam.jmax.*;
+package ircam.jmax.guiobj;
 
 /**
- * The proxy of an FTS comment object.
- * The comment is stored in the comment property.
+ * A specialized listener that listen to value changes
+ * where value is a float.
  */
 
-public class FtsCommentObject extends FtsObject
+public interface FtsFloatValueListener
 {
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               CONSTRUCTORS                                */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  /**
-   * Create a FtsObject object;
-   */
-
-    public FtsCommentObject(Fts fts, FtsObject parent/*, int objId*/)
-  {
-      super(fts, parent/*, objId*/, null, "jcomment", "");
-
-    ninlets = 0;
-    noutlets = 0;
-  }
+  public void valueChanged(float value);
 }
-
-
-
-
-
-

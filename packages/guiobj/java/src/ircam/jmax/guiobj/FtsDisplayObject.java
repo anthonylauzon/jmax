@@ -23,19 +23,35 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
 import java.io.*;
 import java.util.*;
+import java.text.*;
 
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
+import ircam.jmax.fts.*;
 
-public class FtsForkObject extends FtsObject
+public class FtsDisplayObject extends FtsObject
 {
-  public FtsForkObject(Fts fts, FtsObject parent, int nOuts)
+  public FtsDisplayObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
   {
-    super(fts, parent, null, "fork", "");
+    super(fts, parent, null, "display", "");
+    
+    ninlets = 1;
+    noutlets = 0;
+  }
+
+  public void handleMessage(String selector, int nArgs, FtsAtom args[])
+  {
+    StringBuffer string = new StringBuffer();
+    
+    if (listener instanceof FtsMessageListener)
+      ((FtsMessageListener) listener).messageChanged(args[0].stringValue);
   }
 }
+
+
+
+
+

@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,14 +23,41 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.guiobj;
 
-/**
- * A specialized listener that listen to value changes
- * where value is a float.
- */
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-public interface FtsFloatValueListener
+import ircam.jmax.*;
+import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.actions.*;
+
+/** Implement the patcher editor File Menu */
+
+public class SliderPopUpMenu extends JMenu
 {
-  public void valueChanged(float value);
+  static private SliderPopUpMenu sliderPopup = new SliderPopUpMenu();
+
+  public SliderPopUpMenu()
+  {
+    super("Slider");
+
+    JMenuItem item;
+    item = new JMenuItem("Set Range");
+    item.addActionListener(new InspectObjectAction());
+    add(item);    
+    item = new JMenuItem("Change Orientation");
+    item.addActionListener(new ChangeSliderOrientationAction());
+    add(item);
+  }
+
+  public static SliderPopUpMenu getInstance()
+  {
+    return sliderPopup;
+  }
 }
+
+
+
+

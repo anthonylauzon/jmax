@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -23,36 +23,26 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.ispw;
+package ircam.jmax.guiobj;
 
-import ircam.jmax.script.pkg.*;
-import ircam.jmax.script.*;
-import ircam.jmax.editors.patcher.objects.*;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
+import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.editors.patcher.objects.*;
 
-import java.io.*;
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
 
-/**
- * The table extension; install the table data type
- * and the table file data handler
- */
-public class ISPWExtension extends tcl.lang.Extension implements JavaExtension
+public class ChangeSliderOrientationAction extends EditorAction
 {
-  public void init(Interpreter interp)
+  public void doAction(EditorContainer container)
   {
-      ObjectCreatorManager.registerFtsClass("messbox", ircam.jmax.ispw.FtsMessageObject.class);
-      ObjectCreatorManager.registerGraphicClass("messbox", ircam.jmax.ispw.Message.class, "ispw");
-  }
-
-    /* this method should be removed as soon as jacl is completely forgotten about */
-  public void init(tcl.lang.Interp interp)
-  {
-      ObjectCreatorManager.registerFtsClass("messbox", ircam.jmax.ispw.FtsMessageObject.class);
-      ObjectCreatorManager.registerGraphicClass("messbox", ircam.jmax.ispw.Message.class, "ispw");
+      ((Slider)ObjectPopUp.getPopUpTarget()).changeOrientation();
   }
 }
-
-
-
-

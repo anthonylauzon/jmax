@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.objects;
+package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -31,6 +31,7 @@ import java.util.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 public class MessConst extends Editable implements FtsObjectErrorListener, FtsIntValueListener
@@ -40,7 +41,7 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
   int cornerSize = 0;
   int cornerSizeMax = 0;
 
-  MessConst( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public MessConst( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
