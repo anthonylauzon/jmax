@@ -423,7 +423,6 @@ public class DisplayList
     Object values[] = displayObjects.getObjectArray();
     int size = displayObjects.size();
     SensibilityArea candidateArea = null;
-      
     /* Look in the reverse order from outside to inside,
        to be consistent with the graphic look */
 
@@ -447,7 +446,7 @@ public class DisplayList
 		      }
 		  }
 	      }
-	    else if (candidateArea == null)
+	    else /*if (candidateArea == null)*/
 	      return area;
 	  }
       }
