@@ -134,14 +134,26 @@ class ErmesObjSlider extends ErmesObject {
 	  itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
 	  itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
 	  itsThrottle.Move(itsThrottle.itsX, y);
-	  itsMovingThrottle = true;//???????????
+	  itsMovingThrottle = true;
 	  DoublePaint();
-	  return true;
 	}
-	else if(evt.getClickCount()>1){
-	  SetSliderDialog();
-	  return true;
+	else if(itsY+currentRect.height-BOTTOM_OFFSET<y){
+	  itsFtsObject.put("value", new Integer(itsRangeMin));
+	  itsInteger = 0;
+	  itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET);
+	  DoublePaint();
 	}
+	else if(itsY+UP_OFFSET>=y){
+	  itsFtsObject.put("value", new Integer(itsRangeMax));
+	  itsInteger = itsRangeMax;
+	  itsThrottle.Move(itsThrottle.itsX, itsY+UP_OFFSET);
+	  DoublePaint();
+	}
+	//else if(evt.getClickCount()>1){
+	//SetSliderDialog();
+	// return true;
+	//}
+	return true;
       }
     }
     else itsSketchPad.ClickOnObject(this, evt, x, y);

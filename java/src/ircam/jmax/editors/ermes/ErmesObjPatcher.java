@@ -168,26 +168,22 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	  
 
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    //if (!itsSketchPad.itsRunMode) {
-       if(evt.getClickCount()>1) {
-	 {	
-	   if (itsSubWindow != null) {//show the subpatcher, it's there
-	     itsSubWindow.setVisible(true);
-	     ErmesSketchPad.RequestOffScreen(itsSketchPad);
-	   }
-	   else{	//this 'else' shouldn't be reached...
-	     itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
-	     MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
-	     GetSketchWindow().AddToSubWindowList(itsSubWindow);
-	   }
-	   return true;
-	 }
-       }
-       itsSketchPad.ClickOnObject(this, evt, x, y);
-       return true;
-       //}
-       /*else return true;*/	//run mode, no editing, no subpatcher opening (?)
-   }
+    if(evt.getClickCount()>1) {
+      if (itsSubWindow != null) {//show the subpatcher, it's there
+	itsSubWindow.setVisible(true);
+	ErmesSketchPad.RequestOffScreen(itsSketchPad);
+      }
+      else{	//this 'else' shouldn't be reached...
+	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
+	GetSketchWindow().AddToSubWindowList(itsSubWindow);
+      }
+      return true;
+    }
+    itsSketchPad.ClickOnObject(this, evt, x, y);
+    return true;
+    /*else return true;*/	//run mode, no editing, no subpatcher opening (?)
+  }
 	
   //--------------------------------------------------------
   // paint
