@@ -324,7 +324,7 @@ void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_at
 	add_blank = 0;
       else if (value2)
 	{
-	  if (want_a_space_before( fts_get_symbol( value2)))
+	  if (want_a_space_before( value2))
 	    add_blank = 1;
 	  else if (dont_want_a_space_before( value2))
 	    add_blank = 0;
