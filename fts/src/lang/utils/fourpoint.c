@@ -24,18 +24,23 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
+#include "fts.h"
+#include "fourpoint.h"
 
-extern void fts_ffuns_init(void);
-extern void fts_fourpoint_init(void);
+fts_fourpoint_t fts_fourpoint_table[FTS_FOURPOINT_TABLE_SIZE];
 
-static void
-fts_utils_init(void)
+void
+fts_fourpoint_init(void)
 {
-  fts_ffuns_init();
-  fts_fourpoint_init();
-}
+  int i;
 
-fts_module_t fts_utils_module = {"Utils", "Message system utilities", fts_utils_init, 0};
+  for(i=0; i<FTS_FOURPOINT_TABLE_SIZE; i++)
+    {
+      float f = i * (1.0f / FTS_FOURPOINT_TABLE_SIZE);
+
+      fts_fourpoint_table[i].pm1 = -.1666667f * f * (1-f) * (2-f);
+      fts_fourpoint_table[i].p0 = .5f * (1+f) * (1-f) * (2-f);
+      fts_fourpoint_table[i].p1 = .5f * (1+f) * f * (2-f);
+      fts_fourpoint_table[i].p2 = -.1666667f * (1+f) * f * (1-f);
+    }
+}

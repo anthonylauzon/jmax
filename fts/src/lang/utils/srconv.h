@@ -27,6 +27,7 @@
 #ifndef _SRCONV_H_
 #define _SRCONV_H_
 
+#define FTS_SRCONV_MAX_RATIO (10.0)
 #define FTS_SRCONV_MAX_CHANNELS 16
 
 typedef struct _fts_srconv
@@ -48,5 +49,7 @@ extern void fts_srconv_delete(fts_srconv_t *srconv);
 
 /* do conversion and return the number of output samples */
 extern int fts_srconv(fts_srconv_t *srconv, float *in, float *out, int size, int out_size, int n_channels);
+
+#define fts_srconv_check_ratio(r) ((r) > FTS_SRCONV_MAX_RATIO || 1./(r) > FTS_SRCONV_MAX_RATIO)
 
 #endif

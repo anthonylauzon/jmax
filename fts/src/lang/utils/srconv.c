@@ -25,11 +25,11 @@
  */
 
 #include "fts.h"
+#include "srconv.h"
 
 #define FILTER_SIZE 24
 #define FILTER_OVER_BITS 11
 #define FILTER_OVER (1 << FILTER_OVER_BITS) /* 2048 */
-#define FTS_SRCONV_MAX_RATIO (double)10.0
 
 static double * restrict fts_srconv_filter = 0;
 
@@ -98,7 +98,7 @@ fts_srconv_new(double ratio, int in_size, int channels)
       srconv->buffer[c] = (double *)fts_malloc((in_size + 2 * FILTER_SIZE) * sizeof(double));
       if(!srconv->buffer[c]) 
 	{
-	  fprintf(stderr, "srconv: Allocation error!\n");
+	  fprintf(stderr, "srconv: allocation error!\n");
 	  return 0;
 	}
       
