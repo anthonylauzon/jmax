@@ -95,7 +95,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   
   ErmesObjMessThread itsMessThread = null;
 
-  boolean itsFirstClick = true;
+  //  boolean itsFirstClick = true;
   //STATIC OFFSCREEN!!!
 
   static ErmesSketchPad lastSketchWithOffScreen = null;
@@ -993,6 +993,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   public void mousePressed(MouseEvent e){
     itsSketchWindow.requestFocus();//???
+    
     //create the object whose name is objectNames[addObject] in coord x, y
     int x = e.getX();
     int y = e.getY();
@@ -1003,9 +1004,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     ErmesConnection aConnection;
 		
     
-    if(itsFirstClick){
+    if(!offScreenPresent){
+      RequestOffScreen(this);
       DrawOffScreen(getGraphics());
-      itsFirstClick = false;
+      //itsFirstClick = false;
     }
     
     if (itsRunMode) {
@@ -1120,6 +1122,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     //(opt.) resetting the "firstclick" flag if safer but heavy 
     //(a repaint foreach mouseup...)
     //itsFirstClick = true;
+    //RequestOffScreen(this);
     MaxApplication.itsSketchWindow = itsSketchWindow;
     if(itsScrolled) itsScrolled=false;
 
