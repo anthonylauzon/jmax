@@ -31,8 +31,6 @@
 /* (fd) For post */
 #include <fts/runtime.h>
 #include "messP.h"
-#include "patlex.h"
-#include "patparser.h"
 
 /* Local symbols */
 

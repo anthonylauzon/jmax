@@ -31,7 +31,6 @@
 
 #include <fts/sys.h>
 #include <fts/lang/mess.h>
-#include "patlex.h"
 
 
 /**

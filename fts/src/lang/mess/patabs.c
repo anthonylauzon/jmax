@@ -52,7 +52,6 @@
 #include <fts/lang/mess.h>
 #include <fts/lang/utils.h>
 #include "messP.h"
-#include "patlex.h"
 
 enum abstraction_mode {fts_abstraction_cache, fts_abstraction_declaration};
 
