@@ -18,10 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 /*
@@ -70,19 +66,15 @@
    and without.
 
 */
-#include <fts/sys.h>
 
 #include <string.h>
-
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 
-#include <fts/lang.h>
-#include <fts/runtime.h>
-#include "ucs.h"
-#include "messtile.h"
-
+#include <fts/fts.h>
+#include <fts/private/OLDclient.h>
+#include <fts/private/patparser.h>
 
 /******************************************************************************/
 /*                                                                            */
@@ -101,34 +93,6 @@ fts_status_description_t unknown_command =
 };
 
 
-
-/******************************************************************************/
-/*                                                                            */
-/*             FS UCS module definition                                       */
-/*                                                                            */
-/******************************************************************************/
-
-
-/* 
-   The init function install the client subprotocol 
-   handler for the configuration.
-*/
-
-static void fts_ucs_client_dispatch(int argc, const fts_atom_t *argv);
-
-static void fts_ucs_install_commands(void );
-
-static void fts_ucs_init(void);
-
-fts_module_t fts_ucs_module = {"UCS", "FTS Universal Configuration System", fts_ucs_init, 0, 0};
-
-static void
-fts_ucs_init(void)
-{
-  fts_client_install(UCS_CODE, fts_ucs_client_dispatch);
-
-  fts_ucs_install_commands();
-}
 
 /******************************************************************************/
 /*                                                                            */
@@ -573,6 +537,15 @@ fts_ucs_install_commands()
 }
 
 
+/***********************************************************************
+ *
+ * UCS kernel initialization
+ *
+ */
 
-
+static void fts_kernel_ucs_init(void)
+{
+  fts_client_install(UCS_CODE, fts_ucs_client_dispatch);
+  fts_ucs_install_commands();
+}
 

@@ -5,6 +5,7 @@ libfts_la_SOURCES= \
 OLDclient.c \
 OLDftsdata.c \
 OLDpatcherdata.c \
+OLDucs.c \
 abstraction.c \
 array.c \
 atom.c \

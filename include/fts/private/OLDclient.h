@@ -144,4 +144,9 @@ extern void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property
 extern void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
 extern void fts_object_reset_changed(fts_object_t *obj);
 
+extern void fts_updates_set_updates_per_ticks(int upt);
+extern void fts_updates_set_update_period(int upt);
+
+extern void fts_client_install(char type, void (* fun) (int, const fts_atom_t *));
+
 #endif
