@@ -85,6 +85,8 @@ void fts_pop_package(void);
  */
 
 struct _fts_package_t {
+  fts_object_t ob;
+
   fts_symbol_t name;
   fts_symbol_t dir;
   fts_package_state_t state;
@@ -137,23 +139,6 @@ void fts_package_set_state(fts_package_t* pkg, fts_package_state_t s);
  * @param s the message string
  * @ingroup package */
 void fts_package_set_error(fts_package_t* pkg, const char* s);
-
-/**
- * A call to this function explicitely forces the package to load. As
- * a side effect, all packages on which this package depends will be
- * loaded too. This function returns 0 when the package was
- * successfully loaded and -1 if an error occured. In case of error,
- * call fts_package_get_error() to get a user readable message.  If
- * the package is already loaded this function performs no actions and
- * simple returns 0. If the package is in the error state, this
- * function simple returns -1.
- *
- * @fn int fts_package_load(fts_package_t* pkg)
- * @param pkg the package
- * @return 0 if the package was succesfully loaded, -1 otherwise
- * @ingroup package 
- */
-int fts_package_load(fts_package_t* pkg);
 
 /**
  * Tell this package it depends on an other package. 
