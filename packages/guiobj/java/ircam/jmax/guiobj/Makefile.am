@@ -5,6 +5,7 @@ BangControlPanel.java \
 Comment.java \
 CommentControlPanel.java \
 Define.java \
+DefineControlPanel.java \
 Display.java \
 FloatBox.java \
 FloatBoxControlPanel.java \
