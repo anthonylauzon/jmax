@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.21 $ IRCAM $Date: 1998/05/18 14:59:03 $
+ *      $Revision: 1.22 $ IRCAM $Date: 1998/05/19 15:31:56 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -59,45 +59,24 @@ void fts_objects_init()
 /*                                                                            */
 /******************************************************************************/
 
+/* A static function making the real FTS object if possible. */
 
-/* the new function now create an object in a patcher */
-
-
-fts_object_t *
-fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
+static fts_object_t *
+fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 {
   fts_status_t   status;
   fts_class_t   *cl;
   fts_object_t  *obj;
   int i;
 
-  if (! fts_is_symbol(&at[0]))
-    {
-      fprintf(stderr,"Non symbol class name in object creation\n"); /* @@@@ ERROR !!! */
-      return 0;
-    }
-
   cl = fts_class_instantiate(ac, at);
-
-  /* Class not found, try with old style abstraction */
-
-  if (! cl)
-    {
-      obj =  fts_abstraction_new(patcher, id, ac, at);
-
-      return obj;
-    }
 
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
   obj->cl = cl;
 
   /* Copying the arguments */
 
-  obj->argc = ac;
-  obj->argv = (fts_atom_t *) fts_block_zalloc(ac * sizeof(fts_atom_t));
-
-  for (i = 0; i < ac; i++)
-    obj->argv[i] = at[i];
+  fts_object_set_description(obj, ac, at);
 
   /* Other Initializations */
 
@@ -170,12 +149,79 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
   return obj;
 }
 
+/* the new function create an object in a patcher
+
+   In order, do the following:
+
+   1- check for a explicitly declared abstraction
+   2- check for a standard object
+   3- check for path declared abstraction
+   4- check for object doctors
+   5- if everything else fail, do an error object
+
+   3- is not tryied if the metaclass does exists; i.e. an abstraction
+      is not used to fix an error in an object ... ????
+ */
+
+
+fts_object_t *
+fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
+{
+  fts_object_t  *obj;
+  fts_metaclass_t *mcl;
+
+  if (! fts_is_symbol(&at[0]))
+    {
+      fprintf(stderr,"Non symbol class name in object creation\n"); /* @@@@ ERROR !!! */
+      return 0;
+    }
+
+  /* First of all, try an explicitly declared abstraction */
+
+  obj =  fts_abstraction_new_declared(patcher, id, ac, at);
+
+  if (obj) 
+    return obj;
+
+  /* If not there, look for the metaclass: if there,
+     try to make an object, and if fail a path abstraction */
+
+  mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
+
+  if (mcl != 0)
+    {
+      obj =  fts_make_object(patcher, id, ac, at);
+
+      if (obj)
+	return obj;
+
+      obj = fts_abstraction_new_search(patcher, id, ac, at);
+
+      if (obj)
+	return obj;
+    }
+     
+
+  /* Try with an object doctor */
+
+  obj = fts_call_object_doctor(patcher, id, ac, at);
+
+  if (obj)
+    return obj;
+
+  /* if an obj */
+
+  obj = fts_error_object_new(patcher, id, ac, at);
+
+  return obj;
+}
+
 /* This is to support "changing" objects; usefull during 
    .pat loading, where not all the information is available 
    at the right place; used currently explode in the fts1.5 package.
    */
 
-void fts_object_change_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
+void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
 {
   int i;
 
@@ -188,9 +234,10 @@ void fts_object_change_description(fts_object_t *obj, int argc, const fts_atom_t
     }
   else
     {
-      /* Free the old object description */
+      /* Free the old object description, if any */
 
-      fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+      if (obj->argv)
+	fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
 
       /* reallocate the description and copy the arguments */
 
@@ -593,12 +640,14 @@ fts_message_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 	  if (status != fts_Success)
 	    {
+#ifdef PRINT_ERRORS
 	      fprintf(stderr,"%s error for object of class %s, inlet %d, message %s arguments:",
 		   status->description, fts_symbol_name(fts_object_get_class_name(o)), 
 		   winlet,  fts_symbol_name(s)); /* @@@@ ERROR !!! */
 
 	      fprintf_atoms(stderr, ac, at);
 	      fprintf(stderr,"\n");/* @@@@ ERROR !!! */
+#endif
 
 	      return status;
 	    }

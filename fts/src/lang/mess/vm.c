@@ -591,17 +591,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 
 	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
 
-	    if (! new)
-	      {
-		/* Make the error object instead  */
-
-		post("Cannot create object ");
-		postatoms(nargs, eval_tos);
-		post("\n");
-
-		new = fts_error_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
-	      }
-
 	    /* Push the object in the object stack */
 
 	    object_tos--;
@@ -622,17 +611,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 #endif
 
 	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
-
-	    if (! new)
-	      {
-		/* Make the error object  instead   */
-
-		post("Cannot create object ");
-		postatoms(nargs, eval_tos);
-		post("\n");
-
-		new = fts_error_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
-	      }
 
 	    /* Push the object in the object stack */
 
@@ -655,17 +633,6 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 #endif
 
 	    new  = fts_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
-
-	    if (! new)
-	      {
-		/* Make the error object  instead  */
-
-		post("Cannot create object ");
-		postatoms(nargs, eval_tos);
-		post("\n");
-
-		new = fts_error_object_new((fts_patcher_t *) (*object_tos), FTS_NO_ID, nargs, eval_tos);
-	      }
 
 	    /* Push the object in the object stack */
 

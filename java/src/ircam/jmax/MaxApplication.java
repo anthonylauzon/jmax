@@ -216,17 +216,22 @@ public class MaxApplication extends Object
 
 
     // Default values
-    if (jmaxProperties.get("root") == null) {
-      //user didn't specify the root. Take the /usr/local/max default directory.
-      jmaxProperties.put("root", "/usr/local/max");
-    }
+    if (jmaxProperties.get("root") == null)
+      {
+	//user didn't specify the root. Take the /usr/local/max default directory.
+
+	jmaxProperties.put("root", "/usr/local/max");
+      }
 
     //the version number as a system property
-    try {
-      jmaxProperties.put("jmaxVersion", MaxVersion.getMaxVersion());
-    } catch (java.lang.NoClassDefFoundError e) {
-      jmaxProperties.put("jmaxVersion", "version info not available");
-    }
+    try
+      {
+	jmaxProperties.put("jmaxVersion", MaxVersion.getMaxVersion());
+      }
+    catch (java.lang.NoClassDefFoundError e)
+      {
+	jmaxProperties.put("jmaxVersion", "version info not available");
+      }
     
     itsHookTable = new MaxWhenHookTable(); 
 
@@ -305,6 +310,12 @@ public class MaxApplication extends Object
 
     // If there is no console up and running,
     // start the MaxTclConsole from the standard input
+
+
+    //    if (ConsoleWindow.getConsoleWindow() == null)
+    //{
+    // MaxTclShell.start(itsInterp);
+    // }
 
     // Finally, run forever the notifier loop of the 
     // Tcl interpreter, so that the TCL event system work

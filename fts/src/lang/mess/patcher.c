@@ -300,8 +300,6 @@ patcher_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
    Set the open flag to 1, so that all the "updating"
    objects can be active.
 
-   The "open" message don't cope anymore with properties; all the objects
-   created by the client get the properties value at creation time.
    A "OPEN" message is sent to all the objects (but not the patchers)
    in the patch
    */
@@ -909,7 +907,7 @@ internal_patcher_config(void)
 
 fts_object_t *fts_root_patcher;
 
-static void fts_create_root_patcher()
+void fts_create_root_patcher()
 {
   fts_atom_t description[4];
   fts_object_t *patcher;
@@ -943,8 +941,6 @@ void fts_patcher_init(void)
   internal_patcher_config();
   internal_inlet_config();
   internal_outlet_config();
-
-  fts_create_root_patcher();
 }
 
 

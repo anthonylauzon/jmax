@@ -128,6 +128,7 @@ proc packageRequire {package version} {
 	return $package
     }
 
+    puts "package $package not found"
     return ""
 }
 
@@ -215,3 +216,5 @@ proc packageInit { } {
 ##
 
 packageInit
+
+

@@ -53,4 +53,9 @@ extern void fts_patcher_reassign_inlets_outlets_name(fts_patcher_t *obj, fts_sym
 
 extern void fts_properties_free(fts_object_t *obj);
 
+/* Doctor */
+
+extern void fts_doctor_init();
+extern fts_object_t *fts_call_object_doctor(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at);
+
 #endif

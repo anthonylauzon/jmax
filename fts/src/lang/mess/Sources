@@ -18,5 +18,6 @@ patlex.c        \
 patabs.c        \
 patparser.c     \
 selection.c     \
-clipboard.c
+clipboard.c     \
+doctor.c
 

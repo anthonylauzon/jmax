@@ -672,7 +672,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 	  fts_set_symbol(&void_description[0],  fts_new_symbol("empty"));
 
-	  obj = fts_error_object_new((fts_patcher_t *) parent, FTS_NO_ID, 1, void_description);
+	  obj = fts_object_new((fts_patcher_t *) parent, FTS_NO_ID, 1, void_description);
 
 	  fts_patparse_set_text_graphic_properties(graphicDescr, obj);
 
@@ -695,22 +695,6 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       argc = fts_patparse_read_object_arguments(description + 1, in);
 
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1 , description);
-
-      if (obj == 0)
-	{
-	  int i;
-	  fts_atom_t err_description[513];
-
-	  /* the object do not exists, should give an error message here,
-	     and then return a errobj object, so that we can continue
-	     the parsing */
-
-	  post("Cannot create object ");
-	  postatoms(argc + 1, description);
-	  post("\n");
-
-	  obj = fts_error_object_new((fts_patcher_t *) parent, FTS_NO_ID, argc + 1, description);
-	}
 
       if (obj)
 	fts_patparse_set_text_graphic_properties(graphicDescr, obj);
@@ -861,7 +845,9 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       argc = fts_patparse_read_object_arguments(description + 1, in);
       fts_patparse_set_normal_mode(in);
 
-      obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1, description);
+      obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
+      fts_message_send(obj, fts_SystemInlet, fts_s_clear, 0, 0);
+      fts_message_send(obj, fts_SystemInlet, fts_s_append, argc, description + 1);
 
       fts_patparse_set_text_graphic_properties(graphicDescr, obj);
     }

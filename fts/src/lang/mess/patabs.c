@@ -92,12 +92,9 @@ void fts_abstraction_declare_path(fts_symbol_t path)
 }
 
 
-static FILE *fts_abstraction_find_file(fts_symbol_t name)
+static FILE *fts_abstraction_find_declared_file(fts_symbol_t name)
 {
-  char buf[1024];
-  int i;
   FILE *file;
-
   void *d;
 
   /* First, look in the abstraction declaration table */
@@ -118,10 +115,24 @@ static FILE *fts_abstraction_find_file(fts_symbol_t name)
       if (file)
 	return file;
     }
+  
+  return 0;
+}
+
+
+
+static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
+{
+  char buf[1024];
+  int i;
+  FILE *file;
 
   /*
-   * Not there, look in the search path, either with or without ".pat" or ".abs"
+   * Look in the search path, either with or without ".pat" or ".abs"
    * extensions; declare the abstraction if found !!
+   * Problem: in this way, an already path loaded abstraction overwrite
+   * a C object dynamically loaded after the first abstraction instantiation.
+   * this path thing should just have a private cache.
    */
 
   for (i = 0; i < search_path_fill ; i++)
@@ -173,8 +184,47 @@ static FILE *fts_abstraction_find_file(fts_symbol_t name)
  *
  */
 
+static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, int id, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  fts_symbol_t name;
+  char name_buf[1024];
+  char *p;
+  int i;
+  fts_patlex_t *in; 
+  fts_atom_t a;
+  fts_atom_t description[4];
 
-fts_object_t *fts_abstraction_new(fts_patcher_t *patcher, int id, int ac, const fts_atom_t *at)
+  fts_set_symbol(&description[0], fts_s_patcher);
+  fts_set_symbol(&description[1], fts_new_symbol("unnamed"));
+  fts_set_int(&description[2], 0);
+  fts_set_int(&description[3], 0);
+
+  obj = fts_object_new((fts_patcher_t *)patcher, id, 4, description);
+
+  /* Change the description in the object */
+
+  fts_object_set_description(obj, ac, at);
+
+  /* flag the patcher as abstraction */
+
+  fts_patcher_set_abstraction((fts_patcher_t *)obj);
+
+  /* get the lexer */
+
+  in = fts_patlex_open_file(file, ac - 1, at + 1);
+
+  fts_patparse_parse_patlex(obj, in);
+
+  fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *) obj, fts_get_symbol(&at[0]));
+
+  fts_patlex_close(in);
+
+  return obj;
+}
+
+
+fts_object_t *fts_abstraction_new_declared(fts_patcher_t *patcher, int id, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj;
   fts_symbol_t name;
@@ -200,54 +250,46 @@ fts_object_t *fts_abstraction_new(fts_patcher_t *patcher, int id, int ac, const 
       name = fts_get_symbol(&at[0]);
     }
 
-  file = fts_abstraction_find_file(name);
+  file = fts_abstraction_find_declared_file(name);
 
   if (file)
-    {
-      int i;
-      fts_patlex_t *in; 
-      fts_atom_t a;
-      fts_atom_t description[4];
-      fts_object_t *obj;
-
-      fts_set_symbol(&description[0], fts_s_patcher);
-      fts_set_symbol(&description[1], fts_new_symbol("unnamed"));
-      fts_set_int(&description[2], 0);
-      fts_set_int(&description[3], 0);
-
-      obj = fts_object_new((fts_patcher_t *)patcher, id, 4, description);
-
-      /* Change the description in the object */
-
-      fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
-
-      obj->argc = ac;
-      obj->argv = (fts_atom_t *) fts_block_zalloc(ac * sizeof(fts_atom_t));
-
-      for (i = 0; i < ac; i++)
-	obj->argv[i] = at[i];
-
-      /* flag the patcher as abstraction */
-
-      fts_patcher_set_abstraction((fts_patcher_t *)obj);
-
-      /* get the lexer */
-
-      in = fts_patlex_open_file(file, ac - 1, at + 1);
-
-      fts_patparse_parse_patlex(obj, in);
-
-      fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *) obj, fts_get_symbol(&at[0]));
-
-      fts_patlex_close(in);
-
-      return obj;
-    }
-
-
-  /* file not found, return null */
-
-  return 0;
+    return fts_make_abstraction(file, patcher, id, ac, at);
+  else
+    return 0;
 }
 
 
+fts_object_t *fts_abstraction_new_search(fts_patcher_t *patcher, int id, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  fts_symbol_t name;
+  char name_buf[1024];
+  char *p;
+  FILE *file;
+
+  strcpy(name_buf, fts_symbol_name(fts_get_symbol(&at[0])));
+
+  p = strrchr(name_buf, '.');
+
+  if (p && ((! strcmp(p, ".abs")) || (! strcmp(p, ".pat"))))
+    {
+      /* .pat or .abs Extension used, generate a new name symbol */
+
+      *p = '\0';
+      name = fts_new_symbol_copy(name_buf);
+    }
+  else
+    {
+      /* No extension used, use the provided symbol directly */
+
+      name = fts_get_symbol(&at[0]);
+    }
+
+  file = fts_abstraction_find_path_file(name);
+
+  if (file)
+    return fts_make_abstraction(file, patcher, id, ac, at);
+  else
+    return 0;
+}
+  

@@ -597,6 +597,8 @@ fts_client_mess_add_string
 fts_client_mess_add_atoms
 fts_client_mess_send_msg
 fts_object_send_mess
+fts_object_set_description
+fts_register_object_doctor
 fts_updates_set_updates_per_ticks
 fts_updates_set_update_period
 fts_updates_sync

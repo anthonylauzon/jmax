@@ -30,13 +30,7 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int id, int ac, const 
 
   /* Change the description in the object */
 
-  fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
-
-  obj->argc = ac;
-  obj->argv = (fts_atom_t *) fts_block_zalloc(ac * sizeof(fts_atom_t));
-
-  for (i = 0; i < ac; i++)
-    obj->argv[i] = at[i];
+  fts_object_set_description(obj, ac, at);
 
   /* flag the patcher as error */
 

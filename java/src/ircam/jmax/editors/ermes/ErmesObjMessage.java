@@ -40,7 +40,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
     // to get the string from the object.
 
-    itsArgs = theFtsObject.getDescription();
+    itsArgs = (String) theFtsObject.get("value");
     
     super.Init(theSketchPad,  theFtsObject);
     ParseText(itsArgs);
@@ -59,7 +59,8 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   {
     try
       {
-	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "messbox", itsArgs);
+	itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "messbox");
+	((FtsMessageObject)itsFtsObject).setMessage(itsArgs);
       }
     catch (FtsException e)
       {

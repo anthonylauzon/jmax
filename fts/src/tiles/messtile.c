@@ -485,13 +485,6 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
       new = fts_object_new(parent, id, ac - 2, av + 2);
 
-      if (! new)
-	{
-	  post_mess("Cannot create object ", ac - 2, av + 2);
-	  new = fts_error_object_new(parent, id, ac - 2, av + 2);
-	}
-
-
       /* Upload the object if it have an ID */
 
       if (id != FTS_NO_ID)
