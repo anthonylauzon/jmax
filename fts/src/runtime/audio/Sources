@@ -24,4 +24,6 @@
 #
 
 SOURCES=	\
+audio.c		\
 audioport.c	\
+nullaudioport.c	\

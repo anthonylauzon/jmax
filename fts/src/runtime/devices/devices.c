@@ -161,7 +161,7 @@ static void fts_dev_shutdown(void);
 static fts_dev_class_t *dev_class_list = 0;
 static fts_dev_t *open_dev_list = 0;
 
-fts_module_t fts_dev_module = {"dev", "The FST device set", fts_dev_init, fts_dev_shutdown, 0};
+fts_module_t fts_dev_module = {"dev", "The FTS device set", fts_dev_init, fts_dev_shutdown, 0};
 
 static void
 fts_dev_init(void)

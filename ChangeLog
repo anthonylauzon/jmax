@@ -1,3 +1,9 @@
+2001-03-19  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* removed old directories: alsa0.6dev, alsadev, halsadev, hammerfalldev
+
+	* added null audio port, to prevent locking the machine.
+
 2001-03-15  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Changed the audio I/O system

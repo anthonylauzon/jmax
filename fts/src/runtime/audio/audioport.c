@@ -524,4 +524,3 @@ void audioport_config( void)
   fts_metaclass_install( s_audioportout, audioportout_instantiate, fts_never_equiv);
 }
 
-fts_module_t fts_audio_module = {"FTS Audio", "FTS Audio Input Output system ", audioport_config, 0, 0};
