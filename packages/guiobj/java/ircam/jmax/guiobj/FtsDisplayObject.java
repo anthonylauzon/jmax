@@ -40,7 +40,7 @@ public class FtsDisplayObject extends FtsGraphicObject
     FtsObject.registerMessageHandler( FtsDisplayObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsDisplayObject)obj).display(args.getSymbol( 0).toString());
+	  ((FtsDisplayObject)obj).display( args.getString( 0));
 	}
       });
   }
