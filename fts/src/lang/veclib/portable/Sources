@@ -1,4 +1,10 @@
-SOURCES = \
+ifeq ($(ARCH), rhapsody)
+STRANGE_SOURCES = 
+else
+STRANGE_SOURCES = vecx_scl_cfmul.c vecx_scl_icmp.c vecx_sqrt.c vecx_trigon.c
+endif
+
+SOURCES = $(STRANGE_SOURCES)    \
 	cfft.c			\
 	rfft_shuffle.c		\
 	vec_bit.c		\
@@ -65,11 +71,14 @@ SOURCES = \
 	vecx_rsqrt.c		\
 	vecx_scl_bit.c		\
 	vecx_scl_carith.c	\
-	vecx_scl_cfmul.c	\
 	vecx_scl_farith.c	\
-	vecx_scl_fcmp.c	\
-	vecx_scl_iarith.c	\
-	vecx_scl_icmp.c	\
-	vecx_sqrt.c		\
-	vecx_trigon.c		
+	vecx_scl_fcmp.c	        \
+	vecx_scl_iarith.c
+
+
+
+
+
+
+
 

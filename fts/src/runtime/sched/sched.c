@@ -64,7 +64,7 @@ static float tick_length;
    Default to 3 hundreds of ticks (around 400 msec, with 44.1Khz/64 samples per ticks)
    */
 
-static int fts_pause_period = 300;
+static int fts_pause_period = 12;
 
 /* forward declarations */
 

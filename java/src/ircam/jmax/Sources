@@ -1,0 +1,6 @@
+SOURCES = MaxApplication.java \
+	  MaxDocument.java    \
+          MaxEditor.java      \
+          MaxInterp.java      \
+          MaxResourceId.java  \
+          MaxWindow.java

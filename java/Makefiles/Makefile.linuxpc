@@ -1,0 +1,5 @@
+#
+# Find the system classes on Linux (1.1.3) installations
+#
+
+SYSTEM_CLASSPATH = /usr/local/jdk1.1.3/lib/classes.zip

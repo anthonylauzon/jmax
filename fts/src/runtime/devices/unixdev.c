@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <sys/resource.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 
@@ -514,6 +515,10 @@ socket_server_get(fts_dev_t *dev, unsigned char *cp)
 	  
 	  p->get_fd = newfd;      
 	  p->put_fd = newfd;
+
+	  /* '6' is the TCP protocol number */
+
+	  setsockopt(newfd, 6,  TCP_NODELAY, 0, 0);
 	}
       else
 	{
@@ -540,9 +545,13 @@ socket_server_get(fts_dev_t *dev, unsigned char *cp)
 		  perror("error in socket_server_get: accept :");
 		  return &fts_dev_io_error; 
 		}
-	  
+
 	      p->get_fd = newfd;      
 	      p->put_fd = newfd;
+
+	      /* '6' is the TCP protocol number */
+
+	      setsockopt(newfd, 6,  TCP_NODELAY, 0, 0);
 	    }
 	}
     }
@@ -587,6 +596,10 @@ socket_server_put(fts_dev_t *dev, unsigned char c)
 
       p->get_fd = newfd;      
       p->put_fd = newfd;
+
+      /* '6' is the TCP protocol number */
+
+      setsockopt(newfd, 6,  TCP_NODELAY, 0, 0);
     }
 
   ret = fd_dev_put(dev, c);
@@ -784,6 +797,10 @@ open_socket_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   p->get_fd = sock;
   p->put_fd = sock;
+
+  /* '6' is the TCP protocol number */
+
+  setsockopt(sock, 6,  TCP_NODELAY, 0, 0);
 
   fts_dev_set_device_data(dev, (void *) p);
 

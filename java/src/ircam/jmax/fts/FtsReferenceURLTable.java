@@ -1,0 +1,31 @@
+package ircam.jmax.fts;
+
+import java.util.*;
+
+/**
+ * This class provide a registration service for reference urls.
+ * The class is filled thru the TCL Command <b>referenceURL</b>.
+ *
+ * @see FtsReferenceURLCmd
+ */
+
+
+public class FtsReferenceURLTable
+{
+  static Hashtable FtsReferenceURLTable = new Hashtable();
+
+  static public void add(String className, String url)
+  {
+    FtsReferenceURLTable.put(className, url);
+  }
+
+  static public boolean exists(String className)
+  {
+    return FtsReferenceURLTable.containsKey(className);
+  }
+
+  static String getReferenceURL(String className)
+  {
+    return (String) FtsReferenceURLTable.get(className);
+  }
+}

@@ -315,9 +315,11 @@ fts_class_instantiate(int ac, const fts_atom_t *at)
       mcl = mcl->next_same_name;
     }
 
+#ifdef DEBUG
   fprintf(stderr, "Unable to create :"); /* @@@ ERROR !!! */
   fprintf_atoms(stderr, ac, at); 
   fprintf(stderr, "\n");	/* @@@ ERROR !!! */
+#endif
 
   return 0;
 }

@@ -141,10 +141,10 @@ fts_mess_client_open_patcher(int ac, const fts_atom_t *av)
       if (patcher)
 	fts_message_send(patcher, fts_SystemInlet, fts_s_open, 0, 0);
       else
-	post_mess("Error in FOS message OPEN PATCHER: null patcher", ac, av);
+	post_mess("System Error in FOS message OPEN PATCHER: null patcher", ac, av);
     }
   else
-    post_mess("Error in FOS message OPEN PATCHER: bad args", ac, av);
+    post_mess("System Error in FOS message OPEN PATCHER: bad args", ac, av);
 }
 
 
@@ -169,10 +169,10 @@ fts_mess_client_close_patcher(int ac, const fts_atom_t *av)
       if (patcher)
 	fts_message_send(patcher, fts_SystemInlet, fts_s_close, 0, 0);
       else
-	post_mess("Error in FOS message CLOSE PATCHER: null patcher ", ac, av);
+	post_mess("System Error in FOS message CLOSE PATCHER: null patcher ", ac, av);
     }
   else
-    post_mess("Error in FOS message CLOSE PATCHER: bad args", ac, av);
+    post_mess("System Error in FOS message CLOSE PATCHER: bad args", ac, av);
 }
 
 
@@ -198,10 +198,10 @@ fts_mess_client_patcher_loaded(int ac, const fts_atom_t *av)
       if (patcher)
 	fts_message_send(patcher, fts_SystemInlet, fts_s_load_init, 0, 0);
       else
-	post_mess("Error in FOS message PATCHER LOADED: null patcher", ac, av);
+	post_mess("System Error in FOS message PATCHER LOADED: null patcher", ac, av);
     }
   else
-    post_mess("Error in FOS message PATCHER LOADED: bad args", ac, av);
+    post_mess("System Error in FOS message PATCHER LOADED: bad args", ac, av);
 }
 
 
@@ -232,12 +232,12 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
       if (! new)
 	{
-	  post_mess("Error in FOS message NEW: error in object creation", ac, av);
+	  post_mess("Error in object creation", ac - 2, av + 2);
 	  return;
 	}
     }
   else
-    post_mess("Error in FOS message NEW: bad args", ac, av);
+    post_mess("System Error in FOS message NEW: bad args", ac, av);
 }
 
 
@@ -262,7 +262,7 @@ fts_mess_client_redefine(int ac, const fts_atom_t *av)
 
       if (! old)
 	{
-	  post_mess("Error in FOS message REDEFINE: redefining a non existing object", ac, av);
+	  post_mess("System Error in FOS message REDEFINE: redefining a non existing object", ac, av);
 	  return;
 	}
 
@@ -270,12 +270,12 @@ fts_mess_client_redefine(int ac, const fts_atom_t *av)
 
       if (! new)
 	{
-	  post_mess("Error in FOS message REDEFINE: error in object redefinition", ac, av);
+	  post_mess("Error in object creation", ac - 1, av + 1);
 	  return;
 	}
     }
   else
-    post_mess("Error in FOS message REDEFINE: bad args", ac, av);
+    post_mess("System Error in FOS message REDEFINE: bad args", ac, av);
 }
 
 
@@ -301,14 +301,14 @@ fts_mess_client_free(int ac, const fts_atom_t *av)
 
       if (! obj)
 	{
-	  post_mess("Error in FOS message FREE: freeing a non existing object", ac, av);
+	  post_mess("System Error in FOS message FREE: freeing a non existing object", ac, av);
 	  return;
 	}
 
       fts_object_delete(obj);
     }
   else
-    post_mess("Error in FOS message FREE: bad args", ac, av);
+    post_mess("System Error in FOS message FREE: bad args", ac, av);
 }
 
 
@@ -347,13 +347,13 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 	  ret = fts_object_connect(from, outlet, to, inlet);
 
 	  if (ret)
-	    post("Error in FOS message CONNECT: %s\n", ret->description);
+	    post("Error connecting objects: %s\n", ret->description);
 	}
       else
-	post_mess("Error in FOS message CONNECT: connecting non existing object", ac, av);
+	post_mess("Error trying to connect non existing objects", ac, av);
     }
   else
-    post_mess("Error in FOS message CONNECT: bad args", ac, av);
+    post_mess("System Error in FOS message CONNECT: bad args", ac, av);
 }
 
 
@@ -394,13 +394,13 @@ fts_mess_client_disconnect(int ac, const fts_atom_t *av)
 	  ret = fts_object_disconnect(from, outlet, to, inlet);
 
 	  if (ret)
-	    post("Error in FOS message DISCONNECT: %s\n", ret->description);
+	    post("System Error in FOS message DISCONNECT: %s\n", ret->description);
 	}
       else
-	post_mess("Error in FOS message DISCONNECT: disconnecting non existing object", ac, av);
+	post_mess("System Error in FOS message DISCONNECT: disconnecting non existing object", ac, av);
     }
   else
-    post_mess("Error in FOS message DISCONNECT: bad args", ac, av);
+    post_mess("System Error in FOS message DISCONNECT: bad args", ac, av);
 }
 
 
@@ -434,7 +434,7 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
 
       if (! obj)
 	{
-	  post_mess("Error in FOS message MESS: message to a non existing object", ac, av);
+	  post_mess("System Error in FOS message MESS: message to a non existing object", ac, av);
 	  return;
 	}
 
@@ -448,7 +448,7 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
 	}
     }
   else
-    post_mess("Error in FOS message MESS: bad args", ac, av);
+    post_mess("System Error in FOS message MESS: bad args", ac, av);
 }
 
 /*
@@ -486,7 +486,7 @@ fts_mess_client_nmess(int ac, const fts_atom_t *av)
 
       if (! obj)
 	{
-	  post_mess("Error in FOS message NMESS: no object", ac, av);
+	  post("Error: receive %s do not exists", name);
 	  return;
 	}
 
@@ -500,7 +500,7 @@ fts_mess_client_nmess(int ac, const fts_atom_t *av)
 	}
     }
   else
-    post_mess("Error in FOS message NMESS: bad args", ac, av);
+    post_mess("System Error in FOS message NMESS: bad args", ac, av);
 }
 
 /*
@@ -529,7 +529,7 @@ fts_mess_client_put_prop(int ac, const fts_atom_t *av)
       fts_object_put_prop(obj, name, &av[2]);
     }
   else
-    post_mess("Error in FOS message PUTPROP: bad args", ac, av);
+    post_mess("System Error in FOS message PUTPROP: bad args", ac, av);
 }
 
 
@@ -559,7 +559,7 @@ fts_mess_client_get_prop(int ac, const fts_atom_t *av)
       fts_object_property_changed(obj, name);
     }
   else
-    post_mess("Error in FOS message GETPROP: bad args", ac, av);
+    post_mess("System Error in FOS message GETPROP: bad args", ac, av);
 }
 
 

@@ -1,0 +1,8 @@
+SOURCES = \
+           ExtensionFilter.java \
+           TWOutputStream.java \
+           TWPrintStream.java \
+           TextWindow.java    \
+	   Platform.java
+
+

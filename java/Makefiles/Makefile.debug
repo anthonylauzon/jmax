@@ -1,0 +1,6 @@
+#
+# Makefile.debug
+#
+
+JAVAC_FLAGS = -g
+

@@ -1,0 +1,16 @@
+##
+## Support makefile, with additional targets 
+##
+
+clean:
+	(cd $(JAVA_CLASSES_ROOT)/$(PACKAGE_DIR) ; find . -name "*.class" -exec /bin/rm -f '{}' \; )
+
+tags:
+	(cd $(JAVA_SRC_ROOT) ; find . -name "*.java" -print | etags - )
+
+
+.SUFFIXES: .class
+
+$(JAVA_CLASSES_ROOT)/$(PACKAGE_DIR)/%.class: %.java
+	javac $(JFLAGS) $<
+

@@ -1,0 +1,5 @@
+#
+# Find the system classes on Sgi 3.01 installations
+#
+
+SYSTEM_CLASSPATH = /usr/java/lib/rt.jar:/usr/java/lib/i18n.jar

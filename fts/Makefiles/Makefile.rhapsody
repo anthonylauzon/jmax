@@ -9,11 +9,17 @@ VENDOR := gnu
 OS_TYPE := unix
 CC := cc
 
-ARCH_CFLAGS := -Wall -DGNU
+RANLIB = ranlib
+LD_ALL_FLAG = 
+LD_NONE_FLAG =
+CC_ALL_FLAG = 
+CC_NONE_FLAG = 
+
+ARCH_CFLAGS := -Wall -DGNU -traditional-cpp
 ARCH_LDFLAGS :=
 
 
 ARCH_OPT_CFLAGS := -O3
 ARCH_OPT_LDFLAGS := 
 
-FTS_SYS_LIBS = -lm 
+FTS_SYS_LIBS = 

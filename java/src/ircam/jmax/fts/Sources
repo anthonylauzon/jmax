@@ -1,0 +1,27 @@
+SOURCES = \
+          FtsAbstractionTable.java \
+          FtsClientProtocol.java \
+          FtsConnection.java \
+          FtsErrorStreamer.java \
+          FtsGraphicDescription.java \
+          FtsHelpPatchTable.java \
+          FtsMessage.java \
+          FtsMessageHandler.java \
+          FtsObject.java \
+          FtsParse.java \
+          FtsPatcher.java \
+          FtsPort.java \
+          FtsPropertyHandler.java \
+          FtsPropertyHandlerTable.java \
+          FtsReferenceURLTable.java \
+          FtsSaveStream.java \
+          FtsServer.java \
+          FtsSocketClientServer.java \
+          FtsSocketPort.java \
+          FtsSocketServer.java \
+          FtsSocketServerPort.java \
+          FtsSubProcessPort.java \
+          FtsSubProcessServer.java \
+          FtsTemplateTable.java \
+          FtsWindowDescription.java
+

@@ -1,0 +1,173 @@
+/**
+ *  Name:               Platform.java
+ *      
+ *  Comment: A class that insulates the platform-specific
+ *  constants.
+ *      
+ *  @version:   0.1
+ *      @author         Peter Hanappe, IRCAM, France
+ *
+ *  Modifications:
+ *
+ */
+
+
+
+
+package ircam.jmax.utils;
+
+import java.awt.*;
+
+
+//=====================================================
+//   Platform 
+//=====================================================
+
+public class Platform
+{
+   static public String NEWLINE     = null;
+   static public char   NEWLINECHAR = 0;
+   static public int    DELETE_KEY  = 0;
+   static public int    BACKSPACE_KEY  = 0;	//to check in all the platforms
+   static public int    ENTER_KEY   = 0;
+   static public int    RETURN_KEY  = 0;
+   static public int    FONT_SIZE   = 0;
+   static public String FONT_NAME   = null;
+   static public int    LEFT_KEY    = 1006;//??
+   static public int    RIGHT_KEY   = 1007;//??
+   static public int    UP_KEY      = 1004;//??
+   static public int    DOWN_KEY    = 1005;//??
+
+   static public String  SYSTEM     = null;
+   static public boolean INAPPLET   = false;
+
+
+
+//============================
+//   * mac: okay
+//
+//   * sgi:
+//       return = ?
+//       newlinechar = ?
+//   
+//   * dec-alpha ?
+//   * windows ?
+//   * linux ?
+//   
+//============================
+
+
+
+   //------------------------------------------
+   // setValues
+   //------------------------------------------
+   
+   static public void setValues()
+   { 
+      
+      if (!INAPPLET){
+         SYSTEM =  (String)(System.getProperties().getProperty("os.name"));
+      }
+      else if (SYSTEM == null){
+         SYSTEM = "unknown";
+      }
+      if (SYSTEM.equalsIgnoreCase("macos")){
+         setMacValues();
+      }
+      else if (SYSTEM.equals("Irix")) // SGI
+      {
+         setIrixValues();
+      }
+      else if (SYSTEM.equals("DEC")){
+         setIrixValues();
+          }  
+      else if (SYSTEM.equals("windows")){
+         setWindowsValues();
+      }  
+      else if (SYSTEM.equals("Linux")){
+         	setLinuxValues();
+             }  
+            else{
+         	setDefaultValues();
+          }
+   }
+
+   //------------------------------------------
+   // setMacValues
+   //------------------------------------------
+   
+        static protected void setMacValues(){
+         	NEWLINE     = "\n";
+        	NEWLINECHAR = '\n';
+         	DELETE_KEY  = 8;
+        	BACKSPACE_KEY = 127;
+        	ENTER_KEY   = 3;
+         	RETURN_KEY  = 10;
+        	FONT_SIZE   = 9;
+         	FONT_NAME   = new String("monaco");
+        }
+
+   //------------------------------------------
+   // setIrixValues
+   //------------------------------------------
+   
+        static protected void setIrixValues(){
+         	NEWLINE     = "\n";
+         	NEWLINECHAR = '\n';
+        	DELETE_KEY  = 127;
+         	BACKSPACE_KEY = 8;
+         	ENTER_KEY   = 10;
+         	RETURN_KEY  = 10;
+         	FONT_SIZE   = 10;
+         	FONT_NAME   = new String("SansSerif");
+        }
+
+   //------------------------------------------
+   // setDECValues
+   //------------------------------------------
+   
+        static protected void setDECValues(){
+        	NEWLINE     = "\n";
+        	NEWLINECHAR = '\n';
+         	DELETE_KEY  = 8;
+         	ENTER_KEY   = 10;
+         	RETURN_KEY  = 10;
+         	FONT_SIZE   = 18;
+        	FONT_NAME   = new String("monaco");
+        }
+
+   //------------------------------------------
+   // setWindowsValues
+   //------------------------------------------
+   
+        static protected void setWindowsValues() {
+         	setDefaultValues();
+        }
+
+   //------------------------------------------
+   // setLinuxValues
+   //------------------------------------------
+   
+        static protected void setLinuxValues(){
+	  setDefaultValues();
+        }
+        
+   //------------------------------------------
+   // setDefaultValues
+   //------------------------------------------
+   
+        static protected void setDefaultValues(){
+         	NEWLINE     = "\n";
+         	NEWLINECHAR = '\n';
+        	 DELETE_KEY  = 8;
+        	 BACKSPACE_KEY = 127;
+         	ENTER_KEY   = 10;
+        	 RETURN_KEY  = 10;
+		 FONT_NAME = Toolkit.getDefaultToolkit().getFontList()[1];
+        	 FONT_SIZE   = 10;
+
+		 //FONT_NAME   = new String("helvetica");
+
+        }
+     }
+ 

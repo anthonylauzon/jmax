@@ -22,4 +22,6 @@ FTS_BIN = $(BINDIR)/fts
 all: $(FTS_BIN)
 
 
+TOCLEAN = $(FTS_BIN)
+
 include $(ROOTDIR)/Makefiles/Makefile.misc

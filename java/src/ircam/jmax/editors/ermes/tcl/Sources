@@ -1,0 +1,18 @@
+SOURCES =  \
+          ErmesConnectCmd.java \
+          ErmesDisconnectCmd.java \
+          ErmesElementsCmd.java \
+          ErmesGraphicsOffCmd.java \
+          ErmesGraphicsOnCmd.java \
+          ErmesObjDeleteCmd.java \
+          ErmesObjNewObjCmd.java \
+          ErmesObjectGetPositionXCmd.java \
+          ErmesObjectGetPositionYCmd.java \
+          ErmesObjectGetSizeHCmd.java \
+          ErmesObjectGetSizeWCmd.java \
+          ErmesObjectSetPositionCmd.java \
+          ErmesObjectSetSizeCmd.java \
+          ErmesPatNewCmd.java \
+          ErmesSelectedCmd.java \
+          ErmesShowCmd.java   \
+	  TclErmesPackage.java
