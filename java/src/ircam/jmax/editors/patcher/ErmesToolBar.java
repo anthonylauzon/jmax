@@ -105,7 +105,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 	  PatcherSaveManager.Save(sketch.getEditorContainer());
 	}
     });
-
+    toSaveButton.setToolTipText("save file");
     toSaveButton.setEnabled(false);
     toSaveButton.setVisible(false);
 
@@ -118,6 +118,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 	upButton = new JButton(Icons.get( "_up_"));
 	upButton.setDoubleBuffered( false);
 	upButton.setMargin( new Insets(0,0,0,0));
+	upButton.setToolTipText("show parent patcher");
 	upButton.addActionListener( new ActionListener() {
 	  public void actionPerformed( ActionEvent e)
 	    {

@@ -41,7 +41,7 @@ public class FtsSliderObject extends FtsIntValueObject
 
   int minValue;
   int maxValue;
-  int horientation;
+  int orientation;
 
   /**
    * Create a FtsObject object;
@@ -73,12 +73,12 @@ public class FtsSliderObject extends FtsIntValueObject
     fts.getServer().putObjectProperty(this, "maxValue", maxValue);
   }
 
-  /** Set the horientation */
+  /** Set the orientation */
 
-  public void setHorientation(int hor)
+  public void setOrientation(int or)
   {
-    horientation = hor;
-    fts.getServer().putObjectProperty(this, "horientation", horientation);
+    orientation = or;
+    fts.getServer().putObjectProperty(this, "orientation", orientation);
   }
 
   /** Get the Min Value for the slider. */
@@ -95,9 +95,9 @@ public class FtsSliderObject extends FtsIntValueObject
     return maxValue;
   }
 
-  public int getHorientation()
+  public int getOrientation()
   {
-    return horientation;
+    return orientation;
   }
 
   /** Over write the localPut message to handle the min/max properties;
@@ -115,9 +115,9 @@ public class FtsSliderObject extends FtsIntValueObject
       {
 	maxValue = value;
       }
-    else if (name == "horientation")
+    else if (name == "orientation")
       {
-	horientation = value;
+	orientation = value;
       }
     else
       super.localPut(name, value);

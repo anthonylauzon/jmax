@@ -242,7 +242,6 @@ public class FtsObject
   protected void localPut(String name, Object value)
   {
     // check first hardcoded properties
-
     if (name == "errdesc")
       {
 	errorDescription = (String) value;

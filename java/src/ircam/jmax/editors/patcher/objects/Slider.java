@@ -55,13 +55,13 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   protected final static int BOTTOM_OFFSET = 5;
   protected final static int UP_OFFSET = 5;
   
-  static final int VERTICAL_HOR = 0;
-  static final int HORIZONTAL_HOR = 1;
+  static final int VERTICAL_OR = 0;
+  static final int HORIZONTAL_OR = 1;
   
   private int value = 0;
   private int rangeMax;
   private int rangeMin;
-  private int horientation;
+  private int orientation;
 
   public Slider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
@@ -87,9 +87,10 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     if (getHeight() < BOTTOM_OFFSET +  UP_OFFSET)
       setHeight( h);
     
-    horientation = ((FtsSliderObject)ftsObject).getHorientation();
-    if((horientation!=HORIZONTAL_HOR)&&(horientation!=VERTICAL_HOR))
-      setHorientation(VERTICAL_HOR);
+    orientation = ((FtsSliderObject)ftsObject).getOrientation();
+
+    if((orientation!=HORIZONTAL_OR)&&(orientation!=VERTICAL_OR))
+      setOrientation(VERTICAL_OR);
   }
 
   public void setMinValue( int theValue) 
@@ -143,15 +144,15 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     redraw();
   }
 
-  public void setHorientation(int hor)
+  public void setOrientation(int or)
   {
-    horientation = hor;
-    ((FtsSliderObject)ftsObject).setHorientation(horientation);
+    orientation = or;
+    ((FtsSliderObject)ftsObject).setOrientation(orientation);
   }
 
-  public int getHorientation()
+  public int getOrientation()
   {
-    return horientation;
+    return orientation;
   }
 
   public void valueChanged(int v) 
@@ -174,7 +175,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   {
     int newValue;
 
-    if(horientation==VERTICAL_HOR)
+    if(orientation==VERTICAL_OR)
       newValue = ((( getY() + getHeight() - mouse.y - BOTTOM_OFFSET) * (rangeMax - rangeMin)) /
 		  (getHeight() - BOTTOM_OFFSET - UP_OFFSET-THROTTLE_HEIGHT)) + rangeMin;
     else
@@ -207,7 +208,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     /* Paint the throttle */
     g.setColor( Color.black);  
     int pixels, pos;
-    if(horientation==VERTICAL_HOR)
+    if(orientation==VERTICAL_OR)
     {
       pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
       pos = y + BOTTOM_OFFSET + pixels  - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
@@ -238,7 +239,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     /* Paint the throttle */
     g.setColor( Color.black);
     int pixels, pos;
-    if(horientation==VERTICAL_HOR)
+    if(orientation==VERTICAL_OR)
     {
       pixels = h - BOTTOM_OFFSET - UP_OFFSET - THROTTLE_HEIGHT;
       pos = y + BOTTOM_OFFSET + pixels - (pixels * (value-rangeMin)) / (rangeMax - rangeMin);
@@ -276,8 +277,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
 
   public void changeOrientation()
   {
-    if(horientation == VERTICAL_HOR) setHorientation(HORIZONTAL_HOR);
-    else setHorientation(VERTICAL_HOR);
+    if(orientation == VERTICAL_OR) setOrientation(HORIZONTAL_OR);
+    else setOrientation(VERTICAL_OR);
     
     updateDimension();
   }
