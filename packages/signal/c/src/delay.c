@@ -599,7 +599,7 @@ tapout_instantiate(fts_class_t *cl)
 
 /************************************************************
  *
- *  tapin~ and tapout~
+ *  feedback input tap
  *
  */
 

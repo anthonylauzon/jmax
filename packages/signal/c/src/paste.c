@@ -21,198 +21,170 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
+#include <utils/c/include/utils.h>
 #include <data/c/include/fvec.h>
+#include "delay.h"
 
-fts_symbol_t paste_symbol = 0;
-
-typedef struct _paste_
-{
-  fts_dsp_object_t o;
-  float *buf;
-  int size;
-  int ring_size; /* size + tick_size */
-  int index;
-  double conv;
-} paste_t;
-
-/***************************************************************************************
+/********************************************************
  *
- *  user methods
+ *  dcopy
  *
  */
 
-static void 
-paste_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_symbol_t sym_dcopy = 0;
+static fts_symbol_t sym_dpaste = 0;
+
+typedef struct
 {
-  paste_t *this = (paste_t *)o;
-  float *buf = this->buf;
-  int buf_size = this->size;
+  fts_object_t o;
+  delayline_t *line;
+} dcopy_t;
+
+static void 
+dcopy_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dcopy_t *this = (dcopy_t *)o;
   fvec_t *fvec = (fvec_t *)fts_get_object(at);
+  delayline_t *delayline = this->line;
+  float *buffer = delayline->buffer;
+  int phase = delayline->phase;
+  int delay_size = delayline->delay_size;
+  int ring_size = delayline->ring_size;
   int size = fvec_get_size(fvec);
   float *ptr = fvec_get_ptr(fvec);
-  int onset = (int)((fts_get_time() - fts_dsp_get_time()) * this->conv);
-  int tail;
-  int index;
-  int i;
+  int onset, tail;
+  int i, k;
 
-  if(size > buf_size)
-    size = buf_size;
-  
-  index = this->index + onset;
-  tail = this->ring_size - index;
+  if(size > delay_size)
+    size = delay_size;
+
+  onset = delayline->phase - size;
+  if(onset < 0)
+    onset += ring_size; /* ring buffer wrap around */
+
+  tail = ring_size - onset;
 
   if(tail > size)
     tail = size;
 
-  /* fill fvec from ring buffer */
+  /* copy fvec from delay line */
   for(i=0; i<tail; i++)
-    buf[index + i] += ptr[i];
-  
-  for(i=0; i<size-tail; i++)
-    buf[i] += ptr[tail + i];
-}
+    ptr[i] = buffer[onset + i];
 
-/***************************************************************************************
- *
- *  dsp
- *
- */
-static void
-paste_reset(paste_t *this, double sr, int n_tick)
-{
-  int i;
+  for(k=0; i<size; k++, i++)
+    ptr[i] = buffer[k];
 
-  this->conv = 0.001 * fts_dsp_get_sample_rate();
-  this->ring_size = this->size + n_tick;
-  this->buf = (float *)fts_realloc(this->buf, this->ring_size * sizeof(float));
-
-  for(i=0; i<this->ring_size; i++)
-    this->buf[i] = 0.0;
+  fts_outlet_object(o, 0, (fts_object_t *)fvec);
 }
 
 static void 
-paste_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dpaste_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  paste_t *this = (paste_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
-  float sr = fts_dsp_get_output_srate(dsp, 0);
-  int n_tick = fts_dsp_get_output_size(dsp, 0);
-  fts_atom_t a[3];
-  
-  paste_reset(this, sr, n_tick);
-  
-  fts_set_object(a + 0, this);
-  fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_int(a + 2, n_tick);
-  fts_dsp_add_function(paste_symbol, 3, a);
-}
-
-static void
-paste_ftl(fts_word_t *argv)
-{
-  paste_t *this = (paste_t *)fts_word_get_pointer(argv + 0);
-  float * restrict out = (float *)fts_word_get_pointer(argv + 1);
-  int n_tick = fts_word_get_int(argv + 2);
-  float *buf = this->buf;
-  int index = this->index;
-  int tail = this->ring_size - index;
+  dcopy_t *this = (dcopy_t *)o;
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
+  delayline_t *delayline = this->line;
+  float *buffer = delayline->buffer;
+  int phase = delayline->phase;
+  int drain_size = delayline->drain_size;
+  int ring_size = delayline->ring_size;
+  int size = fvec_get_size(fvec);
+  float *ptr = fvec_get_ptr(fvec);
+  int tail;
   int i;
 
-  /* fill ring buffer */
-  if(tail > n_tick)
-    {
-      for(i=0; i<n_tick; i++)
-	{
-	  out[i] = buf[index + i];
-	  buf[index + i] = 0.0;
-	}
+  if(size > drain_size)
+    size = drain_size;
 
-      this->index += n_tick;
+  if(phase >= ring_size)
+    phase -= ring_size;
+
+  tail = ring_size - phase;
+
+  /* add fvec to delay drain */
+  if(tail > size)
+    {
+      for(i=0; i<size; i++)
+	buffer[phase + i] += ptr[i];
     }
   else
     {
+      int k;
+
       for(i=0; i<tail; i++)
-	{
-	  out[i] = buf[index + i];
-	  buf[index + i] = 0.0;
-	}
+	buffer[phase + i] += ptr[i];
 
-      for(i=0; i<n_tick-tail; i++)
-	{
-	  out[tail + i] = buf[i];
-	  buf[i] = 0.0;
-	}
-
-      this->index = i;
+      for(k=0; i<size; k++, i++)
+	buffer[k] += ptr[i];
     }
 }
 
-/***************************************************************************************
- *
- *  class
- *
- */
-
 static void
-paste_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dcopy_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  paste_t *this = (paste_t *)o;
-  int size = 1024;
+  dcopy_t *this = (dcopy_t *)o;
+  delayline_t *line = (delayline_t *)fts_get_object(at);
 
-  this->buf = NULL;
-  this->size = 0;
-  this->ring_size = 0;
-  this->index = 0;
-
-  if(ac > 0)
+  if(line != this->line)
     {
-      if(fts_is_number(at))
-	{
-	  size = fts_get_number_int(at);
-	  
-	  if(size < 0)
-	    size = 0;
-	}
-      else
-	{
-	  fts_object_set_error(o, "bad argument");
-	  return;
-	}
+      if(this->line != NULL)
+	fts_object_release((fts_object_t *)this->line);
+
+      this->line = line;
+      fts_object_refer((fts_object_t *)line);
     }
-      
-  this->size = size;
-
-  fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-paste_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dcopy_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  dcopy_t *this = (dcopy_t *)o;
+
+  this->line = NULL;
+
+  if(ac > 0 && fts_is_a(at, delayline_class))
+    dcopy_set_line(o, 0, 0, 1, at);
+  else
+    {
+      fts_object_set_error(o, "first argument must be a delay line");
+      return;
+    }
+}
+
+static void
+dcopy_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  dcopy_t *this = (dcopy_t *)o;
+
+  if(this->line != NULL)
+    fts_object_release((fts_object_t *)this->line);
+}
+
+static void
+dcopy_instantiate(fts_class_t *cl)
 {
-  paste_t *this = (paste_t *)o;
+  fts_class_init(cl, sizeof(dcopy_t), dcopy_init, dcopy_delete);
 
-  if(this->buf != NULL)
-    fts_free(this->buf);
+  fts_class_inlet(cl, 0, fvec_type, dcopy_fvec);
+  fts_class_inlet(cl, 1, delayline_class, dcopy_set_line);
 
-  fts_dsp_object_delete((fts_dsp_object_t *)o);
+  fts_class_outlet(cl, 0, fvec_type);
 }
 
 static void
-paste_instantiate(fts_class_t *cl)
-{  
-  fts_class_init(cl, sizeof(paste_t), paste_init, paste_delete);      
-  
-  fts_class_message_varargs(cl, fts_s_put, paste_put);
-  
-  fts_class_inlet(cl, 0, fvec_type, paste_fvec);
+dpaste_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(dcopy_t), dcopy_init, dcopy_delete);
 
-  fts_dsp_declare_outlet(cl, 0);
+  fts_class_inlet(cl, 0, fvec_type, dpaste_fvec);
+  fts_class_inlet(cl, 1, delayline_class, dcopy_set_line);
 }
 
 void
-signal_paste_config(void)
+signal_dpaste_config(void)
 {
-  paste_symbol = fts_new_symbol("paste~");
-  fts_dsp_declare_function(paste_symbol, paste_ftl);  
+  sym_dcopy = fts_new_symbol("dcopy");
+  sym_dpaste = fts_new_symbol("dpaste");
 
-  fts_class_install(paste_symbol, paste_instantiate);
+  fts_class_install(sym_dcopy, dcopy_instantiate);
+  fts_class_install(sym_dpaste, dpaste_instantiate);
 }

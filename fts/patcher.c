@@ -1304,13 +1304,22 @@ patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *old = fts_get_object(at);
-  fts_object_t *obj = fts_object_redefine(old, ac - 1, at + 1);
+  int dsp_restart = fts_dsp_is_active() && fts_is_dsp_object(old);
+  fts_object_t *obj;
   fts_atom_t a;
+
+  if(dsp_restart)
+    fts_dsp_desactivate();
+
+  obj = fts_object_redefine(old, ac - 1, at + 1);
 
   fts_set_object(&a, obj);
   fts_client_send_message(o, sym_objectRedefined, 1, &a);
 
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
+
+  if(dsp_restart)
+    fts_dsp_activate();
 }
 
 static void 
@@ -1320,6 +1329,7 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
 
   if (ac > 0)
     {
+      int dsp_restart = 0;
       fts_object_t *obj;
       int i;
   
@@ -1354,7 +1364,10 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
 	  if (obj)
 	    {
 	      if(fts_dsp_is_active() && fts_is_dsp_object(obj))
-		fts_dsp_desactivate();
+		{
+		  fts_dsp_desactivate();
+		  dsp_restart = 1;
+		}
 
 	      /* remove connections and unbind the object from used and defined names */
 	      fts_object_unpatch(obj);
@@ -1365,6 +1378,9 @@ patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s,
 	}
       
         fts_patcher_set_dirty((fts_patcher_t *)o, 1);
+
+	if(dsp_restart == 1)
+	  fts_dsp_activate();
     }
 }
 
@@ -1415,11 +1431,19 @@ patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t
 
   if (connection)
     {
+      int dsp_restart = 0;
+
       if(fts_connection_get_type(connection) == fts_c_audio_active)
-	fts_dsp_desactivate();
+	{
+	  fts_dsp_desactivate();
+	  dsp_restart = 1;
+	}
 
       fts_connection_delete(connection);
       fts_patcher_set_dirty((fts_patcher_t *)o, 1);
+
+      if(dsp_restart == 1)
+	fts_dsp_activate();
     }
 }
 

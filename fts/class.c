@@ -249,7 +249,7 @@ fts_class_default_error_handler(fts_object_t *o, int winlet, fts_symbol_t s, int
 {
   if(s == 0)
     {
-      if(ac > 0)
+      if(ac > 1)
 	fts_object_signal_runtime_error(o, "no tuple method at inlet %d", s, winlet);
       else
 	fts_object_signal_runtime_error(o, "no method for %s at inlet %d", fts_get_class_name(at), winlet);

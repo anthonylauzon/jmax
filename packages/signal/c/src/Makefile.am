@@ -6,7 +6,6 @@ binop.c \
 biquad.c \
 bus.c \
 clip.c \
-cut.c \
 delay.c \
 env.c \
 fir.c \
@@ -16,7 +15,6 @@ matrix.c \
 osc.c \
 osc_ieeewrap.c \
 paste.c \
-pick.c \
 pink.c \
 playfvec.c \
 recfvec.c \

@@ -826,6 +826,12 @@ signal_binop_config(void)
   sym_div = fts_new_symbol("/~");
   sym_bus = fts_new_symbol("-+~");
   sym_vid = fts_new_symbol("/*~");
+  sym_ee = fts_new_symbol("==~");
+  sym_ne = fts_new_symbol("!=~");
+  sym_ge = fts_new_symbol(">=~");
+  sym_le = fts_new_symbol("<=~");
+  sym_gt = fts_new_symbol(">~");
+  sym_lt = fts_new_symbol("<~");
 
   binop_add.signal.symbol = sym_add;
   binop_add.scalar.symbol = fts_new_symbol("+~ scalar");

@@ -23,6 +23,7 @@
 #include <utils/c/include/utils.h>
 #include <data/c/include/cvec.h>
 #include <data/c/include/fvec.h>
+#include <data/c/include/ivec.h>
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -243,6 +244,22 @@ cvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    {
 	      l[i].re *= r[i];
 	      l[i].im *= r[i];
+	    }
+	}
+      else if(fts_is_a(at, ivec_type))
+	{
+	  ivec_t *right = (ivec_t *)fts_get_object(at);
+	  int right_size = ivec_get_size(right);
+	  int this_size = cvec_get_size(this);
+	  int size = (this_size <= right_size)? this_size: right_size;
+	  complex *l = cvec_get_ptr(this);
+	  int *r = ivec_get_ptr(right);
+	  int i;
+  
+	  for(i=0; i<size; i++)
+	    {
+	      l[i].re *= (float)r[i];
+	      l[i].im *= (float)r[i];
 	    }
 	}
       else if(fts_is_a(at, cvec_type))
