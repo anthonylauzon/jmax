@@ -11,6 +11,7 @@ help_DATA=\
  scope.help.jmax \
  slider.help.jmax \
  toggle.help.jmax \
- vecdisplay.help.jmax 
+ vecdisplay.help.jmax \
+ matdisplay.help.jmax 
 
 EXTRA_DIST= $(help_DATA)
