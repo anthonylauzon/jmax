@@ -1,6 +1,8 @@
 #!/bin/sh
 APPDIR=$HOME/jMax.app
 
+set -x
+
 if [ ! -d $APPDIR/Contents/Resources/share/jmax ]
 then
     mkdir -p $APPDIR/Contents/Resources/share/jmax
