@@ -31,9 +31,9 @@ CXXFLAGS=
 dnl Check for debug
 AC_ARG_ENABLE(debug,
   [  --enable-debug[=DEBUG]   compile with debug [default=no]],
-  debug="yes",
-  debug="no")
-case "$debug" in
+  with_debug="yes",
+  with_debug="no")
+case "$with_debug" in
  yes)
   CXXFLAGS="$CXXFLAGS -g"
   AC_DEFINE(DEBUG,1,[Define to enable debug])
@@ -88,7 +88,7 @@ dnl AC_PROG_JAVAC
 JAVACX=$JAVAC
 AC_SUBST(JAVACX)
 JAVACFLAGSX=
-case "$debug" in
+case "$with_debug" in
  yes)
   JAVACFLAGSX="-g"
   ;;
