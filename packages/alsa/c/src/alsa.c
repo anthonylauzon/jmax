@@ -33,10 +33,15 @@
 /******************************************************************************/
 
 extern void alsaaudioport_config( void);
-extern void alsarawmidiport_config( void);
+
+/* MIDI IS NOT WORKING 
+  extern void alsarawmidiport_config( void);
+*/
 
 void alsa_config(void)
 {
   alsaaudioport_config();
-  alsarawmidiport_config();
+/* MIDI IS NOT WORKING 
+   alsarawmidiport_config();
+*/
 }
