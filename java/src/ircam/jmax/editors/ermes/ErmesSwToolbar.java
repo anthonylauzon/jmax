@@ -10,7 +10,7 @@ import com.sun.java.swing.*;
 import com.sun.java.swing.plaf.*;
 import com.sun.java.swing.plaf.motif.*;
 
-public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseListener{
+public class ErmesSwToolbar extends JPanel implements  MouseListener{
   ErmesSketchPad itsSketchPad;
   int itsPressedButton = -1;
   boolean locked = false;
@@ -117,7 +117,7 @@ public class ErmesSwToolbar extends JPanel implements /*ActionListener,*/ MouseL
 
   public void mouseClicked(MouseEvent e){
     ErmesSwToggleButton aTButton = (ErmesSwToggleButton) e.getSource();
-    //first: put to null the last, if re-pressed
+
     if (e.getClickCount() > 1) {
       pressed = true;
       aTButton.setSelected(true);

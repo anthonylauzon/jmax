@@ -71,6 +71,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
   //end
 
   protected boolean Copy() {
+    if (itsConsole.itsTextArea.getSelectedText().equals("")) return true;
     MaxApplication.systemClipboard.setContents(this, this);
     itsCopiedText = itsConsole.itsTextArea.getSelectedText();//tout simplement
     return true;

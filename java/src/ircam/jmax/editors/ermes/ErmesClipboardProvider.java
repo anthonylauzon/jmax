@@ -43,6 +43,9 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
    * Fill the clipboard starting from an FtsSelection
    */
   void addSelection(FtsSelection theSelection) {
+    if (theSelection.getObjects().size() == 0)
+      return;
+
     flushContent();
 
      try 
