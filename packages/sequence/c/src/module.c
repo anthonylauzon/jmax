@@ -35,6 +35,7 @@ extern void event_config(void);
 extern void note_config(void);
 extern void message_config(void);
 
+extern void seqstep_config(void);
 extern void seqplay_config(void);
 extern void seqrec_config(void);
 extern void seqplode_config(void);
@@ -52,6 +53,7 @@ sequence_module_init(void)
   note_config();
   message_config();
 
+  seqstep_config();
   seqplay_config();
   seqrec_config();
   seqplode_config();
