@@ -1,3 +1,8 @@
+2003-03-25  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/package.c (fts_package_require): Check required package loading before append package name to
+	required pacakges list (closed bug [ 700877 ] crash on loading corrupt file )
+
 2003-03-20  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fts/*.c: merged _config and kernel_*_init functions.
