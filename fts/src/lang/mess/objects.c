@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.50 $ IRCAM $Date: 1998/10/28 15:50:32 $
+ *      $Revision: 1.51 $ IRCAM $Date: 1998/10/30 17:48:28 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -620,9 +620,6 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   new = fts_object_new(fts_object_get_patcher(old), ac, at);
   fts_object_set_id(new, new_id);
   
-  if (do_client)
-    fts_client_upload_object(new);
-
   /* Update the loading vm */
 
   fts_vm_substitute_object(old, new);
@@ -640,6 +637,9 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   fts_object_move_properties(old, new);
 
   fts_object_free(old, do_client);
+
+  if (do_client)
+    fts_client_upload_object(new);
 
   return new;
 }

@@ -2174,6 +2174,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   void cleanAll()
   {
+    deselectAll( false);
+
     Object[] objects = itsElements.getObjectArray();
     int size       = itsElements.size();
 
@@ -2193,7 +2195,6 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     remove( itsOutPop);
     remove( itsEditField);
     remove( itsTextArea);
-    deselectAll( false);
 
     if (lastSketchWithOffScreen == this)
       {

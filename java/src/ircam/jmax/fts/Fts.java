@@ -381,27 +381,32 @@ public class Fts
     {
       final MaxData data = (MaxData) newData;
 
-      // Set the document; when documents will be remote data,
-      // it will be handled in FTS.
+      if (data != null)
+	{
+	  // Set the document; when documents will be remote data,
+	  // it will be handled in FTS.
 
-      if (data instanceof FtsRemoteData)
-	((FtsRemoteData) data).setDocument(obj.getDocument());
+	  if (data instanceof FtsRemoteData)
+	    ((FtsRemoteData) data).setDocument(obj.getDocument());
 
-      SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  MaxDataEditor editor;
+	  SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      MaxDataEditor editor;
 
-	  try
-	    {
-	      editor = Mda.edit(data, where);
-	      editor.addEditorReadyListener(listener);
-	    }
-	  catch (MaxDocumentException e)
-	    {
-	      // Error; we should do an
-	      listener.editorReady(null); 
-	    }
-	}});
+	      try
+		{
+		  editor = Mda.edit(data, where);
+		  editor.addEditorReadyListener(listener);
+		}
+	      catch (MaxDocumentException e)
+		{
+		  // Error; we should do an
+		  listener.editorReady(null); 
+		}
+	    }});
+	}
+      else
+	listener.editorReady(null);
 
       Fts.removeNewDataListenerOn(obj);
     }

@@ -50,11 +50,6 @@ void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
     {
       fts_object_get_prop(obj, name, &a);
 
-      /* Don't send a void, non existing property */
-
-      if (fts_is_void(&a))
-	return;
-
       if (fts_is_data(&a))
 	{
 	  /* If the property value is an fts_data, we
@@ -80,6 +75,17 @@ void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 	  if (obj->id == FTS_NO_ID)
 	    fts_client_upload_object(obj);
 	}
+
+      /* If the value is void, send a null value only
+	 if the property is a special registered property;
+	 for the moment, only fts_s_data; it should be done
+	 better */
+
+      if (fts_is_void(&a))
+	if (name == fts_s_data)
+	  fts_set_data(&a, (fts_data_t *) 0);
+	else
+	  return;
 
       fts_client_mess_start_msg(CLIENTPROP_CODE);
       fts_client_mess_add_object(obj);

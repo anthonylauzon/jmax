@@ -1157,6 +1157,11 @@ public class FtsServer
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
+	  //
+	  // Note that a null value can be acceptable for
+	  // some properties 
+	  //
+
 	  FtsObject obj;
 	  String prop;
 	  Object value;
@@ -1165,13 +1170,13 @@ public class FtsServer
 	  prop = ((String) msg.getNextArgument()).intern();
 	  value =  msg.getNextArgument();
 
-	  if ((obj == null) || (prop == null) || (value == null))
+	  if ((obj == null) || (prop == null))
  	    System.err.println("Wrong property value message " + msg);
 	  else 
 	    {
-	      if (value instanceof Integer)
+	      if ((value != null) && (value instanceof Integer))
 		obj.localPut(prop, ((Integer) value).intValue());
-	      else if (value instanceof Float)
+	      else if ((value != null) && (value instanceof Float))
 		obj.localPut(prop, ((Float) value).floatValue());
 	      else
 		obj.localPut(prop, value);

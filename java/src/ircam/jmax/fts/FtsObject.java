@@ -181,19 +181,19 @@ public class FtsObject
   {
     // check first hardcoded properties
 
-    if ((name == "errdesc") && (value instanceof String))
+    if (name == "errdesc")
       {
 	errorDescription = (String) value;
       }
-    else if ((name == "font") && (value instanceof String))
+    else if (name == "font")
       {
 	font = (String) value;
       }
-    else if ((name == "name") && (value instanceof String))
+    else if (name == "name")
       {
 	setObjectName((String) value);
       }
-    else if ((name == "data") && (value instanceof MaxData))
+    else if (name == "data")
       {
 	data = (MaxData) value;
 	Fts.fireNewDataListenerOn(this, data);
