@@ -663,14 +663,15 @@ public class FtsParse
       
   static private final boolean wantASpaceBefore(FtsAtom value)
   {
-    if (value.isString())
+    if (value.isString() || value.isSymbol())
       {
+	String stringVal = (value.isString()) ? value.stringValue : value.symbolValue.toString();
 	String keywords[] = {"+", "-", "*", "/", "%", 
 			     "&&", "&", "||", "|", "==", "!=", "!", ">=", "^",
 			     ">>", ">", "<<", "<=", "<", "?", "::", ":" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value.stringValue))
+	  if (keywords[i].equals( stringVal))
 	    return true;
 
 	return false;
@@ -699,13 +700,14 @@ public class FtsParse
       
   static private final boolean dontWantASpaceBefore(FtsAtom value)
   {
-    if (value.isString())
+    if (value.isString() || value.isSymbol())
       {
+	String stringVal = (value.isString()) ? value.stringValue : value.symbolValue.toString();
 	String keywords[] = {")", "[", "]", "}", ",", ";", ".", "="};
 
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value.stringValue))
+	  if (keywords[i].equals( stringVal))
 	    return true;
 
 	return false;
@@ -735,15 +737,16 @@ public class FtsParse
 
   static private final boolean wantASpaceAfter(FtsAtom value)
   {
-    if (value.isString())
+    if (value.isString() || value.isSymbol())
       {
+	String stringVal = (value.isString()) ? value.stringValue : value.symbolValue.toString();
 	String keywords[] = { "+", "-", "*", "/", "%", 
 			      ",", "&&", "&", "||", "|", "==", "!=", "!", ">=",
 			      ">>", ">", "<<", "<=", "<", "?", "::", ":", "^",
 			      ";" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value.stringValue))
+	  if (keywords[i].equals( stringVal))
 	    return true;
 
 	return false;
@@ -771,13 +774,14 @@ public class FtsParse
       
   static private final boolean dontWantASpaceAfter(FtsAtom value)
   {
-    if (value.isString())
+    if (value.isString() || value.isSymbol())
       {
+	String stringVal = (value.isString()) ? value.stringValue : value.symbolValue.toString();	
 	String keywords[] = { "(", "[", "{", 
 			      "$", "'", ".", "=" };
 
 	for (int i = 0 ; i < keywords.length; i++)
-	  if (keywords[i].equals(value.stringValue))
+	  if (keywords[i].equals(stringVal))
 	    return true;
 
 	return false;
@@ -1033,9 +1037,9 @@ public class FtsParse
 	    else if(value1.isFloat())
 	      descr.append(removeZeroAtEnd(formatter.format(value1.floatValue)));
 	    else if(value1.isString())
-		noNewLine = unparseString( value1.stringValue, descr);
+	      noNewLine = unparseString( value1.stringValue, descr);
 	    else if(value1.isSymbol())
-		noNewLine = unparseString( value1.symbolValue.toString(), descr);
+	      noNewLine = unparseString( value1.symbolValue.toString(), descr);
 	    else descr.append("??");
 
 	    /* decide to put or not a blank between the two */

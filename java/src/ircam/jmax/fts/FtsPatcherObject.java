@@ -359,6 +359,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  sketch.setLocked(true);
 	else
 	  sketch.setLocked( ((FtsPatcherObject)getParent()).isLocked());
+	
+	ErmesSelection.patcherSelection.deselectAll();
       }
   }
 
