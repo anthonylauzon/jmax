@@ -26,27 +26,31 @@ ROOTDIR = ../..
 PACKAGE_DIR = 
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
-INCLUDE_PATH := $(JAVA_SRC_ROOT)/ircam/jmax
 
-include $(INCLUDE_PATH)/Sources2
-
-BASIC_PACKAGES =  ircam.jmax ircam.jmax.tcl ircam.jmax.utils ircam.jmax.dialogs ircam.jmax.widgets ircam.jmax.toolkit
-
-FTS_PACKAGES = ircam.jmax.fts ircam.jmax.fts.tcl
-EDITORS_PACKAGES = ircam.jmax.editors.console ircam.jmax.editors.console.tcl
-ERMES_PACKAGES = ircam.jmax.editors.ermes ircam.jmax.editors.ermes.tcl
-ALL_PACKAGES = $(BASIC_PACKAGES) $(FTS_PACKAGES) $(EDITORS_PACKAGES) $(ERMES_PACKAGES)
+DOC_PACKAGES = \
+	ircam.jmax \
+	ircam.jmax.tcl \
+	ircam.jmax.utils \
+	ircam.jmax.dialogs \
+	ircam.jmax.widgets \
+	ircam.jmax.toolkit \
+	ircam.jmax.fts \
+	ircam.jmax.fts.tcl \
+	ircam.jmax.editors.console \
+	ircam.jmax.editors.console.tcl \
+	ircam.jmax.editors.patcher \
+	to.be.completed
 
 all: 
 	(cd ircam ; $(MAKE) all)
 .PHONY: all
 
 doc:  
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH ; javadoc -d $(ROOTDIR)/java/doc $(ALL_PACKAGES))
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH ; javadoc -d $(ROOTDIR)/java/doc $(DOC_PACKAGES))
 .PHONY: doc
 
 doc_private:  
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -private -d $(ROOTDIR)/java/doc_private $(ALL_PACKAGES))
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -private -d $(ROOTDIR)/java/doc_private $(DOC_PACKAGES))
 .PHONY: doc_private
 
 jar:  
