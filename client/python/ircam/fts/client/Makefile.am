@@ -7,6 +7,7 @@ BinaryProtocolEncoder.py \
 BinaryProtocol.py \
 FtsClientException.py \
 FtsObject.py \
+FtsPipeConnection.py \
 FtsRawString.py \
 FtsServerConnection.py \
 FtsSocketConnection.py \
