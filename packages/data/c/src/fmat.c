@@ -1474,7 +1474,11 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_set_copy_function(cl, fmat_copy_function);
 
-  /* class doc */
+
+  /*
+   * class doc 
+   */
+
   fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (default is 1)> [<num: init values> ...]]]", "matrix of floats");
   fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "set matrix values at given index");
   fts_class_doc(cl, fts_s_set, "<fmat: other>", "set from fmat instance");
