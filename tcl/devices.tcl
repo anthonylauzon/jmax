@@ -47,8 +47,6 @@ proc openAudioIn { name device} {
 
     puts "Opening audio in $name: $jmaxDeviceDoc($device)"
     eval [concat " ucs open device in~ $name as " $jmaxDeviceTable($device) ]
-
-    puts $jmaxDeviceTable
 }
 
 proc openDefaultAudioIn { device } {
@@ -58,8 +56,6 @@ proc openDefaultAudioIn { device } {
     puts "Opening default audio in: $jmaxDeviceDoc($device)"
     eval [concat " ucs open device in~ __defaultAudioIn as " $jmaxDeviceTable($device) ]
     ucs default in~ __defaultAudioIn
-
-    puts $jmaxDeviceTable
 }
 
 proc openNamedDefaultAudioIn { name device } {
@@ -69,8 +65,6 @@ proc openNamedDefaultAudioIn { name device } {
     puts "Opening audio in $name (also default): $jmaxDeviceDoc($device)"
     eval [concat " ucs open device in~ $name as " $jmaxDeviceTable($device) ]
     ucs default in~ $name
-
-    puts $jmaxDeviceTable
 }
 
 proc resetAudioOut {} {
