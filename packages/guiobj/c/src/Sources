@@ -35,3 +35,4 @@ panel.c \
 message.c \
 message_doctor.c \
 toggle.c \
+fork.c \

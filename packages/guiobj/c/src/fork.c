@@ -26,32 +26,40 @@
 
 #include "fts.h"
 
-extern void toggle_config(void);
-extern void message_config(void);
-extern void message_doctor_init(void);
-extern void panel_config(void);
-extern void gint_config(void);
-extern void slider_config(void);
-extern void gfloat_config(void);
-extern void comment_config(void);
-extern void comment_doctor_init(void);
-extern void button_config(void);
-extern void fork_config(void);
+static fts_symbol_t sym_fork = 0;
 
 static void
-fts_guiobj_init(void)
+fork_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  toggle_config();
-  message_config();
-  message_doctor_init();
-  panel_config();
-  gint_config();
-  slider_config();
-  gfloat_config();
-  comment_config();
-  comment_doctor_init();
-  button_config();
-  fork_config();
+  int n = fts_object_get_outlets_number(o);
+
+  while(n--)
+    fts_outlet_send(o, n, s, ac, at);
 }
 
-fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init, 0, 0};
+static void 
+fork_set_outlets(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_change_number_of_outlets(o, fts_get_int(at));
+}
+
+static fts_status_t 
+fork_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t a[1];
+  int n_outs = fts_get_int(at + 1);
+
+  fts_class_init(cl, sizeof(fts_object_t), 1, n_outs, 0);
+  fts_method_define_varargs(cl, 0, fts_s_anything, fork_input);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_outlets"), fork_set_outlets);
+
+  return fts_Success;
+}
+
+void fork_config(void)
+{
+  sym_fork = fts_new_symbol("fork");
+
+  fts_metaclass_install(sym_fork, fork_instantiate, fts_first_arg_equiv);
+}
