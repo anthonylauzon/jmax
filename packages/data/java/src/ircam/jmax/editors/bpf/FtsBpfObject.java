@@ -63,16 +63,10 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
      */
     public void openEditor(int nArgs, FtsAtom args[])
     {
-      if(bpf == null){
-	  bpf = new Bpf(this);
-	  setEditorFrame(bpf);
-      }
-      if (! bpf.isVisible())
-	  {
-	      bpf.setVisible(true);
-	      MaxWindowManager.getWindowManager().addWindow(bpf);
-	  }   
-      bpf.toFront();
+	if(getEditorFrame() == null)
+	    setEditorFrame( new Bpf(this));
+
+	showEditor();
     }
 
     /**
@@ -80,12 +74,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
      */
     public void destroyEditor(int nArgs, FtsAtom args[])
     {
-	if(bpf != null)
-	    {
-		bpf.dispose();
-		bpf = null;
-		setEditorFrame(null);
-	    }
+	disposeEditor();
     }
 
   public void addPoint(int nArgs , FtsAtom args[])
@@ -428,8 +417,6 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     }    
 
     ////////////////////////////////////////////////////////
-  Bpf bpf = null;  
-  
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();
 

@@ -25,7 +25,8 @@
 
 package ircam.jmax.editors.bpf;
 
-import ircam.jmax.fts.*;
+//import ircam.jmax.fts.*;
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.script.pkg.*;
 import ircam.jmax.script.*;
@@ -38,15 +39,18 @@ public class BpfExtension extends tcl.lang.Extension implements JavaExtension
 {
  public void init(ircam.jmax.script.Interpreter interp)
   {
-    FtsObject.registerFtsObjectCreator("bpf", new FtsBpfObjectCreator());
+      //FtsObject.registerFtsObjectCreator("bpf", new FtsBpfObjectCreator());
+      ObjectCreatorManager.registerFtsObjectCreator("bpf", new FtsBpfObjectCreator());
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
-    FtsObject.registerFtsObjectCreator("bpf", new FtsBpfObjectCreator());
+      //FtsObject.registerFtsObjectCreator("bpf", new FtsBpfObjectCreator());
+      ObjectCreatorManager.registerFtsObjectCreator("bpf", new FtsBpfObjectCreator());
   }
 }
+
 
 
 

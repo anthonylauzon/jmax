@@ -25,7 +25,8 @@
 
 package ircam.jmax.editors.sequence;
 
-import ircam.jmax.fts.*;
+//import ircam.jmax.fts.*;
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.script.pkg.*;
 import ircam.jmax.script.*;
@@ -40,17 +41,23 @@ public class SequenceExtension extends tcl.lang.Extension implements JavaExtensi
 {
  public void init(ircam.jmax.script.Interpreter interp)
   {
-    FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-    FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
-    FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());
+      /*FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
+	FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
+	FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());*/
+      ObjectCreatorManager.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
+      ObjectCreatorManager.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
+      ObjectCreatorManager.registerFtsObjectCreator("event", new FtsEventObjectCreator());
   }
 
     /* this method should be removed as soon as jacl is completely forgotten about */
   public void init(tcl.lang.Interp interp)
   {
-    FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
-    FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
-    FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());
+      /*FtsObject.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
+	FtsObject.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
+	FtsObject.registerFtsObjectCreator("event", new FtsEventObjectCreator());*/
+      ObjectCreatorManager.registerFtsObjectCreator("sequence", new FtsSequenceObjectCreator());
+      ObjectCreatorManager.registerFtsObjectCreator("track", new FtsTrackObjectCreator());
+      ObjectCreatorManager.registerFtsObjectCreator("event", new FtsEventObjectCreator());
   }
 }
 

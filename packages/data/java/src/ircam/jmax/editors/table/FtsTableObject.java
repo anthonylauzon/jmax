@@ -170,10 +170,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
       pixelsSize = args[0].getInt();    
       pixels = new int[pixelsSize];
 
-      /*if (isInGroup()) 
-	for(i = 0; i<nArgs-1; i++)
-	pixels[i] = args[i+1].getInt();
-	else*/
       for(i = 0; i<nArgs-1; i++)
 	  pixels[i] = args[i+1].getInt();
 
