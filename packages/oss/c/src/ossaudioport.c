@@ -52,6 +52,20 @@ static fts_symbol_t s_slash_dev_slash_audio;
 static fts_symbol_t s_read_only;
 static fts_symbol_t s_write_only;
 
+fts_class_t* ossaudioport_type = NULL;
+
+
+static void
+ossaudiomanager_scan_devices()
+{
+  /* Dummy function */
+  fts_audioport_t* port;
+  fts_atom_t at;
+
+  fts_set_symbol(&at, s_slash_dev_slash_audio);
+  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, NULL, 1, &at);
+  fts_audiomanager_put_port(s_slash_dev_slash_audio, port);
+}
 
 /**
  * The audioport IO function calls the native audio layer to read/write a buffer
@@ -272,6 +286,13 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, ossaudioport_input_copy_fun);
   fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, ossaudioport_output_copy_fun);
 
+  fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+  fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+
+/* WHY IT DOESN'T COMPILE ? */
+/*   fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, channels); */
+/*   fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, channels); */
+
 /*   fts_audioport_set_xrun_function( (fts_audioport_t *)self, ossaudioport_xrun); */
 
   self->buff_size =  fts_dsp_get_tick_size() * channels * sizeof(short);
@@ -305,15 +326,10 @@ void ossaudioport_config( void)
   s_read_only = fts_new_symbol( "read_only");
   s_write_only = fts_new_symbol( "write_only");
 
-  fts_class_install( s, ossaudioport_instantiate);
+  ossaudioport_type = fts_class_install( s, ossaudioport_instantiate);
 
-  /*
-   * If a default class is not installed, install it.
-   * If ALSA package has already installed a default,
-   * we don't overwrite it
-   */
-/*   if (!fts_audioport_get_default_class()) */
-/*     fts_audioport_set_default_class(s); */
+  ossaudiomanager_scan_devices();
+
 }
 
 /** EMACS **

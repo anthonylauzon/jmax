@@ -38,3 +38,10 @@ void oss_config(void)
 {
   ossaudioport_config();
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
