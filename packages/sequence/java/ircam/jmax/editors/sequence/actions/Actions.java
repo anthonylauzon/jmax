@@ -45,6 +45,7 @@ public class Actions
   public static EditorAction pasteAction     = new PasteAction();
   public static EditorAction undoAction      = new UndoAction();
   public static EditorAction redoAction      = new RedoAction();
+  public static EditorAction selectAllAction = new SelectAllAction();
 
   public static EditorAction removeTrackAction  = new RemoveTrackAction();
 
@@ -126,6 +127,18 @@ public class Actions
        ((SequenceEditor)container.getEditor()).redo();
      }
    }
+  
+  public static class SelectAllAction extends EditorAction
+  {
+    public SelectAllAction()
+    {
+      super("Select All", null, KeyEvent.VK_A, KeyEvent.VK_A, true);
+    }
+    public void doAction(EditorContainer container)
+    {
+      ((SequenceEditor)container.getEditor()).selectAll();
+    }
+  }
 }
 
 

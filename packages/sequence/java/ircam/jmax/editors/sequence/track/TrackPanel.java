@@ -117,122 +117,122 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     data.addListener(this); 
     data.addHighlightListener(ruler);
     manager.addContextSwitcher(new ComponentContextSwitcher( trackEditor.getComponent(), trackEditor.getGraphicContext()));//???
-		manager.contextChanged( trackEditor.getGraphicContext());//????
-		scrollTracks = new JScrollPane( trackEditor.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-																		JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		setLayout( new BorderLayout());
-		
-		//------------------------------------------------
-		separate_tracks = new JPanel();
-		separate_tracks.setLayout( new BorderLayout());
-		
-		if( trackData.getType().getPublicName().equals( AmbitusValue.SCOOB_PUBLIC_NAME))
-		{
-			// Create TempoBar
-			tempoBar = new TempoBar(geometry, ftsTrackObject, this);
-			
-			//------------------ prepares Center Section
-			centerSection = new JPanel();			
-			Border border = scrollTracks.getBorder();
-			scrollTracks.setBorder(new EtchedBorder());
-			centerSection.setBorder(border);
-			centerSection.setLayout( new BorderLayout());
-			centerSection.add( scrollTracks, BorderLayout.CENTER);
-		
-			separate_tracks.add( centerSection, BorderLayout.CENTER);
-		}
-		else
-			separate_tracks.add( scrollTracks, BorderLayout.CENTER);
-
-		//------------------ prepares ruler & northSection
-		Box northSection = new Box(BoxLayout.Y_AXIS); 
-		ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);		
-		northSection.add(ruler);
-		
-		separate_tracks.add(northSection, BorderLayout.NORTH);
-		
-		//---------- prepares the time zoom listeners
-		geometry.addZoomListener( new ZoomListener() {
-			public void zoomChanged(float zoom, float oldZoom)
-		  {
-				repaint();
-				TrackEvent lastEvent = trackData.getLastEvent();
-				if(lastEvent != null)
-					resizePanelToTimeWithoutScroll((int)(lastEvent.getTime() + ((Double)lastEvent.getProperty("duration")).intValue()));
-				ftsTrackObject.editorObject.setZoom(zoom);
-			}
-		});
-		
-		//-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
-		int totalTime = MINIMUM_TIME;
-		itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
-		itsTimeScrollbar.setUnitIncrement(10);
-		itsTimeScrollbar.setBlockIncrement(1000);
-		itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {	
-			public void adjustmentValueChanged(AdjustmentEvent e) {
-				int currentTime = e.getValue();
-				geometry.setXTransposition(-currentTime);
-				ftsTrackObject.editorObject.setTransposition(-currentTime);
-			}
-		});
-		separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);
-		add( separate_tracks, BorderLayout.CENTER);
-				
-		validate();
-		
-		for(Enumeration e = data.getEvents(); e.hasMoreElements();)
-			trackEditor.updateNewObject((TrackEvent)e.nextElement());
-  
-		geometry.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent e)
-		  {	  
-				String name = e.getPropertyName();
-				if( name.equals("gridMode"))
-				{
-					int grid = ((Integer) e.getNewValue()).intValue();
-					if( grid == MidiTrackEditor.MEASURES_GRID)
-						centerSection.add( tempoBar, BorderLayout.NORTH);
-					else
-						centerSection.remove( tempoBar);
+      manager.contextChanged( trackEditor.getGraphicContext());//????
+        scrollTracks = new JScrollPane( trackEditor.getComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        setLayout( new BorderLayout());
+        
+        //------------------------------------------------
+        separate_tracks = new JPanel();
+        separate_tracks.setLayout( new BorderLayout());
+        
+        if( trackData.getType().getPublicName().equals( AmbitusValue.SCOOB_PUBLIC_NAME))
+        {
+          // Create TempoBar
+          tempoBar = new TempoBar(geometry, ftsTrackObject, this);
           
-          /*tempoBar.resetDisplayer();*/
-          centerSection.validate();
-          TrackPanel.this.validate();
-          getEditorContainer().getFrame().pack();
-				}
-			}
-		});
-		
-		markersSelectionListener = new ListSelectionListener(){
-			public void valueChanged(ListSelectionEvent e)
-			{
-				SequenceSelection sel = trackEditor.getGraphicContext().getMarkersSelection();
-				if( sel.size() > 0)
-				{
-					TrackEvent evt = (TrackEvent) sel.getSelected().nextElement();
-					makeVisible(evt);
-				}
-			}
-		};
-		
-		trackData.addTrackStateListener(new TrackStateListener(){
-			public void lock(boolean lock){}
-			public void active(boolean active){}
-			public void restoreEditorState(FtsTrackEditorObject editorState){};
-			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
-		  {
-				currentMarkersSelection = markersSelection;
-				currentMarkersSelection.addListSelectionListener( markersSelectionListener);
-			}
-			public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
-			{			
-				currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
-				currentMarkersSelection = markersSelection;
-				if(markersSelection != null)
-					currentMarkersSelection.addListSelectionListener( markersSelectionListener);
-			}
-      public void ftsNameChanged(String name){}
-		});		
+          //------------------ prepares Center Section
+          centerSection = new JPanel();			
+          Border border = scrollTracks.getBorder();
+          scrollTracks.setBorder(new EtchedBorder());
+          centerSection.setBorder(border);
+          centerSection.setLayout( new BorderLayout());
+          centerSection.add( scrollTracks, BorderLayout.CENTER);
+          
+          separate_tracks.add( centerSection, BorderLayout.CENTER);
+        }
+        else
+          separate_tracks.add( scrollTracks, BorderLayout.CENTER);
+        
+        //------------------ prepares ruler & northSection
+        Box northSection = new Box(BoxLayout.Y_AXIS); 
+        ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);		
+        northSection.add(ruler);
+        
+        separate_tracks.add(northSection, BorderLayout.NORTH);
+        
+        //---------- prepares the time zoom listeners
+        geometry.addZoomListener( new ZoomListener() {
+          public void zoomChanged(float zoom, float oldZoom)
+        {
+            repaint();
+            TrackEvent lastEvent = trackData.getLastEvent();
+            if(lastEvent != null)
+              resizePanelToTimeWithoutScroll((int)(lastEvent.getTime() + ((Double)lastEvent.getProperty("duration")).intValue()));
+            ftsTrackObject.editorObject.setZoom(zoom);
+        }
+        });
+        
+        //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
+        int totalTime = MINIMUM_TIME;
+        itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
+        itsTimeScrollbar.setUnitIncrement(10);
+        itsTimeScrollbar.setBlockIncrement(1000);
+        itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {	
+          public void adjustmentValueChanged(AdjustmentEvent e) {
+            int currentTime = e.getValue();
+            geometry.setXTransposition(-currentTime);
+            ftsTrackObject.editorObject.setTransposition(-currentTime);
+          }
+        });
+        separate_tracks.add( itsTimeScrollbar, BorderLayout.SOUTH);
+        add( separate_tracks, BorderLayout.CENTER);
+				
+        validate();
+        
+        for(Enumeration e = data.getEvents(); e.hasMoreElements();)
+          trackEditor.updateNewObject((TrackEvent)e.nextElement());
+        
+        geometry.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+          public void propertyChange(PropertyChangeEvent e)
+        {	  
+            String name = e.getPropertyName();
+            if( name.equals("gridMode"))
+            {
+              int grid = ((Integer) e.getNewValue()).intValue();
+              if( grid == MidiTrackEditor.MEASURES_GRID)
+                centerSection.add( tempoBar, BorderLayout.NORTH);
+              else
+                centerSection.remove( tempoBar);
+              
+              /*tempoBar.resetDisplayer();*/
+              centerSection.validate();
+              TrackPanel.this.validate();
+              getEditorContainer().getFrame().pack();
+            }
+        }
+        });
+        
+        markersSelectionListener = new ListSelectionListener(){
+          public void valueChanged(ListSelectionEvent e)
+        {
+            SequenceSelection sel = trackEditor.getGraphicContext().getMarkersSelection();
+            if( sel.size() > 0)
+            {
+              TrackEvent evt = (TrackEvent) sel.getSelected().nextElement();
+              makeVisible(evt);
+            }
+        }
+        };
+        
+        trackData.addTrackStateListener(new TrackStateListener(){
+          public void lock(boolean lock){}
+          public void active(boolean active){}
+          public void restoreEditorState(FtsTrackEditorObject editorState){};
+          public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+          {
+            currentMarkersSelection = markersSelection;
+            currentMarkersSelection.addListSelectionListener( markersSelectionListener);
+          }
+          public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+          {			
+            currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
+            currentMarkersSelection = markersSelection;
+            if(markersSelection != null)
+              currentMarkersSelection.addListSelectionListener( markersSelectionListener);
+          }
+          public void ftsNameChanged(String name){}
+        });		
 	}
 	
   boolean isVisible(int y)
@@ -378,13 +378,19 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void redo()
   {
     try 
-	{
-		((UndoableData) trackData).redo();
-	} catch (CannotRedoException e1) {
-		System.out.println("Can't redo");
-	}
+	  {
+      ((UndoableData) trackData).redo();
+    } catch (CannotRedoException e1) {
+      System.out.println("Can't redo");
+    }
   }
-	
+  
+  public void selectAll()
+  {
+    trackEditor.getSelection().selectAll();
+    trackEditor.getGraphicContext().getGraphicDestination().requestFocus();
+	}
+  
   public FtsGraphicObject getFtsObject()
   {
     return ftsTrackObject;

@@ -630,6 +630,13 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 			}
   }
 	
+  public void selectAll()
+  {
+    TrackEditor editor = getCurrentTrackEditor();
+    editor.getSelection().selectAll();
+    editor.getGraphicContext().getGraphicDestination().requestFocus();
+	}
+  
   public FtsGraphicObject getFtsObject()
   {
     return ftsSequenceObject;

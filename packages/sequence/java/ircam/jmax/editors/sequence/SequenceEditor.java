@@ -37,5 +37,6 @@ public interface SequenceEditor extends Editor
   public void duplicate();
   public void undo();
   public void redo();
+  public void selectAll();
 }
 

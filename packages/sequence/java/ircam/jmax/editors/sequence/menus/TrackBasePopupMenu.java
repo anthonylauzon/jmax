@@ -53,7 +53,6 @@ public class TrackBasePopupMenu extends JPopupMenu
   JSlider maxSlider, minSlider;
   Box maxBox, minBox;
   MoveTrackToAction moveToAction;
-  public EditorAction cutAction, copyAction, duplicateAction;
 	
   public TrackBasePopupMenu( TrackBaseEditor editor, boolean isInSequence)
   {
@@ -78,16 +77,6 @@ public class TrackBasePopupMenu extends JPopupMenu
 		
     if( addRangeMenu())
       addSeparator();
-		
-    item = new JMenuItem("Select All");
-    item.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				target.getSelection().selectAll();
-				target.getGraphicContext().getGraphicDestination().requestFocus();
-			}
-    });
-    add(item);
 		
     if(isInSequence)
 		{
@@ -115,25 +104,6 @@ public class TrackBasePopupMenu extends JPopupMenu
 			});
 			add(removeItem);
 		}
-		
-    if(JMaxApplication.getProperty("no_menus") != null)
-    {
-      addSeparator();
-			
-      add( Actions.undoAction);
-      add( Actions.redoAction);
-      
-      addSeparator();
-			
-      cutAction = new Actions.CutAction();      
-      copyAction = new Actions.CopyAction();
-      duplicateAction = new Actions.DuplicateAction();
-     
-      add(cutAction);
-      add(copyAction);
-      add(Actions.pasteAction);
-      add(duplicateAction);
-    }
 		
     addSeparator();
     item = new JMenuItem("Export Track");
@@ -197,10 +167,7 @@ public class TrackBasePopupMenu extends JPopupMenu
       updateMoveToMenu();
 			
 	    updateViewMenu();
-		
-    if(JMaxApplication.getProperty("no_menus") != null)
-      updateCutCopyPaste();
-	
+			
 		if(!isInSequence)
 		{
 			boolean saveEditor = target.getTrack().getFtsTrack().saveEditor;
@@ -233,24 +200,6 @@ public class TrackBasePopupMenu extends JPopupMenu
 		}
   }
 	
-  void updateCutCopyPaste()
-  {
-    if((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()))
-    {
-      //Empty selection
-      cutAction.setEnabled(false);
-      copyAction.setEnabled(false);
-      duplicateAction.setEnabled(false);
-    }
-    else
-    {
-      // Object selection
-      cutAction.setEnabled(true);
-      copyAction.setEnabled(true);
-      duplicateAction.setEnabled(true);
-    }
-  }
-  
   class SetViewAction extends AbstractAction {
     SetViewAction(int viewType, TrackBaseEditor editor)
 	{

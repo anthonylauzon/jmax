@@ -62,6 +62,10 @@ public class EditMenu extends EditorMenu
     add(copyAction);
     add(Actions.pasteAction);
     add(duplicateAction);
+    
+    addSeparator();
+    
+    add(Actions.selectAllAction);
   }
 
   public void updateMenu()
