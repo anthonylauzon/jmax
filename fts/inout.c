@@ -21,8 +21,8 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/inout.h>
-#include <fts/private/patcher.h>
+#include <ftsprivate/inout.h>
+#include <ftsprivate/patcher.h>
 
 /***********************************************************************
  *

@@ -45,9 +45,9 @@
 #include <sys/stat.h>
 
 #include <fts/fts.h>
-#include <fts/private/errobj.h>
-#include <fts/private/patcher.h>
-#include <fts/private/patparser.h>
+#include <ftsprivate/errobj.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/patparser.h>
 
 enum abstraction_mode {fts_abstraction_cache, fts_abstraction_declaration};
 

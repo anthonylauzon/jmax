@@ -73,9 +73,9 @@
 #endif
 
 #include <fts/fts.h>
-#include <fts/private/OLDclient.h>
-#include <fts/private/patparser.h>
-#include <fts/private/platform.h>
+#include <ftsprivate/OLDclient.h>
+#include <ftsprivate/patparser.h>
+#include <ftsprivate/platform.h>
 
 /******************************************************************************/
 /*                                                                            */

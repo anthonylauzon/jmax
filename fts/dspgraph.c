@@ -25,10 +25,10 @@
 #include <assert.h>
 
 #include <fts/fts.h>
-#include <fts/private/class.h>
-#include <fts/private/connection.h>
-#include <fts/private/sigconn.h>
-#include <fts/private/dspgraph.h>
+#include <ftsprivate/class.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/sigconn.h>
+#include <ftsprivate/dspgraph.h>
 
 fts_symbol_t fts_s_sig_zero;
 fts_symbol_t fts_s_dsp_descr;

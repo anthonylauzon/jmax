@@ -21,7 +21,7 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/class.h>
+#include <ftsprivate/class.h>
 
 #ifdef DEBUG 
 #define INIT_CHECK_STATUS 1

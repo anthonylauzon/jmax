@@ -53,17 +53,17 @@
 #include <stdio.h>
 
 #include <fts/fts.h>
-#include <fts/private/OLDclient.h>
-#include <fts/private/OLDpatcherdata.h>
-#include <fts/private/class.h>
-#include <fts/private/connection.h>
-#include <fts/private/errobj.h>
-#include <fts/private/expression.h>
-#include <fts/private/inout.h>
-#include <fts/private/object.h>
-#include <fts/private/patcher.h>
-#include <fts/private/template.h>
-#include <fts/private/variable.h>
+#include <ftsprivate/OLDclient.h>
+#include <ftsprivate/OLDpatcherdata.h>
+#include <ftsprivate/class.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/errobj.h>
+#include <ftsprivate/expression.h>
+#include <ftsprivate/inout.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/template.h>
+#include <ftsprivate/variable.h>
 
 extern fts_class_t *inlet_class;
 extern fts_class_t *outlet_class;

@@ -21,7 +21,7 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/fpe.h>
+#include <ftsprivate/fpe.h>
 
 void fts_fpe_handler( int which)
 {

@@ -45,7 +45,7 @@
 #define INITIAL_SELECTION_SIZE 16
 
 #include <fts/fts.h>
-#include <fts/private/selection.h>
+#include <ftsprivate/selection.h>
 
 static void
 selection_object_size_to_fit(fts_selection_t *this)

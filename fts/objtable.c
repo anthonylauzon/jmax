@@ -26,7 +26,7 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/objtable.h>
+#include <ftsprivate/objtable.h>
 
 static fts_hashtable_t object_table;
 static fts_hashtable_t connection_table;

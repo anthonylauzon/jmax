@@ -22,6 +22,78 @@
 
 #include <fts/fts.h>
 
+
+
+typedef struct _v_t {
+  fts_object_t head;
+  fts_atom_t value;
+} v_t;
+
+static fts_symbol_t s___v;
+static fts_patcher_t *env_patcher;
+
+static void v_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  v_t *this = (v_t *)o;
+
+  this->value = at[1];
+}
+
+static void v_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  v_t *this = (v_t *)o;
+
+  *value = this->value;
+}
+
+static fts_status_t v_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init( cl, sizeof( v_t), 0, 0, 0);
+
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, v_init);
+  fts_class_add_daemon( cl, obj_property_get, fts_s_state, v_get_state);
+
+  return fts_Success;
+}
+
+static void test_define( const char *s, int i)
+{
+  fts_atom_t a[4];
+  fts_object_t *newobj;
+
+  fts_set_symbol( a+0, fts_new_symbol_copy( s));
+  fts_set_symbol( a+1, fts_s_colon);
+  fts_set_symbol( a+2, s___v);
+  fts_set_int( a+3, i);
+
+  newobj = fts_eval_object_description( env_patcher, 4, a);
+
+  if (!newobj)
+    {
+      fprintf( stderr, "Error instantiation v object\n");
+    }
+}
+
+static void test_get( const char *s)
+{
+}
+
+static void test_variables( void)
+{
+  s___v = fts_new_symbol( "__v");
+  fts_class_install( s___v, v_instantiate);
+
+  test_define( "foo", 1);
+  test_define( "boo", 2);
+  test_get( "boo");
+  test_get( "foo");
+  test_get( "ttt");
+}
+
+
+
+
+
 extern void fts_kernel_symbol_init( void);
 extern void fts_kernel_hashtable_init( void);
 extern void fts_kernel_atom_init( void);
@@ -85,4 +157,8 @@ void fts_init( void)
   fts_kernel_oldclient_init();
   fts_kernel_oldftsdata_init();
   fts_kernel_oldpatcherdata_init();
+
+#if 1
+  test_variables();
+#endif
 }

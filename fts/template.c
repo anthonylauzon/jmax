@@ -59,11 +59,11 @@
 #endif
 
 #include <fts/fts.h>
-#include <fts/private/errobj.h>
-#include <fts/private/vm.h>
-#include <fts/private/object.h>
-#include <fts/private/patcher.h>
-#include <fts/private/loader.h>
+#include <ftsprivate/errobj.h>
+#include <ftsprivate/vm.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/loader.h>
 
 /* Template */
 

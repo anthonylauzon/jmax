@@ -32,12 +32,12 @@
 #include <string.h>
 
 #include <fts/fts.h>
-#include <fts/private/bmaxhdr.h>
-#include <fts/private/patcher.h>
-#include <fts/private/object.h>
-#include <fts/private/selection.h>
-#include <fts/private/template.h>
-#include <fts/private/vm.h>
+#include <ftsprivate/bmaxhdr.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/selection.h>
+#include <ftsprivate/template.h>
+#include <ftsprivate/vm.h>
 
 /* #define SAVER_DEBUG */
 

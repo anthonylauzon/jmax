@@ -62,9 +62,9 @@
 /* #define EXPRESSION_TRACE_DEBUG */
 
 #include <fts/fts.h>
-#include <fts/private/expression.h>
-#include <fts/private/symbol.h>
-#include <fts/private/patcher.h>
+#include <ftsprivate/expression.h>
+#include <ftsprivate/symbol.h>
+#include <ftsprivate/patcher.h>
 
 /* Operator codes: symbols can store a special operator code,
    to identify them as operators, and to do direct access to some
@@ -1635,7 +1635,7 @@ void fts_kernel_expression_init(void)
   fts_symbol_set_operator(fts_s_smaller, FTS_OP_SMALLER);
   fts_symbol_set_operator(fts_s_smaller_equal, FTS_OP_SMALLER_EQUAL);
   fts_symbol_set_operator(fts_s_conditional, FTS_OP_CONDITIONAL);
-  fts_symbol_set_operator(fts_s_column, FTS_OP_ELSE);
+  fts_symbol_set_operator(fts_s_colon, FTS_OP_ELSE);
   fts_symbol_set_operator(fts_s_equal, FTS_OP_ASSIGN);
 
 

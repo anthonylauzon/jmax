@@ -44,7 +44,7 @@
 #endif
 
 #include <fts/fts.h>
-#include <fts/private/connection.h>
+#include <ftsprivate/connection.h>
 
 
 #define AUDIOPORT_DEFAULT_IDLE ((void (*)( struct _fts_audioport_t *port))-1)

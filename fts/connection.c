@@ -22,13 +22,13 @@
 
 
 #include <fts/fts.h>
-#include <fts/private/class.h>
-#include <fts/private/connection.h>
-#include <fts/private/object.h>
-#include <fts/private/errobj.h>
-#include <fts/private/patcher.h>
-#include <fts/private/objtable.h>
-#include <fts/private/OLDclient.h>
+#include <ftsprivate/class.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/errobj.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/objtable.h>
+#include <ftsprivate/OLDclient.h>
 
 /* Note that in this code there are error messages sent as blip;
    this is ok during editing, but the same error may occour while

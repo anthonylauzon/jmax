@@ -30,7 +30,7 @@
 #include <string.h>
 
 #include <fts/fts.h>
-#include <fts/private/OLDclient.h>
+#include <ftsprivate/OLDclient.h>
 
 
 /******************************************************************************/

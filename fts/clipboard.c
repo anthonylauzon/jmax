@@ -44,8 +44,8 @@
 #endif
 
 #include <fts/fts.h>
-#include <fts/private/loader.h>
-#include <fts/private/saver.h>
+#include <ftsprivate/loader.h>
+#include <ftsprivate/saver.h>
 
 typedef struct {
   fts_object_t ob;

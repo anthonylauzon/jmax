@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include <fts/fts.h>
-#include <fts/private/class.h>
+#include <ftsprivate/class.h>
 
 const int fts_SystemInlet = -1;
 

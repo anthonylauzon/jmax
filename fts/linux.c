@@ -39,9 +39,9 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include "fts/fts.h"
-#include "fts/private/fpe.h"
-#include "fts/private/platform.h"
+#include <fts/fts.h>
+#include <ftsprivate/fpe.h>
+#include <ftsprivate/platform.h>
 
 /***********************************************************************
  *

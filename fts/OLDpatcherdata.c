@@ -21,9 +21,9 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/OLDftsdata.h>
-#include <fts/private/OLDclient.h>
-#include <fts/private/OLDpatcherdata.h>
+#include <ftsprivate/OLDftsdata.h>
+#include <ftsprivate/OLDclient.h>
+#include <ftsprivate/OLDpatcherdata.h>
 
 /* Remote call codes */
 

@@ -22,8 +22,8 @@
 
 #include <assert.h>
 #include <fts/fts.h>
-#include <fts/private/OLDclient.h>
-#include <fts/private/OLDftsdata.h>
+#include <ftsprivate/OLDclient.h>
+#include <ftsprivate/OLDftsdata.h>
 
 /* (nos):
    Added a pseudo generic "new" function for fts_data.

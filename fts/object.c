@@ -28,20 +28,20 @@
 #include <stdarg.h>
 
 #include <fts/fts.h>
-#include <fts/private/OLDclient.h>
-#include <fts/private/abstraction.h>
-#include <fts/private/class.h>
-#include <fts/private/connection.h>
-#include <fts/private/doctor.h>
-#include <fts/private/errobj.h>
-#include <fts/private/expression.h>
-#include <fts/private/objtable.h>
-#include <fts/private/object.h>
-#include <fts/private/patcher.h>
-#include <fts/private/property.h>
-#include <fts/private/template.h>
-#include <fts/private/variable.h>
-#include <fts/private/vm.h>
+#include <ftsprivate/OLDclient.h>
+#include <ftsprivate/abstraction.h>
+#include <ftsprivate/class.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/doctor.h>
+#include <ftsprivate/errobj.h>
+#include <ftsprivate/expression.h>
+#include <ftsprivate/objtable.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/property.h>
+#include <ftsprivate/template.h>
+#include <ftsprivate/variable.h>
+#include <ftsprivate/vm.h>
 
 
 /* forward declarations  */
@@ -746,7 +746,7 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
 int
 fts_object_description_defines_variable(int ac, const fts_atom_t *at)
 {
-  return (ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_column);
+  return (ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_colon);
 }
 
 static fts_symbol_t

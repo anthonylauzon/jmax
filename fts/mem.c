@@ -44,7 +44,7 @@
 #include <stdio.h>
 
 #include <fts/fts.h>
-#include <fts/private/platform.h>
+#include <ftsprivate/platform.h>
 
 /***********************************************************************
  *

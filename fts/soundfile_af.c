@@ -44,7 +44,7 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/srconv.h>
+#include <ftsprivate/srconv.h>
 
 #include <audiofile.h>
 #include <string.h>

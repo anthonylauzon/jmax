@@ -21,11 +21,11 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/class.h>
-#include <fts/private/connection.h>
-#include <fts/private/sigconn.h>
-#include <fts/private/dspgraph.h>
-#include <fts/private/audio.h>
+#include <ftsprivate/class.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/sigconn.h>
+#include <ftsprivate/dspgraph.h>
+#include <ftsprivate/audio.h>
 
 #define FTS_DSP_DEFAULT_SAMPLE_RATE 44100
 

@@ -21,8 +21,8 @@
  */
 
 #include <fts/fts.h>
-#include <fts/private/connection.h>
-#include <fts/private/sigconn.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/sigconn.h>
 
 #define BLOCK_SIZE 256
 

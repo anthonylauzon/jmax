@@ -36,9 +36,9 @@
 
 
 #include <fts/fts.h>
-#include <fts/private/object.h>
-#include <fts/private/patcher.h>
-#include <fts/private/variable.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/variable.h>
 
 /****************************************************************************
  *

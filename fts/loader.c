@@ -28,9 +28,9 @@
 #endif
 
 #include <fts/fts.h>
-#include <fts/private/bmaxhdr.h>
-#include <fts/private/loader.h>
-#include <fts/private/vm.h>
+#include <ftsprivate/bmaxhdr.h>
+#include <ftsprivate/loader.h>
+#include <ftsprivate/vm.h>
 
 /*  #define LOAD_DEBUG */
 

@@ -28,8 +28,8 @@
 #include <string.h>
 
 #include <fts/fts.h>
-#include <fts/private/connection.h>
-#include <fts/private/OLDftsdata.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/OLDftsdata.h>
 
 static fts_hashtable_t fts_atom_type_table;
 

@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #include <fts/fts.h>
-#include <fts/private/saver.h>
+#include <ftsprivate/saver.h>
 
 /* Implement autosave functions; autosave is implemented
    only for catastrophic situations, but can be easily implemented 

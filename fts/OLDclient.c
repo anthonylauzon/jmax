@@ -36,19 +36,19 @@
 #endif
 
 #include <fts/fts.h>
-#include <fts/private/OLDclient.h>
-#include <fts/private/OLDftsdata.h>
-#include <fts/private/objtable.h>
-#include <fts/private/abstraction.h>
-#include <fts/private/connection.h>
-#include <fts/private/errobj.h>
-#include <fts/private/object.h>
-#include <fts/private/patcher.h>
-#include <fts/private/loader.h>
-#include <fts/private/patparser.h>
-#include <fts/private/saver.h>
-#include <fts/private/symbol.h>
-#include <fts/private/template.h>
+#include <ftsprivate/OLDclient.h>
+#include <ftsprivate/OLDftsdata.h>
+#include <ftsprivate/objtable.h>
+#include <ftsprivate/abstraction.h>
+#include <ftsprivate/connection.h>
+#include <ftsprivate/errobj.h>
+#include <ftsprivate/object.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/loader.h>
+#include <ftsprivate/patparser.h>
+#include <ftsprivate/saver.h>
+#include <ftsprivate/symbol.h>
+#include <ftsprivate/template.h>
 
 
 /*
