@@ -14,7 +14,7 @@ public class QListExtension extends tcl.lang.Extension
 {
   public void init(Interp interp)
   {
-    Mda.installEditorFactory(new QListFactory());
+    Mda.installEditorFactory( new QListFactory());
   }
 }
 

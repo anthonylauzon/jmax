@@ -19,6 +19,9 @@ public class QListPanel extends JPanel implements ActionListener {
   Button itsSetButton;
   Button itsGetButton;
 
+  String textToFind;
+  int lastFindIndex;
+
   public QListPanel(FtsAtomList theAtomList) 
   { 
     super();
@@ -41,7 +44,12 @@ public class QListPanel extends JPanel implements ActionListener {
 
     add("Center", itsTextArea);
     validate();
+
     itsAtomList = theAtomList;
+
+    textToFind = "";
+    lastFindIndex = 0;
+
     setBackground(Color.white);
   }
 
@@ -82,11 +90,28 @@ public class QListPanel extends JPanel implements ActionListener {
   {
     return preferredSize();
   }
+
+  // (fd) {
+  public void jumpToZero()
+  {
+    itsTextArea.setCaretPosition( 0);
+  }
+
+  public int getCaretPosition()
+  {
+    return itsTextArea.getCaretPosition();
+  }
+
+  public int find( String textToFind, int fromIndex)
+  {
+    int index = itsTextArea.getText().indexOf( textToFind, fromIndex);
+
+    if ( index >= 0)
+      {
+	itsTextArea.select( index, index + textToFind.length());
+      }
+
+    return index;
+  }
+  // } (fd)
 }
-
-
-
-
-
-
-
