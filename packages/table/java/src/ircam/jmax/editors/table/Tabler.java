@@ -115,6 +115,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   public void quitEdit()
   {
     Close();
+    dispose();
   }
 
   public void reEdit()

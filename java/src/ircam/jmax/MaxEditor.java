@@ -169,7 +169,8 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     aMenuItem.addActionListener(new ActionListener()
 				{
 				  public  void actionPerformed(ActionEvent e)
-				    { Close();}});
+				    { 
+				      Close();}});
 
     fileMenu.add(new MenuItem("-"));
 
@@ -271,7 +272,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     //    super.Close()
     //
     setVisible(false);
-    dispose();
   }
 
   protected void Cut(){};
