@@ -89,6 +89,9 @@ if {[file exists $jmaxRootDir/config/$jmaxHostType.tcl]} then {
 } else {
     if {[file exists $jmaxRootDir/tcl/config/$jmaxHostType.tcl]} then {
 	source $jmaxRootDir/tcl/config/$jmaxHostType.tcl
+    } else {
+	puts "Host Type $jmaxHostType do not exists"
+	exit
     }
 }
 

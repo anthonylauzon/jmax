@@ -46,5 +46,12 @@ proc help {} {
 }
 
 
+##
+## Define an host type
+##
 
+proc defineHost {name type} {
+    global jmaxHostTypeTable
 
+    set jmaxHostTypeTable($name) $type
+}
