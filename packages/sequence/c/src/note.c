@@ -280,7 +280,16 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     if(!fts_is_void(atoms + i))
     {
       fts_array_append_symbol(array, scoob_properties[i].name);
-      fts_array_append(array, 1, atoms + i);
+
+      if (fts_is_object(atoms + i)  &&
+	  !fts_object_has_id(fts_get_object(atoms + i)))
+      { /* object has no client-id: upload only string representation 
+	   todo: prevent string from being edited in table editor */
+	fts_symbol_t objdescription = fts_get_class_name(atoms + i);
+	fts_array_append_symbol(array, objdescription);
+      }
+      else
+	fts_array_append(array, 1, atoms + i);
     }
   }
 }
