@@ -95,7 +95,11 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 
 /* class */
 #define fts_object_get_class(o) ((o)->cl)
+#ifdef WIN32
+FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
+#else
 #define fts_object_get_class_name(o) (fts_class_get_name((o)->cl))
+#endif
 
 /* context & container*/
 #define fts_object_get_context(o) ((o)->context)
