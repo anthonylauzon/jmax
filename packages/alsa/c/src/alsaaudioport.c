@@ -496,7 +496,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
     fts_log("[alsaaudioport] null plugin selected => audioport not opened \n");
     snd_pcm_close(stream->handle);
     stream->handle = NULL;
-    return -1;
+    return 0;
   }
   /* 
      Check if acces type is available,
@@ -1033,6 +1033,16 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
     fts_object_error(o, "Error when trying to open alsastream \n");
     post("[alsaaudioport_open_input] err: %s \n", snd_strerror(err));
     fts_log("[alsaaudioport_open_input] err: %s \n", snd_strerror(err));
+    if (self->capture.handle != NULL)
+    {
+      snd_pcm_close(self->capture.handle);
+      self->capture.handle = NULL;
+    }
+    return;
+  }
+  if (self->capture.handle == NULL)
+  {
+    /* null plugin */
     return;
   }
   /* 
@@ -1067,8 +1077,19 @@ alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
     fts_object_error(o, "Error when trying to open alsastream \n");
     post("[alsaaudioport_open_output] err: %s \n", snd_strerror(err));
     fts_log("[alsaaudioport_open_output] err: %s \n", snd_strerror(err));
+    if (self->playback.handle != NULL)
+    {
+      snd_pcm_close(self->playback.handle);
+      self->playback.handle = NULL;
+    }
     return;
   }
+  if (self->playback.handle == NULL)
+  {
+    /* null plugin */
+    return;
+  }
+
   /* set fts_audioport io_fun and copy fun */
   alsaaudioport_update_audioport_output_functions(self, &self->playback);
   
