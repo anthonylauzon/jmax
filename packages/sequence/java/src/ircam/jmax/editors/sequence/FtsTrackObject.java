@@ -681,10 +681,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	copy();
 	
 	beginUpdate(); //cut is undoable
-
 	SequenceSelection.getCurrent().deleteAll();
-
-	endUpdate();
     }
     
     public void copy()
@@ -693,7 +690,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	    return;
 	SequenceSelection.getCurrent().prepareACopy();
 	MaxApplication.systemClipboard.setContents(SequenceSelection.getCurrent(), this);
-
     }  
     
     public void paste()

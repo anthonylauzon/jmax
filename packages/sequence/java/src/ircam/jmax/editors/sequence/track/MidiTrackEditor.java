@@ -131,7 +131,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 				    gc.getScrollManager().makeVisible(temp);
 				    first = false;
 				}
-			    //temp.getRenderer().render(temp, g, true, gc);
 			    temp.setHighlighted(true);
 			    temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
 			    oldElements.addElement(temp);			    
@@ -321,7 +320,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	{
 	    viewMode=viewType;
 	    renderer.setViewMode(viewMode);
-	    //((PartitionAdapter)gc.getAdapter()).setViewMode(viewMode);
 	    track.setProperty("viewMode", new Integer(viewType));
 	    repaint();
 	}    
