@@ -493,7 +493,7 @@ typedef int fts_intphase_t;
  */
 
 /* machine-dependent definitions of word order*/
-#if WORDS_BIGENDIAN
+#ifdef FTS_CONFIG_BIGENDIAN
 
 #define MSB_OFFSET 0 /* word offset to find MSW */
 #define LSB_OFFSET 1 /* word offset to find LSW */
