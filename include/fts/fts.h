@@ -25,7 +25,7 @@
 
 /**
  * Global FTS include file. 
- * Object programmer just need to include this file as:
+ * Object programmers just need to include this file as:
  *
  * @code
  *   #include <fts/fts.h>
@@ -37,7 +37,7 @@
 /**
  * @mainpage
  * 
- * This will be the developers documentation of the FTS API.
+ * This will be the developer's documentation of the FTS API.
  * For now there are only a few documentation modules.
  *
  * FTS includes mainly the following components:
@@ -140,6 +140,13 @@ FTS_API fts_symbol_t fts_cmd_args_get( fts_symbol_t name);
  * Root directory
  */
 FTS_API fts_symbol_t fts_get_root_directory( void);
+
+/**
+ * Return the user's home directory as a symbol.
+ *
+ * @return The current user's home directory.
+ */
+FTS_API fts_symbol_t fts_get_user_directory(void);
 
 #ifdef __cplusplus
 }

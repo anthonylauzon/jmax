@@ -32,7 +32,17 @@ extern void fts_connections_init(void);
 #define fts_connection_get_inlet(c) ((c)->winlet)
 #define fts_connection_get_type(c) ((c)->type)
 
-extern void fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type);
+/*
+ * WARNING
+ *
+ * This function is exported because it is used by
+ * VideoDSP. This will probably be fixed in the future.
+ * VideoDSP redeclares the function, so it does not need
+ * this header.
+ * --Carl Seleborg
+ */
+
+FTS_API void fts_connection_set_type(fts_connection_t *connection, fts_connection_type_t type);
 
 #endif
 
