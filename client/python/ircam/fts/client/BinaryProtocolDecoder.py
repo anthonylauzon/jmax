@@ -78,7 +78,7 @@ class BinaryProtocolDecoder:
     
     def endIntAction(self, input):
         self.__lval = self.__lval << 8 | input
-        if self.__argscount >= 2:
+        if self.__argsCount >= 2:
             self.__args.addInt(self.__lval)
         self.__argsCount += 1
     
