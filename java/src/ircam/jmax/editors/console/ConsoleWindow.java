@@ -90,7 +90,16 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
   private void makeMenuBar()
   {
-    JMenuBar mb = new JMenuBar();
+    JMenuBar mb = new JMenuBar(){        
+        //BUG FIX on MacOSX to avoid QUIT on CMD-a
+        public boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed)
+        {
+            if( e.getKeyChar() == 'a')
+                return false;
+            else
+                return super.processKeyBinding(ks, e, condition, pressed);
+        }		
+    };
 
     EditorMenu fileMenu = new DefaultFileMenu();
     fileMenu.setEnabled( false, 3);

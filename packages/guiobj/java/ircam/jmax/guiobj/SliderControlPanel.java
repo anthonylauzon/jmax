@@ -68,6 +68,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 
     maxLabel = new JLabel("top", JLabel.CENTER);
     maxValueField = new JTextField();
+    
     maxValueField.setPreferredSize(new Dimension(100, 20));
     maxValueField.setMaximumSize(new Dimension(100, 20));
     maxValueField.addActionListener(this);
@@ -113,7 +114,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     minValueField.setPreferredSize(new Dimension(100, 20));
     minValueField.setMaximumSize(new Dimension(100, 20));
     minValueField.addActionListener(this);
-    
+
     minPanel = new JPanel();
     minPanel.setPreferredSize(new Dimension(170, 20));
     minPanel.setLayout(new BoxLayout(minPanel, BoxLayout.X_AXIS));
@@ -259,7 +260,7 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
   {
     if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
       setRange();
-  }
+  }  
 }
 
 

@@ -5,6 +5,268 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F544CD9303387B6001664092 = {
+			isa = PBXFileReference;
+			name = thread.c;
+			path = ../../fts/thread.c;
+			refType = 2;
+		};
+		F544CD9403387B6001664092 = {
+			fileRef = F544CD9303387B6001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CD9503387D3501664092 = {
+			buildActionMask = 2147483647;
+			files = (
+				F544CDB30338807501664092,
+				F544CDB50338807501664092,
+				F544CDBA0338807501664092,
+				F544CDBC0338807501664092,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F544CD9603387D3501664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F544CD9703387D3501664092 = {
+			buildActionMask = 2147483647;
+			files = (
+				F544CDB20338807501664092,
+				F544CDBB0338807501664092,
+				F544CDBE0338807501664092,
+				F544CDBF0338807501664092,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F544CD9803387D3501664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F544CD9903387D3501664092 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F544CD9A03387D3501664092 = {
+			buildPhases = (
+				F544CD9503387D3501664092,
+				F544CD9603387D3501664092,
+				F544CD9703387D3501664092,
+				F544CD9803387D3501664092,
+				F544CD9903387D3501664092,
+			);
+			buildSettings = {
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				HEADER_SEARCH_PATHS = ../../include;
+				OTHER_CFLAGS = "-Wno-unused";
+				OTHER_LDFLAGS = "-flat_namespace -undefined suppress -lpthread";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = libdtd;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "\U0001-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = libdtd;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = libdtd;
+			productReference = F544CD9B03387D3501664092;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F544CD9B03387D3501664092 = {
+			isa = PBXBundleReference;
+			path = libdtd.bundle;
+			refType = 3;
+		};
+		F544CDA003387F2601664092 = {
+			children = (
+				F544CDA103387F4001664092,
+			);
+			isa = PBXGroup;
+			name = dtd;
+			refType = 4;
+		};
+		F544CDA103387F4001664092 = {
+			children = (
+				F544CDA30338807501664092,
+				F544CDA40338807501664092,
+				F544CDA60338807501664092,
+				F544CDAB0338807501664092,
+				F544CDAC0338807501664092,
+				F544CDAD0338807501664092,
+				F544CDAF0338807501664092,
+				F544CDB00338807501664092,
+			);
+			isa = PBXGroup;
+			name = c;
+			refType = 4;
+		};
+		F544CDA30338807501664092 = {
+			isa = PBXFileReference;
+			name = dtd.c;
+			path = ../../packages/dtd/c/src/dtd.c;
+			refType = 2;
+		};
+		F544CDA40338807501664092 = {
+			isa = PBXFileReference;
+			name = dtddefs.h;
+			path = ../../packages/dtd/c/src/dtddefs.h;
+			refType = 2;
+		};
+		F544CDA60338807501664092 = {
+			isa = PBXFileReference;
+			name = dtdfifo.h;
+			path = ../../packages/dtd/c/src/dtdfifo.h;
+			refType = 2;
+		};
+		F544CDAB0338807501664092 = {
+			isa = PBXFileReference;
+			name = dtdserver.h;
+			path = ../../packages/dtd/c/src/dtdserver.h;
+			refType = 2;
+		};
+		F544CDAC0338807501664092 = {
+			isa = PBXFileReference;
+			name = libtime.c;
+			path = ../../packages/dtd/c/src/libtime.c;
+			refType = 2;
+		};
+		F544CDAD0338807501664092 = {
+			isa = PBXFileReference;
+			name = libtime.h;
+			path = ../../packages/dtd/c/src/libtime.h;
+			refType = 2;
+		};
+		F544CDAF0338807501664092 = {
+			isa = PBXFileReference;
+			name = readsf.c;
+			path = ../../packages/dtd/c/src/readsf.c;
+			refType = 2;
+		};
+		F544CDB00338807501664092 = {
+			isa = PBXFileReference;
+			name = writesf.c;
+			path = ../../packages/dtd/c/src/writesf.c;
+			refType = 2;
+		};
+		F544CDB20338807501664092 = {
+			fileRef = F544CDA30338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDB30338807501664092 = {
+			fileRef = F544CDA40338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDB50338807501664092 = {
+			fileRef = F544CDA60338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDBA0338807501664092 = {
+			fileRef = F544CDAB0338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDBB0338807501664092 = {
+			fileRef = F544CDAC0338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDBC0338807501664092 = {
+			fileRef = F544CDAD0338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDBE0338807501664092 = {
+			fileRef = F544CDAF0338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDBF0338807501664092 = {
+			fileRef = F544CDB00338807501664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F544CDC00338812601664092 = {
+			isa = PBXTargetDependency;
+			target = F544CD9A03387D3501664092;
+		};
+		F544CDC10338861901664092 = {
+			isa = PBXBundleReference;
+			name = libdtd.bundle;
+			path = build/libdtd.bundle;
+			refType = 2;
+		};
+		F544CDCB0338862A01664092 = {
+			buildActionMask = 2147483647;
+			dstPath = share/jmax/packages/dtd/c;
+			dstSubfolderSpec = 7;
+			files = (
+				F544CDCC0338864C01664092,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F544CDCC0338864C01664092 = {
+			fileRef = F544CDC10338861901664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5933FE503363A6501664092 = {
 			isa = PBXFileReference;
 			name = FloatBoxControlPanel.java;
@@ -253,6 +515,7 @@
 				F80A5F55028FD44C01664092,
 				F80A5F56028FD44C01664092,
 				F80A5F57028FD44C01664092,
+				F544CDC00338812601664092,
 				F80A5F58028FD44C01664092,
 			);
 			isa = PBXAggregateTarget;
@@ -11881,6 +12144,7 @@
 			children = (
 				F851227F028BDFF301664092,
 				F8B8E48802867E1C01664092,
+				F544CDA003387F2601664092,
 				F8B8E5750286822501664092,
 				F85122BB028BE16601664092,
 				F844696A028BCC2301664092,
@@ -11895,6 +12159,7 @@
 			);
 			isa = PBXGroup;
 			name = packages;
+			path = "";
 			refType = 4;
 		};
 		F880006B0283072001664092 = {
@@ -12242,6 +12507,7 @@
 				F8512352028BE5ED01664092,
 				F8512385028BE77D01664092,
 				F85123A0028BE77D01664092,
+				F544CD9A03387D3501664092,
 				F880FFF80283022401664092,
 			);
 		};
@@ -12345,6 +12611,7 @@
 				F823078302916C7401664092,
 				F823078402916C7401664092,
 				F823078502916C7401664092,
+				F544CD9B03387D3501664092,
 			);
 			isa = PBXGroup;
 			name = Products;
@@ -12635,6 +12902,7 @@
 				F8677A5F02E5C2CF01664092,
 				F82C2A0902E5DB1001664092,
 				F889510902ED989301664092,
+				F544CD9303387B6001664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -13070,6 +13338,7 @@
 				F8677A6002E5C2CF01664092,
 				F82C2A0A02E5DB1001664092,
 				F889510A02ED989301664092,
+				F544CD9403387B6001664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -16958,6 +17227,7 @@
 				F8512515028BED1101664092,
 				F851252E028BED1101664092,
 				F8512535028BED1101664092,
+				F544CDCB0338862A01664092,
 			);
 			buildSettings = {
 				DEBUGGING_SYMBOLS = NO;
@@ -21503,6 +21773,7 @@
 				F8F010D7028D861401664092,
 				F8F010D8028D861401664092,
 				F8F010D9028D861401664092,
+				F544CDC10338861901664092,
 			);
 			isa = PBXGroup;
 			name = "jMax Bundles";

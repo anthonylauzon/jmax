@@ -53,7 +53,7 @@ class KeyMap
 
     this.component = component;
     // Install the keyboard actions
-
+ 
     // Move actions
 
     add(Actions.moveTenLeftAction, Event.SHIFT_MASK, KeyEvent.VK_LEFT);
