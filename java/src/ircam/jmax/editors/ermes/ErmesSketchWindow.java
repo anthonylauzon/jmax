@@ -758,15 +758,16 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       }
       aDialog.dispose();
     }
-    ErmesObject aObject;
-    FtsObject aFtsObject;
-    for (Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();){
-      aObject = (ErmesObject)e.nextElement();
-      if(aObject.NeedPropertyHandler()){
-	aFtsObject = aObject.GetFtsObject();
-	if(aFtsObject!=null) aFtsObject.removeWatch(aObject);
-      }
-    }
+    //Bug#22
+    //ErmesObject aObject;
+    //FtsObject aFtsObject;
+    //for (Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();){
+    //aObject = (ErmesObject)e.nextElement();
+      //if(aObject.NeedPropertyHandler()){
+      //aFtsObject = aObject.GetFtsObject();
+      //if(aFtsObject!=null) aFtsObject.removeWatch(aObject);
+      //}
+    //}
     CloseAllSubWindows();//?????
 
     MaxApplication.RemoveThisWindowFromMenus(this);
