@@ -17,5 +17,4 @@ SOURCES = \
   ramps.c \
   ramp_vectors.c \
   units.c \
-  ieeewrap.c \
   srconv.c

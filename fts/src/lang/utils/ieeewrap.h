@@ -65,14 +65,9 @@ typedef union _fts_wrap_fudge
   fts_int32_t i[2];
 } fts_wrapper_t;
 
-/* get the normalized MSW for a certain range (2 ^ bits)
-   same as: fts_wrap_normalized_msw[bits]
-*/
-#define fts_wrap_normalized_msw(wrapper, bits) \
-( \
-  (wrapper)->f = (double)(value) + UNITBIT32 * (double)(1 << bits), \
-  (wrapper)->i[MSB_OFFSET] \
-)
+/* get the normalized MSW for a certain range of 2 ^ bits */
+#define fts_wrap_constant(bits) \
+  (FTS_WRAP_NORMALIZED_MSW + (bits) * FTS_WRAP_NORMALIZED_MSW_BIT)
 
 /* set wrapper with value to be wrapped to the range of 2 ^ bits */
 #define fts_wrapper_set(wrapper, value, bits) \
@@ -97,7 +92,7 @@ typedef union _fts_wrap_fudge
 /* wrap and get it */
 #define fts_wrapper_get_wrap(wrapper, bits) \
 ( \
-  (wrapper)->i[MSB_OFFSET] = FTS_WRAP_NORMALIZED_MSW + (bits) * FTS_WRAP_NORMALIZED_MSW_BIT, \
+  (wrapper)->i[MSB_OFFSET] = (FTS_WRAP_NORMALIZED_MSW + (bits) * FTS_WRAP_NORMALIZED_MSW_BIT), \
   (wrapper)->f - UNITBIT32 * (double)(1 << bits) \
 )
 
@@ -118,7 +113,7 @@ typedef union _fts_wrap_fudge
 #define fts_wrap(wrapper, value, bits) \
 ( \
   (wrapper)->f = (double)(value) + UNITBIT32 * (double)(1 << bits), \
-  (wrapper)->i[MSB_OFFSET] = FTS_WRAP_NORMALIZED_MSW + (bits) * FTS_WRAP_NORMALIZED_MSW_BIT, \
+  (wrapper)->i[MSB_OFFSET] = (FTS_WRAP_NORMALIZED_MSW + (bits) * FTS_WRAP_NORMALIZED_MSW_BIT), \
   (wrapper)->f - UNITBIT32 * (double)(1 << bits) \
 )
 
