@@ -363,6 +363,8 @@ public class FtsServer
     if (! connected)
       return;
 
+    System.err.println( "in getDone");
+
     if (FtsServer.debug)
       System.err.println("getDone(" + patcher + ")");
 

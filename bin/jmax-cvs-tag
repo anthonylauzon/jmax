@@ -63,7 +63,7 @@ then
     exit 1
 fi
 
-if [ $QUALIFIER = "none"]
+if [ $QUALIFIER = "none" ]
 then
     help
     exit 2
@@ -79,7 +79,5 @@ VERSION=$MAJOR.$MINOR.$PATCH_LEVEL
 V=`echo $VERSION | sed -e 's/^/V_/' -e 's/\./_/g'`
 TAG="${V}_${QUALIFIER}"
 
-echo "... Tagging sources with tag $TAG"
+echo "cvs tag $TAG"
 cvs tag $TAG
-
-echo "... Done"
