@@ -102,12 +102,8 @@ import ircam.jmax.fts.*;
   // mouseDown
   //--------------------------------------------------------
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    /*if(evt.getClickCount()>1) {
-      RestartEditing();
-      }
-      else*/ 
-      itsSketchPad.ClickOnObject(this, evt, x, y);
-      return true;
+    itsSketchPad.ClickOnObject(this, evt, x, y);
+    return true;
   }
 	
   public void RestartEditing(){
@@ -157,7 +153,6 @@ import ircam.jmax.fts.*;
     itsSketchPad.RemoveElementRgn(this);//???
     Resize1(d1.width, d1.height);	
     itsSketchPad.SaveOneElementRgn(this);//???
-    //preferredSize = d1;//prova prova
     itsSketchPad.GetEditField().setText(theString);
     itsSketchPad.GetEditField().setSize(d1.width-WIDTH_DIFF, d1.height-HEIGHT_DIFF);
     itsSketchPad.GetEditField().repaint();

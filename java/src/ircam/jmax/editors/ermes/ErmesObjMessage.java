@@ -77,9 +77,6 @@ class ErmesObjMessage extends ErmesObjEditableObject {
 	else aMessThread.start();
       }
     }
-    /*else if(evt.getClickCount()>1) {
-      RestartEditing();
-      }*/
     else itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
     
@@ -90,7 +87,11 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     itsSketchPad.GetEditField().setFont(itsFont);
     itsSketchPad.GetEditField().setText(itsArgs);//warning: what will it happen if itsArgs is not here yet?
     itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+    
+    if(itsParsedTextVector.size()==0)
+      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*2);
+    else
+      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
     itsParsedTextVector.removeAllElements();
     
@@ -188,6 +189,9 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     }
   }
 }
+
+
+
 
 
 

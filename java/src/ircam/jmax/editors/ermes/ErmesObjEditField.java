@@ -99,7 +99,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     ///qui accorcia se il testo e' piu' corto dell'oggetto
     //dovrebbe farlo anche per l'altezza...
 
-    // int lenght = getFontMetrics(getFont()).stringWidth(aTextString);
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
   
     if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
@@ -117,8 +116,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     }
     itsOwner.update(itsOwner.itsFtsObject);
     
-    //itsSketchPad.repaint();//?????????????????????
-
     AbortEdit();
 
     setRows(2);
@@ -176,32 +173,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	requestFocus();
 	return;
       }
-      //else if (e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY || e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
-      //if(start==end){//se non c' testo selezionato
-      // if(start>0){
-      // if(start < s.length()){//cancella intermedio
-      // s1 = s.substring(0, start-1);
-      // s2 = s.substring(start, s.length());
-      // s = s1+s2;
-      // }
-      // else//cancella in coda
-      // s = s.substring(0, s.length()-1);
-      
-      //setText(s);
-      //select(start-1,start-1);
-      // }
-      //}
-      //else{//se c' testo selezionato
-      //s1 = s.substring(0, start+1);
-      //  s2 = s.substring(end, s.length());
-      //  s = s1+s2;
-      //  setText(s);
-      //  select(start+1,start+1);
-      //}
-      //itsOwner.itsArgs = s;
-      //}
       else{//scrittura
-	aCurrentLineChars = GetCurrentLineChars(s);//s.length() - itsOldLineChars;
+	aCurrentLineChars = GetCurrentLineChars(s);
 	if(aCurrentLineChars+10 > getColumns())
 	  setColumns(getColumns()+20);
 
@@ -292,6 +265,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   }
   
 }
+
+
 
 
 

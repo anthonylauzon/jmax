@@ -39,11 +39,8 @@ public class ErmesObject implements FtsPropertyHandler {
   FontMetrics itsFontMetrics = null;
   int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
   boolean itsResized = false;
-  //static Color itsUILightColor = new Color(201, 226, 283);
   static Color itsUINormalColor = new Color(153, 204, 255);
-  //static Color itsUIMediumColor = new Color(102, 176, 228);
   static Color itsUISelectedColor = new Color(51, 153, 204);
-  //static Color itsUIDarkColor = new Color(21, 132, 180);
   static Color itsLangNormalColor = new Color(153, 204, 204);
   static Color itsLangSelectedColor = new Color(51, 153, 153);
   
@@ -90,8 +87,8 @@ public class ErmesObject implements FtsPropertyHandler {
     // do nothing
   }
   
-  /*abstract*/ public void Paint_specific(Graphics g) {};  
-  /*abstract*/ public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
+  public void Paint_specific(Graphics g) {};  
+  public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
   public void ChangeFont(Font theFont) {
     itsFont = theFont;
     itsFontMetrics =itsSketchPad.getFontMetrics(theFont);
@@ -352,8 +349,8 @@ public class ErmesObject implements FtsPropertyHandler {
     return itsY;
   }
 
-  public /*abstract*/ boolean ConnectionRequested(ErmesObjInOutlet theRequester) {return true;};
-  public /*abstract*/ boolean ConnectionAbort(ErmesObjInOutlet theRequester) {return true;};
+  public boolean ConnectionRequested(ErmesObjInOutlet theRequester) {return true;};
+  public boolean ConnectionAbort(ErmesObjInOutlet theRequester) {return true;};
   
   
   public boolean MouseMove(MouseEvent e,int x,int y){
@@ -371,13 +368,10 @@ public class ErmesObject implements FtsPropertyHandler {
   }
 		
   public boolean IsInDragBox(int x,int y){
-    //return GetDragBoxRect().inside(x,y);
     return (x >(currentRect.x+currentRect.width - DRAG_DIMENSION ) && 
 	    x <(currentRect.x+currentRect.width) &&
 	    y > (currentRect.y+currentRect.height-DRAG_DIMENSION) &&
-	    y < (currentRect.y+currentRect.height) );
-    
-    
+	    y < (currentRect.y+currentRect.height) );    
   }
 
   public boolean MouseDown(MouseEvent e,int x, int y) {
@@ -505,7 +499,6 @@ public class ErmesObject implements FtsPropertyHandler {
 	aConnection.Delete();
 	aConnection.PrepareToRouting();
 	aConnection.AutoRouting();
-				//bug 24 aConnection.Paint(itsSketchPad.getGraphics());
 	
 	if(!aConnection.GetErrorState()){ 
 	  itsSketchPad.SaveConnectionRgn(aConnection);

@@ -57,7 +57,6 @@ class ErmesObjComment extends ErmesObject {
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    //itsFontMetrics = theSketchPad.GetTextArea().getFontMetrics(itsFont);
     FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
     itsArgs = theFtsObject.getDescription();
@@ -100,17 +99,11 @@ class ErmesObjComment extends ErmesObject {
   }
 
   public boolean MouseUp(MouseEvent evt,int x,int y){
-    //if(itsInEdit) return true;
-    //else 
     return super.MouseUp(evt, x, y);
   }
 
   public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
     if (itsSketchPad.itsRunMode) return true; 
-    /*if (evt.getClickCount() > 1) { //re-edit the field.. 
-      RestartEditing();
-      }
-      else*/
     itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
   }
@@ -120,8 +113,11 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.GetTextArea().setFont(itsFont);
     itsSketchPad.GetTextArea().setText(itsArgs);
     itsSketchPad.GetTextArea().itsOwner = this;
-    
-    itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+
+    if(itsParsedTextVector.size()==0)
+      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width, itsFontMetrics.getHeight()*5);
+    else
+      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
     itsParsedTextVector.removeAllElements();
     
@@ -136,8 +132,6 @@ class ErmesObjComment extends ErmesObject {
     super.Resize1(d.width, d.height);
     if (itsSketchPad != null) itsSketchPad.SaveOneElementRgn(this);
     currentRect.setSize(d.width, d.height);
-    //d.width -= (WIDTH_DIFF-6);		
-    //d.height -= HEIGHT_DIFF;
     if (itsSketchPad != null) itsSketchPad.repaint();
   }
   
