@@ -1,4 +1,4 @@
- //
+//
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -291,13 +291,3 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     itsSketchPad.repaint();//???
   }
 }
-
-
-
-
-
-
-
-
-
-

@@ -48,7 +48,7 @@ append_blank_and_atom(char *str, const fts_atom_t *a)
   if(fts_is_int(a))
     snprintf(s, STRING_SIZE - n, " %d", fts_get_int(a));
   else if(fts_is_float(a))
-    snprintf(s, STRING_SIZE - n, " %f", fts_get_float(a));
+    snprintf(s, STRING_SIZE - n, " %g", fts_get_float(a));
   else if(fts_is_symbol(a))
     snprintf(s, STRING_SIZE - n, " %s", fts_symbol_name(fts_get_symbol(a)));
   else
@@ -64,7 +64,7 @@ append_atom(char *str, const fts_atom_t *a)
   if(fts_is_int(a))
     snprintf(s, STRING_SIZE - n, "%d", fts_get_int(a));
   else if(fts_is_float(a))
-    snprintf(s, STRING_SIZE - n, "%f", fts_get_float(a));
+    snprintf(s, STRING_SIZE - n, "%g", fts_get_float(a));
   else if(fts_is_symbol(a))
     snprintf(s, STRING_SIZE - n, "%s", fts_symbol_name(fts_get_symbol(a)));
   else
@@ -77,14 +77,14 @@ append_atom(char *str, const fts_atom_t *a)
  *
  */
 static void
-display_deliver(display_t *this, fts_atom_t *a)
+display_deliver(display_t *this)
 {
   if(this->gate)
     {
       this->pending = 0;
       this->gate = 0;
 
-      fts_client_send_message((fts_object_t *)this, fts_s_set, 1, a);
+      fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
 
       fts_alarm_set_delay(&this->alarm, this->period);
       fts_alarm_arm(&this->alarm);
@@ -137,7 +137,7 @@ display_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   sprintf(this->string, "%d", fts_get_int(at));
 
-  display_deliver(this, &this->a);
+  display_deliver(this);
 }
 
 static void
@@ -145,9 +145,9 @@ display_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   display_t * this = (display_t *)o;
 
-  sprintf(this->string, "%f", fts_get_float(at));
+  sprintf(this->string, "%g", fts_get_float(at));
 
-  display_deliver(this, &this->a);
+  display_deliver(this);
 }
 
 static void
@@ -155,7 +155,9 @@ display_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
-  display_deliver(this, at);
+  sprintf(this->string, "%s", fts_symbol_name(fts_get_symbol(at)));
+
+  display_deliver(this);
 }
 
 static void 
@@ -170,7 +172,7 @@ display_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   for(i=1; i<ac; i++)
     append_blank_and_atom(this->string, at + i);
 
-  display_deliver(this, &this->a);
+  display_deliver(this);
 }
 
 static void 
@@ -184,7 +186,7 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   for(i=0; i<ac; i++)
     append_blank_and_atom(this->string, at + i);
 
-  display_deliver(this, &this->a);
+  display_deliver(this);
 }
 
 static fts_status_t 

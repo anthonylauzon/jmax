@@ -47,7 +47,7 @@ class Display extends GraphicObject implements FtsMessageListener
   {
     super(theSketchPad, theFtsObject);
 
-    redefine("");
+    redefine("     ");
 
     setFont(getFont());
   }
@@ -101,10 +101,10 @@ class Display extends GraphicObject implements FtsMessageListener
   {
     super.setFont( theFont);
 
-    minWidth = getFontMetrics().stringWidth("000");
-
     int w = getFontMetrics().stringWidth(display) + 4;
     int h = getFontMetrics().getHeight() + 4;
+
+    minWidth = h;
 
     if(w < minWidth)
       super.setWidth(minWidth);
@@ -147,14 +147,17 @@ class Display extends GraphicObject implements FtsMessageListener
 
     if(itsSketchPad.isLocked())
       {
-	/*g.setColor( Color.white);*/
-	/*g.fillRect( x, y, w, h);*/
+	g.setColor( Color.white);
+	g.fillRect( x + 1, y + 1, w - 2, h - 2);
 
 	g.setColor( Color.black);
-	g.drawLine( x, y, x + w - 1, y);
+	//g.drawLine( x, y, x + w - 1, y);
+	g.drawLine( x, y, x + h/2, y);
+	g.drawLine( x, y, x, y + h/4);
 	
 	paintInlets(g);
 	
+	g.setColor( Color.gray);
 	g.setFont(getFont());
 	g.drawString(display, x + 2, y + h - getFontMetrics().getDescent() - 2);
       }
@@ -168,8 +171,10 @@ class Display extends GraphicObject implements FtsMessageListener
 	g.fill3DRect( x, y + 1, w, h - 1, true); 
 
 	g.setColor( Color.black);
-	g.drawLine( x, y, x + w - 1, y);
-	
+	//g.drawLine( x, y, x + w - 1, y);
+	g.drawLine( x, y, x + h/2, y);
+	g.drawLine( x, y, x, y + h/4);
+
 	paintInlets(g);
 	
 	g.setFont(getFont());
