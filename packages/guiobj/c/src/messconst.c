@@ -64,9 +64,10 @@ messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
 static void
 messconst_eval( messconst_t *this)
 {
+  fts_patcher_t *patcher = fts_object_get_patcher( (fts_object_t *)this);
   fts_status_t status;
 
-  status = fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
+  status = fts_expression_reduce( this->expression, patcher, this->ac, this->at, messconst_expression_callback, this);
 
   if (status != fts_ok)
     fts_object_signal_runtime_error( (fts_object_t *)this, "%s", fts_status_get_description( status));
@@ -115,7 +116,7 @@ messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int ninlets;
   fts_status_t status;
 
-  status = fts_expression_set( this->expression, ac, at, fts_object_get_patcher( (fts_object_t *)this));
+  status = fts_expression_set( this->expression, ac, at);
   if (status != fts_ok)
     {
       fts_object_signal_runtime_error( o, "%s", fts_status_get_description( status));
@@ -210,7 +211,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       new = 1;
     }
 
-  status = fts_expression_new( 0, 0, fts_object_get_patcher( (fts_object_t *)this), &this->expression);
+  status = fts_expression_new( 0, 0, &this->expression);
   if (status != fts_ok)
     {
       fts_object_set_error( o, "%s", fts_status_get_description( status));

@@ -13,6 +13,7 @@ fir.c \
 harmtap.c \
 iir.c \
 matrix.c \
+multi.c \
 osc.c \
 osc_ieeewrap.c \
 paste.c \

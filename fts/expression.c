@@ -34,7 +34,6 @@ static fts_heap_t *expression_heap;
 struct _fts_expression_t {
   fts_stack_t stack;            /* evaluation stack */
   fts_parsetree_t *tree;        /* parser abstract tree */
-  fts_patcher_t *scope;         /* expression scope for variables */
   int fp;                       /* frame pointer */
 };
 
@@ -268,7 +267,7 @@ static void expression_stack_init( fts_expression_t *exp)
  */
 
 #define UNOP_EVAL(OP)											 \
-  if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok) \
+  if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok) \
     return status;											 \
   top = expression_stack_top( exp);								 \
   if (fts_is_int( top))											 \
@@ -279,7 +278,7 @@ static void expression_stack_init( fts_expression_t *exp)
     return operand_type_mismatch_error;
 
 #define IUNOP_EVAL(OP)											 \
-  if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok) \
+  if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok) \
     return status;											 \
   top = expression_stack_top( exp);								 \
   if (fts_is_int( top))											 \
@@ -288,9 +287,9 @@ static void expression_stack_init( fts_expression_t *exp)
     return operand_type_mismatch_error;
 
 #define ABINOP_EVAL(OP)											  \
-  if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok)  \
+  if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)  \
     return status;											  \
-  if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok) \
+  if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok) \
     return status;											  \
   top = expression_stack_top( exp);								  \
   if (fts_is_int( top-1) && fts_is_int( top))								  \
@@ -306,9 +305,9 @@ static void expression_stack_init( fts_expression_t *exp)
   expression_stack_pop( exp, 1);
 
 #define IABINOP_EVAL(OP)										  \
-  if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok)  \
+  if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)  \
     return status;											  \
-  if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok) \
+  if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok) \
     return status;											  \
   top = expression_stack_top( exp);								  \
   if (fts_is_int( top) && fts_is_int( top-1))								  \
@@ -318,9 +317,9 @@ static void expression_stack_init( fts_expression_t *exp)
   expression_stack_pop( exp, 1);
 
 #define LBINOP_EVAL(OP)											  \
-  if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok)  \
+  if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)  \
     return status;											  \
-  if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok) \
+  if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok) \
     return status;											  \
   top = expression_stack_top( exp);								  \
   if (fts_is_int( top) && fts_is_int( top-1))								  \
@@ -336,7 +335,7 @@ static void expression_stack_init( fts_expression_t *exp)
   expression_stack_pop( exp, 1);
 
 
-fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data, int toplevel)
+fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_patcher_t *scope, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data, int toplevel)
 {
   int ac;
   fts_atom_t *at, *top, ret[1];
@@ -349,12 +348,12 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
   switch( tree->token) {
 
   case TK_COMMA:
-    if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, toplevel)) != fts_ok)
+    if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, toplevel)) != fts_ok)
       return status;
 
     expression_stack_push_frame( exp);
 
-    if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, toplevel)) != fts_ok)
+    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, toplevel)) != fts_ok)
       return status;
 
     ac = expression_stack_frame_count( exp);
@@ -374,7 +373,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       {
 	expression_stack_push_frame( exp);
 
-	if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
+	if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
 	  return status;
 
 	ac = expression_stack_frame_count( exp);
@@ -394,16 +393,16 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       }
     else
       {
-	if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
+	if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
 	  return status;
       }
 
     break;
 
   case TK_TUPLE:
-    if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
+    if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
-    if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
+    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
     break;
 
@@ -452,7 +451,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       {
 	fts_atom_t *p;
 
-	if ((p = fts_variable_get_value( exp->scope, fts_get_symbol( &tree->value))))
+	if ((p = fts_variable_get_value(scope, fts_get_symbol( &tree->value))))
 	  expression_stack_push( exp, p);
 	else
 	  return undefined_variable_error;
@@ -464,9 +463,9 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     break;
 
   case TK_POWER:
-    if ((status = expression_eval_aux( tree->left, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
+    if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
-    if ((status = expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data, 0)) != fts_ok)
+    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
     top = expression_stack_top( exp);
     if (fts_is_int( top-1) && fts_is_int( top))
@@ -558,7 +557,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
   case TK_FUNCALL:
     expression_stack_push_frame( exp);
 
-    expression_eval_aux( tree->right, exp, env_ac, env_at, callback, data);
+    expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data);
 
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
@@ -579,7 +578,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 }
 
 
-fts_status_t fts_expression_reduce( fts_expression_t *exp, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data)
+fts_status_t fts_expression_reduce( fts_expression_t *exp, fts_patcher_t *scope, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data)
 {
 #ifdef EXPRESSION_DEBUG
   fts_expression_print( exp);
@@ -590,7 +589,7 @@ fts_status_t fts_expression_reduce( fts_expression_t *exp, int env_ac, const fts
 
   expression_stack_init( exp);
 
-  return expression_eval_aux( exp->tree, exp, env_ac, env_at, callback, data, 1);
+  return expression_eval_aux( exp->tree, exp, scope, env_ac, env_at, callback, data, 1);
 }
 
 
@@ -701,32 +700,24 @@ static void fts_expression_print( fts_expression_t *exp)
  *
  */
 
-fts_status_t fts_expression_new( int ac, const fts_atom_t *at, fts_patcher_t *scope, fts_expression_t **pexp)
+fts_status_t fts_expression_new( int ac, const fts_atom_t *at, fts_expression_t **pexp)
 {
   *pexp = (fts_expression_t *)fts_heap_zalloc( expression_heap);
 
   fts_stack_init( &(*pexp)->stack, fts_atom_t);
 
-  return fts_expression_set( *pexp, ac, at, scope);
+  return fts_expression_set( *pexp, ac, at);
 }
 
-fts_status_t fts_expression_set( fts_expression_t *exp, int ac, const fts_atom_t *at, fts_patcher_t *scope)
+fts_status_t fts_expression_set( fts_expression_t *exp, int ac, const fts_atom_t *at)
 {
   fts_status_t status;
-
-  if (exp->scope)
-    fts_object_release( exp->scope);
 
   if (exp->tree)
     fts_parsetree_delete( exp->tree);
 
   if ((status = fts_parsetree_parse( ac, at, &exp->tree)) != fts_ok)
     return status;
-
-  exp->scope = scope;
-  
-  if (exp->scope)
-    fts_object_refer( exp->scope);
 
   return fts_ok;
 }
@@ -735,8 +726,6 @@ void fts_expression_delete( fts_expression_t *exp)
 {
   if (exp->tree)
     fts_parsetree_delete( exp->tree);
-
-  fts_object_release( exp->scope);
 
   fts_stack_destroy( &exp->stack);
 

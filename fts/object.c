@@ -216,7 +216,6 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
     }
 
   fts_patcher_add_object(patcher, obj);
-  fts_object_refer(obj);
 
   *ret = obj;
   return fts_ok;
@@ -327,7 +326,7 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
 	new_at[i+1] = at[i];
     }
 
-  if ((status = fts_expression_new( new_ac, new_at, patcher, &expression)) != fts_ok)
+  if ((status = fts_expression_new( new_ac, new_at, &expression)) != fts_ok)
     {
       obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
       fts_object_set_description(obj, new_ac, new_at);
@@ -335,17 +334,23 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
       return obj;
     }
 
-  if ((status = fts_expression_reduce( expression, 0, 0, eval_object_description_expression_callback, &data)) == fts_ok)
+  if ((status = fts_expression_reduce( expression, patcher, 0, 0, eval_object_description_expression_callback, &data)) == fts_ok)
     {
       obj = data.obj;
       fts_object_set_description(obj, new_ac, new_at);
       CHECK_ERROR_PROPERTY(obj);
+
+      fts_expression_delete(expression);
+
       return obj;
     }      
 
   obj = fts_error_object_new( patcher, new_ac, new_at, fts_status_get_description( status));
   fts_object_set_description(obj, new_ac, new_at);
   CHECK_ERROR_PROPERTY(obj);
+
+  fts_expression_delete(expression);
+
   return obj;
 }
 
@@ -431,31 +436,14 @@ fts_object_destroy(fts_object_t *obj)
 void 
 fts_object_delete_from_patcher(fts_object_t *obj)
 {
-  /* unbind the objects from defined and used variables */
-  fts_object_unbind(obj);
-  
   /* remove connections */
   fts_object_unconnect(obj);
 
-  /* unreference by hand */
-  obj->refcnt--;
+  /* unbind the objects from defined and used variables */
+  fts_object_unbind(obj);
 
-  /* call deconstructor */
-  if(obj->refcnt == 0 && fts_class_get_deconstructor(fts_object_get_class(obj)))
-    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_system_inlet, fts_s_delete, 0, 0);
-
-  /* remove from patcher */
   if(obj->patcher)
     fts_patcher_remove_object(obj->patcher, obj);
-
-  /* release all client components (no patcher, no appearance) */
-  fts_object_unclient(obj);
-
-  /* destroy or set no patcher */
-  if(obj->refcnt == 0)
-    fts_object_free(obj);
-  else
-    obj->patcher = 0;
 }
 
 /*********************************************************************************
@@ -526,12 +514,9 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       
       /* unbind variables */
       fts_object_unbind(old);
-      
-      /* unreference by hand */
-      old->refcnt--;
-      
+
       /* call deconstructor */
-      if(old->refcnt == 0 && fts_class_get_deconstructor(old->head.cl))
+      if(old->refcnt == 1 && fts_class_get_deconstructor(old->head.cl))
 	fts_class_get_deconstructor(old->head.cl)(old, fts_system_inlet, fts_s_delete, 0, 0);
       
       /* make the new object  */
@@ -560,16 +545,22 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
       /* remove old from client */
       fts_object_unclient(old);
       
+      /* assure that object won't be destroyed when removed from patcher */
+      old->refcnt++;
+
       /* remove the object from the patcher */
       if(old->patcher)
 	fts_patcher_remove_object(old->patcher, old);
       
       fts_update_reset(old);
       
-      if(old->refcnt == 0)
+      if(old->refcnt == 1)
 	fts_object_free(old);
       else
-	old->patcher = 0;
+	{
+	  old->patcher = NULL;
+	  fts_object_signal_runtime_error(old, "referenced %s object deleted from patcher", fts_object_get_class_name(old));
+	}
       
       return new;
     }

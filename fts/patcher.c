@@ -2004,8 +2004,9 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 void 
 fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 {
-  fts_object_t **p; /* indirect precursor */
+  fts_object_t **p;
 
+  /* add object at end (???) */
   for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
     {
     }
@@ -2017,12 +2018,16 @@ fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
 void 
 fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
 {
-  fts_object_t **p; /* indirect precursor */
+  fts_object_t **p;
 
   for (p = &(this->objects); *p; p = &((*p)->next_in_patcher))
     if (*p == obj)
       {
+	fts_object_t *remove = *p;
+
 	*p = obj->next_in_patcher;
+
+	fts_object_release(remove);
 	return;
       }
 }
@@ -2091,11 +2096,14 @@ fts_create_root_patcher()
 
   fts_set_symbol(a, fts_new_symbol("root"));
   fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_metaclass, 1, a);
+
+  fts_object_refer((fts_object_t *)fts_root_patcher);
 }
 
 static void fts_delete_root_patcher(void)
 {
-  fts_object_destroy((fts_object_t *)fts_root_patcher);
+  /* should be destroyed here! */
+  fts_object_release((fts_object_t *)fts_root_patcher);
 }
 
 fts_patcher_t *
