@@ -295,10 +295,10 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
     qSymbolCache1.addTransition( qSymbolCache2, shiftAction);
     qSymbolCache2.addTransition( qSymbolCache3, shiftAction);
     qSymbolCache3.addTransition( qSymbolCache4, shiftAction);
-    qSymbolCache4.addTransition( FtsProtocol.SYMBOL_CACHE_END, qStart, endSymbolCacheAction);
+    qSymbolCache4.addTransition( (byte)0, qStart, endSymbolCacheAction);
     qSymbolCache4.addTransition( qSymbolCache4, bufferShiftAction);
 
-    qString.addTransition( FtsProtocol.STRING_END, qStart, endStringAction);
+    qString.addTransition( (byte)0, qStart, endStringAction);
     qString.addTransition( qString, bufferShiftAction);
 
     qObject0.addTransition( qObject1, shiftAction);

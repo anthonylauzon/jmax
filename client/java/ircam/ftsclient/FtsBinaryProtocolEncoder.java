@@ -74,6 +74,7 @@ class FtsBinaryProtocolEncoder extends FtsProtocolEncoder {
   {
     outputBuffer = new OutputBuffer();
     connection = server.getConnection();
+    symbolCache = new FtsSymbol[512];
   }
 
   private final void write( int v)
@@ -82,6 +83,14 @@ class FtsBinaryProtocolEncoder extends FtsProtocolEncoder {
     outputBuffer.append( (byte) ((v >> 16) & 0xff));
     outputBuffer.append( (byte) ((v >> 8) & 0xff));
     outputBuffer.append( (byte) ((v >> 0) & 0xff));
+  }
+
+  private final void write( String v)
+  {
+    for ( int i = 0; i < v.length(); i++)
+      outputBuffer.append( (byte)v.charAt(i));
+
+    outputBuffer.append( (byte)0);
   }
 
   void writeInt( int v) throws IOException
@@ -98,16 +107,27 @@ class FtsBinaryProtocolEncoder extends FtsProtocolEncoder {
 
   void writeSymbol( FtsSymbol v) throws IOException
   {
+    int index = v.hashCode() % symbolCache.length;
+
+    if (symbolCache[index] == v)
+      {
+	outputBuffer.append( FtsProtocol.SYMBOL_INDEX);
+	write( index);
+      }
+    else
+      {
+	symbolCache[index] = v;
+
+	outputBuffer.append( FtsProtocol.SYMBOL_CACHE);
+	write( index);
+	write( v.toString());
+      }
   }
 
   void writeString( String v) throws IOException
   {
     outputBuffer.append( FtsProtocol.STRING);
-
-    for ( int i = 0; i < v.length(); i++)
-      outputBuffer.append( (byte)v.charAt(i));
-
-    outputBuffer.append( FtsProtocol.STRING_END);
+    write( v);
   }
 
   void writeObject( FtsObject v) throws IOException
@@ -129,8 +149,8 @@ class FtsBinaryProtocolEncoder extends FtsProtocolEncoder {
     outputBuffer.clear();
   }
 
-  // Output to FTS
   private OutputBuffer outputBuffer;
   private FtsServerConnection connection;
+  private FtsSymbol[] symbolCache;
 }
 

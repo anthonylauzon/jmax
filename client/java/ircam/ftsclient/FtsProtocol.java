@@ -26,9 +26,7 @@ interface FtsProtocol {
   public static final byte FLOAT = (byte)0x2;
   public static final byte SYMBOL_INDEX = (byte)0x3;
   public static final byte SYMBOL_CACHE = (byte)0x4;
-  public static final byte SYMBOL_CACHE_END = (byte)0;
   public static final byte STRING = (byte)0x05;
-  public static final byte STRING_END = (byte)0;
   public static final byte OBJECT = (byte)0x7;
   public static final byte END_OF_MESSAGE = (byte)0xF;
 }
