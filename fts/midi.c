@@ -20,17 +20,28 @@
  */
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
+#include <ftsprivate/OLDexpression.h>
+#include <ftsprivate/loader.h>
+#include <ftsprivate/bmaxhdr.h>
+#include <ftsprivate/saver.h>
 #include <ftsprivate/variable.h>
 #include <stdlib.h>
 #include <string.h>
 
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
 /*
- * This files contains all things MIDI related:
+ * This file contains everything related to MIDI:
  *
  *  - MIDI events
+ *  - MIDI fifo
  *  - MIDI parser 
- *  - MIDI port
- *  - initialization of the MIDI module
+ *  - MIDI port (incl. midibus and midinull class)
+ *  - MIDI label
+ *  - MIDI manager
  *
  * MIDI files are handled in midifile.c
  */
@@ -430,6 +441,119 @@ midievent_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+/***************************************************
+*
+*  midi fifo
+*
+*/
+void
+fts_midififo_init(fts_midififo_t *fifo, int size)
+{
+  int bytes = sizeof(fts_midififo_entry_t) * size;
+  fts_midififo_entry_t *entries;
+  int i;
+
+  fts_fifo_init(&fifo->data, fts_malloc(bytes), bytes);
+  entries = (fts_midififo_entry_t *)fts_fifo_get_buffer(&fifo->data);
+
+  for(i=0; i<size; i++) 
+    {
+      fts_object_t *obj = fts_object_create(fts_midievent_type, 0, 0);
+      fts_object_refer(obj);
+      entries[i].event = (fts_midievent_t *)obj;
+    }
+
+  fifo->delta = 0.0;
+  fifo->size = size;
+}
+
+void
+fts_midififo_reset(fts_midififo_t *fifo)
+{
+  fts_midififo_entry_t *entries = (fts_midififo_entry_t *)fts_fifo_get_buffer(&fifo->data);
+  int i;
+
+  for(i=0; i<fifo->size; i++)
+    fts_object_release((fts_object_t *)entries[i].event);
+
+  fts_free((void *)fifo->data.buffer);
+}
+
+/* read next fifo entry into time base (returns pointer to atom of newly allocated entry) */
+void
+fts_midififo_poll(fts_midififo_t *fifo)
+{
+  if(fts_fifo_read_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) 
+    {
+      fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_read_pointer(&fifo->data);
+      double now = fts_get_time();
+      double delay;
+      fts_atom_t a;
+      
+      /* set midievent argument */
+      fts_set_object(&a, entry->event);
+      
+      /* time == 0.0 means: send now */
+      if(entry->time != 0.0) 
+	{
+	  /* adjust delta time on very first fifo entry */
+	  if(fifo->delta == 0.0)
+	    fifo->delta = entry->time;
+	  
+	  /* translate event time to delay */
+	  delay = entry->time - fifo->delta;
+	  
+	  /* adjust delta time */
+	  if(delay < 0.0) 
+	    {
+	      delay = 0.0;
+	      fifo->delta = entry->time;
+	    }
+	  
+	  /* schedule midiport input call */
+	  fts_timebase_add_call(fts_get_timebase(), entry->port, fts_midiport_input, &a, delay);
+	} 
+      else
+	fts_midiport_input(entry->port, 0, 0, 1, &a);
+      
+      fts_object_release(entry->event);
+      
+      /* insert a new midievent into fifo and claim it */
+      entry->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
+      fts_object_refer(entry->event);
+      
+      fts_fifo_incr_read(&fifo->data, sizeof(fts_midififo_entry_t));
+    }
+}
+
+fts_midievent_t *
+fts_midififo_get_event(fts_midififo_t *fifo)
+{
+  if(fts_fifo_write_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) 
+    {
+      fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
+      return entry->event;
+    } 
+  else
+    return NULL;
+}
+
+void
+fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time)
+{
+  fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
+  
+  /* set midport */
+  entry->port = port;
+  fts_object_refer(port);
+
+  /* set time */
+  entry->time = time;
+
+  /* send entry */
+  fts_fifo_incr_write(&fifo->data, sizeof(fts_midififo_entry_t));
+}
+
 /************************************************************
  *
  *  MIDI parser
@@ -499,15 +623,16 @@ midiparser_get_event(fts_midiparser_t *parser)
 void
 fts_midiparser_set_event(fts_midiparser_t *parser, fts_midievent_t *event)
 {
-  if(event != parser->event) {
-    if(parser->event != NULL)
-      fts_object_release(parser->event);
-
-    parser->event = event;
-
-    if(event != NULL)
-      fts_object_refer(event);
-  }
+  if(event != parser->event) 
+    {
+      if(parser->event != NULL)
+	fts_object_release(parser->event);
+      
+      parser->event = event;
+      
+      if(event != NULL)
+	fts_object_refer(event);
+    }
 }
 
 void
@@ -829,8 +954,6 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
  *
  */
 
-static fts_symbol_t fts_s_midiport = 0;
-
 /* MIDI port listeners */
 static void 
 add_listener(fts_midiport_listener_t **list, fts_object_t *object, fts_method_t fun)
@@ -1082,10 +1205,10 @@ fts_object_is_midiport(fts_object_t *obj)
 }
 
 /****************************************************
-*
-*  internal MIDI port class
-*
-*/
+ *
+ *  internal MIDI port class
+ *
+ */
 static fts_metaclass_t *midibus_type = NULL;
 
 static void
@@ -1119,7 +1242,7 @@ midibus_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static fts_status_t
 midibus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fts_midiport_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_midiport_t), 0, 0, 0);
 
   fts_midiport_class_init(cl);
 
@@ -1130,30 +1253,30 @@ midibus_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 /****************************************************
-*
-*  error MIDI port class
-*
-*/
-static fts_metaclass_t *midierror_type = NULL;
+ *
+ *  null MIDI port class
+ *
+ */
+static fts_metaclass_t *midinull_type = NULL;
 
 static void
-midierror_output(fts_object_t *o, fts_midievent_t *event, double time)
+midinull_output(fts_object_t *o, fts_midievent_t *event, double time)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
 }
 
 static void
-midierror_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midinull_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
 
   fts_midiport_init(this);
   fts_midiport_set_input(this);
-  fts_midiport_set_output(this, midierror_output);
+  fts_midiport_set_output(this, midinull_output);
 }
 
 static void
-midierror_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midinull_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
 
@@ -1161,60 +1284,25 @@ midierror_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static fts_status_t
-midierror_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+midinull_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fts_midiport_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_midiport_t), 0, 0, 0);
 
   fts_midiport_class_init(cl);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midierror_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midierror_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midinull_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midinull_delete);
 
   return fts_Success;
 }
 
 /************************************************************
  *
- *  MIDI manager
- *
- *  the fts_midimanager is a class implementing the following
- *  methods depending on the platform:
- *    fts_midimanager_s_get_default_devices
- *    fts_midimanager_s_append_device_names
- *    fts_midimanager_s_get_input
- *    fts_midimanager_s_get_output
- *
- *  the following methods are platform independently declared
- *  by the function fts_midimanager_class_init()
- *    fts_s_insert
- *    fts_s_remove
- *    fts_s_input
- *    fts_s_output
- *    fts_s_upload
+ *  MIDI label
  *
  */
 
-/* current MIDI manager & hashtable of MIDI ports */
-static fts_midimanager_t *midimanager = NULL;
-static fts_midiport_t *midierror = NULL;
-
-fts_symbol_t fts_s_midimanager;
-fts_symbol_t fts_midimanager_s_get_default_devices;
-fts_symbol_t fts_midimanager_s_append_device_names;
-fts_symbol_t fts_midimanager_s_get_input;
-fts_symbol_t fts_midimanager_s_get_output;
-
-static fts_symbol_t fts_midimanager_s_internal_bus;
-static fts_symbol_t fts_midimanager_s_unconnected;
-static fts_symbol_t fts_midimanager_s_inputs;
-static fts_symbol_t fts_midimanager_s_outputs;
-
-/* device names */
-static fts_array_t midimanger_inputs;
-static fts_array_t midimanger_outputs;
-
-/* MIDI label */
-struct _midilabel
+typedef struct _midilabel
 {
   fts_symbol_t name;
   fts_midiport_t *input;
@@ -1222,7 +1310,7 @@ struct _midilabel
   fts_symbol_t input_name;
   fts_symbol_t output_name;
   struct _midilabel *next;
-};
+} midilabel_t;
 
 static midilabel_t *
 midilabel_new(fts_symbol_t name)
@@ -1232,8 +1320,8 @@ midilabel_new(fts_symbol_t name)
   label->name = name;
   label->input = NULL;
   label->output = NULL;
-  label->input_name = fts_midimanager_s_unconnected;
-  label->output_name = fts_midimanager_s_unconnected;
+  label->input_name = NULL;
+  label->output_name = NULL;
   label->next = NULL;
 
   return label;
@@ -1254,37 +1342,168 @@ midilabel_delete(midilabel_t *label)
 static void
 midilabel_set_input(midilabel_t *label, fts_midiport_t *port, fts_symbol_t name)
 {
-  if(port != label->input) {
-    if(label->input != NULL)
-      fts_object_release(label->input);
-
-    label->input = port;
-    label->input_name = name;
-
-    if(port != NULL)
-      fts_object_refer(port);
-  }
+  if(port != label->input) 
+    {
+      if(label->input != NULL)
+	fts_object_release(label->input);
+      
+      label->input = port;
+      label->input_name = name;
+      
+      if(port != NULL)
+	fts_object_refer(port);
+    }
 }
 
 static void
 midilabel_set_output(midilabel_t *label, fts_midiport_t *port, fts_symbol_t name)
 {
-  if(port != label->output) {
-    if(label->output != NULL)
-      fts_object_release(label->output);
+  if(port != label->output) 
+    {
+      if(label->output != NULL)
+	fts_object_release(label->output);
+      
+      label->output = port;
+      label->output_name = name;
+      
+      if(port != NULL)
+	fts_object_refer(port);
+    }
+}
 
-    label->output = port;
-    label->output_name = name;
+/************************************************************
+ *
+ *  MIDI configuration
+ *
+ */
 
-    if(port != NULL)
-      fts_object_refer(port);
-  }
+typedef struct _midiconfig
+{
+  fts_object_t o;
+  midilabel_t *labels;
+  int n_labels;
+} midiconfig_t;
+
+/* current MIDI configuration */
+static midiconfig_t *midiconfig = NULL;
+
+/* array of device names */
+static fts_array_t midiconfig_inputs;
+static fts_array_t midiconfig_outputs;
+
+/* list of MIDI managers */
+static fts_midimanager_t *midimanagers = NULL;
+
+/* MIDI port used for invalid references */
+static fts_midiport_t *midinull = NULL;
+
+static fts_symbol_t midiconfig_s_name;
+static fts_symbol_t midiconfig_s_internal_bus;
+static fts_symbol_t midiconfig_s_unconnected;
+static fts_symbol_t midiconfig_s_inputs;
+static fts_symbol_t midiconfig_s_outputs;
+
+fts_symbol_t fts_midimanager_s_get_default_input;
+fts_symbol_t fts_midimanager_s_get_default_output;
+fts_symbol_t fts_midimanager_s_append_input_names;
+fts_symbol_t fts_midimanager_s_append_output_names;
+fts_symbol_t fts_midimanager_s_get_input;
+fts_symbol_t fts_midimanager_s_get_output;
+
+/* handle midimanagers */
+static fts_midiport_t *
+midimanagers_get_input(fts_symbol_t device_name, fts_symbol_t label_name)
+{
+  fts_midiport_t *port = NULL;
+
+  if(device_name != NULL)
+    {
+      fts_midimanager_t *mm;
+      fts_atom_t args[3];
+      
+      fts_set_pointer(args + 0, &port);
+      fts_set_symbol(args + 1, device_name);
+      fts_set_symbol(args + 2, label_name);
+      
+      for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
+	fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_input, 3, args);
+    }
+
+  return port;      
+}
+
+static fts_midiport_t *
+midimanagers_get_output(fts_symbol_t device_name, fts_symbol_t label_name)
+{
+  fts_midiport_t *port = NULL;
+
+  if(device_name != NULL)
+    {
+      fts_midimanager_t *mm;
+      fts_atom_t args[3];
+      
+      fts_set_pointer(args + 0, &port);
+      fts_set_symbol(args + 1, device_name);
+      fts_set_symbol(args + 2, label_name);
+      
+      for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
+	fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_output, 3, args);
+    }
+      
+  return port;
+}
+
+static void
+midimanagers_get_device_names(void)
+{
+  fts_midimanager_t *mm;
+  fts_atom_t arg;
+  
+  fts_set_pointer(&arg, &midiconfig_inputs);
+  
+  for(mm = midimanagers; mm != NULL; mm = mm->next)
+    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_append_input_names, 1, &arg);
+
+  fts_set_pointer(&arg, &midiconfig_outputs);
+  
+  for(mm = midimanagers; mm != NULL; mm = mm->next)
+    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_append_output_names, 1, &arg);
+}
+
+static fts_symbol_t
+midimanagers_get_default_input(void)
+{
+  fts_symbol_t name = NULL;
+  fts_midimanager_t *mm;
+  fts_atom_t arg;
+  
+  fts_set_pointer(&arg, &name);
+
+  for(mm = midimanagers; mm != NULL && name == NULL; mm = mm->next)
+    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_default_input, 1, &arg);
+
+  return name;
+}
+
+static fts_symbol_t
+midimanagers_get_default_output(void)
+{
+  fts_symbol_t name = NULL;
+  fts_midimanager_t *mm;
+  fts_atom_t arg;
+  
+  fts_set_pointer(&arg, &name);
+
+  for(mm = midimanagers; mm != NULL && name == NULL; mm = mm->next)
+    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_default_output, 1, &arg); 
+
+  return name;
 }
 
 static midilabel_t *
-midimanager_label_get_by_index(fts_midimanager_t *mm, int index)
+midiconfig_label_get_by_index(midiconfig_t *config, int index)
 {
-  midilabel_t *label =  mm->labels;
+  midilabel_t *label =  config->labels;
 
   while(label && index--)
     label = label->next;
@@ -1293,9 +1512,9 @@ midimanager_label_get_by_index(fts_midimanager_t *mm, int index)
 }
 
 static midilabel_t *
-midimanager_label_get_by_name(fts_midimanager_t *mm, fts_symbol_t name)
+midiconfig_label_get_by_name(midiconfig_t *config, fts_symbol_t name)
 {
-  midilabel_t *label =  mm->labels;
+  midilabel_t *label =  config->labels;
 
   while(label && label->name != name)
     label = label->next;
@@ -1304,11 +1523,14 @@ midimanager_label_get_by_name(fts_midimanager_t *mm, fts_symbol_t name)
 }
 
 static midilabel_t *
-midimanager_label_insert_new(fts_midimanager_t *mm, int index, fts_symbol_t name)
+midiconfig_label_insert(midiconfig_t *config, int index, fts_symbol_t name)
 {
-  midilabel_t **p = &mm->labels;
+  midilabel_t **p = &config->labels;
   midilabel_t *label = midilabel_new(name);
   int n = index;
+
+  label->input_name = midiconfig_s_unconnected;
+  label->output_name = midiconfig_s_unconnected;
 
   /* inset label to list */
   while((*p) && n--)
@@ -1317,83 +1539,143 @@ midimanager_label_insert_new(fts_midimanager_t *mm, int index, fts_symbol_t name
   label->next = (*p);
   *p = label;
 
-  mm->n_labels++;
+  config->n_labels++;
 
+  /* send new label to client */
+  if(fts_object_has_id((fts_object_t *)config)) 
+    {
+      fts_atom_t args[4];
+      
+      fts_set_int(args, index);
+      fts_set_symbol(args + 1, name);
+      fts_set_symbol(args + 2, midiconfig_s_unconnected);
+      fts_set_symbol(args + 3, midiconfig_s_unconnected);
+      fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
+    }
+  
   return label;
 }
 
 static void
-midimanager_label_remove(fts_midimanager_t *mm, int index)
+midiconfig_label_remove(midiconfig_t *config, int index)
 {
-  midilabel_t **p = &mm->labels;
+  midilabel_t **p = &config->labels;
   int n = index;
 
   /* remove label and send to client */
   while((*p) && n--)
     p = &(*p)->next;
 
-  if(*p) {
-    midilabel_t *label = *p;
+  if(*p) 
+    {
+      midilabel_t *label = *p;
+      
+      *p = (*p)->next;
+      config->n_labels--;
+      
+      midilabel_delete(label);
+    }
 
-    *p = (*p)->next;
-    mm->n_labels--;
-
-    midilabel_delete(label);
-  }
+  /* send remove to client */
+  if(fts_object_has_id((fts_object_t *)config)) 
+    {
+      fts_atom_t arg;
+      
+      fts_set_int(&arg, index);
+      fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
+    }
 }
 
 static void
-midimanager_label_set_input(fts_midimanager_t *mm, midilabel_t *label, int index, fts_midiport_t *midiport, fts_symbol_t name)
+midiconfig_label_set_input(midiconfig_t *config, midilabel_t *label, int index, fts_midiport_t *midiport, fts_symbol_t name)
 {
   if(midiport == NULL)
-    name = fts_midimanager_s_unconnected;
+    name = midiconfig_s_unconnected;
 
-  if(midiport != label->input || name != label->input_name) {
-    midilabel_set_input(label, midiport, name);
-
-    if(fts_object_has_id((fts_object_t *)mm)) {
-      fts_atom_t args[2];
-
-      fts_set_int(args + 0, index);
-      fts_set_symbol(args + 1, name);
-      fts_client_send_message((fts_object_t *)mm, fts_s_input, 2, args);
+  if(midiport != label->input || name != label->input_name) 
+    {
+      midilabel_set_input(label, midiport, name);
+      
+      if(fts_object_has_id((fts_object_t *)config)) 
+	{
+	  fts_atom_t args[2];
+	  
+	  fts_set_int(args + 0, index);
+	  fts_set_symbol(args + 1, name);
+	  fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
+	}
     }
-  }
 }
 
 static void
-midimanager_label_set_output(fts_midimanager_t *mm, midilabel_t *label, int index, fts_midiport_t *midiport, fts_symbol_t name)
+midiconfig_label_set_output(midiconfig_t *config, midilabel_t *label, int index, fts_midiport_t *midiport, fts_symbol_t name)
 {
   if(midiport == NULL)
-    name = fts_midimanager_s_unconnected;
-
-  if(midiport != label->output || name != label->output_name) {
-    midilabel_set_output(label, midiport, name);
-
-    if(fts_object_has_id((fts_object_t *)mm)) {
-      fts_atom_t args[2];
-
-      fts_set_int(args + 0, index);
-      fts_set_symbol(args + 1, name);
-      fts_client_send_message((fts_object_t *)mm, fts_s_output, 2, args);
+    name = midiconfig_s_unconnected;
+  
+  if(midiport != label->output || name != label->output_name) 
+    {
+      midilabel_set_output(label, midiport, name);
+      
+      if(fts_object_has_id((fts_object_t *)config)) 
+	{
+	  fts_atom_t args[2];
+	  
+	  fts_set_int(args + 0, index);
+	  fts_set_symbol(args + 1, name);
+	  fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
+	}
     }
-  }
 }
 
 static void
-midimanager_label_set_internal(fts_midimanager_t *mm, midilabel_t *label, int index)
+midiconfig_label_set_internal(midiconfig_t *config, midilabel_t *label, int index)
 {
   /* create internal MIDI port */
   fts_midiport_t *port = (fts_midiport_t *)fts_object_create(midibus_type, 0, 0);
 
   /* set input and output to internal MIDI port */
-  midimanager_label_set_input(mm, label, index, port, fts_midimanager_s_internal_bus);
-  midimanager_label_set_output(mm, label, index, port, fts_midimanager_s_internal_bus);
+  midiconfig_label_set_input(config, label, index, port, midiconfig_s_internal_bus);
+  midiconfig_label_set_output(config, label, index, port, midiconfig_s_internal_bus);
+}
+
+static void
+midiconfig_set_input(midiconfig_t *config, int index, fts_symbol_t name)
+{
+  midilabel_t *label = midiconfig_label_get_by_index(config, index);  
+
+  /* reset output to none if it is set to internal */
+  if(name != midiconfig_s_internal_bus && label->output && label->output_name == midiconfig_s_internal_bus)
+    midiconfig_label_set_output(config, label, index, NULL, NULL);
+
+  if(name == midiconfig_s_unconnected)
+    midiconfig_label_set_input(config, label, index, NULL, NULL);
+  else if(name == midiconfig_s_internal_bus)
+    midiconfig_label_set_internal(config, label, index);
+  else
+    midiconfig_label_set_input(config, label, index, midimanagers_get_input(name, label->name), name);
+}
+
+static void
+midiconfig_set_output(midiconfig_t *config, int index, fts_symbol_t name)
+{
+  midilabel_t *label = midiconfig_label_get_by_index(config, index);
+
+  /* reset output to none if it is set to internal */
+  if(name != midiconfig_s_internal_bus && label->input && label->input_name == midiconfig_s_internal_bus)
+    midiconfig_label_set_input(config, label, index, NULL, NULL);
+
+  if(name == midiconfig_s_unconnected)
+    midiconfig_label_set_output(config, label, index, NULL, NULL);
+  else if(name == midiconfig_s_internal_bus)
+    midiconfig_label_set_internal(config, label, index);
+  else
+    midiconfig_label_set_output(config, label, index, midimanagers_get_output(name, label->name), name);
 }
 
 /* name utility */
 static fts_symbol_t
-midimanager_get_fresh_label_name(fts_midimanager_t *mm, fts_symbol_t name)
+midiconfig_get_fresh_label_name(midiconfig_t *config, fts_symbol_t name)
 {
   const char *str = name;
   int len = strlen(str);
@@ -1403,97 +1685,68 @@ midimanager_get_fresh_label_name(fts_midimanager_t *mm, fts_symbol_t name)
   int i;
 
   /* separate base name and index */
-  for(i=len-1; i>=0; i--) {
-    if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
-      num += (str[len = i] - '0') * dec;
-    else
-      new_str[i] = str[i];
-
-    dec *= 10;
-  }
-
+  for(i=len-1; i>=0; i--) 
+    {
+      if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
+	num += (str[len = i] - '0') * dec;
+      else
+	new_str[i] = str[i];
+      
+      dec *= 10;
+    }
+  
   /* generate new label name */
-  while(midimanager_label_get_by_name(mm, name) != NULL) {
-    sprintf(new_str + len, "%d", ++num);
-    name = fts_new_symbol_copy(new_str);
-  }
+  while(midiconfig_label_get_by_name(config, name) != NULL) 
+    {
+      sprintf(new_str + len, "%d", ++num);
+      name = fts_new_symbol_copy(new_str);
+    }
 
   return name;
 }
 
-static fts_midiport_t *
-midimanager_platform_get_input(fts_midimanager_t *mm, fts_symbol_t device_name, fts_symbol_t label_name)
-{
-  fts_midiport_t *port = NULL;
-  fts_atom_t args[3];
-
-  fts_set_pointer(args + 0, &port);
-  fts_set_symbol(args + 1, device_name);
-  fts_set_symbol(args + 2, label_name);
-  fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_input, 3, args);
-
-  return port;
-}
-
-static fts_midiport_t *
-midimanager_platform_get_output(fts_midimanager_t *mm, fts_symbol_t device_name, fts_symbol_t label_name)
-{
-  fts_midiport_t *port = NULL;
-  fts_atom_t args[3];
-
-  fts_set_pointer(args + 0, &port);
-  fts_set_symbol(args + 1, device_name);
-  fts_set_symbol(args + 2, label_name);
-  fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_output, 3, args);
-
-  return port;
-}
-
 static void
-midimanager_restore(fts_midimanager_t *mm)
+midiconfig_restore(midiconfig_t *config)
 {
   fts_atom_t a;
 
-  fts_set_object(&a, midimanager);
-  fts_variable_suspend(fts_get_root_patcher(), fts_s_midimanager);
-  fts_variable_restore(fts_get_root_patcher(), fts_s_midimanager, &a, (fts_object_t *)mm);
+  fts_set_object(&a, midiconfig);
+  fts_variable_suspend(fts_get_root_patcher(), midiconfig_s_name);
+  fts_variable_restore(fts_get_root_patcher(), midiconfig_s_name, &a, (fts_object_t *)config);
 }
 
 static void
-midimanager_update_devices(fts_midimanager_t *mm)
+midiconfig_update_devices(midiconfig_t *config)
 {
   int ac;
   fts_atom_t *at;
-  fts_atom_t args[2];
   
-  fts_array_clear(&midimanger_inputs);
-  fts_array_clear(&midimanger_outputs);
+  fts_array_clear(&midiconfig_inputs);
+  fts_array_clear(&midiconfig_outputs);
 
-  fts_array_append_symbol(&midimanger_inputs, fts_midimanager_s_unconnected);
-  fts_array_append_symbol(&midimanger_outputs, fts_midimanager_s_unconnected);
+  fts_array_append_symbol(&midiconfig_inputs, midiconfig_s_unconnected);
+  fts_array_append_symbol(&midiconfig_outputs, midiconfig_s_unconnected);
 
-  fts_array_append_symbol(&midimanger_inputs, fts_midimanager_s_internal_bus);
-  fts_array_append_symbol(&midimanger_outputs, fts_midimanager_s_internal_bus);
+  fts_array_append_symbol(&midiconfig_inputs, midiconfig_s_internal_bus);
+  fts_array_append_symbol(&midiconfig_outputs, midiconfig_s_internal_bus);
 
-  fts_set_pointer(args + 0, &midimanger_inputs);
-  fts_set_pointer(args + 1, &midimanger_outputs);
+  /* get device names from all midimanagers */
+  midimanagers_get_device_names();
 
-  fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_append_device_names, 2, args);
-
-  ac = fts_array_get_size(&midimanger_inputs);
-  at = fts_array_get_atoms(&midimanger_inputs);
-  fts_client_send_message((fts_object_t *)mm, fts_midimanager_s_inputs, ac, at);
+  ac = fts_array_get_size(&midiconfig_inputs);
+  at = fts_array_get_atoms(&midiconfig_inputs);
+  fts_client_send_message((fts_object_t *)config, midiconfig_s_inputs, ac, at);
   
-  ac = fts_array_get_size(&midimanger_outputs);
-  at = fts_array_get_atoms(&midimanger_outputs);
-  fts_client_send_message((fts_object_t *)mm, fts_midimanager_s_outputs, ac, at);
+  ac = fts_array_get_size(&midiconfig_outputs);
+  at = fts_array_get_atoms(&midiconfig_outputs);
+  fts_client_send_message((fts_object_t *)config, midiconfig_s_outputs, ac, at);
 }
 
 static void
-midimanager_update_labels(fts_midimanager_t *mm)
+midiconfig_update_labels(midiconfig_t *config)
 {
-  midilabel_t *label = mm->labels;
-  int n = mm->n_labels;
+  midilabel_t *label = config->labels;
+  int n = config->n_labels;
   int i;
 
   /* check inout and output midiports */
@@ -1506,18 +1759,18 @@ midimanager_update_labels(fts_midimanager_t *mm)
 	  
 	  if(label->input != NULL)
 	    {
-	      input = midimanager_platform_get_input(mm, label->input_name, label->name);
+	      input = midimanagers_get_input(label->input_name, label->name);
 	      
 	      if(input != label->input) 
-		midimanager_label_set_input(mm, label, i, input, label->input_name);
+		midiconfig_label_set_input(config, label, i, input, label->input_name);
 	    }	  
 
 	  if(label->output != NULL)
 	    {
-	      output = midimanager_platform_get_output(mm, label->output_name, label->name);
+	      output = midimanagers_get_output(label->output_name, label->name);
 	      
 	      if(output != label->output) 
-		midimanager_label_set_output(mm, label, i, output, label->output_name);
+		midiconfig_label_set_output(config, label, i, output, label->output_name);
 	    }
 	}
       
@@ -1526,352 +1779,385 @@ midimanager_update_labels(fts_midimanager_t *mm)
 }
 
 static void
-midimanager_set_default_devices(fts_midimanager_t *mm)
+midiconfig_erase_labels(midiconfig_t *config)
 {
-  midilabel_t *label = midimanager_label_get_by_index(mm, 0);
-  fts_midiport_t *input = NULL;
-  fts_midiport_t *output = NULL;
-
-  if(label == NULL)
-    label = midimanager_label_insert_new(mm, 0, fts_s_default);
-
-  input = label->input;
-  output = label->output;
-
-  if(input == NULL || output == NULL) {
-    fts_symbol_t input_name;
-    fts_symbol_t output_name;
-    fts_atom_t args[4];
-
-    fts_set_pointer(args + 0, &input);
-    fts_set_pointer(args + 1, &input_name);
-    fts_set_pointer(args + 2, &output);
-    fts_set_pointer(args + 3, &output_name);
-    fts_send_message((fts_object_t *)mm, fts_SystemInlet, fts_midimanager_s_get_default_devices, 4, args);
-
-    midimanager_label_set_input(mm, label, 0, input, input_name);
-    midimanager_label_set_output(mm, label, 0, output, output_name);
-  }
-}
-
-/* platform independent MIDI manager methods */
-static void
-midimanager_insert_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
+  midilabel_t *label = config->labels;
   
-  /* check if name is not already used */
-  if(midimanager_label_get_by_name(mm, name) != NULL)
-    name = midimanager_get_fresh_label_name(mm, name);
-
-  midimanager_label_insert_new(mm, index, name);
+  while(label != NULL)
+    {
+      midilabel_t *next = label->next;
+      
+      midilabel_delete(label);
+      label = next;
+    }
   
-  /* send new label to client */
-  if(fts_object_has_id((fts_object_t *)mm)) {
-    fts_atom_t args[4];
-
-    fts_set_int(args, index);
-    fts_set_symbol(args + 1, name);
-    fts_set_symbol(args + 2, fts_midimanager_s_unconnected);
-    fts_set_symbol(args + 3, fts_midimanager_s_unconnected);
-    fts_client_send_message((fts_object_t *)mm, fts_s_set, 4, args);
-  }
+  config->labels = NULL;
+  config->n_labels = 0;
 }
 
 static void
-midimanager_remove_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_set_defaults()
 {
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  int index = fts_get_int(at);
+  if(midiconfig != NULL)
+    {
+      midilabel_t *label = midiconfig_label_get_by_index(midiconfig, 0);
+      
+      if(label == NULL)
+	label = midiconfig_label_insert(midiconfig, 0, fts_s_default);
+      
+      if(label->input == NULL)
+	{
+	  fts_symbol_t name = midimanagers_get_default_input();
+	  fts_midiport_t *port = midimanagers_get_input(name, fts_s_default);
+	  
+	  midiconfig_label_set_input(midiconfig, label, 0, port, name);
+	}
 
-  midimanager_label_remove(mm, index);
-
-  /* send remove to client */
-  if(fts_object_has_id((fts_object_t *)mm)) {
-    fts_atom_t arg;
-
-    fts_set_int(&arg, index);
-    fts_client_send_message((fts_object_t *)mm, fts_s_remove, 1, &arg);
-  }    
-
-  midimanager_update_labels(mm);
-  midimanager_update_devices(mm);
-  midimanager_restore(mm);
+      if(label->output == NULL)
+	{
+	  fts_symbol_t name = midimanagers_get_default_output();
+	  fts_midiport_t *port = midimanagers_get_output(name, fts_s_default);
+	  
+	  midiconfig_label_set_output(midiconfig, label, 0, port, name);
+	}
+    }
 }
 
-static void
-midimanager_set_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+/* midi manager API */
+void
+fts_midiconfig_update()
 {
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-  midilabel_t *label = midimanager_label_get_by_index(mm, index);
-
-  /* reset output to none if it is set to internal */
-  if(label->output && fts_object_get_metaclass((fts_object_t *)label->output) == midibus_type)
-    midimanager_label_set_output(mm, label, index, NULL, NULL);
-
-  if(name == fts_midimanager_s_unconnected)
-    midimanager_label_set_input(mm, label, index, NULL, NULL);
-  else if(name == fts_midimanager_s_internal_bus)
-    midimanager_label_set_internal(mm, label, index);
-  else
-    midimanager_label_set_input(mm, label, index, midimanager_platform_get_input(mm, name, label->name), name);
-
-  midimanager_update_labels(mm);
-  midimanager_update_devices(mm);
-  midimanager_restore(mm);
+  midiconfig_update_labels(midiconfig);
+  midiconfig_update_devices(midiconfig);
 }
 
-static void
-midimanager_set_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+void
+fts_midiconfig_add_manager(fts_midimanager_t *mm)
 {
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-  midilabel_t *label = midimanager_label_get_by_index(mm, index);
-
-  /* reset output to none if it is set to internal */
-  if(label->input && fts_object_get_metaclass((fts_object_t *)label->input) == midibus_type)
-    midimanager_label_set_input(mm, label, index, NULL, NULL);
-
-  if(name == fts_midimanager_s_unconnected)
-    midimanager_label_set_output(mm, label, index, NULL, NULL);
-  else if(name == fts_midimanager_s_internal_bus)
-    midimanager_label_set_internal(mm, label, index);
-  else
-    midimanager_label_set_output(mm, label, index, midimanager_platform_get_output(mm, name, label->name), name);
-
-  midimanager_update_labels(mm);
-  midimanager_update_devices(mm);
-  midimanager_restore(mm);
-}
-
-static void
-midimanager_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  midilabel_t *label = mm->labels;
-  int i;
-
-  midimanager_update_labels(mm);
-  midimanager_update_devices(mm);
+  fts_midimanager_t **p = &midimanagers;
+  fts_atom_t a;
   
-  /* upload labels with inputs and outputs */
-  for(i=0; i<mm->n_labels; i++) {
-    fts_atom_t args[4];
+  while(*p != NULL)
+    *p = (*p)->next;
 
-    fts_set_int(args, i);
-    fts_set_symbol(args + 1, label->name);
-    fts_set_symbol(args + 2, label->input_name);
-    fts_set_symbol(args + 3, label->output_name);
-    fts_client_send_message((fts_object_t *)mm, fts_s_insert, 4, args);
+  *p = mm;
+  mm->next = NULL;
 
-    label = label->next;
-  }
-}
-
-static void
-midimanager_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_midimanager_t *mm = (fts_midimanager_t *)o;
-  midilabel_t *label = mm->labels;
-
-  post("labels\n");
-  while(label) {
-    fts_symbol_t name = label->name;
-    post("  %s %s %s\n", name, label->input_name, label->output_name);
-    label = label->next;
-  }
+  /* update default devices */
+  midiconfig_set_defaults();
 }
 
 /* midi objects API */
 fts_midiport_t *
-fts_midimanager_get_input(fts_symbol_t name)
+fts_midiconfig_get_input(fts_symbol_t name)
 {
-  if(midimanager != NULL)
+  if(midiconfig != NULL)
     {
-      midilabel_t *label = midimanager_label_get_by_name(midimanager, name);
+      midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
       
       if(label != NULL && label->input != NULL)
 	return label->input;
     }
 
-  return midierror;
+  return midinull;
 }
 
 fts_midiport_t *
-fts_midimanager_get_output(fts_symbol_t name)
+fts_midiconfig_get_output(fts_symbol_t name)
 {
-  if(midimanager != NULL)
+  if(midiconfig != NULL)
     {
-      midilabel_t *label = midimanager_label_get_by_name(midimanager, name);
+      midilabel_t *label = midiconfig_label_get_by_name(midiconfig, name);
       
       if(label != NULL && label->output != NULL)
 	return label->output;
     }
   
-  return midierror;
+  return midinull;
 }
 
 void
-fts_midimanger_register(fts_object_t *obj)
+fts_midiconfig_add_listener(fts_object_t *obj)
 {
-  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, obj);
+  fts_variable_add_user(fts_get_root_patcher(), midiconfig_s_name, obj);
 }
 
-/* midi manager API */
-void
-fts_midimanager_update(fts_midimanager_t *mm)
+fts_object_t *
+fts_midiconfig_get(void)
 {
-  midimanager_update_labels(mm);
-  midimanager_update_devices(mm);
+  return (fts_object_t *)midiconfig;
 }
 
-void
-fts_midimanager_class_init(fts_class_t *class)
+static void
+midiconfig_set(midiconfig_t *config)
 {
-  fts_method_define_varargs(class, fts_SystemInlet, fts_s_insert, midimanager_insert_label);
-  fts_method_define_varargs(class, fts_SystemInlet, fts_s_remove, midimanager_remove_label);
-  fts_method_define_varargs(class, fts_SystemInlet, fts_s_input, midimanager_set_input);
-  fts_method_define_varargs(class, fts_SystemInlet, fts_s_output, midimanager_set_output);
-  fts_method_define_varargs(class, fts_SystemInlet, fts_s_upload, midimanager_upload);
+  if(midiconfig != NULL)
+    fts_object_release((fts_object_t *)midiconfig);
   
-  fts_method_define_varargs(class, fts_SystemInlet, fts_s_print, midimanager_print);
+  midiconfig = config;
+  
+  if(config != NULL)
+    fts_object_refer((fts_object_t *)config);
 }
 
-void
-fts_midimanager_set(fts_midimanager_t *mm)
+/****************************************************
+ *
+ *  MIDI configuration class
+ *
+ */
+static fts_metaclass_t *midiconfig_type = NULL;
+
+static void
+midiconfig_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  midiconfig_t *this = (midiconfig_t *)o;
+
+  midiconfig_erase_labels(this);
+  midiconfig_label_insert(this, 0, fts_s_default);  
+}
+
+static void
+midiconfig_restore_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  fts_symbol_t name = fts_get_symbol(at);
+  fts_symbol_t input = fts_get_symbol(at + 1);
+  fts_symbol_t output = fts_get_symbol(at + 2);
+  int index = this->n_labels;
+  
+  /* make sure that first label is "default" */
+  if(index == 0 && name != fts_s_default)
+    {
+      midiconfig_label_insert(this, 0, fts_s_default);
+      index = 1;
+    }
+    
+  midiconfig_label_insert(this, index, name);
+  midiconfig_set_input(this, index, input);
+  midiconfig_set_output(this, index, output);
+}
+
+static void
+midiconfig_insert_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  int index = fts_get_int(at);
+  fts_symbol_t name = fts_get_symbol(at + 1);
+  
+  /* check if name is not already used */
+  if(midiconfig_label_get_by_name(this, name) != NULL)
+    name = midiconfig_get_fresh_label_name(this, name);
+
+  midiconfig_label_insert(this, index, name);
+}
+
+static void
+midiconfig_remove_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  int index = fts_get_int(at);
+
+  midiconfig_label_remove(this, index);
+
+  midiconfig_update_labels(this);
+  midiconfig_update_devices(this);
+  midiconfig_restore(this);
+}
+
+static void
+midiconfig_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  int index = fts_get_int(at);
+  fts_symbol_t name = fts_get_symbol(at + 1);
+
+  midiconfig_set_input(this, index, name);
+
+  midiconfig_update_labels(this);
+  midiconfig_update_devices(this);
+  midiconfig_restore(this);
+}
+
+static void
+midiconfig_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  int index = fts_get_int(at);
+  fts_symbol_t name = fts_get_symbol(at + 1);
+
+  midiconfig_set_output(this, index, name);
+
+  midiconfig_update_labels(this);
+  midiconfig_update_devices(this);
+  midiconfig_restore(this);
+}
+
+static void
+midiconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  midilabel_t *label = this->labels;
+  int i;
+
+  /* upload labels with inputs and outputs */
+  for(i=0; i<this->n_labels; i++) 
+    {
+      fts_atom_t args[4];
+      
+      fts_set_int(args, i);
+      fts_set_symbol(args + 1, label->name);
+      fts_set_symbol(args + 2, label->input_name);
+      fts_set_symbol(args + 3, label->output_name);
+      fts_client_send_message((fts_object_t *)this, fts_s_insert, 4, args);
+      
+      label = label->next;
+    }
+
+  midiconfig_update_labels(this);
+  midiconfig_update_devices(this);
+}
+
+static void
+midiconfig_load( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  fts_symbol_t file_name = fts_get_symbol(at);
+  fts_symbol_t project_dir = fts_project_get_dir();
+  fts_object_t *obj = NULL;
+  char path[MAXPATHLEN];
+
+  fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
+
+  obj = fts_binary_file_load(path, (fts_object_t *)fts_get_root_patcher(), 0, 0, 0);
+
+  if(obj != NULL && fts_object_get_metaclass(obj) == midiconfig_type) 
+    {
+      /* replace current config by loaded config */
+      midiconfig_set((midiconfig_t *)obj);
+
+      /* upload */
+    }
+  else
+    fts_log( "midiconfig load: cannot read MIDI configuration from file %s\n", file_name);
+}
+
+static void
+midiconfig_save( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  fts_symbol_t file_name = fts_get_symbol(at);
+  fts_symbol_t project_dir = fts_project_get_dir();
+  char path[MAXPATHLEN];
+  fts_bmax_file_t f;
+
+  fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
+
+  if (fts_bmax_file_open(&f, path, 0, 0, 0) >= 0)
+    {
+      midilabel_t *label = this->labels;
+      int i;
+
+      fts_bmax_code_new_object(&f, o, -1);
+      
+      while(label) 
+	{
+	  /* code insert message for each label */
+	  fts_bmax_code_push_symbol(&f, label->output_name);
+	  fts_bmax_code_push_symbol(&f, label->input_name);
+	  fts_bmax_code_push_symbol(&f, label->name);
+	  fts_bmax_code_obj_mess(&f, fts_SystemInlet, fts_s_restore, 3);
+	  fts_bmax_code_pop_args(&f, 3);
+
+	  label = label->next;	  
+	}
+
+      fts_bmax_code_return(&f);
+      fts_bmax_file_close(&f);
+    }
+  else
+    fts_log( "midiconfig save: cannot open file %s\n", file_name);
+}
+
+static void
+midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
+  midilabel_t *label = this->labels;
+
+  post("labels\n");
+  for(label = this->labels; label != NULL; label = label->next) 
+    post("  %s: '%s' '%s'\n", label->name, label->input_name, label->output_name);
+}
+
+static void
+midiconfig_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiconfig_t *this = (midiconfig_t *)o;
   fts_atom_t a;
+      
+  this->labels = NULL;
+  this->n_labels = 0;
 
-  /* check methods ??? */
-  midimanager = mm;
-
-  if(midierror == NULL)
-    midierror = (fts_midiport_t *)fts_object_create(midierror_type, 0, 0);
-
-  /* first search for default devices */
-  midimanager_set_default_devices(mm);
-
-  /* define global midimanager variable */
-  fts_set_object(&a, midimanager);
-  fts_variable_define(fts_get_root_patcher(), fts_s_midimanager);
-  fts_variable_restore(fts_get_root_patcher(), fts_s_midimanager, &a, (fts_object_t *)midimanager);
+  /* modify object description */
+  fts_set_symbol(&a, midiconfig_s_name);
+  fts_object_set_description(o, 1, &a);
 }
 
-fts_midimanager_t *
-fts_midimanager_get(void)
+static void
+midiconfig_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  return midimanager;
+  midiconfig_t *this = (midiconfig_t *)o;
+
+  midiconfig_erase_labels(this);
 }
 
-/***************************************************
-*
-*  midi fifo
-*
-*/
-void
-fts_midififo_init(fts_midififo_t *fifo, int size)
+static fts_status_t
+midiconfig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int bytes = sizeof(fts_midififo_entry_t) * size;
-  fts_midififo_entry_t *entries;
-  int i;
+  fts_class_init(cl, sizeof(midiconfig_t), 0, 0, 0);
 
-  fts_fifo_init(&fifo->data, fts_malloc(bytes), bytes);
-  entries = (fts_midififo_entry_t *)fts_fifo_get_buffer(&fifo->data);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiconfig_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiconfig_delete);
 
-  for(i=0; i<size; i++) {
-    fts_object_t *obj = fts_object_create(fts_midievent_type, 0, 0);
-    fts_object_refer(obj);
-    entries[i].event = (fts_midievent_t *)obj;
-  }
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, midiconfig_clear);
 
-  fifo->delta = 0.0;
-  fifo->size = size;
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_restore, midiconfig_restore_label);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_insert, midiconfig_insert_label);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_remove, midiconfig_remove_label);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_input, midiconfig_input);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_output, midiconfig_output);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, midiconfig_upload);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_load, midiconfig_load);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, midiconfig_save);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, midiconfig_print);
+
+  return fts_Success;
 }
 
-void
-fts_midififo_destroy(fts_midififo_t *fifo)
+/* temporary object for debugging */
+static void
+mm_redirect( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_midififo_entry_t *entries = (fts_midififo_entry_t *)fts_fifo_get_buffer(&fifo->data);
-  int i;
-
-  for(i=0; i<fifo->size; i++)
-    fts_object_release((fts_object_t *)entries[i].event);
-
-  fts_free((void *)fifo->data.buffer);
-}
-
-/* read next fifo entry into time base (returns pointer to atom of newly allocated entry) */
-void
-fts_midififo_poll(fts_midififo_t *fifo)
-{
-  if(fts_fifo_read_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) {
-    fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_read_pointer(&fifo->data);
-    double now = fts_get_time();
-    double delay;
-    fts_atom_t a;
-
-    /* set midievent argument */
-    fts_set_object(&a, entry->event);
-
-    /* time == 0.0 means: send now */
-    if(entry->time != 0.0) {
-      /* adjust delta time on very first fifo entry */
-      if(fifo->delta == 0.0)
-        fifo->delta = entry->time;
-
-      /* translate event time to delay */
-      delay = entry->time - fifo->delta;
-
-      /* adjust delta time */
-      if(delay < 0.0) {
-        delay = 0.0;
-        fifo->delta = entry->time;
-      }
-
-      /* schedule midiport input call */
-      fts_timebase_add_call(fts_get_timebase(), entry->port, fts_midiport_input, &a, delay);
-    } else
-      fts_midiport_input(entry->port, 0, 0, 1, &a);
-
-    fts_object_release(entry->event);
-
-    /* insert a new midievent into fifo and claim it */
-    entry->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
-    fts_object_refer(entry->event);
-
-    fts_fifo_incr_read(&fifo->data, sizeof(fts_midififo_entry_t));
-  }
-}
-
-fts_midievent_t *
-fts_midififo_get_event(fts_midififo_t *fifo)
-{
-  if(fts_fifo_write_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) {
-    fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
-    return entry->event;
-  } else
-    return NULL;
-}
-
-void
-fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time)
-{
-  fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
+  fts_midimanager_t *mm;
+      
+  /* redirect to MIDI config */
+  fts_send_message((fts_object_t *)midiconfig, fts_SystemInlet, s, ac, at);
   
-  /* set midport */
-  entry->port = port;
-  fts_object_refer(port);
+  /* redirect to MIDI managers */
+  for(mm = midimanagers; mm != NULL; mm = mm->next)
+    fts_send_message((fts_object_t *)mm, fts_SystemInlet, s, ac, at);
+}
 
-  /* set time */
-  entry->time = time;
+static fts_status_t
+mm_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_object_t), 1, 0, 0);
 
-  /* send entry */
-  fts_fifo_incr_write(&fifo->data, sizeof(fts_midififo_entry_t));
+  fts_method_define_varargs(cl, 0, fts_s_anything, mm_redirect);
+
+  return fts_Success;
 }
 
 /************************************************************
@@ -1882,23 +2168,45 @@ fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time)
 void
 fts_midi_config(void)
 {
+  fts_atom_t a;
+
   fts_s_midievent = fts_new_symbol("midievent");
   fts_midievent_type = fts_class_install(fts_s_midievent, midievent_instantiate);
 
-  fts_s_midiport = fts_new_symbol("midiport");
   midibus_type = fts_class_install(NULL, midibus_instantiate);
-  midierror_type = fts_class_install(NULL, midierror_instantiate);
+  midinull_type = fts_class_install(NULL, midinull_instantiate);
   
-  fts_s_midimanager = fts_new_symbol("midimanager");
-  fts_midimanager_s_internal_bus = fts_new_symbol("Internal Bus");
-  fts_midimanager_s_unconnected = fts_new_symbol("-");
-  fts_midimanager_s_get_default_devices = fts_new_symbol("get_default_devices");
-  fts_midimanager_s_append_device_names = fts_new_symbol("append_device_names");
+  midiconfig_s_name = fts_new_symbol("__midiconfig");
+  midiconfig_s_internal_bus = fts_new_symbol("Internal Bus");
+  midiconfig_s_unconnected = fts_new_symbol("-");
+  midiconfig_s_inputs = fts_new_symbol("inputs");
+  midiconfig_s_outputs = fts_new_symbol("outputs");  
+  fts_array_init(&midiconfig_inputs, 0, 0);
+  fts_array_init(&midiconfig_outputs, 0, 0);
+
+  /* midi manager interface messages */
+  fts_midimanager_s_get_default_input = fts_new_symbol("get_default_input");
+  fts_midimanager_s_get_default_output = fts_new_symbol("get_default_output");
+  fts_midimanager_s_append_input_names = fts_new_symbol("append_input_names");
+  fts_midimanager_s_append_output_names = fts_new_symbol("append_output_names");
   fts_midimanager_s_get_input = fts_new_symbol("get_input");
   fts_midimanager_s_get_output = fts_new_symbol("get_output");
-  fts_array_init(&midimanger_inputs, 0, 0);
-  fts_array_init(&midimanger_outputs, 0, 0);
 
-  fts_midimanager_s_inputs = fts_new_symbol("inputs");
-  fts_midimanager_s_outputs = fts_new_symbol("outputs");  
+  /* MIDI configuration class */
+  midiconfig_type = fts_class_install(midiconfig_s_name, midiconfig_instantiate);
+
+  /* create global NULL MIDI port */
+  midinull = (fts_midiport_t *)fts_object_create(midinull_type, 0, 0);
+  fts_object_refer((fts_object_t *)midinull);
+
+  /* create first default midi configuration */
+  midiconfig_set((midiconfig_t *)fts_object_create(midiconfig_type, 0, 0));
+  midiconfig_set_defaults();
+
+  /* define global midiconfig variable */
+  fts_set_object(&a, midiconfig);
+  fts_variable_define(fts_get_root_patcher(), midiconfig_s_name);
+  fts_variable_restore(fts_get_root_patcher(), midiconfig_s_name, &a, (fts_object_t *)midiconfig);
+
+  fts_class_install(fts_new_symbol("mm"), mm_instantiate);
 }

@@ -83,10 +83,13 @@ alsamidi_scan_devices(alsamidi_t *this, int stream, fts_array_t *array)
 	  device_symbol = fts_new_symbol_copy(device_name);
 	  hw_symbol = fts_new_symbol_copy(hw_name);
 
-	  /* enter device to hashtable */
+	  /* enter device to hashtable id not already done */
 	  fts_set_symbol(&k, device_symbol);
-	  fts_set_symbol(&a, hw_symbol);
-	  fts_hashtable_put(&this->devices, &k, &a);
+	  if(!fts_hashtable_get(&this->devices, &k, &a))
+	    {
+	      fts_set_symbol(&a, hw_symbol);
+	      fts_hashtable_put(&this->devices, &k, &a);
+	    }
 
 	  /* append name to array */
 	  fts_array_append_symbol(array, device_symbol);
@@ -105,11 +108,15 @@ alsamidi_scan_devices(alsamidi_t *this, int stream, fts_array_t *array)
 }
 
 static void
-alsamidi_update_devices(alsamidi_t *this)
+alsamidi_update_inputs(alsamidi_t *this)
 {
   if(fts_array_get_size(&this->inputs) == 0)
     alsamidi_scan_devices(this, SND_RAWMIDI_STREAM_INPUT, &this->inputs);
+}
 
+static void
+alsamidi_update_outputs(alsamidi_t *this)
+{
   if(fts_array_get_size(&this->outputs) == 0)
     alsamidi_scan_devices(this, SND_RAWMIDI_STREAM_OUTPUT, &this->outputs);
 }
@@ -148,53 +155,46 @@ alsamidi_get_midiport(alsamidi_t *this, fts_symbol_t name)
 }
 
 static void
-alsamidi_get_default_devices(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+alsamidi_get_default_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsamidi_t *this = (alsamidi_t *)o;
-  fts_midiport_t **input = (fts_midiport_t **)fts_get_pointer(at + 0);
-  fts_symbol_t *input_name = (fts_symbol_t *)fts_get_pointer(at + 1);
-  fts_midiport_t **output = (fts_midiport_t **)fts_get_pointer(at + 2);
-  fts_symbol_t *output_name = (fts_symbol_t *)fts_get_pointer(at + 3);
+  fts_symbol_t *name = (fts_symbol_t *)fts_get_pointer(at);
 
-  alsamidi_update_devices(this);
+  alsamidi_update_inputs(this);
   
   if(fts_array_get_size(&this->inputs) > 0)
-    {
-      fts_atom_t *a = fts_array_get_element(&this->inputs, 0);
-      fts_symbol_t name = fts_get_symbol(a);
-      fts_midiport_t *port = alsamidi_get_midiport(this, name);
-	      
-      if(port && fts_midiport_is_input(port))
-	{
-	  *input = port;
-	  *input_name = name;
-	}
-    }
-
-  if(fts_array_get_size(&this->outputs) > 0)
-    {
-      fts_atom_t *a = fts_array_get_element(&this->outputs, 0);
-      fts_symbol_t name = fts_get_symbol(a);
-      fts_midiport_t *port = alsamidi_get_midiport(this, name);
-	      
-      if(port && fts_midiport_is_output(port))
-	{
-	  *output = port;
-	  *output_name = name;
-	}
-    }
+    *name = fts_get_symbol(fts_array_get_element(&this->inputs, 0));
 }
 
 static void
-alsamidi_append_device_names( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+alsamidi_get_default_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsamidi_t *this = (alsamidi_t *)o;
-  fts_array_t *inputs = (fts_array_t *)fts_get_pointer(at + 0);
-  fts_array_t *outputs = (fts_array_t *)fts_get_pointer(at + 1);
+  fts_symbol_t *name = (fts_symbol_t *)fts_get_pointer(at);
 
-  alsamidi_update_devices(this);
+  alsamidi_update_outputs(this);
   
+  if(fts_array_get_size(&this->outputs) > 0)
+    *name = fts_get_symbol(fts_array_get_element(&this->outputs, 0));
+}
+
+static void
+alsamidi_append_inputs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  alsamidi_t *this = (alsamidi_t *)o;
+  fts_array_t *inputs = (fts_array_t *)fts_get_pointer(at);
+
+  alsamidi_update_inputs(this);
   fts_array_append(inputs, fts_array_get_size(&this->inputs), fts_array_get_atoms(&this->inputs));
+}
+
+static void
+alsamidi_append_outputs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  alsamidi_t *this = (alsamidi_t *)o;
+  fts_array_t *outputs = (fts_array_t *)fts_get_pointer(at);
+
+  alsamidi_update_outputs(this);
   fts_array_append(outputs, fts_array_get_size(&this->outputs), fts_array_get_atoms(&this->outputs));
 }
 
@@ -225,13 +225,14 @@ alsamidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-alsamidi_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+alsamidi_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsamidi_t *this = (alsamidi_t *)o;
   int i;
 
-  alsamidi_update_devices(this);
-
+  alsamidi_update_inputs(this);
+  alsamidi_update_outputs(this);
+  
   post("ALSA MIDI inputs:\n");
   for(i=0; i<fts_array_get_size(&this->inputs); i++)
     {
@@ -243,10 +244,10 @@ alsamidi_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  if(fts_is_object(&a))
 	    {
 	      alsarawmidiport_t *port = (alsarawmidiport_t *)fts_get_object(&a);
-	      post("  %s: active (%s)\n", fts_get_symbol(&k), port->hw_name);
+	      post("  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
 	    }
 	  else if(fts_is_symbol(&a))
-	    post("  %s: inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
+	    post("  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
 	}
     }
 
@@ -261,10 +262,10 @@ alsamidi_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  if(fts_is_object(&a))
 	    {
 	      alsarawmidiport_t *port = (alsarawmidiport_t *)fts_get_object(&a);
-	      post("  %s: active (%s)\n", fts_get_symbol(&k), port->hw_name);
+	      post("  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
 	    }
 	  else if(fts_is_symbol(&a))
-	    post("  %s: inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
+	    post("  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
 	}
     }
 }
@@ -273,7 +274,6 @@ static void
 alsamidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsamidi_t *this = (alsamidi_t *)o;
-  fts_timebase_entry_t **entries;
 
   fts_array_init(&this->inputs, 0, 0);
   fts_array_init(&this->outputs, 0, 0);
@@ -298,43 +298,24 @@ alsamidi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsamidi_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, alsamidi_delete);
 
-  /* FTS MIDI manager class initialization */
-  fts_midimanager_class_init(cl);
-
   /* FTS MIDI manager interface implementation */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_default_devices, alsamidi_get_default_devices);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_append_device_names, alsamidi_append_device_names);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_default_input, alsamidi_get_default_input);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_default_output, alsamidi_get_default_output);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_append_input_names, alsamidi_append_inputs);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_append_output_names, alsamidi_append_outputs);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_input, alsamidi_get_input);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_midimanager_s_get_output, alsamidi_get_output);
 
-  /* debug state print */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_state, alsamidi_state);
+  /* debug print */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, alsamidi_print);
 
   return fts_Success;
 }
 
-/* temporary object for debugging */
-static void
-mm_redirect( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_send_message((fts_object_t *)fts_midimanager_get(), fts_SystemInlet, s, ac, at);
-}
-
-static fts_status_t
-mm_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(fts_object_t), 1, 0, 0);
-  fts_method_define_varargs(cl, 0, fts_s_anything, mm_redirect);
-  return fts_Success;
-}
-  
 void 
 alsamidi_config( void)
 {
   fts_metaclass_t *mc = fts_class_install(NULL, alsamidi_instantiate);
-  fts_midimanager_t *mm = (fts_midimanager_t *)fts_object_create(mc, 0, 0);
 
-  fts_class_install(fts_new_symbol("mm"), mm_instantiate);
-  
-  fts_midimanager_set(mm);
+  fts_midiconfig_add_manager((fts_midimanager_t *)fts_object_create(mc, 0, 0));
 }

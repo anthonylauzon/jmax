@@ -58,7 +58,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   name = fts_get_symbol(at);
 
   if(ac > 0 && fts_is_symbol(at)) {
-    this->port = fts_midimanager_get_input(name);
+    this->port = fts_midiconfig_get_input(name);
 
     if(this->port == NULL) {
       fts_object_set_error(o, "Cannot find MIDI input %s", name);
@@ -67,13 +67,13 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   }
 
   if(this->port == NULL)
-    this->port = fts_midimanager_get_input(fts_s_default);
+    this->port = fts_midiconfig_get_input(fts_s_default);
   
   /* add call back to midi port or set error */
   if(this->port != NULL)
     {
       fts_midiport_add_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o, sysexin_callback);
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
   else
     fts_object_set_error(o, "Cannot find default MIDI output");
@@ -133,7 +133,7 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   name = fts_get_symbol(at);
 
   if(ac > 0 && fts_is_symbol(at)) {
-    this->port = fts_midimanager_get_output(name);
+    this->port = fts_midiconfig_get_output(name);
 
     if(this->port == NULL) {
       fts_object_set_error(o, "Cannot find MIDI output %s", name);
@@ -142,10 +142,10 @@ sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }
 
   if(this->port == NULL)
-    this->port = fts_midimanager_get_output(fts_s_default);
+    this->port = fts_midiconfig_get_output(fts_s_default);
 
   if(this->port != NULL)
-    fts_midimanger_register(o);
+    fts_midiconfig_add_listener(o);
   else
     fts_object_set_error(o, "Cannot find default MIDI output");
 }

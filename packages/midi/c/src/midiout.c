@@ -35,6 +35,7 @@ typedef struct _midiout_
 } midiout_t;
 
 static fts_symbol_t sym_omni = 0;
+static fts_midievent_t *midievent_general_midi = 0;
 
 static void
 midiout_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -74,6 +75,27 @@ midiout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
+midiout_panic(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midiout_t *this = (midiout_t *)o;
+  int i;
+  
+  for(i=0; i<n_midi_channels; i++)
+    {
+      fts_midievent_t *event = fts_midievent_control_change_new(i, 120, 0);
+      fts_midiport_output(this->port, event, 0.0);
+    }
+}
+
+static void
+midiout_general_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midiout_t *this = (midiout_t *)o;
+
+  fts_midiport_output(this->port, midievent_general_midi, 0.0);  
+}
+
+static void
 noteout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiout_t *this = (midiout_t *)o;
@@ -104,6 +126,38 @@ noteout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     case 0:
       break;
     }
+}
+
+static void
+noteout_all_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midiout_t *this = (midiout_t *)o;
+  int channel = 0;
+
+  if(ac > 0 && fts_is_number(at))
+    channel = fts_get_number_int(at);
+
+  if(channel > 16)
+    channel = 16;
+
+  if(channel <= 0)
+    {
+      int i;
+
+      for(i=0; i<n_midi_channels; i++)
+	{
+	  fts_midievent_t *event = fts_midievent_control_change_new(i, 123, 0);
+	  fts_midiport_output(this->port, event, 0.0);
+	}
+    }
+  else
+    {
+      fts_midievent_t *event = fts_midievent_control_change_new(channel - 1, 123, 0);
+
+      midiout_set_channel(o, 0, 0, 1, at);
+
+      fts_midiport_output(this->port, event, 0.0);
+    }    
 }
 
 static void
@@ -292,6 +346,43 @@ xbendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
+static void
+bendout_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiout_t *this = (midiout_t *)o;
+  fts_midievent_t *event;
+  int range = 2;
+
+  switch (ac)
+    {
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_channel(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	{
+	  range = fts_get_number_int(at);
+
+	  if(range < 0)
+	    range = 0;
+	  else if(range > 24)
+	    range = 24;
+	}
+    case 0:
+      break;
+    }  
+
+  event = fts_midievent_control_change_new(this->channel, 100, 0);
+  fts_midiport_output(this->port, event, 0.0);
+
+  event = fts_midievent_control_change_new(this->channel, 101, 0);
+  fts_midiport_output(this->port, event, 0.0);
+
+  event = fts_midievent_control_change_new(this->channel, 6, range);
+  fts_midiport_output(this->port, event, 0.0);  
+}
+
 /************************************************************
  *
  *  class
@@ -314,7 +405,7 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     if(fts_is_symbol(at)) {
       fts_symbol_t name = fts_get_symbol(at);
 
-      this->port = fts_midimanager_get_output(name);
+      this->port = fts_midiconfig_get_output(name);
 
       /* skip port argument */
       ac--;
@@ -345,10 +436,10 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   /* if there is still no port try default */
   if(this->port == NULL)
-    this->port = fts_midimanager_get_output(fts_s_default);
+    this->port = fts_midiconfig_get_output(fts_s_default);
 
   if(this->port != NULL)
-    fts_midimanger_register(o);
+    fts_midiconfig_add_listener(o);
   else
     fts_object_set_error(o, "Cannot find default MIDI output");
 }
@@ -359,6 +450,10 @@ midiout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(midiout_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("panic"), midiout_panic);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("GM"), midiout_general_midi);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("gm"), midiout_general_midi);
 
   fts_method_define_varargs(cl, 0, fts_s_midievent, midiout_send);
 
@@ -371,6 +466,8 @@ noteout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(midiout_t), 3, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("off"), noteout_all_off);
 
   fts_method_define_varargs(cl, 0, fts_s_int, noteout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, noteout_send);
@@ -467,6 +564,8 @@ bendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
 
+  fts_method_define_varargs(cl, 0, fts_new_symbol("range"), bendout_range);
+
   fts_method_define_varargs(cl, 0, fts_s_int, bendout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, bendout_send);
   fts_method_define_varargs(cl, 0, fts_s_list, bendout_send);
@@ -484,6 +583,8 @@ xbendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
 
+  fts_method_define_varargs(cl, 0, fts_new_symbol("range"), bendout_range);
+
   fts_method_define_varargs(cl, 0, fts_s_int, xbendout_send);
   fts_method_define_varargs(cl, 0, fts_s_float, xbendout_send);
   fts_method_define_varargs(cl, 0, fts_s_list, xbendout_send);
@@ -498,6 +599,15 @@ void
 midiout_config(void)
 {
   sym_omni = fts_new_symbol("omni");
+
+  midievent_general_midi = fts_midievent_system_exclusive_new(0, 0);
+  fts_midievent_system_exclusive_append(midievent_general_midi, 126);
+  fts_midievent_system_exclusive_append(midievent_general_midi, 0);
+  fts_midievent_system_exclusive_append(midievent_general_midi, 9);
+  fts_midievent_system_exclusive_append(midievent_general_midi, 1);
+
+  /* claim forever */
+  fts_object_refer(midievent_general_midi);
 
   fts_class_install(fts_new_symbol("midiout"), midiout_instantiate);
   fts_class_install(fts_new_symbol("noteout"), noteout_instantiate);

@@ -453,17 +453,25 @@ void fts_log( char *format, ...)
   FILE *log;
 
   if (log_file_name == NULL)
-    log_init();
+    {
+      log_init();
+      log_time = fts_systime();
+    }
 
   log = fopen( log_file_name, "a");
   if (log == NULL)
     return;
 
-  fprintf( log, "[%u]", (unsigned int) (fts_systime() - log_time));
+  if(format[0] == '\n' && format[1] == '\0')
+    fprintf( log, "\n");
+  else
+    {
+      fprintf( log, "[%u]", (unsigned int) (fts_systime() - log_time));
 
-  va_start( ap, format); 
-  vfprintf( log, format, ap);
-  va_end( ap);
+      va_start( ap, format); 
+      vfprintf( log, format, ap);
+      va_end( ap);
+    }
 
   fflush( log);
   fclose( log);
@@ -475,7 +483,10 @@ void fts_log_atoms( int ac, const fts_atom_t *at)
   int n;
 
   if (log_file_name == NULL)
-    log_init();
+    {
+      log_init();
+      log_time = fts_systime();
+    }
 
   log = fopen( log_file_name, "a");
   if (log == NULL)
@@ -488,7 +499,6 @@ void fts_log_atoms( int ac, const fts_atom_t *at)
   fflush(log);
   fclose( log);
 }
-
 
 /***********************************************************************
  *

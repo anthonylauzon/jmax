@@ -170,7 +170,7 @@ midiin_get_port(fts_object_t *o, int ac, const fts_atom_t *at)
   if(ac > 0 && fts_is_symbol(at)) {
     fts_symbol_t name = fts_get_symbol(at);
 
-    port = fts_midimanager_get_input(name);
+    port = fts_midiconfig_get_input(name);
 
     if(port == NULL) {
       fts_object_set_error(o, "Cannot find MIDI input %s", name);
@@ -180,7 +180,7 @@ midiin_get_port(fts_object_t *o, int ac, const fts_atom_t *at)
 
   /* if there is still no port try default */
   if(port == NULL)
-    port = fts_midimanager_get_input(fts_s_default);
+    port = fts_midiconfig_get_input(fts_s_default);
 
   if(port == NULL)
     fts_object_set_error(o, "Cannot find default MIDI output");
@@ -282,7 +282,7 @@ midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->number = midi_note_any;
 
       fts_midiport_add_listener(this->port, midi_type_any, midi_channel_any, midi_note_any, o, midiin_callback);
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 
@@ -307,7 +307,7 @@ notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, note_channel_number_callback); 
 
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 
@@ -332,7 +332,7 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_channel_number_callback); 
 
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 
@@ -356,7 +356,7 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_channel_number_callback); 
 
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 
@@ -378,7 +378,7 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_channel_callback); 
 
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 
@@ -400,7 +400,7 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_channel_callback); 
 
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 
@@ -422,7 +422,7 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, bend_channel_callback); 
 
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 
@@ -444,7 +444,7 @@ xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       else
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, xbend_channel_callback); 
 
-      fts_midimanger_register(o);
+      fts_midiconfig_add_listener(o);
     }
 }
 

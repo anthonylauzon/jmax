@@ -294,6 +294,108 @@ FTS_API fts_midievent_t *fts_midievent_real_time_new(enum midi_real_time_event t
 FTS_API fts_metaclass_t *fts_midievent_type;
 FTS_API fts_symbol_t fts_s_midievent;
 
+/*****************************************************
+ *
+ *  MIDI fifo
+ *
+ */
+
+/**
+ * Simple fifo of time tagged MIDI events with their target port.
+ * At the initialization the fifo is filled with (invalid) MIDI events.
+ *
+ * With the function fts_midififo_get_event() one gets the next event from the fifo
+ * which can be initiatized in the following. The write function fts_midififo_write() 
+ * completes the new fifo event with a time tag and target port and increments the 
+ * fifo write pointer.
+ * Reading an event from the fifo using fts_midififo_poll() directly calls the
+ * target MIDI port's input function or schedules the call to the FTS timebase 
+ * (depending on the time tag). The time tag of the event has to be coherent for the
+ * writing thread (or function) and is automatically adjusted to the FTS time base.
+ *
+ * @defgroup midififo MIDI fifo
+ */
+
+typedef struct fts_midififo_entry
+{
+  double time;
+  fts_midievent_t *event;
+  fts_object_t *port;
+} fts_midififo_entry_t;
+
+typedef struct fts_midififo
+{
+  fts_fifo_t data;
+  int size;
+  double delta;
+} fts_midififo_t;
+
+/** 
+ * @name MIDI fifo
+ */
+/*@{*/
+
+FTS_API void fts_midififo_get_events(fts_midififo_t *fifo);
+#define fts_midififo_get_events(f) ((fts_midififo_entry_t **)((f)->data.buffer))
+
+/**
+ * Initialize (and allocate) a MIDI fifo structure.
+ *
+ * @fn void fts_midififo_init(fts_midififo_t *fifo, int size)
+ * @param fifo the MIDI fifo
+ * @size size in number of events
+ *
+ * @ingroup midififo
+ */
+FTS_API void fts_midififo_init(fts_midififo_t *fifo, int size);
+
+/**
+ * Reset (and free) a MIDI fifo structure.
+ *
+ * @fn void void fts_midififo_reset(fts_midififo_t *fifo)
+ * @param fifo the MIDI fifo
+ * @warning This function doesn't free the MIDI fifo structure itself.
+ *
+ * @ingroup midififo
+ */
+FTS_API void fts_midififo_reset(fts_midififo_t *fifo);
+
+/**
+ * Poll all qued events of the MIDI fifo (calls input function of target MIDI port).
+ *
+ * @fn void fts_midififo_poll(fts_midififo_t *fifo)
+ * @param fifo the MIDI fifo
+ *
+ * @ingroup midififo
+ */
+FTS_API void fts_midififo_poll(fts_midififo_t *fifo);
+
+/**
+ * Get the next MIDI event ready for writing.
+ *
+ * @fn fts_midievent_t *fts_midififo_get_event(fts_midififo_t *fifo)
+ * @param fifo the MIDI fifo
+ * @return next available MIDI event to be initialized or NULL if fifo is full
+ *
+ * @ingroup midififo
+ */
+FTS_API fts_midievent_t *fts_midififo_get_event(fts_midififo_t *fifo);
+
+/**
+ * Finalize the MIDI event previously returned by fts_midififo_get_event()
+ * and increment the fifo's write pointer.
+ *
+ * @fn void fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time)
+ * @param fifo the MIDI fifo
+ * @param port target MIDI port of the MIDI event
+ * @param time time tag in msec regarding the time of the writing thread
+ *
+ * @ingroup midififo
+ */
+FTS_API void fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time);
+
+/*@}*/
+
 /****************************************************
  *
  *  MIDI ports
@@ -493,7 +595,8 @@ FTS_API void fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int
 /**
  * Check whether an FTS object implements the MIDI port abstraction
  *
- * An object who wants to listen to or output via a MIDI port should check if the object it referes to implements the MIDI port abstraction
+ * An object who wants to listen to or output via a MIDI port should check 
+ * if the object it referes to implements the MIDI port abstraction
  *
  * @fn int fts_object_is_midiport(fts_object_t *obj)
  * @param obj the object to be checked
@@ -663,59 +766,28 @@ FTS_API fts_midievent_t *fts_midiparser_byte(fts_midiparser_t *parser, unsigned 
  *
  */
 
-typedef struct _midilabel midilabel_t;
-
 typedef struct fts_midimanager
 {
   fts_object_t o;
-  midilabel_t *labels;
-  int n_labels;
+  struct fts_midimanager *next;
 } fts_midimanager_t;
 
 /* MIDI manager messages */
 FTS_API fts_symbol_t fts_s_midimanager;
-FTS_API fts_symbol_t fts_midimanager_s_get_default_devices;
-FTS_API fts_symbol_t fts_midimanager_s_append_device_names;
+FTS_API fts_symbol_t fts_midimanager_s_get_default_input;
+FTS_API fts_symbol_t fts_midimanager_s_get_default_output;
+FTS_API fts_symbol_t fts_midimanager_s_append_input_names;
+FTS_API fts_symbol_t fts_midimanager_s_append_output_names;
 FTS_API fts_symbol_t fts_midimanager_s_get_input;
 FTS_API fts_symbol_t fts_midimanager_s_get_output;
 
 /* MIDI objects API */
-FTS_API fts_midiport_t *fts_midimanager_get_input(fts_symbol_t name);
-FTS_API fts_midiport_t *fts_midimanager_get_output(fts_symbol_t name);
-FTS_API void fts_midimanger_register(fts_object_t *obj);
+FTS_API fts_midiport_t *fts_midiconfig_get_input(fts_symbol_t name);
+FTS_API fts_midiport_t *fts_midiconfig_get_output(fts_symbol_t name);
+FTS_API void fts_midiconfig_add_listener(fts_object_t *obj);
 
 /* MIDI manager API */
-FTS_API void fts_midimanager_update(fts_midimanager_t *mm);
-FTS_API void fts_midimanager_class_init(fts_class_t *class);
-FTS_API void fts_midimanager_set(fts_midimanager_t *mm);
-FTS_API fts_midimanager_t *fts_midimanager_get(void);
+FTS_API void fts_midiconfig_update(void);
+FTS_API void fts_midiconfig_add_manager(fts_midimanager_t *mm);
 
-/*****************************************************
- *
- *  MIDI fifo
- *
- */
-
-typedef struct fts_midififo_entry
-{
-  double time;
-  fts_midievent_t *event;
-  fts_object_t *port;
-} fts_midififo_entry_t;
-
-typedef struct fts_midififo
-{
-  fts_fifo_t data;
-  int size;
-  double delta;
-} fts_midififo_t;
-
-#define fts_midififo_get_events(f) ((fts_midififo_entry_t **)((f)->data.buffer))
-
-FTS_API void fts_midififo_init(fts_midififo_t *fifo, int size);
-FTS_API void fts_midififo_destroy(fts_midififo_t *fifo);
-FTS_API void fts_midififo_poll(fts_midififo_t *fifo);
-FTS_API fts_midievent_t *fts_midififo_get_event(fts_midififo_t *fifo);
-FTS_API void fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time);
-
-
+FTS_API fts_object_t *fts_midiconfig_get(void);

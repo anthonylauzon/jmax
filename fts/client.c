@@ -22,8 +22,8 @@
 
 #define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
 /* Define this if you want logs of symbol cache hit */
-#define CACHE_REPORT
-#define CLIENT_LOG
+/*#define CACHE_REPORT*/
+/*#define CLIENT_LOG*/
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
@@ -1007,20 +1007,22 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_send_message( project, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
-static void client_get_midi_manager( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_get_midiconfig( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a[1];
-  fts_object_t *midimanager = (fts_object_t *)fts_midimanager_get();
+  fts_object_t *config = fts_midiconfig_get();
 
-  if( !midimanager) return;
+  if(config != NULL) 
+    {
+      fts_atom_t a;
 
-  if (!fts_object_has_id( midimanager))
-    client_register_object( (client_t *)o, midimanager, FTS_NO_ID);
-
-  fts_set_int(a, fts_get_object_id( midimanager));
-  fts_client_send_message(o, s_midi_manager, 1, a);
-  
-  fts_send_message( midimanager, fts_SystemInlet, fts_s_upload, 0, 0);
+      if (!fts_object_has_id(config))
+	client_register_object((client_t *)o, config, FTS_NO_ID);
+      
+      fts_set_int(&a, fts_get_object_id(config));
+      fts_client_send_message(o, s_midi_manager, 1, &a);
+      
+      fts_send_message(config, fts_SystemInlet, fts_s_upload, 0, 0);
+    }
 }
 
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1055,7 +1057,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_project"), client_get_project);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_midi_manager"), client_get_midi_manager);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_midi_manager"), client_get_midiconfig);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
