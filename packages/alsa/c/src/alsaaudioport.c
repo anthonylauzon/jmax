@@ -47,6 +47,10 @@
 #define DEFAULT_SAMPLING_RATE (44100.)
 #define DEFAULT_FIFO_SIZE 2048
 
+/* Define WANT_XRUN_LOG to put xrun message in fts log file */
+#undef WANT_XRUN_LOG 
+/* #define WANT_XRUN_LOG 1 */
+
 /* ---------------------------------------------------------------------- */
 /* Structure used for both capture and playback                           */
 /* ---------------------------------------------------------------------- */
@@ -642,16 +646,18 @@ static int xrun( alsaaudioport_t *port, snd_pcm_t *handle)
     fts_log("[alsaaudioport] snd_pcm_status port %p, error:%d  (%s)\n", port, err, snd_strerror(err));
     return err;
   }
+#ifdef WANT_XRUN_LOG
   if ( snd_pcm_status_get_state( status) == SND_PCM_STATE_XRUN)
   {
     struct timeval now, diff, tstamp;
     gettimeofday(&now, 0);
     snd_pcm_status_get_trigger_tstamp(status, &tstamp);
     timersub(&now, &tstamp, &diff);
-    fts_log("[alsaaudioport] xrun of at least %.3f msecs\n", 
+    fts_log("[alsaaudioport] xrun of at least %.3f msecs\n",
 	    diff.tv_sec * 1000 + diff.tv_usec / 1000.0);
     port->xrun = 1;
   }
+#endif /* WANT_XRUN_LOG */
 
   if (( err = snd_pcm_prepare( handle)) < 0)
   {
