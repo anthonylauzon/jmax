@@ -250,6 +250,14 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     return aObject;
   }
 
+  public Font getSketchFont() {
+    return sketchFont;
+  }
+
+  public int getSketchFontSize() {
+    return sketchFontSize;
+  }
+
   void ChangeFont(Font theFont) {
     try {
       FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(theFont);

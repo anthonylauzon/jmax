@@ -209,6 +209,7 @@ public class MaxApplication extends Object {
     // create the new SketchWindow based on the Document created....
 
     itsSketchWindow = new ErmesSketchWindow(false, null, false);
+    itsSketchWindow.Init();
     itsWindow = itsSketchWindow;
 
     //itsSketchWindow.addKeyListener(itsSketchWindow);
@@ -231,8 +232,8 @@ public class MaxApplication extends Object {
     itsSketchWindow.inAnApplet = false;
     itsSketchWindow.setTitle(itsSketchWindow.itsDocument.GetTitle());
     aPatcherDoc.SetWindow(itsSketchWindow);
-    CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(8);
-    aEditMenuItem.setState(doAutorouting);
+    //CheckboxMenuItem aEditMenuItem = (CheckboxMenuItem)itsSketchWindow.itsEditMenu.getItem(8);
+    //aEditMenuItem.setState(doAutorouting);
 
     /*#if(itsProjectWindow.itsProject.GetItems().size()==0)
       itsSketchWindow.getMenuBar().getMenu(2).getItem(2).setEnabled(false);
@@ -395,6 +396,7 @@ public class MaxApplication extends Object {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow, false);
+    itsSketchWindow.Init();
     theFtsPatcher.open();
     itsSketchWindow.repaint();
     itsWindow = itsSketchWindow;
@@ -418,6 +420,7 @@ public class MaxApplication extends Object {
     aPatcherDoc.alreadySaved = true;
     boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
     aSketchWindow = new ErmesSketchWindow(true, itsSketchWindow, false);
+    aSketchWindow.Init();
     aSketchWindow.itsSketchPad.doAutorouting = temp;
     theFtsPatcher.open();
     //aSketchWindow.repaint();
@@ -445,6 +448,7 @@ public class MaxApplication extends Object {
     case NEW_COMMAND:
 
       itsSketchWindow = new ErmesSketchWindow(false, null, false);
+      itsSketchWindow.Init();
       itsWindow = itsSketchWindow;
 
       itsSketchWindowList.addElement(itsSketchWindow);
@@ -467,6 +471,7 @@ public class MaxApplication extends Object {
     case NEW_ABSTRACTION_COMMAND://for test purposes only!!!!!!!
 
       itsSketchWindow = new ErmesSketchWindow(false, null, true);
+      itsSketchWindow.Init();
       itsWindow = itsSketchWindow;
 
       itsSketchWindowList.addElement(itsSketchWindow);
@@ -805,7 +810,7 @@ public class MaxApplication extends Object {
     System.setOut(itsConsole.getPrintStream());
 
     itsConsoleWindow = new ConsoleWindow(itsConsole, "jMax Console");
-    itsConsoleWindow.Init(/*itsProjectWindow.itsProject*/);
+    itsConsoleWindow.Init();
     itsConsoleWindow.setLocation(0,0);
     itsConsoleWindow.pack();
     itsConsoleWindow.setVisible(true);

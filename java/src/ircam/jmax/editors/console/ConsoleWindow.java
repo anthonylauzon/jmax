@@ -44,7 +44,7 @@ public class ConsoleWindow extends MaxEditor {
     GetCloseMenu().setEnabled(false);
     GetSaveMenu().setEnabled(false);
     GetSaveAsMenu().setEnabled(false);
-    GetPrintMenu().setEnabled(false);
+    GetPrintMenu().setEnabled(true);
     GetCutMenu().setEnabled(false);
     GetCopyMenu().setEnabled(false);
     GetPasteMenu().setEnabled(false);
@@ -54,6 +54,19 @@ public class ConsoleWindow extends MaxEditor {
   //redefini parce-que la console ne doit pas se fermer sans quitter
   public boolean Close(){
     return false;
+  }
+
+  public void Print(){
+    PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Console", MaxApplication.jmaxProperties);
+    if(aPrintjob != null){
+      Graphics aPrintGraphics = aPrintjob.getGraphics();
+      if(aPrintGraphics != null){
+	//aPrintGraphics.setClip(0, 0, 400, 400);
+	printAll(aPrintGraphics);
+	aPrintGraphics.dispose();
+      }
+      aPrintjob.end();
+    }
   }
 
   public boolean CustomMenuActionPerformed(MenuItem theMenuItem, String theString){

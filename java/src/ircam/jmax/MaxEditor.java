@@ -36,7 +36,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     super("");
   }
   
-  public final void Init(/*Project theProject*/){
+  public final void Init(){
     //itsProject = theProject;
     itsWindowMenuList = new Vector();
     
@@ -48,12 +48,14 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     mb.add(itsFileMenu);
     mb.add(itsEditMenu);
     //mb.add(itsProjectMenu);
-    mb.add(itsWindowsMenu);
+    //mb.add(itsWindowsMenu);
 
     setMenuBar(mb);
     
     addKeyListener(this);
     SetupMenu();
+
+    mb.add(itsWindowsMenu);
   }
 
   private Menu CreateNewFileMenu(){
@@ -375,12 +377,12 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this, "Save As ", GetDocument().GetFile()));
       GetDocument().Save();
     }
-    else if (theString.equals("Close Ctrl+W")) {
+    else if (theString.equals("Close   Ctrl+W")) {
       // MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
       Close();
     }
     else if (theString.equals("Print... Ctrl+P")) {
-      //MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);
+      Print();
     }
     else if (theString.equals("Quit    Ctrl+Q")) { 
       MaxApplication.Quit();
@@ -399,6 +401,9 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     return true;
   }
   
+  public void Print(){}
+
+
   public boolean Close(){
     if(!GetDocument().GetSaveFlag()){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
@@ -579,7 +584,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       if(placeHolder instanceof MaxDocument){
 	if(placeHolder instanceof MaxEditor){
 	  MaxEditor aEditor = (MaxEditor) placeHolder;
-	  aEditor.Init(/*itsProject*/);
+	  //aEditor.Init(/*itsProject*/);
 	}
 	
 	aDocument = (MaxDocument) placeHolder;
@@ -649,7 +654,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 	else*/ 
       if(aInt == 78) New();//n
       else if(aInt == 79) Open();//o
-      else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
+      else if(aInt == 80) Print();//p
       else if(aInt == 81) MaxApplication.Quit(); //q
       else if(aInt == 83) GetDocument().Save();//s
       else if(aInt == 87) Close();//w 
@@ -744,9 +749,16 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     return aMenuItem;
   }
 
-  public CheckboxMenuItem AddCheckboxMenuItem(Menu theMenu, String theName){
+  public Menu AddSubMenu(Menu theMenu, String theSubMenuName){
+    Menu aSubMenu =new Menu(theSubMenuName); 
+    theMenu.add(aSubMenu);
+    return aSubMenu;
+  }
+
+
+  public CheckboxMenuItem AddCheckboxMenuItem(Menu theMenu, String theName, boolean state){
     CheckboxMenuItem aMenuItem;
-    theMenu.add(aMenuItem = new CheckboxMenuItem(theName));
+    theMenu.add(aMenuItem = new CheckboxMenuItem(theName, state));
     aMenuItem.addActionListener(this);
     return aMenuItem;
   }
