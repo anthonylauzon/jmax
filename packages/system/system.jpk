@@ -33,8 +33,8 @@ global jmaxArch jmaxMode
 ucs load module system $dir/c/lib/$jmaxArch/$jmaxMode/libsystem.so
 
 #help
-helpPatch var $dir/help/var.help.jmax
-helpPatch const $dir/help/const.help.jmax
+sourceFile $dir/help/system.help.index.tcl
+helpSummary "System" $dir/help/system.summary.jmax
 
-# load silently
+#load silently
 #post "package: system"

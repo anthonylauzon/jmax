@@ -29,4 +29,7 @@ dsp1.c \
 system.c \
 ucsobj.c \
 const.c \
-argument.c
+argument.c \
+print.c \
+blip.c \
+

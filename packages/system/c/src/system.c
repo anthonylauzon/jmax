@@ -33,6 +33,9 @@ extern void arch_config(void);
 extern void const_config(void);
 extern void argument_init(void);
 
+extern void print_config(void);
+extern void blip_config(void);
+
 static void
 system_module_init(void)
 {
@@ -42,6 +45,9 @@ system_module_init(void)
 
   const_config();
   argument_init();
+
+  print_config();
+  blip_config();
 }
 
 fts_module_t system_module = {"system", "Basic System Objects", system_module_init};
