@@ -11,6 +11,7 @@
 //  for DISCLAIMER OF WARRANTY.
 //  
 
+
 package ircam.jmax.utils;
 
 /**
@@ -22,3 +23,4 @@ package ircam.jmax.utils;
 public interface OscillSource {
   abstract public int getValue();
 }
+

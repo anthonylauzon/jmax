@@ -14,6 +14,7 @@ SOURCES := \
            $(INCLUDE_PATH)/ExtensionFilter.java \
            $(INCLUDE_PATH)/TextWindow.java    \
 	   $(INCLUDE_PATH)/IndentedPrintWriter.java \
+	   $(INCLUDE_PATH)/KeyConsumer.java \
 	   $(INCLUDE_PATH)/Platform.java \
 	   $(INCLUDE_PATH)/List.java \
 	   $(INCLUDE_PATH)/ListObject.java \
