@@ -1,3 +1,26 @@
+2004-02-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* applied patch send by Lorenz Schori
+
+	* packages/alsa/c/src/alsaseqmidiport.c (alsaseqmidiport_output): added midi song position pointer and midi song selection support.
+
+	* packages/alsa/c/src/alsarawmidiport.c (alsarawmidiport_output): added midi song position pointer and midi song selection support.
+
+	* packages/macosx/c/src/macosxmidiport.c (macosxmidiport_output): added midi song position pointer and midi song selection support.
+
+	* packages/midi/c/src/midiparse.c (midiunparse_input): added midi song poistion pointer and midi song selection support.
+
+	* fts/midievent.c: 
+	(fts_midievent_song_position_pointer_message_init, fts_midievent_song_position_pointer_message_new, fts_midievent_song_select_message_init, fts_midievent_song_select_message_new): added support for midi song position pointer and midi song selection.
+	(midievent_copy, midievent_set, midievent_get_tuple, midievent_dump_state ,midievent_post, midievent_instantiate): modified to add support for midi song position pointer and midi song selection.
+	(_midievent_set_first, _midievent_get_first, _midievent_set_second, _midievent_get_second, _midievent_get_status): modifed to add support for  midi song position pointer and midi song selection.
+	(fts_midiparser_byte): modified
+	(fts_kernel_midievent_init): modified 
+
+	* include/fts/midievent.h: apply patch send by Lorenz Schori
+	(enum midi_type):
+	(fts_midievent_song_position_pointer_get, fts_midievent_song_position_pointer_set, fts_midievent_song_position_pointer_get_first, fts_midievent_song_position_pointer_set_first, fts_midievent_song_position_pointer_get_second, fts_midievent_song_position_pointer_set_second): added prototype for midi song position pointer and mid song selection support
+
 2004-02-20  Alexandre Pages  <Alexandre.Pages@ircam.fr>
 
      * fts/win32.c : added version conflict warning under win32 (comparison registry vs current)
