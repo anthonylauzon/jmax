@@ -273,7 +273,7 @@ seqmidi_set_note_off(noteevt_t *note, double time)
 {
   double duration = time - event_get_time((event_t *)note);
 
-  noteevt_set_duration(note, duration);
+  noteevt_set_duration(note,  duration);
 }
 
 static int
@@ -281,7 +281,7 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
   eventtrk_t *track = data->note_track;
-  double time = fts_midifile_get_current_time_in_seconds(file);
+  double time = 1000.0 * fts_midifile_get_current_time_in_seconds(file);
 
   if(!track)
     {
@@ -334,7 +334,7 @@ static int
 seqmidi_read_note_off(fts_midifile_t *file, int chan, int pitch, int vel)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
-  double time = fts_midifile_get_current_time_in_seconds(file);
+  double time = 1000.0 * fts_midifile_get_current_time_in_seconds(file);
 
   if(data->note_is_on[chan][pitch] != 0)
     {
@@ -350,7 +350,7 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
   eventtrk_t *track = data->controller_tracks[ctrl_num];
-  double time = fts_midifile_get_current_time_in_seconds(file);
+  double time = 1000.0 * fts_midifile_get_current_time_in_seconds(file);
   fts_object_t *intevt;
   fts_atom_t a[3];
   
@@ -390,7 +390,7 @@ static int
 seqmidi_read_track_end(fts_midifile_t *file)
 {
   seqmidi_data_t *data = (seqmidi_data_t *)fts_midifile_get_user_data(file);
-  double time = fts_midifile_get_current_time_in_seconds(file);
+  double time = 1000.0 * fts_midifile_get_current_time_in_seconds(file);
   int i, j;
   
   /* shut down all pending note ons */

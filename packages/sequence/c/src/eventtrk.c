@@ -302,7 +302,7 @@ eventtrk_event_new_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
   eventtrk_add_event(this, time, (event_t *)event);
 
   /* create event at client (short cut: could also send upload message to event object) */
-  fts_client_upload(event, event_symbol, ac, at);  
+  /*fts_client_upload(event, event_symbol, ac, at);*/  
 }
 
 /* delete event by client request */
@@ -358,7 +358,7 @@ eventtrk_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       
       event = event_get_next(event);
     }
-  
+ 
   if(n > 0)
     fts_client_send_message((fts_object_t *)this, sym_addEvents, n, a);    
 }
