@@ -1,8 +1,12 @@
-dnl $Id: configure.in,v 1.90 2002/09/06 08:42:05 dechelle Exp $
+dnl $Id: configure.in,v 1.91 2002/09/09 15:01:05 tisseran Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.91  2002/09/09 15:01:05  tisseran
+dnl Try to use pkg-config if --with-jack-cflags or --with-jack-ldflags are not used
+dnl Add test on jack/jack.h and libjack if jack support is wanted
+dnl
 dnl Revision 1.90  2002/09/06 08:42:05  dechelle
 dnl Changed protocol floating point values to double.
 dnl Changed the Java client API
@@ -319,54 +323,6 @@ AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
 
 
-dnl ###########################################################################
-dnl choice of SDIF package
-with_sdif="no"
-AC_ARG_WITH(sdif, dnl newline and indentation:
-[
-  --with-sdif[=value]		compile sdif package [default=no]])
-dnl   [  # actions if given    ],
-dnl   [  # actions if not given      dummy=stupid    ])
-
-dnl options where to find sdif lib, enables package sdif
-AC_ARG_WITH(sdif-incl,
-    [    --with-sdif-incl=PATH	directory of sdif.h [optional]],
-    [    SDIF_INCLUDE="-I$withval";  with_sdif="yes"; ])
-
-AC_ARG_WITH(sdif-libdir,
-    [    --with-sdif-libdir=PATH	directory where SDIF library is installed [optional]],
-    [    SDIF_LIBDIR="-L$withval"    with_sdif="yes"; ])
-
-AC_ARG_WITH(sdif-libname,
-    [    --with-sdif-libname=LIBNAME	base name of SDIF library to use [default: sdif]],
-    [    SDIF_LIBNAME="-l$withval";    with_sdif="yes";  ],
-    [    if test "$with_debug" = "yes";  then
-	     SDIF_LIBNAME="-lsdif-debug" 
-	 else
-	     SDIF_LIBNAME="-lsdif" 
-	 fi
-    ])
-
-dnl output SDIF feature
-dnl todo: add test for sdif
-if test "$with_sdif" = "yes"; then
-    echo "PACKAGE sdif... $with_sdif"
-    echo "        SDIF_INCLUDE = $SDIF_INCLUDE"
-    echo "        SDIF_LIBDIR  = $SDIF_LIBDIR"
-    echo "        SDIF_LIBNAME = $SDIF_LIBNAME"
-
-    dnl add sdif to packages to compile
-    ADDITIONAL_PACKAGES="$ADDITIONAL_PACKAGES sdif"
-fi
-
-AC_SUBST(SDIF_INCLUDE)
-AC_SUBST(SDIF_LIBNAME)
-AC_SUBST(SDIF_LIBDIR)
-
-dnl end of SDIF package
-dnl ###########################################################################
-
-
 dnl tell makefiles to use this variable 
 AC_SUBST(ADDITIONAL_PACKAGES)
 
@@ -492,9 +448,6 @@ packages/oss/Makefile
 packages/oss/c/Makefile
 packages/oss/c/src/Makefile
 packages/oss/help/Makefile
-packages/sdif/Makefile
-packages/sdif/c/Makefile
-packages/sdif/c/src/Makefile
 packages/sequence/Makefile
 packages/sequence/c/Makefile
 packages/sequence/c/src/Makefile
