@@ -23,6 +23,7 @@ clean:
 	(cd icebrowser; $(MAKE) clean)
 	(cd espresso; $(MAKE) clean)
 	(cd table; $(MAKE) clean)
+	(cd qlist; $(MAKE) clean)
 
 clean_c:
 	(cd fts1.5; $(MAKE) clean)
@@ -41,3 +42,4 @@ clean_java:
 .PHONY: clean
 .PHONY: clean_c
 .PHONY: clean_java
+
