@@ -52,6 +52,6 @@ typedef struct
 } dtd_thread_t;
 
 
-fts_class_t* dtd_thread_type;
+extern fts_class_t* dtd_thread_type;
 
 #endif /* DTD_THREAD_H_ */
