@@ -182,6 +182,9 @@ inlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static fts_status_t
 inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  ac--;
+  at++;
+
   if(ac == 0 || fts_is_int(at))
     {
       /* initialize the class */
@@ -309,6 +312,9 @@ outlet_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 static fts_status_t 
 outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  ac--;
+  at++;
+
   if(ac == 0 || fts_is_int(at))
     {
       fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
@@ -2023,9 +2029,7 @@ void fts_kernel_patcher_init(void)
 
   fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
   fts_metaclass_install(fts_s_inlet, inlet_instantiate, fts_arg_type_equiv);
-
-  fts_alias_install(fts_s_inlet, fts_s_receive);
-  fts_alias_install(fts_s_outlet, fts_s_send);
+  fts_metaclass_install(fts_s_outlet, outlet_instantiate, fts_arg_type_equiv);
 
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
   patcher_class = fts_class_get_by_name(fts_s_patcher);
