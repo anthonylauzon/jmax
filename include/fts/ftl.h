@@ -75,6 +75,7 @@ FTS_API ftl_instruction_info_t *ftl_program_get_current_instruction_info( ftl_pr
 FTS_API void ftl_program_post( const ftl_program_t *prog );
 FTS_API void ftl_program_post_signals( const ftl_program_t *prog );
 FTS_API void ftl_program_post_signals_count( const ftl_program_t *prog);
+FTS_API void ftl_program_post_bytecode( const ftl_program_t *prog);
 
 FTS_API void ftl_program_fprint( FILE *f, const ftl_program_t *prog );
 FTS_API void ftl_program_fprint_signals( FILE *f, const ftl_program_t *prog );

@@ -88,8 +88,8 @@ extern "C" {
 #include <fts/saver.h>
 #include <fts/param.h>
 
-/*  #include <fts/ftl.h> */
-/*  #include <fts/ftlmem.h> */
+#include <fts/ftl.h>
+#include <fts/ftlmem.h>
 /*  #include <fts/dsp.h> */
 
 #ifdef __cplusplus
