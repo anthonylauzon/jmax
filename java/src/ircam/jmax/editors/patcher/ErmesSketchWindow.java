@@ -379,6 +379,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     /* not loading patch or opening subpatcher */
     if( itsSketchPad.getFtsPatcher().getWindowWidth() > 0)
       itsSketchPad.resizeToWindow( getSize().width - horizontalOffset(), getSize().height - verticalOffset());
+    else
+      itsSketchPad.setCurrentWindowSize( getSize().width - horizontalOffset(), getSize().height - verticalOffset());
   }
 
   public void componentMoved( ComponentEvent e) 
