@@ -142,8 +142,6 @@ int fts_sched_remove( fts_object_t *obj)
 	  *p = (*p)->next;
 
 	  fts_free( to_remove);
-
-	  return 0;
 	}
       else
 	p = &(*p)->next;

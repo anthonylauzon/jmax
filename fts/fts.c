@@ -41,6 +41,7 @@ typedef struct _v_t {
 } v_t;
 
 static fts_symbol_t s___v;
+static fts_symbol_t s_yes;
 static fts_patcher_t *cmd_args_patcher;
 
 static void v_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -67,7 +68,7 @@ static fts_status_t v_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-static int fts_cmd_args_put( fts_symbol_t name, fts_atom_t *value)
+static int fts_cmd_args_put( fts_symbol_t name, fts_symbol_t value)
 {
   fts_atom_t a[4];
   fts_object_t *newobj;
@@ -75,26 +76,30 @@ static int fts_cmd_args_put( fts_symbol_t name, fts_atom_t *value)
   fts_set_symbol( a+0, name);
   fts_set_symbol( a+1, fts_s_colon);
   fts_set_symbol( a+2, s___v);
-  a[3] = *value;
+  fts_set_symbol( a+3, value);
 
   newobj = fts_eval_object_description( cmd_args_patcher, 4, a);
 
   return !fts_object_is_error( newobj);
 }
 
-int fts_cmd_args_get( fts_symbol_t name, fts_atom_t *value)
+fts_symbol_t fts_cmd_args_get( fts_symbol_t name)
 {
-  *value = *fts_variable_get_value( cmd_args_patcher, name);
+  fts_atom_t *value;
 
-  return !fts_is_void( value);
+  value = fts_variable_get_value( cmd_args_patcher, name);
+
+  if (!fts_is_symbol( value))
+    return 0;
+
+  return fts_get_symbol( value);
 }
 
 static void fts_cmd_args_parse( int argc, char **argv)
 {
   int filecount = 1, r;
   char filevar[32];
-  fts_atom_t value;
-  fts_symbol_t name;
+  fts_symbol_t name, value;
 
   argc--;
   argv++;
@@ -110,24 +115,21 @@ static void fts_cmd_args_parse( int argc, char **argv)
 	  name = fts_new_symbol_copy( *argv + 2);
 
 	  if (p == NULL || p[1] == '\0')
-	    fts_set_int( &value, 1);
+	    value = s_yes;
 	  else
 	    {
 	      p++;
-	      if ( sscanf( p, "%d", &r) == 1)
-		fts_set_int( &value, r);
-	      else
-		fts_set_symbol( &value, fts_new_symbol_copy( p));
+	      value = fts_new_symbol_copy( p);
 	    }
 	}
       else
 	{
 	  sprintf( filevar, "file%d", filecount++);
 	  name = fts_new_symbol_copy( filevar);
-	  fts_set_symbol( &value, fts_new_symbol_copy( *argv));
+	  value = fts_new_symbol_copy( *argv);
 	}
 
-      fts_cmd_args_put( name, &value);
+      fts_cmd_args_put( name, value);
 
       argc--;
       argv++;
@@ -140,6 +142,8 @@ static void fts_kernel_cmd_args_init( void)
 
   s___v = fts_new_symbol( "__v");
   fts_class_install( s___v, v_instantiate);
+
+  s_yes = fts_new_symbol( "yes");
 
   fts_set_symbol( a+0, fts_s_patcher);
   fts_set_symbol( a+1, fts_new_symbol("environnment"));

@@ -356,7 +356,7 @@ void fts_platform_init( void)
 {
   fts_atom_t a;
 
-  if ( !(fts_cmd_args_get( fts_new_symbol( "no-watchdog"), &a) && fts_is_int( &a) && fts_get_int( &a)) )
+  if ( fts_cmd_args_get( fts_new_symbol( "no-watchdog")))
     start_watchdog();
 
   set_priority( -2);

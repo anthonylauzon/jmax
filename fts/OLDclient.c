@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -87,6 +88,8 @@ typedef struct _oldclient_t {
   fts_buffer_t output_buffer;
 } oldclient_t;
 
+static void oldclient_flush( oldclient_t *this);
+
 static oldclient_t *oldclient;
 
 static void
@@ -94,6 +97,12 @@ oldclient_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   oldclient_t *this = (oldclient_t *)o;
   int r, i;
+
+  if ( fts_get_int_arg( ac, at, 0, -1) < 0)
+    {
+      oldclient_flush( this);
+      return;
+    }
 
   if ((r = recvfrom( this->socket, this->input_buffer, UDP_PACKET_SIZE, 0, 0, 0)) < 0)
     {
@@ -116,14 +125,16 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   unsigned short port = 0;
   const char *host = "127.0.0.1";
   struct hostent *hostptr;
+  fts_symbol_t value;
 
   /*
    * Get values from command line args
    */
-  if (fts_cmd_args_get( fts_new_symbol( "port"), &a) && fts_is_int( &a))
-    port = fts_get_int( &a);
-  if (fts_cmd_args_get( fts_new_symbol( "host"), &a) && fts_is_symbol( &a))
-    host = fts_symbol_name( fts_get_symbol( &a));
+  if ((value = fts_cmd_args_get( fts_new_symbol( "port"))))
+    port = atoi( fts_symbol_name( value));
+
+  if ((value = fts_cmd_args_get( fts_new_symbol( "host"))))
+    host = fts_symbol_name( value);
 
   hostptr = gethostbyname( host);
 
@@ -164,6 +175,7 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);
 
   fts_buffer_init( &this->output_buffer, unsigned char);
 }
@@ -219,6 +231,9 @@ static void oldclient_flush( oldclient_t *this)
 
   p = fts_buffer_get_ptr( &this->output_buffer);
   len = fts_buffer_get_length( &this->output_buffer);
+
+  if (!len)
+    return;
 
   p[0] = this->sequence;
   this->sequence = (this->sequence + 1) %128;
