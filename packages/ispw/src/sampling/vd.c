@@ -53,10 +53,11 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
   fts_symbol_t unit = fts_unit_get_samples_arg(ac, at, 2, 0);
 
+  this->name = name;
+
   if(!name)
     return;
   
-  this->name = name;
   this->vd_data = ftl_data_new(ftl_vd_t);
   this->next = 0;
 
@@ -117,11 +118,15 @@ vd_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   vd_t *this = (vd_t *)o;
 
-  delay_table_remove_delreader(o, this->name);
 
-  ftl_data_free(this->vd_data);
-
-  dsp_list_remove(o);
+  if(this->name)
+    {
+      delay_table_remove_delreader(o, this->name);
+      
+      ftl_data_free(this->vd_data);
+      
+      dsp_list_remove(o);
+    }
 }
 
 /**************************************************
@@ -141,59 +146,62 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
   float conv;
   del_buf_t *buf;
   fts_atom_t argv[6];
-
-  buf = delay_table_get_delbuf(this->name);
-  if(!buf){
-    post("vd~: can't find delay line: %s\n", fts_symbol_name(this->name));
-    return;
-  }
-
-  if(delay_table_is_delwrite_scheduled(this->name))
-    ftl->write_advance = (float)buf->n_tick;
-  else
-    ftl->write_advance = 0.0f;
-
-  ftl->conv = fts_unit_convert_to_base(this->unit, 1.0f, &sr);
-  ftl->max_span = this->max_incr * (float)n_tick;
   
-  if(this->millers_fix_del == 0.0f)
+  if(this->name)
     {
-      if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
-	{
-	  /* Inplace call */
+      buf = delay_table_get_delbuf(this->name);
+      if(!buf){
+	post("vd~: can't find delay line: %s\n", fts_symbol_name(this->name));
+	return;
+      }
 
-	  fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-	  fts_set_ptr(argv + 1, buf);
-	  fts_set_ftl_data(argv + 2, this->vd_data);
-	  fts_set_long(argv + 3, n_tick);
-	  dsp_add_funcall(vd_inplace_dsp_symbol, 4, argv);
+      if(delay_table_is_delwrite_scheduled(this->name))
+	ftl->write_advance = (float)buf->n_tick;
+      else
+	ftl->write_advance = 0.0f;
+
+      ftl->conv = fts_unit_convert_to_base(this->unit, 1.0f, &sr);
+      ftl->max_span = this->max_incr * (float)n_tick;
+  
+      if(this->millers_fix_del == 0.0f)
+	{
+	  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+	    {
+	      /* Inplace call */
+
+	      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+	      fts_set_ptr(argv + 1, buf);
+	      fts_set_ftl_data(argv + 2, this->vd_data);
+	      fts_set_long(argv + 3, n_tick);
+	      dsp_add_funcall(vd_inplace_dsp_symbol, 4, argv);
+	    }
+	  else
+	    {
+	      /* Standard call */
+
+	      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+	      fts_set_ptr(argv + 2, buf);
+	      fts_set_ftl_data(argv + 3, this->vd_data);
+	      fts_set_long(argv + 4, n_tick);
+	      dsp_add_funcall(vd_dsp_symbol, 5, argv);
+	    }
 	}
       else
 	{
-	  /* Standard call */
+	  /* call millers version */
 
 	  fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
 	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_ptr(argv + 2, buf);
 	  fts_set_ftl_data(argv + 3, this->vd_data);
 	  fts_set_long(argv + 4, n_tick);
-	  dsp_add_funcall(vd_dsp_symbol, 5, argv);
+	  fts_set_float(argv + 5, this->millers_fix_del * (float)n_tick); /* write tick size (hopefully) */
+	  dsp_add_funcall(vd_miller_dsp_symbol, 6, argv);
 	}
-    }
-  else
-    {
-      /* call millers version */
 
-      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_ptr(argv + 2, buf);
-      fts_set_ftl_data(argv + 3, this->vd_data);
-      fts_set_long(argv + 4, n_tick);
-      fts_set_float(argv + 5, this->millers_fix_del * (float)n_tick); /* write tick size (hopefully) */
-      dsp_add_funcall(vd_miller_dsp_symbol, 6, argv);
+      delay_table_delreader_scheduled(this->name);
     }
-
-  delay_table_delreader_scheduled(this->name);
 }
 
 /**************************************************
