@@ -35,7 +35,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       // just an hack: remove the watch temporarly, add it just after
       // to avoid recursion
       itsPatcher.removeWatch(this, "deletedObject");
-      itsSketchPad.itsHelper.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()));
+      itsSketchPad.itsHelper.DeleteGraphicObject((ErmesObject)(((FtsObject)value).getRepresentation()), false);
       itsPatcher.watch("deletedObject", this);
     }
     else if (name.equals("deleteConnection")) {
@@ -44,9 +44,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       int outletFrom = ((FtsConnection)value).getFromOutlet();
       ErmesObject objTo = (ErmesObject) (((FtsConnection)value).getTo()).getRepresentation();
       int inletTo = ((FtsConnection)value).getToInlet();
-      itsSketchPad.itsHelper.DeleteConnectionByInOut(objFrom, outletFrom, objTo, inletTo);
+      itsSketchPad.itsHelper.DeleteConnectionByInOut(objFrom, outletFrom, objTo, inletTo, false);
       itsPatcher.watch("deleteConnection", this);
     }
+    itsSketchPad.paintDirtyList();
   }
 
   
@@ -234,7 +235,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
   
   int verticalOffset() {
-    //sketchPad is not there yet, and there's no time for the release.
     //    return itsSketchPad.getLocation().y;//the size of the toolbar + menus
     return 130;
   }
@@ -247,7 +247,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     int width=500;
     int height=480;
     Integer x1, y1, width1, height1;
-    String autorouting;
+    //String autorouting;
     //double check the existence of the window properties. If there aren't, use defaults
       
       x1 = (Integer) patcher.get("wx");
@@ -263,21 +263,21 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       if (height1 == null) patcher.put("wh", new Integer(height));
       else  height = height1.intValue();
       
-      autorouting = (String) patcher.get("autorouting");
-      if (autorouting == null) patcher.put("autorouting", "on");
+      //autorouting = (String) patcher.get("autorouting");
+      //if (autorouting == null) patcher.put("autorouting", "on");
       //get the window dimension use it for: reshape to the right dimensions
 
       setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
 
       //assigning the autorouting mode.
 
-      if (((String)(patcher.get("autorouting"))).equals("on"))
-	SetAutorouting(true);
-      else SetAutorouting(false);
+      // if (((String)(patcher.get("autorouting"))).equals("on"))
+      //SetAutorouting(true);
+      //else SetAutorouting(false);
 
       validate();
       itsSketchPad.InitFromFtsContainer(patcher);
-      itsSketchPad.repaint();//force a repaint to build an offGraphics context
+      //itsSketchPad.repaint();//force a repaint to build an offGraphics context
       validate();
     }
 
@@ -412,9 +412,10 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   private void FillGraphicsMenu(Menu theGraphicsMenu){
     itsAutoroutingMenu = new CheckboxMenuItem("Autorouting", true);
     theGraphicsMenu.add(itsAutoroutingMenu);
+    itsAutoroutingMenu.setEnabled(false);//still there, but inactive
     itsAutoroutingMenu.addItemListener(new ItemListener() {
       public  void itemStateChanged(ItemEvent e)
-	{ SetAutorouting(itsAutoroutingMenu.getState());}});
+	{ /*SetAutorouting(itsAutoroutingMenu.getState());*/}});
   }
 
 
@@ -680,68 +681,106 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   // for all the standard key bindings
   public void keyPressed(KeyEvent e){
     int aInt = e.getKeyCode();
-    if(e.isControlDown()){
-      if(aInt == 65) itsSketchPad.SelectAll();//a
-      else if(aInt == 69){//e
-	if (itsSketchPad.GetRunMode()) setRunMode(false);
-	else setRunMode(true);
-	return;
-      }
-      else if (aInt == 47){//?
-	//ask help for the reference Manual for the selected element...
-	// open one url *only*, because we open only one browser.
-      
-	ErmesObject aObject;
-	String urlToOpen;
-	Interp interp  = MaxApplication.getTclInterp();
-	
-	if (itsSketchPad.itsSelectedList.size() > 0){
-	  aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
 
-	  urlToOpen = FtsReferenceURLTable.getReferenceURL(aObject.itsFtsObject);
-	  
-	  if (urlToOpen != null){
-	    try
-	      {
-		// Call the tcl browse function, with the URL as argument
-		// By default, the tcl browse function do nothing.
-		// if a user installed a browser package, this will
-		// show the documentation.
+      //arrows first:
+      if (isAnArrow(aInt)) {
 
-
-
-		interp.eval("browse " + urlToOpen);
-	      }
-	    catch (tcl.lang.TclException et)
-	      {
-		System.out.println("TCL error executing browse " + urlToOpen + " : " + interp.getResult());
-	      }
+	//***
+	if (e.isShiftDown()) {
+	  if (e.isControlDown()) {
+	    itsSketchPad.resizeSelection(10, aInt);
 	  }
-	}   
+	  else {
+	    itsSketchPad.moveSelection(10, aInt);
+	  }
+	}
+	else {
+	  if (e.isControlDown()) {
+	    if (e.isMetaDown()) {
+	      itsSketchPad.alignSizeSelection(aInt);
+	    }
+	    else {
+	      itsSketchPad.resizeSelection(1, aInt);
+	    }
+	  }
+	  else {
+	    if (e.isMetaDown()) {
+	      //align
+	       String where;
+	       if (aInt == Platform.LEFT_KEY) where = "Left";
+	       else if (aInt == Platform.RIGHT_KEY) where = "Right";
+	       else if (aInt == Platform.UP_KEY) where = "Top";
+	       else where = "Bottom";
+	       itsSketchPad.AlignSelectedObjects(where);
+	    }
+	    else {
+	      itsSketchPad.moveSelection(1, aInt);
+	    }
+	  }
+	}
       }
-      else super.keyPressed(e);
-    } 
-    else if((aInt==ircam.jmax.utils.Platform.DELETE_KEY)||(aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
+
+      /////// end of arrows
+
+      else if(e.isControlDown()){
+	
+	if(aInt == 65) itsSketchPad.SelectAll();//a
+	else if(aInt == 69){//e
+	  if (itsSketchPad.GetRunMode()) setRunMode(false);
+	  else setRunMode(true);
+	  return;
+	}
+	else if (aInt == 47){//?
+	  //ask help for the reference Manual for the selected element...
+	  // open one url *only*, because we open only one browser.
+	  
+	  ErmesObject aObject;
+	  String urlToOpen;
+	  Interp interp  = MaxApplication.getTclInterp();
+	  
+	  if (itsSketchPad.itsSelectedList.size() > 0){
+	    aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
+	    
+	    urlToOpen = FtsReferenceURLTable.getReferenceURL(aObject.itsFtsObject);
+	    
+	    if (urlToOpen != null){
+	      try
+		{
+		  // Call the tcl browse function, with the URL as argument
+		  // By default, the tcl browse function do nothing.
+		  // if a user installed a browser package, this will
+		// show the documentation.
+		  
+		  
+		  
+		  interp.eval("browse " + urlToOpen);
+		}
+	      catch (tcl.lang.TclException et)
+		{
+		  System.out.println("TCL error executing browse " + urlToOpen + " : " + interp.getResult());
+		}
+	    }
+	  }   
+	}
+	else super.keyPressed(e);
+      } 
+      else if((aInt==ircam.jmax.utils.Platform.DELETE_KEY)||(aInt==ircam.jmax.utils.Platform.BACKSPACE_KEY)){
       if(itsSketchPad.GetEditField()!=null){
 	if(!itsSketchPad.GetEditField().HasFocus())
 	  itsSketchPad.itsHelper.DeleteSelected();
       }
     }
-    else if(aInt == 47){//this is a patch to trap the '?'
+      else if(aInt == 47){//this is a patch to trap the '?'
       //ask help for the selected element...
       ErmesObject aObject = null;
-
+      
       for (Enumeration en = itsSketchPad.itsSelectedList.elements(); en.hasMoreElements();) {
 	aObject = (ErmesObject) en.nextElement();
 	
 	FtsHelpPatchTable.openHelpPatch(aObject.itsFtsObject);
       }
     } 
-    else if (aInt == Platform.LEFT_KEY || aInt == Platform.RIGHT_KEY ||
-	     aInt == Platform.UP_KEY || aInt == Platform.DOWN_KEY){
-      itsSketchPad.arrowsPressed(aInt);
-    }
-    else {
+      else {
       // Finally, if we don't redefine the key, call the superclass method
       // that define the standard things.
       super.keyPressed(e);
@@ -749,6 +788,15 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
+
+  public boolean isAnArrow(int code) {
+    return (code == Platform.LEFT_KEY ||
+	     code == Platform.RIGHT_KEY ||
+	     code == Platform.UP_KEY ||
+	     code == Platform.DOWN_KEY 
+	     );
+  }
+
   public void Close(){
     if (isSubPatcher){
       setVisible(false);
@@ -914,7 +962,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
     itsSelectedJustificationMenu = itsSketchJustificationMenu;
     itsSelectedJustificationMenu.setState(true);
-    itsAutoroutingMenu.setState(itsSketchPad.doAutorouting);
+    //itsAutoroutingMenu.setState(itsSketchPad.doAutorouting);
     //itsSketchPad.itsSelectionRouting = itsSketchPad.doAutorouting;
   }
 
@@ -983,27 +1031,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     }
     else itsSelectedJustificationMenu = null;
     
-    UpdateRoutingMenuWithSelection();
   }
 
-  public void UpdateRoutingMenuWithSelection(){
-    int temp = itsSketchPad.getSelectionRouting();
-    if (temp == 1) itsAutoroutingMenu.setState(true);
-    else if (temp ==0) itsAutoroutingMenu.setState(false);
-    else itsAutoroutingMenu.setState(itsSketchPad.doAutorouting);
-    /*    if(itsSketchPad.itsSelectedConnections.size()!=0){
-	  boolean aAutorouting = ((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(0)).GetAutorouted();
-	  boolean aBothRoutingMode = false;
-	  for(int i=1; i<itsSketchPad.itsSelectedConnections.size(); i++){
-	  if(aAutorouting!=((ErmesConnection)itsSketchPad.itsSelectedConnections.elementAt(i)).GetAutorouted()){
-	  aBothRoutingMode = true;
-	  break;
-	  }
-	  }
-	  if(aBothRoutingMode) itsAutoroutingMenu.setState(false);
-	  else itsAutoroutingMenu.setState(aAutorouting);
-	  }*/
-  }
 
   private void ExecutionMenuAction(MenuItem theMenuItem, String theString) {
     ErmesObject aObject;
@@ -1082,9 +1111,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     requestFocus();
     if(!itsClosing){
       MaxApplication.setCurrentWindow(this);
-      ErmesSketchPad.RequestOffScreen(itsSketchPad);
-      if(itsSketchPad.getGraphics()!= null)
-	itsSketchPad.update(itsSketchPad.getGraphics());
     }
   }
 
@@ -1104,14 +1130,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   //--------------------------------------------------------
   public void SetSnapToGrid(){
     itsSketchPad.SetSnapToGrid();
-  }
-  
-  //--------------------------------------------------------
-  //	SetAutorouting
-  //--------------------------------------------------------
-  public void SetAutorouting(boolean t){
-    itsSketchPad.SetAutorouting(t);
-    itsAutoroutingMenu.setState(t);
   }
   
   private MenuItem getRunModeMenuItem() {
@@ -1175,8 +1193,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     theSketchWindow.itsPatcher.put("ww", aRect.width-horizontalOffset());//e.m.1103
     theSketchWindow.itsPatcher.put("wh", aRect.height-verticalOffset());//e.m.1103
 
-    if (theSketchWindow.itsSketchPad.doAutorouting) theSketchWindow.itsPatcher.put("autorouting", "on");
-    else theSketchWindow.itsPatcher.put("autorouting", "off");
+    /*if (theSketchWindow.itsSketchPad.doAutorouting) theSketchWindow.itsPatcher.put("autorouting", "on");
+    else theSketchWindow.itsPatcher.put("autorouting", "off");*/
 
     for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
       aErmesObject = (ErmesObject) e.nextElement();
@@ -1196,8 +1214,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       if (aErmesObject.itsFont.getSize() != theSketchWindow.itsSketchPad.sketchFont.getSize())
 	aFObject.put("fs", aErmesObject.itsFont.getSize());
 
-      if(aErmesObject.itsResized) aFObject.put("resized", "on");
-      else aFObject.put("resized", "off");
+      /*#@!if(aErmesObject.itsResized) aFObject.put("resized", "on");
+      else aFObject.put("resized", "off");*/
       // if (aErmesObject.itsJustification != itsSketchPad.itsJustificationMode)
       //aFObject.put("jsf", aErmesObject.itsJustification);
       //moved to putOtherProperties

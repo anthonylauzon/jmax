@@ -27,21 +27,10 @@ ErmesModule:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesModule.java)
 .PHONY: ErmesModule
 
-ErmesConnCircle:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnCircle.java)
-.PHONY: ErmesConnCircle
-
-ErmesConnSegment:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnSegment.java)
-.PHONY: ErmesConnSegment
-
 ErmesConnection:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnection.java)
 .PHONY: ErmesConnection
 
-ErmesConnectionSet:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnectionSet.java)
-.PHONY: ErmesConnectionSet
 
 ErmesObjBang:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjBang.java)
@@ -202,5 +191,13 @@ ErmesKeyAdapter:
 ErmesClipboardProvider:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesClipboardProvider.java)
 .PHONY: ErmesClipboardProvider
+
+ErmesArea:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesArea.java)
+.PHONY: ErmesArea
+
+ErmesDrawable:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesDrawable.java)
+.PHONY: ErmesDrawable
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

@@ -70,7 +70,7 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.GetTextArea().setBackground(Color.white);
     
     ParseText(itsArgs);
-    if(!itsResized) RestoreDimensions();    
+    /*#@!if(!itsResized)*/ RestoreDimensions();    
     return true;
   }
 	
@@ -94,19 +94,9 @@ class ErmesObjComment extends ErmesObject {
   
   //the 'ResizeToNewFont' method worked very well, so we're using it also in the shift-double_click  
   public void RestoreDimensions(){
-    itsResized = false;
-    itsSketchPad.RemoveElementRgn(this);
+
     Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-currentRect.width, itsFontMetrics.getHeight()*itsParsedTextVector.size()-currentRect.height);
-    itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
-  }
-
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
-    return true;
-  }
-
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester){
-    return true;	//for now, everything is allowed
   }
 
   public boolean MouseUp(MouseEvent evt,int x,int y){
@@ -140,9 +130,7 @@ class ErmesObjComment extends ErmesObject {
 
   public void setSize(int theH, int theV) {
     Dimension d = new Dimension(theH, theV);
-    if (itsSketchPad != null) itsSketchPad.RemoveElementRgn(this);
     super.Resize1(d.width, d.height);
-    if (itsSketchPad != null) itsSketchPad.SaveOneElementRgn(this);
     currentRect.setSize(d.width, d.height);
     if (itsSketchPad != null) itsSketchPad.repaint();
   }
@@ -153,11 +141,11 @@ class ErmesObjComment extends ErmesObject {
 
   
   void ResizeToNewFont(Font theFont) {
-    if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET - currentRect.width,
-	     itsFontMetrics.getHeight()*itsParsedTextVector.size()- currentRect.height);
-    }
-    else ResizeToText(0,0);
+    //#@!if(!itsResized){
+    //#@!  Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET - currentRect.width,
+    //#@!    itsFontMetrics.getHeight()*itsParsedTextVector.size()- currentRect.height);
+      //#@!}
+    /*#@!else*/ ResizeToText(0,0);
   }
 
 

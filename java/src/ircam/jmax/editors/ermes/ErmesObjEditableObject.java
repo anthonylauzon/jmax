@@ -18,6 +18,7 @@ import ircam.jmax.fts.*;
   protected int FIELD_HEIGHT;
   protected int FIELD_WIDTH;
   Dimension preferredSize = null;
+  Dimension currentMinimumSize = new Dimension(); 
   String 	  itsArgs;
   public Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
@@ -31,10 +32,6 @@ import ircam.jmax.fts.*;
     super();
   }
 
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester) {return true;}
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester) {return true;}
-
-	
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
@@ -123,7 +120,7 @@ import ircam.jmax.fts.*;
     itsSketchPad.GetEditField().setText(itsArgs);
     itsSketchPad.GetEditField().itsOwner = this; 
 
-    itsSketchPad.RemoveElementRgn(this);
+    //itsSketchPad.RemoveElementRgn(this);
 
     if(itsParsedTextVector.size()==0)
       itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);
@@ -150,15 +147,13 @@ import ircam.jmax.fts.*;
   }
 
   public void RestoreDimensions(){
-    itsResized = false;
-    itsSketchPad.RemoveElementRgn(this);
+
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
    
     int aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height;
 
     Resize(aMaxWidth-currentRect.width, aHeight);
-    itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
 
@@ -180,10 +175,8 @@ import ircam.jmax.fts.*;
     Dimension d1 = preferredSize;/*minimumSize();*/
     while(lenght > d1.width-20)
       d1.width += 20;
-    preferredSize = d1;	//6/06
-    itsSketchPad.RemoveElementRgn(this);//???
+    preferredSize = d1;	
     Resize1(d1.width, d1.height);	
-    itsSketchPad.SaveOneElementRgn(this);//???
     itsSketchPad.GetEditField().setText(theString);
     itsSketchPad.GetEditField().setSize(d1.width-WIDTH_DIFF, d1.height-HEIGHT_DIFF);
     itsSketchPad.GetEditField().repaint();
@@ -192,11 +185,7 @@ import ircam.jmax.fts.*;
   }
 	
   void ResizeToNewFont(Font theFont) {
-    if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF - currentRect.width,
-	     itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF - currentRect.height);
-    }
-    else ResizeToText(0,0);
+    ResizeToText(0,0);
   }
 	
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -261,7 +250,7 @@ import ircam.jmax.fts.*;
     for (Enumeration e=itsOutletList.elements(); e.hasMoreElements();) {
       aOutlet = (ErmesObjOutlet) e.nextElement();
       aOutlet.MoveTo(aOutlet.itsX, itsY+currentRect.height);
-      ReroutingConnections(aOutlet);
+      //ReroutingConnections(aOutlet);
     }
   }
 
@@ -275,9 +264,11 @@ import ircam.jmax.fts.*;
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
     if(itsParsedTextVector.size()==0) return getPreferredSize();
-    else
-      return new Dimension(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF,
-			   itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF);
+    else {
+      currentMinimumSize.width = itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF;
+      currentMinimumSize.height = itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF;
+      return currentMinimumSize;
+    }
   }
   
   //--------------------------------------------------------

@@ -27,7 +27,7 @@ class MaxGetMaxVersionCmd implements Command
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
     if (argv.length == 1)
-      interp.setResult(MaxVersion.getMaxVersion());
+      interp.setResult((String) MaxApplication.getProperty("jmaxVersion"));
     else
       throw new TclNumArgsException(interp, 1, argv, "name");
   }

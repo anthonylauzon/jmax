@@ -26,10 +26,17 @@ class ErmesDebugRegionsCmd implements Command
 	ErmesSketchPad pad;
 
 	/* SOrry, itsSketchWindowList do not exist any more */
-
+       
 	pad = ((ErmesSketchWindow)MaxApplication.getCurrentWindow()).itsSketchPad;
-
-	//pad.paintAllRegions();
+	if (argv.length > 1) {
+	  System.err.println("Element region:");
+	  pad.GetElementRegion().writeRegionOnErrorStream();
+	  System.err.println("HSegmRgn region:");	  
+	  pad.GetHSegmRgn().writeRegionOnErrorStream();
+	  System.err.println("VSegmRgn region:");	  
+	  pad.GetVSegmRgn().writeRegionOnErrorStream();
+	}
+	pad.paintAllRegions();
   }
 }
 

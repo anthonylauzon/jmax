@@ -18,7 +18,7 @@ public class ErmesObjInlet extends ErmesObjInOutlet{
     itsInletNum = theInletNum;
   }
   
-  public void Paint(Graphics g) {
+  public void Paint_specific(Graphics g) {
     if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
     g.setColor(Color.black);
 
@@ -29,11 +29,11 @@ public class ErmesObjInlet extends ErmesObjInOutlet{
 	g.drawLine(itsX+3, itsY+4, itsX+3, itsY+8);
       }
       else 
-	if(connected) g.fillRect(itsX+1, itsY+7, getPreferredSize().width-2, 2);
-	else{	// not selected, not connected
-	  g.fillOval(itsX+1, itsY+3, getPreferredSize().width-2,getPreferredSize().height-4);
-	  g.drawLine(itsX+3, itsY+7, itsX+3, itsY+8);
-	}
+	/*if(connected)*/ g.fillRect(itsX+1, itsY+7, getPreferredSize().width-2, 2);
+      //else{	// not selected, not connected
+      //g.fillOval(itsX+1, itsY+3, getPreferredSize().width-2,getPreferredSize().height-4);
+      //g.drawLine(itsX+3, itsY+7, itsX+3, itsY+8);
+      //}
     }
   }
 	
@@ -46,9 +46,8 @@ public class ErmesObjInlet extends ErmesObjInOutlet{
     return itsInletNum;
   }
 	
-  public Point GetAnchorPoint(){
-    Point aPoint = new Point(itsX+3, itsY+6);
-    return aPoint;
+  public void updateAnchorPoint(){
+    itsAnchorPoint.setLocation(itsX+3, itsY+6);
   }
 }
 

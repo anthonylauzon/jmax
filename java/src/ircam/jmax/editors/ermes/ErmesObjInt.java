@@ -125,10 +125,10 @@ class ErmesObjInt extends ErmesObject {
   }
   
   void ResizeToNewFont(Font theFont){
-    if(!itsResized){
+    //#@!if(!itsResized){
       Resize(17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..")-currentRect.width,itsFontMetrics.getHeight()+4-currentRect.height);
-    }
-    else ResizeToText(0,0);
+      //#@!}
+      //#@!else ResizeToText(0,0);
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -157,10 +157,8 @@ class ErmesObjInt extends ErmesObject {
     int aHeight, aWidth;
     aHeight = itsFontMetrics.getHeight()+4;
     aWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
-    itsResized = false;
-    itsSketchPad.RemoveElementRgn(this);
+
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
-    itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
 	
@@ -238,24 +236,6 @@ class ErmesObjInt extends ErmesObject {
   }
   
 
-  //--------------------------------------------------------
-  // ConnectionRequested
-  //--------------------------------------------------------
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
-    if (!theRequester.IsInlet())
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); 
-  }
-  
-  //--------------------------------------------------------
-  // ConnectionAbort
-  //--------------------------------------------------------
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester){
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;
-  }
-  
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------

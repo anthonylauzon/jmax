@@ -47,9 +47,9 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     super.Init(theSketchPad,  theFtsObject);
     ParseText(itsArgs);
     Resize(0, itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height);
-    if(!itsResized){
+    //#@!if(!itsResized){
       if(!IsResizeTextCompat(0,0)) RestoreDimensions();
-    }
+      //#@!}
     return true;  
   }
 
@@ -109,9 +109,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   //--------------------------------------------------------
   public void setSize(int theH, int theV) {
     Dimension d = new Dimension(theH, theV);
-    if (itsSketchPad != null) itsSketchPad.RemoveElementRgn(this);
     super.Resize1(d.width, d.height);
-    if (itsSketchPad != null) itsSketchPad.SaveOneElementRgn(this);
     currentRect.setSize(d.width, d.height);
     d.width -= (WIDTH_DIFF-6);		
     d.height -= HEIGHT_DIFF;
@@ -120,24 +118,6 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   
   public void setSize(Dimension d) {
     setSize(d.width, d.height);
-  }
-  
-  //--------------------------------------------------------
-  // ConnectionRequested
-  //--------------------------------------------------------
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
-    if (!theRequester.IsInlet())	//if is an outlet...
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
-  }
-  
-  //--------------------------------------------------------
-  // ConnectionAbort
-  //--------------------------------------------------------
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester){
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;	//for now, everything is allowed
   }
   
   //--------------------------------------------------------

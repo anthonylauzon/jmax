@@ -12,7 +12,7 @@ class ErmesObjOutInlet extends ErmesObjInlet{
     super(theInletNum, theOwner, x_coord, y_coord);
   }
 
-  public void Paint(Graphics g) {
+  public void Paint_specific(Graphics g) {
     if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
     g.setColor(Color.black);
     if (selected){

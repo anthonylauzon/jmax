@@ -5,7 +5,10 @@ SOURCES = \
            TextWindow.java    \
 	   IndentedPrintWriter.java \
 	   Platform.java \
-	   Probe.java
-
-
-
+	   List.java \
+	   ListObject.java \
+	   ListIterator.java \
+           MetaListIterator.java \
+           Enumeration2.java \
+	   MetaList.java \
+           Probe.java

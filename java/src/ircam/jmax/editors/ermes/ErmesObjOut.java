@@ -87,22 +87,6 @@ class ErmesObjOut extends ErmesObject {
     ((FtsOutletObject)itsFtsObject).setPosition(itsId);
   }
   
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection requested allowed?
-    if (!theRequester.IsInlet())	//if is an outlet...
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
-  }
-
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection abort allowed?
-    // (for now always allowed)
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;	//for now, everything is allowed
-  }
 
   public boolean MouseDown_specific(MouseEvent evt, int x, int y) {
     if (itsSketchPad.itsRunMode || evt.getClickCount() == 1) {

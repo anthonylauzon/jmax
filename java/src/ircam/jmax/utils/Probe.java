@@ -15,7 +15,7 @@ import java.util.*;
  */
 
 public class Probe {
-  final static int MAX_EVENTS = 1000; 
+  final static int MAX_EVENTS = 10000; 
   long times[] = new long[MAX_EVENTS];
   String labels[] = new String[MAX_EVENTS]; 
   long startTime;
@@ -33,16 +33,17 @@ public class Probe {
   }
 
   public void mark(String markName) {
-    if (running) {
+    if (running && eventCounter < MAX_EVENTS) {
       times[eventCounter] = System.currentTimeMillis();
       labels[eventCounter++] = markName;
     }  
-    else start();//System.out.println("Probe "+itsName+" is stopped. Can't store time stamp");
   }
 
   public void silentMark() {
+    if (eventCounter < MAX_EVENTS) {
     times[eventCounter] = System.currentTimeMillis();
     labels[eventCounter++] = "";
+    }
   }
   
   public void stop() {

@@ -239,16 +239,6 @@ class ErmesObjSlider extends ErmesObject {
     return true;
   }
   
-  public void ResizeToText(int theDeltaX, int theDeltaY){
-    //int aWidth = currentRect.width+theDeltaX;
-    //int aHeight = currentRect.height+theDeltaY;
-    //if(aWidth<getPreferredSize().width) aWidth = getPreferredSize().width;
-    //if(aHeight<getPreferredSize().height) aHeight = getPreferredSize().height;
-    //Resize(aWidth-currentRect.width, aHeight-currentRect.height);
-    
-    Resize(theDeltaX, theDeltaY);
-  }
-  
   public boolean IsInThrottle(int theX, int theY){
     Rectangle aRect = itsThrottle.Bounds();
     return aRect.contains(theX,theY);
@@ -264,18 +254,6 @@ class ErmesObjSlider extends ErmesObject {
     return true;
   }
 
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
-    if (!theRequester.IsInlet())	
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester));
-  }
-
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester){
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;
-  }
-  
   public void Paint_specific(Graphics g) {
     
     if (g==null) {
@@ -306,8 +284,9 @@ class ErmesObjSlider extends ErmesObject {
   // minimumSize()
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    currentMinimumSize.width =20;
-    currentMinimumSize.height = BOTTOM_OFFSET+(itsRangeMax-itsRangeMin)+UP_OFFSET;
+    currentMinimumSize.width =15;/*20;*/
+    currentMinimumSize.height = 30;
+    //    currentMinimumSize.height = BOTTOM_OFFSET+(itsRangeMax-itsRangeMin)+UP_OFFSET;
     return currentMinimumSize;
   }
   
@@ -315,6 +294,48 @@ class ErmesObjSlider extends ErmesObject {
     return preferredSize;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

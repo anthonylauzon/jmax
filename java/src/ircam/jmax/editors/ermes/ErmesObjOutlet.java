@@ -10,7 +10,6 @@ import java.awt.*;
 public class ErmesObjOutlet extends ErmesObjInOutlet{
 
   int itsOutletNum;
-  public ErmesConnectionSet itsConnectionSet;
   static int debug_count = 1;
   
   //--------------------------------------------------------
@@ -21,13 +20,12 @@ public class ErmesObjOutlet extends ErmesObjInOutlet{
     super(theOwner, x_coord, y_coord);
     Rectangle aRect = itsOwner.Bounds();
     itsOutletNum = theOutletNum;
-    itsConnectionSet = new ErmesConnectionSet(this);
   }
 	
   //--------------------------------------------------------
   //	Paint
   //--------------------------------------------------------
-  public void Paint(Graphics g){
+  public void Paint_specific(Graphics g){
     if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
     g.setColor(Color.black);	
     
@@ -38,11 +36,11 @@ public class ErmesObjOutlet extends ErmesObjInOutlet{
 	g.drawLine(itsX+3, itsY, itsX+3, itsY+4);
       }
       else 
-	if (connected) g.fillRect(itsX+1, itsY, getPreferredSize().width-2, 2);
-	else{	// not selected, not connected
-	  g.fillOval(itsX+1, itsY+1, getPreferredSize().width-2,getPreferredSize().height-4);
-	  g.drawLine(itsX+3, itsY, itsX+3, itsY+1);
-	}
+	/*if (connected)*/ g.fillRect(itsX+1, itsY, getPreferredSize().width-2, 2);
+      //else{	// not selected, not connected
+      //  g.fillOval(itsX+1, itsY+1, getPreferredSize().width-2,getPreferredSize().height-4);
+      //  g.drawLine(itsX+3, itsY, itsX+3, itsY+1);
+      //}
     }
   }
   
@@ -61,17 +59,10 @@ public class ErmesObjOutlet extends ErmesObjInOutlet{
   }
   
   //--------------------------------------------------------
-  //	GetConnectionSet
+  //	updateAnchorPoint
   //--------------------------------------------------------
-  public ErmesConnectionSet GetConnectionSet(){
-    return itsConnectionSet;
-  }
-  
-  //--------------------------------------------------------
-  //	GetAnchorPoint
-  //--------------------------------------------------------
-  public Point GetAnchorPoint(){
-    return new Point(itsX+3, itsY+2);
+  void updateAnchorPoint(){
+    itsAnchorPoint.setLocation(itsX+3, itsY+2);
   }
 }
 

@@ -41,7 +41,7 @@ class ErmesObjDeleteCmd implements Command
       for (int i = 1; i < argv.length; i++)
 	{
 	  aObject = (ErmesObject) ReflectObject.get(interp, argv[i]);
-	  aObject.itsSketchPad.itsHelper.DeleteObject(aObject);
+	  aObject.itsSketchPad.itsHelper.DeleteObject(aObject, true);
 	}
   }
 }

@@ -1,7 +1,6 @@
 package ircam.jmax.fts;
 
 import ircam.jmax.*;
-
 import java.util.*;
 import java.io.*;
 

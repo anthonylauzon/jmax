@@ -60,7 +60,7 @@ public class TclErmesPackage
     interp.createCommand("newobj", new ErmesObjNewObjCmd());
     interp.createCommand("connect", new ErmesConnectCmd());
     interp.createCommand("selected", new ErmesSelectedCmd());
-    interp.createCommand("debugregions", new ErmesDebugRegionsCmd());
+    //interp.createCommand("debugregions", new ErmesDebugRegionsCmd());
   }
 }
 

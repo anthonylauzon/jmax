@@ -15,6 +15,8 @@ import ircam.jmax.editors.project.*;
  */
 class ErmesSketchHelper extends Object{
   ErmesSketchPad itsSketchPad;
+  Rectangle normalizedRect = new Rectangle();
+
 
   public ErmesSketchHelper(ErmesSketchPad theSketchPad) {
     itsSketchPad = theSketchPad;
@@ -28,8 +30,7 @@ class ErmesSketchHelper extends Object{
     ErmesObjOutlet aOutlet;
     ErmesObjInlet aInlet;
     
-    ErmesConnection aConnection = new ErmesConnection(fromObj, toObj, itsSketchPad, fromOutlet, 
-					      toInlet, fc, itsSketchPad.doAutorouting);
+    ErmesConnection aConnection = new ErmesConnection(fromObj, toObj, itsSketchPad, fromOutlet, toInlet, fc);
     aConnection.update(fc);
     return aConnection;
   }
@@ -49,16 +50,13 @@ class ErmesSketchHelper extends Object{
 
       x = ((Integer)theFtsObject.get("x")).intValue();
       y = ((Integer)theFtsObject.get("y")).intValue();
-      Point aPoint = SnapToGrid(x, y);
-      theFtsObject.put("x", x);
-      theFtsObject.put("y", y);
+      //Point aPoint = SnapToGrid(x, y);
+      //theFtsObject.put("x", x);
+      //theFtsObject.put("y", y);
     }
 
     try
       {
-      //there was an error "aObject may not have been initialized"
-      // Yes, because if the following statement raise an exception,
-      // the fi
       aObject = (ErmesObject) theClass.newInstance();
       aObject.Init(itsSketchPad, theFtsObject);
       }
@@ -79,15 +77,6 @@ class ErmesSketchHelper extends Object{
 
     itsSketchPad.itsElements.addElement(aObject);
     if (!itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = itsSketchPad.DOING_NOTHING;	
-    aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, 
-			  aObject.currentRect.width, aObject.currentRect.height);
-    aRect.grow(3,6);
-    itsSketchPad.itsElementRgn.Add(aRect);
-    for (Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
-      aOutlet = (ErmesObjOutlet)e.nextElement();
-      itsSketchPad.itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
-
-    }
     return aObject;
   }
   
@@ -103,7 +92,7 @@ class ErmesSketchHelper extends Object{
   //	DeleteObjectConnections
   //	delete the object's connections
   //--------------------------------------------------------
-  public void DeleteObjectConnections(ErmesObject theObject){
+  public void DeleteObjectConnections(ErmesObject theObject, boolean paintNow){
     ErmesObjInlet aInlet;
     ErmesObjOutlet aOutlet;
     ErmesConnection aConnection;
@@ -111,43 +100,17 @@ class ErmesSketchHelper extends Object{
       aInlet = (ErmesObjInlet) e.nextElement();
       while (!aInlet.GetConnections().isEmpty()) {
 	aConnection = (ErmesConnection) aInlet.GetConnections().firstElement();
-	aOutlet = aConnection.GetOutlet();
-	itsSketchPad.itsConnections.removeElement(aConnection);
-	aInlet.GetConnections().removeElement(aConnection);
-	aOutlet.GetConnections().removeElement(aConnection);
-	if(aOutlet.GetConnections().size()==0) {
-	  aOutlet.SetConnected(false);
-	}
-	if(!aConnection.GetErrorState()){
-	  itsSketchPad.RemoveConnRgn(aConnection);
-	  aConnection.GetConnectionSet().Remove(aConnection);
-	}
-
-	if(aConnection.GetSelected()) itsSketchPad.itsSelectedConnections.removeElement(aConnection);
-	if (aConnection.itsFtsConnection != null) aConnection.itsFtsConnection.delete();
+	DeleteConnection(aConnection, false);
       }
     }
     for(Enumeration e1 = theObject.GetOutletList().elements() ; e1.hasMoreElements() ;) {
       aOutlet = (ErmesObjOutlet) e1.nextElement();
       while (!aOutlet.GetConnections().isEmpty()) {
 	aConnection = (ErmesConnection) aOutlet.GetConnections().firstElement();
-	
-	aInlet = aConnection.GetInlet();
-	itsSketchPad.itsConnections.removeElement(aConnection);
-	aInlet.GetConnections().removeElement(aConnection); 
-	aOutlet.GetConnections().removeElement(aConnection);
-	if(aInlet.GetConnections().size()==0) {
-	  aInlet.SetConnected(false);
-	}
-	if(!aConnection.GetErrorState()){
-	  itsSketchPad.RemoveConnRgn(aConnection);
-	  aConnection.GetConnectionSet().Remove(aConnection);
-	}
-	if(aConnection.GetSelected()) itsSketchPad.itsSelectedConnections.removeElement(aConnection);
-	if (aConnection.itsFtsConnection != null) aConnection.itsFtsConnection.delete();
+	DeleteConnection(aConnection, false);
       }
     }
-    itsSketchPad.repaint();
+    if (paintNow) itsSketchPad.paintDirtyList();
   }
   
   //--------------------------------------------------------
@@ -155,7 +118,7 @@ class ErmesSketchHelper extends Object{
   //	delete one connection routine
   //--------------------------------------------------------
   
-  public void DeleteConnectionByInOut(ErmesObject srcObj, int srcOut, ErmesObject destObj, int destIn)
+  public void DeleteConnectionByInOut(ErmesObject srcObj, int srcOut, ErmesObject destObj, int destIn, boolean paintNow)
   {
     ErmesObjOutlet out;
     ErmesObjInlet  in;
@@ -171,17 +134,17 @@ class ErmesSketchHelper extends Object{
     }
 
     if(aConnection!=null) {
-      DeleteConnection(aConnection);
-      itsSketchPad.repaint();
+      DeleteConnection(aConnection, false);
+      if (paintNow) itsSketchPad.paintDirtyList();
     }
   }
 
 
   //--------------------------------------------------------
   //	DeleteConnection
-  //	delete one object routine
+  //	delete one connection routine
   //--------------------------------------------------------
-  public void DeleteConnection(ErmesConnection theConnection) {
+  public void DeleteConnection(ErmesConnection theConnection, boolean paintNow) {
     ErmesObjOutlet aOutlet = theConnection.GetOutlet();
     ErmesObjInlet aInlet = theConnection.GetInlet();
     
@@ -189,13 +152,11 @@ class ErmesSketchHelper extends Object{
     itsSketchPad.itsConnections.removeElement(theConnection);
     aOutlet.GetConnections().removeElement(theConnection);
     aInlet.GetConnections().removeElement(theConnection);
-    if(aInlet.GetConnections().size()==0) aInlet.SetConnected(false);
-    if(aOutlet.GetConnections().size()==0) aOutlet.SetConnected(false);
-    if(theConnection.itsAutorouted){
-      itsSketchPad.RemoveConnRgn(theConnection);
-      theConnection.GetConnectionSet().Remove(theConnection);
-    }
+    if(aInlet.GetConnections().size()==0) aInlet.SetConnected(false, false);
+    if(aOutlet.GetConnections().size()==0) aOutlet.SetConnected(false, false);
     if (theConnection.itsFtsConnection != null) theConnection.itsFtsConnection.delete();	//delete from FTS
+    itsSketchPad.markSketchAsDirty();
+    if (paintNow) itsSketchPad.paintDirtyList();
   }
 
 
@@ -203,14 +164,13 @@ class ErmesSketchHelper extends Object{
   //	DeleteObject
   //	delete one object routine
   //--------------------------------------------------------
-  public void DeleteObject(ErmesObject theObject) {
-    DeleteGraphicObject(theObject);
+  public void DeleteObject(ErmesObject theObject, boolean paintNow) {
+    DeleteGraphicObject(theObject, paintNow);
     if (theObject.itsFtsObject != null) theObject.itsFtsObject.delete();
   }
   
-  public void DeleteGraphicObject(ErmesObject theObject) {
-    itsSketchPad.RemoveElementRgn(theObject);
-    DeleteObjectConnections(theObject);
+  public void DeleteGraphicObject(ErmesObject theObject, boolean paintNow) {
+    DeleteObjectConnections(theObject, false);
     //removes theObject from the selected elements list	
     if(theObject.NeedPropertyHandler())
       if(theObject.GetFtsObject()!=null) theObject.GetFtsObject().removeWatch(theObject);
@@ -218,8 +178,7 @@ class ErmesSketchHelper extends Object{
     //removes theObject from the element list (delete)
     itsSketchPad.itsElements.removeElement(theObject);
     itsSketchPad.RemoveInOutlets(theObject);
-    //removes theObject from the container (sketchpad)
-    //remove(theObject);	//from the sketchpad components
+    itsSketchPad.markSketchAsDirty();
     
     if(theObject instanceof ErmesObjExternal)
       if (((ErmesObjExternal)theObject).itsSubWindow!= null) 
@@ -228,6 +187,7 @@ class ErmesSketchHelper extends Object{
       ErmesObjPatcher aPatcher = (ErmesObjPatcher)theObject;
       if (aPatcher.itsSubWindow!= null) aPatcher.itsSubWindow.Close(true);
     }
+    if (paintNow) itsSketchPad.paintDirtyList();
   }
   
   //--------------------------------------------------------
@@ -240,226 +200,140 @@ class ErmesSketchHelper extends Object{
     ErmesObjOutlet aOutlet;
     ErmesObjInlet aInlet;
 
-    if(!DeleteInOutletConnections()){
+    if(!DeleteInOutletConnections(false)){
       while (!itsSketchPad.itsSelectedList.isEmpty()) {
 	aObject = (ErmesObject) itsSketchPad.itsSelectedList.firstElement();
-	DeleteObject(aObject);
+	DeleteObject(aObject, false);
       }
-
+      
       while(!itsSketchPad.itsSelectedConnections.isEmpty()){
 	int i=0;
 	aConnection = (ErmesConnection) itsSketchPad.itsSelectedConnections.firstElement();
-	DeleteConnection(aConnection);
+	DeleteConnection(aConnection, false);
       }
     }
+    
     itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
     itsSketchPad.ToSave();
-    itsSketchPad.repaint();
+    itsSketchPad.paintDirtyList();
   }
     
-  public boolean DeleteInOutletConnections(){
+  public boolean DeleteInOutletConnections(boolean paintNow){
     ErmesObjInOutlet aInOutlet;
+    boolean ret = false;
+
     if(itsSketchPad.itsConnectingLetList.size()==0){
       if(itsSketchPad.itsConnectingLet!=null){
-	DeleteThisInOutletConn(itsSketchPad.itsConnectingLet);
+	DeleteThisInOutletConn(itsSketchPad.itsConnectingLet, false);
 	itsSketchPad.ResetConnect();
-	return true;
+	ret = true;
       }
     }
     else{
       for (Enumeration e = itsSketchPad.itsConnectingLetList.elements(); e.hasMoreElements();) {
 	aInOutlet = (ErmesObjInOutlet)e.nextElement();
-	DeleteThisInOutletConn(aInOutlet);
+	DeleteThisInOutletConn(aInOutlet, false);
       }
       itsSketchPad.ResetConnect();
-      return true;
+      ret = true;
     }
-    return false;
+    if (paintNow) itsSketchPad.paintDirtyList();
+    return ret;
   }
 
-  public void DeleteThisInOutletConn(ErmesObjInOutlet theInOutlet){
+  public void DeleteThisInOutletConn(ErmesObjInOutlet theInOutlet, boolean paintNow){
     ErmesConnection aConnection;
     ErmesObjOutlet aOutlet;
     ErmesObjInlet aInlet;
     
-    if(theInOutlet.IsInlet()){
-      for (Enumeration e = theInOutlet.GetConnections().elements(); e.hasMoreElements();) {
-	aConnection = (ErmesConnection)e.nextElement();
-	itsSketchPad.itsConnections.removeElement(aConnection);
-	aOutlet = aConnection.GetOutlet();
-	aOutlet.GetConnections().removeElement(aConnection);
-	if(aOutlet.GetConnections().size()==0) aOutlet.ChangeState(false, false);
-	else  aOutlet.ChangeState(false, true);
-	if(aConnection.itsAutorouted){
-	  itsSketchPad.RemoveConnRgn(aConnection);
-	  aConnection.GetConnectionSet().Remove(aConnection);
-	}
-	if (aConnection.itsFtsConnection != null) aConnection.itsFtsConnection.delete();
+      while (theInOutlet.GetConnections().size() != 0) {
+	aConnection = (ErmesConnection)theInOutlet.GetConnections().elementAt(0);
+	DeleteConnection(aConnection, false);
       }
-    }
-    else{
-      for (Enumeration e = theInOutlet.GetConnections().elements(); e.hasMoreElements();) {
-	aConnection = (ErmesConnection)e.nextElement();
-	itsSketchPad.itsConnections.removeElement(aConnection);
-	aInlet = aConnection.GetInlet();
-	aInlet.GetConnections().removeElement(aConnection);
-	if(aInlet.GetConnections().size()==0) aInlet.ChangeState(false, false);
-	else aInlet.ChangeState(false, true);
-	if(aConnection.itsAutorouted)
-	  itsSketchPad.RemoveConnRgn(aConnection);
-	if (aConnection.itsFtsConnection != null) aConnection.itsFtsConnection.delete();//enzo
-      }
-
-     ((ErmesObjOutlet)theInOutlet).GetConnectionSet().RemoveAllConnections();//svuota la lista
-    }
-    theInOutlet.GetConnections().removeAllElements();
-    theInOutlet.ChangeState(false, false);
+      
+      theInOutlet.GetConnections().removeAllElements();
+      theInOutlet.ChangeState(false, false, false);
+      if (paintNow) itsSketchPad.paintDirtyList();
   }
 
   //--------------------------------------------------------
-  //	DeselectAll
-  //	deselect all the objects AND CONNECTIONS currently selected
+  //	deselectObjects
+  //	deselect all the objects of a given list
   //--------------------------------------------------------
   
-  public void DeselectObjects(){
+  void deselectObjects(Vector theObjects, boolean paintNow){
     ErmesObject aObject;
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
+    for (Enumeration e = theObjects.elements() ; e.hasMoreElements() ;) {
       aObject = (ErmesObject) e.nextElement();
-      aObject.Deselect();
-      aObject.Paint(itsSketchPad.offGraphics);
+      aObject.Deselect(false);
     }
-    itsSketchPad.itsSelectedList.removeAllElements();
+    if (paintNow) {
+      itsSketchPad.paintDirtyList();
+    }
   }
+  //--------------------------------------------------------
+  //	deselectConnections
+  //	deselect all the connections of a given list
+  //--------------------------------------------------------
 
-  public void DeselectConnections(){
+  void deselectConnections(Vector theConnections, boolean paintNow){
     ErmesConnection aConnection;
-    for (Enumeration e = itsSketchPad.itsSelectedConnections.elements() ; e.hasMoreElements() ;) {
+    for (Enumeration e = theConnections.elements() ; e.hasMoreElements() ;) {
       aConnection = (ErmesConnection) e.nextElement();
-      aConnection.Deselect();
-      aConnection.Update(itsSketchPad.GetOffGraphics());
-      aConnection.Paint(itsSketchPad.GetOffGraphics());		     
+      aConnection.Deselect(false);
     }
+    if (paintNow) {
+      itsSketchPad.paintDirtyList();
+    }
+  }
+
+
+  /**
+   * Deselect everything selected in the sketch 
+   * (objects, connections, current selected in/outlet).
+   * This function handles the Focus change and updates the menus.
+   */
+  public void deselectAll(boolean paintNow) {
+    if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
+      itsSketchPad.GetEditField().transferFocus();
+    }
+    if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
+      itsSketchPad.GetEditField().LostFocus();
+    }
+
+    if(itsSketchPad.itsSelectedList.size() != 0) 
+      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
+
+    deselectCurrentInOutlet(false);
+    deselectObjects(itsSketchPad.itsSelectedList, false);
+    deselectConnections(itsSketchPad.itsSelectedConnections, false);
+    
+    itsSketchPad.itsSelectedList.removeAllElements();
     itsSketchPad.itsSelectedConnections.removeAllElements();
-  }
 
-
-  void DeselectAll() {
+    if (paintNow) {
+      itsSketchPad.paintDirtyList();
+    }
     if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
       itsSketchPad.GetEditField().transferFocus();
     }
     if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
       itsSketchPad.GetEditField().LostFocus();
     }
-
-    //itsSketchPad.itsToolBar.Unlock();
-    
-    DeselectInOutlet();
-
-    if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
-
-    if((itsSketchPad.itsSelectedList.size() != 0)||(itsSketchPad.itsSelectedConnections.size()!=0)) 
-      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
-
-    DeselectObjects();
-    
-    if(itsSketchPad.itsConnectingLet!=null) {
-      itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
-    }
-    
-    DeselectConnections();
-    
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
-
   }
 
-  public void DeselectAllInEditing(ErmesObject theObject){
-    DeselectInOutlet();
-    if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
-    
-    if((itsSketchPad.itsSelectedList.size() != 0)||(itsSketchPad.itsSelectedConnections.size()!=0)) 
-      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
-
-    DeselectObjects();
-    itsSketchPad.itsSelectedList.addElement(theObject);
-    
-    if(itsSketchPad.itsConnectingLet!=null) {
-      itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
-    }
-    
-    DeselectConnections();
-    
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
-  }
-
-  
-  public void DeselectObjAndConn(){
-    if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
-      itsSketchPad.GetEditField().transferFocus();
-    }
-    if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
-      itsSketchPad.GetEditField().LostFocus();
-    }
-
-    if(itsSketchPad.itsSelectedList.size() != 0) 
-      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
-
-    if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
-
-    DeselectObjects();
-    
-    if(itsSketchPad.itsConnectingLet!=null) {
-      itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
-    }
-    
-    DeselectConnections();
-
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
-    itsSketchPad.editStatus = itsSketchPad.DOING_NOTHING;
-  }
-
-
-  void DeselectAll(ErmesConnection theConnection) {
-    if (itsSketchPad.GetEditField() != null && itsSketchPad.GetEditField().HasFocus()) {
-      itsSketchPad.GetEditField().transferFocus();
-    }
-    if(itsSketchPad.editStatus == ErmesSketchPad.EDITING_OBJECT){
-      itsSketchPad.GetEditField().LostFocus();
-    }
-
-    DeselectInOutlet();
-
-    if(itsSketchPad.itsSelectedList.size() != 0) 
-      itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
-
-    if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
-
-    DeselectObjects();
-
-    if(itsSketchPad.itsConnectingLet!=null) {
-      itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.GetConnected());
-    }
-		
-    DeselectConnections();
-
-    itsSketchPad.itsSelectedConnections.addElement(theConnection);
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
-  }
-
-  public void DeselectInOutlet(){
+  public void deselectCurrentInOutlet(boolean paintNow){
     ErmesObjInOutlet aInOutlet;
     if(itsSketchPad.itsConnectingLet!=null) 
-      itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.connected);
+      itsSketchPad.itsConnectingLet.ChangeState(false, itsSketchPad.itsConnectingLet.connected, false);
     if(itsSketchPad.itsConnectingLetList.size()!=0){
       for (Enumeration e = itsSketchPad.itsConnectingLetList.elements(); e.hasMoreElements();) {
 	aInOutlet = (ErmesObjInOutlet)e.nextElement();
-	//aInOutlet.ChangeState(false, aInOutlet.connected);
-	aInOutlet.selected = false;
-	if(itsSketchPad.offGraphics!=null)
-	  aInOutlet.Update(itsSketchPad.offGraphics);
+	aInOutlet.ChangeState(false, aInOutlet.GetConnected(), false);
       }
-      //itsSketchPad.DrawLinesOffScreen();
     }
     itsSketchPad.ResetConnect();
+    if (paintNow) itsSketchPad.paintDirtyList();
   }
 
   
@@ -536,9 +410,7 @@ class ErmesSketchHelper extends Object{
     ErmesObjInlet aInlet;
     ErmesObjOutlet aOutlet;
     Rectangle aRect;
-    // for(Enumeration e = itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
-    //aObject = (ErmesObject)e.nextElement();
-    //for(Enumeration e1 = aObject.GetInletList().elements(); e1.hasMoreElements();) {
+
     for(Enumeration e = itsSketchPad.itsInletList.elements(); e.hasMoreElements();) {
       aInlet = (ErmesObjInlet)e.nextElement();
       aRect = aInlet.Bounds();
@@ -578,62 +450,6 @@ class ErmesSketchHelper extends Object{
   }
   
   //--------------------------------------------------------
-  //	IsMovable
-  //	say if is possible to drag a segment
-  //--------------------------------------------------------
-  public boolean IsMovable(ErmesConnSegment theSegment){
-    ErmesConnSegment aSegment;
-    boolean trovato = false;
-    ErmesConnection aConnection = itsSketchPad.itsSelectedSegment.GetConnection();
-    if(!aConnection.GetErrorState()){
-      if(theSegment.preferredSize().width<3){//is vertical
-	int i;
-	for(i=0; ((i<aConnection.GetVSegmentList().size())&&!trovato); i++){
-	  aSegment = (ErmesConnSegment) aConnection.GetVSegmentList().elementAt(i);
-	  if(aSegment == theSegment) trovato = true; 
-	}
-	if((i!=1)&&(i!=aConnection.GetVSegmentList().size())) return true;
-	else return false;
-      }
-      return true;	
-    }
-    else return false;
-  }
-  
-  //--------------------------------------------------------
-  //	MoveCircles
-  //	move connectionSet circles
-  //--------------------------------------------------------
-  public void MoveCircles(ErmesConnectionSet theConnectionSet, int theDeltaH, int theDeltaV){
-    ErmesConnCircle aCircle;
-    for (Enumeration e = theConnectionSet.GetCircles().elements(); e.hasMoreElements() ;){
-      aCircle = (ErmesConnCircle) e.nextElement();
-      aCircle.MoveBy(theDeltaH,theDeltaV);
-    }
-  }
-  
-  //--------------------------------------------------------
-  //	MoveDraggedSegment
-  //	Move the selected elements
-  //--------------------------------------------------------
-  public void MoveDraggedSegment(int theDeltaH, int theDeltaV){
-    Rectangle aRect = itsSketchPad.itsSelectedSegment.Bounds();
-    ErmesConnection aConnection = itsSketchPad.itsSelectedSegment.GetConnection();
-    if(IsHorizontal(aRect)){
-      //RemoveSegmRgn(true, itsSelectedSegment);
-      aConnection.UpdateAllSegments(itsSketchPad.itsSelectedSegment, true, theDeltaV);
-      itsSketchPad.itsSelectedSegment.MoveBy(0, theDeltaV);
-    }
-    else{
-      //RemoveSegmRgn(false, itsSelectedSegment);
-      aConnection.UpdateAllSegments(itsSketchPad.itsSelectedSegment, false, theDeltaH);
-      itsSketchPad.itsSelectedSegment.MoveBy(theDeltaH, 0);
-    }
-    aConnection.GetConnectionSet().UpdateCircles();
-    aConnection.CalcNewPoints();
-  }
-  
-  //--------------------------------------------------------
   //	MoveElements
   //	Move the selected elements
   //--------------------------------------------------------
@@ -641,306 +457,25 @@ class ErmesSketchHelper extends Object{
     ErmesObject aObject;
     for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
-      itsSketchPad.RemoveElementRgn(aObject);
       aObject.MoveBy(theDeltaH, theDeltaV);
     }
   }
 
- //--------------------------------------------------------
-  //	MoveElemListConnections
-  //	Move or re-route connections of a list of objects
-  //--------------------------------------------------------
-  public void MoveElementListConnections(Vector theList, int theDeltaH, int theDeltaV){
-    ErmesObject aObject;
-    ErmesObjInlet aInlet;
-    ErmesObjOutlet aOutlet;
-    ErmesConnection aConnection;
-    boolean toUpdating = false;
-    Vector UpdatedLinesList = new Vector();
-    Vector UpdatingConnSet = new Vector();
-    for (Enumeration e = theList.elements() ; e.hasMoreElements() ;) {
-      aObject = (ErmesObject) e.nextElement();
-      for (Enumeration e1 = aObject.GetInletList().elements() ; e1.hasMoreElements() ;) {
-	aInlet = (ErmesObjInlet) e1.nextElement();
-	for (Enumeration e2 = aInlet.GetConnections().elements() ; e2.hasMoreElements() ;) {
-	  aConnection = (ErmesConnection) e2.nextElement();
-	  if(!UpdatedLinesList.contains(aConnection)){
-	    if(aConnection.itsAutorouted){//only for the autorouted lines
-	      if(!aConnection.GetErrorState()) {
-		itsSketchPad.RemoveConnRgn(aConnection);
-		aConnection.GetConnectionSet().RemoveRgn(aConnection);
-	      }
-	      if((theList.contains(aConnection.GetOutlet().GetOwner()))&&(aConnection.IsToMoving(theDeltaH, theDeltaV))&&
-		 (!aConnection.GetErrorState()))
-		aConnection.MoveConnection(theDeltaH, theDeltaV);
-	      else{
-		aConnection.Delete();
-		aConnection.PrepareToRouting();
-		aConnection.AutoRouting();
-		if(!UpdatingConnSet.contains(aConnection.GetConnectionSet()))
-		  UpdatingConnSet.addElement(aConnection.GetConnectionSet());
-	      }
-	      if(!aConnection.GetErrorState()){ 
-		itsSketchPad.SaveConnectionRgn(aConnection);
-		aConnection.GetConnectionSet().SaveRgn(aConnection);
-	      }
-	    }
-	    else aConnection.PrepareToRouting();
-	    UpdatedLinesList.addElement(aConnection);
-	  }					
-	}
-      }
-      for (Enumeration e3 = aObject.GetOutletList().elements() ; e3.hasMoreElements() ;) {
-	aOutlet = (ErmesObjOutlet) e3.nextElement();
-	toUpdating = false;
-	for (Enumeration e4 = aOutlet.GetConnections().elements() ; e4.hasMoreElements() ;) {
-	  aConnection = (ErmesConnection) e4.nextElement();
-	  if(!UpdatedLinesList.contains(aConnection)){
-	    if(aConnection.itsAutorouted){
-	      if(!aConnection.GetErrorState()) {
-		itsSketchPad.RemoveConnRgn(aConnection);
-		aConnection.GetConnectionSet().RemoveRgn(aConnection);
-	      }
-	      if((theList.contains(aConnection.GetInlet().GetOwner()))&&
-		 (aConnection.IsToMoving(theDeltaH, theDeltaV))&&(!aConnection.GetErrorState()))
-		aConnection.MoveConnection(theDeltaH, theDeltaV);	
-	      else{
-		aConnection.Delete();
-		aConnection.PrepareToRouting();
-		aConnection.AutoRouting();
-		toUpdating = true;
-	      }
-	      if(!aConnection.GetErrorState()) {
-		itsSketchPad.SaveConnectionRgn(aConnection);
-		aConnection.GetConnectionSet().SaveRgn(aConnection);
-	      }
-	    }
-	    else aConnection.PrepareToRouting();
-	    UpdatedLinesList.addElement(aConnection);
-	  }
-	}
-	if(toUpdating){
-	  if(!UpdatingConnSet.contains(aOutlet.GetConnectionSet()))
-	    UpdatingConnSet.addElement(aOutlet.GetConnectionSet());
-	}
-	else {
-	  if(aOutlet.GetConnectionSet().GetCount()!=0)
-	    MoveCircles(aOutlet.GetConnectionSet(), theDeltaH, theDeltaV);
-	}
-      }
-    }
-    UpdateConnectionSet(UpdatingConnSet);				
-  }
-  //--------------------------------------------------------
-  //	MoveElemConnections
-  //	Move or re-route the moved elements connections
-  //--------------------------------------------------------
-  public void MoveElemConnections(int theDeltaH, int theDeltaV){
-    ErmesObject aObject;
-    ErmesObjInlet aInlet;
-    ErmesObjOutlet aOutlet;
-    ErmesConnection aConnection;
-    boolean toUpdating = false;
-    Vector UpdatedLinesList = new Vector();
-    Vector UpdatingConnSet = new Vector();
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
-      aObject = (ErmesObject) e.nextElement();
-      for (Enumeration e1 = aObject.GetInletList().elements() ; e1.hasMoreElements() ;) {
-	aInlet = (ErmesObjInlet) e1.nextElement();
-	for (Enumeration e2 = aInlet.GetConnections().elements() ; e2.hasMoreElements() ;) {
-	  aConnection = (ErmesConnection) e2.nextElement();
-	  if(!UpdatedLinesList.contains(aConnection)){
-	    if(aConnection.itsAutorouted){//only for the autorouted lines
-	      if(!aConnection.GetErrorState()) {
-		itsSketchPad.RemoveConnRgn(aConnection);
-		aConnection.GetConnectionSet().RemoveRgn(aConnection);
-		if((itsSketchPad.itsSelectedList.contains(aConnection.GetOutlet().GetOwner()))&&
-		   (aConnection.IsToMoving(theDeltaH, theDeltaV)))
-		  aConnection.MoveConnection(theDeltaH, theDeltaV);
-		else{
-		  aConnection.Delete();
-		  aConnection.PrepareToRouting();
-		  aConnection.AutoRouting();
-		  if(!UpdatingConnSet.contains(aConnection.GetConnectionSet()))
-		    UpdatingConnSet.addElement(aConnection.GetConnectionSet());
-		}
-		//itsSketchPad.SaveConnectionRgn(aConnection);
-		//aConnection.GetConnectionSet().SaveRgn(aConnection);
-	      }
-	      else{
-		aConnection.Delete();
-		aConnection.PrepareToRouting();
-		aConnection.AutoRouting();
-		if(!UpdatingConnSet.contains(aConnection.GetConnectionSet()))
-		  UpdatingConnSet.addElement(aConnection.GetConnectionSet());
-	      }
-	      if(!aConnection.GetErrorState()){
-		itsSketchPad.SaveConnectionRgn(aConnection);
-		aConnection.GetConnectionSet().SaveRgn(aConnection);
-	      }
-	    }
-	    else aConnection.PrepareToRouting();
-	    UpdatedLinesList.addElement(aConnection);
-	  }					
-	}
-      }
-      for (Enumeration e3 = aObject.GetOutletList().elements() ; e3.hasMoreElements() ;) {
-	aOutlet = (ErmesObjOutlet) e3.nextElement();
-	toUpdating = false;
-	for (Enumeration e4 = aOutlet.GetConnections().elements() ; e4.hasMoreElements() ;) {
-	  aConnection = (ErmesConnection) e4.nextElement();
-	  if(!UpdatedLinesList.contains(aConnection)){
-	    if(aConnection.itsAutorouted){
-	      if(!aConnection.GetErrorState()) {
-		itsSketchPad.RemoveConnRgn(aConnection);
-		aConnection.GetConnectionSet().RemoveRgn(aConnection);
-		if((itsSketchPad.itsSelectedList.contains(aConnection.GetInlet().GetOwner()))&&
-		   (aConnection.IsToMoving(theDeltaH, theDeltaV)))
-		  aConnection.MoveConnection(theDeltaH, theDeltaV);	
-		else{
-		  aConnection.Delete();
-		  aConnection.PrepareToRouting();
-		  aConnection.AutoRouting();
-		  toUpdating = true;
-		}
-		//itsSketchPad.SaveConnectionRgn(aConnection);
-		//aConnection.GetConnectionSet().SaveRgn(aConnection);
-	      }
-	      else{
-		aConnection.Delete();
-		aConnection.PrepareToRouting();
-		aConnection.AutoRouting();
-		toUpdating = true;
-	      }
-	      if(!aConnection.GetErrorState()){
-		itsSketchPad.SaveConnectionRgn(aConnection);
-		aConnection.GetConnectionSet().SaveRgn(aConnection);
-	      }
-	    }
-	    else aConnection.PrepareToRouting();
-	    UpdatedLinesList.addElement(aConnection);
-	  }
-	}
-	if(toUpdating){
-	  if(!UpdatingConnSet.contains(aOutlet.GetConnectionSet()))
-	    UpdatingConnSet.addElement(aOutlet.GetConnectionSet());
-	}
-	else {
-	  if(aOutlet.GetConnectionSet().GetCount()!=0)
-	    MoveCircles(aOutlet.GetConnectionSet(), theDeltaH, theDeltaV);
-	}
-      }
-    }
-    UpdateConnectionSet(UpdatingConnSet);				
-  }
-  
+
+
   //--------------------------------------------------------
   //	NormalizedRect
   //--------------------------------------------------------
   public Rectangle NormalizedRect(Rectangle theRect) {
-    Rectangle aNewRect = new Rectangle();
     
-    aNewRect.x = (theRect.width < 0)? theRect.x + theRect.width: theRect.x;
-    aNewRect.y = (theRect.height < 0)? theRect.y +theRect.height: theRect.y;
-    aNewRect.width = (theRect.width < 0)? - theRect.width: theRect.width;
-    aNewRect.height = (theRect.height < 0)? - theRect.height: theRect.height;
+    normalizedRect.x = (theRect.width < 0)? theRect.x + theRect.width: theRect.x;
+    normalizedRect.y = (theRect.height < 0)? theRect.y +theRect.height: theRect.y;
+    normalizedRect.width = (theRect.width < 0)? - theRect.width: theRect.width;
+    normalizedRect.height = (theRect.height < 0)? - theRect.height: theRect.height;
     
-    return aNewRect;
+    return normalizedRect;
   }
   
-  //--------------------------------------------------------
-  //	RemoveSegmRgn
-  //	remove the segments region (prec e succ)
-  //--------------------------------------------------------
-  public void RemoveSegmRgn(boolean theHor, ErmesConnSegment theSegment){
-    int i;
-    boolean trovato = false;
-    ErmesConnSegment aSegment1, aSegment2;
-    Rectangle aRect1, aRect2;
-    ErmesConnection aConnection = theSegment.GetConnection();
-    ErmesConnectionSet aConnectionSet = aConnection.GetConnectionSet();
-    aRect1 = theSegment.Bounds();
-    if(theHor){
-      itsSketchPad.itsHSegmRgn.Remove(aRect1);
-      aConnectionSet.GetHSegmentRgn().Remove(aRect1);
-      for(i=0; ((i<aConnection.GetHSegmentList().size())&&(trovato==false)); i++){
-	aSegment1 = (ErmesConnSegment )(aConnection.GetHSegmentList().elementAt(i));
-	if(aSegment1 == theSegment)
-	  trovato = true;
-      }
-      aSegment1 = (ErmesConnSegment)(aConnection.GetVSegmentList().elementAt(i-1));
-      aSegment2 = (ErmesConnSegment)(aConnection.GetVSegmentList().elementAt(i));
-      aRect1 = aSegment1.Bounds();
-      aRect2 = aSegment2.Bounds();
-      itsSketchPad.itsVSegmRgn.Remove(aRect1);
-      aConnectionSet.GetVSegmentRgn().Remove(aRect1);
-      itsSketchPad.itsVSegmRgn.Remove(aRect2);
-      aConnectionSet.GetVSegmentRgn().Remove(aRect2);
-    }
-    else{
-      itsSketchPad.itsVSegmRgn.Remove(aRect1);
-      aConnectionSet.GetVSegmentRgn().Remove(aRect1);
-      for(i=0; ((i<aConnection.GetVSegmentList().size())&&(trovato==false)); i++){
-	aSegment1 = (ErmesConnSegment )(aConnection.GetVSegmentList().elementAt(i));
-	if(aSegment1 == theSegment)
-	  trovato = true;
-      }
-      aSegment1 = (ErmesConnSegment )(aConnection.GetHSegmentList().elementAt(i-2));
-      aSegment2 = (ErmesConnSegment )(aConnection.GetHSegmentList().elementAt(i-1));
-      aRect1 = aSegment1.Bounds();
-      aRect2 = aSegment2.Bounds();
-      itsSketchPad.itsHSegmRgn.Remove(aRect1);
-      aConnectionSet.GetHSegmentRgn().Remove(aRect1);
-      itsSketchPad.itsHSegmRgn.Remove(aRect2);
-      aConnectionSet.GetHSegmentRgn().Remove(aRect1);
-    }
-  }
-  
-  //--------------------------------------------------------
-  //	ReroutingAllConnections
-  //	redo all existing connections autorouting
-  //  used only in SetSnapToGrid function
-  //--------------------------------------------------------
-  public void ReroutingAllConnections(){
-    ErmesObject aObject;
-    ErmesObjOutlet aOutlet;
-    ErmesConnection aConnection;
-    for(int i=0; i<itsSketchPad.itsConnections.size();i++){
-      aConnection = (ErmesConnection) itsSketchPad.itsConnections.elementAt(i);
-      if(!aConnection.GetErrorState()) itsSketchPad.RemoveConnRgn(aConnection);
-      aConnection.Delete();
-      aConnection.PrepareToRouting();
-      aConnection.AutoRouting();
-      if(!aConnection.GetErrorState()) {
-	itsSketchPad.SaveConnectionRgn(aConnection);
-	aConnection.GetConnectionSet().SaveRgn(aConnection);
-      }
-    }
-    for(int j=0; j<itsSketchPad.itsElements.size();j++){
-      aObject = (ErmesObject) itsSketchPad.itsElements.elementAt(j);
-      for(int k=0; k<aObject.GetOutletList().size(); k++){
-	aOutlet = (ErmesObjOutlet) aObject.GetOutletList().elementAt(k);
-	aOutlet.GetConnectionSet().UpdateCircles();
-      }
-    }
-  }
-  
-  //--------------------------------------------------------
-  //	SaveElementRgn
-  //	save all selected elements regions
-  //--------------------------------------------------------
-  void SaveElementRgn(){
-    Rectangle aRect;
-    ErmesObject aObject;
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
-      aObject = (ErmesObject) e.nextElement();
-      aRect = aObject.Bounds();
-      aRect.grow(3,6);
-      itsSketchPad.itsElementRgn.Add(aRect);
-    }		
-  }
-  
-  //??	void SaveSegmRgn(ErmesConnSegment theSegment)
   //--------------------------------------------------------
   //	SearchFtsName
   //  corrispondence between fts names and ermes names (new and old format...)
@@ -956,7 +491,6 @@ class ErmesSketchHelper extends Object{
     }
   }
   
-  //??	public void SetSelectedSegment(ErmesConnSegment theSegment)
   //--------------------------------------------------------
   //	SetSnapToGrid
   //	set the snap to grid flag and snap the existing objects
@@ -972,11 +506,8 @@ class ErmesSketchHelper extends Object{
 	aPoint = SnapToGrid(aObject.itsX, aObject.itsY);
 	aDeltaH = aPoint.x - aObject.itsX;
 	aDeltaV = aPoint.y - aObject.itsY ;
-	itsSketchPad.RemoveElementRgn(aObject);
 	aObject.MoveBy(aDeltaH, aDeltaV);
-	itsSketchPad.SaveOneElementRgn(aObject);
       }
-      ReroutingAllConnections();
     }
     itsSketchPad.repaint();
   }
@@ -1009,31 +540,11 @@ class ErmesSketchHelper extends Object{
     ErmesObject aObject;
     Rectangle aRect;
     ErmesObjOutlet aOutlet;
-    ErmesConnSegment aSegment;
     ErmesConnection aConnection;
     for(int i=0; i<itsSketchPad.itsSelectedList.size(); i++){
       aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(i);
-      aRect = aObject.Bounds();
-      aRegion.Add(aRect);
-      for(int j = 0; j<aObject.GetOutletList().size(); j++){
-	aOutlet = (ErmesObjOutlet) aObject.GetOutletList().elementAt(j);
-	for(int k=0; k<aOutlet.GetConnections().size(); k++){
-	  aConnection = (ErmesConnection) aOutlet.GetConnections().elementAt(k);
-	  //aggiunge il rettangolo solo se entrambi gli estremi sono in lista selezioanti
-	  if(itsSketchPad.itsSelectedList.contains(aConnection.GetInlet().GetOwner())){
-	    for(int z=0; z< aConnection.GetHSegmentList().size();z++){
-	      aSegment = (ErmesConnSegment) aConnection.GetHSegmentList().elementAt(z);
-	      aRect = aSegment.Bounds();
-	      aRegion.Add(aRect);
-	    }
-	    for(int z=0; z< aConnection.GetVSegmentList().size();z++){
-	      aSegment = (ErmesConnSegment) aConnection.GetVSegmentList().elementAt(z);
-	      aRect = aSegment.Bounds();
-	      aRegion.Add(aRect);
-	    }
-	  }
-	}
-      }
+      //aRect = aObject.Bounds();
+      aRegion.addArea(aObject);
     }
     return aRegion.MinimumRect();
   }
@@ -1042,31 +553,15 @@ class ErmesSketchHelper extends Object{
   //	TraceConnection
   //--------------------------------------------------------
   
-  public ErmesConnection TraceConnection(ErmesObjOutlet theSourceOutlet, ErmesObjInlet theDestInlet){
-    ErmesConnection aConnection = new ErmesConnection(itsSketchPad, theDestInlet, theSourceOutlet, itsSketchPad.doAutorouting);
+  public ErmesConnection TraceConnection(ErmesObjOutlet theSourceOutlet, ErmesObjInlet theDestInlet, boolean paintNow){
+    ErmesConnection aConnection = new ErmesConnection(itsSketchPad, theDestInlet, theSourceOutlet);
     theSourceOutlet.AddConnection(aConnection);
     theDestInlet.AddConnection(aConnection); 
-    if((aConnection.itsAutorouted)&&(!aConnection.GetErrorState())){
-      itsSketchPad.SaveConnectionRgn(aConnection);
-      theSourceOutlet.itsConnectionSet.Add(aConnection);
-    }
     itsSketchPad.itsConnections.addElement(aConnection);
     itsSketchPad.ToSave();
-    itsSketchPad.repaint();
+    if (paintNow) aConnection.DoublePaint();
+    else itsSketchPad.addToDirtyConnections(aConnection);
     return aConnection;
-  }
-  
-  //--------------------------------------------------------
-  //	UpdateConnectionSet
-  //	update connectionSet circles
-  //--------------------------------------------------------
-  public void UpdateConnectionSet(Vector theConnSetList){
-    ErmesConnectionSet aConnectionSet;
-    for (Enumeration e = theConnSetList.elements() ; e.hasMoreElements() ;) {
-      aConnectionSet = (ErmesConnectionSet) e.nextElement();
-      if(aConnectionSet.GetCount()!=0)
-	aConnectionSet.UpdateCircles();
-    }
   }
 }
 

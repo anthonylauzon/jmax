@@ -57,7 +57,6 @@ class FtsSocketPort extends FtsPort
       {
 	System.out.println("I/O failed on closing the connection to " + host + ":" + port);
       }
-
   }
 
   void setParameter(String property, Object value)

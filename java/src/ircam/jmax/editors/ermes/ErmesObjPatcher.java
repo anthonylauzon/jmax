@@ -52,12 +52,13 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     itsArgs = theFtsObject.getDescription().trim();
 
     super.Init(theSketchPad, theFtsObject);
+
     Resize(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-currentRect.height);
     ParseText(itsArgs);
     
-    if(!itsResized){
+    //#@!if(!itsResized){
       if(!IsResizeTextCompat(0,0)) RestoreDimensions();
-    }
+      //#@!}
     
     return true;		// Why this method return a value ????
   }
@@ -159,24 +160,6 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 
   //--------------------------------------------------------
-  // ConnectionRequested
-  //--------------------------------------------------------
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
-    if (!theRequester.IsInlet())
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester));
-  }
-  
-  //--------------------------------------------------------
-  // ConnectionAbort
-  //--------------------------------------------------------
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester){
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;
-  }
-	
-  //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
 	  
@@ -234,11 +217,11 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 	
   void ResizeToNewFont(Font theFont) {
-    if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsMaxString)/*+32*/+(itsFontMetrics.getHeight()+10)/2+5+5 - currentRect.width,
-	     itsFontMetrics.getHeight() + 10 - currentRect.height);
-    }
-    else ResizeToText(0,0);
+    //#@!if(!itsResized){
+    //#@!Resize(itsFontMetrics.stringWidth(itsMaxString)/*+32*/+(itsFontMetrics.getHeight()+10)/2+5+5 - currentRect.width,
+    //#@!    itsFontMetrics.getHeight() + 10 - currentRect.height);
+      //#@!}
+    /*#@!else*/ ResizeToText(0,0);
   }
 	
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -258,11 +241,9 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 
   public void RestoreDimensions(){
-    itsResized = false;
-    itsSketchPad.RemoveElementRgn(this);
+
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+/*2*WIDTH_DIFF+10*/(itsFontMetrics.getHeight()+10)/2+5+5,(itsInletList.size())*12, (itsOutletList.size())*12);
     Resize(aMaxWidth-currentRect.width, itsFontMetrics.getHeight() + 10 - currentRect.height);
-    itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
 
@@ -271,9 +252,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   //--------------------------------------------------------
   public void setSize(int theH, int theV) {
     Dimension d = new Dimension(theH, theV);
-    if (itsSketchPad != null) itsSketchPad.RemoveElementRgn(this);
     super.Resize1(d.width, d.height);
-    if (itsSketchPad != null) itsSketchPad.SaveOneElementRgn(this);
     currentRect.setSize(d.width, d.height);
     if (itsSketchPad != null) itsSketchPad.repaint();
   }

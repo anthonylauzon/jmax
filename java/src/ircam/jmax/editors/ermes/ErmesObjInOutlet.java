@@ -7,36 +7,59 @@ import java.util.*;
 /**
  * The abstract base class for (object's) graphic inlet and outlets
  */
-abstract public class ErmesObjInOutlet {
+abstract public class ErmesObjInOutlet implements ErmesDrawable{
   
-  public boolean selected;
-  public boolean connected;
-  int itsX, itsY;
+  protected boolean selected = false;
+  protected boolean connected = false; //ignore the connected flag
+  protected int itsX, itsY;
   ErmesObject itsOwner;
-  boolean laidOut = false;
+
+  protected final int UPDATE_AND_DRAW = 0;
+  protected final int DRAW = 1;
+  protected int itsCurrentDrawingMethod = DRAW;
+  
   public Vector itsConnections;
   static Dimension preferredSize;
-  int itsAnchorX, itsAnchorY; 
   boolean itsAlreadyMoveIn = false;
+  Rectangle currentBounds = new Rectangle();
+  Point itsAnchorPoint = new Point();
   
+
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
   public ErmesObjInOutlet(ErmesObject theOwner, int x_coord, int y_coord){
     
     itsConnections = new Vector();
-    itsX = itsAnchorX = x_coord;
-    itsY = itsAnchorY = y_coord;
-    
+    itsX = x_coord;
+    itsY = y_coord;
+
     itsOwner = theOwner;
     selected = false;
     connected = false;
     if (preferredSize == null) preferredSize = new Dimension(7,9);
     if (IsInlet()) itsY-=9;
     else itsY+= itsOwner.currentRect.height;
+    updateAnchorPoint();
+  }
+
+  public boolean getDirty() {
+    //return itsDirtyFlag;
+    return true;//for now, just for test
+  }
+
+  public void setDirty(boolean b) {
+    //itsDirtyFlag = b;
   }
   
-  abstract public void Paint(Graphics g);
+  public void Paint(Graphics g) {
+    if (g== null) return;
+    if (itsCurrentDrawingMethod == DRAW) 
+      Paint_specific(g);
+    else Update(g);
+  }
+
+  abstract protected void Paint_specific(Graphics g);
 
   protected void DoublePaint() {
     
@@ -49,13 +72,24 @@ abstract public class ErmesObjInOutlet {
   }
 
   //--------------------------------------------------------
-  //	Repaint
+  //	Repaint //to be dropped?
   //--------------------------------------------------------
-  public void Repaint() {
-    if (itsOwner.itsSketchPad.offGraphics == null) return;
-    if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
-    Update(itsOwner.GetSketchPad().offGraphics);
-    itsOwner.GetSketchPad().DrawLinesOffScreen();
+  void Repaint(boolean paintNow) {
+    ErmesSketchPad mySketch = itsOwner.itsSketchPad;
+    if (paintNow) {
+      Update(mySketch.getGraphics());
+      Update(mySketch.offGraphics);
+      for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) {
+	((ErmesConnection)e.nextElement()).DoublePaint();
+      }
+      mySketch.removeDirtyInOutlet(this);
+    }
+    else {
+      mySketch.addToDirtyInOutlets(this);
+      for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) {
+	mySketch.addToDirtyConnections((ErmesConnection)e.nextElement());
+      }
+    }
   }
 
   //--------------------------------------------------------
@@ -63,26 +97,27 @@ abstract public class ErmesObjInOutlet {
   //--------------------------------------------------------
   public void Update(Graphics g) {
     int aHeight;
-    if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
-    g.setColor(itsOwner.GetSketchPad().getBackground());
+    if(!itsOwner.itsSketchPad.itsGraphicsOn || g == null) return;
+    g.setColor(itsOwner.itsSketchPad.getBackground());
     if(IsInlet())aHeight=preferredSize.height;
     else aHeight=preferredSize.height+1;
     g.fillRect(itsX, itsY, preferredSize.width, aHeight);
-    Paint(g);
+    Paint_specific(g);
   }
     
   //--------------------------------------------------------
   //	Bounds
   //--------------------------------------------------------
   public Rectangle Bounds(){
-    return new Rectangle(itsX, itsY, preferredSize.width, preferredSize.height);
+    currentBounds.setBounds(itsX, itsY, preferredSize.width, preferredSize.height);
+    return currentBounds;
   }
   
   //--------------------------------------------------------
   //	SetConnected
   //--------------------------------------------------------
-  public void SetConnected(boolean theConnected){
-    ChangeState(selected, theConnected);
+  public void SetConnected(boolean theConnected, boolean paintNow){
+    ChangeState(selected, theConnected, paintNow);
   }
   
   //--------------------------------------------------------
@@ -132,27 +167,54 @@ abstract public class ErmesObjInOutlet {
   //--------------------------------------------------------
   //	GetAnchorPoint
   //--------------------------------------------------------
-  abstract Point GetAnchorPoint() /*{return null;}*/;  
+  Point GetAnchorPoint() {
+    return itsAnchorPoint;
+  }  
   
   //--------------------------------------------------------
   //	ChangeState
   //--------------------------------------------------------
-  public void ChangeState(boolean theSelState, boolean theConState){
-    selected = theSelState;
-    connected = theConState;
-    Repaint();
+  public void ChangeState(boolean theSelState, boolean theConState, boolean paintNow){
+    ErmesSketchPad mySketch = itsOwner.itsSketchPad;
+    boolean toPaint = false;
+    if (selected != theSelState) {
+      toPaint = true;
+      itsCurrentDrawingMethod = UPDATE_AND_DRAW;
+      selected = theSelState;
+    }
+    //if (connected != theConState) {
+    //toPaint = true;
+      connected = theConState;
+      //}
+
+    if (toPaint) {
+      //if (paintNow) {
+      Paint(mySketch.getGraphics());
+      Paint(mySketch.offGraphics);
+      for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) {
+	((ErmesConnection)e.nextElement()).DoublePaint();	  
+      }
+    }
+    //else {//do not paint now
+    //mySketch.addToDirtyInOutlets(this);
+    //for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) {
+    //  mySketch.addToDirtyConnections((ErmesConnection)e.nextElement());	  
+    //}
+    //}    
   }
   
   //--------------------------------------------------------
   //	MoveBy
   //--------------------------------------------------------
   public boolean MoveBy(int theDeltaX, int theDeltaY) {
-    itsX+=theDeltaX; itsY+=theDeltaY;
+    MoveTo(itsX+theDeltaX, itsY+=theDeltaY);
     return true;
   }
   
   public boolean MoveTo(int theX, int theY) {
     itsX=theX; itsY=theY;
+    updateAnchorPoint();
+    itsCurrentDrawingMethod = DRAW;
     return true;
   }
   
@@ -163,6 +225,11 @@ abstract public class ErmesObjInOutlet {
     itsConnections.addElement(theConnection);
   }
 	
+  //--------------------------------------------------------
+  //	updateAnchorPoint
+  //--------------------------------------------------------
+  
+  abstract void updateAnchorPoint();
 	
   //--------------------------------------------------------
   //	minimumSize

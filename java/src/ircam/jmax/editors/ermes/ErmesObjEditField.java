@@ -105,19 +105,19 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
 
-    if(!itsOwner.itsResized){
+    //#@!if(!itsOwner.itsResized){
       Dimension d1 = itsOwner.Size();
       d1.width = lenght+2*itsOwner.WIDTH_DIFF+10;
       itsOwner.setSize(d1.width, d1.height);
-    }
+      //#@!}
     int height = getFontMetrics(getFont()).getHeight()*itsOwner.itsParsedTextVector.size();
-    if(!itsOwner.itsResized){
-      Dimension d1 = itsOwner.Size();
-      d1.height = height+2*itsOwner.HEIGHT_DIFF;
-      itsOwner.setSize(d1.width, d1.height);
+    //#@!if(!itsOwner.itsResized){
+      Dimension d2 = itsOwner.Size();
+      d2.height = height+2*itsOwner.HEIGHT_DIFF;
+      itsOwner.setSize(d2.width, d2.height);
       if(itsOwner.itsOutletList.size()>0)
 	itsOwner.MoveOutlets();
-    }
+      //#@!}
     //itsOwner.Repaint();
     itsOwner.update(itsOwner.itsFtsObject);
     

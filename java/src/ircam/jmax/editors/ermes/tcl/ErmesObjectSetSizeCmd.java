@@ -35,15 +35,11 @@ class ErmesObjectSetSizeCmd implements Command
 	int width  = TclInteger.get(interp, argv[2]);
 	int height = TclInteger.get(interp, argv[3]);
 	
-	aSketchPad.RemoveElementRgn(aObject);
-
 	if(aObject.IsResizeTextCompat(width, height)) 
 	  aObject.Resize(width - aObject.currentRect.width, height - aObject.currentRect.height);
 	else 
 	  aObject.ResizeToText(width - aObject.currentRect.width, height - aObject.currentRect.height);
 
-	aSketchPad.SaveOneElementRgn(aObject);
-    
 	aSketchPad.repaint();
       }
     else

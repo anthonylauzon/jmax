@@ -52,4 +52,32 @@ Probe:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Probe.java)
 .PHONY: Probe
 
+ListObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ListObject.java)
+.PHONY: ListObject
+
+List:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) List.java)
+.PHONY: List
+
+ListIterator:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ListIterator.java)
+.PHONY: ListIterator
+
+MetaList:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MetaList.java)
+.PHONY: MetaList
+
+MetaListIterator:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MetaListIterator.java)
+.PHONY: MetaListIterator
+
+Enumeration2:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Enumeration2.java)
+.PHONY: Enumeration2
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
+
+
+

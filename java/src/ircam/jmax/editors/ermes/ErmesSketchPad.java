@@ -24,18 +24,18 @@ import ircam.jmax.utils.*;
  * It keeps track of the toolbar state, it handles the 
  * offscreen and much, much more...
  */
-public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener/*, FtsUpdateGroupListener*/{
+public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, ErmesDrawable{
   
   //2703...
   public boolean isInGroup = false;
   public boolean drawPending = false;
   public boolean copyPending = false;
+
   
-  /*
   public void updateGroupStart() {
     isInGroup = true;
   }
-
+  
   public void updateGroupEnd() {
     isInGroup = false;
     if (drawPending) {
@@ -44,11 +44,25 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     else if (copyPending) {
       CopyTheOffScreen(getGraphics());
     }
-      drawPending = false;
-      copyPending = false;
-  }*/
+    drawPending = false;
+    copyPending = false;
+  }
   //...2703
   
+  //ErmesDrawable interface:
+  public boolean getDirty() {
+    return true;
+  }
+
+  public void setDirty(boolean b) {
+    //itsDirtyFlag = b;
+  }
+
+  public void Paint(Graphics g) {
+    repaint();
+  }
+  //end of ErmesDrawable
+
   ErmesSketchWindow itsSketchWindow;
   Dimension preferredSize; 
   final static int DOING_NOTHING = 0;		
@@ -76,9 +90,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   final static Dimension snapGrid = new Dimension(30, 50);
   final public static Color sketchColor = new Color(230, 230, 230);	//the sketchPad gray...
 
-  public final int PIXEL_LEFT = 0;
-  public final int PIXEL_RIGHT = 1;
-
   public Font sketchFont = new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE);
   public int sketchFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
   int SKETCH_WIDTH = 1200/*800*/;
@@ -97,8 +108,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   int itsDirection = NoDirections;
   public boolean itsRunMode = false;
   boolean doSnapToGrid = false;
-  public boolean doAutorouting = true;
-  //  public boolean itsSelectionRouting = true;
   public boolean itsGraphicsOn = true;
   public boolean paintForTheFirstTime = true;
   
@@ -110,9 +119,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   int itsPreviousMouseX, itsPreviousMouseY;// used during the MOVING status
 
   
-  ErmesRegion itsElementRgn;
-  ErmesRegion itsHSegmRgn;
-  ErmesRegion itsVSegmRgn;
   Vector itsConnections;
   Vector itsInletList;
   Vector itsOutletList;
@@ -120,7 +126,6 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   Vector itsTempSelected;
   public Vector itsElements;
   Vector itsSelectedConnections;
-  Vector itsConnectionSetList;
   Vector itsUpdateList;
   Vector itsPatcherElements;
   Rectangle currentRect = new Rectangle();
@@ -131,15 +136,10 @@ Rectangle previousResizeRect = new Rectangle();
 
   Rectangle currentMovingBigRect = new Rectangle();
   Rectangle previousMovingBigRect = new Rectangle();
-  //Rectangle currentMovingLittleRect = new Rectangle();
-  //Rectangle previousMovingLittleRect = new Rectangle();
   Vector itsMovingRectangles = new Vector();
 
   public boolean offScreenValid = true;
   
-  //2203ErmesObjMessThread itsMessThread = null;
-
-  //  boolean itsFirstClick = true;
   //STATIC OFFSCREEN!!!
 
   static ErmesSketchPad lastSketchWithOffScreen = null;
@@ -150,7 +150,6 @@ Rectangle previousResizeRect = new Rectangle();
 		
 		
   ErmesSwToolbar itsToolBar;
-  ErmesConnSegment itsSelectedSegment;
   Point itsStartMovingPt;
   Rectangle itsStartInclusionRect;
   ErmesObjInOutlet itsCurrentInOutlet = null;
@@ -197,16 +196,86 @@ Rectangle previousResizeRect = new Rectangle();
   public ErmesSketchHelper itsHelper;
 
   boolean itsScrolled = false;
+  Vector dirtyInOutlets = new Vector();
+  Vector dirtyConnections = new Vector();
+  Vector dirtyObjects = new Vector();
+  private boolean dirtySketch = false;
 
-
-  // debug utility, to be removed //
-  public void paintAllRegions() {
-
-    itsElementRgn.paintRegion(getGraphics());
-    itsHSegmRgn.paintRegion(getGraphics());
-    itsVSegmRgn.paintRegion(getGraphics());
+  public void addToDirtyInOutlets(ErmesObjInOutlet theInOutlet) {
+    if (!dirtyInOutlets.contains(theInOutlet))
+      dirtyInOutlets.addElement(theInOutlet);
   }
 
+  public void addToDirtyConnections(ErmesConnection theConnection) {
+    if (!dirtyConnections.contains(theConnection))
+      dirtyConnections.addElement(theConnection);
+  }
+
+  public void addToDirtyObjects(ErmesObject theObject) {
+    if (!dirtyObjects.contains(theObject))
+    dirtyObjects.addElement(theObject);
+  }
+
+  public void markSketchAsDirty() {
+    dirtySketch = true;
+  }
+
+  public void removeDirtyInOutlet(ErmesObjInOutlet io) {
+    dirtyInOutlets.removeElement(io);
+  }
+
+  private void emptyDirtyLists() {
+    dirtyInOutlets.removeAllElements();
+    dirtyObjects.removeAllElements();
+    dirtyConnections.removeAllElements();
+    dirtySketch = false;
+  }
+
+  /**
+   * At this level, we can implement a politic of drawing.
+   * (example, if there are not objects to paint, paint connections and
+   * in/outlets directly, without using CopyTheOffScreen())
+   */
+  public void paintDirtyList() {
+    if (offGraphics == null) GetOffGraphics();
+    if (dirtySketch) {
+      DrawOffScreen(getGraphics());
+      //repaint();
+      emptyDirtyLists();
+      return;
+    }
+    else {
+      
+      paintList(dirtyInOutlets, offGraphics);
+      dirtyInOutlets.removeAllElements();
+      //--
+      paintList(dirtyConnections, offGraphics);
+      dirtyConnections.removeAllElements();
+      
+      paintList(dirtyObjects, offGraphics);
+      dirtyObjects.removeAllElements();
+      //--
+      paintList(dirtyInOutlets, offGraphics);
+      dirtyInOutlets.removeAllElements();
+      //--
+      paintList(dirtyConnections, offGraphics);
+      dirtyConnections.removeAllElements();
+      //--
+      CopyTheOffScreen(getGraphics());
+      //emptyDirtyLists is done in CopyTheOffScreen()
+      
+    }
+  }
+  
+
+  private void paintList(Vector theList, Graphics theContext) {
+    if (theContext == null) return;
+    if (theList.size()!= 0) {
+       for (Enumeration e = theList.elements(); e.hasMoreElements();) {
+	 ((ErmesDrawable) e.nextElement()).Paint(theContext);
+       }
+    }
+  }
 
   //--------------------------------------------------------
   //	AddObjectForName
@@ -220,7 +289,6 @@ Rectangle previousResizeRect = new Rectangle();
     Rectangle aRect;
     
     try { 
-      //there was an error "aObject may not have been initialized"
       aObject = (ErmesObject) Class.forName(theName).newInstance();	
     }  catch(ClassNotFoundException e) {return null;}
     catch(IllegalAccessException e) {return null;}
@@ -228,26 +296,14 @@ Rectangle previousResizeRect = new Rectangle();
     //finally {
     aObject.Init(this, x, y, args);
       //something went wrong...
-    //return null;
     //};
       itsElements.addElement(aObject);
-      if (offScreenPresent) {
-	aObject.Paint(offGraphics);
-	CopyTheOffScreen(getGraphics());
-      }
-      else aObject.Paint(getGraphics());
+      aObject.DoublePaint();
+
       if(theName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
 	itsPatcherElements.addElement(aObject);
       if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
-      aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, 
-			    aObject.currentRect.width, aObject.currentRect.height);
-      aRect.grow(3,6);
-      itsElementRgn.Add(aRect);
-      for (Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
-	aOutlet = (ErmesObjOutlet)e.nextElement();
-	itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
-      }
-      
+
       ToSave();
       return aObject;
   }
@@ -266,53 +322,13 @@ Rectangle previousResizeRect = new Rectangle();
     out = (ErmesObjOutlet) srcObj.itsOutletList.elementAt(srcOut);
     in  = (ErmesObjInlet) destObj.itsInletList.elementAt(destIn);
 
-    in.ChangeState(false, true); //warning: how many repaint() this function costs?
-    out.ChangeState(false, true);//warning: how many repaint() this function costs?
+    in.ChangeState(false, true, false); //warning: how many repaint() this function costs?
+    out.ChangeState(false, true, false);//warning: how many repaint() this function costs?
     ToSave();
-    return itsHelper.TraceConnection(out, in);
+    ErmesConnection aConnection = itsHelper.TraceConnection(out, in, true);
+    return aConnection;
   }
   
-  //--------------------------------------------------------
-  //	AddSameObjectAs
-  //  adding an object given a template of it, and initialization arguments
-  //	(mainly for messages and externs substitutions)
-  //--------------------------------------------------------
-  public ErmesObject AddSameObjectAs(ErmesObject theObject, int x, int y, String args) {
-
-    ErmesObject aObject = null;	//wasting time...
-    Rectangle aRect;
-    ErmesObjOutlet aOutlet;
-    int i;
-		
-    String theName = theObject.getClass().getName();
-    if(doSnapToGrid){
-      Point aPoint = itsHelper.SnapToGrid(x, y);
-      x = aPoint.x;
-      y = aPoint.y;
-    }
-    try {
-      //there was an error "aObject may not have been initialized"
-      aObject = (ErmesObject) Class.forName(theName).newInstance();
-    } catch(ClassNotFoundException e) {i = 0;}
-    catch(IllegalAccessException e) {i = 1;}
-    catch(InstantiationException e) {i = 2;}
-    finally {
-      aObject.Init(this, x, y, args);
-      itsElements.addElement(aObject);
-      aObject.Paint(getGraphics());
-      if (!itsToolBar.locked) editStatus = DOING_NOTHING;	
-      aRect = aObject.Bounds();
-      aRect.grow(3,6);
-      itsElementRgn.Add(aRect);
-      for (Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
-	aOutlet = (ErmesObjOutlet)e.nextElement();
-	itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
-      }
-    }
-    ToSave();
-    return aObject;
-  }
-
   public Font getSketchFont() {
     return sketchFont;
   }
@@ -333,10 +349,10 @@ Rectangle previousResizeRect = new Rectangle();
     sketchFont = theFont;
   }
   
-
   public void ChangeNameFont(String theFontName){
     ErmesObject aObject;
     Font aFont;
+
     for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
@@ -354,13 +370,10 @@ Rectangle previousResizeRect = new Rectangle();
 	  return;
 	}
        
-	RemoveElementRgn(aObject);
 	aObject.ChangeFont(aFont);
-	SaveOneElementRgn(aObject);
       }
     }
     ToSave();
-    repaint();
   }
 
   public void ChangeSizeFont(int fontSize){
@@ -383,9 +396,7 @@ Rectangle previousResizeRect = new Rectangle();
 	  return;
 	}
 	
-	RemoveElementRgn(aObject);
 	aObject.ChangeFont(aFont);
-	SaveOneElementRgn(aObject);
       }
     }
     ToSave();
@@ -424,82 +435,38 @@ Rectangle previousResizeRect = new Rectangle();
     case START_ADD:
       break;
     case DOING_NOTHING:
-      itsHelper.DeselectInOutlet();
-      if(evt.getClickCount()>1){   
-	if(!evt.isShiftDown()) itsCurrentConnection.ChangeRoutingMode();
-	else  itsCurrentConnection.ReroutingConn();
-	
-	itsSketchWindow.UpdateRoutingMenuWithSelection();
+      itsHelper.deselectCurrentInOutlet(false);
 
-	editStatus = START_SELECT;
-	ToSave();
-	repaint();
-      }
-      else{
-	itsSelectedConnections.addElement(itsCurrentConnection); 
-	itsCurrentConnection.Select();
-	editStatus = START_SELECT;///////
-	itsSketchWindow.UpdateRoutingMenuWithSelection();
-	if (offScreenPresent) {
-	  itsCurrentConnection.Paint(offGraphics);
-	  CopyTheOffScreen(getGraphics());
-	}
-	else
-	  itsCurrentConnection.Paint(getGraphics());
-
-	if((!itsCurrentConnection.GetErrorState())&&(itsCurrentConnection.GetAutorouted())
-	   &&(itsHelper.IsMovable(itsSelectedSegment))){
-	  MoveSegment(x,y);
-	  RemoveConnRgn(itsCurrentConnection);
-	  itsCurrentConnection.GetConnectionSet().RemoveRgn(itsCurrentConnection);
-	  ToSave();
-	}
-      }
+      itsSelectedConnections.addElement(itsCurrentConnection); 
+      itsCurrentConnection.Select(false);
+      paintDirtyList();
+      editStatus = START_SELECT;///////
+      
+      ToSave();
       break;
     case START_SELECT:
       if (!evt.isShiftDown()) {//lo shift non e' premuto
-	itsHelper.DeselectAll(itsCurrentConnection);
-	if(evt.getClickCount()>1){
-	  itsCurrentConnection.ChangeRoutingMode();
-	  ToSave();
-	  repaint();
-	}
-	else{
-	  itsSelectedConnections.addElement(itsCurrentConnection); 
-	  //itsCurrentConnection.Select();
-	  if((!itsCurrentConnection.GetErrorState())&(itsCurrentConnection.GetAutorouted())&&
-	     (itsHelper.IsMovable(itsSelectedSegment))){
-	    MoveSegment(x,y);
-	    RemoveConnRgn(itsCurrentConnection);
-	    itsCurrentConnection.GetConnectionSet().RemoveRgn(itsCurrentConnection);
-	    ToSave();
-	  }
-	  itsCurrentConnection.Select();
-	  itsCurrentConnection.Repaint();
-	  itsSketchWindow.UpdateRoutingMenuWithSelection();
-	}
-      }
-      else{//se c'e' lo shift premuto
-	if(evt.getClickCount()>1){
-	  itsCurrentConnection.ReroutingConn();
-	  itsSketchWindow.UpdateRoutingMenuWithSelection();
-	  ToSave();
-	}
-	else{
-	  if(!(itsSelectedConnections.contains(itsCurrentConnection))){
-	    itsSelectedConnections.addElement(itsCurrentConnection); 
-	    itsCurrentConnection.Select();
-	  }	
-	  else {
-	    itsSelectedConnections.removeElement(itsCurrentConnection);
-	    itsCurrentConnection.Deselect();
+	itsHelper.deselectAll(false);
+	itsSelectedConnections.addElement(itsCurrentConnection); 
 
-	    if((itsSelectedConnections.size()) == 0)
-	      editStatus = DOING_NOTHING;
-	  }
-	  itsSketchWindow.UpdateRoutingMenuWithSelection();
+	ToSave();
+	  
+	itsCurrentConnection.Select(false);
+	paintDirtyList();
+      }
+      else{
+	if(!(itsSelectedConnections.contains(itsCurrentConnection))){
+	  itsSelectedConnections.addElement(itsCurrentConnection); 
+	  itsCurrentConnection.Select(true);
+	}	
+	else {
+	  itsSelectedConnections.removeElement(itsCurrentConnection);
+	  itsCurrentConnection.Deselect(false);
+	  
+	  if((itsSelectedConnections.size()) == 0)
+	    editStatus = DOING_NOTHING;
+	  paintDirtyList();
 	}
-	repaint();
       }	
       break;	
     }
@@ -518,41 +485,24 @@ Rectangle previousResizeRect = new Rectangle();
       case START_ADD:
 	break;
       case DOING_NOTHING:
-	itsHelper.DeselectInOutlet();
+	itsHelper.deselectCurrentInOutlet(false);
 	itsSelectedList.addElement(theObject);
-	theObject.Select();
+	theObject.Select(false);
 	CheckCurrentFont();
-	if (offScreenPresent) {
-	  theObject.Paint(offGraphics);
-	  CopyTheOffScreen(getGraphics());   
-	}
-	else 
-	  theObject.Paint(getGraphics());
 	MoveSelected(theX,theY);
 	ToSave();
+	paintDirtyList();
 	break;
       case START_SELECT:
 	if (evt.isShiftDown()) {
 	  if(!itsSelectedList.contains(theObject)){
 	    itsSelectedList.addElement(theObject);
-      	    theObject.Select();
+      	    theObject.Select(true);
 	    CheckCurrentFont();
-	    if (offScreenPresent) {
-	      theObject.Paint(offGraphics);
-	      CopyTheOffScreen(getGraphics());
-	    }
-	    else 
-	      theObject.Paint(getGraphics());
 	  }
 	  else{
 	    itsSelectedList.removeElement(theObject);	
-	    theObject.Deselect();
-	    if (offScreenPresent) {
-	      theObject.Paint(offGraphics);
-	      CopyTheOffScreen(getGraphics()); 
-	    }
-	    else 
-	      theObject.Paint(getGraphics());
+	    theObject.Deselect(true);
 	    if(itsSelectedList.isEmpty()) 
 	      editStatus = DOING_NOTHING;
 	  }
@@ -561,18 +511,11 @@ Rectangle previousResizeRect = new Rectangle();
 	  MoveSelected(theX, theY);
 	  ToSave();
 	}
-	else {
-	  itsHelper.DeselectAll();
-	  // select the object involved
+	else { 
+	  itsHelper.deselectAll(true);
 	  itsSelectedList.addElement(theObject);
-	  theObject.Select();
+	  theObject.Select(true);
 	  CheckCurrentFont();
-	  if (offScreenPresent) {
-	    theObject.Paint(offGraphics);
-	    CopyTheOffScreen(getGraphics());
-	  }
-	  else 
-	    theObject.Paint(getGraphics());
 	  MoveSelected(theX,theY);
 	  ToSave();
 	}
@@ -584,14 +527,14 @@ Rectangle previousResizeRect = new Rectangle();
   }
   
   public void CopyTheOffScreen(Graphics g) {
-    //this is a security check; should never happen, but 
-    //a problem has detected during loads, when the Sketch is not visible yet, and some
-    //component start to paint. This problem should be insulated
     if((g!= null)&&(offScreenPresent)) {
       if (isInGroup || copyPending) {
 	copyPending = true;
       }
-      else g.drawImage(offImage,0,0, this);
+      else {
+	g.drawImage(offImage,0,0, this);
+	emptyDirtyLists();
+      }    
     }
   }
 
@@ -600,7 +543,6 @@ Rectangle previousResizeRect = new Rectangle();
   //	message received from the ToolBar when an object is DEselected
   //--------------------------------------------------------
   public void DoNothing() {
-    //itsToolBar.Deselect();
     editStatus = DOING_NOTHING;
   }
   
@@ -666,7 +608,6 @@ Rectangle previousResizeRect = new Rectangle();
       for (Enumeration e1 = aObject.GetOutletList().elements(); e1.hasMoreElements();) {
 	aOutlet = (ErmesObjOutlet) e1.nextElement();
 	aOutlet.Paint(offGraphics);
-	aOutlet.GetConnectionSet().DrawCircles(offGraphics);
       }
       aObject.Paint(offGraphics);
     }
@@ -675,18 +616,9 @@ Rectangle previousResizeRect = new Rectangle();
       aConnection.Paint(offGraphics);
     }
     
-    //g.drawImage(offImage,0,0, this);
     CopyTheOffScreen(g);
   }
   
-  //--------------------------------------------------------
-  //	GetElementRegion
-  //  return the elements region
-  //--------------------------------------------------------
-  public ErmesRegion GetElementRegion(){
-    return itsElementRgn;
-  }
-
   //--------------------------------------------------------
   //	GetElements
   //  return the elements list
@@ -696,14 +628,6 @@ Rectangle previousResizeRect = new Rectangle();
   }
   
   //--------------------------------------------------------
-  //	GetHSegmRgn
-  //  return the horizontal segments region
-  //--------------------------------------------------------
-  public ErmesRegion GetHSegmRgn(){
-    return itsHSegmRgn;
-  }
-
-  //--------------------------------------------------------
   //	GetPatcherElements
   // 
   //--------------------------------------------------------
@@ -711,22 +635,11 @@ Rectangle previousResizeRect = new Rectangle();
     return itsPatcherElements;
   }
 
-  //--------------------------------------------------------
-  //	GetVSegmRgn
-  //  return the vertical segments region
-  //--------------------------------------------------------
-  public ErmesRegion GetVSegmRgn(){
-    return itsVSegmRgn;
-  }
-
-
   public Graphics GetOffGraphics() {
     Dimension d = preferredSize;
     
     //Create the offscreen graphics context, if no good one exists.
     if ( (offGraphics == null)){	//first sketch of the day. We do this even if it doesn't belong
-      // || (d.width != offDimension.width)
-      // || (d.height != offDimension.height)  
       offDimension = d;
       offImage = createImage(d.width, d.height);
       if (offImage != null) {		//this can happen...
@@ -753,10 +666,11 @@ Rectangle previousResizeRect = new Rectangle();
     return itsSketchWindow;
   }
   
-  /*2203 public ErmesObjMessThread GetMessThread(){
-    return itsMessThread;
-    }*/
-
+  int incrementalPasteOffset = -10;
+  private Point startPastingPoint = new Point();
+  void resetPasteOffset() {
+    incrementalPasteOffset = -10;
+  }
   // note: the following function is a reduced version of InitFromFtsContainer.
   // better organization urges
   void PasteObjects(Vector objectVector, Vector connectionVector) {
@@ -764,13 +678,28 @@ Rectangle previousResizeRect = new Rectangle();
     FtsConnection fc;
     ErmesObject aObject;
     ErmesConnection aConnection;
+    int pasteDeltaX;
+    int pasteDeltaY;
 
     int objectX;    
     int objectY;
     
-    itsHelper.DeselectAll();
+    itsHelper.deselectAll(false);
 
     if (objectVector == null) return;
+
+    //compute the delta to be applied to the position of pasted objects
+    if (startPastingPoint.x == 0 || startPastingPoint.y == 0) { 
+      System.err.println("setto a 300, 300");
+      startPastingPoint.setLocation(300, 300);
+    }
+    fo = (FtsObject)(objectVector.elementAt(0));
+    objectX = ((Integer)fo.get("x")).intValue();
+    objectY = ((Integer)fo.get("y")).intValue();
+
+    pasteDeltaX = startPastingPoint.x - objectX;
+    pasteDeltaY = startPastingPoint.y - objectY;
+
     for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
       fo = (FtsObject)e.nextElement();
       // Note that the representation is now found from the fts className,
@@ -783,18 +712,19 @@ Rectangle previousResizeRect = new Rectangle();
 
       objectX = ((Integer)fo.get("x")).intValue();
       objectY = ((Integer)fo.get("y")).intValue();
-      fo.put("x", objectX+10);//offset by 10      
-      fo.put("y", objectY+10);//offset by 10
-      
+      fo.put("x", objectX+pasteDeltaX+incrementalPasteOffset);     
+      fo.put("y", objectY+pasteDeltaY+incrementalPasteOffset);
+       
       aObject = itsHelper.AddObject(objectClass, fo);
       itsSelectedList.addElement(aObject);
-      aObject.Select();
+      aObject.Select(false);
        
       if (objectClass == ircam.jmax.editors.ermes.ErmesObjPatcher.class)
 	itsPatcherElements.addElement(aObject);
       
       if (aObject != null) fo.setRepresentation(aObject);
     }
+    incrementalPasteOffset += 10;
 
     // chiama tanti AddConnection...
 
@@ -807,9 +737,10 @@ Rectangle previousResizeRect = new Rectangle();
       toObj = (ErmesObject) fc.getTo().getRepresentation();
       aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
       itsSelectedConnections.addElement(aConnection);
-      aConnection.Select();
+      aConnection.Select(false);
     }
     editStatus = START_SELECT;
+    paintDirtyList();
   }
   
   
@@ -860,6 +791,8 @@ Rectangle previousResizeRect = new Rectangle();
 			   + " to object " + fc.getTo() + " inlet " + fc.getToInlet());
       }
     }
+    repaint();
+    //paintDirtyList();
   }
 
   //--------------------------------------------------------
@@ -872,37 +805,38 @@ Rectangle previousResizeRect = new Rectangle();
       itsConnectingObj = theObject;
       itsConnectingLet = theRequester;
       itsDirection = FromInToOut;
-      theRequester.ChangeState(true, theRequester.connected);
+      theRequester.ChangeState(true, theRequester.connected, false);
     }
     else if (itsDirection == FromInToOut) {
       //deselection of old inlet
       if(itsConnectingLetList.size()!=0){
 	for (Enumeration e = itsConnectingLetList.elements(); e.hasMoreElements();) {
 	  aInlet = (ErmesObjInlet)e.nextElement();
-	  aInlet.ChangeState(false, aInlet.connected);
+	  aInlet.ChangeState(false, aInlet.connected, false);
 	}
 	ResetConnect();
       }
-      else itsConnectingObj.ConnectionAbort(itsConnectingLet);
+      else itsConnectingObj.ConnectionAbort(itsConnectingLet, false);
       
       if(theRequester!=itsConnectingLet){
 	//selection of new outlet
 	itsConnectingObj = theObject;
 	itsConnectingLet = theRequester;
 	itsDirection = FromInToOut;
-	theRequester.ChangeState(true, theRequester.connected);
+	theRequester.ChangeState(true, theRequester.connected, false);
       }
       //else nothing to do
     }
     else {// FromOutToIn
       if(itsConnectingLetList.size()!=0) MultiConnect(theRequester);
       else{
-	itsConnectingLet.ChangeState(false, true);
-	theRequester.ChangeState(false, true);
-	itsHelper.TraceConnection((ErmesObjOutlet)itsConnectingLet, (ErmesObjInlet)theRequester);
+	itsConnectingLet.ChangeState(false, true, false);
+	theRequester.ChangeState(false, true/*false*/, false);
+	itsHelper.TraceConnection((ErmesObjOutlet)itsConnectingLet, (ErmesObjInlet)theRequester, false);
 	ResetConnect();
       }
     }
+    paintDirtyList();
     return true;
   }
   
@@ -916,25 +850,19 @@ Rectangle previousResizeRect = new Rectangle();
     setLayout(null);
     preferredSize = new Dimension(SKETCH_WIDTH, SKETCH_HEIGHT);
     itsSketchWindow = theSketchWindow;
-    itsElementRgn = new ErmesRegion();
-    itsHSegmRgn = new ErmesRegion();
-    itsVSegmRgn = new ErmesRegion();
     itsConnections = new Vector();
     itsInletList = new Vector();
     itsOutletList = new Vector();
     itsSelectedList = new Vector();
     itsElements = new Vector();
     itsSelectedConnections = new Vector();
-    itsSelectedSegment = new ErmesConnSegment();
     itsStartMovingPt = new Point(0,0);    
     itsStartInclusionRect = new Rectangle();  
-    itsConnectionSetList = new Vector();
     itsUpdateList = new Vector();
     itsPatcherElements = new Vector();
     itsConnectingLetList = new Vector();
         
     itsEditField = new ErmesObjEditField(this);
-    //2203itsMessThread = new ErmesObjMessThread(this, "aFlash");
     add(itsEditField);
     validate();
     itsEditField.setVisible(false);
@@ -955,13 +883,12 @@ Rectangle previousResizeRect = new Rectangle();
   }
 	
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {
-    if (lastSketchWithOffScreen == theSketchPad) return;
+    if (lastSketchWithOffScreen == theSketchPad || theSketchPad.offScreenPresent) return;
     if (lastSketchWithOffScreen!=null)
       lastSketchWithOffScreen.offScreenPresent = false;
     theSketchPad.offScreenPresent = true;
     lastSketchWithOffScreen = theSketchPad;
     theSketchPad.paintForTheFirstTime = true;
-    //no check for now: change the OffScreen property
   }
   
   public void CheckCurrentFont(){
@@ -1019,7 +946,6 @@ Rectangle previousResizeRect = new Rectangle();
       y = aPoint.y;
     }
       
-    //bug 1003.8: waiting for lock on Maurizio's modifs
     boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
     if (isTopPatcher && (itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
       //forbidden to add such objects in a top level patch
@@ -1051,18 +977,11 @@ Rectangle previousResizeRect = new Rectangle();
     
     aObject.Init(this, x, y, "");
     itsElements.addElement(aObject);
-    aObject.Paint(offGraphics);
-    CopyTheOffScreen(getGraphics());
+    aObject.DoublePaint();
+    //CopyTheOffScreen(getGraphics());
     if(itsAddObjectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
       itsPatcherElements.addElement(aObject);
     if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
-    aRect = new Rectangle(aObject.currentRect.x, aObject.currentRect.y, aObject.currentRect.width, aObject.currentRect.height);
-    aRect.grow(3,6);
-    itsElementRgn.Add(aRect);
-    for (Enumeration en = aObject.GetOutletList().elements(); en.hasMoreElements();) {
-      aOutlet = (ErmesObjOutlet)en.nextElement();
-      itsConnectionSetList.addElement(aOutlet.GetConnectionSet());
-    }
     ToSave();
   }
 
@@ -1071,13 +990,15 @@ Rectangle previousResizeRect = new Rectangle();
 
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
-  public void mouseClicked(MouseEvent e){}
+  public void mouseClicked(MouseEvent e){
+    startPastingPoint.setLocation(e.getX(), e.getY());
+    incrementalPasteOffset = -5;
+  }
 
   public void mousePressed(MouseEvent e){
-    MaxApplication.setCurrentWindow(itsSketchWindow); //demo only: 4/03/98 0:55
+    MaxApplication.setCurrentWindow(itsSketchWindow);
     itsSketchWindow.requestFocus();//???
     
-    //create the object whose name is 
     int x = e.getX();
     int y = e.getY();
     int i;
@@ -1085,7 +1006,6 @@ Rectangle previousResizeRect = new Rectangle();
     if(!offScreenPresent){
       RequestOffScreen(this);
       DrawOffScreen(getGraphics());
-      //itsFirstClick = false;
     }
     
     if (itsRunMode) {
@@ -1107,7 +1027,8 @@ Rectangle previousResizeRect = new Rectangle();
     ///if we are in a InOutLet
     if(itsHelper.IsInInOutLet(x,y)){
       if(itsToolBar.pressed) itsToolBar.Unlock();
-      itsHelper.DeselectObjAndConn();
+      itsHelper.deselectObjects(itsSelectedList, false);
+      itsHelper.deselectConnections(itsSelectedConnections, false);
       if (e.isShiftDown()){
 	MultiConnect(itsCurrentInOutlet);
       }
@@ -1116,9 +1037,10 @@ Rectangle previousResizeRect = new Rectangle();
 	  itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
 	}
 	else {
-	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet); 
+	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
 	}
       }
+      paintDirtyList();
       return;
     }
     ///if we are in a Object
@@ -1140,8 +1062,10 @@ Rectangle previousResizeRect = new Rectangle();
     if(editStatus == START_ADD){
       AddingObject(x,y);
     }
-    else{
-      if (!e.isShiftDown()) itsHelper.DeselectAll();
+    else{ //DOING_NOTHING, START_SELECT
+      if (!e.isShiftDown()) {
+	itsHelper.deselectAll(true);
+      }
       editStatus = AREA_SELECT;
       currentRect.setBounds(x,y,0,0);
       previousRect.setBounds(x,y,0,0);
@@ -1150,14 +1074,10 @@ Rectangle previousResizeRect = new Rectangle();
   }
        
   public void mouseReleased(MouseEvent e){
-
     int x = e.getX();
     int y = e.getY();
-    
-    //(opt.) resetting the "firstclick" flag if safer but heavy 
-    //(a repaint foreach mouseup...)
-    //itsFirstClick = true;
-    //RequestOffScreen(this);
+
+    startPastingPoint.setLocation(x, y);
     MaxApplication.setCurrentWindow(itsSketchWindow);
     if(itsScrolled) itsScrolled=false;
 
@@ -1165,45 +1085,39 @@ Rectangle previousResizeRect = new Rectangle();
 
       if (itsStartDragObject != null) itsStartDragObject.MouseUp(e, x, y);
       itsStartDragObject = null;
-      return;//why not?
+      return;
     }
     if (editStatus == AREA_SELECT) {
-      
+
       Rectangle aRect = itsHelper.NormalizedRect(currentRect);
       if (!aRect.isEmpty()) { 
 	for (Enumeration en = itsElements.elements() ; en.hasMoreElements() ;) {
 	  ErmesObject aObject = (ErmesObject) en.nextElement();
 	  if (aObject.Bounds().intersects(aRect)) {
-	    aObject.Select();
-	    aObject.Paint(offGraphics);
+	    aObject.Select(false);
 	    itsSelectedList.addElement(aObject);
 	  }
 	}	
-	CheckCurrentFont();
-	
-	SelectConnections();
-	
-	if (offScreenPresent) {
-	  CopyTheOffScreen(getGraphics());
-	}
-	else {//should never happen, but..
-	  DrawOffScreen(getGraphics());
-	}
+	CheckCurrentFont();	
+	SelectConnections(false);
       }
-      else if (!e.isShiftDown()) itsHelper.DeselectAll();
-	       
-      //currentRect = null;
-      //currentPoint = null;
-      if (itsSelectedList.isEmpty()) editStatus = DOING_NOTHING;
-      else editStatus = START_SELECT;
+	
+
+      if (itsSelectedList.isEmpty()) { 
+	editStatus = DOING_NOTHING;
+	if (!aRect.isEmpty())
+	  CopyTheOffScreen(getGraphics());//a better solution?
+      }
+      else {
+	editStatus = START_SELECT;
+	paintDirtyList();
+      }
       return;
     }
     else if (editStatus == MOVING) {
       int aDeltaH, aDeltaV;
       currentMovingBigRect.setBounds(0,0,0,0);
-      //currentMovingLittleRect.setBounds(0,0,0,0);
       previousMovingBigRect.setBounds(0,0,0,0);
-      //previousMovingLittleRect.setBounds(0,0,0,0);
       itsMovingRectangles.removeAllElements();
       editStatus = START_SELECT;
       if((currentMouseX-itsStartMovingPt.x!=0)||(currentMouseY-itsStartMovingPt.y!=0)){
@@ -1215,40 +1129,22 @@ Rectangle previousResizeRect = new Rectangle();
 	  aDeltaV = aPoint.y;
 	}
 	itsHelper.MoveElements(aDeltaH, aDeltaV);
-	itsHelper.SaveElementRgn();
-	itsHelper.MoveElemConnections(aDeltaH,aDeltaV);
+	//itsHelper.MoveElemConnections(aDeltaH,aDeltaV);
 	repaint();
       }
-      //repaint();
       else {//se non ha mosso
 	if(e.getClickCount() == 1){
 	  if(oldEditStatus == START_SELECT){
 	    if(itsCurrentObject instanceof ErmesObjEditableObject){
 	      if(clickHappenedOnAnAlreadySelected) {
-		itsHelper.DeselectAllInEditing(itsCurrentObject);
+		itsHelper.deselectAll(true);
+		itsSelectedList.addElement(itsCurrentObject);
 		((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
-	      }
-	    }
-	    else if(itsCurrentObject instanceof ErmesObjComment){
-	      if(clickHappenedOnAnAlreadySelected) {
-		itsHelper.DeselectAllInEditing(itsCurrentObject);
-		((ErmesObjComment)itsCurrentObject).RestartEditing();
 	      }
 	    }
 	  }
 	}
       }
-    }
-    else if (editStatus == MOVINGSEGMENT){
-      if(itsHelper.IsMovable(itsSelectedSegment)) {
-	itsHelper.MoveDraggedSegment(currentMouseX-itsStartMovingPt.x, currentMouseY-itsStartMovingPt.y);
-	ErmesConnection aConnection = itsSelectedSegment.GetConnection();
-	SaveConnectionRgn(aConnection);
-	aConnection.GetConnectionSet().SaveRgn(aConnection);
-	aConnection.GetConnectionSet().UpdateCircles();
-      }
-      editStatus = START_SELECT;
-      repaint();
     }
     else if (editStatus == RESIZING_OBJECT){
       itsCurrentObject.MouseUp(e,x,y);
@@ -1268,46 +1164,100 @@ Rectangle previousResizeRect = new Rectangle();
     }
   }
 
-  void arrowsPressed(int whichArrow) {
-    if (editStatus != START_SELECT) return;
+  /**
+   * Resize a group of object by the given amount of pixel in the given direction
+   */
+  void resizeSelection(int amount, int direction) {
+    int x_amount = 0;
+    int y_amount = 0;
+    
+    if (direction == Platform.LEFT_KEY) x_amount = -amount;
+    else if (direction == Platform.RIGHT_KEY) x_amount = amount;
+    if (direction == Platform.UP_KEY) y_amount = -amount;
+    else if (direction == Platform.DOWN_KEY) y_amount = amount;
 
-    if (whichArrow == Platform.LEFT_KEY) {
-      itsHelper.MoveElements(-1, 0);
-      itsHelper.SaveElementRgn();
-      itsHelper.MoveElemConnections(-1,0);
-    }
-    else if (whichArrow == Platform.RIGHT_KEY) {
-      itsHelper.MoveElements(1, 0);
-      itsHelper.SaveElementRgn();
-      itsHelper.MoveElemConnections(1,0);
-    }
-    else if (whichArrow == Platform.UP_KEY) {
-      itsHelper.MoveElements(0, -1);
-      itsHelper.SaveElementRgn();
-      itsHelper.MoveElemConnections(0,-1);
-    }
-    else if (whichArrow == Platform.DOWN_KEY) {
-      itsHelper.MoveElements(0, 1);
-      itsHelper.SaveElementRgn();
-      itsHelper.MoveElemConnections(0,1);
+    ErmesObject aObject;
+    for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject) e.nextElement();
+      if(aObject.IsResizeTextCompat(x_amount, y_amount)) aObject.Resize(x_amount, y_amount);
+      else aObject.ResizeToText(x_amount, y_amount);
     }
     repaint();
+  }
     
+  /** 
+   * Resize all the object in the selection to a size (width or height...)
+   */ 
+  void alignSizeSelection(int direction) {
+    ErmesObject aObject;
+    int max = 0;
+
+    if (direction == Platform.LEFT_KEY) { //we're resetting the selection to the minimum (hor.) size
+      for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject) e.nextElement();
+	aObject.Resize(aObject.getMinimumSize().width-aObject.currentRect.width, 0);
+      }
+      repaint();
+    }    
+    else if (direction == Platform.RIGHT_KEY) { //we're setting all the object's widths to the max      
+      for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject) e.nextElement();
+	if (aObject.currentRect.width > max) max = aObject.currentRect.width;
+      }
+      for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject) e.nextElement();
+	aObject.Resize(max-aObject.currentRect.width, 0);
+      }
+      repaint();
+    }
+    else if (direction == Platform.UP_KEY) {
+      for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject) e.nextElement();
+	aObject.Resize(0, aObject.getMinimumSize().height-aObject.currentRect.height);
+      }
+      repaint();
+    }
+    else if (direction == Platform.DOWN_KEY) {
+      for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject) e.nextElement();
+	if (aObject.currentRect.height > max) max = aObject.currentRect.height;
+      }
+      for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject) e.nextElement();
+	aObject.Resize(0, max-aObject.currentRect.height);
+      }
+      repaint();
+    }
+  }
+
+  void moveSelection(int amount, int direction) {
+    int x_amount = 0;
+    int y_amount = 0;
+    ErmesObject aObject;
+
+    if (direction == Platform.LEFT_KEY) x_amount = -amount;
+    else if (direction == Platform.RIGHT_KEY) x_amount = amount;
+    if (direction == Platform.UP_KEY) y_amount = -amount;
+    else if (direction == Platform.DOWN_KEY) y_amount = amount;
+
+    itsHelper.MoveElements(x_amount, y_amount);
+    
+    repaint();
+    //DrawOffScreen(getGraphics());
   }
   
   //////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////mouseListener--fine
-  public void SelectConnections(){
+  public void SelectConnections(boolean paintNow){
     ErmesConnection aConnection;
     for (Enumeration en = itsConnections.elements() ; en.hasMoreElements() ;) {
       aConnection = (ErmesConnection) en.nextElement();
       if((aConnection.GetSourceObject().itsSelected)&&(aConnection.GetDestObject().itsSelected)){	
-	aConnection.Select();
-	aConnection.Paint(offGraphics);
+	aConnection.Select(false);
 	itsSelectedConnections.addElement(aConnection);
-	itsSketchWindow.UpdateRoutingMenuWithSelection();
       }
-    }	
+    }
+    if (paintNow) paintDirtyList();
   }
 
 
@@ -1365,12 +1315,14 @@ Rectangle previousResizeRect = new Rectangle();
     } 
     if(editStatus == RESIZING_OBJECT) {
       int aWidth, aHeight;
-      if((java.lang.Math.abs(x-currentResizeRect.x)<itsResizingObject.getMinimumSize().width)||
-	 (x<currentResizeRect.x)) aWidth = currentResizeRect.width;
+
+      if((java.lang.Math.abs(x-currentResizeRect.x)<itsResizingObject.getMinimumSize().width)|| 
+	 (x<currentResizeRect.x)) 
+	aWidth = currentResizeRect.width;
       else aWidth = x-currentResizeRect.x;
 
-      if((java.lang.Math.abs(y-currentResizeRect.y)<itsResizingObject.getMinimumSize().height)||
-	(y<currentResizeRect.y)) aHeight = currentResizeRect.height;
+      if((java.lang.Math.abs(y-currentResizeRect.y)<itsResizingObject.getMinimumSize().height+1)||
+	 (y<currentResizeRect.y)) aHeight = currentResizeRect.height;
       else aHeight = y-currentResizeRect.y;
 
       if(itsResizeMode == BOTH_RESIZING)
@@ -1381,18 +1333,6 @@ Rectangle previousResizeRect = new Rectangle();
 	currentResizeRect.setSize(currentResizeRect.width, aHeight);
       update(getGraphics());
       return;
-
-      /*if((java.lang.Math.abs(x-currentResizeRect.x)<itsResizingObject.getMinimumSize().width)||
-	(java.lang.Math.abs(y-currentResizeRect.y)<itsResizingObject.getMinimumSize().height)||
-	(x<currentResizeRect.x)||(y<currentResizeRect.y)) return;
-	if(itsResizeMode == BOTH_RESIZING)
-	currentResizeRect.setSize(x-currentResizeRect.x, y-currentResizeRect.y);
-	else if(itsResizeMode == HORIZONTAL_RESIZING)
-	currentResizeRect.setSize(x-currentResizeRect.x, currentResizeRect.height);
-	else if(itsResizeMode == VERTICAL_RESIZING)
-	currentResizeRect.setSize(currentResizeRect.width, y-currentResizeRect.y);
-	update(getGraphics());
-	return;*/
     } 
     else if (editStatus == MOVING){
       repaint();
@@ -1400,12 +1340,6 @@ Rectangle previousResizeRect = new Rectangle();
 	currentMouseX = x;
       if(itsStartInclusionRect.y+(y-itsStartMovingPt.y)>=0)
 	currentMouseY = y;
-      repaint();
-      return;
-    }
-    else if(editStatus == MOVINGSEGMENT){
-      currentMouseX = x;
-      currentMouseY = y;
       repaint();
       return;
     }
@@ -1424,7 +1358,7 @@ Rectangle previousResizeRect = new Rectangle();
 	  if (!itsCurrentInOutlet.GetSelected())
 	    itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
 	  else 
-	    itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet); 
+	    itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
 	}
 	itsCurrentInOutlet.itsAlreadyMoveIn = true;
       }
@@ -1447,34 +1381,6 @@ Rectangle previousResizeRect = new Rectangle();
   }
   public ErmesObjTextArea GetTextArea(){
     return itsTextArea;
-  }
-  //--------------------------------------------------------
-  //	MoveSegment
-  //--------------------------------------------------------
-  public void MoveSegment(ErmesConnSegment theSegment, MouseEvent evt, int theX, int theY)
-  {
-    itsSelectedSegment = theSegment;
-    editStatus = MOVINGSEGMENT;
-    itsStartMovingPt.x = theX;
-    itsStartMovingPt.y = theY;
-    currentMouseX = theX;
-    currentMouseY = theY;
-  }
-  
-  public void MoveSegment(ErmesConnSegment theSegment, int theX, int theY){
-    itsSelectedSegment = theSegment;
-    itsStartMovingPt.x = theX;
-    itsStartMovingPt.y = theY;
-    currentMouseX = theX;
-    currentMouseY = theY;
-  }
-  
-  public void MoveSegment(int theX, int theY){
-    editStatus = MOVINGSEGMENT;
-    itsStartMovingPt.x = theX;
-    itsStartMovingPt.y = theY;
-    currentMouseX = theX;
-    currentMouseY = theY;
   }
   
   //--------------------------------------------------------
@@ -1516,18 +1422,17 @@ Rectangle previousResizeRect = new Rectangle();
     for (Enumeration e = itsElements.elements() ; e.hasMoreElements() ;) {
       aObject = (ErmesObject) e.nextElement();
       itsSelectedList.addElement(aObject);
-      aObject.Select();
+      aObject.Select(false);
     }
     CheckCurrentFont();
     for (Enumeration e = itsConnections.elements() ; e.hasMoreElements() ;) {
       aConnection = (ErmesConnection) e.nextElement();
       itsSelectedConnections.addElement(aConnection);
-      aConnection.Select();
+      aConnection.Select(false);
     }
-    itsSketchWindow.UpdateRoutingMenuWithSelection();
-    repaint();
+    paintDirtyList();
+    //    repaint();
   }
-
 
 
   //--------------------------------------------------------
@@ -1540,34 +1445,35 @@ Rectangle previousResizeRect = new Rectangle();
       itsConnectingLet = theRequester;
       itsConnectingObj = theObject;
       itsDirection = FromOutToIn;
-      theRequester.ChangeState(true, theRequester.connected);
+      theRequester.ChangeState(true, theRequester.connected, true);
     }
     else if (itsDirection == FromOutToIn) {
       //deselection of old outlet
       if(itsConnectingLetList.size()!=0){
 	for (Enumeration e = itsConnectingLetList.elements(); e.hasMoreElements();) {
 	  aOutlet = (ErmesObjOutlet)e.nextElement();
-	  aOutlet.ChangeState(false,aOutlet.connected);
+	  aOutlet.ChangeState(false,aOutlet.connected, true);
 	}
 	ResetConnect();
       }
-      else itsConnectingObj.ConnectionAbort(itsConnectingLet);
+      else itsConnectingObj.ConnectionAbort(itsConnectingLet, true);
       
       if(theRequester!=itsConnectingLet){
 	//selection of new outlet
 	itsConnectingObj = theObject;
 	itsConnectingLet = theRequester;
 	itsDirection = FromOutToIn;
-	theRequester.ChangeState(true, theRequester.connected);
+	theRequester.ChangeState(true, theRequester.connected, true);
       }
       //else nothing to do
     }
     else {// FromInToOut
       if(itsConnectingLetList.size()!=0) MultiConnect(theRequester);
       else{
-	itsConnectingLet.ChangeState(false, true);
-	theRequester.ChangeState(false, true);
-	itsHelper.TraceConnection((ErmesObjOutlet)theRequester, (ErmesObjInlet)itsConnectingLet);
+	itsConnectingLet.ChangeState(false, true, false);
+	theRequester.ChangeState(false, true, false);
+	itsHelper.TraceConnection((ErmesObjOutlet)theRequester, (ErmesObjInlet)itsConnectingLet, true);
+	
 	ResetConnect();
       }
     }
@@ -1587,7 +1493,7 @@ Rectangle previousResizeRect = new Rectangle();
 	if(theInOutlet.IsInlet()) itsDirection = FromInToOut;
 	else itsDirection = FromOutToIn;
 	itsConnectingLetList.addElement(theInOutlet);
-	theInOutlet.ChangeState(true, theInOutlet.connected);
+	theInOutlet.ChangeState(true, theInOutlet.connected, false);
       }
     }
     else{
@@ -1595,43 +1501,47 @@ Rectangle previousResizeRect = new Rectangle();
 	if(theInOutlet.IsInlet()){
 	  if(itsConnectingLetList.contains(theInOutlet)){
 	    itsConnectingLetList.removeElement(theInOutlet);
-	    theInOutlet.ChangeState(false, theInOutlet.connected);
+	    theInOutlet.ChangeState(false, theInOutlet.connected, false);
 	  }
 	  else{
 	    itsConnectingLetList.addElement(theInOutlet);
-	    theInOutlet.ChangeState(true, theInOutlet.connected);
+	    theInOutlet.ChangeState(true, theInOutlet.connected, false);
 	  }
 	}
 	else {
 	  for (Enumeration e = itsConnectingLetList.elements(); e.hasMoreElements();) {
 	    aInlet = (ErmesObjInlet)e.nextElement();
-	    aInlet.ChangeState(false, true);
-	    itsHelper.TraceConnection((ErmesObjOutlet)theInOutlet, aInlet);
+	    aInlet.ChangeState(false, true, false);
+	    itsHelper.TraceConnection((ErmesObjOutlet)theInOutlet, aInlet, false);
 	  }
+	  ((ErmesObjOutlet)theInOutlet).ChangeState(false, true, false);
 	  ResetConnect();
+	  paintDirtyList();
 	}
       }
       else{
 	if(!theInOutlet.IsInlet()){
 	  if(itsConnectingLetList.contains(theInOutlet)){
 	    itsConnectingLetList.removeElement(theInOutlet);
-	    theInOutlet.ChangeState(false, theInOutlet.connected);
+	    theInOutlet.ChangeState(false, theInOutlet.connected, false);
 	  }
 	  else{
 	    itsConnectingLetList.addElement(theInOutlet);
-	    theInOutlet.ChangeState(true, theInOutlet.connected);
+	    theInOutlet.ChangeState(true, theInOutlet.connected, true);
 	  }
 	}
 	else {
 	  for (Enumeration e = itsConnectingLetList.elements(); e.hasMoreElements();) {
 	    aOutlet = (ErmesObjOutlet)e.nextElement();
-	    aOutlet.ChangeState(false, true);
-	    itsHelper.TraceConnection(aOutlet, (ErmesObjInlet)theInOutlet);
+	    aOutlet.ChangeState(false, true, false);
+	    itsHelper.TraceConnection(aOutlet, (ErmesObjInlet)theInOutlet, false);
 	  }
+	  ((ErmesObjInlet)theInOutlet).ChangeState(false, true, false);
 	  ResetConnect();
 	}
       }
     }
+    paintDirtyList();
     return true;
   }
 
@@ -1694,35 +1604,6 @@ Rectangle previousResizeRect = new Rectangle();
   }			
   
   //--------------------------------------------------------
-  //	RemoveConnRgn
-  //	remove the connection's segments region from itsH/VSegmRgn
-  //--------------------------------------------------------
-  public void RemoveConnRgn(ErmesConnection theConnection){
-    Rectangle aRect = new Rectangle();
-    ErmesConnSegment aSegment;
-    for (Enumeration e = theConnection.GetHSegmentList().elements(); e.hasMoreElements();) {
-      aSegment = (ErmesConnSegment)e.nextElement();
-      aRect = aSegment.Bounds();
-      itsHSegmRgn.Remove(aRect);
-    }
-    for (Enumeration e1 = theConnection.GetVSegmentList().elements(); e1.hasMoreElements();) {
-      aSegment = (ErmesConnSegment)e1.nextElement();
-      aRect = aSegment.Bounds();
-      itsVSegmRgn.Remove(aRect);
-    }
-  }
-  
-  //--------------------------------------------------------
-  //	RemoveElementRgn
-  //	remove the element region from itsElementRgn
-  //--------------------------------------------------------
-  public void RemoveElementRgn(ErmesObject theObject){
-    Rectangle aRect = theObject.Bounds();
-    aRect.grow(3,6);
-    itsElementRgn.Remove(aRect);
-  }
-  
-  //--------------------------------------------------------
   //	ResetConnect
   //--------------------------------------------------------
   
@@ -1733,125 +1614,7 @@ Rectangle previousResizeRect = new Rectangle();
     itsConnectingLetList.removeAllElements();
     return true;
   }
-  //--------------------------------------------------------
-  //	SaveTo
-  //	general saving method. 
-  //--------------------------------------------------------
-  boolean SaveTo(OutputStream stream) throws IOException {
-    ErmesObject aObject = null;
-    int index = 0;
-    String put = new String();
-    byte ric[] = new byte[256];
-    byte end[] = {']', '\r', '\n'};
-    //byte end
-    
-    //save the objects
-    for (Enumeration e = itsElements.elements(); e.hasMoreElements();) {
-      aObject = (ErmesObject) e.nextElement();
-      put = "set obj(" + index++ + ") [";
-      put.getBytes(0, put.length(), ric, 0);
-      stream.write(ric, 0, put.length());	//
-      aObject.SaveTo(stream);	
-      stream.write(end, 0, end.length);	
-    }
-    
-    //save the connections
-    ErmesConnection aConnection = null;
-    for (Enumeration e1 = itsConnections.elements(); e1.hasMoreElements();) {
-      aConnection = (ErmesConnection) e1.nextElement();
-      put = 	"connect $obj(" + 
-	itsElements.indexOf(aConnection.itsFromObject) +
-	") " +
-	aConnection.itsOutlet.itsOutletNum +
-	" $obj(" +
-	itsElements.indexOf(aConnection.itsToObject)+ 
-	") "+ 
-	aConnection.itsInlet.itsInletNum;
-      put.getBytes(0, put.length(), ric, 0);
-      stream.write(ric, 0, put.length());	//
-      stream.write('\r');
-      stream.write('\n');
-    }
-    
-    return true;	//check this
-  }
-  
-	
-  //--------------------------------------------------------
-  //	SaveConnectionRgn
-  //	save the connection regions
-  //--------------------------------------------------------
-  void SaveConnectionRgn(ErmesConnection theConnection){
-    Rectangle aRect = new Rectangle();
-    ErmesConnSegment aSegment;
-    for (Enumeration e = theConnection.GetHSegmentList().elements(); e.hasMoreElements();) {
-      aSegment = (ErmesConnSegment)e.nextElement();
-      aRect = aSegment.Bounds();
-      itsHSegmRgn.Add(aRect);
-    }
-    for (Enumeration e1 = theConnection.GetVSegmentList().elements(); e1.hasMoreElements();) {
-      aSegment = (ErmesConnSegment)e1.nextElement();
-      aRect = aSegment.Bounds();
-      itsVSegmRgn.Add(aRect);
-    }
-  }
-  
-  public void SaveOneElementRgn(ErmesObject theObject){
-    Rectangle aRect;
-    aRect = theObject.Bounds();
-    aRect.grow(3,6);
-    itsElementRgn.Add(aRect);
-  }
-  
-  public void SetAutorouting(boolean t) {
-    //setting the routing mode could happen in two cases:
-    //1). The demand is global (no connections selected)
-    if(itsSelectedConnections.size()==0) {
-      SetPatcherAutorouting(t);
-    }
-    else {
-      //2. connections were selected, the demand is local to those connections
-      SetSelectionAutorouting(t);
-      repaint();
-    }
-  } 
-  
-  public void SetSelectionAutorouting(boolean t) {
-    ErmesConnection aConnection;
 
-    int selectionState = getSelectionRouting();
-
-    if ((t?1:0) == selectionState) return; //nothing to do
-    for (Enumeration e = itsSelectedConnections.elements(); e.hasMoreElements();) {
-      aConnection = (ErmesConnection)e.nextElement();
-      if(aConnection.GetAutorouted() != t) aConnection.ChangeRoutingMode();
-    }
-  }
-
-  //returns 1 if all the selected connections are autorouted,
-  //0 if all the selected connections are not autorouted,
-  //-1 otherwise 
-  public int getSelectionRouting() {
-    ErmesConnection aConnection;
-    boolean currentValue;
-    boolean allEquals = true;
-    
-    if (itsSelectedConnections.size() == 0) return -1;
-    else if (itsSelectedConnections.size() == 1) return (((ErmesConnection)itsSelectedConnections.elementAt(0)).GetAutorouted())?1:0;
-    //(else)
-    currentValue = ((ErmesConnection)itsSelectedConnections.elementAt(0)).GetAutorouted();
-    for (int i=0; i<itsSelectedConnections.size();i++) {
-      allEquals = currentValue && ((ErmesConnection)itsSelectedConnections.elementAt(i)).GetAutorouted();
-      if (!allEquals) return -1;
-    }
-    return (currentValue)?1:0;
-  }
-
-  public void SetPatcherAutorouting(boolean t){
-    doAutorouting = t;
-    ToSave();
-  }
-  
   public void SetResizeState(ErmesObject theResizingObject){
     editStatus = RESIZING_OBJECT;
     itsResizingObject = theResizingObject;
@@ -1866,8 +1629,9 @@ Rectangle previousResizeRect = new Rectangle();
   public void SetRunMode(boolean theMode) {
     itsRunMode = theMode;
     setBackground(theMode?Color.white:sketchColor);
-    if (theMode) itsHelper.DeselectAll();
-    repaint(); 
+    if (theMode) {
+      itsHelper.deselectAll(true);
+    }
   }
     
   public boolean GetRunMode(){
@@ -1889,11 +1653,8 @@ Rectangle previousResizeRect = new Rectangle();
 	aPoint = itsHelper.SnapToGrid(aObject.itsX, aObject.itsY);
 	aDeltaH = aPoint.x - aObject.itsX;
 	aDeltaV = aPoint.y - aObject.itsY ;
-	RemoveElementRgn(aObject);
 	aObject.MoveBy(aDeltaH, aDeltaV);
-	SaveOneElementRgn(aObject);
       }
-      itsHelper.ReroutingAllConnections();//troppo...farlo solo per gli elem selezionati
       ToSave();
     }
     repaint();
@@ -1907,7 +1668,6 @@ Rectangle previousResizeRect = new Rectangle();
   //	SetToolBar
   //  ToolBar associated with the SketchPad
   //--------------------------------------------------------
-  /*provaSw public void SetToolBar(ErmesToolBar theToolBar) { questa riga sostituita a quella dopo*/
   public void SetToolBar(ErmesSwToolbar theToolBar) {
     itsToolBar = theToolBar;
   }
@@ -1917,13 +1677,13 @@ Rectangle previousResizeRect = new Rectangle();
   //	message received from the ToolBar when an object is selected
   //--------------------------------------------------------
   public void StartAdd(int theObject) {
-    itsHelper.DeselectAll();
+    itsHelper.deselectAll(true);
     editStatus = START_ADD;
     itsAddObject = theObject;
   }
   
   public void startAdd(String theObject) {
-    itsHelper.DeselectAll();
+    itsHelper.deselectAll(true);
     editStatus = START_ADD;
     itsAddObjectName = theObject;
   }
@@ -2045,17 +1805,6 @@ Rectangle previousResizeRect = new Rectangle();
       }
       return;
     }
-    else if (editStatus == MOVINGSEGMENT){
-      if(itsHelper.IsMovable(itsSelectedSegment)){
-	CopyTheOffScreen(g);//g.drawImage(offImage,0,0, this);
-	Rectangle aRect = itsSelectedSegment.Bounds();
-	if(itsHelper.IsHorizontal(aRect)) aRect.y+=(currentMouseY-itsStartMovingPt.y);
-	else aRect.x+=(currentMouseX-itsStartMovingPt.x);
-	g.setColor(Color.black);
-	g.fillRect(aRect.x, aRect.y, aRect.width, aRect.height);
-      }
-      return;
-    }
     else paint(g);
   }
 
@@ -2066,49 +1815,34 @@ Rectangle previousResizeRect = new Rectangle();
   public void AlignSelectedObjects(String thePosition){
     ErmesObject aObject;
     int aValue;
-    Vector aConnVector = new Vector();
-    Vector aConnSetVector = new Vector();
     if(thePosition.equals("Top")){
       aValue = MinYSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
-	RemoveElementRgn(aObject);
 	aObject.MoveBy(0, aValue-aObject.GetY());
-	SaveOneElementRgn(aObject);
       }
     }
     else if(thePosition.equals("Left")){
       aValue = MinXSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
-	RemoveElementRgn(aObject);
 	aObject.MoveBy(aValue-aObject.GetX(), 0);
-	SaveOneElementRgn(aObject);
       }
     }
     else if(thePosition.equals("Bottom")){
       aValue = MaxYSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
-	RemoveElementRgn(aObject);
 	aObject.MoveBy(0, aValue-(aObject.GetY()+aObject.currentRect.height));
-	SaveOneElementRgn(aObject);
       }
     }
     else if(thePosition.equals("Right")){
       aValue = MaxXSelected();
       for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	ConnectionsToRouting(aConnVector, aConnSetVector, aObject);
-	RemoveElementRgn(aObject);
 	aObject.MoveBy(aValue-(aObject.GetX()+aObject.currentRect.width), 0);
-	SaveOneElementRgn(aObject);
       }
     }
-    RerouteAlignedObjectConnections(aConnVector, aConnSetVector);
     DrawOffScreen(getGraphics());//repaint();
   }
   
@@ -2152,57 +1886,7 @@ Rectangle previousResizeRect = new Rectangle();
 	aMaxX = aObject.GetX()+aObject.currentRect.width;
     }
     return aMaxX;
-  }
-
-  private void RerouteAlignedObjectConnections(Vector theConnVector, Vector theConnSetVector){
-    ErmesConnection aConnection;
-    for(Enumeration e = theConnVector.elements(); e.hasMoreElements();) {
-      aConnection = (ErmesConnection)e.nextElement();
-      if(aConnection.itsAutorouted){
-	if(!aConnection.GetErrorState()) {
-	  RemoveConnRgn(aConnection);
-	  aConnection.GetConnectionSet().RemoveRgn(aConnection);
-	}
-	aConnection.Delete();
-	aConnection.PrepareToRouting();
-	aConnection.AutoRouting();
-	if(!aConnection.GetErrorState()){ 
-	  SaveConnectionRgn(aConnection);
-	  aConnection.GetConnectionSet().SaveRgn(aConnection);
-	}
-      }
-      else aConnection.PrepareToRouting();
-    }
-    itsHelper.UpdateConnectionSet(theConnSetVector);
-  }
-
-  private void ConnectionsToRouting(Vector theConnVector, Vector theConnSetVector, ErmesObject aObject){
-    ErmesObjInlet aInlet;
-    ErmesObjOutlet aOutlet;
-    ErmesConnection aConnection;
-    for(Enumeration e = aObject.GetInletList().elements(); e.hasMoreElements();) {
-      aInlet = (ErmesObjInlet)e.nextElement();
-      for(Enumeration e1 = aInlet.GetConnections().elements(); e1.hasMoreElements();) {
-	aConnection = (ErmesConnection)e1.nextElement();
-	if(!theConnVector.contains(aConnection)) {
-	  theConnVector.addElement(aConnection);
-	  if(!theConnSetVector.contains(aConnection.GetConnectionSet())) 
-	    theConnSetVector.addElement(aConnection.GetConnectionSet());
-	}
-      }
-    }
-    for(Enumeration e = aObject.GetOutletList().elements(); e.hasMoreElements();) {
-      aOutlet = (ErmesObjOutlet)e.nextElement();
-      for(Enumeration e1 = aOutlet.GetConnections().elements(); e1.hasMoreElements();) {
-	aConnection = (ErmesConnection)e1.nextElement();
-	if(!theConnVector.contains(aConnection)) {
-	  theConnVector.addElement(aConnection);
-	  if(!theConnSetVector.contains(aConnection.GetConnectionSet())) 
-	    theConnSetVector.addElement(aConnection.GetConnectionSet());
-	}
-      }
-    }
-  }  
+   }
 }
 
 

@@ -2,21 +2,26 @@ package ircam.jmax.editors.ermes;
 
 import java.awt.*;
 import java.util.*;
+import ircam.jmax.utils.List;
+import ircam.jmax.utils.ListIterator;
 
 /**
  * A "topological" region, and the associated services.
  * used by the graphic objects and connections.
+ * A region is a list of shapes.
  */
 class ErmesRegion
 {
-  private Vector itsRegions;
+  private List itsAreas;
+  private Rectangle minimumRect;
   
   //--------------------------------------------------------
   //	Constructor
   //--------------------------------------------------------
   public ErmesRegion()
   {
-    itsRegions = new Vector();
+    itsAreas = new List();
+    minimumRect = new Rectangle();
   }
 	
   //--------------------------------------------------------
@@ -24,77 +29,70 @@ class ErmesRegion
   //--------------------------------------------------------
   public ErmesRegion(ErmesRegion theRgn)
   {
-    Rectangle aRect;
-    itsRegions = new Vector();
-    for(int i=0; i<theRgn.itsRegions.size() ; i++)
-      {
-	aRect = new Rectangle();
-	aRect = (Rectangle)theRgn.itsRegions.elementAt(i);
-	itsRegions.addElement(aRect);
-      }
+    ErmesArea  aErmesArea;
+
+    itsAreas = new List();
+    for (Enumeration l = itsAreas.elements(); l.hasMoreElements();) {
+      itsAreas.addElement(l.nextElement());
+    }
   }
   
   //--------------------------------------------------------
   //	Constructor
   //--------------------------------------------------------
-  public ErmesRegion(Rectangle theRect)
+  public ErmesRegion(ErmesArea theErmesArea)
   {
-    itsRegions = new Vector();
-    Rectangle aRect = new Rectangle();
-    aRect = theRect;
-    itsRegions.addElement(aRect);
+    itsAreas = new List();
+    itsAreas.addElement(theErmesArea);
   }
   
 	
+  List getList() {
+    return itsAreas;
+  }
+
   //--------------------------------------------------------
   //	IsEmpty
   //--------------------------------------------------------
   public boolean IsEmpty()
   {
-    if(itsRegions.size() == 0) return true;
-    else return false;
+    return itsAreas.isEmpty();
+  }
+  
+
+  public int length() {
+    int i=0;
+    for(Enumeration li = itsAreas.elements(); li.hasMoreElements();i++){
+      li.nextElement();
+    }
+    return i;
   }
   
   //--------------------------------------------------------
-  //	Remove
+  //	removeArea
   //--------------------------------------------------------
-  public void Remove(Rectangle theRect){
-    Rectangle aRect = new Rectangle();
-    for(Enumeration e = itsRegions.elements(); e.hasMoreElements();) {
-      aRect = (Rectangle)e.nextElement();
-      if(aRect.equals(theRect)){
-	itsRegions.removeElement(aRect);
-	return;
-      }
-    }			
+  public void removeArea(ErmesArea theArea){
+    itsAreas.removeElement(theArea);
   }
   
-  public void RemoveAllElements(){
-    itsRegions.removeAllElements();
+  public void addArea(ErmesArea theArea) {
+    itsAreas.addElement(theArea);
   }
 
-  //--------------------------------------------------------
-  //	Add
-  //--------------------------------------------------------
-  public void Add(Rectangle theRect){
-    Rectangle aRect = new Rectangle();
-    aRect.x = theRect.x;
-    aRect.y = theRect.y;
-    aRect.width = theRect.width;
-    aRect.height = theRect.height;
-    itsRegions.addElement(aRect);
+  public void RemoveAllElements(){
+    itsAreas.removeAllElements();
   }
-  
+
   //--------------------------------------------------------
   //	PointInRgn
   //--------------------------------------------------------
   public boolean PointInRgn(Point thePoint)
   {
     Rectangle aRect;
-    Point aPoint = new Point(thePoint.x,thePoint.y);
-    for(int i=0; i<itsRegions.size() ; i++){
-      aRect = (Rectangle)itsRegions.elementAt(i);
-      if(aRect.contains(aPoint.x, aPoint.y)) return true;
+    
+    for(Enumeration li = itsAreas.elements(); li.hasMoreElements();){
+      aRect = ((ErmesArea) li.nextElement()).getArea();
+      if(aRect.contains(thePoint.x, thePoint.y)) return true;
     }
     return false;
   }
@@ -106,52 +104,42 @@ class ErmesRegion
     Rectangle aRect;
     boolean aBoolean = false;
     
-    for(int i=0; i<itsRegions.size() ; i++){
-      aRect = (Rectangle)itsRegions.elementAt(i);
+    for(Enumeration li = itsAreas.elements(); li.hasMoreElements();){
+      aRect = ((ErmesArea) li.nextElement()).getArea();
       if(aRect.intersects(theRect)){
-	aBoolean = true;
-	break;
+	return true;
       }
     }
-    return aBoolean;
+    return false;
   }
   
   //--------------------------------------------------------
   //	IsInRgn
   //--------------------------------------------------------
-  public boolean IsInRgn(Rectangle theRect){
-    return itsRegions.contains(theRect);
+  public boolean IsInRgn(ErmesArea theErmesArea){
+    return itsAreas.isInList(theErmesArea);
   }
   
 
-  public void LeggiRegione(){
-    Rectangle aRect = new Rectangle();
-    int k = itsRegions.size();
-    int i = 0;
-    for(i = 0; i< k; i++) {
-      aRect = (Rectangle)itsRegions.elementAt(i);
-    }
-  }	
-	
   //--------------------------------------------------------
   //	MinimumRect
   //--------------------------------------------------------
   public Rectangle MinimumRect(){
     int top, left, bottom, right;
     Rectangle aRect;
-    aRect = (Rectangle)itsRegions.elementAt(0);
+    aRect = ((ErmesArea) itsAreas.next()).getArea();
     top = aRect.y;left = aRect.x;
     bottom = aRect.y + aRect.height;
     right = aRect.x + aRect.width;
     	
-    for(int i=1; i<itsRegions.size() ; i++){
-      aRect = (Rectangle)itsRegions.elementAt(i);
+    for(Enumeration li = itsAreas.elements(); li.hasMoreElements();){
+      aRect = ((ErmesArea) li.nextElement()).getArea();
       if(aRect.x<left) left = aRect.x;
       if(aRect.y<top) top = aRect.y;
       if(aRect.y+aRect.height>bottom) bottom = aRect.y + aRect.height;
       if(aRect.x +aRect.width>right) right = aRect.x + aRect.width;
     }
-    Rectangle minimumRect = new Rectangle(left, top, right-left, bottom-top);
+    minimumRect.setBounds(left, top, right-left, bottom-top);
     return minimumRect;
   }
 
@@ -159,9 +147,17 @@ class ErmesRegion
     Rectangle aRect;
 
     g.setColor(Color.red);
-    for(int i=0; i<itsRegions.size() ; i++){
-      aRect = (Rectangle) itsRegions.elementAt(i);
+    for(Enumeration li = itsAreas.elements(); li.hasMoreElements();){
+      aRect = ((ErmesArea) li.nextElement()).getArea();
       g.fillRect(aRect.x, aRect.y, aRect.width, aRect.height);
+    }
+  }
+
+  public void writeRegionOnErrorStream(){
+    System.err.println("");
+    for (Enumeration li = itsAreas.elements(); 
+	 li.hasMoreElements();) {
+      System.err.println(((ErmesArea) li.nextElement()).getArea().toString());
     }
   }
 }

@@ -36,7 +36,7 @@ class ErmesDisconnectCmd implements Command
 	pad.itsHelper.DeleteConnectionByInOut((ErmesObject) ReflectObject.get(interp, argv[1]),
 					       TclInteger.get(interp, argv[2]),
 					       (ErmesObject) ReflectObject.get(interp, argv[3]),
-					       TclInteger.get(interp, argv[4]));
+					       TclInteger.get(interp, argv[4]), true);
       }
     else
       {

@@ -95,22 +95,6 @@ class ErmesObjIn extends ErmesObject {
     ((FtsInletObject)itsFtsObject).setPosition(itsId);
   }
   
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection requested allowed?
-    if (!theRequester.IsInlet())	//if is an outlet...
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
-  }
-
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection abort allowed?
-    // (for now always allowed)
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;	//for now, everything is allowed
-  }
   
   public void Paint_specific(Graphics g) {
   	//you want to create a Dimension each Paint?

@@ -15,7 +15,7 @@ class ErmesObjInletOutlet extends ErmesObjOutlet{
 	//--------------------------------------------------------
     //	Paint
     //--------------------------------------------------------
-  public void Paint(Graphics g){
+  public void Paint_specific(Graphics g){
     if(!itsOwner.itsSketchPad.itsGraphicsOn) return;
     debug_count += 1;
     if (debug_count % ErmesSketchPad.DEBUG_COUNT == 0) {

@@ -106,12 +106,12 @@ class ErmesObjFloat extends ErmesObject {
   }
 	
   void ResizeToNewFont(Font theFont) {
-    if(!itsResized){
-      int tempWidth = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...")+17;
-      int tempHeight = itsFontMetrics.getHeight()+4;
-      Resize(tempWidth - currentRect.width, tempHeight - currentRect.height);
-    }
-    else ResizeToText(0,0);
+    //#@!if(!itsResized){
+    //#@!int tempWidth = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...")+17;
+    //#@!int tempHeight = itsFontMetrics.getHeight()+4;
+    //#@!Resize(tempWidth - currentRect.width, tempHeight - currentRect.height);
+      //#@! }
+    /*#@!else*/ ResizeToText(0,0);
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){
@@ -137,12 +137,10 @@ class ErmesObjFloat extends ErmesObject {
   
 	
   public void RestoreDimensions(){
-    itsResized = false;
-    itsSketchPad.RemoveElementRgn(this);
+
     int tempWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
     int tempHeight = itsFontMetrics.getHeight()+4;
     Resize(tempWidth - currentRect.width, tempHeight - currentRect.height);		
-    itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
   
@@ -209,26 +207,6 @@ class ErmesObjFloat extends ErmesObject {
     return true;
   }
 
-
-	
-  //--------------------------------------------------------
-  // ConnectionRequested
-  //--------------------------------------------------------
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester){
-    if (!theRequester.IsInlet())
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
-  }
-	
-  //--------------------------------------------------------
-  // ConnectionAbort
-  //--------------------------------------------------------
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester){
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;	
-  }
-	
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------

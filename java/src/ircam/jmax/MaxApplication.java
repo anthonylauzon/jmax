@@ -131,8 +131,12 @@ public class MaxApplication extends Object
     }
 
     //the version number as a system property
-    jmaxProperties.put("jmaxVersion", " version 2.1.1 beta");
-
+    try {
+      jmaxProperties.put("jmaxVersion", MaxVersion.getMaxVersion());
+    } catch (java.lang.NoClassDefFoundError e) {
+      jmaxProperties.put("jmaxVersion", "version not available");
+    }
+    
     itsHookTable = new MaxWhenHookTable(); 
 
     ircam.jmax.utils.Platform.setValues();
@@ -170,12 +174,14 @@ public class MaxApplication extends Object
     
     //if there were no connection statements in startup.tcl, ask the user
     
+    
     if (FtsServer.getServer() == null)
       {
 	new ConnectionDialog();
 	MaxApplication.runHooks("start");
       }
     
+
     // Finally, run forever the notifier loop of the 
     // Tcl interpreter, so that the TCL event system work
     // (and in particular, tcl built panels; thanks to the

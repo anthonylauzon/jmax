@@ -69,23 +69,6 @@ class ErmesObjToggle extends ErmesObject {
     return true;
   }
 
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection requested allowed?
-    if (!theRequester.IsInlet())	//if is an outlet...
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
-  }
-
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection abort allowed?
-    // (for now always allowed)
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;	//for now, everything is allowed
-  }
-  
   public void Paint_specific(Graphics g) {
     if(!itsSelected) g.setColor(itsUINormalColor/*Color.lightGray*/);
     else g.setColor(itsUISelectedColor/*Color.gray*/);
@@ -108,14 +91,6 @@ class ErmesObjToggle extends ErmesObject {
        (currentRect.height+theDeltaY < getMinimumSize().height))
       return false;
     else return true;
-  }
-  //resize to preferredSize()
-  public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
-    if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
   //--------------------------------------------------------

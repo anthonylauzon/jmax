@@ -1,9 +1,6 @@
 SSOURCES = \
 	  ErmesModule.java \
-          ErmesConnCircle.java \
-          ErmesConnSegment.java \
           ErmesConnection.java \
-          ErmesConnectionSet.java \
           ErmesRegion.java \
           ErmesScrollerView.java \
           ErmesSketchHelper.java \
@@ -42,6 +39,8 @@ SSOURCES = \
           ErmesObjThrottle.java \
           ErmesObjToggle.java \
           ErmesObject.java \
+	  ErmesDrawable.java \
+	  ErmesArea.java
 
 SOURCES = $(SSOURCES) $(DSOURCES) 
 

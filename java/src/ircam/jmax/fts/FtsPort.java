@@ -19,7 +19,6 @@ abstract class FtsPort implements Runnable
 {
   FtsMessage portMsg = new FtsMessage();
   boolean flushing = true;
-
   /** Local Exception represeting a crash in the FTS server. */
 
   class FtsQuittedException extends Exception
@@ -116,9 +115,7 @@ abstract class FtsPort implements Runnable
 	try
 	  {
 	    FtsMessage msg;
-
 	    msg = receiveMessage();
-
 	    if (msg != null)
 	      server.dispatchMessage(msg);
 	  }
@@ -136,7 +133,6 @@ abstract class FtsPort implements Runnable
       }
 
     // close the thread and the streams
-
     closeIOStreams();
   }
 
@@ -444,7 +440,6 @@ abstract class FtsPort implements Runnable
     portMsg.reset();
 
     // read command
-
     command   = in_stream.read();
 
     if (command == -1)
@@ -559,5 +554,6 @@ abstract class FtsPort implements Runnable
     return portMsg;
   }
 }
+
 
 

@@ -35,13 +35,8 @@ class ErmesObjectSetPositionCmd implements Command
 	int theDeltaX = TclInteger.get(interp, argv[2]) - aObject.itsX; 
 	int theDeltaY = TclInteger.get(interp, argv[3]) - aObject.itsY;
 
-	aSketchPad.RemoveElementRgn(aObject);
 	aObject.MoveBy(theDeltaX, theDeltaY);
-
-	Vector aVector = new Vector();
-	aVector.addElement(aObject);
-	aObject.itsSketchPad.itsHelper.MoveElementListConnections(aVector, theDeltaX, theDeltaY); 
-	aSketchPad.SaveOneElementRgn(aObject);		
+	//aSketchPad.itsHelper.moveConnectionsAttachedTo(aObject);
 	aSketchPad.repaint();
       }
     else

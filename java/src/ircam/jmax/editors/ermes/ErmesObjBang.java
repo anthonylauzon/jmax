@@ -15,25 +15,11 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
 
   boolean itsFlashing = false;
   static Dimension preferredSize = new Dimension(20,20);
-  //static Probe itsProbe;
-  //static ErmesObjBang whichToProbe;
+  public MetaList itsDebugVariable;
 
   public ErmesObjBang(){
     super();
-    /*if (itsProbe == null) {
-      itsProbe = new Probe("bang");
-      itsProbe.start();
-      }
-      if (whichToProbe == null) {
-      whichToProbe = this;
-    }*/
   }
-
-  /*  public void actionPerformed(ActionEvent e) {
-    itsFlashing = false;
-    Paint_specific(itsSketchPad.getGraphics());
-    itsTimer.stop();
-  }*/
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
@@ -91,23 +77,6 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     return true;
   }
 
-  public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection requested allowed?
-    if (!theRequester.IsInlet())	//if is an outlet...
-      return (itsSketchPad.OutletConnect(this, theRequester));
-    else return (itsSketchPad.InletConnect(this, theRequester)); // then, is it's an inlet
-  }
-
-  public boolean ConnectionAbort(ErmesObjInOutlet theRequester)
-  {
-    // HERE the checking: is the type of connection abort allowed?
-    // (for now always allowed)
-    theRequester.ChangeState(false, theRequester.connected);
-    itsSketchPad.ResetConnect();
-    return true;	//for now, everything is allowed
-  }
-  
   public void Paint_specific(Graphics g) {
     if(!itsFlashing){
       if(!itsSelected) g.setColor(itsUINormalColor);
@@ -134,13 +103,6 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     else return true;
   }
   //resize to preferredSize()
-  public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
-    if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
-  }
   
   //--------------------------------------------------------
   // minimumSize()
