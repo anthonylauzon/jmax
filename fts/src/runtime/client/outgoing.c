@@ -65,6 +65,16 @@ fts_client_mess_add_long(long value)
 void
 fts_client_mess_add_object(fts_object_t *obj)
 {
+
+  /* @@@ DEBUG CODE  */
+
+  if (! obj) 
+    fprintf(stderr, "Sending null object\n");
+  else if (fts_object_get_id(obj) == FTS_NO_ID)
+        fprintf(stderr, "Sending null ID object\n");
+
+  /* @@@ DEBUG CODE  END */
+
   sprintf(outbuf_fill, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
 
   outbuf_fill = outbuf_fill + strlen(outbuf_fill);

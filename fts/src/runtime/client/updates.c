@@ -19,6 +19,8 @@
    and send them to the client.
    */
 
+#include <stdio.h>
+
 #include "sys.h"
 #include "lang.h"
 #include "runtime/sched.h"

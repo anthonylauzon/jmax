@@ -22,6 +22,7 @@
 
 /* Return Status declarations */
 
+fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
 fts_status_description_t fts_ClassAlreadyInitialized = {"class already initialized"};
 fts_status_description_t fts_InletOutOfRange = {"inlet out of range"};
 fts_status_description_t fts_OutletOutOfRange = {"outlet out of range"};
@@ -113,9 +114,7 @@ fts_atom_type_copy(int ac, fts_symbol_t *at, fts_symbol_t **sat)
 /*                                                                            */
 /******************************************************************************/
 
-static long sub_metaclass_id_counter = 0;
-
-fts_metaclass_t *
+fts_status_t
 fts_metaclass_create(fts_symbol_t name,
 		     fts_method_instantiate_t mth_instantiate,
 		     fts_method_equiv_t mth_equiv)
@@ -128,57 +127,15 @@ fts_metaclass_create(fts_symbol_t name,
   mcl->mth_instantiate = mth_instantiate;
   mcl->mth_equiv = mth_equiv;
   mcl->name = name;
-  mcl->next_same_name   = 0;
-  mcl->sub_metaclass_id = (sub_metaclass_id_counter)++;
 
   if (fts_hash_table_lookup(&fts_metaclass_table, name, &data))
     {
-      fts_metaclass_t **pp;
-      
-      pp = (fts_metaclass_t **) &(data);
-
-      while ((*pp)->next_same_name)
-	pp = &((*pp)->next_same_name);
-
-      (*pp)->next_same_name = mcl;
+      return &fts_DuplicatedMetaclass;
     }
   else
     fts_hash_table_insert(&fts_metaclass_table, name, (void *)mcl);
 
-  return mcl;
-}
-
-
-void
-fts_metaclass_declare_dynamic(fts_symbol_t name, fts_object_t *loader)
-{
-  void *data;
-
-  if (fts_hash_table_lookup(&fts_metaclass_dynamic_table, name, &data))
-    {
-      fts_atom_t a;
-      fts_object_t *obj = (fts_object_t *) data;
-
-      fts_set_ptr(&a, (void *)loader);
-      fts_message_send(obj, fts_SystemInlet, fts_new_symbol("add"), 1, &a);
-    }
-  else
-    fts_hash_table_insert(&fts_metaclass_dynamic_table, name, (void *)loader);
-}
-
-
-
-static void
-fts_metaclass_load(fts_symbol_t name)
-{
-  void *data;
-
-  if (fts_hash_table_lookup(&fts_metaclass_dynamic_table, name, &data))
-    {
-      fts_object_t *loader = (fts_object_t *) data;
-
-      fts_message_send(loader, fts_SystemInlet, fts_new_symbol("load"), 0, 0);
-    }
+  return fts_Success;
 }
 
 
@@ -207,14 +164,10 @@ fts_metaclass_get_real_name(fts_symbol_t name)
 }
 
 
-static fts_metaclass_t *
+fts_metaclass_t *
 fts_metaclass_get_by_name(fts_symbol_t name)
 {
   void *data;
-
-  /* do nothing if there is nothing to load, or if the class/module has been already loaded */
-
-  fts_metaclass_load(name);
 
   if (fts_hash_table_lookup(&fts_metaclass_table, fts_metaclass_get_real_name(name), &data))
     return (fts_metaclass_t *) data;
@@ -273,46 +226,44 @@ fts_class_instantiate(int ac, const fts_atom_t *at)
   fts_class_t *cl;
 
   mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
-  
-  while (mcl)
+
+  if (! mcl)
+    return 0;
+
+  cl = fts_class_get(mcl, ac, at);
+
+  if (cl)
+    return cl;
+  else
     {
-      cl = fts_class_get(mcl, ac, at);
+      fts_status_t s;
 
-      if (cl)
-	return cl;
-      else
+      cl = fts_zalloc(sizeof(fts_class_t));
+
+      cl->properties  = 0;
+      cl->daemons = 0;
+
+      cl->mcl = mcl;
+      s = mcl->mth_instantiate(cl, ac, at);
+
+      if (s == fts_Success)
 	{
-	  fts_status_t s;
+	  fts_atom_t a;
 
-	  cl = fts_zalloc(sizeof(fts_class_t));
+	  fts_class_register(mcl, ac, at, cl);
+	  
+	  /* put the ninlets and noutlets in the class */
 
-	  cl->properties  = 0;
-	  cl->daemons = 0;
+	  fts_set_int(&a, cl->ninlets);
+	  fts_class_put_prop(cl, fts_s_ninlets, &a);
 
-	  cl->mcl = mcl;
-	  s = mcl->mth_instantiate(cl, ac, at);
+	  fts_set_int(&a, cl->noutlets);
+	  fts_class_put_prop(cl, fts_s_noutlets, &a);
 
-	  if (s == fts_Success)
-	    {
-	      fts_atom_t a;
-
-	      fts_class_register(mcl, ac, at, cl);
-
-	      /* put the ninlets and noutlets in the class */
-
-	      fts_set_int(&a, cl->ninlets);
-	      fts_class_put_prop(cl, fts_s_ninlets, &a);
-
-	      fts_set_int(&a, cl->noutlets);
-	      fts_class_put_prop(cl, fts_s_noutlets, &a);
-
-	      return cl;
-	    }
-	  else
-	    fts_free(cl);
+	  return cl;
 	}
-
-      mcl = mcl->next_same_name;
+      else
+	fts_free(cl);
     }
 
   return 0;

@@ -56,6 +56,19 @@ public class FtsOutletObject  extends FtsObject
   }
 
 
+  public FtsOutletObject(FtsContainerObject parent, int position, int objId)
+  {
+    super(parent, "outlet", "outlet " + position, objId);
+
+    this.position = position;
+
+    parent.addOutlet(this, position);
+
+    ninlets = 1;
+    noutlets = 0;
+  }
+
+
   public void setPosition(int i)
   {
     position = i;

@@ -39,18 +39,11 @@ public class FtsServer
       theServer = new FtsSubProcessServer();
     else
       System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
+
     theServer.setParameter("ftsdir", theFtsdir);
     theServer.setParameter("ftsname", theFtsname);
     theServer.start();
   }
-
-  /** Count objects for statistics */
-
-  int objCount = 0;
-
-  /** Count connections for statistics */
-
-  int connCount = 0;
 
   /** The FtsPort used to communicate with FTS */
 
@@ -132,15 +125,96 @@ public class FtsServer
       port.setFlushing(flushing);
   }
 
-  /** Send a "open patcher" messages to FTS.*/
+  /** Send a "save patcher as bmax" messages to FTS.*/
 
-  final void savePatcher(FtsObject patcher, String filename)
+  final void savePatcherBmax(FtsObject patcher, String filename)
   {
     try
       {
-	port.sendCmd(FtsClientProtocol.fts_save_patcher_cmd);
+	port.sendCmd(FtsClientProtocol.fts_save_patcher_bmax_cmd);
 	port.sendObject(patcher);
 	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** Send a "save patcher as tpat" messages to FTS.*/
+
+  final void savePatcherTpat(FtsObject patcher, String filename)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_save_patcher_tpat_cmd);
+	port.sendObject(patcher);
+	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
+  /** send a "load patcher as bmax" messages to FTS.*/
+
+  final void loadPatcherBmax(FtsObject patcher, String filename)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_load_patcher_bmax_cmd);
+	port.sendObject(patcher);
+	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** send a "load patcher as tpat" messages to FTS.*/
+
+  final void loadPatcherTpat(FtsObject patcher, String filename)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_load_patcher_tpat_cmd);
+	port.sendObject(patcher);
+	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** send a "load patcher as dot pat" messages to FTS.*/
+
+  final void loadPatcherDpat(FtsObject patcher, String filename)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_load_patcher_dpat_cmd);
+	port.sendObject(patcher);
+	port.sendString(filename);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "download patcher" messages to FTS.*/
+
+  final void sendDownloadPatcher(FtsObject patcher)
+  {
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_download_patcher_cmd);
+	port.sendObject(patcher);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -545,8 +619,6 @@ public class FtsServer
 	port.sendObject(to);
 	port.sendInt(inlet);
 	port.sendEom();
-
-	connCount++;
       }
     catch (java.io.IOException e)
       {
@@ -566,8 +638,6 @@ public class FtsServer
 	port.sendObject(to);
 	port.sendInt(inlet);
 	port.sendEom();
-
-	connCount--;
       }
     catch (java.io.IOException e)
       {
@@ -694,12 +764,19 @@ public class FtsServer
       {
       case FtsClientProtocol.fts_property_value_cmd:
 	{
-	  FtsObject obj;
+	  if (msg.getNumberOfArguments() >= 3)
+	    {
+	      FtsObject obj;
 
-	  obj = (FtsObject) msg.getArgument(0);
-	  obj.localPut((String) msg.getArgument(1), 
-		       msg.getArgument(2));
+	      obj = (FtsObject) msg.getArgument(0);
 
+	      if (obj == null)
+		System.err.println("Null object in property value message " + msg);
+	      else
+		obj.localPut((String) msg.getArgument(1), msg.getArgument(2));
+	    }
+	  else
+	    System.err.println("Wrong property value message " + msg);
 	}
       break;
 
@@ -732,6 +809,59 @@ public class FtsServer
 	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
 	break;
 
+	// Messages add to support creation on demand of FtsObject 
+	// on server request.
+	// Object deletetion will (for now, at least, always happen
+	// on client request
+
+      case FtsClientProtocol.fts_new_object_cmd:
+	{
+	  FtsObject newObj;
+
+	  try
+	    {
+	      newObj = FtsObject.makeFtsObjectFromMessage(msg);
+	      registerObject(newObj);
+	    }
+	  catch (FtsException e)
+	    {
+	      System.err.println("System error, cannot instantiate from message " + msg);
+	    }
+
+	  break;
+	}
+
+      case FtsClientProtocol.fts_new_abstraction_cmd:
+	{
+	  FtsObject newObj;
+
+	  try
+	    {
+	      newObj = FtsObject.makeFtsAbstractionFromMessage(msg);
+	      registerObject(newObj);
+	    }
+	  catch (FtsException e)
+	    {
+	      System.err.println("System error, cannot instantiate from message " + msg);
+	    }
+
+	  break;
+	}
+
+      case FtsClientProtocol.fts_connect_objects_cmd:
+	{
+	  FtsObject from, to;
+	  int outlet, inlet;
+
+	  from = (FtsObject) msg.getArgument(0);
+	  outlet = ((Integer) msg.getArgument(1)).intValue();
+	  to = (FtsObject) msg.getArgument(2);
+	  inlet = ((Integer) msg.getArgument(3)).intValue();
+
+	  new FtsConnection(from, outlet, to, inlet, false);
+	}
+	break;
+
       default:
 	break;
       }
@@ -747,7 +877,8 @@ public class FtsServer
 	// it should be smarter, detect the problem,
 	// and set the server as halted.
 
-	wait(10000);
+	// wait(10000);
+	wait();
       }
     catch (java.lang.InterruptedException e)
       {
@@ -790,26 +921,35 @@ public class FtsServer
    * a register and unregister function; also, the server store and access
    * the object id directly in the FtsObject, for efficency, but this is 
    * transparent to the object.
+   *
+   * The Client use only odd IDs; server generated objects use
+   * only even IDs; on the server, IDs are assigned by need,
+   * not to all the objects.
    */
 
   private void registerObject(FtsObject obj)
   {
-    int newid;
+    if (obj == null)
+      System.err.println("registerObject got a null object");
 
-    newid = ftsIDCounter++;
-
-    if (newid > maxId)
+    if (obj.getObjId() == -1)
       {
-	maxId = (newid * 3) / 2;
+	int newid;
+
+	newid = ftsIDCounter;
+	ftsIDCounter += 2;
+
+	obj.setObjId(newid);
+      }
+
+    if (obj.getObjId() > maxId)
+      {
+	maxId = obj.getObjId() * 2;
+
 	objTable.setSize(maxId + 1);
       }
 
-    objTable.setElementAt(obj, newid);
-
-    obj.setObjId(newid);
-
-    // stats
-    objCount++;
+    objTable.setElementAt(obj, obj.getObjId());
   }
 
   /**
@@ -823,7 +963,6 @@ public class FtsServer
   private void unregisterObject(FtsObject obj)
   {
     objTable.setElementAt(null, obj.getObjId());
-    objCount--;
   }
 
   /**
@@ -835,9 +974,24 @@ public class FtsServer
   FtsObject getObjectByFtsId(int id)
   {
     if (id == 0)
-      return null;
+      {
+	System.err.println("System error: received 0 as object id\n");
+	return null;
+      }
+    else if (id == -1)
+      {
+	System.err.println("System error: received FTS_NO_ID as object id\n");
+	return null;
+      }
     else
-      return (FtsObject) objTable.elementAt(id);
+      {
+	FtsObject obj = (FtsObject) objTable.elementAt(id);
+
+	if (obj == null)
+	  System.err.println("getObjectByFtsId: null object for id " + id);
+	
+	return obj;
+      }
   }
 }
 

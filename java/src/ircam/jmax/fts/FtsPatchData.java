@@ -82,7 +82,7 @@ public class FtsPatchData extends MaxData implements MaxTclData
 
   public void saveBmax(String fileName)
   {
-    FtsServer.getServer().savePatcher(patcher, fileName);
+    FtsServer.getServer().savePatcherBmax(patcher, fileName);
   }
 }
 

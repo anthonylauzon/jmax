@@ -34,10 +34,32 @@ import tcl.lang.*;
 
 public class MaxApplication extends Object
 {
+  private static Properties jmaxProperties;
 
-  // Static global services
+  /** Method to get system wide properties, stored
+    in jmaxProperties */
+
+  public static String getProperty(String key)
+  {
+    return jmaxProperties.getProperty(key);
+  }
+
+  /** Method to get system wide properties, stored
+    in jmaxProperties */
+
+  public static String getProperty(String key, String defaultValue)
+  {
+    return jmaxProperties.getProperty(key, defaultValue);
+  }
+
+  public static Properties getProperties()
+  {
+    return jmaxProperties;
+  }
 
   /** Get the unique active TCL interpreter */
+
+  static private Interp itsInterp;
 
   public static Interp getTclInterp()
   {
@@ -45,9 +67,9 @@ public class MaxApplication extends Object
   }
 
   public static Clipboard systemClipboard = new Clipboard("system");
-  static Interp itsInterp;//e.m.
 
-  public static Properties jmaxProperties;
+
+
 
   private static ErmesSketchWindow itsSketchWindow;
 
@@ -135,9 +157,9 @@ public class MaxApplication extends Object
 	// create the startup configuration, included reading user files
 	// installing editors, data types and data handlers
 	
-	itsInterp.evalFile(jmaxProperties.getProperty("root") +
-			   jmaxProperties.getProperty("file.separator") + "tcl" +
-			   jmaxProperties.getProperty("file.separator") +  "jmaxboot.tcl");
+	itsInterp.evalFile(getProperty("root") +
+			   getProperty("file.separator") + "tcl" +
+			   getProperty("file.separator") +  "jmaxboot.tcl");
       }
     catch (TclException e)
       {

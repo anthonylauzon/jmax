@@ -36,6 +36,15 @@ public class FtsMessageObject extends FtsObject
     noutlets = 1;
   }
 
+
+  public FtsMessageObject(FtsContainerObject parent, String description, int objId)
+  {
+    super(parent, "messbox", description, objId);
+
+    ninlets = 1;
+    noutlets = 1;
+  }
+
   /**
    * redefine the message
    */

@@ -71,12 +71,21 @@ class FtsClientProtocol
   static final int sync_done_cmd = '<';
   static final int post_cmd = 'h';
 
-  static final int fts_save_patcher_cmd = 'S';
+  static final int fts_save_patcher_bmax_cmd = 'S';
+  static final int fts_save_patcher_tpat_cmd = 'T';
+
+  static final int fts_load_patcher_bmax_cmd = 'U';
+  static final int fts_load_patcher_tpat_cmd = 'V';
+  static final int fts_load_patcher_dpat_cmd = 'Z';
+
+  static final int fts_download_patcher_cmd = 'D';
+
   static final int fts_open_patcher_cmd = 'O';
   static final int fts_close_patcher_cmd = 'C';
   static final int fts_patcher_loaded_cmd = 'L';
 
   static final int fts_new_object_cmd = 'n';
+  static final int fts_new_abstraction_cmd = 'A';
   static final int fts_redefine_object_cmd = 'N';
   static final int fts_replace_object_cmd = 'R';
   static final int fts_free_object_cmd = 'f';
@@ -84,7 +93,7 @@ class FtsClientProtocol
   static final int fts_disconnect_objects_cmd = 'd';
 
   static final int fts_message_cmd = 'm';
-  static final int fts_named_message_cmd = 'z';
+  static final int fts_named_message_cmd = 'q';
 
   static final int fts_put_property_cmd = 'p';
   static final int fts_get_property_cmd = 'g';

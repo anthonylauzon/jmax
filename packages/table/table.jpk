@@ -7,8 +7,6 @@ package provide table
 ## the data type and handler
 ##
 
-puts "java::load -classpath $dir/java/classes ircam.jmax.editors.table.TableExtension"
-
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.table.TableExtension
 
 puts "Table Loaded"

@@ -883,6 +883,15 @@ fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
   struct changes *p;
   struct changes *last = 0;
 
+  /* Debug code !!! @@@ */
+
+  if ((! obj) || (obj->id == FTS_NO_ID))
+    fprintf(stderr, "Property %s changed urgently for object %lx (# %d) class %s\n",
+	    fts_symbol_name(property), obj, obj->id, fts_symbol_name(fts_object_get_class_name(obj)));
+
+  /* Debug code end !!! @@@ */
+
+
   /* check if the object is already in the evsched list */
 
   for (p = urgent_changes_queue_head; p; last = p, p = p->next)

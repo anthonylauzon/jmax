@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.4 $ IRCAM $Date: 1998/03/25 16:42:50 $
+ *      $Revision: 1.5 $ IRCAM $Date: 1998/04/02 16:21:54 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -143,6 +143,7 @@ typedef fts_status_t (*fts_method_instantiate_t)(fts_class_t *, int, const fts_a
 typedef int (*fts_method_equiv_t)(int, const fts_atom_t *, int, const fts_atom_t *);
 typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
 
+
 struct fts_metaclass
 {
   fts_method_instantiate_t mth_instantiate;
@@ -151,12 +152,6 @@ struct fts_metaclass
 
   fts_method_equiv_t mth_equiv;
   fts_class_t *inst_list;
-
-  /* Meta Class genericity support */
-
-  fts_metaclass_t *next_same_name;
-  int sub_metaclass_id;
-
 
   fts_symbol_t name;		/* the name of the metaclass, i.e. the first name used to register it */
 };
@@ -291,7 +286,8 @@ struct fts_patcher
 
   int open;			/* the open flag */
   int load_init_fired;		/* the multiple load init protection flag*/
-};
+  int is_abstraction;
+};    
 
 
 struct fts_inlet

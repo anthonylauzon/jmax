@@ -24,11 +24,11 @@ abstract public class FtsAbstractContainerObject extends FtsObject
 {
   /** The objects contained in the patcher */
 
-  protected Vector objects     = new Vector();
+  private Vector objects     = new Vector();
 
   /** All the connections between these objects */
 
-  protected Vector connections = new Vector();
+  private Vector connections = new Vector();
 
   /** Just for the building of the root object */
 
@@ -37,9 +37,20 @@ abstract public class FtsAbstractContainerObject extends FtsObject
     super();
   }
 
+  FtsAbstractContainerObject(int objId)
+  {
+    super(objId);
+  }
+
   protected  FtsAbstractContainerObject(FtsContainerObject parent, String className, String description)
   {
     super(parent, className, description);
+  }
+
+  protected  FtsAbstractContainerObject(FtsContainerObject parent, String className,
+					String description, int objId)
+  {
+    super(parent, className, description, objId);
   }
 
 
@@ -139,14 +150,14 @@ abstract public class FtsAbstractContainerObject extends FtsObject
 
   /** Get the connections. */
 
-  public final Vector getConnections()
+  public Vector getConnections()
   {
     return connections;
   }
 
   /** Get the objects. */
 
-  public final Vector getObjects()
+  public Vector getObjects()
   {
     return objects;
   }

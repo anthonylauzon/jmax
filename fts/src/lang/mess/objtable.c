@@ -22,6 +22,18 @@
 static int table_size = 0;
 static fts_object_t **object_table = 0;
 
+/* skip 0, use even numbers only */
+
+static int id_generator_count = 2;
+
+void fts_object_table_register(fts_object_t *obj)
+{
+  obj->id = id_generator_count;
+  id_generator_count += 2;
+
+  fts_object_table_put(obj->id, obj);
+}
+
 void
 fts_object_table_put(int id, fts_object_t *obj)
 {

@@ -167,12 +167,30 @@ Rectangle previousResizeRect = new Rectangle();
   int editStatus = DOING_NOTHING;
   int oldEditStatus = DOING_NOTHING;
 
-  Hashtable nameTable; // substitute name lists, initialized in the constructor.
+  static Hashtable nameTable = new Hashtable(16, (float) 0.5); // substitute name lists
+
+  // Static initializer for the hashTable
+  static
+  {
+    // Initialization of the "fts class"  to "graphic object" table
+
+    nameTable.put("messbox", ircam.jmax.editors.ermes.ErmesObjMessage.class);
+    nameTable.put("button", ircam.jmax.editors.ermes.ErmesObjBang.class);
+    nameTable.put("toggle", ircam.jmax.editors.ermes.ErmesObjToggle.class);
+    nameTable.put("intbox", ircam.jmax.editors.ermes.ErmesObjInt.class);
+    nameTable.put("floatbox", ircam.jmax.editors.ermes.ErmesObjFloat.class);
+    nameTable.put("comment", ircam.jmax.editors.ermes.ErmesObjComment.class);
+    nameTable.put("slider", ircam.jmax.editors.ermes.ErmesObjSlider.class);
+    nameTable.put("inlet", ircam.jmax.editors.ermes.ErmesObjIn.class);
+    nameTable.put("outlet", ircam.jmax.editors.ermes.ErmesObjOut.class);
+    // nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjExternal.class);
+    nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
+  }
+
   int itsAddObject;
   String itsAddObjectName;
   Rectangle resizeRect = new Rectangle();
   public ErmesSketchHelper itsHelper;
-
 
   boolean itsScrolled = false;
 
@@ -930,19 +948,6 @@ Rectangle previousResizeRect = new Rectangle();
     addKeyListener(itsSketchWindow);
 
     // Initialization of the "fts class"  to "graphic object" table
-
-    nameTable = new Hashtable(16, (float) 0.5);
-    nameTable.put("messbox", ircam.jmax.editors.ermes.ErmesObjMessage.class);
-    nameTable.put("button", ircam.jmax.editors.ermes.ErmesObjBang.class);
-    nameTable.put("toggle", ircam.jmax.editors.ermes.ErmesObjToggle.class);
-    nameTable.put("intbox", ircam.jmax.editors.ermes.ErmesObjInt.class);
-    nameTable.put("floatbox", ircam.jmax.editors.ermes.ErmesObjFloat.class);
-    nameTable.put("comment", ircam.jmax.editors.ermes.ErmesObjComment.class);
-    nameTable.put("slider", ircam.jmax.editors.ermes.ErmesObjSlider.class);
-    nameTable.put("inlet", ircam.jmax.editors.ermes.ErmesObjIn.class);
-    nameTable.put("outlet", ircam.jmax.editors.ermes.ErmesObjOut.class);
-    // nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjExternal.class);
-    nameTable.put("patcher", ircam.jmax.editors.ermes.ErmesObjPatcher.class);
   }
 	
   static public void RequestOffScreen(ErmesSketchPad theSketchPad) {

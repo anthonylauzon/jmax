@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.10 $ IRCAM $Date: 1998/04/08 12:03:10 $
+ *      $Revision: 1.11 $ IRCAM $Date: 1998/04/09 10:57:30 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -175,20 +175,48 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
       return 0;
     }
 
-  /* If the object have an ID (i.e. was created by the client),
-     ask the object to send the ninlets and noutlets  properties,
-     and name and declaration if any. */
-
-  if ((obj->id != FTS_NO_ID) && (! fts_object_is_patcher(obj)))
-    {
-      fts_object_property_changed(obj, fts_new_symbol("ins"));
-      fts_object_property_changed(obj, fts_new_symbol("outs"));
-      fts_object_property_changed(obj, fts_new_symbol("name"));
-      fts_object_property_changed(obj, fts_new_symbol("declaration"));
-    }
 
   return obj;
 }
+
+
+void
+fts_object_send_properties(fts_object_t *obj)
+{
+  /* If the object have an ID (i.e. was created by the client, or a property has
+     been assigned to it),
+     ask the object to send the ninlets and noutlets  properties,
+     and name and declaration if any. */
+
+  if (obj->id != FTS_NO_ID) 
+    { 
+      fts_object_property_changed_urgent(obj, fts_s_x);
+      fts_object_property_changed_urgent(obj, fts_s_y);
+      fts_object_property_changed_urgent(obj, fts_s_height);
+      fts_object_property_changed_urgent(obj, fts_s_width);
+
+      if (fts_object_is_patcher(obj))
+	{
+	  fts_object_property_changed_urgent(obj, fts_s_autorouting);
+	  fts_object_property_changed_urgent(obj, fts_s_wx);
+	  fts_object_property_changed_urgent(obj, fts_s_wy);
+	  fts_object_property_changed_urgent(obj, fts_s_wh);
+	  fts_object_property_changed_urgent(obj, fts_s_ww);
+	}
+
+      fts_object_property_changed_urgent(obj, fts_s_ninlets);
+      fts_object_property_changed_urgent(obj, fts_s_noutlets);
+      fts_object_property_changed_urgent(obj, fts_s_name);
+
+      fts_object_property_changed_urgent(obj, fts_s_min_value);
+      fts_object_property_changed_urgent(obj, fts_s_max_value);
+
+      /* Declarations are not yet really supported */
+
+      /* fts_object_property_changed_urgent(obj, fts_new_symbol("declaration")); */
+    }
+}
+
 
 
 void
@@ -246,6 +274,10 @@ fts_object_delete(fts_object_t *obj)
 
   fts_properties_free(obj);
 
+  /* Free the object description */
+
+  fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+
   /* free the object */
 
   if (obj->out_conn)
@@ -264,6 +296,11 @@ fts_object_delete(fts_object_t *obj)
 }
 
 /*
+ * >>>>>>>>> This function , and the corresponding method, will be phased
+ * >>>>>>>>> out; redefining is an editing operation, coping with everything in FTS is 
+ * >>>>>>>>> too complex and not very generic (think about properties: which properties we
+ * >>>>>>>>> should move on to the new object ? "x" for sure, dsp_is_sink surely not !! )
+ *
  * object replace substitute an object with another in the
  * graph, i.e. rebuild all the connection the old object had
  * in the new object.
@@ -363,16 +400,24 @@ fts_object_replace(fts_object_t *old, fts_object_t *new)
     }
 }
 
-/* fts_object_redefine replace an object with a new
-   one whose definition is passed as argument; it is a convenience
-   function to access _replace in the simplified case.
-
-   The old object is deleted.
-   */
+/* 
+ * >>>>>>>>> This function , and the corresponding method, will be phased
+ * >>>>>>>>> out; redefining is an editing operation, coping with everything in FTS is 
+ * >>>>>>>>> too complex and not very generic (think about properties: which properties we
+ * >>>>>>>>> should move on to the new object ? "x" for sure, dsp_is_sink surely not !! )
+ *
+ * fts_object_redefine replace an object with a new
+ * one whose definition is passed as argument; it is a convenience
+ * function to access _replace in the simplified case.
+ *
+ * The old object is deleted.
+ *
+ */
 
 fts_object_t *
 fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 {
+  fts_atom_t value;
   fts_patcher_t *parent;
   fts_object_t  *new;
 
@@ -383,7 +428,6 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
     return (fts_object_t *) 0;
 
   fts_object_replace(old, new);
-  fts_object_delete(old);
 
   return new;
 }
@@ -403,9 +447,21 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
   fts_connection_t *outconn;
   int anything;
 
-  /* First, check againsts double connections */
+  /* check the range */
+
+  if (woutlet >= out->cl->noutlets || woutlet < 0)
+    {
+      fprintf(stderr,"fts_object_connect: outlet %d out of range %d for object %s(%d)\n",
+	      woutlet,	out->cl->noutlets, 
+	      fts_symbol_name(fts_get_class_name(out->cl)), fts_object_get_id(out)); /* @@@@ ERROR !!! */
+
+      return &fts_OutletOutOfRange;
+    }
+
+
+  /* check againsts double connections */
   { 
-    fts_connection_t *p;		/* indirect precursor */
+    fts_connection_t *p;
 
     for (p = out->out_conn[woutlet]; p ; p = p->next_same_src)
     {
@@ -417,17 +473,6 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 	}
     }
   }
-
-  /* check the range */
-
-  if (woutlet >= out->cl->noutlets || woutlet < 0)
-    {
-      fprintf(stderr,"fts_object_connect: outlet %d out of range %d for object %s(%d)\n",
-	      woutlet,	out->cl->noutlets, 
-	      fts_symbol_name(fts_get_class_name(out->cl)), fts_object_get_id(out)); /* @@@@ ERROR !!! */
-
-      return &fts_OutletOutOfRange;
-    }
 
   /* find the outlet and the inlet in the class structure */
 

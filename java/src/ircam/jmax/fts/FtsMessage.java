@@ -96,6 +96,12 @@ final public class FtsMessage
       doubleSize();
 
     args[args_fill++] = obj;
+
+    if (obj == null)
+      {
+	System.err.println("Adding null argument to a message ");
+	Thread.dumpStack();
+      }
   }
 
   /** Write the message to a Connection. */
@@ -127,7 +133,13 @@ final public class FtsMessage
     buf.append("FtsMessage<" + command + " [");
 
     for (int i = 0; i < args_fill ; i++)
-      buf.append(args[i].toString());
+      if (args[i] == null)
+	buf.append("(null) ");
+      else
+	{
+	  buf.append(args[i].toString());
+	  buf.append(" ");
+	}
 
     buf.append("]>");
 

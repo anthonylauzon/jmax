@@ -37,6 +37,12 @@ public class FtsStandardObject extends FtsObject
   }
 
 
+  FtsStandardObject(FtsContainerObject parent, String className, String description, int objId)
+  {
+    super(parent, className, description, objId);
+  }
+
+
   /*****************************************************************************/
   /*                                                                           */
   /*                      CLIENT API and  PROPERTIES                           */

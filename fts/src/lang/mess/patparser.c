@@ -10,15 +10,18 @@
 
 /* Local symbols */
 
-static fts_symbol_t fts_s_autorouting;
 static fts_symbol_t fts_s_off;
 static fts_symbol_t fts_s_unnamed;
 static fts_symbol_t fts_s_max;
 static fts_symbol_t fts_s_v2;
 static fts_symbol_t fts_s_diesN;
+static fts_symbol_t fts_s_diesn;
 static fts_symbol_t fts_s_diesP;
+static fts_symbol_t fts_s_diesp;
 static fts_symbol_t fts_s_diesT;
+static fts_symbol_t fts_s_diest;
 static fts_symbol_t fts_s_diesX;
+static fts_symbol_t fts_s_diesx;
 static fts_symbol_t fts_s_newex;
 static fts_symbol_t fts_s_newobj;
 static fts_symbol_t fts_s_vpatcher;
@@ -68,24 +71,26 @@ static void parsePatcher(fts_object_t *parent, fts_pat_lexer_t *in);
 static fts_object_t *fts_get_child(fts_object_t *obj, int idx);
 static void parseConnection(fts_object_t *parent, fts_pat_lexer_t *in);
 static int readObjectArguments(fts_atom_t *args, fts_pat_lexer_t *in);
-static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
+static void parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
 				 fts_object_t *lastNObject, fts_symbol_t  lastNObjectType);
-static fts_graphic_description_t *parseGraphic(fts_pat_lexer_t *in);
+static fts_graphic_description_t *parseGraphic(fts_pat_lexer_t *in, fts_graphic_description_t *g);
 static void parseWindowProperties(fts_object_t *parent, fts_pat_lexer_t *in);
 static void pat_error(const char *description);
-static fts_object_t *fts_patcher_assign_in_outlets_and_rename(fts_object_t *obj, fts_symbol_t new_name);
 
 void fts_patparser_init()
 {
-  fts_s_autorouting = fts_new_symbol("autorouting");
   fts_s_unnamed = fts_new_symbol("unnamed");
   fts_s_off = fts_new_symbol("off");
   fts_s_max = fts_new_symbol("max");
   fts_s_v2 = fts_new_symbol("v2");
   fts_s_diesN = fts_new_symbol("#N");
+  fts_s_diesn = fts_new_symbol("#n");
   fts_s_diesP = fts_new_symbol("#P");
+  fts_s_diesp = fts_new_symbol("#p");
   fts_s_diesT = fts_new_symbol("#T");
+  fts_s_diest = fts_new_symbol("#t");
   fts_s_diesX = fts_new_symbol("#X");
+  fts_s_diesx = fts_new_symbol("#x");
   fts_s_newex = fts_new_symbol("newex");
   fts_s_newobj = fts_new_symbol("newobj");
   fts_s_vpatcher = fts_new_symbol("vpatcher");
@@ -126,7 +131,7 @@ fts_graphic_description_init(fts_graphic_description_t *this)
   fts_set_int(&(this->y), 0);
   fts_set_int(&(this->width), 0);
   fts_set_int(&(this->range), 0);
-  fts_set_int(&(this->fontSize), 12);
+  fts_set_int(&(this->fontSize), 10);
 }
 
 /* Called only if it make sense */
@@ -182,7 +187,7 @@ void setTextGraphicProperties(fts_graphic_description_t *this, fts_object_t *obj
   fts_object_put_prop(obj, fts_s_y, &(this->y));
   fts_object_put_prop(obj, fts_s_width, &(this->width));
 
-  if (fts_get_int(&(this->fontSize)) != 12)
+  if (fts_get_int(&(this->fontSize)) != 10)
     fts_object_put_prop(obj, fts_s_fontSize, &(this->fontSize));
 }
 
@@ -213,16 +218,11 @@ void setSquareGraphicProperties(fts_graphic_description_t *this, fts_object_t *o
 /*
  * Create a new patcher from a .pat file.
  * The patcher is always a top level patcher.
- *  @@@ The calling API is not yet clear
- * @param server the server where the patcher is loaded.
- * @param inputFile the file to read.
  */
     
-fts_object_t *importPatcher(fts_object_t *patcher, const char *inputFile) 
+fts_object_t *fts_load_dotpat_patcher(fts_object_t *patcher, const char *inputFile) 
 {
   fts_pat_lexer_t *in; 
-
-  /* Probabily the root patcher should be built here @@@@ !!! */
 
   in = fts_open_pat_lexer(inputFile, 0, 0);
   
@@ -234,13 +234,15 @@ fts_object_t *importPatcher(fts_object_t *patcher, const char *inputFile)
 
       fts_close_pat_lexer(in);
 
-      patcher = fts_patcher_assign_in_outlets_and_rename(patcher, fts_s_unnamed);
+      fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *) patcher, fts_s_unnamed);
 
       fts_set_symbol(&a, fts_s_unnamed);
       fts_object_put_prop(patcher, fts_s_name, &a);
 
-      fts_set_symbol(&a, fts_s_autorouting);
-      fts_object_put_prop(patcher, fts_s_off, &a);
+      fts_set_symbol(&a, fts_s_off);
+      fts_object_put_prop(patcher, fts_s_autorouting, &a);
+
+      fts_object_send_properties(patcher);
 
       /* activate the post-load init, like loadbangs */
 
@@ -342,8 +344,8 @@ static void parsePatcher(fts_object_t *parent, fts_pat_lexer_t *in)
 
 	      lastNObject = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 4, description);
 
-	      fts_set_symbol(&a, fts_s_autorouting);
-	      fts_object_put_prop(lastNObject, fts_s_off, &a);
+	      fts_set_symbol(&a, fts_s_off);
+	      fts_object_put_prop(lastNObject, fts_s_autorouting, &a);
 
 	      parsePatcher(lastNObject, in);
 
@@ -630,17 +632,17 @@ static int readObjectArguments(fts_atom_t *args, fts_pat_lexer_t *in)
  */
 
 
-static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
+static void parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
 				 fts_object_t *lastNObject, fts_symbol_t lastNObjectType)
 {
   fts_object_t *obj;
   fts_symbol_t objclass = fts_get_symbol(&(in->val));
-
-  fts_graphic_description_t *graphicDescr;
+  fts_graphic_description_t gd;
+  fts_graphic_description_t *graphicDescr = &gd;
 
   /* get the graphic information */
 
-  graphicDescr = parseGraphic(in);
+  parseGraphic(in, graphicDescr);
 
   if (objclass == fts_s_slider)
     {
@@ -652,35 +654,43 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
 
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
       setSliderGraphicProperties(graphicDescr, obj);
-
-      return obj;
     }
   else if (objclass == fts_s_newex)
     {
       fts_atom_t description[512];
+
+
+
+
+
+
+
       int argc;
 
-      setFontIndex(graphicDescr,in);
+      setFontIndex(graphicDescr, in);
 
       nextToken(in);/* get the object name */
 
-      /* Abstraction are handled directly by the makeFtsObject function now. */
+      /* Abstraction are handled directly by the fts_object_new function */
 
       if (in->ttype == FTS_LEX_EOC)
 	{
 	  /*
 	   * Empty object, built and return a 
-	   * arbitrary choosen "int" object
+	   * arbitrary choosen "comment" object
 	   */
+
 	  fts_atom_t description[1];
 
 	  pushBack(in);
 
-	  fts_set_symbol(&description[0], fts_s_int);
+	  fts_set_symbol(&description[0], fts_s_comment);
 
 	  obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
-	  return obj;
+	  setTextGraphicProperties(graphicDescr, obj);
+
+	  return;
 	}
 
       if (in->ttype == FTS_LEX_SYMBOL)
@@ -690,7 +700,7 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
 	  fts_set_symbol(&description[0], fts_s_int);
 	  pushBack(in);
 	}
-      else if (in->ttype ==  FTS_LEX_FLOAT)
+      else if (in->ttype == FTS_LEX_FLOAT)
 	{
 	  fts_set_symbol(&description[0], fts_s_float);
 	  pushBack(in);
@@ -701,8 +711,6 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1 , description);
 
       setTextGraphicProperties(graphicDescr, obj);
-
-      return obj;
     }
   else if (objclass == fts_s_newobj)
     {
@@ -725,40 +733,30 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
 	  setTextGraphicProperties(graphicDescr, lastNObject);
 
 	  if (argc > 1)
-	    lastNObject = fts_patcher_assign_in_outlets_and_rename(lastNObject, fts_get_symbol(&args[1]));
+	    fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *)lastNObject, fts_get_symbol(&args[1]));
 	  else
-	    lastNObject = fts_patcher_assign_in_outlets_and_rename(lastNObject, fts_s_unnamed);
-
-	  return lastNObject;
+	    fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *)lastNObject, fts_s_unnamed);
 	}
       else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_qlist) &&
 	       (lastNObjectType == fts_s_qlist))
 	{
 	  setTextGraphicProperties(graphicDescr, lastNObject);
-
-	  return lastNObject;
 	}
       else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_table) &&
 	       (lastNObjectType == fts_s_table))
 	{
 	  setTextGraphicProperties(graphicDescr, lastNObject);
-
-	  return lastNObject;
 	}
       else if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_explode) &&
 	       (lastNObjectType == fts_s_explode))
 	{
 	  setTextGraphicProperties(graphicDescr, lastNObject);
-
-	  return lastNObject;
 	}
       else
 	{
 	  if (fts_is_symbol(&args[0]))
 	    fprintf(stderr, "Object type %s not yet Supported in .pat files",
 		    fts_symbol_name(fts_get_symbol(&(args[0]))));
-
-	  return 0;
 	}
     }
   else if (objclass == fts_s_inlet)
@@ -775,8 +773,6 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
       setSquareGraphicProperties(graphicDescr, obj);
-
-      return obj;
     }
   else if (objclass == fts_s_outlet)
     {
@@ -793,8 +789,6 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
       setSquareGraphicProperties(graphicDescr, obj);
-
-      return obj;
     }
   else if (objclass == fts_s_number)
     {
@@ -806,7 +800,6 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
       setTextGraphicProperties(graphicDescr, obj);
-      return obj;
     }
   else if (objclass == fts_s_flonum)
     {
@@ -818,8 +811,6 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
       setTextGraphicProperties(graphicDescr, obj);
-
-      return obj;
     }
   else if (objclass == fts_s_button)
     {
@@ -829,8 +820,6 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
       setSquareGraphicProperties(graphicDescr, obj);
-
-      return obj;
     }
   else if (objclass == fts_s_toggle)
     {
@@ -841,7 +830,6 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
       setSquareGraphicProperties(graphicDescr, obj);
-      return obj;
     }
   else if (objclass == fts_s_message)
     {
@@ -857,13 +845,9 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1, description);
 
       setTextGraphicProperties(graphicDescr, obj);
-
-      return obj;
     }
   else if (objclass == fts_s_comment)
     {
-      /* We need to define a comment object !!!! @@@@@@@@@@@@@@@@@ */
-
       fts_atom_t description[512];
       int argc;
 
@@ -876,12 +860,9 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1, description);
 
       setTextGraphicProperties(graphicDescr, obj);
-      return obj;
     }
-
-  pat_error("unknown object type error");
-
-  return 0;
+  else
+    pat_error("unknown object type error");
 }
 
 	    
@@ -892,13 +873,11 @@ static fts_object_t *parseObject(fts_object_t *parent, fts_pat_lexer_t *in,
  * or the file contains an unimplemented construct.
  */
 
-static fts_graphic_description_t gd;
 
 
-static fts_graphic_description_t *parseGraphic(fts_pat_lexer_t *in)
+
+static fts_graphic_description_t *parseGraphic(fts_pat_lexer_t *in, fts_graphic_description_t *g)
 {
-  fts_graphic_description_t *g = &gd;
-
   fts_graphic_description_init(g);
 
   nextToken(in);
@@ -974,38 +953,6 @@ static void pat_error(const char *description)
   fprintf(stderr, "Error loading .pat file: %s\n", description);
 }
 
-/* May be should go in patcher */
-
-static fts_object_t *
-fts_patcher_assign_in_outlets_and_rename(fts_object_t *obj, fts_symbol_t new_name)
-{
-  fts_atom_t description[4];
-  fts_object_t *new;
-  fts_patcher_t *patcher = (fts_patcher_t *) obj;
-  int inlets;
-  int outlets;
-
-  /* Compute number of inlets and outlets */
-
-  inlets = fts_patcher_count_inlet_objects(patcher);
-  outlets = fts_patcher_count_outlet_objects(patcher);
-
-  /* make a new patcher and redefine the old one */
-
-  fts_set_symbol(&description[0], fts_s_patcher);
-  fts_set_symbol(&description[1], new_name);
-  fts_set_int(&description[2], inlets);
-  fts_set_int(&description[3], outlets);
-
-  new = fts_object_redefine(obj, 4, description);
-
-  /* reassign inlet and outlets (in the patcher code) */
-
-  fts_patcher_reassign_inlets_and_outlets((fts_patcher_t *) new);
-
-  return new;
-}
-
 
 /* The real abstraction loader */
 
@@ -1076,6 +1023,7 @@ fts_object_t *fts_abstraction_new(fts_patcher_t *patcher, int ac, const fts_atom
 
   if (file)
     {
+      int i;
       fts_pat_lexer_t *in; 
       fts_atom_t a;
       fts_atom_t description[4];
@@ -1088,8 +1036,22 @@ fts_object_t *fts_abstraction_new(fts_patcher_t *patcher, int ac, const fts_atom
 
       obj = fts_object_new((fts_patcher_t *)patcher, FTS_NO_ID, 4, description);
 
-      fts_set_symbol(&a, fts_s_autorouting);
-      fts_object_put_prop(obj, fts_s_off, &a);
+      fts_set_symbol(&a, fts_s_off);
+      fts_object_put_prop(obj, fts_s_autorouting, &a);
+
+      /* Change the description in the object */
+
+      fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+
+      obj->argc = ac;
+      obj->argv = (fts_atom_t *) fts_block_zalloc(ac * sizeof(fts_atom_t));
+
+      for (i = 0; i < ac; i++)
+	obj->argv[i] = at[i];
+
+      /* flag the patcher as abstraction */
+
+      fts_patcher_set_abstraction((fts_patcher_t *)obj);
 
       /* get the lexer */
 
@@ -1097,7 +1059,7 @@ fts_object_t *fts_abstraction_new(fts_patcher_t *patcher, int ac, const fts_atom
 
       readFromPatLexer(obj, in);
 
-      obj = fts_patcher_assign_in_outlets_and_rename(obj, fts_get_symbol(&at[0]));
+      fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *) obj, fts_get_symbol(&at[0]));
 
       fts_close_pat_lexer(in);
 

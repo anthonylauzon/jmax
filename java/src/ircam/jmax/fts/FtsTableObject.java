@@ -63,6 +63,26 @@ public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject,
       FtsServer.getServer().syncToFts();
   }
 
+
+  FtsTableObject(FtsContainerObject parent, String className, String description, int objId)
+  {
+    super(parent, className, description, objId);
+
+
+    //Then, look for the size in the argument
+
+    Vector args;
+
+    args = new Vector();
+    
+    FtsParse.parseObjectArguments(description, args);
+
+    if (args.size() >= 3)
+      vectorSize = Integer.parseInt(args.elementAt(2).toString());
+
+    installMessageHandler(new TableMessageHandler());
+  }
+
   /** Send the whole vector content to fts */
 
   public void saveVectorToFts()

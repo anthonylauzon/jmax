@@ -23,26 +23,67 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 {
   /** The objects that are also inlets */
 
-  Vector inlets      = new Vector();
+  protected Vector inlets      = new Vector();
 
   /** The objects that are also outlets */
 
-  Vector outlets     = new Vector();
+  protected Vector outlets     = new Vector();
 
   /** True if the patcher is Open in FTS */
 
-  boolean open = false;
+  protected boolean open = false;
+
+  /** True if the patcher content have been downloaded from FTS */
+
+  protected boolean downLoaded;
 
   /** Just for the building of the root object */
 
   FtsContainerObject()
   {
     super();
+    downLoaded = true;
+  }
+
+  FtsContainerObject(int objId)
+  {
+    super(objId);
+    downLoaded = false;
   }
 
   protected  FtsContainerObject(FtsContainerObject parent, String className, String description)
   {
     super(parent, className, description);
+    downLoaded = true;
+  }
+
+  protected  FtsContainerObject(FtsContainerObject parent, String className, String description, int objId)
+  {
+    super(parent, className, description, objId);
+    downLoaded = false;
+  }
+
+
+  /** Overwrite the getConnections methods so to download the patcher
+    by need */
+
+  public Vector getConnections()
+  {
+    if (! downLoaded)
+      download();
+
+    return super.getConnections();
+  }
+
+  /** Overwrite the getObjects methods so to download the patcher
+    by need */
+
+  public Vector getObjects()
+  {
+    if (! downLoaded)
+      download();
+
+    return super.getObjects();
   }
 
   /** Set the number of inlets */
@@ -168,10 +209,15 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
       inlets.setElementAt(null, pos);
   }
 
-  /** Open tell FTS that this patcher is "alive" */
+  /** Open tell FTS that this patcher is "alive";
+   * open need to download the patcher if not downloaded.
+   */
 
   public final void open()
   {
+    if (! downLoaded)
+      download();
+
     open = true;
     FtsServer.getServer().openPatcher(this);
     FtsServer.getServer().syncToFts();
@@ -192,6 +238,20 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
   {
     return open;
   }
+
+  /** Download the patcher content, if needed */
+
+  private final void download()
+  {
+    if (! downLoaded)
+      {
+	FtsServer.getServer().sendDownloadPatcher(this);
+	FtsServer.getServer().syncToFts();
+      }
+
+    downLoaded = true;
+  }
+
 
   /**
    * Loaded tell FTS that this patcher has been loaded, and
@@ -384,17 +444,17 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
     // We do two loops to find all the objects in a patcher
     // before looking in the contained patcher.
 
-    for (int i = 0; i < objects.size(); i++)
+    for (int i = 0; i < getObjects().size(); i++)
       {
-	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 	
 	if (obj.getDescription().indexOf(pattern) != -1)
 	  v.addElement(obj);
       }
 
-    for (int i = 0; i < objects.size(); i++)
+    for (int i = 0; i < getObjects().size(); i++)
       {
-	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 
 	if (obj instanceof FtsContainerObject)
 	  {
@@ -439,9 +499,9 @@ abstract public class FtsContainerObject extends FtsAbstractContainerObject
 
   final private FtsObject getObjectBySimpleName(String name)
   {
-    for (int i = 0; i < objects.size(); i++)
+    for (int i = 0; i < getObjects().size(); i++)
       {
-	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 	String objName  =  (String) obj.get("name");
 
 	if ((objName != null) && (objName.equals(name)))

@@ -67,8 +67,8 @@ public class FtsSelection extends FtsAbstractContainerObject
 
   final public void clean()
   {
-    objects.removeAllElements();
-    connections.removeAllElements();
+    getObjects().removeAllElements();
+    getConnections().removeAllElements();
   }
 
   /** This object is not visible */
@@ -97,9 +97,9 @@ public class FtsSelection extends FtsAbstractContainerObject
     // First, store the declarations; declaration don't have
     // connections, so we don't store them in variables.
 
-    for (int i = 0; i < objects.size(); i++)
+    for (int i = 0; i < getObjects().size(); i++)
       {
-	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 	
 	if (obj instanceof FtsDeclarationObject)
 	  {
@@ -110,9 +110,9 @@ public class FtsSelection extends FtsAbstractContainerObject
 
     // Then store the objects
 
-    for (int i = 0; i < objects.size(); i++)
+    for (int i = 0; i < getObjects().size(); i++)
       {
-	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 	
 	if (! (obj instanceof FtsDeclarationObject))
 	  {
@@ -127,11 +127,11 @@ public class FtsSelection extends FtsAbstractContainerObject
     // Then, store the connections
     // Connections are only stored if both ends are in the selection !
 
-    for (int i = 0; i < connections.size(); i++)
+    for (int i = 0; i < getConnections().size(); i++)
       {
-	FtsConnection c   =  (FtsConnection) connections.elementAt(i);
+	FtsConnection c   =  (FtsConnection) getConnections().elementAt(i);
 
-	if (objects.contains(c.to) && objects.contains(c.from))
+	if (getObjects().contains(c.to) && getObjects().contains(c.from))
 	  {
 	    c.saveAsTcl(writer);
 	    writer.println();

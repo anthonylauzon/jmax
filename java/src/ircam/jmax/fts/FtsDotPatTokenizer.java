@@ -21,10 +21,21 @@ class FtsDotPatTokenizer
 {
   static private int unique_count = 3333; // the unique number generation
 
+  private int lineNumber = 0;
+  private String name;
+
+  /* Token story, for debug */
+
+  String svalm0;
+  String svalm1;
+  String svalm2;
+  String svalm3;
+  String svalm4;
+
   /* exported variables */
 
   int ttype;
-  String sval;
+  String sval = null;
   Vector env = null;
 
   InputStream in;
@@ -51,15 +62,17 @@ class FtsDotPatTokenizer
 
   /* constructors */
 
-  FtsDotPatTokenizer(InputStream in)
+  FtsDotPatTokenizer(InputStream in, String name)
   {
     this.in = in;
+    this.name = name;
   }
 
-  FtsDotPatTokenizer(InputStream in, Vector env)
+  FtsDotPatTokenizer(InputStream in, Vector env, String name)
   {
     this.in = in;
     this.env = env;
+    this.name = name;
   }
 
   /** Debug method: store the history 
@@ -92,6 +105,13 @@ class FtsDotPatTokenizer
   final private boolean isBlank(int c)
   {
     return (c == '\t') || (c == ' ') || (c == '\n') || (c == '\r');
+  }
+
+  // Unix only, but also debug only 
+
+  final private boolean isNewLine(int c)
+  {
+    return (c == '\n');
   }
 
   final private boolean isEof(int c)
@@ -139,6 +159,16 @@ class FtsDotPatTokenizer
 
   final void nextToken() throws java.io.IOException
   {
+    // Debug history
+ 
+    svalm4 = svalm3;
+    svalm3 = svalm2;
+    svalm2 = svalm1;
+    svalm1 = svalm0;
+    svalm0 = sval;
+
+    // Debug end
+
     buf.setLength(0);
 
     if (pushedBack)
@@ -158,6 +188,9 @@ class FtsDotPatTokenizer
 	else
 	  {
 	    c = in.read();
+
+	    if (isNewLine(c))
+	      lineNumber++;
 	  }
 
 	status = tt_waiting;
@@ -393,6 +426,9 @@ class FtsDotPatTokenizer
 	      }
 
 	    c = in.read();
+
+	    if (isNewLine(c))
+	      lineNumber++;
 	  }
       }
   }
@@ -418,6 +454,13 @@ class FtsDotPatTokenizer
       {
 	// Ingnore bugs in closing.
       }
+  }
+
+  public String toString()
+  {
+    return ("FtsDotPatTokenized< " + name + " @ " + lineNumber +
+	    " [" + sval + ", " + svalm0 + ", " +  svalm1 + 
+	    ", " + svalm2 + ", " + svalm3 + ", " + svalm4 + "]>");
   }
 }
     

@@ -132,7 +132,7 @@ public class MaxTclFileDataHandler extends MaxDataHandler
 	  /* Now, if the "bmax" system property is set, we do a wild
 	     binary format save; highly experimental */
 
-	  String bmaxSave = MaxApplication.jmaxProperties.getProperty("bmax");
+	  String bmaxSave = MaxApplication.getProperty("bmax");
 
 	  if ((bmaxSave != null) && bmaxSave.equals("yes") && (instance instanceof ircam.jmax.fts.FtsPatchData))
 	    ((ircam.jmax.fts.FtsPatchData) instance).saveBmax("~/tmp/patch.bmax");

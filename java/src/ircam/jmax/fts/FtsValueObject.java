@@ -41,6 +41,11 @@ public class FtsValueObject extends FtsStandardObject
     super(parent, className, description);
   }
 
+  FtsValueObject(FtsContainerObject parent, String className, String description, int objId)
+  {
+    super(parent, className, description, objId);
+  }
+
   /* if you want value to become a "java beans property"
      this code is the beginning */
 

@@ -64,7 +64,11 @@
 static void fts_messtile_install_all();
 
 static fts_symbol_t fts_s_open;
+static fts_symbol_t fts_s_download;
 static fts_symbol_t fts_s_close;
+static fts_symbol_t fts_s_patcher;
+static fts_symbol_t fts_s_inlet;
+static fts_symbol_t fts_s_outlet;
 static fts_symbol_t fts_s_load_init;
 
 /******************************************************************************/
@@ -85,8 +89,11 @@ fts_messtile_init()
 {
   fts_messtile_install_all();
 
-
+  fts_s_inlet = fts_new_symbol("inlet");
+  fts_s_outlet = fts_new_symbol("outlet");
+  fts_s_patcher = fts_new_symbol("patcher");
   fts_s_open = fts_new_symbol("open");
+  fts_s_download = fts_new_symbol("download");
   fts_s_close = fts_new_symbol("close");
   fts_s_load_init = fts_new_symbol("load_init");
 }
@@ -134,15 +141,15 @@ trace_mess(const char *msg, int ac, const fts_atom_t *av)
 /*                                                                            */
 /******************************************************************************/
 
-/*    SAVE_PATCHER   (obj)p (sym)filename
+/*    SAVE_PATCHER_BMAX  (obj)p (sym)filename
 
       Save the patcher in a bmax binary file.
  */
 
 static void
-fts_mess_client_save_patcher(int ac, const fts_atom_t *av)
+fts_mess_client_save_patcher_bmax(int ac, const fts_atom_t *av)
 {
-  trace_mess("Received save patcher ", ac, av);
+  trace_mess("Received save patcher bmax ", ac, av);
 
   if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
     {
@@ -160,11 +167,229 @@ fts_mess_client_save_patcher(int ac, const fts_atom_t *av)
 	  fts_close_bmax_file(f);
 	}
       else
-	post_mess("System Error in FOS message OPEN PATCHER: null patcher", ac, av);
+	post_mess("System Error in FOS message SAVE PATCHER BMAX: null patcher", ac, av);
     }
   else
-    post_mess("System Error in FOS message OPEN PATCHER: bad args", ac, av);
+    post_mess("System Error in FOS message SAVE PATCHER BMAX: bad args", ac, av);
 }
+
+
+/*    SAVE_PATCHER_TPAT  (obj)p (sym)filename
+
+      Save the patcher in a tpat binary file.
+ */
+
+static void
+fts_mess_client_save_patcher_tpat(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received save patcher tpat ", ac, av);
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
+    {
+      post_mess("Don't know yet how to save a tpat file: null patcher", ac, av);
+    }
+  else
+    post_mess("System Error in FOS message SAVE PATCHER TPAT: bad args", ac, av);
+}
+
+
+/*    LOAD_PATCHER_BMAX  (obj)p (sym)filename
+
+      Save the patcher in a bmax binary file.
+ */
+
+static void
+fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received load patcher bmax ", ac, av);
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
+    {
+      post_mess("Don't know yet how to load a bmax file: null patcher", ac, av);
+    }
+  else
+    post_mess("System Error in FOS message LOAD PATCHER BMAX: bad args", ac, av);
+}
+
+
+/*    LOAD_PATCHER_TPAT  (obj)p (sym)filename
+
+      Save the patcher in a bmax binary file.
+ */
+
+static void
+fts_mess_client_load_patcher_tpat(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received load patcher tpat ", ac, av);
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
+    {
+      post_mess("Don't know yet how to load a tpat file: null patcher", ac, av);
+    }
+  else
+    post_mess("System Error in FOS message LOAD PATCHER TPAT: bad args", ac, av);
+}
+
+
+/*    LOAD_PATCHER_DPAT  (obj)p (sym)filename
+
+      Save the patcher in a bmax binary file.
+ */
+
+static void
+fts_mess_client_load_patcher_dpat(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received load patcher dpat", ac, av);
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
+    {
+      fts_object_t *patcher;
+      fts_symbol_t filename;
+
+      patcher = (fts_object_t *) fts_get_object(&av[0]);
+      filename = fts_get_symbol(&av[1]);
+
+      if (patcher)
+	{
+	  fts_object_t *ret;
+
+	  ret = fts_load_dotpat_patcher(patcher, fts_symbol_name(filename));
+
+	  if (ret == 0)
+	    post("Cannot read file %s\n", filename);
+	}
+      else
+	post_mess("System Error in FOS message SAVE PATCHER BMAX: null patcher", ac, av);
+
+    }
+  else
+    post_mess("System Error in FOS message LOAD PATCHER DPAT: bad args", ac, av);
+}
+
+
+
+/*    DOWNLOAD_PATCHER   (obj)p
+
+      Send to the patcher the message "download". (system inlet)
+      Do the actual work here; this is not good; but: it cannot be
+      in the mess module because use the runtime !!
+ */
+
+static void
+fts_mess_client_download_patcher(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received download patcher ", ac, av);
+
+  if (ac == 1 && fts_is_object(&av[0]))
+    {
+      fts_patcher_t *patcher;
+      fts_object_t *p;
+
+      patcher = (fts_patcher_t *) fts_get_object(&av[0]);
+
+      if (! patcher)
+	{
+	  post_mess("System Error in FOS message DOWNLOAD PATCHER: null patcher", ac, av);
+	  return;
+	}
+
+      /* Code all the objects */
+
+      for (p = patcher->objects; p ; p = p->next_in_patcher)
+	{
+	  /* Assign an ID if needed */
+
+	  if (p->id == FTS_NO_ID)
+	    fts_object_table_register(p);
+
+	  /* Check if it is an abstraction; 
+	     the trick is: if the object is a patcher, but
+	     it first argument is not, then we consider it an abstraction,
+	     (or template or whatever) and we send a different message
+	     to tell it to the client 
+
+	     Some object require special handling, because their description is
+	     not necessarly consistent.
+	     */
+
+	  if (fts_object_is_inlet(p))
+	    {
+	      fts_inlet_t *inlet = (fts_inlet_t *) p;
+
+	      fts_client_mess_start_msg(NEW_OBJECT_CODE);
+	      fts_client_mess_add_object((fts_object_t *) p->patcher);
+	      fts_client_mess_add_long(p->id);
+	      fts_client_mess_add_sym(fts_s_inlet);
+	      fts_client_mess_add_long(inlet->position);
+	      fts_client_mess_send_msg();
+	    }
+	  else if (fts_object_is_outlet(p))
+	    {
+	      fts_outlet_t *outlet = (fts_outlet_t *) p;
+
+	      fts_client_mess_start_msg(NEW_OBJECT_CODE);
+	      fts_client_mess_add_object((fts_object_t *) p->patcher);
+	      fts_client_mess_add_long(p->id);
+	      fts_client_mess_add_sym(fts_s_outlet);
+	      fts_client_mess_add_long(outlet->position);
+	      fts_client_mess_send_msg();
+	    }
+	  else if (fts_object_is_abstraction(p))
+	    {
+	      /* Send the abstraction object */
+
+	      /* NEW_ABSTRACTION  (obj)pid (int)new-id [<args>]+ */
+
+	      fts_client_mess_start_msg(NEW_ABSTRACTION_CODE);
+	      fts_client_mess_add_object((fts_object_t *) p->patcher);
+	      fts_client_mess_add_long(p->id);
+	      fts_client_mess_add_atoms(p->argc, p->argv);
+	      fts_client_mess_send_msg();
+	    }
+	  else
+	    {
+	      /* Send the object */
+
+	      /* NEW  (obj)pid (int)new-id [<args>]+ */
+
+	      fts_client_mess_start_msg(NEW_OBJECT_CODE);
+	      fts_client_mess_add_object((fts_object_t *) p->patcher);
+	      fts_client_mess_add_long(p->id);
+	      fts_client_mess_add_atoms(p->argc, p->argv);
+	      fts_client_mess_send_msg();
+	    }
+
+	  fts_object_send_properties(p);
+	}
+
+      /* For each object, for each outlet, code all the connections */
+
+      for (p = patcher->objects; p ; p = p->next_in_patcher)
+	{
+	  int outlet;
+
+	  for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
+	    {
+	      fts_connection_t *c;
+
+	      for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
+		{
+		  /* CONNECT (obj)from (int)outlet (obj)to (int)inlet */
+
+		  fts_client_mess_start_msg(CONNECT_OBJECTS_CODE);
+		  fts_client_mess_add_object(c->src);
+		  fts_client_mess_add_long(c->woutlet);
+		  fts_client_mess_add_object(c->dst);
+		  fts_client_mess_add_long(c->winlet);
+		  fts_client_mess_send_msg();
+		}
+	    }
+	}
+    }
+  else
+    post_mess("System Error in FOS message DOWNLOAD PATCHER: bad args", ac, av);
+}
+
 
 /*    OPEN_PATCHER   (obj)p
 
@@ -273,6 +498,9 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 	  post_mess("Error in object creation", ac - 2, av + 2);
 	  return;
 	}
+
+      /* No, too much !!; must be smarted, may be an explicit request */
+      /* fts_object_send_properties(new); */
     }
   else
     post_mess("System Error in FOS message NEW: bad args", ac, av);
@@ -622,7 +850,15 @@ fts_mess_client_get_prop(int ac, const fts_atom_t *av)
 static void
 fts_messtile_install_all()
 {
-  fts_client_mess_install(SAVE_PATCHER_CODE, fts_mess_client_save_patcher);
+  fts_client_mess_install(SAVE_PATCHER_BMAX_CODE, fts_mess_client_save_patcher_bmax);
+  fts_client_mess_install(SAVE_PATCHER_TPAT_CODE, fts_mess_client_save_patcher_tpat);
+
+  fts_client_mess_install(LOAD_PATCHER_BMAX_CODE, fts_mess_client_load_patcher_bmax);
+  fts_client_mess_install(LOAD_PATCHER_TPAT_CODE, fts_mess_client_load_patcher_tpat);
+  fts_client_mess_install(LOAD_PATCHER_DPAT_CODE, fts_mess_client_load_patcher_dpat);
+
+  fts_client_mess_install(DOWNLOAD_PATCHER_CODE, fts_mess_client_download_patcher);
+
   fts_client_mess_install(OPEN_PATCHER_CODE, fts_mess_client_open_patcher);
   fts_client_mess_install(CLOSE_PATCHER_CODE, fts_mess_client_close_patcher);
   fts_client_mess_install(PATCHER_LOADED_CODE,  fts_mess_client_patcher_loaded);

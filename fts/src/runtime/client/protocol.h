@@ -2,19 +2,27 @@
 #define _PROTOCOLS_H
 
 /* A message  is conceptually made of:
+ *
+ * 1- a type of message (i.e. control, max message, event ...) (an int)
+ * 2- the command this message represent.
+ * 2- an integer giving the number of arguments
+ * 3- an array of fts_values, whose interpretation depend
+ *    on the type of message
+ *
+ *    The size of the array is variable
+ *
+ * From now on, the character code and the value in the message structure
+ * are the same, so the users can add as many message type as they want.
+ * (of course, different from the existings ..).
+ * 
+ * Used Letters are:
 
-   1- a type of message (i.e. control, max message, event ...) (an int)
-   2- the command this message represent.
-   2- an integer giving the number of arguments
-   3- an array of fts_values, whose interpretation depend
-      on the type of message
-
-The size of the array is variable
-
-From now on, the character code and the value in the message structure
-are the same, so the users can add as many message type as they want.
-(of course, different from the existings ..).
-*/
+ * Low values: 0x01 0x02 0x03
+ * Symbols   : - { } > < \
+ * Lowercase : c d f g h i m n o p q u z 
+ * Uppercase : A C D L M N O P R S T U V Z
+ * 
+ */
 
 /* The first character identify
    The meaning of the command is subsystem specific.
@@ -32,19 +40,28 @@ are the same, so the users can add as many message type as they want.
 
 /* Command defined for the FOS subsystem  */
 
-#define SAVE_PATCHER_CODE       'S'
+#define SAVE_PATCHER_BMAX_CODE       'S'
+#define SAVE_PATCHER_TPAT_CODE       'T'
+
+#define LOAD_PATCHER_BMAX_CODE       'U'
+#define LOAD_PATCHER_TPAT_CODE       'V'
+#define LOAD_PATCHER_DPAT_CODE       'Z'
+
+
 #define OPEN_PATCHER_CODE       'O'
+#define DOWNLOAD_PATCHER_CODE   'D'
 #define CLOSE_PATCHER_CODE      'C'
 #define PATCHER_LOADED_CODE     'L'
 
 #define NEW_OBJECT_CODE         'n'
+#define NEW_ABSTRACTION_CODE    'A'
 #define REDEFINE_OBJECT_CODE    'N'
 #define REPLACE_OBJECT_CODE     'R'
 #define FREE_OBJECT_CODE        'f'
 #define CONNECT_OBJECTS_CODE    'c'
 #define DISCONNECT_OBJECTS_CODE 'd'
 #define MESSAGE_CODE            'm'
-#define NAMED_MESSAGE_CODE      'z'
+#define NAMED_MESSAGE_CODE      'q'
 
 #define PUTPROP_CODE            'p'
 #define GETPROP_CODE            'g'
@@ -64,22 +81,11 @@ are the same, so the users can add as many message type as they want.
 
 /* Value coding */
 
-/* Need more documentation ... */
-
-/* Strings are delimited by '"'; quotes inside
-   the strings are automatically quoted by a backslash
-   This is done to don't have nulls in the message,
-   so it is really human readable ascii.
-
+/*
    The float code cannot be f, because this bring
    to an ambiguity with hex ints.
 
-   Ints are represented base hex, with value + sign representation.
-   (2's complement is not architecture indipendent); the sign is merged
-   with the type id to spare one char for negative ints.
-
    Objects are represented as a positive number corresponding to its ID.
-   
 */
    
 #define LONG_POS_CODE 'i'
@@ -100,6 +106,8 @@ are the same, so the users can add as many message type as they want.
 
 
 #endif
+
+
 
 
 

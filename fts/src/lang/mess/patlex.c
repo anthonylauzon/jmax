@@ -231,7 +231,7 @@ void nextToken(fts_pat_lexer_t *this)
 			  else if (fts_is_float(value))
 			    {
 			      status = tt_in_float;
-			      sprintf(this->buf, "%f", fts_get_int(value));
+			      sprintf(this->buf, "%f", fts_get_float(value));
 			      this->buf_fill = strlen(this->buf);
 			    }
 			  else if (fts_is_symbol(value))
@@ -408,15 +408,19 @@ void nextToken(fts_pat_lexer_t *this)
 	    case tt_in_float:
 	      if (feof(this->fd))
 		{
+		  float f;	
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_float(&(this->val), atof(this->buf));
+		  sscanf(this->buf, "%f", &f);
+		  fts_set_float(&(this->val), f);
 		  this->ttype = FTS_LEX_FLOAT;
 		  return;
 		}
 	      if (isSemi(c))
 		{
+		  float f;
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_float(&(this->val), atof(this->buf));
+		  sscanf(this->buf, "%f", &f);
+		  fts_set_float(&(this->val), f);
 		  this->ttype = FTS_LEX_FLOAT;
 		  this->lookahead = c;
 		  this->lookahead_valid = 1;
@@ -424,8 +428,10 @@ void nextToken(fts_pat_lexer_t *this)
 		}
 	      else if (isBlank(c))
 		{
+		  float f;
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_float(&(this->val), atof(this->buf));
+		  sscanf(this->buf, "%f", &f);
+		  fts_set_float(&(this->val), f);
 		  this->ttype = FTS_LEX_FLOAT;
 		  return;
 		}

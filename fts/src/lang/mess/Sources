@@ -1,6 +1,5 @@
 SOURCES = $(ARCH_SOURCES) \
 atoms.c		\
-class.c		\
 classes.c	\
 events.c	\
 loader.c	\

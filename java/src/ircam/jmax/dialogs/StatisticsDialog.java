@@ -27,7 +27,7 @@ public class StatisticsDialog extends Dialog implements ActionListener, KeyListe
     //Create middle section.
     Panel p1 = new Panel();
     p1.setLayout(new GridLayout(0, 1));
-    Label label1 = new Label("jMax "+  MaxApplication.jmaxProperties.getProperty("jmaxVersion"));
+    Label label1 = new Label("jMax "+  MaxApplication.getProperty("jmaxVersion"));
     p1.add(label1);
     Label label2 = new Label("running on " + (String)(System.getProperties().getProperty("os.name")));
     p1.add(label2);

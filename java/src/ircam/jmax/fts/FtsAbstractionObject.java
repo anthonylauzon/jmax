@@ -78,6 +78,16 @@ public class FtsAbstractionObject  extends FtsContainerObject
   }
 
 
+  // For an abstraction loaded from FTS, just behave as a standard object.
+
+  FtsAbstractionObject(FtsContainerObject parent, String className, String description, int objId)
+  {
+    super(parent, className, description, objId);
+
+    this.className = className;
+  }
+
+
   /*****************************************************************************/
   /*                                                                           */
   /*                      CLIENT API and  PROPERTIES                           */

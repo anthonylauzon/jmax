@@ -155,8 +155,8 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
   //--------------------------------------------------------
   private void InsertButtons() {
     //charge images if not already charged
-    String fs = MaxApplication.jmaxProperties.getProperty("file.separator");
-    String path = MaxApplication.jmaxProperties.getProperty("root")+fs+"images"+fs;
+    String fs = MaxApplication.getProperty("file.separator");
+    String path = MaxApplication.getProperty("root")+fs+"images"+fs;
     String p = new String("ircam.jmax.editors.ermes.");
 
     AddButton(p+"ErmesObjExternal", path+"tool_ext.gif");

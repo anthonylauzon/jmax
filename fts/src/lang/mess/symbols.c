@@ -63,6 +63,7 @@ fts_symbol_t fts_s_wh;
 fts_symbol_t fts_s_range;
 fts_symbol_t fts_s_font;
 fts_symbol_t fts_s_fontSize;
+fts_symbol_t fts_s_autorouting;
 
 
 static void 
@@ -110,13 +111,14 @@ fts_predefine_symbols(void)
   fts_s_wx                = fts_new_builtin_symbol("wx");
   fts_s_y                 = fts_new_builtin_symbol("y");
   fts_s_wy                = fts_new_builtin_symbol("wy");
-  fts_s_width             = fts_new_builtin_symbol("width");
+  fts_s_width             = fts_new_builtin_symbol("w");
   fts_s_ww                = fts_new_builtin_symbol("ww");
-  fts_s_height            = fts_new_builtin_symbol("height");
+  fts_s_height            = fts_new_builtin_symbol("h");
   fts_s_wh                = fts_new_builtin_symbol("wh");
   fts_s_range             = fts_new_builtin_symbol("range");
   fts_s_font              = fts_new_builtin_symbol("font");
-  fts_s_fontSize          = fts_new_builtin_symbol("fc");
+  fts_s_fontSize          = fts_new_builtin_symbol("fs");
+  fts_s_autorouting       = fts_new_symbol("autorouting");
 }
 
 

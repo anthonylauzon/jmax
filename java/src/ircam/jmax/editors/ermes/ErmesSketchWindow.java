@@ -62,7 +62,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public static int preferredHeight = 450;
   Dimension preferredsize = new Dimension(preferredWidth,preferredHeight);
   public ErmesSketchPad itsSketchPad = new ErmesSketchPad(this);
-  public ErmesPatcherDoc itsDocument;
   ErmesScrollerView itsScrollerView = new ErmesScrollerView(this, itsSketchPad);
   ErmesSwToolbar itsToolBar = new ErmesSwToolbar(itsSketchPad);
   ErmesSketchWindow itsTopWindow = null;
@@ -208,7 +207,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsWindowMenuList = new Vector();
     itsSketchPad.setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));						// communicate with
       
-    itsDocument = new ErmesPatcherDoc(this);
     InitSketchWin();
     validate();
     alreadySaved = true;
@@ -859,7 +857,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
 
   public void Print(){
-    PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Patcher", MaxApplication.jmaxProperties);
+    PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Patcher", MaxApplication.getProperties());
     if(aPrintjob != null){
       Graphics aPrintGraphics = aPrintjob.getGraphics();
       if(aPrintGraphics != null){

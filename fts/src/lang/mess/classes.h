@@ -24,19 +24,11 @@ extern fts_status_description_t fts_CannotInstantiate;
 
 /* Meta classes functions */
 
-extern fts_metaclass_t *fts_metaclass_create(fts_symbol_t name,
+extern fts_status_t fts_metaclass_create(fts_symbol_t name,
 					     fts_method_instantiate_t mth_instantiate,
 					     fts_method_equiv_t mth_equiv);
 
-extern fts_metaclass_t *fts_metaclass_create_override(fts_symbol_t name,
-						      fts_method_instantiate_t mth_instantiate,
-						      fts_method_equiv_t mth_equiv);
-
-
 extern void fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name);
-
-extern void fts_metaclass_declare_dynamic(fts_symbol_t name, fts_object_t *loader);
-
 
 /* Class functions  and macros */
 

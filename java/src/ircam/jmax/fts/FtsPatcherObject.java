@@ -67,6 +67,11 @@ public class FtsPatcherObject extends FtsContainerObject
     super();
   }
 
+  FtsPatcherObject(int objId)
+  {
+    super(objId);
+  }
+
   /**
    * Create a FtsPatcherObject object: temporary constructor, should go away
    * as soon as the graphic patcher object work !
@@ -99,12 +104,23 @@ public class FtsPatcherObject extends FtsContainerObject
 
     updateDescription();
 
-    FtsServer.getServer().newPatcherObject(parent, this,
-						   getObjectName(),
-						   ninlets,
-						   noutlets);
+    FtsServer.getServer().newPatcherObject(parent, this, getObjectName(), ninlets, noutlets);
+
     if (parent.isOpen())
       FtsServer.getServer().syncToFts();
+  }
+
+
+  public FtsPatcherObject(FtsContainerObject parent, String name, int inlets, int outlets, int objId)
+  {
+    // @@@ !!! Verify that this method do not implicitly fire a redefine.
+    super(parent, "patcher", "", objId);
+
+    setObjectName(name);
+    setNumberOfInlets(inlets);
+    setNumberOfOutlets(outlets);
+
+    updateDescription();
   }
 
   /**
@@ -122,10 +138,40 @@ public class FtsPatcherObject extends FtsContainerObject
     setNumberOfOutlets(0);
     updateDescription();
 
-    FtsServer.getServer().newPatcherObject(parent, this,
-						   objectName,
-						   ninlets,
-						   noutlets);
+    FtsServer.getServer().newPatcherObject(parent, this, objectName, ninlets, noutlets);
+
+    if (parent.isOpen())
+      FtsServer.getServer().syncToFts();
+  }
+
+
+  public FtsPatcherObject(FtsContainerObject parent, int objId)
+  {
+    super(parent, "patcher", "unnamed 0 0", objId);
+
+    setObjectName("unnamed");
+    setNumberOfInlets(0);
+    setNumberOfOutlets(0);
+    updateDescription();
+  }
+
+
+  /** Special constructor used when creating a new patcher to be
+   * filled within FTS
+   */
+
+  public FtsPatcherObject(FtsContainerObject parent, boolean downLoaded)
+  {
+    super(parent, "patcher", "unnamed 0 0");
+
+    this.downLoaded = downLoaded;
+
+    setObjectName("unnamed");
+    setNumberOfInlets(0);
+    setNumberOfOutlets(0);
+    updateDescription();
+
+    FtsServer.getServer().newPatcherObject(parent, this, objectName, ninlets, noutlets);
 
     if (parent.isOpen())
       FtsServer.getServer().syncToFts();
@@ -208,9 +254,9 @@ public class FtsPatcherObject extends FtsContainerObject
     // First, store the declarations; declaration don't have
     // connections, so we don't store them in variables.
 
-    for (int i = 0; i < objects.size(); i++)
+    for (int i = 0; i < getObjects().size(); i++)
       {
-	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 	
 	if (obj instanceof FtsDeclarationObject)
 	  {
@@ -221,9 +267,9 @@ public class FtsPatcherObject extends FtsContainerObject
 
     // Then store the objects
 
-    for (int i = 0; i < objects.size(); i++)
+    for (int i = 0; i < getObjects().size(); i++)
       {
-	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 	
 	if ((! (obj instanceof FtsDeclarationObject)) &&  obj.isPersistent())
 	  {
@@ -259,9 +305,9 @@ public class FtsPatcherObject extends FtsContainerObject
 
     // Then, store the connections
 
-    for (int i = 0; i < connections.size(); i++)
+    for (int i = 0; i < getConnections().size(); i++)
       {
-	FtsConnection c   =  (FtsConnection) connections.elementAt(i);
+	FtsConnection c   =  (FtsConnection) getConnections().elementAt(i);
 	
 	c.saveAsTcl(writer);
 	writer.println();

@@ -184,6 +184,10 @@ FtsDotPatFileDataHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatFileDataHandler.java )
 .PHONY: FtsDotPatFileDataHandler
 
+FtsDotPatRemoteDataHandler:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatRemoteDataHandler.java )
+.PHONY: FtsDotPatRemoteDataHandler
+
 FtsTpaFileDataHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTpaFileDataHandler.java)
 .PHONY: FtsTpaFileDataHandler

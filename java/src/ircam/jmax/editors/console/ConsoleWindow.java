@@ -114,7 +114,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
   public void Close(){}
 
   public void Print(){
-    PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Console", MaxApplication.jmaxProperties);
+    PrintJob aPrintjob = getToolkit().getPrintJob(this, "Printing Console", MaxApplication.getProperties());
     if(aPrintjob != null){
       Graphics aPrintGraphics = aPrintjob.getGraphics();
       if(aPrintGraphics != null){

@@ -35,6 +35,22 @@ public class FtsConnection
   }
 
 
+  public FtsConnection(FtsObject from, int outlet, FtsObject to, int inlet, boolean doOnFts)
+  {
+    super();
+   
+    this.from   = from;
+    this.outlet = outlet;
+    this.to     = to;
+    this.inlet  = inlet;
+
+    if (doOnFts)
+      FtsServer.getServer().connectObjects(from, outlet, to, inlet);
+
+    from.getParent().addConnectionToContainer(this);
+  }
+
+
   /** Replace one object with the other in the connection
    *  valid only if we are doing a replace on the FTS side, also,
    *  this do not change the connections in FTS; this is why this method
@@ -65,7 +81,7 @@ public class FtsConnection
     else
       {
 	System.err.println("Deleting delete connection" + this);
-	(new Exception()).printStackTrace();
+	Thread.dumpStack();
       }
   }
 

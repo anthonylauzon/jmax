@@ -4,7 +4,6 @@ SSOURCES = \
           ErmesConnSegment.java \
           ErmesConnection.java \
           ErmesConnectionSet.java \
-          ErmesPatcherDoc.java \
           ErmesRegion.java \
           ErmesScrollerView.java \
           ErmesSketchHelper.java \

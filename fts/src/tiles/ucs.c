@@ -585,7 +585,7 @@ fts_ucs_load_pat_file(int argc, const fts_atom_t *argv)
 
       gettimeofday(&before, 0); /* 0 is for compatibility with BSD */
 
-      ret = importPatcher(patcher, fts_symbol_name(file));
+      ret = fts_load_dotpat_patcher(patcher, fts_symbol_name(file));
 
       if (ret == 0)
 	fprintf(stderr, "Error loading pat file %s\n", fts_symbol_name(file));

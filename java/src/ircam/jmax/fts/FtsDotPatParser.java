@@ -119,7 +119,7 @@ public class FtsDotPatParser
 
     try
       {
-	in  = new FtsDotPatTokenizer(new BufferedInputStream(new FileInputStream(inputFile), 1024));
+	in  = new FtsDotPatTokenizer(new BufferedInputStream(new FileInputStream(inputFile), 1024),  inputFile.getName());
       }
     catch (FileNotFoundException e)
       {
@@ -214,7 +214,7 @@ public class FtsDotPatParser
 	  {
 	    in.nextToken(); 
 
-	    if (in.sval.equals("#N"))
+	    if (in.sval.equals("#N") || in.sval.equals("#n"))
 	      {
 
 		in.nextToken();
@@ -286,7 +286,7 @@ public class FtsDotPatParser
 		      in.nextToken();
 		  }
 	      }
-	    else if (in.sval.equals("#P"))
+	    else if (in.sval.equals("#P") || in.sval.equals("#p"))
 	      {
 		// get the line name
 
@@ -320,7 +320,7 @@ public class FtsDotPatParser
 
 		in.nextToken();//skip ';'
 	      }
-	    else if (in.sval.equals("#T"))
+	    else if (in.sval.equals("#T") || in.sval.equals("#t"))
 	      {
 		in.nextToken(); // get the command
 
@@ -336,7 +336,7 @@ public class FtsDotPatParser
 		else
 		  syntaxError("Syntax error in a #T (table content)");		  
 	      }
-	    else if (in.sval.equals("#X"))
+	    else if (in.sval.equals("#X") || in.sval.equals("#x"))
 	      {
 		if (lastNObjectType.equals("qlist"))
 		  {
@@ -380,7 +380,7 @@ public class FtsDotPatParser
 	      }
 	    else
 	      {
-		System.out.println("format not supported (#" + (char) in.ttype + ")");
+		System.out.println("format not supported (" + in.sval + ") at " + in.toString());
 
 		// skip until the next ';'
 
@@ -411,7 +411,7 @@ public class FtsDotPatParser
     
     try
       {
-	in  = new FtsDotPatTokenizer(new BufferedInputStream(new FileInputStream(inputFile), 1024), env);
+	in  = new FtsDotPatTokenizer(new BufferedInputStream(new FileInputStream(inputFile), 1024), env, inputFile.getName());
 
 	readFromFtsDotPatTokenizer(parent, in);
 

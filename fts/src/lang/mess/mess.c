@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/04/08 12:03:09 $
+ *      $Revision: 1.4 $ IRCAM $Date: 1998/04/09 10:57:29 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -56,10 +56,6 @@ fts_mess_init(void)
 
   fts_patcher_init();
 
-  /* Create the class class */
-
-  class_config();
-  
   /* Create the send/receive class */
 
   send_config();

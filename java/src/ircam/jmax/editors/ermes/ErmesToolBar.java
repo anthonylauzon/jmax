@@ -38,6 +38,37 @@ public class ErmesToolBar extends Panel {
   static Image aImage20;
   static Image aImage21;
   static Image aImage22;
+
+  // Static initialized to fill the images 
+  static {
+    String fs = MaxApplication.getProperty("file.separator");
+    String path = MaxApplication.getProperty("root")+fs+"images"+fs;
+
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    aImage1 = toolkit.getImage(path+"extUp.gif");
+    aImage2 = toolkit.getImage(path+"extDown.gif");
+    aImage3 = toolkit.getImage(path+"messUp.gif");
+    aImage4 = toolkit.getImage(path+"messDown.gif");
+    aImage5 = toolkit.getImage(path+"bangUp.gif");
+    aImage6 = toolkit.getImage(path+"bangDown.gif");
+    aImage7 = toolkit.getImage(path+"toggleUp.gif");
+    aImage8 = toolkit.getImage(path+"toggleDown.gif");
+    aImage9 = toolkit.getImage(path+"intUp.gif");
+    aImage10 = toolkit.getImage(path+"intDown.gif");
+    aImage11 = toolkit.getImage(path+"floatUp.gif");
+    aImage12 = toolkit.getImage(path+"floatDown.gif");
+    aImage13 = toolkit.getImage(path+"textUp.gif");
+    aImage14 = toolkit.getImage(path+"textDown.gif");
+    aImage15 = toolkit.getImage(path+"sliderUp.gif");
+    aImage16 = toolkit.getImage(path+"sliderDown.gif");
+    aImage17 = toolkit.getImage(path+"inUp.gif");
+    aImage18 = toolkit.getImage(path+"inDown.gif");
+    aImage19 = toolkit.getImage(path+"outUp.gif");
+    aImage20 = toolkit.getImage(path+"outDown.gif");
+    aImage21 = toolkit.getImage(path+"patcherUp.gif");
+    aImage22 = toolkit.getImage(path+"patcherDown.gif");
+  }
+
 	
   //--------------------------------------------------------
   //	CONSTRUCTOR
@@ -142,10 +173,11 @@ public class ErmesToolBar extends Panel {
   //--------------------------------------------------------
   private void InsertButton() {
     //charge images if not already charged
-    String fs = MaxApplication.jmaxProperties.getProperty("file.separator");
-    String path = MaxApplication.jmaxProperties.getProperty("root")+fs+"images"+fs;
 
     if (aImage1 == null) {
+      String fs = MaxApplication.getProperty("file.separator");
+      String path = MaxApplication.getProperty("root")+fs+"images"+fs;
+
       Toolkit toolkit = Toolkit.getDefaultToolkit();
       aImage1 = toolkit.getImage(path+"extUp.gif");
       aImage2 = toolkit.getImage(path+"extDown.gif");

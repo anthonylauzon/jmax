@@ -131,6 +131,95 @@ abstract public class FtsObject implements MaxTclInterpreter
       return new FtsStandardObject(parent, className, description);
   }
 
+
+  /** This version create an application layer object for an already existing
+   *  object in FTS; take directly the FtsMessage as argument.
+   *  Abstractions and FTS template are represented as ????? !!!!!
+   */
+
+  static private String makeDescription(int offset, FtsMessage msg)
+  {
+    boolean addBlank = false;
+    StringBuffer descr = new StringBuffer();
+
+    for (int i = offset; i < msg.getNumberOfArguments(); i++)
+      {
+	Object value;
+
+	if (addBlank)
+	  descr.append(" ");
+	else
+	  addBlank = true;
+
+	value = msg.getArgument(i);
+
+	descr.append(value);
+
+	if (value.equals(";"))
+	  {
+	    descr.append("\n");
+	    addBlank = false;
+	  }
+      }
+
+    return descr.toString();
+  }
+
+
+  static public FtsObject makeFtsObjectFromMessage(FtsMessage msg) throws FtsException
+  {
+    String className;
+    StringBuffer description;
+    FtsContainerObject parent;
+    int objId;
+
+    parent = (FtsContainerObject) msg.getArgument(0);
+    objId = ((Integer) msg.getArgument(1)).intValue();
+    className = (String) msg.getArgument(2);
+
+    if (className.equals("table"))
+      return new FtsTableObject(parent, className, makeDescription(2, msg), objId);
+    else if (className.equals("patcher"))
+      return new FtsPatcherObject(parent, (String) msg.getArgument(3),
+				  ((Integer) msg.getArgument(4)).intValue(),
+				  ((Integer) msg.getArgument(5)).intValue(), objId);
+    else if (className.equals("inlet"))
+      return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+    else if (className.equals("outlet"))
+      return new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+    else if (className.equals("messbox"))
+      return new FtsMessageObject(parent, makeDescription(3, msg), objId);
+    else if (className.equals("comment"))
+      return new FtsCommentObject(parent, makeDescription(3, msg), objId);
+    else if (className.equals("slider"))
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+    else if (className.equals("intbox"))
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+    else if (className.equals("floatbox"))
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+    else if (className.equals("toggle"))
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+    else if (className.equals("param"))
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+    else
+      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+  }
+
+
+  static public FtsObject makeFtsAbstractionFromMessage(FtsMessage msg) throws FtsException
+  {
+    String className;
+    StringBuffer description;
+    FtsContainerObject parent;
+    int objId;
+
+    parent = (FtsContainerObject) msg.getArgument(0);
+    objId = ((Integer) msg.getArgument(1)).intValue();
+    className = (String) msg.getArgument(2);
+
+    return new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
+  }
+
   /**
    * Static function to redefine a FtsObject.
    * It is static, for
@@ -663,6 +752,11 @@ abstract public class FtsObject implements MaxTclInterpreter
   {
   }
 
+  FtsObject(int objId)
+  {
+    setObjId(objId);
+  }
+
   /**
    * Create a FtsObject object.
    */
@@ -674,6 +768,20 @@ abstract public class FtsObject implements MaxTclInterpreter
     this.className = className;
     this.description = description;
     this.parent = parent;
+
+    parent.addObjectToContainer(this);
+  }
+
+
+  protected FtsObject(FtsContainerObject parent, String className, String description, int objId)
+  {
+    super();
+
+    this.className = className;
+    this.description = description;
+    this.parent = parent;
+
+    setObjId(objId);
 
     parent.addObjectToContainer(this);
   }

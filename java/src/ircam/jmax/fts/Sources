@@ -40,6 +40,7 @@ SOURCES = \
           FtsTemplateTable.java \
 	  FtsLocation.java  \
 	  FtsDotPatFileDataHandler.java  \
+	  FtsDotPatRemoteDataHandler.java  \
 	  FtsPatchData.java  \
 	  FtsIntegerVectorData.java  \
 	  FtsPatchDataType.java \

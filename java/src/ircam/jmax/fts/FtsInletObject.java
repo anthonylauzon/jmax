@@ -28,6 +28,10 @@ public class FtsInletObject  extends FtsObject
    * Create a FtsInletObject object.
    */
 
+  // Inlets without a position cannot be 
+  // created by FTS (of course); and soon ,
+  // they will not be created also here !!!
+
   FtsInletObject(FtsContainerObject parent)
   {
     super(parent, "inlet", "inlet");
@@ -50,6 +54,19 @@ public class FtsInletObject  extends FtsObject
     parent.addInlet(this, position);
 
     FtsServer.getServer().newInletObject(parent, this, position);// create the fts inlet
+
+    ninlets = 0;
+    noutlets = 1;
+  }
+
+
+  public FtsInletObject(FtsContainerObject parent, int position, int objId)
+  {
+    super(parent, "inlet", "inlet " + position, objId);
+
+    this.position = position;
+
+    parent.addInlet(this, position);
 
     ninlets = 0;
     noutlets = 1;

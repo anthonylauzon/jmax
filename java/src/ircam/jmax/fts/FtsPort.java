@@ -67,6 +67,7 @@ abstract class FtsPort implements Runnable
     // start the input thread
 
     inputThread = new Thread(this, name);
+    inputThread.setPriority(Thread.MAX_PRIORITY);
     inputThread.start(); 
   }
 
@@ -110,7 +111,7 @@ abstract class FtsPort implements Runnable
 
   public void run()
   {
-    while (running)
+    while (running && (in_stream !=  null) && (out_stream != null))
       {
 	try
 	  {
@@ -125,12 +126,12 @@ abstract class FtsPort implements Runnable
 	  {
 	    running = false;
 	  }
-	catch (java.io.IOException e)
+	catch (Exception e)
 	  {
-	    // ignore possible io error, for now, but should
-	    // do something 
-
-	    running = false;
+	    // Try to survive an exception
+	    
+	    System.err.println("System exception " + e);
+	    e.printStackTrace();
 	  }
       }
 
@@ -509,8 +510,13 @@ abstract class FtsPort implements Runnable
 
 	    if (FtsClientProtocol.tokenStartingChar(c))
 	      {
+		FtsObject obj;
+
 		status = tokenCode(c);
-		portMsg.addArgument(server.getObjectByFtsId(Integer.parseInt(s.toString())));
+
+		obj = server.getObjectByFtsId(Integer.parseInt(s.toString()));
+		
+		portMsg.addArgument(obj);
 		s.setLength(0);
 	      }
 	    else

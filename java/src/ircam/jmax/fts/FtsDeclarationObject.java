@@ -34,6 +34,11 @@ public class FtsDeclarationObject extends FtsObject
     FtsServer.getServer().newObject(parent, this, description);
   }
 
+  FtsDeclarationObject(FtsContainerObject parent, String className, String description, int objId)
+  {
+    super(parent, className, description, objId);
+  }
+
   /*****************************************************************************/
   /*                                                                           */
   /*                      CLIENT API and  PROPERTIES                           */

@@ -520,3 +520,10 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj)
 
   fts_bmax_code_pop_obj_table(f);
 }
+
+
+
+
+
+
+
