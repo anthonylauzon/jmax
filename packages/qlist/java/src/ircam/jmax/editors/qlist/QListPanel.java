@@ -80,15 +80,15 @@ public class QListPanel extends JPanel implements ActionListener {
     itsTextArea.setCaretPosition( caretPosition);
   }
 
-  public Dimension preferredSize() 
+  public Dimension getPreferredSize() 
   {
     Dimension d = new Dimension(512, 412);
     return d;
   }
 
-  public Dimension minimumSize() 
+  public Dimension getMinimumSize() 
   {
-    return preferredSize();
+    return getPreferredSize();
   }
 
   // (fd) {

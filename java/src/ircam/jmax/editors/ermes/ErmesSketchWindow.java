@@ -21,7 +21,7 @@ import javax.swing.*;
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
 //
-public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
+public class ErmesSketchWindow extends MaxEditor implements ComponentListener, ClipboardOwner {
 
   protected KeyEventClient keyEventClient;
 
@@ -350,6 +350,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     if (itsSketchPad.canCopyText())
       {
 	textClipboard = itsSketchPad.getSelectedText(); 
+	MaxApplication.systemClipboard.setContents(new StringSelection(textClipboard), this);
       }
     else if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
       {
@@ -375,9 +376,17 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-    if (itsSketchPad.canPasteText())
+    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+    if (clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor))
       {
-	itsSketchPad.pasteText(textClipboard);
+	if (itsSketchPad.canPasteText())
+	  {
+	    try {
+	      textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
+	      itsSketchPad.pasteText(textClipboard);
+	    }
+	    catch (Exception e) {System.err.println("error while pasting text: "+e);}
+	  }
       }
     else 
       {
@@ -410,6 +419,10 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
       }
 
     setCursor( temp);
+  }
+
+  public void lostOwnership(Clipboard c, Transferable t) 
+  {
   }
 
   protected void Duplicate()
