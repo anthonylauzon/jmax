@@ -100,7 +100,8 @@ void
 scoob_property_get_by_index(scoob_t *this, int index, fts_atom_t *p)
 {
   if(index < fts_array_get_size(&this->properties))
-    fts_atom_assign(p, fts_array_get_element(&this->properties, index));
+    /* copy atom to output argument */
+    *p = *fts_array_get_element(&this->properties, index);
 }
 
 void
@@ -649,3 +650,10 @@ scoob_config(void)
   }
 
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
