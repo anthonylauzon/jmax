@@ -28,8 +28,10 @@
  * This file's author: François Déchelle
  */
 
-#include <alloca.h>
 #include <stdlib.h>
+#ifndef MACOSX
+#include <alloca.h>
+#endif
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime.h>
