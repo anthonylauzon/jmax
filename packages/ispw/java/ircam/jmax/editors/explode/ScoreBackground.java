@@ -26,7 +26,7 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.MaxApplication;
+import ircam.jmax.JMaxApplication;
 
 import java.awt.*;
 import java.awt.image.ImageObserver;

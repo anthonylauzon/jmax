@@ -1,2 +1,2 @@
-SUBDIRS=ispw
+SUBDIRS=ispw editors
 

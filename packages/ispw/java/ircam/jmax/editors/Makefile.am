@@ -1,4 +1,2 @@
-SUBDIRS=qlist
-
-#explode
+SUBDIRS=qlist explode
 

@@ -25,7 +25,7 @@
 
 package ircam.jmax.editors.explode;
 
-import ircam.ftsclient.*;
+import ircam.fts.client.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -66,8 +66,8 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadAppend"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsExplodeObject)obj).loadAppend(argv[0].intValue, argv[1].intValue, 
-					     argv[2].intValue, argv[3].intValue, argv[4].intValue);
+	  ((FtsExplodeObject)obj).loadAppend(args.getInt( 0), args.getInt( 1), 
+					     args.getInt( 2), args.getInt( 3), args.getInt( 4));
 	}
       });
     FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadEnd"), new FtsMessageHandler(){
@@ -85,14 +85,14 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
 	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("append"), new FtsMessageHandler(){
 		public void invoke( FtsObject obj, FtsArgs args)
 		{
-		    ((FtsExplodeObject)obj).append(argv[0].intValue, argv[1].intValue, 
-						   argv[2].intValue, argv[3].intValue, argv[4].intValue);
+		    ((FtsExplodeObject)obj).append(args.getInt( 0), args.getInt( 1), 
+						   args.getInt( 2), args.getInt( 3), args.getInt( 4));
 		}
 	    });
 	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
 		public void invoke( FtsObject obj, FtsArgs args)
 		{
-		    ((FtsExplodeObject)obj).setName(argv[0].stringValue);
+		    ((FtsExplodeObject)obj).setName(args.getSymbol( 0).toString());
 		}
 	    });
     }
@@ -100,11 +100,10 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
   /**
    * constructor.
    */
-  public FtsExplodeObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
+  public FtsExplodeObject(FtsServer server, FtsObject parent, int objId, String classname, FtsAtom args[], int offset, int length)
   {
-      super(server, parent, classname, nArgs, args, id);
-      
-      listeners = new MaxVector();   
+    super(server, parent, objId, classname, args, offset, length);
+    listeners = new MaxVector();   
   }
 
   /* Access the name */
@@ -389,12 +388,12 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     events[index] = event;
 
     args.clear();
-    args.add(index);
-    args.add(event.getTime());
-    args.add(event.getPitch());
-    args.add(event.getVelocity());
-    args.add(event.getDuration());
-    args.add(event.getChannel());
+    args.addInt( index);
+    args.addInt( event.getTime());
+    args.addInt( event.getPitch());
+    args.addInt( event.getVelocity());
+    args.addInt( event.getDuration());
+    args.addInt( event.getChannel());
 
     try{
 	send(FtsSymbol.get("add_event"), args);
@@ -462,7 +461,7 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     
     // Send the remove command to fts
     args.clear();
-    args.add(deleteIndex);
+    args.addInt(deleteIndex);
 
     try{
 	send(FtsSymbol.get("remove_event"), args);
@@ -505,12 +504,12 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
 
     // Send the change command to fts    
     args.clear();
-    args.add(index);
-    args.add(event.getTime());
-    args.add(event.getPitch());
-    args.add(event.getVelocity());
-    args.add(event.getDuration());
-    args.add(event.getChannel());
+    args.addInt( index);
+    args.addInt( event.getTime());
+    args.addInt( event.getPitch());
+    args.addInt( event.getVelocity());
+    args.addInt( event.getDuration());
+    args.addInt( event.getChannel());
 
     try{
 	send(FtsSymbol.get("change_event"), args);
@@ -555,8 +554,8 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     
     // inform FTS
     args.clear();
-    args.add(index);
-    args.add(event.getTime());
+    args.addInt( index);
+    args.addInt( event.getTime());
 
     try{
 	send(FtsSymbol.get("change_time"), args);
@@ -644,25 +643,25 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     return events[index];
   }
   
-    /**
-     * Fts callback: open the editor associated with this FtsSequenceObject.
-     * If not exist create them else show them.
-     */
-    public void openEditor(int argc, FtsAtom[] argv)
-    {
-	if(getEditorFrame() == null)	    
-	    setEditorFrame( new ExplodeWindow(this));
-	
-	showEditor();
-    }
-
-    /**
-     * Fts callback: destroy the editor associated with this FtsSequenceObject.
-     */
-    public void destroyEditor()
-    {
-	disposeEditor();
-    } 
+  /**
+   * Fts callback: open the editor associated with this FtsSequenceObject.
+   * If not exist create them else show them.
+   */
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    if(getEditorFrame() == null)	    
+      setEditorFrame( new ExplodeWindow(this));
+    
+    showEditor();
+  }
+  
+  /**
+   * Fts callback: destroy the editor associated with this FtsSequenceObject.
+   */
+  public void destroyEditor()
+  {
+    disposeEditor();
+  } 
     /**
      * Clean the explode before a new loading (Needed ?? )
      */
