@@ -76,7 +76,18 @@ public class FtsRuntimeErrors extends FtsObject implements ListModel
       list.addElement(err);
       fireListChanged();
   }
-   
+  
+  public void removeErrors(int[] ids)
+  {
+      if(ids.length>0)
+	  {
+	      for(int i = ids.length-1; i>=0; i--)
+		  list.removeElementAt(ids[i]);
+	      
+	      fireListChanged();
+	  }
+  }
+ 
   public boolean errorPosted(RuntimeError err)
   {
       for(Enumeration e = list.elements(); e.hasMoreElements();)

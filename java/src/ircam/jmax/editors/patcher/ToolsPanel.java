@@ -47,10 +47,7 @@ import ircam.jmax.widgets.*;
 public class ToolsPanel extends JFrame implements FtsActionListener
 {
     Fts fts;
-    public final static ImageIcon objectIcon = SystemIcons.get("_object_");
-    public final static ImageIcon inletIcon = SystemIcons.get("_inlet_");
-    public final static ImageIcon outletIcon =  SystemIcons.get("_outlet_");
-  
+
     class FtsMutableTreeNode extends DefaultMutableTreeNode
     { 
 	FtsObject ftsObj;
@@ -270,7 +267,7 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 		  }
 	      DefaultTreeModel treeModel = new DefaultTreeModel(start);
 	      ((DefaultTreeCellRenderer)tree.getCellRenderer()).
-		  setLeafIcon(ToolsPanel.getObjectIcon(((FtsMutableTreeNode)node).getFtsObject()));
+		  setLeafIcon(ObjectSetViewer.getObjectIcon(((FtsMutableTreeNode)node).getFtsObject()));
 	      
 	      tree.setModel(treeModel);
 	      
@@ -278,33 +275,6 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 		  tree.setSelectionPath(new TreePath(node.getPath()));
 	  }
   }
-
-  /*////////////////////// Object Icons //////////////////////////*/
-  /* Move this in SystemIcons !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-  public static ImageIcon getObjectIcon(FtsObject obj)
-  {
-      ImageIcon icon;
-      String className = ((FtsObject)obj).getClassName();
-
-      if(obj.isError())
-	   icon = ErrorTablePanel.errorIcon;
-      else if (obj instanceof FtsTemplateObject)
-	  icon = objectIcon;
-      else if (obj instanceof FtsPatcherObject)
-	  icon = ErrorTablePanel.patcherIcon;
-      else if (obj instanceof FtsInletObject)
-	  icon = inletIcon;
-      else if (obj instanceof FtsOutletObject)
-	  icon = outletIcon;
-      else if(ObjectCreatorManager.containsClass(className))
-	  if(SystemIcons.get(className)!=null)
-	      icon = SystemIcons.get(className);
-	  else
-	      icon = objectIcon;
-      else
-	  icon = objectIcon;
-      return icon;
-  }  
 
   /*///////////////////////////////////////////////////////////////////*/
 
@@ -316,12 +286,13 @@ public class ToolsPanel extends JFrame implements FtsActionListener
   private static ToolsPanel toolsPanel = null;
   private ToolTableModel currentTableModel;
   
+  /* JTabbedPane */
   private JTabbedPane tabbedPane;
   private ErrorTablePanel errorTable;
   private RuntimeErrorsTablePanel runErrorTable;
   private FinderTablePanel finderTable;
 
-  /* JTree variables */
+  /* JTree  */
   private JTree tree;
   private DefaultTreeModel emptyTreeModel;
 

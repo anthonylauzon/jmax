@@ -49,7 +49,7 @@ public class RuntimeErrorsTablePanel extends JPanel implements JMaxToolPanel{
 	  
 	  setText((String) obj);
 	  setIcon( ObjectSetViewer.getObjectIcon(((RuntimeError)((RuntimeErrorsTableModel)table.getModel())
-						 .getListModel().getElementAt(row)).getObject()));
+						  .getListModel().getElementAt(row)).getObject()));
  
 	  return this;
       }
@@ -102,7 +102,18 @@ public class RuntimeErrorsTablePanel extends JPanel implements JMaxToolPanel{
 		    }
 	    }
 	});
-    
+    table.addKeyListener(new KeyListener(){
+	    public void keyTyped(KeyEvent e){}
+	    public void keyPressed(KeyEvent e)
+	    {
+		if((e.getKeyCode() == KeyEvent.VK_DELETE)||(e.getKeyCode() == KeyEvent.VK_BACK_SPACE))
+		    {
+			runtimeErrorsSource.removeErrors(table.getSelectedRows());
+		    }
+	    }
+	    public  void keyReleased(KeyEvent e){}
+	});
+
     JScrollPane scrollPane = new JScrollPane(table);
 
     scrollPane.setAlignmentX( LEFT_ALIGNMENT);
