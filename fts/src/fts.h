@@ -27,10 +27,36 @@
 #ifndef _FTS_H
 #define _FTS_H
 
-/*
-  Interface file for the whole FTS; object programmer just need to include this
-  file
-*/
+/**
+ * Global FTS include file. 
+ * Object programmer just need to include this file.
+ *
+ * @file fts.h
+ */
+
+/**
+ * @mainpage
+ * 
+ * This will be the developers documentation of the FTS API.
+ * For now there are only a few documentation modules.
+ *
+ * FTS includes mainly the following components:
+ *
+ * \li object system (lang/mess/)
+ * \li DSP system (lang/dsp/, lang/ftl/)
+ * \li scheduler (runtime/scheduler/)
+ * \li timing system (runtime/time/)
+ * \li device abstractions (runtime/devices/)
+ * \li file handling (runtime/files/)
+ * \li client/server communication (runtime/client/, tiles/messtile.*)
+ * \li configuration handling: UCS (tiles/ucs.*)
+ * \li system utilities: memory management, module sytem, ... (sys/)
+ * \li platform dependend components: dynamic loading, memory management, scheduling, ... (non-portable/)
+ * \li misc utilities: hash tables, sampling rate conversion routines, four-point interpolation, ... (lang/utils/)
+ *
+ * This documentation is generated automatically from the comments in the header files of FTS 
+ * by the \e doxygen documentation system by Dimitri van Heesch.
+ */
 
 #include "sys.h"
 #include "lang.h"

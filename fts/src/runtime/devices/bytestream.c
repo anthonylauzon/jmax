@@ -110,7 +110,7 @@ fts_bytestream_add_listener(fts_bytestream_t *stream, fts_object_t *listener, ft
 }
 
 void 
-fts_bytestream_remove_listener(struct _fts_bytestream_ *stream, fts_object_t *listener)
+fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_t *listener)
 {
   fts_bytestream_listener_t *l = stream->listeners;
 

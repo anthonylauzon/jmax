@@ -209,7 +209,7 @@ midishareport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   midishareport_t *this = (midishareport_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
 
-  fts_midiport_init(&this->head, midishareport_send_channel_message, midishareport_send_system_exclusive);
+  fts_midiport_init(&this->head);
 
   this->refnum = -1;
   this->name = 0;
@@ -227,7 +227,12 @@ midishareport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
   
   if(this->refnum >= 0)
-    fts_sched_add(fts_sched_get_current(), midishareport_dispatch, o);
+    {
+      fts_midiport_set_input(&this->head);
+      fts_midiport_set_output(&this->head, midishareport_send_channel_message, midishareport_send_system_exclusive);
+
+      fts_sched_add(fts_sched_get_current(), midishareport_dispatch, o);
+    }
 }
 
 static void 

@@ -61,25 +61,25 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int argc, const fts_
       return;
     }
 	
-  strcpy(outstr, fts_symbol_name(s));   /* get name */
-  bytecount += strlen(fts_symbol_name(s))+1; /* increment past inserted '\0' */
+  strcpy(outstr, fts_symbol_name(s)); /* get name */
+  bytecount += strlen(fts_symbol_name(s)) + 1; /* increment past inserted '\0' */
 
-  for (i = 0; i < argc; i++)
+  for(i=0; i<argc; i++)
     {
       if (fts_is_long(&av[i]))
 	{
 	  data[0] = (char) RSEND_LONG;
-	  sprintf(data+1,"%d", fts_get_int(&av[i]));
+	  sprintf(data + 1,"%d", fts_get_int(&av[i]));
 	}
       else if (fts_is_float(&av[i]))
 	{
 	  data[0] = (char) RSEND_FLOAT;
-	  sprintf(data+1,"%#f", fts_get_float(&av[i]));
+	  sprintf(data + 1,"%#f", fts_get_float(&av[i]));
 	}
       else if (fts_is_symbol(&av[i]))
 	{
 	  data[0] = (char) RSEND_SYM;
-	  sprintf(data+1,"%s", fts_symbol_name(fts_get_symbol(&av[i])));
+	  sprintf(data + 1,"%s", fts_symbol_name(fts_get_symbol(&av[i])));
 	}
       else
 	{
@@ -87,23 +87,21 @@ Rsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int argc, const fts_
 	  return;
 	}
 
-      len = strlen(data)+1;
-      if (bytecount+len >= SYSEXMAX)
+      len = strlen(data) + 1;
+      if (bytecount + len >= SYSEXMAX)
 	{
 	  post("Rsend: message longer than %d charactors\n", SYSEXMAX);
 	  return;
 	}
-      strcpy(outstr+bytecount, data);
+
+      strcpy(outstr + bytecount, data);
       bytecount += len;
     }
 
-  fts_set_int(a, 0x7f);
-
-  for(i=0; i<bytecount-1; i++)
-    fts_set_int(a + i + 1, (int)outstr[i]);
-
+  for(i=0; i<bytecount-2; i++)
+    fts_set_int(a + i, (int)outstr[i]);
   
-  fts_outlet_send(o, 0, fts_s_list, bytecount, a);
+  fts_outlet_send(o, 0, fts_s_list, bytecount - 1, a);
 }
 
 

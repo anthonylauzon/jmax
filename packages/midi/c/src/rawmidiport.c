@@ -239,7 +239,7 @@ rawmidiport_check(int ac, const fts_atom_t *at)
     {
       fts_object_t *obj = fts_get_object(at + 1);
       
-      if(fts_bytestream_has_superclass(obj) && (fts_bytestream_is_output((fts_bytestream_t *)obj) || fts_bytestream_is_input((fts_bytestream_t *)obj)))
+      if(fts_bytestream_check(obj) && (fts_bytestream_is_output((fts_bytestream_t *)obj) || fts_bytestream_is_input((fts_bytestream_t *)obj)))
 	return 1;
     }
   

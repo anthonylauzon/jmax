@@ -42,14 +42,14 @@ union _fts_midiport_callback_
   fts_midiport_sysex_fun_t sysex;
 };
 
-typedef struct _fts_midiport_listener_
+typedef struct fts_midiport_listener
 {
   union _fts_midiport_callback_ callback;
   fts_object_t *listener;
-  struct _fts_midiport_listener_ *next;
+  struct fts_midiport_listener *next;
 } fts_midiport_listener_t;
 
-struct _fts_midiport_listeners_ 
+struct fts_midiport_listeners
 {
   fts_midiport_listener_t *note[17][128]; /* channels 1..16 + 0 for omni */
   fts_midiport_listener_t *poly_pressure[17][128];

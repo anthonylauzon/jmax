@@ -152,7 +152,7 @@ class Display extends GraphicObject implements FtsMessageListener
 
 	g.setColor( Color.black);
 	//g.drawLine( x, y, x + w - 1, y);
-	g.drawLine( x, y, x + h/2, y);
+	g.drawLine( x, y, x + minWidth, y);
 	g.drawLine( x, y, x, y + h/4);
 	
 	paintInlets(g);
@@ -172,7 +172,7 @@ class Display extends GraphicObject implements FtsMessageListener
 
 	g.setColor( Color.black);
 	//g.drawLine( x, y, x + w - 1, y);
-	g.drawLine( x, y, x + h/2, y);
+	g.drawLine( x, y, x + minWidth, y);
 	g.drawLine( x, y, x, y + h/4);
 
 	paintInlets(g);
