@@ -1,4 +1,4 @@
 SUBDIRS=c help
 
 packagedir=$(pkgdatadir)/packages/lists
-package_DATA=lists.jpk lists.jmax 
+package_DATA=lists.jpk
