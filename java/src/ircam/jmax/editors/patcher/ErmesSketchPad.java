@@ -1061,7 +1061,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   // ------------------------------------------------------------------------
   public void showAddPopUp(Point p)
   {
-    AddPopUp.popup(this, p.x, p.y);
+    AddPopUp.getInstance().popup(this, p.x, p.y);
   }
 
 

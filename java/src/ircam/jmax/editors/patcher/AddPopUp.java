@@ -41,12 +41,18 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public class AddPopUp extends JPopupMenu
 {
-  static private AddPopUp popup = new AddPopUp();
-  static private Hashtable subMenus = new Hashtable();
+  static private AddPopUp popup;
+  private Hashtable subMenus = new Hashtable();
 
   int x;
   int y;
-  static public boolean initDone = false;
+  public boolean initDone = false;
+
+  static AddPopUp getInstance()
+  {
+    if( popup == null) popup = new AddPopUp();
+    return popup;
+  }
 
   static class AddPopUpListener implements ActionListener
   {
@@ -119,44 +125,44 @@ public class AddPopUp extends JPopupMenu
   {
   }
 
-  static public void popup(Component invoker, int x, int y)
+  public void popup(Component invoker, int x, int y)
   {
-    popup.x = x;
-    popup.y = y;
-    popup.pack();
-    popup.show(invoker, x - 2, y - 2);
+    this.x = x;
+    this.y = y;
+    pack();
+    show(invoker, x - 2, y - 2);
   }
 
-  static public void addAbbreviation(String cmd, String descr, String message, boolean edit)
+  public void addAbbreviation(String cmd, String descr, String message, boolean edit)
   {
     JMenuItem item  = new JMenuItem(cmd);
 
     item.addActionListener(new AddPopUpListener(descr, message, edit));
-    popup.add(item);
-    popup.pack();
+    add(item);
+    pack();
   }
 
-  static public void addAbbreviation(String className, ImageIcon icon, boolean edit)
+  public void addAbbreviation(String className, ImageIcon icon, boolean edit)
   {
     JMenuItem item = new JMenuItem(icon);  
 
     item.addActionListener(new AddPopUpListener(className, "Adding New "+className+" Object", edit));
-    popup.add(item);
-    popup.pack();
+    add(item);
+    pack();
   }
 
-  static JMenu addAbbreviationMenu(String name)
+  JMenu addAbbreviationMenu(String name)
   {
     JMenu menu = new JMenu(name);
 
-    popup.add(menu);
-    popup.pack();
+    add(menu);
+    pack();
     subMenus.put(name, menu);
 
     return menu;
   }
 
-  static public void addAbbreviation(String menuName, String cmd, String descr, String message, boolean edit)
+  public void addAbbreviation(String menuName, String cmd, String descr, String message, boolean edit)
   {
     JMenuItem item;
     JMenu menu;
@@ -172,7 +178,7 @@ public class AddPopUp extends JPopupMenu
     menu.add(item);
   }
 
-  public static void initDone(){
+  public void initDone(){
     initDone = true;
   }
 }

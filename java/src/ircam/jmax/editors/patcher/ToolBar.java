@@ -202,8 +202,8 @@ public class ToolBar extends JPanel implements ComponentListener{
   {
     JToggleButton button = new ToolButton( this, className);
     toolBar.add( button);
-    if(!AddPopUp.initDone)
-      AddPopUp.addAbbreviation( className, JMaxClassMap.getIcon( className), true);
+    if(!AddPopUp.getInstance().initDone)
+      AddPopUp.getInstance().addAbbreviation( className, JMaxClassMap.getIcon( className), true);
 	
     bGroup.add( button);
     numButtons++;
@@ -214,7 +214,7 @@ public class ToolBar extends JPanel implements ComponentListener{
     for ( Iterator i = JMaxClassMap.getClassNames(); i.hasNext(); )
       addButton( (String)i.next());
     
-    AddPopUp.initDone();
+    AddPopUp.getInstance().initDone();
   }
 
   public void setDirty(boolean dirty)
