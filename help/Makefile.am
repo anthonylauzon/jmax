@@ -1,6 +1,7 @@
 
 helpdir=$(pkgdatadir)/help
 help_DATA= \
+ define.help.jmax \
  jpatcher.help.jmax \
  param.help.jmax \
  preset.help.jmax \
