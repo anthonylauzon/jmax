@@ -44,7 +44,7 @@ public class FtsIntValueObject extends FtsObject
   /*****************************************************************************/
 
   int value; 
-  int flashDuration;
+    //int flashDuration;
 
   /* for the message box */
     public FtsIntValueObject(Fts fts, FtsObject parent, String className, String description)
@@ -72,17 +72,17 @@ public class FtsIntValueObject extends FtsObject
 	return value;
     }
 
-    public void setFlashDuration(int fd)
-    {
-	flashDuration = fd;
-	fts.getServer().putObjectProperty(this, "flash", fd);
-	setDirty();
-    }
-
-    public int getFlashDuration()
-    {
-	return flashDuration;
-    }
+    /*public void setFlashDuration(int fd)
+      {
+      flashDuration = fd;
+      fts.getServer().putObjectProperty(this, "flash", fd);
+      setDirty();
+      }
+    
+      public int getFlashDuration()
+      {
+      return flashDuration;
+      }*/
 
     /** Ask the server for the latest value */
 
@@ -103,11 +103,11 @@ public class FtsIntValueObject extends FtsObject
 		if (listener instanceof FtsIntValueListener)
 		    ((FtsIntValueListener) listener).valueChanged(newValue);
 	    }
+	/*else
+	  if (name == "flash")
+	  flashDuration = newValue;*/
 	else
-	    if (name == "flash")
-		flashDuration = newValue;
-	    else
-		super.localPut(name, newValue);
+	    super.localPut(name, newValue);
     }
 }
 
