@@ -6,7 +6,7 @@ package_JAVA= Data.java
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= $(top_builddir)/packages/data/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/packages/guiobj/java/guiobj.jar:$(top_builddir)/client/java/ftsclient.jar
+CLASSPATH_ENV= CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/packages/guiobj/java/guiobj.jar:$(top_builddir)/client/java/ftsclient.jar
 
 jardir=$(pkgdatadir)/packages/data/java
 JARFILE= data.jar

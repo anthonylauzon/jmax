@@ -50,5 +50,5 @@ XYPad.java
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= $(top_builddir)/packages/guiobj/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
+CLASSPATH_ENV= CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
 
