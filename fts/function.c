@@ -24,58 +24,86 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/package.h>
 
+static fts_status_description_t invalid_object_creation = {
+  "invalid object creation in function new"
+};
+static fts_status_t invalid_object_creation_status = &invalid_object_creation;
+
+static fts_status_description_t undefined_class = {
+  "undefined class in function new"
+};
+static fts_status_t undefined_class_status = &undefined_class;
+
+static fts_status_description_t class_required = {
+  "class required in function new"
+};
+static fts_status_t class_required_status = &class_required;
+
 fts_fun_t
 fts_function_install(fts_symbol_t name, fts_fun_t fun)
 {
   fts_status_t status;
-
+  
   if ( (status = fts_package_add_function( fts_get_current_package(), fun, name)) != fts_ok)
     return NULL;
-
+  
   return fun;
 }
 
 /* **********************************************************************
- * 
- * Some usefull functions
- *
- */
-static void unique_function(int ac, const fts_atom_t *at)
+* 
+* Some usefull functions
+*
+*/
+static fts_status_t
+unique_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   static int seed = 1;
-  fts_atom_t ret[1];						
-
-  fts_set_int( ret, seed++);
   
-  fts_return( ret);
+  fts_set_int(ret, seed++);
+  
+  return fts_ok;
 }
 
-static void new_function(int ac, const fts_atom_t *at)
+static fts_status_t
+new_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fts_atom_t a;
+  fts_class_t *cl = NULL;
   fts_object_t *obj = NULL;
   
-  if(ac > 0)
+  if(ac == 0)
+    return class_required_status;
+  
+  if(fts_is_symbol(at))
+    cl = fts_get_class_by_name(fts_get_symbol(at));
+  else if(fts_is_a(at, fts_class_class))
+    cl = (fts_class_t *)fts_get_object(at);
+  else
+    return class_required_status;
+  
+  if(cl != NULL)
+    obj = fts_object_create(cl, ac - 1, at + 1);
+  else if (fts_is_symbol(at))
+    return fts_status_format("undefined class %s in function new", fts_symbol_name(fts_get_symbol(at)));
+  else
+    return undefined_class_status;
+  
+  if(obj == NULL)
   {
-    fts_class_t *class = NULL;
+    fts_symbol_t clname = fts_class_get_name(cl);
     
-    if(fts_is_symbol(at))
-      class = fts_get_class_by_name(fts_get_symbol(at));
-    else if(fts_is_a(at, fts_class_class))
-      class = (fts_class_t *)fts_get_object(at);
-
-    if(class != NULL)
-      obj = fts_object_create(class, ac - 1, at + 1);
+    fts_set_void(ret);
+    
+    if(clname != NULL)
+      return fts_status_format("invalid arguments for %s object in function new", fts_symbol_name(clname));
+    else
+      return invalid_object_creation_status;
   }
   
-  if(obj != NULL)
-    fts_set_object(&a, obj);
-  else
-    fts_set_void(&a);
+  fts_set_object(ret, obj);
   
-  fts_return(&a);
+  return fts_ok;
 }
-
 
 static void
 declare_functions( void)
@@ -84,14 +112,13 @@ declare_functions( void)
   fts_function_install( fts_new_symbol( "new"), new_function);
 }
 
-/* **********************************************************************
- *
- * Kernel initialization
- *
- */
+/***********************************************************************
+*
+* Kernel initialization
+*
+*/
 
 void fts_kernel_function_init( void)
 {
   declare_functions();
 }
-

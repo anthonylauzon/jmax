@@ -23,12 +23,29 @@
 #include <fts/fts.h>
 
 fts_status_t
-fts_status_new( fts_symbol_t description)
+fts_status_new(fts_symbol_t description)
 {
-  fts_status_t status = (fts_status_t)fts_malloc( sizeof( fts_status_description_t));
+  fts_status_t status = (fts_status_t)fts_malloc(sizeof(fts_status_description_t));
 
   status->description = fts_symbol_name(description);
 
   return status;
+}
+
+fts_status_t
+fts_status_format(const char *format, ...)
+{
+  va_list ap;
+  char buf[1024];
+  fts_symbol_t error;
+  
+  /* make up the errdesc property  */
+  va_start(ap, format);
+  vsnprintf(buf, 1024, format, ap);
+  va_end(ap);
+  
+  error = fts_new_symbol(buf);
+  
+  return fts_status_new(fts_new_symbol(buf));  
 }
 

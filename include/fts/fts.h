@@ -88,9 +88,10 @@ extern "C" {
 #include <fts/class.h>
 #include <fts/function.h>
 #include <fts/connection.h>
+#include <fts/array.h>
+#include <fts/tokenizer.h>
 #include <fts/expression.h>
 #include <fts/objectset.h>
-#include <fts/array.h>
 #include <fts/tuple.h>
 #include <fts/message.h>
 #include <fts/outlet.h>

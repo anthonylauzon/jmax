@@ -25,38 +25,15 @@
 
 #include <fts/packages/data/data.h>
 
-DATA_API fts_symbol_t fvec_symbol;
-DATA_API fts_class_t *fvec_type;
-
-typedef fmat_t fvec_t;
-
-#define fvec_get_size(v) ((v)->m)
-DATA_API void fvec_set_size(fvec_t *vector, int size);
+#define fvec_get_size(v) ((v)->m * (v)->n)
+#define fvec_set_size(v, s) fmat_set_size((v), (s), 1)
 
 #define fvec_get_ptr(v) ((v)->values)
-
-#define fvec_get_element(v, i) ((v)->values[i])
+#define fvec_get_element(m, i) ((m)->values[(i)])
 #define fvec_set_element(v, i, x) ((v)->values[i] = (x))
 
-DATA_API void fvec_copy(fvec_t *org, fvec_t *copy);
-
-DATA_API void fvec_set_const(fvec_t *vector, float c);
-
-DATA_API void fvec_set_with_onset_from_atoms(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
-
-DATA_API float fvec_get_max_value(fvec_t *vector);
-DATA_API float fvec_get_max_abs_value_in_range(fvec_t *vector, int a, int b);
-DATA_API float fvec_get_max_value_in_range(fvec_t *vector, int a, int b);
-DATA_API float fvec_get_min_value_in_range(fvec_t *vector, int a, int b);
-
-#define fvec_set_editor_open(v) ((v)->opened = 1)
-#define fvec_set_editor_close(v) ((v)->opened = 0)
-#define fvec_editor_is_open(v) ((v)->opened)
-
-/**
- * If another object changed our data, do the necessary stuff
- * (update editor, set data dirty)
- */
-DATA_API void fvec_changed(fvec_t *this);
+#define fvec_copy(o, c) fmat_copy((o), (c))
+#define fvec_set_const(v, c) fmat_set_const((v), (c))
+#define fvec_set_with_onset_from_atoms(v, o, n, a) fmat_set_from_atoms((v), (o), 1, (n), (a))
 
 #endif

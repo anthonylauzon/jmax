@@ -32,7 +32,7 @@
 static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right);
 
 static fts_status_description_t syntax_error_status_description = {
-  "Syntax error"
+  "expression syntax error"
 };
 fts_status_t syntax_error_status = &syntax_error_status_description;
 
@@ -64,7 +64,6 @@ static int yyerror( const char *msg);
 %token <a> TK_INT
 %token <a> TK_FLOAT
 %token <a> TK_SYMBOL
-%token TK_SEMI
 %token TK_OPEN_PAR
 %token TK_CLOSED_PAR
 %token TK_OPEN_CPAR
@@ -78,6 +77,7 @@ static int yyerror( const char *msg);
 
 /* Operators */
 %left TK_COMMA
+%left TK_SEMI
 %left TK_SPACE
 %left TK_LOGICAL_OR
 %left TK_LOGICAL_AND
@@ -117,23 +117,27 @@ static int yyerror( const char *msg);
  */
 
 toplevel: comma_expression_list
-		{ ((parser_data_t *)parm)->tree = $1; }
+		{ ((parser_data_t *)parm)->tree = fts_parsetree_new( TK_COMMA, 0, $1, 0); }
+  | comma_expression_list TK_SEMI
+    { ((parser_data_t *)parm)->tree = fts_parsetree_new( TK_SEMI, 0, $1, 0); }
+  | 
+    { ((parser_data_t *)parm)->tree = 0; }
 ;
 
 comma_expression_list: comma_expression_list TK_COMMA toplevel_term_list
-		{ $$ = fts_parsetree_new( TK_COMMA, 0, $1, $3); }
-	| toplevel_term_list
-		{ $$ = fts_parsetree_new( TK_COMMA, 0, 0, $1); }
-	| 
-		{ $$ = 0; }
-;
-
-toplevel_term_list: toplevel_term_list toplevel_term  /*---*/ %prec TK_SPACE
-		{ $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
+    { $$ = fts_parsetree_new( TK_COMMA, 0, $1, $3); }
+  | comma_expression_list TK_SEMI toplevel_term_list
+    { $$ = fts_parsetree_new( TK_SEMI, 0, $1, $3); }
+  | toplevel_term_list
+    { $$ = $1 }
+  ;
+ 
+ toplevel_term_list: toplevel_term_list toplevel_term  /*---*/ %prec TK_SPACE
+    { $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
 	| toplevel_term
-		{ $$ = fts_parsetree_new( TK_SPACE, 0, 0, $1); }
-;
-
+    { $$ = fts_parsetree_new( TK_SPACE, 0, 0, $1); }
+  ; 
+ 
 toplevel_term: primitive
 	| reference
 	| par

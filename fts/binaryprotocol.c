@@ -21,10 +21,7 @@
  */
 
 #include <fts/fts.h>
-
-#include <ftsprivate/tokenizer.h>
 #include <ftsprivate/protocol.h>
-
 #include <string.h>
 
 #define SYMBOL_CACHE_SIZE 1031

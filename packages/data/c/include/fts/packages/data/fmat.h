@@ -25,6 +25,11 @@
 
 #include <fts/packages/data/data.h>
 
+/********************************************************************************
+ *
+ *  fmat format
+ *
+ */
 #define FMAT_FORMATS_MAX 256
 
 enum fmat_format_id_enum {
@@ -52,6 +57,11 @@ DATA_API fmat_format_t *fmat_format_real;
 #define fmat_format_get_n(f) ((f)->n_columns)
 #define fmat_format_get_column_name(f, i) ((f)->column[i])
 
+/********************************************************************************
+ *
+ *  fmat
+ *
+ */
 typedef struct
 {
   fts_object_t o;
@@ -74,9 +84,8 @@ DATA_API fts_symbol_t fmat_symbol;
 /**
 * @ingroup fmat
  */
-DATA_API fts_class_t *fmat_type;
-
-
+DATA_API fts_class_t *fmat_class;
+#define fmat_type fmat_class
 
 /** Get number of rows of matrix x.
 *
@@ -94,6 +103,10 @@ DATA_API fts_class_t *fmat_type;
 
 #define fmat_get_format(x) ((x)->format)
 #define fmat_set_format(x, f) ((x)->format = (f))
+
+#define fmat_editor_is_open(m) ((m)->opened == 1)
+#define fmat_editor_set_open(m) ((m)->opened = 1)
+#define fmat_editor_set_close(m) ((m)->opened = 0)
 
 /**
 * @ingroup fmat
@@ -141,6 +154,69 @@ DATA_API void fmat_copy(fmat_t *orig, fmat_t *copy);
 /**
 * @ingroup fmat
  */
-DATA_API void fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
+DATA_API void fmat_set_from_atoms(fmat_t *mat, int onset, int step, int ac, const fts_atom_t *at);
+
+DATA_API float fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b);
+DATA_API float fmat_get_max_value_in_range(fmat_t *mat, int a, int b);
+DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
+
+/********************************************************************************
+ *
+ *  fvec
+ *
+ */
+typedef fmat_t fvec_t;
+
+DATA_API fts_symbol_t fvec_symbol;
+DATA_API fts_class_t *fvec_class;
+#define fvec_type fvec_class
+
+/********************************************************************************
+ *
+ *  fmat slice: fcol, frow
+ *
+ */
+typedef struct
+{
+  fts_object_t o;
+	enum {fslice_column, fslice_row} type;
+  fmat_t *fmat; /* pointer to fmat */
+  int index; /* index of row or column */
+} fslice_t;
+
+#define fslice_init_column(s, m, i) ((s)->type = fslice_column, (s)->fmat = (m), (s)->index = (i))
+#define fslice_init_row(s, m, i) ((s)->type = fslice_row, (s)->fmat = (m), (s)->index = (i))
+
+#define fslice_get_index(s) ((s)->index)
+#define fslice_check_index(s) (((s)->type == fslice_row)? \
+                               ((s)->index < fmat_get_m((s)->fmat)): \
+                               ((s)->index < fmat_get_n((s)->fmat)))
+
+#define fslice_get_ptr(s) (((s)->type == fslice_row)? \
+                           (fmat_get_ptr((s)->fmat) + (s)->index * fmat_get_n((s)->fmat)): \
+                           (fmat_get_ptr((s)->fmat) + (s)->index))
+                           
+#define fslice_get_stride(s) (((s)->type == fslice_row)? (1): (fmat_get_n((s)->fmat)))
+#define fslice_get_size(s) (((s)->type == fslice_row)? (fmat_get_n((s)->fmat)): (fmat_get_m((s)->fmat)))
+#define fslice_get_m(s) (((s)->type == fslice_row)? (1): (fmat_get_m((s)->fmat)))
+#define fslice_get_n(s) (((s)->type == fslice_row)? (fmat_get_n((s)->fmat)): (1))
+                           
+#define frow_get_ptr(f) (fmat_get_ptr((f)->fmat) + (f)->index * fmat_get_n((f)->fmat))
+#define fcol_get_ptr(f) (fmat_get_ptr((f)->fmat) + (f)->index)
+
+#define frow_get_stride(f) (1)
+#define fcol_get_stride(f) (fmat_get_n((f)->fmat))
+
+#define frow_get_n(f) (fmat_get_n((f)->fmat))
+#define fcol_get_n(f) (1)
+
+#define frow_get_m(f) (1)
+#define fcol_get_m(f) (fmat_get_m((f)->fmat))
+
+#define frow_get_index(f) ((f)->index)
+#define fcol_get_index(f) ((f)->index)
+
+#define frow_check_index(f) ((f)->index < fmat_get_m((f)->fmat))
+#define fcol_check_index(f) ((f)->index < fmat_get_n((f)->fmat))
 
 #endif

@@ -21,6 +21,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 #include <fts/fts.h>
 
 #ifdef WIN32
@@ -33,18 +34,27 @@
 #define FUNCTIONS_API extern
 #endif
 
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
 FUNCTIONS_API void
 functions_config(void);
 
-#define DEFINE_FUN(FUN)						\
-static void FUN##_function( int ac, const fts_atom_t *at)	\
-{								\
-  fts_atom_t ret[1];						\
-								\
-  if (ac == 1 && fts_is_number( at))				\
-    fts_set_float( ret, FUN( fts_get_number_float( at)));	\
-								\
-  fts_return( ret);						\
+/**********************************************************************
+*
+*  C functions
+*
+*/
+
+#define DEFINE_FUN(FUN) \
+static fts_status_t FUN##_function( int ac, const fts_atom_t *at, fts_atom_t *ret) \
+{ \
+  if (ac == 1 && fts_is_number( at)) \
+    fts_set_float( ret, FUN( fts_get_number_float( at))); \
+  return fts_ok;  \
 }
 
 #define INSTALL_FUN(FUN) fts_function_install( fts_new_symbol( #FUN), FUN##_function);
@@ -52,11 +62,133 @@ static void FUN##_function( int ac, const fts_atom_t *at)	\
 #define FUN DEFINE_FUN
 #include "mathfuns.h"
 
+/**********************************************************************
+*
+*  misc math functions
+*
+*/
+
+static fts_status_t 
+abs_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if (ac > 0 && fts_is_number( at))
+    fts_set_float(ret, fabs(fts_get_number_float( at)));
+  
+  return fts_ok;
+}
+
+/**********************************************************************
+*
+*  random function
+*
+*/
+#define RA 16807 /* multiplier */
+#define RM 2147483647L /* 2**31 - 1 */
+#define RQ 127773L /* m div a */
+#define RR 2836 /* m mod a */
+
+static unsigned int seed = 1;
+
+static void
+random_init(void)
+{
+#ifdef HAVE_SYS_TIME_H
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  seed = tv.tv_usec;
+#else
+  seed = time( NULL);
+#endif		
+}
+
+static fts_status_t 
+random_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  double min = 0.0;
+  double max = 1.0;
+  
+  unsigned int hi;
+  
+  hi = RA * (long)((unsigned int)seed >> 16);
+  seed = RA * (long)(seed & 0xFFFF);
+  
+  seed += (hi & 0x7FFF) << 16;
+  
+  if (seed > RM)
+  {
+    seed &= RM;
+    ++seed;
+  }
+  
+  seed += hi >> 15;
+  
+  if (seed > RM)
+  {
+    seed &= RM;
+    ++seed;
+  }
+  
+  if(ac > 0 && fts_is_number(at))
+  {
+    if(ac > 1 && fts_is_number(at + 1))
+    {
+      min = fts_get_number_float(at);
+      max = fts_get_number_float(at + 1);
+    }
+    else
+      max = fts_get_number_float(at);
+  }
+  
+  fts_set_float(ret, min + (max - min) * ((double)seed / (double)RM));
+  
+  return fts_ok;
+}
+
+/**********************************************************************
+*
+*  symbol functions
+*
+*/
+#define MAX_CONCAT_LENGTH 512
+
+static fts_status_t
+cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  char buf[MAX_CONCAT_LENGTH + 1];
+  int n = 0;
+  int i;
+  
+  buf[0] = '\0';
+  buf[MAX_CONCAT_LENGTH] = '\0';
+  
+  for(i=0; i<ac && n<MAX_CONCAT_LENGTH; i++)
+  {
+    if(fts_is_int(at + i))
+      snprintf(buf + n, MAX_CONCAT_LENGTH, "%d", fts_get_int(at + i));
+    else if(fts_is_float(at + i))
+      snprintf(buf + n, MAX_CONCAT_LENGTH, "%g", fts_get_float(at + i));
+    else if(fts_is_symbol(at + i))
+      strncpy(buf + n, fts_symbol_name(fts_get_symbol(at + i)), MAX_CONCAT_LENGTH - n);
+    else
+      continue;
+    
+    n = strlen(buf);
+  }
+  
+  fts_set_symbol(ret, fts_new_symbol(buf));
+  
+  return fts_ok;
+}
+
 void
 functions_config(void)
 {
 #undef FUN
 #define FUN INSTALL_FUN
 #include "mathfuns.h"
+  random_init();
+  
+  fts_function_install( fts_new_symbol("abs"), abs_function);
+  fts_function_install( fts_new_symbol("random"), random_function);
+  fts_function_install( fts_new_symbol("cat"), cat_function);
 }
-

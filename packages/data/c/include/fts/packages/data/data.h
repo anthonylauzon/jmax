@@ -37,6 +37,20 @@
 
 DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);  
 
+/* expression class */
+typedef struct
+{
+  fts_object_t o;
+  fts_array_t descr;
+  fts_expression_t *expression;
+  fts_status_t status;
+} expr_t;
+
+DATA_API fts_class_t *expr_class;
+
+DATA_API void expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *at, fts_atom_t *ret);
+DATA_API void expr_evaluate_in_scope(expr_t *self, fts_patcher_t *scope, int ac, const fts_atom_t *at, fts_atom_t *ret);
+
 #include <fts/packages/data/mat.h>
 #include <fts/packages/data/vec.h>
 #include <fts/packages/data/ivec.h>

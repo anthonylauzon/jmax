@@ -29,8 +29,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fts/fts.h>
-#include "ftsprivate/tokenizer.h"
-
 #define YY_DECL static int yylex( fts_atom_t *lvalp)
 
 #define SET_INT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 10))

@@ -67,7 +67,7 @@ struct fts_patcher
 FTS_API void fts_patcher_set_dirty(fts_patcher_t *self, int is_dirty);
 
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
-
+#define fts_get_global_definitions() (fts_get_root_patcher()->definitions)
 
 /** 
 * Return an iterator to enumerate all objects contained by the given patcher

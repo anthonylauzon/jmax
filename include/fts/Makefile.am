@@ -52,6 +52,7 @@ status.h \
 symbol.h \
 thread.h \
 time.h \
+tokenizer.h \
 tuple.h \
 types.h \
 update.h \

@@ -20,7 +20,39 @@
  * 
  */
 
+/****************************************************************************
+ *
+ *  definitions (low level interface)
+ *
+ */
 typedef struct fts_definition fts_definition_t;
+typedef struct fts_definition_listener fts_definition_listener_t;
+
+struct fts_definition
+{
+  fts_symbol_t name;
+  fts_atom_t value;
+  fts_definition_t *global;
+  fts_definition_listener_t *listeners;
+};
+
+#define fts_definition_get_name(d) ((d)->name)
+#define fts_definition_get_value(d) (&(d)->value)
+
+FTS_API void fts_definition_add_listener(fts_definition_t *def, fts_object_t *obj);
+FTS_API void fts_definition_remove_listener(fts_definition_t *def, fts_object_t *obj);
+
+/* get definition by name from given patcher */
+FTS_API fts_definition_t *fts_definition_get(fts_patcher_t *patcher, fts_symbol_t name);
+
+/* set value and call listeners */
+FTS_API void fts_definition_update(fts_definition_t *def, const fts_atom_t *a);
+
+/*************************************************************
+ *
+ *  names (high level API)
+ *
+ */
 
 FTS_API void fts_name_set_value(fts_patcher_t *patcher, fts_symbol_t name, const fts_atom_t *value);
 

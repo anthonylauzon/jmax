@@ -1,3 +1,16 @@
+2004-04-08  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* fts/status.c: added fts_status function fts_status_format to dynamically generate status messages
+	* fts/tokenizer.l, parser.y and expression.c: added semicolon as list separator similar to comma but without calling callback (leading comma is now forbidden, added terminating semicolon)
+	* include/ftsprivate/tokenizer.h moved to incude/fts/ (updated Xcode project and Makefile.am files)
+	* fts/expression.c: extended error status descriptions to more expressive messages
+	* fts/expression.c: changed function expression_eval_aux added function fts_expression_evaluate to invoke expression evaluation with two hashtables for local and global variables
+	* include/fts/function.h: changes signature of fts_fun_t (added return value to arguments and added return of fts_status_t)
+	* fts/function.c: adapted functions to new fts_fun_t, added error status messages to new function
+	* packages/functions/c/src/functions.c: adapted functions to new fts_fun_t, added functions abs, random and cat (symbol concatenation)
+	* packages/data/c/src/data.c: added expr class
+	* packages/data/c/src/fmat.c: extended fmat (fvec now 100% equals to fmat by setting class in init method)
+
 2004-04-05  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
 
 	* added fonts for music notation in sequence package (MusiSync.ttf and MusiTone.ttf). The

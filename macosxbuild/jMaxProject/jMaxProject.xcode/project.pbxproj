@@ -11898,6 +11898,7 @@
 				5C74562406098F4800B69585,
 				5C74562606098F4800B69585,
 				5C74562706098F4800B69585,
+				5CAF2E9E0621AF5400FC31EF,
 				5C74562806098F4800B69585,
 				5C74562906098F4800B69585,
 				5C74562A06098F4800B69585,
@@ -11962,7 +11963,6 @@
 				5C74566006098F6800B69585,
 				5C74566106098F6800B69585,
 				5C74566206098F6800B69585,
-				5C74566406098F6800B69585,
 				5C74566506098F6900B69585,
 			);
 			isa = PBXGroup;
@@ -12708,15 +12708,6 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
-		5C74566406098F6800B69585 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = tokenizer.h;
-			path = ../../include/ftsprivate/tokenizer.h;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
 		5C74566506098F6900B69585 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -12741,6 +12732,15 @@
 			lastKnownFileType = sourcecode.c.c;
 			name = function.c;
 			path = ../../fts/function.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CAF2E9E0621AF5400FC31EF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tokenizer.h;
+			path = ../../include/fts/tokenizer.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};

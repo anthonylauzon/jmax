@@ -31,6 +31,5 @@ sched.h \
 selection.h \
 sigconn.h \
 template.h \
-tokenizer.h \
 time.h \
 variable.h 

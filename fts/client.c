@@ -41,7 +41,6 @@
 #include <ftsprivate/object.h>
 #include <ftsprivate/patfile.h>
 #include <ftsprivate/package.h>
-#include <ftsprivate/tokenizer.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/audio.h>

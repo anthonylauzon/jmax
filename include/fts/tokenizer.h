@@ -20,8 +20,8 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_TOKENIZER_H_
-#define _FTS_PRIVATE_TOKENIZER_H_
+#ifndef _FTS_TOKENIZER_H_
+#define _FTS_TOKENIZER_H_
 
 /*
  * The FLEX tokenizer

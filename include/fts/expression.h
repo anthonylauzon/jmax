@@ -35,10 +35,8 @@ FTS_API void fts_expression_add_variables_user( fts_expression_t *exp, fts_patch
 typedef fts_status_t (*fts_expression_callback_t)( int ac, const fts_atom_t *at, void *data);
 
 FTS_API fts_status_t fts_expression_reduce( fts_expression_t *exp, fts_patcher_t *scope, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data);
+FTS_API fts_status_t fts_expression_evaluate( fts_expression_t *exp, fts_hashtable_t *locals, fts_hashtable_t *globals, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data);
 
 #if 0
 FTS_API void fts_expression_declare_function( fts_symbol_t name, fts_function_t function);
 #endif
-
-
-

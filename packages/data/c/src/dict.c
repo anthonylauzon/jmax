@@ -88,7 +88,12 @@ dict_store_list (dict_t *dict, int ac, const fts_atom_t *at)
   }
 }
 
-
+void 
+dict_get(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom)
+{
+  if(!fts_hashtable_get(&dict->hash, key, atom))
+    fts_set_void(atom);
+}
 
 static void
 dict_remove(dict_t *dict, const fts_atom_t *key)
@@ -157,8 +162,6 @@ dict_copy_function(const fts_atom_t *from, fts_atom_t *to)
 {
   dict_copy((dict_t *)fts_get_object(from), (dict_t *)fts_get_object(to));
 }
-
-
 
 /**********************************************************
  *
