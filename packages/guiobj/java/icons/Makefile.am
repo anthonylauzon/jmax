@@ -34,6 +34,8 @@ vecdisplay_cursor.gif
 
 CLEANFILES= time.stamp
 
+EXTRA_DIST=$(noinst_DATA)
+
 all-am: time.stamp
 
 time.stamp: $(noinst_DATA)
