@@ -23,6 +23,9 @@ abstract public class Adapter {
     else return 0;
   }
 
+  abstract public int getInvX(int x);
+  abstract public int getInvY(int y);
+
   public void setX(ScrEvent e, int x) {
     XMapper.set(e, x);
   }

@@ -17,8 +17,6 @@ public class Selecter extends InteractionModule {
   int oldX = 0;
   int oldY = 0;
   
-  int startX;
-  int startY;
 
   public Selecter(SelectionListener theListener, Component theGraphicObject) {
     super(theGraphicObject, theGraphicObject);
@@ -33,6 +31,7 @@ public class Selecter extends InteractionModule {
   } 
 
   public void mouseDragged(MouseEvent e) {
+
     drawXORSelection(e.getX(), e.getY());
   }
 
@@ -42,7 +41,10 @@ public class Selecter extends InteractionModule {
     updated = true;
     drawXORSelection(x, y);
     updated = false;
-    itsListener.selectionChoosen(startX, startY, x, y);
+
+    tempRect.setBounds(startSelection.x, startSelection.y, x-startSelection.x, y-startSelection.y);
+    normalizeRectangle(tempRect);
+    itsListener.selectionChoosen(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
   }
 
 
@@ -71,28 +73,33 @@ public class Selecter extends InteractionModule {
   
   } 
 
+  Rectangle tempRect = new Rectangle();
   /**
    * utility function. Gets rid of the "negative lenght" problems
    * in the selection rectangles.
    */
   private void drawRectGiven2Points(Graphics g, int x1, int y1, int x2, int y2) {
-    int ox;
-    int oy;
-    int width;
-    int height;
+    tempRect.setBounds(x1, y1, x2-x1, y2-y1);
+    normalizeRectangle(tempRect);
+
+    g.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+
+  }
+
+  /**
+   * utility function. Gets rid of the "negative width/lenght" problems
+   * in rectangles.
+   */
+  public void normalizeRectangle(Rectangle r) {
     
     /* sets the origin */
-    if (x1 < x2) ox = x1;
-    else ox = x2;
+    if (r.width < 0) r.x = r.x+r.width;
     
-    if (y1 < y2) oy = y1;
-    else oy = y2;
+    if (r.height < 0) r.y = r.y+r.height;
 
     /* sets width and height */
-    width = x1-x2; if (width<0) width = -width;
-    height = y1-y2; if (height<0) height = -height;
-
-    g.drawRect(ox, oy, width, height);
+    if (r.width<0) r.width = -r.width;
+    if (r.height<0) r.height = -r.height;
 
   }
 }

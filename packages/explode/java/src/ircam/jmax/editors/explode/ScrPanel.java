@@ -22,6 +22,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   
   Adapter itsAdapter;
   ExplodeDataModel itsExplodeDataModel;
+  ExplodeSelection itsSelection;
   Renderer itsRenderer;
   Vector tools = new Vector();
 
@@ -40,12 +41,13 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     
     setLayout(new BorderLayout());
     setExplodeDataModel(ep);
-    setAdapter(new PartitionAdapter()); 
+    setAdapter(new PartitionAdapter());
+    itsSelection = new ExplodeSelection(itsExplodeDataModel, itsAdapter);
     ((PartitionAdapter) itsAdapter).setXZoom(20);// just a try
     ((PartitionAdapter) itsAdapter).setYZoom(300);// just a try
     ((PartitionAdapter) itsAdapter).setYInvertion(true);// just a try
     ((PartitionAdapter) itsAdapter).setYTransposition(115);// just a try
-    itsRenderer = new ScoreRenderer(this, ep, this);
+    itsRenderer = new ScoreRenderer(this, ep, this, itsSelection);
     itsExplodeDataModel.addListener(this);
     
     
@@ -61,23 +63,33 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
       }
     });
 
-    itsTimeScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, itsExplodeDataModel.getEventAt(itsExplodeDataModel.length()-1).getTime());
+
+    int totalTime = 1000;
+    if (itsExplodeDataModel.length() != 0){
+      totalTime = itsExplodeDataModel.getEventAt(itsExplodeDataModel.length()-1).getTime();
+    }
+    itsTimeScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
     
-    itsTimeScrollbar.setUnitIncrement(100);
-    itsTimeScrollbar.setBlockIncrement(1000);
+    itsTimeScrollbar.setUnitIncrement(windowTimeWidth()/100);
+    itsTimeScrollbar.setBlockIncrement(windowTimeWidth()/3);
 
     itsTimeScrollbar.addAdjustmentListener(new AdjustmentListener() {
       public void adjustmentValueChanged(AdjustmentEvent e) {
+	
 	logicalTime = e.getValue();
 	int maxIndex = itsExplodeDataModel.length();
-	int howMany = 10;
+	
+	int howMany = itsExplodeDataModel.indexOfLastEventBefore(logicalTime+windowTimeWidth());
 
 	int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
-	if (temp != -1) {
-	  ((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
-	  if (maxIndex < temp+howMany) howMany = maxIndex-temp; 
-	  itsRenderer.render(getGraphics(), temp, temp+howMany);
-	}
+
+	if (temp != -1) 
+	  {
+	    ((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
+	    if (maxIndex < temp+howMany) howMany = maxIndex-temp; 
+	    itsRenderer.render(getGraphics(), temp, temp+howMany);
+	  }
+	
 	itsLabel.setText("starting time: "+logicalTime+"msec"+"                 zoomfactor"+itsTimeZoom.getValue()+"%");
       }
     });
@@ -86,7 +98,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     add(itsTimeZoom, BorderLayout.EAST);
     
     //----
-    //prepare the toolbar...
+    //prepare the tools & the toolbar...
     initTools();
 
     ScrToolbar aToolbar = new ScrToolbar(this);
@@ -107,7 +119,6 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   public ExplodeDataModel getExplodeDataModel() {
     return itsExplodeDataModel;
   }
-
 
   /**
    * set the ExplodeDataModel
@@ -148,11 +159,15 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
  
 
   /**
-   * prepares the tools that will be used with this editor
+   * prepares the tools that will be used with this editor,
+   * and activate the default tool (the selecter)
    */
   private void initTools() {
+    currentTool = new ScrSelectingTool(this, itsSelection);
     tools.addElement(new ScrAddingTool(this, this, itsExplodeDataModel));
-    tools.addElement(new ScrSelectingTool(this));
+    tools.addElement(currentTool);
+
+    currentTool.activate();
 
   }
 
@@ -202,9 +217,20 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    * Delegated to the current Renderer
    */
   public void paint(Graphics g) {
-    
-    int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
-    itsRenderer.render(g, temp, temp+10);    
+  
+    int temp1 = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
+    //int temp2 = temp1+10;
+   
+    int temp2 = itsExplodeDataModel.indexOfLastEventBefore(logicalTime+windowTimeWidth());
+    itsRenderer.render(g, temp1, temp2);
+  }
+
+  public ExplodeSelection getSelection() {
+    return itsSelection;
+  }
+
+  int windowTimeWidth() {
+    return (int)(PANEL_WIDTH/(((PartitionAdapter)itsAdapter).getXZoom()));
   }
 
   /**
@@ -226,5 +252,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   }
   
 }
+
+
 
 

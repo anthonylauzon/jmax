@@ -33,6 +33,12 @@ public interface ExplodeDataModel {
   public abstract int indexOfFirstEventAfter(int time);
 
   /**
+   * access the last event whose ending time is 
+   * before a given time
+   */
+  public abstract int indexOfLastEventBefore(int time);
+
+  /**
    * adds an event in the database
    */
   public abstract void addEvent(ScrEvent theEvent);

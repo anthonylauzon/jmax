@@ -17,13 +17,18 @@ public class PartitionEventRenderer implements EventRenderer {
     itsAdapterProvider = theAdapterProvider;
   }
 
-  public void render(ScrEvent e, Graphics g) {
+  public void render(ScrEvent e, Graphics g, boolean selected) {
+
     int x = itsAdapterProvider.getAdapter().getX(e);
     int y = itsAdapterProvider.getAdapter().getY(e);
     int lenght = itsAdapterProvider.getAdapter().getLenght(e);
 
+    if (selected) g.setColor(Color.red);
+
     g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
     g.drawString(""+e.getPitch(), x, y-5);
+
+    if (selected) g.setColor(Color.black);
   }
   
 }

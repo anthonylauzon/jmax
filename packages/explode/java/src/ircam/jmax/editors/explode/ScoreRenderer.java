@@ -14,6 +14,7 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   Container itsContainer;
   ExplodeDataModel itsExplodeDataModel;
   AdapterProvider itsAdapterProvider;
+  SelectionHandler itsSelection;
 
   Image itsImage;
   boolean imageReady = false;
@@ -27,10 +28,11 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   /**
    * Constructor with the graphic container and the ExplodeDataModel (the data base)
    */
-  public ScoreRenderer(Container theContainer, ExplodeDataModel theExplodeDataModel, AdapterProvider theAdapterProvider) {
+  public ScoreRenderer(Container theContainer, ExplodeDataModel theExplodeDataModel, AdapterProvider theAdapterProvider, SelectionHandler theSelection) {
     itsContainer = theContainer;
     itsExplodeDataModel = theExplodeDataModel; 
     itsAdapterProvider = theAdapterProvider;
+    itsSelection = theSelection;
     itsEventRenderer = new PartitionEventRenderer(itsAdapterProvider);
     init();
   }
@@ -78,16 +80,16 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   public void render(Graphics g, int startEvent, int endEvent) {
     
     if (!prepareBackground(g)) return;
-    
-    for (int i = startEvent; i< endEvent; i++) {
 
+    for (int i = startEvent; i< endEvent; i++) {
+      
       temp = itsExplodeDataModel.getEventAt(i);
-      itsEventRenderer.render(temp, g);
+      itsEventRenderer.render(temp, g, itsSelection.isInSelection(temp));
       
     }
-
+    
   }
-
+  
   boolean prepareBackground(Graphics g) {
     if (!imageReady) {
       /* received a paint while loading the image... don't paint yet */

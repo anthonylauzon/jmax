@@ -33,14 +33,49 @@ public class PartitionAdapter extends Adapter {
     return (int) ((temp+xTranspose)*xZoomFactor);
   }
 
+  public int getInvX(int x) {
+    int temp;
+
+    if (xInvertion) temp = (int) (xTranspose -x/xZoomFactor);
+    else temp = (int) (x/xZoomFactor - xTranspose);
+    
+    return temp;
+  }
+
+  public void setX(ScrEvent e, int x) {
+    
+    super.setX(e, getInvX(x));
+
+  }
+
   public int getY(ScrEvent e) {
+    
     int temp = super.getY(e);
     if (yInvertion) temp = -temp;
     return (int) ((temp+yTranspose)*yZoomFactor);
+  
+  }
+
+  public int getInvY(int y) {
+    int temp;
+
+    if (yInvertion) temp = (int) (yTranspose -y/yZoomFactor);
+    else temp = (int) (y/yZoomFactor - yTranspose);
+  
+    return temp;
+  }
+
+  public void setY(ScrEvent e, int y) {
+
+    super.setY(e, getInvY(y));
   }
 
   public int getLenght(ScrEvent e) {
     return (int) (super.getLenght(e)*xZoomFactor);
+  }
+
+  public  void setLenght(ScrEvent e, int l) {
+    super.setLenght(e, (int) (l*xZoomFactor));
   }
 
   /**
@@ -48,6 +83,14 @@ public class PartitionAdapter extends Adapter {
    */
   public void setXZoom(int factor) {
     xZoomFactor = factor/(float)100;
+  }
+
+  public float getXZoom() {
+    return xZoomFactor;
+  }
+
+  public float getYZoom() {
+    return yZoomFactor;
   }
 
   /**
@@ -79,5 +122,9 @@ public class PartitionAdapter extends Adapter {
     yInvertion = b;
   }
 }
+
+
+
+
 
 

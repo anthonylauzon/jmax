@@ -6,6 +6,7 @@ SOURCES = \
 	ExplodeExtension.java	\
 	ExplodeFactory.java	\
 	ExplodeRemoteData.java	\
+	ExplodeSelection.java	\
 	AAAReadme.java		\
 	Adapter.java		\
 	AdapterProvider.java	\
@@ -26,6 +27,7 @@ SOURCES = \
 	ScrTool.java		\
 	ScrToolbar.java		\
 	Selecter.java		\
+	SelectionHandler.java	\
 	SelectionListener.java	\
 	TimeMapper.java		\
 	ToolChangeEvent.java	\

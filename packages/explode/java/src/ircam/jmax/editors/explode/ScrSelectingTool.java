@@ -13,12 +13,16 @@ public class ScrSelectingTool extends ScrTool implements SelectionListener{
 
   ScrPanel itsPanel;
   Selecter itsSelecter;
+  SelectionHandler itsSelectionHandler;
+
   /**
-   * Constructor. It needs to know the panel on which to operate 
+   * Constructor. It needs to know the panel and the SelectionHandler
+   * on which to operate 
    */
-  public ScrSelectingTool(ScrPanel thePanel) {
+  public ScrSelectingTool(ScrPanel thePanel, SelectionHandler theSelectionHandler) {
     super("select", new ImageIcon("/u/worksta/maggi/projects/max/images/tool_bang.gif"));
     itsPanel = thePanel;
+    itsSelectionHandler = theSelectionHandler;
     itsSelecter = new Selecter(this, itsPanel);
   }
 
@@ -29,6 +33,13 @@ public class ScrSelectingTool extends ScrTool implements SelectionListener{
 
   public void deactivate(){}
 
-  public void selectionChoosen(int x, int y, int w, int h) {}
+  public void selectionChoosen(int x, int y, int w, int h) {
+    itsSelectionHandler.selectArea(x, y, w, h);
+    itsPanel.repaint();
+  }
 }
+
+
+
+
 

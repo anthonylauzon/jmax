@@ -44,13 +44,17 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	  {
 	    int med = (max + min) / 2;
 	    
-	    if (events[med].getTime() <= time)
+	    if (events[med].getTime() <= time) 
+
 	      min = med;
-	    else
+
+	    else 
+
 	      max = med;
+
 	  }
 
-	return min;
+	return max;
       }
   }
 
@@ -72,12 +76,12 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   private final void makeRoomAt(int index)
   {
-    if (events_fill_p >= events_size)
+    if (events_fill_p >= events_size) 
       reallocateEvents();
 
-    for (int i = index;  i < events_fill_p; i++)
-      events[i + 1] = events[i];
-
+    for (int i = events_fill_p; i> index; i--) 
+      events[i] = events[i-1];
+    
     events_fill_p++;
   }
 
@@ -122,9 +126,10 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     int index;
 
     index = getIndexAfter(event.getTime());
+    System.err.println("index "+index);
     makeRoomAt(index);
     events[index] = event;
-    
+    System.err.println("added event ["+index+"] time: "+event.getTime()+" pitch: "+event.getPitch());
     // @@@@: Spedire l'evento a FTS
     
     notifyListeners();
@@ -180,6 +185,15 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
       return -1;
     else
       return index;
+  }
+
+  public int indexOfLastEventBefore(int time) {
+    int index;
+
+    index = getIndexAfter(time);
+    if (index == 0) return 0;
+    else return index-1;
+
   }
 
   /* a method inherited from FtsRemoteData */
