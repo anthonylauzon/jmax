@@ -94,7 +94,8 @@ pack_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 pack_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_varargs(o, 0, ((pack_t *)o)->argc, ((pack_t *)o)->argv);
+  pack_t* self = (pack_t*)o;
+  fts_outlet_varargs(o, 0, self->argc, self->argv);
 }
 
 static void
@@ -113,6 +114,13 @@ pack_inlet(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   if (ac > 0)
     ((pack_t *)o)->argv[winlet] = at[0];
+}
+
+static void
+pack_error_inlet(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  post("pack object want number or symbol in inlet %d\n", winlet);
+  fts_object_error(o, "pack object want number or symbol in inlet %d", winlet);
 }
 
 static void
@@ -169,7 +177,7 @@ pack_instantiate(fts_class_t *cl)
   fts_class_inlet_symbol(cl, 0, pack_send);
   fts_class_inlet_number(cl, 1, pack_inlet);
   fts_class_inlet_symbol(cl, 1, pack_inlet);
-
+  fts_class_inlet_varargs(cl, 1, pack_error_inlet);
   fts_class_outlet_varargs(cl, 0);
 }
 
@@ -182,3 +190,10 @@ pack_config(void)
   fts_class_install(fts_new_symbol("pack"), pack_instantiate);
 }
 
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
