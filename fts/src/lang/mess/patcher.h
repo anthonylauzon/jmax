@@ -63,6 +63,8 @@ extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const f
 extern fts_object_t *fts_patcher_get_inlet(fts_object_t *patcher, int inlet);
 extern fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet);
 
+extern void fts_patcher_blip(fts_patcher_t *this, const char *msg);
+
 extern fts_object_t *fts_outlet_get_next_inlet(fts_object_t *outlet);
 extern fts_object_t *fts_inlet_get_next_inlet(fts_object_t *inlet);
 

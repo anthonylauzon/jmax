@@ -721,10 +721,8 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
       fts_is_symbol(&av[2]))
     {
       int inlet;
-
       fts_object_t *obj;
       fts_symbol_t selector;
-      fts_status_t ret;
 
       obj    = fts_get_object(&av[0]);
       inlet  = fts_get_int(&av[1]);
@@ -736,16 +734,10 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      ret = fts_message_send(obj, inlet, selector, ac - 3, av + 3);
-      
-      if (ret != fts_Success)
-	{
-	  fprintf(stderr, "Error in FOS message MESS: %s sending message %s to object of class %s\n",
-	       ret->description, fts_symbol_name(selector),
-	       fts_symbol_name(fts_object_get_class_name(obj)));
+      // Ignore failure; it is normal that the UI interface try to send
+      // messages that have no methods defined 
 
-	  printf_mess("Message MESSAGE_CODE", ac, av);
-	}
+      fts_message_send(obj, inlet, selector, ac - 3, av + 3);
     }
   else
     printf_mess("System Error in FOS message MESS: bad args", ac, av);

@@ -53,6 +53,7 @@ extern const fts_atom_t fts_null;
 #define fts_is_a(ap, ttype)        (((ap)->type) == (ttype))
 #define fts_get_value(ap)          (&((ap)->value))
 
+
 /* specialized macros for predefined symbols */
 
 #define fts_set_symbol(ap, x)       \
@@ -149,7 +150,9 @@ extern int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const
 #define fts_get_operator(a)        (fts_symbol_get_operator(fts_get_symbol(a)))
 
 /* Atom printing function, usually for debug */
+
 void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at);
+void sprintf_atoms(char *s, int ac, const fts_atom_t *at);
 
 #endif
 

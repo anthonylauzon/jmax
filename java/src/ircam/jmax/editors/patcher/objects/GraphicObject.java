@@ -745,6 +745,76 @@ abstract public class GraphicObject implements DisplayObject
       }
   }
 
+  // Assist code
+  // Protected against repetitions of assist messages
+
+  static MaxVector assistArgs = new MaxVector();
+
+  static FtsObject lastAssistedObject;
+  static int lastPosition;
+
+  static final int ASSIST_OBJECT = 1;
+  static final int ASSIST_INLET = 2;
+  static final int ASSIST_OUTLET = 3;
+
+  static int lastAssistOperation = 0;
+
+
+  public boolean canDoAssist(int operation, int n)
+  {
+    boolean ret = false;
+
+    if (itsSketchPad.isMessageReset())
+      ret = true;
+    else if (lastAssistOperation != operation)
+      ret = true;
+    else if (lastAssistedObject != ftsObject)
+      ret = true;
+    else if ((lastAssistOperation == ASSIST_INLET) || (lastAssistOperation == ASSIST_OUTLET))
+      ret = (n != lastPosition);
+
+    lastAssistOperation = operation;
+    lastPosition = n;
+    lastAssistedObject = ftsObject;
+
+    return ret;
+  }
+  
+  public void assistOnObject()
+  {
+    if (canDoAssist(ASSIST_OBJECT, 0))
+      {
+	assistArgs.removeAllElements();
+
+	assistArgs.addElement("object");
+	ftsObject.sendMessage(-1, "assist", assistArgs);
+      }
+  }
+
+  public void assistOnInlet(int n)
+  {
+    if (canDoAssist(ASSIST_INLET, n))
+      {
+	assistArgs.removeAllElements();
+
+	assistArgs.addElement("inlet");
+	assistArgs.addElement(new Integer(n));
+	ftsObject.sendMessage(-1, "assist", assistArgs);
+      }
+  }
+
+  public void assistOnOutlet(int n)
+  {
+    if (canDoAssist(ASSIST_OUTLET, n))
+      {
+	assistArgs.removeAllElements();
+
+	assistArgs.addElement("outlet");
+	assistArgs.addElement(new Integer(n));
+	ftsObject.sendMessage(-1, "assist", assistArgs);
+      }
+  }
+
   public String toString()
   {
     return "GraphicObject<" + ftsObject.toString() + ">";

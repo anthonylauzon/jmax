@@ -29,15 +29,30 @@ class FollowInteraction extends Interaction
 	editor.resetHighlightedOutlet();
 
 	if (Squeack.onBackground(squeack))
-	  editor.setCursor(Cursor.getDefaultCursor());
+	  {
+	    editor.resetMessage();
+	    editor.setCursor(Cursor.getDefaultCursor());
+	  }
 	else if (Squeack.onObject(squeack))
-	  editor.setCursor(Cursor.getDefaultCursor());
+	  {
+	    editor.setCursor(Cursor.getDefaultCursor());
+	    ((GraphicObject) area.getTarget()).assistOnObject();
+	  }
 	else if (Squeack.onConnection(squeack))
-	  editor.setCursor(Cursor.getDefaultCursor());
+	  {
+	    editor.resetMessage();
+	    editor.setCursor(Cursor.getDefaultCursor());
+	  }
 	else if (Squeack.onHResizeHandle(squeack))
-	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
+	  {
+	    editor.resetMessage();
+	    editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
+	  }
 	else if (Squeack.onVResizeHandle(squeack))
-	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
+	  {
+	    editor.resetMessage();
+	    editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
+	  }
 	else if (Squeack.onInlet(squeack))
 	  {
 	    if (! editor.isHighlightedInlet((GraphicObject) area.getTarget(), area.getNumber()))
@@ -45,6 +60,8 @@ class FollowInteraction extends Interaction
 		editor.setHighlightedInlet((GraphicObject) area.getTarget(), area.getNumber());
 		editor.setCursor(Cursor.getDefaultCursor());
 	      }
+
+	    ((GraphicObject) area.getTarget()).assistOnInlet(area.getNumber());
 	  }
 	else if (Squeack.onOutlet(squeack))
 	  {
@@ -53,9 +70,14 @@ class FollowInteraction extends Interaction
 		editor.setHighlightedOutlet((GraphicObject) area.getTarget(), area.getNumber());
 		editor.setCursor(Cursor.getDefaultCursor());
 	      }
+
+	    ((GraphicObject) area.getTarget()).assistOnOutlet(area.getNumber());
 	  }
 	else if (Squeack.onText(squeack))
-	  editor.setCursor(Cursor.getDefaultCursor());
+	  {
+	    editor.resetMessage();
+	    editor.setCursor(Cursor.getDefaultCursor());
+	  }
       }
 
     editor.endInteraction();

@@ -27,6 +27,7 @@ class EditModeInteraction extends Interaction
     if (Squeack.isMove(squeack))
       {
       	// Move
+
 	return  Interactions.followInteraction;
       }
     else

@@ -52,6 +52,8 @@ public class FtsPatcherData extends FtsRemoteData
   static final int REMOTE_SET_WW         = 10;
   static final int REMOTE_SET_WH         = 11;
 
+  static final int REMOTE_MESSAGE        = 12;
+
   /** Patcher content: the container object  */
 
   FtsObject container;
@@ -317,6 +319,11 @@ public class FtsPatcherData extends FtsRemoteData
       listener.patcherChanged(this);
   }
 	
+  private final void firePatcherHaveMessage(String msg)
+  {
+    if (listener != null)
+      listener.patcherHaveMessage(msg);
+  }
 
   //
   // Remote Data management
@@ -367,10 +374,16 @@ public class FtsPatcherData extends FtsRemoteData
       case REMOTE_SET_WH:
 	windowHeight = msg.getNextIntArgument();
 	break;
+      case REMOTE_MESSAGE:
+	firePatcherHaveMessage(msg.getNextStringArgument());
+	break;
       default:
 	break;
       }
   }
 }
+
+
+
 
 

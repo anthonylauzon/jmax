@@ -948,4 +948,9 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
   {
     itsSketchWindow.resetMessage();
   }
+
+  public boolean isMessageReset()
+  {
+    return itsSketchWindow.isMessageReset();
+  }
 }

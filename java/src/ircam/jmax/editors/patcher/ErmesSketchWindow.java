@@ -695,14 +695,26 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
   }
 
+  boolean gotMessage = false;
+
   public void showMessage(String text)
   {
     itsMessageLabel.setText(text);
+    gotMessage = true;
   }
 
   public void resetMessage()
   {
-    itsMessageLabel.setText("    ");
+    if (gotMessage)
+      {
+	itsMessageLabel.setText("    ");
+	gotMessage = false;
+      }
+  }
+
+  public boolean isMessageReset()
+  {
+    return (! gotMessage);
   }
 }
 

@@ -38,7 +38,8 @@ extern void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object);
    redefined.
  */
 
-extern void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *owner);
+extern void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name);
+
 
 /* Verify if a fts_variable_define can be issued in the passed scope.
    Note that this is not like testing if a variable is bound; the binding can be 
@@ -53,16 +54,14 @@ extern int fts_variable_is_suspended(fts_patcher_t *scope, fts_symbol_t name);
 
 /*
   Remove the variable bound to the name in the scope represented by the object.
-   the removing is generic enough to support any possible style of future declarations.
-   cause a redefinition of all the objects that use the same variable.
    Can be called also on suspended variables; in this case, it recursively resolve
    all the suspended bindings dependent on this one; to resolve means in this
    case to redefine the object, and either redefine or undefine the object
    binding.
    */
 
-extern void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name);
 
+extern void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *owner);
 
 /*
   Like fts_variable_undefine, but act on all the variables in the current scope defined

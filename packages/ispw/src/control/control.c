@@ -50,6 +50,7 @@ extern void ftom_config(void);
 extern void logscale_config(void);
 extern void mtof_config(void);
 extern void scale_config(void);
+extern void blip_config(void);
 
 #ifdef BUS_OBJECTS
 extern void bus_config(void);
@@ -93,6 +94,9 @@ control_module_init(void)
   logscale_config();
   mtof_config();
   scale_config();
+
+  blip_config();
+
 #ifdef BUS_OBJECTS
   bus_config();
 #endif

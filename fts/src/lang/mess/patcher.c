@@ -707,7 +707,7 @@ static void patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_data_set_const(this->args);
   fts_data_refer(this->args);
 
-  fts_variable_define(this, fts_s_args, o);
+  fts_variable_define(this, fts_s_args);
   fts_set_data(&va, this->args);
   fts_variable_restore(this, fts_s_args, &va, o);
 
@@ -1029,17 +1029,17 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
   if (var)
     {
       if (obj->varname == var)
-	fts_variable_suspend(obj->patcher, obj->varname);
+	{
+	  fts_variable_suspend(obj->patcher, obj->varname);
+	  fts_variable_undefine(obj->patcher, obj->varname, obj); /* ??/ */
+	}
       else
 	{
-	  /* If the variable already exists in this local context, make an wannabe patcher  */
+	  /* If the variable already exists in this local context, make an double definition patcher  */
 
-	  if (! (fts_variable_is_suspended(obj->patcher, var) ||
-		 fts_variable_can_define(obj->patcher, var)))
+	  if (! fts_variable_can_define(obj->patcher, var))
 	    {
-	      obj->is_wannabe = 1;
-
-	      fts_variable_add_wannabe(obj->patcher, var, obj);
+	      fts_variable_define(obj->patcher, var);
 
 	      fts_variables_undefine_suspended(this, obj);
 
@@ -1065,13 +1065,13 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 		 this will also steal all the objects referring to the same variable name
 		 in the local scope from any variable defined outside the scope */
 
-	      fts_variable_define(obj->patcher, var, obj);
+	      fts_variable_define(obj->patcher, var);
 	    }
 	}
     }
   else if (obj->varname)
     {
-      fts_variable_undefine(obj->patcher, obj->varname);
+      fts_variable_undefine(obj->patcher, obj->varname, obj);
       obj->varname = 0;
     }
 
@@ -1608,6 +1608,20 @@ fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet)
     return (fts_object_t *) this->outlets[outlet];
   else
     return 0;
+}
+
+
+void fts_patcher_blip(fts_patcher_t *this, const char *msg)
+{
+  if (fts_patcher_is_open(this))
+    {
+      if (this->data)
+	fts_patcher_data_blip((fts_data_t *)this->data, msg);
+    }
+  else if (fts_object_get_patcher((fts_object_t *)this))
+    {
+      fts_patcher_blip(fts_object_get_patcher((fts_object_t *)this), msg);
+    }
 }
 
 /* Class/metaclass installation  */

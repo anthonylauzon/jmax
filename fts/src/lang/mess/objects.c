@@ -16,6 +16,8 @@
 
 /* #define TRACE_DEBUG */
 
+#include <stdarg.h>
+
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
@@ -193,20 +195,14 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
       
       var = fts_get_symbol(&aot[0]);
 
-      /* If the variable already exists in this local context, make an wannabe error object  */
+      /* If the variable already exists in this local context, make a double definition error object  */
 
-      if (! (fts_variable_is_suspended(patcher, var) ||
-	     fts_variable_can_define(patcher, var)))
+      if (! fts_variable_can_define(patcher, var))
 	{
 	  /* Error: redefined variable */
 
 	  obj = fts_error_object_new(patcher, aoc, aot,
-				     "Variable %s is already defined", fts_symbol_name(var));
-	  obj->is_wannabe = 1;
-
-	  fts_variable_add_wannabe(patcher, var, obj);
-
-	  var = 0;		/* forget about the variable, no binding to do */
+				     "Variable %s doubly defined", fts_symbol_name(var));
 	}
       else
 	{
@@ -231,7 +227,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 	 this will also steal all the objects referring to the same variable name
 	 in the local scope from any variable defined outside the scope */
 
-      fts_variable_define(patcher, var, obj);
+      fts_variable_define(patcher, var);
     }
 
   /* Then, check for zero arguments, and produce an error object in this case */
@@ -473,7 +469,6 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
       obj->varname = var;
     }
 
-
   /* Finally, assign the error property;
      Always present, and always explicit for the moment,
      until we don't have global daemons again.
@@ -567,20 +562,12 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
 
   /* if the old object define a variable, and the new definition
      do not define  the same variable, delete the variable;
-     if the new object define the same variable,  just suspend it.
+     if the new object define the same variable,  just suspend it,
+     but unregister the old object as definition
      */
 
-  if (old->varname)
-    {
-      if (old->varname == var)
-	fts_variable_suspend(old->patcher, old->varname);
-      else
-	fts_variable_undefine(old->patcher, old->varname);
-
-      /* Anyway, take away the name from the old object */
-
-      old->varname = 0;
-    }
+  if (old->varname && (old->varname == var))
+    fts_variable_suspend(old->patcher, old->varname);
 
   /* if old id and new id are the same, do the replace without telling the client */
 
@@ -789,12 +776,7 @@ static void fts_object_reset(fts_object_t *obj)
   /* Unbind it from its variable if any */
 
   if (fts_object_get_variable(obj))
-    fts_variable_undefine(obj->patcher, fts_object_get_variable(obj));
-
-  /* Or, if the object is a wannabe, remove it from the variable */
-
-  if (obj->is_wannabe)
-    fts_variable_remove_wannabe(obj->patcher, obj->varname, obj);
+    fts_variable_undefine(obj->patcher, fts_object_get_variable(obj), obj);
 
   /* Remove it as user of its var refs */
 
@@ -1046,6 +1028,22 @@ static void fts_object_move_properties(fts_object_t *old, fts_object_t *new)
   fts_move_property(old, new, fts_s_font);
   fts_move_property(old, new, fts_s_fontSize);
 }
+
+
+void fts_object_blip(fts_object_t *obj, const char *format , ...)
+{
+  fts_atom_t a;
+  va_list ap;
+  char buf[512];
+
+  va_start( ap, format);
+  vsprintf(buf, format, ap);
+  va_end(ap);
+
+  fts_patcher_blip(fts_object_get_patcher(obj), buf);
+}
+    
+
 
 /* Debug print
    An object is printed as:

@@ -47,4 +47,5 @@ logscale.c \
 mtof.c \
 bus.c \
 scale.c \
+blip.c \
 

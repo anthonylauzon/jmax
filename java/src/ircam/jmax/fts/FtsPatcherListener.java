@@ -11,6 +11,7 @@
 // for DISCLAIMER OF WARRANTY.
 // 
 //
+
 package ircam.jmax.fts;
 
 /** This interface define a listener of the changes
@@ -30,4 +31,6 @@ public interface FtsPatcherListener
   public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins);
   public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts);
   public void patcherChanged(FtsPatcherData data);
+
+  public void patcherHaveMessage(String msg);
 }

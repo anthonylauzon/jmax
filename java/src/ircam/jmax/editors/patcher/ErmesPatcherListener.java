@@ -103,5 +103,10 @@ class ErmesPatcherListener implements FtsPatcherListener
   {
     // not implemented yet; it should redo the sketch content.
   }
+
+  public void patcherHaveMessage(String msg)
+  {
+    window.showMessage(msg);
+  }
 }
 

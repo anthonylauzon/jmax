@@ -55,7 +55,7 @@ extern fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, 
 #define fts_object_get_inlets_number(O)        (((fts_object_t *)(O))->cl->ninlets)
 #define fts_object_get_patcher(O)              (((fts_object_t *)(O))->patcher)
 
-#define fts_object_get_variable(o)             ((o)->is_wannabe ? 0 : ((o)->varname))
+#define fts_object_get_variable(o)             ((o)->varname)
 #define fts_object_set_variable(o, name)       ((o)->varname = (name))
 
 extern int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s);
@@ -71,6 +71,9 @@ extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
 extern int  fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 
+/* Messages for the status line */
+
+extern void fts_object_blip(fts_object_t *obj, const char *format , ...);
 
 /* Debug print */
 

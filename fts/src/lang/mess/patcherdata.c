@@ -31,6 +31,7 @@
 #define REMOTE_SET_WY            9
 #define REMOTE_SET_WW            10
 #define REMOTE_SET_WH            11
+#define REMOTE_BLIP              12
 
 static fts_heap_t *patcher_data_heap;
 
@@ -153,6 +154,18 @@ void fts_patcher_data_redefine(fts_patcher_data_t *d)
 
   fts_data_remote_call((fts_data_t *)d, REMOTE_REDEFINED, 0, 0);
 }
+
+/*
+ * A function to send a text message to the patcher data editor
+ */
+
+void fts_patcher_data_blip(fts_data_t *d, const char *msg)
+{
+  fts_data_start_remote_call((fts_data_t *)d, REMOTE_BLIP);
+  fts_client_mess_add_string(msg);
+  fts_data_end_remote_call();
+}
+
 
 /*
  * The export function

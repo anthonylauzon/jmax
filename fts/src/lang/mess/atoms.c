@@ -83,6 +83,43 @@ void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 }
 
 
+void sprintf_atoms(char *s, int ac, const fts_atom_t *at)
+{
+  int i;
+
+  *s = '\0';
+
+  for (i = 0; i < ac; i++)
+    {
+      char *ps;
+
+      if (i == (ac-1))
+	ps = "";
+      else
+	ps = " ";
+
+      if (fts_is_symbol(&at[i]))
+	sprintf(s + strlen(s),"%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
+      else if (fts_is_long(&at[i]))
+	sprintf(s + strlen(s),"%d%s", fts_get_int(&at[i]), ps);
+      else if (fts_is_float(&at[i]))
+	sprintf(s + strlen(s),"%f%s", fts_get_float(&at[i]), ps);
+      else if (fts_is_ptr(&at[i]) )
+	sprintf(s + strlen(s),"(ptr)%lx%s", (unsigned long) fts_get_ptr( &at[i]), ps);
+      else if (fts_is_void(&at[i]))
+	sprintf(s + strlen(s),"<void>%s", ps);
+      else if (fts_is_error(&at[i]))
+	sprintf(s + strlen(s),"<error>%s", ps);
+      else if (fts_get_type(&at[i]))
+	sprintf(s + strlen(s),"<%s>%lx%s", fts_symbol_name(fts_get_type(&at[i])), 
+		(unsigned long) fts_get_ptr( &at[i]), ps);
+      else
+	sprintf(s + strlen(s),"<NULL TYPE>%lx%s", 
+		(unsigned long) fts_get_ptr( &at[i]), ps);
+    }
+}
+
+
 int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
 {
   if (fts_same_types(a1, a2))

@@ -286,7 +286,6 @@ struct fts_object
      this is the variable  name */
 
   fts_symbol_t varname;
-  int is_wannabe;		/* wannabe flag */
 
   /* Variables referred by the object */
 
@@ -327,11 +326,10 @@ struct fts_binding_list
 struct fts_binding
 {
   fts_symbol_t   name;
-  fts_object_t  *owner;
   int            suspended;
   fts_atom_t     value;
   fts_object_list_t *users;	/* object that use this variables */
-  fts_object_list_t *wannabes;	/* object that want to redefine this variables locally, if any*/
+  fts_object_list_t *definitions;/* object that want to redefine this variables locally, if any*/
   struct fts_env  *env;		/* back pointer to the environment where the variable is stored */
   fts_binding_t *next;		/* next in the environent */
 };
