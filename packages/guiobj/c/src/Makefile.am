@@ -34,7 +34,7 @@ if MACOSX
 
 # This causes libtool to issue a warning and not to produce the .so 
 XLDFLAGS= -no-undefined -module
-XLIBADD= -L$(top_srcdir)/packages/data/c/src/.libs -ldata -L$(top_srcdir)/fts/.libs -lfts 
+XLIBADD= -L$(top_srcdir)/packages/data/c/src/.libs -ldata -L$(top_srcdir)/packages/utils/c/src/.libs -lutils -L$(top_srcdir)/fts/.libs -lfts 
 
 # So we add this explicitely !!!
 all-local: .libs/libguiobj.so
