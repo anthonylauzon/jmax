@@ -97,6 +97,7 @@ public class Platform
       {
 	setDefaultValues();
       }
+
     //setDefaultUIColors(Color.red);
   }
 
@@ -170,6 +171,7 @@ public class Platform
    
   static protected void setMacValues()
   {
+    System.setProperty( "com.apple.macos.useScreenMenuBar", "true");
     NEWLINE       = "\n";
     NEWLINECHAR   = '\n';
     DELETE_KEY    = 8;
