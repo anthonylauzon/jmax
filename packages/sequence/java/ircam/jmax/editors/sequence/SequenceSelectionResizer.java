@@ -152,8 +152,8 @@ public class SequenceSelectionResizer extends SelectionResizer {
 
     g.clipRect(clip.x, clip.y, clip.width, clip.height);
 
-    g.setColor(Color.gray);
-    g.setXORMode(Color.white); //there's an assumption here on the color of the background.
+    g.setColor( Color.gray);
+    g.setXORMode( Color.white); //there's an assumption here on the color of the background.
     
     TrackEvent last = egc.getSelection().getLastSelectedEvent();
 
@@ -163,13 +163,15 @@ public class SequenceSelectionResizer extends SelectionResizer {
     for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aTrackEvent = (TrackEvent) e.nextElement();
-	a.setX(tempEvent, a.getX(aTrackEvent));
-	a.setY(tempEvent, a.getY(aTrackEvent));
+	a.setX( tempEvent, a.getX( aTrackEvent));
+	a.setY( tempEvent, a.getY( aTrackEvent));
+	a.setHeigth( tempEvent, a.getHeigth( aTrackEvent));
+	a.setType( tempEvent, a.getType( aTrackEvent));
 
-	a.setLenght(tempEvent, a.getLenght(aTrackEvent)+dx);
-	aTrackEvent.getRenderer().render(tempEvent, g, false, egc);
+	a.setLenght( tempEvent, a.getLenght( aTrackEvent) + dx);
+	aTrackEvent.getRenderer().render( tempEvent, g, false, egc);
 	
-	if(aTrackEvent == last) 
+	if( aTrackEvent == last) 
 	    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),
 				    a.LenghtMapper.getName()+" "+a.getInvLenght(tempEvent));
       }

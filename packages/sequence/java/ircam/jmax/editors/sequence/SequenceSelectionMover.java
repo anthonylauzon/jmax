@@ -216,7 +216,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
       g.setXORMode(Color.white);
 
       if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-	  enclosingRect.x += dx-previousX;
+	enclosingRect.x += dx-previousX;
       
       if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 	enclosingRect.y += dy-previousY;
@@ -237,49 +237,52 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	for (Enumeration e = ((SequenceGraphicContext)gc).getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    movTrackEvent = (TrackEvent) e.nextElement();
-
+	    
 	    tempEvent.setOriginal(movTrackEvent);
 
 	    tempEvent.setTime(movTrackEvent.getTime());
 	    
 	    a.setY(tempEvent, a.getY(movTrackEvent));
 	    a.setLabel(tempEvent, a.getLabel(movTrackEvent));
+	    a.setType( tempEvent, a.getType(movTrackEvent));
 
 	    tempEvent.setLocalProperties(movTrackEvent);
 
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
+	    
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-		if(a.isHorizontalMovementAllowed())
-		    if(!a.isHorizontalMovementBounded())
-			a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+	      if(a.isHorizontalMovementAllowed())
+		if(!a.isHorizontalMovementBounded())
+		  a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+		else
+		  {
+		    int prevX = 0;
+		    int nextX = 0;
+		    FtsTrackObject ftsTrk = ((SequenceGraphicContext)gc).getTrack().getFtsTrack();
+		    TrackEvent next = ftsTrk.getNextEvent(movTrackEvent);
+		    if(next!=null)
+		      nextX = a.getX(next)-1;
+		    TrackEvent prev = ftsTrk.getPreviousEvent(movTrackEvent);
+		    if(prev!=null)
+		      prevX = a.getX(prev)+1;
+		    
+		    if((a.getX(movTrackEvent) + dx > nextX)&&(next!=null))
+		      a.setX(tempEvent, nextX);
 		    else
-			{
-			    int prevX = 0;
-			    int nextX = 0;
-			    FtsTrackObject ftsTrk = ((SequenceGraphicContext)gc).getTrack().getFtsTrack();
-			    TrackEvent next = ftsTrk.getNextEvent(movTrackEvent);
-			    if(next!=null)
-				nextX = a.getX(next)-1;
-			    TrackEvent prev = ftsTrk.getPreviousEvent(movTrackEvent);
-			    if(prev!=null)
-				prevX = a.getX(prev)+1;
-
-			    if((a.getX(movTrackEvent) + dx > nextX)&&(next!=null))
-				a.setX(tempEvent, nextX);
-			    else
-				if((a.getX(movTrackEvent) + dx < prevX)&&(prev!=null))
-				    a.setX(tempEvent, prevX);
-				else
-				    a.setX(tempEvent, a.getX(movTrackEvent) + dx);
-			}		    
+		      if((a.getX(movTrackEvent) + dx < prevX)&&(prev!=null))
+			a.setX(tempEvent, prevX);
+		      else
+			a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+		  }		    
 	    
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
-		a.setY(tempEvent, a.getY(movTrackEvent)+dy);
-
+	      a.setY(tempEvent, a.getY(movTrackEvent)+dy);
+	    
 	    tempEvent.setDeltaX(dx);//?????
 
-	    movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
+	    //movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
+	    movTrackEvent.getRenderer().renderBounds(tempEvent, g, true, gc);
 
 	    // e_m_ incorrect! instead, make this object communicate the new position to the listeners,
 	    // and make the keyboard in the MidiTrack a listener of such movements.
@@ -288,16 +291,16 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	      ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
 	  
 	    if(movTrackEvent == last) 
-		{
-		    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-			((SequenceGraphicContext)gc).getStatusBar().
-			    post(((SequenceGraphicContext)gc).
-				 getToolManager().getCurrentTool(), a.XMapper.getName()+" "+tempEvent.getTime());
-		    if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-			((SequenceGraphicContext)gc).getStatusBar().
-			    post(((SequenceGraphicContext)gc).
-				 getToolManager().getCurrentTool(), a.YMapper.getName()+" "+a.getInvY(a.getY(tempEvent)));
-		}
+	      {
+		if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
+		  ((SequenceGraphicContext)gc).getStatusBar().
+		    post(((SequenceGraphicContext)gc).
+			 getToolManager().getCurrentTool(), a.XMapper.getName()+" "+tempEvent.getTime());
+		if ((itsMovements & VERTICAL_MOVEMENT) != 0)
+		  ((SequenceGraphicContext)gc).getStatusBar().
+		    post(((SequenceGraphicContext)gc).
+			 getToolManager().getCurrentTool(), a.YMapper.getName()+" "+a.getInvY(a.getY(tempEvent)));
+	      }
 	  }
       }
     

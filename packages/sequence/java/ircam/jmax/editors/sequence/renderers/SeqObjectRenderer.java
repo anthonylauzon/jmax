@@ -28,7 +28,7 @@ import ircam.jmax.toolkit.*;
 public interface SeqObjectRenderer extends ObjectRenderer {
 
   public abstract void render(Object obj, Graphics g, int state, GraphicContext gc);
-  
+  public abstract void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext gc);
 }
 
 

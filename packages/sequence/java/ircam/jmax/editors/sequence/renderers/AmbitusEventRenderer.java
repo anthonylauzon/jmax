@@ -70,7 +70,7 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
       else
 	render(obj, g, Event.DESELECTED, theGc); 
   }
-  
+
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
   {
     Event e = (Event) obj;
@@ -82,53 +82,130 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     int lenght = pa.getLenght(e);
     String label = pa.getLabel(e);
     int heigth = pa.getHeigth(e);
-    Object type = e.getProperty("type");
+    String type = pa.getType(e);
 
     if (heigth == 0)
       heigth = Adapter.NOTE_DEFAULT_HEIGTH;
 
-    /*y = y-heigth/2;*/
-    y = y-heigth+2;
-    
-    switch(state)
+    if( type.equals("rest"))
       {
-      case Event.SELECTED:
-	g.setColor(Color.red);
-	break;
-      case Event.DESELECTED:
-	g.setColor(Color.black);
-	break;
-      case Event.HIGHLIGHTED:
-	g.setColor(Color.green);
-	break;
-      }
+	y = y-heigth/2;
 
-    if(type.equals("rest"))
-      g.drawRect(x, y, lenght, heigth);
-    else
-      if ( gc.getSelection().getModel() != gc.getDataModel()) 
-	g.drawRect(x, y, lenght, heigth);
-      else 
-	g.fillRect(x, y, lenght, heigth);    
-
-    if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
-      {
-	int alt = pa.getAlteration(e);
-	g.setFont(altFont);
-	switch(alt)
+	Color col, bordCol;
+	switch(state)
 	  {
-	  case PartitionAdapter.ALTERATION_DIESIS:
-	    g.drawString("#", x-8, y+5);
+	  default:
+	  case Event.SELECTED:
+	    col = restSelColor;
+	    bordCol = Color.red;
 	    break;
-	  case PartitionAdapter.ALTERATION_BEMOLLE:
-	    g.drawString("b", x-8, y+5);
+	  case Event.DESELECTED:
+	    col = restColor;
+	    bordCol = Color.black;
+	    break;
+	  case Event.HIGHLIGHTED:
+	    col = restHighlightColor;
+	    bordCol = Color.green;
+	    break;
+	  }
+
+	g.setColor( col);
+	g.fillRect(x, y, lenght, heigth);
+	g.setColor( bordCol);
+	g.drawLine(x, y, x, y + heigth - 1);
+	g.drawLine(x + 1, y, x + 1, y + heigth - 1);
+	g.drawLine(x + lenght, y, x + lenght, y + heigth - 1);
+	g.drawLine(x + lenght - 1, y, x + lenght - 1, y + heigth - 1);
+	g.fillRect(x , y + heigth/2 - 1, lenght, /*2*/ 3);
+      }
+    else
+      {
+	y = y-heigth+2;
+
+	switch(state)
+	  {
+	  case Event.SELECTED:
+	    g.setColor(Color.red);
+	    break;
+	  case Event.DESELECTED:
+	    g.setColor(Color.black);
+	    break;
+	  case Event.HIGHLIGHTED:
+	    g.setColor(Color.green);
+	    break;
+	  }
+
+	if( type.equals("trill"))
+	  {
+	    double tw = 0.5 * (double)lenght / Math.ceil((double)lenght / 12.0);
+	    double i = 0;
+	    while(i < lenght)
+	      {
+		int d = (int)i;
+		i += tw;
+		
+		g.drawLine(x + d, y + heigth, x + (int)i, y);
+		g.drawLine(x + 1 + d, y + heigth, x + 1 + (int)i, y);
+		
+		d = (int)i;
+		i += tw;
+		
+		g.drawLine( x + d, y, x + (int)i, y + heigth);
+		g.drawLine( x + 1 + d, y, x + 1 + (int)i, y + heigth);
+	      }
+	  }
+	else
+	  if ( gc.getSelection().getModel() != gc.getDataModel()) 
+	    g.drawRect(x, y, lenght, heigth);
+	  else 
+	    g.fillRect(x, y, lenght, heigth);    
+      
+	if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
+	  {
+	    int alt = pa.getAlteration(e);
+	    g.setFont(altFont);
+	    switch(alt)
+	      {
+	      case PartitionAdapter.ALTERATION_DIESIS:
+		g.drawString("#", x-8, y+5);
+		break;
+	      case PartitionAdapter.ALTERATION_BEMOLLE:
+		g.drawString("b", x-8, y+5);
+	      }
+	  }
+	if(pa.isDisplayLabels())
+	  {
+	    g.setFont(SequencePanel.rulerFont);
+	    g.drawString(label, x, y-5);
 	  }
       }
-    if(pa.isDisplayLabels())
-      {
-	g.setFont(SequencePanel.rulerFont);
-	g.drawString(label, x, y-5);
-      }
+  }
+
+  public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
+  {
+    Event e = (Event) obj;
+    PartitionAdapter pa = (PartitionAdapter)((SequenceGraphicContext) theGc).getAdapter();
+    
+    int x = pa.getX(e);
+    int y = pa.getY(e);
+    int lenght = pa.getLenght(e);
+    int heigth = pa.getHeigth(e);
+    String type = pa.getType(e);
+
+    if (heigth == 0)
+      heigth = Adapter.NOTE_DEFAULT_HEIGTH;
+
+    if( type.equals("rest"))
+      y = y-heigth/2;
+    else
+      y = y-heigth+2;
+    
+    if( selected)
+      g.setColor(Color.red);
+    else
+      g.setColor(Color.black);
+
+    g.drawRect( x, y, lenght, heigth);
   }
   /**
    * returns true if the given event contains the given (graphic) point
@@ -150,9 +227,13 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     int evty = gc.getAdapter().getY(e);
     int evtlenght = gc.getAdapter().getLenght(e);
     int evtheigth = gc.getAdapter().getHeigth(e);
+    String type = ((PartitionAdapter)gc.getAdapter()).getType(e);
 
     //return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && (evty+evtheigth/2) >= y);
-    return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth+2<=y && evty+2 >= y);
+    if( type.equals("rest"))
+      return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && evty + evtheigth/2 >= y);
+    else
+      return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth+2<=y && evty+2 >= y);
   }
 
 
@@ -179,10 +260,16 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     int evty = gc.getAdapter().getY(e);
     int evtlenght = gc.getAdapter().getLenght(e);
     int evtheigth = gc.getAdapter().getHeigth(e);
+    String type = ((PartitionAdapter)gc.getAdapter()).getType(e);
 
     tempRect.setBounds(x, y, w, h);
+
     //eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
-    eventRect.setBounds(evtx, evty-evtheigth+2, evtlenght, evtheigth);
+    if( type.equals("rest"))
+      eventRect.setBounds(evtx, evty-evtheigth/2, evtlenght, evtheigth);
+    else
+      eventRect.setBounds(evtx, evty-evtheigth+2, evtlenght, evtheigth);
+    
     return  tempRect.intersects(eventRect);
   }
 
@@ -199,7 +286,14 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
   public SequenceGraphicContext gc;
   public static AmbitusEventRenderer staticInstance;
   static public Font altFont = new Font("SansSerif", Font.BOLD, 12);
-    
+  
+  Color restColor = new Color(165, 165, 165, 60);
+  Color restSelColor = new Color(255, 0, 0, 60);
+  Color restHighlightColor = new Color(0, 255, 0, 60);
+  Color intervColor = new Color(165, 165, 165, 40);
+  Color intervSelColor = new Color(255, 0, 0, 40);
+  Color intervHighlightColor = new Color(0, 255, 0, 40);
+
   int oldX, oldY;
 }
 

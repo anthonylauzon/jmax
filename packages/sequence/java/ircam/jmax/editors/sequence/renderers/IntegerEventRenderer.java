@@ -51,25 +51,30 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
    * It takes into account the selection state.
    */
   public void render(Object obj, Graphics g, boolean selected)
-    {
-	render(obj, g, selected, gc);
-    } 
-
+  {
+    render(obj, g, selected, gc);
+  } 
+  
   /**
    * draw the given event in the given graphic context.
    * It takes into account the selection state.
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-      if(((Event)obj).isHighlighted())
-	  render(obj, g, Event.HIGHLIGHTED, theGc); 
+    if(((Event)obj).isHighlighted())
+      render(obj, g, Event.HIGHLIGHTED, theGc); 
+    else
+      if(selected)
+	render(obj, g, Event.SELECTED, theGc); 
       else
-	  if(selected)
-	      render(obj, g, Event.SELECTED, theGc); 
-	  else
-	      render(obj, g, Event.DESELECTED, theGc); 
+	render(obj, g, Event.DESELECTED, theGc); 
   }
   
+  public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
+  {
+    render(obj, g, selected, gc);
+  }
+
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
   {
     Event e = (Event) obj;

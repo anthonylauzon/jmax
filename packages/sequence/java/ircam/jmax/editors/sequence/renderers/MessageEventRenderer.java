@@ -67,13 +67,16 @@ public class MessageEventRenderer implements SeqObjectRenderer {
 	else
 	    render(obj, g, Event.DESELECTED, theGc); 
     }
-  
-    public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
-    {
-	Event e = (Event) obj;
-
-	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-
+  public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
+  {
+    render( obj, g, selected, gc);
+  }
+  public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
+  {
+    Event e = (Event) obj;
+    
+    SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+	
 	FontMetrics fm = gc.getGraphicDestination().getFontMetrics(stringFont);
 	String mess = gc.getAdapter().getLabel(e);
 	boolean open = ((Boolean)e.getProperty("open")).booleanValue();

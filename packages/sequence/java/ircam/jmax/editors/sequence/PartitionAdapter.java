@@ -87,27 +87,18 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
    * Returns the time associated with the value of an X coordinate after
    * the coordinate conversion.
    */
-    public double getInvX(int x) 
-    {
-      if (geometry.getXInvertion()) return (double) (geometry.getXTransposition() -(x-ScoreBackground.KEYEND)/geometry.getXZoom());
-
-      else return (double) ((x-ScoreBackground.KEYEND)/geometry.getXZoom() - geometry.getXTransposition());
+  public double getInvX(int x) 
+  {
+    if (geometry.getXInvertion()) return (double) (geometry.getXTransposition() -(x-ScoreBackground.KEYEND)/geometry.getXZoom());
+    
+    else return (double) ((x-ScoreBackground.KEYEND)/geometry.getXZoom() - geometry.getXTransposition());
     
   }
 
   public int getInvWidth(int w)
   {
-      return (int)(getInvX(w)-getInvX(0));
+    return (int)(getInvX(w)-getInvX(0));
   }
-
-  /**
-   * set the time of the event associated with the graphic X
-   */
-    /*public void setX(TrackEvent e, int x) 
-      {  
-      super.setX(e, getInvX(x));
-      }*/
-
 
   /**
    * inherited from Adapter.
@@ -272,18 +263,14 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
    * returns the lenght value of the event in graphic coordinates,
    * making the needed cordinate conversions (zooming).
    */
-    public int getLenght(Event e)
-    {
-	return (int)(super.getLenght(e)*geometry.getXZoom());
-    }
+  public int getLenght(Event e)
+  {
+    return (int)(super.getLenght(e)*geometry.getXZoom());
+  }
   /**
    * inherited from Adapter.
    * returns the lenght value of the event in logic coordinates,
    */
-    /*public int getInvLenght(Event e)
-      {
-      return (int) (super.getLenght(e));
-      }*/
   public double getInvLenght(Event e)//*@*// 
   {
     if (LenghtMapper != null) return LenghtMapper.get(e);
@@ -295,7 +282,6 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
    */
   public void setLenght(Event e, int l) 
   {
-    //super.setLenght(e, (int) (l/geometry.getXZoom()));//*@*//
     LenghtMapper.set(e, (double)((double)l/geometry.getXZoom()) );
   }
 
@@ -304,7 +290,6 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
   public int getHeigth(Event e) 
   {
     if (HeigthMapper != null) 
-      //return 3*(2* HeigthMapper.get(e)+1);
       return NOTE_DEFAULT_HEIGTH*(HeigthMapper.get(e)+1);
     
     return NOTE_DEFAULT_HEIGTH;
@@ -312,7 +297,20 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
     
   public void setHeigth(Event e, int heigth)
   {
-    HeigthMapper.set(e, (heigth-3)/6);
+    HeigthMapper.set(e, heigth/NOTE_DEFAULT_HEIGTH - 1);
+  }
+
+  public void setType(Event e, String type)
+  {
+    e.setProperty("type", type);
+  }
+
+  public String getType(Event e)
+  {
+    Object type = e.getProperty("type");
+
+    if(type instanceof String) return (String)type;
+    else return type.toString();
   }
 
   /**
