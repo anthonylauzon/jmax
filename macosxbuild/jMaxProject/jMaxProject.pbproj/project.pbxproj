@@ -8955,8 +8955,6 @@
 				F85123DB028BEAB301664092,
 				F85123DC028BEAB301664092,
 				F85123DD028BEAB301664092,
-				F85123DE028BEAB301664092,
-				F85123DF028BEAB301664092,
 				F85123E0028BEAB301664092,
 				F85123E1028BEAB301664092,
 				F85123E2028BEAB301664092,
@@ -8971,8 +8969,6 @@
 				F85123EC028BEAB301664092,
 				F704740A04040A7901664058,
 				F7050A2204055D1C01664058,
-				F85123ED028BEAB301664092,
-				F85123EE028BEAB301664092,
 				F85123EF028BEAB301664092,
 				F85123F0028BEAB301664092,
 				F85123F1028BEAB301664092,
@@ -9264,8 +9260,6 @@
 				F8512417028BEAB401664092,
 				F8512418028BEAB401664092,
 				F8512419028BEAB401664092,
-				F851241A028BEAB401664092,
-				F851241B028BEAB401664092,
 				F851241C028BEAB401664092,
 				F851241D028BEAB401664092,
 				F851241E028BEAB401664092,
@@ -9278,8 +9272,6 @@
 				F8512426028BEAB401664092,
 				F8512427028BEAB401664092,
 				F8512428028BEAB401664092,
-				F8512429028BEAB401664092,
-				F851242A028BEAB401664092,
 				F851242B028BEAB401664092,
 				F851242C028BEAB401664092,
 				F851242D028BEAB401664092,
@@ -9350,13 +9342,9 @@
 				F8512478028BEAB401664092,
 				F8512479028BEAB401664092,
 				F851247B028BEAB401664092,
-				F851247C028BEAB401664092,
-				F85124B8028BEBB301664092,
 				F85124B9028BEBB301664092,
 				F85124BB028BEBB301664092,
 				F85124BC028BEBB301664092,
-				F85124BD028BEBB301664092,
-				F85124BE028BEBB301664092,
 				F85124BF028BEBB301664092,
 				F85124C0028BEBB301664092,
 				F85124C1028BEBB301664092,
@@ -9707,14 +9695,10 @@
 		F85123D3028BEAB301664092 = {
 			children = (
 				F85123D5028BEAB301664092,
-				F85123D6028BEAB301664092,
-				F851247E028BEBB201664092,
 				F851247F028BEBB201664092,
 				F8512481028BEBB201664092,
 				F7DA5E65052DDDD501664058,
 				F8512482028BEBB201664092,
-				F8512483028BEBB201664092,
-				F8512484028BEBB201664092,
 			);
 			isa = PBXGroup;
 			name = tools;
@@ -9724,12 +9708,6 @@
 			isa = PBXFileReference;
 			name = ArrowTool.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/ArrowTool.java;
-			refType = 2;
-		};
-		F85123D6028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = CombTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/CombTool.java;
 			refType = 2;
 		};
 		F85123D7028BEAB301664092 = {
@@ -9822,18 +9800,6 @@
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/ChannelMapper.java;
 			refType = 2;
 		};
-		F85123DE028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = CombDrawer.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/CombDrawer.java;
-			refType = 2;
-		};
-		F85123DF028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = CombListener.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/CombListener.java;
-			refType = 2;
-		};
 		F85123E0028BEAB301664092 = {
 			isa = PBXFileReference;
 			name = DoubleMapper.java;
@@ -9904,18 +9870,6 @@
 			isa = PBXFileReference;
 			name = IntEnumeration.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/IntEnumeration.java;
-			refType = 2;
-		};
-		F85123ED028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = LineDrawer.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/LineDrawer.java;
-			refType = 2;
-		};
-		F85123EE028BEAB301664092 = {
-			isa = PBXFileReference;
-			name = LineListener.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/LineListener.java;
 			refType = 2;
 		};
 		F85123EF028BEAB301664092 = {
@@ -10164,18 +10118,6 @@
 			settings = {
 			};
 		};
-		F851241A028BEAB401664092 = {
-			fileRef = F85123DE028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851241B028BEAB401664092 = {
-			fileRef = F85123DF028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F851241C028BEAB401664092 = {
 			fileRef = F85123E0028BEAB301664092;
 			isa = PBXBuildFile;
@@ -10244,18 +10186,6 @@
 		};
 		F8512428028BEAB401664092 = {
 			fileRef = F85123EC028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512429028BEAB401664092 = {
-			fileRef = F85123ED028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851242A028BEAB401664092 = {
-			fileRef = F85123EE028BEAB301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -10680,18 +10610,6 @@
 			settings = {
 			};
 		};
-		F851247C028BEAB401664092 = {
-			fileRef = F85123D6028BEAB301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851247E028BEBB201664092 = {
-			isa = PBXFileReference;
-			name = LinerTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/LinerTool.java;
-			refType = 2;
-		};
 		F851247F028BEBB201664092 = {
 			isa = PBXFileReference;
 			name = ResizerTool.java;
@@ -10708,18 +10626,6 @@
 			isa = PBXFileReference;
 			name = SequenceTools.java;
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/SequenceTools.java;
-			refType = 2;
-		};
-		F8512483028BEBB201664092 = {
-			isa = PBXFileReference;
-			name = VResizerTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/VResizerTool.java;
-			refType = 2;
-		};
-		F8512484028BEBB201664092 = {
-			isa = PBXFileReference;
-			name = ZoomTool.java;
-			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/tools/ZoomTool.java;
 			refType = 2;
 		};
 		F8512485028BEBB201664092 = {
@@ -11022,12 +10928,6 @@
 			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ValueInfoTable.java;
 			refType = 2;
 		};
-		F85124B8028BEBB301664092 = {
-			fileRef = F851247E028BEBB201664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F85124B9028BEBB301664092 = {
 			fileRef = F851247F028BEBB201664092;
 			isa = PBXBuildFile;
@@ -11042,18 +10942,6 @@
 		};
 		F85124BC028BEBB301664092 = {
 			fileRef = F8512482028BEBB201664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F85124BD028BEBB301664092 = {
-			fileRef = F8512483028BEBB201664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F85124BE028BEBB301664092 = {
-			fileRef = F8512484028BEBB201664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
