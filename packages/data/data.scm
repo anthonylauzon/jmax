@@ -23,6 +23,8 @@
 ;; Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 ;;
 
+(require-package "utils" "0.0.0")
+
 (provide-package "data" "0.0.0")
 
 (ucs "load" "module" "data" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "data")))

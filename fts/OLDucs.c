@@ -348,7 +348,7 @@ static fts_status_t fts_ucs_load_module(int argc, const fts_atom_t *argv)
       strcpy( name, module_name);
       strcat( name, MODULE_INIT_FUNCTION_SUFFIX);
 
-      ret = fts_load_library( file, module_name);
+      ret = fts_load_library( file, name);
 
       if (ret != fts_Success)
 	post("Error loading module %s: %s\n", module_name, ret->description);

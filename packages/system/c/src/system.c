@@ -27,7 +27,7 @@
 #include "system.h"
 
 extern void dsp_config(void);
-extern void arch_config(void);
+/*  extern void arch_config(void); */
 
 extern void const_config(void);
 extern void argument_config(void);
@@ -42,7 +42,7 @@ void
 system_config(void)
 {
   dsp_config();
-  arch_config();
+/*    arch_config(); */
 
   const_config();
   argument_config();
