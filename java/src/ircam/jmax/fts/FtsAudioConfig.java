@@ -171,7 +171,7 @@ public class FtsAudioConfig extends FtsObject
 
     try
       {
-	send( FtsSymbol.get( "buffe_size"), args);
+	send( FtsSymbol.get( "buffer_size"), args);
       }
     catch(IOException e)
       {
