@@ -181,7 +181,6 @@ prof_dac_put(fts_word_t *argv)
 {
   long n = fts_word_get_long(argv + 1);
 
-#if 0
   if (prof_dac_data.active)
     {
       if (prof_dac_data.one_done)
@@ -255,7 +254,6 @@ prof_dac_put(fts_word_t *argv)
 	  prof_dac_data.total_samples = 0;
 	}
     }
-#endif
 }
 
 
