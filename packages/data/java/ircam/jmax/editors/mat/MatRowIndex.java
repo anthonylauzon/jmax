@@ -39,6 +39,11 @@ public class MatRowIndex extends PopupToolbarPanel
     setDoubleBuffered(false);
     this.data = data;
     this.matPanel = panel;
+    
+    ROW_HEIGHT = data.getDefaultSize().width; 
+    fiveNumDimension = new Dimension(ROW_WIDTH, ROW_HEIGHT);
+    sixNumDimension = new Dimension(ROW_WIDTH+10, ROW_HEIGHT);
+    
     rowIndexFont = matPanel.table.getTableHeader().getFont();
       
     setFont( rowIndexFont);
@@ -133,14 +138,13 @@ public void paintComponent(Graphics g)
   }
 }
 
-Dimension fiveNumDimension = new Dimension(ROW_WIDTH, ROW_HEIGHT);
-Dimension sixNumDimension = new Dimension(ROW_WIDTH+10, ROW_HEIGHT);
+Dimension fiveNumDimension, sixNumDimension;
 FontMetrics fm;
 MatDataModel data;
 MatPanel matPanel;
 RowIndexPopupMenu popup;
 public final static int ROW_WIDTH = 38; 
-public final static int ROW_HEIGHT = MatWindow.DEFAULT_HEIGHT; 
+public int ROW_HEIGHT; 
 Font rowIndexFont;
 int yTransp = 0;
 }    

@@ -54,7 +54,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   
   public static final Color matGridColor = new Color(220, 220, 220);
   public static final Color rowsIdColor = new Color(245, 245, 245);
-  public static final int COLUMN_MIN_WIDTH = 70;
+  public static final int COLUMN_MIN_WIDTH = 60;
   public static final int ROW_HEIGHT = 17;
   
   public MatPanel(EditorContainer container, MatDataModel data) 
@@ -91,7 +91,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     table = new MatTable(tableModel);
 		table.setGridColor( matGridColor);
 		table.setShowGrid(true);			
-    table.setPreferredScrollableViewportSize(new Dimension( MatWindow.DEFAULT_WIDTH, MatWindow.DEFAULT_HEIGHT));
+    table.setPreferredScrollableViewportSize(matData.getDefaultSize());
     table.setRowHeight(ROW_HEIGHT);
     table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
     table.getTableHeader().setReorderingAllowed(false);
@@ -260,7 +260,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     {
       setOpaque(true); 
       setBorder(BorderFactory.createEtchedBorder());
-      setBackground(Color.lightGray);
+      setBackground(/*Color.lightGray*/MatPanel.rowsIdColor);
       setHorizontalTextPosition(SwingConstants.CENTER);
     }
     

@@ -30,6 +30,7 @@ import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * A concrete implementation of the SequenceDataModel,
@@ -334,6 +335,10 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     listeners.removeElement(theListener);
   }
 
+  public Dimension getDefaultSize()
+  {
+    return defaultSize;
+  }
  /********************************************************************
   * notifications
   */
@@ -367,6 +372,10 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   protected FtsArgs args = new FtsArgs();
   int n_rows = 0;
   int n_cols = 0;
+
+  public final static int DICT_DEFAULT_WIDTH  = 200;
+  public final static int DICT_DEFAULT_HEIGHT = 200;
+  static Dimension defaultSize = new Dimension(DICT_DEFAULT_WIDTH, DICT_DEFAULT_HEIGHT);  
 }
 
 

@@ -43,11 +43,6 @@ public class MatWindow extends JMaxEditor {
   MatPanel itsMatPanel;
   MatDataModel matData;
   
-  public final static int DEFAULT_WIDTH  = 600;
-  public final static int DEFAULT_HEIGHT = 350;
-  public final static int MAX_HEIGHT     = 800;
-  public final static int EMPTY_HEIGHT   = 78;
-  
   public MatWindow(MatDataModel data)
   {
     super();
@@ -55,9 +50,7 @@ public class MatWindow extends JMaxEditor {
     matData = data;
     
     makeTitle();
-    
-    setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    
+        
     itsMatPanel = new MatPanel(this, data);
     getContentPane().add(itsMatPanel);
     
@@ -106,7 +99,7 @@ public class MatWindow extends JMaxEditor {
       makeSimpleMenuBar();
     
     setLocation(200, 200);
-    setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    setSize( matData.getDefaultSize());
     
     getContentPane().validate();
     itsMatPanel.validate();

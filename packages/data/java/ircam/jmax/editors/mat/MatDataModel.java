@@ -26,6 +26,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 
 import java.util.Enumeration;
+import java.awt.*;
 
 public interface MatDataModel {
 
@@ -46,6 +47,8 @@ public interface MatDataModel {
     public abstract int getColumns();
     
     public abstract void setSize(int m, int n);
+    
+    public abstract Dimension getDefaultSize();
     
     public abstract void setRows(int m);
     
