@@ -1,12 +1,12 @@
 all	README
+all	VERSION
+all	bin
 all	config
 all	doc
 all	examples
 all	fts
-all	packages
-all	utilities
 all	images
 all	java
+all	packages
 all	tcl
-all	bin
 

@@ -38,24 +38,23 @@ clean_java:
 # 3: for all architectures, make clean all
 # 4: make tar
 #      This will create tar file for installation.
-# 5: test
+# 5: installation and test
 # Once test is OK
 # 6: make version
-#      This will copy the tar file to archive, do a cvs tag,
-#      update the version number and commit it.
+#      This will do a cvs tag, update the version number and commit it.
 
 tar:
-	scripts/make-distrib . /tmp/max $(ARCH) t
-	(cd /tmp ; tar cvf - max) | gzip > jmax.$(ARCH).`cat VERSION`.tar.gz
-	/bin/rm -rf /tmp/max
+	make-distrib . $(ARCH) | sed 's/^./\.\/max/' | (cd .. ; tar cvf - -) | gzip > /u/worksta/jmax/release/jmax.$(ARCH).`cat VERSION`.tar.gz
 .PHONY: tar
 
 
 version:
-	cp jmax.$(ARCH).`cat VERSION`.tar.gz /u/worksta/jmax/archive
 	rsh maelzel cd projects/max \; cvs tag -F `awk -F . 'NF==3 { m=$$1; n=$$2; p=$$2; } END { printf("V%d_%d_%d\n",m,n,p);}' VERSION`
-	scripts/make-new-version VERSION fts/src/sys/version.h java/src/ircam/jmax/MaxVersion.java
-	rsh maelzel cd projects/max \; cvs commit -l -m "Automatic commit for new version." VERSION fts/src/sys/version.h java/src/ircam/jmax/MaxVersion.java
+	bin/make-new-version VERSION fts/src/sys/version.h java/src/ircam/jmax/MaxVersion.java
+	rsh maelzel cd projects/max \; cvs commit -l -m \"Automatic commit of new version number `cat VERSION`\" VERSION
+	rsh maelzel cd projects/max/fts/src/sys \; cvs commit -l -m \"Automatic commit of new version number `cat VERSION`\" version.h
+	rsh maelzel cd projects/max/java/src/ircam/jmax \; cvs commit -l -m \"Automatic commit of new version number `cat VERSION`\" MaxVersion.java
+	echo "Don't forget to do a 'cvs update'...\n" | Mail -s "New jMax version is now `cat VERSION`"  dechelle@ircam.fr dececco@ircam.fr maggi@ircam.fr schnell@ircam.fr borghesi@ircam.fr
 .PHONY: version
 
 
