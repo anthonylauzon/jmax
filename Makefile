@@ -31,10 +31,10 @@ tar:
 
 
 version:
-	echo cp jmax.$(ARCH).`cat VERSION`.tar.gz /u/worksta/jmax/archive
-	echo rsh maelzel cd projects/max \; cvs tag -F `awk -F . 'NF==3 { m=$$1; n=$$2; p=$$2; } END { printf("V%d_%d_%d\n",m,n,p);}' VERSION`
+	cp jmax.$(ARCH).`cat VERSION`.tar.gz /u/worksta/jmax/archive
+	rsh maelzel cd projects/max \; cvs tag -F `awk -F . 'NF==3 { m=$$1; n=$$2; p=$$2; } END { printf("V%d_%d_%d\n",m,n,p);}' VERSION`
 	scripts/make-new-version VERSION fts/src/sys/version.h java/src/ircam/jmax/MaxVersion.java
-	echo rsh maelzel cd projects/max \; cvs commit -l -m "Automatic commit for new version." VERSION fts/src/sys/version.h java/src/ircam/jmax/MaxVersion.java
+	rsh maelzel cd projects/max \; cvs commit -l -m "Automatic commit for new version." VERSION fts/src/sys/version.h java/src/ircam/jmax/MaxVersion.java
 .PHONY: version
 
 
