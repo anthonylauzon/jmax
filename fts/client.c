@@ -221,7 +221,7 @@ static void symbol_cache_init( symbol_cache_t *cache)
 
 static void symbol_cache_destroy( symbol_cache_t *cache)
 {
-  fts_free( cache->symbols);
+  fts_free((void*)cache->symbols);
 }
 
 static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
@@ -231,7 +231,7 @@ static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
     int i, old_length = cache->length;
 
     cache->length = index+1;
-    cache->symbols = fts_realloc( cache->symbols, cache->length * sizeof( fts_symbol_t));
+    cache->symbols = fts_realloc((void*)cache->symbols, cache->length * sizeof( fts_symbol_t));
 
     for ( i = old_length; i < cache->length; i++)
       cache->symbols[i] = 0;
