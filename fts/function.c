@@ -61,7 +61,7 @@ static void new_function(int ac, const fts_atom_t *at)
     
     if(fts_is_symbol(at))
       class = fts_get_class_by_name(fts_get_symbol(at));
-    else if(fts_is_a(&a, fts_class_class))
+    else if(fts_is_a(at, fts_class_class))
       class = (fts_class_t *)fts_get_object(at);
 
     if(class != NULL)
