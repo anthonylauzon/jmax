@@ -12,6 +12,8 @@ AC_SUBST(JMAX_VERSION)
 
 AM_INIT_AUTOMAKE(jmax,${JMAX_VERSION})
 
+AC_PREFIX_DEFAULT(/usr)
+
 AM_CONFIG_HEADER(include/ftsconfig-ac.h)
 
 dnl Checks for programs.
@@ -75,10 +77,10 @@ AC_ARG_ENABLE(electric-fence,
 dnl Check for platform-specific code
 AC_CANONICAL_HOST
 case "$host" in
-dnl FIXME: must add conditionnal tests for ALSA
 i*86-pc-linux-gnu)
     PLATFORM=linux ;
-    PLATFORM_PACKAGES="alsa oss unixdtd" ;
+dnl FIXME: must add conditionnal tests for ALSA
+    PLATFORM_PACKAGES="alsa audiofile oss unixdtd" ;
     FTS_SYS_LIBS="-ldl -laudiofile -lpthread" ;
     if test "$electric_fence" = "yes" ; then FTS_SYS_LIBS="-lefence $FTS_SYS_LIBS" ; fi ;
     ;;
@@ -171,6 +173,9 @@ packages/Makefile
 packages/alsa/Makefile
 packages/alsa/c/Makefile
 packages/alsa/c/src/Makefile
+packages/audiofile/Makefile
+packages/audiofile/c/Makefile
+packages/audiofile/c/src/Makefile
 packages/control/Makefile
 packages/control/c/Makefile
 packages/control/c/src/Makefile
