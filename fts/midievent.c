@@ -308,6 +308,8 @@ midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
         
       case midi_program_change:
       case midi_channel_pressure:
+        fts_midievent_channel_message_set_second(this, MIDI_EMPTY_BYTE);
+        
         switch(ac)
         {
           default:

@@ -1263,6 +1263,8 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       fts_message_append_float(mess, f);
     }
+    
+    fts_dumper_message_send(dumper, mess);
   }
 }
 
