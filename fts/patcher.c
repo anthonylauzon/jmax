@@ -1980,7 +1980,9 @@ fts_create_root_patcher()
 static void fts_delete_root_patcher(void)
 {
   /* should be destroyed here! */
+  fts_object_set_id( (fts_object_t *)fts_root_patcher, FTS_NO_ID);
   fts_object_release((fts_object_t *)fts_root_patcher);
+  fts_root_patcher = NULL;
 }
 
 fts_patcher_t *

@@ -760,6 +760,8 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
       fts_log( "[client] error in reading message, client stopped\n");
 
       fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
+      fts_bytestream_destroy( this->stream);
+      this->stream = NULL;
       fts_patcher_remove_object(fts_get_root_patcher(), (fts_object_t *) this);
 
       return;
@@ -1215,7 +1217,7 @@ void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   client_write_object( client, obj);
@@ -1226,7 +1228,7 @@ void fts_client_add_int( fts_object_t *obj, int v)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   client_write_int( client, v);
@@ -1236,7 +1238,7 @@ void fts_client_add_float( fts_object_t *obj, float v)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   client_write_float( client, v);
@@ -1246,7 +1248,7 @@ void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   client_write_symbol( client, v);
@@ -1256,7 +1258,7 @@ void fts_client_add_string( fts_object_t *obj, const char *v)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   client_write_string( client, v);
@@ -1266,7 +1268,7 @@ void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   client_write_object( client, v);
@@ -1276,7 +1278,7 @@ void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   while (ac--)
@@ -1300,7 +1302,7 @@ void fts_client_done_message( fts_object_t *obj)
 {
   client_t *client = object_get_client( obj);
 
-  if ( !client)
+  if ( !client || client->stream == NULL)
     return;
 
   put_byte( client, FTS_PROTOCOL_END_OF_MESSAGE);
@@ -1312,6 +1314,11 @@ void fts_client_done_message( fts_object_t *obj)
 
 void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
+  client_t *client = object_get_client( obj);
+
+  if ( !client || client->stream == NULL)
+    return;
+
 #ifdef CLIENT_LOG
   fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", obj, selector, ac);
   fts_log_atoms( ac, at);
