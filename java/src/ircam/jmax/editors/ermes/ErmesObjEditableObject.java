@@ -22,9 +22,11 @@ import ircam.jmax.fts.*;
   String 	  itsArgs;
   public Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
-  public void setSize(int theH, int theV) {}; 
+  //public void setSize(int theH, int theV) {}; 
   public boolean resized = false;
   public boolean itsInEdit = true;
+  String itsBackupText = new String();;
+
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -36,7 +38,7 @@ import ircam.jmax.fts.*;
   // Init
   //--------------------------------------------------------
   //this 'glue' method is called when the external (or the message) have not their arguments yet
-  //and we have to create also the JEditableField 
+  //and we have to create also the (static) ErmesObjEditableField 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y) {
     itsX = x; itsY = y;
     itsSketchPad = theSketchPad;
@@ -53,7 +55,8 @@ import ircam.jmax.fts.*;
     currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
     Reshape(itsX, itsY, preferredSize.width, preferredSize.height);
     
-    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);	
+    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);
+    DoublePaint();
     itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
     
     itsSketchPad.GetEditField().setVisible(true);
@@ -113,6 +116,14 @@ import ircam.jmax.fts.*;
     return true;
   }
 	
+  void backupText() {
+    itsBackupText = itsArgs.toString();
+  }
+
+  void restoreText() {
+    itsArgs = itsBackupText.toString();
+  }
+
   public void RestartEditing(){
     if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
     
@@ -120,7 +131,6 @@ import ircam.jmax.fts.*;
     itsSketchPad.GetEditField().setText(itsArgs);
     itsSketchPad.GetEditField().itsOwner = this; 
 
-    //itsSketchPad.RemoveElementRgn(this);
 
     if(itsParsedTextVector.size()==0)
       itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);
@@ -146,15 +156,25 @@ import ircam.jmax.fts.*;
 			    (itsInletList.size())*12, (itsOutletList.size())*12));
   }
 
-  public void RestoreDimensions(){
+  public void RestoreDimensions(boolean paintNow){
 
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
    
-    int aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height;
-
-    Resize(aMaxWidth-currentRect.width, aHeight);
-    itsSketchPad.repaint();
+    int aHeightDiff = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height;
+    int aWidthDiff = aMaxWidth-currentRect.width;
+    if (aHeightDiff == 0 && aWidthDiff == 0) return;
+    Resize(aWidthDiff, aHeightDiff);
+    if (paintNow) {
+      if (aHeightDiff < 0 || aWidthDiff <0)
+	itsSketchPad.repaint();
+      else DoublePaint();
+    }    
+    else {
+      if (aHeightDiff < 0 || aWidthDiff <0)
+	itsSketchPad.markSketchAsDirty();
+      else itsSketchPad.addToDirtyObjects(this);
+    } 
   }
 
   public int MaxWidth(int uno, int due, int tre){

@@ -29,34 +29,28 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
     }catch (Exception exc) {
       new ErrorDialog(theSketchPad.itsSketchWindow, "Could not load MotifLookAndFeel");
     }
-    setDoubleBuffered(true);
+
+    /* important note for (future) developers:
+       Swing uses a double buffer by default FOR EACH JComponent.
+       It dows not seem, however, to handle this buffer correctly.
+       It is very common to go low memory, so your component will
+       repaint partially, or will not show up at all.
+       Most of the time, you're forced to setDoubleBuffered(false).*/
+    setDoubleBuffered(false);
     itsSketchPad = theSketchPad;
     setLayout (new BorderLayout());    
     itsSwToolbar = new JToolBar();
     itsSwToolbar.setFloatable (false);   
-    
     InsertButtons();
-
     add (itsSwToolbar, BorderLayout.WEST);
-    //setBackground(itsSwToolbar.getBackground());
     validate();
   }
 
-  void CreateADump(){
-    int a = 0;
-    try {
-      a = 14/a;
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-  
-  public void update(Graphics g) {
-    super.update(g);
-    //System.err.println("got an update()");
-  }
-  
+  /*public void paint(Graphics g) {
+   System.err.println("got a paint");
+   super.paint(g);
+  }*/
+
   /**
    * Add a button to the toolbar, trying not to load already loaded
    * gif files (case of multiple windows with same palette).
@@ -138,8 +132,7 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
 
   public void setRunMode(boolean theRunMode) {
     if(pressed) Unlock();
-    //if(theRunMode) setBackground(Color.white);
-    //else setBackground(itsSwToolbar.getBackground());
+    //itsSwToolbar.setEnabled(!theRunMode);
     itsSwToolbar.setVisible(!theRunMode);
   }
  

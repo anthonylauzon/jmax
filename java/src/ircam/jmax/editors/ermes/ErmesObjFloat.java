@@ -91,7 +91,8 @@ class ErmesObjFloat extends ErmesObject {
   protected void FtsValueChanged(Object value) {
     
     itsFloat = ((Float) value).floatValue();
-    DoublePaint();
+    //DoublePaint();
+    Paint(itsSketchPad.getGraphics());
   }
 	
   public void FromDialogValueChanged(Float theFloat){

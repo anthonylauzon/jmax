@@ -15,7 +15,8 @@ import ircam.jmax.mda.*;
 public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public boolean iAmPatcher = false;
-  // public ErmesSketchWindow itsSubWindow = null;
+  private String itsBackupText = new String();
+
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -59,7 +60,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       this.YouArePatcher(true);
     ParseText(itsArgs);
     //Resize(0, itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height);
-    if(!IsResizeTextCompat(0,0)) RestoreDimensions();
+    if(!IsResizeTextCompat(0,0)) RestoreDimensions(false);
 
     return true;		// Why this method return a value ????
   }
@@ -84,8 +85,9 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
     }
     catch (FtsException e){
+      Toolkit.getDefaultToolkit().beep();
       System.out.println("Cannot create object: " + itsArgs);
-      // Enzo !!! Aiuto :-> (MDC)
+      
     }
     if (itsFtsObject instanceof FtsContainerObject)
       YouArePatcher(true);
@@ -101,7 +103,10 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       }
     catch (FtsException e)
       {
-	// Here pop up error box or something ..
+	System.out.println("Error in redefining object, action cancelled");
+	Toolkit.getDefaultToolkit().beep();
+	restoreText();
+	ParseText(itsArgs);
       }
 
     this.YouArePatcher(itsFtsObject instanceof FtsContainerObject);
@@ -115,17 +120,18 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   
    public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
      if(evt.getClickCount()>1) {
+       
        if(itsFtsObject instanceof FtsObjectWithData){
 	 try{
 	   // New !!! Actually the same thing can be done for 
 	   // patchers now !!!
-
+	   
 	   MaxData data;
-
+	   
 	   data = ((FtsObjectWithData) itsFtsObject).getData();
-
+	   
 	   Mda.edit(data);
-	   }
+	 }
 	 catch (MaxDocumentException e)
 	   {
 	     // SHould do something better
@@ -150,7 +156,10 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------
+  int paintCount = 0;
   public void Paint_specific(Graphics g) {
+    //System.err.println(". "+(paintCount++));
+    //(new Throwable()).printStackTrace();
     if(!itsSelected) g.setColor(itsLangNormalColor);
     else g.setColor(itsLangSelectedColor);
 
@@ -203,18 +212,18 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   //--------------------------------------------------------
   // resize
   //--------------------------------------------------------
-  public void setSize(int theH, int theV) {
+  /*public void setSize(int theH, int theV) {
     Dimension d = new Dimension(theH, theV);
     super.Resize1(d.width, d.height);
     currentRect.setSize(d.width, d.height);
     d.width -= WIDTH_DIFF;		
     d.height -= HEIGHT_DIFF;
     if (itsSketchPad != null) itsSketchPad.repaint();
-  }
+  }*/
   
-  public void setSize(Dimension d) {
+  /*public void setSize(Dimension d) {
     setSize(d.width, d.height);
-  }
+  }*/
 }
 
 

@@ -154,7 +154,7 @@ class ErmesSketchHelper extends Object{
     aInlet.GetConnections().removeElement(theConnection);
     if(aInlet.GetConnections().size()==0) aInlet.SetConnected(false, false);
     if(aOutlet.GetConnections().size()==0) aOutlet.SetConnected(false, false);
-    if (theConnection.itsFtsConnection != null) theConnection.itsFtsConnection.delete();	//delete from FTS
+    if (theConnection.itsFtsConnection != null && theConnection.itsFtsConnection.checkConsistency()) theConnection.itsFtsConnection.delete();	//delete from FTS
     itsSketchPad.markSketchAsDirty();
     if (paintNow) itsSketchPad.paintDirtyList();
   }
@@ -405,16 +405,15 @@ class ErmesSketchHelper extends Object{
 
     for(Enumeration e = itsSketchPad.itsInletList.elements(); e.hasMoreElements();) {
       aInlet = (ErmesObjInlet)e.nextElement();
-      aRect = aInlet.Bounds();
+      aRect = aInlet.getSensibleBounds();
       if(aRect.contains(x,y)) {
 	itsSketchPad.itsCurrentInOutlet = aInlet;
 	return true;
       }
     }
-    //for(Enumeration e2 = aObject.GetOutletList().elements(); e2.hasMoreElements();) {
     for(Enumeration e2 = itsSketchPad.itsOutletList.elements(); e2.hasMoreElements();) {
       aOutlet = (ErmesObjOutlet)e2.nextElement();
-      aRect = aOutlet.Bounds();
+      aRect = aOutlet.getSensibleBounds();
       if(aRect.contains(x,y)) {
 	itsSketchPad.itsCurrentInOutlet = aOutlet;
 	return true;

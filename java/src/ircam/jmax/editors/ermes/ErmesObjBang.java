@@ -48,7 +48,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
   }
     
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    //    itsProbe.stop();
+    //itsProbe.stop();
     //itsProbe.reportToFile("bang_test");
     if (itsSketchPad.itsRunMode) {
       itsFtsObject.sendMessage(0, "bang", null);
@@ -70,7 +70,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
     else {
        itsFlashing = false;
     } 
-    Paint_specific(itsSketchPad.getGraphics());
+    Paint(itsSketchPad.getGraphics());
   }
 	
   public boolean NeedPropertyHandler(){

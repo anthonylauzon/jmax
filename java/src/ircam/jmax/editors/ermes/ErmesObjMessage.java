@@ -47,7 +47,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
     super.Init(theSketchPad,  theFtsObject);
     ParseText(itsArgs);
     //Resize(0, itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height);
-    if(!IsResizeTextCompat(0,0)) RestoreDimensions();
+    if(!IsResizeTextCompat(0,0)) RestoreDimensions(false);
     return true;  
   }
 
@@ -83,7 +83,8 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   protected void FtsValueChanged(Object value) {
     itsArgs = (String) value;
     ParseText(itsArgs);
-    DoublePaint();
+    //DoublePaint();
+    Paint(itsSketchPad.getGraphics());
   }
 
   public boolean NeedPropertyHandler(){
@@ -120,18 +121,18 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   //--------------------------------------------------------
   // resize
   //--------------------------------------------------------
-  public void setSize(int theH, int theV) {
+  /*public void setSize(int theH, int theV) {
     Dimension d = new Dimension(theH, theV);
     super.Resize1(d.width, d.height);
     currentRect.setSize(d.width, d.height);
     d.width -= (WIDTH_DIFF-6);		
     d.height -= HEIGHT_DIFF;
     if (itsSketchPad != null) itsSketchPad.repaint();
-  }
+  }*/
   
-  public void setSize(Dimension d) {
+  /*public void setSize(Dimension d) {
     setSize(d.width, d.height);
-  }
+  }*/
   
   //--------------------------------------------------------
   // paint

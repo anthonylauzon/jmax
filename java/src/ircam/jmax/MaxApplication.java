@@ -196,20 +196,19 @@ public class MaxApplication extends Object
 	MaxApplication.runHooks("start");
       }
     
-
     // Finally, run forever the notifier loop of the 
     // Tcl interpreter, so that the TCL event system work
     // (and in particular, tcl built panels; thanks to the
     // jacl doc, that make this absolutely unclear.
     
     Notifier notifier = itsInterp.getNotifier();
-
+      
     while (true)
       notifier.doOneEvent(TCL.ALL_EVENTS);
- }
-
+  }
+  
   /** This private method build the tcl interpreter, 
-      and do all the required initialization relative
+    and do all the required initialization relative
       to the jmax package *only*; each module load its
       own tcl commands.
       */

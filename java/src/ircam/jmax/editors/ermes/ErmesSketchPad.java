@@ -47,7 +47,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     drawPending = false;
     copyPending = false;
   }
-  //...2703
+
   
   //ErmesDrawable interface:
   public boolean getDirty() {
@@ -83,6 +83,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   final static int BOTH_RESIZING = 23;
   final static int HORIZONTAL_RESIZING = 24;
   final static int VERTICAL_RESIZING = 25;
+  final static int START_CONNECT = 26;
+
   public static int debug_count_update = 1;
   public static int debug_count_paint  = 1;
   public final static int DEBUG_COUNT  = 50;
@@ -202,16 +204,19 @@ Rectangle previousResizeRect = new Rectangle();
   private boolean dirtySketch = false;
 
   public void addToDirtyInOutlets(ErmesObjInOutlet theInOutlet) {
+    if (dirtySketch) return;
     if (!dirtyInOutlets.contains(theInOutlet))
       dirtyInOutlets.addElement(theInOutlet);
   }
 
   public void addToDirtyConnections(ErmesConnection theConnection) {
+    if (dirtySketch) return;
     if (!dirtyConnections.contains(theConnection))
       dirtyConnections.addElement(theConnection);
   }
 
   public void addToDirtyObjects(ErmesObject theObject) {
+    if (dirtySketch) return;
     if (!dirtyObjects.contains(theObject))
     dirtyObjects.addElement(theObject);
   }
@@ -245,7 +250,6 @@ Rectangle previousResizeRect = new Rectangle();
       return;
     }
     else {
-      
       paintList(dirtyInOutlets, offGraphics);
       dirtyInOutlets.removeAllElements();
       //--
@@ -516,7 +520,11 @@ Rectangle previousResizeRect = new Rectangle();
     return true;
   }
   
+  static int noOfCopy = 0;
   public void CopyTheOffScreen(Graphics g) {
+    //System.err.println(""+(noOfCopy++));
+    /*System.err.println("--copy chiamato da");
+    (new Throwable()).printStackTrace();*/
     if((g!= null)&&(offScreenPresent)) {
       if (isInGroup || copyPending) {
 	copyPending = true;
@@ -680,7 +688,7 @@ Rectangle previousResizeRect = new Rectangle();
 
     //compute the delta to be applied to the position of pasted objects
     if (startPastingPoint.x == 0 || startPastingPoint.y == 0) { 
-      System.err.println("setto a 300, 300");
+      //System.err.println("setto a 300, 300");
       startPastingPoint.setLocation(300, 300);
     }
     fo = (FtsObject)(objectVector.elementAt(0));
@@ -826,6 +834,8 @@ Rectangle previousResizeRect = new Rectangle();
 	ResetConnect();
       }
     }
+
+    editStatus = DOING_NOTHING;
     paintDirtyList();
     return true;
   }
@@ -963,13 +973,14 @@ Rectangle previousResizeRect = new Rectangle();
     
     aObject.Init(this, x, y, "");
     itsElements.addElement(aObject);
-    aObject.DoublePaint();
-    //CopyTheOffScreen(getGraphics());
+    //System.err.println("dirty list: "+dirtyInOutlets.size()+" inoutlets"+
+    //		       dirtyConnections.size()+" connections"+
+    //		       dirtyObjects.size()+" objects");
+    paintDirtyList();
     if(itsAddObjectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
       itsPatcherElements.addElement(aObject);
     if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
   }
-
 
 
 
@@ -981,6 +992,7 @@ Rectangle previousResizeRect = new Rectangle();
   }
 
   public void mousePressed(MouseEvent e){
+    
     MaxApplication.setCurrentWindow(itsSketchWindow);
     itsSketchWindow.requestFocus();//???
     
@@ -1020,6 +1032,11 @@ Rectangle previousResizeRect = new Rectangle();
       else{
 	if (!itsCurrentInOutlet.GetSelected()) {// no previously selected
 	  itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
+	  editStatus = START_CONNECT;
+	  startConnectPoint.setLocation(itsCurrentInOutlet.GetAnchorPoint());
+	  currentConnectPoint.setLocation(startConnectPoint);
+	  previousConnectPoint.setLocation(startConnectPoint);
+	  setCursor(Cursor.getDefaultCursor());
 	}
 	else {
 	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
@@ -1059,6 +1076,7 @@ Rectangle previousResizeRect = new Rectangle();
   }
        
   public void mouseReleased(MouseEvent e){
+    
     int x = e.getX();
     int y = e.getY();
 
@@ -1067,12 +1085,30 @@ Rectangle previousResizeRect = new Rectangle();
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode) {
-
       if (itsStartDragObject != null) itsStartDragObject.MouseUp(e, x, y);
       itsStartDragObject = null;
       return;
     }
-    if (editStatus == AREA_SELECT) {
+
+    if (editStatus == START_CONNECT) {
+      if (itsHelper.IsInInOutLet(x,y)) {
+	if (itsCurrentInOutlet == itsConnectingLet) return;
+ 	if (!itsCurrentInOutlet.GetSelected()) {// no previously selected
+	  itsCurrentInOutlet.GetOwner().ConnectionRequested(itsCurrentInOutlet);
+	  setCursor(Cursor.getDefaultCursor());
+	}
+	else {
+	  itsCurrentInOutlet.GetOwner().ConnectionAbort(itsCurrentInOutlet, false); 
+	}
+      }
+      else { //mouse up while dragging lines, out of a in/outlet. Abort
+	currentConnectPoint.setLocation(0,0);
+	startConnectPoint.setLocation(0,0);
+	previousConnectPoint.setLocation(0,0);
+	CopyTheOffScreen(getGraphics());
+      }
+    }
+    else if (editStatus == AREA_SELECT) {
 
       Rectangle aRect = itsHelper.NormalizedRect(currentRect);
       if (!aRect.isEmpty()) { 
@@ -1124,6 +1160,7 @@ Rectangle previousResizeRect = new Rectangle();
 	      if(clickHappenedOnAnAlreadySelected) {
 		itsHelper.deselectAll(true);
 		itsSelectedList.addElement(itsCurrentObject);
+		((ErmesObjEditableObject)itsCurrentObject).backupText();
 		((ErmesObjEditableObject)itsCurrentObject).RestartEditing();
 	      }
 	    }
@@ -1271,6 +1308,9 @@ Rectangle previousResizeRect = new Rectangle();
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListener--inizio
 
+  Point startConnectPoint = new Point();
+  Point previousConnectPoint = new Point();
+  Point currentConnectPoint = new Point();
   public void mouseDragged(MouseEvent e){
 
     Rectangle aRect;
@@ -1284,7 +1324,18 @@ Rectangle previousResizeRect = new Rectangle();
 
     DynamicScrolling(x, y);
     
-    if(editStatus == AREA_SELECT) {
+    if (editStatus == START_CONNECT) {
+      currentConnectPoint.setLocation(x, y);
+      update(getGraphics());
+      if (itsHelper.IsInInOutLet(x, y)) {
+	if (itsCurrentInOutlet != itsConnectingLet)
+	  setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      } else 
+	if (itsSketchWindow.getCursor() != Cursor.getDefaultCursor()) 
+	  setCursor(Cursor.getDefaultCursor());
+      return;
+    }
+    else if(editStatus == AREA_SELECT) {
       if((java.lang.Math.abs(x-currentPoint.x)<5)||(java.lang.Math.abs(y-currentPoint.y)<5)) 
 	return;
       if(x>currentPoint.x) 
@@ -1320,7 +1371,7 @@ Rectangle previousResizeRect = new Rectangle();
       return;
     } 
     else if (editStatus == MOVING){
-      repaint();
+      //repaint();
       if(itsStartInclusionRect.x+(x-itsStartMovingPt.x)>=0)
 	currentMouseX = x;
       if(itsStartInclusionRect.y+(y-itsStartMovingPt.y)>=0)
@@ -1441,8 +1492,9 @@ Rectangle previousResizeRect = new Rectangle();
 	}
 	ResetConnect();
       }
-      else itsConnectingObj.ConnectionAbort(itsConnectingLet, true);
-      
+      else {
+	itsConnectingObj.ConnectionAbort(itsConnectingLet, true);
+      }
       if(theRequester!=itsConnectingLet){
 	//selection of new outlet
 	itsConnectingObj = theObject;
@@ -1462,6 +1514,8 @@ Rectangle previousResizeRect = new Rectangle();
 	ResetConnect();
       }
     }
+
+    editStatus = DOING_NOTHING;
     return true;
   }
   
@@ -1706,7 +1760,20 @@ Rectangle previousResizeRect = new Rectangle();
   boolean erased1 = false;
 
   public void update(Graphics g) {
-    if (editStatus == AREA_SELECT) {
+    if (editStatus == START_CONNECT) {
+      if (!erased) {
+	g.setColor(Color.black);
+	g.setXORMode(sketchColor);
+	g.drawLine(startConnectPoint.x, startConnectPoint.y, 
+		   previousConnectPoint.x, previousConnectPoint.y);
+	erased = true;
+      }
+      g.drawLine(startConnectPoint.x, startConnectPoint.y,
+		 currentConnectPoint.x, currentConnectPoint.y);
+      previousConnectPoint.setLocation(currentConnectPoint);
+      erased = false;
+    }
+    else if (editStatus == AREA_SELECT) {
            //faster version
       if (!erased) {
 	g.setColor(Color.black);

@@ -22,6 +22,7 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
   static Dimension preferredSize;
   boolean itsAlreadyMoveIn = false;
   Rectangle currentBounds = new Rectangle();
+  Rectangle currentSensibleBounds = new Rectangle();
   Point itsAnchorPoint = new Point();
   
 
@@ -113,6 +114,14 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
     return currentBounds;
   }
   
+  public Rectangle getSensibleBounds() {
+    if (IsInlet()) currentSensibleBounds.setBounds(itsX-2, itsY+4, preferredSize.width+4, preferredSize.height);
+    else {
+      currentSensibleBounds.setBounds(itsX-2, itsY-4,preferredSize.width+4, preferredSize.height);
+    }
+    return currentSensibleBounds;
+  }
+
   //--------------------------------------------------------
   //	SetConnected
   //--------------------------------------------------------

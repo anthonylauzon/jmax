@@ -60,13 +60,14 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       itsSketchPad.itsHelper.DeleteConnectionByInOut(objFrom, outletFrom, objTo, inletTo, false);
       itsPatcher.watch("deleteConnection", this);
     }
-    itsSketchPad.paintDirtyList();
+    if (!pasting) itsSketchPad.paintDirtyList();
   }
 
   
   FtsSelection itsSelection;
   Vector ftsObjectsPasted = new Vector();
   Vector ftsConnectionsPasted = new Vector();
+  boolean pasting = false;
   public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
   //  public ErmesObject itsOwner;//in case this is a subpatcher
   public boolean isAbstraction = false;
@@ -365,6 +366,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
     ftsObjectsPasted.removeAllElements();
     ftsConnectionsPasted.removeAllElements();
+    pasting = true;
     //evaluate the script
     itsPatcher.watch("newObject", this);
     itsPatcher.watch("newConnection", this);
@@ -380,7 +382,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
     itsPatcher.removeWatch("newObject", this);    
     itsPatcher.removeWatch("newConnection", this);    
-
+    pasting = false;
     // make the sketch do the graphic job
     itsSketchPad.PasteObjects(ftsObjectsPasted, ftsConnectionsPasted);
     ErmesSketchPad.RequestOffScreen(itsSketchPad);

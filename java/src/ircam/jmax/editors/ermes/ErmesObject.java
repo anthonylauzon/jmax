@@ -7,6 +7,7 @@ import java.util.*;
 import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.utils.GlobalProbe;
 
 /**
  * The base class of all the graphic objects on the sketch.
@@ -103,7 +104,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     // do nothing
   }
   
-  public synchronized void Paint_specific(Graphics g) {}  
+  protected synchronized void Paint_specific(Graphics g) {}  
   public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
   public void ChangeFont(Font theFont) {
     itsFont = theFont;
@@ -161,19 +162,28 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   public  void Paint(Graphics g)
   {
     if(!itsSketchPad.itsGraphicsOn)return;
-    Paint_specific(g);
+    if (itsSketchPad.isInGroup) {
+      //emergency situation: ignore the Graphics and paint offScreen 
+      Paint_specific(itsSketchPad.GetOffGraphics());
+      itsSketchPad.drawPending = true;
+    }
+    else Paint_specific(g);
+    /*old code
+      if(!itsSketchPad.itsGraphicsOn)return;
+      else Paint_specific(g);
+      */
   }
 
 
   protected void DoublePaint() {
-    //this double paint is usefull when an object schange its state in run mode
+    //this double paint is usefull when an object change its state in run mode
     Graphics aGraphics = itsSketchPad.getGraphics();
 
     if (aGraphics != null) {	
       Paint(aGraphics);	
     }
 
-    if (itsSketchPad.offScreenPresent)
+    if (itsSketchPad.offScreenPresent && !itsSketchPad.itsRunMode)
       Paint(itsSketchPad.GetOffGraphics());
   }
 	
@@ -213,13 +223,12 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     if (n_inlts > 1) in_local_distance = (aRect.width-10)/(n_inlts-1) ;
     if (n_outlts > 1) out_local_distance = (aRect.width-10)/(n_outlts-1) ;
     
-    Graphics g = itsSketchPad.getGraphics();
-    Graphics offGraphics = itsSketchPad.GetOffGraphics();
     if (n_inlts > old_ninlts) {	//we added inlets...
       for (i=0; i< n_inlts; i++) {
 	if (i<old_ninlts) {
 	  aErmesObjInlet = (ErmesObjInlet) itsInletList.elementAt(i);
 	  aErmesObjInlet.MoveTo(itsX+2+(i)*in_local_distance, aErmesObjInlet.itsY);
+	  itsSketchPad.markSketchAsDirty();
 	}
 	else {
 	  if (this instanceof ircam.jmax.editors.ermes.ErmesObjOut) 
@@ -227,6 +236,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 	  else aErmesObjInlet = new ErmesObjInlet(i, this, itsX+2+(i)*in_local_distance, itsY);
 	  itsInletList.addElement(aErmesObjInlet);
 	  itsSketchPad.AddInlet(aErmesObjInlet);
+	  itsSketchPad.addToDirtyInOutlets(aErmesObjInlet);
 	}
       }
     }
@@ -237,17 +247,17 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 	if (i<n_inlts){
 	  aErmesObjInlet = (ErmesObjInlet) itsInletList.elementAt(i);
 	  aErmesObjInlet.MoveTo(itsX+2+(i)*aHDist,aErmesObjInlet.itsY);
-	  if (offGraphics!= null) aErmesObjInlet.Repaint(false); 
+	  itsSketchPad.markSketchAsDirty();
 	}
 	else{
 	  //erase the inlet, and the associated connections
 	  aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt(itsInletList.size()-1);
 	  itsInletList.removeElementAt(itsInletList.size()-1);
 	  itsSketchPad.RemoveInlet(aErmesObjInlet);
-	  //we should remove the connections. How?
+	  itsSketchPad.markSketchAsDirty();
 	}
       }
-      itsSketchPad.paintDirtyList();
+      //yahooitsSketchPad.paintDirtyList();
     }
     
 /////////    
@@ -260,10 +270,12 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
        else aErmesObjOutlet = new ErmesObjOutlet(i,this,itsX,itsY);
        itsOutletList.addElement(aErmesObjOutlet);
        itsSketchPad.AddOutlet(aErmesObjOutlet);
+       itsSketchPad.addToDirtyInOutlets(aErmesObjOutlet);
      }
      for (i=0; i<itsOutletList.size(); i++) {
        aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
        aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
+       if (old_noutlts > 0 && old_noutlts != n_outlts) itsSketchPad.markSketchAsDirty();
      }
     }
     else if (n_outlts <= old_noutlts) { //we reduced the number of outlets
@@ -273,20 +285,22 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 	itsOutletList.removeElementAt(size);
 	itsSketchPad.RemoveOutlet(aErmesObjOutlet);
 	size--;
+	itsSketchPad.markSketchAsDirty();
       }
       if(n_outlts>1) aHDist = (currentRect.width-10)/(n_outlts-1);
       else aHDist = 0;
       for (i=0;i<n_outlts;i++){
 	aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
 	aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
+	itsSketchPad.markSketchAsDirty();
       }
     }
-    
+   
     //prepare to be waked up when values change
     if(NeedPropertyHandler()){
       itsFtsObject.watch("value", this);
     }
-    if (offGraphics!=null) PaintComplete();
+    //if (offGraphics!=null) PaintComplete();
   }
   
   public boolean NeedPropertyHandler(){
@@ -315,6 +329,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     makeFtsObject();
     if (itsFtsObject == null) return false;
     else update(itsFtsObject);
+    itsSketchPad.addToDirtyObjects(this);
     return true;
   }
 
@@ -477,7 +492,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   public boolean MouseDown(MouseEvent e,int x, int y) {
     if (!itsSketchPad.itsRunMode){
       if((e.getClickCount()>1)&&(e.isShiftDown())) {
-	RestoreDimensions();
+	RestoreDimensions(true);
 	return true;
       }
       else 
@@ -504,7 +519,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 	boolean wrongHeight = (java.lang.Math.abs(y-currentRect.y)<getMinimumSize().height) ||
 	  (y<currentRect.y);
 
-	if (wrongWidth && wrongHeight) RestoreDimensions();
+	if (wrongWidth && wrongHeight) RestoreDimensions(true);
 	else if(wrongWidth) {
 
 	  Resize(getMinimumSize().width - currentRect.width, y-itsInitY);
@@ -534,9 +549,11 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     return false;
   }
   
-  public void RestoreDimensions(){
+  public void RestoreDimensions(boolean paintNow){
+    //possible optimization: don't repaint if nothing changes
     Resize(getMinimumSize().width - currentRect.width, getMinimumSize().height-currentRect.height);
-    itsSketchPad.repaint();
+     if (paintNow) itsSketchPad.repaint();
+     else itsSketchPad.addToDirtyObjects(this);
   }
 	
   public void ResizeToText(int theDeltaX, int theDeltaY){

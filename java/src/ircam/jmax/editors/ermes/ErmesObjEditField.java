@@ -37,8 +37,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     else itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
     itsOwner.itsInEdit = false;
 
-    if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
+    /*if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());*/
     itsOwner = null;  
   }
 
@@ -53,17 +53,12 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
       itsSketchPad.itsSketchWindow.requestFocus();
     }
-    //try to test if this lost foscus happens in the following conditions:
-    // an object was put on the sketchpad without writing into it
-    // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
     String aTextString = getText();
     if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
       AbortEdit();
       return true; 
     }
-    //try to test if the object was already instantiated; in case, delete the object... (how?)
-    
-    //qui si prova a togliere gli spazi in fondo dalla parola....
+
     if(aTextString.endsWith(" ")){
       while(aTextString.endsWith(" ")){
 	aTextString = aTextString.substring(0, aTextString.length()-1);
@@ -89,7 +84,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	itsOwner.ParseText(aTextString);
 	
 	itsOwner.redefineFtsObject();
-
       }
     }
     else {
@@ -101,32 +95,30 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       itsOwner.makeFtsObject();
     }
         
-    itsOwner.UpdateOnly(itsSketchPad.GetOffGraphics());//
+    //itsOwner.UpdateOnly(itsSketchPad.GetOffGraphics());//
 
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
-
-    //#@!if(!itsOwner.itsResized){
-      Dimension d1 = itsOwner.Size();
-      d1.width = lenght+2*itsOwner.WIDTH_DIFF+10;
-      itsOwner.setSize(d1.width, d1.height);
-      //#@!}
     int height = getFontMetrics(getFont()).getHeight()*itsOwner.itsParsedTextVector.size();
-    //#@!if(!itsOwner.itsResized){
-      Dimension d2 = itsOwner.Size();
-      d2.height = height+2*itsOwner.HEIGHT_DIFF;
-      itsOwner.setSize(d2.width, d2.height);
-      if(itsOwner.itsOutletList.size()>0)
-	itsOwner.MoveOutlets();
-      //#@!}
-    //itsOwner.Repaint();
-    itsOwner.update(itsOwner.itsFtsObject);
+    Dimension d1 = itsOwner.Size();
+    d1.width = lenght+2*itsOwner.WIDTH_DIFF+10;
+    d1.height = height+2*itsOwner.HEIGHT_DIFF;    
+//itsOwner.setSize(d1.width, d1.height);
+    itsOwner.Resize1(d1.width, d1.height); 
+    //first idea:itsOwner.Resize(d1.width-itsOwner.currentRect.width, d1.height-itsOwner.currentRect.height);
+
     
-    //itsSketchPad.SaveOneElementRgn(itsOwner);
-
-    AbortEdit();
-
+    if(itsOwner.itsOutletList.size()>0)
+      itsOwner.MoveOutlets();
+      
+    
+    itsOwner.update(itsOwner.itsFtsObject);
+    itsOwner.itsSketchPad.markSketchAsDirty();
+    itsOwner.itsSketchPad.paintDirtyList();
     setRows(2);
     setColumns(20);
+
+    AbortEdit(); //after this, itsOwner = null.
+
     return true;       
   }
 	
@@ -173,7 +165,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
 	setRows(getRows()+1);
 	Dimension d2 = itsOwner.Size();
-	itsOwner.setSize(d2.width, d2.height+fm.getHeight());
+	itsOwner.Resize1(d2.width, d2.height+fm.getHeight());
+	itsSketchPad.repaint();
 	if(itsOwner.itsOutletList.size()>0)
 	  itsOwner.MoveOutlets();
 	setSize(getSize().width, getSize().height + fm.getHeight());
@@ -208,7 +201,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	  if(aWidth>20) step = aWidth;
 	  else step = 30;
   
-	  itsOwner.setSize(itsOwner.Size().width+step, itsOwner.Size().height);
+	  itsOwner.Resize1(itsOwner.Size().width+step, itsOwner.Size().height);
+	  itsSketchPad.repaint();
 	  setSize(getSize().width+step, getSize().height);
 	  requestFocus();
 	} 

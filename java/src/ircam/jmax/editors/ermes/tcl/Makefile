@@ -87,6 +87,10 @@ ErmesShowCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesShowCmd.java)
 .PHONY: ErmesShowCmd
 
+GlobalProbeCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) GlobalProbeCmd.java)
+.PHONY: GlobalProbeCmd
+
 TclErmesPackage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclErmesPackage.java)
 .PHONY: TclErmesPackage
