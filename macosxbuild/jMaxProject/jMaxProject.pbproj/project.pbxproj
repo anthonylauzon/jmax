@@ -445,6 +445,7 @@
 				F526F3FF03EA8FA3016640F1,
 				F567FA7703FC1B4B016640F1,
 				F7E5D349043B319501664058,
+				F783BA96043D971401664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2433,6 +2434,18 @@
 		};
 		F77A695C03FA79FF01664058 = {
 			fileRef = F77A695B03FA79FF01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F783BA95043D971401664058 = {
+			isa = PBXFileReference;
+			name = clientmanager.c;
+			path = ../../fts/clientmanager.c;
+			refType = 2;
+		};
+		F783BA96043D971401664058 = {
+			fileRef = F783BA95043D971401664058;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -13366,6 +13379,7 @@
 				F880FD4D0282FA3901664092,
 				F880FD4E0282FA3901664092,
 				F880FD4F0282FA3901664092,
+				F783BA95043D971401664058,
 				F880FD500282FA3901664092,
 				F52946EA039E799A01664092,
 				F880FD510282FA3901664092,
