@@ -1,5 +1,7 @@
 2003-10-27  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/ispw/c/src/deltable.h: fixed bug "[ 822062 ] delay~.help.jmax patch has problems".
+
 	* fts/package.c (__fts_package_save): fixed bug "[ 830993 ] cannot create new project".
 	Package are saved if filename have changed.
 
