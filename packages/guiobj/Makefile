@@ -48,6 +48,7 @@ install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
 	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj/guiobj.jpk
 	$(INSTALL_DATA) guiobj.scm $(lib_install_dir)/packages/guiobj/guiobj.scm
+	( cd images; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
 	( cd c; $(MAKE) $@)
