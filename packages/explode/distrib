@@ -1,5 +1,5 @@
-all	all		help
 all	all		explode.jpk
+all	all		help
 all	all     	java/classes/explode.jar
 all	all		images
 all	irix62r4k	c/lib/irix62r4k/opt/libexplode.so

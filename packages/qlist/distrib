@@ -1,7 +1,7 @@
 all	all     qlist.jpk
+all	all	help
 all	all     java/classes/qlist.jar
 all	all	help/qlist.help.jmax
-
 all	irix62r4k	c/lib/irix62r4k/opt/libqlist.so
 all	irix63r10k	c/lib/irix63r10k/opt/libqlist.so
 all	irix63r5k	c/lib/irix63r5k/opt/libqlist.so

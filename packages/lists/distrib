@@ -1,7 +1,6 @@
 all	all	help
 all	all	templates
 all	all	lists.jpk
-
 all	irix62r4k	lib/irix62r4k/opt/liblists.so
 all	irix63r10k	lib/irix63r10k/opt/liblists.so
 all	irix63r5k	lib/irix63r5k/opt/liblists.so
