@@ -38,11 +38,19 @@ clean:
 
 all_java:
 	(cd java ; $(MAKE) all)
-.PHONY: all
+.PHONY: all_java
 
 clean_java:
 	(cd java ; $(MAKE) clean)
-.PHONY: clean
+.PHONY: clean_java
+
+all_c:
+	(cd c ; $(MAKE) all)
+.PHONY: all_c
+
+clean_c:
+	(cd c ; $(MAKE) clean)
+.PHONY: clean_c
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
