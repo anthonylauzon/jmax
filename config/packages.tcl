@@ -28,20 +28,26 @@
 ## Packages installed by default in this site
 ##
 
-# ISPW classes
-package require ispw
-package require ispwmath
-package require table
-package require qlist
-package require explode
+global jmaxCompatibility
+
+if {$jmaxCompatibility == "ispw"} { 
+  package require ispwmath
+} else {
+  package require math
+}
 
 # new classes
-#package require math
 package require data
 package require control
 package require mess
 package require numeric
 package require lists
+
+# ISPW classes
+package require ispw
+package require table
+package require qlist
+package require explode
 
 # I/O package
 package require io
