@@ -35,6 +35,9 @@
 #define DEFAULT_FIFO_SIZE 256
 #define DEFAULT_CHANNELS 2
 
+#define MAX_NUMBER_OF_DEVICE 100 /* if you change this, change in memory allocation in ossaudiomanager_scan_dev_name */
+/* by the way, I think if you have more than 100 audiocards, it's a bit strange .... */
+
 typedef struct {
   fts_audioport_t head;
   fts_symbol_t device_name;
@@ -48,30 +51,46 @@ typedef struct {
   int no_xrun_message_already_posted;
 } ossaudioport_t;
 
-static fts_symbol_t s_slash_dev_slash_audio;
-static fts_symbol_t s_slash_dev_slash_dsp;
 
 static fts_symbol_t s_read_only;
 static fts_symbol_t s_write_only;
 
 fts_class_t* ossaudioport_type = NULL;
 
+static void
+ossaudiomanager_scan_dev_name(const char* devname)
+{
+  fts_audioport_t* port;
+  fts_atom_t at;
+  fts_symbol_t devicename = 0;
+  int count = 0;
+
+  int newdevlength=  strlen(devname) + 1 + 2; /* length devname + \0 + "[0-9][0-9] " */
+  char* newdevname = (char*)malloc(newdevlength * sizeof(char));
+  
+  newdevname = strncpy(newdevname, devname, newdevlength);
+
+  devicename = fts_new_symbol(newdevname);
+
+  while ((fts_file_exists(devicename))
+	 && (count < MAX_NUMBER_OF_DEVICE))
+  {
+    fts_set_symbol(&at, devicename);
+    port = (fts_audioport_t*)fts_object_create(ossaudioport_type, 1, &at);
+    fts_audiomanager_put_port(devicename, port);
+    snprintf(newdevname + strlen(devname), 3, "%d", count);
+    devicename = fts_new_symbol(newdevname);
+    count++;
+  }
+
+  free(newdevname);
+}
 
 static void
 ossaudiomanager_scan_devices()
 {
-  /* Dummy function */
-  fts_audioport_t* port;
-  fts_atom_t at;
-
-  fts_set_symbol(&at, s_slash_dev_slash_audio);
-  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, 1, &at);
-  fts_audiomanager_put_port(s_slash_dev_slash_audio, port);
-
-  fts_set_symbol(&at, s_slash_dev_slash_dsp);
-  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, 1, &at);
-  fts_audiomanager_put_port(s_slash_dev_slash_dsp, port);
-
+  ossaudiomanager_scan_dev_name("/dev/dsp");
+  ossaudiomanager_scan_dev_name("/dev/audio");
 }
 
 /**
@@ -183,7 +202,7 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   sample_rate = (int)sr ;
 
   /* FIXME */
-  device_name = s_slash_dev_slash_audio;
+  device_name = self->device_name;
   channels = DEFAULT_CHANNELS;
   flags = O_RDWR;
 
@@ -340,8 +359,6 @@ void ossaudioport_config( void)
 {
   fts_symbol_t s = fts_new_symbol("ossaudioport");
 
-  s_slash_dev_slash_audio = fts_new_symbol( "/dev/audio");
-  s_slash_dev_slash_dsp = fts_new_symbol( "/dev/dsp");
   s_read_only = fts_new_symbol( "read_only");
   s_write_only = fts_new_symbol( "write_only");
 
