@@ -1,0 +1,7 @@
+provided-package         = reftype
+name                     = reftype
+version                  = 0.0.0
+description              = reference types
+required-package         : jmax
+module-path              = $(dir)/c/lib/$(arch)/$(mode)
+module                   : reftype

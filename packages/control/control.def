@@ -1,0 +1,8 @@
+provided-package         = control
+name                     = control
+version                  = 0.0.0
+description              = control classes
+required-package         : jmax
+module-path              = $(dir)/c/lib/$(arch)/$(mode)
+module                   : control
+script                   = $(dir)/control.scm

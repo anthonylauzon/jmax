@@ -1,0 +1,20 @@
+provided-package         = ispw
+name                     = ispw
+version                  = 0.0.0
+description              = ISPW standard class library
+required-package         : jmax
+required-package         : reftype
+module-path              = $(dir)/lib/$(arch)/$(mode)
+module                   : ispw_control
+module                   : ispw_data
+module                   : ispw_filters
+module                   : ispw_io
+module                   : ispw_midi
+module                   : ispw_sampling
+module                   : ispw_pitch
+module                   : ispw_signal
+script                   = $(dir)/ispw.scm
+abstraction-directory    = $(dir)/abs/compatibility
+template-directory       = $(dir)/templates/compatibility
+template-directory       = $(dir)/templates/extensions
+data-directory           = $(dir)/sounds

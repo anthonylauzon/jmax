@@ -1,0 +1,8 @@
+provided-package         = guiobj
+name                     = guiobj
+version                  = 0.0.0
+description              = The jMax package
+required-package         : jmax
+module-path              = $(dir)/c/lib/$(arch)/$(mode)
+module                   : guiobj
+script                   = $(dir)/help/guiobj.help.index.scm

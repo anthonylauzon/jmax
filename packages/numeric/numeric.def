@@ -1,0 +1,8 @@
+provided-package         = numeric
+name                     = numeric
+version                  = 0.0.0
+description              = numeric classes
+required-package         : jmax
+module-path              = $(dir)/c/lib/$(arch)/$(mode)
+module                   : numeric
+script                   = $(dir)/numeric.scm

@@ -1,0 +1,8 @@
+provided-package         = sgidev
+name                     = sgidev
+version                  = 0.0.0
+description              = SGI devices
+required-package         : jmax
+module-path              = $(dir)/c/lib/$(arch)/$(mode)
+module                   : sgidev
+
