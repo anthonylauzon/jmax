@@ -13,10 +13,10 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include <ieeefp.h>
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/mess/fpe.h"
 #include "lang/utils.h"
 #include "lang/datalib.h"
 #include "lang/ftl.h"
@@ -1103,7 +1103,7 @@ static int ftl_check_nan_buffers( int n, struct buffer_info *infos)
       vector = infos[i].buffer;
 
       for ( j = 0; j < infos[i].size; j++)
-	if (isnanf( vector[j]))
+	if (fts_isnanf( vector[j]))
 	  {
 	    post_vector(infos[i].size, vector);
 	    
