@@ -1,10 +1,8 @@
-all	irix62r4k	irix62r4k
 all	irix63r5k	irix63r5k
 all	irix63r10k	irix63r10k
 all	irix65r4k	irix65r4k
 all	irix65r5k	irix65r5k
 all	irix65r10k	irix65r10k
-all	sgi		irix62r4k
 all	sgi		irix63r5k
 all	sgi		irix63r10k
 all	sgi		irix65r4k
