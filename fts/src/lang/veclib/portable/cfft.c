@@ -15,7 +15,7 @@ fft_lookup_t *the_fft_lookups = (fft_lookup_t *)0;
  *         see routine: generate_fft_coefficients()
  *
  */
-void cfft_inplc(complex *buf, complex *coef, long nstep, long npoints)
+void cfft_inplc(complex * restrict buf, complex * restrict coef, long nstep, long npoints)
 {
   long log2;
   long m, n;
