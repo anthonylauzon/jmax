@@ -172,7 +172,7 @@ PREDEF_SYMBOL( fts_s_greater_equal, ">=")
 PREDEF_SYMBOL( fts_s_smaller, "<")
 PREDEF_SYMBOL( fts_s_smaller_equal, "<=")
 PREDEF_SYMBOL( fts_s_conditional, "?")
-PREDEF_SYMBOL( fts_s_column, ":")
+PREDEF_SYMBOL( fts_s_colon, ":")
 PREDEF_SYMBOL( fts_s_equal, "=")
 
 /* FTS Data  */
