@@ -245,6 +245,9 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
      the object, if one of this variables have been redefined. */
   fts_expression_add_variables_user( expression, patcher, obj);
 
+  if (obj && fts_object_get_description_size(obj) == 0)
+    fts_object_set_description( obj, new_ac, new_at);
+
   fts_expression_delete(expression);
 
   return obj;

@@ -352,23 +352,20 @@ static void expression_stack_init( fts_expression_t *exp)
 /*
  * Utility functions for creating objects
  */
-static fts_object_t *create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at, int offset)
+static fts_object_t *create_instance_in_package( fts_package_t *package, fts_patcher_t *patcher, fts_symbol_t class_name, int ac, const fts_atom_t *at)
 {
   fts_template_t *template;
   fts_class_t *cl;
   fts_object_t *obj = NULL;
 
   if ((template = fts_package_get_declared_template( package, class_name)) != NULL)
-    obj = fts_template_make_instance( template, patcher, ac-offset, at+offset);
+    obj = fts_template_make_instance( template, patcher, ac, at);
 
   if ((cl = fts_package_get_class( package, class_name)) != NULL)
-    obj = fts_object_create( cl, patcher, ac-offset, at+offset);
+    obj = fts_object_create( cl, patcher, ac, at);
 
   if ((template = fts_package_get_template_in_path( package, class_name)) != NULL)
-    obj = fts_template_make_instance( template, patcher, ac-offset, at+offset);
-
-  if (obj && fts_object_get_description_size(obj) == 0)
-    fts_object_set_description( obj, ac, at);
+    obj = fts_template_make_instance( template, patcher, ac, at);
 
   return obj;
 }
@@ -390,7 +387,7 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 
       pkg = fts_package_get( package_name);
       if (pkg != NULL)
-	return create_instance_in_package( pkg, patcher, class_name, ac, at, 3);
+	return create_instance_in_package( pkg, patcher, class_name, ac-3, at+3);
 
       return NULL;
     }
@@ -399,12 +396,12 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 
   /* 1) ask kernel package */
   pkg = fts_get_system_package();
-  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2)) != NULL)
+  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2)) != NULL)
     return obj;
 
   /* 2) ask the current package */
   pkg = fts_get_current_package();
-  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2)) != NULL)
+  if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2)) != NULL)
     return obj;
 
   /* 3) ask the required packages of the current package */
@@ -420,7 +417,7 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
       if (pkg == NULL)
 	continue;
 
-      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac, at, 2)) != NULL)
+      if ((obj = create_instance_in_package( pkg, patcher, class_name, ac-2, at+2)) != NULL)
 	return obj;
   }
 
