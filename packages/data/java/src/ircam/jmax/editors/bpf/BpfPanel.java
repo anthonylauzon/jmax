@@ -46,20 +46,19 @@ import ircam.jmax.editors.bpf.tools.*;
    */
 public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSelectionListener, ScrollManager {
     
-    EditorToolbar toolbar;
+    /*EditorToolbar toolbar;
+      public InfoPanel statusBar;*/
+
     FtsBpfObject bpfData;
     EditorContainer itsContainer;
-    public InfoPanel statusBar;
+
     public BpfRuler ruler;
     
     Box trackPanel;
-    //JScrollPane scrollTracks;
-    
     //---
-    JLabel itsZoomLabel;
     JScrollBar itsTimeScrollbar;
     Geometry geometry;
-    ToolManager manager;
+    BpfToolManager manager;
 
     public final int INITIAL_ZOOM = 20;
     public static final int MINIMUM_TIME = 10000;
@@ -98,11 +97,11 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     //- Create a toolbar associated to this ToolManager
     //- Create a status bar containing the toolbar
     
-    manager = new ToolManager(BpfTools.instance);    
+    manager = new BpfToolManager(BpfTools.instance);    
 
-    toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize(180, 25);    
-    toolbar.setPreferredSize(new Dimension(180, 25));    
+    /*toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
+      toolbar.setSize(180, 25);    
+      toolbar.setPreferredSize(new Dimension(180, 25));*/    
     Tool arrow = manager.getToolByName("arrow");     
     manager.activate(arrow, null); //we do not have a gc yet...
     
@@ -128,33 +127,33 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     //------------------ prepares the Status bar    
     Box northSection = new Box(BoxLayout.Y_AXIS);
     
-    statusBar = new InfoPanel();
+    /*statusBar = new InfoPanel();
       
-    manager.addToolListener(new ToolListener() {
-	    public void toolChanged(ToolChangeEvent e) 
-	    {
+      manager.addToolListener(new ToolListener() {
+      public void toolChanged(ToolChangeEvent e) 
+      {
 		
-		if (e.getTool() != null) 
-		    {
-			statusBar.post(e.getTool(), "");
-		    }
-	    }
-	});
+      if (e.getTool() != null) 
+      {
+      statusBar.post(e.getTool(), "");
+      }
+      }
+      });
     
-    statusBar.setSize(300, 30);
+      statusBar.setSize(300, 30);
 
-    JPanel toolbarPanel = new JPanel();
-    toolbarPanel.setSize(228, 25);
-    toolbarPanel.setPreferredSize(new Dimension(228, 25));
-    toolbarPanel.setLayout(new BorderLayout());
-    toolbarPanel.add(toolbar, BorderLayout.CENTER);
-    toolbarPanel.validate();
-    statusBar.addWidgetAt(toolbarPanel, 2);
-    statusBar.validate();
+      JPanel toolbarPanel = new JPanel();
+      toolbarPanel.setSize(228, 25);
+      toolbarPanel.setPreferredSize(new Dimension(228, 25));
+      toolbarPanel.setLayout(new BorderLayout());
+      toolbarPanel.add(toolbar, BorderLayout.CENTER);
+      toolbarPanel.validate();
+      statusBar.addWidgetAt(toolbarPanel, 2);
+      statusBar.validate();
+
+      northSection.add(statusBar);*/
 
     ruler.setSize(300, 20);
-
-    northSection.add(statusBar);
     northSection.add(ruler);	
     container_panel.add(northSection, BorderLayout.NORTH);
 
@@ -167,7 +166,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom)
 	    {
-		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
+		//statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
 		BpfPoint lastPoint = bpfData.getLastPoint();
 		if(lastPoint!=null)
@@ -191,7 +190,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	    geometry.setXTransposition(-currentTime);	    
 	}
     });
- 
+
     container_panel.add(itsTimeScrollbar, BorderLayout.SOUTH);
     add(container_panel, BorderLayout.CENTER);
   }

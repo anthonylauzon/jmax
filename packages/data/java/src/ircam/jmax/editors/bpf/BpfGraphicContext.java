@@ -103,12 +103,12 @@ public class BpfGraphicContext extends GraphicContext {
 			     getGraphicDestination().getSize().height);
     }
 
-  public void setToolManager(ToolManager t)
+  public void setToolManager(BpfToolManager t)
   {
     toolManager = t;
   }
 
-  public ToolManager getToolManager()
+  public BpfToolManager getToolManager()
   {
     return toolManager;
   }
@@ -123,20 +123,20 @@ public class BpfGraphicContext extends GraphicContext {
     return itsSelection;
   }
 
-    public StatusBar getStatusBar()
-    {
-	return ((Bpf) getFrame()).itsBpfPanel.statusBar;
-    }
+    /*public StatusBar getStatusBar()
+      {
+      return ((Bpf) getFrame()).itsBpfPanel.statusBar;
+      }*/
 
     public FtsBpfObject getFtsObject()
     {
 	return ((Bpf) getFrame()).bpfData;
     }
 
-    public  EditorToolbar getToolbar()
-    {
-	return ((Bpf) getFrame()).itsBpfPanel.toolbar;
-    }
+    /*public  EditorToolbar getToolbar()
+      {
+      return ((Bpf) getFrame()).itsBpfPanel.toolbar;
+      }*/
 
     public void setScrollManager(ScrollManager manager)
     {
@@ -158,7 +158,7 @@ public class BpfGraphicContext extends GraphicContext {
 
     int itsLogicalTime;
 
-    ToolManager toolManager;
+    BpfToolManager toolManager;
 
     ScrollManager scrollManager;
 }

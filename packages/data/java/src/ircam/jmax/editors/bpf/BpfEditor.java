@@ -83,7 +83,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     
     public JMenu getToolsMenu()
     {
-	return gc.getToolbar().itsMenu;
+	return gc.getToolManager().getMenu();
     }
     
     public JPopupMenu getMenu()
