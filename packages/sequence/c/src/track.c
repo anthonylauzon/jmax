@@ -798,7 +798,7 @@ track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
   else 
     {
-      if(track_type == NULL)
+      if(track_type != NULL)
 	fts_spost(stream, "<%s ", fts_class_get_name(track_type));
       else
 	fts_spost(stream, "<");

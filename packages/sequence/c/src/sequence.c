@@ -129,13 +129,6 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
   }
 }
 
-void
-sequence_set_dirty(sequence_t *sequence)
-{
-  if(sequence->persistence == 1)
-    fts_patcher_set_dirty( fts_object_get_patcher( (fts_object_t *)sequence), 1);
-}
-
 static void
 sequence_move_track(sequence_t *sequence, track_t *track, int index)
 {
@@ -149,6 +142,32 @@ sequence_move_track(sequence_t *sequence, track_t *track, int index)
     sequence_insert_track(sequence, 0, track);
 
     fts_object_release((fts_object_t *)track);
+  }
+}
+
+void
+sequence_set_dirty(sequence_t *sequence)
+{
+  if(sequence->persistence == 1)
+    fts_patcher_set_dirty( fts_object_get_patcher( (fts_object_t *)sequence), 1);
+}
+
+static void
+sequence_set_persistence(sequence_t *this, int persistence)
+{
+  track_t *track = sequence_get_first_track(this);
+  fts_atom_t a;
+
+  fts_set_int(&a, persistence);
+  
+  this->persistence = persistence;
+  fts_client_send_message((fts_object_t *)this, fts_s_persistence, 1, &a);
+
+  /* set flag of all tracks */
+  while(track != NULL)
+  {
+    track->persistence = persistence;
+    track = track->next;
   }
 }
 
@@ -511,6 +530,8 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
 }
 
+
+
 static void
 sequence_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -520,20 +541,7 @@ sequence_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   {
     /* set persistence flag */
     if(fts_is_number(at) && this->persistence >= 0)
-    {
-      track_t *track = sequence_get_first_track(this);
-      int persistence = (fts_get_number_int(at) != 0);
-
-      this->persistence = persistence;
-      fts_client_send_message(o, fts_s_persistence, 1, at);
-
-      /* set flag of all tracks */
-      while(track != NULL)
-      {
-        track->persistence = persistence;
-        track = track->next;
-      }
-    }
+      sequence_set_persistence(this, (fts_get_number_int(at) != 0));
   }
   else
   {
@@ -730,7 +738,6 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       if(fts_is_symbol(at + i))
       {
-        fts_symbol_t type_name = fts_get_symbol(at + i);
         track_t *track = (track_t *)fts_object_create(track_class, 1, at + i);
 
         if(track != NULL)
@@ -758,7 +765,6 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   while(track)
   {
     sequence_remove_track(this, track);
-
     track = sequence_get_first_track(this);
   }
 
@@ -774,6 +780,10 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, sequence_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, sequence_update_gui);
   fts_class_message_varargs(cl, fts_s_dump, sequence_dump);
+
+  /* old sequence bmax files */
+  fts_class_message_varargs(cl, fts_new_symbol("bmax_add_track"), sequence_add_track_and_update);
+  fts_class_message_varargs(cl, fts_new_symbol("bmax_add_event"), sequence_add_event_from_file);
 
   fts_class_message_varargs(cl, fts_s_upload_child, sequence_upload_child);
   fts_class_message_varargs(cl, fts_s_upload, sequence_upload);

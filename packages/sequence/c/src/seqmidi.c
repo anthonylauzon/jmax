@@ -139,16 +139,27 @@ notetrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
 	  note_set_duration(note, time - event_get_time(event));
 	  data->note_is_on[channel - 1][pitch] = 0;
 	}
-      else if(velocity != 0)
+      else if(velocity > 0)
 	{
 	  note_t *note;
 	  event_t *event;
 	  fts_atom_t a[3];
-	  
+
+          if(data->note_is_on[channel - 1][pitch] != 0)
+          {
+            event_t *event = data->note_is_on[channel - 1][pitch];
+            note_t *note = (note_t *)event_get_object(event);
+
+            note_set_duration(note, time - event_get_time(event));
+          }          
+          
 	  /* create a note */
 	  fts_set_int(a + 0, pitch);
 	  fts_set_float(a + 1, 0.0);
 	  note = (note_t *)fts_object_create(note_type, 2, a);
+
+          note_set_velocity(note, velocity);
+          note_set_channel(note, channel);
 	  
 	  /* create a new event with the note */
 	  fts_set_object(a, (fts_object_t *)note);

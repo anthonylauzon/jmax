@@ -398,6 +398,8 @@ static float GET_F(unsigned char *p)
   return f;
 }
 
+static fts_symbol_t s_sequence = 0;
+
 static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
   if (version == 1 && fts_is_symbol(at))
@@ -435,37 +437,39 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	}
 
       if(class_name == fts_s_jpatcher)
-	{
-	  obj = fts_eval_object_description(patcher, 1, a);
-	  
-	  if(ac > 1)
-	    fts_send_message_varargs(obj, fts_s_set_arguments, ac - 1, a + 1);
-	}
+      {
+        obj = fts_eval_object_description(patcher, 1, a);
+
+        if(ac > 1)
+          fts_send_message_varargs(obj, fts_s_set_arguments, ac - 1, a + 1);
+
+        return obj;
+      }
       else if(class_name == fts_s_comment)
-	{
-	  fts_atom_t s;
-	  fts_object_t *obj;
+      {
+        fts_atom_t s;
 
-	  fts_set_symbol(&s, fts_s_jcomment);
+        fts_set_symbol(&s, fts_s_jcomment);
+        obj = fts_eval_object_description(patcher, 1, &s);
 
-	  obj = fts_eval_object_description(patcher, 1, &s);
-	  
-	  if(ac > 1)
-	    fts_send_message_varargs(obj, fts_s_set, ac - 1, a + 1);
+        if(ac > 1)
+          fts_send_message_varargs(obj, fts_s_set, ac - 1, a + 1);
 
-	  return obj;
-	}
-      else if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon)
-	{
-	  /* fix bmax 1 variable definition */
-	  obj = fts_eval_object_description(patcher, ac - 2, a + 2);
+        return obj;
+      }
 
-	  fts_send_message_varargs(obj, fts_s_name, 1, a);
-	}
+      /* fix variable definition */
+      if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon && fts_is_symbol(a + 2))
+      {
+        class_name = fts_get_symbol(a + 2);
+        obj = fts_eval_object_description(patcher, ac - 2, a + 2);
+        fts_send_message_varargs(obj, fts_s_name, 1, a);
+      }
       else
 	obj = fts_eval_object_description( patcher, ac, at);
 
-      if(persistence != 0)
+      /* fix persistence (keep = yes) */
+      if(persistence > 0 || class_name == s_sequence)
 	{
 	  fts_atom_t a;
 	  
@@ -1973,4 +1977,5 @@ void
 fts_saver_config(void)
 {
   saver_dumper_type = fts_class_install(NULL, saver_dumper_instantiate);
+  s_sequence = fts_new_symbol("sequence");
 }
