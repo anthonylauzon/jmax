@@ -96,6 +96,11 @@ public class MaxWindowJMenu extends JMenu implements ListDataListener
     addMenuListener(new WindowMenuListener());
   }
 
+  public void reset()
+  {
+    toolFinders.removeListDataListener(this);    
+  }
+
   private void rebuildWindowMenuIfNeeded()
   {
     if (windowOperationCount < MaxWindowManager.getWindowManager().getWindowOperationCount())

@@ -69,6 +69,7 @@ public class ScaleTransform {
     fontName = fName;
     baseSize = bSize;
     
+    if( comp == null) return;
     initFontMetrics();
 	
     scaleX = computeScaleX();   
@@ -87,22 +88,30 @@ public class ScaleTransform {
 
   public final int scaleX( float x)
   {
-    return Math.round(x*scaleX);
+    int nx = Math.round(x*scaleX);
+    comp = null;
+    return nx;
   }
 
   public final float invScaleX( int x)
   {
-    return x*invScaleX;
+    float nx = x*invScaleX;
+    comp = null;
+    return nx;
   }
 
   public final int scaleY( float y)
   {
-    return Math.round(y*scaleY);
+    int ny = Math.round(y*scaleY);
+    comp = null;
+    return ny;
   }
 
   public final float invScaleY( int y)
   {
-    return y*invScaleY;
+    float ny = y*invScaleY;
+    comp = null;
+    return ny;
   }
 
   private float computeScaleX()

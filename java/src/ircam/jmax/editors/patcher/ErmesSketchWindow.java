@@ -308,6 +308,15 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     getContentPane().remove( itsScrollerView);
     getContentPane().remove( itsMessageLabel);
 
+    ((MaxWindowJMenu)itsWindowsMenu).reset();
+    itsWindowsMenu = null;
+    itsFileMenu.reset();
+    itsFileMenu = null;
+    itsEditMenu = null;	
+    itsTextMenu = null;
+    itsHelpMenu = null;
+
+
     itsSketchPad = null;
     itsScrollerView = null;
     itsToolBar = null;

@@ -44,6 +44,8 @@ import ircam.jmax.toolkit.actions.*;
 public class DefaultFileMenu extends EditorMenu
 {
   JMenuItem dspMenuItem;
+  ListDataListener recentFileListener;
+
   public DefaultFileMenu()
   {
     super("File");
@@ -68,7 +70,7 @@ public class DefaultFileMenu extends EditorMenu
     dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ENTER);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
   
-    JMaxApplication.getRecentFileHistory().addListDataListener(new ListDataListener(){
+    recentFileListener =  new ListDataListener(){
 	public void contentsChanged(ListDataEvent e)
 	{
 	  buildRecentFiles();
@@ -81,9 +83,15 @@ public class DefaultFileMenu extends EditorMenu
 	{
 	  buildRecentFiles();
 	}
-      });
-
+      };
+    JMaxApplication.getRecentFileHistory().addListDataListener( recentFileListener);
+    
     buildRecentFiles();
+  }
+
+  public void reset()
+  {
+    JMaxApplication.getRecentFileHistory().removeListDataListener( recentFileListener);
   }
 
   public void updateMenu()
