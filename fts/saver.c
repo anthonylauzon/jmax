@@ -1049,7 +1049,7 @@ fts_bmax_code_new_selection(fts_bmax_file_t *f, fts_object_t *obj)
 	    }
 	  else
 	    {
-	      if(fts_object_is_connection(p))
+	      if(fts_is_connection(p))
 		{
 		  if(fts_selection_connection_ends_selected(selection, (fts_connection_t *)p))
 		    fts_bmax_code_new_connection_in_selection(f, (fts_connection_t *)p, selection);

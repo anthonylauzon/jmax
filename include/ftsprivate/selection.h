@@ -33,9 +33,6 @@ typedef struct _fts_selection_t
   int objects_size;
   int objects_count;
 
-  fts_connection_t **connections;
-  int connections_size;
-  int connections_count;
 } fts_selection_t;
 
 FTS_API int fts_selection_contains_object(fts_selection_t *sel, fts_object_t *o);

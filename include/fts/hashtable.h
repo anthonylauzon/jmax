@@ -138,7 +138,6 @@ FTS_API int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, 
  * @ingroup hashtable
  */
 FTS_API int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value);
-
 /**
  * Removes specified key 
  *

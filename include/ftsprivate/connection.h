@@ -45,3 +45,4 @@ extern void fts_connection_set_type(fts_connection_t *connection, fts_connection
 
 #endif
 
+
