@@ -282,7 +282,7 @@ fts_get_default_root_directory( void)
 }
 
 fts_symbol_t 
-fts_get_user_config( void)
+fts_get_user_project( void)
 {
   char cwd[_MAX_PATH];
   char path[_MAX_PATH];
@@ -301,7 +301,7 @@ fts_get_user_config( void)
 }
 
 fts_symbol_t 
-fts_get_system_config( void)
+fts_get_system_project( void)
 {
   fts_symbol_t root;
   char win[_MAX_PATH];

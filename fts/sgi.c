@@ -61,7 +61,7 @@ fts_symbol_t fts_get_default_root_directory( void)
 }
 
 fts_symbol_t
-fts_get_user_config( void)
+fts_get_user_project( void)
 {
   char* home;
   char path[MAXPATHLEN];
@@ -76,7 +76,7 @@ fts_get_user_config( void)
 }
 
 fts_symbol_t 
-fts_get_system_config( void)
+fts_get_system_project( void)
 {
   char path[MAXPATHLEN];
 

@@ -138,12 +138,12 @@ void fts_load_project( void)
 
   /* check if the user has a project file in the home directory  */
   if (project_file == NULL) {
-    project_file = fts_get_user_config();
+    project_file = fts_get_user_project();
   }
 
   /* check if there's a system wide project */
   if (project_file == NULL) {
-    project_file = fts_get_system_config();
+    project_file = fts_get_system_project();
   }
 
   /* create an empty project */
