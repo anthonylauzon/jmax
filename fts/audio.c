@@ -138,7 +138,7 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
   fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? fts_s_open_input : fts_s_open_output;
 
   /* Call "open" method when adding first label */
-  if ( !port->inout[direction].used)
+  if ( !port->inout[direction].used && !fts_audioport_is_open( port, direction))
     {
       fts_atom_t a[1];
 

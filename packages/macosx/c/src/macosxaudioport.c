@@ -379,7 +379,7 @@ static void macosxaudioport_instantiate(fts_class_t *cl)
   fts_class_message_varargs( cl, fts_s_sched_ready, macosxaudioport_halt);
 }
 
-#define print_error( err, fun) post( "[Mac OS X audio port] error %d in function %s\n", err, #fun);
+#define print_error( err, fun) post( "[macosxaudioport] error %d in function %s\n", err, #fun);
 
 static void
 macosxaudiomanager_scan_devices( void)
@@ -387,9 +387,25 @@ macosxaudiomanager_scan_devices( void)
   UInt32 size, i, buffsize, count;
   char *buff;
   AudioDeviceID *device_list;
-  AudioDeviceID default_device;
+  AudioDeviceID default_input_device, default_output_device;
   OSStatus status;
 
+  /* Get the default devices */
+  count = sizeof( default_input_device);
+  if ((status = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultInputDevice, &count, (void *)&default_input_device)) != noErr)
+    {
+      print_error( status, AudioHardwareGetProperty);
+      return;
+    }
+
+  count = sizeof( default_output_device);
+  if ((status = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&default_output_device)) != noErr)
+    {
+      print_error( status, AudioHardwareGetProperty);
+      return;
+    }
+
+  /* Get device list */
   if ((status = AudioHardwareGetPropertyInfo( kAudioHardwarePropertyDevices, &size, NULL)) != noErr)
     {
       print_error( status, AudioHardwareGetPropertyInfo);
@@ -437,17 +453,16 @@ macosxaudiomanager_scan_devices( void)
       fts_set_symbol( at+1, name);
       port = (fts_audioport_t *)fts_object_create( macosxaudioport_class, 2, at);
       fts_audiomanager_put_port( name, port);
+
+      if (device_list[i] == default_input_device && device_list[i] == default_output_device)
+	{
+	  post( "Default: %s\n", name);
+	  fts_audiomanager_put_port( fts_s_default, port);
+	}
     }
 
   fts_free( buff);
 
-  /* Get the default device */
-  count = sizeof( default_device);
-  if ((status = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&default_device)) != noErr)
-    {
-      print_error( status, AudioHardwareGetProperty);
-      return;
-    }
 }
 
 

@@ -105,11 +105,15 @@ FTS_API int fts_audioport_is_channel_used( fts_audioport_t *port, int direction,
   ((port)->inout[(direction)].valid = 1)
 #define fts_audioport_unset_valid(port, direction) \
   ((port)->inout[(direction)].valid = 0)
+#define fts_audioport_is_valid(port, direction) \
+  ((port)->inout[(direction)].valid)
 
 #define fts_audioport_set_open(port, direction) \
   ((port)->inout[direction].open = 1)
 #define fts_audioport_unset_open(port, direction) \
   ((port)->inout[direction].open = 0)
+#define fts_audioport_is_open(port, direction) \
+  ((port)->inout[direction].open)
 
 #define fts_audioport_set_io_fun( port, direction, fun) \
   ((port)->inout[(direction)].io_fun = (fun))

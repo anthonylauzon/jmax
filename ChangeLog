@@ -1,3 +1,7 @@
+2003-01-23  François Déchelle  <dechelle@mac-dechelle.ircam.fr>
+
+	* update Mac OS X audio port for default device.
+
 2003-01-21  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* update alsa audioport. Works with input and output

@@ -194,6 +194,7 @@ PREDEF_SYMBOL( fts_s_persistence, "persistence")
 PREDEF_SYMBOL( fts_s_config, "config")
 PREDEF_SYMBOL( fts_s_midi_config, "midi_config")
 PREDEF_SYMBOL( fts_s_audio_config, "audio_config")
+
 PREDEF_SYMBOL( fts_s_windows, "windows")
 PREDEF_SYMBOL( fts_s_keep, "keep")
 PREDEF_SYMBOL( fts_s_type, "type")
