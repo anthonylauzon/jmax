@@ -22,12 +22,14 @@ public class QListPanel extends JPanel implements ActionListener {
     super();
     itsTextArea = new TextArea(40, 40);
     Panel aPanel = new Panel();
-    itsSetButton = new Button("Set");
+    aPanel.setLayout(new GridLayout(1, 2));
+    itsSetButton = new Button("set");
     itsSetButton.addActionListener(this);
-    itsGetButton = new Button("Get");
+    itsGetButton = new Button("get");
     itsGetButton.addActionListener(this);
     aPanel.add(itsSetButton);
     aPanel.add(itsGetButton);
+    aPanel.validate();
 
     setLayout(new BorderLayout());
     add("North", aPanel);
@@ -49,9 +51,9 @@ public class QListPanel extends JPanel implements ActionListener {
     }
     else if (e.getSource() == itsGetButton) {
       itsAtomList.forceUpdate();
-      fillContent(itsAtomList);
-      repaint(); //is it necessary?
     }
+    //in every case, update the content
+    fillContent(itsAtomList);
   }
 
   public Dimension preferredSize() {
