@@ -206,4 +206,62 @@ fts_atom_list_iterator_current( const fts_atom_list_iterator_t *iter)
   return iter->atom;
 }
 
+/* this function save an atom list to a bmax file as a set of messages
+   to an object (passed as argument).
+   The first message is "clear" to clean the atom list,
+   the others are a number of append, each of max 256 elements.
+   Note that the there is provision here for the loading; the messages
+   must be understood natively by the object saving the atom list (within
+   its save_bmax method); in the future, a better support for data will
+   be implemented.
+   */
 
+void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_object_t *target)
+{
+  fts_atom_list_iterator_t iterator;
+  fts_atom_t av[256];
+  int ac = 0;
+
+  /* Code a "clear" message without arguments */
+
+  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_clear, 0);
+
+  fts_atom_list_iterator_init(&iterator, list);
+
+  while (! fts_atom_list_iterator_end(&iterator))
+    {
+      av[ac++] = *fts_atom_list_iterator_current(&iterator);
+      fts_atom_list_iterator_next(&iterator);
+
+      if (ac == 256)
+	{
+	  /* Code a push of all the values */
+
+	  fts_bmax_code_push_atoms(f, ac, av);
+
+	  /* Code an "append" message for 256 values */
+
+	  fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_append, ac);
+	  ac = 0;
+
+	  /* Code a pop of all the values  */
+
+	  fts_bmax_code_pop_args(f, ac);
+	}
+    }
+
+  if (ac != 0)
+    {
+      /* Code a push of all the values */
+
+      fts_bmax_code_push_atoms(f, ac, av);
+
+      /* Code an "append" message for the values left */
+      
+      fts_bmax_code_obj_mess(f, fts_SystemInlet, fts_s_append, ac);
+
+      /* Code a pop of all the values  */
+
+      fts_bmax_code_pop_args(f, ac);
+    }
+}

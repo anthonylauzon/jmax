@@ -156,6 +156,9 @@ public class FtsServer
 
   final void savePatcherBmax(FtsObject patcher, String filename)
   {
+    if (FtsServer.debug)
+      System.err.println("savePatcherBmax(" + patcher + "," + filename + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_save_patcher_bmax_cmd);
@@ -173,6 +176,9 @@ public class FtsServer
 
   final void savePatcherTpat(FtsObject patcher, String filename)
   {
+    if (FtsServer.debug)
+      System.err.println("savePatcherTpat(" + patcher + "," + filename + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_save_patcher_tpat_cmd);
@@ -188,12 +194,16 @@ public class FtsServer
 
   /** send a "load patcher as bmax" messages to FTS.*/
 
-  final void loadPatcherBmax(FtsObject patcher, String filename)
+  final void loadPatcherBmax(FtsObject parent, int id, String filename)
   {
+    if (FtsServer.debug)
+      System.err.println("loadPatcherBmax(" + parent + ", " + id + ", " + filename + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_load_patcher_bmax_cmd);
-	port.sendObject(patcher);
+	port.sendObject(parent);
+	port.sendInt(id);
 	port.sendString(filename);
 	port.sendEom();
       }
@@ -202,14 +212,16 @@ public class FtsServer
       }
   }
 
-  /** send a "load patcher as tpat" messages to FTS.*/
-
-  final void loadPatcherTpat(FtsObject patcher, String filename)
+  final void loadPatcherTpat(FtsObject parent, int id, String filename)
   {
+    if (FtsServer.debug)
+      System.err.println("loadPatcherTpat(" + parent + ", " + id + ", " + filename + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_load_patcher_tpat_cmd);
-	port.sendObject(patcher);
+	port.sendObject(parent);
+	port.sendInt(id);
 	port.sendString(filename);
 	port.sendEom();
       }
@@ -220,12 +232,16 @@ public class FtsServer
 
   /** send a "load patcher as dot pat" messages to FTS.*/
 
-  final void loadPatcherDpat(FtsObject patcher, String filename)
+  final void loadPatcherDpat(FtsObject parent, int id, String filename)
   {
+    if (FtsServer.debug)
+      System.err.println("loadPatcherDpat(" + parent + ", " + id + ", " + filename + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_load_patcher_dpat_cmd);
-	port.sendObject(patcher);
+	port.sendObject(parent);
+	port.sendInt(id);
 	port.sendString(filename);
 	port.sendEom();
       }
@@ -238,6 +254,9 @@ public class FtsServer
 
   final public void sendAbstractionDeclare(String abstraction, String filename)
   {
+    if (FtsServer.debug)
+      System.err.println("sendAbstractionDeclare(" + abstraction + ", " + filename + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_declare_abstraction_cmd);
@@ -255,6 +274,9 @@ public class FtsServer
 
   final public void sendAbstractionDeclarePath(String path)
   {
+    if (FtsServer.debug)
+      System.err.println("sendAbstractionDeclarePath(" + path + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_declare_abstraction_path_cmd);
@@ -271,6 +293,9 @@ public class FtsServer
 
   final void sendDownloadPatcher(FtsObject patcher)
   {
+    if (FtsServer.debug)
+      System.err.println("sendDownloadPatcher(" + patcher + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_download_patcher_cmd);
@@ -286,6 +311,9 @@ public class FtsServer
 
   final void openPatcher(FtsObject patcher)
   {
+    if (FtsServer.debug)
+      System.err.println("openPatcher(" + patcher + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_open_patcher_cmd);
@@ -301,6 +329,9 @@ public class FtsServer
 
   final void closePatcher(FtsObject patcher)
   {
+    if (FtsServer.debug)
+      System.err.println("closePatcher(" + patcher + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_close_patcher_cmd);
@@ -317,6 +348,9 @@ public class FtsServer
 
   final void patcherLoaded(FtsObject patcher)
   {
+    if (FtsServer.debug)
+      System.err.println("patcherLoaded(" + patcher + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_patcher_loaded_cmd);
@@ -336,6 +370,9 @@ public class FtsServer
 
   final  void newObject(FtsObject patcher, int id, String className, String description)
   {
+    if (FtsServer.debug)
+      System.err.println("newObject(" + patcher + ", " + id + ", " + className + ", " + description + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
@@ -357,6 +394,9 @@ public class FtsServer
 
   final  void newObject(FtsObject patcher, int id, String description)
   {
+    if (FtsServer.debug)
+      System.err.println("newObject(" + patcher + ", " + id + ", " + description + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_new_object_cmd);
@@ -378,6 +418,9 @@ public class FtsServer
 
   final void redefinePatcherObject(FtsObject obj, String name, int ninlets, int noutlets)
   {
+    if (FtsServer.debug)
+      System.err.println("redefinePatcherObject(" + obj + ", " + name + ", " + ninlets + ", " + noutlets + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_redefine_patcher_cmd);
@@ -396,6 +439,9 @@ public class FtsServer
 
   final void repositionInletObject(FtsObject obj, int pos)
   {
+    if (FtsServer.debug)
+      System.err.println("repositionInletObject(" + obj + ", " + pos + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_reposition_inlet_cmd);
@@ -412,6 +458,9 @@ public class FtsServer
 
   final void repositionOutletObject(FtsObject obj, int pos)
   {
+    if (FtsServer.debug)
+      System.err.println("repositionOutletObject(" + obj + ", " + pos + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_reposition_outlet_cmd);
@@ -429,6 +478,9 @@ public class FtsServer
 
   final void freeObject(FtsObject obj)
   {
+    if (FtsServer.debug)
+      System.err.println("freeObject(" + obj + ")");
+
     if (obj.getObjId() != -1)
       {
 	try
@@ -448,6 +500,9 @@ public class FtsServer
 
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, Vector args)
   {
+    if (FtsServer.debug)
+      System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_message_cmd);
@@ -472,6 +527,10 @@ public class FtsServer
 
   final void sendSetMessage(FtsObject dst, int offset, int[] values, int from, int to)
   {
+    if (FtsServer.debug)
+      System.err.println("sendSetMessage(" + dst + ", " + offset + ", " + values  + ", " +
+			 from + ", " + to + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_message_cmd);
@@ -496,6 +555,9 @@ public class FtsServer
 
   final void sendSetMessage(FtsObject dst, Vector values)
   {
+    if (FtsServer.debug)
+      System.err.println("sendSetMessage(" + dst + ", " + values  + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_message_cmd);
@@ -519,6 +581,9 @@ public class FtsServer
 
   final void sendSetMessage(FtsObject obj, String description)
   {
+    if (FtsServer.debug)
+      System.err.println("sendSetMessage(" + obj + ", " + description + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_message_cmd);
@@ -542,6 +607,10 @@ public class FtsServer
 
   final public void sendNamedObjectMessage(String dst, int inlet, String selector, Vector args)
   {
+    if (FtsServer.debug)
+      System.err.println("sendNamedObjectMessage(" + dst + ", " + inlet + ", " +
+			 selector + ", " + args + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_named_message_cmd);
@@ -565,6 +634,10 @@ public class FtsServer
 
   final void connectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
   {
+    if (FtsServer.debug)
+      System.err.println("connectObjects(" + from + ", " + outlet + ", " +
+			 to + ", " + inlet + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_connect_objects_cmd);
@@ -584,6 +657,10 @@ public class FtsServer
 
   final void disconnectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
   {
+    if (FtsServer.debug)
+      System.err.println("disconnectObjects(" + from + ", " + outlet + ", " +
+			 to + ", " + inlet + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_disconnect_objects_cmd);
@@ -603,6 +680,10 @@ public class FtsServer
 
   final void putObjectProperty(FtsObject object, String name, Object value)
   {
+    if (FtsServer.debug)
+      System.err.println("putObjectProperty(" + object + ", " + name + ", " +
+			 value + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_put_property_cmd);
@@ -621,6 +702,9 @@ public class FtsServer
 
   final void getObjectProperty(FtsObject object, String name)
   {
+    if (FtsServer.debug)
+      System.err.println("getObjectProperty(" + object + ", " + name + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.fts_get_property_cmd);
@@ -638,6 +722,9 @@ public class FtsServer
 
   final public void ucsMessage(Vector args)
   {
+    if (FtsServer.debug)
+      System.err.println("ucsMessage(" + args + ")");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.ucs_cmd);
@@ -660,6 +747,9 @@ public class FtsServer
 
   final public synchronized void syncToFts()
   {
+    if (FtsServer.debug)
+      System.err.println("syncToFts()");
+
     try
       {
 	port.sendCmd(FtsClientProtocol.sync_cmd);
@@ -679,6 +769,9 @@ public class FtsServer
 
   final void sendMessage(FtsMessage msg)
   {
+    if (FtsServer.debug)
+      System.err.println("sendMessage(" + msg + ")");
+
     port.sendMessage(msg);
   }
 
@@ -971,7 +1064,6 @@ public class FtsServer
 
   FtsObject getObjectByFtsId(int id)
   {
-    
     if (id == 0)
       {
 	// This is usually the case at the creation of the root patcher
@@ -981,6 +1073,7 @@ public class FtsServer
     else if (id == -1)
       {
 	System.err.println("System error: received FTS_NO_ID as object id\n");
+	Thread.dumpStack();
 	return null;
       }
     else

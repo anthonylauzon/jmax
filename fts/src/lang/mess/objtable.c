@@ -16,20 +16,20 @@
 #include "sys.h"
 #include "lang/mess.h"
 
-#define TABLE_INIT_SIZE (32*1024)
-#define TABLE_GROW  2
+#define OBJECT_TABLE_INIT_SIZE (1024)
+#define OBJECT_TABLE_GROW  2
 
-static int table_size = 0;
+static int object_table_size = 0;
 static fts_object_t **object_table = 0;
 
 /* skip 0, use even numbers only */
 
-static int id_generator_count = 2;
+static int object_id_count = 2;
 
 void fts_object_table_register(fts_object_t *obj)
 {
-  obj->id = id_generator_count;
-  id_generator_count += 2;
+  obj->id = object_id_count;
+  object_id_count += 2;
 
   fts_object_table_put(obj->id, obj);
 }
@@ -40,36 +40,36 @@ fts_object_table_put(int id, fts_object_t *obj)
   if (id <= 0)
     return;
 
-  if (table_size == 0)
+  if (object_table_size == 0)
     {
       int i;
 
-      object_table = fts_malloc(TABLE_INIT_SIZE * sizeof(fts_object_t *));
-      table_size = TABLE_INIT_SIZE;
+      object_table = fts_malloc(OBJECT_TABLE_INIT_SIZE * sizeof(fts_object_t *));
+      object_table_size = OBJECT_TABLE_INIT_SIZE;
 
-      for (i = 0; i < table_size; i ++)
+      for (i = 0; i < object_table_size; i ++)
 	object_table[i] = 0;
     }
-  else if (id >= table_size)
+  else if (id >= object_table_size)
     {
       int i;
       int new_size;
       
-      new_size = table_size;
+      new_size = object_table_size;
 
       /* grow exponentially the table to avoid thousands of realloc;
 	 this scheme produce ten realloc with 4 Mega objects :->
        */
 
       while (new_size <= id)
-	new_size *= TABLE_GROW;
+	new_size *= OBJECT_TABLE_GROW;
 
       object_table = fts_realloc(object_table, new_size * sizeof(fts_object_t *));
 
-      for (i = table_size; i < new_size; i ++)
+      for (i = object_table_size; i < new_size; i ++)
 	object_table[i] = 0;
 
-      table_size = new_size;
+      object_table_size = new_size;
     }
 
   object_table[id] = obj;
@@ -79,7 +79,7 @@ fts_object_table_put(int id, fts_object_t *obj)
 void
 fts_object_table_remove(int id)
 {
-  if (id < table_size)
+  if (id < object_table_size)
     object_table[id] = 0;
 }
 
@@ -89,7 +89,7 @@ fts_object_table_get(int id)
 {
   if (id == 0)
     return 0;
-  else if (id < table_size)
+  else if (id < object_table_size)
     return object_table[id];
   else
     return 0;
@@ -104,7 +104,111 @@ fts_object_table_delete_all(void)
   
   /* first slot of the table unused */
 
-  for (i = 1; i < table_size; i++)
+  for (i = 1; i < object_table_size; i++)
     if (object_table[i])
       fts_object_delete(object_table[i]);
 }
+
+
+#define CONNECTION_TABLE_INIT_SIZE (1024)
+#define CONNECTION_TABLE_GROW  2
+
+static int connection_table_size = 0;
+static fts_connection_t **connection_table = 0;
+
+/* skip 0, use even numbers only */
+
+static int connection_id_count = 2;
+
+void fts_connection_table_register(fts_connection_t *conn)
+{
+  conn->id = connection_id_count;
+  connection_id_count += 2;
+
+  fts_connection_table_put(conn->id, conn);
+}
+
+void
+fts_connection_table_put(int id, fts_connection_t *conn)
+{
+  if (id <= 0)
+    return;
+
+  if (connection_table_size == 0)
+    {
+      int i;
+
+      connection_table = fts_malloc(CONNECTION_TABLE_INIT_SIZE * sizeof(fts_connection_t *));
+      connection_table_size = CONNECTION_TABLE_INIT_SIZE;
+
+      for (i = 0; i < connection_table_size; i ++)
+	connection_table[i] = 0;
+    }
+  else if (id >= connection_table_size)
+    {
+      int i;
+      int new_size;
+      
+      new_size = connection_table_size;
+
+      /* grow exponentially the table to avoid thousands of realloc;
+	 this scheme produce ten realloc with 4 Mega connections :->
+       */
+
+      while (new_size <= id)
+	new_size *= CONNECTION_TABLE_GROW;
+
+      connection_table = fts_realloc(connection_table, new_size * sizeof(fts_connection_t *));
+
+      for (i = connection_table_size; i < new_size; i ++)
+	connection_table[i] = 0;
+
+      connection_table_size = new_size;
+    }
+
+  connection_table[id] = conn;
+}
+
+
+void
+fts_connection_table_remove(int id)
+{
+  if (id < connection_table_size)
+    connection_table[id] = 0;
+}
+
+
+fts_connection_t *
+fts_connection_table_get(int id)
+{
+  if (id == 0)
+    return 0;
+  else if (id < connection_table_size)
+    return connection_table[id];
+  else
+    return 0;
+}
+
+/* for  restart */
+
+void
+fts_connection_table_delete_all(void)
+{
+  int i;
+  
+  /* first slot of the table unused */
+
+  for (i = 1; i < connection_table_size; i++)
+    if (connection_table[i])
+      fts_connection_delete(connection_table[i]);
+}
+
+
+
+
+
+
+
+
+
+

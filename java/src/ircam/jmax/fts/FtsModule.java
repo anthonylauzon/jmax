@@ -14,6 +14,8 @@ public class FtsModule
     // Install the MDA entities
 
     Mda.installDocumentHandler( new FtsDotPatRemoteDocumentHandler());
+    Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
+
     // Not yet
     // Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
 

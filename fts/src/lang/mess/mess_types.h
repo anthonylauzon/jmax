@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.5 $ IRCAM $Date: 1998/04/02 16:21:54 $
+ *      $Revision: 1.6 $ IRCAM $Date: 1998/04/16 18:04:48 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -214,6 +214,8 @@ struct fts_connection
   fts_object_t *dst;
   int winlet;
 
+  int id;                        /* the connection ID, when defined */
+ 
   fts_symbol_t symb;		/* the message cache: the symbol: if null, means anything ! */
   fts_method_t  mth;		/* the message  cache: the method */
 

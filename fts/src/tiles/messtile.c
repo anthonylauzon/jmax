@@ -153,16 +153,13 @@ fts_mess_client_save_patcher_bmax(int ac, const fts_atom_t *av)
     {
       fts_object_t *patcher;
       fts_symbol_t filename;
-      fts_bmax_file_t *f;
 
       patcher = (fts_object_t *) fts_get_object(&av[0]);
       filename = fts_get_symbol(&av[1]);
 
       if (patcher)
 	{
-	  f = fts_open_bmax_file_for_writing(fts_symbol_name(filename));
-	  fts_bmax_code_new_patcher(f, patcher);
-	  fts_close_bmax_file(f);
+	  fts_save_patcher_as_bmax(filename, patcher);
 	}
       else
 	post_mess("System Error in FOS message SAVE PATCHER BMAX: null patcher", ac, av);
@@ -201,9 +198,33 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
 {
   trace_mess("Received load patcher bmax ", ac, av);
 
-  if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
+  if (ac == 3 && fts_is_object(&av[0]) && fts_is_int(&av[1]) && fts_is_symbol(&av[2]))
     {
-      post_mess("Don't know yet how to load a bmax file: null patcher", ac, av);
+      fts_object_t *parent;
+      int id;
+      fts_symbol_t filename;
+
+      parent  = (fts_object_t *) fts_get_object(&av[0]);
+      id       = fts_get_int(&av[1]);
+      filename = fts_get_symbol(&av[2]);
+
+      if (parent)
+	{
+	  fts_object_t *patcher;
+
+	  patcher = fts_binary_file_load(fts_symbol_name(filename), parent, id);
+
+	  if (patcher == 0)
+	    {
+	      post("Cannot read bmax file %s\n", fts_symbol_name(filename));
+	      return;
+	    }
+
+	  fts_client_upload_object(patcher);
+	}
+      else
+	post_mess("System Error in FOS message LOAD PATCHER BMAX: null patcher", ac, av);
+
     }
   else
     post_mess("System Error in FOS message LOAD PATCHER BMAX: bad args", ac, av);
@@ -239,25 +260,32 @@ fts_mess_client_load_patcher_dpat(int ac, const fts_atom_t *av)
 {
   trace_mess("Received load patcher dpat", ac, av);
 
-  if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
+  if (ac == 3 && fts_is_object(&av[0]) && fts_is_int(&av[1]) && fts_is_symbol(&av[2]))
     {
-      fts_object_t *patcher;
+      fts_object_t *parent;
+      int id;
       fts_symbol_t filename;
 
-      patcher = (fts_object_t *) fts_get_object(&av[0]);
-      filename = fts_get_symbol(&av[1]);
+      parent  = (fts_object_t *) fts_get_object(&av[0]);
+      id       = fts_get_int(&av[1]);
+      filename = fts_get_symbol(&av[2]);
 
-      if (patcher)
+      if (parent)
 	{
-	  fts_object_t *ret;
+	  fts_object_t *patcher;
 
-	  ret = fts_load_dotpat_patcher(patcher, fts_symbol_name(filename));
+	  patcher = fts_load_dotpat_patcher(parent, id, filename);
 
-	  if (ret == 0)
-	    post("Cannot read file %s\n", filename);
+	  if (patcher == 0)
+	    {
+	      post("Cannot read .pat file %s\n", fts_symbol_name(filename));
+	      return;
+	    }
+
+	  fts_client_upload_object(patcher);
 	}
       else
-	post_mess("System Error in FOS message SAVE PATCHER BMAX: null patcher", ac, av);
+	post_mess("System Error in FOS message LOAD PATCHER DPAT: null patcher", ac, av);
 
     }
   else

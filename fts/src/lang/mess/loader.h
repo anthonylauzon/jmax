@@ -28,6 +28,11 @@ typedef struct fts_binary_file_header_t {
      other: loaded OK
    Description: loads and run a FTS binary file.
 */
-extern int fts_binary_file_load( const char *name);
+
+extern fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int id);
 
 #endif
+
+
+
+

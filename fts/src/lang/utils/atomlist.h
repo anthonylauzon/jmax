@@ -47,4 +47,8 @@ extern void fts_atom_list_iterator_next( fts_atom_list_iterator_t *iter);
 extern int fts_atom_list_iterator_end( const fts_atom_list_iterator_t *iter);
 extern fts_atom_t *fts_atom_list_iterator_current( const fts_atom_list_iterator_t *iter);
 
+/* Save to bmax */
+
+extern void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_object_t *target);
+
 #endif

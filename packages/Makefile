@@ -5,9 +5,11 @@ all:
 	(cd icebrowser; $(MAKE) -k all)
 	(cd table; $(MAKE) -k all)
 	(cd qlist; $(MAKE) -k all)
+	(cd manoury; $(MAKE) -k all)
 
 all_c:
 	(cd fts1.5; $(MAKE) -k all)
+	(cd manoury; $(MAKE) -k all)
 #	(cd gist; $(MAKE) -k all)
 #	(cd iana; $(MAKE) -k all)
 
@@ -24,8 +26,10 @@ clean:
 	(cd espresso; $(MAKE) clean)
 	(cd table; $(MAKE) clean)
 	(cd qlist; $(MAKE) clean)
+	(cd manoury; $(MAKE) clean)
 
 clean_c:
+	(cd manoury; $(MAKE) clean)
 	(cd fts1.5; $(MAKE) clean)
 #	(cd gist; $(MAKE) clean)
 #	(cd iana; $(MAKE) clean)

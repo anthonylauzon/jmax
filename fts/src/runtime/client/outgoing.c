@@ -158,11 +158,6 @@ fts_client_upload_object(fts_object_t *obj)
   if (obj->id == FTS_NO_ID)
     fts_object_table_register(obj);
 
-  /*
-    Some object require special handling, because their description is
-    not necessarly consistent.
-    */
-
   if (fts_object_is_abstraction(obj))
     {
       /* Send the abstraction object */
@@ -234,3 +229,15 @@ fts_client_upload_patcher_content(fts_patcher_t *patcher)
 	}
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

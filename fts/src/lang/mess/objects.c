@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.16 $ IRCAM $Date: 1998/04/29 14:44:38 $
+ *      $Revision: 1.17 $ IRCAM $Date: 1998/04/30 12:28:46 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -204,6 +204,11 @@ void fts_object_change_description(fts_object_t *obj, int argc, const fts_atom_t
 
 
 
+/* 
+   All this should be somehow reviewed .... it is not completely satisfying,
+   and should be more modular 
+   */
+
 void
 fts_object_send_properties(fts_object_t *obj)
 {
@@ -234,6 +239,7 @@ fts_object_send_properties(fts_object_t *obj)
 
       fts_object_property_changed_urgent(obj, fts_s_min_value);
       fts_object_property_changed_urgent(obj, fts_s_max_value);
+      fts_object_property_changed_urgent(obj, fts_s_value); /* should this be here or elsewhere ?? */
 
       /* Declarations are not yet really supported */
 

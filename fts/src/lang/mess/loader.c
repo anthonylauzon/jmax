@@ -11,7 +11,7 @@
 /* Private structure */
 typedef struct fts_binary_file_desc_t {
   int fd;
-  fts_word_t *code;
+  unsigned char *code;
   fts_symbol_t *symbols;
 } fts_binary_file_desc_t;
 
@@ -52,10 +52,12 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
     }
 
   if (header.magic_number != FTS_BINARY_FILE_MAGIC)
-    return -1;
+    {
+      return -1;
+    }
 
   /* allocate code and symbols */
-  desc->code = (fts_word_t *)fts_malloc( header.code_size * sizeof( fts_word_t));
+  desc->code = (unsigned char *)fts_malloc( header.code_size);
   if (!desc->code)
     {
       return -1;
@@ -68,7 +70,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
     }
 
   /* read the code */
-  if (read( fd, desc->code, header.code_size*sizeof(long)) < header.code_size*sizeof(long))
+  if (read( fd, desc->code, header.code_size) < header.code_size)
     {
       perror( "fts_binary_file_map");
       return -1;
@@ -126,17 +128,36 @@ static void fts_binary_file_dispose( fts_binary_file_desc_t *desc)
   fts_free( desc->symbols);
 }
 
-int fts_binary_file_load( const char *name)
+
+
+fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int id)
 {
+  fts_object_t *obj;
   fts_binary_file_desc_t desc;
 
   if (fts_binary_file_map( name, &desc) < 0)
-    return -1;
+    {
+      post("fts_binary_file_load: Cannot map bmax file %s\n", name);
+      return 0;
+    }
 
-  fts_run_mess_vm( desc.code, desc.symbols);
+  obj = fts_run_mess_vm(parent, desc.code, desc.symbols);
+
+  if (obj == 0)
+    post("fts_binary_file_load: VM return null for %s\n", name);
 
   fts_binary_file_dispose( &desc);
 
-  return 1;
+  if (id != FTS_NO_ID)
+    {
+      obj->id = id;
+      fts_object_table_put(id, obj);
+    }
+
+  /* activate the post-load init, like loadbangs */
+
+  fts_message_send(obj, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
+
+  return obj;
 }
 

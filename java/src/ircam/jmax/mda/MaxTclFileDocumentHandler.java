@@ -127,16 +127,6 @@ public class MaxTclFileDocumentHandler extends MaxDocumentHandler
 	  {
 	    throw new MaxDocumentException("I/O error saving " + document + " to " + file);
 	  }
-
-// 	{
-// 	  /* Now, if the "bmax" system property is set, we do a wild
-// 	     binary format save; highly experimental */
-
-// 	  String bmaxSave = MaxApplication.getProperty("bmax");
-
-// 	  if ((bmaxSave != null) && bmaxSave.equals("yes") && (document instanceof ircam.jmax.fts.FtsPatcherDocument))
-// 	    ((ircam.jmax.fts.FtsPatcherDocument) document).saveBmax("/u/worksta/dececco/tmp/patch.bmax");
-// 	}
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as TCL file");

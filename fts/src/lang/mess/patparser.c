@@ -208,29 +208,42 @@ void fts_patparse_set_square_graphic_properties(fts_graphic_description_t *this,
  * The patcher is always a top level patcher.
  */
     
-fts_object_t *fts_load_dotpat_patcher(fts_object_t *patcher, const char *inputFile) 
+fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, int id, fts_symbol_t filename) 
 {
   fts_patlex_t *in; 
+  fts_symbol_t name;
 
-  in = fts_patlex_open(inputFile, 0, 0);
+  in = fts_patlex_open(fts_symbol_name(filename), 0, 0);
+
+  if (strrchr(fts_symbol_name(filename), '/'))
+    name = fts_new_symbol_copy(strrchr(fts_symbol_name(filename), '/') + 1);
+  else
+    name = filename;
   
   if (in != 0)
     {
+      fts_atom_t description[4];
+      fts_object_t *patcher;
       fts_atom_t a;
+
+      fts_set_symbol(&description[0], fts_s_patcher);
+      fts_set_symbol(&description[1], name);
+      fts_set_int(&description[2], 0);
+      fts_set_int(&description[3], 0);
+
+      patcher = fts_object_new((fts_patcher_t *)parent, id, 4, description);
 
       fts_patparse_parse_patlex(patcher, in);
 
       fts_patlex_close(in);
 
-      fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *) patcher, fts_s_unnamed);
+      fts_patcher_reassign_inlets_outlets_name((fts_patcher_t *) patcher, name);
 
-      fts_set_symbol(&a, fts_s_unnamed);
+      fts_set_symbol(&a, name);
       fts_object_put_prop(patcher, fts_s_name, &a);
 
       fts_set_symbol(&a, fts_s_off);
       fts_object_put_prop(patcher, fts_s_autorouting, &a);
-
-      fts_object_send_properties(patcher);
 
       /* activate the post-load init, like loadbangs */
 

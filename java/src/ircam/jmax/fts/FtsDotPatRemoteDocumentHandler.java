@@ -57,33 +57,35 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 
   protected MaxDocument loadDocument(MaxDocumentSource source)
   {
+    FtsServer server;
     File file = ((MaxFileDocumentSource) source).getFile();
-    FtsContainerObject patcher;
+    FtsObject patcher;
+    int id;
 
     // Build an empty patcher son of root.
 
-    try
+    server = FtsServer.getServer();
+    id = server.getNewObjectId();
+
+    // ask fts to load the file within this 
+    // patcher, using a dedicated message
+
+    server.loadPatcherDpat(server.getRootObject(), id, file.getAbsolutePath());
+    server.syncToFts();
+    patcher = server.getObjectByFtsId(id);
+
+    if (patcher != null)
       {
-	patcher = (FtsContainerObject) FtsObject.makeFtsObject(FtsServer.getServer().getRootObject(),
-							       "patcher", "unnamed 0 0");
-
-	// ask fts to load the file within this 
-	// patcher, using a dedicated message
-
-	FtsServer.getServer().loadPatcherDpat(patcher, file.getAbsolutePath());
-
 	FtsPatcherDocument obj = new FtsPatcherDocument();
 
-	obj.setRootData(patcher);
+	obj.setRootData((MaxData) patcher);
 	obj.setDocumentSource(source);
 	obj.setDocumentHandler(this);
-
+	    
 	return obj;
       }
-    catch (FtsException e)
-      {
-	return null;
-      }
+    else
+      return null;
   }
 
   public void saveDocument(MaxDocument document, MaxDocumentSource source) throws MaxDocumentException
