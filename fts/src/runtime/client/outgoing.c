@@ -278,10 +278,11 @@ void fts_client_mess_send_msg(void)
 
    */
 
-void fts_client_object_send_mess(fts_object_t *obj, int argc, const fts_atom_t *args)
+void fts_client_object_send_mess(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args)
 {
   fts_client_mess_start_msg(CLIENTMESS_CODE);
   fts_client_mess_add_object(obj);
+  fts_client_mess_add_symbol(selector);
   fts_client_mess_add_atoms(argc, args);
   fts_client_mess_send_msg();
 }
