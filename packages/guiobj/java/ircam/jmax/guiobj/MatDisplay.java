@@ -136,18 +136,26 @@ public class MatDisplay extends GraphicObject
 
   public void setCurrentBounds(int x, int y, int w, int h)
   {
-    super.setCurrentBounds( x, y, w, h);
-    
-    if(w <= 2)
-      w = 2;
-    
-    if(h <= 2)
-      h = 2;
+    super.setCurrentBounds( x, y, (w==0) ? DEFAULT_WIDTH : w, (h==0) ? DEFAULT_HEIGHT : h);
 
+    if( w==0 && h==0)
+      {
+	w = DEFAULT_WIDTH;
+	h = DEFAULT_HEIGHT;
+      }
+    else
+      {
+	if(w <= 2)
+	  w = 2;
+	
+	if(h <= 2)
+	  h = 2;
+	
+      }
     width = w - 2;
     height = h - 2;
-
-    ((FtsMatDisplayObject)ftsObject).setWindowSize(height, width);
+	
+    ((FtsMatDisplayObject)ftsObject).setWindowSize(height, width);  
   }
 
   public void setWidth(int w) 
