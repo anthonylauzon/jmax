@@ -1,5 +1,7 @@
 2003-04-01  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/io: added missing in~/out~ help patch, fixed in/out help patch
+
 	* fixed io summary open/close/reopen crash
 
 	* fts/bytestream.c (fts_udpstream_delete): fixed udpstream destructor
