@@ -1061,7 +1061,7 @@ public class ErmesConnection {
 	itsTempPt2.y+=k3;
 	if(IntersectRgn(itsRectTemp1, itsStartPoint)||IntersectRgn(itsRectTemp2, itsStartPoint)||
 	   IntersectRgn(itsRectTemp3, itsStartPoint)||IntersectRgn(itsRectTemp4, itsStartPoint)||
-	   IntersectElement(itsRectTemp5))
+	   IntersectElement(itsRectTemp5)||(itsRectTemp4.y<0))
 	  error1 = true;
 	
 	////// verso destra
@@ -1114,7 +1114,7 @@ public class ErmesConnection {
 	
 	if(IntersectRgn(itsRectTemp21, itsStartPoint)||IntersectRgn(itsRectTemp22, itsStartPoint)||
 	   IntersectRgn(itsRectTemp23, itsStartPoint)||IntersectRgn(itsRectTemp24, itsStartPoint)||
-	   IntersectElement(itsRectTemp25))
+	   IntersectElement(itsRectTemp25)||(itsRectTemp24.y<0))
 	  error2 = true;
 	
 	spostamento1 = ((itsTempPt1.x - itsRectTemp3.x +1) + java.lang.Math.abs(itsRectTemp3.x - itsTempPt6.x +1) + k3 + k6);
@@ -1225,7 +1225,7 @@ public class ErmesConnection {
 	  
 	  if((IntersectRgn(itsRectTemp1, itsStartPoint))||(IntersectRgn(itsRectTemp2, itsStartPoint))||
 	     (IntersectRgn(itsRectTemp3, itsStartPoint))||(IntersectRgn(itsRectTemp4, itsStartPoint))||
-	     (IntersectElement(itsRectTemp5)))
+	     (IntersectElement(itsRectTemp5))||(itsRectTemp4.y<0))
 	    error1 = true;
 	  
 	  // verso sinistra
@@ -1279,7 +1279,7 @@ public class ErmesConnection {
 	  
 	  if((IntersectRgn(itsRectTemp21, itsStartPoint))||(IntersectRgn(itsRectTemp22, itsStartPoint))||
 	     (IntersectRgn(itsRectTemp23, itsStartPoint))||(IntersectRgn(itsRectTemp24, itsStartPoint))||
-	     (IntersectElement(itsRectTemp25)))
+	     (IntersectElement(itsRectTemp25))||(itsRectTemp24.y<0))
 	    error2 = true;
 	  
 	  spostamento1 = ((itsRectTemp3.x +1 - itsTempPt1.x) + java.lang.Math.abs(itsTempPt6.x - itsRectTemp3.x +1) + k3 + k7);
