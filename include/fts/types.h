@@ -5,6 +5,8 @@
 typedef const struct fts_symbol_descr *fts_symbol_t;
 
 #define fts_type_t fts_symbol_t
+#define fts_type_get_selector(T) (T)
+#define fts_type_get_by_name(n) (n)
 
 typedef void (*fts_fun_t)(void);
 typedef struct fts_object fts_object_t;

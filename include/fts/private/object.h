@@ -23,9 +23,6 @@
 #ifndef _FTS_PRIVATE_OBJECT_H_
 #define _FTS_PRIVATE_OBJECT_H_
 
-/* init function */
-extern void fts_objects_init(void);
-
 extern void fts_object_set_id(fts_object_t *obj, int id);
 
 /* support for redefinition */

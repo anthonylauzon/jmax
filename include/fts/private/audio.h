@@ -20,41 +20,9 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_CLASS_H_
-#define _FTS_PRIVATE_CLASS_H_
+#ifndef _FTS_PRIVATE_AUDIO_H_
+#define _FTS_PRIVATE_AUDIO_H_
 
-typedef struct fts_mess_type fts_mess_type_t;
-typedef struct fts_class_mess fts_class_mess_t;
-
-struct fts_mess_type
-{
-  fts_symbol_t symb;
-
-  int mandatory_args;
-  int nargs;
-  fts_symbol_t *arg_types;
-};
-
-
-struct fts_class_mess
-{
-  fts_mess_type_t tmess;
-  fts_method_t mth;
-};
-
-struct fts_inlet_decl
-{
-  int nmess;
-  int nalloc;
-  fts_class_mess_t **messlist;
-};
-
-struct fts_outlet_decl
-{
-  fts_mess_type_t tmess;	
-};
-
-extern fts_metaclass_t *fts_metaclass_get_by_name(fts_symbol_t name);
-extern fts_class_mess_t *fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything);
+extern void fts_audio_idle( void);
 
 #endif

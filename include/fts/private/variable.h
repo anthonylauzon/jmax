@@ -80,6 +80,4 @@ extern void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t 
 /* Restore a variable */
 extern void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner);
 
-extern fts_object_t *fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_class_t *class);
-
 #endif

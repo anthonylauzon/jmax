@@ -66,6 +66,8 @@ struct fts_env
   fts_object_t *patcher;
 };
 
+FTS_API fts_object_t *fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_class_t *class);
+
 /* Access the value of a variable in the scope represented by an object */
 FTS_API fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name);
 

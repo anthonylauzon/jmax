@@ -167,4 +167,16 @@ FTS_API void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at)
  */
 #define fts_array_set_element( array, index, value) ((array)->atoms[(index)] = *(value))
 
+/**
+ * Check index bounds
+ * 
+ * @fn fts_array_check_index(array, index)  (((index) >= 0) && ((index) < (array)->size))
+ * @param array the array
+ * @param index the index
+ * @return 1 if index is within bounds, 0 if not
+ * @ingroup array
+ */
+#define fts_array_check_index(array, index)  (((index) >= 0) && ((index) < (array)->size))
+
+
 #endif

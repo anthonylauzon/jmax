@@ -23,8 +23,10 @@
 #ifndef _FTS_PRIVATE_PLATFORM_H_
 #define _FTS_PRIVATE_PLATFORM_H_
 
-extern void *fts_dl_open( const char *filename, char *error);
-extern int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error);
+extern fts_status_t fts_load_library( const char *filename, const char *symbol);
+
+/*  extern void *fts_dl_open( const char *filename, char *error); */
+/*  extern int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error); */
 
 extern int fts_unlock_memory( void);
 

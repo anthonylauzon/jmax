@@ -92,4 +92,12 @@ extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const f
 
 extern void fts_patcher_blip(fts_patcher_t *this, const char *msg);
 
+extern void fts_patcher_inlet_reposition(fts_object_t *o, int pos);
+extern void fts_patcher_remove_inlet(fts_patcher_t *patcher, fts_inlet_t *this);
+extern void fts_patcher_trim_number_of_inlets(fts_patcher_t *patcher);
+
+extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
+extern void fts_patcher_remove_outlet(fts_patcher_t *patcher, fts_outlet_t *this);
+extern void fts_patcher_trim_number_of_outlets(fts_patcher_t *patcher);
+
 #endif

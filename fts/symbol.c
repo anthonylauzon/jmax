@@ -26,6 +26,8 @@
  *  - predefinitions of some symbols
  */
 
+#include <string.h>
+
 #include <fts/fts.h>
 
 /***********************************************************************
@@ -43,7 +45,7 @@ static fts_symbol_t symbol_new_aux( const char *name, int copy)
   fts_atom_t k, v;
 
   /* Lookup symbol in the hash table */
-  fts_set_string( &k, name);
+  fts_set_string( &k, (char *)name);
   if ( fts_hashtable_get( &symbol_table, &k, &v))
     return (fts_symbol_t)fts_get_ptr( &v);
 
