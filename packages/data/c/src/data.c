@@ -121,7 +121,6 @@ extern void data_types_init(void);
 extern void operators_init(void);
 
 extern void monops_init(void);
-extern void monops_init(void);
 
 extern void binops_init(void);
 extern void binop_arith_init(void);
