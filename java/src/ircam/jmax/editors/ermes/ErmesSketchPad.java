@@ -1128,6 +1128,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode) {
+
       if (itsStartDragObject != null) itsStartDragObject.MouseUp(e, x, y);
       itsStartDragObject = null;
     }
