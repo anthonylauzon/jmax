@@ -1,3 +1,7 @@
+2003-09-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/signal/c/src/osc.c (osc_instantiate): added name support for osc~ object.
+
 2003-09-16  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in: fixed bug "[ 787862 ] No warning on Linux if jMax is compiled without sound support".
