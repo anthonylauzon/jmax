@@ -99,5 +99,5 @@ static void adc_tilda_instantiate(fts_class_t *cl)
 
 void adc_tilda_config( void)
 {
-  fts_class_install( fts_new_symbol( "adc~"), adc_tilda_instantiate);
+/*   fts_class_install( fts_new_symbol( "adc~"), adc_tilda_instantiate); */
 }
