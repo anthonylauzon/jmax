@@ -1364,6 +1364,18 @@
 			settings = {
 			};
 		};
+		F5FD9478038BE7C701664092 = {
+			isa = PBXFileReference;
+			name = AnythingTrackPopupMenu.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/menus/AnythingTrackPopupMenu.java;
+			refType = 2;
+		};
+		F5FD9479038BE7C701664092 = {
+			fileRef = F5FD9478038BE7C701664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5FDEF8D0328BD2801664092 = {
 			isa = PBXFileReference;
 			path = JMaxWrapper.java;
@@ -9172,6 +9184,7 @@
 				F5EA5775038545B501664092,
 				F5EA5778038545F201664092,
 				F5EA5779038545F201664092,
+				F5FD9479038BE7C701664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9267,6 +9280,7 @@
 		};
 		F85123B6028BEAB301664092 = {
 			children = (
+				F5FD9478038BE7C701664092,
 				F85123B7028BEAB301664092,
 				F85123B8028BEAB301664092,
 				F85123B9028BEAB301664092,
