@@ -39,7 +39,7 @@ class ErmesObjComment extends ErmesObjEditableObject {
   String getArgs()
   {
     // Get the correct String from the object
-    return itsFtsObject.getDescription();
+    return itsFtsObject.getComment();
   }
 
   void redefine( String text) 

@@ -69,9 +69,9 @@ abstract public class ErmesObject implements DisplayObject
     static final int H_RESIZE_SENSIBLE_WIDTH = 4;
     static final int V_RESIZE_SENSIBLE_HEIGHT = 5;
 
-    // Inlet and outlets
+    // Inlet and outlets Max
 
-    static final int INOUTLET_SENSIBLE_HEIGHT = 4;
+    static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
   }
 
   protected ErmesSketchPad itsSketchPad;
@@ -453,14 +453,14 @@ abstract public class ErmesObject implements DisplayObject
     final int nOutlets = ftsObject.getNumberOfOutlets();
 
     if (nInlets == 1)
-      horizontalInletSensibility  =  w / 2;
+      horizontalInletSensibility  = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, w / 2);
     else
-      horizontalInletSensibility  = inletDistance / 2;
+      horizontalInletSensibility  = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, inletDistance / 2);
 
     if (nOutlets == 1)
-      horizontalOutletSensibility  =  w / 2;
+      horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, w / 2);
     else
-      horizontalOutletSensibility  = outletDistance / 2;
+      horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, outletDistance / 2);
 
     // if the point is the vertical inlet zone,
     // check if the point in an inlet sensibility area
@@ -631,19 +631,14 @@ abstract public class ErmesObject implements DisplayObject
 				ftsObject.getWidth(), ftsObject.getHeight(), r);
   }
 
-  /* SUpport for graphic ordering; temporarly, it is not
-     persistent, i.e. is not stored in the FTS object */
-
-  private int layer;
-
   final public void setLayer(int v)
   {
-    layer = v;
+    ftsObject.setLayer(v);
   }
 
   final public int getLayer()
   {
-    return layer;
+    return ftsObject.getLayer();
   }
 
   // Called at ErmesObject disposal
@@ -663,8 +658,6 @@ abstract public class ErmesObject implements DisplayObject
 	String value;
 	Graphics g;
 
-	ftsObject.updateErrorDescription();
-	Fts.sync();
 	annotation = ftsObject.getErrorDescription();
 
 	if (annotation != null)

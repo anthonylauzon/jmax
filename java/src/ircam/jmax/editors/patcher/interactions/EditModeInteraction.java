@@ -28,86 +28,94 @@ class EditModeInteraction extends Interaction
       	// Move
 	return  Interactions.followInteraction;
       }
-    else switch (squeack)
+    else
       {
-      case (Squeack.POP_UP | Squeack.BACKGROUND):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.backgroundPopUpInteraction;
+	editor.resetMessage();
 
-      case (Squeack.DOWN | Squeack.BACKGROUND):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.dragSelectInteraction;
+	switch (squeack)
+	  {
+	  case (Squeack.POP_UP | Squeack.BACKGROUND):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.backgroundPopUpInteraction;
 
-      case (Squeack.SHIFT | Squeack.DOWN | Squeack.OBJECT):
-      case (Squeack.SHIFT | Squeack.DOWN | Squeack.BACKGROUND):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.dragToggleSelectInteraction;
+	  case (Squeack.DOWN | Squeack.BACKGROUND):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.dragSelectInteraction;
 
-      case (Squeack.DOWN | Squeack.OBJECT):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.moveInteraction;
+	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.TEXT):
+	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.OBJECT):
+	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.BACKGROUND):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.dragToggleSelectInteraction;
 
-      case (Squeack.POP_UP | Squeack.OBJECT):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.popUpInteraction;
+	  case (Squeack.DOWN | Squeack.OBJECT):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.moveInteraction;
 
-      case (Squeack.DOWN | Squeack.TEXT):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.moveEditInteraction;
+	  case (Squeack.POP_UP | Squeack.OBJECT):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.popUpInteraction;
 
-      case (Squeack.DOWN | Squeack.CONNECTION):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.connectionSelectInteraction;
+	  case (Squeack.DOWN | Squeack.TEXT):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.moveEditInteraction;
 
-      case (Squeack.SHIFT | Squeack.DOWN | Squeack.CONNECTION):
-	// Drag Select
-      	editor.resetHighlighted();
-	return Interactions.connectionToggleSelectInteraction;
+	  case (Squeack.DOWN | Squeack.CONNECTION):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.connectionSelectInteraction;
 
-      case (Squeack.DOWN | Squeack.OUTLET):
-	// Drag connect
-	return Interactions.dragConnectInteraction;
+	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.CONNECTION):
+	    // Drag Select
+	    editor.resetHighlighted();
+	    return Interactions.connectionToggleSelectInteraction;
 
-      case (Squeack.DOWN | Squeack.INLET):
-	// Drag connect
-	return Interactions.dragReverseConnectInteraction;
+	  case (Squeack.DOWN  | Squeack.OUTLET):
+	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.OUTLET):
+	    // Drag connect
+	    return Interactions.dragConnectInteraction;
 
-      case (Squeack.CTRL | Squeack.DOWN | Squeack.OBJECT):
-	// Ctrl drag for controllers
-      	editor.resetHighlighted();
-	return Interactions.editCtrlInteraction;
+	  case (Squeack.DOWN  | Squeack.INLET):
+	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.INLET):
+	    // Drag connect
+	    return Interactions.dragReverseConnectInteraction;
 
-      case (Squeack.DOWN | Squeack.HRESIZE_HANDLE):
-	// Horizontal Resize
-      	editor.resetHighlighted();
-	return Interactions.hResizeInteraction;
+	  case (Squeack.CTRL | Squeack.DOWN | Squeack.OBJECT):
+	    // Ctrl drag for controllers
+	    editor.resetHighlighted();
+	    return Interactions.editCtrlInteraction;
 
-      case (Squeack.DOWN | Squeack.VRESIZE_HANDLE):
-	// Vertical Resize
-      	editor.resetHighlighted();
-	return Interactions.vResizeInteraction;
+	  case (Squeack.DOWN | Squeack.HRESIZE_HANDLE):
+	    // Horizontal Resize
+	    editor.resetHighlighted();
+	    return Interactions.hResizeInteraction;
 
-      case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
-      case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):
-	// Help
-      	editor.resetHighlighted();
-	return Interactions.helpInteraction;
+	  case (Squeack.DOWN | Squeack.VRESIZE_HANDLE):
+	    // Vertical Resize
+	    editor.resetHighlighted();
+	    return Interactions.vResizeInteraction;
 
-      case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.TEXT):
-      case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.OBJECT):
-	// Edit Content
-      	editor.resetHighlighted();
-	return Interactions.doubleClickEditInteraction;
+	  case (Squeack.ALT | Squeack.DOWN | Squeack.TEXT):
+	  case (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT):
+	    // Help
+	    editor.resetHighlighted();
+	    return Interactions.helpInteraction;
 
-      default :
-	return null;
+	  case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.TEXT):
+	  case (Squeack.CTRL | Squeack.DOUBLE_CLICK | Squeack.OBJECT):
+	    // Edit Content
+	    editor.resetHighlighted();
+	    return Interactions.doubleClickEditInteraction;
+
+	  default :
+	    return null;
+	  }
       }
   }
 }

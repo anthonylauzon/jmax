@@ -190,6 +190,10 @@ public class FtsObject
       {
 	fontSize = value;
       }
+    else if (name == "layer")
+      {
+	layer = value;
+      }
   }
 
   protected void localPut(String name, float value)
@@ -218,6 +222,10 @@ public class FtsObject
       {
 	data = (MaxData) value;
 	Fts.fireNewDataListenerOn(this, data);
+      }
+    else if (name == "comment")
+      {
+	comment = (String) value;
       }
   }
 
@@ -288,7 +296,9 @@ public class FtsObject
   protected String  errorDescription;
   protected String font = null;
   protected int fontSize = -1;
+  protected int layer = -1;
   protected MaxData data;
+  protected String comment;
 
   //
   //  Handling of properties
@@ -367,11 +377,6 @@ public class FtsObject
     return errorDescription;
   }
 
-  public final void updateErrorDescription()
-  {
-    Fts.getServer().askObjectProperty(this, "errdesc");
-  }
-
   public final String getFont()
   {
     return font;
@@ -402,6 +407,21 @@ public class FtsObject
       }
   }
 
+  public final int getLayer()
+  {
+    return layer;
+  }
+
+  public final void setLayer(int layer)
+  {
+    if (this.layer != layer)
+      {
+	Fts.getServer().putObjectProperty(this, "layer", layer);
+	this.layer = layer;
+	setDirty();
+      }
+  }
+
   public MaxData getData()
   {
     return data;
@@ -412,6 +432,16 @@ public class FtsObject
     Fts.getServer().askObjectProperty(this, "data");
   }
 
+  public String getComment()
+  {
+    return comment;
+  }
+
+  public void setComment(String v)
+  {
+    comment = v;
+    Fts.getServer().putObjectProperty(this, "comment", comment);
+  }
 
   /*****************************************************************************/
   /*                                                                           */

@@ -19,10 +19,9 @@ import java.util.*;
 import ircam.jmax.*;
 
 /**
- * Class implementing the proxy of an FTS object.
- * It deals with: Object creation/deletion, connections
- * object properties, class and instance information,
- * FTS instantiation 
+ * Class implementing the proxy of an FTS comment object.
+ * Do nothing, the actual comment is stored in the comment 
+ * property.
  */
 
 public class FtsCommentObject extends FtsObject
@@ -43,14 +42,6 @@ public class FtsCommentObject extends FtsObject
 
     ninlets = 0;
     noutlets = 0;
-  }
-
-
-  public void setComment(String comment)
-  {
-    description = comment;
-    Fts.getServer().sendSetMessage(this, description);
-    setDirty();
   }
 }
 

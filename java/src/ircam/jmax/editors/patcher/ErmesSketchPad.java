@@ -172,26 +172,28 @@ public class ErmesSketchPad extends JPanel
 	connection.redraw();
       }
 
+    displayList.reassignLayers();
     displayList.sortDisplayList();
   }
   
   void InitFromFtsContainer( FtsPatcherData theContainerObject)
   {
     FtsPatcherData aFtsPatcherData = theContainerObject;
-
     Object[] objects = aFtsPatcherData.getObjects().getObjectArray();
     int osize = aFtsPatcherData.getObjects().size();
+    boolean doLayers = false;
 
     for ( int i = 0; i < osize; i++)
       {
 	ErmesObject object = ErmesObject.makeErmesObject( this, (FtsObject)objects[i]);
 	displayList.add( object);
+
+	if (object.getLayer() < 0)
+	  doLayers = true;
       }
 		
-    // chiama tanti add...
 
-    MaxVector connectionVector = aFtsPatcherData.getConnections();	//usefull?
-
+    MaxVector connectionVector = aFtsPatcherData.getConnections();
     Object[] connections = aFtsPatcherData.getConnections().getObjectArray();
     int csize = aFtsPatcherData.getConnections().size();
 
@@ -209,6 +211,9 @@ public class ErmesSketchPad extends JPanel
 	displayList.add(connection);
 	connection.updateDimensions();
       }
+
+    if (doLayers)
+      displayList.reassignLayers();
 
     displayList.sortDisplayList();
   }
@@ -429,6 +434,7 @@ public class ErmesSketchPad extends JPanel
 
 	object = ErmesObject.makeErmesObject( this, fo);
 	displayList.add( object);
+	displayList.reassignLayers();
 
 	if (object instanceof ErmesObjExternal)
 	  ((ErmesObjExternal)object).errorChanged(false);
@@ -621,29 +627,25 @@ public class ErmesSketchPad extends JPanel
 
   private boolean locked = false;
 
-
   void setLocked( boolean locked)
   {
-    if (locked != this.locked)
+    this.locked = locked;
+
+    if (isLocked())
+      setRunModeInteraction();
+    else
+      setEditModeInteraction();
+
+    if (isLocked())
       {
-	this.locked = locked;
+	if (isTextEditingObject())
+	  stopTextEditing();
 
-	if (isLocked())
-	  setRunModeInteraction();
-	else
-	  setEditModeInteraction();
-
-	if (isLocked())
-	  {
-	    if (isTextEditingObject())
-	      stopTextEditing();
-
-	    if (ErmesSelection.patcherSelection.ownedBy(this))
-	      ErmesSelection.patcherSelection.deselectAll();
-	  }
-
-	redraw();
+	if (ErmesSelection.patcherSelection.ownedBy(this))
+	  ErmesSelection.patcherSelection.deselectAll();
       }
+
+    redraw();
   }
 
   final public boolean isLocked()

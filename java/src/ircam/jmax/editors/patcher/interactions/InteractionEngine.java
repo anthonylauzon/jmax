@@ -349,11 +349,6 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   {
     Interaction delegate;
 
-    if (area == null)
-      editor.showMessage("Squeack: " + Squeack.describe(squeack) + " point " + mouse);
-    else
-      editor.showMessage("Squeack: " + Squeack.describe(squeack) + " point " + mouse + " area " + area);
-
     delegate = getCurrentInteraction().delegateSqueack(editor, squeack, area, mouse, oldMouse);
 
     if (delegate != null)

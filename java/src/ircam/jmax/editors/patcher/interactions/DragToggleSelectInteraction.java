@@ -30,7 +30,8 @@ class DragToggleSelectInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    if (Squeack.isDown(squeack) && Squeack.isShift(squeack) && Squeack.onObject(squeack))
+    if (Squeack.isDown(squeack) && Squeack.isShift(squeack) &&
+	     (Squeack.onObject(squeack) || Squeack.onText(squeack)))
       {
 	// Fake a drag of 1 pixel, to select the object we are in
 	// But do not draw the rectangle

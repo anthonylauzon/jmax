@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import javax.swing.*;
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
@@ -14,7 +16,7 @@ import ircam.jmax.editors.patcher.*;
 //
 public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorListener
 {
-  private int isError = -1; // cache of the error property, to speed up paint
+  boolean fresh = true;
 
   //--------------------------------------------------------
   // CONSTRUCTOR
@@ -35,13 +37,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
 
   public void errorChanged(boolean value) 
   {
-    // Handle the "error" property, the only one we're listening at.
-
-    if (value)
-      isError = 1;
-    else
-      isError = 0;
-
     redraw();
   }
 
@@ -55,8 +50,14 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
   {
     try 
       {
+	fresh = false;
+
 	ftsObject = Fts.redefineFtsObject( ftsObject, text);
-	isError = -1;
+
+	if (ftsObject.isError())
+	  {
+	    itsSketchPad.showMessage(ftsObject.getErrorDescription());
+	  }
       } 
     catch (FtsException e) 
       {
@@ -119,23 +120,15 @@ public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjec
 
   public void paint(Graphics g) 
   {
-    if (isError == -1)
-      {
-	if (ftsObject.isError())
-	  isError = 1;
-	else
-	  isError = 0;
-      }
-
-    if (isError == 0) 
+    if ((! fresh) && ftsObject.isError())
+      g.setColor( Color.red);
+    else
       {
 	if (isSelected())
 	  g.setColor( Settings.sharedInstance().getSelectedColor());
 	else
 	  g.setColor( Settings.sharedInstance().getObjColor());
       } 
-    else
-      g.setColor( Color.red);
 
     int x = getX();
     int y = getY();

@@ -66,6 +66,7 @@ public class DisplayList
   public void remove( ErmesObject object)
   {
     displayObjects.removeElement( object);
+    reassignLayers();
   }
 
   ErmesObject getErmesObjectFor(FtsObject obj)
@@ -112,6 +113,7 @@ public class DisplayList
   {
     remove(object);
     add(object);
+    reassignLayers();
     sortDisplayList();
   }
 
@@ -196,18 +198,21 @@ public class DisplayList
   // it automatically will call it just too many time in situations
   // like creating a patch and pasting ...
 
+  public void reassignLayers()
+  {
+    Object[] values = displayObjects.getObjectArray();
+    int size = displayObjects.size();
+    int layer = 0;
+
+    for (int i = 0; i < size; i++)
+      if (values[i] instanceof ErmesObject)
+	((ErmesObject) values[i]).setLayer(layer++);
+  }
+
   public void sortDisplayList()
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
-
-
-    // First, assign progressive layer number to objects
-
-    int layer = 0;
-    for (int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesObject)
-	((ErmesObject) values[i]).setLayer(layer++);
 
     // Then, sort 
 
@@ -726,5 +731,6 @@ public class DisplayList
     sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, dragRectangle.height + 1);
   }
 }
+
 
 

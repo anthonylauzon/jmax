@@ -54,6 +54,8 @@ class DragConnectInteraction extends Interaction
     catch (FtsException e)
       {
 	// Just don't do the connection in case of troubles.
+
+	editor.showMessage("Cannot connect");
       }
   }
 
@@ -63,6 +65,9 @@ class DragConnectInteraction extends Interaction
   {
     if (Squeack.isDown(squeack) && Squeack.onOutlet(squeack))
       {
+	ErmesSelection.patcherSelection.redraw();
+	ErmesSelection.patcherSelection.deselectAll();
+
 	src    = (ErmesObject) area.getTarget();
 	outlet = area.getNumber();
 

@@ -52,6 +52,8 @@ class MoveReverseConnectInteraction extends Interaction
     catch (FtsException e)
       {
 	// Just don't do the connection in case of troubles.
+
+	editor.showMessage("Cannot connect");
       }
   }
 
@@ -61,6 +63,9 @@ class MoveReverseConnectInteraction extends Interaction
   {
     if (Squeack.isUp(squeack) && Squeack.onInlet(squeack))
       {
+	ErmesSelection.patcherSelection.redraw();
+	ErmesSelection.patcherSelection.deselectAll();
+
 	dst   = (ErmesObject) area.getTarget();
 	inlet = area.getNumber();
 

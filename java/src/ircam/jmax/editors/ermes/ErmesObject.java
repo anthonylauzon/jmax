@@ -555,8 +555,6 @@ abstract class ErmesObject implements ErmesDrawable {
 
 	itsSketchPad.setAnnotating();
 
-	itsFtsObject.updateErrorDescription();
-	Fts.sync();
 	annotation = itsFtsObject.getErrorDescription();
 
 	if (annotation != null)

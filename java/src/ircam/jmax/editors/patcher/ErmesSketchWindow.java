@@ -39,7 +39,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
       }
     catch (FtsException e) 
       {
-	System.out.println("warning: failed to create an Fts clipboard");
       }
   }
 
@@ -701,7 +700,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   public void resetMessage()
   {
-    itsMessageLabel.setText("");
+    itsMessageLabel.setText("    ");
   }
 }
 
