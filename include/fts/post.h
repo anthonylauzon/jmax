@@ -31,7 +31,7 @@ FTS_API void post_atoms(int ac, const fts_atom_t *at);
 FTS_API void post(const char *format , ...); 
 
 FTS_API void post_error(fts_object_t *obj, const char *format , ...); 
-
+FTS_API void fts_log(char* fmt, ...);
 
 #endif
 

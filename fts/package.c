@@ -186,7 +186,7 @@ fts_package_load(fts_symbol_t name)
   /* locate the directory of the package */
   if (!fts_find_file(NULL, fts_get_package_paths(), fts_symbol_name(name), path, MAXPATHLEN) 
       || !fts_is_directory(path)) {
-    fprintf(stderr, "Couldn't find package %s\n", fts_symbol_name(name));
+    fts_log("[package]: Couldn't find package %s\n", fts_symbol_name(name));
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     return pkg;
@@ -198,6 +198,7 @@ fts_package_load(fts_symbol_t name)
   if (fts_file_exists(filename)) {
     pkg = fts_package_load_from_file(name, filename);
   } else {
+    fts_log("[package]: No package definition for %s package\n", fts_symbol_name(name));
     pkg = fts_package_new(name);
     pkg->state = fts_package_defined;
     pkg->name = name;
@@ -224,7 +225,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   obj = fts_binary_file_load( filename, (fts_object_t *)fts_get_root_patcher(), 0, 0, 0);
 
   if (!obj) {
-    post( "Failed to load package file %s\n", filename);
+    fts_log("[package]: Failed to load package file %s\n", filename);
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto gracefull_exit;
@@ -233,7 +234,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   /* check whether it's a package object */
   if (fts_object_get_class(obj) != fts_package_class) {
 /* FIXME: error corruption     fts_object_destroy(obj); */
-    post( "Invalid package file %s\n", filename);
+    fts_log("[package]: Invalid package file %s\n", filename);
     pkg = fts_package_new(name);
     pkg->state = fts_package_corrupt;
     goto gracefull_exit;
@@ -773,12 +774,12 @@ fts_package_load_default_files(fts_package_t* pkg)
     snprintf(function, 256, "%s_config", fts_symbol_name(pkg->name));
     ret = fts_load_library(filename, function);
     if (ret != fts_Success) {
-      fprintf(stderr, "Error loading library of package %s: %s\n", fts_symbol_name(pkg->name), ret->description);
+      fts_log("[package]: Error loading library of package %s: %s\n", fts_symbol_name(pkg->name), ret->description);
     } else {
-      fprintf(stderr, "debug: loaded library %s\n", fts_symbol_name(pkg->name));
+      fts_log("[package]: Loaded %s library\n", fts_symbol_name(pkg->name));
     }
   } else {
-    fprintf(stderr, "debug: no found no library for %s (tried %s)\n", fts_symbol_name(pkg->name), filename);
+    fts_log("[package]: Didn't found no library for %s (tried %s)\n", fts_symbol_name(pkg->name), filename);
   }
 
   fts_package_pop(pkg);

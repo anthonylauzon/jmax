@@ -138,7 +138,7 @@ void fts_load_project( void)
 
   /* create an empty project */
   if (project_file == NULL) {
-    fprintf(stderr, "starting fts with an empty project. this is probably not what you want. make sure you have a valid project file.\n");
+    fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
     project = fts_package_new(project_symbol);
     fts_project_set(project);
   } else {

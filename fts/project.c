@@ -43,7 +43,7 @@ fts_project_open(const char* filename)
     sym_project = fts_new_symbol("project");
   }
 
-  fprintf(stderr, "opening project %s\n", filename);
+  fts_log("[project]: Opening project %s\n", filename);
   
   fts_project = fts_package_load_from_file(sym_project, filename);
 

@@ -34,9 +34,6 @@ void fts_set_hinstance(HINSTANCE hinstance)
 {
   if (fts_hinstance == NULL) {
     fts_hinstance = hinstance;
-#if DEBUG
-    printf("fts_set_hinstance: instance=%d\n", (int) fts_hinstance);
-#endif
   }	
 }
 
@@ -47,9 +44,6 @@ HINSTANCE fts_get_hinstance()
 
 BOOL WINAPI DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-#if DEBUG
-  printf("DllMain\n");
-#endif
   fts_set_hinstance((HINSTANCE) hModule);
   return TRUE;
 }
@@ -61,15 +55,6 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved
 /*                                                                             */
 /* *************************************************************************** */
 
-/* The Win32 implementation uses LoadLibrary() and GetProcAddress(). */
-
-/*
-    The dl code was adapted from TiMidity++
-
-    TiMidity++ -- MIDI to WAVE converter and player
-    Copyright (C) 1999-2001 Masanao Izumo <mo@goice.co.jp>
-    Copyright (C) 1995 Tuukka Toivonen <tt@cgs.fi>
-*/
 fts_status_t fts_load_library( const char *filename, const char *symbol)
 {
   static char error_description[1024];

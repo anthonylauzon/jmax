@@ -196,3 +196,54 @@ void post_error(fts_object_t *obj, const char *format , ...)
 }
 
 
+
+/*
+ * iiwu_log
+ */
+
+static char* log_file = NULL;
+
+void fts_init_log(void)
+{
+  FILE* log;
+
+#ifdef WIN32
+  log_file = "C:\\fts_log.txt";
+#else
+  char* home = getenv("HOME");
+  if (home) {
+    char buf[1024];
+    snprintf(buf, 1024, "%s/.fts_log", home);
+    log_file = strdup(buf);
+  } else {
+    log_file = "/tmp/fts_log";
+  }
+#endif
+
+  /* truncate the file */
+  log = fopen(log_file, "w");
+  fprintf(log, "[log]: started new log file\n");
+  fclose(log);
+}
+
+void fts_log(char* fmt, ...)
+{
+  FILE* log;
+  va_list args; 
+
+  if (log_file == NULL) {
+    fts_init_log();
+  }
+
+  log = fopen(log_file, "a");
+  if (log == NULL) {
+    return;
+  }
+
+  va_start (args, fmt); 
+  vfprintf(log, fmt, args); 
+  va_end (args); 
+
+  fflush(log);
+  fclose(log);
+}
