@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 
 #include "ftsconfig-win32.h"
-
+#include <common/config.h>
 
 // Default (hard-coded) priorities for FTS process
 #define FTS_DEFAULT_WIN32_PRIORITY_CLASS HIGH_PRIORITY_CLASS
@@ -272,32 +272,33 @@ fts_set_regvalue_int(char* name, int value)
 fts_symbol_t 
 fts_get_default_root_directory( void)
 {
-  char root[_MAX_PATH];
-  int i;
-
-  /* first check the registry */
-  if (fts_get_regvalue_string("ftsRoot", root, _MAX_PATH) != 0) {
-
-    /* otherwise, calculate the root from the current directory */
-    if (GetCurrentDirectory(_MAX_PATH, root) == 0) {
-      return NULL;
+    char root[_MAX_PATH];
+    int i, j;
+    
+    /* retrieve the current exe's file path */
+    if ( ! GetModuleFileName(NULL, root, _MAX_PATH)) {
+        return NULL;
     }
-    /* move one directory up */
+
+    fts_log("[win32]: Current exe is '%s'\n", root);
+
+    /* The jmax root is typically located in the parent directory,
+    ** as the fts executable is typically in <ftsroot>/bin.
+    */
     i = strlen(root);
+    j = 2;
     while (--i >= 0) {
-      if (root[i] == '\\') {
-	root[i] = 0;
-	break;
-      }
+        if (root[i] == '\\') {
+            root[i] = 0;
+            j--;
+            if(j<=0)
+                break;
+        }
     }
-
-    fts_log("[win32]: Using a fts root based on current directory: '%s'\n", root);
-
-  } else {
-    fts_log("[win32]: Using the fts root from the registry: '%s'\n", root);
-  }
-
-  return fts_new_symbol_copy( root);
+    
+    fts_log("[win32]: Using default fts root (relative to fts's executable): '%s'\n", root);
+    
+    return fts_new_symbol_copy( root);
 }
 
 fts_symbol_t 
@@ -622,7 +623,11 @@ int fts_set_win32_thread_priority(int threadPriority)
 
         fts_log("[win32] Attempting to change thread priority to '%s' (%s)\n", pszDesc, pszID);
 
-        SetThreadPriority(GetCurrentThread(), threadPriority);
+        if(!SetThreadPriority(GetCurrentThread(), threadPriority)) {
+            fts_log("[win32] Error: Failed to set current thread's priority.\n");
+            fts_log_last_win32_error();
+            return -1;
+        }
 
         fts_log("[win32] Thread priority changed.\n");
 
@@ -643,7 +648,7 @@ int fts_get_win32_thread_priority()
     int code;
     code = GetThreadPriority(GetCurrentThread());
     if(code == THREAD_PRIORITY_ERROR_RETURN) {
-        fts_log("[win32] Error: Failed to get current thread's priority.");
+        fts_log("[win32] Error: Failed to get current thread's priority.\n");
         fts_log_last_win32_error();
         return THREAD_PRIORITY_ERROR_RETURN;
     }
@@ -661,7 +666,11 @@ int fts_set_win32_priority_class(DWORD priorityClass)
 
         fts_log("[win32] Attempting to change process priority class to '%s' (%s)\n", pszDesc, pszID);
 
-        SetPriorityClass(GetCurrentProcess(), priorityClass);
+        if(!SetPriorityClass(GetCurrentProcess(), priorityClass)) {
+            fts_log("[win32] Error: Failed to set current process's priority class.\n");
+            fts_log_last_win32_error();
+            return -1;
+        }
 
         fts_log("[win32] Process priority class changed.\n");
 
@@ -678,7 +687,15 @@ int fts_set_win32_priority_class(DWORD priorityClass)
 
 DWORD fts_get_win32_priority_class() 
 {
-    return GetPriorityClass(GetCurrentProcess());
+    int code;
+    code = GetPriorityClass(GetCurrentProcess());
+    if(!code) {
+        fts_log("[win32] Error: Failed to get current process's priority class.\n");
+        fts_log_last_win32_error();
+        return THREAD_PRIORITY_ERROR_RETURN;
+    }
+    else 
+        return code;
 }
 
 
@@ -689,7 +706,7 @@ static void fts_init_win32_thread_priority(void)
     int i;
     int bThreadPriorityChanged = 0, bPriorityClassChanged = 0;
         
-    if(! fts_get_regvalue_string("priorityClass", szPriorityClass, 127)) {
+    if(fts_config_get_string("priorityClass", szPriorityClass, 127)>=0) {
 
         DWORD PriorityClass;
 
@@ -726,7 +743,7 @@ static void fts_init_win32_thread_priority(void)
         fts_log("[win32] Process priority class is %s (%d).\n", pID, priorityClass); 
     }
 
-    if(! fts_get_regvalue_string("threadPriority", szThreadPriority, 127)) {
+    if(fts_config_get_string("threadPriority", szThreadPriority, 127)>=0) {
 
         DWORD threadPriority;
 
@@ -805,6 +822,8 @@ void fts_platform_init( int argc, char **argv)
     closesocket(sock);
 
     /* print out the current version in the log file */
+    /* [RS] ...no more, as everything is in config files now */
+    /*
     if ((RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) == 0) &&
         (fts_get_registry_string(key, "FtsVersion", version, 256) == 0)) {
         fts_log("[win32]: FtsVersion %s\n", version);
@@ -812,6 +831,7 @@ void fts_platform_init( int argc, char **argv)
         post("Error opening registry key '%s'\n", JMAX_KEY);
         fts_log("[win32]: Error opening registry key '%s'\n", JMAX_KEY);
     }
+    */
 
     /* set thread priority */
     fts_init_win32_thread_priority();
