@@ -832,6 +832,12 @@ public class FtsParse
   }
 
   /** Unparse an object description from a FTS message.  */
+  static String removeZeroAtEnd(String buff){
+    while(buff.endsWith("0")){
+      buff = buff.substring(0, buff.length()-1);
+    }
+    return buff;
+  }
 
   static String unparseObjectDescription(Object initValue, FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
@@ -862,7 +868,7 @@ public class FtsParse
 	  value2 = stream.getNextArgument();
 
 	if (value1 instanceof Float)
-	  descr.append(formatter.format(value1));
+	  descr.append(removeZeroAtEnd(formatter.format(value1)));
 	else if (value1 instanceof Integer)
 	  descr.append(value1);
 	else if (value1 instanceof String)
