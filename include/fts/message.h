@@ -160,88 +160,6 @@ FTS_API fts_status_t fts_outlet_send(fts_object_t *, int woutlet, fts_symbol_t ,
 ((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (float) fts_get_int(&(AT)[N]) : \
 	      (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
-/* inlined macros for message sending (active only if compiled optimized */
-#ifdef OPTIMIZE
-
-#define fts_send(CONN, S, AC, AT) \
-\
-while((CONN)) \
-  { \
-    if (((CONN)->symb == (S)) || (!(CONN)->symb && (CONN)->mth)) \
-       {							  \
-           FTS_OBJSTACK_PUSH((CONN)->dst);                        \
-           (*(CONN)->mth)((CONN)->dst, (CONN)->winlet, (S), (AC), (AT)); \
-           FTS_OBJSTACK_POP((CONN)->dst);                         \
-       } \
-    else \
-       fts_send_message_cache((CONN)->dst, (CONN)->winlet, (S), (AC), (AT), &((CONN)->symb), &((CONN)->mth)); \
- \
-    (CONN) = (CONN)->next_same_src; \
-  }
-
-
-#define fts_outlet_send(O, WOUTLET, PS, AC, AT) \
-do { \
-  fts_connection_t *__conn; \
-  fts_symbol_t __s = (PS); \
- \
-  __conn = (O)->out_conn[(WOUTLET)]; \
- \
-  fts_send(__conn, __s, (AC), (AT)); \
-} while (0)
-
-
-#define fts_outlet_int(O, WOUTLET, N) \
-do { \
-  fts_connection_t *__conn; \
-  fts_atom_t __a; \
- \
-  fts_set_int(&__a, (N)); \
-  \
-  __conn = (O)->out_conn[(WOUTLET)]; \
- \
-  fts_send(__conn, fts_s_int, 1, &__a); \
-} while (0)
-
-
-#define fts_outlet_float(O, WOUTLET, F) \
-do { \
-  fts_connection_t *__conn; \
-  fts_atom_t __a; \
- \
-  fts_set_float(&__a, (F)); \
-  \
-  __conn = (O)->out_conn[(WOUTLET)]; \
- \
-  fts_send(__conn, fts_s_float, 1, &__a); \
-} while (0)
-
-
-#define fts_outlet_symbol(O, WOUTLET, S) \
-do { \
-  fts_connection_t *__conn; \
-  fts_atom_t __a; \
- \
-  fts_set_symbol(&__a, (S)); \
-  \
-  __conn = (O)->out_conn[(WOUTLET)]; \
- \
-  fts_send(__conn, fts_s_symbol, 1, &__a); \
-} while(0)
-
-
-#define fts_outlet_bang(O, WOUTLET) \
-do { \
-  fts_connection_t *__conn = (O)->out_conn[(WOUTLET)]; \
- \
-  fts_send(__conn, fts_s_bang, 0, 0); \
-} while(0)
-
-#else
-/* Prototypes of the functions equivalent to the macros; actually
-   implemented in messutil.c, but they have to be prototyped here
-   with the macros !!!  
-*/
 
 FTS_API void fts_outlet_bang(fts_object_t *o, int woutlet);
 FTS_API void fts_outlet_int(fts_object_t *o, int woutlet, int n);
@@ -264,4 +182,3 @@ FTS_API void fts_outlet_atoms_copy(fts_object_t *o, int woutlet, int ac, const f
  */
 FTS_API void fts_return( fts_atom_t *p);
 
-#endif

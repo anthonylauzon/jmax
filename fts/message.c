@@ -219,10 +219,17 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
   if (winlet == fts_system_inlet)
     in = cl->sysinlet;
-  else if (winlet < cl->ninlets && winlet >= 0)
-    in = &cl->inlets[winlet];
   else
-    return &fts_InletOutOfRange;
+    {
+      if (winlet >= cl->ninlets)
+	winlet = cl->ninlets-1;
+
+      if (winlet >= 0)
+	in = &cl->inlets[winlet];
+      else
+	return &fts_InletOutOfRange;
+    }
+      
 
   messtable = in->messlist;
 
@@ -280,7 +287,6 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
    The function is left here so that a user can compile an object with -g to test it
 */
 
-#undef fts_outlet_send
 fts_status_t
 fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -347,7 +353,6 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_
    -g also with -O compiled libraries.
 */
 
-#undef fts_outlet_int
 void fts_outlet_int(fts_object_t *o, int woutlet, int n)
 {
   fts_connection_t *conn;
@@ -365,7 +370,6 @@ void fts_outlet_int(fts_object_t *o, int woutlet, int n)
     }
 }
 
-#undef fts_outlet_float
 void fts_outlet_float(fts_object_t *o, int woutlet, float f)
 {
   fts_connection_t *conn;
@@ -383,7 +387,6 @@ void fts_outlet_float(fts_object_t *o, int woutlet, float f)
     }
 }
 
-#undef fts_outlet_symbol
 void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
 {
   fts_connection_t *conn;
@@ -401,7 +404,6 @@ void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
     }
 }
 
-#undef fts_outlet_bang
 void fts_outlet_bang(fts_object_t *o, int woutlet)
 {
   fts_connection_t *conn = o->out_conn[woutlet];
