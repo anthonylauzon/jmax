@@ -220,11 +220,11 @@ jmax_get_classpath(char* path)
     return NULL;
   }
 
-  sprintf(jmax_classpath, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s", 
+  sprintf(jmax_classpath, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s", 
 	  path, PATH_SEPARATOR,
 	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "jmax.jar", PATH_SEPARATOR,
-	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "jacl.jar", PATH_SEPARATOR,
-	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "tcljava.jar");
+	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "jacl.jar", PATH_SEPARATOR,
+	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "tcljava.jar");
 
   return jmax_classpath;
 }
