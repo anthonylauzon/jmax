@@ -22,18 +22,14 @@
 
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <fts/fts.h>
 #include <ftsprivate/parser.h>
 
   /* #define this to 1 if you want a lot of debug printout of the parser */
 #define YYDEBUG 0
 
-#ifndef STANDALONE
 static int yylex();
-#else
-extern int yylex();
-extern void tokenizer_init( const char *s);
-#endif
 
 static int yyerror( const char *msg);
 

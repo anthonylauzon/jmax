@@ -2407,7 +2407,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bison -y ../../fts/parser.y >> /dev/null 2>&1 \nmv y.tab.c ../../fts/parser.c\nflex -olex.yy.c ../../fts/tokenizer.l \nmv lex.yy.c ../../fts/tokenizer.c\nexit 0";
+			shellScript = "bison -y -d ../../fts/parser.y >> /dev/null 2>&1 \nmv y.tab.c ../../fts/parser.c\nmv y.tab.h ../../fts/parser.h\nflex -olex.yy.c ../../fts/tokenizer.l \nmv lex.yy.c ../../fts/tokenizer.c\nexit 0";
 		};
 		F75A0F80043AFFDF01664058 = {
 			isa = PBXTargetDependency;

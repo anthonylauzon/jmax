@@ -56,6 +56,7 @@ struct sockaddr {
 
 #define AF_INET 2
 #define SOCK_STREAM 1
+#define INVALID_SOCKET -1
 
 typedef int ssize_t;
 
@@ -78,5 +79,10 @@ extern char *realpath(const char *path, char *resolved_path);
 
 extern int dup (int __fd);
 extern int dup2 (int __fd, int __fd2);
+
+/***************************************/
+/* from socketstream.c                 */
+/***************************************/
+extern void fts_kernel_socketstream_init(void);
 
 #endif

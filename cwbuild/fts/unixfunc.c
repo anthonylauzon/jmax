@@ -91,3 +91,10 @@ int dup2 (int __fd, int __fd2)
 {
   return -1;
 }
+
+/***************************************/
+/* from socketstream.c                 */
+/***************************************/
+void fts_kernel_socketstream_init(void)
+{
+}

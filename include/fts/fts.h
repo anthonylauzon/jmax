@@ -65,10 +65,12 @@ extern "C" {
 #else
 #define FTS_API __declspec(dllimport)
 #endif
-/*#elif defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
-#define FTS_API __declspec(dllexport)*/
 #else
 #define FTS_API extern
+#endif
+
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#include <unixfunc.h>
 #endif
 
 /* *** The inclusion order is important *** */
