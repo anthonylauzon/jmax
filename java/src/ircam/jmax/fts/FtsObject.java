@@ -26,6 +26,7 @@
 package ircam.jmax.fts;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 
 import ircam.jmax.*;
@@ -788,9 +789,52 @@ public class FtsObject
    * Empty by default, subclassed by special objects
    */
 
-  void handleMessage(FtsStream stream)
+  // (francois)
+  // This is what I have found to get a class object representing the type of an array
+  private static Class ftsAtomArrayClass = (new FtsAtom[1]).getClass();
+
+  void handleMessage( FtsStream stream)
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
+    if ( stream.nextIsSymbol() )
+      {
+	String selector;
+
+	selector = stream.getNextSymbolArgument();
+
+	try
+	  {
+	    Class parameterTypes[] = new Class[1];
+	    parameterTypes[0] = ftsAtomArrayClass;
+
+	    Method method = getClass().getMethod( selector, parameterTypes);
+
+	    Object[] methodArgs = new Object[1];
+	    methodArgs[0] = stream.getArgs();;
+
+	    method.invoke( this, methodArgs);
+	  }
+	catch ( IllegalAccessException exc)
+	  {
+	    System.err.println( exc);
+	  }
+	catch ( IllegalArgumentException exc)
+	  {
+	    System.err.println( exc);
+	  }
+	catch ( InvocationTargetException exc)
+	  {
+	    System.err.println( exc);
+	  }
+	catch( NoSuchMethodException exc)
+	  {
+	    System.err.println( exc);
+	  }
+	catch (SecurityException exc)
+	  {
+	    System.err.println( exc);
+	  }
+      }
   }
 
   /**

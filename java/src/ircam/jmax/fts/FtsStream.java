@@ -715,13 +715,69 @@ abstract public class FtsStream
 	return null;
       }
   }
+
+  /**
+   * Get the arguments as an array of FtsAtom.
+   */
+  private static FtsAtom args[];
+
+  public final FtsAtom[] getArgs()
+       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+  {
+    int argsCount = 0;
+
+    if (args == null)
+      args = new FtsAtom[128];
+
+    while ( ! endOfArguments())
+      {
+	switch (status)
+	  {
+	  case FtsClientProtocol.int_type:
+	    args[ argsCount ].type = FtsAtom.INT;
+	    args[ argsCount ].intValue = getNextIntArgument();
+	    break;
+
+	  case FtsClientProtocol.float_type:
+	    args[ argsCount ].type = FtsAtom.FLOAT;
+	    args[ argsCount ].floatValue = getNextFloatArgument();
+	    break;
+
+	  case FtsClientProtocol.object_type:
+	    args[ argsCount ].type = FtsAtom.OBJECT;
+	    args[ argsCount ].objectValue = getNextObjectArgument();
+	    break;
+
+	  case FtsClientProtocol.string_start:
+	    args[ argsCount ].type = FtsAtom.STRING;
+	    args[ argsCount ].stringValue = getNextStringArgument();
+	    break;
+
+	  case FtsClientProtocol.symbol_cached_type:
+	  case FtsClientProtocol.symbol_and_def_type:
+	  case FtsClientProtocol.symbol_type:
+	    args[ argsCount ].type = FtsAtom.STRING;
+	    args[ argsCount ].stringValue = getNextSymbolArgument();
+	    break;
+
+	  default:
+	    args[ argsCount ].type = FtsAtom.VOID;
+	    break;
+	  }
+
+	argsCount++;
+
+	if ( argsCount >= args.length)
+	  {
+	    FtsAtom newArgs[] = new FtsAtom[ 2 * args.length];
+
+	    System.arraycopy( args, 0, newArgs, 0, args.length);
+
+	    args = newArgs;
+	  }
+      }
+
+    return args;
+  }
 }
-
-
-
-
-
-
-
-
 
