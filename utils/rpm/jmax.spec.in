@@ -48,7 +48,7 @@ find $RPM_BUILD_ROOT/usr/share/jmax/packages -name "*.jpkg" | sed "s|$RPM_BUILD_
 # help files for common rpm
 find $RPM_BUILD_ROOT/usr/share/jmax/packages -type d -name "help" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.common.list
 # for java rpm
-find $RPM_BUILD_ROOT/usr/share/jmax/packages -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
+find $RPM_BUILD_ROOT/usr/share/jmax -name "*.jar" | sed "s|$RPM_BUILD_ROOT||g" >> /var/tmp/rpm.jmax.java.list
 
 %clean
 rm -rf $RPM_BUILD_ROOT
