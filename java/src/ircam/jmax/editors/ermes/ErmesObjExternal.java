@@ -54,6 +54,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
     if (theFtsObject.isContainer())
       this.YouArePatcher(true);
+    
+    ParseText(itsArgs);
 
     return true;		// Why this method return a value ????
   }

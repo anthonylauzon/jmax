@@ -48,6 +48,7 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.editStatus = itsSketchPad.EDITING_COMMENT;
     itsSketchPad.GetTextArea().setVisible(true);
     itsSketchPad.GetTextArea().requestFocus();
+    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsDocument.itsPatcher;
     return true;
   }
 
@@ -55,16 +56,18 @@ class ErmesObjComment extends ErmesObject {
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad,FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
-    itsFontMetrics = theSketchPad.GetTextArea().getFontMetrics(itsFont);
-    FIELD_HEIGHT = theSketchPad.getFontMetrics(theSketchPad.getFont()).getHeight();
-    preferredSize = new Dimension(theSketchPad.getFontMetrics(theSketchPad.getFont()).stringWidth(itsArgs),FIELD_HEIGHT*5);
+    //itsFontMetrics = theSketchPad.GetTextArea().getFontMetrics(itsFont);
+    FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
+    FIELD_HEIGHT = temporaryFM.getHeight();
+    preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
-    itsFontMetrics = itsSketchPad.GetTextArea().getFontMetrics(itsFont);
+    //itsFontMetrics = itsSketchPad.GetTextArea().getFontMetrics(itsFont);
     itsSketchPad.GetTextArea().setBackground(Color.white);
-    currentRect = new Rectangle();
+    //currentRect = new Rectangle();
     // MDC:
     itsArgs = theFtsObject.getArgumentsDescription().trim();
     
+    ParseText(itsArgs);
     return true;
   }
 	

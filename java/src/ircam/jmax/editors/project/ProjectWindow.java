@@ -453,7 +453,7 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	catch (Exception e)
 	  {
 	    System.out.println("error while opening .tpa " + file +" : " + e.toString());
-	    // e.printStackTrace();
+	    e.printStackTrace();
 	    return false;
 	  }
 	MaxApplication.itsSketchWindowList.addElement(MaxApplication.itsSketchWindow);

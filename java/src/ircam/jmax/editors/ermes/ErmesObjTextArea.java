@@ -69,9 +69,17 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     }
     
     if (itsOwner == null) return false; //this happens when the instatiation fails
-    itsOwner.itsArgs = aTextString;
-    itsOwner.ParseText(aTextString);
     
+    if (itsOwner.itsFtsObject != null){
+      itsOwner.itsArgs = aTextString;
+      itsOwner.ParseText(aTextString);
+      itsOwner.redefineFtsObject();
+    }
+    else {
+      itsOwner.itsArgs = aTextString;
+      itsOwner.ParseText(aTextString);
+      itsOwner.makeFtsObject();
+    }
     ///qui accorcia se il testo e' piu' corto dell'oggetto
     //dovrebbe farlo anche per l'altezza...
 

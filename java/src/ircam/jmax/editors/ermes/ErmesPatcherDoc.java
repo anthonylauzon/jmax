@@ -179,7 +179,6 @@ public class ErmesPatcherDoc implements MaxDocument {
     itsTitle = itsFile.getName();
 
     try {
-      System.out.println(itsFile);
       fs = new FileOutputStream(itsFile);
     }
 
@@ -230,13 +229,15 @@ public class ErmesPatcherDoc implements MaxDocument {
     for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
       aErmesObject = (ErmesObject) e.nextElement();
       aFObject = aErmesObject.itsFtsObject;
-
+      
+           
       // if (!(aErmesObject.itsFont.getName().equals(aErmesObject.itsSketchPad.sketchFont.getName()))||
       // ( aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize()))
       // ermesInfo = "(font:"+aErmesObject.itsFont.getName()+", "+aErmesObject.itsFont.getSize()+")";
 
       // Note that ermesInfo is not used anymore; a new function will come soon !! MDC
-
+      
+      
       aGDescription = new FtsGraphicDescription(aErmesObject.itsX, aErmesObject.itsY,
 						aErmesObject.currentRect.width,
 						aErmesObject.currentRect.height);

@@ -41,8 +41,9 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     // to get the string from the object.
 
     itsArgs = theFtsObject.getArgumentsDescription().trim();
-
+    
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+    ParseText(itsArgs);
     return true;  
   }
 	
