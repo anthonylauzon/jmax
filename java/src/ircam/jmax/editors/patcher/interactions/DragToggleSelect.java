@@ -71,8 +71,16 @@ class DragToggleSelect extends Interaction
 	if ( object.isSelected())
 	  ErmesSelection.patcherSelection.deselect(object);
 	else
-	  ErmesSelection.patcherSelection.select(object);
+	  {
+	    if( editor.isTextEditingObject())
+	      {
+		GraphicObject obj = editor.getTextEditedObject();
+		editor.abortTextEditing();
+		ErmesSelection.patcherSelection.select(obj);
+	      }
 
+	    ErmesSelection.patcherSelection.select(object);
+	  }
 	object.redraw();
 	//to made faster the shift+click objects selection we loose "to back" feature 
 	//bringToBack = true;

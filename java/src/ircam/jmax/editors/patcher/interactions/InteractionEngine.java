@@ -492,9 +492,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
   public void mousePressed( MouseEvent e)
   {
-    sketch.setKeyEventClient(null);
-    sketch.stopTextEditing();
-    sketch.requestFocus();
+    if(!e.isShiftDown()) 
+      sketch.stopTextEditing();
 
     //jdk bug fix: in macosx platform isPopupTrigger() function return true with
     //both CTRL and ALT keys pressed. We want that CTRL is popupTrigger (so right button) 
@@ -511,6 +510,9 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
       processEvent(Squeack.DOUBLE_CLICK, e);
     else
       processEvent(Squeack.DOWN, e);	    
+
+    sketch.setKeyEventClient(null);
+    sketch.requestFocus();
   }
 
   public void mouseReleased( MouseEvent e)
