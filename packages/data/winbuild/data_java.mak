@@ -9,44 +9,28 @@ dir:
 	-@if not exist "..\java\classes" mkdir "..\java\classes"
 
 jar:
-	-@cd ..\java\classes
+	-@cd ..\data\java
+	$(JAVAC) -classpath ..\..\..\java\jmax.jar;..\..\..\packages\data\java -d .\classes *.java
 	-@if exist "$(PKG).jar" erase "$(PKG).jar"
-	$(JAR) -cf ..\$(PKG).jar ircam
+	-@cd classes
+	$(JAR) -cf ..\$(PKG).jar ircam *.class
 
 classes:
-	cd ..\java\src\ircam\jmax
+	cd ..\java\ircam\jmax
 
-	cd editors\bpf
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\classes;..\..\..\..\..\src -d ..\..\..\..\..\classes *.java
-	-@cd ..\..
+	$(JAVAC) -classpath ..\..\..\..\..\java\jmax.jar;..\..\..\..\..\packages\data\java -d ..\..\..\java\classes editors\bpf\*.java
 
-	cd editors\bpf\renderers
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..
+	$(JAVAC) -classpath ..\..\..\..\..\java\jmax.jar;..\..\..\..\..\packages\data\java -d ..\..\..\java\classes editors\bpf\renderers\*.java
 
-	cd editors\bpf\tools
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..
+	$(JAVAC) -classpath ..\..\..\..\..\java\jmax.jar;..\..\..\..\..\packages\data\java -d ..\..\..\java\classes editors\bpf\tools\*.java
 
-	cd editors\table
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\classes;..\..\..\..\..\src -d ..\..\..\..\..\classes *.java
-	-@cd ..\..
+	$(JAVAC) -classpath ..\..\..\..\..\java\jmax.jar;..\..\..\..\..\packages\data\java -d ..\..\..\java\classes editors\table\*.java
 
-	cd editors\table\renderers
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..
+	$(JAVAC) -classpath ..\..\..\..\..\java\jmax.jar;..\..\..\..\..\packages\data\java -d ..\..\..\java\classes editors\table\renderers\*.java
 
-	cd editors\table\tools
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..
+	$(JAVAC) -classpath ..\..\..\..\..\java\jmax.jar;..\..\..\..\..\packages\data\java -d ..\..\..\java\classes editors\table\tools\*.java
 
-	cd editors\table\actions
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..
-
-	cd editors\table\menus
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\..\..\classes;..\..\..\..\..\..\src -d ..\..\..\..\..\..\classes *.java
-	-@cd ..\..\..
+	$(JAVAC) -classpath ..\..\..\..\..\java\jmax.jar;..\..\..\..\..\packages\data\java -d ..\..\..\java\classes editors\table\menus\*.java
 
 	cd ..\..\..\..\winbuild
 
