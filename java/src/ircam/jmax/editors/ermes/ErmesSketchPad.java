@@ -2130,7 +2130,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     //removes theObject from the element list (delete)
     itsElements.removeElement( theObject);
 
-    theObject.cleanAll();
+    theObject.dispose();
 
     markSketchAsDirty();
     
@@ -2183,7 +2183,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       {
 	ErmesObject object = (ErmesObject) objects[i];
 
-	object.cleanAll();
+	object.dispose();
       }
 
     Fts.getServer().removeUpdateGroupListener( this);

@@ -28,8 +28,6 @@ static void fts_assign_boot_devices();
    module init function */
 
 static fts_welcome_t version_welcome = {FTS_VERSION_STRING};
-static fts_welcome_t author_welcome = {"by Francois Dechelle, Maurizio De Cecco and Norbert Schnell\n"};
-static fts_welcome_t author_email_welcome = {"  dechelle@ircam.fr   dececco@ircam.fr  schnell@ircam.fr\n"};
 static fts_welcome_t compilation_info_welcome = {COMPILATION_INFO_STRING};
 
 #ifdef DEBUG
@@ -66,8 +64,6 @@ main(int argc, char **argv)
   /* Install the basic welcome messages */
 
   fts_add_welcome(&version_welcome);
-  fts_add_welcome(&author_welcome);
-  fts_add_welcome(&author_email_welcome);
   fts_add_welcome(&compilation_info_welcome);
 
 #ifdef DEBUG

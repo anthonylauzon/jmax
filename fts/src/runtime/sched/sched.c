@@ -69,7 +69,7 @@ static fts_status_t fts_sched_set_scheduler(int argc, const fts_atom_t *argv);
 static void fts_sched_init(void); /* init the scheduler, before the task declarations */
 void fts_sched_compile(void); /* compile the scheduler function list  */
 
-static void fts_sched_set_sampling_rate(const fts_atom_t *listener, fts_symbol_t name, const fts_atom_t *value);
+static void fts_sched_set_sampling_rate(void *listener, fts_symbol_t name, const fts_atom_t *value);
 
 static void fts_sched_describe_failure(void);
 
@@ -487,7 +487,7 @@ fts_sched_get_tick_length()
 
 
 static void
-fts_sched_set_sampling_rate(const fts_atom_t *listener, fts_symbol_t name, const fts_atom_t *value)
+fts_sched_set_sampling_rate(void *listener, fts_symbol_t name, const fts_atom_t *value)
 {
   if (fts_is_number(value))
     {

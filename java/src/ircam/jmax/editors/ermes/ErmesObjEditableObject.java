@@ -85,10 +85,10 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsInletsLi
   }
 
 
-  void cleanAll()
+  void dispose()
   {
     itsText = null;
-    super.cleanAll();
+    super.dispose();
   }
 
   // ----------------------------------------

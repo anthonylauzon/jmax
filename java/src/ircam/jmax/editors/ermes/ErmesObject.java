@@ -540,13 +540,9 @@ abstract class ErmesObject implements ErmesDrawable {
 
   // Called at ErmesObject disposal
 
-  void cleanAll()
+  void dispose()
   {
     itsFtsObject.setObjectListener(null);
-    itsSketchPad = null;
-    itsFtsObject = null;
-    itsFont = null;
-    itsFontMetrics = null;
   }
 
   // Experimental MDC
