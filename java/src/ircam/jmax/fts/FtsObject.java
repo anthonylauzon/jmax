@@ -42,36 +42,42 @@ import ircam.jmax.mda.*;
 
 public class FtsObject 
 {
-    static final public int systemInlet = -1;
-
-    private static Hashtable creators = new Hashtable();
-
-    static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
-    {
-	creators.put(nameclass, creator);
-    }
+  static final public int systemInlet = -1;
+  
+  private static Hashtable creators = new Hashtable();
+  
+  static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
+  {
+    creators.put(nameclass, creator);
+  }
 
   /******************************************************************************/
   /*                                                                            */
   /*              STATIC FUNCTION                                               */
   /*                                                                            */
   /******************************************************************************/
-
+  
   /** This function create an application layer object for an already existing
    * object in FTS; take directly the FtsStream as argument, where we are receiving
    * an object upload message.
    */
 
-  static FtsObject makeFtsObjectFromMessage(Fts fts, FtsStream stream, boolean doVariable)
-     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
+  /**
+   * Send a "new object" messages to the server with arguments in form of an array of FtsAtom
+   * used for objects created 
+   *
+   * @param patcher the parent patcher (can be null)
+   * @param id the object id (object dosn't exist yet on server)
+   * @param nArgs number of valid arguments in args array
+   * @param args arguments of object creation
+   */
+  static FtsObject makeFtsObjectFromMessage(Fts fts, FtsObject parent, FtsPatcherData data, int objId, int nArgs, FtsAtom args[], boolean doVariable)
+    throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
-    FtsPatcherData data;
-    FtsObject parent;
     FtsObject obj;
     String variable = null;
     String className;
     StringBuffer description;
-    int objId;
 
     parent = stream.getNextObjectArgument();
     data   = (FtsPatcherData) stream.getNextDataArgument();
@@ -137,22 +143,22 @@ public class FtsObject
 	  obj =  new FtsClipboard(fts, parent, className, "__clipboard", objId);
 	else
 	  {
-	     Object ctr = creators.get(className);
+	    Object ctr = creators.get(className);
 
-	     if(ctr!=null)
-		 {
-		     obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, objId);
-		 }
-	     else
-		 {
-		     if (doVariable)
-			 obj = new FtsObject(fts, parent, className, variable,
-					     variable + " : " + FtsParse.unparseObjectDescription(className, stream),
-					     objId);
-		     else
-			 obj = new FtsObject(fts, parent, className, variable,
-					     FtsParse.unparseObjectDescription(className, stream), objId);
-		 }
+	    if(ctr!=null)
+	      {
+		obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, objId);
+	      }
+	    else
+	      {
+		if (doVariable)
+		  obj = new FtsObject(fts, parent, className, variable,
+				      variable + " : " + FtsParse.unparseObjectDescription(className, stream),
+				      objId);
+		else
+		  obj = new FtsObject(fts, parent, className, variable,
+				      FtsParse.unparseObjectDescription(className, stream), objId);
+	      }
 	  }
 	     
       }
@@ -224,11 +230,11 @@ public class FtsObject
       }
     else if (name == "error")
       {
-	  if (value == 0)
+	if (value == 0)
 	  {
 	    isError = false;
 	  }
-	  else
+	else
 	  {
 	    isError = true;
 	    parent.addErrorObject(this);
@@ -263,7 +269,7 @@ public class FtsObject
    * See the other version of localPut.
    */
 
-    protected void localPut(String name, Object value)
+  protected void localPut(String name, Object value)
   {
     // check first hardcoded properties
     if (name == "errdesc")
@@ -349,7 +355,7 @@ public class FtsObject
 
 
   /** x, y, width and height cache locally the geometrical properties, to speed
-    up access; also, to prepare transition to beans model */
+      up access; also, to prepare transition to beans model */
 
   protected int x = -1; 
   protected int y = -1 ;
@@ -520,9 +526,9 @@ public class FtsObject
 
 
   /** Set the color property. Tell it to the server.
-    Colors are not locally stored, can only be set, and they are meaningfull only
-    for some object
-    */
+      Colors are not locally stored, can only be set, and they are meaningfull only
+      for some object
+  */
 
   public final void setColor(int color)
   {
@@ -713,7 +719,7 @@ public class FtsObject
 	fts.getSelection().removeObject(this);
 	parent.setDirty();
 	if(hasErrorsInside())
-	    parent.removeErrorObject(this);
+	  parent.removeErrorObject(this);
 	fts.getServer().deleteObject(this);
       }
   }
@@ -747,7 +753,7 @@ public class FtsObject
     parent.setDirty();
 
     if((isError())||(hasErrorsInside()))
-	parent.removeErrorObject(this);
+      parent.removeErrorObject(this);
 
     // Take away the object from the container, if any
 
@@ -774,10 +780,24 @@ public class FtsObject
   // Communication with the object
 
   /** Send a message to an object in the server. */
-
   public final void sendMessage(int inlet, String selector, MaxVector args)
   {
     fts.getServer().sendObjectMessage(this, inlet, selector, args);
+  }
+
+  /**
+   * Send a message to an object on the server.
+   * used for objects created 
+   *
+   * @param inlet the inlet
+   * @param selector the message selector
+   * @param nArgs number of valid arguments in args array
+   * @param args the message arguments
+   */
+
+  public final void sendMessage(int inlet, String selector, int nArgs, FtsAtom args[])
+  {
+    fts.getServer().sendObjectMessage(this, inlet, selector, nArgs, args);
   }
 
   /*****************************************************************************/
@@ -804,10 +824,6 @@ public class FtsObject
   }
 
 
-  // (francois)
-  // This is what I have found to get a class object representing the type of an array
-  private static Class ftsAtomArrayClass = (new FtsAtom[1]).getClass();
-
   /** 
    * Handle a direct message from an FTS object.
    * Implementation based on Core Reflection API.
@@ -819,7 +835,7 @@ public class FtsObject
    */
 
   public void handleMessage( FtsStream stream)
-       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
+    throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     if ( stream.nextIsSymbol() )
       {
@@ -829,13 +845,15 @@ public class FtsObject
 
 	try
 	  {
-	    Class parameterTypes[] = new Class[1];
-	    parameterTypes[0] = ftsAtomArrayClass;
+	    Class parameterTypes[] = new Class[2];
+	    parameterTypes[0] = java.lang.Integer.TYPE;
+	    parameterTypes[1] = FtsAtom[].class;
 	    	    
 	    Method method = getClass().getMethod( selector, parameterTypes);
 
-	    Object[] methodArgs = new Object[1];
-	    methodArgs[0] = stream.getArgs();
+	    Object[] methodArgs = new Object[2];
+	    methodArgs[1] = stream.getArgs();
+	    methodArgs[0] = stream.getNumberOfArgs();
 
 	    method.invoke( this, methodArgs);
 	  }
@@ -865,59 +883,50 @@ public class FtsObject
   /**
    * count of error-objects in a subpatcher or template (to paint this in orange !!!)
    */
-    int errcount = 0;
-    public void removeErrorObject(FtsObject obj)
-    {
-	if(!isARootPatcher())
+  int errcount = 0;
+  public void removeErrorObject(FtsObject obj)
+  {
+    if(!isARootPatcher())
+      {
+	if(errcount>0){
+	  errcount--;
+	  if (listener instanceof FtsObjectErrorListener)
 	    {
-		if(errcount>0){
-		    errcount--;
-		    if (listener instanceof FtsObjectErrorListener)
-			{
-			    if(errcount > 0)
-				((FtsObjectErrorListener)listener).errorChanged(true);
-			    else
-				{
-				    ((FtsObjectErrorListener)listener).errorChanged(false);
-				    parent.removeErrorObject(this);
-				}
-			}
-		    
+	      if(errcount > 0)
+		((FtsObjectErrorListener)listener).errorChanged(true);
+	      else
+		{
+		  ((FtsObjectErrorListener)listener).errorChanged(false);
+		  parent.removeErrorObject(this);
 		}
 	    }
-    }
+		    
+	}
+      }
+  }
 
-    public void addErrorObject(FtsObject obj)
-    {
-	if(!isARootPatcher())
-	    {
-		errcount++;
-		if(errcount==1)
-		    {
-			parent.addErrorObject(this);
+  public void addErrorObject(FtsObject obj)
+  {
+    if(!isARootPatcher())
+      {
+	errcount++;
+	if(errcount==1)
+	  {
+	    parent.addErrorObject(this);
 		
-			if (listener instanceof FtsObjectErrorListener)
-			    ((FtsObjectErrorListener)listener).errorChanged(true);
-		    }
-	    }
-    }
+	    if (listener instanceof FtsObjectErrorListener)
+	      ((FtsObjectErrorListener)listener).errorChanged(true);
+	  }
+      }
+  }
 
-    public boolean hasErrorsInside()
-    {
-	return (errcount > 0);
-    }
+  public boolean hasErrorsInside()
+  {
+    return (errcount > 0);
+  }
     
-    public boolean isARootPatcher()
-    {
-	return (getParent() == getFts().getRootObject());
-    }
+  public boolean isARootPatcher()
+  {
+    return (getParent() == getFts().getRootObject());
+  }
 }
-
-
-
-
-
-
-
-
-

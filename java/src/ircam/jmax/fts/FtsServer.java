@@ -58,29 +58,23 @@ public class FtsServer implements Runnable
   boolean waiting = false;
 
   /** The FtsStream used to communicate with FTS */
-
   FtsStream stream;
 
   /** The name of this server, used for printouts only */
-
   String name;
 
   /** The root object of this server */
-
   FtsObject root;
 
-  /** The list of listener of update groups */
-  
+  /** The list of listener of update groups */  
   MaxVector updateGroupListeners;
   int updateGroupDepth = 0;
 
   /** If true, put a 10 sec timeout on Sync;
    */
-
   private boolean timeoutOnSync = false;
 
   /** Create an FTS Server. With a given stream. */
-
   FtsServer(Fts fts, String name, FtsStream stream)
   {
     this.fts = fts;
@@ -93,7 +87,6 @@ public class FtsServer implements Runnable
   }
 
   /** Give a string representation of the server */
-
   public String toString()
   {
     return this.getClass().getName() + "<" + name + ">";
@@ -126,7 +119,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "save patcher as bmax" messages to FTS.*/
-
   final void savePatcherBmax(FtsObject patcher, String filename)
   {
     if (! connected)
@@ -148,7 +140,6 @@ public class FtsServer implements Runnable
   }
 
   /** send a "load patcher as bmax" messages to FTS.*/
-
   final void loadPatcherBmax(FtsObject parent, int id, String filename)
   {
     if (! connected)
@@ -171,7 +162,6 @@ public class FtsServer implements Runnable
   }
 
   /** send a "load patcher as dot pat" messages to FTS.*/
-
   final void loadPatcherDpat(FtsObject parent, int id, String filename)
   {
     if (! connected)
@@ -194,7 +184,6 @@ public class FtsServer implements Runnable
   }
 
   /** Send a "abstraction declare" message to FTS */
-
   final public void sendAbstractionDeclare(String abstraction, String filename)
   {
     if (! connected)
@@ -217,7 +206,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "abstraction declare" message to FTS */
-
   final public void sendAbstractionDeclarePath(String path)
   {
     if (! connected)
@@ -239,7 +227,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "template declare" message to FTS */
-
   final public void sendTemplateDeclare(String template, String filename)
   {
     if (! connected)
@@ -262,7 +249,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "template declare" message to FTS */
-
   final public void sendTemplateDeclarePath(String path)
   {
     if (! connected)
@@ -287,7 +273,6 @@ public class FtsServer implements Runnable
    *  It is actually used only for those objects that don't have the class name in the description,
    *  i.e. messages.
    */
-
   final  void newObject(FtsObject patcher, int id, String className, String description)
   {
     if (! connected)
@@ -314,8 +299,7 @@ public class FtsServer implements Runnable
   /** Send a "new object" messages to FTS; receive a complete description as a string;
    *   Used for all the objects that have the class identity in the string description
    */
-
-  final  void newObject(FtsObject patcher, int id, String description)
+  final void newObject(FtsObject patcher, int id, String className, String description)
   {
     if (! connected)
       return;
@@ -327,10 +311,40 @@ public class FtsServer implements Runnable
       {
 	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
 	stream.sendObject(patcher);
-	stream.sendInt(id);// cannot send the object, do not exists (yet) on the FTS Side !!
-
+	stream.sendInt(id);
 	FtsParse.parseAndSendObject(description, stream);
+	stream.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
 
+
+  /**
+   * Send a "new object" messages to the server with arguments in form of an array of FtsAtom
+   * used for objects created 
+   *
+   * @param patcher the parent patcher (can be null)
+   * @param id the object id (object dosn't exist yet on server)
+   * @param nArgs number of valid arguments in args array
+   * @param args arguments of object creation
+   */
+  final void newObject(FtsObject patcher, int id, int nArgs, FtsAtom args[])
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println("> newObject(" + patcher + ", " + id + ", " + className + ", " + description + ")");
+
+    try
+      {
+	stream.sendCmd(FtsClientProtocol.fts_new_object_cmd);
+	stream.sendObject(patcher);
+	stream.sendInt(id);
+	stream.sendString(className);
+	stream.sendArray(args, 0, nArgs);
 	stream.sendEom();
       }
     catch (java.io.IOException e)
@@ -340,7 +354,6 @@ public class FtsServer implements Runnable
 
   /** Send a "download object" messages to FTS;
    */
-
   final  void sendDownloadObject(int id)
   {
     if (! connected)
@@ -363,7 +376,6 @@ public class FtsServer implements Runnable
   /** Send a "redefine patcher" messages to a patcher in FTS.
    *  Special optimized version for patcher loading/editing
    */
-
   final void redefinePatcherObject(FtsObject obj, String description)
   {
     if (! connected)
@@ -386,7 +398,6 @@ public class FtsServer implements Runnable
 
   /** Send a "redefine object" messages to an object in FTS.
    */
-
   final void redefineObject(FtsObject obj, int newId, String description)
   {
     if (! connected)
@@ -410,7 +421,6 @@ public class FtsServer implements Runnable
 
 
   /** Reposition an inlet  */
-
   final void repositionInletObject(FtsObject obj, int pos)
   {
     if (! connected)
@@ -432,7 +442,6 @@ public class FtsServer implements Runnable
   }
 
   /** Reposition an outlet  */
-
   final void repositionOutletObject(FtsObject obj, int pos)
   {
     if (! connected)
@@ -455,7 +464,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "free object" messages to FTS.*/
-
   final void deleteObject(FtsObject obj)
   {
     if (! connected)
@@ -478,8 +486,39 @@ public class FtsServer implements Runnable
       }
   }
 
-  /** Send an "object message" messages to FTS.*/
+  /**
+   * Send a message to an object on the server.
+   *
+   * @param dst the destination object
+   * @param inlet the inlet
+   * @param selector the message selector
+   * @param nArgs number of valid arguments in args array
+   * @param args the message arguments
+   */
+  final void sendObjectMessage(FtsObject dst, int inlet, String selector, int nArgs, FtsAtom args[])
+  {
+    if (! connected)
+      return;
 
+    if (FtsServer.debug)
+      System.err.println("> sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + args + ")");
+
+    try
+      {
+	stream.sendCmd(FtsClientProtocol.fts_message_cmd);
+	stream.sendObject(dst);
+	stream.sendInt(inlet);
+	stream.sendString(selector);
+	stream.sendArray(args, 0, nArgs);
+
+	stream.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send an "object message" to the server */
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, MaxVector args)
   {
     if (! connected)
@@ -506,7 +545,6 @@ public class FtsServer implements Runnable
   }
 
   /** Send an "object message" with a unique FtsObject argument  to FTS.*/
-
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, FtsObject arg)
   {
     if (! connected)
@@ -530,7 +568,6 @@ public class FtsServer implements Runnable
   }
 
   /** Send an "object message" with a unique FtsConnection argument  to FTS.*/
-
   final void sendObjectMessage(FtsObject dst, int inlet, String selector, FtsConnection arg)
   {
     if (! connected)
@@ -557,7 +594,6 @@ public class FtsServer implements Runnable
   /** Send an "set" messages to the system inletof an FTS object with as arguments elements
     from a Vector; the vector should only contains String, Floats and Integers, of course.
     */
-
   final void sendSetMessage(FtsObject dst, MaxVector values)
   {
     if (! connected)
@@ -586,7 +622,6 @@ public class FtsServer implements Runnable
   /** Send an "set" messages to the system inletof an FTS object with as arguments elements
     from a string description.
     */
-
   final void sendSetMessage(FtsObject obj, String description)
   {
     if (! connected)
@@ -612,7 +647,6 @@ public class FtsServer implements Runnable
   }
 
   /** Send a "connect objects" messages to FTS. */
-
   final void newConnection(int id, FtsObject from, int outlet, FtsObject to, int inlet)
   {
     if (! connected)
@@ -639,7 +673,6 @@ public class FtsServer implements Runnable
 
   /** Send a "download connection" messages to FTS;
    */
-
   final  void sendDownloadConnection(int id)
   {
     if (! connected)
@@ -661,7 +694,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "disconnect objects" messages to FTS. */
-
   final void deleteConnection(FtsConnection connection)
   {
     if (! connected)
@@ -683,7 +715,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "put property" messages to FTS; version with a generic value */
-
   final void putObjectProperty(FtsObject object, String name, Object value)
   {
     if (! connected)
@@ -708,7 +739,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "put property" messages to FTS; version with an int value */
-
   final void putObjectProperty(FtsObject object, String name, int value)
   {
     if (! connected)
@@ -733,7 +763,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "put property" messages to FTS; version with a float*/
-
   final void putObjectProperty(FtsObject object, String name, float value)
   {
     if (! connected)
@@ -758,7 +787,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "get property" messages to FTS. */
-
   final void askObjectProperty(FtsObject object, String name)
   {
     if (! connected)
@@ -781,7 +809,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a "ucs" messages to FTS. */
-
   final public void ucsMessage(MaxVector args)
   {
     if (! connected)
@@ -802,7 +829,6 @@ public class FtsServer implements Runnable
   }
 
   /** Start a remote call */
-
   final void remoteCallStart(FtsRemoteData data, int key)
   {
     if (! connected)
@@ -943,7 +969,6 @@ public class FtsServer implements Runnable
 
 
   /** Send a single argument "remote call" message to FTS. */
-
   final void remoteCall( FtsRemoteData data, int key, int arg)
   {
     if (! connected)
@@ -1011,7 +1036,6 @@ public class FtsServer implements Runnable
   }
 
   /** Send a "remote call" message to FTS. */
-
   final void remoteCall( FtsRemoteData data, int key, Object args[])
   {
     if (! connected)
@@ -1219,7 +1243,6 @@ public class FtsServer implements Runnable
    * Return true if the sync was ok, return false if there was a server
    * timeout
    */
-
   final public synchronized boolean syncToFts()
   {
     boolean ret;
@@ -1255,7 +1278,6 @@ public class FtsServer implements Runnable
    * Return true if the sync was ok, return false if there was a server
    * timeout
    */
-
   final public synchronized boolean syncToFts(int timeOut)
   {
     boolean ret;
@@ -1286,7 +1308,6 @@ public class FtsServer implements Runnable
 
 
   /** Handle adding an update group listener */
-
   public void addUpdateGroupListener(FtsUpdateGroupListener listener)
   {
     if (updateGroupListeners == null)
@@ -1296,7 +1317,6 @@ public class FtsServer implements Runnable
   }
 
   /** Handle removing an update group listener */
-
   public void removeUpdateGroupListener(FtsUpdateGroupListener listener)
   {
     if (updateGroupListeners == null)
@@ -1313,7 +1333,6 @@ public class FtsServer implements Runnable
   private Thread inputThread;
 
   /** Start the server. */
-
   public void start()
   {
     inputThread = new Thread(this, name);
@@ -1332,14 +1351,12 @@ public class FtsServer implements Runnable
   }
 
   /** Stop the server. */
-
   public void stop()
   {
     sendShutdown();
   }
 
   /** the main loop of the input listener thread. */
-
   public void run()
   {
     boolean running  = true;
@@ -1385,7 +1402,6 @@ public class FtsServer implements Runnable
    * while having still messages (usually properties) arriving; for this
    * reason, messages with null  destinations are simply ignored
    */
-
   void dispatchMessage(FtsStream stream)
        throws java.io.InterruptedIOException, FtsQuittedException, java.io.IOException
   {
@@ -1516,7 +1532,11 @@ public class FtsServer implements Runnable
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, stream, false);
+	      FtsObject parent = stream.getNextObjectArgument();
+	      FtsPatcherData data = (FtsPatcherData) stream.getNextDataArgument();
+	      int objId stream.getNextIntArgument();
+
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, parent, data, objId, stream.getArgs(), false);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1536,7 +1556,7 @@ public class FtsServer implements Runnable
 
 	  try
 	    {
-	      newObj = FtsObject.makeFtsObjectFromMessage(fts, stream, true);
+	      newObj = FtsObject.makeFtsObjectFromMessage(fts, stream.getArgs(), true);
 	      registerObject(newObj);
 
 	      if (FtsServer.debug)
@@ -1654,7 +1674,6 @@ public class FtsServer implements Runnable
   }
 
   /** Synchronization primitive for the Ping/Pong protocol. */
-
   private synchronized boolean waitForPong(int timeOut)
   {
     // If FTS quitted, just return 
@@ -1695,7 +1714,6 @@ public class FtsServer implements Runnable
   }
 
   /** Synchronization primitive for the Ping/Pong protocol. */
-
   private synchronized void deliverPong()
   {
     waiting = false;
@@ -1703,7 +1721,6 @@ public class FtsServer implements Runnable
   }
 
   /** Recovery for FTS Crashes */
-
   void ftsQuitted()
   {
     connected = false;
@@ -1728,15 +1745,12 @@ public class FtsServer implements Runnable
    * Used to generate IDs for FTS objects; skip zero and one
    * and continue by increments
    */
-
   private int ftsObjectIDCounter = 3;	// skip zero and one
 
   /** The object table. Used to map back Ids to objects. */
-
   private MaxVector objectTable = new MaxVector();
 
   /** The max object Id registered */
-
   private int maxObjectId = 0;
 
   /**
@@ -1750,7 +1764,6 @@ public class FtsServer implements Runnable
    * only even IDs; on the server, IDs are assigned by need,
    * not to all the objects.
    */
-
   void registerObject(FtsObject object)
   {
     if (object == null)
@@ -1781,7 +1794,6 @@ public class FtsServer implements Runnable
    * place for it in the object table, but just put a null there.
    *
    */
-
   int getNewObjectId()
   {
     int newid;
@@ -1808,7 +1820,6 @@ public class FtsServer implements Runnable
    * the object id directly in the FtsObject, for efficency, but this is 
    * transparent to the object.
    */
-
   void unregisterObject(FtsObject obj)
   {
     objectTable.setElementAt(null, obj.getObjectId());
@@ -1818,7 +1829,6 @@ public class FtsServer implements Runnable
    * Get an FtsObject by its FtsId.
    *
    */
-
   FtsObject getObjectByFtsId(int id)
   {
     if (id == 0)
@@ -1844,22 +1854,18 @@ public class FtsServer implements Runnable
   }
 
   /* CONNECTION ID HANDLING */
-
   /**
    * The server Connection ID Counter.
    *
    * Used to generate IDs for FTS connections; skip zero, and one
    * and continue by two increments
    */
-
   private int ftsConnectionIDCounter = 3;	// skip zero and one
 
   /** The connection table. Used to map back Ids to connections. */
-
   private MaxVector connectionTable = new MaxVector();
 
   /** The max connection Id registered */
-
   private int maxConnectionId = 0;
 
   /**
@@ -1873,7 +1879,6 @@ public class FtsServer implements Runnable
    * only even IDs; on the server, IDs are assigned by need,
    * not to all the connections.
    */
-
   private void registerConnection(FtsConnection connection)
   {
     if (connection == null)
@@ -1904,7 +1909,6 @@ public class FtsServer implements Runnable
    * place for it in the connection table, but just put a null there.
    *
    */
-
   int getNewConnectionId()
   {
     int newid;
@@ -1931,7 +1935,6 @@ public class FtsServer implements Runnable
    * the connection id directly in the FtsConnection, for efficency, but this is 
    * transparent to the connection.
    */
-
   private void unregisterConnection(FtsConnection obj)
   {
     connectionTable.setElementAt(null, obj.getConnectionId());
@@ -1941,7 +1944,6 @@ public class FtsServer implements Runnable
    * Get an FtsConnection by its FtsId.
    *
    */
-
   FtsConnection getConnectionByFtsId(int id)
   {
     if (id == 0)
