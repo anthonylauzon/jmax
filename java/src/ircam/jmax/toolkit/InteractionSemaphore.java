@@ -2,7 +2,7 @@
 package ircam.jmax.toolkit;
 
 
-class InteractionSemaphore {
+public class InteractionSemaphore {
 
     final static boolean locked()
     {
@@ -12,7 +12,7 @@ class InteractionSemaphore {
 
     /** Locks the current graphic context, i.e., no switches can occur until
      * the context is unlocked */ 
-    final static void lock()
+    public final static void lock()
     {
 	contextLocked = true;
     }
@@ -20,7 +20,7 @@ class InteractionSemaphore {
 
     /** UnLocks the current graphic context. The last context switch asked and not served becomes
      * the current one, if any */ 
-    final static void unlock()
+    public final static void unlock()
     {
 	contextLocked = false;
 	if (lastCaller != null) lastCaller.unlocked();
@@ -37,3 +37,9 @@ class InteractionSemaphore {
     //static InteractionSemaphore instance = new InteractionSemaphore();
 
 }
+
+
+
+
+
+
