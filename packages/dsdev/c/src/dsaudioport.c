@@ -266,11 +266,11 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   ac--;
   at++;
 
-  fts_log("[dsaudioport]: Available audio output devices\n");
-  DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);
+/*    fts_log("[dsaudioport]: Available audio output devices\n"); */
+/*    DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL); */
 
-  fts_log("[dsaudioport]: Available audio input devices\n");
-  DirectSoundCaptureEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);
+/*    fts_log("[dsaudioport]: Available audio input devices\n"); */
+/*    DirectSoundCaptureEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL); */
  
   fts_log("[dsaudioport]: Opening audio port\n");
 
