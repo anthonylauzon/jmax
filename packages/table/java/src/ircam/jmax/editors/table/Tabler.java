@@ -18,6 +18,9 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   TablePanel itsTablePanel;
   TextField itsFormula;
   Label itsCoordinates;
+  Panel itsFrontHeader;
+  Button itsRefreshButton;
+
   public FtsIntegerVectorData itsData;
   static int untitledCounter = 1;
   
@@ -39,10 +42,20 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     itsTablePanel.resize(itsTablePanel.getPreferredSize().width,itsTablePanel.getPreferredSize().height);
     getContentPane().add("Center", itsTablePanel);
     
+    itsFrontHeader = new Panel();
+    itsFrontHeader.setLayout(new BorderLayout());
     itsCoordinates = new Label();
     itsCoordinates.resize(100,20);
     itsCoordinates.setBackground(Color.lightGray);
-    getContentPane().add("North", itsCoordinates);
+
+    itsRefreshButton = new Button("Refresh");
+    itsRefreshButton.resize(60,20);
+    itsFrontHeader.add("Center", itsCoordinates);
+    itsFrontHeader.add("East", itsRefreshButton);
+
+    itsFrontHeader.resize(512, 20);
+
+    getContentPane().add("North", itsFrontHeader);
     
     Init();
 

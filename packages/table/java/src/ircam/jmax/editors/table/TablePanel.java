@@ -1,6 +1,6 @@
 package ircam.jmax.editors.table;
 import ircam.jmax.*;
-//import ircam.jmax.mda.*;
+import ircam.jmax.fts.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.AWTEvent.*;
@@ -8,7 +8,7 @@ import java.io.*;
 import tcl.lang.*;
 import com.sun.java.swing.*;
 
-public class TablePanel extends JPanel implements MouseMotionListener, MouseListener{
+public class TablePanel extends JPanel implements MouseMotionListener, MouseListener, ActionListener{
   
   int x_scale_factor = 4;
   int N_POINTS = 128;
@@ -38,6 +38,12 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
       PaintSingle(i, g);
     }
   }
+
+  public void actionPerformed(ActionEvent e) {
+    System.err.println("PASSATO");
+    itsTabler.fillTable();
+  }
+  
 
    //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListener--inizio
@@ -92,7 +98,10 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     values[x] = y;
     PaintSingle(x, getGraphics());
   }
-  public void mouseReleased(MouseEvent e){}
+  public void mouseReleased(MouseEvent e){
+    ((FtsIntegerVector)(itsTabler.itsData.getContent())).changed();
+  }
+
   public void mouseEntered(MouseEvent e){}
   public void mouseExited(MouseEvent e){}
   //////////////////////////////////////////////////////////////////////////////
