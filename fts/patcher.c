@@ -142,13 +142,17 @@ fts_patcher_get_objects_count(fts_patcher_t *this)
 void 
 fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty)
 {
-  if(this == fts_get_root_patcher()) return;
+  if (this == fts_get_root_patcher())
+    return;
 
-  if( ((fts_object_t *)this)->patcher != fts_get_root_patcher() && !fts_object_is_template((fts_object_t *)this))
-    fts_patcher_set_dirty( ((fts_object_t *)this)->patcher, is_dirty);
+  if ( fts_object_get_patcher( (fts_object_t *)this) != fts_get_root_patcher() 
+      && !fts_object_is_template( (fts_object_t *)this))
+    {
+      fts_patcher_set_dirty( fts_object_get_patcher((fts_object_t *)this), is_dirty);
+    }
   else
     {
-      if(this->dirty != is_dirty)
+      if (this->dirty != is_dirty)
 	{
 	  this->dirty = is_dirty;
 
@@ -220,7 +224,13 @@ patcher_redefine_number_of_inlets(fts_patcher_t *this, int n)
   fts_atom_t a;
   int i;
   
-  this->inlets = (patcher_inout_t **)fts_realloc(this->inlets, n * sizeof(patcher_inout_t *));
+  if ( n > 0)
+    this->inlets = (patcher_inout_t **)fts_realloc(this->inlets, n * sizeof(patcher_inout_t *));
+  else
+    {
+      fts_free( this->inlets);
+      this->inlets = NULL;
+    }
   
   /* init new inlets */
   for(i=this->n_inlets; i<n; i++)
@@ -245,7 +255,13 @@ patcher_redefine_number_of_outlets(fts_patcher_t *this, int n)
   fts_atom_t a;
   int i;
   
-  this->outlets = (patcher_inout_t **)fts_realloc(this->outlets, n * sizeof(patcher_inout_t *));
+  if ( n > 0)
+    this->outlets = (patcher_inout_t **)fts_realloc(this->outlets, n * sizeof(patcher_inout_t *));
+  else
+    {
+      fts_free( this->outlets);
+      this->outlets = NULL;
+    }
   
   /* init new outlets */
   for(i=this->n_outlets; i<n; i++)
@@ -2009,7 +2025,10 @@ void fts_kernel_patcher_init(void)
   fts_class_alias(receive_class, fts_new_symbol("r~"));
   fts_class_alias(send_class, fts_new_symbol("s"));
   fts_class_alias(send_class, fts_new_symbol("s~"));
+}
 
+void fts_patcher_config( void)
+{
   fts_create_root_patcher();
 }
 

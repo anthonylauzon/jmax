@@ -21,6 +21,7 @@
  */
 
 %{
+#include <stdio.h>
 #include <fts/fts.h>
 #include <ftsprivate/parser.h>
 
@@ -40,7 +41,7 @@ static int yyerror( const char *msg);
 
 static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right);
 
-struct _parser_data {
+static struct _parser_data {
   int ac;
   const fts_atom_t *at;
   fts_parsetree_t *tree;
@@ -82,7 +83,7 @@ fts_status_t syntax_error_status = &syntax_error_status_description;
  */
 
 %left TK_COMMA
-%left TK_TUPLE
+%left TK_SPACE
 %left TK_LOGICAL_OR
 %left TK_LOGICAL_AND
 %left TK_EQUAL_EQUAL TK_NOT_EQUAL
@@ -103,19 +104,20 @@ fts_status_t syntax_error_status = &syntax_error_status_description;
  * Non-terminal types
  */
 
-%type <n> expression
-%type <n> comma_tuple_list
-%type <n> tuple
-%type <n> term
-%type <n> primitive
-%type <n> par
-%type <n> unary
 %type <n> binary
-%type <n> reference
-%type <n> array_reference
-%type <n> variable_reference
-%type <n> class
+%type <n> instance
 %type <a> class_name
+%type <n> comma_expression_list
+%type <n> expression
+%type <n> invocation
+%type <n> par
+%type <n> primitive
+%type <n> reference
+%type <n> term
+%type <n> term_list
+%type <n> tuple
+%type <n> unary
+%type <n> variable
 
 %%
 /* **********************************************************************
@@ -124,21 +126,76 @@ fts_status_t syntax_error_status = &syntax_error_status_description;
  *
  */
 
-expression: comma_tuple_list
+toplevel: comma_expression_list
 		{ parser_data.tree = $1; }
 ;
 
-comma_tuple_list: comma_tuple_list TK_COMMA tuple
+comma_expression_list: comma_expression_list TK_COMMA expression
 		{ $$ = fts_parsetree_new( TK_COMMA, 0, $1, $3); }
-	| tuple
+	| expression
 		{ $$ = fts_parsetree_new( TK_COMMA, 0, 0, $1); }
 	| 
 		{ $$ = 0; }
 ;
 
-tuple: tuple term /*---*/ %prec TK_TUPLE
-		{ $$ = fts_parsetree_new( TK_TUPLE, 0, $1, $2); }
-	| term
+expression: instance
+	| tuple
+	| invocation
+;
+
+instance: TK_SYMBOL TK_COLON class_name term_list
+		{ $$ = fts_parsetree_new( TK_COLON, &($3), fts_parsetree_new( TK_SYMBOL, &($1), 0, 0), $4); }
+	| TK_COLON class_name term_list
+		{ $$ = fts_parsetree_new( TK_COLON, &($2), 0, $3); }
+;
+
+class_name: TK_SYMBOL
+	| TK_PLUS
+		{ fts_set_symbol( &($$), fts_s_plus); }
+	| TK_MINUS
+		{ fts_set_symbol( &($$), fts_s_minus); }
+	| TK_TIMES
+		{ fts_set_symbol( &($$), fts_s_times); }
+	| TK_DIV
+		{ fts_set_symbol( &($$), fts_s_div); }
+	| TK_PERCENT
+		{ fts_set_symbol( &($$), fts_s_percent); }
+	| TK_SHIFT_LEFT
+		{ fts_set_symbol( &($$), fts_s_shift_left); }
+	| TK_SHIFT_RIGHT
+		{ fts_set_symbol( &($$), fts_s_shift_right); }
+	| TK_GREATER
+		{ fts_set_symbol( &($$), fts_s_greater); }
+	| TK_GREATER_EQUAL
+		{ fts_set_symbol( &($$), fts_s_greater_equal); }
+	| TK_SMALLER
+		{ fts_set_symbol( &($$), fts_s_smaller); }
+	| TK_SMALLER_EQUAL
+		{ fts_set_symbol( &($$), fts_s_smaller_equal); }
+	| TK_EQUAL_EQUAL
+		{ fts_set_symbol( &($$), fts_s_equal_equal); }
+	| TK_NOT_EQUAL
+		{ fts_set_symbol( &($$), fts_s_not_equal); }
+	| TK_LOGICAL_NOT
+		{ fts_set_symbol( &($$), fts_s_logical_not); }
+	| TK_LOGICAL_OR
+		{ fts_set_symbol( &($$), fts_s_logical_or); }
+	| TK_LOGICAL_AND
+		{ fts_set_symbol( &($$), fts_s_logical_and); }
+;
+
+tuple: term term_list  /*---*/ %prec TK_SPACE
+		{ $$ = fts_parsetree_new( TK_SPACE, 0, $2, $1); }
+;
+
+invocation: reference TK_DOT TK_SYMBOL term_list
+		{ $$ = fts_parsetree_new( TK_DOT, &($3), $1, $4); }
+;
+
+term_list: term_list term  /*---*/ %prec TK_SPACE
+		{ $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
+	|
+		{ $$ = 0; }
 ;
 
 term: primitive
@@ -146,7 +203,6 @@ term: primitive
 	| unary
 	| binary
 	| reference
-	| class
 ;
 
 primitive: TK_INT
@@ -157,7 +213,7 @@ primitive: TK_INT
 		{ $$ = fts_parsetree_new( TK_SYMBOL, &($1), 0, 0); }
 ;
 
-par: TK_OPEN_PAR tuple TK_CLOSED_PAR
+par: TK_OPEN_PAR expression TK_CLOSED_PAR
 		{ $$ = fts_parsetree_new( TK_PAR, 0, 0, $2); }
 ;
 
@@ -203,59 +259,14 @@ binary: term TK_PLUS term
 		{ $$ = fts_parsetree_new( TK_SMALLER_EQUAL, 0, $1, $3); }
 ;
 
-reference: array_reference
-;
-
-array_reference: variable_reference TK_OPEN_SQPAR tuple TK_CLOSED_SQPAR /*---*/ %prec TK_SQPAR
+reference: variable TK_OPEN_SQPAR expression TK_CLOSED_SQPAR /*---*/ %prec TK_SQPAR
 		{ $$ = fts_parsetree_new( TK_SQPAR, 0, $1, $3); }
-	| variable_reference
-;
+	| variable;
 
-variable_reference: TK_DOLLAR TK_SYMBOL
+variable: TK_DOLLAR TK_SYMBOL
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
 	| TK_DOLLAR TK_INT
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
-;
-
-class: TK_SYMBOL TK_COLON class_name
-		{ $$ = fts_parsetree_new( TK_COLON, &($3), fts_parsetree_new( TK_SYMBOL, &($1), 0, 0), 0); }
-	| TK_COLON class_name
-		{ $$ = fts_parsetree_new( TK_COLON, &($2), 0, 0); }
-;
-
-class_name: TK_SYMBOL
-	| TK_PLUS
-		{ fts_set_symbol( &($$), fts_s_plus); }
-	| TK_MINUS
-		{ fts_set_symbol( &($$), fts_s_minus); }
-	| TK_TIMES
-		{ fts_set_symbol( &($$), fts_s_times); }
-	| TK_DIV
-		{ fts_set_symbol( &($$), fts_s_div); }
-	| TK_PERCENT
-		{ fts_set_symbol( &($$), fts_s_percent); }
-	| TK_SHIFT_LEFT
-		{ fts_set_symbol( &($$), fts_s_shift_left); }
-	| TK_SHIFT_RIGHT
-		{ fts_set_symbol( &($$), fts_s_shift_right); }
-	| TK_GREATER
-		{ fts_set_symbol( &($$), fts_s_greater); }
-	| TK_GREATER_EQUAL
-		{ fts_set_symbol( &($$), fts_s_greater_equal); }
-	| TK_SMALLER
-		{ fts_set_symbol( &($$), fts_s_smaller); }
-	| TK_SMALLER_EQUAL
-		{ fts_set_symbol( &($$), fts_s_smaller_equal); }
-	| TK_EQUAL_EQUAL
-		{ fts_set_symbol( &($$), fts_s_equal_equal); }
-	| TK_NOT_EQUAL
-		{ fts_set_symbol( &($$), fts_s_not_equal); }
-	| TK_LOGICAL_NOT
-		{ fts_set_symbol( &($$), fts_s_logical_not); }
-	| TK_LOGICAL_OR
-		{ fts_set_symbol( &($$), fts_s_logical_or); }
-	| TK_LOGICAL_AND
-		{ fts_set_symbol( &($$), fts_s_logical_and); }
 ;
 
 %%
@@ -482,18 +493,22 @@ static void parsetree_print_aux( fts_parsetree_t *tree, int indent)
 {
   int i;
 
-  if (!tree)
-    return;
-
   fprintf( stderr, "%d:", indent);
+
+  if (!tree)
+    {
+      fprintf( stderr, "\n");
+      return;
+    }
 
   for ( i = 0; i < indent; i++)
     fprintf( stderr, "   ");
 
   switch( tree->token) {
+  case TK_DOT: fprintf( stderr, ".%s\n", fts_get_symbol( &tree->value)); break;
   case TK_COLON: fprintf( stderr, ": %s\n", fts_get_symbol( &tree->value)); break;
   case TK_COMMA: fprintf( stderr, ",\n"); break;
-  case TK_TUPLE: fprintf( stderr, "TUPLE\n"); break;
+  case TK_SPACE: fprintf( stderr, "SPACE\n"); break;
   case TK_INT: fprintf( stderr, "INT %d\n", fts_get_int( &tree->value)); break;
   case TK_FLOAT: fprintf( stderr, "FLOAT %g\n", fts_get_float( &tree->value)); break;
   case TK_SYMBOL: 
@@ -554,6 +569,8 @@ main( int argc, char **argv)
 
   if (fts_parsetree_parse( 0, 0, &tree) == fts_ok)
     fts_parsetree_print( tree);
+  else
+    fprintf( stderr, "Syntax error\n");
 }
 
 #endif

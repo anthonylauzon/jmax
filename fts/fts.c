@@ -197,6 +197,7 @@ static void fts_kernel_init( void)
  */
 static void fts_kernel_classes_config( void)
 {
+  _K_DECNCALL( fts_patcher_config);
   _K_DECNCALL( fts_error_object_config);
   _K_DECNCALL( fts_message_config);
   _K_DECNCALL( fts_audio_config);

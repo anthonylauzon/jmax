@@ -69,9 +69,14 @@ static fts_status_description_t undefined_class_error_description = {
 static fts_status_t undefined_class_error = &undefined_class_error_description;
 
 static fts_status_description_t object_creation_failed_error_description = {
-  "object_creation_failed"
+  "object creation failed"
 };
 static fts_status_t object_creation_failed_error = &object_creation_failed_error_description;
+
+static fts_status_description_t invalid_selector_error_description = {
+  "invalid selector"
+};
+static fts_status_t invalid_selector_error = &invalid_selector_error_description;
 
 #undef EXPRESSION_DEBUG
 
@@ -341,6 +346,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
   int ac;
   fts_atom_t *at, *top, ret[1];
   fts_status_t status;
+  fts_class_t *cl;
   fts_object_t *obj;
 
   if (!tree)
@@ -378,25 +384,14 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     /* FIXME */
     /* When creating an object (tuple or not tuple), when is this object released ? 
        Should we go through the stack when popping a frame and release the objects ? */
-
-    /* Is first term a class ? */
-    if (fts_get_class( at) == fts_class_class)
-      {
-	obj = fts_object_create( (fts_class_t *)fts_get_object( at), NULL, ac-1, at+1);
-	fts_object_refer( obj);
-	fts_set_object( ret, obj);
-      }
-    /* Is there is more than one term or are we at toplevel ? If yes, we always create a tuple */
-    else if (ac > 1 || toplevel)
+    if (ac > 1 || toplevel)
       {
 	obj = fts_object_create( fts_tuple_class, NULL, ac, at);
 	fts_object_refer( obj);
 	fts_set_object( ret, obj);
       }
     else
-      {
-	ret[0] = *at;
-      }
+      ret[0] = *at;
 
     expression_stack_pop_frame( exp);
     expression_stack_push( exp, ret);
@@ -430,7 +425,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
     break;
 
-  case TK_TUPLE:
+  case TK_SPACE:
     if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
       return status;
     if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
@@ -446,20 +441,67 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
   case TK_COLON:
     /* is class cached ? */
     if (fts_is_object( &tree->value))
-      expression_stack_push( exp, &tree->value);
+      cl = (fts_class_t *)fts_get_object( &tree->value);
     else
       {
 	fts_symbol_t package_name = (tree->left) ? fts_get_symbol( &tree->left->value) : NULL;
 	fts_symbol_t class_name = fts_get_symbol( &tree->value);
-	fts_class_t *cl = fts_class_get_by_name( package_name, class_name);
+
+	cl = fts_class_get_by_name( package_name, class_name);
 
 	if ( !cl)
 	  return undefined_class_error;
 
 	fts_set_object( &tree->value, cl);
-	
-	expression_stack_push( exp, &tree->value);
       }
+
+    expression_stack_push_frame( exp);
+    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
+      return status;
+
+    ac = expression_stack_frame_count( exp);
+    at = expression_stack_frame( exp);
+
+    obj = fts_object_create( cl, scope, ac, at);
+    if (obj)
+      {
+	fts_object_refer( obj);
+	fts_set_object( ret, obj);
+      }
+    else
+      fts_set_void( ret);
+
+    expression_stack_pop_frame( exp);
+    expression_stack_push( exp, ret);
+
+    break;
+
+  case TK_DOT:
+    expression_stack_push_frame( exp);
+
+    if ((status = expression_eval_aux( tree->left, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
+      return status;
+    if ((status = expression_eval_aux( tree->right, exp, scope, env_ac, env_at, callback, data, 0)) != fts_ok)
+      return status;
+
+    ac = expression_stack_frame_count( exp);
+    at = expression_stack_frame( exp);
+
+    if (!fts_is_object( at))
+      return operand_type_mismatch_error;
+
+    {
+      fts_symbol_t selector = fts_get_symbol( &tree->value);
+      fts_method_t mth = fts_class_get_method( fts_get_class( at), selector);
+
+      if (mth)
+	(*mth)( fts_get_object( at), fts_system_inlet, selector, ac-1, at+1);
+      else
+	return invalid_selector_error;
+    }
+
+    expression_stack_pop_frame( exp);
+    expression_stack_push( exp, fts_get_return_value());
 
     break;
 
@@ -695,7 +737,7 @@ static void expression_print_aux( fts_parsetree_t *tree, int indent)
 
   switch( tree->token) {
   case TK_COMMA: fprintf( stderr, ",\n"); break;
-  case TK_TUPLE: fprintf( stderr, "TUPLE\n"); break;
+  case TK_SPACE: fprintf( stderr, "SPACE\n"); break;
   case TK_INT: fprintf( stderr, "INT %d\n", fts_get_int( &tree->value)); break;
   case TK_FLOAT: fprintf( stderr, "FLOAT %g\n", fts_get_float( &tree->value)); break;
   case TK_SYMBOL: fprintf( stderr, "SYMBOL %s\n", fts_get_symbol( &tree->value)); break;

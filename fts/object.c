@@ -134,9 +134,6 @@ fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_at
       return NULL;
     }
  
-  if(patcher != NULL)
-    fts_patcher_add_object(patcher, obj);    
-
   return obj;
 }
 
@@ -159,46 +156,14 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 
   if (eval_data->obj == NULL)
     {
-      /* create the object */
-      if (ac >= 1 && fts_get_class( at) == fts_class_class)
-	{
-	  fts_class_t *cl = (fts_class_t *)fts_get_object( at);
-
-	  /* TEMPLATE: if (class is template, make a template instance) */
-
-	  /* eval_data->obj = fts_template_make_instance(...) */
-
-	  /* else class is not template, call object_create */
-	  eval_data->obj = fts_object_create( cl, eval_data->patcher, ac-1, at+1);
-
-	  if (eval_data->obj == NULL)
-	    return class_instantiation_error;
-
-	  return fts_ok;
-	}
-
       if (ac == 1 && fts_is_object( at))
 	{
 	  eval_data->obj = fts_get_object( at);
-	  return fts_ok;
-	}
-
-      if (ac >= 1 && fts_is_symbol( at))
-	{
-	  fts_class_t *cl = fts_class_get_by_name( NULL, fts_get_symbol( at));
-
-	  if (cl == NULL)
-	    return class_not_found_error;
-
-	  eval_data->obj = fts_object_create( cl, eval_data->patcher, ac-1, at+1);
-	  if (eval_data->obj == NULL)
-	    return class_instantiation_error;
 
 	  return fts_ok;
 	}
 
-
-      return invalid_class_name_error;
+      return class_instantiation_error;
     }
   else
     {
@@ -245,6 +210,8 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
       obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
       fts_object_set_description(obj, ac, at);
 
+      fts_patcher_add_object( patcher, obj);    
+
       return obj;
     }
 
@@ -285,6 +252,8 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
       fts_set_symbol(&a, fts_status_get_description( status));
       obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
     }
+
+  fts_patcher_add_object( patcher, obj);    
 
   /* Add the newly created object as user of the expression's variables,
      even if it is an error object, because we may try to recompute, and recover,
