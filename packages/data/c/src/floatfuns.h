@@ -24,52 +24,31 @@
 #define DATA_PACKAGE_FLOAT_FUNCTIONS_H
 
 #ifndef HAVE_SINF
-float sinf(float f)
-{
-  return (float)sin(f);
-}
+#define sinf(f)  ((float)sin((float)f))
 #endif
 
 #ifndef HAVE_COSF
-float cosf(float f)
-{
-  return (float)cos(f);
-}
+#define cosf(f)  ((float)cos((float)f))
 #endif
 
 #ifndef HAVE_ATAN2F
-float atan2f(float x, float y)
-{
-  return (float)atan2(x,y);
-}
+#define atan2f(x,y)  ((float)atan2((float)x,(float)y))
 #endif
 
 #ifndef HAVE_SQRTF
-float sqrtf(float f)
-{
-  return (float)sqrt(f);
-}
+#define sqrtf(f)  ((float)sqrt((float)f))
 #endif
 
 #ifndef HAVE_FABSF
-float fabsf(float f)
-{
-  return (float)fabs(f);
-}
+#define fabsf(f)  ((float)fabs((float)f))
 #endif
 
 #ifndef HAVE_LOGF
-float logf(float f)
-{
-  return (float)log(f);
-}
+#define logf(f)  ((float)log((float)f))
 #endif
 
 #ifndef HAVE_EXPF
-float expf(float f)
-{
-  return (float)exp(f);
-}
+#define expf(f)  ((float)exp((float)f))
 #endif
 
 
