@@ -1571,6 +1571,8 @@ fts_mess_client_load_patcher_dpat(int ac, const fts_atom_t *av)
 
   /* FIXME [pH07] */
 
+
+
 /* DECLARE_ABSTRACTION   <name> <file> */
 
 /*  static void */
