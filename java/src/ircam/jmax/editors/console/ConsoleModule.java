@@ -24,7 +24,6 @@
 // 
  
 package ircam.jmax.editors.console;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 
 /** The console module; the initModule function is called at init time

@@ -30,6 +30,7 @@ package ircam.jmax.editors.console;
 
 import java.util.*;
 import java.awt.*;
+import java.io.*;
 import java.awt.event.*;
 import java.beans.*;
 
@@ -39,6 +40,7 @@ import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 public class ControlPanel extends JPanel
 {
@@ -107,7 +109,7 @@ public class ControlPanel extends JPanel
     }
   }
 
-  public ControlPanel(Fts fts)
+  public ControlPanel()
   {
     setSize( 300, 300);
     setLayout( new BoxLayout( this, BoxLayout.X_AXIS));
@@ -176,18 +178,24 @@ public class ControlPanel extends JPanel
     validate();
   }
 
-  public void init(Fts fts)
+  public void init()
   {
-      control = (FtsDspControl)fts.getDspController();
-      
-      if(control == null) return;
+      try
+	  {
+	      control = new FtsDspControl();
+	  }
+      catch(IOException e)
+	  {
+	      System.err.println("ControlPanel: Error in FtsDspControl creation!");
+	      e.printStackTrace();
+	  }
 
       new DspControlAdapter("invalidFpe", control, fpeLed);
       new DspControlAdapter("divideByZeroFpe", control, fpeLed);
       new DspControlAdapter("overflowFpe", control, fpeLed);
       
       new DspControlAdapter("dacSlip", control, syncLed);
-      dspOnButton.setSelected(control.getDspOn().booleanValue());
+      dspOnButton.setSelected(control.getDspOn());
       new DspOnControlAdapter("dspOn", control, dspOnButton);
 
       dspOnButton.addItemListener(new ItemListener() {
@@ -196,9 +204,9 @@ public class ControlPanel extends JPanel
 		  if ( !lock)
 		      {
 			  if (e.getStateChange() == ItemEvent.DESELECTED)
-			      control.setDspOn(Boolean.FALSE);
+			      control.requestSetDspOn(false);
 			  else  if (e.getStateChange() == ItemEvent.SELECTED)
-			      control.setDspOn(Boolean.TRUE);
+			      control.requestSetDspOn(true);
 		      }
 	      }});
       if (MaxApplication.getProperty("debug") != null)
@@ -210,6 +218,11 @@ public class ControlPanel extends JPanel
 		      }
 		  });  
 	  }
+  }
+
+  public FtsDspControl getDspControl()
+  {
+      return control;
   }
 }
 

@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+#include <fts/fts.h>
 
 /***********************************************************************
  *
@@ -87,10 +88,9 @@ static void consolestream_delete( fts_object_t *o, int winlet, fts_symbol_t s, i
   fts_set_default_console_stream( (fts_bytestream_t *)NULL);
 }
 
-static void consolestream_set_default(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+static void consolestream_set_default( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ( fts_is_symbol(value) && fts_get_symbol(value) == fts_s_yes)
-    fts_set_default_console_stream( (fts_bytestream_t *)obj);
+  fts_set_default_console_stream( (fts_bytestream_t *)o);
 }
 
 static fts_status_t consolestream_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -101,14 +101,14 @@ static fts_status_t consolestream_instantiate( fts_class_t *cl, int ac, const ft
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, consolestream_init);
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, consolestream_delete);
 
-  fts_class_add_daemon( cl, obj_property_put, fts_new_symbol("default"), consolestream_set_default);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_new_symbol("set_default"), consolestream_set_default);
 
   return fts_Success;
 }
 
 void console_config( void)
 {
-  fts_class_install( "console_stream", consolestream_instantiate);
+  fts_class_install( fts_new_symbol("console_stream"), consolestream_instantiate);
   s_print_line = fts_new_symbol( "print_line");
 }
 

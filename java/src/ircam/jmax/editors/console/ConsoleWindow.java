@@ -26,22 +26,18 @@
 package ircam.jmax.editors.console;
 
 import java.io.*;
-import java.util.*;
 import java.awt.*;
 import java.awt.print.*;
-import java.awt.event.*;
-import java.awt.datatransfer.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import ircam.jmax.script.*;
-
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.widgets.ConsoleArea;
+
+import ircam.ftsclient.*;
 
 /**
  * Window containing a console
@@ -55,6 +51,8 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
   private boolean noConsole;
   private ControlPanel controlPanel;
   private DefaultHelpMenu helpMenu;
+
+  private FtsConsole ftsConsole;
 
   static {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
@@ -73,8 +71,26 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
   public static void init()
   {
-    consoleWindowSingleInstance.getControlPanel().init(MaxApplication.getFts());
+     try
+       {
+	 FtsArgs args = new FtsArgs();
+	 args.add(FtsSymbol.get("default"));
+	 args.add(FtsSymbol.get("="));
+	 args.add(FtsSymbol.get("yes"));
+
+	 consoleWindowSingleInstance.ftsConsole = new FtsConsole(args);
+
+	 consoleWindowSingleInstance.ftsConsole.send( FtsSymbol.get("set_default"));
+       }
+     catch(IOException e)
+       {
+	 System.err.println("ConsoleWindow: Error in FtsConsole creation!");
+	 e.printStackTrace();
+       }
+
+    consoleWindowSingleInstance.getControlPanel().init();
     consoleWindowSingleInstance.helpMenu.init();
+    consoleWindowSingleInstance.addWindowListener(MaxWindowManager.getWindowManager());
   }
 
   public static ConsoleWindow getInstance()
@@ -128,7 +144,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
     JToolBar toolbar = new JToolBar("Control Panel", JToolBar.HORIZONTAL);
     toolbar.setPreferredSize(new Dimension(250, 23));
-    toolbar.add(controlPanel = new ControlPanel(MaxApplication.getFts()));
+    toolbar.add(controlPanel = new ControlPanel());
     toolbar.addAncestorListener(new AncestorListener(){
 	    public void ancestorAdded(AncestorEvent event)
 	    {
@@ -177,13 +193,11 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
   {
     return controlPanel;
   }
-    
-  // Methods from interface Editor
-  final public Fts getFts()
+  public FtsDspControl getDspControl()
   {
-    return MaxApplication.getFts();
+    return controlPanel.getDspControl();
   }
-
+    
   public EditorContainer getEditorContainer()
   {
     return this;
@@ -193,9 +207,9 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
   {
   }
 
-  public MaxDocument getDocument(){
+    /*public MaxDocument getDocument(){
       return null;
-  }
+      }*/
 
   // Methods from interface EditorContainer
   public Editor getEditor()

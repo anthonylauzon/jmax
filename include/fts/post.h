@@ -110,4 +110,22 @@ FTS_API void fts_log_atoms( int ac, const fts_atom_t *at);
 FTS_API void post( const char *format, ...);
 FTS_API void post_atoms( int ac, const fts_atom_t *at);
 
+/**
+ * Get the default console stream (the bytestream onto which post()
+ * will output the chars)
+ *
+ * @fn fts_bytestream_t *fts_get_default_console_stream( void)
+ * @return the default console stream
+ * @ingroup post
+ */
+FTS_API fts_bytestream_t *fts_get_default_console_stream( void);
 
+/**
+ * Set the default console stream (the bytestream onto which post()
+ * will output the chars)
+ *
+ * @fn void fts_set_default_console_stream( fts_bytestream_t *stream)
+ * @param the default console stream
+ * @ingroup post
+ */
+FTS_API void fts_set_default_console_stream( fts_bytestream_t *stream);
