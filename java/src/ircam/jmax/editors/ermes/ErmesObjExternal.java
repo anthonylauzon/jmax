@@ -59,7 +59,6 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       this.YouArePatcher(true);
     
     ParseText(itsArgs);
-    //ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
     RestoreDimensions();
 
     return true;		// Why this method return a value ????
