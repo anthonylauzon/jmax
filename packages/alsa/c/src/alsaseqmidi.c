@@ -428,28 +428,6 @@ alsaseqmidi_scan_hashtable(fts_hashtable_t* ht)
     
 }
 static void
-alsaseqmidi_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-  alsaseqmidi_t* this = (alsaseqmidi_t*)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-    
-  fts_spost(stream, "\n");
-  fts_spost(stream, "ALSA Sequencer MIDI manager inputs\n");
-  alsaseqmidi_scan_hashtable(&this->inputs);
-    
-  fts_spost(stream, "\n");
-  fts_spost(stream, "ALSA Sequencer MIDI manager outputs\n");
-  alsaseqmidi_scan_hashtable(&this->outputs);  
-  fts_spost(stream, "\n");
-  fts_spost(stream, "ALSA Sequencer MIDI manager declared sources\n");
-  alsaseqmidi_scan_hashtable(&this->sources);
-    
-  fts_spost(stream, "\n");
-  fts_spost(stream, "ALSA Sequencer MIDI manager declared destination\n");
-  alsaseqmidi_scan_hashtable(&this->destinations);
-}
-
-static void
 alsaseqmidi_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(alsaseqmidi_t), alsaseqmidi_init, alsaseqmidi_delete);
@@ -462,8 +440,6 @@ alsaseqmidi_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, fts_midimanager_s_get_input, alsaseqmidi_get_input);
   fts_class_message_varargs(cl, fts_midimanager_s_get_output, alsaseqmidi_get_output);
 
-  /* debug print */
-  fts_class_message_varargs(cl, fts_s_print, alsaseqmidi_print);
 }
 
 void

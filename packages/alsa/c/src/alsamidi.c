@@ -216,52 +216,6 @@ alsamidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     *ptr = port;
 }
 
-static void
-alsamidi_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  alsamidi_t *this = (alsamidi_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int i;
-
-  alsamidi_update_inputs(this);
-  alsamidi_update_outputs(this);
-  
-  fts_spost(stream, "ALSA MIDI inputs:\n");
-  for(i=0; i<fts_array_get_size(&this->inputs); i++)
-    {
-      fts_atom_t k, a;
-
-      fts_set_symbol(&k, fts_get_symbol(fts_array_get_element(&this->inputs, i)));
-      if(fts_hashtable_get(&this->devices, &k, &a))
-	{
-	  if(fts_is_object(&a))
-	    {
-	      alsarawmidiport_t *port = (alsarawmidiport_t *)fts_get_object(&a);
-	      fts_spost(stream, "  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
-	    }
-	  else if(fts_is_symbol(&a))
-	    fts_spost(stream, "  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
-	}
-    }
-
-  fts_spost(stream, "ALSA MIDI outputs:\n");
-  for(i=0; i<fts_array_get_size(&this->outputs); i++)
-    {
-      fts_atom_t k, a;
-
-      fts_set_symbol(&k, fts_get_symbol(fts_array_get_element(&this->outputs, i)));
-      if(fts_hashtable_get(&this->devices, &k, &a))
-	{
-	  if(fts_is_object(&a))
-	    {
-	      alsarawmidiport_t *port = (alsarawmidiport_t *)fts_get_object(&a);
-	      fts_spost(stream, "  '%s': active (%s)\n", fts_get_symbol(&k), port->hw_name);
-	    }
-	  else if(fts_is_symbol(&a))
-	    fts_spost(stream, "  '%s': inactive (%s)\n", fts_get_symbol(&k), fts_get_symbol(&a));
-	}
-    }
-}
 
 static void
 alsamidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -296,8 +250,6 @@ alsamidi_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_midimanager_s_get_input, alsamidi_get_input);
   fts_class_message_varargs(cl, fts_midimanager_s_get_output, alsamidi_get_output);
 
-  /* debug print */
-  fts_class_message_varargs(cl, fts_s_print, alsamidi_print);
 }
 
 void 
