@@ -3,7 +3,7 @@ packagedir=$(pkgdatadir)/packages/sequence/java/classes/ircam/jmax/editors/seque
 package_JAVA = \
 AbstractValueDataFlavor.java \
 Adapter.java \
-AmbitusMapper.java \
+IntervalMapper.java \
 AmbitusValueDataFlavor.java \
 AnythingAdapter.java \
 ChannelMapper.java \

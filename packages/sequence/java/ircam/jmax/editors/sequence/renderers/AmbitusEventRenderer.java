@@ -25,6 +25,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.track.Event;
 import ircam.jmax.toolkit.*;
+import ircam.fts.client.*;
 
 import java.awt.*;
 
@@ -81,43 +82,49 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     int lenght = pa.getLenght(e);
     String label = pa.getLabel(e);
     int heigth = pa.getHeigth(e);
+    Object type = e.getProperty("type");
 
     if (heigth == 0)
       heigth = Adapter.NOTE_DEFAULT_HEIGTH;
 
-    y = y-heigth/2;
+    /*y = y-heigth/2;*/
+    y = y-heigth+2;
     
     switch(state)
       {
       case Event.SELECTED:
 	g.setColor(Color.red);
-	if ( gc.getSelection().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
-	  else g.fillRect(x, y, lenght, heigth);
 	break;
       case Event.DESELECTED:
-	  g.setColor(Color.black);
-	  g.fillRect(x, y, lenght, heigth);
-	  break;
+	g.setColor(Color.black);
+	break;
       case Event.HIGHLIGHTED:
-	  g.setColor(Color.green);
-	  g.fillRect(x, y, lenght, heigth);
-	  break;
+	g.setColor(Color.green);
+	break;
       }
 
-      if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
+    if(type.equals("rest"))
+      g.drawRect(x, y, lenght, heigth);
+    else
+      if ( gc.getSelection().getModel() != gc.getDataModel()) 
+	g.drawRect(x, y, lenght, heigth);
+      else 
+	g.fillRect(x, y, lenght, heigth);    
+
+    if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
       {
-	  int alt = pa.getAlteration(e);
-	  g.setFont(altFont);
-	  switch(alt)
-	      {
-	      case PartitionAdapter.ALTERATION_DIESIS:
-		g.drawString("#", x-8, y+5);
-		break;
-	      case PartitionAdapter.ALTERATION_BEMOLLE:
-		g.drawString("b", x-8, y+5);
-	      }
+	int alt = pa.getAlteration(e);
+	g.setFont(altFont);
+	switch(alt)
+	  {
+	  case PartitionAdapter.ALTERATION_DIESIS:
+	    g.drawString("#", x-8, y+5);
+	    break;
+	  case PartitionAdapter.ALTERATION_BEMOLLE:
+	    g.drawString("b", x-8, y+5);
+	  }
       }
-      if(pa.isDisplayLabels())
+    if(pa.isDisplayLabels())
       {
 	g.setFont(SequencePanel.rulerFont);
 	g.drawString(label, x, y-5);
@@ -127,9 +134,9 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
    * returns true if the given event contains the given (graphic) point
    */
   public boolean contains(Object obj, int x, int y) 
-    {
-	return contains(obj, x, y, gc);
-    }
+  {
+    return contains(obj, x, y, gc);
+  }
 
   /**
    * returns true if the given event contains the given (graphic) point
@@ -144,7 +151,8 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     int evtlenght = gc.getAdapter().getLenght(e);
     int evtheigth = gc.getAdapter().getHeigth(e);
 
-    return  (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && (evty+evtheigth/2) >= y);
+    //return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth/2<=y && (evty+evtheigth/2) >= y);
+    return (evtx<=x && (evtx+evtlenght >= x) && evty-evtheigth+2<=y && evty+2 >= y);
   }
 
 
@@ -155,9 +163,9 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
    * returns true if the representation of the given event "touches" the given rectangle
    */
   public boolean touches(Object obj, int x, int y, int w, int h)
-    {
-	return touches(obj, x, y, w, h, gc);
-    } 
+  {
+    return touches(obj, x, y, w, h, gc);
+  } 
 
   /**
    * returns true if the representation of the given event "touches" the given rectangle
@@ -173,17 +181,18 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
     int evtheigth = gc.getAdapter().getHeigth(e);
 
     tempRect.setBounds(x, y, w, h);
-    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
+    //eventRect.setBounds(evtx, evty, evtlenght, evtheigth);
+    eventRect.setBounds(evtx, evty-evtheigth+2, evtlenght, evtheigth);
     return  tempRect.intersects(eventRect);
   }
 
-    public static AmbitusEventRenderer getRenderer()
-    {
-	if (staticInstance == null)
-	    staticInstance = new AmbitusEventRenderer();
-
-	return staticInstance;
-    }
+  public static AmbitusEventRenderer getRenderer()
+  {
+    if (staticInstance == null)
+      staticInstance = new AmbitusEventRenderer();
+    
+    return staticInstance;
+  }
 
   //------------Fields
   final static int NOTE_DEFAULT_WIDTH = 5;
@@ -191,7 +200,6 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
   public static AmbitusEventRenderer staticInstance;
   static public Font altFont = new Font("SansSerif", Font.BOLD, 12);
     
-    int oldX, oldY;
-    //static public Color selectionColor = new Color(150,90,/*153*/253);
+  int oldX, oldY;
 }
 

@@ -144,10 +144,10 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	    if (((UndoableData) itsTrackDataModel).isInGroup())
 	      ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, "value", newVal));
 	  }
-	  if (value != null)
-	    value.setProperty( "value", newVal);
+	if (value != null)
+	  value.setProperty( "value", newVal);
 	  
-	  itsTrackDataModel.changeEvent( this, "value", newVal);
+	itsTrackDataModel.changeEvent( this, "value", newVal);
       }
     else
       for(int i = 0; i < nArgs-1; i+=2)
@@ -171,8 +171,12 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	      }
 	    }
 	  else if (value != null)
-	    value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object
-	  
+	    {
+	      if( newVal instanceof FtsSymbol)
+		value.setProperty(name, ((FtsSymbol)newVal).toString());
+	      else
+		value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object
+	    }
 	  itsTrackDataModel.changeEvent(this, name, newVal);
 	}    
   }

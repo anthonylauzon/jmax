@@ -41,15 +41,15 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
    */
   public PartitionAdapter(Geometry g, SequenceGraphicContext gc) 
   {
-      super(g);
-      XMapper = TimeMapper.getMapper();
-      YMapper = PitchMapper.getMapper();
-      LenghtMapper = DurationMapper.getMapper();
-      HeigthMapper = AmbitusMapper.getMapper();
-      LabelMapper = PitchLabelMapper.getMapper();
+    super(g);
+    XMapper = TimeMapper.getMapper();
+    YMapper = PitchMapper.getMapper();
+    LenghtMapper = DurationMapper.getMapper();
+    HeigthMapper = IntervalMapper.getMapper();
+    LabelMapper = PitchLabelMapper.getMapper();
       
-      itsName = "Standard Adapter";
-      this.gc = gc;
+    itsName = "Standard Adapter";
+    this.gc = gc;
   }
 
 
@@ -262,10 +262,10 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
   /**
    * set the parameter of the event associated with the graphic y
    */
-    public void setY(Event e, int y) 
-    {
-	super.setY(e, getInvY(y));
-    }
+  public void setY(Event e, int y) 
+  {
+    super.setY(e, getInvY(y));
+  }
 
   /**
    * inherited from Adapter.
@@ -284,33 +284,36 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
       {
       return (int) (super.getLenght(e));
       }*/
-    public double getInvLenght(Event e)//*@*// 
-    {
-	if (LenghtMapper != null) return LenghtMapper.get(e);
-	else return 0.0;
-    }
+  public double getInvLenght(Event e)//*@*// 
+  {
+    if (LenghtMapper != null) return LenghtMapper.get(e);
+    else return 0.0;
+  }
 
   /**
    * set the duration of the event associated with the graphic lenght l.
    */
-    public void setLenght(Event e, int l) 
-    {
-	//super.setLenght(e, (int) (l/geometry.getXZoom()));//*@*//
-	LenghtMapper.set(e, (double)((double)l/geometry.getXZoom()) );
-    }
+  public void setLenght(Event e, int l) 
+  {
+    //super.setLenght(e, (int) (l/geometry.getXZoom()));//*@*//
+    LenghtMapper.set(e, (double)((double)l/geometry.getXZoom()) );
+  }
 
-    /**
-     * returns the heigth of this event */
-    public int getHeigth(Event e) 
-    {
-	if (HeigthMapper != null) return 3*(2*HeigthMapper.get(e)+1);
-	else return NOTE_DEFAULT_HEIGTH;
-    }
+  /**
+   * returns the heigth of this event */
+  public int getHeigth(Event e) 
+  {
+    if (HeigthMapper != null) 
+      //return 3*(2* HeigthMapper.get(e)+1);
+      return NOTE_DEFAULT_HEIGTH*(HeigthMapper.get(e)+1);
     
-    public void setHeigth(Event e, int heigth)
-    {
-	HeigthMapper.set(e, (heigth-3)/6);
-    }
+    return NOTE_DEFAULT_HEIGTH;
+  }
+    
+  public void setHeigth(Event e, int heigth)
+  {
+    HeigthMapper.set(e, (heigth-3)/6);
+  }
 
   /**
    * From the MappingListener interface.
