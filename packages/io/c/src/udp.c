@@ -21,11 +21,6 @@
  */
 
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <string.h>
 
 #include <stdio.h>
@@ -34,88 +29,192 @@
 
 #define UDP_PACKET_SIZE 512
 
+
 typedef struct
 {
-  fts_bytestream_t bytestream;
-  int socket;
-  char buffer[UDP_PACKET_SIZE];
+  fts_object_t head;
+  fts_bytestream_t* udp_stream;
 } udp_t;
 
+fts_symbol_t s_connect = NULL;
+fts_symbol_t s_status = NULL;
+
 static void
-udp_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+udp_connect(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  udp_t *this = (udp_t *)o;
-  int size;
+  udp_t* self = (udp_t*)o;
+  int connected_port;
 
-  size = recvfrom( this->socket, this->buffer, UDP_PACKET_SIZE, 0, NULL, NULL);
-  if ( size > 0)
-    {
-      int i;
-
-      for ( i = 0; i < size; i++)
-	fts_outlet_int( (fts_object_t *)this, 0, this->buffer[i]);
-    }
+  if ((ac !=1) || (!fts_is_int(at)))
+  {
+    fts_log("[udp] connect requires an int as argument\n");
+    fts_object_error(o,"connect requires an int as argument\n");
+    return;
+  }
+  connected_port = fts_get_int(at);
+  fts_udpstream_connect((fts_udpstream_t*)(self->udp_stream), connected_port);
 }
 
 static void
-udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+udp_status(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  udp_t *this = (udp_t *)o;
-  int port = fts_get_int_arg( ac, at, 0, 0);
-  struct sockaddr_in addr;
+  udp_t* self = (udp_t*)o;
 
-  post( "Created UDP object on port %d\n", port);
+  post("[udp] port: %d, connected to port: %d\n",
+       fts_udpstream_get_port((fts_udpstream_t*)(self->udp_stream)),
+       fts_udpstream_get_connected_port((fts_udpstream_t*)(self->udp_stream)));
+        								 
+}
 
-  this->socket = socket(AF_INET, SOCK_DGRAM, 0);
 
-  if (this->socket == -1)
-    {
-      post( "Cannot open socket\n");
-      return;
-    }
-
-  memset( &addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  addr.sin_port = htons(port);
-
-  if ( bind( this->socket, (const struct sockaddr*)&addr, sizeof(struct sockaddr_in)) == -1)
-    {
-      post( "Cannot bind socket\n");
-      close( this->socket);
-      return;
-    }
-
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
+static void
+udp_receive(fts_object_t* o, int size, const unsigned char* buffer)
+{
+  udp_t* self = (udp_t*)o;
+  fts_atom_t a;
+  
+  fts_set_symbol(&a, fts_new_symbol(buffer));
+  fts_outlet_send(o, 0, NULL, 1, &a);
 }
 
 static void
-udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+udpout_symbol(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  udp_t *this = (udp_t *)o;
-
-  if ( this->socket >= 0)
-    {
-      fts_sched_remove( (fts_object_t *)this);
-
-      close( this->socket);
-    }
+  udp_t* self = (udp_t*)o;
+  fts_bytestream_output(self->udp_stream, strlen(s), s);
+  fts_bytestream_flush(self->udp_stream);
 }
 
 static void
-udp_instantiate(fts_class_t *cl)
+udpout_bang(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  fts_class_init(cl, sizeof( udp_t), udp_init, udp_delete);
-
-  fts_class_message_varargs(cl, fts_s_sched_ready, udp_receive);
-
-  fts_class_outlet_int(cl, 0);
+  udp_t* self = (udp_t*)o;
+  fts_bytestream_output(self->udp_stream, strlen(fts_s_bang), fts_s_bang);
+  fts_bytestream_flush(self->udp_stream);
 }
+
+static void
+udpout_send(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  udp_t* self = (udp_t*)o;
+  fts_symbol_t mess_to_send;
+  if (!fts_is_symbol(at))
+  {
+    fts_object_error(o,"send message requires a symbol as argument");
+    return;
+  }
+
+  mess_to_send = fts_get_symbol(at);
+  fts_bytestream_output(self->udp_stream, strlen(mess_to_send) + 1, mess_to_send);
+  fts_bytestream_flush(self->udp_stream);
+}
+
+
+static void
+udpin_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, fts_atom_t* at)
+{
+  udp_t* self = (udp_t*)o;
+  fts_bytestream_remove_listener(self->udp_stream, (fts_object_t*)self);
+
+  if (self->udp_stream != NULL)
+  {
+    fts_object_release((fts_object_t*)self->udp_stream);
+  }
+}
+
+static void
+udpin_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  udp_t *self = (udp_t *)o;
+
+  /* create udp stream */
+  self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
+  if (self->udp_stream != NULL)
+  {
+    fts_object_refer((fts_object_t*)self->udp_stream);
+  }
+  else
+  {
+    fts_object_error(o, "Cannot create udp stream component");
+    return;
+  }
+
+  fts_object_set_outlets_number(o, 1);
+  
+  fts_bytestream_add_listener(self->udp_stream, (fts_object_t*)self, udp_receive);
+}
+
+static void
+udpout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  udp_t *self = (udp_t *)o;
+  if (self->udp_stream != NULL)
+  {
+    fts_object_release((fts_object_t*)self->udp_stream);
+  }
+}
+
+
+static void
+udpout_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  udp_t *self = (udp_t *)o;
+
+  /* create udp stream */
+  self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
+  if (self->udp_stream != NULL)
+  {
+    fts_object_refer((fts_object_t*)self->udp_stream);
+  }
+  else
+  {
+    fts_object_error(o, "Cannot create udp stream component");
+    return;
+  }
+}
+
+
+static void
+udpin_instantiate(fts_class_t* cl)
+{
+  fts_class_init(cl, sizeof(udp_t), udpin_init, udpout_delete);
+
+  fts_class_message_varargs(cl, s_connect, udp_connect);
+  fts_class_message_varargs(cl, s_status, udp_status);
+
+  /* name support */
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
+  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method); 
+  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method); 
+}
+
+static void
+udpout_instantiate(fts_class_t* cl)
+{
+  fts_class_init(cl, sizeof(udp_t), udpout_init, udpout_delete);
+
+  fts_class_message_varargs(cl, s_connect, udp_connect);
+  fts_class_message_varargs(cl, s_status, udp_status);
+
+  fts_class_message_varargs(cl, fts_s_send, udpout_send);
+
+  fts_class_inlet_symbol(cl, 0, udpout_symbol);
+  fts_class_inlet_bang(cl, 0, udpout_bang);   
+
+  /* name support */
+  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method); 
+  fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method); 
+  fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method); 
+}
+
 
 void
 udp_config( void)
 {
-  fts_class_install( fts_new_symbol("udp"), udp_instantiate);
+  s_connect = fts_new_symbol("connect");
+  s_status = fts_new_symbol("status");
+  fts_class_install( fts_new_symbol("udpin"), udpin_instantiate);
+  fts_class_install( fts_new_symbol("udpout"), udpout_instantiate);
 }
 
 
