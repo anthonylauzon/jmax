@@ -945,50 +945,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_log( "[client]: Accepted client connection\n");
 }
 
-static void client_get_packages( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_iterator_t i, j;
-  fts_package_t *pkg;
-  fts_symbol_t dir, filename;
-  fts_atom_t a[2];
-  char path[256];
-
-  fts_get_package_names( &i);
-
-  while (fts_iterator_has_more( &i))
-    {
-      fts_iterator_next( &i, a);
-      
-      pkg = fts_package_get( fts_get_symbol( a));
-      
-      if(pkg != NULL)
-	{
-	  fts_client_start_message( o, s_package_loaded);
-	  fts_client_add_symbol( o, fts_get_symbol( a));
-	  
-	  if(pkg->summaries != NULL)
-	    {
-	      fts_hashtable_get_keys( pkg->summaries, &j);
-	      dir = fts_package_get_dir( pkg);   
-	      
-	      while (fts_iterator_has_more( &j))
-		{
-		  fts_iterator_next( &j, a);
-		  fts_hashtable_get( pkg->summaries, a, &a[1]);
-		  
-		  snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, fts_get_symbol( a+1));
-		  filename = fts_new_symbol_copy(path);
-		  
-		  fts_client_add_symbol( o, fts_get_symbol( a));
-		  fts_client_add_symbol( o, filename);
-		}
-	    }
-
-	  fts_client_done_message( o);
-	}
-    }
-}
-
 static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t a[1];
@@ -1034,7 +990,6 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_packages"), client_get_packages);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_project"), client_get_project);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);

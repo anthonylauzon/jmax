@@ -29,8 +29,7 @@ ftom.help.jmax \
 funbuff.help.jmax \
 gate.help.jmax \
 int.help.jmax \
-ispw.control.summary.jmax \
-ispw.signal.summary.jmax \
+ispw.summary.jmax \
 linedrive.help.jmax \
 line~.help.jmax \
 line.help.jmax \

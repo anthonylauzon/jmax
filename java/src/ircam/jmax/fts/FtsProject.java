@@ -64,6 +64,7 @@ public class FtsProject extends FtsPackage
 	    
 	ftsPkg = new FtsPackage( JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), id);
 	packages.put(pkgName, ftsPkg);
+	ftsPkg.upload();
       }
   }
 

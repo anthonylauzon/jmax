@@ -57,16 +57,30 @@ public class FtsPackage extends FtsObject
 	  ((FtsPackage)obj).addDataPath( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("setNames"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsPackage)obj).setName( args.getSymbol( 0));
+	  ((FtsPackage)obj).setName( args.getSymbol( 0).toString());
+	  ((FtsPackage)obj).setDir( args.getSymbol( 1).toString());
+	  ((FtsPackage)obj).setFileName( args.getSymbol( 2).toString());
+	}
+      });
+     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("hasSummaryHelp"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).hasSummaryHelp = (args.getInt( 0) == 1);
 	}
       });
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("updateDone"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsPackage)obj).listener.ftsActionDone();
+	}
+      });
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("uploadDone"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).uploadDone();
 	}
       });
   }
@@ -135,7 +149,7 @@ public class FtsPackage extends FtsObject
   public void save()
   {
     args.clear();
-    args.addSymbol( name);
+    args.addSymbol( FtsSymbol.get( fileName));
 
     try
       {
@@ -161,6 +175,19 @@ public class FtsPackage extends FtsObject
     catch(IOException e)
       {
 	System.err.println("FtsPackage: I/O Error sending update Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void upload()
+  {
+    try
+      {
+	send( FtsSymbol.get("upload"));
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsPackage: I/O Error sending upload Message!");
 	e.printStackTrace(); 
       }
   }
@@ -194,15 +221,43 @@ public class FtsPackage extends FtsObject
       dataPaths.addElement( args[i].symbolValue.toString());
   }
 
-
-  public void setName( FtsSymbol name)
+  public void setName( String name)
   {
     this.name = name;
+    
   }
 
-  public FtsSymbol getName()
+  public String getName()
   {
     return name;
+  }
+
+  public void setFileName( String fn)
+  {
+    this.fileName = fn;
+    
+  }
+
+  public String getFileName()
+  {
+    return fileName;
+  }
+
+  public void setDir( String dir)
+  {
+    this.dir = dir;
+    
+  }
+
+  public String getDir()
+  {
+    return dir;
+  }
+
+  void uploadDone()
+  {    
+    if( hasSummaryHelp)
+      FtsHelpPatchTable.addSummary( name.toString()+" summary", dir+"/help/"+name+".summary.jmax");
   }
 
   /*************************************/
@@ -231,7 +286,10 @@ public class FtsPackage extends FtsObject
   private Vector templatePaths;
   private Vector absPaths;
   private Vector dataPaths;
-  private FtsSymbol name;
+  private String name;
+  private String fileName;
+  private String dir;
   private FtsActionListener listener;
+  private boolean hasSummaryHelp = true;
 }
 

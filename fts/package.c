@@ -43,8 +43,10 @@
 
 #define PACKAGE_STACK_SIZE    32
 
-fts_symbol_t s_setName = 0;
+fts_symbol_t s_setNames = 0;
+fts_symbol_t s_hasSummary = 0;
 fts_symbol_t s_updateDone = 0;
+fts_symbol_t s_uploadDone = 0;
 
 static fts_hashtable_t fts_packages;
 static fts_list_t* fts_package_paths = NULL;
@@ -743,21 +745,6 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
   fts_hashtable_put(pkg->help, &n, &p);
 }
 
-void 
-fts_package_add_summary(fts_package_t* pkg, fts_symbol_t descr, fts_symbol_t file)
-{
-  fts_atom_t n, p;
-
-  if (pkg->summaries == NULL) {
-    pkg->summaries = fts_malloc(sizeof(fts_hashtable_t));
-    fts_hashtable_init(pkg->summaries, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-  }
-
-  fts_set_symbol(&n, descr);
-  fts_set_symbol(&p, file);
-  fts_hashtable_put(pkg->summaries, &n, &p);
-}
-
 /***********************************************
  *
  *  print and save utilities for methods
@@ -967,16 +954,6 @@ __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-__fts_package_summary(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-
-  if ((ac >= 1) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
-    fts_package_add_summary(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
-  }
-}
-
-static void 
 __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *this = (fts_package_t *)o;
@@ -1020,9 +997,6 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if ( this->help) {
     fts_package_save_hashtable( &f, this->help, fts_s_help, NULL);
   }
-  if ( this->summaries) {
-    fts_package_save_hashtable( &f, this->summaries, fts_s_summary, NULL);
-  }
 
   fts_bmax_code_return( &f);
 
@@ -1057,9 +1031,6 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
   if ( this->help) {
     fts_package_print_hashtable( this->help, fts_s_help, NULL);
-  }
-  if ( this->summaries) {
-    fts_package_print_hashtable( this->summaries, fts_s_summary, NULL);
   }
 }
 
@@ -1098,7 +1069,6 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->abstraction_paths = NULL;
 
   pkg->help = NULL;
-  pkg->summaries = NULL;
   pkg->data_paths = NULL;
 }
 
@@ -1136,9 +1106,6 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if (pkg->help != NULL) {
     fts_hashtable_destroy(pkg->help);
   }
-  if (pkg->summaries != NULL) {
-    fts_hashtable_destroy(pkg->summaries);
-  }
   if (pkg->patcher != NULL) {
     fts_object_destroy(pkg->patcher);
   }
@@ -1162,9 +1129,10 @@ static void
 __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *this = (fts_package_t *)o;
-  fts_atom_t a[1]; 
+  fts_atom_t a[3]; 
   fts_iterator_t i, j, h, k;
   fts_package_t *pkg;
+  char summary[256];
 
   if ( this->packages)
     {
@@ -1179,16 +1147,7 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	    fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( o));
 	  fts_client_add_int( o, fts_get_object_id( (fts_object_t *)pkg));      
 	} 
-      fts_client_done_message( o);      
-      
-      /* upload evry package ?????????????????*/
-      /*fts_list_get_values( this->packages, &i);
-	while (fts_iterator_has_more( &i))
-	{
-	fts_iterator_next( &i, a);
-	pkg = fts_package_get( fts_get_symbol( a));
-	fts_send_message( (fts_object_t *)pkg, fts_SystemInlet, fts_s_upload, 0, 0);
-	}*/
+      fts_client_done_message( o);            
     }
   if ( this->template_paths)
     {
@@ -1203,11 +1162,21 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if ( this->data_paths)
     {
       fts_list_get_values( this->data_paths, &k);
-      fts_package_send_list( o, k, fts_s_data_path);
+      fts_package_send_list( o, k, fts_s_data_path);      
     }
 
-  fts_set_symbol(a, this->filename);
-  fts_client_send_message( o, s_setName, 1, a);  
+  fts_set_symbol(a, this->name);
+  fts_set_symbol(a+1, this->dir);
+  fts_set_symbol(a+2, this->filename);
+  fts_client_send_message( o, s_setNames, 3, a);  
+  
+  /*test if summary help patch exists */
+  snprintf(summary, 256, "%s%c%s%c%s%s", this->dir, fts_file_separator, "help", 
+	   fts_file_separator, this->name, ".summary.jmax");
+  fts_set_int(a, fts_file_exists( summary));
+  fts_client_send_message( o, s_hasSummary, 1, a);  
+
+  fts_client_send_message( o, s_uploadDone, 0, 0);  
 }
 
 static void 
@@ -1237,7 +1206,6 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_data_path, __fts_package_data_path);
   fts_method_define_varargs(cl, 0, fts_s_help, __fts_package_help);
   fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
-  fts_method_define_varargs(cl, 0, fts_s_summary, __fts_package_summary);
 
   /* All these methods are also defined for SystemInlet, as bmax saving
      allows only messages to SystemInlet... 
@@ -1249,7 +1217,6 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction_path, __fts_package_abstraction_path);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_data_path, __fts_package_data_path);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_summary, __fts_package_summary);
 
   return fts_Success;
 }
@@ -1356,8 +1323,10 @@ fts_kernel_package_init(void)
   fts_atom_t a, p;
   int i;
 
-  s_setName = fts_new_symbol("setName");
+  s_setNames = fts_new_symbol("setNames");
+  s_hasSummary = fts_new_symbol("hasSummaryHelp");
   s_updateDone = fts_new_symbol("updateDone");
+  s_uploadDone = fts_new_symbol("uploadDone");
 
   for (i = 0; i < PACKAGE_STACK_SIZE; i++) {
     fts_package_stack[i] = NULL;

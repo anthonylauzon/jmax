@@ -97,7 +97,6 @@ struct fts_package {
   fts_list_t* abstraction_paths;
 
   fts_hashtable_t* help;
-  fts_hashtable_t* summaries;
   fts_list_t* data_paths;
 };
 
