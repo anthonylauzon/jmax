@@ -4,7 +4,7 @@
 # Constants
 # ***************************************************************************
 
-ARCHS="irix62r4k irix63r5k irix63r10k irix64r10k irix65r5i irix65r10k linuxpc"
+ARCHS="irix62r4k irix63r5k irix63r10k irix64r10k irix65r4k irix65r5k irix65r10k linuxpc linuxppc solaris"
 
 # ***************************************************************************
 # Functions
