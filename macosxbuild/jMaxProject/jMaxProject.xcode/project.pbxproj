@@ -139,7 +139,6 @@
 			buildPhases = (
 			);
 			buildSettings = {
-				OPTIMIZATION_CFLAGS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -11587,13 +11586,13 @@
 			targetProxy = 5C542B7A05AB0BA30042B7A2;
 		};
 		5C542BF905AB12FC0042B7A2 = {
+			explicitFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
 			name = functions.c;
-			path = /Volumes/Users/schnell/Projects/jmax/packages/functions/c/src/functions.c;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../packages/functions/c/src/functions.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		5C542BFB05AB13380042B7A2 = {
 			children = (
