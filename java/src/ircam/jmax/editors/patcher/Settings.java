@@ -68,6 +68,7 @@ public class Settings {
     return singleInstance;
   }
 
+  /* merry Xmas */
   public void setCoolColors()
   {
       editBackgroundColor = Color.yellow;

@@ -95,8 +95,6 @@ public class Platform
       {
 	setDefaultValues();
       }
-    
-    setDefaultUIColors(Color.red);
   }
 
   static protected void setDefaultUIComponentsFont(String defFont)
@@ -161,8 +159,6 @@ public class Platform
       UIManager.put("Separator.background", color);
       UIManager.put("Tree.textBackground", color);
       UIManager.put("Tree.background", color);
-
-      Settings.sharedInstance().setCoolColors();
   }
 
   //------------------------------------------
