@@ -797,7 +797,7 @@ fts_dsp_graph_compile(fts_dsp_graph_t *graph)
     
     fts_dsp_signal_init();
     
-    sig_zero = fts_dsp_signal_new(graph->tick_size, graph->sample_rate);
+    sig_zero = fts_dsp_signal_new(graph->tick_size, (float)graph->sample_rate);
     fts_dsp_signal_reference( sig_zero);
     
     dsp_graph_reinit(graph);
