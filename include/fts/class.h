@@ -112,7 +112,6 @@ FTS_API void fts_class_outlet_anything(fts_class_t *cl, int woutlet);
 /* marcros for most popular outlet messages */
 #define fts_class_outlet_bang(c, i) fts_class_outlet_message((c), (i), fts_s_bang)
 
-#define fts_class_get_name(C) ((C)->cl->name)
 #define fts_class_get_name(C) ((C)->name)
 
 FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s);
