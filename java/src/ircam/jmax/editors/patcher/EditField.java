@@ -91,7 +91,7 @@ public class EditField extends JTextArea implements FocusListener
 
     public void keyPressed(KeyEvent e)
     {
-      if (e.getKeyCode() == KeyEvent.VK_CONTROL)
+      if((e.getKeyCode() == KeyEvent.VK_CONTROL)||(e.isControlDown()))
 	consumeNext = true;
     }
 
@@ -228,16 +228,14 @@ public class EditField extends JTextArea implements FocusListener
 
     setVisible(false);
 
-    owner.redraw();
-    owner.redrawConnections();
-
     if (! owner.getArgs().equals(aTextString) )
       {
 	owner.redefine(aTextString);
       } 
-
-    owner.redraw();
-    owner.redrawConnections();
+    else{
+      owner.redraw();
+      owner.redrawConnections();
+    }
 
     owner = null;
   }
@@ -289,3 +287,5 @@ public class EditField extends JTextArea implements FocusListener
       sketch.stopTextEditing();
   }
 }
+
+
