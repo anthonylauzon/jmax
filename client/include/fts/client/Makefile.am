@@ -1,5 +1,5 @@
 
-clientdir=$(prefix)/include/fts/client
+clientdir=$(includedir)/fts/client
 client_HEADERS= \
 atom.h \
 connection.h \

@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/sgi/c
+packagedir=$(pkgdatadir)/packages/sgi/c
 package_LTLIBRARIES=libsgi.la
 libsgi_la_SOURCES= \
 sgi.c \

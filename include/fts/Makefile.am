@@ -1,4 +1,4 @@
-ftsdir=$(prefix)/include/fts
+ftsdir=$(includedir)/fts
 fts_HEADERS= \
 array.h \
 atom.h \

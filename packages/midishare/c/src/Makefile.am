@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/midishare/c
+packagedir=$(pkgdatadir)/packages/midishare/c
 package_LTLIBRARIES=libmidishare.la
 libmidishare_la_SOURCES= \
 midishareport.c 
