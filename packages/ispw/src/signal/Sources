@@ -24,11 +24,11 @@
 #
 
 ifeq ($(VENDOR),sgi)
-  ARCH_SOURCES = osc_ftl_sgi.c
+  ARCH_SOURCES = osc_intphase.c phasor_intphase.c
 endif
 
 ifeq ($(VENDOR),gnu)
-  ARCH_SOURCES = osc_ftl_linuxpc.c
+  ARCH_SOURCES = osc_ieeewrap.c phasor_ieeewrap.c
 endif
 
 SOURCES = \
@@ -37,10 +37,9 @@ fft.c \
 fft_ftl.c \
 noise.c \
 osc.c \
-phas1.c \
+phasor.c \
 resample.c \
 samphold.c \
-sbinop.c \
 sig1.c \
 sigabs.c \
 sigarctan2.c \

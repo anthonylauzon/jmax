@@ -50,7 +50,6 @@ extern void veclog_config(void);
 extern void vecclip_config(void);
 extern void sigarctan2_config(void);
 extern void sigabs_config(void);
-extern void sbinop_config(void);
 extern void fft_config(void);
 extern void sigsamphold_config(void);
 
@@ -81,7 +80,6 @@ signal_module_init(void)
   vecclip_config();
   sigarctan2_config();
   sigabs_config();
-  sbinop_config();
   fft_config();
   sigsamphold_config();
 }

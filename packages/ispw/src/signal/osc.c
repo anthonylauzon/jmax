@@ -28,7 +28,7 @@
 #include <math.h>
 #include <string.h>
 #include "wavetab.h"
-#include "osc_ftl.h"
+#include "osc.h"
 
 /***************************************************************************************
  *

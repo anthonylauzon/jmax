@@ -367,7 +367,8 @@ osc_ftl_declare_functions(void)
  *
  */
 
-ftl_data_t osc_ftl_data_new(void)
+ftl_data_t 
+osc_ftl_data_new(void)
 {
   return ftl_data_new(osc_ftl_t);
 }
