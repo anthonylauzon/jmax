@@ -5,7 +5,7 @@ help ()
     cat >&2 << HELP_EOF
 
 Usage:
-    jmax-cvs-tag [-qualifier <qualifier>]
+    jmax-cvs-tag [-qualifier <qualifier>] [<other cvs options>]
 
 Does a ``cvs tag'' of the sources of jMax.
 
@@ -17,6 +17,9 @@ patch level of the current release, taken from file VERSION.
 Options:
   -qualifier <qualifier>           (mandatory)
     defines the qualifier part of the tag (for instance, TRY1 or FINAL)
+  <other-cvs-options>              (optional)
+    Options that are passed directly to cvs (as -F for example)
+  
 
 HELP_EOF
 }
@@ -25,6 +28,7 @@ HELP_EOF
 # Options decrypting
 OPT="none"
 QUALIFIER=
+CVSOPT=
 
 for ARG in $@
 do
@@ -32,13 +36,12 @@ do
     then
 	case $ARG in
 	\-qualifier )
-	    OPT=$ARG ;;
+	    OPT="-qualifier" ;;
 	\-help | \-h | \-\? )
 	    help ;
 	    exit 2 ;;
 	*)
-	    help ;
-	    exit 2 ;;
+	    CVSOPT="$CVSOPT $arg" ;;
 	esac
     else
 	case $OPT in
@@ -79,4 +82,4 @@ else
 fi
 
 echo "cvs tag $TAG"
-cvs tag $TAG
+cvs tag $CVSOPT $TAG
