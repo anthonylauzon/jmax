@@ -32,7 +32,7 @@ import ircam.jmax.editors.sequence.renderers.*;
 /**
  * A basic implementation of the EventValue interface, with a default property handling (no actions). 
  */
-public class AbstractEventValue implements EventValue 
+public class AbstractEventValue implements EventValue, java.io.Serializable
 {
 
   public AbstractEventValue()

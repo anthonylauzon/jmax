@@ -43,7 +43,7 @@ public class FtsScopeObject extends FtsVectorDisplayObject
     FtsObject.registerMessageHandler(FtsScopeObject.class, FtsSymbol.get("setPeriod"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsScopeObject)obj).setCurrentPeriod(args.getFloat(0));
+	  ((FtsScopeObject)obj).setCurrentPeriod((float)args.getDouble(0));
 	}
       });
   }
@@ -84,7 +84,7 @@ public class FtsScopeObject extends FtsVectorDisplayObject
     if(this.period == period) return;
 
     args.clear();
-    args.addFloat(period);
+    args.addDouble((double)period);
 
     try{
       send( FtsSymbol.get("setPeriod"), args);
@@ -116,7 +116,7 @@ public class FtsScopeObject extends FtsVectorDisplayObject
     else if(th==THRESHOLD_OFF)
       args.addSymbol(FtsSymbol.get( "off"));
     else
-      args.addFloat(th);
+      args.addDouble((double)th);
 
     try{
       send(FtsSymbol.get("setThreshold"), args);

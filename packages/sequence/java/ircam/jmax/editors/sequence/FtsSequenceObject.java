@@ -389,13 +389,13 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       ((TrackListener)(e.nextElement())).trackMoved(track, oldPosition, newPosition);
   }
 
-  SequenceWindow sequence = null;  
+  transient SequenceWindow sequence = null;  
   
-  Vector tracks = new Vector();
-  MaxVector listeners = new MaxVector();
+  transient Vector tracks = new Vector();
+  transient MaxVector listeners = new MaxVector();
   String name = new String("unnamed"); //to be assigned by FTS, usually via a specialized KEY
   
-  protected FtsArgs args = new FtsArgs();
+  protected transient FtsArgs args = new FtsArgs();
 }
 
 

@@ -22,6 +22,8 @@
 
 package ircam.jmax.editors.sequence.track;
 
+import java.io.*;
+
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
@@ -31,7 +33,7 @@ import ircam.jmax.toolkit.*;
  * An utility class a graphic only event in a track.  
  */
 
-public class UtilTrackEvent implements Event, Drawable
+public class UtilTrackEvent implements Event, Drawable, Serializable
 {
 
   public UtilTrackEvent()

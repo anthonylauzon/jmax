@@ -235,7 +235,7 @@ public class MatDisplay extends GraphicObject
     g.setColor(Color.black);
     g.drawRect( x, y, w - 1, h - 1);
     paintInlets(g);
-    Rectangle oldClip = g.getClipRect();
+    Rectangle oldClip = g.getClipBounds();
     Rectangle viewRect = SwingUtilities.computeIntersection(x+1,y+1,w-2,h-2, itsSketchPad.getEditorContainer().getViewRectangle());
     g.setClip( viewRect);  
     
@@ -251,7 +251,7 @@ public class MatDisplay extends GraphicObject
     int w = getWidth();
     int h = getHeight();
 
-    Rectangle oldClip = g.getClipRect();
+    Rectangle oldClip = g.getClipBounds();
     Rectangle viewRect = SwingUtilities.computeIntersection(x+1,y+1,w-2,h-2, itsSketchPad.getEditorContainer().getViewRectangle());
     g.setClip( viewRect);  
     

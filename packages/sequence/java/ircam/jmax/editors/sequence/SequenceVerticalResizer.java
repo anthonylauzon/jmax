@@ -111,7 +111,7 @@ public class SequenceVerticalResizer extends SelectionResizer {
 
   //---- Fields
 
-    static UtilTrackEvent tempEvent;
+  static transient UtilTrackEvent tempEvent;
 }
 
 

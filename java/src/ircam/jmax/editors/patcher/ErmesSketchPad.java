@@ -384,6 +384,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 
     setOpaque(true);
     setLayout(null);
+    setFocusable( true);
 
     itsEditField = new EditField( this);
     add( itsEditField);

@@ -61,7 +61,6 @@ public class FloatBoxControlPanel extends JPanel implements ActionListener, Obje
     incrField = new JTextField();
     incrField.setPreferredSize(new Dimension(140, 20));
     incrField.addActionListener(this);
-    incrField.requestDefaultFocus();
 
     Box fieldBox = new Box( BoxLayout.X_AXIS);
     fieldBox.add( Box.createRigidArea(new Dimension(2, 0)));    

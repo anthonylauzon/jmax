@@ -28,7 +28,8 @@ import java.beans.*;
 /**
  * A convenience base class for Track implementations. It implements 
  * property handling and property change events.*/
-public class TrackBase implements Track{
+public class TrackBase implements Track, java.io.Serializable
+{
     
     public TrackBase(TrackDataModel model)
     {
@@ -107,7 +108,7 @@ public class TrackBase implements Track{
 
     //--- Fields
     Hashtable properties = new Hashtable();
-    PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
+    transient PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
     TrackDataModel model;
     //private int id;
     private String name = "";

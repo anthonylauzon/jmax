@@ -50,7 +50,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
     FtsObject.registerMessageHandler( FtsMatDisplayObject.class, FtsSymbol.get("range"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsMatDisplayObject)obj).setCurrentRange(args.getFloat(0), args.getFloat(1));
+	  ((FtsMatDisplayObject)obj).setCurrentRange((float)args.getDouble(0), (float)args.getDouble(1));
 	}
       });
 
@@ -247,8 +247,8 @@ public class FtsMatDisplayObject extends FtsGraphicObject
   public void setRange(float min, float max)
   {
     args.clear();
-    args.addFloat(min);
-    args.addFloat(max);
+    args.addDouble((double)min);
+    args.addDouble((double)max);
 
     try{
       send( FtsSymbol.get("range"), args);

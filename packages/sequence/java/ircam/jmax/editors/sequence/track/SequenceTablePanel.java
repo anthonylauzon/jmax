@@ -145,10 +145,10 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     table.scrollRectToVisible(rect);      
   }
 
-  TrackTableModel tmodel;
-  SequenceGraphicContext gc;
-  JScrollPane scrollPane; 
-  JTable table;
+  transient TrackTableModel tmodel;
+  transient SequenceGraphicContext gc;
+  transient JScrollPane scrollPane; 
+  transient JTable table;
 }
 
 

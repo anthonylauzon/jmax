@@ -8,7 +8,7 @@
 
 import java.awt.*;
 import java.io.*;
-import com.apple.mrj.*;
+import com.apple.eawt.*;
 import ircam.jmax.*;
 
 public class JMaxWrapper {
@@ -25,21 +25,19 @@ public class JMaxWrapper {
   
  public static void initMacOSXApplication()
   {
-    MRJApplicationUtils.registerQuitHandler( new MRJQuitHandler(){
-        public void handleQuit() {
-            JMaxApplication.Quit();
-            throw new IllegalStateException("Quit Pending User Confirmation");
-        }	
-    });
-    MRJApplicationUtils.registerOpenDocumentHandler( new MRJOpenDocumentHandler(){
-        public void handleOpenFile( File file)
-        {        
-            if( JMaxApplication.getFtsServer() == null)
-                toOpenFile = file;
-            else
-                openFile( file);
-        }
-    });
+   Application jMaxApp = new Application();
+   jMaxApp.addApplicationListener( new ApplicationAdapter(){
+     public void handleOpenApplication(ApplicationEvent e){}
+     public void handleOpenFile(ApplicationEvent e){
+       toOpenFile = new File( e.getFilename());
+       if( JMaxApplication.getFtsServer() != null)
+         openFile( toOpenFile);
+     }
+     public void handleQuit(ApplicationEvent e){
+       JMaxApplication.Quit();
+       e.setHandled( true);
+     }
+   });
   }
   
   public static void openFile( File file)

@@ -34,7 +34,8 @@ import ircam.jmax.editors.sequence.*;
 /**
  * A convenience implementation of the ValueInfo interface.
  */
-public class AbstractValueInfo implements ValueInfo {
+public class AbstractValueInfo implements ValueInfo, Serializable
+{
     
     public String getName()
     {
@@ -109,7 +110,7 @@ public class AbstractValueInfo implements ValueInfo {
   public static AbstractValueInfo instance = new AbstractValueInfo();
   public static final String fs = File.separator;
   static String path;
-  public static ImageIcon GENERIC_ICON;
+  public transient static ImageIcon GENERIC_ICON;
 
   static 
   {

@@ -149,8 +149,6 @@ public class ControlPanel extends JPanel {
     add(dspLabel);
 
     dspOnButton = new JToggleButton( JMaxIcons.dspOff);
-    dspOnButton.setDoubleBuffered( false);
-    dspOnButton.setMargin( new Insets(0,0,0,0));
     dspOnButton.setSelectedIcon( JMaxIcons.dspOn);
     dspOnButton.setPreferredSize(new Dimension(25, 25));   
     dspOnButton.setFocusPainted( false);  

@@ -73,7 +73,7 @@ public class MaxVector implements Serializable
     return fillPointer == 0;
   }
 
-  final class MaxVectorEnumerator implements Enumeration {
+  final class MaxVectorEnumerator implements Enumeration , Serializable{
     int count;
 
     MaxVectorEnumerator()

@@ -510,8 +510,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
       processEvent(Squeack.DOWN, e);	    
 
     sketch.setKeyEventClient(null);
+    ((ErmesSketchWindow)sketch.getEditorContainer()).requestFocusInWindow();
     sketch.requestFocus();
-    sketch.getToolBar().transferFocus();
   }
 
   public void mouseReleased( MouseEvent e)

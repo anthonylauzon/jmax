@@ -384,13 +384,13 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   public void requestEventCreation(float time, String type, int nArgs, Object arguments[])
   {
     args.clear();
-    args.addFloat( time);
+    args.addDouble( (double)time);
     args.addSymbol( FtsSymbol.get(type));
 
     for(int i=0; i<nArgs; i++)
       {
 	if( arguments[i] instanceof Double)
-	  args.addFloat(((Double)arguments[i]).floatValue());
+	  args.addDouble(((Double)arguments[i]).floatValue());
 	else
 	  if(  arguments[i] instanceof String)
 	    args.addSymbol( FtsSymbol.get( (String)arguments[i]));
@@ -410,12 +410,12 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object arguments[])
   {
     args.clear();
-    args.addFloat( time);
+    args.addDouble( (double)time);
     args.addSymbol( FtsSymbol.get( type));
 
     for(int i=0; i<nArgs; i++)
       if(arguments[i] instanceof Double)
-	args.addFloat(((Double)arguments[i]).floatValue());
+	args.addDouble(((Double)arguments[i]).doubleValue());
       else
 	if( arguments[i] instanceof String)
 	  args.addSymbol( FtsSymbol.get( (String)arguments[i]));
@@ -436,7 +436,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   {
     args.clear();
     args.addObject( evt);
-    args.addFloat((float)newTime);
+    args.addDouble(newTime);
       
     try{
       send( FtsSymbol.get("moveEvents"), args);
@@ -457,7 +457,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       {	  
 	aEvent = (TrackEvent) e.nextElement();		    
 	args.addObject( aEvent);
-	args.addFloat((float)a.getInvX(a.getX(aEvent)+deltaX));
+	args.addDouble((double)a.getInvX(a.getX(aEvent)+deltaX));
       }
       
     try{
@@ -502,9 +502,9 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     args.clear();
     
     if( evt == null)
-        args.addFloat( (float)time);
+        args.addDouble( time);
     else
-        args.addFloat( (float)evt.getTime());
+        args.addDouble( evt.getTime());
 
     try{
       send( FtsSymbol.get("notify_gui_listeners"), args);
@@ -1128,7 +1128,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 				   event.getValue().getValueInfo().getName(), 
 				   event.getValue().getDefinedPropertyCount()*2, 
 				   event.getValue().getDefinedPropertyNamesAndValues());
-	      
+    
 	      while (objectsToPaste.hasMoreElements())
 		{
 		  event = (Event) objectsToPaste.nextElement();
@@ -1137,10 +1137,10 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 				       event.getValue().getDefinedPropertyCount()*2, 
 				       event.getValue().getDefinedPropertyNamesAndValues());
 		}
-	      
+              
 	      requestEndPaste();
 	    }
-	    catch (Exception e) {}
+            catch (Exception e) { System.err.println("FtsTrackObject: error in paste "+e);}
 	  }
       }
   }
@@ -1475,7 +1475,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   /********************************************************
    *  FtsObjectWithEditor
    ********************************************************/
-  TrackWindow trackWindow = null;
+  transient TrackWindow trackWindow = null;
   public void openEditor(int argc, FtsAtom[] argv)
   {
     if( trackWindow == null)
@@ -1527,16 +1527,16 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   int events_size   = 256;	// 
   int events_fill_p  = 0;	// next available position
   TrackEvent events[] = new TrackEvent[256];
-  private MaxVector listeners;
-  private MaxVector hhListeners;
-  private MaxVector stateListeners;
-  private MaxVector tempVector = new MaxVector();
+  private transient MaxVector listeners;
+  private transient MaxVector hhListeners;
+  private transient MaxVector stateListeners;
+  private transient MaxVector tempVector = new MaxVector();
   private MaxVector propertyTypes, propertyNames, propertyClasses;
   
   private String trackName;
-  public DataFlavor flavors[];
+  public transient DataFlavor flavors[];
 
-  public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
+  public static transient DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
-  protected FtsArgs args = new FtsArgs();
+  protected transient FtsArgs args = new FtsArgs();
 }

@@ -25,7 +25,8 @@ package ircam.fts.client;
  * A FtsAtom is a typed 'union', holding the values transmitted other the client protocol
  */
 
-public class FtsAtom {
+public class FtsAtom implements java.io.Serializable
+{
   /**
    * If the atom is a integer, holds the integer value
    */

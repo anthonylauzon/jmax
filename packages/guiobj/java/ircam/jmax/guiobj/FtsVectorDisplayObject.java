@@ -48,7 +48,7 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
     FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("setBounds"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsVectorDisplayObject)obj).setCurrentBounds(args.getFloat(0), args.getFloat(1));
+	  ((FtsVectorDisplayObject)obj).setCurrentBounds((float)args.getDouble(0), (float)args.getDouble(1));
 	}
       });
   }
@@ -211,8 +211,8 @@ public class FtsVectorDisplayObject extends FtsGraphicObject
     if(( this.min == min) && ( this.max == max)) return;
 
     args.clear();
-    args.addFloat(min);
-    args.addFloat(max);
+    args.addDouble((double)min);
+    args.addDouble((double)max);
 
     try{
       send( FtsSymbol.get("setBounds"), args);

@@ -44,7 +44,7 @@ import ircam.jmax.editors.sequence.menus.*;
 public class TrackWindow extends JFrame implements EditorContainer{
 
   //------------------- fields
-  TrackPanel trackPanel;
+  transient TrackPanel trackPanel;
   FtsTrackObject trackData;
   
   public final static int DEFAULT_WIDTH  = 800;

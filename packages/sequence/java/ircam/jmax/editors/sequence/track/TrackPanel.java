@@ -43,25 +43,25 @@ import ircam.jmax.toolkit.Geometry;
   /**
    * The graphic component containing the tracks of a Sequence.
    */
-public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListener, ListSelectionListener, ScrollManager {
+public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListener, ListSelectionListener, ScrollManager, Serializable {
     
-  FtsTrackObject ftsTrackObject;
+  transient FtsTrackObject ftsTrackObject;
 
-  EditorToolbar toolbar;
-  TrackDataModel trackData;
-  EditorContainer itsContainer;
-  public InfoPanel statusBar;
+  transient EditorToolbar toolbar;
+  transient TrackDataModel trackData;
+  transient EditorContainer itsContainer;
+  transient public InfoPanel statusBar;
   public SequenceRuler ruler;
     
-  JScrollPane scrollTracks;
+  transient JScrollPane scrollTracks;
   //---
-  JLabel itsZoomLabel;
-  JScrollBar itsTimeScrollbar;
-  Geometry geometry;
-  ToolManager manager;
-  TrackBase track;
-  TrackEditor trackEditor;
-  JProgressBar progressBar;
+  transient JLabel itsZoomLabel;
+  transient JScrollBar itsTimeScrollbar;
+  transient Geometry geometry;
+  transient ToolManager manager;
+  transient TrackBase track;
+  transient TrackEditor trackEditor;
+  transient JProgressBar progressBar;
 
   public final int INITIAL_ZOOM = 20;
   public static final int MINIMUM_TIME = 10000;
@@ -122,6 +122,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     trackEditor.getGraphicContext().setFrame( itsContainer.getFrame());
     trackEditor.getGraphicContext().setScrollManager( this);
     trackEditor.getSelection().addListSelectionListener(this);
+    SequenceSelection.setCurrent( trackEditor.getSelection());
     data.addListener(this); 
     data.addHighlightListener(ruler);    
     manager.addContextSwitcher(new ComponentContextSwitcher( trackEditor.getComponent(), trackEditor.getGraphicContext()));//???

@@ -44,17 +44,17 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
   
   //--- Fields
-  private static SequenceSelection current;
-  private static MaxVector itsCopy = new MaxVector();
+  private transient static SequenceSelection current;
+  transient static MaxVector itsCopy = new MaxVector();
 
-  public DataFlavor flavors[];
+  public transient DataFlavor flavors[];
 
-  private MaxVector temp = new MaxVector();
+  private transient MaxVector temp = new MaxVector();
 
-  private SelectionOwner itsOwner;  
-  protected  TrackDataModel itsModel;
-  protected TrackEvent lastSelectedEvent = null;
-  private Vector pastedObjects = new Vector();
+  private transient SelectionOwner itsOwner;  
+  protected  transient TrackDataModel itsModel;
+  protected transient TrackEvent lastSelectedEvent = null;
+  private transient MaxVector pastedObjects = new MaxVector();
 
   boolean pasting = false;
 
@@ -307,7 +307,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	select(spec);    
 
 	if( pasting)
-	  pastedObjects.add( spec);
+	  pastedObjects.addElement( spec);
       }
   }
   public void objectsAdded(int maxTime) {}
@@ -418,6 +418,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	if (flavor.equals(flavors[i]))
 	  return true;
       }
+
     return false;
   }
 

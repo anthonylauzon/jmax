@@ -27,6 +27,8 @@ import java.util.*;
 import java.io.*;
 
 // import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -75,10 +77,9 @@ public class ToolBar extends JPanel implements ComponentListener{
     bGroup.add( noneButton);
 
     lockEditButton = new JToggleButton( JMaxIcons.lockMode);
-    lockEditButton.setDoubleBuffered( false);
-    lockEditButton.setMargin( new Insets(0,0,0,0));
     lockEditButton.setSelectedIcon( JMaxIcons.editMode);
     lockEditButton.setFocusPainted( false);
+    lockEditButton.setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder( 1, 1, 1, 1))); 
     lockEditButton.addItemListener( new ItemListener() {
 	public void itemStateChanged(ItemEvent e)
 	{
@@ -99,8 +100,8 @@ public class ToolBar extends JPanel implements ComponentListener{
     
     //to save button
     toSaveButton = new JButton( JMaxIcons.toSave);
-    toSaveButton.setDoubleBuffered( false);
-    toSaveButton.setMargin( new Insets(0,0,0,0));
+    toSaveButton.setPressedIcon( JMaxIcons.toSaveSelected);
+    toSaveButton.setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder( 1, 1, 1, 1)));
     toSaveButton.addActionListener( new ActionListener() {
 	public void actionPerformed( ActionEvent e)
 	{
@@ -119,8 +120,8 @@ public class ToolBar extends JPanel implements ComponentListener{
 	(!sketch.isARootPatcher()))
       {
 	upButton = new JButton( JMaxIcons.up);
-	upButton.setDoubleBuffered( false);
-	upButton.setMargin( new Insets(0,0,0,0));
+        upButton.setPressedIcon( JMaxIcons.upSelected);
+        upButton.setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder( 1, 1, 1, 1)));
 	upButton.setToolTipText("show parent patcher");
 	upButton.addActionListener( new ActionListener() {
 	    public void actionPerformed( ActionEvent e)
@@ -212,7 +213,7 @@ public class ToolBar extends JPanel implements ComponentListener{
   {
     for ( Iterator i = JMaxClassMap.getClassNames(); i.hasNext(); )
       addButton( (String)i.next());
-
+    
     AddPopUp.initDone();
   }
 

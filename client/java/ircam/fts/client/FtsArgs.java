@@ -29,7 +29,8 @@ package ircam.fts.client;
  *
  */
 
-public class FtsArgs {
+public class FtsArgs implements java.io.Serializable
+{
   private static final int INITIAL_SIZE = 8;
 
   public FtsArgs()

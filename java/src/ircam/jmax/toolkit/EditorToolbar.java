@@ -91,7 +91,6 @@ public class EditorToolbar extends JToolBar implements ActionListener{
 	JMenuItem aMenuItem;
 	
 	aButton.setToolTipText(theTool.getName());
-	aButton.setMargin(new Insets(0,0,0,0));
 	aButton.addActionListener(this);
 	aButton.addMouseListener(new MouseListener(){
 	    public void mousePressed(MouseEvent e){

@@ -43,25 +43,25 @@ import ircam.jmax.toolkit.Geometry;
   /**
    * The graphic component containing the tracks of a Sequence.
    */
-public class SequencePanel extends JPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager {
+public class SequencePanel extends JPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager, Serializable{
     
   FtsSequenceObject ftsSequenceObject;
 
-  EditorToolbar toolbar;
+  transient EditorToolbar toolbar;
   SequenceDataModel sequenceData;
-  EditorContainer itsContainer;
-  public InfoPanel statusBar;
-  public SequenceRuler ruler;
+  transient EditorContainer itsContainer;
+  transient public InfoPanel statusBar;
+  transient public SequenceRuler ruler;
   
   Box trackPanel;
-  JScrollPane scrollTracks;
-  Hashtable trackContainers = new Hashtable();
-  MutexPropertyHandler mutex = new MutexPropertyHandler("selected");
+  transient JScrollPane scrollTracks;
+  transient Hashtable trackContainers = new Hashtable();
+  transient MutexPropertyHandler mutex = new MutexPropertyHandler("selected");
     //---
-  JLabel itsZoomLabel;
-  JScrollBar itsTimeScrollbar;
-  Geometry geometry;
-  ToolManager manager;
+  transient JLabel itsZoomLabel;
+  transient JScrollBar itsTimeScrollbar;
+  transient Geometry geometry;
+  transient ToolManager manager;
   
   public final int INITIAL_ZOOM = 20;
   public static final int MINIMUM_TIME = 10000;
@@ -69,7 +69,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   static public Color violetColor = new Color(102, 102, 153);
   static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
 
-  Component verticalGlue = Box.createVerticalGlue();
+  transient Component verticalGlue = Box.createVerticalGlue();
   /**
    * Constructor based on a SequenceDataModel containing the tracks to edit.
    */
@@ -209,8 +209,6 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     trackPanel.remove(verticalGlue);
     TrackContainer trackContainer = new TrackContainer(track, teditor);
     trackContainer.setBorder(new EtchedBorder()); 
-    
-    //trackContainer.setMaximumSize(new Dimension(trackContainer.getMaximumSize().width, teditor.getDefaultHeight()));//?????
 
     trackPanel.add(trackContainer);
     trackPanel.add(verticalGlue);

@@ -166,6 +166,7 @@
 				F522D43903D40AA7016640F1,
 			);
 			buildSettings = {
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -207,6 +208,11 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>0.0.1d1</string>
+	<key>Java</key>
+	<dict>
+		<key>JVMVersion</key>
+		<string>1.4+</string>
+	</dict>
 </dict>
 </plist>
 ";
@@ -4532,6 +4538,7 @@
 				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -9034,6 +9041,7 @@
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -13052,6 +13060,7 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -15577,6 +15586,7 @@
 				JAVA_ARCHIVE_TYPE = JAR;
 				JAVA_CLASS_SEARCH_PATHS = build/ftsclient.jar;
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -17524,6 +17534,7 @@
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_ONLY = YES;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_SEARCH_PATHS = "";
@@ -17612,14 +17623,18 @@
 	<dict>
 		<key>ClassPath</key>
 		<string>$JAVAROOT:$JAVAROOT/jmax.jar:$JAVAROOT/ftsclient.jar</string>
+		<key>JVMVersion</key>
+		<string>1.4+</string>
 		<key>MainClass</key>
 		<string>JMaxWrapper</string>
 		<key>Properties</key>
 		<dict>
+			<key>apple.awt.textantialiasing</key>
+			<string>true</string>
+			<key>apple.laf.useScreenMenuBar</key>
+			<string>true</string>
 			<key>com.apple.hwaccel</key>
 			<string>false</string>
-			<key>com.apple.macos.useScreenMenuBar</key>
-			<string>true</string>
 		</dict>
 	</dict>
 </dict>
@@ -18076,6 +18091,7 @@
 				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";
@@ -19547,6 +19563,7 @@
 				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_CFLAGS = "";

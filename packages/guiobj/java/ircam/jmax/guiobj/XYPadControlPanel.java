@@ -71,7 +71,6 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
     xMaxValueField.setPreferredSize(new Dimension(100, 20));
     xMaxValueField.setMaximumSize(new Dimension(100, 20));
     xMaxValueField.addActionListener(this);
-    xMaxValueField.requestDefaultFocus();
     
     xMaxPanel = new JPanel();
     xMaxPanel.setPreferredSize(new Dimension(170, 20));
@@ -166,7 +165,6 @@ public class XYPadControlPanel extends JPanel implements ActionListener, ObjectC
     yMaxValueField.setPreferredSize(new Dimension(100, 20));
     yMaxValueField.setMaximumSize(new Dimension(100, 20));
     yMaxValueField.addActionListener(this);
-    yMaxValueField.requestDefaultFocus();
     
     yMaxPanel = new JPanel();
     yMaxPanel.setPreferredSize(new Dimension(170, 20));

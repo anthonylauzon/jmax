@@ -446,17 +446,17 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
 
     //--- MidiTrack fields
-    Geometry geometry;
-    SequenceGraphicContext gc;
-    Track track;
-    ScoreRenderer renderer;
-    Component component;
-    SequenceSelection selection;
+    transient Geometry geometry;
+    transient SequenceGraphicContext gc;
+    transient Track track;
+    transient ScoreRenderer renderer;
+    transient Component component;
+    transient SequenceSelection selection;
     
-    ScorePanel itsScore;
+    transient ScorePanel itsScore;
 
-    MaxVector oldElements = new MaxVector();
-    SequenceTableDialog listDialog = null;
+    transient MaxVector oldElements = new MaxVector();
+    transient SequenceTableDialog listDialog = null;
     /*****************/
 
     int viewMode = PIANOROLL_VIEW;

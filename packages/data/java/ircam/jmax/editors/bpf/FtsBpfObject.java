@@ -42,7 +42,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("addPoint"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsBpfObject)obj).addPoint(args.getInt( 0), args.getFloat( 1), args.getFloat( 2));
+	  ((FtsBpfObject)obj).addPoint(args.getInt( 0), (float)args.getDouble( 1), (float)args.getDouble( 2));
 	}
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("removePoints"), new FtsMessageHandler(){
@@ -54,7 +54,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("setPoint"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsBpfObject)obj).setPoint(args.getInt( 0), args.getFloat( 1), args.getFloat( 2));
+	  ((FtsBpfObject)obj).setPoint(args.getInt( 0), (float)args.getDouble( 1), (float)args.getDouble( 2));
 	}
       });
     FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("setPoints"), new FtsMessageHandler(){
@@ -187,8 +187,8 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   {
     args.clear();
     args.addInt(index);
-    args.addFloat(time);
-    args.addFloat(value);
+    args.addDouble((double)time);
+    args.addDouble((double)value);
     
     try{
       send( FtsSymbol.get("add_point"), args);
@@ -204,8 +204,8 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   {
     args.clear();
     args.addInt(index);
-    args.addFloat(time);
-    args.addFloat(value);
+    args.addDouble((double)time);
+    args.addDouble((double)value);
     
     try{
       send( FtsSymbol.get("set_points"), args);
@@ -223,8 +223,8 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     args.addInt(index);
     for(int i=0; i<times.length; i++)
       {
-	args.addFloat(times[i]); 
-	args.addFloat(values[i]);
+	args.addDouble((double)times[i]); 
+	args.addDouble((double)values[i]);
       } 
     try{
       send( FtsSymbol.get("set_points"), args);

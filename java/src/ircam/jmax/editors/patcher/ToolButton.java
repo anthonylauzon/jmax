@@ -1,4 +1,4 @@
-
+ 
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -24,6 +24,7 @@ package ircam.jmax.editors.patcher;
 import java.awt.*;
 import java.awt.event.*;
 // import javax.swing.*;
+import javax.swing.BorderFactory;
 import javax.swing.JToggleButton;
 
 import ircam.jmax.*;
@@ -67,9 +68,8 @@ class ToolButton extends JToggleButton
     this.message = "";
     this.toolBar = toolBar;
 
-    setDoubleBuffered( false);
-    setMargin( new Insets(0,0,0,0));
-        
+    setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder( 1, 1, 1, 1)));
+    
     String toolTip = JMaxClassMap.getDescription(name);
     if( toolTip == null)
       setToolTipText( name + " object");

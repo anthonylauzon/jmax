@@ -80,7 +80,6 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
     maxValueField.setPreferredSize(new Dimension(100, 20));
     maxValueField.setMaximumSize(new Dimension(100, 20));
     maxValueField.addActionListener(this);
-    maxValueField.requestDefaultFocus();
 
     maxPanel = new JPanel();
     maxPanel.setPreferredSize(new Dimension(170, 20));
