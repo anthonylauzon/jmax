@@ -244,6 +244,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    a.setY(tempEvent, a.getY(movTrackEvent));
 	    a.setLabel(tempEvent, a.getLabel(movTrackEvent));//???
 
+	    tempEvent.setLocalProperties(movTrackEvent);//?????
+
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 

@@ -772,12 +772,13 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	{
 	    if (length() == 0) return null;
 	    TrackEvent e;
-	    
+
 	    while (index < length() && events[index].getTime() <= endTime)
 		{
-		    e = events[index++];
-		
-		    if (e.getTime() >= startTime || e.getTime()+((Integer)e.getProperty("duration")).intValue() >= startTime)
+		    e = events[index++];	
+
+		    if (e.getTime() >= startTime || 
+			e.getTime()+((Integer)e.getProperty("duration")).intValue() >= startTime)
 			{
 			    return e;
 			}
@@ -901,7 +902,6 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     {
 	return (ValueInfo) infos.elementAt(i);
     }
-
     /**
      * Returns true if this models currently contains events of the given type */
     public boolean containsType(ValueInfo info)

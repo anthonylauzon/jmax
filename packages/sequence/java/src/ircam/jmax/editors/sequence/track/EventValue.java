@@ -6,6 +6,7 @@ import ircam.jmax.toolkit.*;
 import java.util.*;
 import javax.swing.*;
 
+import ircam.jmax.editors.sequence.*;
 /**
  * The interface of the objects that can be values of events in a sequence.
  * The needed functionalities are generic property handling, without assumptions
@@ -27,6 +28,10 @@ public interface EventValue
     public abstract Object getProperty(String name);
 
     /**
+     * Get the given property */
+    public abstract void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc);
+
+    /**
      * Get the popup for this EventValue */
     public abstract JPopupMenu getPopupMenu();
 
@@ -42,21 +47,29 @@ public interface EventValue
      * Returns an Enumeration of all the property names known by this
      * EventValue */
     public abstract Enumeration getPropertyNames();
+    
+    public abstract String[] getLocalPropertyNames();
 
     /**
      * Returns the number of properties known by this
      * EventValue */
     public abstract int getPropertyCount();
 
+    public abstract int getLocalPropertyCount();
+
     /**
      * Returns all the property values known by this
      * EventValue like a FtsAtom array */
     public abstract Object[] getPropertyValues();
+    
+    public abstract Object[] getLocalPropertyValues();
    
     /**
      * Returns all the property values known by this
      * EventValue like a FtsAtom array */
     public abstract void setPropertyValues(int nArgs, Object args[]);
+
+    public abstract void setLocalPropertyValues(int nArgs, Object args[]);
     
     /**
      * getProperty on an unknown property should return this value */

@@ -100,6 +100,7 @@ abstract public class Adapter implements MappingListener{
    */
     abstract public double getInvX(int x);
   
+    abstract public int getInvWidth(int w);
 
   /**
    * get the value of the parameter associated with the graphic Y

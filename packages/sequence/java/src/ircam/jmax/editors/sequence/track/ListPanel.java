@@ -142,9 +142,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
 	g.setColor(Color.black);
 	
-	//int first = firstIndexVisible();
 	int first = getEventIndex(r.y);
-	//int last = lastIndexVisible();
 	int last = getEventIndex(r.y+r.height+3*ystep);
 
 	int y = ystep*(first+1);	    
@@ -159,7 +157,6 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		int i = 1;
 		for(Enumeration e1 = track.getTrackDataModel().getPropertyNames(); e1.hasMoreElements();)
 		    {
-			//drawProperty(evt.getProperty((String)e1.nextElement()), y, i++, g);
 			g.drawString(getPropertyAsString(evt.getProperty((String)e1.nextElement())), 5+i*xstep, y-2);
 			i++;
 		    }

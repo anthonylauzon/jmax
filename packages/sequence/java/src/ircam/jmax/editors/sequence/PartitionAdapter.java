@@ -95,6 +95,10 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
     
   }
 
+  public int getInvWidth(int w)
+  {
+      return (int)(getInvX(w)-getInvX(0));
+  }
 
   /**
    * set the time of the event associated with the graphic X

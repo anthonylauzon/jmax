@@ -105,23 +105,28 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
      */
     public int getLenght(Event e) 
     {
-	if(viewMode == MonoTrackEditor.PEAKS_VIEW)
-	    return IntegerEventRenderer.INTEGER_WIDTH;
-	else
-	    {//STEP_VIEW
-		Event next = gc.getDataModel().getNextEvent(e);
-		
-		if(next != null)		    
-		    return (getX(next.getTime()) - getX(e.getTime()));
+	if(e.getValue() instanceof IntegerValue)
+	    {
+		if(viewMode == MonoTrackEditor.PEAKS_VIEW)
+		    return IntegerEventRenderer.INTEGER_WIDTH;
 		else
-		    return (gc.getGraphicDestination().getSize().width - getX(e.getTime()));
+		    {//STEP_VIEW
+			Event next = gc.getDataModel().getNextEvent(e);
+			
+			if(next != null)		    
+			    return (getX(next.getTime()) - getX(e.getTime()));
+			else
+			    return (gc.getGraphicDestination().getSize().width - getX(e.getTime()));
+		    }
 	    }
+	else
+	    return super.getLenght(e);
     }
 
   /**
    * set the duration of the event associated with the graphic lenght l.
    */
-    public  void setLenght(Event e, int l){}
+    public void setLenght(Event e, int l){}
 
     /**
      * returns the heigth of this event */

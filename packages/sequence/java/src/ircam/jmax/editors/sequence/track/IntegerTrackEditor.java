@@ -56,6 +56,7 @@ public class IntegerTrackEditor extends MonoTrackEditor
 	    track.setProperty("viewMode", new Integer(viewMode));
 
 	((MonoDimensionalAdapter)gc.getAdapter()).setLabelMapper(IntegerLabelMapper.getMapper());
+	setRenderer(new IntegerTrackRenderer(gc));
     }
     
     /*public JPopupMenu getMenu()

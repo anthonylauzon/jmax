@@ -6,6 +6,8 @@ import java.util.*;
 import ircam.jmax.toolkit.*;
 import javax.swing.*;
 
+import ircam.jmax.editors.sequence.*;
+
 /**
  * A basic implementation of the EventValue interface, with a default property handling (no actions). 
  */
@@ -37,6 +39,8 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
 	else return UNKNOWN_PROPERTY; //to be overloaded
     }
     
+    public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc){}
+
     public JPopupMenu getPopupMenu()
     {
 	return null;
@@ -53,12 +57,30 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
 	return 0;
     }
 
+    public String[] getLocalPropertyNames()
+    {
+	return new String[0];
+    }
+
+    public int getLocalPropertyCount()
+    {
+	return 0;
+    }
+
     public static Object[] propertyValuesArray = new Object[128];
     public Object[] getPropertyValues()
     {
 	return propertyValuesArray;
     }
     public void setPropertyValues(int nArgs, Object args[])
+    {
+    }
+
+    public Object[] getLocalPropertyValues()
+    {
+	return propertyValuesArray;
+    }
+    public void setLocalPropertyValues(int nArgs, Object args[])
     {
     }
 

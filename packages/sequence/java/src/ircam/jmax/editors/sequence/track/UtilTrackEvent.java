@@ -145,6 +145,16 @@ public class UtilTrackEvent implements Event, Drawable
 	return (adapter.getY(this) - adapter.getY(trackEvent));
     }
 
+    public void setLocalProperties(Event evt)
+    {
+	String names[] = evt.getValue().getLocalPropertyNames();
+	Object localValues[] = evt.getValue().getLocalPropertyValues();
+	int count = evt.getValue().getLocalPropertyCount();
+
+	for(int i = 0; i<count; i++)
+	    value.setProperty(names[i], localValues[i]);
+    }
+
     /* --------- Drawable interface ----------*/
 
     public ObjectRenderer getRenderer()
