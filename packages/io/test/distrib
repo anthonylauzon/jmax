@@ -1,0 +1,7 @@
+all	all	Makefile
+all	all	README
+all	all	UDPMessageTest.java
+all	all	UDPPort.java
+all	all	UDPTest.java
+all	all	test-udp.jmax
+all	all	test-udpmessage.jmax

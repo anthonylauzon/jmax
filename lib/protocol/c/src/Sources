@@ -1,0 +1,4 @@
+
+SOURCES= \
+	protoencode.c	\
+	protodecode.c	\
