@@ -94,9 +94,9 @@ much more work, like loading files, redefining other objects and so on;
 so there are two meaning in the system for <i>creating an object</i>,
 one is to process a language level object description and do all the needed
 work to add this statement to the program (implemented by the C function
-<code>fts_object_new</code>, and actually instantiating an instance of a
+<code>fts_eval_object_description</code>, and actually instantiating an instance of a
 class of the FTS message system (implemented by the C function 
-<code> fts_make_object</code>); these two functions are documented
+<code> fts_object_new</code>); these two functions are documented
 below.
 <p>
 Changing and deleting an object require also that all effects tied to
@@ -112,7 +112,7 @@ by automatically translating the old object syntax in the new syntax.
 
 <H4> Creating an FTS message system instance</H4> 
 <p>
-It is done by the <code>fts_make_object</code> function.
+It is done by the <code>fts_object_new</code> function.
 <p>
 The object creation is pretty straighforward; including a call to the
 class discrimination mechanism to find the right class, allocating and
@@ -137,7 +137,7 @@ and is handled in the language level object creation.
 
 <H4> Creating a <i>j</i>Max object</H4> 
 
-The language work is done in the <code>fts_object_new</code> function;
+The language work is done in the <code>fts_eval_object_description</code> function;
 given a description, a number of things in the right order need to be
 done.
 
@@ -186,7 +186,7 @@ class, for example a library class.
 mechanism; <i>j</i>Max can read old abstractions, but cannot save new
 ones.<p>
 <li> Standard FTS objects<br>
-If we have not created the object yet, the <code>fts_make_object</code> function is called, to build
+If we have not created the object yet, the <code>fts_object_new</code> function is called, to build
 a standard FTS object if the right class exists; see above.<p>
 <li> Template on a declared template Path<br>
 If we have not created the object yet, we check if a template with the correct
@@ -299,7 +299,7 @@ variable propagation structure.
 <p>
 <li> Prepare for data trasfer if needed, send the delete message otherwise.
 <p>
-<li> Build the new object, using the standard <code>fts_object_new</code> function.
+<li> Build the new object, using the standard <code>fts_eval_object_description</code> function.
 <p>
 <li> Fix the internal structures of the loading vm: if we are loading
 a <i>j</i>Max file, the vm may refer the object being redefined (in
@@ -336,7 +336,7 @@ doctor produce a macro expansion that is not visible to the user (and
 so not persistent); the expanded object keeps the same description as
 the original; an object doctor of this kind usually produce the
 expanded object description starting from the original description,
-create the new object by calling <code>fts_object_new</code> and then
+create the new object by calling <code>fts_eval_object_description</code> and then
 remove the object description of the created object using the
 <code>fts_object_reset_description</code>; this will cause the object
 creation function to install the original description on the object;
@@ -365,8 +365,8 @@ way doctors work: as said above, a doctor can be called before or
 after the evaluation of the expressions defining the object; but, the
 doctor function have no way to know if the expressions has been
 evalutated or not, so it is not clear if the
-<code>fts_object_new</code> function or the
-<code>fts_make_object</code> should be called; calling the first can
+<code>fts_eval_object_description</code> function or the
+<code>fts_object_new</code> should be called; calling the first can
 produce inespected results when the result of the previous evaluation
 is still an expression; calling the second can fail because the
 expressions have not been evaluated; the doctor mechanism should be
