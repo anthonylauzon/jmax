@@ -484,10 +484,21 @@ fts_audiolabel_input( fts_audiolabel_t *label, float *buff, int buffsize)
   fts_audioport_t *port = fts_audiolabel_get_port( label, FTS_AUDIO_INPUT);
   int channel = fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT);
 
-  if (!port)
-    return;
+  if (port)
+    (*fts_audioport_get_copy_fun(port, FTS_AUDIO_INPUT))(port, buff, buffsize, channel);
+  else
+    {
+      int i;
 
-  (*fts_audioport_get_copy_fun(port, FTS_AUDIO_INPUT))(port, buff, buffsize, channel);
+      /* zero the buffer */
+      for ( i = 0; i < buffsize; i += 4)
+	{
+	  buff[i] = 0.0;
+	  buff[i+1] = 0.0;
+	  buff[i+2] = 0.0;
+	  buff[i+3] = 0.0;
+	}
+    }
 }
 
 void
