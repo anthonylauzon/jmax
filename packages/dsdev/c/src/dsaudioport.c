@@ -22,7 +22,7 @@
 
 #define INITGUID
 
-#define CAPTURE 1
+#define CAPTURE 0
 
 #include <fts/fts.h>
 #include <windows.h>
