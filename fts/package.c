@@ -184,7 +184,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
  gracefull_exit:
 
   pkg->name = name;
-  pkg->filename = filename;
+  pkg->filename = fts_new_symbol(filename);
 
   dir = strcpy( fts_malloc( strlen( path) + 1), path);
   pkg->dir = fts_new_symbol( fts_dirname( dir));
@@ -227,7 +227,7 @@ fts_package_load(fts_symbol_t name)
     pkg = fts_package_new(name);
     pkg->state = fts_package_defined;
     pkg->name = name;
-    pkg->filename = filename;
+    pkg->filename = fts_new_symbol(filename);
     pkg->dir = fts_new_symbol(path);
   }
   
@@ -1295,7 +1295,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   if( this->filename == NULL)
     {  
-      this->filename = filename;
+      this->filename = fts_new_symbol(filename);
   
       fts_make_absolute_path(NULL, filename, path, MAXPATHLEN);
       dir = strcpy( fts_malloc( strlen( path) + 1), path);
