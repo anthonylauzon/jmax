@@ -2272,6 +2272,18 @@
 			settings = {
 			};
 		};
+		F77A695B03FA79FF01664058 = {
+			isa = PBXFileReference;
+			name = DefineControlPanel.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/DefineControlPanel.java;
+			refType = 2;
+		};
+		F77A695C03FA79FF01664058 = {
+			fileRef = F77A695B03FA79FF01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F78563BF02BA3BCE016640F1 = {
 			isa = PBXFileReference;
 			name = macosxmidi.c;
@@ -19583,6 +19595,7 @@
 				F53B0615035D7EDF01664090,
 				F5A3897003AA48B701664092,
 				F5A3897103AA48B701664092,
+				F77A695C03FA79FF01664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -19699,6 +19712,7 @@
 				F889510B02ED9ACD01664092,
 				F5933FE503363A6501664092,
 				F51A243C03520EDF01664092,
+				F77A695B03FA79FF01664058,
 				F51A243D03520EDF01664092,
 				F53B0614035D7EDF01664090,
 			);
