@@ -109,6 +109,8 @@ int fts_sched_add( fts_object_t *obj, int flags, ...)
   return 0;
 }
 
+
+#if 0
 int fts_sched_remove( fts_object_t *obj)
 {
   sched_callback_t **p;
@@ -129,6 +131,26 @@ int fts_sched_remove( fts_object_t *obj)
 	}
       else
 	p = &(*p)->next;
+    }
+
+  return -1;
+}
+#endif
+
+int fts_sched_remove( fts_object_t *obj)
+{
+  sched_callback_t *p;
+  fts_sched_t *sched = fts_sched_get_current();
+
+  p = sched->callback_head;
+
+  while (p)
+    {
+      if ( p->object == obj)
+	{
+	  p->flags = FTS_SCHED_REMOVE;
+	}
+      p = p->next;
     }
 
   return -1;
@@ -238,6 +260,30 @@ static void run_always( fts_sched_t *sched)
     }
 }
 
+static void fts_sched_gc( fts_sched_t *sched)
+{
+  sched_callback_t **p;
+
+  p = &sched->callback_head;
+
+  while (*p)
+    {
+      if ( (*p)->flags == FTS_SCHED_REMOVE)
+	{
+	  sched_callback_t *to_remove;
+
+	  to_remove = *p;
+	  *p = (*p)->next;
+
+	  fts_free( to_remove);
+	}
+      else
+	p = &(*p)->next;
+    }
+
+  return -1;
+}
+
 static void fts_sched_do_select(fts_sched_t *sched)
 {
   fd_set readfds, writefds, exceptfds;
@@ -249,7 +295,11 @@ static void fts_sched_do_select(fts_sched_t *sched)
     run_select( sched, n_fd, &readfds, &writefds, &exceptfds);
 
   run_always( sched);
+
+  fts_sched_gc( sched);
 }
+
+
 
 void
 fts_sched_init(fts_sched_t *sched)

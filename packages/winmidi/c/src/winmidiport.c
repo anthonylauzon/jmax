@@ -52,6 +52,7 @@
 
 #define WINMIDI_READ 1
 #define WINMIDI_WRITE 2
+#define WINMIDI_SCHEDULED 4
 
 
 static char winmidiport_error_buffer[256];
@@ -95,7 +96,8 @@ typedef struct _winmidiport_t
 #define winmidiport_buffer_full(_this)  ((_this->head == _this->tail - 1) || ((_this->head == BUFFER_SIZE - 1) && (_this->tail == 0)))
 #define winmidiport_available(_this)  (_this->head != _this->tail)
 
-static void winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static int winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at);
+static void winmidiport_close(fts_object_t *o);
 static void winmidiport_output(fts_object_t *o, fts_midievent_t *event, double time);
 static char* winmidiport_output_error(int no);
 static char* winmidiport_input_error(int no);
@@ -430,8 +432,8 @@ winmidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t 
  *
  */
 
-static void
-winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static int
+winmidiport_open(fts_object_t *o, int ac, const fts_atom_t *at)
 { 
   winmidiport_t *this = (winmidiport_t *)o;
   MMRESULT res;
@@ -474,20 +476,17 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     } else {
       post("Warning: winmidiport: Invalid argument (mode)\n");
       fts_log("[winmidiport]: Invalid argument (mode)\n");
-      fts_object_set_error(o, "Invalid argument (mode)");
       goto error_recovery;
     }
   } else {
     post("Warning: winmidiport: Not enough arguments (mode)\n");
     fts_log("[winmidiport]: Not enough arguments (mode)\n");
-    fts_object_set_error(o, "Not enough arguments (mode)");
     goto error_recovery;
   }
 
   if ((mode != fts_s_read) && (mode != fts_s_write) && (mode != fts_s_read_write)) {
     post("Warning: winmidiport: Invalid argument (mode=\"%s\")\n", fts_symbol_name(mode));
     fts_log("[winmidiport]: Invalid argument (mode=\"%s\")\n", fts_symbol_name(mode));
-    fts_object_set_error(o, "Invalid argument (mode=\"%s\")", fts_symbol_name(mode));    
     goto error_recovery;
   }
 
@@ -521,10 +520,9 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
       /* I am being tough here. But I think it's for the best. */
       if ((out_num == MIDI_MAPPER) && (devname != fts_s_default)) {
-	post("Warning: winmidiport: Invalid device (%s)\n", fts_symbol_name(devname));
-	fts_log("[winmidiport]: Invalid device (%s)\n", fts_symbol_name(devname));
-	fts_object_set_error(o, "Invalid device (%s)", fts_symbol_name(devname));    
-	goto error_recovery;
+	post("Warning: winmidiport: Invalid MIDI out device (%s)\n", fts_symbol_name(devname));
+	fts_log("[winmidiport]: Invalid MIDI out device (%s)\n", fts_symbol_name(devname));
+	goto open_midiin;
       }
 
       /* try opening the default port */
@@ -553,8 +551,9 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 			 "jMax - Warning", 
 			 MB_YESNO | MB_ICONSTOP | MB_APPLMODAL) == IDNO) {
 	    
-	    fts_object_set_error(o, "Failed to open the MIDI port");
-	    goto error_recovery;
+	    post("Open MIDI out cancelled\n");
+	    fts_log("[winmidiport]: Open MIDI out cancelled\n");
+	    goto open_midiin;
 	  }
 	}
 
@@ -563,9 +562,8 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	if (err != MMSYSERR_NOERROR) {
 	  post("Warning: winmidiport: couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
 	  fts_log("[winmidiport]: Couldn't open default MIDI out device: %s (error %d)\n", winmidiport_output_error(err), err);
-	  fts_object_set_error(o, "Failed to open the MIDI port");
 	  this->hmidiout = NULL;
-	  goto error_recovery;
+	  goto open_midiin;
 
 	} else {
 	  fts_log("[winmidiport]: Opened\n");
@@ -584,6 +582,8 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
     
   /* open midi input device */
+
+ open_midiin:
   
   if (this->flags & WINMIDI_READ) {
 
@@ -611,10 +611,9 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 	/* I am being tough here. But I think it's for the best. */
 	if (devname != fts_s_default) {
-	  post("Warning: winmidiport: Invalid device (%s)\n", fts_symbol_name(devname));
-	  fts_log("[winmidiport]: Invalid device (%s)\n", fts_symbol_name(devname));
-	  fts_object_set_error(o, "Invalid device (%s)", fts_symbol_name(devname));    
-	  goto error_recovery;
+	  post("Warning: winmidiport: Invalid MIDI in device (%s)\n", fts_symbol_name(devname));
+	  fts_log("[winmidiport]: Invalid MIDI in device (%s)\n", fts_symbol_name(devname));
+	  goto graceful_exit;
 	} else {
 	  in_num = 0;
 	}
@@ -631,9 +630,8 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       if (err != MMSYSERR_NOERROR) {
 	post("Warning: winmidiport: couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
 	fts_log("[winmidiport]: Couldn't open default MIDI in device: %s (error %d)\n", winmidiport_input_error(err), err);
-	fts_object_set_error(o, "Failed to open the MIDI port");
 	this->hmidiin = NULL;
-	goto error_recovery;
+	goto graceful_exit;
 
       } else {
 	fts_log("[winmidiport]: Opened\n");
@@ -680,23 +678,25 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       midiInGetErrorText(err, &msg[0], 256);
       post("Warning: winmidiport: failed to start the input device; midi input not available (%s)\n", msg);
       fts_log("[winmidiport]: Failed to start the input device; midi input not available (%s)\n", msg);
+      goto error_recovery;
     } 
   }
+
+ graceful_exit:
   
   LeaveCriticalSection(&this->critical_section);
 
-  fts_sched_add(o, FTS_SCHED_ALWAYS);
-
-  return;
+  return 0;
 
  error_recovery:
 
-  winmidiport_close(o, 0, NULL, 0, NULL);
+  winmidiport_close(o);
   LeaveCriticalSection(&this->critical_section);
+  return -1;
 }
 
 static void 
-winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+winmidiport_close(fts_object_t *o)
 { 
   winmidiport_t *this = (winmidiport_t *)o;
   int i;
@@ -803,8 +803,6 @@ winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_log("[winmidiport]: Done\n");
 
   DeleteCriticalSection(&this->critical_section);
-
-  fts_sched_remove(o);
 }
 
 static void
@@ -813,23 +811,27 @@ winmidiport_reopen(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   ac--;
   at++;
 
-  winmidiport_close(o, 0, NULL, 0, NULL);
-  winmidiport_open(o, 0, NULL, ac, at);
+  winmidiport_close(o);
+  winmidiport_open(o, ac, at);
 }
 
 static void
 winmidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
+  winmidiport_t *this = (winmidiport_t *) o;
+
   ac--;
   at++;
   
-  winmidiport_open(o, winlet, s, ac, at);
+  winmidiport_open(o, ac, at);
+  fts_sched_add(o, FTS_SCHED_ALWAYS);
 }
 
 static void 
 winmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  winmidiport_close(o, winlet, s, ac, at);
+  winmidiport_close(o);
+  fts_sched_remove(o);
 }
 
 static fts_status_t

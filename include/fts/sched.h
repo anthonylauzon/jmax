@@ -46,6 +46,7 @@
 #define FTS_SCHED_ALWAYS 1
 #define FTS_SCHED_READ 2
 #define FTS_SCHED_WRITE 3
+#define FTS_SCHED_REMOVE 4
 
 /**
  * Add an object to the scheduler
