@@ -70,13 +70,31 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
 }
 
+static void
+sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_audioport_t *port = fts_audioport_get_default();
+
+  fts_send_message((fts_object_t *)port, fts_SystemInlet, fts_s_print, 0, 0);
+}
+
+static void
+sysinfo_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_t *config = fts_midiconfig_get();
+
+  fts_send_message(config, fts_SystemInlet, fts_s_print, 0, 0);
+}
+
 static fts_status_t
 sysinfo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sysinfo_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, sysinfo_arch);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("arch"), sysinfo_arch);
   fts_method_define_varargs(cl, 0, fts_new_symbol("classes"), sysinfo_classes);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("audio"), sysinfo_audio);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("midi"), sysinfo_midi);
   
   return fts_Success;
 }
