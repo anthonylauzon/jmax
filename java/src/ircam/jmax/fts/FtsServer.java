@@ -42,7 +42,7 @@ public class FtsServer
   /** If true, put a 10 sec timeout on Sync;
    */
 
-  private boolean timeoutOnSync = false ;
+  private boolean timeoutOnSync = false;
 
   /** Create an FTS Server. With a given port. */
 

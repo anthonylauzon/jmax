@@ -47,7 +47,6 @@
 
  */
 
-
 #include "sys.h"
 #include "lang/mess.h"
 
@@ -114,6 +113,17 @@ fts_plist_put( fts_plist_t *plist, fts_symbol_t property, const fts_atom_t *valu
 {
   struct fts_plist_cell *prev, *current, *insert;
 
+  /* See if the property is already there */
+
+  for( current = plist->head; current; current = current->next)
+    if (current->property == property)
+      {
+	current->value = *value;
+	return;
+      }
+
+  /* It is not there, add a new list entry */
+	  
   prev = 0;
   for( current = plist->head; current; current = current->next )
     prev = current;
@@ -406,17 +416,16 @@ _fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value
     ret = fts_plist_get(obj->properties, property);
 
   if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-
-  ret = fts_class_get_prop(obj->cl, property);
-
-  if (ret)
     *value = *ret;
   else
-    fts_set_void(value);
+    {
+      ret = fts_class_get_prop(obj->cl, property);
+
+      if (ret)
+	*value = *ret;
+      else
+	fts_set_void(value);
+    }
 }
 
 
@@ -434,23 +443,26 @@ fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
   if (ret)
     {
       *value = *ret;
-      return;
     }
-    
-  ret = fts_class_get_prop(obj->cl, property);
-
-  if (ret)
-    {
-      *value = *ret;
-      return;
-    }
-
-  d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_get, property);
-
-  if (d)
-    (* d)(obj_property_remove, obj, 0, property, value);
   else
-    fts_set_void(value);
+    {
+    
+      ret = fts_class_get_prop(obj->cl, property);
+
+      if (ret)
+	{
+	  *value = *ret;
+	}
+      else
+	{
+	  d = fts_property_daemon_list_get(&(obj->cl->daemons), obj_property_get, property);
+
+	  if (d)
+	    (* d)(obj_property_remove, obj, 0, property, value);
+	  else
+	    fts_set_void(value);
+	}
+    }
 }
 
 /* Object inlet get properties */
@@ -881,15 +893,6 @@ fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
 {
   struct changes *p;
   struct changes *last = 0;
-
-  /* Debug code !!! @@@ */
-
-  if ((! obj) || (obj->id == FTS_NO_ID))
-    fprintf(stderr, "Property %s changed urgently for object %lx (# %d) class %s\n",
-	    fts_symbol_name(property), obj, obj->id, fts_symbol_name(fts_object_get_class_name(obj)));
-
-  /* Debug code end !!! @@@ */
-
 
   /* check if the object is already in the evsched list */
 

@@ -98,7 +98,7 @@ static fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
 static fts_object_t ***object_table_tos;
 static fts_object_t **object_table;
 
-
+/* Macros to do stack operations */
 
 
 /* The parent argument is pushed to the object stack, so to be used

@@ -72,8 +72,10 @@ static void
 selection_add_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
+  fts_object_t *newobj;
   int i;
-  
+
+  newobj = fts_get_object(at);
   this->objects_count++;
 
   if (this->objects_count > this->objects_size)
@@ -82,7 +84,7 @@ selection_add_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   for (i = 0; i < this->objects_size; i++)
     if (this->objects[i] == 0)
       {
-	this->objects[i] = fts_get_object(at);
+	this->objects[i] = newobj;
 	return;
       }
 }
@@ -146,7 +148,7 @@ selection_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   fts_selection_t *this  = (fts_selection_t *) o;
   int i;
-
+  
   this->objects_count = 0;
   for (i = 0; i < this->objects_size; i++)
     this->objects[i] = 0;

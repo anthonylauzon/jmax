@@ -10,7 +10,7 @@
 #include "lang/mess/loader.h"
 
 
-/* #define SAVER_DEBUG */
+/* #define SAVER_DEBUG   */
 
 struct fts_bmax_file
 {
@@ -689,7 +689,7 @@ void fts_bmax_code_set_atom(fts_bmax_file_t *f, const fts_atom_t *a)
 static void fts_bmax_code_new_property(fts_bmax_file_t *f, fts_object_t *obj, fts_symbol_t prop)
 {
   fts_atom_t value;
-
+  
   fts_object_get_prop(obj, prop, &value);
 
   if (! fts_is_void(&value))
@@ -715,7 +715,7 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    */
 
 #ifdef SAVER_DEBUG
-  fprintf(stderr, "Saving Object %: ", obj->id);
+  fprintf(stderr, "Saving Object %lx %d: ", obj,  obj->id);
   fprintf_atoms(stderr, obj->argc, obj->argv);
   fprintf(stderr, "\n");
 #endif

@@ -56,67 +56,76 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
       return -1;
     }
 
-  /* allocate code and symbols */
+  /* allocate code */
+
   desc->code = (unsigned char *)fts_malloc( header.code_size);
   if (!desc->code)
     {
       return -1;
     }
 
-  desc->symbols = (fts_symbol_t *)fts_malloc( header.n_symbols * sizeof( fts_symbol_t));
-  if (!desc->symbols)
-    {
-      return -1;
-    }
-
   /* read the code */
+
   if (read( fd, desc->code, header.code_size) < header.code_size)
     {
       perror( "fts_binary_file_map");
       return -1;
     }
 
-  /* allocate temporary memory for the symbol table */
-  symbols_size = file_size - lseek( fd, 0, SEEK_CUR);
+  /* allocate code and read symbols */
 
-  symbuf = (char *) fts_malloc( symbols_size);
-  if ( !symbuf)
+  if (header.n_symbols > 0)
     {
-      return -1;
-    }
+      desc->symbols = (fts_symbol_t *)fts_malloc( header.n_symbols * sizeof( fts_symbol_t));
 
-  /* read the symbol table */
-  if (read( fd, symbuf, symbols_size) < symbols_size)
-    {
-      perror( "fts_binary_file_map");
-      return -1;
-    }
+      if (!desc->symbols)
+	{
+	  return -1;
+	}
 
-  /* enter the symbols in the global symbol table */
-  {
-    char *p;
-    int i;
+      /* allocate temporary memory for the symbol table */
+      symbols_size = file_size - lseek( fd, 0, SEEK_CUR);
 
-    i = 0;
-    p = symbuf;
-    while (*p)
+      symbuf = (char *) fts_malloc( symbols_size);
+      if ( !symbuf)
+	{
+	  return -1;
+	}
+
+      /* read the symbol table */
+      if (read( fd, symbuf, symbols_size) < symbols_size)
+	{
+	  perror( "fts_binary_file_map");
+	  return -1;
+	}
+
+      /* enter the symbols in the global symbol table */
       {
-	fts_symbol_t symbol;
+	char *p;
+	int i;
 
-	symbol = fts_new_symbol_copy( p);
-	if ( !symbol)
+	i = 0;
+	p = symbuf;
+	while (*p)
 	  {
-	    return -1;
-	  }
-	desc->symbols[i] = symbol;
-	i++;
+	    fts_symbol_t symbol;
 
-	/* advance to next symbol */
-	while (*p++)
-	  ;
+	    symbol = fts_new_symbol_copy( p);
+	    if ( !symbol)
+	      {
+		return -1;
+	      }
+	    desc->symbols[i] = symbol;
+	    i++;
+	    
+	    /* advance to next symbol */
+	    while (*p++)
+	      ;
+	  }
       }
-  }
-  fts_free( symbuf);
+      
+      fts_free( symbuf);
+    }
 
   return 1;
 }

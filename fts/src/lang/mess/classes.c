@@ -33,7 +33,6 @@ fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 /* Static  declarations  */
 
 static fts_hash_table_t fts_metaclass_table;
-static fts_hash_table_t fts_metaclass_dynamic_table;
 static fts_hash_table_t fts_metaclass_alias_table;
 static fts_heap_t class_mess_heap;
 
@@ -60,7 +59,6 @@ fts_classes_init(void)
   /* Initialize the heaps */
 
   fts_hash_table_init(&fts_metaclass_table);
-  fts_hash_table_init(&fts_metaclass_dynamic_table);
   fts_hash_table_init(&fts_metaclass_alias_table);
   fts_heap_init(&class_mess_heap, sizeof(fts_class_mess_t), 64);
 }
