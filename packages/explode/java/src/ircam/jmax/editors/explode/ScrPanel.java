@@ -44,7 +44,7 @@ import ircam.jmax.toolkit.*;
    * The panel builds also the Graphic context to be used during edit, 
    * and the Toolbar. 
    */
-public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener, ListSelectionListener, StatusBarClient{
+public class ScrPanel extends JPanel implements ExplodeDataListener, ToolProvider, ToolListener, ListSelectionListener, StatusBarClient{
   
   /**
    * Constructor based on a ExplodeDataModel and a selection model
@@ -110,6 +110,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
       gc.setStatusBar(itsStatusBar);
       
     }
+
+    // prepare the toolbar and insert it in the status bar
+    prepareToolbar();
 
     // make this panel repaint when the selection status change
     // either in content or in ownership.
@@ -212,60 +215,69 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public EditorToolbar prepareToolbar() 
   {
-    //gc.setFrame(GraphicContext.getFrame(explodePanel));
-    gc.setFrame(explodePanel.getFrame());
+      initTools();
+      /*if (toolManager == null)*/ toolManager = new /*ExplodeToolManager*/ToolManager(this);
 
-    tb = new EditorToolbar(this, EditorToolbar.HORIZONTAL);
-    tb.setFloatable(false);
-
-    gc.setToolbar(tb);
-
-    // prepare the Panel containing the toolbar when anchored
-    JPanel c = new JPanel() {
-
-      // this callback is called when the user anchors the tooolbar
-      protected void addImpl(Component comp,
-			     Object constraints,
-			     int index)
-	{
-	  if (! toolbarAnchored && GraphicContext.getFrame(tb) != null)
-	    {
-	      GraphicContext.getFrame(tb).setVisible(false);
-	      GraphicContext.getFrame(tb).dispose();
-	    }
-
-	  super.addImpl(comp, constraints, index);
-	  ScrPanel.toolbarAnchored = true;
-	}
-
-      // the tolbar is going to be unanchored
-      public void remove(Component c)
-	{
-	  super.remove(c);
-	  ScrPanel.toolbarAnchored = false;
-	  repaint();
-	}
       
-    };
+      tb = new EditorToolbar(toolManager, EditorToolbar.HORIZONTAL);
+      tb.setFloatable(false);
+      
+      gc.setToolManager(toolManager);
+      
+      // prepare the Panel containing the toolbar when anchored
+      JPanel c = new JPanel() {
+	  
+	  // this callback is called when the user anchors the tooolbar
+	  protected void addImpl(Component comp,
+				 Object constraints,
+				 int index)
+	  {
+	      if (! toolbarAnchored && GraphicContext.getFrame(tb) != null)
+	      {
+		  GraphicContext.getFrame(tb).setVisible(false);
+		  GraphicContext.getFrame(tb).dispose();
+	      }
+	      
+	      super.addImpl(comp, constraints, index);
+	      ScrPanel.toolbarAnchored = true;
+	  }
+	  
+	  // the tolbar is going to be unanchored
+	  public void remove(Component c1)
+	  {
+	      super.remove(c1);
+	      ScrPanel.toolbarAnchored = false;
+	      repaint();
+	  }
+	  
+      };
 
-    c.setLayout(new BorderLayout());
-    c.setOpaque(false);
-    
-    c.setSize(200, 30);
-    
-    itsStatusBar.addWidgetAt(c, 2);
+      c.setLayout(new BorderLayout());
+      c.setOpaque(false);
+      
+      c.setSize(200, 30);
+      
+      itsStatusBar.addWidgetAt(c, 2); // the toolbar of explode is added as WIDGET in the statusBar!
+      
+      if ( toolbarAnchored)
+	  {
+	      tb.setSize(200, 30);
+	      c.add(tb, BorderLayout.CENTER);
+	  }
 
-    if ( toolbarAnchored)
-      {
-	tb.setSize(200, 30);
-	c.add(tb, BorderLayout.CENTER);
-      }
-
- 
-    tb.addToolListener(this);
-    itsStatusBar.post(tb.getTool(), "");
-    return tb;
+      //itsStatusBar.post(toolManager.getCurrentTool(), "");
+      return tb;
   }
+
+
+
+    void frameAvailable()
+    {
+	gc.setFrame(explodePanel.getFrame());
+	toolManager.addContextSwitcher(new WindowContextSwitcher(gc.getFrame(), gc));
+	toolManager.addToolListener(this);
+	toolManager.activate(itsDefaultTool, gc);
+    }
 
 
   /**
@@ -281,14 +293,14 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     String path = null;
     String fs = File.separator;
     //String path = MaxApplication.getProperty("root")+fs+"packages/explode/images"+fs;
-    //String path = MaxApplication.getProperty("explodePackageDir")+fs+"images" +fs;
-    try
+    path = MaxApplication.getProperty("explodePackageDir")+fs+"images" +fs;
+    /*try
       {
 	path  = MaxApplication.getPackageHandler().locatePackage("explode").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
       System.err.println("Couldn't locate explode images");
-    }
+      }*/
 
     itsDefaultTool = new ArrowTool(new ImageIcon(path+"selecter.gif"));
     tools.addElement( itsDefaultTool);
@@ -306,7 +318,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
 
   /**
-   * ToolbarProvider interface
+   * ToolProvider interface
    */
   public Enumeration getTools() 
   {  
@@ -464,6 +476,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   JLabel itsZoomLabel;
 
   EditorToolbar tb;
+    /*static*/ ToolManager toolManager;
   static boolean toolbarAnchored = true;
   
   InfoPanel itsStatusBar;
