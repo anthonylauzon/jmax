@@ -4,7 +4,8 @@ help_DATA=\
  bus.help.jmax \
  bus~.help.jmax \
  const.help.jmax \
- inout.help.jmax \
+ inlet.help.jmax \
+ outlet.help.jmax \
  print.help.jmax \
  system.summary.jmax 
 
