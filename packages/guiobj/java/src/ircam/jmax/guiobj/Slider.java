@@ -64,6 +64,8 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   private int rangeMin;
   private int orientation;
 
+  public static SliderControlPanel controlPanel = new SliderControlPanel();
+
   public Slider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super( theSketchPad, theFtsObject);
@@ -165,14 +167,14 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     updateRedraw();
   }
 
-  public void inspect()
-  {
-    Point aPoint = itsSketchPad.getEditorContainer().getContainerLocation();
-    SliderDialog dialog = new SliderDialog(itsSketchPad.getEditorContainer().getFrame(), this);
-    dialog.setBounds( aPoint.x + getX(), aPoint.y + getY() - 25, 200, 100);
-    dialog.setVisible( true);
-    dialog = null;//for the gc
-  }
+    /*public void inspect()
+      {
+      Point aPoint = itsSketchPad.getEditorContainer().getContainerLocation();
+      SliderDialog dialog = new SliderDialog(itsSketchPad.getEditorContainer().getFrame(), this);
+      dialog.setBounds( aPoint.x + getX(), aPoint.y + getY() - 25, 200, 100);
+      dialog.setVisible( true);
+      dialog = null;//for the gc
+      }*/
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
@@ -275,24 +277,32 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       return super.findSensibilityArea( mouseX, mouseY);
   }
 
+ public ObjectControlPanel getControlPanel()
+ {
+   return this.controlPanel;
+ }
+
  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
   {
     super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.addMenu(SliderPopUpMenu.getInstance());
+    getControlPanel().update(this);
+    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
+    ObjectPopUp.getInstance().revalidate();
+    ObjectPopUp.getInstance().pack();
   }
   public void popUpReset()
   {
     super.popUpReset();
-    ObjectPopUp.removeMenu(SliderPopUpMenu.getInstance());
+    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
   }
 
-  public void changeOrientation()
-  {
-    if(orientation == VERTICAL_OR) setOrientation(HORIZONTAL_OR);
-    else setOrientation(VERTICAL_OR);
+    /*public void changeOrientation()
+      {
+      if(orientation == VERTICAL_OR) setOrientation(HORIZONTAL_OR);
+      else setOrientation(VERTICAL_OR);
     
-    updateDimension();
-  }
+      updateDimension();
+      }*/
   void updateDimension()
   {
     int w = getWidth();
