@@ -1,49 +1,26 @@
-all:
-	(cd fts1.5; $(MAKE) -k all)
-#	(cd gist; $(MAKE) -k all)
-#	(cd iana; $(MAKE) -k all)
-	(cd icebrowser; $(MAKE) -k all)
-	(cd table; $(MAKE) -k all)
-	(cd qlist; $(MAKE) -k all)
-	(cd manoury; $(MAKE) -k all)
+
+C_TARGETS= fts1.5 manoury tools
+JAVA_TARGETS=table qlist
+
+all: all_c all_java
+.PHONY: all
 
 all_c:
-	(cd fts1.5; $(MAKE) -k all)
-	(cd manoury; $(MAKE) -k all)
-#	(cd gist; $(MAKE) -k all)
-#	(cd iana; $(MAKE) -k all)
+	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) -k all ) ; done
+.PHONY: all_c
 
 all_java:
-	(cd icebrowser; $(MAKE) -k all)
-	(cd table; $(MAKE) -k all)
-	(cd qlist; $(MAKE) -k all)
-
-clean:
-	(cd fts1.5; $(MAKE) clean)
-#	(cd gist; $(MAKE) clean)
-#	(cd iana; $(MAKE) clean)
-	(cd icebrowser; $(MAKE) clean)
-	(cd espresso; $(MAKE) clean)
-	(cd table; $(MAKE) clean)
-	(cd qlist; $(MAKE) clean)
-	(cd manoury; $(MAKE) clean)
-
-clean_c:
-	(cd manoury; $(MAKE) clean)
-	(cd fts1.5; $(MAKE) clean)
-#	(cd gist; $(MAKE) clean)
-#	(cd iana; $(MAKE) clean)
-
-clean_java:
-	(cd icebrowser; $(MAKE) clean)
-	(cd table; $(MAKE) clean)
-	(cd qlist; $(MAKE) clean)
-
-.PHONY: all
-.PHONY: all_c
+	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) -k all ) ; done
 .PHONY: all_java
 
+clean: clean_c clean_java
 .PHONY: clean
+
+clean_c:
+	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) -k clean ) ; done
 .PHONY: clean_c
+
+clean_java:
+	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) -k clean ) ; done
 .PHONY: clean_java
 
