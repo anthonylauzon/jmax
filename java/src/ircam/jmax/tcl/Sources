@@ -4,6 +4,7 @@ SOURCES = MaxFtsConnectCmd.java\
           MaxQuitCmd.java      \
           MaxRunHooksCmd.java  \
           MaxSystemPropertyCmd.java \
+          MaxSetSystemPropertyCmd.java \
           MaxWhenCmd.java           \
 	  MaxSourceCmd.java      \
 	  MaxSysSourceCmd.java      \

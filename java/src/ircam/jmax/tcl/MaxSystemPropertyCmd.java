@@ -44,7 +44,7 @@ class MaxSystemPropertyCmd implements Command
 	  interp.setResult(property);
       }
     else
-      throw new TclNumArgsException(interp, 1, argv, "propery");
+      throw new TclNumArgsException(interp, 1, argv, "property");
   }
 }
 
