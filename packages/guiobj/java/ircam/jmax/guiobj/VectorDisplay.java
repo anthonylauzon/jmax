@@ -288,6 +288,7 @@ public class VectorDisplay extends GraphicObject
     int w = getWidth();
     int h = getHeight();
     
+
     ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
     drawContent( g, x+1, y+1, w-2, h-2);
