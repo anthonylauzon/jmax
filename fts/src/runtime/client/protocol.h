@@ -17,7 +17,7 @@
  * Low values: 0x01 0x02 0x03
  * Symbols   : - { } > < \
  * Lowercase : c d f g h i m n o p q u z x
- * Uppercase : A C D E F L M N O P Q R S T U V X Y Z 
+ * Uppercase : A C D E F G H L M N O P Q R S T U V X Y Z 
  * 
  */
 
@@ -47,8 +47,11 @@
 #define DECLARE_ABSTRACTION_CODE          'E'
 #define DECLARE_ABSTRACTION_PATH_CODE     'F'
 
-#define OPEN_PATCHER_CODE       'O'
 #define DOWNLOAD_PATCHER_CODE   'D'
+#define DOWNLOAD_OBJECT_CODE    'G'
+#define DOWNLOAD_CONNECTION_CODE  'H'
+
+#define OPEN_PATCHER_CODE       'O'
 #define CLOSE_PATCHER_CODE      'C'
 #define PATCHER_LOADED_CODE     'L'
 

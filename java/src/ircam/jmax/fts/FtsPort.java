@@ -287,6 +287,22 @@ abstract class FtsPort implements Runnable
       out_stream.write(s.charAt(i));
   }
 
+
+  final void sendObject(int id) throws java.io.IOException 
+  {
+    int value;
+    String s;
+
+    value = id;
+
+    out_stream.write(FtsClientProtocol.object_type_code);
+    s = Integer.toString(value);
+		
+    for (int i = 0; i < s.length(); i++)
+      out_stream.write(s.charAt(i));
+  }
+
+
   final void sendConnection(FtsConnection connection) throws java.io.IOException 
   {
     int value;
@@ -296,6 +312,21 @@ abstract class FtsPort implements Runnable
       value = connection.getConnectionId();
     else
       value = 0;
+
+    out_stream.write(FtsClientProtocol.connection_type_code);
+    s = Integer.toString(value);
+		
+    for (int i = 0; i < s.length(); i++)
+      out_stream.write(s.charAt(i));
+  }
+
+
+  final void sendConnection(int id) throws java.io.IOException 
+  {
+    int value;
+    String s;
+
+    value = id;
 
     out_stream.write(FtsClientProtocol.connection_type_code);
     s = Integer.toString(value);

@@ -53,6 +53,7 @@ public class Fts
     id = server.getNewObjectId();
 
     server.newObject(parent, id, className, description);
+    server.sendDownloadObject(id);
     
     // Wait for FTS to do his work
 
@@ -83,6 +84,7 @@ public class Fts
 
     id = server.getNewObjectId();
     server.newObject(parent, id, description);
+    server.sendDownloadObject(id);
     
     // Wait for FTS to do his work
 
@@ -110,6 +112,7 @@ public class Fts
     id = server.getNewConnectionId();
 
     server.newConnection(id, from, outlet, to, inlet);
+    server.sendDownloadConnection(id);
 
     // Wait for FTS to do his work
 
@@ -153,18 +156,36 @@ public class Fts
   {
     FtsObject newObject;
     FtsContainerObject parent;
+    int oldInlets, oldOutlets;
 
     parent = oldObject.getParent();
+
+    oldInlets = oldObject.getNumberOfInlets();
+    oldOutlets = oldObject.getNumberOfOutlets();
 
     // makeFtsObject can throw a connection if the
     // object do not exists.
 
     newObject = makeFtsObject(parent, description);
 
-    // replaceInConnections should delete the connections
-    // not existing any more
+    if (newObject.get("error") != null)
+      {
+	// Error object; simply keep all the connections,
+	// and artificially set the number of inlets and outlets
+	// to the previous ones.
 
-    parent.replaceInConnections(oldObject, newObject);
+	newObject.setNumberOfInlets(oldInlets);
+	newObject.setNumberOfOutlets(oldOutlets);
+	parent.replaceInAllConnections(oldObject, newObject);
+      }
+    else
+      {
+	// replaceInConnections should delete the connections
+	// not existing any more
+
+	parent.replaceInConnections(oldObject, newObject);
+      }
+
     oldObject.delete();
 
     return newObject;

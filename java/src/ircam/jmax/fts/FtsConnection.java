@@ -87,6 +87,9 @@ public class FtsConnection
       return;
 
     deleted = true;
+
+    Fts.getSelection().removeConnection(this);
+
     from.setDirty();
     to.setDirty();
 	
@@ -132,7 +135,7 @@ public class FtsConnection
 
   public String  toString()
   {
-    return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ")";
+    return "FtsConnection(" + from + "," + outlet + "," + to + "," + inlet + ", #" + id + ")";
   }
 }
 

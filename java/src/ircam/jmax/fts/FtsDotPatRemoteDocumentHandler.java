@@ -72,6 +72,7 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
     // patcher, using a dedicated message
 
     server.loadPatcherDpat(server.getRootObject(), id, file.getAbsolutePath());
+    server.sendDownloadObject(id);
     server.syncToFts();
     patcher = server.getObjectByFtsId(id);
 

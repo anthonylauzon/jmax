@@ -150,6 +150,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   }
 
   /** Replace an object with an other one in all the connections
+   *   that are consistent after the substitution.
    * We assume that the container is open !!
    */
 
@@ -157,7 +158,6 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   {
     // First, collect the connections that will not be consistent 
     // with newObject in a new Vectro
-
 
     Vector toDelete = new Vector();
 
@@ -178,7 +178,7 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
     for (int i = 0; i < toDelete.size(); i++)
       {
-	FtsConnection conn = (FtsConnection)connections.elementAt(i);
+	FtsConnection conn = (FtsConnection)toDelete.elementAt(i);
 
 	conn.delete();
       }
@@ -189,6 +189,19 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
       ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
   }
 
+
+  /** Replace an object with an other one in all the connections
+   * without checking for errors; used when the new object is an error object
+   * We assume that the container is open !!
+   */
+
+  void replaceInAllConnections(FtsObject oldObject, FtsObject newObject)
+  {
+    // Redo the connections
+
+    for (int i = 0; i < connections.size(); i++)
+      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
+  }
 
   /** Overwrite the getObjects methods so to download the patcher
     by need */

@@ -34,7 +34,7 @@
    REPOSITION_OUTLET (obj)obj <pos>
    FREE (obj)obj
    CONNECT (obj)from (int)outlet (obj)to (int)inlet
-   DISCONNECT (obj)from (int)outlet (obj)to (int)inlet
+   DISCONNECT (obj)cid
 
    This two are temporary: they will be substituted with special
    protected mechanisms .. or extended with protection mechanism.
@@ -229,8 +229,6 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
 	  /* activate the post-load init, like loadbangs */
 	  
 	  fts_message_send(patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);
-
-	  fts_client_upload_object(patcher);
 	}
       else
 	post_mess("System Error in FOS message LOAD PATCHER BMAX: null patcher", ac, av);
@@ -291,8 +289,6 @@ fts_mess_client_load_patcher_dpat(int ac, const fts_atom_t *av)
 	      post("Cannot read .pat file %s\n", fts_symbol_name(filename));
 	      return;
 	    }
-
-	  fts_client_upload_object(patcher);
 	}
       else
 	post_mess("System Error in FOS message LOAD PATCHER DPAT: null patcher", ac, av);
@@ -348,8 +344,6 @@ fts_mess_client_declare_abstraction_path(int ac, const fts_atom_t *av)
 /*    DOWNLOAD_PATCHER   (obj)p
 
       Send to the patcher the message "download". (system inlet)
-      Do the actual work here; this is not good; but: it cannot be
-      in the mess module because use the runtime !!
  */
 
 static void
@@ -376,6 +370,67 @@ fts_mess_client_download_patcher(int ac, const fts_atom_t *av)
     post_mess("System Error in FOS message DOWNLOAD PATCHER: bad args", ac, av);
 }
 
+
+/*    DOWNLOAD_OBJECT   (obj)p
+
+      Send to the object the message "download". (system inlet)
+ */
+
+static void
+fts_mess_client_download_object(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received download object ", ac, av);
+
+  if (ac == 1 && fts_is_object(&av[0]))
+    {
+      fts_object_t *object;
+      fts_object_t *p;
+
+      object = (fts_object_t *) fts_get_object(&av[0]);
+
+      if (! object)
+	{
+	  post_mess("System Error in FOS message DOWNLOAD OBJECT: null object", ac, av);
+	  return;
+	}
+
+      fts_client_upload_object(object);
+    }
+  else
+    post_mess("System Error in FOS message DOWNLOAD OBJECT: bad args", ac, av);
+}
+
+
+/*    DOWNLOAD_CONNECTION   (obj)p
+
+      Send to the connection the message "download". (system inlet)
+      Do the actual work here; this is not good; but: it cannot be
+      in the mess module because use the runtime !!
+ */
+
+static void
+fts_mess_client_download_connection(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received download connection ", ac, av);
+
+  if (ac == 1 && fts_is_connection(&av[0]))
+    {
+      fts_connection_t *connection;
+      fts_object_t *p;
+
+      connection = (fts_connection_t *) fts_get_connection(&av[0]);
+
+      if (! connection)
+	{
+	  post_mess("System Error in FOS message DOWNLOAD CONNECTION: null connection", ac, av);
+	  return;
+	}
+
+      fts_client_upload_connection(connection);
+    }
+  else
+    post_mess("System Error in FOS message DOWNLOAD CONNECTION: bad args", ac, av);
+}
 
 /*    OPEN_PATCHER   (obj)p
 
@@ -472,7 +527,6 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
     {
       int id;
       fts_patcher_t *parent;
-      fts_object_t  *new;
 
       parent = (fts_patcher_t *) fts_get_object(&av[0]);
 
@@ -483,12 +537,7 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
       id  = fts_get_int(&av[1]);
 
-      new = fts_object_new(parent, id, ac - 2, av + 2);
-
-      /* Upload the object if it have an ID */
-
-      if (id != FTS_NO_ID)
-	fts_client_upload_object(new);
+      fts_object_new(parent, id, ac - 2, av + 2);
     }
   else
     post_mess("System Error in FOS message NEW: bad args", ac, av);
@@ -648,7 +697,6 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
       int id;
       fts_object_t *from, *to;
       fts_status_t ret;
-      fts_connection_t *new;
 
       id     = fts_get_int(&av[0]);
       from   = fts_get_object(&av[1]);
@@ -658,13 +706,7 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 
       if (to && from)
 	{
-	  new = fts_object_connect(id, from, outlet, to, inlet);
-
-	  if (! new)
-	    return;
-
-	  if (id != FTS_NO_ID)
-	    fts_client_upload_connection(new);
+	  fts_object_connect(id, from, outlet, to, inlet);
 	}
       else
 	post_mess("Error trying to connect non existing objects", ac, av);
@@ -862,6 +904,8 @@ fts_messtile_install_all()
   fts_client_mess_install(DECLARE_ABSTRACTION_PATH_CODE, fts_mess_client_declare_abstraction_path);
 
   fts_client_mess_install(DOWNLOAD_PATCHER_CODE, fts_mess_client_download_patcher);
+  fts_client_mess_install(DOWNLOAD_OBJECT_CODE, fts_mess_client_download_object);
+  fts_client_mess_install(DOWNLOAD_CONNECTION_CODE, fts_mess_client_download_connection);
 
   fts_client_mess_install(OPEN_PATCHER_CODE, fts_mess_client_open_patcher);
   fts_client_mess_install(CLOSE_PATCHER_CODE, fts_mess_client_close_patcher);

@@ -83,10 +83,15 @@ class FtsClientProtocol
   static final int fts_declare_abstraction_path_cmd = 'F';
 
   static final int fts_download_patcher_cmd = 'D';
+  static final int fts_download_object_cmd = 'G';
+  static final int fts_download_connection_cmd = 'H';
 
   static final int fts_open_patcher_cmd = 'O';
   static final int fts_close_patcher_cmd = 'C';
   static final int fts_patcher_loaded_cmd = 'L';
+
+
+
 
   static final int fts_new_object_cmd = 'n';
   static final int fts_new_abstraction_cmd = 'A';

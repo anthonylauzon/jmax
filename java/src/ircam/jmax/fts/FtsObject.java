@@ -797,6 +797,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void delete()
   {
+    Fts.getSelection().removeObject(this);
     parent.setDirty();
     parent.removeObjectFromContainer(this); 
     Fts.getServer().freeObject(this);

@@ -50,9 +50,11 @@ public class FtsSelection  extends FtsObject
 
   final public void removeObject(FtsObject obj)
   {
-    objects.removeElement(obj);
-
-    Fts.getServer().sendObjectMessage(this, -1, "remove_object", obj);
+    if (objects.contains(obj))
+      {
+	objects.removeElement(obj);
+	Fts.getServer().sendObjectMessage(this, -1, "remove_object", obj);
+      }
   }
 
   /** Get the objects */
@@ -75,9 +77,11 @@ public class FtsSelection  extends FtsObject
 
   final public void removeConnection(FtsConnection obj)
   {
-    connections.removeElement(obj);
-
-    Fts.getServer().sendObjectMessage(this, -1, "remove_connection", obj);
+    if (connections.contains(obj))
+      {
+	connections.removeElement(obj);
+	Fts.getServer().sendObjectMessage(this, -1, "remove_connection", obj);
+      }
   }
 
   /** Get the connections */

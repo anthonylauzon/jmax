@@ -270,6 +270,26 @@ public class FtsServer
       }
   }
 
+
+  /** Send a "download patcher" messages to FTS.*/
+
+  final void sendDownloadPatcher(int id)
+  {
+    if (FtsServer.debug)
+      System.err.println("sendDownloadPatcher(" + id + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_download_patcher_cmd);
+	port.sendObject(id);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+
   /** Send a "open patcher" messages to FTS.*/
 
   final void openPatcher(FtsObject patcher)
@@ -368,6 +388,25 @@ public class FtsServer
 
 	FtsParseToPort.parseAndSendObject(description, port);
 
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "download object" messages to FTS;
+   */
+
+  final  void sendDownloadObject(int id)
+  {
+    if (FtsServer.debug)
+      System.err.println("sendDownloadObject(" + id + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_download_object_cmd);
+	port.sendObject(id);
 	port.sendEom();
       }
     catch (java.io.IOException e)
@@ -651,6 +690,25 @@ public class FtsServer
 	port.sendInt(outlet);
 	port.sendObject(to);
 	port.sendInt(inlet);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
+  /** Send a "download connection" messages to FTS;
+   */
+
+  final  void sendDownloadConnection(int id)
+  {
+    if (FtsServer.debug)
+      System.err.println("sendDownloadConnection(" + id + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_download_connection_cmd);
+	port.sendConnection(id);
 	port.sendEom();
       }
     catch (java.io.IOException e)
