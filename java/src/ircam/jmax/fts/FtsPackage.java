@@ -103,6 +103,13 @@ public class FtsPackage extends FtsObjectWithEditor
 	  ((FtsPackage)obj).setDirty( args.getInt( 0) == 1);
 	}
       });
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("requireError"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).requireError( args.getInt( 0));
+	}
+      });
+
   }
     
   public FtsPackage() throws IOException
@@ -387,6 +394,12 @@ public class FtsPackage extends FtsObjectWithEditor
   public boolean isDirty()
   {
     return isDirty;
+  }
+
+  public void requireError(int index)
+  {
+      if (listener != null)
+	  listener.setErrorAt(index);
   }
   /*************************************/
 
