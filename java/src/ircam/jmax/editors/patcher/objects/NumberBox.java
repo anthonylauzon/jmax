@@ -118,7 +118,8 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
   public void redefined()
   {
-      fitToText();
+    setDefaults();
+    //fitToText()
   }
 
   // ----------------------------------------

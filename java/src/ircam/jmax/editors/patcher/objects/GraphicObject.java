@@ -1014,7 +1014,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   public void editContent()
   {
   }
-
   public boolean hasContent()
   {
     return false;

@@ -109,14 +109,14 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 
   public void redefine( String text) 
   {
-      ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, "messconst " +text);
-      itsSketchPad.getDisplayList().remove(this);
-      dispose();
+    ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, "messconst " +text);
+    itsSketchPad.getDisplayList().remove(this);
+    dispose();
   }
 
   public void redefined()
   {
-      fitToText();
+    fitToText();
   }
 
   /* Inspector */    

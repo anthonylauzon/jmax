@@ -54,6 +54,12 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
     updateDimensions();
   }
 
+  public void redefined()
+  {
+    setDefaults();
+    //fitToText();
+  }
+
   public String getArgs()
   {
      return ftsObject.getDescription();
@@ -86,11 +92,6 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
     ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
     itsSketchPad.getDisplayList().remove(this);
     dispose();
-  }
-
-  public void redefined()
-  {
-      fitToText();
   }
 
   public void errorChanged(boolean value) 

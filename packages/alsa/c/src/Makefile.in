@@ -61,6 +61,7 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
+CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
 DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@

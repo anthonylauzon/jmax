@@ -186,10 +186,10 @@ public class TextRenderer implements ObjectRenderer
     area.setBackground(color);
   }
 
-    public void setForeground(Color color)
-    {
-	area.setForeground(color);
-    }
+  public void setForeground(Color color)
+  {
+    area.setForeground(color);
+  }
 
   static Container ic = new JPanel();
 

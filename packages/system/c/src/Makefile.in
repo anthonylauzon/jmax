@@ -61,6 +61,7 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
+CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
 DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
@@ -100,13 +101,7 @@ sigbus.h \
 system.h
 
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-
-@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
-@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/fts/.libs -lfts 
-
-libsystem_la_LDFLAGS = $(XLDFLAGS)
-libsystem_la_LIBADD = $(XLIBADD)
+libsystem_la_LDFLAGS = -module
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -117,8 +112,7 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-@MACOSX_TRUE@libsystem_la_DEPENDENCIES = 
-@MACOSX_FALSE@libsystem_la_DEPENDENCIES = 
+libsystem_la_LIBADD = 
 libsystem_la_OBJECTS =  argument.lo bus.lo bus_tilda.lo const.lo dsp1.lo \
 print.lo sigbus.lo system.lo
 CFLAGS = @CFLAGS@

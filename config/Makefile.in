@@ -61,6 +61,7 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
+CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
 DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
@@ -82,15 +83,10 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-configdir = $(pkgdatadir)
-config_DATA = config.jmax
-
-EXTRA_DIST = $(config_DATA)
+EXTRA_DIST = @CONFIG_FILE@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
-DATA =  $(config_DATA)
-
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -107,25 +103,6 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-
-install-configDATA: $(config_DATA)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(configdir)
-	@list='$(config_DATA)'; for p in $$list; do \
-	  if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(configdir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(configdir)/$$p; \
-	  else if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(configdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(configdir)/$$p; \
-	  fi; fi; \
-	done
-
-uninstall-configDATA:
-	@$(NORMAL_UNINSTALL)
-	list='$(config_DATA)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(configdir)/$$p; \
-	done
 tags: TAGS
 TAGS:
 
@@ -161,20 +138,19 @@ installcheck: installcheck-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-configDATA
+install-data-am: install-data-local
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-configDATA
+uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile $(DATA)
+all-am: Makefile
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(configdir)
 
 
 mostlyclean-generic:
@@ -205,13 +181,16 @@ maintainer-clean-am:  maintainer-clean-generic distclean-am
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: uninstall-configDATA install-configDATA tags distdir info-am \
-info dvi-am dvi check check-am installcheck-am installcheck \
-install-exec-am install-exec install-data-am install-data install-am \
-install uninstall-am uninstall all-redirect all-am all installdirs \
+.PHONY: tags distdir info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-exec-am install-exec \
+install-data-local install-data-am install-data install-am install \
+uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+install-data-local:
+	$(INSTALL_DATA) @CONFIG_FILE@ $(pkgdatadir)/config.jmax
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

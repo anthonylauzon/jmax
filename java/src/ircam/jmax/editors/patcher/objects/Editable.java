@@ -59,10 +59,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
   public void setDefaults()
   {
-    //if (getWidth() == -1)     
     setWidth(getDefaultWidth());
-    /*else
-      updateDimensions();*/
   }
 
   public void updateDimensions()
@@ -84,23 +81,23 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     renderer = new TextRenderer(this);
   }
 
-    /* it's still there only to redefine Patcher object */
-    /* when will be asynchronous remove them and use "redefined" */
-    public void redefine(String text) 
-    {
-	computeRenderer();
-      
-	updateDimensions();
-      
-	if(itsSketchPad.isAutomaticFitToText()){
-	    redraw();
-	    fitToText();
-	}
-	else
-	    redraw();
-	
-	super.redefine(text);    
+  /* it's still there only to redefine Patcher object */
+  /* when will be asynchronous remove them and use "redefined" */
+  public void redefine(String text) 
+  {
+    computeRenderer();
+    
+    updateDimensions();
+    
+    if(itsSketchPad.isAutomaticFitToText()){
+      redraw();
+      fitToText();
     }
+    else
+      redraw();
+    
+    super.redefine(text);    
+  }
 
 
   public int getMinimumWidth(){

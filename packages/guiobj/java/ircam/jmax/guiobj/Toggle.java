@@ -97,6 +97,11 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
     updateRedraw();
   }
 
+  public void redefined()
+  {
+    setDefaults();
+  }
+
   public void paint(Graphics g) 
   {
     int x = getX();

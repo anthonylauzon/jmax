@@ -93,6 +93,11 @@ public class Fork extends GraphicObject
     super.setHeight(CONST_HEIGHT);
   }
 
+  public void redefined()
+  {
+    setDefaults();
+  }
+
   public void setWidthShift( int theWidth) 
   {
     int minWidth = 2 * getOutletDistance() + 2 * ObjectGeometry.INOUTLET_PAD - 1;

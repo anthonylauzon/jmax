@@ -61,6 +61,7 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
+CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
 DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
@@ -103,13 +104,7 @@ rfft_shuffle.h \
 utils.h
 
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-
-@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
-@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/fts/.libs -lfts 
-
-libutils_la_LDFLAGS = $(XLDFLAGS)
-libutils_la_LIBADD = $(XLIBADD)
+libutils_la_LDFLAGS = -module
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -120,8 +115,7 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-@MACOSX_TRUE@libutils_la_DEPENDENCIES = 
-@MACOSX_FALSE@libutils_la_DEPENDENCIES = 
+libutils_la_LIBADD = 
 libutils_la_OBJECTS =  cfft.lo complex.lo cubic.lo floatfuns.lo \
 ramp_vectors.lo ramps.lo random.lo rfft_shuffle.lo utils.lo vec_fft.lo
 CFLAGS = @CFLAGS@

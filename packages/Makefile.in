@@ -65,6 +65,7 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
+CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
 DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
@@ -86,7 +87,7 @@ ROOTDIR = @ROOTDIR@
 STRIP = @STRIP@
 VERSION = @VERSION@
 
-SUBDIRS = utils control data guiobj io ispw ispwmath lists math midi numeric qlist signal system @PLATFORM_PACKAGES@
+SUBDIRS = utils control data guiobj io ispw ispwmath lists midi numeric qlist signal system @PLATFORM_PACKAGES@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

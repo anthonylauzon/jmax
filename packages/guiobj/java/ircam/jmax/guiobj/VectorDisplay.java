@@ -122,6 +122,11 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
     super.setHeight(h);
   }
 
+  public void redefined()
+  {
+    setDefaults();
+  }
+
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {          
   }

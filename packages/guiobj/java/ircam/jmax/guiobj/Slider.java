@@ -191,6 +191,11 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     updateRedraw();
   }
 
+  public void redefined()
+  {
+    setDefaults();
+  }
+
     /*public void inspect()
       {
       Point aPoint = itsSketchPad.getEditorContainer().getContainerLocation();

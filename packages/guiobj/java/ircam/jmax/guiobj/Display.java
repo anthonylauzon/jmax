@@ -79,7 +79,7 @@ public class Display extends GraphicObject implements FtsMessageListener
 
   public void redefined()
   {
-      messageChanged(display);
+    messageChanged(display);
   } 
 
   // Set the text when FTS change the display content

@@ -73,9 +73,9 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       
       obj->head.cl = cl;
       obj->head.id = FTS_NO_ID;
-      /*obj->properties = 0;*/
-      /*obj->varname = 0;*/
-      /*obj->refcnt = 0;*/
+      obj->properties = 0;
+      obj->varname = 0;
+      obj->refcnt = 0;
       
       if (cl->noutlets)
 	obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));

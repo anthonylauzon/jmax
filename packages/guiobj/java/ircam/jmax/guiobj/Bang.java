@@ -126,6 +126,11 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
       updateImages(getWidth(), flashColorIndex, itsColor);
   }
 
+  public void redefined()
+  {
+    setDefaults();
+  }
+
   public void valueChanged(int value) 
   {
     int flash = value;

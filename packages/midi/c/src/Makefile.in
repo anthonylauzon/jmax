@@ -61,6 +61,7 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
+CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
 DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
@@ -97,13 +98,7 @@ noinst_HEADERS = \
 midi.h
 
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-
-@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
-@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/fts/.libs -lfts 
-
-libmidi_la_LDFLAGS = $(XLDFLAGS)
-libmidi_la_LIBADD = $(XLIBADD)
+libmidi_la_LDFLAGS = -module
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -114,8 +109,7 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-@MACOSX_TRUE@libmidi_la_DEPENDENCIES = 
-@MACOSX_FALSE@libmidi_la_DEPENDENCIES = 
+libmidi_la_LIBADD = 
 libmidi_la_OBJECTS =  midi.lo midiin.lo midiout.lo midiport.lo \
 rawmidiport.lo sysex.lo
 CFLAGS = @CFLAGS@

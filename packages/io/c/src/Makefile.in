@@ -61,6 +61,7 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
+CONFIG_FILE = @CONFIG_FILE@
 DLLTOOL = @DLLTOOL@
 DOT_LIBS = @DOT_LIBS@
 ECHO = @ECHO@
@@ -104,13 +105,7 @@ noinst_HEADERS = \
 iomodule.h
 
 
-# Mac OS X libtool/twolevel_namespace mess (see ChangeLog)
-
-@MACOSX_TRUE@XLDFLAGS = @MACOSX_TRUE@-no-undefined -module
-@MACOSX_TRUE@XLIBADD = @MACOSX_TRUE@-L$(top_srcdir)/fts/.libs -lfts 
-
-libio_la_LDFLAGS = $(XLDFLAGS)
-libio_la_LIBADD = $(XLIBADD)
+libio_la_LDFLAGS = -module
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -121,8 +116,7 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-@MACOSX_TRUE@libio_la_DEPENDENCIES = 
-@MACOSX_FALSE@libio_la_DEPENDENCIES = 
+libio_la_LIBADD = 
 libio_la_OBJECTS =  fakestream.lo filestream.lo in.lo in_out_tilda.lo \
 iomodule.lo loopback.lo out.lo
 CFLAGS = @CFLAGS@
