@@ -41,7 +41,7 @@ CFG=sequence_java - Win32 Debug
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "sequence_java___Win32_Release"
 # PROP Intermediate_Dir "sequence_java___Win32_Release"
-# PROP Cmd_Line "nmake /f "sequence_java.mak" JAVA_HOME="C:\Program Files\IBM\Java13""
+# PROP Cmd_Line "nmake /f "sequence_java.mak""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "sequence_java.exe"
 # PROP Bsc_Name ""
@@ -62,7 +62,7 @@ CFG=sequence_java - Win32 Debug
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "sequence_java___Win32_Debug"
 # PROP Intermediate_Dir "sequence_java___Win32_Debug"
-# PROP Cmd_Line "nmake /f "sequence_java.mak" JAVA_HOME="C:\Program Files\IBM\Java13""
+# PROP Cmd_Line "nmake /f "sequence_java.mak""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "sequence_java.exe"
 # PROP Bsc_Name ""

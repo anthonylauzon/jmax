@@ -635,17 +635,20 @@ fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name)
   
   fts_set_symbol( &k, name);
   
-  if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data)) 
+  if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data)) {
     return fts_get_ptr(&data);
-  else 
+  } else {
     return NULL;
+  }
 }
 
 fts_status_t 
 fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
 {
-  fts_metaclass_t *mcl = fts_package_get_metaclass(pkg, name);
+  fts_metaclass_t *mcl;
   fts_atom_t data, k;
+
+  mcl = fts_package_get_metaclass(pkg, name);
   
   fts_set_symbol( &k, alias);
   if (fts_hashtable_get(pkg->classes, &k, &data))

@@ -41,7 +41,7 @@ CFG=guiobj_java - Win32 Debug
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "guiobj_java___Win32_Release"
 # PROP Intermediate_Dir "guiobj_java___Win32_Release"
-# PROP Cmd_Line "NMAKE /f guiobj_java.mak JAVA_HOME="C:\Program Files\IBM\Java13""
+# PROP Cmd_Line "NMAKE /f guiobj_java.mak"
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "guiobj_java.exe"
 # PROP Bsc_Name "guiobj_java.bsc"
@@ -62,7 +62,7 @@ CFG=guiobj_java - Win32 Debug
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "guiobj_java___Win32_Debug"
 # PROP Intermediate_Dir "guiobj_java___Win32_Debug"
-# PROP Cmd_Line "nmake /f "guiobj_java.mak" JAVA_HOME="C:\Program Files\IBM\Java13""
+# PROP Cmd_Line "nmake /f "guiobj_java.mak""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "guiobj_java.exe"
 # PROP Bsc_Name ""

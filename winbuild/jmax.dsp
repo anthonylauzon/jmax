@@ -41,7 +41,7 @@ CFG=jmax - Win32 Debug
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
-# PROP Cmd_Line "nmake /f "jmax.mak" JAVA_HOME="C:\Program Files\IBM\Java13""
+# PROP Cmd_Line "nmake /f "jmax.mak""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "..\java\jmax.jar"
 # PROP Bsc_Name ""

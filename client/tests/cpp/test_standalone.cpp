@@ -111,6 +111,9 @@ main( int ac, char **av)
 
       server = new FtsServer( connection);
 
+//        sleep(10);
+      cout << "loading patch" << endl;
+
       // load a patch
       args.clear();
       args.add( av[2]);
@@ -139,10 +142,11 @@ main( int ac, char **av)
 //  	  if ( cin.eof() )
 //  	    break;
 
-//  	  o1->send( i);
-//  	}
+      char c;
+      cin >> c;
 
       server->shutdown();
+      server->wait();
     }
   catch( FtsClientException e)
     {
@@ -150,5 +154,5 @@ main( int ac, char **av)
       cerr << endl;
     }
 
-  clean_exit( 0);
+  exit( 0);
 }
