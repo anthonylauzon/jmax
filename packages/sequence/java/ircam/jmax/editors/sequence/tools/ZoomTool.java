@@ -101,7 +101,7 @@ public class ZoomTool extends Tool implements  DirectionListener, DynamicDragLis
 		egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+(int)(geometry.getXZoom()*100)+"%");
 	    }	
     }
-    public void dragEnd(int x, int y){}
+    public void dragEnd(int x, int y, MouseEvent e){}
     public void updateStartingPoint(int deltaX, int deltaY){}
   
     /**

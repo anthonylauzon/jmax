@@ -30,7 +30,7 @@ import ircam.jmax.toolkit.*;
 import java.awt.*;
 import java.util.Enumeration;
 import javax.swing.ImageIcon;
-
+import java.awt.event.MouseEvent;
 
 /**
  * the tool used to move a selection of events.
@@ -92,7 +92,7 @@ public class MoverTool extends Tool implements PositionListener, DragListener {
    * Moves the selected objects in the new location,
    * and then mount its default UI Module
    */
-  public void dragEnd(int x, int y) 
+  public void dragEnd(int x, int y, MouseEvent ev) 
   {
     ScrEvent aEvent;
 

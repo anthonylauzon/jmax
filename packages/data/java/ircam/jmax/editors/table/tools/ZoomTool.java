@@ -115,7 +115,7 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
 	  if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
 	    a.incrYZoom( -deltaY);
     }
-    public void dragEnd(int x, int y){}
+    public void dragEnd(int x, int y, MouseEvent e){}
     public void updateStartingPoint(int deltaX, int deltaY){}
 
     public void doubleClick()

@@ -28,6 +28,7 @@ package ircam.jmax.editors.explode;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.undo.*;
@@ -80,7 +81,7 @@ public class ResizerTool extends SelecterTool implements DragListener {
    * Resizes all the selected objects,
    * and then mount its default UI Module
    */
-  public void dragEnd(int x, int y) 
+  public void dragEnd(int x, int y, MouseEvent ev) 
   {
     ScrEvent aEvent;
 

@@ -90,7 +90,7 @@ public class FreeHandDrawer extends TableInteractionModule {
   public void mouseReleased(MouseEvent e) 
   {
     if (! active) return;
-    itsListener.dragEnd(e.getX(), e.getY());
+    itsListener.dragEnd(e.getX(), e.getY(), e);
     active = false;
   }
 

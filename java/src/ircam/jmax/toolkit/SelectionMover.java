@@ -100,7 +100,7 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
     if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
       endX = e.getX();
     
-    itsListener.dragEnd(endX, endY);
+    itsListener.dragEnd(endX, endY, e);
     InteractionSemaphore.unlock();
   }
     

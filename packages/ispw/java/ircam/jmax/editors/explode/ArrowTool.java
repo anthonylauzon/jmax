@@ -104,7 +104,7 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
    * at the end of its interaction.
    * Moves all the selected elements
    */
-  public void dragEnd(int x, int y)
+  public void dragEnd(int x, int y, MouseEvent ev)
   {
     ScrEvent aEvent;
     ScrEvent newEvent;

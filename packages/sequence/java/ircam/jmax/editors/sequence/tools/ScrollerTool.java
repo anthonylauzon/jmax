@@ -104,7 +104,7 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
 		egc.getScrollManager().scrollToValue(-transp);
 	    }	
     }
-    public void dragEnd(int x, int y){}
+    public void dragEnd(int x, int y, MouseEvent e){}
     public void updateStartingPoint(int deltaX, int deltaY){}
   
     /**

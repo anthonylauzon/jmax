@@ -105,7 +105,7 @@ public class ArrowTool extends SelecterTool implements DragListener{
    * at the end of its interaction.
    * Moves all the selected elements
    */
-  public void dragEnd(int x, int y)
+  public void dragEnd(int x, int y, MouseEvent e)
   {
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;

@@ -80,7 +80,7 @@ abstract public class SelectionResizer extends InteractionModule implements XORP
   {
     itsXORHandler.end();
 
-    itsListener.dragEnd(e.getX(), e.getY()); //this 0 is not generic!
+    itsListener.dragEnd(e.getX(), e.getY(), e); //this 0 is not generic!
     InteractionSemaphore.unlock();
   }
 

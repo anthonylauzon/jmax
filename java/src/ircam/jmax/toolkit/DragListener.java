@@ -25,6 +25,7 @@
 
 package ircam.jmax.toolkit;
 
+import java.awt.event.MouseEvent;
 /**
  * The interface used by objects that listen to dragging operations,
  * such as the moving tools. The information passed back is limited 
@@ -38,7 +39,7 @@ public interface DragListener {
   /**
    * informs that the drag ended at the point x,y
    */
-  public abstract void dragEnd(int x, int y);
+  public abstract void dragEnd(int x, int y, MouseEvent e);
   public abstract void updateStartingPoint(int deltaX, int deltaY);
 }
 

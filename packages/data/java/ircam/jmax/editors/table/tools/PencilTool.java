@@ -111,7 +111,7 @@ public class PencilTool extends TableTool implements DynamicDragListener {
   
   /**
    * DynamicDragListener interface */
-  public void dragEnd(int x, int y)
+  public void dragEnd(int x, int y, MouseEvent e)
   {
     setPoint(x, y);
     getGc().getFtsObject().requestEndEdit();

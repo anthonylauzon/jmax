@@ -106,7 +106,7 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
 	else
 	    geometry.incrXZoom(deltaX);
     }
-    public void dragEnd(int x, int y){}
+    public void dragEnd(int x, int y, MouseEvent e){}
     public void updateStartingPoint(int deltaX, int deltaY){}
   
     /**

@@ -53,7 +53,7 @@ public class MouseDragTracker extends InteractionModule {
  
     public void mouseReleased(MouseEvent e) 
     {
-	itsListener.dragEnd(e.getX(), e.getY());
+	itsListener.dragEnd(e.getX(), e.getY(), e);
 	InteractionSemaphore.unlock();
     }
 
