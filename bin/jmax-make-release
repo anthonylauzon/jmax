@@ -11,6 +11,8 @@
 #  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
 #  for DISCLAIMER OF WARRANTY.
 #  
+#
+# $Author$
 
 # ***************************************************************************
 # Constants
@@ -103,9 +105,9 @@ check_options()
 }
 
 # ---------------------------------------------------------------------------
+# Check that all files are synchronous with the CVS repository
 check_cvs_sync ()
 {
-    # - check that all files are synchronous with the CVS repository
     if cvs -n update | egrep -s '^[UARMC] '
     then
 	echo "Working directory is not synchronized with repository: update and retry..."
@@ -114,15 +116,13 @@ check_cvs_sync ()
 }
 
 # ---------------------------------------------------------------------------
+# Check that nothing needs to be recompiled
 check_recompile ()
 {
-    # - check that nothing needs to be recompiled
     for ARCH in $ARCHS
     do
-	if make -q ARCH=$ARCH MODE=opt all
+	if make -q ARCH=$ARCH MODE=opt all  > /dev/null 2>&1 || (exit 0)
 	then
-	    echo > /dev/null
-	else
 	    echo "$ARCH must be recompiled: recompile and retry..."
 	    exit 1
 	fi
