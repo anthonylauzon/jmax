@@ -94,8 +94,7 @@ class KeyMap
     add(Actions.deleteSelectionAction, 0, KeyEvent.VK_BACK_SPACE);
 
     // Annotation 
-
-    add(Actions.showErrorAction, Event.CTRL_MASK, KeyEvent.VK_Z);
+    add(Actions.showErrorAction, Event.CTRL_MASK, KeyEvent.VK_R);
   }
 
 

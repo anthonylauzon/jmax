@@ -74,8 +74,8 @@ public class EditMenu extends EditorMenu
 
     addSeparator();
 
-    undoItem = add( Actions.undoAction, "Undo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_U);
-    redoItem = add( Actions.redoAction, "Redo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_R);
+    undoItem = add( Actions.undoAction, "Undo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Z);
+    redoItem = add( Actions.redoAction, "Redo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Y);
 
     addSeparator();
 
