@@ -18,11 +18,11 @@ static fts_data_class_t *fts_integer_vector_data_class = 0;
 
 #define INTEGER_VECTOR_SET    1
 #define INTEGER_VECTOR_UPDATE 2
+#define INTEGER_VECTOR_NAME   3
 
 /* local */
 
-static void
-intvec_set_size(fts_integer_vector_t *vector, int size)
+static void intvec_set_size(fts_integer_vector_t *vector, int size)
 {
   if(size > vector->alloc)
     {
@@ -39,8 +39,7 @@ intvec_set_size(fts_integer_vector_t *vector, int size)
 
 /* new/delete */
 
-fts_integer_vector_t *
-fts_integer_vector_new(int size)
+fts_integer_vector_t *fts_integer_vector_new(int size)
 {
   fts_integer_vector_t *vector;
   int i;
@@ -60,14 +59,14 @@ fts_integer_vector_new(int size)
     }
 
   vector->alloc = size;
+  vector->name  = 0;
 
   fts_data_init((fts_data_t *) vector, fts_integer_vector_data_class);
 
   return vector;
 }
 
-void
-fts_integer_vector_delete(fts_integer_vector_t *vector)
+void fts_integer_vector_delete(fts_integer_vector_t *vector)
 {
   fts_data_delete((fts_data_t *) vector);
   fts_free((void *)vector->values);
@@ -87,6 +86,14 @@ void
 fts_integer_vector_zero(fts_integer_vector_t *vector)
 {
   fts_vec_izero(vector->values, vector->size);  
+}
+
+/* Set the optional vector name (?)*/
+
+void
+fts_integer_vector_set_name(fts_integer_vector_t *vector, fts_symbol_t name)
+{
+  vector->name = name;
 }
 
 /* set the size of the vector */
@@ -194,6 +201,13 @@ static void fts_integer_vector_export_fun(fts_data_t *data)
 {
   fts_integer_vector_t *vector = (fts_integer_vector_t *)data;
   int i;
+
+  if (vector->name)
+    {
+      fts_data_start_remote_call(data, INTEGER_VECTOR_NAME);
+      fts_client_mess_add_symbol(vector->name);
+      fts_data_end_remote_call();
+    }
 
   fts_data_start_remote_call(data, INTEGER_VECTOR_SET);
   fts_client_mess_add_int(vector->size);

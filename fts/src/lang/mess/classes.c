@@ -224,8 +224,7 @@ fts_class_get(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
  */
 
 
-fts_class_t *
-fts_class_instantiate(int ac, const fts_atom_t *at)
+fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at)
 {
   fts_metaclass_t *mcl;
   fts_class_t *cl;

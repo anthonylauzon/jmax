@@ -16,12 +16,23 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
 
   static final int REMOTE_SET     = 1;
   static final int REMOTE_UPDATE  = 2;
+  static final int REMOTE_NAME    = 3;
 
+  // The name of this data; actually, this should be defined in a subclass,
+  // not all the integer vectors are named
+
+  String name;
   protected int[] values = null;
 
   public FtsIntegerVector()
   {
     super();
+  }
+  /** Get the vector name */
+
+  public String getName()
+  {
+    return name;
   }
 
   /** Get the vector size */
@@ -115,7 +126,10 @@ public class FtsIntegerVector extends FtsRemoteUndoableData
        throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     switch( key)
-      {
+      {      
+      case REMOTE_NAME:
+	name = stream.getNextStringArgument();
+	break;
       case REMOTE_SET:
 	int size;
 	

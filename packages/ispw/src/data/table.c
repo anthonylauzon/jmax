@@ -41,6 +41,7 @@ table_integer_vector_get(fts_symbol_t name, int size)
       this = (table_integer_vector_t *) fts_heap_alloc(table_integer_vector_heap);
       this->name = name;
       this->v = fts_integer_vector_new(size);
+      fts_integer_vector_set_name(this->v, name);
       this->refcount = 1;
 
       fts_set_ptr(&d, this);

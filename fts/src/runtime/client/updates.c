@@ -19,6 +19,7 @@
    and send them to the client.
    */
 
+/*  #define UPDATE_TRACE */
 
 #include "sys.h"
 #include "lang.h"
@@ -91,6 +92,16 @@ void fts_client_send_property(fts_object_t *obj, fts_symbol_t name)
 	  else
 	    return;
 	}
+
+#ifdef UPDATE_TRACE 
+      {
+	fprintf(stderr, "Sending property %s value " , fts_symbol_name(name));
+	fprintf_atoms(stderr, 1, &a);
+	fprintf(stderr, " for object ");
+	fprintf_object(stderr, obj);
+	fprintf(stderr, "\n");
+      }
+#endif
 
       fts_client_mess_start_msg(CLIENTPROP_CODE);
       fts_client_mess_add_object(obj);

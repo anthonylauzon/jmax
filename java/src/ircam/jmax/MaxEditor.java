@@ -109,6 +109,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   private MenuItem itsCutMenuItem;
   private MenuItem itsCopyMenuItem;
   private MenuItem itsPasteMenuItem;  
+  private MenuItem itsDuplicateMenuItem;
   
   private MenuItem itsUndoMenuItem;
   private MenuItem itsRedoMenuItem;
@@ -389,6 +390,13 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 				  public  void actionPerformed(ActionEvent e)
 				    { Paste();}});
 
+    itsDuplicateMenuItem = new MenuItem("Duplicate  Ctrl+D");
+    editMenu.add(itsDuplicateMenuItem);
+    itsDuplicateMenuItem.addActionListener(new MaxActionListener(itsDuplicateMenuItem)
+				{
+				  public  void actionPerformed(ActionEvent e)
+				    { Copy(); Paste();}});
+
     return editMenu;
   }
 
@@ -558,6 +566,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	else if (aInt == 81) MaxApplication.Quit(); //q
 	else if (aInt == 83) Save();//s
 	else if (aInt == 86) Paste();//v
+	else if (aInt == 68) {Copy(); Paste();} //d
 	else if (aInt == 87) Close();//w
 	else if (aInt == 88) Cut();//x
 	else if (aInt == 70) Find(); //F
@@ -663,6 +672,11 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   {
     return itsPasteMenuItem;
   }  
+
+  public MenuItem GetDuplicateMenu()
+  {
+    return itsDuplicateMenuItem;
+  }
 
   public MenuItem GetUndoMenu()
   {

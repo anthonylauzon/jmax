@@ -7,6 +7,7 @@ typedef struct fts_integer_vector
   int *values;
   int size;	
   int alloc;
+  fts_symbol_t name;
 } fts_integer_vector_t;
 
 extern fts_symbol_t fts_s_integer_vector;
@@ -19,7 +20,11 @@ extern void fts_integer_vector_copy(fts_integer_vector_t *in, fts_integer_vector
 extern void fts_integer_vector_zero(fts_integer_vector_t *vector);
 
 #define fts_integer_vector_get_size(vector) ((vector)->size)
+#define fts_integer_vector_get_name(vector) ((vector)->name)
+
 extern void fts_integer_vector_set_size(fts_integer_vector_t *vector, int size);
+extern void fts_integer_vector_set_name(fts_integer_vector_t *vector, fts_symbol_t name);
+
 #define fts_integer_vector_is_empty(vector) ((vector)->size == 0)
 
 #define fts_integer_vector_get_element(vector, index) ((vector)->values[index])

@@ -272,6 +272,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     GetCutMenu().setEnabled( true);
     GetCopyMenu().setEnabled( true);
     GetPasteMenu().setEnabled( true);
+    GetDuplicateMenu().setEnabled( true);
     
     // Add the Objects menu
     itsObjectsMenu = new Menu( "Objects");

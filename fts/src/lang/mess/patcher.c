@@ -874,6 +874,26 @@ patcher_get_state(fts_daemon_action_t action, fts_object_t *obj,
   fts_set_object(value, obj);
 }
 
+/* Daemon for setting the number of inlets
+ */
+
+static void
+patcher_set_ninlets(fts_daemon_action_t action, fts_object_t *obj,
+		    fts_symbol_t property, fts_atom_t *value)
+{
+  fts_patcher_redefine_number_of_inlets((fts_patcher_t *)obj, fts_get_int(value));
+}
+
+/* Daemon for setting the number of outlets
+ */
+
+static void
+patcher_set_noutlets(fts_daemon_action_t action, fts_object_t *obj,
+		     fts_symbol_t property, fts_atom_t *value)
+{
+  fts_patcher_redefine_number_of_outlets((fts_patcher_t *)obj, fts_get_int(value));
+}
+
 /* Class instantiation */
 
 static fts_status_t
@@ -913,6 +933,9 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_add_daemon(cl, obj_property_get, fts_s_name, patcher_get_name);
   fts_class_add_daemon(cl, obj_property_get, fts_s_patcher_type, patcher_get_patcher_type);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, patcher_get_state);
+
+  fts_class_add_daemon(cl, obj_property_put, fts_s_ninlets, patcher_set_ninlets);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_noutlets, patcher_set_noutlets);
 
   return fts_Success;
 }
@@ -1239,7 +1262,15 @@ void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 
 
   if (((fts_object_t *)this)->id != FTS_NO_ID)
-    fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
+    {
+      /* @@@ */
+      fts_atom_t a;
+
+      fts_object_get_prop((fts_object_t *)this, fts_s_ninlets, &a);
+      
+      fprintf(stderr, "Sending fts_s_ninlets property changed (from %d to %d, prop %d)\n",  old_ninlets,  fts_object_get_inlets_number((fts_object_t *) this), fts_get_int(&a)); /* @@@ */
+      fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
+    }
 }
 
 void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)

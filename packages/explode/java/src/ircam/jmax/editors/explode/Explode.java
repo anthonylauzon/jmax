@@ -64,6 +64,7 @@ public class Explode extends MaxEditor implements AAAReadme {
     editMenu.remove(GetCopyMenu());
     editMenu.remove(GetPasteMenu());
     editMenu.remove(GetCutMenu());
+    editMenu.remove(GetDuplicateMenu());
 
     Menu optionsMenu = new Menu("Options");    
 

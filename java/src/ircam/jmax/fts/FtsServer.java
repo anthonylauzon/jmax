@@ -1221,15 +1221,40 @@ public class FtsServer  implements Runnable
 	  obj = stream.getNextObjectArgument();
 	  prop = stream.getNextSymbolArgument();
 
-	  if (stream.nextIsInt())
-	    obj.localPut(prop, stream.getNextIntArgument());
-	  if (stream.nextIsFloat())
-	    obj.localPut(prop, stream.getNextFloatArgument());
-	  else
-	    obj.localPut(prop, stream.getNextArgument());
-	      
 	  if (FtsServer.debug)
-	    System.err.println("SetPropertyValue " + obj + " " + prop);
+	    {
+	      if (stream.nextIsInt())
+		{
+		  int v = stream.getNextIntArgument();
+
+		  System.err.println("SetPropertyValue  " + prop + " to " + v + " for object " + obj);
+		  obj.localPut(prop, v);
+		}
+	      else if (stream.nextIsFloat())
+		{
+		  float v = stream.getNextFloatArgument();
+
+		  System.err.println("SetPropertyValue  " + prop + " to " + v + " for object " + obj);
+		  obj.localPut(prop, v);
+		}
+	      else
+		{
+		  Object v = stream.getNextArgument();
+
+		  System.err.println("SetPropertyValue  " + prop + " to " + v + " for object " + obj);
+		  obj.localPut(prop, v);
+		}
+	    }
+	  else
+	    {
+	      if (stream.nextIsInt())
+		obj.localPut(prop, stream.getNextIntArgument());
+	      if (stream.nextIsFloat())
+		obj.localPut(prop, stream.getNextFloatArgument());
+	      else
+		obj.localPut(prop, stream.getNextArgument());
+	    }
+	      
 	}
       break;
 

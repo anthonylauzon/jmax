@@ -21,7 +21,10 @@ public class Tabler extends MaxEditor {
 
     Init();
 
-    setTitle("Table");
+    if (theData.getName() != null)
+      setTitle("table " + theData.getName());
+    else
+      setTitle("table " + theData.getName());
 
     itsData = new TableRemoteData(theData);
 

@@ -76,6 +76,7 @@ public class ConsoleWindow extends MaxEditor implements ClipboardOwner, Transfer
     GetCutMenu().setEnabled(false);
     GetCopyMenu().setEnabled(true);//clipboard test
     GetPasteMenu().setEnabled(true);
+    GetDuplicateMenu().setEnabled(true);
   }
 
   // start of ClipboardOwner, Tranferable interface methods
