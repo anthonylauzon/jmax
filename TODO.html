@@ -16,9 +16,7 @@
  
   <li><a href="#tasks for release 3.1">tasks for release 3.1</a>
  </li>
-  <li><a href="#tasks for release 3.2">tasks for release 3.2</a>
- </li>
-  <li><a href="#non release related tasks">non release related tasks</a>
+  <li><a href="#other tasks">other tasks</a>
  </li>
 </ul>
 
@@ -39,67 +37,44 @@
 </p>
 
 <!-- ---------------------------------------------------------------------- -->
-<h3>Dynamic client/server connection</h3>
+<h3>Bugs</h3>
 
 <p>
-Changing JAVA GUI to FTS client library:
-<ul>
-<li>data models: implement a library of data models a la Swing (NumberModel and others)</li>
-<li>connection: create instance of FtsServerConnection chosen subclass and of FtsServer</li>
-<li>remove current properties and replace by JavaBeans properties + messages</li>
-<li>reimplement upload mechanism</li>
-</ul>
+Message box help patch makes FTS crash
 </p>
 
 <p>
-FTS data models:
-<ul>
-<li> package ircam.fts.data contains a collection of data models interfaces and a partial implementation
-of these interfaces using FtsObject (as in BoundedRangeModel and DefaultBoundedRangeModel)
-<li> objects that are used by the Java GUI delegate the model handling to a support class coming from ircam.fts.data (they do not derive from DefaultBlabalModel because they must also derive from GraphicObject where the graphic properties are managed)
-</ul>
+Inlets/outlets of patchers
 </p>
+
+<p>
+FTS connection lost results in tons of exceptions
+</p>
+
+
+<!-- ---------------------------------------------------------------------- -->
+<h3>Client/server</h3>
 
 <p>
 FTS client library:
 <ul>
-<li> add a protocol header that describes the protocol used, its version, gives the UDP port number,
-etc (as in HTTP, header ends with an empty line)
+<li>Add a UDP socket: create a udpstream derived from bytestream, add packet numbering 
+and may be simple packet reordering (window of N packets, with N < 10), add methods for
+sending message over the UDP socket instead of TCP
+</li>
 <li> finish C++ reorganisation: split FtsServer into several classes (protocol encoder, decoder),
 remove as much references as possible, FtsValue -> FtsAtom, rewrite protocol decoder as in Java
 </ul>
 </p>
 
 <p>
- Introduce unparsed strings in the protocol: unparsed strings are parsed
-by a simple Bison parser that accepts
-plain lists of {int, float, symbols}.
-</p>
-
-<p>
-Implement a "remote" file box, derived from the Swing JFileChooser, but 
-that takes the file list from FTS, using objects and messages. This because 
-the machine running the client and the machine running the server do no longer
-share file system via NFS, and the files are loaded on the server.
-</p>
-
-<p>
 Intelligent client connection process (auto connect to running server)
 </p>
 
-<p>
-Add a UDP connection: create a udpstream derived from bytestream, add packet numbering 
-and may be simple packet reordering (window of N packets, with N < 10).
-</p>
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>Project, package and configuration</h3>
   
-<p>
-[Remove Tcl configuration commands and use a patch for audio and midi
-configuration]
-</p>
-
 <p>
 Separated client and server package path
 </p>
@@ -115,6 +90,7 @@ a global path (not per package).
 
 <p>
 Configuration script for installation (see contributions from Christian Klippel)
+that produces a default configuration
 </p>
 
 <p>
@@ -122,40 +98,7 @@ Configuration editor [see <a href="notes/io-configuration.html">notes/io-configu
 </p>
 
 <!-- ---------------------------------------------------------------------- -->
-<h3>Platform embedding</h3>
-  
-<p>
- Do GNOME and KDE apps
-</p>
-
-<p>
- Do a Mac OS X application: use either the invocation API (as on Windows
-and Linux) or use the OS X framework for building JAVA applications.
-</p>
-
-<p>
-Evaluate use of Java Drag&amp;Drop API
-</p>
-
-
-<!-- ---------------------------------------------------------------------- -->
-<h3>Changes in the object set</h3>
-  
-<p>
- Finish integration of variables (sampread/write,...) ?
-</p>
-
-<p>
- Table float ?
-</p>
-
-<!-- ---------------------------------------------------------------------- -->
-<h3>Changes in the FTS expression parser</h3>
-
-<p>
-Add a first scanner+parser using Flex+Bison for parsing of protocol unparsed
-strings (see "Dynamic client/server connection").
-</p>
+<h3>Expressions</h3>
 
 <p>
 Extends this parser to be able to parse arrays of atoms (by switching scanner)
@@ -163,38 +106,20 @@ and implement a first grammar for expressions (similar to the actual grammar,
 plus implementation of the dot operator and may be object creation).
 </p>
 
- 
-<!-- ---------------------------------------------------------------------- -->
-<h3>Portable soundfile I/O</h3>
-  
 <p>
- Do a very simple implementation of audio file access, working only for
-.wav for instance.
+Add the action table, reintroduce evaluation stack
 </p>
 
-<!-- ---------------------------------------------------------------------- -->
-<h3>Misc</h3>
-  
 <p>
-<a name="tasks for release 3.2"></a>
-<table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
- <tbody>
-    <tr>
- <td valign="Middle">
-      <h2>Tasks for release 3.2</h2>
-      </td>
- </tr>
- 
-  </tbody>
-</table>
+Evaluate variables.c reimplementation
 </p>
-
+ 
  
 <!-- ---------------------------------------------------------------------- -->
 <h3>Multi-thread</h3>
   
 <p>
- Implement a message fifo. The message arguments should be in  a separate
+Implement a message fifo. The message arguments should be in  a separate
 buffer (allocator?) so that one message arguments are contiguous and cannot
 overlap.
 </p>
@@ -215,7 +140,7 @@ thread, as well as MIDI input.
 </p>
 
 <p>
- Do an async file reader (based on methods callback)
+Do an async file reader (based on methods callback)
 </p>
 
 <p>
@@ -223,14 +148,32 @@ Do a threaded Direct-to-Disk, using fifos and inter-thread messages
 </p>
 
 <!-- ---------------------------------------------------------------------- -->
+<h3>File format</h3>
+
 <p>
-<a name="non release related tasks"></a>
+Implement XML files with separates converters (jmax2xml and xml2jmax)
+</p>
+
+<p>
+ Implement file loading and saving by using "loader" and "saver" objects,
+that register themself as loaders and that are tried in turn when a file
+is opened. This way, you can open a text file as long as you have a loader
+object that understand text files. Caveat: the text file loader must be tried
+after the .pat loader, or it must understand that the file is a .pat and
+refuse to load it (which implies some knowledger between the different loader
+objects).
+</p>
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<a name="other tasks"></a>
 </p>
 <table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
  <tbody>
     <tr>
  <td valign="Middle">
-      <h2>Non release related tasks</h2>
+      <h2>other tasks</h2>
       </td>
  </tr>
   </tbody>
@@ -238,6 +181,25 @@ Do a threaded Direct-to-Disk, using fifos and inter-thread messages
 </p>
 
  
+<!-- ---------------------------------------------------------------------- -->
+<h3>Client/server</h3>
+
+<p>
+Implement a "remote" file box, derived from the Swing JFileChooser, but 
+that takes the file list from FTS, using objects and messages. This because 
+the machine running the client and the machine running the server do no longer
+share file system via NFS, and the files are loaded on the server.
+</p>
+
+<p>
+FTS data models:
+<ul>
+<li> package ircam.fts.data contains a collection of data models interfaces and a partial implementation
+of these interfaces using FtsObject (as in BoundedRangeModel and DefaultBoundedRangeModel)
+<li> objects that are used by the Java GUI delegate the model handling to a support class coming from ircam.fts.data (they do not derive from DefaultBlabalModel because they must also derive from GraphicObject where the graphic properties are managed)
+</ul>
+</p>
+
 <!-- ---------------------------------------------------------------------- -->
 <h3>Audio</h3>
   
@@ -259,10 +221,6 @@ with ALSA). Check ALSA version number.
 </p>
   
 <p>
- Help patches for SGI audio port
-</p>
-
-<p>
 ?? Fix adc~ with 0 channels
 </p>
 
@@ -271,10 +229,6 @@ with ALSA). Check ALSA version number.
   
 <p>
  Reintegrate compilation stuff for compilation date.
-</p>
-
-<p>
- Add the autoconf macros for guessing the JDK
 </p>
 
 <!-- ---------------------------------------------------------------------- -->
@@ -291,6 +245,18 @@ with ALSA). Check ALSA version number.
 <p>
  Doxygenate all .h
 </p>
+
+<!-- ---------------------------------------------------------------------- -->
+<h3>Platform embedding</h3>
+  
+<p>
+Do GNOME and KDE apps
+</p>
+
+<p>
+Evaluate use of Java Drag&amp;Drop API
+</p>
+
 
 <!-- ---------------------------------------------------------------------- -->
 <h3>User interface</h3>
@@ -335,18 +301,6 @@ annotation with a menu item </li>
 </ul>
   
 <p>
- Move graphic objects to packages:
-</p>
-<ul>
-  <li>graphic object defines Java class, FTS class, button, cursor </li>
-  <li>use of reflection API and JavaBeans property descriptors </li>
-</ul>
-  
-<p>
- Check editors on-line help
-</p>
-
-<p>
 Delete JMaxApplication.getProperty() and use system properties.
 </p>
 
@@ -365,6 +319,10 @@ be passed to a "print" object) and that opens a console when double-clicked.
 Add a pop-up menu with the list of all available objects (by package maybe).
 </p>
 
+<p>
+Introduce inlet/outlet assistance
+</p>
+
 <!-- ---------------------------------------------------------------------- -->
 <h3>Packaging</h3>
   
@@ -381,7 +339,6 @@ Add a pop-up menu with the list of all available objects (by package maybe).
 </p>
 
 
-
 <p>
  Do a DSP profiler using a thread and an object set for viewing results
 (sorted by objects, classes and patches)
@@ -394,16 +351,6 @@ Add a pop-up menu with the list of all available objects (by package maybe).
 <p>
  Use same mechanism for fts_midiport_class_init and fts_bytestream_class_init 
 as in fts_audioport_class_init
-</p>
-
-<p>
- Implement file loading and saving by using "loader" and "saver" objects,
-that register themself as loaders and that are tried in turn when a file
-is opened. This way, you can open a text file as long as you have a loader
-object that understand text files. Caveat: the text file loader must be tried
-after the .pat loader, or it must understand that the file is a .pat and
-refuse to load it (which implies some knowledger between the different loader
-objects).
 </p>
 
 <p>
