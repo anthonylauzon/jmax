@@ -851,8 +851,6 @@ void FtsServer::aEndMessage()
     return;
   }
 
-  ftsclient_log("[receive]: message \"%s\" for object[id=%d]\n", (const char*)_selector, _object->getID());
-
   _object->_callbacks->get( _selector, callback);
 
   if (callback)
