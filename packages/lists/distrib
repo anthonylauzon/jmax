@@ -4,14 +4,12 @@ all	all	lists.jpk
 all	irix62r4k	lib/irix62r4k/opt/liblists.so
 all	irix63r10k	lib/irix63r10k/opt/liblists.so
 all	irix63r5k	lib/irix63r5k/opt/liblists.so
-all	irix64r10k	lib/irix64r10k/opt/liblists.so
 all	irix65r10k	lib/irix65r10k/opt/liblists.so
 all	irix65r4k	lib/irix65r4k/opt/liblists.so
 all	irix65r5k	lib/irix65r5k/opt/liblists.so
 all	sgi		lib/irix62r4k/opt/liblists.so
 all	sgi		lib/irix63r10k/opt/liblists.so
 all	sgi		lib/irix63r5k/opt/liblists.so
-all	sgi		lib/irix64r10k/opt/liblists.so
 all	sgi		lib/irix65r10k/opt/liblists.so
 all	sgi		lib/irix65r4k/opt/liblists.so
 all	sgi		lib/irix65r5k/opt/liblists.so
