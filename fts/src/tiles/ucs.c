@@ -423,16 +423,19 @@ fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
 
 /* ucs function to set the default audio and midi ports */
 
-static fts_status_t
-fts_ucs_default_audio(int argc, const fts_atom_t *argv)
+static fts_status_t fts_ucs_default_audio(int argc, const fts_atom_t *argv)
 {
   if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
     {
       post( "Setting default audio port to \"");
       post_atoms( 1, argv);
-      post( "\" (arguments: ");
-      post_atoms( argc-1, argv+1);
-      post( ")\n");
+      post( "\"");
+      if (argc >= 2)
+	{
+	  post( "arguments: ");
+	  post_atoms( argc-1, argv+1);
+	  post( ")\n");
+	}
 
       fts_audioport_set_default( argc, argv);
     }
@@ -440,16 +443,19 @@ fts_ucs_default_audio(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
-static fts_status_t
-fts_ucs_default_midi(int argc, const fts_atom_t *argv)
+static fts_status_t fts_ucs_default_midi(int argc, const fts_atom_t *argv)
 {
   if ((argc >= 1)  && (fts_is_symbol(&argv[0])))
     { 
       post( "Setting default MIDI port to \"");
       post_atoms( 1, argv);
-      post( "\" (arguments: ");
-      post_atoms( argc-1, argv+1);
-      post( ")\n");
+      post( "\"");
+      if (argc >= 2)
+	{
+	  post( "arguments: ");
+	  post_atoms( argc-1, argv+1);
+	  post( ")\n");
+	}
 
       fts_midiport_set_default( argc, argv);
     }
