@@ -1,3 +1,4 @@
+
 ftsdir=$(includedir)/fts
 fts_HEADERS= \
 array.h \
@@ -23,6 +24,7 @@ fifo.h \
 fpe.h \
 ftl.h \
 ftlmem.h \
+ftmext.h \
 fts.h \
 function.h \
 hashtable.h \
@@ -59,5 +61,3 @@ tuple.h \
 types.h \
 update.h \
 variable.h
-
-
