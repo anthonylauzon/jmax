@@ -229,12 +229,18 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+/* this variable is accessed by macros, 
+   and implicitly used by the dsp compiler */
+
+fts_metaclass_t *fts_send_metaclass;
 
 static void
 internal_send_config(void)
 {
   fts_metaclass_create(fts_new_symbol("send"),send_instantiate, fts_always_equiv);
   fts_metaclass_alias(fts_new_symbol("s"),     fts_new_symbol("send"));
+
+  fts_send_metaclass = fts_metaclass_get_by_name(fts_new_symbol("send"));
 }
 
 
@@ -287,12 +293,18 @@ receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+/* this variable is accessed by macros, 
+   and implicitly used by the dsp compiler */
+
+fts_metaclass_t *fts_receive_metaclass;
 
 static void
 internal_receive_config(void)
 {
   fts_metaclass_create(fts_new_symbol("receive"),receive_instantiate, fts_always_equiv);
   fts_metaclass_alias(fts_new_symbol("r"), fts_new_symbol("receive"));
+
+  fts_receive_metaclass = fts_metaclass_get_by_name(fts_new_symbol("receive"));
 }
 
 
@@ -308,5 +320,21 @@ send_config(void)
 
   internal_send_config();
   internal_receive_config();
+}
+
+/* function to support the send/receive navigation */
+
+
+fts_object_t *fts_send_get_first_receive(fts_object_t *send)
+{
+  send_t *this = (send_t *) send;
+
+
+  return (fts_object_t *) this->receive_list->first_receive;
+}
+
+fts_object_t *fts_receive_get_next_receive(fts_object_t *receive)
+{
+  return (fts_object_t *) ((receive_t *)receive)->next_receive;
 }
 
