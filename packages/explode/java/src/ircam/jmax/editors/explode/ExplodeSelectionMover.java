@@ -168,7 +168,7 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
 	    if ((itsMovements & MoverTool.VERTICAL_MOVEMENT) != 0) 
 	      a.setY(tempEvent, a.getY(aScrEvent)+dy);
 	    
-	    er.render(tempEvent, g, true);
+	    er.render(tempEvent, g, true, gc);
 	    if (singleObject) 
 	      ScoreBackground.pressKey(tempEvent.getPitch(), gc);
 	  }

@@ -45,11 +45,6 @@ import java.awt.*;
 public interface ObjectRenderer {
 
   /**
-   * renders an object graphically, given an (awt) graphic context
-   */
-  public abstract void render(Object obj, Graphics g, boolean selected);
-
-  /**
    * renders an object graphically, given an (awt) graphic context AND a (toolkit) graphic context.
    * This variation is usefull for renderers that have to be used indipendently from a 
    * graphic context.
@@ -59,17 +54,7 @@ public interface ObjectRenderer {
   /**
    * returns true if the representation of given object contains the given (graphic) point
    */
-  public abstract boolean contains(Object obj, int x, int y);
-
-  /**
-   * returns true if the representation of given object contains the given (graphic) point
-   */
   public abstract boolean contains(Object obj, int x, int y, GraphicContext gc);
-
-  /**
-   * returns true if the representation of the given object "touches" the given rectangle
-   */
-  public abstract boolean touches(Object obj, int x, int y, int w, int h);
 
   /**
    * returns true if the representation of the given object "touches" the given rectangle

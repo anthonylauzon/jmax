@@ -88,7 +88,7 @@ public class ExplodeSelectionResizer extends SelectionResizer {
 	a.setY(tempEvent, a.getY(aScrEvent));
 
 	a.setLenght(tempEvent, a.getLenght(aScrEvent)+dx);
-	er.render(tempEvent, g, false);
+	er.render(tempEvent, g, false, gc);
       }
 	 
     g.setPaintMode();

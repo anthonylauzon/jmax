@@ -65,7 +65,7 @@ public class ScoreForeground implements Layer {
     for (Enumeration e = gc.getRenderManager().objectsIntersecting( r.x, r.y, r.width, r.height); e.hasMoreElements();) 
       {
 	temp = (ScrEvent) e.nextElement();
-	itsEventRenderer.render( temp, g, gc.getSelection().isInSelection(temp));
+	itsEventRenderer.render( temp, g, gc.getSelection().isInSelection(temp), gc);
       }
 
     g.setClip(tempr);

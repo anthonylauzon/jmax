@@ -95,7 +95,7 @@ public class ScoreRenderer extends AbstractRenderer{
       {      
 	aScrEvent = (ScrEvent) e.nextElement();
 
-	if (getObjectRenderer().contains(aScrEvent, x, y))
+	if (getObjectRenderer().contains(aScrEvent, x, y, gc))
 	  tempList.addElement(aScrEvent);
       }
 
@@ -118,7 +118,7 @@ public class ScoreRenderer extends AbstractRenderer{
       {      
 	aScrEvent = (ScrEvent) e.nextElement();
 
-	if (getObjectRenderer().contains(aScrEvent, x, y))
+	if (getObjectRenderer().contains(aScrEvent, x, y, gc))
 	  last = aScrEvent;
       }
 
@@ -142,7 +142,7 @@ public class ScoreRenderer extends AbstractRenderer{
       {
 	aScrEvent = (ScrEvent) e.nextElement();
 
-	if (getObjectRenderer().touches(aScrEvent, x, y, w, h))
+	if (getObjectRenderer().touches(aScrEvent, x, y, w, h, gc))
 	  {
 	    tempList.addElement(aScrEvent);
 	  }

@@ -476,7 +476,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolProvide
   JLabel itsZoomLabel;
 
   EditorToolbar tb;
-    /*static*/ ToolManager toolManager;
+  /*static*/ ToolManager toolManager;
   static boolean toolbarAnchored = true;
   
   InfoPanel itsStatusBar;
