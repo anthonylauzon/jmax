@@ -41,6 +41,7 @@ clean_c:
 
 install-exec:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/control
+	for f in *.jpk *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/control ; done
 	$(INSTALL_DATA) control.jpk $(lib_install_dir)/packages/control
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)

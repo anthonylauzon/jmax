@@ -50,7 +50,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(PACKAGE_ROOT)/classes ; /bin/rm -f table.jar ; jar -cvf table.jar ircam	)
+	(cd $(PACKAGE_ROOT)/java/classes ; /bin/rm -f table.jar ; jar -cvf table.jar ircam )
 .PHONY: jar
 
 

@@ -1,0 +1,8 @@
+require_vendor: 1
+distribution: Ircam
+vendor: Ircam
+rpmdir: .
+srcrpmdir: .
+sourcedir: /var/tmp/jmax-rpm/src
+specdir: .
+builddir: /var/tmp/jmax-rpm/build

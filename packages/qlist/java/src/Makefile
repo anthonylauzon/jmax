@@ -50,7 +50,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(PACKAGE_ROOT)/java/classes ; /bin/rm -f qlist.jar ; jar -cvf qlist.jar ircam	)
+	(cd $(PACKAGE_ROOT)/java/classes ; /bin/rm -f qlist.jar ; jar -cvf qlist.jar ircam )
 .PHONY: jar
 
 
