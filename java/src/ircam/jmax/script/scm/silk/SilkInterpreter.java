@@ -43,6 +43,10 @@ public class SilkInterpreter extends SchemeInterpreter
 { 
     /** The current environment used for the evaluation. */
     Environment currEnvironment;
+    Environment jmaxEnvironment;
+    //SettingsEnvironment jmaxSettings;
+    Environment jmaxSettings;
+    Environment schemeEnvironment;
 
     /** The Silk object ued for the evaluation. */
     Scheme itsInterp;
@@ -59,12 +63,15 @@ public class SilkInterpreter extends SchemeInterpreter
 
     class loadProcedure extends Procedure {
 	public Object apply(Scheme interpreter, Object args) {
+	    String name = "<unknown>";
 	    try {
-		load(new String((char[]) first(args)));
-		return "OK";
+		name = new String((char[]) first(args)); 
+		load(name);
+		return Boolean.TRUE;
 	    } catch (Exception e) {
-		e.printStackTrace(output);
-		return "Failed";
+		String m = (e.getMessage() != null) ? e.getMessage() : e.getClass().getName();
+		System.out.println("Can't load file " + name + ": " + m);
+		return Boolean.FALSE;
 	    }
 	}
     }
@@ -75,14 +82,13 @@ public class SilkInterpreter extends SchemeInterpreter
 	super();
 	itsInterp = new Scheme(null);
 
-	Environment schemeEnvironment = new Environment();
+	//schemeEnvironment = new Environment();
+	schemeEnvironment = new SettingsEnvironment();
 	setCurrentEnvironment(schemeEnvironment);
+	define("these-settings", schemeEnvironment);
+
 	Primitive.installPrimitives(schemeEnvironment); 
 	load(new InputPort(new StringReader(SchemePrimitives.CODE)));
-
-	Environment usrEnvironment = new Environment();
-	usrEnvironment.parent = schemeEnvironment;
-	setCurrentEnvironment(usrEnvironment);
 
 	/* By default use the standard in/out */
 	setInput(new InputPort(System.in));
@@ -95,6 +101,8 @@ public class SilkInterpreter extends SchemeInterpreter
 	/* FIXME should disappear as soon as Silk is more complete. */
 	define("constructor", SilkJavaConstructor.getFactory());
 	define("method", SilkJavaMethod.getFactory());
+	define("invoke", new SilkJavaInvoke(SilkJavaInvoke.VIRTUAL));
+	define("invoke-static", new SilkJavaInvoke(SilkJavaInvoke.STATIC));
 	define("load", new loadProcedure());
     }
 
@@ -102,6 +110,11 @@ public class SilkInterpreter extends SchemeInterpreter
     {
 	try
 	    {
+		//jmaxSettings = new SettingsEnvironment();
+		jmaxSettings = new Environment();
+		jmaxSettings.parent = schemeEnvironment;
+		setCurrentEnvironment(jmaxSettings);
+
 		/* Define jmaxInterp so all Scheme file have acces to
                  * this object. The root property is also exported to
                  * Scheme for succesful living in the interpreter
@@ -117,13 +130,22 @@ public class SilkInterpreter extends SchemeInterpreter
 		 * and "this-package" manually */
 		define("dir", root);
 		define("this-package", "");
+
+		jmaxEnvironment = new Environment();
+		jmaxEnvironment.parent = jmaxSettings;
+		setCurrentEnvironment(jmaxEnvironment);
+		
 		/* Load the "jmaxboot.scm" file that will do whatever is needed to
 		 * create the startup configuration, included reading user files
 		 * installing editors, data types and data handlers. */
-		load(root + System.getProperty("file.separator") + "scm" +
-		     System.getProperty("file.separator") +  "jmaxboot.scm");
+		load(root + File.separator + "scm" + File.separator +  "jmaxboot.scm");
+
+		Environment usrEnvironment = new Environment();
+		usrEnvironment.parent = jmaxEnvironment;
+		setCurrentEnvironment(usrEnvironment);
+
 	    }
-	catch (ScriptException e)
+	catch (Exception e)
 	    {
 		throw new ScriptException("Scheme error in initialization: " + e.getMessage());
 	    }	
@@ -189,8 +211,11 @@ public class SilkInterpreter extends SchemeInterpreter
     {
 	try  {
 	    return load(new InputPort(new FileReader(file)));	
-	} catch (IOException e) {
-	    throw new ScriptException(e.getMessage());
+	} catch (ScriptException sex) {
+	    throw sex;
+	} catch (Exception e) {
+	    String m = (e.getMessage() != null) ? e.getMessage() : e.getClass().getName();	    
+	    throw new ScriptException(m);
 	}
     }
 
@@ -198,8 +223,11 @@ public class SilkInterpreter extends SchemeInterpreter
     {
 	try  {
 	    return load(new InputPort(new FileReader(path)));
-	} catch (IOException e) {
-	    throw new ScriptException(e.getMessage());
+	} catch (ScriptException sex) {
+	    throw sex;
+	} catch (Exception ex) {
+	    String m = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getName();	    
+	    throw new ScriptException(m);
 	}
     }
 
@@ -207,22 +235,20 @@ public class SilkInterpreter extends SchemeInterpreter
      *  input stream using the current environment. */
     public Object load(InputPort in) throws ScriptException 
     {
-	try  
-	    {
-		Object x = null;
-		Object y = null;
-		while (true) {
-		    x = in.read();
-		    if (InputPort.isEOF(x)) {
-			return y;
-		    }
-		    y = itsInterp.eval(x, currEnvironment); 
+	try {
+	    Object x = null;
+	    Object y = null;
+	    while (true) {
+		x = in.read();
+		if (InputPort.isEOF(x)) {
+		    return y;
 		}
+		y = itsInterp.eval(x, currEnvironment); 
 	    }
-	catch (Exception e) 
-	    {
-		throw new ScriptException(e.getMessage());
-	    }
+	} catch (Exception ex) {
+	    String m = (ex.getMessage() != null) ? ex.getClass().getName() + ": " + ex.getMessage() : ex.getClass().getName();	    
+	    throw new ScriptException(m);
+	}
     }
 
     public Script convert(Object script) throws ScriptException
@@ -319,3 +345,7 @@ public class SilkInterpreter extends SchemeInterpreter
 	new SilkInterpreter().readEvalWriteLoop();
     }
 }
+
+
+
+
