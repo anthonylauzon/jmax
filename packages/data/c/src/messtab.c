@@ -674,6 +674,60 @@ messtab_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pr
 }
 
 static void
+messtab_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtab_t *this = (messtab_t *)o;
+  fts_iterator_t iterators[2];
+  fts_message_t *mess;
+  int size;
+  int tab;
+
+  size = fts_hashtable_get_size(&this->table_int) + fts_hashtable_get_size(&this->table_symbol);
+
+  if(size > 0)
+    {
+      post("(%d entrie%s) {\n", size, (size == 1)? "": "s");
+      
+      fts_hashtable_get_keys(&this->table_int, iterators + 0);
+      fts_hashtable_get_keys(&this->table_symbol, iterators + 1);
+      
+      for(tab=0; tab<2; tab++)
+	{
+	  fts_iterator_t *iterator = iterators + tab;
+	  
+	  while(fts_iterator_has_more(iterator))
+	    {
+	      fts_atom_t key;
+	      fts_message_t *mess;
+	      fts_symbol_t mess_s;
+	      int mess_ac;
+	      const fts_atom_t *mess_at;
+	      
+	      fts_iterator_next(iterator, &key);
+	      messtab_get_entry(this, &key, &mess_s, &mess_ac, &mess_at);
+	      
+	      if(fts_is_int(&key))
+		post("  %d: ", fts_get_int(&key));
+	      else
+		post("  %s: ", fts_symbol_name(fts_get_symbol(&key)));
+	      
+	      if(mess_s)
+		post("%s ", fts_symbol_name(mess_s));
+	      
+	      if(mess_ac)
+		post_atoms(mess_ac, mess_at);
+	      
+	      post("\n");
+	    }
+	}
+      
+      post("}\n");
+    }
+  else
+    post("(empty messtab)\n");
+}
+
+static void
 messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
@@ -751,7 +805,10 @@ messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, messtab_set_from_instance);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, messtab_put);
 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear, messtab_clear);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, messtab_dump);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, messtab_print);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, messtab_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, messtab_get_keep);

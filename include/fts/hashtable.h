@@ -82,6 +82,8 @@ typedef struct {
 #define FTS_HASHTABLE_MEDIUM 2
 #define FTS_HASHTABLE_BIG 3
 
+#define fts_hashtable_get_size(h) ((h)->count)
+
 /**
  * Initializes a hashtable
  *

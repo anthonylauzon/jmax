@@ -1,8 +1,10 @@
 #!/bin/sh
+set -x
 JMAX_TOPDIR=`echo $PWD`
 aclocal -I m4
+libtoolize --automake --copy
 autoconf
-automake --foreign
+automake --foreign -v --add-missing --copy
 (
     cd client
     aclocal

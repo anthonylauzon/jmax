@@ -255,6 +255,9 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 			  mess_at = fts_message_get_at(mess);
 			  
 			  fts_send_message(object, fts_SystemInlet, fts_message_get_selector(mess), mess_ac, mess_at);
+			  
+			  /* reset message */
+			  fts_message_set(mess, 0, 0, 0);
 			}
 		    }
 		  else if(sym == fts_s_semi)

@@ -271,45 +271,119 @@ static void
 midievent_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
-  int type = this->type;
-  
-  if(fts_midievent_is_channel_message(this))
-    {
-      int byte1 = this->data.channel_message.first;
-      int byte2 = this->data.channel_message.second;
-      
-      switch (this->type)
-	{
-	case midi_type_note:
-	  post("{note (%d) %d %d}\n", this->id + 1, byte1, byte2);
-	  break;
-	  
-	case midi_type_poly_pressure:
-	  post("{poly pressure (%d) %d %d}\n", this->id + 1, byte1, byte2);
-	  break;
-	  
-	case midi_type_control_change:
-	  post("{control change (%d) %d %d}\n", this->id + 1, byte1, byte2);
-	  break;
-	  
-	case midi_type_program_change:
-	  post("{program change (%d) %d}\n", this->id + 1, byte1);
-	  break;
-	  
-	case midi_type_channel_pressure:		
-	  post("{channel pressure (%d) %d}\n", this->id + 1, byte1);
-	  break;
-	  
-	case midi_type_pitch_bend:
-	  post("{pitch bend (%d) %d %d}\n", this->id + 1, byte1, byte2);
-	  break;
+  int type = fts_midievent_get_type(this);
 
-	default:
-	  break;	  
-	}
+  switch (type)
+    {
+    case midi_type_note:
+      post("{<note> %d %d %d}\n",
+	   fts_midievent_channel_message_get_first(this), 
+	   fts_midievent_channel_message_get_second(this),
+	   fts_midievent_get_id(this) + 1);
+      break;
+      
+    case midi_type_poly_pressure:
+      post("{<poly pressure> %d %d %d}\n",
+	   fts_midievent_channel_message_get_first(this), 
+	   fts_midievent_channel_message_get_second(this),
+	   fts_midievent_get_id(this) + 1);
+      break;
+      
+    case midi_type_control_change:
+      post("{<control change> %d %d %d}\n",
+	   fts_midievent_channel_message_get_first(this), 
+	   fts_midievent_channel_message_get_second(this),
+	   fts_midievent_get_id(this) + 1);
+      break;
+      
+    case midi_type_program_change:
+      post("{<program change> %d %d}\n", 
+	   fts_midievent_channel_message_get_first(this), 
+	   fts_midievent_get_id(this) + 1);
+      break;
+      
+    case midi_type_channel_pressure:		
+      post("{<channel pressure> %d %d}\n", 
+	   fts_midievent_channel_message_get_first(this), 
+	   fts_midievent_get_id(this) + 1);
+      break;
+      
+    case midi_type_pitch_bend:
+      post("{<pitch bend> %d %d %d}\n",
+	   fts_midievent_channel_message_get_first(this), 
+	   fts_midievent_channel_message_get_second(this),
+	   fts_midievent_get_id(this) + 1);
+      break;
+      
+    case midi_type_system: 
+      {
+	int id = fts_midievent_get_id(this);
+	
+	switch(id)
+	  {
+	  case midi_system_exclusive:
+	    post("{<system exclusive message>}\n");
+	    break;
+
+	  case midi_time_code:
+	    post("{<time code (%d)> %d %d %d %d}\n",
+		 fts_midievent_time_code_get_type(this),
+		 fts_midievent_time_code_get_hour(this),
+		 fts_midievent_time_code_get_minute(this),
+		 fts_midievent_time_code_get_second(this),
+		 fts_midievent_time_code_get_frame(this));
+	    break;
+
+	  case midi_song_position_pointer:
+	    break;
+
+	  case midi_song_select:
+	    break;
+
+	  case midi_tune_request:
+	    break;
+
+	  case midi_real_time:
+	    {
+	      int mess = fts_midievent_real_time_get(this);
+	    
+	      switch(mess)
+		{
+		case midi_timing_clock:
+		  post("{<timing clock tick>}\n");
+		  break;
+
+		case midi_undefined_0:
+		  post("{<undefined real-time message>}\n");
+		  break;
+
+		case midi_start:
+		  post("{<start>}\n");
+		  break;
+
+		case midi_continue:
+		  post("{<continue>}\n");
+		  break;
+
+		case midi_stop:
+		  post("{<stop>}\n");
+		  break;
+
+		case midi_undefined_1:
+		  post("{<undefined real-time message>}\n");
+		  break;
+
+		case midi_active_sensing:
+		  post("{<active sensing>}\n");
+		  break;
+
+		case midi_system_reset:
+		  post("{<reset>}\n");
+		}
+	    }
+	  }
+      }
     }
-  else
-    post("midi system message");
 }
 
 static void
@@ -465,7 +539,7 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
   if(byte >= midi_status_timing_clock)
     {
       /* system real-time messages */
-      fts_midievent_t *event = fts_midievent_real_time_new((int)byte - midi_status_timing_clock + 1);
+      fts_midievent_t *event = fts_midievent_real_time_new((int)byte - midi_status_timing_clock);
       
       fts_midiport_input(port, event, 0.0);
     }

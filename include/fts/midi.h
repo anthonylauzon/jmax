@@ -63,11 +63,11 @@ enum midi_real_time_event
 {
   midi_real_time_any = -1,
   midi_timing_clock = 0,
-  midi_undefined_2,
+  midi_undefined_0,
   midi_start,
   midi_continue,
   midi_stop,
-  midi_undefined_3,
+  midi_undefined_1,
   midi_active_sensing,
   midi_system_reset,
   n_midi_real_time_events

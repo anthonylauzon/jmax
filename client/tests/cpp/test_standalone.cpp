@@ -101,7 +101,7 @@ main( int ac, char **av)
       if (pipe)
 	args.add( "--stdio");
 
-      fts = new FtsProcess( "/u/worksta/dechelle/projects/jmax/3.0.0/jmax-install/bin/fts", args);
+      fts = new FtsProcess( "/u/worksta/schnell/projects/jmax-install/bin/fts", args);
 
       FtsServerConnection *connection;
       if (pipe)
