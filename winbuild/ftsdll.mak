@@ -25,10 +25,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "ftsdll - Win32 Release"
 
 OUTDIR=.\..\fts\lib
@@ -43,17 +39,23 @@ CLEAN :
 	-@erase "$(INTDIR)\atom.obj"
 	-@erase "$(INTDIR)\atomfile.obj"
 	-@erase "$(INTDIR)\audio.obj"
+	-@erase "$(INTDIR)\audioconfig.obj"
+	-@erase "$(INTDIR)\audiofile.obj"
 	-@erase "$(INTDIR)\autosave.obj"
+	-@erase "$(INTDIR)\binaryprotocol.obj"
+	-@erase "$(INTDIR)\bmaxfile.obj"
 	-@erase "$(INTDIR)\bytestream.obj"
 	-@erase "$(INTDIR)\class.obj"
 	-@erase "$(INTDIR)\client.obj"
+	-@erase "$(INTDIR)\clientmanager.obj"
 	-@erase "$(INTDIR)\clipboard.obj"
+	-@erase "$(INTDIR)\config.obj"
 	-@erase "$(INTDIR)\connection.obj"
-	-@erase "$(INTDIR)\doctor.obj"
 	-@erase "$(INTDIR)\dsp.obj"
 	-@erase "$(INTDIR)\dspgraph.obj"
 	-@erase "$(INTDIR)\errobj.obj"
 	-@erase "$(INTDIR)\expression.obj"
+	-@erase "$(INTDIR)\fifo.obj"
 	-@erase "$(INTDIR)\file.obj"
 	-@erase "$(INTDIR)\fpe.obj"
 	-@erase "$(INTDIR)\ftl.obj"
@@ -70,30 +72,31 @@ CLEAN :
 	-@erase "$(INTDIR)\object.obj"
 	-@erase "$(INTDIR)\objectlist.obj"
 	-@erase "$(INTDIR)\objectset.obj"
-	-@erase "$(INTDIR)\objtable.obj"
-	-@erase "$(INTDIR)\OLDclient.obj"
 	-@erase "$(INTDIR)\package.obj"
 	-@erase "$(INTDIR)\param.obj"
+	-@erase "$(INTDIR)\parser.obj"
 	-@erase "$(INTDIR)\patcher.obj"
-	-@erase "$(INTDIR)\patparser.obj"
+	-@erase "$(INTDIR)\patfile.obj"
 	-@erase "$(INTDIR)\post.obj"
+	-@erase "$(INTDIR)\preset.obj"
 	-@erase "$(INTDIR)\project.obj"
 	-@erase "$(INTDIR)\property.obj"
-	-@erase "$(INTDIR)\saver.obj"
 	-@erase "$(INTDIR)\sched.obj"
 	-@erase "$(INTDIR)\selection.obj"
 	-@erase "$(INTDIR)\sigconn.obj"
-	-@erase "$(INTDIR)\soundfile.obj"
-	-@erase "$(INTDIR)\soundfile_def.obj"
-	-@erase "$(INTDIR)\srconv.obj"
+	-@erase "$(INTDIR)\socketstream.obj"
 	-@erase "$(INTDIR)\stack.obj"
+	-@erase "$(INTDIR)\status.obj"
 	-@erase "$(INTDIR)\symbol.obj"
 	-@erase "$(INTDIR)\template.obj"
+	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\time.obj"
+	-@erase "$(INTDIR)\tokenizer.obj"
+	-@erase "$(INTDIR)\tuple.obj"
+	-@erase "$(INTDIR)\update.obj"
 	-@erase "$(INTDIR)\variable.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\version.obj"
-	-@erase "$(INTDIR)\vm.obj"
 	-@erase "$(INTDIR)\win32.obj"
 	-@erase "$(OUTDIR)\fts.exp"
 	-@erase "$(OUTDIR)\fts.lib"
@@ -105,228 +108,8 @@ CLEAN :
 "$(INTDIR)" :
     if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\fts.pdb" /machine:I386 /out:"..\bin\fts.dll" /implib:"$(OUTDIR)\fts.lib" 
-LINK32_OBJS= \
-	"$(INTDIR)\abstraction.obj" \
-	"$(INTDIR)\array.obj" \
-	"$(INTDIR)\atom.obj" \
-	"$(INTDIR)\atomfile.obj" \
-	"$(INTDIR)\audio.obj" \
-	"$(INTDIR)\autosave.obj" \
-	"$(INTDIR)\bytestream.obj" \
-	"$(INTDIR)\class.obj" \
-	"$(INTDIR)\client.obj" \
-	"$(INTDIR)\clipboard.obj" \
-	"$(INTDIR)\connection.obj" \
-	"$(INTDIR)\doctor.obj" \
-	"$(INTDIR)\dsp.obj" \
-	"$(INTDIR)\dspgraph.obj" \
-	"$(INTDIR)\errobj.obj" \
-	"$(INTDIR)\expression.obj" \
-	"$(INTDIR)\file.obj" \
-	"$(INTDIR)\fpe.obj" \
-	"$(INTDIR)\ftl.obj" \
-	"$(INTDIR)\ftlmem.obj" \
-	"$(INTDIR)\fts.obj" \
-	"$(INTDIR)\hashtable.obj" \
-	"$(INTDIR)\label.obj" \
-	"$(INTDIR)\list.obj" \
-	"$(INTDIR)\loader.obj" \
-	"$(INTDIR)\mem.obj" \
-	"$(INTDIR)\message.obj" \
-	"$(INTDIR)\midi.obj" \
-	"$(INTDIR)\midifile.obj" \
-	"$(INTDIR)\object.obj" \
-	"$(INTDIR)\objectlist.obj" \
-	"$(INTDIR)\objectset.obj" \
-	"$(INTDIR)\objtable.obj" \
-	"$(INTDIR)\OLDclient.obj" \
-	"$(INTDIR)\package.obj" \
-	"$(INTDIR)\param.obj" \
-	"$(INTDIR)\patcher.obj" \
-	"$(INTDIR)\patparser.obj" \
-	"$(INTDIR)\post.obj" \
-	"$(INTDIR)\project.obj" \
-	"$(INTDIR)\property.obj" \
-	"$(INTDIR)\saver.obj" \
-	"$(INTDIR)\sched.obj" \
-	"$(INTDIR)\selection.obj" \
-	"$(INTDIR)\sigconn.obj" \
-	"$(INTDIR)\soundfile.obj" \
-	"$(INTDIR)\soundfile_def.obj" \
-	"$(INTDIR)\srconv.obj" \
-	"$(INTDIR)\stack.obj" \
-	"$(INTDIR)\symbol.obj" \
-	"$(INTDIR)\template.obj" \
-	"$(INTDIR)\time.obj" \
-	"$(INTDIR)\variable.obj" \
-	"$(INTDIR)\version.obj" \
-	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj"
-
-"..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "ftsdll - Win32 Debug"
-
-OUTDIR=.\..\fts\lib
-INTDIR=.\Debug
-
-ALL : "..\bin\fts.dll"
-
-
-CLEAN :
-	-@erase "$(INTDIR)\abstraction.obj"
-	-@erase "$(INTDIR)\array.obj"
-	-@erase "$(INTDIR)\atom.obj"
-	-@erase "$(INTDIR)\atomfile.obj"
-	-@erase "$(INTDIR)\audio.obj"
-	-@erase "$(INTDIR)\autosave.obj"
-	-@erase "$(INTDIR)\bytestream.obj"
-	-@erase "$(INTDIR)\class.obj"
-	-@erase "$(INTDIR)\client.obj"
-	-@erase "$(INTDIR)\clipboard.obj"
-	-@erase "$(INTDIR)\connection.obj"
-	-@erase "$(INTDIR)\doctor.obj"
-	-@erase "$(INTDIR)\dsp.obj"
-	-@erase "$(INTDIR)\dspgraph.obj"
-	-@erase "$(INTDIR)\errobj.obj"
-	-@erase "$(INTDIR)\expression.obj"
-	-@erase "$(INTDIR)\file.obj"
-	-@erase "$(INTDIR)\fpe.obj"
-	-@erase "$(INTDIR)\ftl.obj"
-	-@erase "$(INTDIR)\ftlmem.obj"
-	-@erase "$(INTDIR)\fts.obj"
-	-@erase "$(INTDIR)\hashtable.obj"
-	-@erase "$(INTDIR)\label.obj"
-	-@erase "$(INTDIR)\list.obj"
-	-@erase "$(INTDIR)\loader.obj"
-	-@erase "$(INTDIR)\mem.obj"
-	-@erase "$(INTDIR)\message.obj"
-	-@erase "$(INTDIR)\midi.obj"
-	-@erase "$(INTDIR)\midifile.obj"
-	-@erase "$(INTDIR)\object.obj"
-	-@erase "$(INTDIR)\objectlist.obj"
-	-@erase "$(INTDIR)\objectset.obj"
-	-@erase "$(INTDIR)\objtable.obj"
-	-@erase "$(INTDIR)\OLDclient.obj"
-	-@erase "$(INTDIR)\package.obj"
-	-@erase "$(INTDIR)\param.obj"
-	-@erase "$(INTDIR)\patcher.obj"
-	-@erase "$(INTDIR)\patparser.obj"
-	-@erase "$(INTDIR)\post.obj"
-	-@erase "$(INTDIR)\project.obj"
-	-@erase "$(INTDIR)\property.obj"
-	-@erase "$(INTDIR)\saver.obj"
-	-@erase "$(INTDIR)\sched.obj"
-	-@erase "$(INTDIR)\selection.obj"
-	-@erase "$(INTDIR)\sigconn.obj"
-	-@erase "$(INTDIR)\soundfile.obj"
-	-@erase "$(INTDIR)\soundfile_def.obj"
-	-@erase "$(INTDIR)\srconv.obj"
-	-@erase "$(INTDIR)\stack.obj"
-	-@erase "$(INTDIR)\symbol.obj"
-	-@erase "$(INTDIR)\template.obj"
-	-@erase "$(INTDIR)\time.obj"
-	-@erase "$(INTDIR)\variable.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(INTDIR)\version.obj"
-	-@erase "$(INTDIR)\vm.obj"
-	-@erase "$(INTDIR)\win32.obj"
-	-@erase "$(OUTDIR)\fts.exp"
-	-@erase "$(OUTDIR)\fts.lib"
-	-@erase "$(OUTDIR)\fts.pdb"
-	-@erase "..\bin\fts.dll"
-	-@erase "..\bin\fts.ilk"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-"$(INTDIR)" :
-    if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
-
-CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
-MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"..\bin\fts.dll" /implib:"$(OUTDIR)\fts.lib" /pdbtype:sept 
-LINK32_OBJS= \
-	"$(INTDIR)\abstraction.obj" \
-	"$(INTDIR)\array.obj" \
-	"$(INTDIR)\atom.obj" \
-	"$(INTDIR)\atomfile.obj" \
-	"$(INTDIR)\audio.obj" \
-	"$(INTDIR)\autosave.obj" \
-	"$(INTDIR)\bytestream.obj" \
-	"$(INTDIR)\class.obj" \
-	"$(INTDIR)\client.obj" \
-	"$(INTDIR)\clipboard.obj" \
-	"$(INTDIR)\connection.obj" \
-	"$(INTDIR)\doctor.obj" \
-	"$(INTDIR)\dsp.obj" \
-	"$(INTDIR)\dspgraph.obj" \
-	"$(INTDIR)\errobj.obj" \
-	"$(INTDIR)\expression.obj" \
-	"$(INTDIR)\file.obj" \
-	"$(INTDIR)\fpe.obj" \
-	"$(INTDIR)\ftl.obj" \
-	"$(INTDIR)\ftlmem.obj" \
-	"$(INTDIR)\fts.obj" \
-	"$(INTDIR)\hashtable.obj" \
-	"$(INTDIR)\label.obj" \
-	"$(INTDIR)\list.obj" \
-	"$(INTDIR)\loader.obj" \
-	"$(INTDIR)\mem.obj" \
-	"$(INTDIR)\message.obj" \
-	"$(INTDIR)\midi.obj" \
-	"$(INTDIR)\midifile.obj" \
-	"$(INTDIR)\object.obj" \
-	"$(INTDIR)\objectlist.obj" \
-	"$(INTDIR)\objectset.obj" \
-	"$(INTDIR)\objtable.obj" \
-	"$(INTDIR)\OLDclient.obj" \
-	"$(INTDIR)\package.obj" \
-	"$(INTDIR)\param.obj" \
-	"$(INTDIR)\patcher.obj" \
-	"$(INTDIR)\patparser.obj" \
-	"$(INTDIR)\post.obj" \
-	"$(INTDIR)\project.obj" \
-	"$(INTDIR)\property.obj" \
-	"$(INTDIR)\saver.obj" \
-	"$(INTDIR)\sched.obj" \
-	"$(INTDIR)\selection.obj" \
-	"$(INTDIR)\sigconn.obj" \
-	"$(INTDIR)\soundfile.obj" \
-	"$(INTDIR)\soundfile_def.obj" \
-	"$(INTDIR)\srconv.obj" \
-	"$(INTDIR)\stack.obj" \
-	"$(INTDIR)\symbol.obj" \
-	"$(INTDIR)\template.obj" \
-	"$(INTDIR)\time.obj" \
-	"$(INTDIR)\variable.obj" \
-	"$(INTDIR)\version.obj" \
-	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj"
-
-"..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ENDIF 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -357,6 +140,285 @@ LINK32_OBJS= \
    $(CPP) @<<
    $(CPP_PROJ) $< 
 <<
+
+MTL=midl.exe
+MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
+RSC=rc.exe
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\fts.pdb" /machine:I386 /out:"..\bin\fts.dll" /implib:"$(OUTDIR)\fts.lib" 
+LINK32_OBJS= \
+	"$(INTDIR)\abstraction.obj" \
+	"$(INTDIR)\array.obj" \
+	"$(INTDIR)\atom.obj" \
+	"$(INTDIR)\atomfile.obj" \
+	"$(INTDIR)\audio.obj" \
+	"$(INTDIR)\audioconfig.obj" \
+	"$(INTDIR)\audiofile.obj" \
+	"$(INTDIR)\autosave.obj" \
+	"$(INTDIR)\binaryprotocol.obj" \
+	"$(INTDIR)\bmaxfile.obj" \
+	"$(INTDIR)\bytestream.obj" \
+	"$(INTDIR)\class.obj" \
+	"$(INTDIR)\client.obj" \
+	"$(INTDIR)\clientmanager.obj" \
+	"$(INTDIR)\clipboard.obj" \
+	"$(INTDIR)\config.obj" \
+	"$(INTDIR)\connection.obj" \
+	"$(INTDIR)\dsp.obj" \
+	"$(INTDIR)\dspgraph.obj" \
+	"$(INTDIR)\errobj.obj" \
+	"$(INTDIR)\expression.obj" \
+	"$(INTDIR)\fifo.obj" \
+	"$(INTDIR)\file.obj" \
+	"$(INTDIR)\fpe.obj" \
+	"$(INTDIR)\ftl.obj" \
+	"$(INTDIR)\ftlmem.obj" \
+	"$(INTDIR)\fts.obj" \
+	"$(INTDIR)\hashtable.obj" \
+	"$(INTDIR)\label.obj" \
+	"$(INTDIR)\list.obj" \
+	"$(INTDIR)\loader.obj" \
+	"$(INTDIR)\mem.obj" \
+	"$(INTDIR)\message.obj" \
+	"$(INTDIR)\midi.obj" \
+	"$(INTDIR)\midifile.obj" \
+	"$(INTDIR)\object.obj" \
+	"$(INTDIR)\objectlist.obj" \
+	"$(INTDIR)\objectset.obj" \
+	"$(INTDIR)\package.obj" \
+	"$(INTDIR)\param.obj" \
+	"$(INTDIR)\parser.obj" \
+	"$(INTDIR)\patcher.obj" \
+	"$(INTDIR)\patfile.obj" \
+	"$(INTDIR)\post.obj" \
+	"$(INTDIR)\preset.obj" \
+	"$(INTDIR)\project.obj" \
+	"$(INTDIR)\property.obj" \
+	"$(INTDIR)\sched.obj" \
+	"$(INTDIR)\selection.obj" \
+	"$(INTDIR)\sigconn.obj" \
+	"$(INTDIR)\socketstream.obj" \
+	"$(INTDIR)\stack.obj" \
+	"$(INTDIR)\status.obj" \
+	"$(INTDIR)\symbol.obj" \
+	"$(INTDIR)\template.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\time.obj" \
+	"$(INTDIR)\tokenizer.obj" \
+	"$(INTDIR)\tuple.obj" \
+	"$(INTDIR)\update.obj" \
+	"$(INTDIR)\variable.obj" \
+	"$(INTDIR)\version.obj" \
+	"$(INTDIR)\win32.obj"
+
+"..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+!ELSEIF  "$(CFG)" == "ftsdll - Win32 Debug"
+
+OUTDIR=.\..\fts\lib
+INTDIR=.\Debug
+
+ALL : "..\bin\fts.dll"
+
+
+CLEAN :
+	-@erase "$(INTDIR)\abstraction.obj"
+	-@erase "$(INTDIR)\array.obj"
+	-@erase "$(INTDIR)\atom.obj"
+	-@erase "$(INTDIR)\atomfile.obj"
+	-@erase "$(INTDIR)\audio.obj"
+	-@erase "$(INTDIR)\audioconfig.obj"
+	-@erase "$(INTDIR)\audiofile.obj"
+	-@erase "$(INTDIR)\autosave.obj"
+	-@erase "$(INTDIR)\binaryprotocol.obj"
+	-@erase "$(INTDIR)\bmaxfile.obj"
+	-@erase "$(INTDIR)\bytestream.obj"
+	-@erase "$(INTDIR)\class.obj"
+	-@erase "$(INTDIR)\client.obj"
+	-@erase "$(INTDIR)\clientmanager.obj"
+	-@erase "$(INTDIR)\clipboard.obj"
+	-@erase "$(INTDIR)\config.obj"
+	-@erase "$(INTDIR)\connection.obj"
+	-@erase "$(INTDIR)\dsp.obj"
+	-@erase "$(INTDIR)\dspgraph.obj"
+	-@erase "$(INTDIR)\errobj.obj"
+	-@erase "$(INTDIR)\expression.obj"
+	-@erase "$(INTDIR)\fifo.obj"
+	-@erase "$(INTDIR)\file.obj"
+	-@erase "$(INTDIR)\fpe.obj"
+	-@erase "$(INTDIR)\ftl.obj"
+	-@erase "$(INTDIR)\ftlmem.obj"
+	-@erase "$(INTDIR)\fts.obj"
+	-@erase "$(INTDIR)\hashtable.obj"
+	-@erase "$(INTDIR)\label.obj"
+	-@erase "$(INTDIR)\list.obj"
+	-@erase "$(INTDIR)\loader.obj"
+	-@erase "$(INTDIR)\mem.obj"
+	-@erase "$(INTDIR)\message.obj"
+	-@erase "$(INTDIR)\midi.obj"
+	-@erase "$(INTDIR)\midifile.obj"
+	-@erase "$(INTDIR)\object.obj"
+	-@erase "$(INTDIR)\objectlist.obj"
+	-@erase "$(INTDIR)\objectset.obj"
+	-@erase "$(INTDIR)\package.obj"
+	-@erase "$(INTDIR)\param.obj"
+	-@erase "$(INTDIR)\parser.obj"
+	-@erase "$(INTDIR)\patcher.obj"
+	-@erase "$(INTDIR)\patfile.obj"
+	-@erase "$(INTDIR)\post.obj"
+	-@erase "$(INTDIR)\preset.obj"
+	-@erase "$(INTDIR)\project.obj"
+	-@erase "$(INTDIR)\property.obj"
+	-@erase "$(INTDIR)\sched.obj"
+	-@erase "$(INTDIR)\selection.obj"
+	-@erase "$(INTDIR)\sigconn.obj"
+	-@erase "$(INTDIR)\socketstream.obj"
+	-@erase "$(INTDIR)\stack.obj"
+	-@erase "$(INTDIR)\status.obj"
+	-@erase "$(INTDIR)\symbol.obj"
+	-@erase "$(INTDIR)\template.obj"
+	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\time.obj"
+	-@erase "$(INTDIR)\tokenizer.obj"
+	-@erase "$(INTDIR)\tuple.obj"
+	-@erase "$(INTDIR)\update.obj"
+	-@erase "$(INTDIR)\variable.obj"
+	-@erase "$(INTDIR)\vc60.idb"
+	-@erase "$(INTDIR)\vc60.pdb"
+	-@erase "$(INTDIR)\version.obj"
+	-@erase "$(INTDIR)\win32.obj"
+	-@erase "$(OUTDIR)\fts.exp"
+	-@erase "$(OUTDIR)\fts.lib"
+	-@erase "$(OUTDIR)\fts.pdb"
+	-@erase "..\bin\fts.dll"
+	-@erase "..\bin\fts.ilk"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+"$(INTDIR)" :
+    if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
+
+CPP=cl.exe
+CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSDLL_EXPORTS" /Fp"$(INTDIR)\ftsdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+
+.c{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
+MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
+RSC=rc.exe
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"..\bin\fts.dll" /implib:"$(OUTDIR)\fts.lib" /pdbtype:sept 
+LINK32_OBJS= \
+	"$(INTDIR)\abstraction.obj" \
+	"$(INTDIR)\array.obj" \
+	"$(INTDIR)\atom.obj" \
+	"$(INTDIR)\atomfile.obj" \
+	"$(INTDIR)\audio.obj" \
+	"$(INTDIR)\audioconfig.obj" \
+	"$(INTDIR)\audiofile.obj" \
+	"$(INTDIR)\autosave.obj" \
+	"$(INTDIR)\binaryprotocol.obj" \
+	"$(INTDIR)\bmaxfile.obj" \
+	"$(INTDIR)\bytestream.obj" \
+	"$(INTDIR)\class.obj" \
+	"$(INTDIR)\client.obj" \
+	"$(INTDIR)\clientmanager.obj" \
+	"$(INTDIR)\clipboard.obj" \
+	"$(INTDIR)\config.obj" \
+	"$(INTDIR)\connection.obj" \
+	"$(INTDIR)\dsp.obj" \
+	"$(INTDIR)\dspgraph.obj" \
+	"$(INTDIR)\errobj.obj" \
+	"$(INTDIR)\expression.obj" \
+	"$(INTDIR)\fifo.obj" \
+	"$(INTDIR)\file.obj" \
+	"$(INTDIR)\fpe.obj" \
+	"$(INTDIR)\ftl.obj" \
+	"$(INTDIR)\ftlmem.obj" \
+	"$(INTDIR)\fts.obj" \
+	"$(INTDIR)\hashtable.obj" \
+	"$(INTDIR)\label.obj" \
+	"$(INTDIR)\list.obj" \
+	"$(INTDIR)\loader.obj" \
+	"$(INTDIR)\mem.obj" \
+	"$(INTDIR)\message.obj" \
+	"$(INTDIR)\midi.obj" \
+	"$(INTDIR)\midifile.obj" \
+	"$(INTDIR)\object.obj" \
+	"$(INTDIR)\objectlist.obj" \
+	"$(INTDIR)\objectset.obj" \
+	"$(INTDIR)\package.obj" \
+	"$(INTDIR)\param.obj" \
+	"$(INTDIR)\parser.obj" \
+	"$(INTDIR)\patcher.obj" \
+	"$(INTDIR)\patfile.obj" \
+	"$(INTDIR)\post.obj" \
+	"$(INTDIR)\preset.obj" \
+	"$(INTDIR)\project.obj" \
+	"$(INTDIR)\property.obj" \
+	"$(INTDIR)\sched.obj" \
+	"$(INTDIR)\selection.obj" \
+	"$(INTDIR)\sigconn.obj" \
+	"$(INTDIR)\socketstream.obj" \
+	"$(INTDIR)\stack.obj" \
+	"$(INTDIR)\status.obj" \
+	"$(INTDIR)\symbol.obj" \
+	"$(INTDIR)\template.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\time.obj" \
+	"$(INTDIR)\tokenizer.obj" \
+	"$(INTDIR)\tuple.obj" \
+	"$(INTDIR)\update.obj" \
+	"$(INTDIR)\variable.obj" \
+	"$(INTDIR)\version.obj" \
+	"$(INTDIR)\win32.obj"
+
+"..\bin\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+!ENDIF 
 
 
 !IF "$(NO_EXTERNAL_DEPS)" != "1"
@@ -399,9 +461,33 @@ SOURCE=..\fts\audio.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\fts\audioconfig.c
+
+"$(INTDIR)\audioconfig.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\audiofile.c
+
+"$(INTDIR)\audiofile.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\fts\autosave.c
 
 "$(INTDIR)\autosave.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\binaryprotocol.c
+
+"$(INTDIR)\binaryprotocol.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\bmaxfile.c
+
+"$(INTDIR)\bmaxfile.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -423,21 +509,27 @@ SOURCE=..\fts\client.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\fts\clientmanager.c
+
+"$(INTDIR)\clientmanager.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\fts\clipboard.c
 
 "$(INTDIR)\clipboard.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\connection.c
+SOURCE=..\fts\config.c
 
-"$(INTDIR)\connection.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\config.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\doctor.c
+SOURCE=..\fts\connection.c
 
-"$(INTDIR)\doctor.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\connection.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -462,6 +554,12 @@ SOURCE=..\fts\errobj.c
 SOURCE=..\fts\expression.c
 
 "$(INTDIR)\expression.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\fifo.c
+
+"$(INTDIR)\fifo.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -561,18 +659,6 @@ SOURCE=..\fts\objectset.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\objtable.c
-
-"$(INTDIR)\objtable.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\OLDclient.c
-
-"$(INTDIR)\OLDclient.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
 SOURCE=..\fts\package.c
 
 "$(INTDIR)\package.obj" : $(SOURCE) "$(INTDIR)"
@@ -585,21 +671,33 @@ SOURCE=..\fts\param.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\fts\parser.c
+
+"$(INTDIR)\parser.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\fts\patcher.c
 
 "$(INTDIR)\patcher.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\patparser.c
+SOURCE=..\fts\patfile.c
 
-"$(INTDIR)\patparser.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\patfile.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\fts\post.c
 
 "$(INTDIR)\post.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\preset.c
+
+"$(INTDIR)\preset.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -612,12 +710,6 @@ SOURCE=..\fts\project.c
 SOURCE=..\fts\property.c
 
 "$(INTDIR)\property.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\saver.c
-
-"$(INTDIR)\saver.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -639,27 +731,21 @@ SOURCE=..\fts\sigconn.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\fts\soundfile.c
+SOURCE=..\fts\socketstream.c
 
-"$(INTDIR)\soundfile.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\soundfile_def.c
-
-"$(INTDIR)\soundfile_def.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\srconv.c
-
-"$(INTDIR)\srconv.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\socketstream.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\fts\stack.c
 
 "$(INTDIR)\stack.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\status.c
+
+"$(INTDIR)\status.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -675,9 +761,33 @@ SOURCE=..\fts\template.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\fts\thread.c
+
+"$(INTDIR)\thread.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\fts\time.c
 
 "$(INTDIR)\time.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\tokenizer.c
+
+"$(INTDIR)\tokenizer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\tuple.c
+
+"$(INTDIR)\tuple.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\update.c
+
+"$(INTDIR)\update.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -690,12 +800,6 @@ SOURCE=..\fts\variable.c
 SOURCE=..\fts\version.c
 
 "$(INTDIR)\version.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\fts\vm.c
-
-"$(INTDIR)\vm.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

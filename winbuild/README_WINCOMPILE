@@ -1,0 +1,44 @@
+Compiling jmax 4.0.1 in Microsoft Windows 
+
+Required tools:
+Microsoft Visual C++ 5.0/6.0
+CYGWIN bash with sed, flex and bison installed
+JAVA JDK 1.3 or JDK1.4
+Windows XP/2000/98
+------------------------------------------------------------------------
+Preparing the MS Windows system to build jmax.
+
+Install JAVA JDK on your system, define environment (system or user)
+variable JAVA_HOME and point it to the root directory of your JAVA
+installation directory (for example: D:\j2sdk1.4.1_01)
+
+Define environment variable (system or user) CYGWIN_HOME and point it to
+the root of your cygwin installation directory (D:\cygwin)
+
+ADD to your system or user $PATH variable
+$(JAVA_HOME)\bin
+$(JAVA_HOME)\jre\client\bin
+-------------------------------------------------------------------------
+Make sure that flex.exe, bison.exe and sed.exe reside in your
+$(CYGWIN_HOME)\bin directory
+-------------------------------------------------------------------------
+Build Procedure. 
+
+On the first built after checkout (download), start a bash shell and move (cd) into 
+the top jmax directory (jmax root directory), execute command:
+./winprep.sh
+
+This will generate proper version files 'JMaxVersion.java' and 'version.c'
+it will also invoke a flex and bison to generate necessary tokenizer and 
+parser 'tokenizer.c'  'parser.c' and 'parser.h'
+
+Open jmax/winbuld/fts.dsw using Visual C++
+Set fts as your selected active project
+Build fts
+Set jmax as your selected active project
+Built jmax
+Set jmaxrun as your selected active project
+Built jmaxrun
+
+You are all set
+To start the jmax, use explorer to enter jmax/bin directory and click on jmax.exe

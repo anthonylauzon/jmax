@@ -80,6 +80,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /debug /machine:I386 /out:"..\bin\fts.dll" /pdbtype:sept
+# SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
 
@@ -109,11 +110,23 @@ SOURCE=..\fts\audio.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\audioconfig.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\audiofile.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\fts\autosave.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\binaryprotocol.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\bmaxfile.c
 # End Source File
 # Begin Source File
 
@@ -129,15 +142,19 @@ SOURCE=..\fts\client.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\clientmanager.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\clipboard.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\connection.c
+SOURCE=..\fts\config.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\doctor.c
+SOURCE=..\fts\connection.c
 # End Source File
 # Begin Source File
 
@@ -154,6 +171,10 @@ SOURCE=..\fts\errobj.c
 # Begin Source File
 
 SOURCE=..\fts\expression.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\fifo.c
 # End Source File
 # Begin Source File
 
@@ -221,14 +242,6 @@ SOURCE=..\fts\objectset.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\objtable.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\OLDclient.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\fts\package.c
 # End Source File
 # Begin Source File
@@ -237,15 +250,23 @@ SOURCE=..\fts\param.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\parser.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\patcher.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\patparser.c
+SOURCE=..\fts\patfile.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\fts\post.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\preset.c
 # End Source File
 # Begin Source File
 
@@ -254,10 +275,6 @@ SOURCE=..\fts\project.c
 # Begin Source File
 
 SOURCE=..\fts\property.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\saver.c
 # End Source File
 # Begin Source File
 
@@ -273,19 +290,15 @@ SOURCE=..\fts\sigconn.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\soundfile.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\soundfile_def.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\fts\srconv.c
+SOURCE=..\fts\socketstream.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\fts\stack.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\status.c
 # End Source File
 # Begin Source File
 
@@ -297,7 +310,23 @@ SOURCE=..\fts\template.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\thread.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\time.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\tokenizer.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\tuple.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\update.c
 # End Source File
 # Begin Source File
 
@@ -309,12 +338,7 @@ SOURCE=..\fts\version.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\fts\vm.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\fts\win32.c
 # End Source File
 # End Target
 # End Project
-
