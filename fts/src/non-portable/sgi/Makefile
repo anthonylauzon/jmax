@@ -21,19 +21,6 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-SOURCES = $(INCLUDE_PATH)/MaxFtsConnectCmd.java\
-	  $(INCLUDE_PATH)/MaxOpenCmd.java     \
-          $(INCLUDE_PATH)/MaxQuitCmd.java      \
-          $(INCLUDE_PATH)/MaxRunHooksCmd.java  \
-          $(INCLUDE_PATH)/MaxSystemPropertyCmd.java \
-          $(INCLUDE_PATH)/MaxSetSystemPropertyCmd.java \
-          $(INCLUDE_PATH)/MaxWhenCmd.java           \
-	  $(INCLUDE_PATH)/MaxSourceCmd.java      \
-	  $(INCLUDE_PATH)/MaxSysSourceCmd.java      \
-	  $(INCLUDE_PATH)/MaxSplashCmd.java    \
-	  $(INCLUDE_PATH)/MaxGetMaxVersionCmd.java \
-          $(INCLUDE_PATH)/MaxDeclareIconCmd.java   \
-	  $(INCLUDE_PATH)/TclMaxPackage.java
-
+JMAXDISTDIR = ../../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.fts
