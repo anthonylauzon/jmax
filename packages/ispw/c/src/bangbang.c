@@ -35,8 +35,8 @@ bangbang_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   int noutlets;
 
-  if (ac >= 1  && fts_is_int(at))
-    noutlets = fts_get_int(at);
+  if (ac > 0 && fts_is_number(at))
+    noutlets = fts_get_number_int(at);
   else
     noutlets = 2;
 
@@ -46,7 +46,7 @@ bangbang_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 bangbang_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), 0, 0);
+  fts_class_init(cl, sizeof(fts_object_t), bangbang_init, 0);
 
   fts_class_inlet_varargs(cl, 0, bangbang_input);
   fts_class_set_default_handler(cl, bangbang_input);
