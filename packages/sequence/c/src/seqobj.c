@@ -22,7 +22,7 @@ static fts_symbol_t sym_addEvent = 0;
 
 static fts_symbol_t sym_seqevent = 0;
 
-void
+static void
 seqevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_event_t *this = (sequence_event_t *)o;
@@ -32,12 +32,29 @@ seqevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   sequence_event_init(this, time, selector, ac - 3, at + 3);
 }
 
-void
+static void
 seqevt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_event_t *this = (sequence_event_t *)o;
 
   sequence_event_reset_value(this);
+}
+
+static void
+seqevt_move(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_event_t *this = (sequence_event_t *)o;
+  float time = fts_get_float(at + 0);
+
+  sequence_move_event(this, time);
+}
+
+static void
+seqevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_event_t *this = (sequence_event_t *)o;
+
+  sequence_event_set_value(this, ac, at);
 }
 
 static fts_status_t
@@ -47,6 +64,9 @@ seqevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqevt_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqevt_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), seqevt_move);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), seqevt_set);
 
   return fts_Success;
 }
@@ -254,11 +274,3 @@ seqobj_config(void)
   fts_class_install(fts_new_symbol("sequence"), seqobj_instantiate);
   fts_class_install(sym_seqevent, seqevt_instantiate);
 }
-
-
-
-
-
-
-
-

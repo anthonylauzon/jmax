@@ -53,7 +53,7 @@ sequence_event_reset_value(sequence_event_t *event)
 }
 
 void
-sequence_event_init(sequence_event_t *event, float time, fts_symbol_t selector, int ac, const fts_atom_t *at)
+sequence_event_init(sequence_event_t *event, double time, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
   sequence_event_set_time(event, time);
   sequence_event_set_value(event, selector, ac, at);
@@ -273,6 +273,16 @@ sequence_insert_event_after(sequence_t *sequence, sequence_event_t *here, sequen
     }  
 }
 
+void
+sequence_insert_event(sequence_t *sequence, sequence_event_t *event)
+{
+  sequence_event_t *next = sequence_get_event_by_time(sequence, sequence_event_get_time(event));
+  
+  if(next)
+    sequence_insert_event_before(sequence, next, event);
+  else
+    sequence_append_event(sequence, event);
+}
 
 /*********************************************************
  *
@@ -340,32 +350,30 @@ sequence_remove_track(sequence_t *sequence, fts_symbol_t name)
 {
   sequence_track_t *track = sequence->tracks;
 
-  if(track)
+  if(track && sequence_track_get_name(track) == name)
     {
-      if(sequence_track_get_name(track) == name)
+      sequence->tracks = track->next;
+      sequence_track_delete(track);
+      sequence->n_tracks--;
+    }
+  else
+    {
+      sequence_track_t *prev = track;
+      track = track->next;
+      
+      while(track && sequence_track_get_name(track) != name)
 	{
-	  sequence->tracks = track->next;
-	  sequence_track_delete(track);
-	}
-      else
-	{
-	  sequence_track_t *prev = track;
+	  prev = track;
 	  track = track->next;
-
-	  while(track)
-	    {
-	      if(sequence_track_get_name(track) == name)
-		{
-		  prev->next = track->next;
-		  sequence_track_delete(track);
-		  break;
-		}
-
-	      prev = track;
-	      track = track->next;
-	    }
 	}
-    } 
+
+      if(track)
+	{
+	  prev->next = track->next;
+	  sequence_track_delete(track);
+	  sequence->n_tracks--;	  
+	}
+    }
 }
 
 /*********************************************************
@@ -379,20 +387,32 @@ sequence_add_event(sequence_t *sequence, sequence_track_t *track, sequence_event
 {
   sequence_event_t *next = sequence_get_event_by_time(sequence, sequence_event_get_time(event));
   
-  if(next)
-    sequence_insert_event_before(sequence, next, event);
-  else
-    sequence_append_event(sequence, event);
-
   sequence_event_set_track(event, track);
+  sequence_insert_event(sequence, event);
 }
 
 void
 sequence_remove_event(sequence_event_t *event)
 {
   sequence_t *sequence = event->track->sequence;
-
   sequence_cut_event(sequence, event);
+}
+
+void
+sequence_move_event(sequence_event_t *event, double time)
+{
+  sequence_t *sequence = event->track->sequence;
+  sequence_event_t *next = event->next;
+  sequence_event_t *prev = event->prev;
+
+  if((next && time > next->time) || (prev && time < prev->time))
+    {
+      sequence_cut_event(sequence, event);
+      sequence_event_set_time(event, time);
+      sequence_insert_event(sequence, event);
+    }
+  else
+    sequence_event_set_time(event, time);
 }
 
 /*********************************************************
