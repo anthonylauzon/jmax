@@ -115,7 +115,7 @@ fmat_set_from_lists(fmat_t *mat, int ac, const fts_atom_t *at)
     {
       if(fts_is_list(at + i))
 	{
-	  fts_array_t *aa = fts_get_list(at + i);
+	  fts_array_t *aa = fts_get_array(at + i);
 	  int size = fts_array_get_size(aa);
 
 	  if(size > n)
@@ -662,7 +662,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	{
 	  if(fts_is_list(at + i))
 	    {
-	      fts_array_t *aa = fts_get_list(at + i);
+	      fts_array_t *aa = fts_get_array(at + i);
 	      int size = fts_array_get_size(aa);
 	      
 	      if(size > n)

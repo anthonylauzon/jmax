@@ -76,7 +76,7 @@ FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
      do {fts_set_type(ap, fts_s_connection); fts_word_set_connection(fts_atom_value(ap), (x));} while (0)
 #define fts_set_data(ap, x) \
      do {fts_set_type(ap, fts_s_data); fts_word_set_data( fts_atom_value(ap), (x));} while (0)
-#define fts_set_list(ap, x) \
+#define fts_set_array(ap, x) \
      do {fts_set_type(ap, fts_s_list); fts_word_set_ptr(fts_atom_value(ap), (x));} while (0)
 #define fts_set_object(ap, x) \
      do {fts_set_object_type(ap, fts_s_object); fts_word_set_object(fts_atom_value(ap), (x));} while (0)
@@ -96,7 +96,7 @@ FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
 #define fts_get_fun(ap) (fts_word_get_fun(fts_atom_value(ap)))
 #define fts_get_connection(ap) (fts_word_get_connection(fts_atom_value(ap)))
 #define fts_get_data(ap) (fts_word_get_data(fts_atom_value(ap)))
-#define fts_get_list(ap) ((fts_array_t *)fts_word_get_ptr(fts_atom_value(ap)))
+#define fts_get_array(ap) ((fts_array_t *)fts_word_get_ptr(fts_atom_value(ap)))
 #define fts_get_object(ap) (fts_word_get_object(fts_atom_value(ap)))
 
 /* check atoms for predefined types */

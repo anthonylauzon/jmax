@@ -294,7 +294,7 @@ vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     mat_alloc((mat_t *)this, fts_get_int(at), 1);
   else if(ac == 1 && fts_is_list(at))
     {
-      fts_array_t *aa = fts_get_list(at);
+      fts_array_t *aa = fts_get_array(at);
       int size = fts_array_get_size(aa);
       
       mat_alloc((mat_t *)this, size, 1);

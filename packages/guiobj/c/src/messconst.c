@@ -146,7 +146,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       if(ac == fts_is_list(at))
 	{
-	  fts_array_t *list = fts_get_list(at);
+	  fts_array_t *list = fts_get_array(at);
 
 	  /* create empty message */
 	  mess = (message_t *)fts_object_create(message_class, 0, 0);

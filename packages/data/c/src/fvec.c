@@ -733,7 +733,7 @@ fvec_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fvec_t *this = (fvec_t *)o;
   float *values = fvec_get_ptr(this);
   int size = fvec_get_size(this);
-  fts_array_t *array = fts_get_list(at);
+  fts_array_t *array = fts_get_array(at);
   fts_atom_t a;
   int i;
   
@@ -872,7 +872,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(ac == 1 && fts_is_list(at))
     {
-      fts_array_t *aa = fts_get_list(at);
+      fts_array_t *aa = fts_get_array(at);
       int size = fts_array_get_size(aa);
       
       fvec_alloc(this, size);

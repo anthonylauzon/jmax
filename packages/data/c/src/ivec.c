@@ -976,7 +976,7 @@ ivec_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   ivec_t *this = (ivec_t *)o;
   int *values = ivec_get_ptr(this);
   int size = ivec_get_size(this);
-  fts_array_t *array = fts_get_list(at);
+  fts_array_t *array = fts_get_array(at);
   fts_atom_t a;
   int i;
   
@@ -1092,7 +1092,7 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(ac == 1 && fts_is_list(at))
     {
-      fts_array_t *aa = fts_get_list(at);
+      fts_array_t *aa = fts_get_array(at);
       int size = fts_array_get_size(aa);
 
       ivec_alloc(this, size);

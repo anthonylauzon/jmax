@@ -15,6 +15,8 @@ getsize.c \
 getval.c \
 ivec.c \
 mat.c \
+message.c \
+messtab.c \
 preset.c \
 row.c \
 value.c \

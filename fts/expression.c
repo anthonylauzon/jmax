@@ -506,7 +506,7 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      /* Make the array */
 	      array = fts_malloc( sizeof( fts_array_t));
 	      fts_array_init( array, args, tos + 1);
-	      fts_set_list(&result, array);
+	      fts_set_array(&result, array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -783,7 +783,7 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      /* Make the array */
 	      array = fts_malloc( sizeof( fts_array_t));
 	      fts_array_init( array, args, tos + 1);
-	      fts_set_list(&result, array);
+	      fts_set_array(&result, array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -1355,7 +1355,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	case FTS_OP_ARRAY_REF:
 	  if (fts_is_int(tos) && fts_is_list(ptos))
 	    {
-	      fts_array_t *aa = fts_get_list(ptos);
+	      fts_array_t *aa = fts_get_array(ptos);
 	      int idx = fts_get_int(tos);
 	      
 	      if (fts_array_check_index(aa, idx))
@@ -1565,7 +1565,7 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 {
   if ((ac == 4) && fts_is_int(at + 2) && fts_is_list(at + 1))
     {
-      fts_array_t *array = fts_get_list(at + 1);
+      fts_array_t *array = fts_get_array(at + 1);
       int idx = fts_get_int(&at[2]);
 
       if (fts_array_check_index(array, idx))

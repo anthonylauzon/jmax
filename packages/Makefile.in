@@ -76,7 +76,7 @@ RANLIB = @RANLIB@
 ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-SUBDIRS = control data explode guiobj io ispw ispwmath lists math mess midi numeric qlist sequence signal system utils @PLATFORM_PACKAGES@
+SUBDIRS = control data explode guiobj io ispw ispwmath lists math midi numeric qlist sequence signal system utils @PLATFORM_PACKAGES@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
@@ -199,7 +199,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

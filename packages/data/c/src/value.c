@@ -97,7 +97,7 @@ static void
 value_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
-  fts_array_t *array = fts_get_list(at);
+  fts_array_t *array = fts_get_array(at);
 
   fts_array_set(array, 1, &this->a);
 }

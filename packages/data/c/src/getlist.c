@@ -26,6 +26,9 @@
 #include "mat.h"
 #include "col.h"
 #include "row.h"
+#include "bpf.h"
+#include "preset.h"
+#include "messtab.h"
 
 typedef struct 
 {
@@ -67,24 +70,18 @@ getlist_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   getlist_t *this = (getlist_t *)o;
   ivec_t *ivec = ivec_atom_get(at);
   int size = ivec_get_size(ivec);
+  fts_atom_t *atoms;
   int i;
+
+  fts_array_set_size(&this->list, 0);
+  fts_array_set_size(&this->list, size);
   
-  if(size == 1)
-    fts_outlet_int(o, 0, ivec_get_element(ivec, 0));
-  else if(size > 1)
-    {
-      fts_atom_t *atoms;
-
-      fts_array_set_size(&this->list, 0);
-      fts_array_set_size(&this->list, size);
-      
-      atoms = fts_array_get_atoms(&this->list);
-      
-      for(i=0; i<size; i++)
-	fts_set_int(atoms + i, ivec_get_element(ivec, i));
-
-      fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
-    }
+  atoms = fts_array_get_atoms(&this->list);
+  
+  for(i=0; i<size; i++)
+    fts_set_int(atoms + i, ivec_get_element(ivec, i));
+  
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -93,24 +90,18 @@ getlist_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   getlist_t *this = (getlist_t *)o;
   fvec_t *fvec = fvec_atom_get(at);
   int size = fvec_get_size(fvec);
+  fts_atom_t *atoms;
   int i;
-  
-  if(size == 1)
-    fts_outlet_float(o, 0, fvec_get_element(fvec, 0));
-  else if(size > 1)
-    {
-      fts_atom_t *atoms;
 
-      fts_array_set_size(&this->list, 0);
-      fts_array_set_size(&this->list, size);
+  fts_array_set_size(&this->list, 0);
+  fts_array_set_size(&this->list, size);
       
-      atoms = fts_array_get_atoms(&this->list);
+  atoms = fts_array_get_atoms(&this->list);
       
-      for(i=0; i<size; i++)
-	fts_set_float(atoms + i, fvec_get_element(fvec, i));
+  for(i=0; i<size; i++)
+    fts_set_float(atoms + i, fvec_get_element(fvec, i));
 
-      fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
-    }
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -120,17 +111,8 @@ getlist_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   vec_t *vec = vec_atom_get(at);
   int size = vec_get_size(vec);
   
-  if(size == 1)
-    {
-      fts_atom_t a = vec_get_element(vec, 0);
-
-      fts_outlet_send(o, 0, fts_get_selector(&a), 1, &a);
-    }
-  else if(size > 1)
-    {
-      fts_array_set(&this->list, vec_get_size(vec), vec_get_ptr(vec));
-      fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
-    }
+  fts_array_set(&this->list, vec_get_size(vec), vec_get_ptr(vec));
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -143,6 +125,57 @@ static void
 getlist_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getlist_t *this = (getlist_t *)o;
+}
+
+static void
+getlist_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getlist_t *this = (getlist_t *)o;
+  bpf_t *bpf = bpf_atom_get(at);
+  int size = bpf_get_size(bpf);
+  fts_atom_t *atoms;
+  int i;
+
+  fts_array_set_size(&this->list, 0);
+  fts_array_set_size(&this->list, size * 2);
+  
+  atoms = fts_array_get_atoms(&this->list);
+  
+  for(i=0; i<size; i++)
+    {
+      fts_set_float(atoms + 2 * i, bpf_get_time(bpf, i));
+      fts_set_float(atoms + 2 * i + 1, bpf_get_value(bpf, i));
+    }
+    
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+}
+
+static void
+getlist_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getlist_t *this = (getlist_t *)o;
+  preset_t *preset = preset_atom_get(at);
+  int size = 0;
+  int i;
+
+  fts_array_set_size(&this->list, 0);
+  preset_get_keys(preset, &this->list);
+
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
+}
+
+static void
+getlist_messtab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getlist_t *this = (getlist_t *)o;
+  messtab_t *messtab = messtab_atom_get(at);
+  int size = 0;
+  int i;
+
+  fts_array_set_size(&this->list, 0);
+  messtab_get_keys(messtab, &this->list);
+
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 /************************************************
@@ -165,6 +198,10 @@ getlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, row_type, getlist_row);
   fts_method_define_varargs(cl, 0, col_type, getlist_col);
+  
+  fts_method_define_varargs(cl, 0, bpf_type, getlist_bpf);
+  fts_method_define_varargs(cl, 0, preset_type, getlist_preset);
+  fts_method_define_varargs(cl, 0, messtab_type, getlist_messtab);
   
   fts_outlet_type_define_varargs(cl, 0, fts_s_list);
   

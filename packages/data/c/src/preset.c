@@ -20,6 +20,7 @@
  *
  */
 #include <fts/fts.h>
+#include "preset.h"
 
 /******************************************************
  *
@@ -27,20 +28,15 @@
  *
  */
 
+fts_symbol_t preset_symbol = 0;
+fts_type_t preset_type = 0;
+fts_class_t *preset_class = 0;
+
 static fts_symbol_t sym_get_state_as_array = 0;
 static fts_symbol_t sym_restore_state_from_array = 0;
 
 static fts_symbol_t sym_add_state_from_bmax = 0;
 static fts_symbol_t sym_add_array_from_bmax = 0;
-
-typedef struct 
-{
-  fts_object_t o;
-  fts_object_t **objects;
-  fts_hashtable_t hash;
-  int n_objects;
-  fts_symbol_t keep;
-} preset_t;
 
 static int
 preset_check_object(preset_t *this, fts_object_t *obj)
@@ -77,7 +73,7 @@ preset_get_or_add(preset_t *this, const fts_atom_t *key)
   fts_atom_t value;
   
   if(fts_hashtable_get(&this->hash, key, &value))
-    states = fts_get_list(&value);
+    states = fts_get_array(&value);
   else
     {
       int i;
@@ -92,6 +88,22 @@ preset_get_or_add(preset_t *this, const fts_atom_t *key)
     }
 
   return states;
+}
+
+void
+preset_get_keys(preset_t *this, fts_array_t *array)
+{
+  fts_iterator_t iterator;
+  
+  fts_hashtable_get_keys(&this->hash, &iterator);
+  
+  while(fts_iterator_has_more( &iterator))
+    {
+      fts_atom_t key;
+      
+      fts_iterator_next( &iterator, &key);
+      fts_array_append(array, 1, &key);
+    }
 }
 
 /******************************************************
@@ -151,7 +163,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_array_set_size(states + i, 0);
 
 	      /* get object state as array */
-	      fts_set_list(&value, states + i);
+	      fts_set_array(&value, states + i);
 	      fts_message_send(this->objects[i], fts_SystemInlet, sym_get_state_as_array, 1, &value);
 	    }
 	}
@@ -164,7 +176,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      fts_array_init(states + i, 0, 0);
 
 	      /* get object state as array */
-	      fts_set_list(&value, states + i);
+	      fts_set_array(&value, states + i);
 	      fts_message_send(this->objects[i], fts_SystemInlet, sym_get_state_as_array, 1, &value);
 	    }
 
@@ -185,7 +197,7 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       if(fts_hashtable_get(&this->hash, at, &value))
 	{
-	  fts_array_t *states = fts_get_list(&value);
+	  fts_array_t *states = fts_get_array(&value);
 	  int i;
 	  
 	  for(i=0; i<this->n_objects; i++)
@@ -232,7 +244,7 @@ preset_add_array_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
       fts_atom_t *a = fts_array_get_element(states + i_object, i_array);
 
       fts_array_init(atoms, ac - 3, at + 3);
-      fts_set_list(a, atoms);
+      fts_set_array(a, atoms);
     }
 }
 
@@ -291,7 +303,7 @@ preset_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 		{
 		  if(fts_is_list(atoms + j))
 		    {
-		      fts_array_t *array = fts_get_list(atoms + j);
+		      fts_array_t *array = fts_get_array(atoms + j);
 		      int n = fts_array_get_size(array);
 
 		      /* write array */
@@ -390,11 +402,21 @@ preset_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_object_release(this->objects[i]);
 }
 
+static void
+preset_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  preset_t *this = (preset_t *) obj;
+  
+  fts_set_object_with_type(value, (fts_object_t *)this, preset_symbol);
+}
+
 static fts_status_t
 preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(preset_t), 2, 1, 0);
   
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, preset_get_state);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preset_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preset_delete);
 
@@ -422,6 +444,10 @@ preset_config(void)
   sym_add_state_from_bmax = fts_new_symbol("add_state_from_bmax");
   sym_add_array_from_bmax = fts_new_symbol("add_array_from_bmax");
 
-  fts_class_install(fts_new_symbol("preset"), preset_instantiate);
+  preset_symbol = fts_new_symbol("preset");
+  preset_type = preset_symbol;
+
+  fts_class_install(preset_symbol, preset_instantiate);
+  preset_class = fts_class_get_by_name(preset_symbol);
 }
 

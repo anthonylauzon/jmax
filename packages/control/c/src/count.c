@@ -205,7 +205,7 @@ count_int_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pro
 {
   if(fts_is_list(value))
     {
-      fts_array_t *list = fts_get_list(value);
+      fts_array_t *list = fts_get_array(value);
 
       count_int_set(o, 0, 0, fts_array_get_size(list), fts_array_get_atoms(list));
     }
@@ -428,7 +428,7 @@ count_float_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t p
 {
   if(fts_is_list(value))
     {
-      fts_array_t *list = fts_get_list(value);
+      fts_array_t *list = fts_get_array(value);
 
       count_float_set(o, 0, 0, fts_array_get_size(list), fts_array_get_atoms(list));
     }

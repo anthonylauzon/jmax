@@ -40,6 +40,8 @@ extern void getrange_config(void);
 extern void getlist_config(void);
 
 extern void preset_config(void);
+extern void message_config(void);
+extern void messtab_config(void);
 
 extern void fill_config(void);
 extern void copy_config(void);
@@ -66,6 +68,8 @@ data_config(void)
   getlist_config();  
 
   preset_config();
+  message_config();
+  messtab_config();
 
   fill_config();
   copy_config();

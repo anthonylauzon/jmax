@@ -107,7 +107,7 @@ sync_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
     }
   else if(fts_is_list(at))
     {
-      fts_array_t *l = fts_get_list(at);
+      fts_array_t *l = fts_get_array(at);
       fts_atom_t *a = fts_array_get_atoms(l);
       int size = fts_array_get_size(l);
       int i;
