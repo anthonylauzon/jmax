@@ -70,36 +70,36 @@ static void fts_cmd_args_parse( int argc, char **argv)
   argc--;
   argv++;
   while (argc)
+  {
+    if (!strncmp( *argv, "--", 2))
     {
-      if (!strncmp( *argv, "--", 2))
-	{
-	  char *p = strchr( *argv, '=');
+      char *p = strchr( *argv, '=');
 
-	  if (p != NULL)
-	    *p = '\0';
+      if (p != NULL)
+	*p = '\0';
 
-	  name = fts_new_symbol( *argv + 2);
+      name = fts_new_symbol( *argv + 2);
 
-	  if (p == NULL || p[1] == '\0')
-	    value = s_yes;
-	  else
-	    {
-	      p++;
-	      value = fts_new_symbol( p);
-	    }
-	}
+      if (p == NULL || p[1] == '\0')
+	value = s_yes;
       else
-	{
-	  sprintf( filevar, "file%d", filecount++);
-	  name = fts_new_symbol( filevar);
-	  value = fts_new_symbol( *argv);
-	}
-
-      fts_cmd_args_put( name, value);
-
-      argc--;
-      argv++;
+      {
+	p++;
+	value = fts_new_symbol( p);
+      }
     }
+    else
+    {
+      sprintf( filevar, "file%d", filecount++);
+      name = fts_new_symbol( filevar);
+      value = fts_new_symbol( *argv);
+    }
+
+    fts_cmd_args_put( name, value);
+
+    argc--;
+    argv++;
+  }
 }
 
 fts_symbol_t fts_get_root_directory( void)
@@ -163,8 +163,8 @@ void fts_load_project( void)
 static void fts_kernel_init( void)
 {
   /*
-   *** Attention !!! The order is important, at least for the first lines ***
-   */
+ *** Attention !!! The order is important, at least for the first lines ***
+ */
   _K_DECNCALL( fts_kernel_hashtable_init);
   _K_DECNCALL( fts_kernel_symbol_init);
   _K_DECNCALL( fts_kernel_class_init);
@@ -208,6 +208,7 @@ static void fts_kernel_classes_config( void)
   _K_DECNCALL( fts_clipboard_config);
   _K_DECNCALL( fts_label_config);
   _K_DECNCALL( fts_midi_config);
+  _K_DECNCALL( fts_config_config);
   _K_DECNCALL( fts_objectset_config);
   _K_DECNCALL( fts_selection_config);
   _K_DECNCALL( fts_saver_config);
@@ -259,3 +260,10 @@ void fts_shutdown( void)
   fts_log("[fts]: Deleting root patcher\n");
   fts_kernel_patcher_shutdown();
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
