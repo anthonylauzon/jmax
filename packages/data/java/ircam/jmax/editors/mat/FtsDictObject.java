@@ -63,6 +63,12 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
         ((FtsDictObject)obj).appendRow();
     }
     });
+    FtsObject.registerMessageHandler( FtsDictObject.class, FtsSymbol.get("register_obj"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((FtsDictObject)obj).registerObject( args.getLength(), args.getAtoms());
+    }
+    });    
   }
 
   /**
@@ -161,6 +167,19 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     super.nameChanged( name);
     notifyNameChanged( name);
   }
+  
+  public void registerObject(int nArgs , FtsAtom argums[])
+  {            
+    if(nArgs > 1 && argums[0].isInt() && argums[1].isSymbol())
+    {
+      int id = argums[0].intValue;
+      String className = argums[1].symbolValue.toString();
+      
+      args.clear();
+      args.addString(className);
+      JMaxApplication.getObjectManager().makeFtsObject(id, className, args.getAtoms());
+    }
+}
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES to the server
   //////////////////////////////////////////////////////////////////////////////////////

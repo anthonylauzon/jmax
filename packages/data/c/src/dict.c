@@ -28,6 +28,7 @@ fts_class_t *dict_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
+static fts_symbol_t sym_register_obj = 0;
 
 #define dict_set_editor_open(m) ((m)->opened = 1)
 #define dict_set_editor_close(m) ((m)->opened = 0)
@@ -259,10 +260,23 @@ dict_upload_data(dict_t *self)
       
       if(fts_is_object(d))
       {
+        fts_atom_t b[3];
+        fts_object_t *dobj = fts_get_object(d);
+        
+        if(!fts_object_has_id(dobj))
+          fts_client_register_object(dobj, fts_object_get_client_id((fts_object_t *)self));	
+        
+        fts_set_int(b, fts_object_get_id(dobj));
+        fts_set_symbol(b+1, fts_object_get_class_name(dobj));
+        
         fts_memorystream_reset(stream);
-        fts_spost_object((fts_bytestream_t *)stream, fts_get_object(d));
+        fts_spost_object((fts_bytestream_t *)stream, dobj);
         fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-        fts_set_symbol(&a[2+i],  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));
+        fts_set_symbol(b+2,  fts_new_symbol((char *)fts_memorystream_get_bytes( stream)));
+        
+        fts_client_send_message((fts_object_t *)self, sym_register_obj, 3, b);
+        
+        fts_set_object(&a[2+i], dobj);
       }
       else
         fts_atom_copy(d, &a[2+i]);
@@ -855,6 +869,7 @@ dict_config(void)
   sym_text = fts_new_symbol("text");
   sym_coll = fts_new_symbol("coll");
   dict_symbol = fts_new_symbol("dict");
+  sym_register_obj = fts_new_symbol("register_obj");
 
   dict_type = fts_class_install(dict_symbol, dict_instantiate);
 }

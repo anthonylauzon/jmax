@@ -49,6 +49,9 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   
   transient JScrollPane scrollPane; 
   transient JTable table;
+  FtsObjectCellEditor ftsObjEditor;
+  FtsObjectCellRenderer ftsObjRenderer;
+  
   public static final Color matGridColor = new Color(220, 220, 220);
   public static final Color rowsIdColor = new Color(245, 245, 245);
   public static final int COLUMN_MIN_WIDTH = 70;
@@ -82,13 +85,17 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   {
     setLayout(new BorderLayout());
     
-    table = new JTable(tableModel);
+    ftsObjEditor = new FtsObjectCellEditor();
+    ftsObjRenderer = new FtsObjectCellRenderer();
+    
+    table = new MatTable(tableModel);
 		table.setGridColor( matGridColor);
 		table.setShowGrid(true);			
     table.setPreferredScrollableViewportSize(new Dimension( MatWindow.DEFAULT_WIDTH, MatWindow.DEFAULT_HEIGHT));
     table.setRowHeight(ROW_HEIGHT);
     table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
     table.getTableHeader().setReorderingAllowed(false);
+        
     scrollPane = new JScrollPane(table);
     add(BorderLayout.CENTER, scrollPane);
     
@@ -207,6 +214,80 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   public void save(){}
   public void saveAs(){}
   public void print(){}
+
+  /************************     FtsObject Table CellEditor ***********************************/
+  public class FtsObjectCellEditor extends AbstractCellEditor implements TableCellEditor, ActionListener 
+  {
+    JButton button;
+    protected static final String EDIT = "edit";
+    FtsGraphicObject currentObject = null;  
+    
+    public FtsObjectCellEditor() 
+    {
+      button = new JButton();
+      button.setActionCommand(EDIT);
+      button.addActionListener(this);
+    }
+      
+    public void actionPerformed(ActionEvent e) 
+    {
+      if (EDIT.equals(e.getActionCommand())) 
+      {          
+        ((FtsObjectWithEditor)currentObject).requestOpenEditor();
+        fireEditingStopped();
+      } 
+    }
+  
+    public Object getCellEditorValue() {
+      return currentObject;
+    }
+      
+    //Implement the one method defined by TableCellEditor.
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+      currentObject = (FtsGraphicObject)value;
+      button.setText("< "+currentObject.getClassName()+" >");
+      button.setHorizontalTextPosition(SwingConstants.LEFT);
+      return button;
+    }
+  }
+  
+  public class FtsObjectCellRenderer extends JLabel implements TableCellRenderer 
+  {  
+    public FtsObjectCellRenderer() 
+    {
+      setOpaque(true); 
+      setBorder(BorderFactory.createEtchedBorder());
+      setBackground(Color.lightGray);
+    }
+    
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,int row, int column) 
+    {      
+      setText("< "+((FtsGraphicObject)value).getClassName()+" >");
+      return this;
+    }
+  }  
+  
+  public class MatTable extends JTable
+  {
+    public MatTable(TableModel model)
+    {
+      super(model);
+    }
+    public TableCellEditor getCellEditor(int row,int col)
+    {
+      if( getModel().getValueAt(row, col) instanceof FtsGraphicObject)
+        return ftsObjEditor;
+      else
+        return super.getCellEditor(row, col);
+    }
+    public TableCellRenderer getCellRenderer(int row,int col)
+    {
+      if( getModel().getValueAt(row, col) instanceof FtsGraphicObject)
+        return ftsObjRenderer;
+      else
+        return super.getCellRenderer(row, col);
+    }
+  }
 }
 
 

@@ -296,6 +296,26 @@
 			settings = {
 			};
 		};
+		3B972D2706BA54CD00DE9B8C = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			name = fmat.gif;
+			path = ../../packages/sequence/images/fmat.gif;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B972D2806BA54CD00DE9B8C = {
+			fileRef = 3B972D2706BA54CD00DE9B8C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B972D4806BA551B00DE9B8C = {
+			fileRef = 3B972D2706BA54CD00DE9B8C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B9E15010621ADD500CDEBB6 = {
 			children = (
 				3B9E150B0621AE1200CDEBB6,
@@ -1256,6 +1276,7 @@
 			files = (
 				5C54253E05AB0B8A0042B7A2,
 				5C54253F05AB0B8A0042B7A2,
+				3B972D2806BA54CD00DE9B8C,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3744,6 +3765,7 @@
 				5C54269705AB0B8A0042B7A2,
 				5C54269805AB0B8A0042B7A2,
 				5C54269A05AB0B8A0042B7A2,
+				3B972D4806BA551B00DE9B8C,
 				5C54269B05AB0B8A0042B7A2,
 				5C54269C05AB0B8A0042B7A2,
 				5C54269D05AB0B8A0042B7A2,
@@ -19943,6 +19965,7 @@
 		};
 		F85124F1028BEC7D01664092 = {
 			children = (
+				3B972D2706BA54CD00DE9B8C,
 				F85124F2028BEC7D01664092,
 				F85124F3028BEC7D01664092,
 				F85124F4028BEC7D01664092,

@@ -28,6 +28,7 @@ import java.util.*;
 import java.lang.*;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.fts.*;
 
 
 class MatTableModel extends AbstractTableModel
@@ -45,8 +46,8 @@ public int getColumnCount()
 }
 
 public void setValueAt(Object aValue, int rowIndex, int columnIndex) 
-{	  
-  if( aValue != null)
+{	    
+  if( aValue != null && !(aValue instanceof FtsGraphicObject))
   {
     Object obj;
     try{
@@ -82,7 +83,7 @@ public int getRowCount() {
 
 public Object getValueAt(int row, int col) 
 { 
-  return model.getValueAt(row, col);
+  return  model.getValueAt(row, col);
 }
 
 public MatDataModel getMatDataModel()
