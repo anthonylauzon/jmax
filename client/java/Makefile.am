@@ -11,3 +11,6 @@ CLEANFILES=${JAR}
 $(JAR): $(JAR_DEP)
 	-test -f $(JAR) || rm -f $(JAR)
 	jar -cvf $(JAR) `find ircam/fts/client -name '*.class'`
+
+install-data-hook:
+	cd $(DESTDIR)$(jardir); find . -name "*.class" -exec rm {} \;
