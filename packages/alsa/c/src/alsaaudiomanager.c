@@ -109,6 +109,7 @@ alsaaudiomanager_scan_devices()
       s_devicename = fts_new_symbol(device_name);
       fts_set_symbol(&at, s_devicename);
       port = (fts_audioport_t*)fts_object_create(alsaaudioport_type, 1, &at);
+      fts_object_refer((fts_object_t*)port);
       fts_audiomanager_put_port(fts_new_symbol(snd_pcm_info_get_name(pcminfo)), port);
       fts_log("[alsaaudiomanager] fts_audiomanager_put_port: %s\n", snd_pcm_info_get_name(pcminfo));
     }
