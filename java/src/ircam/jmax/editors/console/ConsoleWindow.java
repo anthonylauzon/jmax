@@ -51,7 +51,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
     JScrollPane jsp = new JScrollPane( consoleArea);
     jsp.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    //jsp.getViewport().setBackingStoreEnabled( true);
+    jsp.setPreferredSize( new Dimension( 500, 550));
 
     getContentPane().add( BorderLayout.CENTER, jsp);
 
@@ -105,17 +105,13 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
 
     makeContent();
     makeMenuBar();
-
     MaxWindowManager.setTopFrame( this);
     addWindowListener( MaxWindowManager.getWindowManager());
-    
     setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE);
-    setLocation(0,0);
-    setSize( 500, 600);
-
+    validate();
+    pack();
     setVisible( true);
   }
-  
 
   public ControlPanel getControlPanel()
   {

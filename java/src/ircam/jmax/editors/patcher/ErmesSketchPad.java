@@ -326,10 +326,16 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
     return lastCopyCount;
   }
 
-  public void startPaste(){}
+  private boolean pasting = false;
+  public void startPaste()
+  {
+    pasting = true;
+  }
 
   public void endPaste()
   {
+    pasting = false;
+
     ErmesSelection.patcherSelection.deselectAll();
     for(Enumeration e = pastedObjects.elements(); e.hasMoreElements();)
       ErmesSelection.patcherSelection.select( (GraphicObject)e.nextElement());
@@ -593,7 +599,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   {
     displayList.add( object);
 	
-    if(object.getLayer() == -1)
+    if((object.getLayer() == -1)||( pasting))
       displayList.reassignLayers();
 
     object.updateInOutlets();
@@ -630,7 +636,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 							   displayList.getGraphicObjectFor(fc.getTo()),
 							   fc.getToInlet(), fc.getType(), fc);
       displayList.add(connection);
-      displayList.sortDisplayList();
+      //displayList.sortDisplayList();
       connection.updateDimensions();
       ErmesSelection.patcherSelection.select( connection);
       connection.redraw();

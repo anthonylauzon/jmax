@@ -45,40 +45,41 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
   {
     public Component getTableCellRendererComponent(JTable table, Object obj, 
 						   boolean selected, boolean hasFocus, int row, int column)
-      {
-	  super.getTableCellRendererComponent(table, obj, selected, hasFocus, row, column);
-	  
-	  setText((String) obj);
-	  setIcon( ErrorTablePanel.errorIcon);
-	  
-	  return this;
-      }
+    {
+      super.getTableCellRendererComponent(table, obj, selected, hasFocus, row, column);
+      
+      setText((String) obj);
+      setIcon( ErrorTablePanel.errorIcon);
+      
+      return this;
+    }
   }
 
   public ErrorTablePanel()
   {
     try
-	{
-	    set = new FtsObjectSet();
-	}
+      {
+	set = new FtsObjectSet();
+      }
     catch(IOException e)
-	{
-	    System.err.println("[ErrorTablePanel]: Error in FtsObjectSet creation!");
-	    e.printStackTrace();
-	}
+      {
+	System.err.println("[ErrorTablePanel]: Error in FtsObjectSet creation!");
+	e.printStackTrace();
+      }
 
     try
-	{
-	    errorFinder = new FtsErrorFinderObject();
-	}
+      {
+	errorFinder = new FtsErrorFinderObject();
+      }
     catch(IOException e)
-	{
-	    System.err.println("[ErrorTablePanel]: Error in FtsErrorFinderObject creation!");
-	    e.printStackTrace();
-	}
+      {
+	System.err.println("[ErrorTablePanel]: Error in FtsErrorFinderObject creation!");
+	e.printStackTrace();
+      }
 
     tableModel = new ErrorTableModel(set);
     table = new JTable(tableModel);
+
     table.setPreferredScrollableViewportSize(new Dimension(400, 200));
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setPreferredWidth(150);
@@ -87,31 +88,30 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     table.addMouseListener(new MouseListener(){
-	    public void mouseEntered(MouseEvent e) {} 
-	    public void mouseExited(MouseEvent e) {}
-	    public void mousePressed(MouseEvent e) {}
-	    public void mouseReleased(MouseEvent e) {}
-	    public void mouseClicked(MouseEvent e)
+	public void mouseEntered(MouseEvent e) {} 
+	public void mouseExited(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e)
+	{
+	  if (e.getClickCount() == 2)
 	    {
-		if (e.getClickCount() == 2)
+	      int index = table.rowAtPoint(e.getPoint());
+	      
+	      if ((index >= 0) && (index < set.getSize()))
+		{
+		  if (objectSelectedListener != null)
 		    {
-			int index = table.rowAtPoint(e.getPoint());
-			
-			if ((index >= 0) && (index < set.getSize()))
-			    {
-				if (objectSelectedListener != null)
-				    {
-					FtsGraphicObject object = (FtsGraphicObject) set.getElementAt(index);
-					
-					objectSelectedListener.objectSelected(object);
-				    }
-			    }
+		      FtsGraphicObject object = (FtsGraphicObject) set.getElementAt(index);
+		      
+		      objectSelectedListener.objectSelected(object);
 		    }
+		}
 	    }
-	});
+	}
+      });
     
     JScrollPane scrollPane = new JScrollPane(table);
-
     scrollPane.setAlignmentX( LEFT_ALIGNMENT);
     scrollPane.setAlignmentY( TOP_ALIGNMENT);
 
@@ -120,44 +120,44 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
     add( scrollPane);
 
     set.addListDataListener(new ListDataListener(){
-	    public void contentsChanged(ListDataEvent evt)
-	    {
-		table.revalidate();
-		table.repaint();
-		table.getSelectionModel().clearSelection();
-	    };
-	    public void intervalRemoved(ListDataEvent e){};
-	    public void intervalAdded(ListDataEvent e){};
-	});
+	public void contentsChanged(ListDataEvent evt)
+	{
+	  table.revalidate();
+	  table.repaint();
+	  table.getSelectionModel().clearSelection();
+	};
+	public void intervalRemoved(ListDataEvent e){};
+	public void intervalAdded(ListDataEvent e){};
+      });
     
     FtsPatcherObject.addGlobalEditListener(new FtsEditListener(){	    
-	    public void objectAdded(FtsObject object)
-	    {
-		if(!atomic) 
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run()
-			    { 
-				findErrors();
-			    }});
-	    };
-	    public void objectRemoved(FtsObject object)
-	    {
-		if(!atomic) 
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run()
-			    { 
-				findErrors();
-			    }});
-	    };
-	    public void connectionAdded(FtsConnection connection){};
-	    public void connectionRemoved(FtsConnection connection){};
-	    public void atomicAction(boolean active)
-	    {
-		atomic = active;
-		if(!atomic) findErrors();
-	    };
+	public void objectAdded(FtsObject object)
+	{
+	  if(!atomic) 
+	    SwingUtilities.invokeLater(new Runnable() {
+		public void run()
+		{ 
+		  findErrors();
+		}});
+	};
+	public void objectRemoved(FtsObject object)
+	{
+	  if(!atomic) 
+	    SwingUtilities.invokeLater(new Runnable() {
+		public void run()
+		{ 
+		  findErrors();
+		}});
+	};
+	public void connectionAdded(FtsConnection connection){};
+	public void connectionRemoved(FtsConnection connection){};
+	public void atomicAction(boolean active)
+	{
+	  atomic = active;
+	  if(!atomic) findErrors();
+	};
       });
-
+    
     findErrors();
   }
 

@@ -279,11 +279,8 @@ public class JMaxApplication extends FtsClient {
     initModules();
     openConsole();
     openConnection();
-    /*initConsole();*/
-
     // This should be really here, right before we eventually open command line documents
     recentFileHistory.load();
-
     openCommandLineFiles();
   }
 
@@ -354,8 +351,8 @@ public class JMaxApplication extends FtsClient {
   private void openConsole()
   {
     consoleWindow = new ConsoleWindow( "jMax Console");
-
     noConsole = true;
+
     if ( (JMaxApplication.getProperty("jmaxNoConsole") == null) || 
 	 (JMaxApplication.getProperty("jmaxNoConsole").equals("false")))
       {
@@ -364,7 +361,7 @@ public class JMaxApplication extends FtsClient {
       }
     else
       consoleWindow.getConsoleArea().append( "Output redirected to Java standard output");
-    
+
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
 	public String getToolName() { return "Console";}
 	public void open() { consoleWindow.toFront();}
