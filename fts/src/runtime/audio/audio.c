@@ -16,8 +16,6 @@
 #include "runtime/audio/audio.h"
 
 
-extern void dsp_chain_delete(void);
-
 
 /******************************************************************************/
 /*                                                                            */
@@ -108,6 +106,9 @@ static fts_symbol_t default_output_name;	/* initted to _default_output_ */
 static fts_hash_table_t fts_audio_input_logical_device_table;
 static fts_hash_table_t fts_audio_output_logical_device_table;
 
+
+static int fts_audio_pending_close = 0; 
+
 fts_module_t fts_audio_module = {"FTS Audio", "FTS Audio Input Output system ",
 				    fts_audio_init, fts_audio_restart, fts_audio_shutdown};
 
@@ -142,6 +143,10 @@ fts_audio_init(void)
   fts_hash_table_init(&fts_audio_output_logical_device_table);
 }
 
+void fts_audio_set_pending_close()
+{
+  fts_audio_pending_close = 1;
+}
 
 static void fts_audio_close_an_input_device(fts_symbol_t name, fts_atom_t *data, void *user_data)
 {
@@ -374,8 +379,21 @@ fts_audio_dev_set_input_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at)
      can be inconsistent, now (changing buffers !!!)
      */
 
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);
 
+  /* 
+     Also, if the current devices are in "pending close" conditions,
+     close all input and output audio devices; this currently happen 
+     only at startup, but this mechanism should be used to change devices
+     to avoid spikes in load */
+
+  if (fts_audio_pending_close)
+    {
+      fts_audio_reset_output_logical_dev();
+      fts_audio_reset_input_logical_dev();
+      fts_audio_pending_close = 0;
+    }
+      
   /* we get the logical device name */
 
   if ((ac >= 1) && fts_is_symbol(at))
@@ -452,7 +470,7 @@ fts_audio_unset_input_logical_dev(int ac, const fts_atom_t *at)
      can be inconsistent, now (changing buffers !!!)
      */
 
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);
 
   if ((ac > 0) && fts_is_symbol(at))
     name = fts_get_symbol(at);
@@ -501,7 +519,20 @@ fts_audio_dev_set_output_ldev(fts_dev_t *dev, int ac, const fts_atom_t *at)
      can be inconsistent, now (changing buffers !!!)
      */
 
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);  
+
+  /* 
+     Also, if the current devices are in "pending close" conditions,
+     close all input and output audio devices; this currently happen 
+     only at startup, but this mechanism should be used to change devices
+     to avoid spikes in load */
+
+  if (fts_audio_pending_close)
+    {
+      fts_audio_reset_output_logical_dev();
+      fts_audio_reset_input_logical_dev();
+      fts_audio_pending_close = 0;
+    }
 
   /* we get the logical device name */
 
@@ -583,7 +614,7 @@ fts_audio_unset_output_logical_dev(int ac, const fts_atom_t *at)
      can be inconsistent, now (changing buffers !!!)
      */
 
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);  
 
   if ((ac > 0) && fts_is_symbol(at))
     name = fts_get_symbol(at);

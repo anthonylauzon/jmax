@@ -587,6 +587,22 @@ void dsp_chain_delete(void)
   fts_audio_deactivate_devices();
 }
 
+/* DSP ON parameter listener */
+
+static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
+{
+  if (fts_is_int(value))
+    {
+      int on;
+      on = fts_get_int(value);
+
+      if (on)
+	dsp_chain_create(fts_param_get_float(fts_s_vector_size, DEFAULTVS));
+      else
+	dsp_chain_delete();
+    }
+}
+
 
 fts_object_t *dsp_get_current_object()
 {
@@ -677,9 +693,9 @@ void dsp_list_remove(fts_object_t *o)
   dsp_node_t *node, *prev_node;
 
   /* We stop the dsp chain, because for sure is not more
-   consistent with the object network */
+   consistent with the object network; use the param to propagate */
 
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);
 
   _fts_object_remove_prop(o, fts_s_dsp_descr);
 
@@ -802,5 +818,9 @@ void dsp_compiler_init(void)
 {
   dsp_graph_heap = fts_heap_new(sizeof(dsp_node_t));
   dsp_descr_heap = fts_heap_new(sizeof(fts_dsp_descr_t));
+
+  /* Install the dsp_on parameter listener */
+  
+  fts_param_add_listener(fts_s_dsp_on, 0, dsp_on_listener);
 }
 

@@ -160,6 +160,8 @@ extern fts_symbol_t fts_s_args;
 /* Kernel Parameter names */ 
 
 extern fts_symbol_t fts_s_sampling_rate;
+extern fts_symbol_t fts_s_vector_size;
+extern fts_symbol_t fts_s_dsp_on;
 extern fts_symbol_t fts_s_fifo_size;
 
 #endif

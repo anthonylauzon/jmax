@@ -15,7 +15,7 @@ public class FtsDspControl extends FtsRemoteData
   static final int FIFO_SIZE     = 6;
   static final int DSP_ON        = 7;
 
-  /* Outgoing calls */
+  /* Outgoing calls (also DSP_ON can be outgoing) */
 
   static final int FPE_START_COLLECT = 8;
   static final int FPE_STOP_COLLECT  = 9;
@@ -102,7 +102,7 @@ public class FtsDspControl extends FtsRemoteData
   {
     dspOn = value;
 
-    // Remote call to be implemented
+    remoteCall( DSP_ON, (dspOn.booleanValue() ? 1 : 0));
   }
 
   /* Fpe support */
@@ -191,6 +191,8 @@ public class FtsDspControl extends FtsRemoteData
     listeners.firePropertyChange(prop, oldValue, newValue);
   }
 }
+
+
 
 
 

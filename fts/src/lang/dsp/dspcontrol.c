@@ -108,6 +108,14 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
 }
 
 
+static void fts_dsp_control_dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
+{
+  fts_dsp_control_t *this = (fts_dsp_control_t *)listener;
+
+  fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_DSP_ON, 1, value);
+}
+
+
 static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
 {
   fts_dsp_control_t *this = (fts_dsp_control_t *)fts_malloc(sizeof(fts_dsp_control_t));
@@ -129,6 +137,8 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
   fts_alarm_arm(&(this->poll_alarm));
 
   this->dac_slip_dev = fts_dsp_get_dac_slip_dev();
+
+  fts_param_add_listener(fts_s_dsp_on, this, fts_dsp_control_dsp_on_listener);
 
   return (fts_data_t *) this;
 }
@@ -176,6 +186,19 @@ static void fts_dsp_control_fpe_stop_collect( fts_data_t *d, int ac, const fts_a
   fts_dsp_fpe_stop_collect();
 }
 
+
+static void fts_dsp_control_remote_dsp_on( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  if ((ac == 1) && fts_is_int(at))
+    {
+      fts_dsp_control_t *this = (fts_dsp_control_t *)d;
+      int on;
+
+      fts_param_set_by(fts_s_dsp_on, at, this);
+    }
+}
+
+
 void fts_dsp_control_config(void)
 {
   fts_dsp_control_data_class = fts_data_class_new( fts_new_symbol( "dspcontrol_data"));
@@ -187,6 +210,8 @@ void fts_dsp_control_config(void)
 				 fts_dsp_control_fpe_start_collect);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_STOP_COLLECT,
 				 fts_dsp_control_fpe_stop_collect);
+  fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_ON,
+				 fts_dsp_control_remote_dsp_on);
 }
 
 

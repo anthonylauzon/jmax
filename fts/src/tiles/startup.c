@@ -193,6 +193,12 @@ fts_assign_boot_devices(int argc, char **argv)
 
     fts_open_logical_device(fts_new_symbol("out~"), 1, ld_argv,
 			    fts_new_symbol("null~"), 0, 0);
+
+    /* Declare this audio device as pending close, so that it will be automagically
+       closed when other audio device are opened.
+     */
+
+    fts_audio_set_pending_close();
   }
 }
 

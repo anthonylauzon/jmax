@@ -76,6 +76,7 @@ extern void         dsp_chain_post_signals(void);
 extern void         dsp_chain_fprint(FILE *f);
 extern void         dsp_chain_fprint_signals(FILE *f);
 
+
 extern fts_object_t *dsp_get_current_object();
 
 extern int          dsp_is_running( void);

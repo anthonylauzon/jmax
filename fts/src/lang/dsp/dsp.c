@@ -69,14 +69,14 @@ dsp_module_init(void)
 static void
 dsp_module_restart(void)
 {
-  dsp_chain_delete();  
+  fts_param_set_int(fts_s_dsp_on, 0);
 }
 
 
 static void
 dsp_module_shutdown(void)
 {
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);
 }
 
 

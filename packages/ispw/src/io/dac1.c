@@ -84,16 +84,23 @@ dac_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 dac_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (dsp_is_running())
-    dsp_chain_delete();
+  fts_atom_t a;
 
-  dsp_chain_create(fts_get_long_arg(ac, at, 0, DEFAULTVS));
+  if (ac > 0)
+    fts_param_set(fts_s_vector_size, at);
+
+  /* Switch off if already on, before switching on again */
+
+  if (fts_param_get_int(fts_s_dsp_on, 0))
+    fts_param_set_int(fts_s_dsp_on, 0);
+
+  fts_param_set_int(fts_s_dsp_on, 1);
 }
 
 static void
 dac_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);
 }
 
 
@@ -419,16 +426,21 @@ adc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 adc_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (dsp_is_running())
-    dsp_chain_delete();
+  if (ac > 0)
+    fts_param_set(fts_s_vector_size, at);
 
-  dsp_chain_create(fts_get_long_arg(ac, at, 0, DEFAULTVS));
+  /* Switch off if already on, before switching on again */
+
+  if (fts_param_get_int(fts_s_dsp_on, 0))
+    fts_param_set_int(fts_s_dsp_on, 0);
+
+  fts_param_set_int(fts_s_dsp_on, 1);
 }
 
 static void
 adc_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_chain_delete();
+  fts_param_set_int(fts_s_dsp_on, 0);
 }
 
 

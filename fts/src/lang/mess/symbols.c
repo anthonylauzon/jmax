@@ -135,6 +135,8 @@ fts_symbol_t fts_s_args;
 /* Kernel Parameter names */ 
 
 fts_symbol_t fts_s_sampling_rate;
+fts_symbol_t fts_s_vector_size;
+fts_symbol_t fts_s_dsp_on;
 fts_symbol_t fts_s_fifo_size;
 
 static void
@@ -260,6 +262,8 @@ fts_predefine_symbols(void)
   /* Kernel Parameter names */ 
 
   fts_s_sampling_rate = fts_new_symbol("sampling_rate");
+  fts_s_vector_size   = fts_new_symbol("vector_size");
+  fts_s_dsp_on        = fts_new_symbol("dsp_on");
   fts_s_fifo_size     = fts_new_symbol("fifo_size");
 }
 

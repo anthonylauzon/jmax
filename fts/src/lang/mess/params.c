@@ -41,13 +41,18 @@ static fts_heap_t *param_listener_heap;
 static fts_param_t *param_list = 0;
 static fts_param_listener_t *param_listener_list = 0;
 
-static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value);
+static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value, const void *author);
 
 /*
  * Note that a Parameter can't be removed.
  */
 
 void fts_param_set(fts_symbol_t name, const fts_atom_t *value)
+{
+  fts_param_set_by(name, value, 0);
+}
+
+void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *author)
 {
   fts_param_t *p;
 
@@ -74,7 +79,7 @@ void fts_param_set(fts_symbol_t name, const fts_atom_t *value)
 
   /* Second, run the listeners */
 
-  fts_param_run_listeners(name, value);
+  fts_param_run_listeners(name, value, author);
 }
 
 
@@ -123,15 +128,14 @@ void fts_param_add_listener(fts_symbol_t name, void *listener,
 }
 
 
-static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value)
+static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value, const void *author)
 {
   fts_param_listener_t *p;
 
   for (p = param_listener_list; p ; p = p->next)
-    if (p->name == name)
+    if ((p->name == name) && (p->listener != author))
       (* p->listener_fun)(p->listener, name, value);
 }
-
 
 
 void fts_param_remove_listener(void *listener)
@@ -193,8 +197,68 @@ fts_symbol_t fts_param_get_symbol(fts_symbol_t name, fts_symbol_t default_value)
     return default_value;
 }
 
+
+void fts_param_set_float(fts_symbol_t name,  float value)
+{
+  fts_atom_t a;
+
+  fts_set_float(&a, value);
+  fts_param_set(name, &a);
+}
+
+
+void fts_param_set_float_by(fts_symbol_t name,  float value, void *author)
+{
+  fts_atom_t a;
+
+  fts_set_float(&a, value);
+  fts_param_set_by(name, &a, author);
+}
+
+
+void fts_param_set_int(fts_symbol_t name,  int value)
+{
+  fts_atom_t a;
+
+  fts_set_int(&a, value);
+  fts_param_set(name, &a);
+}
+
+
+void fts_param_set_int_by(fts_symbol_t name,  int value, void *author)
+{
+  fts_atom_t a;
+
+  fts_set_int(&a, value);
+  fts_param_set_by(name, &a, author);
+}
+
+
+void fts_param_set_symbol(fts_symbol_t name,  fts_symbol_t value)
+{
+  fts_atom_t a;
+
+  fts_set_symbol(&a, value);
+  fts_param_set(name, &a);
+}
+
+
+void fts_param_set_symbol_by(fts_symbol_t name,  fts_symbol_t value, void *author)
+{
+  fts_atom_t a;
+
+  fts_set_symbol(&a, value);
+  fts_param_set_by(name, &a, author);
+}
+
+
 void fts_params_init()
 {
   param_heap = fts_heap_new(sizeof(fts_param_t));
   param_listener_heap = fts_heap_new(sizeof(fts_param_listener_t));
 }
+
+
+
+
+

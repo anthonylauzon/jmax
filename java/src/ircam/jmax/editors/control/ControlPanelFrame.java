@@ -30,6 +30,7 @@ public class ControlPanelFrame extends JFrame
   private IndicatorWithMemory invalidFpeIndicator;
   private IndicatorWithMemory divideByZeroFpeIndicator;
   private IndicatorWithMemory overflowFpeIndicator;
+  private JCheckBox dspOnButton;
 
   class DspControlAdapter implements PropertyChangeListener
   {
@@ -50,6 +51,25 @@ public class ControlPanelFrame extends JFrame
 	  ind.setValue(true);
 	else
 	  ind.setValue(false);
+    }
+  }
+
+  class DspOnControlAdapter implements PropertyChangeListener
+  {
+    String prop;
+    JCheckBox b;
+
+    DspOnControlAdapter(String prop, FtsDspControl control, JCheckBox b)
+    {
+      this.prop = prop;
+      this.b    = b;
+      control.addPropertyChangeListener(this);
+    }
+
+    public void propertyChange(PropertyChangeEvent event)
+    {
+      if (prop.equals(event.getPropertyName()))
+	b.setSelected(((Boolean) event.getNewValue()).booleanValue());
     }
   }
 
@@ -118,6 +138,20 @@ public class ControlPanelFrame extends JFrame
     fifoSizePanel.add("East", fifoSizeText);
 
     panel.add(fifoSizePanel);
+
+    dspOnButton = new JCheckBox("Dsp On");
+    dspOnButton.setSelected(control.getDspOn().booleanValue());
+    new DspOnControlAdapter("dspOn", control, dspOnButton);
+
+    dspOnButton.addItemListener(new ItemListener() {
+      public void itemStateChanged(ItemEvent e) {
+	if (e.getStateChange() == ItemEvent.DESELECTED)
+	  control.setDspOn(Boolean.FALSE);
+	else  if (e.getStateChange() == ItemEvent.SELECTED)
+	  control.setDspOn(Boolean.TRUE);
+      }});
+
+    panel.add(dspOnButton);
 
     getContentPane().add( panel);
 

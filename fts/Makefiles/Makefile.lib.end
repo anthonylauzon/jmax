@@ -44,7 +44,7 @@ $(OBJDIR)/%.o : %.c
 
 ifeq ($(VENDOR),sgi)
 $(LIBDIR)/%.so : $(LIBDIR)/%.a
-	ld $(FTS_SOFLAGS) -elf -shared -rdata_shared -o $@ $(LD_ALL_FLAG) $< $(LD_NONE_FLAG) $(SOLIBS) -delay_load -lc  $(MORESOLIBS)
+	ld $(FTS_SOFLAGS) -elf -shared -rdata_shared -o $@ $(LD_ALL_FLAG) $< $(LD_NONE_FLAG) $(SOLIBS) -lc  $(MORESOLIBS)
 endif
 
 ifeq ($(VENDOR),gnu)
