@@ -673,13 +673,14 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
         int to_remove = 0;
         int i = 0;
         event_t *stop_evt = NULL;
+        event_t *next_evt = NULL;
         /* remove bars between current_bar and the one after next_time */
         scomark_t *stop_bar = marker_track_get_next_bar_by_time(marker_track, next_bar, next_time);
         if(stop_bar != NULL)
           stop_evt = (event_t *)fts_object_get_context((fts_object_t *)stop_bar); 
         
         /* find bars to be removed */
-        event_t *next_evt = event_get_next(marker_evt); 
+        next_evt = event_get_next(marker_evt); 
         while(next_evt != stop_evt && next_evt != NULL)
         {
           scomark_t *next_scomark = (scomark_t *)fts_get_object( event_get_value(next_evt));
