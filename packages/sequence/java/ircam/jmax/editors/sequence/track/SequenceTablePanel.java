@@ -52,15 +52,14 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 			JComboBox combo = new JComboBox( trackObj.getEventTypes());
 			combo.setBackground(Color.white);
 			typeEditor = new ComboCellEditor( combo);		
-			table.getColumnModel().getColumn(2).setCellEditor(typeEditor);
+			table.getColumnModel().getColumn(1).setCellEditor(typeEditor);
 			combo.setFont(table.getFont());
 		}
 		/************/
-    table.setPreferredScrollableViewportSize(new Dimension(650, 300));
+    int width = COL_WIDTH * tmodel.getColumnCount();
+    if(width > DEF_TABLE_WIDTH) width = DEF_TABLE_WIDTH;
+    table.setPreferredScrollableViewportSize(new Dimension(width, 200));
     table.setRowHeight(17);
-    table.getColumnModel().getColumn(0).setPreferredWidth(50);
-    table.getColumnModel().getColumn(0).setMaxWidth(50);
-		/*table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);*/
 		
     scrollPane = new JScrollPane(table);
 		
@@ -247,6 +246,8 @@ transient JScrollPane scrollPane;
 transient JTable table;
 ComboCellEditor typeEditor;
 boolean restoring = false;
+static final int COL_WIDTH = 100;
+static final int DEF_TABLE_WIDTH = 700;
 }
 
 

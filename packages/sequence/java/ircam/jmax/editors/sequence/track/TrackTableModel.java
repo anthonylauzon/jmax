@@ -50,7 +50,7 @@ class TrackTableModel extends AbstractTableModel{
 * The number of columns in this model */
 public int getColumnCount() 
 { 
-	return 2 + model.getPropertyCount();
+	return 1 + model.getPropertyCount();
 }
 
 /**
@@ -59,12 +59,9 @@ public Class getColumnClass(int col)
 {
 	int type;
 	if(col == 0)
-		return Integer.class;
-	else 
-		if(col == 1) 
-			return Double.class;
+    return Double.class;
 	else	      
-		return model.getPropertyType(col-2);
+		return model.getPropertyType(col-1);
 }
 
 /**
@@ -72,15 +69,13 @@ public Class getColumnClass(int col)
  * in the Explode. Row is the event number, column is the field to change. 
  * @see WholeNumberField*/
 public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
-{	
-	if(columnIndex == 0) return;
-	
+{		
 	Event event = model.getEventAt(rowIndex);
 	
 	if (model instanceof UndoableData) //can't make assumptions...
 		((UndoableData) model).beginUpdate(); 
 	
-	if(columnIndex == 1)
+	if(columnIndex == 0)
 		event.move(((Double) aValue).doubleValue());
 	else
 		if( aValue == null || (aValue instanceof String && ((String)aValue).equals("")))
@@ -96,7 +91,7 @@ public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex)
 * Every field in an explode is editable, except the event number */
 public boolean isCellEditable(int row, int col)
 {
-	return col != 0;
+  return true;
 }
 
 /**
@@ -105,23 +100,19 @@ public String getColumnName(int col)
 {
 	String name;
 	if(col == 0)
-		return "evt. no";
-	else 
-	{
-		if(col == 1)
-			return "time";
-		else
-	  {
-	    int i = 2;
-	    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-			{
-				name = (String)e.nextElement();
-				if(i==col)
-					return name;
-				i++;
-			}
-	  }
-	}
+    return "time";
+  else
+  {
+    int i = 1;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+    {
+      name = (String)e.nextElement();
+      if(i==col)
+        return name;
+      i++;
+    }
+  }
+	/*}*/
 	return "";
 }
 
@@ -133,25 +124,20 @@ public int getRowCount() {
 
 /**
 * Returns the value of the given field of the given Event */
-public Object getValueAt(int row, int col) { 
-	
-	if(col == 0)
-		return new Integer(row);
-	else 
-	{
+public Object getValueAt(int row, int col)
+{ 
 		Event temp = model.getEventAt(row);    
 		
-		if(col == 1)
+		if(col == 0)
 			return new Float(temp.getTime());
 		else
 	  {
-	    Object val = temp.getValue().getPropertyValues()[col-2];
+	    Object val = temp.getValue().getPropertyValues()[col-1];
       
 	    if( val != EventValue.UNKNOWN_PROPERTY) 
 	      return val;
 	    else return null;
 	  }
-	}
 }
 
 /**
