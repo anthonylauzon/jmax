@@ -20,8 +20,8 @@
  * 
  */
 
-#ifndef _FTS_H
-#define _FTS_H
+#ifndef FTS_FTS_H_
+#define FTS_FTS_H_
 
 /**
  * Global FTS include file. 
@@ -145,7 +145,7 @@ FTS_API fts_symbol_t fts_get_root_directory( void);
 }
 #endif
 
-#endif
+#endif /* FTS_FTS_H_ */
 
 
 
