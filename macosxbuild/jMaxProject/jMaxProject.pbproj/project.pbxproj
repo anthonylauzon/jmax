@@ -2174,7 +2174,7 @@
 		};
 		F5FC7B1203542EAD01664092 = {
 			buildActionMask = 12;
-			dstPath = share/jmax/packages/dtd/c;
+			dstPath = lib/jmax/packages/dtd/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F5FC7B1403542EF901664092,
@@ -2265,6 +2265,30 @@
 		};
 		F7112B670401730701664058 = {
 			fileRef = F7112B660401730701664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F73BB60804F4CC0E01664058 = {
+			isa = PBXFileReference;
+			name = RedoAction.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/actions/RedoAction.java;
+			refType = 2;
+		};
+		F73BB60904F4CC0E01664058 = {
+			isa = PBXFileReference;
+			name = UndoAction.java;
+			path = ../../java/src/ircam/jmax/editors/patcher/actions/UndoAction.java;
+			refType = 2;
+		};
+		F73BB60A04F4CC0E01664058 = {
+			fileRef = F73BB60804F4CC0E01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F73BB60B04F4CC0E01664058 = {
+			fileRef = F73BB60904F4CC0E01664058;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -4772,7 +4796,7 @@
 		};
 		F8448E4E0286C0A901664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/system/c;
+			dstPath = lib/jmax/packages/system/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E1028D870301664092,
@@ -4804,7 +4828,7 @@
 		};
 		F8448E580286C23601664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/system/help;
+			dstPath = lib/jmax/packages/system/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F8448E5D0286C23601664092,
@@ -4828,7 +4852,7 @@
 		};
 		F8448E5F0286C23601664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/system;
+			dstPath = lib/jmax/packages/system;
 			dstSubfolderSpec = 7;
 			files = (
 				F85494FF02D2511801664092,
@@ -6512,7 +6536,7 @@
 		};
 		F8512203028BDC3701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispw/c;
+			dstPath = lib/jmax/packages/ispw/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E2028D870301664092,
@@ -6522,7 +6546,7 @@
 		};
 		F8512205028BDC3701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispw/java;
+			dstPath = lib/jmax/packages/ispw/java;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010FA028D890E01664092,
@@ -6532,7 +6556,7 @@
 		};
 		F8512207028BDC3701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispw/images;
+			dstPath = lib/jmax/packages/ispw/images;
 			dstSubfolderSpec = 7;
 			files = (
 				F8512208028BDC3701664092,
@@ -6590,7 +6614,7 @@
 		};
 		F851220F028BDC3701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispw/help;
+			dstPath = lib/jmax/packages/ispw/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F8512261028BDC6D01664092,
@@ -6978,7 +7002,7 @@
 		};
 		F8512264028BDEE401664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispw/sounds;
+			dstPath = lib/jmax/packages/ispw/sounds;
 			dstSubfolderSpec = 7;
 			files = (
 				F8512265028BDEE401664092,
@@ -7085,7 +7109,7 @@
 		};
 		F8512273028BDEE401664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispw;
+			dstPath = lib/jmax/packages/ispw;
 			dstSubfolderSpec = 7;
 			files = (
 				F5632C2203499A0701664092,
@@ -7095,7 +7119,7 @@
 		};
 		F8512275028BDF6901664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/signal/c;
+			dstPath = lib/jmax/packages/signal/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E3028D870301664092,
@@ -7105,7 +7129,7 @@
 		};
 		F8512277028BDF6901664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/signal/help;
+			dstPath = lib/jmax/packages/signal/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F8512278028BDF6901664092,
@@ -7172,7 +7196,7 @@
 		};
 		F851227D028BDF6901664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/signal;
+			dstPath = lib/jmax/packages/signal;
 			dstSubfolderSpec = 7;
 			files = (
 				F5632C2303499A1501664092,
@@ -7485,7 +7509,7 @@
 		};
 		F85122AF028BE0F601664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/control/c;
+			dstPath = lib/jmax/packages/control/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F5F40D720348A14401664092,
@@ -7495,7 +7519,7 @@
 		};
 		F85122B1028BE0F601664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/control/help;
+			dstPath = lib/jmax/packages/control/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F85122B2028BE0F601664092,
@@ -7551,7 +7575,7 @@
 		};
 		F85122B9028BE0F601664092 = {
 			buildActionMask = 12;
-			dstPath = share/jmax/packages/control;
+			dstPath = lib/jmax/packages/control;
 			dstSubfolderSpec = 7;
 			files = (
 				F5EEB8B503BC97A6016640F1,
@@ -7821,7 +7845,7 @@
 		};
 		F85122E9028BE2AB01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/io/c;
+			dstPath = lib/jmax/packages/io/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E5028D870301664092,
@@ -7831,7 +7855,7 @@
 		};
 		F85122EB028BE2AB01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/io/help;
+			dstPath = lib/jmax/packages/io/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F85122ED028BE2AB01664092,
@@ -7868,7 +7892,7 @@
 		};
 		F85122F3028BE2AB01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/io;
+			dstPath = lib/jmax/packages/io;
 			dstSubfolderSpec = 7;
 			files = (
 				F5632C2503499A3101664092,
@@ -8063,7 +8087,7 @@
 		};
 		F851230B028BE3EA01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispwmath/c;
+			dstPath = lib/jmax/packages/ispwmath/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E6028D870301664092,
@@ -8073,7 +8097,7 @@
 		};
 		F851230D028BE3EA01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispwmath/help;
+			dstPath = lib/jmax/packages/ispwmath/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F851230E028BE3EA01664092,
@@ -8117,7 +8141,7 @@
 		};
 		F8512313028BE3EA01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/ispwmath;
+			dstPath = lib/jmax/packages/ispwmath;
 			dstSubfolderSpec = 7;
 			files = (
 				F5632C2603499AD201664092,
@@ -8374,7 +8398,7 @@
 		};
 		F8512339028BE55901664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/midi/c;
+			dstPath = lib/jmax/packages/midi/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E7028D870401664092,
@@ -8384,7 +8408,7 @@
 		};
 		F851233B028BE55901664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/midi/help;
+			dstPath = lib/jmax/packages/midi/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F851233C028BE55901664092,
@@ -8454,7 +8478,7 @@
 		};
 		F8512347028BE55901664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/midi;
+			dstPath = lib/jmax/packages/midi;
 			dstSubfolderSpec = 7;
 			files = (
 				F5632C2703499AE001664092,
@@ -8682,7 +8706,7 @@
 		};
 		F8512361028BE68701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/numeric/c;
+			dstPath = lib/jmax/packages/numeric/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E8028D870401664092,
@@ -8692,7 +8716,7 @@
 		};
 		F8512363028BE68701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/numeric/help;
+			dstPath = lib/jmax/packages/numeric/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F8512364028BE68701664092,
@@ -8732,7 +8756,7 @@
 		};
 		F8512367028BE68701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/numeric;
+			dstPath = lib/jmax/packages/numeric;
 			dstSubfolderSpec = 7;
 			files = (
 				F5632C2803499AEC01664092,
@@ -11484,7 +11508,7 @@
 		};
 		F8512511028BED1101664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/sequence/c;
+			dstPath = lib/jmax/packages/sequence/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E9028D870401664092,
@@ -11494,7 +11518,7 @@
 		};
 		F8512513028BED1101664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/sequence/java;
+			dstPath = lib/jmax/packages/sequence/java;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010FB028D890E01664092,
@@ -11504,7 +11528,7 @@
 		};
 		F8512515028BED1101664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/sequence/images;
+			dstPath = lib/jmax/packages/sequence/images;
 			dstSubfolderSpec = 7;
 			files = (
 				F8512516028BED1101664092,
@@ -11668,7 +11692,7 @@
 		};
 		F851252E028BED1101664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/sequence/help;
+			dstPath = lib/jmax/packages/sequence/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F8512533028BED1101664092,
@@ -11696,7 +11720,7 @@
 		};
 		F8512535028BED1101664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/sequence;
+			dstPath = lib/jmax/packages/sequence;
 			dstSubfolderSpec = 7;
 			files = (
 				F5632C2903499AFD01664092,
@@ -12358,7 +12382,7 @@
 		};
 		F88000370283043C01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/images;
+			dstPath = lib/jmax/images;
 			dstSubfolderSpec = 7;
 			files = (
 				F88000390283051101664092,
@@ -12684,7 +12708,7 @@
 		};
 		F88000680283056E01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax;
+			dstPath = lib/jmax;
 			dstSubfolderSpec = 7;
 			files = (
 				F7D8EEE003F132B101664058,
@@ -12978,7 +13002,7 @@
 		};
 		F88000910283076201664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/utils/c;
+			dstPath = lib/jmax/packages/utils/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010DD028D870301664092,
@@ -13987,6 +14011,7 @@
 				F880FDF20283013E01664092,
 				F880FDF30283013E01664092,
 				F880FDF40283013E01664092,
+				F73BB60804F4CC0E01664058,
 				F880FDF60283013E01664092,
 				F880FDF70283013E01664092,
 				F880FDF80283013E01664092,
@@ -14001,6 +14026,7 @@
 				F880FE010283013E01664092,
 				F880FE020283013E01664092,
 				F880FE030283013E01664092,
+				F73BB60904F4CC0E01664058,
 			);
 			isa = PBXGroup;
 			name = actions;
@@ -15998,6 +16024,8 @@
 				F774414303F0114C01664058,
 				F7F6153D04164DA001664058,
 				F7F6153E04164DA001664058,
+				F73BB60A04F4CC0E01664058,
+				F73BB60B04F4CC0E01664058,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17827,7 +17855,7 @@
 		};
 		F8A9635802D36B3701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/help;
+			dstPath = lib/jmax/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F756D674040D3B9E01664058,
@@ -20381,7 +20409,7 @@
 		};
 		F8DC5EC9028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/data/c;
+			dstPath = lib/jmax/packages/data/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010DE028D870301664092,
@@ -20391,7 +20419,7 @@
 		};
 		F8DC5ECB028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/data/java;
+			dstPath = lib/jmax/packages/data/java;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010F8028D890E01664092,
@@ -20401,7 +20429,7 @@
 		};
 		F8DC5ECD028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/data/images;
+			dstPath = lib/jmax/packages/data/images;
 			dstSubfolderSpec = 7;
 			files = (
 				F8DC5ECE028685AF01664092,
@@ -20452,7 +20480,7 @@
 		};
 		F8DC5ED4028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/data/help;
+			dstPath = lib/jmax/packages/data/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F8DC5ED5028685AF01664092,
@@ -20516,7 +20544,7 @@
 		};
 		F8DC5EDF028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/data;
+			dstPath = lib/jmax/packages/data;
 			dstSubfolderSpec = 7;
 			files = (
 				F85494E402D24FB101664092,
@@ -20526,7 +20554,7 @@
 		};
 		F8DC5EE1028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/guiobj/c;
+			dstPath = lib/jmax/packages/guiobj/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010DF028D870301664092,
@@ -20536,7 +20564,7 @@
 		};
 		F8DC5EE3028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/guiobj/java;
+			dstPath = lib/jmax/packages/guiobj/java;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010F9028D890E01664092,
@@ -20546,7 +20574,7 @@
 		};
 		F8DC5EE5028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/guiobj/help;
+			dstPath = lib/jmax/packages/guiobj/help;
 			dstSubfolderSpec = 7;
 			files = (
 				F8DC5EE6028685AF01664092,
@@ -20633,7 +20661,7 @@
 		};
 		F8DC5EF1028685AF01664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/guiobj;
+			dstPath = lib/jmax/packages/guiobj;
 			dstSubfolderSpec = 7;
 			files = (
 				F85494E702D24FDA01664092,
@@ -20652,7 +20680,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "chmod a+r build/jMax.app/Contents/Resources/share/jmax/default_project.jprj\nmv build/jMax.app/Contents/Resources/share/jmax/default_config_macosx.jcfg build/jMax.app/Contents/Resources/share/jmax/default_config.jcfg\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default_config.jcfg";
+			shellScript = "chmod a+r build/jMax.app/Contents/Resources/lib/jmax/default_project.jprj\nmv build/jMax.app/Contents/Resources/lib/jmax/default_config_macosx.jcfg build/jMax.app/Contents/Resources/lib/jmax/default_config.jcfg\nchmod a+r build/jMax.app/Contents/Resources/lib/jmax/default_config.jcfg";
 		};
 		F8DC5EF40286A1FA01664092 = {
 			children = (
@@ -20818,7 +20846,7 @@
 		};
 		F8DC5F0A0286A34701664092 = {
 			buildActionMask = 2147483647;
-			dstPath = share/jmax/packages/macosx/c;
+			dstPath = lib/jmax/packages/macosx/c;
 			dstSubfolderSpec = 7;
 			files = (
 				F8F010E0028D870301664092,
