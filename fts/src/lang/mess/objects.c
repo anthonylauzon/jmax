@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.32 $ IRCAM $Date: 1998/06/30 14:27:09 $
+ *      $Revision: 1.33 $ IRCAM $Date: 1998/07/21 16:48:46 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -138,7 +138,8 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
       fts_block_free((char *)obj, obj->cl->size);
 
 
-      fts_object_table_remove(id);
+      if ( id != FTS_NO_ID) /* (fd): purified... */
+	fts_object_table_remove(id);
 
       return 0;
     }
