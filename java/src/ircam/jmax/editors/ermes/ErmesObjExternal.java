@@ -102,34 +102,41 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   // mouseDown
   //--------------------------------------------------------
   
-   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-     if(evt.getClickCount()>1) {
-       Cursor temp = itsSketchPad.getCursor();
+  public boolean MouseDown_specific(MouseEvent evt,int x, int y) 
+  {
+    if ( evt.getClickCount() > 1 ) 
+      {
+	Cursor temp = itsSketchPad.getCursor();
        
-       if(itsFtsObject instanceof FtsObjectWithData){
-	 try{
-	   // New !!! Actually the same thing can be done for 
-	   // patchers now !!!
-	   
-	   MaxData data;
-	   itsSketchPad.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	   
-	   data = ((FtsObjectWithData) itsFtsObject).getData();	   
-	   Mda.edit(data);
+	if ( itsFtsObject instanceof FtsObjectWithData)
+	  {
+	    itsSketchPad.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-	   itsSketchPad.setCursor(temp);
+	    try
+	      {
+		// New !!! Actually the same thing can be done for 
+		// patchers now !!!
+	   
+		MaxData data;
+	   
+		data = ((FtsObjectWithData) itsFtsObject).getData();	   
+		Mda.edit( data);
 
-	 }
-	 catch (MaxDocumentException e)
-	   {
-	     // SHould do something better
-	     System.err.println(e);
-	   }
-       }
-     }
-     else if (!itsSketchPad.itsRunMode) itsSketchPad.ClickOnObject(this, evt, x, y);
-     return true;
-   }
+	      }
+	    catch ( MaxDocumentException e)
+	      {
+		// SHould do something better
+		System.err.println( e);
+	      }
+
+	    itsSketchPad.setCursor( temp);
+	  }
+      }
+    else if ( !itsSketchPad.itsRunMode) 
+      itsSketchPad.ClickOnObject( this, evt, x, y);
+
+    return true;
+  }
 
   public void RestartEditing() {
     super.RestartEditing();

@@ -63,7 +63,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   public void setItsX(int theX) {
     itsX = theX;
-    // (fd)   itsFtsObject.put("x", itsX);
+    itsFtsObject.put("x", itsX);
   }
 
   public int getItsY() {
@@ -72,7 +72,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   public void setItsY(int theY) {
     itsY = theY;
-    // (fd) itsFtsObject.put("y", itsY);
+    itsFtsObject.put("y", itsY);
   }
 
   public int getItsWidth() {
@@ -83,7 +83,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   public void setItsWidth(int theWidth) {
     
     currentRect.width = theWidth;
-    // (fd)    itsFtsObject.put("w", theWidth);
+    itsFtsObject.put("w", theWidth);
   }
 
   public int getItsHeight() {
@@ -95,7 +95,7 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   public void setItsHeight(int theHeight) {
     
     currentRect.height = theHeight;
-    // (fd) itsFtsObject.put("h", theHeight);
+    itsFtsObject.put("h", theHeight);
   }
 
   public Font getFont() {
@@ -104,14 +104,6 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
   public void setFont( Font theFont) 
   {
-    // (fd) {
-//     {
-//       System.err.println( "Ouarghl ! setFont(" + theFont + ")");
-
-//       (new Throwable()).printStackTrace();
-//     }
-    // } (fd)
-
     itsFont = theFont;
     itsFontMetrics = itsSketchPad.getFontMetrics( theFont);
 
@@ -339,8 +331,8 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
 
     // itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); // (fd) already done in setFont() !!!
     
-    //setItsX(x);
-    //setItsY(y);
+    //setItsX(x); (fd) also done in makeCurrentRect(x, y)
+    //setItsY(y); idem
 		
     makeCurrentRect(x, y);
 
@@ -422,8 +414,13 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     int width = 0;
     int height = 0;
 
-    setItsX( ((Integer)theFtsObject.get("x")).intValue() );
-    setItsY( ((Integer)theFtsObject.get("y")).intValue() );
+    //setItsX( ((Integer)theFtsObject.get("x")).intValue() );
+    // (fd) changed to avoid back-propagation of the property
+    // to the application layer and ? to FTS
+    itsX = ((Integer)theFtsObject.get("x")).intValue();
+    //setItsY( ((Integer)theFtsObject.get("y")).intValue() );
+    // idem
+    itsY = ((Integer)theFtsObject.get("y")).intValue();
 
     Integer widthInt = (Integer) theFtsObject.get("w");
     if (widthInt != null)
@@ -435,18 +432,22 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
     
     if ( width < 10)
       {
-	width  = getMinimumSize().width;
+	width = getMinimumSize().width;
+	theFtsObject.put( "w", width);
       }
 
     if ( height < 10)
       {
-	height  = getMinimumSize().height;
+	height = getMinimumSize().height;
+	theFtsObject.put( "h", height);
       }
 
     currentRect = new Rectangle(itsX, itsY, width, height);
-
-    setItsWidth(width);
-    setItsHeight(height);
+    
+    // apart from setting again width (first line of setItsWidth: currentRect.width = theWidth;)
+    // this propagates back the property value to the application layer and then may be to FTS
+    //setItsWidth(width);
+    //setItsHeight(height);
   }
 
   public boolean Select(boolean paintNow)
