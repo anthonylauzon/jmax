@@ -39,6 +39,7 @@ import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.actions.*;
 import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.interactions.*;
+import ircam.jmax.toolkit.*;
 
 //
 // The "slider" graphic object

@@ -121,6 +121,12 @@ public class FtsGraphicObject extends FtsObject {
 	  ((FtsGraphicObject)obj).setCurrentLayer( args.getInt( 0));
 	}
       });
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setName"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsGraphicObject)obj).setVariableName( args.getSymbol( 0).toString());
+	}
+      });
     FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setComment"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -177,6 +183,7 @@ public class FtsGraphicObject extends FtsObject {
   protected String comment = "";
   protected int noutlets = -1;
   protected int ninlets = -1;
+  protected String varName = null;
 
   /** Get the X property */
 
@@ -551,6 +558,16 @@ public class FtsGraphicObject extends FtsObject {
   public void setCurrentComment( String comment)
   {
     this.comment = comment;
+  }
+
+  public final void setVariableName( String name)
+  {
+    this.varName = name;
+  }
+
+  public final String getVariableName()
+  {
+    return varName;
   }
   /********************************************************************************/
     

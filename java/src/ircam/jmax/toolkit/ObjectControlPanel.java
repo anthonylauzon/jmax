@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.guiobj;
+package ircam.jmax.toolkit;
 
 import ircam.jmax.editors.patcher.objects.*;
 /**

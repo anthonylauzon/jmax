@@ -28,10 +28,12 @@ package ircam.jmax.editors.patcher.objects;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.toolkit.*;
 
 public class Standard extends Editable implements FtsObjectErrorListener
 {
@@ -173,6 +175,27 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
     super.paint( g);
   }
+
+  /**************  popup interaction ********************/ 
+  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
+  {
+    super.popUpUpdate(onInlet, onOutlet, area);
+    getControlPanel().update(this);
+    ObjectPopUp.getInstance().add((JPanel)getControlPanel());
+    ObjectPopUp.getInstance().revalidate();
+    ObjectPopUp.getInstance().pack();
+  }
+  public void popUpReset()
+  {
+    super.popUpReset();
+    getControlPanel().done();
+    ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
+  }  
+  public ObjectControlPanel getControlPanel()
+  {
+    return this.controlPanel;
+  }
+  public static StandardControlPanel controlPanel = new StandardControlPanel();
 }
 
 

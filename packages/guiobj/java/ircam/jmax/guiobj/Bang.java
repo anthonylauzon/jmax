@@ -40,6 +40,7 @@ import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
 import ircam.jmax.editors.patcher.menus.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.toolkit.*;
 
 //
 // The "bang" graphic object.

@@ -31,7 +31,6 @@ InOutlet.java \
 IntBox.java \
 MessConst.java \
 Monitor.java \
-ObjectControlPanel.java \
 Outlet.java \
 Patcher.java \
 Scope.java \

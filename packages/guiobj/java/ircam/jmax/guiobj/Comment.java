@@ -37,6 +37,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
+import ircam.jmax.toolkit.*;
 
 //
 // The "comment" graphic object

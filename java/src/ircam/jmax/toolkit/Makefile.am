@@ -28,6 +28,7 @@ MouseDragTracker.java\
 MouseTracker.java\
 NumericPropertyEditor.java\
 NumericalWidget.java\
+ObjectControlPanel.java\
 ObjectRenderer.java\
 PopupProvider.java\
 PopupToolbarPanel.java\
