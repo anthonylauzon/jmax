@@ -270,8 +270,10 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
   else
     seqplay_stop(o, 0, 0, 0, 0);
 
-  if(sequence_editor_is_open(this->sequence))
+  /*
+    if(sequence_editor_is_open(this->sequence))
     fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, ac, at);
+  */
 
   fts_set_ptr(a, &ac);
   fts_set_ptr(a + 1, at);

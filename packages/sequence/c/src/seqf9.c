@@ -96,6 +96,14 @@ seqf9_advanceto(seqf9_t *this, note_t *newnote)
   noteevt_t *e;
   note_t *wanttail;
 
+  if(sequence_editor_is_open(this->sequence))
+    {
+      fts_atom_t a[1];
+
+      fts_set_object(a, (fts_object_t *)newnote->n_evt);
+      fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, 1, a);
+    }
+
   /* send the matched note (helps monitor progress) */
   fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)newnote->n_evt));
 
