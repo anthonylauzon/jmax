@@ -10,6 +10,7 @@ dspgraph.h \
 errobj.h \
 expression.h \
 fpe.h \
+label.h \
 loader.h \
 object.h \
 package.h \
