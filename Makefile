@@ -157,16 +157,16 @@ cvs-tag:
 # spec_files
 # update the spec files for version number
 #
-spec_files:
+spec-files:
 	(cd pkg/sgi ; $(MAKE) all)
 	(cd pkg/rpm ; $(MAKE) all)
-.PHONY: spec_files
+.PHONY: spec-files
 
 #
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-src-dist: spec_files cvs-tag 
+src-dist: spec-files cvs-tag 
 	rm -rf $(distdir)
 	umask 22
 	mkdir $(distdir)
@@ -227,21 +227,25 @@ new-snapshot:
 	echo "MINOR=$(MINOR)" >> VERSION
 	echo "PATCH_LEVEL=$(PATCH_LEVEL)" >> VERSION
 	echo "SNAPSHOT="`echo $(SNAPSHOT) | tr a-yz b-za` >> VERSION
+	$(MAKE) spec-files
 
 new-patch:
 	echo "MAJOR=$(MAJOR)" > VERSION
 	echo "MINOR=$(MINOR)" >> VERSION
 	echo "PATCH_LEVEL="`expr $(PATCH_LEVEL) + 1` >> VERSION
 	echo "SNAPSHOT=a" >> VERSION
+	$(MAKE) spec-files
 
 new-minor:
 	echo "MAJOR=$(MAJOR)" > VERSION
 	echo "MINOR="`expr $(MINOR) + 1` >> VERSION
 	echo "PATCH_LEVEL=0" >> VERSION
 	echo "SNAPSHOT=a" >> VERSION
+	$(MAKE) spec-files
 
 new-major:
 	echo "MAJOR="`expr $(MAJOR) + 1` > VERSION
 	echo "MINOR=0" >> VERSION
 	echo "PATCH_LEVEL=0" >> VERSION
 	echo "SNAPSHOT=a" >> VERSION
+	$(MAKE) spec-files
