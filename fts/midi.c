@@ -488,9 +488,7 @@ fts_midififo_poll(fts_midififo_t *fifo)
 	  
 	  /* translate event time to delay */
 	  delay = time - fifo->delta;
-          
-          post("midififo_poll: entry %f, delta %f, delay %f\n", entry->time,  fifo->delta, delay);
-	  
+          	  
 	  /* adjust delta time */
 	  if(delay < 0.0) 
 	    {

@@ -483,7 +483,6 @@ play_fvec_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set, play_fvec_set);
 
-  fts_class_inlet(cl, 0, fvec_type, play_fvec_set_object);
   fts_class_inlet_varargs(cl, 0, play_fvec_list);
 
   fts_class_inlet_int(cl, 1, play_fvec_set_begin);

@@ -435,7 +435,7 @@ midiin_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(midiin_t), midiin_init, midiin_delete);
 
-  fts_class_outlet_int(cl, 0);
+  fts_class_outlet(cl, fts_midievent_type,0);
 }
 
 static void
