@@ -1,3 +1,5 @@
+src		all		Makefile
+src		all		Makefiles
 all		all		classes
 all		all	 	lib/jacl1.0/jacl.jar
 all		all		lib/jacl1.0/README
@@ -12,5 +14,6 @@ free		all		lib/swing/CHANGES.txt
 free		all		lib/swing/LICENSE.txt
 free		all		lib/swing/README.html
 free		all		lib/swing/README.txt
+src		all		src
 
 

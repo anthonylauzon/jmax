@@ -22,7 +22,6 @@ all: $(LIBDIR)/libMidi.a
 
 $(LIBDIR)/libMidi.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libMidi.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libMidi.a
 
 TOCLEAN = $(LIBDIR)/libMidi.a
 

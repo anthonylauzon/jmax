@@ -22,7 +22,6 @@ all: $(LIBDIR)/libcontrol.a $(LIBDIR)/libcontrol.so
 
 $(LIBDIR)/libcontrol.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libcontrol.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libcontrol.a
 
 TOCLEAN = $(LIBDIR)/libcontrol.a
 

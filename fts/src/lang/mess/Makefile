@@ -22,7 +22,6 @@ all: $(LIBDIR)/libMess.a
 
 $(LIBDIR)/libMess.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libMess.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libMess.a
 
 TOCLEAN = $(LIBDIR)/libMess.a
 

@@ -22,7 +22,6 @@ all: $(LIBDIR)/libDevices.a
 
 $(LIBDIR)/libDevices.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDevices.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libDevices.a
 
 TOCLEAN = $(LIBDIR)/libDevices.a
 

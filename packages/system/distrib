@@ -1,16 +1,4 @@
+src	all	Makefile
 all	all	system.jpk
-all	irix62r4k	c/lib/irix62r4k/opt/libsystem.so
-all	irix63r10k	c/lib/irix63r10k/opt/libsystem.so
-all	irix63r5k	c/lib/irix63r5k/opt/libsystem.so
-all	irix65r10k	c/lib/irix65r10k/opt/libsystem.so
-all	irix65r4k	c/lib/irix65r4k/opt/libsystem.so
-all	irix65r5k	c/lib/irix65r5k/opt/libsystem.so
-all	sgi		c/lib/irix62r4k/opt/libsystem.so
-all	sgi		c/lib/irix63r10k/opt/libsystem.so
-all	sgi		c/lib/irix63r5k/opt/libsystem.so
-all	sgi		c/lib/irix65r10k/opt/libsystem.so
-all	sgi		c/lib/irix65r4k/opt/libsystem.so
-all	sgi		c/lib/irix65r5k/opt/libsystem.so
-all	linuxpc		c/lib/linuxpc/opt/libsystem.so
-all	linuxppc	c/lib/linuxppc/opt/libsystem.so
-all	solaris		c/lib/solaris/opt/libsystem.so
+all	all	c
+

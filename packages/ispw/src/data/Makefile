@@ -23,7 +23,6 @@ all: $(LIBDIR)/libdata.a $(LIBDIR)/libdata.so
 
 $(LIBDIR)/libdata.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libdata.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libdata.a
 
 TOCLEAN = $(LIBDIR)/libdata.a
 

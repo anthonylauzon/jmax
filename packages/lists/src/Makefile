@@ -22,7 +22,6 @@ all: $(LIBDIR)/liblists.a $(LIBDIR)/liblists.so
 
 $(LIBDIR)/liblists.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/liblists.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/liblists.a
 
 TOCLEAN = $(LIBDIR)/liblists.a
 

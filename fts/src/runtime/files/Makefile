@@ -21,7 +21,6 @@ all: $(LIBDIR)/libFiles.a
 
 $(LIBDIR)/libFiles.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libFiles.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libFiles.a
 
 TOCLEAN = $(LIBDIR)/libFiles.a
 

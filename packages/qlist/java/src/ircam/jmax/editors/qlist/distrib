@@ -1,0 +1,8 @@
+src	all	Makefile
+src	all	QList.java
+src	all	QListDataEditor.java
+src	all	QListExtension.java
+src	all	QListFactory.java
+src	all	QListFindDialog.java
+src	all	QListPanel.java
+src	all	Sources

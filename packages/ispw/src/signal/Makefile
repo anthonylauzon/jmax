@@ -22,7 +22,6 @@ all: $(LIBDIR)/libsignal.a $(LIBDIR)/libsignal.so
 
 $(LIBDIR)/libsignal.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libsignal.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libsignal.a
 
 TOCLEAN = $(LIBDIR)/libsignal.a
 

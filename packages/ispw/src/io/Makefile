@@ -27,7 +27,6 @@ all: $(LIBDIR)/libio.a $(LIBDIR)/libio.so
 
 $(LIBDIR)/libio.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libio.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libio.a
 
 TOCLEAN = $(LIBDIR)/libio.a
 

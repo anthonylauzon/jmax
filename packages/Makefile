@@ -23,27 +23,27 @@ all: all_c all_java
 .PHONY: all
 
 all_c:
-	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) -k all ) ; done
-	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) -k all_c ) ; done
-	for i in $(LATE_C_TARGETS) ; do ( cd $$i; $(MAKE) -k all ) ; done
+	for i in $(C_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi) ; done
+	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all_c ; fi ) ; done
+	for i in $(LATE_C_TARGETS) ; do (  if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done
 .PHONY: all_c
 
 all_java:
-	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) -k all ) ; done
-	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) -k all_java ) ; done
+	for i in $(JAVA_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all ; fi ) ; done
+	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) -k all_java ; fi ) ; done
 .PHONY: all_java
 
 clean: clean_c clean_java
 .PHONY: clean
 
 clean_c:
-	for i in $(C_TARGETS) ; do ( cd $$i; $(MAKE) clean ) ; done
-	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) clean_c ) ; done
-	for i in $(LATE_C_TARGETS) ; do ( cd $$i; $(MAKE) clean ) ; done
+	for i in $(C_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
+	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_c ; fi ) ; done
+	for i in $(LATE_C_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
 .PHONY: clean_c
 
 clean_java:
-	for i in $(JAVA_TARGETS) ; do ( cd $$i; $(MAKE) clean ) ; done
-	for i in $(MIXED_TARGETS) ; do ( cd $$i; $(MAKE) clean_java ) ; done
+	for i in $(JAVA_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean ; fi ) ; done
+	for i in $(MIXED_TARGETS) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_java ; fi ) ; done
 .PHONY: clean_java
 

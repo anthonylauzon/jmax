@@ -22,7 +22,6 @@ all: $(LIBDIR)/libpitch.a $(LIBDIR)/libpitch.so
 
 $(LIBDIR)/libpitch.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libpitch.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libpitch.a
 
 TOCLEAN = $(LIBDIR)/libpitch.a
 

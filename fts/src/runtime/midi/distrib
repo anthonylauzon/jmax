@@ -1,1 +1,4 @@
-all	all    midi.h
+src	all	Makefile
+src	all	Sources
+src	all	midi.c
+src	all	midi.h

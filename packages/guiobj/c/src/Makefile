@@ -20,7 +20,6 @@ all: $(LIBDIR)/libguiobj.a $(LIBDIR)/libguiobj.so
 
 $(LIBDIR)/libguiobj.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libguiobj.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libguiobj.a
 
 TOCLEAN = $(LIBDIR)/libguiobj.a
 

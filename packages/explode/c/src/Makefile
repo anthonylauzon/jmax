@@ -23,7 +23,6 @@ all: $(LIBDIR)/libexplode.a $(LIBDIR)/libexplode.so
 
 $(LIBDIR)/libexplode.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libexplode.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libexplode.a
 
 TOCLEAN = $(LIBDIR)/libexplode.a
 

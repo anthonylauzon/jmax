@@ -23,7 +23,6 @@ all: $(LIBDIR)/libSys.a
 
 $(LIBDIR)/libSys.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libSys.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libSys.a
 
 TOCLEAN = $(LIBDIR)/libSys.a
 

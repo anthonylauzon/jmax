@@ -21,7 +21,6 @@ all: $(LIBDIR)/libAudio.a
 
 $(LIBDIR)/libAudio.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libAudio.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libAudio.a
 
 TOCLEAN = $(LIBDIR)/libAudio.a
 

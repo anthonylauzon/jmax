@@ -1,5 +1,12 @@
-all	all	complex.h
-all	all	ftlfun.h
-all	all	include
-all	all	vecmod.h
-all	all	vecstat.h
+src	all	Makefile
+src	all	Sources
+src	all	complex.c
+src	all	complex.h
+src	all	ftlfun.c
+src	all	ftlfun.h
+src	all	include
+src	all	portable
+src	all	vecmod.c
+src	all	vecmod.h
+src	all	vecstat.c
+src	all	vecstat.h

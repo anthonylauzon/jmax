@@ -23,7 +23,6 @@ all: $(LIBDIR)/libfilters.a $(LIBDIR)/libfilters.so
 
 $(LIBDIR)/libfilters.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libfilters.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libfilters.a
 
 TOCLEAN = $(LIBDIR)/libfilters.a
 

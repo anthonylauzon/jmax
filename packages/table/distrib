@@ -1,4 +1,5 @@
-all	all      table.jpk
-all	all      java/classes/table.jar
-all	all	 images
+src	all	Makefile
+all	all	images
+all	all	java
+all	all	table.jpk
 

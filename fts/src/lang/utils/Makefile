@@ -22,7 +22,6 @@ all: $(LIBDIR)/libUtils.a
 
 $(LIBDIR)/libUtils.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libUtils.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libUtils.a
 
 TOCLEAN = $(LIBDIR)/libUtils.a
 

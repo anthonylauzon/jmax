@@ -1,0 +1,5 @@
+src	all	ControlModule.java
+src	all	ControlPanelFrame.java
+src	all	Makefile
+src	all	Sources
+src	all	Sources2

@@ -1,0 +1,5 @@
+src	all	Makefile
+ircam	all	lib
+free	all	lib
+src	all	src
+	

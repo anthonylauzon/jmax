@@ -22,7 +22,6 @@ all: $(LIBDIR)/libClient.a
 
 $(LIBDIR)/libClient.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libClient.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libClient.a
 
 TOCLEAN = $(LIBDIR)/libClient.a
 

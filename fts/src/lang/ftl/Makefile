@@ -22,7 +22,6 @@ all: $(LIBDIR)/libFtl.a
 
 $(LIBDIR)/libFtl.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libFtl.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libFtl.a
 
 TOCLEAN = $(LIBDIR)/libFtl.a
 

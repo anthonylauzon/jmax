@@ -23,7 +23,6 @@ all: $(LIBDIR)/libmidi.a $(LIBDIR)/libmidi.so
 
 $(LIBDIR)/libmidi.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libmidi.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libmidi.a
 
 TOCLEAN = $(LIBDIR)/libmidi.a
 

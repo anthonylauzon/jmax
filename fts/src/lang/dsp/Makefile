@@ -21,7 +21,6 @@ all: $(LIBDIR)/libDsp.a
 
 $(LIBDIR)/libDsp.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDsp.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libDsp.a
 
 TOCLEAN = $(LIBDIR)/libDsp.a
 

@@ -1,0 +1,10 @@
+src	all	Makefile
+src	all	Sources
+src	all	pitch.c
+src	all	pitch_module.c
+src	all	pt.c
+src	all	pt_meth.c
+src	all	pt_meth.h
+src	all	pt_obj.h
+src	all	pt_tools.c
+src	all	pt_tools.h

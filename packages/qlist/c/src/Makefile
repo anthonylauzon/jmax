@@ -23,7 +23,6 @@ all: $(LIBDIR)/libqlist.a $(LIBDIR)/libqlist.so
 
 $(LIBDIR)/libqlist.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libqlist.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libqlist.a
 
 TOCLEAN = $(LIBDIR)/libqlist.a
 

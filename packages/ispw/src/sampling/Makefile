@@ -22,7 +22,6 @@ all: $(LIBDIR)/libsampling.a $(LIBDIR)/libsampling.so
 
 $(LIBDIR)/libsampling.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libsampling.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libsampling.a
 
 TOCLEAN = $(LIBDIR)/libsampling.a
 

@@ -1,3 +1,4 @@
+src	all	Makefile
 ircam	all	additive
 ircam	all	eric
 ircam	all	jimmies

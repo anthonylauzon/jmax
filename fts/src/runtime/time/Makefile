@@ -22,7 +22,6 @@ all: $(LIBDIR)/libTime.a
 
 $(LIBDIR)/libTime.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libTime.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libTime.a
 
 TOCLEAN = $(LIBDIR)/libTime.a
 

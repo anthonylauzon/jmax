@@ -32,7 +32,6 @@ portable_clean:
 
 $(LIBDIR)/libVecLib.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libVecLib.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libVecLib.a
 
 TOCLEAN = $(LIBDIR)/libVecLib.a
 

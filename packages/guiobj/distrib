@@ -1,16 +1,4 @@
+src	all	Makefile
 all	all	guiobj.jpk
-all	irix62r4k	c/lib/irix62r4k/opt/libguiobj.so
-all	irix63r10k	c/lib/irix63r10k/opt/libguiobj.so
-all	irix63r5k	c/lib/irix63r5k/opt/libguiobj.so
-all	irix65r10k	c/lib/irix65r10k/opt/libguiobj.so
-all	irix65r4k	c/lib/irix65r4k/opt/libguiobj.so
-all	irix65r5k	c/lib/irix65r5k/opt/libguiobj.so
-all	sgi		c/lib/irix62r4k/opt/libguiobj.so
-all	sgi		c/lib/irix63r10k/opt/libguiobj.so
-all	sgi		c/lib/irix63r5k/opt/libguiobj.so
-all	sgi		c/lib/irix65r10k/opt/libguiobj.so
-all	sgi		c/lib/irix65r4k/opt/libguiobj.so
-all	sgi		c/lib/irix65r5k/opt/libguiobj.so
-all	linuxpc		c/lib/linuxpc/opt/libguiobj.so
-all	linuxppc	c/lib/linuxppc/opt/libguiobj.so
-all	solaris		c/lib/solaris/opt/libguiobj.so
+all	all	c
+

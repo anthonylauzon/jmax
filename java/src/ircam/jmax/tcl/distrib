@@ -1,0 +1,17 @@
+src	all	Makefile
+src	all	MaxFtsConnectCmd.java
+src	all	MaxGetMaxVersionCmd.java
+src	all	MaxOpenCmd.java
+src	all	MaxOscilloscopeCmd.java
+src	all	MaxPreloadClassCmd.java
+src	all	MaxQuitCmd.java
+src	all	MaxRunHooksCmd.java
+src	all	MaxSetSystemPropertyCmd.java
+src	all	MaxSourceCmd.java
+src	all	MaxSplashCmd.java
+src	all	MaxSysSourceCmd.java
+src	all	MaxSystemPropertyCmd.java
+src	all	MaxWhenCmd.java
+src	all	Sources
+src	all	Sources2
+src	all	TclMaxPackage.java

@@ -1,8 +1,10 @@
-all	all	fts.h
-all	all	sys
-all	all	sys.h
-all	all	lang
-all	all	lang.h
-all	all	runtime
-all	all	runtime.h
-
+src	all	ChangeLog
+src	all	Makefile
+src	all	fts.h
+src	all	lang
+src	all	lang.h
+src	all	runtime
+src	all	runtime.h
+src	all	sys
+src	all	sys.h
+src	all	tiles

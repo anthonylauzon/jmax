@@ -22,7 +22,6 @@ all: $(LIBDIR)/libSched.a
 
 $(LIBDIR)/libSched.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libSched.a $(OBJECTS)
-	$(RANLIB) $(LIBDIR)/libSched.a
 
 TOCLEAN = $(LIBDIR)/libSched.a
 
