@@ -90,7 +90,7 @@ extern "C" {
 
 #include <fts/ftl.h>
 #include <fts/ftlmem.h>
-/*  #include <fts/dsp.h> */
+#include <fts/dsp.h>
 
 #include <fts/fpe.h>
 
