@@ -212,6 +212,11 @@ public class BpfAdapter {
 	return true;
     }
 
+    public float getXZoom()
+    {
+	return geometry.getXZoom()*1000/2;
+    }
+
     //------------- Fields
     int constant;    
     boolean displayLabels = true;

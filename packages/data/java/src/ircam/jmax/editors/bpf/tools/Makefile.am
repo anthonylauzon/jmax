@@ -3,9 +3,8 @@ noinst_PROGRAMS = package
 package_SOURCES = \
 ArrowTool.java \
 BpfTools.java \
-ScrollerTool.java \
-SelecterTool.java \
-ZoomTool.java 
+ScrollZoomTool.java \
+SelecterTool.java 
 
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@

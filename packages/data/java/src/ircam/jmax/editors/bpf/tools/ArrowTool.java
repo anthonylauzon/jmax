@@ -49,7 +49,7 @@ public class ArrowTool extends SelecterTool implements DragListener{
    */
   public ArrowTool(ImageIcon theImageIcon) 
   {
-    super("arrow", theImageIcon);
+    super("edit tool", theImageIcon);
     
     itsSelectionMover = new BpfSelectionMover(this, 
 					      SelectionMover.HORIZONTAL_MOVEMENT |

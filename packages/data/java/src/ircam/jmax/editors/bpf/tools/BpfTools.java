@@ -54,8 +54,7 @@ public class BpfTools implements ToolProvider{
     }
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
-    tools[1] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-    tools[2] = new ScrollerTool(new ImageIcon(path+"scroller.gif"));
+    tools[1] = new ScrollZoomTool(new ImageIcon(path+"scroller.gif"));
   }
 
   public Enumeration getTools()
@@ -85,7 +84,7 @@ public class BpfTools implements ToolProvider{
   }
 
   //---
-  Tool tools[] = new Tool[3];
+  Tool tools[] = new Tool[2];
   public static BpfTools instance = new BpfTools();
 }
 

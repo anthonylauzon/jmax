@@ -50,7 +50,8 @@ public class Bpf extends JFrame implements EditorContainer{
     FtsBpfObject bpfData;
 
     public final static int DEFAULT_WIDTH  = 300;
-    public final static int DEFAULT_HEIGHT = 210;
+    //public final static int DEFAULT_HEIGHT = 210;
+    public final static int DEFAULT_HEIGHT = 150;
     public final static int MAX_HEIGHT     = 800;
     public final static int EMPTY_HEIGHT   = 78;
   /**

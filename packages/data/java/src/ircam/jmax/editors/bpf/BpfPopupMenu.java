@@ -35,6 +35,8 @@ import javax.swing.event.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
+import ircam.jmax.editors.bpf.tools.*;
+
 //
 // The graphic pop-up menu used to change the number of an inlet or an outlet in a subpatcher.
 //
@@ -51,7 +53,18 @@ public class BpfPopupMenu extends JPopupMenu
     target = editor;
 
     /////////// Tools /////////////////////////////////////////
-    add(target.getToolsMenu());
+    //add(target.getToolsMenu());
+    JMenuItem aMenuItem;
+    Tool tool;
+    ButtonGroup toolsMenuGroup = new ButtonGroup();
+    for(Enumeration e = BpfTools.instance.getTools(); e.hasMoreElements();)
+	{
+	    tool = (Tool)e.nextElement();
+	    aMenuItem = new JRadioButtonMenuItem(tool.getName(), tool.getIcon());
+	    aMenuItem.addActionListener(target.getGraphicContext().getToolManager());
+	    toolsMenuGroup.add(aMenuItem);
+	    add(aMenuItem);
+	}
 
     addSeparator();    
 
@@ -94,27 +107,18 @@ public class BpfPopupMenu extends JPopupMenu
 
     rangePanel.add(labelRangeBox);    
 
+    ActionListener rangeListener = new ActionListener(){
+	    public void actionPerformed( ActionEvent e)
+	    {
+		setRange();
+	    }
+	};
+
     JLabel maxLabel = new JLabel("max", JLabel.CENTER);
     maxValueField = new JTextField();
     maxValueField.setPreferredSize(new Dimension(100, 20));
     maxValueField.setMaximumSize(new Dimension(100, 20));
-    maxValueField.addActionListener(new ActionListener(){
-	    public void actionPerformed( ActionEvent e)
-	    {
-		float max;		
-		try
-		    {
-			max = Float.valueOf(maxValueField.getText()).floatValue();
-			target.getGraphicContext().getDataModel().setMaximumValue(max);
-			target.getGraphicContext().getGraphicDestination().repaint();
-		    }
-		catch (NumberFormatException e1)
-		    {
-			System.err.println("Error:  invalid number format!");
-			return;
-		    }
-	    }
-	});
+    maxValueField.addActionListener(rangeListener);
     
     JPanel maxPanel = new JPanel();
     maxPanel.setPreferredSize(new Dimension(150, 20));
@@ -130,23 +134,7 @@ public class BpfPopupMenu extends JPopupMenu
     minValueField = new JTextField();
     minValueField.setPreferredSize(new Dimension(100, 20));
     minValueField.setMaximumSize(new Dimension(100, 20));
-    minValueField.addActionListener(new ActionListener(){
-	    public void actionPerformed( ActionEvent e)
-	    {
-		float min;		
-		try
-		    {
-			min = Float.valueOf(minValueField.getText()).floatValue();
-			target.getGraphicContext().getDataModel().setMinimumValue(min);
-			target.getGraphicContext().getGraphicDestination().repaint();
-		    }
-		catch (NumberFormatException e1)
-		    {
-			System.err.println("Error:  invalid number format!");
-			return;
-		    }
-	    }
-	});
+    minValueField.addActionListener(rangeListener);
 
     JPanel minPanel = new JPanel();
     minPanel.setPreferredSize(new Dimension(150, 20));
@@ -162,9 +150,35 @@ public class BpfPopupMenu extends JPopupMenu
     add(rangePanel);
 
     ///////////////////////////////////
+    addPopupMenuListener(new PopupMenuListener(){
+	    public void popupMenuWillBecomeVisible(PopupMenuEvent e){}
+	    public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
+	    {
+		setRange();
+	    }
+	    public void popupMenuCanceled(PopupMenuEvent e){}
+	});
+
     validate();
     pack();
   }
+
+    public void setRange()
+    {
+	try
+	    {
+		float min = Float.valueOf(minValueField.getText()).floatValue();
+		float max = Float.valueOf(maxValueField.getText()).floatValue();
+		target.getGraphicContext().getDataModel().setMinimumValue(min);
+		target.getGraphicContext().getDataModel().setMaximumValue(max);
+		target.getGraphicContext().getGraphicDestination().repaint();
+	    }
+	catch (NumberFormatException e1)
+	    {
+		System.err.println("Error:  invalid number format!");
+		return;
+	    }
+    }
 
   public void show(Component invoker, int x, int y)
   {

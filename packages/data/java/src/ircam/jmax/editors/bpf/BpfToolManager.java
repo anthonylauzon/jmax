@@ -66,21 +66,23 @@ public class BpfToolManager extends ToolManager implements ActionListener{
   {
     super.addTool(theTool);
 
-    if(itsMenu==null) initBpfToolManager();
+    //itsBpfTools.put(theTool.getName(), theTool);
 
-    JMenuItem aMenuItem = new JMenuItem (theTool.getIcon());
+    if(itsMenu==null) initBpfToolManager();
+    
+    JMenuItem aMenuItem = new JMenuItem (theTool.getName(), theTool.getIcon());
     
     aMenuItem.addActionListener(this);
-    
-    itsBpfTools.put(aMenuItem, theTool);
+      
+    itsBpfTools.put(/*aMenuItem,*/theTool.getName(), theTool);
     
     itsMenu.add(aMenuItem);
   }  
     
   void initBpfToolManager()
   {
-     itsMenu = new JMenu("Tools");
-     itsBpfTools = new Hashtable();    
+      itsMenu = new JMenu("Tools");
+      itsBpfTools = new Hashtable();    
   }
     
   /**
@@ -91,15 +93,14 @@ public class BpfToolManager extends ToolManager implements ActionListener{
   public void actionPerformed(ActionEvent e) 
   {    
     Object aSource =  e.getSource();
-    Tool aTool = (Tool) itsBpfTools.get(aSource);	
+    Tool aTool = (Tool) itsBpfTools.get(/*aSource*/((JMenuItem)aSource).getText());	
     changeTool(aTool);    
   }
   
-    public JMenu getMenu()
-    {
-	return itsMenu;
-    }
-  
+  public JMenu getMenu()
+  {
+      return itsMenu;
+  }  
   //---- Fields and accessors    
   private JMenu itsMenu;
   Hashtable itsBpfTools;

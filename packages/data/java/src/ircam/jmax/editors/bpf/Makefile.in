@@ -79,7 +79,7 @@ SUBDIRS = renderers tools
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  Bpf.java BpfAdapter.java BpfDataListener.java BpfDataModel.java BpfEditor.java BpfExtension.java BpfGraphicContext.java BpfPanel.java BpfPoint.java BpfPopupMenu.java BpfRuler.java BpfSelection.java BpfSelectionMover.java BpfTableDialog.java BpfTableModel.java BpfTablePanel.java BpfToolManager.java Drawable.java FtsBpfObject.java ScrollManager.java UtilBpfPoint.java 
+package_SOURCES =  Bpf.java BpfAdapter.java BpfDataListener.java BpfDataModel.java BpfEditor.java BpfExtension.java BpfGraphicContext.java BpfPanel.java BpfPoint.java BpfPopupMenu.java BpfSelection.java BpfSelectionMover.java BpfTableDialog.java BpfTableModel.java BpfTablePanel.java BpfToolManager.java Drawable.java FtsBpfObject.java ScrollManager.java UtilBpfPoint.java 
 
 
 JAVACX = @JAVACX@
@@ -101,10 +101,10 @@ LIBS = @LIBS@
 package_OBJECTS =  Bpf.class BpfAdapter.class BpfDataListener.class \
 BpfDataModel.class BpfEditor.class BpfExtension.class \
 BpfGraphicContext.class BpfPanel.class BpfPoint.class \
-BpfPopupMenu.class BpfRuler.class BpfSelection.class \
-BpfSelectionMover.class BpfTableDialog.class BpfTableModel.class \
-BpfTablePanel.class BpfToolManager.class Drawable.class \
-FtsBpfObject.class ScrollManager.class UtilBpfPoint.class
+BpfPopupMenu.class BpfSelection.class BpfSelectionMover.class \
+BpfTableDialog.class BpfTableModel.class BpfTablePanel.class \
+BpfToolManager.class Drawable.class FtsBpfObject.class \
+ScrollManager.class UtilBpfPoint.class
 package_LDADD = $(LDADD)
 package_DEPENDENCIES = 
 package_LDFLAGS = 

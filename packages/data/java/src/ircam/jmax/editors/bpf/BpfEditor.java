@@ -92,7 +92,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
 	manager.addToolListener(new ToolListener() {
 		public void toolChanged(ToolChangeEvent e) 
-		{		
+		{		    
 		    if (e.getTool() != null) 
 			setCursor(e.getTool().getCursor());
 		}
@@ -105,6 +105,36 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		public void mouseEntered(MouseEvent e){}
 		public void mouseExited(MouseEvent e){
 		    gc.display("");
+		}
+	    });
+	addMouseMotionListener(new MouseMotionListener(){
+		public void mouseMoved(MouseEvent e)
+		{
+		    if(gc.getToolManager().getCurrentTool().getName().equals("edit tool"))
+			{
+			    float time = gc.getAdapter().getInvX(e.getX());
+			    float val =  gc.getAdapter().getInvY(e.getY());
+			    gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
+				       PointRenderer.numberFormat.format(val)+" )");		    
+			}
+		}
+		public void mouseDragged(MouseEvent e)
+		{
+		    String toolName = gc.getToolManager().getCurrentTool().getName();
+		    if(toolName.equals("edit tool"))
+			{
+			    float time = gc.getAdapter().getInvX(e.getX());
+			    float val =  gc.getAdapter().getInvY(e.getY());
+			    gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
+				       PointRenderer.numberFormat.format(val)+" )");	
+			}
+		    else
+			if(toolName.equals("scroll&zoom tool"))
+			{
+			    int start = gc.getLogicalTime();
+			    int end = start + gc.getTimeWindow();
+			    gc.display("[ "+start+" -- "+end+" ]");
+			}
 		}
 	    });
     }
@@ -211,14 +241,20 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 	return new Dimension(Bpf.DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
-    public void processMouseMotionEvent(MouseEvent e)
-    {
-	float time = gc.getAdapter().getInvX(e.getX());
-	float val =  gc.getAdapter().getInvY(e.getY());
-	gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
-		   PointRenderer.numberFormat.format(val)+" )");
-	super.processMouseMotionEvent(e);
-    }
+    /**
+     * Displays (x, y) coord in top-left corner
+     **/
+    /*public void processMouseMotionEvent(MouseEvent e)
+      {
+      if(!getMenu().isVisible())
+      {
+      float time = gc.getAdapter().getInvX(e.getX());
+      float val =  gc.getAdapter().getInvY(e.getY());
+      gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
+      PointRenderer.numberFormat.format(val)+" )");
+      }
+      super.processMouseMotionEvent(e);
+      }*/
 
     public void processKeyEvent(KeyEvent e)
     {

@@ -49,7 +49,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     FtsBpfObject bpfData;
     EditorContainer itsContainer;
 
-    public BpfRuler ruler;
+    //public BpfRuler ruler;
     
     Box trackPanel;
     //---
@@ -86,12 +86,12 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     }
     //------------------------------------------------
     // Create the ruler
-    ruler = new BpfRuler(geometry, this);
+    //ruler = new BpfRuler(geometry, this);
 
     //-------------------------------------------------
     //- Create the ToolManager with the needed tools
     manager = new BpfToolManager(BpfTools.instance);    
-    Tool arrow = manager.getToolByName("arrow");     
+    Tool arrow = manager.getToolByName("edit tool");     
     manager.activate(arrow, null); //we do not have a gc yet...
     
     setLayout(new BorderLayout());
@@ -99,8 +99,8 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     ///prepare the bpfEditor
     JPanel container_panel = new JPanel();
     container_panel.setLayout(new BorderLayout());
-    container_panel.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-30));
-    container_panel.setSize(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT-30);
+    container_panel.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT/*-30*/));
+    container_panel.setSize(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT/*-30*/);
 
     editor = new BpfEditor(geometry, bpfData, manager);
     editor.setBorder(new EtchedBorder());
@@ -112,11 +112,11 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 
     editor.getGraphicContext().getSelection().addListSelectionListener(this);
     //------------------     
-    Box northSection = new Box(BoxLayout.Y_AXIS);
+    /*Box northSection = new Box(BoxLayout.Y_AXIS);
 
-    ruler.setSize(300, 20);
-    northSection.add(ruler);	
-    container_panel.add(northSection, BorderLayout.NORTH);
+      ruler.setSize(300, 20);
+      northSection.add(ruler);	
+      container_panel.add(northSection, BorderLayout.NORTH);*/
 
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {

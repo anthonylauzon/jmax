@@ -13,7 +13,6 @@ BpfGraphicContext.java \
 BpfPanel.java \
 BpfPoint.java \
 BpfPopupMenu.java \
-BpfRuler.java \
 BpfSelection.java \
 BpfSelectionMover.java \
 BpfTableDialog.java \

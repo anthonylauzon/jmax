@@ -38,12 +38,12 @@ import javax.swing.ImageIcon;
  * It uses just one user-interaction module:
  * a mouse tracker to choose the position.
  */ 
-public class ScrollerTool extends Tool implements  DirectionListener, DynamicDragListener {
+public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicDragListener {
 
   /** constructor */
-  public ScrollerTool(ImageIcon theImageIcon) 
+  public ScrollZoomTool(ImageIcon theImageIcon) 
   {
-    super("scroller", theImageIcon);
+    super("scroll&zoom tool", theImageIcon);
 
     itsDirectionChooser = new DirectionChooser(this);
     itsMouseTracker = new MouseDragTracker(this);
@@ -74,20 +74,26 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
   /**
    * DynamicDragListener interface
    */
-    public void dragStart(int x, int y)
+    public void dragStart(int x, int y, MouseEvent e)
     {
 	mountIModule(itsDirectionChooser, x, y);
+	//isZoom = e.isShiftDown(); 
 	tempX = x;
 	tempY = y;
     }
     private boolean rep = false;
-    public void dynamicDrag(int deltaX, int deltaY)
+    public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
 	BpfGraphicContext bgc = (BpfGraphicContext) gc;
 	Geometry geometry = bgc.getAdapter().getGeometry();
 
-	int transp = geometry.getXTransposition()+bgc.getAdapter().getInvWidth(deltaX);
-	bgc.getScrollManager().scrollToValue(-transp);
+	if(e.isShiftDown())
+	    geometry.incrXZoom(deltaX);
+	else
+	    {
+		int transp = geometry.getXTransposition()+bgc.getAdapter().getInvWidth(deltaX);
+		bgc.getScrollManager().scrollToValue(-transp);
+	    }
     }
     public void dragEnd(int x, int y){}
     public void updateStartingPoint(int deltaX, int deltaY){}
@@ -108,6 +114,7 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
   //-------------- Fields
   MouseDragTracker itsMouseTracker;
   DirectionChooser itsDirectionChooser;
+    //boolean isZoom = false;
   int tempX = 0;
   int tempY = 0;
   int direction;
