@@ -99,7 +99,7 @@ public class RecentFileHistory extends DefaultListModel
 
     private File history_file_name()
     {
-	return  new File(System.getProperty("user.dir"), ".jmax_history");
+	return  new File(System.getProperty("user.home"), ".jmax_history");
     }
 
     public void addFile(File file)
