@@ -466,10 +466,14 @@ void
 alsaseqmidi_config(void)
 {
     fts_metaclass_t* mc = fts_class_install(fts_new_symbol("alsaseqmidi"), alsaseqmidi_instantiate);
-
+    fts_object_t* o;
     alsaseqmidi_symbol_jmax_prefix = fts_new_symbol("jMax");
     alsaseqmidi_symbol_default_unset = fts_new_symbol("default unset");
     alsaseqmidi_symbol_alsaseq_midi_destination = fts_new_symbol("ALSA Destination");
     alsaseqmidi_symbol_alsaseq_midi_source = fts_new_symbol("ALSA Source");
-    fts_midiconfig_add_manager((fts_midimanager_t*)fts_object_create(mc, 0, 0));
+    o = fts_object_create(mc, 0, 0);
+    if (0 == fts_object_get_error(o))
+      {
+	fts_midiconfig_add_manager((fts_midimanager_t*)o);
+      }
 }
