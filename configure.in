@@ -324,8 +324,6 @@ packages/ispw/java/ircam/jmax/editors/explode/Makefile
 packages/ispw/java/ircam/jmax/editors/explode/actions/Makefile
 packages/ispw/java/ircam/jmax/editors/explode/menus/Makefile
 packages/ispw/help/Makefile
-packages/ispw/help/control/Makefile
-packages/ispw/help/signal/Makefile
 packages/ispw/images/Makefile
 packages/ispw/sounds/Makefile
 packages/ispwmath/Makefile
