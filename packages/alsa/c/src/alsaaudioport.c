@@ -44,8 +44,6 @@
 */
 #define DEFAULT_FORMAT s_s32_le
 #define DEFAULT_ACCESS s_mmap_noninterleaved
-#define DEFAULT_SAMPLING_RATE (44100.)
-#define DEFAULT_FIFO_SIZE 2048
 
 /* Define WANT_XRUN_LOG to put xrun message in fts log file */
 #undef WANT_XRUN_LOG 
@@ -67,6 +65,7 @@ typedef struct _alsastream_t {
   snd_pcm_access_t access;
   int format;
   int fifo_size;
+  int rate;
 
 } alsastream_t;
 
@@ -411,6 +410,7 @@ alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, in
       {
 	post("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
 	fts_log("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
+	fts_object_error(o, "Sample rate change failed (%s)", snd_strerror(err));
       }
       else
       {
@@ -444,6 +444,65 @@ alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, in
 
 }
 
+
+static void
+alsaaudioport_buffer_size_change(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  alsaaudioport_t* self = (alsaaudioport_t*)o;
+  int err;
+  alsastream_t* stream;
+  int format_is_32;
+
+  if (fts_is_number(at))
+  {
+    int buffer_size = fts_get_number_int(at);
+    /* close playback handle */
+    if (NULL != self->playback.handle)
+    {
+      /* we change only if device was previously opened */
+      snd_pcm_close(self->playback.handle);
+      
+      stream = &self->playback;
+      err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, stream->rate, buffer_size, &stream->access);
+      
+      if (err < 0)
+      {
+	post("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
+	fts_log("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
+	fts_object_error(o, "buffer size change failed (%s)", snd_strerror(err));
+      }
+      else
+      {
+	fts_log("[alsaaudioport] buffer size change: success \n");	
+	/* update output functions */
+	alsaaudioport_update_audioport_output_functions(self, stream);
+      }
+    }
+    
+    if (NULL != self->capture.handle)
+    {
+      /* we change only if device was previously opened */
+      snd_pcm_close(self->capture.handle);
+      
+      stream = &self->capture;
+      err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, stream->rate, buffer_size, &stream->access);
+      
+      if (err < 0)
+      {
+	post("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
+	fts_log("[alsaaudioport] buffer size change: failed (%s)\n", snd_strerror(err));
+      }
+      else
+      {
+	fts_log("[alsaaudioport] buffer size change: success \n");	
+	/* update input functions */
+	alsaaudioport_update_audioport_input_functions(self, stream);
+      }
+    }
+  }
+
+}
+
 /* ---------------------------------------------------------------------- */
 /* alsatream_open: opens a stream                                         */
 /* ---------------------------------------------------------------------- */
@@ -458,7 +517,6 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   int err = 0;
   int open_mode = 0;
   int dir;
-
 
   snd_pcm_hw_params_alloca( &hwparams);
   snd_pcm_sw_params_alloca( &swparams);
@@ -558,7 +616,8 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
     fts_log("[alsaaudioport] rate doesn't match (requested %iHz, get %iHz)\n", sampling_rate, err);
     post("[alsaaudioport] rate doesn't match (requested %iHz, get %iHz)\n", sampling_rate, err);
   }
-    
+  
+  stream->rate = err;
   /*
    * Set buffer size
    */
@@ -567,13 +626,13 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
     fts_log("[alsaaudioport] buffer size not available (%s)\n", snd_strerror(err));
     return err;
   }
-  stream->fifo_size = fifo_size;
 
   if (err != fifo_size)
   {
     fts_log("[alsaaudioport] buffer size doesn't match (requested %i, get %i)\n", fifo_size, err);
     fifo_size = err;
   }
+  stream->fifo_size = fifo_size;
   
   /*
    * Set period size: the period size is the fifo size divided by the number of periods, here 2
@@ -1028,7 +1087,7 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   int format  = snd_pcm_format_value(DEFAULT_FORMAT);
   snd_pcm_access_t access = alsaaudiomanager_convert_jmax_symbol_to_alsa_access(DEFAULT_ACCESS);
   int sampling_rate = (int)fts_dsp_get_sample_rate();
-  int fifo_size = DEFAULT_FIFO_SIZE;
+  int fifo_size = fts_dsp_get_buffer_size();
 
   err = alsastream_open(&self->capture, self->device_name, 
 			SND_PCM_STREAM_CAPTURE, &format, self->capture.channels, 
@@ -1061,6 +1120,7 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
 
   fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
+  fts_dsp_buffer_size_add_listener(o, alsaaudioport_buffer_size_change);
 }
 
 static void
@@ -1072,7 +1132,7 @@ alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   int format  = snd_pcm_format_value(DEFAULT_FORMAT);
   snd_pcm_access_t access = alsaaudiomanager_convert_jmax_symbol_to_alsa_access(DEFAULT_ACCESS);
   int sampling_rate = (int)fts_dsp_get_sample_rate();
-  int fifo_size = DEFAULT_FIFO_SIZE;
+  int fifo_size = fts_dsp_get_buffer_size();
 
   err = alsastream_open(&self->playback, self->device_name, 
 			SND_PCM_STREAM_PLAYBACK, &format, self->playback.channels, 
@@ -1102,6 +1162,7 @@ alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
   
   fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
+  fts_dsp_buffer_size_add_listener(o, alsaaudioport_buffer_size_change);
 }
 
 static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -1117,6 +1178,7 @@ static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t 
   }
 
   fts_dsp_sample_rate_remove_listener(o);
+  fts_dsp_buffer_size_remove_listener(o);
 }
 
 static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -1132,6 +1194,7 @@ static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t
   }
 
   fts_dsp_sample_rate_remove_listener(o);
+  fts_dsp_buffer_size_remove_listener(o);
 }
 
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1155,7 +1218,7 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
     
   sr = fts_dsp_get_sample_rate();
   sampling_rate = (int)sr ;
-  fifo_size = DEFAULT_FIFO_SIZE;
+  fifo_size = fts_dsp_get_buffer_size();
     
   self->device_name = fts_get_symbol(at);
   
