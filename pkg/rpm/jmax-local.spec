@@ -26,7 +26,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root)
-/usr/doc/%{NAME}-%{VERSION}
+/usr/doc/jMax-2.4.8b
 /usr/bin/jmax
 /usr/lib/jmax
 /usr/include/fts

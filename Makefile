@@ -57,7 +57,7 @@ INSTALL_SETUID=$(INSTALL) --mode=4755
 INSTALL_LIB=$(INSTALL) --mode=0755
 INSTALL_DIR=$(INSTALL) -d --mode=0755
 prefix=/usr
-doc_install_dir=$(prefix)/doc/jmax
+doc_install_dir=$(prefix)/doc/jmax-$(version)
 lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
