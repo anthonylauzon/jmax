@@ -395,6 +395,8 @@ static void client_release_object( client_t *this, fts_object_t *object)
   fts_atom_t k;
   fts_set_int( &k, fts_get_object_id( object));
   fts_hashtable_remove( &this->object_table, &k);
+
+  object->head.id = FTS_NO_ID;
 }
 
 static void client_register_object( client_t *this, fts_object_t *object)
