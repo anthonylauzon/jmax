@@ -70,7 +70,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     itsSequencePanel = new SequencePanel(this, data);
     
     getContentPane().add(itsSequencePanel);
-    setSize(new Dimension(DEFAULT_WIDTH, EMPTY_HEIGHT));
+    setSize(new Dimension(DEFAULT_WIDTH + TrackContainer.BUTTON_WIDTH, EMPTY_HEIGHT));
     
     addWindowListener(new WindowListener(){
 	public void windowOpened(WindowEvent e){}

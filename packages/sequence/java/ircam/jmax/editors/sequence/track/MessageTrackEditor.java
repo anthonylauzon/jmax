@@ -42,9 +42,9 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class MessageTrackEditor extends MonoTrackEditor
 {
-  public MessageTrackEditor(Geometry g, Track track)
+  public MessageTrackEditor(Geometry g, Track track, boolean isInsequence)
 {
-    super(g, track);
+    super(g, track, isInsequence);
     
     super.setAdapter(new MessageAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
     

@@ -40,9 +40,9 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class FloatTrackEditor extends MonoTrackEditor
 {
-  public FloatTrackEditor(Geometry g, Track trk)
+  public FloatTrackEditor(Geometry g, Track trk, boolean isInSequence)
   {
-    super(g, trk);
+    super(g, trk, isInSequence);
     
     if(track.getProperty("maximumValue")==null)
       track.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));

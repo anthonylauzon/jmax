@@ -302,7 +302,12 @@ private void drawVerticalGrid(Graphics g)
 	Dimension d = gc.getGraphicDestination().getSize();
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
 	int timeStep, xPosition, snappedTime;
-	int maxY = ((PartitionAdapter)gc.getAdapter()).getMaxScoreY();
+	int maxY;
+	
+	if( gc.isInSequence())
+		maxY = d.height;
+	else
+		maxY = ((PartitionAdapter)gc.getAdapter()).getMaxScoreY();
 	
 	timeStep = findBestTimeStep(windowTime);	
 	

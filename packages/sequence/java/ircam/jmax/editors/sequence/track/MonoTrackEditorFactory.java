@@ -30,9 +30,9 @@ import ircam.jmax.toolkit.*;
  * Creates new MidiTrack editors. */
 public class MonoTrackEditorFactory implements TrackEditorFactory {
     
-    public TrackEditor newEditor(Track track, Geometry geometry)
+    public TrackEditor newEditor(Track track, Geometry geometry, boolean isInsequence)
     {
-	return new MonoTrackEditor(geometry, track);
+	return new MonoTrackEditor(geometry, track, isInsequence);
     }
 
     public int getWeight()

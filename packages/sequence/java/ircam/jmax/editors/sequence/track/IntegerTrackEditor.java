@@ -40,9 +40,9 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class IntegerTrackEditor extends MonoTrackEditor
 {
-  public IntegerTrackEditor(Geometry g, Track trk)
+  public IntegerTrackEditor(Geometry g, Track trk, boolean isInsequence)
   {
-    super(g, trk);
+    super(g, trk, isInsequence);
 
     if(track.getProperty("maximumValue")==null)
       track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));

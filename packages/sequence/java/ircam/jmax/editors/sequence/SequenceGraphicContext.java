@@ -31,187 +31,202 @@ import javax.swing.event.*;
 import java.beans.*;
 
 /**
- * The context for an sequence editing session.
+* The context for an sequence editing session.
  * It stores the data model and other stuff related to Sequence
  */
 public class SequenceGraphicContext extends GraphicContext {
-
+	
   /**
-   * Constructor */
+	* Constructor */
   public SequenceGraphicContext(TrackDataModel model, SequenceSelection s, TrackEditor editor)
-  {
+{
     super();
     setDataModel(model);
     itsSelection = s;
     itsEditor = editor;
-  }
+}
 
-  /**
-   * Change the selection ownership when this graphic context become active... troppo */
-  public void activate()
-  {
-    //SequenceSelection.setCurrent(itsSelection);
-  }
+/**
+* Change the selection ownership when this graphic context become active... troppo */
+public void activate()
+{
+	//SequenceSelection.setCurrent(itsSelection);
+}
 
-  /**
-   * Returns the lenght (in msec) rapresented in the current window */
-  public int getTimeWindow()
-  {
-    return (int)(itsGraphicDestination.getSize().width/
-			   (itsAdapter.getGeometry().getXZoom()));
-  }
+/**
+* Returns the lenght (in msec) rapresented in the current window */
+public int getTimeWindow()
+{
+	return (int)(itsGraphicDestination.getSize().width/
+							 (itsAdapter.getGeometry().getXZoom()));
+}
 
-  /**
-   * sets the adapter to be used in this context
-   */
-  public void setAdapter(Adapter theAdapter) 
-  {
-    itsAdapter = theAdapter;
+/**
+* sets the adapter to be used in this context
+ */
+public void setAdapter(Adapter theAdapter) 
+{
+	itsAdapter = theAdapter;
   
 		itsAdapter.getGeometry().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
-			{		
+		{		
 				String name = e.getPropertyName();
 				if( name.equals("gridMode"))
 				{
 					gridMode = ((Integer)e.getNewValue()).intValue();
 				}
-			}
+		}
 		});				
-	}
+}
 
-  /**
-   * gets the current adapter
-   */
-  public Adapter getAdapter() 
-  {
-    return itsAdapter;
-  }
+/**
+* gets the current adapter
+ */
+public Adapter getAdapter() 
+{
+	return itsAdapter;
+}
 
-  /**
-   * sets the DataModel of this context
-   */
-  public void setDataModel(TrackDataModel theDataModel) 
-  {
-    itsDataModel = theDataModel;
-  }
+/**
+* sets the DataModel of this context
+ */
+public void setDataModel(TrackDataModel theDataModel) 
+{
+	itsDataModel = theDataModel;
+}
 
-  /**
-   * returns the data model
-   */
-  public TrackDataModel getDataModel() {
-    return itsDataModel;
-  }
+/**
+* returns the data model
+ */
+public TrackDataModel getDataModel() {
+	return itsDataModel;
+}
 
-  /**
-   * returns the current logical time
-   */
-  public int getLogicalTime() 
-  {
-    return -itsAdapter.getGeometry().getXTransposition();
-  }
+/**
+* returns the current logical time
+ */
+public int getLogicalTime() 
+{
+	return -itsAdapter.getGeometry().getXTransposition();
+}
 
-    /*
-     * returns visible rectangle of the associated track editor
-     */
-  public Rectangle getTrackClip()
-  {
-    return new Rectangle( ScoreBackground.KEYEND, 0, ((EditorContainer)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);
-  }
+/*
+ * returns visible rectangle of the associated track editor
+ */
+public Rectangle getTrackClip()
+{
+	return new Rectangle( ScoreBackground.KEYEND, 0, ((EditorContainer)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);
+}
 
-  public void setToolManager(ToolManager t)
-  {
-    toolManager = t;
-  }
+public void setToolManager(ToolManager t)
+{
+	toolManager = t;
+}
 
-  public ToolManager getToolManager()
-  {
-    return toolManager;
-  }
+public ToolManager getToolManager()
+{
+	return toolManager;
+}
 
-  public void setSelection(SequenceSelection s)
-  {
-    itsSelection = s;
-  }
+public void setSelection(SequenceSelection s)
+{
+	itsSelection = s;
+}
 
-  public SequenceSelection getSelection()
-  {
-    return itsSelection;
-  }
+public SequenceSelection getSelection()
+{
+	return itsSelection;
+}
 
 
-  public Track getTrack()
-  {
-    return itsEditor.getTrack();
-  }
-  
-  public TrackEditor getTrackEditor()
-  {
-    return itsEditor;
-  }
+public Track getTrack()
+{
+	return itsEditor.getTrack();
+}
 
-  public FtsGraphicObject getFtsObject()
-  {
-    return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getFtsObject();
-  }
+public TrackEditor getTrackEditor()
+{
+	return itsEditor;
+}
 
-  public void setScrollManager(ScrollManager manager)
-  {
-    scrollManager = manager;
-  }
-  public ScrollManager getScrollManager()
-  {
-    return scrollManager;
-  }
+public FtsGraphicObject getFtsObject()
+{
+	FtsGraphicObject parent = (FtsGraphicObject)((FtsTrackObject)itsDataModel).getParent();
+	if( parent instanceof FtsSequenceObject)
+		return parent;
+	else
+	  return (FtsTrackObject)itsDataModel;
+	/*return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getFtsObject();*/
+}
 
-  public void setDisplayer(Displayer displayer)
-  {
-    this.displayer = displayer; 
-  }
+public void setScrollManager(ScrollManager manager)
+{
+	scrollManager = manager;
+}
+public ScrollManager getScrollManager()
+{
+	return scrollManager;
+}
 
-  public Displayer getDisplayer()
-  {
-    return displayer; 
-  }
+public void setDisplayer(Displayer displayer)
+{
+	this.displayer = displayer; 
+}
 
-  public boolean isInSequence()
-  {
-    return (getFtsObject() instanceof FtsSequenceObject);
-  }
+public Displayer getDisplayer()
+{
+	return displayer; 
+}
 
-	public int getGridMode()
+public boolean isInSequence()
+{
+	return (getFtsObject() instanceof FtsSequenceObject);
+}
+
+public int getGridMode()
 {
 		return gridMode;
 }
-	
+public void setGridMode(int gm)
+{
+		gridMode = gm;
+}
+
 public FtsTrackObject getMarkersTrack()
 {
-	return ((FtsTrackObject)getFtsObject()).getMarkersTrack();
+	if( !isInSequence())
+		return ((FtsTrackObject)getFtsObject()).getMarkersTrack();
+	else
+		return ((FtsSequenceObject)getFtsObject()).getMarkersTrack();
 }
 
 public SequenceSelection getMarkersSelection()
 {
-	return ((FtsTrackObject)getFtsObject()).markersSelection;
+	if( !isInSequence())
+		return ((FtsTrackObject)getFtsObject()).getMarkersSelection();
+	else
+		return ((FtsSequenceObject)getFtsObject()).getMarkersSelection();
 }
-  //---- Fields 
-  
-  TrackDataModel itsDataModel;
-  
+//---- Fields 
+
+TrackDataModel itsDataModel;
+
 SequenceSelection itsSelection;
-  
-  Adapter itsAdapter;
-  
-  int itsLogicalTime;
-  
-  ToolManager toolManager;
-  
-  ScrollManager scrollManager;
 
-  TrackEditor itsEditor;
+Adapter itsAdapter;
 
-  Displayer displayer;
-	
-	int gridMode = TrackEditor.TIME_GRID;
+int itsLogicalTime;
+
+ToolManager toolManager;
+
+ScrollManager scrollManager;
+
+TrackEditor itsEditor;
+
+Displayer displayer;
+
+int gridMode = TrackEditor.TIME_GRID;
 }
 
 

@@ -29,9 +29,9 @@ import ircam.jmax.toolkit.*;
  * Creates new MidiTrack editors. */
 public class MessageTrackEditorFactory implements TrackEditorFactory {
     
-    public TrackEditor newEditor(Track track, Geometry geometry)
+    public TrackEditor newEditor(Track track, Geometry geometry, boolean isInsequence)
     {
-	return new MessageTrackEditor(geometry, track);
+	return new MessageTrackEditor(geometry, track, isInsequence);
     }
 
     public int getWeight()

@@ -75,9 +75,15 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 {
 	Event e = (Event) obj;
 	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-	
+	Dimension d = gc.getGraphicDestination().getSize();	
 	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-	int maxY = pa.getMaxScoreY();
+	
+	int maxY;
+	if( gc.isInSequence())
+		maxY = d.height;
+	else
+		maxY = pa.getMaxScoreY();
+	
 	int minY = pa.getMinScoreY();
 	String type = (String)(e.getProperty("type"));
 	

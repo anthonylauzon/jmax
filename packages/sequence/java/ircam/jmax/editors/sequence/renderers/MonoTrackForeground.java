@@ -29,61 +29,82 @@ import java.awt.*;
 import java.util.Enumeration;
 
 /**
- * The foreground layer of a monodimensionalTrack representation */
+* The foreground layer of a monodimensionalTrack representation */
 public class MonoTrackForeground implements Layer {
-
+	
   public MonoTrackForeground(SequenceGraphicContext theGc)
-  {
+{
     gc = theGc;
-  }
+}
 
-  Rectangle tempRect = new Rectangle();
-  /**
-   * render all the visible objects in this layer (all the notes in the window)
-   */
-  public void render(Graphics g, int order) 
-  {   
-    tempRect.setBounds(0,0,gc.getGraphicDestination().getSize().width, 
-		gc.getGraphicDestination().getSize().height);
+Rectangle tempRect = new Rectangle();
+/**
+* render all the visible objects in this layer (all the notes in the window)
+ */
+public void render(Graphics g, int order) 
+{   
+	tempRect.setBounds(0,0,gc.getGraphicDestination().getSize().width, 
+										 gc.getGraphicDestination().getSize().height);
+	
+	render(g, tempRect, order);
+}
 
-    render(g, tempRect, order);
-  }
-
-  /** Layer interface */
-  public void render(Graphics g, Rectangle r, int order)
-  {
-    TrackEvent temp;
-    Dimension d = gc.getGraphicDestination().getSize();
-    Rectangle tempr = (Rectangle) g.getClip();
-
-    g.clipRect(ScoreBackground.KEYEND, 0, gc.getGraphicDestination().getSize().width-ScoreBackground.KEYEND, gc.getGraphicDestination().getSize().height);
-
-    for (Enumeration e = gc.getRenderManager().
+/** Layer interface */
+public void render(Graphics g, Rectangle r, int order)
+{
+	TrackEvent temp;
+	Dimension d = gc.getGraphicDestination().getSize();
+	Rectangle tempr = (Rectangle) g.getClip();
+	
+	g.clipRect(ScoreBackground.KEYEND, 0, gc.getGraphicDestination().getSize().width-ScoreBackground.KEYEND, gc.getGraphicDestination().getSize().height);
+	
+	for (Enumeration e = gc.getRenderManager().
 	     objectsIntersecting( r.x, 0, r.width, d.height); e.hasMoreElements();) 
-	{
-	    temp = (TrackEvent) e.nextElement();
-	    temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
-	}
-
-    //draw the first object out of rectangle left bound  
-    if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() != MonoTrackEditor.PEAKS_VIEW)
-	{
-	    temp = ((FtsTrackObject)gc.getDataModel()).getPreviousEvent(gc.getAdapter().getInvX(r.x));
-	    if(temp != null) 
+		{
+		temp = (TrackEvent) e.nextElement();
 		temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
+		}
+	
+	//draw the first object out of rectangle left bound  
+	if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() != MonoTrackEditor.PEAKS_VIEW)
+	{
+		temp = ((FtsTrackObject)gc.getDataModel()).getPreviousEvent(gc.getAdapter().getInvX(r.x));
+		if(temp != null) 
+			temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
 	}
 	
-    g.setClip(tempr);
-  }
+	if( gc.getGridMode() == TrackEditor.MEASURES_GRID)
+		renderMeasures(g);
+	
+	g.setClip(tempr);
+}
 
-  /** Returns the current EventRenderer */
-  public ObjectRenderer getObjectRenderer()
-  {
-      return null;
-  }
+private void renderMeasures(Graphics g)
+{
+	FtsTrackObject markers = gc.getMarkersTrack();
+	if( markers!= null)
+	{
+		TrackEvent evt;
+		Dimension d = gc.getGraphicDestination().getSize();
+		SequenceSelection sel = gc.getMarkersSelection();
+		
+    for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
+																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
+		{
+			evt = (TrackEvent) e.nextElement();
+			evt.getRenderer().render( evt, g, sel.isInSelection(evt), gc);
+		}
+	}
+}
 
-  //--- Fields
-  SequenceGraphicContext gc;
+/** Returns the current EventRenderer */
+public ObjectRenderer getObjectRenderer()
+{
+	return null;
+}
+
+//--- Fields
+SequenceGraphicContext gc;
 }
 
 

@@ -28,6 +28,6 @@ import ircam.jmax.toolkit.*;
  * The interface of Factories for editors of Tracks
  */
 public interface TrackEditorFactory {
-    public TrackEditor newEditor(Track track, Geometry geometry);
+    public TrackEditor newEditor(Track track, Geometry geometry, boolean isInSequence);
     public int getWeight();
 }

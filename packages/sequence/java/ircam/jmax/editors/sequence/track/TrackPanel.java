@@ -56,6 +56,9 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public SequenceRuler ruler;
 	public TempoBar tempoBar;
 	
+	transient ListSelectionListener markersSelectionListener = null;
+	transient SequenceSelection currentMarkersSelection = null;
+	
   transient JScrollPane scrollTracks;
 	transient JPanel centerSection;
   //---
@@ -104,7 +107,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     manager.activate(arrow, null); //we do not have a gc yet...
 		
     //------------------- prepare track editor:
-    trackEditor = TrackEditorFactoryTable.newEditor( track, geometry);
+    trackEditor = TrackEditorFactoryTable.newEditor( track, geometry, false);
     trackEditor.getGraphicContext().setToolManager( manager);
     trackEditor.getGraphicContext().setFrame( itsContainer.getFrame());
     trackEditor.getGraphicContext().setScrollManager( this);
@@ -125,7 +128,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 		if( trackData.getType().getPublicName().equals( AmbitusValue.SCOOB_PUBLIC_NAME))
 		{
 			// Create TempoBar
-			tempoBar = new TempoBar(geometry, trackEditor.getGraphicContext(), false);
+			tempoBar = new TempoBar(geometry, ftsTrackObject);
 			tempoBar.setSize(SequenceWindow.DEFAULT_WIDTH, TempoBar.TEMPO_HEIGHT);
 			//------------------ prepares Center Section
 			centerSection = new JPanel();			
@@ -133,7 +136,6 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 			scrollTracks.setBorder(BorderFactory.createEmptyBorder());
 			centerSection.setBorder(border);
 			centerSection.setLayout( new BorderLayout());
-			/*centerSection.add( tempoBar, BorderLayout.NORTH);*/
 			centerSection.add( scrollTracks, BorderLayout.CENTER);
 		
 			separate_tracks.add( centerSection, BorderLayout.CENTER);
@@ -203,23 +205,33 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 			}
 		});
 		
+		markersSelectionListener = new ListSelectionListener(){
+			public void valueChanged(ListSelectionEvent e)
+			{
+				SequenceSelection sel = trackEditor.getGraphicContext().getMarkersSelection();
+				if( sel.size() > 0)
+				{
+					TrackEvent evt = (TrackEvent) sel.getSelected().nextElement();
+					makeVisible(evt);
+				}
+			}
+		};
+		
 		trackData.addTrackStateListener(new TrackStateListener(){
 			public void lock(boolean lock){}
 			public void active(boolean active){}
 			public void restoreEditorState(FtsTrackEditorObject editorState){};
 			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
 		  {
-				markersSelection.addListSelectionListener( new ListSelectionListener(){
-					public void valueChanged(ListSelectionEvent e)
-				  {
-						SequenceSelection sel = trackEditor.getGraphicContext().getMarkersSelection();
-						if( sel.size() > 0)
-						{
-							TrackEvent evt = (TrackEvent) sel.getSelected().nextElement();
-							makeVisible(evt);
-						}
-					}
-				});
+				currentMarkersSelection = markersSelection;
+				currentMarkersSelection.addListSelectionListener( markersSelectionListener);
+			}
+			public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+			{			
+				currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
+				currentMarkersSelection = markersSelection;
+				if(markersSelection != null)
+					currentMarkersSelection.addListSelectionListener( markersSelectionListener);
 			}
 		});		
 	}

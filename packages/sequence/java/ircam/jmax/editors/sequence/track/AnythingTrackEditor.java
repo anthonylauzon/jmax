@@ -43,9 +43,9 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class AnythingTrackEditor extends TrackBaseEditor
 {
-  public AnythingTrackEditor(Geometry g, Track trk)
+  public AnythingTrackEditor(Geometry g, Track trk, boolean isInSequence)
   {
-    super(g, trk);
+    super(g, trk, isInSequence);
 
     setBackground(Color.lightGray);
     DEFAULT_HEIGHT = 70;

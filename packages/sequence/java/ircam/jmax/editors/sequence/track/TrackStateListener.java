@@ -30,6 +30,7 @@ public interface TrackStateListener
   public abstract void active(boolean active);
 	public abstract void restoreEditorState(FtsTrackEditorObject editorState);
 	public abstract void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection);
+	public abstract void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection);
 }
 
 

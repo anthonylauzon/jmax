@@ -62,6 +62,12 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 				{
 					SequenceTableDialog.this.hasMarkers = true; 
 				}
+				public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+				{				
+					removeMarkersAndSplit();
+					if( sgc.getMarkersTrack()!=null)
+						addMarkersAndSplit();
+				}
 			});		
 		
     track.getTrackDataModel().addListener( new TrackDataListener() {

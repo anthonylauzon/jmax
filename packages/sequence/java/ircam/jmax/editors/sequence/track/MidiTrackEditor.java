@@ -41,9 +41,9 @@ import javax.swing.event.*;
  * a Midi value) */
 public class MidiTrackEditor extends TrackBaseEditor
 {
-  public MidiTrackEditor(Geometry geometry, Track trk)
+  public MidiTrackEditor(Geometry geometry, Track trk, boolean isInsequence)
   {
-    super( geometry, trk);
+    super( geometry, trk, isInsequence);
 
 		if(track.getProperty("rangeMode")==null)
 			 track.setProperty("rangeMode", new Integer(SequenceDefaults.DEFAULT_RANGE_MODE));

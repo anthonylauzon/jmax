@@ -105,7 +105,8 @@ public class TrackBasePopupMenu extends JPopupMenu
 			});
 			
 			add(nameItem);
-			
+
+			moveToAction = new MoveTrackToAction(target);
 			moveMenu = new JMenu("Move to Position");
 			item = new JMenuItem(""+trackCount);
 			item.addActionListener( moveToAction);
@@ -155,6 +156,14 @@ public class TrackBasePopupMenu extends JPopupMenu
 		  }
     });
     add(item);
+    item = new JMenuItem("Import...");
+    item.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+		  {
+				target.getTrack().getFtsTrack().importMidiFile();
+		  }
+    });
+    add(item);
 		
 		if(!isInSequence)
 		{
@@ -167,8 +176,7 @@ public class TrackBasePopupMenu extends JPopupMenu
 			});
 			add(saveItem);    
 		}
-    moveToAction = new MoveTrackToAction(target);
-		
+    		
     pack();
   }
 	

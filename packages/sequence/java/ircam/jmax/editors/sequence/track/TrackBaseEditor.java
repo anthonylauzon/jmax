@@ -38,7 +38,7 @@ import javax.swing.event.*;
 
 public abstract class TrackBaseEditor extends PopupToolbarPanel implements TrackDataListener, ListSelectionListener, TrackEditor
 {
-  public TrackBaseEditor(Geometry geom, Track trk)
+  public TrackBaseEditor(Geometry geom, Track trk, boolean isInSequence)
 {
     super();
 		
@@ -53,6 +53,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
     gc = createGraphicContext(geometry, track);
 		
 		setDisplayer();
+		setGridMode();
 		
     track.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent e)
@@ -109,22 +110,22 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 			};
 			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
 		  {
-				markersSelection.addListSelectionListener(TrackBaseEditor.this);
-				
-				gc.getMarkersTrack().addListener( new TrackDataListener() {
-						public void objectChanged(Object spec, String propName, Object propValue){repaint();}
-						public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
-						public void objectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
-						public void objectAdded(Object whichObject, int index){repaint();}
-						public void objectsAdded(int maxTime){repaint();}
-						public void objectDeleted(Object whichObject, int oldIndex){repaint();}
-						public void trackCleared(){repaint();}
-						public void startTrackUpload( TrackDataModel track, int size){}
-						public void endTrackUpload( TrackDataModel track){}
-						public void startPaste(){}
-						public void endPaste(){}
-						public void trackNameChanged(String oldName, String newName) {}
-					});
+				listenToMarkers(markers, markersSelection);
+			}
+			public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+			{			
+				if(currentSelMarkers!=null)
+					currentSelMarkers.removeListSelectionListener( TrackBaseEditor.this);
+				if(currentMarkers != null)
+					currentMarkers.removeListener( markerTrackListener);
+				if( markers != null && markersSelection != null)
+					listenToMarkers( markers, markersSelection);
+				else
+				{
+					currentSelMarkers = null;
+					currentMarkers = null;
+				}
+				repaint();
 			}
 		});
 		
@@ -154,13 +155,13 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 						scrollEvent = temp;
 						SwingUtilities.invokeLater(new Runnable(){
 							public void run()
-						  {
+						{
 								if(scrollEvent != null)
 								{
 									gc.getScrollManager().makeVisible(scrollEvent);
 									scrollEvent = null;
 								}
-						  }
+						}
 						});
 						
 						first = false;
@@ -169,7 +170,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 					temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
 					oldElements.addElement(temp);			    
 				}
-		 }
+		}
 		});
     
     addMouseListener(new MouseListener(){
@@ -197,6 +198,24 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 			public void mouseDragged(MouseEvent e){}
 		});
 		
+		markerTrackListener = new TrackDataListener() {
+			public void objectChanged(Object spec, String propName, Object propValue){repaint();}
+			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
+			public void objectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
+			public void objectAdded(Object whichObject, int index){repaint();}
+			public void objectsAdded(int maxTime){repaint();}
+			public void objectDeleted(Object whichObject, int oldIndex){repaint();}
+			public void trackCleared(){repaint();}
+			public void startTrackUpload( TrackDataModel track, int size){}
+			public void endTrackUpload( TrackDataModel track){}
+			public void startPaste(){}
+			public void endPaste(){}
+			public void trackNameChanged(String oldName, String newName) {}
+		};
+		
+		if( isInSequence && gc.getMarkersTrack() != null)
+			listenToMarkers( gc.getMarkersTrack(), gc.getMarkersSelection());
+	
     component = this;
 }
 
@@ -226,6 +245,21 @@ void setDisplayer()
 			displayLabel.setText( text);
 	}
 	});	
+}
+
+void setGridMode()
+{
+	Object prop = geometry.getProperty("gridMode");
+	if(prop != null)
+		gc.setGridMode( ((Integer)prop).intValue());
+}
+
+void listenToMarkers( FtsTrackObject markers, SequenceSelection markSel)
+{
+	currentMarkers = markers;
+	currentSelMarkers = markSel;
+	currentSelMarkers.addListSelectionListener(this);
+	currentMarkers.addListener( markerTrackListener);	
 }
 
 public abstract void reinit();
@@ -437,6 +471,10 @@ transient TrackEvent scrollEvent = null;
 
 transient MaxVector oldElements = new MaxVector();
 transient SequenceTableDialog listDialog = null;
+
+transient FtsTrackObject currentMarkers = null; 
+transient SequenceSelection currentSelMarkers = null;
+transient TrackDataListener markerTrackListener = null;
 
 public int DEFAULT_HEIGHT = 430;
 public int viewMode, rangeMode;

@@ -204,6 +204,11 @@ public FtsTrackObject(FtsServer server, FtsObject parent, int objId, String clas
   flavors[0] = sequenceFlavor;
 }
 
+public boolean isInSequence()
+{
+	return (getParent() instanceof FtsSequenceObject);
+}
+
 void setType( String type)
 {
   this.info = ValueInfoTable.getValueInfo( type);
@@ -1082,6 +1087,11 @@ private void notifyMarkers(FtsTrackObject markers, SequenceSelection markersSele
   for (Enumeration e = stateListeners.elements(); e.hasMoreElements();)
 		 ((TrackStateListener) e.nextElement()).hasMarkers(markers, markersSelection);
 }
+void notifyUpdateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+{
+  for (Enumeration e = stateListeners.elements(); e.hasMoreElements();)
+		 ((TrackStateListener) e.nextElement()).updateMarkers(markers, markersSelection);
+}
 /**
 * requires to be notified when the database changes
  */
@@ -1549,15 +1559,22 @@ public void setFtsTrackEditorObject(int id)
 
 public void setMarkersTrack(int nArgs , FtsAtom args[])
 {	
-  markersTrack = new FtsTrackObject( JMaxApplication.getFtsServer(), this, args[0].intValue, "track", args, 1, nArgs);	
+	markersTrack = new FtsTrackObject( JMaxApplication.getFtsServer(), this, args[0].intValue, "track", args, 1, nArgs);	
 	markersSelection = new SequenceSelection(markersTrack);
 	
-	notifyMarkers( markersTrack, markersSelection);
+	if(!isInSequence() || 
+		(isInSequence() && ((FtsSequenceObject)getParent()).getTrackIndex(this) == 0))
+			notifyMarkers( markersTrack, markersSelection);
 }
 
 public FtsTrackObject getMarkersTrack()
 {	
   return markersTrack;	
+}
+
+public SequenceSelection getMarkersSelection()
+{	
+  return markersSelection;	
 }
 
 public void setSaveEditor(boolean save)

@@ -43,9 +43,9 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class MonoTrackEditor extends TrackBaseEditor
 {
-  public MonoTrackEditor(Geometry g, Track trk)
+  public MonoTrackEditor(Geometry g, Track trk, boolean isInsequence)
   {
-    super(g, trk);
+    super(g, trk, isInsequence);
     
     viewMode = PEAKS_VIEW;
     DEFAULT_HEIGHT = 127;

@@ -22,6 +22,8 @@
 package ircam.jmax.editors.sequence;
 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.fts.*;
+import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.menus.*;
@@ -34,54 +36,29 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 
-public class TempoBar extends JPanel
+public class TempoBar extends JPanel implements TrackDataListener, TrackStateListener, TrackListener, ListSelectionListener
 {
-  public TempoBar( Geometry geom, SequenceGraphicContext gc, boolean isInSequence)
+  public TempoBar( Geometry geom, FtsGraphicObject obj)
   {
     super();
 	
 		setFont(SequencePanel.rulerFont);
     fm = getFontMetrics( SequencePanel.rulerFont);
     this.geometry = geom;
-		this.gc = gc;
+		this.ftsObj = obj;
+		this.isInSequence = (ftsObj instanceof FtsSequenceObject);
+		pa = new PartitionAdapter(geometry, null);
     
 		setBackground(Color.white);
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
-		utilityPartitionAdapter = new PartitionAdapter(geometry, null);
     
 		if( !isInSequence)
 		{
 			//createDisplayer();
-			
-			gc.getDataModel().addTrackStateListener(new TrackStateListener(){
-				public void lock(boolean lock){}
-				public void active(boolean active){}
-				public void restoreEditorState(FtsTrackEditorObject editorState){};
-				public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
-				{
-					markersSelection.addListSelectionListener( new ListSelectionListener(){
-						public void valueChanged(ListSelectionEvent e)
-				    {
-							repaint();
-						}
-					});
-					TempoBar.this.gc.getMarkersTrack().addListener( new TrackDataListener() {
-						public void objectChanged(Object spec, String propName, Object propValue){repaint();}
-						public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
-						public void objectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
-						public void objectAdded(Object whichObject, int index){repaint();}
-						public void objectsAdded(int maxTime){repaint();}
-						public void objectDeleted(Object whichObject, int oldIndex){repaint();}
-						public void trackCleared(){repaint();}
-						public void startTrackUpload( TrackDataModel track, int size){}
-						public void endTrackUpload( TrackDataModel track){}
-						public void startPaste(){}
-						public void endPaste(){}
-						public void trackNameChanged(String oldName, String newName) {}
-					});
-				}
-			});		
+			((FtsTrackObject)ftsObj).addTrackStateListener(this);		
 		}
+		else
+			((FtsSequenceObject)ftsObj).addTrackListener(this);
 							
     geometry.addTranspositionListener( new TranspositionListener() {
 			public void transpositionChanged(int newValue)
@@ -132,10 +109,7 @@ public class TempoBar extends JPanel
 
 public void paintComponent(Graphics g)
 {
-	if( gc.getGridMode() == TrackEditor.TIME_GRID)
-		paintTimeGrid(g);
-	else
-		paintMeasures(g);
+	paintMeasures(g);
 }
 
 public void paintMeasures(Graphics g)
@@ -144,28 +118,24 @@ public void paintMeasures(Graphics g)
 	g.setColor( Color.white);
 	g.fillRect( clip.x, clip.y, clip.width, clip.height);
 	
-	FtsTrackObject markers = gc.getMarkersTrack();
-	if( markers!= null)
+	if( markersTrack!= null)
 	{
 		TrackEvent evt;		
 		int x;
 		String type;
-		Dimension d = getSize();
-		PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
-		SequenceSelection sel = gc.getMarkersSelection();
-		
+		Dimension d = getSize();		
 		g.setFont( Displayer.displayFont);
 		
-		for (Enumeration e = markers.intersectionSearch( gc.getAdapter().getInvX(ScoreBackground.KEYEND), 
-																										 gc.getAdapter().getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
+		for (Enumeration e = markersTrack.intersectionSearch( pa.getInvX(ScoreBackground.KEYEND), 
+																													pa.getInvX(d.width-ScoreBackground.KEYEND)); e.hasMoreElements();) 
 		{
 			evt = (TrackEvent) e.nextElement();
 			type = (String)(evt.getProperty("type"));
-			x = pa.getX(evt);
+			x = pa.getX(evt)+getXIndentation();
 			
 			if(type.equals("tempo"))
 			{
-				if( sel.isInSelection(evt))
+				if( markersSelection.isInSelection(evt))
 					g.setColor( selTempoColor);
 				else
 					g.setColor( tempoColor);		
@@ -180,7 +150,7 @@ public void paintMeasures(Graphics g)
 			}
 			else if(type.equals("bar"))
 			{					
-				if( sel.isInSelection(evt))
+				if( markersSelection.isInSelection(evt))
 					g.setColor( Color.red);
 				else
 					g.setColor( Color.darkGray);			
@@ -198,35 +168,10 @@ public void paintMeasures(Graphics g)
 	}
 }
 
-public void paintTimeGrid(Graphics g)
-{
-	int xPosition;
-	int snappedTime;
-	String timeString;
-	Dimension d = getSize();
-	Rectangle clip = g.getClipBounds();
-	
-	int logicalTime = -geometry.getXTransposition();
-	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(ScoreBackground.KEYEND))-1;
-	int timeStep = ScoreBackground.findBestTimeStep(windowTime);	
-	
-	g.setColor( Color.white);
-	g.fillRect( clip.x, clip.y, clip.width, clip.height);
-	
-	g.setColor( Color.lightGray);
-	
-	for (int i=logicalTime+timeStep; i<logicalTime+windowTime; i+=timeStep) 
-	{
-		snappedTime = (i/timeStep)*timeStep;
-		xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
-		g.drawLine(xPosition, 0, xPosition, TEMPO_HEIGHT);		  
-	}
-}
-
 int getXIndentation()
 {
-	if( gc.isInSequence())
-		return 3+TrackContainer.BUTTON_WIDTH;
+	if( isInSequence)
+		return 2+TrackContainer.BUTTON_WIDTH;
 	else
 		return 0;
 }
@@ -249,13 +194,68 @@ public Dimension getPreferredSize()
 public Dimension getMinimumSize()
 { return tempoDimension; }
 
+//=================== TrackDataListener interface ========================
+
+public void objectChanged(Object spec, String propName, Object propValue){repaint();}
+public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
+public void objectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
+public void objectAdded(Object whichObject, int index){repaint();}
+public void objectsAdded(int maxTime){repaint();}
+public void objectDeleted(Object whichObject, int oldIndex){repaint();}
+public void trackCleared(){repaint();}
+public void startTrackUpload( TrackDataModel track, int size){}
+public void endTrackUpload( TrackDataModel track){}
+public void startPaste(){}
+public void endPaste(){}
+public void trackNameChanged(String oldName, String newName) {}
+//==================== ListSelectionListener interface =====================
+
+public void valueChanged(ListSelectionEvent e){repaint();}
+//==================== TrackStateListener interface ========================
+public void lock(boolean lock){}
+public void active(boolean active){}
+public void restoreEditorState(FtsTrackEditorObject editorState){};
+public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+{
+	this.markersSelection = markersSelection;
+	markersSelection.addListSelectionListener(this);
+	markersTrack = markers;
+	markersTrack.addListener(this);
+}
+public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
+{
+	markersSelection.removeListSelectionListener(this);
+	markersTrack.removeListener(this);
+	if(marks != null)
+		hasMarkers( marks, markSel);
+	else
+	{
+		markersSelection = null;
+		markersTrack = null;
+	}
+	repaint();
+}
+//===================== TrackListener interface =============================
+public void trackAdded(Track track)
+{
+	track.getTrackDataModel().addTrackStateListener(this);	
+};   
+public void tracksAdded(int maxTime){};   
+public void trackRemoved(Track track){};   
+public void trackChanged(Track track){};   
+public void trackMoved(Track track, int oldPosition, int newPosition){};   
+
 //--- Ruler fields
 Dimension tempoDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, TEMPO_HEIGHT);
 FontMetrics fm;
 PartitionAdapter utilityPartitionAdapter;
 Geometry geometry;
-SequenceGraphicContext gc;
+FtsGraphicObject ftsObj;
+PartitionAdapter pa;
 public final static int TEMPO_HEIGHT = 20; 
+public boolean isInSequence;
+FtsTrackObject markersTrack = null;
+SequenceSelection markersSelection = null;
 /*JLabel displayLabel;
 Displayer oldDisplayer;*/
 
