@@ -82,9 +82,8 @@ struct fts_object {
  * A new instance of the class is created and initialized.
  * If parent is not NULL, the created instance will be added as child to the parent object.
  *
- * @fn fts_object_t *fts_object_create( fts_class_t *cl, fts_object_t *parent, int ac, const fts_atom_t *at)
+ * @fn fts_object_t *fts_object_create( fts_class_t *cl, int ac, const fts_atom_t *at)
  * @param cl the class to instantiate
- * @param parent the parent of the created object
  * @param ac argument count
  * @param at the arguments
  * @return the created object, NULL if instantiation failed
@@ -92,6 +91,20 @@ struct fts_object {
 FTS_API fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at);
 FTS_API void fts_object_destroy(fts_object_t *obj);
 
+/**
+ * Evaluate an object description.
+ * An object description is supposed to begin with a class name followed 
+ * by the object constructor arguments.
+ * fts_eval_object_description evaluates all the arguments using the 
+ * expression syntax defined in parser.y
+ *
+ * If patcher is not NULL, the created instance will be added as child of the patcher object.
+ *
+ * @fn fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+ * @param patcher the patcher containing of the created object
+ * @param ac argument count
+ * @param at the arguments (including the class name)
+ */
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
 /* garbage collector handling */
