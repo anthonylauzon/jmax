@@ -127,8 +127,9 @@ public class MidiConfigPanel extends JPanel implements Editor
     outputCellEditor = new DefaultCellEditor( destCombo);
   }
 
-  void update()
+  void update(FtsMidiManager mm)
   {    
+    midiMan = mm;
     initDataModel();
     midiTable.setModel( midiModel);
     midiTable.revalidate();
@@ -404,13 +405,51 @@ public class MidiConfigPanel extends JPanel implements Editor
 
   public void close(boolean doCancel)
   {
+    boolean toClose = true;
+    if( midiMan.isDirty())
+      {
+	String message = "MIDI Configuration File is not saved.\nDo you want to save it now?";
+	String title =  "MIDI Config Not Saved";
+	Object[] options = { "Save", "Don't save", "Cancel" };
+	int result = JOptionPane.showOptionDialog( window, message, title, 
+						   JOptionPane.YES_NO_CANCEL_OPTION,
+						   JOptionPane.QUESTION_MESSAGE,
+						   null, options, options[0]);
+	
+	if( result == JOptionPane.CANCEL_OPTION)
+	  return;
+
+	if( result == JOptionPane.YES_OPTION)
+	  save();	
+      }
     window.setVisible(false);
   }
 
-  public void save(){}
-  public void saveAs(){}
+  public void save()
+  {
+    if( midiMan.getFileName() != null)
+      midiMan.save( midiMan.getFileName());
+    else
+      saveAs();
+  }
+  public void saveAs()
+  {
+    String dir = JMaxApplication.getProject().getDir();
+    String name = dir+"/"+JMaxApplication.getProject().getName()+".midi.jcfg";    
+    
+    fileChooser.setSelectedFile( new File( name));
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    int result = fileChooser.showSaveDialog( window);
+
+    if ( result == JFileChooser.APPROVE_OPTION)
+      {
+	String fileName = fileChooser.getSelectedFile().getAbsolutePath();		  		
+	if( fileName != null)
+	  midiMan.save( fileName);
+      }
+  }
   public void print(){}
- 
+
   /********************************/
   private JTabbedPane tabbedPane;
   private JTable midiTable;
@@ -423,6 +462,8 @@ public class MidiConfigPanel extends JPanel implements Editor
   private FtsMidiManager midiMan;
   private final int DEFAULT_WIDTH = 450;
   private final int DEFAULT_HEIGHT = 280;
+
+  private JFileChooser fileChooser = new JFileChooser(); 
 
   private Font tableFont = (Font)UIManager.get("Table.font");
   private Font defaultLabelFont;

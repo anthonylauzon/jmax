@@ -366,7 +366,7 @@ public class FtsPackage extends FtsObjectWithEditor
   private String name;
   private String fileName;
   private String dir;
-  private ircam.jmax.editors.project.ConfigPackagePanel listener;
+  ircam.jmax.editors.project.ConfigPackagePanel listener;
   private boolean hasSummaryHelp = true;
   private boolean isDirty = false;
 }

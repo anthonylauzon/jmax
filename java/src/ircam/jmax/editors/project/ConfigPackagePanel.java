@@ -46,16 +46,16 @@ public class ConfigPackagePanel extends JPanel implements Editor
   {
     window = win;
     ftsPkg = pkg;
-
+    
     ftsPkg.setPackageListener( this);
-
+    
     initDataModels( ftsPkg);
-
+    
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
     setBorder( BorderFactory.createEtchedBorder());
 
     /******** Requires Panel ******************************************/
-
+    
     requiresTable = new JTable(requiresModel);
     requiresTable.setPreferredScrollableViewportSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     requiresTable.setRowHeight(17);
@@ -63,36 +63,139 @@ public class ConfigPackagePanel extends JPanel implements Editor
     requiresTable.getColumnModel().getColumn(1).setMaxWidth( 50);  
     requiresTable.getColumnModel().getColumn(1).setResizable( false);  
     requiresTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
-
+    
     requiresScrollPane = new JScrollPane(requiresTable);
     requiresScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
     /******** TemplatePaths Panel ******************************************/
-
+    
     templPathList = new JList( templPathModel);
     templPathList.setSelectionMode(  ListSelectionModel.SINGLE_SELECTION);
     
     templPathScrollPane = new JScrollPane( templPathList);
     templPathScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
-
+    
     /******** DataPaths Panel ******************************************/
 
     dataPathList = new JList( dataPathModel);
     dataPathList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
-
+    
     dataPathScrollPane = new JScrollPane( dataPathList);
     dataPathScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
     /******** Help Panel ******************************************/
-
+    
     helpTable = new JTable(helpModel);
     helpTable.setPreferredScrollableViewportSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     helpTable.setRowHeight(17);
     helpTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
-
+    
     helpScrollPane = new JScrollPane(helpTable);
     helpScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
-
+    
+    /******** Config Panel ******************************************/
+    
+    configPanel = new JPanel();
+    configPanel.setLayout( new BoxLayout( configPanel, BoxLayout.Y_AXIS));
+    configPanel.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    
+    JPanel midiPanel = new JPanel();
+    midiPanel.setLayout( new BoxLayout( midiPanel, BoxLayout.Y_AXIS));
+    midiPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), "Midi Configuration File"));    
+    midiField = new JTextField();
+    midiField.setPreferredSize(new Dimension( DEFAULT_WIDTH, 30));
+    midiField.setMaximumSize(new Dimension( 2000, 30));
+    midiField.setEditable(false);
+    if((ftsPkg instanceof FtsProject) && ((FtsProject)ftsPkg).getMidiConfig() != null)
+      midiField.setText( ((FtsProject)ftsPkg).getMidiConfig());
+    JPanel midiButtons = new JPanel();
+    midiButtons.setLayout( new BoxLayout( midiButtons, BoxLayout.X_AXIS));
+    JButton midiSetButton = new JButton("set");
+    midiSetButton.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  JFileChooser fileChooser = new JFileChooser();
+	  fileChooser.setFileFilter( configFilter);
+	  int result = fileChooser.showDialog(null, "Choose");
+	  if ( result == JFileChooser.APPROVE_OPTION)
+	    {
+	      String path = fileChooser.getSelectedFile().getAbsolutePath();		  		
+	      if(path!=null)
+		((FtsProject)ftsPkg).setMidiConfig( path);
+	    }
+	}
+      });
+    midiSetButton.setPreferredSize( new Dimension( 80, 30));
+    midiSetButton.setMinimumSize( new Dimension( 80, 30));
+    midiSetButton.setMaximumSize( new Dimension( 80, 30));
+    JButton midiResetButton = new JButton("reset");
+    midiResetButton.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  ((FtsProject)ftsPkg).setMidiConfig( null);
+	}
+      });
+    
+    midiResetButton.setPreferredSize( new Dimension( 80, 30));
+    midiResetButton.setMinimumSize( new Dimension( 80, 30));
+    midiResetButton.setMaximumSize( new Dimension( 80, 30));
+    midiButtons.add( midiSetButton);
+    midiButtons.add( midiResetButton);
+    
+    midiPanel.add( midiField);
+    midiPanel.add( Box.createRigidArea( new Dimension(0, 5)));
+    midiPanel.add( midiButtons);
+    
+    JPanel audioPanel = new JPanel();
+    audioPanel.setLayout( new BoxLayout( audioPanel, BoxLayout.Y_AXIS));
+    audioPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), "Audio Configuration File"));
+    audioField = new JTextField();
+    audioField.setPreferredSize(new Dimension( DEFAULT_WIDTH, 30));
+    audioField.setMaximumSize(new Dimension( 2000, 30));
+    audioField.setEditable( false);
+    if((ftsPkg instanceof FtsProject) && ((FtsProject)ftsPkg).getAudioConfig() != null)
+      audioField.setText( ((FtsProject)ftsPkg).getAudioConfig());
+    JPanel audioButtons = new JPanel();
+    audioButtons.setLayout( new BoxLayout( audioButtons, BoxLayout.X_AXIS));
+    JButton audioSetButton = new JButton("set");
+    audioSetButton.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  JFileChooser fileChooser = new JFileChooser();
+	  fileChooser.setFileFilter( configFilter);
+	  int result = fileChooser.showDialog(null, "Choose");
+	  if ( result == JFileChooser.APPROVE_OPTION)
+	    {
+	      String path = fileChooser.getSelectedFile().getAbsolutePath();		  		
+	      if(path!=null)
+		((FtsProject)ftsPkg).setAudioConfig( path);
+	    }
+	}
+      });
+    audioSetButton.setPreferredSize( new Dimension( 80, 30));
+    audioSetButton.setMinimumSize( new Dimension( 80, 30));
+    audioSetButton.setMaximumSize( new Dimension( 80, 30));
+    JButton audioResetButton = new JButton("reset");
+    audioResetButton.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  ((FtsProject)ftsPkg).setAudioConfig( null);
+	}
+      });
+    audioResetButton.setPreferredSize( new Dimension( 80, 30));
+    audioResetButton.setMinimumSize( new Dimension( 80, 30));
+    audioResetButton.setMaximumSize( new Dimension( 80, 30));
+    audioButtons.add( audioSetButton);
+    audioButtons.add( audioResetButton);
+    
+    audioPanel.add( audioField);
+    audioPanel.add( Box.createRigidArea( new Dimension(0, 5)));
+    audioPanel.add( audioButtons);
+    
+    configPanel.add( midiPanel);
+    configPanel.add( audioPanel);
+    configPanel.add( Box.createVerticalGlue());
+    
     /******** TabbedPane ***********************************************/
 
     tabbedPane = new JTabbedPane();
@@ -101,19 +204,23 @@ public class ConfigPackagePanel extends JPanel implements Editor
     tabbedPane.addTab("Template Path", templPathScrollPane);
     tabbedPane.addTab("Data Path", dataPathScrollPane);    
     tabbedPane.addTab("Help Patches", helpScrollPane);    
+    tabbedPane.addTab("Audio/MIDI", configPanel);    
+    if( !(ftsPkg instanceof FtsPackage)) 
+      tabbedPane.setEnabledAt( 4, false);
     tabbedPane.setSelectedIndex(0);
-
+    
     add( tabbedPane);
 
     /************ Buttons **********************************/
-    JButton addButton = new JButton("Add");
+
+    addButton = new JButton("Add");
     addButton.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
 	  Add();
 	}
       });
-    JButton deleteButton = new JButton("Delete");
+    deleteButton = new JButton("Delete");
     deleteButton.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
@@ -129,6 +236,16 @@ public class ConfigPackagePanel extends JPanel implements Editor
     
     add( tabbedPane);
     add( buttons);
+    
+    validate();
+
+    tabbedPane.addChangeListener( new ChangeListener(){
+	public void stateChanged( ChangeEvent e){
+	  boolean enable = (tabbedPane.getSelectedIndex() != tabbedPane.indexOfTab("Audio/MIDI"));
+	  addButton.setEnabled( enable);
+	  deleteButton.setEnabled( enable);
+	}
+      });
   }
 
   void initDataModels( FtsPackage pkg)
@@ -163,7 +280,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
   void setPackage( FtsPackage pkg)
   {
     if(ftsPkg == pkg) return;
-
+    
     ftsPkg = pkg;
     
     ftsPkg.setPackageListener( this);
@@ -177,17 +294,34 @@ public class ConfigPackagePanel extends JPanel implements Editor
     requiresTable.getColumnModel().getColumn(1).setMaxWidth( 50);  
     requiresTable.getColumnModel().getColumn(1).setResizable( false);
     requiresTable.revalidate();
-
+    
     templPathList.setModel( templPathModel);
     templPathList.revalidate();
-
+    
     dataPathList.setModel( dataPathModel);
     dataPathList.revalidate();
     revalidate();    
-
+    
     helpTable.setModel( helpModel);
     helpTable.revalidate();
 
+    tabbedPane.setSelectedIndex(0);    
+    if( ftsPkg instanceof FtsProject)
+      {
+	tabbedPane.setEnabledAt( 4, true);
+	
+	if( ((FtsProject)ftsPkg).getMidiConfig() != null)
+	  midiField.setText( ((FtsProject)ftsPkg).getMidiConfig());
+	else
+	  midiField.setText( "");
+	if(((FtsProject)ftsPkg).getAudioConfig() != null)
+	  audioField.setText( ((FtsProject)ftsPkg).getAudioConfig());
+	else
+	  audioField.setText( "");
+      }
+    else
+      tabbedPane.setEnabledAt( 4, false);
+    
     window.pack();
   }
 
@@ -197,7 +331,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
 
     for(Enumeration e = ftsPkg.getDataPaths(); e.hasMoreElements();)
       dataPathModel.addElement(e.nextElement());   
-
+    
     dataPathList.setModel( dataPathModel);
     dataPathList.revalidate();
     revalidate();    
@@ -586,6 +720,20 @@ public class ConfigPackagePanel extends JPanel implements Editor
     window.setVisible( true);
   }
 
+  public void midiConfigChanged( String config)
+  {
+    if( config != null)
+      midiField.setText( config);
+    else
+      midiField.setText( "");
+  }
+  public void audioConfigChanged( String config)
+  {
+    if( config != null)
+      audioField.setText( config);
+    else
+      audioField.setText( "");
+  }
   /************* interface Editor ************************/
   public EditorContainer getEditorContainer()
   {
@@ -642,6 +790,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
   /********************************/
   private JTabbedPane tabbedPane;
   private JTable requiresTable, helpTable;
+  private JButton addButton, deleteButton;
   private JList templPathList, dataPathList;
   private JScrollPane requiresScrollPane, templPathScrollPane, dataPathScrollPane, helpScrollPane;
   private RequiresTableModel requiresModel;
@@ -652,6 +801,30 @@ public class ConfigPackagePanel extends JPanel implements Editor
   private JFileChooser fileChooser = new JFileChooser(); 
   private final int DEFAULT_WIDTH = 450;
   private final int DEFAULT_HEIGHT = 280;
+
+  JTextField midiField, audioField;
+  JPanel configPanel;
+  private static javax.swing.filechooser.FileFilter configFilter;
+  static
+  {
+    configFilter = new javax.swing.filechooser.FileFilter(){	
+	public boolean accept( File f) {
+	  if (f.isDirectory())
+	    return true;
+	  
+	  String name = f.getAbsolutePath();
+	  if (name != null)
+	    if (name.endsWith(".jcfg"))
+	      return true;
+	    else
+	       return false;
+	  return false;
+	}
+	public String getDescription() {
+	  return "jMax Audio/MIDI Config";
+	}
+      };
+  }
 }
 
 

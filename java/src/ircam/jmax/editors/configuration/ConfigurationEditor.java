@@ -78,7 +78,6 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
     tabbedPane = new JTabbedPane();
     tabbedPane.setBorder( BorderFactory.createEtchedBorder());
-    tabbedPane.setPreferredSize( new Dimension( 500, 350));
     tabbedPane.addTab("MIDI", midiPanel);
     tabbedPane.addTab("Audio", audioPanel);
     tabbedPane.setSelectedIndex(0);
@@ -118,6 +117,17 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 	addButton.setEnabled( false);
 	deleteButton.setEnabled( false);
       }
+
+    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    addWindowListener(new WindowAdapter(){
+	public void windowClosing(WindowEvent e)
+	{
+	  if( tabbedPane.getSelectedIndex() == tabbedPane.indexOfTab( "MIDI"))
+	    midiPanel.close(false);    
+	  else
+	    audioPanel.close(false);    
+	}
+      });
   }
 
   private void makeMenuBar()
@@ -137,7 +147,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
   void update()
   {
-    midiPanel.update();
+    midiPanel.update( JMaxApplication.getMidiManager());
     audioPanel.update();
   } 
 

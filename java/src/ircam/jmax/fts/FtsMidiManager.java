@@ -82,6 +82,24 @@ public class FtsMidiManager extends FtsObject
 	   ((FtsMidiManager)obj).setOutput( args.getInt( 0), args.getSymbol( 1).toString());
 	 }
        });
+     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("name"), new FtsMessageHandler(){
+	 public void invoke( FtsObject obj, FtsArgs args)
+	 {
+	   ((FtsMidiManager)obj).setFileName( args.getSymbol( 0).toString());
+	 }
+       });
+     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("setDirty"), new FtsMessageHandler(){
+	 public void invoke( FtsObject obj, FtsArgs args)
+	 {
+	   ((FtsMidiManager)obj).setDirty( args.getInt( 0) == 1);
+	 }
+       });
+     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+	 public void invoke( FtsObject obj, FtsArgs args)
+	 {
+	   ((FtsMidiManager)obj).clear();
+	 }
+       });
   }
     
   public FtsMidiManager(FtsServer server, FtsObject parent, int id)
@@ -181,7 +199,22 @@ public class FtsMidiManager extends FtsObject
       }
     catch(IOException e)
       {
-	System.err.println("FtsPackage: I/O Error sending upload Message!");
+	System.err.println("FtsMidiManager: I/O Error sending upload Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void save( String fileName)
+  {
+    args.clear();
+    args.addSymbol( FtsSymbol.get( fileName));
+    try
+      {
+	send( FtsSymbol.get("save"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsMidiManager: I/O Error sending save Message!");
 	e.printStackTrace(); 
       }
   }
@@ -194,6 +227,15 @@ public class FtsMidiManager extends FtsObject
   
     if(listener != null)
       listener.sourcesChanged();
+  }
+
+  public void setDirty( boolean d)
+  {
+    isDirty = d;
+  }
+  public boolean isDirty()
+  {
+    return isDirty;
   }
 
   public String[] getSources()
@@ -251,6 +293,23 @@ public class FtsMidiManager extends FtsObject
       listener.labelChanged( index, null, null, output);
   }
 
+  public void setFileName( String fn)
+  {
+    this.fileName = fn;
+    
+  }
+  
+  public String getFileName()
+  {
+    return fileName;
+  }
+
+  public void clear()
+  {
+    labels.removeAllElements();
+    fileName = null;
+  }
+
   public class MidiLabel extends Object
   {
     public MidiLabel( String label, String input, String output)
@@ -267,7 +326,10 @@ public class FtsMidiManager extends FtsObject
 
   private String[] sources;
   private String[] destinations;
+  private String fileName = null;
+  private String dir = null;
   private Vector labels; 
   private ircam.jmax.editors.configuration.MidiConfigPanel listener;
+  private boolean isDirty = false;
 }
 

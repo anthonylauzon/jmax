@@ -30,6 +30,30 @@ import ircam.jmax.editors.project.*;
 
 public class FtsProject extends FtsPackage
 {
+  static
+  {
+    FtsObject.registerMessageHandler( FtsProject.class, FtsSymbol.get("midi_config"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  String config = null;
+	  if( args.getLength() == 1)
+	    config = args.getSymbol( 0).toString();
+	  
+	  ((FtsProject)obj).setCurrentMidiConfig( config);
+	}
+      });
+    FtsObject.registerMessageHandler( FtsProject.class, FtsSymbol.get("audio_config"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  String config = null;
+	  if( args.getLength() == 1)
+	    config = args.getSymbol( 0).toString();
+	  
+	  ((FtsProject)obj).setCurrentAudioConfig( config);
+	}
+      });
+  }
+
   public FtsProject() throws IOException
   {
     super();
@@ -82,11 +106,72 @@ public class FtsProject extends FtsPackage
       }
   }
 
+  public void setMidiConfig( String fileName)
+  {
+    args.clear();
+
+    if( fileName != null)
+      args.addSymbol( FtsSymbol.get( fileName));
+    try
+      {
+	send( FtsSymbol.get("midi_config"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsProject: I/O Error sending setMidiConfig Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void setCurrentMidiConfig( String fileName)
+  {
+    midiConfig = fileName;
+    if( listener != null)
+      listener.midiConfigChanged( fileName);
+  }
+
+  public String getMidiConfig()
+  {
+    return midiConfig;
+  } 
+
+  public void setAudioConfig( String fileName)
+  {
+    args.clear();
+
+    if( fileName != null)
+      args.addSymbol( FtsSymbol.get( fileName));
+    try
+      {
+	send( FtsSymbol.get("audio_config"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsProject: I/O Error sending setAudioConfig Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void setCurrentAudioConfig( String fileName)
+  {
+    audioConfig = fileName;
+    
+    if( listener!= null)
+      listener.audioConfigChanged( fileName);
+  }
+
+  public String getAudioConfig()
+  {
+    return audioConfig;
+  } 
+
   public void openEditor(int nArgs, FtsAtom[] args)
   {
     ProjectEditor.editCurrent();
   }
 
   Hashtable packages = new Hashtable();
+  String midiConfig = null;
+  String audioConfig = null;
 }
 

@@ -1035,6 +1035,57 @@ __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
+__fts_package_midi_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  
+  if( ac == 1)
+    pkg->midi_config = fts_get_symbol(&at[0]);  
+  else
+    pkg->midi_config = NULL;
+
+  if( fts_object_has_id( o))
+    {
+      fts_client_start_message( o, fts_s_midi_config);
+      if( pkg->midi_config != NULL)
+	fts_client_add_symbol( o, pkg->midi_config);      
+      fts_client_done_message( o);    
+    }
+
+  fts_package_set_dirty( pkg, 1);
+
+  if(( pkg->midi_config != NULL) && ( fts_midiconfig_get() != NULL))
+    {
+      fts_atom_t a[1];
+      fts_set_symbol( a, pkg->midi_config);
+      fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_SystemInlet, fts_s_load, 1, a);
+    }
+  else
+    fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_SystemInlet, fts_s_default, 0, 0);
+}
+
+static void 
+__fts_package_audio_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  
+  if( ac == 1)
+    pkg->audio_config = fts_get_symbol(&at[0]);  
+  else
+    pkg->audio_config = NULL;
+
+  if( fts_object_has_id( o))
+    {
+      fts_client_start_message( o, fts_s_audio_config);
+      if( pkg->audio_config != NULL)
+	fts_client_add_symbol( o, pkg->audio_config);      
+      fts_client_done_message( o);    
+    }
+
+  fts_package_set_dirty( pkg, 1);
+}
+
+static void 
 __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *this = (fts_package_t *)o;
@@ -1101,6 +1152,22 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     free(a);
 #endif    
   }
+  if( this->midi_config)
+    {
+      fts_atom_t a[1];
+      fts_set_symbol(a, this->midi_config);
+      fts_bmax_code_push_atoms(&f, 1, a);
+      fts_bmax_code_obj_mess(&f, fts_SystemInlet, fts_s_midi_config, 1);
+      fts_bmax_code_pop_args(&f, 1);
+    }
+  if( this->audio_config)
+    {
+      fts_atom_t a[1];
+      fts_set_symbol(a, this->audio_config);
+      fts_bmax_code_push_atoms(&f, 1, a);
+      fts_bmax_code_obj_mess(&f, fts_SystemInlet, fts_s_audio_config, 1);
+      fts_bmax_code_pop_args(&f, 1);
+    }
 
   fts_bmax_code_return( &f);
 
@@ -1140,8 +1207,7 @@ __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
 }
 
-/* set a patch as dirty or as saved: if this patcher is a sub-patcher propagate the set_dirty to his father
- * until a firts level patche is reached.
+/* set a package as dirty or as saved.
  * A "setDirty" message is sent to the client after is_dirty flag changed
  */
 void 
@@ -1170,6 +1236,7 @@ void
 __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t* pkg = (fts_package_t *)o;
+  fts_atom_t a;
 
   ac--;
   at++;
@@ -1199,6 +1266,12 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->help_classes = NULL;
 
   pkg->data_paths = NULL;
+
+  pkg->midi_config = NULL;
+  pkg->audio_config = NULL;
+
+  fts_set_symbol(&a, fts_s_package);
+  fts_object_set_description(o, 1, &a);
 }
 
 void 
@@ -1350,6 +1423,21 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if ( this->help)
     fts_package_upload_help( this);
 
+  if( this->midi_config)
+    if( fts_object_has_id( o))
+      {
+	fts_client_start_message( o, fts_s_midi_config);
+	fts_client_add_symbol( o, this->midi_config);      
+	fts_client_done_message( o);    
+      }
+  if( this->audio_config)
+    if( fts_object_has_id( o))
+      {
+	fts_client_start_message( o, fts_s_audio_config);
+	fts_client_add_symbol( o, this->audio_config);      
+	fts_client_done_message( o);    
+      }
+  
   fts_set_symbol(a, this->name);
   fts_set_symbol(a+1, this->dir);
   fts_set_symbol(a+2, this->filename);
@@ -1421,6 +1509,8 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, __fts_package_open_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_midi_config, __fts_package_midi_config);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_audio_config, __fts_package_audio_config);
 
   return fts_Success;
 }

@@ -261,7 +261,7 @@ public class ProjectEditor extends JFrame implements EditorContainer
   private ConfigPackagePanel packagePanel;
   private static ProjectEditor projectEditor = null;
   private static JFileChooser fileChooser = new JFileChooser(); 
-  private static javax.swing.filechooser.FileFilter projectFilter, packageFilter;
+  private static javax.swing.filechooser.FileFilter projectFilter, packageFilter, configFilter;
   static
   {
      projectFilter = new javax.swing.filechooser.FileFilter(){	
@@ -296,6 +296,23 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	 }
 	 public String getDescription() {
 	   return "jMax Packages";
+	 }
+       };
+     configFilter = new javax.swing.filechooser.FileFilter(){	
+	 public boolean accept( File f) {
+	   if (f.isDirectory())
+	     return true;
+	   
+	   String name = f.getAbsolutePath();
+	   if (name != null)
+	     if (name.endsWith(".jcfg"))
+	       return true;
+	     else
+	       return false;
+	   return false;
+	 }
+	 public String getDescription() {
+	   return "jMax Audio/MIDI Config";
 	 }
        };
   }

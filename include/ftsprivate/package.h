@@ -101,6 +101,9 @@ struct fts_package {
 
   fts_list_t* data_paths;
 
+  fts_symbol_t midi_config;
+  fts_symbol_t audio_config;
+
   int dirty; /* set to one if package's content is not saved */
 };
 

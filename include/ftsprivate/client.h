@@ -23,6 +23,8 @@
 #ifndef _FTS_PRIVATE_CLIENT_H_
 #define _FTS_PRIVATE_CLIENT_H_
 
+typedef struct _client_t client_t;
+
 #define CLIENT_DEFAULT_PORT 2023
 
 /*
@@ -40,8 +42,6 @@
 #define fts_get_client_id(O) OBJECT_ID_CLIENT(fts_object_get_id(O))
 #define fts_get_object_id(O) OBJECT_ID_OBJ(fts_object_get_id(O))
 
-extern void fts_object_reset_changed(fts_object_t *obj);
-
 /**
  * Load a patcher from file
  *
@@ -53,6 +53,12 @@ extern void fts_object_reset_changed(fts_object_t *obj);
  * @ingroup client
  */
 extern fts_patcher_t *fts_client_load_patcher( fts_symbol_t file_name, int client_id);
-
+extern client_t *object_get_client( fts_object_t *obj);
 
 #endif
+
+
+
+
+
+

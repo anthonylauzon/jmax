@@ -150,7 +150,7 @@ class JMaxClient extends FtsObject {
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "project"), new ProjectMessageHandler());
-    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "midi_manager"), new MidiManagerMessageHandler());
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "midi_config"), new MidiManagerMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "package"), new PackageMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "showMessage"), new FtsMessageHandler() {
 	public void invoke( FtsObject obj, FtsArgs args)
@@ -277,6 +277,34 @@ public class JMaxApplication {
 		((ErmesSketchWindow)win).Destroy();
 	      }
 	  }
+      }
+    
+    //Look if current project needs to be saved
+    if( getProject().isDirty())
+      {
+	Object[] options = { "Save", "Don't save"};
+	int result = JOptionPane.showOptionDialog( getConsoleWindow(), 
+						   "Project File is not saved.\nDo you want to save it now?",
+						   "Project Not Saved", 
+						   JOptionPane.YES_NO_CANCEL_OPTION,
+						   JOptionPane.QUESTION_MESSAGE,
+						   null, options, options[0]);
+	
+	if( result == JOptionPane.YES_OPTION)
+	  getProject().save( null);	
+      }
+    //Look if current midi configuration needs to be saved
+    if( getMidiManager().isDirty() && ( getMidiManager().getFileName() != null))
+      {
+	Object[] options = { "Save", "Don't save"};
+	int result = JOptionPane.showOptionDialog( getConsoleWindow(), 
+						   "MIDI Configuration File is not saved.\nDo you want to save it now?", 
+						   "MIDI Config Not Saved", 
+						   JOptionPane.YES_NO_CANCEL_OPTION,
+						   JOptionPane.QUESTION_MESSAGE,
+						   null, options, options[0]);
+	if( result == JOptionPane.YES_OPTION)
+	  getMidiManager().save( getMidiManager().getFileName());	
       }
     /////////////////////////////////////////////////////////////////////////
 
@@ -679,7 +707,7 @@ public class JMaxApplication {
 
     try
       {
-	clientObject.send( FtsSymbol.get( "get_midi_manager"));
+	clientObject.send( FtsSymbol.get( "midi_config"));
       }
     catch(IOException e)
       {

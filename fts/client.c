@@ -32,6 +32,7 @@
 #include <ftsprivate/patparser.h>
 #include <ftsprivate/package.h>
 #include <ftsprivate/tokenizer.h>
+#include <ftsprivate/client.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -104,15 +105,11 @@ typedef int socket_t;
 #include "ftsprivate/client.h"
 #include "ftsprivate/protocol.h"
 
-/* Forward decls */
-typedef struct _client_t client_t;
-
 static fts_symbol_t s_client;
 static fts_symbol_t s_client_manager;
 static fts_symbol_t s_package_loaded;
 static fts_symbol_t s_remove_object;
 static fts_symbol_t s_show_message;
-static fts_symbol_t s_midi_manager;
 
 
 /* Predefined ids */
@@ -1019,7 +1016,7 @@ static void client_get_midiconfig( fts_object_t *o, int winlet, fts_symbol_t s, 
 	client_register_object((client_t *)o, config, FTS_NO_ID);
       
       fts_set_int(&a, fts_get_object_id(config));
-      fts_client_send_message(o, s_midi_manager, 1, &a);
+      fts_client_send_message(o, fts_s_midi_config, 1, &a);
       
       fts_send_message(config, fts_SystemInlet, fts_s_upload, 0, 0);
     }
@@ -1057,7 +1054,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_project"), client_get_project);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_midi_manager"), client_get_midiconfig);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_midi_config, client_get_midiconfig);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
@@ -1551,7 +1548,6 @@ void fts_client_config( void)
   s_package_loaded = fts_new_symbol( "package_loaded");
   s_remove_object = fts_new_symbol( "removeObject");
   s_show_message = fts_new_symbol( "showMessage");
-  s_midi_manager = fts_new_symbol( "midi_manager");
 
   client_table_init();
 
