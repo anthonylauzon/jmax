@@ -124,8 +124,34 @@ FTS_API void fts_array_set( fts_array_t *array, int ac, const fts_atom_t *at);
  */
 FTS_API void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at);
 
+/** 
+ * Append an int element at the end of array
+ * 
+ * @fn void fts_array_append_int(fts_array_t* array, int i)
+ * @param array the array 
+ * @param i the int to append
+ * @ingroup array
+ */
 FTS_API void fts_array_append_int( fts_array_t *array, int i);
+
+/** 
+ * Append a float element at the end of array
+ * 
+ * @fn void fts_array_append_float(fts_array_t* array, float f)
+ * @param array the array
+ * @param f the float to append
+ * @ingroup array
+ */
 FTS_API void fts_array_append_float( fts_array_t *array, float f);
+
+/** 
+ * Append a symbol element at the end of array
+ * 
+ * @fn void fts_array_append_symbol(fts_array_t* array, fts_symbol_t s)
+ * @param array the array
+ * @param s the symbol to append
+ * @ingroup array
+ */
 FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
 
 /**
@@ -165,7 +191,7 @@ FTS_API void fts_array_cut( fts_array_t *array, int index, int n);
 /**
  * Copy array
  *
- * @fn void fts_array_insert( fts_array_t *array, int index, int ac, const fts_atom_t *at)
+ * @fn void fts_array_copy(fts_array_t *org, fts_array_t *copy)
  * @param org the source
  * @param copy the destination of the copy
  * @ingroup array
@@ -203,9 +229,25 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
  */
 #define fts_array_get_element( array, index) ((array)->atoms + (index))
 
+/** 
+ * Set an element at index
+ * 
+ * @fn void fts_array_set_element(fts_array_t* array, int index, const fts_atom_t* at)
+ * @param array the array
+ * @param index the index
+ * @param at element value
+ * @ingroup array
+ */
 FTS_API void fts_array_set_element(fts_array_t *array, int index, const fts_atom_t *at);
 
-/* init array iterator */
+/** 
+ * Get an iterator on array elements
+ * 
+ * @fn void fts_array_get_values(fts_array_t* array, fts_iterator_t* iter)
+ * @param array the array
+ * @param iter the iterator
+ * @ingroup array
+ */
 FTS_API void fts_array_get_values(fts_array_t *array, fts_iterator_t *iter);
 
 
