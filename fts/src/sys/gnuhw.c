@@ -50,14 +50,16 @@ void fts_platform_init(void)
     {
       if ( sched_setscheduler( 0, SCHED_FIFO, &sp) < 0)
 	{
-	  perror( "sched_setscheduler");
+	  /* Should we post a message ? */
 	  running_real_time = 0;
 	}
     }
 
   /* Get rid of root privilege if we have them */
   if (setreuid(geteuid(), getuid()) == -1)
-    fprintf( stderr, "setreuid failed (%s) continuing\n", strerror(errno));
+    {
+      /* Should we post a message ? */
+    }
 
   signal( SIGFPE, SIG_IGN);
 }
