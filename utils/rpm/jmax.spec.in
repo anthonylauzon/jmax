@@ -1,24 +1,10 @@
-Name: jmax
-Summary: a visual programming environment for real-time, interactive multimedia applications
-Version: @VERSION@
-Release: 1
-Copyright: LGPL
-Group: Applications/Multimedia
-Source: ftp://freesoftware.ircam.fr/pub/jmax/releases/%{version}/jmax-%{version}.tar.gz
-BuildRoot: /var/tmp/jmax-%{version}-root
-Provides: %{name}-common = %{version}, %{name}-java = %{version}
-
-# gnome and kde menu
-%define _pixmaps_dir /usr/share/pixmaps
-
-%define desktop_utils   %(if which desktop-file-install 2>&1 >/dev/null ; then echo "yes" ; fi)
-
-%define vendor_name ircam
-
 # These macros doesn't seems to be defined on RedHat 9
 %define ifdef() %if %{expand:%%{?%{1}:1}%%{!?%{1}:0}}
 %define ifndef() %if %{expand:%%{?%{1}:0}%%{!?%{1}:1}}
 
+##################################################
+# JAVA SETTINGS
+##################################################
 # We use these macros to set path to java, javac and jar when calling rpmbuild
 # Use the --define='' flag of rpmbuild
 # e.g:
@@ -33,13 +19,74 @@ Provides: %{name}-common = %{version}, %{name}-java = %{version}
 %define jar jar
 %endif
 
+##################################################
+# AGNULA SETTINGS
+##################################################
+# We use this macros to display the warning about java in case of agnula rpm.
+# Use the --define='' flag of rpmbuild to set if you want to package for agnula.
+# e.g:
+# rpmbuild --define='agnula 1' -ba jmax.spec
+%ifndef agnula
+%define agnula 0
+%endif
+
+%define jmax_name jmax
+# If we build for agnula, we postfix the rpm name with agnula.
+%if %{agnula} == 0
+%define fullname jmax
+%else
+%define fullname jmax-agnula
+%endif
+
+Name: %{fullname}
+Summary: a visual programming environment for real-time, interactive multimedia applications
+Version: @VERSION@
+Release: 1
+Copyright: LGPL
+Group: Applications/Multimedia
+Source: ftp://freesoftware.ircam.fr/pub/jmax/releases/%{version}/jmax-%{version}.tar.gz
+BuildRoot: /var/tmp/jmax-%{version}-root
+Provides: %{name}-common = %{version}, %{name}-java = %{version}
+
+%if  %{agnula} == 1
+Provides: %{jmax_name}-common = %{version}, %{jmax_name}-java = %{version}
+%endif
+
+# gnome and kde menu
+%define _pixmaps_dir /usr/share/pixmaps
+%define desktop_utils   %(if which desktop-file-install 2>&1 >/dev/null ; then echo "yes" ; fi)
+%define vendor_name ircam
+
 %description
 jMax is a visual programming environment for developing real-time, interactive multimedia applications. 
-
+%if %{agnula} == 1
+#======================================================================
+IMPORTANT WARNING: Even though the <jmax-java> package itself is
+licensed as Free Software under the GNU General Public License (GPL),
+it depends upon a proprietary Java runtime environment, so in order
+to be able to use it, you would also have to find, install and run
+proprietary software.
+The AGNULA consortium only provides the package for completeness
+reference or reimplementation purposes.
+There are freedom-preserving alternatives to this package and we
+encourage you to choose those instead, namely the <jmax-bindings>
+Python bindings.
+Should you choose to proceed, information about the Java Runtime
+Environments is available at
+ http://www.ircam.fr/jmax
+Information about the Java situation and its problems along with
+the efforts to finally Free Java are available at
+ http://fsfeurope.org/projects/agnula/java.html
+#Are you sure you wish to proceed? (yes/NO)
+#======================================================================
+%endif
 
 %package common
 Summary: Kernel of JMax
 Group: Application/Multimedia
+%if %{agnula} == 1
+Provides: %{jmax_name}-common = %{version}
+%endif
 %description common
 jMax FTS kernel
 
@@ -47,6 +94,9 @@ jMax FTS kernel
 Summary: Header files for jMax
 Group: Development/Libraries
 Requires: %{name}-common = %{version} 
+%if %{agnula} == 1
+Provides: %{jmax_name}-devel = %{version}
+%endif
 %description devel
 Header files for jMax
 
@@ -54,12 +104,39 @@ Header files for jMax
 Summary: Java gui for jMax
 Group: Applications/Multimedia
 Requires: %{name}-common = %{version}
+%if %{agnula} == 1
+Provides: %{jmax_name}-java = %{version}
+%endif
 %description java
 Java Graphical User Interface for jMax
+%if %{agnula} == 1
+#======================================================================
+IMPORTANT WARNING: Even though the <jmax-java> package itself is
+licensed as Free Software under the GNU General Public License (GPL),
+it depends upon a proprietary Java runtime environment, so in order
+to be able to use it, you would also have to find, install and run
+proprietary software.
+The AGNULA consortium only provides the package for completeness
+reference or reimplementation purposes.
+There are freedom-preserving alternatives to this package and we
+encourage you to choose those instead, namely the <jmax-bindings>
+Python bindings.
+Should you choose to proceed, information about the Java Runtime
+Environments is available at
+ http://www.ircam.fr/jmax
+Information about the Java situation and its problems along with
+the efforts to finally Free Java are available at
+ http://fsfeurope.org/projects/agnula/java.html
+#Are you sure you wish to proceed? (yes/NO)
+#======================================================================
+%endif
 
 %package client
 Summary: Client for jMax
 Group: Applications/Multimedia
+%if %{agnula} == 1
+Provides: %{jmax_name}-client = %{version}
+%endif
 %description client
 Contains C++ and Python client for jMax
 
@@ -67,6 +144,9 @@ Contains C++ and Python client for jMax
 Summary: Jack Audio Connection Kit support for jMax
 Group: Applications/Multimedia
 Requires: jack-audio-connection-kit, %{name}-common = %{version}
+%if %{agnula} == 1
+Provides: %{jmax_name}-jack = %{version}
+%endif
 %description jack
 Jack Audio Connection Kit support for jMax
 
@@ -101,6 +181,10 @@ cat /var/tmp/rpm.jmax.java.list /var/tmp/rpm.jmax.common.list >> /var/tmp/rpm.jm
 mkdir -p $RPM_BUILD_ROOT%{_pixmaps_dir}
 install -c -m 644 ./images/jmax_icon_48x48.png $RPM_BUILD_ROOT%{_pixmaps_dir}/jmax_icon.png
 
+%if %{agnula} == 1
+mv ./utils/linux_desktop/%{jmax_name}.desktop ./utils/linux_desktop/%{name}.desktop
+%endif
+
 %if "%{desktop_utils}" == "yes"
   mkdir -p %{buildroot}%{_datadir}/applications
   desktop-file-install --vendor %{vendor_name}  \
@@ -124,6 +208,44 @@ rm -f /var/tmp/rpm.jmax.java.list
 rm -f /var/tmp/rpm.jmax.global.list
 # Removed sources 
 rm -rf $RPM_BUILD_DIR/jmax-%{version}
+
+%if %{agnula} == 1
+%pre java
+# In case of agnula, we need to display a warning message about jmax-java.
+cat << EOF > $RPM_BUILD_ROOT/$$
+======================================================================
+IMPORTANT WARNING: Even though the <jmax-java> package itself is
+licensed as Free Software under the GNU General Public License (GPL),
+it depends upon a proprietary Java runtime environment, so in order
+to be able to use it, you would also have to find, install and run
+proprietary software.
+The AGNULA consortium only provides the package for completeness
+reference or reimplementation purposes.
+There are freedom-preserving alternatives to this package and we
+encourage you to choose those instead, namely the <jmax-bindings>
+Python bindings.
+Should you choose to proceed, information about the Java Runtime
+Environments is available at
+ http://www.ircam.fr/jmax
+Information about the Java situation and its problems along with
+the efforts to finally Free Java are available at
+ http://fsfeurope.org/projects/agnula/java.html
+Are you sure you wish to proceed?
+======================================================================
+EOF
+#display a dialog box
+dialog --yesno "`cat $RPM_BUILD_ROOT/$$`" 120 120
+if [ $? -eq 1 ]; then
+	clear
+	rm -f $RPM_BUILD_ROOT/$$	
+	# Stop installation of jmax-java
+	exit 1;
+else
+	clear
+	rm -f $RPM_BUILD_ROOT/$$
+fi
+
+%endif
 
 %post
 
@@ -166,7 +288,7 @@ rm -rf $RPM_BUILD_DIR/jmax-%{version}
 %files client
 %defattr(-,root,root)
 %{_includedir}/fts/client
-%{_libdir}/libftsclient.*
+%{_libdir}/libftsclient*.*
 %{_libdir}/jmax/client/python
 
 %files jack
@@ -174,6 +296,11 @@ rm -rf $RPM_BUILD_DIR/jmax-%{version}
 %{_libdir}/jmax/packages/jack
 
 %changelog
+* Mon Oct 13 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- added java warning in description when building for AGNULA.
+- added dialog display when installing AGNULA version of jmax-java.
+- move definitions to top of this file.
+- fixed file list for jmax-client package.
 * Thu Jul 24 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - added macros to set path for java, javac and jar. (use --define='java path_to_java' when calling rpmbuild).
 - removed obsolete files (LICENCE.fr, LICENSE).
