@@ -488,6 +488,7 @@ fts_vec_ccpy
 fts_vec_fcpyre
 fts_vec_fcpyim
 fts_vec_ffill
+fts_vecx_ffill
 fts_vec_ifill
 fts_vec_cfill
 fts_vec_ffillre
