@@ -53,11 +53,14 @@
 <li>
 <a href="#2.3.11">Release notes for <i>j</i>Max 2.3.11</a></li>
 </ul>
-<!-------------------------------------------------------------------------------><a NAME="2.4.5"></a>
+
+<!------------------------------------------------------------------------------->
 <br>
 <hr>
-<h1>
-Release notes for <i>j</i>Max 2.4.10</h1>
+
+<a NAME="2.4.10">
+<h1> Release notes for <i>j</i>Max 2.4.10 </h1>
+</a>
 
 <h3>
 Platforms</h3>
@@ -70,11 +73,13 @@ Irix 6.5 for R5000 and R10000 processors</li>
 Linux for Intel processors</li>
 
 <li>
-Linux for PPC</li>
+Linux for PowerPC</li>
 </ul>
 
 <h3>
 Bugs</h3>
+
+<p>
 Among others the following bugs were fixed:
 <ul>
 <li>
@@ -85,14 +90,20 @@ files and doesn't anymore</li>
 confirmation closing editted patchers</li>
 
 <li>
-compiling under ppc-linux</li>
+compiling under Linux-PPC</li>
 
 <li>
-ppc-linux OSS audio i/o</li>
+OSS audio I/O on Linux-PPC</li>
 
 <li>
 printing large vectors to the console</li>
+
+<li>
+ALSA device caused crash on some audio configurations
+
 </ul>
+
+<p>
 <b>Please note</b> that a number of problems with classes handling soundfiles
 (<b><font face="Arial,Helvetica">readsf~</font></b>, <b><font face="Arial,Helvetica">writesf~</font></b>,
 <b><font face="Arial,Helvetica">table~</font></b>,
@@ -101,11 +112,23 @@ of the <i>libaudiofile</i> library required by <i>j</i>Max. Make sure that
 you are using a recent version of the library.
 <p>For a complete list of fixed and remaining bugs, please refer to the
 IRCAM's <a href="http://www.ircam.fr/bugs">bug tracking system</a>.
-<h3>
-Features</h3>
+
+
+<h3>Features</h3>
+
+<h4>
+Linux-PPC</h4>
+
+<p>
+This release is supported on Linux-PPC and have been tested with native
+audio under OSS. <b>Please note</b> that sound files access using the
+<i>audiofile</i> library has not been fully tested, in particular
+in the direct-to-disk objects.
 
 <h4>
 Patcher editor</h4>
+
+<p>
 The following features have been added to the patcher editor:
 <ul>
 <li>
@@ -143,11 +166,14 @@ change index</li>
 automatic fit to text</li>
 </ul>
 
-<p><br><!-------------------------------------------------------------------------------><a NAME="2.4.10"></a>
+<p><br><!------------------------------------------------------------------------------->
 <br>
 <hr>
-<h1>
-Release notes for <i>j</i>Max 2.4.5</h1>
+
+<a NAME="2.4.5">
+ <h1> Release notes for <i>j</i>Max 2.4.5 </h1>
+</a>
+
 This release introduces significant changes in the FTS kernel, in the user
 interface, in the development API and in the license...
 <h3>

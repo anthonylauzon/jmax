@@ -181,11 +181,17 @@ src-dist: spec-files cvs-tag
 # rpm
 # builds a rpm
 #
-rpm: $(distfile)
+rpm-i686: $(distfile)
 	umask 22
 	cp -fv $(distfile) /usr/src/redhat/SOURCES
 	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
 	(cd /usr/src/redhat/SPECS ; rpm -ba --target i686 jmax.spec)
+
+rpm-ppc: $(distfile)
+	umask 22
+	cp -fv $(distfile) /usr/src/redhat/SOURCES
+	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
+	(cd /usr/src/redhat/SPECS ; rpm -ba --target ppc jmax.spec)
 
 #
 # install
