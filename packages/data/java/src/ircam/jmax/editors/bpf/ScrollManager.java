@@ -31,4 +31,6 @@ public interface ScrollManager {
     public void scrollToValue(int value);
     public void makeVisible(BpfPoint point);
     public Rectangle getViewRectangle();
+    public int getMaximumTime();
+    public boolean isScrollbarVisible();
 }

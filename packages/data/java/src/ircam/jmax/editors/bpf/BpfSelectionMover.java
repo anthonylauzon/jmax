@@ -204,15 +204,16 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     if(dy > 0)
     {
 	int minY = a.getY(bgc.getSelection().getMinValueInSelection());
-	int h = bgc.getGraphicDestination().getSize().height;
-	if(minY + dy > h)
-	    dy = h - minY;
+	int hMin = a.getY(ftsObj.getMinimumValue());
+	if(minY + dy > hMin)
+	    dy = hMin - minY;
     }
     else
     {
 	int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
-	if(maxY + dy < 0)
-	    dy = -maxY;
+	int hMax = a.getY(ftsObj.getMaximumValue());
+	if(maxY + dy < hMax)
+	    dy = hMax - maxY;
     }
 	
     //// Clip deltaX
@@ -231,11 +232,14 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     int prevX = -1;
     if(next!=null)
 	nextX = a.getX(next);
+
     if(prev!=null)
 	prevX = a.getX(prev);
+    else
+	prevX = a.getX(0);
 
     if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
-    else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;
+    else if(firstX+dx < prevX) dx = prevX-firstX;
 
     ////////////////////////
     g.setColor(Color.gray);

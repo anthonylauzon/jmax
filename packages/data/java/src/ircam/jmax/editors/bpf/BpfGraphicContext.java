@@ -51,8 +51,8 @@ public class BpfGraphicContext extends GraphicContext {
    * Returns the lenght (in msec) rapresented in the current window */
   public int getTimeWindow()
   {
-    return (int)(itsGraphicDestination.getSize().width/
-			   (itsAdapter.getGeometry().getXZoom()));
+    return (int)((itsGraphicDestination.getSize().width - BpfAdapter.DX)/
+		 (itsAdapter.getGeometry().getXZoom()));
   }
 
 
@@ -95,6 +95,13 @@ public class BpfGraphicContext extends GraphicContext {
     return -itsAdapter.getGeometry().getXTransposition();
   }
 
+    public int getMaximumTime()
+    {
+	if(scrollManager.isScrollbarVisible())
+	    return scrollManager.getMaximumTime();
+	else
+	    return (int)itsAdapter.getInvX(getGraphicDestination().getSize().width);
+    }
     /*
      * returns visible rectangle of the associated track editor
      */
@@ -156,6 +163,8 @@ public class BpfGraphicContext extends GraphicContext {
     BpfAdapter itsAdapter;
 
     int itsLogicalTime;
+
+    int maximumTime;
 
     BpfToolManager toolManager;
 

@@ -79,45 +79,40 @@ public class BpfBackground implements Layer, ImageObserver{
       System.err.println("something wrong: incomplete Image  ");
     
     //drawVerticalGrid(g, d.width, d.height);
+    drawRectangle(g, d.width, d.height);
 
-    int y0 = (gc.getAdapter()).getY((float)0.0); 
-    g.setColor(Color.lightGray);
-    g.drawLine(0, y0, d.width, y0);
+    //draw zero line if != from minimum
+    if(gc.getFtsObject().getMinimumValue() != 0.0)
+	{
+	    int y0 = (gc.getAdapter()).getY((float)0.0); 
+	    int x0 = (gc.getAdapter()).getX((float)0.0); 
+
+	    g.setColor(Color.gray);
+	    g.drawLine(x0, y0, d.width, y0);
+	}
   }
 
   private void drawHorizontalLine(Graphics g, int w, int h)
   {
-      g.setColor(Color.white);      
+      g.setColor(BPF_COLOR);      
       g.fillRect(0, 0, w, h);      
   }
 
-    /*private void drawVerticalGrid(Graphics g, int w, int h)
-      {
-      int windowTime = (int)(gc.getAdapter().getInvX(w)) - 1 ;    
-      int logicalTime = gc.getLogicalTime();      
-      int timeStep = findBestTimeStep(windowTime-logicalTime);
-    
-      g.setColor(Color.lightGray);
-	
-      int xPosition;
-      int snappedTime;
-    
-      //////////////
-      int stringLenght = fm.stringWidth(""+(windowTime));
-      int delta = gc.getAdapter().getX(windowTime)-gc.getAdapter().getX(windowTime-timeStep);
-      int k, stringWidth;
-      if(stringLenght>delta-10) k = 2;
-      else k=1;
+    private void drawRectangle(Graphics g, int w, int h)
+    {	   
+	int x0 = gc.getAdapter().getX(0);
 
-      /////////////
-      for (int i=logicalTime+timeStep; i<windowTime+timeStep; i+=timeStep*k) 
-      {
-      snappedTime = (i/timeStep)*timeStep;
-      xPosition = gc.getAdapter().getX(snappedTime);
-      g.drawLine(xPosition, 0, xPosition, h);
-      }      
-      }*/
-      
+	float maxTime = gc.getMaximumTime() - gc.getAdapter().getInvWidth(BpfAdapter.DX);
+	//int xMax = gc.getAdapter().getX(gc.getMaximumTime()) - BpfAdapter.DX;//????????????????????????
+	int xMax = gc.getAdapter().getX(maxTime);
+
+	int yMin = gc.getAdapter().getY(gc.getFtsObject().getMinimumValue());
+	int yMax = gc.getAdapter().getY(gc.getFtsObject().getMaximumValue());
+
+	g.setColor(Color.white);	
+	g.drawRect(x0, yMax, xMax-x0, yMin - yMax);
+    }
+
   /**
    * Layer interface. */
   public void render(Graphics g, Rectangle r, int order)
@@ -130,30 +125,6 @@ public class BpfBackground implements Layer, ImageObserver{
     return null; // no events in this layer!
   }
   
-  /**
-   * utility function: find a "good" time step for vertical subdivisions
-   * given a window time size.
-   * The politic is to find 
-   * 1) at least 5 divisions 
-   * 2) if possible, a power of 10  */  
-    /*public static int findBestTimeStep(int windowTime) 
-      {    
-      // find a good time interval between two grid
-    
-      int pow = 1;
-      
-      while (windowTime/pow>0) 
-      {
-      pow *= 10;
-      }
-
-      pow = pow/10;
-      
-      if (windowTime/pow < 5) pow = pow/5;
-      if (pow == 0) return 1;
-      return pow;
-      }*/
-
     /* ImageObserver interface*/
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
     {
@@ -178,7 +149,7 @@ public class BpfBackground implements Layer, ImageObserver{
       numberFormat.setGroupingUsed(false);
   }
 
-  public static final Color OUT_RANGE_COLOR = new Color(230, 230, 230);
+  public static final Color BPF_COLOR = new Color(230, 230, 230);
 }
 
 

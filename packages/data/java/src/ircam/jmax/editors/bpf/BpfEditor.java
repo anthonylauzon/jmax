@@ -116,7 +116,17 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		    if(gc.getToolManager().getCurrentTool().getName().equals("edit tool"))
 			{
 			    float time = gc.getAdapter().getInvX(e.getX());
+			    float maxTime = gc.getMaximumTime();
+			    if(time < 0) time = 0;
+			    else if(time > maxTime) time = maxTime;
+			    
 			    float val =  gc.getAdapter().getInvY(e.getY());
+			    if(val > gc.getFtsObject().getMaximumValue())
+				val = gc.getFtsObject().getMaximumValue();
+			    else 
+				if(val < gc.getFtsObject().getMinimumValue())
+				val = gc.getFtsObject().getMinimumValue();
+			    
 			    gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
 				       PointRenderer.numberFormat.format(val)+" )");		    
 			}
@@ -130,7 +140,17 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		    if(toolName.equals("edit tool"))
 			{
 			    float time = gc.getAdapter().getInvX(e.getX());
+			    float maxTime = gc.getMaximumTime();
+			    if(time < 0) time = 0;
+			    else if(time > maxTime) time = maxTime;
+			    
 			    float val =  gc.getAdapter().getInvY(e.getY());
+			    if(val > gc.getFtsObject().getMaximumValue())
+				val = gc.getFtsObject().getMaximumValue();
+			    else 
+				if(val < gc.getFtsObject().getMinimumValue())
+				val = gc.getFtsObject().getMinimumValue();
+
 			    gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
 				       PointRenderer.numberFormat.format(val)+" )");	
 			}

@@ -116,21 +116,25 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 
   public void setPoints(int nArgs , FtsAtom args[])
   {
-      BpfPoint point;
-      int firstIndex = args[0].getInt();
-      int n = (nArgs - 1) / 2;
+    BpfPoint point = null;
+    float time = 0, value = 0;
+    int firstIndex = args[0].getInt();
+    int n = (nArgs - 1) / 2;
 
-      for(int i=0; i<n; i++)
-	  {
-	      float time = args[i * 2 + 1].getFloat();
-	      float value = args[i * 2 + 2].getFloat();
-	      point = getPointAt(firstIndex + i);
-	      point.setValue(value);
-	      point.setTime(time);	      
-	  }
+    for(int i=0; i<n; i++)
+      {
+	time = args[i * 2 + 1].getFloat();
+	value = args[i * 2 + 2].getFloat();
+	point = getPointAt(firstIndex + i);
+	point.setValue(value);
+	point.setTime(time);	      
+      }
 
+    if(n==1)
+      notifyPointChanged(firstIndex, indexOf(point), time, value);
+    else
       notifyPointsChanged();
-      setDirty();
+    setDirty();
   }
 
   public void clear(int nArgs , FtsAtom args[])

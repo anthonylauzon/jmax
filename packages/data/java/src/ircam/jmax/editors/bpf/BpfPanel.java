@@ -49,8 +49,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     FtsBpfObject bpfData;
     EditorContainer itsContainer;
 
-    //public BpfRuler ruler;
-    
     Box trackPanel;
     //---
     JScrollBar itsTimeScrollbar;
@@ -64,7 +62,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
 
     BpfEditor editor;
-
   /**
    * Constructor based on a SequenceDataModel containing the tracks to edit.
    */
@@ -81,12 +78,8 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	geometry = new Geometry();
 	geometry.setXZoom(20);
 	geometry.setYZoom(300);
-	geometry.setYInvertion(true);
 	geometry.setYTransposition(136);
     }
-    //------------------------------------------------
-    // Create the ruler
-    //ruler = new BpfRuler(geometry, this);
 
     //-------------------------------------------------
     //- Create the ToolManager with the needed tools
@@ -99,8 +92,8 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     ///prepare the bpfEditor
     JPanel container_panel = new JPanel();
     container_panel.setLayout(new BorderLayout());
-    container_panel.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT/*-30*/));
-    container_panel.setSize(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT/*-30*/);
+    container_panel.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT));
+    container_panel.setSize(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT);
 
     editor = new BpfEditor(geometry, bpfData, manager);
     editor.setBorder(new EtchedBorder());
@@ -117,16 +110,26 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	public void zoomChanged(float zoom, float oldZoom)
 	    {
 		repaint();
-		BpfPoint lastPoint = bpfData.getLastPoint();
-		if(lastPoint!=null)
-		    resizePanelToTimeWithoutScroll((int)lastPoint.getTime());
+		if((editor.getSize().width>0)&&(zoom!=oldZoom))
+		    resizePanelToLastPoint();
 	    }
-    });
+	});
+
+    
+    addComponentListener( new ComponentAdapter() {
+	    public void componentResized(ComponentEvent e)
+	    {
+		repaint();
+		if(editor.getSize().width>0)
+		    resizePanelToLastPoint();
+	    }
+	});
 
     //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
-    int totalTime = MINIMUM_TIME;
-    
-    itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
+    int totalTime = (int)editor.getGraphicContext().getAdapter().getInvX(Bpf.DEFAULT_WIDTH);
+
+    itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, totalTime, 0, totalTime);
+    itsTimeScrollbar.setVisible(false);
     itsTimeScrollbar.setUnitIncrement(10);
     itsTimeScrollbar.setBlockIncrement(1000);
     
@@ -156,12 +159,12 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     public void pointsDeleted(int index, int size){}
     public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue) 
     {
-	if(oldIndex!=newIndex)
+	if((oldIndex!=newIndex)||(newIndex == bpfData.length() - 1))
 	    resizePanelToPointTime(bpfData.getPointAt(newIndex));
     }
     public void pointsChanged() 
     {
-      //resizePanelToPointTime(bpfData.getPointAt(bpfData.length() - 1));
+	//resizePanelToPointTime(bpfData.getPointAt(bpfData.length() - 1));
     }
     public void cleared(){}
     /////////////////////////////////////////////////////////////
@@ -180,33 +183,28 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
       
 	if(time > maximumTime)
 	    {
-		int delta = maximumTime-itsTimeScrollbar.getMaximum();
-		
-		itsTimeScrollbar.setMaximum(time-delta);
+		resizePanelToLastPoint();
 		itsTimeScrollbar.setValue(time);
 	    }
 	else 
-	    if( time > maxVisibleTime)		
-		itsTimeScrollbar.setValue(time-maxVisibleTime-geometry.getXTransposition()+10);
-	    else
-		if(time < -geometry.getXTransposition())
-		    itsTimeScrollbar.setValue(time);
+	    if(( time > maxVisibleTime)||(time < -geometry.getXTransposition()))
+		itsTimeScrollbar.setValue(time);    
     }
 
-    private void resizePanelToTimeWithoutScroll(int time)
+    private void resizePanelToLastPoint()
     {
-	int maximumTime = getMaximumTime();
-      
-	if(time > maximumTime)
-	    {
-		int delta = maximumTime-itsTimeScrollbar.getMaximum();
-		itsTimeScrollbar.setMaximum(time-delta);
-	    }
-    }
-    private void resizePanelToPointTimeWithoutScroll(BpfPoint point)
-    {
-	int evtTime = (int)(point.getTime());
-	resizePanelToTimeWithoutScroll(evtTime);
+	BpfPoint lastPoint = bpfData.getLastPoint();
+	int time =0;	    
+
+	int timeWindow = editor.getGraphicContext().getTimeWindow();
+	if(lastPoint!=null)
+	    time = (int)(lastPoint.getTime() + BpfAdapter.DX/geometry.getXZoom());		
+	if(time<timeWindow) time = timeWindow;
+
+	itsTimeScrollbar.setVisible( (time > timeWindow));
+	itsTimeScrollbar.setValue(0);
+	itsTimeScrollbar.setVisibleAmount(timeWindow);
+	itsTimeScrollbar.setMaximum(time);				
     }
 
     public Frame getFrame(){
@@ -259,7 +257,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     {
 	int time = (int)point.getTime();
 	int startTime = -geometry.getXTransposition(); 
-	int endTime = geometry.sizeToMsec(geometry, getSize().width)-1 ;
+	int endTime = geometry.sizeToMsec(geometry, getSize().width)/*-1*/ ;
 	return ((time>startTime)&&(time<endTime));
     }
 
@@ -267,8 +265,11 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     public boolean pointIsVisible(int x, int y)
     {
 	Rectangle r = itsContainer.getViewRectangle();
+	//if(isScrollbarVisible())		
 	return ((x > r.x) && (x < r.x + r.width));
-    } 
+	//else	    
+	//return ((x > r.x ) && (x < r.x + r.width - BpfAdapter.DX));
+    }
 
     public boolean pointIsScrollable(int x, int y)
     {
@@ -280,14 +281,14 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     public int scrollBy(int x, int y)
     {
 	Rectangle r = itsContainer.getViewRectangle();
+	int delta = 0;
 	if(x < r.x)
 	    {
 		if(itsTimeScrollbar.getValue()-scrollingDelta >0)
 		    {
 			itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
-			return -scrolledDelta;//scroll to left
+			delta = -scrolledDelta;//scroll to left
 		    }
-		else return 0;//is already scrolled to zero
 	    }
 	else
 	    {		
@@ -295,39 +296,46 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 		    {
 			int value = itsTimeScrollbar.getValue()+scrollingDelta;
 			if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
-			    itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
-			
+			    {
+				itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
+				if(itsTimeScrollbar.getMaximum() > itsTimeScrollbar.getVisibleAmount())
+				    itsTimeScrollbar.setVisible(true);
+				else
+				    itsTimeScrollbar.setVisible(false);
+			    }
 			itsTimeScrollbar.setValue(value);
-			return scrolledDelta;//scroll to rigth
+			delta = scrolledDelta;//scroll to rigth
 		    }
-		else return 0;//the mouse is in the window
 	    }
+	
+	return delta;
     }
 
     public void makeVisible(BpfPoint pt)
     {
 	int time = (int)pt.getTime();
 	int startTime = -geometry.getXTransposition(); 
-	int endTime = geometry.sizeToMsec(geometry, getSize().width)-1 ;
+	int endTime = geometry.sizeToMsec(geometry, getSize().width)/*-1*/ ;
 	  
 	if((time<startTime)||(time>endTime))
 	    itsTimeScrollbar.setValue(time);
     }
 
+    public boolean isScrollbarVisible()
+    {
+	return itsTimeScrollbar.isVisible();
+    }
+
     public int getMaximumVisibleTime()
     {
-	return geometry.sizeToMsec(geometry, getSize().width)-1 ;
+	return geometry.sizeToMsec(geometry, getSize().width)/*-1*/;
     }
 
     public int getMaximumTime()
     {
 	int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
-	int size = getSize().width;
-      
-	if (geometry.getXInvertion()) 
-	    return (int) (maxTransp -(size)/geometry.getXZoom())-1;
-	
-	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
+	int size = getSize().width - BpfAdapter.DX;//??????
+	return (int) ((size)/geometry.getXZoom() - maxTransp)/*-1*/;
     }
 
       /////////////////ScrollManager Interface

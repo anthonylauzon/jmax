@@ -71,7 +71,7 @@ public class PointRenderer implements ObjectRenderer {
 
 	int x = adapter.getX(point);
 	int y = adapter.getY(point);    
-      
+
 	if(selected)
 	    g.setColor(Color.red);
 	else

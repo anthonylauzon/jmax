@@ -125,15 +125,16 @@ public class ArrowTool extends SelecterTool implements DragListener{
     if(deltaY > 0)
 	{
 	    int minY = a.getY(bgc.getSelection().getMinValueInSelection());
-	    int h = bgc.getGraphicDestination().getSize().height;
-	    if(minY + deltaY > h)
-		deltaY = h - minY;
+	    int hMin = a.getY(ftsObj.getMinimumValue());
+	    if(minY + deltaY > hMin)
+		deltaY = hMin - minY;
 	}
     else
 	{
 	    int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
-	    if(maxY + deltaY < 0)
-		deltaY = -maxY;
+	    int hMax = a.getY(ftsObj.getMaximumValue());
+	    if(maxY + deltaY < hMax)
+		deltaY = hMax - maxY;
 	}
 
     //clip deltaX///////////////////
@@ -160,13 +161,18 @@ public class ArrowTool extends SelecterTool implements DragListener{
     int prevX = -1;
 
     if(next!=null)
-      nextX = a.getX(next);
-    if(prev!=null)
-      prevX = a.getX(prev);
+	nextX = a.getX(next);
+    else
+	nextX = a.getX(bgc.getMaximumTime()) - BpfAdapter.DX;
 
-    if((lastX + deltaX > nextX) && (next!=null)) 
+    if(prev!=null)
+	prevX = a.getX(prev);
+    else
+	prevX = a.getX(0);
+
+    if(lastX + deltaX > nextX) 
       deltaX = nextX-lastX;
-    else if((firstX+deltaX < prevX) && (prev!=null)) 
+    else if(firstX+deltaX < prevX)
       deltaX = prevX-firstX;
 
     // starts a serie of undoable moves
@@ -193,6 +199,11 @@ public class ArrowTool extends SelecterTool implements DragListener{
   {
     startingPoint.x+=deltaX;
     startingPoint.y+=deltaY;
+  }
+
+  public void edit(int x, int y, int modifiers)
+  {
+      ((BpfEditor)gc.getGraphicDestination()).showListDialog();
   }
   //---Fields
   BpfSelectionMover itsSelectionMover;
