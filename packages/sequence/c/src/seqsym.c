@@ -48,6 +48,8 @@ fts_symbol_t seqsym_export_midi = 0;
 fts_symbol_t seqsym_export_midi_dialog = 0;
 fts_symbol_t seqsym_import_midi = 0;
 fts_symbol_t seqsym_import_midi_dialog = 0;
+fts_symbol_t seqsym_lock = 0;
+fts_symbol_t seqsym_unlock = 0;
 
 /* messages to client */
 fts_symbol_t seqsym_createEditor = 0;
@@ -83,6 +85,8 @@ seqsym_config(void)
   seqsym_export_midi_dialog = fts_new_symbol("export_midi_dialog");
   seqsym_import_midi = fts_new_symbol("import_midi");
   seqsym_import_midi_dialog = fts_new_symbol("import_midi_dialog");
+  seqsym_lock = fts_new_symbol("lock");
+  seqsym_unlock = fts_new_symbol("unlock");
 
   /* messages to client */
   seqsym_createEditor = fts_new_symbol("createEditor");

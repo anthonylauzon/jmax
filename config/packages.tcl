@@ -34,6 +34,7 @@ package require control
 package require mess
 package require numeric
 package require lists
+package require midi
 
 # ISPW classes
 package require ispw

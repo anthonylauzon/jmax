@@ -182,7 +182,8 @@ sequence_remove_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_
   fts_atom_t a[1];
 
   /* remove track from sequence */
-  sequence_remove_track(track);
+  if(!track_is_locked(track))
+    sequence_remove_track(track);
   
   /* add track to sequence at client */
   fts_set_object(a + 0, (fts_object_t *)track);	    

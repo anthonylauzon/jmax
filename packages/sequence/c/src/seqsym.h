@@ -50,6 +50,8 @@ extern fts_symbol_t seqsym_export_midi;
 extern fts_symbol_t seqsym_export_midi_dialog;
 extern fts_symbol_t seqsym_import_midi;
 extern fts_symbol_t seqsym_import_midi_dialog;
+extern fts_symbol_t seqsym_lock;
+extern fts_symbol_t seqsym_unlock;
 
 /* messages to client */
 extern fts_symbol_t seqsym_createEditor;

@@ -103,8 +103,15 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
   
   if(this->event)
     {
+      /* playing */
       fts_alarm_set_delay(alarm, (event_get_time(this->event) - now) * this->speed);
       fts_alarm_arm(alarm);
+    }
+  else
+    {
+      /* stop */
+      fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_unlock, 0, 0);            
+      this->track = 0;
     }
 
   fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
@@ -131,12 +138,14 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       if(track)
 	{
 	  event_t *event = eventtrk_get_first(track);
-
-	  this->track = track;
-	  this->event = event;
 	  
 	  if(event)
 	    {
+	      fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_lock, 0, 0);
+	  
+	      this->track = track;
+	      this->event = event;
+
 	      fts_alarm_set_delay(&this->alarm, event_get_time(event) * this->speed);
 	      fts_alarm_arm(&this->alarm);
 	    }
@@ -149,7 +158,14 @@ seqplay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   seqplay_t *this = (seqplay_t *)o;
 
-  fts_alarm_unarm(&this->alarm);
+  if(this->track)
+    {
+      fts_alarm_unarm(&this->alarm);
+      fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_unlock, 0, 0);      
+
+      this->track = 0;
+      this->event = 0;
+    }
 }
 
 static void 

@@ -266,22 +266,26 @@ void
 eventtrk_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
-  double time = fts_get_float(at + 0);
-  fts_object_t *event;
-  fts_atom_t a[1];
 
-  /* make new event object */
-  fts_object_new(0, ac - 1, at + 1, &event);
+  if(!track_is_locked(&this->head))
+    {
+      double time = fts_get_float(at + 0);
+      fts_object_t *event;
+      fts_atom_t a[1];
 
-  /* add event to track */
-  eventtrk_add_event(this, time, (event_t *)event);
+      /* make new event object */
+      fts_object_new(0, ac - 1, at + 1, &event);
 
-  /* create event at client (short cut: could also send upload message to event object) */
-  fts_client_upload(event, seqsym_event, ac, at);
+      /* add event to track */
+      eventtrk_add_event(this, time, (event_t *)event);
 
-  /* add event to track at client */
-  fts_set_object(a, event);    
-  fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 1, a);
+      /* create event at client (short cut: could also send upload message to event object) */
+      fts_client_upload(event, seqsym_event, ac, at);
+
+      /* add event to track at client */
+      fts_set_object(a, event);    
+      fts_client_send_message((fts_object_t *)this, seqsym_addEvents, 1, a);
+    }
 }
 
 /* create new event by client request without uploading */
@@ -289,15 +293,19 @@ void
 eventtrk_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
-  double time = fts_get_float(at + 0);
-  fts_object_t *event;
-  fts_atom_t a[1];
 
-  /* make new event object */
-  fts_object_new(0, ac - 1, at + 1, &event);
+  if(!track_is_locked(&this->head))
+    {
+      double time = fts_get_float(at + 0);
+      fts_object_t *event;
+      fts_atom_t a[1];
 
-  /* add event to track */
-  eventtrk_add_event(this, time, (event_t *)event);
+      /* make new event object */
+      fts_object_new(0, ac - 1, at + 1, &event);
+
+      /* add event to track */
+      eventtrk_add_event(this, time, (event_t *)event);
+    }
 }
 
 /* delete event by client request */
@@ -305,17 +313,37 @@ void
 eventtrk_remove_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   eventtrk_t *this = (eventtrk_t *)o;
-  fts_object_t *event = fts_get_object(at + 0);
-  fts_atom_t a[1];
 
-  eventtrk_cut_event(this, (event_t *)event);
+  if(!track_is_locked(&this->head))
+    {
+      fts_object_t *event = fts_get_object(at + 0);
+      fts_atom_t a[1];
 
-  /* add track to sequence at client */
-  fts_set_object(a + 0, (fts_object_t *)event);
-  fts_client_send_message(o, seqsym_deleteEvents, 1, a);
-  
-  /* delete event object and remove from client */
-  fts_object_delete(event);
+      eventtrk_cut_event(this, (event_t *)event);
+      
+      /* add track to sequence at client */
+      fts_set_object(a + 0, (fts_object_t *)event);
+      fts_client_send_message(o, seqsym_deleteEvents, 1, a);
+      
+      /* delete event object and remove from client */
+      fts_object_delete(event);
+    }
+}
+
+void
+eventtrk_lock(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+
+  track_lock(&this->head);
+}
+
+void
+eventtrk_unlock(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  eventtrk_t *this = (eventtrk_t *)o;
+
+  track_unlock(&this->head);
 }
 
 void
@@ -415,6 +443,9 @@ eventtrk_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, eventtrk_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, eventtrk_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_lock);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_unlock);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, eventtrk_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, eventtrk_print);
