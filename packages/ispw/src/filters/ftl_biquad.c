@@ -22,77 +22,14 @@
  *  
  */
 
-#if 0
-
-void 
-ftl_biquad_df1(fts_word_t *argv)
+void ftl_biquad_df1(fts_word_t *argv)
 {
-  biquad_state_df1_t *state;
-  biquad_coefs_t *coefs;
+  biquad_df1_state_t * restrict state;
+  biquad_coefs_t * restrict coefs;
   int n_tick;
-  float *x, *y;
+  float * restrict x, * restrict y;
   float xnm1, xnm2, ynm2, ynm1;
   float a0, a1, a2, b1, b2;
-  float ynp0, ynp1, ynp2, ynp3;
-  int n;
-
-  x = (float *)fts_word_get_ptr(argv); /* in0 */
-  y = (float *)fts_word_get_ptr(argv+1); /* out0 */
-  state = (biquad_state_df1_t *)fts_word_get_ptr(argv+2);
-  coefs = (biquad_coefs_t *)fts_word_get_ptr(argv+3);
-  n_tick = fts_word_get_long(argv+4);
-
-  xnm1 = state->x1; /* x(n-1) */
-  xnm2 = state->x2; /* x(n-2) */
-  ynm1 = state->y1; /* y(n-1) */
-  ynm2 = state->y2; /* y(n-2) */
-
-  a0 = coefs->a0; 
-  a1 = coefs->a1; 
-  a2 = coefs->a2; 
-  b1 = coefs->b1; 
-  b2 = coefs->b2; 
-
-  ynp0 = a0 * x[0] + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2; /* y(n) */
-  ynp1 = a0 * x[1] + a1 * x[0] + a2 * xnm1 - b1 * ynp0 - b2 * ynm1; /* y(n+1) */
-  ynp2 = a0 * x[2] + a1 * x[1] + a2 * x[0] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
-  ynp3 = a0 * x[3] + a1 * x[2] + a2 * x[1] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
-
-  for(n=4; n<n_tick; n+=4)
-  {
-    y[n-4] = ynp0;
-    ynp0 = a0 * x[n+0] + a1 * x[n-1] + a2 * x[n-2] - b1 * ynp3 - b2 * ynp2; /* y(n) */
-    y[n-3] = ynp1;
-    ynp1 = a0 * x[n+1] + a1 * x[n+0] + a2 * x[n-1] - b1 * ynp0 - b2 * ynp3; /* y(n+1) */
-    y[n-2] = ynp2;
-    ynp2 = a0 * x[n+2] + a1 * x[n+1] + a2 * x[n+0] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
-    y[n-1] = ynp3;
-    ynp3 = a0 * x[n+3] + a1 * x[n+2] + a2 * x[n+1] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
-  }
-
-  state->y1 = ynp3;
-  state->y2 = ynp2;
-  state->x1 = x[n_tick-1];
-  state->x2 = x[n_tick-2];
-
-  y[n_tick-4] = ynp0;
-  y[n_tick-3] = ynp1;
-  y[n_tick-2] = ynp2;
-  y[n_tick-1] = ynp3;
-}
-
-#endif
-
-void
-ftl_biquad_df1(fts_word_t *argv)
-{
-  biquad_df1_state_t *state;
-  biquad_coefs_t *coefs;
-  int n_tick;
-  float *x, *y;
-  float xnm1, xnm2, ynm2, ynm1;
-  float a0, a1, a2, b1, b2;
-  float ynp0, ynp1, ynp2, ynp3;
   int n;
 
   x = (float *)fts_word_get_ptr(argv); /* in0 */
@@ -112,35 +49,76 @@ ftl_biquad_df1(fts_word_t *argv)
   b1 = coefs->b1; 
   b2 = coefs->b2; 
 
-  ynp0 = a0 * x[0] + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2; /* y(n) */
-  ynp1 = a0 * x[1] + a1 * x[0] + a2 * xnm1 - b1 * ynp0 - b2 * ynm1; /* y(n+1) */
-  ynp2 = a0 * x[2] + a1 * x[1] + a2 * x[0] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
-  ynp3 = a0 * x[3] + a1 * x[2] + a2 * x[1] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
+  for ( n = 0; n < n_tick; n ++)
+    {
+      float xn, yn;
 
-  for(n=4; n<n_tick; n+=4)
-  {
-    xnm2 = x[n-2];
-    xnm1 = x[n-1];
+      xn = x[n];
+      yn = a0 * xn + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2;
 
-    y[n-4] = ynp0;
-    y[n-3] = ynp1;
-    y[n-2] = ynp2;
-    y[n-1] = ynp3;
+      y[n] = yn;
 
-    ynp0 = a0 * x[n+0] + a1 * xnm1   + a2 * xnm2   - b1 * ynp3 - b2 * ynp2; /* y(n) */
-    ynp1 = a0 * x[n+1] + a1 * x[n+0] + a2 * xnm1   - b1 * ynp0 - b2 * ynp3; /* y(n+1) */
-    ynp2 = a0 * x[n+2] + a1 * x[n+1] + a2 * x[n+0] - b1 * ynp1 - b2 * ynp0; /* y(n+2) */
-    ynp3 = a0 * x[n+3] + a1 * x[n+2] + a2 * x[n+1] - b1 * ynp2 - b2 * ynp1; /* y(n+3) */
-  }
+      xnm2 = xnm1;
+      xnm1 = xn;
+      ynm2 = ynm1;
+      ynm1 = yn;
+    }
 
-  state->xnm2 = x[n_tick-2];
-  state->xnm1 = x[n_tick-1];
-
-  y[n_tick-4] = ynp0;
-  y[n_tick-3] = ynp1;
-  state->ynm2 = y[n_tick-2] = ynp2;
-  state->ynm1 = y[n_tick-1] = ynp3;
+  state->xnm2 = xnm2;
+  state->xnm1 = xnm1;
+  state->ynm2 = ynm2;
+  state->ynm1 = ynm1;
 }
+
+
+void ftl_biquad_df1_inplace(fts_word_t *argv)
+{
+  biquad_df1_state_t * restrict state;
+  biquad_coefs_t * restrict coefs;
+  int n_tick;
+  float * restrict xy;
+  float xnm1, xnm2, ynm2, ynm1;
+  float a0, a1, a2, b1, b2;
+  int n;
+
+  xy = (float *)fts_word_get_ptr(argv); /* in0 */
+  state = (biquad_df1_state_t *)fts_word_get_ptr(argv+1);
+  coefs = (biquad_coefs_t *)fts_word_get_ptr(argv+2);
+  n_tick = fts_word_get_long(argv+3);
+
+  xnm1 = state->xnm1; /* x(n-1) */
+  xnm2 = state->xnm2; /* x(n-2) */
+  ynm1 = state->ynm1; /* y(n-1) */
+  ynm2 = state->ynm2; /* y(n-2) */
+
+  a0 = coefs->a0; 
+  a1 = coefs->a1; 
+  a2 = coefs->a2; 
+  b1 = coefs->b1; 
+  b2 = coefs->b2; 
+
+  for ( n = 0; n < n_tick; n ++)
+    {
+      float xn, yn;
+
+      xn = xy[n];
+
+      yn = a0 * xn + a1 * xnm1 + a2 * xnm2 - b1 * ynm1 - b2 * ynm2;
+
+      xy[n] = yn;
+
+      xnm2 = xnm1;
+      xnm1 = xn;
+      ynm2 = ynm1;
+      ynm1 = yn;
+    }
+
+  state->xnm2 = xnm2;
+  state->xnm1 = xnm1;
+  state->ynm2 = ynm2;
+  state->ynm1 = ynm1;
+}
+
 
 /****************************
  *  
@@ -151,13 +129,12 @@ ftl_biquad_df1(fts_word_t *argv)
  *
  */
 
-void
-ftl_biquad_df2(fts_word_t *argv)
+void ftl_biquad_df2(fts_word_t *argv)
 {
-  biquad_df2_state_t *state;
-  biquad_coefs_t *coefs;
+  biquad_df2_state_t * restrict state;
+  biquad_coefs_t * restrict coefs;
   int n_tick;
-  float *x, *y;
+  float * restrict x, * restrict y;
   float wnm1, wnm2;
   float a0, a1, a2, b1, b2;
   float wnp0, wnp1, wnp2, wnp3;
@@ -207,3 +184,70 @@ ftl_biquad_df2(fts_word_t *argv)
   state->wnm2 = wnp2;
   state->wnm1 = wnp3;
 }
+
+
+
+void ftl_biquad_df2_inplace(fts_word_t *argv)
+{
+  biquad_df2_state_t * restrict state;
+  biquad_coefs_t * restrict coefs;
+  int n_tick;
+  float * restrict xy;
+  float wnm1, wnm2;
+  float a0, a1, a2, b1, b2;
+  float wnp0, wnp1, wnp2, wnp3;
+  int n;
+
+  xy = (float *)fts_word_get_ptr(argv); /* in0 */
+  state = (biquad_df2_state_t *)fts_word_get_ptr(argv+1);
+  coefs = (biquad_coefs_t *)fts_word_get_ptr(argv+2);
+  n_tick = fts_word_get_long(argv+3);
+
+  wnm1 = state->wnm1; /* w(n-1) */
+  wnm2 = state->wnm2; /* w(n-2) */
+
+  a0 = coefs->a0; 
+  a1 = coefs->a1; 
+  a2 = coefs->a2; 
+  b1 = coefs->b1; 
+  b2 = coefs->b2; 
+
+  wnp0 = xy[0] - b1 * wnm1 - b2 * wnm2; /* w(n) */
+  wnp1 = xy[1] - b1 * wnp0 - b2 * wnm1; /* w(n+1) */
+  wnp2 = xy[2] - b1 * wnp1 - b2 * wnp0; /* w(n+2) */
+  wnp3 = xy[3] - b1 * wnp2 - b2 * wnp1; /* w(n+3) */
+
+  xy[0] = a0 * wnp0 + a1 * wnm1 + a2 * wnm2;
+  xy[1] = a0 * wnp1 + a1 * wnp0 + a2 * wnm1;
+  xy[2] = a0 * wnp2 + a1 * wnp1 + a2 * wnp0;
+  xy[3] = a0 * wnp3 + a1 * wnp2 + a2 * wnp1;
+
+  for(n=4; n<n_tick; n+=4)
+  {
+    wnm2 = wnp2;
+    wnm1 = wnp3;
+
+    wnp0 = xy[n+0] - b1 * wnm1 - b2 * wnm2; /* w(n) */
+    wnp1 = xy[n+1] - b1 * wnp0 - b2 * wnm1; /* w(n+1) */
+    wnp2 = xy[n+2] - b1 * wnp1 - b2 * wnp0; /* w(n+2) */
+    wnp3 = xy[n+3] - b1 * wnp2 - b2 * wnp1; /* w(n+3) */
+
+    xy[n+0] = a0 * wnp0 + a1 * wnm1 + a2 * wnm2;
+    xy[n+1] = a0 * wnp1 + a1 * wnp0 + a2 * wnm1;
+    xy[n+2] = a0 * wnp2 + a1 * wnp1 + a2 * wnp0;
+    xy[n+3] = a0 * wnp3 + a1 * wnp2 + a2 * wnp1;
+  }
+
+  state->wnm2 = wnp2;
+  state->wnm1 = wnp3;
+}
+
+
+
+
+
+
+
+
+
+

@@ -61,21 +61,16 @@ public class FtsParse
 
   /* To unparse floating point numbers */
 
-  static private NumberFormat numberFormat;
+  static private DecimalFormat formatter;
 
   static
   {
     // Number format for messages coming from FTS (to be cleaned up:
     // the text should be sent by FTS as text alread).
     
-    numberFormat = NumberFormat.getInstance(Locale.US);
-    numberFormat.setMaximumFractionDigits(6);
-    numberFormat.setMinimumFractionDigits(0);
-
-    if (numberFormat instanceof DecimalFormat)
-      ((DecimalFormat) numberFormat).setDecimalSeparatorAlwaysShown(true);
-
-    numberFormat.setGroupingUsed(false);
+    formatter  = new DecimalFormat("0.######;-0.######");
+    formatter.setGroupingUsed(false);
+    formatter.setDecimalSeparatorAlwaysShown(true);
   }
 
   /* Operating variables */
@@ -848,7 +843,7 @@ public class FtsParse
 	  value2 = stream.getNextArgument();
 
 	if (value1 instanceof Float)
-	  descr.append(numberFormat.format(value1));
+	  descr.append(formatter.format(value1));
 	else if (value1 instanceof Integer)
 	  descr.append(value1);
 	else if (value1 instanceof String)
@@ -940,7 +935,7 @@ public class FtsParse
 	  value2 = stream.getNextArgument();
 
 	if (value1 instanceof Float)
-	  descr.append(numberFormat.format(value1));
+	  descr.append(formatter.format(value1));
 	else if (value1 instanceof Integer)
 	  descr.append(value1);
 	else if (value1 instanceof String)
@@ -1021,7 +1016,7 @@ public class FtsParse
 	  value2 = en.nextElement();
 
 	if (value1 instanceof Float)
-	  descr.append(numberFormat.format(value1));
+	  descr.append(formatter.format(value1));
 	else if (value1 instanceof Integer)
 	  descr.append(value1);
 	else if (value1 instanceof String)

@@ -18,4 +18,5 @@ typedef struct{
 } ftl_vd_t;
 
 extern void ftl_vd(fts_word_t *argv);
+extern void ftl_vd_inplace(fts_word_t *argv);
 extern void ftl_vd_miller(fts_word_t *argv);

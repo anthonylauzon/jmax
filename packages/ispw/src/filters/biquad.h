@@ -84,3 +84,8 @@ typedef struct
 extern void ftl_biquad_df1(fts_word_t *argv); /* direct form I */
 extern void ftl_biquad_df2(fts_word_t *argv); /* direct form II */
 
+/* In place versions, only one argument as in/out */
+
+extern void ftl_biquad_df1_inplace(fts_word_t *argv); /* direct form I */
+extern void ftl_biquad_df2_inplace(fts_word_t *argv); /* direct form II */
+

@@ -27,7 +27,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import tcl.lang.*;
 
-public class Console extends JPanel{
+public class Console extends JPanel {
   StringBuffer itsSbuf = new StringBuffer();
   ConsoleTextArea itsTextArea;
   Interp itsInterp;

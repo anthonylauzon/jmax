@@ -22,6 +22,8 @@ static fts_symbol_t sym_df2 = 0;
 
 static fts_symbol_t biquad_df1_dsp_function = 0;
 static fts_symbol_t biquad_df2_dsp_function = 0;
+static fts_symbol_t biquad_df1_inplace_dsp_function = 0;
+static fts_symbol_t biquad_df2_inplace_dsp_function = 0;
 
 static void biquad_set_coef_a0(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void biquad_set_coef_a1(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at);
@@ -98,22 +100,43 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
 
 
-  fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_ftl_data(argv+2, this->biquad_state);
-  fts_set_ftl_data(argv+3, this->biquad_coefs);
-  fts_set_long(argv+4, fts_dsp_get_input_size(dsp, 0));
+  if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+    {
+      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_ftl_data(argv+1, this->biquad_state);
+      fts_set_ftl_data(argv+2, this->biquad_coefs);
+      fts_set_long(argv+3, fts_dsp_get_input_size(dsp, 0));
 
-  if(type == sym_df1)
-    {
-      biquad_df1_state_clear(o, 0, 0, 0, 0);
-      dsp_add_funcall(biquad_df1_dsp_function, 5, argv);
+      if (type == sym_df1)
+	{
+	  biquad_df1_state_clear(o, 0, 0, 0, 0);
+	  dsp_add_funcall(biquad_df1_inplace_dsp_function, 4, argv);
+	}
+      else if (type == sym_df2)
+	{
+	  biquad_df2_state_clear(o, 0, 0, 0, 0);
+	  dsp_add_funcall(biquad_df2_inplace_dsp_function, 4, argv);
+	}
     }
-  else if(type == sym_df2)
+  else
     {
-      biquad_df2_state_clear(o, 0, 0, 0, 0);
-      dsp_add_funcall(biquad_df2_dsp_function, 5, argv);
-    }	
+      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+      fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
+      fts_set_ftl_data(argv+2, this->biquad_state);
+      fts_set_ftl_data(argv+3, this->biquad_coefs);
+      fts_set_long(argv+4, fts_dsp_get_input_size(dsp, 0));
+
+      if (type == sym_df1)
+	{
+	  biquad_df1_state_clear(o, 0, 0, 0, 0);
+	  dsp_add_funcall(biquad_df1_dsp_function, 5, argv);
+	}
+      else if (type == sym_df2)
+	{
+	  biquad_df2_state_clear(o, 0, 0, 0, 0);
+	  dsp_add_funcall(biquad_df2_dsp_function, 5, argv);
+	}
+    }
 }
 
 
@@ -295,9 +318,13 @@ biquad_config(void)
   
   biquad_df1_dsp_function = fts_new_symbol("biquad_df1");
   biquad_df2_dsp_function = fts_new_symbol("biquad_df2");
+  biquad_df1_inplace_dsp_function = fts_new_symbol("biquad_df1_inplace");
+  biquad_df2_inplace_dsp_function = fts_new_symbol("biquad_df2_inplace");
 
   dsp_declare_function(biquad_df1_dsp_function, ftl_biquad_df1);
   dsp_declare_function(biquad_df2_dsp_function, ftl_biquad_df2);
+  dsp_declare_function(biquad_df1_inplace_dsp_function, ftl_biquad_df1_inplace);
+  dsp_declare_function(biquad_df2_inplace_dsp_function, ftl_biquad_df2_inplace);
 
   fts_metaclass_create(fts_new_symbol("biquad~"), biquad_instantiate, biquad_class_equiv);
 }

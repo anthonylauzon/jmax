@@ -25,6 +25,7 @@
    against in the loop.) */
 
 static fts_symbol_t vd_dsp_symbol = 0;
+static fts_symbol_t vd_inplace_dsp_symbol = 0;
 static fts_symbol_t vd_miller_dsp_symbol = 0;
 
 /**************************************************
@@ -157,15 +158,32 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
   
   if(this->millers_fix_del == 0.0f)
     {
-      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_ptr(argv + 2, buf);
-      fts_set_ftl_data(argv + 3, this->vd_data);
-      fts_set_long(argv + 4, n_tick);
-      dsp_add_funcall(vd_dsp_symbol, 5, argv);
+      if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
+	{
+	  /* Inplace call */
+
+	  fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_ptr(argv + 1, buf);
+	  fts_set_ftl_data(argv + 2, this->vd_data);
+	  fts_set_long(argv + 3, n_tick);
+	  dsp_add_funcall(vd_inplace_dsp_symbol, 4, argv);
+	}
+      else
+	{
+	  /* Standard call */
+
+	  fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_ptr(argv + 2, buf);
+	  fts_set_ftl_data(argv + 3, this->vd_data);
+	  fts_set_long(argv + 4, n_tick);
+	  dsp_add_funcall(vd_dsp_symbol, 5, argv);
+	}
     }
-  else /* call millers version */
+  else
     {
+      /* call millers version */
+
       fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
       fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
       fts_set_ptr(argv + 2, buf);
@@ -202,8 +220,11 @@ vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   dsp_sig_inlet(cl, 1); 
   dsp_sig_outlet(cl, 0);        
   
-  vd_dsp_symbol = fts_new_symbol("vd");
+  vd_dsp_symbol = fts_new_symbol("ftl_vd");
   dsp_declare_function(vd_dsp_symbol, ftl_vd);
+
+  vd_inplace_dsp_symbol = fts_new_symbol("ftl_vd_inplace");
+  dsp_declare_function(vd_inplace_dsp_symbol, ftl_vd_inplace);
 
   vd_miller_dsp_symbol = fts_new_symbol("vd_miller");
   dsp_declare_function(vd_miller_dsp_symbol, ftl_vd_miller);

@@ -120,19 +120,32 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
   boolean isNear( int x, int y)
   {
-    float z = (float) ((startY - y) * (endX - x) - (startX - x) * (endY - y));
+    // First, answer false for all the points outside a bounding rectangle for
+    // the connection
 
-    if (z > 0.0)
+    if (down)
       {
-	if ((z/length) < 4.0)
-	  System.err.println("Connection " + this + "close to point (" + x + "," + y + ")" + " distance " + z/length);
+	if ((x < (startX - 4)) || (x > (endX + 4)))
+	  return false;
       }
     else
       {
-	if ((z/length) > -4.0)
-	  System.err.println("Connection " + this + "close to point (" + x + "," + y + ")" + " distance " + z/length);
+	if ((x < (endX - 4)) || (x > (startX + 4)))
+	  return false;
       }
 
+    if (right)
+      {
+	if ((y < startY - 4) || (y > endY + 4))
+	  return false;
+      }
+    else
+      {
+	if ((y < endY - 4) || (y > startY + 4))
+	  return false;
+      }
+
+    float z = (float) ((startY - y) * (endX - startX) - (startX - x) * (endY - startY));
 
     if (z > 0.0)
       return ((z/length) < 4.0);
@@ -146,60 +159,78 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
     if ( selected) 
       {
-	if ( java.lang.Math.abs( startX-endX)>50) 
+	if ( java.lang.Math.abs(startX - endX) > java.lang.Math.abs(startY - endY))
 	  {
-	    g.drawLine( startX, startY, endX, endY);
-	    g.drawLine( startX, startY+1, endX, endY+1);
+	    g.drawLine(startX, startY, endX, endY);
+	    g.drawLine(startX, startY+1, endX, endY+1);
 	  } 
 	else 
 	  {
-	    g.drawLine( startX, startY, endX, endY);
-	    g.drawLine( startX-1, startY, endX-1, endY);
+	    g.drawLine(startX, startY, endX, endY);
+	    g.drawLine(startX+1, startY, endX+1, endY);
 	  }
       } 
     else
-      g.drawLine( startX, startY, endX, endY);
+      g.drawLine(startX, startY, endX, endY);
   }
 
   // Connections should store their bounds !!!
 
   public void redraw()
   {
+    int x, y;
+    int height, width;
+
     if (down)
       {
-	if (right)
-      	  sketch.repaint(startX, startY, endX - startX, endY - startY);
-	else
-	  sketch.repaint(startX, endY, endX - startX, startY - endY);
+	x = startX - 2;
+	width = endX - startX + 4;
       }
     else
-      if (right)
-	sketch.repaint(endX, startY, startX - endX, endY - startY);
+      {
+	x = endX - 2;
+	width = startX - endX + 4;
+      }
+
+    if (right)
+      {
+	y = startY - 2;
+	height  = endY - startY + 4;
+      }
     else
-	sketch.repaint(endX, endY, startX - endX, startY - endY);
+      {
+	y = endY - 2;
+	height = startY - endY + 4;
+      }
+
+    sketch.repaint(x, y, width, height);
   }
 
 
   public final boolean intersects(Rectangle r)
   {
+    boolean ret;
+
     if (down)
       {
 	if (right)
-	  return !((r.x + r.width <= startX) || (r.y + r.height <= startY) ||
-		   (r.x >= endX) || (r.y >= endY));
+	  ret =  !((r.x + r.width < startX) || (r.y + r.height < startY) ||
+		   (r.x > endX) || (r.y > endY));
 	else
-	  return !((r.x + r.width <= startX) || (r.y + r.height <= endY) ||
-		   (r.x >= endX) || (r.y >= startY));
+	  ret =  !((r.x + r.width < startX) || (r.y + r.height < endY) ||
+		   (r.x > endX) || (r.y > startY));
       }
     else
       {
 	if (right)
-	  return !((r.x + r.width <= endX) || (r.y + r.height <= startY) ||
-		   (r.x >= startX) || (r.y >= endY));
+	  ret = !((r.x + r.width < endX) || (r.y + r.height < startY) ||
+		   (r.x > startX) || (r.y > endY));
 	else
-	  return !((r.x + r.width <= endX) || (r.y + r.height <= endY) ||
-		   (r.x >= startX) || (r.y >= startY));
+	  ret =  !((r.x + r.width < endX) || (r.y + r.height < endY) ||
+		   (r.x > startX) || (r.y > startY));
       }
+
+    return ret;
   }
 
 

@@ -494,6 +494,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
   {
     fts_atom_t a;
 
+
     if (fts_object_is_error(obj))
       fts_set_int(&a, 1);
     else

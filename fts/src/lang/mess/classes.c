@@ -483,8 +483,9 @@ fts_arg_type_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *a
 
 
 
-int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const
-fts_atom_t *at1) { int n;
+int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+{
+  int n;
 
   if (ac0 != ac1)
     return 0;

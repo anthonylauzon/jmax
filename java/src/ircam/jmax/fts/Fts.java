@@ -18,6 +18,7 @@ import java.net.*;
 
 import javax.swing.*;
 
+import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
@@ -52,6 +53,9 @@ public class Fts
 	    return;
 	  }
       }
+
+    if (MaxApplication.getProperty("ssrun") != null)
+      ftsName = ftsName + ".ss";
 
     if (mode.equals("socket")) 
       server = new FtsServer(serverName, new FtsSocketStream(serverName, Integer.parseInt(port)));

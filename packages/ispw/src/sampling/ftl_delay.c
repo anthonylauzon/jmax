@@ -18,8 +18,8 @@
 void 
 ftl_delwrite(fts_word_t *argv)
 {
-  float *in = (float *)fts_word_get_ptr(argv + 0);
-  del_buf_t *buf = (del_buf_t *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_ptr(argv + 0);
+  del_buf_t * restrict buf = (del_buf_t *)fts_word_get_ptr(argv + 1);
   int n_tick = fts_word_get_long(argv + 2);
   int i;
   int phase = buf->phase;
@@ -60,74 +60,25 @@ ftl_delread(fts_word_t *argv)
 }
 
 /* local */
-static float
-vd_lagrange(float *ptr, float float_index)
-{
-  float one_plus_f = 1.0f + float_index;
-  float one_minus_f = 1.0f - float_index;
-  float two_minus_f = 2.0f - float_index;
-  
-  return (0.5f * one_plus_f * two_minus_f * (one_minus_f * ptr[2] + float_index * ptr[1])
-	  - 0.1666667f * float_index * one_minus_f * (two_minus_f * ptr[3] + one_plus_f * ptr[0]));	  
+
+#define vd_lagrange(ret, ptr, float_index)     \
+{                                         \
+  float one_plus_f = 1.0f + float_index;  \
+  float one_minus_f = 1.0f - float_index; \
+  float two_minus_f = 2.0f - float_index; \
+                                           \
+  ret = (0.5f * one_plus_f * two_minus_f * (one_minus_f * ptr[2] + float_index * ptr[1])            \
+	  - 0.1666667f * float_index * one_minus_f * (two_minus_f * ptr[3] + one_plus_f * ptr[0]));  \
 }
 
-static void
-vd_read_buf(del_buf_t * restrict buf, float onset, float incr, float * restrict out, int n)
+void ftl_vd(fts_word_t *argv)
 {
-  float *delay_line = buf->delay_line;
-  float *write_ptr = delay_line + buf->phase - 2; /* well, actually write pointer - 2 */
-  int i_onset = (int)onset;
-  float * read_ptr = write_ptr - i_onset;
-  
-  if(read_ptr >= delay_line && incr <= 0.0f)
-    {
-      int i;
-
-      for(i=0; i<n-1; i++)
-	{
-	  out[i] = vd_lagrange(read_ptr, onset - (float)i_onset);
-	  
-	  onset += incr;
-
-	  i_onset = onset;
-	  read_ptr = write_ptr - i_onset;
-	}
-
-      out[i] = vd_lagrange(read_ptr, onset - (float)i_onset);
-    }
-  else
-    {
-      int i;
-
-      for(i=0; i<n-1; i++)
-	{
-	  if(read_ptr < delay_line)
-	    read_ptr += buf->ring_size;
-
-	  out[i] = vd_lagrange(read_ptr, onset - (float)i_onset);
-	  
-	  onset += incr;
-	  
-	  i_onset = onset;
-	  read_ptr = write_ptr - i_onset;
-	}
-
-      if(read_ptr < delay_line)
-	read_ptr += buf->ring_size;
-
-      out[i] = vd_lagrange(read_ptr, onset - (float)i_onset);
-    }
-}
-
-void
-ftl_vd(fts_word_t *argv)
-{
-  float *in = (float *)fts_word_get_ptr(argv);
-  float *out = (float *)fts_word_get_ptr(argv + 1);
+  float * restrict in = (float *)fts_word_get_ptr(argv);
+  float * restrict out = (float *)fts_word_get_ptr(argv + 1);
   del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 2);
   ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_ptr(argv + 3);
-  int n_tick = fts_word_get_long(argv + 4);
-  float read_tick = n_tick;
+  int n = fts_word_get_long(argv + 4);
+  float read_tick = n;
   float conv = ftl->conv;
   float write_advance = ftl->write_advance;
   float write_tick = buf->n_tick;
@@ -135,31 +86,167 @@ ftl_vd(fts_word_t *argv)
   float max_delay = (float)buf->size;
   float ratio = write_tick / read_tick;
   float start = in[0] * conv;
-  float target = in[n_tick - 1] * conv;
+  float target = in[n - 1] * conv;
   float span;
 
-  if(start < min_delay)
+  if (start < min_delay)
     start = min_delay;
-  else if(start >= max_delay)
+  else if (start >= max_delay)
     start = max_delay;
 
-  if(target < min_delay)
+  if (target < min_delay)
     target = min_delay;
-  else if(target >= max_delay)
+  else if (target >= max_delay)
     target = max_delay;
 
   target -= (write_tick - ratio); /* target delay -> target onset */
   span = target - start;
 
-  if(span <= ftl->max_span && span >= -ftl->max_span)
+  if (span <= ftl->max_span && span >= -ftl->max_span)
     {
       float incr = (target - start) / (read_tick - 1.0f);
       float onset = start + write_advance;
+      float *delay_line = buf->delay_line;
+      float *write_ptr = delay_line + buf->phase - 2; /* well, actually write pointer - 2 */
+      int i_onset = (int)onset;
+      float d;
+      float * read_ptr = write_ptr - i_onset;
+  
+      if (read_ptr >= delay_line && incr <= 0.0f)
+	{
+	  int i;
 
-      vd_read_buf(buf, onset, incr, out, n_tick);
+	  for(i=0; i<n-1; i++)
+	    {
+	      d = onset - (float)i_onset;
+	      vd_lagrange(out[i], read_ptr, d);
+	  
+	      onset += incr;
+
+	      i_onset = onset;
+	      read_ptr = write_ptr - i_onset;
+	    }
+
+	  d = onset - (float)i_onset;
+	  vd_lagrange(out[i], read_ptr, d);
+	}
+      else
+	{
+	  int i;
+
+	  for(i=0; i<n-1; i++)
+	    {
+	      if(read_ptr < delay_line)
+		read_ptr += buf->ring_size;
+
+	      d = onset - (float)i_onset;
+	      vd_lagrange(out[i], read_ptr, d);
+	  
+	      onset += incr;
+	  
+	      i_onset = onset;
+	      read_ptr = write_ptr - i_onset;
+	    }
+
+	  if(read_ptr < delay_line)
+	    read_ptr += buf->ring_size;
+
+	  d = onset - (float)i_onset;
+	  vd_lagrange(out[i], read_ptr, d);
+	}
     }
   else
-    fts_vec_fzero(out, n_tick);
+    fts_vec_fzero(out, n);
+}
+
+
+/* In place version */
+
+void ftl_vd_inplace(fts_word_t *argv)
+{
+  float * restrict inout = (float *)fts_word_get_ptr(argv);
+  del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 1);
+  ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_ptr(argv + 2);
+  int n = fts_word_get_long(argv + 3);
+  float read_tick = n;
+  float conv = ftl->conv;
+  float write_advance = ftl->write_advance;
+  float write_tick = buf->n_tick;
+  float min_delay = write_tick - write_advance + 2.0f;
+  float max_delay = (float)buf->size;
+  float ratio = write_tick / read_tick;
+  float start = inout[0] * conv;
+  float target = inout[n - 1] * conv;
+  float span;
+
+  if (start < min_delay)
+    start = min_delay;
+  else if (start >= max_delay)
+    start = max_delay;
+
+  if (target < min_delay)
+    target = min_delay;
+  else if (target >= max_delay)
+    target = max_delay;
+
+  target -= (write_tick - ratio); /* target delay -> target onset */
+  span = target - start;
+
+  if (span <= ftl->max_span && span >= -ftl->max_span)
+    {
+      float incr = (target - start) / (read_tick - 1.0f);
+      float onset = start + write_advance;
+      float *delay_line = buf->delay_line;
+      float *write_ptr = delay_line + buf->phase - 2; /* well, actually write pointer - 2 */
+      int i_onset = (int)onset;
+      float d;
+      float * read_ptr = write_ptr - i_onset;
+  
+      if (read_ptr >= delay_line && incr <= 0.0f)
+	{
+	  int i;
+
+	  for(i=0; i<n-1; i++)
+	    {
+	      d = onset - (float)i_onset;
+	      vd_lagrange(inout[i], read_ptr, d);
+	  
+	      onset += incr;
+
+	      i_onset = onset;
+	      read_ptr = write_ptr - i_onset;
+	    }
+
+	  d = onset - (float)i_onset;
+	  vd_lagrange(inout[i], read_ptr, d);
+	}
+      else
+	{
+	  int i;
+
+	  for(i=0; i<n-1; i++)
+	    {
+	      if(read_ptr < delay_line)
+		read_ptr += buf->ring_size;
+
+	      d = onset - (float)i_onset;
+	      vd_lagrange(inout[i], read_ptr, d);
+	  
+	      onset += incr;
+	  
+	      i_onset = onset;
+	      read_ptr = write_ptr - i_onset;
+	    }
+
+	  if(read_ptr < delay_line)
+	    read_ptr += buf->ring_size;
+
+	  d = onset - (float)i_onset;
+	  vd_lagrange(inout[i], read_ptr, d);
+	}
+    }
+  else
+    fts_vec_fzero(inout, n);
 }
 
 /* ISPW bug compatible version */
@@ -170,14 +257,14 @@ ftl_vd_miller(fts_word_t *argv)
   float *out = (float *)fts_word_get_ptr(argv + 1);
   del_buf_t * restrict buf = (del_buf_t *) fts_word_get_ptr(argv + 2);
   ftl_vd_t * restrict ftl = (ftl_vd_t *) fts_word_get_ptr(argv + 3);
-  int n_tick = fts_word_get_long(argv + 4);
+  int n = fts_word_get_long(argv + 4);
   float write_tick = fts_word_get_float(argv + 5);
   float conv = ftl->conv;
   float write_advance = ftl->write_advance;
   float min_delay = write_tick - write_advance + 2.0f;
   float max_delay = (float)buf->size;
   float start = in[0] * conv;
-  float target = in[n_tick - 1] * conv;
+  float target = in[n - 1] * conv;
   float span;
 
   if(start < min_delay)
@@ -195,11 +282,58 @@ ftl_vd_miller(fts_word_t *argv)
 
   if(span <= ftl->max_span && span >= -ftl->max_span)
     {
-      float incr = (target - start) / ((float)n_tick - 1.0f);
+      float incr = (target - start) / ((float)n - 1.0f);
       float onset = start + write_advance;
-      
-      vd_read_buf(buf, onset, incr, out, n_tick);
+      float *delay_line = buf->delay_line;
+      float *write_ptr = delay_line + buf->phase - 2; /* well, actually write pointer - 2 */
+      int i_onset = (int)onset;
+      float d;
+      float * read_ptr = write_ptr - i_onset;
+  
+      if (read_ptr >= delay_line && incr <= 0.0f)
+	{
+	  int i;
+
+	  for(i=0; i<n-1; i++)
+	    {
+	      d = onset - (float)i_onset;
+	      vd_lagrange(out[i], read_ptr, d);
+	  
+	      onset += incr;
+
+	      i_onset = onset;
+	      read_ptr = write_ptr - i_onset;
+	    }
+
+	  d = onset - (float)i_onset;
+	  vd_lagrange(out[i], read_ptr, d);
+	}
+      else
+	{
+	  int i;
+
+	  for(i=0; i<n-1; i++)
+	    {
+	      if(read_ptr < delay_line)
+		read_ptr += buf->ring_size;
+
+	      d = onset - (float)i_onset;
+	      vd_lagrange(out[i], read_ptr, d);
+	  
+	      onset += incr;
+	  
+	      i_onset = onset;
+	      read_ptr = write_ptr - i_onset;
+	    }
+
+	  if(read_ptr < delay_line)
+	    read_ptr += buf->ring_size;
+
+	  d = onset - (float)i_onset;
+	  vd_lagrange(out[i], read_ptr, d);
+	}
     }
   else
-    fts_vec_fzero(out, n_tick);
+    fts_vec_fzero(out, n);
 }
+

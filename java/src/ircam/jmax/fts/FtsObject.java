@@ -37,7 +37,7 @@ public class FtsObject
   /*                                                                            */
   /******************************************************************************/
 
-  /** This version create an application layer object for an already existing
+  /** This function create an application layer object for an already existing
    *  object in FTS; take directly the FtsStream as argument.
    *  Used also in the message box.
    */
@@ -67,53 +67,58 @@ public class FtsObject
 
     /* Get the class name */
 
-    if (stream.nextIsSymbol())
-      className = stream.getNextSymbolArgument();
-    else
-      className = "";
-
-    /* Note that we do the unparsing relative to ':' and variables
-       here; in the future, a dedicated API should be used ! */
-
-    if (className == "jpatcher")
+    if (! stream.nextIsSymbol())
       {
-	if (doVariable)
-	  obj =  new FtsPatcherObject(parent, variable,
-				      variable + " : " + FtsParse.unparseObjectDescription(stream), objId);
-	else
-	  obj =  new FtsPatcherObject(parent, variable,
-				      FtsParse.unparseObjectDescription(stream), objId);
+	obj = new FtsObject(parent, "", variable,
+			    FtsParse.unparseObjectDescription(stream), objId);
       }
-    else if (className == "inlet")
-      obj =  new FtsInletObject(parent, stream.getNextIntArgument(), objId);
-    else if (className == "outlet")
-      obj =  new FtsOutletObject(parent, stream.getNextIntArgument(), objId);
-    else if (className == "messbox")
-      obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(stream), objId);
-    else if (className == "comment")
-      obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(stream), objId);
-    else if (className == "intbox")
-      obj =  new FtsIntValueObject(parent, className, "intbox", objId);
-    else if (className == "toggle")
-      obj =  new FtsIntValueObject(parent, className, "toggle", objId);
-    else if (className == "button")
-      obj =  new FtsIntValueObject(parent, className, "button", objId);
-    else if (className == "slider")
-      obj =  new FtsSliderObject(parent, "slider", objId);
-    else if (className == "floatbox")
-      obj =  new FtsFloatValueObject(parent, className, "floatbox", objId);
-    else if (className == "__selection")
-      obj =  new FtsSelection(parent, className, "__selection", objId);
-    else if (className == "__clipboard")
-      obj =  new FtsClipboard(parent, className, "__clipboard", objId);
     else
       {
-	if (doVariable)
-	  obj = new FtsObject(parent, className, variable,
-			      variable + " : " + FtsParse.unparseObjectDescription(className, stream), objId);
+	className = stream.getNextSymbolArgument();
+	
+	/* Note that we do the unparsing relative to ':' and variables
+	   here; in the future, a dedicated API should be used ! */
+
+	if (className == "jpatcher")
+	  {
+	    if (doVariable)
+	      obj =  new FtsPatcherObject(parent, variable,
+					  variable + " : " + FtsParse.unparseObjectDescription(stream), objId);
+	    else
+	      obj =  new FtsPatcherObject(parent, variable,
+					  FtsParse.unparseObjectDescription(stream), objId);
+	  }
+	else if (className == "inlet")
+	  obj =  new FtsInletObject(parent, stream.getNextIntArgument(), objId);
+	else if (className == "outlet")
+	  obj =  new FtsOutletObject(parent, stream.getNextIntArgument(), objId);
+	else if (className == "messbox")
+	  obj =  new FtsMessageObject(parent, FtsParse.unparseObjectDescription(stream), objId);
+	else if (className == "comment")
+	  obj =  new FtsCommentObject(parent, FtsParse.simpleUnparseObjectDescription(stream), objId);
+	else if (className == "intbox")
+	  obj =  new FtsIntValueObject(parent, className, "intbox", objId);
+	else if (className == "toggle")
+	  obj =  new FtsIntValueObject(parent, className, "toggle", objId);
+	else if (className == "button")
+	  obj =  new FtsIntValueObject(parent, className, "button", objId);
+	else if (className == "slider")
+	  obj =  new FtsSliderObject(parent, "slider", objId);
+	else if (className == "floatbox")
+	  obj =  new FtsFloatValueObject(parent, className, "floatbox", objId);
+	else if (className == "__selection")
+	  obj =  new FtsSelection(parent, className, "__selection", objId);
+	else if (className == "__clipboard")
+	  obj =  new FtsClipboard(parent, className, "__clipboard", objId);
 	else
-	  obj = new FtsObject(parent, className, variable,
-			      FtsParse.unparseObjectDescription(className, stream), objId);
+	  {
+	    if (doVariable)
+	      obj = new FtsObject(parent, className, variable,
+				  variable + " : " + FtsParse.unparseObjectDescription(className, stream), objId);
+	    else
+	      obj = new FtsObject(parent, className, variable,
+				  FtsParse.unparseObjectDescription(className, stream), objId);
+	  }
       }
 
     if (data != null)

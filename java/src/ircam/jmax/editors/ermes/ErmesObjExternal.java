@@ -42,7 +42,15 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
   String getArgs()
   {
     // Get the correct String from the object
-    return itsFtsObject.getDescription().trim();
+    // DEBUG
+
+    if (itsFtsObject == null)
+      System.err.println("NULL itsFtsObject in getArgs()");
+
+    if (itsFtsObject.getDescription() == null)
+      System.err.println("NULL itsFtsObject in getArgs()");
+
+    return itsFtsObject.getDescription();
   }
 
   public void errorChanged(boolean value) 

@@ -249,8 +249,8 @@ public class DisplayList
 	  {
 	    ErmesObject object2 = (ErmesObject) do2;
 
-	    return (object2.getLayer() <= connection1.getSourceObject().getLayer() &&
-		    object2.getLayer() <= connection1.getDestObject().getLayer());
+	    return (object2.getLayer() < connection1.getSourceObject().getLayer() &&
+		    object2.getLayer() < connection1.getDestObject().getLayer());
 
 	  }
 	else if (do2 instanceof ErmesConnection)
