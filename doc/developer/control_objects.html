@@ -316,6 +316,7 @@ Messages can be send on the outlets of an object, using the
 <li> <a href="#Message Sending Example">Message Sending Example</a>
 <li> <a href="#Message Arguments Building">Message Arguments Building</a>
 <li> <a href="#Message Selectors">Message Selectors</a>
+<li> <a href="#Shortcuts for bang, int, float and symbol Messages">Shortcuts for <code>bang</code>, <code>int</code>, <code>float</code> and <code>symbol</code> Messages</a>
 </ul>
 
 
@@ -417,6 +418,36 @@ is used when the passed string is not a constant.
 </ul>
 
 
+<a name="Shortcuts for bang, int, float and symbol Messages"><h3>Shortcuts for <code>bang</code>, <code>int</code>, <code>float</code> and <code>symbol</code> Messages</h3></a>
+
+<p>
+As sending <code>bang</code>, <code>int</code>, <code>float</code> and <code>symbol</code> messages is
+very frequent, a number of shorcuts have been defined:
+<ul>
+<li> <code>fts_outlet_bang( fts_object_t *<i>object</i>, int <i>woutlet</i>)</code>
+<li> <code>fts_outlet_int( fts_object_t *<i>object</i>, int <i>woutlet</i>, int <i>value</i>)</code>
+<li> <code>fts_outlet_float( fts_object_t *<i>object</i>, int <i>woutlet</i>, float <i>value</i>)</code>
+<li> <code>fts_outlet_symbol( fts_object_t *<i>object</i>, int <i>woutlet</i>, fts_symbol_t <i>value</i>)</code>
+</ul>
+
+<p>
+There shortcuts are just wrappers that format a message with a single argument
+and call <code>fts_outlet_send</code>.
+
+<p>
+The previous example of the <code>integer_bang</code> method can then be
+written the following way, which is preferred:
+<pre>
+void integer_bang( fts_object_t *object, int winlet, fts_symbol_t selector,
+                   int ac, const fts_atom_t *at)
+{
+  integer_t *this = (integer_t *)object;
+
+  fts_outlet_int( object, 0, this->n);
+}
+</pre>
+
+
 <!-- ---------------------------------------------------------------------- -->
 <p>
 <hr>
@@ -432,6 +463,7 @@ arguments it expects.
 <li> <a href="#The fts_method_define Function">The <code>fts_method_define</code> Function</a>
 <li> <a href="#Method Definition Example">Method Definition Example</a>
 <li> <a href="#Method Arguments Types">Method Arguments Types</a>
+<li> <a href="#Methods with Variable Arguments Number">Methods with Variable Arguments Number</a>
 </ul>
 
 <a name="The fts_method_define Function"><h3>The <code>fts_method_define</code> Function</h3></a>
@@ -513,6 +545,46 @@ argument must be of type <code>object</code>, initialized with <code>fts_set_obj
 </dl>
 
 
+<a name="Methods with Variable Arguments Number"><h3>Methods with Variable Arguments Number</h3></a>
+
+<p>
+A method accepting a variable number of arguments is defined using function 
+<code>fts_method_define_optargs</code>.
+
+<code>fts_status_t fts_method_define_optargs( fts_class_t *<i>class</i>, int <i>winlet</i>, fts_symbol_t <i>selector</i>, fts_method_t <i>method</i>, int <i>argc</i>, fts_symbol_t *<i>argtypes</i>, int <i>min_argc</i> )</code> <p>
+
+<p>
+The arguments of <code>fts_method_define_optargs</code> are similar to <code>fts_method_define</code>,
+except for the last supplementary arguments:
+<dl>
+<dt> <i> min_argc</i> <dd> 
+the minimum count of expected arguments
+</dl>
+
+<p>
+Below is an example showing the installation of a method <code>integer_incr</code>
+for the <code>integer</code> object. This method takes zero or one argument of type <code>int</code>.
+
+<pre>
+
+void integer_incr( fts_object_t *object, int winlet, fts_symbol_t selector, 
+                  int ac, const fts_atom_t *at)
+{
+  integer_t *this = (integer_t *)object;
+  int incr = fts_get_int_arg( ac, at, 0, 1);
+
+  this->n += incr;
+}
+
+fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
+{
+  fts_symbol_t a;
+
+  a = fts_s_int;
+  fts_method_define_optargs( class, 0, fts_new_symbol("incr"), integer_incr, 1, &a, 0);
+}
+</pre>
+
 
 <!-- ---------------------------------------------------------------------- -->
 <p>
@@ -534,10 +606,7 @@ identical to standard methods.
 
 <ul>
 <li> <a href="#The init Method">The <code>init</code> Method</a>
-<li> <a href="#The init method arguments">The <code>init</code> Method arguments</a>
 <li> <a href="#The delete Method">The <code>delete</code> Method</a>
-<li> <a href="#The connect Method">The <code>connect</code> Method</a>
-<li> <a href="#The disconnect Method">The <code>disconnect</code> Method</a>
 <li> <a href="#System Messages Selectors">System Messages Selectors</a>
 </ul>
 
@@ -558,6 +627,8 @@ init arguments are the content of the object box.
 The declaration of the types of these so-called <i>creation</i> arguments must take 
 into account this feature.
 
+<p>
+The selector of the <code>init</code> method is the predefined symbol <code>fts_s_init</code>.
 
 <p>
 Below is the example of the init method for the <code>integer</code> object
@@ -599,6 +670,9 @@ memory de-allocation. It is very similar to a C++ <i>destructor</i>. If it is de
 it is called automatically by the system when an object is deleted, without arguments.
 
 <p>
+The selector of the <code>delete</code> method is the predefined symbol <code>fts_s_delete</code>.
+
+<p>
 A delete method can be installed for the <code>integer</code> object by the following code :
 
 <pre>
@@ -609,19 +683,6 @@ fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 }
 </pre>
 
-
-<a name="System Messages Selectors"><h3>System Messages Selectors</h3></a>
-
-There is a number of predefined system messages selectors which are defined in the 
-header 
-files for the message system. Below is the list of already defined selectors
-for release 1.3.x together with associated symbol name :
-<dl>
-<dt> <code> fts_s_init</code> <dd> 
-"$init"
-<dt> <code> fts_s_delete</code> <dd> 
-"$delete"
-</dl>
 
 
 
