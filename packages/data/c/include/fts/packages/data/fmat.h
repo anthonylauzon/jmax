@@ -71,6 +71,7 @@ typedef struct
   int alloc;
   double sr; /* sample rate */
   double onset; /* fractional onset */
+  double domain; /* fractional size (rows) */
   fmat_format_t *format;
   int opened;
   fts_object_t *editor;
@@ -140,6 +141,9 @@ DATA_API void fmat_set_n(fmat_t *fmat, int n);
 
 #define fmat_set_onset(fm, f) ((fm)->onset = (f))
 #define fmat_get_onset(fm) ((fm)->onset)
+
+#define fmat_set_domain(fm, f) ((fm)->domain = (f))
+#define fmat_get_domain(fm) (((fm)->domain > 0.0)? ((fm)->domain): ((double)(fm)->m))
 
 /**
 * @ingroup fmat

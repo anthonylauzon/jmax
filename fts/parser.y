@@ -50,6 +50,8 @@ static int yylex ();
 
 static int yyerror( const char *msg);
 
+static fts_atom_t a_times;
+
 %}
 
 %pure_parser
@@ -176,8 +178,10 @@ reference: variable TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
 
 variable: TK_DOLLAR TK_SYMBOL
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
-	| TK_DOLLAR TK_INT
-		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
+  | TK_DOLLAR TK_INT
+    { $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
+  | TK_DOLLAR TK_TIMES
+    { $$ = fts_parsetree_new( TK_DOLLAR, &a_times, 0, 0); }
 ;
 
 par: TK_OPEN_PAR 
@@ -427,6 +431,8 @@ fts_kernel_parser_init( void)
   parsetree_heap = fts_heap_new( sizeof( fts_parsetree_t));
 
   token_table_init();
+  
+  fts_set_symbol(&a_times, fts_s_times);
 
 #if YYDEBUG
   yydebug = 1;

@@ -563,20 +563,38 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
     else if (fts_is_symbol( &tree->value))
     {
       fts_atom_t *name = &tree->value;
-      fts_atom_t value;
+      fts_symbol_t sym = fts_get_symbol(name);
       
-      fts_set_void(&value);
-      
-      if((locals == NULL || !fts_hashtable_get(locals, name, &value)) && 
-         (globals == NULL || !fts_hashtable_get(globals, name, &value)))
-        return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
+      if(sym == fts_s_times)
+      {
+        int i;
+        
+        for(i=0; i<env_ac; i++)
+        {
+          if(!fts_is_void(env_at + i))
+          {
+            expression_stack_push(exp, env_at + i);
+            fts_atom_refer(env_at + i);
+          }
+        }
+      }
+      else
+      {
+        fts_atom_t value;
+        
+        fts_set_void(&value);
+        
+        if((locals == NULL || !fts_hashtable_get(locals, name, &value)) && 
+           (globals == NULL || !fts_hashtable_get(globals, name, &value)))
+          return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
 
-      /* hashtable of name definitions */
-      if(fts_is_pointer(&value))
-        value = *(fts_definition_get_value((fts_definition_t *)fts_get_pointer(&value)));
+        /* hashtable of name definitions */
+        if(fts_is_pointer(&value))
+          value = *(fts_definition_get_value((fts_definition_t *)fts_get_pointer(&value)));
 
-      expression_stack_push( exp, &value);
-      fts_atom_refer(&value);
+        expression_stack_push( exp, &value);
+        fts_atom_refer(&value);
+      }
     }
     else
       return invalid_environment_variable_error;

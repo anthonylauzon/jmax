@@ -1,3 +1,7 @@
+2004-04-15  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+
+	* fts/parser.y and fts/expression.c: added $* to expressions
+
 2004-04-08  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* fts/status.c: added fts_status function fts_status_format to dynamically generate status messages

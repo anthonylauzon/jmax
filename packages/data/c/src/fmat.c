@@ -223,6 +223,7 @@ fmat_set_m(fmat_t *self, int m)
   self->values[size + 0] = self->values[size + 1] = self->values[size + 2] = self->values[size + 3] = 0.0;    
   
   self->m = m;
+  self->domain = 0.0;
 }
 
 void
@@ -386,6 +387,7 @@ fmat_set_size(fmat_t *self, int m, int n)
     
     self->m = m;
     self->n = n;
+    self->domain = 0.0;
     
     fmat_adapt_format(self);
   }
@@ -458,6 +460,11 @@ fmat_copy(fmat_t *org, fmat_t *copy)
 
   for(i=0; i<m*n; i++)
     copy->values[i] = org->values[i];
+
+  copy->onset = org->onset;
+  copy->domain = org->domain;
+  copy->sr = org->sr;
+  copy->format = org->format;
 }
 
 static void
@@ -2955,6 +2962,7 @@ fmat_initialize(fmat_t *self)
   self->n = 0;
   self->alloc = -1;
   self->onset = 0.0;
+  self->domain = 0.0;
   self->sr = fts_dsp_get_sample_rate();
   self->format = fmat_format_real;
   self->opened = 0;
