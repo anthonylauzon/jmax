@@ -2,6 +2,7 @@ packagedir=$(pkglibdir)/packages/data/java/classes/ircam/jmax/editors/mat
 package_JAVA = \
 FtsDictObject.java \
 FtsMatObject.java \
+MatEditMenu.java \
 MatDataListener.java \
 MatDataModel.java \
 MatPanel.java \
