@@ -1,2 +1,18 @@
-SOURCES = ucs.c messtile.c dsptile.c startup.c
+ifneq ($(ARCH),rhapsody)
+
+SOURCES = \
+dsptile.c	\
+messtile.c	\
+startup.c	\
+ucs.c		\
+
+else
+
+SOURCES = \
+dsptile.c	\
+messtile.c	\
+startup_rhapsody.c	\
+ucs.c		\
+
+endif
 
