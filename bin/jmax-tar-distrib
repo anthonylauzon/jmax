@@ -42,7 +42,7 @@ Options:
   -tmp <dir>                   (optional)
     use <dir> as temporary directory. Defaults to /tmp
   -quiet                       (optional)
-    don't exit if a file is missing
+    do not exit if a file is missing
 
 HELP_EOF
 }
@@ -87,7 +87,7 @@ decrypt_options ()
 }
 
 # ---------------------------------------------------------------------------
-check_options ()
+check_it ()
 {
     if [ $ARCH = "none" ]
     then
@@ -148,90 +148,88 @@ clean_exit()
 
 # ---------------------------------------------------------------------------
 # args: DIR
-chmod_dir ()
+create_dir ()
 {
+    D=`echo $1 | sed 's+^\.\/++'`
+    mkdir -p $DEST_DIR/$D
+
     i=$DEST_DIR
-    for d in `echo $1 | sed 's/\// /g'`
+    for d in `echo $D | sed 's+\/+ +g'`
     do
 	i="$i/$d"
-#	echo chmod 755 "$i"
 	chmod 755 $i
     done
 }
 
+# ---------------------------------------------------------------------------
+# args: RELATIVE_DIR PATTERN
+copy_files()
+{
+    for F in `ls -d $2`
+    do
+	if [ -f $F ]
+  	then
+
+  	    DST=`echo $1/$F | sed 's+^\.\/++'`
+
+  	    D=`dirname $DST`
+  	    if [ ! -d $DEST_DIR/$D ]
+  	    then
+  		create_dir $D
+  	    fi
+
+  	    cp $F $DEST_DIR/$DST
+  	    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
+  	    then
+  		chmod 755 $DEST_DIR/$DST
+  	    else
+  		chmod 644 $DEST_DIR/$DST
+  	    fi
+
+  	elif [ -d $F ]
+  	then
+
+  	    create_dir $1/$F
+  	    (cd $F ; select_files $1/$F )
+
+  	else
+  	    echo "File or directory $F not found" >&2
+
+  	    if [ $QUIET = "false" ]
+  	    then
+  		clean_exit 1
+  	    fi
+  	fi
+      done
+}
+
 
 # ---------------------------------------------------------------------------
-# args: ARCH TYPE DIR
-copy_files ()
+# args: RELATIVE_DIR
+select_files ()
 {
-    if [ \! -f $3/distrib ]
+    if [ \! -f distrib ]
     then
-	echo "File $3/distrib missing" >&2
+	echo "jmax-tar-distrib: File $1/distrib missing" >&2
 	clean_exit 1
     fi
 
-    {
-	read TYPE_F ARCH_F NAME NEW_NAME
-	#echo read $TYPE_F $ARCH_F $NAME $NEW_NAME "<" $3/distrib
+      {
+  	echo "jmax-tar-distrib: Processing $1"
 
-	while [ $ARCH_F ] 
-	do
-	    if [ \( $ARCH_F = $1 -o $ARCH_F = "all" \) -a \( $TYPE_F = $2 -o $TYPE_F = "all" \) ]
-	    then
-		if [ -f "$3/$NAME" ]
-		then
+  	read TYPE_F ARCH_F PATTERN NEW_NAME
 
-		    F=`echo $3/$NAME | sed 's/^\.\///'`
-		    D=`dirname $F`
-		    if [ ! -d $DEST_DIR/$D ]
-		    then
-			mkdir -p $DEST_DIR/$D
-			chmod_dir $D
-		    fi
+  	while [ $ARCH_F ] 
+  	do
+  	    if [ \( $ARCH_F = $ARCH -o $ARCH_F = "all" \) -a \( $TYPE_F = $TYPE -o $TYPE_F = "all" \) ]
+  	    then
+  		copy_files $1 "$PATTERN"
+  	    fi
 
-		    if [ $NEW_NAME ]
-		    then
-			DST=$DEST_DIR/$NEW_NAME
-		    else
-			DST=$DEST_DIR/$F
-		    fi
+  	    read TYPE_F ARCH_F PATTERN NEW_NAME
+  	done
+      } < distrib
 
-		    cp $F $DST
-		    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
-		    then
-			chmod 755 $DST
-		    else
-			chmod 644 $DST
-		    fi
-
-		elif [ -d "$3/$NAME" ]
-		then
-
-		    D=`echo $3/$NAME | sed 's/^\.\///'`
-		    mkdir -p $DEST_DIR/$D
-#		    echo "Created $DEST_DIR/$D"
-#		    chmod 755 $4/$NAME
-		    chmod_dir $D
-		    copy_files $1 $2 $D
-
-		else
-
-		    echo "File or directory $3/$NAME not found" >&2
-
-		    if [ $QUIET = "false" ]
-		    then
-			clean_exit 1
-		    fi
-
-		fi
-	    fi
-
-	    read TYPE_F ARCH_F NAME NEW_NAME
-	    #echo read $TYPE_F $ARCH_F $NAME $OTHERS "<" $3/distrib
-	done
-    } < $3/distrib
-
-    echo "Copied $3"
 }
 
 # ---------------------------------------------------------------------------
@@ -274,13 +272,13 @@ create_tar ()
 
 decrypt_options $@
 
-check_options
+check_it
 
 compute_version_number
 
 create_dest_dir
 
-copy_files $ARCH $TYPE .
+select_files .
 
 create_tar
 
