@@ -247,6 +247,14 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	if(SequenceTextArea.isDeleteKey(e))
 	    selection.deleteAll();
+	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
+	    if(e.isControlDown())
+		selection.selectPrevious();
+	    else
+		selection.selectNext();
+
+	super.processKeyEvent(e);
+	requestFocus();
     }
 
     //--- FricativeTrackEditor fields

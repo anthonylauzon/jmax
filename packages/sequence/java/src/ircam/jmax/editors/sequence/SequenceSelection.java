@@ -416,7 +416,45 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 		v = null;
 	    }
     }
-  
+
+    public void selectNext()
+    {
+	if(itsModel.length()>0)
+	    {
+		if(size()==0)
+		    select(itsModel.getEventAt(0));	
+		else
+		    {
+			int last = getMaxSelectionIndex();
+			if(last < itsModel.length()-1)
+			    {
+				TrackEvent evt = itsModel.getEventAt(last+1); 
+				deselectAll();
+				select(evt);
+			    }
+		    }
+	    }
+    }
+
+    public void selectPrevious()
+    {
+	if(itsModel.length()>0)
+	    {
+		if(size()==0)
+		    select(itsModel.getLastEvent());	
+		else
+		    {
+	
+			int first = getMinSelectionIndex();
+			if(first > 0)
+			    {
+				TrackEvent evt = itsModel.getEventAt(first-1); 
+				deselectAll();
+				select(evt);
+			    }
+		    }
+	    }
+    }
   /**
    * An usefull (and fast) class to traverse the selection, to be used
    * when the objects are not changed in the loop (read only) */

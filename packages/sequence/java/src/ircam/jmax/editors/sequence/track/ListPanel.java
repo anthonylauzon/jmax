@@ -305,6 +305,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 			SequenceSelection.getCurrent().select(data.getEventAt(index));
 		    }
 	    }
+	requestFocus();
     }
     public void mouseReleased(MouseEvent e){}
     public void mouseEntered(MouseEvent e){}
@@ -381,10 +382,10 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	else
 	    {
 		evt = SequenceSelection.getCurrent().getLastSelectedEvent();
-		requestFocus();
+		//requestFocus();
 		if(evt != null)
 		    {
-			requestFocus();
+			//requestFocus();
 			index = data.indexOf(evt);
 			select(evt, index, currentParamInEvent);
 		    }
@@ -549,6 +550,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 				SequenceSelection.getCurrent().select(data.getEventAt(index+1));
 			    }
 		    }
+	requestFocus();
     }
     public void keyReleased(KeyEvent e){}
     public void keyTyped(KeyEvent e){}

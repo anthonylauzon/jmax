@@ -338,6 +338,14 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	{
 	    if(SequenceTextArea.isDeleteKey(e))
 		editor.getSelection().deleteAll();
+	    else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
+		if(e.isControlDown())
+		    editor.getSelection().selectPrevious();
+		else
+		    editor.getSelection().selectNext();
+
+	    super.processKeyEvent(e);
+	    requestFocus();
 	}
    
 	public void paint(Graphics g) 

@@ -49,7 +49,8 @@ public class DeleteTool extends Tool implements PositionListener {
   {
     super("eraser", theImageIcon);
     
-    itsMouseTracker = new VerboseMouseTracker(this);
+    //itsMouseTracker = new VerboseMouseTracker(this);
+    itsMouseTracker = new MidiMouseTracker(this);
   }
 
   

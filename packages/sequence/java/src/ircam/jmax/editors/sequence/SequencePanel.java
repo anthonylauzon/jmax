@@ -101,7 +101,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     manager = new ToolManager(SequenceTools.instance);
     toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize(200, 30);    
+    toolbar.setSize(150, 25);    
+    toolbar.setPreferredSize(new Dimension(150, 25));    
     Tool arrow = manager.getToolByName("arrow");     
     manager.activate(arrow, null); //we do not have a gc yet...
     //------------------- prepare the track panel:
@@ -137,7 +138,14 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
  
     statusBar.setSize(300, 20);
 
-    statusBar.addWidgetAt(toolbar, 2);
+    JPanel toolbarPanel = new JPanel();
+    toolbarPanel.setSize(150, 25);
+    toolbarPanel.setPreferredSize(new Dimension(150, 25));
+    toolbarPanel.setLayout(new BorderLayout());
+    toolbarPanel.add(toolbar, BorderLayout.CENTER);
+    toolbarPanel.validate();
+    statusBar.addWidgetAt(toolbarPanel, 2);
+    //statusBar.addWidgetAt(toolbar, 2);
 
     ruler.setSize(300, 20);
 
