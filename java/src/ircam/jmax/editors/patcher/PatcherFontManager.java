@@ -83,6 +83,32 @@ public class PatcherFontManager
     return jmaxFontNames;
   }
 
+  /***********************************************************************/
+  /*   RUNTIME FONT RECOVERING                                           */
+  /***********************************************************************/
+  private String recoveringFont; 
+  private String[] toRecoverFonts = {};
+  public void setRecoveringFont(String font)
+  {
+      recoveringFont = font;
+  }
+  public void setToRecoverFonts(String[] fonts)
+  {
+      toRecoverFonts = fonts;
+  }
+  public String getRecoveringFont()
+  {
+      return recoveringFont;
+  }
+  public boolean isToRecoverFont(String font)
+  {
+      for(int i=0; i<toRecoverFonts.length; i++)
+	  if(font.equals(toRecoverFonts[i])) return true;
+      return false;
+  }
+  /***********************************************************************/
+  /***********************************************************************/
+
   private Hashtable fontNames = new Hashtable();
   private Hashtable fontSizes = new Hashtable();
 

@@ -95,7 +95,6 @@ public class Platform
       {
 	setDefaultValues();
       }
-
     
     //setDefaultUIColors(Color.red);
   }
@@ -150,12 +149,18 @@ public class Platform
       UIManager.put("ScrollPane.background", color);
       UIManager.put("ToolBar.floatingBackground", color);
       UIManager.put("Button.background", color);
+      UIManager.put("ComboBox.background", color);
       UIManager.put("ComboBox.disabledBackground", color);
+      UIManager.put("ComboBox.listBackground", color);
+      UIManager.put("ComboBox.selectionBackground", color);
       UIManager.put("ToolBar.dockingBackground", color);
       UIManager.put("ToggleButton.background", color);
       UIManager.put("CheckBoxMenuItem.background", color);
       UIManager.put("RadioButtonMenuItem.background", color);
+      UIManager.put("RadioButton.background", color);
       UIManager.put("Separator.background", color);
+      UIManager.put("Tree.textBackground", color);
+      UIManager.put("Tree.background", color);
 
       Settings.sharedInstance().setCoolColors();
   }

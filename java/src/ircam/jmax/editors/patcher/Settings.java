@@ -74,6 +74,9 @@ public class Settings {
       lockBackgroundColor = Color.blue.darker();
       consoleBackgroundColor = Color.magenta.darker();
       consoleForegroundColor = Color.white;
+      objColor = Color.pink;
+      UIColor = new Color( 153, 204, 204);
+      selectedColor = Color.orange;
   }
 
   // ----------------------------------------
