@@ -161,6 +161,8 @@ audioconfig_update_devices(fts_audioconfig_t* config)
   while (*names)
     {
       fts_client_add_symbol( (fts_object_t *)config, *names);
+      /* HACK */
+      fts_client_add_int((fts_object_t*)config, 2);
       names++;
     }
   fts_client_done_message( (fts_object_t *)config);
@@ -170,6 +172,8 @@ audioconfig_update_devices(fts_audioconfig_t* config)
   while (*names)
     {
       fts_client_add_symbol( (fts_object_t *)config, *names);
+      /* HACK */
+      fts_client_add_int((fts_object_t*)config, 2);
       names++;
     }
   fts_client_done_message( (fts_object_t *)config);
