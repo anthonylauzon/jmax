@@ -351,7 +351,11 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsSketchPad.close(false);    
   }
 
-  public void windowOpened(WindowEvent e){}
+  public void windowOpened(WindowEvent e)
+  {
+    requestFocusInWindow();
+    itsSketchPad.requestFocus();
+  }
   public void windowClosed(WindowEvent e){}
 
   public void windowIconified( WindowEvent e)
@@ -362,10 +366,13 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   public void windowDeiconified( WindowEvent e)
   {
     itsSketchPad.startUpdates();
+    requestFocusInWindow();
+    itsSketchPad.requestFocus();
   }       
 
   public void windowActivated(WindowEvent e)
   {
+    requestFocusInWindow();
     itsSketchPad.requestFocus();
   }
 

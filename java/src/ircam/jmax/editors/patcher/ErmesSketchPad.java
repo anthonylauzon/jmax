@@ -392,8 +392,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 
     KeyEventsManager.addProducer(this);
 
-    requestDefaultFocus(); 
-
     updateGroup.add( this);
 
     initUndoStuff();

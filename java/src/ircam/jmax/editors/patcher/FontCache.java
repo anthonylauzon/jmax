@@ -59,7 +59,7 @@ public class FontCache {
   }
   
 
-  public static final Font lookupFont( String fontName, int fontSize, int fontStyle)
+  public static final Font lookupFont( String fontName, int fontSize, int fontStyle, Component c)
   {
     int idx;
 
@@ -72,7 +72,7 @@ public class FontCache {
 	Font font = new Font( fontName, fontStyle, fontSize);
 
 	fontTable.addElement(font);
-	fontMetricsTable.addElement(Toolkit.getDefaultToolkit().getFontMetrics( font));
+	fontMetricsTable.addElement( c.getFontMetrics( font));
 
 	return font;
       }
@@ -81,7 +81,7 @@ public class FontCache {
   }
 
 
-  public static final FontMetrics lookupFontMetrics( String fontName, int fontSize, int fontStyle)
+  public static final FontMetrics lookupFontMetrics( String fontName, int fontSize, int fontStyle, Component c)
   {
     int idx;
 
@@ -91,8 +91,8 @@ public class FontCache {
       {
 	// Not found, make and store a new one
 
-	  Font font = new Font( fontName, /*Font.PLAIN*/fontStyle, fontSize);
-	FontMetrics fontMetrics = Toolkit.getDefaultToolkit().getFontMetrics( font);
+	Font font = new Font( fontName, fontStyle, fontSize);
+	FontMetrics fontMetrics = c.getFontMetrics( font);
 	fontTable.addElement(font);
 	fontMetricsTable.addElement(fontMetrics);
 

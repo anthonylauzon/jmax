@@ -147,7 +147,7 @@ public class EditField extends JTextArea implements FocusListener
 
     setFont(FontCache.lookupFont(ircam.jmax.Platform.FONT_NAME,
 				 ircam.jmax.Platform.FONT_SIZE,
-				 ircam.jmax.Platform.FONT_STYLE));
+				 ircam.jmax.Platform.FONT_STYLE, editor));
 
     Keymap myMap = JTextComponent.addKeymap(null, getKeymap());
 
@@ -168,11 +168,11 @@ public class EditField extends JTextArea implements FocusListener
     addCaretListener(new CaretListener(){
 	    public void caretUpdate(CaretEvent e)
 	    {
-		int lt = EditField.this.getText().length();
-		if(e.getDot()>lt)
-		    setSelectionEnd(lt);
+	      int lt = EditField.this.getText().length();
+	      if(e.getDot()>lt)
+		setSelectionEnd(lt);
 	    };
-	});
+      });
   }
 
   // actually starts the edit operation.

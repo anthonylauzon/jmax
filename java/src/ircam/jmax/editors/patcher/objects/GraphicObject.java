@@ -189,8 +189,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     if (fontStyle < 0)      
       fontStyle = itsSketchPad.getDefaultFontStyle();
 
-    itsFont = FontCache.lookupFont(fontName, fontSize, fontStyle);
-    itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize, fontStyle);
+    itsFont = FontCache.lookupFont(fontName, fontSize, fontStyle, itsSketchPad);
+    itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize, fontStyle, itsSketchPad);
 
     updateInOutlets();    
   }
@@ -349,17 +349,17 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void setFontName(String fontName)
   {
-    setFont(FontCache.lookupFont(fontName, itsFont.getSize(), itsFont.getStyle()));
+    setFont(FontCache.lookupFont(fontName, itsFont.getSize(), itsFont.getStyle(), itsSketchPad));
   }
 
   public void setFontSize(int size)
   {
-    setFont(FontCache.lookupFont(itsFont.getName(), size, itsFont.getStyle()));
+    setFont(FontCache.lookupFont(itsFont.getName(), size, itsFont.getStyle(), itsSketchPad));
   }
 
   public void setFontStyle(int style)
   {
-    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), style));
+    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), style, itsSketchPad));
   }
 
   public void changeFontStyle(String style, boolean selected)
@@ -389,7 +389,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 	}
 
     if(fstyle!=-1)
-      setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), fstyle));
+      setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), fstyle, itsSketchPad));
   }
 
   public void fontSmaller()
@@ -399,12 +399,12 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     size = itsFont.getSize();
 
     if (size > 8)
-      setFont(FontCache.lookupFont(itsFont.getName(), size - 2, itsFont.getStyle()));
+      setFont(FontCache.lookupFont(itsFont.getName(), size - 2, itsFont.getStyle(), itsSketchPad));
   }
 
   public void fontBigger()
   {
-    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize() + 2, itsFont.getStyle()));
+    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize() + 2, itsFont.getStyle(), itsSketchPad));
   }
 
   public void setFont( Font theFont) 
@@ -427,7 +427,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 	( fontStyle != Font.BOLD) && (fontStyle != (Font.BOLD + Font.ITALIC)))
       fontStyle = itsSketchPad.getDefaultFontStyle();
 
-    setCurrentFont( FontCache.lookupFont( fontName, fontSize, fontStyle));
+    setCurrentFont( FontCache.lookupFont( fontName, fontSize, fontStyle, itsSketchPad));
   }
 
   public void setCurrentFont(Font font)

@@ -37,8 +37,8 @@ public class KeyEventsManager implements KeyListener
 
   public static void createManager()
   {
-      if(keyEventsManager == null)
-	  keyEventsManager = new KeyEventsManager();  
+    if(keyEventsManager == null)
+      keyEventsManager = new KeyEventsManager();  
   }
 
   public KeyEventsManager()
