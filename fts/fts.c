@@ -176,12 +176,14 @@ extern void fts_kernel_dsp_init( void);
 extern void fts_kernel_expression_init( void);
 extern void fts_kernel_ftl_init( void);
 extern void fts_kernel_hashtable_init( void);
+extern void fts_kernel_inout_init(void);
 extern void fts_kernel_midi_init( void);
 extern void fts_kernel_objtable_init( void);
 extern void fts_kernel_objtable_init( void);
 extern void fts_kernel_oldclient_init( void);
 extern void fts_kernel_oldftsdata_init( void);
 extern void fts_kernel_oldpatcherdata_init( void);
+extern void fts_kernel_olducs_init( void);
 extern void fts_kernel_param_init( void);
 extern void fts_kernel_patcher_init( void);
 extern void fts_kernel_patparser_init( void);
@@ -192,7 +194,6 @@ extern void fts_kernel_soundfile_init( void);
 extern void fts_kernel_symbol_init( void);
 extern void fts_kernel_template_init( void);
 extern void fts_kernel_variable_init( void);
-extern void fts_kernel_olducs_init( void);
 
 extern void fts_oldclient_start( void);
 
@@ -222,6 +223,7 @@ void fts_init( int argc, char **argv)
 
   /* For the rest, the order is no longer important */
   fts_kernel_audio_init();
+  fts_kernel_inout_init();
   fts_kernel_bytestream_init();
   fts_kernel_autosave_init();
   fts_kernel_clipboard_init();
