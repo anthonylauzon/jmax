@@ -245,6 +245,14 @@ readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
   fts_atom_t *argv;
   int i;
+  fts_dev_class_t *dev_class;
+
+  dev_class = fts_dev_class_get_by_name(fts_new_symbol("readsf"));
+  if (!dev_class)
+    {
+      post( "reasf~: error: cannot find Direct-To-Disk device\n");
+      return;
+    }
 
   argv = (fts_atom_t *) fts_malloc(sizeof(fts_atom_t) * (3 + this->nchans));
 
@@ -255,9 +263,7 @@ readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   for (i = 0; i < this->nchans; i++)
     fts_set_symbol(argv + 3 + i, fts_dsp_get_output_name(dsp, i));
 
-  dsp_add_funcall(fts_dev_class_get_sig_get_fun_name(fts_dev_class_get_by_name(fts_new_symbol("readsf"))),
-		  3 + this->nchans,
-		  argv);
+  dsp_add_funcall(fts_dev_class_get_sig_get_fun_name( dev_class), 3 + this->nchans, argv);
 
   fts_free(argv);
 }
