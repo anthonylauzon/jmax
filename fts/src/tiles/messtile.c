@@ -307,7 +307,7 @@ fts_mess_client_replace(int ac, const fts_atom_t *av)
 
       new =  fts_get_object(&av[1]);
 
-      if (! old)
+      if (! new)
 	{
 	  post_mess("System Error in FOS message REPLACE: redefining to a non existing object", ac, av);
 	  return;
