@@ -26,8 +26,6 @@
 
 #include "fts.h"
 
-extern void ivec_config(void);
-extern void fvec_config(void);
 extern void nsplit_config(void);
 extern void wrap_config(void);
 extern void rewrap_config(void);
@@ -35,8 +33,6 @@ extern void rewrap_config(void);
 static void
 numeric_init(void)
 {
-  ivec_config();
-  fvec_config();
   nsplit_config();
   wrap_config();
   rewrap_config();
