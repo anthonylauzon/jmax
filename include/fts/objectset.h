@@ -38,7 +38,6 @@
  * @name The FTS objectset structure
  */
 /*@{*/
-#include <fts/fts.h>
 
 /**
  * The FTS objectset.
@@ -48,20 +47,13 @@
  * @ingroup objectset
  */
 
-typedef struct _fts_object_set_t 
-{
+typedef struct _fts_object_set_t {
   fts_object_t ob;
-
   fts_hashtable_t hashtable;
 } fts_objectset_t;
 
 /*@}*/
 
-FTS_API fts_symbol_t objectset_symbol;
-FTS_API fts_symbol_t sym_objectset_add;
-FTS_API fts_symbol_t sym_objectset_remove;
-FTS_API fts_symbol_t sym_objectset_clear;
-FTS_API fts_symbol_t sym_objectset_get_objects;
 
 /**
  * Initializes an objectset
@@ -70,7 +62,7 @@ FTS_API fts_symbol_t sym_objectset_get_objects;
  * @param set the objectset
  * @ingroup objectset
  */
-/*FTS_API void fts_objectset_init( fts_objectset_t *set);*/
+FTS_API void fts_objectset_init( fts_objectset_t *set);
 
 /**
  * Clears objectset's content
@@ -79,7 +71,7 @@ FTS_API fts_symbol_t sym_objectset_get_objects;
  * @param set the objectset
  * @ingroup objectset
  */
-/*FTS_API void fts_objectset_clear( fts_objectset_t *set);*/
+FTS_API void fts_objectset_clear( fts_objectset_t *set);
 
 /**
  * Deinitializes an objectset
@@ -88,7 +80,7 @@ FTS_API fts_symbol_t sym_objectset_get_objects;
  * @param set the objectset
  * @ingroup objectset
  */
-/*FTS_API void fts_objectset_destroy( fts_objectset_t *set);*/
+FTS_API void fts_objectset_destroy( fts_objectset_t *set);
 
 /**
  * Add an object to the objectset.<BR>
@@ -99,7 +91,7 @@ FTS_API fts_symbol_t sym_objectset_get_objects;
  * @param object the object to add
  * @ingroup objectset
  */
-/*FTS_API void fts_objectset_add( fts_objectset_t *set, fts_object_t *object);*/
+FTS_API void fts_objectset_add( fts_objectset_t *set, fts_object_t *object);
 
 /**
  * Remove an object from the objectset.
@@ -109,7 +101,7 @@ FTS_API fts_symbol_t sym_objectset_get_objects;
  * @param object the object to add
  * @ingroup objectset
  */
-/*FTS_API void fts_objectset_remove( fts_objectset_t *set, fts_object_t *object);*/
+FTS_API void fts_objectset_remove( fts_objectset_t *set, fts_object_t *object);
 
 /* ??? */
 /*  FTS_API int fts_objectset_contains( fts_objectset_t *set, fts_object_t *object); */
@@ -123,6 +115,11 @@ FTS_API fts_symbol_t sym_objectset_get_objects;
  * @param i the iterator
  * @ingroup objectset
  */
-/*FTS_API void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i);*/
+FTS_API void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i);
+
+/**
+ * The global objectset symbol 
+ */
+FTS_API fts_symbol_t objectset_symbol;
 
 #endif
