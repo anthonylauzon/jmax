@@ -11,30 +11,25 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class MoveEditInteraction extends SubInteraction
+class MoveEditInteraction extends Interaction
 {
   ErmesObject object;
   boolean dragged;
 
-  MoveEditInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true);
     filter.setAutoScrolling(true);
   }
 
-  void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     switch (squeack)
       {
       case (Squeack.DOWN | Squeack.TEXT):
 	
 	object = ((SensibilityArea) dobject).getObject();
-	engine.getDisplayList().objectToFront(object);
+	editor.getDisplayList().objectToFront(object);
 	dragged = false;
 
 	break;
@@ -43,7 +38,7 @@ class MoveEditInteraction extends SubInteraction
 
 	if (! dragged)
 	  {
-	    engine.getSketch().setCursor(Cursor.getDefaultCursor());
+	    editor.setCursor(Cursor.getDefaultCursor());
 
 	    dragged = true;
 
@@ -61,7 +56,7 @@ class MoveEditInteraction extends SubInteraction
 	  }
 
 	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
-	engine.getSketch().fixSize(); 
+	editor.fixSize(); 
 	break;
 
       case Squeack.UP:
@@ -73,9 +68,9 @@ class MoveEditInteraction extends SubInteraction
 		ErmesSelection.patcherSelection.deselectAll();
 	      }
 
-	    engine.getSketch().textEditObject((ErmesObjEditableObject)object, mouse);
+	    editor.textEditObject((ErmesObjEditableObject)object, mouse);
 	  }
-	end();
+	editor.endInteraction();
 	break;
       }
   }

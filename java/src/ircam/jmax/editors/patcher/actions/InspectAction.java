@@ -10,17 +10,9 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class InspectAction extends PatcherAction
+public class InspectAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public InspectAction( ErmesSketchWindow editor)
-  {
-    super("Inspect", "Inspect the selection");
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
       {

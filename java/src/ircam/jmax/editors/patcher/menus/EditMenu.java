@@ -28,36 +28,36 @@ public class EditMenu extends PatcherMenu
   JMenuItem inspectItem;
   JMenuItem lockItem;
   
-  public EditMenu(ErmesSketchWindow window)
+  public EditMenu()
   {
-    super("Edit", window);
+    super("Edit");
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    cutItem       = add(new CutAction(getEditor()));
-    copyItem      = add(new CopyAction(getEditor()));
-    pasteItem     = add(new PasteAction(getEditor()));
-    duplicateItem = add(new DuplicateAction(getEditor()));
+    cutItem       = add(Actions.cutAction, "Cut", Event.CTRL_MASK, KeyEvent.VK_X);
+    copyItem      = add(Actions.copyAction, "Copy", Event.CTRL_MASK, KeyEvent.VK_C);
+    pasteItem     = add(Actions.pasteAction, "Paste", Event.CTRL_MASK, KeyEvent.VK_V);
+    duplicateItem = add(Actions.duplicateAction, "Duplicate", Event.CTRL_MASK, KeyEvent.VK_D);
 
     addSeparator();
 
-    selectAllItem = add(new SelectAllAction(getEditor()));
+    selectAllItem = add(Actions.selectAllAction, "SelectAll", Event.CTRL_MASK, KeyEvent.VK_A);
 
     addSeparator();
 
-    add(new FindAction(getEditor()));
-    add(new FindErrorsAction(getEditor()));
+    add(Actions.findAction, "Find");
+    add(Actions.findErrorsAction, "Find Errors");
 
     addSeparator();
 
-    inspectItem = add(new InspectAction(getEditor()));
+    inspectItem = add(Actions.inspectAction, "Inspect");
 
     addSeparator();
 
-    add( new AlignMenu(getEditor()));
+    add( new AlignMenu());
 
     addSeparator();
 
-    lockItem = add(new LockAction(getEditor()));
+    lockItem = add(Actions.lockAction, "Lock", Event.CTRL_MASK, KeyEvent.VK_E);
 
     enableCut(true);
     enableCopy(true);
@@ -141,6 +141,6 @@ public class EditMenu extends PatcherMenu
 	enableSelectAll(true);
       }
 
-    enablePaste(! getEditor().ftsClipboardIsEmpty());
+    enablePaste(! ErmesSketchWindow.ftsClipboardIsEmpty());
   }
 }

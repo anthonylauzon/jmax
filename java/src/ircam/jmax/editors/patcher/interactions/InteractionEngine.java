@@ -1,8 +1,12 @@
 package ircam.jmax.editors.patcher.interactions;
 
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+
 import ircam.jmax.editors.patcher.*;
-
-
+import ircam.jmax.editors.patcher.objects.*;
 
 
 /** This class implement the interaction engine of the patcher editor.
@@ -12,7 +16,6 @@ import ircam.jmax.editors.patcher.*;
   The engine is composed by:
   
   <ul>
-  <li> An instance of this class, that do central housekeeping and control.
   <li> An input filter, essentially the lexical parser, that translate mouse
        events in higher level lexical events; lexical events are implemented as
        simple method call to the interaction; the input filter can change configuration,
@@ -24,87 +27,371 @@ import ircam.jmax.editors.patcher.*;
        and not reused, and have access to the Engine and thru this to the SketchPad/displayList
        to do semantic actions.
   </ul>
+
+  The input filter; translate input mouse events in lexical events
+  for the Interaction engine; it also provide a couple of input tracking
+  services, like keeping the position of the last mouse event, and the
+  previous mouse event position; they are passed to the event.
+  The lexical analysis made is not modal (state less).
+
+  There are events, modifiers and locations;
+  the event is a combination of bit patterns, defined in the Squeack
+  class; the squeack is passed to the interaction thru a single method call
+  together with the destination object, if any, and with the current and previous
+  mouse point.
+
+  Then, there are two properties that control filtering: followingMoves
+  and followingLocations; if followingMoves is false, no move or drag event are
+  generated; if followingLocation is false, no squeack with locations is
+  generated; the two flags should be installed by the interactions
+  when set in the interaction engine.
+
   */
 
-final public class InteractionEngine
+final public class InteractionEngine implements MouseMotionListener, MouseListener
 {
+  // The input filter can be set in different status;
+  // they regard the different granularity input events
+  // are analized.
+
   ErmesSketchPad sketch;
   DisplayList    displayList;
-  Interaction    interaction;
-  InputFilter    filter;
-  boolean        locked;
-
-  // The two master interaction we hande in the patcher editor
-
-  Interaction runMaster  = new IdleRunInteraction(this);
-  Interaction editMaster = new IdleEditInteraction(this);
-  Interaction addMaster  = new AddObjectInteraction(this);
 
   public InteractionEngine(ErmesSketchPad sketch)
   {
     this.sketch = sketch;
-    this.displayList = sketch.getDisplayList();
-    filter = new InputFilter(this);
+    sketch.addMouseListener(this);
 
-    if (sketch.isLocked())
-      setRunMode();
-    else
-      setEditMode();
-	
-    sketch.addMouseListener(filter);
+    displayList = sketch.getDisplayList();
+    initAutoScroll();
   }
-
-  /* Destructor: needed to deinstall the listener */
-
+  
   public void dispose()
   {
-    filter.dispose();
+    if (followingMoves)
+      sketch.removeMouseMotionListener(this); 
+
+    sketch.removeMouseListener(this);
+  }
+
+  // Control properties
+
+  private boolean followingLocations = false;
+  private boolean followingMoves     = false;
+
+  final void setFollowingMoves(boolean v)
+  {
+    if (followingMoves)
+      {
+	if (! v)
+	  sketch.removeMouseMotionListener(this); 
+      }
+    else
+      {
+	if (v)
+	  sketch.addMouseMotionListener(this); 
+      }
+
+    followingMoves = v;
+  }
+
+  final boolean isFollowingMoves()
+  {
+    return followingMoves;
+  }
+
+  final void setFollowingLocations(boolean v)
+  {
+    followingLocations = v;
+  }
+
+  final boolean isFollowingLocations()
+  {
+    return followingLocations;
+  }
+
+  // Utilities
+
+  private Point mouse = new Point();
+  private Point oldMouse = new Point();
+
+  final private void updateMouseHistory(MouseEvent e)
+  {
+    oldMouse.setLocation(mouse);
+    mouse.setLocation(e.getX(), e.getY());
+  }
+
+  final private int getModifiersBits(MouseEvent e)
+  {
+    int ret = 0;
+
+    if (e.isShiftDown())
+      ret |= Squeack.SHIFT;
+
+    if (e.isControlDown())
+      ret |= Squeack.CTRL;
+
+    if (e.isAltDown())
+      ret |= Squeack.ALT;
+
+    return ret;
   }
 
 
-  public void setAddMode()
+  final private int getLocationBits(DisplayObject object)
   {
-    sketch.stopTextEditing();
-    setInteraction(addMaster);
+    if (object == null)
+      return Squeack.BACKGROUND;
+    else if (object instanceof ErmesObject)
+      return Squeack.OBJECT;
+    else if (object instanceof ErmesConnection)
+      return Squeack.CONNECTION;
+    else if (object instanceof SensibilityArea)
+      return ((SensibilityArea)object).getSqueackBits();
+    else
+      return Squeack.UNKNOWN;
   }
 
-  public void setRunMode()
+
+  final private void processEvent(int squeack, MouseEvent e)
   {
-    sketch.stopTextEditing();
-    setInteraction(runMaster);
+    ErmesSketchPad editor = (ErmesSketchPad) e.getSource();
+    DisplayObject object = null;
+
+    updateMouseHistory(e);
+    
+    squeack |= getModifiersBits(e);
+
+    if (followingLocations)
+      {
+	object = displayList.getDisplayObjectAt(mouse.x, mouse.y);
+
+	squeack |= getLocationBits(object);
+      }
+
+    autoScrollIfNeeded(editor, squeack, mouse, oldMouse);
+
+    if (! scrollTimer.isRunning())
+      sendSqueack(editor, squeack, object, mouse, oldMouse);
   }
 
-  public void setEditMode()
+  // Scroll handling
+  // The input filter handle automatic smooth scrolling
+  // the autoresize is handled by the sketch and by the
+  // semantic action directly.
+    
+  Timer scrollTimer;
+  ScrollDragAction scroller;
+  boolean autoScroll = false;
+  final private static int scrollMargin = 5;
+
+  private void initAutoScroll()
   {
-    setInteraction(editMaster);
+    scroller    = new ScrollDragAction();
+    scrollTimer = new Timer(10, scroller);
+    scrollTimer.setCoalesce(true);
+    scrollTimer.setRepeats(true);
   }
 
-  final void setInteraction(Interaction interaction)
+  void setAutoScrolling(boolean v)
   {
-    this.interaction = interaction;
+    autoScroll = v;
+  }
 
-    filter.setFollowingMoves(false);
-    filter.setFollowingLocations(false);
-    filter.setAutoScrolling(false);
+  boolean isAutoScrolling()
+  {
+    return autoScroll;
+  }
 
-    interaction.configureInputFilter(filter);
+  class ScrollDragAction implements ActionListener
+  {
+    ErmesSketchPad editor;
+    int squeack;
+    Point timerMouse = new Point();
+    Point oldTimerMouse = new Point();
+    Point direction  = new Point();
+
+    public void actionPerformed(ActionEvent evt)
+    {
+      // Three case: inside the margin, going outside
+      // outside the window, inside the margin
+      // The third is not handled because this method
+      // is never called in this case.
+
+      if (! sketch.pointIsVisible(timerMouse, scrollMargin))
+	{
+	  // The point is in the margin (visible in the window,
+	  // not visible if we take out the margin
+
+	  sendSqueack(editor, squeack, null, timerMouse, oldTimerMouse);
+
+	  sketch.whereItIs(timerMouse, direction, scrollMargin);
+
+	  sketch.scrollBy(direction.x * 3, direction.y * 3);
+
+	  addPoint(timerMouse);
+	  timerMouse.x = timerMouse.x + direction.x * 3;
+	  timerMouse.y = timerMouse.y + direction.y * 3;
+	}
+    }
+
+    void setSqueack(int squeack)
+    {
+      this.squeack = squeack;
+    }
+
+    void setEditor(ErmesSketchPad editor)
+    {
+      this.editor = editor;
+    }
+
+    void addPoint(Point mouse)
+    {
+      oldTimerMouse.setLocation(timerMouse);
+      timerMouse.setLocation(mouse);
+    }
+
+    void addPoint(int x, int y)
+    {
+      oldTimerMouse.setLocation(timerMouse);
+      timerMouse.setLocation(x, y);
+    }
+  }
+
+  void autoScrollIfNeeded(ErmesSketchPad editor, int squeack, Point mouse, Point oldMouse)
+  {
+    // Handle the auto scrolling and autoresizing
+
+    if (isAutoScrolling() && Squeack.isDrag(squeack) &&
+	(! sketch.pointIsVisible(mouse, scrollMargin)))
+      {
+	if (scrollTimer.isRunning())
+	  {
+	    // Ignore
+	  }
+	else
+	  {
+	    scroller.setEditor(editor);
+	    scroller.setSqueack(squeack);
+	    scroller.addPoint(oldMouse);
+	    scroller.addPoint(mouse);
+	    scrollTimer.start();
+	  }
+      }
+    else 
+      {
+	if (scrollTimer.isRunning())
+	  {
+	    scrollTimer.stop();
+	  }
+      }
+  }
+
+  // Handle the interaction stack
+
+  final static int INTERACTION_STACK_DEPTH = 8;
+  Interaction[]  interactionStack = new Interaction[INTERACTION_STACK_DEPTH];
+  private int tos = -1; //point to the last used element of the stack
+
+  final public void pushInteraction(Interaction interaction)
+  {
+    setFollowingMoves(false);
+    setFollowingLocations(false);
+    setAutoScrolling(false);
+
+    interaction.configureInputFilter(this);
     interaction.reset();
+
+    tos++;
+    interactionStack[tos] = interaction;
   }
-     
-  final Interaction getInteraction()
+  
+  final public Interaction getCurrentInteraction()
   {
-    return interaction;
+    return interactionStack[tos];
   }
 
-  final ErmesSketchPad getSketch()
+  final public void popInteraction()
   {
-    return sketch;
+    tos--;
+    interactionStack[tos].configureInputFilter(this);
+    interactionStack[tos].reset();
   }
 
-  final DisplayList getDisplayList()
+  // Reset the stack and set a top level interaction
+
+  final public void setTopInteraction(Interaction interaction)
   {
-    return displayList;
+    tos = -1;
+    pushInteraction(interaction);
   }
 
+  // Send a squeack to an interaction, but giving the chance to push an interaction before
 
+  final void sendSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  {
+    Interaction delegate;
+
+    delegate = getCurrentInteraction().delegateSqueack(editor, squeack, dobject, mouse, oldMouse);
+
+    if (delegate != null)
+      pushInteraction(delegate);
+
+    getCurrentInteraction().gotSqueack(editor, squeack, dobject, mouse, oldMouse);
+  }
+  
+  // Methods following the mouse
+
+  public void mouseMoved( MouseEvent e)
+  {
+    processEvent(Squeack.MOVE, e);
+  }
+
+  public void mouseDragged( MouseEvent e)
+  {
+    processEvent(Squeack.DRAG, e);
+  }
+
+  public void mousePressed( MouseEvent e)
+  {
+    sketch.setKeyEventClient(null);
+    sketch.stopTextEditing();
+    sketch.requestFocus();
+
+    if (e.getClickCount() > 1)
+      processEvent(Squeack.DOUBLE_CLICK, e);
+    else
+      processEvent(Squeack.DOWN, e);
+  }
+
+  public void mouseReleased( MouseEvent e)
+  {
+    processEvent(Squeack.UP, e);
+  }
+
+  // The following methods are not used by the interaction engine.
+
+  public void mouseClicked( MouseEvent e)
+  {
+  }
+
+  public void mouseEntered( MouseEvent e)
+  {
+    // sketch.requestFocus();
+  } 
+
+  public void mouseExited( MouseEvent e)
+  {
+    // sketch.stopTextEditing();
+  }
 }
+
+
+
+
+
+
+
+
+
+

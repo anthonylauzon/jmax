@@ -12,17 +12,12 @@ import ircam.jmax.editors.patcher.*;
   */
 
 
-class DragSelectInteraction extends SubInteraction
+class DragSelectInteraction extends Interaction
 {
   Point dragStart = new Point();
   boolean dragged = false;
 
-  DragSelectInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     // Note that following locations is false because
     // the first event is not handled by this filter,
@@ -32,7 +27,7 @@ class DragSelectInteraction extends SubInteraction
     filter.setAutoScrolling(true);
   }
 
-  void gotSqueack(int squeack, DisplayObject object, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     switch (squeack)
       {
@@ -43,21 +38,21 @@ class DragSelectInteraction extends SubInteraction
 
       case Squeack.DRAG:
 	if (dragged)
-	  engine.getDisplayList().redrawDragRectangle();
+	  editor.getDisplayList().redrawDragRectangle();
 
-	engine.getDisplayList().setDragRectangle(dragStart.x, dragStart.y,
+	editor.getDisplayList().setDragRectangle(dragStart.x, dragStart.y,
 						 mouse.x - dragStart.x, mouse.y - dragStart.y);
-	engine.getDisplayList().dragRectangle();
-	engine.getDisplayList().selectExactly(engine.getDisplayList().getDragRectangle());
-	engine.getDisplayList().redrawDragRectangle();
+	editor.getDisplayList().dragRectangle();
+	editor.getDisplayList().selectExactly(editor.getDisplayList().getDragRectangle());
+	editor.getDisplayList().redrawDragRectangle();
 	dragged = true;
 	break;
 
       case Squeack.UP:
 	if (dragged)
 	  {
-	    engine.getDisplayList().noDrag();
-	    engine.getDisplayList().redrawDragRectangle();
+	    editor.getDisplayList().noDrag();
+	    editor.getDisplayList().redrawDragRectangle();
 	  }
 	else
 	  {
@@ -65,7 +60,7 @@ class DragSelectInteraction extends SubInteraction
 	    ErmesSelection.patcherSelection.deselectAll();
 	  }
 
-	end();
+	editor.endInteraction();
 	break;
       }
   }

@@ -13,18 +13,11 @@ import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 
-public class NewAction extends PatcherAction
+public class NewAction extends MenuAction
 {
-  JFrame frame;
-
-  public NewAction(JFrame frame)
+  public void doAction(ErmesSketchWindow editor)
   {
-    super("New", "Create a new Patcher", Event.CTRL_MASK, KeyEvent.VK_N);
-    this.frame = frame;
-  }
-
-  public  void actionPerformed(ActionEvent e)
-  {
+    JFrame frame = editor;
     Cursor temp = frame.getCursor();
 
     try

@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class CloseAction extends PatcherAction
+public class CloseAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public CloseAction( ErmesSketchWindow editor)
-  {
-    super("Close", "Close a Patcher", Event.CTRL_MASK, KeyEvent.VK_W);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     editor.Close(true);
   }

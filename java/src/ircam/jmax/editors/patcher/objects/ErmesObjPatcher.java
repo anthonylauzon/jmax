@@ -32,7 +32,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   public String getArgs()
   {
     // get the correct String from the object
-    return itsFtsObject.getDescription().trim();
+    return itsFtsObject.getDescription();
   }
 
   public void redefine( String text) 

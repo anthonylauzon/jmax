@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class DuplicateAction extends PatcherAction
+public class DuplicateAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public DuplicateAction( ErmesSketchWindow editor)
-  {
-    super("Duplicate", "Duplicate the selection", Event.CTRL_MASK, KeyEvent.VK_D);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     editor.Duplicate();
   }

@@ -36,59 +36,56 @@ class KeyMap
 
     // Move actions
 
-    add(new MoveAction(editor, -10,   0, Event.SHIFT_MASK, KeyEvent.VK_LEFT));
-    add(new MoveAction(editor,  10,   0, Event.SHIFT_MASK, KeyEvent.VK_RIGHT));
-    add(new MoveAction(editor,   0, -10, Event.SHIFT_MASK, KeyEvent.VK_UP));
-    add(new MoveAction(editor,   0,  10, Event.SHIFT_MASK, KeyEvent.VK_DOWN));
+    add(Actions.moveTenLeftAction, Event.SHIFT_MASK, KeyEvent.VK_LEFT);
+    add(Actions.moveTenRightAction, Event.SHIFT_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.moveTenUpAction, Event.SHIFT_MASK, KeyEvent.VK_UP);
+    add(Actions.moveTenDownAction, Event.SHIFT_MASK, KeyEvent.VK_DOWN);
 
-    add(new MoveAction(editor, -1,  0, 0, KeyEvent.VK_LEFT));
-    add(new MoveAction(editor,  1,  0, 0, KeyEvent.VK_RIGHT));
-    add(new MoveAction(editor,  0, -1, 0, KeyEvent.VK_UP));
-    add(new MoveAction(editor,  0,  1, 0, KeyEvent.VK_DOWN));
+    add(Actions.moveLeftAction, 0, KeyEvent.VK_LEFT);
+    add(Actions.moveRightAction, 0, KeyEvent.VK_RIGHT);
+    add(Actions.moveUpAction, 0, KeyEvent.VK_UP);
+    add(Actions.moveDownAction, 0, KeyEvent.VK_DOWN);
 
     // Fixed Resize Actions
 
-    add(new ResizeAction(editor, -10,   0, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_LEFT));
-    add(new ResizeAction(editor,  10,   0, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_RIGHT));
-    add(new ResizeAction(editor,   0, -10, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_UP));
-    add(new ResizeAction(editor,   0,  10, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_DOWN));
+    add(Actions.resizeTenLeftAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_LEFT);
+    add(Actions.resizeTenRightAction,Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.resizeTenUpAction,   Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_UP);
+    add(Actions.resizeTenDownAction, Event.CTRL_MASK | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
 
-    add(new ResizeAction(editor, -1,  0, Event.CTRL_MASK, KeyEvent.VK_LEFT));
-    add(new ResizeAction(editor,  1,  0, Event.CTRL_MASK, KeyEvent.VK_RIGHT));
-    add(new ResizeAction(editor,  0, -1, Event.CTRL_MASK, KeyEvent.VK_UP));
-    add(new ResizeAction(editor,  0,  1, Event.CTRL_MASK, KeyEvent.VK_DOWN));
+    add(Actions.resizeLeftAction,  Event.CTRL_MASK, KeyEvent.VK_LEFT);
+    add(Actions.resizeRightAction, Event.CTRL_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.resizeUpAction,    Event.CTRL_MASK, KeyEvent.VK_UP);
+    add(Actions.resizeDownAction,  Event.CTRL_MASK, KeyEvent.VK_DOWN);
 
     // Resize Align operations
 
-    add(new ResizeToMaxWidthAction(editor));
-    add(new ResizeToMaxHeightAction(editor));
+    add(Actions.resizeToMaxWidthAction, Event.CTRL_MASK | Event.META_MASK, KeyEvent.VK_RIGHT);
+    add(Actions.resizeToMaxHeightAction, Event.CTRL_MASK | Event.META_MASK, KeyEvent.VK_UP);
 
     // Delete selection
 
-    add(new DeleteSelectionAction(editor, 0, KeyEvent.VK_DELETE));
-    add(new DeleteSelectionAction(editor, 0, KeyEvent.VK_BACK_SPACE));
+    add(Actions.deleteSelectionAction, 0, KeyEvent.VK_DELETE);
+    add(Actions.deleteSelectionAction, 0, KeyEvent.VK_BACK_SPACE);
 
     // Annotation 
 
-    add(new ShowErrorAction(editor));
+    add(Actions.showErrorAction, Event.CTRL_MASK, KeyEvent.VK_Z);
   }
 
 
-  /** Add a PatcherAction to the keymap */
+  /** Add a Action to the keymap */
 
-  public void add(PatcherAction action)
+  public void add(Action action, int modifiers, int mnemonic)
   {
-    add(action, JComponent.WHEN_FOCUSED);
+    add(action, modifiers, mnemonic, JComponent.WHEN_FOCUSED);
   }
 
-  public void add(PatcherAction action, int condition)
+  public void add(Action action, int modifiers, int mnemonic, int condition)
   {
-    if (action.haveMnemonic())
-      {
-	component.registerKeyboardAction(action, 
-					 KeyStroke.getKeyStroke(action.getMnemonic(), action.getModifiers()),
-					 condition);
-      }
+    component.registerKeyboardAction(action, 
+				     KeyStroke.getKeyStroke(mnemonic, modifiers),
+				     condition);
   }
 }
 

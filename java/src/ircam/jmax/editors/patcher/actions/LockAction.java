@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class LockAction extends PatcherAction
+public class LockAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public LockAction( ErmesSketchWindow editor)
-  {
-    super("Lock", "Lock/Unlock the editor", Event.CTRL_MASK, KeyEvent.VK_E);
-    this.editor = editor;
-  }
-
-  public void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     editor.setLocked(! editor.isLocked());
   }

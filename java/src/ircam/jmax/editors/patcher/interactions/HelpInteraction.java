@@ -13,25 +13,19 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class HelpInteraction extends SubInteraction
+class HelpInteraction extends Interaction
 {
-  HelpInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-
-  void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     if (squeack == (Squeack.ALT | Squeack.DOWN | Squeack.OBJECT))
 	{
 	  ErmesObject object = (ErmesObject) dobject;
 
 	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
-	    new ErrorDialog( engine.getSketch().getSketchWindow(),
+	    new ErrorDialog( editor.getSketchWindow(),
 			     "Sorry, no help for object " + object.getFtsObject().getClassName());
 
-	  end();
+	  editor.endInteraction();
 	}
   }
 }

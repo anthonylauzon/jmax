@@ -10,21 +10,18 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class ResizeToMaxWidthAction extends PatcherAction
+public class ResizeToMaxWidthAction extends AbstractAction
 {
-  ErmesSketchWindow editor;
-
-  public ResizeToMaxWidthAction( ErmesSketchWindow editor)
+  public ResizeToMaxWidthAction()
   {
-    super("Max Width", "Resize the selection to its Max Width",
-	  Event.CTRL_MASK | Event.META_MASK, KeyEvent.VK_RIGHT);
-
-    this.editor = editor;
+    super("Max Width");
   }
 
   public  void actionPerformed(ActionEvent e)
   {
-    if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
+    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
+
+    if (ErmesSelection.patcherSelection.ownedBy(sketch))
       ErmesSelection.patcherSelection.resizeToMaxWidth();
   }
 }

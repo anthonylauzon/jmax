@@ -18,14 +18,14 @@ import ircam.jmax.editors.patcher.actions.*;
 
 public class AlignMenu extends PatcherMenu
 {
-  public AlignMenu(ErmesSketchWindow window)
+  public AlignMenu()
   {
-    super("Align", window);
+    super("Align");
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    add(new AlignTopAction(getEditor()));
-    add(new AlignLeftAction(getEditor()));
-    add(new AlignBottomAction(getEditor()));
-    add(new AlignRightAction(getEditor()));
+    add(Actions.alignTopAction,    "Top",    Event.META_MASK, KeyEvent.VK_UP);
+    add(Actions.alignLeftAction,   "Left",   Event.META_MASK, KeyEvent.VK_LEFT);
+    add(Actions.alignBottomAction, "Bottom", Event.META_MASK, KeyEvent.VK_DOWN);
+    add(Actions.alignRightAction,  "Right",  Event.META_MASK, KeyEvent.VK_RIGHT);
   }
 }

@@ -12,14 +12,9 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class ConnectionToggleSelectInteraction extends SubInteraction
+class ConnectionToggleSelectInteraction extends Interaction
 {
-  ConnectionToggleSelectInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     if (squeack == (Squeack.SHIFT | Squeack.DOWN | Squeack.CONNECTION))
 	{
@@ -31,7 +26,7 @@ class ConnectionToggleSelectInteraction extends SubInteraction
 	    ErmesSelection.patcherSelection.select(connection);
 
 	  connection.redraw();
-	  end();
+	  editor.endInteraction();
 	}
   }
 }

@@ -136,7 +136,7 @@ public class DisplayList
 	{
 	  ErmesConnection connection = (ErmesConnection) values[i];
 
-	  if (connection.itsFtsConnection == c)
+	  if (connection.getFtsConnection() == c)
 	    return connection;
 	}
 
@@ -171,7 +171,7 @@ public class DisplayList
 
 	  if ((connection.getSourceObject() == obj) || 
 	      (connection.getDestObject() == obj))
-	    connection.update();
+	    connection.updateDimensions();
 	}
   }
 
@@ -332,8 +332,8 @@ public class DisplayList
     // Very First, if this is the first paint for the window,
     // we do a fake paint with the textRenderer (doesn't work
     // before its first paint) and then we update the dimension
-    // of all the editable objects; also, don't ask me why we are
-    // doing two updateDimensions ...
+    // of all the editable objects; 
+    // and, of course, update for the connections.
 
     if (! doneOnce)
       {
@@ -345,9 +345,18 @@ public class DisplayList
 
 	    if (object instanceof ErmesObjEditableObject)
 	      {
-		((ErmesObjEditableObject)object).paint(g);
-		((ErmesObjEditableObject)object).updateDimensions(); // HACK ? Yes !
+		((ErmesObjEditableObject)object).DrawParsedString(g);
+		((ErmesObjEditableObject)object).updateDimensionsNoConnections(); // HACK ? Yes !
 	      }
+
+	  }
+
+	for ( int i = 0; i < size; i++)
+	  {
+	    ErmesDrawable object = (ErmesDrawable) values[i];
+
+	    if (object instanceof ErmesConnection)
+	      ((ErmesConnection)object).updateDimensions();
 	  }
       }
 

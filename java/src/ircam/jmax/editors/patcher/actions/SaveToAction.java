@@ -8,17 +8,9 @@ import javax.swing.event.*;
 
 import ircam.jmax.editors.patcher.*;
 
-public class SaveToAction extends PatcherAction
+public class SaveToAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public SaveToAction( ErmesSketchWindow editor)
-  {
-    super("SaveTo", "Save a Copy to a new File");
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     editor.SaveTo();
   }

@@ -13,21 +13,16 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class RunCtrlInteraction extends SubInteraction
+class RunCtrlInteraction extends Interaction
 {
   ErmesObject object;
 
-  RunCtrlInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true);
   }
 
-  void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     // Take away the control modifier (always there)
 
@@ -42,7 +37,7 @@ class RunCtrlInteraction extends SubInteraction
 
       case Squeack.UP:
 	object.gotSqueack(squeack, mouse, oldMouse);
-	end();
+	editor.endInteraction();
 	break;
       }
   }

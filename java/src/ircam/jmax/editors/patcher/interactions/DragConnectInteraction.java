@@ -14,7 +14,7 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class DragConnectInteraction extends SubInteraction
+class DragConnectInteraction extends Interaction
 {
   Point dragStart = new Point();
   ErmesObject srcObject;
@@ -22,22 +22,16 @@ class DragConnectInteraction extends SubInteraction
   ErmesObject dstObject;
   int inlet;
 
-  DragConnectInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true); // need the drag
     filter.setFollowingLocations(true);
     filter.setAutoScrolling(true);
   }
 
-
   boolean destinationChoosen = false;
 
-  void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     if (squeack == (Squeack.DOWN | Squeack.OUTLET))
       {
@@ -64,14 +58,15 @@ class DragConnectInteraction extends SubInteraction
 					   dstObject.getFtsObject(),
 					   inlet);
 	    
-		connection = new ErmesConnection(engine.getSketch(),
+		connection = new ErmesConnection(editor,
 						 srcObject,
 						 outlet,
 						 dstObject,
 						 inlet,
 						 fc);
 		
-		engine.getDisplayList().add(connection);
+		editor.getDisplayList().add(connection);
+		connection.updateDimensions();
 		connection.redraw();
 	      }
 	    catch (FtsException e)
@@ -82,12 +77,12 @@ class DragConnectInteraction extends SubInteraction
 
 	// clean up
 
-	engine.getDisplayList().noDrag();
-	engine.getDisplayList().redrawDragLine();
-	engine.getSketch().setCursor(Cursor.getDefaultCursor());
+	editor.getDisplayList().noDrag();
+	editor.getDisplayList().redrawDragLine();
+	editor.setCursor(Cursor.getDefaultCursor());
 	destinationChoosen = false;
 
-	end();
+	editor.endInteraction();
       }
     else if (squeack == (Squeack.DRAG | Squeack.INLET))
       {
@@ -100,20 +95,20 @@ class DragConnectInteraction extends SubInteraction
 	  }
 
 	destinationChoosen = true;
-	engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-	engine.getDisplayList().dragLine();
-	engine.getDisplayList().redrawDragLine();
-	engine.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
-	engine.getDisplayList().redrawDragLine();
+	editor.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+	editor.getDisplayList().dragLine();
+	editor.getDisplayList().redrawDragLine();
+	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
+	editor.getDisplayList().redrawDragLine();
       }
     else if (Squeack.isDrag(squeack))
       {
 	destinationChoosen = false;
-	engine.getSketch().setCursor(Cursor.getDefaultCursor());
-	engine.getDisplayList().dragLine();
-	engine.getDisplayList().redrawDragLine();
-	engine.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
-	engine.getDisplayList().redrawDragLine();
+	editor.setCursor(Cursor.getDefaultCursor());
+	editor.getDisplayList().dragLine();
+	editor.getDisplayList().redrawDragLine();
+	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
+	editor.getDisplayList().redrawDragLine();
       }
   }
 }

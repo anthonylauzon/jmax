@@ -1,5 +1,7 @@
 SOURCES := $(SOURCES)\
-	$(INCLUDE_PATH)/AddObjectInteraction.java \
+	$(INCLUDE_PATH)/AddModeInteraction.java \
+	$(INCLUDE_PATH)/EditModeInteraction.java \
+	$(INCLUDE_PATH)/RunModeInteraction.java \
 	$(INCLUDE_PATH)/ConnectionSelectInteraction.java \
 	$(INCLUDE_PATH)/ConnectionToggleSelectInteraction.java \
 	$(INCLUDE_PATH)/DragConnectInteraction.java \
@@ -8,9 +10,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/EditCtrlInteraction.java \
 	$(INCLUDE_PATH)/HResizeInteraction.java \
 	$(INCLUDE_PATH)/HelpInteraction.java \
-	$(INCLUDE_PATH)/IdleEditInteraction.java \
-	$(INCLUDE_PATH)/IdleRunInteraction.java \
-	$(INCLUDE_PATH)/InputFilter.java \
 	$(INCLUDE_PATH)/Interaction.java \
 	$(INCLUDE_PATH)/InteractionEngine.java \
 	$(INCLUDE_PATH)/MoveEditInteraction.java \
@@ -18,7 +17,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FollowInteraction.java \
 	$(INCLUDE_PATH)/RunCtrlInteraction.java \
 	$(INCLUDE_PATH)/Squeack.java \
-	$(INCLUDE_PATH)/SubInteraction.java \
 	$(INCLUDE_PATH)/VResizeInteraction.java \
 	$(INCLUDE_PATH)/CtrlDoubleClickEditInteraction.java \
 	$(INCLUDE_PATH)/DoubleClickEditInteraction.java

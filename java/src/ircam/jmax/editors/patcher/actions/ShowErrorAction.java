@@ -10,23 +10,22 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class ShowErrorAction extends PatcherAction
+public class ShowErrorAction extends AbstractAction
 {
-  ErmesSketchWindow editor;
-
-  public ShowErrorAction( ErmesSketchWindow editor)
+  public ShowErrorAction()
   {
-    super("ShowError", "Show the Error explications", Event.CTRL_MASK, KeyEvent.VK_Z);
-    this.editor = editor;
+    super("ShowError");
   }
 
   public  void actionPerformed(ActionEvent e)
   {
-    if (! editor.itsSketchPad.isAnnotating())
-      {
-	editor.itsSketchPad.setAnnotating();
+    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
 
-	if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad) &&
+    if (! sketch.isAnnotating())
+      {
+	sketch.setAnnotating();
+
+	if (ErmesSelection.patcherSelection.ownedBy(sketch) &&
 	    ErmesSelection.patcherSelection.hasObjects())
 	  {
 	    ErmesSelection.patcherSelection.apply(new ObjectAction() {
@@ -34,9 +33,10 @@ public class ShowErrorAction extends PatcherAction
 		{ object.showErrorDescription();}});
 	  }
 	else
-	  editor.itsSketchPad.getDisplayList().applyToObjects(new ObjectAction() {
+	  sketch.getDisplayList().applyToObjects(new ObjectAction() {
 	    public void processObject(ErmesObject object)
 	      { object.showErrorDescription();}});
       }
   }
 }
+

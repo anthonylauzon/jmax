@@ -8,59 +8,47 @@ import javax.swing.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;
 
-/** Convenience class that handle Action mnemonics following
-  the PatcherAction conventions.
-  For some strange reason, swing don't handle mnemonics in Actions,
-  so we add a couple of tricks to do it here.
-  */
+/**
+ * Utility to build menus; note that for some unknow reason or bug,
+ * Menu installed with Actions do not work after a while, usually after
+ * a New followed by the use of a Menu on an old window. 
+ * So we use standard actionlistener programming.
+ */
 
 abstract class PatcherMenu extends JMenu
 {
-  private ErmesSketchWindow editor;
-
-  PatcherMenu(String name, ErmesSketchWindow editor)
+  PatcherMenu(String name)
   {
     super(name);
-
-    this.editor = editor;
+    setDelay(0); // ?? Usefull ?
   }
 
-  public final ErmesSketchWindow getEditor()
-  {
-    return editor;
-  }
-
-  public JMenuItem add(PatcherAction action)
+  public JMenuItem add(MenuAction action, String name, int modifiers, int mnemonic)
   {
     JMenuItem item;
 
-    item = super.add(action);
+    item = new JMenuItem(name, mnemonic);
+    item.addActionListener(action);
+    item.setAccelerator(KeyStroke.getKeyStroke(mnemonic, modifiers));
 
-    if (action.haveMnemonic())
-      {
-	item.setAccelerator(KeyStroke.getKeyStroke(action.getMnemonic(), action.getModifiers()));
-	item.setMnemonic(action.getMnemonic());
-      }
-
-    item.setToolTipText((String) action.getValue(Action.SHORT_DESCRIPTION));
+    add(item);
 
     return item;
   }
 
-  public JMenuItem insert(PatcherAction action, int pos) 
+  public JMenuItem add(MenuAction action, String name)
   {
     JMenuItem item;
 
-    item = super.insert(action, pos);
-
-    if (action.haveMnemonic())
-      {
-	item.setAccelerator(KeyStroke.getKeyStroke(action.getMnemonic(), action.getModifiers()));
-	item.setMnemonic(action.getMnemonic());
-      }
-
-    item.setToolTipText((String) action.getValue(Action.SHORT_DESCRIPTION));
+    item = new JMenuItem(name);
+    add(item);
 
     return item;
   }
 }
+
+
+
+
+
+

@@ -10,16 +10,14 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class ResizeAction extends PatcherAction
+public class ResizeAction extends AbstractAction
 {
-  ErmesSketchWindow editor;
   int dx;
   int dy;
   
-  public ResizeAction( ErmesSketchWindow editor, int dx, int dy, int modifier, int key)
+  public ResizeAction(int dx, int dy)
   {
-    super("Resize", "Resize the selection", modifier, key);
-    this.editor = editor;
+    super("Resize");
 
     this.dx = dx;
     this.dy = dy;
@@ -27,7 +25,9 @@ public class ResizeAction extends PatcherAction
 
   public  void actionPerformed(ActionEvent e)
   {
-    if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
+    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
+
+    if (ErmesSelection.patcherSelection.ownedBy(sketch))
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(ErmesObject object)
@@ -38,7 +38,7 @@ public class ResizeAction extends PatcherAction
 	      object.redraw();
 	    }});
 
-	editor.itsSketchPad.fixSize();
+	sketch.fixSize();
       }
   }
 }

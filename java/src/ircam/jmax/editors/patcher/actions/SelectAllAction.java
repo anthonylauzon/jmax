@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class SelectAllAction extends PatcherAction
+public class SelectAllAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public SelectAllAction( ErmesSketchWindow editor)
-  {
-    super("SelectAll", "Select All", Event.CTRL_MASK, KeyEvent.VK_A);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     if (! editor.isLocked())
       {

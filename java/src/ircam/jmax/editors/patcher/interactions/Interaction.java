@@ -14,19 +14,11 @@ import ircam.jmax.editors.patcher.objects.*;
 
 abstract class Interaction
 {
-  protected InteractionEngine engine;
-
-  Interaction(InteractionEngine engine)
-  {
-    this.engine = engine;
-  }
-
-
   // This method configure the input filter
   // for this interaction; is called by the interaction engine.
   // by default, deinstall the move and the location handling
 
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
   }
 
@@ -40,7 +32,12 @@ abstract class Interaction
 
   // Called for every squeack
 
-  void gotSqueack(int squeack, DisplayObject object, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
+  }
+
+  Interaction delegateSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  {
+    return null;
   }
 }

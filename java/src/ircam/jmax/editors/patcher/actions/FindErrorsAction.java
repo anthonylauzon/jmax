@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class FindErrorsAction extends PatcherAction
+public class FindErrorsAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public FindErrorsAction( ErmesSketchWindow editor)
-  {
-    super("Find Errors", "Find the objects with errors");
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     FindPanel.open().findErrors();
   }

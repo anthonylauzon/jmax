@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class QuitAction extends PatcherAction
+public class QuitAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public QuitAction( ErmesSketchWindow editor)
-  {
-    super("Quit", "Quit a Patcher", Event.CTRL_MASK, KeyEvent.VK_Q);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     MaxApplication.Quit();
   }

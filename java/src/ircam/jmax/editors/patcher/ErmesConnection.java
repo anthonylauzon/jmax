@@ -18,14 +18,14 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public class ErmesConnection implements ErmesDrawable, DisplayObject
 {
-  ErmesObject itsFromObject;
-  int itsOutletNum;
+  private ErmesObject from;
+  private int         outlet;
 
-  ErmesObject itsToObject;
-  int itsInletNum;
+  private ErmesObject to;
+  private int         inlet;
 
-  ErmesSketchPad itsSketchPad;
-  FtsConnection itsFtsConnection;
+  private ErmesSketchPad sketch;
+  private FtsConnection ftsConnection;
   private boolean selected;
 
   private int startX;
@@ -33,71 +33,74 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
   private int endX;
   private int endY;
 
-  static final int UP_RIGHT = 0;
-  static final int UP_LEFT  = 0;
-  static final int DOWN_RIGHT = 0;
-  static final int DOWN_LEFT  = 0;
   private boolean down;
   private boolean right;
 
   // For info in the near function, see http://www.exaflop.org/docs/cgafaq/
 
-  private int squaredK;
+  private float length;
 
   public ErmesConnection(ErmesSketchPad theSketchPad,
 			 ErmesObject fromObj, int theOutlet,
 			 ErmesObject toObj, int theInlet,
 			 FtsConnection theFtsConnection) 
   {
-    itsFtsConnection = theFtsConnection;
-    itsFromObject    = fromObj;
-    itsToObject      = toObj;
-    itsSketchPad     = theSketchPad;
-    itsInletNum      = theInlet;
-    itsOutletNum     = theOutlet;
+    ftsConnection = theFtsConnection;
+    from    = fromObj;
+    to      = toObj;
+    sketch     = theSketchPad;
+    inlet      = theInlet;
+    outlet     = theOutlet;
     selected         = false;
   }
 
 
-  void update()
+  public void updateDimensions()
   {
-    startX = itsFromObject.getConnectionStartX( itsOutletNum);
-    startY = itsFromObject.getConnectionStartY( itsOutletNum);
-    endX   = itsToObject.getConnectionEndX( itsInletNum);
-    endY   = itsToObject.getConnectionEndY( itsInletNum);
+    startX = from.getConnectionStartX( outlet);
+    startY = from.getConnectionStartY( outlet);
+    endX   = to.getConnectionEndX( inlet);
+    endY   = to.getConnectionEndY( inlet);
 
     down  = (startX <= endX);
     right = (startY <= endY);
 
-    squaredK = 9 * ((startX - endX)*(startX - endX) + (startY - endY)*(startY - endY));
+    length = (float) Math.sqrt((startX - endX)*(startX - endX) + (startY - endY)*(startY - endY));
   }
 
-  ErmesSketchPad getSketchPad() 
-  {
-    return itsSketchPad;
-  }
 
   ErmesObject getSourceObject() 
   {
-    return itsFromObject;
+    return from;
   }
 
   ErmesObject getDestObject() 
   {
-    return itsToObject;
+    return to;
   }
 
-  
+
+  FtsConnection getFtsConnection()
+  {
+    return ftsConnection;
+  }
+
+  ErmesSketchPad getSketchPad()
+  {
+    return sketch;
+  }
+
   // Destructor
 
   void delete()
   {
-    itsFtsConnection.delete();
+    ftsConnection.delete();
 
     if (selected)
       ErmesSelection.patcherSelection.deselect(this);
+
     redraw();
-    itsSketchPad.getDisplayList().remove(this);
+    sketch.getDisplayList().remove(this);
   }
 
   //--------------------------------------------------------
@@ -117,9 +120,24 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
   boolean isNear( int x, int y)
   {
-    int z = (startY - y) * (endX - x) - (startX - x) * (endY - y);
+    float z = (float) ((startY - y) * (endX - x) - (startX - x) * (endY - y));
 
-    return (z*z < squaredK);
+    if (z > 0.0)
+      {
+	if ((z/length) < 4.0)
+	  System.err.println("Connection " + this + "close to point (" + x + "," + y + ")" + " distance " + z/length);
+      }
+    else
+      {
+	if ((z/length) > -4.0)
+	  System.err.println("Connection " + this + "close to point (" + x + "," + y + ")" + " distance " + z/length);
+      }
+
+
+    if (z > 0.0)
+      return ((z/length) < 4.0);
+    else
+      return ((z/length) > -4.0);
   }
 
   public void paint( Graphics g) 
@@ -150,15 +168,15 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
     if (down)
       {
 	if (right)
-      	  itsSketchPad.repaint(startX, startY, endX - startX, endY - startY);
+      	  sketch.repaint(startX, startY, endX - startX, endY - startY);
 	else
-	  itsSketchPad.repaint(startX, endY, endX - startX, startY - endY);
+	  sketch.repaint(startX, endY, endX - startX, startY - endY);
       }
     else
       if (right)
-	itsSketchPad.repaint(endX, startY, startX - endX, endY - startY);
+	sketch.repaint(endX, startY, startX - endX, endY - startY);
     else
-	itsSketchPad.repaint(endX, endY, startX - endX, startY - endY);
+	sketch.repaint(endX, endY, startX - endX, startY - endY);
   }
 
 
@@ -183,6 +201,17 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 		   (r.x >= startX) || (r.y >= startY));
       }
   }
+
+
+  // Print function
+
+  public String toString()
+  {
+    return ("ErmesConnection<" + from + "." + outlet + "-" +
+	    to + "." + inlet +
+	    " (" + startX + "." + startY + ")-" + length + "-(" + endX + "." + endY + ")>");
+  }
+  
 }
 
 

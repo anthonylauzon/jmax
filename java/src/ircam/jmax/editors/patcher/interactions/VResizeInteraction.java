@@ -13,23 +13,18 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class VResizeInteraction extends SubInteraction
+class VResizeInteraction extends Interaction
 {
   ErmesObject object;
 
-  VResizeInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true);
     filter.setAutoScrolling(true);
   }
 
 
-  void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     VResizeSensibilityArea area = (VResizeSensibilityArea) dobject;
 
@@ -37,19 +32,19 @@ class VResizeInteraction extends SubInteraction
       {
       case (Squeack.DOWN | Squeack.VRESIZE_HANDLE):
 	object = area.getObject();
-	engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
+	editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
 	break;
 
       case Squeack.DRAG:
 	object.redraw();
 	object.setHeight(mouse.y - object.getY());
 	object.redraw();
-	engine.getSketch().fixSize(); 
+	editor.fixSize(); 
 	break;
 
       case Squeack.UP:
-	engine.getSketch().setCursor(Cursor.getDefaultCursor());
-	end();
+	editor.setCursor(Cursor.getDefaultCursor());
+	editor.endInteraction();
       }
   }
 }

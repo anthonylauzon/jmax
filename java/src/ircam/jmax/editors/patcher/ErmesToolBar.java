@@ -111,7 +111,7 @@ public class ErmesToolBar extends JPanel  {
 	  selectedButton.setSelected(false);
 
 	selectedButton = button;
-	sketch.setAddMode();
+	sketch.setAddModeInteraction();
       }
     else
       {

@@ -9,24 +9,23 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class DeleteSelectionAction extends PatcherAction
+public class DeleteSelectionAction extends AbstractAction
 {
-  ErmesSketchWindow editor;
-
-  public DeleteSelectionAction( ErmesSketchWindow editor, int modifier, int key)
+  public DeleteSelectionAction()
   {
-    super("Delete Selection", "Delete Selection", modifier, key);
-    this.editor = editor;
+    super("Delete Selection");
   }
 
   public  void actionPerformed(ActionEvent e)
   {
-    if (! editor.isLocked())
+    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
+
+    if (! sketch.isLocked())
       {
 	ErmesSelection selection = ErmesSelection.patcherSelection;
 
-	if (selection.ownedBy(editor.itsSketchPad))
-	  if (! editor.itsSketchPad.isTextEditingObject())
+	if (selection.ownedBy(sketch))
+	  if (! sketch.isTextEditingObject())
 	    selection.deleteAll();
       }
   }

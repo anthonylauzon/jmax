@@ -14,26 +14,21 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class AddObjectInteraction extends Interaction
+class AddModeInteraction extends Interaction
 {
-  AddObjectInteraction(InteractionEngine engine)
-  {
-    super(engine);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true);
   }
 
-  void gotSqueack(int squeack, DisplayObject object, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     switch (squeack)
       {
       case Squeack.DOWN:
 	// Help
-	engine.getSketch().getToolBar().makeObject(mouse.x, mouse.y);
-	engine.setEditMode();
+	editor.getToolBar().makeObject(mouse.x, mouse.y);
+	editor.setEditModeInteraction();
 	break;
       }
   }

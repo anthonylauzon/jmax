@@ -12,18 +12,11 @@ import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 
-public class OpenAction extends PatcherAction
+public class OpenAction extends MenuAction
 {
-  JFrame         frame;
-
-  public OpenAction(JFrame frame)
+  public void doAction(ErmesSketchWindow editor)
   {
-    super("Open", "Open a Patcher", Event.CTRL_MASK, KeyEvent.VK_O);
-    this.frame = frame;
-  }
-
-  public  void actionPerformed(ActionEvent e)
-  {
+    JFrame frame = editor;
     File file = MaxFileChooser.chooseFileToOpen(frame);
 
     if (file != null)
@@ -51,7 +44,7 @@ public class OpenAction extends PatcherAction
 
 	    frame.setCursor(temp);
 	  }
-	catch (MaxDocumentException exc)
+	catch (MaxDocumentException e)
 	  {
 	    frame.setCursor(temp);
 	    new ErrorDialog(frame, e.toString());
@@ -59,3 +52,7 @@ public class OpenAction extends PatcherAction
       }
   }
 }
+
+
+
+

@@ -10,17 +10,9 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class AlignBottomAction extends PatcherAction
+public class AlignBottomAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public AlignBottomAction( ErmesSketchWindow editor)
-  {
-    super("Bottom", "Align the selection to its Bottom", Event.META_MASK, KeyEvent.VK_DOWN);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public  void doAction(ErmesSketchWindow editor)
   {
     if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
       ErmesSelection.patcherSelection.alignBottom();

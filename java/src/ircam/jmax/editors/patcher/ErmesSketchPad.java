@@ -34,8 +34,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     return displayList;
   }
 
-  private InteractionEngine engine;
-
   private KeyMap keyMap;
 
   KeyMap getKeyMap()
@@ -113,11 +111,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     defaultFontSize = v;
   }
 
-  final void doNothing() 
-  {
-    // ??? Should reset the interaction engine ???
-  }
-  
   final public ErmesSketchWindow getSketchWindow()
   {
     return itsSketchWindow;
@@ -205,6 +198,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	displayList.add( connection);
 
 	ErmesSelection.patcherSelection.select( connection);
+	connection.updateDimensions();
 	connection.redraw();
       }
   }
@@ -242,6 +236,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 					  fc);
 
 	displayList.add(connection);
+	connection.updateDimensions();
       }
   }
 
@@ -466,8 +461,21 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	object = ErmesObject.makeErmesObject( this, fo);
 	displayList.add( object);
 
+	if (object instanceof ErmesObjExternal)
+	  ((ErmesObjExternal)object).errorChanged(false);
+
 	if (object instanceof ErmesObjEditableObject)
-	  textEditObject((ErmesObjEditableObject)object);
+	  {
+	    // The EditField is not really ready until the control
+	    // is returned back to the event loop; this is why we invoke textEditObject 
+	    // with an invoke later command.
+	    
+	    final ErmesObjEditableObject obj  = (ErmesObjEditableObject)object;
+	    
+	    SwingUtilities.invokeLater(new Runnable() {
+				       public void run()
+					 { textEditObject((ErmesObjEditableObject)obj);}});
+	  }
 
 	object.redraw();
       }
@@ -646,10 +654,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   // Mode handling
   // ----------------------------------------------------------------------
 
-  void setAddMode()
-  {
-    engine.setAddMode();
-  }
 
   private boolean locked = false;
 
@@ -659,9 +663,9 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     this.locked = locked;
 
     if (isLocked())
-      engine.setRunMode();
+      setRunModeInteraction();
     else
-      engine.setEditMode();
+      setEditModeInteraction();
 
     if (isLocked())
       {
@@ -771,5 +775,31 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   void selectionChanged()
   {
     itsSketchWindow.selectionChanged();
+  }
+
+  // Support for the new Interaction Model
+
+  private InteractionEngine engine;
+
+  public void setRunModeInteraction()
+  {
+    stopTextEditing();
+    engine.setTopInteraction(Interactions.runModeInteraction);
+  }
+
+  public void setEditModeInteraction()
+  {
+    engine.setTopInteraction(Interactions.editModeInteraction);
+  }
+
+  public void setAddModeInteraction()
+  {
+    stopTextEditing();
+    engine.setTopInteraction(Interactions.addModeInteraction);
+  }
+
+  public void endInteraction()
+  {
+    engine.popInteraction();
   }
 }

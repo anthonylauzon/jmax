@@ -13,11 +13,11 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class DoubleClickEditInteraction extends Interaction
+class CtrlDoubleClickEditInteraction extends Interaction
 {
   void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
-    if (squeack == (Squeack.DOUBLE_CLICK | Squeack.OBJECT))
+    if (Squeack.onObject(squeack))
 	{
 	  ErmesObject object = (ErmesObject) dobject;
 	  
@@ -25,6 +25,16 @@ class DoubleClickEditInteraction extends Interaction
 
 	  editor.endInteraction();
 	}
+    else if (Squeack.onText(squeack))
+      {
+	{
+	  TextSensibilityArea area = (TextSensibilityArea) dobject;
+	  
+	  area.getObject().editContent();
+
+	  editor.endInteraction();
+	}
+      }
   }
 }
 

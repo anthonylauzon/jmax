@@ -10,22 +10,22 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class MoveAction extends PatcherAction
+public class MoveAction extends AbstractAction
 {
-  ErmesSketchWindow editor;
   int dx, dy;
 
-  public MoveAction( ErmesSketchWindow editor, int dx, int dy, int modifier, int key)
+  public MoveAction(int dx, int dy)
   {
-    super("Move", "Move the selection", modifier, key);
-    this.editor = editor;
+    super("Move");
     this.dx = dx;
     this.dy = dy;
   }
 
   public  void actionPerformed(ActionEvent e)
   {
-    if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
+    ErmesSketchPad sketch = (ErmesSketchPad) e.getSource();
+
+    if (ErmesSelection.patcherSelection.ownedBy(sketch))
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(ErmesObject object)
@@ -35,7 +35,7 @@ public class MoveAction extends PatcherAction
 	      object.redraw();
 	    }});
 
-	editor.itsSketchPad.fixSize();
+	sketch.fixSize();
       }
   }
 }

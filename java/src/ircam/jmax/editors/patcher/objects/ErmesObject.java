@@ -180,6 +180,17 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
       }
   }
 
+  // Special version that do not update the connections.
+
+  protected void setHeightNoConnections( int h) 
+  {
+    if (h > 0)
+      {
+	bounds.height = h;
+	itsFtsObject.setHeight( h);
+      }
+  }
+
   public Font getFont() 
   {
     return itsFont;

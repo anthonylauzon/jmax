@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class PasteAction extends PatcherAction
+public class PasteAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public PasteAction( ErmesSketchWindow editor)
-  {
-    super("Paste", "Paste the clipboard", Event.CTRL_MASK, KeyEvent.VK_V);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     editor.Paste();
   }

@@ -70,13 +70,13 @@ public class ErmesSelection implements Transferable
 
   public void select( ErmesConnection connection) 
   {
-    if (connection.itsSketchPad != owner)
-      setOwner(connection.itsSketchPad);
+    if (connection.getSketchPad() != owner)
+      setOwner(connection.getSketchPad());
 
     if (! connections.contains( connection))
       {
 	connections.addElement( connection);
-	Fts.getSelection().addConnection( connection.itsFtsConnection);
+	Fts.getSelection().addConnection( connection.getFtsConnection());
 	connection.setSelected(true);
       }
 
@@ -100,7 +100,7 @@ public class ErmesSelection implements Transferable
       {
 	connection.setSelected(false);
 	connections.removeElement( connection);
-	Fts.getSelection().removeConnection( connection.itsFtsConnection);
+	Fts.getSelection().removeConnection( connection.getFtsConnection());
 	owner.selectionChanged();
       }
   }

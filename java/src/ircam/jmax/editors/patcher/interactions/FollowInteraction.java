@@ -13,39 +13,33 @@ import ircam.jmax.editors.patcher.objects.*;
   */
 
 
-class FollowInteraction extends SubInteraction
+class FollowInteraction extends Interaction
 {
-  FollowInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true);
   }
 
-
-  void gotSqueack(int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     if (squeack == (Squeack.MOVE | Squeack.BACKGROUND))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
+      editor.setCursor(Cursor.getDefaultCursor());
     if (squeack == (Squeack.MOVE | Squeack.OBJECT))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
+      editor.setCursor(Cursor.getDefaultCursor());
     if (squeack == (Squeack.MOVE | Squeack.CONNECTION))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
+      editor.setCursor(Cursor.getDefaultCursor());
     if (squeack == (Squeack.MOVE | Squeack.HRESIZE_HANDLE))
-      engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
+      editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
     if (squeack == (Squeack.MOVE | Squeack.VRESIZE_HANDLE))
-      engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
+      editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
     if (squeack == (Squeack.MOVE | Squeack.INLET))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
+      editor.setCursor(Cursor.getDefaultCursor());
     if (squeack == (Squeack.MOVE | Squeack.OUTLET))
-      engine.getSketch().setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+      editor.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
     if (squeack == (Squeack.MOVE | Squeack.TEXT))
-      engine.getSketch().setCursor(Cursor.getDefaultCursor());
+      editor.setCursor(Cursor.getDefaultCursor());
     
-    end();
+    editor.endInteraction();
   }
 }
 

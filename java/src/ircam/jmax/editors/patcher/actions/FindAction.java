@@ -10,17 +10,9 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class FindAction extends PatcherAction
+public class FindAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public FindAction( ErmesSketchWindow editor)
-  {
-    super("Find", "Open the Find tool");
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     if (ErmesSelection.patcherSelection.isSingleton())
       {

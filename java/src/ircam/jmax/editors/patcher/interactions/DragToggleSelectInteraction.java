@@ -12,17 +12,12 @@ import ircam.jmax.editors.patcher.*;
   */
 
 
-class DragToggleSelectInteraction extends SubInteraction
+class DragToggleSelectInteraction extends Interaction
 {
   Point dragStart = new Point();
   boolean dragged = false;
 
-  DragToggleSelectInteraction(InteractionEngine engine, Interaction master)
-  {
-    super(engine, master);
-  }
-
-  void configureInputFilter(InputFilter filter)
+  void configureInputFilter(InteractionEngine filter)
   {
     // Note that following locations is false because
     // the first event is not handled by this filter,
@@ -32,7 +27,7 @@ class DragToggleSelectInteraction extends SubInteraction
     filter.setAutoScrolling(true);
   }
 
-  void gotSqueack(int squeack, DisplayObject object, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
   {
     switch (squeack)
       {
@@ -42,8 +37,8 @@ class DragToggleSelectInteraction extends SubInteraction
 
 	dragged = true;
 	dragStart.setLocation(mouse);
-	engine.getDisplayList().setDragRectangle(dragStart.x, dragStart.y, 1, 1);
-	engine.getDisplayList().toggleSelect(engine.getDisplayList().getDragRectangle());
+	editor.getDisplayList().setDragRectangle(dragStart.x, dragStart.y, 1, 1);
+	editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
 	break;
 
       case (Squeack.SHIFT | Squeack.DOWN | Squeack.BACKGROUND):
@@ -56,15 +51,15 @@ class DragToggleSelectInteraction extends SubInteraction
       case Squeack.DRAG:
 	if (dragged)
 	  {
-	    engine.getDisplayList().toggleSelect(engine.getDisplayList().getDragRectangle());
-	    engine.getDisplayList().redrawDragRectangle();
+	    editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
+	    editor.getDisplayList().redrawDragRectangle();
 	  }
 
-	engine.getDisplayList().setDragRectangle(dragStart.x, dragStart.y,
+	editor.getDisplayList().setDragRectangle(dragStart.x, dragStart.y,
 						 mouse.x - dragStart.x, mouse.y - dragStart.y);
-	engine.getDisplayList().dragRectangle();
-	engine.getDisplayList().toggleSelect(engine.getDisplayList().getDragRectangle());
-	engine.getDisplayList().redrawDragRectangle();
+	editor.getDisplayList().dragRectangle();
+	editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
+	editor.getDisplayList().redrawDragRectangle();
 	dragged = true;
 	break;
 
@@ -72,11 +67,11 @@ class DragToggleSelectInteraction extends SubInteraction
       case (Squeack.SHIFT | Squeack.UP):
 	if (dragged)
 	  {
-	    engine.getDisplayList().noDrag();
-	    engine.getDisplayList().redrawDragRectangle();
+	    editor.getDisplayList().noDrag();
+	    editor.getDisplayList().redrawDragRectangle();
 	  }
 
-	end();
+	editor.endInteraction();
 	break;
       }
   }

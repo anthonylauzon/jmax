@@ -12,8 +12,8 @@ import ircam.jmax.editors.patcher.*;
 //
 // The generic "extern" object in ermes. (example: adc1~)
 //
-class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorListener {
-
+public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorListener
+{
   private int isError = -1; // cache of the error property, to speed up paint
 
   //--------------------------------------------------------
@@ -30,7 +30,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
   public String getArgs()
   {
     // get the correct String from the object
-    return itsFtsObject.getDescription().trim();
+    return itsFtsObject.getDescription();
   }
 
   public void errorChanged(boolean value) 
@@ -42,7 +42,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
     else
       isError = 0;
 
-    redraw();// ??? 
+    redraw();
   }
 
   /* Inspector */
@@ -85,8 +85,8 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
   // Text area offset
   // ----------------------------------------
 
-  private static final int TEXT_X_OFFSET = 3;
-  private static final int TEXT_Y_OFFSET = 3;
+  private static final int TEXT_X_OFFSET = 4;
+  private static final int TEXT_Y_OFFSET = 2;
 
   public int getTextXOffset()
   {
@@ -100,7 +100,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
 
   public int getTextWidthOffset()
   {
-    return 5;
+    return 6;
   }
 
   public int getTextHeightOffset()

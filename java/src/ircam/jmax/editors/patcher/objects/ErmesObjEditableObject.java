@@ -24,17 +24,23 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   {
     super( theSketchPad, theFtsObject);
 
-    if (getWidth() == -1)
-      setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
-
     textRenderer = new TextRenderer(this);
     textRenderer.update();
+
+    if (getWidth() == -1)
+      setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
   }
 
   public void updateDimensions()
   {
     textRenderer.update();
     super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
+  }
+
+  public void updateDimensionsNoConnections()
+  {
+    textRenderer.update();
+    super.setHeightNoConnections(textRenderer.getPreferredSize().height + getTextHeightOffset());
   }
 
   // redefined from base class
@@ -64,6 +70,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   {
     super.setFont( f);
     textRenderer.setFont(f);
+    textRenderer.update();
     super.setHeight(textRenderer.getPreferredSize().height + getTextHeightOffset());
   }
 
@@ -111,7 +118,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
   static Container ic = new Panel();
 
-  protected void DrawParsedString(Graphics g) 
+  public void DrawParsedString(Graphics g) 
   {
     if (editing)
       return;

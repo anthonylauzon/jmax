@@ -9,17 +9,9 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 
-public class CopyAction extends PatcherAction
+public class CopyAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public CopyAction( ErmesSketchWindow editor)
-  {
-    super("Copy", "Copy the selection", Event.CTRL_MASK, KeyEvent.VK_C);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public  void doAction(ErmesSketchWindow editor)
   {
     editor.Copy();
   }

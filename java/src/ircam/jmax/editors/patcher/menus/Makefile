@@ -13,7 +13,7 @@
 
 
 ROOTDIR = ../../../../../../..
-PACKAGE_DIR = ircam/jmax/editors/objects/menus
+PACKAGE_DIR = ircam/jmax/editors/patcher/menus
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 

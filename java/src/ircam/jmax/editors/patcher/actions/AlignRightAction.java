@@ -10,17 +10,9 @@ import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class AlignRightAction extends PatcherAction
+public class AlignRightAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public AlignRightAction( ErmesSketchWindow editor)
-  {
-    super("Right", "Align the selection to its Right", Event.META_MASK, KeyEvent.VK_RIGHT);
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public  void doAction(ErmesSketchWindow editor)
   {
     if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
       ErmesSelection.patcherSelection.alignRight();

@@ -10,17 +10,9 @@ import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 
-public class StatisticsAction extends PatcherAction
+public class StatisticsAction extends MenuAction
 {
-  ErmesSketchWindow editor;
-
-  public StatisticsAction( ErmesSketchWindow editor)
-  {
-    super("Statistics", "Statistics a Patcher");
-    this.editor = editor;
-  }
-
-  public  void actionPerformed(ActionEvent e)
+  public void doAction(ErmesSketchWindow editor)
   {
     new StatisticsDialog(editor);
   }
