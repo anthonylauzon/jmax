@@ -375,7 +375,7 @@ FTS_API fts_metaclass_t *fts_t_connection;
   while(0)
 
 /**
- * Assignment between atoms.<br>
+ * Making an atom void.<br>
  * This macro takes care of dereferencing the atom if it was an object.
  *
  * @fn void fts_atom_void( fts_atom_t *p)

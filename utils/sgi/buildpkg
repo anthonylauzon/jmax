@@ -14,8 +14,8 @@ VERSION=`cut -f1 -d\  $ROOT_DIR/VERSION`
 DISTFILE=$ROOT_DIR/../jmax-$VERSION-src.tar.gz
 SRCROOTDIR=jmax-$VERSION
 TMP_IDB_SORTED=/tmp/$$.idb.sorted
-TMP_SPEC=/tmp/$$.spec
-SPEC_FILE=jmax.spec
+TMP_SPEC=/tmp/$$.pkgdef
+SPEC_FILE=jmax.pkgdef
 
 # ---------------------------------------------------------------------------
 help ()

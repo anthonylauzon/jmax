@@ -46,6 +46,10 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_BIGENDIAN
 
+dnl Check for lex/flex and yacc/bison
+AM_PROG_LEX
+AC_PROG_YACC
+
 dnl Check for Java compiler
 dnl AC_PROG_JAVAC
 JAVACX=javac

@@ -544,6 +544,9 @@ static int dtd_get_line( int fd, char *line, int n)
 
   return 0;
 }
+
+static void dtd_main_loop( int fd) __attribute__ ((no_check_memory_usage));
+
 static void dtd_main_loop( int fd)
 {
   DTD_DEBUG( _dbg( "DTD server running") );

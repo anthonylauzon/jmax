@@ -46,10 +46,7 @@ Changing JAVA GUI to FTS client library:
 <ul>
 <li>data models: implement a library of data models a la Swing (NumberModel and others)</li>
 <li>connection: create instance of FtsServerConnection chosen subclass and of FtsServer</li>
-<li>substitute commands by messages</li>
-<li>remove sync (used now by open and paste)</li>
 <li>remove current properties and replace by JavaBeans properties + messages</li>
-<li>reimplement updates</li>
 <li>reimplement upload mechanism</li>
 </ul>
 </p>
@@ -66,10 +63,10 @@ of these interfaces using FtsObject (as in BoundedRangeModel and DefaultBoundedR
 <p>
 FTS client library:
 <ul>
-<li> finish C++ reorganisation: split FtsServer into several classes (protocol encoder, decoder),
-remove as much references as possible, FtsValue -> FtsAtom, rewrite protocol decoder as in Java
 <li> add a protocol header that describes the protocol used, its version, gives the UDP port number,
 etc (as in HTTP, header ends with an empty line)
+<li> finish C++ reorganisation: split FtsServer into several classes (protocol encoder, decoder),
+remove as much references as possible, FtsValue -> FtsAtom, rewrite protocol decoder as in Java
 </ul>
 </p>
 
@@ -77,16 +74,6 @@ etc (as in HTTP, header ends with an empty line)
  Introduce unparsed strings in the protocol: unparsed strings are parsed
 by a simple Bison parser that accepts
 plain lists of {int, float, symbols}.
-</p>
-
-<p>
- Reimplement what is done yet with client/server properties using messages. 
-Reimplement updates using time-delayed messages (a client object that supports
-updates has a cyclic alarm, objects that want to be updated add a callback
-(fts_callback_t) to a hashtable and in the callback send a message to the
-client; the alarm handler does {update group start; call callbacks; update
-group end}). Then remove properties in the client/server communication (remove
-properties at all ???)
 </p>
 
 <p>
@@ -114,15 +101,7 @@ configuration]
 </p>
 
 <p>
-[Remove UCS]
-</p>
-
-<p>
 Separated client and server package path
-</p>
-
-<p>
-Java package loading triggered by server
 </p>
 
 <p>
@@ -189,14 +168,6 @@ plus implementation of the dot operator and may be object creation).
 <h3>Portable soundfile I/O</h3>
   
 <p>
- Put fts_soundfile_t in a separate package, that can be loaded dynamicaly
-(as audio and MIDI ports).
- Question: do we want to support several sound file access libraries simultaneously
-or not ? 
- This is related to autoconf subject.
-</p>
-
-<p>
  Do a very simple implementation of audio file access, working only for
 .wav for instance.
 </p>
@@ -204,13 +175,6 @@ or not ?
 <!-- ---------------------------------------------------------------------- -->
 <h3>Misc</h3>
   
-<p>
- Once the cache is no longer in the symbol_descriptor structure, remove
- also the "operator" field and replace it by a hash table (very simple, it
-is accessed through a macro). Then do a "typedef const char *fts_symbol_t"
-and remove fts_symbol_name().
-</p>
-
 <p>
 <a name="tasks for release 3.2"></a>
 <table width="100%" bgcolor="#ccccff" cellspacing=0 cellpadding=0>
@@ -305,11 +269,6 @@ with ALSA). Check ALSA version number.
 <!-- ---------------------------------------------------------------------- -->
 <h3>Compilation issues</h3>
   
-<p>
-Fix link command line for fts: -lfts -L??? (automake 1.5 adds automatically -L.libs,
-previous versions did not)
-</p>
-
 <p>
  Reintegrate compilation stuff for compilation date.
 </p>

@@ -70,18 +70,21 @@ $x.1 2 3 -> right operand of . has wrong type (tuple, not message)
 .sin 3.14 -> message sin to the "global" value, i.e. function
 
 
-But, big problem: how do we send messages to labels, busses, params, etc ?
+But, big problem: how do we send messages via labels, busses, params, etc ?
 
 $label start   // is it a tuple of 2 elements, an object and a symbol, or sending message start to the label
 $label.start   // OK
-$label.1 2 3   // to send to the label a tuple of 3 elements ???
-$label.1       // to send to the label an int ???
+$label.1 2 3   // to send via the label a tuple of 3 elements ???
+$label.1       // to send via the label an int ???
 
 Other possibility: distinguish label (and others) objects
 $label start   // $label is a label, it is a message
 $label 1 2 3   // idem
 $label 1       // idem
 $x 1 2 3       // $x is not a label, so this is a tuple of 4 elements
+
+
+BUT: do we need to send messages via labels ? NO !!!!????
 
 
 
