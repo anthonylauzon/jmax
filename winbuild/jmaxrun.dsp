@@ -93,5 +93,9 @@ LINK32=link.exe
 
 SOURCE=..\fts\jmax.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\jmax_ico.rc
+# End Source File
 # End Target
 # End Project

@@ -89,6 +89,10 @@ LINK32=link.exe
 # Name "fts - Win32 Debug"
 # Begin Source File
 
+SOURCE=.\jmax_ico.rc
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\main.c
 # End Source File
 # End Target
