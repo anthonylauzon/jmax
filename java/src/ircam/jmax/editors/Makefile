@@ -20,7 +20,7 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all: 
 	(cd console  ; $(MAKE) all )
-	(cd project  ; $(MAKE) all )
+	(cd control  ; $(MAKE) all )
 	(cd ermes    ; $(MAKE) all )
 .PHONY: all
 

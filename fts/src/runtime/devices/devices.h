@@ -147,6 +147,11 @@ typedef struct _fts_dev_class
 
 	  int (* get_nchans_fun)(fts_dev_t *dev);
 
+	  /* this function, if possible, should return
+	     the number of errors (overrun samples) since
+	     its last call */
+
+	  int (* get_nerrors_fun)(fts_dev_t *dev);
 	} sig_methods;
 
     }  methods;
@@ -186,6 +191,7 @@ extern fts_dev_class_t *fts_dev_class_new(fts_dev_type_t type);
 
 
 #define set_sig_dev_get_nchans_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.get_nchans_fun = (fun))
+#define set_sig_dev_get_nerrors_fun(dev_class, fun)    ((dev_class)->methods.sig_methods.get_nerrors_fun = (fun))
 
 /* Class installation and housekeeping; device classes are never un-registered */
 
@@ -258,6 +264,7 @@ extern fts_status_t fts_dev_ctrl(fts_dev_t *dev, int nargs, fts_atom_t *args);
 #define fts_sig_dev_activate(dev)           ((* ((dev)->dev_class->methods.sig_methods.activate_fun))((dev)))
 #define fts_sig_dev_deactivate(dev)         ((* ((dev)->dev_class->methods.sig_methods.deactivate_fun))((dev)))
 #define fts_sig_dev_get_nchans(dev)         ((* ((dev)->dev_class->methods.sig_methods.get_nchans_fun))((dev)))
+#define fts_sig_dev_get_nerrors(dev)         ((* ((dev)->dev_class->methods.sig_methods.get_nerrors_fun))((dev)))
 
 
 /* Logical device

@@ -236,6 +236,13 @@ void_sig_get_nchans_fun(fts_dev_t *dev)
 }
 
 
+static int
+void_sig_get_nerrors_fun(fts_dev_t *dev)
+{
+  return 0;
+}
+
+
 /*
    Create a fts_dev_class_t structure, properly initialized to null or doing nothing functions
    for all of the functions.
@@ -269,6 +276,7 @@ fts_dev_class_new(fts_dev_type_t type)
       dev_class->methods.sig_methods.activate_fun = void_dev_fun;
       dev_class->methods.sig_methods.deactivate_fun = void_dev_fun;
       dev_class->methods.sig_methods.get_nchans_fun = void_sig_get_nchans_fun;
+      dev_class->methods.sig_methods.get_nerrors_fun = void_sig_get_nerrors_fun;
       break;
     }
 

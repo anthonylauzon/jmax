@@ -24,6 +24,8 @@
 #include "lang.h"
 #include "runtime/devices/devices.h"
 
+extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
+
 /* forward declarations */
 
 static fts_status_t sgi_dac_init(void);
@@ -72,6 +74,7 @@ static fts_status_t sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *ar
 static fts_status_t sgi_dac_close(fts_dev_t *dev);
 static void         sgi_dac_put(fts_word_t *args);
 static int          sgi_dac_get_nchans(fts_dev_t *dev);
+static int          sgi_dac_get_nerrors(fts_dev_t *dev);
 
 /*
  * Channels housekeeping structure
@@ -110,6 +113,8 @@ sgi_dac_init(void)
   set_sig_dev_put_fun(sgi_dac_class, sgi_dac_put);
 
   set_sig_dev_get_nchans_fun(sgi_dac_class, sgi_dac_get_nchans);
+
+  set_sig_dev_get_nerrors_fun(sgi_dac_class, sgi_dac_get_nerrors);
 
   return fts_dev_class_register(fts_new_symbol("SgiALOut"), sgi_dac_class);
 }
@@ -318,6 +323,13 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   dev_data->dac_fmtbuf = (float *) fts_malloc(MAXVS * dev_data->nch * sizeof(float));
 
+  /* Install this device as dac slip check device;
+     this means that if multiple sgidac device are opened, the
+     last opened is checked; anyway, since all the device must
+     be syncronized, this make no difference */
+
+  fts_dsp_set_dac_slip_dev(dev);
+
   return fts_Success;
 }
 
@@ -354,13 +366,30 @@ sgi_dac_get_nchans(fts_dev_t *dev)
   return dev_data->nch;
 }
 
-/* fts_dev_t *dev, int n, float *buf1 ... bufm 
-   the device is ignored (only one device for the moment allowed)
 
+static int
+sgi_dac_get_nerrors(fts_dev_t *dev)
+{
+  sgi_dac_data_t *dev_data = (sgi_dac_data_t *) fts_dev_get_device_data(dev);
+  stamp_t al_frames;
+  stamp_t al_time;
+
+  alGetFrameTime(dev_data->port, &al_frames, &al_time);
+
+  if (al_frames > (dev_data->fts_frames + dev_data->fifo_size))
+    {
+      dev_data->fts_frames = al_frames;
+      return (int) al_frames - (dev_data->fts_frames + dev_data->fifo_size);
+    }
+  else
+    return 0;
+}
+
+
+/*
+  fts_dev_t *dev, int n, float *buf1 ... bufm 
 */
 
-#define DACSLIP_INTERVAL 700
-static int dac_slip_count = DACSLIP_INTERVAL;
 
 static void
 sgi_dac_put(fts_word_t *argv)
@@ -374,27 +403,6 @@ sgi_dac_put(fts_word_t *argv)
   int nchans, ch, inc;
 
   dev_data = fts_dev_get_device_data(dev);
-
-  {
-    /* dac slip detection */
-    dac_slip_count--;
-
-    if (dac_slip_count < 0)
-      {
-	stamp_t al_frames;
-	stamp_t al_time;
-
-	dac_slip_count = DACSLIP_INTERVAL;
-	alGetFrameTime(dev_data->port, &al_frames, &al_time);
-
-	if (al_frames > (dev_data->fts_frames + dev_data->fifo_size))
-	  {
-	    post("DAC SLIP (%d) !!!\n",
-		 (long long int) al_frames - (dev_data->fts_frames + dev_data->fifo_size));
-	    dev_data->fts_frames = al_frames;
-	  }
-      }
-  }
 
   dev_data->fts_frames += n;	/* count for the slip detection */
 

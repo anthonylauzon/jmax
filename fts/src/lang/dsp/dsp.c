@@ -22,7 +22,7 @@ extern void dsp_install_clocks(void);
 static void dsp_module_init(void);
 static void dsp_module_restart(void);
 static void dsp_module_shutdown(void);
-
+extern void fts_dsp_control_config(void);
 
 fts_symbol_t fts_s_put;
 fts_symbol_t fts_s_sig;
@@ -59,6 +59,10 @@ dsp_module_init(void)
 
   /* Make the dsp off program  */
   dsp_make_dsp_off_chain();
+
+  /* Initialize the dsp control data object */
+
+  fts_dsp_control_config();
 }
 
 
@@ -81,23 +85,36 @@ dsp_module_shutdown(void)
 static float fts_sr = 44100.0;		
 
 
-void
-fts_dsp_set_sampling_rate(float sr)
+void fts_dsp_set_sampling_rate(float sr)
 {
   fts_sr = sr;
 
 }
 
 
-float 
-fts_dsp_get_sampling_rate(void)
+float fts_dsp_get_sampling_rate(void)
 {
   return fts_sr;
 }
 
-int
-fts_dsp_get_vector_size(void)
+int fts_dsp_get_vector_size(void)
 {
   return 64;			/* soon to change, and to be device relative !!! */
 }
 
+
+
+struct fts_dev;
+typedef struct fts_dev fts_dev_t;
+
+static fts_dev_t *dac_slip_device;
+
+void fts_dsp_set_dac_slip_dev(fts_dev_t *dev)
+{
+  dac_slip_device = dev;
+}
+
+fts_dev_t * fts_dsp_get_dac_slip_dev()
+{
+  return dac_slip_device;
+}

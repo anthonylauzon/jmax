@@ -45,14 +45,15 @@ flush_all_underflows_to_zero(void)
   f.fc_word = get_fpc_csr();
   f.fc_struct.flush = 1;
   
-  /* f.fc_struct.en_invalid = 0; */
-  /* f.fc_struct.en_divide0 = 0; */
-  /* f.fc_struct.en_overflow = 0; */
-  /* f.fc_struct.en_underflow = 0; */
-  /* f.fc_struct.en_inexact = 0; */
+  f.fc_struct.en_invalid = 0;
+  f.fc_struct.en_divide0 = 0;
+  f.fc_struct.en_overflow = 0;
+  f.fc_struct.en_underflow = 0;
+  f.fc_struct.en_inexact = 0;
 
   set_fpc_csr(f.fc_word);
 }
+
 
 
 void
@@ -107,6 +108,45 @@ void fts_pause(void)
 }
 
 
+/* Return non zero if we got 
+   fpe since the last call; first call,
+   return zero.
+ */
 
+static int done_once = 0;
+
+unsigned int fts_check_fpe(void)
+{
+  unsigned int ret = 0;
+
+  union fpc_csr f;
+  f.fc_word = get_fpc_csr();
+
+  if (done_once)
+    {
+      if (f.fc_struct.se_invalid)
+	ret |= FTS_INVALID_FPE;
+      
+      if (f.fc_struct.se_divide0)
+	ret |= FTS_DIVIDE0_FPE;
+
+      if (f.fc_struct.se_overflow)
+	ret |= FTS_OVERFLOW_FPE;
+    }
+
+  /* put the flags to zero anyway */
+
+  f.fc_struct.se_invalid = 0;
+  f.fc_struct.se_divide0 = 0;
+  f.fc_struct.se_overflow = 0;
+
+  /* f.fc_struct.se_inexact = 0; */
+
+  set_fpc_csr(f.fc_word);
+
+  done_once = 1;
+
+  return ret;
+}
 
 

@@ -323,8 +323,6 @@ static void fts_intvec_export_fun(fts_data_t *d)
   fts_intvec_t *this = (fts_intvec_t *)d;
   int i;
 
-  fts_data_export(d);
-
   fts_data_start_remote_call(d, INTEGER_VECTOR_SET, 0, 0);
   fts_client_mess_add_int(this->size);
 

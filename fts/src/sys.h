@@ -11,6 +11,7 @@
   Generic include file for the sys layer.
   */
 
+#include "sys/hw.h"
 #include "sys/status.h"
 #include "sys/platform.h"
 #include "sys/mem.h"

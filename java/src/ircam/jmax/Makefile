@@ -26,7 +26,6 @@ TestWindow:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) -deprecation TestWindow.java)
 .PHONY: TestWindow
 
-
 MaxApplication:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxApplication.java)
 .PHONY: MaxApplication

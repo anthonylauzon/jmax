@@ -303,8 +303,6 @@ static void fts_objectset_export_fun(fts_data_t *d)
 
   fts_objectset_upload_objects(this);
 
-  fts_data_export(d);
-
   fts_data_remote_call(d, REMOTE_CLEAN, 0, 0);
 
   fts_data_start_remote_call(d, REMOTE_APPEND, 0, 0);

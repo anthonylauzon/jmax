@@ -243,6 +243,7 @@ public class MaxApplication extends Object
 
     ircam.jmax.editors.console.ConsoleModule.initModule();
     ircam.jmax.editors.ermes.ErmesModule.initModule();
+    ircam.jmax.editors.control.ControlModule.initModule();
     
     try
       {

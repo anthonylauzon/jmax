@@ -16,7 +16,11 @@ import java.text.*;
  *
  * If a partial parser reconize a token, it put it in the
  * instance variable parsedToken and return true. <p>
+ * 
+ * Waiting for multiple convention support, we support
+ * an almost Max 0.26 compatible lexical convention
  */
+
 
 public class FtsParse
 {
@@ -158,14 +162,7 @@ public class FtsParse
 	    (c == '(') || (c == ')') ||
 	    (c == '[') || (c == ']') ||
 	    (c == '{') || (c == '}') ||
-	    (c == '+') || (c == '-') ||
-	    (c == '*') || (c == '/') ||
-	    (c == '%') || 
-	    (c == '&') || (c == '|') ||
-	    (c == '^') || 
-	    (c == '<') || (c == '>') ||
-	    (c == '!') || (c == '=') ||
-	    (c == '?') || (c == ':') ||
+	    (c == ':') ||
 	    (c == ';') || (c == '\''));
   }
 
@@ -258,11 +255,9 @@ public class FtsParse
   {
     // The order of this list is important
 
-    String keywords[] = { "+~", "-~", "*~", "/~", "inv+~", "inv*~",
-			  "+", "-", "*", "/", "%", "(", ")",
-			  "[", "]", "{", "}", ",", "^", "&&",
-			  "&", "||", "|", "==", "=", "!=", "!", ">=",
-			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
+    String keywords[] = { "(", ")",
+			  "[", "]", "{", "}", ",", 
+			  ":", "$",
 			  ";", "'"};
 
     tryParse();
@@ -625,7 +620,7 @@ public class FtsParse
     if (value instanceof String)
       {
 	String keywords[] = {"+", "-", "*", "/", "%", 
-			     "&&", "&", "||", "|", "==", "=", "!=", "!", ">=",
+			     "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", "^",
 			     ">>", ">", "<<", "<=", "<", "?", ":" };
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -662,7 +657,7 @@ public class FtsParse
       {
 	String keywords[] = { "+", "-", "*", "/", "%", 
 			      ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=",
-			      ">>", ">", "<<", "<=", "<", "?", ":", 
+			      ">>", ">", "<<", "<=", "<", "?", ":", "^",
 			      ";" };
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -679,7 +674,7 @@ public class FtsParse
   {
     if (value instanceof String)
       {
-	String keywords[] = { "(", "[", "{", "^", 
+	String keywords[] = { "(", "[", "{", 
 			      "$", "'" };
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -695,11 +690,10 @@ public class FtsParse
 
   static private final boolean isAKeyword(String value)
   {
-    String keywords[] = { "+", "-", "*", "/", "%", "(", ")",
-			  "[", "]", "{", "}", ",", "^", "&&",
-			  "&", "||", "|", "==", "=", "!=", "!", ">=",
-			  ">>", ">", "<<", "<=", "<", "?", ":", "$",
-			  ";", "'", "+~", "-~", "*~", "/~", "inv+~", "inv*~" };
+    String keywords[] = { "(", ")",
+			  "[", "]", "{", "}", ",", 
+			  ":", "$",
+			  ";", "'" };
     
     for (int i = 0 ; i < keywords.length; i++)
       if (keywords[i].equals((String) value))
@@ -713,9 +707,8 @@ public class FtsParse
   static final private boolean includeStartToken(String s)
   {
     char chars[] = { '$', ',', '(', ')', '[', ']',
-		     '{', '}', '+', '-', '*', '/',
-		     '%', '&', '|', '^',
-		     '<', '>', '!', '=', '?', ':',
+		     '{', '}', 
+		     ':',
 		     ';', '\'', '\t', ' ' };
 
     for (int i = 0 ; i < chars.length; i++)

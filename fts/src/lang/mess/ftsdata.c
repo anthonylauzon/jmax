@@ -88,6 +88,10 @@ fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name)
 
       class->data_class_name = data_class_name;
 
+      class->export_fun = 0;
+      class->remote_constructor = 0;
+      class->remote_destructor  = 0;
+
       for (i = 0; i < FUNCTION_TABLE_SIZE; i++)
 	class->functions_table[i] = 0;
 
@@ -194,8 +198,8 @@ static void fts_data_remote_new(fts_data_t *d, int ac, const fts_atom_t *at)
       fts_set_symbol( &(a[1]), new->class->data_class_name);
       fts_data_remote_call( meta_data, REMOTE_NEW, 2, a);
 
-      (* new->class->export_fun)(new);
-
+      if (new->class->export_fun)
+	(* new->class->export_fun)(new);
     }
   else
     return;			/* error */
@@ -234,7 +238,8 @@ void fts_data_export( fts_data_t *d)
       fts_set_symbol( &(a[1]), d->class->data_class_name);
       fts_data_remote_call( meta_data, REMOTE_NEW, 2, a);
 
-      (* d->class->export_fun)(d);
+      if (d->class->export_fun)
+	(* d->class->export_fun)(d);
     }
 }
 

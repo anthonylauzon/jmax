@@ -88,6 +88,7 @@ extern fts_symbol_t fts_s_dsp_descr;
 extern float fts_dsp_get_sampling_rate(void);
 extern void  fts_dsp_set_sampling_rate(float sr);
 extern int   fts_dsp_get_vector_size(void);
+
 #endif
 
 
