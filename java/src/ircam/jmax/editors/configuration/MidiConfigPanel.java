@@ -57,6 +57,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     /*********** Table  ******************************************/
     initCellEditors();
+    defaultLabelFont = tableFont.deriveFont(Font.BOLD+Font.ITALIC);
 
     midiTable = new JTable( midiModel){
 	public TableCellEditor getCellEditor(int row, int column){
@@ -78,7 +79,10 @@ public class MidiConfigPanel extends JPanel implements Editor
 	    case 0:
 	      DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getCellRenderer(row, column);
 	      if( row == 0)
-		renderer.setForeground( Color.red);
+		renderer.setFont( defaultLabelFont);
+	      else
+		renderer.setFont( tableFont);
+
 	      return renderer;
 	    default: 
 	      return super.getCellRenderer(row, column);
@@ -120,12 +124,12 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     JComboBox sourceCombo = new JComboBox( midiMan.getSources());
     sourceCombo.setBackground( Color.white);
-    sourceCombo.setFont( (Font)UIManager.get("Table.font"));
+    sourceCombo.setFont( tableFont);
     inputCellEditor = new DefaultCellEditor( sourceCombo);
 
     JComboBox destCombo = new JComboBox( midiMan.getDestinations());
     destCombo.setBackground( Color.white);
-    destCombo.setFont( (Font)UIManager.get("Table.font"));
+    destCombo.setFont( tableFont);
     outputCellEditor = new DefaultCellEditor( destCombo);
   }
 
@@ -139,7 +143,7 @@ public class MidiConfigPanel extends JPanel implements Editor
   }
 
   public void sourcesChanged()
-  {
+  {  
     initCellEditors();
     midiTable.revalidate();
     revalidate(); 
@@ -424,6 +428,9 @@ public class MidiConfigPanel extends JPanel implements Editor
   private FtsMidiManager midiMan;
   private final int DEFAULT_WIDTH = 450;
   private final int DEFAULT_HEIGHT = 280;
+
+  private Font tableFont = (Font)UIManager.get("Table.font");
+  private Font defaultLabelFont;
 }
 
 
