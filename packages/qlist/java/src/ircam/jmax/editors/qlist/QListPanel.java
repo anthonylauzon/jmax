@@ -15,6 +15,7 @@ package ircam.jmax.editors.qlist;
 
 import java.lang.*;
 import ircam.jmax.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -23,42 +24,34 @@ import java.io.*;
 import tcl.lang.*;
 import javax.swing.*;
 
-public class QListPanel extends JPanel implements ActionListener {
+/**
+ * A panel that is able to show the content of a FtsAtomList (qlist).
+ * This component does not handle the communication with FTS, but it offers
+ * a simple API (fillContent, getText) in order to be used from outside. */
+public class QListPanel extends JPanel {
   
-  //QList itsQList;
-  FtsAtomList itsAtomList;
-  TextArea itsTextArea;
+  JTextArea itsTextArea;
   int caretPosition;
-  Button itsSetButton;
-  Button itsGetButton;
+  Dimension preferred = new Dimension(512, 412);
 
   String textToFind;
   int lastFindIndex;
 
-  public QListPanel(FtsAtomList theAtomList) 
+  /**
+   * Constructor */
+  public QListPanel() 
   { 
     super();
 
-    itsTextArea = new TextArea(40, 40);
-    caretPosition = 0;
-
-    Panel aPanel = new Panel();
-    aPanel.setLayout(new GridLayout(1, 2));
-    itsSetButton = new Button("set");
-    itsSetButton.addActionListener(this);
-    itsGetButton = new Button("get");
-    itsGetButton.addActionListener(this);
-    aPanel.add(itsSetButton);
-    aPanel.add(itsGetButton);
-    aPanel.validate();
+    itsTextArea = new JTextArea(40, 40);
+    itsTextArea.addKeyListener(KeyConsumer.controlConsumer());
+    // SGI's JTextArea bug. See utils.KeyConsumer class for details
 
     setLayout(new BorderLayout());
-    add("North", aPanel);
-
-    add("Center", itsTextArea);
+    add(BorderLayout.CENTER, new JScrollPane(itsTextArea));
+    
+    caretPosition = 0;
     validate();
-
-    itsAtomList = theAtomList;
 
     textToFind = "";
     lastFindIndex = 0;
@@ -66,56 +59,48 @@ public class QListPanel extends JPanel implements ActionListener {
     setBackground(Color.white);
   }
 
+  /**
+   * Sets the content to the given FtsAtomList object */
   public void fillContent(FtsAtomList theContent) 
   {
+    caretPosition = itsTextArea.getCaretPosition();
     itsTextArea.setText( theContent.getValuesAsText());
-
-    itsAtomList = theContent;
+    itsTextArea.requestFocus();
+    // (em) added a control to avoid setting impossible caret positions.
+    // FtsAtomList.getValueAsText() can infact reformat the text,
+    // removing CR's and then shortening its length
+    if (caretPosition <= itsTextArea.getText().length())
+      itsTextArea.setCaretPosition( caretPosition);
+    else itsTextArea.setCaretPosition(itsTextArea.getText().length());
   }
  
-  public void actionPerformed(ActionEvent e) 
-  {
-    caretPosition = itsTextArea.getCaretPosition();
-
-    if (e.getSource() == itsSetButton) 
-      {
-	itsAtomList.setValuesAsText( itsTextArea.getText());
-      }
-    else if (e.getSource() == itsGetButton) 
-      {
-	itsAtomList.forceUpdate();
-      }
-
-    //in every case, update the content
-    fillContent(itsAtomList);
-
-    itsTextArea.requestFocus();
-    itsTextArea.setCaretPosition( caretPosition);
-  }
-
   public Dimension getPreferredSize() 
   {
-    Dimension d = new Dimension(512, 412);
-    return d;
+    return preferred;
   }
 
   public Dimension getMinimumSize() 
   {
-    return getPreferredSize();
+    return preferred;
   }
 
-  // (fd) {
-  public void jumpToZero()
-  {
-    itsTextArea.setCaretPosition( 0);
-  }
-
-  public int getCaretPosition()
+  /**
+   * part of API offered to the findDialog */
+  int getCaretPosition()
   {
     return itsTextArea.getCaretPosition();
   }
 
-  public int find( String textToFind, int fromIndex)
+  /**
+   * returns the text containing in this panel. */
+  public String getText()
+  {
+    return itsTextArea.getText();
+  }
+
+  /**
+   * part of API offered to the findDialog */
+  int find( String textToFind, int fromIndex)
   {
     int index = itsTextArea.getText().indexOf( textToFind, fromIndex);
 
@@ -126,5 +111,7 @@ public class QListPanel extends JPanel implements ActionListener {
 
     return index;
   }
-  // } (fd)
 }
+
+
+
