@@ -105,13 +105,9 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 	  PatcherSaveManager.Save(sketch.getEditorContainer());
 	}
     });
-    boolean enable;
-    if(sketch.isARootPatcher())
-      enable = false;
-    else
-      enable = sketch.getDocument().isSaved();
-    toSaveButton.setEnabled(enable);
-    toSaveButton.setVisible(enable);
+
+    toSaveButton.setEnabled(false);
+    toSaveButton.setVisible(false);
 
     widgets.add( toSaveButton);
     /////////////////////
