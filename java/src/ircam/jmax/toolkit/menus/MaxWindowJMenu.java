@@ -126,7 +126,10 @@ public class MaxWindowJMenu extends JMenu implements ListDataListener
 	    toolFinder = (MaxToolFinder) toolFinders.getElementAt(i);
 	    
 	    mi = new JMenuItem(toolFinder.getToolName());
-	    add(mi);
+	    if(toolFinder.getToolName().equals("Console"))
+		insert(mi, 3);
+	    else	    
+		add(mi);
 	    mi.addActionListener(new ToolActionListener(mi, toolFinder));
 	}
 
