@@ -466,7 +466,7 @@ track_clear(track_t *track)
   /* merge track is empty */
   track->first = NULL;
   track->last = NULL;
-  track->size = NULL;
+  track->size = 0;
 }
 
 void
@@ -747,7 +747,7 @@ track_copy(track_t *org, track_t *copy)
   {
     double time = event_get_time(event);
     fts_atom_t *value = event_get_value(event);
-    fts_atom_t a;
+    fts_atom_t a = *fts_null;
     event_t *event;
     
     fts_atom_copy(value, &a);
