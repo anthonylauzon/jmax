@@ -2,14 +2,6 @@
 ## help patch declarations for the ispw standard signal classes
 ##
 
-## arithmetics (6)
-helpPatch *~ $dir/arith~.help.jmax
-helpPatch +~ $dir/arith~.help.jmax
-helpPatch -~ $dir/arith~.help.jmax
-helpPatch /~ $dir/arith~.help.jmax
-helpPatch inv*~ $dir/arith~.help.jmax
-helpPatch inv+~ $dir/arith~.help.jmax
-
 ## filters (5)
 helpPatch 2p2z~ $dir/2p2z~.help.jmax
 helpPatch 2pole~ $dir/2pole~.help.jmax

@@ -37,6 +37,8 @@ static fts_data_class_t *float_vector_data_class = 0;
 static void
 floatvec_set_size(float_vector_t *vector, int size)
 {
+  int i;
+
   if(size > vector->alloc)
     {
       if(vector->alloc)
@@ -46,6 +48,10 @@ floatvec_set_size(float_vector_t *vector, int size)
 
       vector->alloc = size;
     }
+
+  /* when shortening: zero old values */
+  for(i=size; i<vector->size; i++)
+    vector->values[i] = 0.0;
 
   vector->size = size;
 }
@@ -64,6 +70,10 @@ float_vector_new(int size)
       vector->values = (float *) fts_malloc(size * sizeof(float));
       vector->size = size;
       float_vector_zero(vector);
+
+      /* init to zero */
+      for(i=0; i<size; i++)
+	vector->values[i] = 0.0;
     }
   else
     {
@@ -106,14 +116,21 @@ float_vector_get_atoms(float_vector_t *vector, int ac, fts_atom_t *at)
 void
 float_vector_copy(float_vector_t *in, float_vector_t *out)
 {
+  int i;
+
   floatvec_set_size(out, in->size);
-  fts_vec_fcpy(in->values, out->values, in->size);
+
+  for(i=0; i<in->size; i++)
+    out->values[i] = in->values[i];
 }
 
 void
 float_vector_zero(float_vector_t *vector)
 {
-  fts_vec_fzero(vector->values, vector->size);  
+  int i;
+
+  for(i=0; i<vector->size; i++)
+    vector->values[i] = 0.0;
 }
 
 void
@@ -130,21 +147,24 @@ void
 float_vector_set_size(float_vector_t *vector, int size)
 {
   int old_size = vector->size;
-  int tail = size - old_size;
+  int i;
 
   floatvec_set_size(vector, size);
 
-  if(tail > 0)
-    fts_vec_fzero(vector->values + old_size, tail);
-  else if(tail < 0)
-    fts_vec_fzero(vector->values + size, -tail);    
+  /* when extending: zero new values */
+  for(i=old_size; i<size; i++)
+    vector->values[i] = 0.0;
 }
 
 void 
 float_vector_set_from_ptr(float_vector_t *vector, float *ptr, int size)
 {
+  int i;
+
   floatvec_set_size(vector, size);
-  fts_vec_fcpy(ptr, vector->values, size);
+
+  for(i=0; i<vector->size; i++)
+    vector->values[i] = ptr[i];
 }
 
 void

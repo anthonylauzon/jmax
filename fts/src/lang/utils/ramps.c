@@ -53,10 +53,16 @@ fts_ramp_set_target(fts_ramp_t *ramp, float target, float time, float rate)
     {
       int n_steps = (int)(0.001f * time * rate + 0.5f);
 
-      if(n_steps < 1) n_steps = 1;
-      ramp->n_steps = n_steps;
-
-      fts_ramp_value_set_target(&ramp->value, target, n_steps);
+      if(n_steps < 1) 
+	{
+	  ramp->n_steps = 0;
+	  fts_ramp_value_set(&ramp->value, target);
+	}
+      else
+	{
+	  ramp->n_steps = n_steps; 
+	  fts_ramp_value_set_target(&ramp->value, target, n_steps);
+	}
     }
   else
     {
@@ -72,22 +78,29 @@ fts_ramp_set_target_hold_and_jump(fts_ramp_t *ramp, float target, float time, fl
     {
       int n_steps = (int)(0.001f * time * rate + 0.5f);
       
-      if(n_steps < 1) n_steps = 1;
-      ramp->n_steps = n_steps;
-      
-      if(target != 0.0)
+      if(n_steps < 1)
 	{
-	  if(fts_ramp_value_get_target(&ramp->value) == 0.0)
-	    /* transition time > 0, but last target was zero: jump to new target */
-	    fts_ramp_value_set(&ramp->value, target);
-	  else
-	    /* normal transition */
-	    fts_ramp_value_set_target(&ramp->value, target, n_steps);
+	  ramp->n_steps = 0;
+	  fts_ramp_value_set(&ramp->value, target);
 	}
       else
 	{
-	  /* transition time > 0, but target is 0: hold current value (jumps to 0 when n_steps gets 0) */
-	  fts_ramp_value_set_hold(&ramp->value, 0.0);
+	  ramp->n_steps = n_steps;
+	  
+	  if(target != 0.0)
+	    {
+	      if(fts_ramp_value_get_target(&ramp->value) == 0.0)
+		/* transition time > 0, but last target was zero: jump to new target */
+		fts_ramp_value_set(&ramp->value, target);
+	      else
+		/* normal transition */
+		fts_ramp_value_set_target(&ramp->value, target, n_steps);
+	    }
+	  else
+	    {
+	      /* transition time > 0, but target is 0: hold current value (jumps to 0 when n_steps gets 0) */
+	      fts_ramp_value_set_hold(&ramp->value, 0.0);
+	    }
 	}
     }
   else
@@ -104,10 +117,16 @@ fts_ramp_set_interval(fts_ramp_t *ramp, float interval, float time, float rate)
     {
       int n_steps = (int)(0.001f * time * rate + 0.5f);
 
-      if(n_steps < 1) n_steps = 1;
-      ramp->n_steps = n_steps;
-
-      fts_ramp_value_set_interval(&ramp->value, interval, n_steps);
+      if(n_steps < 1)
+	{
+	  ramp->n_steps = 0;
+	  fts_ramp_value_add(&ramp->value, interval);
+	}
+      else
+	{
+	  ramp->n_steps = n_steps;	  
+	  fts_ramp_value_set_interval(&ramp->value, interval, n_steps);
+	}
     }
   else
     {
@@ -124,13 +143,19 @@ fts_ramp_set_slope(fts_ramp_t *ramp, float slope, float time, float rate)
       int n_steps = (int)(0.001f * time * rate + 0.5f);
 
       if(n_steps < 1) 
-	n_steps = 1;
-      ramp->n_steps = n_steps;
-
-      if(slope < 0.0f)
-	slope *= -1.0f;
-
-      fts_ramp_value_set_interval(&ramp->value, time * slope, n_steps);
+	{
+	  ramp->n_steps = 0;
+	  fts_ramp_value_freeze(&ramp->value);
+	}
+      else
+	{
+	  ramp->n_steps = n_steps;
+	  
+	  if(slope < 0.0f)
+	    slope *= -1.0f;
+	  
+	  fts_ramp_value_set_interval(&ramp->value, time * slope, n_steps);
+	}
     }
   else
     {
@@ -152,9 +177,9 @@ fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip)
 }
 
 void
-fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size)
+fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, int size)
 {
-  long i;
+  int i;
   
   if(ramp->n_steps <= 0)
     {
@@ -177,9 +202,9 @@ fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size)
 }
 
 void
-fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size)
+fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, int size)
 {
-  long i;
+  int i;
   
   if(ramp->n_steps <= 0)
     {
@@ -204,9 +229,9 @@ fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size)
 
 /*
 void
-fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size)
+fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size)
 {
-  long i;
+  int i;
   
   if(ramp->n_steps <= 0)
     {

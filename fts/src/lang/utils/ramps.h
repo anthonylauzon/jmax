@@ -40,65 +40,68 @@ typedef struct _fts_ramp_value
   double incr;
 } fts_ramp_value_t;
 
-#define fts_ramp_value_zero(ramp_value) \
+#define fts_ramp_value_zero(v) \
 ( \
-  (ramp_value)->incr = (double)0.0, \
-  (ramp_value)->current = (ramp_value)->target = (double)0.0 \
+  (v)->incr = (double)0.0, \
+  (v)->current = (v)->target = (double)0.0 \
 )
 
-#define fts_ramp_value_set(ramp_value, x) \
+#define fts_ramp_value_set(v, x) \
 ( \
-  (ramp_value)->incr = (double)0.0, \
-  (ramp_value)->current = (ramp_value)->target = (x) \
+  (v)->incr = (double)0.0, \
+  (v)->current = (v)->target = (x) \
 )
 
-#define fts_ramp_value_set_hold(ramp_value, x) \
+#define fts_ramp_value_set_hold(v, x) \
 ( \
-  (ramp_value)->incr = (double)0.0, \
-  (ramp_value)->target = (x) \
+  (v)->incr = (double)0.0, \
+  (v)->target = (x) \
 )
 
-#define fts_ramp_value_get(ramp_value) \
-  ((ramp_value)->current)
+#define fts_ramp_value_get(v) \
+  ((v)->current)
 
-#define fts_ramp_value_get_target(ramp_value) \
-  ((ramp_value)->target)
+#define fts_ramp_value_get_target(v) \
+  ((v)->target)
 
-#define fts_ramp_value_add(ramp_value, x) \
-  ((ramp_value)->current = (ramp_value)->target += (x))
+#define fts_ramp_value_add(v, x) \
+  ((v)->current = (v)->target += (x))
 
-#define fts_ramp_value_set_target(ramp_value, x, n_steps) \
+#define fts_ramp_value_set_target(v, x, n_steps) \
 ( \
-  (ramp_value)->incr = ((x) - (ramp_value)->current) / (n_steps), \
-  (ramp_value)->target = (x) \
+  (v)->incr = ((x) - (v)->current) / (n_steps), \
+  (v)->target = (x) \
 )
 
-#define fts_ramp_value_set_interval(ramp_value, x, n_steps) \
+#define fts_ramp_value_set_interval(v, x, n_steps) \
 ( \
-  (ramp_value)->incr = (x) / (n_steps), \
-  (ramp_value)->target = (ramp_value)->current + (x) \
+  (v)->incr = (x) / (n_steps), \
+  (v)->target = (v)->current + (x) \
 )
 
-#define fts_ramp_value_set_incr(ramp_value, x, n_steps) \
+#define fts_ramp_value_set_incr(v, x, n_steps) \
 ( \
-  (ramp_value)->incr = (x), \
-  (ramp_value)->target = (ramp_value)->current + n_steps * (x) \
+  (v)->incr = (x), \
+  (v)->target = (v)->current + n_steps * (x) \
 )
 
-#define fts_ramp_value_jump(ramp_value) \
+#define fts_ramp_value_jump(v) \
 ( \
-  (ramp_value)->incr = (double)0.0, \
-  (ramp_value)->current = (ramp_value)->target \
+  (v)->incr = (double)0.0, \
+  (v)->current = (v)->target \
 )
 
-#define fts_ramp_value_freeze(ramp_value) \
+#define fts_ramp_value_freeze(v) \
 ( \
-  (ramp_value)->incr = (double)0.0, \
-  (ramp_value)->target = (ramp_value)->current \
+  (v)->incr = (double)0.0, \
+  (v)->target = (v)->current \
 )
 
-#define fts_ramp_value_incr(ramp_value) \
-  ((ramp_value)->current += (ramp_value)->incr)
+#define fts_ramp_value_incr(v) \
+  ((v)->current += (v)->incr)
+
+#define fts_ramp_value_incr_by(v, n) \
+  ((v)->current += ((v)->incr * (n)))
 
 
 /*****************************************
@@ -122,18 +125,23 @@ extern void fts_ramp_set_interval(fts_ramp_t *ramp, float interval, float time, 
 extern void fts_ramp_set_slope(fts_ramp_t *ramp, float slope, float time, float rate);
 extern void fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip);
 
-#define fts_ramp_end(r) ((r)->n_steps <= 0)
+#define fts_ramp_running(r) ((r)->n_steps > 0)
 
 #define fts_ramp_get_value(r) ((r)->value.current)
 #define fts_ramp_get_incr(r) ((r)->value.incr)
+#define fts_ramp_get_steps(r) ((r)->n_steps)
 
 extern void fts_ramp_jump(fts_ramp_t *ramp);
 extern void fts_ramp_freeze(fts_ramp_t *ramp);
 extern void fts_ramp_incr(fts_ramp_t *ramp);
+extern void fts_ramp_incr_by(fts_ramp_t *ramp, int n);
 
-extern void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size);
-extern void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size);
-extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size);
+/* vector functions set with control rate (sr / n) */
+extern void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, int size);
+extern void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, int size);
+extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size);
+
+/* makro implementations */
 
 #define fts_ramp_jump(r) (fts_ramp_value_jump(&(r)->value), (r)->n_steps = 0)
 
@@ -151,6 +159,18 @@ extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *o
       (r)->n_steps = 0; \
     } \
 
+#define fts_ramp_incr_by(r, n) \
+  if((r)->n_steps > n) \
+    { \
+      fts_ramp_value_incr_by(&(r)->value, (n)); \
+      (r)->n_steps -= n; \
+    } \
+  else \
+    { \
+      fts_ramp_value_jump(&(r)->value); \
+      (r)->n_steps = 0; \
+    } \
+
 
 #define fts_ramp_vec_mul_add(r, x, y, n) \
   if((r)->n_steps <= 0) \
@@ -159,16 +179,16 @@ extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *o
       int i; \
  \
       for(i=0; i<(n); i++) \
-	(y)[i] += (x)[i] * target; \
+        (y)[i] += (x)[i] * target; \
     } \
   else \
     { \
-      float incr = (r)->value.incr / (n); \
-      float base = (r)->value.current; \
+      double incr = (r)->value.incr / (n); \
+      double value = (r)->value.current; \
       int i; \
  \
       for(i=0; i<(n); i++) \
-	(y)[i] += (x)[i] * (base + i * incr); \
+        ((y)[i] += (x)[i] * value, value += incr) \
  \
       fts_ramp_value_incr(&(r)->value); \
       (r)->n_steps--; \
