@@ -1423,7 +1423,6 @@ static void semi_infix_eval( int token, fts_atom_t *value, void *data)
 static void semi_postfix_eval( int token, fts_atom_t *value, void *data)
 {
   fts_object_t *obj;
-  fts_symbol_t selector;
   fts_atom_t *at;
   int ac;
 
@@ -1434,16 +1433,17 @@ static void semi_postfix_eval( int token, fts_atom_t *value, void *data)
 
   if ( fts_is_symbol( at))
     {
-      selector = fts_get_symbol( at);
+      fts_symbol_t selector = fts_get_symbol( at);
+
       ac--;
       at++;
+
+      fts_outlet_send( obj, 0, selector, ac, at);
     }
   else if (ac == 1)
-    selector = fts_get_selector( at);
+    fts_outlet_atom(obj, 0, at);
   else
-    selector = fts_s_list;
-
-  fts_outlet_send( obj, 0, selector, ac, at);
+    fts_outlet_atoms(obj, 0, ac, at);
 
   evalstack_pop_frame( &parser_eval_stack);
 

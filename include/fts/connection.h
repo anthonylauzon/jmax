@@ -44,19 +44,17 @@ struct fts_connection
   fts_object_t *dst;
   int winlet;
 
-  int id; /* the connection ID, when defined */
- 
   fts_symbol_t symb; /* the message cache: the symbol: if null, means anything ! */
-  fts_method_t  mth; /* the message  cache: the method */
+  fts_method_t mth; /* the message  cache: the method */
 
-  fts_connection_type_t type; /* user visible connection cathogeries */
+  fts_connection_type_t type; /* user visible connection type */
 
   fts_connection_t *next_same_dst;
   fts_connection_t *next_same_src;
 };
 
 
-FTS_API fts_connection_t *fts_connection_new(int id, fts_object_t *src, int out, fts_object_t *dst, int in, fts_connection_type_t type);
+FTS_API fts_connection_t *fts_connection_new(fts_object_t *src, int out, fts_object_t *dst, int in, fts_connection_type_t type);
 FTS_API void fts_connection_delete(fts_connection_t *conn);
 FTS_API fts_connection_t *fts_connection_get(fts_object_t *src, int out, fts_object_t *dst, int in);
 

@@ -858,7 +858,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, unsigned char *progr
 #ifdef VM_DEBUG
 	    fts_log( "CONNECT\n");
 #endif
-	    fts_connection_new(FTS_NO_ID, object_stack[object_tos], fts_get_int(&eval_stack[eval_tos]),
+	    fts_connection_new(object_stack[object_tos], fts_get_int(&eval_stack[eval_tos]),
 			       object_stack[object_tos + 1], fts_get_int(&eval_stack[eval_tos + 1]), fts_c_anything);
 	  }
 	break;

@@ -116,7 +116,7 @@ static int mempost_object( char **pp, int *psize, int offset, fts_object_t *obj)
       return n;
     }
 
-  return mempost( pp, psize, offset, "<\"%s\" #%d>", fts_object_get_class_name(obj), fts_object_get_id(obj));
+  return mempost( pp, psize, offset, "<\"%s\">", fts_object_get_class_name(obj));
 }
 
 static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_atom_t *at)

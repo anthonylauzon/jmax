@@ -68,9 +68,9 @@ print_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   print_t *this = (print_t *)o;
 
-  post("%s: {", this->prompt);
+  post("%s: (", this->prompt);
   post_atoms(ac, at);
-  post("}\n");
+  post(")\n");
 }
 
 static void

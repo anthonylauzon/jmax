@@ -25,6 +25,16 @@
 fts_metaclass_t *fts_tuple_metaclass = 0;
 
 static void
+tuple_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_tuple_t *this = (fts_tuple_t *)o;
+  
+  post("(");
+  post_atoms(fts_tuple_get_size(this), fts_tuple_get_atoms(this));
+  post(")\n");
+}
+
+static void
 tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
@@ -50,6 +60,7 @@ tuple_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tuple_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tuple_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, tuple_print);
   
   return fts_Success;
 }

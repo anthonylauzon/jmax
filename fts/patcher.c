@@ -1594,7 +1594,7 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
 
       if (to && from)
 	{
-	  connection = fts_connection_new( -1, from, outlet, to, inlet, fts_c_anything);
+	  connection = fts_connection_new(from, outlet, to, inlet, fts_c_anything);
 		  
 	  if (! connection)
 	    {

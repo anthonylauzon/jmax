@@ -83,31 +83,6 @@ append_char(char *str, const char c)
     }
 }
 
-static void
-append_blank_and_atom(char *str, const fts_atom_t *a)
-{
-  int n = strlen(str);
-  char *s = str + n;
-
-  if(fts_is_void(a))
-    snprintf(s, STRING_SIZE - n, " <void>");
-  else if(fts_is_int(a))
-    snprintf(s, STRING_SIZE - n, " %d", fts_get_int(a));
-  else if(fts_is_float(a))
-    snprintf(s, STRING_SIZE - n, " %g", fts_get_float(a));
-  else if(fts_is_symbol(a))
-    {
-      fts_symbol_t sym = fts_get_symbol(a);
-
-      if(symbol_contains_blank(sym))
-	snprintf(s, STRING_SIZE - n, " \"%s\"", sym);
-      else
-	snprintf(s, STRING_SIZE - n, " %s", sym);
-    }
-  else
-    snprintf(s, STRING_SIZE - n, " <%s>", fts_get_class(a)->name);
-}
-
 static void append_atoms(char *str, int ac, const fts_atom_t *at);
 
 static void
@@ -153,7 +128,10 @@ append_atoms(char *str, int ac, const fts_atom_t *at)
   append_atom(str, at);
   
   for(i=1; i<ac; i++)
-    append_blank_and_atom(str, at + i);
+    {
+      append_char(str, ' ');
+      append_atom(str, at + i);
+    }
   
 }
 
@@ -347,7 +325,10 @@ display_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	sprintf(this->string, "%s", s);
       
       for(i=0; i<ac; i++)
-	append_blank_and_atom(this->string, at + i);
+	{
+	  append_char(this->string, ' ');
+	  append_atom(this->string, at + i);
+	}
     }
 
   display_deliver(this);

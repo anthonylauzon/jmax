@@ -245,8 +245,16 @@ messconst_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   messconst_t *this = (messconst_t *) o;
 
-  if (ac > 0)
-    this->at[ winlet] = at[0];
+  if (ac == 1)
+    fts_atom_assign(this->at + winlet, at);
+  else
+    {
+      fts_tuple_t *t = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+
+      fts_set_object(&a, (fts_object_t *)t);
+      fts_atom_assign(this->at + winlet, &a);
+    }
 
   if (winlet == 0)
     fts_parser_eval( &this->parser, (fts_object_t *)this, this->ac, this->at);

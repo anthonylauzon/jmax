@@ -45,35 +45,39 @@
 fts_metaclass_t *fts_connection_type = 0;
 
 fts_connection_t *
-fts_connection_new(int id, fts_object_t *src, int woutlet, fts_object_t *dst, int winlet, fts_connection_type_t type)
+fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet, fts_connection_type_t type)
 {
   fts_outlet_decl_t *outlet;
   fts_inlet_decl_t *inlet;
   fts_class_mess_t *mess = 0;
   fts_connection_t *conn;
-  int invalid = 0;
+  int valid = 1;
   int anything;
 
   /* first of all, if one of the two object is an error object, add the required inlets/outlets to it */
   if (fts_object_is_error(src))
     {
-      /* don't create hidden connections between error objects */
+      /* don't create a hidden connection between error objects */
       if(type <= fts_c_hidden)
 	return NULL;
 
       fts_error_object_fit_outlet(src, woutlet);
-      invalid = 1;
+      valid = 0;
     }
   
   if (fts_object_is_error(dst))
     {
-      /* don't create hidden connections between error objects */
+      /* don't create a hidden connection between error objects */
       if(type <= fts_c_hidden)
 	return NULL;
 
       fts_error_object_fit_inlet(dst, winlet);
-      invalid = 1;
+      valid = 0;
     }
+
+  /* don't keep an invalid connection between valid objects */
+  if(valid && type == fts_c_invalid) 
+    type = fts_c_anything;
 
   /* check the outlet range (should never happen, a part from loading) */
   if (woutlet >= src->head.cl->noutlets || woutlet < 0)
@@ -124,21 +128,11 @@ fts_connection_new(int id, fts_object_t *src, int woutlet, fts_object_t *dst, in
 
   conn = (fts_connection_t *) fts_object_create(fts_connection_type, 0, 0);
 
-  conn->id = id;
   conn->src = src;
   conn->woutlet = woutlet;
   conn->dst = dst;
   conn->winlet = winlet;
-
-  /* don't change hidden connections to fts_c_invalid */
-  if(invalid && type > fts_c_hidden)
-    conn->type = fts_c_invalid;
-  else
-    conn->type = type;
-
-  /* don't keep fts_c_invalid between valid objects */
-  if(!invalid && type == fts_c_invalid)
-    conn->type = fts_c_anything;
+  conn->type = type;
 
   ((fts_object_t *)conn)->patcher = conn->src->patcher;
 
@@ -267,7 +261,7 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	{	
 	  for (p = old->out_conn[outlet]; p ;  p = old->out_conn[outlet])
 	    {
-	      fts_connection_new(p->id, new, p->woutlet, p->dst, p->winlet, p->type);
+	      fts_connection_new(new, p->woutlet, p->dst, p->winlet, p->type);
 	      fts_connection_delete(p);
 	    }
 	}
@@ -289,7 +283,7 @@ fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 	{
 	  for (p = old->in_conn[inlet]; p; p = old->in_conn[inlet])
 	    {
-	      fts_connection_new(p->id, p->src, p->woutlet, new, p->winlet, p->type);
+	      fts_connection_new(p->src, p->woutlet, new, p->winlet, p->type);
 	      fts_connection_delete(p);
 	    }
 	}

@@ -250,7 +250,7 @@ void
 fts_dsp_force_order(fts_object_t *first, fts_object_t *second)
 {
   /* create hidden order forcing connection between the two objects */
-  fts_connection_new(FTS_NO_ID, first, 0, second, 0, fts_c_order_forcing);
+  fts_connection_new(first, 0, second, 0, fts_c_order_forcing);
 }
 
 void 
