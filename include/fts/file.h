@@ -52,6 +52,32 @@ FTS_API char* fts_make_absolute_path(const char* parent, const char* file, char*
  */
 FTS_API char *fts_file_find( const char *filename, char *buf, int len);
 
+/*
+ * Find a file on a set of paths.
+ * 
+ * @fn int fts_file_find_in_path(const char* root, fts_list_t* paths, const char* filename, char* buf, int len)
+ * @param root the parent directory of the file
+ * @param paths the list of path to look into
+ * @param filename the name of the file
+ * @param buf the user allocated buffer which will contain the full path
+ * @param len the length of the buffer
+ * 
+ * @return 0 if the file was not found, 1 if file was found
+ */
+FTS_API int fts_file_find_in_path(const char* root, fts_list_t* paths, const char *filename, char* buf, int len);
+
+/** 
+ * Find a file in paths defined by the contains of an environment variable
+ * 
+ * @param root the parent directory of the file
+ * @param path the contains of environment variable
+ * @param filename the name of the file
+ * @param buf the user allocated buffer which will contain the full path
+ * @param len the length of the buffer
+ * 
+ * @return 0 if file was not found, 1 if file was found
+ */
+FTS_API int fts_file_find_in_env( const char *root, fts_symbol_t path, const char *filename, char *buf, int len);
 
 FTS_API char fts_file_separator;
 FTS_API char fts_path_separator;
