@@ -126,4 +126,4 @@ FTS_API void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *
  *
  * @ingroup client
  */
-FTS_API void fts_client_done_message( fts_object_t *obj)
+FTS_API void fts_client_done_message( fts_object_t *obj);

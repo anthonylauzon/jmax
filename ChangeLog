@@ -1,3 +1,7 @@
+2002-02-14  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* fts/: removed global object table. Object table is local to the client.
+
 2002-02-13  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* changed the java Makefiles in client/ and java/ for compiling under

@@ -40,14 +40,12 @@ unsigned int debugid = 0;
 #include <ftsprivate/doctor.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/expression.h>
-#include <ftsprivate/objtable.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/property.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/vm.h>
-
 
 /* forward declarations  */
 static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data);
@@ -510,6 +508,7 @@ fts_object_unconnect(fts_object_t *obj)
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
+#if 0
   /* if no id or object ID belongs to new client, do nothing */
   if (obj->head.id != FTS_NO_ID && !OBJECT_ID_CLIENT( obj->head.id))
     {
@@ -519,6 +518,7 @@ fts_object_unclient(fts_object_t *obj)
 	/* remove the object from the object table */
 	fts_object_table_remove(obj->head.id);
     }
+#endif
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
@@ -684,7 +684,9 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
   /* if old id and new id are the same, do the replace without telling the client */
   if ((old->head.id != FTS_NO_ID) && (old->head.id == new_id))
     {
+#if 0
       fts_object_table_remove(old->head.id);
+#endif
       old->head.id = FTS_NO_ID;
     }
 
@@ -864,6 +866,7 @@ fts_object_reset_description(fts_object_t *obj)
 void 
 fts_object_set_id(fts_object_t *obj, int id)
 {
+#if 0
   /* set the id and put the object in the object table */
   if (obj->head.id != FTS_NO_ID)
     fts_object_table_remove(obj->head.id);
@@ -873,6 +876,7 @@ fts_object_set_id(fts_object_t *obj, int id)
       obj->head.id = id;
       fts_object_table_put(id, obj);
     }
+#endif
 }
 
 /* change number of outlets */

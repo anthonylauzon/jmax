@@ -36,7 +36,6 @@ midifile.c \
 object.c \
 objectlist.c \
 objectset.c \
-objtable.c \
 package.c \
 param.c \
 patcher.c \
@@ -61,8 +60,8 @@ vm.c
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
-#fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
-fts_LDADD=-lfts @FTS_SYS_LIBS@ -lm
+fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
+#fts_LDADD=-lfts @FTS_SYS_LIBS@ -lm
 
 EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 

@@ -275,7 +275,9 @@ struct _state_t {
 typedef struct {
   int length;
   fts_symbol_t *symbols;
+#ifdef CACHE_REPORT
   int naccess, nhit;
+#endif
 } symbol_cache_t;
 
 /* The protocol decoder state */
@@ -362,9 +364,6 @@ static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
   cache->symbols[index] = s;
 }
 
-#define symbol_cache_hit(C) ((C)->nhit++)
-#define symbol_cache_access(C) ((C)->naccess++)
-
 /*----------------------------------------------------------------------
  * Binary protocol encoder
  */
@@ -395,15 +394,17 @@ static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symb
   unsigned int index;
   symbol_cache_t *cache = &encoder->to_client_cache;
 
-  symbol_cache_access(cache);
+#ifdef CACHE_REPORT
+  cache->naccess++;
+#endif
 
   index = (unsigned int)s % cache->length;
 
-  fts_log( "sending symbol %s index %u cache %p\n", s, index, cache->symbols[index]);
-
   if (cache->symbols[index] == s)
     {
-      symbol_cache_hit(cache);
+#ifdef CACHE_REPORT
+      cache->nhit++;
+#endif
 
       /* just send the index */
       push_char( encoder, FTS_PROTOCOL_SYMBOL_INDEX);
@@ -425,7 +426,12 @@ static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symb
       push_char( encoder, 0);
     }
 
-  fts_log( "symbol cache hit %d access %d\n", cache->nhit, cache->naccess);
+#ifdef CACHE_REPORT
+  if (cache->naccess % 32 == 0)
+    {
+      fts_log( "[client] output symbol cache hit: %d%%\n", ((100.0 * cache->nhit) / cache->naccess));
+    }
+#endif
 }
 
 static void protocol_encoder_write_string( protocol_encoder_t *encoder, const char *s)

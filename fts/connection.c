@@ -27,8 +27,10 @@
 #include <ftsprivate/object.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/patcher.h>
-#include <ftsprivate/objtable.h>
 #include <ftsprivate/OLDclient.h>
+
+#define fts_connection_table_put(id, conn) (id)
+#define fts_connection_table_remove(id) (id)
 
 /* Note that in this code there are error messages sent as blip;
    this is ok during editing, but the same error may occour while

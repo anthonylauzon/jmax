@@ -25,6 +25,7 @@ FTS_API void fts_object_property_changed(fts_object_t *obj, fts_symbol_t propert
 FTS_API void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
 FTS_API void fts_client_send_property(fts_object_t *obj, fts_symbol_t property);
 
+#if 0
 FTS_API void fts_client_start_clientmess(void);
 FTS_API void fts_client_add_int(int value);
 FTS_API void fts_client_add_float(float value);
@@ -32,5 +33,5 @@ FTS_API void fts_client_add_symbol(fts_symbol_t s);
 FTS_API void fts_client_add_object(fts_object_t *obj);
 FTS_API void fts_client_add_atoms(int ac, const fts_atom_t *args);
 FTS_API void fts_client_done_msg(void);
-
+#endif
 
