@@ -51,7 +51,9 @@
 <hr noshade size=1>
 
 <UL TYPE=DOT>
-  <LI><A HREF="#chapter"> Chapter </A>
+  <LI><A HREF="#connections"> Connections</A>
+  <LI><A HREF="#messages"> Messages</A>
+  <LI><A HREF="#send"> Send/Receive Objects</A>
 </UL>
 
 <p>
@@ -60,17 +62,60 @@
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=1 CELLPADDING=20 BGCOLOR=#FFFFFF>
 <TR><TD>
   
-<A NAME="chapter"> 
-<H2> Chapter </H2> 
+<A NAME="connections"> 
+<H2> Connections</H2> 
+<P>
+Connection have a client identity, they are not identified by their peers.
+When connecting with an error object, we possibly add the missing inlet/outlet.
+<P>
+Connections Cache last method called, and preload the cache if the outlet is
+typed; but this in practice no performance advantage
+<P>
+Keep the connection table by need; only edited connections have IDs, as objects.
+<P>
+Support for moving a connection without changing its client IDentity;
+in moving connections, connections are also redefined by deleting and re-instantiating
+the connection preserving the old ID if needed.
+<P>
+Trim connections support: when redefining an object, the number of
+inlets and outlets may change, so that some connection can be deleted
+as side effect;so we cut the connections before redefining an object,
+and we tell the client.
+<P>
+<A NAME="messages"> 
+<H2> Messages</H2> 
+<P>
+Optional Argument Run time checks.<br>
+Optimization by using macros accessing internal structures.<br>
+Caching of methods in connections.<br>
+Support macros for accessing arguments, and argument by names.<br>
 
+<A NAME="send"> 
+<H2>Send/Receive Objects</H2> 
+<P>
+Implementation of the send/receive objects in the kernel 
+because the DSP compiler needs to know them.
+
+<p>
+<A NAME="files"> 
+<H2> Related Files</H2> 
 <P>
 
-Blah Blah.
-<p>
+<ul> 
+<li> <code>connections.c</code>
+<li> <code>connections.h</code>
+<li> <code>messages.c</code>
+<li> <code>messages.h</code>
+<li> <code>send.c</code>
+<li> <code>send.h</code>
+</ul>
+
+</TABLE>
 
 <HR NOSHADE SIZE=1>
 
 </BODY>
 </HTML>
+
 
 

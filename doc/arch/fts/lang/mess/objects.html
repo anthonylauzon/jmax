@@ -54,7 +54,7 @@
   <LI><A HREF="#objects"> Objects </A>
   <LI><A HREF="#patchers"> Patchers</A>
   <LI><A HREF="#properties"> Properties</A>
-  <LI><A HREF="#objects"> Error Objects </A>
+  <LI><A HREF="#errors"> Error Objects </A>
 </UL>
 
 <p>
@@ -65,98 +65,335 @@
   
 <A NAME="Objects"> 
 <H2> Objects </H2> 
+<p>
+From the patch programmer point of view, an object is the elementary
+unit he use to build up a MAX program; they are the equivalent to
+basic language statement and definitions in a standard programming
+language.
+<p>
+In order to execute this program, <i>j</i>Max, as its predecessors,
+use an object oriented interpreter; each statement/definition is
+represented with an C object implemented using what we call the FTS
+message system, that have features that resemble from some point of
+view some of the characteristic of some object oriented languages
+(in the old time when you called a generic function by sending
+a message to an object).
+<p>
+"Max" messages are mapped to messages in messages to these objects,
+and executed by executing these objects methods.
+<p>
+This cover primitive <i>j</i>Max objects like "int" or "float"; but currently
+the <i>j</i>Max language is a lot richer, including the definition of new objects
+in terms of the language itself (template and old abstractions), variables
+and expressions and so on.
+<p>
+So when a user type an object description in an object box, the result
+is not always the creation of a single object, but actually can include
+much more work, like loading files, redefining other objects and so on;
+so there are two meaning in the system for <i>creating an object</i>,
+one is to process a language level object description and do all the needed
+work to add this statement to the program (implemented by the C function
+<code>fts_object_new</code>, and actually instantiating an instance of a
+class of the FTS message system (implemented by the C function 
+<code> fts_make_object</code>); these two functions are documented
+below.
+<p>
+Changing and deleting an object require also that all effects tied to
+variables are propagated in the right ways, so also these functionalities
+need to be explained.
+<p>
+One non-user visible mechanism that <i>j</i>Max define is the <i>object doctor</i>,
+essentially a macro processor for object description where macros are defined
+as C functions, and can do invisible or visible transformation on objects; quite
+usefull, for example, to keep compatibility between different version of objects
+by automatically translating the old object syntax in the new syntax.
+<p>
 
-An object: a statement, with a state; describe in a syntax (implemented as a list
-of atoms), corresponding to a number of language features.
-Extending this syntax and semantic is one of the big changes in <i>j</i>Max
-with respect to other implementation of the Max family of languages.
+<H3> Creating an FTS message system instance</H3> 
+<p>
+It is done by the <code>fts_make_object</code> function.
+<p>
+The object creation is pretty straighforward; including a call to the
+class discrimination mechanism to find the right class, allocating and
+initializing the system part of the object, adding it to the container
+patcher, and calling the object initialization (the init method).
+<p>
+Things worth to note:
+<p>
+<ul>
+<li> In <i>j</i>Max, objects know in which patcher they are; they can
+refer to the context of the patcher for various purposes, notably
+variable handling.
+<li> Patcher are not handled as standard objects, and always assigned to the
+same class; see the patcher chapter for details.
+<li> The init message is alway sent with all the checks active; see the
+message chapter for details on optional run time checks.
+<li> While the object include in its state its description (i.e. the
+text given by the user parsed as a list of atoms) this function do not
+initialize it; the description is seen has an high level functionalities,
+and is handled in the language level object creation.
+</ul>
 
-<H3> Creating an Object</H3> 
+<H3> Creating a <i>j</i>Max object</H3> 
 
-Creating an object.
+The language work is done in the <code>fts_object_new</code> function;
+given a description, a number of things in the right order need to be
+done.
 
-Two levels: fts_make_object, real object construction.
-- Finding the correct class
-- Object allocation, and initialization
-- init method
-- Supported by the set description, in order to build more complex language layers.
+<dl>
+<dt> Variable preparation
+<dd> If the object description define a variable ("foo : const 10")
+syntax, the variable need to be defined, in order to inform the
+variable propagation algorithm that we are adding a new variable in
+the local context; this action can have quite a number of side
+effects; note that the variable is defined before the object is
+created, so we don't have a value for the variable; the variable will
+be set later; this mechanism is needed to prevent loops in variable
+value propagation; see the chapter on variables for details.<p>
+<dt> Doctor
+<dd> We check now if there is a object doctor (a C coded macro) registered
+on the class name of this object; we do it here to give the macro a chance
+to change the object before the expression evaluation; but, since also
+the class name can be the result of an expression evaluation, we will need
+to retry this after the expression evaluation.
+See the paragraph on object doctors for details on what a doctor can actually
+do and how.<p>
+<dt> Expression evaluation 
+<dd> Taken away the variable definition (if any) the rest of the
+description is evaluated by the expression evaluation; every
+expression is subtituted by its value; in the process, the expression
+evaluator produce a list of the variable used in this evaluation, and
+a list of name/value pairs corresponding to the assignement syntax at
+the end of the description (corresponding to named variables for
+templates and patchers); see the expression chapter for details
+on expression evaluation.<p>
+<dt> Doctor (II)
+<dd> We re-check for doctors after the expression evaluation,
+for the reasons explained above.<p>
+<dt> Explicit templates
+<dd> We check if the class name correspond to an explicitly declared
+template, i.e. currently declared with the tcl macro <code>template</code>.
+Doing this before trying a standard FTS class allow an explictly declared 
+template to overwrite a C written class, for example a library class.<p>
+<dt> Explicit Abstractions
+<dd> If we hav'nt created the object yet, we check if the class name correspond to an explicitly declared
+abstraction, i.e. currently declared with the tcl macro
+<code>abstraction</code>.  Doing this before trying a standard FTS
+class allow an explictly declared template to overwrite a C written
+class, for example a library class.  
+<i>abstractions</i> are the Max 0.26 and FTS 1.5 abstraction
+mechanism; <i>j</i>Max can read old abstractions, but cannot save new
+ones.<p>
+<dt> If we hav'nt created the object yet, Standard FTS objects
+<dd> The <code>fts_make_object</code> function is called, to build
+a standard FTS object if the right class exists; see above.<p>
+<dt> Template on a declared template Path
+<dd> If we have not created the object yet, we check if a template with the correct
+name exists in one of the template path declared (currently template path
+are declared with the <code>templateDirectory</code> tcl command).
+Note that template on a template path do not overwrite standard FTS class;
+the reason is a matter of loading perfomance: if a template on a template path
+would overwrite an FTS class, we had to look for the template file before
+looking for the FST class for <strong>all</strong> the objects instantiations,
+with a fenomenal degradation in loading performance (a file system call
+for every template path for every object loaded).<p>
+<dt> Abstractions on a declared abstraction Path
+<dd> If we have not created the object yet, we check if a abstraction with the correct
+name exists in one of the abstraction path declared (currently abstraction path
+are declared with the <code>abstractionDirectory</code> tcl command).
+As for templates, an abstraction on an abstraction path do not overwrite standard FTS class.
+<p>
+<dt> error object 
+<dd>If we hav'nt created the object yet, create a fake error object; an error object
+is a special object that work as a place holder for all the connections, and have a special
+error properties for user interface purposes; see the Error object chapter for details.
+<p>
+<dt> Check the variable value
+<dd> In case the description define a variable, check if the object can actually
+define a variable, i.e. do export a <code>state</code> property; if it cannot,
+substitute the object with an error object.
+<p>
+<dt> set the object description 
+<dd> If the previous object creation process have not set the object description,
+assign it; for example, a doctor can have translated on the fly an object to another
+one, producing also the new description, so in this case we should not set the 
+original one.
+<p>
+<dt> register itself as user of the used variables
+Register the created object as user of the variable used in the expression evaluation;
+this links will allow the object to be redefined if some of these variables change values.
+<p>
+<dt> handle the assignements
+<p>
+Get the expression assignements and assign them to internal variables
+in case of patchers or templates, or to object properties in case of
+standard objects.
+<p>
+<dt> restore of the variable value
+<dd> now that the object exists, the state property value can be assigned
+to the defined variable (if any); this action will have as effect the redefinition
+of all the objects depending on this variable.
+<p>
+</dl>
 
-fts_object_new: language level, because it include:
-- error checking (like 0 arguments)
-- variable definition
-- Doctor (object C macro) (before and after the doctor thing)
-- explicitly declared templates
-- explicitly declared abstractions
-- Standard C objects
-- path declared pathnames
-- path declared abstractions
-- expression evaluation 
-- assignement of properties or internal variables
-
-templates, doctors, expression evaluations and so on.
-With error detection for all these
+With error detection for all these.
 
 <H3> Deleting an Object </H3> 
-
-Deleting an object.
-- Reset,
-- calling the delete method
-- calling 
+<p>
+Deleting an object.Reset, calling the delete method, freeing.<br>
 Object redefinition and recomputing
-
+<p>
 <H3> Redefining an Object </H3> 
+<p>
 Recompute: redefine with the same description, taking care
 of communicating with the client, because the recomputing is always
 a server initiative, tied to variable propagation.
-
+<p>
 Redefinitions: an object is substituted with a new one in the patcher,
 without telling the other objects or the client; connections are
 moved, id are kept.
-Handle: - variable suspend and rebind
-        - ID removing if needed
-	- reset the old object, i.e. detach it from the system
-	- make the new one
-	- fix the tables in the loading vm, in case we are loading
-	- if the new one is an error fix the nins and nouts to the
+<p>
+Handle: 
+<ul>
+<li>- variable suspend and rebind
+<li>        - ID removing if needed
+<li>	- reset the old object, i.e. detach it from the system
+<li>	- make the new one
+<li>	- fix the tables in the loading vm, in case we are loading
+<li>	- if the new one is an error fix the nins and nouts to the
 	  old one.
-	- move properties
-	- <i> Could do: move data </i>
-	- move connections
-	- complete the deleting of the old object.
+<li>	- move properties
+<li>	- <i> Could do: move data </i>
+<li>	- move connections
+<li>	- complete the deleting of the old object.
+</ul>
 
-No way to move data when redefining an object.
-
-
-Special strategy for patchers: they are not copied to new objects.
-
+No way to move data when redefining an object.<br>
+Special strategy for patchers: they are not copied to new objects,
+see below.
 <P>
-
-<A NAME="patchers"> 
-<H2> Patchers </H2> 
-Patchers change dynamically class (not meta-class),because they can
-change number of inlets and outlets; they have a completely separate
-support; special support also in fts_make_object.
-<P>
-
-<A NAME="doctors"> 
-<H2> Doctors</H2> 
-What a doctor is.
-Invisible doctors (reset_description).
-Visible doctor (macro expansion).set_description.
+<H3> Doctors</H3> 
+<p>
+What a doctor is. <br>
+Invisible doctors (reset_description). <br>
+Visible doctor (macro expansion).set_description.<br>
 Special purpose (example: expressions and fts_make_object)
 <P>
 
-<A NAME="chapter"> 
-<H2> Chapter </H2> 
 
+<A NAME="patchers"> 
+<H2> Patchers </H2> 
+<p>
+Patchers change dynamically class (not meta-class),because they can
+change number of inlets and outlets; they have a completely separate
+support; special support also in fts_make_object.
+<p>
+Relationship between inlet and outlet objects and patchers: placeholder;
+inlet just keep the connections and get rerouted message from patcher, 
+outlet reroute messages to the patcher outputs.
+<p>
+Special handling of inlets and outlets for .pat compatibility, and
+for edition; patchers keep track of in/outlets, and adapt themselves
+when inlets and outlets are added/removed.
+<p>
+They are instantiated with no ins/outs, then change class dynamically.
+Inlets can automatically position themselves, based on the next free
+slot; or the position can be given explicitly, or being "suspended",
+for inlets charged from a .pat file.
+<p>
+InOut are not redefined when the position change: they are just repositioned,
+and their description changed.
+<p>
+Patchers directly support a number of features:
+<ul>
+<li>- load init (started by load bangs), internal first
+<li>- find: look for atoms occurencies objects inside a patch
+<li>- find error: look for error objects
+<li>- recursively deleting their contents (this was not true in fts.1.5)
+</ul>
+
+Variables handling: $Args[] and by names.
+<p>
+The code support a patcher defining a variable, whose content is a scope.
+<p>
+Given their ability to change number of inlets, Patchers are used to implement abstractions,
+templates and error objects; this means that all they integrate the house keeping code 
+for template instances, for example.
+<p>
+Opening/Closing: sending updates or not; see run time.
+<p>
+Patchers have a data property, that is a patcherdata including its content,
+used to export the content of a patcher to the application layer; actually,
+a patcher editor is an editor of patcherdata; this features can be blocked
+with a special property, to make the patcher not editable.
+<p>
+Patchers have a special redefine strategy: since we don't want its content
+to be redefined; so we have to evaluate locally the expressions, and keeping
+track of the variables and everything; changing nins nouts; very complex,
+because it change the internal structure of the object, and the class,
+require deep knowledge of the class/object internal structure.
+<p>
+Dedicated support to the patcher as container.
+<p>
+Dedicated support to the traduction of .pat in/outlet y position in order position;
+loading patchers, inlets and outlets are created as object but not "registered"
+in the patcher; at the end of the loading of a patcher, a second pass find out
+the right order based on the geometrical position and assign them a position.
+<p>
+SUpport for blips.
+<p>
+Root patcher: a common super-root to all the patchers.
+<p>
+Include a doctor to convert jMax "patcher" objects in "jpatcher"; in fts 2.?.?
+we used a different representation for patchers.
 <P>
 
-<A NAME="chapter"> 
-<H2> Chapter </H2> 
-
+<A NAME="properties"> 
+<H2> Properties </H2> 
+<p>
+Object properties: for now system, and not language, features; used with the client
+mapped to Java beans properties, but used to implement all the language features
+different from the object description; for example, position and color (since we
+have a visual language, these are language and not ui feature).
+<p>
+Basic mechanism for persistency: we save description and properties of an object
+in a file.
+<p>
+Basic mechanism for real time update of scalar values: slider, and so on.
+<p>
+Standard put and get and remove<br>
+Class level put and get and remove.<br>
+Put, get and remove class Daemons.<br>
+<p>
+<i>Should have global daemons</i>
+<p>
+List of properties used in the kernel.
+<p>
+List of saved properties (mechanisms to save properties)
+<p>
+List of uploaded properties.
+<p>
+Implementation: straightforward associative list for each object, unique daemon
+list in the class, with tags for the action type.
 <P>
 
-Blah Blah.
+<A NAME="errors"> 
+<H2> Error Objects</H2> 
+
+<ul>
+<li>
+1- error and err-descr Property: error objects as seen from the ui.
+   Perfectly legal to manually put these properties, support to generate
+   them.
+   <li>
+2- "real" Error objects: patchers, with the error property set; we use
+   patchers because we can change their number of inlets and outlets,
+   and so during loading connections or redefinition have all the connection
+   to the real error obejct.
+<li>
+3- Support for automatic redefinition of all error objects after a big
+   environment change.
+</ul>
 <p>
 
 <p>
