@@ -757,8 +757,8 @@ class ErmesSketchHelper extends Object{
 		  if(!UpdatingConnSet.contains(aConnection.GetConnectionSet()))
 		    UpdatingConnSet.addElement(aConnection.GetConnectionSet());
 		}
-		itsSketchPad.SaveConnectionRgn(aConnection);
-		aConnection.GetConnectionSet().SaveRgn(aConnection);
+		//itsSketchPad.SaveConnectionRgn(aConnection);
+		//aConnection.GetConnectionSet().SaveRgn(aConnection);
 	      }
 	      else{
 		aConnection.Delete();
@@ -766,6 +766,10 @@ class ErmesSketchHelper extends Object{
 		aConnection.AutoRouting();
 		if(!UpdatingConnSet.contains(aConnection.GetConnectionSet()))
 		  UpdatingConnSet.addElement(aConnection.GetConnectionSet());
+	      }
+	      if(!aConnection.GetErrorState()){
+		itsSketchPad.SaveConnectionRgn(aConnection);
+		aConnection.GetConnectionSet().SaveRgn(aConnection);
 	      }
 	    }
 	    else aConnection.PrepareToRouting();
@@ -792,14 +796,18 @@ class ErmesSketchHelper extends Object{
 		  aConnection.AutoRouting();
 		  toUpdating = true;
 		}
-		itsSketchPad.SaveConnectionRgn(aConnection);
-		aConnection.GetConnectionSet().SaveRgn(aConnection);
+		//itsSketchPad.SaveConnectionRgn(aConnection);
+		//aConnection.GetConnectionSet().SaveRgn(aConnection);
 	      }
 	      else{
 		aConnection.Delete();
 		aConnection.PrepareToRouting();
 		aConnection.AutoRouting();
 		toUpdating = true;
+	      }
+	      if(!aConnection.GetErrorState()){
+		itsSketchPad.SaveConnectionRgn(aConnection);
+		aConnection.GetConnectionSet().SaveRgn(aConnection);
 	      }
 	    }
 	    else aConnection.PrepareToRouting();
