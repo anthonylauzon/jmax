@@ -112,6 +112,7 @@ class ErmesObjSlider extends ErmesObject {
   //***************************
 
   protected void FtsValueChanged(Object value) {
+
     int temp = ((Integer) value).intValue();
     int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
     clippedValue-=itsRangeMin;

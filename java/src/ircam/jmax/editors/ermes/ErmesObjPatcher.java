@@ -10,10 +10,7 @@ import ircam.jmax.editors.ermes.*;
 /**
  * The "patcher" graphic object. It knows the subpatchers it contains.
  */
-/* NOTE:
-This class contains a number of non-optimized code, because
-The need have arised to have this object EDITABLE soon (5 Mars 1998)
-*/
+
 public class ErmesObjPatcher extends ErmesObjEditableObject {
 
   //old variable set 

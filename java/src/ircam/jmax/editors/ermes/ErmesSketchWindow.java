@@ -100,7 +100,14 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   // the MaxDataEditor interface
 
-  public void quitEdit() {}
+  public void quitEdit() {
+    /*
+      if (itsData == null || itsData.getDataSource() == null)
+      System.err.println("asked quit for "+getTitle()+":null sources");
+      else
+      System.err.println("asked quit for "+itsData.getDataSource().toString());
+      */
+  }
   /** Tell the editor to syncronize, i.e. to store in the
    * data all the information possibly cached in the editor
    * and still not passed to the data instance; this usually
@@ -783,6 +790,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     }
     else {
       Close(true);
+      itsData.dispose();
     }
   }
 
@@ -886,6 +894,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	aExternal = (ErmesObjExternal)aObject;
 	if(aExternal.iAmPatcher){
 	  if(aExternal.itsSubWindow!=null){
+   
 	    aExternal.itsSubWindow.CloseAllSubWindows();
 	    aExternal.itsSubWindow.setVisible(false);
 	    //bug11 aExternal.itsSubWindow.dispose();

@@ -58,13 +58,16 @@ public class ErmesToolBarLayout implements LayoutManager {
       itsInset =theInset;
     }
 
+  void Test(Object o, String s) {
+    if (o==null) System.err.println(s+": puntatore nullo");
+  }
     /* Required by LayoutManager. */
     public void addLayoutComponent(String name, Component comp) {
       //the name last indicates the "fillObject"
       if (name != null && name.equals("fill")) {
 	itsFill = comp;
+	itsSpecials.put(comp, name);
       }
-      itsSpecials.put(comp, name);
       //      System.err.println("********** "+comp.getClass().getName());
     }
 

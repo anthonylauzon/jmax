@@ -24,7 +24,28 @@ import ircam.jmax.utils.*;
  * It keeps track of the toolbar state, it handles the 
  * offscreen and much, much more...
  */
-public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener{
+public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionListener, MouseListener, FtsUpdateGroupListener{
+
+  //2703...
+  public boolean isInGroup = false;
+  public boolean drawPending = false;
+  public boolean copyPending = false;
+  public void updateGroupStart() {
+    isInGroup = true;
+  }
+
+  public void updateGroupEnd() {
+    isInGroup = false;
+    if (drawPending) {
+      DrawOffScreen(getGraphics());
+    }
+    else if (copyPending) {
+      CopyTheOffScreen(getGraphics());
+    }
+      drawPending = false;
+      copyPending = false;
+  }
+  //...2703
 
   ErmesSketchWindow itsSketchWindow;
   Dimension preferredSize; 
@@ -538,7 +559,10 @@ Rectangle previousResizeRect = new Rectangle();
     //a problem has detected during loads, when the Sketch is not visible yet, and some
     //component start to paint. This problem should be insulated
     if((g!= null)&&(offScreenPresent)) {
-      g.drawImage(offImage,0,0, this);	
+      if (isInGroup || copyPending) {
+	copyPending = true;
+      }
+      else g.drawImage(offImage,0,0, this);	
     }
   }
 
@@ -565,6 +589,11 @@ Rectangle previousResizeRect = new Rectangle();
   }
   
   public void DrawOffScreen(Graphics g) {
+    if (drawPending || isInGroup) {
+      drawPending = true;
+      return;
+    }
+    
     if (editStatus == AREA_SELECT) {	//we are only painting the selection rect
       return;
     }
@@ -583,7 +612,6 @@ Rectangle previousResizeRect = new Rectangle();
       offDimension = d;
       //creare un nuovo offGraphics con le nuove dimensioni
       //e copiarci dentro l'immagine del vecchio
-      
       Image oldOffImage = offImage;
       offImage = createImage(d.width, d.height);
       offGraphics = offImage.getGraphics();
@@ -618,7 +646,8 @@ Rectangle previousResizeRect = new Rectangle();
       aConnection.Paint(offGraphics);
     }
     
-    g.drawImage(offImage,0,0, this);
+    //g.drawImage(offImage,0,0, this);
+    CopyTheOffScreen(g);
   }
   
   //--------------------------------------------------------
@@ -854,6 +883,7 @@ Rectangle previousResizeRect = new Rectangle();
   public ErmesSketchPad(ErmesSketchWindow theSketchWindow) {    
     super();
     itsHelper = new ErmesSketchHelper(this);
+    FtsServer.getServer().addUpdateGroupListener(this);
     setLayout(null);
     preferredSize = new Dimension(SKETCH_WIDTH, SKETCH_HEIGHT);
     itsSketchWindow = theSketchWindow;
@@ -1972,7 +2002,7 @@ Rectangle previousResizeRect = new Rectangle();
     }
     else if (editStatus == MOVINGSEGMENT){
       if(itsHelper.IsMovable(itsSelectedSegment)){
-	g.drawImage(offImage,0,0, this);
+	CopyTheOffScreen(g);//g.drawImage(offImage,0,0, this);
 	Rectangle aRect = itsSelectedSegment.Bounds();
 	if(itsHelper.IsHorizontal(aRect)) aRect.y+=(currentMouseY-itsStartMovingPt.y);
 	else aRect.x+=(currentMouseX-itsStartMovingPt.x);
@@ -2034,7 +2064,7 @@ Rectangle previousResizeRect = new Rectangle();
       }
     }
     RerouteAlignedObjectConnections(aConnVector, aConnSetVector);
-    repaint();
+    DrawOffScreen(getGraphics());//repaint();
   }
   
   public int MinYSelected(){

@@ -88,7 +88,7 @@ public class ErmesObject implements FtsPropertyHandler {
     // do nothing
   }
   
-  public void Paint_specific(Graphics g) {};  
+  public void Paint_specific(Graphics g) {}  
   public boolean MouseDown_specific(MouseEvent e, int x, int y) {return true;};  
   public void ChangeFont(Font theFont) {
     itsFont = theFont;
@@ -155,11 +155,13 @@ public class ErmesObject implements FtsPropertyHandler {
   protected void DoublePaint() {
     //this double paint is usefull when an object schange its state in run mode
     Graphics aGraphics = itsSketchPad.getGraphics();
-    if (aGraphics != null) {	//for some reason, the Sketch may not be visible (yet?)
+
+    if (aGraphics != null) {	
       Paint(aGraphics);	
     }
 
-    if (itsSketchPad.offScreenPresent) Paint(itsSketchPad.GetOffGraphics());
+    if (itsSketchPad.offScreenPresent)
+      Paint(itsSketchPad.GetOffGraphics());
   }
 	
   // This method is called during the inits

@@ -17,10 +17,10 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
   
   
   public ErmesObjIntegerDialog(Frame theFrame) {
-    super(theFrame, "Integer setting", true);
+    super(theFrame, "Integer setting", false);
     
     itsParent = theFrame;
-    setLayout(new BorderLayout());
+    setLayout(new BorderLayout()); 
     
     //Create north section.
     Panel p1 = new Panel();
