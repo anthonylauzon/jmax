@@ -73,3 +73,4 @@ public class IntegerTrackEditor extends MonoTrackEditor
     static public final int BREAK_POINTS_VIEW = 4;
 }
 
+

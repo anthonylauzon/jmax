@@ -43,13 +43,13 @@ public class MoveMonoTrackToAction extends EditorAction
   int position;
   public  void actionPerformed(ActionEvent e)
   {
-    position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue()-1;
-    super.actionPerformed(e);
+      position = Integer.valueOf(((JMenuItem)e.getSource()).getText()).intValue()-1;
+      super.actionPerformed(e);
   }
 
   public void doAction(EditorContainer container)
   {
-    ((SequencePanel)container.getEditor()).moveTrackTo( MonoTrackPopupMenu.getPopupTarget(), position);    
+      ((SequencePanel)container.getEditor()).moveTrackTo( MonoTrackPopupMenu.getPopupTarget(), position);    
   }
 }
 

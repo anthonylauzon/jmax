@@ -59,7 +59,8 @@ public class MessageTrackEditor extends MonoTrackEditor
 	    public void widthChanged(int width)
 	    {
 		int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
-		currentEvt.setProperty("duration", new Integer(lenght));
+		//currentEvt.setProperty("duration", new Integer(lenght));
+		currentEvt.setProperty("duration", new Double(lenght));
 		
 		int time = (int)currentEvt.getTime()+lenght;
 		gc.getScrollManager().scrollIfNeeded(time+((PartitionAdapter)gc.getAdapter()).getInvWidth(20));
@@ -230,7 +231,8 @@ public class MessageTrackEditor extends MonoTrackEditor
 		height = MessageValue.DEFAULT_HEIGHT;		
 		    
 	    int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
-	    evt.setProperty("duration", new Integer(lenght));
+	    //evt.setProperty("duration", new Integer(lenght));
+	    evt.setProperty("duration", new Double(lenght));
 	    evt.setProperty("height", new Integer(height));
 	}
     }

@@ -59,8 +59,6 @@ noteevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_set_float(a + 0, event_get_time(&this->head));
   fts_set_symbol(a + 1, noteevt_symbol);
   fts_set_int(a + 2, this->pitch);
-
-  /*fts_set_int(a + 3, (int)(this->duration)); @@@@@*/
   fts_set_float(a + 3, this->duration);
 
   fts_client_upload(o, event_symbol, 4, a);
@@ -149,3 +147,6 @@ noteevt_config(void)
 
   fts_class_install(noteevt_symbol, noteevt_instantiate);
 }
+
+
+

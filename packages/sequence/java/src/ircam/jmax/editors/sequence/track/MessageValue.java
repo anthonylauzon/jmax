@@ -110,7 +110,8 @@ public class MessageValue extends AbstractEventValue
 			
 			width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
 		    }
-		setProperty("duration", new Integer(width));
+		//setProperty("duration", new Integer(width));
+		setProperty("duration", new Double(width));
 		setProperty("height", new Integer(height));
 	    }
     }
@@ -150,7 +151,10 @@ public class MessageValue extends AbstractEventValue
 	    {
 		//for the undo/redo
 		evt.setProperty("message", text);
-		evt.setProperty("duration", new Integer(width));
+		
+		//evt.setProperty("duration", new Integer(width));
+		evt.setProperty("duration", new Double(width));
+		
 		evt.setProperty("height", new Integer(height));
 		Object[] obj = {text};
 		evt.sendThisMessage("set_from_string", info.getName(), 1, obj);
@@ -158,7 +162,10 @@ public class MessageValue extends AbstractEventValue
 	else
 	    {
 		setProperty("message", text);
-		setProperty("duration", new Integer(width));
+		
+		//setProperty("duration", new Integer(width));
+		setProperty("duration", new Double(width));
+		
 		setProperty("height", new Integer(height));
 	    }
     }
@@ -193,7 +200,8 @@ public class MessageValue extends AbstractEventValue
 
 	 width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
 	
-	 setProperty("duration", new Integer(width));
+	 //setProperty("duration", new Integer(width));
+	 setProperty("duration", new Double(width));
     }
 
     public ValueInfo getValueInfo() 

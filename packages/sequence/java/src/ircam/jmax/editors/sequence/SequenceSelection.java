@@ -295,8 +295,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	else removeSelectionInterval(i, i);
 	}*/
       //deselectAll();
-      select(spec);
-    
+      select(spec);    
   }
   public void objectsAdded(int maxTime) {}
 

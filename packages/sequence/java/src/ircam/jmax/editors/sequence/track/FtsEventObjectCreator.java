@@ -15,17 +15,18 @@ public class FtsEventObjectCreator implements FtsObjectCreator
     {
 	double time = (double)args[0].getFloat();
 	String valueType = args[1].getString();
-	
-	for(int i = 0; i<nArgs-2; i++)
+
+	for(int i = 0; i< nArgs-2; i++)
 	    {
 		Object obj = args[2+i].getValue();
-		if(obj instanceof Float) obj = new Double((double)((Float)obj).floatValue());
+		if(obj instanceof Float) //obj = new Double((double)((Float)obj).floatValue());
+		  obj = new Double(((Float)obj).doubleValue());
 		evtArgs[i] = obj;
 	    }
 
 	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(valueType).newInstance());
 	evtValue.setPropertyValues(nArgs-2, evtArgs);
-	
+
 	return new TrackEvent(fts, time, evtValue);
     }
 }

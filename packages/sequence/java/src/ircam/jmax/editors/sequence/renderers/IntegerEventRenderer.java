@@ -234,3 +234,4 @@ public class IntegerEventRenderer implements ObjectRenderer {
     public final static int INTEGER_WIDTH = 2;
     public final static int POINT_RADIUS = /*4*/5;
 }
+

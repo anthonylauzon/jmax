@@ -140,8 +140,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     sendArgs[1].setString(type);
       
     for(int i=0; i<nArgs; i++)
-	sendArgs[2+i].setValue(args[i]);
-
+      {
+	if(args[i] instanceof Double)
+	    sendArgs[2+i].setFloat(((Double)args[i]).floatValue());
+	else
+	  sendArgs[2+i].setValue(args[i]);
+      }
     sendMessage(FtsObject.systemInlet, "event_add", 2+nArgs, sendArgs);
   }
   
@@ -150,8 +154,15 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     sendArgs[0].setFloat(time); 
     sendArgs[1].setString(type);
       
+    /*for(int i=0; i<nArgs; i++)
+      sendArgs[2+i].setValue(args[i]);*/
     for(int i=0; i<nArgs; i++)
-	sendArgs[2+i].setValue(args[i]);
+      {
+	if(args[i] instanceof Double)
+	  sendArgs[2+i].setFloat(((Double)args[i]).floatValue());
+	else
+	  sendArgs[2+i].setValue(args[i]);
+      }
 
     sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
   }
@@ -361,7 +372,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	
 	makeRoomAt(index);
 	events[index] = event;
-		
+
 	notifyObjectAdded(event, index);
 	
 	if (isInGroup())     

@@ -31,7 +31,7 @@ public class AmbitusValue extends AbstractEventValue
 	properties.put((String) e.nextElement(), DEFAULT_PROPERTY);
       }
     
-    setProperty("duration", /*new Integer(100)*/new Double(100.0));//*@*//
+    setProperty("duration", new Double(100.0));
     setProperty("ambitus", new Integer(0));
   }
 
@@ -156,9 +156,8 @@ public class AmbitusValue extends AbstractEventValue
 
     public boolean samePropertyValues(Object args[])
     {
-	return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
-		/*(((Integer)getProperty("duration")).intValue() == ((Integer)args[1]).intValue())*/
-		(((Double)getProperty("duration")).doubleValue() == ((Double)args[1]).doubleValue()));//*@*// 
+      return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
+	      (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()));
     }
 
   //--- Fields

@@ -57,7 +57,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
 	    public void objectAdded(Object whichObject, int index) {
 		updateNewObject(whichObject);
-		MonoTrackEditor.this.repaint();
+		MonoTrackEditor.this.repaint();			
 	    }
 	    public void objectsAdded(int maxTime) {
 		MonoTrackEditor.this.repaint();
