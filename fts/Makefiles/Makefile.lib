@@ -42,9 +42,6 @@
 #
 # LD         : Linker command to use; define in the global Makefile.$(ARCH), default to cc.
 #
-# RANLIB     : ranlib command to use, if needed; define in the global Makefile.$(ARCH); default
-#              to a void command                
-#
 # SYSLIB     : system libraries to use; to define in the local makefiles of the module
 #                where the linking happen (either ARCH or whatever) and not here; here we provide FTS_SYS_LIBS,
 #                that are the equivalent for FST only executables.
@@ -85,7 +82,6 @@
 
 CC = cc
 AR = ar
-RANLIB = @$(DISTDIR)/scripts/void
 AS = as
 LD = cc
 LD_ALL_FLAG = -all

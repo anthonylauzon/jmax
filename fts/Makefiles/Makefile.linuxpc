@@ -25,11 +25,11 @@ OS_TYPE := unix
 # Standard gcc
 
 CC := gcc
-#CC := gcc-2.8
-ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused -DLINUX -DLINUXPC 
-#ARCH_OPT_CFLAGS := -O6 -funroll-loops -fomit-frame-pointer -ffast-math
-#ARCH_OPT_CFLAGS := -O2 -fno-defer-pop -fomit-frame-pointer -ffast-math
-ARCH_OPT_CFLAGS := 
+# These flags are quite strict and give a lot of warning. But they are safe
+#ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused -DLINUX -DLINUXPC 
+# For now, we use
+ARCH_CFLAGS :=  -pipe -Wall -W -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wstrict-prototypes -Wno-unused -DLINUX -DLINUXPC 
+ARCH_OPT_CFLAGS := -O2
 LD := gcc
 ARCH_LDFLAGS := -rdynamic  
 
@@ -38,11 +38,13 @@ ARCH_LDFLAGS := -rdynamic
 
 #CC := pentium-gcc
 #LD := pentium-gcc
-ARCH_CFLAGS := -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
-ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
-ARCH_LDFLAGS := -rdynamic
-ARCH_OPT_LDFLAGS := 
+#ARCH_CFLAGS := -pipe -Wall -Wno-unused -DLINUX -DLINUXPC
+#ARCH_OPT_CFLAGS := -O6 -mpentiumpro -funroll-all-loops  -mstack-align-double
+#ARCH_LDFLAGS := -rdynamic
+#ARCH_OPT_LDFLAGS := 
 
+# gcc 2.8
+#CC := gcc-2.8
 
 # Common to gcc and Pentium gcc
 LD_ALL_FLAG := --whole-archive
