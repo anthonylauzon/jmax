@@ -47,6 +47,7 @@
 
  */
 
+
 #include "sys.h"
 #include "lang/mess.h"
 
@@ -795,6 +796,7 @@ struct changes
 
 static fts_heap_t changes_heap;
 static struct changes *changes_queue_head = 0;
+static struct changes *urgent_changes_queue_head = 0;
 
 /* return 1 if there are changes, zero otherwise */
 
@@ -811,6 +813,30 @@ fts_object_get_next_change(fts_symbol_t *property, fts_object_t **object)
       *object   = p->obj;
 
       changes_queue_head = p->next;
+
+      fts_heap_free((char *)p, &changes_heap);
+
+      return 1;
+    }
+  else
+    return 0;
+}
+
+/* return 1 if there are changes in the urgent queue, zero otherwise */
+
+int
+fts_object_get_next_change_urgent(fts_symbol_t *property, fts_object_t **object)
+{  
+  if (urgent_changes_queue_head)
+    {
+      struct changes *p;
+
+      p = urgent_changes_queue_head;
+
+      *property = p->property;
+      *object   = p->obj;
+
+      urgent_changes_queue_head = p->next;
 
       fts_heap_free((char *)p, &changes_heap);
 
@@ -851,6 +877,37 @@ fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
     changes_queue_head = p;
 }
 
+void
+fts_object_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
+{
+  struct changes *p;
+  struct changes *last = 0;
+
+  /* check if the object is already in the evsched list */
+
+  for (p = urgent_changes_queue_head; p; last = p, p = p->next)
+    if ((p->obj == obj) && p->property == property)
+      return;
+
+  /* 
+     Here, if last is not null, is the last element of the list;
+     if it is null, there are no element in the list.
+   */
+
+  p = (struct changes *)fts_heap_alloc(&changes_heap);
+
+  p->property = property;
+  p->obj = obj;
+  p->next = 0;
+
+  /* add the new queue element to the end of the list */
+
+  if (last)
+    last->next = p;
+  else
+    urgent_changes_queue_head = p;
+}
+
 /* By using the fts_object_ui_property_changed function, an object declare
    that the changed property is a User Interface related matter, and this
    allow optimization like not registering the property change if the corresponding
@@ -859,13 +916,20 @@ fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
  */
 
 
-#include <stdio.h>		/* @@@ */
+
 
 void
 fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property)
 {
   if (fts_object_patcher_is_open(obj))
       fts_object_property_changed(obj, property);
+}
+
+void
+fts_object_ui_property_changed_urgent(fts_object_t *obj, fts_symbol_t property)
+{
+  if (fts_object_patcher_is_open(obj))
+      fts_object_property_changed_urgent(obj, property);
 }
 
 
@@ -880,6 +944,26 @@ fts_object_reset_changed(fts_object_t *obj)
 {
   struct changes **pp;		/* indirect precursor  */
   struct changes *p;		/* found element */
+
+  /* Do it again for the urgent queue */
+
+  pp = &urgent_changes_queue_head;
+
+  while (*pp)
+    {
+      if ((*pp)->obj == obj)
+	{
+	  p = (*pp);
+
+	  (*pp) = (*pp)->next;
+
+	  fts_heap_free((char *)p, &changes_heap);
+	}
+      else
+	pp = &((*pp)->next);
+    }
+
+  /* Do it again for the standard queue */
 
   pp = &changes_queue_head;
 

@@ -12,4 +12,9 @@ objtable.c	\
 patcher.c	\
 properties.c	\
 symbols.c	\
-send.c
+send.c          \
+patlex.c        \
+patparser.c     \
+abstractions.c
+
+

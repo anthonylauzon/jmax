@@ -28,12 +28,8 @@ public class FtsDotPatParser
 
     final void setRange(FtsDotPatTokenizer in) throws java.io.IOException
     {
-      int n;
-
       in.nextToken();
-      n = in.getNVal();
-
-      range = n;
+      range = in.getNVal();
     }
 
     final void setFontIndex(FtsDotPatTokenizer in) throws java.io.IOException
@@ -119,8 +115,6 @@ public class FtsDotPatParser
 
     FtsContainerObject obj;
 
-    Thread.yield(); 
-
     obj = new FtsPatcherObject(server.getRootObject());
 
     try
@@ -143,6 +137,7 @@ public class FtsDotPatParser
     obj.put("autorouting", "off"); // compatibility with old stuff
     obj.loaded();	// activate the post-load init, like loadbangs
 
+    in.close();
     return obj;
   }
 
@@ -217,8 +212,6 @@ public class FtsDotPatParser
 
 	while (in.ttype != FtsDotPatTokenizer.TT_EOF)
 	  {
-	    Thread.yield();  // ???
-
 	    in.nextToken(); 
 
 	    if (in.sval.equals("#N"))
@@ -414,10 +407,6 @@ public class FtsDotPatParser
   {
     FtsDotPatTokenizer in = null; 
 
-    // Yield 
-
-    Thread.yield();
-
     // open the file
     
     try
@@ -570,7 +559,7 @@ public class FtsDotPatParser
 
     // get the graphic information
 
-    graphicDescr = parseGraphic(in, objclass);
+    graphicDescr = parseGraphic(in);
 
     if (objclass.equals("slider"))
       {
@@ -768,7 +757,7 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
 
-  static FtsGraphicDescription parseGraphic(FtsDotPatTokenizer in, String name) throws java.io.IOException, FtsException
+  static FtsGraphicDescription parseGraphic(FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
 
     FtsGraphicDescription g = new FtsGraphicDescription();

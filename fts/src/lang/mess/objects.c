@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.8 $ IRCAM $Date: 1998/03/27 16:10:16 $
+ *      $Revision: 1.9 $ IRCAM $Date: 1998/04/02 16:21:55 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -17,6 +17,9 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
+#include "lang/mess/abstractions.h"
+
+
 extern void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at); /* @@@ */
 static fts_heap_t connection_heap;
 
@@ -77,8 +80,13 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   cl = fts_class_instantiate(ac, at);
 
+  /* Class not found, try with old style abstraction (temporary !!!) */
+
   if (! cl)
-    return 0;
+    {
+      fprintf(stderr, "Class not found, trying abstraction\n");	/* @@@ */
+      return fts_abstraction_new(patcher, ac, at);
+    }
 
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
   obj->cl = cl;

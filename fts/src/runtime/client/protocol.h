@@ -32,7 +32,7 @@ are the same, so the users can add as many message type as they want.
 
 /* Command defined for the FOS subsystem  */
 
-
+#define SAVE_PATCHER_CODE       'S'
 #define OPEN_PATCHER_CODE       'O'
 #define CLOSE_PATCHER_CODE      'C'
 #define PATCHER_LOADED_CODE     'L'

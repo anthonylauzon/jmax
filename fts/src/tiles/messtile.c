@@ -134,6 +134,38 @@ trace_mess(const char *msg, int ac, const fts_atom_t *av)
 /*                                                                            */
 /******************************************************************************/
 
+/*    SAVE_PATCHER   (obj)p (sym)filename
+
+      Save the patcher in a bmax binary file.
+ */
+
+static void
+fts_mess_client_save_patcher(int ac, const fts_atom_t *av)
+{
+  trace_mess("Received save patcher ", ac, av);
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_symbol(&av[1]))
+    {
+      fts_object_t *patcher;
+      fts_symbol_t filename;
+      fts_bmax_file_t *f;
+
+      patcher = (fts_object_t *) fts_get_object(&av[0]);
+      filename = fts_get_symbol(&av[1]);
+
+      if (patcher)
+	{
+	  f = fts_open_bmax_file_for_writing(fts_symbol_name(filename));
+	  fts_bmax_code_new_patcher(f, patcher);
+	  fts_close_bmax_file(f);
+	}
+      else
+	post_mess("System Error in FOS message OPEN PATCHER: null patcher", ac, av);
+    }
+  else
+    post_mess("System Error in FOS message OPEN PATCHER: bad args", ac, av);
+}
+
 /*    OPEN_PATCHER   (obj)p
 
       Send to the patcher the message "open". (system inlet)
@@ -590,6 +622,7 @@ fts_mess_client_get_prop(int ac, const fts_atom_t *av)
 static void
 fts_messtile_install_all()
 {
+  fts_client_mess_install(SAVE_PATCHER_CODE, fts_mess_client_save_patcher);
   fts_client_mess_install(OPEN_PATCHER_CODE, fts_mess_client_open_patcher);
   fts_client_mess_install(CLOSE_PATCHER_CODE, fts_mess_client_close_patcher);
   fts_client_mess_install(PATCHER_LOADED_CODE,  fts_mess_client_patcher_loaded);

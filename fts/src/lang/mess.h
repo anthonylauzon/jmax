@@ -9,7 +9,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/03/27 16:10:11 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/04/02 16:21:51 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -28,6 +28,10 @@ extern fts_module_t fts_mess_module;
 #include "mess/events.h"
 #include "mess/send.h"
 #include "mess/objtable.h"
+#include "mess/vm.h"
+#include "mess/loader.h"
+#include "mess/saver.h"
+#include "mess/patparser.h"
 
 #endif
 

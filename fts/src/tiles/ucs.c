@@ -47,6 +47,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 #include "sys.h"
 #include "lang.h"
@@ -559,6 +560,105 @@ fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
+/* Loading commands */
+
+static fts_status_t
+fts_ucs_load_pat_file(int argc, const fts_atom_t *argv)
+{
+  if ((argc == 1)  && fts_is_symbol(&argv[0]))
+    {
+      fts_symbol_t file = fts_get_symbol(&argv[0]);
+      struct timeval before;
+      struct timeval after;
+      long dsec, dusec;
+      fts_object_t *ret;
+      fts_atom_t description[4];
+      fts_object_t *patcher;	/* foo !!! */
+      
+      fts_set_symbol(&description[0], fts_new_symbol("patcher"));
+      fts_set_symbol(&description[1], fts_new_symbol("unnamed"));
+      fts_set_int(&description[2], 0);
+      fts_set_int(&description[3], 0);
+      patcher = fts_object_new(0, FTS_NO_ID, 4, description);
+
+      /* Get the current time of the day */
+
+      gettimeofday(&before, 0); /* 0 is for compatibility with BSD */
+
+      fprintf(stderr, "Loading pat file %s\n", fts_symbol_name(file));
+
+      ret = importPatcher(patcher, fts_symbol_name(file));
+
+      fprintf(stderr, "Loaded pat file %s\n", fts_symbol_name(file));
+
+      if (ret == 0)
+	fprintf(stderr, "Error loading pat file %s\n", fts_symbol_name(file));
+
+      gettimeofday(&after, 0); /* 0 is for compatibility with BSD */
+
+      /* Compute the difference */
+  
+      dsec = after.tv_sec - before.tv_sec;
+
+      if (after.tv_usec > before.tv_usec)
+	dusec = after.tv_usec - before.tv_usec;
+      else
+	{
+	  dsec--;
+	  dusec = 1000000 + after.tv_usec - after.tv_usec;
+	}
+
+      post("Loaded file %s in %d sec %d usec\n", fts_symbol_name(file), dsec, dusec);
+      fprintf(stderr, "Loaded file %s in %d sec %d usec\n", fts_symbol_name(file), dsec, dusec);
+    }
+
+  return fts_Success;
+}
+
+
+static fts_status_t
+fts_ucs_load_bmax_file(int argc, const fts_atom_t *argv)
+{
+  if ((argc == 1)  && fts_is_symbol(&argv[0]))
+    {
+      fts_symbol_t file = fts_get_symbol(&argv[0]);
+      struct timeval before;
+      struct timeval after;
+      long dsec, dusec;
+      int ret;
+
+      /* Get the current time of the day */
+
+      gettimeofday(&before, 0); /* 0 is for compatibility with BSD */
+
+      ret = fts_binary_file_load(fts_symbol_name(file));
+
+      if (ret < 0)
+	{
+	  fprintf(stderr, "Error loading bmax file %s\n", fts_symbol_name(file));
+	  return fts_Success;
+	}
+
+      gettimeofday(&after, 0); /* 0 is for compatibility with BSD */
+
+      /* Compute the difference */
+  
+      dsec = after.tv_sec - before.tv_sec;
+
+      if (after.tv_usec > before.tv_usec)
+	dusec = after.tv_usec - before.tv_usec;
+      else
+	{
+	  dsec--;
+	  dusec = 1000000 + after.tv_usec - after.tv_usec;
+	}
+
+      post("Loaded file %s in %d sec %d usec\n", fts_symbol_name(file), dsec, dusec);
+    }
+
+  return fts_Success;
+}
+
 
 /* Install all of them */
 
@@ -637,7 +737,7 @@ fts_ucs_install_commands()
 			 "close the <logdev> logical device");
 
 
-/* Audio related commands */
+  /* Audio related commands */
 
   fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("sample_rate"), fts_ucs_audio_set_sampling_rate,
 			 "set sample_rate <sr>",
@@ -651,7 +751,16 @@ fts_ucs_install_commands()
 			 "default out~ <name>",
 			 "set the name of the default audio output device");
 
+  /* Debug command to load bmax and pat files in fts */
 
+
+  fts_ucs_define_command(fts_new_symbol("load"), fts_new_symbol("pat"), fts_ucs_load_pat_file,
+			 "load pat filename",
+			 "load a .pat file in FTS (debug command)");
+
+  fts_ucs_define_command(fts_new_symbol("load"), fts_new_symbol("bmax"), fts_ucs_load_bmax_file,
+			 "load pat filename",
+			 "load a .pat file in FTS (debug command)");
 }
 
 

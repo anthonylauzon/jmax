@@ -28,8 +28,6 @@ fts_symbol_t fts_s_false;
 fts_symbol_t fts_s_init;
 fts_symbol_t fts_s_delete;
 fts_symbol_t fts_s_replace;
-fts_symbol_t fts_s_value;
-fts_symbol_t fts_s_name;
 fts_symbol_t fts_s_ninlets;
 fts_symbol_t fts_s_noutlets;
 fts_symbol_t fts_s_bang;
@@ -47,6 +45,24 @@ fts_symbol_t fts_s_write;
 fts_symbol_t fts_s_comma;
 fts_symbol_t fts_s_semi;
 fts_symbol_t fts_s_anything;
+
+/* Predefined symbol for properties */
+
+fts_symbol_t fts_s_value;
+fts_symbol_t fts_s_min_value;
+fts_symbol_t fts_s_max_value;
+fts_symbol_t fts_s_name;
+fts_symbol_t fts_s_x;
+fts_symbol_t fts_s_wx;
+fts_symbol_t fts_s_y;
+fts_symbol_t fts_s_wy;
+fts_symbol_t fts_s_width;
+fts_symbol_t fts_s_ww;
+fts_symbol_t fts_s_height;
+fts_symbol_t fts_s_wh;
+fts_symbol_t fts_s_range;
+fts_symbol_t fts_s_font;
+fts_symbol_t fts_s_fontSize;
 
 
 static void 
@@ -66,8 +82,6 @@ fts_predefine_symbols(void)
   fts_s_init 	          = fts_new_builtin_symbol("$init");
   fts_s_delete	          = fts_new_builtin_symbol("$delete");
   fts_s_replace	          = fts_new_builtin_symbol("$replace");
-  fts_s_value             = fts_new_builtin_symbol("value");
-  fts_s_name              = fts_new_builtin_symbol("name");
   fts_s_ninlets           = fts_new_builtin_symbol("ins");
   fts_s_noutlets          = fts_new_builtin_symbol("outs");
   fts_s_bang              = fts_new_builtin_symbol("bang");
@@ -85,6 +99,24 @@ fts_predefine_symbols(void)
   fts_s_anything          = fts_new_builtin_symbol("anything");
   fts_s_comma             = fts_new_builtin_symbol(",");
   fts_s_semi              = fts_new_builtin_symbol(";");
+
+/* Predefined symbol for properties */
+
+  fts_s_value             = fts_new_builtin_symbol("value");
+  fts_s_max_value         = fts_new_builtin_symbol("maxValue");
+  fts_s_min_value         = fts_new_builtin_symbol("minValue");
+  fts_s_name              = fts_new_builtin_symbol("name");
+  fts_s_x                 = fts_new_builtin_symbol("x");
+  fts_s_wx                = fts_new_builtin_symbol("wx");
+  fts_s_y                 = fts_new_builtin_symbol("y");
+  fts_s_wy                = fts_new_builtin_symbol("wy");
+  fts_s_width             = fts_new_builtin_symbol("width");
+  fts_s_ww                = fts_new_builtin_symbol("ww");
+  fts_s_height            = fts_new_builtin_symbol("height");
+  fts_s_wh                = fts_new_builtin_symbol("wh");
+  fts_s_range             = fts_new_builtin_symbol("range");
+  fts_s_font              = fts_new_builtin_symbol("font");
+  fts_s_fontSize          = fts_new_builtin_symbol("fc");
 }
 
 

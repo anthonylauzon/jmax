@@ -99,7 +99,7 @@ public class MaxApplication extends Object
     // command line arguments that can be accessed from tcl scripts
     // and we don't know yet
 
-    for (int i=0; i<args.length &&args[i].startsWith("-"); i++) 
+    for (int i=0; i<args.length &&args[i].startsWith("-"); i++)
       jmaxProperties.put(args[i].substring(1), args[++i]);
 
     // Default values

@@ -406,6 +406,19 @@ class FtsDotPatTokenizer
   {
     return Float.valueOf(sval).floatValue();
   }
+
+  public final void close()
+  {
+
+    try
+      {
+	in.close();
+      }
+    catch (java.io.IOException e)
+      {
+	// Ingnore bugs in closing.
+      }
+  }
 }
     
     

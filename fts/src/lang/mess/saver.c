@@ -13,15 +13,6 @@
 
 #define SYMBOL_TABLE_SIZE 64
 
-typedef struct fts_bmax_file
-{
-  int fd;
-  fts_binary_file_header_t header; 
-  fts_symbol_t *symbol_table;
-  int symbol_table_size;
-  int symbol_table_fill;
-} fts_bmax_file_t;
-
 
 fts_bmax_file_t *
 fts_open_bmax_file_for_writing(const char *name)
@@ -42,7 +33,7 @@ fts_open_bmax_file_for_writing(const char *name)
 
   /* Open the file */
 
-  f->fd = open(name, O_WRONLY);
+  f->fd = open(name, O_WRONLY | O_CREAT);
 
   if (f->fd < 0)
     {
@@ -65,7 +56,7 @@ fts_open_bmax_file_for_writing(const char *name)
 
 
 void
-fts_close_bmax_file_for_writing(fts_bmax_file_t *f)
+fts_close_bmax_file(fts_bmax_file_t *f)
 {
   int i;
 
@@ -91,6 +82,50 @@ fts_close_bmax_file_for_writing(fts_bmax_file_t *f)
 
 /* Aux functions  for file building */
 
+static int
+fts_bmax_find_objidx(fts_object_t *obj)
+{
+  /* As object idx, i.e. the location where to store
+     the object in the object frame, we compute the
+     position of the object in the child list of a patcher.
+     Not so easy to store in the object, because change
+     with editing operations, so at the end may be simpler
+     to compute it, or at most to have an hash table, or to cache
+     the value in a object property or slot
+     */
+
+  int i;
+  fts_patcher_t *patcher = fts_object_get_patcher(obj);
+  fts_object_t *p;
+
+  i = 0;
+  for (p = patcher->objects; p ; p = p->next_in_patcher)
+    {
+      if (obj == p)
+	return i;
+
+      i++;
+    }
+
+  /* If we exit from here, a big coding error have been done,
+     or a message system inconsistency discovered !!! */
+
+  return -1;
+}
+
+static int
+fts_bmax_count_childs(fts_patcher_t *patcher)
+{
+  /* Count the childs in a patcher */
+
+  fts_object_t *p;
+  int i = 0;
+
+  for (p = patcher->objects; p ; p = p->next_in_patcher)
+    i++;
+
+  return i;
+}
 
 
 static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
@@ -124,7 +159,7 @@ static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 
 /* One functions for each opcode */
 
-void
+static void
 fts_bmax_code_return(fts_bmax_file_t *f)
 {
   /* RETURN */
@@ -135,7 +170,7 @@ fts_bmax_code_return(fts_bmax_file_t *f)
   write(f->fd, &w, sizeof(fts_word_t));
 }
 
-void
+static void
 fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
 {
   /* PUSH_INT   <int>   */
@@ -150,7 +185,7 @@ fts_bmax_code_push_int(fts_bmax_file_t *f, int value)
 }
 
 
-void
+static void
 fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 {
   /* PUSH_FLOAT <float> */
@@ -165,8 +200,8 @@ fts_bmax_code_push_float(fts_bmax_file_t *f, float value)
 }
 
 
-void
-fts_bmax_code_push_sym(fts_bmax_file_t *f, fts_symbol_t sym)
+static void
+fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   fts_word_t w;
   fts_word_t s;
@@ -191,8 +226,8 @@ fts_bmax_code_push_sym(fts_bmax_file_t *f, fts_symbol_t sym)
 }
 
 
-void
-fts_bmax_code_pop_arg(fts_bmax_file_t *f, int value)
+static void
+fts_bmax_code_pop_args(fts_bmax_file_t *f, int value)
 {
   /* POP_ARGS    <int>   // pop n values  from the argument stack */
 
@@ -207,7 +242,8 @@ fts_bmax_code_pop_arg(fts_bmax_file_t *f, int value)
   write(f->fd, &i, sizeof(fts_word_t));
 }
 
-void
+
+static void
 fts_bmax_code_push_obj(fts_bmax_file_t *f, int value)
 {
   /* PUSH_OBJ   <objidx> */
@@ -223,7 +259,7 @@ fts_bmax_code_push_obj(fts_bmax_file_t *f, int value)
   write(f->fd, &i, sizeof(fts_word_t));
 }
 
-void
+static void
 fts_bmax_code_mv_obj(fts_bmax_file_t *f, int value)
 {
   /* MV_OBJ     <objidx> */
@@ -240,7 +276,7 @@ fts_bmax_code_mv_obj(fts_bmax_file_t *f, int value)
 
 
 
-void
+static void
 fts_bmax_code_pop_objs(fts_bmax_file_t *f, int value)
 {
   /* POP_OBJS    <int> */
@@ -256,7 +292,7 @@ fts_bmax_code_pop_objs(fts_bmax_file_t *f, int value)
 }
 
 
-void
+static void
 fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
 {
   /* MAKE_OBJ   <nargs> */
@@ -271,7 +307,7 @@ fts_bmax_code_make_obj(fts_bmax_file_t *f, int value)
   write(f->fd, &i, sizeof(fts_word_t));
 }
 
-void
+static void
 fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   fts_word_t w;
@@ -296,7 +332,7 @@ fts_bmax_code_put_prop(fts_bmax_file_t *f, fts_symbol_t sym)
   write(f->fd, &s, sizeof(fts_word_t));
 }
 
-void
+static void
 fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs)
 {
   fts_word_t w;
@@ -329,7 +365,7 @@ fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int narg
 }
 
 
-void
+static void
 fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value)
 {
   /* PUSH_OBJ_TABLE <int> */
@@ -344,7 +380,7 @@ fts_bmax_code_push_obj_table(fts_bmax_file_t *f, int value)
   write(f->fd, &i, sizeof(fts_word_t));
 }
 
-void
+static void
 fts_bmax_code_pop_obj_table(fts_bmax_file_t *f)
 {
   /* POP_OBJ_TABLE */
@@ -356,11 +392,10 @@ fts_bmax_code_pop_obj_table(fts_bmax_file_t *f)
   write(f->fd, &w, sizeof(fts_word_t));
 }
 
-void
+static void
 fts_bmax_code_connect(fts_bmax_file_t *f)
 {
   /* CONNECT */
-  /* POP_OBJ_TABLE */
 
   fts_word_t w;
 
@@ -376,43 +411,112 @@ fts_bmax_code_connect(fts_bmax_file_t *f)
  * 
  */
 
-/* atom args*/
 
-void
+/* atom args: pushed backward, to have them in the right order
+ * in the stack at execution time
+ */
+
+
+static void
 fts_bmax_code_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at)
 {
   int i;
 
-  for (i = 0; i < ac; i++)
+  for (i = (ac - 1); i >= 0; i--)
     {
       const fts_atom_t *a = &(at[i]);
 
       if (fts_is_int(a))
-	{
-	}
+	fts_bmax_code_push_int(f, fts_get_int(a));
       else if (fts_is_float(a))
-	{
-	}
+	fts_bmax_code_push_float(f, fts_get_float(a));
       else if (fts_is_symbol(a))
-	{
-	}
+	fts_bmax_code_push_symbol(f, fts_get_symbol(a));
     }
 }
 
 /* Objects, connections, patchers */
 
-void
-void_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj)
+static void
+fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 {
+  /* Push the object arguments, make the object, and put it in the object table, then push the args 
+   * and the objects (should we, or should we group the pop later ?).
+   * The code generates can be optimized with peep-hole style
+   * techniques.
+   */
+
+  fts_bmax_code_atoms(f, obj->argc, obj->argv);
+  fts_bmax_code_make_obj(f, obj->argc);
+
+  /* PUT HERE THE CODE TO WRITE PROPERTIES !!! */
+
+  fts_bmax_code_mv_obj(f, objidx);
+  fts_bmax_code_pop_args(f, obj->argc);
+  fts_bmax_code_pop_objs(f, 1);
+}
+
+
+static void
+fts_bmax_code_new_connection(fts_bmax_file_t *f, fts_connection_t *conn, int fromidx)
+{
+  /* Push the inlet and outlet (this order) in the evaluation stack */
+
+  fts_bmax_code_push_int(f, conn->winlet);
+  fts_bmax_code_push_int(f, conn->woutlet);
+
+  /* Push the to object, push the from object in the object stack */
+
+  fts_bmax_code_push_obj(f, fromidx);
+  fts_bmax_code_push_obj(f, fts_bmax_find_objidx(conn->dst));
+
+  /* Pop 2 values from the evaluation stack */
+
+  fts_bmax_code_pop_args(f, 2);
+
+  /* Pop 2 object from the object stack */
+
+  fts_bmax_code_pop_objs(f, 2);
 }
 
 
 void
-void_bmax_code_new_connection(fts_bmax_file_t *f)
+fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj)
 {
-}
+  int i;
+  fts_patcher_t *patcher = (fts_patcher_t *) obj;
+  fts_object_t *p;
 
-void
-void_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *patcher)
-{
+  /* Allocate a new object table frame of the right dimension */
+
+  fts_bmax_code_push_obj_table(f, fts_bmax_count_childs(patcher));
+
+  /* Code all the objects */
+
+  i = 0;
+  for (p = patcher->objects; p ; p = p->next_in_patcher)
+    {
+      fts_bmax_code_new_object(f, p, i);
+      i++;
+    }
+
+  /* For each object, for each outlet, code all the connections */
+
+  i = 0;
+  for (p = patcher->objects; p ; p = p->next_in_patcher)
+    {
+      int outlet;
+
+      for (outlet = 0; outlet < fts_object_get_outlets_number(p); outlet++)
+	{
+	  fts_connection_t *c;
+
+	  for (c = p->out_conn[outlet]; c ; c = c->next_same_src)
+	    fts_bmax_code_new_connection(f, c, i);
+	}
+    }
+
+  /* Finally, pop the object table */
+
+  fts_bmax_code_pop_obj_table(f);
 }

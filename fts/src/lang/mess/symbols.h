@@ -42,8 +42,6 @@ extern fts_symbol_t fts_s_init;
 extern fts_symbol_t fts_s_delete;
 extern fts_symbol_t fts_s_replace;
 extern fts_symbol_t fts_s_send_update;
-extern fts_symbol_t fts_s_value;
-extern fts_symbol_t fts_s_name;
 extern fts_symbol_t fts_s_ninlets;
 extern fts_symbol_t fts_s_noutlets;
 extern fts_symbol_t fts_s_bang;
@@ -61,5 +59,23 @@ extern fts_symbol_t fts_s_write;
 extern fts_symbol_t fts_s_comma;
 extern fts_symbol_t fts_s_semi;
 extern fts_symbol_t fts_s_anything;
+
+/* Symbols related to object properties */
+
+extern fts_symbol_t fts_s_value;
+extern fts_symbol_t fts_s_min_value;
+extern fts_symbol_t fts_s_max_value;
+extern fts_symbol_t fts_s_name;
+extern fts_symbol_t fts_s_x;
+extern fts_symbol_t fts_s_wx;
+extern fts_symbol_t fts_s_y;
+extern fts_symbol_t fts_s_wy;
+extern fts_symbol_t fts_s_width;
+extern fts_symbol_t fts_s_ww;
+extern fts_symbol_t fts_s_height;
+extern fts_symbol_t fts_s_wh;
+extern fts_symbol_t fts_s_range;
+extern fts_symbol_t fts_s_font;
+extern fts_symbol_t fts_s_fontSize;
 
 #endif

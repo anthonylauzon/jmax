@@ -55,7 +55,6 @@ done
 ## Change dir to the target
 
 cd $target
-currentDir=
 
 ## Remove the index if present
 
@@ -65,8 +64,13 @@ currentDir=
 if [ $doall = "yes" ]
  then
   for file in  *
-   do
-    echo abstraction `basename $file .abs` '$dir'/$file >> abstractions.tcl
+  do
+    if [ ! \( -d $file \) ]
+    then
+      name=`basename $file .abs`
+      echo abstraction `basename $name .pat` '$dir'/$file >> abstractions.tcl
+    fi
+
     echo Done file $file
   done
 else

@@ -98,16 +98,6 @@ public class FtsDataHandler extends MaxDataHandler
 	  }
 	else
 	  throw new MaxDataException("Object " + location + " do not exists");
-
-	{
-	  /* Now, if the "bmax" system property is set, we do a wild
-	     binary format save; highly experimental */
-
-	  String bmaxSave = MaxApplication.jmaxProperties.getProperty("bmax");
-
-	  if ((bmaxSave != null) && bmaxSave.equals("yes") && (instance instanceof ircam.jmax.fts.FtsPatchData))
-	    ((FtsPatchData) instance).saveBmax("~/tmp/patch.bmax");
-	}
       }
     else
       throw new MaxDataException("Cannot save a " + instance.getDataType() + " to FTS");
