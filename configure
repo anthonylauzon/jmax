@@ -1568,7 +1568,7 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 exec 5>>./config.log
 
 
-CFLAGS="-DFTS_API=extern -Wall -Wno-unused"
+CFLAGS="-Wall -Wno-unused"
 
 
 echo $ac_n "checking how to run the C preprocessor""... $ac_c" 1>&6
@@ -2326,7 +2326,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile fts/Makefile fts/version.c java/src/ircam/jmax/MaxVersion.java fts/config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile fts/Makefile fts/version.c java/src/ircam/jmax/MaxVersion.java include/ftsconfig-ac.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -2510,7 +2510,7 @@ ac_eD='%g'
 if test "${CONFIG_HEADERS+set}" != set; then
 EOF
 cat >> $CONFIG_STATUS <<EOF
-  CONFIG_HEADERS="fts/config.h"
+  CONFIG_HEADERS="include/ftsconfig-ac.h"
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 fi
@@ -2601,7 +2601,7 @@ cat >> $CONFIG_STATUS <<EOF
 
 EOF
 cat >> $CONFIG_STATUS <<\EOF
-test -z "$CONFIG_HEADERS" || echo timestamp > fts/stamp-h
+test -z "$CONFIG_HEADERS" || echo timestamp > include/stamp-h
 
 exit 0
 EOF

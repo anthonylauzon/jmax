@@ -31,9 +31,7 @@
    to the object itself.
 */
 
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include "ftsconfig.h"
 
 #include <stdlib.h>
 #if HAVE_UNISTD_H

@@ -43,9 +43,7 @@
 
 /* #define TEMPLATE_DEBUG */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include "ftsconfig.h"
 
 #include <string.h>
 #include <stdlib.h>

@@ -76,12 +76,12 @@ VERSION = @VERSION@
 SUBDIRS = fts
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = ./fts/config.h
+CONFIG_HEADER = ./include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
-DIST_COMMON =  README AUTHORS ChangeLog Makefile.am Makefile.in \
-acinclude.m4 aclocal.m4 config.guess config.sub configure configure.in \
-fts/config.h.in fts/stamp-h.in install-sh ltconfig ltmain.sh missing \
-mkinstalldirs
+DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
+Makefile.in NEWS acinclude.m4 aclocal.m4 config.guess config.sub \
+configure configure.in include/ftsconfig-ac.h.in include/stamp-h.in \
+install-sh ltconfig ltmain.sh missing mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -91,7 +91,7 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -105,31 +105,31 @@ config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 $(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
 
-fts/config.h: fts/stamp-h
+include/ftsconfig-ac.h: include/stamp-h
 	@if test ! -f $@; then \
-		rm -f fts/stamp-h; \
-		$(MAKE) fts/stamp-h; \
+		rm -f include/stamp-h; \
+		$(MAKE) include/stamp-h; \
 	else :; fi
-fts/stamp-h: $(srcdir)/fts/config.h.in $(top_builddir)/config.status
+include/stamp-h: $(srcdir)/include/ftsconfig-ac.h.in $(top_builddir)/config.status
 	cd $(top_builddir) \
-	  && CONFIG_FILES= CONFIG_HEADERS=fts/config.h \
+	  && CONFIG_FILES= CONFIG_HEADERS=include/ftsconfig-ac.h \
 	     $(SHELL) ./config.status
-	@echo timestamp > fts/stamp-h 2> /dev/null
-$(srcdir)/fts/config.h.in: $(srcdir)/fts/stamp-h.in
+	@echo timestamp > include/stamp-h 2> /dev/null
+$(srcdir)/include/ftsconfig-ac.h.in: $(srcdir)/include/stamp-h.in
 	@if test ! -f $@; then \
-		rm -f $(srcdir)/fts/stamp-h.in; \
-		$(MAKE) $(srcdir)/fts/stamp-h.in; \
+		rm -f $(srcdir)/include/stamp-h.in; \
+		$(MAKE) $(srcdir)/include/stamp-h.in; \
 	else :; fi
-$(srcdir)/fts/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+$(srcdir)/include/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOHEADER)
-	@echo timestamp > $(srcdir)/fts/stamp-h.in 2> /dev/null
+	@echo timestamp > $(srcdir)/include/stamp-h.in 2> /dev/null
 
 mostlyclean-hdr:
 
 clean-hdr:
 
 distclean-hdr:
-	-rm -f fts/config.h
+	-rm -f include/ftsconfig-ac.h
 
 maintainer-clean-hdr:
 
@@ -249,7 +249,7 @@ distdir: $(DISTFILES)
 	top_distdir=`cd $(distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
