@@ -55,6 +55,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	super(fts, null, null, "seqtrack", "seqtrack");
 	
 	listeners = new MaxVector();
+	hhListeners = new MaxVector();
 
 	this.name = name;
 	
@@ -159,20 +160,22 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   {
     int selIndex;
     TrackEvent event = null;
-    Vector events = new Vector();;
+    MaxVector events = new MaxVector();
 
-    SequenceSelection.getCurrent().deselectAll();
-    if(nArgs == 1) SequenceSelection.getCurrent().select(args[0].getObject());
-    else
+    //SequenceSelection.getCurrent().deselectAll();
+    /*if(nArgs == 1) SequenceSelection.getCurrent().select(args[0].getObject());
+      else
+      {*/
+    for(int i=0; i<nArgs; i++)
 	{
-	    for(int i=0; i<nArgs; i++)
-		{
-		    event = (TrackEvent)(args[i].getObject());
-		    selIndex = indexOf(event);
-		    events.addElement(event);
-		}
-	    SequenceSelection.getCurrent().select(events.elements());
+	    event = (TrackEvent)(args[i].getObject());
+	    //selIndex = indexOf(event);
+	    events.addElement(event);
 	}
+    //SequenceSelection.getCurrent().select(events.elements());
+    //}
+    double time = ((TrackEvent)args[0].getObject()).getTime();
+    notifyHighlighting(events, time);
   }
   public void requestEventCreation(float time, String type, int nArgs, Object args[])
   {
@@ -568,13 +571,24 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
 	    ((TrackDataListener) e.nextElement()).objectMoved(spec, oldIndex, newIndex);
     }
-    
+    private void notifyHighlighting(MaxVector hhobj, double time)
+    {
+	for (Enumeration e = hhListeners.elements(); e.hasMoreElements();) 
+	    ((HighlightListener) e.nextElement()).highlight(hhobj.elements(), time);
+    }
     /**
      * requires to be notified when the database changes
      */
     public void addListener(TrackDataListener theListener)
     {
 	listeners.addElement(theListener);
+    }
+    /**
+     * requires to be notified at events highlight
+     */
+    public void addHighlightListener(HighlightListener listener)
+    {
+	hhListeners.addElement(listener);
     }
     
     /**
@@ -584,7 +598,13 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     {
 	listeners.removeElement(theListener);
     }
-
+    /**
+     * removes the listener
+     */
+    public void removeHighlightListener(HighlightListener theListener)
+    {
+	hhListeners.removeElement(theListener);
+    }
 
     // ClipableData functionalities
     public void cut()
@@ -1038,6 +1058,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     int events_fill_p  = 0;	// next available position
     TrackEvent events[] = new TrackEvent[256];
     private MaxVector listeners;
+    private MaxVector hhListeners;
     private MaxVector tempVector = new MaxVector();
     MaxVector infos = new MaxVector();
     private String name;

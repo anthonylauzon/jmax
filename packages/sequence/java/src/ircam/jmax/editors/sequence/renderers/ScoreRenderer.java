@@ -183,9 +183,9 @@ public class ScoreRenderer extends AbstractRenderer{
 
   TrackDataModel itsTrackDataModel;
 
-  ScoreForeground itsForegroundLayer;
+  public ScoreForeground itsForegroundLayer;
 
-  ScoreBackground scoreBackground;
+  public ScoreBackground scoreBackground;
   PartitionBackground partitionBackground;
   
   public static final int XINTERVAL = 10;

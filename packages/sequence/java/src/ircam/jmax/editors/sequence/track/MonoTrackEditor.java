@@ -73,6 +73,33 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    }
 	});
 
+	track.getTrackDataModel().addHighlightListener(new HighlightListener(){
+		public void highlight(Enumeration elements, double time)
+		{
+		    TrackEvent temp;
+		    boolean first = true;
+		    Graphics gr = getGraphics();		    
+		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+			{
+			    temp = (TrackEvent) e.nextElement();
+			    temp.getRenderer().render(temp, gr, false, gc);
+			}
+		    oldElements.removeAllElements();		    
+
+		    for (Enumeration e = elements; e.hasMoreElements();) 
+			{
+			    temp = (TrackEvent) e.nextElement();
+			     if(first)
+				{
+				    gc.getScrollManager().makeVisible(temp);
+				    first = false;
+				}
+			    temp.getRenderer().render(temp, gr, true, gc);
+			    oldElements.addElement(temp);
+			}
+		}
+	    });
+
 	geometry.addTranspositionListener(new TranspositionListener() {
 	    public void transpositionChanged(int newTranspose)
 		{
@@ -276,7 +303,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     MonoDimensionalAdapter ad;
 
     Track track;
-
+    
+    MaxVector oldElements = new MaxVector();
     /*****************/
     //list-->table//
     ListDialog listDialog = null;

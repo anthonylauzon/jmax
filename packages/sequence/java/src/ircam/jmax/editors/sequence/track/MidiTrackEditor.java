@@ -95,6 +95,35 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	});
 	
 	track.getTrackDataModel().addListener(this);
+	
+	track.getTrackDataModel().addHighlightListener(new HighlightListener(){
+		public void highlight(Enumeration elements, double time)
+		{
+		    TrackEvent temp;
+		    boolean first = true;
+		    Graphics g = itsScore.getGraphics();
+		    
+		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+			{
+			    temp = (TrackEvent) e.nextElement();
+			    temp.getRenderer().render(temp, g, false, gc);
+			}
+		    oldElements.removeAllElements();
+
+		    for (Enumeration e = elements; e.hasMoreElements();) 
+			{
+			    temp = (TrackEvent) e.nextElement();
+			    if(first)
+				{
+				    gc.getScrollManager().makeVisible(temp);
+				    first = false;
+				}
+			    temp.getRenderer().render(temp, g, true, gc);
+			    oldElements.addElement(temp);
+			}
+		}
+	    });
+
 	component = this;
     }
 
@@ -182,8 +211,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     {
 	repaint();
     }
-    
-    
+
     /* avoid to paint the white background twice*/   
     public void update(Graphics g) {}
     
@@ -382,6 +410,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     
     ScorePanel itsScore;
 
+    MaxVector oldElements = new MaxVector();
     /*****************/
     //list-->table//
     ListDialog listDialog = null;

@@ -178,6 +178,8 @@ public interface TrackDataModel {
 
     public abstract Enumeration getPropertyNames();
 
+    public abstract void addHighlightListener(HighlightListener listener);
+    public abstract void removeHighlightListener(HighlightListener listener);
     /**
      * Move all the events of the given model in this model, and
      * remove them from the original one. After this operation, the old

@@ -225,6 +225,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
 	//added to update maximum time if needed
 	track.getTrackDataModel().addListener(this);    
+	//add sequenceRuler as highlighting listener 
+	track.getTrackDataModel().addHighlightListener(ruler);    
     
 	//resize the frame
 	int height;	
@@ -568,7 +570,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
     }
 
-    /////////////////ScrollerManager Interface
+    /////////////////ScrollManager Interface
     public void scrollIfNeeded(int time)
     {
 	resizePanelToTime(time);

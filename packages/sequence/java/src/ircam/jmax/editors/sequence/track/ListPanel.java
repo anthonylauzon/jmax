@@ -62,11 +62,31 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
       data.addListener(this);
 
+      data.addHighlightListener(new HighlightListener(){
+	      public void highlight(Enumeration hhElements, double time)
+	      {
+		  TrackEvent evt;
+		  int index;
+		  hh = true;
+		  hhObjects.removeAllElements();
+		  for (Enumeration e = hhElements; e.hasMoreElements();) 
+		      {
+			  evt = (TrackEvent) e.nextElement();			  
+			  index = data.indexOf(evt);
+			  selRect.setBounds(xstep, index*ystep, xstep, ystep);
+			  scrollRectToVisible(selRect);
+			  notifySelection(index, 0, evt);//????
+			  hhObjects.addElement(evt);
+		      }
+		  //repaint();
+	      }
+	  });
+
       //to make current this selection maybe move on the mouseright-showpopup  action
       if(!((Boolean)track.getProperty("active")).booleanValue())
 	  track.setProperty("active", Boolean.TRUE);
 
-      SequenceSelection.getCurrent().addListSelectionListener(this);
+      gc.getSelection().addListSelectionListener(this);
 
       setSize((data.getNumProperty()+1)*xstep +25, data.length()*20+20);
 
@@ -232,12 +252,23 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	TrackEvent evt;
 	Dimension d = getSize();
 	g.setColor(SequencePanel.violetColor.brighter());
-	for(Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
+	if(hh)
 	    {
-		evt = (TrackEvent) e.nextElement();
-		index = data.indexOf(evt);
-		g.fillRect(0, (index)*ystep+1, d.width, ystep-1);
+		for(Enumeration e = hhObjects.elements(); e.hasMoreElements();)
+		    {
+			evt = (TrackEvent) e.nextElement();
+			index = data.indexOf(evt);
+			g.fillRect(0, (index)*ystep+1, d.width, ystep-1);
+		    }
+		hh = false;
 	    }
+	else
+	    for(Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
+		{
+		    evt = (TrackEvent) e.nextElement();
+		    index = data.indexOf(evt);
+		    g.fillRect(0, (index)*ystep+1, d.width, ystep-1);
+		}
     }
 
     int getEventIndex(int y)
@@ -584,6 +615,9 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     {
 	return gc;
     }
+
+    boolean hh = false;
+    MaxVector hhObjects= new MaxVector();
 
     final public static int xstep = 120;
     final public static int ystep = 20;

@@ -14,7 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
  /**
   * A graphic JPanel that represents a ruler containing time indications */
-public class SequenceRuler extends PopupToolbarPanel{
+public class SequenceRuler extends PopupToolbarPanel implements HighlightListener{
 
     public SequenceRuler(Geometry geom, SequencePanel panel)
     {
@@ -62,6 +62,8 @@ public class SequenceRuler extends PopupToolbarPanel{
 	int snappedTime;
 	String timeString;
 	Dimension d = getSize();
+	Rectangle clip = g.getClipRect();
+
 	int logicalTime = -geometry.getXTransposition();
 	int windowTime = sequencePanel.getMaximumVisibleTime();	    
 	
@@ -73,21 +75,51 @@ public class SequenceRuler extends PopupToolbarPanel{
 	int k, stringWidth;
 	if(stringLenght>delta-10) k = 2;
 	else k=1;
-	
-	g.setColor(SequencePanel.violetColor);
-	for (int i=logicalTime+timeStep; i<windowTime; i+=timeStep*k) 
-	    {
-		snappedTime = (i/timeStep)*timeStep;
-		xPosition = utilityPartitionAdapter.getX(snappedTime)+3+TrackContainer.BUTTON_WIDTH;
-		g.drawLine(xPosition, d.height-4, xPosition, d.height);
-	
-		if(unity==MILLISECONDS_UNITY)		    
-		    timeString = ""+snappedTime;
-		else
-		    timeString = ""+(float)(snappedTime/(float)1000.0);
 		
-		stringWidth = fm.stringWidth(timeString);
-		g.drawString(timeString, xPosition-stringWidth/2, /*15*/12);		  
+	g.setColor(SequencePanel.violetColor);
+
+	if(hh)//during highlighting
+	    {
+		for (int i=logicalTime+timeStep; i < windowTime; i+=timeStep*k) 
+		    {
+			snappedTime = (i/timeStep)*timeStep;
+			xPosition = utilityPartitionAdapter.getX(snappedTime)+3+TrackContainer.BUTTON_WIDTH;
+
+			if(unity==MILLISECONDS_UNITY)		    
+			    timeString = ""+snappedTime;
+			else
+			    timeString = ""+(float)(snappedTime/(float)1000.0);		
+			stringWidth = fm.stringWidth(timeString);
+			
+			if((xPosition <= clip.x+clip.width+20)&&(xPosition+stringWidth >= clip.x-20))
+			    {				
+				g.drawLine(xPosition, d.height-4, xPosition, d.height);				
+				g.drawString(timeString, xPosition-stringWidth/2, /*15*/12);		  
+			    }
+		    }
+
+		int hhX = utilityPartitionAdapter.getX(hhTime)+3+TrackContainer.BUTTON_WIDTH;
+		g.setColor(Color.red);
+		g.fillRect(hhX-1, 1, 3, d.height-2);
+
+		hh = false;				
+	    }
+	else
+	    {
+		for (int i=logicalTime+timeStep; i<windowTime; i+=timeStep*k) 
+		    {
+			snappedTime = (i/timeStep)*timeStep;
+			xPosition = utilityPartitionAdapter.getX(snappedTime)+3+TrackContainer.BUTTON_WIDTH;
+			g.drawLine(xPosition, d.height-4, xPosition, d.height);
+			
+			if(unity==MILLISECONDS_UNITY)		    
+			    timeString = ""+snappedTime;
+			else
+			    timeString = ""+(float)(snappedTime/(float)1000.0);
+			
+			stringWidth = fm.stringWidth(timeString);
+			g.drawString(timeString, xPosition-stringWidth/2, /*15*/12);		  
+		    }
 	    }
     }
 
@@ -132,8 +164,21 @@ public class SequenceRuler extends PopupToolbarPanel{
 	popup.update();
 	return popup;
     }
-
+    //------- HighlightListener interface
+    public void highlight(Enumeration elements, double time)
+    {
+	//---------
+	hh = true;
+	int hhX = utilityPartitionAdapter.getX(hhTime)+3+TrackContainer.BUTTON_WIDTH;
+	int timeX = utilityPartitionAdapter.getX(time)+3+TrackContainer.BUTTON_WIDTH;
+	repaint(new Rectangle(hhX-1, 1, timeX-hhX+3, getSize().height-2));
+    
+	hhTime = time;
+    }
     //--- Ruler fields
+    boolean hh = false;
+    double hhTime;
+
     Dimension rulerDimension = new Dimension(200, RULER_HEIGHT);
     FontMetrics fm;
     String unityName = "Milliseconds";
