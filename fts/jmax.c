@@ -340,7 +340,7 @@ jmax_vfprintf(FILE *fp, const char *format, va_list args)
 #define IBM_JRE_13	"Software\\IBM\\Java2 Runtime Environment"
 #define SUN_RELEASE_13  "1.3" 
 #define SUN_JRE_13	"Software\\JavaSoft\\Java Runtime Environment"
-#define LOG_FILE        "C:\\jmax-log.txt"
+#define LOG_FILE        "C:\\jmax_log.txt"
 
 static int jmax_get_jvm_from_registry(char *buf, jint bufsize, char* key, char* release);
 static int jmax_get_root_from_registry(char *buf, jint bufsize);
@@ -523,9 +523,6 @@ jmax_new_log()
   }
 }
 
-
-#ifdef HAVE_JMAX_MAIN
-
 #define is_white(_c)   (strchr(" \t\n\r", _c) != NULL)
 #define is_black(_c)   (strchr(" \t\n\r", _c) == NULL)
 #define is_quote(_c)   ((_c) == '"')
@@ -638,7 +635,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   return 0;
 }
-#endif /* HAVE_JMAX_MAIN */
 
 
 #else

@@ -145,6 +145,8 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   ac--;
   at++;
 
+  fts_log("[dsaudioport]: Opening audio port\n");
+
   fts_audioport_init( &this->head);
 
   /* initialize everything to null */
@@ -245,6 +247,8 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   IDirectSoundBuffer_Play(this->dsBuffer, 0, 0, DSBPLAY_LOOPING);
 
   this->state = dsaudioport_running;
+
+  fts_log("[dsaudioport]: Done\n");
   
   return;
 
@@ -264,6 +268,8 @@ dsaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   int i;
   dsaudioport_t *dev = (dsaudioport_t *)o;
+
+  fts_log("[dsaudioport]: Closing audio port\n");
 
   if (dev->event != NULL) {
     for (i = 0; i < dev->num_buffers; i++) {
@@ -291,6 +297,8 @@ dsaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   }
 
   fts_audioport_delete( (fts_audioport_t *) dev);
+
+  fts_log("[dsaudioport]: Done\n");
 }
 
 static void 
@@ -383,10 +391,14 @@ fts_open_direct_sound(char *device)
 static int 
 fts_close_direct_sound() 
 {
-  IDirectSoundBuffer_Release(fts_primary_buffer); 
-  fts_primary_buffer = NULL;
-  IDirectSound_Release(fts_direct_sound); 
-  fts_direct_sound = NULL;
+  if (fts_primary_buffer != NULL) {
+    IDirectSoundBuffer_Release(fts_primary_buffer); 
+    fts_primary_buffer = NULL;
+  }
+  if (fts_direct_sound != NULL) {
+    IDirectSound_Release(fts_direct_sound); 
+    fts_direct_sound = NULL;
+  }
   return 0;
 }
 
@@ -453,8 +465,10 @@ BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID lpReserved)
 
   case DLL_THREAD_DETACH:
   case DLL_PROCESS_DETACH:
+    fts_log("[dsdev]: Cleaning up\n");
     fts_win32_destroy_window();
     fts_close_direct_sound();
+    fts_log("[dsdev]: Done\n");
   }
   return TRUE;
 }

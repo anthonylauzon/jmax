@@ -286,8 +286,9 @@ void fts_shutdown( void)
   /* the old client is closed first, to avoid the sending of
      fts_client_release_object() messages (see fts_object_unclient())
      on a deadly dangling oldclient object.  */
+  fts_log("[fts]: Shutting down client connection\n");
   fts_oldclient_shutdown();
 
-  fts_log("[fts]: Shutting down\n");
+  fts_log("[fts]: Deleting root patcher\n");
   fts_kernel_patcher_shutdown();
 }

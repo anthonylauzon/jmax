@@ -47,9 +47,6 @@ static char winmidiport_error_buffer[256];
 #define msg_p2(_m)    ((_m >> 16) & 0x7f)
 
 
-DWORD winmidi_in = 0;
-DWORD winmidi_out = 0;
-
 char*
 winmidi_tostring(DWORD midi, char* buf, int len)
 {
@@ -108,15 +105,10 @@ typedef struct _winmidiport_t
 #define winmidiport_buffer_full(_this)  ((_this->head == _this->tail - 1) || ((_this->head == BUFFER_SIZE - 1) && (_this->tail == 0)))
 #define winmidiport_available(_this)  (_this->head != _this->tail)
 
-static char* 
-winmidiport_output_error(int no);
+static char* winmidiport_output_error(int no);
+static char* winmidiport_input_error(int no);
+void CALLBACK winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
 
-static char* 
-winmidiport_input_error(int no);
-
-void CALLBACK 
-winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, 
-			DWORD dwParam1, DWORD dwParam2);
 
 void CALLBACK 
 winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
@@ -132,7 +124,6 @@ winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1
     break;
     
   case MIM_DATA:
-    winmidi_in = dwParam1;
     if (!winmidiport_buffer_full(this)) {
       this->incoming[this->head++] = dwParam1;
       if (this->head == BUFFER_SIZE) {
@@ -258,9 +249,8 @@ static void
 winmidiport_send_note(fts_object_t *o, int channel, int number, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
-  winmidi_out = msg_pack(NOTEON, channel, number, value);
   if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, winmidi_out);  
+    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(NOTEON, channel - 1, number, value));  
   }
 }
 
@@ -268,9 +258,8 @@ static void
 winmidiport_send_poly_pressure(fts_object_t *o, int channel, int number, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
-  winmidi_out = msg_pack(KEYPRESSURE, channel, number, value);
   if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(KEYPRESSURE, channel, number, value));  
+    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(KEYPRESSURE, channel - 1, number, value));  
   }
 }
 
@@ -278,9 +267,8 @@ static void
 winmidiport_send_control_change(fts_object_t *o, int channel, int number, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
-  winmidi_out = msg_pack(CONTROLCHANGE, channel, number, value);
   if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CONTROLCHANGE, channel, number, value));  
+    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CONTROLCHANGE, channel - 1, number, value));  
   }
 }
 
@@ -288,9 +276,8 @@ static void
 winmidiport_send_program_change(fts_object_t *o, int channel, int value, double time)
 {	
   winmidiport_t *this = (winmidiport_t *)o;
-  winmidi_out = msg_pack(PROGRAMCHANGE, channel, value, 0);
   if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PROGRAMCHANGE, channel, value, 0));  
+    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PROGRAMCHANGE, channel - 1, value, 0));  
   }
 }
 
@@ -298,9 +285,8 @@ static void
 winmidiport_send_channel_pressure(fts_object_t *o, int channel, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
-  winmidi_out = msg_pack(CHANNELPRESSURE, channel, value, 0);
   if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CHANNELPRESSURE, channel, value, 0));  
+    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(CHANNELPRESSURE, channel - 1, value, 0));  
   }
 }
 
@@ -308,9 +294,8 @@ static void
 winmidiport_send_pitch_bend(fts_object_t *o, int channel, int value, double time)
 {
   winmidiport_t *this = (winmidiport_t *)o;
-  winmidi_out = msg_pack(PITCHBEND, channel, (value & 0x7f), ((value >> 7) & 0x7f));
   if (this->hmidiout) {
-    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PITCHBEND, channel, (value & 0x7f), ((value >> 7) & 0x7f)));  
+    MMRESULT res = midiOutShortMsg(this->hmidiout, msg_pack(PITCHBEND, channel - 1, (value & 0x7f), ((value >> 7) & 0x7f)));  
   }
 }
 

@@ -63,6 +63,25 @@ public class MaxApplication extends Object
 
   static Fts fts;
 
+  public static void log(String s)
+  {
+      //
+      // I added the log function to trace some bug on windows. Will
+      // remove it as soon as I found the nasty bastard [peter]
+      //
+//        try {
+//  	  int len = s.length();
+//  	  RandomAccessFile file = new RandomAccessFile("C:\\jmax_log.txt", "rw");
+//  	  file.seek(file.length());
+//  	  for (int i = 0; i < len; i++) {
+//  	      int c = s.charAt(i);
+//  	      file.writeByte(c & 0x000000ff);	  
+//  	  }
+//  	  file.close();
+//        } catch (Exception e) {
+//        }
+  }
+
   public static Fts getFts()
   {
     return fts;
@@ -172,6 +191,8 @@ public class MaxApplication extends Object
   {
     MaxVector toOpen = new MaxVector();
 
+    log("main 1\n");
+
     // main function parse the argument line and create the main class...
     //create a new default Properties object
 
@@ -188,6 +209,9 @@ public class MaxApplication extends Object
 
     boolean inOpt = false;
     String option = null;
+
+    log("main 2\n");
+
 
     for (int i = 0; i < args.length; i++)
       {
@@ -218,6 +242,9 @@ public class MaxApplication extends Object
 
       }
 
+    log("main 3\n");
+
+
     // Default values
     if (jmaxProperties.get("jmaxRoot") == null)
       {
@@ -225,9 +252,15 @@ public class MaxApplication extends Object
 	jmaxProperties.put("jmaxRoot", "/usr/lib/jmax");
       }
 
+    log("main 4\n");
+
+
     //Splash Screen Dialog
     if((jmaxProperties.get("jmaxSplashScreen") == null)||(!jmaxProperties.get("jmaxSplashScreen").equals("hide")))
 	splash = new SplashDialog(jmaxProperties.get("jmaxRoot")+"/images/Splash.gif", MaxVersion.getMaxVersion());  
+
+    log("main 5\n");
+
 
     if (jmaxProperties.get("jmaxInterp") == null)
       {
@@ -235,6 +268,9 @@ public class MaxApplication extends Object
 	jmaxProperties.put("jmaxInterp", "jacl");
 	//jmaxProperties.put("jmaxInterp", "silk");
       }
+
+    log("main 6\n");
+
 
     //the version number as a system property
     try
@@ -246,6 +282,9 @@ public class MaxApplication extends Object
 	jmaxProperties.put("jmaxVersion", "version info not available");
       }
 
+    log("main 7\n");
+
+
     // Get optional username and password
 
     itsHookTable = new MaxWhenHookTable(); 
@@ -255,6 +294,9 @@ public class MaxApplication extends Object
     // Create the package handler
 
     itsPackageHandler = new PackageHandler();
+
+    log("main 8\n");
+
 
     // Create and initialize the tcl interpreter
     try
@@ -269,15 +311,27 @@ public class MaxApplication extends Object
 	}
     // Initialize all the submodules; first the kernel modules
 
+    log("main 9\n");
+
+
     ircam.jmax.fts.FtsModule.initModule();
+
+    log("main 10\n");
+
 
     // Initialize dialogs
 
     ircam.jmax.dialogs.DialogsModule.initModule();
 
+    log("main 11\n");
+
+
     // then the builtin editors 
     ircam.jmax.editors.console.ConsoleModule.initModule();
     ircam.jmax.editors.patcher.ErmesModule.initModule(true);
+
+    log("main 12\n");
+
 
     // Before booting the server, check if it is asked to run in real-time mode,
     // and if yes, inform the application layer
@@ -289,10 +343,16 @@ public class MaxApplication extends Object
 	{
 	    System.out.println("Interpreter error in initialization: " + e.getMessage());
 	}
+
+    log("main 13\n");
+
     
     ircam.jmax.editors.console.ConsoleWindow.init();
     ircam.jmax.editors.patcher.ErmesSketchWindow.touch(fts);
     //if there were no connection statements in startup.tcl, ask the user
+
+    log("main 14\n");
+
 
     if (fts == null)
       {
@@ -302,6 +362,9 @@ public class MaxApplication extends Object
 
     // Look if there are documents to open in the 
     // command line.
+
+    log("main 15\n");
+
 
     long startTime = 0;
     if (getProperty("jmaxLoadBenchmark") != null)
@@ -349,6 +412,9 @@ public class MaxApplication extends Object
       }
 
 
+    log("main 16\n");
+
+
     /* Report the loading time if needed */
 
 
@@ -366,6 +432,10 @@ public class MaxApplication extends Object
 					     Runtime.getRuntime().freeMemory()));
 
       }
+
+
+    log("main 17\n");
+
   }
   
 

@@ -109,6 +109,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   fts_log("[winmain]: Exiting\n");
 
+  ExitProcess(0);
   return 0;
 }
 

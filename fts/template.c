@@ -63,7 +63,7 @@
 #include <ftsprivate/package.h>
 #include <ftsprivate/template.h>
 
-#define TEMPLATE_DEBUG 
+/*  #define TEMPLATE_DEBUG  */
 
 /*
  * globals variable
@@ -138,7 +138,7 @@ fts_template_recompute_instances(fts_template_t *template)
   fts_list_t* list;
 
 #ifdef TEMPLATE_DEBUG 
-  fprintf(stderr, "Recomputing instances of template %s\n", fts_symbol_name(template->name)); /* @@@ */
+  fts_log("Recomputing instances of template %s\n", fts_symbol_name(template->name)); /* @@@ */
 #endif
 
   list = template->instances;
@@ -146,12 +146,6 @@ fts_template_recompute_instances(fts_template_t *template)
 
   while (list) {
     fts_object_t *object = fts_get_object( fts_list_get(list));
-    
-#ifdef TEMPLATE_DEBUG 
-    fprintf(stderr, "Recomputing instance:"); /* @@@ */
-    fprintf_object(stderr, object);
-    fprintf(stderr, "\n");
-#endif
 
     fts_object_recompute(object);
     
@@ -159,7 +153,7 @@ fts_template_recompute_instances(fts_template_t *template)
   }
 
 #ifdef TEMPLATE_DEBUG 
-  fprintf(stderr, "Done.\n");
+  fts_log("Done.\n");
 #endif
 }
 
@@ -173,9 +167,7 @@ fts_template_add_instance(fts_template_t *template, fts_object_t *object)
   template->instances = fts_list_prepend(template->instances, a);
        
 #ifdef TEMPLATE_DEBUG 
-  fprintf(stderr, "Adding instance to template %s : ", fts_symbol_name(template->filename)); /* @@@ */
-  fprintf_object(stderr, object);
-  fprintf(stderr, "\n");
+  fts_log("Adding instance to template %s : \n", fts_symbol_name(template->filename)); /* @@@ */
 #endif
 }
 
@@ -188,9 +180,7 @@ fts_template_remove_instance(fts_template_t *template, fts_object_t *object)
   template->instances = fts_list_remove(template->instances, a);
 
 #ifdef TEMPLATE_DEBUG 
-  fprintf(stderr, "Removing instance to template %s : ", fts_symbol_name(template->filename)); /* @@@ */
-  fprintf_object(stderr, object);
-  fprintf(stderr, "\n");
+  fts_log("Removing instance from template %s : \n", fts_symbol_name(template->filename)); 
 #endif
 }
 
@@ -285,7 +275,7 @@ fts_template_file_modified(fts_symbol_t filename)
   filename = fts_new_symbol_copy(buf);
 
 #ifdef TEMPLATE_DEBUG 
-  fprintf(stderr, "File %s modified.\n", fts_symbol_name(filename));
+  fts_log("File %s modified.\n", fts_symbol_name(filename));
 #endif
 
   fts_get_packages( &pkg_iter);
@@ -299,7 +289,7 @@ fts_template_file_modified(fts_symbol_t filename)
 
     if (template) {
 #ifdef TEMPLATE_DEBUG 
-      fprintf(stderr, "Then Redefining Instances.\n");
+      fts_log("Then Redefining Instances.\n");
 #endif
       fts_template_recompute_instances(template);
     }
