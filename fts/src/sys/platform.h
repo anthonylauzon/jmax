@@ -63,6 +63,16 @@
 
 #define FTS_ARCH_NAME        "sgi"
 
+#elif defined(SOLARIS2)
+
+#define HAS_DL
+#define HAS_DTD
+#define HAS_TIME_OF_THE_DAY
+#define HAS_UNROLL_BY8
+#define HAS_UNIX
+
+#define FTS_ARCH_NAME        "solaris2"
+
 #else
 
 #error "platform.h : no architecture defined"

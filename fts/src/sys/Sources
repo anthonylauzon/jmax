@@ -7,7 +7,9 @@ ifeq ($(VENDOR),gnu)
 	ARCH_SOURCES = gnuhw.c
 endif
 
-
+ifeq ($(VENDOR),solaris2)
+	ARCH_SOURCES = solaris2hw.c
+endif
 
 SOURCES = $(ARCH_SOURCES) \
 	smem.c	          \
