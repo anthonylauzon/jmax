@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/ispw/c
+packagedir=$(pkgdatadir)/packages/ispw/c
 package_LTLIBRARIES=libispw.la
 
 # The following are architecture dependant and must be determined by configure script
@@ -56,7 +56,6 @@ makenote.c \
 message.c \
 message_doctor.c \
 metro.c \
-midi.c \
 mididecrypt.c \
 midiformat.c \
 midiparse.c \
@@ -126,5 +125,7 @@ voxalloc.c \
 wahwah.c \
 wavetab.c \
 zerocross.c 
+
+#midi.c \
 
 INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src

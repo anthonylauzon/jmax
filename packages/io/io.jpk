@@ -27,10 +27,6 @@
 ## package declaration
 package provide io
 
-# load dynamic libraries into the server
-global jmaxArch jmaxMode
-ucs load module io $dir/c/lib/$jmaxArch/$jmaxMode/libio.so
-
 post "package: io (I/O class library: udp, ...)"
 
 # help

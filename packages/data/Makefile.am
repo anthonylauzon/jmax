@@ -1,5 +1,8 @@
-SUBDIRS=c 
+SUBDIRS=c java help images
 
-# java does not compile yet
+packagedir=$(pkgdatadir)/packages/data
+package_DATA=data.jmax data.jpk 
+
+
 
 

@@ -1,7 +1,7 @@
 SUBDIRS= src
 
 JARFILE = ispw.jar
-jardir=$(prefix)/packages/ispw/java
+jardir=$(pkgdatadir)/packages/ispw/java
 jar_DATA = $(JARFILE)
 
 clean-compile:

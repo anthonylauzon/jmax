@@ -12,9 +12,6 @@
 #  
 package provide mess
 
-global jmaxArch jmaxMode
-ucs load module mess $dir/c/lib/$jmaxArch/$jmaxMode/libmess.so
-
 puts "package: mess (message classes)"
 
 # help

@@ -88,13 +88,17 @@ if {[file exists [systemProperty user.home]/.jmaxrc]} then {
 ##
 ## Site specific configurations
 ##
-source $jmaxRootDir/config/site.tcl
+#source $jmaxRootDir/config/site.tcl
+source $jmaxRootDir/tcl/site.tcl
 
 ##
 ## Load the machine file if existing
 ## 
-if {[file exists $jmaxRootDir/config/$jmaxHost.tcl]} then {
-    source $jmaxRootDir/config/$jmaxHost.tcl
+#if {[file exists $jmaxRootDir/config/$jmaxHost.tcl]} then {
+#    source $jmaxRootDir/config/$jmaxHost.tcl
+#}
+if {[file exists $jmaxRootDir/tcl/$jmaxHost.tcl]} then {
+    source $jmaxRootDir/tcl/$jmaxHost.tcl
 }
 
 ##
@@ -105,15 +109,22 @@ source $jmaxRootDir/tcl/params.tcl
 ##
 ## Load the machine type file if existing
 ## 
-if {[file exists $jmaxRootDir/config/$jmaxHostType.tcl]} then {
-    source $jmaxRootDir/tcl/config/$jmaxHostType.tcl
+#if {[file exists $jmaxRootDir/config/$jmaxHostType.tcl]} then {
+#    source $jmaxRootDir/tcl/config/$jmaxHostType.tcl
+#} else {
+#    if {[file exists $jmaxRootDir/tcl/config/$jmaxHostType.tcl]} then {
+#	source $jmaxRootDir/tcl/config/$jmaxHostType.tcl
+#    } else {
+#	puts "Host Type $jmaxHostType do not exists"
+#	exit
+#    }
+#}
+
+if {[file exists $jmaxRootDir/tcl/$jmaxHostType.tcl]} then {
+    source $jmaxRootDir/tcl/$jmaxHostType.tcl
 } else {
-    if {[file exists $jmaxRootDir/tcl/config/$jmaxHostType.tcl]} then {
-	source $jmaxRootDir/tcl/config/$jmaxHostType.tcl
-    } else {
-	puts "Host Type $jmaxHostType do not exists"
-	exit
-    }
+    puts "Host Type $jmaxHostType do not exists"
+    exit
 }
 
 ##

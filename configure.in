@@ -60,10 +60,18 @@ PLATFORM=linux
 AC_SUBST(PLATFORM)
 
 if test "x${prefix}" = "xNONE"; then
-  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "/usr/lib/jmax")
+  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "/usr/share/jmax")
 else
-  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}")
+  AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}/share/jmax")
 fi
+
+
+FTSDIR=${bindir}
+ROOTDIR="${datadir}/jmax"
+
+AC_SUBST(FTSDIR)
+AC_SUBST(ROOTDIR)
+
 
 dnl Check for Java compiler
 dnl AC_PROG_JAVAC
@@ -74,6 +82,12 @@ AC_OUTPUT(
 Makefile
 fts/Makefile
 fts/version.c
+bin/Makefile
+bin/jmax
+tcl/Makefile
+images/Makefile
+tutorials/Makefile
+tutorials/basics/Makefile
 java/src/ircam/jmax/MaxVersion.java
 java/Makefile
 java/src/Makefile
@@ -109,6 +123,7 @@ packages/alsa/c/src/Makefile
 packages/control/Makefile
 packages/control/c/Makefile
 packages/control/c/src/Makefile
+packages/control/help/Makefile
 packages/data/Makefile
 packages/data/c/Makefile
 packages/data/c/src/Makefile
@@ -126,6 +141,8 @@ packages/data/java/src/ircam/jmax/editors/table/actions/Makefile
 packages/data/java/src/ircam/jmax/editors/table/menus/Makefile
 packages/data/java/src/ircam/jmax/editors/table/renderers/Makefile
 packages/data/java/src/ircam/jmax/editors/table/tools/Makefile
+packages/data/help/Makefile
+packages/data/images/Makefile
 packages/explode/Makefile
 packages/explode/c/Makefile
 packages/explode/c/src/Makefile
@@ -138,6 +155,8 @@ packages/explode/java/src/ircam/jmax/editors/Makefile
 packages/explode/java/src/ircam/jmax/editors/explode/Makefile
 packages/explode/java/src/ircam/jmax/editors/explode/actions/Makefile
 packages/explode/java/src/ircam/jmax/editors/explode/menus/Makefile
+packages/explode/help/Makefile
+packages/explode/images/Makefile
 packages/guiobj/Makefile
 packages/guiobj/c/Makefile
 packages/guiobj/c/src/Makefile
@@ -147,9 +166,12 @@ packages/guiobj/java/src/Makefile
 packages/guiobj/java/src/ircam/Makefile
 packages/guiobj/java/src/ircam/jmax/Makefile
 packages/guiobj/java/src/ircam/jmax/guiobj/Makefile
+packages/guiobj/help/Makefile
+packages/guiobj/images/Makefile
 packages/io/Makefile
 packages/io/c/Makefile
 packages/io/c/src/Makefile
+packages/io/help/Makefile
 packages/ispw/Makefile
 packages/ispw/c/Makefile
 packages/ispw/c/src/Makefile
@@ -159,24 +181,33 @@ packages/ispw/java/src/Makefile
 packages/ispw/java/src/ircam/Makefile
 packages/ispw/java/src/ircam/jmax/Makefile
 packages/ispw/java/src/ircam/jmax/ispw/Makefile
+packages/ispw/help/Makefile
+packages/ispw/help/control/Makefile
+packages/ispw/help/signal/Makefile
 packages/ispwmath/Makefile
 packages/ispwmath/c/Makefile
 packages/ispwmath/c/src/Makefile
+packages/ispwmath/help/Makefile
 packages/lists/Makefile
 packages/lists/c/Makefile
 packages/lists/c/src/Makefile
+packages/lists/help/Makefile
 packages/math/Makefile
 packages/math/c/Makefile
 packages/math/c/src/Makefile
+packages/math/help/Makefile
 packages/mess/Makefile
 packages/mess/c/Makefile
 packages/mess/c/src/Makefile
+packages/mess/help/Makefile
 packages/midi/Makefile
 packages/midi/c/Makefile
 packages/midi/c/src/Makefile
+packages/midi/help/Makefile
 packages/numeric/Makefile
 packages/numeric/c/Makefile
 packages/numeric/c/src/Makefile
+packages/numeric/help/Makefile
 packages/oss/Makefile
 packages/oss/c/Makefile
 packages/oss/c/src/Makefile
@@ -207,12 +238,15 @@ packages/sequence/java/src/ircam/jmax/editors/sequence/menus/Makefile
 packages/sequence/java/src/ircam/jmax/editors/sequence/renderers/Makefile
 packages/sequence/java/src/ircam/jmax/editors/sequence/tools/Makefile
 packages/sequence/java/src/ircam/jmax/editors/sequence/track/Makefile
+packages/sequence/help/Makefile
 packages/signal/Makefile
 packages/signal/c/Makefile
 packages/signal/c/src/Makefile
+packages/signal/help/Makefile
 packages/system/Makefile
 packages/system/c/Makefile
 packages/system/c/src/Makefile
+packages/system/help/Makefile
 packages/unixdtd/Makefile
 packages/unixdtd/c/Makefile
 packages/unixdtd/c/src/Makefile

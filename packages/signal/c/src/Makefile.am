@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/signal/c
+packagedir=$(pkgdatadir)/packages/signal/c
 package_LTLIBRARIES=libsignal.la
 libsignal_la_SOURCES= \
 binop.c \

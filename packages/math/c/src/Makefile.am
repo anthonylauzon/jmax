@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/math/c
+packagedir=$(pkgdatadir)/packages/math/c
 package_LTLIBRARIES=libmath.la
 libmath_la_SOURCES= \
 binop.c \

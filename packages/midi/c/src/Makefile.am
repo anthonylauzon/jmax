@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/midi/c
+packagedir=$(pkgdatadir)/packages/midi/c
 package_LTLIBRARIES=libmidi.la
 libmidi_la_SOURCES= \
 midi.c \

@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/alsa/c
+packagedir=$(pkgdatadir)/packages/alsa/c
 package_LTLIBRARIES=libalsa.la
 libalsa_la_SOURCES= \
 alsa.c \

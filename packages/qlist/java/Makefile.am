@@ -1,7 +1,7 @@
 SUBDIRS= src
 
 JARFILE = qlist.jar
-jardir=$(prefix)/packages/qlist/java
+jardir=$(pkgdatadir)/packages/qlist/java
 jar_DATA = $(JARFILE)
 
 clean-compile:

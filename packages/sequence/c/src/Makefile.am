@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/sequence/c
+packagedir=$(pkgdatadir)/packages/sequence/c
 package_LTLIBRARIES=libsequence.la
 libsequence_la_SOURCES= \
 event.c \

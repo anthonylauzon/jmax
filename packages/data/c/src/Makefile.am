@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/data/c
+packagedir=$(pkgdatadir)/packages/data/c
 package_LTLIBRARIES=libdata.la
 libdata_la_SOURCES= \
 bpf.c \

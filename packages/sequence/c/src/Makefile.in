@@ -62,6 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+FTSDIR = @FTSDIR@
 JAVACX = @JAVACX@
 JMAX_VERSION = @JMAX_VERSION@
 LIBTOOL = @LIBTOOL@
@@ -71,9 +72,10 @@ OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 PLATFORM = @PLATFORM@
 RANLIB = @RANLIB@
+ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-packagedir = $(prefix)/jmax/packages/sequence/c
+packagedir = $(pkgdatadir)/packages/sequence/c
 package_LTLIBRARIES = libsequence.la
 libsequence_la_SOURCES =  event.c eventtrk.c message.c midival.c module.c note.c seqfind.c seqmidi.c seqplay.c seqrec.c seqref.c seqstep.c seqsym.c sequence.c track.c 
 

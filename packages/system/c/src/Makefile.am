@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/system/c
+packagedir=$(pkgdatadir)/packages/system/c
 package_LTLIBRARIES=libsystem.la
 libsystem_la_SOURCES= \
 argument.c \

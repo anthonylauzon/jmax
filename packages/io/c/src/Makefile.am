@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/io/c
+packagedir=$(pkgdatadir)/packages/io/c
 package_LTLIBRARIES=libio.la
 libio_la_SOURCES= \
 fakestream.c \

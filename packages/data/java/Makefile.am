@@ -1,7 +1,7 @@
 SUBDIRS= src
 
 JARFILE = data.jar
-jardir=$(prefix)/packages/data/java
+jardir=$(pkgdatadir)/packages/data/java
 jar_DATA = $(JARFILE)
 
 clean-compile:

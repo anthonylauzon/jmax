@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/control/c
+packagedir=$(pkgdatadir)/packages/control/c
 package_LTLIBRARIES=libcontrol.la
 libcontrol_la_SOURCES= \
 control.c \

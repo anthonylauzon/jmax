@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/mess/c
+packagedir=$(pkgdatadir)/packages/mess/c
 package_LTLIBRARIES=libmess.la
 libmess_la_SOURCES= \
 mess.c \

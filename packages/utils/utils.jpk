@@ -25,8 +25,5 @@
 
 package provide utils
 
-global jmaxArch jmaxMode
-
-ucs load module utils $dir/c/lib/$jmaxArch/$jmaxMode/libutils.so
-
+puts "package: utils (utility structures)"
 

@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/qlist/c
+packagedir=$(pkgdatadir)/packages/qlist/c
 package_LTLIBRARIES=libqlist.la
 libqlist_la_SOURCES= \
 qlist.c 

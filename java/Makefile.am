@@ -1,8 +1,8 @@
 SUBDIRS= src
 
 JARFILE = jmax.jar
-jardir=$(prefix)/java
-jar_DATA = $(JARFILE)
+pkgjavadir=$(pkgdatadir)/java
+pkgjava_DATA = $(JARFILE) jacl.jar tcljava.jar
 
 clean-compile:
 	rm -f $(JARFILE)

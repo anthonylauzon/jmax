@@ -27,11 +27,4 @@
 ## package declaration
 package provide winmidi
 
-# load dynamic libraries into the server
-ucs load module winmidi $dir/lib/winmidi.dll
-
-# summary and help patches
-#helpSummary "Winmidi summary" $dir/help/winmidi.summary.jmax
-#helpPatch winmidiport $dir/help/winmidiport.help.jmax
-
 post "package: winmidi (Midi port for Windows)"

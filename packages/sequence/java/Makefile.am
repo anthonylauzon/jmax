@@ -1,7 +1,7 @@
 SUBDIRS= src
 
 JARFILE = sequence.jar
-jardir=$(prefix)/packages/sequence/java
+jardir=$(pkgdatadir)/packages/sequence/java
 jar_DATA = $(JARFILE)
 
 clean-compile:

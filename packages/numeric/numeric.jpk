@@ -25,9 +25,6 @@
 
 package provide numeric
 
-global jmaxArch jmaxMode
-ucs load module numeric $dir/c/lib/$jmaxArch/$jmaxMode/libnumeric.so
-
 puts "package: numeric (numeric classes)"
 
 # help

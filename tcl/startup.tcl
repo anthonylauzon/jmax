@@ -76,7 +76,8 @@ sourceFile $jmaxRootDir/tutorials/basics/project.env
 # load installation default packages
 # Use sourceFile as a protection against user errors
 #
-sourceFile $jmaxRootDir/config/packages.tcl
+#sourceFile $jmaxRootDir/config/packages.tcl
+sourceFile $jmaxRootDir/tcl/require.tcl
 
 jmaxSetSampleRate $jmaxSampleRate
 jmaxSetAudioBuffer $jmaxAudioBuffer

@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/utils/c
+packagedir=$(pkgdatadir)/packages/utils/c
 package_LTLIBRARIES=libutils.la
 libutils_la_SOURCES= \
 cfft.c \

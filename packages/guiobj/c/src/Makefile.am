@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/guiobj/c
+packagedir=$(pkgdatadir)/packages/guiobj/c
 package_LTLIBRARIES=libguiobj.la
 libguiobj_la_SOURCES= \
 button.c \

@@ -22,16 +22,12 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
-package require data
-package require mess
 
-## package declaration
 package provide guiobj
 
-global jmaxArch jmaxMode
-ucs load module guiobj $dir/c/lib/$jmaxArch/$jmaxMode/libguiobj.so
-java::load -classpath "$dir/java/classes" ircam.jmax.guiobj.GuiObjExtension
+java::load -classpath "$dir/java" ircam.jmax.guiobj.GuiObjExtension
 
 ## load help patch table
 sourceFile $dir/help/guiobj.help.index.tcl
 helpSummary "GUI summary" $dir/help/guiobj.summary.jmax
+

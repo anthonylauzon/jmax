@@ -62,6 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+FTSDIR = @FTSDIR@
 JAVACX = @JAVACX@
 JMAX_VERSION = @JMAX_VERSION@
 LIBTOOL = @LIBTOOL@
@@ -71,9 +72,10 @@ OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 PLATFORM = @PLATFORM@
 RANLIB = @RANLIB@
+ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-packagedir = $(prefix)/jmax/packages/ispw/c
+packagedir = $(pkgdatadir)/packages/ispw/c
 package_LTLIBRARIES = libispw.la
 
 # The following are architecture dependant and must be determined by configure script
@@ -82,8 +84,10 @@ package_LTLIBRARIES = libispw.la
 #phasor_ieeewrap.c \
 #phasor_intphase.c \
 
-libispw_la_SOURCES =  osc_ieeewrap.c phasor_ieeewrap.c Rreceive.c Rsend.c abs.c accum.c adc_tilda.c atomlist.c bag.c bangbang.c biquad.c cfbpass2.c change.c clip.c coef_h1.c dac_tilda.c delay.c delbuf.c delread.c deltable.c delwrite.c drunk.c expr_doctor.c exscale.c fft.c fft_ftl.c filters.c float.c fourpoint.c ftl_biquad.c ftl_delay.c ftl_fir.c ftl_iir.c ftl_samprw.c ftom.c funbuff.c gate.c iir.c integer.c ispw.c ispwcomp.c line.c loadbang.c logscale.c makenote.c message.c message_doctor.c metro.c midi.c mididecrypt.c midiformat.c midiparse.c mtof.c naming.c nbangs.c noise.c osc.c pack.c pbank.c phasor.c pipe.c pitch.c poly.c prepend.c pt.c pt_meth.c pt_tools.c random.c resample.c route.c sampbuf.c samphold.c samppeek.c sampread.c sampunit.c sampwrite.c scale.c select.c sig1.c sigabs.c sigapass3.c sigarctan2.c sigline.c sigparam.c sigprint.c sigsnap.c sigswitch.c sigtable.c sigthres.c sigthrow.c sigthru.c speedlim.c split.c stripnote.c sustain.c symbol.c tabcycle.c table.c tabpeek.c tabpoke.c time.c timer.c trigger.c unpack.c value.c vd.c vecclip.c veclog.c vecsqrt.c vectrigon.c vexp.c vexp_fun.c vexp_if.c vexp_util.c voxalloc.c wahwah.c wavetab.c zerocross.c 
+libispw_la_SOURCES =  osc_ieeewrap.c phasor_ieeewrap.c Rreceive.c Rsend.c abs.c accum.c adc_tilda.c atomlist.c bag.c bangbang.c biquad.c cfbpass2.c change.c clip.c coef_h1.c dac_tilda.c delay.c delbuf.c delread.c deltable.c delwrite.c drunk.c expr_doctor.c exscale.c fft.c fft_ftl.c filters.c float.c fourpoint.c ftl_biquad.c ftl_delay.c ftl_fir.c ftl_iir.c ftl_samprw.c ftom.c funbuff.c gate.c iir.c integer.c ispw.c ispwcomp.c line.c loadbang.c logscale.c makenote.c message.c message_doctor.c metro.c mididecrypt.c midiformat.c midiparse.c mtof.c naming.c nbangs.c noise.c osc.c pack.c pbank.c phasor.c pipe.c pitch.c poly.c prepend.c pt.c pt_meth.c pt_tools.c random.c resample.c route.c sampbuf.c samphold.c samppeek.c sampread.c sampunit.c sampwrite.c scale.c select.c sig1.c sigabs.c sigapass3.c sigarctan2.c sigline.c sigparam.c sigprint.c sigsnap.c sigswitch.c sigtable.c sigthres.c sigthrow.c sigthru.c speedlim.c split.c stripnote.c sustain.c symbol.c tabcycle.c table.c tabpeek.c tabpoke.c time.c timer.c trigger.c unpack.c value.c vd.c vecclip.c veclog.c vecsqrt.c vectrigon.c vexp.c vexp_fun.c vexp_if.c vexp_util.c voxalloc.c wahwah.c wavetab.c zerocross.c 
 
+
+#midi.c \
 
 INCLUDES = -I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -106,18 +110,18 @@ expr_doctor.lo exscale.lo fft.lo fft_ftl.lo filters.lo float.lo \
 fourpoint.lo ftl_biquad.lo ftl_delay.lo ftl_fir.lo ftl_iir.lo \
 ftl_samprw.lo ftom.lo funbuff.lo gate.lo iir.lo integer.lo ispw.lo \
 ispwcomp.lo line.lo loadbang.lo logscale.lo makenote.lo message.lo \
-message_doctor.lo metro.lo midi.lo mididecrypt.lo midiformat.lo \
-midiparse.lo mtof.lo naming.lo nbangs.lo noise.lo osc.lo pack.lo \
-pbank.lo phasor.lo pipe.lo pitch.lo poly.lo prepend.lo pt.lo pt_meth.lo \
-pt_tools.lo random.lo resample.lo route.lo sampbuf.lo samphold.lo \
-samppeek.lo sampread.lo sampunit.lo sampwrite.lo scale.lo select.lo \
-sig1.lo sigabs.lo sigapass3.lo sigarctan2.lo sigline.lo sigparam.lo \
-sigprint.lo sigsnap.lo sigswitch.lo sigtable.lo sigthres.lo sigthrow.lo \
-sigthru.lo speedlim.lo split.lo stripnote.lo sustain.lo symbol.lo \
-tabcycle.lo table.lo tabpeek.lo tabpoke.lo time.lo timer.lo trigger.lo \
-unpack.lo value.lo vd.lo vecclip.lo veclog.lo vecsqrt.lo vectrigon.lo \
-vexp.lo vexp_fun.lo vexp_if.lo vexp_util.lo voxalloc.lo wahwah.lo \
-wavetab.lo zerocross.lo
+message_doctor.lo metro.lo mididecrypt.lo midiformat.lo midiparse.lo \
+mtof.lo naming.lo nbangs.lo noise.lo osc.lo pack.lo pbank.lo phasor.lo \
+pipe.lo pitch.lo poly.lo prepend.lo pt.lo pt_meth.lo pt_tools.lo \
+random.lo resample.lo route.lo sampbuf.lo samphold.lo samppeek.lo \
+sampread.lo sampunit.lo sampwrite.lo scale.lo select.lo sig1.lo \
+sigabs.lo sigapass3.lo sigarctan2.lo sigline.lo sigparam.lo sigprint.lo \
+sigsnap.lo sigswitch.lo sigtable.lo sigthres.lo sigthrow.lo sigthru.lo \
+speedlim.lo split.lo stripnote.lo sustain.lo symbol.lo tabcycle.lo \
+table.lo tabpeek.lo tabpoke.lo time.lo timer.lo trigger.lo unpack.lo \
+value.lo vd.lo vecclip.lo veclog.lo vecsqrt.lo vectrigon.lo vexp.lo \
+vexp_fun.lo vexp_if.lo vexp_util.lo voxalloc.lo wahwah.lo wavetab.lo \
+zerocross.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -141,7 +145,7 @@ DEP_FILES =  .deps/Rreceive.P .deps/Rsend.P .deps/abs.P .deps/accum.P \
 .deps/ftom.P .deps/funbuff.P .deps/gate.P .deps/iir.P .deps/integer.P \
 .deps/ispw.P .deps/ispwcomp.P .deps/line.P .deps/loadbang.P \
 .deps/logscale.P .deps/makenote.P .deps/message.P \
-.deps/message_doctor.P .deps/metro.P .deps/midi.P .deps/mididecrypt.P \
+.deps/message_doctor.P .deps/metro.P .deps/mididecrypt.P \
 .deps/midiformat.P .deps/midiparse.P .deps/mtof.P .deps/naming.P \
 .deps/nbangs.P .deps/noise.P .deps/osc.P .deps/osc_ieeewrap.P \
 .deps/pack.P .deps/pbank.P .deps/phasor.P .deps/phasor_ieeewrap.P \

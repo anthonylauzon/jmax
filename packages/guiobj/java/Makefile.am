@@ -1,7 +1,7 @@
 SUBDIRS= src
 
 JARFILE = guiobj.jar
-jardir=$(prefix)/packages/guiobj/java
+jardir=$(pkgdatadir)/packages/guiobj/java
 jar_DATA = $(JARFILE)
 
 clean-compile:

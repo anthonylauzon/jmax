@@ -1,7 +1,7 @@
 SUBDIRS= src
 
 JARFILE = explode.jar
-jardir=$(prefix)/packages/explode/java
+jardir=$(pkgdatadir)/packages/explode/java
 jar_DATA = $(JARFILE)
 
 clean-compile:

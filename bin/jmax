@@ -29,7 +29,12 @@
 # ***************************************************************************
 # JAVA_DEFAULT_OPTIONS="-noclassgc -noasyncgc -mx64m -ms2m"
 JAVA_DEFAULT_OPTIONS="-noclassgc -mx64m -ms2m"
-DEFAULT_ROOT_DIR=/usr/lib/jmax
+
+prefix=/u/worksta/hanappe/tmp/jmax
+exec_prefix=${prefix}
+rootdir=${prefix}/share/jmax
+ftsdir=${exec_prefix}/bin
+javadir=${rootdir}/java
 
 # ***************************************************************************
 # Functions
@@ -66,7 +71,7 @@ Options and arguments:
   -root|-r <directory>       (optional)
     Specify the root directory (where to find the jmax.jar file, the initialization
     scripts, etc.)
-    Defaults to $DEFAULT_ROOT_DIR
+    Defaults to $rootdir
 
   <other-jmax-options>       (optional)
     Defines jMax options that are passed directly to ircam.jmax.MaxApplication as 
@@ -96,7 +101,7 @@ decrypt_options ()
     VERBOSE=
     NOFORK=
     NOJAR=
-    ROOTDIR=$DEFAULT_ROOT_DIR
+    ROOTDIR=$rootdir
 
     for arg in $@
     do
@@ -138,16 +143,16 @@ check_installation ()
 {
     if [ $NOJAR ]
     then
-	if [ ! -f ${ROOTDIR}/java/src/ircam/jmax/MaxApplication.class ]
+	if [ ! -f ${javadir}/src/ircam/jmax/MaxApplication.class ]
 	then
-	    echo "Cannot find file ${ROOTDIR}/java/src/ircam/jmax/MaxApplication.class"
+	    echo "Cannot find file ${javadir}/src/ircam/jmax/MaxApplication.class"
 	    echo "You have probably installed a source distribution and did not compile it !"
 	    exit 1
 	fi
     else
-	if [ ! -f ${ROOTDIR}/java/jmax.jar ]
+	if [ ! -f ${javadir}/jmax.jar ]
 	then
-	    echo "Cannot find file ${ROOTDIR}/java/jmax.jar"
+	    echo "Cannot find file ${javadir}/jmax.jar"
 	    echo "You have probably installed a source distribution and did not compile it !"
 	    exit 1
 	fi
@@ -159,16 +164,16 @@ build_classpath ()
 {
     if [ $NOJAR ]
     then
-	JMAX_CLASSPATH=${ROOTDIR}/java/src
+	JMAX_CLASSPATH=${javadir}/src
     else
-	JMAX_CLASSPATH=${ROOTDIR}/java/jmax.jar
+	JMAX_CLASSPATH=${javadir}/jmax.jar
     fi
 
     if [ $CLASSPATH ]
     then
-	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar:${ROOTDIR}/java/lib/jacl/tcljava.jar
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${javadir}/jacl.jar:${javadir}/tcljava.jar
     else
-	CLASSPATH=${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar:${ROOTDIR}/java/lib/jacl/tcljava.jar
+	CLASSPATH=${JMAX_CLASSPATH}:${javadir}/jacl.jar:${javadir}/tcljava.jar
     fi
 }
 
@@ -189,7 +194,7 @@ start_it ()
 	echo "CLASSPATH=${CLASSPATH}"
     fi
 
-    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -jmaxRoot $ROOTDIR $JMAXOPT "
+    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.MaxApplication -jmaxServerDir ${ftsdir} -jmaxRoot $ROOTDIR $JMAXOPT "
 
     ECHO_CMD="CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD"
 

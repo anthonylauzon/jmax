@@ -62,6 +62,7 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+FTSDIR = @FTSDIR@
 JAVACX = @JAVACX@
 JMAX_VERSION = @JMAX_VERSION@
 LIBTOOL = @LIBTOOL@
@@ -71,12 +72,18 @@ OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 PLATFORM = @PLATFORM@
 RANLIB = @RANLIB@
+ROOTDIR = @ROOTDIR@
 VERSION = @VERSION@
 
-SUBDIRS = c
+SUBDIRS = c help
+
+packagedir = $(pkgdatadir)/packages/io
+package_DATA = io.jpk 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
+DATA =  $(package_DATA)
+
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -93,6 +100,25 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
+
+install-packageDATA: $(package_DATA)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(packagedir)
+	@list='$(package_DATA)'; for p in $$list; do \
+	  if test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(packagedir)/$$p"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(packagedir)/$$p; \
+	  else if test -f $$p; then \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(packagedir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(packagedir)/$$p; \
+	  fi; fi; \
+	done
+
+uninstall-packageDATA:
+	@$(NORMAL_UNINSTALL)
+	list='$(package_DATA)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(packagedir)/$$p; \
+	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -224,20 +250,21 @@ installcheck: installcheck-recursive
 install-exec-am:
 install-exec: install-exec-recursive
 
-install-data-am:
+install-data-am: install-packageDATA
 install-data: install-data-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-recursive
-uninstall-am:
+uninstall-am: uninstall-packageDATA
 uninstall: uninstall-recursive
-all-am: Makefile
+all-am: Makefile $(DATA)
 all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs: installdirs-recursive
 installdirs-am:
+	$(mkinstalldirs)  $(DESTDIR)$(packagedir)
 
 
 mostlyclean-generic:
@@ -269,11 +296,11 @@ maintainer-clean-am:  maintainer-clean-tags maintainer-clean-generic \
 
 maintainer-clean: maintainer-clean-recursive
 
-.PHONY: install-data-recursive uninstall-data-recursive \
-install-exec-recursive uninstall-exec-recursive installdirs-recursive \
-uninstalldirs-recursive all-recursive check-recursive \
-installcheck-recursive info-recursive dvi-recursive \
-mostlyclean-recursive distclean-recursive clean-recursive \
+.PHONY: uninstall-packageDATA install-packageDATA install-data-recursive \
+uninstall-data-recursive install-exec-recursive \
+uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
+all-recursive check-recursive installcheck-recursive info-recursive \
+dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir info-am info \
 dvi-am dvi check check-am installcheck-am installcheck install-exec-am \

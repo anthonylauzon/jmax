@@ -1,4 +1,4 @@
-packagedir=$(prefix)/jmax/packages/lists/c
+packagedir=$(pkgdatadir)/packages/lists/c
 package_LTLIBRARIES=liblists.la
 liblists_la_SOURCES= \
 list.c \
