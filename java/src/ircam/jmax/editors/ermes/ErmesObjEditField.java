@@ -13,8 +13,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   boolean focused = false;    
   ErmesObjEditableObject itsOwner= null;
   ErmesSketchPad itsSketchPad = null;
-  int itsOldLineWidth = 0;
-  int itsOldLineChars = 0;
 	
   //--------------------------------------------------------
   // CONSTRUCTOR
@@ -63,7 +61,9 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       }
     }
     if(aTextString.endsWith("\n")){
-      aTextString = aTextString.substring(0, aTextString.length()-1);
+      while(aTextString.endsWith("\n")){
+	aTextString = aTextString.substring(0, aTextString.length()-1);
+      }
     }
     
     if (itsOwner == null) return false; //this happens when the instatiation fails
@@ -91,6 +91,14 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       d1.width = lenght+itsOwner.WIDTH_DIFF+10;
       itsOwner.setSize(d1.width, d1.height);
     }
+    int height = getFontMetrics(getFont()).getHeight()*itsOwner.itsParsedTextVector.size();
+    if((height< getSize().height-10)&&(!itsOwner.itsResized)){
+      Dimension d1 = itsOwner.Size();
+      d1.height = height+2*itsOwner.HEIGHT_DIFF;
+      itsOwner.setSize(d1.width, d1.height);
+      if(itsOwner.itsOutletList.size()>0)
+	itsOwner.MoveOutlets();
+    }
     itsOwner.update(itsOwner.itsFtsObject);
     
     itsOwner.itsInEdit = false;
@@ -100,8 +108,9 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     focused = false;
     itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
     
-    if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+    if(itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
     itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
+    //itsSketchPad.repaint();//?????
     itsOwner = null;
 
     setRows(1);
@@ -139,9 +148,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     itsSketchPad.editStatus = ErmesSketchPad.EDITING_OBJECT;
     if (focused) return;
     else focused = true;
-    
-    //if (getText().compareTo("") == 0) return true; 
-    //else return true;
   }
 
   public void focusLost(FocusEvent e){}
@@ -178,50 +184,14 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     if (isEditable()) {
       if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
 	setRows(getRows()+1);
-	itsOldLineWidth = fm.stringWidth(s);
-	itsOldLineChars = s.length(); 
 	Dimension d2 = itsOwner.Size();
 	itsOwner.setSize(d2.width, d2.height+fm.getHeight());
-	setSize(getSize().width, getSize().height + fm.getHeight());//non sposta le outlet se ci sono
+	if(itsOwner.itsOutletList.size()>0)
+	  itsOwner.MoveOutlets();
+	setSize(getSize().width, getSize().height + fm.getHeight());
 	requestFocus();
 	return;
       }
-      //else if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
-      //if(start==end){
-      //if(start>0){
-      //if(e.isShiftDown())
-      //select(start-1, start);
-      //    else
-      //    select(start-1,start-1);
-      // }
-      //	}
-      //else{
-      //if(e.isShiftDown())
-      //  select(start-1, end);
-      //else
-      // select(start,start);
-      //}
-      // return;
-      //}
-      //else if(e.getKeyCode() == Event.RIGHT){//freccia a destra
-      //if(start==end){
-      //if(start < s.length()){
-      //if(e.isShiftDown())
-      //select(start, end+1);
-      //	    else
-      //      select(start+1,start+1);
-      //}
-      //}
-      //else{
-      //if(e.isShiftDown())
-      //select(start, end+1);
-      // else
-      // select(end,end);
-      //}
-      //return;
-      //}
-      //else if((e.getKeyCode()==Event.UP)||(e.getKeyCode()== Event.DOWN))
-      //	return;
       //else if (e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY || e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
       //if(start==end){//se non c' testo selezionato
       // if(start>0){
@@ -247,8 +217,8 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       //itsOwner.itsArgs = s;
       //}
       else{//scrittura
-	aCurrentLineChars = s.length() - itsOldLineChars;
-	if(aCurrentLineChars+5 > getColumns())
+	aCurrentLineChars = GetCurrentLineChars(s);//s.length() - itsOldLineChars;
+	if(aCurrentLineChars+10 > getColumns())
 	  setColumns(getColumns()+20);
 
 	char k = e.getKeyChar();
@@ -257,25 +227,18 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	    s1 = s.substring(0, start);
 	    s2 = s.substring(end, s.length());
 	    s = s1+s2;
-	    // setText(s);
-	    //select(start,start);
 	  }
 	}
 	if(start < s.length()){//inserisce testo intermedio
 	  s1 = s.substring(0, start);
 	  s2 = s.substring(start, s.length());
 	  s = s1+k+s2;
-	  //e.e.setText(s);
 	}
 	else//inserisce testo in coda
 	  s = s+k;
 	
-	aCurrentLineWidth = fm.stringWidth(s)-itsOldLineWidth;
+	aCurrentLineWidth = GetCurrentLineWidth(fm, s);
 	aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
-	//System.out.println("fm.stringWidth(s) = "+fm.stringWidth(s));
-	//System.out.println("itsOldLineWidth = "+aOldLineWidth);
-	//System.out.println("aCurrentLineWidth = "+aCurrentLineWidth);
-	//if (lenght >= getSize().width-5) {
 	if (aCurrentLineWidth >= getSize().width-5) {  
 	  int step;
 	  if(aWidth>20) step = aWidth;
@@ -285,12 +248,42 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	  setSize(getSize().width+step, getSize().height);
 	  requestFocus();
 	} 
-	//select(start,start);
       }
     }
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
+
+  public int GetCurrentLineWidth(FontMetrics fm, String theString){
+    int aPos = getCaretPosition();
+    int aIndex = theString.indexOf("\n");
+    int aOldIndex = -1;
+    while((aIndex!=-1)&&(aIndex<aPos)){
+      aOldIndex = aIndex;
+      aIndex = theString.indexOf("\n", aOldIndex+1);
+    } 
+    if(aIndex==-1){
+      if(aOldIndex==-1) return fm.stringWidth(theString);
+      else return fm.stringWidth(theString.substring(aOldIndex));
+    }
+    else return fm.stringWidth(theString.substring(aOldIndex, aIndex));
+  }
+
+   public int GetCurrentLineChars(String theString){
+    int aPos = getCaretPosition();
+    int aIndex = theString.indexOf("\n");
+    int aOldIndex = -1;
+    while((aIndex!=-1)&&(aIndex<aPos)){
+      aOldIndex = aIndex;
+      aIndex = theString.indexOf("\n", aOldIndex+1);
+    } 
+    if(aIndex==-1){
+      if(aOldIndex==-1) return theString.length();
+      else return theString.length()-aOldIndex;
+    }
+    else return aIndex-aOldIndex;
+  }
+
 
   //--------------------------------------------------------
   // paint()

@@ -32,6 +32,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   final static int MOVINGSEGMENT    = 5;	
   final static int RESIZING_OBJECT  = 6;
   final static int EDITING_OBJECT   = 7;
+  final static int EDITING_COMMENT  = 8;
   final static int FromOutToIn 	    = 1;
   final static int FromInToOut 	    = -1;
   final static int NoDirections     = 0;
@@ -58,6 +59,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public boolean itsGraphicsOn = true;
   
   ErmesObjEditField itsEditField = null;
+  ErmesObjTextArea itsTextArea = null;
   ErmesObject itsConnectingObj = null;  
   ErmesObjInOutlet itsConnectingLet = null;
   int currentMouseX, currentMouseY;	// used during the MOVING status
@@ -729,6 +731,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     validate();
     itsEditField.setVisible(false);
     itsEditField.setLocation(-200,-200);
+    
+    itsTextArea = new ErmesObjTextArea(this);
+    add(itsTextArea);
+    validate();
+    itsTextArea.setVisible(false);
+    itsTextArea.setLocation(-200,-200);
 
     setBackground(sketchColor);
     addMouseMotionListener(this);
@@ -797,7 +805,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     if(editStatus == EDITING_OBJECT){
       itsEditField.LostFocus();
     }
-    
+    if(editStatus == EDITING_COMMENT){
+      itsTextArea.LostFocus();
+    }
     ///if we are in a InOutLet
     if(itsHelper.IsInInOutLet(x,y)){
       itsHelper.DeselectObjAndConn();
@@ -1071,7 +1081,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public ErmesObjEditField GetEditField(){
     return itsEditField;
   }
-
+  public ErmesObjTextArea GetTextArea(){
+    return itsTextArea;
+  }
   //--------------------------------------------------------
   //	MoveSegment
   //--------------------------------------------------------

@@ -9,53 +9,140 @@ import ircam.jmax.utils.*;
  */
 class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
   static String filler = " ";
-  ErmesObjComment itsOwner;
+  ErmesObjComment itsOwner = null;
+  ErmesSketchPad itsSketchPad = null;
+  boolean laidOut = false;
   boolean focused = false;
-  Dimension preferredRCSize;
   int DEFAULT_COLS = 20;
   
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  ErmesObjTextArea(int lines, int rows, ErmesObjComment theOwner) {
-    super(" ", lines, rows, TextArea.SCROLLBARS_NONE);
-    preferredRCSize = new Dimension(lines, rows);
-    itsOwner = theOwner;
+  ErmesObjTextArea(ErmesSketchPad theSketchPad) {
+    super(" ", 5, 20, TextArea.SCROLLBARS_NONE);
     setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME,Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));
     setEditable(true);
     selectAll();
+    itsSketchPad = theSketchPad;
     focused = true;
-
+    
     addKeyListener(this);
     addFocusListener(this);
   }
-  ///////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////focusListener --inizio
-  public void focusGained(FocusEvent e){}
 
-  public void focusLost(FocusEvent e){
-    String pippazza = getText();
-    if (pippazza.compareTo("") == 0 || pippazza.compareTo(" ") == 0) return; 
-    itsOwner.itsArgs = getText();
-    setVisible(false);
-    setLocation(-2000,-2000);
-    if (itsOwner.itsSketchPad != null) {
-    itsOwner.ReComputeSizes(itsOwner.itsArgs, DEFAULT_COLS);
-    itsOwner.Paint(itsOwner.itsSketchPad.GetOffGraphics());
-    itsOwner.itsSketchPad.CopyTheOffScreen(itsOwner.itsSketchPad.getGraphics());
+  //--------------------------------------------------------
+  // lostFocus
+  //--------------------------------------------------------
+  public boolean LostFocus() {
+    if (!focused) return true;
+    else {
+      focused = false;
+      itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+      itsSketchPad.itsSketchWindow.requestFocus();
     }
+    //try to test if this lost foscus happens in the following conditions:
+    // an object was put on the sketchpad without writing into it
+    // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
+    String aTextString = getText();
+    if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
+      setVisible(false);
+      setLocation(-200,-200);
+      
+      if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+      itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
+      itsOwner = null;	//seems to be crazy but...
+      
+      return true; //(immediately)
+    }
+    //try to test if the object was already instantiated; in case, delete the object... (how?)
+    
+    //qui si prova a togliere gli spazi in fondo dalla parola....
+    if(aTextString.endsWith(" ")){
+      while(aTextString.endsWith(" ")){
+	aTextString = aTextString.substring(0, aTextString.length()-1);
+      }
+    }
+    if(aTextString.endsWith("\n")){
+      while(aTextString.endsWith("\n")){
+	aTextString = aTextString.substring(0, aTextString.length()-1);
+      }
+    }
+    
+    if (itsOwner == null) return false; //this happens when the instatiation fails
+    itsOwner.itsArgs = aTextString;
+    ParseText(aTextString);
+    
+    ///qui accorcia se il testo e' piu' corto dell'oggetto
+    //dovrebbe farlo anche per l'altezza...
+
+    int lenght = getFontMetrics(getFont()).stringWidth(aTextString);
+  
+    if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
+      Dimension d1 = itsOwner.Size();
+      d1.width = lenght+10;
+      itsOwner.setSize(d1.width, d1.height);
+    }
+    int height = getFontMetrics(getFont()).getHeight()*itsOwner.itsParsedTextVector.size();
+    if((height< getSize().height-10)&&(!itsOwner.itsResized)){
+      Dimension d1 = itsOwner.Size();
+      d1.height = height;
+      itsOwner.setSize(d1.width, d1.height);
+    }
+        
+    setVisible(false);
+    setLocation(-200,-200);
+    focused = false;
+    itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+    
+    if(itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
+    itsOwner = null;
+
+    setRows(5);
+    setColumns(20);
+    return true;       
+  }
+	
+  private void ParseText(String theString){
+    int aIndex = theString.indexOf("\n");
+    int aOldIndex = -1;
+    int aLastIndex = theString.lastIndexOf("\n");
+    String aString;
+    int length = 0;
+    int i = 0;
+    while(aIndex!=-1){
+      aString = theString.substring(aOldIndex+1, aIndex);
+      length = getFontMetrics(getFont()).stringWidth(aString);
+      if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
+	itsOwner.itsMaxString = aString;
+      itsOwner.itsParsedTextVector.addElement(aString);
+      aOldIndex = aIndex;
+      aIndex = theString.indexOf("\n", aOldIndex+1);
+      i++;
+    }
+    aString = theString.substring(aOldIndex+1);
+    length = getFontMetrics(getFont()).stringWidth(aString);
+    if(length> getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString)) 
+      itsOwner.itsMaxString = aString;
+    itsOwner.itsParsedTextVector.addElement(aString);
   }
 
+  ///////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////focusListener --inizio
+  public void focusGained(FocusEvent e){
+    itsSketchPad.editStatus = ErmesSketchPad.EDITING_COMMENT;
+    if (focused) return;
+    else focused = true;
+  }
+
+  public void focusLost(FocusEvent e){}
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////focusListener --fine
 
   /////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////keyListener --inizio
-
-
   public void keyTyped(KeyEvent e){}
   public void keyReleased(KeyEvent e){}
-  
   public void keyPressed(KeyEvent e){
     int lenght;
     String s1, s2;
@@ -63,116 +150,89 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     int end = getSelectionEnd();
     String s = getText();
     FontMetrics fm = getFontMetrics(getFont());
-    int aWidth;
+    int aWidth = 0;
+    int aCurrentLineWidth = 0;
+    int aCurrentLineChars = 0;
     
     if (isEditable()) {
-      //if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
-	//Dimension d2 = itsOwner.size();
-	//d2.height += fm.getHeight();
-	// itsOwner.ResizeTo(d2);
-	//itsOwner.validate();
-      //return;
-      //}
-      //else 
-      if(e.getKeyCode() == Event.LEFT){//freccia a sinistra
-	if(start==end){
-	  if(start>0){
-	    if(e.isShiftDown())
-	      select(start-1, start);
-	    else
-	      select(start-1,start-1);
-	  }
+      if(e.getKeyCode()==ircam.jmax.utils.Platform.ENTER_KEY||e.getKeyCode()==ircam.jmax.utils.Platform.RETURN_KEY){//return
+	itsOwner.itsTextRowNumber++;
+	if(itsOwner.itsTextRowNumber>4){
+	  setRows(getRows()+1);
+	  Dimension d2 = itsOwner.Size();
+	  itsOwner.setSize(d2.width, d2.height+fm.getHeight());
+	  setSize(getSize().width, getSize().height + fm.getHeight());
+	  requestFocus();
 	}
-	else{
-	  if(e.isShiftDown())
-	    select(start-1, end);
-	  else
-	    select(start,start);
-	}
-      }
-      else if(e.getKeyCode() == Event.RIGHT){//freccia a destra
-	if(start==end){
-	  if(start < s.length()){
-	    if(e.isShiftDown())
-	      select(start, end+1);
-	    else
-	      select(start+1,start+1);
-	  }
-	}
-	else{
-	  if(e.isShiftDown())
-	    select(start, end+1);
-	  else
-	    select(end,end);
-	}
-      }
-      else if((e.getKeyCode()==Event.UP)||(e.getKeyCode()== Event.DOWN))
 	return;
-      else if (e.getKeyCode()==ircam.jmax.utils.Platform.DELETE_KEY || e.getKeyCode()==ircam.jmax.utils.Platform.BACKSPACE_KEY) {//cancellazione
-	if(start==end){//se non c' testo selezionato
-	  if(start>0){
-	    if(start < s.length()){//cancella intermedio
-	      s1 = s.substring(0, start-1);
-	      s2 = s.substring(start, s.length());
-	      s = s1+s2;
-	    }
-	    else//cancella in coda
-	      s = s.substring(0, s.length()-1);
-	    setText(s);
-	    select(start-1,start-1);
-	  }
-	}
-	else{//se c' testo selezionato
-	  s1 = s.substring(0, start);
-	  s2 = s.substring(end, s.length());
-	  s = s1+s2;
-	  setText(s);
-	  select(start,start);
-	}
-	
-	//meglio che cancellando non faccia il resize
-	
-	lenght = fm.stringWidth(s);
-	if ((lenght< getSize().width-20)&&(lenght>itsOwner.getMinimumSize().width-20)){
-	Dimension d1 = itsOwner.Size();
-	d1.width -= 20;
-	itsOwner.itsArgs = s;
-	itsOwner.Resize1(d1.width, d1.height);
-	}
       }
       else{//scrittura
+	aCurrentLineChars = GetCurrentLineChars(s);//s.length() - itsOldLineChars;
+	if(aCurrentLineChars+10 > getColumns())
+	  setColumns(getColumns()+20);
+
 	char k = e.getKeyChar();
 	if(start!=end){//cancella selezione
-	  s1 = s.substring(0, start);
-	  s2 = s.substring(end, s.length());
-	  s = s1+s2;
-	  select(start,start);
+	  if(!e.isShiftDown()){
+	    s1 = s.substring(0, start);
+	    s2 = s.substring(end, s.length());
+	    s = s1+s2;
+	  }
 	}
 	if(start < s.length()){//inserisce testo intermedio
 	  s1 = s.substring(0, start);
 	  s2 = s.substring(start, s.length());
 	  s = s1+k+s2;
-	  setText(s);
 	}
 	else//inserisce testo in coda
 	  s = s+k;
 	
-	//lenght = fm.stringWidth(s);
-	  //aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
-	  //if (lenght >= size().width-5) {
-	 // Dimension d = itsOwner.Size();
-	 // if(aWidth>20) d.width += aWidth;
-	 // else d.width += 30;
-	 // itsOwner.resize(d.width, d.height);
-	 // }
-	
-	setText(s);
-	select(start+1,start+1);
+	aCurrentLineWidth = GetCurrentLineWidth(fm, s);//fm.stringWidth(s)-itsOldLineWidth;
+	aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
+	if (aCurrentLineWidth >= getSize().width-5) {  
+	  int step;
+	  if(aWidth>20) step = aWidth;
+	  else step = 30;
+  
+	  itsOwner.setSize(itsOwner.Size().width+step, itsOwner.Size().height);
+	  setSize(getSize().width+step, getSize().height);
+	  requestFocus();
+	} 
       }
     }
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
+  
+  public int GetCurrentLineWidth(FontMetrics fm, String theString){
+    int aPos = getCaretPosition();
+    int aIndex = theString.indexOf("\n");
+    int aOldIndex = -1;
+    while((aIndex!=-1)&&(aIndex<aPos)){
+      aOldIndex = aIndex;
+      aIndex = theString.indexOf("\n", aOldIndex+1);
+    } 
+    if(aIndex==-1){
+      if(aOldIndex==-1) return fm.stringWidth(theString);
+      else return fm.stringWidth(theString.substring(aOldIndex));
+    }
+    else return fm.stringWidth(theString.substring(aOldIndex, aIndex));
+  }  
+  
+  public int GetCurrentLineChars(String theString){
+    int aPos = getCaretPosition();
+    int aIndex = theString.indexOf("\n");
+    int aOldIndex = -1;
+    while((aIndex!=-1)&&(aIndex<aPos)){
+      aOldIndex = aIndex;
+      aIndex = theString.indexOf("\n", aOldIndex+1);
+    } 
+    if(aIndex==-1){
+      if(aOldIndex==-1) return theString.length();
+      else return theString.length()-aOldIndex;
+    }
+    else return aIndex-aOldIndex;
+  }
 
   //--------------------------------------------------------
   // minimumSize()
@@ -188,22 +248,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
   //--------------------------------------------------------
   public Dimension getPreferredSize() {
     return getMinimumSize();
-  }
-    
-  //--------------------------------------------------------
-  // minimumSize(rows, col)
-  //--------------------------------------------------------
-  public Dimension getMinimumSize(int row, int col) {
-    return preferredRCSize;
-  }
-
-    //--------------------------------------------------------
-	// preferredSize(rows, col)
-    //--------------------------------------------------------
-    public Dimension getPreferredSize(int row, int col) {
-        return preferredRCSize;
-    }
-
+  }    
 }
 
 

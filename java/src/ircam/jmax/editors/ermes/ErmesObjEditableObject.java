@@ -15,12 +15,10 @@ import ircam.jmax.fts.*;
   final int WIDTH_DIFF = 14;
   final int HEIGHT_DIFF = 2;
 	
-  //protected static ErmesObjEditField itsEditField = null;
   protected int FIELD_HEIGHT;
   Dimension preferredSize = null;
   String 	  itsArgs;
   public Vector itsParsedTextVector = new Vector();
-  //public int itsLineMaxWidth = 0;
   public String itsMaxString = "";
   public void setSize(int theH, int theV) {}; 
   public boolean resized = false;
@@ -30,8 +28,6 @@ import ircam.jmax.fts.*;
   //--------------------------------------------------------
   public ErmesObjEditableObject(){
     super();
-    //itsFont = ErmesSketchPad.sketchFont;
-    //itsSketchPad.getFontMetrics(itsFont);
   }
 
   public boolean ConnectionRequested(ErmesObjInOutlet theRequester) {return true;}
@@ -47,20 +43,13 @@ import ircam.jmax.fts.*;
     itsX = x; itsY = y;
     itsSketchPad = theSketchPad;
     itsFont = itsSketchPad.sketchFont;
-    /* if (itsEditField == null)	{
-      itsEditField = new ErmesObjEditField(this);
-      itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
-      FIELD_HEIGHT = itsFontMetrics.getHeight();
-      itsEditField.hide();
-    }*/
-    // else {
+
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     FIELD_HEIGHT = itsFontMetrics.getHeight();
     preferredSize = new Dimension(70,FIELD_HEIGHT+2*HEIGHT_DIFF);
     itsSketchPad.GetEditField().setFont(itsFont);
     itsSketchPad.GetEditField().setText("");
     itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-    // }
     currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
     Reshape(itsX, itsY, preferredSize.width, preferredSize.height);
     
@@ -79,20 +68,12 @@ import ircam.jmax.fts.*;
   //this method is called when the external (or the message) have their arguments
   //this happens (for now) just when we are instantiating from a script
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String args) {
-    //prova:
-    /*itsX = x; itsY = y;
-      itsSketchPad = theSketchPad;*/
     itsFont = itsSketchPad.sketchFont;
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); //bugsgi*/
     FIELD_HEIGHT = itsFontMetrics.getHeight();
     preferredSize = new Dimension(70,FIELD_HEIGHT+2*HEIGHT_DIFF);
-    /*currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
-      Reshape(itsX, itsY, preferredSize.width, preferredSize.height);*/
     super.Init(theSketchPad, x, y, args);
     
-    //bugsgi itsEditField.reshape(itsX+4-itsSketchPad.tx, itsY+1-itsSketchPad.ty, currentRect.width-(WIDTH_DIFF-6), currentRect.height-HEIGHT_DIFF);
-    // itsEditField.reshape(itsX+4-itsSketchPad.tx, itsY+1-itsSketchPad.ty, currentRect.width-(WIDTH_DIFF-6), 
-    //					itsFontMetrics.getHeight() + 20 /*?*/); //bugsgi		
     ResizeToText(0, 0);	//will it work?
     return true;
   }
@@ -109,14 +90,9 @@ import ircam.jmax.fts.*;
 
     FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
-    //*preferredSize = new Dimension(70, FIELD_HEIGHT+2*HEIGHT_DIFF);
     int lenght = temporaryFM.stringWidth(itsArgs);	//*
     preferredSize = new Dimension(lenght+2*WIDTH_DIFF, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
-
-    //*int lenght = itsFontMetrics.stringWidth(theString);
-    //*Resize1(lenght+2*WIDTH_DIFF, FIELD_HEIGHT+2*HEIGHT_DIFF);	//desperado
-        
     return true;
   }
 	
@@ -127,7 +103,6 @@ import ircam.jmax.fts.*;
     if(evt.getClickCount()>1) {
       if (itsSketchPad.GetEditField() != null) {
 	itsSketchPad.GetEditField().setEditable(true);
-	//itsParsedTextVector.removeAllElements();//??????????????????
 	itsInEdit = true;
       }
     }
@@ -221,6 +196,14 @@ import ircam.jmax.fts.*;
     super.MoveBy(theDeltaH, theDeltaV);
   }
 	
+  public void MoveOutlets(){
+    ErmesObjOutlet aOutlet;
+    for (Enumeration e=itsOutletList.elements(); e.hasMoreElements();) {
+      aOutlet = (ErmesObjOutlet) e.nextElement();
+      aOutlet.MoveTo(aOutlet.itsX, itsY+currentRect.height);
+      ReroutingConnections(aOutlet);
+    }
+  }
 
   //--------------------------------------------------------
   // minimumSize

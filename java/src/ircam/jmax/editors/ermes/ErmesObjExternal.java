@@ -128,10 +128,14 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	  itsSketchPad.GetEditField().setFont(itsFont);
 	  itsSketchPad.GetEditField().setText(itsArgs);	//warning: what will it happen if itsArgs is not here yet?
 	  itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
-	  itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()+20);
-			       	
+	  //itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()+20);
+	  itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+
+	  itsParsedTextVector.removeAllElements();
+       	
 	  itsSketchPad.GetEditField().setVisible(true);
 	  itsSketchPad.GetEditField().requestFocus();
+	  itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
 	  return true;
 	  // until here bug 55
 	}
