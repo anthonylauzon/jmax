@@ -2164,8 +2164,6 @@
 				F851217E028BD7EA01664092,
 				F851217F028BD7EA01664092,
 				F8512180028BD7EA01664092,
-				F8512181028BD7EA01664092,
-				F8512182028BD7EA01664092,
 				F8512183028BD7EA01664092,
 				F8512184028BD7EA01664092,
 				F8512185028BD7EA01664092,
@@ -2219,6 +2217,7 @@
 				F85121B5028BD7EA01664092,
 				F85121B6028BD7EA01664092,
 				F85121B7028BD7EA01664092,
+				F854BE7402B7CA2901664092,
 			);
 			isa = PBXGroup;
 			name = help;
@@ -4728,18 +4727,6 @@
 			path = ../../packages/ispw/help/int.help.jmax;
 			refType = 2;
 		};
-		F8512181028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = ispw.control.summary.jmax;
-			path = ../../packages/ispw/help/ispw.control.summary.jmax;
-			refType = 2;
-		};
-		F8512182028BD7EA01664092 = {
-			isa = PBXFileReference;
-			name = ispw.signal.summary.jmax;
-			path = ../../packages/ispw/help/ispw.signal.summary.jmax;
-			refType = 2;
-		};
 		F8512183028BD7EA01664092 = {
 			isa = PBXFileReference;
 			name = line.help.jmax;
@@ -5608,8 +5595,6 @@
 				F8512216028BDC3701664092,
 				F8512217028BDC3701664092,
 				F8512218028BDC3701664092,
-				F8512219028BDC3701664092,
-				F851221A028BDC3701664092,
 				F851221B028BDC3701664092,
 				F851221C028BDC3701664092,
 				F851221D028BDC3701664092,
@@ -5663,6 +5648,7 @@
 				F851224D028BDC3701664092,
 				F851224E028BDC3701664092,
 				F851224F028BDC3701664092,
+				F854BE7602B7CA2F01664092,
 			);
 			isa = PBXCopyFilesBuildPhase;
 		};
@@ -5716,18 +5702,6 @@
 		};
 		F8512218028BDC3701664092 = {
 			fileRef = F8512180028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8512219028BDC3701664092 = {
-			fileRef = F8512181028BD7EA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851221A028BDC3701664092 = {
-			fileRef = F8512182028BD7EA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -11430,6 +11404,30 @@
 			settings = {
 			};
 		};
+		F854BE7202B7C9BC01664092 = {
+			isa = PBXFileReference;
+			name = FtsProject.java;
+			path = ../../java/src/ircam/jmax/fts/FtsProject.java;
+			refType = 2;
+		};
+		F854BE7302B7C9BC01664092 = {
+			fileRef = F854BE7202B7C9BC01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F854BE7402B7CA2901664092 = {
+			isa = PBXFileReference;
+			name = ispw.summary.jmax;
+			path = ../../packages/ispw/help/ispw.summary.jmax;
+			refType = 2;
+		};
+		F854BE7602B7CA2F01664092 = {
+			fileRef = F854BE7402B7CA2901664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F85C878F0290238D01664092 = {
 			isa = PBXBundleReference;
 			path = "file-generation.bundle";
@@ -14638,6 +14636,7 @@
 				F848668302A2745401664092,
 				F848668402A2745401664092,
 				F86A04F302B4AD8401664092,
+				F854BE7202B7C9BC01664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -15795,6 +15794,7 @@
 				F86A04F402B4AD8401664092,
 				F80902C302B762B101664092,
 				F80902C402B762B101664092,
+				F854BE7302B7C9BC01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
