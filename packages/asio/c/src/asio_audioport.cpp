@@ -1,3 +1,4 @@
+<<<<<<< asio_audioport.cpp
 /*
  * jMax
  * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
@@ -28,6 +29,8 @@
 #include <io.h>
 #include <fcntl.h>
 #include "jmax_asio_port.h"
+#include "sample_conversions.h"
+
 
 /* Define this if you want to post debug message */
 #undef WANT_TO_DEBUG_ASIO_PACKAGES
@@ -488,36 +491,41 @@ asio_audioport_input(fts_audioport_t* port, float** buffers, int buffsize)
 {
   // WE CAN ONLY HAVE ONE ASIO DRIVER AT THE SAME TIME
   // So we use current_port instead of port 
-  int i, j;
+  int i;
   int nbAsioChannels = current_port->inputChannels + current_port->outputChannels;
 
   for (i = 0; i <nbAsioChannels; ++i)
   {
-    if (current_port->bufferInfos[i].isInput == ASIOFalse)
+    if (current_port->bufferInfos[i].isInput == ASIOTrue)
     {      
-      // ASIO -> jMax type conversion 
-      switch (current_port->channelInfos[0].type)
-      {
-      case ASIOSTInt16LSB:
-	// get FTS channel index
-	int channelIndex = current_port->bufferInfos[i].channelNum;
-	// get corret fts buffer 
-	float* buff = buffers[channelIndex];
-	// get asio buffer
-	short* input_buffers = (short*)current_port->input_buffers[channelIndex];
-	for (j = 0; j < buffsize; ++j)
-	{
-	  // convert samples
-	  buff[j] = (float)(input_buffers[j]) / 32767.0f;
-	}
-	break;
-#if 0
-      case ASIOSTInt24LSB: // not implemented
-	break;	
-      case ASIOSTInt32LSB: // not implemented
-	break;	
-#endif
-      }
+	      int channelIndex = current_port->bufferInfos[i].channelNum; // get FTS channel index
+	      float* buff = buffers[channelIndex]; // get correct fts buffer 
+
+        // ASIO -> jMax type conversion 
+        switch (current_port->channelInfos[0].type)
+        {
+
+          case ASIOSTInt16LSB:
+            fts_convert_int16_to_float32(buffsize,(short*)current_port->input_buffers[channelIndex],buff);
+    	      break;
+
+          case ASIOSTInt24LSB: 
+            fts_convert_int24P_to_float32(buffsize,(char*)current_port->input_buffers[channelIndex],buff);
+            break;	
+
+          case ASIOSTInt32LSB: 
+            fts_convert_int32_to_float32(buffsize,(long*)current_port->input_buffers[channelIndex],buff);
+            break;	
+
+          case ASIOSTInt32LSB24:
+            fts_convert_int24R_to_float32(buffsize,(long*)current_port->input_buffers[channelIndex],buff);
+            break;	
+
+          case ASIOSTInt32MSB24:
+            fts_convert_int24L_to_float32(buffsize,(long*)current_port->input_buffers[channelIndex],buff);
+            break;	
+
+        }
     }
   }
 }
@@ -534,42 +542,63 @@ asio_audioport_output(fts_audioport_t* port, float** buffers, int buffsize)
   {
     if (current_port->bufferInfos[i].isInput == ASIOFalse)
     {      
-      // ASIO -> jMax type conversion 
-      switch (current_port->channelInfos[0].type)
+      int channelIndex = current_port->bufferInfos[i].channelNum; // get FTS channel index
+      float* buff = buffers[channelIndex]; // get corret fts buffer 
+
+      if(fts_audioport_is_channel_used((fts_audioport_t*)current_port, FTS_AUDIO_OUTPUT, channelIndex))
       {
-      case ASIOSTInt16LSB:
-	// get FTS channel index
-	int channelIndex = current_port->bufferInfos[i].channelNum;
-	// get corret fts buffer 
-	float* buff = buffers[channelIndex];
-	// get asio buffer
-	short* output_buffers = (short*)current_port->output_buffers[channelIndex];
-	if (fts_audioport_is_channel_used((fts_audioport_t*)current_port, FTS_AUDIO_OUTPUT, channelIndex))
-	  {
-	    for (j = 0; j < buffsize; ++j)
-	      {
-		// convert samples 
-		output_buffers[j] = (short)(buff[j] * 32767.0f);
+
+        // ASIO -> jMax type conversion 
+        switch (current_port->channelInfos[0].type)
+        {
+          case ASIOSTInt16LSB:
+            fts_convert_float32_to_int16(buffsize,buff,(short*)current_port->input_buffers[channelIndex]);
+    	      break;
+
+          case ASIOSTInt24LSB: 
+            fts_convert_float32_to_int24P(buffsize,buff,(char*)current_port->input_buffers[channelIndex]);
+    	      break;
+
+          case ASIOSTInt32LSB:
+            fts_convert_float32_to_int32(buffsize,buff,(long*)current_port->input_buffers[channelIndex]);
+    	      break;
+
+          case ASIOSTInt32LSB24:
+            fts_convert_float32_to_int24R(buffsize,buff,(long*)current_port->input_buffers[channelIndex]);
+    	      break;
+
+          case ASIOSTInt32MSB24:
+            fts_convert_float32_to_int24L(buffsize,buff,(long*)current_port->input_buffers[channelIndex]);
+    	      break;
 	      }
-	  }
-	else
-	  {
-	    for (j = 0; j < buffsize; ++j)
-	      {
-		output_buffers[j] = 0;
-	      }
-	  }
-	break;
-#if 0
-      case ASIOSTInt24LSB: // not implemented
-	break;	
-      case ASIOSTInt32LSB: // not implemented
-	break;	
-#endif
       }
-    }
+      else /* output silence if channel is not used */
+	    {
+        switch (current_port->channelInfos[0].type)
+        {
+          case ASIOSTInt16LSB:
+	          for (j = 0; j < buffsize; ++j)
+              *((short*)current_port->input_buffers[channelIndex]+j) = 0;
+    	      break;
+
+          case ASIOSTInt24LSB: 
+	          for (j = 0; j < buffsize * 3; ++j)
+              *((char*)current_port->input_buffers[channelIndex]+j) = 0;
+    	      break;
+
+          case ASIOSTInt32LSB:
+          case ASIOSTInt32LSB24:
+          case ASIOSTInt32MSB24:
+	          for (j = 0; j < buffsize; ++j)
+              *((long*)current_port->input_buffers[channelIndex]+j) = 0;
+    	      break;
+	      }
+	    }
+    }    
   }
 }
+
+
 
 static void asio_restart_fts_scheduler()
 {
@@ -579,6 +608,8 @@ static void asio_restart_fts_scheduler()
   fts_log("[asio] Restart FTS scheduler \n");
   write(pipe_handles[1], &val, sizeof(int));
 }
+
+
 
 static void asio_stop_fts_scheduler()
 {
@@ -599,6 +630,8 @@ static void asio_stop_fts_scheduler()
     }
   
 }
+
+
 
 static int
 asio_audioport_open(asio_audioport_t* port, int input_or_output)
@@ -636,6 +669,8 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
   return result;
 }
 
+
+
 static void
 asio_audioport_close()
 {
@@ -659,6 +694,8 @@ asio_audioport_close()
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
 }
 
+
+
 static void 
 asio_audioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -667,6 +704,8 @@ asio_audioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   asio_audioport_t* port = (asio_audioport_t*)o;
   asio_audioport_open(port, FTS_AUDIO_INPUT);
 }
+
+
 
 static void 
 asio_audioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -677,6 +716,8 @@ asio_audioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
   asio_audioport_open(port, FTS_AUDIO_OUTPUT);
 }
 
+
+
 static void
 asio_audioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -685,6 +726,8 @@ asio_audioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
   asio_audioport_close();
 }
 
+
+
 static void
 asio_audioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -692,6 +735,8 @@ asio_audioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
   // dont forget to restart FTS scheduler  
   asio_audioport_close();
 }
+
+
 
 static void
 asio_audioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -711,6 +756,8 @@ asio_audioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int a
   }
 }
 
+
+
 static void 
 asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -718,11 +765,9 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
   ASIOSampleRate sampleRate;
 
   asio_audioport_t* self = (asio_audioport_t*)o;
-  asio_driver_t* driver;
+  asio_driver_t* driver = (asio_driver_t*)fts_get_pointer(at);
   fts_audioport_init((fts_audioport_t*)self);
   
-
-  driver = (asio_driver_t*)fts_get_pointer(at);
   self->driver = driver;
   self->driver->isStarted = false;
 
@@ -786,6 +831,7 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 
+
 static void 
 asio_audioport_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -803,6 +849,8 @@ asio_audioport_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   self->driver->asiodrv = 0;
 }
 
+
+
 static void asio_audioport_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(asio_audioport_t), asio_audioport_init, asio_audioport_delete);
@@ -813,6 +861,8 @@ static void asio_audioport_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, fts_s_close_input, asio_audioport_close_input);
   fts_class_message_varargs(cl, fts_s_close_output, asio_audioport_close_output);
 }
+
+
 
 extern "C"
 {
@@ -830,3 +880,5 @@ extern "C"
  * c-basic-offset:2
  * End:
  */
+
+
