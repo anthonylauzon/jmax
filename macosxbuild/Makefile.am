@@ -1,0 +1,3 @@
+SUBDIRS=jMaxProject
+EXTRA_DIST= \
+	README.txt
