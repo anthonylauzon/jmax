@@ -6,7 +6,10 @@ in.c \
 in_out_tilda.c \
 iomodule.c \
 loopback.c \
-out.c 
+out.c \
+udp.c 
+#udpreceive.c \
+#udpsend.c 
 
 # Not compiled yet (MAC OS X)
 #profileaudioport.c 
