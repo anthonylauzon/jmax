@@ -101,7 +101,8 @@ append_event(eventtrk_t *track, event_t *event)
     {
       event->prev = track->last;
       event->next = 0;
-      track->last = event->prev->next = event;
+      track->last->next = event;      
+      track->last = event;
       track->size++;
     }  
 }
