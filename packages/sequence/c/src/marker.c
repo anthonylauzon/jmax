@@ -510,17 +510,19 @@ marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double ol
     scomark_t *marker = NULL;
     
     mark_evt = event_get_next(mark_evt);
-    scomark_get_tempo((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
-    
-    while(mark_evt != NULL && t < 0.0)
+    if(mark_evt != NULL)
     {
       scomark_get_tempo((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
-      mark_evt = event_get_next(mark_evt);
+    
+      while(mark_evt != NULL && t < 0.0)
+      {
+        scomark_get_tempo((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
+        mark_evt = event_get_next(mark_evt);
+      }
+    
+      if(mark_evt != NULL)
+        end = event_get_time(mark_evt);
     }
-    
-    if(mark_evt != NULL)
-      end = event_get_time(mark_evt);
-    
     /* stretch scoob track */
     track_segment_get(track, begin, end, &first, &after);
     if(first != NULL)
