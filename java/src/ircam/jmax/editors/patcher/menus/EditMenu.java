@@ -29,8 +29,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.JMenuItem;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

@@ -25,7 +25,17 @@
 
 package ircam.jmax.editors.project;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;

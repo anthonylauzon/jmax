@@ -26,7 +26,6 @@
 package ircam.jmax.editors.patcher.interactions;
 
 import java.awt.*;
-import javax.swing.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;

@@ -28,7 +28,8 @@ package ircam.jmax.editors.patcher.menus;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.AbstractButton;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

@@ -28,7 +28,9 @@ package ircam.jmax.editors.patcher.interactions;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;

@@ -28,7 +28,10 @@ package ircam.jmax.editors.patcher.menus;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.actions.*;

@@ -25,12 +25,17 @@
 
 package ircam.jmax.editors.project;
 
-import javax.swing.*;
-import javax.swing.table.*;
+// import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuBar;
+import javax.swing.WindowConstants;
+
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.filechooser.*;
+
 import java.io.*;
 
 import ircam.fts.client.*;

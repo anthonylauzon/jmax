@@ -29,8 +29,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
