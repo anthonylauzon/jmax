@@ -83,7 +83,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // FtsUpdateGroupListener interface
   // --------------------------------------  
   static boolean syncPaint = false;
-    
+  
   static void setSyncPaint(boolean v)
   {
     syncPaint = v;
@@ -91,8 +91,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void updateGroupStart()
   {
-    
-    resetUpdate();
+      resetUpdate();
   }
 
   public void updateGroupEnd()
@@ -749,22 +748,21 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     // Store the mode in a non persistent, property of 
     // the patch, so that subpatcher can use it as their initial mode
     if (locked)
-      itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
-    else
-      itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
-    if (isLocked())
-      setRunModeInteraction();
-    else
-      setEditModeInteraction();
-
-    if (locked)
       {
+	itsPatcherData.setEditMode(FtsPatcherData.RUN_MODE);
+	setRunModeInteraction();
+
 	if (isTextEditingObject())
 	  stopTextEditing();
 
 	if (ErmesSelection.patcherSelection.ownedBy(this))
 	  ErmesSelection.patcherSelection.deselectAll();
       }
+    else
+    {
+      setEditModeInteraction();
+      itsPatcherData.setEditMode(FtsPatcherData.EDIT_MODE);
+    }
     redraw();
     
     setKeyEventClient( null); //when changing mode, always remove key listeners
@@ -890,6 +888,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void setRunModeInteraction()
   {
+    setCursor(Cursor.getDefaultCursor());
     stopTextEditing();
     toolBar.reset();
     resetHighlightedInlet();
