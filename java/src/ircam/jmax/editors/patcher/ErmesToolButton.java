@@ -26,31 +26,37 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.editors.patcher.*;
 
-class ErmesToolButton extends JToggleButton 
+class ErmesToolButton extends JToggleButton
 {
   String description;
   String message;
   ErmesToolBar  toolBar;
   boolean state = false;
 
-  static ChangeListener listener = new ChangeListener(){
-    public void stateChanged(ChangeEvent e)
-    {
+  static MouseListener mListener = new MouseListener(){
+    public void mouseClicked(MouseEvent e){
+    } 
+    public void mouseEntered(MouseEvent e){
+    } 
+    public void mouseExited(MouseEvent e){
+    } 
+    public void mousePressed(MouseEvent e){
       ErmesToolButton button = (ErmesToolButton)e.getSource();
-
-      if ( button.state != button.isSelected() )
-      { 
-	button.state = ! button.state;
-	button.toolBar.buttonChanged( button);
+      if(!button.isSelected()){
+	button.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+	button.state = true;
+	button.setSelected(true);
+	button.toolBar.buttonSelected( button);
       }
-      else
-      button.setSelected(!button.state);
-    }
+    } 
+    public void mouseReleased(MouseEvent e){
+    }     
   };
 
   ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String message)
@@ -63,7 +69,12 @@ class ErmesToolButton extends JToggleButton
     this.message = message;
     this.toolBar = toolBar;
 
-    addChangeListener(ErmesToolButton.listener);    
+    addMouseListener(ErmesToolButton.mListener);
+  }
+
+  void reset(){
+    state = false;
+    setCursor( Cursor.getDefaultCursor());
   }
 
   String getDescription()

@@ -869,6 +869,13 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     engine.setTopInteraction(Interactions.editModeInteraction);
   }
 
+  public void resetAdding(){
+    setCursor(Cursor.getDefaultCursor());
+    toolBar.reset();
+    resetMessage();
+    setEditModeInteraction();
+  }
+
   String newObjectDescription = null;
   boolean newObjectEdit;
 

@@ -40,59 +40,66 @@ import ircam.jmax.utils.*;
 import java.net.URL;
 import java.io.IOException;
 /**
- * A class giving a set of standard questions dialogs.
- * Use it thru the static function; they provide 
- * the complete handling.
+ * A class giving an HTML document viewer.
+ * Use it thru the static function;
  */
 
 
-public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener*/
+public class HTMLDialog extends JDialog 
 {
   static HTMLDialog dialog = null;
   JEditorPane editorPane;
 
-  public static void showThisPackageDoc(String packageName, String title)
+  public static void showThisPackageDocPage(String packageName, String pageName, String title)
   {
-    if(dialog==null){
-      dialog = new HTMLDialog(getUrlName(packageName), title);
-      dialog.setLocation(300, 300);
-      dialog.setVisible(true);
-    }
-    else
-      if(dialog.isVisible())
-	dialog.toFront();
-      else{
-	dialog.reinit(getUrlName(packageName), title);      
+    if(dialog==null)
+      {
+	dialog = new HTMLDialog(getUrlName(packageName, pageName), title);
 	dialog.setLocation(300, 300);
 	dialog.setVisible(true);
+      }
+    else
+      {
+	dialog.reinit(getUrlName(packageName, pageName), title);   
+	if(dialog.isVisible())
+	  dialog.toFront();
+	else
+	  {
+	    dialog.setLocation(300, 300);
+	    dialog.setVisible(true);
+	  }
       }
   }
 
   public static void showThisPage(String path, String pageName, String title)
   {
-    if(dialog==null){
-      dialog = new HTMLDialog(path+pageName, title);
-      dialog.setLocation(300, 300);
-      dialog.setVisible(true);
-    }    
-    else
-      if(dialog.isVisible())
-	dialog.toFront();
-      else{
-	dialog.reinit(getUrlName(path+pageName), title);      
+    if(dialog==null)
+      {
+	dialog = new HTMLDialog(path+pageName, title);
 	dialog.setLocation(300, 300);
 	dialog.setVisible(true);
+      }    
+    else
+      {
+	dialog.reinit(path+pageName, title); 
+	if(dialog.isVisible())
+	  dialog.toFront();
+	else
+	  {
+	    dialog.setLocation(300, 300);
+	    dialog.setVisible(true);
+	  }
       }
   }
 
-  private static String getUrlName(String packageName){
+  private static String getUrlName(String packageName, String pageName){
     String separator = System.getProperty("file.separator");
     return "file:"+ MaxApplication.getProperty("jmaxRoot")+ 
       separator+"doc"+
       separator+"user"+
       separator+"packages"+
       separator+packageName+
-      separator+"index.html";
+      separator+pageName;
   }
 
   public HTMLDialog(String urlName, String title)
@@ -103,7 +110,7 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
     JEditorPane editorPane = createEditorPane(urlName);
     JScrollPane editorScrollPane = new JScrollPane(editorPane);
     editorScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    editorScrollPane.setPreferredSize(new Dimension(650, 550));
+    editorScrollPane.setPreferredSize(new Dimension(650, 500));
     editorScrollPane.setMinimumSize(new Dimension(20, 20));
 
     JPanel panel = new JPanel();
@@ -162,10 +169,6 @@ public class HTMLDialog extends JDialog /*implements ActionListener, KeyListener
     }
   }
   
-  /*public void actionPerformed(ActionEvent e){}
-    public void keyTyped(KeyEvent e){}
-    public void keyReleased(KeyEvent e){}
-    public void keyPressed(KeyEvent e){}*/
   /***************************************************************/
   class Hyperactive implements HyperlinkListener {
 

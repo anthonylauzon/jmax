@@ -43,7 +43,7 @@ public class ShowHTMLAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-    HTMLDialog.showThisPackageDoc("patcher", "Patch Editor Summary");
+    HTMLDialog.showThisPackageDocPage("patcher", "index.html", "Patch Editor Summary");
   }
 }
 

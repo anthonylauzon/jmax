@@ -53,7 +53,10 @@ public class ErmesToolBar extends JPanel  {
   JPanel cards;
   JToggleButton lockEditButton;
   JButton upButton;
-  ErmesToolButton selectedButton = null;
+
+  ButtonGroup bGroup;
+  JToggleButton noneButton;
+  JToggleButton selectedButton = null;
 
   public ErmesToolBar( ErmesSketchPad theSketchPad)
   {
@@ -62,6 +65,10 @@ public class ErmesToolBar extends JPanel  {
     setDoubleBuffered( false);
 
     setLayout( new BorderLayout());    
+
+    noneButton = new JToggleButton();
+    bGroup = new ButtonGroup();
+    bGroup.add( noneButton);
 
     lockEditButton = new JToggleButton( Icons.get( "_lock_mode_"));
     lockEditButton.setDoubleBuffered( false);
@@ -119,35 +126,21 @@ public class ErmesToolBar extends JPanel  {
     insertButtons();
 
     cards.add( "edit", toolBar);
+
+    bGroup = new ButtonGroup();
   }
 
-  void buttonChanged(ErmesToolButton button)
+  void buttonSelected(ErmesToolButton button)
   {
-    if (button.isSelected())
-      {
-	if(button != selectedButton){
-	  if(selectedButton != null)
-	    selectedButton.setSelected(false);
-	  
-	  selectedButton = button;
-	  sketch.setAddModeInteraction(selectedButton.getDescription(),selectedButton.getMessage(), true);
-	}
-      }
-    else
-      {
-	if (button == selectedButton){
-	  selectedButton = null;
-	  //trovare il modo di differenziare il click sull bottone che lo rimette a non selezionato
-	  //da quando lo chiama al mouseUp... (a che vedere col focus?)
-	  //sketch.setEditModeInteraction();
-	}
-      }
+    selectedButton = button;
+    sketch.setAddModeInteraction(selectedButton.getDescription(), selectedButton.getMessage(), true);
   }
 
   public void reset()
   {
-    if (selectedButton != null)
-      selectedButton.setSelected(false); 
+    selectedButton.reset();
+    selectedButton = null;
+    noneButton.setSelected(true);
   }
 
   protected void setLocked( boolean locked)
@@ -168,9 +161,12 @@ public class ErmesToolBar extends JPanel  {
 
   private void addButton( String descr, String iconName, String message)
   {
-    toolBar.add( new ErmesToolButton(this, descr, Icons.get(iconName), message));
+    JToggleButton button = new ErmesToolButton(this, descr, Icons.get(iconName), message);
+    toolBar.add( button);
     if(!AddPopUp.initDone)
       AddPopUp.addAbbreviation(iconName, descr, message, true);
+
+    bGroup.add( button);
   }
 
   private void insertButtons()
@@ -189,6 +185,8 @@ public class ErmesToolBar extends JPanel  {
     AddPopUp.initDone();//????
   }
 }
+
+
 
 
 
