@@ -37,16 +37,16 @@
 /* #define HELP_PURIFY */
 #endif
 
-/* #include "smem.h"  */
+/* #include "smem.h" */
 
 #include <stdlib.h>
 #include <string.h>
 #include "sys.h"
 
 #ifndef SAFE_MEM
-#define real_malloc  malloc
-#define real_free    free
-#define real_realloc realloc
+#define real_malloc(size, filename, line)       malloc((size))
+#define real_free(m, filename, line)            free((m))
+#define real_realloc(m, size, filename, line)   realloc((m), (size))
 #endif
 
 extern void post( const char *format, ...);
@@ -70,9 +70,7 @@ void mem_init(void)
 /*                                                                            */
 /******************************************************************************/
 
-/* statistic routines */
-
-void *fts_zalloc(unsigned int size)
+void *fts_do_zalloc(unsigned int size, const char *filename, int line)
 {
   if (size <= 0)
     return 0;
@@ -80,7 +78,7 @@ void *fts_zalloc(unsigned int size)
     {
       void *p;
 
-      p = fts_malloc(size);
+      p = fts_do_malloc(size, filename, line);
 
       if (p)
 	memset(p, 0, size);
@@ -90,21 +88,21 @@ void *fts_zalloc(unsigned int size)
 }
 
 
-void *fts_malloc(unsigned int size)
+void *fts_do_malloc(unsigned int size, const char *filename, int line)
 {
   void *p;
 
   if (size == 0)
     return (void *)0;
 
-  p = real_malloc(size);
+  p = real_malloc(size, filename, line);
 
   if (p == 0)
     {
       if (fts_memory_is_locked())
 	{
 	  fts_unlock_memory();
-	  p = real_malloc(size);
+	  p = real_malloc(size, filename, line);
 	  
 	  if (p == 0)
 	    fprintf(stderr, "Out of virtual memory");
@@ -122,14 +120,14 @@ void *fts_malloc(unsigned int size)
 }
 
 
-void *fts_realloc(void *p, unsigned int size)
+void *fts_do_realloc(void *p, unsigned int size, const char *filename, int line)
 {
-  return real_realloc(p, size);
+  return real_realloc(p, size, filename, line);
 }
 
-void fts_free(void *p)
+void fts_do_free(void *p, const char *filename, int line)
 {
-  real_free(p);
+  real_free(p, filename, line);
 }
 
 /******************************************************************************/
@@ -233,10 +231,10 @@ fts_heap_new(unsigned int block_size)
 }
 
 
-void *fts_heap_alloc(fts_heap_t *p)
+void *fts_do_heap_alloc(fts_heap_t *p, const char *filename, int line)
 {
 #ifdef HELP_PURIFY
-  return fts_malloc(p->block_size);
+  return fts_do_malloc(p->block_size, filename, line);
 #else
   char *m;
 
@@ -252,14 +250,14 @@ void *fts_heap_alloc(fts_heap_t *p)
 }
 
 
-void *fts_heap_zalloc(fts_heap_t *heap)
+void *fts_do_heap_zalloc(fts_heap_t *heap, const char *filename, int line)
 {
 #ifdef HELP_PURIFY
-  return fts_zalloc(heap->block_size);
+  return fts_do_zalloc(heap->block_size, filename, line);
 #else
   char *p;
 
-  p = fts_heap_alloc(heap);
+  p = fts_do_heap_alloc(heap, filename, line);
 
   if (p)
     memset(p, 0, heap->block_size);
@@ -269,10 +267,10 @@ void *fts_heap_zalloc(fts_heap_t *heap)
 }
 
 
-void fts_heap_free(void *m, fts_heap_t *p)
+void fts_do_heap_free(void *m, fts_heap_t *p,  const char *filename, int line)
 {
 #ifdef HELP_PURIFY
-  fts_free((void *)m);
+  fts_do_free((void *)m, filename, line);
 #else
   *((char **)m) = p->free_list;
   p->free_list = m;
@@ -293,13 +291,13 @@ void fts_heap_free(void *m, fts_heap_t *p)
 
 
 
-void *fts_block_alloc(unsigned int size)
+void *fts_do_block_alloc(unsigned int size, const char *filename, int line)
 {
 #ifdef HELP_PURIFY
-  return fts_malloc(size);
+  return fts_do_malloc(size, filename, line);
 #else
   if (size > SHARED_HEAP_MAX_SIZE)
-    return fts_malloc(size);
+    return fts_do_malloc(size, filename, line);
   else
     {
       int idx;
@@ -309,19 +307,19 @@ void *fts_block_alloc(unsigned int size)
       if (! fts_heaps[idx])
 	fts_heaps[idx] = fts_heap_new((idx + 1) * sizeof(long));
 
-      return fts_heap_alloc(fts_heaps[idx]);
+      return fts_do_heap_alloc(fts_heaps[idx], filename, line);
     }
 #endif
 }
 
 
-void *fts_block_zalloc(unsigned int size)
+void *fts_do_block_zalloc(unsigned int size, const char *filename, int line)
 {
 #ifdef HELP_PURIFY
-  return fts_zalloc(size);
+  return fts_do_zalloc(size, filename, line);
 #else
   if (size > SHARED_HEAP_MAX_SIZE)
-    return fts_zalloc(size);
+    return fts_do_zalloc(size, filename, line);
   else
     {
       int idx;
@@ -331,19 +329,19 @@ void *fts_block_zalloc(unsigned int size)
       if (! fts_heaps[idx])
 	fts_heaps[idx] = fts_heap_new((idx + 1) * sizeof(long));
 
-      return fts_heap_zalloc(fts_heaps[idx]);
+      return fts_do_heap_zalloc(fts_heaps[idx], filename, line);
     }
 #endif
 }
 
 
-void fts_block_free(void *p, unsigned int size)
+void fts_do_block_free(void *p, unsigned int size, const char *filename, int line)
 {
 #ifdef HELP_PURIFY
-  fts_free(p);
+  fts_do_free(p, filename, line);
 #else
   if (size > SHARED_HEAP_MAX_SIZE)
-    fts_free(p);
+    fts_do_free(p, filename, line);
   else
     {
       int idx;
@@ -353,7 +351,7 @@ void fts_block_free(void *p, unsigned int size)
       if (! fts_heaps[idx])
 	return;			/* error !!! */
 
-      fts_heap_free(p, fts_heaps[idx]);
+      fts_do_heap_free(p, fts_heaps[idx], filename, line);
     }
 #endif
 }

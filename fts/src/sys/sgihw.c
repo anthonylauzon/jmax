@@ -15,6 +15,13 @@
    Platform initialization for the SGI platform.
 */
 
+/* Comment the following define to suppress fpe handling; 
+   usefull because purify do not work with fpe handling
+   */
+
+
+#define HANDLE_FPE 
+
 #include <stdio.h>
 #include <errno.h>
 
@@ -185,11 +192,14 @@ void fts_unlock_memory()
   memory_is_locked = 0;
 }
 
+
 /* API to catch the exceptions */
+#ifdef HANDLE_FPE
 
 static fts_fpe_handler fpe_handler = 0;
 
 /* Sgi man page tell to use this not ANSI prototype !! */
+
 
 int fts_sgi_fpe_handler( sig, code, sc )
      int sig, code;
@@ -222,19 +232,24 @@ int fts_sgi_fpe_handler( sig, code, sc )
   return 0;
 }
 
+#endif
 
 void fts_set_fpe_handler(fts_fpe_handler fh)
 {
+#ifdef HANDLE_FPE
   enable_fpes();
   fpe_handler = fh;
 
   handle_sigfpes (_ON, _EN_OVERFL | _EN_DIVZERO | _EN_INVALID, 0,
 		  _USER_HANDLER,  fts_sgi_fpe_handler);
+#endif
 }
 
 void fts_reset_fpe_handler(void)
 {
+#ifdef HANDLE_FPE
   handle_sigfpes(_OFF, 0, 0, _USER_HANDLER, 0);
+#endif
 }
 
 

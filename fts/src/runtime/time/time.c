@@ -397,11 +397,11 @@ void fts_clock_remove_reset_callback(fts_symbol_t clock_name, void (* callback)(
   struct clock_reset_callback **c;
 
   for (c = &(clock->callbacks); *c ; c = &((*c)->next))
-    if (((*c)->callback == callback) && ((*c)->data == (*c)->data))
+    if (((*c)->callback == callback) && ((*c)->data == data))
       {
 	struct clock_reset_callback *p;
 
-	p = (*c)->data;
+	p = *c;
 	(*c) = (*c)->next;
 
 	fts_heap_free(p, clocks_heap);

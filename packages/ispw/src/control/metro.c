@@ -18,7 +18,7 @@ typedef struct
   fts_object_t ob;
   double cycle;
   long run;
-  fts_alarm_t alarm;
+  fts_alarm_t *alarm;
 } metro_t;
 
 
@@ -27,8 +27,8 @@ metro_tick(fts_alarm_t *alarm, void *o)
 {
   metro_t *x = (metro_t *)o;
 
-  fts_alarm_set_delay(&x->alarm, x->cycle);
-  fts_alarm_arm(&x->alarm);
+  fts_alarm_set_delay(x->alarm, x->cycle);
+  fts_alarm_arm(x->alarm);
   
   fts_outlet_bang((fts_object_t *)o, 0);
 }
@@ -38,8 +38,8 @@ static void metro_clock_reset(void *o)
 {
   metro_t *x = (metro_t *)o;
 
-  fts_alarm_set_delay(&x->alarm, x->cycle);
-  fts_alarm_arm(&x->alarm);
+  fts_alarm_set_delay(x->alarm, x->cycle);
+  fts_alarm_arm(x->alarm);
 }
 
 
@@ -49,8 +49,8 @@ metro_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   metro_t *x = (metro_t *)o;
 
   x->run = 1;
-  fts_alarm_set_delay(&x->alarm, x->cycle);
-  fts_alarm_arm(&x->alarm);
+  fts_alarm_set_delay(x->alarm, x->cycle);
+  fts_alarm_arm(x->alarm);
   fts_outlet_bang((fts_object_t *)o, 0);
 }
 
@@ -61,7 +61,7 @@ metro_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   metro_t *x = (metro_t *)o;
 
   x->run = 0;
-  fts_alarm_unarm(&x->alarm);
+  fts_alarm_unarm(x->alarm);
 }
 
 
@@ -74,14 +74,14 @@ metro_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if (n)
     {
       x->run = 1;
-      fts_alarm_set_delay(&x->alarm, x->cycle);
-      fts_alarm_arm(&x->alarm);
+      fts_alarm_set_delay(x->alarm, x->cycle);
+      fts_alarm_arm(x->alarm);
       fts_outlet_bang((fts_object_t *)o, 0);
     }
   else
     {
       x->run = 0;
-      fts_alarm_unarm(&x->alarm);
+      fts_alarm_unarm(x->alarm);
     }
 }
 
@@ -106,8 +106,8 @@ metro_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   metro_t *x = (metro_t *)o;
 
-  fts_alarm_unarm(&x->alarm);
-  fts_clock_remove_reset_callback(fts_alarm_get_clock(&(x->alarm)), metro_clock_reset, (void *) x);
+  fts_clock_remove_reset_callback(fts_alarm_get_clock(x->alarm), metro_clock_reset, (void *) x);
+  fts_alarm_free(x->alarm);
 }
 
 static void
@@ -127,15 +127,10 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       n = (float) fts_get_float_arg(ac, at, 1, 0.0f);    
     }
   
-  if (clock)
-    {
-      if (! fts_clock_exists(clock))
-	post("metro: warning: clock %s does not exists, yet\n", fts_symbol_name(clock));
+  if (clock && (! fts_clock_exists(clock)))
+      post("metro: warning: clock %s does not exists, yet\n", fts_symbol_name(clock));
 
-      fts_alarm_init(&x->alarm, clock, metro_tick, x);
-    }
-  else
-    fts_alarm_init(&x->alarm, 0, metro_tick, x);
+  x->alarm = fts_alarm_new(clock, metro_tick, x); 
 
   if (n <= 0.0)
     x->cycle = 5.0;

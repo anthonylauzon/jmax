@@ -11,6 +11,7 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
+
 /* Safe memory library.
 
    To link only during debugging of bugs difficult to trace.
@@ -38,6 +39,15 @@
 
 #include <stdio.h>
 #include <malloc.h>
+
+/* Uncomment the following define to get a print for each malloc/free operation.
+   Usefull to understand what's going on; only for small tests, of course */
+
+/* #define LOG_CALLS */
+
+/* Uncomment the following define to get smem to trap (core dump) for each error found */
+
+#define TRAP_ON_ERROR
 
 #define OPS_LIMIT 512*1024
 #define BLOCK_CACHE_SIZE 16
@@ -106,6 +116,7 @@ void check_integrity(char *p, const char *msg)
   fprintf(stderr, "%s %s\nOriginally allocated file %s line %d\n", err, msg, 
 	  ((struct mem_header *)p)->filename,  ((struct mem_header *)p)->line);
 
+#ifdef TRAP_ON_ERROR
   fprintf(stderr, " - Trapping !!!!\n");
   fflush(stderr);
 
@@ -113,6 +124,7 @@ void check_integrity(char *p, const char *msg)
     volatile char c;
     c = *((volatile char *) 0);
   }
+#endif
 }
 
 
@@ -210,7 +222,7 @@ register_check_malloc(char *p, unsigned long size)
 
 
 static void
-register_check_free(char *p)
+register_check_free(char *p, const char *filename, int line)
 {
   unsigned int i;
   int found = 0;		/* 1 if we found the block to free */
@@ -241,7 +253,9 @@ register_check_free(char *p)
     {
       /* ERROR: Freeing  a not malloced block  */
 
-      fprintf(stderr, "Freeing not malloc'ed !!!\n");
+      fprintf(stderr, "In file %s line %d: freeing not malloc'ed memory !!!\n", filename, line);
+
+#ifdef TRAP_ON_ERROR
       fprintf(stderr, "Trapping !!!!\n");
       fflush(stderr);
 
@@ -249,6 +263,7 @@ register_check_free(char *p)
 	volatile char c;
 	c = *((volatile char *) 0);
       }
+#endif
     }
 }
 
@@ -276,15 +291,25 @@ char *fts_safe_malloc(unsigned long size, const char *filename, int line)
 
   register_check_malloc(p, size + sizeof(struct mem_header) + sizeof(struct mem_trailer));
 
+#ifdef LOG_CALLS
+  fprintf(stderr, "Malloc %lx at %s:%d\n", (unsigned long) p + sizeof(struct mem_header), filename, line);
+#endif
+
   return p + sizeof(struct mem_header);
 }
 
 
-void fts_safe_free(char *p)
+void fts_safe_free(void *pv, const char *filename, int line)
 {
+  char *p = (char *)pv;
+
+#ifdef LOG_CALLS
+  fprintf(stderr, "Free %lx at %s:%d\n", (unsigned long) p, filename, line);
+#endif
+
   check_integrity((char *)p  - sizeof(struct mem_header), "freeing block");
   remove_block(p - sizeof(struct mem_header));
-  register_check_free(p - sizeof(struct mem_header));
+  register_check_free(p - sizeof(struct mem_header), filename, line);
   free(p - sizeof(struct mem_header));
 }
 
@@ -300,7 +325,7 @@ char *fts_safe_realloc(void *pv, int size, const char *filename, int line)
   if (size % sizeof(unsigned long))
     size = ((size / sizeof(unsigned long)) + 1) * sizeof(unsigned long);
 
-  register_check_free(p - sizeof(struct mem_header)); 
+  register_check_free(p - sizeof(struct mem_header), filename, line); 
   remove_block(p - sizeof(struct mem_header));
 
   p = (char *)realloc(p - sizeof(struct mem_header),
@@ -316,6 +341,10 @@ char *fts_safe_realloc(void *pv, int size, const char *filename, int line)
   add_block(p);
 
   register_check_malloc(p, size + sizeof(struct mem_header) + sizeof(struct mem_trailer));
+
+#ifdef LOG_CALLS
+  fprintf(stderr, "Realloc %lx at %s:%d\n", (unsigned long) p + sizeof(struct mem_header), filename, line);
+#endif
 
   return p + sizeof(struct mem_header);
 }

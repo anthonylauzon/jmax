@@ -34,12 +34,12 @@
 #define HELP_PURIFY
 
 extern char *fts_safe_malloc(unsigned long size, const char *filename, int line);
-extern void fts_safe_free(char *p);
+extern void fts_safe_free(void  *pv, const char *filename, int line);
 extern char *fts_safe_realloc(void *pv, int size, const char *filename, int line);
 
-#define real_malloc(size)   fts_safe_malloc(size, __FILE__, __LINE__)
-#define real_free    fts_safe_free
-#define real_realloc(pnt, size)  fts_safe_realloc(pnt, size, __FILE__, __LINE__)
+#define real_malloc(size, filename, line)        fts_safe_malloc(size, filename, line)
+#define real_free(size, filename, line)          fts_safe_free(size, filename, line)
+#define real_realloc(pnt, size, filename, line)  fts_safe_realloc(pnt, size, filename, line)
 
 
 
