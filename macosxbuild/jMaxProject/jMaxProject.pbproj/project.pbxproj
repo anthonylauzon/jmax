@@ -472,12 +472,6 @@
 			settings = {
 			};
 		};
-		F8386EA4028D3F9101664092 = {
-			fileRef = F880FD520282FA3901664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8386EA5028D3F9101664092 = {
 			fileRef = F880FD530282FA3901664092;
 			isa = PBXBuildFile;
@@ -1172,7 +1166,6 @@
 				F8446982028BCC2301664092,
 				F8446983028BCC2301664092,
 				F8446984028BCC2301664092,
-				F8446985028BCC2301664092,
 				F8446986028BCC2301664092,
 				F8446987028BCC2301664092,
 				F8446988028BCC2301664092,
@@ -1200,7 +1193,6 @@
 				F844699E028BCC2301664092,
 				F844699F028BCC2301664092,
 				F84469A3028BCC2301664092,
-				F84469A4028BCC2301664092,
 				F84469A5028BCC2301664092,
 				F84469A6028BCC2301664092,
 				F84469A7028BCC2301664092,
@@ -1445,12 +1437,6 @@
 			path = ../../packages/ispw/c/src/explode.h;
 			refType = 2;
 		};
-		F8446985028BCC2301664092 = {
-			isa = PBXFileReference;
-			name = expr_doctor.c;
-			path = ../../packages/ispw/c/src/expr_doctor.c;
-			refType = 2;
-		};
 		F8446986028BCC2301664092 = {
 			isa = PBXFileReference;
 			name = exscale.c;
@@ -1611,12 +1597,6 @@
 			isa = PBXFileReference;
 			name = makenote.c;
 			path = ../../packages/ispw/c/src/makenote.c;
-			refType = 2;
-		};
-		F84469A4028BCC2301664092 = {
-			isa = PBXFileReference;
-			name = message_doctor.c;
-			path = ../../packages/ispw/c/src/message_doctor.c;
 			refType = 2;
 		};
 		F84469A5028BCC2301664092 = {
@@ -2568,7 +2548,6 @@
 				F8446A3F028BCC2401664092,
 				F8446A40028BCC2401664092,
 				F8446A41028BCC2401664092,
-				F8446A42028BCC2401664092,
 				F8446A43028BCC2401664092,
 				F8446A44028BCC2401664092,
 				F8446A45028BCC2401664092,
@@ -2590,7 +2569,6 @@
 				F8446A55028BCC2401664092,
 				F8446A56028BCC2401664092,
 				F8446A57028BCC2401664092,
-				F8446A58028BCC2401664092,
 				F8446A59028BCC2401664092,
 				F8446A5A028BCC2401664092,
 				F8446A5B028BCC2401664092,
@@ -2787,12 +2765,6 @@
 			settings = {
 			};
 		};
-		F8446A42028BCC2401664092 = {
-			fileRef = F8446985028BCC2301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8446A43028BCC2401664092 = {
 			fileRef = F8446986028BCC2301664092;
 			isa = PBXBuildFile;
@@ -2915,12 +2887,6 @@
 		};
 		F8446A57028BCC2401664092 = {
 			fileRef = F84469A3028BCC2301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8446A58028BCC2401664092 = {
-			fileRef = F84469A4028BCC2301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -12647,8 +12613,8 @@
 		};
 		F880FCE90282F7CE01664092 = {
 			buildStyles = (
-				F880FCEB0282F7CE01664092,
 				F880FCEC0282F7CE01664092,
+				F880FCEB0282F7CE01664092,
 			);
 			isa = PBXProject;
 			mainGroup = F880FCEA0282F7CE01664092;
@@ -13023,7 +12989,6 @@
 				F880FD4F0282FA3901664092,
 				F880FD500282FA3901664092,
 				F880FD510282FA3901664092,
-				F880FD520282FA3901664092,
 				F880FD530282FA3901664092,
 				F880FD540282FA3901664092,
 				F880FD550282FA3901664092,
@@ -13068,6 +13033,7 @@
 				F829DA4202B674E601664092,
 				F8677A5F02E5C2CF01664092,
 				F82C2A0902E5DB1001664092,
+				F889510902ED989301664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -13143,12 +13109,6 @@
 			isa = PBXFileReference;
 			name = connection.c;
 			path = ../../fts/connection.c;
-			refType = 2;
-		};
-		F880FD520282FA3901664092 = {
-			isa = PBXFileReference;
-			name = doctor.c;
-			path = ../../fts/doctor.c;
 			refType = 2;
 		};
 		F880FD530282FA3901664092 = {
@@ -13464,7 +13424,6 @@
 				F8386EA1028D3F9101664092,
 				F8386EA2028D3F9101664092,
 				F8386EA3028D3F9101664092,
-				F8386EA4028D3F9101664092,
 				F8386EA5028D3F9101664092,
 				F8386EA6028D3F9101664092,
 				F8386EA7028D3F9101664092,
@@ -13507,6 +13466,7 @@
 				F8FE337102CC778F01664092,
 				F8677A6002E5C2CF01664092,
 				F82C2A0A02E5DB1001664092,
+				F889510A02ED989301664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -17413,6 +17373,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array/>
 	<key>CFBundleExecutable</key>
 	<string></string>
 	<key>CFBundleGetInfoString</key>
@@ -17465,6 +17427,42 @@
 			files = (
 			);
 			isa = PBXFrameworksBuildPhase;
+		};
+		F889510702ED932301664092 = {
+			isa = PBXFileReference;
+			name = macosxmidi.h;
+			path = ../../packages/macosx/c/src/macosxmidi.h;
+			refType = 2;
+		};
+		F889510802ED932301664092 = {
+			fileRef = F889510702ED932301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F889510902ED989301664092 = {
+			isa = PBXFileReference;
+			name = OLDexpression.c;
+			path = ../../fts/OLDexpression.c;
+			refType = 2;
+		};
+		F889510A02ED989301664092 = {
+			fileRef = F889510902ED989301664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F889510B02ED9ACD01664092 = {
+			isa = PBXFileReference;
+			name = CommentControlPanel.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/CommentControlPanel.java;
+			refType = 2;
+		};
+		F889510C02ED9ACD01664092 = {
+			fileRef = F889510B02ED9ACD01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		F8A4E73902D3775D01664092 = {
 			isa = PBXFileReference;
@@ -17594,7 +17592,6 @@
 		F8B8E48902867E1C01664092 = {
 			children = (
 				F8B8E48A02867E1C01664092,
-				F8B8E48B02867E1C01664092,
 				F8B8E48C02867E1C01664092,
 				F8B8E48D02867E1C01664092,
 				F8B8E48F02867E1C01664092,
@@ -17635,12 +17632,6 @@
 			name = bpf.c;
 			path = ../../packages/data/c/src/bpf.c;
 			refType = 2;
-		};
-		F8B8E48B02867E1C01664092 = {
-			isa = PBXFileReference;
-			name = macosxmidi.h;
-			path = "/Volumes/TR-684-G4-Users/projects/jmax/packages/macosx/c/src/macosxmidi.h";
-			refType = 0;
 		};
 		F8B8E48C02867E1C01664092 = {
 			isa = PBXFileReference;
@@ -17914,7 +17905,6 @@
 		F8B8E4B102867E1C01664092 = {
 			buildActionMask = 2147483647;
 			files = (
-				F8B8E4B202867E1C01664092,
 				F8B8E4B302867E1C01664092,
 				F8B8E4B402867E1C01664092,
 				F8B8E4B502867E1C01664092,
@@ -17929,12 +17919,6 @@
 				F8B8E4BE02867E1C01664092,
 			);
 			isa = PBXHeadersBuildPhase;
-		};
-		F8B8E4B202867E1C01664092 = {
-			fileRef = F8B8E48B02867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F8B8E4B302867E1C01664092 = {
 			fileRef = F8B8E48D02867E1C01664092;
@@ -19282,7 +19266,6 @@
 		F8B8E5760286822501664092 = {
 			children = (
 				F8B8E5770286822501664092,
-				F8B8E5780286822501664092,
 				F8B8E5790286822501664092,
 				F8B8E57A0286822501664092,
 				F8B8E57B0286822501664092,
@@ -19316,12 +19299,6 @@
 			isa = PBXFileReference;
 			name = button.c;
 			path = ../../packages/guiobj/c/src/button.c;
-			refType = 2;
-		};
-		F8B8E5780286822501664092 = {
-			isa = PBXFileReference;
-			name = comment_doctor.c;
-			path = ../../packages/guiobj/c/src/comment_doctor.c;
 			refType = 2;
 		};
 		F8B8E5790286822501664092 = {
@@ -19688,7 +19665,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8B8E5AD0286822601664092,
-				F8B8E5AE0286822601664092,
 				F8B8E5AF0286822601664092,
 				F8B8E5B00286822601664092,
 				F8B8E5B10286822601664092,
@@ -19716,12 +19692,6 @@
 		};
 		F8B8E5AD0286822601664092 = {
 			fileRef = F8B8E5770286822501664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E5AE0286822601664092 = {
-			fileRef = F8B8E5780286822501664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -19944,6 +19914,7 @@
 				F820645C02AE144301664092,
 				F820645D02AE144301664092,
 				F820645E02AE144301664092,
+				F889510C02ED9ACD01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -20054,6 +20025,7 @@
 				F820645902AE144301664092,
 				F820645A02AE144301664092,
 				F820645B02AE144301664092,
+				F889510B02ED9ACD01664092,
 			);
 			isa = PBXGroup;
 			name = guiobj;
@@ -20877,6 +20849,7 @@
 				F8DC5EF80286A1FA01664092,
 				F8DC5EF90286A1FA01664092,
 				F78563BF02BA3BCE016640F1,
+				F889510702ED932301664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -20970,6 +20943,7 @@
 		F8DC5EFC0286A1FB01664092 = {
 			buildActionMask = 2147483647;
 			files = (
+				F889510802ED932301664092,
 			);
 			isa = PBXHeadersBuildPhase;
 		};
