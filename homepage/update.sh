@@ -16,25 +16,24 @@ EOF
 copy_file ()
 {
     cp $1 $2
-    chmod 664 $2/`basename $1`
+    chmod 664 $2
 }
 
-for i in *.html
+mkdir ${DSTDIR}/images
+for i in *.html images/*.gif
 do
-    copy_file $i ${DSTDIR}
+    copy_file $i ${DSTDIR}/$i
 done
 
-for d in `find doc -type d`
+for d in `find doc -follow -type d \! \( -name CVS -prune \) `
 do
-    echo "directory " $d
     mkdir -p ${DSTDIR}/$d
     chmod 775 ${DSTDIR}/$d
 done
 
-for i in `find doc -type f \( -name '*.html' -o -name '*.gif' \)`
+for i in `find doc -follow -type f \( -name '*.html' -o -name '*.gif' \)`
 do
-    echo "file " $d
-    copy_file $i ${DSTDIR}
+    copy_file $i ${DSTDIR}/$i
 done
 
 
