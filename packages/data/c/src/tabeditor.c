@@ -156,7 +156,7 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
       else
         fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send, a);
       
-      current+=k*j;
+      current += (int)k*j;
       count+=j;
       num_val -= send;
     }
@@ -259,7 +259,7 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
 
       fts_client_send_message((fts_object_t *)tabeditor, sym_add_pixels, send, a);
   
-      current+=k*j;
+      current+= (int)k*j;
       start+=j;
       num_val -= send;
     }
@@ -312,7 +312,7 @@ tabeditor_set_visible_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac
     {
       this->vsize = fts_get_number_int(at);
       this->vindex = fts_get_number_int(at+1);	  
-      this->zoom = fts_get_number_float(at+2);	  
+      this->zoom = (float)fts_get_number_float(at+2);	  
       this->pixsize = fts_get_number_int(at+3);	  
     }
 }
