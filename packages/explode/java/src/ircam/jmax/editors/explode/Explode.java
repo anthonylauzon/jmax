@@ -55,7 +55,7 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
   JMenu itsFileMenu;
   EditMenu itsEditMenu;
   OptionsMenu itsOptionsMenu;
-  JMenu itsToolsMenu;
+    //JMenu itsToolsMenu;
   JMenu itsWindowsMenu;
 
   /**
@@ -135,8 +135,8 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
     mb.add( itsOptionsMenu); 
 
     // New Tool menu 
-    itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
-    mb.add(itsToolsMenu);
+    /*itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
+      mb.add(itsToolsMenu);*/
 
     // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 

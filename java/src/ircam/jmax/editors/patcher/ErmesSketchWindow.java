@@ -53,7 +53,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private EditMenu itsEditMenu;	
   private ScriptMenu itsScriptMenu;	
   private JMenu itsWindowsMenu;
-  private JMenu itsToolsMenu;
+    //private JMenu itsToolsMenu;
   private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
 
@@ -193,8 +193,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     mb.add( itsScriptMenu);
 
     // New Tool menu 
-    itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
-    mb.add(itsToolsMenu);
+    /*itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
+      mb.add(itsToolsMenu);*/
 
     // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 

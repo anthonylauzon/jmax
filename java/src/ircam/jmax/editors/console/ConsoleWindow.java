@@ -160,7 +160,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
     mb.add( new EditMenu( this));
     
     // Tool menu 
-    mb.add( new ircam.jmax.toolkit.menus.MaxToolsJMenu( "Tools"));
+    //mb.add( new ircam.jmax.toolkit.menus.MaxToolsJMenu( "Tools"));
 
     // Windows Menu
     mb.add( new ircam.jmax.toolkit.menus.MaxWindowJMenu( "Windows", this));

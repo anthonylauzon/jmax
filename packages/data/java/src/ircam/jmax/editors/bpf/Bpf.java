@@ -113,7 +113,7 @@ public class Bpf extends JFrame implements EditorContainer{
 	//mb.add(new EditMenu(this)); 
 	
 	// New Tool menu 
-	mb.add(new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools")); 
+	//mb.add(new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools")); 
 	
 	// New Window Manager based Menu
 	mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 

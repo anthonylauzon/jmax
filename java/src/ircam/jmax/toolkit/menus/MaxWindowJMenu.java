@@ -34,7 +34,7 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
-public class MaxWindowJMenu extends JMenu
+public class MaxWindowJMenu extends JMenu implements ListDataListener 
 {
   class WindowMenuListener implements MenuListener
   {
@@ -52,11 +52,29 @@ public class MaxWindowJMenu extends JMenu
     }
   }
 
+  class ToolActionListener implements ActionListener
+  {
+    JMenuItem item;
+    MaxToolFinder toolFinder;
+
+    ToolActionListener(JMenuItem item,  MaxToolFinder toolFinder)
+    {
+      this.item = item;
+      this.toolFinder = toolFinder;
+    }
+
+    public  void actionPerformed(ActionEvent e)
+    {
+      toolFinder.open();
+    }
+  }
+
+
   Frame frame;
   int windowOperationCount = -1;
   boolean windowIsActive = false;
   ListModel windowList;
-
+  ListModel toolFinders;
   /** Build a window menu for frame */
 
   public MaxWindowJMenu(String title, Frame frame)
@@ -66,6 +84,8 @@ public class MaxWindowJMenu extends JMenu
     
     this.frame = frame;
     windowList = MaxWindowManager.getWindowManager().getWindowList();
+    toolFinders = MaxWindowManager.getWindowManager().getToolFinderList();
+    toolFinders.addListDataListener(this);
 
     addMenuListener(new WindowMenuListener());
   }
@@ -99,6 +119,19 @@ public class MaxWindowJMenu extends JMenu
 
     addSeparator();
 
+    for (int i = 0; i < toolFinders.getSize(); i++)
+	{
+	    MaxToolFinder toolFinder;
+
+	    toolFinder = (MaxToolFinder) toolFinders.getElementAt(i);
+	    
+	    mi = new JMenuItem(toolFinder.getToolName());
+	    add(mi);
+	    mi.addActionListener(new ToolActionListener(mi, toolFinder));
+	}
+
+    addSeparator();
+
     for (int i = 0; i < windowList.getSize(); i++)
       {
 	final Frame w = (Frame) windowList.getElementAt(i);
@@ -110,6 +143,22 @@ public class MaxWindowJMenu extends JMenu
 			     { public  void actionPerformed(ActionEvent e)
 			       { w.toFront();}});
       }
+  }
+
+  // ListDataListener
+  public void contentsChanged(ListDataEvent e)
+  {
+    rebuildWindowMenu();
+  }
+
+  public void intervalAdded(ListDataEvent e)
+  {
+    rebuildWindowMenu();
+  }
+
+  public void intervalRemoved(ListDataEvent e) 
+  {
+    rebuildWindowMenu();
   }
 }
 
