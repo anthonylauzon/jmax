@@ -142,12 +142,12 @@ serial_set_speed(serial_t *this, fts_symbol_t sym)
     speed = B230400;
 #endif
   else
-    {
-      const char *name;
+  {
+    const char *name;
 
-      name = sym;
-      sscanf( name+1, "%d", &speed);
-    }
+    name = sym;
+    sscanf( name+1, "%d", &speed);
+  }
 
   cfsetospeed(&this->termios, speed);
   cfsetispeed(&this->termios, 0);
@@ -204,10 +204,10 @@ serial_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int n_read;
 
   do
-    {
-      n_read = read(this->fd, this->in_buf, size);
-      fts_bytestream_input((fts_bytestream_t *)o, n_read, this->in_buf);
-    }
+  {
+    n_read = read(this->fd, this->in_buf, size);
+    fts_bytestream_input((fts_bytestream_t *)o, n_read, this->in_buf);
+  }
   while(n_read == size);
 }
 
@@ -237,27 +237,27 @@ serial_output(fts_bytestream_t *stream, int n, const unsigned char *c)
   int n_wrote = 0;
   
   if(n_over > 0)
-    {
-      bcopy(c, this->out_buf + this->out_fill, n - n_over);
-      n_wrote = write(this->fd, this->out_buf, this->size);
+  {
+    bcopy(c, this->out_buf + this->out_fill, n - n_over);
+    n_wrote = write(this->fd, this->out_buf, this->size);
       
-      bcopy(c, this->out_buf, n_over);
-      this->out_fill = n_over;
-    }
+    bcopy(c, this->out_buf, n_over);
+    this->out_fill = n_over;
+  }
   else if(n_over == 0)
-    {
-      bcopy(c, this->out_buf + this->out_fill, n);
-      n_wrote = write(this->fd, this->out_buf, this->size);
+  {
+    bcopy(c, this->out_buf + this->out_fill, n);
+    n_wrote = write(this->fd, this->out_buf, this->size);
       
-      this->out_fill = 0;
-    }
+    this->out_fill = 0;
+  }
   else
-    {
-      bcopy(c, this->out_buf + this->out_fill, n);
-      this->out_fill = n_write;
+  {
+    bcopy(c, this->out_buf + this->out_fill, n);
+    this->out_fill = n_write;
       
-      n_wrote = n;
-    }
+    n_wrote = n;
+  }
   
   if(n_wrote != n)
     post("serial %s: write error (%s)\n", this->name, strerror(errno));
@@ -273,14 +273,14 @@ serial_output_char(fts_bytestream_t *stream, unsigned char c)
   this->out_buf[this->out_fill++] = c;
   
   if(this->out_fill >= size)
-    {
-      n_wrote = write(this->fd, this->out_buf, this->size);
+  {
+    n_wrote = write(this->fd, this->out_buf, this->size);
       
-      if(n_wrote != size)
-	post("serial %s: write error (%s)\n", this->name, strerror(errno));
+    if(n_wrote != size)
+      post("serial %s: write error (%s)\n", this->name, strerror(errno));
 
-      this->out_fill = 0;
-    }
+    this->out_fill = 0;
+  }
   
 }
 
@@ -291,12 +291,12 @@ serial_flush(fts_bytestream_t *stream)
   int n = this->out_fill;
   
   if(n > 0)
-    {
-      int n_wrote = write(this->fd, this->out_buf, n);
+  {
+    int n_wrote = write(this->fd, this->out_buf, n);
       
-      if(n_wrote != n)
-	post("serial %s: write error (%s)\n", this->name, strerror(errno));
-    }
+    if(n_wrote != n)
+      post("serial %s: write error (%s)\n", this->name, strerror(errno));
+  }
 
   this->out_fill = 0;
 }
@@ -321,13 +321,13 @@ serial_varargs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   serial_t *this = (serial_t *)o;
 
   if(fts_bytestream_is_output(&this->head))
-    {
-      int i;
+  {
+    int i;
       
-      for(i=0; i<ac; i++)
-	if(fts_is_number(at + i))
-	  serial_output_char(&this->head, (unsigned char)fts_get_number_int(at + i));
-    }
+    for(i=0; i<ac; i++)
+      if(fts_is_number(at + i))
+	serial_output_char(&this->head, (unsigned char)fts_get_number_int(at + i));
+  }
 }
 
 static void 
@@ -351,78 +351,81 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->fd = -1;
 
   if(fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+    speed_t speed;
+    int i = 1; /* running argument index */
+    int size = 0;
+      
+    if(fts_is_number(at + i))
     {
-      fts_symbol_t name = fts_get_symbol(at);
-      speed_t speed;
-      int i = 1; /* running argument index */
-      int size = 0;
-      
-      if(fts_is_number(at + i))
-	{
-	  size = fts_get_number_int(at + i);
-	  i++;
-	}
-      
-      if(size <= 0)
-	size = DEFAULT_BUFFER_SIZE;
-      
-      serial_set_default_termios(this);
-      
-      for(; i<ac; i++)
-	{
-	  if(fts_is_symbol(at + i))
-	    serial_set_flag(this, fts_get_symbol(at + i));
-	  else
-	    {
-	      post("serial: wrong argument: ");
-	      post_atoms(1, at + i);
-	      post(" (ignored)\n");
-	    }
-	}
-      
-      if(this->noread)
-	this->termios.c_cflag &= ~CREAD;
-      
-      this->fd = open(name, O_RDWR);
-      
-      if(this->fd < 0)
-	{
-	  fts_object_error(o, "can't open serial port \"%s\" (%s)", name, strerror( errno));
-	  return;
-	}
-      
-      if(tcsetattr(this->fd, TCSANOW, &this->termios) < 0)
-	{
-	  fts_object_error(o, "can't set termios configuration (%s)", strerror(errno));
-	  
-	  close(this->fd);
-	  return;
-	}
-      
-      fts_bytestream_init(&this->head);
-      
-      if(!this->noread)
-	{
-	  this->in_buf = (unsigned char *)fts_malloc(size);
-	  
-	  /* add fd to FTS scheduler */
-	  fts_sched_add( o, FTS_SCHED_READ, this->fd);
-	  
-	  /* set bytestream callback functions */
-	  fts_bytestream_set_input(&this->head);
-	  
-	  /* install default input callback */
-	  fts_bytestream_add_listener(&this->head, o, serial_default_input);
-	}
-      
-      this->out_buf = (unsigned char *)fts_malloc(size);
-      this->out_fill = 0;
-      
-      this->size = size;
-      this->name = name;
-      
-      fts_bytestream_set_output(&this->head, serial_output, serial_output_char, serial_flush);
+      size = fts_get_number_int(at + i);
+      i++;
     }
+      
+    if(size <= 0)
+      size = DEFAULT_BUFFER_SIZE;
+      
+    serial_set_default_termios(this);
+      
+    for(; i<ac; i++)
+    {
+      if(fts_is_symbol(at + i))
+	serial_set_flag(this, fts_get_symbol(at + i));
+      else
+      {
+	post("serial: wrong argument: ");
+	post_atoms(1, at + i);
+	post(" (ignored)\n");
+      }
+    }
+      
+    if(this->noread)
+      this->termios.c_cflag &= ~CREAD;
+      
+    this->fd = open(name, O_RDWR);
+      
+    if(this->fd < 0)
+    {
+      fts_object_error(o, "can't open serial port \"%s\" (%s)", name, strerror( errno));
+      return;
+    }
+      
+    if(tcsetattr(this->fd, TCSANOW, &this->termios) < 0)
+    {
+      fts_object_error(o, "can't set termios configuration (%s)", strerror(errno));
+	  
+      close(this->fd);
+      return;
+    }
+      
+    fts_bytestream_init(&this->head);
+      
+    if(!this->noread)
+    {
+      this->in_buf = (unsigned char *)fts_malloc(size);
+	  
+      /* add fd to FTS scheduler */
+      fts_sched_add( o, FTS_SCHED_READ, this->fd);
+	  
+      /* set bytestream callback functions */
+      fts_bytestream_set_input(&this->head);
+	  
+      /* install default input callback */
+      fts_bytestream_add_listener(&this->head, o, serial_default_input);
+    }
+      
+    this->out_buf = (unsigned char *)fts_malloc(size);
+    this->out_fill = 0;
+      
+    this->size = size;
+    this->name = name;
+      
+    fts_bytestream_set_output(&this->head, serial_output, serial_output_char, serial_flush);
+
+    /* add one outlet to serial object */
+    fts_object_set_outlets_number(o, 1);
+  }
   else
     fts_object_error(o, "first argument of serial device name required");
 }
@@ -433,11 +436,11 @@ serial_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   serial_t *this = (serial_t *)o;
 
   if(this->fd >= 0)
-    {
-      fts_bytestream_remove_listener(&this->head, o);
-      fts_sched_remove( o);
-      close( this->fd);
-    }
+  {
+    fts_bytestream_remove_listener(&this->head, o);
+    fts_sched_remove( o);
+    close( this->fd);
+  }
 }
 
 static void 
@@ -486,3 +489,10 @@ void serial_config( void)
 
   fts_class_install( fts_new_symbol("serial"), serial_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
