@@ -73,7 +73,7 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     item.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 		  {
-				((MidiTrackEditor)target).getTrack().getFtsTrack().appendBar();
+				//((MidiTrackEditor)target).getTrack().getFtsTrack().appendBar();
 		  }
 		});	
     add(item);

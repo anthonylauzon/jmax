@@ -38,5 +38,7 @@ public interface SequenceEditor extends Editor
   public void undo();
   public void redo();
   public void selectAll();
+	public SequenceSelection getSelection();
+	public SequenceSelection getMarkerSelection();
 }
 

@@ -636,6 +636,16 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     editor.getSelection().selectAll();
     editor.getGraphicContext().getGraphicDestination().requestFocus();
 	}
+
+	public SequenceSelection getSelection()
+  {
+    return getCurrentTrackEditor().getSelection();
+	}
+	
+	public SequenceSelection getMarkerSelection()
+  {
+    return currentMarkersSelection;
+	}	
   
   public FtsGraphicObject getFtsObject()
   {

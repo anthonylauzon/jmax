@@ -28,6 +28,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.fts.*;
 
 /** This class define a set of static variables 
@@ -151,9 +152,15 @@ public class Actions
     public void doAction(EditorContainer container)
     {
       FtsGraphicObject fobj = ((SequenceEditor)container.getEditor()).getFtsObject();
-      if(fobj  instanceof FtsTrackObject)
-        ((FtsTrackObject) fobj).appendBar();
-    }
+			if(fobj  instanceof FtsTrackObject)
+			{
+				SequenceSelection sel = ((SequenceEditor)container.getEditor()).getMarkerSelection();
+				TrackEvent bar = null;
+				if(sel != null && sel.size() == 1)
+					bar = (TrackEvent)sel.getSelected().nextElement();
+				((FtsTrackObject) fobj).appendBar( bar);
+			}
+		}
   }
 }
 

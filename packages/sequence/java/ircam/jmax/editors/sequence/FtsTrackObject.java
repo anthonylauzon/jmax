@@ -670,10 +670,13 @@ public void makeTrillFromSelection( Enumeration events)
   }
 }
 
-public void appendBar()
-{  
+public void appendBar(TrackEvent evt)
+{ 	
   try{
-    send( FtsSymbol.get("append_bar"));
+		args.clear();
+		if(evt != null)
+			args.addObject(evt);
+    send( FtsSymbol.get("append_bar"), args);
   }
   catch(IOException e)
   {

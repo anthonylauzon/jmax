@@ -420,6 +420,16 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     trackEditor.getSelection().selectAll();
     trackEditor.getGraphicContext().getGraphicDestination().requestFocus();
 	}
+	
+	public SequenceSelection getSelection()
+  {
+    return trackEditor.getSelection();
+	}	
+	
+	public SequenceSelection getMarkerSelection()
+  {
+    return currentMarkersSelection;
+	}	
   
   public FtsGraphicObject getFtsObject()
   {

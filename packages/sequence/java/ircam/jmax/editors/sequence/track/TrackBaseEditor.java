@@ -39,10 +39,10 @@ import javax.swing.event.*;
 public abstract class TrackBaseEditor extends PopupToolbarPanel implements TrackDataListener, ListSelectionListener, TrackEditor
 {
   public TrackBaseEditor(Geometry geom, Track trk, boolean isInSequence)
-{
-    super();
+	{ 
+    super();	
 		
-    this.track = trk;
+		this.track = trk;
     this.geometry = geom;
 		
     setBackground(Color.white);

@@ -736,14 +736,18 @@ _track_append_bar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   track_t *self = (track_t *)o;
   track_t *markers = self;
   event_t *new_bar = NULL;
-  fts_symbol_t tr_type = fts_class_get_name( track_get_type(self));
+  event_t *start_bar = NULL;
+	fts_symbol_t tr_type = fts_class_get_name( track_get_type(self));
   
   if(tr_type != seqsym_scomark)
   {
     markers = track_get_or_make_markers(self);
     track_upload_markers(self);
   }
-  new_bar = marker_track_append_bar( markers);
+	if((ac > 0) && fts_is_object(at))
+		start_bar = (event_t *)fts_get_object(at);
+	
+  new_bar = marker_track_append_bar( markers, start_bar);
  
   track_upload_event(markers, new_bar);
 }
@@ -1724,6 +1728,8 @@ track_upload_event_with_array(track_t *self, event_t *event, fts_array_t *temp_a
       fts_client_send_message((fts_object_t *)self, seqsym_addEvents, 4, a);
     }
   }
+	else
+		event_set_at_client(event);
 }
 
 void
@@ -1945,8 +1951,6 @@ track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s,
 }
 
 
-
-
 /* editor */
 
 static void
@@ -2045,9 +2049,6 @@ track_set_save_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
         }
 }
 
-
-
-
 /******************************************************
 *
 *  persistence
@@ -2141,9 +2142,6 @@ track_notify_gui_listeners(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     fts_send_message_varargs( fts_get_object(&a), fts_s_send, ac, at);
   }
 }
-
-
-
 
 /******************************************************
 *
@@ -2272,9 +2270,9 @@ track_instantiate(fts_class_t *cl)
   
   /* markers */
   fts_class_message_void(cl, fts_new_symbol("getmarkers"), _track_get_markers);
-  fts_class_message_void(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_void(cl, fts_new_symbol("make_bars"), _track_make_bars);
   fts_class_message_void(cl, fts_new_symbol("renumber_bars"), _track_renumber_bars);
+	fts_class_message_varargs(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_varargs(cl, fts_new_symbol("make_trill"), _track_make_trill);
   fts_class_message_varargs(cl, seqsym_marker, _track_append_marker);
   

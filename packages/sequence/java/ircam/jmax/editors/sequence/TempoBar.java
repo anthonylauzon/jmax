@@ -368,6 +368,23 @@ public void processKeyEvent(KeyEvent e)
 	requestFocus();
 }
 
+TrackEvent lastBar = null;
+double lastBarTime = -1.0;
+/* if is a bar set if is last bar in score as a property "last_bar" */
+void setLastBar(TrackEvent evt)
+{
+	double time = evt.getTime();
+	if(time >= lastBarTime)
+	{
+		if(lastBar != null) 
+			lastBar.getValue().setProperty("last_bar", Boolean.FALSE);
+		
+		lastBar = evt;
+		lastBarTime = time;
+		lastBar.getValue().setProperty("last_bar", Boolean.TRUE);
+	}	
+}
+
 //=================== MouseListener interface ===========================
 public void mouseClicked(MouseEvent e){}
 public void mousePressed(MouseEvent e)
@@ -427,29 +444,34 @@ public void mouseEntered(MouseEvent e)
 public void mouseExited(MouseEvent e){}
 //=================== TrackDataListener interface ========================
 
-public void objectChanged(Object spec, String propName, Object propValue){repaint();}
-public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
-public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
+public void objectChanged(Object spec, String propName, Object propValue)
+{
+	if(propName.equals("type"))
+		if((propValue.toString()).equals("bar"))
+			setLastBar((TrackEvent)spec);
 
-TrackEvent lastBar = null;
-double lastBarTime = -1.0;
+	repaint();
+}
+public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient)
+{
+	String type = (String)(((TrackEvent)whichObject).getProperty("type"));  
+  if( type.equals("bar"))
+		setLastBar((TrackEvent)whichObject);
+	repaint();
+}
+public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient)
+{
+	if(whichObject == lastBar)
+		setLastBar((TrackEvent)whichObject);
+	repaint();
+}
+
 public void objectAdded(Object whichObject, int index)
 {
   String type = (String)(((TrackEvent)whichObject).getProperty("type"));  
   if( type.equals("bar"))
-  {    
-    double time = ((TrackEvent)whichObject).getTime();
-    if(time >= lastBarTime)
-    {
-      if(lastBar != null) 
-        lastBar.getValue().setProperty("last_bar", Boolean.FALSE);
-      
-      lastBar = (TrackEvent)whichObject;
-      lastBarTime = time;
-      lastBar.getValue().setProperty("last_bar", Boolean.TRUE);
-    }
-  }
-  /* if is a bar set if is last bar in score as a property "last_bar" */
+		setLastBar((TrackEvent)whichObject);
+	
   repaint();
 }
 public void objectsAdded(int maxTime){repaint();}

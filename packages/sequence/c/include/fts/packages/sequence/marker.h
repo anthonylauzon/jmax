@@ -92,5 +92,5 @@ extern void marker_track_unset_tempo_on_selection(track_t *marker_track, int ac,
 extern scomark_t *marker_track_append_marker(track_t *marker_track, double time, int ac, const fts_atom_t *at, event_t **event);
 extern scomark_t *marker_track_insert_marker(track_t *marker_track, double time, fts_symbol_t type, event_t **event);
 extern void marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num, int upload);
-extern event_t *marker_track_append_bar(track_t *marker_track);
+extern event_t *marker_track_append_bar(track_t *marker_track, event_t *start_evt);
 #endif
