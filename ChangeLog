@@ -1,3 +1,8 @@
+2002-09-09  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fix code of dtdserver, now dtdserver constructor is called by fts_object_new_patcher 
+	and not only by readsf_init. So now dtdserver destructor is called by fts_shutdown
+	
 2002-09-06  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* moved client/server protocol to "double" values. Changed the client Java API
