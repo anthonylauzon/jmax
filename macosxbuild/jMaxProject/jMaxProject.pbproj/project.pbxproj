@@ -5,6 +5,54 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F51108C803D439EB01664092 = {
+			isa = PBXFileReference;
+			name = FtsFvecObject.java;
+			path = ../../packages/data/java/ircam/jmax/editors/table/FtsFvecObject.java;
+			refType = 2;
+		};
+		F51108C903D439EB01664092 = {
+			isa = PBXFileReference;
+			name = FtsIvecObject.java;
+			path = ../../packages/data/java/ircam/jmax/editors/table/FtsIvecObject.java;
+			refType = 2;
+		};
+		F51108CA03D439EB01664092 = {
+			fileRef = F51108C803D439EB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51108CB03D439EB01664092 = {
+			fileRef = F51108C903D439EB01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51108CC03D43A1F01664092 = {
+			isa = PBXFileReference;
+			name = tabeditor.c;
+			path = ../../packages/data/c/src/tabeditor.c;
+			refType = 2;
+		};
+		F51108CD03D43A1F01664092 = {
+			fileRef = F51108CC03D43A1F01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51108CE03D43A5F01664092 = {
+			isa = PBXFileReference;
+			name = tabeditor.h;
+			path = ../../packages/data/c/include/tabeditor.h;
+			refType = 2;
+		};
+		F51108CF03D43A5F01664092 = {
+			fileRef = F51108CE03D43A5F01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F519DF6D034B353A01664092 = {
 			isa = PBXFileReference;
 			name = bus.c;
@@ -483,6 +531,7 @@
 				F5999CC5032E298301664092,
 				F5999CC6032E298301664092,
 				F5999CC7032E298301664092,
+				F51108CE03D43A5F01664092,
 			);
 			isa = PBXGroup;
 			name = includes;
@@ -18134,6 +18183,7 @@
 				F8B8E4AB02867E1C01664092,
 				F8EE4BA0031CEE1701664092,
 				F8EE4BA1031CEE1701664092,
+				F51108CC03D43A1F01664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -18367,6 +18417,7 @@
 				F5999CCB032E298301664092,
 				F5999CCC032E298301664092,
 				F5999CCD032E298301664092,
+				F51108CF03D43A5F01664092,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18428,6 +18479,7 @@
 				F8B8E4D402867E1C01664092,
 				F8B8E4D502867E1C01664092,
 				F8EE4BA5031CEE1701664092,
+				F51108CD03D43A1F01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18635,6 +18687,8 @@
 				F8B8E572028680BC01664092,
 				F56C3E190338D3DC01664092,
 				F59A845A033F11C901664092,
+				F51108CA03D439EB01664092,
+				F51108CB03D439EB01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18900,6 +18954,8 @@
 				F8B8E52B028680BB01664092,
 				F56C3E180338D3DC01664092,
 				F59A8459033F11C901664092,
+				F51108C803D439EB01664092,
+				F51108C903D439EB01664092,
 			);
 			isa = PBXGroup;
 			name = table;
