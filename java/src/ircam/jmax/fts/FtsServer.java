@@ -152,6 +152,7 @@ public class FtsServer
 	connection.sendInt(obj.getObjId());// cannot send the object, do not exists (yet) on the FTS Side !!
 	connection.sendString(className);
 
+
 	if (args != null)
 	  connection.sendVector(args);
 

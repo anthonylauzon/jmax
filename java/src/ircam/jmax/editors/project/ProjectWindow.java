@@ -458,6 +458,8 @@ public class ProjectWindow extends Frame implements KeyListener, WindowListener,
 	  }
 	MaxApplication.itsSketchWindowList.addElement(MaxApplication.itsSketchWindow);
 	MaxApplication.AddThisWindowToMenus(MaxApplication.itsSketchWindow);
+	MaxApplication.itsSketchWindow.itsDocument.SetFile(file);
+	MaxApplication.itsSketchWindow.setTitle(file.getName());
 	return true;
       }
     else if(aExtension.equals("pat"))

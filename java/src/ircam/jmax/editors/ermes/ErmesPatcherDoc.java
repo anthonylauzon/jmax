@@ -116,6 +116,14 @@ public class ErmesPatcherDoc implements MaxDocument {
 
   public void SetFile(File theFile) {
     itsFile = theFile;
+
+    if (itsFile != null)
+      {
+	itsTitle = itsFile.getName();
+	
+	if (itsSketchWindow != null)
+	  itsSketchWindow.setTitle(itsFile.getName());
+      }
   }
   
   
