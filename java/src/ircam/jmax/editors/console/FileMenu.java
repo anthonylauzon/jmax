@@ -44,7 +44,9 @@ public class FileMenu extends DefaultFileMenu
 	super();
 	insert(new PrintAction(), "Print", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P, 3);
 	
+	remove(5);
 	remove(4);
+	setDefaultNumEntries(6);
     }
 
     public class PrintAction extends EditorAction

@@ -43,6 +43,8 @@ public class FileMenu extends DefaultFileMenu
 {
   public FileMenu(ErmesSketchPad sketch)
   {
+    setDefaultNumEntries(10);
+
     if(sketch.isARootPatcher())
       {
 	insert(Actions.saveAction, "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S, 3);

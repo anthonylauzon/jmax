@@ -47,12 +47,10 @@ public class DefaultFileMenu extends EditorMenu
     super("File");
 
     setHorizontalTextPosition(AbstractButton.LEFT);
+    setDefaultNumEntries(7);
 
     add(DefaultActions.newAction, "New", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
     add(DefaultActions.openAction, "Open", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
-
-    RecentMenu recentMenu = new RecentMenu();
-    add(recentMenu);
 
     addSeparator();
 
@@ -62,6 +60,23 @@ public class DefaultFileMenu extends EditorMenu
     
     dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_SPACE);
     add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
+  
+    MaxApplication.getRecentFileHistory().addListDataListener(new ListDataListener(){
+	    public void contentsChanged(ListDataEvent e)
+	    {
+		buildRecentFiles();
+	    }
+	    public void intervalAdded(ListDataEvent e)
+	    {
+		buildRecentFiles();
+	    }    
+	    public void intervalRemoved(ListDataEvent e) 
+	    {
+		buildRecentFiles();
+	    }
+	});
+
+    buildRecentFiles();
   }
 
   public void updateMenu()
@@ -77,6 +92,35 @@ public class DefaultFileMenu extends EditorMenu
 	  }
        else
 	  dspMenuItem.setEnabled(false);
+  }
+
+  void buildRecentFiles()
+  {
+      RecentFileHistory recentFileHistory = MaxApplication.getRecentFileHistory();
+	
+      //remove all recent Files
+      int num = getItemCount() - getDefaultNumEntries();
+      while(num>0)
+	  {
+	      remove(getItemCount()-1); 
+	      num--;
+	  }
+
+      if(recentFileHistory.size() > 0)          
+      {  
+	  File file;
+	  JMenuItem jMenuItem;
+
+	  addSeparator();
+
+	  for (int i = 0; i < recentFileHistory.size(); ++i)
+	      {
+		  file = (File)recentFileHistory.get(i);
+		  
+		  jMenuItem = add(new OpenAction(file), (i+1)+":  "+file.getName());
+		  jMenuItem.setMnemonic(Character.forDigit(i+1, 10));
+	      }
+      }
   }
 }
 
