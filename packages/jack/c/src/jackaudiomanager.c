@@ -89,6 +89,53 @@ static fts_symbol_t s_default_client_name;
 jack_client_t* manager_jack_client = NULL;
 static int jack_count = 0;
 
+
+/* JACK callback */
+/* TODO:
+   Change this function if we want more JACK port 
+*/
+static
+int jackaudiomanager_process(jack_nframes_t nframes, void* arg)
+{
+
+/*   jackaudioport_t* self = (jackaudioport_t*)arg; */
+/*   /\* Get JACK output port buffer pointer *\/ */
+/*   jack_default_audio_sample_t* out = (jack_default_audio_sample_t*)jack_port_get_buffer(self->output_port, nframes); */
+/*   /\* Get JACK input port buffer pointer *\/ */
+/*   jack_default_audio_sample_t* in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, nframes); */
+    
+  int n = 0;
+  /* get number of samples of a FTS tick */
+  int samples_per_tick = fts_dsp_get_tick_size();
+
+/*   /\* TODO:  */
+/*      Check if in/out are valid pointer  */
+/*   *\/ */
+/*   self->input_buffer = in; */
+/*   self->output_buffer = out; */
+    
+  /* TODO: 
+     Need to be fix if (nframes % samples_per_tick != 0) 
+
+     Case 1: nframes < samples_per_tick
+       
+     Case 2: nframes > samples_per_tick
+
+  */
+  for (n = 0; n < nframes; n += samples_per_tick)
+  {
+    /*	fts_sched_run_one_tick_without_select(); */
+    /* Run scheduler */
+    fts_sched_run_one_tick();  
+/*     /\* Step forward in input/output buffer *\/ */
+/*     self->input_buffer += samples_per_tick; */
+/*     self->output_buffer += samples_per_tick; */
+  }
+  return 0;
+}
+
+
+
 static
 void create_jack_manager_client()
 {
@@ -485,6 +532,8 @@ jackaudiomanager_scan_ports(fts_array_t* array, int flags)
 {
   const char** ports;
   int i;
+  fts_symbol_t cur_sym;
+  fts_audioport_t* port;
   ports = jack_get_ports(manager_jack_client, 
 			 NULL, /* no pattern on port name NULL */
 			 NULL, /* no pattern on type */
@@ -493,8 +542,13 @@ jackaudiomanager_scan_ports(fts_array_t* array, int flags)
   i = 0;
   while(NULL != ports[i])
   {
-    fts_array_append_symbol(array, fts_new_symbol(ports[i]));
+    fts_atom_t at;
+    cur_sym = fts_new_symbol(ports[i]);
+    fts_array_append_symbol(array, cur_sym);
     fts_log("[jackaudiomanager] append symbol : %s\n", ports[i]);
+    fts_set_int(&at, flags);
+    port = (fts_audioport_t*)fts_object_create(jackaudioport_type, NULL, 1, &at);
+    fts_audiomanager_put_port(cur_sym, port);
     ++i;
   }
 }
@@ -650,6 +704,43 @@ jackaudiomanager_unregister(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 
 }
 
+/* This function is used to remove object from scheduler and to activate JACK client */
+static void
+jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fd_set rfds;
+  jackaudiomanager_t* self = (jackaudiomanager_t*)o;
+  jack_client_t* client = jackaudiomanager_get_jack_client();
+  /* Remove object of FTS scheduler */
+  fts_sched_remove(o);
+  fts_log("[jackaudioport] jackaudioport removed from scheduler \n");
+
+    
+  /* Activate jack client */    
+  if (jack_activate(client) == -1)
+  {
+    fts_log("[jackaudiomanager] cannot activate JACK client \n");
+    fts_object_set_error(o, "cannot activate JACK client \n");
+    return;
+  }
+
+
+  fts_log("[jackaudiomanager] jack client activated \n");
+
+
+  /* Stop FTS scheduler */
+  FD_ZERO(&rfds);
+  FD_SET(0, &rfds);
+  /* check return value of select */
+  if (select(1, &rfds, NULL, NULL, NULL) < 0)
+  {
+    fts_log("[jackaudiomanager] select failed \n");
+  }
+
+  fts_log("[jackaudiomanager] FTS scheduler stopped \n");
+
+}
+
 
 static void
 jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -671,6 +762,17 @@ jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
   /* create register and unregister threads */
   create_register_thread(self);
 /*   create_unregister_thread(self); */
+
+
+  /* JACK client process callback setting */
+  jack_set_process_callback(jackaudiomanager_get_jack_client(),
+			    jackaudiomanager_process, /* callback function */
+			    (void*)self);          /* we need to have our object
+						      in our callback function
+						   */
+  fts_log("[jackaudioport] set jackaudioport process callback \n");
+
+  fts_sched_add(o, FTS_SCHED_ALWAYS);
 }
 
 static void
@@ -699,6 +801,8 @@ jackaudiomanager_instantiate(fts_class_t* cl)
 
   fts_class_message_varargs(cl, s_register, jackaudiomanager_register);
   fts_class_message_varargs(cl, s_unregister, jackaudiomanager_unregister);
+
+  fts_class_message_varargs(cl, fts_s_sched_ready, jackaudiomanager_halt);
 }
 
 /***********************************************************************
@@ -726,6 +830,12 @@ void jackaudiomanager_config( void)
 
   fts_array_init(&jackaudiomanager_inputs_array, 0, 0);
   fts_array_init(&jackaudiomanager_outputs_array, 0, 0);
+
+  fts_array_clear(&jackaudiomanager_inputs_array);
+  jackaudiomanager_scan_ports(&jackaudiomanager_inputs_array, JackPortIsOutput);
+
+  fts_array_clear(&jackaudiomanager_outputs_array);
+  jackaudiomanager_scan_ports(&jackaudiomanager_outputs_array, JackPortIsInput);
   
   jackaudiomanager_thread_type = fts_class_install(fts_new_symbol("jackaudiomanager_thread"), 
 							   jackaudiomanager_thread_instantiate);
