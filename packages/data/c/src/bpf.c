@@ -551,7 +551,7 @@ _bpf_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     {
       int i;
       
-      for(i=1; i<m*n; i+=n)
+      for(i=0; i<m*n; i+=n)
         bpf_append_point(this, ptr[i], ptr[i + 1]);
     }
     else

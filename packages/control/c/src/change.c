@@ -127,7 +127,7 @@ change_anything(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 	    if (obj1 != obj2)
 	    {
 	      fts_class_t* class = fts_object_get_class(obj1);
-	      fts_equals_function_t equals = fts_class_get_equals_function(class);
+	      fts_class_equals_function_t equals = fts_class_get_equals_function(class);
         
 	      if ((NULL == equals) || (0 == (*equals)(obj1, obj2)))
 	      {

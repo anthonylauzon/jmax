@@ -20,13 +20,16 @@
  * 
  */
 
+typedef void (*fts_class_interpolation_function_t)(fts_object_t *obj0, fts_object_t *obj1, double inter, fts_object_t *result);
+
 /* "system methods" every class should implement */
 typedef void (*fts_instantiate_fun_t)(fts_class_t *);
-typedef unsigned int (*fts_hash_function_t)( const fts_atom_t *);
-typedef int (*fts_equals_function_t)( const fts_object_t *, const fts_object_t *);
-typedef void (*fts_copy_function_t)( const fts_object_t *, fts_object_t *);
-typedef void (*fts_array_function_t)(fts_object_t *obj, fts_array_t *array);
-typedef void (*fts_description_function_t)(fts_object_t *obj, fts_array_t *array);
+typedef unsigned int (*fts_class_hash_function_t)( const fts_atom_t *);
+typedef int (*fts_class_equals_function_t)( const fts_object_t *, const fts_object_t *);
+typedef void (*fts_class_description_function_t)(fts_object_t *obj, fts_array_t *array);
+typedef void (*fts_class_copy_function_t)( const fts_object_t *, fts_object_t *);
+typedef void (*fts_class_array_function_t)(fts_object_t *obj, fts_array_t *array);
+typedef fts_class_interpolation_function_t (*fts_class_interpolation_select_t)(fts_object_t *obj, fts_symbol_t mode);
 
 typedef struct fts_class_outlet fts_class_outlet_t;
 
@@ -34,8 +37,6 @@ FTS_API void fts_class_instantiate(fts_class_t *cl);
 
 /* Predefined typeids */
 #define FTS_FIRST_OBJECT_TYPEID   16
-
-
 
 /**************************************************
  *
@@ -76,11 +77,12 @@ struct fts_class {
   int type_id;
 
   /* The hash function and equality function for this class */
-  fts_hash_function_t hash_function;
-  fts_equals_function_t equals_function;
-  fts_copy_function_t copy_function;
-  fts_array_function_t array_function;
-  fts_description_function_t description_function;
+  fts_class_hash_function_t hash_function;
+  fts_class_equals_function_t equals_function;
+  fts_class_description_function_t description_function;
+  fts_class_copy_function_t copy_function;
+  fts_class_array_function_t array_function;
+  fts_class_interpolation_select_t interpolation_select;
   fts_array_t import_handlers;	  /* list of import handlers */
 
   fts_instantiate_fun_t instantiate_fun;
@@ -113,15 +115,17 @@ struct fts_class {
 
 #define fts_class_get_hash_function(cl) ((cl)->hash_function)
 #define fts_class_get_equals_function(cl) ((cl)->equals_function)
+#define fts_class_get_description_function(cl) ((cl)->description_function)
 #define fts_class_get_copy_function(cl) ((cl)->copy_function)
 #define fts_class_get_array_function(cl) ((cl)->array_function)
-#define fts_class_get_description_function(cl) ((cl)->description_function)
+#define fts_class_get_interpolation_function(cl, o, m) ((*(cl)->interpolation_select)(o, m))
 
 #define fts_class_set_hash_function( cl, f) ((cl)->hash_function = (f))
 #define fts_class_set_equals_function( cl, f) ((cl)->equals_function = (f))
+#define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
 #define fts_class_set_copy_function( cl, f) ((cl)->copy_function = (f))
 #define fts_class_set_array_function( cl, f) ((cl)->array_function = (f))
-#define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
+#define fts_class_set_interpolation_select(cl, f) ((cl)->interpolation_select = (f))
 
 #define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
 

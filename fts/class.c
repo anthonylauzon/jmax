@@ -38,10 +38,10 @@ static int type_id = FTS_FIRST_OBJECT_TYPEID;
 #define CLASS_INLET_MAX 255
 
 /***********************************************************************
- *
- * Class Handling
- *
- */
+*
+* Class Handling
+*
+*/
 
 static unsigned int
 default_hash_function (const fts_atom_t * p)
@@ -67,30 +67,36 @@ default_description_function(fts_object_t *obj, fts_array_t *array)
   fts_array_append_symbol(array, fts_object_get_class_name(obj));
 }
 
+static fts_class_interpolation_function_t
+default_interpolation_select(fts_object_t *obj, fts_symbol_t mode)
+{
+  return NULL;
+}
 
 fts_class_t *
-fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
+fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
-  fts_class_t *cl = (fts_class_t *) fts_object_create (fts_class_class, 0, 0);
-
+  fts_class_t *cl = (fts_class_t * )fts_object_create(fts_class_class, 0, 0);
+  
   cl->name = name;
   cl->instantiate_fun = instantiate_fun;
   cl->type_id = type_id++;
-
+  
   fts_class_set_hash_function (cl, default_hash_function);
   fts_class_set_equals_function (cl, default_equals_function);
+  fts_class_set_description_function (cl, default_description_function);
   fts_class_set_copy_function (cl, NULL);
   fts_class_set_array_function (cl, NULL);
-  fts_class_set_description_function (cl, default_description_function);
+  fts_class_set_interpolation_select (cl, default_interpolation_select);
+  
   fts_array_init(&cl->import_handlers, 0, NULL);
 
   if (name != NULL)
   {
-    if (fts_package_add_class (fts_get_current_package (), cl, name) !=
-        fts_ok)
-      return 0;
+    if (fts_package_add_class (fts_get_current_package (), cl, name) != fts_ok)
+      return NULL;
   }
-
+  
   return cl;
 }
 
@@ -110,10 +116,10 @@ fts_class_alias (fts_class_t * cl, fts_symbol_t alias)
 }
 
 /********************************************
- *
- * inlet/outlet utils
- *
- */
+*
+* inlet/outlet utils
+*
+*/
 #define CLASS_INOUT_BLOCK_SIZE 4
 
 static void
@@ -127,26 +133,25 @@ class_set_outlets_number (fts_class_t * cl, int n)
 {
   int n_alloc = cl->out_alloc;
   int i;
-
+  
   if (n > n_alloc)
-    {
-      while (n_alloc < n)
-	n_alloc += CLASS_INOUT_BLOCK_SIZE;
-
-      cl->outlets =
-	fts_realloc (cl->outlets, n_alloc * sizeof (fts_class_outlet_t));
-
-      /* init new outlets */
-      for (i = cl->out_alloc; i < n_alloc; i++)
-	fts_list_init (cl->outlets[i].declarations);
-
-      cl->out_alloc = n_alloc;
-    }
-
+  {
+    while (n_alloc < n)
+      n_alloc += CLASS_INOUT_BLOCK_SIZE;
+    
+    cl->outlets = fts_realloc (cl->outlets, n_alloc * sizeof (fts_class_outlet_t));
+    
+    /* init new outlets */
+    for (i = cl->out_alloc; i < n_alloc; i++)
+      fts_list_init (cl->outlets[i].declarations);
+    
+    cl->out_alloc = n_alloc;
+  }
+  
   /* delete outlets cut off */
   for (i = n; i < cl->noutlets; i++)
     fts_list_delete (cl->outlets[i].declarations);
-
+  
   cl->noutlets = n;
 }
 
@@ -154,14 +159,14 @@ static fts_class_outlet_t *
 class_get_outlet (fts_class_t * cl, int woutlet)
 {
   if (cl->outlets != NULL)
-    {
-      if (woutlet < 0)
-	woutlet = 0;
-      else if (woutlet >= cl->noutlets)
-	woutlet = cl->noutlets - 1;
-
-      return cl->outlets + woutlet;
-    }
+  {
+    if (woutlet < 0)
+      woutlet = 0;
+    else if (woutlet >= cl->noutlets)
+      woutlet = cl->noutlets - 1;
+    
+    return cl->outlets + woutlet;
+  }
   else
     return NULL;
 }
@@ -173,14 +178,13 @@ class_outlet_add_declaration (fts_class_outlet_t * out, const fts_atom_t * a)
 }
 
 static int
-class_outlet_get_declarations (fts_class_outlet_t * out,
-			       fts_iterator_t * iter)
+class_outlet_get_declarations (fts_class_outlet_t * out, fts_iterator_t * iter)
 {
   int n = fts_list_get_size (out->declarations);
-
+  
   if (n > 0)
     fts_list_get_values (out->declarations, iter);
-
+  
   return n;
 }
 
@@ -188,28 +192,28 @@ static int
 class_outlet_has_declaration (fts_class_outlet_t * out, const fts_atom_t * p)
 {
   fts_iterator_t iter;
-
+  
   if (class_outlet_get_declarations (out, &iter) > 0)
+  {
+    while (fts_iterator_has_more (&iter))
     {
-      while (fts_iterator_has_more (&iter))
-	{
-	  fts_atom_t a;
-
-	  fts_iterator_next (&iter, &a);
-
-	  if (fts_atom_identical (p, &a))
-	    return 1;
-	}
+      fts_atom_t a;
+      
+      fts_iterator_next (&iter, &a);
+      
+      if (fts_atom_identical (p, &a))
+        return 1;
     }
-
+  }
+  
   return 0;
 }
 
 /********************************************
- *
- *  class
- *
- */
+*
+*  class
+*
+*/
 
 static void
 dummy_method (fts_object_t * o, int winlet, fts_symbol_t s, int ac, const fts_atom_t * at)
@@ -222,14 +226,14 @@ fts_class_init (fts_class_t * cl, unsigned int size, fts_method_t constructor, f
 {
   cl->size = size;
   cl->heap = fts_heap_new (size);
-
+  
   cl->constructor = (constructor != NULL) ? constructor : dummy_method;
   cl->deconstructor = (deconstructor != NULL) ? deconstructor : dummy_method;
-
+  
   cl->methods = fts_hashtable_new (FTS_HASHTABLE_MEDIUM);
   cl->input_handler = NULL;
   cl->ninlets = 0;
-
+  
   cl->noutlets = 0;
   cl->out_alloc = 0;
   cl->outlets = NULL;
@@ -259,7 +263,7 @@ static unsigned int
 method_key_hash (const fts_atom_t * a)
 {
   method_key_t *key = (method_key_t *) fts_get_object (a);
-
+  
   return (unsigned int) key->selector + (unsigned int) key->type;
 }
 
@@ -268,7 +272,7 @@ method_key_equals (const fts_object_t *a, const fts_object_t *b)
 {
   method_key_t *key_a = (method_key_t *)a;
   method_key_t *key_b = (method_key_t *)b;
-
+  
   return (key_a->selector == key_b->selector && key_a->type == key_b->type);
 }
 
@@ -276,7 +280,7 @@ static void
 method_key_instantiate (fts_class_t * cl)
 {
   fts_class_init (cl, sizeof (method_key_t), NULL, NULL);
-
+  
   fts_class_set_hash_function (cl, method_key_hash);
   fts_class_set_equals_function (cl, method_key_equals);
 }
@@ -286,7 +290,7 @@ method_key_init (void)
 {
   method_key_class = fts_class_install (NULL, method_key_instantiate);
   method_key = (method_key_t *) fts_object_create (method_key_class, 0, 0);
-
+  
   fts_set_object (&method_key_atom, (fts_object_t *) method_key);
 }
 
@@ -294,11 +298,11 @@ static method_key_t *
 method_key_new (fts_symbol_t selector, fts_class_t * type)
 {
   method_key_t *key =
-    (method_key_t *) fts_object_create (method_key_class, 0, 0);
-
+  (method_key_t *) fts_object_create (method_key_class, 0, 0);
+  
   key->selector = selector;
   key->type = type;
-
+  
   return key;
 }
 
@@ -324,23 +328,23 @@ method_put (fts_class_t * cl, const void *selector, fts_class_t * type, fts_meth
 {
   method_key_t *key = method_key_new((fts_symbol_t) selector, type);
   fts_atom_t k, a;
-
+  
   fts_set_object (&k, key);
   fts_set_pointer (&a, method);
-
+  
   fts_hashtable_put (cl->methods, &k, &a);
 }
 
 /********************************************
- *
- * inlet/outlet definitions
- *
- */
+*
+* inlet/outlet definitions
+*
+*/
 void
 fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t method)
 {
   fts_method_t declared = method_get(cl, (const void *)s, type);
-
+  
   if(declared != NULL)
   {
     fts_symbol_t cl_name = fts_class_get_name(cl);
@@ -364,10 +368,10 @@ class_adjust_inlet(fts_class_t * cl, int winlet)
     winlet = 0;
   else if (winlet > CLASS_INLET_MAX)
     winlet = CLASS_INLET_MAX;
-
+  
   if (winlet >= cl->ninlets)
     class_set_inlets_number (cl, winlet + 1);
-
+  
   return winlet;
 }
 
@@ -378,7 +382,7 @@ class_clip_inlet(fts_class_t * cl, int winlet)
     return 0;
   else if (winlet >= cl->ninlets)
     return cl->ninlets - 1;
-
+  
   return winlet;
 }
 
@@ -400,7 +404,7 @@ fts_class_inlet(fts_class_t * cl, int winlet, fts_class_t * type, fts_method_t m
     else
       fts_post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_symbol_name(cl_name));
   }
-
+  
   method_put (cl, (const void *) n, type, method);
 }
 
@@ -414,45 +418,45 @@ void
 fts_class_input_handler(fts_class_t * cl, fts_method_t method)
 {
   cl->input_handler = method;
-
+  
   if (cl->ninlets == 0)
     class_set_inlets_number (cl, 1);
 }
 
 /**************************************************
- *
- *  outlet types definition
- *
- */
+*
+*  outlet types definition
+*
+*/
 void
 fts_class_outlet(fts_class_t * cl, int woutlet, fts_class_t * class)
 {
   fts_class_outlet_t *out;
   fts_atom_t a;
-
+  
   if (woutlet >= cl->noutlets)
     class_set_outlets_number (cl, woutlet + 1);
-
+  
   out = class_get_outlet (cl, woutlet);
-
+  
   fts_set_pointer (&a, class);
   class_outlet_add_declaration (out, &a);
 }
 
 /**************************************************
- *
- *  request inlet/outlet methods and definitions
- *
- */
+*
+*  request inlet/outlet methods and definitions
+*
+*/
 fts_method_t
 fts_class_get_method(fts_class_t * cl, fts_symbol_t s, fts_class_t * type)
 {
   fts_method_t method = method_get (cl, (const void *) s, type);
-
+  
   /* try varargs if not found with given type */
   if(method == NULL)
     method = method_get (cl, (const void *) s, NULL);
-
+  
   return method;
 }
 
@@ -468,19 +472,19 @@ fts_class_get_inlet_method(fts_class_t * cl, int winlet, fts_class_t * type)
   int n = class_clip_inlet (cl, winlet);
   
   fts_method_t method = method_get(cl, (const void *) n, type);
-
+  
   if (method == NULL && type != fts_void_class)
     method = method_get (cl, (const void *) n, NULL);
-
+  
   return method;
 }
 
 int
 fts_class_outlet_get_declarations (fts_class_t * cl, int woutlet,
-				   fts_iterator_t * iter)
+                                   fts_iterator_t * iter)
 {
   fts_class_outlet_t *out = class_get_outlet (cl, woutlet);
-
+  
   if (out)
     return class_outlet_get_declarations (out, iter);
   else
@@ -491,31 +495,31 @@ int
 fts_class_outlet_has_type (fts_class_t * cl, int woutlet, fts_class_t * type)
 {
   fts_class_outlet_t *out = class_get_outlet (cl, woutlet);
-
+  
   if (out)
-    {
-      fts_atom_t a;
-
-      fts_set_pointer (&a, type);
-      return class_outlet_has_declaration (out, &a);
-    }
+  {
+    fts_atom_t a;
+    
+    fts_set_pointer (&a, type);
+    return class_outlet_has_declaration (out, &a);
+  }
   else
     return 0;
 }
 
 int
 fts_class_outlet_has_message (fts_class_t * cl, int woutlet,
-			      fts_symbol_t selector)
+                              fts_symbol_t selector)
 {
   fts_class_outlet_t *out = class_get_outlet (cl, woutlet);
-
+  
   if (out)
-    {
-      fts_atom_t a;
-
-      fts_set_symbol (&a, selector);
-      return class_outlet_has_declaration (out, &a);
-    }
+  {
+    fts_atom_t a;
+    
+    fts_set_symbol (&a, selector);
+    return class_outlet_has_declaration (out, &a);
+  }
   else
     return 0;
 }
@@ -524,10 +528,10 @@ fts_class_outlet_has_message (fts_class_t * cl, int woutlet,
 
 
 /***********************************************************************
- *
- *  class documentation
- *
- */
+*
+*  class documentation
+*
+*/
 
 void
 fts_class_doc_post(fts_class_t *cl)
@@ -581,55 +585,55 @@ fts_class_doc_post(fts_class_t *cl)
 /* append triples of doc-symbols to array */
 int fts_class_doc_get (fts_class_t *cl, fts_array_t *out)
 {
-    fts_class_doc_t *doc = fts_class_get_doc(cl);
-    fts_symbol_t class_name = fts_class_get_name(cl);
-    enum {state_ready, state_constructor, state_messages} state = state_ready;
+  fts_class_doc_t *doc = fts_class_get_doc(cl);
+  fts_symbol_t class_name = fts_class_get_name(cl);
+  enum {state_ready, state_constructor, state_messages} state = state_ready;
   
-    if (class_name != NULL)
+  if (class_name != NULL)
+  {
+    while (doc != NULL)
     {
-	while (doc != NULL)
-	{
 	    fts_symbol_t  name    = fts_class_doc_get_name(doc);
 	    const char   *args    = fts_class_doc_get_args(doc);
 	    const char   *comment = fts_class_doc_get_comment(doc);
       
 	    if(args == NULL)
-		args = "";
+        args = "";
       
 	    if (name == class_name  &&  state != state_messages)
 	    {   /* constructor */
-		fts_array_append_symbol(out, name);
-		fts_array_append_symbol(out, fts_new_symbol(args));
-		fts_array_append_symbol(out, fts_new_symbol(comment));
-
-		state = state_constructor;
+        fts_array_append_symbol(out, name);
+        fts_array_append_symbol(out, fts_new_symbol(args));
+        fts_array_append_symbol(out, fts_new_symbol(comment));
+        
+        state = state_constructor;
 	    }
 	    else
 	    {
-		switch(state)
-		{
-		case state_ready:
-		    fts_array_append_symbol(out, name);
-		    fts_array_append_symbol(out, fts_s_empty_string);
-		    fts_array_append_symbol(out, fts_s_empty_string);
-
-		case state_constructor:
-		case state_messages:
-		default:
-		    fts_array_append_symbol(out, name);
-		    fts_array_append_symbol(out, fts_new_symbol(args));
-		    fts_array_append_symbol(out, fts_new_symbol(comment));
-
-		    state = state_messages;
-		break;
-		}
+        switch(state)
+        {
+          case state_ready:
+            fts_array_append_symbol(out, name);
+            fts_array_append_symbol(out, fts_s_empty_string);
+            fts_array_append_symbol(out, fts_s_empty_string);
+            
+          case state_constructor:
+          case state_messages:
+          default:
+            fts_array_append_symbol(out, name);
+            fts_array_append_symbol(out, fts_new_symbol(args));
+            fts_array_append_symbol(out, fts_new_symbol(comment));
+            
+            state = state_messages;
+            break;
+        }
 	    }
       
 	    doc = fts_class_doc_get_next(doc);
-	}
     }
+  }
 
-    return 3;	/* return number of columns (group of atoms in list) */
+return 3;	/* return number of columns (group of atoms in list) */
 }
 
 
@@ -676,10 +680,10 @@ fts_class_add_import_handler (fts_class_t *cl, fts_method_t func)
 
 
 /***********************************************************************
- *
- * Initialization
- *
- */
+*
+* Initialization
+*
+*/
 
 static void
 class_class_instantiate (fts_class_t * cl)
@@ -691,22 +695,22 @@ fts_kernel_class_init (void)
 {
   /* As the 'class' class is used to create a class, it cannot be created using standard ways. */
   fts_heap_t *heap = fts_heap_new (sizeof (fts_class_t));
-
+  
   fts_class_class = (fts_class_t *) fts_heap_zalloc (heap);
-
+  
   fts_class_class->head.cl = fts_class_class;
   fts_class_class->name = NULL;
   fts_class_class->instantiate_fun = class_class_instantiate;
   fts_class_class->type_id = type_id++;
-
+  
   fts_class_class->size = sizeof (fts_class_t);
   fts_class_class->heap = heap;
   fts_class_class->constructor = dummy_method;
   fts_class_class->deconstructor = dummy_method;
   fts_class_class->methods = fts_hashtable_new (FTS_HASHTABLE_MEDIUM);
   fts_class_class->input_handler = NULL;
-
+  
   fts_class_set_name (fts_class_class, fts_s_class);
-
+  
   method_key_init ();
 }

@@ -92,7 +92,7 @@ fts_atom_equals( const fts_atom_t *first, const fts_atom_t *second)
         
         if(class_first == class_second)
         {
-          fts_equals_function_t equals = fts_class_get_equals_function(class_first);
+          fts_class_equals_function_t equals = fts_class_get_equals_function(class_first);
         
           return (*equals)(obj_first, obj_second);
         }
@@ -164,7 +164,7 @@ fts_atom_copy( const fts_atom_t *from, fts_atom_t *to)
     
     if(class_from == class_to)
     {
-      fts_copy_function_t copy = fts_class_get_copy_function(class_from);
+      fts_class_copy_function_t copy = fts_class_get_copy_function(class_from);
       
       if(copy != NULL)
         (*copy)(obj_from, obj_to);
@@ -201,6 +201,7 @@ static fts_class_t VAR =                                        \
   0, /* copy_function */                                        \
   0, /* array_function */                                       \
   0, /* description_function */                                 \
+  0, /* interpolation_select */                                 \
   { 0, 0, 0, 0 }, /* struct fts_array import_handlers */        \
   0, /* instantiate_fun */                                      \
   0, /* constructor */                                          \

@@ -495,7 +495,7 @@ getup_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   {
     fts_object_t *obj = fts_get_object(at);
     fts_class_t *cl = fts_object_get_class(obj);
-    fts_array_function_t fun = fts_class_get_array_function(cl);
+    fts_class_array_function_t fun = fts_class_get_array_function(cl);
 
     if(fun != NULL)
     {
