@@ -530,12 +530,6 @@
 			settings = {
 			};
 		};
-		F8386ECD028D3F9101664092 = {
-			fileRef = F8800093028307F801664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F8386ECE028D3F9101664092 = {
 			fileRef = F88000950283082801664092;
 			isa = PBXBuildFile;
@@ -3336,6 +3330,9 @@
 				F85121ED028BD7EB01664092,
 				F85121EE028BD7EB01664092,
 				F85121EF028BD7EB01664092,
+				F848667E02A273A101664092,
+				F848667F02A273A101664092,
+				F848668102A273D401664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -3498,6 +3495,162 @@
 			settings = {
 			};
 		};
+		F848667C02A273A101664092 = {
+			isa = PBXFileReference;
+			name = FtsAtomList.java;
+			path = ../../packages/ispw/java/ircam/jmax/ispw/FtsAtomList.java;
+			refType = 2;
+		};
+		F848667D02A273A101664092 = {
+			isa = PBXFileReference;
+			name = FtsAtomListListener.java;
+			path = ../../packages/ispw/java/ircam/jmax/ispw/FtsAtomListListener.java;
+			refType = 2;
+		};
+		F848667E02A273A101664092 = {
+			fileRef = F848667C02A273A101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848667F02A273A101664092 = {
+			fileRef = F848667D02A273A101664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848668002A273D401664092 = {
+			isa = PBXFileReference;
+			name = QListUnparse.java;
+			path = ../../packages/ispw/java/ircam/jmax/editors/qlist/QListUnparse.java;
+			refType = 2;
+		};
+		F848668102A273D401664092 = {
+			fileRef = F848668002A273D401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848668202A2745401664092 = {
+			isa = PBXFileReference;
+			name = FtsUnparse.java;
+			path = ../../java/src/ircam/jmax/fts/FtsUnparse.java;
+			refType = 2;
+		};
+		F848668302A2745401664092 = {
+			isa = PBXFileReference;
+			name = FtsUpdateGroup.java;
+			path = ../../java/src/ircam/jmax/fts/FtsUpdateGroup.java;
+			refType = 2;
+		};
+		F848668402A2745401664092 = {
+			isa = PBXFileReference;
+			name = FtsUpdateGroupListener.java;
+			path = ../../java/src/ircam/jmax/fts/FtsUpdateGroupListener.java;
+			refType = 2;
+		};
+		F848668502A2745401664092 = {
+			fileRef = F848668202A2745401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848668602A2745401664092 = {
+			fileRef = F848668302A2745401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848668702A2745401664092 = {
+			fileRef = F848668402A2745401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848668802A2751001664092 = {
+			isa = PBXFileReference;
+			name = update.c;
+			path = ../../fts/update.c;
+			refType = 2;
+		};
+		F848668902A2751001664092 = {
+			fileRef = F848668802A2751001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848668A02A2756401664092 = {
+			isa = PBXFileReference;
+			name = BinaryProtocol.java;
+			path = ../../client/java/ircam/fts/client/BinaryProtocol.java;
+			refType = 2;
+		};
+		F848668B02A2756401664092 = {
+			isa = PBXFileReference;
+			name = BinaryProtocolDecoder.java;
+			path = ../../client/java/ircam/fts/client/BinaryProtocolDecoder.java;
+			refType = 2;
+		};
+		F848668C02A2756401664092 = {
+			isa = PBXFileReference;
+			name = BinaryProtocolEncoder.java;
+			path = ../../client/java/ircam/fts/client/BinaryProtocolEncoder.java;
+			refType = 2;
+		};
+		F848668D02A2756401664092 = {
+			isa = PBXFileReference;
+			name = RawString.java;
+			path = ../../client/java/ircam/fts/client/RawString.java;
+			refType = 2;
+		};
+		F848668E02A2756401664092 = {
+			isa = PBXFileReference;
+			name = SymbolCache.java;
+			path = ../../client/java/ircam/fts/client/SymbolCache.java;
+			refType = 2;
+		};
+		F848668F02A2756401664092 = {
+			fileRef = F848668A02A2756401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848669002A2756401664092 = {
+			fileRef = F848668B02A2756401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848669102A2756401664092 = {
+			fileRef = F848668C02A2756401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848669202A2756401664092 = {
+			fileRef = F848668D02A2756401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848669302A2756401664092 = {
+			fileRef = F848668E02A2756401664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F848669402A2758B01664092 = {
+			isa = PBXFileReference;
+			name = tokenizer.l;
+			path = ../../fts/tokenizer.l;
+			refType = 2;
+		};
+		F848669502A2758B01664092 = {
+			fileRef = F848669402A2758B01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F85120F1028BD4D301664092 = {
 			children = (
 				F85120F2028BD4D301664092,
@@ -3569,6 +3722,7 @@
 				F85120F8028BD4D301664092,
 				F85120F9028BD4D301664092,
 				F85120FA028BD4D301664092,
+				F848668002A273D401664092,
 			);
 			isa = PBXGroup;
 			name = qlist;
@@ -3635,6 +3789,8 @@
 			children = (
 				F85120FC028BD4D301664092,
 				F85120FD028BD4D301664092,
+				F848667C02A273A101664092,
+				F848667D02A273A101664092,
 			);
 			isa = PBXGroup;
 			name = ispw;
@@ -12264,12 +12420,6 @@
 			);
 			isa = PBXCopyFilesBuildPhase;
 		};
-		F8800093028307F801664092 = {
-			isa = PBXFileReference;
-			name = scanner.c;
-			path = ../../fts/scanner.c;
-			refType = 2;
-		};
 		F88000950283082801664092 = {
 			isa = PBXFileReference;
 			name = parser.c;
@@ -12370,21 +12520,20 @@
 			children = (
 				F880FD230282F99101664092,
 				F880FD240282F99101664092,
-				F880FD250282F99101664092,
-				F880FD260282F99101664092,
-				F880FD270282F99101664092,
 				F880FD280282F99101664092,
 				F880FD290282F99101664092,
 				F880FD2A0282F99101664092,
 				F880FD2B0282F99101664092,
 				F880FD2C0282F99101664092,
-				F880FD2D0282F99101664092,
-				F880FD2E0282F99101664092,
-				F880FD2F0282F99101664092,
 				F880FD300282F99101664092,
 				F880FD310282F99101664092,
 				F880FD320282F99101664092,
 				F880FD330282F99101664092,
+				F848668A02A2756401664092,
+				F848668B02A2756401664092,
+				F848668C02A2756401664092,
+				F848668D02A2756401664092,
+				F848668E02A2756401664092,
 			);
 			isa = PBXGroup;
 			name = java;
@@ -12486,21 +12635,20 @@
 			files = (
 				F880FD340282F99101664092,
 				F880FD350282F99101664092,
-				F880FD360282F99101664092,
-				F880FD370282F99101664092,
-				F880FD380282F99101664092,
 				F880FD390282F99101664092,
 				F880FD3A0282F99101664092,
 				F880FD3B0282F99101664092,
 				F880FD3C0282F99101664092,
 				F880FD3D0282F99101664092,
-				F880FD3E0282F99101664092,
-				F880FD3F0282F99101664092,
-				F880FD400282F99101664092,
 				F880FD410282F99101664092,
 				F880FD420282F99101664092,
 				F880FD430282F99101664092,
 				F880FD440282F99101664092,
+				F848668F02A2756401664092,
+				F848669002A2756401664092,
+				F848669102A2756401664092,
+				F848669202A2756401664092,
+				F848669302A2756401664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -12526,24 +12674,6 @@
 			isa = PBXFileReference;
 			name = FtsAtom.java;
 			path = ../../client/java/ircam/fts/client/FtsAtom.java;
-			refType = 2;
-		};
-		F880FD250282F99101664092 = {
-			isa = PBXFileReference;
-			name = FtsBinaryProtocolDecoder.java;
-			path = ../../client/java/ircam/fts/client/FtsBinaryProtocolDecoder.java;
-			refType = 2;
-		};
-		F880FD260282F99101664092 = {
-			isa = PBXFileReference;
-			name = FtsBinaryProtocolEncoder.java;
-			path = ../../client/java/ircam/fts/client/FtsBinaryProtocolEncoder.java;
-			refType = 2;
-		};
-		F880FD270282F99101664092 = {
-			isa = PBXFileReference;
-			name = FtsClient.java;
-			path = ../../client/java/ircam/fts/client/FtsClient.java;
 			refType = 2;
 		};
 		F880FD280282F99101664092 = {
@@ -12574,24 +12704,6 @@
 			isa = PBXFileReference;
 			name = FtsProcess.java;
 			path = ../../client/java/ircam/fts/client/FtsProcess.java;
-			refType = 2;
-		};
-		F880FD2D0282F99101664092 = {
-			isa = PBXFileReference;
-			name = FtsProtocol.java;
-			path = ../../client/java/ircam/fts/client/FtsProtocol.java;
-			refType = 2;
-		};
-		F880FD2E0282F99101664092 = {
-			isa = PBXFileReference;
-			name = FtsProtocolDecoder.java;
-			path = ../../client/java/ircam/fts/client/FtsProtocolDecoder.java;
-			refType = 2;
-		};
-		F880FD2F0282F99101664092 = {
-			isa = PBXFileReference;
-			name = FtsProtocolEncoder.java;
-			path = ../../client/java/ircam/fts/client/FtsProtocolEncoder.java;
 			refType = 2;
 		};
 		F880FD300282F99101664092 = {
@@ -12630,24 +12742,6 @@
 			settings = {
 			};
 		};
-		F880FD360282F99101664092 = {
-			fileRef = F880FD250282F99101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FD370282F99101664092 = {
-			fileRef = F880FD260282F99101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FD380282F99101664092 = {
-			fileRef = F880FD270282F99101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F880FD390282F99101664092 = {
 			fileRef = F880FD280282F99101664092;
 			isa = PBXBuildFile;
@@ -12674,24 +12768,6 @@
 		};
 		F880FD3D0282F99101664092 = {
 			fileRef = F880FD2C0282F99101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FD3E0282F99101664092 = {
-			fileRef = F880FD2D0282F99101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FD3F0282F99101664092 = {
-			fileRef = F880FD2E0282F99101664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FD400282F99101664092 = {
-			fileRef = F880FD2F0282F99101664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -12776,9 +12852,10 @@
 				F880FD7F0282FA3901664092,
 				F880FD800282FA3901664092,
 				F880FD810282FA3901664092,
-				F8800093028307F801664092,
 				F88000950283082801664092,
 				F88000960283082801664092,
+				F848668802A2751001664092,
+				F848669402A2758B01664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -13245,8 +13322,9 @@
 				F8386ECA028D3F9101664092,
 				F8386ECB028D3F9101664092,
 				F8386ECC028D3F9101664092,
-				F8386ECD028D3F9101664092,
 				F8386ECE028D3F9101664092,
+				F848668902A2751001664092,
+				F848669502A2758B01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -14330,8 +14408,6 @@
 		F880FE590283013E01664092 = {
 			children = (
 				F880FE5A0283013E01664092,
-				F880FE5B0283013E01664092,
-				F880FE5C0283013E01664092,
 				F880FE5D0283013E01664092,
 				F880FE5E0283013E01664092,
 				F880FE5F0283013E01664092,
@@ -14349,12 +14425,10 @@
 				F880FE6B0283013E01664092,
 				F880FE6C0283013E01664092,
 				F880FE6D0283013E01664092,
-				F880FE6E0283013E01664092,
 				F880FE6F0283013E01664092,
 				F880FE700283013E01664092,
 				F880FE710283013E01664092,
 				F880FE720283013E01664092,
-				F880FE730283013E01664092,
 				F880FE740283013E01664092,
 				F880FE750283013E01664092,
 				F880FE760283013E01664092,
@@ -14362,6 +14436,9 @@
 				F880FE780283013E01664092,
 				F880FE790283013E01664092,
 				F880FE7A0283013E01664092,
+				F848668202A2745401664092,
+				F848668302A2745401664092,
+				F848668402A2745401664092,
 			);
 			isa = PBXGroup;
 			name = fts;
@@ -14371,18 +14448,6 @@
 			isa = PBXFileReference;
 			name = FtsActionListener.java;
 			path = ../../java/src/ircam/jmax/fts/FtsActionListener.java;
-			refType = 2;
-		};
-		F880FE5B0283013E01664092 = {
-			isa = PBXFileReference;
-			name = FtsAtomList.java;
-			path = ../../java/src/ircam/jmax/fts/FtsAtomList.java;
-			refType = 2;
-		};
-		F880FE5C0283013E01664092 = {
-			isa = PBXFileReference;
-			name = FtsAtomListListener.java;
-			path = ../../java/src/ircam/jmax/fts/FtsAtomListListener.java;
 			refType = 2;
 		};
 		F880FE5D0283013E01664092 = {
@@ -14487,12 +14552,6 @@
 			path = ../../java/src/ircam/jmax/fts/FtsMessageListener.java;
 			refType = 2;
 		};
-		F880FE6E0283013E01664092 = {
-			isa = PBXFileReference;
-			name = FtsModule.java;
-			path = ../../java/src/ircam/jmax/fts/FtsModule.java;
-			refType = 2;
-		};
 		F880FE6F0283013E01664092 = {
 			isa = PBXFileReference;
 			name = FtsObjectErrorListener.java;
@@ -14515,12 +14574,6 @@
 			isa = PBXFileReference;
 			name = FtsOutletsListener.java;
 			path = ../../java/src/ircam/jmax/fts/FtsOutletsListener.java;
-			refType = 2;
-		};
-		F880FE730283013E01664092 = {
-			isa = PBXFileReference;
-			name = FtsParse.java;
-			path = ../../java/src/ircam/jmax/fts/FtsParse.java;
 			refType = 2;
 		};
 		F880FE740283013E01664092 = {
@@ -15432,8 +15485,6 @@
 				F880FF790283013F01664092,
 				F880FF7A0283013F01664092,
 				F880FF7B0283013F01664092,
-				F880FF7C0283013F01664092,
-				F880FF7D0283013F01664092,
 				F880FF7E0283013F01664092,
 				F880FF7F0283013F01664092,
 				F880FF800283013F01664092,
@@ -15451,12 +15502,10 @@
 				F880FF8C0283013F01664092,
 				F880FF8D0283013F01664092,
 				F880FF8E0283013F01664092,
-				F880FF8F0283013F01664092,
 				F880FF900283013F01664092,
 				F880FF910283013F01664092,
 				F880FF920283013F01664092,
 				F880FF930283013F01664092,
-				F880FF940283013F01664092,
 				F880FF950283013F01664092,
 				F880FF960283013F01664092,
 				F880FF970283013F01664092,
@@ -15542,6 +15591,9 @@
 				F880FFE70283013F01664092,
 				F880FFE80283013F01664092,
 				F880FFE90283013F01664092,
+				F848668502A2745401664092,
+				F848668602A2745401664092,
+				F848668702A2745401664092,
 			);
 			isa = PBXSourcesBuildPhase;
 		};
@@ -16481,18 +16533,6 @@
 			settings = {
 			};
 		};
-		F880FF7C0283013F01664092 = {
-			fileRef = F880FE5B0283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FF7D0283013F01664092 = {
-			fileRef = F880FE5C0283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F880FF7E0283013F01664092 = {
 			fileRef = F880FE5D0283013E01664092;
 			isa = PBXBuildFile;
@@ -16595,12 +16635,6 @@
 			settings = {
 			};
 		};
-		F880FF8F0283013F01664092 = {
-			fileRef = F880FE6E0283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F880FF900283013F01664092 = {
 			fileRef = F880FE6F0283013E01664092;
 			isa = PBXBuildFile;
@@ -16621,12 +16655,6 @@
 		};
 		F880FF930283013F01664092 = {
 			fileRef = F880FE720283013E01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F880FF940283013F01664092 = {
-			fileRef = F880FE730283013E01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
