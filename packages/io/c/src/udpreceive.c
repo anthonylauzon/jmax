@@ -79,15 +79,26 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   self->binary_protocol = (fts_binary_protocol_t*)fts_object_create(fts_binary_protocol_type, 0, NULL);
   fts_object_refer((fts_object_t*)self->binary_protocol);
 
-  /* create udp stream */
-  self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
-  if (self->udp_stream != NULL)
+  /* check number of argument */
+  if ((ac == 1) 
+      && fts_is_object(at)
+      && (fts_get_class(at) == fts_udpstream_class))
   {
+    self->udp_stream = (fts_bytestream_t*)fts_get_object(at);
     fts_object_refer((fts_object_t*)self->udp_stream);
   }
   else
   {
-    fts_object_error(o, "Cannot create udp stream component");
+    /* create udp stream */
+    self->udp_stream = (fts_bytestream_t*)fts_object_create(fts_udpstream_class, ac, at);
+    if (self->udp_stream != NULL)
+    {
+      fts_object_refer((fts_object_t*)self->udp_stream);
+    }
+    else
+    {
+      fts_object_error(o, "Cannot create udp stream component");
+    }
   }
 
   /* 1 outlet for sending received message */
