@@ -21,6 +21,7 @@
 
 #include <windows.h>
 #include <fts/fts.h>
+#include <mmreg.h>
 
 /* 
    The code to handle sysex in is still being debugged. The current
