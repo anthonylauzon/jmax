@@ -79,8 +79,6 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
   
   SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 	FontMetrics fm = gc.getGraphicDestination().getFontMetrics( SequencePanel.rulerFont);
-  String text = "#"+e.getValue().getProperty("objid");
-  
   Dimension d = gc.getGraphicDestination().getSize();
   
 	int x = gc.getAdapter().getX(e);
@@ -120,8 +118,9 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
     
   if(!( e instanceof UtilTrackEvent))
   {
+    String text = (String)(e.getValue().getProperty("name"));
     g.setFont(SequencePanel.rulerFont);
-    g.drawString(text, x+2, y+height/2+3);
+    g.drawString(text, x+2, y+height/2+4);
   }
 }
 /**
@@ -201,7 +200,7 @@ public static FmatEventRenderer staticInstance;
 
 public final static int MINIMUM_WIDTH = 20;
 public final static int DEFAULT_WIDTH = 40;
-public final static int DEFAULT_HEIGHT = 50;
+public final static int DEFAULT_HEIGHT = 30;
 
 public static Font stringFont = new Font("SansSerif", Font.PLAIN, 10); 
 private Font backupFont;

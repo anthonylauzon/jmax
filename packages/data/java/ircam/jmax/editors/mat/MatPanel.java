@@ -261,7 +261,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,int row, int column) 
     {      
-      String name = matData.getName();
+      String name = ((FtsGraphicObject)value).getVariableName();
       
       if( name != null && !name.equals(""))
         setText(((FtsGraphicObject)value).getClassName()+" "+name);

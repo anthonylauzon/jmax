@@ -190,14 +190,9 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 		});
     addMouseMotionListener(new MouseMotionListener(){
 			public void mouseMoved(MouseEvent e)
-		{
-				double time = gc.getAdapter().getInvX(e.getX());
-				if(time < 0) time = 0;	      
-				int val =  gc.getAdapter().getInvY(e.getY());
-	      
-				gc.getDisplayer().display(Displayer.numberFormat.format(time)+" , "+
-																	Displayer.numberFormat.format(val));	
-		}
+		  {
+        displayMousePosition(e.getX(), e.getY());
+      }
 			public void mouseDragged(MouseEvent e){}
 		});
 		
@@ -247,6 +242,15 @@ void setDisplayer()
 			displayLabel.setText( text);
 	}
 	});	
+}
+
+void displayMousePosition(int x, int y)
+{
+  double time = gc.getAdapter().getInvX( x);
+  if(time < 0) time = 0;	      
+  int val =  gc.getAdapter().getInvY( y);
+  
+  gc.getDisplayer().display(Displayer.numberFormat.format(time)+" , "+Displayer.numberFormat.format(val));	  
 }
 
 void setGridMode()

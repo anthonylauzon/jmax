@@ -57,6 +57,13 @@ public class FmatTrackEditor extends MonoTrackEditor
 		});
   }
 
+  void displayMousePosition(int x, int y)
+  {
+    double time = gc.getAdapter().getInvX( x);
+    if(time < 0) time = 0;	          
+    gc.getDisplayer().display( Displayer.numberFormat.format(time));	  
+  }
+  
   void createPopupMenu()
   {
     popup = new TrackBasePopupMenu( this, (((FtsGraphicObject)track.getTrackDataModel()) instanceof FtsSequenceObject));
@@ -98,7 +105,7 @@ public class FmatTrackEditor extends MonoTrackEditor
   }
   
   static public final int FMAT_VIEW = 5;
-  static public int FMAT_DEFAULT_HEIGHT = 90;
+  static public int FMAT_DEFAULT_HEIGHT = 70;
 }
 
 

@@ -35,14 +35,12 @@ import java.awt.datatransfer.*;
 
 import ircam.fts.client.*;
 
-/**
-* The EventValue object that represents a Integer event. Is used during score-recognition */
 public class FmatValue extends AbstractEventValue
 {
   double DEFAULT_DURATION = 64.0;
   Object value = new Integer(50);
   Object objId = new Integer(-1);
-  FtsObjectWithEditor fmat = null;
+  Object varname = "";
   static FtsArgs args = new FtsArgs();
   
   public FmatValue()
@@ -60,10 +58,24 @@ public class FmatValue extends AbstractEventValue
     if(name.equals("objid"))
     {
       if(((Integer)objId).intValue() != ((Integer)value).intValue())
+      {
         objId = value;
+        
+        FtsObject fmat = JMaxApplication.getFtsServer().getObject(((Integer)objId).intValue());
+        String varname = null;
+        if(fmat != null)
+          varname = ((FtsGraphicObject)fmat).getVariableName();
+        
+        if(varname != null && !varname.equals(""))
+          setProperty("name", varname);
+        else
+          setProperty("name", "#"+((Integer)objId).intValue());
+      }
     }
     else if(name.equals("value"))
       this.value = value;
+    else if(name.equals("name"))
+      this.varname = value;
     else 
       super.setProperty(name, value);
   }
@@ -74,19 +86,24 @@ public class FmatValue extends AbstractEventValue
       return objId;
     else if(name.equals("value"))
       return value;
+    else if(name.equals("name"))
+      return varname;
     else 
       return super.getProperty(name);
   }
   
   public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc)
   {
+    int id = ((Integer)objId).intValue();
+    FtsObject fmat = JMaxApplication.getFtsServer().getObject(id);
+    
     if(fmat == null)
     {
       args.clear();
-      args.addString("fmat");
-      fmat = (FtsObjectWithEditor) JMaxApplication.getObjectManager().makeFtsObject(((Integer)objId).intValue(), "fmat", args.getAtoms());
+      args.addString(FMAT_NAME);
+      fmat = JMaxApplication.getObjectManager().makeFtsObject(id, FMAT_NAME, args.getAtoms());
     }
-    fmat.requestOpenEditor();
+    ((FtsObjectWithEditor)fmat).requestOpenEditor();
   }
       
   public ValueInfo getValueInfo() 
@@ -97,7 +114,7 @@ public class FmatValue extends AbstractEventValue
   public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
   {
     FontMetrics fm = gc.getGraphicDestination().getFontMetrics( SequencePanel.rulerFont);
-    String text = "#"+objId;
+    String text = (String)varname;
     int width =  fm.stringWidth(text) + 6;
     int duration = ((FmatAdapter)gc.getAdapter()).getInvWidth(width);
     

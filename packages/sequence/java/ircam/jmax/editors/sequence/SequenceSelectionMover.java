@@ -70,7 +70,7 @@ class SequenceScrollDragAction implements ActionListener
 		getListener().updateStartingPoint(-delta, 0);
 		
 		PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
-		getGc().getDisplayer().display("time "+pa.getInvX(x));
+		getGc().getDisplayer().display(""+pa.getInvX(x));
 	}
 	void setScrollManager( ScrollManager man)
 	{
@@ -286,19 +286,15 @@ public void XORDraw(int dx, int dy)
 				
 			movTrackEvent.getRenderer().renderBounds(tempEvent, g, true, gc);
 			
-			// e_m_ incorrect! instead, make this object communicate the new position to the listeners,
-			// and make the keyboard in the MidiTrack a listener of such movements.
-			// (something like using the ircam.jmax.toolkit.DynamicDragListener).
 			if ((singleObject)&&(a.getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)) 
-				//ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
 				ScoreBackground.pressKey((int)((Double)tempEvent.getProperty("pitch")).doubleValue(), getGc());
 			
 			if(movTrackEvent == last) 
 			{
 				if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-					((SequenceGraphicContext)gc).getDisplayer().display( a.XMapper.getName()+" "+Displayer.numberFormat.format(tempEvent.getTime()));
+					((SequenceGraphicContext)gc).getDisplayer().display( ""+Displayer.numberFormat.format(tempEvent.getTime()));
 				if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-					((SequenceGraphicContext)gc).getDisplayer().display( a.YMapper.getName()+" "+Displayer.numberFormat.format( a.getInvY( a.getY(tempEvent))));
+					((SequenceGraphicContext)gc).getDisplayer().display(""+Displayer.numberFormat.format( a.getInvY( a.getY(tempEvent))));
 			}
 	  }
 	}
@@ -309,8 +305,8 @@ public void XORDraw(int dx, int dy)
 	previousX = dx;
 	previousY = dy;
 	
-	g.setClip(tempr);//????
-    g.dispose();
+	g.setClip(tempr);
+  g.dispose();
 }
 
 void updateStart(int deltaX, int deltaY)
@@ -336,8 +332,6 @@ int getMovements()
 
 //--- Fields
 Rectangle enclosingRect = new Rectangle();
-// every event type would be OK, but we also need to handle the little keyboard in the
-// left side of the window... so we need an event that knows about the "pitch" property
 }
 
 
