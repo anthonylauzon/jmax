@@ -4,7 +4,7 @@ help ()
     cat << HELP_EOF
 
 Usage:
-    jmax-install
+    INSTALL
 
 Do all the post-detar stuff to install jMax, mainly
 chown and chmod on fts executable to allow high priority execution.
@@ -22,8 +22,8 @@ then
     exit 2
 fi
 
-# Try to change mode to setuid for the fts executables
-for fts in `find . -name fts -type f -perm -a+x`
+# Try to change mode to setuid for the FTS executables
+for fts in `find . -name fts -type f -perm -u+x`
 do
     echo "Changing mode of $fts to allow high priority execution"
     chown root $fts
