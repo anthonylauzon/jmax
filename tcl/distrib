@@ -1,8 +1,11 @@
 all	all 	defaults.tcl
+all	all	devices.tcl
 all	all 	intrinsics.tcl
 all	all 	jmaxboot.tcl
 all	all 	jmaxpkg.tcl
 all	all 	packages.tcl
+all	all	params.tcl
 all	all 	projects.tcl
-all	all 	sgi.tcl
 all	all 	startup.tcl
+all	all	config
+
