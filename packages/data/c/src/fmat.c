@@ -1106,10 +1106,10 @@ fmat_fill_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       upper = 0.0;
       
       if(fts_is_number(at))
-        lower = fts_is_number(at);
+        lower = fts_get_number_float(at);
 
-      if(fts_is_number(at))
-        upper = fts_is_number(at);
+      if(fts_is_number(at + 1))
+        upper = fts_get_number_float(at + 1);
       break;
   }
   
@@ -3024,12 +3024,15 @@ fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
   
-  if(fmat_get_m(right) == m && fmat_get_n(right) == n && n == 1)
+  if(n == 1 && fmat_get_n(right) == 1)
   {
     float *l = fmat_get_ptr(self);
     float *r = fmat_get_ptr(right);
     float sum = 0.0;
     int i;
+    
+    if(m > fmat_get_m(right))
+      m = fmat_get_m(right);
     
     for(i=0; i<m; i++)
       sum += l[i] * r[i];
