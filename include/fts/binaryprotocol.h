@@ -49,4 +49,17 @@ typedef struct {
 } fts_binary_protocol_t;
 
 FTS_API fts_class_t* fts_binary_protocol_type;
+
+/* decoder */
 FTS_API int fts_binary_protocol_decode(fts_binary_protocol_t* binary_protocol, int size, const unsigned char* buffer);
+
+/* encoder */
+FTS_API void fts_binary_protocol_add_int(fts_binary_protocol_t* binary_protocol, int v);
+FTS_API void fts_binary_protocol_add_float(fts_binary_protocol_t* binary_protocol, double v);
+FTS_API void fts_binary_protocol_add_symbol(fts_binary_protocol_t* binary_protocol, fts_symbol_t s);
+FTS_API void fts_binary_protocol_add_string(fts_binary_protocol_t* binary_protocol, const char* s);
+FTS_API void fts_binary_protocol_add_object(fts_binary_protocol_t* binary_protocol, fts_object_t* obj);
+FTS_API void fts_binary_protocol_add_atoms( fts_binary_protocol_t *binary_protocol, int ac, const fts_atom_t *at);
+
+FTS_API void fts_binary_protocol_start_message(fts_binary_protocol_t* binary_protocol, fts_object_t* obj ,fts_symbol_t selector);
+FTS_API void fts_binary_protocol_end_message(fts_binary_protocol_t* binary_protocol);

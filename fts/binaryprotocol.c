@@ -165,9 +165,6 @@ static void end_string_action( unsigned char input, fts_binary_protocol_t *binar
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, '\0');
   fts_set_string( &a, strdup( fts_stack_base( &binary_protocol->input_buffer)));
   fts_stack_push( &binary_protocol->input_args, fts_atom_t, a);
-  post("[binary_protocol] end string action \n");
-  fts_log("[binary_protocol] end string action \n");
-
 }
 
 static void end_raw_string_action( unsigned char input, fts_binary_protocol_t *binary_protocol)
@@ -199,8 +196,7 @@ static void end_object_action( unsigned char input, fts_binary_protocol_t *binar
   fts_stack_push( &binary_protocol->input_buffer, unsigned char, input);
   id = get_int_from_bytes( fts_stack_base( &binary_protocol->input_buffer));
 
-  post("[binary_protocol] end object action \n");
-  fts_log("[binary_protocol] end object action \n");
+  /* @@@@@ client specific code @@@@@ */
 /*   obj = binary_protocol_get_object( binary_protocol, id); */
 
 /*   if (obj == NULL) */
@@ -422,6 +418,141 @@ static void state_next( fts_binary_protocol_t *binary_protocol, unsigned char in
   }
 }
 
+#define put_byte(B,N) fts_stack_push( &(B)->output_buffer, unsigned char, (N))
+
+#define put_int(B,N) \
+	put_byte(B, (unsigned char) (((N) >> 24) & 0xff)), \
+	put_byte(B, (unsigned char) (((N) >> 16) & 0xff)), \
+	put_byte(B, (unsigned char) (((N) >> 8) & 0xff)), \
+	put_byte(B, (unsigned char) (((N) >> 0) & 0xff))
+
+void fts_binary_protocol_add_int(fts_binary_protocol_t* binary_protocol, int v)
+{
+  put_byte(binary_protocol, FTS_PROTOCOL_INT);
+  put_int(binary_protocol, v);
+}
+
+void fts_binary_protocol_add_float(fts_binary_protocol_t* binary_protocol, double v)
+{
+  unsigned char* p;
+  int i;
+
+  put_byte(binary_protocol, FTS_PROTOCOL_FLOAT);
+  
+  p = (unsigned char*)&v;
+#ifndef WORDS_BIGENDIAN
+  swap_bytes(p, sizeof(double));
+#endif
+  
+  for (i = 0; i < sizeof(double); ++i)
+    put_byte(binary_protocol, p[i]);
+}
+
+void fts_binary_protocol_add_symbol(fts_binary_protocol_t* binary_protocol, fts_symbol_t s)
+{
+  unsigned int index;
+  fts_symbol_cache_t* cache = &binary_protocol->output_cache;
+
+#ifdef CACHE_REPORT
+  cache->nbaccess++;
+#endif
+
+  index = (unsigned int)s % cache->length;
+
+  if (cache->symbols[index] == s)
+  {
+#ifdef CACHE_REPORT
+    cache->nhit++;
+#endif
+    /* just send the index */
+    put_byte(binary_protocol, FTS_PROTOCOL_SYMBOL_INDEX);
+    put_int(binary_protocol, index);
+  }
+  else
+  {
+    const char* p = s;
+    cache->symbols[index] = s;
+
+    /* send both cache index and the symbol */
+    put_byte(binary_protocol, FTS_PROTOCOL_SYMBOL_CACHE);
+    put_int(binary_protocol, index);
+
+    while (*p)
+      put_byte(binary_protocol, (unsigned char)*p++);
+
+    put_byte(binary_protocol, 0);
+  }
+#ifdef CACHE_REPORT
+  if (cache->naccess % 1024 == 0)
+  {
+    fts_log("[binary_protocol] output symbol cache hit: %6.2f%%\n", ((100.0 * cache->nhit) / cache->naccess));
+  }
+#endif 
+}
+
+void fts_binary_protocol_add_string(fts_binary_protocol_t* binary_protocol, const char* s)
+{
+  put_byte(binary_protocol, FTS_PROTOCOL_STRING);
+  
+  while (*s)
+    put_byte(binary_protocol, (unsigned char)*s++);
+
+  put_byte(binary_protocol, 0);
+}
+
+
+void fts_binary_protocol_add_object(fts_binary_protocol_t* binary_protocol, fts_object_t* obj)
+{
+  put_byte(binary_protocol, FTS_PROTOCOL_OBJECT);
+  put_int(binary_protocol, OBJECT_ID_OBJ(fts_object_get_id(obj)));
+}
+
+
+void fts_binary_protocol_add_atoms( fts_binary_protocol_t *binary_protocol, int ac, const fts_atom_t *at)
+{
+  while (ac--)
+  {
+    if ( fts_is_int( at))
+      fts_binary_protocol_add_int( binary_protocol, fts_get_int( at));
+    else if ( fts_is_float( at))
+      fts_binary_protocol_add_float( binary_protocol, fts_get_float( at));
+    else if ( fts_is_symbol( at))
+      fts_binary_protocol_add_symbol( binary_protocol, fts_get_symbol( at));
+    else if ( fts_is_string( at))
+      fts_binary_protocol_add_string( binary_protocol, fts_get_string( at));
+    else if ( fts_is_object( at))
+      fts_binary_protocol_add_object( binary_protocol, fts_get_object( at));
+
+    at++;
+  }
+}
+
+void fts_binary_protocol_start_message(fts_binary_protocol_t* binary_protocol, fts_object_t* obj, fts_symbol_t selector)
+{
+  fts_binary_protocol_add_object(binary_protocol, obj);
+  fts_binary_protocol_add_symbol(binary_protocol, selector);
+}
+
+
+void fts_binary_protocol_end_message(fts_binary_protocol_t* binary_protocol)
+{
+  put_byte(binary_protocol, FTS_PROTOCOL_END_OF_MESSAGE);
+}
+
+int fts_binary_protocol_decode(fts_binary_protocol_t* binary_protocol, int size, const unsigned char* buffer)
+{
+  int i;
+  for (i = 0; i < size; ++i)
+  {
+    state_next(binary_protocol, buffer[i]);
+    if (binary_protocol->state == 0)
+    {
+      fts_log("[bianry_protocol] protocol error \n");
+      return -1;
+    }   
+  }
+  return size;
+}
 
 
 static void 
@@ -458,21 +589,6 @@ static void
 binary_protocol_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(fts_binary_protocol_t), binary_protocol_init, binary_protocol_delete);
-}
-
-int fts_binary_protocol_decode(fts_binary_protocol_t* binary_protocol, int size, const unsigned char* buffer)
-{
-  int i;
-  for (i = 0; i < size; ++i)
-  {
-    state_next(binary_protocol, buffer[i]);
-    if (binary_protocol->state == 0)
-    {
-      fts_log("[bianry_protocol] protocol error \n");
-      return -1;
-    }   
-  }
-  return size;
 }
 
 void fts_binary_protocol_config(void)
