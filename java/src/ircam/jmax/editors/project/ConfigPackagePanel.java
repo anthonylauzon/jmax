@@ -139,6 +139,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	{
 	  JFileChooser fileChooser = new JFileChooser();
 	  fileChooser.setFileFilter( configFilter);
+	  fileChooser.setCurrentDirectory( new File( ftsPkg.getDir()));
 	  int result = fileChooser.showDialog(null, "Choose");
 	  if ( result == JFileChooser.APPROVE_OPTION)
 	    {
@@ -186,6 +187,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	{
 	  JFileChooser fileChooser = new JFileChooser();
 	  fileChooser.setFileFilter( configFilter);
+	  fileChooser.setCurrentDirectory( new File( ftsPkg.getDir()));
 	  int result = fileChooser.showDialog(null, "Choose");
 	  if ( result == JFileChooser.APPROVE_OPTION)
 	    {
@@ -419,7 +421,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
   void chooseAndAddPath( DefaultListModel model, String message, int index)
   {
     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-    fileChooser.setSelectedFile( null);
+    fileChooser.setCurrentDirectory( new File( ftsPkg.getDir()));
     
     int result = fileChooser.showDialog(null, "Select Path");
     if ( result == JFileChooser.APPROVE_OPTION)
@@ -444,7 +446,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
       requiresModel.addRow( requiresTable.getSelectedRow());
     else
       if( selected == templPathScrollPane)
-	  chooseAndAddPath( templPathModel, "template_path", templPathList.getSelectedIndex());
+	chooseAndAddPath( templPathModel, "template_path", templPathList.getSelectedIndex());
       else
 	if( selected == dataPathScrollPane)
 	  chooseAndAddPath( dataPathModel, "data_path", dataPathList.getSelectedIndex());
@@ -1018,6 +1020,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
       f.addMouseListener(new MouseAdapter() {
 	  public void mousePressed( MouseEvent e) {
 	    JFileChooser fileChooser = new JFileChooser();
+	    fileChooser.setCurrentDirectory( new File( ftsPkg.getDir()));
 	    int result = fileChooser.showDialog(null, "Choose");
 	    if ( result == JFileChooser.APPROVE_OPTION)
 	      {
