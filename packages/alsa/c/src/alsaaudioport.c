@@ -33,16 +33,19 @@
 #include <fts/fts.h>
 
 static fts_symbol_t s_default;
+static fts_symbol_t s_hw_0_0;
+static fts_symbol_t s_plug_0_0;
 static fts_symbol_t s_s16_le, s_s32_le;
 static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleaved, s_rw_interleaved;
 
 #define GUESS_CHANNELS -1
-#define DEFAULT_PCM_NAME s_default
+#define DEFAULT_PCM_NAME s_hw_0_0
+#define DEFAULT_FORMAT s_s32_le
+#define DEFAULT_ACCESS s_mmap_noninterleaved
 #define DEFAULT_SAMPLING_RATE (44100.)
 #define DEFAULT_FIFO_SIZE 2048
 #define DEFAULT_INPUT_CHANNELS 0
-#define DEFAULT_OUTPUT_CHANNELS 2
-#define DEFAULT_ACCESS s_mmap_interleaved
+#define DEFAULT_OUTPUT_CHANNELS 26
 
 /* ---------------------------------------------------------------------- */
 /* Structure used for both capture and playback                           */
@@ -551,7 +554,7 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   capture_channels = fts_get_int_arg( ac, at, 1, DEFAULT_INPUT_CHANNELS);
   playback_channels = fts_get_int_arg( ac, at, 2, DEFAULT_OUTPUT_CHANNELS);
 
-  format_name = fts_get_symbol_arg( ac, at, 3, s_s16_le);
+  format_name = fts_get_symbol_arg( ac, at, 3, DEFAULT_FORMAT);
   format = snd_pcm_format_value( format_name);
   format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
 
@@ -669,6 +672,8 @@ void alsaaudioport_config( void)
   fts_audioport_set_default_class( s);
 
   s_default = fts_new_symbol( "default");
+  s_hw_0_0 = fts_new_symbol("hw:0,0");
+  s_plug_0_0 = fts_new_symbol("plug:0,0");
   s_s32_le = fts_new_symbol( "S32_LE");
   s_s16_le = fts_new_symbol( "S16_LE");
   s_mmap_noninterleaved = fts_new_symbol( "mmap_noninterleaved");

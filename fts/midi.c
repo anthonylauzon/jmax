@@ -20,6 +20,9 @@
  */
 
 #include <fts/fts.h>
+#include <ftsprivate/variable.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  * This files contains all things MIDI related:
@@ -1182,6 +1185,7 @@ void fts_midiport_set_default_class( fts_symbol_t name)
  *
  */
 
+fts_symbol_t fts_s_midimanager;
 fts_symbol_t fts_s_sources;
 fts_symbol_t fts_s_destinations;
 
@@ -1321,7 +1325,7 @@ fts_midimanager_set_output(fts_midimanager_t *mm, int index, fts_midiport_t *mid
 
   fts_set_int(args + 0, index);
   fts_set_symbol(args + 1, name);
-  fts_client_send_message((fts_object_t *)mm, fts_s_input, 2, args);
+  fts_client_send_message((fts_object_t *)mm, fts_s_output, 2, args);
 }
 
 void
@@ -1346,25 +1350,31 @@ fts_midimanager_set_internal(fts_midimanager_t *mm, int index)
 
 /* midi objects API */
 fts_midiport_t *
-fts_midimanager_get_input(fts_midimanager_t *mm, fts_symbol_t name)
+fts_midimanager_get_input(fts_symbol_t name)
 {
-  fts_midilabel_t *label = fts_midimanager_get_label_by_name(mm, name);
+  if(midimanager != NULL)
+    {
+      fts_midilabel_t *label = fts_midimanager_get_label_by_name(midimanager, name);
+      
+      if(label)
+	return label->input;
+    }
 
-  if(label)
-    return label->input;
-  else
-    return NULL;
+  return NULL;
 }
 
 fts_midiport_t *
-fts_midimanager_get_output(fts_midimanager_t *mm, fts_symbol_t name)
+fts_midimanager_get_output(fts_symbol_t name)
 {
-  fts_midilabel_t *label = fts_midimanager_get_label_by_name(mm, name);
-
-  if(label)
-    return label->input;
-  else
-    return NULL;
+  if(midimanager != NULL)
+    {
+      fts_midilabel_t *label = fts_midimanager_get_label_by_name(midimanager, name);
+      
+      if(label)
+	return label->output;
+    }
+  
+  return NULL;
 }
 
 /* name utility */
@@ -1403,14 +1413,32 @@ fts_midimanager_get_fresh_label_name(fts_midimanager_t *mm, fts_symbol_t name)
 void
 fts_midimanager_set(fts_midimanager_t *mm)
 {
+  fts_atom_t a;
+
   /* check methods ??? */
   midimanager = mm;
+
+  fts_set_object(&a, midimanager);
+
+  fts_variable_define(fts_get_root_patcher(), fts_s_midimanager);
+  fts_variable_restore(fts_get_root_patcher(), fts_s_midimanager, &a, (fts_object_t *)midimanager);
 }
 
 fts_midimanager_t *
 fts_midimanager_get(void)
 {
   return midimanager;
+}
+
+void
+fts_midimanager_update(void)
+{
+  fts_atom_t a;
+
+  fts_set_object(&a, midimanager);
+
+  fts_variable_suspend(fts_get_root_patcher(), fts_s_midimanager);
+  fts_variable_restore(fts_get_root_patcher(), fts_s_midimanager, &a, (fts_object_t *)midimanager);
 }
 
 /************************************************************
@@ -1421,6 +1449,7 @@ fts_midimanager_get(void)
 
 void fts_midi_config(void)
 {
+  fts_s_midimanager = fts_new_symbol("midimanager");
   fts_s_midievent = fts_new_symbol("midievent");
   fts_s_midiport = fts_new_symbol("midiport");
   fts_s_sources = fts_new_symbol("sources");
@@ -1428,3 +1457,5 @@ void fts_midi_config(void)
 
   midievent_config();
 }
+
+

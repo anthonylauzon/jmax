@@ -144,19 +144,22 @@ alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
   fts_midiparser_t *parser = (fts_midiparser_t *)o;
-  char name[256];
+  fts_symbol_t name;
+  char str[256];
   int err, fd;
   struct pollfd fds;
 
   ac--;
   at++;
 
-  strcpy( name, fts_get_symbol_arg( ac, at, 0, s_hw_1_0) );
+  name = fts_get_symbol_arg(ac, at, 0, s_hw_1_0);
 
-  if( (err = snd_rawmidi_open( &this->handle_in, &this->handle_out, name, O_RDWR | SND_RAWMIDI_NONBLOCK)) < 0)
+  strcpy(str, name);
+
+  if( (err = snd_rawmidi_open( &this->handle_in, &this->handle_out, str, O_RDWR | SND_RAWMIDI_NONBLOCK)) < 0)
     {
       fts_object_set_error(o, "Error opening ALSA raw MIDI port (%s)", snd_strerror( err));
-      post("alsarawmidiport: cannot open ALSA raw MIDI port %s (%s)\n", name, snd_strerror( err));
+      post("alsarawmidiport: cannot open ALSA raw MIDI port %s (%s)\n", str, snd_strerror( err));
       return;
     }
 
@@ -200,17 +203,6 @@ alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
 }
 
-static void 
-alsarawmidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-
-  if( this->handle_in && this->handle_out)
-    fts_set_object( value, o);
-  else
-    fts_set_void( value);
-}
-
 static fts_status_t 
 alsarawmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -221,8 +213,6 @@ alsarawmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, alsarawmidiport_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, alsarawmidiport_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, alsarawmidiport_select);
-
-  fts_class_add_daemon(cl, obj_property_get, fts_s_state, alsarawmidiport_get_state);
 
   return fts_Success;
 }

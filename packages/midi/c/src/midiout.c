@@ -312,19 +312,20 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(ac > 0)
     {
-      if(fts_is_object(at))
+      if(fts_is_symbol(at))
 	{
-	  fts_object_t *obj = fts_get_object(at);
+	  fts_symbol_t name = fts_get_symbol(at);
+	  fts_midiport_t *port = fts_midimanager_get_output(name);
 
 	  /* skip port argument */
 	  ac--;
 	  at++;
 
-	  if(fts_object_is_midiport(obj) && fts_midiport_is_output((fts_midiport_t *)obj)) 
-	    this->port = (fts_midiport_t *) obj;
+	  if(port != NULL)
+	    this->port = port;
 	  else
 	    {
-	      fts_object_set_error(o, "Wrong argument for midiport");
+	      fts_object_set_error(o, "Cannot find MIDI output %s", name);
 	      return;
 	    }
 	}
@@ -350,10 +351,12 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   /* if there is still no port just get default */
   if(!this->port)
-    this->port = fts_midiport_get_default();
-  
-  if(!this->port)
-    fts_object_set_error(o, "Default MIDI port is not defined");
+    this->port = fts_midimanager_get_output(fts_s_default);
+
+  if(this->port)
+    fts_object_set_error(o, "Cannot find default MIDI output");
+
+  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
 }
 
 static fts_status_t
