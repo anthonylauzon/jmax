@@ -1,0 +1,192 @@
+
+Changes from V3_0_x branch point to 3.1 main trunc head
+******************************************************
+
+(cvs diff -r bpV3_0_x -r HEAD )
+
+client/
+configure.in
+- version numbering
+java
+- added FtsSymbol class
+- changed FtsAtom accordingly
+- added symbol cache
+- changed state machine for protocol decoding
+- introduced ProtocolEncoder and ProtocolDecoder abstract classes
+and their derived classes for binary protocol
+- changed FtsServer to use protocol encoder and decoder
+- removed "anything" message handler
+- added recursive lookup of message handlers in base classes
+- renamed callback to message handler
+- replaced Hashtable (synchronized) by Hashmap (non synchronized)
+
+configure.in
+. integrated version number handling and file JMAX-VERSION
+. added generation of include/fts/config.h (for now, pointer to int
+macros are hardcoded)
+
+fts/
+- client.c
+. changed client table from a hashtable to a stack (faster)
+. symbol cache
+. moved pipestream and socketstream to bytestream.c
+. introduced protocol encoder and decoder
+. reimplemented the decoding state machine
+- symbol.c
+. removed symbol cache handling from symbol structure
+. removed fts_symbol_name and replaced it by a compatibility layer
+- expression.c
+. added operator symbols hash table
+. added fts_atom_is_null
+- atom.c
+. replaced symbol type tag by hacked fts_metaclass_t * pointer
+. cleaned the atom API: removed types and useless functions
+. replaced fts_*_fun by fts_*_pointer (pointer was always casted)
+. replaced fts_*_ptr by fts_*_pointer
+. removed fts_atom_type_register
+. removed fts_atom_is_null and moved it to expression.c
+. removed fts_atom_is_error
+. removed fts_set_object_with_type
+- class.c
+. fts_*class_install returns a pointer to the metaclass (was: a fts_status_t 
+which was always ignored)
+. removed fts_get_class_name function and replaced by macro fts_class_get_name
+- array.c
+. updated to used new atom structure
+- bytestream.c
+. added pipestream and socketstream (moved from client.c)
+- all files
+. updated according to fts_atom_t changes
+. removed some fts_data commented code
+. removed most of fts_symbol_name calls
+. changed #include "ftsconfig.h" to <ftsconfig.h>
+- platform specifics
+. added fts_systime()
+
+include/
+- stack.h
+. renamed ptr to base and size by top
+- symbol.h
+. removed is_operator and implemented it in expression.c
+- atom.h
+. replaced symbol type tag by hacked fts_metaclass_t * pointer
+. cleaned the atom API: removed types and useless functions
+. replaced fts_*_fun by fts_*_pointer (pointer was always casted)
+. replaced fts_*_ptr by fts_*_pointer
+. removed fts_atom_type_register
+. removed fts_atom_is_null and moved it to expression.c
+. removed fts_atom_is_error
+. removed fts_set_object_with_type
+- fts/config.h
+. added macros for pointer to int conversions
+- all files
+. unified structure declarations (as in "typedef struct toto toto_t")
+
+packages/
+- everywhere
+. changed fts_*_ptr to fts_*_pointer and fts_*_fun to fts_*_pointer + cast
+- alsa
+. 3.0.x is updated w.r.t. ALSA 0.9.0beta10
+- explode/c/src/explode.c
+. removed #include <ftsconfig.h>
+- guiobj/c/src/display.c
+. removed #include <ftsconfig.h>
+- io/c/src/filestream.c
+. removed #include <ftsconfig.h>
+. removed HAVE_UNISTD_H
+- io/c/src/profileaudioport.c
+. removed #include <ftsconfig.h>
+. removed inclusion of sys/time.h ???
+- ispw/c/src/Rsend.c
+. removed #include <ftsconfig.h>
+- ispw/c/src/atomlist.c
+. removed #include <ftsconfig.h>
+- sequence/c/src/seqmidi.c
+. removed #include <ftsconfig.h>
+- sequence/c/src/sequence.c
+. removed #include <ftsconfig.h>
+- sequence/c/src/track.c
+. removed #include <ftsconfig.h>
+
+
+
+Changes from branch point bpV3_0_x to branch V3_0_x head
+********************************************************
+
+(cvs diff -r bpV3_0_x -r V3_0_x)
+
+client/
+- cpp/ftsclient.cpp
+. fixed anonymous pipes on windows
+. fixed DefaultRoot
+
+fts/
+- OLDclient.c
+. fixed hostptr->h_addr_list[0] bug
+- audiofile.c added
+- client.c
+. fixes of pipe bytestream
+- file.c
+. absolute path name
+- fts.c
+. fts_kernel_audiofile_init
+- linux.c
+. fts_systime
+- macosx.c
+. fts_systime
+- midi.c
+. changes in names
+- midifile.c
+. changes in names, as in midi.c
+- package.c
+. changes in class searching
+. added fts_package_get_data_file
+- post.c
+. added system time in log
+- project.c
+. added fts_project_get_data_file
+- sgi.c
+. added fts_systime
+- win32.c
+. fts_systime
+
+include/
+- audiofile.h added
+- midi.h
+. changed names
+- package.h
+. added fts_package_get_data_file
+- project.h
+. added fts_project_get_data_file
+
+packages/
+- alsa
+. updated for ALSA 0.9.0beta10
+- control
+. count.c
+- data
+. bpf.c
+. fvec.c
+. getinter.c
+. Bpf.java and co
+- dsdev
+. dsaudioport.c
+- explode
+. explode.c
+- ispw
+. sigtable.c
+. wavetab.c
+- midi
+. midiin.c
+. rawmidiport.c
+. sysex.c
+- sequence
+. seqmidi.c
+. seqplay.c
+. track.c
+- signal
+. signal.c
+. white.c
+- winmidi
+. winmidiport.c
+
