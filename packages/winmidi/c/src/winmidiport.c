@@ -740,8 +740,10 @@ winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   if (hmidiout != NULL) {
 
-    /* make sure all sysex messages are sent */
+    /* mark the output buffers as done */
+    midiOutReset(hmidiout);
 
+    /* make sure everything is flushed */
     i = 0;
     cur_send = 1 - this->cur_outhdr;
     while (this->outhdr[cur_send].dwFlags & MHDR_DONE == 0) {
@@ -750,7 +752,6 @@ winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	break;
       }
     }
-    midiOutUnprepareHeader(hmidiout, &this->outhdr[cur_send], sizeof(MIDIHDR));
 
     for (i = 0; i < 2; i++) {
       if (this->outhdr[i].lpData != NULL) {
@@ -764,11 +765,16 @@ winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   if (hmidiin != NULL) {
 
+    midiInReset(hmidiin);
+    
     for (i = 0; i < 2; i++) {
-      midiInUnprepareHeader(hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
-      if (this->inhdr[i].lpData != NULL) {
-	fts_free(this->inhdr[i].lpData);
-	this->inhdr[i].lpData = NULL;
+      if (this->inhdr[i].dwFlags & MHDR_DONE) {
+	if (this->inhdr[i].lpData != NULL) {
+	  fts_free(this->inhdr[i].lpData);
+	  this->inhdr[i].lpData = NULL;
+	}
+      } else {
+	fts_log("[winmidiport]: Input buffers not done\n");	
       }
     }
 
