@@ -8,7 +8,6 @@ atom.c \
 atomfile.c \
 audio.c \
 audioconfig.c \
-audiolabel.c \
 audiofile.c \
 autosave.c \
 bmaxfile.c \

@@ -30,12 +30,11 @@
 #endif
 
 #include <ftsprivate/bmaxfile.h>
-#include <ftsprivate/audiolabel.h>
+#include <ftsprivate/audio.h>
 #include <ftsprivate/audioconfig.h>
 #include <ftsprivate/midi.h>
 #include <ftsprivate/config.h>
 #include <ftsprivate/client.h>
-
 
 
 #define AUDIO_CONFIG_DEFAULT_SAMPLE_RATE 44100.
@@ -57,6 +56,7 @@ static fts_array_t audioconfig_sample_rates_array;
 static fts_array_t audioconfig_buffer_sizes_array;
 
 
+static fts_symbol_t audioconfig_s_unconnected;
 static fts_symbol_t audioconfig_s_name;
 static fts_symbol_t audioconfig_s_buffer_sizes;
 static fts_symbol_t audioconfig_s_sampling_rates;
@@ -72,7 +72,7 @@ static fts_symbol_t audioconfig_s_outputs;
 
 
 static void
-audioconfig_restore(audioconfig_t* config)
+audioconfig_restore(fts_audioconfig_t* config)
 {
   fts_atom_t a;
 
@@ -81,102 +81,6 @@ audioconfig_restore(audioconfig_t* config)
   fts_name_set_value(fts_get_root_patcher(), audioconfig_s_name, &a);
 }
 
-
-static fts_audioport_t*
-audiomanagers_get_input(fts_symbol_t device_name, fts_symbol_t label_name)
-{
-#warning NOT YET IMPLEMENTED (audiomanagers_get_input)
-  fts_audioport_t *port = NULL;
-
-/*   if(device_name != NULL) */
-/*   { */
-/*     fts_audiomanager_t *mm; */
-/*     fts_atom_t args[3]; */
-      
-/*     fts_set_pointer(args + 0, &port); */
-/*     fts_set_symbol(args + 1, device_name); */
-/*     fts_set_symbol(args + 2, label_name); */
-      
-/*     for(mm = audiomanagers; mm != NULL && port == NULL; mm = mm->next) */
-/*       fts_send_message((fts_object_t *)mm, fts_audiomanager_s_get_input, 3, args); */
-/*   } */
-
-  return port;      
-}
-
-static fts_audioport_t*
-audiomanagers_get_output(fts_symbol_t device_name, fts_symbol_t label_name)
-{
-#warning NOT YET IMPLEMENTED (audiomanagers_get_output)
-  fts_audioport_t *port = NULL;
-
-/*   if(device_name != NULL) */
-/*   { */
-/*     fts_audiomanager_t *mm; */
-/*     fts_atom_t args[3]; */
-      
-/*     fts_set_pointer(args + 0, &port); */
-/*     fts_set_symbol(args + 1, device_name); */
-/*     fts_set_symbol(args + 2, label_name); */
-      
-/*     for(mm = audiomanagers; mm != NULL && port == NULL; mm = mm->next) */
-/*       fts_send_message((fts_object_t *)mm, fts_audiomanager_s_get_output, 3, args); */
-/*   } */
-
-  return port;      
-}
-
-
-static void
-audiomanagers_get_input_device_names(fts_array_t* inputs_array)
-{
-#warning NOT YET IMPLEMENTED (audiomanagers_get_input_device_names), dummy implementation to test server<->client communication
-  /*
-    foreach registered audiomanagers
-       check which devices can be used for input
-         foreach devices check number of channel availables for input
-
-    skeleton implementation:
-  */
-/*   fts_atom_t args; */
-/*   fts_set_pointer(&args, &inputs_array); */
-/*   for (am = audiomanagers; am != NULL; am = am->next) */
-/*   { */
-/*     fts_send_message((fts_object_t*)am, fts_audiomanager_s_append_input_devices_names, 1, &args);     */
-/*   } */
-
-  fts_array_append_symbol(inputs_array, fts_new_symbol("hw:1"));
-  fts_array_append_int(inputs_array, 10);
-  fts_array_append_symbol(inputs_array, fts_new_symbol("hw:2"));
-  fts_array_append_int(inputs_array, 4);
-  fts_array_append_symbol(inputs_array, fts_new_symbol("hw:3"));
-  fts_array_append_int(inputs_array, 3);
-}
-
-static void
-audiomanagers_get_output_device_names(fts_array_t* outputs_array)
-{
-#warning NOT YET IMPLEMENTED (audiomanagers_get_output_device_names), dummy implementation to test server<->client communication
-  /*
-    foreach registered audiomanagers
-       check which devices can be used for output
-         foreach devices check number of channel availables for output
-  */
-  fts_array_append_symbol(outputs_array, fts_new_symbol("hw:0"));
-  fts_array_append_int(outputs_array, 5);
-  fts_array_append_symbol(outputs_array, fts_new_symbol("hw:1"));
-  fts_array_append_int(outputs_array, 2);
-  fts_array_append_symbol(outputs_array, fts_new_symbol("hw:3"));
-  fts_array_append_int(outputs_array, 1);
-}
-
-static void
-audiomanagers_get_device_names(fts_array_t* inputs_array, fts_array_t* outputs_array)
-{
-#warning NOT YET IMPLEMENTED (audiomanagers_get_device_names), dummy implementation to test communication between fts server and client
-  audiomanagers_get_input_device_names(inputs_array);
-  audiomanagers_get_output_device_names(outputs_array);
-}
 
 static void
 audiomanagers_get_sample_rates(fts_array_t* sample_rates_array)
@@ -246,19 +150,17 @@ audiomanagers_get_default_output(void)
 }
 
 static void 
-audioconfig_update_devices(audioconfig_t* config)
+audioconfig_update_devices(fts_audioconfig_t* config)
 {
   int ac;
   fts_atom_t* at;
   
-  fts_array_clear(&audioconfig_inputs_array);
-  fts_array_clear(&audioconfig_outputs_array);
   fts_array_clear(&audioconfig_sample_rates_array);
   fts_array_clear(&audioconfig_buffer_sizes_array);
 
-  fts_array_append_symbol(&audioconfig_inputs_array, fts_s_unconnected);
+  fts_array_append_symbol(&audioconfig_inputs_array, audioconfig_s_unconnected);
   fts_array_append_int(&audioconfig_inputs_array, -1);
-  fts_array_append_symbol(&audioconfig_outputs_array, fts_s_unconnected);
+  fts_array_append_symbol(&audioconfig_outputs_array, audioconfig_s_unconnected);
   fts_array_append_int(&audioconfig_outputs_array, -1);
 
   /* get devices names from all audiomanagers */
@@ -275,7 +177,7 @@ audioconfig_update_devices(audioconfig_t* config)
 }
 
 static void 
-audioconfig_update_sample_rates(audioconfig_t* config)
+audioconfig_update_sample_rates(fts_audioconfig_t* config)
 {
   int ac;
   fts_atom_t* at;
@@ -289,7 +191,7 @@ audioconfig_update_sample_rates(audioconfig_t* config)
 }
 
 static void
-audioconfig_update_buffer_sizes(audioconfig_t* config)
+audioconfig_update_buffer_sizes(fts_audioconfig_t* config)
 {
   int ac;
   fts_atom_t* at;
@@ -303,10 +205,10 @@ audioconfig_update_buffer_sizes(audioconfig_t* config)
 }
 
 static void 
-audioconfig_update_labels(audioconfig_t* config)
+audioconfig_update_labels(fts_audioconfig_t* config)
 {
 #warning NOT YET IMPLEMENTED (audioconfig_update_labels)
-  audiolabel_t* label = config->labels;
+  fts_audiolabel_t* label = config->labels;
   int n = config->n_labels;
   int i;
   /* Make a query on audiomanagers to know which input and output audioport are available */
@@ -318,13 +220,13 @@ audioconfig_update_labels(audioconfig_t* config)
 }
 
 static void 
-audioconfig_erase_labels(audioconfig_t* config)
+audioconfig_erase_labels(fts_audioconfig_t* config)
 {
-  audiolabel_t* label = config->labels;
+  fts_audiolabel_t* label = config->labels;
   
   while (NULL != label)
   {
-    audiolabel_t* next = label->next;
+    fts_audiolabel_t* next = label->next;
     fts_object_release((fts_object_t*)label);
     label = next;
   }
@@ -334,10 +236,10 @@ audioconfig_erase_labels(audioconfig_t* config)
 }
 
 /* Return NULL if no such index */
-static audiolabel_t*
-audioconfig_label_get_by_index(audioconfig_t* config, int index)
+static fts_audiolabel_t*
+audioconfig_label_get_by_index(fts_audioconfig_t* config, int index)
 {
-  audiolabel_t* label = config->labels;
+  fts_audiolabel_t* label = config->labels;
   while(label && index--)
     label = label->next;
 
@@ -345,29 +247,28 @@ audioconfig_label_get_by_index(audioconfig_t* config, int index)
 }
 
 /* Return NULL if no such label name */
-audiolabel_t*
-audioconfig_label_get_by_name(audioconfig_t* config, fts_symbol_t name)
+fts_audiolabel_t*
+audioconfig_label_get_by_name(fts_audioconfig_t* config, fts_symbol_t name)
 {
-  audiolabel_t* label = config->labels;
+  fts_audiolabel_t* label = config->labels;
   while(label && label->name != name)
     label = label->next;
 
   return label;
 }
 
-static audiolabel_t* 
-audioconfig_label_insert(audioconfig_t* config, int index, fts_symbol_t name)
+static fts_audiolabel_t* 
+audioconfig_label_insert(fts_audioconfig_t* config, int index, fts_symbol_t name)
 {
-  audiolabel_t** p = &config->labels;
-  audiolabel_t* label = (audiolabel_t*)fts_object_create(audiolabel_type, NULL, 0, 0);
+  fts_audiolabel_t** p = &config->labels;
+  fts_audiolabel_t* label = (fts_audiolabel_t*)fts_object_create(fts_audiolabel_type, NULL, 0, 0);
   int n = index;
 
   fts_object_refer((fts_object_t*)label);
 
-
   label->name = name;
-  label->input_device = fts_s_unconnected;
-  label->output_device = fts_s_unconnected;
+  label->input_device = audioconfig_s_unconnected;
+  label->output_device = audioconfig_s_unconnected;
   
   /* insert label to list */
   while ((*p) && n--)
@@ -378,16 +279,16 @@ audioconfig_label_insert(audioconfig_t* config, int index, fts_symbol_t name)
   
   config->n_labels++;
   
-  fts_config_set_dirty((config_t*)fts_config_get(), 1);
+  fts_config_set_dirty((fts_config_t*)fts_config_get(), 1);
 
   return label;
 }
 
 
 static void
-audioconfig_label_remove(audioconfig_t* config, int index)
+audioconfig_label_remove(fts_audioconfig_t* config, int index)
 {
-  audiolabel_t** p = &config->labels;
+  fts_audiolabel_t** p = &config->labels;
   int n = index;
   
   /* remove label and send to client */
@@ -396,7 +297,7 @@ audioconfig_label_remove(audioconfig_t* config, int index)
 
   if (*p)
   {
-    audiolabel_t* label = *p;
+    fts_audiolabel_t* label = *p;
 
     *p = (*p)->next;
     config->n_labels--;
@@ -412,14 +313,14 @@ audioconfig_label_remove(audioconfig_t* config, int index)
     fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
   }
 
-  fts_config_set_dirty((config_t*)fts_config_get(), 1);
+  fts_config_set_dirty((fts_config_t*)fts_config_get(), 1);
 }
 
 static void
-audioconfig_label_set_input_port(audioconfig_t* config, audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
+audioconfig_label_set_input_port(fts_audioconfig_t* config, fts_audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
 {
   if(audioport == NULL)
-    name = fts_s_unconnected;
+    name = audioconfig_s_unconnected;
 
   if(audioport != label->input_audioport || name != label->input_device) 
   {
@@ -434,15 +335,15 @@ audioconfig_label_set_input_port(audioconfig_t* config, audiolabel_t *label, int
       fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
     }
 
-    fts_config_set_dirty( (config_t *)fts_config_get(), 1);
+    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
   }
 }
 
 static void
-audioconfig_label_set_output_port(audioconfig_t *config, audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
+audioconfig_label_set_output_port(fts_audioconfig_t *config, fts_audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
 {
   if(audioport == NULL)
-    name = fts_s_unconnected;
+    name = audioconfig_s_unconnected;
   
   if(audioport != label->output_audioport || name != label->output_device) 
   {
@@ -457,17 +358,18 @@ audioconfig_label_set_output_port(audioconfig_t *config, audiolabel_t *label, in
       fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
     }
     
-    fts_config_set_dirty( (config_t *)fts_config_get(), 1);
+    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
   }
 }
 
 
+
 void
-fts_audioconfig_set_defaults(audioconfig_t* audioconfig)
+fts_audioconfig_set_defaults(fts_audioconfig_t* audioconfig)
 {
   if(audioconfig != NULL)
   {
-    audiolabel_t *label = audioconfig_label_get_by_index(audioconfig, 0);
+    fts_audiolabel_t *label = audioconfig_label_get_by_index(audioconfig, 0);
       
     if(label == NULL)
       label = audioconfig_label_insert(audioconfig, 0, fts_s_default);
@@ -488,51 +390,10 @@ fts_audioconfig_set_defaults(audioconfig_t* audioconfig)
       audioconfig_label_set_output_port(audioconfig, label, 0, port, name);
     }
 
-    fts_config_set_dirty((config_t*)fts_config_get(), 0);
+    fts_config_set_dirty((fts_config_t*)fts_config_get(), 0);
   }
 }
 
-static void 
-audioconfig_set_input_port(audioconfig_t* config, int index, fts_symbol_t name)
-{
-  audiolabel_t* label = audioconfig_label_get_by_index(config, index);
-
-  /* reset output to none if it is set to internal */
-  if(label->output_audioport)
-    audioconfig_label_set_output_port(config, label, index, NULL, NULL);
-
-  if(name == fts_s_unconnected)
-  {
-    audioconfig_label_set_input_port(config, label, index, NULL, NULL);
-  }
-  else
-  {
-    audioconfig_label_set_input_port(config, label, index, audiomanagers_get_input(name, label->name), name);
-  }
-
-  post("[audioconfig] audioconfig_set_input_port, index: %d, name: %s\n", index, name);
-}
-
-static void 
-audioconfig_set_output_port(audioconfig_t* config, int index, fts_symbol_t name)
-{
-  audiolabel_t* label = audioconfig_label_get_by_index(config, index);
-
-  /* reset output to none if it is set to internal */
-  if(label->output_audioport)
-    audioconfig_label_set_output_port(config, label, index, NULL, NULL);
-
-  if(name == fts_s_unconnected)
-  {
-    audioconfig_label_set_output_port(config, label, index, NULL, NULL);
-  }
-  else
-  {
-    audioconfig_label_set_output_port(config, label, index, audiomanagers_get_input(name, label->name), name);
-  }
-
-  post("[audioconfig] audioconfig_set_output_port, index: %d, name: %s\n", index, name);
-}
 
 /****************************************************
  *
@@ -541,13 +402,13 @@ audioconfig_set_output_port(audioconfig_t* config, int index, fts_symbol_t name)
  */
 #define AUDIO_CONFIG_DEBUG
 
-fts_class_t* audioconfig_type = NULL;
+fts_class_t* fts_audioconfig_type = NULL;
 
 
 static void
 audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 
   audioconfig_erase_labels(self);
   audioconfig_label_insert(self, 0, fts_s_default);
@@ -558,7 +419,7 @@ audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 
 /* name utility */
 fts_symbol_t
-audioconfig_get_fresh_label_name(audioconfig_t *config, fts_symbol_t name)
+audioconfig_get_fresh_label_name(fts_audioconfig_t *config, fts_symbol_t name)
 {
   const char *str = name;
   int len = strlen(str);
@@ -569,7 +430,7 @@ audioconfig_get_fresh_label_name(audioconfig_t *config, fts_symbol_t name)
 
   /* separate base name and index */
   for(i=len-1; i>=0; i--) 
-  {
+    {
     if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
       num += (str[len = i] - '0') * dec;
     else
@@ -591,11 +452,11 @@ audioconfig_get_fresh_label_name(audioconfig_t *config, fts_symbol_t name)
 static void
 audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int index = fts_get_int(at);
   fts_symbol_t name = fts_get_symbol(at + 1);
   int n = 0;
-  audiolabel_t* label;
+  fts_audiolabel_t* label;
 
   if( name == fts_s_default)
     {
@@ -642,7 +503,7 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 static void
 audioconfig_remove_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int index = fts_get_int(at);
 
   audioconfig_label_remove(self, index);
@@ -651,7 +512,7 @@ audioconfig_remove_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 }
 
 
-int audioconfig_check_sample_rate(audioconfig_t* config, double sample_rate)
+int audioconfig_check_sample_rate(fts_audioconfig_t* config, double sample_rate)
 {
 #warning NOT YET IMPLEMENTED (audioconfig_check_sample_rate)
   int success = 1;
@@ -665,7 +526,7 @@ int audioconfig_check_sample_rate(audioconfig_t* config, double sample_rate)
   return success;
 }
 
-int audioconfig_check_buffer_size(audioconfig_t* config, int buffer_size)
+int audioconfig_check_buffer_size(fts_audioconfig_t* config, int buffer_size)
 {
 #warning NOT YET IMPLEMENTED (audioconfig_check_buffer_size)
   int success = 1;
@@ -682,14 +543,14 @@ int audioconfig_check_buffer_size(audioconfig_t* config, int buffer_size)
 
 
 int 
-fts_audioconfig_get_buffer_size(audioconfig_t* self)
+fts_audioconfig_get_buffer_size(fts_audioconfig_t* self)
 {
 #warning TODO: Convert this function into a macro
   return self->buffer_size;
 }
 
 int 
-fts_audioconfig_set_buffer_size(audioconfig_t* config, int buffer_size)
+fts_audioconfig_set_buffer_size(fts_audioconfig_t* config, int buffer_size)
 {
 #warning NOT YET IMPLEMENTED (fts_audioconfig_set_buffer_size)
   /* check if buffer size is available with current use audioport */
@@ -707,14 +568,14 @@ fts_audioconfig_set_buffer_size(audioconfig_t* config, int buffer_size)
 }
 
 int
-fts_audioconfig_get_sample_rate(audioconfig_t* config)
+fts_audioconfig_get_sample_rate(fts_audioconfig_t* config)
 {
 #warning TODO: Convert this function into a macro
   return config->sample_rate;
 }
 
 int
-fts_audioconfig_set_sample_rate(audioconfig_t* config, int sample_rate)
+fts_audioconfig_set_sample_rate(fts_audioconfig_t* config, int sample_rate)
 {
 #warning NOT YET IMPLEMENTED , need to change dsp code to set sample rate
   int set_sample_rate = 0;
@@ -742,9 +603,9 @@ fts_audioconfig_set_sample_rate(audioconfig_t* config, int sample_rate)
 
 
 void
-fts_audioconfig_dump( audioconfig_t *this, fts_bmax_file_t *f)
+fts_audioconfig_dump( fts_audioconfig_t *this, fts_bmax_file_t *f)
 {
-  audiolabel_t* label = this->labels;
+  fts_audiolabel_t* label = this->labels;
   int i = 0;
   fts_atom_t a[7];
 
@@ -783,7 +644,7 @@ fts_audioconfig_dump( audioconfig_t *this, fts_bmax_file_t *f)
 static void 
 audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int buffer_size = fts_get_int(at);
   fts_atom_t arg;
       
@@ -792,14 +653,14 @@ audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   fts_set_int(&arg, self->buffer_size);
   fts_client_send_message( o, audioconfig_s_buffer_size, 1, &arg);
 
-  fts_config_set_dirty((config_t*)fts_config_get(), 1);
+  fts_config_set_dirty((fts_config_t*)fts_config_get(), 1);
 }
 
 static void
 audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
 #warning NOT YET IMPLEMENTED (audioconfig_sample_rate)
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int sample_rate = fts_get_int(at);
   fts_atom_t arg;
 
@@ -808,49 +669,14 @@ audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   fts_set_int(&arg, self->sample_rate);
   fts_client_send_message( o, audioconfig_s_sampling_rate, 1, &arg); 
 
-  fts_config_set_dirty((config_t*)fts_config_get(), 1);
+  fts_config_set_dirty((fts_config_t*)fts_config_get(), 1);
 }
-
-static void
-audioconfig_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-#warning NOT YET IMPLEMENTED (audioconfig_input) Add channel setting ?
-  audioconfig_t* self = (audioconfig_t*)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-
-  post("[audioconfig:] new input: index: %d \t device: %s\n",index, name);
-
-  audioconfig_set_input_port(self, index, name);
-
-  audioconfig_update_labels(self);
-  audioconfig_update_devices(self);
-  audioconfig_restore(self);
-}
-
-static void
-audioconfig_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-#warning NOT YET IMPLEMENTED (audioconfig_input) Add channel setting ?
-  audioconfig_t* self = (audioconfig_t*)o;
-  int index = fts_get_int(at);
-  fts_symbol_t name = fts_get_symbol(at + 1);
-
-  post("[audioconfig:] new output: index: %d \t device: %s\n", index, name);
-
-  audioconfig_set_output_port(self, index, name);
-
-  audioconfig_update_labels(self);
-  audioconfig_update_devices(self);
-  audioconfig_restore(self);
-}
-
 
 static void
 audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  audioconfig_t *self = (audioconfig_t *)o;
-  audiolabel_t* label = self->labels;
+  fts_audioconfig_t *self = (fts_audioconfig_t *)o;
+  fts_audiolabel_t* label = self->labels;
   int index;
   fts_atom_t args[7];
 
@@ -898,18 +724,18 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 audioconfig_set_to_defaults(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   audioconfig_clear(o, winlet, fts_s_clear, 0, 0);
   audioconfig_upload(o, winlet, fts_s_upload, 0, 0);
-  fts_config_set_dirty((config_t*)fts_config_get(), 0);
+  fts_config_set_dirty((fts_config_t*)fts_config_get(), 0);
 }
 
 static void
 audiconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   fts_bytestream_t* stream = fts_post_get_stream(ac, at);
-  audiolabel_t* label = self->labels;
+  fts_audiolabel_t* label = self->labels;
 
   fts_spost(stream, "[audioconfig] sampling rate: %d\t buffer size: %d\n", 
 	    self->sample_rate, 
@@ -929,7 +755,7 @@ audiconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 
   self->sample_rate = AUDIO_CONFIG_DEFAULT_SAMPLE_RATE;
   self->buffer_size = AUDIO_CONFIG_DEFAULT_BUFFER_SIZE;
@@ -939,14 +765,14 @@ audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 static void
 audioconfig_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  audioconfig_t* self = (audioconfig_t*)o;
+  fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 }
 
 /* DUMMY CLASS INSTANTIATION */
 static void
 audioconfig_instantiate(fts_class_t* cl)
 {
-  fts_class_init(cl, sizeof(audioconfig_t), audioconfig_init, audioconfig_delete);
+  fts_class_init(cl, sizeof(fts_audioconfig_t), audioconfig_init, audioconfig_delete);
 
   fts_class_message_varargs(cl, fts_s_clear, audioconfig_clear);
   fts_class_message_varargs(cl, fts_s_default, audioconfig_set_to_defaults);
@@ -965,6 +791,7 @@ void fts_audioconfig_config(void)
 {
   /* AUDIO configuration class */
   audioconfig_s_name = fts_new_symbol("__audioconfig");  
+  audioconfig_s_unconnected = fts_new_symbol("-");
 
   audioconfig_s_buffer_sizes = fts_new_symbol("buffer_sizes");
   audioconfig_s_sampling_rates = fts_new_symbol("sampling_rates");
@@ -975,14 +802,11 @@ void fts_audioconfig_config(void)
   audioconfig_s_inputs = fts_new_symbol("inputs");
   audioconfig_s_outputs = fts_new_symbol("outputs");
 
-  fts_array_init(&audioconfig_inputs_array, 0, 0);
-  fts_array_init(&audioconfig_outputs_array, 0, 0);
-
   fts_array_init(&audioconfig_sample_rates_array, 0, 0);
   fts_array_init(&audioconfig_buffer_sizes_array, 0, 0);
 
   /* AUDIO configuration class */
-  audioconfig_type = fts_class_install(audioconfig_s_name, audioconfig_instantiate);
+  fts_audioconfig_type = fts_class_install(audioconfig_s_name, audioconfig_instantiate);
 }
 
 

@@ -21,8 +21,11 @@
  */
 
 
+#define FTS_AUDIO_INPUT 0
+#define FTS_AUDIO_OUTPUT 1
+
 /**
- * The FTS audio port structure.
+ * The audio port.
  *
  * A class implementing a audio port must inherit from fts_audioport_t:
  *
@@ -34,73 +37,130 @@
  *   } my_audioport_t;
  * @endcode
  *
- * A audio port class must call \c fts_audioport_init() and \c fts_audioport_delete() 
- * in the objects \e init and \e delete methods.
- *
  * @typedef fts_audioport_t
  *
  * @ingroup audioport
  */
+
+typedef struct fts_audiolabel fts_audiolabel_t;
+
+typedef struct fts_audioport fts_audioport_t;
+
+/**
+ * The audioport IO function calls the native audio layer to read/write a buffer
+ * of samples in the native format.
+ * Its argument is the audioport. Buffers are allocated by the port.
+ */
+typedef void (*fts_audioport_io_fun_t)( fts_audioport_t *port);
+
+/** 
+ * The audioport copy function copies the samples in the native format to a float buffer
+ * for a given channel.
+ */
+typedef void (*fts_audioport_copy_fun_t)( fts_audioport_t *port, float *buff, int buffsize, int channel);
+
+typedef void (*fts_audioport_mute_fun_t)( fts_audioport_t *port, int channel);
+typedef int (*fts_audioport_xrun_fun_t)( fts_audioport_t *port);
+
 struct fts_audioport_direction {
-  int channels;
-  fts_symbol_t io_function_name;
-  ftl_wrapper_t io_function;
-  fts_object_t *dsp_object;
-  fts_object_t *dispatcher;
+  int valid;
+  fts_audioport_io_fun_t io_fun;
+  fts_audioport_copy_fun_t copy_fun;
+  fts_audioport_mute_fun_t mute_fun;
+  unsigned int used_channels;
+  int max_channels;
+  fts_audiolabel_t *labels;
 };
-  
-  
-typedef struct fts_audioport {
+
+struct fts_audioport {
   fts_object_t head;
+  fts_symbol_t name;
   struct fts_audioport *next;
-  struct fts_audioport_direction input;
-  struct fts_audioport_direction output;
+  struct fts_audioport_direction inout[2];
   void (*idle_function)( struct fts_audioport *port);
   int (*xrun_function)( struct fts_audioport *port);
-} fts_audioport_t;
+};
 
 FTS_API void fts_audioport_init( fts_audioport_t *port);
 FTS_API void fts_audioport_delete( fts_audioport_t *port);
 
-FTS_API int fts_object_is_audioport( fts_object_t *obj);
+#define fts_audioport_set_max_channels( port, direction, max_channel) \
+  ((port)->inout[(direction)].max_channels = (max_channels))
 
-#define fts_audioport_get_input_function(P) (((fts_audioport_t *)(P))->input.io_function)
-#define fts_audioport_get_input_function_name(P) (((fts_audioport_t *)(P))->input.io_function_name)
-#define fts_audioport_set_input_function(P,F) __fts_audioport_set_input_function((fts_audioport_t *)(P),fts_new_symbol(#F),F)
-FTS_API void __fts_audioport_set_input_function( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun);
+#define fts_audioport_set_io_fun( port, direction, fun) \
+  ((port)->inout[(direction)].io_fun = (fun))
+#define fts_audioport_set_copy_fun( port, direction, fun) \
+  ((port)->inout[(direction)].copy_fun = (fun))
+#define fts_audioport_set_mute_fun( port, direction, fun) \
+  ((port)->inout[(direction)].mute_fun = (fun))
 
-#define fts_audioport_get_output_function(P) (((fts_audioport_t *)(P))->output.io_function)
-#define fts_audioport_get_output_function_name(P) (((fts_audioport_t *)(P))->output.io_function_name)
-#define fts_audioport_set_output_function(P,F) __fts_audioport_set_output_function((fts_audioport_t *)(P),fts_new_symbol(#F),F)
-FTS_API void __fts_audioport_set_output_function( fts_audioport_t *port, fts_symbol_t name, ftl_wrapper_t fun);
+#define fts_audioport_set_idle_fun( port, fun) \
+  ((port)->mute_fun = (fun))
+#define fts_audioport_set_xrun_fun( port, fun) \
+  ((port)->idle_fun = (fun))
 
-#define fts_audioport_get_input_channels(P) (((fts_audioport_t *)(P))->input.channels)
-FTS_API void fts_audioport_set_input_channels( fts_audioport_t *port, int channels);
 
-#define fts_audioport_get_output_channels(P) (((fts_audioport_t *)(P))->output.channels)
-FTS_API void fts_audioport_set_output_channels( fts_audioport_t *port, int channels);
+/**
+ * 
+ * The audio label
+ *
+ * @typedef fts_audiolabel_t
+ *
+ * @ingroup audiolabel
+ */
 
-FTS_API void fts_audioport_add_input_object( fts_audioport_t *port, int channel, fts_object_t *object);
-FTS_API void fts_audioport_remove_input_object( fts_audioport_t *port, int channel, fts_object_t *object);
+struct fts_audiolabel_direction {
+  fts_audioport_t *port;
+  int channel;
+  struct fts_audiolabel *next_same_port;
+};
 
-#define fts_audioport_get_output_dispatcher(P) ((P)->output.dispatcher)
+struct fts_audiolabel {
+  fts_object_t o;
+  fts_symbol_t name;
+  struct fts_audiolabel *next;
+  struct fts_audiolabel_direction inout[2];
+};
 
-/*  1)  fts_audioport_set_idle_function( my_idle_function); */
-/*  2)  fts_audioport_set_idle_function( NULL); */
-/*  3)  corresponding to default (idle function created by fts_audioport_idle() */
-#define fts_audioport_set_idle_function(P,F) (((fts_audioport_t *)(P))->idle_function = (F))
+#define fts_audiolabel_get_port( label, direction) ((label)->inout[(direction)].port)
+#define fts_audiolabel_get_channel( label, direction) ((label)->inout[(direction)].channel)
 
-/* dac slip report:
- the audioport xrun function returns an int saying that there has been an xrun since last call
- the dspcontrol calls fts_audioport_report_xrun to know the state of xrun
-*/
-#define fts_audioport_set_xrun_function(P,F) (((fts_audioport_t *)(P))->xrun_function = (F))
+/**
+ * Audiolabels have listeners, that are called when audiolabels are created/deleted.
+ * The native audio packages can use these listeners to be informed when labels are created and
+ * create new audioports. 
+ */
+FTS_API void fts_audiolabel_add_listener( fts_object_t *listener, fts_method_t label_added, fts_method_t label_removed);
+FTS_API void fts_audiolabel_remove_listener( fts_object_t *listener);
 
-FTS_API int fts_audioport_report_xrun( void);
 
-FTS_API fts_audioport_t *fts_audioport_get_default( fts_object_t *obj);
+/**
+ * The FTS audiomanager
+ *
+ * Maintains the list of audio port names
+ *
+ * @ingroup audiomanager
+ */
 
-FTS_API void fts_audioport_set_default_class( fts_symbol_t name);
-FTS_API fts_symbol_t fts_audioport_get_default_class( void);
+/**
+ * Get an audioport by name.
+ *
+ * @ingroup audiomanager
+ */
+FTS_API fts_audioport_t *fts_audiomanager_get_port( fts_symbol_t name);
+
+/**
+ * Register a new audioport.
+ *
+ * @ingroup audiomanager
+ */
+FTS_API void fts_audiomanager_put_port( fts_symbol_t name, fts_audioport_t *port);
+
+/**
+ * Remove an audioport.
+ *
+ * @ingroup audiomanager
+ */
+FTS_API void fts_audiomanager_remove_port( fts_symbol_t name);
 
 

@@ -32,7 +32,6 @@
 #include <ftsprivate/client.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/midi.h>
-#include <ftsprivate/audiolabel.h>
 #include <ftsprivate/audioconfig.h> /* requires audiolabel.h */
 #include <ftsprivate/config.h> /* requires audioconfig.h */
 
@@ -1511,7 +1510,7 @@ midiconfig_label_insert(midiconfig_t *config, int index, fts_symbol_t name)
     fts_client_send_message((fts_object_t *)config, fts_s_set, 4, args);
   }
   
-  fts_config_set_dirty( (config_t *)fts_config_get(), 1);
+  fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
 
   return label;
 }
@@ -1545,7 +1544,7 @@ midiconfig_label_remove(midiconfig_t *config, int index)
     fts_client_send_message((fts_object_t *)config, fts_s_remove, 1, &arg);
   }
 
-  fts_config_set_dirty( (config_t *)fts_config_get(), 1);
+  fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
 }
 
 static void
@@ -1567,7 +1566,7 @@ midiconfig_label_set_input(midiconfig_t *config, midilabel_t *label, int index, 
       fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
     }
 
-    fts_config_set_dirty( (config_t *)fts_config_get(), 1);
+    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
   }
 }
 
@@ -1590,7 +1589,7 @@ midiconfig_label_set_output(midiconfig_t *config, midilabel_t *label, int index,
       fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
     }
     
-    fts_config_set_dirty( (config_t *)fts_config_get(), 1);
+    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
   }
 }
 
@@ -1788,7 +1787,7 @@ midiconfig_set_defaults()
       midiconfig_label_set_output(midiconfig, label, 0, port, name);
     }
 
-    fts_config_set_dirty( (config_t *)fts_config_get(), 0);
+    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 0);
   }
 }
 
@@ -1818,7 +1817,7 @@ fts_midiconfig_set_defaults(midiconfig_t* midiconfig)
       midiconfig_label_set_output(midiconfig, label, 0, port, name);
     }
 
-    fts_config_set_dirty( (config_t *)fts_config_get(), 0);
+    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 0);
   }
 }
 
@@ -1935,7 +1934,7 @@ midiconfig_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if(fts_object_has_id( o)) 
     fts_client_send_message( o, fts_s_clear, 0, 0);
   
-  fts_config_set_dirty( (config_t *)fts_config_get(), 1);
+  fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
 }
 
 static void
@@ -2086,7 +2085,7 @@ midiconfig_set_to_defaults( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   /* this->file_name = NULL; */
   midiconfig_upload( o, winlet, fts_s_upload, 0, 0); 
   
-  fts_config_set_dirty( (config_t *)fts_config_get(), 0);
+  fts_config_set_dirty( (fts_config_t *)fts_config_get(), 0);
 }
 
 static void

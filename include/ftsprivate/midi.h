@@ -24,29 +24,27 @@
 #define _FTS_PRIVATE_MIDI_H_ 1
 
 
-typedef struct _midilabel
-{
+typedef struct fts_midilabel {
   fts_symbol_t name;
   fts_midiport_t *input;
   fts_midiport_t *output;
   fts_symbol_t input_name;
   fts_symbol_t output_name;
-  struct _midilabel *next;
-} midilabel_t;
+  struct fts_midilabel *next;
+} fts_midilabel_t;
 
-typedef struct _midiconfig
-{
+typedef struct fts_midiconfig {
   fts_object_t o;
-  midilabel_t *labels;
+  fts_midilabel_t *labels;
   int n_labels;
-} midiconfig_t;
+} fts_midiconfig_t;
 
 
 extern fts_class_t* midiconfig_type;
 
-void fts_midiconfig_set(midiconfig_t* config);
-void fts_midiconfig_set_defaults(midiconfig_t* config);
-extern void fts_midiconfig_dump( midiconfig_t *mc, fts_bmax_file_t *f);
+void fts_midiconfig_set( fts_midiconfig_t* config);
+void fts_midiconfig_set_defaults( fts_midiconfig_t* config);
+extern void fts_midiconfig_dump( fts_midiconfig_t *mc, fts_bmax_file_t *f);
 
 #endif /* _FTS_PRIVATE_MIDI_H_ */
 

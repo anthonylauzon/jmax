@@ -27,7 +27,6 @@
 #endif /* HAVE_SYS_PARAM_H */
 
 #include <ftsprivate/bmaxfile.h>
-#include <ftsprivate/audiolabel.h> 
 #include <ftsprivate/audioconfig.h> /* require bmaxfile.h */
 #include <ftsprivate/midi.h> /* require bmaxfile.h */
 
@@ -43,12 +42,12 @@ static fts_symbol_t config_s_name;
 
 static fts_class_t* config_type = NULL;
 
-static config_t *config;
+static fts_config_t *config;
 
 static void
 config_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* self = (config_t*)o;
+  fts_config_t* self = (fts_config_t*)o;
   /* send message clear to audio config and mid config */
   fts_send_message((fts_object_t*)self->audio_config, fts_s_clear, ac, at);
   fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at);
@@ -57,7 +56,7 @@ config_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 config_restore_labels(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* self = (config_t*)o;
+  fts_config_t* self = (fts_config_t*)o;
   /* send message restore_labels to audio config and midi config */
   fts_send_message((fts_object_t*)self->audio_config, fts_s_clear, ac, at);
   fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at);
@@ -79,12 +78,12 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     
   if (obj != NULL && fts_object_get_class(obj) == config_type)
   {
-    ((config_t*)obj)->file_name = fts_new_symbol(path);
+    ((fts_config_t*)obj)->file_name = fts_new_symbol(path);
 
     /* replace current config by loaded config */
-    fts_config_set( (config_t*)obj);
+    fts_config_set( (fts_config_t*)obj);
 
-    fts_config_set_dirty((config_t*)obj, 0);
+    fts_config_set_dirty((fts_config_t*)obj, 0);
   }
   else
   {
@@ -95,7 +94,7 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* this = (config_t*)o;
+  fts_config_t* this = (fts_config_t*)o;
   fts_symbol_t file_name = fts_get_symbol(at);
   fts_symbol_t project_dir = fts_project_get_dir();
   char path[MAXPATHLEN];
@@ -127,7 +126,7 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 config_midi_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* this = (config_t*)o;
+  fts_config_t* this = (fts_config_t*)o;
   fts_symbol_t selector = fts_get_symbol( at);
   fts_send_message( ((fts_object_t *)this->midi_config), selector, ac - 1, at + 1);
 }
@@ -135,7 +134,7 @@ config_midi_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 static void
 config_audio_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* this = (config_t*)o;
+  fts_config_t* this = (fts_config_t*)o;
   fts_symbol_t selector = fts_get_symbol( at);
   fts_send_message( ((fts_object_t *)this->audio_config), selector, ac - 1, at + 1);
 }
@@ -143,7 +142,7 @@ config_audio_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const 
 /* set config as dirty or as saved.
  * A "setDirty" message is sent to the client after is_dirty flag changed
  */
-void fts_config_set_dirty(config_t *this, int is_dirty)
+void fts_config_set_dirty(fts_config_t *this, int is_dirty)
 {
   if(( this)&&(this->dirty != is_dirty))
     {
@@ -162,7 +161,7 @@ void fts_config_set_dirty(config_t *this, int is_dirty)
 static void
 config_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* self = (config_t*)o;
+  fts_config_t* self = (fts_config_t*)o;
     
   /* send message print to audio config and mid config */
   fts_send_message((fts_object_t*)self->audio_config, fts_s_print, ac, at);
@@ -172,7 +171,7 @@ config_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  config_t *this = (config_t *)o;
+  fts_config_t *this = (fts_config_t *)o;
   fts_atom_t a;
 
   if ( !fts_object_has_id( ((fts_object_t *)this->audio_config)))
@@ -203,22 +202,22 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* self = (config_t*)o;
+  fts_config_t* self = (fts_config_t*)o;
   fts_atom_t a;
-  audioconfig_t* audio_config;
-  midiconfig_t* midi_config;
+  fts_audioconfig_t* audio_config;
+  fts_midiconfig_t* midi_config;
 
   self->file_name = NULL;
   self->dirty = 0;
 
   /* create midi config object */
-  midi_config = (midiconfig_t*)fts_object_create(midiconfig_type, NULL, 0, 0);
+  midi_config = (fts_midiconfig_t*)fts_object_create(midiconfig_type, NULL, 0, 0);
   fts_object_refer((fts_object_t*)midi_config);
   self->midi_config = midi_config;
   fts_midiconfig_set_defaults(self->midi_config);
 
   /* create audio config object */
-  audio_config = (audioconfig_t*)fts_object_create(audioconfig_type, NULL, 0, 0);
+  audio_config = (fts_audioconfig_t*)fts_object_create(audioconfig_type, NULL, 0, 0);
   fts_object_refer((fts_object_t*)audio_config);
   self->audio_config = audio_config;
   fts_audioconfig_set_defaults(self->audio_config);
@@ -232,7 +231,7 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 config_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  config_t* self = (config_t*)o;
+  fts_config_t* self = (fts_config_t*)o;
   
   fts_object_release((fts_object_t*)self->audio_config);
   fts_object_release((fts_object_t*)self->midi_config);
@@ -241,7 +240,7 @@ config_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 config_instantiate(fts_class_t* cl)
 {
-  fts_class_init(cl, sizeof(config_t), config_init, config_delete);
+  fts_class_init(cl, sizeof(fts_config_t), config_init, config_delete);
 
   fts_class_message_varargs(cl, fts_s_load, config_load);
   fts_class_message_varargs(cl, fts_s_save, config_save);
@@ -279,9 +278,9 @@ fts_midiconfig_get(void)
 }
 
 void
-fts_config_set( config_t *new_config)
+fts_config_set( fts_config_t *new_config)
 {
-  config_t* old_config = (config_t*)fts_config_get();
+  fts_config_t* old_config = (fts_config_t*)fts_config_get();
   if( new_config != NULL)
     {
       fts_object_refer((fts_object_t *)new_config);
@@ -329,7 +328,7 @@ void fts_config_config(void)
   config_type = fts_class_install(config_s_name, config_instantiate);
 
   /* create config object */
-  fts_config_set( (config_t*)fts_object_create(config_type, NULL, 0, 0));
+  fts_config_set( (fts_config_t*)fts_object_create(config_type, NULL, 0, 0));
 
   /* define global config variable */
   fts_set_object(&a, config);

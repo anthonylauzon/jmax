@@ -21,12 +21,9 @@ l'objet audio:
 - DSP postlude:
   . appel de toutes les fonctions d'output des audio ports (idem pr null audio port)
 
-audiolabel:
-- input: appelle copy_in du audioport
-- output: mixe dans le buffer de sortie 
-
 
 open/close audio port: il faut marquer le audio port comme actif (actif entrée, actif sortie).
+
 
 DSP execution:
 
@@ -165,3 +162,10 @@ void fts_audioport_close( fts_audioport_t *port)
 }
 
 
+======================================================================
+TODO:
+ - merge fts/audiolabel.c into fts/audio.c
+ - merge include/ftsprivate/audiolabel.h into include/ftsprivate/audio.h
+ - add code for idle
+ - complete audioport API (fts_audioport_init/delete, reference count, open/close)
+ - change alsaaudioport and ossaudioport w.r.t. new API 

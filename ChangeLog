@@ -1,3 +1,8 @@
+2002-12-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* commited an intermediate version of audio. It currently does not compile, but
+	include the necessary prototypes for updating the audio ports.
+
 2002-12-16  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* add python fts client into autoconf stuff (install into $(datadir)/jmax/client/python).

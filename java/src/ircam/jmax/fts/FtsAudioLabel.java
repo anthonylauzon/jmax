@@ -51,13 +51,13 @@ public class FtsAudioLabel extends FtsObject
 	  ((FtsAudioLabel)obj).setOutput( args.getSymbol( 0).toString());
 	}
       });
-    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("in_channel"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("input_channel"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsAudioLabel)obj).setInputChannel( args.getInt( 0));
 	}
       });
-    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("out_channel"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsAudioLabel.class, FtsSymbol.get("output_channel"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsAudioLabel)obj).setOutputChannel( args.getInt( 0));
@@ -145,7 +145,7 @@ public class FtsAudioLabel extends FtsObject
     
     try
       {
-	send( FtsSymbol.get( "in_channel"), args);
+	send( FtsSymbol.get( "input_channel"), args);
       }
     catch(IOException e)
       {
@@ -161,7 +161,7 @@ public class FtsAudioLabel extends FtsObject
     
     try
       {
-	send( FtsSymbol.get( "out_channel"), args);
+	send( FtsSymbol.get( "output_channel"), args);
       }
     catch(IOException e)
       {

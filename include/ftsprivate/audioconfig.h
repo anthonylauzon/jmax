@@ -25,23 +25,22 @@
 
 /* Requires audiolabel */
 
-typedef struct _audioconfig
-{
-    fts_object_t o;
-    audiolabel_t* labels;
-    int n_labels;    
+typedef struct fts_audioconfig {
+  fts_object_t o;
+  fts_audiolabel_t* labels;
+  int n_labels;    
 
-    int buffer_size;
-    int sample_rate;
+  int buffer_size;
+  int sample_rate;
 
-} audioconfig_t;
+} fts_audioconfig_t;
 
 extern fts_class_t* audioconfig_type;
 
-extern void fts_audioconfig_set_defaults(audioconfig_t* config);
-extern void fts_audioconfig_dump( audioconfig_t *mc, fts_bmax_file_t *f);
-extern fts_symbol_t audioconfig_get_fresh_label_name(audioconfig_t *config, fts_symbol_t name);
-extern audiolabel_t*audioconfig_label_get_by_name(audioconfig_t* config, fts_symbol_t name);
+extern void fts_audioconfig_set_defaults( fts_audioconfig_t* config);
+extern void fts_audioconfig_dump( fts_audioconfig_t *mc, fts_bmax_file_t *f);
+extern fts_symbol_t fts_audioconfig_get_fresh_label_name( fts_audioconfig_t *config, fts_symbol_t name);
+extern fts_audiolabel_t *fts_audioconfig_label_get_by_name( fts_audioconfig_t* config, fts_symbol_t name);
 
 #endif /* _FTS_PRIVATE_AUDIOCONFIG_H_ */
 
