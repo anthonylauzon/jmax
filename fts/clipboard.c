@@ -59,6 +59,9 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   char buf[1024];
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
+#if WIN32  
+  this->file = tmpfile();
+#else
   if (ac == 1)
     name = "clipboard";
   else
@@ -80,6 +83,7 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
      Note that this will not work on Windows :-> (but who care, anyway) */
      
   unlink(buf);
+#endif
 }
 
 

@@ -80,6 +80,11 @@ dsaudioport_output(fts_word_t *argv)
   int boffset, soffset, n, channels, ch, i, j;
 
   port = (dsaudioport_t *) fts_word_get_ptr(argv+0);
+  if (port->state != dsaudioport_running) {
+    /* FIXME */
+    return;
+  }
+
   n = fts_word_get_int(argv + 1);
   channels = fts_audioport_get_output_channels(port);
 
@@ -153,7 +158,9 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /* get the basic audio settings */
   sample_rate = (int) fts_dsp_get_sample_rate();
-  channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
+  channels = fts_get_int_arg( ac, at, 0, DEFAULT_CHANNELS);
+  fts_audioport_set_output_channels((fts_audioport_t *)this, channels);
+
   frames = fts_dsp_get_tick_size();
   this->buffer_sample_size = channels * frames;
   this->buffer_byte_size = this->buffer_sample_size * sizeof(short);
@@ -285,6 +292,7 @@ dsaudioport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsaudioport_init);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, dsaudioport_delete, 0, 0);
+
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dsaudioport_get_state);
 

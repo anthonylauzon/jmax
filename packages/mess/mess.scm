@@ -18,6 +18,6 @@
 
 ;; help
 (sshh-load (file-cat dir "help" "mess.help.index.scm"))
-(help-summary "Mess" (file-cat dir "help" "mess.summary.jmax"))
+(help-summary "mess summary" (file-cat dir "help" "mess.summary.jmax"))
 
 

@@ -1,4 +1,4 @@
-(help-summary "Signal summary" (file-cat dir "signal.summary.jmax"))
+(help-summary "signal summary" (file-cat dir "signal.summary.jmax"))
 (data-directory dir)
 
 ;; generators

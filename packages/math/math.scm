@@ -29,7 +29,7 @@
 
 ;; help
 (sshh-load (file-cat dir "help" "math.help.index.scm"))
-(help-summary "Math" (file-cat dir "help" "math.summary.jmax"))
+(help-summary "math summary" (file-cat dir "help" "math.summary.jmax"))
 
 (println "package: math (math classes)")
 

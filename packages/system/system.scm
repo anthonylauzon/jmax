@@ -28,8 +28,5 @@
 (ucs "load" "module" "system" (file-cat dir "c" "lib" jmax-arch jmax-mode (libname "system")))
 
 ;help
-(help-patch "var" (file-cat dir "help" "var.help.jmax"))
-(help-patch "const" (file-cat dir "help" "const.help.jmax"))
-
-; load silently
-;post "package: system"
+(sshh-load (file-cat dir "help" "system.help.index.scm"))
+(help-summary "system summary" (file-cat dir "help" "system.summary.jmax"))

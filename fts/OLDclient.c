@@ -61,7 +61,9 @@
 #include <ftsprivate/symbol.h>
 #include <ftsprivate/template.h>
 
-
+#ifdef WIN32
+#define USE_TCPIP 0
+#endif
 
 /***********************************************************************
  *
@@ -89,6 +91,8 @@ typedef struct _oldclient_t {
   int socket;
 #endif
   struct sockaddr_in client_addr;
+  /* Connection type */
+  int stream;
   /* Input */
   char input_buffer[UDP_PACKET_SIZE];
   /* Output */
@@ -112,10 +116,25 @@ oldclient_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       return;
     }
 
-  if ((r = recvfrom( this->socket, this->input_buffer, UDP_PACKET_SIZE, 0, 0, 0)) < 0)
+  if (this->stream) 
     {
-      post( "[client] error in reading message (%s)\n", strerror( errno));
-      return;
+#if WIN32
+      if ((r = recv( this->socket, this->input_buffer, UDP_PACKET_SIZE, 0)) < 0)
+#else
+      if ((r = read( this->socket, this->input_buffer, UDP_PACKET_SIZE)) < 0)
+#endif
+	{
+	  post( "[client] error in reading message (error %d)\n", errno);
+	  return;
+	}
+    }
+  else
+    {
+      if ((r = recvfrom( this->socket, this->input_buffer, UDP_PACKET_SIZE, 0, 0, 0)) < 0)
+	{
+	  post( "[client] error in reading message (%s)\n", strerror( errno));
+	  return;
+	}
     }
 
   for ( i = 0; i < r; i++)
@@ -144,6 +163,8 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   if ((value = fts_cmd_args_get( fts_new_symbol( "host"))))
     host = fts_symbol_name( value);
 
+  this->stream = (fts_cmd_args_get( fts_new_symbol( "tcp")) != NULL);
+
   hostptr = gethostbyname( host);
 
   if ( !hostptr)
@@ -152,44 +173,79 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       return;
     }
 
-  if ( (this->socket = socket( AF_INET, SOCK_DGRAM, 0) ) == -1)
+  fts_buffer_init( &this->output_buffer, unsigned char);
+
+  if (this->stream) 
     {
-      fprintf( stderr, "[oldclient] error opening socket (%s)\n", strerror( errno));
-      return;
-    }
+      if ( (this->socket = socket( AF_INET, SOCK_STREAM, 0) ) == -1)
+	{
+	  fprintf( stderr, "[oldclient] error opening socket (%s)\n", strerror( errno));
+	  return;
+	}
+      
+      /* Bind the socket to an arbitrary available port  */
+      memset( &my_addr, 0, sizeof(struct sockaddr_in));
+      my_addr.sin_family = AF_INET;
+      my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+      my_addr.sin_port = 0;
+      
+      if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
+	{
+	  fprintf( stderr, "[oldclient] cannot bind socket (%s)\n", strerror( errno));
+	  return;
+	}
+      
+      memset( &this->client_addr, 0, sizeof(this->client_addr));
+      this->client_addr.sin_family = AF_INET;
+      this->client_addr.sin_addr = *(struct in_addr *)hostptr->h_addr_list[0];
+      this->client_addr.sin_port = htons(port);
 
-  /* Bind the socket to an arbitrary available port  */
-  memset( &my_addr, 0, sizeof(struct sockaddr_in));
-  my_addr.sin_family = AF_INET;
-  my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  my_addr.sin_port = 0;
-
-  if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
+      /* Connect the socket to the client */
+      if ( connect(this->socket, &this->client_addr, sizeof(this->client_addr)) < 0) 
+	{
+	  fprintf( stderr, "[oldclient] cannot connect (%s)\n", strerror( errno));
+	  return;
+	}
+    } 
+  else 
     {
-      fprintf( stderr, "[oldclient] cannot bind socket (%s)\n", strerror( errno));
-      return;
-    }
+      if ( (this->socket = socket( AF_INET, SOCK_DGRAM, 0) ) == -1)
+	{
+	  fprintf( stderr, "[oldclient] error opening socket (%s)\n", strerror( errno));
+	  return;
+	}
+      
+      /* Bind the socket to an arbitrary available port  */
+      memset( &my_addr, 0, sizeof(struct sockaddr_in));
+      my_addr.sin_family = AF_INET;
+      my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+      my_addr.sin_port = 0;
+      
+      if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
+	{
+	  fprintf( stderr, "[oldclient] cannot bind socket (%s)\n", strerror( errno));
+	  return;
+	}
+      
+      memset( &this->client_addr, 0, sizeof(this->client_addr));
+      this->client_addr.sin_family = AF_INET;
+      this->client_addr.sin_addr = *(struct in_addr *)hostptr->h_addr_list[0];
+      this->client_addr.sin_port = htons(port);
+      
+      /* Send an init packet: empty content, just the packet */
+      if ( sendto( this->socket, "init", 4, 0, &this->client_addr, sizeof( this->client_addr)) < 0)
+	{
+	  fprintf( stderr, "[oldclient] cannot send init packet (%s)\n", strerror( errno));
+	  return;
+	}
 
-  memset( &this->client_addr, 0, sizeof(this->client_addr));
-  this->client_addr.sin_family = AF_INET;
-  this->client_addr.sin_addr = *(struct in_addr *)hostptr->h_addr_list[0];
-  this->client_addr.sin_port = htons(port);
-
-  /* Send an init packet: empty content, just the packet */
-  if ( sendto( this->socket, "init", 4, 0, &this->client_addr, sizeof( this->client_addr)) < 0)
-    {
-      fprintf( stderr, "[oldclient] cannot send init packet (%s)\n", strerror( errno));
-      return;
+      fts_buffer_append( &this->output_buffer, unsigned char, 0);
+      fts_buffer_append( &this->output_buffer, unsigned char, 0);
+      fts_buffer_append( &this->output_buffer, unsigned char, 0);
     }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);
-
-  fts_buffer_init( &this->output_buffer, unsigned char);
-
-  fts_buffer_append( &this->output_buffer, unsigned char, 0);
-  fts_buffer_append( &this->output_buffer, unsigned char, 0);
-  fts_buffer_append( &this->output_buffer, unsigned char, 0);
 }
 
 static void
@@ -266,52 +322,76 @@ static void oldclient_flush( oldclient_t *this)
 
   len = fts_buffer_get_length( &this->output_buffer);
 
-  if (len <= 3)
-    return;
+  if (this->stream) 
+    {
+      if (len <= 0)
+	return;
 
-  p = (unsigned char *)fts_buffer_get_ptr( &this->output_buffer);
+      p = (unsigned char *)fts_buffer_get_ptr( &this->output_buffer);
+      
+      /* Send an init packet: empty content, just the packet */
+#if WIN32
+      if ( send( this->socket, p, len, 0) < 0)
+#else
+      if ( write( this->socket, p, len) < 0)
+#endif
+	{
+	  fprintf( stderr, "[oldclient] cannot send init packet (%s)\n", strerror( errno));
+	  return;
+	}
+      
+      fts_buffer_clear( &this->output_buffer);
+    } 
+  else
+    {
+      if (len <= 3)
+	return;
 
-  p[0] = this->sequence;
-  this->sequence = (this->sequence + 1) % 128;
-
-  p[1] = len / 256;
-  p[2] = len % 256;
-
+      p = (unsigned char *)fts_buffer_get_ptr( &this->output_buffer);
+      
+      p[0] = this->sequence;
+      
+      this->sequence = (this->sequence + 1) % 128;
+      
+      p[1] = len / 256;
+      p[2] = len % 256;
+      
 #if 0
-  {
-    int i;
-
-    fprintf( stderr, "Sending %d bytes\n", len);
-
-#define NN 32
-    for ( i = 0; i < len; i++)
       {
-	if ( i % NN == 0)
-	  fprintf( stderr, "[%03d]", i);
-
-	if (p[i] >= ' ')
-	  fprintf( stderr, " %2c", p[i]);
-	else
-	  fprintf( stderr, " %02x", (int)p[i]);
-
-	if ( i % NN == (NN-1))
+	int i;
+	
+	fprintf( stderr, "Sending %d bytes\n", len);
+	
+#define NN 32
+	for ( i = 0; i < len; i++)
+	  {
+	    if ( i % NN == 0)
+	      fprintf( stderr, "[%03d]", i);
+	    
+	    if (p[i] >= ' ')
+	      fprintf( stderr, " %2c", p[i]);
+	    else
+	      fprintf( stderr, " %02x", (int)p[i]);
+	    
+	    if ( i % NN == (NN-1))
+	      fprintf( stderr, "\n");
+	  }
+	
+	if ( i % NN != (NN-1))
 	  fprintf( stderr, "\n");
       }
-
-    if ( i % NN != (NN-1))
-      fprintf( stderr, "\n");
-  }
 #endif
+      
+      r = sendto( this->socket, p, len, 0, &this->client_addr, sizeof( this->client_addr));
 
-  r = sendto( this->socket, p, len, 0, &this->client_addr, sizeof( this->client_addr));
+      if ( r != len)
+	fprintf( stderr, "[oldclient] error sending (%s)\n", strerror( errno));
 
-  if ( r != len)
-    fprintf( stderr, "[oldclient] error sending (%s)\n", strerror( errno));
-
-  fts_buffer_clear( &this->output_buffer);
-  fts_buffer_append( &this->output_buffer, unsigned char, 0);
-  fts_buffer_append( &this->output_buffer, unsigned char, 0);
-  fts_buffer_append( &this->output_buffer, unsigned char, 0);
+      fts_buffer_clear( &this->output_buffer);
+      fts_buffer_append( &this->output_buffer, unsigned char, 0);
+      fts_buffer_append( &this->output_buffer, unsigned char, 0);
+      fts_buffer_append( &this->output_buffer, unsigned char, 0);
+    }
 }
 
 

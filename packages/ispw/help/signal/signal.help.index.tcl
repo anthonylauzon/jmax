@@ -62,7 +62,7 @@ helpPatch sqrt~ $dir/sqrt~.help.jmax
 helpPatch down~ $dir/down~.help.jmax
 helpPatch up~ $dir/down~.help.jmax
 helpPatch thrxw~ $dir/catch~.help.jmax
-helpPatch catxh~ $dir/catch~.help.jmax
+helpPatch cxtch~ $dir/catch~.help.jmax
 helpPatch switch~ $dir/switch~.help.jmax
 helpPatch thru~ $dir/thru~.help.jmax
 

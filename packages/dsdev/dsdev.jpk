@@ -31,7 +31,7 @@ package provide dsdev
 ucs load module dsdev $dir/lib/dsdev.dll
 
 # summary and help patches
-helpSummary "DsDev summary" $dir/help/dsdev.summary.jmax
-helpPatch dsaudioport $dir/help/dsaudioport.help.jmax
+#helpSummary "DsDev summary" $dir/help/dsdev.summary.jmax
+#helpPatch dsaudioport $dir/help/dsaudioport.help.jmax
 
 post "package: dsdev (DirectSound audioport)"

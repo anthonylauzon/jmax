@@ -110,7 +110,7 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
 
 /*
   
-      FIXME: Not implemented yet   
+      FIXME: Not implemented yet. check out _clear87, _control87, _status87.
 
  */
 

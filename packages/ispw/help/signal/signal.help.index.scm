@@ -2,13 +2,8 @@
 ;; help patch declarations for the ispw standard signal classes
 ;;
 
-;; arithmetics (6)
-(help-patch "*~" (file-cat dir "arith~.help.jmax"))
-(help-patch "+~" (file-cat dir "arith~.help.jmax"))
-(help-patch "-~" (file-cat dir "arith~.help.jmax"))
-(help-patch "/~" (file-cat dir "arith~.help.jmax"))
-(help-patch "inv*~" (file-cat dir "arith~.help.jmax"))
-(help-patch "inv+~" (file-cat dir "arith~.help.jmax"))
+;; Summary
+(help-summary "ISPW signal summary" (file-cat dir "ispw.signal.summary.jmax"))
 
 ;; filters (5)
 (help-patch "2p2z~" (file-cat dir "2p2z~.help.jmax"))
@@ -32,8 +27,6 @@
 ;; io (5)
 (help-patch "adc~" (file-cat dir "adc~.help.jmax"))
 (help-patch "dac~" (file-cat dir "adc~.help.jmax"))
-(help-patch "readsf~" (file-cat dir "sf~.help.jmax"))
-(help-patch "writesf~" (file-cat dir "sf~.help.jmax"))
 (help-patch "print~" (file-cat dir "print~.help.jmax"))
 
 ;; misc math (7)
@@ -48,8 +41,8 @@
 ;; signal flow (6)
 (help-patch "down~" (file-cat dir "down~.help.jmax"))
 (help-patch "up~" (file-cat dir "down~.help.jmax"))
-(help-patch "throw~" (file-cat dir "catch~.help.jmax"))
-(help-patch "catch~" (file-cat dir "catch~.help.jmax"))
+(help-patch "thrxw~" (file-cat dir "catch~.help.jmax"))
+(help-patch "cxtch~" (file-cat dir "catch~.help.jmax"))
 (help-patch "switch~" (file-cat dir "switch~.help.jmax"))
 (help-patch "thru~" (file-cat dir "thru~.help.jmax"))
 
@@ -87,6 +80,3 @@
 (help-patch "zerocross~" (file-cat dir "zerocross~.help.jmax"))
 (help-patch "samplerate~" (file-cat dir "samplerate~.help.jmax"))
 (help-patch "vectorsize~" (file-cat dir "samplerate~.help.jmax"))
-
-;; Summary
-(help-summary "ISPW signal" (file-cat dir "ispw.signal.summary.jmax"))

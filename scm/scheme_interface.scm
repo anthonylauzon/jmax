@@ -405,9 +405,3 @@
     (max-application-add-hook label (make-script proc arg))))
 
 
-(define when
-  (lambda (label proc . arg)
-    (println "Hello! when is no longer used. Please use define-hook instead.")
-    (println "(We defined " label "-hook for you anyway.)")
-    (apply define-hook (append (list label proc) arg))))
-

@@ -29,7 +29,7 @@
 
 ;; help
 (sshh-load (file-cat dir "help" "control.help.index.scm"))
-(help-summary "Control" (file-cat dir "help" "control.summary.jmax"))
+(help-summary "control summary" (file-cat dir "help" "control.summary.jmax"))
 
 (println "package: control (control classes)")
 

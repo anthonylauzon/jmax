@@ -24,7 +24,7 @@
 
 ; load dynamic libraries into the server
 (ucs "load" "module" "dsdev" (file-cat dir "c" "lib" (libname "dsdev")))
-(help-summary "DsDev summary" (file-cat dir "help" "dsdev.summary.jmax"))
-(help-patch "dsaudioport" (file-cat dir "help" "dsaudioport.help.jmax"))
+;(help-summary "DsDev summary" (file-cat dir "help" "dsdev.summary.jmax"))
+;(help-patch "dsaudioport" (file-cat dir "help" "dsaudioport.help.jmax"))
 
 (println "package: dsdev (DirectSound audioport)")

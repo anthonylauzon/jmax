@@ -2,31 +2,8 @@
 ;; help declarations for the ispw control classes
 ;;
 
-;; logic operators (4)
-(help-patch "|" (file-cat dir "logic.help.jmax"))
-(help-patch "||" (file-cat dir "logic.help.jmax"))
-(help-patch "&&" (file-cat dir "logic.help.jmax"))
-(help-patch "&" (file-cat dir "logic.help.jmax"))
-
-;; comparison operators (6)
-(help-patch "<=" (file-cat dir "compare.help.jmax"))
-(help-patch "==" (file-cat dir "compare.help.jmax"))
-(help-patch ">" (file-cat dir "compare.help.jmax"))
-(help-patch ">=" (file-cat dir "compare.help.jmax"))
-(help-patch "!=" (file-cat dir "compare.help.jmax"))
-(help-patch "<" (file-cat dir "compare.help.jmax"))
-
-;; arithmetics (6)
-(help-patch "%" (file-cat dir "arith.help.jmax"))
-(help-patch "*" (file-cat dir "arith.help.jmax"))
-(help-patch "+" (file-cat dir "arith.help.jmax"))
-(help-patch "-" (file-cat dir "arith.help.jmax"))
-(help-patch "inv*" (file-cat dir "arith.help.jmax"))
-(help-patch "inv+" (file-cat dir "arith.help.jmax"))
-
-;;shifting operators (2)
-(help-patch "<<" (file-cat dir "shift.help.jmax"))
-(help-patch ">>" (file-cat dir "shift.help.jmax"))
+;; Summary
+(help-summary "ISPW control summary" (file-cat dir "ispw.control.summary.jmax"))
 
 ;; misc math (10)
 (help-patch "abs" (file-cat dir "abs.help.jmax"))
@@ -39,7 +16,6 @@
 (help-patch "logscale" (file-cat dir "exscale.help.jmax"))
 (help-patch "mtof" (file-cat dir "mtof.help.jmax"))
 (help-patch "scale" (file-cat dir "scale.help.jmax"))
-
 
 ;; data (7)
 (help-patch "bag" (file-cat dir "bag.help.jmax"))
@@ -75,7 +51,6 @@
 (help-patch "split" (file-cat dir "split.help.jmax"))
 (help-patch "swap" (file-cat dir "swap.help.jmax"))
 (help-patch "trigger" (file-cat dir "trigger.help.jmax"))
-;alias
 (help-patch "t" (file-cat dir "trigger.help.jmax"))
 
 ;; genarators (6)
@@ -108,9 +83,3 @@
 ; polyphonic (2)
 (help-patch "poly" (file-cat dir "poly.help.jmax"))
 (help-patch "voxalloc" (file-cat dir "voxalloc.help.jmax"))
-
-;; print (1)
-(help-patch "print" (file-cat dir "print.help.jmax"))
-
-;; Summary
-(help-summary "ISPW control" (file-cat dir "ispw.control.summary.jmax"))

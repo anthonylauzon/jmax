@@ -24,7 +24,7 @@
 
 ; load dynamic libraries into the server
 (ucs "load" "module" "winmidi" (file-cat dir "c" "lib" (libname "winmidi")))
-(help-summary "Winmidi summary" (file-cat dir "help" "winmidi.summary.jmax"))
-(help-patch "winmidiport" (file-cat dir "help" "winmidiport.help.jmax"))
+;(help-summary "Winmidi summary" (file-cat dir "help" "winmidi.summary.jmax"))
+;(help-patch "winmidiport" (file-cat dir "help" "winmidiport.help.jmax"))
 
 (println "package: winmidi (Midi port for Windows)")

@@ -103,7 +103,7 @@
 ;;
 (define (default-audio . l)
   (display "Setting default audio port to ") 
-  (lprintln l)
+  (println l)
   (apply ucs (append (list "newobj" "DefaultAudioPort" ":") l)))
 
 
@@ -112,11 +112,5 @@
 ;;
 (define (default-midi . l)
   (display "Setting default midi to ") 
-  (lprintln l)
+  (println l)
   (apply ucs (append (list "default" "midi") l)))
-
-
-
-
-
-
