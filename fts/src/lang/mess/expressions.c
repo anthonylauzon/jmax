@@ -110,12 +110,12 @@ static fts_hash_table_t fts_expression_fun_table;
 
 /* Storing assignement set in expressions for future created objects */
 
-typedef struct fts_expression_assignement
+struct fts_expression_assignement
 {
   fts_symbol_t name;
   fts_atom_t   value;
   struct fts_expression_assignement *next;
-} fts_expression_assignement_t;
+};
 
 static fts_heap_t *expr_prop_heap;
 
