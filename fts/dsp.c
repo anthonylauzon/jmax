@@ -583,7 +583,7 @@ dsp_set_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 {
   if (fts_is_number(at))
   {
-    float sr = fts_get_number_float(at);
+    float sr = (float)fts_get_number_float(at);
     
     dsp_sample_rate = sr;
     dsp_reset();
