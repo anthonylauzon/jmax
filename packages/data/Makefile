@@ -41,8 +41,12 @@ clean_c:
 
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/data
-	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/data ; done
 	$(INSTALL_DATA) data.jpk $(lib_install_dir)/packages/data
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) data.smc $(lib_install_dir)/packages/data
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
+
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch
+

@@ -34,7 +34,10 @@ clean:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/system
 	$(INSTALL_DATA) system.jpk $(lib_install_dir)/packages/system
-	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
+
+install-arch:
+	( cd c ; $(MAKE) $@)
+.PHONY: install-arch
 

@@ -52,9 +52,13 @@ clean_java:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/explode
 	$(INSTALL_DATA) explode.jpk $(lib_install_dir)/packages/explode
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) explode.scm $(lib_install_dir)/packages/explode
 	( cd help; $(MAKE) $@)
 	( cd images; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
 .PHONY: install-noarch
+
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch
 

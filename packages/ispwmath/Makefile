@@ -41,7 +41,12 @@ clean_c:
 
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispwmath
-	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispwmath ; done
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) ispwmath.jpk $(lib_install_dir)/packages/ispwmath
+	$(INSTALL_DATA) ispwmath.scm $(lib_install_dir)/packages/ispwmath
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
+
+install-arch:
+	( cd c ; $(MAKE) $@)
+.PHONY: install-arch
+

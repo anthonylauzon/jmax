@@ -41,6 +41,10 @@ clean_c:
 
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/reftype
-	for f in *.jpk *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/reftype ; done
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) reftype.jpk $(lib_install_dir)/packages/reftype ; done
+	$(INSTALL_DATA) reftype.scm $(lib_install_dir)/packages/reftype ; done
 .PHONY: install-noarch
+
+install-arch:
+	( cd c ; $(MAKE) $@)
+.PHONY: install-arch

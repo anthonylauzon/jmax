@@ -41,7 +41,12 @@ clean_c:
 
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/math
-	for f in *.jpk ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/math ; done
+	$(INSTALL_DATA) math.jpk $(lib_install_dir)/packages/math
+	$(INSTALL_DATA) math.scm $(lib_install_dir)/packages/math
 	( cd c ; $(MAKE) $@)
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
+
+install-arch:
+	( cd c ; $(MAKE) $@)
+.PHONY: install-arch

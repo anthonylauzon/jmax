@@ -42,7 +42,11 @@ clean_c:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/numeric
 	$(INSTALL_DATA) numeric.jpk $(lib_install_dir)/packages/numeric
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) numeric.scm $(lib_install_dir)/packages/numeric
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
+
+install-arch:
+	( cd c ; $(MAKE) $@)
+.PHONY: install-arch
 

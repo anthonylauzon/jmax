@@ -34,7 +34,10 @@ clean:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/guiobj
 	$(INSTALL_DATA) guiobj.jpk $(lib_install_dir)/packages/guiobj
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) guiobj.scm $(lib_install_dir)/packages/guiobj
 	( cd help; $(MAKE) $@)
 .PHONY: install-noarch
 
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch

@@ -52,8 +52,12 @@ clean_java:
 install-noarch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist
 	$(INSTALL_DATA) qlist.jpk $(lib_install_dir)/packages/qlist
-	( cd c ; $(MAKE) $@)
+	$(INSTALL_DATA) qlist.scm $(lib_install_dir)/packages/qlist
 	( cd help; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
 .PHONY: install-noarch
+
+install-arch:
+	( cd c; $(MAKE) $@)
+.PHONY: install-arch
 
