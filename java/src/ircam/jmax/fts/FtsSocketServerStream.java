@@ -66,15 +66,16 @@ class FtsSocketServerStream extends FtsStream
       {
 	if ( host.equals( "local") || host.equals( InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = "";
+	    command = ftsDir + File.separator + ftsName + " --tcp --host=127.0.0.1 --port=" + port;
 	  }
 	else
 	  {
-	    command = "rsh " + host + " ";
+	    command = ("rsh " + host + " " 
+		       + ftsDir + File.separator + ftsName
+		       + " --tcp --host=" + InetAddress.getLocalHost().getHostAddress() 
+		       + " --port=" + port);
 	  }
 
-	command += ftsDir + File.separator + ftsName;
-	command += " --tcp --host=" + InetAddress.getLocalHost().getHostAddress() + " --port=" + port;
 	command += " " + ftsOptions;
       }
     catch (UnknownHostException e)

@@ -468,11 +468,15 @@ static void client_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   if ( size < 0)
     {
-      client_error( "[client] error in reading message");
+      client_error( "[client] error in reading message, client stopped");
+      fts_log( "[client]: error in reading message, client stopped\n");
+      fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
   else if (size == 0)
     {
+      client_error( "[client] client stopped");
+      fts_log( "[client]: client stopped\n");
       fts_object_delete_from_patcher( (fts_object_t *)this);
       return;
     }
@@ -665,7 +669,7 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   fts_sched_remove( (fts_object_t *)this);
   CLOSESOCKET( this->socket);
 
-  fts_log( "client: released client connection on socket %d\n", this->socket);
+  fts_log( "[client]: released client connection on socket %d\n", this->socket);
 }
 
 static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
