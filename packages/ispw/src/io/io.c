@@ -27,13 +27,13 @@
 
 #include <fts/fts.h>
 
-extern void dac_config(void);
-extern void adc_config(void);
+extern void dac_tilda_config(void);
+extern void adc_tilda_config(void);
 
 static void ispw_io_module_init(void)
 {
   dac_tilda_config();
-  adc_config();
+  adc_tilda_config();
 }
 
 fts_module_t ispw_io_module = {"io", "ISPW signal i/o classes", ispw_io_module_init, 0, 0};

@@ -476,7 +476,10 @@ static int xrun( snd_pcm_t *handle)
 /*  	ERROR( "snd_pcm_delay", err); */
 
 /*        post( "xrun of %d frames\n", delay); */
+
+#if 0
       post( "xrun\n");
+#endif
     }
 
   if (( err = snd_pcm_prepare( handle)) < 0)

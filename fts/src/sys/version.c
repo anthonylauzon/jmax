@@ -25,6 +25,6 @@
  */
 
 
-#include "version.h"
+#include <fts/sys/version.h>
 
 static char version[] = FTS_VERSION_STRING;

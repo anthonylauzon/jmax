@@ -20,8 +20,12 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell, Riccardo Borghesi.
  *
+ */
+
+/*
+ * This file's author: François Déchelle
  */
 
 #include <stdlib.h>
