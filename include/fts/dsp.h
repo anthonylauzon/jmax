@@ -87,6 +87,53 @@
  * }
  * @endcode
  *
+ * Note that this is not garanted that an input buffer doesn't have the same memory area than an output buffer.
+ *
+ * Bad code 
+ * @code
+ * static void 
+ * my_dsp_object_dsp_function(fts_word_t* argv)
+ * { 
+ *     my_dsp_params_t* params = (my_dsp_params_t*)fts_word_get_pointer(argv + 0); 
+ *     float* in0 = (float*)fts_word_get_pointer(argv + 1); 
+ *     float* in1 = (float*)fts_word_get_pointer(argv + 2); 
+ *     float* in0 = (float*)fts_word_get_pointer(argv + 3); 
+ *     float* in1 = (float*)fts_word_get_pointer(argv + 4); 
+ *     int n_tick = fts_word_get_int(argv + 5); 
+ *     int i; 
+ *
+ *     for (i = 0; i < n_tick; ++i) 
+ *     { 
+ * 	out0[i] = in1[i]; 
+ * 	out1[i] = in0[i]; 
+ *     } 
+ * } 
+ * @endcode
+ *
+ * Correct code
+ * 
+ * @code 
+ * static void 
+ * my_dsp_object_dsp_function(fts_word_t* argv)
+ * { 
+ *     my_dsp_params_t* params = (my_dsp_params_t*)fts_word_get_pointer(argv + 0); 
+ *     float* in0 = (float*)fts_word_get_pointer(argv + 1); 
+ *     float* in1 = (float*)fts_word_get_pointer(argv + 2); 
+ *     float* in0 = (float*)fts_word_get_pointer(argv + 3); 
+ *     float* in1 = (float*)fts_word_get_pointer(argv + 4); 
+ *     int n_tick = fts_word_get_int(argv + 5); 
+ *     int i; 
+ *     float tmp; 
+ *
+ *     for (i = 0; i < n_tick; ++i) 
+ *     { 
+ * 	tmp = in0[i]; 
+ * 	out0[i] = in1[i]; 
+ * 	out1[i] = tmp; 
+ *     } 
+ * } 
+ *@encode
+ *
  * @defgroup dsp DSP subsystem
  */
 
@@ -319,6 +366,7 @@ FTS_API fts_class_t *fts_dsp_signal_class;
  *
  * Returns a symbol associated to the specified input. Using this symbol inputs and outputs can be
  * compared and given as arguments fts_dsp_add_function().
+ *
  *
  * @fn int fts_dsp_get_input_name(fts_dsp_descr_t *descriptor, int number)
  * @param descriptor the DSP descriptor (argument of the put method)
