@@ -50,7 +50,7 @@ typedef struct
 } jackaudioport_t;
 
 
-fts_class_t* jackaudioport_type;
+extern fts_class_t* jackaudioport_type;
 
 jack_client_t* jackaudiomanager_get_jack_client(void);
 fts_object_t* jackaudiomanager_get_manager_object(void);

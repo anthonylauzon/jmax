@@ -36,6 +36,8 @@
 
 static int nframes = 0;
 
+fts_class_t* jackaudioport_type;
+
 
 static void 
 jackaudioport_input_fun( fts_audioport_t* port, float** buffers, int buffsize)
