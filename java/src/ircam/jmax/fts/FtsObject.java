@@ -425,7 +425,7 @@ public class FtsObject
 
   /** Set the Width property. Tell it to the server, too. */
 
-  public final void setWidth(int w)
+    public /*final*/ void setWidth(int w)
   {
     if (this.width != w)
       {

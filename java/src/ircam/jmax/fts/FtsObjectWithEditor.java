@@ -35,7 +35,7 @@ import javax.swing.*;
  * An fts remote data that offers a built-in undo support.
  * 
  */
-public class FtsObjectWithEditor extends FtsObject {
+public class FtsObjectWithEditor extends FtsUndoableObject {
   
   public FtsObjectWithEditor(Fts fts, FtsObject parent, String variableName, String className, String description)
   {
@@ -54,3 +54,4 @@ public class FtsObjectWithEditor extends FtsObject {
 
   private Frame editorFrame = null;
 }
+

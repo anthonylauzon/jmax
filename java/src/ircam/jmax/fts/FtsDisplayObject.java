@@ -47,6 +47,15 @@ public class FtsDisplayObject extends FtsObject
     noutlets = 0;
   }
 
+  public final void setWidth(int w)
+  {
+    if (this.width != w)
+      {
+	fts.getServer().putObjectProperty(this, "w", w);
+	this.width = w;
+      }
+  }
+
   static private DecimalFormat formatter;
 
   static
@@ -67,3 +76,8 @@ public class FtsDisplayObject extends FtsObject
       ((FtsMessageListener) listener).messageChanged(args[0].stringValue);
   }
 }
+
+
+
+
+
