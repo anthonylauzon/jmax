@@ -273,7 +273,7 @@ static BOOL
 dsaudioport_scan_input_device(LPGUID lpGuid, LPCSTR lpcstrDescription, LPCSTR lpcstrModule, LPVOID lpContext)
 {
   fts_object_t* device;
-  int ac;
+  int ac = 3;
   fts_atom_t at[3];
   fts_symbol_t device_name;
 
@@ -301,7 +301,7 @@ static BOOL
 dsaudioport_scan_output_device(LPGUID lpGuid, LPCSTR lpcstrDescription, LPCSTR lpcstrModule, LPVOID lpContext)
 {
   fts_object_t* device;
-  int ac;
+  int ac = 3;
   fts_atom_t at[3];
   fts_symbol_t device_name;
 
@@ -370,9 +370,37 @@ static void
 dsaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   dsaudioport_t* dev = (dsaudioport_t*)o;
-  
+  short* buf1;
+  short* buf2;
+  DWORD bytes1;
+  DWORD bytes2;
+  int boffset, soffset;
+  int i;
+
+  /* Calculate the byte and sample offset in the fifo buffer */
+  if (dev->cur_buffer == 0) 
+  {
+    boffset = (dev->num_buffers - 1) * dev->buffer_byte_size;    
+    soffset = (dev->num_buffers - 1) * dev->buffer_sample_size;
+  } 
+  else 
+  {
+    boffset = (dev->cur_buffer - 1) * dev->buffer_byte_size;    
+    soffset = (dev->cur_buffer - 1) * dev->buffer_sample_size;    
+  }
+
+  /* Lock buffer */
+  IDirectSoundBuffer_Lock(dev->dsBuffer, boffset, dev->buffer_byte_size, (void*) &buf1, &bytes1, (void*) &buf2, &bytes2, 0);
+  for (i = 0; i < dev->buffer_byte_size; ++i)
+    {
+      buf1[i] = 0;
+    }
+  /* Unlock */
+  IDirectSoundBuffer_Unlock(dev->dsBuffer, buf1, bytes1, buf2, bytes2);
   /* do something when you want to close output */
   IDirectSoundBuffer_Stop(dev->dsBuffer);
+
+
   fts_audioport_unset_open((fts_audioport_t*)o, FTS_AUDIO_OUTPUT);
 }
 
