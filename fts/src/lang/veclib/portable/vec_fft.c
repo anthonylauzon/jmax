@@ -2,22 +2,50 @@
 
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/utils.h"
 
 #include "lang/veclib/include/vec_fft.h"
 #include "lang/veclib/complex.h"
 #include "lang/veclib/portable/rfft_shuffle.h"
 #include "lang/veclib/portable/cfft.h"
 
-#define CHECK_LOOKUPS(p, n) ((p)? ((p)->nperiod / (n)): (0))
+/**************************************************************************************
+ *
+ *    stucture and root pointer for fft lookups
+ */
+ 
+typedef struct{
+  float *cos;
+  float *sin;
+  int *bitrev;
+} fft_lookup_t;
+ 
+static fft_lookup_t the_fft_lookups[FTS_FFT_MAX_SIZE_LOG2] =
+{
+  {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},
+  {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}
+};
+
+/* ultility */
+static int
+ilog2(int size)
+{
+  int log_size, i;
+
+  for(log_size=-1, i=size; i; i>>=1, log_size++)
+    ;
+
+  return log_size;
+}
 
 /**************************************************************************************
  *
  *    fts_is_fft_size()
  */
  
-int fts_is_fft_size(long n)
+int fts_is_fft_size(int n)
 {
-  if(n < FTS_MIN_FFT_SIZE || n > FTS_MAX_FFT_SIZE) return(0);
+  if(n < FTS_FFT_MIN_SIZE || n > FTS_FFT_MAX_SIZE) return(0);
 
   /* power of 2? */
   while((n >>= 1) && !(n & 1))
@@ -32,50 +60,23 @@ int fts_is_fft_size(long n)
  *
  */
  
-fts_status_t fts_fft_declaresize(long n_points)
+int 
+fts_fft_declaresize(int size)
 {
-  complex *coef, *icoef;
-  long *bitrev;
-    
-  if(!fts_is_fft_size(n_points)) return &fts_vec_NoFftSize;
-  
-  if(!the_fft_lookups){
-    the_fft_lookups = (fft_lookup_t *)fts_malloc(sizeof(fft_lookup_t));
-  }else if(the_fft_lookups->nperiod >= n_points){
-    return(fts_Success);
-  }else{
-    fts_free((void *)the_fft_lookups->fftcoef);
-    fts_free((void *)the_fft_lookups->ifftcoef);
-    fts_free((void *)the_fft_lookups->bitrev);
-  }
-  
-  /* allocate space for lookup tables */
-  if(!(coef = (complex *)fts_malloc(n_points * sizeof(complex)))){
-    fts_free((void *)the_fft_lookups);
-    the_fft_lookups = (fft_lookup_t *)0;
-    return &fts_vec_NoLookups;
-  }else if(!(icoef = (complex *)fts_malloc(n_points * sizeof(complex)))){
-    fts_free((void *)the_fft_lookups);
-    the_fft_lookups = (fft_lookup_t *)0;
-    fts_free((void *)coef);
-    return &fts_vec_NoLookups;
-  }else if(!(bitrev = (long *)fts_malloc(n_points * sizeof(long)))){
-    fts_free((void *)the_fft_lookups);
-    the_fft_lookups = (fft_lookup_t *)0;
-    fts_free((void *)coef);
-    fts_free((void *)icoef);
-    return &fts_vec_NoLookups;
-  }
-  
-  generate_fft_coefficients(coef, icoef, n_points);
-  generate_bitreversed_indices(bitrev, n_points);
+  int log_size = ilog2(size);
 
-  the_fft_lookups->fftcoef = coef;
-  the_fft_lookups->ifftcoef = icoef;
-  the_fft_lookups->bitrev = bitrev;
-  the_fft_lookups->nperiod = n_points;
-    
-  return(fts_Success);
+  /* power of 2? */
+  if(1 << log_size != size)
+    return 0;
+  
+  if(!the_fft_lookups[log_size].cos)
+    {
+      the_fft_lookups[log_size].cos = fts_fftab_get_cosine(size);
+      the_fft_lookups[log_size].sin = fts_fftab_get_sine(size);
+      the_fft_lookups[log_size].bitrev = cfft_make_bitreversed_table(size);
+    }
+
+  return 1;
 }
 
 /**************************************************************************************\
@@ -83,54 +84,46 @@ fts_status_t fts_fft_declaresize(long n_points)
  *    the complex fft and ifft
  */
 
-fts_status_t fts_cfft_inplc(complex *buf, long n_points)
+void
+fts_cfft_inplc(complex *buf, int size)
 {
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_points);
-  if(!n_over) return &fts_vec_NoLookups;
-    
-  bitreversal_inplc(buf, the_fft_lookups->bitrev, n_over, n_points);
-  cfft_inplc(buf, the_fft_lookups->fftcoef, n_over, n_points);
-  
-  return(fts_Success);
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+
+  cfft_bitreversal_inplc(buf, lookups->bitrev, size);
+  cfft_inplc(buf, lookups->cos, lookups->sin, size);
 }
 
-fts_status_t fts_cfft(complex *in, complex *out, long n_points)
+void
+fts_cfft(complex *in, complex *out, int size)
 {
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_points);
-  if(!n_over) return &fts_vec_NoLookups;
-    
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+
   if(in == out)
-    bitreversal_inplc(out, the_fft_lookups->bitrev, n_over, n_points);
+    cfft_bitreversal_inplc(out, lookups->bitrev, size);
   else
-    bitreversal_outplc(in, out, the_fft_lookups->bitrev, n_over, n_points);
-  cfft_inplc(out, the_fft_lookups->fftcoef, n_over, n_points);
-  
-  return(fts_Success);
+    cfft_bitreversal_outplc(in, out, lookups->bitrev, size);
+  cfft_inplc(out, lookups->cos, lookups->sin, size);
 }
 
-fts_status_t fts_cifft_inplc(complex *buf, long n_points)
+void
+fts_cifft_inplc(complex *buf, int size)
 {
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_points);
-  if(!n_over) return &fts_vec_NoLookups;
-    
-  bitreversal_inplc(buf, the_fft_lookups->bitrev, n_over, n_points);
-  cfft_inplc(buf, the_fft_lookups->ifftcoef, n_over, n_points);
-  
-  return(fts_Success);
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+
+  cfft_bitreversal_inplc(buf, lookups->bitrev, size);
+  cifft_inplc(buf, lookups->cos, lookups->sin, size);
 }
 
-fts_status_t fts_cifft(complex *in, complex *out, long n_points)
+void
+fts_cifft(complex *in, complex *out, int size)
 {
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_points);
-  if(!n_over) return &fts_vec_NoLookups;
-    
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+
   if(in == out)
-    bitreversal_inplc(out, the_fft_lookups->bitrev, n_over, n_points);
+    cfft_bitreversal_inplc(out, lookups->bitrev, size);
   else
-    bitreversal_outplc(in, out, the_fft_lookups->bitrev, n_over, n_points);
-  cfft_inplc(out, the_fft_lookups->ifftcoef, n_over, n_points);
-  
-  return(fts_Success);
+    cfft_bitreversal_outplc(in, out, lookups->bitrev, size);
+  cifft_inplc(out, lookups->cos, lookups->sin, size);
 }
 
 /**************************************************************************************\
@@ -138,60 +131,52 @@ fts_status_t fts_cifft(complex *in, complex *out, long n_points)
  *    the "real" fft
  */
 
-fts_status_t fts_rfft_inplc(float *buf, long n_points)
+void
+fts_rfft_inplc(float *buf, int size)
 {
-  long n_cplx = n_points >> 1;
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_cplx);
-  if(n_over < 2) return &fts_vec_NoLookups;
-    
-  bitreversal_inplc((complex *)buf, the_fft_lookups->bitrev, n_over, n_cplx);
-  cfft_inplc((complex *)buf, the_fft_lookups->fftcoef, n_over, n_cplx);
-  shuffle_after_rfft_inplc((complex *)buf, the_fft_lookups->fftcoef, n_over, n_cplx);
-  
-  return(fts_Success);
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+  int complex_size = size >> 1;
+
+  cfft_bitreversal_over_inplc((complex *)buf, lookups->bitrev, 2, complex_size);
+  cfft_inplc_over_coef((complex *)buf, lookups->cos, lookups->sin, 2, complex_size);
+  rfft_shuffle_after_fft_inplc((complex *)buf, lookups->cos, lookups->sin, complex_size);
 }
 
-fts_status_t fts_rfft(float *in, complex *out, long n_points)
+void
+fts_rfft(float *in, complex *out, int size)
 {
-  long n_cplx = n_points >> 1;
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_cplx);
-  if(n_over < 2) return &fts_vec_NoLookups;
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+  int complex_size = size >> 1;
     
   if(in == (float *)out)
-    bitreversal_inplc(out, the_fft_lookups->bitrev, n_over, n_cplx);
+    cfft_bitreversal_over_inplc(out, lookups->bitrev, 2, complex_size);
   else
-    bitreversal_outplc((complex *)in, out, the_fft_lookups->bitrev, n_over, n_cplx);
-  cfft_inplc(out, the_fft_lookups->fftcoef, n_over, n_cplx);
-  shuffle_after_rfft_inplc(out, the_fft_lookups->fftcoef, n_over, n_cplx);
-  
-  return(fts_Success);
+    cfft_bitreversal_over_outplc((complex *)in, out, lookups->bitrev, 2, complex_size);
+  cfft_inplc_over_coef(out, lookups->cos, lookups->sin, 2, complex_size);
+  rfft_shuffle_after_fft_inplc(out, lookups->cos, lookups->sin, complex_size);
 }
 
-fts_status_t fts_rifft_inplc(float *buf, long n_points)
+void
+fts_rifft_inplc(float *buf, int size)
 {
-  long n_cplx = n_points >> 1;
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_cplx);
-  if(n_over < 2) return &fts_vec_NoLookups;
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+  int complex_size = size >> 1;
     
-  shuffle_before_rifft_inplc((complex *)buf, the_fft_lookups->ifftcoef, n_over, n_cplx);
-  bitreversal_inplc((complex *)buf, the_fft_lookups->bitrev, n_over, n_cplx);
-  cfft_inplc((complex *)buf, the_fft_lookups->ifftcoef, n_over, n_cplx);
-  
-  return(fts_Success);
+  rfft_shuffle_before_ifft_inplc((complex *)buf, lookups->cos, lookups->sin, complex_size);
+  cfft_bitreversal_over_inplc((complex *)buf, lookups->bitrev, 2, complex_size);
+  cifft_inplc_over_coef((complex *)buf, lookups->cos, lookups->sin, 2, complex_size);
 }
 
-fts_status_t fts_rifft(complex *in, float *out, long n_points)
+void
+fts_rifft(complex *in, float *out, int size)
 {
-  long n_cplx = n_points >> 1;
-  long n_over = CHECK_LOOKUPS(the_fft_lookups, n_cplx);
-  if(n_over < 2) return &fts_vec_NoLookups;
+  fft_lookup_t *lookups = &(the_fft_lookups[ilog2(size)]);
+  int complex_size = size >> 1;
     
   if(in == (complex *)out)
-    shuffle_before_rifft_inplc((complex *)out, the_fft_lookups->ifftcoef, n_over, n_cplx);
+    rfft_shuffle_before_ifft_inplc((complex *)out, lookups->cos, lookups->sin, complex_size);
   else
-    shuffle_before_rifft_outplc(in, (complex *)out, the_fft_lookups->ifftcoef, n_over, n_cplx);
-  bitreversal_inplc((complex *)out, the_fft_lookups->bitrev, n_over, n_cplx);
-  cfft_inplc((complex *)out, the_fft_lookups->ifftcoef, n_over, n_cplx);
-  
-  return(fts_Success);
+    rfft_shuffle_before_ifft_outplc(in, (complex *)out, lookups->cos, lookups->sin, complex_size);
+  cfft_bitreversal_over_inplc((complex *)out, lookups->bitrev, 2, complex_size);
+  cifft_inplc_over_coef((complex *)out, lookups->cos, lookups->sin, 2, complex_size);
 }

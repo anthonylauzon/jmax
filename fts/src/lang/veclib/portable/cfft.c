@@ -3,47 +3,139 @@
 #include "lang/veclib/complex.h"
 #include "lang/veclib/portable/cfft.h"
 
-fft_lookup_t *the_fft_lookups = (fft_lookup_t *)0;
-
 /***************************************************************************
  *
  *    fft computation on bit reversed shuffled data
- *    (based on the UDI routine by P.Depalle)
  *      for fft: coef = exp(j*2*PI*n/N), n = 0..N-1 
  *      for ifft: coef = exp(-j*2*PI*n/N), n = 0..N-1
  *         see routine: generate_fft_coefficients()
  *
  */
-void cfft_inplc(complex * restrict buf, complex * restrict coef, long nstep, long npoints)
+
+void 
+cfft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, int size)
 {
-  long log2;
-  long m, n;
-  long i, j, k, halfup, up, down;
+  int m, n;
+  int i, j, k, up, down;
   
-  /* log2 = log2(npoints) */ 
-  for(log2=-1, n=npoints; n; n>>=1, log2++)
-    ; 
+  for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
+    {
+      for(j=0, k=0; j<up; j++, k+=down)
+	{
+	  float Wre = coef_re[k];
+	  float Wim = coef_im[k];
+	  int incr = 2 * up;
+	  
+	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
+	    {
+	      float Are = buf[m].re;
+	      float Aim = buf[m].im;
+	      float Bre = buf[n].re;
+	      float Bim = buf[n].im;
+	      float Cre = Bim * Wim + Bre * Wre;
+	      float Cim = Bim * Wre - Bre * Wim;
+	      buf[m].re = Are + Cre;
+	      buf[m].im = Aim + Cim;
+	      buf[n].re = Are - Cre;
+	      buf[n].im = Aim - Cim;
+	    }
+	}
+    }  
+}
 
-  for(i=1, halfup=1, up=2, down=npoints>>1; i<=log2; i++, halfup<<=1, up<<=1, down>>=1){
+void 
+cifft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, int size)
+{
+  int m, n;
+  int i, j, k, up, down;
+  
+  for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
+    {
+      for(j=0, k=0; j<up; j++, k+=down)
+	{
+	  float Wre = coef_re[k];
+	  float Wim = coef_im[k];
+	  int incr = 2 * up;
+	  
+	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
+	    {
+	      float Are = buf[m].re;
+	      float Aim = buf[m].im;
+	      float Bre = buf[n].re;
+	      float Bim = buf[n].im;
+	      float Cre = Bre * Wre - Bim * Wim;
+	      float Cim = Bre * Wim + Bim * Wre;
+	      buf[m].re = Are + Cre;
+	      buf[m].im = Aim + Cim;
+	      buf[n].re = Are - Cre;
+	      buf[n].im = Aim - Cim;
+	    }
+	}
+    }  
+}
 
-    for(j=0, k=0; j<halfup; j++, k+=(down*nstep)){
-      float Wre = coef[k].re;
-      float Wim = coef[k].im;
-      
-      for(m=j, n=j+halfup; m<npoints; m+=up, n+=up){
-        float Are = buf[m].re;
-        float Aim = buf[m].im;
-        float Bre = buf[n].re;
-        float Bim = buf[n].im;
-        float Cre = Bre * Wre - Bim * Wim;
-        float Cim = Bre * Wim + Bim * Wre;
-        buf[m].re = Are + Cre;
-        buf[m].im = Aim + Cim;
-        buf[n].re = Are - Cre;
-        buf[n].im = Aim - Cim;
-      }
-    }
-  }  
+/* (I)FFT with over-sampled coefficient tables */
+
+void 
+cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size)
+{
+  int m, n;
+  int i, j, k, up, down;
+
+  for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
+    {
+      for(j=0, k=0; j<up; j++, k+=(down * over))
+	{
+	  float Wre = coef_re[k];
+	  float Wim = coef_im[k];
+	  int incr = 2 * up;
+	  
+	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
+	    {
+	      float Are = buf[m].re;
+	      float Aim = buf[m].im;
+	      float Bre = buf[n].re;
+	      float Bim = buf[n].im;
+	      float Cre = Bim * Wim + Bre * Wre;
+	      float Cim = Bim * Wre - Bre * Wim;
+	      buf[m].re = Are + Cre;
+	      buf[m].im = Aim + Cim;
+	      buf[n].re = Are - Cre;
+	      buf[n].im = Aim - Cim;
+	    }
+	}
+    }  
+}
+
+void 
+cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size)
+{
+  int m, n;
+  int i, j, k, up, down;
+
+  for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
+    {
+      for(j=0, k=0; j<up; j++, k+=(down * over))
+	{
+	  float Wre = coef_re[k];
+	  float Wim = coef_im[k];
+	  int incr = 2 * up;
+	  
+	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
+	    {
+	      float Are = buf[m].re;
+	      float Aim = buf[m].im;
+	      float Bre = buf[n].re;
+	      float Bim = buf[n].im;
+	      float Cre = Bre * Wre - Bim * Wim;
+	      float Cim = Bre * Wim + Bim * Wre;
+	      buf[m].re = Are + Cre;
+	      buf[m].im = Aim + Cim;
+	      buf[n].re = Are - Cre;
+	      buf[n].im = Aim - Cim;
+	    }
+	}
+    }  
 }
 
 /***************************************************************************
@@ -51,19 +143,16 @@ void cfft_inplc(complex * restrict buf, complex * restrict coef, long nstep, lon
  *    bitreversal buffer 
  *
  */
-void bitreversal_inplc(complex * restrict buf, long * restrict bitrev, long nstep, long npoints)
+
+void 
+cfft_bitreversal_inplc(complex * restrict buf, int * restrict bitrev, int size)
 {
-  long idx;
+  int idx;
   complex z;
-  long nshift;
 
-  /* nshift = log2(nstep) */
-  for(nshift=-1; nstep; nstep>>=1, nshift++)
-    ;
-
-  for(idx=0; idx<npoints; idx++)
+  for(idx=0; idx<size; idx++)
     {
-      int xdi = bitrev[idx] >> nshift;
+      int xdi = bitrev[idx];
       if(xdi > idx)
 	{
 	  z = buf[idx];    
@@ -73,38 +162,48 @@ void bitreversal_inplc(complex * restrict buf, long * restrict bitrev, long nste
     }
 }
 
-void bitreversal_outplc(complex * restrict in, complex * restrict out, long * restrict bitrev, long nstep, long npoints)
+void 
+cfft_bitreversal_outplc(complex * restrict in, complex * restrict out, int * restrict bitrev, int size)
 {
-  long idx;
-  long nshift;
+  int idx;
 
-  /* nshift = log2(nstep) */
-  for(nshift=-1; nstep; nstep>>=1, nshift++)
-    ;
-
-  for(idx=0; idx<npoints; idx++)
+  for(idx=0; idx<size; idx++)
     {
-      idx = bitrev[idx]>>nshift;
-      out[idx] = in[idx];
+      int xdi = bitrev[idx];
+      out[xdi] = in[idx];
     }
 }
 
-/***************************************************************************
- *
- *    compute weights for the fft
- *
- */
-void generate_fft_coefficients(complex * restrict coef, complex * restrict icoef, long npoints)
+/* bitreversal with oversampled index table */
+
+void 
+cfft_bitreversal_over_inplc(complex * restrict buf, int * restrict bitrev, int over, int size)
 {
-  long i;
-  double phase = 0;
-  double phsinc = 6.283185307 / npoints;
-  
-  for(i=0; i<npoints; i++){
-    coef[i].re = icoef[i].re = cos(phase);
-    coef[i].im = -(icoef[i].im = sin(phase));
-    phase += phsinc;
-  }
+  int idx;
+  complex z;
+
+  for(idx=0; idx<size; idx++)
+    {
+      int xdi = bitrev[over * idx];
+      if(xdi > idx)
+	{
+	  z = buf[idx];    
+	  buf[idx] = buf[xdi];
+	  buf[xdi] = z;    
+	}
+    }
+}
+
+void 
+cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, int * restrict bitrev, int over, int size)
+{
+  int idx;
+
+  for(idx=0; idx<size; idx++)
+    {
+      int xdi = bitrev[over * idx];
+      out[xdi] = in[idx];
+    }
 }
 
 /***************************************************************************
@@ -112,24 +211,30 @@ void generate_fft_coefficients(complex * restrict coef, complex * restrict icoef
  *    compute table of bitreversed indices
  *
  */
-void generate_bitreversed_indices(long * restrict bitrev, long npoints)
-{
-  long idx, xdi;
-  long i, j;
-  long log2;
 
-  /* log2 = log2(npoints) */
-  for(log2=-1, i=npoints; i; i>>=1, log2++)
+int *
+cfft_make_bitreversed_table(int size)
+{
+  int log_size;
+  int *bitrev;
+  int idx, xdi;
+  int i, j;
+
+  bitrev = (int *)fts_malloc(size * sizeof(int));
+
+  for(log_size=-1, i=size; i; i>>=1, log_size++)
     ;
 
-  for(i=0; i<npoints; i++){
+  for(i=0; i<size; i++){
     idx = i;
     xdi = 0;
-    for(j=1; j<log2; j++){
+    for(j=1; j<log_size; j++){
       xdi += (idx & 1);
       xdi <<= 1;
       idx >>= 1;
     }
     bitrev[i] = xdi + (idx & 1);
   }
+
+  return bitrev;
 }
