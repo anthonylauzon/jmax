@@ -87,6 +87,7 @@ decrypt_options ()
     VERBOSE=
     NOFORK=
     NOJAR=
+    ROOTDIR=
 
     for arg in $@
     do
@@ -104,6 +105,9 @@ decrypt_options ()
 		NOFORK="yes" ;;
 	    \-nojar)
 		NOJAR="yes" ;;
+	    \-jmaxRoot)
+		opt=$arg ;
+		JMAXOPT="${JMAXOPT} $arg" ;;
 	    *)
 		JMAXOPT="${JMAXOPT} $arg" ;;
 	    esac
@@ -111,6 +115,9 @@ decrypt_options ()
 	    case $opt in
 	    \-javaopt)
 		JAVAOPT="${JAVAOPT} $arg" ;;
+	    \-jmaxRoot)
+		ROOTDIR=$arg ;
+		JMAXOPT="${JMAXOPT} $arg" ;;
 	    esac
 	    opt="none";
 	fi
@@ -156,7 +163,12 @@ start_it ()
 decrypt_options $@
 
 DIR=`dirname $0`
-ROOTDIR=`(cd ${DIR}/.. ; pwd)`
+if [ $ROOTDIR ]
+then
+    :
+else
+    ROOTDIR=`(cd ${DIR}/.. ; pwd)`
+fi
 
 if [ $NOJAR ]
 then
