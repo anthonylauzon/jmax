@@ -253,7 +253,7 @@ scoobtrack_read_time_signature(fts_midifile_t *file, int numerator, int denomina
   else
     scomark_set_type(scomark, seqsym_bar);
   
-  scomark_bar_set_meter_from_quotient(scomark, numerator, denominator);
+  scomark_bar_set_meter_quotient(scomark, numerator, denominator);
   
   data->last_marker = scomark;
   data->last_marker_time = time;

@@ -476,8 +476,8 @@ scomark_set_tempo(scomark_t *self, double tempo)
   propobj_set_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);
 }
 
-double
-scomark_get_tempo(scomark_t *self)
+void
+scomark_get_tempo(scomark_t *self, double *tempo)
 {
   fts_atom_t a;
   
@@ -485,9 +485,7 @@ scomark_get_tempo(scomark_t *self)
   propobj_get_property_by_index((propobj_t *)self, scomark_propidx_tempo, &a);
   
   if(fts_is_float(&a))
-    return fts_get_float(&a);
-  else
-    return -1.0;
+    *tempo = fts_get_float(&a);
 }
 
 void
@@ -502,8 +500,8 @@ scomark_set_cue(scomark_t *self, int cue)
   propobj_set_property_by_index((propobj_t *)self, scomark_propidx_cue, &a);
 }
 
-int
-scomark_get_cue(scomark_t *self)
+void
+scomark_get_cue(scomark_t *self, int *cue)
 {
   fts_atom_t a;
   
@@ -511,9 +509,7 @@ scomark_get_cue(scomark_t *self)
   propobj_get_property_by_index((propobj_t *)self, scomark_propidx_cue, &a);
   
   if(fts_is_int(&a))
-    return fts_get_int(&a);
-  else
-    return -1;
+    *cue = fts_get_int(&a);
 }
 
 void
@@ -525,8 +521,8 @@ scomark_set_label(scomark_t *self, fts_symbol_t label)
   propobj_set_property_by_index((propobj_t *)self, scomark_propidx_label, &a);
 }
 
-fts_symbol_t
-scomark_get_label(scomark_t *self)
+void
+scomark_get_label(scomark_t *self, fts_symbol_t *label)
 {
   fts_atom_t a;
   
@@ -534,78 +530,99 @@ scomark_get_label(scomark_t *self)
   propobj_get_property_by_index((propobj_t *)self, scomark_propidx_label, &a);
   
   if(fts_is_symbol(&a))
-    return fts_get_symbol(&a);
-  else
-    return NULL;
+    *label = fts_get_symbol(&a);
 }
 
 void
 scomark_bar_set_number(scomark_t *self, int num)
 {
-  fts_atom_t a;
-  
-  if(num < 0)
-    num = 0;
-  
-  fts_set_int(&a, num);
-  propobj_set_property_by_index((propobj_t *)self, scomark_propidx_bar_num, &a);
+  if(scomark_is_bar(self))
+  {
+    fts_atom_t a;
+    
+    if(num < 0)
+      num = 0;
+    
+    fts_set_int(&a, num);
+    propobj_set_property_by_index((propobj_t *)self, scomark_propidx_bar_num, &a);
+  }
 }
 
-int
-scomark_bar_get_number(scomark_t *self)
+void
+scomark_bar_get_number(scomark_t *self, int *num)
 {
-  fts_atom_t a;
-  
-  fts_set_void(&a);
-  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_bar_num, &a);
-  
-  if(fts_is_int(&a))
-    return fts_get_int(&a);
-  else
-    return -1;
+  if(scomark_is_bar(self))
+  {
+    fts_atom_t a;
+    
+    fts_set_void(&a);
+    propobj_get_property_by_index((propobj_t *)self, scomark_propidx_bar_num, &a);
+    
+    if(fts_is_int(&a))
+      *num = fts_get_int(&a);
+  }
 }
 
 void 
 scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym)
 {
-  fts_atom_t a;
-  
-  fts_set_symbol(&a, meter_sym);
-  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_meter, &a);    
+  if(scomark_is_bar(self))
+  {
+    int num = 0;
+    int den = 0;
+    fts_atom_t a;
+    
+    scomark_meter_symbol_get_quotient(meter_sym, &num, &den);
+    
+    if(num > 0 && den > 0)
+    {
+      fts_set_symbol(&a, meter_sym);
+      propobj_set_property_by_index((propobj_t *)self, scomark_propidx_meter, &a);    
+    }
+  }
+}
+
+void
+scomark_bar_get_meter(scomark_t *self, fts_symbol_t *meter)
+{
+  if(scomark_is_bar(self))
+  {
+    fts_atom_t a;
+    
+    fts_set_void(&a);
+    propobj_get_property_by_index((propobj_t *)self, scomark_propidx_meter, &a);
+    
+    if(fts_is_symbol(&a))
+      *meter = fts_get_symbol(&a);
+  }
 }
 
 void 
-scomark_bar_set_meter_from_quotient(scomark_t *self, int meter_num, int meter_den)
+scomark_bar_set_meter_quotient(scomark_t *self, int meter_num, int meter_den)
 {
-  fts_symbol_t meter = scomark_meter_quotient_get_symbol(meter_num, meter_den);
-  
-  if(meter != NULL)
-    scomark_bar_set_meter(self, meter);
-}
-
-fts_symbol_t
-scomark_bar_get_meter(scomark_t *self)
-{
-  fts_atom_t a;
-  
-  fts_set_void(&a);
-  propobj_get_property_by_index((propobj_t *)self, scomark_propidx_meter, &a);
-  
-  if(fts_is_symbol(&a))
-    return fts_get_symbol(&a);
-  else
-    return NULL;
+  if(scomark_is_bar(self))
+  {
+    fts_symbol_t meter = scomark_meter_quotient_get_symbol(meter_num, meter_den);
+    
+    if(meter != NULL)
+      scomark_bar_set_meter(self, meter);
+  }
 }
 
 void 
 scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den)
 {
-  fts_symbol_t meter = scomark_bar_get_meter(self);
-  
-  if(meter != NULL)
-    scomark_meter_symbol_get_quotient(meter, meter_num, meter_den);
-  else
-    *meter_num = *meter_den = 0;
+  if(scomark_is_bar(self))
+  {
+    fts_symbol_t meter = NULL;
+    
+    scomark_bar_get_meter(self, &meter);
+    
+    if(meter != NULL)
+      scomark_meter_symbol_get_quotient(meter, meter_num, meter_den);
+    else
+      *meter_num = *meter_den = 0;
+  }
 }
 
 static void

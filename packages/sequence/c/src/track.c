@@ -1438,11 +1438,14 @@ track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       scomark = (scomark_t *)fts_get_object(event_get_value(marker_event));
       time = event_get_time(marker_event);
-      meter = scomark_bar_get_meter(scomark);
+      
+      scomark_bar_get_meter(scomark, &meter);
+      scomark_get_tempo(scomark, &tempo);
       
       if(scomark_is_bar(scomark) && meter != NULL)
       {
         scomark_meter_symbol_get_quotient(meter, &numerator, &denominator);
+        scomark_get_tempo(scomark, &tempo);
         
         /* free tempo not handled yet!!! */
         if(tempo > 0.0)
@@ -1463,12 +1466,14 @@ track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       scomark = (scomark_t *)fts_get_object(event_get_value(marker_event));
       time = event_get_time(marker_event);
       
-      if(scomark_get_tempo(scomark) > 0.0)
-        tempo = scomark_get_tempo(scomark);
+      scomark_get_tempo(scomark, &tempo);
       
       if(scomark_is_bar(scomark))
       {
-        fts_symbol_t meter = scomark_bar_get_meter(scomark);
+        fts_symbol_t meter = NULL;
+        
+        scomark_bar_get_meter(scomark, &meter);
+        scomark_get_tempo(scomark, &tempo);
         
         if(meter != NULL)
           scomark_meter_symbol_get_quotient(meter, &numerator, &denominator);
@@ -1784,7 +1789,7 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   /* dump marker track */
   if(markers != NULL)
-    track_dump_state(0, 0, NULL, ac, at);
+    track_dump_state((fts_object_t *)markers, 0, NULL, ac, at);
   
   if(self->save_editor == 1)
 	{

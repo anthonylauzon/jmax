@@ -136,17 +136,17 @@ extern int scomark_meter_symbol_get_quotient(fts_symbol_t sym, int *meter_num, i
 extern fts_symbol_t scomark_meter_quotient_get_symbol(int meter_num, int meter_den);
 
 extern void scomark_set_tempo(scomark_t *scomark, double tempo);
-extern double scomark_get_tempo(scomark_t *scomark);
+extern void scomark_get_tempo(scomark_t *scomark, double *tempo);
 extern void scomark_set_cue(scomark_t *scomark, int cue);
-extern int scomark_get_cue(scomark_t *scomark);
-extern fts_symbol_t scomark_get_label(scomark_t *self);
+extern void scomark_get_cue(scomark_t *scomark, int *cue);
+extern void scomark_get_label(scomark_t *self, fts_symbol_t *label);
 extern void scomark_set_label(scomark_t *self, fts_symbol_t label);
 
-extern int scomark_bar_get_number(scomark_t *self);
+extern void scomark_bar_get_number(scomark_t *self, int *num);
 extern void scomark_bar_set_number(scomark_t *self, int num);
-extern void scomark_bar_set_meter_from_quotient(scomark_t *scomark, int meter_num, int meter_den);
 extern void scomark_bar_set_meter(scomark_t *scomark, fts_symbol_t meter_sym);
-extern fts_symbol_t scomark_bar_get_meter(scomark_t *self);
+extern void scomark_bar_get_meter(scomark_t *self, fts_symbol_t *meter);
+extern void scomark_bar_set_meter_quotient(scomark_t *scomark, int meter_num, int meter_den);
 extern void scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den);
 
 extern void scomark_spost(fts_object_t *o, fts_bytestream_t *stream);
