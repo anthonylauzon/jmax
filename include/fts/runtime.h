@@ -35,7 +35,6 @@
 #include <fts/runtime/client/incoming.h>
 #include <fts/runtime/client/outgoing.h>
 #include <fts/runtime/client/updates.h>
-#include <fts/runtime/client/protcodec.h>
 /* Devices */
 #include <fts/runtime/devices/bytestream.h>
 #include <fts/runtime/devices/devices.h>

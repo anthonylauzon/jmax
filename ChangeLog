@@ -1,3 +1,9 @@
+2001-06-27  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* moved fts/src/runtime/client/protcodec.c code to udpsend and udpreceive objects.
+
+	* removed include/fts/runtime/client/protcodec.h
+
 2001-06-15  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* added automatic track naming to MIDI file import of the sequence class
