@@ -21,6 +21,6 @@ SymbolCache.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@
-JAVAROOT= @top_srcdir@/java
+JAVAROOT= $(top_builddir)/java
 CLASSPATH_ENV= CLASSPATH=$(JAVAROOT)
 
