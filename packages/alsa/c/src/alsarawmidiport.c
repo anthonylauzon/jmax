@@ -98,7 +98,7 @@ alsarawmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
     }
   else 
     {
-      switch(fts_midievent_system_get_type(event))
+      switch(fts_midievent_get_type(event))
 	{
 	case midi_system_exclusive:
 	  {

@@ -32,15 +32,16 @@
 
 #include <fts/fts.h>
 
-static fts_symbol_t s_plug_0_0;
+static fts_symbol_t s_default;
 static fts_symbol_t s_s16_le, s_s32_le;
 static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleaved, s_rw_interleaved;
 
 #define GUESS_CHANNELS -1
-#define DEFAULT_PCM_NAME s_plug_0_0
+#define DEFAULT_PCM_NAME s_default
 #define DEFAULT_SAMPLING_RATE (44100.)
 #define DEFAULT_FIFO_SIZE 256
-#define DEFAULT_CHANNELS 2
+#define DEFAULT_INPUT_CHANNELS 0
+#define DEFAULT_OUTPUT_CHANNELS 2
 
 enum transfer_mode_t { MMAP_NONINTERLEAVED, MMAP_INTERLEAVED, RW_NONINTERLEAVED, RW_INTERLEAVED};
 
@@ -50,7 +51,6 @@ enum transfer_mode_t { MMAP_NONINTERLEAVED, MMAP_INTERLEAVED, RW_NONINTERLEAVED,
 typedef struct _alsastream_t {
   snd_pcm_t *handle;
   int period_size;
-  int periods;
   size_t bytes_per_sample, bytes_per_frame;
   int channels;
   int fd;
@@ -69,6 +69,49 @@ typedef struct {
 } alsaaudioport_t;
 
 /* ********************************************************************** */
+/* debug                                                                  */
+/* ********************************************************************** */
+
+static snd_output_t *log_for_post = 0;
+
+static void post_log( void)
+{
+  char *p, *q;
+
+  if ( !log_for_post)
+    return;
+
+  snd_output_buffer_string( log_for_post, &p);
+
+  do
+    {
+      q = index( p, '\n');
+      if (q)
+	{
+	  *q = '\0';
+	  post( "%s\n", p);
+	  p = q+1;
+	}
+    }
+  while ( *p);
+
+  snd_output_close( log_for_post);
+
+  log_for_post = 0;
+}
+
+static snd_output_t *get_post_log( void)
+{
+  if (log_for_post)
+    return log_for_post;
+  
+  snd_output_buffer_open( &log_for_post);
+
+  return log_for_post;
+}
+
+
+/* ********************************************************************** */
 /* alsastream_t functions                                                 */
 /* ********************************************************************** */
 
@@ -79,15 +122,12 @@ typedef struct {
 static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, int format, int channels, int sampling_rate, int fifo_size, enum transfer_mode_t transfer_mode)
 {
   snd_pcm_access_mask_t *mask;
-  snd_output_t *log;
   snd_pcm_hw_params_t *hwparams;
   snd_pcm_sw_params_t *swparams;
-  char *outbuf;
-  int err, periods;
+  int err;
   int open_mode = 0;
   int dir;
 
-  err = snd_output_stdio_attach( &log, stderr, 0);
   snd_pcm_hw_params_alloca( &hwparams);
   snd_pcm_sw_params_alloca( &swparams);
 
@@ -148,30 +188,22 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
     return err;
 
   /*
-   * Set periods: we ask for 2 periods
+   * Set buffer size
    */
-  periods = 2;
-  if ((err = snd_pcm_hw_params_set_periods( st->handle, hwparams, periods, 0) < 0))
+  if ((err = snd_pcm_hw_params_set_buffer_size_near( st->handle, hwparams, fifo_size)) < 0)
     return err;
 
-  st->periods = snd_pcm_hw_params_get_periods( hwparams, 0);
-
   /*
-   * Set period size: the period size is the fifo size divided by the number of periods
+   * Set period size: the period size is the fifo size divided by the number of periods, here 2
    */
-  if ((err = snd_pcm_hw_params_set_period_size( st->handle, hwparams, fifo_size / periods, 0)) < 0) 
+  if ((err = snd_pcm_hw_params_set_period_size_near( st->handle, hwparams, fifo_size / 2, 0)) < 0) 
     return err;
 
   st->period_size = snd_pcm_hw_params_get_period_size( hwparams, &dir);
 
-  /*
-   * Set buffer size
-   */
-  if ((err = snd_pcm_hw_params_set_buffer_size( st->handle, hwparams, fifo_size)) < 0)
-    return err;
-
-#if 1
-  snd_pcm_hw_params_dump( hwparams, log);
+#ifdef DEBUG
+  snd_pcm_hw_params_dump( hwparams, get_post_log());
+  post_log();
 #endif
 
   /*
@@ -179,30 +211,33 @@ static int alsastream_open( alsastream_t *st, char *pcm_name, int which_stream, 
    */
   if ((err = snd_pcm_hw_params( st->handle, hwparams)) < 0)
     {
-      snd_pcm_hw_params_dump( hwparams, log);
+      snd_pcm_hw_params_dump( hwparams, get_post_log());
+      post_log();
       return err;
     }
 
   snd_pcm_sw_params_current( st->handle, swparams);
 
   /* start transfer when the buffer is full */
-  if ((err = snd_pcm_sw_params_set_start_threshold(handle, swparams, fifo_size)) < 0)
+  if ((err = snd_pcm_sw_params_set_start_threshold( st->handle, swparams, fifo_size)) < 0)
     return err;
 
-  if ((err = snd_pcm_sw_params_set_avail_min( st->handle, swparams, fifo_size / periods)) < 0) 
+  if ((err = snd_pcm_sw_params_set_avail_min( st->handle, swparams, st->period_size)) < 0) 
     return err;
 
   /* align all transfers to 1 samples */
   if ((err = snd_pcm_sw_params_set_xfer_align( st->handle, swparams, 1)) < 0)
     return err;
 
-#if 1
-  snd_pcm_sw_params_dump(swparams, log);
+#ifdef DEBUG
+  snd_pcm_sw_params_dump( swparams, get_post_log());
+  post_log();
 #endif
 
   if ((err = snd_pcm_sw_params( st->handle, swparams)) < 0) 
     {
-/*        snd_pcm_sw_params_dump(swparams, log); */
+      snd_pcm_sw_params_dump(swparams, get_post_log());
+      post_log();
       return err;
     }
 
@@ -506,28 +541,6 @@ static int alsaaudioport_xrun_function( fts_audioport_t *port)
 #ifdef DEBUG
 static void pcm_dump_post( snd_pcm_t *handle)
 {
-  snd_output_t *log;
-  char *p, *q;
-
-  snd_output_buffer_open( &log);
-
-  snd_pcm_dump( handle, log);
-
-  snd_output_buffer_string( log, &p);
-
-  do
-    {
-      q = index( p, '\n');
-      if (q)
-	{
-	  *q = '\0';
-	  post( "%s\n", p);
-	  p = q+1;
-	}
-    }
-  while ( *p);
-
-  snd_output_close( log);
 }
 #endif
 
@@ -540,7 +553,6 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   const char *format_name;
   fts_symbol_t s_transfer_mode;
   alsaaudioport_t *this = (alsaaudioport_t *)o;
-  snd_output_t *log;
 
   fts_audioport_init( &this->head);
 
@@ -550,10 +562,10 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   sampling_rate = (int)sr ;
   fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
-  strcpy( pcm_name, fts_symbol_name( fts_get_symbol_arg( ac, at, 0, s_plug_0_0)) );
+  strcpy( pcm_name, fts_symbol_name( fts_get_symbol_arg( ac, at, 0, DEFAULT_PCM_NAME)) );
 
-  capture_channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
-  playback_channels = fts_get_int_arg( ac, at, 2, DEFAULT_CHANNELS);
+  capture_channels = fts_get_int_arg( ac, at, 1, DEFAULT_INPUT_CHANNELS);
+  playback_channels = fts_get_int_arg( ac, at, 2, DEFAULT_OUTPUT_CHANNELS);
 
   format_name = fts_symbol_name( fts_get_symbol_arg( ac, at, 3, s_s16_le));
   format = snd_pcm_format_value( format_name);
@@ -571,6 +583,7 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   if ( capture_channels != 0)
     {
+      post ("opening input\n");
       if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, format, capture_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
@@ -586,12 +599,17 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   if ( playback_channels != 0)
     {
+      post ("opening output\n");
       if ( (err = alsastream_open( &this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, format, playback_channels, sampling_rate, fifo_size, transfer_mode)) < 0)
 	{
 	  fts_object_set_error(o, "Error opening ALSA device (%s)", snd_strerror( err));
+
 	  post("alsaaudioport: cannot open ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
+
 	  return;
 	}
+
+      post ("output opened OK\n");
 
       fts_audioport_set_output_channels( (fts_audioport_t *)this, this->playback.channels);
       fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[transfer_mode][format_is_32][1]);
@@ -603,9 +621,15 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
 #ifdef DEBUG
   if (this->capture.handle)
-    pcm_dump_post( this->capture.handle);
+    {
+      snd_pcm_dump( this->capture.handle, get_post_log());
+      post_log();
+    }
   if (this->playback.handle)
-    pcm_dump_post( this->playback.handle);
+    {
+      snd_pcm_dump( this->playback.handle, get_post_log());
+      post_log();
+    }
 #endif
 }
 
@@ -646,7 +670,7 @@ void alsaaudioport_config( void)
 {
   fts_class_install( fts_new_symbol("alsaaudioport"), alsaaudioport_instantiate);
 
-  s_plug_0_0 = fts_new_symbol( "plug:0,0");
+  s_default = fts_new_symbol( "default");
   s_s32_le = fts_new_symbol( "S32_LE");
   s_s16_le = fts_new_symbol( "S16_LE");
 

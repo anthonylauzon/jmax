@@ -38,7 +38,5 @@ extern void alsarawmidiport_config( void);
 void alsa_config(void)
 {
   alsaaudioport_config();
-#if 0
   alsarawmidiport_config();
-#endif
 }
