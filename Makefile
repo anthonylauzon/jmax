@@ -59,7 +59,7 @@ clean:
 	(cd java ; $(MAKE) clean)
 	(cd lib; $(MAKE) clean)
 	(cd packages; $(MAKE) clean)
-	(cd syspackages; $(MAKE) all)
+	(cd syspackages; $(MAKE) clean)
 .PHONY: clean
 
 clean_c:
