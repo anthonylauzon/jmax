@@ -3,7 +3,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/mman.h>
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/utils.h"
@@ -12,8 +11,6 @@
 /* Private structure */
 typedef struct fts_binary_file_desc_t {
   int fd;
-  size_t length;
-  void *address;
   fts_word_t *code;
   fts_symbol_t *symbols;
 } fts_binary_file_desc_t;
@@ -21,9 +18,10 @@ typedef struct fts_binary_file_desc_t {
 static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 {
   int fd;
-  void *address;
-  fts_binary_file_header_t *header;
+  fts_binary_file_header_t header;
+  off_t file_size;
   int symbols_size;
+  char *symbuf;
 
   /* open the file */
   fd = open( name, O_RDONLY);
@@ -43,31 +41,52 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 	perror( "fts_binary_file_map");
 	return -1;
       }
-    desc->length = buf.st_size;
+    file_size = buf.st_size;
   }
 
-  /* map the file */
-  address = mmap( NULL, desc->length, PROT_READ, MAP_PRIVATE, fd, 0);
-  if (address == MAP_FAILED)
+  /* read the header */
+  if (read( fd, &header, sizeof( header)) < sizeof( header))
     {
       perror( "fts_binary_file_map");
       return -1;
     }
-  desc->address = address;
-    
-  /* get the header */
-  header = (fts_binary_file_header_t *)address;
 
-  if (header->magic_number != FTS_BINARY_FILE_MAGIC)
+  if (header.magic_number != FTS_BINARY_FILE_MAGIC)
     return -1;
 
-  /* get the code */
-  desc->code = (fts_word_t *)((char *)address + sizeof( fts_binary_file_header_t));
+  /* allocate code and symbols */
+  desc->code = (fts_word_t *)fts_malloc( header.code_size * sizeof( fts_word_t));
+  if (!desc->code)
+    {
+      return -1;
+    }
 
-  /* allocate temporary memory for the symbol table */
-  desc->symbols = (fts_symbol_t *)fts_malloc( header->n_symbols * sizeof( fts_symbol_t));
+  desc->symbols = (fts_symbol_t *)fts_malloc( header.n_symbols * sizeof( fts_symbol_t));
   if (!desc->symbols)
     {
+      return -1;
+    }
+
+  /* read the code */
+  if (read( fd, desc->code, header.code_size*sizeof(long)) < header.code_size*sizeof(long))
+    {
+      perror( "fts_binary_file_map");
+      return -1;
+    }
+
+  /* allocate temporary memory for the symbol table */
+  symbols_size = file_size - lseek( fd, 0, SEEK_CUR);
+
+  symbuf = (char *) fts_malloc( symbols_size);
+  if ( !symbuf)
+    {
+      return -1;
+    }
+
+  /* read the symbol table */
+  if (read( fd, symbuf, symbols_size) < symbols_size)
+    {
+      perror( "fts_binary_file_map");
       return -1;
     }
 
@@ -77,7 +96,7 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
     int i;
 
     i = 0;
-    p = (char *)address + sizeof( fts_binary_file_header_t) + header->code_size*sizeof(long);
+    p = symbuf;
     while (*p)
       {
 	fts_symbol_t symbol;
@@ -95,14 +114,15 @@ static int fts_binary_file_map( const char *name, fts_binary_file_desc_t *desc)
 	  ;
       }
   }
+  fts_free( symbuf);
 
   return 1;
 }
 
 static void fts_binary_file_dispose( fts_binary_file_desc_t *desc)
 {
-  munmap( desc->address, desc->length);
   close( desc->fd);
+  fts_free( desc->code);
   fts_free( desc->symbols);
 }
 
