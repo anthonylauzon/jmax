@@ -90,8 +90,7 @@ midiparse_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(midiparse_t), midiparse_init, midiparse_delete);
 
-  fts_class_inlet_int(cl, 0, midiparse_input);
-  fts_class_inlet_float(cl, 0, midiparse_input);
+  fts_class_inlet_number(cl, 0, midiparse_input);
   fts_class_inlet_varargs(cl, 0, midiparse_input);
   
   fts_class_outlet(cl, 0, fts_midievent_type);
@@ -171,8 +170,7 @@ midiunparse_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_object_t), 0, 0);
 
-  fts_class_message_varargs(cl, fts_s_midievent, midiunparse_input);
-
+  fts_class_inlet(cl, 0, fts_midievent_type, midiunparse_input);
   fts_class_outlet_varargs(cl, 0);
 }
 

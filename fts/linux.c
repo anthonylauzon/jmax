@@ -65,7 +65,7 @@ fts_get_user_config( void)
   char path[MAXPATHLEN];
 
   home = getenv("HOME");
-  fts_make_absolute_path(home, ".jmaxcf", path, MAXPATHLEN);
+  fts_make_absolute_path(home, ".jmax.jprj", path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol(path);
   }

@@ -192,8 +192,13 @@ preset_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(ac > 0)
     {
-      if(fts_is_int(at))
-	preset_remove(this, at);
+      if(fts_is_number(at))
+	{
+	  fts_atom_t a;
+	  
+	  fts_set_int(&a, fts_get_number_int(at));
+	  preset_remove(this, &a);
+	}    
     }
   else
     {
@@ -220,14 +225,16 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
-  if(fts_is_int(at))
+  if(fts_is_number(at))
     {
       fts_object_t **objects = this->objects;
       fts_object_t **clones;
-      fts_atom_t a;
+      fts_atom_t k, a;
       int i;  
+
+      fts_set_int(&k, fts_get_number_int(at));
   
-      if(fts_hashtable_get(&this->hash, at, &a))
+      if(fts_hashtable_get(&this->hash, &k, &a))
 	{
 	  /* overwrite existing preset */
 	  clones = (fts_object_t **)fts_get_pointer(&a);
@@ -269,7 +276,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 	  /* store new preset */
 	  fts_set_pointer(&a, (void *)clones);
-	  fts_hashtable_put(&this->hash, at, &a);
+	  fts_hashtable_put(&this->hash, &k, &a);
 	}
     }
 }
@@ -279,12 +286,14 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
-  if(fts_is_int(at))
+  if(fts_is_number(at))
     {
-      int n = fts_get_int(at);
-      fts_atom_t a;
+      int n = fts_get_number_int(at);
+      fts_atom_t k, a;
 
-      if(fts_hashtable_get(&this->hash, at, &a))
+      fts_set_int(&k, n);
+
+      if(fts_hashtable_get(&this->hash, &k, &a))
 	{
 	  fts_object_t **clones = fts_get_pointer(&a);
 	  int i, j;
@@ -571,7 +580,8 @@ preset_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("recall"), preset_recall);
   fts_class_message_varargs(cl, fts_s_clear, preset_clear);
 
-  fts_class_inlet_anything(cl, 0);
+  fts_class_inlet_int(cl, 0, preset_recall);
+  fts_class_inlet_int(cl, 1, preset_store);
   fts_class_outlet_int(cl, 0);
 }
 

@@ -48,61 +48,61 @@ static void
 matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matrix_t *this = (matrix_t *)o;
+  int n_ins = 0;
+  int n_outs = 0;
+  float def_time = 0.0;
+  fts_ramp_t *ramps;
+  int n, in, out, i;
   
-  if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
+  if(ac > 1 && fts_is_number(at + 1))
+    n_outs = fts_get_number_int(at + 1);
+    
+  if(ac > 0 && fts_is_number(at))
+    n_ins = fts_get_number_int(at);
+  
+  if(n_ins < 1)
+    n_ins = 1;
+  
+  if(n_outs < 1)
+    n_outs = 1;
+  
+  if(ac > 2 && fts_is_number(at + 2))
+    def_time = fts_get_number_float(at + 2);
+  
+  /* buffer for FTL arguments */
+  this->ftl_args = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * (5 + n_ins + n_outs));
+  
+  /* get minimum of n_ins/n_outs */
+  n = (n_ins < n_outs)? n_ins: n_outs;
+  
+  /* allocate array of buffer pointers */
+  this->bufs = (float **)fts_malloc(sizeof(float *) * n);
+  for(i=0; i<n; i++)
+    this->bufs[i] = 0;
+  
+  /* allocate ramps */
+  this->ramps = ftl_data_alloc(sizeof(fts_ramp_t) * n_outs * n_ins);
+  ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
+  
+  /* initialize ramps */
+  for(out=0; out<n_outs; out++)
     {
-      int n_ins = fts_get_number_int(at); /* # of ins */
-      int n_outs = fts_get_number_int(at + 1); /* # of outs */
-      float def_time = 0.0;
-      fts_ramp_t *ramps;
-      int n, in, out, i;
-
-      if(n_ins < 1)
-	n_ins = 1;
-      
-      if(n_outs < 1)
-	n_outs = 1;
-      
-      if(ac > 2 && fts_is_number(at + 2))
-	def_time = fts_get_number_float(at + 2);
-
-      /* buffer for FTL arguments */
-      this->ftl_args = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * (5 + n_ins + n_outs));
-      
-      /* get minimum of n_ins/n_outs */
-      n = (n_ins < n_outs)? n_ins: n_outs;
-      
-      /* allocate array of buffer pointers */
-      this->bufs = (float **)fts_malloc(sizeof(float *) * n);
-      for(i=0; i<n; i++)
-	this->bufs[i] = 0;
-      
-      /* allocate ramps */
-      this->ramps = ftl_data_alloc(sizeof(fts_ramp_t) * n_outs * n_ins);
-      ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
-      
-      /* initialize ramps */
-      for(out=0; out<n_outs; out++)
+      for(in=0; in<n_ins; in++)
 	{
-	  for(in=0; in<n_ins; in++)
-	    {
-	      fts_ramp_t *ramp = ramps + out * n_ins + in;
-	      fts_ramp_init(ramp, 0.0);
-	    }
+	  fts_ramp_t *ramp = ramps + out * n_ins + in;
+	  fts_ramp_init(ramp, 0.0);
 	}
-      
-      this->n_ins = n_ins;
-      this->n_outs = n_outs;
-      this->def_time = def_time;
-      this->cr = 1.0f; /* will be properly set in the put routine */
-      this->n_tick = 0;
-      
-      fts_dsp_object_init((fts_dsp_object_t *)o);
-      fts_object_set_inlets_number(o, n_ins);
-      fts_object_set_outlets_number(o, n_outs);      
     }
-  else
-    fts_object_set_error(o, "matrix dimension arguments required");
+  
+  this->n_ins = n_ins;
+  this->n_outs = n_outs;
+  this->def_time = def_time;
+  this->cr = 1.0f; /* will be properly set in the put routine */
+  this->n_tick = 0;
+  
+  fts_dsp_object_init((fts_dsp_object_t *)o);
+  fts_object_set_inlets_number(o, n_ins);
+  fts_object_set_outlets_number(o, n_outs);      
 }
 
 static void matrix_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

@@ -441,7 +441,10 @@ static void
 fts_object_unclient(fts_object_t *obj)
 {
   if ( fts_object_get_id( obj) > FTS_NO_ID)
-    fts_client_release_object(obj);
+    {
+      fts_send_message(obj, fts_s_closeEditor, 0, 0);
+      fts_client_release_object(obj);
+    }
 }
 
 void 

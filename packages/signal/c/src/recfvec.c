@@ -52,7 +52,7 @@ typedef struct _rec_fvec_
   
 } rec_fvec_t;
 
-static fts_symbol_t sym_rec = 0;
+static fts_symbol_t sym_record = 0;
 
 /************************************************************
  *
@@ -200,7 +200,7 @@ rec_fvec_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
-  fts_dsp_add_function(sym_rec, 3, a);
+  fts_dsp_add_function(sym_record, 3, a);
 }
 
 static void
@@ -338,9 +338,12 @@ rec_fvec_instantiate(fts_class_t *cl)
 void
 signal_rec_fvec_config(void)
 {
-  sym_rec = fts_new_symbol("rec~");
+  fts_class_t *cl;
 
-  fts_class_install(sym_rec, rec_fvec_instantiate);
+  sym_record = fts_new_symbol("record~");
 
-  fts_dsp_declare_function(sym_rec, rec_fvec_ftl);
+  cl = fts_class_install(sym_record, rec_fvec_instantiate);
+  fts_class_alias(cl, fts_new_symbol("rec~"));
+
+  fts_dsp_declare_function(sym_record, rec_fvec_ftl);
 }

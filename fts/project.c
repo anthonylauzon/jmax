@@ -39,9 +39,44 @@ static fts_package_t* fts_project = NULL;
 static fts_symbol_t sym_project = NULL;
 static char *loading_project_dir = NULL;
 
+static void
+project_cut_name(const char* filename, char *name)
+{
+  int n = strlen(filename);
+  int i_begin, i_end;
+  int i = n - 1;
+
+  while(i > 0 && filename[i] != '.' && filename[i] != '/')
+    i--;
+
+  if(i == 0)
+    {
+      i_end = n;
+      i_begin = 0;
+    }
+  else if(filename[i] == '/')
+    {
+      i_end = n;
+      i_begin = i + 1;      
+    }
+  else
+    {
+      i_end = i;
+
+      while(i > 0 && filename[i] != '/')
+	i--;
+
+      i_begin = i + 1;
+    }
+
+  snprintf(name, i_end - i_begin + 1, "%s", filename + i_begin);
+}
+
 fts_package_t* 
 fts_project_open(const char* filename)
 {
+  fts_symbol_t sym;
+  char name[256];
   char *fnm;
 
   if (fts_project != NULL) {
@@ -56,6 +91,16 @@ fts_project_open(const char* filename)
   
   fnm = strcpy( fts_malloc( strlen( filename) + 1), filename);
   loading_project_dir = fts_dirname( fnm);
+
+  project_cut_name(filename, name);
+  sym = fts_new_symbol(name);
+
+  if(sym == fts_new_symbol("config"))
+    post("open default project\n", name);
+  else if(sym == fts_new_symbol(".jmax"))
+    post("open user defined default project\n", name);
+  else
+    post("open project: %s\n", name);
 
   fts_project = fts_package_load_from_file(sym_project, filename);
 
