@@ -542,6 +542,26 @@ class ErmesSketchHelper extends Object{
     return aRegion.MinimumRect();
   }
 	
+  /**
+   * an utility function to find the upper-left corner of a selection
+   */
+  public Point selectionUpperLeft() {
+    int minX;
+    int minY;
+    ErmesObject aObject;    
+
+    if (ErmesSketchPad.currentSelection.itsObjects.size() == 0) return new Point(0,0);
+    aObject = (ErmesObject)ErmesSketchPad.currentSelection.itsObjects.elementAt(0);
+    minX = aObject.getItsX();
+    minY = aObject.getItsY();
+    for(int i=1; i<ErmesSketchPad.currentSelection.itsObjects.size(); i++){
+      aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt(i);
+      if (aObject.getItsX() < minX) minX = aObject.getItsX();
+      if (aObject.getItsY() < minY) minY = aObject.getItsY();
+    }
+    return new Point(minX, minY);
+  }
+
   //--------------------------------------------------------
   //	TraceConnection
   //--------------------------------------------------------

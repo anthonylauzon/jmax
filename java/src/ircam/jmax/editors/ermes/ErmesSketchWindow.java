@@ -340,8 +340,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   protected void Copy() {
     Cursor temp = getCursor();
 
-    Rectangle tempRect = itsSketchPad.itsHelper.StartMoveInclusionRect();
-    itsSketchPad.pasteDelta.setLocation(tempRect.x-itsSketchPad.itsCurrentScrollingX, tempRect.y - itsSketchPad.itsCurrentScrollingY);
+    Point tempPoint = itsSketchPad.itsHelper.selectionUpperLeft();
+    itsSketchPad.pasteDelta.setLocation(tempPoint.x-itsSketchPad.itsCurrentScrollingX, tempPoint.y - itsSketchPad.itsCurrentScrollingY);
     itsSketchPad.numberOfPaste = 0;
 
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

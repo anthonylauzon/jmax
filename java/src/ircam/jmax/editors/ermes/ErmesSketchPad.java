@@ -698,6 +698,7 @@ Rectangle previousResizeRect = new Rectangle();
       incrementalPasteOffsetY = 20;
     }
     else if (numberOfPaste == 2) {
+      
       incrementalPasteOffsetX = (((Integer)(anOldPastedObject.get("x"))).intValue()-minX);
       incrementalPasteOffsetY = (((Integer)(anOldPastedObject.get("y"))).intValue()-minY);
     }
