@@ -2052,7 +2052,10 @@ fts_patcher_get_top_level(fts_patcher_t *patcher)
       fts_patcher_t *parent = fts_object_get_patcher((fts_object_t *)patcher);
       
       while(parent != NULL && parent != fts_root_patcher && fts_patcher_get_template(patcher) == NULL)
-	patcher = fts_object_get_patcher((fts_object_t *)patcher);
+	{
+	  patcher = parent;
+	  parent = fts_object_get_patcher((fts_object_t *)patcher);
+	}
       
       return patcher;
     }
