@@ -215,6 +215,7 @@ sgi-pkg: $(distfile)
 		sort +4u -6 < /tmp/jmax.idb > /tmp/jmax.idb.sorted ; \
 		/usr/sbin/gendist -root .. -sbase .. -dist .. -idb /tmp/jmax.idb.sorted -spec /tmp/jmax.spec )
 	( cd $(BUILD_DIR)/src ; tar cvf - jmax jmax.idb jmax.sw ) > jmax-$(version).r10k.tardist 
+	/bin/rm -rf $(BUILD_DIR)/src
 .PHONY: sgi-pkg
 
 #
