@@ -189,8 +189,3 @@ public class ErmesToolBar extends JPanel  {
     AddPopUp.initDone();//????
   }
 }
-
-
-
-
-

@@ -303,9 +303,9 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       if(sf)
 	{
 	  int n_samples = fts_soundfile_read_float(sf, buf, size);
-
+	  
 	  fts_soundfile_close(sf);
-
+	  
 	  if(n_samples > 0)
 	    fts_outlet_int(o, 0, n_samples);
 	  else
