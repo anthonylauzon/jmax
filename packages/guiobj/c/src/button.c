@@ -134,9 +134,12 @@ button_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   button_t *this = (button_t *)o;
 
-  this->color = fts_get_int( at);
+  if( this->color != fts_get_int( at))
+    {
+      this->color = fts_get_int( at);
   
-  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+      fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+    }
 }
 
 static void
@@ -144,9 +147,12 @@ button_set_flash(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   button_t *this = (button_t *)o;
 
-  this->flash = fts_get_int( at);
-
-  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+  if( this->flash != fts_get_int( at))
+    {
+      this->flash = fts_get_int( at);
+      
+      fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+    }
 }
 
 static void

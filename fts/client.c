@@ -905,6 +905,9 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
 
   /* upload the patcher to the client */
   fts_send_message( (fts_object_t *)patcher, fts_s_upload, 0, 0);
+
+  fts_patcher_set_dirty( patcher, 0);
+
   fts_send_message( (fts_object_t *)patcher, fts_new_symbol("openEditor"), 0, 0);
 
   fts_log("[patcher]: Finished loading patcher %s\n", file_name);
