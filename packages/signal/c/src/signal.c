@@ -57,7 +57,7 @@ extern void signal_harmtap_config(void);
 
 extern void signal_dpaste_config(void);
 
-extern void signal_play_fvec_config(void);
+extern void signal_play_config(void);
 extern void signal_rec_fvec_config(void);
 
 void
@@ -93,6 +93,6 @@ signal_config(void)
 
   signal_dpaste_config();
 
-  signal_play_fvec_config();
+  signal_play_config();
   signal_rec_fvec_config();
 }
