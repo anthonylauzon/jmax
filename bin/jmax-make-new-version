@@ -105,10 +105,10 @@ fi
 
 # ---------------------------------------------------------------------------
 # Tag the sources with the current version number
-TAG=`echo $OLD_VERSION | sed -e 's/^/V/' -e 's/\./_/g'`
+TAG=`echo $OLD_VERSION | sed -e 's/^/V_/' -e 's/\./_/g'`
 
 echo "... Tagging sources with tag $TAG"
-echo cvs tag -F $TAG
+cvs tag -F $TAG
 
 
 # ---------------------------------------------------------------------------
@@ -157,7 +157,6 @@ JAVA_VERSION_EOF
 # ---------------------------------------------------------------------------
 # Automatically commit the generated files
 CVS_MESSAGE="Automatic commit (version number changed to $NEW_VERSION)"
-echo $CVS_MESSAGE
 echo "... Commiting file VERSION"
 (cvs commit -l -m "$CVS_MESSAGE" VERSION)
 echo "... Commiting file fts/src/sys/version.h"

@@ -18,7 +18,7 @@ Options:
   -tar <tar-command>           (optional)
     defines tar command to use (gnutar, /usr/local/bin/tar, ...)
     WARNING: this script relies on the -T - option of the used tar command.
-    Default: tar.
+    Default: gnutar.
   -norecompile                 (optional)
     do not recompile everything (i.e.make ARCH=$ARCH MODE=opt clean all) before
     creating tar file. Use if you are REALLY sure everything is up-to-date.
@@ -80,8 +80,10 @@ then
     exit 1
 fi
 
-if \! $TAR --version 2>/dev/null | grep -s GNU
+if $TAR --version | grep -s GNU >/dev/null 
 then
+    echo > /dev/null
+else
     echo $TAR is not GNU tar. Cannot use it!
     exit 2
 fi

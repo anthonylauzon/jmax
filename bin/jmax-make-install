@@ -48,6 +48,12 @@ fi
 TARFILE=$1
 
 
+if [ \! -f $TARFILE ]
+then
+    echo $TARFILE not found >&2
+    exit 2
+fi
+
 # As this script is supposed to be run as root, some confirmation is usefull
 confirm "OK to install jMax in ${INSTALL_DIR}/max ? "
 
@@ -80,8 +86,10 @@ gzip -cd $TARFILE | ( cd ${INSTALL_DIR}/max/.. && tar xvf - )
 confirm "Change mode of executables to allow setuid ? "
 for fts in `find ${INSTALL_DIR}/max -name fts -type f -perm -a+x`
 do
-    echo "Changing mode of $fts to allow setuid"
-    chown root $fts
-    chmod u+s $fts
+    echo "Copying $fts to $fts.setuid"
+    cp $fts $fts.setuid
+    echo "Changing mode of $fts.setuid to allow setpriority()"
+    chown root $fts.setuid
+    chmod u+s $fts.setuid
 done
 

@@ -1,57 +1,6 @@
-************************************************************************
-*
-*  Welcome to jMax 2.1. BETA Forum CD
-*
-*  This version is exclusively released for the IRCAM Forum CD Spring '98
-*  and shows the work in progress of the jMax project replacing Max/FTS 1.5.
-* 
-*  For additional information, please refer to the jMax home page.
-*
-*     http:/www.ircam.fr/jmax
-*
-*
 
-The distribution consists of the following files and directiories:
+This is the first release of jMax 2.2 with saving/loading patches
+in binary file format. 
 
-	README		this file
+Release information will be provided via mail.
 
-	bin		scripts and binary executables
-
-	config		configuration files
-
-	doc		sorry, empty for now (you might find more on the jMax home page)
-
-	examples	examples patches
-
-	fts		server binaries
-
-	images		internal images
-
-	java		client binaries
-
-	packages	dynamic components distributed
-
-	tcl		internal TCL code
-
-	ulitities	some usefull ulitities
-
-
-To run jMax:
- 
-  1. copy all files of the jMax distribution (see above) to
-     "/usr/local/max" (recommended) or a directory of your choice 
-     we'll refer to as "<jMax root dir>" in the following
-
-  2. copy the configuration file "<jMax root dir>/config/example.jmaxrc" to "~/.jmaxrc"
-
-  3. edit the configuration file "~/.jmaxrc" so that ...
-       ... the variable "jmaxArch" will be set to your platform string (see line 13 to 17)
-       ... the variable "jmaxHost" will be set to the host name you want to run jMax on  (see line 19 to 21)
-
-  4. in the case you installed jMax in "/usr/local/max" as recommended just run 
-
-        <jMax root dir>/bin/jmax
-
-     otherwise use the following command line (replace <jMax root dir>)
-	
-        "java -noasyncgc -mx64m -ms2m  -classpath .:/usr/java/lib/rt.jar:<jMax root dir>/java/classes/jmax.jar:<jMax root dir>/java/lib/jacl1.0/jacl.jar:<jMax root dir>/java/lib/swing-1.0.1/swingall.jar ircam.jmax.MaxApplication -root <jMax root dir>"
