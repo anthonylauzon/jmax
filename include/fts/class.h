@@ -81,6 +81,7 @@ struct fts_class {
   fts_copy_function_t copy_function;
   fts_array_function_t array_function;
   fts_description_function_t description_function;
+  fts_array_t import_handlers;	  /* list of import handlers */
 
   fts_instantiate_fun_t instantiate_fun;
 
@@ -202,6 +203,18 @@ FTS_API void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t con
  * @ingroup class_api
  */
 FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
+
+
+/** prepend import handler to list of handlers to try 
+ *
+ *  An import handler is called with the object to import into, and
+ *  the list of filename and arguments.  It should examine the object
+ *  type (or subtype), and the file, to see if it can be imported.  If
+ *  not, just return false and don't make any fuss (don't print error
+ *  messages).
+ */
+FTS_API void fts_class_add_import_handler (fts_class_t *cl, fts_method_t func);
+
 
 /**
  * Register a method for a given message and argument type (of a single argument or void).
