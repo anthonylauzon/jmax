@@ -1,3 +1,13 @@
+2002-11-21  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* first setup for multi rpm building
+	
+	* add config.h, config-ac.h.in (autoconf), config-win32.h (windows) and config-macosx.h (macosX) for system dependant configuration of installed package headers
+	
+	* add a configure flag to disable jMax java compilation (--disable-java-part or --enable-java-part=no)
+
+	* remove java test if jMax java compilation is disabled
+
 2002-11-14  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* commited first version of Python FTS client client/python
