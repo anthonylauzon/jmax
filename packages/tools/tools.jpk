@@ -1,0 +1,14 @@
+#TCL definition of the ``tools'' package
+
+## package declaration
+
+package provide tools
+
+# Load the dynamic libraries in FTS
+
+global jmaxArch jmaxMode
+
+ucs load module tools $dir/lib/$jmaxArch/$jmaxMode/libtools.so
+
+post "Loaded package: tools"
+
