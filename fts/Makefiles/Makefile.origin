@@ -10,11 +10,15 @@ SYSTEM_CFLAGS := -mips4 -n32 -r10000
 SYSTEM_LDFLAGS :=  -mips4 -n32 -lmalloc
 SYSTEM_SOFLAGS := -mips4 -n32
 
-SYSTEM_OPT_CFLAGS := -Ofast=ip27 -IPA -OPT:roundoff=3 -OPT:IEEE_arithmetic=3 
-SYSTEM_OPT_LDFLAGS = -Ofast=ip27  -IPA  -Wl,-exports_file,$(EXPORTS_FILE) 
-SYSTEM_OPT_SOFLAGS = -IPA
+# 7.2 compiler, no -IPA for the moment (but get 10% better anyway)
 
+SYSTEM_OPT_CFLAGS := -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:fast_io=ON:Olimit=0 -TARG:platform=ip27:processor=r10000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1 -LANG:restrict
+SYSTEM_OPT_LDFLAGS = -O3  
+SYSTEM_OPT_SOFLAGS = 
 
+#SYSTEM_OPT_CFLAGS := -Ofast=ip27 -IPA -OPT:roundoff=3 -OPT:IEEE_arithmetic=3 
+#SYSTEM_OPT_LDFLAGS = -Ofast=ip27  -IPA  -Wl,-exports_file,$(EXPORTS_FILE) 
+#SYSTEM_OPT_SOFLAGS = -IPA
 
 ARCH_CFLAGS := $(SYSTEM_CFLAGS) -DSGI -DIRIX6_4
 ARCH_LDFLAGS := $(SYSTEM_LDFLAGS)
