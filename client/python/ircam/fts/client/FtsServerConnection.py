@@ -17,21 +17,22 @@ class FtsServerConnection:
         self.__newObjectID = 16
         self.__objectTable = {}
         self.readThread = threading.Thread(target=self.receiveThread)
+        self.readThread._stopevent = threading.Event()
         raise NotImplementedError
 
     def startThread(self):
         """
         Start receive thread
         """
-        self.runningThread = 1
         self.readThread.start()
 
     def stopThread(self):
         """
         Stop receive thread
         """
-        self.runningThread = 0
-        
+        self.readThread._stopevent.set()
+        # threading.Thread.join(self.readThread)
+    
     def getNewObjectID(self):
         """
         Return a new object ID
@@ -146,14 +147,13 @@ class FtsServerConnection:
         Received thread
         """
         byte = []
-        while self.runningThread == 1:
+        while not self.readThread._stopevent.isSet():
             try:
                 n, byte = self.read(byte, FtsServerConnection.DEFAULT_RECEIVE_BUFFER_SIZE)
                 self.__decoder.decode(byte)
             except FtsClientException, myex:
-                print myex
-                self.runningThread = 0
-                break
+                # close the connection if we can't read ...
+                self.close()
 
 
 
