@@ -346,8 +346,13 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
     if( getEditorFrame() != null)
       {
-	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().sortDisplayList();
-	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.setLocked(true);
+	ErmesSketchPad sketch = ((ErmesSketchWindow)getEditorFrame()).itsSketchPad;
+	sketch.getDisplayList().sortDisplayList();
+	
+	if(isARootPatcher())
+	  sketch.setLocked(true);
+	else
+	  sketch.setLocked( ((FtsPatcherObject)getParent()).isLocked());
       }
   }
 
@@ -711,7 +716,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   {
     if(getEditorFrame() == null)
       {
-	setEditorFrame(new ErmesSketchWindow(FtsPatcherObject.this));
+	setEditorFrame( new ErmesSketchWindow(FtsPatcherObject.this));
 
 	try{
 	  send( FtsSymbol.get("upload"));
@@ -723,6 +728,14 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	  }
       }
     requestOpenEditor();
+  }
+
+  public boolean isLocked()
+  {
+    if( getEditorFrame()!= null)
+      return ((ErmesSketchWindow)getEditorFrame()).getSketchPad().isLocked();
+    else
+      return false;
   }
 
   public final void requestOpenHelpPatch( FtsObject obj)

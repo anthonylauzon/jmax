@@ -883,10 +883,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
   // initialMode property of a patcher is set and it is set
   // to something different than "run" (usually, "edit" :)
   void InitLock(){
-    if (itsPatcher.getRecursiveEditMode() == FtsPatcherObject.EDIT_MODE)
-      setLocked( false);
-    else
-      setLocked( true);
+    setLocked( false);
   }
 
   public void setLocked( boolean locked)

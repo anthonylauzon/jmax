@@ -173,32 +173,32 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     tree.setCellRenderer(renderer);
 
     tree.addMouseListener(new MouseListener(){
-	    public void mouseEntered(MouseEvent e) {} 
-	    public void mouseExited(MouseEvent e) {}
-	    public void mousePressed(MouseEvent e) {}
-	    public void mouseReleased(MouseEvent e) {}
-	    public void mouseClicked(MouseEvent e)
+	public void mouseEntered(MouseEvent e) {} 
+	public void mouseExited(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e)
+	{
+	  if (e.getClickCount() == 2)
 	    {
-		if (e.getClickCount() == 2)
-		    {
-			TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-			FtsGraphicObject obj = ((FtsMutableTreeNode)path.getLastPathComponent()).getFtsObject();
-
-			ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
-
-			if(obj instanceof FtsPatcherObject)
-			    {
-				((FtsPatcherObject)obj).requestOpenEditor();
-				((FtsPatcherObject)obj).requestStopWaiting(ToolsPanel.toolsPanel);
-			    }
-			else
-			    {
-				((FtsPatcherObject)obj.getParent()).requestShowObject(obj);
-				((FtsPatcherObject)obj.getParent()).requestStopWaiting(ToolsPanel.toolsPanel);
-			    }
-		    }
+	      TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+	      FtsGraphicObject obj = ((FtsMutableTreeNode)path.getLastPathComponent()).getFtsObject();
+	      
+	      ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
+	      
+	      if(obj instanceof FtsPatcherObject)
+		{
+		  ((FtsPatcherObject)obj).requestOpenEditor();
+		  ((FtsPatcherObject)obj).requestStopWaiting(ToolsPanel.toolsPanel);
+		}
+	      else
+		{
+		  ((FtsPatcherObject)obj.getParent()).requestShowObject(obj);
+		  ((FtsPatcherObject)obj.getParent()).requestStopWaiting(ToolsPanel.toolsPanel);
+		}
 	    }
-	});
+	}
+      });
 
     //Create the scroll pane and add the tree to it. 
     JScrollPane treeView = new JScrollPane(tree);
@@ -248,10 +248,9 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	    ftsObj = (FtsGraphicObject)enum.nextElement();
 	    if(top==null)
 	      {
-		/* WARNING: decomment when reimplemented document stuffs */
-		/*top = new FtsMutableTreeNode(ftsObj, (ftsObj.getDocument()!=null) ? 
-		  ftsObj.getDocument().getName() : ftsObj.getDescription());*/
-		top = new FtsMutableTreeNode(ftsObj, ftsObj.getDescription());
+		top = new FtsMutableTreeNode(ftsObj, (((FtsPatcherObject)ftsObj).getName()!=null) ? 
+						      ((FtsPatcherObject)ftsObj).getName() : ftsObj.getDescription());
+		//top = new FtsMutableTreeNode(ftsObj, ftsObj.getDescription());  
 		start = top;
 	      }				
 	    else
