@@ -138,6 +138,10 @@ AC_PROG_JAVA
 AC_TRY_RUN_JAVA
 dnl Check for swing
 AC_CHECK_CLASS(javax.swing.JButton)
+  if test "$ac_cv_class_javax_swing_JButton" = no
+  then
+  AC_MSG_ERROR([swing is not available with this java compiler, check your classpath or use the --with-javac flag])
+  fi
 fi
 
 JAVACX=$JAVAC
