@@ -41,40 +41,39 @@ struct _fts_expression_t {
 static fts_status_description_t empty_expression_error_description = {
   "Empty expression"
 };
-fts_status_t empty_expression_error = &empty_expression_error_description;
+static fts_status_t empty_expression_error = &empty_expression_error_description;
 
 static fts_status_description_t undefined_variable_error_description = {
   "Undefined variable"
 };
-fts_status_t undefined_variable_error = &undefined_variable_error_description;
+static fts_status_t undefined_variable_error = &undefined_variable_error_description;
 
 static fts_status_description_t operand_type_mismatch_error_description = {
   "Operand type mismatch"
 };
-fts_status_t operand_type_mismatch_error = &operand_type_mismatch_error_description;
+static fts_status_t operand_type_mismatch_error = &operand_type_mismatch_error_description;
 
 static fts_status_description_t array_access_error_error_description = {
   "Array access error"
 };
-fts_status_t array_access_error_error = &array_access_error_error_description;
+static fts_status_t array_access_error_error = &array_access_error_error_description;
 
 static fts_status_description_t invalid_environment_variable_error_description = {
   "Invalid environment variable"
 };
-fts_status_t invalid_environment_variable_error = &invalid_environment_variable_error_description;
+static fts_status_t invalid_environment_variable_error = &invalid_environment_variable_error_description;
 
 static fts_status_description_t undefined_class_error_description = {
   "undefined class"
 };
-fts_status_t undefined_class_error = &undefined_class_error_description;
+static fts_status_t undefined_class_error = &undefined_class_error_description;
 
 static fts_status_description_t object_creation_failed_error_description = {
   "object_creation_failed"
 };
-fts_status_t object_creation_failed_error = &object_creation_failed_error_description;
+static fts_status_t object_creation_failed_error = &object_creation_failed_error_description;
 
-#define EXPRESSION_DEBUG
-/* #undef EXPRESSION_DEBUG */
+#undef EXPRESSION_DEBUG
 
 static void fts_expression_print( fts_expression_t *exp);
 
@@ -174,8 +173,7 @@ static void declare_functions( void)
  *
  */
 
-#define STACK_DEBUG
-/* #undef STACK_DEBUG */
+#undef STACK_DEBUG
 
 #define FRAME_OFFSET 1  /* offset of first argument from frame base */
 
@@ -363,7 +361,9 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     at = expression_stack_frame( exp);
     expression_stack_pop_frame( exp);
 
-    (*callback)( ac, at, data);
+    if ((status = (*callback)( ac, at, data)) != fts_ok)
+      return status;
+
     break;
 
   case TK_PAR:

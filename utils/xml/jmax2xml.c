@@ -954,7 +954,7 @@ static int process_file( FILE *in, FILE *out)
       swap_long( &header.n_symbols);
     }
 
-  if (header.magic_number != FTS_BINARY_FILE_MAGIC)
+  if (header.magic_number != FTS_BINARY_FILE_MAGIC_V1 && header.magic_number != FTS_BINARY_FILE_MAGIC_V2)
     return -1;
 
   /* allocate code */

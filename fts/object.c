@@ -43,6 +43,21 @@
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 static void fts_object_unbind(fts_object_t *obj);
 
+static fts_status_description_t class_not_found_error_description = {
+  "object or template not found"
+};
+static fts_status_t class_not_found_error = &class_not_found_error_description;
+
+static fts_status_description_t class_instantiation_error_description = {
+  "class instantiation error"
+};
+static fts_status_t class_instantiation_error = &class_instantiation_error_description;
+
+static fts_status_description_t invalid_class_name_error_description = {
+  "invalid class name"
+};
+static fts_status_t invalid_class_name_error = &invalid_class_name_error_description;
+
 /******************************************************************************
  *
  *  create object
@@ -212,10 +227,11 @@ struct eval_data {
   fts_patcher_t *patcher;
 };
 
-static void
+static fts_status_t
 eval_object_description_expression_callback( int ac, const fts_atom_t *at, void *data)
 {
   struct eval_data *eval_data = (struct eval_data *)data;
+  fts_metaclass_t *mcl;
 
   if (eval_data->obj == NULL)
     {
@@ -223,45 +239,41 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
       if (ac == 1 && fts_is_object( at))
 	{
 	  eval_data->obj = fts_get_object( at);
-	  return;
+	  return fts_ok;
 	}
 
       if (ac >= 1 && fts_is_symbol( at))
 	{
-	  fts_metaclass_t *mcl;
-
 	  mcl = fts_metaclass_get_by_name( NULL, fts_get_symbol( at));
 	  if (mcl == NULL)
-	    {
-	      eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Object or template %s not found", fts_get_symbol(at));
-	      return;
-	    }
+	    return class_not_found_error;
 
 	  eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
 	  if (eval_data->obj == NULL)
-	    eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Error in class instantiation");
+	    return class_instantiation_error;
 
-	  return;
+	  return fts_ok;
 	}
 
       if (ac >= 1 && fts_is_pointer( at))
 	{
-	  fts_metaclass_t *mcl = (fts_metaclass_t *)fts_get_pointer( at);
+	  mcl = (fts_metaclass_t *)fts_get_pointer( at);
 
 	  eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
 	  if (eval_data->obj == NULL)
-	    eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Error in class instantiation");
+	    return class_instantiation_error;
 
-	  return;
+	  return fts_ok;
 	}
 
-      eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "No valid class name");
+      return invalid_class_name_error;
     }
   else
     {
       /* send the message to the already created object */
-
     }
+
+  return fts_ok;
 }
 
 #define CHECK_ERROR_PROPERTY(OBJ)		\
