@@ -1,5 +1,8 @@
 2003-01-20  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
+	* fixed channel_used updating (channels were set as used but were never reset).
+	Removed labels list in audioport (now, only a counter)
+
 	* changed audio API to 1) fix the problem of unused channels not being muted
 	and 2) reduce the number of function calls by pointer
 

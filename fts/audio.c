@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #if HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
@@ -46,6 +45,12 @@
 #define AUDIOPORT_DEFAULT_IDLE ((void (*)(fts_audioport_t *port))-1)
 
 static fts_audioport_t *audioport_list = 0;
+
+#define fts_audioport_is_direction( port, direction) ((port)->inout[(direction)].valid)
+#define fts_audioport_is_open( port, direction) ((port)->inout[(direction)].open)
+
+#define fts_audioport_is_input( port) fts_audioport_is_direction( (port), FTS_AUDIO_INPUT)
+#define fts_audioport_is_output( port) fts_audioport_is_direction( (port), FTS_AUDIO_OUTPUT)
 
 
 void
@@ -108,73 +113,55 @@ void fts_audioport_set_channels( fts_audioport_t *port, int direction, int chann
     }
 }
 
-void
-fts_audioport_set_channel_used( fts_audioport_t *port, int direction, int channel, int used)
+static void
+fts_audioport_set_channel_used( fts_audioport_t *port, int direction, int channel)
 {
-  assert(channel < fts_audioport_get_channels( port, direction));
+  port->inout[direction].channel_used[channel]++;
+}
 
-  port->inout[direction].channel_used[ channel] = used;
+static void
+fts_audioport_set_channel_unused( fts_audioport_t *port, int direction, int channel)
+{
+  port->inout[direction].channel_used[channel]--;
 }
 
 int
 fts_audioport_is_channel_used( fts_audioport_t *port, int direction, int channel)
 {
-  return port->inout[direction].channel_used[channel];
+  return port->inout[direction].channel_used[channel] > 0;
 }
 
-static fts_audiolabel_t **lookup_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
-{
-  fts_audiolabel_t **p = &port->inout[direction].labels;
-
-  while ( *p && (*p) != label)
-    p = &(*p)->inout[direction].next_same_port;
-
-  return p;
-}
-
-void
+static void
 fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
 {
-  fts_audiolabel_t **p = lookup_label( port, direction, label);
   fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? fts_s_open_input : fts_s_open_output;
 
-  if (!*p)
+  /* Call "open" method when adding first label */
+  if ( !port->inout[direction].used)
     {
-      /* Call "open" method when adding first label */
-      if (*p == NULL)
-      {
-	fts_atom_t a[1];
+      fts_atom_t a[1];
 
-	fts_set_symbol( a, fts_audiolabel_get_name( label));
-	fts_send_message( (fts_object_t *)port, selector, 1, a);
-      }
-
-      fts_object_refer( (fts_object_t *)label);
-
-      *p = label;
-      (*p)->inout[direction].next_same_port = 0;
-
-      /* FIXME */
-      /* when do we set the channel used ??? */
-      fts_audioport_set_channel_used( port, direction, fts_audiolabel_get_channel( label, direction), 1);
+      fts_set_symbol( a, fts_audiolabel_get_name( label));
+      fts_send_message( (fts_object_t *)port, selector, 1, a);
     }
+
+  port->inout[direction].used++;
+
+  fts_audioport_set_channel_used( port, direction, fts_audiolabel_get_channel( label, direction));
 }
 
-void
+static void
 fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label)
 {
-  fts_audiolabel_t **p = lookup_label( port, direction, label);
   fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? fts_s_close_input : fts_s_close_output;
 
-  if (*p)
-    {
-      *p = (*p)->inout[direction].next_same_port;
-      fts_object_release( (fts_object_t *)label);
+  port->inout[direction].used--;
 
-      /* Call "close" method when removing last label */
-      if (*p == NULL)
-	fts_send_message( (fts_object_t *)port, selector, 0, 0);
-    }
+  /* Call "close" method when removing last label */
+  if ( !port->inout[direction].used)
+    fts_send_message( (fts_object_t *)port, selector, 0, 0);
+
+  fts_audioport_set_channel_unused( port, direction, fts_audiolabel_get_channel( label, direction));
 }
 
 
@@ -344,12 +331,12 @@ static void
 audiolabel_set_channel( fts_audiolabel_t *label, int direction, int channel)
 {
   if ( label->inout[direction].port != NULL && label->inout[direction].channel >= 0)
-    fts_audioport_set_channel_used( label->inout[direction].port, direction, label->inout[direction].channel, 0);
+    fts_audioport_set_channel_unused( label->inout[direction].port, direction, label->inout[direction].channel);
 
   label->inout[direction].channel = channel;
 
   if ( label->inout[direction].port != NULL && channel >= 0)
-    fts_audioport_set_channel_used( label->inout[direction].port, direction, channel, 1);
+    fts_audioport_set_channel_used( label->inout[direction].port, direction, channel);
 }
 
 static void

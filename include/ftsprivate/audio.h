@@ -25,25 +25,6 @@
 
 /* **********************************************************************
  *
- * audio port private api
- * 
- */
-
-extern void fts_audioport_set_channel_used( fts_audioport_t *port, int direction, int channel, int used);
-extern int fts_audioport_is_channel_used( fts_audioport_t *port, int direction, int channel);
-
-extern void fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label);
-extern void fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel_t *label);
-
-#define fts_audioport_is_direction( port, direction) ((port)->inout[(direction)].valid)
-#define fts_audioport_is_open( port, direction) ((port)->inout[(direction)].open)
-
-#define fts_audioport_is_input( port) fts_audioport_is_direction( (port), FTS_AUDIO_INPUT)
-#define fts_audioport_is_output( port) fts_audioport_is_direction( (port), FTS_AUDIO_OUTPUT)
-
-
-/* **********************************************************************
- *
  * audio label private API
  *
  */

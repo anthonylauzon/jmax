@@ -79,7 +79,7 @@ struct fts_audioport_direction {
   int channels;
   int *channel_used;
   float **buffers;
-  fts_audiolabel_t *labels;
+  int used;
 };
 
 struct fts_audioport {
@@ -98,6 +98,8 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
   ((port)->inout[(direction)].channels)
 
 FTS_API void fts_audioport_set_channels( fts_audioport_t *port, int direction, int channels);
+
+FTS_API int fts_audioport_is_channel_used( fts_audioport_t *port, int direction, int channel);
 
 #define fts_audioport_set_valid(port, direction) \
   ((port)->inout[(direction)].valid = 1)
@@ -130,7 +132,6 @@ struct fts_audiolabel_direction {
   fts_symbol_t port_name;
   fts_audioport_t *port;
   int channel;
-  struct fts_audiolabel *next_same_port;
 };
 
 struct fts_audiolabel {
