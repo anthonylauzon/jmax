@@ -68,6 +68,8 @@ public class ConsoleWindow extends JFrame implements WindowListener, EditorConta
 
     MaxWindowManager.setTopFrame(this);
 
+    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
     itsConsole = new Console(this, MaxApplication.getInterpreter());
     itsConsole.Start();
 
