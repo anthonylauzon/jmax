@@ -107,6 +107,9 @@ toggle.c \
 vecdisplay.c
 
 
+libguiobj_la_LDFLAGS = -no-undefined -module
+libguiobj_la_LIBADD = -L$(top_srcdir)/fts/.libs -lfts
+
 INCLUDES = -I@top_srcdir@/packages/data/c/src
 
 noinst_HEADERS = \
@@ -123,8 +126,7 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../include
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libguiobj_la_LDFLAGS = 
-libguiobj_la_LIBADD = 
+libguiobj_la_DEPENDENCIES = 
 libguiobj_la_OBJECTS =  button.lo comment.lo comment_doctor.lo \
 console.lo display.lo dspcontrol.lo errorfinder.lo finder.lo fork.lo \
 gfloat.lo gint.lo guiobj.lo key.lo keyserver.lo messconst.lo panel.lo \
