@@ -77,10 +77,12 @@ readsf_thread_read(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
 	buffer = com_buffer->buffer;
 	buffer_size = com_buffer->size;
 #ifdef MY_DEBUG	
-	post("[readsf_thread] fill %d buffer ... \n", buffer_to_write);
+	post("[readsf_thread] fill buffer %d... \n", buffer_to_write);
+	fts_log("[readsf_thread] fill buffer %d... \n", buffer_to_write);
 #endif /* MY_DEBUG */
 	size = fts_audiofile_read(self->sf, buffer, com_buffer->n_channels, buffer_size);
 	com_buffer->full = 1;
+	com_buffer->end_index = buffer_size;
     }
 
 }
@@ -176,6 +178,45 @@ static void readsf_dsp( fts_word_t *argv)
   buffer_index = self->buffer_index;
   fts_log("readsf_dsp self->buffer_index = %d \n", self->buffer_index);
 
+
+  /* check if there is enough data available in com_buffer */
+  if (!(self->com_buffer[buffer_index].end_index >= (self->read_index + n_tick)))
+  {
+#ifdef MY_DEBUG
+      post("[readsf~] not enough data available, swap buffer buffer_index:%d"
+	   ", read_index:%d end_index:%d\n", buffer_index, self->read_index, 
+	   self->com_buffer[buffer_index].end_index);
+      fts_log("[readsf~] not enough data available, swap buffer buffer_index:%d"
+	      " , read_index:%d end_index:%d\n", buffer_index, self->read_index, 
+	      self->com_buffer[buffer_index].end_index);
+#endif /* MY_DEBUG */
+
+      /* swap buffer */
+      buffer_index = (buffer_index + 1) % 2;
+      /* check again */
+      if (!(self->com_buffer[buffer_index].end_index > (self->read_index + n_tick)))
+      {
+#ifdef MY_DEBUG
+      post("[readsf~] again not enough data available, fill with zero buffer_index:%d"
+	   ", read_index:%d end_index:%d\n", buffer_index, self->read_index, 
+	   self->com_buffer[buffer_index].end_index);
+      fts_log("[readsf~] again not enough data available, fill with zero buffer buffer_index:%d"
+	      ", read_index:%d end_index:%d\n", buffer_index, self->read_index, 
+	      self->com_buffer[buffer_index].end_index);
+#endif /* MY_DEBUG */
+
+	  /* fill output with zero */
+	  for (n = 0; n < n_tick; ++n)
+	  {
+	      out[n] = 0.0f;
+	  }
+	  /* job done, go away ... */
+	  return;
+      }
+      /* set new value for buffer_index */
+      self->buffer_index = buffer_index;
+  }
+
   com_buffer = &self->com_buffer[buffer_index];
   buffer = com_buffer->buffer;
 
@@ -187,7 +228,6 @@ static void readsf_dsp( fts_word_t *argv)
   self->read_index += n_tick;
 #ifdef MY_DEBUG
   fts_log("reading buffer %d \n", self->buffer_index);
-  fts_log("buffer adress : %x \n",&(self->buffer_index));
 #endif /* MY_DEBUG */
 
   if ((self->read_index + n_tick) > com_buffer->size)
@@ -204,7 +244,6 @@ static void readsf_dsp( fts_word_t *argv)
 #ifdef MY_DEBUG
       post("buffer (%d) is going to be read \n", self->buffer_index);
       fts_log("buffer (%d) is going to be read \n", self->buffer_index);
-      fts_log("buffer adress : %x \n", &(self->buffer_index));
 #endif /* MY_DEBUG */      
   }
 }
@@ -382,6 +421,7 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 	  com_buffer->buffer[j] = fts_malloc(com_buffer->size * sizeof(float));
       }
       com_buffer->full = 0;
+      com_buffer->end_index = 0;
   }
 
   self->read_index = 0;
