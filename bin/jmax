@@ -165,7 +165,7 @@ build_classpath ()
     then
 	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar
     else
-	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar
+	CLASSPATH=${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar
     fi
 
     if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;

@@ -197,7 +197,7 @@ rpm-ppc: $(distfile)
 	cp /usr/src/redhat/RPMS/ppc/jMax-$(version)-1.ppc.rpm .
 
 #
-# sgipkg targets
+# sgi-pkg targets
 # builds a SGI package
 #
 BUILD_DIR=/data/jmax-build
