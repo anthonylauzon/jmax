@@ -26,6 +26,8 @@
 #include <fts/fts.h>
 #include "seqsym.h"
 #include "event.h"
+#include "note.h"
+#include "seqmess.h"
 
 fts_class_t *event_class = 0;
 
@@ -41,23 +43,107 @@ event_get_array(event_t *event, fts_array_t *array)
   if(fts_is_object(&event->value))
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      fts_symbol_t type = fts_object_get_class_name(obj);
+      fts_atom_t a;
+      
+      fts_set_array(&a, array);
+      fts_send_message(obj, fts_SystemInlet, fts_s_get_array, 1, &a);
+    }
+  else if(!fts_is_void(&event->value))
+    fts_array_append(array, 1, &event->value);
+}
+
+static void
+event_get_description(event_t *event, fts_array_t *array)
+{
+  if(fts_is_object(&event->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
+      fts_symbol_t type = fts_get_selector(&event->value);
       fts_atom_t a[2];
       
       fts_set_array(a, array);
       fts_send_message(obj, fts_SystemInlet, fts_s_get_array, 1, a);
-
+      
       fts_set_float(a + 0, (float) event->time);
       fts_set_symbol(a + 1, type);
       fts_array_prepend(array, 2, a);
     }
   else if(!fts_is_void(&event->value))
     {
-      fts_symbol_t type = fts_type_get_selector(fts_get_type(&event->value));
-
+      fts_symbol_t type = fts_get_selector(&event->value);
+      
       fts_array_append_float(array, (float)event->time);
-      fts_array_append_symbol(array, type);
       fts_array_append(array, 1, &event->value);
+    }
+}
+
+void
+event_dump(event_t *event, fts_dumper_t *dumper)
+{
+  fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
+
+  event_get_description(event, fts_message_get_args(mess));
+
+  /* dump add event message */
+  fts_dumper_message_send(dumper, mess);
+}
+
+void
+event_upload(event_t *event)
+{
+  fts_symbol_t type = event_get_type(event);
+
+  if(fts_is_object(&event->value))
+    {
+      if(type == seqsym_note)
+	{
+	  note_t *note = (note_t *)fts_get_object(&event->value);
+	  fts_atom_t a[4];
+
+	  fts_set_float(a + 0, (float)event_get_time(event));
+	  fts_set_symbol(a + 1, seqsym_note);
+	  fts_set_int(a + 2, note_get_pitch(note));
+	  fts_set_float(a + 3, (float)note_get_duration(note));
+	  fts_client_upload((fts_object_t *)event, seqsym_event, 4, a);
+	}
+      else if(type == seqsym_seqmess)
+	{
+	  seqmess_t *seqmess = (seqmess_t *)fts_get_object(&event->value);
+	  fts_atom_t a[4];
+
+	  fts_set_float(a + 0, (float)event_get_time(event));
+	  fts_set_symbol(a + 1, seqsym_seqmess);
+	  fts_set_symbol(a + 2, seqmess_get_selector(seqmess));
+	  fts_set_int(a + 3, seqmess_get_position(seqmess));
+	  fts_client_upload((fts_object_t *)event, seqsym_event, 4, a);
+	}
+    }
+  else if(!fts_is_void(&event->value))
+    { 
+      fts_atom_t a[3];
+
+      fts_set_float(a + 0, (float)event_get_time(event));
+      fts_set_symbol(a + 1, fts_get_selector(&event->value));
+      a[2] = event->value;
+      fts_client_upload((fts_object_t *)event, seqsym_event, 3, a);
+    }
+}
+
+void
+event_print(event_t *event)
+{
+  if(fts_is_object(&event->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
+
+      post("<%s> ", fts_symbol_name(event_get_type(event)));
+
+      fts_send_message(obj, fts_SystemInlet, fts_s_print, 0, 0);
+    }
+  else if(!fts_is_void(&event->value))
+    {
+      post_atoms(1, &event->value);
+      post("\n");
     }
 }
 
@@ -77,7 +163,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
       fts_send_message(obj, fts_SystemInlet, fts_s_set_from_array, ac, at);
     }
-  else
+  else if(!fts_is_void(&this->value))
     this->value = at[0];
 }
 
@@ -91,11 +177,19 @@ event_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   event_t *this = (event_t *)o;  
 
+  ac--;
+  at++;
+
+  fts_atom_void(&this->value);
+
   this->value = at[1];
   this->time = 0.0;
   this->track = 0;
   this->prev = 0;
   this->next = 0;
+
+  if(ac > 0)
+    fts_atom_assign(&this->value, at);
 }
 
 static void

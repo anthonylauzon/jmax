@@ -36,12 +36,7 @@ extern fts_symbol_t seqsym_event;
 
 /* events */
 extern fts_symbol_t seqsym_note;
-extern fts_symbol_t seqsym_midival;
-extern fts_symbol_t seqsym_message;
-
-/* properties */
-extern fts_symbol_t seqsym_midi_channel;
-extern fts_symbol_t seqsym_midi_velocity;
+extern fts_symbol_t seqsym_seqmess;
 
 /* messages */
 extern fts_symbol_t seqsym_export_midifile;

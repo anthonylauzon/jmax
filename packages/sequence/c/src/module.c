@@ -28,13 +28,13 @@
 
 extern void seqsym_config(void);
 
-extern void _sequence_config(void);
+extern void sequence_class_config(void);
 extern void track_config(void);
 extern void event_config(void);
 
 extern void note_config(void);
 extern void midival_config(void);
-extern void message_config(void);
+extern void seqmess_config(void);
 
 extern void seqfind_config(void);
 extern void seqstep_config(void);
@@ -46,13 +46,12 @@ sequence_config(void)
 {
   seqsym_config();
 
-  _sequence_config();
+  sequence_class_config();
   track_config();
   event_config();
 
   note_config();
-  midival_config();
-  message_config();
+  seqmess_config();
 
   seqfind_config();
   seqstep_config();

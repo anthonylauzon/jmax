@@ -23,34 +23,25 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _MIDIVAL_H_
-#define _MIDIVAL_H_
+#ifndef _SEQMESS_H_
+#define _SEQMESS_H_
 
 #include <fts/fts.h>
 #include "event.h"
 
-extern fts_class_t *midival_class;
+extern fts_class_t *seqmess_class;
 
-typedef struct _midival_
+typedef struct _seqmess_
 {
   fts_object_t head;
-  int type;
-  int value;
-  int number;
-  int channel;
-} midival_t;
+  fts_symbol_t s; /* selector (no arguments yet) */
+  int position; /* vertical position */
+} seqmess_t;
 
-#define MIDIVAL_DEF_VALUE 64
-#define MIDIVAL_DEF_NUMBER 64
-#define MIDIVAL_DEF_CHANNEL 1
+#define seqmess_set_selector(m, x) ((m)->s = (x))
+#define seqmess_get_selector(m) ((m)->s)
 
-#define midival_set_value(n, x) ((n)->value = (x))
-#define midival_get_value(n) ((n)->value)
-
-#define midival_set_number(n, x) ((n)->number = (x))
-#define midival_get_number(n) ((n)->number)
-
-#define midival_set_channel(n, x) ((n)->channel = (x))
-#define midival_get_channel(n, x) ((n)->channel)
+#define seqmess_set_position(m, x) ((m)->position = (x))
+#define seqmess_get_position(m) ((m)->position)
 
 #endif

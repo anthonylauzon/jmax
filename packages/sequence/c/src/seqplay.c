@@ -338,7 +338,7 @@ seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_object_refer(this->track);
     }
   else
-    fts_object_set_error(o, "Wrong arguments");
+    fts_object_set_error(o, "Argument of track required");
 }
 
 static void 
@@ -376,5 +376,5 @@ seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 seqplay_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("seqplay"), seqplay_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("play"), seqplay_instantiate, fts_arg_type_equiv);
 }

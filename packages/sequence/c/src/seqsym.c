@@ -39,11 +39,7 @@ fts_symbol_t seqsym_symbol = 0;
 fts_symbol_t seqsym_note = 0;
 fts_symbol_t seqsym_midi = 0;
 fts_symbol_t seqsym_midival = 0;
-fts_symbol_t seqsym_message = 0;
-
-/* properties */
-fts_symbol_t seqsym_midi_channel = 0;
-fts_symbol_t seqsym_midi_velocity = 0;
+fts_symbol_t seqsym_seqmess = 0;
 
 /* messages */
 fts_symbol_t seqsym_add = 0;
@@ -88,13 +84,8 @@ seqsym_config(void)
   /* event types */
   seqsym_note = fts_new_symbol("note");
   seqsym_midi = fts_new_symbol("midi");
-  seqsym_midival = fts_new_symbol("midival");
-  seqsym_message = fts_new_symbol("message");
+  seqsym_seqmess = fts_new_symbol("seqmess");
   
-  /* properties */
-  seqsym_midi_channel = fts_new_symbol("midi_channel");
-  seqsym_midi_velocity = fts_new_symbol("midi_velocity");
-
   /* messages */
   seqsym_export_midifile = fts_new_symbol("export_midifile");
   seqsym_export_midifile_dialog = fts_new_symbol("export_midifile_dialog");

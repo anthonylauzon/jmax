@@ -79,7 +79,7 @@ VERSION = @VERSION@
 
 packagedir = $(pkgdatadir)/packages/sequence/c
 package_LTLIBRARIES = libsequence.la
-libsequence_la_SOURCES =  event.c message.c midival.c module.c note.c seqfind.c seqmidi.c seqplay.c seqrec.c seqstep.c seqsym.c sequence.c track.c
+libsequence_la_SOURCES =  event.c module.c note.c seqmess.c seqfind.c seqmidi.c seqplay.c seqrec.c seqstep.c seqsym.c sequence.c track.c
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../include/ftsconfig-ac.h
@@ -93,8 +93,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libsequence_la_LDFLAGS = 
 libsequence_la_LIBADD = 
-libsequence_la_OBJECTS =  event.lo message.lo midival.lo module.lo \
-note.lo seqfind.lo seqmidi.lo seqplay.lo seqrec.lo seqstep.lo seqsym.lo \
+libsequence_la_OBJECTS =  event.lo module.lo note.lo seqmess.lo \
+seqfind.lo seqmidi.lo seqplay.lo seqrec.lo seqstep.lo seqsym.lo \
 sequence.lo track.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -108,10 +108,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/event.P .deps/message.P .deps/midival.P \
-.deps/module.P .deps/note.P .deps/seqfind.P .deps/seqmidi.P \
-.deps/seqplay.P .deps/seqrec.P .deps/seqstep.P .deps/seqsym.P \
-.deps/sequence.P .deps/track.P
+DEP_FILES =  .deps/event.P .deps/module.P .deps/note.P .deps/seqfind.P \
+.deps/seqmess.P .deps/seqmidi.P .deps/seqplay.P .deps/seqrec.P \
+.deps/seqstep.P .deps/seqsym.P .deps/sequence.P .deps/track.P
 SOURCES = $(libsequence_la_SOURCES)
 OBJECTS = $(libsequence_la_OBJECTS)
 
@@ -228,7 +227,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

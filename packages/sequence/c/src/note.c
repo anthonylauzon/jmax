@@ -42,8 +42,18 @@ note_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   note_t *this = (note_t *)o;
   
-  this->pitch = fts_get_number_int(at + 0);
-  this->duration = fts_get_number_float(at + 1);
+  switch(ac)
+    {
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+	this->duration = fts_get_number_float(at + 1);
+    case 1:
+      if(fts_is_number(at + 1))
+	this->pitch = fts_get_number_int(at + 0);
+    case 0:
+      break;
+    }
 }
 
 void 
@@ -56,19 +66,26 @@ note_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_array_append_float(array, (float)this->duration);
 }
 
-/**************************************************************
- *
- *  class
- *
- */
+void 
+note_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  note_t *this = (note_t *)o;
+
+  post("{%d %f}\n", this->pitch, (float)this->duration);
+}
 
 static void
 note_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   note_t *this = (note_t *)o;
-  
-  this->pitch = fts_get_int_arg(ac, at, 1, NOTE_DEF_PITCH);
-  this->duration = fts_get_float_arg(ac, at, 2, NOTE_DEF_DURATION);
+
+  ac--;
+  at++;
+
+  this->pitch = NOTE_DEF_PITCH;
+  this->duration = NOTE_DEF_DURATION;
+
+  note_set_from_array(o, 0, 0, ac, at);  
 }
 
 static fts_status_t
@@ -80,6 +97,8 @@ note_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, note_get_array);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, note_set_from_array);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, note_print);
 
   return fts_Success;
 }

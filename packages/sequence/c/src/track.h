@@ -82,8 +82,8 @@ extern void track_highlight_event(track_t *track, event_t *event);
 extern void track_highlight_cluster(track_t *track, event_t *event, event_t *next);
 extern event_t *track_highlight_and_next(track_t *track, event_t *event);
 
-extern void track_write_to_dumper(track_t *this, fts_dumper_t *dumper);
-extern void track_add_event_from_array(track_t *this, int ac, const fts_atom_t *at);
+extern void track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void track_add_event_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /* track atoms */
 #define track_atom_set(ap, x) fts_set_object_with_type((ap), (x), seqsym_track)

@@ -443,7 +443,9 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       while(track)
 	{      
 	  sequence_remove_track(this, track);
-	  fts_client_send_message(o, seqsym_removeTracks, 1, at);
+	  
+	  if(sequence_editor_is_open(this))
+	    fts_client_send_message(o, seqsym_removeTracks, 1, at);
 
 	  track = sequence_get_first_track(this);
 	}    
@@ -471,24 +473,26 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       int size = sequence_get_size(this);
       int i;
 
-      if(size == 1)
-	{
-	  post("sequence: single track of %s: %s (%d event%s)\n", fts_symbol_name(track_get_type(track)), 
-	       (track_get_name(track))? fts_symbol_name(track_get_name(track)): "untitled", 
-	       track_get_size(track), (track_get_size(track) > 1)? "s": "");
-	}
+      if(size == 0)
+	post("(empty sequence)\n");
       else
 	{
-	  post("sequence: %d tracks\n", size);
-	  
+	  post("(%d track%s) {\n", size, (size > 1)? "s": "");
+
 	  for(i=0; i<size; i++)
 	    {
-	      post("  %d of %s: %s (%d event%s)\n", i, fts_symbol_name(track_get_type(track)), 
-		   (track_get_name(track))? fts_symbol_name(track_get_name(track)): "untitled", 
-		   track_get_size(track), (track_get_size(track) > 1)? "s": "");
+	      fts_symbol_t track_name = track_get_name(track);
+	      fts_symbol_t track_type = track_get_type(track);
+	      int track_size = track_get_size(track);
+	      const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
+
+	      post("  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
+		   fts_symbol_name(track_type), (track_size > 1)? "s": "");
 
 	      track = track_get_next(track);
   	    }
+
+	  post("}\n");      
   	}
     }
   else if(ac && fts_is_number(at))
@@ -497,11 +501,9 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       track_t *track = sequence_get_track_by_index(this, index);
 
       if(track)
-	{
-	  post("sequence %d: ", index);
-
-	  fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
-	}
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, fts_s_print, 0, 0);
+      else
+	fts_object_signal_runtime_error(o, "print: no track %d", index);
     }
 }
 
@@ -604,7 +606,7 @@ sequence_add_event_to_last_track(fts_object_t *o, int winlet, fts_symbol_t s, in
 {
   sequence_t *this = (sequence_t *)o;
 
-  track_add_event_from_array(this->last_track, ac, at);
+  track_add_event_from_array((fts_object_t *)this->last_track, 0, 0, ac, at);
 }  
 
 static void
@@ -629,7 +631,7 @@ sequence_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_dumper_message_send(dumper, mess);
 
       /* write track events */
-      track_write_to_dumper(track, dumper);
+      track_dump((fts_object_t *)track, 0, 0, 1, at);
       track = track_get_next(track);
     }
 }
@@ -658,6 +660,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_add_event, sequence_add_event_to_last_track);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, sequence_dump);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, sequence_print);
   
   /* graphical editor */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("getName"), sequence_send_name_to_client);
@@ -677,7 +680,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 void
-_sequence_config(void)
+sequence_class_config(void)
 {
   fts_class_install(seqsym_sequence, sequence_instantiate);
 }
