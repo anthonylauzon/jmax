@@ -249,16 +249,19 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	return new Dimension(800, 430);
     }
 
-    public Dimension getMinimumSize()
-    {
-	return new Dimension(800, 250);
-    }
+    /*public Dimension getMinimumSize()
+      {
+      return new Dimension(800, 150);
+      }*/
 
     public Track getTrack()
     {
 	return track;
     }
-
+    public SequenceGraphicContext getGc()
+    {
+	return gc;
+    }
     public void setViewMode(int viewType)
     {
 	if(viewMode!=viewType)

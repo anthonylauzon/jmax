@@ -76,6 +76,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     static public Color violetColor = new Color(102,102,153);
     static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
 
+    Component verticalGlue = Box.createVerticalGlue();
   /**
    * Constructor based on a SequenceDataModel containing the tracks to edit.
    */
@@ -104,13 +105,13 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    }
     });
 
+
     //-------------------------------------------------
     //-- Tools, toolbar and status bar:
     //- Create the ToolManager with the needed tools
     //- Create a toolbar associated to this ToolManager
     //- Create a status bar containing the toolbar
     
-
     manager = new ToolManager(SequenceTools.instance);
     Tool arrow = manager.getToolByName("arrow"); 
     
@@ -120,30 +121,21 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     toolbar.setSize(200, 30);
 
     //------------------- prepare the track panel:
-
     trackPanel = new Box(BoxLayout.Y_AXIS);
     scrollTracks = new JScrollPane(trackPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				   JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    trackPanel.add(verticalGlue);
 
-    /**********  DEBUG CODE: for now, sequenceRemoteData is Empty (the FTS counterpart does not exist yet)
-     ********** so we insert some false track to test the track editors */
-
-    //ftsSequenceObject.addTrack(new TrackBase(new AbstractSequence(ftsSequenceObject, AmbitusValue.info)));    
-    ftsSequenceObject.requestTrackCreation(/*AmbitusValue.info.getName()*/"ambitus");
+    ftsSequenceObject.requestTrackCreation("ambitus");
 
     setLayout(new BorderLayout());
 
     JPanel separate_tracks = new JPanel();
     separate_tracks.setLayout(new BorderLayout());
 
-    //ftsSequenceObject.getTrackAt(0).setProperty("active", Boolean.TRUE);
-
-    trackPanel.setSize(500, 50);
-
     separate_tracks.add(scrollTracks, BorderLayout.CENTER);
     
-    //-- prepares the Status bar
-    
+    //-- prepares the Status bar    
     Box northSection = new Box(BoxLayout.Y_AXIS);
     
     statusBar = new InfoPanel();
@@ -249,10 +241,12 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	teditor.getGraphicContext().setFrame(itsContainer.getFrame());
 	manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
 
+	trackPanel.remove(verticalGlue);
+
 	TrackContainer trackContainer = new TrackContainer(track, teditor);
-	
 	trackContainer.setBorder(new EtchedBorder()); 
 	trackPanel.add(trackContainer);
+	trackPanel.add(verticalGlue);
 	
 	trackPanel.validate();
 	scrollTracks.validate();
@@ -453,22 +447,33 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	return ((time>startTime)&&(time+dur<endTime));
     }
+    
+    public boolean pointIsVisible(int x, int y)
+    {
+	Rectangle r = itsContainer.getViewRectangle();
+	return ((x > r.x + ScoreBackground.KEYEND) && (x < r.x + r.width - TrackContainer.BUTTON_WIDTH));
+    }
+
 
     private int scrollingDelta = 10; 
-    public boolean scrollBy(int eventTime)
+    public boolean scrollBy(int x, int y)
     {
-	int startTime = -geometry.getXTransposition(); 
-	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-	if(eventTime<startTime)
+	Rectangle r = itsContainer.getViewRectangle();
+	if(x < r.x  + ScoreBackground.KEYEND)
 	    {
 		itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
 		return false;//going to left
 	    }
 	else
-	    {
-		if(eventTime>endTime){
-		    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()+scrollingDelta);
-		}
+	    {		
+		if(x > r.x + r.width - TrackContainer.BUTTON_WIDTH)
+		    {
+			int value = itsTimeScrollbar.getValue()+scrollingDelta;
+			if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
+			    itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
+			
+			itsTimeScrollbar.setValue(value);
+		    }
 		return true;//going to rigth
 	    }
     }

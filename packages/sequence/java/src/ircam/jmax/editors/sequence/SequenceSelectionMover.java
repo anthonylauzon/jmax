@@ -66,60 +66,66 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     class SequenceScrollDragAction implements ActionListener
     {
 	SequencePanel sequencePanel;
-	Event event;
+	//Event event;
 	private int delta = 10;
-	
+	int x, y;
 	public void actionPerformed(ActionEvent ae)
 	{
-	    /*int time = (int)event.getTime();
+	    /*int time = (int)event.getTime();//verson 1
 	      if(sequencePanel.scrollBy(time))
 	      
 	      event.setTime(time+delta);
 	      else
 	      event.setTime(time-delta);*/
 	    
-	    int time = (int)event.getTime();
-	    if(sequencePanel.scrollBy(time))
-		event.setTime(time+delta);
-	    else
-		event.setTime(time-delta);
+	    /*int time = (int)event.getTime();//version 2
+	      if(sequencePanel.scrollBy(x, y))
+	      event.setTime(time+delta);
+	      else
+	      event.setTime(time-delta);*/
 
-	    PartitionAdapter a = (PartitionAdapter)(getGc().getAdapter());
-
-	    moveTo(a.getX(time+delta), a.getY(event));
+	    sequencePanel.scrollBy(x, y);//version 3
 	}
 	void setEditor(SequencePanel editor)
 	{
 	    this.sequencePanel = editor;
 	}
-	void setEvent(Event evt)
+	/*Event getEvent()
+	  {
+	  return event;
+	  }
+	  void setEvent(Event evt)
+	  {
+	  event = evt;
+	  }*/
+	void setXY(int x, int y)
 	{
-	    event = evt;
+	    this.x = x;
+	    this.y = y;
 	}
     }
 
-    void autoScrollIfNeeded()
+    void autoScrollIfNeeded(int x, int y)
     {
 	SequencePanel panel = (SequencePanel)((Sequence)gc.getFrame()).getEditor();
-	if (! panel.eventIsVisible(tempEvent))
-	    {
-		if (scrollTimer.isRunning())
-		    {
-			// Ignore
-		    }
-		else
-		    {
-			scroller.setEditor(panel);
-			scroller.setEvent(tempEvent);
-			scrollTimer.start();
-		    }
-	    }
+	//if (! panel.eventIsVisible(tempEvent))
+	if (! panel.pointIsVisible(x , y))
+	{
+	    scroller.setXY(x, y);
+	    if (!scrollTimer.isRunning())
+		{
+		    scroller.setEditor(panel);
+		    //scroller.setEvent(tempEvent);
+		    scrollTimer.start();
+		}
+	}
 	else 
 	    {
 		if (scrollTimer.isRunning())
 		    {
 			scrollTimer.stop();
 		    }
+		//moveTo(x, y);
 	    }
     }
 
@@ -196,6 +202,9 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	if (scrollTimer.isRunning())
 	{
 	    scrollTimer.stop();
+	    PartitionAdapter a = (PartitionAdapter)(getGc().getAdapter());
+	    //Event evt = scroller.getEvent();
+	    a.setX(/*evt*/tempEvent, e.getX());
 	}
 	super.mouseReleased(e);
     }
@@ -216,9 +225,10 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	  egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dy "+deltaY);
       else egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX)+", dy "+(deltaY));
       
-      super.mouseDragged(e);
+      if(!scrollTimer.isRunning())
+	  super.mouseDragged(e);
 
-      autoScrollIfNeeded();
+      autoScrollIfNeeded(e.getX(), e.getY());
   }
 
   /**

@@ -168,6 +168,16 @@ public class MidiTrackPopupMenu extends JPopupMenu
 	}
     });
     add(displayLabelItem);
+    addSeparator();
+    item = new JMenuItem("Remove Track");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	    MidiTrackPopupMenu.getPopupTarget().getGc().getFtsSequenceObject().
+		removeTrack(MidiTrackPopupMenu.getPopupTarget().getTrack());
+	}
+    });
+    add(item);
 
     pack();
   }

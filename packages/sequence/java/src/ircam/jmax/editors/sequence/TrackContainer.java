@@ -91,6 +91,7 @@ class TrackContainer extends JPanel {
 		  int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight();
 		  setSize(getSize().width, height);
 		  setPreferredSize(new Dimension(getPreferredSize().width, height));
+		  setMaximumSize(new Dimension(getMaximumSize().width, height));
 		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
 	      }
     }

@@ -77,7 +77,7 @@ public class PartitionBackground implements Layer, ImageObserver{
 
     g.setColor(ScoreBackground.OUT_RANGE_COLOR);
     g.fillRect(0, 0 -delta, d.width, maxPitch);
-    g.fillRect(0, minPitch -delta, d.width, d.height-maxPitch);
+    g.fillRect(0, minPitch -delta, d.width, d.height-minPitch+delta);
     
     int positionY = SC_BOTTOM;
     g.setFont(gridSubdivisionFont);

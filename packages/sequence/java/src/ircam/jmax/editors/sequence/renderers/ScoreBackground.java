@@ -66,14 +66,6 @@ public class ScoreBackground implements Layer{
   private void drawHorizontalGrid(Graphics g)
   {
       PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-      /*Track track = gc.getTrack();
-	int max = ((Integer)track.getProperty("maximumPitch")).intValue();
-	int maxPitch = pa.getY(max);
-	int minPitch = pa.getY(((Integer)track.getProperty("minimumPitch")).intValue());
-      
-	int delta;
-	if(max<127) delta = maxPitch-SC_TOP;
-	else delta = 0;*/
       int maxPitch = pa.getY(pa.getMaxPitch());
       int minPitch = pa.getY(pa.getMinPitch());
       int delta = pa.getVerticalTransp();
@@ -85,7 +77,7 @@ public class ScoreBackground implements Layer{
 
       g.setColor(OUT_RANGE_COLOR);
       g.fillRect(0 , 0 -delta, d.width, maxPitch);
-      g.fillRect(0, minPitch -delta, d.width, d.height-maxPitch);
+      g.fillRect(0, minPitch+2 -delta, d.width, d.height-minPitch-2+delta);
 
       int positionY;
       g.setFont(gridSubdivisionFont);
@@ -95,18 +87,19 @@ public class ScoreBackground implements Layer{
       for (int i = 0; i < 381; i+=9)
 	  {
 	      positionY = SC_BOTTOM-i;
-	      g.drawLine(KEYX, positionY -delta, d.width, positionY -delta);
+	      g.drawLine(KEYEND+1, positionY -delta, d.width, positionY -delta);
 	  }
 
       // the major subdivision lines and numbers
       g.setColor(Color.black);
-      for (int j = 0; j < 381; j+=36)
+      g.drawLine(KEYEND+1, SC_BOTTOM+1 -delta, d.width,SC_BOTTOM+1-delta);
+      for (int j = 36; j < 381; j+=36)
 	  {
 	      positionY = SC_BOTTOM-j;
 	      g.drawLine(KEYEND+1, positionY -delta, d.width, positionY-delta);
 	  }
       // the last (127) line
-      g.drawLine(KEYEND+1, SC_TOP -delta, d.width, SC_TOP -delta);
+      g.drawLine(KEYEND+1, SC_TOP-3 -delta, d.width, SC_TOP-3 -delta);//?????
     
       g.setColor(Color.gray);
       for (int j = 0; j < 381; j+=36)
@@ -120,22 +113,25 @@ public class ScoreBackground implements Layer{
       // the piano keys...
       for (int i = 0; i <= 127; i++)
 	  {
-	      positionY = SC_BOTTOM-(i*3)-1;
+	      positionY = SC_BOTTOM-(i*3)-2;
 	      if (isAlteration(i)) 
 		  {
 		      g.setColor(Color.darkGray);
-		      g.fillRect(KEYX, positionY-delta, KEYWIDTH, KEYHEIGHT);
+		      g.fillRect(KEYX, positionY-delta, SHORTKEYWIDTH, KEYHEIGHT);
 		  }
 	      else 
 		  {
-		      g.setColor(Color.lightGray);
+		      g.setColor(Color.white);
 		      g.fillRect(KEYX, positionY -delta, KEYWIDTH, KEYHEIGHT);
 		  }
 	  }
-
-      // the vertical line at the end of keyboard
       g.setColor(Color.black);
-      g.drawLine(KEYEND, SC_TOP-delta, KEYEND, SC_BOTTOM-delta);
+      //lines at top and bottom of the keybord 
+      g.drawLine(KEYX, SC_TOP-3-delta, KEYEND,SC_TOP-3-delta);
+      g.drawLine(KEYX, SC_BOTTOM+1-delta, KEYEND,SC_BOTTOM+1-delta);
+      // the vertical line at the end of keyboard
+      g.drawLine(KEYEND, SC_TOP-3-delta, KEYEND, SC_BOTTOM+1-delta);
+      g.drawLine(KEYX-1, SC_TOP-3-delta, KEYX-1, SC_BOTTOM+1-delta);
   }
 
   public static boolean isAlteration(int note)
@@ -150,11 +146,15 @@ public class ScoreBackground implements Layer{
     if (key < 0 || key > 127) return;
     if (currentPressedKey != -1 && currentPressedKey != key) releaseKey(sgc);
     PartitionAdapter pa = (PartitionAdapter)(sgc.getAdapter());
-    int positionY = SC_BOTTOM-(key*KEYHEIGHT)-1-pa.getVerticalTransp();//@@@@@@@@@@@@@@@@@@@@@@
+    int positionY = SC_BOTTOM-(key*KEYHEIGHT)-2-pa.getVerticalTransp();
 
     Graphics g = sgc.getGraphicDestination().getGraphics();
-    g.setColor(Color.white);
-    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
+    g.setColor(OUT_RANGE_COLOR);
+    if (isAlteration(key))
+	g.fillRect(KEYX, positionY, SHORTKEYWIDTH, KEYHEIGHT);
+    else
+	g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
+
     g.dispose();
     currentPressedKey = key;
   }
@@ -163,13 +163,19 @@ public class ScoreBackground implements Layer{
   {
     if (currentPressedKey == -1) return;
     PartitionAdapter pa = (PartitionAdapter)(sgc.getAdapter());
-    int positionY = SC_BOTTOM-(currentPressedKey*KEYHEIGHT)-1-pa.getVerticalTransp();
+    int positionY = SC_BOTTOM-(currentPressedKey*KEYHEIGHT)/*-1*/-2-pa.getVerticalTransp();
 
     Graphics g = sgc.getGraphicDestination().getGraphics();
     if (isAlteration(currentPressedKey))
-      g.setColor(Color.darkGray);
-    else g.setColor(Color.lightGray);
-    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
+	{
+	    g.setColor(Color.darkGray);
+	    g.fillRect(KEYX, positionY, SHORTKEYWIDTH, KEYHEIGHT);
+	}
+    else
+	{ 
+	    g.setColor(Color.white);
+	    g.fillRect(KEYX, positionY, KEYWIDTH, KEYHEIGHT);
+	}
     g.dispose();
     currentPressedKey = -1;
   }
@@ -282,6 +288,7 @@ public class ScoreBackground implements Layer{
     public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
     public static final int KEYX = 31;
     public static final int KEYWIDTH = 24;
+    public static final int SHORTKEYWIDTH = 16;
     public static final int KEYHEIGHT = 3;
     public static final int KEYEND = KEYX + KEYWIDTH;
 
