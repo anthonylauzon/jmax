@@ -21,6 +21,8 @@
 
 package ircam.jmax;
 
+import ircam.fts.client.*;
+
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
@@ -90,7 +92,7 @@ class ClassMapEntry {
 }
 
 
-public class JMaxClassMap {
+public class JMaxClassMap implements JMaxObjectManager{
 
   public static void put( String ftsClassName, JMaxObjectCreator creator, String iconName, String selectedIconName, String cursorName, String description, JMaxPackage jmaxPackage)
   {
@@ -167,7 +169,22 @@ public class JMaxClassMap {
     instance.map.clear();
     instance.names.clear();
   }
-
+  
+  /* JMaxObjectManager interface */
+  public FtsObject makeFtsObject(int objId, String className, FtsAtom[] args)
+  {
+    JMaxObjectCreator creator = JMaxClassMap.getCreator( className);
+    if(creator != null)
+      return creator.createFtsObject(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), objId, className, args, 0, args.length);
+    else
+      return null;
+  }
+  
+  static public JMaxClassMap getInstance()
+  {
+    return instance;
+  }
+  
   private static JMaxClassMap instance = new JMaxClassMap();
   private HashMap map;
   private ArrayList names;

@@ -6,6 +6,7 @@ JMaxApplication.java				\
 JMaxClassMap.java				\
 JMaxIcons.java					\
 JMaxObjectCreator.java				\
+JMaxObjectManager.java				\
 JMaxPackage.java				\
 JMaxPackageLoader.java				\
 JMaxPackageLoadingException.java		\

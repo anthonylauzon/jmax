@@ -33,7 +33,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 
-import ircam.jmax.editors.mat.*;
 import ircam.fts.client.*;
 
 /**
@@ -85,12 +84,8 @@ public class FmatValue extends AbstractEventValue
     {
       args.clear();
       args.addString("fmat");
-      
-      JMaxObjectCreator creator = JMaxClassMap.getCreator( "fmat");
-      fmat = (FtsObjectWithEditor) creator.createFtsObject(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), 
-                                                           ((Integer)objId).intValue(),"fmat", args.getAtoms(), 0, 1);
+      fmat = (FtsObjectWithEditor) JMaxApplication.getObjectManager().makeFtsObject(((Integer)objId).intValue(), "fmat", args.getAtoms());
     }
-    
     fmat.requestOpenEditor();
   }
       

@@ -5,6 +5,27 @@
 	};
 	objectVersion = 39;
 	objects = {
+		3B02487F06B94BDA002BEB0D = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = JMaxObjectManager.java;
+			path = ../../java/src/ircam/jmax/JMaxObjectManager.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B02488006B94BDA002BEB0D = {
+			fileRef = 3B02487F06B94BDA002BEB0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B02488106B94BDA002BEB0D = {
+			fileRef = 3B02487F06B94BDA002BEB0D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B513E2806A4274500F1664A = {
 			children = (
 				3BA9870506AD60A600D18F4E,
@@ -7624,6 +7645,7 @@
 				5C5429BE05AB0B970042B7A2,
 				5C5429BF05AB0B970042B7A2,
 				5C5429C005AB0B970042B7A2,
+				3B02488106B94BDA002BEB0D,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10202,7 +10224,7 @@
 				INSTALL_PATH = "";
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/data.jar build/jmax.jar build/ftsclient.jar";
+				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
@@ -10392,6 +10414,7 @@
 				3B5C4AF906B7E39500CC2ECC,
 				3B5C4AFB06B7E40100CC2ECC,
 				3B5C4B1306B80DEF00CC2ECC,
+				3B02488006B94BDA002BEB0D,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -21697,6 +21720,7 @@
 				F880FECE0283013E01664092,
 				F880FECF0283013E01664092,
 				F880FED00283013E01664092,
+				3B02487F06B94BDA002BEB0D,
 				F880FED10283013E01664092,
 				F880FED20283013E01664092,
 				F880FED30283013E01664092,

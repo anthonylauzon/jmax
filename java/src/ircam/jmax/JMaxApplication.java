@@ -488,6 +488,11 @@ public class JMaxApplication {
     singleInstance._reportException( t);
   }
 
+  public static JMaxObjectManager getObjectManager()
+  {
+    return JMaxClassMap.getInstance();
+  }
+  
   private JMaxApplication()
   {
     singleInstance = this;
