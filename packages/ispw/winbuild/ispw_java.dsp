@@ -41,7 +41,7 @@ CFG=ispw_java - Win32 Debug
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "ispw_java___Win32_Release"
 # PROP Intermediate_Dir "ispw_java___Win32_Release"
-# PROP Cmd_Line "nmake /f "ispw_java.mak"  JAVA_HOME=c:\jdk1.3.1"
+# PROP Cmd_Line "nmake /f "ispw_java.mak"  JAVA_HOME="C:\Program Files\IBM\Java13""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "ispw_java.exe"
 # PROP Bsc_Name ""

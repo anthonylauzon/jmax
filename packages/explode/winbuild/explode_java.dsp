@@ -41,7 +41,7 @@ CFG=explode_java - Win32 Debug
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
-# PROP Cmd_Line "nmake /f "explode_java.mak" JAVA_HOME=c:\jdk1.3.1"
+# PROP Cmd_Line "nmake /f "explode_java.mak" JAVA_HOME="C:\Program Files\IBM\Java13""
 # PROP Rebuild_Opt "/a"
 # PROP Target_File "explode_java.exe"
 # PROP Bsc_Name ""
