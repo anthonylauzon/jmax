@@ -10,7 +10,8 @@ import com.sun.java.swing.*;
 
 public class TablePanel extends JPanel implements MouseMotionListener, MouseListener{
   
-  int N_POINTS = 300;
+  int x_scale_factor = 4;
+  int N_POINTS = 128;
   int MAX_VALUE = 300;
   int old_dragx = 0;
   int old_dragy = 0;
@@ -26,8 +27,10 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   }
 
   public void initValues(int[] vector, int size) {
-    values = vector;
-    N_POINTS = size;
+    if (size != 0) {
+      values = vector;
+      N_POINTS = size;
+    }
   }
 
   public void paint(Graphics g) {

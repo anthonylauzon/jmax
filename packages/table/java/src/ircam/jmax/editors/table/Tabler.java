@@ -47,6 +47,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     Init();
 
     fillTable();
+    itsTablePanel.repaint();
 
     validate();
     itsFormula.addKeyListener(this);
