@@ -1,3 +1,13 @@
+2003-05-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/io/c/src/filestream.c, packages/io/c/src/wacom.c: applied patches send by Jarek Myszewski (Windows port).
+
+	* packages/ispw/winbuild/ispw.dsp, packages/ispw/winbuild/ispw_java.mak: applied patches send by Jarek Myszewski (Windows port).
+
+	* packages/midi/winbuild/midi.dsp :applied patches send by Jarek Myszewski (Windows port).
+
+	* packages/numeric/winbuild/numeric.dsp :applied patches send by Jarek Myszewski (Windows port).
+	
 2003-04-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>, Riccardo Borghesi  <Riccardo.Borghesi@ircam.fr>
 
 	* works on jMax Windows port (updated porject files, fixed source code).
