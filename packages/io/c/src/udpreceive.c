@@ -63,11 +63,8 @@ static void udpreceive_receive( fts_object_t *o, int size, const unsigned char* 
   argc = fts_stack_size( &binary_protocol->input_args);
   argv = (fts_atom_t *)fts_stack_base( &binary_protocol->input_args);
 
-  selector = fts_get_symbol( argv+1);
-  argc -= 2;
-  argv += 2;
-
-  fts_outlet_send( (fts_object_t *)self, 0, selector, argc, argv);
+  fts_outlet_send( (fts_object_t *)self, 0, 0, argc, argv);
+  fts_stack_clear(&binary_protocol->input_args);
 }
 
 
