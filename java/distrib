@@ -1,9 +1,9 @@
 src		all		Makefile
 src		all		Makefiles
 all		all		classes
-all		all	 	lib/jacl1.0/jacl.jar
-all		all		lib/jacl1.0/README
-all		all		lib/jacl1.0/license.terms
+all		all	 	lib/jacl/jacl.jar
+all		all		lib/jacl/README
+all		all		lib/jacl/license.terms
 ircam		all		lib/swing/swingall.jar
 ircam		all		lib/swing/CHANGES.txt
 ircam		all		lib/swing/LICENSE.txt

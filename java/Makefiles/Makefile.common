@@ -59,7 +59,7 @@ include $(ROOTDIR)/java/Makefiles/Makefile.$(MODE)
 
 JAVA_CLASSES_ROOT =  $(ROOTDIR)/java/classes
 JAVA_SRC_ROOT =  $(ROOTDIR)/java/src
-JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl1.0/jacl.jar:$(ROOTDIR)/java/lib/swing/swingall.jar
+JAVA_LIBS_CLASSPATH = $(ROOTDIR)/java/lib/jacl/jacl.jar:$(ROOTDIR)/java/lib/swing/swingall.jar
 
 LOCAL_PATH = $(ROOTDIR)/$(PACKAGE_DIR)
 
