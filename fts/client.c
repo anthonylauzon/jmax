@@ -47,23 +47,7 @@
 #ifdef WIN32
 #include <windows.h>
 
-static int
-win_close(int socket)
-{
-  int r;
-  char buf[1024];
-  if (socket != INVALID_SOCKET) {
-    shutdown(socket, 0x02);
-    while (1) {
-      r = recv(socket, buf, 1024, 0);
-      if ((r == 0) || (r == SOCKET_ERROR)) {
-	break;
-      }
-    }
-    closesocket(socket);
-  }
-  return 0;
-}
+extern int win_close(int socket);
 
 #define CLOSESOCKET  win_close
 #define READSOCKET(S,B,L) recv(S,B,L,0)
