@@ -206,8 +206,8 @@ static fts_class_t VAR =                                        \
   0, /* description_function */                                 \
   0, /* copy_function */                                        \
   0, /* array_function */                                       \
-  0, /* fts_list_t *import_handlers */                          \
-  0, /* fts_list_t *export_handlers */                          \
+  { 0, 0, 0, 0 }, /* fts_hashtable_t import_handlers */		\
+  { 0, 0, 0, 0 }, /* fts_hashtable_t export_handlers */         \
   0, /* instantiate_fun */                                      \
   0, /* constructor */                                          \
   0, /* deconstructor */                                        \
