@@ -9,4 +9,9 @@ EXTRA_DIST= \
 	jmaxrun.dsp \
 	jmaxrun.mak \
 	README_WINCOMPILE \
-	winprep.sh
+	winprep.sh \
+	jmax.iss \
+	jmax.ico \
+	jmax_ico.rc 
+
+
