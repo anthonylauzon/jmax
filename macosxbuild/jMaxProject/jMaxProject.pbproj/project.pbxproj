@@ -267,6 +267,18 @@
 			settings = {
 			};
 		};
+		F56C3E180338D3DC01664092 = {
+			isa = PBXFileReference;
+			name = Actions.java;
+			path = ../../packages/data/java/ircam/jmax/editors/table/Actions.java;
+			refType = 2;
+		};
+		F56C3E190338D3DC01664092 = {
+			fileRef = F56C3E180338D3DC01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5933FE503363A6501664092 = {
 			isa = PBXFileReference;
 			name = FloatBoxControlPanel.java;
@@ -18041,16 +18053,6 @@
 				F8B8E55A028680BC01664092,
 				F8B8E55B028680BC01664092,
 				F8B8E55C028680BC01664092,
-				F8B8E55D028680BC01664092,
-				F8B8E55E028680BC01664092,
-				F8B8E55F028680BC01664092,
-				F8B8E560028680BC01664092,
-				F8B8E561028680BC01664092,
-				F8B8E562028680BC01664092,
-				F8B8E563028680BC01664092,
-				F8B8E564028680BC01664092,
-				F8B8E565028680BC01664092,
-				F8B8E566028680BC01664092,
 				F8B8E567028680BC01664092,
 				F8B8E568028680BC01664092,
 				F8B8E569028680BC01664092,
@@ -18063,6 +18065,7 @@
 				F8B8E570028680BC01664092,
 				F8B8E571028680BC01664092,
 				F8B8E572028680BC01664092,
+				F56C3E190338D3DC01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18304,7 +18307,6 @@
 		};
 		F8B8E4FD028680BB01664092 = {
 			children = (
-				F8B8E4FE028680BB01664092,
 				F8B8E509028680BB01664092,
 				F8B8E50D028680BB01664092,
 				F8B8E511028680BB01664092,
@@ -18328,87 +18330,11 @@
 				F8B8E529028680BB01664092,
 				F8B8E52A028680BB01664092,
 				F8B8E52B028680BB01664092,
+				F56C3E180338D3DC01664092,
 			);
 			isa = PBXGroup;
 			name = table;
 			refType = 4;
-		};
-		F8B8E4FE028680BB01664092 = {
-			children = (
-				F8B8E4FF028680BB01664092,
-				F8B8E500028680BB01664092,
-				F8B8E501028680BB01664092,
-				F8B8E502028680BB01664092,
-				F8B8E503028680BB01664092,
-				F8B8E504028680BB01664092,
-				F8B8E505028680BB01664092,
-				F8B8E506028680BB01664092,
-				F8B8E507028680BB01664092,
-				F8B8E508028680BB01664092,
-			);
-			isa = PBXGroup;
-			name = actions;
-			refType = 4;
-		};
-		F8B8E4FF028680BB01664092 = {
-			isa = PBXFileReference;
-			name = Actions.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/Actions.java;
-			refType = 2;
-		};
-		F8B8E500028680BB01664092 = {
-			isa = PBXFileReference;
-			name = CopyAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/CopyAction.java;
-			refType = 2;
-		};
-		F8B8E501028680BB01664092 = {
-			isa = PBXFileReference;
-			name = CutAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/CutAction.java;
-			refType = 2;
-		};
-		F8B8E502028680BB01664092 = {
-			isa = PBXFileReference;
-			name = HollowAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/HollowAction.java;
-			refType = 2;
-		};
-		F8B8E503028680BB01664092 = {
-			isa = PBXFileReference;
-			name = InsertAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/InsertAction.java;
-			refType = 2;
-		};
-		F8B8E504028680BB01664092 = {
-			isa = PBXFileReference;
-			name = PasteAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/PasteAction.java;
-			refType = 2;
-		};
-		F8B8E505028680BB01664092 = {
-			isa = PBXFileReference;
-			name = RedoAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/RedoAction.java;
-			refType = 2;
-		};
-		F8B8E506028680BB01664092 = {
-			isa = PBXFileReference;
-			name = RefreshAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/RefreshAction.java;
-			refType = 2;
-		};
-		F8B8E507028680BB01664092 = {
-			isa = PBXFileReference;
-			name = SolidAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/SolidAction.java;
-			refType = 2;
-		};
-		F8B8E508028680BB01664092 = {
-			isa = PBXFileReference;
-			name = UndoAction.java;
-			path = ../../packages/data/java/ircam/jmax/editors/table/actions/UndoAction.java;
-			refType = 2;
 		};
 		F8B8E509028680BB01664092 = {
 			children = (
@@ -18925,66 +18851,6 @@
 		};
 		F8B8E55C028680BC01664092 = {
 			fileRef = F8B8E52B028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E55D028680BC01664092 = {
-			fileRef = F8B8E4FF028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E55E028680BC01664092 = {
-			fileRef = F8B8E500028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E55F028680BC01664092 = {
-			fileRef = F8B8E501028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E560028680BC01664092 = {
-			fileRef = F8B8E502028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E561028680BC01664092 = {
-			fileRef = F8B8E503028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E562028680BC01664092 = {
-			fileRef = F8B8E504028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E563028680BC01664092 = {
-			fileRef = F8B8E505028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E564028680BC01664092 = {
-			fileRef = F8B8E506028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E565028680BC01664092 = {
-			fileRef = F8B8E507028680BB01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8B8E566028680BC01664092 = {
-			fileRef = F8B8E508028680BB01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
