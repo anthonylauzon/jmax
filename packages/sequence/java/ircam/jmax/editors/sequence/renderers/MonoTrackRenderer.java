@@ -34,7 +34,7 @@ import java.io.File;
 import ircam.jmax.JMaxApplication;
 
 /**
- * The main class for a monodimensionalTrack representation.
+* The main class for a monodimensionalTrack representation.
  * It provides the support for  editing,
  * using a background layer and a foreground.
  * The grid is rendered in the MonoTrackBackground
@@ -43,77 +43,77 @@ import ircam.jmax.JMaxApplication;
 public class MonoTrackRenderer extends AbstractTrackRenderer{
   
   /**
-   * Constructor.
+  * Constructor.
    */
   public MonoTrackRenderer(SequenceGraphicContext theGc) 
-  {  
+{  
     super(theGc);
-
+    
     itsForegroundLayer = new MonoTrackForeground(gc);
-
+    
     itsLayers.addElement(new MonoTrackBackground(gc));
     itsLayers.addElement(itsForegroundLayer);
-  }
+}
 
-  /**
-   * returns its (current) event renderer
-   */
-  public ObjectRenderer getObjectRenderer() 
-  {
-      return null;
-      //the renderer depends from the object, here...
-      //return itsForegroundLayer.getObjectRenderer();
-  }
+/**
+* returns its (current) event renderer
+ */
+public ObjectRenderer getObjectRenderer() 
+{
+  return null;
+  //the renderer depends from the object, here...
+  //return itsForegroundLayer.getObjectRenderer();
+}
+
+/**
+* Returns the first event containg the given point.
+ * If there are more then two objects, it returns the
+ * the topmost in the visual hyerarchy*/
+public Object firstObjectContaining(int x, int y)
+{
+  TrackEvent aTrackEvent;
+  TrackEvent last = null;
   
-  /**
-   * Returns the first event containg the given point.
-   * If there are more then two objects, it returns the
-   * the topmost in the visual hyerarchy*/
-  public Object firstObjectContaining(int x, int y)
-  {
-      TrackEvent aTrackEvent;
-      TrackEvent last = null;
-		    
-      double time = gc.getAdapter().getInvX(x);
-
-      for (Enumeration e = gc.getDataModel().intersectionSearch(time -1, time +1); e.hasMoreElements();) 
-	  {      
-	      aTrackEvent = (TrackEvent) e.nextElement();
-	      
-	      if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-		  last = aTrackEvent;
-	  }
-      return last;
-  }
-
-  /**
-   * returns an enumeration of all the events whose graphic representation
-   * intersects the given rectangle.
-   */
-  public Enumeration objectsIntersecting(int x, int y, int w, int h) 
-  {
-    TrackEvent aTrackEvent;
+  double time = gc.getAdapter().getInvX(x);
+  
+  for (Enumeration e = gc.getDataModel().intersectionSearch(time -1, time +1); e.hasMoreElements();) 
+  {      
+    aTrackEvent = (TrackEvent) e.nextElement();
     
-    double startTime = gc.getAdapter().getInvX(x);
-    double endTime = gc.getAdapter().getInvX(x+w);
-
-    tempList.removeAllElements();
-
-    for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
-    {
-	aTrackEvent = (TrackEvent) e.nextElement();
-	
-	if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
-	{
-	    tempList.addElement(aTrackEvent);
-	}
-    }
-    return tempList.elements();
+    if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+		  last = aTrackEvent;
   }
+  return last;
+}
+
+/**
+* returns an enumeration of all the events whose graphic representation
+ * intersects the given rectangle.
+ */
+public Enumeration objectsIntersecting(int x, int y, int w, int h) 
+{
+  TrackEvent aTrackEvent;
+  
+  double startTime = gc.getAdapter().getInvX(x);
+  double endTime = gc.getAdapter().getInvX(x+w);
+  
+  tempList.removeAllElements();
+  
+  for (Enumeration e = gc.getDataModel().intersectionSearch(startTime, endTime); e.hasMoreElements();) 
+  {
+    aTrackEvent = (TrackEvent) e.nextElement();
+    
+    if (aTrackEvent.getRenderer().touches(aTrackEvent, x, y, w, h, gc))
+    {
+	    tempList.addElement(aTrackEvent);
+    }
+  }
+  return tempList.elements();
+}
 
 
-  //------------------  Fields
-  MonoTrackForeground itsForegroundLayer;
+//------------------  Fields
+MonoTrackForeground itsForegroundLayer;
 }
 
 
