@@ -80,7 +80,7 @@ CC_NONE_FLAG := -Xlinker --no-whole-archive
 #CC_NONE_FLAG := -Xlinker --no-whole-archive
 
 
-FTS_SYS_LIBS = -lm -ldl -laudiofile -lpthread
+FTS_SYS_LIBS = -ldl -laudiofile -lm -lpthread
 FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 
