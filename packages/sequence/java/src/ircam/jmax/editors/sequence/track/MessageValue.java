@@ -253,8 +253,8 @@ public class MessageValue extends AbstractEventValue
 	}
 	
 	
-	String defNamesArray[] = {"integer", "message"};
-	Class propertyTypesArray[] = {Integer.class, String.class};
+	String defNamesArray[] = {"message", "integer"};
+	Class propertyTypesArray[] = {String.class, Integer.class};
 	int defPropertyCount = 2;
     }
 
@@ -322,8 +322,8 @@ public class MessageValue extends AbstractEventValue
 
     public boolean samePropertyValues(Object args[])
     {
-      return (((String)getProperty("message")).equals((String)args[1]) &&
-	      (((Integer)getProperty("integer")).intValue() == ((Integer)args[0]).intValue()));
+      return (((String)getProperty("message")).equals((String)args[0]) &&
+	      (((Integer)getProperty("integer")).intValue() == ((Integer)args[1]).intValue()));
     }
 
     //--- Fields
@@ -335,8 +335,8 @@ public class MessageValue extends AbstractEventValue
     public static final int DEFAULT_HEIGHT = 13;
     static String path;
     public static ImageIcon MESSAGE_ICON;
-    static String nameArray[] = {"integer", "message"};
-    static int propertyTypes[] = {INTEGER_TYPE, STRING_TYPE};
+    static String nameArray[] = {"message", "integer"};
+    static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};
     static String localNameArray[] = {"duration", "open", "height"};
     static int propertyCount = 2;
     static int localPropertyCount = 3;
