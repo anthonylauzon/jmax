@@ -40,9 +40,10 @@
 #define DEFAULT_CHANNELS 2
 
 typedef struct {
-  ALport alport;
+  fts_audioport_t head;
+  ALport input_alport;
+  ALport output_alport;
   stamp_t frames;
-  const char *name;  /* the AL2.0 device name (may be usefull) */
   int fifo_size;
   float *dac_fmtbuf;
   float *adc_fmtbuf;
@@ -56,11 +57,11 @@ static void sgiaudioport_input( fts_word_t *argv)
   sgiaudioport_t *port;
   int n, channels, ch, i, j;
 
-  port = (ossaudioport_t *)fts_word_get_ptr( argv+0);
+  port = (sgiaudioport_t *)fts_word_get_ptr( argv+0);
   n = fts_word_get_long(argv + 1);
   channels = fts_audioport_get_input_channels( port);
 
-  alReadFrames( port->alport, port->adc_fmtbuf, n);
+  alReadFrames( port->input_alport, port->adc_fmtbuf, n);
 
   for ( ch = 0; ch < channels; ch++)
     {
@@ -80,7 +81,7 @@ static void sgiaudioport_output( fts_word_t *argv)
   sgiaudioport_t *port;
   int n, channels, ch, i, j;
 
-  port = (ossaudioport_t *)fts_word_get_ptr( argv+0);
+  port = (sgiaudioport_t *)fts_word_get_ptr( argv+0);
   n = fts_word_get_long(argv + 1);
   channels = fts_audioport_get_output_channels( port);
 
@@ -98,7 +99,7 @@ static void sgiaudioport_output( fts_word_t *argv)
 	}
     }
 
-  alWriteFrames( port->alport, port->dac_fmtbuf, n);
+  alWriteFrames( port->output_alport, port->dac_fmtbuf, n);
 }
 
 static int sgiaudioport_xrun( fts_audioport_t *port)
@@ -106,14 +107,14 @@ static int sgiaudioport_xrun( fts_audioport_t *port)
   sgiaudioport_t *sgiport = (sgiaudioport_t *)port;
   stamp_t al_frames, al_time;
 
-  alGetFrameTime( port->alport, &al_frames, &al_time);
+  alGetFrameTime( sgiport->output_alport, &al_frames, &al_time);
 
-  if (al_frames > (port->frames + port->fifo_size))
+  if (al_frames > (sgiport->frames + sgiport->fifo_size))
     {
       int ret; 
 
-      ret = al_frames - (port->frames + port->fifo_size);
-      port->frames = al_frames;
+      ret = al_frames - (sgiport->frames + sgiport->fifo_size);
+      sgiport->frames = al_frames;
 
       return ret;
     }
@@ -154,12 +155,50 @@ static char *sgiaudioport_get_error_message( int err)
   case AL_BAD_WIDTH:
     return "Invalid sample width";
 
-  case AL_BAD_QSIZE:
-    return "Invalid queue size";
-
   default:
     return "Unknown error";
   }
+}
+
+static int sgiaudioport_open( ALport *alport, char *device_name, char *alport_name, const char *dir, int channels, int fifo_size, int *perr)
+{
+  ALconfig config;
+  int device_id;
+
+  config = alNewConfig();
+
+  if ( (*perr = alSetSampFmt( config, AL_SAMPFMT_FLOAT)) != 0)
+    return 0;
+  
+  if ( (*perr = alSetFloatMax( config, 1.1f)) != 0)
+    return 0;
+
+  if ( (*perr = alSetWidth(config, AL_SAMPLE_24)) != 0)
+    return 0;
+
+  if ( (*perr = alSetChannels( config, channels)) != 0)
+    return 0;
+
+  if ( (*perr = alSetQueueSize( config, fifo_size)) != 0)
+    return 0;
+
+  if ( ! (device_id = alGetResourceByName( AL_SYSTEM, device_name, AL_DEVICE_TYPE)) )
+    {
+      *perr = oserror();
+      return 0;
+    }
+
+  alSetDevice( config, device_id);
+
+  if ( ! (*alport = alOpenPort( alport_name, dir, config)) )
+    {
+      *perr = oserror();
+      return 0;
+    }
+
+  alFreeConfig( config);
+
+  return 1;
 }
 
 static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -168,9 +207,8 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   float sr;
   char input_device_name[256];
   char output_device_name[256];
-  int device_id, err, input_channels, output_channels;
+  int err, input_channels, output_channels, sample_rate;
   stamp_t al_time;
-  ALconfig config;
 
   fts_audioport_init( &this->head);
 
@@ -185,74 +223,36 @@ static void sgiaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   strcpy( output_device_name, fts_symbol_name( fts_get_symbol_arg( ac, at, 2, s_analog_out)));
   output_channels = fts_get_int_arg( ac, at, 3, DEFAULT_CHANNELS);
 
-  config = alNewConfig();
-
-  /* Set float representation */
-  if ( (err = alSetSampFmt( config, AL_SAMPFMT_FLOAT)) != 0)
-    {
-      fts_object_set_error( o, sgiaudioport_get_error_message( err));
-      return;
-    }
-  
-  if ( (err = alSetFloatMax( config, 1.1f)) != 0)
-    {
-      fts_object_set_error( o, sgiaudioport_get_error_message( err));
-      return;
-    }
-
-  if ( ( err = alSetWidth(config, AL_SAMPLE_24)) != 0)
-    {
-      fts_object_set_error( o, sgiaudioport_get_error_message( err));
-      return;
-    }
-
-  if ( (err = alSetChannels( config, channels)) != 0)
-    {
-      fts_object_set_error( o, sgiaudioport_get_error_message( err));
-      return;
-    }
-
-  if ( (err = alSetQueueSize( config, fifo_size) != 0)
-    {
-      fts_object_set_error( o, sgiaudioport_get_error_message( err));
-      return;
-    }
-
-  if ( ! (device_id = alGetResourceByName( AL_SYSTEM, input_device_name, AL_DEVICE_TYPE)) )
-    {
-      fts_object_set_error( o, "Invalid device name");
-      return;
-    }
-
-  alSetDevice( config, device_id);
-
-  if ( ! (this->alport = alOpenPort( "jMax audioport input", "w", config)) )
-    {
-      fts_object_set_error( o, sgiaudioport_get_error_message( oserror()) );
-      return;
-    }
-
-  alGetFrameTime( this->alport, &(this->frames), &al_time);
-
-  alFreeConfig( config);
-
   if (input_channels)
     {
+      if ( !sgiaudioport_open( &this->input_alport, input_device_name, "jMax audioport input", "r", input_channels, this->fifo_size, &err))
+	{
+	  fts_object_set_error( o, sgiaudioport_get_error_message( err));
+	  return;
+	}
+
       fts_audioport_set_input_channels( (fts_audioport_t *)this, input_channels);
       fts_audioport_set_input_function( (fts_audioport_t *)this, sgiaudioport_input);
-      this->adc_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * channels * sizeof(float));
+      this->adc_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * input_channels * sizeof(float));
     }
+
   if (output_channels)
     {
+      if ( !sgiaudioport_open( &this->output_alport, output_device_name, "jMax audioport output", "w", output_channels, this->fifo_size, &err))
+	{
+	  fts_object_set_error( o, sgiaudioport_get_error_message( err));
+	  return;
+	}
+
       fts_audioport_set_output_channels( (fts_audioport_t *)this, output_channels);
       fts_audioport_set_output_function( (fts_audioport_t *)this, sgiaudioport_output);
-      this->dac_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * channels * sizeof(float));
+      this->dac_fmtbuf = (float *) fts_malloc(fts_get_tick_size() * output_channels * sizeof(float));
+
+      alGetFrameTime( this->output_alport, &(this->frames), &al_time);
+
+      fts_audioport_set_xrun_function( (fts_audioport_t *)this, sgiaudioport_xrun);
     }
-
-  fts_audioport_set_xrun_function( (fts_audioport_t *)this, sgiaudioport_xrun);
 }
-
-
 
 static void sgiaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -260,12 +260,15 @@ static void sgiaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   fts_audioport_delete( &this->head);
 
-  if (port->adc_fmtbuf)
-    fts_free( port->adc_fmtbuf);
-  if (port->dac_fmtbuf)
-    fts_free( port->dac_fmtbuf);
+  if (this->adc_fmtbuf)
+    fts_free( this->adc_fmtbuf);
+  if (this->dac_fmtbuf)
+    fts_free( this->dac_fmtbuf);
 
-  alClosePort( port->alport);
+  if (this->input_alport)
+    alCloseThis( this->input_alport);
+  if (this->output_alport)
+    alClosePort( this->output_alport);
 }
 
 static void sgiaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)

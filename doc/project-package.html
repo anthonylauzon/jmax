@@ -41,7 +41,7 @@
 </tr>
 
 <tr>
-<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
+<td align=right valign=top><a href="index.html"><font size=-1>jMax Documentation</font></a></td>
 </tr>
 
 <tr>
@@ -74,9 +74,9 @@
 <H2> Disclaimer </H2> 
 
 <P>
-The current version of <I>j</I>Max use TCL as its
+The current version of jMax use TCL as its
 scripting language, and the feature described in this document is
-currently based on TCL; future version of <I>j</I>Max may
+currently based on TCL; future version of jMax may
 use a different scripting language, so the features described here
 will change, will be implemented with a different language and/or
 syntax, or will simply vanish.
@@ -87,10 +87,10 @@ syntax, or will simply vanish.
 <H2> What is a Package?</H2>
 
 <P>
-A package is a way to package and distribute <I>j</I>Max
+A package is a way to package and distribute jMax
 component, i.e. any kind of library made up of patches, templates, Max
 0.26 abstractions, soundfiles, object libraries, Java libraries,
-documentation, help files and so on; <I>j</I>Max are based on TCL
+documentation, help files and so on; jMax are based on TCL
 packages, and are currently based on <A HREF="http://www.scriptics.com/java/"> jacl </A>,
 a Java implementation of the TCL scripting language.
 
@@ -101,7 +101,7 @@ a Java implementation of the TCL scripting language.
 
 <p>
 This release do not (<i>yet</i>) document how to build up a package; for some examples,
-take a look to under the <i>packages</i> subdirectory in your <I>j</I>Max installations.
+take a look to under the <i>packages</i> subdirectory in your jMax installations.
 The following command is used to load a package (note that is actually a standard TCL
 command).
 <P>
@@ -121,7 +121,7 @@ command).
 <H2> What is a Project?</H2>
 
 <P>
-<I>j</I>Max is, after all, a programming language; and while it's
+jMax is, after all, a programming language; and while it's
 learning curve and its graphical roots make it a good choice for
 starting developping small MIDI or sounds oriented applications, it is
 often used to develop medium or large sized projects, projects in the
@@ -132,19 +132,19 @@ hundred of thousands lines of code.
 Projects of this size require, together with easy of use of the basic
 tools, some tool that help to manage the complexity of developements
 and delivery of applications and libraries.  In this release
-<I>j</I>Max introduce two set of features, a simple and rougth support for projects to handle
+jMax introduce two set of features, a simple and rougth support for projects to handle
 applications, and the support of the concept of <A HREF="packages.html"> package
 </A>, to handle delivery of libraries.
 
 <P>
-A <I>j</I>Max project is usually made by of many kind of components: patches, templates,
+A jMax project is usually made by of many kind of components: patches, templates,
 soundfiles,  object libraries, Java libraries, documentation, help files and so on; managing a project
 means being able to load/install all these components, to browse and edit the project structure,
 to handle the dependencies between this components and other components external to the project
 and so on.
 
 <P>
-Currently <I>j</I>Max provide a simple mechanism to load/install all the components,
+Currently jMax provide a simple mechanism to load/install all the components,
 by means of a script file, 
 and, thru the <A HREF="packages.html"> packages </A>, a way to handle depedencies; future
 release will introduce more functionalities.
@@ -155,7 +155,7 @@ release will introduce more functionalities.
 <H2> The Project File </H2>
 
 <P>
-A <I>j</I>Max project is contained in a directory and all its subdirectory; 
+A jMax project is contained in a directory and all its subdirectory; 
 this directory is called <I> the project directory</I>.
 The main patch, i.e. the patch that is loaded in order to load the project,
 should be in the project directory.
@@ -166,7 +166,7 @@ file, that is a script that load/install all the components needed by the projec
 
 <P>
 The project  file is loaded before the patch, and is found thru a naming
-convention; if the file is called "foo.jmax" or "foo.pat", <I>j</I>Max look first
+convention; if the file is called "foo.jmax" or "foo.pat", jMax look first
 for a file called "foo.env", and if this file does not exists, it look for a file
 called "project.env"; this naming convention allows to have multiple project file
 in the same directory (usefull for small projects) or to share a single project file
@@ -180,14 +180,14 @@ project directory, so that no dependency on the absolute path need to be coded i
 
 <P>
 The project file can contains a number of TCL commands that load or
-install the different kind of components in <I>j</I>Max; for this release, the commands
+install the different kind of components in jMax; for this release, the commands
 needed to install user developed libraries (<code>C</code> or <code>Java</code>) are
 not documented; the project file can also, in special case, contains <A HREF="config/io.html">
 I/O configuration commands</A>, when you want to be sure that a project run 
 in a specific configuration.
 
 <P>
-The currently <I>j</I>Max is not able to properly undo all the action in
+The currently jMax is not able to properly undo all the action in
 a project file; we suggest, for the moment, to restart before changing project.
 
 <p>
@@ -233,7 +233,7 @@ scripting language will the following commands, possibly with a different syntax
   <DD> 
     Declare a single template called <i>name</i>, and set its definition
     to be the patch stored in the file <i>filename</i>; the file must be a 
-    in the <I>j</I>Max format.<p>
+    in the jMax format.<p>
 
   <DT><tt><b>abstractionDirectory</b></tt> <i>directory</i><p>
   <DD> 
@@ -265,6 +265,7 @@ scripting language will the following commands, possibly with a different syntax
     If the <i>name</i> start with an underscore (<code>_</code>), the icon will not be
     used either for comments or for templates, but it is available to Java written modules
     thru a specific API.
+    <p>
 
   <DT><tt><b>patcherMenu</b></tt> <i>cmd</i> [<i>submenu</i>] <i>label</i> <i>object</i> <i>message</i><p>
   <DD>
@@ -287,7 +288,7 @@ scripting language will the following commands, possibly with a different syntax
   <DT><tt><b>puts</b></tt> <i>arg</i><p>
   <DD> 
     A TCL commands, print its argument (that can be a double quoted
-    string) to the <I>j</I>Max  console when the project file is loaded.<p>
+    string) to the jMax  console when the project file is loaded.<p>
 
 </DL>
 

@@ -32,7 +32,7 @@
 #include <fts/lang/mess.h>
 #include <fts/lang/utils.h>
 
-/* #define LOAD_DEBUG */
+/*  #define LOAD_DEBUG */
 
 /* Converted by MDC to use FILE * instead of file,
    in order to integrate it better with the loader;

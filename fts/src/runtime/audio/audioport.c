@@ -483,13 +483,16 @@ static fts_audioport_t *default_audioport = 0;
 void fts_audioport_set_default( int argc, const fts_atom_t *argv)
 {
   fts_object_t *obj;
+  fts_atom_t a[1];
 
   fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &obj);
 
   if (!obj)
     return;
 
-  if ( !fts_object_is_audioport( obj))
+  fts_object_get_prop( obj, fts_s_state, a);
+
+  if ( !fts_is_object( a) || !fts_object_is_audioport( fts_get_object( a)) )
     {
       fts_object_delete_from_patcher( obj);
       return;
@@ -500,7 +503,7 @@ void fts_audioport_set_default( int argc, const fts_atom_t *argv)
       fts_object_delete_from_patcher( (fts_object_t *)default_audioport);
     }
 
-  default_audioport = (fts_audioport_t *)obj;
+  default_audioport = (fts_audioport_t *)fts_get_object( a);
 }
 
 fts_audioport_t *fts_audioport_get_default( void)

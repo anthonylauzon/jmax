@@ -49,7 +49,7 @@ sysexin_check(int ac, const fts_atom_t *at, fts_midiport_t **port)
 	{
 	  fts_object_t *obj = fts_get_object(at);
 	  
-	  if(fts_midiport_check(obj) && fts_midiport_is_input((fts_midiport_t *)obj))
+	  if(fts_object_is_midiport(obj) && fts_midiport_is_input((fts_midiport_t *)obj))
 	    *port = (fts_midiport_t *)fts_get_object(at);	  
 	  else
 	    return 0;
@@ -136,7 +136,7 @@ sysexout_check(int ac, const fts_atom_t *at, fts_midiport_t **port)
 	{
 	  fts_object_t *obj = fts_get_object(at);
 	  
-	  if(fts_midiport_check(obj) && fts_midiport_is_output((fts_midiport_t *)obj))
+	  if(fts_object_is_midiport(obj) && fts_midiport_is_output((fts_midiport_t *)obj))
 	    *port = (fts_midiport_t *)fts_get_object(at);	  
 	  else
 	    return 0;

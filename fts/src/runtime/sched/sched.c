@@ -244,8 +244,8 @@ void fts_sched_run()
 
   while(fts_running_status == running)
     {
-      fts_midi_poll();
       fts_alarm_poll();
+      /* You are the next on the list. Keep cool!!! */
       fts_client_poll();
       fts_sched_do_select( fts_sched_get_current());
       fts_dsp_chain_poll();

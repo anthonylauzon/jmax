@@ -375,7 +375,7 @@ extern void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, doubl
  * These objects can receive events from the MIDI port and send events from the MIDI port.
  *
  * An i/o object can check if a given object implements an FTS MIDI port and whether it is an input and/or an output 
- * using the functions fts_midiport_check(), fts_midiport_is_input() and fts_midiport_is_output().
+ * using the functions fts_object_is_midiport(), fts_midiport_is_input() and fts_midiport_is_output().
  * The API provides functions for declaring an object as a listener to a MIDI port (see fts_bytestream_add_listener()) 
  * and output functions sending events out of a MIDI port (see fts_midiport_output_note()).
  *
@@ -394,7 +394,7 @@ extern void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, doubl
  *
  * An object who wants to listen to or output via a MIDI port should check if the object it referes to implements the MIDI port abstraction
  *
- * @fn int fts_midiport_check(fts_object_t *obj)
+ * @fn int fts_object_is_midiport(fts_object_t *obj)
  * @param obj the object to be checked
  * @return non-zero if object implements an FTS MIDI port 
  *
@@ -420,7 +420,7 @@ extern void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, doubl
  *
  * @ingroup midiport_io
  */
-extern int fts_midiport_check(fts_object_t *obj);
+extern int fts_object_is_midiport(fts_object_t *obj);
 extern int fts_midiport_is_input(fts_midiport_t *port);
 extern int fts_midiport_is_output(fts_midiport_t *port);
 
@@ -706,12 +706,9 @@ extern void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, dou
  *  default MIDI port
  *
  */
-typedef fts_midiport_t * (*fts_midiport_default_function_t)(void);
-
-extern void fts_midiport_set_default_function(fts_midiport_default_function_t fun);
-extern fts_midiport_t *fts_midiport_get_default(void);
 
 extern fts_midiport_t *fts_midiport_get_default(void);
-extern void fts_midiport_set_default_function(fts_midiport_default_function_t fun);
+extern void fts_midiport_set_default( int argc, const fts_atom_t *argv);
+
 
 #endif

@@ -52,5 +52,5 @@ lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
 
-ARCH_PACKAGES=audpdev sgidev unixdtd
+ARCH_PACKAGES=audpdev sgi unixdtd
 

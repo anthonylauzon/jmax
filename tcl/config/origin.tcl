@@ -64,7 +64,7 @@ set jmaxArch r10k-irix6.5
 #defineDevice midi4 { sgi_midi port SerialPort4 } "MIDI on startmidi port SerialPort4"
 
 when platformStart {
-    package require sgidev
+    package require sgi
     package require unixdtd
 }
 

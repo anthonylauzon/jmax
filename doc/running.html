@@ -37,11 +37,11 @@
 </tr>
 
 <tr>
-<td align=right><font size=+3><b>Running <i>j</i>Max</b></font></td>
+<td align=right><font size=+3><b>Running jMax</b></font></td>
 </tr>
 
 <tr>
-<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
+<td align=right valign=top><a href="index.html"><font size=-1>jMax Documentation</font></a></td>
 </tr>
 
 <tr>
@@ -62,23 +62,21 @@
   <li><a href="#running">Running jMax</a>
   <li><a href="#arguments">Command Line Arguments</a>
   <li><a href="#.jmaxrc">The file <TT>.jmaxrc</TT></a>
-  <li><a href="#running FTS under the debugger">Running <code>FTS</code> under the debugger</a>
-  <li><a href="#running FTS with Purify">Running <code>FTS</code> with Purify</a>
 </ul>
 
 <p>
 <hr size=1>
 
 <A NAME="running">
-<h2>Running <I>j</I>Max</h2>
+<h2>Running jMax</h2>
 
 <p>
-<i>j</i>Max can be run by executing the <code>jmax</code> shell script.
+jMax can be run by executing the <code>jmax</code> shell script.
 This script is located in the following directories:
 <ul>
-<li> <code>/usr/bin</code> if <i>j</i>Max has been installed (note that
+<li> <code>/usr/bin</code> if jMax has been installed (note that
 this directory may vary depending on your platform)
-<li> <code>&lt;jMax root directory&gt;/bin</code> if <i>j</i>Max has not
+<li> <code>&lt;jMax root directory&gt;/bin</code> if jMax has not
 been installed and is ran from a source distribution. In this case, the
 <code>-root</code> option must be passed to the <code>jmax</code> script
 </ul>
@@ -90,8 +88,8 @@ to the Java application.
 
 <p>
 The <code>-root</code> option of the <code>jmax</code> script specifies the
-<i>root directory</i>, i.e. where the <i>j</i>Max resources (Java classes, server binaries, 
-configuration files, standard packages, ...) are located. <i>j</i>Max 
+<i>root directory</i>, i.e. where the jMax resources (Java classes, server binaries, 
+configuration files, standard packages, ...) are located. jMax 
 default root directory is <code>/usr/lib/jmax</code> and the installation
 process (either 'make install' or platform-specific installer) places
 resources there. If running from a source distribution, the 
@@ -107,7 +105,7 @@ jmax -root /home/francois/jmax
 <h2>Command Line Arguments</h2>
 
 <P>
-<I>j</I>Max uses a number of <I>configuration parameters</I> to parametrize the system
+jMax uses a number of <I>configuration parameters</I> to parametrize the system
 at startup.These parameters appear as TCL variables and can be also set via the command line:
 
 <UL>
@@ -121,9 +119,9 @@ in the user or site specific configuration files (see down).
 <p>
 The chapter
 <A HREF="configuration.html">configuration</A>
-of this documentation explain the different <i>j</i>Max configuration parameters.
+of this documentation explain the different jMax configuration parameters.
 At least one of the <A HREF="configuration.html#host">host parameters</A> 
-should be set properly in order to start <i>j</i>Max in a default setup.
+should be set properly in order to start jMax in a default setup.
 
 <P>
 The user can implicitly define his own options in the command line using the same syntax
@@ -132,8 +130,8 @@ For example, the command
 <ul>
   <dt><TT>jmax -jmaxHost jack -myOption pho</TT><BR>
 </ul>
-sets the <i>j</i>Max server host name to <i>jack</i> and the user option
-named <i>myOption</i> to the value <i>pho</i> while starting up <i>j</i>Max.
+sets the jMax server host name to <i>jack</i> and the user option
+named <i>myOption</i> to the value <i>pho</i> while starting up jMax.
 The value of this user option can be accessed through the TCL command
 <tt>systemProperty</tt>
 
@@ -146,199 +144,6 @@ For example in the following construct:
 <ul>
   <dt><tt>if{[systemProperty myOption] == "pho"} {...}</tt>
 </ul>
-
-<p>
-<A NAME=".jmaxrc">
-<HR>
-<h2>The file <B><TT>.jmaxrc</TT></B></h2>
-
-<P>
-The user can customize the <i>j</i>Max environment including the configuration parameters
-in the <TT>.jmaxrc</TT> file in his home directory:
-
-<UL>
-  <LI>set the <A HREF="configuration.html">configuration</A>
-  <LI>customize the <A HREF="project-package.html">project environment</A> for your patches
-  <LI>preload <i>j</i>Max <A HREF="project-package.html">packages</A>
-</UL>
-
-<P>
-The configuration parameters set in the <TT>.jmaxrc</TT> file overwrite the site specific
-default values (see down) and they are overwritten by values set via the command line.
-
-<P>
-<strong>NOTE:</strong>
-In the current release the system and i/o configuration 
-<strong>must</strong> be set in the <TT>.jmaxrc</TT> file.
-
-<p>
-The file is loaded at startup and can contain any TCL code.<BR>
-It is possible to declare declare a number of <I>hooks</I>. 
-These hooks contain TCL code that will be executed at precise points during the initialization process.
-In particular, the <B><I>start</I></B> hook is executed after server start and must be used for I/O, 
-environment and package loading purpose.
-
-<P>
-A template <TT>.jmaxrc</TT> file can be found in the distribution.<BR>
-An example is given the following:
-
-<PRE>
-# Lines starting with # are comments
-# --- beginning of .jmaxrc
-
-#set jmaxArch linuxpc
-#set jmaxArch irix65r10k
-#set jmaxArch irix63r5k
-
-#set jmaxHost "astor.ircam.fr"
-#set jmaxHost "amati.ircam.fr"
-#set jmaxHost "marimba.ircam.fr"
-
-set jmaxSplashScreen "hide"
-set jmaxFastFileBox "true"
-
-when start {
-
-if {$jmaxHost == "astor.ircam.fr"} {
-	jmaxSetSampleRate 44100
-	jmaxSetAudioBuffer 1024
-
-	openDefaultAudioIn stereoIn1
-	openDefaultAudioOut stereoOut1
-	openDefaultMidi midi1
-} elseif {$jmaxHost=="amati.ircam.fr"} {
-	jmaxSetSampleRate 44100
-	jmaxSetAudioBuffer 1024
-
-	openDefaultAudioIn adatIn
-	openDefaultAudioOut adatOut
-	openDefaultMidi midi
-}  elseif {$jmaxHost == "marimba.ircam.fr"} {
-	jmaxSetSampleRate 32000
-	jmaxSetAudioBuffer 2048
-
-	openDefaultAudioIn analogIn
-	openDefaultAudioOut analogOut
-}
-}
-
-# --- end of .jmaxrc
-</PRE>
-
-<p>
-<a name="running FTS under the debugger">
- <hr>
- <h2>Running <b><tt>FTS</tt></b> under the debugger</h2>
-</a>
-
-<p>
-In order to run <code>FTS</code> under a debugger, the following steps must
-be taken:
-<dl>
-
-<p>
-<dt>a) recompile FTS with debug options
-
-<p>
-<dd> the make variable MODE must be set to <i>debug</i>, as in:
-<pre>
-make ARCH=i686-linux MODE=debug          # for a i686-linux arch
-</pre>
-
-<p>
-<dt>b) start the Java GUI
-
-<p>
-<dd> the following options must be used:<br>
-<pre>
-jmax -jmaxConnection udpclient -jmaxMode debug -jmaxPort <MY_PORT_NUMBER>
-</pre>
-The console window should appear, but remains almost empty.
-
-<p>
-Note: you can pass also a <code>-jmaxHost HOST_NAME</code> option to jmax.
-
-<p>
-<dt>c) start the debuggger<br>
-
-<p>
-<dd> for instance with gdb:
-<pre>
-$ cd /home/francois/jmax/fts/bin/i686-linux/debug
-$ gdb fts
-</pre>
-
-<p>
-<dt>d) start fts under the debugger
-
-<p>
-<dd> the following options must be passed to FTS:
-<pre>
-run udp MY_MACHINE:MY_PORT_NUMBER
-</pre>
-where:<br>
-&nbsp; <code>MY_MACHINE</code> is the name of the host running FTS (can be 127.0.0.1)<br>
-&nbsp; <code>MY_PORT_NUMBER</code> is the port number that you gave to 
-the -jmaxPort option when starting jmax.
-
-<p>
-The console window should now be filled with normal startup messages. You can
-then stop fts under the debugger, put breakpoints, continue, as usual in
-a debugger session.
-
-</dl>
-
-
-<p>
-<a name="running FTS with Purify">
- <hr>
- <h2>Running <b><tt>FTS</tt></b> with Purify</h2>
-</a>
-
-<p>
-In order to run FTS under Purify (for finding memory allocation bugs on
-SGI platforms), the following must be done:
-
-<dl>
-
-<dt>a) recompile FTS
-
-<p>
-<dd> FTS must be recompiled with ENABLE_PURIFY=yes:
-<pre>
-make r10k-irix6.5 ENABLE_PURIFY=yes all_c
-</pre> 
-
-<dt>b) start JAVA
-
-<p>
-<dd> the following options must be used:<br>
-<pre>
-jmax -jmaxConnection udpclient -jmaxPort <MY_PORT_NUMBER> -jmaxHostType origin-purify
-</pre>
-The console window should appear, but remains almost empty.
-
-<p>
-Note: the <code>-jmaxHostType origin-purify</code> differs from host type <code>origin</code>
-by the <code>pdtddev</code> package that is not loaded
-
-<p>
-<dt>c) start Purified FTS server
-
-<p>
-<dd> the following options must be passed to FTS:
-<pre>
-fts.pure udp MY_MACHINE:MY_PORT_NUMBER
-</pre>
-where:<br>
-&nbsp; <code>MY_MACHINE</code> is the name of the host running FTS (can be 127.0.0.1)<br>
-&nbsp; <code>MY_PORT_NUMBER</code> is the port number that you gave to 
-the -jmaxPort option when starting jmax.
-
-<p>
-The Purify console should open and the server start.
- 
-</dl>
 
 <!-- ---------------------------------------------------------------------- -->
 <!-- ---------------------------------------------------------------------- -->

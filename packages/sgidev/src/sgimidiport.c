@@ -38,9 +38,6 @@
 #define mdGetByte1(msg) (msg[1])
 #define mdGetByte2(msg)(msg[2])
 
-static fts_symbol_t sgimidiport_symbol = 0;
-static fts_class_t *sgimidiport_class = 0;
-
 typedef struct _sgimidiport_
 {
   fts_midiport_t head;
@@ -366,33 +363,6 @@ sgimidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t 
 
 /************************************************************
  *
- *  default port
- *
- */
-/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
-extern fts_symbol_t fts_midi_hack_default_device_name;
-/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
-
-sgimidiport_t *sgimidiport_default = 0;
-
-fts_midiport_t *
-sgimidiport_get_default(void)
-{
-  fts_status_t ret;
-
-  if(!sgimidiport_default && fts_midi_hack_default_device_name)
-    {
-      fts_atom_t a[1];
-      
-      fts_set_symbol(a, fts_midi_hack_default_device_name);
-      sgimidiport_default = (fts_midiport_t *)fts_object_create(sgimidiport_class, 1, a);
-    }
-  
-  return (fts_midiport_t *)sgimidiport_default;
-}
-
-/************************************************************
- *
  *  class
  *
  */
@@ -415,9 +385,5 @@ sgimidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 sgimidiport_config(void)
 {
-  sgimidiport_symbol = fts_new_symbol("sgimidiport");
-  fts_midiport_set_default_function(sgimidiport_get_default);
-
-  fts_class_install(sgimidiport_symbol, sgimidiport_instantiate);
-  sgimidiport_class = fts_class_get_by_name(sgimidiport_symbol);
+  fts_class_install( fts_new_symbol("sgimidiport"), sgimidiport_instantiate);
 }

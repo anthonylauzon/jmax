@@ -37,11 +37,11 @@
 </tr>
 
 <tr>
-<td align=right><font size=+3><b>Compiling <i>j</i>Max</b></font></td>
+<td align=right><font size=+3><b>Compiling jMax</b></font></td>
 </tr>
 
 <tr>
-<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
+<td align=right valign=top><a href="index.html"><font size=-1>jMax Documentation</font></a></td>
 </tr>
 
 <tr>
@@ -62,7 +62,6 @@
   <li><a href="#introduction">Introduction</A>
   <li><a href="#prerequisites">Prerequisites</A>
   <li><a href="#compilation">Compilation</A>
-  <li><a href="#ALSA support">ALSA support</A>
   <li><a href="#rpm">Building rpms</A>
 </ul>
 
@@ -91,34 +90,20 @@ The following elements are needed to recompile jMax:
 <li> GNU make
 </ul>
 
+<p>
+Check <a href="installing.html">Installing jMax</a> documentation for 
+further information on JDK download and installation.
+
 
 <h4>SGI platform</h4>
 
 <p>
-The JDK for SGI platforms can be downloaded at:
-<a href="http://www.sgi.com/Products/Evaluation/#jdk">
-http://www.sgi.com/Products/Evaluation/#jdk</a>
-
-<p>
-The JDK for SGI is distributed as a package that installs itself in <code>/usr/java</code>.
-You must add the following to your <code>.cshrc</code> file (modify accordingly if
-you are using another shell):
-<pre>
-  setenv PATH "${PATH}:/usr/java/bin"
-  setenv JDK_HOME /usr/java/
-  setenv JAVA_HOME /usr/java/
-</pre>
-
-<p>
 On SGI platform, GNU make resides in <code>/usr/freeware/bin/gmake</code>.
+Makefiles will <strong>not</strong> work with standard make.
+
 
 
 <h4>Linux platform</h4>
-
-<p>
-The JDK for Linux platforms can be downloaded at:
-<a href="http://www.blackdown.org/java-linux.html">
-http://www.blackdown.org/java-linux.html</a>
 
 <p>
 You can install the JDK in the directory of your choice,
@@ -169,7 +154,7 @@ that you use JDK instead.
 <a name="compilation"> <h3>Compilation</h3></A>
 
 <p>
-The compilation must be started in <i>j</i>Max sources root directory.
+The compilation must be started in jMax sources root directory.
 Compilation command must specify both a target and an architecture which
 is passed in make variable <code>ARCH</code>.
 
@@ -248,39 +233,15 @@ make clean ARCH=i686-linux
 <!-- ---------------------------------------------------------------------- -->
 <p>
 <hr>
-<a name="ALSA support"><h3>ALSA support</h3></a>
-
-<p>
-As ALSA is not installed on every Linux platform, the compilation 
-of the ALSA input/output devices is defined by the make variable
-<code>ENABLE_ALSA</code>. The following command must be used to
-compile with ALSA support:
-<pre>
-make i686-linux ENABLE_ALSA=yes
-</pre>
-
-
-<h4>Platform specifics</h4>
-
-<p>
-<b>SGI platforms</b><br>
-The <code>make</code> command to use is <code>gmake</code> and resides
-in <code>/usr/freeware/bin/gmake</code>. Makefiles will <strong>not</strong>
-work with standard make.
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
 <a name="rpm"> <h3>Building rpms</h3></A>
 
 <p>
-<i>j</i>Max sources can be used to build rpms, in order to ease installation
+jMax sources can be used to build rpms, in order to ease installation
 and distribution on Linux platforms.
 
 <p>
-The necessary files for rpm building are included in the source rpm of <i>j</i>Max
-and in the <i>j</i>Max source distribution.
+The necessary files for rpm building are included in the source rpm of jMax
+and in the jMax source distribution.
 
 
 <h4>Building rpms from source rpm</h4>
@@ -298,7 +259,7 @@ rpm -ba jmax.spec
 <h4>Building rpms from source distribution </h4>
 
 <p>
-This apply if you installed <i>j</i>Max sources from a .tar.gz file.
+This apply if you installed jMax sources from a .tar.gz file.
 
 <p>
 The file <code>jmax.spec</code> is in the source distribution, in

@@ -41,7 +41,7 @@
 </tr>
 
 <tr>
-<td align=right valign=top><a href="index.html"><font size=-1><i>j</i>Max Documentation</font></a></td>
+<td align=right valign=top><a href="index.html"><font size=-1>jMax Documentation</font></a></td>
 </tr>
 
 <tr>
@@ -58,103 +58,93 @@
 
 <p>
 <UL TYPE=DOT>
-  <LI><A HREF="#disclamier">Disclamier</A>
-  <LI><A HREF="#introduction">Introduction</A>
-  <LI><A HREF="#host">Host Parameters</A>
-  <LI><A HREF="#misc">Miscellaneous Parameters</A>
-  <LI><A HREF="#audio">Audio Configuration</A>
-  <LI><A HREF="#midi">MIDI Configuration</A>
-  <LI><A HREF="#hosttype">Supported host types</A>
-  <li><a href="#using ALSA">Using ALSA</a>
+  <LI><A HREF="#Disclaimer">Disclaimer</A>
+  <LI><A HREF="#Introduction">Introduction</A>
+  <LI><A HREF="#Host Parameters">Host Parameters</A>
+  <LI><A HREF="#Miscellaneous Parameters">Miscellaneous Parameters</A>
+  <LI><A HREF="#Audio Configuration">Audio Configuration</A>
+  <LI><A HREF="#MIDI Configuration">MIDI Configuration</A>
+  <LI><A HREF="#Host type">Host type</A>
+  <LI><A HREF="#The file .jmaxrc">The file .jmaxrc</A>
 </UL>
 
-<p>
+<!-- ---------------------------------------------------------------------- -->
+<P>
 <HR>
-<A NAME="disclamier"> 
-<H2> Disclamier </H2>
+<A NAME="Disclaimer"><H2>Disclaimer</H2></A>
 
 <P>
-The current version of <I>j</I>Max use TCL as its
-scripting language, and the feature described in this document is
-currently based on TCL; future version of <I>j</I>Max may
-use a different scripting language, so the features described here
-will change, will be implemented with a different language and/or
-syntax, or will simply vanish.
+The configuration functionnalities described in this document
+are based on the current implementation that uses Tcl as a scripting language.
 
-<p>
+<P>
+Future versions of jMax will probably provide configuration functionnality
+in a completely different way by mean of configuration patches.
+
+<P>
+As a result, the functionnalities described here will change, will be implemented 
+with a different language and/or syntax, or will simply vanish.
+
+
+<!-- ---------------------------------------------------------------------- -->
+<P>
 <HR>
-
-<A NAME="introduction">
-<H2> Introduction </H2>
+<A NAME="Introduction"><H2>Introduction</H2></A>
 
 <P>
 The system configuration is based on system parameters that 
-can be set either by setting a TCL variable in the
-<tt>.jmaxrc</tt> file or giving a 
-command line argument when running <I>j</I>Max.
+can be set 
+<ul>
+<li> either by setting a TCL variable in the <tt>.jmaxrc</tt> file
+<li> or by giving a command line argument when running jMax
+</ul>
 
 <P>
 Since a patch can be used on different platforms, platform specific information 
 should not be included in the patches themselves, but specified in site, user or 
 project configuration files.
 
-<p>
-For each host type 
-supported by <i>j</i>Max a set of i/o devices is defined, which can be used with
-these commands.
-Refer to the index of supported host types to see which 
-audio devices are provided for each of them.
 
-
-<A NAME="host">
+<!-- ---------------------------------------------------------------------- -->
 <p>
 <HR>
-<H2>Host Parameters</H2>
+<A NAME="Host Parameters"><H2>Host Parameters</H2></A>
 
 <p>
-Since <i>j</i>Max has a client/server architecture the host parameters are to be set
-in order to specify the host on which the <i>j</i>Max server should be run.
-By default this is the local host where <i>j</i>Max is launched (and so the client is started up).<BR>
-In this case the host type must be specified using the <i>jmaxHostType</i> parameter.
+Since jMax has a client/server architecture the host parameters are to be set
+in order to specify the host on which the jMax server should be run.
+By default this is the local host where jMax is launched (and so the client is started up).
 
 <p>
-When the parameter <i>jmaxHost</i> is given, the server will run on the named remote host.<BR>
-In this case <i>j</i>Max automaticly should find the host type in the host table of the 
-<A HREF="../installation.html#site">site specific configuration file</A> 
-(so that is doesn't has to be explicitly set by the user when running <i>j</i>Max).
-
-<p>
-The parameter <i>jmaxArch</i> is automaticly set for a specific host type
-so it should not be set by the user at all!
-
-
 <DL>
   <DT><tt><b>jmaxHost</tt></b><P>
   <DD>
     Specifies the host where to run the server.
     The value can be either </tt>local</tt> (default) to specify the host where the client run, 
     or a complete canonical internet name for an other host, like <tt>mymachine.mycompany.com</tt>.<BR>
-    Beware that <i>j</i>Max currently uses the <tt>rsh</tt> Unix command to run 
+    Beware that jMax currently uses the <tt>rsh</tt> Unix command to run 
     the server remotely, so in order to work you must set your <tt>.rhosts</tt>
     file correctly (see the <tt>rsh</tt> and <tt>rhosts</tt> man page for details).<p>
 
   <DT><tt><b>jmaxHostType</tt></b><P>
   <DD>
     Sets the type of the host running the server.<BR>
-    The host type determines the hardware architecture and the implementation of the i/o devices.<BR>
-    See the index of <A HREF="#hosttype">supported host types</A>.<p>
+    The host type determines the hardware architecture.<BR>
+    See the index of <A HREF="#Host type">supported host types</A>.<p>
 
   <DT><tt><b>jmaxArch</b></tt><P>
   <DD> 
     Sets the hardware architecture of the host running the server.<BR>
-    It is used to choose the proper binaries for the given architecture (do not set).
+    It is used to choose the proper binaries for the given architecture.<BR>
+    This parameter is set automaticaly and derived from the <tt><b>jmaxHostType</tt></b>
+    parameter, so it must not be set by the user.
 </DL>
 
 
-<A NAME="misc">
-<p>
+<!-- ---------------------------------------------------------------------- -->
+<P>
 <HR>
-<H2>Miscellaneous Parameters</H2>
+<A NAME="Miscellaneous Parameters"><H2>Miscellaneous Parameters</H2></A>
 
 <DL>
   <DT><tt><b>jmaxConnection</b></tt><P>
@@ -173,7 +163,7 @@ so it should not be set by the user at all!
   <DT><tt><b>jmaxFastFileBox</b></tt><P>
   <dd>
     If the value is <i>true</i>, the file selection box used by
-    <i>j</i>Max will not shown specific icons for known file types, and
+    jMax will not shown specific icons for known file types, and
     will always show all the files in a directory, and not only the files
     of a known file type, so it's use will be substantially faster. <br>
     Depending on your installation, the default speed can be ok, or you
@@ -186,10 +176,10 @@ so it should not be set by the user at all!
 </DL>
 
 
-<p>
-<A NAME="audio">
+<!-- ---------------------------------------------------------------------- -->
+<P>
 <HR>
-<H2>Audio Configuration</H2>
+<A NAME="Audio Configuration"><H2>Audio Configuration</H2></A>
 
 <P>
 The following set of commands handles the audio configuration.
@@ -199,416 +189,164 @@ and should be used before the others.
 <DL>
   <DT><tt><b>jmaxSetSampleRate</b></tt> <i>sr</i><p>
   <DD> 
-    Set the <i>j</i>Max global sampling rate.<BR>
+    Set the jMax global sampling rate.<BR>
     (<b>Note</b>: For now, the user himself must keep the sampling rate 
-    given for <i>j</i>Max consistent with the settings of the physical 
+    given for jMax consistent with the settings of the physical 
     device using the utillities provided by the operating system, like
     the SGI <tt>audiopanel</tt> application.)<p>
 
   <DT><tt><b>jmaxSetAudioBuffer</b></tt> <i>buf</i><p>
   <DD> 
     Set the length of the audio buffer used, i.e. the length, in samples, 
-    of the output FIFO used to compensate the variation of load in <i>j</i>Max.
+    of the output FIFO used to compensate the variation of load in jMax.
     Typical values are between <tt>256</tt> and <tt>1024</tt>, can be more
     or less depending on the application.<BR>
     Lower values cause lower i/o latencies, while higher values reduce possible
     audio clicks caused by system overloads.<p>
 
-  <DT><tt><b>openDefaultAudioIn</b></tt> <i>device</i><p>
+  <DT><tt><b>defaultAudio</b></tt> <i>audioPortClass</i> <i>arguments...</i><p>
   <DD>
-    Open the audio input device <i>device</i> as the default audio device,
-    i.e. the device used by the <tt>adc~</tt> object.<p>
+    Open the default audio port:<BR>
+    <i>audioPortClass</i> is the class of the audio port<BR>
+    <i>arguments...</i> are the instanciation arguments<BR>
+    The audio port class is architecture-dependant.<BR>
+    Current values are:
+    <UL>
+    <LI>on Linux: <TT>ossaudioport</TT>, located in package <TT>oss</TT> or
+     <TT>alsaaudioport</TT>, located in package <TT>alsa</TT>
+    <LI>on SGI: <TT>sgiaudioport</TT>, located in package <TT>sgi</TT>
+    </UL>
 
-  <DT><tt><b>openAudioIn</b></tt> <i>name</i> <i>device</i><p>
-  <DD> 
-    Open a input device named <i>name</i> connected to the objects <tt>in~</tt> 
-    which have <i>name</i> as first argument 
-    (allowing the use of multiple input devices - one for each object).<p>
+    <P>
+     Refer to the summary patches of these packages for further information
+     on audio port's arguments
 
-  <DT><tt><b>resetAudioIn</b></tt><p>
-  <DD> 
-    Reset the effects of the previous commands, i.e. close all the input audio devices,
-    and delete the registered names (usefull in projects files or other situation where
-    a clean input configuration must be installed from scratch).<p>
-
-  <DT><tt><b>openDefaultAudioOut</b></tt> <i>device</i><p>
-  <DD>
-    Open the audio output device <i>device</i> as the default audio device,
-    i.e. the device used by the <tt>dac~</tt> objects.<p>
-
-  <DT><tt><b>openAudioOut</b></tt> <i>name</i> <i>device</i><p>
-  <DD> 
-    Open an output device named <i>name</i> connected to the objects <tt>out~</tt> 
-    that have <i>name</i> as first argument
-    (allowing the use of multiple output devices - one for each object).<p>
-
-   <DT><tt><b>resetAudioOut</b></tt> <p>
-  <DD> 
-    Reset the effects of the previous commands, i.e. close all the output audio devices,
-    and delete the registered names (usefull in projects files or other situation where
-    a clean output configuration must be installed from scratch).<p>
 </DL>
 
-<p>
-<A NAME="midi">
+<!-- ---------------------------------------------------------------------- -->
+<P>
 <HR>
-<H2>MIDI Configuration</H2>
+<A NAME="MIDI Configuration"><H2>MIDI Configuration</H2></A>
 
 <P>
 These commands handle the MIDI configuration:
 
 <DL>
-  <DT><tt><b>openDefaultMidi</b></tt> <i>device</i><p>
+  <DT><tt><b>defaultMidi</b></tt> <i>midiPortClass</i> <i>arguments...</i><p>
   <DD>
-    Open the MIDI device <i>device</i> as the default MIDI port, 
-    i.e. the device used by all the MIDI objects without a port number argument.<p>
+    Open the default MIDI port, i.e. the port used by all the MIDI objects without a MIDI port argument:<BR>
+    <i>midiPortClass</i> is the class of the MIDI port<BR>
+    <i>arguments...</i> are the instanciation arguments<BR>
+    The MIDI port class is architecture-dependant.<BR>
+    Current values are:
+    <UL>
+    <LI>on Linux: <TT>rawmidiport</TT>, located in package <TT>midi</TT> or
+     <TT>midishareport</TT>, located in package <TT>midishare</TT>
+    <LI>on SGI: <TT>sgimidiport</TT>, located in package <TT>sgi</TT>
+    </UL>
 
-  <DT><tt><b>openMidi</b></tt> <i>num</i> <i>device</i><p>
-  <DD>
-    Open the MIDI device <i>device</i> as the MIDI port installed on port number <i>num</i>
-    i.e. the device used by all the MIDI objects with a port number argument of 
-    <i>num</i>.
-    A device installed with port number of <tt>0</tt> will be used by all the MIDI related 
-    object without a MIDI port number.<p>
-
-  <DT><tt><b>resetMidi</b></tt> <p>
-  <DD> 
-    Reset the effects of the previous commands, i.e. close all the MIDI devices,
-    and delete the registered port number (usefull in projects files or other situation where
-    a clean MIDI configuration must be installed from scratch).<p>
+    <P>
+     Refer to the summary patches of these packages for further information
+     on MIDI port's arguments
+    <P>
 </DL>
 
-<p>
+<!-- ---------------------------------------------------------------------- -->
+<P>
 <HR>
-<A NAME="hosttype">
-<h2>Host type</h2>
+<A NAME="Host type"><H2>Host type</H2></A>
 
 <P>
-Following host types are currently supported:
-
-<P>
-<CENTER>
-<TABLE WIDTH=90% BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
-  <TR><TD ALIGN=RIGHT>host type</TD> <TD><b>machine</b></TD> <TD><b>CPU</b></TD> <TD><b>OS</b></TD> 
-    <TD><b>audio options</b></TD></TR>
-  <TR><TD ALIGN=RIGHT><b>o2r5k</b></TD> <TD>SGI O2</TD> <TD>R5000</TD> <TD>IRIX 6.5</TD> 
-    <TD>stereo analog + 1 digital audio i/o card (AES/ADAT)</TD></TR>
-  <TR><TD ALIGN=RIGHT><b>o2r5ki63</b></TD> <TD>SGI O2</TD> <TD>R5000</TD> <TD>IRIX 6.3</TD> 
-    <TD>stereo analog + 1 digital audio i/o card (AES/ADAT)</TD></TR>
-  <TR><TD ALIGN=RIGHT><b>o2r10k</b></TD> <TD>SGI O2</TD> <TD>R10000</TD> <TD>IRIX 6.5</TD> 
-    <TD>stereo analog + 1 digital audio i/o card (AES/ADAT)</TD></TR>
-  <TR><TD ALIGN=RIGHT><b>o2r10ki63</b></TD> <TD>SGI O2</TD> <TD>R10000</TD> <TD>IRIX 6.3</TD> 
-    <TD>stereo analog + 1 digital audio i/o card (AES/ADAT)</TD></TR>
-  <TR><TD ALIGN=RIGHT><b>octane</b></TD> <TD>SGI Ocatane</TD> <TD>R10000</TD> <TD>IRIX 6.5</TD> 
-    <TD>stereo analog + 3 digital audio i/o cards (AES/ADAT)</TD></TR>
-  <TR><TD ALIGN=RIGHT><b>origin</b></TD> <TD>SGI Origin 200/2000</TD> <TD>R10000</TD> <TD>IRIX 6.5</TD> 
-    <TD>6 digital audio i/o cards (AES/ADAT)</TD></TR>
-  <TR><TD ALIGN=RIGHT><b>linuxpc</b></TD> <TD>PC</TD> <TD>Pentium</TD> <TD>Linux</TD> 
-    <TD>OSS stereo card</TD></TR>
-</TABLE>
-</CENTER>
-
-<P>
-<h3>Audio Devices</h3>
-
-Following audio devices are predefined to be used with the 
-audio configuration commands:
+Following host types are defined:
 
 <P>
 <CENTER>
-<TABLE WIDTH=90% BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
-  <TR>
-    <TD>host types</TD>
-    <TD ROWSPAN=2><b>o2r5k</b></TD>
-    <TD ROWSPAN=2><b>o2r5ki63</b></TD>
-    <TD ROWSPAN=2><b>o2r10k</b></TD>
-    <TD ROWSPAN=2><b>o2r10ki63</b></TD>
-    <TD ROWSPAN=2><b>octane</b></TD>
-    <TD ROWSPAN=2><b>origin</b></TD>
-    <TD ROWSPAN=2><b>linuxpc</b></TD>
-  </TR>
-  <TR><TD ALIGN=RIGHT>audio devices</TD></TR>
-
-  <TR>
-    <TD ALIGN=RIGHT><b>analogIn</b></TD>
-    <TD>Analog In</TD> <TD>Analog In</TD> <TD>Analog In</TD> <TD>Analog In</TD>
-    <TD>Analog In</TD> <TD>Analog In</TD>
-    <TD>OSS input</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>analogOut</b></TD>
-    <TD>Analog Out</TD> <TD>Analog Out</TD> <TD>Analog Out</TD> <TD>Analog Out</TD> 
-    <TD>Analog Out</TD> <TD>Analog Out</TD>
-    <TD>OSS output</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoIn</b></TD>
-    <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD>
-    <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD>
-    <TD>OSS input</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoIn1</b></TD>
-    <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD>
-    <TD>RAD 1.AES In</TD> <TD>RAD 1.AES In</TD>
-    <TD>OSS input</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoIn2</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 2.AES In</TD> <TD>RAD 2.AES In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoIn3</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 3.AES In</TD> <TD>RAD 3.AES In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoIn4</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 4.AES In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoIn5</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 5.AES In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoIn6</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 6.AES In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoOut</b></TD>
-    <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD>
-    <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD>
-    <TD>OSS output</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoOut1</b></TD>
-    <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD>
-    <TD>RAD 1.AES Out</TD> <TD>RAD 1.AES Out</TD>
-    <TD>OSS output</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoOut2</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 2.AES Out</TD> <TD>RAD 2.AES Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoOut3</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 3.AES Out</TD> <TD>RAD 3.AES Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoOut4</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 4.AES Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoOut5</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 5.AES Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>stereoOut6</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 6.AES Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-
-  <TR>
-    <TD ALIGN=RIGHT><b>adatIn</b></TD>
-    <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD>
-    <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatIn1</b></TD>
-    <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD>
-    <TD>RAD 1.ADAT In</TD> <TD>RAD 1.ADAT In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatIn2</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 2.ADAT In</TD> <TD>RAD 2.ADAT In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatIn3</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 3.ADAT In</TD> <TD>RAD 3.ADAT In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatIn4</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 4.ADAT In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatIn5</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 5.ADAT In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatIn6</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 6.ADAT In</TD>
-    <TD>&nbsp</TD>
-  </TR>
-
-  <TR>
-    <TD ALIGN=RIGHT><b>adatOut</b></TD>
-    <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD>
-    <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatOut1</b></TD>
-    <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD>
-    <TD>RAD 1.ADAT Out</TD> <TD>RAD 1.ADAT Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatOut2</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 2.ADAT Out</TD> <TD>RAD 2.ADAT Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatOut3</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>RAD 3.ADAT Out</TD> <TD>RAD 3.ADAT Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatOut4</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 4.ADAT Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatOut5</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 5.ADAT Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>adatOut6</b></TD>
-    <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD> <TD>&nbsp</TD>
-    <TD>&nbsp</TD> <TD>RAD 6.ADAT Out</TD>
-    <TD>&nbsp</TD>
-  </TR>
-</TABLE>
-</CENTER>
-
-<P>
-<h3>MIDI Devices</h3>
-
-Following MIDI devices are predefined to be used with the 
-MIDI configuration commands:
-
-<P>
-<CENTER>
-<TABLE WIDTH=90% BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
-  <TR>
-    <TD>host types</TD>
-    <TD ROWSPAN=2><b>o2r5k</b></TD>
-    <TD ROWSPAN=2><b>o2r5ki63</b></TD>
-    <TD ROWSPAN=2><b>o2r10k</b></TD>
-    <TD ROWSPAN=2><b>o2r10ki63</b></TD>
-    <TD ROWSPAN=2><b>octane</b></TD>
-    <TD ROWSPAN=2><b>origin</b></TD>
-    <TD ROWSPAN=2><b>linuxpc</b></TD>
-  </TR>
-  <TR><TD ALIGN=RIGHT>MIDI devices</TD></TR>
-
-  <TR>
-    <TD ALIGN=RIGHT><b>midi</b></TD>
-    <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> 
-    <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> 
-    <TD>/dev/midi00</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>midi1</b></TD>
-    <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> 
-    <TD>Serial Port 1</TD> <TD>Serial Port 1</TD> 
-    <TD>&nbsp</TD>
-  </TR>
-  <TR>
-    <TD ALIGN=RIGHT><b>midi2</b></TD>
-    <TD>Serial Port 2</TD> <TD>Serial Port 2</TD> <TD>Serial Port 2</TD> <TD>Serial Port 2</TD> 
-    <TD>Serial Port 2</TD> <TD>Serial Port 2</TD> 
-    <TD>&nbsp</TD>
-  </TR>
+<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
+<TR>
+<TD ALIGN=RIGHT>jmaxHostType</TD><TD><b>machine</b></TD> <TD><b>CPU</b></TD> <TD><b>jmaxArch</b></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT><b>o2r5k</b></TD> <TD>SGI O2</TD> <TD>R5000</TD> <TD>r5k-irix6.5</TD> 
+</TR>
+<TR>
+<TD ALIGN=RIGHT><b>o2r10k</b></TD> <TD>SGI O2</TD> <TD>R10000</TD> <TD>r10k-irix6.5</TD> 
+</TR>
+<TR>
+<TD ALIGN=RIGHT><b>octane</b></TD> <TD>SGI Octane</TD> <TD>R10000</TD> <TD>r10k-irix6.5</TD> 
+</TR>
+<TR>
+<TD ALIGN=RIGHT><b>origin</b></TD> <TD>SGI Origin 200/2000</TD> <TD>R10000</TD> <TD>r10k-irix6.5</TD> 
+</TR>
+<TR>
+<TD ALIGN=RIGHT><b>linuxpc</b></TD> <TD>PC</TD> <TD>Pentium</TD> <TD>i686-linux</TD> 
+</TR>
 </TABLE>
 </CENTER>
 
 
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<A NAME=".jmaxrc">
+<HR>
+<A NAME="The file .jmaxrc"><H2>The file .jmaxrc</H2></A>
+
+<P>
+The user can customize the jMax environment including the configuration parameters
+in the <TT>.jmaxrc</TT> file in his home directory:
+
+<UL>
+  <LI>set the <A HREF="configuration.html">configuration</A>
+  <LI>customize the <A HREF="project-package.html">project environment</A> for your patches
+  <LI>preload jMax <A HREF="project-package.html">packages</A>
+</UL>
+
+<P>
+The configuration parameters set in the <TT>.jmaxrc</TT> file overwrite the site specific
+default values (see down) and they are overwritten by values set via the command line.
+
+<P>
+<strong>NOTE:</strong>
+In the current release the system and i/o configuration 
+<strong>must</strong> be set in the <TT>.jmaxrc</TT> file.
 
 <p>
-<hr>
-<a name="using ALSA">
- <h2>Using ALSA</h2>
-</a>
+The file is loaded at startup and can contain any TCL code.<BR>
+It is possible to declare declare a number of <I>hooks</I>. 
+These hooks contain TCL code that will be executed at precise points during the initialization process.
+In particular, the <B><I>start</I></B> hook is executed after server start and must be used for I/O, 
+environment and package loading purpose.
 
-<p>
-The Linux ALSA sound drivers are supported by a dynamically loaded package,
-named <i>alsa</i>. 
+<P>
+A template <TT>.jmaxrc</TT> file is the following:
 
-<p>
-To use <i>j</i>Max with the Linux ALSA sound drivers, <i>j</i>Max must be compiled
-with ALSA support (see <a href="compiling.html#ALSA support">Compiling <i>j</i>Max</a> for further information.
-The ALSA package can then be loaded by adding the following line in your <code>.jmaxrc</code> file, inside the <i>start</i> hook:
-<table border=1>
- <tr><td>
-  <code><pre>
-<code><pre>
-	package require alsa
-</pre></code>
- </td></tr>
-</table>
+<PRE>
+# Lines starting with # are comments
+# --- beginning of .jmaxrc
 
-<p>
-The <i>alsa</i> package installs the <tt>alsaaudioport</tt> class. 
-This audioport can be used by adding the following
-line in your <code>.jmaxrc</code> file, inside a <i>start</i> hook:
-<table border=1>
- <tr><td>
-  <code><pre>
-<code><pre>
-   defaultaudioport alsaaudioport 
-</pre></code>
-</td></tr>
-</table>
+set jmaxFastFileBox "true"
 
-<p>Below is an example of a <code>.jmaxrc</code> file for using ALSA
-audio input and ouput:
-<table border=1>
- <tr><td>
-  <code><pre>
 when start {
-	package require alsadev-0.4
+if {$jmaxHost == "astor.ircam.fr"} {
+# SGI Origin
 	jmaxSetSampleRate 44100
-	jmaxSetAudioBuffer 2048
+	jmaxSetAudioBuffer 1024
 
-	openDefaultAudioIn alsaStereoIn
-	openDefaultAudioOut alsaStereoOut
+	defaultAudio sgiaudioport "RAD2.ADATIn" 8 "RAD2.ADATOut" 8
+
+} elseif {$jmaxHost=="lipari.ircam.fr"} {
+# Linux box with a Hammerfall card
+	jmaxSetSampleRate 44100
+	jmaxSetAudioBuffer 512
+
+	defaultAudio alsaaudioport "hw:0,0" 18 18 S32_LE mmap_noninterleaved
 }
-</pre></code>
+}
+
+# --- end of .jmaxrc
+</PRE>
+
+
+
 </td></tr>
 </table>
 

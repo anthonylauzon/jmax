@@ -33,8 +33,6 @@
 static fts_symbol_t fts_s__superclass = 0;
 static fts_symbol_t fts_s_midiport = 0;
 
-static fts_midiport_default_function_t fts_midiport_default_function = 0;
-
 union _fts_midiport_callback_
 {
   fts_midiport_poly_fun_t poly;
@@ -131,7 +129,7 @@ fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_functions_t *f
 }
 
 int
-fts_midiport_check(fts_object_t *obj)
+fts_object_is_midiport(fts_object_t *obj)
 {
   fts_atom_t a[1];
 
@@ -492,21 +490,44 @@ void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double tim
  *
  */
 
-fts_midiport_t *
-fts_midiport_get_default(void)
+static fts_midiport_t *default_midiport = 0;
+
+void fts_midiport_set_default( int argc, const fts_atom_t *argv)
 {
-  return (fts_midiport_default_function)? fts_midiport_default_function(): 0;
+  fts_object_t *obj;
+  fts_atom_t a[1];
+
+  fts_object_new_to_patcher( fts_get_root_patcher(), argc, argv, &obj);
+
+  if (!obj)
+    return;
+
+  fts_object_get_prop( obj, fts_s_state, a);
+
+  if ( !fts_is_object( a) || !fts_object_is_midiport( fts_get_object( a)) )
+    {
+      fts_object_delete_from_patcher( obj);
+      return;
+    }
+
+  if (default_midiport)
+    {
+      fts_object_delete_from_patcher( (fts_object_t *)default_midiport);
+    }
+
+  default_midiport = (fts_audioport_t *)fts_get_object( a);
 }
 
-void
-fts_midiport_set_default_function(fts_midiport_default_function_t fun)
+fts_midiport_t *fts_midiport_get_default(void)
 {
-  fts_midiport_default_function = fun;
+  return default_midiport;
 }
 
-void
-fts_midiport_config(void)
+void fts_midiport_config(void)
 {
   fts_s_midiport = fts_new_symbol("midiport");
   fts_s__superclass = fts_new_symbol("_superclass");
 }
+
+
+

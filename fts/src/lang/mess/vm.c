@@ -25,7 +25,7 @@
  */
 
 
-/* An experiment to load binary files.
+/* The jmax patch binary file loader
 
    Virtual Machine:
 
