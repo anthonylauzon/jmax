@@ -159,23 +159,26 @@ public class SliderControlPanel extends JPanel implements ActionListener, Object
 	verticalItem.setSelected(true);
   }
 
-  public void actionPerformed( ActionEvent e)
+  public void setRange()
   {
       int max, min;
-      if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
+      try
 	  {
-	      try
-		  {
-		      max = Integer.parseInt(maxValueField.getText());
-		      min = Integer.parseInt(minValueField.getText());
-		  }
-	      catch (NumberFormatException e1)
-		  {
-		      setVisible(false);
-		      return;
-		  }
-	      ((Slider)target).setRange(max, min);
+	      max = Integer.parseInt(maxValueField.getText());
+	      min = Integer.parseInt(minValueField.getText());
 	  }
+      catch (NumberFormatException e1)
+	  {
+	      setVisible(false);
+	      return;
+	  }
+      ((Slider)target).setRange(max, min);
+  }
+
+  public void actionPerformed( ActionEvent e)
+  {
+      if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
+	  setRange();
   }
 }
 

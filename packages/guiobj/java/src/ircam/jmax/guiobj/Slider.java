@@ -167,15 +167,6 @@ public class Slider extends GraphicObject implements FtsIntValueListener
     updateRedraw();
   }
 
-    /*public void inspect()
-      {
-      Point aPoint = itsSketchPad.getEditorContainer().getContainerLocation();
-      SliderDialog dialog = new SliderDialog(itsSketchPad.getEditorContainer().getFrame(), this);
-      dialog.setBounds( aPoint.x + getX(), aPoint.y + getY() - 25, 200, 100);
-      dialog.setVisible( true);
-      dialog = null;//for the gc
-      }*/
-
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     int newValue;
@@ -294,6 +285,7 @@ public class Slider extends GraphicObject implements FtsIntValueListener
   public void popUpReset()
   {
     super.popUpReset();
+    controlPanel.setRange();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
     ObjectPopUp.removeSeparation();
   }
