@@ -169,13 +169,3 @@ FTS_API fts_timebase_t *fts_get_timebase(void);
 FTS_API double fts_systime(void);
 
 /*@}*/ /* logical time */
-
-typedef struct fts_timefifo
-{
-  fts_fifo_t fifo;
-  fts_timebase_t *base;
-  int size;
-  double delta;
-} fts_timefifo_t;
-
-

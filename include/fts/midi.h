@@ -706,6 +706,7 @@ FTS_API void fts_midimanager_insert_label_at_index(fts_midimanager_t *mm, int in
 FTS_API void fts_midimanager_remove_label_at_index(fts_midimanager_t *mm, int index);
 FTS_API fts_midilabel_t *fts_midimanager_get_label_by_index(fts_midimanager_t *mm, int index);
 FTS_API fts_midilabel_t *fts_midimanager_get_label_by_name(fts_midimanager_t *mm, fts_symbol_t name);
+FTS_API void fts_midimanager_upload(fts_midimanager_t *mm);
 
 FTS_API void fts_midimanager_set_input(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name);
 FTS_API void fts_midimanager_set_output(fts_midimanager_t *mm, int index, fts_midiport_t *midiport, fts_symbol_t name);

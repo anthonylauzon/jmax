@@ -1224,34 +1224,48 @@ fts_midimanager_insert_label_at_index(fts_midimanager_t *mm, int index, fts_symb
 {
   fts_midilabel_t **p = &mm->labels;
   fts_midilabel_t *label = fts_midilabel_new(name);
+  int n = index;
 
-  while((*p) && index--)
+  while((*p) && n--)
     p = &(*p)->next;
 
   label->next = (*p);
   *p = label;
 
   mm->n_labels++;
+
+  if(fts_object_has_id((fts_object_t *)mm)) {
+    fts_atom_t args[4];
+
+    fts_set_int(args, index);
+    fts_set_symbol(args + 1, name);
+    fts_set_symbol(args + 2, fts_s_none);
+    fts_set_symbol(args + 3, fts_s_none);
+    fts_client_send_message((fts_object_t *)mm, fts_s_set, 4, args);
+  }
 }
 
 void
 fts_midimanager_remove_label_at_index(fts_midimanager_t *mm, int index)
 {
   fts_midilabel_t **p = &mm->labels;
-  fts_midilabel_t *label;
+  int n = index;
 
-  while((*p) && index--)
+  while((*p) && n--)
     p = &(*p)->next;
 
-  if(*p)
-    {
-      label = *p;
-    
-      *p = (*p)->next;
-      mm->n_labels--;
+  if(*p) {
+    fts_midilabel_t *label = *p;
+    fts_atom_t arg;
 
-      fts_midilabel_delete(label);
-    }
+    *p = (*p)->next;
+    mm->n_labels--;
+
+    fts_midilabel_delete(label);
+
+    fts_set_int(&arg, index);
+    fts_client_send_message((fts_object_t *)mm, fts_s_remove, 1, &arg);
+  }
 }
 
 fts_midilabel_t *
@@ -1352,6 +1366,26 @@ fts_midimanager_set_internal(fts_midimanager_t *mm, int index)
   fts_set_int(args + 0, index);
   fts_set_symbol(args + 1, fts_s_internal);
   fts_client_send_message((fts_object_t *)mm, fts_s_output, 2, args);
+}
+
+void
+fts_midimanager_upload(fts_midimanager_t *mm)
+{
+  fts_midilabel_t *label = mm->labels;
+  int i;
+
+  /* upload labels with inputs and outputs */
+  for(i=0; i<mm->n_labels; i++) {
+    fts_atom_t args[4];
+
+    fts_set_int(args, i);
+    fts_set_symbol(args + 1, label->name);
+    fts_set_symbol(args + 2, label->input_name);
+    fts_set_symbol(args + 3, label->output_name);
+    fts_client_send_message((fts_object_t *)mm, fts_s_insert, 4, args);
+
+    label = label->next;
+  }
 }
 
 /* midi objects API */

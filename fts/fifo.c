@@ -87,3 +87,69 @@ void fts_fifo_incr_write( fts_fifo_t *fifo, int incr)
   fifo->write_index = write_index;
 }
 
+/***************************************************
+*
+*  event fifo
+*
+*/
+void
+fts_eventfifo_init(fts_eventfifo_t *eventfifo, int size)
+{
+  int bytes = sizeof(fts_fifoevent_t) * size;
+
+  fts_fifo_init(&eventfifo->fifo, fts_malloc(bytes), bytes);
+
+  eventfifo->size = size;
+  eventfifo->delta = 0.0;
+}
+
+void
+fts_eventfifo_destroy(fts_eventfifo_t *eventfifo, int size)
+{
+  fts_free(eventfifo->fifo.buffer);
+}
+
+/* read next fifo entry into time base (returns pointer to atom of newly allocated event) */
+fts_fifoevent_t *
+fts_eventfifo_get_read(fts_eventfifo_t *eventfifo)
+{
+  if(fts_fifo_read_level(&eventfifo->fifo) >= sizeof(fts_fifoevent_t)) {
+    fts_fifoevent_t *event = (fts_fifoevent_t *)fts_fifo_read_pointer(&eventfifo->fifo);
+    double time = event->time - eventfifo->delta;
+    double now = fts_get_time();
+
+    /* resync fifo */
+    if(time < now)
+      eventfifo->delta = event->time - now;
+
+    /* adjust event time and return (void value can serve for sync) */
+    if(!fts_is_void(&event->atom)) {
+      event->time = time;
+      return event;
+    }
+  }
+
+  return NULL;
+}
+
+fts_fifoevent_t *
+fts_eventfifo_get_write(fts_eventfifo_t *eventfifo)
+{
+  if(fts_fifo_write_level(&eventfifo->fifo) >= sizeof(fts_fifoevent_t *))
+    return *((fts_fifoevent_t **)fts_fifo_write_pointer(&eventfifo->fifo));
+  else
+    return NULL;
+}
+
+void
+fts_eventfifo_incr_read(fts_eventfifo_t *eventfifo)
+{
+  fts_fifo_incr_write(&eventfifo->fifo, sizeof(fts_fifoevent_t *));
+}
+
+void
+fts_eventfifo_incr_write(fts_eventfifo_t *eventfifo)
+{
+  fts_fifo_incr_write(&eventfifo->fifo, sizeof(fts_fifoevent_t *));
+}
+

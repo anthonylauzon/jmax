@@ -139,3 +139,36 @@ FTS_API void fts_fifo_incr_read( fts_fifo_t *fifo, int incr);
  * @ingroup fifo
  */
 FTS_API void fts_fifo_incr_write( fts_fifo_t *fifo, int incr);
+
+/**
+* @name event fifo
+ */
+/*@{*/
+
+typedef struct fts_fifoevent
+{
+  double time;
+  fts_atom_t atom;
+} fts_fifoevent_t;
+
+#define fts_fifoevent_get_time(e) ((e)->time)
+#define fts_fifoevent_get_value(e) (&(e)->atom)
+
+#define fts_fifoevent_set_time(e, x) ((e)->time = (x))
+#define fts_fifoevent_set_value(e, x) (&(e)->atom = (x))
+
+typedef struct fts_eventfifo
+{
+  fts_fifo_t fifo;
+  int size;
+  double delta;
+} fts_eventfifo_t;
+
+FTS_API void fts_eventfifo_init(fts_eventfifo_t *eventfifo, int size);
+FTS_API void fts_eventfifo_destroy(fts_eventfifo_t *eventfifo, int size);
+FTS_API fts_fifoevent_t *fts_eventfifo_get_read(fts_eventfifo_t *eventfifo);
+FTS_API fts_fifoevent_t *fts_eventfifo_get_write(fts_eventfifo_t *eventfifo);
+FTS_API void fts_eventfifo_incr_read(fts_eventfifo_t *eventfifo);
+FTS_API void fts_eventfifo_incr_write(fts_eventfifo_t *eventfifo);
+
+/*@}*/ /* event fifo */

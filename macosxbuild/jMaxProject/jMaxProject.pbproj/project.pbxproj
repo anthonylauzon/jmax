@@ -5,6 +5,18 @@
 	};
 	objectVersion = 38;
 	objects = {
+		F71E6AFB02C9CA66016640F1 = {
+			isa = PBXFileReference;
+			name = fifo.c;
+			path = ../../fts/fifo.c;
+			refType = 2;
+		};
+		F71E6AFC02C9CA66016640F1 = {
+			fileRef = F71E6AFB02C9CA66016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F78563BF02BA3BCE016640F1 = {
 			isa = PBXFileReference;
 			name = macosxmidi.c;
@@ -369,12 +381,6 @@
 			isa = PBXZipArchiveReference;
 			path = guiobj.jar;
 			refType = 3;
-		};
-		F829DA4202B674E601664092 = {
-			isa = PBXFileReference;
-			name = fifo.c;
-			path = ../../fts/fifo.c;
-			refType = 2;
 		};
 		F8386E97028D3F9101664092 = {
 			fileRef = F88000960283082801664092;
@@ -13015,7 +13021,7 @@
 				F880FD540282FA3901664092,
 				F880FD550282FA3901664092,
 				F880FD560282FA3901664092,
-				F829DA4202B674E601664092,
+				F71E6AFB02C9CA66016640F1,
 				F880FD570282FA3901664092,
 				F880FD580282FA3901664092,
 				F880FD590282FA3901664092,
@@ -13526,6 +13532,7 @@
 				F8386ECE028D3F9101664092,
 				F848668902A2751001664092,
 				F848669502A2758B01664092,
+				F71E6AFC02C9CA66016640F1,
 			);
 			isa = PBXSourcesBuildPhase;
 		};

@@ -185,7 +185,7 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
     this->name = name;
     this->id = fts_get_int(at + 2);
-    this->ref = (MIDIEndpointRef)macosxmidi_get_by_unique_id(this->id, macosxmidi_source);
+    this->ref = macosxmidi_get_reference_by_id(this->id, macosxmidi_source);
 
     if(this->ref != NULL) {
       
@@ -259,7 +259,7 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
     this->name = name;
     this->id = fts_get_int(at + 2);
-    this->ref = (MIDIEndpointRef)macosxmidi_get_by_unique_id(this->id, macosxmidi_destination);
+    this->ref = macosxmidi_get_reference_by_id(this->id, macosxmidi_destination);
 
     if(this->ref != NULL) {
 
@@ -329,7 +329,7 @@ macosxmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     /* remove midiport from hashtable and put back id if still valid */
     fts_set_symbol(&k, this->name);
 
-    if(macosxmidi_get_by_unique_id(this->id, type) != NULL) {
+    if(macosxmidi_get_reference_by_id(this->id, type) != NULL) {
       /* remove midiport from hashtable and put reference instead */
       fts_set_int(&a, this->id);
       fts_hashtable_put(ht, &k, &a);
