@@ -126,7 +126,7 @@ public class AnythingTrackBackground implements Layer, ImageObserver{
 
   private void drawVerticalGrid(Graphics g, int w, int h)
   {
-    UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
+    UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), gc.getDataModel());
     int windowTime = (int)(gc.getAdapter().getInvX(w) - gc.getAdapter().getInvX(KEYEND)) - 1 ;
     int timeStep;
 

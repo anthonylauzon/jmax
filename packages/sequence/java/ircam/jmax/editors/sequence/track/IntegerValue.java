@@ -91,26 +91,25 @@ public class IntegerValue extends AbstractEventValue
 	    return new IntegerValue();
 	}
 	
-	public Enumeration getPropertyNames()
+      /*public Enumeration getPropertyNames()
 	{
-	    return new ArrayEnumeration(defNamesArray);
+	return new ArrayEnumeration(defNamesArray);
 	}
 	public int getPropertyCount()
 	{
-	    return defPropertyCount;
-	}
+	return defPropertyCount;
+	}*/
 
 	public DataFlavor getDataFlavor()
 	{
 	    return IntegerValueDataFlavor.getInstance();
 	}
-	public Class getPropertyType(int index)
+      /*public Class getPropertyType(int index)
 	{
-	  return Integer.class;
+	return Integer.class;
 	}
-
 	String defNamesArray[] = {"integer"};
-	int defPropertyCount = 1;
+	int defPropertyCount = 1;*/
     }
 
     /**
@@ -120,36 +119,36 @@ public class IntegerValue extends AbstractEventValue
 	return IntegerEventRenderer.getRenderer();
     }
   
-    public Enumeration getPropertyNames()
+  /*public Enumeration getPropertyNames()
     {
-	return new ArrayEnumeration(nameArray);
+    return new ArrayEnumeration(nameArray);
     }
 
     public int getPropertyType(int index)
     {
-	if(index < propertyCount)
-	    return propertyTypes[index];
-	else return UNKNOWN_TYPE;
+    if(index < propertyCount)
+    return propertyTypes[index];
+    else return UNKNOWN_TYPE;
     }
     
     public int getPropertyCount()
     {
-	return propertyCount;
-    }
+    return propertyCount;
+    }*/
    
-    public Object[] getPropertyValues()
+  /*public Object[] getPropertyValues()
     {
-	for(int i = 0; i<propertyCount; i++)
-	    propertyValuesArray[i] = getProperty(nameArray[i]);
+    for(int i = 0; i<propertyCount; i++)
+    propertyValuesArray[i] = getProperty(nameArray[i]);
 	
-	return propertyValuesArray;
+    return propertyValuesArray;
     }
 
     public void setPropertyValues(int nArgs, Object args[])
     {
-	for(int i = 0; i<nArgs; i++)
-	    setProperty(nameArray[i], args[i]);
-    }
+    for(int i = 0; i<nArgs; i++)
+    setProperty(nameArray[i], args[i]);
+    }*/
 
     public boolean samePropertyValues(Object args[])
     {
@@ -166,15 +165,13 @@ public class IntegerValue extends AbstractEventValue
     public static final int DEFAULT_MAX_VALUE = 127;
     public static final int DEFAULT_MIN_VALUE = 0;
 
-    static String nameArray[] = {"integer"};
+  /*static String nameArray[] = {"integer"};
     static int propertyTypes[] = {INTEGER_TYPE};
-    static int propertyCount = 1;
+    static int propertyCount = 1;*/
 
     static 
     {
-      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-      /*************************************************************/
-	
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
       INTEGER_ICON = new ImageIcon(path+"integer.gif");
     }
 }

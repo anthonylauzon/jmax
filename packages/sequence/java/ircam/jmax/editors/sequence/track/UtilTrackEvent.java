@@ -34,24 +34,26 @@ import ircam.jmax.toolkit.*;
 public class UtilTrackEvent implements Event, Drawable
 {
 
-    public UtilTrackEvent()
-    {
-	time = DEFAULT_TIME;
-    }
+  public UtilTrackEvent()
+  {
+    time = DEFAULT_TIME;
+  }
 
-    public UtilTrackEvent(EventValue value)
-    {
-	time = DEFAULT_TIME;
+  public UtilTrackEvent(EventValue value, TrackDataModel model)
+  {
+    time = DEFAULT_TIME;
+    this.model = model;
 
-	setValue(value);
-    }
+    setValue(value);
+    value.setDataModel(model);
+  }
 
-    /**
-     * Get the initial time for this event */
-    public double getTime()
-    {
-	return time;
-    }
+  /**
+   * Get the initial time for this event */
+  public double getTime()
+  {
+    return time;
+  }
     
     /**
      * Set the initial time for this event. Use move() when the event is into a 
@@ -185,13 +187,14 @@ public class UtilTrackEvent implements Event, Drawable
 	return false;
     }
 
-    //--- Fields
-    private double time;
-    private EventValue value;
-    private boolean inGroup = false;
-    private TrackEvent trackEvent;
+  //--- Fields
+  private double time;
+  private EventValue value;
+  private boolean inGroup = false;
+  private TrackEvent trackEvent;
+  private TrackDataModel model;
 
-    public static double DEFAULT_TIME = 0;
+  public static double DEFAULT_TIME = 0;
 }
 
 

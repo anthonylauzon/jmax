@@ -40,10 +40,14 @@ import java.util.Enumeration;
  */
 public interface TrackDataModel {
 
-    /**
-     * how many events in the database
-     */
-    public abstract int length();
+  abstract public Enumeration getPropertyNames();
+  abstract public int getPropertyCount();
+  abstract public Class getPropertyType(int i);    
+
+  /**
+   * how many events in the database
+   */
+  public abstract int length();
 
     /**
      * return the time of the last event

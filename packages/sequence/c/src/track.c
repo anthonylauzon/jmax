@@ -429,6 +429,8 @@ track_get_next_by_time_after(track_t *track, double time, event_t *here)
     return 0;
 }
 
+
+
 /******************************************************
  *
  *  client calls: highlighting
@@ -558,134 +560,6 @@ track_highlight_and_next(track_t *track, event_t *event)
     }
 
   return event;
-}
-
-/******************************************************
- *
- *  client calls
- * 
- */
-
-/* set name of track by client request */
-static void
-track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  fts_symbol_t name = fts_get_symbol(at);
-
-  /* check if name is in use in this sequence */
-  if(sequence_get_track_by_name(track_get_sequence(this), name))
-    {
-      fts_symbol_t old_name = track_get_name(this);
-      
-      if(old_name)
-	{
-	  fts_atom_t a[1];
-
-	  fts_set_symbol(a, old_name);
-	  fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
-	}
-      else
-	fts_client_send_message((fts_object_t *)this, seqsym_setName, 0, 0);
-    }
-  else
-    {
-      track_set_name(this, name);
-      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, at);
-    }
-  
-  track_set_dirty( this);
-}
-
-static void
-track_add_event_at_client(track_t *this, event_t *event, int ac, const fts_atom_t *at)
-{
-  if(!fts_object_has_id((fts_object_t *)event))
-    fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));
-
-  fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
-  fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
-  fts_client_add_atoms( (fts_object_t *)this, ac, at);
-  fts_client_done_message( (fts_object_t *)this);
-}
-
-/* create new event and upload by client request */
-static void
-track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  double time = fts_get_float(at + 0);
-  event_t *event;
-  
-  /* make new event object */
-  event = create_event(ac - 1, at + 1);
-  
-  if(event)
-    {
-      /* add event to track */
-      track_add_event(this, time, event);
-      track_add_event_at_client(this, event, ac, at);
-    }
-  
-  track_set_dirty( this);
-}
-
-/* create new event by client request without uploading */
-static void
-track_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  double time = fts_get_float(at + 0);
-  event_t *event;
-  
-  /* make new event object */
-  event = create_event(ac - 1, at + 1);
-  
-  /* add event to track */
-  if(event)
-    track_add_event(this, time, event);
-
-  track_set_dirty( this);
-}
-
-/* delete event by client request */
-static void
-track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  int i;
-  
-  /*  remove event objects from client */
-  fts_client_send_message(o, seqsym_removeEvents, ac, at);
-  
-  for(i=0; i<ac; i++)
-    {
-      fts_object_t *event = fts_get_object(at + i);
-      
-      track_remove_event(this, (event_t *)event);
-    }
-
-  track_set_dirty( this);
-}
-
-/* move event by client request */
-static void
-track_move_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *this = (track_t *)o;
-  int i;
-  
-  for(i=0; i<ac; i+=2)
-    {
-      event_t *event = (event_t *)fts_get_object(at + i);
-      float time = fts_get_float(at + i + 1);
-      
-      track_move_event(this, (event_t *)event, time);
-    }
-  
-  fts_client_send_message(o, seqsym_moveEvents, ac, at);
-
-  track_set_dirty( this);
 }
 
 /******************************************************
@@ -1021,6 +895,140 @@ track_return_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   track_t *this = (track_t *)o;
 
   fts_return_float(track_get_duration(this));      
+}
+
+/******************************************************
+ *
+ *  client calls
+ * 
+ */
+
+/* set name of track by client request */
+static void
+track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  fts_symbol_t name = fts_get_symbol(at);
+
+  /* check if name is in use in this sequence */
+  if(sequence_get_track_by_name(track_get_sequence(this), name))
+    {
+      fts_symbol_t old_name = track_get_name(this);
+      
+      if(old_name)
+	{
+	  fts_atom_t a[1];
+
+	  fts_set_symbol(a, old_name);
+	  fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
+	}
+      else
+	fts_client_send_message((fts_object_t *)this, seqsym_setName, 0, 0);
+    }
+  else
+    {
+      track_set_name(this, name);
+      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, at);
+    }
+  
+  track_set_dirty( this);
+}
+
+/*static void
+  track_add_event_at_client(track_t *this, event_t *event, int ac, const fts_atom_t *at)
+  {
+  if(!fts_object_has_id((fts_object_t *)event))
+  fts_client_register_object((fts_object_t *)event, fts_get_client_id((fts_object_t *)this));
+
+  fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
+  fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
+  fts_client_add_atoms( (fts_object_t *)this, ac, at);
+  fts_client_done_message( (fts_object_t *)this);
+  }*/
+
+/* create new event and upload by client request */
+static void
+track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  double time = fts_get_float(at + 0);
+  event_t *event; 
+  
+  fts_array_t temp_array;
+  fts_array_init(&temp_array, 0, 0);
+
+  /* make new event object */
+  event = create_event(ac - 1, at + 1);
+  
+  if(event)
+    {
+      /* add event to track */
+      track_add_event(this, time, event);
+      /*track_add_event_at_client(this, event, ac, at);*/
+       track_upload_event(this, event, &temp_array);
+    }
+
+  fts_array_destroy(&temp_array);
+
+  track_set_dirty( this);
+}
+
+/* create new event by client request without uploading */
+static void
+track_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  double time = fts_get_float(at + 0);
+  event_t *event;
+  
+  /* make new event object */
+  event = create_event(ac - 1, at + 1);
+  
+  /* add event to track */
+  if(event)
+    track_add_event(this, time, event);
+
+  track_set_dirty( this);
+}
+
+/* delete event by client request */
+static void
+track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  int i;
+  
+  /*  remove event objects from client */
+  fts_client_send_message(o, seqsym_removeEvents, ac, at);
+  
+  for(i=0; i<ac; i++)
+    {
+      fts_object_t *event = fts_get_object(at + i);
+      
+      track_remove_event(this, (event_t *)event);
+    }
+
+  track_set_dirty( this);
+}
+
+/* move event by client request */
+static void
+track_move_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  int i;
+  
+  for(i=0; i<ac; i+=2)
+    {
+      event_t *event = (event_t *)fts_get_object(at + i);
+      float time = fts_get_float(at + i + 1);
+      
+      track_move_event(this, (event_t *)event, time);
+    }
+  
+  fts_client_send_message(o, seqsym_moveEvents, ac, at);
+
+  track_set_dirty( this);
 }
 
 /******************************************************

@@ -93,35 +93,30 @@ public class FloatValue extends AbstractEventValue
       return new FloatValue();
     }
     
-    public Enumeration getPropertyNames()
-    {
+    /*public Enumeration getPropertyNames()
+      {
       return new ArrayEnumeration(defNamesArray);
-    }
-    public int getPropertyCount()
-    {
+      }
+      public int getPropertyCount()
+      {
       return defPropertyCount;
-    }
+      }*/
 
     public DataFlavor getDataFlavor()
     {
       return FloatValueDataFlavor.getInstance();
     }
  
-    public Class getPropertyType(int index)
-    {
-      /*if(index < defPropertyCount)
-	return propertyTypesArray[index];
-	else
-	return Integer.class;*/
+    /*public Class getPropertyType(int index)
+      {
       if(index==0)
-	return Float.class;
+      return Float.class;
       else
-	return Integer.class;
-    }
+      return Integer.class;
+      }
 
-    String defNamesArray[] = {"float"};
-    //Class propertyTypesArray[] = {Float.class};
-    int defPropertyCount = 1;
+      String defNamesArray[] = {"float"};
+      int defPropertyCount = 1;*/
   }
 
     /**
@@ -131,40 +126,40 @@ public class FloatValue extends AbstractEventValue
       return IntegerEventRenderer.getRenderer();
     }
   
-    public Enumeration getPropertyNames()
+  /*public Enumeration getPropertyNames()
     {
-	return new ArrayEnumeration(nameArray);
+    return new ArrayEnumeration(nameArray);
     }
 
     public int getPropertyType(int index)
     {
-	if(index < propertyCount)
-	    return propertyTypes[index];
-	else return UNKNOWN_TYPE;
+    if(index < propertyCount)
+    return propertyTypes[index];
+    else return UNKNOWN_TYPE;
     }
     
     public int getPropertyCount()
     {
-	return propertyCount;
-    }
+    return propertyCount;
+    }*/
    
-    public Object[] getPropertyValues()
+  /*public Object[] getPropertyValues()
     {
-	for(int i = 0; i<propertyCount; i++)
-	    propertyValuesArray[i] = getProperty(nameArray[i]);
-	
-	return propertyValuesArray;
+    for(int i = 0; i<propertyCount; i++)
+    propertyValuesArray[i] = getProperty(nameArray[i]);
+      
+    return propertyValuesArray;
     }
 
     public void setPropertyValues(int nArgs, Object args[])
     {
-	for(int i = 0; i<nArgs; i++)
-	    setProperty(nameArray[i], args[i]);
-    }
+    for(int i = 0; i<nArgs; i++)
+    setProperty(nameArray[i], args[i]);
+    }*/
 
     public boolean samePropertyValues(Object args[])
     {
-	return (((Float)propertyValuesArray[0]).floatValue() == ((Float)args[0]).floatValue());
+      return (((Float)propertyValuesArray[0]).floatValue() == ((Float)args[0]).floatValue());
     }
 
     //--- Fields
@@ -177,27 +172,14 @@ public class FloatValue extends AbstractEventValue
     public static final int DEFAULT_MAX_VALUE = 1;
     public static final int DEFAULT_MIN_VALUE = 0;
 
-    static String nameArray[] = {"float"};
+  /*static String nameArray[] = {"float"};
     static int propertyTypes[] = {FLOAT_TYPE};
-    static int propertyCount = 1;
+    static int propertyCount = 1;*/
 
     static 
     {
-	/*
-	  WARNING:
-	  Waiting for a method to get the packagePath from the package name
-	*/
-	/*try
-	  {
-	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	  }
-	  catch(FileNotFoundException e){
-	  //System.err.println("Can't locate sequence images");
-	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	  }*/
-	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-	/*************************************************************/
-	FLOAT_ICON = new ImageIcon(path+"float.gif");
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+      FLOAT_ICON = new ImageIcon(path+"float.gif");
     }
 }
 

@@ -32,85 +32,97 @@ import ircam.jmax.editors.sequence.renderers.*;
 /**
  * A basic implementation of the EventValue interface, with a default property handling (no actions). 
  */
-public class AbstractEventValue /*extends FtsRemoteData*/ implements EventValue 
+public class AbstractEventValue implements EventValue 
 {
 
-    public AbstractEventValue()
-    {
-    }
+  public AbstractEventValue()
+  {
+  }
 
-    /*public void call(int id, FtsStream stream)
-      {
-      // to be implemented
-      }*/
+  public void setDataModel( TrackDataModel td)
+  {
+    model = td;
+  }
 
-    /**
+  public TrackDataModel getDataModel()
+  {
+    return model;
+  }
+  /**
      * Set the named property */
-    public void setProperty(String name, Object value)
-    {
-	if(properties==null)
-	    properties = new Hashtable();
-	properties.put(name, value);
-    }
+  public void setProperty(String name, Object value)
+  {
+    if(properties==null)
+      properties = new Hashtable();
+    properties.put(name, value);
+  }
 
-    /**
-     * Get the given property */
-    public Object getProperty(String name)
-    {
-	if(properties==null)
-	    properties = new Hashtable();
-	
-	if (properties.containsKey(name))
-	    return properties.get(name);
-	else return UNKNOWN_PROPERTY; //to be overloaded
-    }
+  /**
+   * Get the given property */
+  public Object getProperty(String name)
+  {
+    if(properties==null)
+      properties = new Hashtable();
     
-    public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc){}
+    if (properties.containsKey(name))
+      return properties.get(name);
+    else return UNKNOWN_PROPERTY; //to be overloaded
+  }
+    
+  public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc){}
 
-    public JPopupMenu getPopupMenu()
-    {
-	return null;
-    }
-    /**
-     * This implementation returns an EmptyEnumeration */
-    public Enumeration getPropertyNames()
-    {
-	return new EmptyEnumeration();
-    }
+  public JPopupMenu getPopupMenu()
+  {
+    return null;
+  }
 
-    public int getPropertyCount()
-    {
-	return 0;
-    }
+  public String[] getLocalPropertyNames()
+  {
+    return new String[0];
+  }
 
-    public int getPropertyType(int index)
-    {
-	return UNKNOWN_TYPE;
-    }
+  public int getLocalPropertyCount()
+  {
+    return 0;
+  }
 
-    public String[] getLocalPropertyNames()
-    {
-	return new String[0];
-    }
+  public static Object[] propertyValuesArray = new Object[128];
+  public Object[] getPropertyValues()
+  {
+    int i = 0;
+    Object prop;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+      {
+	prop = getProperty( (String)e.nextElement());
+	if( prop != UNKNOWN_PROPERTY)
+	  propertyValuesArray[i++] = prop;
+      }      
+    return propertyValuesArray;
+  }
+  public void setPropertyValues(int nArgs, Object args[])
+  {
 
-    public int getLocalPropertyCount()
-    {
-	return 0;
-    }
+    System.err.println("setPropertyValues nArgs = "+nArgs);
+    for(int i =0; i<nArgs;i++)
+      System.err.println("args["+i+"] = "+args[i]);
 
-    public static Object[] propertyValuesArray = new Object[128];
-    public Object[] getPropertyValues()
-    {
-	return propertyValuesArray;
-    }
-    public void setPropertyValues(int nArgs, Object args[])
-    {
-    }
-
-    public boolean samePropertyValues(Object args[])
-    {
-	return false;
-    }
+    int i = 0;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+      setProperty( (String)e.nextElement(), args[i++]);
+  }
+  
+  public int getDefinedPropertyCount()
+  {
+    int i = 0;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+      if( getProperty( (String)e.nextElement()) != UNKNOWN_PROPERTY) i++;
+  
+    return i;
+  }
+  public boolean samePropertyValues(Object args[])
+  {
+    return false;
+  }
 
     public Object[] getLocalPropertyValues()
     {
@@ -136,20 +148,21 @@ public class AbstractEventValue /*extends FtsRemoteData*/ implements EventValue
     /**
      * A convenience class to implement an empty enumeration */
     public class EmptyEnumeration implements Enumeration {
-	public boolean hasMoreElements()
-	{
-	    return false;
-	}
-
-	public Object nextElement()
-	{
-	    return null;
-	}
+      public boolean hasMoreElements()
+      {
+	return false;
+      }
+      
+      public Object nextElement()
+      {
+	return null;
+      }
     }
 
-    //--- Fields
-    private String name;
-    protected Hashtable properties;
+  //--- Fields
+  private String name;
+  protected Hashtable properties;
+  TrackDataModel model;
 }
 
 

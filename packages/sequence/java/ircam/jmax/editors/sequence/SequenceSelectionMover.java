@@ -226,6 +226,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     else // move every element
       {
 	g.setXORMode(Color.gray); 
+	
+	UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), ((SequenceGraphicContext) gc).getDataModel());
 
 	PartitionAdapter a = (PartitionAdapter)((SequenceGraphicContext) gc).getAdapter();
 	boolean singleObject = ((SequenceGraphicContext)gc).getSelection().size()==1;
@@ -332,7 +334,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 
   //--- Fields
     Rectangle enclosingRect = new Rectangle();
-    UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
     // every event type would be OK, but we also need to handle the little keyboard in the
     // left side of the window... so we need an event that knows about the "pitch" property
 }

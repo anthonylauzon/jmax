@@ -173,6 +173,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
     propertyNames = new MaxVector();
     propertyTypes = new MaxVector();
+    propertyClasses = new MaxVector();
     
     /* prepare the flavors for the clipboard */
     if (flavors == null)
@@ -182,8 +183,6 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
   void setType( String type)
   {
-    System.err.println("setType type "+type);
-    
     this.info = ValueInfoTable.getValueInfo( type);
   }
 
@@ -197,9 +196,39 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     for(int i = 0; i < nArgs-1 ; i+=2)
     {
       propertyNames.addElement( args[i].symbolValue.toString());
-      propertyTypes.addElement( args[i+1].symbolValue.toString());
+      setPropertyType( args[i+1].symbolValue.toString());
     }
   }
+
+  void setPropertyType( String type)
+  {
+    Class typeClass;
+    propertyTypes.addElement( type);
+
+    if( type.equals("int"))
+      typeClass = Integer.class;
+    else if( type.equals("float"))
+      typeClass = Float.class;
+    else if( type.equals("double"))
+      typeClass = Double.class;
+    else //if( type.equals("string") || type.equals("symbol"))
+      typeClass = String.class;
+
+    propertyClasses.addElement( typeClass);
+  }
+
+  public Enumeration getPropertyNames()
+  {
+    return propertyNames.elements();
+  }
+  public int getPropertyCount()
+  {
+    return propertyNames.size();
+  }
+  public Class getPropertyType(int i)
+  {
+    return (Class) propertyClasses.elementAt( i);
+  }   
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from fts.
   //////////////////////////////////////////////////////////////////////////////////////
@@ -219,12 +248,6 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   }
   public void addEvents(int nArgs , FtsAtom args[])
   {
-    /*TrackEvent evt = null;
-      int evtTime;
-      int index = -1;
-
-      for(int i=0; i<nArgs; i++)
-      addEvent((TrackEvent)(args[i].objectValue));*/
     addEvent( new TrackEvent(getServer(), this, args[0].intValue, "event", args, 1, nArgs));
     
     // ends the undoable transition
@@ -1067,7 +1090,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	      
 	      requestEventCreationWithoutUpload((float)event.getTime(), 
 						event.getValue().getValueInfo().getName(), 
-						event.getValue().getPropertyCount(), 
+						getPropertyCount(), 
 						event.getValue().getPropertyValues());
 	      
 	      while (objectsToPaste.hasMoreElements())
@@ -1075,7 +1098,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 		  event = (Event) objectsToPaste.nextElement();
 		  requestEventCreationWithoutUpload((float)event.getTime(), 
 						    event.getValue().getValueInfo().getName(), 
-						    event.getValue().getPropertyCount(), 
+						    getPropertyCount(), 
 						    event.getValue().getPropertyValues());
 		}
 		    
@@ -1335,7 +1358,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	  event = (Event) e.nextElement();
 	  requestEventCreationWithoutUpload((float)event.getTime(), 
 					    event.getValue().getValueInfo().getName(), 
-					    event.getValue().getPropertyCount(), 
+					    getPropertyCount(), 
 					    event.getValue().getPropertyValues());
 	}	    
 
@@ -1472,7 +1495,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   private MaxVector hhListeners;
   private MaxVector stateListeners;
   private MaxVector tempVector = new MaxVector();
-  private MaxVector propertyTypes, propertyNames;
+  private MaxVector propertyTypes, propertyNames, propertyClasses;
   
   private String trackName;
   public DataFlavor flavors[];

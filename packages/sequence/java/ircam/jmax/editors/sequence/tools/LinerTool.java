@@ -178,11 +178,11 @@ public class LinerTool extends Tool implements LineListener{
 	while(i<=x2) 
 	{
 	    EventValue value = (EventValue)info.newInstance();
-	    UtilTrackEvent aEvent = new UtilTrackEvent(value);
+	    UtilTrackEvent aEvent = new UtilTrackEvent(value, egc.getDataModel());
 
 	    egc.getAdapter().setY(aEvent, ((int)((i-x1)*coeff)+y1));
 	    egc.getTrack().getFtsTrack().requestEventCreationWithoutUpload(i, info.getName(), 
-									   value.getPropertyCount(), 
+									   egc.getDataModel().getPropertyCount(), 
 									   value.getPropertyValues());
 	    i+=itsXStep;
 	}	  

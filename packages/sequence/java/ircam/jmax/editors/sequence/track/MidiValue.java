@@ -100,31 +100,26 @@ public class MidiValue extends AbstractEventValue
 	    return new MidiValue();
 	}
 	
-	public Enumeration getPropertyNames()
+      /*public Enumeration getPropertyNames()
 	{
-	    return new ArrayEnumeration(defNamesArray);
+	return new ArrayEnumeration(defNamesArray);
 	}
 	public int getPropertyCount()
 	{
-	    return defPropertyCount;
-	}
+	return defPropertyCount;
+	}*/
 
 	public DataFlavor getDataFlavor()
 	{
 	    return IntegerValueDataFlavor.getInstance();
 	}
-	public Class getPropertyType(int index)
+      /*public Class getPropertyType(int index)
 	{
-	    /*if(index < defPropertyCount)
-	      return propertyTypesArray[index];
-	      else
-	      return Integer.class;*/
-	    return Integer.class;
+	return Integer.class;
 	}
 
 	String defNamesArray[] = {"integer", "number", "channel"};
-	//Class propertyTypesArray[] = {Integer.class, Integer.class, Integer.class};
-	int defPropertyCount = 3;
+	int defPropertyCount = 3;*/
     }
 
     /**
@@ -134,36 +129,36 @@ public class MidiValue extends AbstractEventValue
 	return IntegerEventRenderer.getRenderer();
     }
   
-    public Enumeration getPropertyNames()
+  /*public Enumeration getPropertyNames()
     {
-	return new ArrayEnumeration(nameArray);
+    return new ArrayEnumeration(nameArray);
     }
 
     public int getPropertyType(int index)
     {
-	if(index < propertyCount)
-	    return propertyTypes[index];
-	else return UNKNOWN_TYPE;
+    if(index < propertyCount)
+    return propertyTypes[index];
+    else return UNKNOWN_TYPE;
     }
     
     public int getPropertyCount()
     {
-	return propertyCount;
+    return propertyCount;
     }
    
     public Object[] getPropertyValues()
     {
-	for(int i = 0; i<propertyCount; i++)
-	    propertyValuesArray[i] = getProperty(nameArray[i]);
-	
-	return propertyValuesArray;
+    for(int i = 0; i<propertyCount; i++)
+    propertyValuesArray[i] = getProperty(nameArray[i]);
+    
+    return propertyValuesArray;
     }
 
     public void setPropertyValues(int nArgs, Object args[])
     {
-	for(int i = 0; i<nArgs; i++)
-	    setProperty(nameArray[i], args[i]);
-    }
+    for(int i = 0; i<nArgs; i++)
+    setProperty(nameArray[i], args[i]);
+    }*/
 
     public boolean samePropertyValues(Object args[])
     {
@@ -182,26 +177,13 @@ public class MidiValue extends AbstractEventValue
     public static final int DEFAULT_MAX_VALUE = 127;
     public static final int DEFAULT_MIN_VALUE = 0;
 
-    static String nameArray[] = {"integer", "number", "channel"};
+  /*static String nameArray[] = {"integer", "number", "channel"};
     static int propertyTypes[] = {INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE};
-    static int propertyCount = 3;
+    static int propertyCount = 3;*/
 
     static 
     {
-	/*
-	  WARNING:
-	  Waiting for a method to get the packagePath from the package name
-	*/
-	/*try
-	  {
-	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	  }
-	  catch(FileNotFoundException e){
-	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	  }*/
-	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-	/*************************************************************/
-	
-	MIDI_ICON = new ImageIcon(path+"midi.gif");
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;  
+      MIDI_ICON = new ImageIcon(path+"midi.gif");
     }
 }

@@ -86,33 +86,30 @@ public class AnythingValue extends AbstractEventValue
       return new AnythingValue();
     }
 
-    public Enumeration getPropertyNames()
-    {
-      return new ArrayEnumeration(defNamesArray);
-    }
-
-
-    public int getPropertyCount()
-    {
-      return defPropertyCount;
-    }
+    /*public Enumeration getPropertyNames()
+     {
+     return new ArrayEnumeration(defNamesArray);
+     }
+     public int getPropertyCount()
+     {
+     return defPropertyCount;
+     }*/
 
     public DataFlavor getDataFlavor()
     {
-      //return AnythingValueDataFlavor.getInstance();
       return null;
     }
 
-    public Class getPropertyType(int index)
-    {
+    /*public Class getPropertyType(int index)
+      {
       if(index==0)
-	return String.class;
+      return String.class;
       else
-	return Integer.class;
-    }
+      return Integer.class;
+      }
  
-    String defNamesArray[] = {"type"};
-    int defPropertyCount = 1;
+      String defNamesArray[] = {"type"};
+      int defPropertyCount = 1;*/
   }
 
   public JPopupMenu getPopupMenu()
@@ -127,35 +124,40 @@ public class AnythingValue extends AbstractEventValue
     return AnythingEventRenderer.getRenderer();
   }
   
-  public Enumeration getPropertyNames()
-  {
+  /*public Enumeration getPropertyNames()
+    {
     return new ArrayEnumeration(nameArray);
-  }
-  public int getPropertyCount()
-  {
+    }
+    public int getPropertyCount()
+    {
     return propertyCount;
-  }
+    }
 
-  public int getPropertyType(int index)
-  {
+    public int getPropertyType(int index)
+    {
     if(index < propertyCount)
-      return propertyTypes[index];
+    return propertyTypes[index];
     else return UNKNOWN_TYPE;
-  }
+    }*/
 
-  public Object[] getPropertyValues()
-  {
-    for(int i = 0; i<propertyCount; i++)
-      propertyValuesArray[i] = getProperty(nameArray[i]);
-
+  /*public Object[] getPropertyValues()
+    {
+    //for(int i = 0; i < dataModel.propertyCount; i++)
+    //propertyValuesArray[i] = getProperty(nameArray[i]);
+    int i = 0;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+    propertyValuesArray[i++] = getProperty( (String)e.nextElement());
     return propertyValuesArray;
-  }
+    }
 
-  public void setPropertyValues(int nArgs, Object args[])
-  {
-    for(int i = 0; i<nArgs; i++)
-      setProperty(nameArray[i], args[i]);
-  }
+    public void setPropertyValues(int nArgs, Object args[])
+    {
+    //for(int i = 0; i<nArgs; i++)
+    //setProperty(nameArray[i], args[i]);
+    int i = 0;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+    setProperty( (String)e.nextElement(), args[i++]);
+    }*/
 
   public boolean samePropertyValues(Object args[])
   {
@@ -174,14 +176,12 @@ public class AnythingValue extends AbstractEventValue
   static 
   {
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;  
-    /*************************************************************/
-    
     ANYTHING_ICON = new ImageIcon(path+"anything.gif");
   }
 
-  static String nameArray[] = {"type"};
-  static int propertyTypes[] = {STRING_TYPE};
-  static int propertyCount = 1;
+  /*static String nameArray[] = {"type"};
+    static int propertyTypes[] = {STRING_TYPE};
+    static int propertyCount = 1;*/
 }
 
 

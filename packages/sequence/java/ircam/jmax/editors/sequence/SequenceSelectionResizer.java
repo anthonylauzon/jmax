@@ -158,6 +158,8 @@ public class SequenceSelectionResizer extends SelectionResizer {
     TrackEvent last = egc.getSelection().getLastSelectedEvent();
 
     TrackEvent aTrackEvent;
+    UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue(), egc.getDataModel());
+
     for (Enumeration e = egc.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aTrackEvent = (TrackEvent) e.nextElement();
@@ -180,8 +182,6 @@ public class SequenceSelectionResizer extends SelectionResizer {
   }
 
   //---- Fields
-
-  UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());
 }
 
 

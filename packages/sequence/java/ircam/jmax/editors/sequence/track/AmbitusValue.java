@@ -120,41 +120,10 @@ public class AmbitusValue extends AbstractEventValue
       return new AmbitusValue();
     }
 
-    public Enumeration getPropertyNames()
-    {
-      return new ArrayEnumeration(defNamesArray);
-    }
-
-
-    public int getPropertyCount()
-    {
-      return defPropertyCount;
-    }
-
     public DataFlavor getDataFlavor()
     {
       return AmbitusValueDataFlavor.getInstance();
     }
-
-    public Class getPropertyType(int index)
-    {
-	/*if(index < defPropertyCount)
-	  return propertyTypesArray[index];
-	  else
-	  return Integer.class;*/
-	switch(index){
-	case 0: 
-	    return Integer.class;
-	case 1:
-	    return Double.class;
-	default:
-	    return Integer.class;
-	}
-    }
- 
-    String defNamesArray[] = {"pitch", "duration", "midi_velocity", "midi_channel"};
-      //Class propertyTypesArray[] = {Integer.class, Double.class, Integer.class, Integer.class};
-    int defPropertyCount = 4;
   }
 
   public JPopupMenu getPopupMenu()
@@ -170,34 +139,15 @@ public class AmbitusValue extends AbstractEventValue
     return AmbitusEventRenderer.getRenderer();
   }
   
-  public Enumeration getPropertyNames()
-  {
-    return new ArrayEnumeration(nameArray);
-  }
-  public int getPropertyCount()
-  {
-    return propertyCount;
-  }
-
-  public int getPropertyType(int index)
-  {
-    if(index < propertyCount)
-      return propertyTypes[index];
-    else return UNKNOWN_TYPE;
-  }
-
-  public Object[] getPropertyValues()
-  {
-    for(int i = 0; i<propertyCount; i++)
-      propertyValuesArray[i] = getProperty(nameArray[i]);
-
-    return propertyValuesArray;
-  }
-
   public void setPropertyValues(int nArgs, Object args[])
   {
-    for(int i = 0; i<nArgs; i++)
-      setProperty(nameArray[i], args[i]);
+    if( nArgs == 2)
+      {
+	setProperty( "pitch", args[0]);
+	setProperty( "duration", args[1]);
+      }
+    else
+      super.setPropertyValues( nArgs, args);
   }
 
   public boolean samePropertyValues(Object args[])
@@ -213,7 +163,7 @@ public class AmbitusValue extends AbstractEventValue
   public static final int DEFAULT_MIN_PITCH = 0;
   public static final String fs = File.separator;
   /*public static final String AMBITUS_NAME = "note";
-  public static final String AMBITUS_PUBLIC_NAME = "note";*/
+    public static final String AMBITUS_PUBLIC_NAME = "note";*/
   public static final String AMBITUS_NAME = "scoob";
   public static final String AMBITUS_PUBLIC_NAME = "scoob";
   static String path;
@@ -222,26 +172,9 @@ public class AmbitusValue extends AbstractEventValue
 
   static 
   {
-      /*
-	WARNING:
-	Waiting for a method to get the packagePath from the package name
-      */
-      /*try
-	{
-	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	}
-	catch(FileNotFoundException e){
-	path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	}*/
-      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-      /*************************************************************/
-      
-      AMBITUS_ICON = new ImageIcon(path+"note.gif");
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+    AMBITUS_ICON = new ImageIcon(path+"note.gif");
   }
-
-  static String nameArray[] = {"pitch", "duration", "midi_velocity", "midi_channel"};
-  static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE, INTEGER_TYPE, INTEGER_TYPE};
-  static int propertyCount = 4;
 }
 
 

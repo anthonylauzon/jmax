@@ -42,40 +42,42 @@ public interface EventValue
 {
    /**
      * Set the named property */
-    public abstract void setProperty(String name, Object value);
-    /**
-     * Get the given property */
-    public abstract Object getProperty(String name);
-
-    /**
-     * Get the given property */
-    public abstract void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc);
-
-    /**
-     * Get the popup for this EventValue */
-    public abstract JPopupMenu getPopupMenu();
-
-    /** 
-     * Returns the ValueInfo object for this EventValue */
-    public abstract ValueInfo getValueInfo();
-
-    /**
-     * Returns the ObjectRenderer for this object */
-    public abstract SeqObjectRenderer getRenderer();
-
-    /**
-     * Returns an Enumeration of all the property names known by this
-     * EventValue */
-    public abstract Enumeration getPropertyNames();
+  public abstract void setProperty(String name, Object value);
+  /**
+   * Get the given property */
+  public abstract Object getProperty(String name);
+  
+  /**
+   * Get the given property */
+  public abstract void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc);
+  
+  public void setDataModel( TrackDataModel td);
+  
+  /**
+   * Get the popup for this EventValue */
+  public abstract JPopupMenu getPopupMenu();
+  
+  /** 
+   * Returns the ValueInfo object for this EventValue */
+  public abstract ValueInfo getValueInfo();
+  
+  /**
+   * Returns the ObjectRenderer for this object */
+  public abstract SeqObjectRenderer getRenderer();
+  
+  /**
+   * Returns an Enumeration of all the property names known by this
+   * EventValue */
+  /*public abstract Enumeration getPropertyNames();*/
     
-    public abstract String[] getLocalPropertyNames();
+  public abstract String[] getLocalPropertyNames();
 
-    public abstract int getPropertyType(int index);
+  /*public abstract int getPropertyType(int index);*/
 
     /**
      * Returns the number of properties known by this
      * EventValue */
-    public abstract int getPropertyCount();
+  /*public abstract int getPropertyCount();*/
 
     public abstract int getLocalPropertyCount();
 
@@ -88,6 +90,8 @@ public interface EventValue
 
     public abstract boolean samePropertyValues(Object args[]);
    
+
+  public int getDefinedPropertyCount();
     /**
      * Returns all the property values known by this
      * EventValue like a FtsAtom array */

@@ -145,13 +145,12 @@ public class MessageValue extends AbstractEventValue
 	evt.setProperty("duration", new Double(width));
 	evt.setProperty("height", new Integer(height));
 	
-	evt.sendSetMessage(MESSAGE_NAME, getPropertyCount(), getPropertyValues());
+	evt.sendSetMessage(MESSAGE_NAME, model.getPropertyCount(), getPropertyValues());
       }
     else
       {
 	setProperty("message", text);
 	
-	//setProperty("duration", new Integer(width));
 	setProperty("duration", new Double(width));
 	
 	setProperty("height", new Integer(height));
@@ -223,36 +222,31 @@ public class MessageValue extends AbstractEventValue
       return new MessageValue();
     }
     
-    public Enumeration getPropertyNames()
-    {
+    /*public Enumeration getPropertyNames()
+      {
       return new ArrayEnumeration(defNamesArray);
-    }
-    public int getPropertyCount()
-    {
+      }
+      public int getPropertyCount()
+      {
       return defPropertyCount;
-    }
+      }*/
     
     public DataFlavor getDataFlavor()
     {
       return MessageValueDataFlavor.getInstance();
     }
 
-    public Class getPropertyType(int index)
-    {
-      /*if(index < defPropertyCount)
-	return propertyTypesArray[index];
-	else
-	return Integer.class;*/
+    /*public Class getPropertyType(int index)
+      {
       if(index==0)
-	return String.class;
+      return String.class;
       else
-	return Integer.class;
-    }
+      return Integer.class;
+      }
 	
     
-    String defNamesArray[] = {"message", "integer"};
-    //Class propertyTypesArray[] = {String.class, Integer.class};
-    int defPropertyCount = 2;
+      String defNamesArray[] = {"message", "integer"};
+      int defPropertyCount = 2;*/
   }
 
   /**
@@ -262,22 +256,22 @@ public class MessageValue extends AbstractEventValue
     return MessageEventRenderer.getRenderer();
   }
   
-  public Enumeration getPropertyNames()
-  {
+  /*public Enumeration getPropertyNames()
+    {
     return new ArrayEnumeration(nameArray);
-  }
+    }
     
-  public int getPropertyCount()
-  {
+    public int getPropertyCount()
+    {
     return propertyCount;
-  }
+    }
   
-  public int getPropertyType(int index)
-  {
+    public int getPropertyType(int index)
+    {
     if(index < propertyCount)
-      return propertyTypes[index];
+    return propertyTypes[index];
     else return UNKNOWN_TYPE;
-  }
+    }*/
   
   public String[] getLocalPropertyNames()
   {
@@ -289,19 +283,19 @@ public class MessageValue extends AbstractEventValue
     return localPropertyCount;
   }
   
-  public Object[] getPropertyValues()
-  {
+  /*public Object[] getPropertyValues()
+    {
     for(int i = 0; i<propertyCount; i++)
-      propertyValuesArray[i] = getProperty(nameArray[i]);
+    propertyValuesArray[i] = getProperty(nameArray[i]);
     
     return propertyValuesArray;
-  }
+    }
 
-  public void setPropertyValues(int nArgs, Object args[])
-  {
+    public void setPropertyValues(int nArgs, Object args[])
+    {
     for(int i = 0; i<nArgs; i++)
-      setProperty(nameArray[i], args[i]);
-  }
+    setProperty(nameArray[i], args[i]);
+    }*/
 
   public Object[] getLocalPropertyValues()
   {
@@ -332,29 +326,15 @@ public class MessageValue extends AbstractEventValue
   public static final int DEFAULT_HEIGHT = 13;
   static String path;
   public static ImageIcon MESSAGE_ICON;
-  static String nameArray[] = {"message", "integer"};
-  static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};
+  /*static String nameArray[] = {"message", "integer"};
+    static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};*/
   static String localNameArray[] = {"duration", "open", "height"};
-  static int propertyCount = 2;
+  //static int propertyCount = 2;
   static int localPropertyCount = 3;
   
   static 
   {
-    /*
-      WARNING:
-      Waiting for a method to get the packagePath from the package name
-    */
-    /*try
-      {
-      path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-      }
-      catch(FileNotFoundException e){
-      //System.err.println("Can't locate sequence images");
-      path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-      }*/
-    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-    /*************************************************************/
-	
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
     MESSAGE_ICON = new ImageIcon(path+"message.gif");
   }
 }

@@ -64,9 +64,9 @@ public interface Event
 
     public abstract boolean isHighlighted();
 
-    final public static int SELECTED    = 0;
-    final public static int DESELECTED  = 1;
-    final public static int HIGHLIGHTED = 2;
+  final public static int SELECTED    = 0;
+  final public static int DESELECTED  = 1;
+  final public static int HIGHLIGHTED = 2;
 }
 
 

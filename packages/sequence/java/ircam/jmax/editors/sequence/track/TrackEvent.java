@@ -67,6 +67,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   public void setDataModel(TrackDataModel model)
   {
     itsTrackDataModel = model;
+    value.setDataModel( model);
   }
 
   /**
@@ -143,13 +144,10 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     else if (value != null)
       value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
     
-    if (itsTrackDataModel != null)
-      {
-	itsTrackDataModel.changeEvent(this, name, theValue);
-      }
-    
+    itsTrackDataModel.changeEvent(this, name, theValue);
+
     //send the set message to the fts event object
-    sendSetMessage(value.getValueInfo().getName(), value.getPropertyCount(), value.getPropertyValues());
+    sendSetMessage(value.getValueInfo().getName(), itsTrackDataModel.getPropertyCount(), value.getPropertyValues());
   }
 
   void sendSetMessage(String type, int nArgs, Object arguments[])
@@ -267,8 +265,8 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     UtilTrackEvent evt = new UtilTrackEvent();
     evt.setTime(getTime());
     EventValue evtValue = (EventValue)(getValue().getValueInfo().newInstance());
-    evtValue.setPropertyValues(getValue().getPropertyCount(), getValue().getPropertyValues());
-    evtValue.setLocalPropertyValues(getValue().getLocalPropertyCount(), getValue().getLocalPropertyValues());
+    evtValue.setPropertyValues( itsTrackDataModel.getPropertyCount(), getValue().getPropertyValues());
+    evtValue.setLocalPropertyValues( getValue().getLocalPropertyCount(), getValue().getLocalPropertyValues());
     evt.setValue(evtValue);
     return evt;
   }

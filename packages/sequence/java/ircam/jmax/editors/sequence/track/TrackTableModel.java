@@ -52,7 +52,7 @@ class TrackTableModel extends AbstractTableModel{
    * The number of columns in this model */
   public int getColumnCount() 
   { 
-      return 2 + model.getType().getPropertyCount();
+    return 2 + model.getPropertyCount();
   }
   
   /**
@@ -66,7 +66,7 @@ class TrackTableModel extends AbstractTableModel{
 	if(col == 1) 
 	  return Double.class;
 	else	      
-	  return model.getType().getPropertyType(col-2);
+	  return model.getPropertyType(col-2);
   }
 
   /**
@@ -80,14 +80,14 @@ class TrackTableModel extends AbstractTableModel{
       Event event = model.getEventAt(rowIndex);
 
       if (model instanceof UndoableData) //can't make assumptions...
-	  ((UndoableData) model).beginUpdate(); 
+	((UndoableData) model).beginUpdate(); 
       
       if(columnIndex == 1)
-	  event.move(((Double) aValue).doubleValue());
+	event.move(((Double) aValue).doubleValue());
       else
-	  event.setProperty(getColumnName(columnIndex), aValue);
+	event.setProperty(getColumnName(columnIndex), aValue);
 
-    if (model instanceof UndoableData)
+      if (model instanceof UndoableData)
 	((UndoableData) model).endUpdate();
   }
 
@@ -104,30 +104,30 @@ class TrackTableModel extends AbstractTableModel{
   {
       String name;
       if(col == 0)
-	  return "evt. no";
+	return "evt. no";
       else 
-	  {
-	      if(col == 1)
-		  return "time";
-	      else
-		  {
-		      int i = 2;
-		      for(Enumeration e = model.getType().getPropertyNames(); e.hasMoreElements();)
-			  {
-			      name = (String)e.nextElement();
-			      if(i==col)
-				  return name;
-			      i++;
-			  }
-		  }
-	  }
+	{
+	  if(col == 1)
+	    return "time";
+	  else
+	    {
+	      int i = 2;
+	      for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+		{
+		  name = (String)e.nextElement();
+		  if(i==col)
+		    return name;
+		  i++;
+		}
+	    }
+	}
       return "";
   }
 
   /**
    * How many events in the database? */
   public int getRowCount() { 
-      return model.length(); 
+    return model.length(); 
   }
   
   /**
@@ -138,12 +138,12 @@ class TrackTableModel extends AbstractTableModel{
       return new Integer(row);
     else 
 	{
-	    Event temp = model.getEventAt(row);    
+	  Event temp = model.getEventAt(row);    
 	    
-	    if(col == 1)
-		return new Float(temp.getTime());
-	    else
-		return temp.getValue().getPropertyValues()[col-2];
+	  if(col == 1)
+	    return new Float(temp.getTime());
+	  else
+	    return temp.getValue().getPropertyValues()[col-2];
 	}
   }
   
