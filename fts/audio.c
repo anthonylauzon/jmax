@@ -47,7 +47,6 @@
 static fts_audioport_t *audioport_list = 0;
 
 #define fts_audioport_is_direction( port, direction) ((port)->inout[(direction)].valid)
-#define fts_audioport_is_open( port, direction) ((port)->inout[(direction)].open)
 
 #define fts_audioport_is_input( port) fts_audioport_is_direction( (port), FTS_AUDIO_INPUT)
 #define fts_audioport_is_output( port) fts_audioport_is_direction( (port), FTS_AUDIO_OUTPUT)

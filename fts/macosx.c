@@ -34,7 +34,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h> 
+#include <sys/param.h>
+#include <sys/stat.h> 
+#include <sys/types.h>
 #include <sys/time.h> 
 #include <mach-o/dyld.h> 
 
@@ -71,13 +73,13 @@ static fts_symbol_t get_user_directory(void)
   strcat( dir, PREF_DIR);
   
   /* create the directory if necessary */
-  if (!fts_file_exists(path) && mkdir( path, 0755) < 0)
-    fts_log( "[user] error: cannot create directory %s\n", path);
+  if (!fts_file_exists(dir) && mkdir( dir, 0755) < 0)
+    fts_log( "[user] error: cannot create directory %s\n", dir);
 
-  if (fts_is_file( path))
-    fts_log( "[user] error: %s is a file, but must be a directory\n", path);
+  if (fts_is_file( dir))
+    fts_log( "[user] error: %s is a file, but must be a directory\n", dir);
 
-  return fts_new_symbol(path);
+  return fts_new_symbol(dir);
 }
 
 fts_symbol_t
@@ -306,7 +308,7 @@ int thread_manager_start(thread_manager_t* self)
 {
     int success;
     /* Time to create the thread */
-    success = pthread_create(&self->thread_manager_ID,
+    success = pthread_create((pthread_t*)&self->thread_manager_ID,
 			     NULL,
 			     thread_manager_main,
 			     (void*)self);
@@ -378,7 +380,7 @@ void* thread_manager_main(void* arg)
 	    else
 	    {
 		/* try to detach thread */
-		success = pthread_detach(worker->id);
+		success = pthread_detach((pthread_t)worker->id);
 		if (0 != success)
 		{
 		    post("[thread manager] cannot detach thread %d \n", worker->id);
@@ -398,7 +400,7 @@ void* thread_manager_main(void* arg)
 
 	    worker = (fts_thread_worker_t*)fts_get_pointer(atom);
 	    
-	    success = pthread_cancel(worker->id);
+	    success = pthread_cancel((pthread_t)worker->id);
 	    if (0 != success)
 	    {
 		if (ESRCH == success)
