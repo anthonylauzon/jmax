@@ -30,6 +30,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "data_java"=..\data\winbuild\data_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "dsdev"=..\dsdev\winbuild\dsdev.dsp - Package Owner=<4>
 
 Package=<5>
@@ -43,6 +55,18 @@ Package=<4>
 ###############################################################################
 
 Project: "explode"=..\explode\winbuild\explode.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "explode_java"=..\explode\winbuild\explode_java.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -68,6 +92,18 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name mess
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "guiobj_java"=..\guiobj\winbuild\guiobj_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -98,6 +134,18 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name utils
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ispw_java"=..\ispw\winbuild\ispw_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -189,7 +237,31 @@ Package=<4>
 
 ###############################################################################
 
+Project: "qlist_java"=..\qlist\winbuild\qlist_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "sequence"=..\sequence\winbuild\sequence.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "sequence_java"=..\sequence\winbuild\sequence_java.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -21,6 +21,8 @@
 
 #include "system.h"
 
+extern void fts_signal_bus_config(void);
+
 extern void dsp_config(void);
 /*  extern void arch_config(void); */
 
@@ -36,6 +38,9 @@ extern void bus_tilda_config(void);
 void
 system_config(void)
 {
+
+  fts_signal_bus_config();
+
   dsp_config();
 /*    arch_config(); */
 

@@ -116,6 +116,14 @@ SOURCE=..\c\src\print.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\sigbus.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\sigbus.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\system.c
 # End Source File
 # Begin Source File
