@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>jMax Documentation - The Circle - Sources</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.01SGoldC-SGI (X11; I; IRIX 6.3 IP32) [Netscape]">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EE" VLINK="#551A8B" ALINK="#FF0000">
+
+<P><!--                                                                      --><!-- jMax                                                                 --><!--                                                                      --><!-- Copyright (C) 1999 by IRCAM                                          --><!-- All rights reserved.                                                 --><!--                                                                      --><!-- This program may be used and distributed under the terms of the      --><!-- accompanying LICENSE.                                                --><!--                                                                      --><!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    --><!-- for DISCLAIMER OF WARRANTY.                                          --><!--                                                                      --></P>
+
+<TABLE CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TD ALIGN=LEFT><A HREF="index.html">patcher index</A> </TD>
+
+<TD ALIGN=RIGHT></TD>
+</TR>
+</TABLE>
+
+<P>
+<HR NOSHADE SIZE=1></P>
+
+<H2>What's a source?</H2>
+
+<P>A source object is a symbolic and graphic representation for a sound
+source in a sound scene. </P>
+
+<P><B>Source Properties</B></P>
+
+<UL>
+<LI><B>identification number</B>: a unique id for the source in a Circle
+instance, you can't change it</LI>
+
+<LI><B>name</B>: a user name for the source, initialized by default to
+the id number. The first char of it is drawn on the source. </LI>
+
+<LI><B>color</B>: red by default. You can change it via the Source Inspector
+Dialog</LI>
+
+<LI><B>type</B>: if &quot;<TT>local&quot;, </TT>the source is a normal
+sound object in the sound scene; if &quot;<TT>receiver&quot; , </TT>the
+source represent the center of the sound scene and the auditory position.
+In this case is not a sound producer</LI>
+
+<LI><B>moving mode:</B> mode in which a moving source changes her orientation.
+In &quot;<TT>centered mode</TT>&quot; the source is always oriented to
+the center of the sound scene; in &quot;<TT>static mode</TT>&quot; the
+source orientation don't change; in &quot;<TT>dynamic mode</TT>&quot; the
+source orientation follow the moving direction</LI>
+
+<LI>associated <B>spat-template</B>: is the .jmax template associated to
+the source</LI>
+
+<LI><B>presence</B>: proximity of sound source, energy of direct sound
+and early room effect</LI>
+
+<LI><B>warmth</B>: variation of early room effect relative to direct sound</LI>
+
+<LI><B>brillance</B>: variation of early room effect relative to direct
+sound</LI>
+
+<LI><B>envelopment</B>: energy of early room effect relative to direct
+sound</LI>
+
+<LI><B>absolute cartesian and polar coordinates</B>: coordinates of the
+source center relatively to the absolute center of the sound scene (the
+center of the green cross in the background)</LI>
+
+<LI><B>&quot;relative to receiver&quot; cartesian and polar coordinates</B>:
+coordinates of the source center relatively to the center of the receiver
+source with the y-axe according to the receiver orientation axe</LI>
+
+<LI>absolute and relative to receiver <B>orientation: </B>direction of
+the sound emission, misured relatively to the zero of cartesian axes</LI>
+
+<LI><B>aperture: a</B>ngle of emission, misured relatively to the orientation</LI>
+</UL>
+
+<P>
+<HR NOSHADE SIZE=1></P>
+
+</BODY>
+</HTML>

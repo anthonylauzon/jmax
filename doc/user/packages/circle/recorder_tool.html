@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>jMax Documentation - The Circle - Recorder Tool</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.01SGoldC-SGI (X11; I; IRIX 6.3 IP32) [Netscape]">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EE" VLINK="#551A8B" ALINK="#FF0000">
+
+<P><!--                                                                      --><!-- jMax                                                                 --><!--                                                                      --><!-- Copyright (C) 1999 by IRCAM                                          --><!-- All rights reserved.                                                 --><!--                                                                      --><!-- This program may be used and distributed under the terms of the      --><!-- accompanying LICENSE.                                                --><!--                                                                      --><!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    --><!-- for DISCLAIMER OF WARRANTY.                                          --><!--                                                                      --></P>
+
+<TABLE CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TD ALIGN=LEFT><A HREF="index.html">patcher index</A> </TD>
+
+<TD ALIGN=RIGHT></TD>
+</TR>
+</TABLE>
+
+<P>
+<HR NOSHADE SIZE=1></P>
+
+<H2>Recorder Tool</H2>
+
+<P>With this tool you can record and playback a trajectory of a source
+(or more sources) in the time, i.e. their changes in position , aperture
+and orientation. The recording is done at a &quot;<B>sampling rate</B>&quot;
+that you can change via the &quot;<B>Recorder Sampling Rate</B>&quot; menu
+(submenu of the menu &quot;Options&quot;). The same for the playing.</P>
+
+<P>When you mount this tool a set of buttons is shown at the top right
+of the window. If you click on the &quot;<B>rec</B>&quot; button you can
+start a recording session. When clicking on a source, the movements and
+changes in aperture/orientation are recorded, and a trajectory is drawn
+in the background with a node for every sample. The recording stops at
+mouseUp. Now you can:</P>
+
+<UL>
+<LI>continue the recording with another (or the same) source by clicking
+and moving</LI>
+
+<LI>click on the &quot;<B>pause</B>&quot; button , then move a source without
+recording the changes</LI>
+
+<LI><A HREF="modify_trajectory.html">modify the trajectory</A> by selecting/removing/adding/modifying
+the nodes of the trajectory</LI>
+
+<LI>click on the &quot;<B>reset</B>&quot; button to delete the trajectory</LI>
+
+<LI>click on the &quot;<B>ok</B>&quot; button to validate this trajectory
+, exit from the record mode and activate the &quot;play&quot; button</LI>
+</UL>
+
+<P>When you click on the &quot;<B>play</B>&quot; button you start a thread
+that play the trajectory with the current sampling rate and sends out the
+corresponding messages.</P>
+
+<P>At this point, click on the &quot;rec&quot; button to modify the existing
+trajectory. Recording and playing are performed by different threads, so
+you can play and record two different trajectory at the same time.</P>
+
+<P>
+<HR NOSHADE SIZE=1></P>
+
+</BODY>
+</HTML>
