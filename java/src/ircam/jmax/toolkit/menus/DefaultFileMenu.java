@@ -54,7 +54,6 @@ public class DefaultFileMenu extends EditorMenu
 
     addSeparator();
 
-    add(DefaultActions.statisticsAction, "Statistics");
     add(DefaultActions.quitAction, "Quit", Event.CTRL_MASK, KeyEvent.VK_Q);
   }
 }

@@ -43,17 +43,6 @@ public class FileMenu extends DefaultFileMenu
 {
   public FileMenu(ErmesSketchPad sketch)
   {
-    /*insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-
-      insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 6);
-      insertSeparator(7);
-
-    
-      if(sketch.isARootPatcher())
-      insert(Actions.saveAsAction, "SaveAs", 4);
-      else
-      insert(Actions.saveToAction, "Save As Template", 4);*/
-
     if(sketch.isARootPatcher())
       {
 	insert(Actions.saveAction, "Save", Event.CTRL_MASK, KeyEvent.VK_S, 3);
@@ -72,7 +61,6 @@ public class FileMenu extends DefaultFileMenu
 	}
      insertSeparator(6);
      insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 7);
-
   }
 }
 

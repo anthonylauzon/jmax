@@ -50,6 +50,9 @@ public class DefaultHelpMenu extends EditorMenu
     super("Help");
     setHorizontalTextPosition(AbstractButton.LEFT);
 
+    add(DefaultActions.statisticsAction, "Statistics");
+    addSeparator();
+
     // Adding the summaries 
     Enumeration en = FtsHelpPatchTable.getSummaries(); 
 
