@@ -1,4 +1,4 @@
-SOURCES := \
+SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/ErmesObject.java    \
 	$(INCLUDE_PATH)/ErmesObjBang.java    \
 	$(INCLUDE_PATH)/ErmesObjComment.java    \

@@ -18,6 +18,7 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/DisplayList.java  \
 	$(INCLUDE_PATH)/DisplayObject.java  \
 	$(INCLUDE_PATH)/ObjectAction.java  \
+	$(INCLUDE_PATH)/ConnectionAction.java  \
 	$(INCLUDE_PATH)/ErmesConnection.java  \
 	$(INCLUDE_PATH)/ErmesDataEditor.java  \
 	$(INCLUDE_PATH)/ErmesDrawable.java  \

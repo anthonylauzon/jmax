@@ -41,7 +41,7 @@ class HResizeInteraction extends SubInteraction
 
       case Squeack.DRAG:
 	object.redraw();
-	object.resizeBy(mouse.x - oldMouse.x, 0);
+	object.setWidth(mouse.x - object.getX());
 	object.redraw();
 	engine.getSketch().fixSize(); 
 	break;

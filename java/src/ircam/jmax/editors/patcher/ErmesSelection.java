@@ -148,7 +148,8 @@ public class ErmesSelection implements Transferable
     connections.removeAllElements();
     Fts.getSelection().clean();
 
-    owner.selectionChanged();
+    if (owner != null)
+      owner.selectionChanged();
   }
 
   public void redraw() 
@@ -263,24 +264,6 @@ public class ErmesSelection implements Transferable
       }
   }
 
-  void resizeAllBy( int dx, int dy)
-  {
-    ErmesObject object;
-
-    Object[] values = objects.getObjectArray();
-    int size = objects.size();
-
-    for (int i = 0; i < size; i++)
-      {
-	object = (ErmesObject) values[i];
-
-	object.redraw();
-	object.resizeBy( dx, dy);
-	object.redraw();
-      }
-  }
-
-
   public void resizeToMaxWidth()
   {
     int max = 0;
@@ -296,7 +279,7 @@ public class ErmesSelection implements Transferable
       {
 	ErmesObject object = (ErmesObject) e.nextElement();
 	object.redraw();
-	object.resizeBy( max-object.getWidth(), 0);
+	object.setWidth(max);
 	object.redraw();
       }
   }
@@ -317,7 +300,7 @@ public class ErmesSelection implements Transferable
       {
 	ErmesObject object = (ErmesObject) e.nextElement();
 	object.redraw();
-	object.resizeBy( 0, max - object.getHeight());
+	object.setHeight(max);
 	object.redraw();
       }
   }

@@ -1,4 +1,4 @@
-SOURCES := \
+SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/PatcherAction.java  \
 	$(INCLUDE_PATH)/OpenAction.java  \
 	$(INCLUDE_PATH)/NewAction.java  \

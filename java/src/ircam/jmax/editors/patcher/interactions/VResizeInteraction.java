@@ -42,7 +42,7 @@ class VResizeInteraction extends SubInteraction
 
       case Squeack.DRAG:
 	object.redraw();
-	object.resizeBy(0, mouse.y - oldMouse.y);
+	object.setHeight(mouse.y - object.getY());
 	object.redraw();
 	engine.getSketch().fixSize(); 
 	break;

@@ -31,7 +31,8 @@ abstract public class ErmesObjInOut extends ErmesObject {
   }
 
   // redefined from base class
-  protected void setWidth( int theWidth)
+
+  public void setWidth( int theWidth)
   {
     if (theWidth < MINIMUM_WIDTH)
       theWidth = MINIMUM_WIDTH;
@@ -41,7 +42,7 @@ abstract public class ErmesObjInOut extends ErmesObject {
   }
 
   // redefined from base class
-  protected void setHeight( int theHeight)
+  public void setHeight( int theHeight)
   {
   }
 

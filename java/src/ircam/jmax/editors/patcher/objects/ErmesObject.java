@@ -156,10 +156,13 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     return itsRectangle.width;
   }
 
-  protected void setWidth( int theWidth) 
+  public void setWidth( int w) 
   {
-    itsRectangle.width = theWidth;
-    itsFtsObject.setWidth( theWidth);
+    if (w > 0)
+      {
+	itsRectangle.width = w;
+	itsFtsObject.setWidth( w);
+      }
   }
 
   public final int getHeight() 
@@ -167,10 +170,13 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     return itsRectangle.height;
   }
 
-  protected void setHeight( int theHeight) 
+  public void setHeight( int h) 
   {
-    itsRectangle.height = theHeight;
-    itsFtsObject.setHeight( theHeight);
+    if (h > 0)
+      {
+	itsRectangle.height = h;
+	itsFtsObject.setHeight( h);
+      }
   }
 
   public Font getFont() 
@@ -280,9 +286,12 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     g.fillRect( itsRectangle.x, itsRectangle.y, itsRectangle.width, itsRectangle.height);
   }
 
+  // Add one to cope with the inlet/outlets
+
   public void redraw()
   {
-    itsSketchPad.repaint( itsRectangle.x, itsRectangle.y, itsRectangle.width, itsRectangle.height);
+    itsSketchPad.repaint( itsRectangle.x, itsRectangle.y - 1, itsRectangle.width, itsRectangle.height + 2 );
+    itsSketchPad.getDisplayList().redrawConnectionsFor(this); // experimental
   }
 
   public void redrawConnections()
@@ -472,29 +481,27 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
     setY( itsRectangle.y + theDeltaV);
   }
 
-  public void resizeBy( int theDeltaW, int theDeltaH) 
-  {
-    if ( theDeltaW == 0 && theDeltaH == 0)
-      return;
-
-    if ( -theDeltaW > itsRectangle.width || -theDeltaH > itsRectangle.height)
-      return;
-
-    setWidth( itsRectangle.width + theDeltaW);
-    setHeight( itsRectangle.height + theDeltaH);
-  }
-
-  public void resize( int w, int h) 
-  {
-    setWidth( w);
-    setHeight( h);
-  }
-
   public Rectangle getBounds() 
   {
     // (fd, mdc) Bounds don't copy the bound rectangle any more
     // and nobody is allowed to modify it.
     return itsRectangle;
+  }
+
+
+  /* SUpport for graphic ordering; temporarly, it is not
+     persistent, i.e. is not stored in the FTS object */
+
+  private int layer;
+
+  final public void setLayer(int v)
+  {
+    layer = v;
+  }
+
+  final public int getLayer()
+  {
+    return layer;
   }
 
   public Dimension Size() 

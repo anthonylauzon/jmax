@@ -1,4 +1,4 @@
-SOURCES := \
+SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/AddObjectInteraction.java \
 	$(INCLUDE_PATH)/ConnectionSelectInteraction.java \
 	$(INCLUDE_PATH)/ConnectionToggleSelectInteraction.java \

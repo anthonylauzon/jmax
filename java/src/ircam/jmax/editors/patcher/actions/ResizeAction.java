@@ -33,7 +33,8 @@ public class ResizeAction extends PatcherAction
 	  public void processObject(ErmesObject object)
 	    {
 	      object.redraw();
-	      object.resizeBy(dx, dy);
+	      object.setWidth(object.getWidth() + dx);
+	      object.setHeight(object.getHeight() + dy);
 	      object.redraw();
 	    }});
 

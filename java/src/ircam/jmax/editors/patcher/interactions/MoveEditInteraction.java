@@ -32,7 +32,9 @@ class MoveEditInteraction extends SubInteraction
     switch (squeack)
       {
       case (Squeack.DOWN | Squeack.OBJECT):
+	
 	object = (ErmesObject) dobject;
+	engine.getDisplayList().objectToFront(object);
 
 	if (object.isSelected())
 	  {

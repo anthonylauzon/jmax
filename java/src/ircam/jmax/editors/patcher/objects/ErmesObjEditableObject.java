@@ -41,7 +41,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   }
 
   // redefined from base class
-  protected void setWidth( int theWidth) 
+  public  void setWidth( int theWidth) 
   {
     int minWidth = getFontMetrics().stringWidth( "m ") + 2*getTextXOffset();
 
@@ -55,15 +55,8 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
   // redefined from base class
   // This way, changing the height from outside is forbidden
-  protected void setHeight( int theHeight)
+  public void setHeight( int theHeight)
   {
-  }
-
-  // redefined from base class
-
-  public void resizeBy( int theDeltaW, int theDeltaH) 
-  {
-    setWidth( getWidth() + theDeltaW);
   }
 
   // redefined from base class

@@ -125,7 +125,8 @@ public class ErmesObjEditField extends JTextArea implements KeyListener, FocusLi
 	  {//return
 	    setRows(getRows()+1);
 	    Dimension d2 = itsOwner.Size();
-	    itsOwner.resize( d2.width, d2.height + fm.getHeight());
+	    itsOwner.setWidth(d2.width);
+	    itsOwner.setHeight(d2.height + fm.getHeight());
 	    itsSketchPad.repaint();
 
 	    setSize( getSize().width, getSize().height + fm.getHeight());
@@ -154,12 +155,14 @@ public class ErmesObjEditField extends JTextArea implements KeyListener, FocusLi
 	    if (aCurrentLineWidth >= getSize().width-20) 
 	      {
 		int step;
+
 		if ( aWidth > 20)
 		  step = aWidth;
 		else
 		  step = 30;
 
-		itsOwner.resize( itsOwner.Size().width + step, itsOwner.Size().height);
+		itsOwner.setWidth(itsOwner.Size().width + step);
+		itsOwner.setHeight(itsOwner.Size().height);
 		itsSketchPad.repaint();
 		setSize( getSize().width + step, getSize().height);
 		requestFocus();

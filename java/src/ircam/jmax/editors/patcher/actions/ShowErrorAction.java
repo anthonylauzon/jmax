@@ -34,7 +34,7 @@ public class ShowErrorAction extends PatcherAction
 		{ object.showErrorDescription();}});
 	  }
 	else
-	  editor.itsSketchPad.getDisplayList().apply(new ObjectAction() {
+	  editor.itsSketchPad.getDisplayList().applyToObjects(new ObjectAction() {
 	    public void processObject(ErmesObject object)
 	      { object.showErrorDescription();}});
       }

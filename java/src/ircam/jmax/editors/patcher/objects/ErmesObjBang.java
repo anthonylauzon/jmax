@@ -32,7 +32,7 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
   }
 
   // redefined from base class
-  protected void setWidth( int theWidth)
+  public void setWidth( int theWidth)
   {
     if (theWidth < MINIMUM_WIDTH)
       theWidth = MINIMUM_WIDTH;
@@ -42,7 +42,7 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
   }
 
   // redefined from base class
-  protected void setHeight( int theHeight)
+  public void setHeight( int theHeight)
   {
   }
 

@@ -21,42 +21,40 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
   // The graphic throttle contained into a 'slider' object.
   //
 
+  static final int THROTTLE_LATERAL_OFFSET = 2;
+  static final int THROTTLE_HEIGHT = 5;
+  static private final int XOR_MODE = 0;
+  static private final int PAINT_MODE = 1;
+
   class Throttle
   {
     protected int itsX, itsY;
     protected int itsWidth, itsHeight;
 
-    private Rectangle bounds = new Rectangle();
-
-    private final int LATERAL_OFFSET = 2;
-    private final int THROTTLE_HEIGHT = 5;
-  
     private int itsPreviousX;
     private int itsPreviousY;
 
     private boolean erased = true;
 
-    private final int XOR_MODE = 0;
-    private final int PAINT_MODE = 1;
-  
     public Throttle() 
     {
-      itsX = getX() + LATERAL_OFFSET;
+      itsX = getX() + THROTTLE_LATERAL_OFFSET;
       itsY = getY() + getHeight() - BOTTOM_OFFSET - 2;
       itsPreviousX = itsX;
       itsPreviousY = itsY;
 
-      itsWidth = getWidth() - 2*LATERAL_OFFSET;
+      itsWidth = getWidth() - 2*THROTTLE_LATERAL_OFFSET;
       itsHeight = THROTTLE_HEIGHT;
     }
 
-    protected Rectangle getBounds()
+    protected boolean contains(int x, int y)
     {
-      bounds.setBounds( itsX, itsY, itsWidth, itsHeight);
-      return bounds;
+      return ((x >= itsX) && (x <= itsX + itsWidth) &&
+	      (y >= itsY) && (y <= itsY + itsHeight));
     }
 
     //coordinate conversion, not inverted and clipped  
+
     int AbsoluteToSlider( int theAbsoluteY) 
     {
       if ( theAbsoluteY >= getY())
@@ -68,47 +66,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 	return 0;
     }
 
-    //coordinate conversion, clipped
 
-    int SliderToDrag( int theSliderCoord) 
-    {
-      if ( theSliderCoord <= BOTTOM_OFFSET) 
-	return 0;
-      else if ( theSliderCoord >= itsPixelRange) 
-	return itsPixelRange;
-      else
-	return ( theSliderCoord - BOTTOM_OFFSET);
-    }
-
-    //check if is in the "dragging" area
-
-    boolean IsInDragArea( int absoluteY)
-    { 
-      return ( AbsoluteToSlider( absoluteY) > UP_OFFSET 
-	       && AbsoluteToSlider( absoluteY) < getHeight()- BOTTOM_OFFSET);
-    }
-
-    //coordinate conversion, inverted and clipped
-
-    int AbsoluteToDrag( int theAbsoluteY) 
-    {
-      int temp = AbsoluteToSlider( theAbsoluteY);
-      return itsPixelRange - SliderToDrag( temp); // invert
-    }
-
-    //coordinate conversion, inverted and clipped  
-
-    int DragToAbsolute( int theDragCoord) 
-    {
-      int normalizedDrag = theDragCoord;
-      if ( theDragCoord <= 0) 
-	normalizedDrag = 0;
-      else if ( theDragCoord >= itsPixelRange) 
-	normalizedDrag = itsPixelRange;
-
-      return getY() + UP_OFFSET + (itsPixelRange - normalizedDrag);
-    }
-  
     void eraseAndPaint( Graphics g) 
     {
       if ( !erased)
@@ -124,7 +82,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
     private  void Paint( Graphics g, int mode) 
     {
-      int deltaX = getX() + LATERAL_OFFSET;
+      int deltaX = getX() + THROTTLE_LATERAL_OFFSET;
       int deltaY;
 
       if ( mode == PAINT_MODE) 
@@ -156,10 +114,9 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 	erased = false;
     }
   
-    public void Resize( int theWidth, int theHeight)
+    void setWidth(int w)
     {
-      itsWidth = theWidth;
-      itsHeight = theHeight;
+      itsWidth = w;
     }
 
     void MoveAbsolute( int theX, int theY) 
@@ -217,6 +174,8 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
   {
     super( theSketchPad, theFtsObject);
 
+    itsThrottle = new Throttle();
+
     itsRangeMin = ((FtsSliderObject)itsFtsObject).getMinValue();
     itsRangeMax = ((FtsSliderObject)itsFtsObject).getMaxValue();
 
@@ -234,10 +193,9 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
       setWidth( 20);
 
     int h = BOTTOM_OFFSET + itsRange + UP_OFFSET;
+
     if (getHeight() < h)
       setHeight( h);
-
-    itsThrottle = new Throttle();
   }
 
   public void setMinValue( int theValue) 
@@ -262,22 +220,34 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     return itsRangeMax;
   }
 
-  public void resizeBy( int theDeltaH, int theDeltaV)
+  private void updateThrottle()
   {
-    // Added minimum size for the slider, otherwise
-    // you can resize and loose it :-< ..
-    // Maurizio & Enzo
-
-    if ((-theDeltaH > (getWidth() - 10))  ||
-	(-theDeltaV > (getHeight() - 20)))
-      return;
-
-    super.resizeBy( theDeltaH, theDeltaV);
     itsPixelRange = getHeight() - (UP_OFFSET + BOTTOM_OFFSET);
     
     itsStep = (float)itsRange / itsPixelRange;
-    itsThrottle.Resize( itsThrottle.itsWidth + theDeltaH, itsThrottle.itsHeight);
-    itsThrottle.MoveAbsolute( itsThrottle.itsX, (int)(getY() + getHeight() - BOTTOM_OFFSET - 2 - itsInteger/itsStep));
+
+    itsThrottle.setWidth( getWidth() - 2 * THROTTLE_LATERAL_OFFSET);
+
+    itsThrottle.MoveAbsolute( itsThrottle.itsX,
+			      (int)(getY() + getHeight() - BOTTOM_OFFSET - 2 - itsInteger/itsStep));
+  }
+
+  public void setWidth(int w)
+  {
+    if (w < 10)
+      return;
+
+    super.setWidth(w);
+    updateThrottle();
+  }
+
+  public void setHeight(int h)
+  {
+    if (h < 10)
+      return;
+
+    super.setHeight(h);
+    updateThrottle();
   }
 
   public void FromDialogValueChanged( int theCurrentInt, int theMaxInt, int theMinInt)
@@ -337,7 +307,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     x = mouse.x;
     y = mouse.y;
 
-    if( IsInThrottle( x, y))
+    if( itsThrottle.contains( x, y))
       {
 	itsMovingThrottle = true;
 	return;
@@ -428,11 +398,6 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
   }
 	
 
-  public boolean IsInThrottle( int theX, int theY)
-  {
-    return itsThrottle.getBounds().contains( theX,theY);
-  }
-  
   public void Paint_movedThrottle( Graphics g) 
   {
     itsThrottle.eraseAndPaint( g);

@@ -50,7 +50,7 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
   }
 
   // redefined from base class
-  protected void setWidth( int theWidth) 
+  public void setWidth( int theWidth) 
   {
     int minWidth = getMinWidth();
     if (theWidth < minWidth)
@@ -61,15 +61,8 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
 
   // redefined from base class
   // This way, changing the height from outside is forbidden
-  protected void setHeight( int theHeight)
+  public void setHeight( int theHeight)
   {
-  }
-
-  // redefined from base class
-
-  public void resizeBy( int theDeltaW, int theDeltaH) 
-  {
-    setWidth( getWidth() + theDeltaW);
   }
 
   // redefined from base class

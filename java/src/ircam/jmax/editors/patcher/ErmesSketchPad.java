@@ -370,6 +370,9 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
 	setPreferredSize(preferredSize);
       }
+
+    if (redraw)
+      redraw();
   }
 
 
@@ -392,6 +395,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     scrollRectToVisible(r);
 
     revalidate(); // ???
+    redraw();
   }
 
   public Point whereItIs(Point point, Point direction, int margin)

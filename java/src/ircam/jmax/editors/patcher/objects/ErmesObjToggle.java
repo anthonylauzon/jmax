@@ -33,7 +33,7 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
   }
 
   // redefined from base class
-  protected void setWidth( int theWidth)
+  public void setWidth( int theWidth)
   {
     if (theWidth < MINIMUM_WIDTH)
       theWidth = MINIMUM_WIDTH;
@@ -43,15 +43,8 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
   }
 
   // redefined from base class
-  protected void setHeight( int theHeight)
+  public void setHeight( int theHeight)
   {
-  }
-
-  // redefined from base class
-
-  public void resizeBy( int theDeltaW, int theDeltaH) 
-  {
-    setWidth( getWidth() + theDeltaW);
   }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
