@@ -339,7 +339,6 @@ public class FtsPackage extends FtsObjectWithEditor
   public void setFileName( String fn)
   {
     this.fileName = fn;
-    
   }
 
   public String getFileName()

@@ -1115,6 +1115,8 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_package_t *this = (fts_package_t *)o;
   fts_bmax_file_t f;
   const char *filename;
+  char path[MAXPATHLEN];
+  char *dir;
 
   if (ac == 0) {
     post( "No filename specified\n");    
@@ -1122,7 +1124,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   }
 
   filename = fts_get_symbol( at);
-
+  
   if (fts_bmax_file_open( &f, filename, 0, 0, 0) < 0)
     {
       post( "Cannot open file %s\n", filename);
@@ -1223,6 +1225,15 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_bmax_file_close( &f);
 
   fts_package_set_dirty( this, 0);
+
+  if( this->filename == NULL)
+    {  
+      this->filename = filename;
+  
+      fts_make_absolute_path(NULL, filename, path, MAXPATHLEN);
+      dir = strcpy( fts_malloc( strlen( path) + 1), path);
+      this->dir = fts_new_symbol( fts_dirname( dir));
+    }
 }
 
 static void 
