@@ -2008,6 +2008,62 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *
  */
 static void
+fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *ptr = fmat_get_ptr(self);
+  fmat_t *in = (fmat_t *)fts_get_object(at);
+  int in_m = fmat_get_m(in);
+  int in_n = fmat_get_n(in);
+  float *in_row = fmat_get_ptr(in);
+  
+  if(in_n == m)
+  {
+    float *res = alloca(sizeof(float) * in_m * n);
+    float *res_row = res;
+    int i_row, i_col, i, j;
+    
+    for(i_row=0; i_row<in_m; i_row++)
+    {
+      float *col = ptr;
+      
+      for(i_col=0; i_col<n; i_col++)
+      {
+        float f = 0.0;
+        
+        for(i=0, j=0; i<m; i++, j+=n)
+          f += in_row[i] * col[j];
+        
+        res_row[i_col] = f;
+        col++;
+      }
+
+      /* next row */
+      in_row += in_n;
+      res_row += n;
+    }
+    
+    fmat_set_m(self, in_m);
+    
+    for(i=0; i<in_m*n; i++)
+      ptr[i] = res[i]; 
+      
+    fts_return_object(o);
+  }
+  else
+  {
+    fmat_format_t *format = fmat_get_format(self);
+    fmat_format_t *in_format = fmat_get_format(in);
+
+    fts_object_error((fts_object_t *)self, "xmul: can't multiply %s matrix %d x %d with %s matrix %d x %d", 
+                     fts_symbol_name(fmat_format_get_name(format)), m, n,
+                     fts_symbol_name(fmat_format_get_name(in_format)), in_m, in_n);
+  }
+}
+
+static void
 fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
@@ -3772,6 +3828,7 @@ fmat_instantiate(fts_class_t *cl)
   fmat_message(cl, fts_new_symbol("lt"), fmat_lt_fmat, fmat_lt_number);
   fmat_message(cl, fts_new_symbol("le"), fmat_le_fmat, fmat_le_number);
 
+  fts_class_message(cl, fts_new_symbol("xmul"), fmat_class, fmat_xmul_fmat);
   fmat_message(cl, fts_new_symbol("cmul"), fmat_cmul_fmat, fmat_cmul_number);
   fts_class_message(cl, fts_new_symbol("dot"), fmat_class, fmat_get_dot);
   
@@ -3871,10 +3928,11 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("lt"), "<num|fmat: operand>", "replace current values by result of < comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("le"), "<num|fmat: operand>", "replace current values by result of <= comparison (0 or 1) with given scalar or fmat (element by element)");
   
+  fts_class_doc(cl, fts_new_symbol("xmul"), "<fmat: operand>", "calculate matrix multiplication of operand M with current matrix C so that C' = M x C");
   fts_class_doc(cl, fts_new_symbol("cmul"), "<num|fmat: operand>", "multiply current values of complex vector (rect or polar format) by given scalar or complex vector fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("dot"), "<fmat: operand>", "get dot product of column vector with given vector");
 
-  fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values C' = ");
   fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("log"), NULL, "calulate lograrithm of current values");
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");

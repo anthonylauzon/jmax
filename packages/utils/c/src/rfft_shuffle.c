@@ -90,7 +90,7 @@ void rfft_shuffle_before_ifft_inplc(complex * restrict buf, float *coef_re, floa
 void rfft_shuffle_before_ifft_outplc(complex * restrict in, complex * restrict out, float *coef_re, float *coef_im, int size)
 {
   int idx, xdi;
-
+  
   out[0].re = out[0].im = in[0].re; /* PI-freq ignored!!! */
   for(idx=1, xdi=size-1; idx<size/2; idx++, xdi--){
     float x1_re = in[idx].re + in[xdi].re;

@@ -245,7 +245,7 @@ fslice_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     {
       double incr = (double)env_size / (double)size;
       double f_index = incr;
-      int i, j;
+      int i;
       
       /* apply envelope by linear interpolation */
       for(i=0; i<size*stride; i+=stride)
@@ -344,8 +344,55 @@ fslice_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fslice_error_index(self, NULL, "env");
 }
 
+static void
+fslice_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+  float *ptr = fslice_get_ptr(self);
+  int stride = fslice_get_stride(self);
+  int size = fslice_get_size(self);
+  int i, j;
+  
+  if(ac > size)
+    ac = size;
+  
+  for(i=0, j=0; i<size; i++, j+=stride)
+  {
+    if(fts_is_number(at))
+      ptr[j] += fts_get_number_float(at + i);
+  }
+  
+  fts_return_object(o);
+}
 
-
+static void
+fslice_set_fmat_or_fslice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fslice_t *self = (fslice_t *)o;
+  
+  if(fslice_check_index(self))
+  {
+    float *ptr = fslice_get_ptr(self);
+    int size = fslice_get_size(self);
+    int stride = fslice_get_stride(self);
+    fts_object_t *obj = fts_get_object(at);
+    float *set;
+    int set_size, set_stride;
+    int i, j;
+    
+    fmat_or_slice_vector(obj, &set, &set_size, &set_stride);
+    
+    if(set_size > size)
+      set_size = size;
+    
+    for(i=0, j=0; i<set_size*stride; i+=stride, j+=set_stride)
+      ptr[i] = set[j];
+    
+    fts_return_object(o);
+  }
+  else
+    fslice_error_index(self, NULL, "set");
+}
 
 /******************************************************************************
  *
@@ -1055,15 +1102,12 @@ fslice_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       
     fts_spost(stream, "{\n");
 
-    for(i=0; i<size; i++)
+    for(i=0; i<size*stride; i+=stride)
       fts_spost(stream, "  %.7g\n", ptr[i]);
 
     fts_spost(stream, "}\n");
   }
 }
-
-
-
 
 /******************************************************************************
  *
@@ -1132,6 +1176,11 @@ fslice_instantiate(fts_class_t *cl)
   
   fts_class_set_post_function(cl, fslice_post_function);
   fts_class_set_array_function(cl, fslice_array_function);
+
+  fts_class_message_varargs(cl, fts_new_symbol("set"), fslice_set);
+  fts_class_message(cl, fts_new_symbol("set"), fcol_class, fslice_set_fmat_or_fslice);
+  fts_class_message(cl, fts_new_symbol("set"), frow_class, fslice_set_fmat_or_fslice);
+  fts_class_message(cl, fts_new_symbol("set"), fmat_class, fslice_set_fmat_or_fslice);
 
   fslice_message(cl, fts_new_symbol("add"), fslice_add_fslice, fslice_add_number);
   fslice_message(cl, fts_new_symbol("sub"), fslice_sub_fslice, fslice_sub_number);
