@@ -19,6 +19,7 @@ dsp.c \
 dspgraph.c \
 errobj.c \
 expression.c \
+fifo.c \
 file.c \
 fpe.c \
 ftl.c \
