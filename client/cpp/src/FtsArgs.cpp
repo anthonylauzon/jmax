@@ -21,37 +21,42 @@
 
 #include <fts/ftsclient.h>
 
-using namespace ircam::fts::client;
+namespace ircam {
+namespace fts {
+namespace client {
 
 #define INITIAL_SIZE 8
 
-FtsArgs::FtsArgs()
-{
-  _size = INITIAL_SIZE;
-  _array = new FtsAtom[_size];
+  FtsArgs::FtsArgs()
+  {
+    _size = INITIAL_SIZE;
+    _array = new FtsAtom[_size];
 
-  for ( int i = 0; i < _size; i++)
-    _array[i].setVoid();
+    for ( int i = 0; i < _size; i++)
+      _array[i].setVoid();
 
-  _current = 0;
+    _current = 0;
+  }
+
+  void FtsArgs::ensureCapacity( int wanted)
+  {
+    if ( _current + wanted < _size)
+      return;
+
+    while (_size <= _current + wanted)
+      _size *= 2;
+
+    FtsAtom *newArray = new FtsAtom[_size];
+
+    for ( int i = 0; i < _current; i++)
+      newArray[i] = _array[i];
+
+    for ( int i = _current; i < _size; i++)
+      newArray[i].setVoid();
+
+    _array = newArray;
+  }
+
 }
-
-void FtsArgs::ensureCapacity( int wanted)
-{
-  if ( _current + wanted < _size)
-    return;
-
-  while (_size <= _current + wanted)
-    _size *= 2;
-
-  FtsAtom *newArray = new FtsAtom[_size];
-
-  for ( int i = 0; i < _current; i++)
-    newArray[i] = _array[i];
-
-  for ( int i = _current; i < _size; i++)
-    newArray[i].setVoid();
-
-  _array = newArray;
 }
-
+}

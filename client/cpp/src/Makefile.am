@@ -1,11 +1,10 @@
 lib_LTLIBRARIES= libftsclient.la
 libftsclient_la_SOURCES= \
 FtsAtom.cpp \
-FtsSymbol.cpp \
 FtsArgs.cpp \
 FtsException.cpp \
 FtsObject.cpp \
-FtsServer.cpp \
+FtsServerConnection.cpp \
 FtsSocketConnection.cpp \
 BinaryProtocolDecoder.cpp \
 BinaryProtocolEncoder.cpp \

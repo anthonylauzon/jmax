@@ -20,7 +20,7 @@
 // 
 
 /**
- * A buffer of FtsAtom, i.e. int, double, FtsSymbol, strings and FtsObject
+ * A buffer of FtsAtom, i.e. int, double, strings and FtsObject
  *
  */
 namespace ircam {
@@ -43,7 +43,7 @@ namespace client {
       _array[_current++].setDouble( value);
     }
 
-    void addSymbol( const FtsSymbol *value)
+    void addSymbol( const char *value)
     {
       ensureCapacity(1);
       _array[_current++].setSymbol( value);
@@ -108,7 +108,7 @@ namespace client {
       return _array[index].doubleValue;
     }
 
-    const FtsSymbol *getSymbol( int index)
+    const char *getSymbol( int index)
     {
       return _array[index].symbolValue;
     }

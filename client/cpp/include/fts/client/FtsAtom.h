@@ -29,7 +29,6 @@ namespace client {
 
   // Forward declarations
   class FtsObject;
-  class FtsSymbol;
 
   /**
    * A FtsAtom is a typed 'union', holding the values transmitted other the client protocol
@@ -48,9 +47,9 @@ namespace client {
     double doubleValue;
 
     /**
-     * If the atom is a FtsSymbol, holds the FtsSymbol value
+     * If the atom is a "symbol", holds the "symbol" value
      */
-    const FtsSymbol *symbolValue;
+    const char *symbolValue;
 
     /**
      * If the atom is a string, holds the string value
@@ -93,9 +92,9 @@ namespace client {
     }
 
     /**
-     * Tests if atom contains a FtsSymbol
+     * Tests if atom contains a "symbol"
      * 
-     * @return true if atom type is FtsSymbol
+     * @return true if atom type is "symbol"
      */
     int isSymbol() const
     {
@@ -164,11 +163,11 @@ namespace client {
     }
 
     /**
-     * Set the FtsSymbol value
+     * Set the "symbol" value
      * 
      * @param s the value
      */
-    void setSymbol( const FtsSymbol *s)
+    void setSymbol( const char *s)
     {
       _type = SYMBOL;
       symbolValue = s;

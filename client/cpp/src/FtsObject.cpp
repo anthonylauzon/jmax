@@ -19,7 +19,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-#include <typeinfo>
 #include <fts/ftsclient.h>
 #include "Hashtable.h"
 #include "BinaryProtocolEncoder.h"
@@ -30,8 +29,8 @@ namespace client {
 
   class MessageHandlerEntry {
   public:
-    FtsClass *_ftsClass;
-    FtsSymbol *_selector;
+    const type_info *_ftsClass;
+    const char *_selector;
   };
 
   int hash( MessageHandlerEntry &m)
@@ -39,113 +38,63 @@ namespace client {
     return reinterpret_cast<int>(m._ftsClass)  + reinterpret_cast<int>(m._selector);
   }
 
-  FtsObject::FtsObject(FtsServer* server, FtsObject* parent, FtsSymbol* ftsClassName) throw(FtsClientException)
+  FtsObject::FtsObject(FtsServerConnection* serverConnection, FtsObject* parent, const char* ftsClassName) throw(FtsClientException)
   {
-    _server = server;
+    _serverConnection = serverConnection;
     _parent = parent;
-    _encoder = server->getEncoder();
-    _id = server->getNewObjectID();
-    server->putObject(_id, this);
+    _id = serverConnection->getNewObjectID();
+    _serverConnection->putObject(_id, this);
 
-    _encoder->writeObject(FtsServer::CLIENT_OBJECT_ID);
-    _encoder->writeSymbol( FtsSymbol::sNewObject);
+    _serverConnection->writeObject(FtsServerConnection::CLIENT_OBJECT_ID);
+    _serverConnection->writeSymbol( "new_object");
 
-    _encoder->writeObject(parent);
-    _encoder->writeInt(_id);
-    _encoder->writeSymbol(ftsClassName);
-    _encoder->flush();
+    _serverConnection->writeObject(parent);
+    _serverConnection->writeInt(_id);
+    _serverConnection->writeSymbol(ftsClassName);
+    _serverConnection->endOfMessage();
 
   }
 
-  FtsObject::FtsObject(FtsServer* server, FtsObject* parent, FtsSymbol* ftsClassName, FtsArgs* args) throw(FtsClientException)
+  FtsObject::FtsObject(FtsServerConnection* serverConnection, FtsObject* parent, const char* ftsClassName, FtsArgs* args) throw(FtsClientException)
   {
-    _server = server;
+    _serverConnection = serverConnection;
     _parent = parent;
-    _encoder = server->getEncoder();
 	
-    _id = server->getNewObjectID();
-    server->putObject(_id, this);
+    _id = _serverConnection->getNewObjectID();
+    _serverConnection->putObject(_id, this);
 
-    _encoder->writeObject(FtsServer::CLIENT_OBJECT_ID);
-    _encoder->writeSymbol( FtsSymbol::sNewObject);
-    _encoder->writeObject(parent);
-    _encoder->writeInt(_id);
-    _encoder->writeSymbol(ftsClassName);
-    _encoder->writeArgs(*args);
-    _encoder->flush();
+    _serverConnection->writeObject(FtsServerConnection::CLIENT_OBJECT_ID);
+    _serverConnection->writeSymbol( "new_object");
+    _serverConnection->writeObject(parent);
+    _serverConnection->writeInt(_id);
+    _serverConnection->writeSymbol(ftsClassName);
+    _serverConnection->writeArgs(*args);
+    _serverConnection->endOfMessage();
   }
 
-  FtsObject::FtsObject(FtsServer* server, FtsObject* parent, int id)
+  FtsObject::FtsObject(FtsServerConnection* serverConnection, FtsObject* parent, int id)
   {
-    _server = server;
+    _serverConnection = serverConnection;
     _parent = parent;
-	
-    _encoder = server->getEncoder();
 	
     _id = id;
     if (_id != NO_ID)
       {
-	server->putObject(_id, this);
+	serverConnection->putObject(_id, this);
       }
   }
 
-  void FtsObject::send(FtsSymbol* selector, FtsArgs* args) throw(FtsClientException)
+  void FtsObject::send(const char* selector, FtsArgs* args) throw(FtsClientException)
   {
-    _encoder->writeObject(this);
-    _encoder->writeSymbol(selector);
-    _encoder->writeArgs(*args);
-    _encoder->flush();
+    _serverConnection->writeObject(this);
+    _serverConnection->writeSymbol(selector);
+    if (args != NULL)
+      _serverConnection->writeArgs(*args);
+    _serverConnection->endOfMessage();
   }
 
-  void FtsObject::send(FtsSymbol* selector) throw(FtsClientException)
+  void FtsObject::registerMessageHandler(const type_info &ftsClass, const char* selector, FtsMessageHandler* messageHandler)
   {
-    _encoder->writeObject(this);
-    _encoder->writeSymbol(selector);
-    _encoder->flush();
-  }
-
-  void FtsObject::send(FtsArgs* args) throw(FtsClientException)
-  {
-    _encoder->writeObject(this);
-    _encoder->writeSymbol( FtsSymbol::sList);
-    _encoder->writeArgs(*args);
-    _encoder->flush();
-  }
-
-  void FtsObject::send(int n) throw(FtsClientException)
-  {
-    _encoder->writeObject(this);
-    _encoder->writeSymbol( FtsSymbol::sInt);
-    _encoder->writeInt(n);
-    _encoder->flush();
-  }
-
-  void FtsObject::send(double d) throw(FtsClientException)
-  {
-    _encoder->writeObject(this);
-    _encoder->writeSymbol( FtsSymbol::sFloat);
-    _encoder->writeDouble(d);
-    _encoder->flush();
-  }
-
-  void FtsObject::sendProperty(FtsArgs* args) throw(FtsClientException)
-  {
-    _encoder->writeObject(FtsServer::CLIENT_OBJECT_ID);
-    _encoder->writeSymbol(FtsSymbol::get("set_object_property"));
-    _encoder->writeObject(this);
-    _encoder->writeArgs(*args);
-    _encoder->flush();
-
-  }
-
-  void FtsObject::registerMessageHandler(FtsClass* ftsClass, FtsSymbol* selector, FtsMessageHandler* messageHandler)
-  {
-    if (0 == selector)
-      {
-	// throw an exception here
-      }
-
-    //    messageHandlersTable->put(new MessageHandlerEntry(ftsClass, selector), messageHandler);
   }
 
 };

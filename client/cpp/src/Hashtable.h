@@ -2,6 +2,9 @@
  * A template hash table
  */
 
+#ifndef _HASHTABLE_H_
+#define _HASHTABLE_H_
+
 #include <iostream.h>
 
 namespace ircam {
@@ -120,10 +123,10 @@ namespace client {
   template <class KeyT, class ValT> 
     unsigned int Hashtable< KeyT, ValT>::hash( const char *s)
     {
-      unsigned int h = *s, i = 0;
+      unsigned int h = 0;
 
-      for ( s += 1; *s != '\0'; s++)
-	h = (h<<1) + *s;
+      while( *s)
+	h = (h<<1) + *s++;
 
       return h;
     }
@@ -265,3 +268,5 @@ namespace client {
 };
 };
 };
+
+#endif

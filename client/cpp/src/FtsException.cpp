@@ -20,6 +20,7 @@
 // 
 
 #include <iostream>
+#include <cstring>
 
 #include <fts/ftsclient.h>
 

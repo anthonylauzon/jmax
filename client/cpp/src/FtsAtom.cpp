@@ -22,22 +22,28 @@
 #include <fts/ftsclient.h>
 #include "hashtable.h"
 
-using namespace ircam::fts::client;
+namespace ircam {
+namespace fts {
+namespace client {
 
-std::ostream &operator<<( std::ostream &os, const FtsAtom &a)
-{
-  if ( a.isVoid())
-    os << "void";
-  else if ( a.isInt())
-    os << a.intValue;
-  else if ( a.isDouble())
-    os << a.doubleValue;
-  else if ( a.isSymbol())
-    os << (const char *)a.symbolValue;
-  else if ( a.isString() || a.isRawString())
-    os << a.stringValue;
-//   else if ( a.isObject())
-//     os << a.objectValue();
+  std::ostream &operator<<( std::ostream &os, const FtsAtom &a)
+  {
+    if ( a.isVoid())
+      os << "void";
+    else if ( a.isInt())
+      os << a.intValue;
+    else if ( a.isDouble())
+      os << a.doubleValue;
+    else if ( a.isSymbol())
+      os << (const char *)a.symbolValue;
+    else if ( a.isString() || a.isRawString())
+      os << a.stringValue;
+    //   else if ( a.isObject())
+    //     os << a.objectValue();
 
-  return os;
+    return os;
+  }
+
+}
+}
 }

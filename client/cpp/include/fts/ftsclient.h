@@ -34,7 +34,6 @@
 
 #include <iostream>
 
-#include <fts/client/FtsSymbol.h>
 #include <fts/client/FtsAtom.h>
 #include <fts/client/FtsArgs.h>
 #include <fts/client/FtsClientException.h>
@@ -42,6 +41,5 @@
 #include <fts/client/FtsServerConnection.h>
 #include <fts/client/FtsSocketConnection.h>
 #include <fts/client/FtsObject.h>
-#include <fts/client/FtsServer.h>
 
 #endif

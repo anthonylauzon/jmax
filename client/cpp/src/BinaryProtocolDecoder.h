@@ -34,7 +34,7 @@ namespace client {
 
   public:
 
-    BinaryProtocolDecoder( FtsServer *server);
+    BinaryProtocolDecoder( FtsServerConnection *serverConnection);
 
     void decode( const unsigned char *data, int length) throw( FtsClientException);
 
@@ -58,19 +58,21 @@ namespace client {
 
   private:
 
-    FtsServer *_server;
+    FtsServerConnection *_serverConnection;
 
     long _lval;
     Buffer *_buffer;
 
     FtsObject *_target;
-    const FtsSymbol *_selector;
+    const char *_selector;
     FtsArgs *_args;
     int _argsCount;
 
     int _currentState;
 
     SymbolCache *_symbolCache;
+
+    static Hashtable< const char *, const char *> symbolTable;
   };
 
 };

@@ -27,6 +27,9 @@ namespace client {
 
   class FTSCLIENT_API FtsSocketConnection : public FtsServerConnection {
   public:
+    static const int DEFAULT_PORT;
+    static const int DEFAULT_CONNECT_TIMEOUT;
+
     FtsSocketConnection( const char *hostname = "127.0.0.1", int port = DEFAULT_PORT, int connectTimeout = DEFAULT_CONNECT_TIMEOUT) throw( FtsClientException);
 
     void close() throw (FtsClientException);
@@ -36,8 +39,6 @@ namespace client {
   private:
     void connect() throw( FtsClientException );
     int connectOnce() throw( FtsClientException );
-    static const int DEFAULT_PORT;
-    static const int DEFAULT_CONNECT_TIMEOUT;
 
     int _socket;
     const char *_hostname;

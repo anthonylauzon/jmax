@@ -114,30 +114,6 @@ public class FtsObject implements Serializable
     encoder.flush();
   }
 
-  public void send( FtsArgs args) throws IOException
-  {
-    encoder.writeObject( this);
-    encoder.writeSymbol( sList);
-    encoder.writeArgs( args);
-    encoder.flush();
-  }
-
-  public void send( int n) throws IOException
-  {
-    encoder.writeObject( this);
-    encoder.writeSymbol( sInt);
-    encoder.writeInt( n);
-    encoder.flush();
-  }
-
-  public void send( double d) throws IOException
-  {
-    encoder.writeObject( this);
-    encoder.writeSymbol( sFloat);
-    encoder.writeDouble( d);
-    encoder.flush();
-  }
-
   public void sendProperty(FtsArgs args) throws IOException
   {
     encoder.writeObject( FtsServer.CLIENT_OBJECT_ID);
@@ -220,8 +196,5 @@ public class FtsObject implements Serializable
 
   private transient static FtsSymbol sNewObject = FtsSymbol.get( "new_object");
   private transient static FtsSymbol sDelObject = FtsSymbol.get( "delete_object");
-  private transient static FtsSymbol sInt = FtsSymbol.get( "int");
-  private transient static FtsSymbol sFloat = FtsSymbol.get( "float");
-  private transient static FtsSymbol sList = FtsSymbol.get( "list");
 }
 

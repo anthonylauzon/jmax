@@ -28,12 +28,10 @@ using namespace ircam::fts::client;
 main( int ac, char **av)
 {
   FtsSocketConnection *connection;
-  FtsServer *server;
 
   try
     {
       connection = new FtsSocketConnection();
-      server = new FtsServer( connection);
     }
   catch( FtsClientException e)
     {

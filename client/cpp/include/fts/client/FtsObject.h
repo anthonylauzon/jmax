@@ -23,10 +23,7 @@ namespace ircam {
 namespace fts {
 namespace client {
 
-  class FtsServer;
-  class BinaryProtocolEncoder;
   class MessageHandlerEntry;
-  class FtsClass;
   template <class KeyT, class ValT> class FTSCLIENT_API Hashtable;
 
   class FTSCLIENT_API FtsObject {
@@ -34,38 +31,28 @@ namespace client {
   public:
     static const int NO_ID = -1;
 
-    FtsObject( FtsServer *server, FtsObject *parent, FtsSymbol *ftsClassName) throw( FtsClientException);
+    FtsObject( FtsServerConnection *serverConnection, FtsObject *parent, const char *ftsClassName) throw( FtsClientException);
 
-    FtsObject( FtsServer *server, FtsObject *parent, FtsSymbol *ftsClassName, FtsArgs *args) throw( FtsClientException);
+    FtsObject( FtsServerConnection *serverConnection, FtsObject *parent, const char *ftsClassName, FtsArgs *args) throw( FtsClientException);
 
-    FtsObject( FtsServer *server, FtsObject *parent, int id);
+    FtsObject( FtsServerConnection *serverConnection, FtsObject *parent, int id);
 
-    void send( FtsSymbol *selector, FtsArgs *args) throw( FtsClientException);
+    void send( const char *selector, FtsArgs *args = NULL) throw( FtsClientException);
 
-    void send( FtsSymbol *selector) throw( FtsClientException);
-
-    void send( FtsArgs *args) throw( FtsClientException);
-
-    void send( int n) throw( FtsClientException);
-
-    void send( double d) throw( FtsClientException);
-
-    void sendProperty(FtsArgs *args) throw( FtsClientException);
-  
     FtsObject *getParent()
     {
       return _parent;
     }
 
-    FtsServer *getServer()
+    FtsServerConnection *getServerConnection()
     {
-      return _server;
+      return _serverConnection;
     }
 
-    static void registerMessageHandler( FtsClass *ftsClass, FtsSymbol *selector, FtsMessageHandler *messageHandler);
+    static void registerMessageHandler( const type_info &ftsClass, const char *selector, FtsMessageHandler *messageHandler);
 
   private:
-    void invokeMessageHandler( FtsObject *obj, FtsSymbol *selector, FtsArgs *args);
+    void invokeMessageHandler( FtsObject *obj, const char *selector, FtsArgs *args);
 
     int getID() const
     {
@@ -78,12 +65,11 @@ namespace client {
     }
 
     int _id;
-    FtsServer *_server;
-    BinaryProtocolEncoder *_encoder;
+    FtsServerConnection *_serverConnection;
 
     FtsObject *_parent;
 
-    FtsSymbol *_selectorCache;
+    const char *_selectorCache;
     FtsMessageHandler *_messageHandlerCache;
 
     static Hashtable<MessageHandlerEntry *, FtsMessageHandler *> *messageHandlersTable;

@@ -31,13 +31,13 @@ namespace client {
 
   class BinaryProtocolEncoder {
   public:
-    BinaryProtocolEncoder( FtsServerConnection *connection);
+    BinaryProtocolEncoder();
 
     void writeInt( int v) throw( FtsClientException);
 
     void writeDouble( double v) throw( FtsClientException);
 
-    void writeSymbol( const FtsSymbol *v) throw( FtsClientException);
+    void writeSymbol( const char *v) throw( FtsClientException);
 
     void writeString( const char *v) throw( FtsClientException);
 
@@ -48,11 +48,17 @@ namespace client {
     /* This version is used for object that have predefined IDs */
     void writeObject( int id) throw( FtsClientException);
 
-    void writeAtoms( const FtsAtom *atoms, int offset, int length) throw (FtsClientException);
+    void writeAtoms( const FtsAtom *atoms, int length) throw (FtsClientException);
 
     void writeArgs( const FtsArgs &v) throw( FtsClientException);
 
-    void flush() throw( FtsClientException);
+    void endOfMessage() throw( FtsClientException);
+
+    void clear() { _outputBuffer->clear(); }
+
+    unsigned char *getBytes() { return _outputBuffer->getBytes(); }
+    
+    int getLength() { return _outputBuffer->getLength(); }
 
   private:
     void write( int v);
@@ -63,7 +69,6 @@ namespace client {
 
     Buffer *_outputBuffer;
     SymbolCache *_symbolCache;
-    FtsServerConnection *_connection;
   };
 
 

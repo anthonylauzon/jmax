@@ -20,8 +20,7 @@
 // 
 
 #include <fts/ftsclient.h>
-
-using namespace ircam::fts::client;
+#include "Hashtable.h"
 
 #define DEFAULT_INITIAL_CAPACITY 1031
 
@@ -35,22 +34,22 @@ namespace client {
     SymbolCache( int initialCapacity = DEFAULT_INITIAL_CAPACITY)
     {
       _length = initialCapacity;
-      _cache = new const FtsSymbol * [initialCapacity];
+      _cache = new const char* [initialCapacity];
 
       for ( int i = 0; i < _length; i++)
 	_cache[i] = 0;
     }
 
-    int index( const FtsSymbol *s)
+    int index( const char *s)
     {
-      return (int)s % _length;
+      return Hashtable< const char *, int>::hash(s) % _length;
     }
 
-    void put( int index, const FtsSymbol *s)
+    void put( int index, const char *s)
     {
       if ( index >= _length)
 	{
-	  const FtsSymbol **newCache = new const FtsSymbol* [index+1];
+	  const char **newCache = new const char* [index+1];
 
 	  for ( int i = 0; i < _length; i++)
 	    newCache[i] = _cache[i];
@@ -63,13 +62,13 @@ namespace client {
       _cache[index] = s;
     }
 
-    const FtsSymbol *get( int index)
+    const char *get( int index)
     {
       return _cache[index];
     }
 
   private:
-    const FtsSymbol **_cache;
+    const char **_cache;
     int _length;
   };
 

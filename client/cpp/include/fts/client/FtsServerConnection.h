@@ -25,11 +25,45 @@ namespace ircam {
 namespace fts {
 namespace client {
 
+  template <class KeyT, class ValT> class FTSCLIENT_API Hashtable;
+  class BinaryProtocolEncoder;
+
   class FTSCLIENT_API FtsServerConnection {
   public:
+    static const int CLIENT_OBJECT_ID = 0;
+
+    FtsServerConnection();
+    ~FtsServerConnection();
+
+    // FIXME
+    int getNewObjectID() { int id = _newObjectID; _newObjectID += 2; return id; }
+
+    FtsObject *getObject( int id);
+    void putObject( int id, FtsObject *obj);
+
+    void writeInt( int v) throw( FtsClientException);
+    void writeDouble( double v) throw( FtsClientException);
+    void writeSymbol( const char *v) throw( FtsClientException);
+    void writeString( const char *v) throw( FtsClientException);
+    void writeRawString( const char *v) throw( FtsClientException);
+    void writeObject( const FtsObject *v) throw( FtsClientException);
+    /* This version is used for object that have predefined IDs */
+    void writeObject( int id) throw( FtsClientException);
+    void writeAtoms( const FtsAtom *atoms, int length) throw (FtsClientException);
+    void writeArgs( const FtsArgs &v) throw( FtsClientException);
+
+    void endOfMessage() throw( FtsClientException);
+
     virtual void close() throw (FtsClientException) = 0;
+
+  protected:
     virtual int read( unsigned char *b, int len) throw (FtsClientException) = 0;
     virtual void write( const unsigned char *b, int len) throw (FtsClientException) = 0;
+
+  private:
+    int _newObjectID;
+    Hashtable< int, FtsObject *> *_objectTable;
+    BinaryProtocolEncoder *_encoder;
   };
 
 };
