@@ -24,7 +24,7 @@
  *
  */
 
-#include <sequence.h>
+#include <sequence/c/include/sequence.h>
 
 extern void seqsym_config(void);
 

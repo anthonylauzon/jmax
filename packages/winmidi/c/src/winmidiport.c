@@ -620,7 +620,7 @@ winmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 winmidiport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(winmidiport_t), winmidiport_init, winmidiport_delete);
+  fts_class_init(cl, NULL, sizeof(winmidiport_t), winmidiport_init, winmidiport_delete);
 
   fts_midiport_class_init(cl);
   

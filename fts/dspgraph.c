@@ -148,7 +148,7 @@ graph_iterator_step( graph_iterator_t *iter)
     {
       /* try to replace object by */
       fts_object_t *dest = iter->top->connection->dst;
-      fts_method_t propagate = fts_class_get_method(fts_object_get_class(dest), fts_s_propagate_input);
+      fts_method_t propagate = fts_class_get_method_varargs(fts_object_get_class(dest), fts_s_propagate_input);
 
       if(propagate != NULL)
 	{
@@ -414,7 +414,7 @@ gen_outputs(fts_dsp_object_t *obj, int vector_size, double sample_rate)
 {
   fts_dsp_descr_t *descr = &obj->descr;
   int in_size = -1;
-  int out_size;
+  int out_size = 0;
   float out_sr;
   int resamp;
   int i;
@@ -494,7 +494,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_object_t *obj)
       */
 
       fts_set_pointer(&a, &obj->descr);
-      fts_send_message((fts_object_t *)obj, fts_s_put, 1, &a);
+      fts_send_message_varargs((fts_object_t *)obj, fts_s_put, 1, &a);
 
       /*{
 	ftl_instruction_info_t *info;
@@ -667,7 +667,7 @@ dsp_graph_schedule_depth(fts_dsp_graph_t *graph, fts_dsp_object_t *src, int wout
       dsp_graph_schedule_node(graph, dest);
       dsp_graph_succ_realize(graph, dest, dsp_graph_schedule_depth, fts_c_audio_active);
 
-      fts_send_message((fts_object_t *)dest, fts_new_symbol("put_after_successors"), 0, 0);
+      fts_send_message_varargs((fts_object_t *)dest, fts_new_symbol("put_after_successors"), 0, 0);
     }
 }
 
@@ -702,7 +702,7 @@ dsp_graph_send_message( fts_dsp_graph_t *graph, fts_symbol_t message)
   fts_dsp_object_t *obj;
 
   for( obj = graph->objects; obj != NULL; obj = obj->next_in_dspgraph)
-    fts_send_message((fts_object_t *)obj, message, 0, 0);
+    fts_send_message_varargs((fts_object_t *)obj, message, 0, 0);
 }
 
 static void 

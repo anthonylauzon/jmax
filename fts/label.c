@@ -172,7 +172,7 @@ label_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-label_default_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_input_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_label_t *this = (fts_label_t *) o;
 
@@ -229,12 +229,13 @@ label_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_propagate_input, label_propagate_input);
   fts_class_message_varargs(cl, fts_s_find_friends, label_find_friends);
 
-  fts_class_message_varargs(cl, fts_s_send, label_varargs);
-  fts_class_message_varargs(cl, fts_new_symbol("mess"), label_mess);
   fts_class_message_varargs(cl, fts_s_add_listener, label_add_listener);
   fts_class_message_varargs(cl, fts_s_remove_listener, label_remove_listener);
 
-  fts_class_set_default_handler(cl, label_default_handler);
+  fts_class_message_varargs(cl, fts_s_send, label_varargs);
+  fts_class_message_varargs(cl, fts_new_symbol("mess"), label_mess);
+
+  fts_class_input_handler(cl, label_input_handler);
 }
 
 void 

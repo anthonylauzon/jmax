@@ -76,7 +76,7 @@ static void create_reader_thread(readsf_t* self)
     fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
     
     thread_job->object = (fts_object_t*)reader;
-    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
+    thread_job->method = fts_class_get_method_varargs(fts_object_get_class(thread_job->object),
 					      fts_s_read);
     if (0 == thread_job->method)
     {
@@ -411,9 +411,6 @@ readsf_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, fts_s_start, readsf_start);
   fts_class_message_varargs(cl, fts_s_stop, readsf_stop);
   fts_class_message_varargs(cl, s_pause, readsf_pause);
-
-  /* Create an inlet at index 0 */
-  fts_class_inlet_anything(cl, 0);
 
   fts_dsp_declare_outlet(cl, 0);
   fts_dsp_declare_outlet(cl, 1);

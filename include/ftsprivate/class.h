@@ -33,7 +33,6 @@
 
 #define fts_class_get_typeid(CL) ((CL)->typeid)
 
-
 /* the class of 'class' objects */
 extern fts_class_t *fts_class_class;
 
@@ -49,7 +48,8 @@ struct fts_class_outlet
 
 extern void fts_class_instantiate(fts_class_t *cl);
 
-extern fts_method_t fts_class_inlet_get_method(fts_class_t *cl, int winlet, fts_class_t *type);
+/* get inlet methods */
+extern fts_method_t fts_class_get_inlet_method(fts_class_t *cl, int winlet, fts_class_t *type, int *varargs);
 
 extern int fts_class_outlet_get_declarations(fts_class_t *cl, int woutlet, fts_iterator_t *iter);
 extern int fts_class_outlet_has_type(fts_class_t *cl, int woutlet, fts_class_t *type);

@@ -116,7 +116,7 @@ zerocross_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(zerocross_t), zerocross_init, zerocross_delete);
 
   fts_class_message_varargs(cl, fts_s_put, zerocross_put);
-  fts_class_message_varargs(cl, fts_s_bang, zerocross_bang);
+  fts_class_inlet_bang(cl, 0, zerocross_bang);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_class_outlet_int(cl, 0);

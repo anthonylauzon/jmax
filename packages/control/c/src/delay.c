@@ -100,11 +100,10 @@ delay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delay_t), delay_init, NULL);
 
-  fts_class_message_varargs(cl, fts_s_bang, delay_input);
   fts_class_message_varargs(cl, fts_s_stop, delay_stop);
 
-  fts_class_inlet_int(cl, 1, delay_set_time);
-  fts_class_inlet_float(cl, 1, delay_set_time);
+  fts_class_inlet_bang(cl, 0, delay_input);
+  fts_class_inlet_number(cl, 1, delay_set_time);
 
   fts_class_outlet_bang(cl, 0);
 }

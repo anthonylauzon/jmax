@@ -441,8 +441,6 @@ vec_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_import, vec_import); 
   fts_class_message_varargs(cl, fts_s_export, vec_export); 
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void

@@ -27,7 +27,7 @@
 #define _SEQMESS_H_
 
 #include <fts/fts.h>
-#include <event.h>
+#include <sequence/c/include/event.h>
 
 extern fts_class_t *seqmess_type;
 

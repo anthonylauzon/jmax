@@ -305,16 +305,16 @@ serial_flush(fts_bytestream_t *stream)
  *
  */
 static void 
-serial_int( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_number( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   serial_t *this = (serial_t *)o;
 
   if(fts_bytestream_is_output(&this->head))
-    serial_output_char((fts_bytestream_t *)this, (unsigned char)fts_get_int(at));
+    serial_output_char((fts_bytestream_t *)this, (unsigned char)fts_get_number_int(at));
 }
 
 static void 
-serial_list( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_varargs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   serial_t *this = (serial_t *)o;
 
@@ -323,8 +323,8 @@ serial_list( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       int i;
       
       for(i=0; i<ac; i++)
-	if(fts_is_int(at + i))
-	  serial_output_char(&this->head, (unsigned char)fts_get_int(at + i));
+	if(fts_is_number(at + i))
+	  serial_output_char(&this->head, (unsigned char)fts_get_number_int(at + i));
     }
 }
 
@@ -441,14 +441,14 @@ serial_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void 
 serial_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( serial_t), serial_init, serial_delete, 0);
+  fts_class_init(cl, sizeof( serial_t), serial_init, serial_delete, 0);
   fts_bytestream_class_init(cl);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, serial_read);
 
-  fts_class_message_varargs(cl, fts_s_bang, serial_bang);
-  fts_class_inlet_int(cl, 0, serial_int);
-  fts_class_inlet_varargs(cl, 0, serial_list);
+  fts_class_inlet_bang(cl, 0, serial_bang);
+  fts_class_inlet_number(cl, 0, serial_number);
+  fts_class_inlet_varargs(cl, 0, serial_varargs);
 }
 
 void serial_config( void)

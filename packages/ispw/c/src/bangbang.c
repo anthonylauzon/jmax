@@ -48,8 +48,7 @@ bangbang_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_object_t), bangbang_init, 0);
 
-  fts_class_inlet_varargs(cl, 0, bangbang_input);
-  fts_class_set_default_handler(cl, bangbang_input);
+  fts_class_input_handler(cl, bangbang_input);
 
   fts_class_outlet_bang(cl, 0);
 }

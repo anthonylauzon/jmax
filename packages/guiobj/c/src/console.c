@@ -95,7 +95,7 @@ static void consolestream_set_default( fts_object_t *o, int winlet, fts_symbol_t
 
 static void consolestream_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof(consolestream_t), consolestream_init, consolestream_delete);
+  fts_class_init(cl, sizeof(consolestream_t), consolestream_init, consolestream_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("set_default"), consolestream_set_default);
 }

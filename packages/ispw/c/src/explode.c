@@ -1176,7 +1176,7 @@ explode_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   explode_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
-  fts_send_message( o, fts_s_upload, 0, 0);
+  fts_send_message_varargs( o, fts_s_upload, 0, 0);
 }
 
 static void

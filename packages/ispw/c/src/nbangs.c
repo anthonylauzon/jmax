@@ -30,16 +30,8 @@
 typedef struct
 {
   fts_object_t o;
-  long count;
+  int count;
 } nbangs_t;
-
-static void
-nbangs_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  nbangs_t *this = (nbangs_t *) o;
-
-  this->count = fts_get_number_int(at);
-}
 
 static void
 nbangs_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -50,8 +42,8 @@ nbangs_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       int i;
       
-      if(ac > 1 && fts_is_number(at + 1))
-	nbangs_set_n(o, 0, 0, 1, at + 1);
+      if(ac > 0 && fts_is_number(at))
+        this->count = fts_get_number_int(at);
       
       for(i=0; i<this->count; i++)
 	{
@@ -59,13 +51,22 @@ nbangs_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_outlet_bang(o, 0);
 	}
     }
+  else if(s == 0 && ac > 0 && fts_is_number(at))
+    this->count = fts_get_number_int(at);
+}
+
+static void
+nbangs_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
 }
 
 static void
 nbangs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(ac > 1 && fts_is_number(at + 1))
-    nbangs_set_n(o, 0, 0, 1, at);
+  nbangs_t *this = (nbangs_t *) o;
+  
+  if(ac > 0 && fts_is_number(at + 0))
+    this->count = fts_get_number_int(at);
 }
 
 static void
@@ -73,12 +74,9 @@ nbangs_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(nbangs_t), nbangs_init, 0);
 
-  fts_class_inlet_varargs(cl, 0, nbangs_input);
-  fts_class_set_default_handler(cl, nbangs_input);
-
-  fts_class_inlet_int(cl, 1, nbangs_set_n);
-  fts_class_inlet_float(cl, 1, nbangs_set_n);
-
+  fts_class_input_handler(cl, nbangs_input);
+  fts_class_inlet_int(cl, 1, nbangs_set);  
+  
   fts_class_outlet_bang(cl, 0);
   fts_class_outlet_int(cl, 1);
 }
@@ -86,6 +84,6 @@ nbangs_instantiate(fts_class_t *cl)
 void
 nbangs_config(void)
 {
-  fts_class_install(fts_new_symbol("nbangs"),nbangs_instantiate);
+  fts_class_install(fts_new_symbol("nbangs"), nbangs_instantiate);
 }
 

@@ -24,31 +24,28 @@
 
 fts_class_t *fts_tuple_class = 0;
 
-static void
-tuple_compare(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static int
+tuple_equals(const fts_atom_t *a, const fts_atom_t *b)
 {
-  fts_tuple_t *this = (fts_tuple_t *)o;
-  fts_tuple_t *in = (fts_tuple_t *)fts_get_object(at);
-  int in_n = fts_tuple_get_size(in);
-  int n = fts_tuple_get_size(this);
-  fts_atom_t ret;
+  fts_tuple_t *a_tup = (fts_tuple_t *)fts_get_object(a);
+  fts_tuple_t *b_tup = (fts_tuple_t *)fts_get_object(b);
+  int a_n = fts_tuple_get_size(a_tup);
+  int b_n = fts_tuple_get_size(b_tup);
 
-  if(in_n == n)
+  if(a_n == b_n)
     {
-      fts_atom_t *in_a = fts_tuple_get_atoms(in);
-      fts_atom_t *a = fts_tuple_get_atoms(this);
+      fts_atom_t *ap = fts_tuple_get_atoms(b_tup);
+      fts_atom_t *bp = fts_tuple_get_atoms(a_tup);
       int sum = 0;
       int i;
       
-      for(i=0; i<n; i++)
-	sum += fts_atom_compare(in_a + i, a + i);
+      for(i=0; i<a_n; i++)
+	sum += fts_atom_equals(ap + i, bp + i);
 
-      fts_set_int(&ret, (sum == n));
+      return (sum == a_n);
     }
-  else
-    fts_set_int(&ret, 0);
 
-  fts_return(&ret);
+  return 0;
 }
 
 static void
@@ -84,9 +81,8 @@ tuple_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_tuple_t), tuple_init, tuple_delete);
 
   fts_class_message_varargs(cl, fts_s_post, tuple_post);
-
-  fts_class_message_varargs(cl, fts_s_compare, tuple_compare);
-  }
+  fts_class_set_equals_function(cl, tuple_equals);
+}
 
 void
 fts_kernel_tuple_init(void)

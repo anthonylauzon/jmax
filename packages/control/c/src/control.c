@@ -40,9 +40,6 @@ extern void demux_config(void);
 extern void select_config(void);
 extern void change_config(void);
 
-extern void make_config(void);
-extern void invoke_config(void);
-
 extern void metro_config(void);
 extern void delay_config(void);
 extern void retard_config(void);
@@ -65,9 +62,6 @@ control_config(void)
   demux_config();
   select_config();
   change_config();
-
-  make_config();
-  invoke_config();
 
   metro_config();
   delay_config();

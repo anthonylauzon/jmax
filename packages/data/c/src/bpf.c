@@ -670,8 +670,6 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_clear, bpf_set_clear);
   fts_class_message_varargs(cl, fts_s_set, bpf_set);
   fts_class_message_varargs(cl, fts_s_append, bpf_append);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void

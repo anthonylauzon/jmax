@@ -36,7 +36,6 @@ fts_class_t *fvec_type = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_open_file = 0;
-static fts_symbol_t sym_local = 0;
 
 /********************************************************
  *
@@ -1759,8 +1758,6 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_save, fvec_save_soundfile);
 
   fts_class_message_varargs(cl, fts_s_get_element, fvec_element);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 /********************************************************************

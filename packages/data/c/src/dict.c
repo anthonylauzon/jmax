@@ -29,20 +29,13 @@ fts_class_t *dict_type = 0;
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
 
-static fts_hashtable_t *
-dict_get_hash(dict_t *dict, const fts_atom_t *key)
-{
-  return (fts_is_int(key))? &dict->table_int: &dict->table_symbol;
-}
-
 void
 dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom)
 {
-  fts_hashtable_t *hash = dict_get_hash(dict, key);
   fts_atom_t a;
 
   /* remove old entry for same key */
-  if(fts_hashtable_get(hash, key, &a))
+  if(fts_hashtable_get(&dict->hash, key, &a))
     fts_atom_void(&a);  
   else
     fts_set_void(&a);
@@ -50,7 +43,7 @@ dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom)
   fts_atom_assign(&a, atom);
 
   /* insert atom to hashtable */
-  fts_hashtable_put(hash, key, &a);
+  fts_hashtable_put(&dict->hash, key, &a);
 }
 
 void
@@ -71,43 +64,32 @@ dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *
 static void
 dict_remove(dict_t *dict, const fts_atom_t *key)
 {
-  fts_hashtable_t *hash = (fts_is_int(key))? &dict->table_int: &dict->table_symbol;
   fts_atom_t value;
   
-  if(fts_hashtable_get(hash, key, &value))
+  if(fts_hashtable_get(&dict->hash, key, &value))
     {
       fts_atom_void(&value);      
-      fts_hashtable_remove(hash, key);
+      fts_hashtable_remove(&dict->hash, key);
     }
 }
 
 static void
 dict_remove_all(dict_t *dict)
 {
-  fts_hashtable_t *hashtabs[2];
-  int tab;
-	  
-  hashtabs[0] = &dict->table_int;
-  hashtabs[1] = &dict->table_symbol;
+  fts_iterator_t iterator;
 
-  for(tab=0; tab<2; tab++)
-    {
-      fts_hashtable_t *hash = hashtabs[tab];
-      fts_iterator_t iterator;
-      
-      /* get int table */
-      fts_hashtable_get_values(hash, &iterator);
-	      
-      while(fts_iterator_has_more(&iterator))
-	{
-	  fts_atom_t value;
-		      
-	  fts_iterator_next(&iterator, &value);
-	  fts_set_void(&value);
-	}
-	      
-      fts_hashtable_clear(hash);
-    }
+  /* get int table */
+  fts_hashtable_get_values(&dict->hash, &iterator);
+
+  while(fts_iterator_has_more(&iterator))
+  {
+    fts_atom_t value;
+
+    fts_iterator_next(&iterator, &value);
+    fts_set_void(&value);
+  }
+
+  fts_hashtable_clear(&dict->hash);
 }
 
 void
@@ -115,17 +97,7 @@ dict_get_keys(dict_t *dict, fts_array_t *array)
 {
   fts_iterator_t iterator;
 
-  fts_hashtable_get_keys(&dict->table_int, &iterator);
-
-  while(fts_iterator_has_more(&iterator))
-    {
-      fts_atom_t key;
-      
-      fts_iterator_next(&iterator, &key);
-      fts_array_append(array, 1, &key);
-    }
-
-  fts_hashtable_get_keys(&dict->table_symbol, &iterator);
+  fts_hashtable_get_keys(&dict->hash, &iterator);
 
   while(fts_iterator_has_more(&iterator))
     {
@@ -139,46 +111,28 @@ dict_get_keys(dict_t *dict, fts_array_t *array)
 void
 dict_copy(dict_t *org, dict_t *copy)
 {
-  fts_hashtable_t *org_hash[2];
-  fts_hashtable_t *copy_hash[2];
-  int tab;
+  fts_iterator_t key_iterator;
+  fts_iterator_t value_iterator;
 
-  /* clear copy */
-  dict_remove_all(copy);
+  /* iterate on org hash table */
+  fts_hashtable_get_keys(&org->hash, &key_iterator);
+  fts_hashtable_get_values(&org->hash, &value_iterator);
 
-  /* init org hash tables */
-  org_hash[0] = &org->table_int;
-  org_hash[1] = &org->table_symbol;
+  while(fts_iterator_has_more(&key_iterator))
+  {
+    fts_atom_t key;
+    fts_atom_t value;
 
-  /* init copy hash tables */
-  copy_hash[0] = &copy->table_int;
-  copy_hash[1] = &copy->table_symbol;
+    /* get key */
+    fts_iterator_next(&key_iterator, &key);
+    fts_iterator_next(&value_iterator, &value);
 
-  for(tab=0; tab<2; tab++)
-    {
-      fts_iterator_t key_iterator;
-      fts_iterator_t value_iterator;
-      
-      /* iterate on org hash table */
-      fts_hashtable_get_keys(org_hash[tab], &key_iterator);
-      fts_hashtable_get_values(org_hash[tab], &value_iterator);
-	      
-      while(fts_iterator_has_more(&key_iterator))
-	{
-	  fts_atom_t key;
-	  fts_atom_t value;
-		      
-	  /* get key */
-	  fts_iterator_next(&key_iterator, &key);
-	  fts_iterator_next(&value_iterator, &value);
+    /* claim entry */
+    fts_atom_refer(&value);
 
-	  /* claim entry */
-	  fts_atom_refer(&value);
-
-	  /* store entry to copy hash table */
-	  fts_hashtable_put(copy_hash[tab], &key, &value);
-	}
-    }
+    /* store entry to copy hash table */
+    fts_hashtable_put(&copy->hash, &key, &value);
+  }
 }
 
 /**********************************************************
@@ -208,11 +162,10 @@ dict_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   
   if(ac > 0 && (fts_is_symbol(at) || fts_is_int(at)))
     {
-      fts_hashtable_t *hash = dict_get_hash(this, at);
       fts_atom_t a;
       
-      fts_hashtable_get(hash, at, &a);
-      fts_outlet_varargs(o, 0, 1, &a);
+      fts_hashtable_get(&this->hash, at, &a);
+      fts_outlet_atom(o, 0, &a);
     }
 }
 
@@ -238,54 +191,48 @@ dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   dict_t *this = (dict_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_hashtable_t *hash[2] = {&this->table_int, &this->table_symbol};
-  int tab;
-  
-  for(tab=0; tab<2; tab++)
+  fts_iterator_t key_iterator, value_iterator;
+
+  fts_hashtable_get_keys(&this->hash, &key_iterator);
+  fts_hashtable_get_values(&this->hash, &value_iterator);
+
+  while(fts_iterator_has_more(&key_iterator))
+  {
+    fts_atom_t key, value;
+
+    fts_iterator_next(&key_iterator, &key);
+    fts_iterator_next(&value_iterator, &value);
+
+    if(fts_is_tuple(&value))
     {
-      fts_iterator_t key_iterator, value_iterator;
-      
-      fts_hashtable_get_keys(hash[tab], &key_iterator);
-      fts_hashtable_get_values(hash[tab], &value_iterator);
-      
-      while(fts_iterator_has_more(&key_iterator))
-	{
-	  fts_atom_t key, value;
-	  
-	  fts_iterator_next(&key_iterator, &key);
-	  fts_iterator_next(&value_iterator, &value);
-	  
-	  if(fts_is_tuple(&value))
-	    {
-	      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
-	      int size = fts_tuple_get_size(tuple);
-	      const fts_atom_t *atoms = fts_tuple_get_atoms(tuple);
-	      fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
-	      
-	      /* dump key */
-	      fts_message_append(dump_mess, 1, &key);	      
-	      
-	      /* dump tuple */
-	      fts_message_append(dump_mess, size, atoms);
-	      fts_dumper_message_send(dumper, dump_mess);
-	    }
-	  else if(fts_is_object(&value))
-	    {
-	      /* don't now how to do yet */
-	    }
-	  else
-	    {
-	      fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
-	      
-	      /* dump key */
-	      fts_message_append(dump_mess, 1, &key);
-	      
-	      /* dump value */
-	      fts_message_append(dump_mess, 1, &value);
-	      fts_dumper_message_send(dumper, dump_mess);
-	    }
-	}
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
+      int size = fts_tuple_get_size(tuple);
+      const fts_atom_t *atoms = fts_tuple_get_atoms(tuple);
+      fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
+
+      /* dump key */
+      fts_message_append(dump_mess, 1, &key);
+
+      /* dump tuple */
+      fts_message_append(dump_mess, size, atoms);
+      fts_dumper_message_send(dumper, dump_mess);
     }
+    else if(fts_is_object(&value))
+    {
+      /* don't now how to do yet */
+    }
+    else
+    {
+      fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
+
+      /* dump key */
+      fts_message_append(dump_mess, 1, &key);
+
+      /* dump value */
+      fts_message_append(dump_mess, 1, &value);
+      fts_dumper_message_send(dumper, dump_mess);
+    }
+  }
 }
 
 static void
@@ -445,81 +392,76 @@ static int
 dict_export_to_coll(dict_t *this, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(file_name, "w");
-  fts_hashtable_t *hash[2] = {&this->table_int, &this->table_symbol};
+  fts_iterator_t key_iterator;
+  fts_iterator_t value_iterator;
   int size = 0;
-  int tab;
   int i;
 
   if(!file)
     return 0;
 
-  for(tab=0; tab<2; tab++)
+  fts_hashtable_get_keys(&this->hash, &key_iterator);
+  fts_hashtable_get_values(&this->hash, &value_iterator);
+
+  while(fts_iterator_has_more(&key_iterator))
+  {
+    fts_atom_t key, value;
+    fts_symbol_t s = NULL;
+    int ac = 0;
+    const fts_atom_t *at = NULL;
+    fts_atom_t a;
+
+    fts_iterator_next(&key_iterator, &key);
+    fts_iterator_next(&value_iterator, &value);
+
+    if(fts_is_tuple(&value))
     {
-      fts_iterator_t *key_iterator, *value_iterator;
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
 
-      fts_hashtable_get_keys(hash[tab], key_iterator);
-      fts_hashtable_get_values(hash[tab], value_iterator);
-
-      while(fts_iterator_has_more(key_iterator))
-	{
-	  fts_atom_t key, value;
-	  fts_symbol_t s = NULL;
-	  int ac = 0;
-	  const fts_atom_t *at = NULL;
-	  fts_atom_t a;
-	  
-	  fts_iterator_next(key_iterator, &key);
-	  fts_iterator_next(value_iterator, &value);
-
-	  if(fts_is_tuple(&value))
-	    {
-	      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
-
-	      s = fts_s_list;
-	      ac = fts_tuple_get_size(tuple);
-	      at = fts_tuple_get_atoms(tuple);
-	    }
-	  else if(fts_is_symbol(&value))
-	    {
-	      s = fts_s_symbol;
-	      ac = 1;
-	      at = &value;
-	    }
-	  
-	  else if(!fts_is_object(&value))
-	    {
-	      ac = 1;
-	      at = &value;
-	    }
-	  
-	  /* write key */
-	  fts_atom_file_write(file, &key, ' ');
-	  
-	  /* write comma */
-	  fts_set_symbol(&a, fts_s_comma);
-	  fts_atom_file_write(file, &a, ' ');
-	  
-	  /* write selector (if any) */
-	  if(s)
-	    {
-	      fts_set_symbol(&a, s);
-	      fts_atom_file_write(file, &a, ' ');
-	    }
-	  
-	  /* write arguments */
-	  for(i=0; i<ac; i++)
-	    fts_atom_file_write(file, at + i, ' ');
-
-	  /* write semicolon and new line */
-	  fts_set_symbol(&a, fts_s_semi);
-	  fts_atom_file_write(file, &a, '\n');
-	  
-	  size++;
-	}
+      s = fts_s_list;
+      ac = fts_tuple_get_size(tuple);
+      at = fts_tuple_get_atoms(tuple);
+    }
+    else if(fts_is_symbol(&value))
+    {
+      s = fts_s_symbol;
+      ac = 1;
+      at = &value;
     }
 
+    else if(!fts_is_object(&value))
+    {
+      ac = 1;
+      at = &value;
+    }
+
+    /* write key */
+    fts_atom_file_write(file, &key, ' ');
+
+    /* write comma */
+    fts_set_symbol(&a, fts_s_comma);
+    fts_atom_file_write(file, &a, ' ');
+
+    /* write selector (if any) */
+    if(s)
+    {
+      fts_set_symbol(&a, s);
+      fts_atom_file_write(file, &a, ' ');
+    }
+
+    /* write arguments */
+    for(i=0; i<ac; i++)
+      fts_atom_file_write(file, at + i, ' ');
+
+    /* write semicolon and new line */
+    fts_set_symbol(&a, fts_s_semi);
+    fts_atom_file_write(file, &a, '\n');
+
+    size++;
+  }
+
   fts_atom_file_close(file);
-  
+
   return size;
 }
 
@@ -591,47 +533,43 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   dict_t *this = (dict_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  fts_hashtable_t *hash[2] = {&this->table_int, &this->table_symbol};
-  int size = fts_hashtable_get_size(&this->table_int) + fts_hashtable_get_size(&this->table_symbol);
-  int tab;
+  int size = fts_hashtable_get_size(&this->hash);
 
   if(size == 0)
     fts_spost(stream, "<empty dictionary>\n");
   else
     {
-      if(size == 1)
-	fts_spost(stream, "<dictionary of 1 entry>\n");
+    fts_iterator_t key_iterator;
+    fts_iterator_t value_iterator;
+
+    if(size == 1)
+      fts_spost(stream, "<dictionary of 1 entry>\n");
+    else
+      fts_spost(stream, "<dictionary of %d entries>\n", size);
+
+    fts_spost(stream, "{\n");
+
+    fts_hashtable_get_keys(&this->hash, &key_iterator);
+    fts_hashtable_get_values(&this->hash, &value_iterator);
+
+    while(fts_iterator_has_more(&key_iterator))
+    {
+      fts_atom_t key, value;
+
+      fts_iterator_next(&key_iterator, &key);
+      fts_iterator_next(&value_iterator, &value);
+
+      if(fts_is_int(&key))
+        fts_spost(stream, "  %d: ", fts_get_int(&key));
       else
-	fts_spost(stream, "<dictionary of %d entries>\n", size);
+        fts_spost(stream, "  %s: ", fts_get_symbol(&key));
 
-      fts_spost(stream, "{\n");
-
-      for(tab=0; tab<2; tab++)
-	{
-	  fts_iterator_t key_iterator, value_iterator;
-	  
-	  fts_hashtable_get_keys(hash[tab], &key_iterator);
-	  fts_hashtable_get_values(hash[tab], &value_iterator);
-	  
-	  while(fts_iterator_has_more(&key_iterator))
-	    {
-	      fts_atom_t key, value;
-	      
-	      fts_iterator_next(&key_iterator, &key);
-	      fts_iterator_next(&value_iterator, &value);
-	      
-	      if(fts_is_int(&key))
-		fts_spost(stream, "  %d: ", fts_get_int(&key));
-	      else
-		fts_spost(stream, "  %s: ", fts_get_symbol(&key));
-	      
-	      fts_spost_atoms(stream, 1, &value);
-	      fts_spost(stream, "\n");
-	    }
-	}
-	  
-      fts_spost(stream, "}\n");
+      fts_spost_atoms(stream, 1, &value);
+      fts_spost(stream, "\n");
     }
+    }
+
+  fts_spost(stream, "}\n");
 }
 
 /**********************************************************
@@ -650,8 +588,7 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   data_object_init(o);
 
-  fts_hashtable_init(&this->table_int, FTS_HASHTABLE_SMALL);
-  fts_hashtable_init(&this->table_symbol, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&this->hash, FTS_HASHTABLE_SMALL);
 
   for(i=0; i<ac; i+=2)
     {
@@ -693,12 +630,11 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_import, dict_import);
   fts_class_message_varargs(cl, fts_s_export, dict_export);
   
-  fts_class_message_varargs(cl, fts_s_put, dict_set);
   fts_class_message_varargs(cl, fts_s_set, dict_set);
   fts_class_message_varargs(cl, fts_s_get, dict_get);
   fts_class_message_varargs(cl, fts_s_clear, dict_clear);
 
-  fts_class_inlet_anything(cl, 0);
+  fts_class_outlet_atom(cl, 0);
 }
 
 void

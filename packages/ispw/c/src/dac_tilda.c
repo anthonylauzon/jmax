@@ -95,7 +95,7 @@ static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
 
 static void dac_tilda_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( dac_tilda_t), dac_tilda_init, dac_tilda_delete);
+  fts_class_init(cl, sizeof( dac_tilda_t), dac_tilda_init, dac_tilda_delete);
 
   fts_class_message_varargs(cl, fts_s_propagate_input, dac_tilda_propagate_input);
 

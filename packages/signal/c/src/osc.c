@@ -194,9 +194,7 @@ osc_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("phase"), osc_set_phase);
   fts_class_message_varargs(cl, fts_new_symbol("freq"), osc_set_freq);
 
-  fts_class_inlet_int(cl, 0, osc_set_freq);
-  fts_class_inlet_float(cl, 0, osc_set_freq);
-
+  fts_class_inlet_number(cl, 0, osc_set_freq);
   fts_class_inlet(cl, 1, fvec_type, osc_set_fvec);
 
   fts_dsp_declare_inlet(cl, 0);

@@ -70,14 +70,6 @@ demux_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-demux_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  demux_t *this = (demux_t *)o;
-
-  fts_outlet_send(o, this->out, s, ac, at);
-}
-
-static void
 demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   demux_t *this = (demux_t *)o;
@@ -86,6 +78,17 @@ demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   if(i >= 0 && i < n)
     this->out = i;
+}
+
+static void
+demux_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  demux_t *this = (demux_t *)o;
+
+  if(winlet == 0)
+    fts_outlet_send(o, this->out, s, ac, at);
+  else if(s == NULL && ac > 0 && fts_is_number(at))
+    demux_set(o, winlet, 0, 1, at);
 }
 
 /************************************************************
@@ -98,15 +101,12 @@ demux_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(demux_t), demux_init, demux_delete);
   
-  fts_class_set_default_handler(cl, demux_input);
-  fts_class_inlet(cl, 0, NULL, demux_input);
-  
-  fts_class_inlet_int(cl, 1, demux_set);
-  fts_class_inlet_float(cl, 1, demux_set);
+  fts_class_input_handler(cl, demux_input);
+  fts_class_inlet_number(cl, 1, demux_set); /* dummy */
 
-  fts_class_outlet_anything(cl, 0);
-  fts_class_outlet_anything(cl, 1);
-  }
+  fts_class_outlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 1);
+}
 
 void
 demux_config(void)

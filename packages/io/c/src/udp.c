@@ -99,7 +99,7 @@ static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
 static void udp_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( udp_t), udp_init, udp_delete);
+  fts_class_init(cl, sizeof( udp_t), udp_init, udp_delete);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, udp_receive);
 

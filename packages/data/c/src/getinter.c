@@ -235,13 +235,12 @@ getinter_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(getinter_t), getinter_init, getinter_delete);
   
-  fts_class_inlet_int(cl, 0, getinter_input);
-  fts_class_inlet_float(cl, 0, getinter_input);
+  fts_class_inlet_number(cl, 0, getinter_input);
   
   fts_class_inlet(cl, 1, ivec_type, getinter_set_reference);
   fts_class_inlet(cl, 1, fvec_type, getinter_set_reference);
   fts_class_inlet(cl, 1, bpf_type, getinter_set_reference);
-
+  
   fts_class_outlet_float(cl, 0);
 }
 

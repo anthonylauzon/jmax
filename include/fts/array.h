@@ -203,6 +203,8 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
  */
 #define fts_array_get_element( array, index) ((array)->atoms + (index))
 
+FTS_API void fts_array_set_element(fts_array_t *array, int index, const fts_atom_t *at);
+
 /* init array iterator */
 FTS_API void fts_array_get_values(fts_array_t *array, fts_iterator_t *iter);
 

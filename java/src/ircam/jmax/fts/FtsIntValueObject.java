@@ -113,7 +113,7 @@ public class FtsIntValueObject extends FtsGraphicObject
   public void sendBang()
   {
     try{
-      send(FtsSymbol.get("bang"));
+      send(FtsSymbol.get("click"));
     }
     catch(IOException e)
       {

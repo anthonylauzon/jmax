@@ -98,7 +98,7 @@ dsp_timebase_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_timebase_t), dsp_timebase_init, dsp_timebase_delete);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, dsp_timebase_advance);
-  }
+}
 
 void
 fts_dsp_timebase_configure(void)
@@ -175,7 +175,9 @@ dsp_object_get_n_inlets(fts_dsp_object_t *obj)
 
   for(i=0; i<fts_object_get_inlets_number(o); i++)
     {
-      if(fts_class_inlet_get_method(cl, i, fts_dsp_signal_class) == NULL)
+    int varargs = 0;
+    
+      if(fts_class_get_inlet_method(cl, i, fts_dsp_signal_class, &varargs) == NULL)
 	break;
     }
 
@@ -206,7 +208,7 @@ fts_dsp_object_init(fts_dsp_object_t *obj)
   int noutputs = dsp_object_get_n_outlets(obj);
 
   /* make sure that class has a put method */
-  if(fts_class_get_method(cl, fts_s_put) == NULL)
+  if(fts_class_get_method_varargs(cl, fts_s_put) == NULL)
     fts_class_message_varargs(cl, fts_s_put, fts_dsp_default_method);
 
   obj->descr.ninputs = ninputs;
@@ -233,7 +235,7 @@ fts_dsp_object_delete(fts_dsp_object_t *obj)
 int
 fts_is_dsp_object(fts_object_t *o)
 {
-  return (fts_class_get_method(fts_object_get_class(o), fts_s_put) != NULL);
+  return (fts_class_get_method_varargs(fts_object_get_class(o), fts_s_put) != NULL);
 }
 
 void 
@@ -245,7 +247,8 @@ fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 int 
 fts_dsp_is_sig_inlet(fts_object_t *o, int num)
 {
-  return fts_class_inlet_get_method(fts_object_get_class(o), num, fts_dsp_signal_class) != NULL;
+  int varargs = 0;
+  return fts_class_get_inlet_method(fts_object_get_class(o), num, fts_dsp_signal_class, &varargs) != NULL;
 }
 
 int 

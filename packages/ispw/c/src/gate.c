@@ -35,21 +35,19 @@ typedef struct
 } gate_t;
 
 static void 
-gate_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   gate_t *this = (gate_t *)o;
 
-  if(fts_is_number(at))
+  if(winlet == 1)
+    {
+      if(this->opened && winlet == 1)
+	fts_outlet_send(o, 0, s, ac, at);
+    }
+  else if(s == NULL && ac > 1 && fts_is_number(at))
     this->opened = fts_get_number_int(at);
-}
-
-static void 
-gate_realize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  gate_t *this = (gate_t *)o;
-
-  if(this->opened && winlet == 1)
-    fts_outlet_send(o, 0, s, ac, at);
+  else
+    fts_object_signal_runtime_error(o, "bad input at inlet 0");
 }
 
 static void
@@ -57,7 +55,8 @@ gate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   gate_t *this = (gate_t *)o;
 
-  this->opened = fts_get_int_arg(ac, at, 0, 0);
+  if(ac > 0 && fts_is_number(at))
+    this->opened = fts_get_number_int(at);
 }
 
 static void
@@ -65,15 +64,10 @@ gate_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(gate_t), gate_init, 0);
 
-  fts_class_set_default_handler(cl, gate_realize);
+  fts_class_input_handler(cl, gate_input);
 
-  fts_class_inlet_int(cl, 0, gate_open);
-  fts_class_inlet_float(cl, 0, gate_open);
-  fts_class_inlet_varargs(cl, 0, gate_open);
-
-  fts_class_inlet_varargs(cl, 1, gate_realize);
-
-  fts_class_outlet_anything(cl, 0);
+  fts_class_inlet_thru(cl, 1);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

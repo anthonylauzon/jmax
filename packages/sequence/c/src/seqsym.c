@@ -37,6 +37,10 @@ fts_symbol_t seqsym_segment = 0;
 fts_symbol_t seqsym_note = 0;
 fts_symbol_t seqsym_midi = 0;
 fts_symbol_t seqsym_seqmess = 0;
+fts_symbol_t seqsym_pitch = 0;
+fts_symbol_t seqsym_duration = 0;
+fts_symbol_t seqsym_velocity = 0;
+fts_symbol_t seqsym_channel = 0;
 
 /* messages */
 fts_symbol_t seqsym_insert = 0;
@@ -81,6 +85,10 @@ seqsym_config(void)
   seqsym_note = fts_new_symbol("note");
   seqsym_midi = fts_new_symbol("midi");
   seqsym_seqmess = fts_new_symbol("seqmess");
+  seqsym_pitch = fts_new_symbol("pitch");
+  seqsym_duration = fts_new_symbol("duration");
+  seqsym_velocity = fts_new_symbol("velocity");
+  seqsym_channel = fts_new_symbol("channel");
   
   /* messages */
   seqsym_insert = fts_new_symbol("insert");

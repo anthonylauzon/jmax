@@ -122,7 +122,7 @@ sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   fts_audioport_t *port = fts_audioport_get_default(o);
 
-  fts_send_message((fts_object_t *)port, fts_s_print, ac, at);
+  fts_send_message_varargs((fts_object_t *)port, fts_s_print, ac, at);
 }
 
 static void
@@ -130,7 +130,7 @@ sysinfo_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_object_t *config = fts_midiconfig_get();
 
-  fts_send_message(config, fts_s_print, ac, at);
+  fts_send_message_varargs(config, fts_s_print, ac, at);
 }
 
 static void
@@ -143,8 +143,6 @@ sysinfo_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("midi"), sysinfo_midi);
 
   fts_class_message_varargs(cl, fts_new_symbol("noouts"), sysinfo_noouts);  
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void

@@ -89,17 +89,6 @@ access_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static void
-throw_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  access_t *this = (access_t *)o;
-  
-  if(winlet == 0)
-    fts_channel_send(bus_get_channel(this->bus, this->index), 0, s, ac, at);
-  else
-    fts_class_default_error_handler(o, winlet, s, ac, at);
-}
-
-static void
 throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   access_t *this = (access_t *)o;
@@ -125,6 +114,17 @@ throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_object_signal_runtime_error(o, "bad value at inlet %d (bus required)", winlet);
   else
     fts_object_set_error(o, "bus required");
+}
+
+static void
+throw_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  access_t *this = (access_t *)o;
+  
+  if(winlet == 0)
+    fts_channel_send(bus_get_channel(this->bus, this->index), 0, s, ac, at);
+  else if(s == 0 && ac > 0)
+     throw_set_channel(o, 1, NULL, ac, at);
 }
 
 static void
@@ -154,12 +154,7 @@ throw_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(access_t), throw_init, throw_delete);
 
-  fts_class_set_default_handler(cl, throw_input);
-  fts_class_inlet_anything(cl, 0);
-
-  fts_class_inlet_varargs(cl, 1, throw_set_channel);
-  fts_class_inlet(cl, 1, bus_type, throw_set_channel);
-  fts_class_inlet_number(cl, 1, access_set_index);
+  fts_class_input_handler(cl, throw_input);
 }
 
 /*****************************************************************************
@@ -239,11 +234,11 @@ catch_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(access_t), catch_init, catch_delete);
   
-  fts_class_inlet_varargs(cl, 0, catch_set_channel);
-  fts_class_inlet(cl, 0, bus_type, catch_set_channel);
   fts_class_inlet_number(cl, 0, catch_set_index);
+  fts_class_inlet(cl, 0, bus_type, catch_set_channel);
+  fts_class_inlet_varargs(cl, 0, catch_set_channel);
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 /*****************************************************************************
@@ -290,8 +285,6 @@ bus_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
   fts_class_message_varargs(cl, fts_s_dump, fts_name_dump_method);
   fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void

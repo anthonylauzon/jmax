@@ -156,7 +156,7 @@ for_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(for_t), for_init, NULL);
 
   fts_class_message_varargs(cl, fts_s_set, for_set);
-  fts_class_message_varargs(cl, fts_s_bang, for_go);
+  fts_class_inlet_bang(cl, 0, for_go);
   fts_class_inlet_varargs(cl, 0, for_set_and_go);
 
   fts_class_inlet_number(cl, 0, for_set_init_and_go);

@@ -100,7 +100,7 @@ sigtab1_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigtab1_t), sigtab1_init, sigtab1_delete);
 
-  fts_class_message_varargs(cl, fts_s_bang, sigtab1_reload);
+  fts_class_inlet_bang(cl, 0, sigtab1_reload);
   
   wavetable_init();
 }

@@ -60,38 +60,35 @@ int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
 int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
 {
   if(fts_is_int(p1))
-    {
-      if(fts_is_int(p2))
-	return fts_get_int( p1) == fts_get_int( p2);
-      else if(fts_is_float(p2))
-	return (double)fts_get_int( p1) == fts_get_float( p2);
-    }
+  {
+    if(fts_is_int(p2))
+      return fts_get_int( p1) == fts_get_int( p2);
+    else if(fts_is_float(p2))
+      return (double)fts_get_int( p1) == fts_get_float( p2);
+  }
   else if(fts_is_float(p1) && fts_is_number(p2))
     return fts_get_float( p1) == fts_get_number_float( p2);
   else if (fts_atom_same_type( p1, p2))
+  {
+    if ( fts_is_symbol( p1))
+      return fts_get_symbol( p1) == fts_get_symbol( p2);
+    else if ( fts_is_object( p1))
     {
-      if ( fts_is_symbol( p1))
-	return fts_get_symbol( p1) == fts_get_symbol( p2);
-      else if ( fts_is_object( p1))
-	{
-	  fts_object_t *obj = fts_get_object( p1);
+      fts_object_t *obj = fts_get_object( p1);
 
-	  if(obj == fts_get_object( p2))
-	    return 1;
-	  else
-	    {
-	      fts_class_t *class = fts_object_get_class(obj);
-	      fts_method_t meth_compare = fts_class_get_method(class, fts_s_compare);
-	      
-	      if(meth_compare)
-		{
-		  meth_compare(obj, 0, 0, 1, p2);
-		  return(fts_get_int(fts_get_return_value()));
-		}
-	    }
-	}
+      if(obj == fts_get_object( p2))
+        return 1;
+      else
+      {
+        fts_class_t *class = fts_object_get_class(obj);
+        fts_equals_function_t equals = fts_class_get_equals_function(class);
+
+        if(fts_class_get_equals_function(class) != NULL)
+          return (*equals)(p1, p2);
+      }
     }
-
+  }
+  
   return 0;
 }
 

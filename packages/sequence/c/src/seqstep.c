@@ -25,11 +25,11 @@
  */
 
 #include <fts/fts.h>
-#include <sequence.h>
-#include <track.h>
-#include <event.h>
-#include <track.h>
-#include "seqsym.h"
+#include <sequence/c/include/sequence.h>
+#include <sequence/c/include/track.h>
+#include <sequence/c/include/event.h>
+#include <sequence/c/include/track.h>
+#include <sequence/c/include/seqsym.h>
 
 typedef struct _seqstep_
 {
@@ -279,7 +279,6 @@ seqstep_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_next, seqstep_next);
   fts_class_message_varargs(cl, fts_s_bang, seqstep_next);
   
-  fts_class_inlet_anything(cl, 0);
   fts_class_inlet(cl, 1, track_type, seqstep_set_reference);
   
   fts_class_outlet_varargs(cl, 0);

@@ -48,7 +48,7 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       fts_object_t *obj = fts_get_object(a);
       fts_class_t *class = fts_object_get_class(obj);
-      fts_method_t method = fts_class_get_method(class, fts_s_send);
+      fts_method_t method = NULL;;
 
       if(method)
 	method(obj, fts_system_inlet, fts_s_send, ac, at);
@@ -75,16 +75,11 @@ dispatch_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_propagate_input, dispatch_propagate_input);
 
-  fts_class_inlet_int(cl, 0, dispatch_values);
-  fts_class_inlet_float(cl, 0, dispatch_values);
-  fts_class_inlet_symbol(cl, 0, dispatch_values);
-  fts_class_inlet_varargs(cl, 0, dispatch_values);
-
-  fts_class_set_default_handler(cl, dispatch_send);
+  fts_class_input_handler(cl, dispatch_send);
 
   fts_dsp_declare_outlet(cl, 0);
   fts_class_outlet_varargs(cl, 1);
-  fts_class_outlet_anything(cl, 2);
+  fts_class_outlet_thru(cl, 2);
 }
 
 void

@@ -1191,7 +1191,7 @@ fts_midiport_class_init(fts_class_t *cl)
 int
 fts_object_is_midiport(fts_object_t *obj)
 {
-  return (fts_class_get_method(fts_object_get_class(obj), fts_s_midievent) == fts_midiport_input);
+  return (fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_midievent) == fts_midiport_input);
 }
 
 /****************************************************

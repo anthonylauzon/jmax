@@ -352,7 +352,7 @@ sgimidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 sgimidiport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(sgimidiport_t), sgimidiport_init, sgimidiport_delete);
+  fts_class_init(cl, NULL, sizeof(sgimidiport_t), sgimidiport_init, sgimidiport_delete);
   fts_class_message_varargs(cl, fts_s_sched_ready, sgimidiport_dispatch);
 }
 

@@ -228,7 +228,7 @@ cut_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_put, cut_put);
   
-  fts_class_message_varargs(cl, fts_s_bang, cut_bang);
+  fts_class_inlet_bang(cl, 0, cut_bang);
   fts_class_inlet(cl, 1, fvec_type, cut_set_fvec);
 
   fts_dsp_declare_inlet(cl, 0);

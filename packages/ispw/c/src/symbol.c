@@ -85,8 +85,9 @@ symbol_obj_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(symbol_obj_t), symbol_obj_init, 0);
 
-  fts_class_message_varargs(cl, fts_s_bang, symbol_obj_bang);
+  fts_class_inlet_bang(cl, 0, symbol_obj_bang);
 
+  fts_class_inlet_symbol(cl, 1, symbol_obj_symbol);
   fts_class_inlet_varargs(cl, 0, symbol_obj_varargs);
   fts_class_inlet_symbol(cl, 1, symbol_obj_set);
 

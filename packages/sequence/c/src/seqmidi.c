@@ -28,10 +28,10 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #include <string.h>
-#include <sequence.h>
-#include <track.h>
-#include <note.h>
-#include "seqsym.h"
+#include <sequence/c/include/sequence.h>
+#include <sequence/c/include/track.h>
+#include <sequence/c/include/note.h>
+#include <sequence/c/include/seqsym.h>
 
 #define STRING_SIZE 1024
 

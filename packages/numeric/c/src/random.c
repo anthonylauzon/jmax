@@ -69,7 +69,7 @@ random_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(random_t), random_init, 0);
 
-  fts_class_message_varargs(cl, fts_s_bang, random_bang);
+  fts_class_inlet_bang(cl, 0, random_bang);
   fts_class_inlet_number(cl, 1, random_set_range);
   fts_class_outlet_int(cl, 0);
 }

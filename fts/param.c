@@ -95,7 +95,7 @@ param_call_listeners(fts_param_t *param)
 	}
       
       /* send from outlet */
-      fts_outlet_varargs((fts_object_t *)param, 0, 1, &param->value);
+      fts_outlet_atom((fts_object_t *)param, 0, &param->value);
     }
 }
 
@@ -137,38 +137,46 @@ param_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
   
 static void
-param_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
-  
+
+  fts_atom_assign(&this->value, at);
+}
+
+static void
+param_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+  fts_param_t *param = (fts_param_t *)fts_get_object(at);
+
+  fts_atom_assign(&this->value, &param->value);
+}
+
+static void
+param_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+
   if(ac == 1)
     fts_atom_assign(&this->value, at);
   else if(ac > 1)
-    {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, (fts_object_t *)tuple);
-      fts_atom_assign(&this->value, &a);
-    }
+  {
+    fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
+    fts_atom_t a;
+
+    fts_set_object(&a, (fts_object_t *)tuple);
+    fts_atom_assign(&this->value, &a);
+  }
 }
 
 static void
-param_input_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_param_t *this = (fts_param_t *)o;
 
-  param_set_varargs(o, 0, 0, ac, at);
+  fts_atom_assign(&this->value, at);
   param_call_listeners(this);
-}
-
-static void
-param_default_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(s == NULL)
-    param_input_varargs(o, 0, 0, ac, at);
-  else
-    fts_class_default_error_handler(o, 0, s, ac, at);
 }
 
 static void
@@ -226,16 +234,6 @@ param_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
   else
     fts_array_append(array, 1, &this->value);
-}
-
-static void
-param_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_param_t *this = (fts_param_t *)o;
-  fts_param_t *in = (fts_param_t *)fts_get_object(at);
-
-  fts_atom_assign(&this->value, &in->value);
-  param_call_listeners(this);
 }
 
 static void
@@ -327,10 +325,10 @@ param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->persistence = 0;
 
   if(ac > 0)
-    {
-      param_set_varargs(o, 0, 0, ac, at);
-      this->persistence = -1;    
-    }
+  {
+    fts_send_message(o, fts_s_set, ac, at);
+    this->persistence = -1;
+  }
 }
 
 static void
@@ -350,31 +348,29 @@ param_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, param_update_gui);
 
   fts_class_message_varargs(cl, fts_s_dump_state, param_dump_state);
-  fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
 
   fts_class_message_varargs(cl, fts_s_persistence, param_persistence);
   fts_class_message_varargs(cl, fts_s_dump, param_dump);
 
   fts_class_message_varargs(cl, fts_s_post, param_post);
-  
-  fts_class_message_varargs(cl, fts_s_set, param_set_varargs);
 
+  fts_class_message_varargs(cl, fts_s_set_from_array, param_set_from_array);
   fts_class_message_varargs(cl, fts_s_get_array, param_get_array);
-  fts_class_message_varargs(cl, fts_s_set_from_array, param_set_varargs);
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), param_update);
 
   fts_class_message_varargs(cl, fts_s_add_listener, param_add_listener);
   fts_class_message_varargs(cl, fts_s_remove_listener, param_remove_listener);
 
-  fts_class_message_varargs(cl, fts_s_bang, param_update);
   fts_class_message_varargs(cl, fts_s_clear, param_clear);
-  fts_class_message_varargs(cl, fts_s_send, param_input_varargs);
+  fts_class_message_varargs(cl, fts_s_send, param_input_atom);
 
-  fts_class_set_default_handler(cl, param_default_handler);
+  fts_class_message_atom(cl, fts_s_set, param_set);
+  fts_class_message(cl, fts_s_set_from_instance, cl, param_set_from_instance);
   
-  fts_class_inlet_varargs(cl, 0, param_input_varargs);
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_inlet_bang(cl, 0, param_update);
+  fts_class_inlet_atom(cl, 0, param_input_atom);
+  fts_class_outlet_atom(cl, 0);
 }
 
 /***********************************************************************

@@ -308,7 +308,7 @@ static void pt_class_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, dsp_fun_put);
 	
-  fts_class_message_varargs(cl, fts_s_bang, pt_bang);
+  fts_class_inlet_bang(cl, 0, pt_bang);
   fts_class_message_varargs(cl, fts_new_symbol("gliss-time"), pt_gliss_time);
   fts_class_message_varargs(cl, fts_new_symbol("reattack"), pt_reattack);
   fts_class_message_varargs(cl, fts_s_print, pt_print);

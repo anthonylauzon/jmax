@@ -23,6 +23,7 @@
 #include <ftsconfig.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -454,7 +455,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	  obj = fts_eval_object_description(patcher, 1, a);
 	  
 	  if(ac > 1)
-	    fts_send_message(obj, fts_s_set_arguments, ac - 1, a + 1);
+	    fts_send_message_varargs(obj, fts_s_set_arguments, ac - 1, a + 1);
 	}
       else if(class_name == fts_s_comment)
 	{
@@ -466,7 +467,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	  obj = fts_eval_object_description(patcher, 1, &s);
 	  
 	  if(ac > 1)
-	    fts_send_message(obj, fts_s_set_from_array, ac - 1, a + 1);
+	    fts_send_message_varargs(obj, fts_s_set_from_array, ac - 1, a + 1);
 
 	  return obj;
 	}
@@ -475,7 +476,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	  /* fix bmax 1 variable definition */
 	  obj = fts_eval_object_description(patcher, ac - 2, a + 2);
 
-	  fts_send_message(obj, fts_s_name, 1, a);
+	  fts_send_message_varargs(obj, fts_s_name, 1, a);
 	}
       else
 	obj = fts_eval_object_description( patcher, ac, at);
@@ -485,7 +486,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 	  fts_atom_t a;
 	  
 	  fts_set_int(&a, 1);
-	  fts_send_message(obj, fts_s_persistence, 1, &a);
+	  fts_send_message_varargs(obj, fts_s_persistence, 1, &a);
 	}
       
       return obj;
@@ -911,7 +912,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    p += 4;
 
 
-	    fts_send_message(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos]);
+	    fts_send_message_varargs(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos]);
 	  }
 	break;
 
@@ -1674,7 +1675,7 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 
   /* send a dump message to the object to give it the opportunity to save its data */
   fts_set_object(&a, (fts_object_t *)saver_dumper);
-  fts_send_message(obj, fts_s_dump, 1, &a);
+  fts_send_message_varargs(obj, fts_s_dump, 1, &a);
 }
 
 

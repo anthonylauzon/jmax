@@ -148,7 +148,7 @@ vecdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-vecdisplay_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   int size = this->size;
@@ -454,9 +454,8 @@ vecdisplay_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, sym_bounds, vecdisplay_set_bounds);
   fts_class_message_varargs(cl, fts_s_clear, vecdisplay_clear);
   
-  fts_class_inlet_int(cl, 0, vecdisplay_number);
-  fts_class_inlet_float(cl, 0, vecdisplay_number);
-  fts_class_inlet_varargs(cl, 0, vecdisplay_list);
+  fts_class_inlet_number(cl, 0, vecdisplay_number);
+  fts_class_inlet_varargs(cl, 0, vecdisplay_varargs);
   fts_class_inlet(cl, 0, ivec_type, vecdisplay_ivec);
   fts_class_inlet(cl, 0, fvec_type, vecdisplay_fvec);
   fts_class_inlet(cl, 0, cvec_type, vecdisplay_cvec);

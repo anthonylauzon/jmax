@@ -213,10 +213,10 @@ trigger_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(trigger_t), trigger_init, trigger_delete);
 
-  fts_class_inlet_varargs(cl, 0, trigger_anything);
-  fts_class_set_default_handler(cl, trigger_anything);
+  fts_class_input_handler(cl, trigger_anything);
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 

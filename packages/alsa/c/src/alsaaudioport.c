@@ -1047,7 +1047,7 @@ alsaaudioport_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 
 static void alsaaudioport_instantiate(fts_class_t *cl)
 {
-    fts_class_init( cl, sizeof( alsaaudioport_t), alsaaudioport_init, alsaaudioport_delete);
+    fts_class_init(cl, NULL, sizeof( alsaaudioport_t), alsaaudioport_init, alsaaudioport_delete);
 
     /* debug print */
     fts_class_message_varargs(cl, fts_s_print, alsaaudioport_print);

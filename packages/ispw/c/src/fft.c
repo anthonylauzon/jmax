@@ -496,7 +496,7 @@ fft_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, fft_put);
   
-  fts_class_message_varargs(cl, fts_s_bang, fft_bang);
+  fts_class_inlet_bang(cl, 0, fft_bang);
   fts_class_message_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
 
   fts_dsp_declare_inlet(cl, 0);
@@ -510,7 +510,7 @@ ifft_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, ifft_put);
 
-  fts_class_message_varargs(cl, fts_s_bang, fft_bang);
+  fts_class_inlet_bang(cl, 0, fft_bang);
   fts_class_message_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
 
   fts_dsp_declare_inlet(cl, 0);

@@ -349,7 +349,7 @@ count_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("reverse"), count_mode_reverse);
   fts_class_message_varargs(cl, fts_s_set, count_set);
   fts_class_message_varargs(cl, fts_new_symbol("reset"), count_reset);
-  fts_class_message_varargs(cl, fts_s_bang, count_step);
+  fts_class_inlet_bang(cl, 0, count_step);
   
   fts_class_inlet_number(cl, 1, count_set_begin);
   fts_class_inlet_number(cl, 2, count_set_end);

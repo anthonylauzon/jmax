@@ -43,7 +43,7 @@ typedef struct
  */
 
 static void
-fifo_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fifo_t *this = (fifo_t *)o;
 
@@ -73,21 +73,6 @@ fifo_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-fifo_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    fifo_input_atom(o, 0, 0, 1, at);
-  else if(ac > 1)
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, tuple);
-      fifo_input_atom(o, 0, 0, 1, &a);
-    }
-}
-
-static void
 fifo_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fifo_t *this = (fifo_t *)o;
@@ -106,7 +91,7 @@ fifo_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_atom_t *atom = (fts_atom_t *)fts_fifo_read_pointer(&this->fifo);
 
-      fts_outlet_varargs(o, 0, 1, atom);
+      fts_outlet_atom(o, 0, atom);
       fts_atom_void(atom);
 
       fts_fifo_incr_read(&this->fifo, sizeof(fts_atom_t));
@@ -122,7 +107,7 @@ fifo_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       fts_atom_t *atom = (fts_atom_t *)fts_fifo_read_pointer(&this->fifo);
       
-      fts_outlet_varargs(o, 0, 1, atom);
+      fts_outlet_atom(o, 0, atom);
       fts_atom_void(atom);
       
       fts_fifo_incr_read(&this->fifo, sizeof(fts_atom_t));
@@ -187,14 +172,14 @@ fifo_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fifo_t), fifo_init, fifo_delete);
 
-  fts_class_inlet_varargs(cl, 0, fifo_input_atoms);
+  fts_class_message_void(cl, fts_s_next, fifo_next);
+  fts_class_message_void(cl, fts_s_flush, fifo_flush);
+  fts_class_message_void(cl, fts_s_clear, fifo_clear);
 
-  fts_class_message_varargs(cl, fts_s_bang, fifo_next);
-  fts_class_message_varargs(cl, fts_s_next, fifo_next);
-  fts_class_message_varargs(cl, fts_s_flush, fifo_flush);
-  fts_class_message_varargs(cl, fts_s_clear, fifo_clear);
+  fts_class_inlet_bang(cl, 0, fifo_next);
+  fts_class_inlet(cl, 0, NULL, fifo_input);
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_atom(cl, 0);
 }
 
 void

@@ -410,7 +410,7 @@ static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
 
 static void halaudioport_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( halaudioport_t), halaudioport_init, halaudioport_delete);
+  fts_class_init(cl, sizeof( halaudioport_t), halaudioport_init, halaudioport_delete);
 }
 
 void halaudioport_config( void)

@@ -35,42 +35,27 @@ typedef struct
 } print_t;
 
 static void
-print_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-
-  fts_object_destroy((fts_object_t *)this->stream);
-}
-
-static void
-print_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  print_t *this = (print_t *)o;
-
-  if(this->prompt)
-    fts_spost(this->stream, "%s: ", this->prompt);
-
-  /* ordinary message */
-  fts_spost_symbol(this->stream, s);
-  fts_spost(this->stream, " ");
-  fts_spost_atoms(this->stream, ac, at);
-  fts_spost(this->stream, "\n");
-}
-
-static void
-print_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   print_t *this = (print_t *)o;
 
   if(this->prompt)
     fts_spost(this->stream, "%s: ", this->prompt);
   
-  if(ac == 1)
+  if(s != NULL)
     {
+      /* ordinary message */
+      fts_spost_symbol(this->stream, s);
+      fts_spost(this->stream, " ");
+    }
+
+  if(ac == 1 && !fts_is_symbol(at))
+    {
+      /* single argument */
       if(fts_is_object(at))
 	{
 	  fts_object_t *obj = fts_get_object(at);	  
-	  fts_method_t meth = fts_class_get_method(fts_object_get_class(obj), fts_s_print);
+	  fts_method_t meth = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_print);
 	  fts_atom_t a;
 	  
 	  if(meth)
@@ -80,7 +65,7 @@ print_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      return;
 	    }
 	  
-	  meth = fts_class_get_method(fts_object_get_class(obj), fts_s_post);
+	  meth = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_post);
 	  
 	  if(meth)
 	    {
@@ -95,13 +80,19 @@ print_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_spost_atoms(this->stream, 1, at);
       fts_spost(this->stream, "\n");
     }
-  else
-    {
-      /* varargs */
+  else if(ac > 0)
+  {
+    /* multiple args */
+    if(s == NULL)
       fts_spost(this->stream, "(", this->prompt);
-      fts_spost_atoms(this->stream, ac, at);
+
+    fts_spost_atoms(this->stream, ac, at);
+
+    if(s == NULL)
       fts_spost(this->stream, ")\n");
-    }
+  }
+  else if(s == NULL)
+    fts_spost(this->stream, "<bang>\n");
 }
 
 /**********************************************************************
@@ -127,8 +118,7 @@ print_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(print_t), print_init, 0);
 
-  fts_class_inlet_varargs(cl, 0, print_varargs);
-  fts_class_set_default_handler(cl, print_message);
+  fts_class_input_handler(cl, print_input);
 }
 
 void

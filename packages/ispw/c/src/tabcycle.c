@@ -207,7 +207,7 @@ class_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, tabcycle_put);
 
-  fts_class_message_varargs(cl, fts_s_bang, tabcycle_bang);
+  fts_class_inlet_bang(cl, 0, tabcycle_bang);
   fts_class_message_varargs(cl, fts_s_set, tabcycle_set);
 
   fts_dsp_declare_inlet(cl, 0);

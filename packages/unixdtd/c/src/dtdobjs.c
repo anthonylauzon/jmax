@@ -428,7 +428,7 @@ static void readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
 static void readsf_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(readsf_t), readsf_init, readsf_delete);
+  fts_class_init(cl, NULL, sizeof(readsf_t), readsf_init, readsf_delete);
 
   fts_class_message_varargs(cl, fts_s_put, readsf_put);
 
@@ -744,7 +744,7 @@ static void writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 static void 
 writesf_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(writesf_t), writesf_init, writesf_delete);
+  fts_class_init(cl, NULL, sizeof(writesf_t), writesf_init, writesf_delete);
 
   fts_class_message_varargs(cl, fts_s_put, writesf_put);
 

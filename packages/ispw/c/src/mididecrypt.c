@@ -312,7 +312,7 @@ static void decrypt_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol( "enable"), decrypt_enable);
   fts_class_message_varargs(cl, fts_new_symbol( "format"), decrypt_format);
 
-  fts_class_message_varargs(cl, fts_s_bang, decrypt_bang);
+  fts_class_inlet_bang(cl, 0, decrypt_bang);
   fts_class_inlet_int(cl, 0, decrypt_int);
 
   fts_class_inlet_int(cl, 1, decrypt_chn);

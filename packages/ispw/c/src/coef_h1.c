@@ -279,7 +279,7 @@ sigcoef_hlshelf1_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, sigcoef_hlshelf1_put);
 
-  fts_class_message_varargs(cl, fts_s_bang, sigcoef_hlshelf1_bang);
+  fts_class_inlet_bang(cl, 0, sigcoef_hlshelf1_bang);
 
   fts_class_inlet_float(cl, 0, sigcoef_hlshelf1_in0);
   fts_class_inlet_float(cl, 1, sigcoef_hlshelf1_in1);

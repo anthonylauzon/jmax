@@ -116,7 +116,7 @@ accum_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 2, accum_mul);
   fts_class_inlet_float(cl, 2, accum_mul);
 
-  fts_class_message_varargs(cl, fts_s_bang, accum_bang);
+  fts_class_inlet_bang(cl, 0, accum_bang);
   fts_class_inlet_int(cl, 0, accum_number);
   fts_class_inlet_float(cl, 0, accum_number);
 

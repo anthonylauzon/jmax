@@ -37,6 +37,7 @@ typedef struct _note_
   fts_object_t head;
   int pitch;
   double duration;
+  fts_array_t properties;
 } note_t;
 
 #define NOTE_DEF_PITCH 64

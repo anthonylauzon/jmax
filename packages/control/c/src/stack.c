@@ -39,7 +39,7 @@ typedef struct
  */
 
 static void
-stack_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   stack_t *this = (stack_t *)o;
   fts_atom_t a;
@@ -47,21 +47,6 @@ stack_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_set_void(&a);
   fts_atom_assign(&a, at);
   fts_stack_push(&this->stack, fts_atom_t, a);
-}
-
-static void
-stack_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    stack_input_atom(o, 0, 0, 1, at);
-  else if(ac > 1)
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, tuple);
-      stack_input_atom(o, 0, 0, 1, &a);
-    }
 }
 
 static void
@@ -82,7 +67,7 @@ stack_pop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   while(n-- && top >= 0)
     {
-      fts_outlet_varargs(o, 0, 1, stack + top);
+      fts_outlet_atom(o, 0, stack + top);
       fts_atom_void(stack + top);
       fts_stack_pop(&this->stack, 1);
 
@@ -99,7 +84,7 @@ stack_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   while(top >= 0)
     {
-      fts_outlet_varargs(o, 0, 1, stack + top);
+      fts_outlet_atom(o, 0, stack + top);
       fts_atom_void(stack + top);
       fts_stack_pop(&this->stack, 1);
       top = fts_stack_top(&this->stack);
@@ -147,14 +132,15 @@ stack_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(stack_t), stack_init, stack_delete);
 
-  fts_class_inlet_number(cl, 0, stack_input_atom);
-  fts_class_inlet_symbol(cl, 0, stack_input_atom);
-  fts_class_inlet_varargs(cl, 0, stack_input_atoms);
-
-  fts_class_message_varargs(cl, fts_s_bang, stack_pop);
   fts_class_message_varargs(cl, fts_new_symbol("pop"), stack_pop);
   fts_class_message_varargs(cl, fts_s_flush, stack_flush);
   fts_class_message_varargs(cl, fts_s_clear, stack_clear);
+
+  fts_class_inlet_bang(cl, 0, stack_pop);
+  fts_class_inlet_number(cl, 0, stack_input);
+  fts_class_inlet_symbol(cl, 0, stack_input);
+  fts_class_inlet_atom(cl, 0, stack_input);
+
 
   fts_class_outlet_varargs(cl, 0);
 }

@@ -85,7 +85,7 @@ gfloat_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   gfloat_t *this = (gfloat_t *)o;
   double f;
 
-  if(ac && fts_is_number(at))
+  if(ac > 0 && fts_is_number(at))
     f = this->value + fts_get_number_float(at);
   else
     f = this->value + 1.0;
@@ -132,10 +132,10 @@ gfloat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_value, gfloat_number);
   fts_class_message_varargs(cl, fts_s_save_dotpat, gfloat_save_dotpat); 
 
-  fts_class_message_varargs(cl, fts_s_bang, gfloat_bang);
   fts_class_message_varargs(cl, fts_s_set, gfloat_set);
   fts_class_message_varargs(cl, fts_new_symbol("incr"), gfloat_incr);
 
+  fts_class_inlet_bang(cl, 0, gfloat_bang);
   fts_class_inlet_number(cl, 0, gfloat_number);
   fts_class_inlet_varargs(cl, 0, gfloat_varargs);
 

@@ -44,7 +44,7 @@ change_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       fts_atom_release(&this->state);
       this->state = at[0];
-      fts_outlet_send(o, 0, 0, 1, at);
+      fts_outlet_atom(o, 0, at);
     }
 }
 
@@ -57,7 +57,7 @@ change_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       fts_atom_release(&this->state);
       this->state = at[0];
-      fts_outlet_send(o, 0, 0, 1, at);
+      fts_outlet_atom(o, 0, at);
     }
 }
 
@@ -70,58 +70,28 @@ change_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       fts_atom_release(&this->state);
       this->state = at[0];
-      fts_outlet_send(o, 0, 0, 1, at);
+      fts_outlet_atom(o, 0, at);
     }
 }
 
 static void
-change_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+change_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   change_t *this = (change_t *)o;
 
   if(!fts_atom_compare(&this->state, at))
     {
       fts_atom_assign(&this->state, at);
-      fts_outlet_varargs(o, 0, 1, at);
+      fts_outlet_atom(o, 0, at);
     }
 }
 
 static void
-change_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    change_single(o, 0, 0, 1, at);
-  else if(ac > 0)
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-
-      fts_set_object(&a, tuple);
-      change_single(o, 0, 0, 1, &a);
-    }
-}
-
-static void
-change_set_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   change_t *this = (change_t *)o;
 
   fts_atom_assign(&this->state, at);
-}
-
-static void
-change_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    change_set_single(o, 0, 0, 1, at);
-  else if(ac > 0)
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-
-      fts_set_object(&a, tuple);
-      change_set_single(o, 0, 0, 1, &a);
-    }
 }
 
 static void
@@ -130,7 +100,9 @@ change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   change_t *this = (change_t *)o;
 
   fts_set_void(&this->state);
-  change_set_varargs(o, 0, 0, ac, at);  
+
+  if(ac > 0)
+    fts_send_message(o, fts_s_set, ac, at);
 }
 
 static void
@@ -146,16 +118,16 @@ change_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(change_t), change_init, change_delete);
 
-  fts_class_message_varargs(cl, fts_s_set, change_set_varargs);
+  fts_class_message_varargs(cl, fts_s_set, change_set);
   
   fts_class_inlet_int(cl, 0, change_int);
   fts_class_inlet_float(cl, 0, change_float);
   fts_class_inlet_symbol(cl, 0, change_symbol);
-  fts_class_inlet_varargs(cl, 0, change_varargs);
+  fts_class_inlet_atom(cl, 0, change_input);
 
-  fts_class_inlet_varargs(cl, 1, change_set_varargs);
+  fts_class_inlet_atom(cl, 1, change_set);
 
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_atom(cl, 0);
 }
 
 void

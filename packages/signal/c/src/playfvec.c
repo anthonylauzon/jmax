@@ -253,15 +253,6 @@ play_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-play_from_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  play_t *this = (play_t *)o;
-
-  this->position = this->segment->begin;
-  this->mode = mode_play;
-}
-
-static void 
 play_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_t *this = (play_t *)o;
@@ -319,13 +310,10 @@ play_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   play_t *this = (play_t *)o;
 
-  if(ac > 0 && fts_is_object(at) && fts_get_class(at) == fvec_type)
-    {
-      segment_set(this->segment, ac, at);
-      
-      this->position = this->segment->begin;
-      this->mode = mode_play;
-    }
+  segment_set(this->segment, ac, at);
+
+  this->position = this->segment->begin;
+  this->mode = mode_play;
 }
 
 static void 
@@ -533,8 +521,6 @@ play_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(play_t), play_init, play_delete);
 
   fts_class_message_varargs(cl, fts_s_put, play_put);
-
-  fts_class_message_varargs(cl, fts_s_bang, play_from_begin);
 
   /* transport */
   fts_class_message_varargs(cl, fts_new_symbol("play"), play_play);

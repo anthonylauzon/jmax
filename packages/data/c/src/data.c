@@ -21,7 +21,6 @@
 
 #include <data/c/include/data.h>
 
-extern void value_config(void);
 extern void vec_config(void);
 extern void ivec_config(void);
 extern void fvec_config(void);
@@ -96,7 +95,6 @@ data_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 void
 data_config(void)
 {
-  value_config();
   vec_config();
   ivec_config();
   fvec_config();

@@ -114,21 +114,6 @@ tup_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-tup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    tup_input_single(o, winlet, s, 1, at);
-  else
-    {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, (fts_object_t *)tuple);
-      tup_input_single(o, winlet, s, 1, &a);
-    }
-}
-
-static void
 tup_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
 {
   if(fts_is_symbol(at))
@@ -319,7 +304,6 @@ tup_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(tup_t), tup_init, tup_delete);
 
-  fts_class_message_varargs(cl, fts_s_bang, tup_output);
   fts_class_message_varargs(cl, fts_s_set, tup_set);
 
   fts_class_message_varargs(cl, fts_new_symbol("mode"), tup_set_mode);
@@ -329,13 +313,10 @@ tup_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("trigger"), tup_set_trigger);
   fts_class_message_varargs(cl, fts_new_symbol("require"), tup_set_require);
 
-  fts_class_inlet_number(cl, 0, tup_input_single);
-  fts_class_inlet_symbol(cl, 0, tup_input_single);
-  fts_class_inlet_varargs(cl, 0, tup_varargs);
+  fts_class_inlet_bang(cl, 0, tup_output);
+  fts_class_inlet_atom(cl, 0, tup_input_single);
 
-  fts_class_inlet_number(cl, 1, tup_input_single);
-  fts_class_inlet_symbol(cl, 1, tup_input_single);
-  fts_class_inlet_varargs(cl, 1, tup_varargs);
+  fts_class_inlet_bang(cl, 1, tup_input_single);
 
   fts_class_outlet_varargs(cl, 0);
 }
@@ -353,9 +334,9 @@ typedef struct _untup_
 } untup_t;
 
 static void
-untup_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+untup_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_varargs(o, 0, 1, at);
+  fts_outlet_atom(o, 0, at);
 }
 
 static void
@@ -371,7 +352,7 @@ untup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   for(i=n-1; i>=0; i--)
     {
       if(!fts_is_void(at + i))
-	fts_outlet_varargs(o, i, 1, at + i);
+	fts_outlet_atom(o, i, at + i);
     }
 }
 
@@ -396,12 +377,12 @@ untup_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(untup_t), untup_init, NULL);
 
-  fts_class_inlet_int(cl, 0, untup_input_single);
-  fts_class_inlet_float(cl, 0, untup_input_single);
-  fts_class_inlet_symbol(cl, 0, untup_input_single);
+  fts_class_inlet_int(cl, 0, untup_atom);
+  fts_class_inlet_float(cl, 0, untup_atom);
+  fts_class_inlet_symbol(cl, 0, untup_atom);
   fts_class_inlet_varargs(cl, 0, untup_varargs);
 
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_atom(cl, 0);
 }
 
 /************************************************
@@ -426,15 +407,7 @@ cotup_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-cotup_append_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  cotup_t *this = (cotup_t *)o;
-
-  fts_array_append(&this->array, ac, at);
-}
-
-static void
-cotup_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cotup_output(fts_object_t *o)
 {
   cotup_t *this = (cotup_t *)o;
   int size = fts_array_get_size(&this->array);
@@ -443,15 +416,31 @@ cotup_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   int i;
 
   for(i=0; i<size; i++)
-    {
-      output[i] = atoms[i];
-      fts_atom_refer(output + i);
-    }
+  {
+    output[i] = atoms[i];
+    fts_atom_refer(output + i);
+  }
 
   fts_outlet_varargs(o, 0, size, output);
 
   for(i=0; i<size; i++)
     fts_atom_release(output + i);
+}
+
+static void
+cotup_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cotup_t *this = (cotup_t *)o;
+
+  cotup_output(o);
+}
+
+static void
+cotup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cotup_t *this = (cotup_t *)o;
+
+  fts_array_append(&this->array, ac, at);
 }
 
 static void
@@ -507,12 +496,12 @@ cotup_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(cotup_t), cotup_init, cotup_delete);
 
   fts_class_message_varargs(cl, fts_s_set, cotup_set);
-  fts_class_message_varargs(cl, fts_s_bang, cotup_output);
-  fts_class_message_varargs(cl, fts_s_clear, cotup_clear);
-  fts_class_message_varargs(cl, fts_s_flush, cotup_flush);
+  fts_class_message_void(cl, fts_s_clear, cotup_clear);
+  fts_class_message_void(cl, fts_s_flush, cotup_flush);
 
-  fts_class_inlet_varargs(cl, 0, cotup_append_atoms);
-
+  fts_class_inlet_bang(cl, 0, cotup_bang);
+  fts_class_inlet_varargs(cl, 0, cotup_varargs);
+  
   fts_class_outlet_varargs(cl, 0);
 }
 
@@ -523,9 +512,9 @@ cotup_instantiate(fts_class_t *cl)
  */
 
 static void
-detup_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+detup_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_varargs(o, 0, 1, at);
+  fts_outlet_atom(o, 0, at);
 }
 
 static void
@@ -536,7 +525,7 @@ detup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   for(i=0; i<ac; i++)
     {
       if(!fts_is_void(at + i))
-	fts_outlet_varargs(o, 0, 1, at + i);
+	fts_outlet_atom(o, 0, at + i);
     }
 }
 
@@ -545,9 +534,9 @@ detup_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_object_t), NULL, NULL); 
 
-  fts_class_inlet_int(cl, 0, detup_input_single);
-  fts_class_inlet_float(cl, 0, detup_input_single);
-  fts_class_inlet_symbol(cl, 0, detup_input_single);
+  fts_class_inlet_int(cl, 0, detup_input_atom);
+  fts_class_inlet_float(cl, 0, detup_input_atom);
+  fts_class_inlet_symbol(cl, 0, detup_input_atom);
   fts_class_inlet_varargs(cl, 0, detup_varargs);
 
   fts_class_outlet_varargs(cl, 0);
@@ -560,95 +549,73 @@ detup_instantiate(fts_class_t *cl)
  */
 
 static void
-getup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getup_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  cotup_t *this = (cotup_t *)o;
-
-  fts_array_init(&this->array, 0, 0);
-}
-
-static void
-getup_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  cotup_t *this = (cotup_t *)o;
-
-  fts_array_destroy(&this->array);
-}
-
-static void
-getup_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  cotup_t *this = (cotup_t *)o;
-
-  fts_array_clear(&this->array);
-  fts_array_append_symbol(&this->array, s);
-  fts_array_append(&this->array, ac, at);
-  
-  cotup_output(o, 0, 0, 0, 0);
-}
-
-static void
-getup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-
-  if(ac == 1)
+  if(fts_is_object(at))
     {
-      if(fts_is_object(at))
+      cotup_t *this = (cotup_t *)o;
+      fts_object_t *input = fts_get_object(at);
+      fts_class_t *class = fts_object_get_class(input);
+      fts_method_t method = fts_class_get_method_varargs(class, fts_s_get_array);
+      
+      if(method)
 	{
-	  cotup_t *this = (cotup_t *)o;
-	  fts_object_t *input = fts_get_object(at);
-	  fts_class_t *class = fts_object_get_class(input);
-	  fts_method_t method = fts_class_get_method(class, fts_s_get_array);
+	  fts_atom_t a;
+	  fts_array_clear(&this->array);
 	  
-	  if(method)
-	    {
-	      fts_atom_t a;
-	      fts_array_clear(&this->array);
-	      
-	      /* get object state as array */
-	      fts_set_pointer(&a, &this->array);
-	      method(input, 0, fts_s_get_array, 1, &a);
-	      
-	      /* output array */
-	      cotup_output(o, 0, 0, 0, 0);
-	    }
-	  else
-	    fts_object_signal_runtime_error(o, "cannot get tuple from %s object", fts_object_get_class_name(input));
+	  /* get object state as array */
+	  fts_set_pointer(&a, &this->array);
+	  method(input, 0, fts_s_get_array, 1, &a);
+	  
+	  /* output array */
+	  cotup_output(o);
 	}
       else
-	fts_outlet_varargs(o, 0, 1, at);
+	fts_object_signal_runtime_error(o, "cannot get tuple from %s object", fts_object_get_class_name(input));
     }
   else
-    fts_outlet_varargs(o, 0, ac, at);
+    fts_outlet_atom(o, 0, at);
 }
 
 static void
 getup_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(cotup_t), getup_init, getup_delete);
+  fts_class_init(cl, sizeof(cotup_t), cotup_init, cotup_delete);
 
-  fts_class_set_default_handler(cl, getup_message);
-  fts_class_inlet_varargs(cl, 0, getup_varargs);
+  fts_class_inlet_atom(cl, 0, getup_object);
   fts_class_outlet_varargs(cl, 0);
 }
 
 static void
-messtup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(fts_is_symbol(at))
-    fts_outlet_send(o, 0, fts_get_symbol(at), ac - 1, at + 1);
+  cotup_t *this = (cotup_t *)o;
+
+  if(s == 0)
+    {
+      if(fts_is_symbol(at))
+	fts_outlet_message(o, 0, fts_get_symbol(at), ac - 1, at + 1);
+      else
+	fts_object_signal_runtime_error(o, "tuple doesn't start with a symbol");
+    }
   else
-    fts_object_signal_runtime_error(o, "tuple doesn't start with a symbol");
+    {
+      fts_array_clear(&this->array);
+      fts_array_append_symbol(&this->array, s);
+      fts_array_append(&this->array, ac, at);
+      
+      cotup_output(o);
+    }
 }
 
 static void
 messtup_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(fts_object_t), NULL, NULL);
+  fts_class_init(cl, sizeof(cotup_t), cotup_init, cotup_delete);
   
-  fts_class_inlet_varargs(cl, 0, messtup_varargs);  
+  fts_class_input_handler(cl, messtup_input); 
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_message(cl, 0);
 }
 
 /************************************************

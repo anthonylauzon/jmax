@@ -56,7 +56,7 @@ messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
   if (ac > 0)
     {
       if (fts_is_symbol( at))
-	fts_outlet_send( (fts_object_t *)data, 0, fts_get_symbol(at), ac-1, at+1);
+	fts_outlet_message( (fts_object_t *)data, 0, fts_get_symbol(at), ac-1, at+1);
       else
 	fts_outlet_varargs( (fts_object_t *)data, 0, ac, at);
     }
@@ -65,12 +65,11 @@ messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
 }
 
 static void
-messconst_eval( messconst_t *this)
+messconst_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_patcher_t *patcher = fts_object_get_patcher( (fts_object_t *)this);
-  fts_status_t status;
-
-  status = fts_expression_reduce( this->expression, patcher, this->ac, this->at, messconst_expression_callback, this);
+  messconst_t *this = (messconst_t *)o;
+  fts_patcher_t *patcher = fts_object_get_patcher(o);
+  fts_status_t status = fts_expression_reduce( this->expression, patcher, this->ac, this->at, messconst_expression_callback, this);
 
   if (status != fts_ok)
     fts_object_signal_runtime_error( (fts_object_t *)this, "%s", fts_status_get_description( status));
@@ -78,7 +77,7 @@ messconst_eval( messconst_t *this)
 
 
 static void
-messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_click(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
 
@@ -91,7 +90,7 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_timebase_add_call(fts_get_timebase(), o, messconst_off, 0, MESSCONST_FLASH_TIME);
     }
 
-  messconst_eval( this);
+  messconst_eval(o, 0, 0, 0, 0);
 }
 
 static void
@@ -113,7 +112,7 @@ messconst_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
  
 static void 
-messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
   int ninlets;
@@ -169,23 +168,20 @@ messconst_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-messconst_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_set_argument(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
 
-  if(ac == 1)
-    fts_atom_assign(this->at + winlet, at);
-  else
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, tuple);
-      fts_atom_assign(this->at + winlet, &a);
-    }
+  fts_atom_assign(this->at + winlet, at);
+}
 
-  if (winlet == 0)
-    messconst_eval( this);
+static void
+messconst_set_first_and_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messconst_t *this = (messconst_t *) o;
+
+  fts_atom_assign(this->at, at);
+  messconst_eval(o, 0, 0, 0, 0);
 }
 
 /************************************************
@@ -238,7 +234,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* if old one, then we must call the set method by hand, giving as argument the description */
   if(!new)
-    messconst_set( (fts_object_t *)this, fts_system_inlet, fts_s_set, ac, at);
+    messconst_set_expression( (fts_object_t *)this, fts_system_inlet, fts_s_set, ac, at);
 }
 
 static void
@@ -256,16 +252,21 @@ messconst_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(messconst_t), messconst_init, messconst_delete);
 
-  fts_class_message_varargs(cl, fts_s_set, messconst_set);
+  fts_class_message_varargs(cl, fts_s_set, messconst_set_expression);
   fts_class_message_varargs(cl, fts_s_dump, messconst_dump);
 
   fts_class_message_varargs(cl, fts_s_update_real_time, messconst_update_real_time); 
   fts_class_message_varargs(cl, fts_s_spost_description, messconst_spost_description); 
-  
-  fts_class_message_varargs(cl, fts_s_bang, messconst_send);
-  
-  fts_class_inlet_varargs(cl, 0, messconst_varargs);
-  fts_class_outlet_anything(cl, 0);
+
+  fts_class_message_varargs(cl, fts_new_symbol("click"), messconst_click);
+
+  fts_class_inlet_bang(cl, 0, messconst_eval);
+  fts_class_inlet_atom(cl, 0, messconst_set_first_and_eval); 
+
+  fts_class_inlet_atom(cl, 1, messconst_set_argument);
+
+  fts_class_outlet_message(cl, 0);
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

@@ -99,50 +99,33 @@ prepend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-prepend_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  prepend_set_realize(o, ac, at);
-}
-
-static void
-prepend_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+prepend_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   prepend_t *x = (prepend_t *)o;
-  fts_atom_t sat[max_prepend];
-  int n;
 
-  if (ac + x->ac + 1 >= max_prepend)
-    ac = max_prepend - x->ac - 1;
-  
-  n = ac + x->ac + 1;
-  memcpy(&sat[0], x->at, x->ac * sizeof(fts_atom_t));
-  fts_set_symbol(&sat[x->ac], s);
-  memcpy(&sat[x->ac + 1], at, ac * sizeof(fts_atom_t));
-  
-  if (x->presym)
-    fts_outlet_send(o, 0, x->presym, n, sat);
+  if(s == fts_s_set)
+    prepend_set_realize(o, ac, at);
   else
-    fts_outlet_varargs(o, 0, n, sat);
-}
+    {
+      fts_atom_t sat[max_prepend];
+      int onset = 0;
+      int n;
 
-static void
-prepend_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  prepend_t *x = (prepend_t *)o;
-  fts_atom_t sat[max_prepend];
-  int n;
+      if(s != NULL)
+	{
+	  fts_set_symbol(&sat[x->ac], s);	  
+	  onset = 1;
+	}
 
-  if(ac + x->ac >= max_prepend)
-    ac = max_prepend - x->ac;
-  
-  n = ac + x->ac;
-  memcpy(&sat[0], x->at, x->ac * sizeof(fts_atom_t));
-  memcpy(&sat[x->ac], at, ac * sizeof(fts_atom_t));
-  
-  if (x->presym)
-    fts_outlet_send(o, 0, x->presym, n, sat);
-  else
-    fts_outlet_varargs(o, 0, n, sat);
+      if(ac + x->ac + onset >= max_prepend)
+	ac = max_prepend - x->ac - onset;
+      
+      n = ac + x->ac + onset;
+      memcpy(&sat[0], x->at, x->ac * sizeof(fts_atom_t));
+      memcpy(&sat[x->ac + onset], at, ac * sizeof(fts_atom_t));
+
+      fts_outlet_send(o, 0, x->presym, n, sat);
+    }
 }
 
 static void
@@ -150,12 +133,10 @@ prepend_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(prepend_t), prepend_init, prepend_delete);
 
-  fts_class_message_varargs(cl, fts_s_set, prepend_set);
+  fts_class_input_handler(cl, prepend_input);
 
-  fts_class_set_default_handler(cl, prepend_message);
-  fts_class_inlet_varargs(cl, 0, prepend_varargs);
-
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_message(cl, 0);
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void

@@ -83,7 +83,7 @@ int_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(int_t), int_init, 0);
 
-  fts_class_message_varargs(cl, fts_s_bang, int_bang);
+  fts_class_inlet_bang(cl, 0, int_bang);
   fts_class_inlet_int(cl, 0, int_input);
   fts_class_inlet_float(cl, 0, int_input);
   fts_class_inlet_varargs(cl, 0, int_list);

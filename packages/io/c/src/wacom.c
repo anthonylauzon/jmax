@@ -814,7 +814,7 @@ wacom_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 wacom_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(wacom_t), wacom_init, wacom_delete);
+  fts_class_init(cl, NULL, sizeof(wacom_t), wacom_init, wacom_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol("reset"), wacom_reset);
   }

@@ -53,20 +53,22 @@ switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-switch_default(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+switch_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   switch_t *this = (switch_t *)o;
 
-  if(winlet == 0 && this->on != 0)
-    fts_outlet_send(o, 0, s, ac, at);
+  if(winlet == 0)
+    {
+      if(this->on != 0)
+	fts_outlet_send(o, 0, s, ac, at);
+    }
+  else if(s == 0 && ac > 0 && fts_is_number(at))
+    this->on = fts_get_number_int(at);    
 }
 
 static void
-switch_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+switch_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  switch_t *this = (switch_t *)o;
-
-  this->on = fts_get_number_int(at);
 }
 
 /************************************************************
@@ -79,13 +81,12 @@ switch_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(switch_t), switch_init, NULL);
 
-  fts_class_inlet_varargs(cl, 0, switch_default);
-  fts_class_set_default_handler(cl, switch_default);
+  fts_class_input_handler(cl, switch_input);
 
-  fts_class_inlet_int(cl, 1, switch_set);
-  fts_class_inlet_float(cl, 1, switch_set);
+  fts_class_inlet_thru(cl, 0);
+  fts_class_inlet_number(cl, 1, switch_dummy); /* number dummy */
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void

@@ -1352,8 +1352,6 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_import, fmat_import);
   fts_class_message_varargs(cl, fts_s_export, fmat_export);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void 

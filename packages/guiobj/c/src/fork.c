@@ -66,10 +66,9 @@ fork_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_object_t), fork_init, 0);
 
-  fts_class_inlet_varargs(cl, 0, fork_input);
-  fts_class_set_default_handler(cl, fork_input);
-
   fts_class_message_varargs(cl, fts_new_symbol("set_outlets"), fork_set_outlets);
+
+  fts_class_input_handler(cl, fork_input);
 }
 
 void fork_config(void)

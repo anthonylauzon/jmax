@@ -100,6 +100,15 @@ fts_array_set(fts_array_t *array, int ac, const fts_atom_t *at)
 }
 
 void
+fts_array_set_element(fts_array_t *array, int index, const fts_atom_t *at)
+{
+  if(index >= array->size)
+    fts_array_set_size(array, index + 1);
+
+  fts_atom_assign(array->atoms + index, at);
+}
+
+void
 fts_array_insert(fts_array_t *array, int index, int ac, const fts_atom_t *at)
 {
   int size = array->size;

@@ -37,7 +37,12 @@ extern fts_symbol_t seqsym_segment;
 
 /* events */
 extern fts_symbol_t seqsym_note;
+extern fts_symbol_t seqsym_midi;
 extern fts_symbol_t seqsym_seqmess;
+extern fts_symbol_t seqsym_pitch;
+extern fts_symbol_t seqsym_duration;
+extern fts_symbol_t seqsym_velocity;
+extern fts_symbol_t seqsym_channel;
 
 /* messages */
 extern fts_symbol_t seqsym_insert;

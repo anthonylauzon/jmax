@@ -34,7 +34,7 @@ fts_object_t *runtime_error_handler = 0;
 fts_symbol_t sym_runtime_error_post = 0;
 
 static void
-error_object_default_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+error_object_input_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /* should we signal an error here? */
 }
@@ -55,10 +55,10 @@ error_object_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_error_object_t), error_object_init, NULL);
 
-  fts_class_set_default_handler(cl, error_object_default_handler);
+  fts_class_input_handler(cl, error_object_input_handler);
 
-  fts_class_inlet_anything(cl, 0);
-  fts_class_outlet_anything(cl, 0);
+  fts_class_inlet_thru(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 
   fts_dsp_declare_inlet(cl, 0);
 }

@@ -697,8 +697,6 @@ cvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("ifft"), cvec_ifft);
 
   fts_class_message_varargs(cl, fts_s_size, cvec_size);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 /********************************************************************

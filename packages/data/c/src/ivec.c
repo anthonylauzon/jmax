@@ -1159,8 +1159,6 @@ ivec_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_import, ivec_import);
   fts_class_message_varargs(cl, fts_s_export, ivec_export);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 /********************************************************************

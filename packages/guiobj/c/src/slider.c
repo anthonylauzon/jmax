@@ -73,21 +73,21 @@ slider_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_client_send_message_real_time(o, fts_s_value, 1, &a);  
 }
 
-static void 
-slider_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
-  int n;
 
-  n = fts_get_int_arg( ac, at, 0, 0);
+  if(ac > 0 && fts_is_number(at))
+  {
+    int n = fts_get_number_int(at);
 
-  if ( this->n != n)
+    if (this->n != n)
     {
       this->n = n;
-      fts_update_request( (fts_object_t *)this);
+      fts_update_request(o);
     }
-
-  fts_outlet_int( o, 0, n);
+  }
 }
 
 static void
@@ -98,64 +98,36 @@ slider_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_outlet_int(o, 0, this->n);
 }
 
-
-static void
-slider_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+slider_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
-  int n = fts_get_int(at);
-
+  int n = fts_get_number_int(at);
+  
   if (this->n != n)
     {
       fts_update_request(o);
       this->n = n;
     }
-
+  
   fts_outlet_int(o, 0, n);
 }
 
-
-static void
-slider_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+slider_set_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   slider_t *this = (slider_t *)o;
-  int n = (int)fts_get_float(at);
 
-  if (this->n != n)
-    {
-      fts_update_request(o);
-      this->n = n;
-    }
-
-  fts_outlet_int(o, 0, n);
+  if(ac > 0 && fts_is_number(at))
+    slider_number(o, 0, 0, 1, at);
 }
 
 static void
 slider_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if (fts_is_int(at))
-    slider_int(o, winlet, fts_s_int, 1, at);
-  else if (fts_is_float(at))
-    slider_float(o, winlet, fts_s_float, 1, at);
-}
-
-static void 
-slider_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
   slider_t *this = (slider_t *)o;
 
-  if(fts_is_number(at))
-    {
-      int n = fts_get_number_int(at);
-      
-      if (this->n != n)
-	{
-	  fts_update_request(o);
-	  this->n = n;
-	}
-      
-      fts_outlet_int(o, 0, n);
-    }
+  slider_set_and_output(o, 0, 0, 1, at);
 }
 
 static void
@@ -236,23 +208,6 @@ slider_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
       fts_set_int(&a, this->persistence);
       fts_return(&a);
-    }
-}
-
-static void
-slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  slider_t *this = (slider_t *)o;
-
-  if(ac > 0 && fts_is_number(at))
-    {
-      int n = fts_get_number_int(at);
-
-      if (this->n != n)
-	{
-	  this->n = n;
-	  fts_update_request(o);
-	}
     }
 }
 
@@ -375,24 +330,23 @@ slider_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_save_dotpat, slider_save_dotpat); 
 
-  fts_class_message_varargs(cl, fts_s_value, slider_set_value); 
+  fts_class_message_varargs(cl, fts_s_value, slider_set_and_output); 
   fts_class_message_varargs(cl, fts_s_min_value, slider_set_min); 
   fts_class_message_varargs(cl, fts_s_max_value, slider_set_max); 
   fts_class_message_varargs(cl, fts_s_orientation, slider_set_orientation); 
-
-  fts_class_message_varargs(cl, fts_s_bang, slider_bang);
-  fts_class_message_varargs(cl, fts_s_set, slider_set);
-  fts_class_message_varargs(cl, fts_s_send, slider_send);
-  fts_class_message_varargs(cl, fts_s_range, slider_set_range);
-
-  fts_class_inlet_int(cl, 0, slider_int);
-  fts_class_inlet_float(cl, 0, slider_float);
-  fts_class_inlet_varargs(cl, 0, slider_varargs);
 
   /* property daemons for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_min_value, slider_put_min);
   fts_class_add_daemon(cl, obj_property_put, fts_s_max_value, slider_put_max);
   fts_class_add_daemon(cl, obj_property_put, fts_s_orientation, slider_put_orientation);
+
+  fts_class_message_varargs(cl, fts_s_set, slider_set);
+  fts_class_message_varargs(cl, fts_s_range, slider_set_range);
+
+  fts_class_message_varargs(cl, fts_s_send, slider_set_and_output);
+
+  fts_class_inlet_number(cl, 0, slider_number);
+  fts_class_inlet_varargs(cl, 0, slider_varargs);
 
   fts_class_outlet_number(cl, 0);
 }

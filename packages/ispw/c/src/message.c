@@ -98,19 +98,6 @@ static void init_eval(void)
   ev_s_star  = fts_new_symbol("*");
 }
 
-static void
-messbox_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_class_t *cl = fts_object_get_class(o);
-  fts_method_t meth = fts_class_get_method(cl, s);
-
-  if(meth == NULL)
-    meth = fts_class_get_default_handler(cl);
-
-  if(meth != NULL)
-    (*meth)(o, fts_system_inlet, s, ac, at);
-}
-
 /*
    Atom stack: this module can become pubblic, if needed;
    it provide stack frame based allocation of atoms arrays.
@@ -595,7 +582,7 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   messbox_t *this = (messbox_t *) o;
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_s_delete, 0, 0);
+  fts_send_message_varargs((fts_object_t *)this->atom_list, fts_s_delete, 0, 0);
 }
 
 
@@ -757,16 +744,23 @@ static void messbox_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 
 static void messbox_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{  
+{
   messbox_t *this = (messbox_t *) o;
 
-  if(this->value == 0 && winlet == fts_system_inlet)
-    {
-      this->value = 1;
-      fts_update_request(o);
+  fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
+}
 
-      fts_timebase_add_call(fts_get_timebase(), o, messbox_off, 0, DEFAULT_DURATION);
-    }
+static void messbox_click(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messbox_t *this = (messbox_t *) o;
+
+  if(this->value == 0)
+  {
+    this->value = 1;
+    fts_update_request(o);
+
+    fts_timebase_add_call(fts_get_timebase(), o, messbox_off, 0, DEFAULT_DURATION);
+  }
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
@@ -822,7 +816,8 @@ static void messbox_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, messbox_get_value);
 
-  fts_class_message_varargs(cl, fts_s_bang, messbox_eval);
+  fts_class_message_varargs(cl, fts_new_symbol("click"), messbox_click);
+  
   fts_class_message_varargs(cl, fts_s_set, messbox_set);
   fts_class_message_varargs(cl, fts_s_append, messbox_append);
   fts_class_message_varargs(cl, fts_s_clear, messbox_clear);
@@ -832,7 +827,8 @@ static void messbox_instantiate(fts_class_t *cl)
   fts_class_inlet_symbol(cl, 0, messbox_eval);
   fts_class_inlet_varargs(cl, 0, messbox_eval);
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_message(cl, 0);
+  fts_class_outlet_varargs(cl, 0);
 }
 
 void messbox_config(void)

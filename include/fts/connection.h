@@ -44,9 +44,9 @@ struct fts_connection {
   fts_object_t *dst;
   int winlet;
 
-  fts_symbol_t selector; /* cache message selector */
-  fts_class_t *class; /* message cache class (type, NULL == varargs) */
-  fts_method_t method; /* message cache method */
+  fts_class_t *cache_type; /* message cache class */
+  int cache_varargs; /* message cache varargs flag */
+  fts_method_t cache_method; /* message cache method */
 
   fts_connection_type_t type;
 
@@ -54,6 +54,22 @@ struct fts_connection {
   fts_connection_t *next_same_src;
 };
 
+#define fts_connection_get_source(c) ((c)->src)
+#define fts_connection_get_outlet(c) ((c)->woutlet)
+
+#define fts_connection_get_destination(c) ((c)->dst)
+#define fts_connection_get_inlet(c) ((c)->winlet)
+
+#define fts_connection_get_next_of_same_source(c) ((c)->next_same_src)
+#define fts_connection_get_next_of_same_destination(c) ((c)->next_same_dst)
+
+#define fts_connection_cache_get_type(c) ((c)->cache_type)
+#define fts_connection_cache_get_method(c) ((c)->cache_method)
+#define fts_connection_cache_get_varargs(c) ((c)->cache_varargs)
+
+#define fts_connection_cache_set_type(c, t) ((c)->cache_type = (t))
+#define fts_connection_cache_set_method(c, m) ((c)->cache_method = (m))
+#define fts_connection_cache_set_varargs(c, v) ((c)->cache_varargs = (v))
 
 FTS_API fts_connection_t *fts_connection_new(fts_object_t *src, int out, fts_object_t *dst, int in, fts_connection_type_t type);
 FTS_API void fts_connection_delete(fts_connection_t *conn);

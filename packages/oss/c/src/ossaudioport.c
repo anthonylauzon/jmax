@@ -292,7 +292,7 @@ static void ossaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
 
 static void ossaudioport_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( ossaudioport_t), ossaudioport_init, ossaudioport_delete);
+  fts_class_init(cl, NULL, sizeof( ossaudioport_t), ossaudioport_init, ossaudioport_delete);
 }
 
 void ossaudioport_config( void)

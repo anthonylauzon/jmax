@@ -356,7 +356,7 @@ static void dtdserver_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 static void dtdserver_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof(dtdserver_t), dtdserver_init, dtdserver_delete);
+  fts_class_init(cl, NULL, sizeof(dtdserver_t), dtdserver_init, dtdserver_delete);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, dtdserver_select);
 }

@@ -125,7 +125,7 @@ drunk_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     case 1:
       if(fts_is_number(at + 0))
 	{
-	  int n;
+	  int n = 0;
 	  
 	  if(ac > 0 && fts_is_number(at))
 	    n = fts_get_number_int(at);
@@ -182,7 +182,7 @@ drunk_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set, drunk_set);
 
-  fts_class_message_varargs(cl, fts_s_bang, drunk_bang);
+  fts_class_inlet_bang(cl, 0, drunk_bang);
   fts_class_inlet_number(cl, 0, drunk_number);
   fts_class_inlet_varargs(cl, 0, drunk_varargs);
 

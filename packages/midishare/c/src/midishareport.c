@@ -464,7 +464,7 @@ midishareport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void
 midishareport_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(midishareport_t), midishareport_init, midishareport_delete);
+  fts_class_init(cl, NULL, sizeof(midishareport_t), midishareport_init, midishareport_delete);
   
   fts_midiport_class_init(cl);
   

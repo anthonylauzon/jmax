@@ -43,20 +43,11 @@
 /* forward declarations  */
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 
-static fts_status_description_t class_not_found_error_description = {
-  "object or template not found"
-};
-static fts_status_t class_not_found_error = &class_not_found_error_description;
-
 static fts_status_description_t class_instantiation_error_description = {
   "class instantiation error"
 };
-static fts_status_t class_instantiation_error = &class_instantiation_error_description;
 
-static fts_status_description_t invalid_class_name_error_description = {
-  "invalid class name"
-};
-static fts_status_t invalid_class_name_error = &invalid_class_name_error_description;
+static fts_status_t class_instantiation_error = &class_instantiation_error_description;
 
 
 /******************************************************************************
@@ -147,10 +138,15 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
   if (eval_data->obj == NULL)
     {
       if (ac == 1 && fts_is_object( at))
-	{
-	  eval_data->obj = fts_get_object( at);
-	  fts_patcher_add_object( eval_data->patcher, eval_data->obj);
-	  return fts_ok;
+      {
+        eval_data->obj = fts_get_object( at);
+
+        /* all objects in patcher should have at least one inlet */
+        if(fts_object_get_inlets_number(eval_data->obj) == 0)
+          fts_object_set_inlets_number(eval_data->obj, 1);
+        
+        fts_patcher_add_object( eval_data->patcher, eval_data->obj);
+        return fts_ok;
 	}
 
       return class_instantiation_error;
@@ -159,14 +155,8 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
     {
       if(ac > 0 && fts_is_symbol(at))
 	{
-	  fts_class_t *cl = fts_object_get_class(eval_data->obj);
-	  fts_symbol_t selector = fts_get_symbol(at);
-	  fts_method_t meth = fts_class_get_method(cl, selector);
-
-	  if(meth)
+	  if(fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1))
 	    {
-	      (*meth)(eval_data->obj, fts_system_inlet, selector, ac - 1, at + 1);
-
 	      if(fts_object_get_error(eval_data->obj) == NULL)
 		return fts_ok;
 	    }
@@ -442,7 +432,7 @@ fts_object_unclient(fts_object_t *obj)
 {
   if ( fts_object_get_id( obj) > FTS_NO_ID)
     {
-      fts_send_message(obj, fts_s_closeEditor, 0, 0);
+      fts_send_message_varargs(obj, fts_s_closeEditor, 0, 0);
       fts_client_release_object(obj);
     }
 }
@@ -541,12 +531,12 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 	  fts_atom_t a;
 
 	  fts_set_symbol(&a, name);
-	  fts_send_message(new, fts_s_name, 1, &a);
+	  fts_send_message_varargs(new, fts_s_name, 1, &a);
 	}
 
       /* try to rescue the old object state to the new one */
       fts_set_object(&a, old);
-      fts_send_message(new, fts_s_redefine, 1, &a);
+      fts_send_message_varargs(new, fts_s_redefine, 1, &a);
 
       /* remove the old object from the patcher */
       fts_patcher_remove_object(old->patcher, old);

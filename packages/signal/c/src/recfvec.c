@@ -123,19 +123,14 @@ rec_fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-rec_fvec_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fvec_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   rec_fvec_t *this = (rec_fvec_t *)o;
+  
+  rec_fvec_set(o, 0, 0, ac, at);
 
   this->index = this->begin;
   this->mode = mode_rec;
-}
-
-static void 
-rec_fvec_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  rec_fvec_set(o, 0, 0, ac, at);
-  rec_fvec_bang(o, 0, 0, 0, 0);
 }
 
 static void 
@@ -316,7 +311,6 @@ rec_fvec_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, rec_fvec_put);
 
-  fts_class_message_varargs(cl, fts_s_bang, rec_fvec_bang);
   fts_class_message_varargs(cl, fts_new_symbol("rec"), rec_fvec_rec);
   fts_class_message_varargs(cl, fts_new_symbol("pause"), rec_fvec_pause);
   fts_class_message_varargs(cl, fts_s_stop, rec_fvec_stop);
@@ -327,13 +321,13 @@ rec_fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, rec_fvec_set);
 
   fts_dsp_declare_inlet(cl, 0);
-  fts_class_inlet_varargs(cl, 0, rec_fvec_varargs);
   fts_class_inlet(cl, 0, fvec_type, rec_fvec_set_fvec);
+  fts_class_inlet_varargs(cl, 0, rec_fvec_varargs);
   fts_class_inlet_number(cl, 1, rec_fvec_set_begin);
   fts_class_inlet_number(cl, 2, rec_fvec_set_end);
 
   fts_class_outlet_bang(cl, 0);
-    }
+}
 
 void
 signal_rec_fvec_config(void)

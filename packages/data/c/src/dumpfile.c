@@ -167,7 +167,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	  fts_object_t *object = fts_get_object(at);
 	  fts_class_t *class = fts_object_get_class(object);
 	  fts_symbol_t class_name = fts_class_get_name(class);
-	  fts_method_t meth_dump = fts_class_get_method(class, fts_s_dump);
+	  fts_method_t meth_dump = fts_class_get_method_varargs(class, fts_s_dump);
 
 	  if(meth_dump)
 	    {
@@ -341,10 +341,11 @@ dumpfile_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dumpfile_t), dumpfile_init, dumpfile_delete);
 
+  fts_class_message_varargs(cl, fts_s_dump, dumpfile_dump_object); 
+
   fts_class_message_varargs(cl, fts_s_open, dumpfile_open);
   fts_class_message_varargs(cl, fts_s_close, dumpfile_close);
 
-  fts_class_message_varargs(cl, fts_s_dump, dumpfile_dump_object); 
   fts_class_message_varargs(cl, fts_new_symbol("restore"), dumpfile_restore_object);
 }
 

@@ -207,8 +207,6 @@ delayline_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
 
   fts_class_message_varargs(cl, fts_s_put_epilogue, delayline_put);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 /************************************************************

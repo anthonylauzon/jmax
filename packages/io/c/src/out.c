@@ -42,44 +42,44 @@ out_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-out_int_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_number_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_t *this = (out_t *)o;
   
-  fts_bytestream_output_char(this->stream, (unsigned char)fts_get_int(at));
+  fts_bytestream_output_char(this->stream, (unsigned char)fts_get_number_int(at));
   fts_bytestream_flush(this->stream);
 }
 
 static void
-out_list_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_varargs_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_t *this = (out_t *)o;
   int i;
 
   for(i=0; i<ac; i++)
-    if(fts_is_int(at + i))
-      fts_bytestream_output_char(this->stream, (unsigned char)fts_get_int(at + i));
+    if(fts_is_number(at + i))
+      fts_bytestream_output_char(this->stream, (unsigned char)fts_get_number_int(at + i));
 
   fts_bytestream_flush(this->stream);
 }
 
 static void
-out_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_t *this = (out_t *)o;
   
-  fts_bytestream_output_char(this->stream, (unsigned char)fts_get_int(at));
+  fts_bytestream_output_char(this->stream, (unsigned char)fts_get_number_int(at));
 }
 
 static void
-out_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_t *this = (out_t *)o;
   int i;
 
   for(i=0; i<ac; i++)
-    if(fts_is_int(at + i))
-      fts_bytestream_output_char(this->stream, (unsigned char)fts_get_int(at + i));
+    if(fts_is_number(at + i))
+      fts_bytestream_output_char(this->stream, (unsigned char)fts_get_number_int(at + i));
 }
 
 /************************************************************
@@ -111,12 +111,14 @@ static void
 out_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(out_t), out_init, 0);
+
+  fts_class_inlet_bang(cl, 0, out_bang);
   
-  fts_class_message_varargs(cl, fts_s_bang, out_bang);
-  fts_class_inlet_int(cl, 0, out_int_and_flush);
-  fts_class_inlet_varargs(cl, 0, out_list_and_flush);
-  fts_class_inlet_int(cl, 1, out_int);
-  fts_class_inlet_varargs(cl, 1, out_list);
+  fts_class_inlet_number(cl, 0, out_number_and_flush);
+  fts_class_inlet_varargs(cl, 0, out_varargs_and_flush);
+  
+  fts_class_inlet_number(cl, 1, out_number);
+  fts_class_inlet_varargs(cl, 1, out_varargs);
   }
 
 void

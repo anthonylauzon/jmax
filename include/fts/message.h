@@ -147,7 +147,8 @@ FTS_API fts_object_t *fts_objstack[];
 
 
 /* messages */
-FTS_API void fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /* outlets */
 FTS_API void fts_outlet_bang(fts_object_t *o, int woutlet);
@@ -155,9 +156,10 @@ FTS_API void fts_outlet_int(fts_object_t *o, int woutlet, int n);
 FTS_API void fts_outlet_float(fts_object_t *o, int woutlet, float f);
 FTS_API void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s);
 FTS_API void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj);
+FTS_API void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* at);
 FTS_API void fts_outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at);
 FTS_API void fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
+FTS_API void fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 /**
  * Return a value from a method.
  * The returned value is an atom that is copied by the calling code.
@@ -167,4 +169,8 @@ FTS_API void fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int a
  * @ingroup message
  */
 FTS_API void fts_return( fts_atom_t *p);
+FTS_API void fts_return_int(int x);
+FTS_API void fts_return_float(float x);
+FTS_API void fts_return_symbol(fts_symbol_t x);
+FTS_API void fts_return_object(fts_object_t *x);
 

@@ -42,17 +42,16 @@ struct fts_class {
   fts_equals_function_t equals_function;
 
   fts_instantiate_fun_t instantiate_fun;
-  
+
   fts_method_t constructor;
   fts_method_t deconstructor;
 
   fts_package_t *package;
 
-  fts_hashtable_t *messages;
+  fts_hashtable_t *methods;
 
   int ninlets;
-  fts_hashtable_t *inlets;
-  fts_method_t default_handler;
+  fts_method_t input_handler;
 
   int noutlets;
   int out_alloc;
@@ -67,19 +66,17 @@ struct fts_class {
   struct daemon_list *daemons;
 };
 
+#define fts_class_get_name(C) ((C)->name)
+
+#define fts_class_get_constructor(c) ((c)->constructor)
+#define fts_class_get_deconstructor(c) ((c)->deconstructor)
+
 /* Class hash function and equality function */
 #define fts_class_get_hash_function(cl) ((cl)->hash_function)
 #define fts_class_get_equals_function(cl) ((cl)->equals_function)
 
 #define fts_class_set_hash_function( cl, fun) ((cl)->hash_function = fun)
 #define fts_class_set_equals_function( cl, fun) ((cl)->equals_function = fun)
-
-
-/* Status return values */
-FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
-FTS_API fts_status_description_t fts_InletOutOfRange;
-FTS_API fts_status_description_t fts_OutletOutOfRange;
-FTS_API fts_status_description_t fts_CannotInstantiate;
 
 FTS_API fts_class_t *fts_class_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name);
 
@@ -88,52 +85,73 @@ FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
 
 #define fts_class_is_primitive(CL) ((CL)->typeid < FTS_FIRST_OBJECT_TYPEID)
 
-FTS_API void fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor);
+FTS_API void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor);
 
 /* default input handler */
-#define fts_class_get_default_handler(c) ((c)->default_handler)
-#define fts_class_set_default_handler(c, m) ((c)->default_handler = (m))
+#define fts_class_get_input_handler(c) ((c)->input_handler)
+#define fts_class_input_handler(c, m) ((c)->input_handler = (m))
 
 FTS_API void fts_class_default_error_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-/* method definition */
+/* message definition */
+FTS_API void fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t mth);
 FTS_API void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth);
+
+/* marcros for most popular message types */
+#define fts_class_message_void(c, s, m) fts_class_message((c), (s), fts_void_class, (m))
+#define fts_class_message_int(c, s, m) fts_class_message((c), (s), fts_int_class, (m))
+#define fts_class_message_float(c, s,  m) fts_class_message((c), (s), fts_float_class, (m))
+#define fts_class_message_number(c, s,  m) do{ \
+  fts_class_message((c), (s), fts_int_class, (m)); \
+    fts_class_message((c), (s), fts_float_class, (m));} while(0)
+#define fts_class_message_symbol(c, s,  m) fts_class_message((c), (s), fts_symbol_class, (m))
+#define fts_class_message_atom(c, s,  m) fts_class_message((c), (s), NULL, (m))
+
+/* inlet definition */
 FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t mth);
-FTS_API void fts_class_inlet_anything(fts_class_t *cl, int winlet);
+FTS_API void fts_class_inlet_varargs(fts_class_t *cl, int winlet, fts_method_t mth);
+FTS_API void fts_class_inlet_thru(fts_class_t *cl, int winlet);
 
 /* outlet definition */
 FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *type);
-FTS_API void fts_class_outlet_message(fts_class_t *cl, int woutlet, fts_symbol_t selector);
-FTS_API void fts_class_outlet_anything(fts_class_t *cl, int woutlet);
 
 /* marcros for most popular inlet types */
+#define fts_class_inlet_bang(c, i, m) fts_class_inlet((c), (i), fts_void_class, (m))
+#define fts_class_inlet_void(c, i, m) fts_class_inlet((c), (i), fts_void_class, (m))
 #define fts_class_inlet_int(c, i, m) fts_class_inlet((c), (i), fts_int_class, (m))
 #define fts_class_inlet_float(c, i, m) fts_class_inlet((c), (i), fts_float_class, (m))
 #define fts_class_inlet_number(c, i, m) do{ \
   fts_class_inlet((c), (i), fts_int_class, (m)); \
   fts_class_inlet((c), (i), fts_float_class, (m));} while(0)
 #define fts_class_inlet_symbol(c, i, m) fts_class_inlet((c), (i), fts_symbol_class, (m))
-#define fts_class_inlet_varargs(c, i, m) fts_class_inlet((c), (i), NULL, (m))
+#define fts_class_inlet_atom(c, i, m) fts_class_inlet((c), (i), NULL, (m))
 
 /* marcros for most popular outlet types */
+#define fts_class_outlet_bang(c, i) fts_class_outlet((c), (i), fts_void_class)
+#define fts_class_outlet_void(c, i) fts_class_outlet((c), (i), fts_void_class)
 #define fts_class_outlet_int(c, i) fts_class_outlet((c), (i), fts_int_class)
 #define fts_class_outlet_float(c, i) fts_class_outlet((c), (i), fts_float_class)
 #define fts_class_outlet_number(c, i) do{ \
   fts_class_outlet((c), (i), fts_int_class); \
   fts_class_outlet((c), (i), fts_float_class);} while(0)
 #define fts_class_outlet_symbol(c, i) fts_class_outlet((c), (i), fts_symbol_class)
+#define fts_class_outlet_atom(c, i) fts_class_outlet((c), (i), NULL)
+
 #define fts_class_outlet_varargs(c, i) fts_class_outlet((c), (i), NULL)
+#define fts_class_outlet_message(c, i) fts_class_outlet((c), (i), NULL)
+#define fts_class_outlet_thru(c, i) fts_class_outlet((c), (i), NULL)
 
-/* marcros for most popular outlet messages */
-#define fts_class_outlet_bang(c, i) fts_class_outlet_message((c), (i), fts_s_bang)
-
-#define fts_class_get_name(C) ((C)->name)
-
-FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s);
-#define fts_class_get_constructor(c) ((c)->constructor)
-#define fts_class_get_deconstructor(c) ((c)->deconstructor)
+/* get (message) methods */
+FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, int *varargs);
+FTS_API fts_method_t fts_class_get_method_varargs(fts_class_t *cl, fts_symbol_t s);
 
 FTS_API const int fts_system_inlet;
+
+/* Status return values */
+FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
+FTS_API fts_status_description_t fts_InletOutOfRange;
+FTS_API fts_status_description_t fts_OutletOutOfRange;
+FTS_API fts_status_description_t fts_CannotInstantiate;
 
 /*****************************************************************************
  *

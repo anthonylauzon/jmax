@@ -86,11 +86,7 @@ ispw_target_send(fts_object_t *target, fts_symbol_t s, int ac, const fts_atom_t 
     fts_label_send((fts_label_t *)target, s, ac, at);
   else if(s != NULL)
     {
-      fts_method_t meth = fts_class_get_method(cl, s);
-      
-      if(meth != NULL)
-	(*meth)(target, fts_system_inlet, s, ac, at);
-      else
+      if(!fts_send_message(target, s, ac, at))
 	fts_object_signal_runtime_error(target, "don't understand message %s (from ispw message box)", s);
     }
 }

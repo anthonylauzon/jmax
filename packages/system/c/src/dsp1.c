@@ -124,7 +124,7 @@ dsp_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 0, dsp_on_off);
   fts_class_inlet_float(cl, 0, dsp_on_off);
   
-  fts_class_message_varargs(cl, fts_s_bang, dsp_print);
+  fts_class_inlet_bang(cl, 0, dsp_print);
   fts_class_message_varargs(cl, fts_s_print, dsp_print);
 
   fts_class_message_varargs(cl, fts_new_symbol("save"), dsp_save);

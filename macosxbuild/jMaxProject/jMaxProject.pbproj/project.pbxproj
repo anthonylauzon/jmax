@@ -8586,7 +8586,6 @@
 				F8512378028BE77C01664092,
 				F8512379028BE77C01664092,
 				F851237A028BE77C01664092,
-				F851237B028BE77C01664092,
 				F851237C028BE77C01664092,
 				F851237E028BE77C01664092,
 			);
@@ -8676,12 +8675,6 @@
 			isa = PBXFileReference;
 			name = seqsym.c;
 			path = ../../packages/sequence/c/src/seqsym.c;
-			refType = 2;
-		};
-		F851237B028BE77C01664092 = {
-			isa = PBXFileReference;
-			name = seqsym.h;
-			path = ../../packages/sequence/c/src/seqsym.h;
 			refType = 2;
 		};
 		F851237C028BE77C01664092 = {
@@ -8810,7 +8803,7 @@
 			);
 			buildSettings = {
 				DEBUGGING_SYMBOLS = NO;
-				HEADER_SEARCH_PATHS = "../../packages/sequence/c/include ../../include";
+				HEADER_SEARCH_PATHS = "../../packages ../../include";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-Wno-unused";
@@ -8864,7 +8857,6 @@
 			files = (
 				F8512389028BE77D01664092,
 				F851238A028BE77D01664092,
-				F851238B028BE77D01664092,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8877,12 +8869,6 @@
 		};
 		F851238A028BE77D01664092 = {
 			fileRef = F8512376028BE77C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F851238B028BE77D01664092 = {
-			fileRef = F851237B028BE77C01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};

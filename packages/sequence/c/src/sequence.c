@@ -27,9 +27,9 @@
 #include <ftsprivate/client.h>
 #include <ftsprivate/patcher.h>
 #include <ftsconfig.h>
-#include <sequence.h>
-#include <track.h>
-#include "seqsym.h"
+#include <sequence/c/include/sequence.h>
+#include <sequence/c/include/track.h>
+#include <sequence/c/include/seqsym.h>
 #include "seqmidi.h"
 
 #define SEQUENCE_ADD_BLOCK_SIZE 64
@@ -818,8 +818,6 @@ sequence_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_import, sequence_import);
   fts_class_message_varargs(cl, fts_s_export, sequence_export_track_by_index);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void

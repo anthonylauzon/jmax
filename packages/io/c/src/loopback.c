@@ -74,19 +74,10 @@ loopback_output_char(fts_bytestream_t *stream, unsigned char c)
  *
  */
 static void
-loopback_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+loopback_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_bytestream_t *stream = (fts_bytestream_t *)o;
-  unsigned char c = fts_get_int(at);
-
-  loopback_output_char(stream, c);
-}
-
-static void
-loopback_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_bytestream_t *stream = (fts_bytestream_t *)o;
-  unsigned char c = fts_get_float(at);
+  unsigned char c = fts_get_number_int(at);
 
   loopback_output_char(stream, c);
 }
@@ -94,7 +85,7 @@ loopback_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 #define LIST_SIZE 128
 
 static void
-loopback_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+loopback_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_bytestream_t *stream = (fts_bytestream_t *)o;
 
@@ -152,9 +143,8 @@ loopback_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(loopback_t), loopback_init, 0);
   
-  fts_class_inlet_int(cl, 0, loopback_int);
-  fts_class_inlet_float(cl, 0, loopback_float);
-  fts_class_inlet_varargs(cl, 0, loopback_list);
+  fts_class_inlet_number(cl, 0, loopback_number);
+  fts_class_inlet_varargs(cl, 0, loopback_varargs);
   
   fts_class_outlet_int(cl, 0);
 }

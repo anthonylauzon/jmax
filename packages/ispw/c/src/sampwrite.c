@@ -188,7 +188,7 @@ class_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_put, sampwrite_put);
   
   fts_class_message_varargs(cl, fts_s_set, sampwrite_set);  
-  fts_class_message_varargs(cl, fts_s_bang, sampwrite_bang);
+  fts_class_inlet_bang(cl, 0, sampwrite_bang);
   fts_class_inlet_int(cl, 0, sampwrite_set_by_int);
   
   fts_dsp_declare_inlet(cl, 0);

@@ -359,7 +359,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
 
   if(obj)
     {
-      fts_method_t meth_post = fts_class_get_method(fts_object_get_class(obj), fts_s_post);
+      fts_method_t meth_post = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_post);
 
       if(meth_post)
 	{

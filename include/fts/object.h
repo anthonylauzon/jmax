@@ -52,6 +52,12 @@ struct fts_object
   fts_connection_t **in_conn;
   fts_connection_t **out_conn;
 
+  /* message cache */
+  fts_symbol_t cache_selector;
+  fts_class_t *cache_type;
+  int cache_varargs;
+  fts_method_t cache_method;
+
   /* object dynamic properties */
   fts_plist_t *properties;
 
@@ -106,6 +112,18 @@ FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_get_id(o) ((o)->client_id)
 #define fts_object_has_id(o) (fts_object_get_id(o) > FTS_NO_ID)
 #define fts_object_get_class(o) ((o)->cl)
+
+#define fts_object_get_outlet_connection(o, i) ((o)->out_conn[i])
+
+#define fts_object_message_cache_get_selector(o) ((o)->cache_selector)
+#define fts_object_message_cache_get_type(o) ((o)->cache_type)
+#define fts_object_message_cache_get_varargs(o) ((o)->cache_varargs)
+#define fts_object_message_cache_get_method(o) ((o)->cache_method)
+
+#define fts_object_message_cache_set_selector(o, s) ((o)->cache_selector = (s))
+#define fts_object_message_cache_set_type(o, t) ((o)->cache_type = (t))
+#define fts_object_message_cache_set_varargs(o, v) ((o)->cache_varargs = (v))
+#define fts_object_message_cache_set_method(o, m) ((o)->cache_method = (m))
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);

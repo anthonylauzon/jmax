@@ -31,8 +31,6 @@ fts_class_t *mat_type = 0;
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
 
-#define MAT_BLOCK_SIZE 64
-
 /********************************************************
  *
  *  utility functions
@@ -744,8 +742,6 @@ mat_instantiate(fts_class_t *cl)
             
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export); 
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void

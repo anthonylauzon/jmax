@@ -41,7 +41,7 @@ typedef struct
 static void
 retard_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_varargs(o, 0, 1, at);
+  fts_outlet_atom(o, 0, at);
 }
 
 static void
@@ -52,29 +52,7 @@ retard_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if(this->time > 0.0)
     fts_timebase_add_call(fts_get_timebase(), o, retard_output, at, this->time);
   else
-    fts_outlet_varargs(o, 0, 1, at);
-}
-
-static void
-retard_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  retard_t *this = (retard_t *)o;
-  
-  if(this->time > 0.0)
-    {
-      if(ac == 1)
-	retard_input_atom(o, 0, 0, 1, at);
-      else if(ac > 1)
-	{
-	  fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-	  fts_atom_t a;
-	  
-	  fts_set_object(&a, tuple);
-	  retard_input_atom(o, 0, 0, 1, &a);
-	}
-    }
-  else
-    fts_outlet_varargs(o, 0, ac, at);
+    fts_outlet_atom(o, 0, at);
 }
 
 static void
@@ -131,12 +109,12 @@ retard_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 0, retard_input_atom);
   fts_class_inlet_float(cl, 0, retard_input_atom);
   fts_class_inlet_symbol(cl, 0, retard_input_atom);
-  fts_class_inlet_varargs(cl, 0, retard_input_atoms);
+  fts_class_inlet_atom(cl, 0, retard_input_atom);
 
   fts_class_inlet_int(cl, 1, retard_set_time);
   fts_class_inlet_float(cl, 1, retard_set_time);
 
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_atom(cl, 0);
 }
 
 void

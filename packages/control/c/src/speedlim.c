@@ -49,7 +49,7 @@ speedlim_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  fts_set_void(&this->state);
 	  
 	  /* send atom */
-	  fts_outlet_varargs(o, 0, 1, &output);
+	  fts_outlet_atom(o, 0, &output);
 	  
 	  /* clear stack */
 	  fts_atom_void(&output);
@@ -63,51 +63,23 @@ speedlim_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-speedlim_thru_and_close(fts_object_t *o, int winlet, int ac, const fts_atom_t *at)
-{
-  speedlim_t *this = (speedlim_t *)o;
-
-  /* close gate */
-  this->gate = 0;
-  
-  /* shedule next output */
-  fts_timebase_add_call(fts_get_timebase(), o, speedlim_output, NULL, this->time);
-  
-  /* let values thru */
-  fts_outlet_varargs(o, 0, ac, at);
-}
-
-static void
-speedlim_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+speedlim_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   speedlim_t *this = (speedlim_t *)o;
 
   if(this->gate)
-    speedlim_thru_and_close(o, 0, 1, at);
+  {
+    /* close gate */
+    this->gate = 0;
+
+    /* shedule next output */
+    fts_timebase_add_call(fts_get_timebase(), o, speedlim_output, NULL, this->time);
+
+    /* let values thru */
+    fts_outlet_varargs(o, 0, ac, at);
+  }
   else
     fts_atom_assign(&this->state, at); /* schedule for next opening */
-}
-
-static void
-speedlim_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  speedlim_t *this = (speedlim_t *)o;
-  
-  if(this->gate)
-   speedlim_thru_and_close(o, 0, ac, at);
-  else
-    {
-      if(ac == 1)
-	speedlim_input_atom(o, 0, 0, 1, at);
-      else if(ac > 1)
-	{
-	  fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-	  fts_atom_t a;
-	  
-	  fts_set_object(&a, tuple);
-	  speedlim_input_atom(o, 0, 0, 1, &a);
-	}
-    }
 }
 
 static void
@@ -140,9 +112,7 @@ speedlim_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(speedlim_t), speedlim_init, 0);
 
-  fts_class_inlet_varargs(cl, 0, speedlim_input_atoms);
-  fts_class_inlet_number(cl, 0, speedlim_input_atom);
-  fts_class_inlet_symbol(cl, 0, speedlim_input_atom);
+  fts_class_inlet_atom(cl, 0, speedlim_input);
   fts_class_inlet_number(cl, 1, speedlim_set_time);
 
   fts_class_outlet_varargs(cl, 0);

@@ -421,7 +421,7 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
       return operand_type_mismatch_error;
 
     {
-      fts_method_t mth = fts_class_get_method( fts_get_class( at), fts_s_get_element);
+      fts_method_t mth = fts_class_get_method_varargs( fts_get_class( at), fts_s_get_element);
       if (mth)
 	{
 	  fts_set_void( fts_get_return_value());
@@ -508,14 +508,10 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 
     {
       fts_symbol_t selector = fts_get_symbol( &tree->value);
-      fts_method_t mth = fts_class_get_method( fts_get_class( at), selector);
 
-      if (mth)
-	{
-	  fts_set_void( fts_get_return_value());
-	  (*mth)( fts_get_object( at), fts_system_inlet, selector, ac-1, at+1);
-	}
-      else
+      fts_set_void( fts_get_return_value());
+
+      if (!fts_send_message(fts_get_object( at), selector, ac - 1, at + 1))
 	return invalid_selector_error;
     }
 

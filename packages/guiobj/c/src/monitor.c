@@ -57,7 +57,7 @@ monitor_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-monitor_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(fts_dsp_is_active())
     fts_dsp_desactivate();
@@ -125,9 +125,12 @@ monitor_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, monitor_get_value);
 
-  fts_class_message_varargs(cl, fts_s_bang, monitor_bang);
   fts_class_message_varargs(cl, fts_s_start, monitor_start);
   fts_class_message_varargs(cl, fts_s_stop, monitor_stop);
+
+  fts_class_message_varargs(cl, fts_new_symbol("click"), monitor_toggle);
+
+  fts_class_inlet_bang(cl, 0, monitor_toggle);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);

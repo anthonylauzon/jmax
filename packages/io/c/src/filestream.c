@@ -180,16 +180,16 @@ filestream_flush(fts_bytestream_t *stream)
  */
 
 static void
-filestream_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   filestream_t *this = (filestream_t *)o;
 
   if(fts_bytestream_is_output(&this->head))
-    filestream_output_char(&this->head, (unsigned char)fts_get_int(at));
+    filestream_output_char(&this->head, (unsigned char)fts_get_number_int(at));
 }
 
 static void
-filestream_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   filestream_t *this = (filestream_t *)o;
 
@@ -356,9 +356,10 @@ filestream_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_open, filestream_open);
   fts_class_message_varargs(cl, fts_s_close, filestream_close);
-  fts_class_message_varargs(cl, fts_s_bang, filestream_bang);
-  fts_class_inlet_int(cl, 0, filestream_int);
-  fts_class_inlet_varargs(cl, 0, filestream_list);
+  
+  fts_class_inlet_bang(cl, 0, filestream_bang);
+  fts_class_inlet_number(cl, 0, filestream_number);
+  fts_class_inlet_varargs(cl, 0, filestream_varargs);
 
   fts_class_outlet_int(cl, 0);
 }

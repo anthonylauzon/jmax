@@ -27,10 +27,10 @@
 #include <ftsprivate/client.h>
 #include <ftsprivate/patcher.h>
 #include <ftsconfig.h>
-#include <note.h>
-#include <event.h>
-#include <track.h>
-#include "seqsym.h"
+#include <sequence/c/include/note.h>
+#include <sequence/c/include/event.h>
+#include <sequence/c/include/track.h>
+#include <sequence/c/include/seqsym.h>
 #include "seqmidi.h"
 #include "seqmess.h"
 
@@ -54,26 +54,26 @@ create_event(int ac, const fts_atom_t *at)
   if(type_name == fts_s_int || type_name == fts_s_float || type_name == fts_s_symbol)
     event = (event_t *)fts_object_create(event_type, NULL, 1, at + 1);
   else
+  {
+    fts_class_t *type = fts_class_get_by_name( NULL, type_name);
+
+    if(type)
     {
-      fts_class_t *type = fts_class_get_by_name( NULL, type_name);
+      fts_object_t *obj = fts_object_create(type, NULL, 0, 0);
+      fts_class_t *class = fts_object_get_class(obj);
+      fts_method_t meth_set = fts_class_get_method_varargs(class, fts_s_set_from_array);
 
-      if(type)
-	{
-	  fts_object_t *obj = fts_object_create(type, NULL, 0, 0);	
-	  fts_class_t *class = fts_object_get_class(obj);
-	  fts_method_t meth_set = fts_class_get_method(class, fts_s_set_from_array);
+      if(obj && meth_set)
+      {
+        fts_atom_t a;
 
-	  if(obj && meth_set)
-	    {
-	      fts_atom_t a;
-	      
-	      meth_set(obj, 0, 0, ac - 1, at + 1);
+        meth_set(obj, 0, 0, ac - 1, at + 1);
 
-	      fts_set_object(&a, obj);
-	      event = (event_t *)fts_object_create(event_type, NULL, 1, &a);
-	    }
-	}
+        fts_set_object(&a, obj);
+        event = (event_t *)fts_object_create(event_type, NULL, 1, &a);
+      }
     }
+  }
 
   return event;
 }
@@ -1199,8 +1199,6 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_closeEditor, track_close_editor);
 
   fts_class_message_varargs(cl, fts_new_symbol("duration"), track_duration);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 void

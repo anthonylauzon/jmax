@@ -46,7 +46,7 @@ pipe_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   /* output single atoms of current list */
   for(i=this->ac-1; i>=0; i--)
     {
-      fts_outlet_varargs(o, i, 1, atoms + i);
+      fts_outlet_atom(o, i, atoms + i);
       fts_atom_void(atoms + i);
     }
 
@@ -209,20 +209,20 @@ pipe_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(pipe_t), pipe_init, pipe_delete);
 
-  fts_class_message_varargs(cl, fts_s_bang,  pipe_bang);
+  fts_class_inlet_bang(cl, 0,  pipe_bang);
   fts_class_message_varargs(cl, fts_s_clear, pipe_clear);
   fts_class_message_varargs(cl, fts_s_flush, pipe_flush);
 
-  fts_class_inlet_varargs(cl, 0, pipe_list);
   fts_class_inlet_int(cl, 0, pipe_atom_trigger);
   fts_class_inlet_float(cl, 0, pipe_atom_trigger);
   fts_class_inlet_symbol(cl, 0, pipe_atom_trigger);
+  fts_class_inlet_varargs(cl, 0, pipe_list);
   
   fts_class_inlet_int(cl, 1, pipe_atom_right);
   fts_class_inlet_float(cl, 1, pipe_atom_right);
   fts_class_inlet_symbol(cl, 1, pipe_atom_right);
 
-  fts_class_outlet_varargs(cl, 0);
+  fts_class_outlet_atom(cl, 0);
 }
 
 void

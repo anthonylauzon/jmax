@@ -24,12 +24,141 @@
  *
  */
 #include <fts/fts.h>
-#include <sequence.h>
-#include <track.h>
-#include <note.h>
-#include "seqsym.h"
+#include <sequence/c/include/sequence.h>
+#include <sequence/c/include/track.h>
+#include <sequence/c/include/note.h>
+#include <sequence/c/include/seqsym.h>
 
 fts_class_t *note_type = 0;
+
+typedef struct
+{
+  fts_symbol_t name;
+  fts_symbol_t type;
+} note_property_t;
+
+static int note_n_properties = 0;
+static note_property_t note_properties[512];
+static fts_hashtable_t note_property_indices;
+
+static fts_atom_t *
+note_property_get_by_index(note_t *this, int index)
+{
+  if(index < fts_array_get_size(&this->properties))
+  {
+    fts_atom_t *a = fts_array_get_element(&this->properties, index);
+
+    if(!fts_is_void(a))
+      return a;
+  }
+
+  return NULL;
+}
+
+fts_atom_t *
+note_property_get(note_t *this, fts_symbol_t name)
+{
+  fts_atom_t k, a;
+
+  fts_set_symbol(&k, name);
+  if(fts_hashtable_get(&note_property_indices, &k, &a))
+    note_property_get_by_index(this, fts_get_int(&a));
+
+  return NULL;
+}
+
+static void
+note_property_set_by_index(note_t *this, int index, const fts_atom_t *value)
+{
+  fts_array_set_element(&this->properties, index, value);
+}
+
+int
+note_property_set(note_t *this, fts_symbol_t name, const fts_atom_t *value)
+{
+  fts_atom_t k, a;
+
+  fts_set_symbol(&k, name);
+  if(fts_hashtable_get(&note_property_indices, &k, &a))
+  {
+    note_property_set_by_index(this, fts_get_int(&a), value);
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
+note_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  note_t *this = (note_t *)o;
+
+  if(ac > 0)
+    note_property_set(this, s, at);
+  else
+    fts_return(note_property_get(this, s));
+}
+
+void
+note_declare_property(fts_symbol_t name, fts_symbol_t type)
+{
+  fts_atom_t k, a;
+
+  if(!fts_class_get_method_varargs(note_type, name))
+  {
+    fts_set_symbol(&k, name);
+    fts_set_int(&a, note_n_properties);
+
+    fts_hashtable_put(&note_property_indices, &k, &a);
+
+    note_properties[note_n_properties].name = name;
+    note_properties[note_n_properties].type = type;
+    
+    fts_class_message_varargs(note_type, name, note_property);
+
+    note_n_properties++;
+  }
+}
+
+void
+note_set_velocity(note_t *this, int velocity)
+{
+  fts_atom_t a;
+
+  fts_set_int(&a, velocity);
+  note_property_set_by_index(this, 0, &a);
+}
+
+int
+note_get_velocity(note_t *this)
+{
+  fts_atom_t *p = note_property_get_by_index(this, 0);
+
+  if(p)
+    return fts_get_int(p);
+  else
+    return 0;
+}
+
+void
+note_set_channel(note_t *this, int channel)
+{
+  fts_atom_t a;
+
+  fts_set_int(&a, channel);
+  note_property_set_by_index(this, 1, &a);
+}
+
+int
+note_get_channel(note_t *this)
+{
+  fts_atom_t *p = note_property_get_by_index(this, 1);
+
+  if(p)
+    return fts_get_int(p);
+  else
+    return 0;
+}
 
 /**************************************************************
  *
@@ -42,15 +171,20 @@ note_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   note_t *this = (note_t *)o;
 
-  if(fts_is_number(at))
+  if(ac > 0)
+  {
+    if(fts_is_number(at))
     {
       int pitch = fts_get_number_int(at);
-      
+
       if(pitch < 0)
-	pitch = 0;
+        pitch = 0;
 
       this->pitch = pitch;
     }
+  }
+  else
+    fts_return_int(this->pitch);
 }
   
 static void
@@ -58,15 +192,20 @@ note_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   note_t *this = (note_t *)o;
 
-  if(fts_is_number(at))
+  if(ac > 0)
+  {
+    if(fts_is_number(at))
     {
       double duration = fts_get_number_float(at);
 
       if(duration < 0.0)
-	duration = 0.0;
-      
+        duration = 0.0;
+
       this->duration = duration;
     }
+  }
+  else
+    fts_return_float(this->pitch);  
 }
 
 static void
@@ -99,8 +238,42 @@ note_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   note_t *this = (note_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int i;
 
-  fts_spost(stream, "(:note %d %d)", this->pitch, (float)this->duration);
+  fts_spost(stream, "(:note %d %f", this->pitch, this->duration);
+
+  for(i=0; i<fts_array_get_size(&this->properties); i++)
+  {
+    fts_atom_t *a = fts_array_get_element(&this->properties, i);
+    
+    if(!fts_is_void(a))
+    {
+      fts_spost(stream, ", %s: ", note_properties[i].name);
+      fts_spost_atoms(stream, 1, a);
+    }
+  }
+
+  fts_spost(stream, ")", this->pitch, this->duration);
+}
+
+static void
+note_get_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  note_t *this = (note_t *)o;
+  fts_array_t *array = fts_get_pointer(at);
+  int i;
+
+  fts_array_append_symbol(array, seqsym_pitch);
+  fts_array_append_symbol(array, fts_s_int);
+
+  fts_array_append_symbol(array, seqsym_duration);
+  fts_array_append_symbol(array, fts_s_float);
+
+  for(i=0; i<note_n_properties; i++)
+  {
+    fts_array_append_symbol(array, note_properties[i].name);
+    fts_array_append_symbol(array, note_properties[i].type);
+  }
 }
 
 static void
@@ -111,7 +284,8 @@ note_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->pitch = NOTE_DEF_PITCH;
   this->duration = NOTE_DEF_DURATION;
 
-  note_set_from_array(o, 0, 0, ac, at);  
+  note_set_from_array(o, 0, 0, ac, at);
+  fts_array_init(&this->properties, 0, 0);
 }
 
 static void
@@ -119,13 +293,20 @@ note_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(note_t), note_init, 0);
 
+  fts_class_message_varargs(cl, fts_new_symbol("get_properties"), note_get_properties);
+
   fts_class_message_varargs(cl, fts_s_get_array, note_get_array);
   fts_class_message_varargs(cl, fts_s_set_from_array, note_set_from_array);
 
   fts_class_message_varargs(cl, fts_s_post, note_post);
 
-  fts_class_message_varargs(cl, fts_new_symbol("duration"), note_duration);
-  fts_class_message_varargs(cl, fts_new_symbol("pitch"), note_pitch);
+  fts_class_message_varargs(cl, seqsym_duration, note_duration);
+  fts_class_message_varargs(cl, seqsym_pitch, note_pitch);
+
+  fts_hashtable_init(&note_property_indices, FTS_HASHTABLE_SMALL);
+  
+  note_declare_property(seqsym_velocity, fts_s_int); /* property 0 */
+  note_declare_property(seqsym_channel, fts_s_int); /* property 1 */
 }
 
 void

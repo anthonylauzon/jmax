@@ -20,7 +20,6 @@
  * 
  */
 
-
 /* This file implement the class structure */
 
 #include <string.h>
@@ -189,15 +188,6 @@ class_set_outlets_number(fts_class_t *cl, int n)
   cl->noutlets = n;
 }
 
-static int
-class_inlet_key(int winlet, fts_class_t *type)
-{
-  if(type == NULL)
-    return winlet;
-  else
-    return (type->typeid << 8) + winlet;
-}
-
 static fts_class_outlet_t *
 class_get_outlet(fts_class_t *cl, int woutlet)
 {
@@ -220,7 +210,7 @@ class_outlet_add_declaration(fts_class_outlet_t *out, const fts_atom_t *a)
   out->declarations = fts_list_append(out->declarations, a);
 }
 
-int 
+static int 
 class_outlet_get_declarations(fts_class_outlet_t *out, fts_iterator_t *iter)
 {
   int n = fts_list_get_size(out->declarations);
@@ -231,7 +221,7 @@ class_outlet_get_declarations(fts_class_outlet_t *out, fts_iterator_t *iter)
   return n;
 }
 
-int
+static int
 class_outlet_has_declaration(fts_class_outlet_t *out, const fts_atom_t *p)
 {
   fts_iterator_t iter;
@@ -252,20 +242,6 @@ class_outlet_has_declaration(fts_class_outlet_t *out, const fts_atom_t *p)
   return 0;
 }
 
-void
-fts_class_default_error_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(s == 0)
-    {
-      if(ac > 1)
-	fts_object_signal_runtime_error(o, "no tuple method at inlet %d", s, winlet);
-      else
-	fts_object_signal_runtime_error(o, "no method for %s at inlet %d", fts_get_class_name(at), winlet);
-    }
-  else
-    fts_object_signal_runtime_error(o, "don't understand %s", s);    
-}
-
 /********************************************
  *
  *  class
@@ -278,7 +254,7 @@ dummy_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 void
-fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor)
+fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor)
 {
   cl->size = size;
   cl->heap = fts_heap_new(size);
@@ -286,15 +262,144 @@ fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, ft
   cl->constructor = (constructor != NULL) ? constructor: dummy_method;
   cl->deconstructor = (deconstructor != NULL) ? deconstructor: dummy_method;
 
-  cl->messages= fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
-  cl->default_handler = fts_class_default_error_handler;
-
+  cl->methods = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
+  cl->input_handler = NULL;
   cl->ninlets = 0;
-  cl->inlets = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
 
   cl->noutlets = 0;
   cl->out_alloc = 0;
   cl->outlets = NULL;
+}
+
+/********************************************
+*
+*  method hashtable
+*
+*/
+
+typedef struct
+{
+  fts_object_t o;
+  const void *selector;
+  fts_class_t *type;
+} method_key_t;
+
+static fts_class_t *method_key_class;
+static method_key_t *method_key;
+static fts_atom_t method_key_atom;
+
+static unsigned int
+method_key_hash(const fts_atom_t *a)
+{
+  method_key_t *key = (method_key_t *)fts_get_object(a);
+
+  return (unsigned int)key->selector + (unsigned int)key->type;
+}
+
+static int
+method_key_equals(const fts_atom_t *a, const fts_atom_t *b)
+{
+  method_key_t *key_a = (method_key_t *)fts_get_object(a);
+  method_key_t *key_b = (method_key_t *)fts_get_object(b);
+
+  return (key_a->selector == key_b->selector && key_a->type == key_b->type);
+}
+
+static void
+method_key_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(method_key_t), NULL, NULL);
+
+  fts_class_set_hash_function(cl, method_key_hash);
+  fts_class_set_equals_function(cl, method_key_equals);
+}
+
+static void
+method_key_init(void)
+{
+  method_key_class = fts_class_install(NULL, method_key_instantiate);
+  method_key = (method_key_t *)fts_object_create(method_key_class, NULL, 0, 0);
+
+  fts_set_object(&method_key_atom, (fts_object_t *)method_key);
+}
+
+static method_key_t *
+method_key_new(fts_symbol_t selector, fts_class_t *type)
+{
+  method_key_t *key = (method_key_t *)fts_object_create(method_key_class, NULL, 0, 0);
+
+  key->selector = selector;
+  key->type = type;
+
+  return key;
+}
+
+typedef struct
+{
+  fts_method_t method;
+  int varargs;
+} method_handle_t;
+
+static method_handle_t *
+method_handle_new(fts_method_t method, int varargs)
+{
+  method_handle_t *handle = (method_handle_t *)fts_malloc(sizeof(method_handle_t));
+
+  handle->method = method;
+  handle->varargs = varargs;
+
+  return handle;
+}
+
+enum method_check_e {found_no_method = -1, found_method = 0, found_varargs_method = 1};
+
+static enum method_check_e
+method_check(fts_class_t *cl, const void *selector, fts_class_t *type)
+{
+  fts_atom_t a;
+
+  method_key->selector = selector;
+  method_key->type = type;
+
+  if(fts_hashtable_get(cl->methods, &method_key_atom, &a))
+  {
+    method_handle_t *handle = fts_get_pointer(&a);
+    return handle->varargs;
+  }
+
+  return -1; /* method not found */
+}
+
+static fts_method_t
+method_get(fts_class_t *cl, const void *selector, fts_class_t *type, int *varargs)
+{
+  fts_atom_t a;
+  
+  method_key->selector = selector;
+  method_key->type = type;
+  
+  if(fts_hashtable_get(cl->methods, &method_key_atom, &a))
+  {
+    method_handle_t *handle = fts_get_pointer(&a);
+
+    *varargs = handle->varargs;
+    return handle->method;
+  }
+
+  return NULL;  
+}
+
+static void
+method_put(fts_class_t *cl, const void *selector, fts_class_t *type, fts_method_t method, int varargs)
+{
+  method_key_t *key = method_key_new(selector, type);
+  method_handle_t *handle = method_handle_new(method, varargs);
+  fts_atom_t k, a;
+
+  fts_set_object(&k, key);
+  fts_set_pointer(&a, handle);
+
+  fts_hashtable_put(cl->methods, &k, &a);
 }
 
 /********************************************
@@ -303,63 +408,117 @@ fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, ft
  *
  */
 void
-fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth)
+fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t method)
 {
-  if(s != NULL)
-    {    
-      fts_atom_t k, a;
-      
-      fts_set_symbol(&k, s);
+  enum method_check_e check = method_check(cl, s, type);
+  
+  if(check == found_varargs_method && type != fts_void_class)
+    post("warning: redefinition of varargs method for message %s of class %s\n", s, fts_class_get_name(cl));
+  else if(check != found_no_method && type != NULL)
+    post("warning: redefinition of %s method for message %s of class %s\n", fts_class_get_name(type), s, fts_class_get_name(cl));
+  else if(check != found_no_method && type == NULL)
+    post("warning: redefinition of generic atom method for message %s of class %s\n", s, fts_class_get_name(cl));      
 
-      if(fts_hashtable_get( cl->messages, &k, &a))
-	post("message \"%s\" doubly defined for class %s\n", s, fts_class_get_name(cl));
-      else
-	{
-	  fts_set_pointer(&a, mth);
-	  fts_hashtable_put( cl->messages, &k, &a);
-	}
-    }
-  else
-    post("method definition with NULL selector for class %s\n", fts_class_get_name(cl)); 
+  method_put(cl, s, type, method, 0);
 }
 
 void
-fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t mth)
+fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t method)
 {
-  fts_atom_t k, a;
+  enum method_check_e check = method_check(cl, s, NULL);  
+
+  if(check == found_method)
+    post("warning: redefinition of generic atom method for message %s of class %s by varargs declaration\n", s, fts_class_get_name(cl));
+  else if(check == found_varargs_method)
+    post("warning: redefinition of varargs method for message %s of class %s\n", s, fts_class_get_name(cl));    
   
-  if(winlet < 0)
-    winlet = 0;
-  else if(winlet > CLASS_INLET_MAX)
-    winlet = CLASS_INLET_MAX;
-  
-  fts_set_int(&k, class_inlet_key(winlet, type));
-  
-  if (fts_hashtable_get( cl->inlets, &k, &a))
-    post("%s method doubly defined for class %s at inlet %d\n", (type) ? type->name : "anything", fts_class_get_name(cl), winlet);
-  else
-    {
-      /* register inlet method */
-      fts_set_pointer(&a, mth);
-      fts_hashtable_put( cl->inlets, &k, &a);
-      
-      if(winlet >= cl->ninlets)
-	class_set_inlets_number(cl, winlet + 1);
-    }
+  if(method_check(cl, s, fts_tuple_class) != found_no_method)
+    post("warning: redefinition of tuple method for message %s of class %s by varargs declaration\n", s, fts_class_get_name(cl));
+
+  /* register method void if void method not already defined */
+  if(method_check(cl, s, fts_tuple_class) != found_method)
+    method_put(cl, s, fts_void_class, method, 1);
+
+  /* register method for NULL and tuple */
+  method_put(cl, s, NULL, method, 1);
+  method_put(cl, s, fts_tuple_class, method, 1);
 }
 
-void
-fts_class_inlet_anything(fts_class_t *cl, int winlet)
+static int
+class_adjust_inlet(fts_class_t *cl, int winlet)
 {
   if(winlet < 0)
     winlet = 0;
   else if(winlet > CLASS_INLET_MAX)
     winlet = CLASS_INLET_MAX;
-  
+
   if(winlet >= cl->ninlets)
     class_set_inlets_number(cl, winlet + 1);
+
+  return winlet;
 }
 
+static int
+class_clip_inlet(fts_class_t *cl, int winlet)
+{
+  if(winlet < 0)
+    return 0;
+  else if(winlet >= cl->ninlets)
+    return cl->ninlets  - 1;
+
+  return winlet;
+}
+
+void
+fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t method)
+{
+  int n = class_adjust_inlet(cl, winlet);
+  enum method_check_e check = method_check(cl, (const void *)n, type);
+
+  if(check == found_varargs_method && type != fts_void_class)
+    post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_class_get_name(cl));
+  else if(check != found_no_method && type != NULL)
+    post("warning: redefinition of %s method for inlet %d of class %s\n", fts_class_get_name(type), n, fts_class_get_name(cl));
+  else if(check != found_no_method && type == NULL)
+    post("warning: redefinition of generic atom method for inlet %d of class %s\n", fts_class_get_name(type), n, fts_class_get_name(cl));
+
+  method_put(cl, (const void *)n, type, method, 0);
+}
+
+void
+fts_class_inlet_varargs(fts_class_t *cl, int winlet, fts_method_t method)
+{
+  int n = class_adjust_inlet(cl, winlet);
+  enum method_check_e check = method_check(cl, (const void *)n, NULL);
+
+  if(check == found_method)
+    post("warning: redefinition of generic atom method for inlet %d of class %s by varargs declaration\n", n, fts_class_get_name(cl));
+  else if(check == found_varargs_method)
+    post("warning: redefinition of varargs method for inlet %d of class %s\n", n, fts_class_get_name(cl));
+
+  if(method_check(cl, (const void *)n, fts_tuple_class) != found_no_method)
+    post("warning: redefinition of tuple method for inlet %d of class %s by varargs declaration\n", n, fts_class_get_name(cl));
+
+  /* register method void if void method not already defined */
+  if(method_check(cl, (const void *)n, fts_void_class) != found_method)
+    method_put(cl, (const void *)n, fts_void_class, method, 1);
+
+  /* register method for NULL and tuple */
+  method_put(cl, (const void *)n, NULL, method, 1);
+  method_put(cl, (const void *)n, fts_tuple_class, method, 1);
+}
+
+void
+fts_class_inlet_thru(fts_class_t *cl, int winlet)
+{
+  class_adjust_inlet(cl, winlet);
+}
+
+/**************************************************
+ *
+ *  outlet types definition
+ *
+ */
 void
 fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *class)
 {
@@ -375,62 +534,44 @@ fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *class)
   class_outlet_add_declaration(out, &a);
 }
 
-void
-fts_class_outlet_message(fts_class_t *cl, int woutlet, fts_symbol_t selector)
-{
-  fts_class_outlet_t *out;
-  fts_atom_t a;
-
-  if(woutlet >= cl->noutlets)
-    class_set_outlets_number(cl, woutlet + 1);
-    
-  out = class_get_outlet(cl, woutlet);
-
-  fts_set_symbol(&a, selector);
-  class_outlet_add_declaration(out, &a);
-}
-
-void
-fts_class_outlet_anything(fts_class_t *cl, int woutlet)
-{
-  if(woutlet >= cl->noutlets)
-    class_set_outlets_number(cl, woutlet + 1);
-}
-
-/********************************************
+/**************************************************
  *
  *  request inlet/outlet methods and definitions
  *
  */
-fts_method_t 
-fts_class_get_method(fts_class_t *cl, fts_symbol_t s)
+fts_method_t
+fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, int *varargs)
 {
-  fts_atom_t k, a;
+  fts_method_t method = method_get(cl, (const void *)s, type, varargs);
 
-  fts_set_symbol(&k, s);
-  
-  if (fts_hashtable_get( cl->messages, &k, &a))
-    return (fts_method_t)fts_get_pointer(&a);
-  else
-    return NULL;	
+  if(method == NULL && type != fts_void_class)
+    method = method_get(cl, (const void *)s, NULL, varargs);
+
+  return method;
 }
 
 fts_method_t
-fts_class_inlet_get_method(fts_class_t *cl, int winlet, fts_class_t *type)
+fts_class_get_method_varargs(fts_class_t *cl, fts_symbol_t s)
 {
-  fts_atom_t k, a;
-  
-  if(winlet < 0)
-    winlet = 0;
-  else if(winlet >= cl->ninlets)
-    winlet = cl->ninlets - 1;
-  
-  fts_set_int(&k, class_inlet_key(winlet, type));
-  
-  if (fts_hashtable_get( cl->inlets, &k, &a))
-    return (fts_method_t)fts_get_pointer(&a);
+  int varargs = 0;
+  fts_method_t method = method_get(cl, (const void *)s, NULL, &varargs);
+
+  if(varargs != NULL)
+    return method;
   else
-    return NULL;	
+    return NULL;
+}
+
+fts_method_t
+fts_class_get_inlet_method(fts_class_t *cl, int winlet, fts_class_t *type, int *varargs)
+{
+  int n = class_clip_inlet(cl, winlet);
+  fts_method_t method = method_get(cl, (const void *)n, type, varargs);
+
+  if(method == NULL && type != fts_void_class)
+    method = method_get(cl, (const void *)n, NULL, varargs);
+
+  return method;
 }
 
 int
@@ -487,7 +628,7 @@ static void class_class_instantiate( fts_class_t *cl)
 }
 
 void fts_kernel_class_init( void)
-{
+{  
   /* As the 'class' class is used to create a class, it cannot be created using standard ways. */
   fts_heap_t *heap = fts_heap_new( sizeof( fts_class_t));
 
@@ -502,9 +643,10 @@ void fts_kernel_class_init( void)
   fts_class_class->heap = heap;
   fts_class_class->constructor = dummy_method;
   fts_class_class->deconstructor = dummy_method;
-  fts_class_class->messages = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
-  fts_class_class->default_handler = fts_class_default_error_handler;
-  fts_class_class->inlets = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
+  fts_class_class->methods = fts_hashtable_new( FTS_HASHTABLE_MEDIUM);
+  fts_class_class->input_handler = NULL;
 
   fts_class_set_name( fts_class_class, fts_s_class);
+
+  method_key_init();
 }

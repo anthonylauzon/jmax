@@ -619,7 +619,7 @@ env_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, env_put);
 
-  fts_class_message_varargs(cl, fts_s_bang, env_bang);
+  fts_class_inlet_bang(cl, 0, env_bang);
   fts_class_message_varargs(cl, fts_s_stop, env_stop);
   fts_class_message_varargs(cl, fts_new_symbol("adsr"), env_adsr);
   fts_class_message_varargs(cl, fts_new_symbol("speed"), env_set_speed);
@@ -628,8 +628,8 @@ env_instantiate(fts_class_t *cl)
 
   fts_class_inlet_int(cl, 0, env_number);
   fts_class_inlet_float(cl, 0, env_number);
-  fts_class_inlet_varargs(cl, 0, env_array);
   fts_class_inlet(cl, 0, bpf_type, env_bpf);
+  fts_class_inlet_varargs(cl, 0, env_array);
 
   fts_dsp_declare_outlet(cl, 0);
   fts_class_outlet_bang(cl, 1);

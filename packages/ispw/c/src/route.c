@@ -56,11 +56,7 @@ route_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      if(ac == 1)
 		fts_outlet_bang(o, i);
 	      else if (fts_is_symbol(at))
-		{
-		  fts_symbol_t sel = fts_get_symbol(at);
-		  
-		  fts_outlet_send(o, i, sel, ac - 2, at + 2);
-		}
+                fts_outlet_send(o, i, fts_get_symbol(at), ac - 2, at + 2);
 	      else 
 		fts_outlet_varargs(o, i, ac - 1, at + 1);
 	    }
@@ -84,12 +80,12 @@ route_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      if (this->symbols[i] == fts_get_class_name(at))
 		{
 		  match = 1;
-		  fts_outlet_varargs(o, i, 1, at);
+		  fts_outlet_atom(o, i, at);
 		}
 	    }
 
 	  if (!match)
-	    fts_outlet_varargs(o, ns, 1, at);
+	    fts_outlet_atom(o, ns, at);
 	}
       else if(ac > 0)
 	{
@@ -130,11 +126,7 @@ route_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      if (ac == 0)
 		fts_outlet_bang(o, i);
 	      else if (fts_is_symbol(at))
-		{
-		  fts_symbol_t sel = fts_get_symbol(at);
-		  
-		  fts_outlet_send(o, i, sel, ac - 1, at + 1);
-		}
+                fts_outlet_send(o, i, fts_get_symbol(at), ac - 1, at + 1);
 	      else
 		fts_outlet_varargs(o, i, ac, at);
 	    }
@@ -145,6 +137,15 @@ route_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
   else
     fts_object_signal_runtime_error(o, "don't understand %s", s);
+}
+
+static void
+route_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if(s != NULL)
+    route_message(o, winlet, s, ac, at);
+  else
+    route_varargs(o, winlet, NULL, ac, at);    
 }
 
 static void
@@ -212,9 +213,9 @@ route_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(route_t), route_init, route_delete);
 
-  fts_class_set_default_handler(cl, route_message);
-  fts_class_inlet_varargs(cl, 0, route_varargs);
+  fts_class_input_handler(cl, route_input);
 
+  fts_class_outlet_message(cl, 0);
   fts_class_outlet_varargs(cl, 0);
 }
 

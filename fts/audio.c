@@ -330,7 +330,7 @@ static void audioport_guard_put_epilogue( fts_object_t *o, int winlet, fts_symbo
 
 static void audioport_guard_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( audioport_guard_t), audioport_guard_init, audioport_guard_delete);
+  fts_class_init(cl, sizeof( audioport_guard_t), audioport_guard_init, audioport_guard_delete);
 
   fts_class_message_varargs(cl, fts_s_put_prologue, audioport_guard_put_prologue);
   fts_class_message_varargs(cl, fts_s_put_epilogue, audioport_guard_put_epilogue);
@@ -404,7 +404,7 @@ static void audioportin_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
 static void audioportin_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( fts_audioportin_t), audioportin_init, audioportin_delete);
+  fts_class_init(cl, sizeof( fts_audioportin_t), audioportin_init, audioportin_delete);
 
   fts_class_message_varargs(cl, fts_s_put, audioportin_put);
 
@@ -446,7 +446,7 @@ static void indispatcher_propagate_input(fts_object_t *o, int winlet, fts_symbol
 
 static void indispatcher_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( indispatcher_t), indispatcher_init, 0);
+  fts_class_init(cl, sizeof( indispatcher_t), indispatcher_init, 0);
 
   fts_class_message_varargs(cl, fts_s_propagate_input, indispatcher_propagate_input);
 
@@ -553,7 +553,7 @@ static void audioportout_put( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 static void audioportout_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( fts_audioportout_t), audioportout_init, audioportout_delete);
+  fts_class_init(cl, sizeof( fts_audioportout_t), audioportout_init, audioportout_delete);
 
   fts_class_message_varargs(cl, fts_s_put, audioportout_put);
 
@@ -574,9 +574,9 @@ static void outdispatcher_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
 static void outdispatcher_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( fts_object_t), outdispatcher_init, 0);
+  fts_class_init(cl, sizeof( fts_object_t), outdispatcher_init, 0);
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 static void fts_audioport_create_out_objects( fts_audioport_t *port)

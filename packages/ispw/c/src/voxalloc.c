@@ -221,7 +221,7 @@ voxalloc_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(voxalloc_t), voxalloc_init, voxalloc_delete);
 
-  fts_class_message_varargs(cl, fts_s_bang, voxalloc_bang);
+  fts_class_inlet_bang(cl, 0, voxalloc_bang);
   fts_class_message_varargs(cl, fts_new_symbol("used"), voxalloc_used);
 
   fts_class_inlet_varargs(cl, 0, voxalloc_list);

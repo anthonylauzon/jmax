@@ -77,7 +77,7 @@ static void create_writer_thread(writesf_t* self)
     fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
     
     thread_job->object = (fts_object_t*)writer;
-    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
+    thread_job->method = fts_class_get_method_varargs(fts_object_get_class(thread_job->object),
 					      fts_s_write);
     if (0 == thread_job->method)
     {

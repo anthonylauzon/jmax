@@ -185,35 +185,33 @@ display_ftl(fts_word_t *argv)
     }
 }
 
-static void 
-display_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+display_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
 
   fts_memorystream_reset(this->stream);  
 
-  fts_spost_symbol((fts_bytestream_t *)this->stream, s);
-  fts_spost((fts_bytestream_t *)this->stream, " ");
-  fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
-
-  display_deliver(this);
-}
-
-static void 
-display_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  display_t * this = (display_t *)o;
-
-  fts_memorystream_reset(this->stream);  
+  if(s != NULL)
+    {
+      fts_spost_symbol((fts_bytestream_t *)this->stream, s);
+      fts_spost((fts_bytestream_t *)this->stream, " ");
+    }    
 
   if(ac == 1 && !fts_is_symbol(at))
     fts_spost_atoms((fts_bytestream_t *)this->stream, 1, at);	
-  else
+  else if(ac > 0)
     {
+    if(s == NULL)
       fts_spost((fts_bytestream_t *)this->stream, "(");
-      fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
+
+    fts_spost_atoms((fts_bytestream_t *)this->stream, ac, at);
+
+    if(s == NULL)
       fts_spost((fts_bytestream_t *)this->stream, ")");
-    }    
+    }
+  else if(s == NULL)
+    fts_spost((fts_bytestream_t *)this->stream, "<bang>");    
 
   display_deliver(this);
 }
@@ -258,9 +256,8 @@ display_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_put, display_put);
   fts_class_message_varargs(cl, fts_s_update_real_time, display_update_real_time); 
 
+  fts_class_input_handler(cl, display_input);
   fts_dsp_declare_inlet(cl, 0);
-  fts_class_inlet_varargs(cl, 0, display_varargs);
-  fts_class_set_default_handler(cl, display_message);
 }
 
 void 

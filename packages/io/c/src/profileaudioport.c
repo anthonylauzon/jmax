@@ -113,7 +113,7 @@ static void profileaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s,
 
 static void profileaudioport_instantiate(fts_class_t *cl)
 {
-  fts_class_init( cl, sizeof( profileaudioport_t), profileaudioport_init, profileaudioport_delete);
+  fts_class_init(cl, sizeof( profileaudioport_t), profileaudioport_init, profileaudioport_delete);
 }
 
 void profileaudioport_config( void)

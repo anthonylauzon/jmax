@@ -219,13 +219,13 @@ print_tilda_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, print_tilda_put);
 
-  fts_class_message_varargs(cl, fts_s_bang, print_tilda_print);
   fts_class_message_varargs(cl, fts_s_print, print_tilda_print);
 
   fts_class_message_varargs(cl, fts_s_set, print_tilda_set);
   fts_class_message_varargs(cl, fts_new_symbol("cols"), print_tilda_set_cols);
   fts_class_message_varargs(cl, fts_new_symbol("size"), print_tilda_set_size);
 
+  fts_class_inlet_bang(cl, 0, print_tilda_print);
   fts_dsp_declare_inlet(cl, 0);
 
   fts_dsp_declare_function(fts_s_print, ftl_print_tilda);

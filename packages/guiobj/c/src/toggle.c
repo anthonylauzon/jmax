@@ -72,7 +72,7 @@ toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-toggle_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+toggle_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   toggle_number(o, 0, 0, 1, at);
 }
@@ -120,12 +120,13 @@ toggle_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_real_time, toggle_update_real_time); 
   fts_class_message_varargs(cl, fts_s_save_dotpat, toggle_save_dotpat); 
 
-  fts_class_message_varargs(cl, fts_s_bang, toggle_toggle);
-  fts_class_message_varargs(cl, fts_s_set, toggle_set);
+  fts_class_message_varargs(cl, fts_s_set, toggle_toggle);
 
-  fts_class_inlet_int(cl, 0, toggle_number);
-  fts_class_inlet_float(cl, 0, toggle_number);
-  fts_class_inlet_varargs(cl, 0, toggle_list);
+  fts_class_message_varargs(cl, fts_new_symbol("click"), toggle_toggle);
+
+  fts_class_inlet_bang(cl, 0, toggle_toggle);
+  fts_class_inlet_number(cl, 0, toggle_number);
+  fts_class_inlet_varargs(cl, 0, toggle_number);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, toggle_get_value);
 

@@ -113,22 +113,6 @@ button_on(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  *
  */
  
-/* daemon to get the "value" property */
-static void
-button_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  button_t *this = (button_t *)obj;
-
-  fts_set_int(value, this->value);
-}
-
-
-static void
-button_put_value(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  button_on(o, 0, 0, 0, 0);
-}
-
 static void
 button_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -221,18 +205,19 @@ button_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, button_update_gui); 
   fts_class_message_varargs(cl, fts_s_update_real_time, button_update_real_time); 
 
+  fts_class_message_varargs(cl, fts_s_save_dotpat, button_save_dotpat); 
+
   fts_class_message_varargs(cl, fts_s_color, button_set_color); 
   fts_class_message_varargs(cl, fts_s_flash, button_set_flash); 
-
-  fts_class_message_varargs(cl, fts_s_save_dotpat, button_save_dotpat); 
-  fts_class_message_varargs(cl, fts_s_bang, button_on);
 
   /* property daemons for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_color, button_put_color);
   fts_class_add_daemon(cl, obj_property_put, fts_s_flash, button_put_flash);
 
-  fts_class_set_default_handler(cl, button_on);
-  fts_class_inlet_varargs(cl, 0, button_on);
+  fts_class_message_varargs(cl, fts_new_symbol("click"), button_on);
+
+  fts_class_input_handler(cl, button_on);
+ 
   fts_class_outlet_bang(cl, 0);
 }
 

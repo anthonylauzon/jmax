@@ -175,22 +175,6 @@ zll_length(struct zll *list)
   return length;
 }		
 
-static void
-zll_DBprin(struct zll *x)
-{
-  post("ZLL: x = %ld  y = %ld\n", x->x, x->y);
-
-  if (x->prev)
-    post("		prev ptr = %ld\n", x->prev);
-  else
-    post("		prev ptr = ()\n");
-
-  if (x->next)
-    post("		next ptr = %ld\n", x->next);
-  else
-    post("		next ptr = ()\n");
-}		
-
 /* accepts a vector : x1 y1 x2 y2 x3 y3 ... places it in a zll list  returns list or 0 */
 static struct zll *
 zll_vecToZll(int ac, const fts_atom_t *av)
@@ -1052,7 +1036,7 @@ funbuff_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_set, funbuff_set);
 
-  fts_class_message_varargs(cl, fts_s_bang, funbuff_bang);
+  fts_class_inlet_bang(cl, 0, funbuff_bang);
   fts_class_inlet_int(cl, 0, funbuff_number);
   fts_class_inlet_float(cl, 0, funbuff_number);
 

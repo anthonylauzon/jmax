@@ -24,8 +24,6 @@
  *
  */
 
-
-
 #include <fts/fts.h>
 
 typedef struct 
@@ -35,7 +33,7 @@ typedef struct
 } select_t;
 
 static void
-select_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
   int n = fts_array_get_size(&this->compare);
@@ -51,46 +49,16 @@ select_input_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	}
     }
 
-  fts_outlet_varargs(o, n, 1, at);
+  fts_outlet_atom(o, n, at);
 }
 
 static void
-select_input_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    select_input_single(o, 0, 0, 1, at);
-  else
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, tuple);
-      select_input_single(o, 0, 0, 1, &a);
-    }
-}
-
-static void
-select_set_single(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
   fts_atom_t *a = fts_array_get_atoms(&this->compare);
 
   fts_atom_assign(a + winlet - 1, at);
-}
-
-static void
-select_set_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    select_set_single(o, winlet, 0, 1, at);
-  else
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, tuple);
-      select_set_single(o, winlet, 0, 1, &a);
-    }
 }
 
 /***************************************
@@ -133,13 +101,8 @@ select_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(select_t), select_init, select_delete);
   
-  fts_class_inlet_varargs(cl, 0, select_input_varargs);
-  fts_class_inlet_number(cl, 0, select_input_single);
-  fts_class_inlet_symbol(cl, 0, select_input_single);
-
-  fts_class_inlet_varargs(cl, 1, select_set_varargs);
-  fts_class_inlet_number(cl, 1, select_set_single);
-  fts_class_inlet_symbol(cl, 1, select_set_single);
+  fts_class_inlet_atom(cl, 0, select_input);
+  fts_class_inlet_atom(cl, 1, select_set);
 
   fts_class_outlet_bang(cl, 0);
   fts_class_outlet_varargs(cl, 1);

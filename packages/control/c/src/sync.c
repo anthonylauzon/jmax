@@ -59,11 +59,11 @@ sync_output(sync_t *this)
   int i;
 
   for(i=this->n-1; i>=0; i--)
-    fts_outlet_varargs((fts_object_t *)this, i, 1, this->a + i);
+    fts_outlet_atom((fts_object_t *)this, i, this->a + i);
 }
 
 static void
-sync_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sync_t *this = (sync_t *)o;
   unsigned int bit = 1 << winlet;
@@ -76,21 +76,6 @@ sync_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       sync_output(this);
       this->wait |= this->reset & this->require;
-    }
-}
-
-static void
-sync_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  if(ac == 1)
-    sync_input_atom(o, 0, 0, 1, at);
-  else if(ac > 1)
-    {
-      fts_object_t *tuple = fts_object_create(fts_tuple_class, NULL, ac, at);
-      fts_atom_t a;
-      
-      fts_set_object(&a, tuple);
-      sync_input_atom(o, 0, 0, 1, &a);
     }
 }
 
@@ -160,34 +145,30 @@ static void
 sync_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sync_t *this = (sync_t *)o;
+  fts_symbol_t mode = fts_get_symbol(at);
 
-  if(fts_is_symbol(at))
-    {
-      fts_symbol_t mode = fts_get_symbol(at);
-      
-      if(mode == sym_any)
-	{
-	  this->trigger = (1 << this->n) - 1;
-	  this->reset = 0;
-	  this->require = 0;
-	}
-      else if(mode == sym_all)
-	this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
-      else if(mode == sym_left)
-	{
-	  this->trigger = 1;
-	  this->reset = 0;
-	  this->require = 0;
-	}
-      else if(mode == sym_right)
-	{
-	  this->trigger = (1 << (this->n - 1));
-	  this->reset = 0;
-	  this->require = 0;
-	}
+  if(mode == sym_any)
+  {
+    this->trigger = (1 << this->n) - 1;
+    this->reset = 0;
+    this->require = 0;
+  }
+  else if(mode == sym_all)
+    this->trigger = this->require = this->reset = this->wait = (1 << this->n) - 1;
+  else if(mode == sym_left)
+  {
+    this->trigger = 1;
+    this->reset = 0;
+    this->require = 0;
+  }
+  else if(mode == sym_right)
+  {
+    this->trigger = (1 << (this->n - 1));
+    this->reset = 0;
+    this->require = 0;
+  }
 
-      this->wait = this->require;
-    }
+  this->wait = this->require;
 }
 
 static void
@@ -262,17 +243,14 @@ sync_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sync_t), sync_init, NULL);
 
-  fts_class_message_varargs(cl, fts_new_symbol("mode"), sync_set_mode);
-  fts_class_message_varargs(cl, fts_new_symbol("any"), sync_set_mode_any);
-  fts_class_message_varargs(cl, fts_new_symbol("all"), sync_set_mode_all);
+  fts_class_message_symbol(cl, fts_new_symbol("mode"), sync_set_mode);
+  fts_class_message_void(cl, fts_new_symbol("any"), sync_set_mode_any);
+  fts_class_message_void(cl, fts_new_symbol("all"), sync_set_mode_all);
 
-  fts_class_message_varargs(cl, fts_new_symbol("trigger"), sync_set_trigger);
-  fts_class_message_varargs(cl, fts_new_symbol("require"), sync_set_require);
-      
-  fts_class_inlet_varargs(cl, 0, sync_input_atoms);
-  fts_class_inlet_number(cl, 0, sync_input_atom);
-  fts_class_inlet_symbol(cl, 0, sync_input_atom);
+  fts_class_message_atom(cl, fts_new_symbol("trigger"), sync_set_trigger);
+  fts_class_message_atom(cl, fts_new_symbol("require"), sync_set_require);
 
+  fts_class_inlet_atom(cl, 0, sync_input);
   fts_class_outlet_varargs(cl, 0);
 }
 

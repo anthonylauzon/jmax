@@ -185,7 +185,7 @@ table_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   table_t *this = (table_t *)o;
   
-  fts_send_message((fts_object_t *)this->vec, fts_s_dump, ac, at);
+  fts_send_message_varargs((fts_object_t *)this->vec, fts_s_dump, ac, at);
 }
 
 static int 
@@ -347,9 +347,9 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_atom_t a;
 
   fts_set_object(&a, (fts_object_t *)this->vec);
-  fts_send_message( (fts_object_t *)fts_object_get_patcher(o), fts_s_upload_child, 1, &a);  
+  fts_send_message_varargs( (fts_object_t *)fts_object_get_patcher(o), fts_s_upload_child, 1, &a);  
 
-  fts_send_message((fts_object_t *)this->vec, fts_s_openEditor, 0, 0);
+  fts_send_message_varargs((fts_object_t *)this->vec, fts_s_openEditor, 0, 0);
 }
 
 static void
@@ -369,7 +369,7 @@ table_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_new_symbol("inv"), table_inv);
   fts_class_message_varargs(cl, fts_new_symbol("quantile"), table_quantile);
-  fts_class_message_varargs(cl, fts_s_bang, table_get_random);
+  fts_class_inlet_bang(cl, 0, table_get_random);
   
   fts_class_message_varargs(cl, fts_new_symbol("sum"), table_sum);  
   fts_class_message_varargs(cl, fts_s_size, table_size);

@@ -286,16 +286,13 @@ explay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(explay_t), explay_init, NULL);
 
-  fts_class_message_varargs(cl, fts_s_bang, explay_bang);
-  fts_class_inlet_int(cl, 0, explay_number);
-  fts_class_inlet_float(cl, 0, explay_number);
-
-  fts_class_inlet_int(cl, 1, explay_number_1);
-  fts_class_inlet_float(cl, 1, explay_number_1);
-
   fts_class_message_varargs(cl, fts_s_set, explay_set);
   fts_class_message_varargs(cl, fts_new_symbol("nth"), explay_nth);
   fts_class_message_varargs(cl, fts_new_symbol("startat"), explay_startat);
+
+  fts_class_inlet_bang(cl, 0, explay_bang);
+  fts_class_inlet_number(cl, 0, explay_number);
+  fts_class_inlet_number(cl, 1, explay_number_1);
 
   fts_class_outlet_int(cl, 0);
   fts_class_outlet_int(cl, 1);

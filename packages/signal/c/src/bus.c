@@ -181,8 +181,6 @@ bus_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, fts_name_gui_method);
 
   fts_class_message_varargs(cl, fts_s_put_epilogue, bus_put_epilogue);
-
-  fts_class_inlet_anything(cl, 0);
 }
 
 /*****************************************************************************
@@ -387,9 +385,9 @@ throw_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, throw_put);
 
-  fts_class_inlet_varargs(cl, 1, access_varargs);
   fts_class_inlet(cl, 1, bus_class, access_set_bus);
   fts_class_inlet_int(cl, 1, access_set_index);
+  fts_class_inlet_varargs(cl, 1, access_varargs);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -452,9 +450,9 @@ catch_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_put, catch_put);
 
-  fts_class_inlet_varargs(cl, 0, access_varargs);
-  fts_class_inlet(cl, 0, bus_class, access_set_bus);
   fts_class_inlet_int(cl, 0, access_set_index);
+  fts_class_inlet(cl, 0, bus_class, access_set_bus);
+  fts_class_inlet_varargs(cl, 0, access_varargs);
       
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

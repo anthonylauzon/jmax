@@ -66,28 +66,28 @@ oneshot_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   oneshot_t *this = (oneshot_t *)o;
 
-  if(this->open == 1)
+  if(winlet == 0)
     {
-      this->open = 0;
-      fts_outlet_send(o, 0, s, ac, at);
+      if(this->open != 0)
+	{
+	  this->open = 0;
+	  fts_outlet_send(o, 0, s, ac, at);
+	}
+    }
+  else if(s == NULL)
+    {
+      if(ac == 0)
+	this->open = 1;
+      else if(ac > 0 && fts_is_number(at))
+	this->open = fts_get_number_int(at);    
+      else
+	fts_object_signal_runtime_error(o, "bad input for inlet 1");
     }
 }
 
 static void
-oneshot_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+oneshot_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  oneshot_t *this = (oneshot_t *)o;
-
-  this->open = 1;
-}
-
-static void
-oneshot_switch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  oneshot_t *this = (oneshot_t *)o;
-  int n = fts_get_number_int(at);
-  
-  this->open = (n != 0);
 }
 
 /************************************************************
@@ -100,13 +100,13 @@ oneshot_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(oneshot_t), oneshot_init, NULL);
 
-  fts_class_set_default_handler(cl, oneshot_input);
+  fts_class_input_handler(cl, oneshot_input);
 
-  fts_class_inlet_varargs(cl, 0, oneshot_input);
-  fts_class_inlet_int(cl, 1, oneshot_switch);
-  fts_class_inlet_float(cl, 1, oneshot_switch);
+  fts_class_inlet_thru(cl, 0);
+  fts_class_inlet_void(cl, 1, oneshot_dummy); /* bang dummy */
+  fts_class_inlet_number(cl, 1, oneshot_dummy); /* number dummy */
 
-  fts_class_outlet_anything(cl, 0);
+  fts_class_outlet_thru(cl, 0);
 }
 
 void
