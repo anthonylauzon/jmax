@@ -44,55 +44,71 @@ public class FtsIntValueObject extends FtsObject
   /*****************************************************************************/
 
   int value; 
+  int flashDuration;
 
   /* for the message box */
     public FtsIntValueObject(Fts fts, FtsObject parent, String className, String description)
-  {
-      super(fts, parent, null, className, description);
-  }
+    {
+	super(fts, parent, null, className, description);
+    }
 
     public FtsIntValueObject(Fts fts, FtsObject parent/*, int objId*/, String className)
-  {
-      super(fts, parent, null, className, className);
-  }
+    {
+	super(fts, parent, null, className, className);
+    }
 
-  /** Set the value. Tell it to the server, also */
+    /** Set the value. Tell it to the server, also */
 
-  public void setValue(int value)
-  {
-    this.value = value;
-    fts.getServer().putObjectProperty(this, "value", value);
-  }
+    public void setValue(int value)
+    {
+	this.value = value;
+	fts.getServer().putObjectProperty(this, "value", value);
+    }
 
-  /** Get the current value */
+    /** Get the current value */
 
-  public int getValue()
-  {
-    return value;
-  }
+    public int getValue()
+    {
+	return value;
+    }
 
-  /** Ask the server for the latest value */
+    public void setFlashDuration(int fd)
+    {
+	flashDuration = fd;
+	fts.getServer().putObjectProperty(this, "flash", fd);
+	setDirty();
+    }
 
-  public void updateValue()
-  {
-    fts.getServer().askObjectProperty(this, "value");
-  }
+    public int getFlashDuration()
+    {
+	return flashDuration;
+    }
+
+    /** Ask the server for the latest value */
+
+    public void updateValue()
+    {
+	fts.getServer().askObjectProperty(this, "value");
+    }
        
-  /* Over write the localPut message to handle value changes;
-   */
+    /* Over write the localPut message to handle value changes;
+     */
 
-  protected void localPut(String name, int newValue)
-  {
-    if (name == "value")
-      {
-	value = newValue;
-
-	if (listener instanceof FtsIntValueListener)
-	  ((FtsIntValueListener) listener).valueChanged(newValue);
-      }
-    else
-      super.localPut(name, newValue);
-  }
+    protected void localPut(String name, int newValue)
+    {
+	if (name == "value")
+	    {
+		value = newValue;
+		
+		if (listener instanceof FtsIntValueListener)
+		    ((FtsIntValueListener) listener).valueChanged(newValue);
+	    }
+	else
+	    if (name == "flash")
+		flashDuration = newValue;
+	    else
+		super.localPut(name, newValue);
+    }
 }
 
 

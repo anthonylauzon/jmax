@@ -44,7 +44,7 @@ import ircam.jmax.editors.patcher.menus.*;
 public class Bang extends GraphicObject implements FtsIntValueListener
 {
   private Color itsFlashColor = Settings.sharedInstance().getUIColor();
-  private int flashDuration = DEFAULT_FLASH_DURATION;
+    //private int flashDuration = DEFAULT_FLASH_DURATION;
   private static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 15;
   private static final int CIRCLE_ORIGIN = 3;
@@ -71,14 +71,15 @@ public class Bang extends GraphicObject implements FtsIntValueListener
     super.setHeight( theWidth);
   }
 
-  public void setFlashDuration(int fd)
-  {
+    /*public void setFlashDuration(int fd)
+      {
       flashDuration = fd;
-  }
-  public int getFlashDuration()
-  {
+      getFtsObject().setIntegerProperty("flash", fd);
+      }
+      public int getFlashDuration()
+      {
       return flashDuration;
-  }
+      }*/
 
   // redefined from base class
   public void setHeight( int theHeight)
