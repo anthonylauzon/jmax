@@ -356,6 +356,9 @@ audiolabel_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_symbol_t port_name = fts_get_symbol(at);
 
   audiolabel_set_port( self, FTS_AUDIO_INPUT, port_name);
+  /* @@@@@@ set channel to 0 @@@@@@ */
+  /* Java do it in graphical interface */
+  audiolabel_set_channel(self, FTS_AUDIO_INPUT, 0);
 
   fts_client_send_message(o, fts_s_input, 1, at);  
 
@@ -369,6 +372,9 @@ audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   fts_symbol_t port_name = fts_get_symbol(at);
 
   audiolabel_set_port( self, FTS_AUDIO_OUTPUT, port_name);
+  /* @@@@@@ set channel to 0 @@@@@@ */
+  /* Java do it in graphical interface */
+  audiolabel_set_channel(self, FTS_AUDIO_OUTPUT, 0);
 
   fts_client_send_message(o, fts_s_output, 1, at);  
 
@@ -380,8 +386,6 @@ audiolabel_input_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   int channel = fts_get_int(at);
-
-  post("[audiolabel] label name: %s, input channel: %d\n", self->name, channel);
 
   audiolabel_set_channel( self, FTS_AUDIO_INPUT, channel);
 
@@ -396,8 +400,6 @@ audiolabel_output_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   int channel = fts_get_int(at);
-
-  post("[audiolabel] label name: %s, output channel: %d\n", self->name, channel);
 
   audiolabel_set_channel( self, FTS_AUDIO_OUTPUT, channel);
 
