@@ -353,7 +353,7 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(!this->port)
     this->port = fts_midimanager_get_output(fts_s_default);
 
-  if(this->port)
+  if(!this->port)
     fts_object_set_error(o, "Cannot find default MIDI output");
 
   fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);

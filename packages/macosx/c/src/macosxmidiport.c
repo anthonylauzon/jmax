@@ -95,7 +95,7 @@ macosxmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 
   if(fts_midievent_is_channel_message(event))
     {
-    unsigned char buffer[3];
+    Byte buffer[3];
 
     if(fts_midievent_channel_message_has_second_byte(event))
       {
@@ -185,7 +185,7 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
     this->name = name;
     this->id = fts_get_int(at + 2);
-    this->ref = (MIDIEndpointRef)macosxmidi_get_by_unique_id(this->id, kMIDIObjectType_Source);
+    this->ref = (MIDIEndpointRef)macosxmidi_get_by_unique_id(this->id, macosxmidi_source);
 
     if(this->ref != NULL) {
       
@@ -259,7 +259,7 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
     this->name = name;
     this->id = fts_get_int(at + 2);
-    this->ref = (MIDIEndpointRef)macosxmidi_get_by_unique_id(this->id, kMIDIObjectType_Destination);
+    this->ref = (MIDIEndpointRef)macosxmidi_get_by_unique_id(this->id, macosxmidi_destination);
 
     if(this->ref != NULL) {
 
@@ -312,6 +312,7 @@ macosxmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   if(this->port != NULL) {
     fts_hashtable_t *ht;
+    macosxmidi_type_t type;
 
     /* (device) midiport */
     if(fts_midiport_is_input((fts_midiport_t *)this)) {
@@ -319,14 +320,16 @@ macosxmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       MIDIPortDisconnectSource(this->port, this->ref);
 
       ht = &this->manager->sources;
+      type = macosxmidi_source;
     } else {
       ht = &this->manager->destinations;
+      type = macosxmidi_destination;
     }
 
     /* remove midiport from hashtable and put back id if still valid */
     fts_set_symbol(&k, this->name);
 
-    if(macosxmidi_get_by_unique_id(this->id, MACOSXMIDI_OBJECT_TYPE_ANY) != NULL) {
+    if(macosxmidi_get_by_unique_id(this->id, type) != NULL) {
       /* remove midiport from hashtable and put reference instead */
       fts_set_int(&a, this->id);
       fts_hashtable_put(ht, &k, &a);

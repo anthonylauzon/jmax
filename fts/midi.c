@@ -1389,7 +1389,7 @@ fts_midimanager_get_fresh_label_name(fts_midimanager_t *mm, fts_symbol_t name)
 {
   const char *str = name;
   int len = strlen(str);
-  char *new_str = alloca((len + 2) * sizeof(char));
+  char *new_str = alloca((len + 10) * sizeof(char));
   int num = 0;
   int dec = 1;
   int i;

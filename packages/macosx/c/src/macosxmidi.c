@@ -28,89 +28,93 @@
 #include <fts/fts.h>
 #include "macosxmidi.h"
 
-static void 
+static void
 macosxmidi_bang( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  CFStringRef str;
-  SInt32 id;
-  const char *name;
-  int n_dest, n_src, n_dev, n_ent;
-  int i, j, k;
+  int i, n;
 
-  n_src = MIDIGetNumberOfSources();
-  post("%d sources\n", n_src);
+  n = MIDIGetNumberOfSources();
+  post("%d source(s)\n", n);
 
-  for(i=0; i<n_src; i++)
-    {
-      MIDIEndpointRef src = MIDIGetSource(i);
+  for(i=0; i<n; i++) {
+    MIDIEndpointRef endpoint = MIDIGetSource(i);
+    CFStringRef cfsr;
+    SInt32 id;
+    const char *name;    
 
-      MIDIObjectGetStringProperty((MIDIObjectRef)src, kMIDIPropertyName, &str);
-      MIDIObjectGetIntegerProperty((MIDIObjectRef)src, kMIDIPropertyUniqueID, &id);
-      name = CFStringGetCStringPtr(str, 0);
+    MIDIObjectGetIntegerProperty((MIDIObjectRef)endpoint, kMIDIPropertyUniqueID, &id);
+    MIDIObjectGetStringProperty((MIDIObjectRef)endpoint, kMIDIPropertyName, &cfsr);
+    name = CFStringGetCStringPtr(cfsr, CFStringGetSystemEncoding());
+    
+    post("  %d: '%s' (%d)\n", i, name, id);
+  }
 
-      post("  %d: %s (%d)\n", i, name, id);
-    }
+  n = MIDIGetNumberOfDestinations();
+  post("%d destination(s)\n", n);
 
-  n_dest = MIDIGetNumberOfDestinations();
-  post("%d destinations\n", n_dest);
+  for(i=0; i<n; i++) {
+    MIDIEndpointRef endpoint = MIDIGetDestination(i);
+    CFStringRef cfsr;
+    SInt32 id;
+    const char *name;
+    
+    MIDIObjectGetIntegerProperty((MIDIObjectRef)endpoint, kMIDIPropertyUniqueID, &id);
+    MIDIObjectGetStringProperty((MIDIObjectRef)endpoint, kMIDIPropertyName, &cfsr);
+    name = CFStringGetCStringPtr(cfsr, CFStringGetSystemEncoding());
 
-  for(i=0; i<n_dest; i++)
-    {
-      MIDIEndpointRef dst = MIDIGetDestination(i);
-
-      MIDIObjectGetStringProperty((MIDIObjectRef)dst, kMIDIPropertyName, &str);
-      MIDIObjectGetIntegerProperty((MIDIObjectRef)dst, kMIDIPropertyUniqueID, &id);
-      name = CFStringGetCStringPtr(str, 0);
-
-      post("  %d: %s (%d)\n", i, name, id);
-    }
-
-  n_dev = MIDIGetNumberOfDevices();
-  post("%d devices: \n", n_dev);
-
-  for(i=0; i<n_dev; i++)
-    {
-      MIDIDeviceRef dev;
-
-      dev = MIDIGetDevice(i);
-      n_ent = MIDIDeviceGetNumberOfEntities(dev);
-
-      MIDIObjectGetStringProperty((MIDIObjectRef)dev, kMIDIPropertyName, &str);
-      MIDIObjectGetIntegerProperty((MIDIObjectRef)dev, kMIDIPropertyUniqueID, &id);
-      name = CFStringGetCStringPtr(str, 0);
-
-      post("  %d: %s (%d) (%d entities)\n", i, name, id, n_ent);
-
-      for(j=0; j<n_ent; j++)
-	{
-	  MIDIEntityRef ent = MIDIDeviceGetEntity(dev, j);
-
-	  MIDIObjectGetStringProperty((MIDIObjectRef)ent, kMIDIPropertyName, &str);
-	  MIDIObjectGetIntegerProperty((MIDIObjectRef)ent, kMIDIPropertyUniqueID, &id);
-	  name = CFStringGetCStringPtr(str, 0);
-
-	  post("    %d: %s (%d)\n", j, name, id);
-	}
-    }
+    post("  %d: '%s' (%d)\n", i, name, id);
+  }
 }
 
+/*
 MIDIObjectRef *
-macosxmidi_get_by_unique_id(int id, MIDIObjectType exspect)
+macosxmidi_get_by_unique_id(int id, macosxmidi_type_t type)
 {
   MIDIObjectRef obj = NULL;
-  MIDIObjectType type;
-  
-  MIDIObjectFindByUniqueID(id, &obj, &type);
+  MIDIObjectType got_type;
 
-  if(exspect == MACOSXMIDI_OBJECT_TYPE_ANY || (type & 0x0f) == exspect)
+  MIDIObjectFindByUniqueID(id, &obj, &got_type);
+
+  if(type == macosxmidi_any || (got_type & 0x0f) == type)
     return obj;
   else
     return NULL;
 }
+*/
+
+MIDIObjectRef *
+macosxmidi_get_by_unique_id(int id, macosxmidi_type_t type)
+{
+  MIDIObjectRef obj;
+  SInt32 got_id;
+  int i;
+
+  if(type == macosxmidi_any || type == macosxmidi_source) {
+    for(i=0; i<MIDIGetNumberOfSources(); i++) {
+      obj = (MIDIObjectRef)MIDIGetSource(i);
+      MIDIObjectGetIntegerProperty(obj, kMIDIPropertyUniqueID, &got_id);
+
+      if(got_id == id)
+        return obj;
+    }
+  }
+
+  if(type == macosxmidi_any || type == macosxmidi_destination) {
+    for(i=0; i<MIDIGetNumberOfDestinations(); i++) {
+      obj = (MIDIObjectRef)MIDIGetDestination(i);
+      MIDIObjectGetIntegerProperty(obj, kMIDIPropertyUniqueID, &got_id);
+
+      if(got_id == id)
+        return obj;
+    }
+  }
+
+  return NULL;
+}
 
 static void
-macosxmidi_check_references(fts_hashtable_t *ht)
+macosxmidi_check_references(fts_hashtable_t *ht, macosxmidi_type_t type)
 {
   fts_iterator_t keys, values;
   fts_array_t invalid;
@@ -131,7 +135,7 @@ macosxmidi_check_references(fts_hashtable_t *ht)
       int id = fts_get_int(&a);
 
       /* remind key of invalid id in order to remove from hashtable */
-      if(macosxmidi_get_by_unique_id(id, MACOSXMIDI_OBJECT_TYPE_ANY) == NULL)
+      if(macosxmidi_get_by_unique_id(id, type) == NULL)
         fts_array_append(&invalid, 1, &k);
     }
   }
@@ -142,26 +146,78 @@ macosxmidi_check_references(fts_hashtable_t *ht)
   fts_array_destroy(&invalid);
 }
 
+static int
+macosxmidi_get_id(fts_hashtable_t *ht, fts_atom_t *key)
+{
+  fts_atom_t a;
+
+  if(fts_hashtable_get(ht, key, &a)) {
+    if(fts_is_int(&a))
+      return fts_get_int(&a);
+    else if(fts_is_object(&a))
+      return macosxmidiport_get_id((macosxmidiport_t *)fts_get_object(&a));
+  }
+
+  return 0;
+}
+
+/* hash utility */
+static fts_symbol_t
+macosxmidi_hash_fresh(fts_hashtable_t *ht, fts_symbol_t name, int id)
+{
+  fts_atom_t a;
+  fts_atom_t k;
+
+  fts_set_symbol(&k, name);
+
+  if(!fts_hashtable_get(ht, &k, &a)) {
+    fts_set_int(&a, id);
+    fts_hashtable_put(ht, &k, &a);
+  } else if(macosxmidi_get_id(ht, &k) != id) {
+    const char *str = name;
+    int len = strlen(str);
+    char *new_str = alloca((len + 10) * sizeof(char));
+    int num = 0;
+    int dec = 1;
+    int i;
+
+    /* separate base name and index */
+    for(i=len-1; i>=0; i--)  {
+      if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
+        num += (str[len = i] - '0') * dec;
+      else
+        new_str[i] = str[i];
+
+      dec *= 10;
+    }
+
+    /* generate new key */
+    while(fts_hashtable_get(ht, &k, &a) && macosxmidi_get_id(ht, &k) != id) {
+      sprintf(new_str + len, "%d", ++num);
+      fts_set_symbol(&k, fts_new_symbol_copy(new_str));
+    }
+
+    /* put with new key */
+    fts_set_int(&a, id);
+    fts_hashtable_put(ht, &k, &a);
+  }
+
+  return fts_get_symbol(&k);
+}
+
 static fts_symbol_t
 macosxmidi_insert_reference(fts_hashtable_t *ht, MIDIObjectRef ref)
 {
   SInt32 id;
   CFStringRef cfsr;
   fts_symbol_t name;
-  fts_atom_t k, a;
+  fts_atom_t a;
 
   MIDIObjectGetIntegerProperty((MIDIObjectRef)ref, kMIDIPropertyUniqueID, &id);
   MIDIObjectGetStringProperty(ref, kMIDIPropertyName, &cfsr);
-  name = fts_new_symbol_copy(CFStringGetCStringPtr(cfsr, 0));
+  name = fts_new_symbol_copy(CFStringGetCStringPtr(cfsr, CFStringGetSystemEncoding()));
 
-  fts_set_symbol(&k, name);
-
-  if(!fts_hashtable_get(ht, &k, &a)) {
-    fts_set_int(&a, (int)id);
-    fts_hashtable_put(ht, &k, &a);
-  }
-
-  return name;
+  return macosxmidi_hash_fresh(ht, name, (int)id);
 }
 
 static fts_symbol_t
@@ -186,16 +242,15 @@ static void
 macosxmidi_update_sources( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  int n, i;
+  int i;
 
-  macosxmidi_check_references(&this->sources);
+  macosxmidi_check_references(&this->sources, macosxmidi_source);
   
   /* send source names to client */
   fts_client_start_message(o, fts_s_sources);
   fts_client_add_symbol(o, fts_s_none);
   
-  n = MIDIGetNumberOfSources();
-  for(i=0; i<n; i++) {
+  for(i=0; i<MIDIGetNumberOfSources(); i++) {
     MIDIObjectRef ref = (MIDIObjectRef)MIDIGetSource(i);
     fts_symbol_t name = macosxmidi_insert_reference(&this->sources, ref);
     fts_client_add_symbol(o, name);
@@ -210,17 +265,15 @@ static void
 macosxmidi_update_destinations( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  fts_atom_t *atoms;
-  int n, i;
+  int i;
 
-  macosxmidi_check_references(&this->destinations);
+  macosxmidi_check_references(&this->destinations, macosxmidi_destination);
   
   /* send source names to client */
   fts_client_start_message(o, fts_s_destinations);
   fts_client_add_symbol(o, fts_s_none);
 
-  n = MIDIGetNumberOfDestinations();
-  for(i=0; i<n; i++) {
+  for(i=0; i<MIDIGetNumberOfDestinations(); i++) {
     MIDIObjectRef ref = (MIDIObjectRef)MIDIGetDestination(i);
     fts_symbol_t name = macosxmidi_insert_reference(&this->destinations, ref);
     fts_client_add_symbol(o, name);
@@ -250,7 +303,7 @@ macosxmidi_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     if(input != NULL) {
       int id = macosxmidiport_get_id(input);
 
-      if(id != 0 && macosxmidi_get_by_unique_id(id, kMIDIObjectType_Source) == NULL)
+      if(id != 0 && macosxmidi_get_by_unique_id(id, macosxmidi_source) == NULL)
         fts_midimanager_set_input(mm, i, NULL, fts_s_none);
     }
 
@@ -258,7 +311,7 @@ macosxmidi_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     if(output != NULL) {
       int id = macosxmidiport_get_id(output);
 
-      if(id != 0 && macosxmidi_get_by_unique_id(id, kMIDIObjectType_Destination) == NULL)
+      if(id != 0 && macosxmidi_get_by_unique_id(id, macosxmidi_destination) == NULL)
         fts_midimanager_set_output(mm, i, NULL, fts_s_none);
     }
 
@@ -268,6 +321,8 @@ macosxmidi_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   /* upload sources and destinations */
   macosxmidi_update_sources(o, 0, 0, 0, 0);
   macosxmidi_update_destinations(o, 0, 0, 0, 0);
+
+  fts_midimanager_update();
 }
 
 static void
@@ -506,7 +561,7 @@ macosxmidi_scan_hashtable(fts_hashtable_t *ht)
     if(fts_is_int(&a)) {
       int id = fts_get_int(&a);
       
-      if(macosxmidi_get_by_unique_id(id, MACOSXMIDI_OBJECT_TYPE_ANY) != NULL)
+      if(macosxmidi_get_by_unique_id(id, macosxmidi_any) != NULL)
         post("  %s inactive (%d)\n", name, id);
       else
         post("  %s invalid id!!\n", name);
@@ -515,7 +570,7 @@ macosxmidi_scan_hashtable(fts_hashtable_t *ht)
       macosxmidiport_t *port = (macosxmidiport_t *)fts_get_object(&a);
       int id = macosxmidiport_get_id(port);
 
-      if(macosxmidi_get_by_unique_id(id, MACOSXMIDI_OBJECT_TYPE_ANY) != NULL)
+      if(macosxmidi_get_by_unique_id(id, macosxmidi_any) != NULL)
         post("  %s active (%d)\n", name, id);
       else
         post("  %s invalid midiport!!\n", name);

@@ -27,7 +27,7 @@
 
 #include <CoreMIDI/MIDIServices.h>
 
-#define MACOSXMIDI_OBJECT_TYPE_ANY kMIDIObjectType_Other
+typedef enum macosxmidi_type {macosxmidi_any = -1, macosxmidi_source = 2, macosxmidi_destination = 3} macosxmidi_type_t;
 
 typedef struct _macosxmidi_
 {
@@ -54,6 +54,6 @@ typedef struct _macosxmidiport_
 extern fts_metaclass_t *macosxmidi_input_type;
 extern fts_metaclass_t *macosxmidi_output_type;
 
-extern MIDIObjectRef *macosxmidi_get_by_unique_id(int id, MIDIObjectType exspect);
+extern MIDIObjectRef *macosxmidi_get_by_unique_id(int id, macosxmidi_type_t type);
 
 #endif
