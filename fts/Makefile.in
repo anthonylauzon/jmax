@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ABS_TOP_SRCDIR = @ABS_TOP_SRCDIR@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
@@ -76,6 +77,11 @@ lib_LTLIBRARIES = libfts.la
 
 libfts_la_SOURCES =  @PLATFORM@.c OLDclient.c OLDftsdata.c OLDpatcherdata.c OLDucs.c abstraction.c array.c atom.c atomfile.c audio.c autosave.c class.c clipboard.c connection.c doctor.c dsp.c dspgraph.c errobj.c expression.c file.c fpe.c ftl.c ftlmem.c fts.c hashtable.c inout.c loader.c mem.c message.c midi.c midifile.c object.c objectlist.c objectset.c objtable.c param.c patcher.c patparser.c post.c property.c saver.c sched.c selection.c sigconn.c soundfile.c soundfile_af.c srconv.c symbol.c template.c time.c variable.c version.c vm.c 
 
+
+bin_PROGRAMS = fts
+fts_SOURCES = main.c
+fts_LDADD = -L.libs -lfts -ldl -laudiofile -lm
+fts_LDFLAGS = -rpath @ABS_TOP_SRCDIR@/fts/.libs
 
 INCLUDES = -I$(top_srcdir)/include
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -99,6 +105,10 @@ midi.lo midifile.lo object.lo objectlist.lo objectset.lo objtable.lo \
 param.lo patcher.lo patparser.lo post.lo property.lo saver.lo sched.lo \
 selection.lo sigconn.lo soundfile.lo soundfile_af.lo srconv.lo \
 symbol.lo template.lo time.lo variable.lo version.lo vm.lo
+PROGRAMS =  $(bin_PROGRAMS)
+
+fts_OBJECTS =  main.o
+fts_DEPENDENCIES = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -118,7 +128,7 @@ DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/OLDftsdata.P \
 .deps/class.P .deps/clipboard.P .deps/connection.P .deps/doctor.P \
 .deps/dsp.P .deps/dspgraph.P .deps/errobj.P .deps/expression.P \
 .deps/file.P .deps/fpe.P .deps/ftl.P .deps/ftlmem.P .deps/fts.P \
-.deps/hashtable.P .deps/inout.P .deps/loader.P .deps/mem.P \
+.deps/hashtable.P .deps/inout.P .deps/loader.P .deps/main.P .deps/mem.P \
 .deps/message.P .deps/midi.P .deps/midifile.P .deps/object.P \
 .deps/objectlist.P .deps/objectset.P .deps/objtable.P .deps/param.P \
 .deps/patcher.P .deps/patparser.P .deps/post.P .deps/property.P \
@@ -126,8 +136,8 @@ DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/OLDftsdata.P \
 .deps/soundfile.P .deps/soundfile_af.P .deps/srconv.P .deps/symbol.P \
 .deps/template.P .deps/time.P .deps/variable.P .deps/version.P \
 .deps/vm.P
-SOURCES = $(libfts_la_SOURCES)
-OBJECTS = $(libfts_la_OBJECTS)
+SOURCES = $(libfts_la_SOURCES) $(fts_SOURCES)
+OBJECTS = $(libfts_la_OBJECTS) $(fts_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -230,6 +240,35 @@ maintainer-clean-libtool:
 libfts.la: $(libfts_la_OBJECTS) $(libfts_la_DEPENDENCIES)
 	$(LINK) -rpath $(libdir) $(libfts_la_LDFLAGS) $(libfts_la_OBJECTS) $(libfts_la_LIBADD) $(LIBS)
 
+mostlyclean-binPROGRAMS:
+
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+
+distclean-binPROGRAMS:
+
+maintainer-clean-binPROGRAMS:
+
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	  else :; fi; \
+	done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	done
+
+fts: $(fts_OBJECTS) $(fts_DEPENDENCIES)
+	@rm -f fts
+	$(LINK) $(fts_LDFLAGS) $(fts_OBJECTS) $(fts_LDADD) $(LIBS)
+
 tags: TAGS
 
 ID: $(HEADERS) $(SOURCES) $(LISP)
@@ -322,7 +361,7 @@ installcheck: installcheck-am
 all-recursive-am: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-libLTLIBRARIES install-binPROGRAMS
 install-exec: install-exec-am
 
 install-data-am:
@@ -331,14 +370,14 @@ install-data: install-data-am
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-libLTLIBRARIES
+uninstall-am: uninstall-libLTLIBRARIES uninstall-binPROGRAMS
 uninstall: uninstall-am
-all-am: Makefile $(LTLIBRARIES) config.h
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) config.h
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(libdir)
+	$(mkinstalldirs)  $(DESTDIR)$(libdir) $(DESTDIR)$(bindir)
 
 
 mostlyclean-generic:
@@ -352,18 +391,20 @@ distclean-generic:
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-hdr mostlyclean-libLTLIBRARIES \
 		mostlyclean-compile mostlyclean-libtool \
-		mostlyclean-tags mostlyclean-depend mostlyclean-generic
+		mostlyclean-binPROGRAMS mostlyclean-tags \
+		mostlyclean-depend mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
 clean-am:  clean-hdr clean-libLTLIBRARIES clean-compile clean-libtool \
-		clean-tags clean-depend clean-generic mostlyclean-am
+		clean-binPROGRAMS clean-tags clean-depend clean-generic \
+		mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-hdr distclean-libLTLIBRARIES distclean-compile \
-		distclean-libtool distclean-tags distclean-depend \
-		distclean-generic clean-am
+		distclean-libtool distclean-binPROGRAMS distclean-tags \
+		distclean-depend distclean-generic clean-am
 	-rm -f libtool
 
 distclean: distclean-am
@@ -371,8 +412,9 @@ distclean: distclean-am
 maintainer-clean-am:  maintainer-clean-hdr \
 		maintainer-clean-libLTLIBRARIES \
 		maintainer-clean-compile maintainer-clean-libtool \
-		maintainer-clean-tags maintainer-clean-depend \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-binPROGRAMS maintainer-clean-tags \
+		maintainer-clean-depend maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -384,12 +426,14 @@ clean-libLTLIBRARIES maintainer-clean-libLTLIBRARIES \
 uninstall-libLTLIBRARIES install-libLTLIBRARIES mostlyclean-compile \
 distclean-compile clean-compile maintainer-clean-compile \
 mostlyclean-libtool distclean-libtool clean-libtool \
-maintainer-clean-libtool tags mostlyclean-tags distclean-tags \
-clean-tags maintainer-clean-tags distdir mostlyclean-depend \
-distclean-depend clean-depend maintainer-clean-depend info-am info \
-dvi-am dvi check check-am installcheck-am installcheck all-recursive-am \
-install-exec-am install-exec install-data-am install-data install-am \
-install uninstall-am uninstall all-redirect all-am all installdirs \
+maintainer-clean-libtool mostlyclean-binPROGRAMS distclean-binPROGRAMS \
+clean-binPROGRAMS maintainer-clean-binPROGRAMS uninstall-binPROGRAMS \
+install-binPROGRAMS tags mostlyclean-tags distclean-tags clean-tags \
+maintainer-clean-tags distdir mostlyclean-depend distclean-depend \
+clean-depend maintainer-clean-depend info-am info dvi-am dvi check \
+check-am installcheck-am installcheck all-recursive-am install-exec-am \
+install-exec install-data-am install-data install-am install \
+uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 

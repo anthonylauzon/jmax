@@ -294,7 +294,7 @@ void fts_outlet_int(fts_object_t *o, int woutlet, int n)
   fts_connection_t *conn;
   fts_atom_t atom;
 
-  fts_set_long(&atom, n);
+  fts_set_int(&atom, n);
 
   conn = o->out_conn[woutlet];
 

@@ -445,10 +445,10 @@ void
 fts_midiport_delete(fts_midiport_t *port)
 {
   if(port->sysex_alloc)
-    fts_block_free(port->sysex_at, port->sysex_alloc);
+    fts_free( port->sysex_at);
 
   if(port->listeners)
-    fts_free(port->listeners);
+    fts_free( port->listeners);
 }
 
 void
@@ -761,7 +761,7 @@ fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value)
   if(index >= port->sysex_alloc)
     {
       int new_alloc = port->sysex_alloc + SYSEX_BLOCK_SIZE;
-      fts_atom_t *new_buf = fts_block_alloc(new_alloc * sizeof(fts_atom_t));
+      fts_atom_t *new_buf = fts_malloc(new_alloc * sizeof(fts_atom_t));
       int i;
       
       if(port->sysex_alloc)
@@ -769,7 +769,7 @@ fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value)
 	  for(i=0; i<port->sysex_alloc; i++)
 	    new_buf[i] = port->sysex_at[i];
 	  
-	  fts_block_free(port->sysex_at, port->sysex_alloc * sizeof(fts_atom_t));
+	  fts_free( port->sysex_at);
 	}
       
       port->sysex_at = new_buf;

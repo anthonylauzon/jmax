@@ -28,7 +28,20 @@
 #include <stdarg.h>
 
 #include <fts/fts.h>
+#include <fts/private/OLDclient.h>
+#include <fts/private/abstraction.h>
+#include <fts/private/class.h>
+#include <fts/private/connection.h>
+#include <fts/private/doctor.h>
+#include <fts/private/errobj.h>
+#include <fts/private/expression.h>
+#include <fts/private/objtable.h>
+#include <fts/private/object.h>
 #include <fts/private/patcher.h>
+#include <fts/private/property.h>
+#include <fts/private/template.h>
+#include <fts/private/variable.h>
+#include <fts/private/vm.h>
 
 
 /* forward declarations  */
@@ -50,7 +63,7 @@ static void fts_object_free(fts_object_t *obj);
 fts_object_t *
 fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj = (fts_object_t *)fts_block_zalloc(cl->size);
+  fts_object_t *obj = (fts_object_t *)fts_calloc(cl->size);
 
   obj->head.cl = cl;
   obj->head.id = FTS_NO_ID;
@@ -59,15 +72,25 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   obj->refcnt = 0;
   
   if (cl->noutlets)
-    obj->out_conn = (fts_connection_t **) fts_block_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+    obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
   
   if (cl->ninlets)
-    obj->in_conn = (fts_connection_t **) fts_block_zalloc(cl->ninlets * sizeof(fts_connection_t *));
+    obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
   
   /* &@#!@#$%*@#$ very nice hack to survive until jMax 3 (Merci Francois!) */
   fts_message_send(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1);
 
   return obj;
+}
+
+static fts_status_t
+fts_new_status(const char *description)
+{
+  fts_status_description_t *sd = fts_malloc(sizeof(fts_status_description_t));
+
+  sd->description = description;
+  
+  return (fts_status_t)sd;
 }
 
 fts_status_t 
@@ -101,7 +124,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
       return &fts_CannotInstantiate;
     }
 
-  obj = (fts_object_t *)fts_block_zalloc(cl->size);
+  obj = (fts_object_t *)fts_calloc(cl->size);
 
   obj->patcher = patcher;
   obj->head.cl = cl;
@@ -111,10 +134,10 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   obj->refcnt = 0;
 
   if (cl->noutlets)
-    obj->out_conn = (fts_connection_t **) fts_block_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+    obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
 
   if (cl->ninlets)
-    obj->in_conn = (fts_connection_t **) fts_block_zalloc(cl->ninlets * sizeof(fts_connection_t *));
+    obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
     
   /* send the init message */
   {
@@ -522,16 +545,16 @@ fts_object_free(fts_object_t *obj)
 
   /* free the object description */
   if (obj->argv)
-    fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+    fts_free( obj->argv);
 
   /* free the inlets and outlets */
   if (obj->out_conn)
-    fts_block_free((char *)obj->out_conn, obj->head.cl->noutlets * sizeof(fts_connection_t *));
+    fts_free( obj->out_conn);
   if (obj->in_conn)
-    fts_block_free((char *)obj->in_conn, obj->head.cl->ninlets * sizeof(fts_connection_t *));
+    fts_free( obj->in_conn);
 
   /* free the object */
-  fts_block_free((char *)obj, obj->head.cl->size);
+  fts_free( obj);
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
@@ -754,14 +777,14 @@ fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
     {
       /* Free the old object description, if any */
       if (obj->argv)
-	fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+	fts_free( obj->argv);
 
       /* reallocate the description if argc > -0 and copy the arguments */
       obj->argc = argc;
 
       if (argc > 0)
 	{
-	  obj->argv = (fts_atom_t *) fts_block_zalloc(argc * sizeof(fts_atom_t));
+	  obj->argv = (fts_atom_t *) fts_calloc(argc * sizeof(fts_atom_t));
 
 	  for (i = 0; i < argc; i++)
 	    obj->argv[i] = argv[i];
@@ -797,11 +820,11 @@ fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name,
       /* Free the old object description, if any */
 
       if (obj->argv)
-	fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+	fts_free( obj->argv);
 
       /* reallocate the description if argc > -0 and copy the arguments */
       obj->argc = argc + 1;
-      obj->argv = (fts_atom_t *) fts_block_zalloc((argc + 1) * sizeof(fts_atom_t));
+      obj->argv = (fts_atom_t *) fts_calloc((argc + 1) * sizeof(fts_atom_t));
 
       fts_set_symbol(&(obj->argv[0]), class_name);
 
@@ -824,7 +847,7 @@ fts_object_reset_description(fts_object_t *obj)
 
   if (obj->argv)
     {
-      fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+      fts_free( obj->argv);
       
       obj->argv = 0;
       obj->argc = 0;
@@ -863,7 +886,7 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
   if (new_noutlets == 0)
     {
       /* no new outlets, but there are old outlets to delete */
-      fts_block_free((char *)o->out_conn, old_noutlets * sizeof(fts_connection_t *));
+      fts_free( o->out_conn);
 
       o->out_conn = 0;
     }
@@ -874,8 +897,8 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
       fts_outlet_t  **new_outlets;
       fts_connection_t **new_out_conn;
 
-      new_outlets  = (fts_outlet_t **)  fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
-      new_out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets * sizeof(fts_connection_t *));
+      new_outlets  = (fts_outlet_t **)  fts_malloc(new_noutlets * sizeof(fts_outlet_t *));
+      new_out_conn = (fts_connection_t **) fts_calloc(new_noutlets * sizeof(fts_connection_t *));
 
       for (i = 0; i < new_noutlets; i++)
 	{
@@ -887,7 +910,7 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
 	    new_out_conn[i] = 0;
 	}
 
-      fts_block_free((char *)o->out_conn, old_noutlets * sizeof(fts_connection_t *));
+      fts_free( o->out_conn);
 	      
       o->out_conn = new_out_conn;
     }
@@ -896,7 +919,7 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
       /* there are new outlets, but there were no outlets before (allocate without copying old stuff) */
       int i;
 
-      o->out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets * sizeof(fts_connection_t *));
+      o->out_conn = (fts_connection_t **) fts_calloc(new_noutlets * sizeof(fts_connection_t *));
 
       for (i = 0; i < new_noutlets; i++)
 	o->out_conn[i] = 0;

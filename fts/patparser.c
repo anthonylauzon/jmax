@@ -27,6 +27,8 @@
 #include <fcntl.h>
 
 #include <fts/fts.h>
+#include <fts/private/connection.h>
+#include <fts/private/patcher.h>
 #include <fts/private/patparser.h>
 
 

@@ -29,11 +29,14 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 
 #include <fts/fts.h>
 #include <fts/private/bmaxhdr.h>
-#include <fts/private/saver.h>
+#include <fts/private/patcher.h>
+#include <fts/private/object.h>
 #include <fts/private/selection.h>
+#include <fts/private/template.h>
 #include <fts/private/vm.h>
 
 /* #define SAVER_DEBUG */

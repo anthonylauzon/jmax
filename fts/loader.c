@@ -30,6 +30,7 @@
 #include <fts/fts.h>
 #include <fts/private/bmaxhdr.h>
 #include <fts/private/loader.h>
+#include <fts/private/vm.h>
 
 /*  #define LOAD_DEBUG */
 
