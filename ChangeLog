@@ -1,3 +1,12 @@
+2003-07-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/signal/c/src/biquad.c: fixed initialization of biquad~ coefficient.
+	added error message if biquad~ arguments are not numbers.
+
+	* packages/signal/c/src/delay.c: fixed initialization of delay~, tapin~ and tapout~ objects.
+
+	* packages/signal/c/src/threshold.c: added default values for threshold~.
+
 2003-07-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/dsdev/c/src/dsaudioport.c (dsaudioport_output): fill buffer with 0 if channel is not used.
