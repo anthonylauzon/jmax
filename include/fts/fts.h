@@ -94,6 +94,15 @@ extern "C" {
 
 #include <fts/fpe.h>
 
+#include <fts/file.h>
+#include <fts/atomfile.h>
+#include <fts/soundfile.h>
+#include <fts/midifile.h>
+#include <fts/post.h>
+#include <fts/midi.h>
+#include <fts/time.h>
+#include <fts/sched.h>
+
 #ifdef __cplusplus
 }
 #endif

@@ -88,7 +88,7 @@ FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
 */
 #undef PREDEF_SYMBOL
 #define PREDEF_SYMBOL(V,S) FTS_API fts_symbol_t V;
-#include <fts/lang/mess/predefsymbols.h>
+#include <fts/predefsymbols.h>
 
 /* 
  * fts_type_t equivalent of symbols
