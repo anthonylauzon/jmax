@@ -63,26 +63,44 @@
 #include "runtime/client.h"
 #include "runtime/files.h"
 
+extern fts_metaclass_t *inlet_metaclass;
+extern fts_metaclass_t *outlet_metaclass;
+
 fts_metaclass_t *patcher_metaclass = 0;
 
 static fts_class_t *patcher_class;
-static fts_metaclass_t *inlet_metaclass;
-static fts_metaclass_t *outlet_metaclass;
 
 #define fts_object_is_outlet(o) ((o)->head.cl->mcl == outlet_metaclass)
 #define fts_object_is_inlet(o) ((o)->head.cl->mcl == inlet_metaclass)
 
-extern fts_status_t fts_send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
-extern fts_status_t fts_receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
-
 /*************************************************************
  *
- *  inlet house keeping
+ *  inlet/outlet house keeping
  *
  */
 
-static void 
-inlet_remove_from_patcher(fts_inlet_t *this, fts_patcher_t *patcher)
+void 
+fts_patcher_add_inlet(fts_patcher_t *patcher, fts_inlet_t *this)
+{
+  if (this->position >= 0)
+    {
+      this->next = patcher->inlets[this->position];
+      patcher->inlets[this->position] = this;
+    }
+}
+
+void 
+fts_patcher_add_outlet(fts_patcher_t *patcher, fts_outlet_t *this)
+{
+  if (this->position >= 0)
+    {
+      this->next = patcher->outlets[this->position];
+      patcher->outlets[this->position] = this;
+    }
+}
+
+void 
+fts_patcher_remove_inlet(fts_patcher_t *patcher, fts_inlet_t *this)
 {
   /* remove the inlet from its previous position (ignore the case where the inlet was not there yet) */
   if ((this->position >= 0) && (this->position < fts_object_get_inlets_number((fts_object_t *)patcher)))
@@ -98,9 +116,8 @@ inlet_remove_from_patcher(fts_inlet_t *this, fts_patcher_t *patcher)
     }
 }
 
-/* reposition an outlet without using redefinition (bad for properties) */
-static void 
-outlet_remove_from_patcher(fts_outlet_t *this, fts_patcher_t *patcher)
+void 
+fts_patcher_remove_outlet(fts_patcher_t *patcher, fts_outlet_t *this)
 {
   /* remove the outlet from its previous position (ignore the case where the outlet was not there yet) */
   if ((this->position >= 0) && (this->position < fts_object_get_outlets_number((fts_object_t *)patcher)))
@@ -116,61 +133,13 @@ outlet_remove_from_patcher(fts_outlet_t *this, fts_patcher_t *patcher)
     }
 }
 
-/* remove the last empty inlets in a patcher */
 static void 
-patcher_trim_number_of_inlets(fts_patcher_t *patcher)
-{
-  int new_inlets;
-
-  new_inlets = fts_object_get_inlets_number((fts_object_t *) patcher);
-     
-  while ((new_inlets > 0) && (patcher->inlets[new_inlets - 1] == 0))
-    new_inlets--;
-
-  fts_patcher_redefine_number_of_inlets(patcher, new_inlets);
-}
-
-/* remove the last empty inlets in a patcher */
-static void 
-patcher_trim_number_of_outlets(fts_patcher_t *patcher)
-{
-  int new_outlets;
-
-  new_outlets = fts_object_get_outlets_number((fts_object_t *) patcher);
-
-  while ((new_outlets > 0) && (patcher->outlets[new_outlets - 1] == 0))
-    new_outlets--;
-
-  fts_patcher_redefine_number_of_outlets(patcher, new_outlets);
-}
-
-static void 
-inlet_add_to_patcher(fts_inlet_t *this, fts_patcher_t *patcher)
-{
-  if (this->position >= 0)
-    {
-      this->next = patcher->inlets[this->position];
-      patcher->inlets[this->position] = this;
-    }
-}
-
-static void 
-outlet_add_to_patcher(fts_outlet_t *this, fts_patcher_t *patcher)
-{
-  if (this->position >= 0)
-    {
-      this->next = patcher->outlets[this->position];
-      patcher->outlets[this->position] = this;
-    }
-}
-
-static void 
-inlet_set_position(fts_patcher_t *patcher, fts_inlet_t *this, int pos)
+patcher_position_inlet(fts_patcher_t *patcher, fts_inlet_t *this, int pos)
 {
   fts_object_t *o = (fts_object_t *) this;
 
   /* Remove the inlet from the patcher */
-  inlet_remove_from_patcher(this, patcher);
+  fts_patcher_remove_inlet(patcher, this);
 
   /* Change the description  */
   if (o->argv)
@@ -185,16 +154,16 @@ inlet_set_position(fts_patcher_t *patcher, fts_inlet_t *this, int pos)
     }
 
   this->position = pos;
-  inlet_add_to_patcher(this, patcher);
+  fts_patcher_add_inlet(patcher, this);
 }
 
 static void 
-outlet_set_position(fts_patcher_t *patcher, fts_outlet_t *this, int pos)
+patcher_position_outlet(fts_patcher_t *patcher, fts_outlet_t *this, int pos)
 {
   fts_object_t *o = (fts_object_t *)this;
 
   /* Remove the outlet from the patcher */
-  outlet_remove_from_patcher(this, patcher);
+  fts_patcher_remove_outlet(patcher, this);
 
   /* Change or create the description */
   if (o->argv)
@@ -209,10 +178,38 @@ outlet_set_position(fts_patcher_t *patcher, fts_outlet_t *this, int pos)
     }
 
   this->position = pos;
-  outlet_add_to_patcher(this, patcher);
+  fts_patcher_add_outlet(patcher, this);
 }
 
-static void 
+/* remove the last empty inlets in a patcher */
+void 
+fts_patcher_trim_number_of_inlets(fts_patcher_t *patcher)
+{
+  int new_inlets;
+
+  new_inlets = fts_object_get_inlets_number((fts_object_t *) patcher);
+     
+  while ((new_inlets > 0) && (patcher->inlets[new_inlets - 1] == 0))
+    new_inlets--;
+
+  fts_patcher_redefine_number_of_inlets(patcher, new_inlets);
+}
+
+/* remove the last empty inlets in a patcher */
+void 
+fts_patcher_trim_number_of_outlets(fts_patcher_t *patcher)
+{
+  int new_outlets;
+
+  new_outlets = fts_object_get_outlets_number((fts_object_t *) patcher);
+
+  while ((new_outlets > 0) && (patcher->outlets[new_outlets - 1] == 0))
+    new_outlets--;
+
+  fts_patcher_redefine_number_of_outlets(patcher, new_outlets);
+}
+
+void 
 fts_patcher_inlet_reposition(fts_object_t *o, int pos)
 {
   fts_inlet_t *this  = (fts_inlet_t *) o;
@@ -226,16 +223,16 @@ fts_patcher_inlet_reposition(fts_object_t *o, int pos)
 	fts_patcher_redefine_number_of_inlets(patcher, pos + 1);
 
       /* set the inlet position */
-      inlet_set_position(patcher, this, pos);
+      patcher_position_inlet(patcher, this, pos);
 
       /* trim the number of inlets if needed 
        * (this in general avoid redefining the patched twice while changing the last inlet) 
        */
-      patcher_trim_number_of_inlets(patcher);
+      fts_patcher_trim_number_of_inlets(patcher);
     }
 }
 
-static void 
+void 
 fts_patcher_outlet_reposition(fts_object_t *o, int pos)
 {
   fts_outlet_t *this  = (fts_outlet_t *) o;
@@ -249,262 +246,11 @@ fts_patcher_outlet_reposition(fts_object_t *o, int pos)
 	fts_patcher_redefine_number_of_outlets(patcher, pos + 1);
 
        /* set the outlet position */
-      outlet_set_position(patcher, this, pos);
+      patcher_position_outlet(patcher, this, pos);
 
       /* trim the number of outlets */
-      patcher_trim_number_of_outlets(patcher);
+      fts_patcher_trim_number_of_outlets(patcher);
     }
-}
-
-static int 
-inlet_get_next_position(fts_patcher_t *patcher, fts_inlet_t *this)
-{
-  int pos;
-
-  pos = 0;
-
-  while (1)
-    {
-      int found;
-      fts_object_t *p;
-
-      found = 1;
-
-      for (p = patcher->objects; p ; p = p->next_in_patcher)
-	if (fts_object_is_inlet(p) && ((fts_inlet_t *)p) != this)
-	  if (((fts_inlet_t *) p)->position == pos)
-	    found = 0;
-
-      if (found)
-	return pos;
-      else
-	pos++;
-    }
-}
-
-static int 
-outlet_get_next_position(fts_patcher_t *patcher, fts_outlet_t *this)
-{
-  int pos;
-  pos = 0;
-
-  while (1)
-    {
-      int found;
-      fts_object_t *p;
-
-      found = 1;
-
-      for (p = patcher->objects; p ; p = p->next_in_patcher)
-	if (fts_object_is_outlet(p) && ((fts_outlet_t *) p) != this)
-	  if (((fts_outlet_t *) p)->position == pos)
-	    found = 0;
-
-      if (found)
-	return pos;
-      else
-	pos++;
-    }
-}
-
-static int
-inoutlet_check(int ac, const fts_atom_t *at)
-{
-  return (ac == 1 && (fts_is_int(at) || fts_is_symbol(at) || fts_is_a(at, fts_s_channel)));
-}
-
-/*************************************************************
- *
- *  inlet class
- *
- *  the inlet has one mandatory argument, the position (inlet number):
- *    -2: the inlet is not assigned (compatibility with the .pat parser) it will be assigned later.
- *    -1: the inlet is assigned to the next unused number in the existing inlet list.
- */
-
-static void 
-inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_inlet_t *this  = (fts_inlet_t *) o;
-  fts_patcher_t *patcher = fts_object_get_patcher(o);
-  int pos = fts_get_int_arg(ac, at, 1, 0);
-
-  /* Initialize to a non valid value */
-  this->position = -1;
-  this->next = 0;
-
-  if (pos == -2)
-    {
-      /* OFF inlets: inlet will be redefined later (.pat parsing) */
-      return;
-    }
-  else if (pos == -1)
-    fts_patcher_inlet_reposition(o, inlet_get_next_position(patcher, this));
-  else
-    fts_patcher_inlet_reposition(o, pos);
-}
-
-static void 
-inlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_inlet_t *this   = (fts_inlet_t *) o;
-  fts_patcher_t  *patcher = fts_object_get_patcher(o);
-
-  inlet_remove_from_patcher(this, patcher);
-
-  if (! patcher->deleted)
-    patcher_trim_number_of_inlets(patcher);
-}
-
-static void 
-inlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  FILE *file;
-  fts_atom_t xa, ya, wa;
-
-  file = (FILE *)fts_get_ptr( at);
-
-  fts_object_get_prop( o, fts_s_x, &xa);
-  fts_object_get_prop( o, fts_s_y, &ya);
-  fts_object_get_prop( o, fts_s_width, &wa);
-
-  fprintf( file, "#P inlet %d %d %d;\n", fts_get_int( &xa), fts_get_int( &ya), fts_get_int( &wa));
-}
-
-static fts_status_t
-inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  ac--;
-  at++;
-
-  if(inoutlet_check(ac, at))
-    {
-      if(fts_is_int(at))
-	{
-	  /* initialize the class */
-	  fts_class_init(cl, sizeof(fts_inlet_t),  1, 1, 0);
-	  
-	  /* define the system methods */
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, inlet_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, inlet_delete);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, inlet_save_dotpat); 
-	  
-	  fts_class_define_thru(cl, 0);
-
-	  return fts_Success;
-	}
-      else
-	return fts_receive_instantiate(cl, ac, at);
-    }
-      
-  return &fts_CannotInstantiate;
-}
-
-/*************************************************************
- *
- *  outlet class
- *
- */
-
-/* if outlets are assigned, send the message they receive directly thru the patcher outlet */
-static void 
-outlet_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
-{
-  fts_outlet_t *this  = (fts_outlet_t *) o;
-  fts_patcher_t  *patcher = fts_object_get_patcher(o);
-
-  fts_outlet_send((fts_object_t *)patcher, this->position, s, ac, at);
-}
-
-static void
-outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_t *this = (fts_outlet_t *) o;
-  fts_patcher_t  *patcher = fts_object_get_patcher(o);
-  int pos = fts_get_int_arg(ac, at, 1, 0);
-
-  this->position = -1;      
-  this->next = 0;      
-
-  if (pos == -2)
-    {
-      /* OFF inlets: inlet will be redefined later (.pat parsing) */
-      return;
-    }
-  else if (pos == -1)
-    fts_patcher_outlet_reposition(o, outlet_get_next_position(patcher, this));
-  else
-    fts_patcher_outlet_reposition(o, pos);
-}
-
-static void
-outlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_t *this   = (fts_outlet_t *) o;
-  fts_patcher_t  *patcher = fts_object_get_patcher(o);
-
-  outlet_remove_from_patcher(this, patcher);
-
-  if (! patcher->deleted)
-    patcher_trim_number_of_outlets(patcher);
-}
-
-static void 
-outlet_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  FILE *file;
-  fts_atom_t xa, ya, wa;
-
-  file = (FILE *)fts_get_ptr( at);
-
-  fts_object_get_prop( o, fts_s_x, &xa);
-  fts_object_get_prop( o, fts_s_y, &ya);
-  fts_object_get_prop( o, fts_s_width, &wa);
-
-  fprintf( file, "#P outlet %d %d %d;\n", fts_get_int( &xa), fts_get_int( &ya), fts_get_int( &wa));
-}
-
-static void
-outlet_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_t *this  = (fts_outlet_t *)o;
-  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
-  void *propagate_context = fts_get_ptr(at + 1);
-  fts_patcher_t *patcher;
-
-  patcher = fts_object_get_patcher(this);
-
-  propagate_fun(propagate_context, (fts_object_t *)patcher, this->position);
-}
-
-static fts_status_t 
-outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  ac--;
-  at++;
-
-  if(inoutlet_check(ac, at))
-    {
-      if(fts_is_int(at))
-	{
-	  fts_class_init(cl, sizeof(fts_outlet_t), 1, 1, 0);
-	  
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, outlet_init);
-	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, outlet_delete);
-	  
-	  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_save_dotpat, outlet_save_dotpat); 
-
-	  fts_class_define_thru(cl, outlet_propagate_input);
-	  
-	  fts_method_define_varargs(cl, 0, fts_s_anything, outlet_anything);
-	  
-	  return fts_Success;
-	}
-      else
-	return fts_send_instantiate(cl, ac, at);
-    }
-  
-  return &fts_CannotInstantiate;
 }
 
 /*************************************************************
@@ -1374,7 +1120,7 @@ fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 	  fts_inlet_t *inlet = (fts_inlet_t *)p;
 
 	  if (inlet->position < new_ninlets)
-	    inlet_set_position(this, inlet, inlet->position);
+	    patcher_position_inlet(this, inlet, inlet->position);
 	}
   }
 
@@ -1468,7 +1214,7 @@ fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
 	  fts_outlet_t *outlet = (fts_outlet_t *)p;
 
 	  if (outlet->position < new_noutlets)
-	    outlet_set_position(this, outlet, outlet->position);
+	    patcher_position_outlet(this, outlet, outlet->position);
 	}
   }
 
@@ -1666,7 +1412,7 @@ fts_patcher_reassign_inlets_outlets(fts_patcher_t *this)
 
   /* redefine all the inlets */
   for (i = 0; i < ninlets; i++)
-    inlet_set_position(this, this->inlets[i], i);
+    patcher_position_inlet(this, this->inlets[i], i);
 
   /* same for the outlets */
   for (i = 0; i < noutlets; i++)
@@ -1674,7 +1420,7 @@ fts_patcher_reassign_inlets_outlets(fts_patcher_t *this)
 
   /* redefine all the outlets */
   for (i = 0; i < noutlets; i++)
-    outlet_set_position(this, this->outlets[i], i);
+    patcher_position_outlet(this, this->outlets[i], i);
 }
 
 void 
@@ -1756,28 +1502,15 @@ patcher_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
   return obj;
 }
 
-static int
-inoutlet_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  if(inoutlet_check(ac1 - 1, at1 + 1))
-    return (fts_get_type(at0 + 1) == fts_get_type(at1 + 1));
-  else
-    return 0;
-}
-
 void 
 fts_patcher_init(void)
 {
   fts_register_object_doctor(fts_new_symbol("patcher"), patcher_doctor);
 
   fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
-  fts_metaclass_install(fts_s_inlet, inlet_instantiate, inoutlet_equiv);
-  fts_metaclass_install(fts_s_outlet, outlet_instantiate, inoutlet_equiv);
 
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
   patcher_class = fts_class_get_by_name(fts_s_patcher);
-  inlet_metaclass = fts_metaclass_get_by_name(fts_s_inlet);
-  outlet_metaclass = fts_metaclass_get_by_name(fts_s_outlet);
 }
 
 void 
@@ -1807,3 +1540,4 @@ fts_patcher_shutdown(void)
 {
   fts_delete_root_patcher();
 }
+

@@ -24,12 +24,11 @@
 #
 
 SOURCES = \
-bus.c \
-catch.c \
 control.c \
 demux.c \
 for.c \
 oneshot.c \
 range.c \
 switch.c \
-throw.c \
+#throw.c \
+

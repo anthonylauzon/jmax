@@ -32,6 +32,7 @@ clipboard.c \
 doctor.c \
 errobj.c \
 expressions.c \
+inout.c \
 templates.c \
 ftsdata.c \
 ftsdataid.c \

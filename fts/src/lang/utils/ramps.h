@@ -131,7 +131,7 @@ extern void fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip);
 #define fts_ramp_get_incr(r) ((r)->value.incr)
 #define fts_ramp_get_steps(r) ((r)->n_steps)
 
-extern void fts_ramp_jump(fts_ramp_t *ramp);
+/*extern void fts_ramp_jump(fts_ramp_t *ramp);*/
 extern void fts_ramp_freeze(fts_ramp_t *ramp);
 extern void fts_ramp_incr(fts_ramp_t *ramp);
 extern void fts_ramp_incr_by(fts_ramp_t *ramp, int n);
@@ -142,7 +142,6 @@ extern void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, 
 extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size);
 
 /* makro implementations */
-
 #define fts_ramp_jump(r) (fts_ramp_value_jump(&(r)->value), (r)->n_steps = 0)
 
 #define fts_ramp_freeze(r) (fts_ramp_value_freeze(&(r)->value), (r)->n_steps = 0)
@@ -170,28 +169,5 @@ extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *o
       fts_ramp_value_jump(&(r)->value); \
       (r)->n_steps = 0; \
     } \
-
-
-#define fts_ramp_vec_mul_add(r, x, y, n) \
-  if((r)->n_steps <= 0) \
-    { \
-      float target = (r)->value.target; \
-      int i; \
- \
-      for(i=0; i<(n); i++) \
-        (y)[i] += (x)[i] * target; \
-    } \
-  else \
-    { \
-      double incr = (r)->value.incr / (n); \
-      double value = (r)->value.current; \
-      int i; \
- \
-      for(i=0; i<(n); i++) \
-        ((y)[i] += (x)[i] * value, value += incr) \
- \
-      fts_ramp_value_incr(&(r)->value); \
-      (r)->n_steps--; \
-    }
 
 #endif

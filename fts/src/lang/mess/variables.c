@@ -797,8 +797,8 @@ fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_clas
 	  fts_class_put_prop(class, fts_s_named_defaults, &a);
 	}
       
-      if(!obj)
-	obj = fts_object_create(class, 0, 0);
+      obj = fts_object_create(class, 0, 0);
+      fts_object_refer(obj);
       
       fts_set_object(&a, obj);
       fts_hash_table_insert(happy_hash, name, &a);

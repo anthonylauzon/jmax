@@ -37,6 +37,7 @@ extern fts_module_t fts_mess_module;
 #include "mess/params.h"
 #include "mess/ftsdata.h"
 #include "mess/ftsdataid.h"
+#include "mess/channel.h"
 #include "mess/classes.h"
 #include "mess/objects.h"
 #include "mess/connections.h"
@@ -59,12 +60,3 @@ extern fts_module_t fts_mess_module;
 #include "mess/templates.h"
 
 #endif
-
-
-
-
-
-
-
-
-

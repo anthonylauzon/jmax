@@ -40,8 +40,8 @@ helpPatch sqrt~ $dir/sqrt~.help.jmax
 ## signal flow (6)
 helpPatch down~ $dir/down~.help.jmax
 helpPatch up~ $dir/down~.help.jmax
-helpPatch throw~ $dir/catch~.help.jmax
-helpPatch catch~ $dir/catch~.help.jmax
+helpPatch thrxw~ $dir/catch~.help.jmax
+helpPatch catxh~ $dir/catch~.help.jmax
 helpPatch switch~ $dir/switch~.help.jmax
 helpPatch thru~ $dir/thru~.help.jmax
 

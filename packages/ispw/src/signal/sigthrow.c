@@ -195,15 +195,6 @@ sigcatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-void
-sigcatch_config(void)
-{
-  fts_hash_table_init(&catch_table);
-
-  fts_class_install(fts_new_symbol("catch~"), sigcatch_instantiate);
-}
-
-
 /*****************************************************************************
  *
  *  throw~ object
@@ -403,7 +394,7 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   dsp_sig_inlet(cl, 0);
   dsp_sig_outlet(cl, 0);
 
-  sigthrow_function = fts_new_symbol("sigthrow");
+  sigthrow_function = fts_new_symbol("xthrw");
   dsp_declare_function(sigthrow_function, sigthrow_dsp_fun);
 
   sigthrow_64_function = fts_new_symbol("sigthrow_64");
@@ -412,8 +403,51 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+static fts_object_t *
+sigthrow_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  if(ac == 2 && fts_is_symbol(at + 1))
+    {
+      fts_object_t *obj;
+      fts_atom_t a[2];
+
+      fts_set_symbol(a, fts_new_symbol("thrxw~"));
+      a[1] = at[1];
+      
+      obj = fts_eval_object_description(patcher, 2, a);
+
+      return obj;
+    }
+  else
+    return 0;
+}
+
+static fts_object_t *
+sigcatch_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  if(ac == 2 && fts_is_symbol(at + 1))
+    {
+      fts_object_t *obj;
+      fts_atom_t a[2];
+
+      fts_set_symbol(a, fts_new_symbol("cxtch~"));
+      a[1] = at[1];
+      
+      obj = fts_eval_object_description(patcher, 2, a);
+
+      return obj;
+    }
+  else
+    return 0;
+}
+
 void
 sigthrow_config(void)
 {
-  fts_class_install(fts_new_symbol("throw~"),sigthrow_instantiate);
+  fts_hash_table_init(&catch_table);
+  fts_class_install(fts_new_symbol("cxtch~"), sigcatch_instantiate);
+  fts_register_object_doctor(fts_new_symbol("catch~"), sigcatch_doctor);
+
+  fts_class_install(fts_new_symbol("thrxw~"), sigthrow_instantiate);
+  fts_register_object_doctor(fts_new_symbol("throw~"), sigthrow_doctor);
 }

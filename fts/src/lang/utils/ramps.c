@@ -227,7 +227,6 @@ fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, int size)
     }
 }
 
-/*
 void
 fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size)
 {
@@ -252,4 +251,3 @@ fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size
       ramp->n_steps--;
     }
 }
-*/

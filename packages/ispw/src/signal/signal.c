@@ -29,7 +29,6 @@
 extern void zerocross_config(void);
 extern void sigthru_config(void);
 extern void sigthrow_config(void);
-extern void sigcatch_config(void);
 extern void sigthreshold_config(void);
 extern void sigswitch_config(void);
 extern void sigsnapshot_config(void);
@@ -57,7 +56,6 @@ static void ispw_signal_module_init(void)
   zerocross_config();
   sigthru_config();
   sigthrow_config();
-  sigcatch_config();
   sigthreshold_config();
   sigswitch_config();
   sigsnapshot_config();
