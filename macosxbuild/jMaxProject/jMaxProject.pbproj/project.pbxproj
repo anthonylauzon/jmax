@@ -161,18 +161,6 @@
 			settings = {
 			};
 		};
-		F542CC8303CAF4A701664090 = {
-			isa = PBXFileReference;
-			name = tup.c;
-			path = /Users/dechelle/projects/jmax/packages/control/c/src/tup.c;
-			refType = 0;
-		};
-		F542CC8403CAF4A701664090 = {
-			fileRef = F542CC8303CAF4A701664090;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F544CD9303387B6001664092 = {
 			isa = PBXFileReference;
 			name = thread.c;
@@ -223,6 +211,30 @@
 			name = libdtd.bundle;
 			path = build/libdtd.bundle;
 			refType = 2;
+		};
+		F54EC4DB03CB1DBF01664092 = {
+			isa = PBXFileReference;
+			name = macosxaudioport.c;
+			path = ../../packages/macosx/c/src/macosxaudioport.c;
+			refType = 2;
+		};
+		F54EC4DC03CB1DBF01664092 = {
+			fileRef = F54EC4DB03CB1DBF01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F54EC4DD03CB1FDF01664092 = {
+			isa = PBXFileReference;
+			name = tup.c;
+			path = ../../packages/control/c/src/tup.c;
+			refType = 2;
+		};
+		F54EC4DE03CB1FDF01664092 = {
+			fileRef = F54EC4DD03CB1FDF01664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		F5632C2203499A0701664092 = {
 			fileRef = F85494EB02D2501E01664092;
@@ -781,18 +793,6 @@
 		};
 		F5F40D720348A14401664092 = {
 			fileRef = F8F010CD028D861401664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F5F7D25303C057E201664090 = {
-			isa = PBXFileReference;
-			name = macosxaudioport.c;
-			path = /Users/dechelle/projects/jmax/packages/macosx/c/src/macosxaudioport.c;
-			refType = 0;
-		};
-		F5F7D25403C057E201664090 = {
-			fileRef = F5F7D25303C057E201664090;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -7008,7 +7008,7 @@
 				F851228D028BDFF301664092,
 				F851228E028BDFF301664092,
 				F57835EB034B08D301664092,
-				F542CC8303CAF4A701664090,
+				F54EC4DD03CB1FDF01664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -7203,7 +7203,7 @@
 				F8EE4BB7031CEE7001664092,
 				F57835EC034B08D301664092,
 				F519DF6E034B353A01664092,
-				F542CC8403CAF4A701664090,
+				F54EC4DE03CB1FDF01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -21037,7 +21037,7 @@
 				F8DC5EF90286A1FA01664092,
 				F78563BF02BA3BCE016640F1,
 				F889510702ED932301664092,
-				F5F7D25303C057E201664090,
+				F54EC4DB03CB1DBF01664092,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -21146,7 +21146,7 @@
 				F8DC5F020286A1FB01664092,
 				F800EB8F02CB316E01664092,
 				F800EB9002CB316F01664092,
-				F5F7D25403C057E201664090,
+				F54EC4DC03CB1DBF01664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
