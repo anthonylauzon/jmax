@@ -140,7 +140,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	 if (iAmPatcher) {	
 	   if (itsSubWindow != null) {//show the subpatcher, it's there
 	     itsSubWindow.setVisible(true);
-	     itsSketchPad.itsFirstClick = true;
+	     //itsSketchPad.itsFirstClick = true;
+	     ErmesSketchPad.RequestOffScreen(itsSketchPad);
 	   }
 	   else{	//this 'else' shouldn't be reached...
 	     itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());

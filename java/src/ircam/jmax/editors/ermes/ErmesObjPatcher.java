@@ -167,7 +167,8 @@ public class ErmesObjPatcher extends ErmesObject {
     if(evt.getClickCount()>1){
       if (itsSubWindow != null) {
 	itsSubWindow.show();
-	itsSketchPad.itsFirstClick = true;
+	//itsSketchPad.itsFirstClick = true;
+	ErmesSketchPad.RequestOffScreen(itsSketchPad);
       }
       //ask MaxApplication to create a new Patcher with this FtsPatcher
       //

@@ -1082,7 +1082,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
 
   public void focusLost(FocusEvent e){
-    itsSketchPad.itsFirstClick = true;
+    //itsSketchPad.itsFirstClick = true;
+    ErmesSketchPad.RequestOffScreen(itsSketchPad);
     itsSketchPad.itsScrolled = false;
   }
 
