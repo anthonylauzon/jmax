@@ -52,11 +52,15 @@ static fts_symbol_t sym_im = 0;
 static fts_symbol_t sym_mag = 0;
 static fts_symbol_t sym_arg = 0;
 
+
+
+
 /********************************************************
  *
  *  fmat format
  *
  */
+
 static fts_hashtable_t fmat_format_hash;
 static fmat_format_t *fmat_formats[FMAT_FORMATS_MAX + 1];
 static int fmat_n_formats = 0;
@@ -140,6 +144,9 @@ fmat_adapt_format(fmat_t *self)
     }    
   }
 }
+
+
+
 
 /********************************************************
  *
@@ -467,11 +474,38 @@ fmat_copy(fmat_t *org, fmat_t *copy)
   copy->format = org->format;
 }
 
+
+/* copy matrix row or col reference to an fvec */
+void
+fslice_copy(fslice_t *org, fvec_t *copy)
+{
+  fmat_t *orgmat = org->fmat;
+  float  *orgptr = fslice_get_ptr(org);
+  int     step   = fslice_get_stride(org);
+  int     size   = fslice_get_size(org);
+  int     i;
+
+  fmat_reshape(copy, size, 1);
+
+  for (i = 0; i < size; i++)
+  {
+    copy->values[i] = *orgptr;
+    orgptr += step;
+  }
+
+  copy->onset  = orgmat->onset;
+  copy->domain = orgmat->domain;
+  copy->sr     = orgmat->sr;
+  /* don't copy format from orgmat, since it's set to vector by fmat_reshape */
+}
+
+
 static void
 fmat_copy_function(const fts_atom_t *from, fts_atom_t *to)
 {
   fmat_copy((fmat_t *)fts_get_object(from), (fmat_t *)fts_get_object(to));
 }
+
 
 float
 fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b)
@@ -535,11 +569,15 @@ fmat_get_min_value_in_range(fmat_t *mat, int a, int b)
   return min;
 }
 
+
+
+
 /********************************************************
  *
  *  files
  *
  */
+
 #define FMAT_BLOCK_SIZE 256
 
 static void
@@ -712,11 +750,15 @@ fmat_export_audiofile(fmat_t *mat, fts_symbol_t file_name)
   return size;
 }
 
+
+
+
 /********************************************************************
  *
  *   check & errors
  *
  */
+
 static void
 fmat_error_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
 {
@@ -762,6 +804,9 @@ fslice_error_index(fslice_t *slice, fslice_t *op, const char *prefix)
                      frow_get_index(op), fmat_get_m(op->fmat), fmat_get_n(op->fmat));
   }
 }
+
+
+
 
 /********************************************************************
  *
@@ -1021,6 +1066,9 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_return_float(fmat_get_element(self, i, j));
 }
 
+
+
+
 /******************************************************************************
  *
  * functions, i.e. methods that return a value but don't change the object
@@ -1182,11 +1230,15 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object(obj);
 }
 
+
+
+
 /******************************************************************************
  *
  *  real arithmetics
  *
  */
+
 static void
 fmat_add_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1397,7 +1449,10 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     p[i] = r / p[i];
 }
 
-/**************************************************************************************
+
+
+
+/******************************************************************************
  *
  *  real comparison
  *
@@ -1613,11 +1668,15 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     p[i] = (float)(p[i] <= r);
 }
 
+
+
+
 /******************************************************************************
  *
  *  complex arithmetics
  *
  */
+
 static void
 fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1770,11 +1829,15 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
 }
 
+
+
+
 /******************************************************************************
  *
  *  mixed real/complex math funs
  *
  */
+
 static void
 fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2129,11 +2192,15 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
 }
 
+
+
+
 /********************************************************************
  *
  *  order operations
  *
  */
+
 static void
 fmat_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2270,11 +2337,15 @@ fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }
 }
 
+
+
+
 /******************************************************************************
  *
  *  format conversion
  *
  */
+
 static void
 fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2428,11 +2499,15 @@ fmat_convert_real(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   }
 }
 
+
+
+
 /******************************************************************************
  *
  *  matrix slice operations
  *
  */
+
 static void
 fslice_add_fslice(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
@@ -2703,11 +2778,15 @@ fslice_vid_number(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const ft
     fslice_error_index(self, NULL, "vid");
 }
 
-/**************************************************************************************
+
+
+
+/******************************************************************************
  *
  *  load, save, import, export
  *
  */
+
 static const char str_aiff[3] = "aif";
 
 /* well this works for "aif" and "aiff" and "aifff" and "aaiiiffff" and so on  */
@@ -2781,11 +2860,15 @@ fmat_export_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const f
   fts_object_save_dialog(o, fts_s_export, fts_new_symbol("export fmat"), fts_project_get_dir(), fts_new_symbol(".aiff"));
 }
 
+
+
+
 /*********************************************************
  *
  *  editor
  *
  */
+
 static void 
 fmat_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2833,11 +2916,15 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   }
 }
 
+
+
+
 /********************************************************************
  *
  *  system functions
  *
  */
+
 static void
 fmat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2949,11 +3036,15 @@ fmat_equals(const fts_atom_t *a, const fts_atom_t *b)
   return 0;
 }
 
+
+
+
 /*********************************************************
  *
  *  class init/delete
  *
  */
+
 static void
 fmat_initialize(fmat_t *self)
 {
@@ -3098,11 +3189,15 @@ fslice_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_object_release(self->fmat);
 }
 
+
+
+
 /*********************************************************
  *
  *  class instantiate
  *
  */
+
 static void
 fmat_message(fts_class_t *cl, fts_symbol_t s, fts_method_t marix_method, fts_method_t scalar_method)
 {
@@ -3217,6 +3312,11 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_outlet_thru(cl, 0);
   
   fts_class_set_copy_function(cl, fmat_copy_function);
+
+
+  /*
+   * fmat/fvec class documentation
+   */
   
   fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (default is 1)> [<num: init values> ...]]]", "matrix of floats");
   
@@ -3278,6 +3378,11 @@ fslice_instantiate(fts_class_t *cl)
   fslice_message(cl, fts_new_symbol("bus"), fslice_bus_fslice, fslice_bus_number);
   fslice_message(cl, fts_new_symbol("vid"), fslice_vid_fslice, fslice_vid_number);
 
+
+  /*
+   * fcol/frow class documentation
+   */
+  
   fts_class_doc(cl, fts_new_symbol("add"), "<num|fcol|frow: operand>", "add given scalar, fcol or frow (element by element) to current values");
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fcol|frow: operand>", "substract given scalar, fcol or frow (element by element)");
   fts_class_doc(cl, fts_new_symbol("mul"), "<num|fcol|frow: operand>", "multiply current values by given scalar, fcol or frow (element by element)");
@@ -3351,6 +3456,8 @@ fmat_config(void)
   /*fmat_null = (fmat_t *)fts_object_create(fmat_class, 0, 0);*/
   /*fts_object_refer((fts_object_t *)fmat_null);*/
 }
+
+
 
 /** EMACS **
  * Local variables:

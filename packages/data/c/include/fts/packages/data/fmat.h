@@ -25,11 +25,14 @@
 
 #include <fts/packages/data/data.h>
 
+
+
 /********************************************************************************
  *
  *  fmat format
  *
  */
+
 #define FMAT_FORMATS_MAX 256
 
 enum fmat_format_id_enum {
@@ -57,11 +60,14 @@ DATA_API fmat_format_t *fmat_format_real;
 #define fmat_format_get_n(f) ((f)->n_columns)
 #define fmat_format_get_column_name(f, i) ((f)->column[i])
 
-/********************************************************************************
+
+
+/******************************************************************************
  *
  *  fmat
  *
  */
+
 typedef struct
 {
   fts_object_t o;
@@ -164,22 +170,28 @@ DATA_API float fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_max_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
 
-/********************************************************************************
+
+
+/******************************************************************************
  *
  *  fvec
  *
  */
+
 typedef fmat_t fvec_t;
 
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
 #define fvec_type fvec_class
 
-/********************************************************************************
+
+
+/******************************************************************************
  *
  *  fmat slice: fcol, frow
  *
  */
+
 typedef struct
 {
   fts_object_t o;
@@ -187,6 +199,10 @@ typedef struct
   fmat_t *fmat; /* pointer to fmat */
   int index; /* index of row or column */
 } fslice_t;
+
+DATA_API fts_symbol_t fcol_symbol;
+DATA_API fts_symbol_t frow_symbol;
+
 
 #define fslice_init_column(s, m, i) ((s)->type = fslice_column, (s)->fmat = (m), (s)->index = (i))
 #define fslice_init_row(s, m, i) ((s)->type = fslice_row, (s)->fmat = (m), (s)->index = (i))
@@ -222,5 +238,10 @@ typedef struct
 
 #define frow_check_index(f) ((f)->index < fmat_get_m((f)->fmat))
 #define fcol_check_index(f) ((f)->index < fmat_get_n((f)->fmat))
+
+/**
+* @ingroup fslice
+ */
+DATA_API void fslice_copy(fslice_t *org, fvec_t *copy);
 
 #endif
