@@ -819,25 +819,30 @@ fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t fil
   /* If the declaration existed already, remove it first */
   template = fts_package_get_declared_template(pkg, name);
   
-  if (template) {
-    
-    /* change the template definition, and redefine all the instances */
-    fts_template_redefine(template, file);
-    
-  } else {
+  if (template) 
+    {
+      /* change the template definition, and redefine all the instances */
+      fts_template_redefine(template, file);
+    } 
+  else 
+    {
+      
+      /* Create the database if necessary */
+      if (pkg->declared_templates == NULL) 
+	{
+	  pkg->declared_templates = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
+	  fts_hashtable_init(pkg->declared_templates, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+	}
+      
+      /* Register the template */
+      template = fts_template_new(name, NULL, file);
 
-    /* Create the database if necessary */
-    if (pkg->declared_templates == NULL) {
-      pkg->declared_templates = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->declared_templates, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+      fts_set_symbol(&n, name);
+      fts_set_ptr(&p, template);
+      fts_hashtable_put(pkg->declared_templates, &n, &p);
+
+      fts_template_set_package(template, pkg);
     }
-
-    /* Register the template */
-    template = fts_template_new(name, NULL, file);
-    fts_set_symbol(&n, name);
-    fts_set_ptr(&p, template);
-    fts_hashtable_put(pkg->declared_templates, &n, &p);  
-  }
 }
 
 void fts_package_add_template_path(fts_package_t* pkg, fts_symbol_t path)
@@ -852,27 +857,24 @@ fts_template_t *
 fts_package_get_declared_template(fts_package_t* pkg, fts_symbol_t name)
 {
   fts_atom_t a, k;
-  fts_template_t *template;
   char buf[MAXPATHLEN];
 
   fts_set_symbol( &k, name);
-  if ((pkg->declared_templates != NULL) 
-      && fts_hashtable_get(pkg->declared_templates, &k, &a)) {
 
-    template = (fts_template_t *) fts_get_ptr(&a);
-
-    if (fts_template_get_filename(template) == NULL) {
-      fts_make_absolute_path(fts_symbol_name(pkg->dir), 
-			     fts_symbol_name(fts_template_get_original_filename(template)), 
-			     buf, MAXPATHLEN);
-      fts_template_set_filename(template, fts_new_symbol_copy(buf));
-    }
-
-    return template;
-
-  } else {
+  if ((pkg->declared_templates != NULL) && fts_hashtable_get(pkg->declared_templates, &k, &a)) 
+    {
+      fts_template_t *template = (fts_template_t *) fts_get_ptr(&a);
+      
+      if (fts_template_get_filename(template) == NULL) 
+	{
+	  fts_make_absolute_path(fts_symbol_name(pkg->dir), fts_symbol_name(fts_template_get_original_filename(template)), buf, MAXPATHLEN);
+	  fts_template_set_filename(template, fts_new_symbol_copy(buf));
+	}
+      
+      return template;
+    } 
+  else
     return NULL;
-  }
 }
 
 fts_template_t *
@@ -882,42 +884,45 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
 
   fts_set_symbol( &k, name);
 
-  if ((pkg->templates_in_path != NULL) 
-      && fts_hashtable_get(pkg->templates_in_path, &k, &a)) {
+  if ((pkg->templates_in_path != NULL) && fts_hashtable_get(pkg->templates_in_path, &k, &a)) 
     return (fts_template_t *) fts_get_ptr(&a);
-  } else {
-    char filename[MAXPATHLEN];
-    char path[MAXPATHLEN];
-    fts_template_t* t;
-    fts_atom_t n, p;
-    const char* root;
+  else
+    {
+      char filename[MAXPATHLEN];
+      char path[MAXPATHLEN];
+      fts_template_t* template;
+      fts_atom_t n, p;
+      const char* root;
+      
+      root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
+      
+      snprintf(filename, MAXPATHLEN, "%s.jmax", fts_symbol_name(name));
 
-    root = (pkg->dir != NULL)? fts_symbol_name(pkg->dir) : NULL;
+      if (!fts_find_file(root, pkg->template_paths, filename, path, MAXPATHLEN))
+	return NULL;
+      
+      /* Register the template */
+      template = fts_template_new(name, fts_new_symbol_copy(path), NULL);
+      
+      /* Create the database if necessary */
+      if (pkg->templates_in_path == NULL) 
+	{
+	  pkg->templates_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
+	  fts_hashtable_init(pkg->templates_in_path, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+	}
+      
+      fts_set_symbol(&n, name);
+      fts_set_ptr(&p, template);
+      fts_hashtable_put(pkg->templates_in_path, &n, &p);  
 
-    snprintf(filename, MAXPATHLEN, "%s.jmax", fts_symbol_name(name));
-    if (!fts_find_file(root, pkg->template_paths, filename, path, MAXPATHLEN)) {
-      return NULL;
+      fts_template_set_package(template, pkg);
+      
+      return template;
     }
-
-    /* Register the template */
-    t = fts_template_new(name, fts_new_symbol_copy(path), NULL);
-
-    /* Create the database if necessary */
-    if (pkg->templates_in_path == NULL) {
-      pkg->templates_in_path = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-      fts_hashtable_init(pkg->templates_in_path, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-    }
-
-    fts_set_symbol(&n, name);
-    fts_set_ptr(&p, t);
-    fts_hashtable_put(pkg->templates_in_path, &n, &p);  
-
-    return t;
-  }
 }
 
 
-fts_template_t* 
+fts_template_t * 
 fts_package_get_template_from_file(fts_package_t* pkg, fts_symbol_t filename)
 {
   fts_iterator_t iter;
@@ -1074,76 +1079,61 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
  */
 
 fts_status_t 
-fts_package_add_metaclass( fts_package_t* pkg, 
-			   fts_symbol_t name, 
-			   fts_instantiate_fun_t instantiate_fun, 
-			   fts_equiv_fun_t equiv_fun)
+fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl)
 {
+  fts_symbol_t name = mcl->name;
   fts_atom_t data, k;
-  fts_metaclass_t *mcl;
 
   /* Create the database if necessary */
-  if (pkg->classes == NULL) {
-    pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-    fts_hashtable_init(pkg->classes, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-  }
+  if (pkg->classes == NULL) 
+    {
+      pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
+      fts_hashtable_init(pkg->classes, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    }
 
   fts_set_symbol( &k, name);
   if (fts_hashtable_get(pkg->classes, &k, &data))
-    {
-      return &fts_DuplicatedMetaclass;
-    }
+    return &fts_DuplicatedMetaclass;
   else
     {
-      mcl = fts_new_metaclass(name, instantiate_fun, equiv_fun);
       fts_set_ptr(&data, mcl);
       fts_hashtable_put(pkg->classes, &k, &data);
     }
 
-  return fts_Success;
-}
-
-fts_status_t 
-fts_package_add_metaclass_alias(fts_package_t* pkg, fts_symbol_t new_name, fts_symbol_t old_name)
-{
-  fts_atom_t data, k;
-  fts_metaclass_t *mcl;
-
-
-  /* Create the database if necessary */
-  if (pkg->classes == NULL) {
-    pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
-    fts_hashtable_init(pkg->classes, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
-  }
-
-  fts_set_symbol( &k, new_name);
-  if (fts_hashtable_get(pkg->classes, &k, &data))
-    {
-      return &fts_DuplicatedMetaclass;
-    }
-  else
-    {
-      mcl = fts_package_get_metaclass(pkg, old_name);
-      fts_set_ptr(&data, mcl);
-      fts_hashtable_put(pkg->classes, &k, &data);
-    }
+  fts_metaclass_set_package(mcl, pkg);
 
   return fts_Success;
 }
 
-fts_metaclass_t*
+fts_metaclass_t *
 fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name)
 {
   fts_atom_t data, k;
-
+  
   fts_set_symbol( &k, name);
-
-  if ((pkg->classes != NULL) 
-      && fts_hashtable_get(pkg->classes, &k, &data)) {
+  
+  if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data)) 
     return fts_get_ptr(&data);
-  } else {
+  else 
     return NULL;
-  }
+}
+
+fts_status_t 
+fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
+{
+  fts_metaclass_t *mcl = fts_package_get_metaclass(pkg, name);
+  fts_atom_t data, k;
+  
+  fts_set_symbol( &k, alias);
+  if (fts_hashtable_get(pkg->classes, &k, &data))
+    return &fts_DuplicatedMetaclass;
+  else
+    {
+      fts_set_ptr(&data, mcl);
+      fts_hashtable_put(pkg->classes, &k, &data);
+    }
+  
+  return fts_Success;
 }
 
 /********************************************************************

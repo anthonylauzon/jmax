@@ -455,7 +455,7 @@ patcher_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 void 
 fts_patcher_set_template(fts_patcher_t *this, fts_template_t *template)
 {
-  this->type     = fts_p_template;
+  this->type = fts_p_template;
   this->template = template;
 
   fts_template_add_instance(template, (fts_object_t *) this);

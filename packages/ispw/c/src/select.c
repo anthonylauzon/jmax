@@ -204,5 +204,5 @@ void
 select_config(void)
 {
   fts_metaclass_install(fts_new_symbol("select"), select_instantiate, fts_narg_equiv);
-  fts_metaclass_alias(fts_new_symbol("sel"), fts_new_symbol("select"));
+  fts_alias_install(fts_new_symbol("sel"), fts_new_symbol("select"));
 }

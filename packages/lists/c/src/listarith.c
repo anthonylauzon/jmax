@@ -788,15 +788,15 @@ listarith_config(void)
   fts_class_install(fts_new_symbol("list=="), listarith_instantiate);
 
   /* aliases */
-  fts_class_alias(fts_new_symbol("l+"), fts_new_symbol("list+"));
-  fts_class_alias(fts_new_symbol("l-"), fts_new_symbol("list-"));
-  fts_class_alias(fts_new_symbol("l*"), fts_new_symbol("list*"));
-  fts_class_alias(fts_new_symbol("l/"), fts_new_symbol("list/"));
+  fts_alias_install(fts_new_symbol("l+"), fts_new_symbol("list+"));
+  fts_alias_install(fts_new_symbol("l-"), fts_new_symbol("list-"));
+  fts_alias_install(fts_new_symbol("l*"), fts_new_symbol("list*"));
+  fts_alias_install(fts_new_symbol("l/"), fts_new_symbol("list/"));
 
-  fts_class_alias(fts_new_symbol("l<"), fts_new_symbol("list<"));
-  fts_class_alias(fts_new_symbol("l<="), fts_new_symbol("list<="));
-  fts_class_alias(fts_new_symbol("l>"), fts_new_symbol("list>"));
-  fts_class_alias(fts_new_symbol("l>="), fts_new_symbol("list>="));
-  fts_class_alias(fts_new_symbol("l!="), fts_new_symbol("list!="));
-  fts_class_alias(fts_new_symbol("l=="), fts_new_symbol("list=="));
+  fts_alias_install(fts_new_symbol("l<"), fts_new_symbol("list<"));
+  fts_alias_install(fts_new_symbol("l<="), fts_new_symbol("list<="));
+  fts_alias_install(fts_new_symbol("l>"), fts_new_symbol("list>"));
+  fts_alias_install(fts_new_symbol("l>="), fts_new_symbol("list>="));
+  fts_alias_install(fts_new_symbol("l!="), fts_new_symbol("list!="));
+  fts_alias_install(fts_new_symbol("l=="), fts_new_symbol("list=="));
 }

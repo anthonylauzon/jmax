@@ -512,7 +512,7 @@ fft_config(void)
   sym_miller = fts_new_symbol("miller");
   
   fts_metaclass_install(sym_fft, class_instantiate, fft_class_equiv);
-  fts_metaclass_alias(sym_ifft, sym_fft);
+  fts_alias_install(sym_ifft, sym_fft);
   
   if(!dsp_sym_fft_complex) ftl_fft_init(); /* init the fft functions dsp symbol table */
 }

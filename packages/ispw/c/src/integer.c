@@ -82,8 +82,8 @@ integer_config(void)
 
   /* ... and register 2 aliases for the "int" name: "i" and "integer" */
 
-  fts_class_alias(fts_new_symbol("integer"), fts_new_symbol("int"));
-  fts_class_alias(fts_new_symbol("i"), fts_new_symbol("int"));
+  fts_alias_install(fts_new_symbol("integer"), fts_new_symbol("int"));
+  fts_alias_install(fts_new_symbol("i"), fts_new_symbol("int"));
 }
 
 /* ---------------- the metaclass instantiation function ------------------ */

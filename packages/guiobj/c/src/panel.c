@@ -122,5 +122,5 @@ void
 panel_config(void)
 {
   fts_class_install( fts_new_symbol("openpanel"), panel_instantiate);
-  fts_class_alias( fts_new_symbol("savepanel"), fts_new_symbol("openpanel"));
+  fts_alias_install( fts_new_symbol("savepanel"), fts_new_symbol("openpanel"));
 }

@@ -178,7 +178,7 @@ value_config(void)
 
   fts_class_install(value_symbol, value_instantiate);
 
-  fts_class_alias(fts_new_symbol("val"), value_symbol);
+  fts_alias_install(fts_new_symbol("val"), value_symbol);
 
   value_class = fts_class_get_by_name(value_symbol);
 }

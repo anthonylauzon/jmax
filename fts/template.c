@@ -61,6 +61,7 @@
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/loader.h>
 #include <ftsprivate/package.h>
+#include <ftsprivate/template.h>
 
 #define TEMPLATE_DEBUG 
 
@@ -69,24 +70,11 @@
  */
 static fts_heap_t *template_heap;
 
-/*
- * template definition
- */
-struct fts_template
-{
-  fts_symbol_t name;
-  fts_symbol_t filename;
-  fts_symbol_t original_filename;
-  fts_list_t *instances;
-};
-
 static void fts_template_recompute_instances(fts_template_t *template);
 static fts_template_t *fts_template_for_file(fts_symbol_t filename);
 
-static fts_object_t* fts_make_template_instance(fts_template_t *template,
-						fts_patcher_t *patcher,
-						int ac, const fts_atom_t *at,
-						fts_expression_state_t *e);
+static fts_object_t* 
+fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_expression_state_t *e);
 
 /***********************************************************************
  *
@@ -105,6 +93,7 @@ fts_template_new(fts_symbol_t name, fts_symbol_t filename, fts_symbol_t original
   template->filename = filename;
   template->original_filename = original_filename;
   template->instances = 0;
+  template->package = 0;
 
 #ifdef TEMPLATE_DEBUG 
   {
@@ -123,25 +112,22 @@ fts_template_redefine(fts_template_t *template, fts_symbol_t filename)
   fts_template_recompute_instances(template);
 }
 
-
 /*
  * The real template loader: load the template, looking in the
  * declaration and path table
  *
  */
 static fts_object_t*
-fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher,
-			   int ac, const fts_atom_t *at, fts_expression_state_t *e)
+fts_make_template_instance(fts_template_t *template, fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_expression_state_t *e)
 {
   fts_object_t *obj;
 
   obj = fts_binary_file_load(fts_symbol_name(template->filename), (fts_object_t *) patcher, ac, at, e);
     
   /* flag the patcher as template, and set the template */
-  if (obj) {
+  if (obj) 
     fts_patcher_set_template((fts_patcher_t *)obj, template);
-  }
-
+  
   return obj;
 }
 
@@ -208,24 +194,6 @@ fts_template_remove_instance(fts_template_t *template, fts_object_t *object)
 #endif
 }
 
-fts_symbol_t 
-fts_template_get_filename(fts_template_t *template)
-{
-  return template->filename;
-}
-
-void 
-fts_template_set_filename(fts_template_t *template, fts_symbol_t filename)
-{
-  template->filename = filename;
-}
-
-fts_symbol_t 
-fts_template_get_original_filename( fts_template_t *template)
-{
-  return template->original_filename;
-}
-
 /***********************************************************************
  *
  *  Global template functions
@@ -242,30 +210,29 @@ fts_template_new_declared(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
 
   pkg = fts_get_current_package();
   template = fts_package_get_declared_template(pkg, fts_get_symbol(&at[0]));
-  if (template) {
+
+  if (template)
     return fts_make_template_instance(template, patcher, ac, at, e);
-  }
   
   /* ask the required packages of the current package */
   fts_package_get_required_packages(pkg, &pkg_iter);
 
-  while ( fts_iterator_has_more( &pkg_iter)) {
-    fts_iterator_next( &pkg_iter, &pkg_name);
-    pkg = fts_package_get(fts_get_symbol(&pkg_name));
-    
-    if (pkg == NULL) {
-      continue;
-    }
+  while ( fts_iterator_has_more( &pkg_iter)) 
+    {
+      fts_iterator_next( &pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+      
+      if (pkg == NULL)
+	continue;
+      
+      template = fts_package_get_declared_template(pkg, fts_get_symbol(&at[0]));
 
-    template = fts_package_get_declared_template(pkg, fts_get_symbol(&at[0]));
-    if (template) {
-      return fts_make_template_instance(template, patcher, ac, at, e);
+      if (template)
+	return fts_make_template_instance(template, patcher, ac, at, e);
     }
-  }
   
   return 0;
 }
-
 
 fts_object_t*
 fts_template_new_search(fts_patcher_t *patcher,	int ac, const fts_atom_t *at, fts_expression_state_t *e)
@@ -277,26 +244,26 @@ fts_template_new_search(fts_patcher_t *patcher,	int ac, const fts_atom_t *at, ft
 
   pkg = fts_get_current_package();
   template = fts_package_get_template_in_path(pkg, fts_get_symbol(&at[0]));
-  if (template) {
+
+  if (template)
     return fts_make_template_instance(template, patcher, ac, at, e);
-  }
   
   /* ask the required packages of the current package */
   fts_package_get_required_packages(pkg, &pkg_iter);
 
-  while ( fts_iterator_has_more( &pkg_iter)) {
-    fts_iterator_next( &pkg_iter, &pkg_name);
-    pkg = fts_package_get(fts_get_symbol(&pkg_name));
-    
-    if (pkg == NULL) {
-      continue;
-    }
+  while ( fts_iterator_has_more( &pkg_iter)) 
+    {
+      fts_iterator_next( &pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+      
+      if (pkg == NULL)
+	continue;
+      
+      template = fts_package_get_template_in_path(pkg, fts_get_symbol(&at[0]));
 
-    template = fts_package_get_template_in_path(pkg, fts_get_symbol(&at[0]));
-    if (template) {
-      return fts_make_template_instance(template, patcher, ac, at, e);
+      if (template)
+	return fts_make_template_instance(template, patcher, ac, at, e);
     }
-  }
   
   return 0;
 }

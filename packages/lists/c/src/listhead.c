@@ -55,7 +55,7 @@ void
 listhead_config(void)
 {
   fts_class_install(fts_new_symbol("listhead"), listhead_instantiate);
-  fts_class_alias(fts_new_symbol("lhead"), fts_new_symbol("listhead"));
+  fts_alias_install(fts_new_symbol("lhead"), fts_new_symbol("listhead"));
 }
 
 

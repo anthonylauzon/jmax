@@ -23,9 +23,6 @@
 #ifndef _FTS_PACKAGE_H_
 #define _FTS_PACKAGE_H_
 
-/* forward declaration */
-typedef struct _fts_package_t fts_package_t;
-
 /***********************************************
  *
  *  Package registry

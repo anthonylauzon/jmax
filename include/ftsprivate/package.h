@@ -256,29 +256,23 @@ fts_abstraction_t *fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_s
 /**
  * Add a new meta class to this package.
  *
- * @fn fts_status_t fts_package_add_metaclass(fts_package_t* pkg, fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
+ * @fn fts_status_t fts_package_add_metaclass(fts_package_t* pkg, fts_metaclass_t *mcl)
  * @param pkg the package
- * @param name the name of the meta class
- * @param instantiate_fun the class instantiation function
- * @param equiv_fun the class equivalence function
+ * @param mcl the meta class
  * @return a status object 
  * @ingroup package */
-fts_status_t fts_package_add_metaclass( fts_package_t* pkg, 
-						fts_symbol_t name, 
-						fts_instantiate_fun_t instantiate_fun, 
-						fts_equiv_fun_t equiv_fun);
-
+fts_status_t fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl);
 
 /**
- * Add a new alias for a meta class.
+ * Add a new alias for an existing class name to this package.
  *
- * @fn fts_status_t fts_package_add_metaclass_alias(fts_package_t* pkg, fts_symbol_t new_name, fts_symbol_t old_name)
+ * @fn fts_status_t fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
  * @param pkg the package
- * @param new_name the alias name  
- * @param old_name the original class name
+ * @param alias alias name
+ * @param name name of the class to be aliased
  * @return a status object 
  * @ingroup package */
-fts_status_t fts_package_add_metaclass_alias(fts_package_t* pkg, fts_symbol_t new_name, fts_symbol_t old_name);
+fts_status_t fts_package_add_alias( fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name);
 
 /**
  * Returns the meta class with the specified name. 

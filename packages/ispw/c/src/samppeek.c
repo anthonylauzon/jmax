@@ -185,6 +185,6 @@ void
 samppeek_config(void)
 {
   fts_class_install(fts_new_symbol("samppeek"), class_instantiate);
-  fts_class_alias(fts_new_symbol("samppeek~"), fts_new_symbol("samppeek"));
+  fts_alias_install(fts_new_symbol("samppeek~"), fts_new_symbol("samppeek"));
 }
 

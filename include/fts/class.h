@@ -24,7 +24,6 @@
 #ifndef _FTS_CLASS_H_
 #define _FTS_CLASS_H_
 
-
 typedef fts_status_t (*fts_instantiate_fun_t)(fts_class_t *, int, const fts_atom_t *);
 typedef int (*fts_equiv_fun_t)(int, const fts_atom_t *, int, const fts_atom_t *);
 
@@ -33,13 +32,13 @@ typedef struct fts_outlet_decl fts_outlet_decl_t;
 
 struct fts_metaclass
 {
+  fts_symbol_t name; /* name of the metaclass, i.e. the first name used to register it */
+
   fts_instantiate_fun_t instantiate_fun;
-
-  /* Instance data base */
   fts_equiv_fun_t equiv_fun;
-  fts_class_t *inst_list;
+  fts_class_t *inst_list; /* instance data base */
 
-  fts_symbol_t name;		/* the name of the metaclass, i.e. the first name used to register it */
+  fts_package_t *package; /* home package of the metaclass */
 };
 
 struct fts_class
@@ -81,19 +80,12 @@ FTS_API fts_status_description_t fts_CannotInstantiate;
 
 /* Meta classes functions */
 
-FTS_API fts_status_t fts_metaclass_install( fts_symbol_t name,
-					   fts_instantiate_fun_t instantiate_fun,
-					   fts_equiv_fun_t equiv_fun);
-
+FTS_API fts_status_t fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun);
 FTS_API fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 
-FTS_API void fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name);
-
-FTS_API void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name);
-
+FTS_API void fts_alias_install(fts_symbol_t alias_name, fts_symbol_t class_name);
 
 /* Class functions  and macros */
-
 #define FTS_VAR_ARGS  -1
 
 FTS_API fts_status_t fts_class_init(fts_class_t *, unsigned int, int ninlets, int noutlets, void *);

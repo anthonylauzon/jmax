@@ -45,6 +45,7 @@ struct fts_outlet
 #define fts_patcher_set_abstraction(p)   ((p)->type = fts_p_abstraction)
 #define fts_patcher_set_error(p)         ((p)->type = fts_p_error)
 extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *template);
+#define fts_patcher_get_template(p) ((p)->template)
 
 #define fts_patcher_is_standard(p)       ((p)->type == fts_p_standard)
 #define fts_patcher_is_abstraction(p)    ((p)->type == fts_p_abstraction)

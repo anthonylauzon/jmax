@@ -134,6 +134,6 @@ void
 delay_config(void)
 {
   fts_class_install(fts_new_symbol("delay"),delay_instantiate);
-  fts_class_alias(fts_new_symbol("del"), fts_new_symbol("delay"));
+  fts_alias_install(fts_new_symbol("del"), fts_new_symbol("delay"));
 }
 

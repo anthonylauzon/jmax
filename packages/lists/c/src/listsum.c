@@ -71,5 +71,5 @@ void
 listsum_config(void)
 {
   fts_class_install(fts_new_symbol("listsum"), listsum_instantiate);
-  fts_class_alias(fts_new_symbol("lsum"), fts_new_symbol("listsum"));
+  fts_alias_install(fts_new_symbol("lsum"), fts_new_symbol("listsum"));
 }

@@ -53,6 +53,6 @@ void
 listsize_config(void)
 {
   fts_class_install(fts_new_symbol("listsize"), listsize_instantiate);
-  fts_class_alias(fts_new_symbol("listlength"), fts_new_symbol("listsize"));
-  fts_class_alias(fts_new_symbol("lsize"), fts_new_symbol("listsize"));
+  fts_alias_install(fts_new_symbol("listlength"), fts_new_symbol("listsize"));
+  fts_alias_install(fts_new_symbol("lsize"), fts_new_symbol("listsize"));
 }

@@ -1,3 +1,8 @@
+2001-10-23  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* added package to metaclass and template for fts_object_get_package()
+	* changed API function fts_(meta)class_alias() to fts_alias_install()
+
 2001-10-23  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Changed fts/client.c. The FTS object that is created by the client

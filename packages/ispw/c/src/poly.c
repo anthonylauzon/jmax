@@ -309,6 +309,6 @@ void
 poly_config(void)
 {
   fts_class_install(fts_new_symbol("poly"), poly_instantiate);
-  fts_class_alias(fts_new_symbol("loco"), fts_new_symbol("poly"));
+  fts_alias_install(fts_new_symbol("loco"), fts_new_symbol("poly"));
 }
 

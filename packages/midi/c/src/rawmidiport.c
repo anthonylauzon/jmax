@@ -149,7 +149,6 @@ rawmidiport_send_system_exclusive_byte(fts_object_t *o, int value)
       this->sysex_head = 1;
 
       fts_bytestream_output_char(this->stream, (unsigned char)STATUS_BYTE_SYSEX);
-      fts_bytestream_output_char(this->stream, (unsigned char)STATUS_BYTE_SYSEX_REALTIME);
     }
 
   fts_bytestream_output_char(this->stream, (unsigned char)(value & 0x7f));

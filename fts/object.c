@@ -1107,6 +1107,20 @@ fts_object_blip(fts_object_t *obj, const char *format , ...)
   fts_patcher_blip(fts_object_get_patcher(obj), buf);
 }
 
+/*************************************************************************************
+ *
+ *  package
+ *
+ */
+fts_package_t *
+fts_object_get_package(fts_object_t *obj)
+{
+  if(fts_object_is_template(obj))
+    return fts_template_get_package(fts_patcher_get_template((fts_patcher_t *)obj));
+  else
+    return fts_metaclass_get_package(fts_object_get_metaclass(obj));
+}
+
 /**************************************************************************************
  *
  *  debug print 

@@ -42,9 +42,6 @@ fts_status_description_t fts_OutletAlreadyDefined = {"outlet already defined"};
 fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
 
 /* Static  declarations  */
-
-static fts_hashtable_t fts_metaclass_table;
-static fts_hashtable_t fts_metaclass_alias_table;
 static fts_heap_t *class_mess_heap;
 
 /* Forward declarations */
@@ -100,83 +97,38 @@ static void fts_atom_type_copy( int ac, fts_symbol_t *at, fts_symbol_t **sat)
 /******************************************************************************/
 
 
-fts_metaclass_t*
-fts_new_metaclass( fts_symbol_t name,
-		   fts_instantiate_fun_t instantiate_fun,
-		   fts_equiv_fun_t equiv_fun)
+static fts_metaclass_t*
+fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
 {
-  fts_metaclass_t *mcl;
+  fts_metaclass_t *mcl = fts_zalloc(sizeof(fts_metaclass_t));
 
-  mcl = fts_zalloc(sizeof(fts_metaclass_t));
-
+  mcl->name = name;
   mcl->instantiate_fun = instantiate_fun;
   mcl->equiv_fun = equiv_fun;
-  mcl->name = name;
+  mcl->package = 0;
 
   return mcl;
 }
 
-fts_status_t fts_metaclass_install( fts_symbol_t name, 
-				    fts_instantiate_fun_t instantiate_fun, 
-				    fts_equiv_fun_t equiv_fun)
+fts_status_t 
+fts_metaclass_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun)
 {
-  return fts_package_add_metaclass(fts_get_current_package(), name, instantiate_fun, equiv_fun);
+  fts_metaclass_t *mcl =  fts_metaclass_new(name, instantiate_fun, equiv_fun);
+
+  return fts_package_add_metaclass(fts_get_current_package(), mcl);
 }
 
-
-fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
+fts_status_t 
+fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
   return fts_metaclass_install( name, instantiate_fun, fts_always_equiv);
 }
 
-
-static void fts_metaclass_alias_realize( fts_symbol_t new_name, fts_symbol_t old_name)
+void 
+fts_alias_install( fts_symbol_t alias_name, fts_symbol_t class_name)
 {
-  fts_package_add_metaclass_alias(fts_get_current_package(), new_name, old_name);
+  fts_package_add_alias(fts_get_current_package(), alias_name, class_name);
 }
-
-void fts_metaclass_alias( fts_symbol_t new_name, fts_symbol_t old_name)
-{
-  fts_metaclass_t *mcl;
-
-  mcl = fts_metaclass_get_by_name( old_name);
-
-  if (mcl && mcl->equiv_fun == fts_always_equiv)
-    {
-      post( "Error: Cannot alias \"%s\" using fts_metaclass_alias(): \"%s\" is a class. Use fts_class_alias() instead.\n", fts_symbol_name( old_name));
-      return;
-    }
-
-  fts_metaclass_alias_realize( new_name, old_name);
-}
-
-void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name)
-{
-  fts_metaclass_t *mcl;
-
-  mcl = fts_metaclass_get_by_name( old_name);
-
-  if (mcl && mcl->equiv_fun != fts_always_equiv)
-    {
-      const char *s;
-
-      s = fts_symbol_name( old_name);
-      post( "Error: Cannot alias %s using fts_class_alias(): %s is a metaclass. Use fts_metaclass_alias() instead.\n", s, s);
-      return;
-    }
-
-  fts_metaclass_alias_realize( new_name, old_name);
-}
-
-
-static fts_symbol_t fts_metaclass_get_real_name(fts_symbol_t name)
-{
-  fts_metaclass_t *mcl;
-
-  mcl = fts_metaclass_get_by_name(name);
-  return (mcl != NULL)? mcl->name : NULL;
-}
-
 
 fts_metaclass_t*
 fts_metaclass_get_by_name(fts_symbol_t name)
@@ -613,8 +565,6 @@ fts_arg_type_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *a
   return 1;
 }
 
-
-
 int fts_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
   int n;
@@ -706,7 +656,6 @@ fts_arg_equiv_or_float(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_
 }
 
 /* if there is no first arg, return 1 */
-
 int
 fts_first_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
@@ -752,24 +701,17 @@ fts_first_arg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *a
     return 0;
 }
 
-
-
-
-
 int
 fts_narg_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
   return ac0 == ac1;
 }
 
-
-
 int
 fts_never_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
   return 0;
 }
-
 
 int
 fts_always_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
@@ -786,9 +728,5 @@ fts_always_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 
 void fts_kernel_class_init( void)
 {
-  fts_hashtable_init(&fts_metaclass_table, 0, FTS_HASHTABLE_MEDIUM);
-  fts_hashtable_init(&fts_metaclass_alias_table, 0, FTS_HASHTABLE_MEDIUM);
-
   class_mess_heap = fts_heap_new(sizeof(fts_class_mess_t));
 }
-
