@@ -466,7 +466,7 @@ public class DisplayList
     for ( int i = (size - 1); i >= 0; i--)
       {
 	DisplayObject object = (DisplayObject) values[i];
-	
+	 
 	if(object instanceof GraphicObject){ 
 	  SensibilityArea area = object.getSensibilityAreaAt( x, y);
 
@@ -485,7 +485,8 @@ public class DisplayList
 			}
 		    }
 		}
-	      else return area;
+	      else
+		return area;
 	    }
 	}
       }

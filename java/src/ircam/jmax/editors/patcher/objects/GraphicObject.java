@@ -507,12 +507,12 @@ abstract public class GraphicObject implements DisplayObject
   
   // Utility functions for getSensibilityAreaAt
 
-  private SensibilityArea makeInletArea(int mouseY, int n, int xcost)
+  private SensibilityArea makeInletArea(int mouseX, int mouseY, int n, int xcost)
   {
     final int inletsAnchorY  = getY() - 1;
     SensibilityArea area = SensibilityArea.get(this, Squeack.INLET);
 
-    if (mouseY < inletsAnchorY)
+    if ((mouseY < inletsAnchorY)||(mouseX < getX()))
       {
 	area.setTransparent(true);
 	area.setCost(xcost + Math.abs(mouseY - inletsAnchorY));
@@ -523,12 +523,12 @@ abstract public class GraphicObject implements DisplayObject
     return area;
   }
 
-  private SensibilityArea makeOutletArea(int mouseY, int n, int xcost)
+  private SensibilityArea makeOutletArea(int mouseX, int mouseY, int n, int xcost)
   {
     final int outletsAnchorY = getY() + getHeight();
     SensibilityArea area = SensibilityArea.get(this, Squeack.OUTLET);
 
-    if (mouseY > outletsAnchorY)
+    if ((mouseY > outletsAnchorY) || (mouseX < getX()))
       {
 	area.setTransparent(true);
 	area.setCost(xcost + Math.abs(mouseY - outletsAnchorY));
@@ -591,16 +591,16 @@ abstract public class GraphicObject implements DisplayObject
 	      {
 		d = Math.abs(mouseX - start);
 		if (d < horizontalInletSensibility)
-		  return makeInletArea(mouseY, 0, d);
+		  return makeInletArea(mouseX, mouseY, 0, d);
 	      }
 	    else if (nInlets > 1)
 	      {
 		int n = (mouseX - start) / inletDistance;
 		d = (mouseX - start) % inletDistance;
 		if ((d < horizontalInletSensibility) && (n >= 0) && (n < nInlets))
-		  return makeInletArea(mouseY, n, d);
+		  return makeInletArea(mouseX, mouseY, n, d);
 		else if ((d > inletDistance - horizontalInletSensibility) && (n >= 0) && (n < (nInlets - 1)))
-		  return makeInletArea(mouseY, n + 1, inletDistance - d);
+		  return makeInletArea(mouseX, mouseY, n + 1, inletDistance - d);
 	      }
 	  }
 
@@ -628,14 +628,14 @@ abstract public class GraphicObject implements DisplayObject
 	    if (n == 0)
 	      {
 		if (d < horizontalOutletSensibility)
-		  return makeOutletArea(mouseY, 0, d);
+		  return makeOutletArea(mouseX, mouseY, 0, d);
 	      }
 	    else if (n > 0)
 	      {
 		if ((d < horizontalOutletSensibility) && (n >= 0) && (n < nOutlets))
-		  return makeOutletArea(mouseY, n, d);
+		  return makeOutletArea(mouseX, mouseY, n, d);
 		else if ((d > outletDistance - horizontalOutletSensibility) && (n >= 0) && (n < (nOutlets - 1)))
-		  return makeOutletArea(mouseY, n + 1, outletDistance - d);
+		  return makeOutletArea(mouseX, mouseY, n + 1, outletDistance - d);
 	      }
 	  }
       }
@@ -708,7 +708,7 @@ abstract public class GraphicObject implements DisplayObject
 		  d = Math.abs(mouseX - start);
 		  
 		  if (d < horizontalInletSensibility)
-		    return makeInletArea(mouseY, 0, d);
+		    return makeInletArea(mouseX, mouseY, 0, d);
 		}
 	      else if (nInlets > 1)
 		{
@@ -716,9 +716,9 @@ abstract public class GraphicObject implements DisplayObject
 		  d = (mouseX - start) % inletDistance;
 		  
 		  if ((d < horizontalInletSensibility) && (n >= 0) && (n < nInlets))
-		    return makeInletArea(mouseY, n, d);
+		    return makeInletArea(mouseX, mouseY, n, d);
 		  else if ((d > inletDistance - horizontalInletSensibility) && (n >= 0) && (n < (nInlets - 1)))
-		    return makeInletArea(mouseY, n + 1, inletDistance - d);
+		    return makeInletArea(mouseX, mouseY, n + 1, inletDistance - d);
 		}
 	    }
 	}
@@ -753,14 +753,14 @@ abstract public class GraphicObject implements DisplayObject
 	      if (n == 0)
 		{
 		  if (d < horizontalOutletSensibility)
-		    return makeOutletArea(mouseY, 0, d);
+		    return makeOutletArea(mouseX, mouseY, 0, d);
 		}
 	      else if (n > 0)
 		{
 		  if ((d < horizontalOutletSensibility) && (n >= 0) && (n < nOutlets))
-		    return makeOutletArea(mouseY, n, d);
+		    return makeOutletArea(mouseX, mouseY, n, d);
 		  else if ((d > outletDistance - horizontalOutletSensibility) && (n >= 0) && (n < (nOutlets - 1)))
-		    return makeOutletArea(mouseY, n + 1, outletDistance - d);
+		    return makeOutletArea(mouseX, mouseY, n + 1, outletDistance - d);
 		}
 	    }
 	}
