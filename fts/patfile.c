@@ -29,7 +29,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/patcher.h>
-#include <ftsprivate/patparser.h>
+#include <ftsprivate/patfile.h>
 
 
 /* **********************************************************************
@@ -50,27 +50,41 @@
  *
  */
 
+/* Token types */
+
+#define FTS_LEX_NUMBER  0
+#define FTS_LEX_FLOAT   1
+#define FTS_LEX_SYMBOL  2
+#define FTS_LEX_EOC     3
+#define FTS_LEX_EOF  4
+
+
+typedef struct fts_patlex {
+  int ttype;
+  fts_atom_t val;
+
+  const fts_atom_t *env_argv;
+  int env_argc;
+
+  FILE *fd;
+  int line_number;
+
+  int pushedBack;
+  int lookahead_valid;
+  int lookahead;	
+
+  int unique_var;
+
+  char buf[512];
+  int buf_fill;
+
+  int messbox_mode;
+} fts_patlex_t;
+
+
 static int unique_count = 3333; /* the unique number generation */
 
-fts_patlex_t *
-fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
-{
-  FILE *file;
-
-  file  = fopen(filename, "rb");
-
-  if (file == 0)
-    return 0;
-
-  return fts_patlex_open_file( file, env_argc, env_argv);
-}
-
-/* Version of the above that already get a FILE * instead of the file name.
-   Used for abstractions, where we need to look for a file 
-   */
-
-fts_patlex_t *
-fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
+static fts_patlex_t *fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
 {
   fts_patlex_t *this;
 
@@ -90,8 +104,19 @@ fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv)
   return this;
 }
 
-void
-fts_patlex_close(fts_patlex_t *this)
+static fts_patlex_t *fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv)
+{
+  FILE *file;
+
+  file  = fopen(filename, "rb");
+
+  if (file == 0)
+    return 0;
+
+  return fts_patlex_open_file( file, env_argc, env_argv);
+}
+
+static void fts_patlex_close(fts_patlex_t *this)
 {
   fclose(this->fd);
   fts_free(this);
@@ -135,6 +160,11 @@ static int fts_patlex_is_backslash(int c)
   return (c == '\\');
 }
 
+#define fts_patlex_push_back(this) ((this)->pushedBack = 1)
+
+/* Convenience macros: test of a values against a symbol */
+#define token_sym_equals(in, sym)  (((in)->ttype == FTS_LEX_SYMBOL) && (fts_get_symbol(&((in)->val)) == (sym)))
+
 /* states for the automata */
 
 #define tt_waiting      0
@@ -145,7 +175,7 @@ static int fts_patlex_is_backslash(int c)
 #define tt_in_number_or_sign 6
 #define tt_in_float    7
 
-void fts_patlex_next_token(fts_patlex_t *this)
+static void fts_patlex_next_token(fts_patlex_t *this)
 {
   this->buf_fill = 0;
 
@@ -569,8 +599,7 @@ static fts_symbol_t patlex_sym_load_init;
  *  an object 
  */
 
-typedef struct fts_graphic_description
-{
+typedef struct fts_graphic_description {
   fts_atom_t x;
   fts_atom_t y;
   fts_atom_t width;
@@ -579,6 +608,8 @@ typedef struct fts_graphic_description
 } fts_graphic_description_t;
 
 
+#define  fts_patparse_set_messbox_mode(in) ((in)->messbox_mode = 1)
+#define  fts_patparse_set_normal_mode(in) ((in)->messbox_mode = 0)
 
 static void fts_patparse_graphic_description_init(fts_graphic_description_t *this);
 static void fts_patparse_parse_patcher(fts_object_t *parent, fts_patlex_t *in);
@@ -617,20 +648,6 @@ static void fts_patparse_set_range(fts_graphic_description_t *this, fts_patlex_t
 }
 
 
-int fontIndexTable[8] = {9, 10, 12, 14, 16, 18, 20, 24};
-#define FONTINDEXTABLE_SIZE (sizeof(fontIndexTable)/sizeof(int))
-
-void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at)
-{
-  int i;
-
-  for (i = 0; (i < ac) && (i < 8); i++)
-    {
-      if (fts_is_int(&at[i]))
-	fontIndexTable[i] = fts_get_int(&at[i]);
-    }
-}
-
 #define SIZE_BITS 6
 #define SIZE_RANGE (1 << 6)
 
@@ -640,6 +657,10 @@ In the actual Max .pat format the Mac font Id and the font size are saved togeth
 little set of Mac Fonts with a fixed Id, the others Id are platform dependents and the conversion
 Id -->font_name is possible only with a systen_call on Mac Systems. So for the moment we are using font size only.    
  */
+
+static int fontIndexTable[8] = {9, 10, 12, 14, 16, 18, 20, 24};
+#define FONTINDEXTABLE_SIZE (sizeof(fontIndexTable)/sizeof(int))
+
 static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_patlex_t *in)
 {
   int i;
@@ -702,74 +723,11 @@ static void fts_patparse_set_square_graphic_properties(fts_graphic_description_t
 
 
 /*
- * Create a new patcher from a .pat file.
- * The patcher is always a top level patcher.
- */
-    
-fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filename) 
-{
-  fts_patlex_t *in; 
-
-  in = fts_patlex_open(filename, 0, 0);
-
-  if (in != 0)
-    {
-      fts_atom_t description[1];
-      fts_object_t *patcher;
-
-      fts_set_symbol(&description[0], fts_s_patcher);
-      patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
-
-      fts_patparse_parse_patlex(patcher, in);
-      fts_patlex_close(in);
-      fts_patcher_reassign_inlets_outlets((fts_patcher_t *) patcher);
-
-      /* activate the post-load init, like loadbangs */
-
-      fts_send_message(patcher, fts_SystemInlet, patlex_sym_load_init, 0, 0);
-
-      return patcher;
-    }
-  else
-    return 0;
-}
-
-int fts_is_dotpat_file(fts_symbol_t filename) 
-{
-  fts_patlex_t *in; 
-  int isdotpat = 1;
-
-  in = fts_patlex_open(filename, 0, 0);
-  if (in != 0)
-    {
-      fts_patlex_next_token(in);
-
-      if (! token_sym_equals(in, patlex_sym_max))
-	{
-	  isdotpat = 0;
-	}
-
-      fts_patlex_next_token(in); 
-
-      if (! token_sym_equals(in, patlex_sym_v2))
-	{
-	  isdotpat = 0;
-	}
-      
-      fts_patlex_close(in);
-    }
-  else
-    isdotpat = 0;
-  
-  return isdotpat;
-}
-  
-/*
  * Method implementing the actual reading and parsing.
  *
  */
   
-void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
+static void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 {
   /* skip the header from the file, */
 
@@ -1512,11 +1470,80 @@ static void pat_warning(const char *description)
 
 /***********************************************************************
  *
+ * Public functions
+ *
+ */
+
+/*
+ * Create a new patcher from a .pat file.
+ * The patcher is always a top level patcher.
+ */
+    
+fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t filename) 
+{
+  fts_patlex_t *in; 
+
+  in = fts_patlex_open(filename, 0, 0);
+
+  if (in != 0)
+    {
+      fts_atom_t description[1];
+      fts_object_t *patcher;
+
+      fts_set_symbol(&description[0], fts_s_patcher);
+      patcher = fts_eval_object_description((fts_patcher_t *)parent, 1, description);
+
+      fts_patparse_parse_patlex(patcher, in);
+      fts_patlex_close(in);
+      fts_patcher_reassign_inlets_outlets((fts_patcher_t *) patcher);
+
+      /* activate the post-load init, like loadbangs */
+
+      fts_send_message(patcher, fts_SystemInlet, patlex_sym_load_init, 0, 0);
+
+      return patcher;
+    }
+  else
+    return 0;
+}
+
+int fts_is_dotpat_file(fts_symbol_t filename) 
+{
+  fts_patlex_t *in; 
+  int isdotpat = 1;
+
+  in = fts_patlex_open(filename, 0, 0);
+  if (in != 0)
+    {
+      fts_patlex_next_token(in);
+
+      if (! token_sym_equals(in, patlex_sym_max))
+	{
+	  isdotpat = 0;
+	}
+
+      fts_patlex_next_token(in); 
+
+      if (! token_sym_equals(in, patlex_sym_v2))
+	{
+	  isdotpat = 0;
+	}
+      
+      fts_patlex_close(in);
+    }
+  else
+    isdotpat = 0;
+  
+  return isdotpat;
+}
+  
+/***********************************************************************
+ *
  * Initialization
  *
  */
 
-void fts_kernel_patparser_init()
+void fts_kernel_patfile_init()
 {
   patlex_sym_max = fts_new_symbol("max");
   patlex_sym_v2 = fts_new_symbol("v2");

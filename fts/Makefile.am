@@ -9,6 +9,7 @@ atomfile.c \
 audio.c \
 audiofile.c \
 autosave.c \
+bmaxfile.c \
 bytestream.c \
 class.c \
 client.c \
@@ -28,7 +29,6 @@ fts.c \
 hashtable.c \
 label.c \
 list.c \
-loader.c \
 mem.c \
 message.c \
 midi.c \
@@ -39,11 +39,10 @@ objectset.c \
 package.c \
 param.c \
 patcher.c \
-patparser.c \
+patfile.c \
 post.c \
 project.c \
 property.c \
-saver.c \
 sched.c \
 selection.c \
 sigconn.c \
@@ -55,7 +54,6 @@ tuple.c \
 update.c \
 variable.c \
 version.c \
-vm.c \
 parser.y \
 tokenizer.l
 

@@ -2,7 +2,7 @@ noinst_HEADERS= \
 OLDexpression.h \
 abstraction.h \
 audio.h \
-bmaxhdr.h \
+bmaxfile.h \
 class.h \
 client.h \
 connection.h \
@@ -11,20 +11,16 @@ dspgraph.h \
 errobj.h \
 fpe.h \
 label.h \
-loader.h \
 object.h \
 package.h \
 patcher.h \
-patparser.h \
+patfile.h \
 platform.h \
 property.h \
 protocol.h \
-saver.h \
 selection.h \
 sigconn.h \
-srconv.h \
 template.h \
 tokenizer.h \
 time.h \
-variable.h \
-vm.h
+variable.h 

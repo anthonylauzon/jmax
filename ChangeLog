@@ -1,3 +1,28 @@
+2002-07-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* removing old expression implementation and moving to the new
+	parser/evaluator.
+	First step is to remove all unnecessary inclusion of OLDexpression.h.
+	This implied changing fts_run_mess_vm and was the occasion to merge all
+	files dealing with file loading into one file per file format (.pat and .jmax)
+	The following files were added:
+		fts/bmaxfile.c
+		fts/patfile.c
+		include/ftsprivate/bmaxfile.h 
+		include/ftsprivate/patfile.h 
+	The following files were removed:
+		fts/loader.c
+		fts/patparser.c
+		fts/saver.c
+		fts/vm.c 
+		include/fts/soundfile.h
+		include/ftsprivate/bmaxhdr.h 
+		include/ftsprivate/loader.h
+		include/ftsprivate/patparser.h 
+		include/ftsprivate/saver.h
+		include/ftsprivate/srconv.h 
+		include/ftsprivate/vm.h 
+
 2002-07-08  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* commited first version of the message box with expression parser

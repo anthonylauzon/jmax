@@ -21,11 +21,8 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
-#include <ftsprivate/OLDexpression.h>
-#include <ftsprivate/loader.h>
-#include <ftsprivate/bmaxhdr.h>
+#include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/client.h>
-#include <ftsprivate/saver.h>
 #include <ftsprivate/variable.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2072,14 +2069,14 @@ midiconfig_load( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_make_absolute_path(project_dir, file_name, path, MAXPATHLEN);
 
-  obj = fts_binary_file_load(path, (fts_object_t *)fts_get_root_patcher(), 0, 0, 0);
+  obj = fts_binary_file_load(path, (fts_object_t *)fts_get_root_patcher(), 0, 0);
 
   if(obj != NULL && fts_object_get_metaclass(obj) == midiconfig_type) 
     {
       /* replace current config by loaded config */
       midiconfig_set((midiconfig_t *)obj);
 
-      ((midiconfig_t *)obj)->file_name = fts_new_symbol_copy( &path);
+      ((midiconfig_t *)obj)->file_name = fts_new_symbol_copy( path);
       
       midiconfig_set_dirty( (midiconfig_t *)obj, 0);
     }

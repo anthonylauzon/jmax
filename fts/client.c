@@ -27,9 +27,8 @@
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
-#include <ftsprivate/OLDexpression.h>
-#include <ftsprivate/loader.h>
-#include <ftsprivate/patparser.h>
+#include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/patfile.h>
 #include <ftsprivate/package.h>
 #include <ftsprivate/tokenizer.h>
 #include <ftsprivate/client.h>
@@ -823,7 +822,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   type = ! fts_is_dotpat_file( file_name);
 
   if( type)
-    patcher = (fts_patcher_t *)fts_binary_file_load( file_name, parent, 0, 0, 0);
+    patcher = (fts_patcher_t *)fts_binary_file_load( file_name, parent, 0, 0);
   else
     patcher = (fts_patcher_t *)fts_load_dotpat_patcher( parent, file_name);
 

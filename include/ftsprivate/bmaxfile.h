@@ -20,14 +20,38 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_VM_H_
-#define _FTS_PRIVATE_VM_H_
-
+#ifndef _FTS_PRIVATE_BMAXFILE_H_
+#define _FTS_PRIVATE_BMAXFILE_H_
 
 /*
-  Opcodes are built like this: 2 bits of argument size, and 6 of real opcode.
-  The two bits are zero in the case where they are not needed.
-  */
+ * A FTS binary file is made of the following:
+ *  . a header:
+ *  . magic number: 'bMax'
+ *  . code size
+ *  . number of symbols
+ * . code
+ * . symbol table
+ */
+
+/*
+ *
+ * bmax file header
+ *
+ */
+typedef struct fts_binary_file_header_t {
+  unsigned long magic_number;
+  unsigned long code_size;
+  unsigned long n_symbols;
+} fts_binary_file_header_t;
+
+/* magic word is 'bMax' */
+#define FTS_BINARY_FILE_MAGIC 0x624D6178
+
+/*
+ * Opcode of the bmax stack machine
+ * Opcodes are built like this: 2 bits of argument size, and 6 of real opcode.
+ * The two bits are zero in the case where they are not needed.
+ */
 
 #define FVM_N_ARG               0x00
 #define FVM_B_ARG               0x40
@@ -118,13 +142,60 @@
 #define FVM_MAKE_TOP_OBJ_L    (FVM_MAKE_TOP_OBJ | FVM_L_ARG)
 
 
-extern fts_object_t *fts_run_mess_vm(fts_object_t *parent,
-				     unsigned char *program,
-				     fts_symbol_t symbol_table[],
-				     int ac, const fts_atom_t *at,
-				     fts_expression_state_t *e);
+/*
+ *
+ * bmax file loading
+ *
+ */
 
+/* Loads a FTS binary file. Return value is < 0 if an error occured */
+extern fts_object_t *fts_binary_file_load( const char *name, fts_object_t *parent, int ac, const fts_atom_t *at);
+
+/* Idem but with a FILE * argument */
+extern fts_object_t *fts_binary_filedesc_load( FILE *f, fts_object_t *parent, int ac, const fts_atom_t *at);
+
+/*
+ *
+ * bmax file saving
+ *
+ */
+
+typedef struct fts_bmax_file fts_bmax_file_t;
+struct _saver_dumper;
+
+struct fts_bmax_file {
+  FILE *file;
+  fts_binary_file_header_t header; 
+  fts_symbol_t *symbol_table;
+  unsigned int symbol_table_size;
+  int symbol_table_static;
+  struct _saver_dumper *dumper;
+};
+
+/* used by package class only!!! */
+extern void fts_bmax_code_push_atoms(fts_bmax_file_t *f, int ac, const fts_atom_t *at);
+extern void fts_bmax_code_push_symbol(fts_bmax_file_t *f, fts_symbol_t sym);
+extern void fts_bmax_code_pop_args(fts_bmax_file_t *f, int value);
+extern void fts_bmax_code_obj_mess(fts_bmax_file_t *f, int inlet, fts_symbol_t sel, int nargs);
+extern void fts_bmax_code_return(fts_bmax_file_t *f);
+extern void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx);
+
+extern int fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symbol_t *symbol_table, int symbol_table_size);
+extern void fts_bmax_file_sync( fts_bmax_file_t *f);
+extern void fts_bmax_file_close( fts_bmax_file_t *f);
+
+extern void fts_save_patcher_as_bmax( fts_symbol_t file, fts_object_t *patcher);
+extern void fts_save_selection_as_bmax( FILE *file, fts_object_t *selection);
+extern void fts_save_simple_as_bmax( const char *filename, fts_object_t *patcher);
+
+
+/*
+ *
+ * misc functions
+ *
+ */
+
+/* bizarre function for objects redefinition...*/
 extern void fts_vm_substitute_object(fts_object_t *old, fts_object_t *new);
 
 #endif
-

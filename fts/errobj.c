@@ -23,7 +23,7 @@
 
 /* 
    The error_obj; it have no methods, no inlets, not outlets;
-   it is created by the patparser when it cannot find 
+   it is created by the pat file loader when it cannot find 
    an object, in order to mantain the consistency of the
    parsing (inlet and outlets are relative to the position).
 */

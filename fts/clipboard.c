@@ -42,10 +42,7 @@
 #include <process.h>
 #endif
 
-#include <ftsprivate/OLDexpression.h>
-#include <ftsprivate/loader.h>
-#include <ftsprivate/bmaxhdr.h>
-#include <ftsprivate/saver.h>
+#include <ftsprivate/bmaxfile.h>
 
 typedef struct {
   fts_object_t ob;
@@ -97,7 +94,7 @@ clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
   if (this->file)
-    fts_binary_filedesc_load(this->file, fts_get_object(at), 0, 0, 0);
+    fts_binary_filedesc_load(this->file, fts_get_object(at), 0, 0);
 }
 
 

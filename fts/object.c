@@ -32,19 +32,19 @@ unsigned int debugid = 0;
 #include <stdarg.h>
 
 #include <fts/fts.h>
+#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/abstraction.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/doctor.h>
 #include <ftsprivate/errobj.h>
-#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/property.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/variable.h>
-#include <ftsprivate/vm.h>
+#include <ftsprivate/bmaxfile.h>
 
 /* forward declarations  */
 static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data);
@@ -324,7 +324,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
   if (! obj)
     {
       /* First of all, try an explicitly declared abstraction */
-      obj =  fts_template_new_declared(patcher, ac, at, e);
+      obj =  fts_template_new_declared(patcher, ac, at);
     }
 
 
@@ -363,7 +363,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 
   /* 7- Try a path template  */
   if (! obj)
-    obj = fts_template_new_search(patcher, ac, at, e);
+    obj = fts_template_new_search(patcher, ac, at);
 
   /* 8 - Try a path abstraction */
   if (! obj)

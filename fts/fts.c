@@ -187,7 +187,7 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_abstraction_init);
   _K_DECNCALL( fts_kernel_template_init);
   _K_DECNCALL( fts_kernel_autosave_init);
-  _K_DECNCALL( fts_kernel_patparser_init);
+  _K_DECNCALL( fts_kernel_patfile_init);
   _K_DECNCALL( fts_kernel_time_init);
   _K_DECNCALL( fts_kernel_sched_init);
   _K_DECNCALL( fts_kernel_audiofile_init);

@@ -28,8 +28,7 @@
 #include <stdlib.h>
 
 #include <fts/fts.h>
-#include <ftsprivate/bmaxhdr.h>
-#include <ftsprivate/saver.h>
+#include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/patcher.h>
 
 /* Implement autosave functions; autosave is implemented

@@ -20,26 +20,10 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_BMAXHDR_H_
-#define _FTS_PRIVATE_BMAXHDR_H_
+#ifndef _FTS_PRIVATE_PATFILE_H_
+#define _FTS_PRIVATE_PATFILE_H_
 
-/*
-  A FTS binary file is made of the following:
-  . a header:
-    . magic number: 'bMax'
-    . code size
-    . number of symbols
-  . code
-  . symbol table
-*/
-
-typedef struct fts_binary_file_header_t {
-  unsigned long magic_number;
-  unsigned long code_size;
-  unsigned long n_symbols;
-} fts_binary_file_header_t;
-
-/* 'bMax' */
-#define FTS_BINARY_FILE_MAGIC 0x624D6178
+extern fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t name);
+extern int fts_is_dotpat_file(fts_symbol_t name);
 
 #endif

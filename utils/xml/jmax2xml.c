@@ -47,9 +47,7 @@
 #endif
 
 #include <fts/fts.h>
-#include <ftsprivate/bmaxhdr.h>
-#include <ftsprivate/OLDexpression.h>
-#include <ftsprivate/vm.h>
+#include <ftsprivate/bmaxfile.h>
 
 /* **********************************************************************
  *

@@ -47,7 +47,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/patcher.h>
-#include <ftsprivate/patparser.h>
+#include <ftsprivate/patfile.h>
 #include <ftsprivate/package.h>
 
 struct fts_abstraction

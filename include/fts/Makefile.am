@@ -39,7 +39,6 @@ predefsymbols.h \
 project.h \
 property.h \
 sched.h \
-soundfile.h \
 stack.h \
 status.h \
 symbol.h \

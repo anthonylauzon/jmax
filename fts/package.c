@@ -31,16 +31,13 @@
 #endif
 
 #include <ftsprivate/package.h>
-#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/abstraction.h>
 #include <ftsprivate/errobj.h>
-#include <ftsprivate/loader.h>
 #include <ftsprivate/platform.h>
 #include <ftsprivate/class.h>
-#include <ftsprivate/bmaxhdr.h>
-#include <ftsprivate/saver.h>
+#include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/client.h>
 
 #define PACKAGE_STACK_SIZE    32
@@ -160,7 +157,7 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
 
   fts_make_absolute_path(NULL, filename, path, MAXPATHLEN);
 
-  obj = fts_binary_file_load( path, (fts_object_t *)fts_get_root_patcher(), 0, 0, 0);
+  obj = fts_binary_file_load( path, (fts_object_t *)fts_get_root_patcher(), 0, 0);
 
   if (!obj) {
     fts_log("[package]: Failed to load package file %s\n", path);
@@ -1579,7 +1576,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_status_t status;
 
   /* Load the .jmax file */
-  obj = fts_binary_file_load( fts_get_symbol( at), (fts_object_t *)fts_get_root_patcher(), 0, a, 0);
+  obj = fts_binary_file_load( fts_get_symbol( at), (fts_object_t *)fts_get_root_patcher(), 0, a);
 
   if (!obj)
     {

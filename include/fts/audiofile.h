@@ -20,9 +20,6 @@
  * 
  */
 
-#ifndef _FTS_AUDIOFILE_H_
-#define _FTS_AUDIOFILE_H_
-
 /***********************************************
  *
  *  API for audio files
@@ -154,8 +151,4 @@ FTS_API void fts_audiofile_close(fts_audiofile_t* aufile);
 
 FTS_API void fts_audiofile_set_file_format_by_suffix(fts_audiofile_t* aufile, fts_symbol_t suffix);
 FTS_API void fts_audiofile_set_sample_format_by_name(fts_audiofile_t* aufile, fts_symbol_t name);
-
-#endif
-
-
 

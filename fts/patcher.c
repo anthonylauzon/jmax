@@ -58,12 +58,10 @@
 #include <ftsprivate/connection.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/OLDexpression.h>
-#include <ftsprivate/loader.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/package.h>
-#include <ftsprivate/bmaxhdr.h>
-#include <ftsprivate/saver.h>
+#include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/template.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/label.h>
@@ -1130,17 +1128,12 @@ patcher_save_dotpat( FILE *file, fts_patcher_t *patcher)
   fprintf( file, "#P pop;\n");
 }
 
-/* save a patcher in .pat format:
- * at[0]: filename (the name of the destination file)
+/* 
+ * save a patcher in .pat format:
  *
- * (note: this method does not check for nor add a .pat suffix to the file name,
+ * (note: this function does not check for nor add a .pat suffix to the file name,
  * it is left to the user interface)
 */
-static void 
-patcher_save_dotpat_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_save_as_dotpat( fts_get_symbol( at), (fts_patcher_t *)o);
-}
 
 static void 
 fts_patcher_save_as_dotpat(fts_symbol_t filename, fts_patcher_t *patcher)
@@ -1750,8 +1743,6 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 			    fts_patcher_redefine_object_from_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("redefine_patcher"),
 			    fts_patcher_redefine_from_client);
-
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_new_symbol("save_dotpat_file"), patcher_save_dotpat_file); 
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_spost_description, patcher_spost_description); 
 
