@@ -66,9 +66,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public void redefine( String text) 
   {
-    ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
-    /*itsSketchPad.getDisplayList().remove(this);
-      dispose();*/
+    ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);    
   }
 
   public void editContent()

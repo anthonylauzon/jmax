@@ -579,8 +579,7 @@ public class DisplayList
 
   void updatePaint(Graphics g){
     Object[] values = updateObjects.getObjectArray();
-    int size = updateObjects.size();
-    for ( int i = 0; i < size; i++)
+    for ( int i = 0; i < updateObjects.size(); i++)
       ((DisplayObject) values[i]).updatePaint(g);
   }
 
@@ -596,7 +595,6 @@ public class DisplayList
   public void paint( Graphics g)
   {
     Object[] values = displayObjects.getObjectArray();
-    int size = displayObjects.size();
 
     // Very First, if this is the first paint for the window,
     // we do a fake paint with the textRenderer (doesn't work
@@ -608,7 +606,7 @@ public class DisplayList
       {
 	doneOnce = true;
  
-	for ( int i = 0; i < size; i++)
+	for ( int i = 0; i < displayObjects.size(); i++)
 	  {
 	    DisplayObject object = (DisplayObject) values[i];
 
@@ -620,7 +618,7 @@ public class DisplayList
 
 	  }
 
-	for ( int i = 0; i < size; i++)
+	for ( int i = 0; i < displayObjects.size(); i++)
 	  {
 	    DisplayObject object = (DisplayObject) values[i];
 
@@ -641,7 +639,7 @@ public class DisplayList
 
     // Second, paint the display objects in the right order
 
-    for ( int i = 0; i < size; i++)
+    for ( int i = 0; i < displayObjects.size(); i++)
       {
 	DisplayObject object = (DisplayObject) values[i];
 

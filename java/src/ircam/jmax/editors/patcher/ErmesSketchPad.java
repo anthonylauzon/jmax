@@ -626,6 +626,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
       stopTextEditing();
 
     obj.redefined();
+    
+    ErmesSelection.patcherSelection.deselectAll();
     repaint();
   }
 
@@ -636,7 +638,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable
 							   displayList.getGraphicObjectFor(fc.getTo()),
 							   fc.getToInlet(), fc.getType(), fc);
       displayList.add(connection);
-      //displayList.sortDisplayList();
       connection.updateDimensions();
       ErmesSelection.patcherSelection.select( connection);
       connection.redraw();
