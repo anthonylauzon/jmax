@@ -28,6 +28,7 @@
 #include <fts/fts.h>
 
 #define WACOM_REQUEST_TIMEOUT 500
+#define WACOM_WAIT_RESET 10
 #define WACOM_INIT_TRIALS 10
 #define WACOM_ANSWER_SIZE 64
 
@@ -41,7 +42,7 @@ enum wacom_outlets
   wacom_outlet_b1, 
   wacom_outlet_b2, 
   wacom_outlet_b3, 
-  wacom_outlet_b4,
+  wacom_outlet_fun,
   wacom_outlet_init,
   wacom_n_outlets
 };
@@ -55,17 +56,20 @@ typedef struct _wacom_
   unsigned char answer_string[WACOM_ANSWER_SIZE + 1];
   int answer_index;
   int init_trials;
+  int init_wait;
   fts_alarm_t alarm;
 
   /* tablet parameters */
   float version;
-  int resolution_x;
-  int resolution_y;
   int range_x;
   int range_y;
+  int range_z;
+  int range_tilt_x;
+  int range_tilt_y;
 
   /* state */
   unsigned char bytes[9];
+  int wacom;
   int index;
   int x;
   int y;
@@ -75,7 +79,7 @@ typedef struct _wacom_
   int b1;
   int b2;
   int b3;
-  int b4;
+  int fun;
 } wacom_t;
 
 /************************************************************
@@ -85,34 +89,33 @@ typedef struct _wacom_
  */
 
 static const unsigned char wacom_string_reset[] = "#\r";
+static const unsigned char wacom_string_start[] = "ST\r";
+static const unsigned char wacom_string_stop[] = "SP\r";
 static const unsigned char wacom_string_request_model[] = "~#\r";
-static const unsigned char wacom_string_request_resolution[] = "~R\r";
 static const unsigned char wacom_string_request_coordinates[] = "~C\r";
 
-static const unsigned char wacom_string_enable_tilt[] = "FM1\r"; /* enable extra protocol for tilt management */
+static const unsigned char wacom_string_enable_tilt[] = "FM1\r"; /* enable tilt mode */
 
-#define WACOM_STRING_MULTI "MU1\r" /* multi mode input */
-#define WACOM_STRING_UPPER_ORIGIN "OC1\r" /* origin in upper left */
-#define WACOM_STRING_SUPPRESS "SU" /* suppress mode */
-#define WACOM_STRING_ALL_MACRO "~M0\r" /* enable all macro buttons */
-#define WACOM_STRING_NO_MACRO1 "~M1\r" /* disable macro buttons of group 1 */
-#define WACOM_STRING_RATE "IT0\r" /* max transmit rate (unit of 5 ms) */
-#define WACOM_STRING_NO_INCREMENT "IN0\r" /* do not enable increment mode */
-#define WACOM_STRING_STREAM_MODE "SR\r" /* enable continuous mode */
-#define WACOM_STRING_PRESSURE_MODE "PH1\r" /* enable pressure mode */
-#define WACOM_STRING_START "ST\r" /* start sending coordinates */
+/* setup commands */
+#define WACOM_STRING_ALWAYS_TRANSMIT "AL2\r" /* send 3 coordinate pairs when the pointing device leaves proximity */
+#define WACOM_STRING_ABSOLUTE "DE0\r" /* absolute mode */
+#define WACOM_STRING_INCREMENT_OFF "IN0\r" /* disable increment mode */
+#define WACOM_STRING_RATE_MAX "IT0\r" /* set max transmit rate (unit of 5 ms) */
+#define WACOM_STRING_MULTI_MODE_OFF "MU0\r" /* disable multi mode */
+#define WACOM_STRING_ORIGIN_UPPER_LEFT "OC1\r" /* origin in upper left corner */
+#define WACOM_STRING_STREAM_MODE_ON "SR\r" /* enable continuous mode */
+#define WACOM_STRING_ALL_BUTTONS_ON "~M0\r" /* enable all macro buttons */
 
 static const unsigned char wacom_string_setup[] = \
-WACOM_STRING_MULTI \
-WACOM_STRING_UPPER_ORIGIN \
-WACOM_STRING_ALL_MACRO \
-WACOM_STRING_NO_MACRO1 \
-WACOM_STRING_RATE \
-WACOM_STRING_NO_INCREMENT \
-WACOM_STRING_STREAM_MODE;
-
-#define WACOM_SYNC_BIT 0x80
-#define WACOM_BUTTON_PRESSSED 0x08
+WACOM_STRING_ALWAYS_TRANSMIT \
+WACOM_STRING_ABSOLUTE \
+WACOM_STRING_INCREMENT_OFF \
+WACOM_STRING_RATE_MAX \
+WACOM_STRING_MULTI_MODE_OFF \
+WACOM_STRING_ORIGIN_UPPER_LEFT \
+WACOM_STRING_STREAM_MODE_ON \
+WACOM_STRING_ALL_BUTTONS_ON \
+;
 
 /*************************************************************************
  *
@@ -120,72 +123,96 @@ WACOM_STRING_STREAM_MODE;
  *
  */
 
+#define WACOM_BUTTON 0x08
+#define WACOM_POINTER 0x20
+#define WACOM_PROXIMITY 0x40
+#define WACOM_SYNC_BIT 0x80
+
 static void
-wacom_decode(fts_object_t *o, int n, const unsigned char *c)
+wacom_decode_IV(fts_object_t *o, int n, const unsigned char *c)
 {
   wacom_t *this = (wacom_t *)o;
   int index = this->index;
-  int x, y, z;
-  int tilt_x = 0;
-  int tilt_y = 0;
-  int b1, b2, b3, b4;
   int i;
-
+  
   for(i=0; i<n; i++) 
     { 
-      /* reset char count on sync bit set */
+      /* interpret data on sync bit set (beginning of next frame) */
       if(c[i] & WACOM_SYNC_BIT)
 	{
-	  if(index >= 7)
+	  int proximity = this->bytes[0] & WACOM_PROXIMITY;
+	  int button_pressed = this->bytes[0] & WACOM_BUTTON;
+	  int is_stylus = this->bytes[0] & WACOM_POINTER;
+	  
+	  if(index < 7)
+	    continue;
+	  
+	  if(!proximity && button_pressed)
 	    {
-	      x = (((this->bytes[0] & 0x3) << 14) + (this->bytes[1] << 7) + this->bytes[2]);
-	      y = (((this->bytes[3] & 0x3) << 14) + (this->bytes[4] << 7) + this->bytes[5]);
-	      z = ((this->bytes[6] & 0x3F) + 0x40 - (this->bytes[6] & 0x40)) * 2 + ((this->bytes[3] & 0x04) >> 2);
+	      /* function/macro button */
+	      int button;
+	      int fun;
 	      
-	      if(this->bytes[0] & WACOM_BUTTON_PRESSSED)
+	      fun = this->bytes[6];
+	      
+	      if(fun != this->fun)
+		{
+		  this->fun = fun;
+		  fts_outlet_int(o, wacom_outlet_fun, fun);
+		}
+	    }
+	  else
+	    {
+	      /* coordinates */
+	      int b1, b2, b3;
+	      int x, y;
+	      int z = 0;
+	      int tilt_x = 0;
+	      int tilt_y = 0;
+	      
+	      if(button_pressed)
 		{
 		  b1 = (this->bytes[3] & 0x08) >> 3;
 		  b2 = (this->bytes[3] & 0x10) >> 4;
 		  b3 = (this->bytes[3] & 0x20) >> 5;
-		  b4 = (this->bytes[3] & 0x40) >> 6;
 		}
 	      else
-		b1 = b2 = b3 = b4 = 0;
+		b1 = b2 = b3 = 0;
 	      
-	      if(index >= 8)
+	      x = (((this->bytes[0] & 0x3) << 14) + (this->bytes[1] << 7) + this->bytes[2]);
+	      y = (((this->bytes[3] & 0x3) << 14) + (this->bytes[4] << 7) + this->bytes[5]);
+	      
+	      if(is_stylus)
 		{
-		  tilt_x = (this->bytes[7] & 0x7f);
-		  tilt_y = (this->bytes[8] & 0x7f);
-		  
-		  if (this->bytes[7] & 0x40)
-		    tilt_x = -(~(tilt_x-1) & 0x7f);
-		  if (this->bytes[8] & 0x40)
-		    tilt_y = -(~(tilt_y-1) & 0x7f);
-		}
-	      else
-		{
-		  tilt_x = 0;
-		  tilt_y = 0;
-		}
+		  z = ((this->bytes[6] & 0x3F) + 0x40 - (this->bytes[6] & 0x40)) * 2 + ((this->bytes[3] & 0x04) >> 2);
 
-	      if(b4 != this->b4)
-		{
-		  this->b4 = b4;
-		  fts_outlet_int(o, wacom_outlet_b4, b4);
-		}
+		  if(z == 128 && b1 == 0)
+		    z = 0;
 
+		  if(index >= 8)
+		    {
+		      tilt_x = (this->bytes[7] & 0x7f);
+		      tilt_y = (this->bytes[8] & 0x7f);
+		      
+		      if (this->bytes[7] & 0x40)
+			tilt_x = -(~(tilt_x - 1) & 0x7f);
+		      if (this->bytes[8] & 0x40)
+			tilt_y = -(~(tilt_y - 1) & 0x7f);
+		    }
+		}
+	      
 	      if(b3 != this->b3)
 		{
 		  this->b3 = b3;
 		  fts_outlet_int(o, wacom_outlet_b3, b3);
 		}
-
+	      
 	      if(b2 != this->b2)
 		{
 		  this->b2 = b2;
 		  fts_outlet_int(o, wacom_outlet_b2, b2);
 		}
-
+	      
 	      if(b1 != this->b1)
 		{
 		  this->b1 = b1;
@@ -197,25 +224,25 @@ wacom_decode(fts_object_t *o, int n, const unsigned char *c)
 		  this->tilt_y = tilt_y;
 		  fts_outlet_int(o, wacom_outlet_tilt_y, tilt_y);
 		}
-
+	      
 	      if(tilt_x != this->tilt_x)
 		{
 		  this->tilt_x = tilt_x;
 		  fts_outlet_int(o, wacom_outlet_tilt_x, tilt_x);
 		}
-
+	      
 	      if(z != this->z)
 		{
 		  this->z = z;
 		  fts_outlet_int(o, wacom_outlet_z, z);
 		}
-
+	      
 	      if(y != this->y)
 		{
 		  this->y = y;
 		  fts_outlet_int(o, wacom_outlet_y, y);
 		}
-
+	      
 	      if(x != this->x)
 		{
 		  this->x = x;
@@ -223,6 +250,7 @@ wacom_decode(fts_object_t *o, int n, const unsigned char *c)
 		}
 	    }
 
+	  /* start new protocol frame */
 	  this->bytes[0] = c[i];	
 	  index = 1;
 	}
@@ -232,7 +260,204 @@ wacom_decode(fts_object_t *o, int n, const unsigned char *c)
 	  index++;
 	}
     }
+  
+  this->index = index;
+}
 
+static void
+wacom_decode_V(fts_object_t *o, int n, const unsigned char *c)
+{
+  wacom_t *this = (wacom_t *)o;
+  int index = this->index;
+  int i;
+  
+  for(i=0; i<n; i++) 
+    { 
+      /* interpret data on sync bit set (beginning of next frame) */
+      if(c[i] & WACOM_SYNC_BIT)
+	{
+	  int proximity = this->bytes[0] & WACOM_PROXIMITY;
+	  int button_pressed = this->bytes[0] & WACOM_BUTTON;
+	  int is_stylus = this->bytes[0] & WACOM_POINTER;
+	  int device;
+	  
+	  if(index < 7)
+	    continue;
+	  
+	  if ((this->bytes[0] & 0xfc) == 0xc0) 
+	    {
+	      /* device ID packet */
+	      device = (((this->bytes[1] & 0x7f) << 5) + ((this->bytes[2] & 0x7c) >> 2));
+	    }
+	  else if ((this->bytes[0] & 0xfe) == 0x80) 
+	    {
+	      /* out of proximity packet */
+	    }
+	  else if ((this->bytes[0] & 0xb8) == 0xa0)
+	    {
+	      /* stylus packet with button and pressure */
+	      int x = (((this->bytes[1] & 0x7f) << 9) + ((this->bytes[2] & 0x7f) << 2) + ((this->bytes[3] & 0x60) >> 5));
+	      int y = (((this->bytes[3] & 0x1f) << 11) + ((this->bytes[4] & 0x7f) << 4) + ((this->bytes[5] & 0x78) >> 3));
+	      int z = (((this->bytes[5] & 0x07) << 7) + (this->bytes[6] & 0x7f));
+	      int tilt_x = (this->bytes[7] & 0x3f);
+	      int tilt_y = (this->bytes[8] & 0x3f);
+	      int b1 = (z > 200);
+	      int b2 = (this->bytes[0] & 0x02) >> 1;
+	      
+	      if (this->bytes[7] & 0x40)
+		tilt_x -= (0x3f + 1);
+	      
+	      if (this->bytes[8] & 0x40)
+		tilt_y -= (0x3f + 1);
+	      
+	      if(b2 != this->b2)
+		{
+		  this->b2 = b2;
+		  fts_outlet_int(o, wacom_outlet_b2, b2);
+		}
+	      
+	      if(b1 != this->b1)
+		{
+		  this->b1 = b1;
+		  fts_outlet_int(o, wacom_outlet_b1, b1);
+		}
+	      
+	      if(tilt_y != this->tilt_y)
+		{
+		  this->tilt_y = tilt_y;
+		  fts_outlet_int(o, wacom_outlet_tilt_y, tilt_y);
+		}
+	      
+	      if(tilt_x != this->tilt_x)
+		{
+		  this->tilt_x = tilt_x;
+		  fts_outlet_int(o, wacom_outlet_tilt_x, tilt_x);
+		}
+	      
+	      if(z != this->z)
+		{
+		  this->z = z;
+		  fts_outlet_int(o, wacom_outlet_z, z);
+		}
+	      
+	      if(y != this->y)
+		{
+		  this->y = y;
+		  fts_outlet_int(o, wacom_outlet_y, y);
+		}
+	      
+	      if(x != this->x)
+		{
+		  this->x = x;
+		  fts_outlet_int(o, wacom_outlet_x, x);
+		}	      
+	    }
+	  else if ((this->bytes[0] & 0xbe) == 0xb4)
+	    {
+	      /* stylus packet with wheel */
+	      int x = (((this->bytes[1] & 0x7f) << 9) + ((this->bytes[2] & 0x7f) << 2) + ((this->bytes[3] & 0x60) >> 5));
+	      int y = (((this->bytes[3] & 0x1f) << 11) + ((this->bytes[4] & 0x7f) << 4) + ((this->bytes[5] & 0x78) >> 3));
+	      int tilt_x = (this->bytes[7] & 0x3f);
+	      int tilt_y = (this->bytes[8] & 0x3f);
+	      int b3 = (((this->bytes[5] & 0x07) << 7) + (this->bytes[6] & 0x7f));
+	      
+	      if (this->bytes[7] & 0x40)
+		tilt_x -= (0x3f + 1);
+	      
+	      if (this->bytes[8] & 0x40)
+		tilt_y -= (0x3f + 1);
+
+	      if(b3 != this->b3)
+		{
+		  this->b3 = b3;
+		  fts_outlet_float(o, wacom_outlet_b3, (float)b3 / (float)1023.0);
+		}
+	      
+	      if(tilt_y != this->tilt_y)
+		{
+		  this->tilt_y = tilt_y;
+		  fts_outlet_int(o, wacom_outlet_tilt_y, tilt_y);
+		}
+	      
+	      if(tilt_x != this->tilt_x)
+		{
+		  this->tilt_x = tilt_x;
+		  fts_outlet_int(o, wacom_outlet_tilt_x, tilt_x);
+		}
+	      
+	      if(y != this->y)
+		{
+		  this->y = y;
+		  fts_outlet_int(o, wacom_outlet_y, y);
+		}
+	      
+	      if(x != this->x)
+		{
+		  this->x = x;
+		  fts_outlet_int(o, wacom_outlet_x, x);
+		}	      
+	    }
+	  else if (((this->bytes[0] & 0xbe) == 0xa8) || ((this->bytes[0] & 0xbe) == 0xb0)) 
+	    {
+	      /* lens cursor packet */
+	      int x = (((this->bytes[1] & 0x7f) << 9) + ((this->bytes[2] & 0x7f) << 2) + ((this->bytes[3] & 0x60) >> 5));
+	      int y = (((this->bytes[3] & 0x1f) << 11) + ((this->bytes[4] & 0x7f) << 4) + ((this->bytes[5] & 0x78) >> 3));
+	      int z = (((this->bytes[5] & 0x07) << 7) + (this->bytes[6] & 0x7f));
+	      int b1 = this->bytes[8] & 0x01;
+	      int b2 = (this->bytes[8] & 0x02) >> 1;
+	      int b3 = (this->bytes[8] & 0x04) >> 2;
+	      
+	      if (this->bytes[8] & 0x08) 
+		z = -z;
+	      
+	      if(b3 != this->b3)
+		{
+		  this->b3 = b3;
+		  fts_outlet_int(o, wacom_outlet_b3, b3);
+		}
+	      
+	      if(b2 != this->b2)
+		{
+		  this->b2 = b2;
+		  fts_outlet_int(o, wacom_outlet_b2, b2);
+		}
+	      
+	      if(b1 != this->b1)
+		{
+		  this->b1 = b1;
+		  fts_outlet_int(o, wacom_outlet_b1, b1);
+		}
+	      
+	      if(z != this->z)
+		{
+		  this->z = z;
+		  fts_outlet_int(o, wacom_outlet_z, z);
+		}
+	      
+	      if(y != this->y)
+		{
+		  this->y = y;
+		  fts_outlet_int(o, wacom_outlet_y, y);
+		}
+	      
+	      if(x != this->x)
+		{
+		  this->x = x;
+		  fts_outlet_int(o, wacom_outlet_x, x);
+		}
+	    }
+	  
+	  /* start new protocol frame */
+	  this->bytes[0] = c[i];	
+	  index = 1;
+	}
+      else if(index < 9)
+	{
+	  this->bytes[index] = c[i];	
+	  index++;
+	}
+    }
+  
   this->index = index;
 }
 
@@ -242,10 +467,10 @@ wacom_reset_buttons(fts_alarm_t *alarm, void *p)
   fts_object_t *o = (fts_object_t *)p;
   wacom_t *this = (wacom_t *)p;
 
-  if(this->b4 != 0)
+  if(this->fun != 0)
     {
-      this->b4 = 0;
-      fts_outlet_int(o, wacom_outlet_b4, 0);
+      this->fun = 0;
+      fts_outlet_int(o, wacom_outlet_fun, 0);
     }
 
   if(this->b3 != 0)
@@ -314,6 +539,7 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
 		{
 		case '#':
 		  {
+		    /* wacom sends version */
 		    unsigned char *version_string;
 		    int n_scan = 0;
 		    float version;
@@ -344,12 +570,31 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
 			wacom_init_stop(this);
 		      }
 
-		    wacom_init_send_string(this, wacom_string_request_resolution);
+		    if(string[2] == 'G' && string[3] == 'D')
+		      {
+			/* Wacom V protocol (Intous) */
+			this->wacom = 5;
+			this->range_z = 1023;
+		      }
+		    else
+		      {
+			/* Wacom IV protocol */
+			this->wacom = 4;
+			this->range_z = 255;
+
+			/* set tilt mode if for tablets from version 1.4 */
+			if(this->version >= (float)1.4)
+			  wacom_init_send_string(this, wacom_string_enable_tilt);
+		      }
+
+		    /* request coordinate range */
+		    wacom_init_send_string(this, wacom_string_request_coordinates);
 
 		    break;
 		  }
 		case 'R':
 		  {
+		    /* wacom sends resolution */
 		    unsigned char *resolution_string;
 		    int n_scan;
 		    int x, y;
@@ -368,28 +613,13 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
 
 		    n_scan = sscanf(resolution_string, "%d,%d", &x, &y);
 
-		    if(n_scan == 2)
-		      {
-			this->resolution_x = x;
-			this->resolution_y = y;
-		      }
-		    else
-		      {
-			this->resolution_x = 1270;
-			this->resolution_y = 1270;
-			post("wacom: init failed (invalid resolution string)\n");
-
-			wacom_init_stop(this);
-		      }
-
-		    wacom_init_send_string(this, wacom_string_request_coordinates);
-
 		    break;
 		  }
 		case 'C':
 		  {
+		    /* wacom sends coordinate range */
 		    unsigned char *maxima_string = string + 2;
-		    fts_atom_t a[4];
+		    fts_atom_t a[5];
 		    int n_scan;
 		    int x, y;
 
@@ -409,22 +639,32 @@ wacom_init_callback(fts_object_t *o, int n, const unsigned char *c)
 			post("wacom: init failed (invalid coordinates string)\n");
 		      }
 
+		    this->range_tilt_x = 64;
+		    this->range_tilt_y = 64;
+
 		    wacom_init_send_string(this, wacom_string_setup);
 
-		    /* set tilt mode if for tablets from version 1.4 */
-		    if(this->version >= (float)1.4)
-		      wacom_init_send_string(this, wacom_string_enable_tilt);
+		    /* install wacom decode callback */
+		    if(this->wacom == 4)
+		      {
+			fts_bytestream_remove_listener(this->stream, (fts_object_t *)this);
+			fts_bytestream_add_listener(this->stream, (fts_object_t *)this, wacom_decode_IV);
+		      }
+		    else if(this->wacom == 5)
+		      {
+			fts_bytestream_remove_listener(this->stream, (fts_object_t *)this);
+			fts_bytestream_add_listener(this->stream, (fts_object_t *)this, wacom_decode_V);
+		      }		      
+
+		    wacom_init_send_string(this, wacom_string_start);
 
 		    fts_set_int(a + 0, this->range_x);
 		    fts_set_int(a + 1, this->range_y);
-		    fts_set_int(a + 2, this->resolution_x);
-		    fts_set_int(a + 3, this->resolution_y);
-		    fts_outlet_send(o, wacom_outlet_init, fts_s_list, 4, a);
+		    fts_set_int(a + 2, this->range_z);
+		    fts_set_int(a + 3, this->range_tilt_x);
+		    fts_set_int(a + 4, this->range_tilt_y);
+		    fts_outlet_send(o, wacom_outlet_init, fts_s_list, 5, a);
 		    
-		    /* install wacom decode callback */
-		    fts_bytestream_remove_listener(this->stream, (fts_object_t *)this);
-		    fts_bytestream_add_listener(this->stream, (fts_object_t *)this, wacom_decode);
-
 		    break;
 		  }
 		  default:
@@ -446,31 +686,46 @@ wacom_init_start(wacom_t *this)
 {
   this->answer_index = 0;
 
-  /* set alarm for init timeout */
-  fts_alarm_set_delay(&this->alarm, WACOM_REQUEST_TIMEOUT);
-  fts_alarm_arm(&this->alarm);
-
   /* set byte stream callback for init procedure */
   fts_bytestream_remove_listener(this->stream, (fts_object_t *)this);
   fts_bytestream_add_listener(this->stream, (fts_object_t *)this, wacom_init_callback);
 
+  wacom_init_send_string(this, wacom_string_stop);
   wacom_init_send_string(this, wacom_string_reset);
-  wacom_init_send_string(this, wacom_string_request_model);
 
-  /* all the rest is handled by wacom_init_callback() */
+  /* wait for reset */
+  this->init_wait = 1;
+  fts_alarm_set_delay(&this->alarm, WACOM_WAIT_RESET);
+  fts_alarm_arm(&this->alarm);
 }
 
 static void
-wacom_init_timeout(fts_alarm_t *alarm, void *o)
+wacom_init_alarm(fts_alarm_t *alarm, void *o)
 {
   wacom_t *this = (wacom_t *)o;
 
-  wacom_init_stop(this);
+  if(this->init_wait)
+    {
+      /* waited for reset */
+      this->init_wait = 0;
 
-  if(this->init_trials-- > 0)
-    wacom_init_start(this);
+      /* now request model string */
+      wacom_init_send_string(this, wacom_string_request_model);
+      
+      /* set init timeout (all the rest is handled by the init callback) */
+      fts_alarm_set_delay(&this->alarm, WACOM_REQUEST_TIMEOUT);
+      fts_alarm_arm(&this->alarm);
+    }
   else
-    post("wacom: can't init device (request timeout)\n");
+    {
+      /* init timeout */
+      wacom_init_stop(this);
+      
+      if(this->init_trials-- > 0)
+	wacom_init_start(this);
+      else
+	post("wacom: can't init device (request timeout)\n");
+    }
 }
 
 /************************************************************
@@ -530,6 +785,8 @@ wacom_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  
 	  this->index = 0;
 	  
+	  this->wacom = 0;
+	  
 	  this->x = 0;
 	  this->y = 0;
 	  this->z = 0;
@@ -539,10 +796,11 @@ wacom_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  this->b1 = 0;
 	  this->b2 = 0;
 	  this->b3 = 0;
-	  this->b4 = 0;
-	  
-	  fts_alarm_init(&this->alarm, 0, wacom_init_timeout, (void *)this);
-	  this->init_trials = WACOM_INIT_TRIALS;
+	  this->fun = 0;
+
+	  fts_alarm_init(&this->alarm, 0, wacom_init_alarm, (void *)this);
+	  this->init_wait = 0;
+	  this->init_trials = 0;
 	  
 	  wacom_init_start(this);
 	  

@@ -42,13 +42,14 @@ public class MoreObjectsButton extends JMenuBar
   public MoreObjectsButton(Enumeration buttons)
   {
       super();
-      setBorder(BorderFactory.createEtchedBorder());
+      setMargin(new Insets(0, 0, 0, 0));
+      setBorder(BorderFactory.createEmptyBorder());
       setPreferredSize(new Dimension(24, 20));
       setMinimumSize(new Dimension(24, 20));
 
       menu = new JMenu("");
-      menu.setIcon(Icons.get("_more_objects_"));
       menu.setMargin(new Insets(0, 0, 0, 0));
+      menu.setIcon(Icons.get("_more_objects_"));
       menu.setPreferredSize(new Dimension(24, 19));
       menu.setMinimumSize(new Dimension(24, 19));
 
@@ -68,8 +69,9 @@ public class MoreObjectsButton extends JMenuBar
 	      for(Enumeration e = buttons; e.hasMoreElements();)
 		  {
 		      button = (ErmesToolButton)e.nextElement();
+
 		      if(i++ >= count)
-			  menu.add(button, 0);
+			menu.add(button, 0);
 		  }
 	  }
       else
