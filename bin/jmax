@@ -154,7 +154,7 @@ else
     JMAX_CLASSPATH=${ROOTDIR}/java/classes/jmax.jar
 fi
 
-JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl1.0/jacl.jar
+JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl/jacl.jar
 
 SWING_DISTRIB_CLASSPATH=
 
@@ -183,5 +183,10 @@ then
 else
     CLASSPATH=${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
 fi
+
+# This fixes the font problem on SGI platform. See /usr/java/webdocs/release_eoe.html for
+# further explainations.
+JAVA_SMALL_FONTS=true
+export JAVA_SMALL_FONTS
 
 start_it
