@@ -76,7 +76,7 @@ public class FtsServer {
       }
     else
       {
-	client = new FtsObject( this, root, 1);
+	this.client = new FtsObject( this, root, 1);
       }
 
     receiveThread = new ReceiveThread();
