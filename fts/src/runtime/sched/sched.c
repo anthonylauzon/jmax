@@ -262,7 +262,9 @@ void fts_sched_run( void)
   
       if (tick_counter > fts_pause_period)
 	{
+#if 0
 	  fts_pause(); /* call the OS dependent pause function */
+#endif
 	  tick_counter = 0;
 	}
     }

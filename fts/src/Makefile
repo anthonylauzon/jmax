@@ -25,8 +25,6 @@
 JMAXDISTDIR=../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.fts
 
-TOCLEAN=$(FTS_LIB)
-
 all_c: all
 .PHONY: all_c
 
@@ -38,18 +36,19 @@ all: lib-recursive
 .PHONY: all
 
 lib-recursive:
-	(cd non-portable ; $(MAKE) lib-recursive)
+	(cd non-portable ; $(MAKE) lib)
 	(cd sys; $(MAKE) lib)
 	(cd lang; $(MAKE) lib-recursive)
 	(cd runtime; $(MAKE) lib-recursive)
 .PHONY: lib-recursive
 
-clean: cleanobjs-recursive clean-local
+clean: cleanobjs-recursive
 	(cd tiles; $(MAKE) clean-local)
+	rm -f $(FTS_LIB)
 .PHONY: clean
 
 cleanobjs-recursive:
-	(cd non-portable ; $(MAKE) cleanobjs-recursive)
+	(cd non-portable ; $(MAKE) cleanobjs)
 	(cd sys; $(MAKE) cleanobjs)
 	(cd lang; $(MAKE) cleanobjs-recursive)
 	(cd runtime; $(MAKE) cleanobjs-recursive)
@@ -60,4 +59,5 @@ install:
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts ; done
 	for d in lang runtime sys ; do (cd $$d ; $(MAKE) $@ ) ; done
 .PHONY: install
+
 

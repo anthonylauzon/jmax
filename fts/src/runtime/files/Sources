@@ -27,11 +27,7 @@ ifeq ($(PLATFORM),sgi)
   ARCH_SOURCES = af.c
 endif
 
-ifeq ($(PLATFORM),linux-intel)
-  ARCH_SOURCES = af.c
-endif
-
-ifeq ($(PLATFORM),linux-ppc)
+ifeq ($(PLATFORM),linux)
   ARCH_SOURCES = af.c
 endif
 

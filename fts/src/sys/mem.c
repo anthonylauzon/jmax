@@ -96,9 +96,8 @@ void *fts_do_malloc(unsigned int size, const char *filename, int line)
 
   if (p == 0)
     {
-      if (fts_memory_is_locked())
+      if (fts_unlock_memory())
 	{
-	  fts_unlock_memory();
 	  p = real_malloc(size, filename, line);
 	  
 	  if (p == 0)
