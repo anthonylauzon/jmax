@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "DATA_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\include" /I "..\..\utils\c\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "DATA_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\utils\c\src" /I "..\..\..\include" /I "..\c\include" /I "..\..\utils\c\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "DATA_EXPORTS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "DATA_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\include" /I "..\..\utils\c\src" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "DATA_EXPORTS" /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\c\include" /I "..\..\utils\c\include" /I "..\..\..\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "DATA_EXPORTS" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -106,7 +106,7 @@ SOURCE=..\c\src\col.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\copy.c
+SOURCE=..\c\src\cvec.c
 # End Source File
 # Begin Source File
 
@@ -118,11 +118,11 @@ SOURCE=..\c\src\data.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\dumpfile.c
+SOURCE=..\c\src\dict.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\fill.c
+SOURCE=..\c\src\dumpfile.c
 # End Source File
 # Begin Source File
 
@@ -142,23 +142,7 @@ SOURCE=..\c\src\fvec.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\getinter.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\getlist.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\getrange.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\getsize.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\getval.c
 # End Source File
 # Begin Source File
 
@@ -178,26 +162,6 @@ SOURCE=..\c\src\mat.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\message.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\message.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\messtab.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\messtab.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\preset.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\row.c
 # End Source File
 # Begin Source File
@@ -206,11 +170,11 @@ SOURCE=..\c\src\row.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\value.c
+SOURCE=..\c\src\tabeditor.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\value.h
+SOURCE=..\c\src\tabeditor.h
 # End Source File
 # Begin Source File
 

@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "ISPW_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\include" /I "..\..\data\c\src" /I "..\..\utils\c\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "ISPW_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\..\packages\data\c\src" /I "..\..\..\include" /I "..\..\..\packages\utils\c\include" /I "..\..\..\packages\data\c\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "ISPW_EXPORTS" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "ISPW_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\include" /I "..\..\data\c\src" /I "..\..\utils\c\src" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "ISPW_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\..\include" /I "..\..\..\packages\utils\c\include" /I "..\..\..\packages\data\c\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "ISPW_EXPORTS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "_DEBUG"
@@ -86,10 +86,6 @@ LINK32=link.exe
 
 # Name "ispw - Win32 Release"
 # Name "ispw - Win32 Debug"
-# Begin Source File
-
-SOURCE=..\c\src\abs.c
-# End Source File
 # Begin Source File
 
 SOURCE=..\c\src\accum.c
@@ -116,23 +112,7 @@ SOURCE=..\c\src\bangbang.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\biquad.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\biquad.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\cfbpass2.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\change.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\clip.c
 # End Source File
 # Begin Source File
 
@@ -141,10 +121,6 @@ SOURCE=..\c\src\coef_h1.c
 # Begin Source File
 
 SOURCE=..\c\src\dac_tilda.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\delay.c
 # End Source File
 # Begin Source File
 
@@ -172,15 +148,15 @@ SOURCE=..\c\src\delwrite.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\drunk.c
+SOURCE=..\c\src\explay.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\expr_doctor.c
+SOURCE=..\c\src\explode.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\exscale.c
+SOURCE=..\c\src\explode.h
 # End Source File
 # Begin Source File
 
@@ -204,10 +180,6 @@ SOURCE=..\c\src\filters.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\fir.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\float.c
 # End Source File
 # Begin Source File
@@ -224,19 +196,7 @@ SOURCE=..\c\src\ftl_delay.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\ftl_fir.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\ftl_iir.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\ftl_samprw.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\ftom.c
 # End Source File
 # Begin Source File
 
@@ -245,14 +205,6 @@ SOURCE=..\c\src\funbuff.c
 # Begin Source File
 
 SOURCE=..\c\src\gate.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\iir.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\iir.h
 # End Source File
 # Begin Source File
 
@@ -276,10 +228,6 @@ SOURCE=..\c\src\loadbang.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\logscale.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\makenote.c
 # End Source File
 # Begin Source File
@@ -288,23 +236,7 @@ SOURCE=..\c\src\message.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\message_doctor.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\metro.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\midicd.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\mididecrypt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\mtof.c
 # End Source File
 # Begin Source File
 
@@ -332,27 +264,11 @@ SOURCE=..\c\src\osc.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\osc_ieeewrap.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\pack.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\c\src\pbank.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\phasor.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\phasor.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\phasor_ieeewrap.c
 # End Source File
 # Begin Source File
 
@@ -396,7 +312,11 @@ SOURCE=..\c\src\pt_tools.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\random.c
+SOURCE=..\c\src\qlist.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\qlist.h
 # End Source File
 # Begin Source File
 
@@ -408,27 +328,11 @@ SOURCE=..\c\src\route.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\Rreceive.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\Rsend.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\Rsend.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\sampbuf.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\c\src\sampbuf.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\samphold.c
 # End Source File
 # Begin Source File
 
@@ -464,15 +368,7 @@ SOURCE=..\c\src\scale.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\select.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\sig1.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\sigabs.c
 # End Source File
 # Begin Source File
 
@@ -492,35 +388,11 @@ SOURCE=..\c\src\sigparam.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\sigprint.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\sigsnap.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\sigswitch.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\sigtable.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\sigthres.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\sigthrow.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\sigthru.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\speedlim.c
 # End Source File
 # Begin Source File
 
@@ -533,10 +405,6 @@ SOURCE=..\c\src\stripnote.c
 # Begin Source File
 
 SOURCE=..\c\src\sustain.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\symbol.c
 # End Source File
 # Begin Source File
 
@@ -553,14 +421,6 @@ SOURCE=..\c\src\tabpeek.c
 # Begin Source File
 
 SOURCE=..\c\src\tabpoke.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\time.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\timer.c
 # End Source File
 # Begin Source File
 
@@ -581,10 +441,6 @@ SOURCE=..\c\src\vd.c
 # Begin Source File
 
 SOURCE=..\c\src\vd.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\vecclip.c
 # End Source File
 # Begin Source File
 
@@ -628,19 +484,11 @@ SOURCE=..\c\src\voxalloc.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\wahwah.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\wavetab.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\c\src\wavetab.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\zerocross.c
 # End Source File
 # End Target
 # End Project

@@ -89,6 +89,14 @@ LINK32=link.exe
 # Name "control - Win32 Debug"
 # Begin Source File
 
+SOURCE=..\c\src\bus.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\change.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\control.c
 # End Source File
 # Begin Source File
@@ -97,7 +105,7 @@ SOURCE=..\c\src\control.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\count.c
+SOURCE=..\c\src\delay.c
 # End Source File
 # Begin Source File
 
@@ -105,11 +113,15 @@ SOURCE=..\c\src\demux.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\fit.c
+SOURCE=..\c\src\dispatch.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\for.c
+SOURCE=..\c\src\fifo.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\metro.c
 # End Source File
 # Begin Source File
 
@@ -117,7 +129,19 @@ SOURCE=..\c\src\oneshot.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\range.c
+SOURCE=..\c\src\retard.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\select.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\speedlim.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\stack.c
 # End Source File
 # Begin Source File
 
@@ -126,6 +150,14 @@ SOURCE=..\c\src\switch.c
 # Begin Source File
 
 SOURCE=..\c\src\sync.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\timer.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\tup.c
 # End Source File
 # End Target
 # End Project
