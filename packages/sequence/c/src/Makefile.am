@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.14 2002/12/09 14:58:16 borghesi Exp $
+# $Id: Makefile.am,v 1.15 2003/01/28 11:01:22 nschnell Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.15  2003/01/28 11:01:22  nschnell
+# *** empty log message ***
+#
 # Revision 1.14  2002/12/09 14:58:16  borghesi
 # fix on previous Norbert's commit
 #
@@ -62,8 +65,6 @@ track.c
 #    exported header 'extern.h' in 'thispackage/c/include' 
 #    (before it is installed!):
 #
-#    #include <extern.h>  -->  -I$(top_srcdir)/packages/mypackage/c/include
-#    or
 #    #include <sequence/c/include/extern.h>  -->  -I$(top_srcdir)/packages 
 #
 #
@@ -84,8 +85,6 @@ track.c
 #    in 'otherpackage/c/include' of another package which resides 
 #    in the jmax source-tree (i.e. again before it is installed!):
 #
-#    #include <api.h>  -->  -I$(top_srcdir)/packages/otherpackage/c/include
-#    or
 #    #include <otherpackage/c/include/api.h>  -->  -I$(top_srcdir)/packages 
 #
 # 5. an external package (outside of the jmax source-tree) includes an

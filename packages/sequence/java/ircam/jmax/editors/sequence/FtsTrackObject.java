@@ -286,31 +286,19 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
   public void setName(String name)
   {    
-    if(name == null)
+      /*if(trackName == name)
       {
-	//here will be the sequence frame , not null but.....
-	JOptionPane.showMessageDialog(null,
-				      "A track with this name already exist!\n Choose another name.",
-				      "Warning",
-				      JOptionPane.WARNING_MESSAGE); 
-	return;
-      }
-    else
-      {
-	if(trackName == name)
-	  {
-	    JOptionPane.showMessageDialog(null,
-					  "A track with this name already exist!\n Please choose another name.",
-					  "Warning",
-					  JOptionPane.WARNING_MESSAGE); 
-	    return;
-	  }
-	      
-	String old = trackName;
-	trackName = name;
-
-	notifyTrackNameChanged(old, trackName);
-      }
+	  JOptionPane.showMessageDialog(null,
+					"A track with this name already exist!\n Please choose another name.",
+					"Warning",
+					JOptionPane.WARNING_MESSAGE); 
+	  return;
+	  }*/
+      
+      String old = trackName;
+      trackName = name;
+      
+      notifyTrackNameChanged(old, trackName);
   }  
 
 

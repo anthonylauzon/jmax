@@ -86,12 +86,61 @@ extern event_t *track_get_event_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time_after(track_t *track, double time, event_t *here);
 
-/* high-lighting events in editor */
+
+/** @name highlighting events in editor
+ *  @{ */
+
+/**
+ * Highlight one event in track editor and set cursor on its starting time.
+ * Previous highlighting is removed.
+ *
+ * @param event	pointer to track event
+ */
 extern void track_highlight_event(track_t *track, event_t *event);
+
+/**
+ * Highlight events in track editor (up to 64) and set cursor to start
+ * time of group.
+ * Previous highlighting is removed.
+ *
+ * @param n	number of events in event array
+ * @param event	array of track events
+ */
+extern void track_highlight_events(track_t *track, int n, event_t *event[]);
+
+/**
+ * Highlight events in track editor (up to 64) and set cursor to arbitrary time.
+ * Set n to 0 and event to NULL to only display time.
+ * Previous highlighting is removed.
+ *
+ * @param time	time to display in editor
+ * @param n	number of events in event array
+ * @param event	array of track events
+ */
+extern void track_highlight_events_and_time(track_t *track, double time, 
+					    int n, event_t *event[]);
+
+/**
+ * Highlight sequential event group in track editor.
+ * Previous highlighting is removed.
+ *
+ * @param event pointer to first event
+ * @param event pointer to last event
+ */
 extern void track_highlight_cluster(track_t *track, event_t *event, event_t *next);
+
+/**
+ * Highlight one event in track editor, set cursor on its starting time.
+ * Previous highlighting is removed.
+ *
+ * @return next event in track
+ * @param event	pointer to track event
+ */
 extern event_t *track_highlight_and_next(track_t *track, event_t *event);
 
-extern void track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+/** @}	end of doc group highlighting */
+
+extern void track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 

@@ -27,6 +27,7 @@
 #include "seqmess.h"
 
 #define TRACK_BLOCK_SIZE 256
+#define MAX_CLIENT_MSG_ATOMS 64		/* max. number of atoms to send */
 
 fts_class_t *track_class = 0;
 
@@ -430,7 +431,7 @@ track_get_next_by_time_after(track_t *track, double time, event_t *here)
 
 /******************************************************
  *
- *  client calls
+ *  client calls: highlighting
  * 
  */
 
@@ -446,15 +447,61 @@ track_highlight_event(track_t *track, event_t *event)
     }
 }
   
+void track_highlight_events(track_t *track, int n, event_t *event[])
+{
+    if (track_editor_is_open(track))
+    {
+	fts_atom_t a[MAX_CLIENT_MSG_ATOMS];
+	int        i;
+      
+	if (n > MAX_CLIENT_MSG_ATOMS)
+	{
+	    post("too many events for client message in track_highlight_events, ignored %d\n", n - MAX_CLIENT_MSG_ATOMS);
+	    n = MAX_CLIENT_MSG_ATOMS;
+	}
+
+	for (i = 0; i < n; i++)
+	    fts_set_object(&a[i], (fts_object_t *) event[i]);
+
+	fts_client_send_message((fts_object_t *) track, 
+				seqsym_highlightEvents, n, a);
+    }
+}
+
+
+void track_highlight_events_and_time(track_t *track, double time, 
+				     int n, event_t *event[])
+{
+    if (track_editor_is_open(track))
+    {
+	fts_atom_t a[MAX_CLIENT_MSG_ATOMS + 1];
+	int        i;
+
+	if (n > MAX_CLIENT_MSG_ATOMS)
+	{
+	    post("too many events for client message in track_highlight_events_and_time, ignored %d\n", n - MAX_CLIENT_MSG_ATOMS);
+	    n = MAX_CLIENT_MSG_ATOMS;
+	}
+
+	fts_set_float(a, time);
+
+	for (i = 0; i < n; i++)
+	    fts_set_object(&a[i+1], (fts_object_t *) event[i]);
+
+	fts_client_send_message((fts_object_t *) track, 
+				seqsym_highlightEventsAndTime, n + 1, a);
+    }
+}
+
 void
 track_highlight_cluster(track_t *track, event_t *event, event_t *next)
 {
   if(track_editor_is_open(track))
     {
-      fts_atom_t at[64];
+      fts_atom_t at[MAX_CLIENT_MSG_ATOMS];
       int ac = 0;
 
-      while(event && ( event != next) && ( ac < 64))
+      while(event && ( event != next) && ( ac < MAX_CLIENT_MSG_ATOMS))
 	{
 	  fts_set_object(at + ac, (fts_object_t *)event);
 	  ac++;
@@ -473,14 +520,14 @@ track_highlight_and_next(track_t *track, event_t *event)
 
   if(track_editor_is_open(track))
     {
-      fts_atom_t at[64];
+      fts_atom_t at[MAX_CLIENT_MSG_ATOMS];
       int ac = 0;
       
       fts_set_object(at + ac, (fts_object_t *)event);
       ac++;
       event = event_get_next(event);
 
-      while(event && ( event_get_time(event) == time) && (ac < 64))
+      while(event && ( event_get_time(event) == time) && (ac < MAX_CLIENT_MSG_ATOMS))
 	{
 	  fts_set_object(at + ac, (fts_object_t *)event);
 	  ac++;
@@ -1145,59 +1192,53 @@ track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     track_append_event(this, time, event);
 }
 
-static void 
+void 
 track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
-
-  if(this->persistence == 1)
-  {
-    fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-    event_dumper_t *event_dumper = (event_dumper_t *)fts_object_create(event_dumper_class, 1, at);
-    event_t *event = track_get_first(this);
-    fts_atom_t dumper_atom;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  event_dumper_t *event_dumper = (event_dumper_t *)fts_object_create(event_dumper_class, 1, at);
+  event_t *event = track_get_first(this);
+  fts_atom_t dumper_atom;
     
-    fts_set_object(&dumper_atom, (fts_object_t *)event_dumper);
+  fts_set_object(&dumper_atom, (fts_object_t *)event_dumper);
 
-    while(event)
-    {
+  while(event)
+  {
       fts_atom_t *value = event_get_value(event);
       
       if(fts_is_object(value))
       {
-        fts_object_t *obj = fts_get_object(value);
-        fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
-
-        /* save event time and class name */
-        fts_message_append_float(mess, event_get_time(event));
-        fts_message_append_symbol(mess, fts_s_colon);
-        fts_message_append_symbol(mess, fts_object_get_class_name(obj));
-        fts_dumper_message_send(dumper, mess);
-
-        /* dump object messages */
-        fts_send_message_varargs(obj, fts_s_dump_state, 1, &dumper_atom);
+	  fts_object_t *obj = fts_get_object(value);
+	  fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
+	  
+	  /* save event time and class name */
+	  fts_message_append_float(mess, event_get_time(event));
+	  fts_message_append_symbol(mess, fts_s_colon);
+	  fts_message_append_symbol(mess, fts_object_get_class_name(obj));
+	  fts_dumper_message_send(dumper, mess);
+	  
+	  /* dump object messages */
+	  fts_send_message_varargs(obj, fts_s_dump_state, 1, &dumper_atom);
       }
       else
       {
-        fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
-
-        /* save event time and (primitive) value */
-        fts_message_append_float(mess, event_get_time(event));
-        fts_message_append(mess, 1, value);
-        fts_dumper_message_send(dumper, mess);
+	  fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_event);
+	  
+	  /* save event time and (primitive) value */
+	  fts_message_append_float(mess, event_get_time(event));
+	  fts_message_append(mess, 1, value);
+	  fts_dumper_message_send(dumper, mess);
       }
       
       event = event_get_next(event);
-    }
-
-    /* destroy dumper */
-    fts_object_destroy((fts_object_t *)event_dumper);
   }
-
-  fts_name_dump_method(o, 0, 0, ac, at);
+  
+  /* destroy dumper */
+  fts_object_destroy((fts_object_t *)event_dumper);
 }
 
-void 
+static void 
 track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
@@ -1248,12 +1289,14 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     if(fts_is_symbol(at))
     {
       fts_symbol_t class_name = fts_get_symbol(at);
-      fts_class_t *class = fts_class_get_by_name(NULL, class_name);
 
-      if(class != NULL)
-        this->type = class;
-      else
-        fts_object_error(o, "cannot create track of %s", class_name);
+      if(class_name != fts_s_void)
+      {
+	this->type = fts_class_get_by_name(NULL, class_name);
+
+	if(this->type == NULL)
+	  fts_object_error(o, "cannot create track of %s", class_name);
+      }
     }
     else
       fts_object_error(o, "bad argument");

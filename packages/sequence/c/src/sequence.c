@@ -148,27 +148,9 @@ sequence_set_dirty(sequence_t *sequence)
     fts_patcher_set_dirty( fts_object_get_patcher( (fts_object_t *)sequence), 1);
 }
 
-static void
-sequence_set_persistence(sequence_t *this, int persistence)
-{
-  track_t *track = sequence_get_first_track(this);
-  fts_atom_t a;
-
-  fts_set_int(&a, persistence);
-  
-  this->persistence = persistence;
-  fts_client_send_message((fts_object_t *)this, fts_s_persistence, 1, &a);
-
-  /* set flag of all tracks */
-  while(track != NULL)
-  {
-    track->persistence = persistence;
-    track = track->next;
-  }
-}
-
 /******************************************************
 *
+
 *  system methods
 *
 */
@@ -177,7 +159,6 @@ static void
 sequence_add_track_at_client(sequence_t *this, track_t *track)
 {
   fts_class_t *track_type = track_get_type(track);
-  fts_symbol_t track_name;
 
   if( !fts_object_has_id((fts_object_t *)track))
   {
@@ -185,11 +166,11 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
 
     fts_client_start_message( (fts_object_t *)this, seqsym_addTracks);
     fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)track));
-    fts_client_add_symbol( (fts_object_t *)this, fts_class_get_name(track_type));
 
-    track_name = track_get_name(track);
-    if( track_name)
-      fts_client_add_symbol( (fts_object_t *)this, track_name);
+    if(track_type != NULL)
+      fts_client_add_symbol( (fts_object_t *)this, fts_class_get_name(track_type));
+    else
+      fts_client_add_symbol( (fts_object_t *)this, fts_s_void);     
 
     fts_client_done_message( (fts_object_t *)this);
   }
@@ -204,10 +185,28 @@ sequence_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 static void
 sequence_send_name_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  sequence_t *this = (sequence_t *)o;
+  fts_symbol_t name = fts_object_get_name(o);
   fts_atom_t a;
 
-  fts_set_symbol(&a, seqsym_sequence);
-  fts_client_send_message(o, seqsym_setName, 1, &a);
+  if(name != NULL)
+    fts_set_symbol(&a, name);
+  else
+    fts_set_symbol(&a, seqsym_sequence);
+
+  if(sequence_editor_is_open(this))
+    fts_client_send_message(o, seqsym_setName, 1, &a);
+}
+
+static void
+sequence_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(sequence_editor_is_open(this))
+    fts_client_send_message(o, seqsym_setName, 1, at);
+  
+  fts_name_set_method(o, 0, 0, ac, at);
 }
 
 /* move track by client request */
@@ -537,7 +536,10 @@ sequence_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   {
     /* set persistence flag */
     if(fts_is_number(at) && this->persistence >= 0)
-      sequence_set_persistence(this, (fts_get_number_int(at) != 0));
+    {
+      this->persistence = fts_get_number_int(at);
+      fts_client_send_message((fts_object_t *)this, fts_s_persistence, 1, at);
+    }
   }
   else
   {
@@ -654,7 +656,10 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       fts_class_t *type = track_get_type(track);
       fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_track);
 
-      fts_message_append_symbol(mess, fts_class_get_name(type));
+      if(type != NULL)
+	fts_message_append_symbol(mess, fts_class_get_name(type));
+      else
+	fts_message_append_symbol(mess, fts_s_void);
 
       if(name)
         fts_message_append_symbol(mess, name);
@@ -662,7 +667,7 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       fts_dumper_message_send(dumper, mess);
 
       /* write track events */
-      track_dump((fts_object_t *)track, 0, 0, 1, at);
+      track_dump_state((fts_object_t *)track, 0, 0, 1, at);
       track = track_get_next(track);
     }
   }
@@ -772,7 +777,7 @@ sequence_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sequence_t), sequence_init, sequence_delete);
 
-  fts_class_message_varargs(cl, fts_s_name, fts_name_set_method);
+  fts_class_message_varargs(cl, fts_s_name, sequence_set_name);
   fts_class_message_varargs(cl, fts_s_persistence, sequence_persistence);
   fts_class_message_varargs(cl, fts_s_update_gui, sequence_update_gui);
   fts_class_message_varargs(cl, fts_s_dump, sequence_dump);

@@ -45,4 +45,10 @@ typedef struct _note_
 #define note_set_duration(n, x) ((n)->duration = (x))
 #define note_get_duration(n) ((n)->duration)
 
+extern void note_set_velocity(note_t *this, int velocity);
+extern int note_get_velocity(note_t *this);
+
+extern void note_set_channel(note_t *this, int channel);
+extern int note_get_channel(note_t *this);
+
 #endif
