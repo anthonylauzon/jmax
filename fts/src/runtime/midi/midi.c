@@ -134,7 +134,7 @@ struct _fts_midi_port
   struct _fts_midi_port *next;
 };
 
-static fts_midi_port_t *port_list;
+static fts_midi_port_t *port_list = 0;
 
 /* Operations to get a midi port */
 
@@ -291,13 +291,13 @@ fts_midi_close_all(void)
 
   /* indirect precursor iteration */
 
-  fts_set_int(&a, port_list->idx);
+  while (port_list)
+    {
+      fts_set_int(&a, port_list->idx);
 
-  fts_close_logical_device(fts_new_symbol("midi"), 1, &a);
+      fts_close_logical_device(fts_new_symbol("midi"), 1, &a);
+    }
 }
-
-
-
 
 
 /******************************************************************************/

@@ -49,7 +49,7 @@ fts_object_table_put(int id, fts_object_t *obj)
 	 this scheme produce ten realloc with 4 Mega objects :->
        */
 
-      while (new_size < id)
+      while (new_size <= id)
 	new_size *= TABLE_GROW;
 
       object_table = fts_realloc(object_table, new_size * sizeof(fts_object_t *));
