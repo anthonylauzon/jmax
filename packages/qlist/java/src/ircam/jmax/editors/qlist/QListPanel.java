@@ -12,11 +12,12 @@ import com.sun.java.swing.*;
 
 public class QListPanel extends JPanel implements ActionListener {
   
-  QList itsQList;
+  //QList itsQList;
+  FtsAtomList itsAtomList;
   TextArea itsTextArea;
   Button itsSendButton;
   
-  public QListPanel(QList theQList) { 
+  public QListPanel(FtsAtomList theAtomList) { 
     super();
     itsTextArea = new TextArea(40, 40);
     itsSendButton = new Button("Send");
@@ -25,15 +26,18 @@ public class QListPanel extends JPanel implements ActionListener {
     add("North", itsSendButton);
     add("Center", itsTextArea);
     validate();
-    itsQList = theQList;
+    itsAtomList = theAtomList;
     setBackground(Color.white);
   }
 
   public void fillContent(FtsAtomList theContent) {
     itsTextArea.setText(theContent.getValuesAsText());
+    itsAtomList = theContent;
   }
  
   public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == itsSendButton)
+      itsAtomList.setValuesAsText(itsTextArea.getText());
   }
 
   public Dimension preferredSize() {
