@@ -121,7 +121,7 @@ public class FtsGraphicObject extends FtsObject {
 	  ((FtsGraphicObject)obj).setCurrentLayer( args.getInt( 0));
 	}
       });
-    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "setName"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "set_name"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsGraphicObject)obj).setVariableName( args.getSymbol( 0).toString());
@@ -560,9 +560,30 @@ public class FtsGraphicObject extends FtsObject {
     this.comment = comment;
   }
 
+  public void requestSetName( String name)
+  {
+    if (this.varName != name)
+      {
+	args.clear();
+	args.addSymbol( FtsSymbol.get( name));
+
+	try{
+	  send( FtsSymbol.get("set_name"), args);
+	}
+	catch(IOException e)
+	  {
+	    System.err.println("FtsGraphicObject: I/O Error sending set_name Message!");
+	    e.printStackTrace(); 
+	  }
+
+	this.varName = name;
+      }
+  }
+
   public final void setVariableName( String name)
   {
     this.varName = name;
+    ((GraphicObject)getObjectListener()).setCurrentName( name);
   }
 
   public final String getVariableName()

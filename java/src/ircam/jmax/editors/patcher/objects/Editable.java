@@ -111,8 +111,8 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
   public int getDefaultWidth()
   {
-      if(defaultWidth==-1)
-	  defaultWidth = getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset();
+    if(defaultWidth==-1)
+      defaultWidth = getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset();
       
       return defaultWidth;      
   }
@@ -128,13 +128,13 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     if( w <= 0)
       super.setWidth( getDefaultWidth());
     else
-      if (renderer.canResizeWidthTo(w - getTextWidthOffset()))
+      if (renderer.canResizeWidthTo(w - getVariableWidth() - getTextWidthOffset()))
 	{
 	  super.setWidth(w);
 	  super.setHeight(renderer.getHeight() + getTextHeightOffset());
 	}
       else{
-	super.setWidth( getMinimumWidth());
+	super.setWidth( getMinimumWidth() + getVariableWidth());
 	super.setHeight( renderer.getHeight() + getTextHeightOffset());
       } 
   }
@@ -267,7 +267,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     renderer.render(g, 
 		    getX() + getTextXOffset(),
 		    getY() + getTextYOffset(),
-		    getWidth() - getTextWidthOffset(),
+		    getWidth() - getVariableWidth() - getTextWidthOffset(),
 		    getHeight() - getTextHeightOffset());
   }
 
@@ -278,7 +278,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     int dx = mouseX - (getX() + getTextXOffset());
     int dy = mouseY - (getY() + getTextYOffset());
 
-    if ((dx >= 0) && (dx < getWidth() - getTextWidthOffset()) &&
+    if ((dx >= 0) && (dx < getWidth() - getVariableWidth() - getTextWidthOffset()) &&
 	(dy >= 0) && (dy < getHeight() - getTextHeightOffset()))
       {
 	return SensibilityArea.get(this, Squeack.TEXT);

@@ -98,7 +98,7 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
     if( (this.name == null) || (( text != null) && !text.equals( this.name)))
       {
 	target.getFtsObject().setVariableName( text);//solo per debug!!!!!
-	((FtsPatcherObject)target.getFtsObject().getParent()).requestSetObjectName( target.getFtsObject(), text);
+	target.getFtsObject().requestSetName( text);
 	name = text;
       }
   }

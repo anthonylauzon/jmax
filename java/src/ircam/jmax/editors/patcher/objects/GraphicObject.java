@@ -248,6 +248,13 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     setWidth(w);
   }
+
+  /* redefined only in Standard object */
+  public int getVariableWidth()
+  {
+    return 0;
+  }
+
   public final int getHeight() 
   {
     if(isSquare())
@@ -284,6 +291,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 				  : ScaleTransform.getInstance().invScaleY(h ));
     
   }
+
+  public void setCurrentName( String name){}
 
   public void setDefaults(){}
 
@@ -569,10 +578,10 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   public void updateInOutlets()
   {
     if (ftsObject.getNumberOfInlets() > 1)
-      inletDistance = (getWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfInlets() - 1);
+      inletDistance = (getWidth() - getVariableWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfInlets() - 1);
     
     if (ftsObject.getNumberOfOutlets() > 1)
-      outletDistance = (getWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfOutlets() - 1);
+      outletDistance = (getWidth() - getVariableWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfOutlets() - 1);
   }
 
   // redefine provide a default empty implementation
@@ -580,7 +589,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void redefine(String text) 
   {
-      updateInOutlets();
+    updateInOutlets();
   }
 
   public void redefined(){}

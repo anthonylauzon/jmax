@@ -37,6 +37,9 @@ import ircam.jmax.toolkit.*;
 
 public class Standard extends Editable implements FtsObjectErrorListener
 {
+  private String varName = null;
+  private int varWidth = 0;
+
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -87,6 +90,52 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public boolean hasContent()
   {
     return true;
+  }
+
+  public void setCurrentName( String name)
+  {
+    if( varName == null)
+      {
+	varName = name;	
+	varWidth = getFontMetrics().stringWidth( varName) + 6;
+	setWidth( getWidth() + varWidth);
+      }
+    else
+      if( !varName.equals( name))
+	{
+	  varName = name;
+	  int oldw = getWidth() - varWidth;
+	  varWidth = getFontMetrics().stringWidth( varName) + 6;
+	  setWidth( oldw + varWidth);
+	}
+    redraw();
+  }
+
+  public void setFont( Font theFont)
+  {
+    super.setFont( theFont);
+    if( varName != null)
+      {
+	int oldw = getWidth() - varWidth;
+	varWidth = getFontMetrics().stringWidth( varName) + 6;
+	setWidth( oldw + varWidth);
+      }
+  }
+
+  public void setCurrentFont( Font theFont)
+  {
+    super.setCurrentFont( theFont);
+    if( varName != null)
+      {
+	int oldw = getWidth() - varWidth;
+	varWidth = getFontMetrics().stringWidth( varName) + 6;
+	setWidth( oldw + varWidth);
+      }
+  }
+
+  public int getVariableWidth()
+  {
+    return varWidth;
   }
 
   // ----------------------------------------
@@ -166,12 +215,35 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
     int x = getX();
     int y = getY();
-    int w = getWidth();
+    int w = getWidth() - varWidth;
     int h = getHeight();
 
     g.fill3DRect( x+1, y+1, w-2, h-2, true);
 
     drawContent( g);
+
+    /* draw variable name */
+
+    if( varName!= null)
+      {
+	if( isSelected())
+	  g.setColor( Color.yellow.darker());
+	else
+	  g.setColor( Color.yellow);
+
+	g.fillRect( x+w, y+1, varWidth-1, h-2);
+
+	if( isSelected())
+	  g.setColor( Settings.sharedInstance().getObjColor().darker());
+	else
+	  g.setColor( Settings.sharedInstance().getObjColor());
+
+	g.drawLine( x+w-2, y+1, x+w-2, y+h-2);
+	g.setColor( Color.black);
+	g.drawLine( x+w-1, y+1, x+w-1, y+h-2);
+	g.setFont( getFont());
+	g.drawString( varName, x+w+2, y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2);
+      }
 
     super.paint( g);
   }

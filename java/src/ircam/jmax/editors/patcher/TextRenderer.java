@@ -100,13 +100,13 @@ public class TextRenderer implements ObjectRenderer
     if (owner.getHeight() > 0){
       area.setBounds(owner.getX() + owner.getTextXOffset(),
 		     owner.getY() + owner.getTextYOffset(),
-		     owner.getWidth() - owner.getTextWidthOffset(),
+		     owner.getWidth() - owner.getVariableWidth() - owner.getTextWidthOffset(),
 		     owner.getHeight() - owner.getTextHeightOffset());
     }    
     else
       area.setBounds(owner.getX() + owner.getTextXOffset(),
 		     owner.getY() + owner.getTextYOffset(), 
-		     owner.getWidth() - owner.getTextWidthOffset(),
+		     owner.getWidth() - owner.getVariableWidth() - owner.getTextWidthOffset(),
 		     5);
     area.setFont(owner.getFont());    
     area.setText(owner.getArgs()); 
@@ -118,7 +118,7 @@ public class TextRenderer implements ObjectRenderer
     int lines = area.getLineCount();
 
     if(lines==0)
-      w = owner.getWidth() - owner.getTextWidthOffset();
+      w = owner.getWidth() - owner.getVariableWidth() - owner.getTextWidthOffset();
     else 
       if(lines==1){
 	w = SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs());
@@ -129,7 +129,7 @@ public class TextRenderer implements ObjectRenderer
 	  ww = SwingUtilities.computeStringWidth(owner.getFontMetrics(), area.getTextLine(i));
 	  if(ww>w) w = ww;
 	}
-	if(w==0) w = owner.getWidth() - owner.getTextWidthOffset();
+	if(w==0) w = owner.getWidth()  - owner.getVariableWidth() - owner.getTextWidthOffset();
       }
     return w;
   }
@@ -156,7 +156,7 @@ public class TextRenderer implements ObjectRenderer
   public boolean isTextLonger(){
     if( owner.getArgs() != null)
       return (SwingUtilities.computeStringWidth(owner.getFontMetrics(), owner.getArgs()) >= 
-	      owner.getWidth() - owner.getTextWidthOffset());
+	      owner.getWidth()  - owner.getVariableWidth() - owner.getTextWidthOffset());
     else
       return true;
   }

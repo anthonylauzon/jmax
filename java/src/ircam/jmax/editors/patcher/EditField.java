@@ -196,7 +196,7 @@ public class EditField extends JTextArea implements FocusListener
 
     setBounds(owner.getX() + owner.getTextXOffset(),
 	      owner.getY() + owner.getTextYOffset(),
-	      owner.getWidth() - owner.getTextWidthOffset(),
+	      owner.getWidth() - owner.getVariableWidth() - owner.getTextWidthOffset(),
 	      owner.getHeight() - owner.getTextHeightOffset());
 
     if (p != null)
@@ -304,7 +304,7 @@ public class EditField extends JTextArea implements FocusListener
 		  owner.setWidthToText(getText());
 		  
 		  d = getSize();
-		  d.width = owner.getWidth() - owner.getTextWidthOffset();
+		  d.width = owner.getWidth() - owner.getVariableWidth() - owner.getTextWidthOffset();
 		}
 	      
 	      owner.redraw();

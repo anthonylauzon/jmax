@@ -869,22 +869,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       }
   }
 
-  public void requestSetObjectName( FtsObject obj, String name)
-  {
-    args.clear();
-    args.addObject( obj);      
-    args.addSymbol( FtsSymbol.get( name));      
-      
-    try{
-      send( FtsSymbol.get("set_object_name"), args);
-    }
-    catch(IOException e)
-      {
-	System.err.println("FtsPatcherObject: I/O Error sending set_object_name Message!");
-	e.printStackTrace(); 
-      }
-  }
-
   //used in addObject method to start editing in added object if needed 
   public void addObject(int nArgs , FtsAtom args[]) 
   {
