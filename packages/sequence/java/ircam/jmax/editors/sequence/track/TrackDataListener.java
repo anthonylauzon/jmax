@@ -46,7 +46,8 @@ public interface TrackDataListener {
   abstract public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex);
   abstract public void trackNameChanged(String oldName, String newName);
   abstract public void trackCleared();
-  abstract public void endTrackUpload();
+  abstract public void startTrackUpload( TrackDataModel track, int size);
+  abstract public void endTrackUpload( TrackDataModel track);
   abstract public void startPaste();
   abstract public void endPaste();
 }

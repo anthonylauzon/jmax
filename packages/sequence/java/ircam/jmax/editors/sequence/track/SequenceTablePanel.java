@@ -98,7 +98,8 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
 	public void objectAdded(Object whichObject, int index)
 	{
-	  table.revalidate();
+	  if( !uploading)
+	    table.revalidate();
 	}
 	public void objectsAdded(int maxTime)
 	{
@@ -112,7 +113,15 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 	{
 	  table.revalidate();
 	}
-	public void endTrackUpload(){}
+	boolean uploading = false;
+	public void startTrackUpload( TrackDataModel track, int size)
+	{
+	  uploading  = true;
+	}
+	public void endTrackUpload( TrackDataModel track)
+	{
+	  uploading = false;
+	}
 	public void startPaste(){}
 	public void endPaste(){}
 	public void trackNameChanged(String oldName, String newName) {}

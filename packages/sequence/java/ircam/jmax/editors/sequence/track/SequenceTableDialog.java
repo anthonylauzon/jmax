@@ -63,40 +63,47 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
     /**
      * TrackDataListener interface
      */
-    public void objectChanged(Object spec, String propName, Object propValue){}
+  public void objectChanged(Object spec, String propName, Object propValue){}
       
-    public void objectAdded(Object spec, int index) 
-    {
+  public void objectAdded(Object spec, int index) 
+  {
+    if( !uploading)
+      {
 	getContentPane().validate();
 	tabPanel.validate();
 	validate();
-	//pack();
-    }
+      }
+  }
       
-    public void objectsAdded(int maxTime) 
-    {
-	getContentPane().validate();
-	tabPanel.validate();
-	validate();
-	//pack();
-    }
+  public void objectsAdded(int maxTime) 
+  {
+    getContentPane().validate();
+    tabPanel.validate();
+    validate();
+  }
     
-    public void objectDeleted(Object whichObject, int index) 
-    {
-	getContentPane().validate();
-	tabPanel.validate();
-	validate();
-	//pack();
-    }
+  public void objectDeleted(Object whichObject, int index) 
+  {
+    getContentPane().validate();
+    tabPanel.validate();
+    validate();
+  }
 
-    public void trackCleared() 
-    {
-	getContentPane().validate();
-	tabPanel.validate();
-	validate();
-	//pack();
-    }
-  public void endTrackUpload(){}    
+  public void trackCleared() 
+  {
+    getContentPane().validate();
+    tabPanel.validate();
+    validate();
+  }
+  boolean uploading = false;
+  public void startTrackUpload( TrackDataModel track, int size)
+  {
+    uploading = true;
+  }    
+  public void endTrackUpload( TrackDataModel track)
+  {
+    uploading = true;
+  }    
   public void startPaste(){}    
   public void endPaste(){}    
   public void objectMoved(Object whichObject, int oldIndex, int newIndex){}

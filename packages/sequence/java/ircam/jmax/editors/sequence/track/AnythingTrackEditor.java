@@ -46,223 +46,268 @@ import javax.swing.event.*;
  * and settings of y are simply ignored. */
 public class AnythingTrackEditor extends JPanel implements ListSelectionListener, TrackEditor
 {
-    public AnythingTrackEditor(Geometry g, Track track)
-    {
-	super();
+  public AnythingTrackEditor(Geometry g, Track track)
+  {
+    super();
 
-	this.geometry = g;
-	this.itsTrack = track;
+    this.geometry = g;
+    this.itsTrack = track;
 
-	itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
-	    public void objectDeleted(Object whichObject, int oldIndex) 
-	    {
-	      AnythingTrackEditor.this.repaint();
-	    }
-	    public void trackCleared() 
-	    {
-	      AnythingTrackEditor.this.repaint();
-	    }
-	    public void endTrackUpload(){}
-	    public void startPaste(){}
-	    public void endPaste(){}
-	    public void objectAdded(Object whichObject, int index) 
-	    { 
-	      AnythingTrackEditor.this.repaint();
-	    }
-	    public void objectsAdded(int maxTime) 
-	    {
-	      AnythingTrackEditor.this.repaint();
-	      selection.deselectAll();
-	    }
-	    public void objectChanged(Object whichObject, String propName, Object propValue) 
-	    {
-	      AnythingTrackEditor.this.repaint();
-	    }
-	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
-	    {
-	      AnythingTrackEditor.this.repaint();
-	    }
-	    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) {}
-	    public void trackNameChanged(String oldName, String newName) {
-		itsTrack.setProperty("trackName", newName);
-	    }
-	});
+    itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
+	boolean uploading  = false;
+	public void objectDeleted(Object whichObject, int oldIndex) 
+	{
+	  AnythingTrackEditor.this.repaint();
+	}
+	public void trackCleared() 
+	{
+	  AnythingTrackEditor.this.repaint();
+	}
+	public void startTrackUpload( TrackDataModel track, int size)
+	{
+	  uploading  = true;
+	}
+	public void endTrackUpload( TrackDataModel track)
+	{
+	  uploading  = false;
+	}
+	public void startPaste(){}
+	public void endPaste(){}
+	public void objectAdded(Object whichObject, int index) 
+	{ 
+	  if( !uploading)
+	    AnythingTrackEditor.this.repaint();
+	}
+	public void objectsAdded(int maxTime) 
+	{
+	  AnythingTrackEditor.this.repaint();
+	  selection.deselectAll();
+	}
+	public void objectChanged(Object whichObject, String propName, Object propValue) 
+	{
+	  updateEventProperties(whichObject, propName, propValue);
+	  updateRange(whichObject);
+	  AnythingTrackEditor.this.repaint();
+	}
+	public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
+	{
+	  AnythingTrackEditor.this.repaint();
+	}
+	public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) {}
+	public void trackNameChanged(String oldName, String newName) {
+	  itsTrack.setProperty("trackName", newName);
+	}
+      });
 
-	geometry.addTranspositionListener(new TranspositionListener() {
-	    public void transpositionChanged(int newTranspose)
+    itsTrack.getTrackDataModel().addHighlightListener(new HighlightListener(){
+	public void highlight(Enumeration elements, double time)
+	{
+	  TrackEvent temp;
+	  boolean first = true; 
+	  
+	  Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
+	  Graphics gr = getGraphics();		    
+	  gr.clipRect(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+	  
+	  for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+	    {
+	      temp = (TrackEvent) e.nextElement();
+	      temp.setHighlighted(false);
+	      temp.getRenderer().render(temp, gr, false, gc);
+	    }
+	  oldElements.removeAllElements();		    
+	  
+	  for (Enumeration e = elements; e.hasMoreElements();) 
+	    {
+	      temp = (TrackEvent) e.nextElement();
+	      if(first)
 		{
-		    repaint();
+		  gc.getScrollManager().makeVisible(temp);
+		  first = false;
 		}
-	});
+	      temp.setHighlighted(true);
+	      temp.getRenderer().render(temp, gr, true, gc);
+	      oldElements.addElement(temp);
+	    }
+	}
+      });
 
-	itsTrack.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
-		public void lock(boolean lock){}
-		public void active(boolean active)
-		{
-		    itsTrack.setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
-		}
-	    });
+    geometry.addTranspositionListener(new TranspositionListener() {
+	public void transpositionChanged(int newTranspose)
+	{
+	  repaint();
+	}
+      });
 
-	createGraphicContext(geometry, itsTrack.getTrackDataModel());
+    itsTrack.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
+	public void lock(boolean lock){}
+	public void active(boolean active)
+	{
+	  itsTrack.setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
+	}
+      });
 
-	//--- make this track's selection the current 
-	// one when the track is activated
-	itsTrack.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
-		public void propertyChange(PropertyChangeEvent e)
-		{		    
-		    if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
-			SequenceSelection.setCurrent(selection);
-		}
-	});
+    createGraphicContext(geometry, itsTrack.getTrackDataModel());
 
-	//track.setProperty("locked", new Boolean(true));
+    //--- make this track's selection the current 
+    // one when the track is activated
+    itsTrack.getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
+	public void propertyChange(PropertyChangeEvent e)
+	{		    
+	  if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
+	    SequenceSelection.setCurrent(selection);
+	}
+      });
 
-	selection.addListSelectionListener(this);
+    //track.setProperty("locked", new Boolean(true));
 
-	selection.setOwner(new SelectionOwner() {
-		public void selectionDisactivated()
-		{
-		    repaint();
-		}
-		public void selectionActivated()
-		{
-		    repaint();
-		}
-	});
+    selection.addListSelectionListener(this);
 
-	setBackground(Color.lightGray);
-	setOpaque(false);
-    }
+    selection.setOwner(new SelectionOwner() {
+	public void selectionDisactivated()
+	{
+	  repaint();
+	}
+	public void selectionActivated()
+	{
+	  repaint();
+	}
+      });
 
-    public void reinit(){}
+    setBackground(Color.lightGray);
+    setOpaque(false);
+  }
+
+  public void reinit(){}
+  
+  public JMenu getToolsMenu()
+  {
+    return gc.getToolbar().itsMenu;
+  }
     
-    public JMenu getToolsMenu()
-    {
-	return gc.getToolbar().itsMenu;
-    }
+  public JPopupMenu getMenu()
+  {
+    return null;
+  }
+
+  public int trackCount()
+  {
+    if( gc.getFtsObject() instanceof FtsSequenceObject)
+      return ((FtsSequenceObject)gc.getFtsObject()).trackCount();
+    else
+      return 1;
+  }
+
+  public void paintComponent(Graphics g) 
+  {
+    Rectangle r = g.getClipBounds();
+    renderer.render(g, r); //et c'est tout	
+  }
+
+  private void createGraphicContext(Geometry geometry, TrackDataModel model)
+  {
+    selection = new SequenceSelection(model);
     
-    public JPopupMenu getMenu()
-    {
-	return null;
-    }
+    gc = new SequenceGraphicContext(model, selection, this); //loopback?
+    gc.setGraphicSource(this);
+    gc.setGraphicDestination(this);
+    ad = new AnythingAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
+    itsTrack.getPropertySupport().addPropertyChangeListener(ad);
+    gc.setAdapter(ad);
 
-    public int trackCount()
-    {
-      if( gc.getFtsObject() instanceof FtsSequenceObject)
-	return ((FtsSequenceObject)gc.getFtsObject()).trackCount();
-      else
-	return 1;
-    }
+    renderer = new AnythingTrackRenderer(gc);
+    gc.setRenderManager(renderer);
+  }
 
-    public void paintComponent(Graphics g) 
-    {
-      Rectangle r = g.getClipBounds();
-      renderer.render(g, r); //et c'est tout	
-    }
+  public void setAdapter(AnythingAdapter adapter)
+  {
+    itsTrack.getPropertySupport().removePropertyChangeListener(ad);	
+    itsTrack.getPropertySupport().addPropertyChangeListener(adapter);
+    gc.setAdapter(adapter);	
+    ad = adapter;
+  }
 
-    private void createGraphicContext(Geometry geometry, TrackDataModel model)
-    {
-	selection = new SequenceSelection(model);
+  public void setRenderer(AnythingTrackRenderer renderer)
+  {
+    this.renderer = renderer;
+    gc.setRenderManager(renderer);
+  }
 
-	gc = new SequenceGraphicContext(model, selection, this); //loopback?
-	gc.setGraphicSource(this);
-	gc.setGraphicDestination(this);
-	ad = new AnythingAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
-	itsTrack.getPropertySupport().addPropertyChangeListener(ad);
-	gc.setAdapter(ad);
+  public void showListDialog(){}
+  public void updateNewObject(Object obj){};
+  void updateEventProperties(Object whichObject, String propName, Object propValue){}
+  void updateRange(Object whichObject){}  
 
-	renderer = new AnythingTrackRenderer(gc);
-	gc.setRenderManager(renderer);
-    }
-
-    public void setAdapter(AnythingAdapter adapter)
-    {
-	itsTrack.getPropertySupport().removePropertyChangeListener(ad);	
-	itsTrack.getPropertySupport().addPropertyChangeListener(adapter);
-	gc.setAdapter(adapter);	
-	ad = adapter;
-    }
-
-    public void setRenderer(AnythingTrackRenderer renderer)
-    {
-	this.renderer = renderer;
-	gc.setRenderManager(renderer);
-    }
-
-    public void showListDialog(){}
-    public void updateNewObject(Object obj){};
-    void updateEventProperties(Object whichObject, String propName, Object propValue){}
-    void updateRange(Object whichObject){}  
-
-    /**
-     * ListSelectionListener interface
-     */
-    
-    public void valueChanged(ListSelectionEvent e)
-    {
-	repaint();
-    }
+  /**
+   * ListSelectionListener interface
+   */
+  
+  public void valueChanged(ListSelectionEvent e)
+  {
+    repaint();
+  }
       
-    /**
-     * Track editor interface */
+  /**
+   * Track editor interface */
+  
+  public Component getComponent()
+  {
+    return this;
+  }
 
-    public Component getComponent()
-    {
-	return this;
-    }
+  public SequenceGraphicContext getGraphicContext()
+  {
+    return gc;
+  }
 
-    public SequenceGraphicContext getGraphicContext()
-    {
-	return gc;
-    }
-
-    public int getDefaultHeight()
-    {
-	return DEFAULT_HEIGHT;
-    }
-    public void dispose(){}
-    public SequenceSelection getSelection()
-    {
-	return selection;
-    }
-    public Dimension getPreferredSize()
-    {
-	return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
-    }
-    public Track getTrack()
-    {
-	return itsTrack;
-    }
-
-    public void processKeyEvent(KeyEvent e)
-    {
-	if(SequenceTextArea.isDeleteKey(e))
-	    {
-		if(e.getID()==KeyEvent.KEY_PRESSED)
-		    {
-			((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
-			selection.deleteAll();
-		    }
-	    }
-	else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
-	    if(e.isControlDown())
-		selection.selectPrevious();
-	    else
-		selection.selectNext();
-
-	super.processKeyEvent(e);
-	requestFocus();
-    }
-
-    //--- AnythingTrackEditor fields
-    Geometry geometry;
-    SequenceGraphicContext gc;
-    SequenceSelection selection;
-    static int MONODIMENSIONAL_TRACK_OFFSET = 0;
-    static public int DEFAULT_HEIGHT = 70;
-    AnythingTrackRenderer renderer;
-    AnythingAdapter ad;
-    Track itsTrack;
+  public int getDefaultHeight()
+  {
+    return DEFAULT_HEIGHT;
+  }
+  public void dispose(){}
+  public SequenceSelection getSelection()
+  {
+    return selection;
+  }
+  public Dimension getPreferredSize()
+  {
+    return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
+  }
+  public Track getTrack()
+  {
+    return itsTrack;
+  }
+  
+  public void processKeyEvent(KeyEvent e)
+  {
+    if(SequenceTextArea.isDeleteKey(e))
+      {
+	if(e.getID()==KeyEvent.KEY_PRESSED)
+	  {
+	    ((UndoableData)itsTrack.getTrackDataModel()).beginUpdate();
+	    selection.deleteAll();
+	  }
+      }
+    else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
+      if(e.isControlDown())
+	selection.selectPrevious();
+      else
+	selection.selectNext();
+    
+    super.processKeyEvent(e);
+    requestFocus();
+  }
+  
+  //--- AnythingTrackEditor fields
+  Geometry geometry;
+  SequenceGraphicContext gc;
+  SequenceSelection selection;
+  static int MONODIMENSIONAL_TRACK_OFFSET = 0;
+  static public int DEFAULT_HEIGHT = 70;
+  AnythingTrackRenderer renderer;
+  AnythingAdapter ad;
+  Track itsTrack;
+  MaxVector oldElements = new MaxVector();
 }
 
 

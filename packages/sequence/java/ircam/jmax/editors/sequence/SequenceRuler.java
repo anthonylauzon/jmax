@@ -103,7 +103,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	for (int i=logicalTime+timeStep; i < windowTime; i+=timeStep*k) 
 	  {
 	    snappedTime = (i/timeStep)*timeStep;
-	    xPosition = utilityPartitionAdapter.getX(snappedTime)+3+TrackContainer.BUTTON_WIDTH;
+	    xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
 	    
 	    if(unity==MILLISECONDS_UNITY)		    
 	      timeString = ""+snappedTime;
@@ -114,11 +114,11 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	    if((xPosition <= clip.x+clip.width+20)&&(xPosition+stringWidth >= clip.x-20))
 	      {				
 		g.drawLine(xPosition, d.height-4, xPosition, d.height);				
-		g.drawString(timeString, xPosition-stringWidth/2, /*15*/12);		  
+		g.drawString(timeString, xPosition-stringWidth/2, 12);		  
 	      }
 	  }
 	
-	int hhX = utilityPartitionAdapter.getX(hhTime)+3+TrackContainer.BUTTON_WIDTH;
+	int hhX = utilityPartitionAdapter.getX(hhTime)+getXIndentation();
 	g.setColor(Color.green);
 	g.fillRect(hhX-1, 1, 3, d.height-2);
 	
@@ -129,7 +129,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	for (int i=logicalTime+timeStep; i<windowTime; i+=timeStep*k) 
 	  {
 	    snappedTime = (i/timeStep)*timeStep;
-	    xPosition = utilityPartitionAdapter.getX(snappedTime)+3+TrackContainer.BUTTON_WIDTH;
+	    xPosition = utilityPartitionAdapter.getX(snappedTime)+getXIndentation();
 	    g.drawLine(xPosition, d.height-4, xPosition, d.height);
 	    
 	    if(unity==MILLISECONDS_UNITY)		    
@@ -138,9 +138,17 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
 	      timeString = ""+(float)(snappedTime/(float)1000.0);
 	    
 	    stringWidth = fm.stringWidth(timeString);
-	    g.drawString(timeString, xPosition-stringWidth/2, /*15*/12);		  
+	    g.drawString(timeString, xPosition-stringWidth/2, 12);		  
 	  }
       }
+  }
+
+  int getXIndentation()
+  {
+    if( scrollManager instanceof SequencePanel)
+      return 3+TrackContainer.BUTTON_WIDTH;
+    else
+      return 3;
   }
   
   protected void processMouseEvent(MouseEvent e)
@@ -191,8 +199,8 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
     //---------
     hh = true;
     
-    int hhX = utilityPartitionAdapter.getX(hhTime)+3+TrackContainer.BUTTON_WIDTH;
-    int timeX = utilityPartitionAdapter.getX(time)+3+TrackContainer.BUTTON_WIDTH;
+    int hhX = utilityPartitionAdapter.getX(hhTime) + getXIndentation();
+    int timeX = utilityPartitionAdapter.getX(time) + getXIndentation();
     
     if(time >= hhTime)
       paintRect.setBounds(hhX-1, 1, timeX-hhX+3, getSize().height-2);
@@ -203,7 +211,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
     
     hhTime = time;
   }
-
+  
   //--- Ruler fields
   boolean hh = false;
   double hhTime;

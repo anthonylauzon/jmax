@@ -283,6 +283,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 
   /** TrackDataListener interface*/
 
+  
   public void objectChanged(Object spec, String propName, Object propValue) 
   {
   }
@@ -299,10 +300,13 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
       else removeSelectionInterval(i, i);
       }*/
     //deselectAll();
-    select(spec);    
+    if( !uploading)
+      {
+	select(spec);    
 
-    if( pasting)
-      pastedObjects.add( spec);
+	if( pasting)
+	  pastedObjects.add( spec);
+      }
   }
   public void objectsAdded(int maxTime) {}
 
@@ -376,8 +380,14 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   {
       deselectAll();
   }
-  public void endTrackUpload() 
+  boolean uploading = false;
+  public void startTrackUpload( TrackDataModel track, int size)
   {
+    uploading = true;
+  }
+  public void endTrackUpload( TrackDataModel track) 
+  {
+    uploading = false;
     deselectAll();
   }
   public void startPaste() 

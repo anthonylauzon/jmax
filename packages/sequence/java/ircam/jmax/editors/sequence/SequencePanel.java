@@ -351,19 +351,28 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   /**
    * called when the database is changed: DataTrackListener interface
    */
-  
+  boolean uploading = false;
   public void objectChanged(Object spec, String propName, Object propValue) {}
   public void objectAdded(Object spec, int index) 
   {
-    resizePanelToEventTime((TrackEvent)spec);	
+    if( !uploading)
+      resizePanelToEventTime((TrackEvent)spec);	
   }
   public void objectsAdded(int maxTime) 
   {
-    resizePanelToTime(maxTime);	
+    if( !uploading)
+      resizePanelToTime(maxTime);	
   }
   public void objectDeleted(Object whichObject, int index){}
   public void trackCleared(){}
-  public void endTrackUpload(){}
+  public void startTrackUpload(TrackDataModel track, int size)
+  {
+    uploading = true;
+  }
+  public void endTrackUpload(TrackDataModel track)
+  {
+    uploading = false;
+  }
   public void startPaste(){}
   public void endPaste(){}
   public void objectMoved(Object whichObject, int oldIndex, int newIndex){}

@@ -65,6 +65,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   ToolManager manager;
   TrackBase track;
   TrackEditor trackEditor;
+  JProgressBar progressBar;
 
   public final int INITIAL_ZOOM = 20;
   public static final int MINIMUM_TIME = 10000;
@@ -155,6 +156,20 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     toolbarPanel.add(toolbar, BorderLayout.CENTER);
     toolbarPanel.validate();
     statusBar.addWidgetAt(toolbarPanel, 2);
+
+    JPanel panel = new JPanel();
+    panel.setSize( 150, 10);
+    panel.setVisible( false);
+    statusBar.addWidget( panel);
+
+    progressBar = new JProgressBar( 0, 100);
+    progressBar.setPreferredSize(new Dimension(150, 20));
+    progressBar.setSize( 150, 20);
+    progressBar.setStringPainted( true);
+    progressBar.setValue( 0);
+    progressBar.setVisible( false);
+    statusBar.addWidget( progressBar);
+
     statusBar.validate();
     
     ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
@@ -222,11 +237,14 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   /**
    * called when the database is changed: DataTrackListener interface
    */
-    
+  boolean uploading = false;
+
   public void objectChanged(Object spec, String propName, Object propValue) {}
   public void objectAdded(Object spec, int index) 
   {
-    resizePanelToEventTime((TrackEvent)spec);	
+    if( !uploading)
+      resizePanelToEventTime((TrackEvent)spec);	
+    progressBar.setValue( index);
   }
   public void objectsAdded(int maxTime) 
   {
@@ -234,7 +252,19 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   }
   public void objectDeleted(Object whichObject, int index){}
   public void trackCleared(){}
-  public void endTrackUpload(){}
+  public void startTrackUpload( TrackDataModel track, int size)
+  {
+    uploading = true;
+    progressBar.setMaximum( size);
+    progressBar.setValue( 0);
+    progressBar.setVisible( true);
+  }
+  public void endTrackUpload( TrackDataModel track)
+  {
+    uploading = false;
+    resizePanelToEventTimeWithoutScroll( track.getLastEvent());
+    progressBar.setVisible( false);
+  }
   public void startPaste(){}
   public void endPaste(){}
   public void objectMoved(Object whichObject, int oldIndex, int newIndex){}

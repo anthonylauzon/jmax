@@ -205,6 +205,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
    * called when the database is changed: DataTrackListener interface
    */
   
+  boolean uploading  = false;
   public void objectChanged(Object spec, String propName, Object propValue) 
   {
     repaint();
@@ -212,7 +213,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
   
   public void objectAdded(Object spec, int index) 
   {
-    repaint();
+    if( !uploading)
+      repaint();
   }
   
   public void objectsAdded(int maxTime) 
@@ -229,8 +231,14 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
   {
     repaint();
   }
-
-  public void endTrackUpload(){}
+  public void startTrackUpload( TrackDataModel track, int size)
+  {
+    uploading  = true;
+  }
+  public void endTrackUpload( TrackDataModel track)
+  {
+    uploading  = false;
+  }
   public void startPaste(){}
   public void endPaste(){}
     

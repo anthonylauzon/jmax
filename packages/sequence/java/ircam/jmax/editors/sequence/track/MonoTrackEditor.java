@@ -54,15 +54,26 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
     this.itsTrack = track;
     
     itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
+	boolean uploading = false;
 	public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
 	public void trackCleared() {MonoTrackEditor.this.repaint();}
-	public void endTrackUpload() {}
+	public void startTrackUpload( TrackDataModel track, int size) 
+	{
+	  uploading = true;
+	}
+	public void endTrackUpload( TrackDataModel track) 
+	{
+	  uploading = false;
+	}
 	public void startPaste() {}
 	public void endPaste() {}
 	public void objectAdded(Object whichObject, int index) {
-	  updateNewObject(whichObject);
-	  updateRange(whichObject);
-	  MonoTrackEditor.this.repaint();			
+	  if( !uploading)
+	    {
+	      updateNewObject(whichObject);
+	      updateRange(whichObject);
+	      MonoTrackEditor.this.repaint();			
+	    }
 	}
 	public void objectsAdded(int maxTime) {
 	  MonoTrackEditor.this.repaint();

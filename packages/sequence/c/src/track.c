@@ -788,6 +788,9 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   event_t *event = track_get_first(this);
   fts_atom_t a[TRACK_BLOCK_SIZE];
   
+  fts_set_int(a, track_get_size( this));
+  fts_client_send_message((fts_object_t *)this, fts_s_start_upload, 1, a);  
+
   /* set track name */
   if(name)
     {
@@ -927,7 +930,7 @@ track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_t *this = (track_t *)o;
   fts_symbol_t type = track_get_type(this);
 
-  if(type == fts_s_midievent || type == fts_s_void)
+  if(type == fts_s_midievent || type == seqsym_note || type == fts_s_void)
     {
       if(ac == 0)
 	track_import_midifile_dialog(o, 0, 0, 0, 0);

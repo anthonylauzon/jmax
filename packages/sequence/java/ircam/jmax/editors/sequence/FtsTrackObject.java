@@ -102,7 +102,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("active"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsTrackObject)obj).active( args.getInt(0) == 1);
+	  ((FtsTrackObject)obj).active( args.getInt( 0) == 1);
       }
       });
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("highlightEvents"), new FtsMessageHandler(){
@@ -115,6 +115,12 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       public void invoke( FtsObject obj, FtsArgs args)
       {
 	((FtsTrackObject)obj).setType( args.getSymbol( 0).toString());		  
+      }
+    });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("startUpload"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+	((FtsTrackObject)obj).startUpload( args.getInt( 0));		  
       }
     });
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
@@ -715,6 +721,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 	
     makeRoomAt(index);
     events[index] = event;
+    
     notifyObjectAdded(event, index);
 
     if (isInGroup())     
@@ -839,7 +846,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     notifyObjectDeleted(event, removeIndex);
   }
 
-  /**
+  /** 
      * utility to notify the data base change to all the listeners
      */
     
@@ -876,10 +883,15 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((TrackDataListener) e.nextElement()).trackCleared();
   }
+  private void notifyUploadStart( int size)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((TrackDataListener) e.nextElement()).startTrackUpload( this, size);
+  }
   private void notifyUploadEnd()
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((TrackDataListener) e.nextElement()).endTrackUpload();
+      ((TrackDataListener) e.nextElement()).endTrackUpload( this);
   }
   private void notifyStartPaste()
   {
@@ -1389,11 +1401,18 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   {
     trackWindow = null;
     disposeEditor();
+    System.gc();
   }
   /********************************************************/
+  void startUpload( int size)
+  {
+    uploading = true;
+    notifyUploadStart( size);
+  }
 
   void endUpload()
   {
+    uploading = false;
     notifyUploadEnd();
   }
 
@@ -1415,6 +1434,7 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   ValueInfo info;
 
   boolean pasting  = false;
+  boolean uploading  = false;
   boolean locked = false;
   int events_size   = 256;	// 
   int events_fill_p  = 0;	// next available position
