@@ -85,13 +85,14 @@ static void xypad_set_couple(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
   if((this->x != x || this->y != y) && fts_object_has_id(o))
     {
-      fts_atom_t a[2];
+      /*fts_atom_t a[2];*/
 
       this->x = x;
       this->y = y;
-      fts_set_int(a + 0, this->x);
-      fts_set_int(a + 1, this->y);
-      fts_client_send_message(o, sym_position, 2, a);
+      /*fts_set_int(a + 0, this->x);
+	fts_set_int(a + 1, this->y);
+	fts_client_send_message(o, sym_position, 2, a);*/
+      fts_update_request(o);
     }
 
   fts_outlet_atoms(o, 0, ac, at); 
@@ -194,13 +195,14 @@ xypad_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   if((this->x != x || this->y != y) && fts_object_has_id(o))
     {
-      fts_atom_t a[2];
-        
+      /*fts_atom_t a[2];*/
+      
       this->x = x;
       this->y = y;
-      fts_set_int(a + 0, this->x);
-      fts_set_int(a + 1, this->y);
-      fts_client_send_message(o, sym_position, 2, a);
+      /*fts_set_int(a + 0, this->x);
+	fts_set_int(a + 1, this->y);
+	fts_client_send_message(o, sym_position, 2, a);*/
+      fts_update_request(o);
     }
 }  
 
@@ -217,6 +219,17 @@ xypad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   /* silent agreement with client */
   this->x = 64;
   this->y = 64;
+}
+
+static void 
+xypad_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  xypad_t *this = (xypad_t *) o;  
+  fts_atom_t a[2];
+
+  fts_set_int( a, this->x);
+  fts_set_int( a + 1, this->y);
+  fts_client_send_message(o, sym_position, 2, a);
 }
 
 static void
@@ -246,6 +259,7 @@ xypad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, xypad_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, xypad_dump);  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_real_time, xypad_update_real_time); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_update_gui, xypad_update_gui); 
   fts_method_define_varargs(cl, fts_system_inlet, sym_setXMinValue, xypad_set_xminvalue); 

@@ -27,6 +27,7 @@ package ircam.jmax.guiobj;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import javax.swing.*;
 import java.util.*;
 import java.lang.Math;
@@ -70,6 +71,9 @@ public class XYPad extends GraphicObject
 
   public static XYPadControlPanel controlPanel = new XYPadControlPanel();
 
+  /*private BufferedImage buff;
+    private Graphics2D buffG;*/
+
   public XYPad(FtsGraphicObject theFtsObject)
   {
     super(theFtsObject);
@@ -90,7 +94,22 @@ public class XYPad extends GraphicObject
       yValue = yRangeMin;
     else if(yValue > yRangeMax) 
       yValue = yRangeMax;
+    
+    //updateOffScreenBuffer();
   }
+
+  /*
+    void updateOffScreenBuffer()
+    {
+    int w = getWidth() - 4;
+    if( w <= 0) w = DEFAULT_WIDTH - 4;
+    int h = getHeight() - 4;
+    if( h <= 0) h = DEFAULT_HEIGHT - 4;
+    
+    buff = new BufferedImage( w, h, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
+    buffG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+    }*/
 
   public void setDefaults()
   {
@@ -117,6 +136,8 @@ public class XYPad extends GraphicObject
       yValue = yRangeMax;
 
     redraw();
+    /*drawContent( buffG, 0, 0, getWidth() - 4, getHeight() - 4);
+      updateRedraw();*/
   }
 
   public void setXMinValue( int theValue) 
@@ -207,6 +228,8 @@ public class XYPad extends GraphicObject
       w = MINIMUM_DIMENSION;
 
     super.setWidth(w);
+
+    //updateOffScreenBuffer();
   }
 
   public void setHeight(int h)
@@ -217,7 +240,15 @@ public class XYPad extends GraphicObject
       h = MINIMUM_DIMENSION;
 
     super.setHeight(h);
+
+    //updateOffScreenBuffer();
   }
+
+  /*public void setCurrentBounds( int x, int y, int w, int h)
+    {
+    super.setCurrentBounds( x, y, w, h);
+    updateOffScreenBuffer();
+    }*/
 
   public void setXRange(int theMaxInt, int theMinInt)
   {
@@ -272,7 +303,7 @@ public class XYPad extends GraphicObject
     if ( (newXValue != xValue) || (newYValue != yValue)){
       ((FtsXYPadObject)ftsObject).setXYValues( newXValue, newYValue);
     }
-    redraw();
+    //redraw();
   }
 
   public void paint( Graphics g) 
@@ -317,6 +348,8 @@ public class XYPad extends GraphicObject
   
   public void updatePaint(Graphics g) 
   {
+    //g.drawImage( buff, getX() + 2, getY() + 2, itsSketchPad);  
+
     int x = getX();
     int y = getY();
     int w = getWidth();
@@ -326,15 +359,9 @@ public class XYPad extends GraphicObject
     int xP = ((xValue - xRangeMin) * (w - LEFT_OFFSET - RIGHT_OFFSET)) / xRange;
     int yP = ((yRangeMax - yValue) * (h - UP_OFFSET - BOTTOM_OFFSET)) / yRange;
     
-      
-    /* Paint the box */ 
-    /*g.setColor( Settings.sharedInstance().getUIColor());
+    g.setColor( NORMAL_TRANSPARENCY);
     g.fillRect( x+2, y+2, w-4,  h-4);
-    */    
-    // g.draw3DRect( x+1, y+1, w-2,  h-2, true);    
-
-    /* Paint the Cursor */ 
-    //g.setColor( Settings.sharedInstance().getUIColor().brighter());
+    
     g.setColor(Color.lightGray);
     g.drawLine( x + LEFT_OFFSET + xP,  y + UP_OFFSET, x + LEFT_OFFSET + xP, y + h - BOTTOM_OFFSET);
     g.drawLine( x + LEFT_OFFSET,  y + UP_OFFSET + yP, x + w - RIGHT_OFFSET ,  y + UP_OFFSET + yP); 
@@ -342,6 +369,24 @@ public class XYPad extends GraphicObject
     g.setColor( Color.black);
     g.drawRect(x + LEFT_OFFSET - 1 + xP, y + UP_OFFSET - 1 + yP, DOT_DIAMETER, DOT_DIAMETER); 
   }
+
+  /*public void drawContent( Graphics g, int x, int y, int w, int h)
+    {
+    int xRange = (xRangeMax - xRangeMin);
+    int yRange = (yRangeMax - yRangeMin);
+    int xP = ((xValue - xRangeMin) * (w + 4 - LEFT_OFFSET - RIGHT_OFFSET)) / xRange;
+    int yP = ((yRangeMax - yValue) * (h + 4 - UP_OFFSET - BOTTOM_OFFSET)) / yRange;
+    
+    g.setColor( NORMAL_TRANSPARENCY);
+    g.fillRect( x, y, w, h);
+    
+    g.setColor(Color.lightGray);
+    g.drawLine( x + LEFT_OFFSET + xP,  y + UP_OFFSET, x + LEFT_OFFSET + xP, y + h - BOTTOM_OFFSET);
+    g.drawLine( x + LEFT_OFFSET,  y + UP_OFFSET + yP, x + w - RIGHT_OFFSET ,  y + UP_OFFSET + yP); 
+    
+    g.setColor( Color.black);
+    g.drawRect(x + LEFT_OFFSET - 1 + xP, y + UP_OFFSET - 1 + yP, DOT_DIAMETER, DOT_DIAMETER); 
+    }*/
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
   {
@@ -385,3 +430,5 @@ public class XYPad extends GraphicObject
     itsSketchPad.repaint();//???
   }
 }
+
+
