@@ -66,7 +66,15 @@ dsp_on_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 dsp_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_chain_post();
+  if (!fts_dsp_is_active())
+  {
+    fts_object_error(o, "Cannot print dsp chains if dsp is inactive");
+    post("[dsp] Cannot print dsp chains if dsp is inactive\n");
+  }
+  else
+  {
+    dsp_chain_post();
+  }
 }
 
 static void
@@ -92,7 +100,7 @@ dsp_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 dsp_print_signals(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_chain_post_signals();
+    dsp_chain_post_signals();
 }
 
 
@@ -136,3 +144,9 @@ dsp_config(void)
   fts_class_alias(cl, fts_new_symbol("dsp~"));
 }
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
