@@ -146,11 +146,22 @@ pack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	  /* Bizzarre compatibility hack .. */
 
 	  if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == pack_s_i))
+	  {
 	    fts_set_int(&(x->argv[i]), 0);
+	  }
 	  else if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == pack_s_f))
+	  {
 	    fts_set_float(&(x->argv[i]), 0.0f);
+	  }
 	  else
+	  {
+	    if (fts_is_object(&at[i]))
+	    {
+	      fts_object_error(o, "pack only supports int and float");
+	      return;
+	    }
 	    x->argv[i] = at[i];
+	  }
 	}
     }
 
@@ -161,6 +172,7 @@ static void
 pack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pack_t *x = (pack_t *)o;
+  int i;
 
   fts_free( x->argv);
 }
