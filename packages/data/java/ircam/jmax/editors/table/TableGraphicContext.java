@@ -26,6 +26,7 @@
 package ircam.jmax.editors.table;
 
 import ircam.jmax.toolkit.*;
+import javax.swing.*;
 
 /**
  * The graphic context for a generic Table editing session.
@@ -43,7 +44,7 @@ public class TableGraphicContext extends GraphicContext{
   {
     itsModel = dm;
     itsFtsObject = (FtsTableObject)dm;
-    //itsWriter = new CoordinateWriter(this);
+    /*itsWriter = new CoordinateWriter(this);*/
   }
 
 
@@ -56,13 +57,13 @@ public class TableGraphicContext extends GraphicContext{
   }
 
 
-    /*
-     * redefined to handle selection ownership when
-     * the owner is closed (bug #171) */
-    public void destroy()
-    {
-	TableSelection.ownerDied(itsSelection.getOwner());
-    }
+  /*
+   * redefined to handle selection ownership when
+   * the owner is closed (bug #171) */
+  public void destroy()
+  {
+    TableSelection.ownerDied(itsSelection.getOwner());
+  }
 
   //--- Fields & accessors ---//
 
@@ -70,7 +71,7 @@ public class TableGraphicContext extends GraphicContext{
   FtsTableObject itsFtsObject;
   TableAdapter itsAdapter;
   CoordinateWriter itsWriter;
-  EditorToolbar toolbar;
+  //EditorToolbar toolbar;
   TableSelection itsSelection;
   ToolManager toolManager;
 
@@ -106,21 +107,21 @@ public class TableGraphicContext extends GraphicContext{
   {
     return itsWriter;
   }
-
+  
   public void setCoordWriter(CoordinateWriter cw)
   {
     itsWriter = cw;
   }
 
-  public void setToolbar(EditorToolbar t)
-  {
+  /*public void setToolbar(EditorToolbar t)
+    {
     toolbar = t;
-  }
+    }
 
-  public EditorToolbar getToolbar()
-  {
+    public EditorToolbar getToolbar()
+    {
     return toolbar;
-  }
+    }*/
 
   public void setToolManager(ToolManager tm)
   {
@@ -170,7 +171,8 @@ public class TableGraphicContext extends GraphicContext{
 
   public int getVisibleVerticalScope()
   {
-      return itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height);
+    //return itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height);
+    return itsAdapter.getInvY(getGraphicDestination().getSize().height) - itsAdapter.getInvY(0);
   }
 
   public int getVisiblePixelsSize()
@@ -196,6 +198,25 @@ public class TableGraphicContext extends GraphicContext{
   {
       itsVerticalMaximum = max;
   }
+
+  /* display informations */
+
+  public void display(String text)
+  {
+    display.setText(text);
+  }
+
+  public void displayInfo(String text)
+  {
+    info.setText(text);
+  }
+  public void setDisplay(JLabel label, JLabel infoLabel)
+  {
+    display = label;
+    info = infoLabel;
+  }
+
+  JLabel display, info;
 }
 
 

@@ -43,9 +43,89 @@ public class TableDisplay extends PopupToolbarPanel
   public TableDisplay(TablePanel tp)
   {
     super();
+
     panel = tp;
     setBackground(Color.white);
     popup = new TablePopupMenu(this);
+
+    /******** display labels **********/
+    JPanel labelPanel = new JPanel();
+    labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
+    labelPanel.setOpaque(false);
+	
+    displayMouseLabel = new JLabel();
+    displayMouseLabel.setFont(displayFont);
+    displayMouseLabel.setPreferredSize(new Dimension(102, 15));
+    displayMouseLabel.setMaximumSize(new Dimension(102, 15));
+    displayMouseLabel.setMinimumSize(new Dimension(102, 15));
+    
+    infoLabel = new JLabel("", JLabel.RIGHT);
+    infoLabel.setFont(displayFont);
+    infoLabel.setPreferredSize(new Dimension(190, 15));
+    infoLabel.setMaximumSize(new Dimension(190, 15));
+    infoLabel.setMinimumSize(new Dimension(190, 15));
+	
+    labelPanel.add(displayMouseLabel);
+    labelPanel.add(Box.createHorizontalGlue());
+    labelPanel.add(infoLabel);
+
+    setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
+    add(labelPanel);
+    add(Box.createVerticalGlue());
+    /*********************************/
+
+    addMouseListener(new MouseListener(){
+	public void mouseClicked(MouseEvent e){}
+	public void mousePressed(MouseEvent e){}
+	public void mouseReleased(MouseEvent e){}
+	public void mouseEntered(MouseEvent e){}
+	public void mouseExited(MouseEvent e){
+	  gc.display("");
+	}
+      });
+    addMouseMotionListener(new MouseMotionListener(){
+	public void mouseMoved(MouseEvent e)
+	{
+	  if(getMenu().isVisible()) return;
+      
+	  if(!gc.getToolManager().getCurrentTool().getName().equals("zoomer"))
+	    {
+	      int index = gc.getAdapter().getInvX( e.getX());
+	      int value = gc.getAdapter().getInvY( e.getY());
+	      if( index < 0) index = 0;
+
+	      if (index < gc.getDataModel().getSize() && index >=0)
+		gc.display( "( "+index+" , "+value+" )");
+	    }
+	}
+	public void mouseDragged(MouseEvent e)
+	{
+	  if(getMenu().isVisible()) return;
+	  
+	  String toolName = gc.getToolManager().getCurrentTool().getName();
+	  if(!toolName.equals("zoomer"))
+	    {
+	      int index = gc.getAdapter().getInvX( e.getX());
+	      int value = gc.getAdapter().getInvY( e.getY());
+	      if( index < 0) index = 0;
+	      
+	      if (index < gc.getDataModel().getSize() && index >=0)
+		gc.display( "( "+index+" , "+value+" )");
+	    }
+	  else
+	    {
+	      /*int start = gc.getAdapter().getInvX(x1);
+		int end = gc.getAdapter().getInvX(x2);
+	      
+		if (end < tgc.getDataModel().getSize() && start>=0)
+		gc.display("[ "+start+" -- "+end+" ]");*/
+
+	      /*int start = gc.getLogicalTime();
+		int end = start + gc.getTimeWindow();
+		gc.display("[ "+start+" -- "+end+" ]");*/	      
+	    }
+	}
+      });
   }
 
   /**
@@ -75,6 +155,7 @@ public class TableDisplay extends PopupToolbarPanel
   public void setGraphicContext(TableGraphicContext tgc)
   {
       gc = tgc;
+      gc.setDisplay( displayMouseLabel, infoLabel);
   }
   public TableGraphicContext getGraphicContext()
   {
@@ -115,5 +196,8 @@ public class TableDisplay extends PopupToolbarPanel
   TablePopupMenu popup;
   TableGraphicContext gc;
   public TablePanel panel;
+  JLabel displayMouseLabel, infoLabel;
+
+  static public Font displayFont = new Font("SansSerif", Font.PLAIN, 10);
 }
 

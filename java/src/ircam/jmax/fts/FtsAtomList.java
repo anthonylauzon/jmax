@@ -96,7 +96,7 @@ public class FtsAtomList extends FtsObject
 
   public String getValuesAsText()
   {
-    return FtsParse.unparseDescription(values);
+    return FtsUnparse.unparseDescription(values);
   }
 
 
@@ -104,9 +104,9 @@ public class FtsAtomList extends FtsObject
   
   public void setValuesAsText(String value)
   {
-    values.removeAllElements();
-    FtsParse.parseAtoms(value, values);
-    changed();
+    /*values.removeAllElements();
+      FtsParse.parseAtoms(value, values);*/
+    changed( value);
   }
 
 
@@ -129,11 +129,12 @@ public class FtsAtomList extends FtsObject
    * Send the content of the atom list to the server.
    */
 
-  public void changed()
+  public void changed( String value)
   {
     args.clear();
-    for(int i = 0; i < values.size(); i++)
-      args.add(values.elementAt(i));
+    /*for(int i = 0; i < values.size(); i++)
+      args.add(values.elementAt(i));*/
+    args.addRawString( value);
       
     try{
       send( FtsSymbol.get("atomlist_set"), args);

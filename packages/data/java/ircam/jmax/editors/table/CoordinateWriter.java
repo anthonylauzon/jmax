@@ -46,23 +46,22 @@ public class CoordinateWriter implements StatusBarClient {
    * status bar */
   public void postCoordinates(int x, int y)
   {
-      int index = tgc.getAdapter().getInvX(x);
-      int value = tgc.getAdapter().getInvY(y);
+    int index = tgc.getAdapter().getInvX(x);
+    int value = tgc.getAdapter().getInvY(y);
       
-      if (index < tgc.getDataModel().getSize() &&
-	  index >=0)
-	{
-	  tgc.getStatusBar().post(this, tgc.getAdapter().getInvX(x)+" "+tgc.getAdapter().getInvY(y));
-	}
+    /*if (index < tgc.getDataModel().getSize() && index >=0)
+      {
+      tgc.display( tgc.getAdapter().getInvX(x)+" "+tgc.getAdapter().getInvY(y));
+      }*/
   }
 
   public void postXRange(int x1, int x2)
   {
-      int start = tgc.getAdapter().getInvX(x1);
-      int end = tgc.getAdapter().getInvX(x2);
+    int start = tgc.getAdapter().getInvX(x1);
+    int end = tgc.getAdapter().getInvX(x2);
       
-      if (end < tgc.getDataModel().getSize() && start>=0)
-	  tgc.getStatusBar().post(this, start+" "+end);
+    if (end < tgc.getDataModel().getSize() && start>=0)
+      tgc.displayInfo("[ "+start+" , "+end+" ]");
   }
 
   /** StatusBarClient interface */

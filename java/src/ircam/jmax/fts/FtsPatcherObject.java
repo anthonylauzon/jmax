@@ -323,7 +323,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public FtsPatcherObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom[] args, int offset, int length)
   {
-    super(server, parent, id, className, FtsParse.unparseArguments( args, offset+1, length-1));
+    super(server, parent, id, className, FtsUnparse.unparseArguments( args, offset+1, length-1));
   }
 
   public FtsPatcherObject() throws IOException
@@ -425,7 +425,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   {
     args.clear();
     args.addInt( type);
-    args.addString( name);
+    args.addSymbol( FtsSymbol.get( name));
     
     try{
       send( FtsSymbol.get("save"), args);
@@ -622,12 +622,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public void redefinePatcher(String description)
   {
-    MaxVector vec = new MaxVector();
-    FtsParse.parseAtoms(description, vec);
-
     args.clear();
-    for(int i=0; i<vec.size(); i++)
-      args.add(vec.elementAt(i));
+    args.addRawString( description);
       
     try{
       send( FtsSymbol.get("redefine_patcher"), args);
@@ -777,15 +773,10 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   
   public void requestAddObject(String description, int x, int y, boolean doedit)
   {
-    MaxVector vec = new MaxVector();
-    FtsParse.parseAtoms(description, vec);
-
     args.clear();
     args.addInt(x);
     args.addInt(y);
-
-    for(int i=0; i<vec.size(); i++)
-	args.add(vec.elementAt(i));
+    args.addRawString( description);
 
     try{
       send( FtsSymbol.get("add_object"), args);  
@@ -799,14 +790,10 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public void requestRedefineObject(FtsGraphicObject oldObject, String description)
   {
-    MaxVector vec = new MaxVector();
-    FtsParse.parseAtoms(description, vec);
-     
     args.clear();
     args.addObject(oldObject);
+    args.addRawString( description);
 
-    for(int i=0; i<vec.size(); i++)
-	args.add(vec.elementAt(i));
     try{
       send( FtsSymbol.get("redefine_object"), args);
     }
@@ -1028,7 +1015,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public void setDescription(int nArgs, FtsAtom args[])
   {
-    this.description = FtsParse.unparseArguments(args, 0, nArgs);
+    this.description = FtsUnparse.unparseArguments(args, 0, nArgs);
     if(getGraphicListener()!=null) getGraphicListener().redefined(this);
     if(getEditorFrame() != null) ((ErmesSketchWindow)getEditorFrame()).updateTitle(); 
   }

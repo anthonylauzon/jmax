@@ -116,9 +116,9 @@ public class FtsScopeObject extends FtsVectorDisplayObject
     args.clear();
 
     if(th==THRESHOLD_AUTO)
-      args.addString("auto");
+      args.addSymbol(FtsSymbol.get( "auto"));
     else if(th==THRESHOLD_OFF)
-      args.addString("off");
+      args.addSymbol(FtsSymbol.get( "off"));
     else
       args.addFloat(th);
 

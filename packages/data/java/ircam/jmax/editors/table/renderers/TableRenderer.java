@@ -61,6 +61,7 @@ public class TableRenderer extends AbstractRenderer implements Layer{
   private void render(Graphics g, int x, int y)
   {
     int zero = gc.getAdapter().getY(0);
+
     int width = (int)( gc.getAdapter().getXZoom());
     int height;
 
@@ -131,21 +132,21 @@ public class TableRenderer extends AbstractRenderer implements Layer{
       //g.setColor(Color.white);
       //g.fillRect(r.x, r.y, r.width, r.height);
       if(gc.getAdapter().getXZoom()>0.5)
-	  {
-	      if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
-	      int index = gc.getFirstVisibleIndex();
-	      int visibleSize = gc.getVisibleHorizontalScope();
-	      int tableSize = gc.getFtsObject().getSize();
+	{
+	  if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
+	  int index = gc.getFirstVisibleIndex();
+	  int visibleSize = gc.getVisibleHorizontalScope();
+	  int tableSize = gc.getFtsObject().getSize();
 
-	      for (int i = 0; (i < visibleSize)&&(index+i<tableSize); i++)
-		  renderPoint(g, i, gc.getFtsObject().getVisibleValue(index+i));
-	  }
+	  for (int i = 0; (i < visibleSize)&&(index+i<tableSize); i++)
+	    renderPoint(g, i, gc.getFtsObject().getVisibleValue(index+i));
+	}
       else
-	  {
-	      int pixSize = gc.getFtsObject().getPixelsSize();	      
-	      for (int i = 0; i < pixSize; i++)
-		  render(g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));
-	  }
+	{
+	  int pixSize = gc.getFtsObject().getPixelsSize();	      
+	  for (int i = 0; i < pixSize; i++)
+	    render(g, i, gc.getAdapter().getY(gc.getFtsObject().getPixel(i)));
+	}
       /*g.setColor(Color.red);
 	g.setXORMode(Color.white);
 	g.fillRect(0, gc.getAdapter().getY(0), r.width, 1);

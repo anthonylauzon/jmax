@@ -45,55 +45,35 @@ public class FtsFinderObject extends FtsObject
   }
   
   /* Client to server queries */
-
-  public void find(FtsObject context, FtsObjectSet set, String name)
-  {
-    args.clear();
-    args.add(set);
-    args.add(context);
-    args.add(name);
-    
-    try{
-      send( FtsSymbol.get("finder_find"), args);
-    }
-    catch(IOException e)
-      {
-	System.err.println("[FtsFinderObject]: I/O Error sending find message!");
-	e.printStackTrace(); 
-      }
-  }
-
-  public void find(FtsObject context, FtsObjectSet set, Object values[])
-  {
+  /*public void find(FtsObject context, FtsObjectSet set, Object values[])
+    {
     args.clear();
     args.add(set);
     args.add(context);
     int i=0;
     for(i=0; i<values.length ; i++)
-      args.add((String)values[i]);
-      
+    args.add((String)values[i]);
+    
     try{
-      send( FtsSymbol.get("finder_find"), args);
+    send( FtsSymbol.get("finder_find"), args);
     }
     catch(IOException e)
-      {
-	System.err.println("[FtsFinderObject]: I/O Error sending find message!");
-	e.printStackTrace(); 
-      }
-  }
+    {
+    System.err.println("[FtsFinderObject]: I/O Error sending find message!");
+    e.printStackTrace(); 
+    }
+    }*/
 
-  public void find(FtsObjectSet set, MaxVector values)
+  public void find(FtsObjectSet set, String query)
   {
-    find(getRoot(), set, values);
+    find(getRoot(), set, query);
   }
-  public void find(FtsObject context, FtsObjectSet set, MaxVector values)
+  public void find(FtsObject context, FtsObjectSet set, String query)
   {
     args.clear();
     args.add(set);
     args.add(context);
-    int i=0;
-    for( i = 0; i < values.size(); i++)
-      args.add((String)values.elementAt(i));
+    args.addRawString( query);
       
     try{
       send( FtsSymbol.get("finder_find"), args);

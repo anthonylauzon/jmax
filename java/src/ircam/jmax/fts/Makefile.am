@@ -23,7 +23,6 @@ FtsObjectErrorListener.java\
 FtsObjectSet.java\
 FtsObjectWithEditor.java\
 FtsOutletsListener.java\
-FtsParse.java\
 FtsPatcherListener.java\
 FtsPatcherObject.java\
 FtsTemplateObject.java\
@@ -31,6 +30,7 @@ FtsQuittedException.java\
 FtsRuntimeErrors.java\
 FtsSelection.java\
 FtsUndoableObject.java\
+FtsUnparse.java\
 FtsActionListener.java
 
 JAVAC= @JAVACX@

@@ -66,7 +66,7 @@ public class LineDrawer extends TableInteractionModule implements XORPainter{
    * to show the position in the status bar*/
   public void mouseMoved(MouseEvent e)
   {
-    getGc().getCoordWriter().postCoordinates(e.getX(), e.getY());
+    //getGc().getCoordWriter().postCoordinates(e.getX(), e.getY());
   }
 
 
@@ -89,7 +89,7 @@ public class LineDrawer extends TableInteractionModule implements XORPainter{
   {
     if (!active) return;//!!
     itsXORHandler.moveTo(e.getX(), e.getY());
-    getGc().getCoordWriter().postCoordinates(e.getX(), e.getY());
+    getGc().getCoordWriter().postXRange( startSelection.x , e.getX());
   }
 
   /**

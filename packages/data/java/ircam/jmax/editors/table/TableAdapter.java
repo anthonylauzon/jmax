@@ -41,7 +41,6 @@ public class TableAdapter {
   {
   }
 
-
   /**
    * Constructor with the data model and the dimension of the componenet 
    * that will contain the model. This constructor takes care of setting
@@ -54,27 +53,28 @@ public class TableAdapter {
    * in the given vertical dimension, */
   public TableAdapter(TableDataModel tm, Dimension d, int minVisibleValue)
   {
-      float fx;
-      if(tm.getSize()!=0)
-	  fx = findZoomRatioClosestTo(((float)(d.width))/tm.getSize());
-      else
-	  fx = (float)1.0;
+    float fx;
+    if(tm.getSize()!=0)
+      fx = findZoomRatioClosestTo(((float)(d.width))/tm.getSize());
+    else
+      fx = (float)1.0;
 
-      setXZoom(fx);
+    setXZoom(fx);
+    
+    int maxY = Math.abs(tm.max());
+    int minY = Math.abs(tm.min());
+    
+    if (minY > maxY)
+      maxY = minY;
+    
+    //maxY now contains the max absolute value in the table
+    if(maxY < minVisibleValue) maxY = minVisibleValue;
+    
+    /*float fy = findZoomRatioClosestTo(((float)(d.height))/(float)(2*maxY));
+      setYZoom(fy);*/
+    setYZoom( ((float)(d.height))/(float)(2*maxY));
       
-      int maxY = Math.abs(tm.max());
-      int minY = Math.abs(tm.min());
-
-      if (minY > maxY)
-	  maxY = minY;
-
-      //maxY now contains the max absolute value in the table
-      if(maxY < minVisibleValue) maxY = minVisibleValue;
-
-      float fy = findZoomRatioClosestTo(((float)(d.height))/(2*maxY));
-      setYZoom(fy);
-      
-      setOY(maxY);
+    setYTransposition( maxY);
   } 
 
   /**
@@ -84,9 +84,9 @@ public class TableAdapter {
   public float findZoomRatioClosestTo(float f)
   {
     if (f >1) 
-	return Math.round(f);
+      return Math.round(f);
     else
-	return (float)(((float)1)/Math.ceil(1/f));
+      return (float)(((float)1)/Math.ceil(1/f));
   }
 
   /**
@@ -128,7 +128,7 @@ public class TableAdapter {
    * returns the index in the table corresponding to the graphic x */
   public int getInvX(int x)
   {
-      return (int) (x/itsXZoom+xTransposition);
+    return (int) (x/itsXZoom+xTransposition);
   }
 
   /**
@@ -136,17 +136,17 @@ public class TableAdapter {
    * The y coordinates are implicitily inverted. */
   public int getY(int value)
   {
-      //if (value < 0);
-      //return (int) (oY-value * itsYZoom);
-      return (int) ((oY-value) * itsYZoom);
+    //if (value < 0);
+    //return (int) (oY-value * itsYZoom);
+    return (int) ((value - yTransposition) * itsYZoom);
   }
 
   /**
    * returns the value corresponding to the graphic y */ 
   public int getInvY(int y)
   {
-      //return (int) ((oY-y)/itsYZoom);
-      return (int) (oY - y/itsYZoom);
+    //return (int) ((oY-y)/itsYZoom);
+    return (int) (yTransposition + y/itsYZoom);
   }
 
   /**
@@ -171,7 +171,7 @@ public class TableAdapter {
     if (whichOne == X_ZOOM) listeners = xZoomListeners; 
     else if (whichOne == Y_ZOOM) listeners = yZoomListeners; 
     else return; //can add other zooms here (?)
-
+    
     ZoomListener zl;
     for (int i = 0; i< listeners.size(); i++)
       {
@@ -179,7 +179,7 @@ public class TableAdapter {
 	zl.zoomChanged(value, oldValue);
       }
   }
-
+  
   //--- Fields & accessors ---//
   float itsXZoom;
   float itsYZoom;
@@ -195,7 +195,7 @@ public class TableAdapter {
   /** the graphic x offset of oX */
   int xOffset;
   /** the first value in the table we're vertically showing */
-  int oY;
+  int yTransposition;
   /** the graphic y offset of oY */
   int yOffset;
 
@@ -223,14 +223,12 @@ public class TableAdapter {
     notifyZoomChanged(Y_ZOOM, zoom, old);
   }
 
-  public int getOY()
+  public void incrYZoom(int delta)
   {
-    return oY;
-  }
+    float dlt = (float)delta;
+    if(itsYZoom < 1) dlt = delta*itsYZoom;
 
-  public void setOY(int theOY)
-  {
-    oY = theOY;
+    setYZoom( ( itsYZoom*100+dlt)/(float)100);
   }
 
   public int getXTransposition()
@@ -241,6 +239,16 @@ public class TableAdapter {
   public void setXTransposition(int xT)
   {
     xTransposition = xT;
+  }
+
+  public int getYTransposition()
+  {
+    return yTransposition;
+  }
+
+  public void setYTransposition(int yT)
+  {
+    yTransposition = yT;
   }
 
   public int getYOffset()

@@ -68,7 +68,7 @@ public class FreeHandDrawer extends TableInteractionModule {
   public void mouseMoved(MouseEvent e)
   {
 
-    getGc().getCoordWriter().postCoordinates(e.getX(), e.getY());
+    //getGc().getCoordWriter().postCoordinates(e.getX(), e.getY());
  
   }
 

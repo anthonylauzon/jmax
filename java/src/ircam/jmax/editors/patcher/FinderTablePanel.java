@@ -178,20 +178,15 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
        });
   }
 
- public void find()
+  public void find()
   {
-    String query;
-    MaxVector args;
+    String query = textField.getText();
     Cursor temp = getCursor();
 
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
-    query = textField.getText();
-    args = new MaxVector();
-    FtsParse.parseAtoms(query, args);
-    
-    if(args.size()>0)
-	ftsFinder.find(set, args);
+    if(query!=null && !query.equals(""))
+      ftsFinder.find(set, query);
 
     setCursor(temp);
   }

@@ -49,7 +49,7 @@ public class FtsMessConstObject extends FtsIntValueObject
   /*****************************************************************************/
   public FtsMessConstObject(FtsServer fts, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
-    super(fts, parent, id, className, FtsParse.unparseArguments(args, offset+1, length-1));
+    super(fts, parent, id, className, FtsUnparse.unparseArguments(args, offset+1, length-1));
     setNumberOfInlets(1);
     setNumberOfOutlets(1);
   }

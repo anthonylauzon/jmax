@@ -41,13 +41,11 @@ public class Tabler extends JFrame implements EditorContainer {
   
   //--- Fields 
   TablePanel itsPanel;
-  static EditorToolbar toolbar; 
 
   private JMenu itsFileMenu;
   private EditMenu itsEditMenu;	
   private ViewMenu itsViewMenu;
   private JMenu itsWindowsMenu;
-    //private JMenu itsToolsMenu;
 
   /** Constructor */
   public Tabler(FtsTableObject theData) {

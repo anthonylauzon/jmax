@@ -62,7 +62,7 @@ public class FtsMessageObject extends FtsIntValueObject
   
   public FtsMessageObject(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, objId, className, FtsParse.unparseArguments(args, offset+1, length-1));
+    super(server, parent, objId, className, FtsUnparse.unparseArguments(args, offset+1, length-1));
     
     setNumberOfInlets(1);
     setNumberOfOutlets(1);
@@ -76,12 +76,13 @@ public class FtsMessageObject extends FtsIntValueObject
   {
     this.message = message;
     
-    MaxVector vec = new MaxVector();
-    FtsParse.parseAtoms(message, vec);
+    /*MaxVector vec = new MaxVector();
+      FtsParse.parseAtoms(message, vec);*/
     
     args.clear();
-    for(int i=0; i<vec.size(); i++)
-      args.add(vec.elementAt(i));
+    /*for(int i=0; i<vec.size(); i++)
+      args.add(vec.elementAt(i));*/
+    args.addRawString( message);
     
     try{
       send(FtsSymbol.get("set"), args);
@@ -104,7 +105,7 @@ public class FtsMessageObject extends FtsIntValueObject
   
   public void setCurrentMessage(int nArgs, FtsAtom args[])
   {
-      this.message = FtsMessageObject.preParseMessage( FtsParse.unparseArguments(args, 0, nArgs));
+      this.message = FtsMessageObject.preParseMessage( FtsUnparse.unparseArguments(args, 0, nArgs));
       ((FtsMessageListener) listener).messageChanged(message);
   }
 

@@ -114,26 +114,27 @@ public class ZoomTool extends TableTool implements  DirectionListener, TableDyna
 	else
 	    if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
 	    {
-		float yZoom = a.getYZoom();
+	      a.incrYZoom( -deltaY);
+	      /*float yZoom = a.getYZoom();
 		dddy+=deltaY;
 		if(dddy<-35)
-		    {
-			if (yZoom>0.9)
-			    a.setYZoom(Math.round(yZoom)+1);
-			else
-			    a.setYZoom(yZoom*(1/(1-yZoom)));
-			
-			dddy=0;
-		    }
+		{
+		if (yZoom>0.9)
+		a.setYZoom(Math.round(yZoom)+1);
+		else
+		a.setYZoom(yZoom*(1/(1-yZoom)));
+		
+		dddy=0;
+		}
 		else if(dddy>35)
-		    {
-			if (yZoom > 1.9 )
-			    a.setYZoom(Math.round(yZoom)-1);
-			else
-			    a.setYZoom(yZoom*(1/(1+yZoom)));
-			
-			dddy=0;
-		    }
+		{
+		if (yZoom > 1.9 )
+		a.setYZoom(Math.round(yZoom)-1);
+		else
+		a.setYZoom(yZoom*(1/(1+yZoom)));
+		
+		dddy=0;
+		}*/
 	    }
     }
     public void dragEnd(int x, int y){}

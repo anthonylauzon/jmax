@@ -53,9 +53,9 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   //--- Fields  
   final static int SCROLLBAR_SIZE = 30;
   final static int PANEL_WIDTH = 500;
-  final static int PANEL_HEIGHT = 300+SCROLLBAR_SIZE;
+  final static int PANEL_HEIGHT = 240+SCROLLBAR_SIZE;
 
-  InfoPanel itsStatusBar;
+  /*InfoPanel itsStatusBar;*/
 
   JScrollBar itsVerticalControl, itsHorizontalControl;
 
@@ -68,9 +68,9 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   TableDisplay itsCenterPanel;
   ToolManager toolManager;
 
-  ScalePanel scalePanel;
+  /*ScalePanel scalePanel;*/
 
-  static Dimension toolbarDimension = new Dimension(30, 200);
+  //static Dimension toolbarDimension = new Dimension(30, 200);
   /**
    * Constructor. */
   public TablePanel(EditorContainer container, TableDataModel tm) {
@@ -82,7 +82,7 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     setLayout(new BorderLayout());
 
     //make the NORTH Status bar 
-    prepareStatusBar();
+    //prepareStatusBar();
 
     prepareToolbarPanel();
     
@@ -93,9 +93,9 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     prepareGraphicContext();
     itsCenterPanel.setGraphicContext(gc);
 
-    scalePanel = new ScalePanel(gc);
-    scalePanel.setBorder(new EtchedBorder());
-    add(scalePanel, BorderLayout.WEST);	    
+    /*scalePanel = new ScalePanel(gc);
+      scalePanel.setBorder(new EtchedBorder());
+      add(scalePanel, BorderLayout.WEST);*/	    
 
     //... the renderer
     itsTableRenderer = new TableRenderer(gc);
@@ -146,39 +146,39 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     toolManager.activate(TableTools.getDefaultTool(), gc);
   }
 
-  private void prepareStatusBar()
-  {
+  /*private void prepareStatusBar()
+    {
     JPanel northSection = new JPanel();
     northSection.setLayout(new BoxLayout(northSection, BoxLayout.Y_AXIS));    
     itsStatusBar = new InfoPanel();    
     itsStatusBar.setSize(300, 20);
     northSection.add(itsStatusBar);
     add(northSection, BorderLayout.NORTH);
-  }
+    }*/
   
   private void prepareToolbarPanel()
   {
     toolManager = new ToolManager(TableTools.instance);    
-    toolManager.addToolListener(new ToolListener(){
-	    public void toolChanged(ToolChangeEvent e) 
-	    {
-		if (e.getTool() != null) 
-		    {
-			itsStatusBar.post(e.getTool(), "");			
-		    }	    
-	    }
-	});
+    /*toolManager.addToolListener(new ToolListener(){
+      public void toolChanged(ToolChangeEvent e) 
+      {
+      if (e.getTool() != null) 
+      {
+      itsStatusBar.post(e.getTool(), "");			
+      }	    
+      }
+      });*/
     toolbar = new EditorToolbar(toolManager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize(60, 25);    
-    toolbar.setPreferredSize(new Dimension(60, 25));    
+    /*toolbar.setSize(60, 25);    
+      toolbar.setPreferredSize(new Dimension(60, 25));    
       
-    JPanel toolbarPanel = new JPanel();
-    toolbarPanel.setSize(108, 25);
-    toolbarPanel.setPreferredSize(new Dimension(108, 25));
-    toolbarPanel.setLayout(new BorderLayout());
-    toolbarPanel.add(toolbar, BorderLayout.CENTER);
-    itsStatusBar.addWidgetAt(toolbarPanel, 2);
-    itsStatusBar.validate();
+      JPanel toolbarPanel = new JPanel();
+      toolbarPanel.setSize(108, 25);
+      toolbarPanel.setPreferredSize(new Dimension(108, 25));
+      toolbarPanel.setLayout(new BorderLayout());
+      toolbarPanel.add(toolbar, BorderLayout.CENTER);
+      itsStatusBar.addWidgetAt(toolbarPanel, 2);
+      itsStatusBar.validate();*/
   }
 
   private void prepareCenterPanel()
@@ -187,10 +187,11 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setBorder(new EtchedBorder());
 
-    itsCenterPanel.setBounds(toolbarDimension.width+ScalePanel.scaleDimension.width, 
-			     InfoPanel.INFO_WIDTH, 
-			     getSize().width-toolbarDimension.width-ScalePanel.scaleDimension.width-SCROLLBAR_SIZE, 
-			     getSize().height-InfoPanel.INFO_HEIGHT-SCROLLBAR_SIZE);
+    itsCenterPanel.setBounds(/*toolbarDimension.width+ScalePanel.scaleDimension.width, 
+			       InfoPanel.INFO_WIDTH,*/ 
+			     0,0, 
+			     getSize().width/*-toolbarDimension.width-ScalePanel.scaleDimension.width*/-SCROLLBAR_SIZE, 
+			     getSize().height/*-InfoPanel.INFO_HEIGHT*/-SCROLLBAR_SIZE);
 
     add(itsCenterPanel, BorderLayout.CENTER);
     validate();
@@ -205,7 +206,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     gc.setCoordWriter(new CoordinateWriter(gc));
     gc.setToolManager(toolManager);
     gc.setSelection(new TableSelection(tableData));
-    gc.setStatusBar(itsStatusBar);
     TableAdapter ta = new TableAdapter(tableData, itsCenterPanel.getSize(), gc.getVerticalMaximum());
 
     ta.addXZoomListener(new ZoomListener() {
@@ -241,7 +241,7 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
 	});
 
     gc.setAdapter(ta);
-    gc.setStatusBar(itsStatusBar);
+    //gc.setStatusBar(itsStatusBar);
   }
 
   private void prepareVerticalScrollbar()
@@ -251,9 +251,10 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
     itsVerticalControl.addAdjustmentListener( new AdjustmentListener() {
       public void adjustmentValueChanged( AdjustmentEvent e)
 	{
-	    gc.getAdapter().setOY(-e.getValue());	    
-	    scalePanel.updateScale();
-	    repaint();
+	  //gc.getAdapter().setOY(-e.getValue());	    
+	  gc.getAdapter().setYTransposition( e.getValue());
+	  /*scalePanel.updateScale();*/
+	  repaint();
 	}
     });
 
@@ -265,27 +266,27 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   int start0;
   void updateVerticalScrollbar()
   {
-      int verticalScope = gc.getVisibleVerticalScope();
+    int verticalScope = gc.getVisibleVerticalScope();
 
-      if(verticalScope >= gc.getVerticalMaximum()*2)
+    if(verticalScope >= gc.getVerticalMaximum()*2)
+      {
+	if(itsVerticalControl.isVisible())
 	  {
-	      if(itsVerticalControl.isVisible())
-		  {
-		      itsVerticalControl.setValue(-verticalScope/2);
-		      itsVerticalControl.setEnabled(false);
-		      itsVerticalControl.setVisible(false);
-		  }
+	    itsVerticalControl.setValue(-verticalScope/2);
+	    itsVerticalControl.setEnabled(false);
+	    itsVerticalControl.setVisible(false);
 	  }
-      else
+      }
+    else
+      {
+	if(!itsVerticalControl.isVisible())
 	  {
-	      if(!itsVerticalControl.isVisible())
-		  {
-		      itsVerticalControl.setEnabled(true);
-		      itsVerticalControl.setVisible(true);		      
-		  }
-	      itsVerticalControl.setVisibleAmount(verticalScope);
-	      itsVerticalControl.setValue(-Math.round(start0/gc.getAdapter().getYZoom()));
-	  }    
+	    itsVerticalControl.setEnabled(true);
+	    itsVerticalControl.setVisible(true);		      
+	  }
+	itsVerticalControl.setVisibleAmount(verticalScope);
+	itsVerticalControl.setValue(-Math.round(start0/gc.getAdapter().getYZoom()));
+      }    
   }
   private int hScrollVal = 0;
   private void prepareHorizontalScrollbar()
