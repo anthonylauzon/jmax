@@ -32,14 +32,12 @@
 
 #include <fts/fts.h>
 
+#include "alsaaudio.h" 
+
 /* PCM device */
 static fts_symbol_t s_default;
 static fts_symbol_t s_hw_0_0;
 static fts_symbol_t s_plug_0_0;
-/* sample format */
-static fts_symbol_t s_s16_le, s_s32_le;
-/* access type */
-static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleaved, s_rw_interleaved;
 
 #define GUESS_CHANNELS -1
 /*
@@ -73,7 +71,6 @@ typedef struct _alsastream_t {
   int fd;
 
 /* storing of current configuration */
-  fts_symbol_t name;
   snd_pcm_stream_t stream;
   int mode;
   snd_pcm_access_t access;
@@ -89,9 +86,13 @@ typedef struct {
   fts_audioport_t head;
   alsastream_t capture;
   alsastream_t playback;
+
   void *input_buffer;
   void *output_buffer;
   int xrun;
+  fts_symbol_t device_name;
+  
+  size_t to_output;
 } alsaaudioport_t;
 
 /* ********************************************************************** */
@@ -107,10 +108,12 @@ static int alsastream_open( alsastream_t *stream,
 			    int sampling_rate, 
 			    int fifo_size, 
 			    snd_pcm_access_t* access);
+
 static void
-alsaaudioport_update_audioport_input_function(alsaaudioport_t* self, alsastream_t* stream);
+alsaaudioport_update_audioport_input_functions(alsaaudioport_t* self, alsastream_t* stream);
+
 static void
-alsaaudioport_update_audioport_output_function(alsaaudioport_t* self, alsastream_t* stream);
+alsaaudioport_update_audioport_output_functions(alsaaudioport_t* self, alsastream_t* stream);
 
 static void post_log( void)
 {
@@ -181,7 +184,6 @@ convert_alsa_access_to_access_index(snd_pcm_access_t access)
   int access_index;
 
   /* convert access to access_index */
-
   switch(access)
   {
   case SND_PCM_ACCESS_MMAP_NONINTERLEAVED:
@@ -252,9 +254,9 @@ static const char* get_alsa_access_type_name(snd_pcm_access_t access)
  * 
  * @return new access type
  */
-static snd_pcm_access_t alsaaudioport_check_better_access_type(snd_pcm_t* handle, 
-							       snd_pcm_hw_params_t* params, 
-							       snd_pcm_access_t access)
+static snd_pcm_access_t check_better_access_type(snd_pcm_t* handle, 
+						 snd_pcm_hw_params_t* params, 
+						 snd_pcm_access_t access)
 {
   int test_result = -1;
 
@@ -348,9 +350,9 @@ static const char* get_alsa_sample_format_name(snd_pcm_format_t format)
  * 
  * @return new PCM format
  */
-static int alsaaudioport_check_better_sample_format(snd_pcm_t* handle,
-						    snd_pcm_hw_params_t* params,
-						    int format)
+static int check_better_sample_format(snd_pcm_t* handle,
+				      snd_pcm_hw_params_t* params,
+				      int format)
 {
   int test_result = -1;
 
@@ -388,7 +390,7 @@ static int alsaaudioport_check_better_sample_format(snd_pcm_t* handle,
 static void
 alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  alsaaudioport_t* this = (alsaaudioport_t*)o;
+  alsaaudioport_t* self = (alsaaudioport_t*)o;
   int err;
   alsastream_t* stream;
   int format_is_32;
@@ -397,23 +399,23 @@ alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, in
   {
     int sampling_rate = (int)fts_get_number_float(at);
     /* close playback handle */
-    if (NULL != this->playback.handle)
-      snd_pcm_close(this->playback.handle);
-/* static int alsastream_open( alsastream_t *stream, char *pcm_name, int which_stream, int* format, int channels, int sampling_rate, int fifo_size, snd_pcm_access_t* access) */
-
-    stream = &this->playback;
-    err = alsastream_open(stream, stream->name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
-
-    /* update output function */
-    alsaaudioport_update_audioport_output_function(this, stream);
-
-    if (NULL != this->capture.handle)
-      snd_pcm_close(this->capture.handle);
-    stream = &this->capture;
-    err = alsastream_open(stream, stream->name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
-
-    /* update input function */
-    alsaaudioport_update_audioport_input_function(this, stream);
+    if (NULL != self->playback.handle)
+      snd_pcm_close(self->playback.handle);
+    
+    stream = &self->playback;
+    err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
+    
+    /* update output functions */
+    alsaaudioport_update_audioport_output_functions(self, stream);
+    
+    if (NULL != self->capture.handle)
+      snd_pcm_close(self->capture.handle);
+    
+    stream = &self->capture;
+    err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
+    
+    /* update input functions */
+    alsaaudioport_update_audioport_input_functions(self, stream);
 
     if (err < 0)
     {
@@ -454,7 +456,6 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
     fts_log("[alsaaudioport] cannot open ALSA PCM device %s (%s)\n", pcm_name, snd_strerror(err));
     return err;
   }
-  stream->name = fts_new_symbol(pcm_name);
   stream->stream = which_stream;
   stream->mode = open_mode;
 
@@ -472,7 +473,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
      Check if acces type is available,
      return a better choice if not 
   */
-  *access = alsaaudioport_check_better_access_type(stream->handle, hwparams, *access);  
+  *access = check_better_access_type(stream->handle, hwparams, *access);
   if ((err = snd_pcm_hw_params_set_access( stream->handle, hwparams, *access)) < 0)
   {
     fts_log("[alsaaudioport] acces type not available for handle: (%s)\n", snd_strerror(err));
@@ -483,25 +484,17 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   /*
    * Set the sample format
    */
-  /* 
-     Check if sample format is available
-     return a better choice if not 
-  */
-  *format = alsaaudioport_check_better_sample_format(stream->handle, hwparams, *format);
+  *format = check_better_sample_format(stream->handle, hwparams, *format);
   if ((err = snd_pcm_hw_params_set_format( stream->handle, hwparams, *format)) < 0)
   {
     fts_log("[alsaaudioport] sample format not available: (%s)\n", snd_strerror(err));
     return err;
   }
   stream->format = *format;
+
   /*
    * Set the number of channels
-   */
-#if 0
-  if (stream->channels == GUESS_CHANNELS)
-    stream->channels = snd_pcm_hw_params_get_channels_max (hwparams);
-#endif
-  
+   */  
   if ( (snd_pcm_hw_params_get_channels_max(hwparams) < channels)
        || (snd_pcm_hw_params_get_channels_min(hwparams) > channels)
     )
@@ -559,11 +552,6 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
 
   stream->period_size = snd_pcm_hw_params_get_period_size( hwparams, &dir);
 
-#ifdef DEBUG
-  snd_pcm_hw_params_dump( hwparams, get_post_log());
-  post_log();
-#endif
-
   /*
    * Set hardware parameters
    */
@@ -583,18 +571,12 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
       return err;
   }
 
-
   if ((err = snd_pcm_sw_params_set_avail_min( stream->handle, swparams, stream->period_size)) < 0) 
     return err;
 
   /* align all transfers to 1 samples */
   if ((err = snd_pcm_sw_params_set_xfer_align( stream->handle, swparams, 1)) < 0)
     return err;
-
-#ifdef DEBUG
-  snd_pcm_sw_params_dump( swparams, get_post_log());
-  post_log();
-#endif
 
   if ((err = snd_pcm_sw_params( stream->handle, swparams)) < 0) 
   {
@@ -836,32 +818,80 @@ static void FUN_NAME( fts_word_t *argv)									\
   24 bits: 8388607
 */
 
-INPUT_FUN_INTERLEAVED( alsa_input_16_rw_i, short, snd_pcm_readi, 0, 32767.0f)
-  INPUT_FUN_INTERLEAVED( alsa_input_32_rw_i, long, snd_pcm_readi, 8, 8388607.0f)
-  INPUT_FUN_INTERLEAVED( alsa_input_16_mmap_i, short, snd_pcm_mmap_readi, 0, 32767.0f)
-  INPUT_FUN_INTERLEAVED( alsa_input_32_mmap_i, long, snd_pcm_mmap_readi, 8, 8388607.0f)
-  OUTPUT_FUN_INTERLEAVED( alsa_output_16_rw_i, short, snd_pcm_writei, 0, 32767.0f)
-  OUTPUT_FUN_INTERLEAVED( alsa_output_32_rw_i, long, snd_pcm_writei, 8, 8388607.0f)
-  OUTPUT_FUN_INTERLEAVED( alsa_output_16_mmap_i, short, snd_pcm_mmap_writei, 0, 32767.0f)
-  OUTPUT_FUN_INTERLEAVED( alsa_output_32_mmap_i, long, snd_pcm_mmap_writei, 8, 8388607.0f)
-  INPUT_FUN_NONINTERLEAVED( alsa_input_16_rw_n, short, snd_pcm_readn, 0, 32767.0f)
-  INPUT_FUN_NONINTERLEAVED( alsa_input_32_rw_n, long, snd_pcm_readn, 8, 8388607.0f)
-  INPUT_FUN_NONINTERLEAVED( alsa_input_16_mmap_n, short, snd_pcm_mmap_readn, 0, 32767.0f)
-  INPUT_FUN_NONINTERLEAVED( alsa_input_32_mmap_n, long, snd_pcm_mmap_readn, 8, 8388607.0f)
-  OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_rw_n, short, snd_pcm_writen, 0, 32767.0f)
-  OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_rw_n, long, snd_pcm_writen, 8, 8388607.0f)
-  OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_mmap_n, short, snd_pcm_mmap_writen, 0, 32767.0f)
-  OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_mmap_n, long, snd_pcm_mmap_writen, 8, 8388607.0f)
+/* INPUT_FUN_INTERLEAVED( alsa_input_16_rw_i, short, snd_pcm_readi, 0, 32767.0f) */
+/*   INPUT_FUN_INTERLEAVED( alsa_input_32_rw_i, long, snd_pcm_readi, 8, 8388607.0f) */
+/*   INPUT_FUN_INTERLEAVED( alsa_input_16_mmap_i, short, snd_pcm_mmap_readi, 0, 32767.0f) */
+/*   INPUT_FUN_INTERLEAVED( alsa_input_32_mmap_i, long, snd_pcm_mmap_readi, 8, 8388607.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_rw_i, short, snd_pcm_writei, 0, 32767.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_rw_i, long, snd_pcm_writei, 8, 8388607.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_mmap_i, short, snd_pcm_mmap_writei, 0, 32767.0f) */
+/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_mmap_i, long, snd_pcm_mmap_writei, 8, 8388607.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_rw_n, short, snd_pcm_readn, 0, 32767.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_rw_n, long, snd_pcm_readn, 8, 8388607.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_mmap_n, short, snd_pcm_mmap_readn, 0, 32767.0f) */
+/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_mmap_n, long, snd_pcm_mmap_readn, 8, 8388607.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_rw_n, short, snd_pcm_writen, 0, 32767.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_rw_n, long, snd_pcm_writen, 8, 8388607.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_mmap_n, short, snd_pcm_mmap_writen, 0, 32767.0f) */
+/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_mmap_n, long, snd_pcm_mmap_writen, 8, 8388607.0f) */
 
 
-/* to access this table: functions_table[mode][format][inout] */
-  static ftl_wrapper_t functions_table[4][2][2] = {
-    { { alsa_input_16_mmap_n, alsa_output_16_mmap_n}, { alsa_input_32_mmap_n, alsa_output_32_mmap_n} }, 
-    { { alsa_input_16_mmap_i, alsa_output_16_mmap_i}, { alsa_input_32_mmap_i, alsa_output_32_mmap_i} }, 
-    { { alsa_input_16_rw_n, alsa_output_16_rw_n}, { alsa_input_32_rw_n, alsa_output_32_rw_n} }, 
-    { { alsa_input_16_rw_i, alsa_output_16_rw_i}, { alsa_input_32_rw_i, alsa_output_32_rw_i} }
-  };
+/* /\* to access this table: functions_table[mode][format][inout] *\/ */
+/*   static ftl_wrapper_t functions_table[4][2][2] = { */
+/*     { { alsa_input_16_mmap_n, alsa_output_16_mmap_n}, { alsa_input_32_mmap_n, alsa_output_32_mmap_n} },  */
+/*     { { alsa_input_16_mmap_i, alsa_output_16_mmap_i}, { alsa_input_32_mmap_i, alsa_output_32_mmap_i} },  */
+/*     { { alsa_input_16_rw_n, alsa_output_16_rw_n}, { alsa_input_32_rw_n, alsa_output_32_rw_n} },  */
+/*     { { alsa_input_16_rw_i, alsa_output_16_rw_i}, { alsa_input_32_rw_i, alsa_output_32_rw_i} } */
+/*   }; */
 
+
+static void alsa_output_fun_16_rw_i(fts_audioport_t* port)
+{
+  alsaaudioport_t* alsa_port = (alsaaudioport_t*)port;
+  ssize_t r;
+  size_t count;
+  u_char* data;
+
+  data = (u_char*)alsa_port->output_buffer;
+  count = alsa_port->to_output;
+  while (count > 0)
+  {
+    r = snd_pcm_writei( alsa_port->playback.handle, data, count); 
+    if (r == -EAGAIN || (r >= 0 && r < (ssize_t)count)) 
+      snd_pcm_wait( alsa_port->playback.handle, 1000); 
+    else if ( r == -EPIPE ) 
+      xrun( alsa_port, alsa_port->playback.handle); 
+    else if (r < 0) 
+      post( "%s error: %d, %s\n", "snd_pcm_writei", r, snd_strerror(r)); 
+    if ( r > 0) 
+    { 
+      count -= r; 
+      data += r * alsa_port->playback.bytes_per_frame; 
+    } 
+    
+  }
+  alsa_port->to_output = count;
+}
+
+
+static void alsa_output_copy_fun_16_rw_i(fts_audioport_t* port, float* buf, int buffsize, int channel)
+{
+  alsaaudioport_t* alsa_port = (alsaaudioport_t*)port;
+  int channels = fts_audioport_get_max_channels(port, FTS_AUDIO_OUTPUT);
+  int i;
+  int j = channel;
+  short* buffer;
+
+  buffer = (short*)alsa_port->output_buffer;
+  
+  for (i = 0; i < buffsize; ++i)
+  {    
+    buffer[j] = ((short) (32767.0f * buf[i])) << 0;
+    j += channels;
+  }
+
+  alsa_port->to_output = buffsize;
+}
 
 /* ********************************************************************** */
 /* alsaaudioport methods                                                  */
@@ -892,53 +922,62 @@ static void *alsaaudioport_allocate_buffer( snd_pcm_access_t access, int channel
 
 
 static void
-alsaaudioport_update_audioport_input_function(alsaaudioport_t* self, alsastream_t* stream)
+alsaaudioport_update_audioport_input_functions(alsaaudioport_t* self, alsastream_t* stream)
 {
   int format_is_32;
   /* convert access type to function array index */
   int access_index = convert_alsa_access_to_access_index(stream->access);
-    if (-1 == access_index)
-    {
-      post("[alsaaudioport] playback access type unknown \n");
-      fts_object_error((fts_object_t*)self,"playback access type unknown \n");
-      return;
-    }
-    format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
-
+  if (-1 == access_index)
+  {
+    post("[alsaaudioport] playback access type unknown \n");
+    fts_object_error((fts_object_t*)self,"playback access type unknown \n");
+    return;
+  }
+  format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
+    
 #warning (OLD API) alsaaudioport_update_audioport_input_function use fts_audioport_set_input_channels (OLD API)  
 /*     fts_audioport_set_input_channels( (fts_audioport_t *)self, stream->channels); */
 #warning (OLD API) alsaaudioport_update_audioport_input_function use fts_audioport_set_input_function (OLD API)  
 /*     fts_audioport_set_input_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][0]); */
-    if (self->input_buffer)
-    {
-      fts_free(self->input_buffer);
-    }
-    self->input_buffer = alsaaudioport_allocate_buffer( stream->access, stream->channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(stream->format)/8);
+  if (self->input_buffer)
+  {
+    fts_free(self->input_buffer);
+  }
+  self->input_buffer = alsaaudioport_allocate_buffer(stream->access, stream->channels, 
+						     fts_dsp_get_tick_size(), snd_pcm_format_physical_width(stream->format)/8);
     
 }
 
 static void
-alsaaudioport_update_audioport_output_function(alsaaudioport_t* self, alsastream_t* stream)
+alsaaudioport_update_audioport_output_functions(alsaaudioport_t* self, alsastream_t* stream)
 {
   int format_is_32;
   /* convert access type to function array index */
   int access_index = convert_alsa_access_to_access_index(stream->access);
-    if (-1 == access_index)
-    {
-      post("[alsaaudioport] playback access type unknown \n");
-      fts_object_error((fts_object_t*)self,"playback access type unknown \n");
-      return;
-    }
-    format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
+  if (-1 == access_index)
+  {
+    post("[alsaaudioport] playback access type unknown \n");
+    fts_object_error((fts_object_t*)self,"playback access type unknown \n");
+    return;
+  }
+  format_is_32 = (stream->format == SND_PCM_FORMAT_S32_LE);
+
+
 #warning (OLD API) alsaaudioport_update_audioport_output_function use   fts_audioport_set_output_channels (OLD API)
 /*     fts_audioport_set_output_channels( (fts_audioport_t *)self, stream->channels); */
 #warning (OLD API) alsaaudioport_update_audioport_output_function use   fts_audioport_set_output_function (OLD API)
 /*     fts_audioport_set_output_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][1]); */
-    if (self->input_buffer)
-    {
-      fts_free(self->input_buffer);
-    }
-    self->input_buffer = alsaaudioport_allocate_buffer( stream->access, stream->channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(stream->format)/8);
+  if (self->input_buffer)
+  {
+    fts_free(self->input_buffer);
+  }
+  self->output_buffer = alsaaudioport_allocate_buffer( stream->access, stream->channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(stream->format)/8);
+
+  /* @@@@@
+     Hardcoded for testing alsa output on a SB 128 
+  */
+  fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, alsa_output_fun_16_rw_i);
+  fts_audioport_set_copy_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, alsa_output_copy_fun_16_rw_i);
 
 }
 
@@ -953,31 +992,80 @@ static int alsaaudioport_xrun_function( fts_audioport_t *port)
   return xrun;
 }
 
-
-static snd_pcm_access_t convert_jmax_symbol_to_alsa_access(fts_symbol_t s_access)
+static void
+alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  snd_pcm_access_t access;
+  alsaaudioport_t* self = (alsaaudioport_t*)o;
 
-  if (s_access == s_mmap_noninterleaved)
-  {
-    access = SND_PCM_ACCESS_MMAP_NONINTERLEAVED;
-  }
-  else if (s_access == s_mmap_interleaved)
-  {
-    access = SND_PCM_ACCESS_MMAP_INTERLEAVED;
-  }
-  else if (s_access == s_rw_noninterleaved)
-  {
-    access = SND_PCM_ACCESS_RW_NONINTERLEAVED;
-  }
-  else
-  {
-    access = SND_PCM_ACCESS_RW_INTERLEAVED;
-  }
+  int err;
+  int format  = snd_pcm_format_value(DEFAULT_FORMAT);
+  snd_pcm_access_t access = alsaaudiomanager_convert_jmax_symbol_to_alsa_access(DEFAULT_ACCESS);
+  int sampling_rate = (int)fts_dsp_get_sample_rate();
+  int fifo_size = DEFAULT_FIFO_SIZE;
 
-  return access;
+  err = alsastream_open(&self->capture, self->device_name, 
+			SND_PCM_STREAM_CAPTURE, &format, self->capture.channels, 
+			sampling_rate, fifo_size, &access);
+
+  if (err != 0)
+  {
+    fts_object_error(o, "Error when trying to open alsastream \n");
+    post("[alsaaudioport_open_input] err: %d \n", err);
+    return;
+  }
+  /* 
+     set fts_audioport io_fun and copy fun 
+     and 
+     memory allocation for buffers 
+   */
+  alsaaudioport_update_audioport_input_functions(self, &self->capture);
+
+
 }
 
+static void
+alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  alsaaudioport_t* self = (alsaaudioport_t*)o;
+
+  int err;
+  int format  = snd_pcm_format_value(DEFAULT_FORMAT);
+  snd_pcm_access_t access = alsaaudiomanager_convert_jmax_symbol_to_alsa_access(DEFAULT_ACCESS);
+  int sampling_rate = (int)fts_dsp_get_sample_rate();
+  int fifo_size = DEFAULT_FIFO_SIZE;
+
+  err = alsastream_open(&self->playback, self->device_name, 
+			SND_PCM_STREAM_PLAYBACK, &format, self->playback.channels, 
+			sampling_rate, fifo_size, &access);
+
+  /* set fts_audioport io_fun and copy fun */
+  alsaaudioport_update_audioport_output_functions(self, &self->playback);
+
+  fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+}
+
+static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  alsaaudioport_t* self = (alsaaudioport_t*)o;
+
+  post("[alsaaudioport_close_input]\n");
+  if (self->capture.handle != 0)
+    snd_pcm_close(self->capture.handle);
+
+}
+
+static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  alsaaudioport_t* self = (alsaaudioport_t*)o;
+
+  post("[alsaaudioport_close_output]\n");
+
+  fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+
+  if (self->playback.handle != 0)
+    snd_pcm_close(self->playback.handle);
+
+}
 
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -988,39 +1076,45 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   snd_pcm_access_t access;
   fts_symbol_t s_access;
   int access_index;
-  alsaaudioport_t *this = (alsaaudioport_t *)o;
+  alsaaudioport_t *self = (alsaaudioport_t *)o;
 
-  fts_audioport_init( &this->head);
+  int in_max_channels;
+  int out_max_channels;
 
-  this->capture.handle = NULL;
-  this->playback.handle = NULL;
+  fts_audioport_init( &self->head);
+
+  self->capture.handle = NULL;
+  self->playback.handle = NULL;
     
   sr = fts_dsp_get_sample_rate();
   sampling_rate = (int)sr ;
   fifo_size = DEFAULT_FIFO_SIZE;
     
-  strcpy( pcm_name, fts_get_symbol_arg( ac, at, 0, DEFAULT_PCM_NAME) );
-
-  capture_channels = fts_get_int_arg( ac, at, 1, DEFAULT_INPUT_CHANNELS);
-  playback_channels = fts_get_int_arg( ac, at, 2, DEFAULT_OUTPUT_CHANNELS);
-
-  format_name = fts_get_symbol_arg( ac, at, 3, DEFAULT_FORMAT);
-  format = snd_pcm_format_value( format_name);
-
-  s_access = fts_get_symbol_arg( ac, at, 4, DEFAULT_ACCESS);
-
-  access = convert_jmax_symbol_to_alsa_access(s_access);
-
-  if ( capture_channels != 0)
+  self->device_name = fts_get_symbol(at);
+  
+  /* check for capture */
+  in_max_channels = alsaaudiomanager_get_channels_max(self->device_name, SND_PCM_STREAM_CAPTURE);
+  if (0 < in_max_channels)
   {
-    if ( (err = alsastream_open( &this->capture, pcm_name, SND_PCM_STREAM_CAPTURE, &format, capture_channels, sampling_rate, fifo_size, &access)) < 0)
-    {
-      fts_object_error(o, "error opening playback ALSA device (%s)", snd_strerror( err));
-      fts_log("[alsaaudioport] error opening playback ALSA device (%s)", snd_strerror( err));
-      post("[alsaaudioport] cannot open playback ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
-      return;
-    }
+    fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+    fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_INPUT, in_max_channels);
+    self->capture.channels = in_max_channels;
+  }
 
+  /* check for playback */
+  out_max_channels = alsaaudiomanager_get_channels_max(self->device_name, SND_PCM_STREAM_PLAYBACK);
+  if (0 < out_max_channels)
+  {
+    fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+    fts_audioport_set_max_channels((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, out_max_channels);
+    self->playback.channels = out_max_channels;
+  }
+
+  self->to_output = 0;
+
+    fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
+#if 0
+  {
 
 /*     /\* convert access type to function array index *\/ */
 /*     access_index = convert_alsa_access_to_access_index(access); */
@@ -1032,94 +1126,73 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 /*     } */
 /*     format_is_32 = (format == SND_PCM_FORMAT_S32_LE); */
   
-/*     fts_audioport_set_input_channels( (fts_audioport_t *)this, this->capture.channels); */
-/*     fts_audioport_set_input_function( (fts_audioport_t *)this, functions_table[access_index][format_is_32][0]); */
+/*     fts_audioport_set_input_channels( (fts_audioport_t *)self, self->capture.channels); */
+/*     fts_audioport_set_input_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][0]); */
 
-/*     this->input_buffer = alsaaudioport_allocate_buffer( access, this->capture.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8); */
-  }
-
-  if ( playback_channels != 0)
-  {
-    if ( (err = alsastream_open(&this->playback, pcm_name, SND_PCM_STREAM_PLAYBACK, &format, playback_channels, sampling_rate, fifo_size, &access)) < 0)
-    {
-      fts_object_error(o, "error opening playback ALSA device (%s)", snd_strerror( err));
-      fts_log("[alsaaudioport] error opening playback ALSA device (%s)", snd_strerror( err));
-      post("[alsaaudioport] cannot open playback ALSA device %s (%s)\n", pcm_name, snd_strerror( err));
-
-      return;
+/*     self->input_buffer = alsaaudioport_allocate_buffer( access, self->capture.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8); */
     }
 
-    /* convert access type to function array index */
-    access_index = convert_alsa_access_to_access_index(access);
-    if (-1 == access_index)
-    {
-      post("[alsaaudioport] playback access type unknown \n");
-      fts_object_error(o,"playback access type unknown \n");
-      return;
-    }
+      /* convert access type to function array index */
+      access_index = convert_alsa_access_to_access_index(access);
+      if (-1 == access_index)
+      {
+	post("[alsaaudioport] playback access type unknown \n");
+	fts_object_error(o,"playback access type unknown \n");
+	return;
+      }
 
-    format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
+      format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
 
 #warning (OLD API) alsaaudioport_init use fts_audioport_set_output_channels (OLD API)
-/*     fts_audioport_set_output_channels( (fts_audioport_t *)this, this->playback.channels); */
+/*     fts_audioport_set_output_channels( (fts_audioport_t *)self, self->playback.channels); */
 #warning (OLD API) alsaaudioport_init use fts_audioport_set_output_function (OLD API)
-/*     fts_audioport_set_output_function( (fts_audioport_t *)this, functions_table[access_index][format_is_32][1]); */
-
-    this->output_buffer = alsaaudioport_allocate_buffer( access, this->playback.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8);
-  }
+/*     fts_audioport_set_output_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][1]); */
 
 #warning (OLD API) alsaaudioport_init use fts_audioport_set_xrun_function (OLD API)
-/*   fts_audioport_set_xrun_function( (fts_audioport_t *)this, alsaaudioport_xrun_function); */
+/*   fts_audioport_set_xrun_function( (fts_audioport_t *)self, alsaaudioport_xrun_function); */
 
 #ifdef DEBUG
-  if (this->capture.handle)
-  {
-    snd_pcm_dump( this->capture.handle, get_post_log());
-    post_log();
-  }
-  if (this->playback.handle)
-  {
-    snd_pcm_dump( this->playback.handle, get_post_log());
-    post_log();
-  }
+    if (self->capture.handle)
+    {
+      snd_pcm_dump( self->capture.handle, get_post_log());
+      post_log();
+    }
+    if (self->playback.handle)
+    {
+      snd_pcm_dump( self->playback.handle, get_post_log());
+      post_log();
+    }
 #endif
 
-  fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
+
+  }
+#endif /* DEBUGGING */
 
 }
 
 static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  alsaaudioport_t *this = (alsaaudioport_t *)o;
+  alsaaudioport_t *self = (alsaaudioport_t *)o;
 
   fts_dsp_sample_rate_remove_listener(o);
+  fts_audioport_delete( &self->head);
 
-  fts_audioport_delete( &this->head);
 
-
-  if (this->input_buffer)
-    fts_free( this->input_buffer);
-  if (this->output_buffer)
-    fts_free( this->output_buffer);
-  if (this->capture.handle)
-    snd_pcm_close(this->capture.handle);
-  if (this->playback.handle)
-    snd_pcm_close(this->playback.handle);
+  if (self->input_buffer)
+    fts_free( self->input_buffer);
+  if (self->output_buffer)
+    fts_free( self->output_buffer);
+  if (self->capture.handle)
+    snd_pcm_close(self->capture.handle);
+  if (self->playback.handle)
+    snd_pcm_close(self->playback.handle);
 }
 
 static void
-alsaaudioport_print_all_device(alsaaudioport_t* this)
+alsaaudioport_print_all_device(alsaaudioport_t* self)
 {
   snd_output_t *out;
-/*     char* output_content; */
-/*     size_t buffer_size; */
   int err;
-/*   snd_config_t* conf = snd_config_update(); */
-/*     if (err < 0)  */
-/*     { */
-/* 	fts_log("[alsaaudioport] snd_config_update error : %s", snd_strerror(err)); */
-/* 	return; */
-/*     } */
 
   err = snd_output_buffer_open(&out);
   if (err < 0)
@@ -1128,10 +1201,10 @@ alsaaudioport_print_all_device(alsaaudioport_t* this)
     return;
   }
 
-  if (NULL != this->capture.handle)
+  if (NULL != self->capture.handle)
   {
 
-    if (snd_pcm_dump(this->capture.handle, out) < 0)
+    if (snd_pcm_dump(self->capture.handle, out) < 0)
     {
       fts_log("[alsaaudioport] error when dumping capture handle (%s)\n", 
 	      snd_strerror(err));
@@ -1144,9 +1217,9 @@ alsaaudioport_print_all_device(alsaaudioport_t* this)
   }
   snd_output_flush(out);
 
-  if (NULL != this->playback.handle)
+  if (NULL != self->playback.handle)
   {
-    if (snd_pcm_dump(this->playback.handle, out) < 0)
+    if (snd_pcm_dump(self->playback.handle, out) < 0)
     {	    
       fts_log("[alsaaudioport] error when dumping capture handle (%s)\n", 
 	      snd_strerror(err));
@@ -1165,29 +1238,18 @@ alsaaudioport_print_all_device(alsaaudioport_t* this)
 
 
 
-static void
-alsaaudioport_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
-{
-  alsaaudioport_t* this = (alsaaudioport_t*)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  
-  fts_spost(stream, "[alsaaudioport] All PCM device \n");
-  alsaaudioport_print_all_device(this);
-/*
-  post("Current PCM capture stream:\n");
-  alsaaudioport_print_stream(&this->capture);
-  post("Current PCM playback stream:\n");
-  alsaaudioport_print_stream(&this->playback);
-*/
-}
-
 
 static void alsaaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( alsaaudioport_t), alsaaudioport_init, alsaaudioport_delete);
 
-  /* debug print */
-  fts_class_message_varargs(cl, fts_s_print, alsaaudioport_print);
+
+  fts_class_message_varargs(cl, fts_s_open_input, alsaaudioport_open_input);
+  fts_class_message_varargs(cl, fts_s_open_output, alsaaudioport_open_output);
+  
+/*   fts_class_message_varargs(cl, fts_s_close_input, alsaaudioport_close_input); */
+/*   fts_class_message_varargs(cl, fts_s_close_output, alsaaudioport_close_output); */
+
 }
 
 /***********************************************************************
@@ -1209,7 +1271,9 @@ void alsaaudioport_config( void)
   s_rw_noninterleaved = fts_new_symbol( "rw_noninterleaved");
   s_rw_interleaved = fts_new_symbol( "rw_interleaved");
 
-  fts_class_install( s, alsaaudioport_instantiate);
+  alsaaudioport_type = fts_class_install( s, alsaaudioport_instantiate);
+
+  alsaaudiomanager_scan_devices();
 }
 
 
