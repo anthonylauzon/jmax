@@ -234,7 +234,7 @@ scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
   scomark_t *scomark = data->last_marker;
   
   if(scomark == NULL || time > data->last_marker_time)
-    scomark = track_insert_marker(data->merge, time, seqsym_tempo);
+    scomark = track_insert_marker(data->merge, time, seqsym_marker);
   
   scomark_set_tempo(scomark, 60000000.0 / (double)tempo, &old_tempo);
   

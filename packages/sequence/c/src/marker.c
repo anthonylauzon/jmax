@@ -652,7 +652,6 @@ marker_track_dump_state(track_t *self, fts_dumper_t *dumper)
     fts_atom_t *value = event_get_value(event);
     fts_object_t *marker = fts_get_object(value);
     
-    fts_message_append_symbol(mess, seqsym_marker);
     fts_message_append_float(mess, event_get_time(event));
     scomark_array_function(marker, fts_message_get_args(mess));
     fts_dumper_message_send(dumper, mess);
@@ -669,7 +668,7 @@ marker_track_create_marker(track_t *marker_track, fts_symbol_t type, event_t **e
   
   if(type != NULL)
   {
-    fts_set_symbol(&a, seqsym_scomark);
+    fts_set_symbol(&a, type);
     scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
   }
   else
