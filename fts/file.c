@@ -59,10 +59,11 @@
 char fts_path_separator = ';';
 char fts_file_separator = '\\';
 
-#define fts_path_is_absolute(_p) \
- ((_p[0] == '/') || \
-  ((_p[1] == ':') && (_p[2] == '/')) || \
-  ((_p[1] == ':') && (_p[2] == '\\')))
+// Now defined in ftsconfig-win32.h
+//#define fts_path_is_absolute(_p) \
+// ((_p[0] == '\\') || (_p[0] == '/') || \
+//  ((_p[1] == ':') && (_p[2] == '/')) || \
+//  ((_p[1] == ':') && (_p[2] == '\\')))
 
 #else
 

@@ -71,8 +71,10 @@
 #define realpath  win32_realpath
 
 /* Valid absolute paths are:  /c/jmax, c:/jmax, c:\jmax */
+/* [RS] \\stuff is valid too now - Fix for MusiqueLab */
+
 #define fts_path_is_absolute(_p) \
- ((_p[0] == '/') || \
+  ((_p[0] == '/') || ((_p[0] == '\\') && (_p[1] == '\\')) ||\
   ((_p[1] == ':') && (_p[2] == '/')) || \
   ((_p[1] == ':') && (_p[2] == '\\')))
 
