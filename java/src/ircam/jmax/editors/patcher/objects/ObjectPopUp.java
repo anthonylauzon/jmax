@@ -68,7 +68,9 @@ public class ObjectPopUp extends JPopupMenu implements PopupMenuListener
   static public GraphicObject getPopUpTarget(){
     return popup.target;
   }
-
+  static public ObjectPopUp getInstance(){
+    return popup;
+  }
   public static JMenuItem getMenuItem(String name)
   {
     return (JMenuItem) popup.items.get(name);

@@ -428,7 +428,7 @@ vecdisplay_config(void)
   sym_vecdisplay = fts_new_symbol("vecdisplay");
   sym_display = fts_new_symbol("display");
   sym_scroll = fts_new_symbol("scroll");
-  sym_bounds = fts_new_symbol("bounds");
+  sym_bounds = fts_new_symbol("setBounds");
 
   fts_class_install(sym_vecdisplay, vecdisplay_instantiate);
 }
