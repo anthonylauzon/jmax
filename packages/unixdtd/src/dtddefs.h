@@ -29,16 +29,16 @@
 #ifndef _FTS_DTDDEFS_H_
 #define _FTS_DTDDEFS_H_
 
-#define BLOCK_FRAMES  32768
-#define BLOCK_MAX_CHANNELS  8
-#define BLOCKS_PER_FIFO 4
-
-#define PRELOAD_BLOCK_FRAMES  2048
-
-#define DTD_SERVER_SELECT_TIMEOUT_SEC 0
-#define DTD_SERVER_SELECT_TIMEOUT_USEC 100000
-
-#define DTD_BASE_DIR "/tmp/ftsdtd"
+/* The default settings for the server.
+   The server receives these parameters as arguments and never 
+   uses the #defined defaults values
+*/
+#define DEFAULT_BLOCK_FRAMES  32768
+#define DEFAULT_PRELOAD_BLOCK_FRAMES  2048
+#define DEFAULT_BLOCK_MAX_CHANNELS  8
+#define DEFAULT_FIFO_BLOCKS 4
+#define DEFAULT_LOOP_MILLISECONDS 100
+#define DEFAULT_BASE_DIR "/tmp/ftsdtd"
 
 #define FTS_SIDE 0
 #define DTD_SIDE 1

@@ -247,7 +247,7 @@ void audp_set_swapper(audp_t* audp)
 audp_t* audp_send_open(char addr[256], int port, int ttl) /* open transmiter */
 {
   audp_t* audp;
-  // struct hostent *hp = (struct hostent*)malloc(sizeof(struct hostent));
+  /*  struct hostent *hp = (struct hostent*)malloc(sizeof(struct hostent)); */
  
 
   audp = audp_init();
@@ -275,7 +275,7 @@ audp_t* audp_send_open(char addr[256], int port, int ttl) /* open transmiter */
 
   if (IN_MULTICAST(ntohl(audp->sockaddr.sin_addr.s_addr))) 
     {
-      // perror("multicast sender started");
+      /*   perror("multicast sender started"); */
 
       if (setsockopt(audp->sockd, IPPROTO_IP, IP_MULTICAST_TTL, (char *) &ttl, sizeof(ttl)) != 0) 
 	{
@@ -350,7 +350,7 @@ audp_t* audp_recv_open(char* addr, int port) /* open transmiter */
   {
       struct ip_mreq  imr;
       		
-      // perror("multicast receiver started");
+      /*   perror("multicast receiver started"); */
       imr.imr_multiaddr.s_addr = audp->sockaddr.sin_addr.s_addr;
       imr.imr_interface.s_addr = INADDR_ANY;
       if (setsockopt(audp->sockd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *) &imr, sizeof(struct ip_mreq)) != 0) {
@@ -380,7 +380,7 @@ void audp_close(audp_t* audp)
       if (setsockopt(audp->sockd, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char *) &imr, sizeof(struct ip_mreq)) != 0) 
 	{
 	  perror("setsockopt IP_DROP_MEMBERSHIP");
-	  // return NULL;
+	  /*   return NULL; */
 	}
     }
   close (audp->sockd);
@@ -488,7 +488,7 @@ int audp_recv(audp_t* audp, unsigned char* pbuff)
 	{
 	  bcopy(&packet, pbuff, ret);
 	  audp->audp_header->packet_size = ret;
-	  // perror("no head");
+/*  	   perror("no head"); */
 	}
       
     }

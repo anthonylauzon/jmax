@@ -70,7 +70,8 @@ extern int dtdfifo_get_number_of_fifos( void);
 extern int dtdfifo_allocate( int side);
 
 extern int dtdfifo_new( int id, const char *dirname, int buffer_size);
-extern void dtdfifo_delete( int id);
+
+extern void dtdfifo_delete_all( void);
 
 extern dtdfifo_t *dtdfifo_get( int id);
 

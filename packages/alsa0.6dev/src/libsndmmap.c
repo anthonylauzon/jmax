@@ -106,21 +106,21 @@ static int snd_configure( snd_pcm_t *handle, int format, int sampling_rate, int 
   return 0;
 }
 
-int snd_open( mmapdev_t *d, int card, int dev, int subdev, int format, int sampling_rate, int frag_size, int init_frag)
+int snd_open( mmapdev_t *d, char *pcm_name, int format, int sampling_rate, int frag_size, int init_frag)
 {
   snd_pcm_params_info_t params_info;
   snd_pcm_setup_t setup;
   int n_channels, channel, err;
 
-  if ((err = snd_pcm_hw_open_subdevice( &d->capture_handle, card, dev, subdev, SND_PCM_STREAM_CAPTURE, 0)) < 0)
+  if ((err = snd_pcm_open( &d->capture_handle, pcm_name, SND_PCM_STREAM_CAPTURE, 0)) < 0)
     {
-      error( "hw_open_subdevice", err);
+      error( "snd_pcm_open", err);
       return -1;
     }
 
-  if ((err = snd_pcm_hw_open_subdevice( &d->playback_handle, card, dev, subdev, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
+  if ((err = snd_pcm_subdevice( &d->playback_handle, pcm_name, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
     {
-      error( "hw_open_subdevice", err);
+      error( "snd_pcm_open", err);
       return -1;
     }
 

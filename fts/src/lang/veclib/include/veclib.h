@@ -41,8 +41,11 @@
 #include "lang/veclib/include/declare_fts.h"
 #include "lang/veclib/include/vec_fft.h"
 
-#ifndef MACOSX
+#if 0
 
+/* (fd) This gives a lot of warning when compiling on redhat 7.0 (gcc version 2.96),
+   so I've commented this out and replaced it by the macro expanded prototypes.
+*/
 #include "lang/veclib/include/vec_fun.h"
 #include "lang/veclib/include/vec_arith.h"
 #include "lang/veclib/include/vec_cmp.h"

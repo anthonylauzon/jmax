@@ -38,7 +38,7 @@
 #include <sys/stat.h>
 #include <assert.h>
 
-#include "dtddefs.h"
+/*  #include "dtddefs.h" */
 #include "dtdfifo.h"
 
 typedef struct {
@@ -238,12 +238,9 @@ int dtdfifo_new( int id, const char *dirname, int buffer_size)
   return id;
 }
 
-void dtdfifo_delete( int id)
+static void dtdfifo_apply_delete( int id, dtdfifo_t *fifo, void *user_data)
 {
   int size;
-  dtdfifo_t *fifo;
-
-  fifo = dtdfifo_get( id);
 
   if (unlink( table[id].full_path) < 0)
     fprintf( stderr, "Cannot unlink %s (%d,%s)\n", table[id].full_path, errno, strerror( errno));
@@ -258,6 +255,11 @@ void dtdfifo_delete( int id)
 
   table[id].fifo = 0;
   table[id].user_data = 0;
+}
+
+void dtdfifo_delete_all( void)
+{
+  dtdfifo_apply( dtdfifo_apply_delete);
 }
 
 /* ********************************************************************** */

@@ -35,15 +35,16 @@
 #include "fts.h"
 #include "dtdserver.h"
 
-extern void dtdobjs_init(void);
+extern void dtdserver_config( void);
+extern void dtdobjs_init( void);
 
-static void unixdtd_init(void)
+static void unixdtd_init( void)
 {
-  dtdserver_init();
+  dtdserver_config();
   dtdobjs_init();
 }
 
-static void unixdtd_shutdown(void)
+static void unixdtd_shutdown( void)
 {
   dtdserver_quit();
 }

@@ -41,6 +41,7 @@ static fts_symbol_t s_pause;
 static fts_symbol_t s_record;
 
 static int number_of_dtdobjs = 0;
+static int dtdserver_started = 0;
 
 /* ********************************************************************** */
 /* ********************************************************************** */
@@ -215,19 +216,14 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   /* 
    * Create enough fifos so that there is at least X*number_of_objects fifos
-   * so that, when you open a file, 
+   * so that, when you open a file, you don't need to create the fifo, i.e.
+   * create the file and mmap it, which would block FTS
    */
 #define X 2.0
 
   while ( dtdfifo_get_number_of_fifos() < (int) (ceil( X * number_of_dtdobjs)) )
     {
-      int id, buffer_size;
-
-      buffer_size = BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float);
-
-      id = dtdfifo_new( 0, DTD_BASE_DIR, buffer_size);
-
-      dtdserver_new( id, DTD_BASE_DIR, buffer_size);
+      dtdserver_new_fifo();
     }
 
   this->state = readsf_closed;
@@ -409,7 +405,7 @@ static void readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n_channels, i;
-  fts_symbol_t a[4];
+  fts_type_t a[4];
 
   n_channels = fts_get_long_arg(ac, at, 1, 1);
 
@@ -418,20 +414,20 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 
   fts_class_init(cl, sizeof(readsf_t), 1, n_channels + 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  a[3] = fts_s_int;
+  a[0] = fts_t_symbol;
+  a[1] = fts_t_int;
+  a[2] = fts_t_int;
+  a[3] = fts_t_int;
   fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, readsf_init, 4, a, 1);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, readsf_delete, 0, 0);
 
-  a[0] = fts_s_ptr;
+  a[0] = fts_t_ptr;
   fts_method_define(cl, fts_SystemInlet, fts_s_put, readsf_put, 1, a);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  a[2] = fts_s_symbol;
+  a[0] = fts_t_symbol;
+  a[1] = fts_t_int;
+  a[2] = fts_t_symbol;
   fts_method_define_optargs(cl, 0, fts_new_symbol("open"),  readsf_open, 3, a, 0);
 
   fts_method_define( cl, 0, fts_new_symbol("play"), readsf_play, 0, 0);
@@ -442,7 +438,7 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define( cl, 0, fts_new_symbol("close"), readsf_close, 0, 0);
   fts_method_define( cl, 0, fts_new_symbol("stop"), readsf_close, 0, 0);
 
-  a[0] = fts_s_int;
+  a[0] = fts_t_int;
   fts_method_define( cl, 0, fts_s_int, readsf_number, 1, a);
 
   for (i = 0; i < n_channels; i++)
@@ -450,6 +446,12 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 
   readsf_dsp_function = fts_new_symbol( "readsf~");
   dsp_declare_function( readsf_dsp_function, readsf_dsp);
+
+  if ( !dtdserver_started)
+    {
+      dtdserver_start();
+      dtdserver_started = 1;
+    }
 
   return fts_Success;
 }
@@ -728,7 +730,7 @@ static void writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n_channels, i;
-  fts_symbol_t a[4];
+  fts_type_t a[4];
 
   n_channels = fts_get_long_arg(ac, at, 1, 1);
 
@@ -737,20 +739,20 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
 
   fts_class_init(cl, sizeof(writesf_t), 1, n_channels + 1, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  a[3] = fts_s_int;
+  a[0] = fts_t_symbol;
+  a[1] = fts_t_int;
+  a[2] = fts_t_int;
+  a[3] = fts_t_int;
   fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, writesf_init, 4, a, 1);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, writesf_delete, 0, 0);
 
-  a[0] = fts_s_ptr;
+  a[0] = fts_t_ptr;
   fts_method_define(cl, fts_SystemInlet, fts_s_put, writesf_put, 1, a);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  a[2] = fts_s_symbol;
+  a[0] = fts_t_symbol;
+  a[1] = fts_t_int;
+  a[2] = fts_t_symbol;
   fts_method_define_optargs(cl, 0, fts_new_symbol("open"),  writesf_open, 3, a, 0);
 
   fts_method_define( cl, 0, fts_new_symbol("record"), writesf_record, 0, 0);
@@ -761,7 +763,7 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
   fts_method_define( cl, 0, fts_new_symbol("close"), writesf_close, 0, 0);
   fts_method_define( cl, 0, fts_new_symbol("stop"), writesf_close, 0, 0);
 
-  a[0] = fts_s_int;
+  a[0] = fts_t_int;
   fts_method_define( cl, 0, fts_s_int, writesf_number, 1, a);
 
   for (i = 0; i < n_channels; i++)
@@ -769,6 +771,12 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
 
   writesf_dsp_function = fts_new_symbol( "writesf~");
   dsp_declare_function( writesf_dsp_function, writesf_dsp);
+
+  if ( !dtdserver_started)
+    {
+      dtdserver_start();
+      dtdserver_started = 1;
+    }
 
   return fts_Success;
 }

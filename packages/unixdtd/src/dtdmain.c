@@ -33,10 +33,6 @@
  * implementation that interacts strangely with isolated processors management.
  */
 
-/* #define one of these to get a server that reads commands via udp or on a pipe */
-#define USE_UDP
-#undef USE_PIPE
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,11 +43,9 @@
 #include <sched.h>
 #include <signal.h>
 #include <audiofile.h>
-#ifdef USE_UDP
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#endif
 
 #include "fts.h"
 
@@ -97,13 +91,24 @@ static int __debug( const char *format, ...)
 #define DTD_DEBUG(x)
 #endif
 
+/*
+ * Constants used by the server
+ */
+static int block_frames;
+static int preload_block_frames;
+static int block_max_channels;
+static int fifo_blocks;
+static int loop_milliseconds;
+static int base_dir;
+
+
 typedef struct {
   AFfilehandle file;
   int n_channels;
 } dtdhandle_t;
 
 /* One read block for all */
-static short read_block[BLOCK_FRAMES*BLOCK_MAX_CHANNELS];
+static short *read_block;
 
 #define N 2048
 
@@ -307,11 +312,11 @@ static void dtd_open( const char *line)
 
   handle->n_channels = n_channels;
 
-  for ( i = 0; i < BLOCK_FRAMES/PRELOAD_BLOCK_FRAMES; i++)
+  for ( i = 0; i < DEFAULT_BLOCK_FRAMES/DEFAULT_PRELOAD_BLOCK_FRAMES; i++)
     {
       int ret;
 
-      ret = dtd_read_block( handle->file, fifo, read_block, PRELOAD_BLOCK_FRAMES, n_channels);
+      ret = dtd_read_block( handle->file, fifo, read_block, DEFAULT_PRELOAD_BLOCK_FRAMES, n_channels);
     }
 
   DTD_DEBUG( __debug( "preloaded `%s'", filename) );
@@ -357,24 +362,24 @@ static void dtd_new( const char *line)
   dtdfifo_put_user_data( id, handle);
 }
 
-
-static void dtd_delete( const char *line)
+static void dtd_init( const char *line)
 {
-  int id;
-
-  sscanf( line, "%*s%d", &id);
-
-  free( dtdfifo_get_user_data( id));
-
-  dtdfifo_delete( id);
+  sscanf( line, "%*s%d%d%d%d%d%d", 
+	  &block_frames,
+	  &preload_block_frames,
+	  &block_max_channels,
+	  &fifo_blocks,
+	  &loop_milliseconds,
+	  &base_dir);
 }
-
 
 /*
  * Commands are:
+ * init <block_frames> <preload_block_frames> <block_max_channels> <fifo_blocks> <loop_milliseconds> <base_dir>
  * new <id> <dirname> <filename> <buffer_size>
  * open <id> <sound_file_name> <search_path> <n_channels>
  * close <id>
+ * quit
  */
 static void dtd_process_command( const char *line)
 {
@@ -384,14 +389,14 @@ static void dtd_process_command( const char *line)
 
   sscanf( line, "%s", command);
 
-  if ( !strcmp( "open", command))
+  if ( !strcmp( "init", command))
+    dtd_init( line);
+  else if ( !strcmp( "open", command))
     dtd_open( line);
   else if ( !strcmp( "close", command))
     dtd_close( line);
   else if ( !strcmp( "new", command))
     dtd_new( line);
-  else if ( !strcmp( "delete", command))
-    dtd_delete( line);
   else if ( !strcmp( "quit", command))
     exit( 0);
 }
@@ -411,7 +416,7 @@ static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 
       n_channels = handle->n_channels;
 
-      block_size = BLOCK_FRAMES * n_channels * sizeof( float);
+      block_size = DEFAULT_BLOCK_FRAMES * n_channels * sizeof( float);
 
       DTD_DEBUG( __debug( "polling fifo %d channels=%d level=%d block_size=%d", id, n_channels, dtdfifo_get_write_level( fifo), block_size));
 
@@ -419,7 +424,7 @@ static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 	{
 	  int ret;
 
-	  ret = dtd_read_block( handle->file, fifo, read_block, BLOCK_FRAMES, n_channels);
+	  ret = dtd_read_block( handle->file, fifo, read_block, DEFAULT_BLOCK_FRAMES, n_channels);
 
 	  DTD_DEBUG( __debug("filled %d samples in fifo %d", ret, id));
 	}
@@ -431,7 +436,6 @@ static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 }
 
 
-#ifdef USE_UDP
 static int dtd_get_line( int fd, char *line, int n)
 {
   int size;
@@ -446,20 +450,6 @@ static int dtd_get_line( int fd, char *line, int n)
 
   return 0;
 }
-#endif
-
-#ifdef USE_PIPE
-static int dtd_get_line( int fd, char *line, int n)
-{
-  if ( fgets( line, n, stdin) == NULL)
-    return -1;
-
-  line[ strlen(line) - 1] = '\0';
-
-  return 0;
-}
-#endif
-
 static void dtd_main_loop( int fd)
 {
   DTD_DEBUG( __debug( "DTD server running") );
@@ -471,8 +461,8 @@ static void dtd_main_loop( int fd)
       int retval;
       char line[N];
       
-      tv.tv_sec = DTD_SERVER_SELECT_TIMEOUT_SEC;
-      tv.tv_usec = DTD_SERVER_SELECT_TIMEOUT_USEC;
+      tv.tv_sec = 0;
+      tv.tv_usec = DEFAULT_LOOP_MILLISECONDS * 1000;
 
       FD_ZERO( &rfds);
 
@@ -505,7 +495,6 @@ static void dtd_main_loop( int fd)
   DTD_DEBUG( __debug( "DTD server exiting") );
 }
 
-#ifdef USE_UDP
 static int dtd_create_socket( int *pport)
 {
   struct sockaddr_in my_addr;
@@ -543,7 +532,6 @@ static int dtd_create_socket( int *pport)
 
   return sock;
 }
-#endif
 
 static void dtd_no_real_time( void)
 {
@@ -587,7 +575,6 @@ static void signal_handler( int sig)
 
 int main( int argc, char **argv)
 {
-#ifdef USE_UDP
   int socket, port;
 
   if ((socket = dtd_create_socket( &port)) < 0)
@@ -596,14 +583,8 @@ int main( int argc, char **argv)
       return 1;
     }
 
-  /* Prints the port number for FTS */
-  printf( "%d\n", port);
-  fflush( stdout);
-
-#endif
-#ifdef USE_PIPE
-  int socket = 0; /* standard input */
-#endif
+  /* Write the port number for FTS */
+  write( 1, &port, 4);
 
 #ifdef DTD_SERVER_ENABLE_DEBUG
   if (getenv( "DTDSERVER_DEBUG"))
