@@ -7,12 +7,12 @@
 #                              manager@ircam.fr
 #
 #
-# $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:53:31 $
+# $Revision: 1.1 $ IRCAM $Date: 1998/09/18 11:56:50 $
 #
 #
 
 DISTDIR = ../../../../fts/
-PACKAGEROOT = ../..
+PACKAGEROOT = ..
 
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
