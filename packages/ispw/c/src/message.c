@@ -98,6 +98,16 @@ static void init_eval(void)
   ev_s_star  = fts_new_symbol("*");
 }
 
+static void
+messbox_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_class_t *cl = fts_object_get_class(o);
+  fts_method_t meth = fts_class_get_method(cl, fts_s_input);
+
+  if(meth)
+    meth(o, fts_system_inlet, s, ac, at);
+}
+
 /*
    Atom stack: this module can become pubblic, if needed;
    it provide stack frame based allocation of atoms arrays.
@@ -139,6 +149,14 @@ static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
    "reader engine" controlled by specific opcode.
    
  */
+
+/* LOCAL MACRO for the evaluation engine */
+#define SEND_MESSAGE \
+  if (ev_dest_is_object) \
+    { if(target) messbox_send((fts_object_t *)target, ev_sym, ev_argc, ev_fp); } \
+  else \
+    fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
+
 static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
 		   fts_object_t *default_dst, int outlet)
 {
@@ -169,16 +187,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
   fts_symbol_t ev_sym = 0;	/* the message symbol */
   fts_object_t *target = 0;
 
-  /* LOCAL MACRO for the evaluation engine */
-
-#define SEND_MESSAGE \
-  if (ev_dest_is_object) \
-    { if(target) fts_send_message((fts_object_t *)target, ev_sym, ev_argc, ev_fp); } \
-  else \
-    fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
-
   /* Init the reader */
-
   rd_command = rd_read_list;
   iter = fts_atom_list_iterator_new(list);
 

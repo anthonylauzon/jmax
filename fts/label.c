@@ -233,6 +233,8 @@ label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, label_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_find_friends, label_find_friends);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_input, label_send);
+
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
 
   fts_class_define_thru(cl, label_propagate_input);

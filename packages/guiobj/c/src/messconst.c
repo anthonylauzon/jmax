@@ -219,6 +219,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   messconst_t *this = (messconst_t *)o;
   int ninlets = 1;
   int noutlets = 1;
+  int new = 0;
   int i;
   
   /* Do we have a new object description (i.e. "ins <INT> outs <INT>") or an old one ? */
@@ -234,11 +235,8 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       fts_object_set_inlets_number(o, ninlets);
       fts_object_set_outlets_number(o, noutlets);
-    }
-  else
-    {
-      /* if old one, then we must call the set method by hand, giving as argument the description */
-      messconst_set( (fts_object_t *)this, fts_system_inlet, fts_s_set, ac, at);
+
+      new = 1;
     }
 
   this->expression = fts_expression_new( 0, 0, fts_object_get_patcher( (fts_object_t *)this));
@@ -249,6 +247,10 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for ( i = 0; i < this->ac; i++)
     fts_set_int( this->at + i, 0);
+
+  /* if old one, then we must call the set method by hand, giving as argument the description */
+  if(!new)
+    messconst_set( (fts_object_t *)this, fts_system_inlet, fts_s_set, ac, at);
 }
 
 static void

@@ -230,14 +230,9 @@ message_outlet(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_a
 		  FTS_OBJSTACK_PUSH(o);
 		  (*meth)(conn->dst, conn->winlet, s, ac, at);
 		  FTS_OBJSTACK_POP(o);
-		  
-		  return fts_ok;
 		}
 	      else
-		{
-		  fts_object_signal_runtime_error(o, "Received unknown message %s at inlet %d", s, conn->winlet);
-		  return &fts_MethodNotFound;
-		}
+		fts_object_signal_runtime_error(o, "Received unknown message %s at inlet %d", s, conn->winlet);
 	    }
 	  
 	  conn = conn->next_same_src;
