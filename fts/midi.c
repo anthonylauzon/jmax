@@ -1013,7 +1013,10 @@ fts_midiport_remove_listener(fts_midiport_t *port, enum midi_type type, int id, 
   fts_midiport_listener_t **type_list = port->listeners[type + 1]; 
   fts_midiport_listener_t **list = type_list + (number + 1) * (n_midi_channels + 1) + (id + 1);
 
-  remove_listener(list, obj);
+  if (NULL != list)
+  {
+      remove_listener(list, obj);
+  }
 }
 
 void
