@@ -1172,10 +1172,6 @@ static int fts_op_eval(fts_expression_state_t *e)
 		  if (fts_is_void(value))
 		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
 					    fts_symbol_name(varname));
-		  else if (fts_is_error(value))
-		    return expression_error(e, FTS_EXPRESSION_ERROR_OBJECT_REFERENCE,
-					    "Variable %s value is an error object, cannot be used",
-					    fts_symbol_name(varname));
 		  else
 		    *ptos = *value;
 		}

@@ -200,7 +200,7 @@ fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...)
     }
   else
     {
-      fts_symbol_t class = fts_get_class_name(fts_object_get_class(obj));
+      fts_symbol_t class = fts_class_get_name(fts_object_get_class(obj));
       fts_symbol_t variable = fts_object_get_variable(obj);
 
       if(variable)

@@ -22,10 +22,20 @@
 
 #include <fts/fts.h>
 
+/***********************************************************************
+ * Globals
+ */
+
+fts_class_t *fts_array_class = 0;
+fts_metaclass_t *fts_array_metaclass = 0;
+
+/***********************************************************************
+ * Array functions
+ */
+
 #define ARRAY_DEFAULT_ALLOC_INCREMENT 64
 
-void 
-fts_array_init(fts_array_t *array, int ac, const fts_atom_t *at)
+void fts_array_init(fts_array_t *array, int ac, const fts_atom_t *at)
 {
   array->atoms = 0;
   array->size = 0;
@@ -174,8 +184,6 @@ fts_array_copy(fts_array_t *org, fts_array_t *copy)
  *  array class
  *
  */
-fts_class_t *fts_array_class = 0;
-
 static void
 array_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -209,6 +217,6 @@ array_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fts_array_config(void)
 {
-  fts_class_install(fts_s_array, array_instantiate);
+  fts_array_metaclass = fts_class_install(fts_s_array, array_instantiate);
   fts_array_class = fts_class_get_by_name(fts_s_array);
 }

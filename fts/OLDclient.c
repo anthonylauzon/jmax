@@ -905,10 +905,6 @@ void fts_client_upload_connection(fts_connection_t *c)
 
   fts_client_start_msg(NEW_CONNECTION_CODE);
 
-  /*if (c->src->patcher)
-    fts_client_add_object((fts_object_t *) c->src->patcher->data);
-    else
-    fts_client_add_object((fts_object_t *) 0);*/
   if (c->src->patcher)
     fts_client_add_object((fts_object_t *) c->src->patcher);
   else

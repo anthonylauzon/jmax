@@ -88,7 +88,7 @@ int fts_sched_add( fts_object_t *obj, int flags, ...)
   mth = fts_class_get_method( fts_object_get_class(obj), fts_SystemInlet, fts_s_sched_ready);
   if ( !mth)
     {
-      fprintf( stderr, "[sched] object %s does not define a method for \"sched_ready\"\n", fts_symbol_name( fts_get_class_name( fts_object_get_class(obj))));
+      fprintf( stderr, "[sched] object %s does not define a method for \"sched_ready\"\n", fts_symbol_name( fts_class_get_name( fts_object_get_class(obj))));
       return -1;
     }
 

@@ -57,6 +57,8 @@ struct fts_outlet_decl
 #define fts_metaclass_get_package(m) ((m)->package)
 #define fts_metaclass_set_package(m, p) ((m)->package = (p))
 
+#define fts_metaclass_set_selector(m, s) ((m)->selector = (s))
+
 extern fts_class_mess_t *fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything);
 extern fts_class_mess_t *fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s);
 

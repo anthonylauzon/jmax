@@ -224,7 +224,6 @@ extern void fts_clipboard_config( void);
 extern void fts_label_config( void);
 extern void fts_midi_config( void);
 extern void fts_objectset_config();
-extern void fts_oldclient_config( void);
 extern void fts_selection_config( void);
 extern void fts_saver_config( void);
 
@@ -242,7 +241,6 @@ static void fts_kernel_classes_config( void)
   fts_label_config();
   fts_midi_config();
   fts_objectset_config();
-  fts_oldclient_config();
   fts_selection_config();
   fts_saver_config();
 }
@@ -285,17 +283,10 @@ void fts_init( int argc, char **argv)
  *
  */
 
-void fts_oldclient_shutdown( void);
 void fts_kernel_patcher_shutdown(void);
 
 void fts_shutdown( void)
 {
-  /* the old client is closed first, to avoid the sending of
-     fts_client_release_object() messages (see fts_object_unclient())
-     on a deadly dangling oldclient object.  */
-  fts_log("[fts]: Shutting down client connection\n");
-  fts_oldclient_shutdown();
-
   fts_log("[fts]: Deleting root patcher\n");
   fts_kernel_patcher_shutdown();
 }

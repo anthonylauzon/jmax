@@ -208,7 +208,7 @@ static void fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *
 	     However, this is related to metaclass mechanism, which we hope to
 	     remove soon.
 	  */
-	  store[i].typeid = fts_get_type( at+i);
+	  store[i].typeid = fts_get_class( at+i);
 	  fts_word_set_object( &store[i].value, 0);
 	}
     }
@@ -365,7 +365,7 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_metho
   else
     {
       post("fts_method_define: inlet number %d out of range [0..%d] for class `%s', method `%s'\n", 
-	   winlet, cl->ninlets, fts_symbol_name(fts_get_class_name(cl)),
+	   winlet, cl->ninlets, fts_symbol_name(fts_class_get_name(cl)),
 	   (s ? fts_symbol_name(s) : "")); 
 
       return &fts_InletOutOfRange;
@@ -376,7 +376,7 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_metho
   if (fts_class_mess_exists(in, msg))
     {
       post("fts_method_define: doubly defined method, class %s, inlet number %d message `%s'\n", 
-	   fts_symbol_name(fts_get_class_name(cl)), winlet, (s ? fts_symbol_name(s) : ""));
+	   fts_symbol_name(fts_class_get_name(cl)), winlet, (s ? fts_symbol_name(s) : ""));
     }
   else
     {
@@ -395,7 +395,7 @@ fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s, in
   if (woutlet >= cl->noutlets || woutlet < 0)
     {
       post("fts_outlet_type_define: outlet out of range #%d for class `%s'\n", woutlet,
-	   fts_symbol_name(fts_get_class_name(cl)));
+	   fts_symbol_name(fts_class_get_name(cl)));
       return &fts_OutletOutOfRange;
     }
   out = &cl->outlets[woutlet];
@@ -403,7 +403,7 @@ fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s, in
   if (out->tmess.symb)
     {
       post("fts_outlet_type_define: outlet #%d already defined for class `%s'\n", woutlet,
-	   fts_symbol_name(fts_get_class_name(cl)));
+	   fts_symbol_name(fts_class_get_name(cl)));
       return &fts_OutletAlreadyDefined;
     }
 
@@ -414,12 +414,6 @@ fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s, in
 
   return fts_Success;
 }
-
-fts_symbol_t fts_get_class_name( fts_class_t *cl)
-{
-  return cl->mcl->name;
-}
-
 
 /******************************************************************************/
 /*                                                                            */

@@ -35,11 +35,6 @@ void fts_stack_destroy( fts_stack_t *s)
   fts_free( s->buffer);
 }
 
-void fts_stack_clear( fts_stack_t *s)
-{
-  s->top = 0;
-}
-
 int __fts_stack_realloc( fts_stack_t *s)
 {
   s->alloc *= 2;

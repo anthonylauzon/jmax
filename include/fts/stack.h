@@ -85,7 +85,7 @@ FTS_API void fts_stack_destroy( fts_stack_t *stack);
  * @param b the stack
  * @ingroup stack
  */
-FTS_API void fts_stack_clear( fts_stack_t *b);
+#define fts_stack_clear(S) ((S)->top = 0)
 
 /**
  * Push an element on the stack.<BR>
@@ -98,7 +98,7 @@ FTS_API void fts_stack_clear( fts_stack_t *b);
  * @param v the value to push
  * @ingroup stack
  */
-#define fts_stack_push(B,T,V) (((B)->top+1 >= (B)->alloc) ? __fts_stack_realloc((B)) : 0, ((T*)(B)->buffer)[(B)->top++] = (V))
+#define fts_stack_push(S,T,V) (((S)->top+1 >= (S)->alloc) ? __fts_stack_realloc((S)) : 0, ((T*)(S)->buffer)[(S)->top++] = (V))
 
 /* This function is not to be called directly */
 FTS_API int __fts_stack_realloc( fts_stack_t *b);
@@ -111,7 +111,7 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  * @return a pointer to the current content of the stack
  * @ingroup stack
  */
-#define fts_stack_get_base(B) ((B)->buffer)
+#define fts_stack_get_base(S) ((S)->buffer)
 
 /**
  * Get the number of elements in a stack
@@ -121,5 +121,5 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  * @return the number of elements
  * @ingroup array
  */
-#define fts_stack_get_top(B) ((B)->top)
+#define fts_stack_get_top(S) ((S)->top)
 

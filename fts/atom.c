@@ -24,40 +24,19 @@
 #include <string.h>
 
 #include <fts/fts.h>
+#include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
 
+fts_metaclass_t *fts_t_void;
+fts_metaclass_t *fts_t_int;
+fts_metaclass_t *fts_t_float;
+fts_metaclass_t *fts_t_symbol;
+fts_metaclass_t *fts_t_pointer;
+fts_metaclass_t *fts_t_string;
+/* To be removed */
+fts_metaclass_t *fts_t_connection;
+
 const fts_atom_t fts_null[] = {FTS_NULL};
-
-void fprintf_atoms( FILE *file, int ac, const fts_atom_t *at)
-{
-  int i;
-
-  for ( i = 0; i < ac; i++, at++)
-    {
-      if ( fts_is_void( at))
-	fprintf( file,"<void>");
-      else if ( fts_is_int( at))
-	fprintf( file,"%d", fts_get_int( at));
-      else if ( fts_is_float( at))
-	fprintf( file,"%f", fts_get_float( at));
-      else if ( fts_is_symbol( at))
-	fprintf( file,"%s", fts_get_symbol( at));
-      else if ( fts_is_object( at))
-	fprintf_object( file, fts_get_object( at));
-      else if ( fts_is_pointer( at) )
-	fprintf( file,"%p", fts_get_pointer( at));
-      else if ( fts_is_string( at))
-	fprintf( file,"%s", fts_get_string( at));
-      /* To be removed */
-      else if ( fts_is_connection( at))
-	fprintf_connection( file, fts_get_connection( at));
-      else
-	fprintf( file, "<UNKNOWN TYPE>%x", fts_get_int( at));
-
-      if ( i != ac-1)
-	fprintf( file, " ");
-    }
-}
 
 int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
 {
@@ -91,8 +70,37 @@ int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
  * Initialization
  *
  */
+#define make_primitive_typeid(M) ((fts_metaclass_t *)UINT_TO_POINTER( POINTER_TO_UINT(M) | 1))
 
 void fts_kernel_atom_init( void)
 {
+  fts_metaclass_t *mcl;
+
+  mcl = fts_metaclass_install( fts_new_symbol( "__PRIMITIVE_VOID"), 0, 0);
+  fts_t_void = make_primitive_typeid( mcl);
+
+  mcl = fts_metaclass_install( fts_new_symbol( "__PRIMITIVE_INT"), 0, 0);
+  fts_metaclass_set_selector( mcl, fts_s_int);
+  fts_t_int = make_primitive_typeid( mcl);
+
+  mcl = fts_metaclass_install( fts_new_symbol( "__PRIMITIVE_FLOAT"), 0, 0);
+  fts_metaclass_set_selector( mcl, fts_s_float);
+  fts_t_float = make_primitive_typeid( mcl);
+
+  mcl = fts_metaclass_install( fts_new_symbol( "__PRIMITIVE_SYMBOL"), 0, 0);
+  fts_metaclass_set_selector( mcl, fts_s_symbol);
+  fts_t_symbol = make_primitive_typeid( mcl);
+
+  mcl = fts_metaclass_install( fts_new_symbol( "__PRIMITIVE_POINTER"), 0, 0);
+  fts_metaclass_set_selector( mcl, fts_s_pointer);
+  fts_t_pointer = make_primitive_typeid( mcl);
+
+  mcl = fts_metaclass_install( fts_new_symbol( "__PRIMITIVE_STRING"), 0, 0);
+  fts_metaclass_set_selector( mcl, fts_s_string);
+  fts_t_string = make_primitive_typeid( mcl);
+
+  mcl = fts_metaclass_install( fts_new_symbol( "__PRIMITIVE_CONNECTION"), 0, 0);
+  fts_metaclass_set_selector( mcl, fts_s_connection);
+  fts_t_connection = make_primitive_typeid( mcl);
 }
 

@@ -143,7 +143,7 @@ FTS_API fts_status_t fts_method_define_optargs(fts_class_t *cl, int winlet, fts_
 FTS_API fts_status_t fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet, fts_symbol_t s,
 						   int ac, fts_symbol_t *at,  int mandatory_args);
 
-FTS_API fts_symbol_t fts_get_class_name(fts_class_t *cl);
+#define fts_class_get_name(C) ((C)->mcl->name)
 
 FTS_API fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s);
 

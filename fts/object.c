@@ -957,7 +957,7 @@ fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet)
 fts_symbol_t 
 fts_object_get_class_name(fts_object_t *obj)
 {
-  return fts_get_class_name(obj->head.cl);
+  return fts_class_get_name(obj->head.cl);
 }
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */

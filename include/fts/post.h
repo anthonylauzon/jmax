@@ -22,9 +22,8 @@
 
 /* definition file for logging functions (post and co) */
 
-FTS_API void post_vector(int n, float *fp);
-FTS_API void post_symbol(fts_symbol_t sym);
 FTS_API void post_atoms(int ac, const fts_atom_t *at);
+
 FTS_API void post(const char *format , ...); 
 
 FTS_API void post_error(fts_object_t *obj, const char *format , ...); 

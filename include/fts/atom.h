@@ -32,20 +32,20 @@
 /*
  * Definition of type ids and predefined values
  *
- * The type id of an atom is a pointer to a metaclass. The lower bit of the
- * pointer is used to separate primitive types from object types.
+ * The type id of an atom is a "hacked" pointer to a metaclass. The lower bit 
+ * of the pointer is used to separate primitive types from object types.
  *
  */
 
 /**
- * Get the type of the atom
+ * Get the class of the atom
  * 
- * @fn fts_metaclass_t *fts_get_type( const fts_atom_t *p)
+ * @fn fts_metaclass_t *fts_get_class( const fts_atom_t *p)
  * @param p pointer to the atom
  * @return the type of the atom as a fts_metaclass_t *
  * @ingroup atom
  */
-#define fts_get_type(p) ((fts_metaclass_t *)UINT_TO_POINTER(POINTER_TO_UINT((p)->typeid) & ~1))
+#define fts_get_class(p) ((fts_metaclass_t *)UINT_TO_POINTER(POINTER_TO_UINT((p)->typeid) & ~1))
 
 /**
  * Get the selector associated with the type of the atom.
@@ -56,7 +56,9 @@
  * @return the selector
  * @ingroup atom
  */
-#define fts_get_selector(p) fts_metaclass_get_selector( fts_get_type(p))
+#define fts_get_selector(p) fts_metaclass_get_selector( fts_get_class(p))
+
+#define fts_is_a(p,c) ((p)->typeid == (c))
 
 /* 
  * Primitive types
@@ -140,7 +142,7 @@ FTS_API fts_metaclass_t *fts_t_connection;
  * @param v the value
  * @ingroup atom
  */
-#define fts_set_object(p, v) ((p)->typeid = fts_object_get_metaclass(v), fts_word_set_object( &(p)->value, (v)))
+#define fts_set_object(p, v) ((p)->typeid = fts_object_get_metaclass((fts_object_t *)(v)), fts_word_set_object( &(p)->value, (fts_object_t *)(v)))
 
 /**
  * Set the pointer value
@@ -399,8 +401,6 @@ FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
  * Not documented
  */
 FTS_API void fprintf_atoms( FILE *f, int ac, const fts_atom_t *at);
-
-FTS_API const char *fts_atom_get_printable_typeid( const fts_atom_t *p);
 
 /* An initializer for empty atoms */
 #define FTS_NULL { 0, {0}}
