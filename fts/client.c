@@ -58,6 +58,10 @@
 #include <ftsprivate/client.h>
 #include <ftsprivate/protocol.h>
 
+#ifdef WIN32
+#include <direct.h> /* Win32 _chdir() */
+#endif
+
 fts_class_t *fts_client_class;
 
 static fts_symbol_t s_package_loaded;
@@ -766,7 +770,12 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
 
   strcpy( dir_name, file_name);
   fts_dirname( dir_name);
-  chdir( dir_name);
+
+#ifdef WIN32
+  _chdir(dir_name);
+#else
+  chdir(dir_name);
+#endif
 
   if (fts_bmax_file_load( file_name, parent, 0, 0, (fts_object_t **)&patcher) != fts_ok)
   {
