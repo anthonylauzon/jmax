@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.27 $ IRCAM $Date: 1998/06/04 14:01:18 $
+ *      $Revision: 1.29 $ IRCAM $Date: 1998/06/04 16:16:04 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -272,7 +272,7 @@ fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
      changed the object definition, for persistent fixes !!
      */
 
-  if (! obj->argv)
+ if ((fts_object_is_patcher(obj) && (! fts_patcher_is_standard((fts_patcher_t *)obj))) || (! obj->argv))
     fts_object_set_description(obj, aoc, aot);
 
 #ifdef DO_EXPRESSIONS
