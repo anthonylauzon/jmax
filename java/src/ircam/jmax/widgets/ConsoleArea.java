@@ -384,7 +384,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
     while( lineToPaint < lastLineToPaint)
       {
-	g.drawString( buffer[(lineToPaint + first) % rows], 0, y);
+	g.drawString( buffer[(lineToPaint + first) % rows], 2, y);
 
 	y += lineHeight;
 
