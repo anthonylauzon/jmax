@@ -74,7 +74,7 @@ typedef struct _scoob_
  */
 
 int  scoob_declare_property(fts_symbol_t name, fts_symbol_t type);
-int  scoob_property_get_index(scoob_t *this, fts_symbol_t name);
+int  scoob_property_get_index(fts_symbol_t name);
 
 /* general */
 void scoob_property_get(scoob_t *this, fts_symbol_t name, fts_atom_t *p);

@@ -81,16 +81,55 @@ scoob_get_type_from_atom(const fts_atom_t *at)
  *
  */
 
+/**
+* Method to get or set property.
+ */
+static void
+scoob_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  scoob_t *self = (scoob_t *)o;
+  
+  if(ac > 0)
+    scoob_property_set(self, s, at);
+  else
+    scoob_property_get(self, s, fts_get_return_value());
+}
+
 int
-scoob_property_get_index(scoob_t *self, fts_symbol_t name)
+scoob_declare_property(fts_symbol_t name, fts_symbol_t type)
+{
+  fts_atom_t k, a;
+  
+  fts_class_instantiate(scoob_class);
+  if(!fts_class_get_method_varargs(scoob_class, name))
+  {
+    fts_set_symbol(&k, name);
+    fts_set_int(&a, scoob_n_properties);
+    
+    fts_hashtable_put(&scoob_property_indices, &k, &a);
+    
+    scoob_properties[scoob_n_properties].name = name;
+    scoob_properties[scoob_n_properties].type = type;
+    
+    fts_class_message_varargs(scoob_class, name, scoob_property);
+    
+    return scoob_n_properties++;
+  }
+  else
+    return -1;
+  
+}
+
+int
+scoob_property_get_index(fts_symbol_t name)
 {
   fts_atom_t k, a;
 
   fts_set_symbol(&k, name);
   if(fts_hashtable_get(&scoob_property_indices, &k, &a))
-      return fts_get_int(&a);
+    return fts_get_int(&a);
   else
-      return -1;
+    return -1;
 }
 
 void
@@ -130,45 +169,6 @@ scoob_property_set(scoob_t *self, fts_symbol_t name, const fts_atom_t *value)
   }
 
   return 0;
-}
-
-
-/**
- * Method to get or set property.
- */
-static void
-scoob_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  scoob_t *self = (scoob_t *)o;
-
-  if(ac > 0)
-    scoob_property_set(self, s, at);
-  else
-    scoob_property_get(self, s, fts_get_return_value());
-}
-
-int
-scoob_declare_property(fts_symbol_t name, fts_symbol_t type)
-{
-  fts_atom_t k, a;
-
-  fts_class_instantiate(scoob_class);
-  if(!fts_class_get_method_varargs(scoob_class, name))
-  {
-    fts_set_symbol(&k, name);
-    fts_set_int(&a, scoob_n_properties);
-
-    fts_hashtable_put(&scoob_property_indices, &k, &a);
-
-    scoob_properties[scoob_n_properties].name = name;
-    scoob_properties[scoob_n_properties].type = type;
-    
-    fts_class_message_varargs(scoob_class, name, scoob_property);
-
-    return scoob_n_properties++;
-  }
-  else
-      return -1;
 }
 
 static void 

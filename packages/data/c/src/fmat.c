@@ -119,7 +119,7 @@ fmat_set_size(fmat_t *mat, int m, int n)
     if(mat->values == NULL)
       mat->values = (float *)fts_malloc(n * (m + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
     else
-      mat->values = (float *)fts_realloc((mat->values - HEAD_POINTS), n * (m + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+      mat->values = (float *)fts_realloc((mat->values - n * HEAD_POINTS), n * (m + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
   
     mat->values += n * HEAD_POINTS;
     mat->alloc = size;
