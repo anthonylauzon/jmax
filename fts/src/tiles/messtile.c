@@ -232,15 +232,16 @@ fts_mess_client_load_patcher_dpat(int ac, const fts_atom_t *av)
 
 	  patcher = fts_load_dotpat_patcher(parent, filename);
 
-	  if (id != FTS_NO_ID)
-	    fts_object_set_id(patcher, id);
-
 	  if (patcher == 0)
 	    {
 	      post("Cannot read .pat file %s\n", fts_symbol_name(filename));
 	      return;
 	    }
+
+	  if (id != FTS_NO_ID)
+	    fts_object_set_id(patcher, id);
 	}
+
       else
 	post_mess("System Error in FOS message LOAD PATCHER DPAT: null patcher", ac, av);
 
