@@ -790,12 +790,20 @@ static void
 _track_get_markers (fts_object_t *o, int winlet, fts_symbol_t s, 
                     int ac, const fts_atom_t *at)
 {
-  track_t    *markers = track_get_or_make_markers((track_t *) o);
-  fts_atom_t  ret;
+    fts_atom_t  ret;
 
-  fts_set_object(&ret, markers);
+    if (!track_is_marker((track_t *) o))
+    {
+	track_t *markers = track_get_or_make_markers((track_t *) o);
 
-  fts_return(&ret);
+	fts_set_object(&ret, markers);
+    }
+    else
+    {   /* a track that is already a marker track returns itself */
+	fts_set_object(&ret, o);
+    }
+
+    fts_return(&ret);
 }
 
 
