@@ -27,7 +27,7 @@ fts_type_t message_table_type = 0;
  */
 
 void
-message_init(message_t *mess, fts_symbol_t s, int ac, fts_atom_t *at)
+message_init(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mess->s = s;
 
@@ -65,7 +65,7 @@ message_clear(message_t *mess)
 
 /* clear and init */
 void
-message_set(message_t *mess, fts_symbol_t s, int ac, fts_atom_t *at)
+message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int i;
 

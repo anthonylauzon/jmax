@@ -68,9 +68,9 @@ messtab_init_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 	      fts_atom_t *aat = fts_atom_array_get_ptr(aa);
 	      
 	      if(fts_is_symbol(aat))
-		message_set(mess, fts_get_symbol(aat), aac - 1, (fts_atom_t *)(aat + 1));
+		message_set(mess, fts_get_symbol(aat), aac - 1, aat + 1);
 	      else
-		message_set(mess, fts_s_list, aac, (fts_atom_t *)aat);
+		message_set(mess, fts_s_list, aac, aat);
 	    }
 	}
     }
@@ -168,6 +168,20 @@ messtab_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  message_t *mess = &message_table_get_element(this->tab, i);
 	  message_clear(mess);
 	}
+    }
+}
+
+static void
+messtab_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messtab_t *this = (messtab_t *)o;
+
+  if(ac && fts_is_number(at))
+    {
+      int size = fts_get_number_int(at);
+
+      if(size >= 0)
+	message_table_set_size(this->tab, size);
     }
 }
 
@@ -275,14 +289,16 @@ messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), messtab_import);
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), messtab_export);
 
-      fts_method_define_varargs(cl, 0, fts_s_set, messtab_set);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), messtab_clear);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("size"), messtab_set_size);
     }
   else
     return &fts_CannotInstantiate;
   
   fts_method_define_varargs(cl, 0, fts_s_int, messtab_index);
   fts_method_define_varargs(cl, 0, fts_s_float, messtab_index);
+
+  fts_method_define_varargs(cl, 0, fts_s_set, messtab_set);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), messtab_clear);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), messtab_assist); 
 

@@ -29,12 +29,8 @@
 #ifndef _FTS_DTDFIFO_H_
 #define _FTS_DTDFIFO_H_
 
-typedef enum { FIFO_LEFT, FIFO_RIGHT} dtdfifo_side_t;
-#define OTHER_SIDE(S) (((S)==FIFO_LEFT) ? FIFO_RIGHT : FIFO_LEFT)
-
 typedef struct {
   volatile int used[2];
-  volatile int eof;
   volatile int read_index;
   volatile int write_index;
   int buffer_size;
@@ -61,8 +57,8 @@ typedef struct {
 #define dtdfifo_is_eof(F) ((F)->eof)
 #define dtdfifo_set_eof(F,E) ((F)->eof = (E))
 
-#define dtdfifo_is_used(F,W) ((F)->used[W])
-#define dtdfifo_set_used(F,W,U) ((F)->used[W] = (U))
+#define dtdfifo_is_used(F,S) ((F)->used[S])
+#define dtdfifo_set_used(F,S,U) ((F)->used[S] = (U))
 
 
 /*
@@ -71,8 +67,7 @@ typedef struct {
 
 extern int dtdfifo_get_number_of_fifos( void);
 
-extern int dtdfifo_allocate( dtdfifo_side_t side);
-extern void dtdfifo_deallocate( dtdfifo_side_t side, int id);
+extern int dtdfifo_allocate( int side);
 
 extern int dtdfifo_new( int id, const char *dirname, int buffer_size);
 extern void dtdfifo_delete( int id);

@@ -139,22 +139,26 @@ static void
 seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
-  double now = fts_get_time_in_msecs();    
 
-  if(!this->event)
+  if(!fts_alarm_is_armed(&this->alarm))
     {
-      seqplay_locate(o, 0, 0, 0, 0);
-
-      if(this->event)
-	fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_lock, 0, 0);
-      else
-	return;
+      double now = fts_get_time_in_msecs();    
+      
+      if(!this->event)
+	{
+	  seqplay_locate(o, 0, 0, 0, 0);
+	  
+	  if(this->event)
+	    fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_lock, 0, 0);
+	  else
+	    return;
+	}
+      
+      this->start_time = now;
+      
+      fts_alarm_set_time(&this->alarm, now + event_get_time(this->event) - this->start_location);
+      fts_alarm_arm(&this->alarm);
     }
-
-  this->start_time = now;
-  
-  fts_alarm_set_time(&this->alarm, now + event_get_time(this->event) - this->start_location);
-  fts_alarm_arm(&this->alarm);
 }
 
 static void 
@@ -197,7 +201,8 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  this->start_time = fts_get_time_in_msecs();
 	  this->start_location = time;
 
-	  /*if(fts_alam_arm*/
+	  if(fts_alarm_is_armed(&this->alarm))
+	    fts_alarm_set_time(&this->alarm, fts_get_time_in_msecs() + event_get_time(this->event) - time);
 	}
       else
 	seqplay_stop(o, 0, 0, 0, 0);

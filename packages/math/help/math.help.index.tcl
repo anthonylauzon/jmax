@@ -1,23 +1,23 @@
-helpPatch v+ $dir/arithmetic.help.jmax
-helpPatch v- $dir/arithmetic.help.jmax
-helpPatch v* $dir/arithmetic.help.jmax
-helpPatch v/ $dir/arithmetic.help.jmax
-helpPatch v-+ $dir/arithmetic.help.jmax
-helpPatch v/* $dir/arithmetic.help.jmax
+helpPatch m+ $dir/arithmetic.help.jmax
+helpPatch m- $dir/arithmetic.help.jmax
+helpPatch m* $dir/arithmetic.help.jmax
+helpPatch m/ $dir/arithmetic.help.jmax
+helpPatch m-+ $dir/arithmetic.help.jmax
+helpPatch m/* $dir/arithmetic.help.jmax
 
-helpPatch v<= $dir/comparison.help.jmax
-helpPatch v== $dir/comparison.help.jmax
-helpPatch v> $dir/comparison.help.jmax
-helpPatch v>= $dir/comparison.help.jmax
-helpPatch v!= $dir/comparison.help.jmax
-helpPatch v< $dir/comparison.help.jmax
+helpPatch m<= $dir/comparison.help.jmax
+helpPatch m== $dir/comparison.help.jmax
+helpPatch m> $dir/comparison.help.jmax
+helpPatch m>= $dir/comparison.help.jmax
+helpPatch m!= $dir/comparison.help.jmax
+helpPatch m< $dir/comparison.help.jmax
 
-#helpPatch v|| $dir/boolean.help.jmax
-#helpPatch v&& $dir/boolean.help.jmax
+#helpPatch m|| $dir/boolean.help.jmax
+#helpPatch m&& $dir/boolean.help.jmax
 
-#helpPatch v| $dir/logic.help.jmax
-#helpPatch v& $dir/logic.help.jmax
+#helpPatch m| $dir/logic.help.jmax
+#helpPatch m& $dir/logic.help.jmax
 
-#helpPatch v<< $dir/shift.help.jmax
-#helpPatch v>> $dir/shift.help.jmax
+#helpPatch m<< $dir/shift.help.jmax
+#helpPatch m>> $dir/shift.help.jmax
 

@@ -40,4 +40,7 @@
 
 #define DTD_BASE_DIR "/tmp/ftsdtd"
 
+#define FTS_SIDE 0
+#define DTD_SIDE 1
+
 #endif

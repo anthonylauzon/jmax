@@ -127,11 +127,11 @@ binop_fvec_set_result(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
 /**************************************************************************************
  *
- *  float_vector (o) number
+ *  fvec x number
  *
  */
 
-/* float_vector (o) number arithmetics */
+/* fvec x number arithmetics */
 
 static void
 binop_fvec_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -259,7 +259,7 @@ binop_fvec_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
 }
 
-/* float_vector (o) number comparison */
+/* float_vector x number comparison */
 
 static void
 binop_fvec_ee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -387,7 +387,7 @@ binop_fvec_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
 }
 
-/* float_vector (o) number min/max */
+/* float_vector x number min/max */
 
 static void
 binop_fvec_min_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -433,13 +433,12 @@ binop_fvec_max_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
 /**************************************************************************************
  *
- *  fvec (o) fvec
+ *  fvec x fvec
  *
  */
 
-/* fvec (o) fvec arithmetics */
-
-static void
+/* fvec x fvec arithmetics */
+void
 binop_fvec_add_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   binop_fvec_t *this = (binop_fvec_t *)o;
@@ -571,7 +570,7 @@ binop_fvec_vid_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
 }
 
-/* fvec (o) fvec comparison  */
+/* fvec x fvec comparison  */
 
 static void
 binop_fvec_ee_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -705,7 +704,7 @@ binop_fvec_le_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
 }
 
-/* fvec (o) fvec min/max */
+/* fvec x fvec min/max */
 
 static void
 binop_fvec_min_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -753,6 +752,312 @@ binop_fvec_max_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 /**************************************************************************************
  *
+ *  number x fvec
+ *
+ */
+
+/* number x fvec arithmetics */
+
+static void
+binop_fvec_number_add_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left + right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_sub_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left - right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_mul_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left * right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_div_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left / right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_bus_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, right - left);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_vid_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, right / left);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+/* float_vector x number comparison */
+
+static void
+binop_fvec_number_ee_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left == right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_ne_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left != right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_gt_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left > right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_ge_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left >= right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_lt_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left < right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_le_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, left <= right);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+/* float_vector x number min/max */
+
+static void
+binop_fvec_number_min_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+      
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, (right <= left)? right: left);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+static void
+binop_fvec_number_max_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  binop_fvec_t *this = (binop_fvec_t *)o;
+  float left = fts_get_number_float(at);
+  float_vector_t *vec = this->right;
+  float_vector_t *res = this->res;
+  int left_size = float_vector_get_size(vec);
+  int res_size = float_vector_get_size(res);
+  int size = (left_size <= res_size)? left_size: res_size;
+  int i;
+      
+  for(i=0; i<size; i++)
+    {
+      float right = float_vector_get_element(vec, i);
+      float_vector_set_element(res, i, (right >= left)? right: left);
+    }
+
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->out);
+}
+
+/**************************************************************************************
+ *
  *  class
  *
  */
@@ -769,98 +1074,154 @@ binop_fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_add_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_add_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_add_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_add_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_add_fvec);
+	}
     }
   else if(name == math_sym_sub)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_sub_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_sub_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_sub_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_sub_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_sub_fvec);
+	}
     }
   else if(name == math_sym_mul)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_mul_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_mul_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_mul_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_mul_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_mul_fvec);
+	}
     }
   else if(name == math_sym_div)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_div_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_div_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_div_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_div_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_div_fvec);
+	}
     }
   else if(name == math_sym_bus)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_bus_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_bus_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_bus_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_bus_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_bus_fvec);
+	}
     }
   else if(name == math_sym_vid)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_vid_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_vid_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_vid_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_vid_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_vid_fvec);
+	}
     }
   else if(name == math_sym_ee)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ee_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ee_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ee_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_ee_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ee_fvec);
+	}
     }
   else if(name == math_sym_ne)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ne_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ne_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ne_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_ee_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ee_fvec);
+	}
     }
   else if(name == math_sym_gt)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_gt_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_gt_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_gt_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_gt_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_gt_fvec);
+	}
     }
   else if(name == math_sym_ge)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ge_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ge_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_ge_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_ge_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_ge_fvec);
+	}
     }
   else if(name == math_sym_lt)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_lt_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_lt_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_lt_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_lt_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_lt_fvec);
+	}
     }
   else if(name == math_sym_le)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_le_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_le_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_le_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_le_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_le_fvec);
+	}
     }
   else if(name == math_sym_min)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_min_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_min_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_min_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_min_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_min_fvec);
+	}
     }
   else if(name == math_sym_max)
     {
       if(fts_is_number(at + 1))
 	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_max_number);
       else
-	fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_max_fvec);
+	{
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, binop_fvec_max_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_float, binop_fvec_number_max_fvec);
+	  fts_method_define_varargs(cl, 0, fts_s_int, binop_fvec_number_max_fvec);
+	}
     }
   
   if(fts_is_number(at + 1))

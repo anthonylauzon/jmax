@@ -181,42 +181,25 @@ static void dtdserver_send_command( const char *command)
 }
 #endif
 
-int dtdserver_new( const char *dirname, int buffer_size)
+void dtdserver_new( int id, const char *dirname, int buffer_size)
 {
   char buffer[1024];
-  int id;
-
-  id = dtdfifo_new( 0, dirname, buffer_size);
 
   sprintf( buffer, "new %d %s %d", id, dirname, buffer_size);
   dtdserver_send_command( buffer);
-  
-  return id;
 }
 
-int dtdserver_open( const char *filename, const char *path, int n_channels)
+void dtdserver_open( int id, const char *filename, const char *path, int n_channels)
 {
   char buffer[1024];
-  int id;
-
-  id = dtdfifo_allocate( FIFO_RIGHT);
-
-  fprintf( stderr, "%d\n", id);
-
-  if (id < 0)
-    return -1;
 
   sprintf( buffer, "open %d %s %s %d", id, filename, path, n_channels);
   dtdserver_send_command( buffer);
-
-  return id;
 }
 
 void dtdserver_close( int id)
 {
   char buffer[128];
-
-  dtdfifo_deallocate( FIFO_RIGHT, id);
 
   sprintf( buffer, "close %d", id);
   dtdserver_send_command( buffer);

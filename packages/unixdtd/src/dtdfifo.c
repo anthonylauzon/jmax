@@ -133,16 +133,21 @@ int dtdfifo_get_number_of_fifos( void)
   return n;
 }
 
-int dtdfifo_allocate( dtdfifo_side_t side)
+int dtdfifo_allocate( int side)
 {
   int id;
 
   for ( id = 0; id < table_size; id++)
     {
       if ( table[id].fifo 
-	   && ! dtdfifo_is_used( table[id].fifo, side)
-	   && ! dtdfifo_is_used( table[id].fifo, OTHER_SIDE( side)))
+	   && ! dtdfifo_is_used( table[id].fifo, 0)
+	   && ! dtdfifo_is_used( table[id].fifo, 1))
 	{
+	  dtdfifo_set_read_index( table[id].fifo, 0);
+	  dtdfifo_set_write_index( table[id].fifo, 0);
+
+	  fprintf( stderr, "allocate: fifo %d DTD %d FTS %d\n", id, dtdfifo_is_used(table[id].fifo, DTD_SIDE), dtdfifo_is_used(table[id].fifo, FTS_SIDE));
+
 	  dtdfifo_set_used( table[id].fifo, side, 1);
 
 	  return id;
@@ -150,11 +155,6 @@ int dtdfifo_allocate( dtdfifo_side_t side)
     }
 
   return -1;
-}
-
-void dtdfifo_deallocate( dtdfifo_side_t side, int id)
-{
-  dtdfifo_set_used( table[id].fifo, side, 0);
 }
 
 /* ********************************************************************** */
@@ -228,9 +228,8 @@ int dtdfifo_new( int id, const char *dirname, int buffer_size)
   close(fd);
 
   fifo->buffer_size = buffer_size;
-  fifo->used[ FIFO_LEFT] = 0;
-  fifo->used[ FIFO_RIGHT] = 0;
-  fifo->eof = 0;
+  fifo->used[ 0] = 0;
+  fifo->used[ 1] = 0;
   fifo->read_index = 0;
   fifo->write_index = 0;
 

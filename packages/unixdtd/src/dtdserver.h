@@ -34,8 +34,8 @@
 extern void dtdserver_init( void);
 extern void dtdserver_exit( void);
 
-extern int dtdserver_new( const char *dirname, int buffer_size);
-extern int dtdserver_open( const char *filename, const char *path, int n_channels);
+extern void dtdserver_new( int id, const char *dirname, int buffer_size);
+extern void dtdserver_open( int id, const char *filename, const char *path, int n_channels);
 extern void dtdserver_close( int id);
 extern void dtdserver_delete( int id);
 

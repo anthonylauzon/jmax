@@ -73,23 +73,34 @@ static fts_symbol_t readsf_dsp_function;
 
 static void readsf_open_realize( readsf_t *this, const char *filename)
 {
-  this->id = dtdserver_open( filename, fts_symbol_name(fts_get_search_path()), this->n_channels);
+  int id;
 
-  if ( this->id < 0)
+  id = dtdfifo_allocate( FTS_SIDE);
+
+  if (id < 0)
     {
       post( "readsf~: error: cannot allocate fifo for DTD server\n");
       return;
     }
 
+  this->id = id;
   this->fifo = dtdfifo_get( this->id);
+
+  dtdserver_open( id, filename, fts_symbol_name(fts_get_search_path()), this->n_channels);
 
   this->state = readsf_opened;
 }
 
 static void readsf_close_realize( readsf_t *this)
 {
+  fprintf( stderr, "FTS close: fifo %d DTD %d FTS %d\n", this->id, dtdfifo_is_used(this->fifo, DTD_SIDE), dtdfifo_is_used(this->fifo, FTS_SIDE));
+
   if (this->id >= 0)
-    dtdserver_close( this->id);
+    {
+      dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
+
+      dtdserver_close( this->id);
+    }
 
   this->id = -1;
   this->fifo = 0;
@@ -210,7 +221,13 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   while ( dtdfifo_get_number_of_fifos() < (int) (ceil( X * number_of_dtdobjs)) )
     {
-      dtdserver_new( DTD_BASE_DIR, BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float));
+      int id, buffer_size;
+
+      buffer_size = BLOCK_FRAMES * BLOCK_MAX_CHANNELS * BLOCKS_PER_FIFO * sizeof( float);
+
+      id = dtdfifo_new( 0, DTD_BASE_DIR, buffer_size);
+
+      dtdserver_new( id, DTD_BASE_DIR, buffer_size);
     }
 
   this->state = readsf_closed;
@@ -302,6 +319,8 @@ static void readsf_dsp( fts_word_t *argv)
     else
       {
 	read_fifo( n, n_channels, this->fifo, outputs);
+
+	fprintf( stderr, "FTS: pending->playing fifo %d DTD %d FTS %d\n", this->id, dtdfifo_is_used( this->fifo, DTD_SIDE), dtdfifo_is_used( this->fifo, FTS_SIDE));
 	this->state = readsf_playing;
       }
     break;
@@ -313,12 +332,17 @@ static void readsf_dsp( fts_word_t *argv)
       }
     else
       {
-	if ( dtdfifo_is_eof( this->fifo))
+	if ( !dtdfifo_is_used( this->fifo, DTD_SIDE))
 	  {
+	    /* end of file */
 	    fts_alarm_set_delay( &this->eof_alarm, 0.01f);
 	    fts_alarm_arm( &this->eof_alarm);
 
-	    readsf_close_realize( this);
+	    dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
+
+	    this->id = -1;
+	    this->fifo = 0;
+	    this->state = readsf_closed;
 	  }
 	else if ( this->can_post_data_late)
 	  {
@@ -329,6 +353,8 @@ static void readsf_dsp( fts_word_t *argv)
 	    fts_alarm_set_delay( &this->post_data_late_alarm, 200.0f);
 	    fts_alarm_arm( &this->post_data_late_alarm);
 	  }
+
+	clear_outputs( n, n_channels, outputs);
       }
   }
 }
@@ -439,6 +465,8 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 /* ********************************************************************** */
 /* ********************************************************************** */
 
+#if 0
+
 typedef enum { 
   writesf_closed, 
   writesf_opened, 
@@ -458,6 +486,7 @@ typedef struct {
 } writesf_t;
 
 static fts_symbol_t writesf_dsp_function;
+
 
 static void writesf_open_realize( writesf_t *this, const char *filename)
 {
@@ -786,6 +815,7 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
   return fts_Success;
 }
 
+#endif
 /* ********************************************************************** */
 /* ********************************************************************** */
 /*                                                                        */
@@ -797,7 +827,9 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
 void dtdobjs_init( void)
 {
   fts_metaclass_install(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
+#if 0
   fts_metaclass_install(fts_new_symbol("writesf~"), writesf_instantiate, fts_first_arg_equiv);
+#endif
 
   s_open = fts_new_symbol( "open");
   s_close = fts_new_symbol( "close");

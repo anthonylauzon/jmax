@@ -30,9 +30,11 @@ sequence.c \
 track.c \
 event.c \
 seqmidi.c \
-seqplay.c \
 eventtrk.c \
 intevt.c \
 noteevt.c \
 messevt.c \
 floatevt.c \
+seqplay.c \
+seqplode.c \
+

@@ -104,7 +104,7 @@ typedef struct {
 /* One read block for all */
 static short read_block[BLOCK_FRAMES*BLOCK_MAX_CHANNELS];
 
-#define N 256
+#define N 2048
 
 static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, int n_frames, int n_channels)
 {
@@ -150,12 +150,14 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
 	}
     }
 
+  dtdfifo_incr_write_index( fifo, size * sizeof( float));
+
   if (n_read < n_frames)
     {
-      dtdfifo_set_eof( fifo, 1);
-    }
+      fprintf( stderr, "DTD EOF: fifo ? DTD %d FTS %d\n", dtdfifo_is_used( fifo, DTD_SIDE), dtdfifo_is_used(fifo, FTS_SIDE));
 
-  dtdfifo_incr_write_index( fifo, size * sizeof( float));
+      dtdfifo_set_used( fifo, DTD_SIDE, 0);
+    }
 
   return n_read;
 }
@@ -329,6 +331,8 @@ static void dtd_open( const char *line)
   char filename[N], path[N];
   dtdhandle_t *handle;
 
+  fprintf( stderr, "line=%s\n", line);
+
   sscanf( line, "%*s%d%s%s%d", &id, filename, path, &n_channels);
 
   fifo = dtdfifo_get( id);
@@ -341,7 +345,9 @@ static void dtd_open( const char *line)
 
   handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
   
-  dtdfifo_set_used( fifo, FIFO_LEFT, 1);
+  fprintf( stderr, "DTD open: fifo %d DTD %d FTS %d\n", id, dtdfifo_is_used( fifo, DTD_SIDE), dtdfifo_is_used(fifo, FTS_SIDE));
+
+  dtdfifo_set_used( fifo, DTD_SIDE, 1);
 
   /* This should not happen */
   if ( handle->file != AF_NULL_FILEHANDLE)
@@ -375,17 +381,15 @@ static void dtd_close( const char *line)
   sscanf( line, "%*s%d", &id);
 
   fifo = dtdfifo_get( id);
-  handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
 
-  /*
-   * A "close" command is send by FTS when it releases the fifo.
-   * It will not reallocate the fifo as long as it is marked
-   * as used, so we can safely reinitialize it here.
-   */
-  dtdfifo_set_eof( fifo, 0);
-  dtdfifo_set_read_index( fifo, 0);
-  dtdfifo_set_write_index( fifo, 0);
-  dtdfifo_set_used( fifo, FIFO_LEFT, 0);
+  fprintf( stderr, "DTD close: fifo %d DTD %d FTS %d\n", id, dtdfifo_is_used(fifo, DTD_SIDE), dtdfifo_is_used(fifo, FTS_SIDE));
+
+  if ( !dtdfifo_is_used( fifo, DTD_SIDE) )
+    return;
+
+  dtdfifo_set_used( fifo, DTD_SIDE, 0);
+
+  handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
 
   if ( handle->file != AF_NULL_FILEHANDLE)
     {
@@ -455,9 +459,8 @@ static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
   handle = (dtdhandle_t *)user_data;
 
   if ( handle->file != AF_NULL_FILEHANDLE 
-       && dtdfifo_is_used( fifo, FIFO_LEFT) 
-       && dtdfifo_is_used( fifo, FIFO_RIGHT)
-       && !dtdfifo_is_eof( fifo))
+       && dtdfifo_is_used( fifo, 0) 
+       && dtdfifo_is_used( fifo, 1) )
     {
       int n_channels, block_size;
 
@@ -474,9 +477,6 @@ static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 	  ret = dtd_read_block( handle->file, fifo, read_block, BLOCK_FRAMES, n_channels);
 
 	  DTD_DEBUG( __debug("filled %d samples in fifo %d", ret, id));
-
-	  if (dtdfifo_is_eof( fifo))
-	    DTD_DEBUG( __debug("EOF on fifo %d", id));
 	}
       else
 	{

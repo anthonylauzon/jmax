@@ -27,9 +27,9 @@ typedef struct
  *
  */
 
-extern void message_init(message_t *mess, fts_symbol_t s, int ac, fts_atom_t *at);
+extern void message_init(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void message_clear(message_t *mess);
-extern void message_set(message_t *mess, fts_symbol_t s, int ac, fts_atom_t *at);
+extern void message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void message_move(message_t *from, message_t *to);
 
 
@@ -64,3 +64,4 @@ extern int message_table_file_import_ascii(message_table_t *mt, fts_symbol_t fil
 extern int message_table_file_export_ascii(message_table_t *mt, fts_symbol_t file_name);
 
 #endif
+
