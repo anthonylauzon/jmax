@@ -8,6 +8,7 @@ ircam		all		examples
 ircam		all		fts
 ircam		all		images
 ircam		all		java
+ircam		all		lib
 ircam		all		packages
 ircam		all		tcl
 ircam		all		tests
@@ -21,22 +22,12 @@ free		all		examples
 free		all		fts
 free		all		images
 free		all		java
+free		all		lib
 free		all		packages
 free		all		tcl
 free		all		tests
 free		sgi		LICENSE
 free		linuxpc		LICENSE
-src		all		Makefile
-src		all		INSTALL.sh
-src		all 		README
-src		all		VERSION
-src		all		config
-src		all		doc
-src		all		fts
-src		all		images
-src		all		java
-src		all		packages
-src		all		tcl
 additive	all		packages/data
 additive	all		packages/additive
 
