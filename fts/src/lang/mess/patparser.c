@@ -986,6 +986,9 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
       fts_set_int( &a, 1);
       fts_object_put_prop( parent, fts_new_symbol( "no_upload"), &a);
 
+      x1 = -x1;
+      y1 = -y1;
+
       return;
     }
 
