@@ -7,8 +7,6 @@ IntervalMapper.java \
 AmbitusValueDataFlavor.java \
 AnythingAdapter.java \
 ChannelMapper.java \
-CombDrawer.java \
-CombListener.java \
 DoubleMapper.java \
 DurationMapper.java \
 FloatAdapter.java \
@@ -22,8 +20,6 @@ IntegerAdapter.java \
 IntegerMapper.java \
 IntegerValueDataFlavor.java \
 LabelsMapper.java \
-LineDrawer.java \
-LineListener.java \
 Mapper.java \
 MappingListener.java \
 MessageAdapter.java \
