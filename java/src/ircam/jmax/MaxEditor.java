@@ -59,7 +59,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     // the ResId mechanism is substituted by  the MaxDataType getTypes() call.
     // The installation of MaxDataTypes is dynamic (it's the execution of the 
     // resources.erm tcl script)
-
+     
     for(Enumeration e = MaxDataType.getTypes().elements(); e.hasMoreElements();) {
       final MaxDataType aDataType = (MaxDataType) e.nextElement();
       aMenuItem = new MenuItem(aDataType.getName());
@@ -71,6 +71,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
 	}
 
     return newFileMenu;
+
   }
   
   private Menu CreateFileMenu() {
@@ -119,6 +120,10 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     return windowsMenu;
   }
 
+  public String GetTitle() {
+    return getTitle();
+  }
+  
   private void AddWindowItems(Menu theWindowMenu){
     ErmesSketchWindow aSketchWindow;
     ErmesSketchWindow aSubWindow;
@@ -149,7 +154,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
      if(aWindow!=this){
-       theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetDocument().GetTitle()));
+       theWindowMenu.add(aMenuItem = new MenuItem(aWindow.GetTitle()));
        aMenuItem.addActionListener(this);
      }
     }
@@ -299,7 +304,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     MaxWindow aWindow; 
     for (int i=0; i< MaxApplication.itsEditorsFrameList.size(); i++) {
       aWindow = (MaxWindow)MaxApplication.itsEditorsFrameList.elementAt(i);
-      if(aWindow.GetDocument().GetTitle().equals(theName)) return true;
+      if(aWindow.GetTitle().equals(theName)) return true;
     }
     return false;
   } 
@@ -332,48 +337,52 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
   }
 
  public boolean FileMenuAction(MenuItem theMenuItem, String theString) {
-    if (theString.equals("Open... Ctrl+O")) {
+   
+   if (theString.equals("Open... Ctrl+O")) {
       Open();
     }
-    else if (theString.equals("Save Ctrl+S")) {
-      GetDocument().Save();
-    }
-    else if (theString.equals("Save As...")) {
-      GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this, "Save As ", GetDocument().GetFile()));
-      GetDocument().Save();
-    }
-    else if (theString.equals("Close   Ctrl+W")) {
-      // MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
-      Close();
-    }
-    else if (theString.equals("Print... Ctrl+P")) {
-      Print();
-    }
+   else if (theString.equals("Save Ctrl+S")) {
+     GetDocument().Save();
+     
+   }
+   else if (theString.equals("Save As...")) {
+     GetDocument().SetFile(MaxFileChooser.chooseFileToSave(this, "Save As ", GetDocument().GetFile()));
+     Save();
+   }
+   else if (theString.equals("Close   Ctrl+W")) {
+     // MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
+     Close();
+   }
+   else if (theString.equals("Print... Ctrl+P")) {
+     Print();
+   }
     else if (theString.equals("Quit    Ctrl+Q")) { 
       MaxApplication.Quit();
     }
-    else if (theString.equals("Open with Autorouting")) {
-      MaxApplication.doAutorouting = !MaxApplication.doAutorouting;
-    }
-    else if (theString.equals("System statistics...")) {
-      StatisticsDialog aDialog = new StatisticsDialog(this);
-      aDialog.setLocation(100, 100);
-      aDialog.setVisible(true);
-    }
-    return true;
-  }
+   else if (theString.equals("Open with Autorouting")) {
+     MaxApplication.doAutorouting = !MaxApplication.doAutorouting;
+   }
+   else if (theString.equals("System statistics...")) {
+     StatisticsDialog aDialog = new StatisticsDialog(this);
+     aDialog.setLocation(100, 100);
+     aDialog.setVisible(true);
+   }
+   return true;
+ }
   
   public void Print(){}
 
 
+  public boolean Save(){return true;}//override this function if you want to save your content
+  public boolean ShouldSave(){return false;}//override this function if your data changed
   public boolean Close(){
-    if(!GetDocument().GetSaveFlag()){
+    if(ShouldSave()){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
       aDialog.setLocation(300, 300);
       aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
-	GetDocument().Save();
+	Save();
       }
       aDialog.dispose();
     }
@@ -428,7 +437,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     }
     for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
       aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-      if(aWindow.GetDocument().GetTitle().equals(theName)) {
+      if(aWindow.GetTitle().equals(theName)) {
 	aWindow.ToFront();
 	return;
       }
@@ -504,7 +513,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
       else if(aInt == 79) Open();//o
       else if(aInt == 80) Print();//p
       else if(aInt == 81) MaxApplication.Quit(); //q
-      else if(aInt == 83) GetDocument().Save();//s
+      else if(aInt == 83) Save();//s
       else if(aInt == 87) Close();//w 
       //MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);//w
     }

@@ -9,20 +9,24 @@ import ircam.jmax.fts.*;
  */
 public class ErmesPatcherFactory implements MaxDataEditorFactory {
   /**
-   * creates a new instance of patcher editor satrting from the MaxData to edit
+   * creates a new instance of patcher editor starting from the MaxData to edit
    */
   public MaxDataEditor newEditor(MaxData theData) {
-    ErmesSketchWindow aSketchWindow = MaxApplication.NewPatcherWindow((FtsContainerObject)theData.getContent());
+    ErmesSketchWindow aSketchWindow = new ErmesSketchWindow(theData);
+    //ErmesSketchWindow aSketchWindow = new ErmesSketchWindow((FtsContainerObject)theData.getContent());
 
-    // This stuff have to move to the constructor
     MaxApplication.itsSketchWindowList.addElement(aSketchWindow);
+    if (theData.getName() != null) aSketchWindow.setTitle(theData.getName());
+    else { //data has no name (did you do a "new"?)
+    }
     MaxApplication.AddThisWindowToMenus(aSketchWindow);
-    // aSketchWindow.itsDocument.SetFile(file);
-    aSketchWindow.setTitle(theData.getName());
 
     return aSketchWindow;
   }
 }
+
+
+
 
 
 

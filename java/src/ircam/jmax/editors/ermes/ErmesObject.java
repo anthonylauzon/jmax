@@ -75,6 +75,9 @@ public class ErmesObject implements FtsPropertyHandler {
 
   /*abstract */Dimension getPreferredSize() {return new Dimension(0,0);};
   
+  final ErmesSketchWindow GetSketchWindow() {
+  return (ErmesSketchWindow)(itsSketchPad.itsSketchWindow);
+  }
   //
   public void propertyChanged(FtsObject obj, String name, Object value) {
     //the ipothesys is that value is of the correct type...
@@ -255,7 +258,7 @@ public class ErmesObject implements FtsPropertyHandler {
     currentRect = new Rectangle(x, y, d.width, d.height);
     Reshape(itsX, itsY, d.width, d.height);
     
-    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsDocument.itsPatcher;
+    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsPatcher;
     makeFtsObject();
     if (itsFtsObject == null) return false;
     else update(itsFtsObject);
@@ -300,7 +303,7 @@ public class ErmesObject implements FtsPropertyHandler {
 
     itsFtsObject = theFtsObject;
     update(itsFtsObject);
-    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsDocument.itsPatcher;
+    itsFtsPatcher = GetSketchWindow().itsPatcher;
     return true;
   }
   
@@ -333,10 +336,6 @@ public class ErmesObject implements FtsPropertyHandler {
     return itsSketchPad;
   }
 	
-  public Frame GetSketchWindow() {
-    return itsSketchPad.GetSketchWindow();
-  }
-
   public int GetX(){
     return itsX;
   }

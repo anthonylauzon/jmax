@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+import java.text.*;//DateFormat...
 
 
 import tcl.lang.*;
@@ -37,7 +38,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor {
   ErmesSketchWindow itsTopWindow = null;
   static String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
   ErmesSwVarEdit itsVarEdit;//created when we need a variable editor (abstractions)!
-
+  public FtsContainerObject itsPatcher;
   private Menu itsJustificationMenu;
   private Menu itsResizeObjectMenu;
   private Menu itsAlignObjectMenu;
@@ -58,7 +59,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor {
   boolean itsChangingRunEditMode = false;
   public Vector itsSubWindowList;
   Vector itsWindowMenuList;
-
+  public boolean alreadySaved =true;
+  boolean neverSaved =true;
+  public File itsFile;
+  //public String itsTitle;
+  public MaxData itsData;
+  static int untitledCounter = 1;
 
   public boolean CustomMenuActionPerformed(MenuItem theMenuItem, String itemName){
 
@@ -103,6 +109,74 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor {
    * is null, means usually that all the data is changed
    */
   public void dataChanged(Object reason){}
+
+  //end of the MaxDataEditor interface
+
+
+  //----------alternative contructors:
+  /**
+   * constructor from a MaxData-only (to be used for top-level patchers)
+   */
+  public ErmesSketchWindow(MaxData theData) {
+    super();
+    if (theData.getName()==null) setTitle(GetNewUntitledName());
+    else setTitle(theData.getName());
+    itsData = theData;
+    itsPatcher = (FtsContainerObject)(theData.getContent());
+    CommonInitializations();
+    isSubPatcher = false;
+    //setTitle(theData.getName());
+  }
+  /**
+   * constructor from a MaxData AND a ftsContainer AND a father window (subpatchers editors)
+   */
+  public ErmesSketchWindow (MaxData theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
+    super(theData.getName());
+    itsPatcher = theFtsPatcher;
+    itsData = theData;
+    CommonInitializations();
+    isSubPatcher = true;
+    itsTopWindow = theTopWindow;
+  }
+   
+  /**
+   *utility function, used to avoid to replicate code in the two contructors
+   */
+  void CommonInitializations() {
+    
+    itsSketchPad.setFont(new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));						// communicate with
+    Init(); //MaxEditor base class init (standard menu handling)
+    //isSubPatcher = false;
+    isAbstraction = false;
+    //itsTopWindow = null;
+    itsSketchPad.SetToolBar(itsToolBar);	// inform the Sketch of the ToolBar to 
+    itsSubWindowList = new Vector();
+    itsWindowMenuList = new Vector();
+
+      
+    //itsDocument = new ErmesPatcherDoc(this);
+    InitSketchWin();
+    validate();
+    //*-
+    //    itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow, false);
+    //itsSketchWindow.Init();
+    itsPatcher.open();
+    //repaint();
+    MaxApplication.itsWindow = this;
+    InitFromContainer(itsPatcher);
+    //InitFromDocument(aPatcherDoc);
+    inAnApplet = false;
+    //aPatcherDoc.SetWindow(itsSketchWindow);
+    setVisible(true);
+  }
+
+  public static String GetNewUntitledName() {
+    return "untitled"+(untitledCounter++);
+  }
+
+  public void ToSave(){
+    alreadySaved = false;
+  }
 
     //--------------------------------------------------------
     //	CONSTRUCTOR
@@ -153,6 +227,30 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting();//???
       validate();
       itsSketchPad.InitFromDocument(itsDocument);
+      itsSketchPad.repaint();//force a repaint to build an offGraphics context
+      validate();
+    }
+
+    public void InitFromContainer(FtsContainerObject patcher) {
+		
+      Object aObject;
+      int x, y, width, height;
+
+
+      x = ((Integer) patcher.get("win.pos.x")).intValue();
+      y = ((Integer) patcher.get("win.pos.y")).intValue();
+      width  = ((Integer) patcher.get("win.size.w")).intValue();
+      height = ((Integer) patcher.get("win.size.h")).intValue();
+
+      //get the window dimension use it for: reshape to the right dimensions
+
+      setBounds(x, y, width, height+80);
+
+      //assigning the right name to the window.
+
+      if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting();//???
+      validate();
+      itsSketchPad.InitFromFtsContainer(patcher);
       itsSketchPad.repaint();//force a repaint to build an offGraphics context
       validate();
     }
@@ -459,7 +557,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       else if(aInt == 79) MaxApplication.GetConsoleWindow()/*itsProjectWindow*/.Open();//o
       else if(aInt == 80) MaxApplication.ObeyCommand(MaxApplication.PRINT_WINDOW);//p
       else if(aInt == 81) MaxApplication.Quit(); //q
-      else if(aInt == 83)itsDocument.Save();//s
+      else if(aInt == 83)Save();//s
       else if(aInt == 87) {//w
 	if (isSubPatcher){
 	  setVisible(false);
@@ -559,14 +657,14 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   public boolean Close(){
     itsClosing = true;
 
-    if (!isSubPatcher) itsDocument.itsPatcher.close();
-    if(!GetDocument().GetSaveFlag()){
+    if (!isSubPatcher) itsPatcher.close();
+    if(!alreadySaved){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this);
       aDialog.setLocation(300, 300);
       aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return false;
       if(aDialog.GetToSaveFlag()){
-	if(!GetDocument().Save()) return false;
+	return Save();
       }
       aDialog.dispose();
     }
@@ -583,11 +681,62 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
     MaxApplication.RemoveThisWindowFromMenus(this);
     MaxApplication.itsSketchWindowList.removeElement(this);
-    itsDocument.itsPatcher.delete();
-    itsDocument.DelWindow();
+    itsPatcher.delete();
+    //itsDocument.DelWindow();
     itsClosing = false;
     setVisible(false);
     dispose();
+    return true;
+  }
+
+  public boolean ShouldSave() {
+    return !alreadySaved;
+  }
+
+  public boolean Save() {
+    // first, tentative implementation:
+    // the FILE is constructed now, and the ErmesSketchPad SaveTo method is invoked.
+    // we should RECEIVE this FILE, or contruct it when we load this document
+    FileOutputStream fs;
+    String oldTitle = getTitle();
+		
+    if (itsFile == null)
+      itsFile = MaxFileChooser.chooseFileToSave(this, "Save Patcher");
+
+    if (itsFile == null)
+      return false;
+    
+    setTitle(itsFile.getName());
+
+    CreateFtsGraphics(this);
+
+    // This code is temporary, just to test the MDA
+    // save architecture; real code will substitute
+    // the whole thing.
+
+    try
+      {
+	FtsPatchData data = new FtsPatchData();
+	data.setContent(itsPatcher);
+	data.setDataSource(MaxDataSource.makeDataSource(itsFile));
+	data.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
+	data.setName(itsFile.getName());
+	data.save();
+      }
+    catch (MaxDataException e)
+      {
+	System.out.println("ERROR " + e + " while saving " + itsFile);
+	e.printStackTrace(); // temporary, MDC
+	return false;
+      }
+
+    alreadySaved = true;
+    neverSaved = false;
+    
+    //if(!oldTitle.equals(itsTitle)){
+    MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
+    //setTitle(itsTitle);
+    //}
     return true;
   }
 
@@ -852,7 +1001,43 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   public Dimension getPreferredSize() {
       return preferredsize;
   }
+  public void CreateFtsGraphics(ErmesSketchWindow theSketchWindow)
+  {
+    //create the graphic descriptions for the FtsObjects, before saving them
+    ErmesObject aErmesObject = null;
+    FtsObject aFObject = null;
+    Rectangle aRect = theSketchWindow.getBounds();
+    String ermesInfo = new String();
+    
+    itsPatcher.put("win.pos.x", aRect.x);
+    itsPatcher.put("win.pos.y", aRect.y);
+    itsPatcher.put("win.size.w", aRect.width);
+    itsPatcher.put("win.size.h", aRect.height);
 
+    for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
+      aErmesObject = (ErmesObject) e.nextElement();
+      aFObject = aErmesObject.itsFtsObject;
+           
+      // Set geometrical properties
+      
+      aFObject.put("pos.x", aErmesObject.itsX);
+      aFObject.put("pos.y", aErmesObject.itsY);
+      aFObject.put("pos.w", aErmesObject.currentRect.width);
+      aFObject.put("pos.h", aErmesObject.currentRect.height);
+
+      // Set the font properties
+
+      if (! aErmesObject.itsFont.getName().equals(aErmesObject.itsSketchPad.sketchFont.getName()))
+	aFObject.put("font", aErmesObject.itsFont.getName());
+
+      if (aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize())
+	aFObject.put("fontSize", aErmesObject.itsFont.getSize());
+
+      if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjExternal &&
+	  ((ErmesObjExternal)aErmesObject).itsSubWindow != null)
+	CreateFtsGraphics(((ErmesObjExternal)aErmesObject).itsSubWindow); //recursive call
+    }
+  }
 }
 
 

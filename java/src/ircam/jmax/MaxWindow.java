@@ -9,6 +9,7 @@ import java.awt.*;
  */
 public interface MaxWindow {
   public abstract MaxDocument GetDocument();
+  public abstract String GetTitle();
   public abstract Frame GetFrame();
   public abstract void InitFromDocument(MaxDocument theDocument);
   public abstract void ToFront();

@@ -49,7 +49,7 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.editStatus = itsSketchPad.EDITING_COMMENT;
     itsSketchPad.GetTextArea().setVisible(true);
     itsSketchPad.GetTextArea().requestFocus();
-    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsDocument.itsPatcher;
+    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsPatcher;
     return true;
   }
 

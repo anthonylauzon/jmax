@@ -39,7 +39,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     itsArgs = theString;			
     if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
     else super.Init(theSketchPad, x, y, theString); //OK, we have the args
-    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsDocument.itsPatcher;
+    itsFtsPatcher = GetSketchWindow().itsPatcher;
     return true;
   }
   
@@ -147,8 +147,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	     itsSketchPad.itsFirstClick = true;
 	   }
 	   else{	//this 'else' shouldn't be reached...
-	     itsSubWindow = MaxApplication.NewSubPatcherWindow( (FtsContainerObject) itsFtsObject);
-	     ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
+	     itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	     GetSketchWindow().AddToSubWindowList(itsSubWindow);
 	   }
 	   return true;
 	 }
@@ -169,7 +169,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
     ////////////////////////????????????????????????????????????
     if((iAmPatcher)&&(itsSubWindow != null)){
-      ((ErmesPatcherDoc)itsSubWindow.GetDocument()).CreateFtsGraphics(itsSubWindow);
+      GetSketchWindow().CreateFtsGraphics(itsSubWindow);
       itsSubWindow.dispose();
       itsSubWindow = null;
     }

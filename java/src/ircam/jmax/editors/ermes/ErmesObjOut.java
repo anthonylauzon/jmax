@@ -26,9 +26,11 @@ class ErmesObjOut extends ErmesObject {
     Dimension d = getPreferredSize();
 
 
+    Integer aInteger = ((Integer)theFtsObject.get("size.h"));
     currentRect = new Rectangle(((Integer)theFtsObject.get("pos.x")).intValue(),
 				((Integer)theFtsObject.get("pos.y")).intValue(),
 				((Integer)theFtsObject.get("size.w")).intValue(),
+				(aInteger == null)?preferredSize.height:
 				((Integer)theFtsObject.get("size.h")).intValue());
 
     itsId = ((FtsOutletObject) theFtsObject).getPosition();

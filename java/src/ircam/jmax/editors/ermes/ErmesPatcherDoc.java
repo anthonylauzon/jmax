@@ -62,10 +62,14 @@ public class ErmesPatcherDoc implements MaxDocument {
   }
 
   public ErmesPatcherDoc(ErmesSketchWindow theSketchWindow) {
-    itsTitle  = "untitled" + (untitledCounter++);
+    itsTitle  = getNewUntitledName();
     itsDocumentType = "patcher";
     itsSketchWindow = theSketchWindow;
     itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
+  }
+
+  public static String getNewUntitledName() {
+    return "untitled"+(untitledCounter++);
   }
 
   FtsContainerObject GetFtsPatcher() {

@@ -680,6 +680,50 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
   }
 	
+  public void InitFromFtsContainer(FtsContainerObject theContainerObject){
+	
+    FtsContainerObject aFtsPatcher = theContainerObject;
+    // chiama tanti AddObject...
+    Vector objectVector = aFtsPatcher.getObjects();	//usefull?
+    
+    FtsObject	fo;
+    FtsConnection fc;
+    ErmesObject aObject;
+    for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
+      fo = (FtsObject)e.nextElement();
+      // Note that the representation is now found from the fts className,
+      // made unique; the new file format will allow for specifing
+      // additional information, like a non default graphic representation
+      // the code will need a small change here
+
+      String objectName = itsHelper.SearchFtsName(fo.getClassName());
+      aObject = itsHelper.AddObject(objectName, fo);
+    
+      if (objectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
+	itsPatcherElements.addElement(aObject);
+
+      if (aObject != null) fo.setRepresentation(aObject);
+    }
+		
+    // chiama tanti AddConnection...
+    Vector connectionVector = aFtsPatcher.getConnections();	//usefull?
+    ErmesObject fromObj, toObj;
+    ErmesConnection aConnection = null;
+    
+    for (Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();) {
+      fc = (FtsConnection)e2.nextElement();
+
+      // MDC: this test has been added to allow loading patches with errors
+      // in connections, so the debug can be done :->
+
+      if (fc.checkConsistency()){
+	fromObj = (ErmesObject) fc.getFrom().getRepresentation();
+	toObj = (ErmesObject) fc.getTo().getRepresentation();
+	aConnection = itsHelper.AddConnection(fromObj, toObj, fc.getFromOutlet(), fc.getToInlet(), fc);
+      }
+    }
+  }
+
   //--------------------------------------------------------
   //	InletConnect
   //--------------------------------------------------------
@@ -928,6 +972,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     int x = e.getX();
     int y = e.getY();
     
+    //(opt.) resetting the "firstclick" flag if safer but heavy 
+    //(a repaint foreach mouseup...)
+    //itsFirstClick = true;
     if(itsScrolled) itsScrolled=false;
 
     if (itsRunMode) {
@@ -1310,7 +1357,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   void PrepareInChoice() {
     if (itsInChoice != null) return; //it's OK, we did it already
     
-    int temp = ((ErmesSketchWindow)itsSketchWindow).itsDocument.itsPatcher.getNumberOfInlets();
+    int temp = ((ErmesSketchWindow)itsSketchWindow).itsPatcher.getNumberOfInlets();
     itsInChoice = new ErmesObjInOutChoice();
     for (int i=0; i<temp; i++) {
       itsInChoice.addItem(Integer.toString(i+1));
@@ -1323,7 +1370,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   void PrepareOutChoice() {
     if (itsOutChoice != null) return; //it's OK, we did it already
     
-    int temp = ((ErmesSketchWindow)itsSketchWindow).itsDocument.itsPatcher.getNumberOfOutlets();
+    int temp = ((ErmesSketchWindow)itsSketchWindow).itsPatcher.getNumberOfOutlets();
     itsOutChoice = new ErmesObjInOutChoice();
     for (int i=0; i<temp; i++) {
       itsOutChoice.addItem(Integer.toString(i+1));
@@ -1541,11 +1588,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   public void ToSave(){
     ErmesSketchWindow aSketchWindow = (ErmesSketchWindow)itsSketchWindow;
+
     if(aSketchWindow.isSubPatcher){
       if(aSketchWindow.itsTopWindow!=null) 
 	aSketchWindow.itsTopWindow.itsSketchPad.ToSave();
     }
-    else aSketchWindow.GetDocument().ToSave();
+    else aSketchWindow.ToSave();
   }
 
 

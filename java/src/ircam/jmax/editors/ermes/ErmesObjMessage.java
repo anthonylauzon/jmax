@@ -31,7 +31,7 @@ class ErmesObjMessage extends ErmesObjEditableObject {
     itsArgs = theString;			
     if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
     else super.Init(theSketchPad, x, y, theString);//OK, we have the args
-    itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsDocument.itsPatcher;
+    itsFtsPatcher = GetSketchWindow().itsPatcher;
     return true;
   }
 

@@ -23,11 +23,14 @@ class ErmesObjIn extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     Dimension d = getPreferredSize();
 
+    // warning.. it seems that when the height is 0, 
+    // the value is null, instead of new Integer(0)
+    Integer aInteger = ((Integer)theFtsObject.get("size.h"));
     currentRect = new Rectangle(((Integer)theFtsObject.get("pos.x")).intValue(),
 				((Integer)theFtsObject.get("pos.y")).intValue(),
 				((Integer)theFtsObject.get("size.w")).intValue(),
+				(aInteger == null)?preferredSize.height:
 				((Integer)theFtsObject.get("size.h")).intValue());
-
 
     itsId = ((FtsInletObject) theFtsObject).getPosition();
 

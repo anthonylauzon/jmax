@@ -327,17 +327,17 @@ public class MaxApplication extends Object{
     for(int i=0;i<itsSketchWindowList.size();i++){
       aSketchWindow = (ErmesSketchWindow)itsSketchWindowList.elementAt(i);
       if(aSketchWindow != theWindow) 
-	aSketchWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
+	aSketchWindow.RemoveWindowFromMenu(theWindow.GetTitle());
     }
     for(int i=0;i<itsEditorsFrameList.size();i++){
       aWindow = (MaxWindow)itsEditorsFrameList.elementAt(i);
       if(aWindow != theWindow)
-	aWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
+	aWindow.RemoveWindowFromMenu(theWindow.GetTitle());
     }
     //#itsProjectWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
 
     if (itsConsoleWindow != null)
-      itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetDocument().GetTitle());
+      itsConsoleWindow.RemoveWindowFromMenu(theWindow.GetTitle());
   }
   
   public static void ChangeWinNameMenus(String theOldName, String theNewName){
@@ -357,8 +357,8 @@ public class MaxApplication extends Object{
       itsConsoleWindow.ChangeWinNameMenu(theOldName, theNewName);
   }
   
-
-  public static ErmesSketchWindow NewPatcherWindow(FtsContainerObject theFtsPatcher) {
+  //static utility function (patcher creations)
+  /*public static ErmesSketchWindow NewPatcherWindow(FtsContainerObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow, false);
@@ -373,7 +373,8 @@ public class MaxApplication extends Object{
     aPatcherDoc.SetWindow(itsSketchWindow);
     itsSketchWindow.setVisible(true);
     return itsSketchWindow;
-  }
+  }*/
+
 
 
   public static ErmesSketchWindow NewSubPatcherWindow(FtsContainerObject theFtsPatcher) {
@@ -609,7 +610,7 @@ public class MaxApplication extends Object{
     }
 
     //the version number as a system property
-    jmaxProperties.put("jmaxVersion", " version 2.1 beta");
+    jmaxProperties.put("jmaxVersion", " version 2.1.0 beta");
 
     itsHookTable = new MaxWhenHookTable(); 
 
