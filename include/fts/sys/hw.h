@@ -29,12 +29,66 @@
 
 /* generic include with the prototypes of HW dependent functions. */
 
+
+/*
+  Function: fts_dl_open
+  Description:
+   loads a dynamic library
+  Arguments: 
+   filename: the name of the library. This file will be searched using
+   platform specific search algorithm.
+   error: a string in which a description of the error will be stored
+   in case of error.
+  Returns: a "handle" to be used for further invocation of fts_dl_lookup
+  0 if an error occured.
+*/
 extern void *fts_dl_open( const char *filename, char *error);
+
+/*
+  Function: fts_dl_lookup
+  Description:
+   lookup the specified symbol in symbol table, returning the address
+   of this symbol
+  Arguments: 
+   handle: a handle returned by fts_dl_open
+   symbol: the symbol name
+   address: a pointer to a pointer: the address of the symbol
+   will be stored here upon return, if the function does not
+   return an error.
+   error: a string in which a description of the error will be stored
+   in case of error.
+  Returns: 1 if symbol is found, 0 if not
+*/
 extern int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error);
 
+/*
+   Function: fts_enable_fpe_traps
+   Description:
+     enables fpe traps.
+     After calling this function, division by zero, overflow and invalid operand
+     should cause a trap and a call to the FTS standard trap handler (fts_fpe_handler)
+     that will signal a runtime error. fts_fpe_handler is defined in mess/fpe.c
+
+     This function usually set various bits in the floating-point unit control
+     register.
+   Arguments: none
+   Returns: none
+*/
 extern void fts_enable_fpe_traps( void);
-extern unsigned int fts_check_fpe( void);
+
+/*
+   Function: fts_disable_fpe_traps
+   Description:
+     disables fpe traps.
+     After calling this function, no more traps will be triggered by floating-point
+     exceptions.
+     This function usually set various bits in the floating-point unit control
+     register.
+   Arguments: none
+   Returns: none
+*/
 extern void fts_disable_fpe_traps( void);
+
 /* 
  * Bit masks returned with fts_check_fpe;
  */
@@ -45,15 +99,36 @@ extern void fts_disable_fpe_traps( void);
 #define FTS_UNDERFLOW_FPE 0x10
 #define FTS_DENORMALIZED_FPE 0x20
 
-extern int fts_memory_is_locked( void);
-extern int fts_lock_memory( void);
-extern void fts_unlock_memory( void);
+/*
+   Function: fts_check_fpe
+   Description:
+     returns a flag describing which floating-point exceptions
+     occured since the last call.
+     This function usually polls the status bits of the floating-point
+     unit status register.
+   Arguments: none
+   Returns: one of (0, FTS_INVALID_FPE, FTS_DIVIDE0_FPE, FTS_OVERFLOW_FPE, 
+   FTS_INEXACT_FPE, FTS_UNDERFLOW_FPE)
+*/
+extern unsigned int fts_check_fpe( void);
 
+
+/*
+   Function: fts_unlock_memory
+   Description:
+    unlocks memory (enable swapping of FTS process)
+   Arguments: none
+   Returns: 1 if memory has been unlocked, 0 if not
+*/
+extern int fts_unlock_memory( void);
+
+/*
+  Function: fts_platform_init
+  Description:
+   performs platform specific initializations
+  Arguments: none
+  Returns: none
+*/
 extern void fts_platform_init( int argc, char **argv);
-
-extern void fts_real_time_on( void);
-extern void fts_real_time_off( void);
-
-extern void fts_pause( void);
 
 #endif
