@@ -54,7 +54,6 @@ public class FtsPatcherObject extends FtsObject
     super(fts, parent, "jpatcher", variableName, description, objId);
   }
 
-
   /**
    * Redefine a patcher without looosing its content.
    */

@@ -313,6 +313,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     itsPatcherData  = thePatcherData;
     fts = itsPatcherData.getFts();
     itsPatcher      = thePatcherData.getContainerObject(); // ???
+
     itsDocument     = itsPatcher.getDocument();
 
     // Initialize state

@@ -33,7 +33,6 @@ import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 
-
 /**
  * Class implementing the proxy of an FTS object.
  * It deals with: Object creation/deletion, connections
@@ -43,6 +42,15 @@ import ircam.jmax.mda.*;
 
 public class FtsObject 
 {
+    static final public int systemInlet = -1;
+
+    private static Hashtable creators = new Hashtable();
+
+    static public void registerFtsObjectCreator(String nameclass, FtsObjectCreator creator)
+    {
+	creators.put(nameclass, creator);
+    }
+
   /******************************************************************************/
   /*                                                                            */
   /*              STATIC FUNCTION                                               */
@@ -86,6 +94,7 @@ public class FtsObject
       }
     else
       {
+
 	className = stream.getNextSymbolArgument();
 	
 	/* Note that we do the unparsing relative to ':' and variables
@@ -128,18 +137,28 @@ public class FtsObject
 	  obj =  new FtsClipboard(fts, parent, className, "__clipboard", objId);
 	else
 	  {
-	    if (doVariable)
-	      obj = new FtsObject(fts, parent, className, variable,
-				  variable + " : " + FtsParse.unparseObjectDescription(className, stream), objId);
-	    else
-	      obj = new FtsObject(fts, parent, className, variable,
-				  FtsParse.unparseObjectDescription(className, stream), objId);
-	  }
-      }
+	     Object ctr = creators.get(className);
 
+	     if(ctr!=null)
+		 {
+		     obj = ((FtsObjectCreator)ctr).createInstance(fts, parent, className, objId);
+		 }
+	     else
+		 {
+		     if (doVariable)
+			 obj = new FtsObject(fts, parent, className, variable,
+					     variable + " : " + FtsParse.unparseObjectDescription(className, stream),
+					     objId);
+		     else
+			 obj = new FtsObject(fts, parent, className, variable,
+					     FtsParse.unparseObjectDescription(className, stream), objId);
+		 }
+	  }
+	     
+      }
     if (data != null)
       data.addObject(obj);
-
+    
     return obj;
   }
 
@@ -812,11 +831,11 @@ public class FtsObject
 	  {
 	    Class parameterTypes[] = new Class[1];
 	    parameterTypes[0] = ftsAtomArrayClass;
-
+	    	    
 	    Method method = getClass().getMethod( selector, parameterTypes);
 
 	    Object[] methodArgs = new Object[1];
-	    methodArgs[0] = stream.getArgs();;
+	    methodArgs[0] = stream.getArgs();
 
 	    method.invoke( this, methodArgs);
 	  }

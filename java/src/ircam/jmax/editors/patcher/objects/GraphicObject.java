@@ -1000,7 +1000,7 @@ abstract public class GraphicObject implements DisplayObject
 
   public void dispose()
   {
-    ftsObject.setObjectListener(null);
+      ftsObject.setObjectListener(null);
   }
 
 
@@ -1111,6 +1111,10 @@ abstract public class GraphicObject implements DisplayObject
     return "GraphicObject<" + ftsObject.toString() + ">";
   }
 }
+
+
+
+
 
 
 
