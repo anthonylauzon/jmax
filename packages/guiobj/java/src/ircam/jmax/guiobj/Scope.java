@@ -26,6 +26,7 @@
 package ircam.jmax.guiobj;
 
 import java.awt.*;
+import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
 
@@ -112,4 +113,11 @@ public class Scope extends VectorDisplay
     
     g.drawLine(x, y - zero, x + size, y - zero);
   }    
+
+  public JPopupMenu getRunModePopUpMenu()
+  {
+      ScopeRunModePopUp.update(this);
+      return ScopeRunModePopUp.popup;
+  }
 }
+

@@ -35,6 +35,14 @@ import ircam.jmax.fts.*;
 
 public class FtsScopeObject extends FtsVectorDisplayObject
 {
+  public static float DEFAULT_PERIOD = (float)100.0;
+  public static float DEFAULT_THRESHOLD = (float)0.5;
+  float period    = DEFAULT_PERIOD;
+  float threshold = DEFAULT_THRESHOLD;
+  
+  public final static float THRESHOLD_AUTO = (float)0.0; 
+  public final static float THRESHOLD_OFF  = (float)1.0; 
+
   public FtsScopeObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
   {
     super(fts, parent, variable, className, nArgs, args);
@@ -47,5 +55,51 @@ public class FtsScopeObject extends FtsVectorDisplayObject
   {
     sendArgs[0].setInt(n); 
     sendMessage(FtsObject.systemInlet, "onset", 1, sendArgs);
+  }   
+  
+  public void requestSetPeriod(float period)
+  {
+    sendArgs[0].setFloat(period); 
+    sendMessage(FtsObject.systemInlet, "setPeriod", 1, sendArgs);
+  }    
+  
+  public void setPeriod(int nArgs , FtsAtom args[])
+  {      
+    period = args[0].getFloat();    
+  } 
+  
+  public float getPeriod()
+  {
+    return period;
+  }  
+  public void requestSetThreshold(float th)
+  {
+      if(th==THRESHOLD_AUTO)
+	  sendArgs[0].setString("auto"); 
+      else if(th==THRESHOLD_OFF)
+	  sendArgs[0].setString("off"); 
+      else
+	  sendArgs[0].setFloat(th);
+      
+      sendMessage(FtsObject.systemInlet, "setThreshold", 1, sendArgs);  
+  } 
+  
+  public void setThreshold(int nArgs , FtsAtom args[])
+  {      
+      if(args[0].isString())
+	  {
+	      String tType = args[0].getString();
+	      if(tType.equals("auto"))
+		  this.threshold = THRESHOLD_AUTO;
+	      else
+		  this.threshold = THRESHOLD_OFF;
+	  }
+      else
+	  this.threshold = args[0].getFloat();    
+  } 
+  
+  public float getThreshold()
+  {
+    return threshold;
   }  
 }

@@ -112,7 +112,6 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if(fts_is_number(at))
     {
       float f = fts_get_number_float(at);
-
       data->trigger = scope_threshold;
       data->threshold = f;
 
@@ -121,7 +120,6 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   else if(fts_is_symbol(at))
     {
       fts_symbol_t s = fts_get_symbol(at);
-
       if(s == sym_auto)
 	{
 	  data->trigger = scope_auto;
