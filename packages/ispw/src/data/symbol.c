@@ -73,6 +73,7 @@ void
 symbol_obj_config(void)
 {
   fts_class_install(fts_new_symbol("symbol"),symbol_obj_instantiate);
+  fts_class_alias(fts_new_symbol("s"), fts_new_symbol("symbol"));
 }
 
 /* ---------------- the metaclass instantiation function ------------------ */
@@ -108,7 +109,6 @@ symbol_obj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, 1, fts_s_int, symbol_obj_symbol_1, 1, a);
 
   /* defined outlet selector */
-
   a[0] = fts_s_symbol;
   fts_outlet_type_define(cl, 0, fts_s_symbol, 1, a);
 

@@ -70,6 +70,8 @@ fill_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
 }
 
+/* int vector */
+
 static void
 fill_ivec_by_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -104,14 +106,40 @@ fill_ivec_by_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_outlet_send(o, 0, int_vector_symbol, 1, &this->a);
 }
 
+/* float vector */
+
 static void
-fill_float_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fill_fvec_by_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  fill_t *this = (fill_t *)o;
+  float_vector_t *fvec = float_vector_atom_get(&this->a);
+  int size = float_vector_get_size(fvec);
+  int n = fts_get_number_int(at);
+  int i;
+
+  for(i=0; i<size; i++)
+    float_vector_set_element(fvec, i, n);
+  
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->a);
 }
 
 static void
-fill_matrix(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fill_fvec_by_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  fill_t *this = (fill_t *)o;
+  float_vector_t *this_fvec = float_vector_atom_get(&this->a);
+  float_vector_t *in_fvec = float_vector_atom_get(at);
+  float * restrict this_ptr = float_vector_get_ptr(this_fvec);
+  float * restrict in_ptr = float_vector_get_ptr(in_fvec);
+  int this_size = float_vector_get_size(this_fvec);
+  int in_size = float_vector_get_size(in_fvec);
+  int size = (this_size <= in_size)? this_size: in_size;
+  int i;
+
+  for(i=0; i<size; i++)
+    this_ptr[i] = in_ptr[i];
+  
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &this->a);
 }
 
 /******************************************************
@@ -145,6 +173,10 @@ fill_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	}
       else if(float_vector_atom_is(at + 1))
 	{
+	  fts_method_define_varargs(cl, 0, fts_s_int, fill_fvec_by_number);
+	  fts_method_define_varargs(cl, 0, fts_s_float, fill_fvec_by_number);
+	  fts_method_define_varargs(cl, 0, float_vector_symbol, fill_fvec_by_fvec);
+	  fts_method_define_varargs(cl, 1, float_vector_symbol, fill_set_reference);
 	}
       else if(matrix_atom_is(at + 1))
 	{

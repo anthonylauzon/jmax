@@ -126,6 +126,18 @@ setelem_set_j(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->j = fts_get_number_int(at);
 }
 
+static void
+setelem_set_ij(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  elem_t *this = (elem_t *)o;
+
+  if(ac > 1 && fts_is_number(at + 1))
+    this->j = fts_get_number_int(at + 1);
+    
+  if(ac > 0 && fts_is_number(at))
+    this->i = fts_get_number_int(at);
+}
+
 /* getelem vector */
 
 static void
@@ -221,7 +233,7 @@ getelem_int_vector_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   elem_t *this = (elem_t *)o;
 
-  if(ac > 1 && vector_atom_is(at + 1))
+  if(ac > 1 && int_vector_atom_is(at + 1))
     elem_set_reference(o, 0, 0, 1, at + 1);
 
   if(ac > 0 && fts_is_number(at))
@@ -248,7 +260,7 @@ setelem_int_vector_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   elem_t *this = (elem_t *)o;
 
-  if(ac > 2 && vector_atom_is(at + 2))
+  if(ac > 2 && int_vector_atom_is(at + 2))
     elem_set_reference(o, 0, 0, 1, at + 2);
 
   if(ac > 1 && fts_is_number(at + 1))
@@ -285,7 +297,7 @@ getelem_float_vector_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   elem_t *this = (elem_t *)o;
 
-  if(ac > 1 && vector_atom_is(at + 1))
+  if(ac > 1 && float_vector_atom_is(at + 1))
     elem_set_reference(o, 0, 0, 1, at + 1);
 
   if(ac > 0 && fts_is_number(at))
@@ -312,7 +324,7 @@ setelem_float_vector_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   elem_t *this = (elem_t *)o;
 
-  if(ac > 2 && vector_atom_is(at + 2))
+  if(ac > 2 && float_vector_atom_is(at + 2))
     elem_set_reference(o, 0, 0, 1, at + 2);
 
   if(ac > 1 && fts_is_number(at + 1))
@@ -457,8 +469,10 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  fts_method_define_varargs(cl, 0, fts_s_float, getelem_float_vector_index);
 	  fts_method_define_varargs(cl, 1, float_vector_symbol, elem_set_reference);
 	}
+      else
+	return &fts_CannotInstantiate;
     }
-  else if(ac == 4 && fts_is_number(at + 1) && fts_is_number(at + 2) &&
+  else if((ac == 2 || (ac == 4 && fts_is_number(at + 1) && fts_is_number(at + 2))) &&
 	  (matrix_atom_is(at + ac - 1)))
     {
       fts_class_init(cl, sizeof(elem_t), 3, 1, 0); 
@@ -467,7 +481,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, elem_matrix_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, elem_delete);
       
-      if(matrix_atom_is(at + 3))
+      if(matrix_atom_is(at + ac - 1))
 	{
 	  fts_method_define_varargs(cl, 0, fts_s_list, getelem_matrix_list);
 
@@ -478,6 +492,8 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  fts_method_define_varargs(cl, 1, fts_s_float, getelem_matrix_col);
 	  fts_method_define_varargs(cl, 2, matrix_symbol, elem_set_reference);
 	}
+      else
+	return &fts_CannotInstantiate;
     }
   else
     return &fts_CannotInstantiate;
@@ -535,6 +551,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, elem_matrix_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, elem_delete);
       
+      fts_method_define_varargs(cl, 1, fts_s_list, setelem_set_ij);
       fts_method_define_varargs(cl, 1, fts_s_int, setelem_set_i);
       fts_method_define_varargs(cl, 1, fts_s_float, setelem_set_i);
       fts_method_define_varargs(cl, 2, fts_s_int, setelem_set_j);

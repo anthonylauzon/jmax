@@ -24,26 +24,69 @@
 #
 
 helpPatch list $dir/list.help.jmax
+helpPatch l $dir/list.help.jmax
+
 helpPatch list+ $dir/listarith.help.jmax
+helpPatch l+ $dir/listarith.help.jmax
+
 helpPatch list- $dir/listarith.help.jmax
+helpPatch l- $dir/listarith.help.jmax
+
 helpPatch list* $dir/listarith.help.jmax
+helpPatch l* $dir/listarith.help.jmax
+
 helpPatch list/ $dir/listarith.help.jmax
+helpPatch l/ $dir/listarith.help.jmax
+
 helpPatch list== $dir/listcompare.help.jmax
+helpPatch l== $dir/listcompare.help.jmax
+
 helpPatch list!= $dir/listcompare.help.jmax
+helpPatch l!= $dir/listcompare.help.jmax
+
 helpPatch list>= $dir/listcompare.help.jmax
+helpPatch l>= $dir/listcompare.help.jmax
+
 helpPatch list> $dir/listcompare.help.jmax
+helpPatch l> $dir/listcompare.help.jmax
+
 helpPatch list<= $dir/listcompare.help.jmax
+helpPatch l<= $dir/listcompare.help.jmax
+
 helpPatch list< $dir/listcompare.help.jmax
+helpPatch l< $dir/listcompare.help.jmax
+
 helpPatch listappend $dir/listappend.help.jmax
+helpPatch lapp $dir/listappend.help.jmax
+
 helpPatch listcompose $dir/listcompose.help.jmax
+helpPatch lcomp $dir/listcompose.help.jmax
+
 helpPatch listdecompose $dir/listdecompose.help.jmax
+helpPatch ldeco $dir/listdecompose.help.jmax
+
 helpPatch listelement $dir/listelement.help.jmax
+helpPatch lelem $dir/listelement.help.jmax
+
 helpPatch listhead $dir/listhead.help.jmax
+helpPatch lhead $dir/listhead.help.jmax
+
 helpPatch listsize $dir/listsize.help.jmax
-helpPatch listsum $dir/listsum.help.jmax
+helpPatch lsize $dir/listsize.help.jmax
+
 helpPatch listprepend $dir/listprepend.help.jmax
+helpPatch lpre $dir/listprepend.help.jmax
+
 helpPatch listreverse $dir/listreverse.help.jmax
-helpPatch lists $dir/lists.overview.jmax
+helpPatch lrev $dir/listreverse.help.jmax
+
 helpPatch listsublist $dir/listsublist.help.jmax
+helpPatch lsub $dir/listsublist.help.jmax
+
+helpPatch listsum $dir/listsum.help.jmax
+helpPatch lsum $dir/listsum.help.jmax
+
 helpPatch listtail $dir/listtail.help.jmax
+helpPatch ltail $dir/listtail.help.jmax
+
 helpSummary Lists $dir/lists.summary.jmax

@@ -108,9 +108,5 @@ void
 listsublist_config(void)
 {
   fts_class_install(fts_new_symbol("listsublist"), listsublist_instantiate);
+  fts_class_alias(fts_new_symbol("lsub"), fts_new_symbol("listsublist"));
 }
-
-
-
-
-

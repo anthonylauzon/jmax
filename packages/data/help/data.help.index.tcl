@@ -1,7 +1,7 @@
 helpPatch mat $dir/mat.help.jmax
-helpPatch ivec $dir/.help.jmax
-helpPatch fvec $dir/.help.jmax
+helpPatch ivec $dir/ivec.help.jmax
+helpPatch fvec $dir/fvec.help.jmax
 helpPatch getsize $dir/getsize.help.jmax
 helpPatch getelem $dir/getelem.help.jmax
-helpPatch setlem $dir/setlem.help.jmax
+helpPatch setelem $dir/setelem.help.jmax
 helpPatch getlist $dir/getlist.help.jmax

@@ -67,6 +67,23 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
+ivec_send(fts_object_t *o, int_vector_t *vec)
+{
+  fts_atom_t a;
+  
+  int_vector_atom_set(&a, vec);
+  fts_outlet_send(o, 0, int_vector_symbol, 1, &a);  
+}
+
+static void
+ivec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+
+  ivec_send(o, this->vec);
+}
+
+static void
 ivec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int_vector_t *vec = ((ivec_t *)o)->vec;
@@ -104,20 +121,14 @@ ivec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   int_vector_t *vec = ((ivec_t *)o)->vec;
 
-  if(ac == 0)
-    {
-      int size = int_vector_get_size(vec);
-
-      fts_outlet_int(o, 0, size);
-    }
-  else if(ac == 1 && fts_is_number(at))
+  if(ac == 1 && fts_is_number(at))
     {
       int size = fts_get_number_int(at);
       
       if(size >= 0)
 	{
 	  int_vector_set_size(vec, size);
-	  fts_outlet_int(o, 0, size);
+	  ivec_send(o, vec);
 	}
     }
 }
@@ -138,7 +149,7 @@ ivec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       int size = int_vector_read_atom_file(vec, file_name);
       
       if(size >= 0)
-	fts_outlet_int(o, 0, size);
+	ivec_send(o, vec);
       else
 	post("ivec: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
@@ -241,6 +252,8 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
 
       /* user methods */
+      fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output); 
+      
       fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), ivec_clear);
       fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), ivec_fill);
       fts_method_define_varargs(cl, 0, fts_new_symbol("set"), ivec_set);
@@ -252,8 +265,8 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
-      /* size outlet */
-      fts_outlet_type_define(cl, 0, fts_s_int, 1, &fts_s_int);
+      /* type outlet */
+      fts_outlet_type_define(cl, 0, int_vector_symbol, 1, &int_vector_type);
       
       return fts_Success;
     }

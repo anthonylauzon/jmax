@@ -109,17 +109,22 @@ range_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   int i;
 
   if(v < points[0])
-    fts_outlet_send(o, 0, fts_s_int, 1, at);
+    {
+      fts_outlet_send(o, 0, fts_s_int, 1, at);
+      return;
+    }
 
-  for(i=1; i<n; i--)
+  for(i=1; i<n; i++)
     {
       if(v < points[i])
 	{
 	  fts_outlet_send(o, i, fts_s_int, 1, at);
+	  return;
+	}
     }
 
   if(v >= points[n-1])
-    fts_outlet_send(o, 0, fts_s_int, 1, at);
+    fts_outlet_send(o, n, fts_s_int, 1, at);
 }
 
 static void
@@ -131,17 +136,23 @@ range_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int n = this->n;
   int i;
 
-  if(v >= points[n-1])
-    fts_outlet_send(o, n, fts_s_float, 1, at);
-
-  for(i=n-1; i>=1; i--)
+  if(v < points[0])
     {
-      if(v >= points[i - 1] && v < points[i])
-	fts_outlet_send(o, i, fts_s_float, 1, at);
+      fts_outlet_send(o, 0, fts_s_float, 1, at);
+      return;
     }
 
-  if(v < points[0])
-    fts_outlet_send(o, 0, fts_s_float, 1, at);
+  for(i=1; i<n; i++)
+    {
+      if(v < points[i])
+	{
+	  fts_outlet_send(o, i, fts_s_float, 1, at);
+	  return;
+	}
+    }
+
+  if(v >= points[n-1])
+    fts_outlet_send(o, n, fts_s_float, 1, at);
 }
 
 static void
@@ -186,10 +197,7 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   for(i=1; i<ac; i++)
     {
       if(!fts_is_number(at + i))
-	{
-	  post("range: all arguments must be numbers\n");
-	  return &fts_CannotInstantiate;
-	}
+	return &fts_CannotInstantiate;
     }
 
   fts_class_init(cl, sizeof(range_t), n + 1, n + 1, 0);
@@ -215,5 +223,5 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 range_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("range"), range_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("range"), range_instantiate, fts_arg_type_equiv);
 }

@@ -91,4 +91,5 @@ void
 listreverse_config(void)
 {
   fts_class_install(fts_new_symbol("listreverse"), listreverse_instantiate);
+  fts_class_alias(fts_new_symbol("lrev"), fts_new_symbol("listreverse"));
 }

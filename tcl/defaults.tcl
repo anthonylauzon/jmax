@@ -29,62 +29,44 @@
 ##  
 
 ## default audio parameters
-
 set jmaxSampleRate 44100
 set jmaxAudioBuffer 2048
 
 ## set jMax client/server connection mode
-
 set jmaxConnection "udp"
 
 ## set binary execution mode for jMax server executable
-
 set jmaxMode "opt"
 
 ## set name for jMax server executable
-
 set jmaxServerName "fts"
 
 ## set port number needed for socket connection
-
 set jmaxPort 2000
 
 ## default user package path
-
 set jmaxPkgPath "[systemProperty user.home]/jmax"
 
 ## default architecture if not specified for host name
-
 set jmaxArch "linuxpc"
 
 ## default "UseIcons" value for Swing File Box
-
 set jmaxFastFileBox "false"
 
 ## default host 
-
 set jmaxHost "local"
 
 ## By default, use the jmax Console
-
 set jmaxNoConsole "false"
 
-
 ## By default, show the register panel
-
 set jmaxNoRegister "false"
 
-##
 ## Set the system packages path
-##
-
 set jmaxSysPkgPath "$jmaxRootDir/packages"
 
-##
 ## Splash screen setting
-##
-
 set jmaxSplashScreen "show"
 
-
-
+## compatibility mode
+set jmaxCompatibility "ispw"

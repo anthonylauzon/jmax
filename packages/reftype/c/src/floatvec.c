@@ -296,7 +296,7 @@ float_vector_remote_update( fts_data_t *data, int ac, const fts_atom_t *at)
   fts_client_mess_add_int(vector->size);
 
   for (i=0; i<vector->size; i++)
-    fts_client_mess_add_int((int)(vector->values[i] * 1000.0f));
+    fts_client_mess_add_int((int)(vector->values[i] * 32768.0f));
 
   fts_data_end_remote_call();
 }
@@ -531,3 +531,11 @@ void float_vector_config(void)
 
   fts_expression_declare_fun(float_vector_symbol, float_vector_function);
 }
+
+
+
+
+
+
+
+

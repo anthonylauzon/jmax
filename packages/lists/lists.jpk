@@ -35,9 +35,11 @@ package require ispw
 
 ## declare templates
 template listcompose $dir/templates/listcompose.jmax
+template lcomp $dir/templates/listcompose.jmax
+template ldeco $dir/templates/listdecompose.jmax
 template listdecompose $dir/templates/listdecompose.jmax
 
 ## load the help patch data base
 sourceFile $dir/help/lists.help.index.tcl
 
-post "package: lists (basic list handling classes)"
+post "package: lists (list classes)"

@@ -139,4 +139,7 @@ listjoin_config(void)
 {
   fts_class_install(fts_new_symbol("listappend"), listjoin_instantiate);
   fts_class_install(fts_new_symbol("listprepend"), listjoin_instantiate);
+
+  fts_class_alias(fts_new_symbol("lapp"), fts_new_symbol("listappend"));
+  fts_class_alias(fts_new_symbol("lpre"), fts_new_symbol("listprepend"));
 }

@@ -72,15 +72,20 @@ getsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
 
-  /* initialize the class */
-  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
-  
-  fts_method_define_varargs(cl, 0, vector_symbol, getsize_vector);
-  fts_method_define_varargs(cl, 0, int_vector_symbol, getsize_int_vector);
-  fts_method_define_varargs(cl, 0, float_vector_symbol, getsize_float_vector);
-  fts_method_define_varargs(cl, 0, matrix_symbol, getsize_matrix);
-
-  return fts_Success;
+  if(ac == 1)
+    {
+      /* initialize the class */
+      fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
+      
+      fts_method_define_varargs(cl, 0, vector_symbol, getsize_vector);
+      fts_method_define_varargs(cl, 0, int_vector_symbol, getsize_int_vector);
+      fts_method_define_varargs(cl, 0, float_vector_symbol, getsize_float_vector);
+      fts_method_define_varargs(cl, 0, matrix_symbol, getsize_matrix);
+      
+      return fts_Success;
+    }
+  else
+    return &fts_CannotInstantiate;
 }
 
 void

@@ -67,6 +67,23 @@ fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
+fvec_send(fts_object_t *o, float_vector_t *vec)
+{
+  fts_atom_t a;
+  
+  float_vector_atom_set(&a, vec);
+  fts_outlet_send(o, 0, float_vector_symbol, 1, &a);  
+}
+
+static void
+fvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+
+  fvec_send(o, this->vec);
+}
+
+static void
 fvec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   float_vector_t *vec = ((fvec_t *)o)->vec;
@@ -104,20 +121,14 @@ fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   float_vector_t *vec = ((fvec_t *)o)->vec;
 
-  if(ac == 0)
-    {
-      int size = float_vector_get_size(vec);
-
-      fts_outlet_int(o, 0, size);
-    }
-  else if(ac == 1 && fts_is_number(at))
+  if(ac == 1 && fts_is_number(at))
     {
       int size = fts_get_number_int(at);
       
       if(size >= 0)
 	{
 	  float_vector_set_size(vec, size);
-	  fts_outlet_int(o, 0, size);
+	  fvec_send(o, vec);
 	}
     }
 }
@@ -139,7 +150,7 @@ fvec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = float_vector_read_atom_file(vec, file_name);
       
       if(size >= 0)
-	fts_outlet_int(o, 0, size);
+	fvec_send(o, vec);
       else
 	post("fvec: can not import from text file \"%s\"\n", fts_symbol_name(file_name));
     }
@@ -203,7 +214,7 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t
 	  fts_soundfile_close(sf);
 
 	  if(size > 0)
-	    fts_outlet_int(o, 0, size);
+	    fvec_send(o, this->vec);
 	  else
 	    post("fvec: can not load from soundfile \"%s\"\n", fts_symbol_name(file_name));
 	  
@@ -323,6 +334,8 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, fvec_get_state);
 
       /* user methods */
+      fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output); 
+      
       fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), fvec_clear);
       fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), fvec_fill);
       fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fvec_set);
@@ -337,8 +350,8 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), fvec_assist); 
 
-      /* size outlet */
-      fts_outlet_type_define(cl, 0, fts_s_int, 1, &fts_s_int);
+      /* type outlet */
+      fts_outlet_type_define(cl, 0, float_vector_symbol, 1, &float_vector_type);
       
       return fts_Success;
     }

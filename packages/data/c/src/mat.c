@@ -289,7 +289,7 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   if(matrix_get_constructor(ac - 1, at + 1))
     {
-      fts_class_init(cl, sizeof(mat_t), 1, 2, 0);
+      fts_class_init(cl, sizeof(mat_t), 1, 1, 0);
   
       /* init/delete */
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mat_init);
@@ -306,6 +306,8 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), mat_assist); 
       
       /* user methods */
+      fts_method_define_varargs(cl, 0, fts_s_bang, mat_output); 
+      
       fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), mat_clear);
       fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), mat_fill);      
       fts_method_define_varargs(cl, 0, fts_new_symbol("set"), mat_set);
@@ -315,7 +317,8 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), mat_import); 
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), mat_export); 
 
-      fts_method_define_varargs(cl, 0, fts_s_bang, mat_output); 
+      /* type outlet */
+      fts_outlet_type_define(cl, 0, matrix_symbol, 1, &matrix_type);
       
       return fts_Success;
     }
