@@ -205,3 +205,10 @@ void dtdserver_close( int id)
   dtdserver_send_command( buffer);
 }
 
+void dtdserver_quit( void)
+{
+  char buffer[128];
+
+  sprintf( buffer, "quit");
+  dtdserver_send_command( buffer);
+}

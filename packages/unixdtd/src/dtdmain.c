@@ -442,6 +442,8 @@ static void dtd_process_command( const char *line)
     dtd_new( line);
   else if ( !strcmp( "delete", command))
     dtd_delete( line);
+  else if ( !strcmp( "quit", command))
+    exit( 0);
 }
 
 static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)

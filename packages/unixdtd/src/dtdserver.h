@@ -32,7 +32,7 @@
 #include "dtdfifo.h"
 
 extern void dtdserver_init( void);
-extern void dtdserver_exit( void);
+extern void dtdserver_quit( void);
 
 extern void dtdserver_new( int id, const char *dirname, int buffer_size);
 extern void dtdserver_open( int id, const char *filename, const char *path, int n_channels);
