@@ -1,4 +1,0 @@
-#!/bin/sh
-
-java -noasyncgc -mx64m -ms2m -classpath .:/usr/java/lib/rt.jar:/usr/local/max/java/classes/jmax.jar:/usr/local/max/java/lib/jacl1.0/jacl.jar:/usr/local/max/java/lib/swing-1.0.1/swingall.jar ircam.jmax.MaxApplication -root /usr/local/max $*
-

@@ -1,5 +1,0 @@
-SOURCES = \
-	MaxInstallDataHandlerCmd.java \
-	MaxInstallDataTypeCmd.java \
-	TclMdaPackage.java \
-	JMaxCmd.java

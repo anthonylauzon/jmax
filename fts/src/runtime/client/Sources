@@ -1,7 +1,0 @@
-SOURCES = client.c \
-	  incoming.c \
-	  outgoing.c \
-	  sync.c     \
-  	  updates.c
-
-

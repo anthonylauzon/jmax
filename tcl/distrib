@@ -1,6 +1,0 @@
-all	intrinsics.tcl
-all	jmaxboot.tcl
-all	jmaxpkg.tcl
-all	packages.tcl
-all	config.tcl
-all	wrappers.tcl
