@@ -30,6 +30,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <ctype.h>
 
 /***********************************************************************
  *
@@ -205,20 +206,43 @@ static fts_symbol_t want_a_space_before_symbols[] = {"+", "-", "*", "/", "%", "&
 static fts_symbol_t dont_want_a_space_before_symbols[] = {")", "[", "]", "}", ",", ";", ".", "=", 0};
 static fts_symbol_t want_a_space_after_symbols[] = { "+", "-", "*", "/", "%", ",", "&&", "&", "||", "|", "==", "=", "!=", "!", ">=", ">>", ">", "<<", "<=", "<", "?", "::", ":", "^", ";", 0 };
 static fts_symbol_t dont_want_a_space_after_symbols[] = { "(", "[", "{", "$", "'", "." , "=", 0 };
+static fts_symbol_t operators[] = { "$", ";", "+", "-", "*", "/", "(", ")", "[", "]", "{", "}", ".", "%", "<<", ">>", "&&", "||", "!", "==", "!=", ">", ">=", "<", "<=", ":", "=", 0};
+
+static void init_punctuation( void)
+{
+  int i, j;
+  fts_symbol_t *p, *tab[] = { want_a_space_before_symbols, dont_want_a_space_before_symbols, want_a_space_after_symbols, dont_want_a_space_after_symbols, operators};
+
+  for ( i = 0; i < sizeof( tab)/sizeof( fts_symbol_t *); i++)
+    for ( j = 0, p = tab[i]; *p; p++)
+      *p = fts_new_symbol( *p);
+}
 
 #define want_a_space_before(value) check_symbol_in( value, want_a_space_before_symbols)
 #define dont_want_a_space_before(value) check_symbol_in( value, dont_want_a_space_before_symbols)
 #define want_a_space_after(value) check_symbol_in( value, want_a_space_after_symbols)
 #define dont_want_a_space_after(value) check_symbol_in( value, dont_want_a_space_after_symbols)
 
-static void init_punctuation( void)
+static int needs_quote( fts_atom_t *p)
 {
-  int i, j;
-  fts_symbol_t *p, *tab[] = { want_a_space_before_symbols, dont_want_a_space_before_symbols, want_a_space_after_symbols, dont_want_a_space_after_symbols};
-
-  for ( i = 0; i < sizeof( tab)/sizeof( fts_symbol_t *); i++)
-    for ( j = 0, p = tab[i]; *p; p++)
-      *p = fts_new_symbol( *p);
+  fts_symbol_t s;
+  if (check_symbol_in( p, operators))
+    return 0;
+  else
+    {
+      s = fts_get_symbol( p);      
+      if( !isalnum( *s) )
+	return 1;
+      
+      s++;
+      while( *s != '\0')
+	{	    
+	  if( !(isalnum( *s) | ( *s == '+') | ( *s == '-')))
+	    return 1;
+	  s++;
+	}
+      return 0;
+    }    
 }
 
 void fts_spost_object_description( fts_bytestream_t *stream, fts_object_t *obj)
@@ -260,7 +284,10 @@ void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_at
       else if ( fts_is_float( value1))
 	fts_spost( stream, "%g", fts_get_float( value1));
       else if ( fts_is_symbol( value1))
-	fts_spost( stream, "%s", fts_get_symbol( value1));
+	if( needs_quote( value1))
+	  fts_spost( stream, "%c%s%c", '"', fts_get_symbol( value1), '"');
+	else
+	  fts_spost( stream, "%s", fts_get_symbol( value1));
       else
 	fts_spost( stream, "??");
 
