@@ -42,6 +42,7 @@ io_config(void)
   in_out_tilda_config();
   loopback_config();
   out_config();
+  udp_config();
 #ifndef WIN32
   udp_config();
   udpreceive_config();

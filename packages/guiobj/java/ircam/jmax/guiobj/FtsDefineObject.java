@@ -42,7 +42,7 @@ public class FtsDefineObject extends FtsGraphicObject
       FtsObject.registerMessageHandler( FtsDefineObject.class, FtsSymbol.get("expression"), new FtsMessageHandler(){
 	  public void invoke(FtsObject obj, FtsArgs args)
 	  {
-	    ((FtsDefineObject)obj).setExpression( args.getString(0));
+	    ((FtsDefineObject)obj).setExpression( args.getSymbol(0).toString());
 	  }
       });
     }
@@ -73,7 +73,7 @@ public class FtsDefineObject extends FtsGraphicObject
 
     args.clear();
     args.addRawString( expression);
-    
+
     try
       {
 	send( FtsSymbol.get("expression"), args);

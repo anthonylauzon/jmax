@@ -310,7 +310,7 @@ typedef struct
   fts_patcher_t *patcher;
   fts_array_t descr;
   fts_expression_t *expression;
-  char *string;
+  fts_symbol_t string;
   fts_status_t error;
 } define_t;
 
@@ -467,15 +467,20 @@ define_set_expression(define_t *this, int ac, const fts_atom_t *at)
 
   fts_array_set(&this->descr, ac, at);
 
-  /* set name of object */
-  fts_memorystream_reset(stream);
-  fts_spost_object_description_args((fts_bytestream_t *)stream, ac, (fts_atom_t *)at);
-  fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
+  if(ac > 0)
+  {
+    /* set name of object */
+    fts_memorystream_reset(stream);
+    fts_spost_object_description_args((fts_bytestream_t *)stream, ac, (fts_atom_t *)at);
+    fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
 
-  this->string = fts_memorystream_get_bytes(stream);
+    this->string = fts_new_symbol(fts_memorystream_get_bytes(stream));
+  }
+  else
+    this->string = fts_s_empty_string;
 
   /* set expression at client */
-  fts_set_string(&a, this->string);
+  fts_set_symbol(&a, this->string);
   fts_client_send_message((fts_object_t *)this, sym_expression, 1, &a);
 }
 
@@ -574,7 +579,7 @@ define_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if(this->string != NULL)
   {
     /* set expression at client */
-    fts_set_string(&a, this->string);
+    fts_set_symbol(&a, this->string);
     fts_client_send_message((fts_object_t *)this, sym_expression, 1, &a);
   }
 
@@ -594,7 +599,7 @@ define_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  define_t *this = (define_t *) o;
+  define_t *this = (define_t *)o;
 
   this->type = sym_const;
   this->name = fts_s_empty_string;

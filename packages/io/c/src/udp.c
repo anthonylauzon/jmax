@@ -34,13 +34,15 @@
 
 #define UDP_PACKET_SIZE 512
 
-typedef struct {
-    fts_object_t o;
-    int socket;
-    char buffer[UDP_PACKET_SIZE];
+typedef struct
+{
+  fts_bytestream_t bytestream;
+  int socket;
+  char buffer[UDP_PACKET_SIZE];
 } udp_t;
 
-static void udp_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+udp_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udp_t *this = (udp_t *)o;
   int size;
@@ -55,7 +57,8 @@ static void udp_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     }
 }
 
-static void udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udp_t *this = (udp_t *)o;
   int port = fts_get_int_arg( ac, at, 0, 0);
@@ -86,7 +89,8 @@ static void udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 }
 
-static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   udp_t *this = (udp_t *)o;
 
@@ -98,16 +102,18 @@ static void udp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     }
 }
 
-static void udp_instantiate(fts_class_t *cl)
+static void
+udp_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( udp_t), udp_init, udp_delete);
 
   fts_class_message_varargs(cl, fts_s_sched_ready, udp_receive);
 
-  fts_class_outlet( cl, 0, fts_int_class);
+  fts_class_outlet_int(cl, 0);
 }
 
-void udp_config( void)
+void
+udp_config( void)
 {
   fts_class_install( fts_new_symbol("udp"), udp_instantiate);
 }

@@ -164,7 +164,6 @@
 				F522D43603D40A07016640F1,
 				F522D43703D40A5B016640F1,
 				F522D43903D40AA7016640F1,
-				F527AE8403D3099C016640F1,
 			);
 			buildSettings = {
 				OTHER_CFLAGS = "";
@@ -217,17 +216,6 @@
 			isa = PBXBundleReference;
 			path = SDK.bundle;
 			refType = 3;
-		};
-		F527AE8403D3099C016640F1 = {
-			buildActionMask = 2147483647;
-			dstPath = ../jMaxSDK/bin;
-			dstSubfolderSpec = 16;
-			files = (
-				F558B54503D58A25016640F1,
-				F558B51503D586C7016640F1,
-			);
-			isa = PBXCopyFilesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F52946E2039E6B2001664092 = {
 			isa = PBXFileReference;
@@ -449,6 +437,7 @@
 				F53489A703D57EC0016640F1,
 				F526F3FD03EA8F47016640F1,
 				F526F3FF03EA8FA3016640F1,
+				F567FA7703FC1B4B016640F1,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -958,18 +947,6 @@
 			path = build/libftsutils.framework;
 			refType = 2;
 		};
-		F558B51503D586C7016640F1 = {
-			fileRef = F558B51303D586C7016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F558B54503D58A25016640F1 = {
-			fileRef = F53489AA03D58205016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F558B54903D58D72016640F1 = {
 			fileRef = F53489AA03D58205016640F1;
 			isa = PBXBuildFile;
@@ -1080,6 +1057,30 @@
 		};
 		F5632C2B0349A14001664092 = {
 			fileRef = F5632C2A0349A14001664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F567FA7603FC1B4B016640F1 = {
+			isa = PBXFileReference;
+			name = binaryprotocol.c;
+			path = ../../fts/binaryprotocol.c;
+			refType = 2;
+		};
+		F567FA7703FC1B4B016640F1 = {
+			fileRef = F567FA7603FC1B4B016640F1;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F567FA7803FC1B8A016640F1 = {
+			isa = PBXFileReference;
+			name = udpreceive.c;
+			path = ../../packages/io/c/src/udpreceive.c;
+			refType = 2;
+		};
+		F567FA7903FC1B8A016640F1 = {
+			fileRef = F567FA7803FC1B8A016640F1;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -7335,6 +7336,7 @@
 				F85122C5028BE16601664092,
 				F85122C6028BE16601664092,
 				F85122C7028BE16601664092,
+				F567FA7803FC1B8A016640F1,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -7495,6 +7497,7 @@
 				F85122D7028BE16701664092,
 				F85122D8028BE16701664092,
 				F7B6E71203FBE61901664058,
+				F567FA7903FC1B8A016640F1,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -13239,6 +13242,7 @@
 				F5A2D68A03A1193601664092,
 				F880FD4B0282FA3901664092,
 				F880FD4C0282FA3901664092,
+				F567FA7603FC1B4B016640F1,
 				F8677A5F02E5C2CF01664092,
 				F880FD4D0282FA3901664092,
 				F880FD4E0282FA3901664092,
