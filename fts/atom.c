@@ -133,8 +133,8 @@ fts_atom_compare (const fts_atom_t *a, const fts_atom_t *b)
 
     case FTS_TYPEID_INT:
     case FTS_TYPEID_FLOAT:
-        return signbit(fts_get_number_float(a) - fts_get_number_float(b))
-               ?  1  :  -1;   /* returns 1 on equal, but who cares? */
+        return fts_get_number_float(a) > fts_get_number_float(b)  ?   1  :
+               fts_get_number_float(a) < fts_get_number_float(b)  ?  -1  :  0;
 
     case FTS_TYPEID_SYMBOL:
         return strcmp(fts_symbol_name(fts_get_symbol(a)),
@@ -180,165 +180,49 @@ fts_atom_copy( const fts_atom_t *from, fts_atom_t *to)
  *
  */
 
-static fts_class_t void_class = 
-{
-  /* class object header */
-  {
-    0, /* class */
-    {0,0,0}, /* flags */
-    0, /* reference counter */
-    0 /* patcher data */
-  },
-  /* class structure */
-  0, /*  */
-  FTS_TYPEID_VOID, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0, /*  */
-  0 /*  */
-};
+#define FTS_PRIMITIVE_CLASS(VAR, TYPEID)                        \
+static fts_class_t VAR =                                        \
+{                                                               \
+  /* class object header */                                     \
+  {                                                             \
+    0, /* class */                                              \
+    {0,0,0}, /* flags */                                        \
+    0, /* reference counter */                                  \
+    0 /* patcher data */                                        \
+  },                                                            \
+  /* class structure */                                         \
+  0, /*  */                                                     \
+  TYPEID, /*  */                                                \
+  0, /* hash_function */                                        \
+  0, /* equals_function */                                      \
+  0, /* copy_function */                                        \
+  0, /* post_function */                                        \
+  0, /* array_function */                                       \
+  0, /* description_function */                                 \
+  { 0, 0, 0, 0 }, /* struct fts_array import_handlers */        \
+  0, /* instantiate_fun */                                      \
+  0, /* constructor */                                          \
+  0, /* deconstructor */                                        \
+  0, /* package */                                              \
+  0, /* methods */                                              \
+  0, /* ninlets */                                              \
+  0, /* input_handler */                                        \
+  0, /* noutlets */                                             \
+  0, /* out_alloc */                                            \
+  0, /* outlets */                                              \
+  0, /* size */                                                 \
+  0, /* heap */                                                 \
+  0, /* doc */                                                  \
+};                                                              \
+fts_class_t *fts_##VAR = &VAR;
 
-fts_class_t *fts_void_class = &void_class;
+FTS_PRIMITIVE_CLASS(void_class,    FTS_TYPEID_VOID)
+FTS_PRIMITIVE_CLASS(int_class,     FTS_TYPEID_INT)
+FTS_PRIMITIVE_CLASS(float_class,   FTS_TYPEID_FLOAT)
+FTS_PRIMITIVE_CLASS(symbol_class,  FTS_TYPEID_SYMBOL)
+FTS_PRIMITIVE_CLASS(pointer_class, FTS_TYPEID_POINTER)
+FTS_PRIMITIVE_CLASS(string_class,  FTS_TYPEID_STRING)
 
-static fts_class_t int_class = { 
-  {
-    0,
-  {0,0,0},
-    0,
-    0
-  },
-  0,
-  FTS_TYPEID_INT,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
-};
-fts_class_t *fts_int_class = &int_class;
-
-static fts_class_t float_class = { 
-  {
-    0,
-  {0,0,0},
-    0,
-    0
-  },
-  0,
-  FTS_TYPEID_FLOAT,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
-};
-fts_class_t *fts_float_class = &float_class;
-
-static fts_class_t symbol_class = { 
-  {
-    0,
-  {0,0,0},
-    0,
-    0
-  },
-  0,
-  FTS_TYPEID_SYMBOL,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
-};
-fts_class_t *fts_symbol_class = &symbol_class;
-
-static fts_class_t pointer_class = { 
-  {
-    0,
-  {0,0,0},
-    0,
-    0
-  },
-  0,
-  FTS_TYPEID_POINTER,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
-};
-fts_class_t *fts_pointer_class = &pointer_class;
-
-static fts_class_t string_class = { 
-  {
-    0,
-  {0,0,0},
-    0,
-    0
-  },
-  0,
-  FTS_TYPEID_STRING,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
-};
-fts_class_t *fts_string_class = &string_class;
 
 void fts_kernel_atom_init( void)
 {
