@@ -157,7 +157,7 @@ class ErmesObjBang extends ErmesObject {
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
     if(aWidth<getPreferredSize().width) aWidth = getPreferredSize().width;
-    if(aHeight<getPreferredSize().width) aHeight = getPreferredSize().height;
+    if(aHeight<getPreferredSize().height) aHeight = getPreferredSize().height;
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
