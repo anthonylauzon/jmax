@@ -14,6 +14,7 @@ dsp.h \
 errobj.h \
 expression.h \
 file.h \
+fifo.h \
 fpe.h \
 ftl.h \
 ftlmem.h \
@@ -42,6 +43,7 @@ stack.h \
 status.h \
 symbol.h \
 time.h \
+tuple.h \
 types.h \
 update.h \
 variable.h
