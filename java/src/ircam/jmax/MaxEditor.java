@@ -326,7 +326,8 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	
 	    try
 	      {
-		document.edit();
+		if (document.getDocumentType().isEditable())
+		  document.edit();
 	      }
 	    catch (MaxDocumentException e)
 	      {

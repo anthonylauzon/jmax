@@ -274,7 +274,7 @@ public class MaxApplication extends Object
 
       for (int j = 0; j < documents.getSize(); j++)
 	{
-	  MaxDocument document = (MaxDocument) documents.getElementAt(i);
+	  MaxDocument document = (MaxDocument) documents.getElementAt(j);
 	
 	  if (! document.isSaved())
 	    {

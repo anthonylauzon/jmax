@@ -173,7 +173,10 @@ abstract public class MaxDocument
 
   public MaxDataEditor edit() throws MaxDocumentException
   {
-    return Mda.edit(rootData);
+    if (rootData != null)
+      return Mda.edit(rootData);
+    else
+      throw new MaxDocumentException("No data to edit");
   }
 
   /** return true if the document can be saved to its current

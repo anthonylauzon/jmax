@@ -81,6 +81,14 @@ abstract public class MaxDocumentType
   /*                                                                           */
   /*****************************************************************************/
 
+
+  /** return true if the document is editable; some documents may be read/load only  */
+
+  public boolean isEditable()
+  {
+    return true;
+  }
+
   /** Create a new empty document of the type */
 
   abstract public MaxDocument newDocument();
