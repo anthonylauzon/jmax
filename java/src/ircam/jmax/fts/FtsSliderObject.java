@@ -107,8 +107,6 @@ public class FtsSliderObject extends FtsIntValueObject
 
   protected void localPut(String name, int value)
   {
-    System.err.println("localput "+name+"  "+value);
-
     if (name == "minValue")
       {
 	minValue = value;
