@@ -87,6 +87,7 @@ FTS_API int fts_mess_get_run_time_check(void);
 #define fts_get_symbol_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_symbol(&(AT)[N]) : (DEF))
 #define fts_get_string_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_string(&(AT)[N]) : (DEF))
 #define fts_get_ptr_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_ptr(&(AT)[N]) : (DEF))
+#define fts_get_object_arg(AC, AT, N, DEF)    ((N) < (AC) ? fts_get_object(&(AT)[N]) : (DEF))
 
 #define fts_get_int_arg(AC, AT, N, DEF) \
 ((N) < (AC) ? (fts_is_int(&(AT)[N]) ? fts_get_int(&(AT)[N]) : \
@@ -99,14 +100,6 @@ FTS_API int fts_mess_get_run_time_check(void);
 #define fts_get_double_arg(AC, AT, N, DEF) \
 ((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (double) fts_get_int(&(AT)[N]) : \
 	      (fts_is_float(&(AT)[N]) ? (double) fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
-
-#define fts_get_long_arg(AC, AT, N, DEF)   fts_get_int_arg(AC, AT, N, DEF)
-
-#define fts_get_long_by_name(AC, AR, NAME, DEF)   fts_get_int_by_name(AC, AR, NAME, DEF) 
-FTS_API long fts_get_int_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int def);
-FTS_API float fts_get_float_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, float def);
-FTS_API fts_symbol_t fts_get_symbol_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, fts_symbol_t def);
-FTS_API long fts_get_boolean_by_name(int argc, const fts_atom_t *at,  fts_symbol_t name, int def);
 
 /* inlined macros for message sending (active only if compiled optimized */
 

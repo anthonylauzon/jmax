@@ -1,9 +1,7 @@
 
-jMax is based on Max/ISPW by Miller Puckette
-
 Ircam's "Real-time systems" team
- - Riccardo Borghesi
  - François Déchelle
+ - Riccardo Borghesi
  - Norbert Schnell
 
 Past members of the team:
@@ -19,3 +17,6 @@ Contributors:
  - Stéphane Letz
  - Christian Klippel
  - Aadjan van der Helm
+
+jMax is based on Max/ISPW by Miller Puckette
+

@@ -57,10 +57,9 @@ AC_CHECK_FUNCS(socket)
 
 dnl Check for Electric Fence (a library to track memory corruption errors on Linux)
 AC_ARG_ENABLE(electric-fence,
-    [  --enable-electric-fence[=value]   link with ElectricFence\, a library to track memory corruption errors on Linux  [default=no]],
+    [  --enable-electric-fence[=value]   link with ElectricFence, a library to track memory corruption errors on Linux  [default=no]],
     electric_fence="yes",
     electric_fence="no")
-
 
 dnl Check for platform-specific code
 AC_CANONICAL_HOST

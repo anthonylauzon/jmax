@@ -61,7 +61,7 @@ dsp_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 dsp_on_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(fts_get_long_arg(ac, at, 0, 0))
+  if(fts_get_int_arg(ac, at, 0, 0))
     fts_param_set_int(fts_s_dsp_on, 1);
   else
     fts_param_set_int(fts_s_dsp_on, 0);

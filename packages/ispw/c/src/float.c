@@ -31,7 +31,7 @@
 
    "fts.h"      defines all basic types and function prototypes
 
-                 AND utility macros such as fts_get_long_arg()
+                 AND utility macros such as fts_get_int_arg()
    	         and useful symbol constants such as fts_s_int, fts_s_float ...
 
                  AND the macro versions of the most used message passing

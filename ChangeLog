@@ -1,3 +1,9 @@
+2001-10-17  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Fixed bugs in fts/client.c. Now, the client does not have
+	to create the "throw" object by hand. Added also a "connect_object"
+	method in the client object.
+
 2001-10-16  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Fixed a bug in package saving: vm opcode return was missing

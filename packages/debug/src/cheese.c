@@ -53,7 +53,7 @@ static void cheese_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   cheese_t *this = ((cheese_t *)o);
 
   this->sym = fts_get_symbol_arg(ac, at, 1, fts_new_symbol(""));
-  this->n_print = fts_get_long_arg(ac, at, 2, 16);
+  this->n_print = fts_get_int_arg(ac, at, 2, 16);
 
   dsp_list_insert(o);
 }

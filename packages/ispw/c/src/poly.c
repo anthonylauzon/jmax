@@ -200,9 +200,9 @@ static void
 poly_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x = (poly_t *)o;
-  long pit   = fts_get_long_arg(ac, at, 0, 0);
-  long vel   = fts_get_long_arg(ac, at, 1, 0);
-  long which = fts_get_long_arg(ac, at, 2, 0);
+  long pit   = fts_get_int_arg(ac, at, 0, 0);
+  long vel   = fts_get_int_arg(ac, at, 1, 0);
+  long which = fts_get_int_arg(ac, at, 2, 0);
   voice_t *v;
 
   v = x->v + (which - 1);
@@ -225,8 +225,8 @@ static void
 poly_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   poly_t *x  = (poly_t *)o;
-  long n     = fts_get_long_arg(ac, at, 1, 0);
-  long strat = fts_get_long_arg(ac, at, 2, 0);
+  long n     = fts_get_int_arg(ac, at, 1, 0);
+  long strat = fts_get_int_arg(ac, at, 2, 0);
   long i;
   voice_t *v;
 

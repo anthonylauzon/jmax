@@ -204,7 +204,7 @@ static void
 explay_nth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explay_t *this = (explay_t *)o;
-  long n = fts_get_long_arg(ac, at, 0, 0);
+  long n = fts_get_int_arg(ac, at, 0, 0);
   explode_t *explode;
 
   explode = explode_get_by_name(this->explode_name); 

@@ -106,7 +106,7 @@ ibinop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom
   ibinop_t *this = (ibinop_t *)o;
 
   this->value = 0;
-  this->operator = fts_get_long_arg(ac, at, 1, 0);
+  this->operator = fts_get_int_arg(ac, at, 1, 0);
 }
 
 

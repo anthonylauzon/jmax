@@ -172,7 +172,7 @@ static void
 iroute_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int ns = ((iroute_t *)o)->ns;
-  long n = fts_get_long_arg(ac, at, 0, 0), *p = ((iroute_t *)o)->s_n+ns;
+  long n = fts_get_int_arg(ac, at, 0, 0), *p = ((iroute_t *)o)->s_n+ns;
   int match = 0;
 
   while (ns--)

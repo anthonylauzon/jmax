@@ -58,7 +58,7 @@ random_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 random_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  long n = fts_get_long_arg(ac, at, 1, 0);
+  long n = fts_get_int_arg(ac, at, 1, 0);
 
   if (n < 1)
     n = 1;

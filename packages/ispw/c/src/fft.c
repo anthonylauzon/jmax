@@ -98,9 +98,9 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       at++;
       ac--;
     }
-  size = fts_get_long_arg(ac, at, 0, DEF_size);
-  hop = fts_get_long_arg(ac, at, 1, size);
-  phase = fts_get_long_arg(ac, at, 2, 0);
+  size = fts_get_int_arg(ac, at, 0, DEF_size);
+  hop = fts_get_int_arg(ac, at, 1, size);
+  phase = fts_get_int_arg(ac, at, 2, 0);
   
   if(!fts_fft_declaresize(size))
   {
@@ -352,7 +352,7 @@ static void
 fft_setphase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fft_t *x = (fft_t *)o;
-  long phase = fts_get_long_arg(ac, at, 0, 0);
+  long phase = fts_get_int_arg(ac, at, 0, 0);
 
   x->phase = phase;
   x->ctl.gap_count = phase;

@@ -693,7 +693,7 @@ static void
 explode_follow_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
-  long int n = fts_get_long_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
   evt_t *e;
   
   explode_stop(this);
@@ -759,7 +759,7 @@ static void
 explode_nth_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   explode_t *this = (explode_t *)o;
-  long int n = fts_get_long_arg(ac, at, 0, 0);
+  long int n = fts_get_int_arg(ac, at, 0, 0);
   evt_t *e;
   
   for (e = this->data.evt; e && n--; e = e->next)

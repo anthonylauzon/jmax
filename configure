@@ -24,7 +24,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-debug[=DEBUG]   compile with debug [default=no]"
 ac_help="$ac_help
-  --enable-electric-fence[=value]   link with ElectricFence\, a library to track memory corruption errors on Linux  [default=no]"
+  --enable-electric-fence[=value]   link with ElectricFence, a library to track memory corruption errors on Linux  [default=no]"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -2443,14 +2443,13 @@ fi
 
 
 
-
 # Make sure we can run config.sub.
 if ${CONFIG_SHELL-/bin/sh} $ac_config_sub sun4 >/dev/null 2>&1; then :
 else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:2454: checking host system type" >&5
+echo "configure:2453: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in

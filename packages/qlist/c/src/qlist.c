@@ -73,7 +73,7 @@ static void
 qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_t *at)
 {
   qlist_t *this = (qlist_t *)o;
-  long drop = fts_get_long_arg(aac, at, 0, 0);
+  long drop = fts_get_int_arg(aac, at, 0, 0);
   fts_atom_t av[NATOM];
   fts_atom_t *ap;
   int ac;

@@ -55,7 +55,7 @@ change_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((change_t *)o)->r_state = fts_get_long_arg(ac, at, 0, 0);
+  ((change_t *)o)->r_state = fts_get_int_arg(ac, at, 0, 0);
 }
 
 static fts_status_t

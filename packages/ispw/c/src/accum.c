@@ -32,7 +32,7 @@ typedef struct {
 static void
 iaccum_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg = (float)fts_get_long_arg(ac, at, 0, 0);
+  ((accum_t *)o)->s_reg = (float)fts_get_int_arg(ac, at, 0, 0);
   fts_outlet_send(o, 0, fts_s_int, ac, at);
 }
 
@@ -92,13 +92,13 @@ accum_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 accum_int_middle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg += fts_get_long_arg(ac, at, 0, 0);
+  ((accum_t *)o)->s_reg += fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void
 accum_int_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ((accum_t *)o)->s_reg *= fts_get_long_arg(ac, at, 0, 0);
+  ((accum_t *)o)->s_reg *= fts_get_int_arg(ac, at, 0, 0);
 }
 
 static void

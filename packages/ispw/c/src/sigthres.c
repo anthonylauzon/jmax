@@ -179,7 +179,7 @@ sigthres_status_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   sigthres_t *this = (sigthres_t *)o;
 
-  this->ctl.status = (int)fts_get_long_arg(ac, at, 0, 0);
+  this->ctl.status = (int)fts_get_int_arg(ac, at, 0, 0);
   this->ctl.wait = 0;
 }
 

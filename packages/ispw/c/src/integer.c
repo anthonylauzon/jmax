@@ -32,7 +32,7 @@
 
    "fts.h"      defines all basic types and function prototypes
 
-                 AND defines utility macros such as fts_get_long_arg()
+                 AND defines utility macros such as fts_get_int_arg()
    	         and useful symbol constants such as fts_s_int, fts_s_float ...
 
                  AND defines the macro versions of the most used message passing
@@ -200,7 +200,7 @@ integer_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
      
   /* one can cast the received object in a integer_t because the current
      method has been set for this type of object (in integer_instantiate) */
-  this->n = fts_get_long_arg(ac, /* the atom array */
+  this->n = fts_get_int_arg(ac, /* the atom array */
 				      at, /* the number of atoms */
 				      1,  /* the index in the array */
 				      0   /* the default value in case of
@@ -276,7 +276,7 @@ integer_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 {
   integer_t *this = (integer_t *) o;
 
-  this->n = fts_get_long_arg(ac, at, 0, 0);
+  this->n = fts_get_int_arg(ac, at, 0, 0);
 }
 
 /* the float 1 method simply set its accumulator */
