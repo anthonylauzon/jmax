@@ -195,7 +195,7 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     pressed = false;
   }
 
-  private void addButton( Container toolbar,String descr, String gifFilePath)
+  private void addButton( Container toolbar, String descr, String gifFilePath)
   {
     ErmesSwToggleButton aToggleButton = new ErmesSwToggleButton( descr, IconCache.getIcon( gifFilePath) );
     toolbar.add( aToggleButton);

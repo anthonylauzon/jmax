@@ -19,19 +19,17 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   boolean itsMovingThrottle = false;
 
-  private int itsRangeMax = PREFERRED_RANGE_MAX;
-  private int itsRangeMin = PREFERRED_RANGE_MIN;
+  private int itsRangeMax;
+  private int itsRangeMin;
 
-  int itsRange = itsRangeMax - itsRangeMin;
-  int itsPixelRange = itsRangeMax - itsRangeMin;
-  float itsStep =  itsRange/itsPixelRange;
+  int itsRange;
+  int itsPixelRange;
+  float itsStep;
 
-  static ErmesObjSliderDialog itsSliderDialog = null;
+  private static ErmesObjSliderDialog itsSliderDialog = null;
 
   protected final static int BOTTOM_OFFSET = 5;
   protected final static int UP_OFFSET = 5;
-  private final static int PREFERRED_RANGE_MAX = 127;
-  private final static int PREFERRED_RANGE_MIN = 0;
 
   ErmesObjSlider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
@@ -42,11 +40,12 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
     if (itsRangeMax == 0)
       {
-	itsRangeMax = 128;
+	itsRangeMax = 127;
 	((FtsSliderObject)itsFtsObject).setMaxValue(itsRangeMax);
       }
 
     itsRange = itsRangeMax - itsRangeMin;
+    itsPixelRange = itsRangeMax - itsRangeMin;
     itsStep = ( float)itsRange/itsPixelRange;
 
     if (getWidth() < 20)
