@@ -49,7 +49,7 @@ public class OpenHelpSummaryAction extends EditorAction
   {
      try
       {	
-	JMaxApplication.load( argument);
+	JMaxApplication.loadSummary( argument);
       }
     catch(IOException e)
       {
@@ -57,4 +57,5 @@ public class OpenHelpSummaryAction extends EditorAction
       }
   }
 }
+
 

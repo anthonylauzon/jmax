@@ -891,7 +891,7 @@ patcher_stop_waiting(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_client_send_message(o, sym_stopWaiting, 0, 0);
 }
 
-static fts_patcher_t * 
+fts_patcher_t * 
 get_patcher_by_file_name( fts_symbol_t file_name)
 {
   fts_patcher_t *root = fts_get_root_patcher();  

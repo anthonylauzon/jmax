@@ -54,5 +54,6 @@ extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
 
 extern void fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this);
+extern fts_patcher_t *get_patcher_by_file_name( fts_symbol_t file_name);
 
 #endif

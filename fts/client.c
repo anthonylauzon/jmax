@@ -975,6 +975,18 @@ static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, in
     }
 }
 
+static void client_load_summary( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;  
+  fts_symbol_t file_name = fts_get_symbol( at);
+  fts_patcher_t *summary = get_patcher_by_file_name(file_name);
+  
+  if( summary)
+    fts_client_send_message((fts_object_t *)summary, fts_s_openEditor, 0, 0);
+  else
+    fts_client_load_patcher( file_name, this->client_id);
+}
+
 static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_sched_halt();
@@ -1111,6 +1123,7 @@ static void client_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol( "load"), client_load_patcher_file);
   fts_class_message_varargs(cl, fts_new_symbol( "load_project"), client_load_project);
   fts_class_message_varargs(cl, fts_new_symbol( "load_package"), client_load_package);
+  fts_class_message_varargs(cl, fts_new_symbol( "load_summary"), client_load_summary);
 
   fts_class_message_varargs(cl, fts_new_symbol( "shutdown"), client_shutdown);
 }

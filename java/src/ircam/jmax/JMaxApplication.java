@@ -151,6 +151,15 @@ class JMaxClient extends FtsObject {
     send( FtsSymbol.get("load_package"), args);
   }
 
+  void loadSummary( String name) throws IOException
+  {
+    FtsArgs args = new FtsArgs();
+
+    args.addSymbol( FtsSymbol.get(name));
+
+    send( FtsSymbol.get("load_summary"), args);
+  }
+
   static
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
@@ -373,6 +382,11 @@ public class JMaxApplication {
   public static void loadPackage( String name, String fileName) throws IOException
   {
     singleInstance.clientObject.loadPackage( name, fileName);
+  }
+
+  public static void loadSummary( String name) throws IOException
+  {
+    singleInstance.clientObject.loadSummary( name);
   }
 
   // **********************************************************************
