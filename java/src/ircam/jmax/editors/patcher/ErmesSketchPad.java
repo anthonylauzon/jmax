@@ -214,6 +214,27 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   {
     defaultFontStyle = s;
   }
+  public final void changeDefaultFontStyle(String style, boolean selected) 
+  {
+    if(style.equals("Bold"))
+	{
+	    if((defaultFontStyle == Font.BOLD || defaultFontStyle == Font.BOLD+Font.ITALIC)&&(!selected))
+		defaultFontStyle -= Font.BOLD;
+	    else
+	      if((defaultFontStyle != Font.BOLD && defaultFontStyle != Font.BOLD+Font.ITALIC)&&(selected))
+		  defaultFontStyle += Font.BOLD;
+      }
+      else
+	  if(style.equals("Italic"))
+	      {
+		  if((defaultFontStyle == Font.ITALIC || defaultFontStyle == Font.BOLD+Font.ITALIC)&&(!selected))
+		      defaultFontStyle -= Font.ITALIC;
+		  else
+		      if((defaultFontStyle != Font.ITALIC && defaultFontStyle != Font.BOLD+Font.ITALIC)&&(selected))
+			  defaultFontStyle += Font.ITALIC;
+	      }
+  }
+
   boolean automaticFitToText = false;
   public void setAutomaticFitToText(boolean fit){
     automaticFitToText = fit;

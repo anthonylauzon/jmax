@@ -60,6 +60,7 @@ public class TextPopUpMenu extends JMenu
   
   private JMenu itsStylesMenu;
   private ButtonGroup itsStylesMenuGroup;
+  JMenuItem boldItem, italicItem;
 
   Vector fontNameItems = new Vector();
   Vector fontSizeItems = new Vector();
@@ -73,6 +74,7 @@ public class TextPopUpMenu extends JMenu
     itsSizesMenuGroup.add(fakeSizeButton);
 
     itsFontMenuGroup = new ButtonGroup();
+    itsStylesMenuGroup = new ButtonGroup();
 
     JMenuItem item;
     item = new JMenuItem("Fit To Text");
@@ -91,6 +93,8 @@ public class TextPopUpMenu extends JMenu
 
     addSeparator();
 
+    add(new JLabel(" Font Names"));
+
     JRadioButtonMenuItem radioItem;
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
     {
@@ -107,6 +111,8 @@ public class TextPopUpMenu extends JMenu
 
     addSeparator();
     
+    add(new JLabel(" Font Sizes"));
+
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontSizes().length; i++)
     {
 	radioItem = new JRadioButtonMenuItem(PatcherFontManager.getInstance().getJMaxFontSizes()[i]);
@@ -122,9 +128,14 @@ public class TextPopUpMenu extends JMenu
     
     addSeparator();
 
-    itsStylesMenu = new JMenu("Styles");
-    FillStylesMenu(itsStylesMenu);
-    add(itsStylesMenu);
+    add(new JLabel(" Font Styles"));
+
+    boldItem = new JCheckBoxMenuItem("Bold");
+    boldItem.addActionListener(Actions.fontStylesPopUpAction);
+    add(boldItem);
+    italicItem = new JCheckBoxMenuItem("Italic");
+    italicItem.addActionListener(Actions.fontStylesPopUpAction);
+    add(italicItem);
   }
 
   private void FillSizesMenu( JMenu menu)
@@ -178,21 +189,6 @@ public class TextPopUpMenu extends JMenu
 		item.addActionListener(Actions.fontPopUpAction);
 	    }
     }
-
-  private void FillStylesMenu( JMenu menu)
-  {
-    String styles[] = {"plain", "bold", "italic"};
-    JRadioButtonMenuItem item; 
-    itsStylesMenuGroup = new ButtonGroup();
-
-    for (int i = 0; i < styles.length; i++)
-      {
-	item = new JRadioButtonMenuItem(styles[i]);
-	menu.add(item);
-	item.addActionListener(Actions.fontStylesPopUpAction);
-	itsStylesMenuGroup.add(item);
-      }
-  }
 
   public static TextPopUpMenu getInstance()
   {
@@ -288,16 +284,24 @@ public class TextPopUpMenu extends JMenu
     switch(fontStyle)
 	{
 	case Font.PLAIN:
-	    textPopup.itsStylesMenu.getItem(0).setSelected(true);
+	    textPopup.boldItem.setSelected(false);
+	    textPopup.italicItem.setSelected(false);
+	    break;
+	case (Font.BOLD + Font.ITALIC):
+	    textPopup.boldItem.setSelected(true);
+	    textPopup.italicItem.setSelected(true);
 	    break;
 	case Font.BOLD:
-	    textPopup.itsStylesMenu.getItem(1).setSelected(true);
+	    textPopup.boldItem.setSelected(true);
+	    textPopup.italicItem.setSelected(false);
 	    break;
 	case Font.ITALIC:
-	    textPopup.itsStylesMenu.getItem(2).setSelected(true);
+	    textPopup.boldItem.setSelected(false);
+	    textPopup.italicItem.setSelected(true);
 	    break;
 	default:
-	    textPopup.itsStylesMenu.getItem(0).setSelected(true);
+	    textPopup.boldItem.setSelected(false);
+	    textPopup.italicItem.setSelected(false);
 	}
   }
 }

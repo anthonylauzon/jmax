@@ -43,34 +43,23 @@ import ircam.jmax.toolkit.actions.*;
 public class FontStylesPopUpAction extends EditorAction
 {
 
-  int style;  
+  String style;
+  boolean selected;
   public  void actionPerformed(ActionEvent e)
   {
-    String sStyle = ((JMenuItem)e.getSource()).getText();
-    style = getIntStyle(sStyle);
+    style = ((JMenuItem)e.getSource()).getText();
+    selected = ((JMenuItem)e.getSource()).isSelected();
 
     super.actionPerformed(e);
   }
   
-    int getIntStyle(String str)
-    {
-	if(str.equals("plain"))
-	    return Font.PLAIN;
-	else if(str.equals("bold"))
-	    return Font.BOLD;
-	else if(str.equals("italic"))
-	    return Font.ITALIC;
-	else
-	    return Font.PLAIN;
-    }
-
   public void doAction(EditorContainer container)
   {
     GraphicObject object = ObjectPopUp.getPopUpTarget();
     try{
       object.redraw();
       object.redrawConnections();
-      object.setFontStyle(style);
+      object.changeFontStyle(style, selected);
       object.redraw();
       object.redrawConnections();
     }

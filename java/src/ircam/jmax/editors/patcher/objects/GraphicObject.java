@@ -366,6 +366,36 @@ abstract public class GraphicObject implements DisplayObject
       setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), style));
   }
 
+  public void changeFontStyle(String style, boolean selected)
+  {
+      int fstyle = -1;
+      
+      if(style.equals("Bold"))
+      {
+	  if(itsFont.isBold() && !selected)
+	      if(itsFont.isItalic())  fstyle = Font.ITALIC;
+	      else fstyle = Font.PLAIN;
+	  else
+	      if(!itsFont.isBold() && selected)
+		  if(!itsFont.isItalic())  fstyle = Font.BOLD;
+		  else fstyle = Font.BOLD + Font.ITALIC; 
+      }
+      else
+	  if(style.equals("Italic"))
+	      {
+		  if(itsFont.isItalic() && !selected)
+		      if(itsFont.isBold())  fstyle = Font.BOLD;
+		      else fstyle = Font.PLAIN;
+		   else
+		       if(!itsFont.isItalic() && selected)
+			   if(!itsFont.isBold())  fstyle = Font.ITALIC;
+			   else fstyle = Font.BOLD + Font.ITALIC;
+	      }
+
+      if(fstyle!=-1)
+	  setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), fstyle));
+  }
+
   public void fontSmaller()
   {
     int size;

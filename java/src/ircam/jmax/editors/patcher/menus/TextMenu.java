@@ -52,6 +52,7 @@ public class TextMenu extends EditorMenu
   JMenuItem biggerItem;
   JMenuItem smallerItem;
   JMenuItem fitItem;
+  JMenuItem boldItem, italicItem;
   JRadioButtonMenuItem automaticFitItem; 
   private JMenu itsSizesMenu;
   private ButtonGroup itsSizesMenuGroup;
@@ -60,10 +61,6 @@ public class TextMenu extends EditorMenu
   private JMenu itsFontsMenu;
   private ButtonGroup itsFontMenuGroup;
   JRadioButtonMenuItem fakeFontButton;
-
-  private JMenu itsStylesMenu;
-  private ButtonGroup itsStylesMenuGroup;
-  JRadioButtonMenuItem fakeStylesButton;
 
     Vector fontNameItems = new Vector();
     Vector fontSizeItems = new Vector();
@@ -100,7 +97,7 @@ public class TextMenu extends EditorMenu
     itsFontMenuGroup = new ButtonGroup();
     fakeFontButton = new JRadioButtonMenuItem( "fake");
     itsFontMenuGroup.add(fakeFontButton);
-	
+
     biggerItem  = add(Actions.fontBiggerAction, "Bigger", Event.CTRL_MASK, KeyEvent.VK_ADD);
     smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
 
@@ -114,6 +111,8 @@ public class TextMenu extends EditorMenu
     fitItem = add(Actions.fitToTextAction, "Fit To Text", Event.CTRL_MASK, KeyEvent.VK_T);
 
     addSeparator();
+    
+    add(new JLabel(" Fonts"));
 
     JRadioButtonMenuItem radioItem;
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontNames().length; i++)
@@ -131,6 +130,8 @@ public class TextMenu extends EditorMenu
     add(itsFontsMenu);
 
     addSeparator();
+
+    add(new JLabel(" Font Sizes"));
 
     for(int i = 0; i < PatcherFontManager.getInstance().getJMaxFontSizes().length; i++)
     {
@@ -154,10 +155,14 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
-    itsStylesMenu = new JMenu("Styles");
+    add(new JLabel(" Font Styles"));
 
-    FillStylesMenu(itsStylesMenu);
-    add(itsStylesMenu);
+    boldItem = new JCheckBoxMenuItem("Bold");
+    boldItem.addActionListener(Actions.fontStylesAction);
+    add(boldItem);
+    italicItem = new JCheckBoxMenuItem("Italic");
+    italicItem.addActionListener(Actions.fontStylesAction);
+    add(italicItem);
 
     addMenuListener(new TextMenuListener());
   }
@@ -193,23 +198,6 @@ public class TextMenu extends EditorMenu
       }
   }
 
-  private void FillStylesMenu( JMenu menu)
-  {
-    String styles[] = {"plain", "bold", "italic"};
-    JRadioButtonMenuItem item; 
-    itsStylesMenuGroup = new ButtonGroup();
-
-    fakeStylesButton = new JRadioButtonMenuItem( "fake");
-    itsStylesMenuGroup.add(fakeStylesButton);
-
-    for (int i = 0; i < styles.length; i++)
-      {
-	  item = new JRadioButtonMenuItem(styles[i]);
-	  menu.add(item);
-	  item.addActionListener(Actions.fontStylesAction);
-	  itsStylesMenuGroup.add(item);
-      }
-  }
     private final int MAX_MENU_SIZE = 20;
     private int numFontFloor = 1;
     private void FillFontMenu( JMenu theFontMenu)
@@ -293,7 +281,6 @@ public class TextMenu extends EditorMenu
 	fitItem.setEnabled(true); 
 	fakeFontButton.setSelected(true);
 	fakeSizeButton.setSelected(true);
-	fakeStylesButton.setSelected(true);
 	return;
       }
 
@@ -383,16 +370,24 @@ public class TextMenu extends EditorMenu
     switch(fontStyle)
 	{
 	case Font.PLAIN:
-	    itsStylesMenu.getItem(0).setSelected(true);
+	    boldItem.setSelected(false);
+	    italicItem.setSelected(false);
+	    break;
+	case (Font.BOLD + Font.ITALIC):
+	    boldItem.setSelected(true);
+	    italicItem.setSelected(true);
 	    break;
 	case Font.BOLD:
-	    itsStylesMenu.getItem(1).setSelected(true);
+	    boldItem.setSelected(true);
+	    italicItem.setSelected(false);
 	    break;
 	case Font.ITALIC:
-	    itsStylesMenu.getItem(2).setSelected(true);
+	    boldItem.setSelected(false);
+	    italicItem.setSelected(true);
 	    break;
 	default:
-	    itsStylesMenu.getItem(0).setSelected(true);
+	    boldItem.setSelected(false);
+	    italicItem.setSelected(false);
 	}
 
     /*for ( int i = 0; i < itsBaseSizesMenu.getItemCount(); i++)
