@@ -36,12 +36,6 @@ static fts_heap_t *seqplode_skip_heap = 0;
 #define NFWD 2 
 #define FTIME 150
 
-/****************************************************************************
- *
- *  object
- *
- */
-
 typedef struct _skip
 {
   noteevt_t *evt;
@@ -63,59 +57,46 @@ typedef struct
   skip_t *skip;
 } seqplode_t;
 
-static void seqplode_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
-static void
-seqplode_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqplode_t *this = (seqplode_t *)o;
-  fts_object_t *seqobj = fts_get_object(at + 1);
-  fts_symbol_t track_name = fts_get_symbol(at + 2);
-
-  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-    this->sequence = (sequence_t *)seqobj;
-  else
-    this->sequence = 0;
-
-  this->track_name = track_name;
-  this->track = 0;
-
-  this->oct = 0;
-  this->nfwd = NFWD;
-  this->ftime = FTIME;
-  this->skip = 0;
-}
-
-/* delete method, system inlet */
-static void
-seqplode_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqplode_t *this = (seqplode_t *)o;
-
-  seqplode_stop(o, 0, 0, 0, 0);
-}
-
 /****************************************************************************
  *
- *  score follower utility functions
+ *  user methods
  *
  */
-/* send out an event matched by follower */
-static void
-seqplode_sendevt(seqplode_t *this, noteevt_t *e)
-{
-  fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)e));
-}
 
 static void
-seqplode_dofollow(seqplode_t *this, int n)
+seqplode_params(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  seqplode_t *this = (seqplode_t *)o;
+
+  switch(ac)
+    {
+    default:
+    case 3:
+      this->oct = fts_get_int(at + 2);
+    case 2:
+      this->ftime = fts_get_int(at + 1);
+    case 1:      
+      this->nfwd = fts_get_int(at + 0);
+    case 0:
+      break;
+    }
+}
+
+/* int/float method, inlet 0 */
+static void
+seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqplode_t *this = (seqplode_t *)o;
   noteevt_t *evtwas = this->event;
   int tquit = 0x7fffffff;
   int count = 0, gotem = 0;
   skip_t newskip, *sp, *sp2;
   int eat = 0;
   noteevt_t *e;
+  int pitch = fts_get_number_int(at);
+  
+  if(pitch < 0)
+    pitch = 0;
 
   newskip.next = this->skip;
 
@@ -130,14 +111,11 @@ seqplode_dofollow(seqplode_t *this, int n)
 	drop = 1;
 
       /* here's the payoff for the skip array: if the pitch is in the array eat it. */
-      if (pit == n || (this->oct && (pit == n+12 || pit == n-12)))
+      if (pit == pitch || (this->oct && (pit == pitch + 12 || pit == pitch - 12)))
 	{
 	  /* if you haven't already sent one */
 	  if (!eat)	
-	    {
-	      /* send the match */
-	      seqplode_sendevt(this, sp2->evt);
-	    }
+	    fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)sp2->evt)); /* send the match */
 
 	  drop = eat = 1;
 	}
@@ -181,7 +159,7 @@ seqplode_dofollow(seqplode_t *this, int n)
 	}
 
       /* break if got the good note */
-      if(noteevt_get_pitch(e) == n || (this->oct && (noteevt_get_pitch(e) == n + 12 || noteevt_get_pitch(e) == n - 12)))
+      if(noteevt_get_pitch(e) == pitch || (this->oct && (noteevt_get_pitch(e) == pitch + 12 || noteevt_get_pitch(e) == pitch - 12)))
 	break;
 
       /* if you got NFWD notes already */
@@ -205,48 +183,10 @@ seqplode_dofollow(seqplode_t *this, int n)
     }
 
   /* output the winning note */
-  seqplode_sendevt(this, this->event);
+  fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)this->event));
 
   /* and set pointer to the note after that */
   this->event = (noteevt_t *)event_get_next((event_t *)this->event);
-}
-
-/****************************************************************************
- *
- *  user methods
- *
- */
-
-static void
-seqplode_params(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqplode_t *this = (seqplode_t *)o;
-
-  switch(ac)
-    {
-    default:
-    case 3:
-      this->oct = fts_get_int(at + 2);
-    case 2:
-      this->ftime = fts_get_int(at + 1);
-    case 1:      
-      this->nfwd = fts_get_int(at + 0);
-    case 0:
-      break;
-    }
-}
-
-/* int/float method, inlet 0 */
-static void
-seqplode_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqplode_t *this = (seqplode_t *)o;
-  int pitch = fts_get_number_int(at);
-  
-  if (pitch < 0)
-    pitch = 0;
-
-  seqplode_dofollow(this, pitch);
 }
 
 static void
@@ -275,20 +215,6 @@ seqplode_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
 }
 
-static void
-seqplode_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqplode_t *this = (seqplode_t *)o;
-
-}
-
-static void
-seqplode_continue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  seqplode_t *this = (seqplode_t *)o;
-
-}
-
 static void 
 seqplode_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
@@ -313,6 +239,7 @@ seqplode_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  if(event)
 	    {
 	      fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_lock, 0, 0);
+	      fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)event));
 	  
 	      this->track = track;
 	      this->event = event;
@@ -326,6 +253,35 @@ seqplode_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  *  class
  *
  */
+
+static void
+seqplode_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqplode_t *this = (seqplode_t *)o;
+  fts_object_t *seqobj = fts_get_object(at + 1);
+  fts_symbol_t track_name = fts_get_symbol(at + 2);
+
+  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
+    this->sequence = (sequence_t *)seqobj;
+  else
+    this->sequence = 0;
+
+  this->track_name = track_name;
+  this->track = 0;
+
+  this->oct = 0;
+  this->nfwd = NFWD;
+  this->ftime = FTIME;
+  this->skip = 0;
+}
+
+static void
+seqplode_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  seqplode_t *this = (seqplode_t *)o;
+
+  seqplode_stop(o, 0, 0, 0, 0);
+}
 
 static fts_status_t
 seqplode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -346,9 +302,10 @@ seqplode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* lists */
   fts_method_define_varargs(cl, 0, fts_new_symbol("params"), seqplode_params);
 
-  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplode_start);
+  /* sequence reference interface methods */
+  /*fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplode_start);*/
   fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqplode_stop);
-  fts_method_define_varargs(cl, 0, fts_new_symbol("continue"), seqplode_continue);
+  /*fts_method_define_varargs(cl, 0, fts_new_symbol("continue"), seqplode_continue);*/
   fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqplode_locate);
   /*fts_method_define_varargs(cl, 0, fts_new_symbol("sync"), seqplode_sync);*/
   

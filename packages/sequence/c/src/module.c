@@ -36,6 +36,7 @@ extern void noteevt_config(void);
 extern void messevt_config(void);
 
 extern void seqplay_config(void);
+extern void seqplode_config(void);
 
 static void
 sequence_module_init(void)
@@ -50,6 +51,8 @@ sequence_module_init(void)
   messevt_config();
 
   seqplay_config();
+  seqplode_config();
+  seqf9_config();
 }
 
 fts_module_t sequence_module = {"sequence", "sequence and score following classes", sequence_module_init, 0, 0};

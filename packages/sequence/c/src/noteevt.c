@@ -39,8 +39,8 @@ noteevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   this->pitch = fts_get_int_arg(ac, at, 1, NOTEEVT_DEF_PITCH);
   this->duration = fts_get_float_arg(ac, at, 2, NOTEEVT_DEF_DURATION);
-  this->midi_channel = -1;
-  this->midi_velocity = -1;
+  this->midi_channel = fts_get_int_arg(ac, at, 3, NOTEEVT_DEF_MIDI_CHANNEL);
+  this->midi_velocity = fts_get_int_arg(ac, at, 4, NOTEEVT_DEF_MIDI_VELOCITY);
 }
 
 /**************************************************************
@@ -90,7 +90,12 @@ noteevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   noteevt_t *this = (noteevt_t *)o;
 
-  post("pitch %d, duration %lf\n", this->pitch, this->duration);
+  post("pitch %d, duration %lf", this->pitch, this->duration);
+
+  if(this->midi_channel < 0)
+    post("\n");
+  else
+    post(", MIDI channel %d, MIDI velocity %d\n", this->midi_channel, this->midi_velocity);
 }
 
 void 
@@ -100,12 +105,18 @@ noteevt_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   int *n = fts_get_ptr(at);
   fts_atom_t *a = fts_get_ptr(at + 1);
 
-  *n = 4;
-
   fts_set_int(a, this->pitch);
   fts_set_float(a + 1, this->duration);
-  fts_set_int(a + 2, noteevt_get_midi_channel(this));
-  fts_set_int(a + 3, noteevt_get_midi_velocity(this));
+
+  if(this->midi_channel < 0)
+    *n = 2;
+  else
+    {
+      fts_set_int(a + 2, this->midi_channel);
+      fts_set_int(a + 3, this->midi_velocity);
+
+      *n = 4;
+    }
 }
 
 static void
@@ -114,13 +125,28 @@ noteevt_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   noteevt_t *this = (noteevt_t *)o;
   fts_bmax_file_t *file = (fts_bmax_file_t *) fts_get_ptr(at);  
 
-  fts_bmax_code_push_float(file, this->duration);
-  fts_bmax_code_push_int(file, this->pitch);
-  fts_bmax_code_push_symbol(file, seqsym_noteevt);
-  fts_bmax_code_push_float(file, event_get_time(&this->head));
-
-  fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_event, 4);
-  fts_bmax_code_pop_args(file, 4);
+  if(this->midi_channel < 0)
+    {
+      fts_bmax_code_push_float(file, this->duration);
+      fts_bmax_code_push_int(file, this->pitch);
+      fts_bmax_code_push_symbol(file, seqsym_noteevt);
+      fts_bmax_code_push_float(file, event_get_time(&this->head));
+      
+      fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_event, 4);
+      fts_bmax_code_pop_args(file, 4);
+    }
+  else
+    { 
+      fts_bmax_code_push_int(file, this->midi_velocity);
+      fts_bmax_code_push_int(file, this->midi_channel);
+      fts_bmax_code_push_float(file, this->duration);
+      fts_bmax_code_push_int(file, this->pitch);
+      fts_bmax_code_push_symbol(file, seqsym_noteevt);
+      fts_bmax_code_push_float(file, event_get_time(&this->head));
+      
+      fts_bmax_code_obj_mess(file, fts_SystemInlet, seqsym_bmax_add_event, 6);
+      fts_bmax_code_pop_args(file, 6);
+    }
 }
 
 /**************************************************************

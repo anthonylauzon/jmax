@@ -37,4 +37,6 @@ messevt.c \
 floatevt.c \
 seqplay.c \
 seqplode.c \
+seqf9.c \
+
 

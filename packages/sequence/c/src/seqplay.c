@@ -187,7 +187,7 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_set_ptr(a, &n_atoms);
       fts_set_ptr(a + 1, atoms);
 
-      while(time >= event_get_time(event))
+      while(event && time >= event_get_time(event))
 	{
 	  fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
 	  fts_outlet_send(o, 0, fts_s_list, n_atoms, atoms);
