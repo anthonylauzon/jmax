@@ -29,7 +29,7 @@ OS_TYPE := unix
 PLATFORM := linux-intel
 
 ifeq ($(ENABLE_ALSA),yes)
-SYS_PACKAGES=ossdev pdtddev alsadev-0.4
+SYS_PACKAGES=ossdev pdtddev alsadev
 else
 SYS_PACKAGES=ossdev pdtddev
 endif

@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.filechooser.*; // tmp !!
 
 
@@ -45,69 +46,120 @@ import ircam.jmax.utils.*;
  * 
  */
 
-public class MaxFileChooser
-{
+class RadioFormatAccessory extends JPanel {
 
-  static private JFileChooser fd;
-  static private boolean configured = false;
-
-  static final int SAVE_JMAX_TYPE = 0;
-  static final int SAVE_PAT_TYPE = 1;
-  static private int saveType = SAVE_JMAX_TYPE;
-
-  static boolean wasSaving = false;
-
-  static private Component filtersCombo;
-  static private JLabel label;
-  static private JComboBox saveTypeCombo;
-  static private JTextField textField;
-  
-  static void makeFileChooser()
+  RadioFormatAccessory()
   {
-    fd = new JFileChooser(MaxApplication.getProperty("user.dir"));
-    
-    //get filters comboBox
-    filtersCombo = ((Container)((Container)fd.getComponent(5)).getComponent(3)).getComponent(3);
+    dotJmaxButton = new JRadioButton( ".jmax");
+    dotPatButton = new JRadioButton( ".pat");
 
-    // get label
-    label = (JLabel)((Container)((Container)fd.getComponent(5)).getComponent(1)).getComponent(2);
-    //get file textfield 
-    textField = (JTextField)((Container)((Container)fd.getComponent(5)).getComponent(3)).getComponent(1);
+    ActionListener listener = new ActionListener() {
+	public void actionPerformed( ActionEvent e)
+	{
+	  String text = ((JRadioButton)(e.getSource())).getText();
 
-    //create save types comboBox
-    String[] types = {".jmax", ".pat"};
-    saveTypeCombo = new JComboBox(types);
-    saveTypeCombo.addActionListener(new ActionListener() {
-	public void actionPerformed(ActionEvent e) {
-	    JComboBox cb = (JComboBox)e.getSource();
-	    setSaveType((String)cb.getSelectedItem());
+	  if ( text.equals( ".pat"))
+	    MaxFileChooser.setSaveType( MaxFileChooser.SAVE_PAT_TYPE );
+	  else
+	    MaxFileChooser.setSaveType( MaxFileChooser.SAVE_JMAX_TYPE );
 	}
-    });
+      };
+
+    dotJmaxButton.addActionListener( listener);
+    dotPatButton.addActionListener( listener);
+
+    ButtonGroup bg = new ButtonGroup();
+
+    bg.add( dotJmaxButton);
+    bg.add( dotPatButton);
+
+    JPanel panel1 = new JPanel();
+
+    TitledBorder titleBorder = new TitledBorder( LineBorder.createGrayLineBorder(), "Format");
+    titleBorder.setTitleJustification( TitledBorder.LEFT);
+
+    panel1.setBorder( titleBorder);
+
+    panel1.setLayout( new GridLayout(0, 1));
+
+    panel1.add( dotJmaxButton);
+    panel1.add( dotPatButton);
+
+    add( panel1);
   }
 
- public static int getSaveType()
- {
-   return saveType; 
- }
+  void setSaveType( int saveType)
+  {
+    if (saveType == MaxFileChooser.SAVE_PAT_TYPE)
+      dotPatButton.setSelected( true);
+    else
+      dotJmaxButton.setSelected( true);
+  }
 
- public static void setSaveType(String type)
- {
-   if(type.equals(".pat"))
-   {
-     saveType = SAVE_PAT_TYPE;
-     textField.setText("untitled.pat");
-   }   
-   else
-   {
-     saveType = SAVE_JMAX_TYPE;
-     textField.setText("untitled.jmax");
-   } 
- }
+  private JRadioButton dotJmaxButton;
+  private JRadioButton dotPatButton;
+}
 
- /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
+public class MaxFileChooser
+{
+  private static JFileChooser fd;
+  private static RadioFormatAccessory formatAccessory;
+
+  private static boolean configured = false;
+
+  public static final int SAVE_JMAX_TYPE = 0;
+  public static final int SAVE_PAT_TYPE = 1;
+  private static int saveType = SAVE_JMAX_TYPE;
+
+  static void makeFileChooser()
+  {
+    fd = new JFileChooser( MaxApplication.getProperty("user.dir"));
+    formatAccessory = new RadioFormatAccessory();
+  }
+
+  public static int getSaveType()
+  {
+    return saveType; 
+  }
+
+  static void setSaveType( int type)
+  {
+    saveType = type;
+
+    File currentFile = fd.getSelectedFile();
+
+    String name = currentFile.getName();
+    String suffix = "";
+
+    if (saveType == SAVE_JMAX_TYPE)
+      suffix = ".jmax";
+    else if (saveType == SAVE_PAT_TYPE)
+      suffix = ".pat";
+
+    if ( name.endsWith( ".jmax") || name.endsWith( ".pat"))
+      {
+	int i = name.lastIndexOf( '.');
+	    
+	String newName = null;
+
+	try
+	  {
+	    newName = name.substring( 0, i) + suffix;
+	    fd.setSelectedFile( new File( newName));
+	  }
+	catch ( StringIndexOutOfBoundsException exc)
+	  {
+	  }
+      }
+
+    if (formatAccessory != null)
+      formatAccessory.setSaveType( type);
+  }
+
+  /* Added the full class name to FileFilter because of clash with java.io.FileFilter in JDK 1.2 */
   private static void configure()
   {
-      if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
+    if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
       {
 	fd.setFileFilter(Mda.getAllDocumentsFileFilter());
 
@@ -139,7 +191,7 @@ public class MaxFileChooser
     if (fd == null)
       makeFileChooser();
 
-    reInit(true);
+    fd.setAccessory( null);
 
     if ( !configured)
       configure();
@@ -174,8 +226,6 @@ public class MaxFileChooser
     if (fd == null)
       makeFileChooser();
 
-    reInit(false);
-
     if ( !configured)
       configure();
 
@@ -198,64 +248,15 @@ public class MaxFileChooser
       }
   }
 
-  static private void reInit(boolean open)
+  public static File chooseFileToSave(Frame frame, File oldFile, String title, int type)
   {
-    if(open)
-    {
-      if(wasSaving)
-      {
-	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).remove(saveTypeCombo);
-	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).add(filtersCombo, 3);
-	  label.setText("Files of type");
-	  wasSaving = false;
-      }
-      textField.setText("");
-    }
-    else
-    {
-      if(!wasSaving)
-      {
-	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).remove(filtersCombo);
-	  ((Container)((Container)fd.getComponent(5)).getComponent(3)).add(saveTypeCombo, 3);
-	  label.setText("Save as type");
-	  wasSaving = true;
-      }
-      saveTypeCombo.setSelectedIndex(0);
-      textField.setText("untitled.jmax");
-    }
+    if (fd == null)
+      makeFileChooser();
+
+    setSaveType( type);
+
+    fd.setAccessory( formatAccessory );
+
+    return chooseFileToSave( frame, oldFile, title);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

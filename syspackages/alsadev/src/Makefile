@@ -33,7 +33,7 @@ include Sources
 
 MORESOLIBS=-lasound
 
-PACKAGELIB=$(LIBDIR)/libalsadev-0.4.so
+PACKAGELIB=$(LIBDIR)/libalsadev.so
 
 all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
 

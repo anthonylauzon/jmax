@@ -58,14 +58,18 @@ extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
   It contains ALSA specific datas.
 */
 
+#define CHANNEL_CNT 20
+
+
 typedef struct alsa_pcm_dev_data {
   snd_pcm_t *handle;
-  int n_channels;
+  snd_pcm_t *pcm_handle[CHANNEL_CNT];
+  int n_voices;
   long bytes_count;
   short *fmtbuf;
 } alsa_pcm_dev_data_t;
 
-#define DEFAULT_N_CHANNELS 2
+#define DEFAULT_N_VOICES 1
 
 
 /*----------------------------------------------------------------------------*/
@@ -103,7 +107,7 @@ static void alsa_dac_init(void)
   */
   fts_dev_class_sig_set_get_nerrors_fun( alsa_dac_class, alsa_dac_get_nerrors);
   /* Definition of the device class `get_nchans' function
-     This function returns the number of channels of the device
+     This function returns the number of voices of the device
   */
   fts_dev_class_sig_set_get_nchans_fun( alsa_dac_class, alsa_dac_get_nchans);
 }
@@ -113,80 +117,184 @@ static void alsa_dac_init(void)
 
   It gets as arguments an array of atoms (as an object...) with a passing by name.
   For instance, the arguments may be:
-  [0] (symbol) "channels"
+  [0] (symbol) "voices"
   [1] (int)    2
   [2] (symbol) "card"
   [3] (int)    2
 */
 
+int
+set_parameters (int card, int rate, int latency_samples)
+
+{
+        snd_ctl_t *ctl_handle;
+        int i, err, dev, idx;
+        snd_switch_t sw;
+
+        if ((err = snd_ctl_open (&ctl_handle, card)) < 0) {
+                fprintf(stderr, 
+                        "error: control open (%i): %s\n", 
+                        card, snd_strerror(err));
+                return 1;
+        }
+
+        /* SAMPLE RATE */
+
+        strcpy (sw.name, "sample rate");
+
+        if ((err = snd_ctl_switch_read (ctl_handle, &sw)) < 0) {
+                fprintf (stderr, "can't read sample rate (%s)\n",
+                         snd_strerror (err));
+                return 1;
+        }
+
+        post ("Old sample rate: %ukHz\n", sw.value.data32[0]);
+
+        sw.value.data32[0] = rate;
+
+        if ((err = snd_ctl_switch_write (ctl_handle, &sw)) < 0) {
+                fprintf (stderr, "can't write sample rate (%s)\n",
+                         snd_strerror (err));
+                return 1;
+        }
+
+        post ("New sample rate: %ukHz\n", sw.value.data32[0]);
+
+        /* LATENCY */
+
+        strcpy (sw.name, "latency");
+
+        if ((err = snd_ctl_switch_read (ctl_handle, &sw)) < 0) {
+                fprintf (stderr, "can't read latency (%s)\n",
+                         snd_strerror (err));
+                return 1;
+        }
+
+        post ("Old latency: %d samples\n", sw.value.data16[0]);
+
+        sw.value.data16[0] = latency_samples;
+
+        if ((err = snd_ctl_switch_write (ctl_handle, &sw)) < 0) {
+                fprintf (stderr, "can't write latency (%s)\n",
+                         snd_strerror (err));
+                return 1;
+        }
+
+        post ("New latency: %d samples\n", sw.value.data16[0]);
+
+        return 0;
+}
+
+static fts_status_t open_subdev( snd_pcm_t **handle, int subdev)
+{
+  snd_pcm_channel_params_t params;
+  int err;
+
+  if ( (err = snd_pcm_open_subdevice( handle, 0, 0, subdev, SND_PCM_OPEN_PLAYBACK)) < 0 )
+    {
+      post( "Error: snd_pcm_open_subdevice() failed: %s\n", snd_strerror (err));
+      return &fts_dev_open_error;
+    }
+
+
+  memset( &params, 0, sizeof( params));
+
+  params.channel = SND_PCM_CHANNEL_PLAYBACK;
+  params.mode = SND_PCM_MODE_BLOCK;
+  params.start_mode = SND_PCM_START_DATA;
+  params.stop_mode = SND_PCM_STOP_ROLLOVER;
+
+  params.format.format = SND_PCM_SFMT_U32_LE; 
+  params.format.rate = 44100;
+  params.format.voices = 1;
+  params.format.interleave = 0;
+
+  params.buf.block.frag_size = 4 * 1024;
+  params.buf.block.frags_min = 2;
+  params.buf.block.frags_max = 2;
+
+  /*    params.buf.stream.queue_size = n_voices * sizeof( short) * MAXVS; */
+  /*    params.buf.stream.fill = SND_PCM_FILL_SILENCE; */
+  /*    params.buf.stream.max_fill = 1024; */
+
+#if 0
+  if ((err = snd_pcm_channel_flush (*handle, SND_PCM_CHANNEL_PLAYBACK)) < 0) 
+    {
+      post( "Error: snd_pcm_channel_flush() failed: %s\n", snd_strerror (err));
+
+      return &fts_dev_open_error;
+    }
+#endif
+
+  if ((err = snd_pcm_channel_params( *handle, &params)) < 0)
+    { 
+      post( "Error: snd_pcm_channel_params() failed: %s\n", snd_strerror( err ));
+      snd_pcm_close( *handle ); 
+
+      return &fts_dev_open_error;
+    } 
+
+  if ( (err = snd_pcm_channel_prepare (*handle, SND_PCM_CHANNEL_PLAYBACK)) < 0)
+    {
+      post( "Error: snd_pcm_channel_prepare() failed: %s\n", snd_strerror (err));
+      return &fts_dev_open_error;
+    }
+
+  return fts_Success;
+}
+
+
 static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  unsigned int n_channels;
+  int n_voices, i;
   int err, card, device;
   alsa_pcm_dev_data_t *data;
-  snd_pcm_t *handle;
-  snd_pcm_playback_info_t playback_info;
-  snd_pcm_format_t format;
-  snd_pcm_playback_params_t pcm_playback_params;
+  snd_pcm_t **handle;
+  snd_pcm_channel_info_t channel_info;
+  snd_pcm_channel_params_t params;
+
+  n_voices = 8;
 
   /* Allocation of device data */
   data = (alsa_pcm_dev_data_t *)fts_malloc( sizeof( alsa_pcm_dev_data_t));
+  /* Device data settings */
+  data->n_voices = n_voices;
+  data->bytes_count = 0;
+  data->fmtbuf = (short *)fts_malloc( MAXVS * n_voices * sizeof( short));
+
+  fts_dev_set_device_data( dev, data);
 
   /* Parameter parsing */
-  n_channels = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), DEFAULT_N_CHANNELS);
+  n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
+
+  post( "n_voices %d\n", n_voices);
 
   card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), snd_defaults_pcm_card());
   device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
 
   /* ALSA handle opening */
+#if 0
   if ( snd_pcm_open( &handle, card, device, SND_PCM_OPEN_PLAYBACK) )
     {
       post( "Error: snd_pcm_open() failed\n");
       return &fts_dev_open_error;
     }
+#else
 
-  if ( snd_pcm_playback_info( handle, &playback_info) )
+  if (set_parameters ( 0, 44100, 1024))
     {
-      post( "Error: snd_pcm_playback_info() failed\n");
       return &fts_dev_open_error;
     }
+      
 
-  if ( n_channels > playback_info.max_channels || n_channels < playback_info.min_channels )
+  for ( i = 0; i < CHANNEL_CNT; i++)
     {
-      post( "Error: wrong number of channels ( %d <= %d <= %d)\n", playback_info.min_channels, n_channels, playback_info.max_channels);
-      return &fts_dev_open_error;
+      fts_status_t err;
+
+      if ( (err = open_subdev( &(data->pcm_handle[i]), i)) != fts_Success)
+	return err;
     }
-
-  format.format = SND_PCM_SFMT_S16_LE; 
-  format.rate = 44100;
-  format.channels = 2;
-
-  if ((err = snd_pcm_playback_format( handle, &format)) < 0)
-    { 
-      post( "Error: format setup failed: %s\n", snd_strerror( err ));  
-      snd_pcm_close( handle ); 
-
-      return &fts_dev_open_error;
-    } 
-
-  pcm_playback_params.fragment_size = n_channels * sizeof( short) * MAXVS;
-  pcm_playback_params.fragments_max = fts_param_get_int(fts_s_fifo_size, 256) / MAXVS;
-  pcm_playback_params.fragments_room = 1;
-
-  if( (err = snd_pcm_playback_params( handle, &pcm_playback_params)) < 0)
-    { 
-      post( "Error: pcm_playback_params failed: %s\n", snd_strerror(err));
-      return &fts_dev_open_error;
-    }
-
-  /* Device data settings */
-  data->handle = handle;
-  data->n_channels = n_channels;
-  data->bytes_count = 0;
-  data->fmtbuf = (short *)fts_malloc( MAXVS * n_channels * sizeof( short));
-
-  fts_dev_set_device_data( dev, data);
-
+#endif
   /* This is to inform the scheduler that it should use this device to check for I/O errors */
   fts_dsp_set_dac_slip_dev( dev);
 
@@ -217,7 +325,7 @@ static int alsa_dac_get_nchans( fts_dev_t *dev)
 
   data = (alsa_pcm_dev_data_t *)fts_dev_get_device_data( dev);
 
-  return data->n_channels;
+  return data->n_voices;
 }
 
 static int alsa_dac_get_nerrors( fts_dev_t *dev)
@@ -248,31 +356,31 @@ static void alsa_dac_put( fts_word_t *argv)
 {
   fts_dev_t *dev;
   alsa_pcm_dev_data_t *data;
-  int n_channels, channel, n, i, j;
+  int n_voices, voice, n, i, j;
 
   dev = *((fts_dev_t **)fts_word_get_ptr( argv));
 
   data = (alsa_pcm_dev_data_t *)fts_dev_get_device_data( dev);
 
-  n_channels = fts_word_get_long(argv + 1);
+  n_voices = fts_word_get_long(argv + 1);
   n = fts_word_get_long(argv + 2);
 
-  for ( channel = 0; channel < n_channels; channel++)
+  for ( voice = 0; voice < n_voices; voice++)
     {
       float *in;
       
-      in = (float *) fts_word_get_ptr( argv + 3 + channel);
+      in = (float *) fts_word_get_ptr( argv + 3 + voice);
 
-      j = channel;
+      j = voice;
       for ( i = 0; i < n; i++)
 	{
 	  data->fmtbuf[j] = (short) ( 32767.0f * in[i]);
-	  j += n_channels;
+	  j += n_voices;
 	}
     }
 
   /* output the buffer */
-  snd_pcm_write( data->handle, data->fmtbuf, n * n_channels * sizeof( short));
+  snd_pcm_write( data->handle, data->fmtbuf, n * n_voices * sizeof( short));
 }
 
 
@@ -306,7 +414,7 @@ static void alsa_adc_init(void)
   fts_dev_class_sig_set_get_fun( alsa_adc_class, alsa_adc_get);
 
   /* Definition of the device class `get_nchans' function
-     This function returns the number of channels of the device
+     This function returns the number of voices of the device
   */
   fts_dev_class_sig_set_get_nchans_fun( alsa_adc_class, alsa_adc_get_nchans);
 }
@@ -321,19 +429,18 @@ static void alsa_adc_init(void)
 
 static fts_status_t alsa_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  unsigned int n_channels;
+  int n_voices;
   int err, card, device;
   alsa_pcm_dev_data_t *data;
   snd_pcm_t *handle;
-  snd_pcm_capture_info_t capture_info;
-  snd_pcm_format_t format;
-  snd_pcm_capture_params_t pcm_capture_params;
+  snd_pcm_channel_info_t channel_info;
+  snd_pcm_channel_params_t params;
 
   /* Allocation of device data */
   data = (alsa_pcm_dev_data_t *)fts_malloc( sizeof( alsa_pcm_dev_data_t));
 
   /* Parameter parsing */
-  n_channels = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), DEFAULT_N_CHANNELS);
+  n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
 
   card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), snd_defaults_pcm_card());
   device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
@@ -345,44 +452,38 @@ static fts_status_t alsa_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *
       return &fts_dev_open_error;
     }
 
-  if ( snd_pcm_capture_info( handle, &capture_info) )
+  if ( snd_pcm_channel_info( handle, &channel_info) )
     {
-      post( "Error: snd_pcm_capture_info() failed\n");
+      post( "Error: snd_pcm_channel_info() failed\n");
       return &fts_dev_open_error;
     }
 
-  if ( n_channels > capture_info.max_channels || n_channels < capture_info.min_channels )
+  if ( n_voices > channel_info.max_voices || n_voices < channel_info.min_voices )
     {
-      post( "Error: wrong number of channels ( %d <= %d <= %d)\n", capture_info.min_channels, n_channels, capture_info.max_channels);
+      post( "Error: wrong number of voices ( %d <= %d <= %d)\n", channel_info.min_voices, n_voices, channel_info.max_voices);
       return &fts_dev_open_error;
     }
 
-  format.format = SND_PCM_SFMT_S16_LE; 
-  format.rate = 44100;
-  format.channels = 2;
+  params.format.interleave = 1;
+  params.format.format = SND_PCM_SFMT_S16_LE; 
+  params.format.rate = 44100;
+  params.format.voices = 2;
+  params.buf.block.frag_size = n_voices * sizeof( short) * MAXVS;
+  params.buf.block.frags_max = fts_param_get_int(fts_s_fifo_size, 256) / MAXVS;
 
-  if ((err = snd_pcm_capture_format( handle, &format)) < 0)
+  if ((err = snd_pcm_channel_params( handle, &params)) < 0)
     { 
-      post( "Error: format setup failed: %s\n", snd_strerror( err ));  
+      post( "Error: snd_pcm_channel_params() failed: %s\n", snd_strerror( err ));  
       snd_pcm_close( handle ); 
 
       return &fts_dev_open_error;
     } 
 
-  pcm_capture_params.fragment_size = n_channels * sizeof( short) * MAXVS;
-  pcm_capture_params.fragments_min = 1;
-
-  if( (err = snd_pcm_capture_params( handle, &pcm_capture_params)) < 0)
-    { 
-      post( "Error: pcm_capture_params failed: %s\n", snd_strerror(err));
-      return &fts_dev_open_error;
-    }
-
   /* Device data settings */
   data->handle = handle;
-  data->n_channels = n_channels;
+  data->n_voices = n_voices;
   data->bytes_count = 0;
-  data->fmtbuf = (short *)fts_malloc( MAXVS * n_channels * sizeof( short));
+  data->fmtbuf = (short *)fts_malloc( MAXVS * n_voices * sizeof( short));
 
   fts_dev_set_device_data( dev, data);
 
@@ -410,7 +511,7 @@ static int alsa_adc_get_nchans(fts_dev_t *dev)
 
   data = (alsa_pcm_dev_data_t *)fts_dev_get_device_data( dev);
 
-  return data->n_channels;
+  return data->n_voices;
 }
 
 /*
@@ -430,28 +531,28 @@ static void alsa_adc_get( fts_word_t *argv)
 {
   fts_dev_t *dev;
   alsa_pcm_dev_data_t *data;
-  int n_channels, channel, n, i, j;
+  int n_voices, voice, n, i, j;
 
   dev = *((fts_dev_t **)fts_word_get_ptr( argv));
 
   data = (alsa_pcm_dev_data_t *)fts_dev_get_device_data( dev);
 
-  n_channels = fts_word_get_long(argv + 1);
+  n_voices = fts_word_get_long(argv + 1);
   n = fts_word_get_long(argv + 2);
 
-  snd_pcm_read( data->handle, data->fmtbuf, n * n_channels * sizeof( short));
+  snd_pcm_read( data->handle, data->fmtbuf, n * n_voices * sizeof( short));
 
-  for ( channel = 0; channel < n_channels; channel++)
+  for ( voice = 0; voice < n_voices; voice++)
     {
       float *out;
       
-      out = (float *) fts_word_get_ptr( argv + 3 + channel);
+      out = (float *) fts_word_get_ptr( argv + 3 + voice);
 
-      j = channel;
+      j = voice;
       for ( i = 0; i < n; i++)
 	{
 	  out[i] = (float)data->fmtbuf[j] / 32767.0f;
-	  j += n_channels;
+	  j += n_voices;
 	}
     }
 }

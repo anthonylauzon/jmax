@@ -120,4 +120,4 @@ fts_mess_shutdown(void)
   fts_object_table_delete_all();
 }
 
-fts_module_t fts_mess_module = {"Mess", "The new Mess module", fts_mess_init, fts_mess_restart, fts_mess_shutdown};
+fts_module_t fts_mess_module = {"Mess", "The new Mess module", fts_mess_init, fts_mess_restart, fts_mess_shutdown, 0};

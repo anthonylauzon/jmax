@@ -130,8 +130,7 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 
     if (document instanceof FtsPatcherDocument) 
       {
-	fts.saveJMaxFile(((FtsPatcherData) document.getRootData()).getContainerObject(),
-					     file);
+	fts.saveJMaxFile(((FtsPatcherData) document.getRootData()).getContainerObject(), file);
       }
     else
       throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");

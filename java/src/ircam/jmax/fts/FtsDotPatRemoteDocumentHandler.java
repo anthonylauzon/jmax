@@ -123,16 +123,16 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
     throw new MaxDocumentException("Cannot save in .pat file format");
   }
 
-  // Overwrite upper class method; we cannot save to a .pat file.
+  // Overwrite upper class method; we can save to a .pat file (or at least we try to...)
 
   public boolean canSaveTo(File file)
   {
-    return false;
+    return true;
   }
 
   public boolean canSaveTo(MaxDocument document, File file)
   {
-    return false;
+    return (document instanceof FtsPatcherDocument);
   }
 
   public String getDescription()

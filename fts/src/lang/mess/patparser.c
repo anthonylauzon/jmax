@@ -563,7 +563,7 @@ fts_get_child(fts_object_t *obj, int idx)
   fts_patcher_t *patcher = (fts_patcher_t *) obj;
   fts_object_t *p;
   
-  idx = fts_patcher_number_of_objects((fts_patcher_t *)obj) - idx - 1;
+  idx = fts_patcher_get_objects_count( (fts_patcher_t *)obj ) - idx - 1;
 
   for (p = patcher->objects; p ; p = p->next_in_patcher)
     {
@@ -950,41 +950,39 @@ static fts_graphic_description_t *fts_patparse_parse_graphic_description(fts_pat
 
 static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patlex_t *in)
 {
-  int x1, y1, x2, y2;
+  int x_top_left, y_top_left, x_bottom_right, y_bottom_right;
   fts_atom_t x, y, height, width;
 
-  /* We don't try to do many checks, for the moment */
-
   fts_patlex_next_token(in);
-  x1 = fts_get_int(&(in->val));
+  x_top_left = fts_get_int(&(in->val));
     
   fts_patlex_next_token(in);
-  y1 = fts_get_int(&(in->val));
+  y_top_left = fts_get_int(&(in->val));
 
   fts_patlex_next_token(in);
-  x2 = (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN;
+  x_bottom_right = fts_get_int(&(in->val));
 
   fts_patlex_next_token(in);
-  y2 = (SCALE_MULT * fts_get_int(&(in->val)))/ SCALE_DEN;
+  y_bottom_right = fts_get_int(&(in->val));
 
   /* If patcher window has big negative coordinates */
-  if (x1 < -10000 || y1 < -10000)
+  if (x_top_left < -10000 || y_top_left < -10000)
     {
       fts_atom_t a;
 
       fts_set_int( &a, 1);
       fts_object_put_prop( parent, fts_new_symbol( "no_upload"), &a);
 
-      x1 = -x1;
-      y1 = -y1;
+      x_top_left = -x_top_left;
+      y_top_left = -y_top_left;
 
       return;
     }
 
-  fts_set_int(&(x), (SCALE_MULT * x1)/ SCALE_DEN);
-  fts_set_int(&(y), (SCALE_MULT * y1)/ SCALE_DEN);
-  fts_set_int(&width,  x2 - fts_get_int(&x));
-  fts_set_int(&height, y2 - fts_get_int(&y));
+  fts_set_int( &x, x_top_left);
+  fts_set_int( &y, y_top_left);
+  fts_set_int( &width, (SCALE_MULT * (x_bottom_right - x_top_left) / SCALE_DEN) );
+  fts_set_int( &height, (SCALE_MULT * (y_bottom_right - y_top_left) / SCALE_DEN) );
 
   fts_object_put_prop(parent, fts_s_wx, &x);
   fts_object_put_prop(parent, fts_s_wy, &y);

@@ -83,10 +83,20 @@ public class PatcherSaveManager
     FtsPatcherData patcherData = sketch.getFtsPatcherData();
     boolean saved = false;
 
+    int saveType;
+
+    if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
+      saveType = MaxFileChooser.SAVE_PAT_TYPE;
+    else
+      saveType = MaxFileChooser.SAVE_JMAX_TYPE;
+    
     if (! document.isRootData(patcherData))
 	return SaveAsFromSubPatcher(container , document);
 
-    file = MaxFileChooser.chooseFileToSave( container.getFrame(), document.getDocumentFile(), "Save As");
+    file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
+					    document.getDocumentFile(), 
+					    "Save As",
+					    saveType);
 
     if (file == null)
       return false;

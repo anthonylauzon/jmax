@@ -351,21 +351,6 @@ fts_bmax_find_objidx(fts_object_t *obj)
   return -1;
 }
 
-static int
-fts_bmax_count_childs(fts_patcher_t *patcher)
-{
-  /* Count the childs in a patcher */
-
-  fts_object_t *p;
-  int i = 0;
-
-  for (p = patcher->objects; p ; p = p->next_in_patcher)
-    i++;
-
-  return i;
-}
-
-
 static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 {
   unsigned int i;
@@ -1072,7 +1057,7 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx, int to
     
   /* Allocate a new object table frame of the right dimension */
 
-  fts_bmax_code_push_obj_table(f, fts_bmax_count_childs(patcher));
+  fts_bmax_code_push_obj_table(f, fts_patcher_get_objects_count(patcher));
 
   /* Code all the objects */
 

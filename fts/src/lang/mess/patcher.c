@@ -51,6 +51,7 @@ rewritten, i am afraid :-< ).
 */
 
 #include <stdarg.h>
+#include <stdio.h>
 #include "sys.h"
 #include "lang.h"
 #include "lang/mess/messP.h"
@@ -474,10 +475,10 @@ static void
 patcher_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
 {
   fts_patcher_t *this  = (fts_patcher_t *) o;
-  fts_inlet_t *p;
+  fts_inlet_t *i;
 
-  for (p = this->inlets[winlet]; p; p = p->next)
-    fts_outlet_send((fts_object_t *)p, 0, s, ac, at);
+  for (i = this->inlets[winlet]; i; i = i->next)
+    fts_outlet_send((fts_object_t *)i, 0, s, ac, at);
 }
 
 
@@ -758,9 +759,132 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_block_free((char *) this->outlets, sizeof(fts_outlet_t *)*fts_object_get_outlets_number((fts_object_t *) this));
 }
 
+/*
+  Function: patcher_open_and_save_dotpat
+  Description:
+    Saves a patcher in .pat format
+  Arguments:
+    at[0]  filename         the name of the destination file
+  Note:
+    This method does not check for nor add a .pat suffix to the file name.
+    This is left to the user interface.
+*/
+static void patcher_save_dotpat_content( fts_patcher_t *patcher, FILE *file);
 
-static void
-patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void patcher_open_and_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  FILE *file;
+
+  file = fopen( fts_symbol_name( fts_get_symbol( at)), "w");
+
+  if ( file != NULL)
+    {
+      fprintf( file, "max v2;\n");
+
+      patcher_save_dotpat_content( (fts_patcher_t *)o, file);
+
+      fclose( file);
+    }
+  else
+    {
+      /* This should be a dialog opened in the user interface */
+      post( "Error: cannot open %s for saving\n", fts_symbol_name( fts_get_symbol(at)) );
+    }
+}
+
+static void patcher_save_dotpat_description( fts_object_t *object, FILE *file, const char *command)
+{
+  int x, y, w, font_index;
+  fts_atom_t a;
+  int i;
+
+  fts_object_get_prop( object, fts_s_x, &a);
+  x = fts_get_int( &a);
+  fts_object_get_prop( object, fts_s_y, &a);
+  y = fts_get_int( &a);
+  fts_object_get_prop( object, fts_s_width, &a);
+  w = fts_get_int( &a);
+  font_index = 1;
+
+  fprintf( file, "#P %s %d %d %d %d ", command, x, y, w, font_index);
+
+  for ( i = 0; i < object->argc; i++)
+    {
+      fts_atom_t *a;
+
+      a = object->argv + i;
+
+      if (fts_is_int(a))
+	fprintf( file, "%d", fts_get_int( a));
+      else if (fts_is_float(a))
+	fprintf( file, "%f", fts_get_float( a));
+      else if (fts_is_symbol(a))
+	fprintf( file, "%s", fts_symbol_name( fts_get_symbol( a)) );
+
+      if ( i < object->argc - 1)
+	fprintf( file, " ");
+    }
+
+  fprintf( file, ";\n");
+}
+
+static void patcher_save_dotpat_content( fts_patcher_t *patcher, FILE *file)
+{
+  int x_top_left, y_top_left, x_bottom_right, y_bottom_right;
+  fts_atom_t a;
+  fts_object_t *object;
+
+  fts_object_get_prop( (fts_object_t *)patcher, fts_s_wx, &a);
+  x_top_left = fts_get_int( &a);
+  fts_object_get_prop( (fts_object_t *)patcher, fts_s_wy, &a);
+  y_top_left = fts_get_int( &a);
+  fts_object_get_prop( (fts_object_t *)patcher, fts_s_ww, &a);
+  x_bottom_right = fts_get_int( &a);
+  fts_object_get_prop( (fts_object_t *)patcher, fts_s_wh, &a);
+  y_bottom_right = fts_get_int( &a);
+
+  /* Save window properties */
+  fprintf( file, "#N vpatcher %d %d %d %d;\n", x_top_left, y_top_left, x_bottom_right, y_bottom_right);
+
+  /* Save objects */
+  for ( object = patcher->objects; object ; object = object->next_in_patcher)
+    {
+      if ( fts_object_handle_message( object, fts_SystemInlet, fts_new_symbol( "save_dotpat")))
+	{
+	  fts_atom_t a;
+
+	  fts_set_ptr( &a, file);
+	  fts_message_send( object, fts_SystemInlet, fts_new_symbol( "save_dotpat"), 1, &a);
+	}
+      else
+	patcher_save_dotpat_description( object, file, "newex");
+    }
+
+  /* Save connections */
+
+  fprintf( file, "#P pop;\n");
+}
+
+static void patcher_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  FILE *file;
+  fts_patcher_t *patcher;
+
+  patcher = (fts_patcher_t *)o;
+  file = (FILE *)fts_get_ptr( at);
+
+  if ( ! fts_patcher_is_abstraction( patcher) && ! fts_patcher_is_template( patcher) )
+    patcher_save_dotpat_description( o, file, "newex");
+  else
+    {
+      patcher_save_dotpat_content( (fts_patcher_t *)o, file);
+
+      patcher_save_dotpat_description( o, file, "newobj");
+    }
+}
+
+
+static void patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_property_changed(o, fts_s_patcher_type);
 }
@@ -1289,7 +1413,7 @@ void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj)
       }
 }
 
-int fts_patcher_number_of_objects(fts_patcher_t *this)
+int fts_patcher_get_objects_count(fts_patcher_t *this)
 {
   int i = 0;
   fts_object_t *p;	

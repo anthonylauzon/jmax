@@ -71,7 +71,7 @@ extern fts_class_mess_t *fts_class_mess_get(fts_class_t *cl, int winlet, fts_sym
 extern void fts_create_root_patcher(void);
 extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
-extern int  fts_patcher_number_of_objects(fts_patcher_t *this);
+extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
 extern void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data);
 
 /* Functions for direct .pat loading support */
