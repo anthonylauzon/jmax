@@ -195,13 +195,17 @@ FindPanel:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FindPanel.java)
 .PHONY: FindPanel
 
+FpePanel:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FpePanel.java)
+.PHONY: FpePanel
+
 Settings:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Settings.java)
 .PHONY: Settings
 
 MultiLineText:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MultiLineText.java)
-.PHONY: FindPanel MultiLineText
+.PHONY: MultiLineText
 
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

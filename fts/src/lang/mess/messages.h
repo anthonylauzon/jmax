@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/08/19 15:15:48 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/08/26 16:31:40 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -26,6 +26,35 @@ extern fts_status_description_t fts_InvalidMessage;
 /* init function */
 
 extern void fts_messages_init(void);
+
+/* The object stack; used for fpe handling, debug and who know what else in the future */
+
+#define DO_OBJECT_STACK
+
+#ifdef DO_OBJECT_STACK
+extern int fts_objstack_top; /* Next free slot; can overflow, must be checked */
+extern fts_object_t *fts_objstack[];
+
+#define FTS_OBJSTACK_SIZE  8*1024
+
+#define FTS_OBJSTACK_PUSH(obj)   { if (fts_objstack_top < FTS_OBJSTACK_SIZE)  \
+                                      fts_objstack[fts_objstack_top++] = (obj); \
+				   else \
+				      fts_objstack_top++; \
+				 }
+
+#define FTS_OBJSTACK_POP(obj)    (fts_objstack_top--)
+
+#define fts_get_current_object() (((fts_objstack_top > 0) && (fts_objstack_top <= FTS_OBJSTACK_SIZE)) ? \
+				  fts_objstack[fts_objstack_top - 1] : \
+				  (fts_object_t *)0)
+#else
+
+#define FTS_OBJSTACK_PUSH(obj)
+#define FTS_OBJSTACK_POP(obj)
+#define fts_get_current_object() (0)
+
+#endif
 
 /* Messaging */
 
@@ -77,7 +106,11 @@ extern long fts_get_boolean_by_name(int argc, const fts_atom_t *at,  fts_symbol_
 while((CONN)) \
   { \
     if (((CONN)->symb == (S)) || (!(CONN)->symb && (CONN)->mth)) \
-       (*(CONN)->mth)((CONN)->dst, (CONN)->winlet, (S), (AC), (AT)); \
+       {							  \
+           FTS_OBJSTACK_PUSH((CONN)->dst);                        \
+           (*(CONN)->mth)((CONN)->dst, (CONN)->winlet, (S), (AC), (AT)); \
+           FTS_OBJSTACK_POP((CONN)->dst);                         \
+       } \
     else \
        fts_send_message_cache((CONN)->dst, (CONN)->winlet, (S), (AC), (AT), &((CONN)->symb), &((CONN)->mth)); \
  \
@@ -166,3 +199,6 @@ extern void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom
 #endif
 
 #endif
+
+
+

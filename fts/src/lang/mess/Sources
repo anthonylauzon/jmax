@@ -29,5 +29,5 @@ send.c		\
 symbols.c	\
 variables.c	\
 vm.c	        \
-params.c
-
+params.c        \
+fpe.c

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/08/19 15:15:46 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/10/28 15:50:31 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -24,6 +24,7 @@
 static long fts_mess_run_time_check = INIT_CHECK_STATUS;
 
 
+
 /* Return Status */
 
 fts_status_description_t fts_MethodNotFound = {"method not found"};
@@ -31,6 +32,11 @@ fts_status_description_t fts_ArgumentMissing = {"argument missing"};
 fts_status_description_t fts_ArgumentTypeMismatch = {"argument type mismatch"};
 fts_status_description_t fts_ExtraArguments = {"extra arguments"};
 fts_status_description_t fts_InvalidMessage = {"invalid symbol message"};
+
+/* The object stack */
+
+int fts_objstack_top = 0; /* Next free slot; can overflow, must be checked */
+fts_object_t *fts_objstack[FTS_OBJSTACK_SIZE];
 
 /******************************************************************************/
 /*                                                                            */
@@ -121,7 +127,10 @@ fts_status_t fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int a
 	    return status;
 	}
 
+      FTS_OBJSTACK_PUSH(o);
       (*mess->mth)(o, winlet, s, ac, at);
+      FTS_OBJSTACK_POP(o);
+
       return fts_Success;
     }
 
@@ -205,7 +214,9 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
 	  *mth_cache = 0;
 	}
 
+      FTS_OBJSTACK_PUSH(o);
       (*mess->mth)(o, winlet, s, ac, at);
+      FTS_OBJSTACK_POP(o);
 
       return fts_Success;
     }
@@ -261,7 +272,9 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
 	  if ((status = fts_args_check(mess, ac, at)) != fts_Success)
 	    return status;
 
+	  FTS_OBJSTACK_PUSH(conn->dst);
 	  (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
+	  FTS_OBJSTACK_POP(conn->dst);
 	}
       else
 	fts_send_message_cache(conn->dst, conn->winlet, s, ac, at, &conn->symb, &conn->mth);
@@ -430,6 +443,9 @@ fts_get_boolean_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int d
 
   return def;
 }
+
+
+
 
 
 

@@ -19,8 +19,9 @@ public class FtsDspControl extends FtsRemoteData
 
   static final int FPE_START_COLLECT = 8;
   static final int FPE_STOP_COLLECT  = 9;
+  static final int FPE_CLEAR_COLLECT = 10;
 
-  static final int DSP_PRINT  = 10;
+  static final int DSP_PRINT  = 11;
 
   protected Integer dacSlip;
   protected Integer invalidFpe;
@@ -125,6 +126,11 @@ public class FtsDspControl extends FtsRemoteData
   public void stopFpeCollecting()
   {
     remoteCall(FPE_STOP_COLLECT);
+  }
+
+  public void clearFpeCollecting()
+  {
+    remoteCall(FPE_CLEAR_COLLECT);
   }
 
   /* Listeners support */

@@ -3,8 +3,8 @@
 #include "lang/datalib.h"
 #include "lang/ftl.h"
 #include "lang/dsp.h"
-#include "lang/dsp/dspfpe.h"
 #include "runtime.h"	/* @@@@ what should we do ?? */
+#include "lang/mess/fpe.h"
 
 /*
  * An ftl_data_t object implementing a set of control functions for the DSP engine.
@@ -29,8 +29,9 @@
 
 #define DSP_CONTROL_FPE_START_COLLECT   8
 #define DSP_CONTROL_FPE_STOP_COLLECT    9
+#define DSP_CONTROL_FPE_CLEAR_COLLECT  10
 
-#define DSP_CONTROL_DSP_PRINT          10
+#define DSP_CONTROL_DSP_PRINT          11
 
 
 extern fts_dev_t * fts_dsp_get_dac_slip_dev();
@@ -178,14 +179,19 @@ static void fts_dsp_control_fpe_start_collect( fts_data_t *d, int ac, const fts_
 
       set = (fts_object_set_t *) fts_get_data(at);
       
-      fts_dsp_fpe_start_collect(set);
+      fts_fpe_start_collect(set);
     }
 }
 
 
 static void fts_dsp_control_fpe_stop_collect( fts_data_t *d, int ac, const fts_atom_t *at)
 {
-  fts_dsp_fpe_stop_collect();
+  fts_fpe_stop_collect();
+}
+
+static void fts_dsp_control_fpe_clear_collect( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_fpe_empty_collection();
 }
 
 
@@ -218,6 +224,8 @@ void fts_dsp_control_config(void)
 				 fts_dsp_control_fpe_start_collect);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_STOP_COLLECT,
 				 fts_dsp_control_fpe_stop_collect);
+  fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_CLEAR_COLLECT,
+				 fts_dsp_control_fpe_clear_collect);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_ON,
 				 fts_dsp_control_remote_dsp_on);
   fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_DSP_PRINT,

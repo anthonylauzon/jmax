@@ -6,7 +6,6 @@
 #include "lang/dsp.h"
 #include "gphiter.h"
 
-extern void fts_dsp_fpe_empty_collection();
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -553,8 +552,6 @@ static void dsp_chain_create_end( void)
 
 void dsp_chain_create(int vs)
 {
-  fts_dsp_fpe_empty_collection();
-
   if (dsp_is_running())
     {
       post( "DSP is running, cannot create DSP chain\n");

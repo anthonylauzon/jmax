@@ -42,8 +42,23 @@ class FpePanel extends JFrame implements WindowListener
 
     addWindowListener(this);
 
-    JLabel label = new JLabel("Objects With Floating Point Exceptions");
+    JLabel label = new JLabel("Objects With Floating Point Exceptions ");
     label.setHorizontalTextPosition(label.RIGHT);
+
+    JPanel labelPanel = new JPanel();
+    labelPanel.setLayout( new BorderLayout());
+    labelPanel.setBorder( new EmptyBorder( 1, 1, 1, 1) );
+    labelPanel.add("West", label);
+
+    JButton clearButton = new JButton("Clear");
+    clearButton.setMargin( new Insets(2,2,2,2));
+    clearButton.addActionListener( new ActionListener() {
+      public void actionPerformed( ActionEvent e)
+	{
+	  Fts.getDspController().clearFpeCollecting();
+	}});
+
+    labelPanel.add("East", clearButton);
 
     objectSetViewer = new ObjectSetViewer();
 
@@ -53,7 +68,7 @@ class FpePanel extends JFrame implements WindowListener
     panel.setAlignmentX( LEFT_ALIGNMENT);
     //FpePanel.setOpaque( false);
 
-    panel.add( "North", label);
+    panel.add( "North", labelPanel);
     panel.add( "Center", objectSetViewer);
 
     //setSize( 300, 300);
