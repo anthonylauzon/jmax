@@ -150,29 +150,13 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
      else return true;	//run mode, no editing, no subpatcher opening (?)
    }
 
-  public void RestartEditing(){
-    if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
+  public void RestartEditing() { //extends ErmesObjEditableObject.RestartEditing()
     if((iAmPatcher)&&(itsSubWindow != null)){
       GetSketchWindow().CreateFtsGraphics(itsSubWindow);
       itsSubWindow.dispose();
       itsSubWindow = null;
     }
-	   
-    itsSketchPad.GetEditField().setFont(itsFont);
-    itsSketchPad.GetEditField().setText(itsArgs);
-    itsSketchPad.GetEditField().itsOwner = this; 
-    
-
-    if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*2);
-    else
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-6), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
-    
-    itsParsedTextVector.removeAllElements();
-    
-    itsSketchPad.GetEditField().setVisible(true);
-    itsSketchPad.GetEditField().requestFocus();
-    itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
+    super.RestartEditing();
   }
   
 

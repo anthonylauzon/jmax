@@ -2,7 +2,7 @@ package ircam.jmax.mda;
 
 import java.io.*;
 
-class MaxFileDataSource extends MaxDataSource
+public class MaxFileDataSource extends MaxDataSource
 {
   private File file;
 
@@ -21,3 +21,6 @@ class MaxFileDataSource extends MaxDataSource
     return "MaxFileDataSource(" + file.toString() + ")";
   }
 }
+
+
+

@@ -10,9 +10,14 @@ import ircam.jmax.editors.ermes.*;
 /**
  * The "patcher" graphic object. It knows the subpatchers it contains.
  */
-public class ErmesObjPatcher extends ErmesObject {
+/* NOTE:
+This class contains a number of non-optimized code, because
+The need have arised to have this object EDITABLE soon (5 Mars 1998)
+*/
+public class ErmesObjPatcher extends ErmesObjEditableObject {
 
-  String itsNameString;
+  //old variable set 
+  String itsNameString = new String();
   public ErmesSketchWindow itsSubWindow = null;
   Dimension preferredSize = new Dimension(80,24);
   String pathForLoading;
@@ -24,51 +29,37 @@ public class ErmesObjPatcher extends ErmesObject {
     super();
   }
 	
-  /*	//--------------------------------------------------------
-	// Init
-	//--------------------------------------------------------
-	public boolean Init(ErmesSketchPad theSketchPad, int x, int y) {
-	super.Init(theSketchPad, x, y);
-	itsNameString = "patcher...";
-	preferredSize = new Dimension(SetDimension(itsNameString));
-	currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
-	return true;
-	}*/
-  
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    if (theString.length() != 0) itsNameString = theString;
-    else itsNameString = "patcher...";
-    preferredSize = new Dimension(80, 20);	//vergogna
-    super.Init(theSketchPad, x, y, theString);
-    preferredSize = new Dimension(SetDimension(itsNameString));
-    currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
+    itsSelected = false;			//this was in ErmesObject
+    itsSketchPad = theSketchPad;	
+    laidOut = false;				
+    itsX = x;						
+    itsY = y;						
+    itsArgs = theString;			
+    if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
+    else super.Init(theSketchPad, x, y, theString); //OK, we have the args
+    itsFtsPatcher = GetSketchWindow().itsPatcher;
+    
+    ParseText(itsArgs);
     return true;
   }
   
-  // This Init(...FtsClass) is called when a FtsClass is available for the Object.
-  // this happens, now, just when we are loading from a file
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
-    String theString;
+    // Added by MDC; get the correct String from the object, and then call super
 
-    // modified by MDC to get the name of the patcher
-    // ???
+    itsArgs = theFtsObject.getDescription().trim();
 
-    theString = theFtsObject.getObjectName();
-
-    if (theString.length() != 0)
-      itsNameString = theString;
-    else
-      itsNameString = "patcher...";
-
-    // preferredSize = new Dimension(80, 20);	//vergogna
     super.Init(theSketchPad, theFtsObject);
 
-    preferredSize = new Dimension(SetDimension(itsNameString));
+    
+    ParseText(itsArgs);
+    ChangeJustification(itsSketchPad.LEFT_JUSTIFICATION);
+    RestoreDimensions();
 
-    return true;
+    return true;		// Why this method return a value ????
   }
 
   // starting of the graphic/FTS mix
@@ -76,22 +67,21 @@ public class ErmesObjPatcher extends ErmesObject {
 
   public void makeFtsObject()
   {
-    // This do not work; this object must be fixed.
-    try
-      {
-	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "patcher " + itsNameString);    
-      }
-    catch (FtsException e)
-      {
-	// Enzo !!! Aiuto :-> (MDC)
-      }
+    itsFtsObject = new FtsPatcherObject(itsFtsPatcher, itsArgs);
+  }
+
+  public void RestartEditing() { //extends ErmesObjEditableObject.RestartEditing()
+    if(itsSubWindow != null){
+      GetSketchWindow().CreateFtsGraphics(itsSubWindow);
+      itsSubWindow.dispose();
+      itsSubWindow = null;
+    }
+    super.RestartEditing();
   }
 
   public void redefineFtsObject()
   {
-    // Not implemented anymore; here, use setName, setNumberOfInlet and setNumberOfOutlet
-    // to change the patcher characteristics.
-    // itsFtsObject.setArgumentsDescription(itsNameString);
+    ((FtsPatcherObject)itsFtsObject).redefinePatcher(itsArgs);  
   }
   
 	
@@ -163,40 +153,29 @@ public class ErmesObjPatcher extends ErmesObject {
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
+	  
+
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    if(evt.getClickCount()>1){
-      if (itsSubWindow != null) {
-	itsSubWindow.show();
-	//itsSketchPad.itsFirstClick = true;
-	ErmesSketchPad.RequestOffScreen(itsSketchPad);
-      }
-      //ask MaxApplication to create a new Patcher with this FtsPatcher
-      //
-      else {
-	itsSubWindow = MaxApplication.NewSubPatcherWindow( (FtsContainerObject) itsFtsObject);
-	itsSketchPad.GetSketchWindow().AddToSubWindowList(itsSubWindow);
-      }
-    }
-    else
-      itsSketchPad.ClickOnObject(this, evt, x, y);
-    return true;
-  }
-	
-  //--------------------------------------------------------
-  // Load
-  //--------------------------------------------------------
-  /*  ???? 
-    public boolean Load(String file, String path) {
-    itsNameString = file;
-    pathForLoading = path;
-    Dimension d = SetDimension(itsNameString);
-    preferredSize.width = d.width;
-    preferredSize.height = d.height;
-    currentRect.width = preferredSize.width;
-    currentRect.height = preferredSize.height;
-    return true;
-  }
-  */
+     if (!itsSketchPad.itsRunMode) {
+       if(evt.getClickCount()>1) {
+	 {	
+	   if (itsSubWindow != null) {//show the subpatcher, it's there
+	     itsSubWindow.setVisible(true);
+	     ErmesSketchPad.RequestOffScreen(itsSketchPad);
+	   }
+	   else{	//this 'else' shouldn't be reached...
+	     itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	     MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
+	     GetSketchWindow().AddToSubWindowList(itsSubWindow);
+	   }
+	   return true;
+	 }
+       }
+       itsSketchPad.ClickOnObject(this, evt, x, y);
+       return true;
+     }
+     else return true;	//run mode, no editing, no subpatcher opening (?)
+   }
 	
   //--------------------------------------------------------
   // paint
@@ -217,7 +196,7 @@ public class ErmesObjPatcher extends ErmesObject {
     g.drawLine(itsX+7,itsY+6,itsX/*+13*/+currentRect.width/6,itsY/*+12*/+currentRect.height/2);
     g.drawLine(itsX+/*13*/currentRect.width/6,itsY/*+12*/+currentRect.height/2,itsX+7,itsY/*+18*/+currentRect.height-6);
     g.setFont(itsFont);
-    g.drawString(itsNameString, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsNameString))/2/*currentRect.width/6+3*/,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);		
+    g.drawString(itsArgs, itsX+(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2/*currentRect.width/6+3*/,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);		
     
     g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
@@ -226,7 +205,7 @@ public class ErmesObjPatcher extends ErmesObject {
 	
   void ResizeToNewFont(Font theFont) {
     if(!itsResized){
-      Resize(itsFontMetrics.stringWidth(itsNameString) + 32 - currentRect.width,
+      Resize(itsFontMetrics.stringWidth(itsArgs) + 32 - currentRect.width,
 	     itsFontMetrics.getHeight() + 10 - currentRect.height);
     }
     else ResizeToText(0,0);
@@ -235,15 +214,15 @@ public class ErmesObjPatcher extends ErmesObject {
   public void ResizeToText(int theDeltaX, int theDeltaY){
     int aWidth = currentRect.width+theDeltaX;
     int aHeight = currentRect.height+theDeltaY;
-    if(aWidth<itsFontMetrics.stringWidth(itsNameString) + 32) 
-      aWidth = itsFontMetrics.stringWidth(itsNameString) + 32;
+    if(aWidth<itsFontMetrics.stringWidth(itsArgs) + 32) 
+      aWidth = itsFontMetrics.stringWidth(itsArgs) + 32;
     if(aHeight<itsFontMetrics.getHeight() + 10) 
       aHeight = itsFontMetrics.getHeight() + 10;
     Resize(aWidth-currentRect.width, aHeight-currentRect.height);
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < itsFontMetrics.stringWidth(itsNameString)+32)||
+    if((currentRect.width+theDeltaX < itsFontMetrics.stringWidth(itsArgs)+32)||
        (currentRect.height+theDeltaY<itsFontMetrics.getHeight() + 10))
       return false;
     else return true;
@@ -252,26 +231,13 @@ public class ErmesObjPatcher extends ErmesObject {
   public void RestoreDimensions(){
     itsResized = false;
     itsSketchPad.RemoveElementRgn(this);
-    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsNameString)+32,
+    int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsArgs)+32,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
     Resize(aMaxWidth-currentRect.width, itsFontMetrics.getHeight() + 10 - currentRect.height);
     itsSketchPad.SaveOneElementRgn(this);
     itsSketchPad.repaint();
   }
 
-  //--------------------------------------------------------
-  // minimumSize()
-  //--------------------------------------------------------
-  public Dimension getMinimumSize() {
-    return new Dimension(80,24);
-  }
-    
-  //--------------------------------------------------------
-  // preferredSize()
-  //--------------------------------------------------------
-  public Dimension getPreferredSize() {
-    return getMinimumSize();
-  }
 }
 
 

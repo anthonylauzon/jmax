@@ -17,6 +17,7 @@ import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.project.*;
 import com.sun.java.swing.*;
+//import com.sun.java.swing.jlf.*;
 
 /**
  * The window that contains the sketchpad. It knows the document
@@ -30,6 +31,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       ftsObjectsPasted.addElement(value);
   }
 
+  LookAndFeel normalLF;
   Vector ftsObjectsPasted = new Vector();
   public static ErmesClipboardProvider itsClipboardProvider = new ErmesClipboardProvider();
   public boolean inAnApplet = false;
@@ -287,6 +289,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     
     getContentPane().setLayout(new ErmesToolBarLayout(ErmesToolBarLayout.VERTICAL)); //provaSw: cancellare
     
+    normalLF = UIManager.getLookAndFeel();
     setSize(new Dimension(600, 300));//tintin...
     //itsToolBar= new ErmesSwToolbar(null);
     itsToolBar.setSize(600, 30);//provaSw: togliere
@@ -328,13 +331,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     GetClearMenu().setEnabled(false);
   }
 
-  // clipboard test
+
+
+  // clipboard handling
   protected boolean Copy() {
     CreateFtsGraphics(this);
     itsClipboardProvider.addGraphicObjects(itsSketchPad.itsSelectedList);
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     return true;
   }
+
+
 
   protected boolean Paste() {
     String tclScriptToExecute = null;
@@ -359,7 +366,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       System.out.println("bad format: cannot paste");
     }
     
-    //ftsObjectPasted contains the needed additions
+    //ftsObjectPasted vector contains the needed new, pasted objects
     itsPatcher.removeWatch(this);    
     itsPatcher.removeWatch(this);
     // make the sketch do the graphic job
@@ -386,8 +393,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   }
   
   private void FillGraphicsMenu(Menu theGraphicsMenu){
+    CheckboxMenuItem aCheckItem;
     theGraphicsMenu.add(itsAutoroutingMenu = new CheckboxMenuItem("Autorouting", true));
     itsAutoroutingMenu.addItemListener(this); 
+
   }
 
 
@@ -798,12 +807,17 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     // we should RECEIVE this FILE, or contruct it when we load this document
     String oldTitle = getTitle();
 		
-    if (itsFile == null)
+    if (itsData.getDataSource() != null) {//already loaded from somewhere (we assume a file for now)
+      if (itsFile == null) //The file is not assigned yet
+	itsFile = ((MaxFileDataSource) itsData.getDataSource()).getFile();    
+    }
+    else { //no saved yet
       itsFile = MaxFileChooser.chooseFileToSave(this, "Save Patcher");
+      if (itsFile == null) return false; //user cancelled the dialog
+    }      
 
-    if (itsFile == null) return false;
-    
     if(!SaveBody()) return false;
+    alreadySaved = true;
     MaxApplication.ChangeWinNameMenus(oldTitle, getTitle());
     return true;
   }
@@ -871,33 +885,14 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     if (theString.equals("Select All  Ctrl+A")) GetSketchPad().SelectAll();
   }
 
-  /*private void CustomEditItemStateChanged(MenuItem theMenuItem, String theString) {    CheckboxMenuItem aCheckItem;
-
-    //if (theString.equals("Snap to Grid")) {
-      //MaxApplication.ObeyCommand(MaxApplication.SNAP_TO_GRID);
-      
-      //aCheckItem = (CheckboxMenuItem)theMenuItem;
-      //if(aCheckItem.getState()) aCheckItem.setState(false);
-     // else aCheckItem.setState(true);
-     // }
-    if (theString.equals("Autorouting")) {
-      SetAutorouting();
-      aCheckItem = (CheckboxMenuItem)theMenuItem;
-      if(aCheckItem.getState())aCheckItem.setState(false);
-      else aCheckItem.setState(true);
-    }
-  }*/
 
   private void GraphicsItemStateChanged(MenuItem theMenuItem, String theString){
     CheckboxMenuItem aCheckItem;
     if (theString.equals("Autorouting")) {
       SetAutorouting();
-      //aCheckItem = (CheckboxMenuItem)theMenuItem;
-      //if(aCheckItem.getState()) aCheckItem.setState(false);
-      //else aCheckItem.setState(true);
     }
   }
-
+  
 
   private void AlignObjectsMenuAction(MenuItem theMenuItem, String theString){
     if (theString.equals("Align Top")) itsSketchPad.AlignSelectedObjects("Top");
