@@ -577,8 +577,10 @@ scomark_bar_set_meter(scomark_t *self, fts_symbol_t meter_sym)
 void 
 scomark_bar_set_meter_from_quotient(scomark_t *self, int meter_num, int meter_den)
 {
-  if(meter_num > 0 && meter_den > 0)
-    scomark_bar_set_meter(self, scomark_meter_quotient_get_symbol(meter_num, meter_den));
+  fts_symbol_t meter = scomark_meter_quotient_get_symbol(meter_num, meter_den);
+  
+  if(meter != NULL)
+    scomark_bar_set_meter(self, meter);
 }
 
 fts_symbol_t

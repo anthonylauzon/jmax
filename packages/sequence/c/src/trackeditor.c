@@ -70,7 +70,6 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
 {
   fts_atom_t a[5];
 
-  /* ones for all */
   fts_set_symbol(a, seqsym_window);
   fts_set_int(a + 1, this->win_x);
   fts_set_int(a + 2, this->win_y);
