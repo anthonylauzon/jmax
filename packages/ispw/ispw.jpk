@@ -21,7 +21,6 @@ templateDirectory $dir/templates/extensions
 
 ## set path for wave tables
 dataDirectory $dir/sounds
-dataDirectory $dir/waves
 
 ## load the help patch tables
 #sourceFile $dir/help/control/control.help.index.tcl
