@@ -7,7 +7,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:53:58 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:11 $
  *
  */
 
@@ -43,7 +43,7 @@ print_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   print_t *this = (print_t *)o;
 
   post("%s: [ ", fts_symbol_name(this->prompt));
-  postatoms(ac, at);
+  post_atoms(ac, at);
   post("]\n");
 }
 
@@ -53,7 +53,7 @@ print_atoms_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   print_t *this = (print_t *)o;
 
   post("%s: ", fts_symbol_name(this->prompt));
-  postatoms(ac, at);
+  post_atoms(ac, at);
   post("\n");
 }
 
@@ -68,7 +68,7 @@ print_anything_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (ac)
     {
       post("%s ", fts_symbol_name(s));
-      postatoms( ac, at);
+      post_atoms( ac, at);
       post("\n");
     }
   else

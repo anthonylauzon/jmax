@@ -174,7 +174,7 @@ fts_ucs_execute_command(int argc, const fts_atom_t *argv)
     }
 
   post("Unknown UCS Command: ");
-  postatoms(argc, argv);
+  post_atoms(argc, argv);
   post("\n");
 
   return fts_Success;		/* shadock */
@@ -249,7 +249,7 @@ fts_ucs_client_dispatch(int argc, const fts_atom_t *argv)
 static fts_status_t
 fts_ucs_lib_print(int argc, const fts_atom_t *argv)
 {
-  postatoms(argc, argv);
+  post_atoms(argc, argv);
   post("\n");
 
   return fts_Success;
@@ -500,28 +500,6 @@ fts_ucs_dev_open_device(int argc, const fts_atom_t *argv)
     return &bad_command; /* bad set device command */
 }
 
-/*
- * Audio related commands
- *
- */
-
-static fts_status_t
-fts_ucs_audio_set_sampling_rate(int argc, const fts_atom_t *argv)
-{
-  if ((argc == 1)  && (fts_is_long(&argv[0]) || fts_is_float(&argv[0])))
-    {
-      float f;
-
-      f = (float) fts_get_number(&argv[0]);
-
-      fts_dsp_set_sampling_rate(f); /* set the dsp compiler sampling rate */
-      fts_sched_set_tick_length((MAXVS * 1000) / f); /* and set the scheduler tick */
-    }
-
-  return fts_Success;
-}
-
-
 /* ucs function to set the default in and out */
 
 static fts_status_t
@@ -556,6 +534,20 @@ fts_ucs_set_mess_trace(int argc, const fts_atom_t *argv)
 
       fts_set_mess_trace(fts_get_int(&argv[0]));
     }
+
+  return fts_Success;
+}
+
+/*
+ * Generic Set Parameters command
+ * (Should contribute to make the others obsoletes
+ */
+
+static fts_status_t
+fts_ucs_set_param(int argc, const fts_atom_t *argv)
+{
+  if ((argc == 2)  && fts_is_symbol(&argv[0]))
+    fts_param_set(fts_get_symbol(&argv[0]), &argv[1]);
 
   return fts_Success;
 }
@@ -639,10 +631,6 @@ fts_ucs_install_commands()
 
   /* Audio related commands */
 
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("sample_rate"), fts_ucs_audio_set_sampling_rate,
-			 "set sample_rate <sr>",
-			 "set sampling rate in a processor");
-
   fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("in~"), fts_ucs_audio_set_default_in,
 			 "default in~ <name>",
 			 "set the name of the default audio input device");
@@ -650,6 +638,12 @@ fts_ucs_install_commands()
   fts_ucs_define_command(fts_new_symbol("default"), fts_new_symbol("out~"), fts_ucs_audio_set_default_out,
 			 "default out~ <name>",
 			 "set the name of the default audio output device");
+
+  /* Parameters */
+
+  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("param"), fts_ucs_set_param,
+			 "set param <name> <value>",
+			 "set an FTS parameter");
 }
 
 

@@ -27,7 +27,7 @@
 */
 
 void
-postvector(int n, float *fp)
+post_vector(int n, float *fp)
 {
   int i;
   
@@ -39,7 +39,7 @@ postvector(int n, float *fp)
 
 
 void
-postatoms(int ac, const fts_atom_t *at)
+post_atoms(int ac, const fts_atom_t *at)
 {
   int i;
 

@@ -79,29 +79,6 @@ dsp_module_shutdown(void)
   dsp_chain_delete();
 }
 
-/* The actual sampling rate is only known to the dsp compiler,
-   so it is handled here */
-  
-static float fts_sr = 44100.0;		
-
-
-void fts_dsp_set_sampling_rate(float sr)
-{
-  fts_sr = sr;
-
-}
-
-
-float fts_dsp_get_sampling_rate(void)
-{
-  return fts_sr;
-}
-
-int fts_dsp_get_vector_size(void)
-{
-  return 64;			/* soon to change, and to be device relative !!! */
-}
-
 
 
 struct fts_dev;

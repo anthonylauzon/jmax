@@ -44,6 +44,7 @@ public class ObjectSetViewer extends JPanel {
     {
       if (obj != null)
 	{
+	  Object value;
 	  setText( ((FtsObject) obj).getDescription());
 	  
 	  if ( selected)
@@ -51,7 +52,9 @@ public class ObjectSetViewer extends JPanel {
 	  else
 	    setBackground( jlist.getBackground());
 
-	  if (((Integer)((FtsObject) obj).get("error")).intValue() != 0)
+	  value = ((FtsObject) obj).get("error");
+
+	  if ((value instanceof Integer) && (((Integer) value).intValue() != 0))
 	    setIcon( errorIcon);
 	  else if (obj instanceof FtsPatcherObject)
 	    setIcon( patcherIcon);

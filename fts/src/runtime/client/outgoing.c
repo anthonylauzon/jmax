@@ -75,9 +75,8 @@ void fts_client_mess_add_data( fts_data_t *data)
   fts_client_send_string(outbuf);
 }
 
-
 void fts_client_mess_add_object(fts_object_t *obj)
-{
+{  
   sprintf(outbuf, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
   fts_client_send_string(outbuf);
 }

@@ -30,6 +30,8 @@ public class FtsMessageObject extends FtsObject
 
     ninlets = 1;
     noutlets = 1;
+
+    localPut("value", description);
   }
 
   /**
@@ -39,6 +41,8 @@ public class FtsMessageObject extends FtsObject
   public void setMessage(String message)
   {
     description = message;
+
+    localPut("value", description);
 
     Fts.getServer().sendSetMessage(this, description);
     setDirty();
@@ -50,7 +54,7 @@ public class FtsMessageObject extends FtsObject
   {
     description = FtsParse.unparseObjectDescription(msg);
 
-    FtsMessageObject.this.localPut("value", description);
+    localPut("value", description);
   }
 }
 

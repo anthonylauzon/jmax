@@ -68,7 +68,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   if (size < 0)
     size = 0;
 
-  sr = fts_dsp_get_sampling_rate();
+  sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
   n_samps = fts_unit_convert_to_base(unit, size, &sr);
   
   sampbuf_init(&this->buf, n_samps);
@@ -121,7 +121,7 @@ put_dsp_check_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       float sr;
       long n_samps;
 
-      sr = fts_dsp_get_sampling_rate();
+      sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
       n_samps = fts_unit_convert_to_base(this->unit, this->check_size, &sr);
 
       sampbuf_realloc(&this->buf, n_samps);
@@ -217,7 +217,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   header.dataLocation = sizeof(header);
   header.dataSize = 0x10000000;
   header.dataFormat = SND_FORMAT_LINEAR_16;
-  header.samplingRate = (long)fts_dsp_get_sampling_rate();
+  header.samplingRate = (long)fts_param_get_float(fts_s_sampling_rate, 44100.);
   header.channelCount = 1;
   header.info = 0x0;
 
@@ -281,7 +281,7 @@ sigtable_realloc(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts
 
   if(this->name && size > 0)
     {
-      float sr = fts_dsp_get_sampling_rate();
+      float sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
       long n_samps = fts_unit_convert_to_base(this->unit, size, &sr);
       
       sampbuf_realloc(&this->buf, n_samps);

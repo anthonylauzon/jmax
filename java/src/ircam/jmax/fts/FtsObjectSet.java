@@ -8,7 +8,7 @@ import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 
 
-/** This class represent an Integer vector in 
+/** This class represent an object set in 
  *  FTS
  */
 
@@ -28,6 +28,7 @@ public class FtsObjectSet extends FtsRemoteData
 
   MaxVector list;
   ObjectSetListModel model;
+  FtsPatcherListener editListener;
 
   class ObjectSetListModel extends AbstractListModel
   {
@@ -47,14 +48,46 @@ public class FtsObjectSet extends FtsRemoteData
     }
   }
 
+  class ObjectSetEditListener implements FtsPatcherListener
+  {
+    public void objectAdded(FtsPatcherData data, FtsObject object)
+    {
+    }
+
+    public void objectRemoved(FtsPatcherData data, FtsObject object)
+    {
+      list.removeElement(object);
+      model.listChanged();
+    }
+
+    public void connectionAdded(FtsPatcherData data, FtsConnection connection)
+    {
+    }
+
+    public void connectionRemoved(FtsPatcherData data, FtsConnection connection)
+    {
+    }
+    
+    public void patcherChanged(FtsPatcherData data)
+    {
+    }
+  }
+
   public FtsObjectSet()
   {
     super();
 
     list = new MaxVector();
     model = new ObjectSetListModel();
+    editListener = new ObjectSetEditListener();
+    Fts.addEditListener(editListener);
   }
 
+  public void release()
+  {
+    Fts.removeEditListener(editListener);
+    super.release();
+  }
   /** Get the vector size */
 
   public ListModel getListModel()
@@ -70,6 +103,7 @@ public class FtsObjectSet extends FtsRemoteData
       {
       case REMOTE_CLEAN:
 	list.removeAllElements();
+	model.listChanged();
 	break;
 
       case REMOTE_APPEND:
@@ -82,6 +116,8 @@ public class FtsObjectSet extends FtsRemoteData
 	    list.addElement(value);
 	    value = msg.getNextArgument();
 	  };
+
+	model.listChanged();
 	break;
 
       case REMOTE_REMOVE_ONE:
@@ -103,39 +139,30 @@ public class FtsObjectSet extends FtsRemoteData
 
     remoteCall(REMOTE_FIND, args);
     Fts.sync();
-    model.listChanged();
   }
 
 
   public void find(FtsObject context, Object values[])
   {
     remoteCall(REMOTE_FIND, values);
-    Fts.sync();
-    model.listChanged();
   }
 
 
   public void find(FtsObject context, MaxVector values)
   {
     remoteCall(REMOTE_FIND, context, values);
-    Fts.sync();
-    model.listChanged();
   }
 
 
   public void findErrors(FtsObject context)
   {
     remoteCall(REMOTE_FIND_ERRORS, context, (MaxVector) null);
-    Fts.sync();
-    model.listChanged();
   }
 
 
   public void findFriends(FtsObject target)
   {
     remoteCall(REMOTE_FIND_FRIENDS, target, (MaxVector) null);
-    Fts.sync();
-    model.listChanged();
   }
 }
 

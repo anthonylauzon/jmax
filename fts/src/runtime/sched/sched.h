@@ -26,6 +26,5 @@ extern void fts_sched_describe_declarations(void);
 /* Tick length handling */
 
 extern float fts_sched_get_tick_length(void);
-extern void  fts_sched_set_tick_length(float t);
 
 #endif

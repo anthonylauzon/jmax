@@ -27,6 +27,17 @@ void fts_pause( void)
 {
 }
 
+/* API to catch the exceptions */
+
+
+void fts_set_fpe_handler(fts_fpe_handler fh)
+{
+}
+
+void fts_reset_fpe_handler()
+{
+}
+
 unsigned int fts_check_fpe(void)
 {
   return 0;

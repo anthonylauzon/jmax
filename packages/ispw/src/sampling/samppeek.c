@@ -30,7 +30,7 @@ obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   if (! unit)
     unit = fts_s_msec; /* default */
 
-  sr = fts_dsp_get_sampling_rate();
+  sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
   obj->conv = fts_unit_convert_to_base(unit, 1.0f, &sr);
 }
 
@@ -46,7 +46,7 @@ meth_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   obj_t *obj = (obj_t *)o;
   float sr;
 
-  sr = fts_dsp_get_sampling_rate();
+  sr = fts_param_get_float(fts_s_sampling_rate, 44100.);
   obj->conv = fts_unit_convert_to_base(obj->unit, 1.0f, &sr);
 }
 

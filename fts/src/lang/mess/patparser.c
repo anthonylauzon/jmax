@@ -514,7 +514,7 @@ void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in)
 	}
       else
 	{
-	  fprintf(stderr, "Format not supported (#%c)\n", (char) in->ttype);
+	  post("Format not supported (#%c)\n", (char) in->ttype);
 	  
 	  /* skip until the next ';' */
 
@@ -709,7 +709,7 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       if (fts_is_symbol(&args[0]) && (fts_get_symbol(&args[0]) == fts_s_old_patcher ) &&
 	  (lastNObjectType == fts_s_patcher))
 	{
-	  /* add the two ninlet and noutlet arguments to description */
+	  /* add the two ninlet and noutlet and the arguments to description */
 
 	  fts_patparse_set_text_graphic_properties(graphicDescr, lastNObject);
 
@@ -720,14 +720,12 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 
 	      fts_patcher_reassign_inlets_outlets((fts_patcher_t *)lastNObject);
 
-	      new_args[0] = args[1];
-	      fts_set_symbol(&new_args[1], fts_s_column);
-	      fts_set_symbol(&new_args[2], fts_s_patcher);
-	      
-	      for (i = 2; (i < argc) && (i < 512 - 2); i++)
-		new_args[i + 1] = args[i];
+	      fts_set_symbol(&new_args[0], fts_s_patcher);
 
-	      fts_patcher_redefine((fts_patcher_t *)lastNObject, argc + 2, new_args);
+	      for (i = 1; (i < argc) && (i < 512); i++)
+		new_args[i] = args[i];
+
+	      fts_patcher_redefine((fts_patcher_t *)lastNObject, argc, new_args);
 	    }
 	  else
 	    {
@@ -757,8 +755,8 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       else
 	{
 	  if (fts_is_symbol(&args[0]))
-	    fprintf(stderr, "Object type %s not yet Supported in .pat files",
-		    fts_symbol_name(fts_get_symbol(&(args[0]))));
+	    post("Object %s not yet Supported in .pat files",
+		 fts_symbol_name(fts_get_symbol(&(args[0]))));
 	}
     }
   else if (objclass == fts_s_inlet)
@@ -963,7 +961,7 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
 
 static void pat_error(const char *description) 
 {
-  fprintf(stderr, "Error loading .pat file: %s\n", description);
+  post("Error loading .pat file: %s\n", description);
 }
 
 

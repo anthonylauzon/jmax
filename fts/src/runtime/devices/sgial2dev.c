@@ -225,7 +225,7 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Parameter parsing  and setting: fifo size */
 
-  dev_data->fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
+  dev_data->fifo_size = fts_param_get_int(fts_s_fifo_size, 256);
 
   if (dev_data->fifo_size)
     {
@@ -561,7 +561,8 @@ sgi_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Parameter parsing and setting: fifo size */
 
-  dev_data->fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
+
+  dev_data->fifo_size = fts_param_get_int(fts_s_fifo_size, 256);
 
   if (dev_data->fifo_size)
     alSetQueueSize(dev_data->config, dev_data->fifo_size);

@@ -148,6 +148,11 @@ extern fts_symbol_t fts_s_equal;
 
 extern fts_symbol_t fts_s_args;
 
+/* Kernel Parameter names */ 
+
+extern fts_symbol_t fts_s_sampling_rate;
+extern fts_symbol_t fts_s_fifo_size;
+
 #endif
 
 

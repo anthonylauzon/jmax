@@ -6,8 +6,8 @@ import java.util.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
-public abstract class FtsRemoteData implements MaxData {
-  
+public abstract class FtsRemoteData implements MaxData
+{
   void setMaster()
   {
     master = true;

@@ -339,14 +339,8 @@ static void fts_binding_add_users_to_set(fts_binding_t *var, fts_object_set_t *s
 {
   fts_object_list_t  *u;	
 
-  fprintf(stderr, "Adding users\n");
   for (u = var->users; u; u = u->next)
-    {
-      fprintf(stderr, "\nAdding user %lx (%d)\n", u->obj, u->obj->id);
-      fts_object_set_add(set, u->obj);
-      
-    }
-  fprintf(stderr, "Done Adding users\n");
+    fts_object_set_add(set, u->obj);
 }
 
 static void fts_binding_add_wannabe(fts_binding_t *var, fts_object_t *object)
@@ -540,7 +534,6 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *
   fts_binding_t *v, *up_v;
 
   fts_set_void(&value);
-
 
   up_v = fts_variable_get_binding(scope, name);
 

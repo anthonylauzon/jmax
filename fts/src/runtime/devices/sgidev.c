@@ -178,7 +178,7 @@ sgi_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   sgi_dac_data.nch = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), 2);
   ALsetchannels(sgi_dac_data.config, sgi_dac_data.nch);
 
-  sgi_dac_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
+  sgi_dac_data.fifo_size = fts_param_get_int(fts_s_fifo_size, 256);
   ALsetqueuesize(sgi_dac_data.config, sgi_dac_data.nch * sgi_dac_data.fifo_size);
 
   /* Assume the config structure is ok, after all the configuration parameters,
@@ -374,7 +374,7 @@ sgi_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   sgi_adc_data.nch = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), 2);
   ALsetchannels(sgi_dac_data.config, sgi_dac_data.nch);
 
-  sgi_adc_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
+  sgi_adc_data.fifo_size = fts_param_get_int(fts_s_fifo_size, 256);
   ALsetqueuesize(sgi_dac_data.config, sgi_dac_data.nch * sgi_dac_data.fifo_size);
 
   /* Assume the config structure is ok, after all the configuration parameters,

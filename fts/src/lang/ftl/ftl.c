@@ -878,7 +878,7 @@ void ftl_program_run( ftl_program_t *prog )
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
-fts_object_t *ftl_program_pc_sample( ftl_program_t *prog)
+fts_object_t *ftl_program_get_current_object( ftl_program_t *prog)
 {
   ftl_subroutine_t *subr;
   int pc;

@@ -34,6 +34,7 @@ SOURCES := \
 	$(INCLUDE_PATH)/ErmesSwToggleButton.java	\
 	$(INCLUDE_PATH)/ErmesSwToolbar.java		\
 	$(INCLUDE_PATH)/FindPanel.java			\
+	$(INCLUDE_PATH)/FpePanel.java			\
 	$(INCLUDE_PATH)/FontCache.java			\
 	$(INCLUDE_PATH)/InletOutletSensibilityArea.java	\
 	$(INCLUDE_PATH)/InletSensibilityArea.java	\

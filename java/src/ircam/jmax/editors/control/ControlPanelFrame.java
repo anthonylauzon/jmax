@@ -25,7 +25,7 @@ public class ControlPanelFrame extends JFrame
     return controlPanel;
   }
 
-  private DspControl control;
+  private FtsDspControl control;
   private IndicatorWithMemory dacSlipIndicator;
   private IndicatorWithMemory invalidFpeIndicator;
   private IndicatorWithMemory divideByZeroFpeIndicator;
@@ -36,7 +36,7 @@ public class ControlPanelFrame extends JFrame
     String prop;
     IndicatorWithMemory ind;
 
-    DspControlAdapter(String prop, DspControl control, IndicatorWithMemory ind)
+    DspControlAdapter(String prop, FtsDspControl control, IndicatorWithMemory ind)
     {
       this.prop = prop;
       this.ind  = ind;
@@ -57,7 +57,7 @@ public class ControlPanelFrame extends JFrame
   {
     super( "Control Panel");
 
-    control = (DspControl) Fts.newRemoteData("dspcontrol_data", null);
+    control = Fts.getDspController();
 
     setSize( 300, 300);
     JPanel panel = new JPanel();
@@ -80,6 +80,44 @@ public class ControlPanelFrame extends JFrame
     overflowFpeIndicator = new IndicatorWithMemory("OverFlow");
     panel.add(overflowFpeIndicator);
     new DspControlAdapter("overflowFpe", control, overflowFpeIndicator);
+
+    //
+    // Temporary code to show sampling rate and fifo size; it should
+    // be a bean property editor field, probabily ...
+
+    JPanel samplingRatePanel = new JPanel();
+
+    samplingRatePanel.setLayout( new BorderLayout());
+    samplingRatePanel.setOpaque( false);
+
+    JLabel samplingRateLabel = new JLabel("Sampling Rate: ");
+    samplingRateLabel.setHorizontalTextPosition(samplingRateLabel.RIGHT);
+    samplingRateLabel.setToolTipText("The current global sampling rate");
+
+    JLabel samplingRateText = new JLabel(control.getSamplingRate().toString());
+    samplingRateText.setHorizontalTextPosition(samplingRateText.RIGHT);
+
+    samplingRatePanel.add("West", samplingRateLabel);
+    samplingRatePanel.add("East", samplingRateText);
+
+    panel.add(samplingRatePanel);
+
+    JPanel fifoSizePanel = new JPanel();
+
+    fifoSizePanel.setLayout( new BorderLayout());
+    fifoSizePanel.setOpaque( false);
+
+    JLabel fifoSizeLabel = new JLabel("Audio Buffer: ");
+    fifoSizeLabel.setHorizontalTextPosition(fifoSizeLabel.RIGHT);
+    fifoSizeLabel.setToolTipText("The current audio buffer size (latency), in samples");
+
+    JLabel fifoSizeText = new JLabel(control.getFifoSize().toString());
+    fifoSizeText.setHorizontalTextPosition(fifoSizeText.RIGHT);
+
+    fifoSizePanel.add("West", fifoSizeLabel);
+    fifoSizePanel.add("East", fifoSizeText);
+
+    panel.add(fifoSizePanel);
 
     getContentPane().add( panel);
 

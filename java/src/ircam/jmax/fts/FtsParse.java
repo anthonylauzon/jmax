@@ -156,7 +156,7 @@ public class FtsParse
   /**
    * Identify characters that always start a new token
    * also if not separated; they must be put in the new token.
-   * '~' suppressed !!!
+   * binops  suppressed !!!
    */
 
   final private boolean isStartToken()
@@ -167,7 +167,7 @@ public class FtsParse
 	    (c == '(') || (c == ')') ||
 	    (c == '[') || (c == ']') ||
 	    (c == '{') || (c == '}') ||
-	    (c == ':') ||
+	    (c == ':') || (c == '.') ||
 	    (c == ';') || (c == '\''));
   }
 
@@ -262,7 +262,7 @@ public class FtsParse
 
     String keywords[] = { "(", ")",
 			  "[", "]", "{", "}", ",", 
-			  ":", "$",
+			  ":", "$", ".",
 			  ";", "'"};
 
     tryParse();
@@ -356,42 +356,41 @@ public class FtsParse
 	switch (status)
 	  {
 	  case lex_float_start:
-
 	    if (isEndOfString())
 	      {backtrack(); return false;}
 	    else if (isDigit())
 	      {storeChar(); status = lex_float_in_value;}
 	    else if (isSign())
 	      {storeChar(); status = lex_float_in_sign;}
+	    else if (isDecimalPoint())
+	      {storeChar(); status = lex_float_after_point;}
 	    else
 	      {backtrack(); return false;}
 	    
 	    break;
 
 	  case lex_float_in_sign:
+
 	    if (isEndOfString())
 	      {backtrack(); return false;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_float_in_value;}
-	    else if (isDecimalPoint())
-	      {status = lex_float_after_point;}
-	    else
-	      {backtrack(); return false;}
-	    break;
-
-	  case lex_float_in_value:
-
-	    if (isEndOfString() ||
-		isSeparator()     ||
-		isStartToken())
-	      {ungetChar(); ParseFloat(); status = lex_float_end;}
 	    else if (isDigit())
 	      {storeChar(); status = lex_float_in_value;}
 	    else if (isDecimalPoint())
 	      {storeChar(); status = lex_float_after_point;}
 	    else
 	      {backtrack(); return false;}
+	    break;
 
+	  case lex_float_in_value:
+
+	    if (isEndOfString())
+	      {backtrack(); return false;}
+	    else if (isDigit())
+	      {storeChar(); status = lex_float_in_value;}
+	    else if (isDecimalPoint())
+	      {storeChar(); status = lex_float_after_point;}
+	    else
+	      {backtrack(); return false;}
 	    break;
 
 	  case lex_float_after_point:
@@ -401,10 +400,9 @@ public class FtsParse
 		isStartToken())
 	      {ungetChar(); ParseFloat(); status = lex_float_end;}
 	    else if (isDigit())
-	      {storeChar(); status = lex_float_in_value;}
+	      {storeChar(); status = lex_float_after_point;}
 	    else
 	      {backtrack(); return false;}
-
 	    break;
 
 	  case lex_float_end:
@@ -413,6 +411,7 @@ public class FtsParse
 
 	nextChar();
       }
+
 
     return true;
   }
@@ -546,9 +545,9 @@ public class FtsParse
 
 	/* The order is important, beacause the 
 	   last parser get accept everything as a symbol,
-	   for easiness of implementation; also, the float parser
-	   accept also ints, so the int parser must be called
-	   before the float parser.
+	   for easiness of implementation; also, a float is made
+	   first of an int, followed by the decimal point; so
+	   float must come before ints.
 	   
 	   Every parser return 1 and advance the pointer to the
 	   char after the end of the reconized token only
@@ -556,8 +555,8 @@ public class FtsParse
 	 */
 
 	if (! parser.tryKeywords())
-	  if (! parser.tryLong())
-	    if (! parser.tryFloat())
+	  if (! parser.tryFloat())
+	    if (! parser.tryLong())
 	      if (! parser.tryQString())
 		parser.tryString();
       }
@@ -643,7 +642,7 @@ public class FtsParse
   {
     if (value instanceof String)
       {
-	String keywords[] = {")", "[", "]", "}", ",", ";"};
+	String keywords[] = {")", "[", "]", "}", ",", ";", "."};
 
 
 	for (int i = 0 ; i < keywords.length; i++)
@@ -680,7 +679,7 @@ public class FtsParse
     if (value instanceof String)
       {
 	String keywords[] = { "(", "[", "{", 
-			      "$", "'" };
+			      "$", "'", "." };
 
 	for (int i = 0 ; i < keywords.length; i++)
 	  if (keywords[i].equals((String) value))

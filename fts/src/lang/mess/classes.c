@@ -312,9 +312,10 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
     in = &cl->inlets[winlet];
   else
     {
-      fprintf(stderr, "fts_method_define: inlet number %d out of range [0..%d] for class `%s', method `%s'\n", 
+      post("fts_method_define: inlet number %d out of range [0..%d] for class `%s', method `%s'\n", 
 	   winlet, cl->ninlets, fts_symbol_name(fts_get_class_name(cl)),
-	   (s ? fts_symbol_name(s) : "")); /* @@@ ERROR !!! */
+	   (s ? fts_symbol_name(s) : "")); 
+
       return &fts_InletOutOfRange;
     }
 
@@ -322,8 +323,8 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
 
   if (fts_class_mess_exists(in, msg))
     {
-      fprintf(stderr, "fts_method_define: doubly defined method, class %s, inlet number %d message `%s'\n", 
-	   fts_symbol_name(fts_get_class_name(cl)), winlet, (s ? fts_symbol_name(s) : "")); /* @@@ ERROR !!! */
+      post("fts_method_define: doubly defined method, class %s, inlet number %d message `%s'\n", 
+	   fts_symbol_name(fts_get_class_name(cl)), winlet, (s ? fts_symbol_name(s) : ""));
     }
   else
     {
@@ -345,16 +346,16 @@ fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet, fts_symbol_t s,
 
   if (woutlet >= cl->noutlets || woutlet < 0)
     {
-      fprintf(stderr, "fts_outlet_type_define: outlet out of range #%d for class `%s'\n", woutlet,
-	   fts_symbol_name(fts_get_class_name(cl))); /* @@@ ERROR !!! */
+      post("fts_outlet_type_define: outlet out of range #%d for class `%s'\n", woutlet,
+	   fts_symbol_name(fts_get_class_name(cl)));
       return &fts_OutletOutOfRange;
     }
   out = &cl->outlets[woutlet];
 
   if (out->tmess.symb)
     {
-      fprintf(stderr, "fts_outlet_type_define: outlet #%d already defined for class `%s'\n", woutlet,
-	   fts_symbol_name(fts_get_class_name(cl))); /* @@@ ERROR !!! */
+      post("fts_outlet_type_define: outlet #%d already defined for class `%s'\n", woutlet,
+	   fts_symbol_name(fts_get_class_name(cl)));
       return &fts_OutletAlreadyDefined;
     }
 

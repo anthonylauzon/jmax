@@ -123,17 +123,17 @@ static fts_symbol_t builtin_symbols[MAX_BUILTIN_SYMBOLS];
 #define CHECK_OBJ_STACK   \
       { \
 	if (object_tos < 0) \
-         fprintf(stderr, "Object Stack overflow\n"); \
+	 post("While loading: Object Stack overflow\n"); \
       else if (object_tos > OBJECT_STACK_DEPTH) \
-         fprintf(stderr, "Object Stack underflow\n"); \
+         post("While Loading: Object Stack underflow\n"); \
       }
 
 #define CHECK_EVAL_STACK   \
       { \
 	if (eval_tos <  0) \
-         fprintf(stderr, "Eval Stack overflow\n"); \
+         post("While loading: Eval Stack overflow\n"); \
       else if (eval_tos > OBJECT_STACK_DEPTH) \
-         fprintf(stderr, "Eval Stack underflow\n"); \
+         post("While loading: Eval Stack underflow\n"); \
       }
 
 #else

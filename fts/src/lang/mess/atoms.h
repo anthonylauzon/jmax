@@ -108,7 +108,7 @@
 #define fts_is_int(ap)             fts_is_a(ap, fts_s_int)
 #define fts_is_long(ap)            fts_is_int(ap)
 #define fts_is_float(ap)           fts_is_a(ap, fts_s_float)
-#define fts_is_number(ap)          fts_is_a(ap, fts_s_int) || fts_is_a(ap, fts_s_float)
+#define fts_is_number(ap)          (fts_is_a(ap, fts_s_int) || fts_is_a(ap, fts_s_float))
 #define fts_is_object(ap)          fts_is_a(ap, fts_s_object)
 #define fts_is_connection(ap)      fts_is_a(ap, fts_s_connection)
 #define fts_is_true(ap)            fts_is_a(ap, fts_s_true)
@@ -122,7 +122,7 @@
 
 /* equality test between two atoms */
 
-extern int fts_atom_equal(const fts_atom_t *a1, const fts_atom_t *a2);
+extern int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2);
 
 /* null test: a null content can be a null pointer or a zero value */
 

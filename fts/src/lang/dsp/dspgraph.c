@@ -2,9 +2,9 @@
 #include "lang/mess.h"
 #include "lang/ftl.h"
 #include "lang/dsp.h"
-
 #include "gphiter.h"
 
+extern void fts_dsp_fpe_empty_collection();
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -265,7 +265,7 @@ static int dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
 
   sig_zero->length = invs;
 
-  sig_zero->srate = fts_dsp_get_sampling_rate() / (double)(DEFAULTVS/size);
+  sig_zero->srate = fts_param_get_float(fts_s_sampling_rate, 44100.) / (double)(DEFAULTVS/size);
 
   return 1;
 }
@@ -570,6 +570,8 @@ static void dsp_chain_create_end( void)
 
 void dsp_chain_create(int vs)
 {
+  fts_dsp_fpe_empty_collection();
+
   if (dsp_is_running())
     {
       post( "DSP is running, cannot create DSP chain\n");
@@ -600,6 +602,15 @@ void dsp_chain_delete(void)
   dsp_chain = dsp_chain_off;
 
   fts_audio_deactivate_devices();
+}
+
+
+fts_object_t *dsp_get_current_object()
+{
+  if (dsp_chain_on)
+    return ftl_program_get_current_object(dsp_chain_on);
+  else
+    return 0;
 }
 
 /* exported, must be redone each time a new out device is installed */
@@ -762,6 +773,7 @@ void dsp_install_clocks(void)
 }
 
 /* This function should be moved to a tile, or to the runtime */
+
 void dsp_chain_poll(void)
 {
   if (dsp_chain == dsp_chain_on)

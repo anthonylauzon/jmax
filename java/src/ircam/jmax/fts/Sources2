@@ -44,7 +44,9 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/FtsSocketServerPort.java	\
 	$(INCLUDE_PATH)/FtsSubProcessPort.java		\
 	$(INCLUDE_PATH)/FtsUpdateGroupListener.java    \
-	$(INCLUDE_PATH)/FtsVoid.java
+	$(INCLUDE_PATH)/FtsVoid.java                   \
+	$(INCLUDE_PATH)/FtsDspControl.java
+
 
 
 

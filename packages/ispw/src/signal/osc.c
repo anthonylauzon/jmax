@@ -1,24 +1,4 @@
-/*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
- *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:37:02 $
- *
- * Oscillator.
- * Based on the old version by Miller Puckette.
- *
- */
-
-/* In this non i860 version */
-
 #include "fts.h"
-
-
-
 #include <math.h>
 #include <string.h>
 
@@ -51,11 +31,6 @@ typedef struct {
   int refcnt;
 } wavetab_t;
 
-typedef struct {
-  fts_object_t _o;
-  wavetab_t *wavetab;
-} sigtab1_t;
-
 #define HEADERSIZE 28
 #define NINTERP    2
 #define TABLESIZE  0x1000
@@ -63,7 +38,7 @@ typedef struct {
 #define NEEDBYTES (HEADERSIZE + TABLESIZE*sizeof(short)/sizeof(sinsamp_t))
 
 static void
-common_bang(wavetab_t *wavetab)
+wavetable_load(wavetab_t *wavetab)
 {
   const char *name = fts_symbol_name(wavetab->sym);
   int fd = fts_file_open(name, wavetab->dir, "r");
@@ -133,7 +108,7 @@ common_bang(wavetab_t *wavetab)
 }
 
 static wavetab_t *
-common_new(fts_symbol_t s)
+wavetable_new(fts_symbol_t s)
 {
   sinsamp_t *samps = (sinsamp_t *) fts_malloc(SINTABSIZE);
   wavetab_t *wavetab;
@@ -146,12 +121,12 @@ common_new(fts_symbol_t s)
   wavetab->refcnt = 1;
   wavetab->samps = samps;
   wavetab->dir = fts_get_default_directory();
-  common_bang(wavetab);
+  wavetable_load(wavetab);
   return wavetab;
 }
 
 static void
-common_delete(wavetab_t *wavetab)
+wavetable_delete(wavetab_t *wavetab)
 {
   fts_hash_table_remove(sigtab1_ht, wavetab->sym);
 
@@ -159,12 +134,23 @@ common_delete(wavetab_t *wavetab)
   fts_free(wavetab);
 }
 
+/***************************************************************************************
+ *
+ *  tab1~
+ *
+ */
+
+typedef struct {
+  fts_object_t _o;
+  wavetab_t *wavetab;
+} sigtab1_t;
+
 static void
-sigtab1_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigtab1_reload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigtab1_t *this = (sigtab1_t *)o;
   if (this->wavetab)
-    common_bang(this->wavetab);
+    wavetable_load(this->wavetab);
 }
 
 static void
@@ -185,8 +171,9 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
     }
   else
     {
-      this->wavetab = common_new(s);
-      r = fts_hash_table_insert(sigtab1_ht, s, (void *)this->wavetab);
+      this->wavetab = wavetable_new(s);
+      fts_set_ptr(&data, this->wavetab);
+      r = fts_hash_table_insert(sigtab1_ht, s, &data);
     }
 }
 
@@ -196,7 +183,7 @@ sigtab1_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
   sigtab1_t *this = (sigtab1_t *)o;
 
   if (this->wavetab && !--this->wavetab->refcnt)
-    common_delete(this->wavetab);
+    wavetable_delete(this->wavetab);
 }
 
 static fts_status_t
@@ -212,7 +199,7 @@ sigtab1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigtab1_delete, 0, a);
 
-  fts_method_define(cl, 0, fts_s_bang, sigtab1_bang, 0, a);
+  fts_method_define(cl, 0, fts_s_bang, sigtab1_reload, 0, a);
   
   return fts_Success;
 }
@@ -226,7 +213,12 @@ sigtab1_config(void)
   fts_hash_table_init(sigtab1_ht);
 }
 
-/* ---------------------------- osc1 ----------------------------------- */
+
+/***************************************************************************************
+ *
+ *  osc1~
+ *
+ */
 
 typedef struct 
 {
@@ -241,6 +233,35 @@ typedef struct
   fts_symbol_t sym;
   ftl_data_t osc_ftl_data;
 } osc_t;
+
+static void
+osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  osc_t *this = (osc_t *)o;
+  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 1, 0);
+
+  this->osc_ftl_data = ftl_data_new(osc_control_t);
+  this->sym = sym;
+
+  dsp_list_insert(o); /* just put object in list */
+}
+
+static void
+osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  osc_t *this = (osc_t *)o;
+
+  ftl_data_free(this->osc_ftl_data);
+
+  dsp_list_remove(o);
+}
+
+
+/***************************************************************************************
+ *
+ *  osc1~ dsp
+ *
+ */
 
 static sinsamp_t *sin_tab;
 static fts_symbol_t osc_function = 0;
@@ -260,7 +281,122 @@ static fts_symbol_t osc_phase_64_function = 0;
    loop with less interlocks ?
 */
 
-#ifdef OLD
+static void
+osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  osc_t *this = (osc_t *)o;
+  fts_atom_t a;
+  fts_atom_t argv[5];
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
+  float f;
+  const double zero = 0.0f;
+  fts_atom_t data;
+
+  f = 1.0f / fts_dsp_get_output_srate(dsp, 0);
+  ftl_data_set(osc_control_t, this->osc_ftl_data, fconv, &f);
+  ftl_data_set(osc_control_t, this->osc_ftl_data, phase, &zero);
+
+  if (this->sym)
+    {
+      if (fts_hash_table_lookup(sigtab1_ht, this->sym, &data))
+	{
+	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
+
+          ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &(wavetab->samps));
+	}
+      else
+	{
+	  post("osc1~: %s: can not find tab1~\n", fts_symbol_name(this->sym));
+	  fts_set_symbol(argv + 0, fts_s_sig_zero);
+	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_long  (argv + 2, fts_dsp_get_output_size(dsp, 0));
+	  dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
+	  return;
+	}
+    }
+  else
+    ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &sin_tab);
+
+  /* The C version of the oscillator include now three version,
+      one with frequency modulation only, one with phase modulation
+      only, and one with both */
+
+  if (fts_dsp_is_input_null(dsp, 0))
+    {
+      /* no frequency input */
+
+      if (fts_dsp_is_input_null(dsp, 1))
+	{
+	  /* no phase input, no frequency input */
+
+	  /* Special case: always output zero */
+
+	  fts_set_symbol (argv + 0,   fts_dsp_get_input_name(dsp, 0)); /* input is zero, anyway */
+	  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_long   (argv + 2, fts_dsp_get_input_size(dsp, 0));
+
+	  dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
+	}
+      else
+	{
+	  /* phase input, no frequency input */
+
+#ifdef HI_OPT
+	  if (fts_dsp_get_input_size(dsp, 0) == 64)
+	    {
+	      fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
+	      fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
+	      fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
+
+	      dsp_add_funcall(osc_phase_64_function, 3, argv);
+	    }
+	  else
+	    {
+	      fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
+	      fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
+	      fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
+	      fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
+	      dsp_add_funcall(osc_phase_function, 4, argv);
+	    }
+#else
+	  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
+	  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
+	  fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
+
+	  dsp_add_funcall(osc_phase_function, 4, argv);
+#endif
+	}
+    }
+  else
+    {
+      if (fts_dsp_is_input_null(dsp, 1))
+	{
+	  /* no phase input, frequency input */
+
+	  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
+	  fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
+
+	  dsp_add_funcall(osc_freq_function, 4, argv);
+	}
+      else
+	{
+	  /* phase input, frequency input */
+	      
+	  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_symbol (argv + 1, fts_dsp_get_input_name(dsp, 1));
+	  fts_set_symbol (argv + 2, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_ftl_data(argv+ 3, this->osc_ftl_data);
+	  fts_set_long   (argv + 4, fts_dsp_get_input_size(dsp, 0));
+
+	  dsp_add_funcall(osc_function, 5, argv);
+	}
+    }
+}
+
+ #ifdef OLD
 static void
 osc_wrapper(fts_word_t *argv)
 {
@@ -591,7 +727,11 @@ osc_wrapper(fts_word_t *argv)
 }
 #endif
 
-
+/***************************************************************************************
+ *
+ *  osc1~ user methods
+ *
+ */
 
 static void
 osc_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -628,164 +768,11 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
     ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &sin_tab);
 }
 
-static void
-osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  osc_t *this = (osc_t *)o;
-  fts_atom_t a;
-  fts_atom_t argv[5];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-  float f;
-  const double zero = 0.0f;
-  fts_atom_t data;
-
-  f = 1.0f / fts_dsp_get_output_srate(dsp, 0);
-  ftl_data_set(osc_control_t, this->osc_ftl_data, fconv, &f);
-  ftl_data_set(osc_control_t, this->osc_ftl_data, phase, &zero);
-
-  if (this->sym)
-    {
-      if (fts_hash_table_lookup(sigtab1_ht, this->sym, &data))
-	{
-	  wavetab_t *wavetab = (wavetab_t *) fts_get_ptr(&data);
-
-          ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &(wavetab->samps));
-	}
-      else
-	{
-	  post("osc1~: %s: can not find tab1~\n", fts_symbol_name(this->sym));
-	  fts_set_symbol(argv + 0, fts_s_sig_zero);
-	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_long  (argv + 2, fts_dsp_get_output_size(dsp, 0));
-	  dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
-	  return;
-	}
-    }
-  else
-    ftl_data_set(osc_control_t, this->osc_ftl_data, samps, &sin_tab);
-
-  /* The C version of the oscillator include now three version,
-      one with frequency modulation only, one with phase modulation
-      only, and one with both */
-
-  if (fts_dsp_is_input_null(dsp, 0))
-    {
-      /* no frequency input */
-
-      if (fts_dsp_is_input_null(dsp, 1))
-	{
-	  /* no phase input, no frequency input */
-
-	  /* Special case: always output zero */
-
-	  fts_set_symbol (argv + 0,   fts_dsp_get_input_name(dsp, 0)); /* input is zero, anyway */
-	  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_long   (argv + 2, fts_dsp_get_input_size(dsp, 0));
-
-	  dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
-	}
-      else
-	{
-	  /* phase input, no frequency input */
-
-#ifdef HI_OPT
-	  if (fts_dsp_get_input_size(dsp, 0) == 64)
-	    {
-	      fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
-	      fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
-
-	      dsp_add_funcall(osc_phase_64_function, 3, argv);
-	    }
-	  else
-	    {
-	      fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
-	      fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
-	      fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
-	      dsp_add_funcall(osc_phase_function, 4, argv);
-	    }
-#else
-	  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
-	  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
-	  fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
-
-	  dsp_add_funcall(osc_phase_function, 4, argv);
-#endif
-	}
-    }
-  else
-    {
-      if (fts_dsp_is_input_null(dsp, 1))
-	{
-	  /* no phase input, frequency input */
-
-	  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 0));
-	  fts_set_symbol (argv + 1, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_ftl_data(argv+ 2, this->osc_ftl_data);
-	  fts_set_long   (argv + 3, fts_dsp_get_input_size(dsp, 0));
-
-	  dsp_add_funcall(osc_freq_function, 4, argv);
-	}
-      else
-	{
-	  /* phase input, frequency input */
-	      
-	  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 0));
-	  fts_set_symbol (argv + 1, fts_dsp_get_input_name(dsp, 1));
-	  fts_set_symbol (argv + 2, fts_dsp_get_output_name(dsp, 0));
-	  fts_set_ftl_data(argv+ 3, this->osc_ftl_data);
-	  fts_set_long   (argv + 4, fts_dsp_get_input_size(dsp, 0));
-
-	  dsp_add_funcall(osc_function, 5, argv);
-	}
-    }
-}
-
-
-static int
-make_sin_tab(void)
-{
-  int i;
-
-  sin_tab = (sinsamp_t *) fts_malloc(SINTABSIZE);
-
-  if (! sin_tab)
-    return (0);
-
-  for (i = 0; i < SIN_NPOINTS; i++)
-    sin_tab[i].value = cos(i * (2*3.141593f/SIN_NPOINTS));
-
-  for (i = 0; i < SIN_NPOINTS; i++)
-    sin_tab[i].slope = 	(sin_tab[(i + 1) & (SIN_NPOINTS - 1)].value - sin_tab[i].value)/ (float) SIN_FRAC;
-
-  return (1);
-}
-
-/* Args: an optional symbol */
-
-static void
-osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  osc_t *this = (osc_t *)o;
-  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 1, 0);
-
-  this->osc_ftl_data = ftl_data_new(osc_control_t);
-  this->sym = sym;
-
-  dsp_list_insert(o); /* just put object in list */
-}
-
-static void
-osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  osc_t *this = (osc_t *)o;
-
-  ftl_data_free(this->osc_ftl_data);
-
-  dsp_list_remove(o);
-}
+/***************************************************************************************
+ *
+ *  osc1~ class
+ *
+ */
 
 static fts_status_t
 osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -823,6 +810,25 @@ osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   dsp_sig_outlet(cl, 0);
   
   return fts_Success;
+}
+
+static int
+make_sin_tab(void)
+{
+  int i;
+
+  sin_tab = (sinsamp_t *) fts_malloc(SINTABSIZE);
+
+  if (! sin_tab)
+    return (0);
+
+  for (i = 0; i < SIN_NPOINTS; i++)
+    sin_tab[i].value = cos(i * (2*3.141593f/SIN_NPOINTS));
+
+  for (i = 0; i < SIN_NPOINTS; i++)
+    sin_tab[i].slope = 	(sin_tab[(i + 1) & (SIN_NPOINTS - 1)].value - sin_tab[i].value)/ (float) SIN_FRAC;
+
+  return (1);
 }
 
 void

@@ -964,8 +964,11 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 							    var));
 	      fts_object_put_prop(obj, fts_s_error_description, &a);
 
-	      fts_object_property_changed(obj, fts_s_name);
-	      fts_object_property_changed(obj, fts_s_error);
+	      if (obj->id != FTS_NO_ID)
+		{
+		  fts_object_property_changed(obj, fts_s_name);
+		  fts_object_property_changed(obj, fts_s_error);
+		}
 
 	      return this;
 	    }
@@ -1018,7 +1021,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
       /* reallocate the atom array */
 
       fts_atom_array_free(this->args);
-      this->args = fts_atom_array_new_fill(ac, at);
+      this->args = fts_atom_array_new_fill(ac - 1, at + 1);
   
       /* set the new variables */
 
@@ -1051,11 +1054,14 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
   fts_expression_state_free(e);
 
   /* Inform the UI that the name is probabily changed (the type cannot change);
-     and the error property anche.
+     and the error property too.
    */
 
-  fts_object_property_changed(obj, fts_s_name);
-  fts_object_property_changed(obj, fts_s_error);
+  if (obj->id != FTS_NO_ID)
+    {
+      fts_object_property_changed(obj, fts_s_name);
+      fts_object_property_changed(obj, fts_s_error);
+    }
 
   return this;
 }

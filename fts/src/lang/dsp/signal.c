@@ -57,7 +57,7 @@ Sig_new( int vectorSize)
 
   s->refcnt = 0;
   s->length = vectorSize;
-  s->srate = fts_dsp_get_sampling_rate() / (double)(DEFAULTVS/vectorSize);
+  s->srate = fts_param_get_float(fts_s_sampling_rate, 44100.) / (double)(DEFAULTVS/vectorSize);
 
   tmp = (SignalList) fts_heap_zalloc(signal_cell_heap);
   tmp->s = s;

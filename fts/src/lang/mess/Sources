@@ -28,5 +28,6 @@ selection.c	\
 send.c		\
 symbols.c	\
 variables.c	\
-vm.c		
+vm.c	        \
+params.c
 

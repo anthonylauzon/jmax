@@ -81,7 +81,13 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     if (name == "value")
       {
 	// (fd) To be redone
-	// itsSketchPad.repaint();
+	// Should be a nice repaint ??
+
+	itsText.setText( (String) value);
+
+	Graphics g = itsSketchPad.getGraphics();
+	Paint_specific(g);
+	g.dispose();
       }
     else
       super.propertyChanged( obj, name, value);

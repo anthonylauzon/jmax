@@ -8,10 +8,18 @@ extern void fts_set_no_real_time();
 extern void fts_pause(void);
 extern unsigned int fts_check_fpe(void);
 
-/* bit masks to be used with fts_check_fpe */
+typedef void (* fts_fpe_handler)(int which);
+extern void fts_set_fpe_handler(fts_fpe_handler fh);
+extern void fts_reset_fpe_handler();
+
+/* bit masks to be used with fts_check_fpe;
+ * 
+ */
 
 #define FTS_INVALID_FPE  0x01
 #define FTS_DIVIDE0_FPE  0x02
 #define FTS_OVERFLOW_FPE 0x04
+#define FTS_INEXACT_FPE  0x08
+#define FTS_UNDERFLOW_FPE 0x10
 
 #endif

@@ -48,12 +48,10 @@ static double schedtime_ms_clock = 0.0;
 static double schedtime_tick_clock = 0.0;
 
 /* The scheduler tick length in millisecond;
-   set calling the fts_sched_set_tick_length function
-   by who know the tick length (currently, the audio sub system,
-   but this is just a little bit weird).
+   set by a sampling rate parameter listener
    */
 
-static float tick_length;
+static float tick_length = ((MAXVS * 1000) / 44100.0); /* set the default scheduler tick */
 
 
 /* the pause length; it say how often (in scheduler ticks) 
@@ -70,6 +68,8 @@ static int fts_pause_period = 12;
 static fts_status_t fts_sched_set_scheduler(int argc, const fts_atom_t *argv);
 static void fts_sched_init(void); /* init the scheduler, before the task declarations */
 void fts_sched_compile(void); /* compile the scheduler function list  */
+
+static void fts_sched_set_sampling_rate(const fts_atom_t *listener, fts_symbol_t name, const fts_atom_t *value);
 
 static void fts_sched_describe_failure(void);
 
@@ -129,6 +129,13 @@ fts_sched_init(void)
   /* Install the "ms" timer as default */
 
   fts_set_default_clock(fts_new_symbol("msec"));
+
+  /* Install the listener for the sampling rate parameter;
+   * the actual listener is a null pointer, no state to pass to the handler
+   * and we will not deinstall the listener.
+   */
+
+  fts_param_add_listener(fts_s_sampling_rate, 0, fts_sched_set_sampling_rate);
 }
 
 void
@@ -478,11 +485,19 @@ fts_sched_get_tick_length()
   return tick_length;
 }
 
-void
-fts_sched_set_tick_length(float t)
+
+static void
+fts_sched_set_sampling_rate(const fts_atom_t *listener, fts_symbol_t name, const fts_atom_t *value)
 {
-  tick_length = t;
+  if (fts_is_number(value))
+    {
+      float f;
+
+      f = (float) fts_get_number(value);
+      tick_length =  ((MAXVS * 1000) / f); /* set the scheduler tick */
+    }
 }
+
 
 /* Pause handling  */
 

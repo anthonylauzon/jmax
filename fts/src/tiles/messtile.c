@@ -97,7 +97,7 @@ static void
 post_mess(const char *msg, int ac, const fts_atom_t *av)
 {
   post("%s (%d args): ", msg, ac);
-  postatoms(ac, av);
+  post_atoms(ac, av);
   post("\n");
 }
 

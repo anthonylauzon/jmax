@@ -7,7 +7,7 @@ AUDIO_LIBRARY := sgial2
 OS_TYPE := unix
 
 SYSTEM_CFLAGS := -mips4 -n32 -r10000 -LANG:restrict
-SYSTEM_LDFLAGS :=  -mips4 -n32 -lmalloc
+SYSTEM_LDFLAGS :=  -mips4 -n32
 #SYSTEM_LDFLAGS :=  -mips4 -n32 -lmalloc -lfpe -lfpe_ss
 #SYSTEM_LDFLAGS :=  -mips4 -n32 -lmalloc
 
@@ -37,7 +37,7 @@ ARCH_DEBUG_CFLAGS := -LANG:restrict
 ## FTS specific declarations
 ##
 
-FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm 
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe
 # (fd) replaced by (great move...)
 # BUT it doesn't work with purify...
 # FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lpthread

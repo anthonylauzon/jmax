@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.17 $ IRCAM $Date: 1998/09/16 20:48:59 $
+ *      $Revision: 1.18 $ IRCAM $Date: 1998/10/21 16:35:28 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -36,6 +36,10 @@ fts_mess_init(void)
   /* Init the atom array module */
 
   fts_atom_array_init();
+
+  /* Init the params module */
+
+  fts_params_init();
 
   /* Init the FTS data module  and id table */
 

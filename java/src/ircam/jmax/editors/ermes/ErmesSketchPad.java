@@ -877,6 +877,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     catch ( FtsException ftse)
       {
 	System.err.println( "ErmesSketchPad:mousePressed: INTERNAL ERROR: FTS Instantiation Error: " + ftse);
+	ftse.printStackTrace();
       }
   }
 

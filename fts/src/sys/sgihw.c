@@ -16,6 +16,7 @@
 #include <sys/prctl.h>
 #include <sys/schedctl.h>
 #include <sys/fpu.h>
+#include <sigfpe.h>
 
 #include "sys.h"
 
@@ -40,15 +41,35 @@ struct timespec pause_time;
 
 
 static void
-flush_all_underflows_to_zero(void)
+init_fpe(void)
 {
   union fpc_csr f;
   f.fc_word = get_fpc_csr();
   f.fc_struct.flush = 1;
   
+  /* Enable all the exceptions by default */
+
   f.fc_struct.en_invalid = 0;
   f.fc_struct.en_divide0 = 0;
   f.fc_struct.en_overflow = 0;
+  f.fc_struct.en_underflow = 0;
+  f.fc_struct.en_inexact = 0;
+
+  set_fpc_csr(f.fc_word);
+}
+
+static void
+enable_fpes(void)
+{
+  union fpc_csr f;
+  f.fc_word = get_fpc_csr();
+  f.fc_struct.flush = 1;
+  
+  /* Enable all the exceptions by default */
+
+  f.fc_struct.en_invalid = 1;
+  f.fc_struct.en_divide0 = 1;
+  f.fc_struct.en_overflow = 1;
   f.fc_struct.en_underflow = 0;
   f.fc_struct.en_inexact = 0;
 
@@ -62,7 +83,7 @@ fts_platform_init(void)
 {
   fts_add_welcome(&sgi_welcome);
 
-  flush_all_underflows_to_zero();
+  init_fpe();
 
 #ifdef IRIX6_4
   if (running_real_time)
@@ -112,6 +133,60 @@ void fts_pause(void)
 {
   if ( running_real_time)
     nanosleep( &pause_time, 0);
+}
+
+
+
+/* API to catch the exceptions */
+
+static fts_fpe_handler fpe_handler = 0;
+
+/* Sgi man page tell to use this not ANSI prototype !! */
+
+int fts_sgi_fpe_handler( sig, code, sc )
+     int sig, code;
+     struct sigcontext *sc;
+{
+  if (fpe_handler)
+    {
+      int exception = __fpe_trap_type();
+
+      switch (exception)
+	{
+	case _OVERFL:
+	  (* fpe_handler)(FTS_OVERFLOW_FPE);
+	  break;
+	case _UNDERFL:
+	  (* fpe_handler)(FTS_UNDERFLOW_FPE);
+	  break;
+	case _DIVZERO:
+	  (* fpe_handler)(FTS_DIVIDE0_FPE);
+	  break;
+	case _INVALID:
+	  (* fpe_handler)(FTS_INVALID_FPE);
+	  break;
+	default:
+	  (* fpe_handler)(0);
+	  break;
+	}
+    }
+
+  return 0;
+}
+
+
+void fts_set_fpe_handler(fts_fpe_handler fh)
+{
+  enable_fpes();
+  fpe_handler = fh;
+
+  handle_sigfpes (_ON, _EN_OVERFL | _EN_DIVZERO | _EN_INVALID, 0,
+		  _USER_HANDLER,  fts_sgi_fpe_handler);
+}
+
+void fts_reset_fpe_handler()
+{
+  handle_sigfpes(_OFF, 0, 0, _USER_HANDLER, 0);
 }
 
 

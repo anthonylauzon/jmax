@@ -62,8 +62,7 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 }
 
 
-int
-fts_atom_equal(const fts_atom_t *a1, const fts_atom_t *a2)
+int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2)
 {
   if (fts_same_types(a1, a2))
     {
@@ -133,12 +132,12 @@ int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_at
   int i,j;
 
   for (i = 0; i < (ac - sac + 1); i++)
-    if (fts_atom_equal(&sav[0], &av[i]))
+    if (fts_atom_are_equals(&sav[0], &av[i]))
       {
 	/* Found the beginning, test the rest */
 	
 	for (j = 1; j < sac; j++)
-	  if (! fts_atom_equal(&sav[j], &av[j + i]))
+	  if (! fts_atom_are_equals(&sav[j], &av[j + i]))
 	    return 0;
 
 	return 1;

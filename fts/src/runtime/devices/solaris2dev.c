@@ -140,36 +140,10 @@ solarisdev_shutdown(void)
  *
  * SOON we will add SOLARIS all the audio parameters.
  *
- * Commands:
- *
- * audio-set sample_rate <int>
  *
  */
 
-/*Patch by gigi
-static fts_status_t 
-solaris_ucs_set_audio_command(int argc, const fts_atom_t *argv)
-{
-  if (argc >= 2)
-    if (fts_is_symbol(argv) && (fts_get_symbol(argv) == fts_new_symbol("sample_rate")) &&
-	fts_is_long(argv + 1))
-      {
-	sample_rate = fts_get_long(argv + 1);
-	return fts_Success;
-      }
 
-  return &fts_dev_invalid_value_error;
-}*/
-
-/*Patch by gigi
-static fts_status_t
-solaris_ucs_init(void)
-{
-  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("audio"), solaris_ucs_set_audio_command,
-			 "set audio [sample_rate <int> | ... ]",
-			 "Set SOLARIS audio system parameters\nIn this release, only sample_rate is supported");
-  return fts_Success;
-}*/
 
 /******************************************************************************/
 /*                                                                            */
@@ -334,14 +308,6 @@ solaris_dac_set_end_action(fts_dev_t *dev, fts_atom_t *value)
 }
 
 
-/*struct command_entry  solaris_dac_command_table[] =
-{
-  {"set", "channels",    solaris_dac_set_channels_action},
-  {"set", "fifo_size",   solaris_dac_set_fifo_size_action},
-  {"set", "end",         solaris_dac_set_end_action},
-  {0,0,0}
-};*/
-
 
 /* SOLARIS DAC dev class functions */
 
@@ -383,7 +349,7 @@ solaris_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Set defaults for the other values */
 
-  solaris_dac_data.config.play.sample_rate   = sample_rate;
+  solaris_dac_data.config.play.sample_rate = fts_param_get_float(fts_s_sampling_rate, 44100.);
 
   solaris_dac_data.config.play.channels   = 2;
 
@@ -392,7 +358,7 @@ solaris_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   solaris_dac_data.config.play.channels   = solaris_dac_data.nch;
   solaris_dac_set_config();
 
-  solaris_dac_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);
+  solaris_dac_data.fifo_size = fts_param_get_int(fts_s_fifo_size, 256);
 
 
   /* Allocate the DAC  formatting buffer */
@@ -737,15 +703,6 @@ solaris_adc_set_end_action(fts_dev_t *dev, fts_atom_t *value)
 }
 
 
-/*struct command_entry  solaris_adc_command_table[] =
-{
-  {"set", "channels",    solaris_adc_set_channels_action},
-  {"set", "fifo_size",   solaris_adc_set_fifo_size_action},
-  {"set", "end",         solaris_adc_set_end_action},
-  {0,0,0}
-};*/
-
-
 /* SOLARIS ADC dev class functions */
 
 static fts_status_t
@@ -778,13 +735,14 @@ solaris_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Set defaults for the other values */
 
-  solaris_adc_data.config.record.sample_rate = sample_rate;
+  solaris_adc_data.config.record.sample_rate = fts_param_get_float(fts_s_sampling_rate, 44100.);
   solaris_adc_data.config.record.channels = 2;
 
   solaris_adc_data.nch  = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), 2);
   solaris_adc_data.config.record.channels = solaris_adc_data.nch;
   solaris_adc_set_config();
-  solaris_adc_data.fifo_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fifo_size"), 256);;
+
+  solaris_adc_data.fifo_size = fts_param_get_int(fts_s_fifo_size, 256);
 
 
   /* Allocate the ADC  formatting buffer */

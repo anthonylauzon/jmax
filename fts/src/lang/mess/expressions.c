@@ -865,7 +865,6 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 /* This thing work only for ints, for now !!!, no type promotion !! */
 
 #define fts_get_float_num(a)   (fts_is_float((a)) ? fts_get_float((a)) : (float) fts_get_int((a)))
-#define OP_ERROR               return(1)
 
 /* pop is the previous operator; used only for ?: checking */
 
@@ -1083,11 +1082,21 @@ static int fts_op_eval(fts_expression_state_t *e)
 
 	      if (value)
 		{
-		  *ptos = *value;
 		  fts_expression_add_var_ref(e, (fts_patcher_t *)obj, varname);
+
+		  if (fts_is_void(value))
+		    return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is undefined",
+					    fts_symbol_name(varname));
+		  else if (fts_is_error(value))
+		    return expression_error(e, FTS_EXPRESSION_ERROR_OBJECT_REFERENCE,
+					    "Variable %s value is an error object, cannot be used",
+					    fts_symbol_name(varname));
+		  else
+		    *ptos = *value;
 		}
 	      else
-		OP_ERROR;
+		return expression_error(e, FTS_EXPRESSION_UNDEFINED_VARIABLE, "Variable %s is not defined ",
+					fts_symbol_name(varname));
 	    }
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for operator .", 0);
@@ -1150,7 +1159,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_EQUAL:
-	  if (fts_atom_equal(tos, ptos))
+	  if (fts_atom_are_equals(tos, ptos))
 	    fts_set_int(ptos, 1);
 	  else
 	    fts_set_int(ptos, 0);
@@ -1158,7 +1167,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_NOT_EQUAL:
-	  if (fts_atom_equal(tos, ptos))
+	  if (fts_atom_are_equals(tos, ptos))
 	    fts_set_int(ptos, 0);
 	  else
 	    fts_set_int(ptos, 1);

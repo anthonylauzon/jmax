@@ -13,7 +13,7 @@ public class ControlModule
   {
     // Install the DspModule remote data
 
-    Fts.registerRemoteDataClass("dspcontrol_data", ircam.jmax.editors.control.DspControl.class);
+    Fts.registerRemoteDataClass("dspcontrol_data", ircam.jmax.fts.FtsDspControl.class);
 
     // Register the Control Panel as a tool
 

@@ -3,4 +3,5 @@ dsp.c		\
 dspgraph.c	\
 gphiter.c	\
 signal.c	\
-dspcontrol.c
+dspcontrol.c    \
+dspfpe.c

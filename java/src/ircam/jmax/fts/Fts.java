@@ -404,4 +404,39 @@ public class Fts
     obj.watch(property, new DelayedEditPropertyHandler(listener, where));
     obj.ask(property);
   }
+
+  /* Get the Fts Dsp Controller */ 
+
+  static FtsDspControl dspController = null;
+
+  static public FtsDspControl getDspController()
+  {
+    if (dspController == null)
+      dspController = (FtsDspControl) Fts.newRemoteData("dspcontrol_data", null);
+    
+    return dspController;
+  }
+
+  /*
+   * The Delete object listeners; for the moment, only the object delete callback is really
+   * fired.
+   */
+
+  static MaxVector editListeners = new MaxVector();
+
+  public static void addEditListener(FtsPatcherListener listener)
+  {
+    editListeners.addElement(listener);
+  }
+
+  public static void removeEditListener(FtsPatcherListener listener)
+  {
+    editListeners.removeElement(listener);
+  }
+
+  public static void fireObjectRemoved(FtsPatcherData data, FtsObject object)
+  {
+    for (int i = 0; i < editListeners.size(); i++)
+      ((FtsPatcherListener) editListeners.elementAt(i)).objectRemoved(data, object);
+  }
 }

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/06/17 15:44:43 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:36 $
  *
  * writesf~, readsf~: disk recording and playback
  *
@@ -259,7 +259,7 @@ writesf_file_open(writesf_t *this, fts_symbol_t shint)
     {
       Audio_hdr hdr;
       /* PCM 16 bits linear */
-      hdr.sample_rate      = fts_dsp_get_sampling_rate();
+      hdr.sample_rate      = fts_param_get_float(fts_s_sampling_rate, 44100.);
       hdr.samples_per_unit = 1;
       hdr.bytes_per_unit   = 2; /* 16 bits */
       hdr.channels         = this->nchans;
@@ -280,7 +280,7 @@ writesf_file_open(writesf_t *this, fts_symbol_t shint)
 
       sfmagic1(hdr)  = SF_MAGIC1;
       sfmagic2(hdr)  = SF_MAGIC2;
-      sfsrate(hdr)   = fts_dsp_get_sampling_rate();
+      sfsrate(hdr)   = fts_param_get_float(fts_s_sampling_rate, 44100.);
       sfchans(hdr)   = this->nchans;
 
       fprintf(stderr, "writesf_file_open --> other format\n");
@@ -718,11 +718,11 @@ readsf_file_open(readsf_t *this)
       fprintf(stderr, "hdr.endian : %d\n", hdr.endian);
       fprintf(stderr, "hdr.data_size : %d\n", hdr.data_size);
   
-      if (hdr.sample_rate != fts_dsp_get_sampling_rate())
+      if (hdr.sample_rate != fts_param_get_float(fts_s_sampling_rate, 44100.))
 	{
 	  post("readsf~: incompatible sampling rate for~ file '%s' :"
 	       "sampling rate file %d, fts sampling rate %d)\n",
-	       file, hdr.sample_rate, fts_dsp_get_sampling_rate());
+	       file, hdr.sample_rate, fts_param_get_float(fts_s_sampling_rate, 44100.));
 	  return 0;
 	}
 

@@ -26,9 +26,10 @@ public class ErmesModule
 
     ErmesSwToolbar.loadToolBarImages();
 
-    // Register the find panel
+    // Register the find panel and the fpe panel
 
     FindPanel.registerFindPanel();
+    FpePanel.registerFpePanel();
   }
 }
 

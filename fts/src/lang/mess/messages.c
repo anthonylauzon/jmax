@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.31 $ IRCAM $Date: 1998/06/26 15:43:03 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/08/19 15:15:46 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -107,11 +107,7 @@ fts_status_t fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int a
   else if (winlet < cl->ninlets && winlet >= 0)
     in = &cl->inlets[winlet];
   else
-    {
-      fprintf(stderr,"Inlet %d out of range, for message %s to an object `%s'\n", winlet,
-	   (s ? fts_symbol_name(s) : "(null)"), fts_symbol_name(fts_object_get_class_name(o)));  /* @@@@ ERROR !!! */
-      return &fts_InletOutOfRange;
-    }
+    return &fts_InletOutOfRange;
 
   mess = fts_class_mess_inlet_get(in, s, &anything);
 
@@ -122,18 +118,7 @@ fts_status_t fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int a
 	  status = fts_args_check(mess, ac, at);
 
 	  if (status != fts_Success)
-	    {
-#ifdef PRINT_ERRORS
-	      fprintf(stderr,"%s error for object of class %s, inlet %d, message %s arguments:",
-		   status->description, fts_symbol_name(fts_object_get_class_name(o)), 
-		   winlet,  fts_symbol_name(s)); /* @@@@ ERROR !!! */
-
-	      fprintf_atoms(stderr, ac, at);
-	      fprintf(stderr,"\n");/* @@@@ ERROR !!! */
-#endif
-
-	      return status;
-	    }
+	    return status;
 	}
 
       (*mess->mth)(o, winlet, s, ac, at);
@@ -160,11 +145,7 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
   else if (winlet < cl->ninlets && winlet >= 0)
     in = &cl->inlets[winlet];
   else
-    {
-      fprintf(stderr,"Inlet %d out of range, for message %s to an object `%s'\n", winlet,
-	   (s ? fts_symbol_name(s) : "(null)"), fts_symbol_name(fts_object_get_class_name(o))); /* @@@@ ERROR !!! */
-      return &fts_InletOutOfRange;
-    }
+    return &fts_InletOutOfRange;
 
 
   messtable = in->messlist;
@@ -209,11 +190,11 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
 
 	  if (status != fts_Success)
 	    {
-	      fprintf(stderr,"%s error for object of class %s, inlet %d, message %s arguments:",
+	      post("%s error for object of class %s, inlet %d, message %s arguments:",
 		   status->description, fts_symbol_name(fts_object_get_class_name(o)), winlet,
-		   fts_symbol_name(s));  /* @@@@ ERROR !!! */
-	      fprintf_atoms(stderr, ac, at);
-	      fprintf(stderr,"\n");/* @@@@ ERROR !!! */
+		   fts_symbol_name(s));
+	      post_atoms(ac, at);
+	      post("\n");
 
 	      return status;
 	    }
@@ -230,8 +211,8 @@ fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
     }
   else
     {
-      fprintf(stderr,"Unknown message %s for object of class %s, inlet %d\n", 
-	   fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet); /* @@@@ ERROR !!! */
+      post("Unknown message %s for object of class %s, inlet %d\n", 
+	   fts_symbol_name(s), fts_symbol_name(fts_object_get_class_name(o)), winlet);
 
       return &fts_MethodNotFound;
     }
@@ -254,30 +235,15 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s,
   fts_status_t status;
 
   if (woutlet >= cl->noutlets || woutlet < 0)
-    {
-      fprintf(stderr,"fts_outlet_send: outlet out of range #%d for object of class `%s'\n", woutlet, 
-	   fts_symbol_name(fts_object_get_class_name(o))); /* @@@@ ERROR !!! */
-
-      return &fts_OutletOutOfRange;
-    }
+    return &fts_OutletOutOfRange;
 
   out = &cl->outlets[woutlet];
 
   if (!s)
-    {
-      fprintf(stderr,"fts_outlet_send: invalid message null symbol on outlet #%d for object of class `%s'\n", 
-	      woutlet, fts_symbol_name(fts_object_get_class_name(o))); /* @@@@ ERROR !!! */
-
-      return &fts_InvalidMessage;
-    }
+    return &fts_InvalidMessage;
 
   if (out->tmess.symb && out->tmess.symb != s)
-    {
-      fprintf(stderr, "fts_outlet_send: invalid message symbol `%s' on outlet #%d for object of class `%s'\n",
-	   fts_symbol_name(s), woutlet, fts_symbol_name(fts_object_get_class_name(o)));	/* @@@ ERROR !!! */
-
-      return &fts_InvalidMessage;
-    }
+    return &fts_InvalidMessage;
 
   conn = o->out_conn[woutlet];
 

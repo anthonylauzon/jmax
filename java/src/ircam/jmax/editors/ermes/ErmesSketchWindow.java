@@ -1080,7 +1080,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     // Store the mode in a non persistent, property of 
     // the patch, so that subpatcher can use it as their initial mode
     
-    itsPatcher.put( "editMode", (theRunMode ? "run" : "edit"));
+    itsPatcher.localPut( "editMode", (theRunMode ? "run" : "edit"));
 
     itsChangingRunEditMode = true;
 

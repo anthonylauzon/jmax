@@ -46,6 +46,6 @@ extern int ftl_program_compile( ftl_program_t *prog);
 extern void ftl_program_call_subr( ftl_program_t *prog, ftl_subroutine_t *subr);
 extern void ftl_program_run( ftl_program_t *prog );
 
-extern fts_object_t *ftl_program_pc_sample( ftl_program_t *prog);
+extern fts_object_t *ftl_program_get_current_object( ftl_program_t *prog);
 
 #endif

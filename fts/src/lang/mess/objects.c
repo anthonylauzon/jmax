@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.48 $ IRCAM $Date: 1998/10/21 16:35:29 $
+ *      $Revision: 1.49 $ IRCAM $Date: 1998/10/23 16:37:08 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -25,7 +25,10 @@ extern void fts_client_release_object(fts_object_t *c);
 
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 static void fts_object_send_kernel_properties(fts_object_t *obj);
-static void fts_object_do_delete(fts_object_t *obj, int release);
+static void fts_object_reset(fts_object_t *obj);
+static void fts_object_tell_deleted(fts_object_t *obj);
+static void fts_object_free(fts_object_t *obj, int release);
+static void fts_object_delete_no_release(fts_object_t *obj);
 
 /******************************************************************************/
 /*                                                                            */
@@ -435,7 +438,7 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 	  /* ERROR: the object cannot define a variable,
 	     it does not have a "state" property */
 
-	  fts_object_do_delete(obj, 0);
+	  fts_object_delete_no_release(obj);
 	  obj = fts_error_object_new(patcher, aoc, aot,
 				     "Object %s cannot define a variable",
 				     fts_symbol_name(fts_get_symbol(aot + 2)));
@@ -604,6 +607,13 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
       old->id = FTS_NO_ID;
     }
 
+  /* Reset the old object, and call its delete method, so that
+     it will release resources that may be needed by the new object,
+     like the name for globally named objects like table */
+
+  fts_object_reset(old);
+  fts_object_tell_deleted(old);
+
   /* Make the new object  */
 
   new = fts_object_new(fts_object_get_patcher(old), ac, at);
@@ -628,7 +638,7 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   fts_object_move_connections(old, new, do_client);
   fts_object_move_properties(old, new);
 
-  fts_object_do_delete(old, do_client);
+  fts_object_free(old, do_client);
 
   return new;
 }
@@ -759,12 +769,32 @@ void fts_object_set_id(fts_object_t *obj, int id)
     }
 }
 
-/* Don't like the function call with a flag !! */
-     
-static void fts_object_do_delete(fts_object_t *obj, int release)
-{
-  int outlet, inlet;
+/* Delete, exported  version */
 
+void fts_object_delete(fts_object_t *obj)
+{
+  fts_object_reset(obj);
+  fts_object_tell_deleted(obj);
+  fts_object_free(obj, 1);
+}
+
+static void fts_object_delete_no_release(fts_object_t *obj)
+{
+  fts_object_reset(obj);
+  fts_object_tell_deleted(obj);
+  fts_object_free(obj, 0);
+}
+
+/* The deleting phase 1: reset the object, i.e. take it away from
+   system structures, like variables definitions, variable users,
+   update fifo and so on; the object is still accessible after this
+   call, and can still manipulate messages, but it will be not
+   reinstantiated, all the object depending on him are already
+   been recomputed.
+   */
+
+static void fts_object_reset(fts_object_t *obj)
+{
   /* Unbind it from its variable if any */
 
   if (fts_object_get_variable(obj))
@@ -783,10 +813,26 @@ static void fts_object_do_delete(fts_object_t *obj, int release)
   /* take it away from the update queue, if there */
 
   fts_object_reset_changed(obj);
+}
 
+
+/* Delete phase 2: tell the object he is going to be deleted */
+     
+static void fts_object_tell_deleted(fts_object_t *obj)
+{
   /* tell the object we are going to delete him */
 
   fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
+}
+
+/* Delete phase 3: actually free the object and its system structures;
+   if the release flag is set to one, release the client representation
+   of the object; sometimes, the client representation can be reused for
+   an other object */
+
+static void fts_object_free(fts_object_t *obj, int release)
+{
+  int outlet, inlet;
 
   /* delete all the survived connections starting in the object */
 
@@ -859,11 +905,6 @@ static void fts_object_do_delete(fts_object_t *obj, int release)
   fts_block_free((char *)obj, obj->cl->size);
 }
 
-void
-fts_object_delete(fts_object_t *obj)
-{
-  fts_object_do_delete(obj, 1);
-}
 
 /******************************************************************************/
 /*                                                                            */
@@ -1062,7 +1103,7 @@ void post_object(fts_object_t *obj)
       else
 	post("<{");
 
-      postatoms(obj->argc, obj->argv);
+      post_atoms(obj->argc, obj->argv);
       post("} #%d>", obj->id);
     }
   else

@@ -1,7 +1,9 @@
 #include "sys.h"
 #include "lang/mess.h"
+#include "lang/datalib.h"
 #include "lang/ftl.h"
 #include "lang/dsp.h"
+#include "lang/dsp/dspfpe.h"
 #include "runtime.h"	/* @@@@ what should we do ?? */
 
 /*
@@ -12,12 +14,22 @@
  * 
  * Currently, it does not implement any remote calls, just send the result
  * of the poll; the poll interval is given at the creation of the object.
+ *
+ * Todo: install the dsp control instance as listener for param sampling rate, param fifo_size,
+ * and DSP on/off (how ?).
  */
 
 #define DSP_CONTROL_DAC_SLIP_STATE      1
 #define DSP_CONTROL_INVALID_FPE_STATE   2
 #define DSP_CONTROL_DIVIDE0_FPE_STATE   3
 #define DSP_CONTROL_OVERFLOW_FPE_STATE  4
+#define DSP_CONTROL_SAMPLING_RATE       5
+#define DSP_CONTROL_FIFO_SIZE           6
+#define DSP_CONTROL_DSP_ON              7
+
+#define DSP_CONTROL_FPE_START_COLLECT   8
+#define DSP_CONTROL_FPE_STOP_COLLECT    9
+
 
 extern fts_dev_t * fts_dsp_get_dac_slip_dev();
 
@@ -122,6 +134,20 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
 }
 
 
+static void fts_dsp_control_export_fun(fts_data_t *d)
+{
+  fts_atom_t a;
+  fts_dsp_control_t *this = (fts_dsp_control_t *)d;
+
+  fts_set_int(&a, fts_param_get_int(fts_s_fifo_size, 0));
+  fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_FIFO_SIZE, 1, &a);
+
+  fts_set_int(&a, (int) fts_param_get_float(fts_s_sampling_rate, 44100.0));
+  fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_SAMPLING_RATE, 1, &a);
+}
+
+
+
 static void
 fts_dsp_control_delete(fts_data_t *d)
 {
@@ -132,13 +158,35 @@ fts_dsp_control_delete(fts_data_t *d)
 }
 
 
+static void fts_dsp_control_fpe_start_collect( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  if ((ac == 1) && fts_is_data(at))
+    {
+      fts_object_set_t *set;
+
+      set = (fts_object_set_t *) fts_get_data(at);
+      
+      fts_dsp_fpe_start_collect(set);
+    }
+}
+
+
+static void fts_dsp_control_fpe_stop_collect( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_dsp_fpe_stop_collect();
+}
 
 void fts_dsp_control_config(void)
 {
   fts_dsp_control_data_class = fts_data_class_new( fts_new_symbol( "dspcontrol_data"));
 
   fts_data_class_define_remote_constructor( fts_dsp_control_data_class, fts_dsp_control_new);
+  fts_data_class_define_export_function(fts_dsp_control_data_class, fts_dsp_control_export_fun);
   fts_data_class_define_remote_destructor(fts_dsp_control_data_class, fts_dsp_control_delete);
+  fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_START_COLLECT,
+				 fts_dsp_control_fpe_start_collect);
+  fts_data_class_define_function(fts_dsp_control_data_class, DSP_CONTROL_FPE_STOP_COLLECT,
+				 fts_dsp_control_fpe_stop_collect);
 }
 
 

@@ -23,7 +23,7 @@ sigprint_tick(fts_alarm_t *alarm, void *o)
   if(x->sym)
     post("%s:\n", fts_symbol_name(x->sym));
 
-  postvector(x->size, x->buf);
+  post_vector(x->size, x->buf);
 
   x->n_print--;
   fts_alarm_unarm(alarm);

@@ -165,7 +165,7 @@ fts_atom_list_is_subsequence( fts_atom_list_t *list, int ac, const fts_atom_t *a
 
   while (! fts_atom_list_iterator_end(iterator))
     {
-      if (fts_atom_equal(&at[0], fts_atom_list_iterator_current(iterator)))
+      if (fts_atom_are_equals(&at[0], fts_atom_list_iterator_current(iterator)))
 	{
 	  int i;
 
@@ -174,7 +174,7 @@ fts_atom_list_is_subsequence( fts_atom_list_t *list, int ac, const fts_atom_t *a
 	  fts_atom_list_iterator_next(ii);
 
 	  while ((i < ac) && (! fts_atom_list_iterator_end(ii)) &&
-		 fts_atom_equal(&at[i], fts_atom_list_iterator_current(ii)))
+		 fts_atom_are_equals(&at[i], fts_atom_list_iterator_current(ii)))
 	    {
 	      i++;
 	      fts_atom_list_iterator_next(ii);

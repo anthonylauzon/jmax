@@ -132,6 +132,11 @@ fts_symbol_t fts_s_equal;
 
 fts_symbol_t fts_s_args;
 
+/* Kernel Parameter names */ 
+
+fts_symbol_t fts_s_sampling_rate;
+fts_symbol_t fts_s_fifo_size;
+
 static void
 fts_predefine_symbols(void)
 {
@@ -251,6 +256,11 @@ fts_predefine_symbols(void)
   /* Predefined variable names */
 
   fts_s_args        = fts_new_symbol("args");
+
+  /* Kernel Parameter names */ 
+
+  fts_s_sampling_rate = fts_new_symbol("sampling_rate");
+  fts_s_fifo_size     = fts_new_symbol("fifo_size");
 }
 
 
