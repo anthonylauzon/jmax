@@ -398,9 +398,16 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   }
 
   /* try to find the GUID of the audio device */
-  if (dsdevice_list == NULL) {
-    DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);              
-  }
+
+  /*
+
+    
+
+   */
+
+/*    if (dsdevice_list == NULL) { */
+/*      DirectSoundEnumerate((LPDSENUMCALLBACK) dsaudioport_enum_callback, NULL);               */
+/*    } */
 
   device = dsdevice_list;
   while (device != NULL) {
@@ -467,11 +474,15 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   if ((dev->mode == fts_s_write) || (dev->mode == fts_s_read_write)) {
 
+    /* create the direct sound interface */
+
     hr = DirectSoundCreate(dev->guid, &dev->direct_sound, NULL);
     if (hr != DS_OK) {
       fts_object_set_error(o, "Warning: dsaudioport: failed to create direct sound");
       goto error_recovery;
     }
+
+    /* set the cooperative level */
     
     hr = IDirectSound_SetCooperativeLevel(dev->direct_sound, fts_wnd, DSSCL_PRIORITY);
     if (hr != DS_OK) {
@@ -490,10 +501,10 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     }
 
     /* create the primary buffer */
+
     ZeroMemory(&desc, sizeof(DSBUFFERDESC));
     desc.dwSize = sizeof(DSBUFFERDESC);
     desc.dwFlags = DSBCAPS_PRIMARYBUFFER;
-/*      desc.lpwfxFormat = dev->format; */
     
     hr = IDirectSound_CreateSoundBuffer(dev->direct_sound, &desc, &dev->primary_buffer, NULL);
     if (hr != DS_OK) {
@@ -509,6 +520,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     }
 
     /* create the secondary sound output buffer */
+
     ZeroMemory(&desc, sizeof(DSBUFFERDESC));
     desc.dwSize = sizeof(DSBUFFERDESC);
     desc.dwFlags = DSBCAPS_GLOBALFOCUS | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY;
