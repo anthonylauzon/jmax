@@ -51,41 +51,6 @@ static char winmidiport_error_buffer[256];
 #define msg_p1(_m) (((_m) >> 8) & 0x7f)
 #define msg_p2(_m) (((_m) >> 16) & 0x7f)
 
-char*
-winmidi_tostring(DWORD midi, char* buf, int len)
-{
-  switch (msg_type(midi)) {
-  case 0:
-    _snprintf(buf, len, "none");
-    break;
-  case NOTEOFF:
-    _snprintf(buf, len, "noteoff: %3d %3d", msg_chan(midi), msg_p1(midi));
-    break;
-  case NOTEON:
-    _snprintf(buf, len, "noteon: %3d %3d %3d", msg_chan(midi), msg_p1(midi), msg_p2(midi));
-    break;
-  case KEYPRESSURE:
-    _snprintf(buf, len, "poly: %3d %3d %3d", msg_chan(midi), msg_p1(midi), msg_p2(midi));
-    break;
-  case CONTROLCHANGE:
-    _snprintf(buf, len, "cc: %3d %3d %3d", msg_chan(midi), msg_p1(midi), msg_p2(midi));
-    break;
-  case PROGRAMCHANGE:
-    _snprintf(buf, len, "prog: %3d %3d", msg_chan(midi), msg_p1(midi));
-    break;
-  case CHANNELPRESSURE:
-    _snprintf(buf, len, "press: %3d %3d", msg_chan(midi), msg_p1(midi));
-    break;
-  case PITCHBEND:
-    _snprintf(buf, len, "bend: %3d %3d", msg_chan(midi), msg_p1(midi) + (msg_p2(midi) << 7));
-    break;
-  case SYSEX:
-    _snprintf(buf, len, "sysex");
-    break;
-  }
-  return buf;
-}
-
 
 /*************************************************
  *
@@ -117,7 +82,6 @@ static void winmidiport_output(fts_object_t *o, fts_midievent_t *event, double t
 static char* winmidiport_output_error(int no);
 static char* winmidiport_input_error(int no);
 void CALLBACK winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
-void CALLBACK winmidiport_callback_out(HMIDIOUT hmo, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
 static unsigned char* winmidiport_realloc_sysex_buffer(MIDIHDR* hdr, int size);
 
 
@@ -162,11 +126,6 @@ winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1
   case MIM_MOREDATA:
     break;
   }
-}
-
-void CALLBACK 
-winmidiport_callback_out(HMIDIOUT hmo, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
-{
 }
 
 void
