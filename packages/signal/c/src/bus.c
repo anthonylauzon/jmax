@@ -54,7 +54,11 @@ bus_get_or_create(fts_patcher_t *patcher, fts_symbol_t name)
   else if(fts_is_void(value))
   {
     /* create new bus */
-    bus_t *bus = (bus_t *)fts_object_create_in_patcher(bus_class, patcher, 0, 0);
+    fts_atom_t a;
+	bus_t* bus;
+    fts_set_symbol(&a, bus_tilda_symbol);
+    bus = (bus_t*)fts_eval_object_description(patcher, 1, &a); 
+/*     bus_t *bus = (bus_t *)fts_object_create_in_patcher(bus_class, patcher, 0, 0); */
 
     /* name the bus */
     fts_object_set_name((fts_object_t *)bus, name);

@@ -21,16 +21,17 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
+
 #include <fts/fts.h>
 #include <fts/config.h>
 #include <math.h>
 
 #ifdef WIN32
-#if defined(DATA_EXPORTS)
+#if defined(UTILS_EXPORTS) 
 #define UTILS_API __declspec(dllexport)
 #else
 #define UTILS_API __declspec(dllimport)
-#endif
+#endif   
 #else
 #define UTILS_API extern
 #endif
@@ -263,7 +264,7 @@ UTILS_API void fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip)
 #define fts_ramp_get_incr(r) ((r)->value.incr)
 #define fts_ramp_get_steps(r) ((r)->n_steps)
 
-/*extern void fts_ramp_jump(fts_ramp_t *ramp);*/
+/* extern void fts_ramp_jump(fts_ramp_t *ramp); */
 UTILS_API void fts_ramp_freeze(fts_ramp_t *ramp);
 UTILS_API void fts_ramp_incr(fts_ramp_t *ramp);
 UTILS_API void fts_ramp_incr_by(fts_ramp_t *ramp, int n);
@@ -570,6 +571,6 @@ typedef union _fts_wrap_fudge
   (wrapper)->f - UNITBIT32 \
 )
 
-
+UTILS_API void utils_config(void);
 
 #endif /* _UTILS_H */
