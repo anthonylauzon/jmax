@@ -474,6 +474,7 @@ track_clear_and_upload(track_t *track)
 {
   track_clear(track);
 
+  if(track_editor_is_open(track))
 	fts_client_send_message((fts_object_t *)track, fts_s_clear, 0, 0);
   
   fts_object_set_state_dirty((fts_object_t *)track);
@@ -772,11 +773,26 @@ track_description_function(fts_object_t *o,  fts_array_t *array)
   fts_array_append_symbol(array, fts_class_get_name(type));
 }
 
+
+
 /******************************************************
 *
 *  markers
 *
 */
+
+static void
+_track_get_markers (fts_object_t *o, int winlet, fts_symbol_t s, 
+                    int ac, const fts_atom_t *at)
+{
+  track_t    *markers = track_get_or_make_markers((track_t *) o);
+  fts_atom_t  ret;
+
+  fts_set_object(&ret, markers);
+
+  fts_return(&ret);
+}
+
 
 track_t *
 track_get_or_make_markers(track_t *track)
@@ -1936,14 +1952,16 @@ _track_get_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 /* default import handler: midifile */
 static void
-track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+track_import_midifile (fts_object_t *o, int winlet, fts_symbol_t s, 
+		       int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *)o;
   fts_symbol_t name = fts_get_symbol(at);
   fts_midifile_t *file = fts_midifile_open_read(name);
   fts_class_t *type = track_get_type(self);
   
-  if (type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL)
+  if (type == fts_midievent_type || type == scoob_class ||
+      type == fts_int_class      || type == NULL)
   {
     if(file)
     {
@@ -1958,10 +1976,12 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       
       if (!error && size > 0)	/* set return value: sucess */
       {
-        if(self->markers)
-          marker_track_renumber_bars(self->markers, track_get_first(self->markers), FIRST_BAR_NUMBER, 0);
+        if (self->markers)
+	  marker_track_renumber_bars(self->markers, 
+				     track_get_first(self->markers), 
+				     FIRST_BAR_NUMBER, 0);
         
-	      track_update_editor(self);
+	track_update_editor(self);
         fts_return_object(o);
       }
       
@@ -1970,9 +1990,14 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   }
 }
 
+
+
+/* exporting */
+
 /* default export handler: midifile */
 static void
-track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+track_export_midifile (fts_object_t *o, int winlet, fts_symbol_t s, 
+                       int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *) o;
   fts_symbol_t sym  = fts_get_symbol(at);
@@ -2005,7 +2030,8 @@ track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
 
 static void
-track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, 
+                     int ac, const fts_atom_t *at)
 {
   fts_symbol_t track_name   = track_get_name(self);   /* why always NULL? */
   fts_symbol_t default_name = track_name  ?  track_name  
@@ -2020,6 +2046,9 @@ track_export_dialog (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
                          fts_new_symbol("Select file to export"), 
                          fts_project_get_dir(), default_name);
 }
+
+
+
 
 /* editor */
 
@@ -2119,6 +2148,9 @@ track_set_save_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 	}
 }
 
+
+
+
 /******************************************************
 *
 *  persistence
@@ -2213,6 +2245,9 @@ track_notify_gui_listeners(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   }
 }
 
+
+
+
 /******************************************************
 *
 *  class
@@ -2285,6 +2320,9 @@ track_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(track_t), track_init, track_delete);
   
+  fts_class_set_copy_function(cl, track_copy_function);
+  fts_class_set_description_function(cl, track_description_function);
+  
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, seqsym_save_editor, track_set_save_editor);
@@ -2322,6 +2360,8 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_insert, _track_insert);  
   fts_class_message_varargs(cl, fts_s_append, _track_append);
   fts_class_message_varargs(cl, seqsym_remove, _track_remove);
+
+  /* fts_class_message_number(cl, fts_s_get_element, track_get_element); */
   
   fts_class_message_varargs(cl, seqsym_shift, _track_shift);
   fts_class_message_varargs(cl, seqsym_stretch, _track_stretch);
@@ -2339,11 +2379,12 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
   
   /* markers */
+  fts_class_message_void(cl, fts_new_symbol("getmarkers"), _track_get_markers);
   fts_class_message_void(cl, fts_new_symbol("make_bars"), _track_make_bars);
   fts_class_message_void(cl, fts_new_symbol("renumber_bars"), _track_renumber_bars);
-	fts_class_message_varargs(cl, fts_new_symbol("append_bar"), _track_append_bar);
+  fts_class_message_varargs(cl, fts_new_symbol("append_bar"), _track_append_bar);
   fts_class_message_varargs(cl, fts_new_symbol("make_trill"), _track_make_trill);
-	fts_class_message_varargs(cl, fts_new_symbol("collapse_markers"), _track_collapse_markers);
+  fts_class_message_varargs(cl, fts_new_symbol("collapse_markers"), _track_collapse_markers);
   fts_class_message_varargs(cl, seqsym_marker, _track_append_marker);
   
   fts_class_inlet_thru(cl, 0);
@@ -2354,9 +2395,6 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
   
   fts_class_message_varargs(cl, fts_new_symbol("insert_marker"), track_insert_marker_from_client);
-  
-  fts_class_set_copy_function(cl, track_copy_function);
-  fts_class_set_description_function(cl, track_description_function);
   
   
   /*
