@@ -33,12 +33,15 @@ extern fts_symbol_t seqsym_sequence;
 extern fts_symbol_t seqsym_miditrack;
 extern fts_symbol_t seqsym_track;
 extern fts_symbol_t seqsym_event;
+extern fts_symbol_t seqsym_segment;
 
 /* events */
 extern fts_symbol_t seqsym_note;
 extern fts_symbol_t seqsym_seqmess;
 
 /* messages */
+extern fts_symbol_t seqsym_insert;
+extern fts_symbol_t seqsym_remove;
 extern fts_symbol_t seqsym_export_midifile;
 extern fts_symbol_t seqsym_export_midifile_dialog;
 extern fts_symbol_t seqsym_import_midifile;

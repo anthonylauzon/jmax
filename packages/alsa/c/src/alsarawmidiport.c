@@ -230,6 +230,7 @@ void
 alsarawmidiport_config( void)
 {
   fts_class_install( fts_new_symbol("alsarawmidiport"), alsarawmidiport_instantiate);
+  fts_midiport_set_default_class(fts_new_symbol("alsarawmidiport"));
 
-  s_hw_0_0 = fts_new_symbol( "hw:0,0");
+  s_hw_0_0 = fts_new_symbol("hw:0,0");
 }

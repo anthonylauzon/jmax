@@ -29,13 +29,33 @@
 #include "note.h"
 #include "seqmess.h"
 
-fts_class_t *event_class = 0;
+fts_metaclass_t *event_type = 0;
 
 /**************************************************************
  *
  *  generic event functions
  *
  */
+
+double 
+event_get_duration(event_t *event)
+{
+  fts_atom_t *value = &event->value;
+  double duration = 0.0;
+
+  if(note_atom_is(value))
+    {
+      note_t *note = note_atom_get(value);
+
+      duration = note_get_duration(note);
+    }
+  else if(fts_is_object(value))
+    {
+      /* get duration property ?? */
+    }
+  
+  return duration;
+}
 
 void 
 event_get_array(event_t *event, fts_array_t *array)
@@ -45,7 +65,7 @@ event_get_array(event_t *event, fts_array_t *array)
       fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
       fts_atom_t a;
       
-      fts_set_array(&a, array);
+      fts_set_pointer(&a, array);
       fts_send_message(obj, fts_SystemInlet, fts_s_get_array, 1, &a);
     }
   else if(!fts_is_void(&event->value))
@@ -61,7 +81,7 @@ event_get_description(event_t *event, fts_array_t *array)
       fts_symbol_t type = fts_get_selector(&event->value);
       fts_atom_t a[2];
       
-      fts_set_array(a, array);
+      fts_set_pointer(a, array);
       fts_send_message(obj, fts_SystemInlet, fts_s_get_array, 1, a);
       
       fts_set_float(a + 0, (float) event->time);
@@ -104,7 +124,7 @@ event_upload(event_t *event)
 	  fts_set_symbol(a + 1, seqsym_note);
 	  fts_set_int(a + 2, note_get_pitch(note));
 	  fts_set_float(a + 3, (float)note_get_duration(note));
-	  fts_client_upload((fts_object_t *)event, seqsym_event, 4, a);
+	  /*fts_client_upload((fts_object_t *)event, seqsym_event, 4, a);*/
 	  
 	  return;
 	}
@@ -116,7 +136,7 @@ event_upload(event_t *event)
 	  fts_set_symbol(a + 1, seqsym_seqmess);
 	  fts_set_symbol(a + 2, seqmess_get_selector(seqmess));
 	  fts_set_int(a + 3, seqmess_get_position(seqmess));
-	  fts_client_upload((fts_object_t *)event, seqsym_event, 4, a);
+	  /*fts_client_upload((fts_object_t *)event, seqsym_event, 4, a);*/
 	  
 	  return;
 	}
@@ -126,7 +146,7 @@ event_upload(event_t *event)
       fts_set_float(a + 0, (float)event_get_time(event));
       fts_set_symbol(a + 1, fts_get_selector(&event->value));
       a[2] = event->value;
-      fts_client_upload((fts_object_t *)event, seqsym_event, 3, a);
+      /*fts_client_upload((fts_object_t *)event, seqsym_event, 3, a);*/
 	  
       return;
     }
@@ -134,7 +154,7 @@ event_upload(event_t *event)
   /* anything else is uploaded as void event */
   fts_set_float(a + 0, (float)event_get_time(event));
   fts_set_symbol(a + 1, fts_s_void);
-  fts_client_upload((fts_object_t *)event, seqsym_event, 2, a);
+  /*fts_client_upload((fts_object_t *)event, seqsym_event, 2, a);*/
 }
 
 void
@@ -177,7 +197,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 /**************************************************************
  *
- *  class
+ *  event class
  *
  */
 static void
@@ -204,7 +224,7 @@ event_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   event_t *this = (event_t *)o;  
 
-  fts_set_void(&this->value);
+  fts_atom_void(&this->value);
 }
 
 static fts_status_t
@@ -218,6 +238,12 @@ event_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   return fts_Success;
 }
+
+/*****************************************************************
+ *
+ *  config & install
+ *
+ */
 
 void
 event_config(void)

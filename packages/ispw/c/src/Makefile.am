@@ -32,6 +32,8 @@ delwrite.c \
 drunk.c \
 expr_doctor.c \
 exscale.c \
+explay.c \
+explode.c \
 fft.c \
 fft_ftl.c \
 filters.c \
@@ -132,6 +134,7 @@ atomlist.h \
 biquad.h \
 delbuf.h \
 deltable.h \
+explode.h \
 fft_ftl.h \
 filters.h \
 fir.h \

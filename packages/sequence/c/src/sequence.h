@@ -55,7 +55,7 @@ typedef struct _sequence_
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
 
-  fts_array_t array;
+  fts_tuple_t *tuple;
 
   int open; /* flag: is 1 if sequence editor is open */
   track_t *last_track; /* last created track */
@@ -78,6 +78,3 @@ extern track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t na
 extern track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
 
 #endif
-
-
-

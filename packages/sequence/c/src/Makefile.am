@@ -2,6 +2,8 @@ packagedir=$(pkgdatadir)/packages/sequence/c
 package_LTLIBRARIES=libsequence.la
 libsequence_la_SOURCES= \
 event.c \
+getdur.c \
+locate.c \
 module.c \
 note.c \
 seqmess.c \

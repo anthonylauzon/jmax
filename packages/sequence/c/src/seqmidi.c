@@ -26,8 +26,8 @@
 #include <ctype.h>
 
 #include <fts/fts.h>
+#include <ftsconfig.h>
 #include <string.h>
-
 #include "seqsym.h"
 #include "sequence.h"
 #include "track.h"
@@ -187,7 +187,7 @@ inttrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   seqmidi_read_data_t *data = (seqmidi_read_data_t *)fts_midifile_get_user_data(file);
   int type = fts_midievent_get_type(midievt);
 
-  if(type < midi_type_system)
+  if(type < midi_system_exclusive)
     {
       track_t *track = data->track;
       double time = fts_midifile_get_time(file);
@@ -343,7 +343,7 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, note_t *note)
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);
   event_t *off = track_get_first(data->free_track);
 
-  fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, 0, pitch, 64);
+  fts_midifile_write_channel_message(file, time_in_ticks, midi_note, 0, pitch, 64);
   data->size++;
 
   /* schedule note off */
@@ -386,7 +386,7 @@ seqmidi_write_note_offs(fts_midifile_t *file, double time)
       int off_pitch = event_get_int(off);
       
       /* write note off */
-      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_type_note, 0, off_pitch, 0);
+      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_note, 0, off_pitch, 0);
       data->size++;
 
       /* prevent off event being destroyed when moved to free_track */
@@ -407,13 +407,13 @@ seqmidi_write_note_offs(fts_midifile_t *file, double time)
 int
 track_export_to_midifile(track_t *track, fts_midifile_t *file)
 {
-  fts_symbol_t track_type = track_get_type(track);
+  fts_symbol_t track_type_name = track_get_type(track);
   int track_size = track_get_size(track);
 
   if(track_size <= 0)
     return 0;
 
-  if(track_type == seqsym_note)
+  if(track_type_name == seqsym_note)
     {
       seqmidi_write_data_t data;
       event_t *event;
@@ -460,7 +460,7 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
       
       return data.size;
     }
-  else if(track_type == fts_s_midievent)
+  else if(track_type_name == fts_s_midievent)
     {
       seqmidi_write_data_t data;
       event_t *event;

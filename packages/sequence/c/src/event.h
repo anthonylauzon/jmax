@@ -28,13 +28,7 @@
 
 #include <fts/fts.h>
 
-/*****************************************************************
- *
- *  event
- *
- */
-
-extern fts_class_t *event_class;
+extern fts_metaclass_t *event_type;
 
 typedef struct _event_ event_t;
 
@@ -51,7 +45,6 @@ struct _event_
 #define event_set_time(e, t) ((e)->time = (t))
 #define event_get_time(e) ((e)->time)
 
-#define event_set_value(e, v) ((e)->value = (*v))
 #define event_get_value(e) (&(e)->value)
 
 #define event_set_track(e, t) ((e)->track = (t))
@@ -73,8 +66,9 @@ struct _event_
 extern void event_get_array(event_t *event, fts_array_t *array);
 extern void event_dump(event_t *event, fts_dumper_t *dumper);
 
+extern double event_get_duration(event_t *event);
+
 extern void event_print(event_t *event);
 extern void event_upload(event_t *event);
 
 #endif
-

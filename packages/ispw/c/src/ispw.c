@@ -61,6 +61,8 @@ extern void scale_config(void);
 extern void accum_config(void);
 extern void bag_config(void);
 extern void int_config(void);
+extern void explay_config(void);
+extern void explode_config(void);
 extern void float_config(void);
 extern void symbol_obj_config(void);
 extern void funbuff_config(void);
@@ -68,6 +70,8 @@ extern void pbank_config(void);
 extern void qlist_config(void);
 extern void table_config(void);
 extern void ispw_value_config(void);
+
+/* expression */
 extern void expr_config(void);
 extern void expr_doctor_init(void);
 
@@ -182,6 +186,8 @@ ispw_config(void)
   accum_config();
   bag_config();
   int_config();
+  explay_config();
+  explode_config();
   float_config();
   symbol_obj_config();
   funbuff_config();

@@ -29,7 +29,7 @@
 #include <fts/fts.h>
 #include "event.h"
 
-extern fts_class_t *seqmess_class;
+extern fts_metaclass_t *seqmess_type;
 
 typedef struct _seqmess_
 {

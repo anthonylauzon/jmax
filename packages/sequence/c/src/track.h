@@ -30,7 +30,7 @@
 #include "track.h"
 #include "event.h"
 
-extern fts_class_t *track_class;
+extern fts_metaclass_t *track_type;
 
 typedef struct _track_ track_t;
 
@@ -62,7 +62,7 @@ struct _track_
 #define track_get_first(t) ((t)->first)
 #define track_get_last(t) ((t)->last)
 #define track_get_size(t) ((t)->size)
-#define track_get_duration(t) ((t)->last->time - (t)->first->time)
+#define track_get_duration(t) (((t)->last)? (t)->last->time: 0.0)
 
 #define track_is_active(t) ((t)->active != 0)
 
@@ -92,8 +92,7 @@ extern void track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 extern void track_add_event_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /* track atoms */
-#define track_atom_set(ap, x) fts_set_object_with_type((ap), (x), seqsym_track)
 #define track_atom_get(ap) ((track_t *)fts_get_object(ap))
-#define track_atom_is(ap) (fts_is_a((ap), seqsym_track))
+#define track_atom_is(ap) (fts_is_a((ap), track_type))
 
 #endif

@@ -24,7 +24,7 @@
  *
  */
 #include <fts/fts.h>
-
+#include <ftsconfig.h>
 #include "seqsym.h"
 #include "sequence.h"
 #include "track.h"
@@ -148,18 +148,18 @@ sequence_move_track(sequence_t *sequence, track_t *track, int index)
 }
 
 static void
-sequence_array_update(sequence_t *this)
+sequence_tuple_update(sequence_t *this)
 {
   track_t *track = sequence_get_first_track(this);
   
-  fts_array_set_size(&this->array, 0);
+  fts_tuple_set_size(this->tuple, 0);
 
   while(track)
     {
       fts_atom_t a;
 
       fts_set_object(&a, (fts_object_t *)track);
-      fts_array_append(&this->array, 1, &a);
+      fts_tuple_append(this->tuple, 1, &a);
 
       track = track_get_next(track);
     }
@@ -168,12 +168,12 @@ sequence_array_update(sequence_t *this)
 }
 
 static void
-sequence_array_append(sequence_t *this, track_t *track)
+sequence_tuple_append(sequence_t *this, track_t *track)
 {
   fts_atom_t a;
 
   fts_set_object(&a, (fts_object_t *)track);
-  fts_array_append(&this->array, 1, &a);
+  fts_tuple_append(this->tuple, 1, &a);
 
   fts_object_redefine_variable((fts_object_t *)this);
 }
@@ -194,7 +194,7 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
       
       /* create track at client */
       fts_set_symbol(&a, track_type);
-      fts_client_upload((fts_object_t *)track, seqsym_track, 1, &a);
+      /*fts_client_upload((fts_object_t *)track, seqsym_track, 1, &a);*/
 
       /* add track to sequence at client */
       fts_set_object(&a, (fts_object_t *)track);
@@ -280,7 +280,7 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	  char *error = fts_midifile_get_error(file);
 
 	  if(error)
-	    fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", name, error);
+	    fts_object_signal_runtime_error(o, "import: read error in \"%s\" (%s)\n", fts_symbol_name(name), error);
 	  else if(size <= 0)
 	    fts_object_signal_runtime_error(o, "import: couldn't get any data from \"%s\"\n", fts_midifile_get_name(file));
 	  
@@ -289,10 +289,10 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	  if(sequence_editor_is_open(this))
 	    sequence_upload(o, 0, 0, 0, 0);
 	  
-	  sequence_array_update(this);
+	  sequence_tuple_update(this);
 	}
       else
-	fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", name);
+	fts_object_signal_runtime_error(o, "import: cannot open \"%s\"\n", fts_symbol_name(name));
     }
 }
       
@@ -369,6 +369,44 @@ sequence_export_track_by_index(fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
+sequence_insert_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(ac > 0 && fts_is_number(at))
+    {
+      int index = fts_get_number_int(at);
+      track_t *track = sequence_get_track_by_index(this, index);
+      
+      if(track)
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_insert, ac - 1, at + 1);
+      else	
+	fts_object_signal_runtime_error(o, "insert: no track #%d", index);
+    }
+  else
+    fts_object_signal_runtime_error(o, "insert: track number required");  
+}
+
+static void
+sequence_remove_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+
+  if(ac > 0 && fts_is_number(at))
+    {
+      int index = fts_get_number_int(at);
+      track_t *track = sequence_get_track_by_index(this, index);
+      
+      if(track)
+	fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_remove, ac - 1, at + 1);
+      else	
+	fts_object_signal_runtime_error(o, "remove: no track #%d", index);
+    }
+  else
+    fts_object_signal_runtime_error(o, "remove: track number required");  
+}
+
+static void
 sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
@@ -387,7 +425,7 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  track = sequence_get_first_track(this);
 	}    
 
-      sequence_array_update(this);
+      sequence_tuple_update(this);
     }
   else if(ac && fts_is_number(at))
     {
@@ -421,10 +459,10 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	      fts_symbol_t track_name = track_get_name(track);
 	      fts_symbol_t track_type = track_get_type(track);
 	      int track_size = track_get_size(track);
-	      const char *name_str = track_name? track_name: "untitled";
+	      const char *name_str = track_name? fts_symbol_name(track_name): "untitled";
 
 	      post("  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
-		   track_type, (track_size == 1)? "": "s");
+		   fts_symbol_name(track_type), (track_size == 1)? "": "s");
 
 	      track = track_get_next(track);
   	    }
@@ -466,7 +504,7 @@ sequence_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pro
 {
   sequence_t *this = (sequence_t *)o;
 
-  fts_set_array(value, &this->array);
+  fts_set_tuple(value, this->tuple);
 }
 
 /******************************************************
@@ -494,7 +532,7 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   if(sequence_editor_is_open(this))
     sequence_add_track_at_client(this, track);
 
-  sequence_array_append(this, track);
+  sequence_tuple_append(this, track);
 }
 
 /* remove track by client request */
@@ -509,7 +547,7 @@ sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, in
   if(fts_object_has_id((fts_object_t *)track))
     fts_client_send_message(o, seqsym_removeTracks, 1, at);
 
-  sequence_array_update(this);
+  sequence_tuple_update(this);
 }
 
 static void
@@ -524,7 +562,7 @@ sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int 
   if(fts_object_has_id((fts_object_t *)track))
     fts_client_send_message(o, seqsym_moveTrack, 2, at);
 
-  sequence_array_update(this);
+  sequence_tuple_update(this);
 }
 
 static void
@@ -579,7 +617,7 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->open = 0;  
   this->keep = fts_s_no;
 
-  fts_array_init(&this->array, 0, 0);
+  this->tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, 0, 0);
 
   if(ac == 1 && fts_is_int(at))
     {
@@ -600,7 +638,7 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	  /* add it to the sequence */
 	  sequence_add_track(this, track);
-	  sequence_array_append(this, track);
+	  sequence_tuple_append(this, track);
 	}
       
       this->keep = fts_s_args;
@@ -621,10 +659,10 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 		{
 		  /* add it to the sequence */
 		  sequence_add_track(this, track);
-		  sequence_array_append(this, track);
+		  sequence_tuple_append(this, track);
 		}
 	      else
-		fts_object_set_error(o, "Cannot create track of type %s", type);
+		fts_object_set_error(o, "Cannot create track of type %s", fts_symbol_name(type));
 	    }
 	  else
 	    fts_object_set_error(o, "Wrong arguments");
@@ -646,6 +684,8 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
       track = sequence_get_first_track(this);
     }    
+
+  fts_object_destroy((fts_object_t *)this->tuple);
   
   fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
 }
@@ -671,13 +711,16 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, sequence_print);
   
   /* graphical editor */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("getName"), sequence_send_name_to_client);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, sequence_open_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, sequence_destroy_editor);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, sequence_close_editor); 
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("getName"), sequence_send_name_to_client);*/
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, sequence_open_editor);*/
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_destroyEditor, sequence_destroy_editor);*/
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_closeEditor, sequence_close_editor);*/
   
   fts_method_define_varargs(cl, 0, fts_s_clear, sequence_clear);
   fts_method_define_varargs(cl, 0, fts_s_print, sequence_print);
+
+  fts_method_define_varargs(cl, 0, seqsym_insert, sequence_insert_event);
+  fts_method_define_varargs(cl, 0, seqsym_remove, sequence_remove_event);
   
   /* MIDI files */
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_import_midifile_dialog, sequence_import_midifile_dialog);

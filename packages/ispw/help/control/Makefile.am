@@ -14,6 +14,8 @@ help_DATA=\
  drunk.help.jmax \
  expr.help.jmax \
  exscale.help.jmax \
+ explode.help.jmax \
+ explay.help.jmax \
  float.help.jmax \
  ftom.help.jmax \
  funbuff.help.jmax \
@@ -31,6 +33,7 @@ help_DATA=\
  pipe.help.jmax \
  poly.help.jmax \
  prepend.help.jmax \
+ qlist.help.jmax \
  random.help.jmax \
  route.help.jmax \
  scale.help.jmax \
