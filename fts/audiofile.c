@@ -203,8 +203,11 @@ fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, f
 	fts_audiofile_set_file_format_by_suffix(aufile, 0);
 
       /* open file */
-      fts_audiofile_loader->open_write(aufile);
-      
+      if (0 != fts_audiofile_loader->open_write(aufile))
+      {
+	fts_log("[audiofile] cannot open %s for writing \n", filename);
+	return NULL;
+      }      
       /* allocate buffer with default length */
       fts_audiofile_loader->buffer_length(aufile, 0);
 
@@ -249,3 +252,10 @@ fts_kernel_audiofile_init(void)
   fts_s_snd = fts_new_symbol("snd");
   fts_s_raw = fts_new_symbol("raw");
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
