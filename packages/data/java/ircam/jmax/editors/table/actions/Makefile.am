@@ -12,7 +12,7 @@ SolidAction.java \
 UndoAction.java 
 
 JAVAC = @JAVACX@
-JAVACFLAGS=@JAVACFLAGSX@
-JAVAROOT=@top_srcdir@/packages/data/java
-CLASSPATH_ENV=CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
+JAVACFLAGS=@JAVACFLAGSX@ -sourcepath $(top_srcdir)/packages/data/java
+JAVAROOT=$(top_builddir)/packages/data/java
+CLASSPATH_ENV=CLASSPATH=$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
 
