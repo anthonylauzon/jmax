@@ -7,6 +7,13 @@
  */
 
 void 
+fts_ramp_init(fts_ramp_t *ramp, float value)
+{
+  fts_ramp_value_set(&ramp->value, value);
+  ramp->n_steps = 0;
+}
+
+void 
 fts_ramp_zero(fts_ramp_t *ramp)
 {
   fts_ramp_value_zero(&ramp->value);
@@ -112,6 +119,83 @@ fts_ramp_incr(fts_ramp_t *ramp)
     {
       fts_ramp_value_jump(&ramp->value);
       ramp->n_steps = 0;
+    }
+}
+
+void
+fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size)
+{
+  long i;
+  
+  if(ramp->n_steps <= 0)
+    {
+      float target = ramp->value.target;
+
+      for(i=0; i<size; i++)
+	out[i] = target;
+    }
+  else
+    {
+      float incr = ramp->value.incr / size;
+      float base = ramp->value.current;
+
+      for(i=0; i<size; i++)
+	out[i] = base + i * incr;
+
+      fts_ramp_value_incr(&ramp->value);
+      ramp->n_steps--;
+    }
+}
+
+void
+fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size)
+{
+  long i;
+  
+  if(ramp->n_steps <= 0)
+    {
+      float target = ramp->value.target;
+
+      for(i=0; i<size; i++)
+	out[i] = in[i] * target;
+    }
+
+  else
+    {
+      float incr = ramp->value.incr / size;
+      float base = ramp->value.current;
+
+      for(i=0; i<size; i++)
+	out[i] = in[i] * (base + i * incr);
+
+      fts_ramp_value_incr(&ramp->value);
+      ramp->n_steps--;
+    }
+}
+
+void
+fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size)
+{
+  long i;
+  
+  if(ramp->n_steps <= 0)
+    {
+      float target = ramp->value.target;
+
+      for(i=0; i<size; i++)
+	out[i] += in[i] * target;
+    }
+
+  else
+    {
+      float incr = ramp->value.incr / size;
+      float base = ramp->value.current;
+
+      for(i=0; i<size; i++)
+	out[i] += in[i] * (base + i * incr);
+
+      fts_ramp_value_incr(&ramp->value);
+      ramp->n_steps--;
     }
 }
 

@@ -22,9 +22,9 @@ extern fts_float_function_t fts_ffun_get_ptr(fts_symbol_t name);
  *  float function tables
  *  (float arrays asssociated to fts_ffuns for fast function lookups)
  *
- *  physical size is their instantiation size + 1
- *  fftab[0] = min
- *  fftab[size] = max
+ *     physical size is their instantiation size + 1
+ *     fftab[0] = ffun(min)
+ *     fftab[size] = ffun(max)
  *
  */
 
@@ -34,7 +34,7 @@ typedef struct _fts_fftab
   int size; /* table size must be a power of two (for fast lookups) */
   float min;
   float max;
-  float range;
+  float scale; /* size. / (max - min) */
   struct _fts_fftab *next_in_list; /* for list of tables for one float function */
   int ref; /* reference counter */
 } fts_fftab_t;

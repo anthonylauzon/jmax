@@ -117,29 +117,29 @@ typedef struct _fts_wrap_value
   fts_wrapper_t wrapper;
 } fts_wrap_value_t;
 
-#define fts_wrap_value_init(x, init) \
+#define fts_wrap_value_init(wv, init) \
 ( \
-  fts_wrapper_init(&(x)->wrapper, 1.0), \
-  (x)->value = (init) + UNITBIT32 \
+  fts_wrapper_init(&(wv)->wrapper, 1.0), \
+  (wv)->value = (init) + UNITBIT32 \
 )
   
-#define fts_wrap_value_incr(x, incr) \
-  ((x)->value += (incr))
+#define fts_wrap_value_incr(wv, incr) \
+  ((wv)->value += (incr))
 
-#define fts_wrap_value_set(x) \
-  (fts_wrapper_set_raw(&(x)->wrapper, (x)->value))
+#define fts_wrap_value_set(wv) \
+  (fts_wrapper_set_raw(&(wv)->wrapper, (wv)->value))
 
-#define fts_wrap_value_get_int(x, range) \
-  (fts_wrapper_get_integer(&(x)->wrapper, (range)))
+#define fts_wrap_value_get_int(wv, range) \
+  (fts_wrapper_get_integer(&(wv)->wrapper, (range)))
 
-#define fts_wrap_value_get_frac(x) \
-  (fts_wrapper_get_wrapped(&(x)->wrapper, 1.0))
+#define fts_wrap_value_get_frac(wv) \
+  (fts_wrapper_get_wrapped(&(wv)->wrapper, 1.0))
 
-#define fts_wrap_value_get_wrapped(x, range) \
+#define fts_wrap_value_get_wrapped(wv, range) \
 ( \
-  fts_wrapper_init(&(x)->wrapper, (range)), \
-  fts_wrapper_set(&(x)->wrapper, (x)->value - UNITBIT32, (range)), \
-  (x)->value = fts_wrapper_get_wrapped(&(x)->wrapper, (range)) \
+  fts_wrapper_init(&(wv)->wrapper, (range)), \
+  fts_wrapper_set(&(wv)->wrapper, (wv)->value - UNITBIT32, (range)), \
+  (wv)->value = fts_wrapper_get_wrapped(&(wv)->wrapper, (range)) \
 )
 
 #endif

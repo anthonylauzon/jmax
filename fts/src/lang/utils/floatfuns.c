@@ -184,17 +184,22 @@ fftab_new(int size, float min, float max)
   fftab = (fts_fftab_t *)fts_malloc(sizeof(fts_fftab_t));
   fftab->values = (float *)fts_malloc(sizeof(float) * (size + 1));
 
-  if(min <= max)
+  if(min < max)
     {
       fftab->min = min;
       fftab->max = max;
-      fftab->range = max - min;
+      fftab->scale = size / (max - min);
     }
-  else
+  else if(max > min)
     {
       fftab->min = max;
       fftab->max = min;
-      fftab->range = min - max;
+      fftab->scale = size / (min - max);
+    }
+  else
+    {
+      fftab->min = fftab->max = min;
+      fftab->scale = size;
     }
     
   fftab->size = size;
@@ -256,8 +261,18 @@ fts_fftab_release(fts_symbol_t name, fts_fftab_t *fftab)
     }
 }
 
-/***************************************************************************************
- *
- *  lookups of float function tables
- *
- */
+float
+fts_fftab_get_value_cyclic_linear(fts_fftab_t *fftab, float value)
+{
+  fts_wrap_value_t wv;
+  float *table = fts_fftab_get_float_ptr(fftab);
+  int index;
+  float frac;
+
+  fts_wrap_value_init(&wv, (value - fftab->min) * fftab->scale);
+  fts_wrap_value_set(&wv);
+  index = fts_wrap_value_get_int(&wv, fftab->size);
+  frac = fts_wrap_value_get_frac(&wv);
+  
+  return table[index] + frac * (table[index+1] - table[index]);
+}

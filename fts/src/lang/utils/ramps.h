@@ -80,6 +80,7 @@ typedef struct _fts_ramp
   int n_steps;
 } fts_ramp_t;
 
+extern void fts_ramp_init(fts_ramp_t *ramp, float value);
 extern void fts_ramp_zero(fts_ramp_t *ramp);
 
 extern void fts_ramp_set_target(fts_ramp_t *ramp, float target, float time, float rate);
@@ -92,8 +93,13 @@ extern void fts_ramp_freeze(fts_ramp_t *ramp);
 
 extern void fts_ramp_incr(fts_ramp_t *ramp);
 
+#define fts_ramp_end(ramp) ((ramp)->n_steps <= 0)
+
 #define fts_ramp_get_value(ramp) ((ramp)->value.current)
 
+void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, long size);
+void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, long size);
+void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, long size);
 
 /*****************************************
  *
