@@ -46,10 +46,11 @@ jackaudioport_input_fun(fts_audioport_t* port)
 {
   jackaudioport_t* self = (jackaudioport_t*)port;
   /* Get JACK input port buffer pointer */
-  jack_default_audio_sample_t* in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, nframes);
+  jack_default_audio_sample_t* in;
   /* get number of samples of a FTS tick */
   int samples_per_tick = fts_dsp_get_tick_size();
 
+  in = (jack_default_audio_sample_t*)jack_port_get_buffer(self->input_port, nframes);
 /*   /\* TODO:  */
 /*      Check if in/out are valid pointer  */
 /*   *\/ */
@@ -89,26 +90,66 @@ jackaudioport_output_copy_fun( fts_audioport_t *port, float *buff, int buffsize,
 
 
 static void
-jackaudioport_open(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-/*   /\* JACK input/output port registering *\/ */
-/*   self->input_port = jack_port_register(client,                   /\* client structure *\/ */
-/* 					"input",                  /\* port name *\/ */
-/* 					JACK_DEFAULT_AUDIO_TYPE,  /\* port type *\/  */
-/* 					JackPortIsInput,          /\* flags *\/ */
-/* 					0);                       /\* we can pass 0 for buffersize, */
-/* 								     because we use the  */
-/* 								     JACK_DEFAULT_AUDIO_TYPE  */
-/* 								     builtin type */
-/* 								  *\/ */
+  jackaudioport_t* self = (jackaudioport_t*)o;
+  fts_audioport_t* port = (fts_audioport_t*)o;
+  /* HACK for port name */
+  fts_symbol_t port_name = fts_new_symbol("input");
+  fts_atom_t at_m[2];
+
+  /* JACK input/output port registering */
+/*   self->input_port = jack_port_register(jackaudiomanager_get_jack_client(), */
+/* 					port_name, */
+/* 					JACK_DEFAULT_AUDIO_TYPE, */
+/* 					JackPortIsInput, */
+/* 					0); */
+
 /*   fts_log("[jackaudioport] input port registered \n"); */
 
-
-/*   fts_audioport_set_open( port, direction); */
+/*   /\* connect port *\/ */
+  fts_set_symbol(at_m, self->port_name);
+  fts_set_symbol(at_m + 1, fts_new_symbol("jMax:toto"));
+  fts_send_message(jackaudiomanager_get_manager_object(), fts_new_symbol("connect"), 2 ,at_m);
+		   
+/*   fts_audioport_set_open( port, FTS_AUDIO_INPUT); */
 }
 
 static void
-jackaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  jackaudioport_t* self = (jackaudioport_t*)o;
+  fts_audioport_t* port = (fts_audioport_t*)o;
+  /* HACK for port name */
+  fts_symbol_t port_name = fts_new_symbol("output");
+
+  /* JACK input/output port registering */
+  self->input_port = jack_port_register(jackaudiomanager_get_jack_client(), 
+					port_name, 
+					JACK_DEFAULT_AUDIO_TYPE, 
+					JackPortIsOutput, 
+					0);                       
+
+  fts_log("[jackaudioport] input port registered \n");
+
+  fts_audioport_set_open( port, FTS_AUDIO_OUTPUT);
+}
+
+static void
+jackaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+/*   /\* see above for jack_port_register parameters *\/ */
+/*   self->output_port = jack_port_register(client,  */
+/* 					 "output",  */
+/* 					 JACK_DEFAULT_AUDIO_TYPE,  */
+/* 					 JackPortIsOutput,  */
+/* 					 0); */
+/*   fts_log("[jackaudioport] output port registered \n"); */
+
+}
+
+static void
+jackaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
 /*   /\* see above for jack_port_register parameters *\/ */
 /*   self->output_port = jack_port_register(client,  */
@@ -126,6 +167,8 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   jackaudioport_t* self = (jackaudioport_t*)o;
   jack_client_t* client = jackaudiomanager_get_jack_client();
   int flags = fts_get_int(at);
+  fts_symbol_t port_name = fts_get_symbol(at + 1);
+
   fts_audioport_init((fts_audioport_t*)self);
 
   if (NULL == client)
@@ -137,7 +180,8 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     return;
   }
     
-    
+  self->port_name = port_name;
+
   /* memory allocation for input/output buffer */
   self->input_buffer = fts_malloc(JACKAUDIOPORT_DEFAULT_FRAME_SIZE * sizeof(float));
   if (NULL == self->input_buffer)
@@ -211,6 +255,12 @@ static void jackaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( jackaudioport_t), jackaudioport_init, jackaudioport_delete);
     
+  /* open / close methods */
+  fts_class_message_varargs(cl, fts_s_open_input, jackaudioport_open_input);
+  fts_class_message_varargs(cl, fts_s_open_output, jackaudioport_open_output);
+  fts_class_message_varargs(cl, fts_s_close_input, jackaudioport_close_input);
+  fts_class_message_varargs(cl, fts_s_close_output, jackaudioport_close_output);
+
   return;
 }
 
