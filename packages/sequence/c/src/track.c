@@ -557,48 +557,42 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   track_t *this = (track_t *)o;
   fts_symbol_t type = track_get_type(this);
   fts_symbol_t name = track_get_name(this);  
-  fts_atom_t a;
+  event_t *event = track_get_first(this);
+  fts_atom_t a[TRACK_BLOCK_SIZE];
+  int n = 0;
   
   /* set track name */
   if(name)
     {
-      fts_set_symbol(&a, name);
-      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, &a);
+      fts_set_symbol(a, name);
+      fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, a);
     }
 
-  fts_set_int(&a, track_is_active(this));
-  fts_client_send_message((fts_object_t *)this, seqsym_active, 1, &a);  
+  fts_set_int(a, track_is_active(this));
+  fts_client_send_message((fts_object_t *)this, seqsym_active, 1, a);  
 
-  /* upload events for known types only */
-  if(type == fts_s_int || type == fts_s_float || type == seqsym_seqmess || type == seqsym_note)
+  while(event)
     {
-      event_t *event = track_get_first(this);
-      fts_atom_t a[TRACK_BLOCK_SIZE];
-      int n = 0;
-
-      while(event)
+      if(!fts_object_has_id((fts_object_t *)event))
 	{
-	  if(!fts_object_has_id((fts_object_t *)event))
+	  /* create event at client */
+	  event_upload(event);
+	      
+	  fts_set_object(a + n, (fts_object_t *)event);
+	  n++;
+	      
+	  if(n == TRACK_BLOCK_SIZE)
 	    {
-	      /* create event at client */
-	      event_upload(event);
-	      
-	      fts_set_object(a + n, (fts_object_t *)event);
-	      n++;
-	      
-	      if(n == TRACK_BLOCK_SIZE)
-		{
-		  fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);
-		  n = 0;
-		}
+	      fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);
+	      n = 0;
 	    }
-	  
-	  event = event_get_next(event);
 	}
-      
-      if(n > 0)
-	fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);    
+	  
+      event = event_get_next(event);
     }
+      
+  if(n > 0)
+    fts_client_send_message((fts_object_t *)this, seqsym_addEvents, n, a);    
 }
 
 static void 

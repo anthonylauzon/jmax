@@ -127,6 +127,14 @@ event_upload(event_t *event)
       a[2] = event->value;
       fts_client_upload((fts_object_t *)event, seqsym_event, 3, a);
     }
+  else
+    {
+      fts_atom_t a[2];
+      
+      fts_set_float(a + 0, (float)event_get_time(event));
+      fts_set_symbol(a + 1, fts_s_void);
+      fts_client_upload((fts_object_t *)event, seqsym_event, 2, a);
+    }
 }
 
 void
