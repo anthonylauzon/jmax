@@ -251,8 +251,8 @@ table_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   else if (index >= size)
     index = size - 1;
 
-  if(fts_is_int(&this->value))
-     fts_integer_vector_set_element(vec, index, fts_get_int(&this->value));
+  if(fts_is_number(&this->value))
+     fts_integer_vector_set_element(vec, index, fts_get_number_int(&this->value));
   else
     fts_outlet_int(o, 0, fts_integer_vector_get_element(vec, index));
 
