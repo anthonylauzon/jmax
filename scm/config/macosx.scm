@@ -25,8 +25,6 @@
 
 (set! jmax-arch "macosx")
 
-(when "default-start" "(default-start-kook)")
-
-(define (default-start-kook)
+(define (default-start-hook)
 )
-
+(define-hook "default-start" default-start-hook)

@@ -40,17 +40,15 @@
 
 (define-device "midi" "oss_midi" "OSS MIDI")
 
-(when "platform-start" "(platform-start-hook)")
-
 (define (platform-start-hook)
   (require-package "ossdev" "0.0.0")
   (require-package "pdtddev" "0.0.0")
 )
-
-(when "default-start" "(default-start-kook)")
+(define-hook "platform-start" platform-start-hook)
 
 (define (default-start-kook)
   (open-default-audio-in "stereoIn")
   (open-default-audio-out "stereoOut")
   (open-default-midi "midi")
 )
+(define-hook "default-start" default-start-hook)

@@ -35,15 +35,13 @@
 (define-device "midi1" (list "sgi_midi" "port" "SerialPort1") "MIDI on startmidi port SerialPort1")
 (define-device "midi2" (list "sgi_midi" "port" "SerialPort2") "MIDI on startmidi port SerialPort2")
 
-(when "platform-start" "(platform-start-hook)")
-
 (define (platform-start-hook)
   (require-package "sgidev" "0.0.0")
 )
+(define-hook "platform-start" platform-start-hook)
 
-(when "start" "(default-start-kook)")
-
-(define (default-start-kook)
+(define (default-start-hook)
   (open-default-audio-in "analogIn")
   (open-default-audio-out "analogOut")
 )
+(define-hook "start" default-start-hook)
