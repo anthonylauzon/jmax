@@ -29,7 +29,7 @@
 #define _PLATFORM_H
 
 #ifndef M_PI
-#define M_PI		3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 /*********************************************************************
@@ -47,6 +47,8 @@
 #define HAS_OSS /* the OSS sound system */
 #define VECLIB_LOOP_UNROLL NO
 #define FTS_HAS_LITTLE_ENDIAN
+#define USE_FP_ONSET
+#define USE_IEEE_WRAP
 
 /* This macro is defined here because not all platforms have a isnanf macro (or function */
 
