@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-ARCH_PACKAGES=sgidev unixdtd
+ARCH_PACKAGES=audpdev sgidev unixdtd
 
 INSTALL=install
 INSTALL_DATA=$(INSTALL) -m 644

@@ -1,3 +1,7 @@
+2000-12-04  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* added audpdev in ARCH_PACKAGES
+
 2000-11-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* added ENABLE_ALSA in jmax.spec. By defining the environment variable ENABLE_ALSA=yes,
