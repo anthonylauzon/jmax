@@ -205,7 +205,8 @@ public class JMaxApplication {
 
   public static void main( String args[]) 
   {
-    singleInstance = new JMaxApplication( args);
+    singleInstance = new JMaxApplication();
+    singleInstance.start( args);
   }
 
   // Static accessors
@@ -217,6 +218,11 @@ public class JMaxApplication {
   public static FtsServer getServer()
   {
     return singleInstance.server;
+  }
+
+  public static FtsDspControl getDspControl()
+  {
+    return singleInstance.consoleWindow.getControlPanel().getDspControl();
   }
 
   public static Clipboard getSystemClipboard()
@@ -235,12 +241,15 @@ public class JMaxApplication {
   }
 
 
-  private JMaxApplication( String[] args)
+  private JMaxApplication()
   {
     recentFileHistory = new RecentFileHistory(5);
     properties = new Properties( System.getProperties());
     toOpen = new MaxVector();
- 
+  }
+
+  private void start( String[] args)
+  {
     parseCommandLineOptions( args);
     showSplashScreen();
     properties.put( "jmaxVersion", JMaxVersion.getVersion());
@@ -335,6 +344,18 @@ public class JMaxApplication {
       });
   }
 
+  static FtsSymbol sPackageLoaded = FtsSymbol.get( "package_loaded");
+
+  private class PackageServerListener implements FtsServerListener {
+    public void messageReceived( FtsServerEvent event, FtsArgs args)
+    {
+      if ( args.isSymbol( 0) 
+	   && args.getSymbol( 0).equals( sPackageLoaded) 
+	   && args.isSymbol( 1) )
+	JMaxPackageLoader.load( args.getSymbol( 1).toString())
+    }
+  }
+
   private void openConnection()
   {
     if (properties.get("jmaxConnection") == null)
@@ -395,6 +416,8 @@ public class JMaxApplication {
       {
 	e.printStackTrace();
       }
+
+    server.addFtsServerListener( new PackageServerListener());
   }
 
   class FtsSystemOutConsole extends FtsObject {
