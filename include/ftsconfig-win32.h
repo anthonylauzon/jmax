@@ -58,7 +58,6 @@
 
 #define MAXPATHLEN _MAX_PATH
 #define realpath  win32_realpath
-#define fts_path_separator      ';'
 
 /* Valid absolute paths are:  /c/jmax, c:/jmax, c:\jmax */
 #define fts_path_is_absolute(_p) \

@@ -51,17 +51,20 @@
 
 #ifdef WIN32
 
-#define fts_path_separator      ';'
-#define fts_file_separator      '\\'
+char fts_path_separator = ';';
+char fts_file_separator = '\\';
+
 #define fts_path_is_absolute(_p) \
  ((_p[0] == '/') || \
   ((_p[1] == ':') && (_p[2] == '/')) || \
   ((_p[1] == ':') && (_p[2] == '\\')))
 
 #else
-#define fts_path_separator      ':'
-#define fts_file_separator      '/'
+
+char fts_path_separator = ':';
+char fts_file_separator = '/';
 #define fts_path_is_absolute(_p) (_p[0] == '/')
+
 #endif
 
 

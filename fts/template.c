@@ -370,7 +370,7 @@ static void fts_template_find_in_path_and_cache(fts_symbol_t name)
 	  
       /* it should use stat here !!! */
 
-      sprintf(buf, "%s/%s.jmax", fts_symbol_name(filename), fts_symbol_name(name));
+      sprintf(buf, "%s%c%s.jmax", fts_symbol_name(filename), fts_file_separator, fts_symbol_name(name));
 
       if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
 	fts_template_register_filename(name, fts_new_symbol_copy(buf), fts_template_filename_cached);

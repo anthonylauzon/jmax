@@ -72,4 +72,7 @@ FTS_API fts_symbol_t fts_get_project_dir(void);
 
 FTS_API fts_symbol_t fts_make_absolute_path(fts_symbol_t parent, fts_symbol_t file);
 
+FTS_API char fts_file_separator;
+FTS_API char fts_path_separator;
+
 #endif
