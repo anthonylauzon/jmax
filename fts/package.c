@@ -214,7 +214,9 @@ fts_package_load(fts_symbol_t name)
   /* avoid loading the package twice */
   fts_set_symbol(&n, name);
   if (fts_hashtable_get(&fts_packages, &n, &p))
+  {
     return fts_get_pointer(&p);
+  }
 
   /* locate the directory of the package */
   if (!fts_file_find_in_path(NULL, fts_get_package_paths(), name, path, MAXPATHLEN) 
@@ -244,11 +246,19 @@ fts_package_load(fts_symbol_t name)
 
       /* load the default files */
       fts_package_load_default_files(pkg);
-
-      /* put the package in the hashtable */
-      fts_set_symbol(&n, name);
-      fts_set_pointer(&p, pkg);
-      fts_hashtable_put(&fts_packages, &n, &p);
+      /* check if package have been succesfully loaded */
+      if (fts_package_get_state(pkg) == fts_package_loaded)
+      {
+	/* put the package in the hashtable */
+	fts_set_symbol(&n, name);
+	fts_set_pointer(&p, pkg);
+	fts_hashtable_put(&fts_packages, &n, &p);
+      }
+      else
+      {
+	/* delete package which is not succesfully loaded */
+	fts_package_delete(pkg);
+      }
     }
 
   return pkg;
@@ -371,9 +381,15 @@ static void fts_package_load_default_files(fts_package_t* pkg)
       snprintf(function, 256, "%s_config", pkg->name);
       ret = fts_load_library(filename, function);
       if (ret != fts_ok) 
+      {
 	fts_log("[package]: Error loading library of package %s: %s\n", pkg->name, ret->description);
+	fts_post("[package]: Error loading library of package %s: %s\n", pkg->name, ret->description);
+      }
       else 
+      {
 	fts_log("[package]: Loaded %s library\n", pkg->name);
+	fts_package_set_state(pkg, fts_package_loaded);
+      }
     }
   else 
     fts_log("[package]: Didn't found no library for %s (tried %s)\n", pkg->name, filename);
@@ -391,8 +407,12 @@ fts_package_require(fts_package_t* pkg, fts_symbol_t required_pkg)
 {
   fts_atom_t n;
   int status = 0;
+  fts_package_t* req_pkg = NULL;
+
   /* provoke the loading the package */
-  if(NULL != fts_package_load(required_pkg))
+  req_pkg = fts_package_load(required_pkg);
+  if((NULL != req_pkg) 
+     && (fts_package_get_state(req_pkg) == fts_package_loaded))
   {
     fts_set_symbol(&n, required_pkg);
     pkg->packages = fts_list_append(pkg->packages, &n);    
