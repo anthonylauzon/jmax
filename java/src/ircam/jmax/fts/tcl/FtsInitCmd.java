@@ -28,9 +28,9 @@ class FtsInitCmd implements Command
   {
     if (argv.length == 2)
       {
-	FtsObject obj;
+	FtsContainerObject obj;
 
-	obj = (FtsObject) ReflectObject.get(interp, argv[1]);
+	obj = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
 
 	obj.loaded();
       }

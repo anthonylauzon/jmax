@@ -13,7 +13,7 @@ abstract public class MaxDataHandler
 {
   /** The data handler able to load/save instances of the type */
 
-  static Vector allHandlers;
+  static Vector allHandlers = new Vector();
 
   /** Static method to find a Data Handler for a given Data Source */
 

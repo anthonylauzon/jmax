@@ -38,7 +38,7 @@ public class FtsServer
 
   /** The root object of this server */
 
-  FtsObject root;
+  FtsContainerObject root;
 
   /** Create an FTS Server. With a given connection. */
 
@@ -63,7 +63,7 @@ public class FtsServer
    * is not editable, and represent the global scope for FTS.
    */ 
 
-  public FtsObject getRootObject()
+  public FtsContainerObject getRootObject()
   {
     return root;
   }

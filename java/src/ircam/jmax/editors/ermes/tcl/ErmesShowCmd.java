@@ -31,7 +31,7 @@ class ErmesShowCmd implements Command {
     if (argv.length < 2)
       throw new TclNumArgsException(interp, 1, argv, "<obj>");
 
-    MaxApplication.NewPatcherWindow((FtsObject) ReflectObject.get(interp, argv[1]));
+    MaxApplication.NewPatcherWindow((FtsContainerObject) ReflectObject.get(interp, argv[1]));
   }
 }
 

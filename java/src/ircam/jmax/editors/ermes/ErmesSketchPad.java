@@ -620,7 +620,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //--------------------------------------------------------
   public void InitFromDocument(ErmesPatcherDoc theDocument){
 	
-    FtsObject aFtsPatcher = theDocument.GetFtsPatcher();
+    FtsContainerObject aFtsPatcher = theDocument.GetFtsPatcher();
     // chiama tanti AddObject...
     Vector objectVector = aFtsPatcher.getContainedObjects();	//usefull?
     

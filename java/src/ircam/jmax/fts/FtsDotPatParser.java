@@ -22,20 +22,20 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
     
-  static public FtsObject importPatcher(FtsServer server, File inputFile) throws java.io.IOException, FtsDotPatException
+  static public FtsContainerObject importPatcher(FtsServer server, File inputFile) throws java.io.IOException, FtsDotPatException
   {
     FtsDotPatTokenizer in = null; 
 
     // Build a new FtsObject, a patcher 0 in 0 out
 
-    FtsObject obj;
+    FtsContainerObject obj;
     Vector oargs = new Vector();
 
     oargs.addElement("unnamed");
     oargs.addElement(new Integer(0));
     oargs.addElement(new Integer(0));
 
-    obj = FtsObject.makeFtsObject(server.getRootObject(), "patcher", oargs);
+    obj = (FtsContainerObject) FtsObject.makeFtsObject(server.getRootObject(), "patcher", oargs);
 
     try
       {
@@ -67,7 +67,7 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
   
-  static void readFromFtsDotPatTokenizer(FtsObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static void readFromFtsDotPatTokenizer(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
   {
     // skip the header from the file,
 
@@ -105,7 +105,7 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
 
-  static void parsePatcher(FtsObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static void parsePatcher(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
   {
     FtsObject lastNObject = null;
     String lastNObjectType = null;
@@ -153,7 +153,7 @@ public class FtsDotPatParser
 
 		    lastNObject = FtsObject.makeFtsObject(parent, "patcher", args);
 
-		    parsePatcher(lastNObject, in);
+		    parsePatcher((FtsContainerObject) lastNObject, in);
 
 		    lastNObjectType = "patcher";
 		  }
@@ -330,7 +330,7 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
 
-  static public FtsObject importAbstraction(FtsObject parent, File inputFile, Vector env) throws java.io.IOException, FtsDotPatException
+  static public FtsObject importAbstraction(FtsContainerObject parent, File inputFile, Vector env) throws java.io.IOException, FtsDotPatException
   {
     FtsDotPatTokenizer in = null; 
 
@@ -364,7 +364,7 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
 
-  static FtsConnection parseConnection(FtsObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
+  static FtsConnection parseConnection(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsDotPatException
   {
 
     FtsObject from;
@@ -434,7 +434,7 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
 
-  static FtsObject parseObject(FtsObject parent, FtsDotPatTokenizer in, FtsObject lastNObject, String lastNObjectType)
+  static FtsObject parseObject(FtsContainerObject parent, FtsDotPatTokenizer in, FtsObject lastNObject, String lastNObjectType)
        throws java.io.IOException, FtsDotPatException
   {
     String objclass = in.sval;
@@ -497,12 +497,12 @@ public class FtsDotPatParser
 	  {
 	    /* add the two ninlet and noutlet arguments to args */
 
-	    lastNObject.setGraphicDescription(graphicDescr);
+	    ((FtsContainerObject)lastNObject).setGraphicDescription(graphicDescr);
 
 	    if (args.size() > 1)
-	      lastNObject.getSubPatcher().assignInOutletsAndName((String) args.elementAt(1));
+	      ((FtsContainerObject)lastNObject).getSubPatcher().assignInOutletsAndName((String) args.elementAt(1));
 	    else
-	      lastNObject.getSubPatcher().assignInOutletsAndName("unnamed");
+	      ((FtsContainerObject)lastNObject).getSubPatcher().assignInOutletsAndName("unnamed");
 
 	    return lastNObject;
 	  }

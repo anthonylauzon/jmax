@@ -3,7 +3,7 @@
 ## used by a MaxTclInterpreter to establish an evaluation context
 ##
 
-prov _MaxTclDataWrapper { this script } {
+proc _BasicThisWrapper { this script } {
     eval $script
 }
 

@@ -14,7 +14,7 @@ import ircam.jmax.*;
  * FTS instantiation 
  */
 
-public class FtsObject 
+abstract public class FtsObject 
 {
   /******************************************************************************/
   /*                                                                            */
@@ -33,7 +33,7 @@ public class FtsObject
    * the content of an object box.
    */
 
-  static public FtsObject makeFtsObject(FtsObject parent, String description)
+  static public FtsObject makeFtsObject(FtsContainerObject parent, String description)
   {
     FtsObject obj;
     String className;
@@ -63,7 +63,7 @@ public class FtsObject
    * the content of an message box.
    */
 
-  static public FtsObject makeFtsObject(FtsObject parent, String className, String argsDescr)
+  static public FtsObject makeFtsObject(FtsContainerObject parent, String className, String argsDescr)
   {
     FtsObject obj;
     Vector args;
@@ -90,13 +90,24 @@ public class FtsObject
    * @param args  a Vector containing the object arguments.
    */
 
-  static public FtsObject makeFtsObject(FtsObject parent, String className, Vector args)
+  static public FtsObject makeFtsObject(FtsContainerObject parent, String className, Vector args)
   {
-    // this is the real function makeFtsObject ; the other just preprocess arguments,
-    // and then call this one; later, this function will select the actual class
-    // to instantiate
+    // Add check for declarations, when they exists,
+    // comments and message box when description and argument description
+    // are merged
 
-    return new FtsObject(parent, className, args);
+    if (className.equals("patcher"))
+      return new FtsPatcherObject(parent, args);
+    else if (className.equals("inlet"))
+      return new FtsInletObject(parent, args);
+    else if (className.equals("outlet"))
+      return new FtsOutletObject(parent, args);
+    else if (className.endsWith(".pat") || className.endsWith(".abs") || FtsAbstractionTable.exists(className))
+      return new FtsAbstractionObject(parent, className, args);
+    else if (FtsTemplateTable.exists(className))
+      return new FtsTemplateObject(parent, className, args);
+    else
+      return new FtsStandardObject(parent, className, args);
   }
 
   /**
@@ -107,7 +118,8 @@ public class FtsObject
    * @see FtsObject#makeFtsObject(FtsObject, String)
    */
 
-  static public FtsObject makeFtsObject(FtsObject parent, String descr, FtsGraphicDescription graphicDescr)
+  static public FtsObject makeFtsObject(FtsContainerObject parent, String descr,
+					FtsGraphicDescription graphicDescr)
   {
     FtsObject obj;
 
@@ -126,7 +138,7 @@ public class FtsObject
    * @see FtsObject#makeFtsObject(FtsObject, String, Vector)
    */
 
-  static public FtsObject makeFtsObject(FtsObject parent, String className, Vector args,
+  static public FtsObject makeFtsObject(FtsContainerObject parent, String className, Vector args,
 					FtsGraphicDescription graphicDescr)
   {
     FtsObject obj;
@@ -138,50 +150,6 @@ public class FtsObject
     return obj;
   }
 
-  /**
-   * Static function to build a FtsObject.<br>
-   * Like makeFtsObject(FtsObject, String, FtsGraphicDescription), but add a declaration
-   * flag to the argument; a declaration is an object that must be saved and instantiated
-   * before the other objects.
-   *
-   * @see FtsObject#makeFtsObject(FtsObject, String, FtsGraphicDescription)
-   */
-
-  static public FtsObject  makeFtsObject(FtsObject parent, String descr,
-					 FtsGraphicDescription graphicDescr, boolean declaration)
-  {
-    FtsObject obj;
-
-    obj = makeFtsObject(parent, descr);
-
-    obj.setGraphicDescription(graphicDescr);
-    obj.setDeclaration(declaration);
-
-    return obj;
-  }
-
-  /**
-   * Static function to build a FtsObject.<br>
-   * Like makeFtsObject(FtsObject, String, Vector, FtsGraphicDescription), but add a declaration
-   * flag to the argument; a declaration is an object that must be saved and instantiated
-   * before the other objects.
-   *
-   * @see FtsObject#makeFtsObject(FtsObject, String, Vector, FtsGraphicDescription)
-   */
-
-  static public FtsObject  makeFtsObject(FtsObject parent, String className, Vector args,
-					 FtsGraphicDescription graphicDescr, boolean declaration)
-  {
-    FtsObject obj;
-
-    obj = makeFtsObject(parent, className, args);
-
-    obj.setGraphicDescription(graphicDescr);
-    obj.setDeclaration(declaration);
-
-    return obj;
-  }
-
 
   /**
    * Static function to redefine a FtsObject.
@@ -189,6 +157,8 @@ public class FtsObject
    * similarity with the constructors, because it can produce 
    * a different Java object from the argument, so logically they are not method of the object.
    *
+   * DO NOT WORK: MORE WORK TO BE DONE, otherwise is not compatible with abstractions and templates,
+   * and multiclass; the object must always be rebuilt and substituted in the connections.
    * @param obj the object to redefine.
    * @param className the name of the FTS class of the object we want to instantiate.
    * @param args  a Vector containing the object arguments.
@@ -196,24 +166,19 @@ public class FtsObject
    * identity, and connections.
    */
 
-  public static FtsObject redefineFtsObject(FtsObject obj, String className, Vector args)
+  public static FtsObject redefineFtsObject(FtsObject argObj, String className, Vector args)
   {
+    FtsStandardObject obj = (FtsStandardObject) argObj;
+
     obj.className = className;
     obj.args = args;
 
     MaxApplication.getFtsServer().redefineObject(obj, className, args);
 
-    if (className.equals("patcher"))
-      {
-	obj.subPatcher.redefine(((Integer)args.elementAt(1)).intValue(),
-				((Integer)args.elementAt(2)).intValue());
-      }
-
     if (obj.parent.isOpen() && obj.updated)
       {	
 	obj.getProperty("ninlets");
 	obj.getProperty("noutlets");
-	obj.getProperty("declaration");
 	MaxApplication.getFtsServer().syncToFts();
       }
 
@@ -293,7 +258,7 @@ public class FtsObject
 
   /** The parent object. Usually the container patcher or abstraction or template */
 
-  FtsObject parent;
+  FtsContainerObject parent;
 
   /** The Fts object class Name */
 
@@ -304,45 +269,19 @@ public class FtsObject
   // className; by the way, this is an hack to be solved with
   // multiple classes.
 
-  private String ftsClassName;	
+  protected String ftsClassName;	
 
   /** The vector containing the obejct argument */
 
   Vector args;
 
-  /** The object subpatch. Null if the object is not a container. */
-
-  FtsPatcher subPatcher = null;	
-
-  /** The number of inlets of this object. Meaningfull only for "open" objects. */
+  /** The number of inlets of this object. Meaningfull only for "open" objects and patchers */
 
   int ninlets;		    
 
-  /** The number of outlets of this object. Meaningfull only for "open" objects. */
+  /** The number of outlets of this object. Meaningfull only for "open" objects and patchers */
 
   int noutlets;
-
-  /**
-   * True if this object is a declaration.
-   * Declaration objects must be loaded before the others in the same container.
-   *
-   * Note that a newly created declaration on the FTS side should send
-   * the declaration property as soon as it known to be a declaration,
-   * inside the "init" method; this field will be valid at the first
-   * "sync" after the object creation.
-   * The "declaration" property must be sent also if the window is
-   * not open.
-   */
-
-  boolean declaration = false; 
-
-  /** True is the object is an .abs abstraction */
-
-  boolean abstraction = false; 
-
-  /** True if it is a Tcl template. */
-
-  boolean template = false; 
 
   /**
    * True when the object is ready and kept consistent.
@@ -387,8 +326,6 @@ public class FtsObject
   Object representation;
 
   /** Support for saving. Used to count indexes for the objs tcl array.*/
-  // @@@ ??? with the new file structure, idx are patcher local,
-  // so probabily this can go away.
 
   int idx;
 
@@ -398,13 +335,7 @@ public class FtsObject
   /*                                                                           */
   /*****************************************************************************/
 
-  /**
-   * The empty constructor.
-   * Used only locally to build the special
-   * root object.
-   */
-
-  private FtsObject()
+  FtsObject()
   {
   }
 
@@ -415,224 +346,16 @@ public class FtsObject
    * particular "patcher", "inlet" and "outlet".
    */
 
-  private FtsObject(FtsObject parent, String className, Vector args)
+  protected FtsObject(FtsContainerObject parent, String className, Vector args)
   {
     super();
-    FtsPatcher patcher;
-
 
     this.className = className;
     this.ftsClassName = className; // by default
     this.args = args;
     this.parent = parent;
 
-    patcher = parent.getSubPatcher();
-
-    patcher.addObject(this);
-
-    // @@@ This go in the template source code
-
-    if (FtsTemplateTable.exists(className))
-      {
-	// A template is a tcl function that is executed to 
-	// create the actual patcher content; the patcher is
-	// passed as first argument, the user argument follow
-	// the patcher.
-
-	setTemplate(true);
-
-	// If there is no description1, generate one now, from the
-	// the arguments before the instantiation
-	// the call is fancy, but it actually generate and cache 
-	// a description if it does not exists; if it exists,
-	// it is a no-op.
-	
-	description = getDescription(); 
-
-	// Then, reset the ftsClassName to "patcher"
-
-	this.ftsClassName = "patcher";
-
-	//create a 0 in 0 out patcher FtsObject
-
-	FtsObject obj;
-	Vector oargs = new Vector();
-	oargs.addElement("unnamed"); // we want to have the name fixed by the template !!!
-	oargs.addElement(new Integer(0));
-	oargs.addElement(new Integer(0));
-
-	MaxApplication.getFtsServer().newObject(parent, this, oargs);
-
-	// load the patcher content from the file
-
-	subPatcher = new FtsPatcher(this, "unnamed", 0, 0);
-
-	// Should really do something better here in case of error !!!
-	// raising exceptions ... 
-
-	Interp interp  = MaxApplication.getTclInterp();
-
-	try
-	  {
-	    // Call the tcl template function, with the container (this) as 
-	    // first argument, and the other args following.
-
-	    TclObject list = TclList.newInstance();
-
-	    TclList.append(interp, list, TclString.newInstance(FtsTemplateTable.getProc(className)));
-	    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
-
-	    for (int i = 1; i < args.size(); i++)
-	      {
-		Object arg = args.elementAt(i);
-
-		if (arg instanceof Integer)
-		  TclList.append(interp, list, TclInteger.newInstance(((Integer)arg).intValue()));
-		else if (arg instanceof Float)
-		  TclList.append(interp, list, TclDouble.newInstance(((Float)arg).doubleValue()));
-		else if (arg instanceof String)
-		  TclList.append(interp, list, TclString.newInstance((String) arg));
-		else
-		  TclList.append(interp, list, ReflectObject.newInstance(interp, arg));
-	      }
-
-	    interp.eval(list, 0);
-	  }
- 	catch (tcl.lang.TclException e)
-	  {
-	    System.out.println("TCL Error in template " + className + ":" + interp.getResult());
-	  }
-
-	loaded();	// activate the post-load init, like loadbangs
-      }
-    else if (className.endsWith(".pat") || className.endsWith(".abs") ||
-	FtsAbstractionTable.exists(className))
-      {
-	// @@@ This go to the abstraction object code
-
-	// An abstraction is translated in its expansion (code from the FtsDotPat parser)
-	// But, it is stored back as an object
-
-	String patname;
-	String realName;
-
-	/* put the class name to "patcher"; the description will
-	   not change */
-
-	setAbstraction(true);
-
-	// If there is no description, generate one now, from the
-	// the arguments before the instantiation
-	// the call is fancy, but it actually generate and cache 
-	// a description if it does not exists; if it exists,
-	// it is a no-op.
-	
-	description = getDescription(); 
-
-	// Then, reset the ftsClassName to "patcher"
-
-	this.ftsClassName = "patcher";
-
-	// First, remove the .pat or the .abs if present, and
-	// compute the real name
-
-	if (className.endsWith(".pat"))
-	  realName = className.substring(0, className.lastIndexOf(".pat"));
-	else if (className.endsWith(".abs"))
-	  realName = className.substring(0, className.lastIndexOf(".abs"));
-	else
-	  realName = className;
-
-
-
-	if (FtsAbstractionTable.exists(realName))
-	  {
-	    patname = FtsAbstractionTable.getFilename(realName);
-	  }
-	else
-	  patname = realName;
-
-	//create a 0 in 0 out patcher FtsObject
-
-	FtsObject obj;
-	Vector oargs = new Vector();
-
-	oargs.addElement("unnamed");
-	oargs.addElement(new Integer(0));
-	oargs.addElement(new Integer(0));
-
-	MaxApplication.getFtsServer().newObject(parent, this, oargs);
-
-	// load the patcher content from the file
-
-	subPatcher = new FtsPatcher(this, "unnamed", 0, 0);
-
-	// Should really do something better here in case of error !!!
-	// raising exceptions ... 
-
-	try
-	  {
-	    FtsDotPatParser.importAbstraction(this, new File(patname), args);
-	  }
-	catch (FtsDotPatException e)
-	  {
-	    System.out.println("Error " + e + " in reading abstraction " + realName);
-	  }
-	catch (java.io.IOException e)
-	  {
-	    System.out.println("I/O Error " + e + " in reading abstraction " + realName);
-	  }
-
-	subPatcher.assignInOutletsAndName("unnamed");
-
-	subPatcher.loaded();	// activate the post-load init, like loadbangs
-      }
-    else if (className.equals("patcher"))
-      {
-	// This go to the FtsPatcherObject class
-	subPatcher = new FtsPatcher(this, 
-				    (String) args.elementAt(0),
-				    ((Integer)args.elementAt(1)).intValue(),
-				    ((Integer)args.elementAt(2)).intValue());
-
-	MaxApplication.getFtsServer().newObject(parent, this,  args);// create the fts object
-      }
-    else if (className.equals("inlet"))
-      {
-	// This go to the FtsInletObject class
-
-	if (args.size() >= 1)
-	  patcher.addInlet(this, ((Integer)args.elementAt(0)).intValue());
-	else
-	  patcher.addInlet(this); // support for .pat
-
-	MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
-      }
-    else if (className.equals("outlet"))
-      {
-	// This go to the FtsOutletObject class
-
-	if (args.size() >= 1)
-	  patcher.addOutlet(this, ((Integer)args.elementAt(0)).intValue());
-	else
-	  patcher.addOutlet(this); // support for .pat
-
-	MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
-      }
-    else
-      {
-	// This go to the FtsStandardObject and Declaration class
-	MaxApplication.getFtsServer().newObject(parent, this, args);// create the fts object
-      }
-
-    if (parent.isOpen())
-      {
-	updated = true;
-	getProperty("ninlets");
-	getProperty("noutlets");
-
-	MaxApplication.getFtsServer().syncToFts();
-      }
+    parent.addObject(this);
   }
 
 
@@ -641,15 +364,16 @@ public class FtsObject
    * The root object is the super patcher of everything;
    * cannot be edited, can include only patchers.
    */
+
   // Should go to the patcher object
 
-  static FtsObject makeRootObject(FtsServer server)
+  static FtsContainerObject makeRootObject(FtsServer server)
   {
-    FtsObject obj;
+    FtsPatcherObject obj;
 
     // Build the arguments
 
-    obj = new FtsObject();
+    obj = new FtsPatcherObject();
 
     obj.className = "patcher";
     obj.ftsClassName = "patcher";
@@ -669,7 +393,7 @@ public class FtsObject
 
     // set the subpatcher (the root patcher)
 
-    obj.subPatcher = new FtsPatcher(obj, "root", 0, 0);
+    obj.setSubPatcher(new FtsPatcher(obj, "root", 0, 0));
 
     // set the inlets and ooutlets.
 
@@ -689,12 +413,7 @@ public class FtsObject
 
   public String toString()
   {
-    if (parent == null)
-       return "FtsObject<" + className + ":" + ftsId +  ">";
-     else if (isOpen())
-       return "FtsObject<" + className + ":" + ftsId + " (" + ninlets + ":" + noutlets + ")>";
-    else
-      return "FtsObject<" + className + ":" + ftsId + ">";
+    return "FtsObject:" + ftsId + "{" + getDescription() + "}";
   }
 
   /*****************************************************************************/
@@ -705,20 +424,9 @@ public class FtsObject
 
   /* Accessors and selectors. */
 
-  /**
-   * Container property.
-   * A container represent under some form
-   * a subpatch, i.e. an object that can contains other objects.
-   */
-
-  public boolean isContainer()
-  {
-    return subPatcher != null;
-  }
-
   /** Get the object including patcher. */
 
-  public FtsObject getParent()
+  public FtsContainerObject getParent()
   {
     return parent;
    }
@@ -826,13 +534,7 @@ public class FtsObject
 
     MaxApplication.getFtsServer().redefineObject(this, ftsClassName, args);
 
-    if (ftsClassName.equals("patcher"))
-      {
-	subPatcher.redefine(((Integer)args.elementAt(1)).intValue(),
-			    ((Integer)args.elementAt(2)).intValue());
-      }
-
-    if (isOpen() && updated)
+    if (parent.isOpen() && updated)
       {
 	getProperty("ninlets");
 	getProperty("noutlets");
@@ -858,22 +560,6 @@ public class FtsObject
     setArguments(args);
   }
 
-
-  /** Get the subPatcher, an implementational object represeting a patcher content. */
-
-  FtsPatcher getSubPatcher()
-  {
-    return subPatcher;
-  }
-
-  /** Set the subPatcher of an object,only for .pat support. */
-
-  void setSubPatcher(FtsPatcher subPatcher)
-  {
-    this.subPatcher = subPatcher;
-
-    subPatcher.setObject(this);
-  }
 
   /** Get the number of inlets of the object (valid only if the patcher is open). */
 
@@ -1014,51 +700,6 @@ public class FtsObject
     representation = r;
   }
 
-
-  /** Set the declaration property. */
-
-  public void setDeclaration(boolean v)
-  {
-    declaration = v;
-  }
-
-  /** Get the declaration boolean property. */
-
-  public boolean isDeclaration()
-  {
-    return declaration;
-  }
-
-  /** Set the abstraction property. */
-
-  public void setAbstraction(boolean v)
-  {
-    abstraction = v;
-  }
-
-  /** Get the abstraction boolean property. */
-
-  public boolean isAbstraction()
-  {
-    return abstraction;
-  }
-
-
-  /** Set the template property. */
-
-  public void setTemplate(boolean v)
-  {
-    template = v;
-  }
-
-  /** Get the template boolean property. */
-
-  public boolean isTemplate()
-  {
-    return template;
-  }
-
-
   /*****************************************************************************/
   /*                                                                           */
   /*                               SERVER COMMUNICATION                        */
@@ -1067,9 +708,7 @@ public class FtsObject
 
 
   /**
-   * Get the object id. <p>
-   * Should *not* be public, the TCL IDs should be handled
-   * separately, so to handle other kind of objects.
+   * Get the fts object id. <p>
    */
 
   int getObjId()
@@ -1104,10 +743,6 @@ public class FtsObject
       {
 	noutlets = ((Integer)value).intValue();
       }
-    else if (name.equals("declaration"))
-      {
-	setDeclaration(true);
-      }
 
     // calling handlers 
 
@@ -1131,200 +766,25 @@ public class FtsObject
 	  }
       }
   }
-  
+
+  /*****************************************************************************/
+  /*                                                                           */
+  /*                               SAVING                                      */
+  /*                                                                           */
+  /*****************************************************************************/
+
   /** Save the object arguments to a TCL stream. */
 
-  private void saveArgsAsTcl(FtsSaveStream stream)
+  protected void saveArgsAsTcl(FtsSaveStream stream)
   {
     stream.print("{");
     stream.print(getDescription());
     stream.print("}");
   }
 
-  /** Save the object to a TCL stream. */
+  /** Save the object to a TCL stream; actually defined by the object */
 
-  void saveAsTcl(FtsSaveStream stream)
-  {
-    if (isDeclaration())
-      {
-	// Save as "declare ..."
-
-	stream.print("declare $objs(" + parent.idx + ") ");
-
-	saveArgsAsTcl(stream);
-
-	stream.print(" ");
-
-	if (graphicDescr != null)
-	  graphicDescr.saveAsTcl(stream);
-      }
-    else if ((! isTemplate()) && (! isAbstraction()) && (subPatcher != null))
-      {
-	if (parent == MaxApplication.getFtsServer().getRootObject())
-	  {
-	    stream.print("patcher ");
-
-	    if (subPatcher.windowDescr != null)
-	      subPatcher.windowDescr.saveAsTcl(stream);
-
-	    // This is a root patcher
-	  }
-	else
-	  {
-	    // Save as "patcher ..."
-
-	    stream.print("patcher $objs(" + parent.idx + ") " +
-			 (String) args.elementAt(0) + " " +
-			 subPatcher.ninlets + " " + subPatcher.noutlets + " ");
-
-	    if (graphicDescr != null)
-	      graphicDescr.saveAsTcl(stream);
-
-	    stream.print(" ");
-
-	    if (subPatcher.windowDescr != null)
-	      subPatcher.windowDescr.saveAsTcl(stream);
-	  }
-      }
-    else
-      {
-	// Save as "object ..."
-
-	stream.print("object $objs(" + parent.idx + ") ");
-
-	saveArgsAsTcl(stream);
-
-	stream.print(" ");
-
-	if (graphicDescr != null)
-	  graphicDescr.saveAsTcl(stream);
-      }
-  }
-
-  /**
-   * Tell Fts the patcher is Open.
-   * An open patcher is a patcher for which we want
-   * continuous updates.
-   */
-
-  public void open()
-  {
-    if (subPatcher != null)
-      subPatcher.open();
-  }
-
-  /**
-   * Tell Fts the patcher is Closed.
-   * An open patcher is a patcher for which we want
-   * continuous updates.
-   */
-
-  public void close()
-  {
-    if (subPatcher != null)
-      subPatcher.close();
-  }
-
-  /** Check if the object is an open patcher. */
-
-  public boolean isOpen()
-  {
-    if (subPatcher != null)
-      return subPatcher.isOpen();
-    else
-      return false;
-  }
-
-
-  /**
-   * Declare the patcher loaded.
-   * This fire the after load initializations
-   * in FTS.
-   */
-
-  public void loaded()
-  {
-    if (subPatcher != null)
-      subPatcher.loaded();
-  }
-
-  /**
-   * Return the contained objects.
-   * For an object representing a patcher, return
-   * a Vector of all the FtsObject in the patcher.
-   */
-
-  public Vector getContainedObjects()
-  {
-    if (subPatcher != null)
-      return subPatcher.getObjects();
-    else
-      return null;
-  }
-
-  /**
-   * Return the contained connections.
-   * For an object representing a patcher, return
-   * a Vector of all the FtsConnection in the patcher.
-   */
-
-  public Vector getContainedConnections()
-  {
-    if (subPatcher != null)
-      return subPatcher.getConnections();
-    else
-      return null;
-  }
-
-  /** Get the Window description of a patcher. */
-
-  public FtsWindowDescription getWindowDescription()
-  {
-    if (subPatcher != null)
-      return subPatcher.getWindowDescription();
-    else
-      return null;
-  }
-
-  /** Set the Window description of a patcher. */
-
-  public void setWindowDescription(FtsWindowDescription wd)
-  {
-    if (subPatcher != null)
-      subPatcher.setWindowDescription(wd);
-  }
-
-
-  /**
-   * Save the object to an output stream.
-   * <i>Bug: it actually work only if the object is a patcher.</i>
-   */
-
-  public void saveTo(OutputStream stream)
-  {
-    if (subPatcher != null)
-      subPatcher.saveTo(stream);
-  }
-
-
-  /**
-   * Find all the objects that have a given pattern 
-   * in its descriptions.
-   */
-
-  public Vector find(String pattern)
-  {
-    if (subPatcher != null)
-      {
-	Vector v = new Vector();
-
-	subPatcher.find(pattern, v);
-
-	return v;
-      }
-    else
-      return null;
-  }
+  abstract void saveAsTcl(FtsSaveStream stream);
 
   /** Access to the help patch for an object. */
 

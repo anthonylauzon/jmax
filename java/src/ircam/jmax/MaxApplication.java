@@ -404,7 +404,7 @@ public class MaxApplication extends Object {
   }
   
 
-  public static ErmesSketchWindow NewPatcherWindow(FtsObject theFtsPatcher) {
+  public static ErmesSketchWindow NewPatcherWindow(FtsContainerObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     itsSketchWindow = new ErmesSketchWindow(false, itsSketchWindow);
@@ -425,7 +425,7 @@ public class MaxApplication extends Object {
   }
 
 
-  public static ErmesSketchWindow NewSubPatcherWindow(FtsObject theFtsPatcher) {
+  public static ErmesSketchWindow NewSubPatcherWindow(FtsContainerObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     ErmesSketchWindow aSketchWindow;
     aPatcherDoc.alreadySaved = true;
@@ -450,7 +450,7 @@ public class MaxApplication extends Object {
     return aSketchWindow;
   }
   
-  /* public static ErmesSketchWindow NewSubPatcherWindow(FtsObject theFtsPatcher) {
+  /* public static ErmesSketchWindow NewSubPatcherWindow(FtsContainerObject theFtsPatcher) {
     ErmesPatcherDoc aPatcherDoc = new ErmesPatcherDoc(theFtsPatcher);
     aPatcherDoc.alreadySaved = true;
     boolean temp = itsSketchWindow.itsSketchPad.doAutorouting;
@@ -476,7 +476,7 @@ public class MaxApplication extends Object {
   }*/
 
 
-  public static ErmesSketchWindow NewDefaultSubPatcher( FtsObject theFtsPatcher) {//to use just for 'patcher' externals
+  public static ErmesSketchWindow NewDefaultSubPatcher( FtsContainerObject theFtsPatcher) {//to use just for 'patcher' externals
     theFtsPatcher.setWindowDescription(new FtsWindowDescription(100, 100, 300, 300));
     ErmesSketchWindow aSketchWindow = NewSubPatcherWindow(theFtsPatcher);
     aSketchWindow.isSubPatcher = true;

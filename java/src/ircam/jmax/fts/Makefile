@@ -59,6 +59,39 @@ FtsObject:
 	javac $(JFLAGS) FtsObject.java
 .PHONY: FtsObject
 
+FtsPatcherObject:
+	javac $(JFLAGS) FtsPatcherObject.java
+.PHONY: FtsPatcherObject
+
+FtsInletObject:
+	javac $(JFLAGS) FtsInletObject.java
+.PHONY: FtsInletObject
+
+FtsOutletObject:
+	javac $(JFLAGS) FtsOutletObject.java
+.PHONY: FtsOutletObject
+
+FtsContainerObject:
+	javac $(JFLAGS) FtsContainerObject.java
+.PHONY: FtsContainerObject
+
+FtsAbstractionObject:
+	javac $(JFLAGS) FtsAbstractionObject.java
+.PHONY: FtsAbstractionObject
+
+FtsTemplateObject:
+	javac $(JFLAGS) FtsTemplateObject.java
+.PHONY: FtsTemplateObject
+
+FtsStandardObject:
+	javac $(JFLAGS) FtsStandardObject.java
+.PHONY: FtsStandardObject
+
+FtsDeclarationObject:
+	javac $(JFLAGS) FtsDeclarationObject.java
+.PHONY: FtsDeclarationObject
+
+
 FtsParse:
 	javac $(JFLAGS) FtsParse.java
 .PHONY: FtsParse

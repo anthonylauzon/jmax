@@ -52,7 +52,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
     super.Init(theSketchPad, theFtsGraphic, theFtsObject);
 
-    if (theFtsObject.isContainer())
+    if (theFtsObject instanceof FtsContainerObject)
       this.YouArePatcher(true);
     
     ParseText(itsArgs);
@@ -72,7 +72,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     // that opens up their favourite editor (the name should be searched in the resources.erm file)
     super.update(theFtsObject);
     if (iAmPatcher){
-      itsSubWindow = MaxApplication.NewDefaultSubPatcher( itsFtsObject);
+      itsSubWindow = MaxApplication.NewDefaultSubPatcher((FtsContainerObject)itsFtsObject);
       itsSketchPad.itsFirstClick = true;//??????
     }
 
@@ -92,7 +92,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   {
     itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
 
-    if (itsFtsObject.isContainer())
+    if (itsFtsObject instanceof FtsContainerObject)
       YouArePatcher(true);
   }
 
@@ -133,7 +133,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	       itsSketchPad.itsFirstClick = true;
 	     }
 	     else{	//this 'else' shouldn't be reached...
-	       itsSubWindow = MaxApplication.NewSubPatcherWindow( itsFtsObject);
+	       itsSubWindow = MaxApplication.NewSubPatcherWindow( (FtsContainerObject) itsFtsObject);
 	       ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).AddToSubWindowList(itsSubWindow);
 	     }
 	     return true;

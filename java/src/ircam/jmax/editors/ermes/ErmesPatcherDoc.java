@@ -20,7 +20,7 @@ public class ErmesPatcherDoc implements MaxDocument {
   private static int untitledCounter = 1;
   private static int itsSubpatcherCounter = 1;
   public ErmesSketchWindow itsSketchWindow;
-  public FtsObject itsPatcher;
+  public FtsContainerObject itsPatcher;
   static final ExtensionFilter itsTpaFilter = new ExtensionFilter(".tpa");
 
   protected String itsTitle = ""; // !!! should be handled in the editor
@@ -39,22 +39,22 @@ public class ErmesPatcherDoc implements MaxDocument {
     args.addElement("unnamed");
     args.addElement(new Integer(0));
     args.addElement(new Integer(0));
-    itsPatcher = FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(), "patcher", args);
+    itsPatcher = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(), "patcher", args);
   }
 
-  public ErmesPatcherDoc(FtsObject theFtsPatcher) {
+  public ErmesPatcherDoc(FtsContainerObject theFtsPatcher) {
     // create a ErmesPatcherDoc starting from an existing FtsPatcher.
 
     if (itsFile != null)
       {
 	itsTitle = itsFile.getName();
       }
-    else if (theFtsPatcher.getClassName().equals("patcher"))
+    else if (((FtsObject)theFtsPatcher).getClassName().equals("patcher"))
       {
-	itsTitle = (String) theFtsPatcher.getArguments().elementAt(0);
+	itsTitle = (String) ((FtsObject) theFtsPatcher).getArguments().elementAt(0);
       }
     else
-      itsTitle  =  theFtsPatcher.getClassName();
+      itsTitle  =  ((FtsObject) theFtsPatcher).getClassName();
 
     if (itsTitle == null || itsTitle.equals(""))
       itsTitle = "subpatcher "+ itsSubpatcherCounter++;
@@ -70,10 +70,10 @@ public class ErmesPatcherDoc implements MaxDocument {
     args.addElement("unnamed");
     args.addElement(new Integer(0));
     args.addElement(new Integer(0));
-    itsPatcher = FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(), "patcher", args);
+    itsPatcher = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(), "patcher", args);
   }
 
-  FtsObject GetFtsPatcher() {
+  FtsContainerObject GetFtsPatcher() {
     return itsPatcher;
   }
   public void DelWindow() {
@@ -146,7 +146,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     itsDocumentType = "patcher";
 
     try {
-      itsPatcher = FtsDotPatParser.importPatcher(MaxApplication.getFtsServer(), file);
+      itsPatcher = (FtsContainerObject) FtsDotPatParser.importPatcher(MaxApplication.getFtsServer(), file);
       itsPatcher.open();
     } catch (Exception e) {
       System.out.println(e.toString() + " can't import "+ file);

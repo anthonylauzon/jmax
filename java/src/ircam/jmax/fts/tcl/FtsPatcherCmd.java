@@ -37,8 +37,7 @@ class FtsPatcherCmd implements Command
 	// Building a root patcher
 
 	Vector args;
-	FtsObject object;
-	FtsObject parent;
+	FtsContainerObject object;
 	String    windowDescription = null;
 
 	// Retrieve the arguments
@@ -52,8 +51,8 @@ class FtsPatcherCmd implements Command
 	args.addElement(new Integer(0));
 	args.addElement(new Integer(0));
     
-	object = FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(),
-					 "patcher", args);
+	object = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(),
+							      "patcher", args);
 	
 	if (windowDescription != null)
 	  object.setWindowDescription(new FtsWindowDescription(windowDescription));
@@ -63,8 +62,8 @@ class FtsPatcherCmd implements Command
     else if (argv.length >= 5) 
       {
 	Vector args;
-	FtsObject object;
-	FtsObject parent;
+	FtsContainerObject object;
+	FtsContainerObject parent;
 	int       ninlets;
 	int       noutlets;
 	String    name;
@@ -74,7 +73,7 @@ class FtsPatcherCmd implements Command
 	// Retrieve the arguments
 	// this call should be substituted by a registration service call
 
-	parent    = (FtsObject) ReflectObject.get(interp, argv[1]);
+	parent    = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
 	name      = new String(argv[2].toString());
 	ninlets   = TclInteger.get(interp, argv[3]);
 	noutlets  = TclInteger.get(interp, argv[4]);
@@ -92,10 +91,10 @@ class FtsPatcherCmd implements Command
 	args.addElement(new Integer(noutlets));
     
 	if (graphicDescription != null)
-	  object = FtsObject.makeFtsObject(parent, "patcher", args,
-					   new FtsGraphicDescription(graphicDescription), false);
+	  object = (FtsContainerObject) FtsObject.makeFtsObject(parent, "patcher", args,
+					   new FtsGraphicDescription(graphicDescription));
 	else
-	  object = FtsObject.makeFtsObject(parent, "patcher", args);
+	  object = (FtsContainerObject) FtsObject.makeFtsObject(parent, "patcher", args);
 
 	if (windowDescription != null)
 	  object.setWindowDescription(new FtsWindowDescription(windowDescription));

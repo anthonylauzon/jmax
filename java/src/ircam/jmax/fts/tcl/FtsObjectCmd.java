@@ -28,17 +28,17 @@ class FtsObjectCmd implements Command
     if ((argv.length >= 3) && (argv.length <= 4))
       {
 	FtsObject object;
-	FtsObject parent;
+	FtsContainerObject parent;
 	String    description;
 
 	// Retrieve the arguments
 
-	parent = (FtsObject) ReflectObject.get(interp, argv[1]);
+	parent = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
 	description = new String(argv[2].toString());
 
 	if (argv.length == 4)
 	  object = FtsObject.makeFtsObject(parent, description,
-					   new FtsGraphicDescription(new String(argv[3].toString())), false);
+					   new FtsGraphicDescription(new String(argv[3].toString())));
 	else
 	  object = FtsObject.makeFtsObject(parent, description);
 

@@ -8,6 +8,14 @@ SOURCES = \
           FtsMessage.java \
           FtsMessageHandler.java \
           FtsObject.java \
+	  FtsPatcherObject.java \
+	  FtsInletObject.java \
+	  FtsOutletObject.java \
+	  FtsContainerObject.java \
+	  FtsAbstractionObject.java \
+	  FtsTemplateObject.java \
+	  FtsStandardObject.java \
+          FtsDeclarationObject.java \
           FtsParse.java \
           FtsPatcher.java \
           FtsPort.java \
@@ -29,3 +37,9 @@ SOURCES = \
 	  FtsTpaFileDataHandler.java \
 	  FtsPatchData.java  \
 	  FtsPatchDataType.java
+
+
+
+
+
+

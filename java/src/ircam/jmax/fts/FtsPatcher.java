@@ -243,9 +243,9 @@ class FtsPatcher
       {
 	FtsObject obj   =  (FtsObject) objects.elementAt(i);
 
-	if (obj.isContainer())
+	if (obj instanceof FtsContainerObject)
 	  {
-	    obj.getSubPatcher().find(pattern, v);
+	    ((FtsContainerObject) obj).getSubPatcher().find(pattern, v);
 	  }
       }
 
@@ -487,8 +487,8 @@ class FtsPatcher
     for (int i = 0; i < objects.size(); i++)
       {
 	FtsObject obj   =  (FtsObject) objects.elementAt(i);
-	
-	if (obj.declaration)
+
+	if (obj instanceof FtsDeclarationObject)
 	  {
 	    if (no_declarations)
 	      {
@@ -514,7 +514,7 @@ class FtsPatcher
       {
 	FtsObject obj   =  (FtsObject) objects.elementAt(i);
 	
-	if (! obj.declaration)
+	if (! (obj instanceof FtsDeclarationObject))
 	  {
 	    if (no_objects)
 	      {
@@ -564,7 +564,7 @@ class FtsPatcher
       {
 	FtsObject obj   =  (FtsObject) objects.elementAt(i);
 	
-	if ((! obj.isTemplate()) && (! obj.isAbstraction()) && (obj.getSubPatcher() != null)) 
+	if (obj instanceof FtsPatcherObject)
 	  {
 	    if (no_subpatchers)
 	      {
@@ -579,7 +579,7 @@ class FtsPatcher
 	    // May be we don't really need to update the idxCount; we can reuse
 	    // old idx, so to reuse Tcl variables, and reduce Tcl memory space.
 	    
-	    obj.getSubPatcher().saveAsTcl(stream, idxCount);
+	    ((FtsPatcherObject)obj).getSubPatcher().saveAsTcl(stream, idxCount);
 	  }
       }
 

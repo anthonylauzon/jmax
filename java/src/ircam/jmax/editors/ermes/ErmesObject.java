@@ -26,7 +26,7 @@ public class ErmesObject implements FtsPropertyHandler {
   boolean laidOut;
   public Rectangle currentRect;
   public ErmesSketchPad	itsSketchPad;
-  FtsObject 	itsFtsPatcher;
+  FtsContainerObject 	itsFtsPatcher;
   FtsGraphicDescription itsFtsGraphicDescription;
   public FtsObject	itsFtsObject = null;
   public Vector itsInletList = new Vector();
