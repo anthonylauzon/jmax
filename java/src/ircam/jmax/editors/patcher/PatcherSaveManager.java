@@ -60,6 +60,7 @@ public class PatcherSaveManager
 	try
 	  {
 	    document.save();
+
 	    saved = true;
 	  }
 	catch ( MaxDocumentException e)
@@ -82,21 +83,20 @@ public class PatcherSaveManager
     MaxDocument document = sketch.getDocument();
     FtsPatcherData patcherData = sketch.getFtsPatcherData();
     boolean saved = false;
-
     int saveType;
-
+ 
     if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
       saveType = MaxFileChooser.SAVE_PAT_TYPE;
     else
       saveType = MaxFileChooser.SAVE_JMAX_TYPE;
-    
+
     if (! document.isRootData(patcherData))
 	return saveAsFromSubPatcher(container , document);
 
     file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
 					    document.getDocumentFile(), 
 					    "Save As",
-  					    saveType);
+   					    saveType);
 
     if (file == null)
       return false;
@@ -129,6 +129,7 @@ public class PatcherSaveManager
       documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
 
     document.setDocumentHandler( documentHandler);
+
     document.setSaved( false );
 
     container.getFrame().setTitle( file.toString()); 
@@ -235,8 +236,17 @@ public class PatcherSaveManager
 
     MaxDocument document = sketch.getDocument();
     FtsPatcherData patcherData = sketch.getFtsPatcherData();
+    int saveType;
+ 
+    if ( document.getDocumentHandler() instanceof FtsDotPatRemoteDocumentHandler)
+      saveType = MaxFileChooser.SAVE_PAT_TYPE;
+    else
+      saveType = MaxFileChooser.SAVE_JMAX_TYPE;
 
-    file = MaxFileChooser.chooseFileToSave(container.getFrame(), document.getDocumentFile(), "Save To");
+    file = MaxFileChooser.chooseFileToSave( container.getFrame(), 
+					    document.getDocumentFile(), 
+					    "Save To",
+					    saveType);
 
     if (file == null)
       return;
@@ -254,27 +264,24 @@ public class PatcherSaveManager
 	  return;
       }
 
-    /////////////////////////????????????????
-    /*MaxDocumentHandler documentHandler = null;
-    
-      if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
+    MaxDocumentHandler documentHandler = null;
+
+    if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
       documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
-      else
+    else
       documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
 
-      document.setDocumentHandler( documentHandler);*/
-      /////////////////////???????????????
     try
       {
 	if (document.isRootData(patcherData))
 	  {
 	    // Make a document save to
-	    document.saveTo( file);
+	    document.saveTo( file, documentHandler);
 	  }
 	else
 	  {
 	    // Make a subdocument save to
-	      document.saveSubDocumentTo( patcherData, file);
+	    document.saveSubDocumentTo( patcherData, file, documentHandler);
 	  }
       }
     catch ( MaxDocumentException e)

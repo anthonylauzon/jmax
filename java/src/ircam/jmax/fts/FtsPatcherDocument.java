@@ -48,20 +48,6 @@ public class FtsPatcherDocument extends MaxDocument
     ((FtsPatcherData) data).getContainerObject().setDocument(this);
   }
 
-    public void saveSubDocumentTo(MaxData data, File file) throws MaxDocumentException
-    {
-	MaxDocumentHandler documentHandler = null;
-		
-	if ( MaxFileChooser.getSaveType() == MaxFileChooser.SAVE_PAT_TYPE)
-	    documentHandler = FtsDotPatRemoteDocumentHandler.getInstance();
-	else
-	    documentHandler = FtsBmaxRemoteDocumentHandler.getInstance();
-
-	setDocumentHandler( documentHandler);
-
-	super.saveSubDocumentTo(data, file);
-    }
-
   public void dispose()
   {
     super.dispose();

@@ -252,6 +252,14 @@ abstract public class MaxDocument
     handler.saveDocument(this, file);
   }
 
+  public void saveTo(File file, MaxDocumentHandler givenHandler) throws MaxDocumentException
+  {
+    if (givenHandler == null)
+      throw new MaxDocumentException("Cannot save to " + file);
+
+    givenHandler.saveDocument(this, file);
+  }
+
   /** Save a subdocument to a given file, without changing the
    *  original binding of the document 
    *
@@ -276,6 +284,18 @@ abstract public class MaxDocument
 	  handler.saveSubDocument(this, data, file);
       }
   }
+
+  public void saveSubDocumentTo( MaxData data, File file, MaxDocumentHandler givenHandler ) throws MaxDocumentException
+  {
+    if (type.canMakeSubDocumentFile(data))
+      {
+	if (givenHandler == null)
+	  throw new MaxDocumentException("Cannot save to " + file);
+
+	givenHandler.saveSubDocument(this, data, file);
+      }
+  }
+
 
   /** Saved flag query: true if the document have been saved to its current
       file.
