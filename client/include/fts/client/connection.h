@@ -21,13 +21,7 @@
  */
 
 #include <string.h>
-
-#ifdef WIN32
-#include <windows.h>
-typedef SOCKET           socket_t;
-#else
-typedef int              socket_t;
-#endif
+#include <fts/client/types.h>
 
 /**
  * An abstract class used as base class for all classes
@@ -46,6 +40,11 @@ public:
 
   static const int DEFAULT_PORT;
   static const int DEFAULT_CONNECT_TIMEOUT;
+
+  // flag and method for static initialization of the socket layer
+  // (windows only)
+  static int _initializedSocketLayer;
+  static void initializeSocketLayer();
 
   /**
      Tries to connect (using connect() socket function) to FTS.
@@ -77,9 +76,15 @@ private:
 class FTSCLIENT_API FtsPipeConnection: public FtsServerConnection {
   friend class FtsProcess;
 public:
-  FtsPipeConnection( const FtsProcess *fts);
+  FtsPipeConnection( FtsProcess *fts);
+  virtual ~FtsPipeConnection();
 
   void close() throw( FtsClientException);
   int read( unsigned char *buffer, int n) throw( FtsClientException);
   int write( unsigned char *buffer, int n) throw( FtsClientException);
+
+private:
+  FtsProcess *_fts;
+  pipe_t _in;
+  pipe_t _out;
 };

@@ -168,14 +168,6 @@ void fts_platform_init( int argc, char **argv)
 	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
     return /* FIXME */;
   }
-
-  hostptr = gethostbyname("127.0.0.1");
-  if (!hostptr) {
-    MessageBox(NULL, "Couldn't find local TCP/IP address. " 
-	       "Make sure your machine is configured with TCP/IP and uses a recent TCP/IP library.", 
-	       "FTS Initialization", MB_OK | MB_ICONSTOP | MB_APPLMODAL); 
-    return;
-  }
   
   if ((sock = socket(AF_INET, SOCK_STREAM, 0) ) == -1)	{
     MessageBox(NULL, "Coulnd't create a socket. " 

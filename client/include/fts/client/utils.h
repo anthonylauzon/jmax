@@ -176,9 +176,9 @@ private:
   FtsHashTableCell< KeyT, ValT> **lookupCell( const KeyT &key);
   int getInitialCapacity( int initialCapacity);
 
-  int _length;
-  int _count;
-  int _rehashCount;
+  unsigned int _length;
+  unsigned int _count;
+  unsigned int _rehashCount;
   FtsHashTableCell< KeyT, ValT> **_table;
 };
 
@@ -190,14 +190,14 @@ FtsHashTable< KeyT, ValT>::FtsHashTable( int initialCapacity)
   _rehashCount = (int)(_length * FTSHASHTABLE_STANDARD_LOAD_FACTOR);
   _table = new FtsHashTableCell< KeyT, ValT> * [_length];
 
-  for ( int i = 0; i < _length; i++)
+  for ( unsigned int i = 0; i < _length; i++)
     _table[i] = 0;
 }
 
 template <class KeyT, class ValT> 
 void FtsHashTable< KeyT, ValT>::clear()
 {
-  for ( int i = 0; i < _length; i++)
+  for ( unsigned int i = 0; i < _length; i++)
     {
       FtsHashTableCell< KeyT, ValT> *p, *next;
 

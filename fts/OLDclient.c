@@ -1159,6 +1159,11 @@ void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
   struct changes *p;
   struct changes *last = 0;
 
+  /* don't send property changed messages after oldclient shutdown */
+  if (oldclient == 0) {
+    return;
+  }
+
   /* check if the object is already in the evsched list */
   for (p = changes_queue_head; p; last = p, p = p->next)
     if ((p->obj == obj) && p->property == property)

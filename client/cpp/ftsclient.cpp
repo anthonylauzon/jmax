@@ -32,7 +32,9 @@
 #include <unistd.h>
 #include <dlfcn.h>
 #include <signal.h>
+#define LASTERROR errno
 #else
+#define LASTERROR WSAGetLastError()
 #define snprintf _snprintf
 #define sleep Sleep
 #endif
@@ -53,16 +55,20 @@
 static char* log_file = NULL;
 static unsigned int log_start;
 
-char* ftsclient_curdate(char* buf)
+char* ftsclient_curdate(char* buf, int len)
 {
 #ifdef WIN32
   char t[9];
   char d[9];
   _strdate(d);
   _strtime(t);
-  sprintf(buf, "%s %s", d, t);
+  snprintf(buf, len, "%s %s", d, t);
 #else
-  buf[0] = 0;
+  time_t t;
+
+  time( &t);
+  snprintf(buf, len, "%s", ctime( &t));
+
 #endif
   return buf;
 }
@@ -101,7 +107,7 @@ void ftsclient_init_log(void)
 
   /* truncate the file */
   log = fopen(log_file, "w");
-  fprintf(log, "[log]: %s started logging\n", ftsclient_curdate(date));
+  fprintf(log, "[log]: %s started logging\n", ftsclient_curdate(date, 64));
   fclose(log);
 }
 
@@ -260,43 +266,74 @@ ostream &operator<<( ostream &os, FtsArgs &args)
 /* ********************************************************************** */
 /* FtsServerConnnection and derived classes                               */
 /* ********************************************************************** */
-
 const int FtsSocketConnection::DEFAULT_PORT = 2023;
 const int FtsSocketConnection::DEFAULT_CONNECT_TIMEOUT = 30;
+
+int FtsSocketConnection::_initializedSocketLayer = 0;
+
+void FtsSocketConnection::initializeSocketLayer()
+{
+#if defined(WIN32)
+  if (_initializedSocketLayer) {
+    return;
+  }
+
+  _initializedSocketLayer++;
+
+  WORD wVersionRequested;
+  WSADATA wsaData;
+  int result;
+
+  wVersionRequested = MAKEWORD(2, 2);
+  
+  result = WSAStartup( wVersionRequested, &wsaData );
+  if (result != 0) {
+    throw FtsClientException( "Couldn't initialize WinSock", result);
+  }
+  
+  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+    WSACleanup();
+    throw FtsClientException( "Bad WinSock version");
+  }
+#endif
+}
 
 int FtsSocketConnection::connectOnce() throw( FtsClientException )
 {
   struct sockaddr_in server_addr;
   struct hostent *hostptr;
+  struct in_addr addr;
 
-  hostptr = gethostbyname( _hostname);
+  /* convert the host name to the inet address. call gethostbyname
+     only when the host is not in a numbers-and-dots notation. this
+     avoids a name resolution on windows machines */
+  addr.s_addr = inet_addr( _hostname);
 
-  if ( !hostptr)
-    throw FtsClientException( "Unknown host");
+  if (addr.s_addr == INADDR_NONE) {
+
+    /* host is not a numbers-and-dots notation. resolve the name. */
+    hostptr = gethostbyname( _hostname);
+
+    if ( !hostptr)
+      throw FtsClientException( "Unknown host");
+
+    addr = *(struct in_addr *)hostptr->h_addr_list[0];
+  }
 
   _socket = socket( PF_INET, SOCK_STREAM, 0);
 
-#ifdef WIN32
   if (_socket == INVALID_SOCKET)
-    throw FtsClientException( "Can't create socket", WSAGetLastError());
-#else
-  if (_socket < 0)
-    throw FtsClientException( "Can't create socket", errno);
-#endif
+    throw FtsClientException( "Can't create socket", LASTERROR);
 
   memset( &server_addr, 0, sizeof( server_addr));
   server_addr.sin_family = AF_INET;
-  server_addr.sin_addr = *((struct in_addr *)hostptr->h_addr_list[0]);
+  server_addr.sin_addr = addr;
   server_addr.sin_port = htons( _port);
 
   if (::connect( _socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == 0)
     return 0;
 
-#ifdef WIN32
-  closesocket( _socket);
-#else
-  ::close( _socket);
-#endif
+  CLOSESOCKET( _socket);
 
   return -1;
 }
@@ -320,8 +357,9 @@ void FtsSocketConnection::connect() throw( FtsClientException )
 }
 
 FtsSocketConnection::FtsSocketConnection( const char *hostname, int port, int connectTimeout) throw( FtsClientException)
-  : _socket( -1), _hostname( hostname), _port( port), _connectTimeout( connectTimeout)
+  : _socket( INVALID_SOCKET), _hostname( hostname), _port( port), _connectTimeout( connectTimeout)
 {
+  initializeSocketLayer();
   connect();
 }
 
@@ -339,40 +377,32 @@ void FtsSocketConnection::close() throw( FtsClientException)
     /* call WSAAsyncSelect ??? */
     ::shutdown(_socket, 0x02);
     while (1) {
-      r = recv(_socket, buf, 1024, 0);
+      r = ::recv(_socket, buf, 1024, 0);
       if ((r == 0) || (r == SOCKET_ERROR)) {
 	break;
       }
     }
-    closesocket(_socket);
-  }
-#else
-  if (_socket >= 0) {
-    ::close(_socket);
   }
 #endif
+
+  if (_socket != INVALID_SOCKET) {
+    CLOSESOCKET(_socket);
+  }
 }
 
 int FtsSocketConnection::read( unsigned char *buffer, int n) throw( FtsClientException)
 {
   int r;
 
-#if defined(WIN32)
-  r = recv( _socket, (char*) buffer, n, 0);
+  r = SOCKETREAD( _socket, buffer, n);
   if (r == SOCKET_ERROR)
     {
-      throw FtsClientException( "Error in message receiving", WSAGetLastError());
+      throw FtsClientException( "Error in message receiving", LASTERROR);
     }
   if (r == 0)
     {
       throw FtsClientException( "Socket closed");
     }
-#else
-  if( (r = ::read( _socket, buffer, n)) < 0)
-    {
-      throw FtsClientException( "Error in message receiving", errno);
-    }
-#endif
 
   return r;
 }
@@ -381,20 +411,85 @@ int FtsSocketConnection::write( unsigned char *buffer, int n) throw( FtsClientEx
 {
   int r;
 
-#if defined(WIN32)
-  if ( send( _socket, buffer, n, 0) < 0)
+  if ( (r = SOCKETWRITE( _socket, buffer, n)) < 0)
     {
-      throw FtsClientException( "Error in sending message", WSAGetLastError());
+      throw FtsClientException( "Error in sending message", LASTERROR);
     }
-#else
-  if ( (r == ::write( _socket, buffer, n)) < 0)
-    {
-      throw FtsClientException( "Error in sending message", errno);
-    }
-#endif
 
   return r;
 }
+
+
+/* ********************************************************************** */
+/* FtsPipeConnection                                                      */
+/* ********************************************************************** */
+
+FtsPipeConnection::FtsPipeConnection( FtsProcess *fts)
+{
+  _fts = fts;
+  _in = fts->getInputPipe();
+  _out = fts->getOutputPipe();
+}
+
+FtsPipeConnection::~FtsPipeConnection(void)
+{
+  close();
+}
+
+void FtsPipeConnection::close() 
+{
+  // Don't do anything. We didn't create the pipes, so we don't
+  // destroy them.
+}
+
+int FtsPipeConnection::read( unsigned char *buffer, int n) 
+{
+#if WIN32
+  DWORD count; 
+
+  if (!ReadFile(_in, (LPVOID) buffer, (DWORD) n, &count, NULL)) {
+
+    /* keep a trace of the error in the log file */
+    LPVOID msg;
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
+    ftsclient_log("[pipe]: failed to write to pipe: (%s)\n", msg);
+    LocalFree(msg);
+
+    /* return -1 and let the caller handle the error situation */
+    return -1;
+  }
+
+  return count;
+
+#else
+#endif
+}
+
+int FtsPipeConnection::write( unsigned char *buffer, int n) 
+{
+#if WIN32
+  DWORD count; 
+
+  if (!WriteFile(_out, (LPCVOID) buffer, (DWORD) n, &count, NULL)) {
+
+    /* keep a trace of the error in the log file */
+    LPVOID msg;
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
+    ftsclient_log("[pipe]: failed to write to pipe: (%s)\n", msg);
+    LocalFree(msg);
+
+    /* return -1 and let the caller handle the error situation */
+    return -1;
+  }
+
+  return count;
+
+#else
+#endif
+}
+
 
 /* ********************************************************************** */
 /* FtsServer                                                              */
@@ -402,39 +497,8 @@ int FtsSocketConnection::write( unsigned char *buffer, int n) throw( FtsClientEx
 
 const int FtsServer::DEFAULT_RECEIVE_BUFFER_SIZE = 65536;
 
-int FtsServer::_initialized = 0;
-
-void FtsServer::initialize()
-{
-#if defined(WIN32)
-  if (_initialized) {
-    return;
-  }
-
-  _initialized++;
-
-  WORD wVersionRequested;
-  WSADATA wsaData;
-  int result;
-
-  wVersionRequested = MAKEWORD(2, 2);
-  
-  result = WSAStartup( wVersionRequested, &wsaData );
-  if (result != 0) {
-    throw FtsClientException( "Couldn't initialize WinSock", result);
-  }
-  
-  if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-    WSACleanup();
-    throw FtsClientException( "Bad WinSock version");
-  }
-#endif
-}
-
 FtsServer::FtsServer( FtsServerConnection *connection, int threaded)
 {
-  initialize();
-
   _connection = connection;
 
   _object = 0;
@@ -544,6 +608,15 @@ void FtsServer::receive() throw( FtsClientException)
 {
   int n;
 
+  n = _connection->read(_receiveBuffer, DEFAULT_RECEIVE_BUFFER_SIZE);
+  
+  if (n < 0) {
+    throw FtsClientException( "Failed to read the input connection");
+  }
+  if (n == 0) {
+    throw FtsClientException( "End of input");
+  }
+
   decode( _receiveBuffer, n);
 }
 
@@ -563,11 +636,7 @@ void FtsServer::poll() throw( FtsClientException)
 
 //    if (r < 0)
 //      {
-//  #if defined(WIN32)
-//        throw FtsClientException( "Error in select()", WSAGetLastError());
-//  #else
-//        throw FtsClientException( "Error in select()", errno);
-//  #endif
+//        throw FtsClientException( "Error in select()", LASTERROR);
 //      }
 //    else if ( r == 0)
 //      return;
@@ -1122,6 +1191,8 @@ FtsPlugin::getSymbol(library_t lib, char* name)
 FtsProcess::FtsProcess( const char *path) 
 {
   _path = (path)? strdup(path) : 0;
+  _in = INVALID_PIPE;
+  _out = INVALID_PIPE;
 }
 
 #if WIN32
@@ -1131,11 +1202,11 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
   char cmdLine[2048];
   PROCESS_INFORMATION process_info;
   STARTUPINFO startup_info;
+  pipe_t new_stdin, new_stdout; 
+  SECURITY_ATTRIBUTES attr; 
   int i;
 
-  GetStartupInfo(&startup_info);
-
-  if ( _path == 0) {
+  if (_path == 0) {
     findDefaultPath();
   }
 
@@ -1150,7 +1221,50 @@ void FtsProcess::run( FtsArgs &args) throw( FtsClientException)
       }
   }
 
-  result = CreateProcess( _path, cmdLine, NULL, NULL, FALSE, 
+  /* 
+     create the pipes to replace the stdin and stdout of the FTS
+     process 
+  */
+
+  /* make sure that the pipe handles can be inherited by the FTS
+     process */
+  attr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+  attr.bInheritHandle = TRUE; 
+  attr.lpSecurityDescriptor = NULL; 
+
+  /* keep a handle to the old stdout */
+  pipe_t old_stdout = GetStdHandle(STD_OUTPUT_HANDLE); 
+
+  /* create a pipe for the new stdout */
+  if (!CreatePipe(&this->_in, &new_stdout, &attr, 0)) {
+    throw FtsClientException("Can't create the anonymous pipe for output");
+  }
+
+  /* set the pipe as the new stdout, so it can be inherited by FTS */
+  if (!SetStdHandle(STD_OUTPUT_HANDLE, new_stdout)) {
+    throw FtsClientException("Can't set the anonymous pipe as output");
+  }
+
+  /* keep a handle to the old stdin */
+  pipe_t old_stdin = GetStdHandle(STD_INPUT_HANDLE); 
+
+  /* create a pipe for the new stdin */
+  if (!CreatePipe(&new_stdin, &this->_out, &attr, 0)) {
+    throw FtsClientException("Can't create the anonymous pipe for input");
+  }
+
+  /* set the pipe as the new stdin, so it can be inherited by FTS */
+  if (!SetStdHandle(STD_INPUT_HANDLE, new_stdin)) {
+    throw FtsClientException("Can't set the anonymous pipe as input");
+  }
+
+  /* 
+     start FTS
+  */
+
+  GetStartupInfo(&startup_info);
+
+  result = CreateProcess(_path, cmdLine, NULL, NULL, TRUE, 
 			 DETACHED_PROCESS | REALTIME_PRIORITY_CLASS, 
 			 NULL, NULL, &startup_info, &process_info);
   if (result == 0) {

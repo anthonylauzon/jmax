@@ -20,23 +20,7 @@
  * 
  */
 
-#ifdef WIN32
-
-#include <windows.h>
-
-typedef HANDLE           thread_t;
-typedef HINSTANCE        library_t;
-typedef FARPROC          library_symbol_t;
-
-#else
-
-#include <pthread.h>
-
-typedef pthread_t        thread_t;
-typedef void*            library_t;
-typedef void*            library_symbol_t;
-
-#endif
+#include <fts/client/types.h>
 
 /**
  * An instance of class Fts represents a running FTS that
@@ -62,10 +46,28 @@ class FTSCLIENT_API FtsProcess : public Fts {
   virtual ~FtsProcess() {}
   virtual void run( FtsArgs &args) throw( FtsClientException);
 
+  pipe_t getInputPipe() {
+    return _in;
+  }
+
+  void setInputPipe(pipe_t in) {
+    _in = in;
+  }
+
+  pipe_t getOutputPipe() {
+    return _out;
+  }
+
+  void setOutputPipe(pipe_t out) {
+    _out = out;
+  }
+
  private:
   void findDefaultPath() throw( FtsClientException);
 
   const char *_path;
+  pipe_t _in;
+  pipe_t _out;
 
 #ifndef WIN32
   int _childPid;
@@ -100,3 +102,4 @@ class FTSCLIENT_API FtsPlugin : public Fts {
   int argc;
   char **argv;
 };
+

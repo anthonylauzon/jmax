@@ -38,8 +38,8 @@ RSC=rc.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
+# PROP Output_Dir "../lib"
+# PROP Intermediate_Dir "../lib"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSCLIENT_EXPORTS" /YX /FD /c
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  ws2_32.lib /nologo /dll /machine:I386 /out:"c:\windows\ftsclient.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib /nologo /dll /machine:I386 /out:"c:\windows\ftsclient.dll"
 
 !ELSEIF  "$(CFG)" == "ftsclient - Win32 Debug"
 
@@ -64,8 +64,8 @@ LINK32=link.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir ""
-# PROP Intermediate_Dir "Debug"
+# PROP Output_Dir "../lib"
+# PROP Intermediate_Dir "../lib"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FTSCLIENT_EXPORTS" /YX /FD /GZ /c
@@ -89,11 +89,47 @@ LINK32=link.exe
 # Name "ftsclient - Win32 Debug"
 # Begin Source File
 
+SOURCE=..\include\fts\client\atom.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\client\connection.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\client\fts.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\cpp\ftsclient.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\include\fts\ftsclient.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\client\object.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\protocol.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\client\server.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\client\types.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\client\utils.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\fts\client\version.h
 # End Source File
 # End Target
 # End Project

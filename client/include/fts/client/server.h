@@ -83,10 +83,6 @@ public:
   FtsObject *getRoot() { return _root; }
 
 private:
-  // flag and method for static initialization 
-  static int _initialized;
-  static void initialize();
-
   // These methods are accessed only from friend class FtsObject
   // This method is shared by several encode() methods
   void put( int n);

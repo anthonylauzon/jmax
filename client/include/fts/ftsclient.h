@@ -59,6 +59,7 @@ private:
 ostream &operator<<( ostream &os, const FtsClientException &e);
 
 #include <fts/client/version.h>
+#include <fts/client/types.h>
 #include <fts/client/utils.h>
 #include <fts/client/atom.h>
 #include <fts/client/fts.h>
