@@ -62,7 +62,7 @@ event_get_duration(event_t *event)
 
 static fts_array_t event_client_array;
 
-static void
+void 
 event_set_at_client(event_t *this)
 {
   if(fts_is_object(&this->value))

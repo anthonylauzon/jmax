@@ -61,4 +61,10 @@ struct _event_
 
 extern double event_get_duration(event_t *event);
 
+/**
+ * Upload changes in event or event's value to client
+ */
+void event_set_at_client(event_t *this);
+
+
 #endif
