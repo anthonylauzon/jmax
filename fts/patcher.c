@@ -833,7 +833,7 @@ patcher_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pr
 
   v = fts_variable_get_value( (fts_patcher_t *)obj, fts_s_export);
 
-  if ( v && !fts_is_void( v))
+  if(v)
     *value = *v;
   else
     fts_set_object(value, obj);

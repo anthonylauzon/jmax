@@ -249,7 +249,7 @@ sgimidiport_send_system_exclusive_byte(fts_object_t *o, int value)
     {
       MDevent event;
 
-      event.msg[0] = MD_SYSEX;
+      event.msg[0] = MD_SYSEX; /* just to make sure */
       event.sysexmsg = this->sysex_buf;
       event.msglen = this->sysex_size;
       
@@ -264,6 +264,7 @@ sgimidiport_send_system_exclusive_flush(fts_object_t *o, double time)
 {
   sgimidiport_t *this = (sgimidiport_t *)o;
   MDevent event;
+  int n = 0;
 
   this->sysex_buf[this->sysex_size] = MD_EOX;
   this->sysex_size++;
@@ -275,9 +276,8 @@ sgimidiport_send_system_exclusive_flush(fts_object_t *o, double time)
   mdSend(this->out, &event, 1);
   
   /* reset sysex buffer */
-  this->sysex_buf[0] = MD_SYSEX;
-  this->sysex_buf[1] = SYSEX_REALTIME;
-  this->sysex_size = 2;
+  port->sysex_buf[0] = MD_SYSEX;
+  this->sysex_size = 1;
 }
 
 static fts_midiport_output_functions_t sgimidiport_output_functions =
@@ -291,7 +291,7 @@ static fts_midiport_output_functions_t sgimidiport_output_functions =
   sgimidiport_send_system_exclusive_byte,
   sgimidiport_send_system_exclusive_flush,
 };
-
+  
 /************************************************************
  *
  *  object
@@ -326,9 +326,8 @@ sgimidiport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     }
 
   /* init sysex buffer */
-  this->sysex_buf[0] = MD_SYSEX;
-  this->sysex_buf[1] = SYSEX_REALTIME;
-  this->sysex_size = 2;
+  port->sysex_buf[0] = MD_SYSEX;
+  this->sysex_size = 1;
 }
 
 static void 

@@ -350,7 +350,8 @@ void fts_env_init(fts_env_t *env, fts_object_t *patcher)
 }
 
 /* add a binding to an environment */
-fts_binding_t *fts_env_add_binding(fts_env_t *env, fts_symbol_t name, fts_atom_t *value)
+fts_binding_t *
+fts_env_add_binding(fts_env_t *env, fts_symbol_t name, fts_atom_t *value)
 {
   fts_binding_t *var;
 
@@ -676,35 +677,49 @@ void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *v
 }
 
 /* access the value of a variable in the given scope */
-fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name)
+fts_atom_t *
+fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_binding_t *v;
 
   scope = fts_variable_get_scope(scope, name);
-
   v = fts_variable_get_binding(scope, name);
 
-  if (! v)
+  if (!v || fts_binding_is_suspended(v) || fts_is_void(&v->value))
+    return 0;
+  else
+    return &v->value;
+}
+
+/* access the value of a variable in the given scope or create void place holder in root patcher */
+fts_atom_t *
+fts_variable_get_value_or_void(fts_patcher_t *scope, fts_symbol_t name)
+{
+  fts_binding_t *v;
+
+  scope = fts_variable_get_scope(scope, name);
+  v = fts_variable_get_binding(scope, name);
+
+  if(!v)
     {
       fts_atom_t a;
 
       /* make the root void variable here */
       fts_set_void(&a);
       v = fts_env_add_binding(fts_patcher_get_env(fts_get_root_patcher()), name, &a);
-    }
+    }  
 
   if (fts_binding_is_suspended(v))
-    {
-      return 0;
-    }
+    return 0;
   else
-    return &(v->value);
+    return &v->value;
 }
 
 /* add a user to a variable in a given scope.
  * (user is an object that referentiate the variable and so need to be redefined when the variable change value)
  */
-void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
+void 
+fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
 {
   fts_binding_t *var;
 
@@ -715,7 +730,8 @@ void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t
   fts_binding_add_user(var, user);
 }
 
-void fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
+void
+fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
 {
   fts_binding_t *var;
 
@@ -741,71 +757,6 @@ void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_object
       fts_binding_add_definitions_to_set(b, set);
     }
 }
-
-/****************************************************************************
- *
- *  get variable or make default
- *
- *  This is designed for classes like send/receive in order to provide always
- *  a value for a used variable name and make the definition optional.
- *
- */
-
-static fts_object_t *
-fts_variable_get_object(fts_patcher_t *scope, fts_symbol_t name, fts_class_t *class)
-{
-  fts_atom_t *value = fts_variable_get_value(scope, name);
-
-  if (value && fts_is_object(value))
-    {
-      fts_object_t *obj = fts_get_object(value);
-
-      if(fts_object_get_class(obj) == class)
-	return obj;
-    }
-  
-  return 0;
-}
-
-fts_object_t *
-fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_class_t *class)
-{
-  fts_object_t *obj = fts_variable_get_object(scope, name, class);
-  
-  if(!obj)
-    {
-      const fts_atom_t *happy_prop = fts_class_get_prop(class, fts_s_named_defaults);
-      fts_hashtable_t *happy_hash;
-      fts_atom_t a, k;
-      
-      if(happy_prop)
-	{
-	  happy_hash = (fts_hashtable_t *)fts_get_ptr(happy_prop);
-	  
-	  fts_set_symbol( &k, name);
-	  if(fts_hashtable_get(happy_hash, &k, &a))
-	    return fts_get_object(&a);
-	}
-      else
-	{      
-	  happy_hash = (fts_hashtable_t *)fts_malloc( sizeof( fts_hashtable_t));
-	  fts_hashtable_init( happy_hash, 0, FTS_HASHTABLE_MEDIUM);
-	  
-	  fts_set_ptr(&a, happy_hash);
-	  fts_class_put_prop(class, fts_s_named_defaults, &a);
-	}
-      
-      obj = fts_object_create(class, 0, 0);
-      fts_object_refer(obj);
-      
-      fts_set_symbol( &k, name);
-      fts_set_object(&a, obj);
-      fts_hashtable_put(happy_hash, &k, &a);
-    }
-
-  return obj;
-}
-
 
 /***********************************************************************
  *

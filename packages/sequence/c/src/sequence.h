@@ -55,6 +55,8 @@ typedef struct _sequence_
   track_t *tracks; /* list of tracks */ 
   int size; /* # of tracks */ 
 
+  fts_array_t array;
+
   int open; /* flag: is 1 if sequence editor is open */
   track_t *currently_loaded_event_track; /* its more like a hack for loading bmax files */
 } sequence_t;

@@ -744,7 +744,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
     }
 
   v = fts_variable_get_value( fts_object_get_patcher(o), fts_get_symbol( at));
-  if ( !fts_is_object( v))
+  if (!v || !fts_is_object(v))
     {
       fts_object_set_error( (fts_object_t *)this, "First argument does not refer to an object");
       return;

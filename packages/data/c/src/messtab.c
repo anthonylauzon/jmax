@@ -181,12 +181,7 @@ messtab_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       message_t *mess = messtab_recall(this, at);
 
       if(mess)
-	{
-	  this->locked = 1; /* lock messtab */
-	  fts_outlet_send(o, 1, fts_get_selector(at), 1, at);
-	  message_output(o, 0, mess);
-	  this->locked = 0;
-	}
+	message_output(o, 0, mess);
     }
 }
 
@@ -326,11 +321,7 @@ getmess_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   message_t *mess = messtab_recall(this->messtab, &this->key);
 
   if(mess)
-    {
-      this->messtab->locked = 1;
-      message_output(o, 0, mess);
-      this->messtab->locked = 0;
-    }
+    message_output(o, 0, mess);
 }
 
 static void
@@ -707,7 +698,7 @@ messtab_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pr
 static fts_status_t
 messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(messtab_t), 1, 2, 0);
+  fts_class_init(cl, sizeof(messtab_t), 1, 1, 0);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, messtab_get_state);
   

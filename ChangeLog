@@ -1,3 +1,13 @@
+2001-10-29  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* listelement.c: bug fixed (crashed for negative indices)
+
+2001-10-26  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* rewrote mechanism for undefined labels
+	* changed sysex handling in midi parser and midi objects (no more id prepend to sysex block)
+	* fixed Rsend/Rreceive
+
 2001-10-26  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* changed client.c: a client has a root pacher that is deleted

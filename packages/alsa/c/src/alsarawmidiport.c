@@ -166,19 +166,22 @@ static void
 alsarawmidiport_send_system_exclusive_byte(fts_object_t *o, int value)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
+  unsigned char buffer[2];
   int n = 0;
 
   if(this->sysex_head == 0)
     {
+      buffer[0] = (unsigned char)STATUS_BYTE_SYSEX;
+      buffer[1] = (unsigned char)(value & 0x7f);
+      snd_rawmidi_write( this->handle_out, buffer, 2);
+
       this->sysex_head = 1;
-
-      buffer[n++] = (unsigned char)STATUS_BYTE_SYSEX;
-      snd_rawmidi_write( this->handle_out, buffer, n);
     }
-
-  buffer[n++] = (unsigned char)(value & 0x7f);
-  snd_rawmidi_write( this->handle_out, buffer, n);
+  else
+    {
+      buffer[0] = (unsigned char)(value & 0x7f);
+      snd_rawmidi_write( this->handle_out, buffer, 1);
+    }
 }
 
 static void

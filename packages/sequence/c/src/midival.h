@@ -34,6 +34,7 @@ extern fts_class_t *midival_class;
 typedef struct _midival_
 {
   fts_object_t head;
+  int type;
   int value;
   int number;
   int channel;

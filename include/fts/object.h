@@ -70,10 +70,10 @@ FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac
 FTS_API fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at);
 FTS_API void fts_object_destroy(fts_object_t *obj);
 
-#define fts_object_refer(o) ((o)->refcnt++)
-#define fts_object_release(o) ((--((o)->refcnt) > 0)? 0: (fts_object_destroy(o), 0))
+#define fts_object_refer(o) ((fts_object_t *)(o)->refcnt++)
+#define fts_object_release(o) ((--((fts_object_t *)(o)->refcnt) > 0)? 0: (fts_object_destroy((fts_object_t *)(o)), 0))
 
-#define fts_object_has_only_one_reference(o) ((o)->refcnt == 1)
+#define fts_object_has_only_one_reference(o) ((fts_object_t *)(o)->refcnt == 1)
 
 /* traditional object in patcher functions */
 FTS_API fts_status_t fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
@@ -101,6 +101,8 @@ FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 /* variables */
 #define fts_object_get_variable(o) ((o)->varname)
 #define fts_object_set_variable(o, name) ((o)->varname = (name))
+
+FTS_API void fts_object_redefine_variable(fts_object_t *o);
 
 #define fts_object_has_id(o) ((o)->head.id != FTS_NO_ID)
 #define fts_object_get_id(o) ((o)->head.id)

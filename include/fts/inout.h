@@ -69,9 +69,8 @@ typedef struct _fts_label_
 
 #define fts_label_get_channel(l) (&(l)->channel)
 
-#define fts_label_get(p, s) ((fts_label_t *)fts_variable_get_object_always((p), (s), fts_label_class))
+FTS_API fts_label_t *fts_label_get(fts_patcher_t *patcher, fts_symbol_t name);
 
-#define fts_label_is_connected(l) (fts_channel_has_target(fts_label_get_channel(l)))
 #define fts_label_send(l, s, n, a) fts_channel_send( fts_label_get_channel(l), 0, (s), (n), (a))
 
 #endif

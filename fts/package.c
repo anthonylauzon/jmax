@@ -54,26 +54,6 @@ static fts_symbol_t s_template_path = 0;
 static fts_symbol_t s_data_path = 0;
 static fts_symbol_t s_package = 0;
 
-static fts_package_t* fts_package_load(fts_symbol_t name);
-static fts_list_t* fts_get_package_paths(void);
-
-static void fts_package_make_paths_absolute(fts_package_t* pkg);
-
-static fts_status_t fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
-static void __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_abstraction(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void __fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
-/* Debug code */
-static fts_status_t loader_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
-
 #ifdef WIN32
 #define fts_lib_prefix   ""
 #define fts_lib_postfix  ".dll"
@@ -81,62 +61,6 @@ static fts_status_t loader_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 #define fts_lib_prefix   "lib"
 #define fts_lib_postfix  ".so"
 #endif
-
-/***********************************************************************
- *
- * Initialization
- *
- */
-void 
-fts_kernel_package_init(void)
-{
-  fts_symbol_t system_symbol;
-  fts_atom_t a, p;
-  int i;
-
-  for (i = 0; i < PACKAGE_STACK_SIZE; i++) {
-    fts_package_stack[i] = NULL;
-  }
-
-  fts_hashtable_init(&fts_packages, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
-
-  /* create the system package */
-  system_symbol = fts_new_symbol("_system_");
-  fts_s_package = fts_new_symbol("package");
-  fts_set_symbol(&a, fts_s_package);
-
-  /* since we need a class to construct a package and a package to
-     find a class, we have to do some non standard hacking to
-     bootstrap the system */
-  fts_system_package = fts_calloc(sizeof(fts_package_t));
-
-  fts_system_package->object.head.cl = 0;
-  fts_system_package->object.head.id = FTS_NO_ID;
-  fts_system_package->object.properties = 0;
-  fts_system_package->object.varname = 0;
-  fts_system_package->object.refcnt = 0;
-  fts_system_package->object.out_conn = 0;
-  fts_system_package->object.in_conn = (fts_connection_t **) fts_calloc(sizeof(fts_connection_t *));
-  
-  __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 1, &a); 
-  fts_package_set_state(fts_system_package, fts_package_loaded); 
-
-  fts_set_ptr(&p, fts_system_package);
-  fts_hashtable_put(&fts_packages, &a, &p);
-
-  fts_package_push(fts_system_package);
-
-  /* now that there's a system package, we can define the package
-     (meta-) class */
-  fts_metaclass_install(fts_s_package, fts_package_instantiate, fts_always_equiv);
-
-  /* update the system package with the correct class */
-  fts_package_class = fts_class_get_by_name(fts_s_package);
-  fts_system_package->object.head.cl = fts_package_class;
-
-  /* Debug code */
-  fts_class_install( fts_new_symbol( "loader"), loader_instantiate);
-}
 
 /***********************************************
  *
@@ -155,60 +79,33 @@ fts_get_packages(fts_iterator_t* i)
   fts_hashtable_get_values(&fts_packages, i);
 }
 
-fts_package_t* 
-fts_package_get(fts_symbol_t name)
+static void
+fts_init_package_paths(void)
 {
-  fts_package_t* pkg;
-  fts_atom_t n, p;
+  fts_atom_t a;
+  fts_symbol_t s;
+  char path[MAXPATHLEN];
 
-  fts_set_symbol(&n, name);
-
-  if (fts_hashtable_get(&fts_packages, &n, &p)) {
-    return fts_get_ptr(&p);
-  } else {
-    /* try to load it */
-    pkg = fts_package_load(name);
-
-    fts_set_ptr(&p, pkg);
-    fts_hashtable_put(&fts_packages, &n, &p);    
-
-    return pkg;
+  /* add the default package path */
+  if (fts_package_paths == NULL) {
+    s = fts_get_root_directory();
+    if (s) {
+      snprintf(path, MAXPATHLEN, "%s%c%s", fts_symbol_name(s), fts_file_separator, "packages");
+      fts_set_symbol(&a, fts_new_symbol_copy(path));
+      fts_package_paths = fts_list_append(fts_package_paths, &a);
+    }
   }
 }
 
-fts_package_t*
-fts_package_load(fts_symbol_t name)
+fts_list_t *
+fts_get_package_paths(void)
 {
-  fts_package_t* pkg;
-  char path[MAXPATHLEN];
-  char filename[MAXPATHLEN];
-
-  /* locate the directory of the package */
-  if (!fts_find_file(NULL, fts_get_package_paths(), fts_symbol_name(name), path, MAXPATHLEN) 
-      || !fts_is_directory(path)) {
-    fts_log("[package]: Couldn't find package %s\n", fts_symbol_name(name));
-    pkg = fts_package_new(name);
-    pkg->state = fts_package_corrupt;
-    return pkg;
+  /* initialize the package path */
+  if (fts_package_paths == NULL) {
+    fts_init_package_paths();
   }
   
-  /* load the definition file */
-  sprintf(filename, "%s%c%s.jmax", path, fts_file_separator, fts_symbol_name(name));
-
-  if (fts_file_exists(filename)) {
-    pkg = fts_package_load_from_file(name, filename);
-  } else {
-    fts_log("[package]: No package definition for %s package\n", fts_symbol_name(name));
-    pkg = fts_package_new(name);
-    pkg->state = fts_package_defined;
-    pkg->name = name;
-    pkg->dir = fts_new_symbol_copy(path);
-  }
-  
-  /* load the default files */
-  fts_package_load_default_files(pkg);
-  
-  return pkg;
+  return fts_package_paths;
 }
 
 fts_package_t*
@@ -257,33 +154,60 @@ fts_package_load_from_file(fts_symbol_t name, const char* filename)
   return pkg;
 }
 
-static void
-fts_init_package_paths(void)
+fts_package_t*
+fts_package_load(fts_symbol_t name)
 {
-  fts_atom_t a;
-  fts_symbol_t s;
+  fts_package_t* pkg;
   char path[MAXPATHLEN];
+  char filename[MAXPATHLEN];
 
-  /* add the default package path */
-  if (fts_package_paths == NULL) {
-    s = fts_get_root_directory();
-    if (s) {
-      snprintf(path, MAXPATHLEN, "%s%c%s", fts_symbol_name(s), fts_file_separator, "packages");
-      fts_set_symbol(&a, fts_new_symbol_copy(path));
-      fts_package_paths = fts_list_append(fts_package_paths, &a);
-    }
-  }
-}
-
-fts_list_t*
-fts_get_package_paths(void)
-{
-  /* initialize the package path */
-  if (fts_package_paths == NULL) {
-    fts_init_package_paths();
+  /* locate the directory of the package */
+  if (!fts_find_file(NULL, fts_get_package_paths(), fts_symbol_name(name), path, MAXPATHLEN) 
+      || !fts_is_directory(path)) {
+    fts_log("[package]: Couldn't find package %s\n", fts_symbol_name(name));
+    pkg = fts_package_new(name);
+    pkg->state = fts_package_corrupt;
+    return pkg;
   }
   
-  return fts_package_paths;
+  /* load the definition file */
+  sprintf(filename, "%s%c%s.jmax", path, fts_file_separator, fts_symbol_name(name));
+
+  if (fts_file_exists(filename)) {
+    pkg = fts_package_load_from_file(name, filename);
+  } else {
+    fts_log("[package]: No package definition for %s package\n", fts_symbol_name(name));
+    pkg = fts_package_new(name);
+    pkg->state = fts_package_defined;
+    pkg->name = name;
+    pkg->dir = fts_new_symbol_copy(path);
+  }
+  
+  /* load the default files */
+  fts_package_load_default_files(pkg);
+  
+  return pkg;
+}
+
+fts_package_t* 
+fts_package_get(fts_symbol_t name)
+{
+  fts_package_t* pkg;
+  fts_atom_t n, p;
+
+  fts_set_symbol(&n, name);
+
+  if (fts_hashtable_get(&fts_packages, &n, &p)) {
+    return fts_get_ptr(&p);
+  } else {
+    /* try to load it */
+    pkg = fts_package_load(name);
+
+    fts_set_ptr(&p, pkg);
+    fts_hashtable_put(&fts_packages, &n, &p);    
+
+    return pkg;
+  }
 }
 
 /***********************************************
@@ -323,424 +247,6 @@ fts_package_pop(fts_package_t* pkg)
   if (fts_package_stack_top > 0) {
     fts_package_stack[--fts_package_stack_top] = NULL;
   }
-}
-
-/***********************************************
- *
- *  Package class 
- */
-
-static fts_status_t
-fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init(cl, sizeof(fts_package_t), 1, 0, 0);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, __fts_package_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, __fts_package_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_print, __fts_package_print);
-
-  fts_method_define_varargs(cl, 0, fts_s_require, __fts_package_require);
-  fts_method_define_varargs(cl, 0, fts_s_template, __fts_package_template);
-  fts_method_define_varargs(cl, 0, fts_s_template_path, __fts_package_template_path);
-  fts_method_define_varargs(cl, 0, fts_s_abstraction, __fts_package_abstraction);
-  fts_method_define_varargs(cl, 0, fts_s_abstraction_path, __fts_package_abstraction_path);
-  fts_method_define_varargs(cl, 0, fts_s_data_path, __fts_package_data_path);
-  fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
-
-  /* All these methods are also defined for SystemInlet, as fts_bmax_save_message
-     allows only messages to SystemInlet... 
-  */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_require, __fts_package_require);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_template, __fts_package_template);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_template_path, __fts_package_template_path);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction, __fts_package_abstraction);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction_path, __fts_package_abstraction_path);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_data_path, __fts_package_data_path);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
-
-  return fts_Success;
-}
-
-/***********************************************
- *
- *  Package object: implemetation of fts methods 
- */
-
-void 
-__fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-
-  ac--;
-  at++;
-
-  if ((ac > 0) && fts_is_symbol(at)) { 
-    pkg->name = fts_get_symbol(at);
-  } else {
-    pkg->name = NULL;
-  }
-  pkg->dir = NULL;
-  pkg->state = fts_package_defined;
-  pkg->error = NULL;
-  pkg->patcher = NULL;
-  pkg->packages = NULL;
-  pkg->classes = NULL;
-
-  pkg->declared_templates = NULL;
-  pkg->templates_in_path = NULL;
-  pkg->template_paths = NULL;
-
-  pkg->declared_abstractions = NULL;
-  pkg->abstractions_in_path = NULL;
-  pkg->abstraction_paths = NULL;
-
-  pkg->help = NULL;
-  pkg->data_paths = NULL;
-}
-
-void 
-__fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  if (pkg->packages != NULL) {
-    fts_list_delete(pkg->packages);
-  }
-  if (pkg->data_paths != NULL) {
-    fts_list_delete(pkg->data_paths);
-  }
-  if (pkg->classes != NULL) {
-    fts_hashtable_destroy(pkg->classes);
-  }
-  if (pkg->declared_templates != NULL) {
-    fts_hashtable_destroy(pkg->declared_templates);
-  }
-  if (pkg->templates_in_path != NULL) {
-    fts_hashtable_destroy(pkg->templates_in_path);
-  }
-  if (pkg->template_paths != NULL) {
-    fts_list_delete(pkg->template_paths);
-  }
-  if (pkg->declared_abstractions != NULL) {
-    fts_hashtable_destroy(pkg->declared_abstractions);
-  }
-  if (pkg->abstractions_in_path != NULL) {
-    fts_hashtable_destroy(pkg->abstractions_in_path);
-  }
-  if (pkg->abstraction_paths != NULL) {
-    fts_list_delete(pkg->abstraction_paths);
-  }
-  if (pkg->help != NULL) {
-    fts_hashtable_destroy(pkg->help);
-  }
-  if (pkg->patcher != NULL) {
-    fts_object_destroy(pkg->patcher);
-  }
-}
-
-static void 
-__fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  int i;
-
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      fts_package_require(pkg, fts_get_symbol(&at[i]));
-    }
-  }
-}
-
-static void 
-__fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-
-  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
-    fts_package_add_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
-  }
-}
-
-static void 
-__fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  int i;
-
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      fts_package_add_template_path(pkg, fts_get_symbol(&at[i]));
-    }
-  }
-}
-
-static void 
-__fts_package_abstraction(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-
-  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
-    fts_package_add_abstraction(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
-  }
-}
-
-static void 
-__fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  int i;
-
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      fts_package_add_abstraction_path(pkg, fts_get_symbol(&at[i]));
-    }
-  }
-}
-
-static void 
-__fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t* pkg = (fts_package_t *)o;
-  int i;
-  
-  for (i = 0; i < ac; i++) {
-    if (fts_is_symbol(&at[i])) {
-      fts_package_add_data_path(pkg, fts_get_symbol(&at[i]));
-    }
-  }
-}
-
-static int fts_package_save_list_aux( fts_bmax_file_t *f, fts_list_t *list)
-{
-  int r;
-
-  if (!list)
-    return 0;
-
-  r = fts_package_save_list_aux( f, fts_list_next( list));
-
-  fts_bmax_code_push_symbol( f, fts_get_symbol( fts_list_get( list)));
-
-  return r+1;
-}
-
-static void fts_package_save_list( fts_bmax_file_t *f, fts_list_t *list, fts_symbol_t selector)
-{
-  int ac;
-
-  ac = fts_package_save_list_aux( f, list);
-  fts_bmax_code_obj_mess( f, fts_SystemInlet, selector, ac);
-  fts_bmax_code_pop_args( f, ac);
-}
-
-static void fts_package_save_hashtable( fts_bmax_file_t *f, fts_hashtable_t *ht, fts_symbol_t selector, void (*fun)(fts_atom_t *))
-{
-  fts_iterator_t keys, values;
-
-  fts_hashtable_get_keys( ht, &keys);
-  fts_hashtable_get_values( ht, &values);
-
-  while ( fts_iterator_has_more( &keys))
-    {
-      fts_atom_t a[2];
-
-      fts_iterator_next( &keys, a);
-      fts_iterator_next( &values, a+1);
-
-      if (fun != NULL)
-	(*fun)(a+1);
-
-      fts_bmax_save_message( f, selector, 2, a);
-    }
-}
-
-static void fun_template( fts_atom_t *a)
-{
-  fts_template_t *template = (fts_template_t *)fts_get_ptr( a);
-
-  fts_set_symbol( a, fts_template_get_original_filename( template));
-}
-
-static void fun_abstraction( fts_atom_t *a)
-{
-  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_ptr( a);
-
-  /* Must be done the same way as in templates */
-/*    fts_set_symbol( a, fts_abstraction_get_original_filename( template)); */
-}
-
-static void 
-__fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t *this = (fts_package_t *)o;
-  fts_bmax_file_t f;
-  const char *filename;
-
-  if (ac == 0) {
-    post( "No filename specified\n");    
-    return;
-  }
-
-  filename = fts_symbol_name( fts_get_symbol( at));
-
-  if (fts_bmax_file_open( &f, filename, 0, 0, 0) < 0)
-    {
-      post( "Cannot open file %s\n", filename);
-      return;
-    }
-
-  fts_bmax_code_new_object( &f, o, -1);
-
-  if ( this->packages) {
-    fts_package_save_list( &f, this->packages, fts_s_require);
-  }
-  if ( this->template_paths) {
-    fts_package_save_list( &f, this->template_paths, fts_s_template_path);
-  }
-  if ( this->abstraction_paths) {
-    fts_package_save_list( &f, this->abstraction_paths, fts_s_abstraction_path);
-  }
-  if ( this->data_paths) {
-    fts_package_save_list( &f, this->data_paths, fts_s_data_path);
-  }
-
-  if ( this->declared_templates) {
-    fts_package_save_hashtable( &f, this->declared_templates, fts_s_template, fun_template);
-  }
-  if ( this->declared_abstractions) {
-    fts_package_save_hashtable( &f, this->declared_abstractions, fts_s_abstraction, fun_abstraction);
-  }
-  if ( this->help) {
-    fts_package_save_hashtable( &f, this->help, fts_s_help, NULL);
-  }
-
-  fts_bmax_code_return( &f);
-
-  fts_bmax_file_close( &f);
-}
-
-
-static void fts_package_print_list_aux( fts_list_t *list)
-{
-  if (!list)
-    return;
-
-  post( " %s", fts_symbol_name( fts_get_symbol( fts_list_get( list))));
-
-  fts_package_print_list_aux( fts_list_next( list));
-}
-
-static void fts_package_print_list( fts_list_t *list, fts_symbol_t selector)
-{
-  post( "  %s", fts_symbol_name( selector));
-
-  fts_package_print_list_aux( list);
-
-  post( "\n");
-}
-
-static void fts_package_print_hashtable( fts_hashtable_t *ht, fts_symbol_t selector, void (*fun)(fts_atom_t *))
-{
-  const char *msg = fts_symbol_name( selector);
-  fts_iterator_t keys, values;
-
-  fts_hashtable_get_keys( ht, &keys);
-  fts_hashtable_get_values( ht, &values);
-
-  while ( fts_iterator_has_more( &keys))
-    {
-      fts_atom_t a[2];
-
-      fts_iterator_next( &keys, a);
-      fts_iterator_next( &values, a+1);
-
-      if (fun != NULL)
-	(*fun)(a+1);
-
-      post( "  %s %s %s\n", msg, fts_symbol_name( fts_get_symbol( a)), fts_symbol_name( fts_get_symbol( a+1)));
-    }
-}
-
-static void 
-__fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_package_t *this = (fts_package_t *)o;
-
-  post( "package %s:\n", fts_symbol_name( fts_package_get_name( this)));
-
-  if ( this->packages) {
-    fts_package_print_list( this->packages, fts_s_require);
-  }
-  if ( this->template_paths) {
-    fts_package_print_list( this->template_paths, fts_s_template_path);
-  }
-  if ( this->abstraction_paths) {
-    fts_package_print_list( this->abstraction_paths, fts_s_abstraction_path);
-  }
-  if ( this->data_paths) {
-    fts_package_print_list( this->data_paths, fts_s_data_path);
-  }
-
-  if ( this->declared_templates) {
-    fts_package_print_hashtable( this->declared_templates, fts_s_template, fun_template);
-  }
-  if ( this->declared_abstractions) {
-    fts_package_print_hashtable( this->declared_abstractions, fts_s_abstraction, fun_abstraction);
-  }
-  if ( this->help) {
-    fts_package_print_hashtable( this->help, fts_s_help, NULL);
-  }
-}
-
-/***********************************************
- * 
- *  package object: old methods 
- */
-
-fts_package_t* 
-fts_package_new(fts_symbol_t name)
-{
-  fts_atom_t a[1];
-  
-  fts_set_symbol(&a[0], name);
-  return (fts_package_t *) fts_object_create(fts_package_class, 1, a);
-}
-
-void 
-fts_package_delete(fts_package_t* pkg)
-{
-  fts_object_destroy( (fts_object_t*) pkg);
-}
-
-
-fts_symbol_t 
-fts_package_get_name(fts_package_t* pkg)
-{
-  return pkg->name;
-}
-
-fts_symbol_t 
-fts_package_get_dir(fts_package_t* pkg)
-{
-  return pkg->dir;
-}
-
-fts_package_state_t 
-fts_package_get_state(fts_package_t* pkg)
-{
-  return pkg->state;
-}
-
-void 
-fts_package_set_state(fts_package_t* pkg, fts_package_state_t s)
-{
-  pkg->state = s;
-}
-
-char* 
-fts_package_get_error(fts_package_t* pkg)
-{
-  return pkg->error;
 }
 
 /********************************************************************
@@ -848,7 +354,8 @@ fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t fil
     }
 }
 
-void fts_package_add_template_path(fts_package_t* pkg, fts_symbol_t path)
+void 
+fts_package_add_template_path(fts_package_t* pkg, fts_symbol_t path)
 {
   fts_atom_t n;
 
@@ -1166,7 +673,8 @@ fts_package_get_data_file(fts_package_t* pkg, fts_symbol_t filename, char *buf, 
  *   - help
  */
 
-void fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
+void 
+fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
 {
   fts_atom_t n, p;
 
@@ -1180,6 +688,446 @@ void fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t fi
   fts_hashtable_put(pkg->help, &n, &p);
 }
 
+/***********************************************
+ *
+ *  print and save utilities for methods
+ */
+
+static void 
+fun_template( fts_atom_t *a)
+{
+  fts_template_t *template = (fts_template_t *)fts_get_ptr( a);
+
+  fts_set_symbol( a, fts_template_get_original_filename( template));
+}
+
+static void 
+fun_abstraction( fts_atom_t *a)
+{
+  fts_abstraction_t *abstraction = (fts_abstraction_t *)fts_get_ptr( a);
+
+  /* Must be done the same way as in templates */
+/*    fts_set_symbol( a, fts_abstraction_get_original_filename( template)); */
+}
+
+static int 
+fts_package_save_list_aux( fts_bmax_file_t *f, fts_list_t *list)
+{
+  int r;
+
+  if (!list)
+    return 0;
+
+  r = fts_package_save_list_aux( f, fts_list_next( list));
+
+  fts_bmax_code_push_symbol( f, fts_get_symbol( fts_list_get( list)));
+
+  return r+1;
+}
+
+static void 
+fts_package_save_list( fts_bmax_file_t *f, fts_list_t *list, fts_symbol_t selector)
+{
+  int ac;
+
+  ac = fts_package_save_list_aux( f, list);
+  fts_bmax_code_obj_mess( f, fts_SystemInlet, selector, ac);
+  fts_bmax_code_pop_args( f, ac);
+}
+
+static void 
+fts_package_save_hashtable( fts_bmax_file_t *f, fts_hashtable_t *ht, fts_symbol_t selector, void (*fun)(fts_atom_t *))
+{
+  fts_iterator_t keys, values;
+
+  fts_hashtable_get_keys( ht, &keys);
+  fts_hashtable_get_values( ht, &values);
+
+  while ( fts_iterator_has_more( &keys))
+    {
+      fts_atom_t a[2];
+
+      fts_iterator_next( &keys, a);
+      fts_iterator_next( &values, a+1);
+
+      if (fun != NULL)
+	(*fun)(a+1);
+
+      fts_bmax_save_message( f, selector, 2, a);
+    }
+}
+
+static void 
+fts_package_print_list_aux( fts_list_t *list)
+{
+  if (!list)
+    return;
+
+  post( " %s", fts_symbol_name( fts_get_symbol( fts_list_get( list))));
+
+  fts_package_print_list_aux( fts_list_next( list));
+}
+
+static void 
+fts_package_print_list( fts_list_t *list, fts_symbol_t selector)
+{
+  post( "  %s", fts_symbol_name( selector));
+
+  fts_package_print_list_aux( list);
+
+  post( "\n");
+}
+
+static void 
+fts_package_print_hashtable( fts_hashtable_t *ht, fts_symbol_t selector, void (*fun)(fts_atom_t *))
+{
+  const char *msg = fts_symbol_name( selector);
+  fts_iterator_t keys, values;
+
+  fts_hashtable_get_keys( ht, &keys);
+  fts_hashtable_get_values( ht, &values);
+
+  while ( fts_iterator_has_more( &keys))
+    {
+      fts_atom_t a[2];
+
+      fts_iterator_next( &keys, a);
+      fts_iterator_next( &values, a+1);
+
+      if (fun != NULL)
+	(*fun)(a+1);
+
+      post( "  %s %s %s\n", msg, fts_symbol_name( fts_get_symbol( a)), fts_symbol_name( fts_get_symbol( a+1)));
+    }
+}
+
+/***********************************************
+ *
+ *  methods 
+ */
+
+static void 
+__fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_require(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+static void 
+__fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
+    fts_package_add_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
+  }
+}
+
+static void 
+__fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_add_template_path(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+static void 
+__fts_package_abstraction(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
+    fts_package_add_abstraction(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
+  }
+}
+
+static void 
+__fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_add_abstraction_path(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+static void 
+__fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  int i;
+  
+  for (i = 0; i < ac; i++) {
+    if (fts_is_symbol(&at[i])) {
+      fts_package_add_data_path(pkg, fts_get_symbol(&at[i]));
+    }
+  }
+}
+
+static void 
+__fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
+    fts_package_add_help(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
+  }
+}
+
+static void 
+__fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *this = (fts_package_t *)o;
+  fts_bmax_file_t f;
+  const char *filename;
+
+  if (ac == 0) {
+    post( "No filename specified\n");    
+    return;
+  }
+
+  filename = fts_symbol_name( fts_get_symbol( at));
+
+  if (fts_bmax_file_open( &f, filename, 0, 0, 0) < 0)
+    {
+      post( "Cannot open file %s\n", filename);
+      return;
+    }
+
+  fts_bmax_code_new_object( &f, o, -1);
+
+  if ( this->packages) {
+    fts_package_save_list( &f, this->packages, fts_s_require);
+  }
+  if ( this->template_paths) {
+    fts_package_save_list( &f, this->template_paths, fts_s_template_path);
+  }
+  if ( this->abstraction_paths) {
+    fts_package_save_list( &f, this->abstraction_paths, fts_s_abstraction_path);
+  }
+  if ( this->data_paths) {
+    fts_package_save_list( &f, this->data_paths, fts_s_data_path);
+  }
+
+  if ( this->declared_templates) {
+    fts_package_save_hashtable( &f, this->declared_templates, fts_s_template, fun_template);
+  }
+  if ( this->declared_abstractions) {
+    fts_package_save_hashtable( &f, this->declared_abstractions, fts_s_abstraction, fun_abstraction);
+  }
+  if ( this->help) {
+    fts_package_save_hashtable( &f, this->help, fts_s_help, NULL);
+  }
+
+  fts_bmax_code_return( &f);
+
+  fts_bmax_file_close( &f);
+}
+
+static void 
+__fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *this = (fts_package_t *)o;
+
+  post( "package %s:\n", fts_symbol_name( fts_package_get_name( this)));
+
+  if ( this->packages) {
+    fts_package_print_list( this->packages, fts_s_require);
+  }
+  if ( this->template_paths) {
+    fts_package_print_list( this->template_paths, fts_s_template_path);
+  }
+  if ( this->abstraction_paths) {
+    fts_package_print_list( this->abstraction_paths, fts_s_abstraction_path);
+  }
+  if ( this->data_paths) {
+    fts_package_print_list( this->data_paths, fts_s_data_path);
+  }
+
+  if ( this->declared_templates) {
+    fts_package_print_hashtable( this->declared_templates, fts_s_template, fun_template);
+  }
+  if ( this->declared_abstractions) {
+    fts_package_print_hashtable( this->declared_abstractions, fts_s_abstraction, fun_abstraction);
+  }
+  if ( this->help) {
+    fts_package_print_hashtable( this->help, fts_s_help, NULL);
+  }
+}
+
+/***********************************************
+ *
+ *  Package class 
+ */
+
+void 
+__fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  ac--;
+  at++;
+
+  if ((ac > 0) && fts_is_symbol(at)) { 
+    pkg->name = fts_get_symbol(at);
+  } else {
+    pkg->name = NULL;
+  }
+  pkg->dir = NULL;
+  pkg->state = fts_package_defined;
+  pkg->error = NULL;
+  pkg->patcher = NULL;
+  pkg->packages = NULL;
+  pkg->classes = NULL;
+
+  pkg->declared_templates = NULL;
+  pkg->templates_in_path = NULL;
+  pkg->template_paths = NULL;
+
+  pkg->declared_abstractions = NULL;
+  pkg->abstractions_in_path = NULL;
+  pkg->abstraction_paths = NULL;
+
+  pkg->help = NULL;
+  pkg->data_paths = NULL;
+}
+
+void 
+__fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+  if (pkg->packages != NULL) {
+    fts_list_delete(pkg->packages);
+  }
+  if (pkg->data_paths != NULL) {
+    fts_list_delete(pkg->data_paths);
+  }
+  if (pkg->classes != NULL) {
+    fts_hashtable_destroy(pkg->classes);
+  }
+  if (pkg->declared_templates != NULL) {
+    fts_hashtable_destroy(pkg->declared_templates);
+  }
+  if (pkg->templates_in_path != NULL) {
+    fts_hashtable_destroy(pkg->templates_in_path);
+  }
+  if (pkg->template_paths != NULL) {
+    fts_list_delete(pkg->template_paths);
+  }
+  if (pkg->declared_abstractions != NULL) {
+    fts_hashtable_destroy(pkg->declared_abstractions);
+  }
+  if (pkg->abstractions_in_path != NULL) {
+    fts_hashtable_destroy(pkg->abstractions_in_path);
+  }
+  if (pkg->abstraction_paths != NULL) {
+    fts_list_delete(pkg->abstraction_paths);
+  }
+  if (pkg->help != NULL) {
+    fts_hashtable_destroy(pkg->help);
+  }
+  if (pkg->patcher != NULL) {
+    fts_object_destroy(pkg->patcher);
+  }
+}
+
+static fts_status_t
+fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_package_t), 1, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, __fts_package_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, __fts_package_delete);
+
+  fts_method_define_varargs(cl, 0, fts_s_print, __fts_package_print);
+
+  fts_method_define_varargs(cl, 0, fts_s_require, __fts_package_require);
+  fts_method_define_varargs(cl, 0, fts_s_template, __fts_package_template);
+  fts_method_define_varargs(cl, 0, fts_s_template_path, __fts_package_template_path);
+  fts_method_define_varargs(cl, 0, fts_s_abstraction, __fts_package_abstraction);
+  fts_method_define_varargs(cl, 0, fts_s_abstraction_path, __fts_package_abstraction_path);
+  fts_method_define_varargs(cl, 0, fts_s_data_path, __fts_package_data_path);
+  fts_method_define_varargs(cl, 0, fts_s_help, __fts_package_help);
+  fts_method_define_varargs(cl, 0, fts_s_save, __fts_package_save);
+
+  /* All these methods are also defined for SystemInlet, as fts_bmax_save_message
+     allows only messages to SystemInlet... 
+  */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_require, __fts_package_require);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_template, __fts_package_template);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_template_path, __fts_package_template_path);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction, __fts_package_abstraction);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction_path, __fts_package_abstraction_path);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_data_path, __fts_package_data_path);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
+
+  return fts_Success;
+}
+
+/***********************************************
+ * 
+ *  package object: old methods 
+ */
+
+fts_package_t* 
+fts_package_new(fts_symbol_t name)
+{
+  fts_atom_t a[1];
+  
+  fts_set_symbol(&a[0], name);
+  return (fts_package_t *) fts_object_create(fts_package_class, 1, a);
+}
+
+void 
+fts_package_delete(fts_package_t* pkg)
+{
+  fts_object_destroy( (fts_object_t*) pkg);
+}
+
+
+fts_symbol_t 
+fts_package_get_name(fts_package_t* pkg)
+{
+  return pkg->name;
+}
+
+fts_symbol_t 
+fts_package_get_dir(fts_package_t* pkg)
+{
+  return pkg->dir;
+}
+
+fts_package_state_t 
+fts_package_get_state(fts_package_t* pkg)
+{
+  return pkg->state;
+}
+
+void 
+fts_package_set_state(fts_package_t* pkg, fts_package_state_t s)
+{
+  pkg->state = s;
+}
+
+char* 
+fts_package_get_error(fts_package_t* pkg)
+{
+  return pkg->error;
+}
 
 /***************************************************
  *
@@ -1220,3 +1168,58 @@ static fts_status_t loader_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   return fts_Success;
 }
 
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
+void 
+fts_kernel_package_init(void)
+{
+  fts_symbol_t system_symbol;
+  fts_atom_t a, p;
+  int i;
+
+  for (i = 0; i < PACKAGE_STACK_SIZE; i++) {
+    fts_package_stack[i] = NULL;
+  }
+
+  fts_hashtable_init(&fts_packages, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_MEDIUM);
+
+  /* create the system package */
+  system_symbol = fts_new_symbol("_system_");
+  fts_s_package = fts_new_symbol("package");
+  fts_set_symbol(&a, fts_s_package);
+
+  /* since we need a class to construct a package and a package to
+     find a class, we have to do some non standard hacking to
+     bootstrap the system */
+  fts_system_package = fts_calloc(sizeof(fts_package_t));
+
+  fts_system_package->object.head.cl = 0;
+  fts_system_package->object.head.id = FTS_NO_ID;
+  fts_system_package->object.properties = 0;
+  fts_system_package->object.varname = 0;
+  fts_system_package->object.refcnt = 0;
+  fts_system_package->object.out_conn = 0;
+  fts_system_package->object.in_conn = (fts_connection_t **) fts_calloc(sizeof(fts_connection_t *));
+  
+  __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 1, &a); 
+  fts_package_set_state(fts_system_package, fts_package_loaded); 
+
+  fts_set_ptr(&p, fts_system_package);
+  fts_hashtable_put(&fts_packages, &a, &p);
+
+  fts_package_push(fts_system_package);
+
+  /* now that there's a system package, we can define the package
+     (meta-) class */
+  fts_metaclass_install(fts_s_package, fts_package_instantiate, fts_always_equiv);
+
+  /* update the system package with the correct class */
+  fts_package_class = fts_class_get_by_name(fts_s_package);
+  fts_system_package->object.head.cl = fts_package_class;
+
+  /* Debug code */
+  fts_class_install( fts_new_symbol( "loader"), loader_instantiate);
+}

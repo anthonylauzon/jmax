@@ -63,6 +63,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/expression.h>
+#include <ftsprivate/variable.h>
 #include <ftsprivate/symbol.h>
 #include <ftsprivate/patcher.h>
 
@@ -935,7 +936,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	      fts_symbol_t varname;
 
 	      varname = fts_get_symbol(tos);
-	      value = fts_variable_get_value(e->scope, varname);
+	      value = fts_variable_get_value_or_void(e->scope, varname);
 
 	      if (value)
 		{
@@ -1138,7 +1139,7 @@ static int fts_op_eval(fts_expression_state_t *e)
 	      fts_symbol_t varname = fts_get_symbol(tos);
 	      fts_atom_t *value;
 
-	      value = fts_variable_get_value((fts_patcher_t *)obj, varname);
+	      value = fts_variable_get_value_or_void((fts_patcher_t *)obj, varname);
 
 	      if (value)
 		{

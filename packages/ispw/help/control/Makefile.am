@@ -4,18 +4,12 @@ help_DATA=\
  Rsend.help.jmax \
  abs.help.jmax \
  accum.help.jmax \
- at.help.jmax \
  bag.help.jmax \
  bangbang.help.jmax \
- bendin.help.jmax \
- bendout.help.jmax \
- bpe.help.jmax \
  change.help.jmax \
  clip.help.jmax \
  clock.help.jmax \
  control.help.index.tcl \
- ctlin.help.jmax \
- ctlout.help.jmax \
  delay.help.jmax \
  drunk.help.jmax \
  expr.help.jmax \
@@ -31,23 +25,14 @@ help_DATA=\
  loadbang.help.jmax \
  makenote.help.jmax \
  metro.help.jmax \
- midiformat.help.jmax \
- midiin.help.jmax \
- midiout.help.jmax \
- midiparse.help.jmax \
  mtof.help.jmax \
- notein.help.jmax \
- noteout.help.jmax \
  pack.help.jmax \
  pbank.help.jmax \
- pgmin.help.jmax \
- pgmout.help.jmax \
  pipe.help.jmax \
  poly.help.jmax \
  prepend.help.jmax \
  random.help.jmax \
  route.help.jmax \
- rtin.help.jmax \
  scale.help.jmax \
  select.help.jmax \
  speedlim.help.jmax \
@@ -55,12 +40,9 @@ help_DATA=\
  stripnote.help.jmax \
  sustain.help.jmax \
  swap.help.jmax \
- sysexin.help.jmax \
  table.help.jmax \
  time.help.jmax \
  timer.help.jmax \
- touchin.help.jmax \
- touchout.help.jmax \
  trigger.help.jmax \
  unpack.help.jmax \
  value.help.jmax \

@@ -156,12 +156,13 @@ midiin_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **por
 	  at++;
 	  
 	  /* grab midiport argument in init (o != 0) only */
-	  if (o != NULL) {
-	    if(fts_object_is_midiport(obj) && fts_midiport_is_input((fts_midiport_t *)obj))
-	      *port = (fts_midiport_t *)obj;	  
-	    else
-	      return 0;
-	  }
+	  if (o != NULL) 
+	    {
+	      if(fts_object_is_midiport(obj) && fts_midiport_is_input((fts_midiport_t *)obj))
+		*port = (fts_midiport_t *)obj;	  
+	      else
+		return 0;
+	    }
 	}
 
       if(ac == 2)

@@ -760,7 +760,8 @@ FTS_API void fts_midiport_set_default_class( fts_symbol_t name);
 enum parser_status 
 {
   status_normal,
-  status_sysex, 
+  status_sysex_head, 
+  status_sysex_byte, 
   status_sysex_realtime,
   status_sysex_mtc, 
   status_sysex_mtc_frame, 

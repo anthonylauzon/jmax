@@ -29,14 +29,8 @@
 typedef struct _sysex_
 {
   fts_object_t o;
-  int mode;
-  int head;
   fts_midiport_t *port;
 } sysex_t;
-
-static fts_symbol_t sym_id = 0;
-static fts_symbol_t sym_real_time = 0;
-static fts_symbol_t sym_non_real_time = 0;
 
 /************************************************************
  *

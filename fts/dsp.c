@@ -134,6 +134,16 @@ dsp_set_on(void *listener, fts_symbol_t name, const fts_atom_t *value)
  *
  */
 
+void
+fts_dsp_restart(void)
+{
+  if(fts_dsp_graph_is_compiled(&main_dsp_graph))
+    {
+      fts_dsp_graph_reset(&main_dsp_graph);      
+      fts_dsp_graph_compile(&main_dsp_graph);
+    }
+}
+
 int
 fts_dsp_is_running(void)
 {
@@ -164,7 +174,8 @@ fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *))
   ftl_declare_function( name, w);
 }
 
-static void sig_dummy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+sig_dummy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
 }
 

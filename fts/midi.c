@@ -35,15 +35,20 @@
  * Definition of the MIDI status bytes 
  */
 #define MASK_CHANNEL_MESSAGE 0x80
+
 #define STATUS_BYTE_SYSEX 0xf0
 #define STATUS_BYTE_QUARTER_FRAME 0xf1
+#define STATUS_BYTE_SONG_POSITION_POINTER 0xf2
+#define STATUS_BYTE_SONG_SELECT 0xf3
+
+#define STATUS_BYTE_TUNE_REQUEST 0xf7
 #define STATUS_BYTE_SYSEX_END 0xf7
 #define STATUS_BYTE_REALTIME_TIMING_CLOCK 0xf8
-#define STATUS_BYTE_REALTIME_TIMING_TICK
+
 #define STATUS_BYTE_REALTIME_START 0xfa
 #define STATUS_BYTE_REALTIME_CONTINUE 0xfb
 #define STATUS_BYTE_REALTIME_STOP 0xfc
-#define STATUS_BYTE_REALTIME_UNDEFINED 0xfd
+
 #define STATUS_BYTE_REALTIME_ACTIVE_SENSING 0xfe
 #define STATUS_BYTE_REALTIME_SYSTEM_RESET 0xff
 
@@ -52,7 +57,6 @@
 
 #define RANGE_CH(n) (((n) < 1)? 1: (((n) > 16)? 16: (n)))
 #define RANGE_VALUE(n) (((n) < 0)? 0: (((n) > 127)? 127: (n)))
-
 
 #define SYSEX_BLOCK_SIZE 512
 
@@ -155,12 +159,17 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
       switch (byte)
 	{
 	case STATUS_BYTE_QUARTER_FRAME:
+
 	  parser->status = status_mtc_quarter_frame;
 	  break;
+
 	case STATUS_BYTE_SYSEX:
-	  parser->status = status_sysex;
+
+	  parser->status = status_sysex_head;
 	  break;
+
 	default:
+
 	  if(byte & MASK_CHANNEL_MESSAGE)
 	    {
 	      parser->message = (byte >> 4) & 7;
@@ -253,7 +262,61 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
       
       break;
       
-    case status_sysex:
+    case status_sysex_head:
+      
+      switch (byte)
+	{
+	case STATUS_BYTE_SYSEX_END:
+
+	  /* end of sysex */
+	  parser->status = status_normal;
+	  
+	  break;
+	  
+	case STATUS_BYTE_SYSEX_REALTIME:
+	  parser->status = status_sysex_realtime;
+	  
+	  break;
+	  
+	default:
+	  /* send vendor or sysex non real-time id */
+	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
+	  parser->status = status_sysex_byte;
+	}
+
+      break;
+	  
+    case status_sysex_realtime:
+      
+      switch (byte)
+	{
+	case STATUS_BYTE_SYSEX_END:
+	  
+	  /* end of sysex */
+	  parser->status = status_normal;
+	  
+	  /* send sysex block */
+	  fts_midiport_input_system_exclusive_call(port, 0.0);
+
+	  break;
+	  
+	case 0x01:
+	  
+	  /* start sysex mtc block */
+      	  parser->status = status_sysex_mtc;
+	  break;
+	  
+	default:
+
+	  /* send sysex real-time id and byte */
+	  fts_midiport_input_system_exclusive_byte(port, (int)STATUS_BYTE_SYSEX_REALTIME);
+	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
+      	  parser->status = status_sysex_byte;
+	}
+
+      break;
+      
+    case status_sysex_byte:
       
       switch (byte)
 	{
@@ -267,58 +330,29 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
 
 	  break;
 	  
-	case STATUS_BYTE_SYSEX_REALTIME:
-	  parser->status = status_sysex_realtime;
+	default:
+	  /* send vendor or sysex non real-time id */
+	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
+	}
+
+      break;
 	  
+    case status_sysex_mtc:
+      
+      switch (byte)
+	{
+	case 0x01:
+
+	  parser->mtc_frame_count  = 0;
+	  parser->status = status_sysex_mtc_frame;
 	  break;
 	  
 	default:
-	  break;
-	}
-
-      break;
-	  
-    case status_sysex_realtime:
-      
-      if(byte == STATUS_BYTE_SYSEX_END)
-	{
-	  /* end of sysex */
+	  /* MTC format error */
 	  parser->status = status_normal;
-	  
-	  /* send sysex block */
-	  fts_midiport_input_system_exclusive_call(port, 0.0);
-	}
-      else if (byte == 0x01)
-	{
-      	  parser->status = status_sysex_mtc;
 
-	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
 	}
-      else
-	fts_midiport_input_system_exclusive_byte(port, (int)byte);
 
-      break;
-      
-    case status_sysex_mtc:
-      
-      if(byte == STATUS_BYTE_SYSEX_END)
-	{
-	  /* end of sysex */
-	  parser->status = status_normal;
-	  
-	  /* send sysex block */
-	  fts_midiport_input_system_exclusive_call(port, 0.0);
-	}
-      else if (byte == 0x01)
-	{
-	  parser->status = status_sysex_mtc_frame;
-	  parser->mtc_frame_count  = 0;
-
-	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
-	}
-      else
-	fts_midiport_input_system_exclusive_byte(port, (int)byte);
-      
       break;
       
     case status_sysex_mtc_frame:
@@ -351,12 +385,7 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
 
 	  /* end of sysex */
 	  parser->status = status_normal;
-	  
-	  /* send sysex block */
-	  fts_midiport_input_system_exclusive_call(port, 0.0);
 	}
-      else
-	fts_midiport_input_system_exclusive_byte(port, (int)byte);
 	  
       break;
 	  

@@ -65,29 +65,38 @@ sequence_get_track_by_index(sequence_t *sequence, int index)
   return track;
 }
 
-void
-sequence_add_track(sequence_t *sequence, track_t *track)
+static void
+sequence_insert_track(sequence_t *sequence, track_t *here, track_t *track)
 {
-  if(!sequence->tracks)
+  if(!here)
     {
       /* first track */
+      track->next = sequence->tracks;      
       sequence->tracks = track;
       sequence->size = 1;
     }
   else
     {
-      /* append at end */
-      track_t *last = sequence->tracks;
-
-      while(last->next)
-	last = last->next;
-
-      last->next = track;
+      /* insert after track here */
+      track->next = here->next;
+      here->next = track;
       sequence->size++;
     }
-  
+
+  fts_object_refer((fts_object_t *)track);
+
   track->sequence = sequence;
-  track->next = 0;
+}
+
+void
+sequence_add_track(sequence_t *sequence, track_t *track)
+{
+  track_t *last = sequence->tracks;
+
+  while(last && last->next)
+    last = last->next;
+  
+  sequence_insert_track(sequence, last, track);
 }
 
 void
@@ -98,6 +107,8 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
       /* first track */
       sequence->tracks = track->next;
       sequence->size--;
+
+      fts_object_release((fts_object_t *)track);
     }
   else
     {
@@ -114,6 +125,8 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
 	{
 	  prev->next = this->next;
 	  sequence->size--;	  
+
+	  fts_object_release((fts_object_t *)track);
 	}
     }
 }
@@ -121,23 +134,48 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
 static void
 sequence_move_track(sequence_t *sequence, track_t *track, int index)
 {
-  sequence_remove_track(sequence, track);
-
-  if(index == 0)
+  track_t *here = sequence_get_track_by_index(sequence, index - 1);
+    
+  if(track != here && (index == 0 || here))
     {
-      track->next = sequence->tracks;
-      sequence->tracks = track;
-    }
-  else
-    {
-      track_t *before = sequence_get_track_by_index(sequence, index - 1);
+      fts_object_refer((fts_object_t *)track);
+      
+      sequence_remove_track(sequence, track);
+      sequence_insert_track(sequence, 0, track);
 
-      if(before)
-	{
-	  track->next = before->next;
-	  before->next = track;
-	}
+      fts_object_release((fts_object_t *)track);
     }
+}
+
+static void
+sequence_array_update(sequence_t *this)
+{
+  track_t *track = sequence_get_first_track(this);
+  
+  fts_array_set_size(&this->array, 0);
+
+  while(track)
+    {
+      fts_atom_t a;
+
+      fts_set_object_with_type(&a, (fts_object_t *)track, seqsym_eventtrk);
+      fts_array_append(&this->array, 1, &a);
+
+      track = track_get_next(track);
+    }
+
+  fts_object_redefine_variable((fts_object_t *)this);
+}
+
+static void
+sequence_array_append(sequence_t *this, track_t *track)
+{
+  fts_atom_t a;
+
+  fts_set_object_with_type(&a, (fts_object_t *)track, seqsym_eventtrk);
+  fts_array_append(&this->array, 1, &a);
+
+  fts_object_redefine_variable((fts_object_t *)this);
 }
 
 /******************************************************
@@ -154,6 +192,8 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->tracks = 0;
   this->size = 0;
   this->open = 0;  
+
+  fts_array_init(&this->array, 0, 0);
 }
 
 static void
@@ -165,7 +205,6 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   while(track)
     {
       sequence_remove_track(this, track);
-      fts_object_release((fts_object_t *)track);
 
       track = sequence_get_first_track(this);
     }    
@@ -192,8 +231,8 @@ sequence_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
   track = (track_t *)fts_object_create(eventtrk_class, 1, at);
 
   /* add it to the sequence */
-  sequence_add_track(this, (track_t *)track);
-      
+  sequence_add_track(this, track);
+
   if(sequence_editor_is_open(this))
     {
       /* create track at client */
@@ -203,6 +242,8 @@ sequence_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s
       fts_set_object(a + 0, (fts_object_t *)track);	    
       fts_client_send_message(o, seqsym_addTracks, 1, a);
     }
+
+  sequence_array_append(this, track);
 }
 
 /* remove track by client request */
@@ -218,9 +259,9 @@ sequence_remove_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_
 
       if(fts_object_has_id((fts_object_t *)track))
 	fts_client_send_message(o, seqsym_deleteTracks, 1, at);
-
-      fts_object_release((fts_object_t *)track);
     }
+
+  sequence_array_update(this);
 }
 
 /* move track by client request */
@@ -238,6 +279,8 @@ sequence_move_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
       if(fts_object_has_id((fts_object_t *)track))
 	fts_client_send_message(o, seqsym_moveTrack, 2, at);
     }
+
+  sequence_array_update(this);
 }
 
 static void
@@ -303,6 +346,8 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   
   if(sequence_editor_is_open(this))
     sequence_upload(o, 0, 0, 0, 0);
+
+  sequence_array_update(this);
 }
 
 static void 
@@ -369,11 +414,12 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	    {
 	      sequence_remove_track(this, track);
 	      fts_client_send_message(o, seqsym_deleteTracks, 1, at);
-	      fts_object_release((fts_object_t *)track);
 	    }
 
 	  track = sequence_get_first_track(this);
 	}    
+
+      sequence_array_update(this);
     }
   else if(ac && fts_is_number(at))
     {
@@ -433,7 +479,10 @@ sequence_send_name_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 static void
 sequence_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_set_object(value, o);
+  sequence_t *this = (sequence_t *)o;
+
+  sequence_array_update(this);
+  fts_set_array(value, &this->array);
 }
 
 /******************************************************

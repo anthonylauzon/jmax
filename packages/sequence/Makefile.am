@@ -1,4 +1,4 @@
-SUBDIRS=c java help
+SUBDIRS=c java help images
 
 packagedir=$(pkgdatadir)/packages/sequence
 package_DATA=sequence.jpk 

@@ -401,8 +401,6 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
       if (fts_is_void(&state))
 	{
 	  /* ERROR: the object cannot define a variable, it does not have a "state" property */
-	  /*fts_object_unbind(obj);*/
-	  /*fts_object_destroy(obj);*/
 	  fts_object_delete_from_patcher(obj);
 	  obj = fts_error_object_new(patcher, aoc, aot, "Object can't define a variable");
 	}
@@ -736,6 +734,21 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
   fts_object_free(old);
 
   return new;
+}
+
+void
+fts_object_redefine_variable(fts_object_t *o)
+{
+  fts_symbol_t name = fts_object_get_variable(o);
+
+  if(name)
+    {
+      fts_atom_t state;
+      
+      fts_variable_suspend(fts_object_get_patcher(o), name);
+      fts_object_get_prop(o, fts_s_state, &state);
+      fts_variable_restore(fts_object_get_patcher(o), name, &state, o);
+    }
 }
 
 /*********************************************************************************

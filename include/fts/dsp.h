@@ -135,6 +135,7 @@ typedef struct _fts_dsp_descr_t {
 
 FTS_API void fts_dsp_run_tick(void);
 FTS_API int fts_dsp_is_running(void);
+FTS_API void fts_dsp_restart(void);
 
 /** 
  * @name Runtime parameters
