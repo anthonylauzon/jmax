@@ -1,16 +1,4 @@
-all	all	floatfuns.h
-all	all	hashtab.h
-all	all	ieeewrap.h
-all	all	intphase.h
-all	all	ramps.h
-all	all	ramp_vectors.h
-all	all	srconv.h
-all	all	units.h
 all	all	Makefile
 all	all	Sources
-src	all	floatfuns.c
-src	all	hashtab.c
-src	all	ramps.c
-src	all	ramp_vectors.c
-src	all	srconv.c
-src	all	units.c
+all	all	*.h
+

@@ -1,6 +1,3 @@
-src	all	Makefile
-src	all	Sources
-src	all	thread.c
-all	all	thread.h
-src	all	threadmod.c
-all	all	threadmod.h
+all	all	Makefile
+all	all	Sources
+all	all	*.h

@@ -1,4 +1,4 @@
-ircam	all	Makefiles
-ircam	all	src
+all	all	Makefiles
+all	all	src
 all	all	bin
 

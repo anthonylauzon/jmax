@@ -1,13 +1,3 @@
-all	all	client.h
-all	all	incoming.h
-all	all	outgoing.h
-all	all	protocol.h
-all	all	sync.h
-all	all	updates.h
 all	all	Makefile
 all	all	Sources
-src	all	client.c
-src	all	incoming.c
-src	all	outgoing.c
-src	all	sync.c
-src	all	updates.c
+all	all	*.h

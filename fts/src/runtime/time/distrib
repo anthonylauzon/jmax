@@ -1,4 +1,3 @@
 all	all	Makefile
 all	all	Sources
-src	all	time.c
-all	all	time.h
+all	all	*.h

@@ -1,4 +1,3 @@
 all	all	Makefile
 all	all	Sources
-src	all	midi.c
-all	all	midi.h
+all	all	*.h

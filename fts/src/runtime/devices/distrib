@@ -1,8 +1,3 @@
 all	all	Makefile
 all	all	Sources
-all	all	devconf.h
-all	all	devices.h
-all	all	ossdev.h
-all	all	profdev.h
-all	all	sgidev.h
-all	all	unixdev.h
+all	all	*.h

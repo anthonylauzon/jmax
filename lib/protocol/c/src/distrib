@@ -1,9 +1,4 @@
 all	all	Makefile
 all	all	Sources
 all	all	distrib
-all	all	protocol.h
-all	all	protodecode.c
-all	all	protodecode.h
-all	all	protodefs.h
-all	all	protoencode.c
-all	all	protoencode.h
+all	all	*.[ch]

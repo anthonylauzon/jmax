@@ -1,13 +1,4 @@
-all	all	atomarray.h
-all	all	atomlist.h
-all	all	floatvector.h
-all	all	intvec.h
-all	all	objectset.h
 all	all	Makefile
 all	all	Sources
-src	all	atomarray.c
-src	all	atomlist.c
-src	all	datalib.c
-src	all	floatvector.c
-src	all	intvec.c
-src	all	objectset.c
+all	all	*.h
+

@@ -1,9 +1,5 @@
-all	all	fts.h
-all	all	lang
-all	all	lang.h
-all	all	runtime
-all	all	runtime.h
-all	all	sys
-all	all	sys.h
 all	all	Makefile
-all	all	tiles
+all	all	lang
+all	all	runtime
+all	all	sys
+all	all	*.h

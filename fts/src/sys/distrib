@@ -1,21 +1,4 @@
 all	all	Makefile
 all	all	Sources
-src	all	gnuhw.c
-all	all	hw.h
-src	all	mem.c
-all	all	mem.h
-src	all	modules.c
-all	all	modules.h
-all	all	platform.h
-src	all	sgihw.c
-src	all	smem.c
-src	all	smem.c.due
-src	all	smem.c.save
-src	all	smem.h
-src	all	solaris2hw.c
-all	all	status.h
-src	all	sys.c
-all	all	sysinit.h
-all	all	version.h
-src	all	welcome.c
-all	all	welcome.h
+all	all	*.h
+
