@@ -55,7 +55,7 @@ seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(seqref_is_locked(o))
     {
       /* upload and unlock track after recording */
-      fts_send_message((fts_object_t *)seqref_get_track(o), fts_SystemInlet, fts_s_upload, 0, 0);
+      seqref_upload(o);
       seqref_unlock(o);
 
       this->event = 0;

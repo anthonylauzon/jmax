@@ -53,35 +53,20 @@ seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(event)
     {
-      event_t *next = event_get_next(event);
       double time = event_get_time(event);
-      fts_atom_t a[2];
-      fts_atom_t atoms[64];
-      int n_atoms;
-  
-      fts_set_object(atoms, (fts_object_t *)event);
-      n_atoms = 1;
-      
-      while(next && event_get_time(next) == time)
-	{
-	  fts_set_object(atoms + n_atoms, (fts_object_t *)next);
-	  n_atoms++;
-	  next = event_get_next(next);
-	}
+      event_t *next = seqref_get_next_and_highlight(o, event, time);
       
       this->prev = event_get_prev(event);
       this->next = next;
       
-      seqref_highlight_array(o, n_atoms, atoms);
       fts_outlet_float(o, 1, (float)time);
 
-      fts_set_ptr(a, &n_atoms);
-      fts_set_ptr(a + 1, atoms);
-      
       do{
-	fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
-	fts_outlet_send(o, 0, fts_s_list, n_atoms, atoms);
-	
+	fts_atom_t atoms[64];
+	int n_atoms;
+
+	event_get_atoms(event, &n_atoms, atoms);
+	fts_outlet_send(o, 0, fts_s_list, n_atoms, atoms);	
 	event = event_get_next(event);
       }
       while(event != next);
@@ -96,35 +81,20 @@ seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(event)
     {
-      event_t *prev = event_get_prev(event);
       double time = event_get_time(event);
-      fts_atom_t a[2];
-      fts_atom_t atoms[64];
-      int n_atoms;
-
-      fts_set_object(atoms, (fts_object_t *)event);
-      n_atoms = 1;
-      
-      while(prev && event_get_time(prev) == time)
-	{
-	  fts_set_object(atoms + n_atoms, (fts_object_t *)prev);
-	  n_atoms++;
-	  prev = event_get_prev(prev);
-	}
+      event_t *prev = seqref_get_prev_and_highlight(o, event, time);
       
       this->prev = prev;
       this->next = event_get_next(event);
       
-      seqref_highlight_array(o, n_atoms, atoms);      
       fts_outlet_float(o, 1, (float)time);
 
-      fts_set_ptr(a, &n_atoms);
-      fts_set_ptr(a + 1, atoms);
-      
       do{
-	fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
-	fts_outlet_send((fts_object_t *)o, 0, fts_s_list, n_atoms, atoms);
-	
+	fts_atom_t atoms[64];
+	int n_atoms;
+
+	event_get_atoms(event, &n_atoms, atoms);
+      	fts_outlet_send((fts_object_t *)o, 0, fts_s_list, n_atoms, atoms);
 	event = event_get_prev(event);
       }
       while(event != prev);

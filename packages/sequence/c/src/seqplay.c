@@ -136,14 +136,10 @@ seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       double time = fts_get_number_float(at);
       int n_atoms;
       fts_atom_t atoms[64];
-      fts_atom_t a[2];
-
-      fts_set_ptr(a, &n_atoms);
-      fts_set_ptr(a + 1, atoms);
 
       while(event && time >= event_get_time(event))
 	{
-	  fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
+	  event_get_atoms(event, &n_atoms, atoms);
 	  fts_outlet_send(o, 0, fts_s_list, n_atoms, atoms);
 	  
 	  event = event_get_next(event);
@@ -184,20 +180,10 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
   seqplay_t *this = (seqplay_t *)o;
   double current_location = fts_get_time_in_msecs() - this->start_time + this->start_location;
   event_t *event = this->event;
-  event_t *next = event_get_next(event);
-  int ac;
-  fts_atom_t at[64];
-  fts_atom_t a[2];
+  event_t *next;
 
-  fts_set_object(at, (fts_object_t *)event);
-  ac = 1;
-
-  while(next && event_get_time(next) <= current_location)
-    {
-      fts_set_object(at + ac, (fts_object_t *)next);
-      ac++;
-      next = event_get_next(next);
-    }
+  /* highlight current group and get next event (event after current_location) */
+  next = seqref_get_next_and_highlight(o, event, current_location);
 
   if(next)
     {
@@ -208,18 +194,19 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
   else
     seqplay_stop(o, 0, 0, 0, 0);
 
-  seqref_highlight_array(o, ac, at);
-
-  fts_set_ptr(a, &ac);
-  fts_set_ptr(a + 1, at);
-
-  do{
-    fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
-    fts_outlet_send((fts_object_t *)o, 0, fts_s_list, ac, at);
+  {
+    int ac;
+    fts_atom_t at[64];
     
-    event = event_get_next(event);
+    do{
+      event_get_atoms(event, &ac, at);
+
+      fts_outlet_send((fts_object_t *)o, 0, fts_s_list, ac, at);
+      
+      event = event_get_next(event);
+    }
+    while(event != next);
   }
-  while(event != next);
 }
 
 /************************************************************

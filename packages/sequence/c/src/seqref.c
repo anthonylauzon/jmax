@@ -73,6 +73,15 @@ seqref_init(fts_object_t *o, int ac, const fts_atom_t *at)
 }
 
 void
+seqref_upload(fts_object_t *o)
+{
+  seqref_t *this = (seqref_t *)o;
+
+  if(fts_object_has_id((fts_object_t *)this->track))
+    fts_send_message((fts_object_t *)this->track, fts_SystemInlet, fts_s_upload, 0, 0);
+}
+
+void
 seqref_highlight_event(fts_object_t *o, event_t *event)
 {
   seqref_t *this = (seqref_t *)o;
@@ -86,11 +95,67 @@ seqref_highlight_event(fts_object_t *o, event_t *event)
     }
 }
   
-void
-seqref_highlight_array(fts_object_t *o, int ac, const fts_atom_t *at)
+event_t *
+seqref_get_next_and_highlight(fts_object_t *o, event_t *event, double time)
 {
   seqref_t *this = (seqref_t *)o;
+  event_t *next = event_get_next(event);
 
   if(sequence_editor_is_open(this->sequence))
-    fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, ac, at);
+    {
+      fts_atom_t at[64];
+      int ac;
+      
+      fts_set_object(at, (fts_object_t *)event);
+      ac = 1;
+      
+      while(next && event_get_time(next) <= time)
+	{
+	  fts_set_object(at + ac, (fts_object_t *)next);
+	  ac++;
+	  next = event_get_next(next);
+	}
+      
+      fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, ac, at);
+    }
+  else
+    {      
+      while(next && event_get_time(next) <= time)
+	next = event_get_next(next);
+    }
+
+  return next;
 }
+
+event_t *
+seqref_get_prev_and_highlight(fts_object_t *o, event_t *event, double time)
+{
+  seqref_t *this = (seqref_t *)o;
+  event_t *prev = event_get_prev(event);
+
+  if(sequence_editor_is_open(this->sequence))
+    {
+      fts_atom_t at[64];
+      int ac;
+      
+      fts_set_object(at, (fts_object_t *)event);
+      ac = 1;
+      
+      while(prev && event_get_time(prev) >= time)
+	{
+	  fts_set_object(at + ac, (fts_object_t *)prev);
+	  ac++;
+	  prev = event_get_prev(prev);
+	}
+      
+      fts_client_send_message((fts_object_t *)this->track, seqsym_highlightEvents, ac, at);
+    }
+  else
+    {
+      while(prev && event_get_time(prev) >= time)
+	prev = event_get_prev(prev);
+    }
+
+  return prev;
+}
+

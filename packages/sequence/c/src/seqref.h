@@ -47,7 +47,10 @@ extern void seqref_set_reference(fts_object_t *o, int ac, const fts_atom_t *at);
 extern eventtrk_t *seqref_get_reference(fts_object_t *o);
 extern void seqref_init(fts_object_t *o, int ac, const fts_atom_t *at);
 
+extern void seqref_upload(fts_object_t *o);
+
 extern void seqref_highlight_event(fts_object_t *o, event_t *event);
-extern void seqref_highlight_array(fts_object_t *o, int ac, const fts_atom_t *at);
+extern event_t *seqref_get_next_and_highlight(fts_object_t *o, event_t *event, double time);
+extern event_t *seqref_get_prev_and_highlight(fts_object_t *o, event_t *event, double time);
 
 #endif

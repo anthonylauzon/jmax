@@ -35,93 +35,99 @@ fts_class_t *event_class = 0;
  *
  */
 
-void
-event_print(event_t *event)
+fts_symbol_t
+event_get_type(event_t *event)
 {
-  post("  @%lf: ", event_get_time(event));
+  fts_symbol_t type = 0;
+
+  if(fts_is_object(&event->value))
+    {
+      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
+      
+      type = fts_object_get_class_name(obj);
+    }
+  else if(!fts_is_void(&event->value))
+    type = fts_type_get_selector(fts_get_type(&event->value));
+
+  return type;
+}
+
+void 
+event_get_atoms(event_t *event, int *n_atoms, fts_atom_t *atoms)
+{
+  *n_atoms = 0;
 
   if(fts_is_object(&event->value))
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
       fts_atom_t a[2];
-      fts_atom_t atoms[64];
-      int n_atoms;
-
-      fts_set_ptr(a, &n_atoms);
+      
+      fts_set_ptr(a, n_atoms);
       fts_set_ptr(a + 1, atoms);
+      
       fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, a);
-
-      post("<%s> ", fts_symbol_name(fts_object_get_class_name(obj)));
-      post_atoms(n_atoms, atoms);
     }
   else if(!fts_is_void(&event->value))
     {
-      post("<%s> ", fts_symbol_name(fts_type_get_selector(fts_get_type(&event->value))));
-      post_atoms(1, &event->value);
+      *n_atoms = 1;
+      *atoms = event->value;
     }
+}
 
-  post("\n");
+void
+event_print(event_t *event)
+{
+  fts_symbol_t type = event_get_type(event);
+
+  if(type)
+    {
+      fts_atom_t atoms[64];
+      int n_atoms;
+
+      event_get_atoms(event, &n_atoms, atoms);
+      
+      post("  @%lf: ", event_get_time(event));
+      post("<%s> ", fts_symbol_name(type));
+      post_atoms(n_atoms, atoms);
+      post("\n");
+    }
 }
 
 void
 event_upload(event_t *event)
 {
-  if(fts_is_object(&event->value))
+  fts_symbol_t type = event_get_type(event);
+
+  if(type)
     {
-      fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      fts_atom_t a[2];
       fts_atom_t atoms[64];
       int n_atoms;
 
       fts_set_float(atoms + 0, event->time);
-      fts_set_symbol(atoms + 1, fts_object_get_class_name(obj));
-
-      fts_set_ptr(a, &n_atoms);
-      fts_set_ptr(a + 1, atoms + 2);
-      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, a);
-
+      fts_set_symbol(atoms + 1, type);
+  
+      event_get_atoms(event, &n_atoms, atoms + 2);
+  
       fts_client_upload((fts_object_t *)event, seqsym_event, n_atoms + 2, atoms);
-    }
-  else if(!fts_is_void(&event->value))
-    { 
-      fts_atom_t atoms[3];
-     
-      fts_set_float(atoms + 0, event->time);
-      fts_set_symbol(atoms + 1, fts_type_get_selector(fts_get_type(&event->value)));
-      atoms[2] = event->value;
-
-      fts_client_upload((fts_object_t *)event, seqsym_event, 3, atoms);
     }
 }
 
 void
 event_save_bmax(fts_bmax_file_t *file, event_t *event)
 {
-  if(fts_is_object(&event->value))
+  fts_symbol_t type = event_get_type(event);
+
+  if(type)
     {
-      fts_object_t *obj = fts_get_object(&event->value);
-      fts_atom_t a[2];
       fts_atom_t atoms[64];
       int n_atoms;
 
       fts_set_float(atoms + 0, event->time);
-      fts_set_symbol(atoms + 1, fts_object_get_class_name(obj));
-
-      fts_set_ptr(a, &n_atoms);
-      fts_set_ptr(a + 1, atoms + 2);
-      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, a);
-
+      fts_set_symbol(atoms + 1, type);
+  
+      event_get_atoms(event, &n_atoms, atoms + 2);
+  
       fts_bmax_save_message(file, seqsym_bmax_add_event, n_atoms + 2, atoms);
-    }
-  else if(!fts_is_void(&event->value))
-    { 
-      fts_atom_t atoms[3];
-     
-      fts_set_float(atoms + 0, event->time);
-      fts_set_symbol(atoms + 1, fts_type_get_selector(fts_get_type(&event->value)));
-      atoms[2] = event->value;
-
-      fts_bmax_save_message(file, seqsym_bmax_add_event, 3, atoms);
     }
 }
 
@@ -143,27 +149,6 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else
     this->value = at[0];
-}
-
-static void 
-event_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  event_t *this = (event_t *)o;
-
-  if(fts_is_object(&this->value))
-    {
-      fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
-
-      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, at);
-    }
-  else
-    {
-      int *n_atoms = fts_get_ptr(at);
-      fts_atom_t *atoms = fts_get_ptr(at + 1);
-
-      *n_atoms = 1;
-      *atoms = this->value;
-    }
 }
 
 /**************************************************************
@@ -203,7 +188,6 @@ event_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, event_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, event_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, seqsym_set, event_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_get_atoms, event_get_atoms);
 
   return fts_Success;
 }
