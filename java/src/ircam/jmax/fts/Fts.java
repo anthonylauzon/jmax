@@ -100,8 +100,12 @@ public class Fts implements MaxContext
 
   public Fts(String ftsDir, String ftsName, String connectionType, String host, String ftsOptions, int port)
   {
-    if (MaxApplication.getProperty("ssrun") != null)
-      ftsName = ftsName + ".ss";
+    String project = MaxApplication.getProperty("project");
+    if ( project != null)
+      {
+	ftsOptions = ftsOptions + " --project=" + project;
+	System.err.println( "ftsOptions" + ftsOptions);
+      }
 
     if (connectionType.equals("socket")) 
       server = new FtsServer(this, host, new FtsSocketStream( host, port));

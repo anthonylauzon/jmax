@@ -29,6 +29,10 @@
 #include <direct.h>
 #endif
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 static fts_package_t* fts_project = NULL;
 static fts_symbol_t sym_project = NULL;
 

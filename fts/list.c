@@ -181,7 +181,7 @@ fts_list_get_values( const fts_list_t *list, fts_iterator_t *i)
 {
   i->has_more = list_iterator_has_more;
   i->next = list_iterator_next;
-  i->data = list;
+  i->data = (void *)list;
 }
 
 static void 

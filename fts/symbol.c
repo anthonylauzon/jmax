@@ -57,7 +57,7 @@ static fts_symbol_t symbol_new_aux( const char *name, int copy)
     {
       sp->name = strcpy( fts_malloc( strlen(name)+1 ), name);
       /* Must copy also the key !!! */
-      fts_set_string( &k, sp->name);
+      fts_set_string( &k, (char *)sp->name);
     }
   else
     sp->name = name;
