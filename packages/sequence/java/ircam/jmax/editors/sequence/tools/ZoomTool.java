@@ -22,6 +22,7 @@
 package ircam.jmax.editors.sequence.tools;
 
 import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.track. *;
 
 import ircam.jmax.toolkit.*;
 
@@ -66,12 +67,19 @@ public class ZoomTool extends Tool implements  DirectionListener, DynamicDragLis
     public void dragStart(int x, int y, MouseEvent e)
     {
 	((SequenceGraphicContext)gc).getTrack().setProperty("selected", Boolean.TRUE);
+
+       /* workaround: right-mouse events used when popup is visible */	
+        if(((SequenceGraphicContext)gc).getTrackEditor().getMenu().isVisible()) return;
+
 	mountIModule(itsDirectionChooser, x, y);
 	tempX = x;
 	tempY = y;
     }
     public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
+        /* workaround: right-mouse events used when popup is visible */	
+        if(((SequenceGraphicContext)gc).getTrackEditor().getMenu().isVisible()) return;
+        
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	Geometry geometry = egc.getAdapter().getGeometry();
 	if(egc.getAdapter().isVerticalZoomable())
