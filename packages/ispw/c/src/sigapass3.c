@@ -22,7 +22,7 @@
 
 #include <math.h> 
 #include <fts/fts.h>
-#include <filters.h>
+#include "filters.h"
 
 /* radian frequency clips to from 0 to 2/3.14159  */
 /* updates coefs twice per vector */
