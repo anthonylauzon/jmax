@@ -54,6 +54,19 @@ typedef struct
 static void
 jackaudioport_input(fts_word_t* argv)
 {
+    jackaudioport_t* this;
+    int n, channels, ch, i, j;
+    float* out;
+
+    this = (jackaudioport_t*)fts_word_get_pointer(argv + 0);
+    n = fts_word_get_int(argv + 1);
+    channels = fts_audioport_get_input_channels((fts_audioport_t*)this);
+    out = (float*)fts_word_get_pointer(argv + 2);
+
+    for (i = 0; i < n; ++i)
+    {
+	out[i] = this->input_buffer[i];
+    }
 }
 
 static void
@@ -72,7 +85,6 @@ jackaudioport_output(fts_word_t* argv)
 	this->output_buffer[i] = in[i];
     }
     
-
 }
 
 static
@@ -86,11 +98,14 @@ int jackaudioport_process(jack_nframes_t nframes, void* arg)
     int n = 0;
     int samples_per_tick = fts_dsp_get_tick_size();
 
+    this->input_buffer = in;
     this->output_buffer = out;
+    
     for (n = 0; n < nframes; n += samples_per_tick)
     {
 /*    fts_sched_run_one_tick_without_select(); */
 	fts_sched_run_one_tick();
+	this->input_buffer += samples_per_tick;
 	this->output_buffer += samples_per_tick;
     }
     return 0;
@@ -131,6 +146,8 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
     fts_audioport_init(&this->head);
 
+    fts_audioport_set_input_channels((fts_audioport_t*)this, 1);
+    fts_audioport_set_input_function((fts_audioport_t*)this, jackaudioport_input);
     fts_audioport_set_output_channels((fts_audioport_t*)this, 1);
     fts_audioport_set_output_function((fts_audioport_t*)this, jackaudioport_output);
 
@@ -151,6 +168,7 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
        ARRRGGHHH 
        MEMORY LEAK HERE
     */
+    this->input_buffer = fts_malloc(DEFAULT_FRAME_SIZE * sizeof(float));
     this->output_buffer = fts_malloc(DEFAULT_FRAME_SIZE * sizeof(float));
     this->nframes = DEFAULT_FRAME_SIZE;
 
@@ -167,6 +185,19 @@ jackaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     jack_deactivate(this->client);
     fts_log("[jackaudioport] close jack client \n");
     jack_client_close(this->client);
+
+    if (0 != this->input_buffer)
+    {
+	fts_free(this->input_buffer);
+    }
+
+    if (0 != this->output_buffer)
+    {
+	fts_free(this->output_buffer);
+    }
+
+    /* go back to fts scheduling */
+    fts_sched_unsuspend();
 }
 
 static void jackaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
