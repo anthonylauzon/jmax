@@ -5,6 +5,6 @@ public class MaxVersion
 {
   static String getMaxVersion()
   {
-    return "jMax version 2.1.2";
+    return "jMax version 2.1.3";
   } 
 }
