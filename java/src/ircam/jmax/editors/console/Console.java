@@ -39,6 +39,7 @@ public class Console extends JPanel {
   public Console(Interp i) {
     StringBuffer itsSbuf = new StringBuffer();
     itsTextArea = new ConsoleTextArea(40, 40);
+
     itsInterp = i;
 
     setLayout(new BorderLayout());
