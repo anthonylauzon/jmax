@@ -135,9 +135,21 @@ the package alsadev ("package require alsadev").
 <h4>Objects</h4>
 
 <p>
-Thanks to Winfried Ritsch, the "serial" object is back. It has been changed
+Thanks to Winfried Ritsch, the "serial" object is back (in the io package). It has been changed
 to take advantage of the scheduler single select() call.
 
+<p> 
+There is a new graphical object in the toolbar (called "fork"), which changes it's number of outlets 
+when ones drags it on the right border. It repeats it's input from all outletss in right to left order
+(replaces "trigger t t t t t ..." and "bangbang").
+
+<p>
+A "for" object is new in the control package.
+
+An object "vec" - a vector of generic values (atoms) - completes the first set in the data package.
+
+<p>
+In a new package called sequence lives an undocumented early beta version of a sequence object...
 
 <h3>Notes</h3>
 
@@ -146,7 +158,6 @@ to take advantage of the scheduler single select() call.
 <p>
 Building rpms (and SGI packages) is now moved to scripts located in ./utils,
 named buildrpm and buildsgipkg. These scripts are quite self explanatory.
-
 
 <h4>syspackages</h4>
 
