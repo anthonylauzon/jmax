@@ -289,7 +289,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     public void removeRow(int rowId)
     {
-      if( rowId==0) return;
+      if(( rowId == 0) || (( rowId == -1)&&( size == 1))) return;
       if(size > 0)
 	{
 	  size--;    
