@@ -1591,7 +1591,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
       }
     else if (editStatus == RESIZING_OBJECT)
       {
-	itsCurrentObject.MouseUp( e,x,y);
+	itsResizingObject.MouseUp( e,x,y);
 	editStatus = START_SELECT;
 	repaint();
       }

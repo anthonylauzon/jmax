@@ -24,6 +24,7 @@ all:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
+
 ErmesModule:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesModule.java)
 .PHONY: ErmesModule
