@@ -23,20 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-
 set jmaxArch r4k-irix6.5
 
-#defineDevice analogIn   { SgiALIn ALdevice AnalogIn channels 2 }  "Analog In"
-#defineDevice analogOut  { SgiALOut ALdevice AnalogOut channels 2 } "Analog Out"
-
-#defineDevice digitalIn  { SgiALIn ALdevice DigitalIn channels 2 } "Digital In"
-#defineDevice digitalOut  { SgiALOut ALdevice DigitalOut channels 2 } "Digital Out"
-
-#defineDevice midi  { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
-#defineDevice midi1 { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
-#defineDevice midi2 { sgi_midi port SerialPort2 } "MIDI on startmidi port SerialPort2"
-
 when defaultStart {
-    openDefaultAudioIn analogIn
-    openDefaultAudioOut analogOut
 }
