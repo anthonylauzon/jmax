@@ -257,7 +257,7 @@ cvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	      l[i].im *= r[i];
 	    }
 	}
-      if(fts_is_a(at, cvec_type))
+      else if(fts_is_a(at, cvec_type))
 	{
 	  cvec_t *right = cvec_atom_get(at);
 	  int right_size = fvec_get_size(right);
@@ -312,6 +312,158 @@ cvec_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       p[i].re = sqrt(re * re + im * im);
       p[i].im = 0.0;
     }
+}
+
+static void
+cvec_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  int size = cvec_get_size(this);
+  complex *p = cvec_get_ptr(this);
+  int i;
+  
+  for(i=0; i<size; i++)
+    {
+      double re = p[i].re;
+      double im = p[i].im;
+      
+      p[i].re = 0.5 * log(re * re + im * im);
+      p[i].im = atan2(im, re);
+    }
+}
+
+static void
+cvec_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  int size = cvec_get_size(this);
+  complex *p = cvec_get_ptr(this);
+  int i;
+  
+  for(i=0; i<size; i++)
+    {
+      double m = exp(p[i].re);
+      double phi = p[i].im;
+      
+      p[i].re = m * cos(phi);
+      p[i].im = m * sin(phi);
+    }
+}
+
+static void
+cvec_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+
+  if(ac == 0)
+    {
+      /* inplace FFT */
+      unsigned int fft_size = fts_get_fft_size(cvec_get_size(this));
+      complex *fft_ptr;
+
+      cvec_set_size(this, fft_size);
+      fft_ptr = cvec_get_ptr(this);
+
+      fts_cfft_inplc(fft_ptr, fft_size);
+    }
+  else if(fts_is_a(at, fvec_type))
+    {
+      /* real FFT */
+      fvec_t *in = fvec_atom_get(at); 
+      float *in_ptr = fvec_get_ptr(in);
+      int in_size = fvec_get_size(in);
+      unsigned int fft_size = fts_get_fft_size(in_size);
+      float *fft_ptr;
+      int i = 0;
+
+      cvec_set_size(this, fft_size >> 1);
+      fft_ptr = (float *)cvec_get_ptr(this);
+
+      for(i=0; i<in_size; i++)
+	fft_ptr[i] = in_ptr[i];
+
+      /* zero padding */
+      for(; i<fft_size; i++)
+	fft_ptr[i] = 0.0;
+  
+      fts_rfft_inplc(fft_ptr, fft_size);
+
+      return;
+    }
+  else if(fts_is_a(at, cvec_type))
+    {
+      /* complex FFT */
+      cvec_t *in = cvec_atom_get(at);
+      int in_size = cvec_get_size(in);
+      unsigned int fft_size = fts_get_fft_size(in_size);
+      complex *fft_ptr;
+
+      cvec_set_size(this, fft_size);
+      fft_ptr = cvec_get_ptr(this);
+
+      if(in != this)
+	{
+	  complex *in_ptr = cvec_get_ptr(in);
+	  int i;
+
+	  for(i=0; i<in_size; i++)
+	    fft_ptr[i] = in_ptr[i];
+	  
+	  /* zero padding */
+	  for(; i<fft_size; i++)
+	    fft_ptr[i] = CZERO;      
+	}
+      
+      fts_cfft_inplc(fft_ptr, fft_size);
+    }
+  else
+    fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+}
+
+static void
+cvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+
+  if(ac == 0)
+    {
+      /* inplace IFFT */
+      unsigned int fft_size = fts_get_fft_size(cvec_get_size(this));
+      complex *fft_ptr;
+
+      cvec_set_size(this, fft_size);
+      fft_ptr = cvec_get_ptr(this);
+
+      fts_cifft_inplc(fft_ptr, fft_size);
+    }
+  else if(fts_is_a(at, cvec_type))
+    {
+      /* complex IFFT */
+      cvec_t *in = cvec_atom_get(at);
+      int in_size = cvec_get_size(in);
+      unsigned int fft_size = fts_get_fft_size(in_size);
+      complex *fft_ptr;
+
+      cvec_set_size(this, fft_size);
+      fft_ptr = cvec_get_ptr(this);
+
+      if(in != this)
+	{
+	  complex *in_ptr = cvec_get_ptr(in);
+	  int i;
+
+	  for(i=0; i<in_size; i++)
+	    fft_ptr[i] = in_ptr[i];
+	  
+	  /* zero padding */
+	  for(; i<fft_size; i++)
+	    fft_ptr[i] = CZERO;      
+	}
+      
+      fts_cifft_inplc(fft_ptr, fft_size);
+    }
+  else
+    fts_object_signal_runtime_error(o, "method not implemented for given arguments");
 }
 
 /********************************************************************
@@ -369,6 +521,35 @@ cvec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   cvec_t *in = cvec_atom_get(at);
   
   cvec_copy(in, this);
+}
+
+static void
+cvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+
+  if(ac > 0)
+    {
+      if(fts_is_a(at, cvec_type))
+	cvec_copy(cvec_atom_get(at), this);
+      else if(fts_is_a(at, fvec_type))
+	{
+	  fvec_t *fvec = fvec_atom_get(at);
+	  float *f = fvec_get_ptr(fvec);
+	  int size = fvec_get_size(fvec);
+	  complex *c;
+	  int i;
+	  
+	  cvec_set_size(this, size);
+	  c = cvec_get_ptr(this);
+
+	  for(i=0; i<size; i++)
+	    {
+	      c[i].re = f[i];
+	      c[i].im = 0.0;
+	    }
+	}
+    }
 }
 
 static void
@@ -477,13 +658,21 @@ cvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, cvec_output);
   
   fts_method_define_varargs(cl, 0, fts_s_clear, cvec_clear);
-  fts_method_define_varargs(cl, 0, fts_s_fill, cvec_fill);
+  fts_method_define_varargs(cl, 0, fts_s_fill, cvec_fill); 
   fts_method_define_varargs(cl, 0, fts_s_set, cvec_set_elements);
-  
+
+  fts_method_define_varargs(cl, 0, fts_s_assign, cvec_assign);
+ 
   fts_method_define_varargs(cl, 0, fts_new_symbol("add"), cvec_add);
   fts_method_define_varargs(cl, 0, fts_new_symbol("sub"), cvec_sub);
   fts_method_define_varargs(cl, 0, fts_new_symbol("mul"), cvec_mul);
+
   fts_method_define_varargs(cl, 0, fts_new_symbol("abs"), cvec_abs);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("log"), cvec_log);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("exp"), cvec_log);
+
+  fts_method_define_varargs(cl, 0, fts_new_symbol("fft"), cvec_fft);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("ifft"), cvec_ifft);
 
   fts_method_define_varargs(cl, 0, fts_s_size, cvec_size);
   

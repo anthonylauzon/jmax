@@ -52,6 +52,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
   fts_class_mess_t *mess = 0;
   fts_connection_t *conn;
   int invalid = 0;
+  int hidden = (id == FTS_HIDDEN);
   int anything;
 
   /* first of all, if one of the two object is an error object, add the required inlets/outlets to it */
@@ -60,7 +61,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
       fts_error_object_fit_outlet(out, woutlet);
       invalid = 1;
     }
-
+  
   if (fts_object_is_error(in))
     {
       fts_error_object_fit_inlet(in, winlet);
@@ -77,19 +78,19 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
   /* check againsts double connections */
   { 
     fts_connection_t *p;
-
+    
     for (p = out->out_conn[woutlet]; p ; p = p->next_same_src)
-    {
-      if ((p->dst == in) && (p->winlet == winlet))
-	{
-	  /* Found, return error message */
-
-	  fts_object_blip(out, "Double connection, cannot connect.");
-	  return 0;
-	}
-    }
+      {
+	if ((p->dst == in) && (p->winlet == winlet))
+	  {
+	    /* Found, return error message */
+	    
+	    fts_object_blip(out, "Double connection, cannot connect.");
+	    return 0;
+	  }
+      }
   }
-
+  
   /* find the outlet and the inlet in the class structure */
   outlet = &out->head.cl->outlets[woutlet];
 
@@ -116,13 +117,15 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
 
   conn = (fts_connection_t *) fts_object_create(fts_connection_type, 0, 0);
 
-  conn->id  = id;
+  conn->id = id;
   conn->src = out;
   conn->woutlet = woutlet;
   conn->dst = in;
   conn->winlet = winlet;
 
-  if(invalid)
+  if(hidden)
+    conn->type = fts_c_hidden;
+  else if(invalid)
     conn->type = fts_c_invalid;
   else
     conn->type = fts_c_anything;
@@ -130,8 +133,7 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
   ((fts_object_t *)conn)->patcher = conn->src->patcher;
 
   /* pre-initialize the cache, if possible */
-
-  if (mess)
+  if(mess)
     {
       if (anything)
 	{
@@ -181,27 +183,17 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
   return conn;
 }
 
-fts_connection_t *
-fts_connection_new_hidden(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+void 
+fts_connection_delete(fts_connection_t *conn)
 {
-  return fts_connection_new(FTS_NO_ID, out, -woutlet, in, -winlet);
-}
-
-
-static void 
-fts_object_do_disconnect(fts_connection_t *conn, int do_client)
-{ 
   fts_object_t *src;
   fts_object_t *dst;
   fts_connection_t **p;		/* indirect precursor */
   fts_connection_t *prev = 0;
 
   /* First, release the client representation of the connection, if any */
-  if (do_client)
-    {
-      if ( fts_object_has_id( (fts_object_t *)conn))
-	fts_patcher_release_connection((fts_object_t *)conn->src->patcher, conn);
-    }
+  if ( fts_object_has_id( (fts_object_t *)conn))
+    fts_patcher_release_connection((fts_object_t *)conn->src->patcher, conn);
 
   src = conn->src;
   dst  = conn->dst;
@@ -225,17 +217,6 @@ fts_object_do_disconnect(fts_connection_t *conn, int do_client)
       }
 }
 
-void fts_connection_delete(fts_connection_t *conn)
-{
-  fts_object_do_disconnect(conn, 1);
-}
-
-static void 
-fts_connection_delete_ignore_id(fts_connection_t *conn)
-{
-  fts_object_do_disconnect(conn, 0);
-}
-
 /*   
  * This function move the connection of the object old to
  * the object new; it delete the connections that are
@@ -243,7 +224,7 @@ fts_connection_delete_ignore_id(fts_connection_t *conn)
  * is kept.
  */
 void 
-fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_client)
+fts_object_move_connections(fts_object_t *old, fts_object_t *new)
 {
   int inlet, outlet;
 
@@ -307,13 +288,17 @@ fts_object_upload_connections(fts_object_t *obj)
   for (outlet = 0; outlet < obj->head.cl->noutlets; outlet++)
     {
       for (p = obj->out_conn[outlet]; p ; p = p->next_same_src)
-	fts_client_upload_object((fts_object_t *)p, -1);
+	{
+	  if(fts_connection_get_type(p) != fts_c_hidden)
+	    fts_client_upload_object((fts_object_t *)p, -1);
+	}
     }
 
   for (inlet = 0; inlet < obj->head.cl->ninlets; inlet++)
     {
       for (p = obj->in_conn[inlet]; p; p = p->next_same_dst)
-	fts_client_upload_object((fts_object_t *)p, -1);
+	if(fts_connection_get_type(p) != fts_c_hidden)
+	  fts_client_upload_object((fts_object_t *)p, -1);
     }
 }
 

@@ -961,27 +961,31 @@ static void client_get_packages( fts_object_t *o, int winlet, fts_symbol_t s, in
       
       pkg = fts_package_get( fts_get_symbol( a));
       
-      fts_client_start_message( o, s_package_loaded);
-      fts_client_add_symbol( o, fts_get_symbol( a));
-      
-      if( pkg != NULL && pkg->summaries !=NULL)
+      if(pkg != NULL)
 	{
-	  fts_hashtable_get_keys( pkg->summaries, &j);
-	  dir = fts_package_get_dir( pkg);   
-
-	  while (fts_iterator_has_more( &j))
+	  fts_client_start_message( o, s_package_loaded);
+	  fts_client_add_symbol( o, fts_get_symbol( a));
+	  
+	  if(pkg->summaries != NULL)
 	    {
-	      fts_iterator_next( &j, a);
-	      fts_hashtable_get( pkg->summaries, a, &a[1]);
-       
-	      snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, fts_get_symbol( a+1));
-	      filename = fts_new_symbol_copy(path);
-       
-	      fts_client_add_symbol( o, fts_get_symbol( a));
-	      fts_client_add_symbol( o, filename);
+	      fts_hashtable_get_keys( pkg->summaries, &j);
+	      dir = fts_package_get_dir( pkg);   
+	      
+	      while (fts_iterator_has_more( &j))
+		{
+		  fts_iterator_next( &j, a);
+		  fts_hashtable_get( pkg->summaries, a, &a[1]);
+		  
+		  snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, fts_get_symbol( a+1));
+		  filename = fts_new_symbol_copy(path);
+		  
+		  fts_client_add_symbol( o, fts_get_symbol( a));
+		  fts_client_add_symbol( o, filename);
+		}
 	    }
+
+	  fts_client_done_message( o);
 	}
-      fts_client_done_message( o);
     }
 }
 

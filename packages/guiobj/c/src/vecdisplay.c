@@ -27,8 +27,10 @@
 #include <math.h>
 #include <string.h>
 #include <fts/fts.h>
+#include "utils.h"
 #include "ivec.h"
 #include "fvec.h"
+#include "cvec.h"
 
 typedef struct 
 {
@@ -272,6 +274,49 @@ vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
+vecdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vecdisplay_t * this = (vecdisplay_t *)o;
+  int size = this->size;
+  cvec_t * vec = cvec_atom_get(at);
+  complex *ptr = cvec_get_ptr(vec);
+  int n = cvec_get_size(vec);
+
+  /* display vector */
+  this->scroll = 0;
+  
+  if(n > size)
+    n = size;
+  
+  if(n)
+    {
+      float min = this->min;
+      float max = this->max;
+      float value_range = max - min;
+      int i;
+
+      for(i=0; i<n; i++)
+	{
+	  float value = ptr[i].re;
+	  int display;
+	  
+	  if(value < min)
+	    value = min;
+	  else if (value > max)
+	    value = max;
+	  
+	  display = (int)((float)(this->range - 1) * (value - min) / value_range + 0.5);
+	  
+	  fts_set_int(this->a + i, display);
+	}
+
+      this->n = n;
+      
+      vecdisplay_deliver(this);
+    }
+}
+
+static void 
 vecdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
@@ -402,8 +447,9 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, vecdisplay_number);
   fts_method_define_varargs(cl, 0, fts_s_float, vecdisplay_number);
   fts_method_define_varargs(cl, 0, fts_s_list, vecdisplay_list);
-  fts_method_define_varargs(cl, 0, fvec_symbol, vecdisplay_fvec);
   fts_method_define_varargs(cl, 0, ivec_symbol, vecdisplay_ivec);
+  fts_method_define_varargs(cl, 0, fvec_symbol, vecdisplay_fvec);
+  fts_method_define_varargs(cl, 0, cvec_symbol, vecdisplay_cvec);
   fts_method_define_varargs(cl, 0, fts_s_clear, vecdisplay_clear);
 
   return fts_Success;

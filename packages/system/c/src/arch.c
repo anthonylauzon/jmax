@@ -22,35 +22,65 @@
 #include <fts/fts.h>
 #include <string.h>
 
-static fts_symbol_t arch_sym;
+static fts_symbol_t sym_arch;
 
 typedef struct 
 {
   fts_object_t _o;
 
-} arch_t;
+} sysinfo_t;
 
 
 static void
-arch_bang_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sysinfo_arch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_outlet_send(o, 0, arch_sym, 0, 0);
+  fts_outlet_symbol(o, 0, aym_arch);
+}
+
+static void
+sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *pkg;
+  fts_metaclass_t *mcl;
+  fts_iterator_t pkg_iter;
+  fts_atom_t pkg_name;
+
+  /* ask the kernel package before any other package. The kernel
+     classes should not be redefined anyway. If we search the kernel
+     package before the required packages, we avoid the loading of all
+     (required) packages to find the patcher class.  */
+  pkg = fts_get_system_package();
+
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &pkg_iter);
+
+  while ( fts_iterator_has_more( &pkg_iter)) 
+    {
+      fts_iterator_next( &pkg_iter, &pkg_name);
+      pkg = fts_package_get(fts_get_symbol(&pkg_name));
+
+      fprintf(stderr, "package %s\n", pkg_name);
+      
+      if (pkg == NULL)
+	continue;
+    }
 }
 
 static fts_status_t
-arch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+sysinfo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(arch_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(sysinfo_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_anything, arch_bang_mth);
+  fts_method_define_varargs(cl, 0, fts_s_anything, sysinfo_arch);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("classes"), sysinfo_classes);
   
   return fts_Success;
 }
 
 void
-arch_config(void)
+sysinfo_config(void)
 {
-  arch_sym = fts_new_symbol(FTS_ARCH_NAME);
+  sym_arch = fts_new_symbol(FTS_ARCH_NAME);
 
-  fts_class_install(fts_new_symbol("arch"),arch_instantiate);
+  fts_class_install(fts_new_symbol("sysinfo"), sysinfo_instantiate);
 }

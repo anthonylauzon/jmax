@@ -2,7 +2,7 @@ packagedir=$(pkgdatadir)/packages/numeric/c
 package_LTLIBRARIES=libnumeric.la
 libnumeric_la_SOURCES= \
 numeric.c \
-fft.c \
+fit.c \
 rewrap.c \
 wrap.c 
 

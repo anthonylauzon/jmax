@@ -54,11 +54,13 @@
 #define	SMPTE_OFFSET 0x54
 #define	TIME_SIGNATURE 0x58
 #define	KEY_SIGNATURE 0x59
-#define	SEQUENCER_SPECIFIC 0x74
+#define	SEQUENCER_SPECIFIC 0x7f
 
 /* magic strings */
 #define MThd 0x4d546864
 #define MTrk 0x4d54726b
+
+#define FTS_MIDIFILE_DEFAULT_TEMPO 500000
 
 /*************************************************************
  *
@@ -140,6 +142,72 @@ read16bit(fts_midifile_t *file)
   return (msb << 8) + lsb;
 }
 
+
+/* format 1 tempo map handling */
+static void
+midifile_tempo_map_add_entry(fts_midifile_t *file, int tick, int tempo)
+{
+  fts_midifile_tempo_map_entry_t *e = file->tempo_map;
+
+  if(e == NULL)
+    {
+      fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
+
+      if(tick == 0)
+	{
+	  entry->tick = 0;
+	  entry->time = 0.0;
+	  entry->conv = 0.001 * tempo / (double)file->division;
+	  entry->next = 0;
+
+	  file->tempo_map = entry;
+	}
+      else
+	{
+	  midifile_tempo_map_add_entry(file, 0, FTS_MIDIFILE_DEFAULT_TEMPO);
+
+	  entry->tick = tick;
+	  entry->time = tick * file->tempo_map->conv;
+	  entry->conv = 0.001 * tempo / (double)file->division;
+	  entry->next = 0;
+
+	  file->tempo_map->next = entry;
+	}
+    }
+  else
+    {
+      fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
+
+      while(e->next != NULL)
+	e = e->next;
+      
+      entry->tick = tick;
+      entry->time = e->time + (tick - e->tick) * e->conv;
+      entry->conv = 0.001 * tempo / (double)file->division;
+      entry->next = 0;
+      
+      e->next = entry;
+    }
+}
+
+static void
+midifile_tempo_map_destroy(fts_midifile_t *file)
+{
+  fts_midifile_tempo_map_entry_t *e = file->tempo_map;
+  
+  while(e != NULL)
+    {
+      fts_midifile_tempo_map_entry_t *next = e->next;
+
+      fts_free(e);
+
+      e = next;
+    }
+
+  file->tempo_map = NULL;
+}
+
+/* ordinary channel message */
 static void
 midifile_channel_message_call(fts_midifile_t *file, enum midi_type type, int channel, int byte1, int byte2)
 {
@@ -153,6 +221,7 @@ midifile_channel_message_call(fts_midifile_t *file, enum midi_type type, int cha
    }
 }
 
+/* system exclusive message buffer */
 static void
 midifile_system_exclusive_start(fts_midifile_t *file)
 {
@@ -163,6 +232,8 @@ midifile_system_exclusive_start(fts_midifile_t *file)
 
   sysex_event = fts_midievent_system_exclusive_new();
   fts_object_refer(sysex_event);
+
+  file->system_exclusive = sysex_event;
 }
 
 static void
@@ -186,8 +257,7 @@ midifile_system_exclusive_call(fts_midifile_t *file)
     }
 }
 
-#define MSGINCREMENT 128
-
+/* divers meta data buffer */
 static void
 midifile_string_clear(fts_midifile_t *file)
 {
@@ -200,7 +270,7 @@ midifile_string_add_char(fts_midifile_t *file, int c)
   /* If necessary, allocate larger message buffer */
   if (file->string_size >= file->string_alloc)
     {
-      file->string_alloc += MSGINCREMENT;
+      file->string_alloc += 128;
       file->string = (char *)fts_realloc(file->string, sizeof(char) * file->string_alloc);
     }
 
@@ -244,6 +314,16 @@ midifile_read_header(fts_midifile_t *file)
   file->n_tracks = read16bit(file);
   file->division = read16bit(file);
 
+  if(file->division > 0)
+    file->time_conv = 0.001 * FTS_MIDIFILE_DEFAULT_TEMPO / (double)file->division;
+  else
+    {
+      double smpte_format = (file->division & 0xff00) >> 8;
+      double smpte_resolution = file->division & 0xff;
+
+      file->time_conv = 1000.0 / (smpte_format * smpte_resolution);
+    }
+
   if(!file->error && file->read->header)
     (*file->read->header)(file);
 
@@ -274,24 +354,43 @@ midifile_read_track(fts_midifile_t *file)
     }
 
   file->bytes = read32bit(file);
+
+  /* time starts at zero */
   file->ticks = 0;
+  file->time = 0.0;
+  file->tempo_map_pointer = file->tempo_map;
 
   if (!file->error && file->read->track_start)
     (*file->read->track_start)(file);
 
   while(!file->error && file->bytes > 0)
     {
+      int delta = readvarinum(file);
+      int byte = readbyte(file);
       int data1 = 0;
       int data2 = 0;
-      int byte;
 
-      file->ticks += readvarinum(file); /* delta time */
-      byte = readbyte(file);
-      
       if(byte == EOF)
 	break;
 
-      if (sysex_continue && byte != SYSTEM_EXCLUSIVE_CONTINUE)
+      file->ticks += delta; /* delta time in ticks */
+
+      if(file->tempo_map_pointer != NULL)
+	{
+	  fts_midifile_tempo_map_entry_t *p = file->tempo_map_pointer;
+
+	  /* adjust tempo map pointer */
+	  while(p->next && p->next->tick <= file->ticks)
+	    p = p->next;
+
+	  file->time = p->time + (file->ticks - p->tick) * p->conv;
+
+	  file->tempo_map_pointer = p;
+	}
+      else
+	file->time += delta * file->time_conv; /* delta time in msec */
+
+      if(sysex_continue && byte != SYSTEM_EXCLUSIVE_CONTINUE)
 	{
 	  mferror(file, "didn't find expected continuation of a sysex");
 	  return;
@@ -300,7 +399,7 @@ midifile_read_track(fts_midifile_t *file)
       if(byte < 128)
 	{
 	  /* running status */
-	  if (status < 128)
+	  if(status < 128)
 	    {
 	      mferror(file, "unexpected running status");
 	      return;
@@ -455,11 +554,20 @@ midifile_read_track(fts_midifile_t *file)
 		  int b0 = readbyte(file);
 		  int b1 = readbyte(file);
 		  int b2 = readbyte(file);
-		
-		  file->tempo = (b0 << 16) + (b1 << 8) + b2;
+		  int tempo = (b0 << 16) + (b1 << 8) + b2;
+
+		  if(file->format == 1)
+		    midifile_tempo_map_add_entry(file, file->ticks, tempo);
+		  else
+		    {
+		      if(file->division > 0)
+			file->time_conv = 0.001 * (double)tempo / (double)file->division;
+
+		      file->tempo = tempo;
+		    }
 		
 		  if (file->read->tempo)
-		    (*file->read->tempo)(file);
+		    (*file->read->tempo)(file, tempo);
 		}
 		break;
 
@@ -498,8 +606,31 @@ midifile_read_track(fts_midifile_t *file)
 		  if (file->read->key_signature)
 		    (*file->read->key_signature)(file, n_sharps_or_flats, major_or_minor);
 		  break;
+		}
+
+	      case SEQUENCER_SPECIFIC:
+		{
+		  /* sequencer specific data */
+		  midifile_string_clear(file);
 		  
-		default:
+		  while (file->bytes > lookfor)
+		    midifile_string_add_char(file, readbyte(file));
+		  
+		  /* ignore data */
+
+		  break;
+		}
+
+	      default:
+		{
+		  /* unknown meta event */
+		  midifile_string_clear(file);
+		  
+		  while (file->bytes > lookfor)
+		    midifile_string_add_char(file, readbyte(file));
+		  
+		  /* ignore data */
+		  
 		  break;
 		}
 	      }
@@ -660,6 +791,7 @@ fts_midifile_write_track_begin(fts_midifile_t *file)
   write32bit(file, 0); /* write length as 0 and correct later */
 
   file->ticks = 0; /* time starts from zero */
+  file->time = 0.0;
   file->size = 0; /* the header's length doesn't count */
 
   return 1;
@@ -849,13 +981,18 @@ fts_midifile_init(fts_midifile_t *file, FILE *fp, fts_symbol_t name)
   file->format = 0;
   file->n_tracks = 0;
   file->division = 0;
-  file->tempo = 50000;
+  file->tempo = FTS_MIDIFILE_DEFAULT_TEMPO;
+
+  file->tempo_map = NULL;
+  file->tempo_map_pointer = NULL;
 
   file->read = 0;
 
   file->ticks = 0;
   file->bytes = 0;
   file->size = 0;
+
+  file->system_exclusive = 0;
 
   file->string = 0;
   file->string_size = 0;
@@ -914,6 +1051,7 @@ fts_midifile_open_write(fts_symbol_t name)
 void 
 fts_midifile_close(fts_midifile_t *file)
 {
+  midifile_tempo_map_destroy(file);
   fclose(file->fp);
 }
 
@@ -941,20 +1079,6 @@ return i;
  *  timing
  *
  */
-
-double
-fts_midifile_get_time(fts_midifile_t *file)
-{
-  if(file->division > 0)
-    return (double)0.001 * (double)file->ticks * (double)file->tempo / (double)file->division;
-  else
-    {
-      double smpte_format = (file->division & 0xff00) >> 8;
-      double smpte_resolution = file->division & 0xff;
-
-      return (double)0.001 * (double)file->ticks / (smpte_format * smpte_resolution);
-    }
-}
 
 int
 fts_midifile_time_to_ticks(fts_midifile_t *file, double time)

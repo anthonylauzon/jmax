@@ -1,6 +1,7 @@
 packagedir=$(pkgdatadir)/packages/system/c
 package_LTLIBRARIES=libsystem.la
 libsystem_la_SOURCES= \
+sysinfo.c \
 argument.c \
 bus.c \
 bus_tilda.c \

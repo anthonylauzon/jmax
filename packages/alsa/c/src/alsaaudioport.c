@@ -39,7 +39,7 @@ static fts_symbol_t s_mmap_noninterleaved, s_mmap_interleaved, s_rw_noninterleav
 #define GUESS_CHANNELS -1
 #define DEFAULT_PCM_NAME s_default
 #define DEFAULT_SAMPLING_RATE (44100.)
-#define DEFAULT_FIFO_SIZE 1024
+#define DEFAULT_FIFO_SIZE 2048
 #define DEFAULT_INPUT_CHANNELS 0
 #define DEFAULT_OUTPUT_CHANNELS 2
 #define DEFAULT_ACCESS s_mmap_interleaved

@@ -37,7 +37,6 @@ extern void for_config(void);
 extern void count_config(void);
 
 extern void range_config(void);
-extern void fit_config(void);
 
 extern void make_config(void);
 extern void mess_config(void);
@@ -57,7 +56,6 @@ control_config(void)
   count_config();
 
   range_config();
-  fit_config();
 
   make_config();
   mess_config();

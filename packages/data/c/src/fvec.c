@@ -1124,6 +1124,28 @@ fvec_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     }
 }
 
+static void
+fvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+
+  if(ac > 0 && fts_is_a(at, cvec_type))
+    {
+      /* complex FFT */
+      cvec_t *in = cvec_atom_get(at);
+      int in_size = cvec_get_size(in);
+      unsigned int fft_size = fts_get_fft_size(2 * in_size);
+      float *fft_ptr;
+
+      fvec_set_size(this, fft_size);
+      fft_ptr = fvec_get_ptr(this);
+
+      fts_rifft_inplc(fft_ptr, fft_size);
+    }
+  else
+    fts_object_signal_runtime_error(o, "method not implemented for given arguments");
+}
+
 /**************************************************************************************
  *
  *  load, save, import, export

@@ -1,374 +1,375 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-                           
+                               
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
   <title>jMax 3 configuration</title>
 </head>
  <body style="font-family: sans-serif; ">
-             
+               
 <h1>jMax 3 i/o configuration</h1>
-    This paper describes the outlines for a jMax 3 i/o configuration management.<br>
-  <br>
-  The basic idea is to provide a i/o configuration layer, which makes it
-possible  to develop patches independent from a concrete machine configuration
-(i.e.  the number and nature of available devices). While a patch uses abstract
-input and output busses of a fixed type or semantic (audio, MIDI, etc.) the
-mapping to concrete i/o devices or even internal busses and their parameterization
- (sample rate, etc.) should be defined independently.<br>
-  <br>
-  The jMax i/o configuration will handle first of all external audio and
-MIDI  devices (extern of jMax, they can be anyway virtual devices for inter
-process  communication). Nevertheless the needed configuration mechanisms
-should be  thought as easily extensible to further i/o domains such as bytestreams,
-connections  using the jMax communication protocol (between different instances
-of jMax),  Open Sound Control, video, etc.<br>
-  <br>
-             
-<h2>audio and MIDI i/o configuration items</h2>
-  The following items are part of the jMax audio i/o configuration:<br>
-   
-<ul>
-       
-  <li>definition of used audio devices (audio ports)</li>
-       
-  <li>definition of input and output busses (or labels)</li>
-       
-  <li>routing of input and output busses to the defined audio ports</li>
-       
-  <li>binding of default audio input and output bus (stereo)<br>
-    </li>
-       
-  <li>sample rate</li>
-       
-  <li>buffer size</li>
-       
-  <li>tick size<br>
-    </li>
-   
-</ul>
-  The following items are part of the jMax MIDI i/o configuration:<br>
-   
-<ul>
-       
-  <li>definition of used MIDI devices (MIDI ports)</li>
-       
-  <li>definition of input and output busses (or labels)</li>
-              
-  <li>routing of input and output busses to the defined MIDI ports</li>
-  <li>binding of default MIDI input and output bus (single port)<br>
-  </li>
-   
-</ul>
-  The input and output busses are <i><b>defined</b></i> by the i/o configuration
- and used (referenced) in the patch by i/o objects objects such as the existing
- classes outlet and inlet (send and receive), out and in, or catch and throw.<br>
-  <br>
-   
-<h2>i/o port definition</h2>
-   
-<h2></h2>
-  The configuration defines for each type (audio, MIDI) a list of ports,
-which  are associated to external devices. These definitions are independent
-from  whether the external devices or input, output or bi-directional devices.<br>
-  <br>
-  It should be possible to generate automatically a list of audio and MIDI
- ports from the available devices of a concrete system by a platform dependent
- routine.<br>
-  <br>
-   
-<h2>routing matrices</h2>
-  A configuration matrix defines the input (or output) busses and the routing
- of these busses to the defined i/o ports. Independent matrices are defined
- for input and output. An input (output) matrix defines defines input busses
- (output busses) and the routing of each channel of each bus to a channel
-of an available input port channel (output port channel). The list of available
- input and output port channels can be derived from the list of defined ports.<br>
-  <br>
-  The input and output matrices for audio and MIDI always (!) define default
- busses for audio (stereo) and MIDI. These default busses are used by i/o
-objects which doesn't explicitly specify a reference to an input or output
-bus.<br>
-  <br>
-  It should be possible to automatically generate a minimal routing for audio
- and MIDI default input and output busses for a given platform. Help files
-and tutorials should generally use the default busses.<br>
-  <br>
-  The following table shows a draft of a graphical representation (editor)
- for an audio output matrix:<br>
-   
-<blockquote>   
-  <table cellpadding="2" cellspacing="0" border="1">
-     <tbody>
-       <tr>
-         <th valign="Middle" align="Center" bgcolor="#cccccc">&nbsp; &nbsp;
-&nbsp;port<br>
-bus &nbsp; &nbsp; <br>
-         </th>
-         <th valign="Middle" rowspan="1" colspan="2" width="40" align="Center" bgcolor="#cccccc">
-Emu<br>
-         </th>
-         <th valign="Middle" rowspan="1" colspan="8" width="160" align="Center" bgcolor="#cccccc">
-ADATDevice<br>
-         </th>
-       </tr>
-       <tr>
-         <th valign="Middle" rowspan="2" colspan="1" align="Center" bgcolor="#cccccc">
-default<br>
-         </th>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <th valign="Middle" align="Center" bgcolor="#cccccc">center<br>
-         </th>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <th valign="Middle" align="Center" bgcolor="#cccccc">frontL<br>
-         </th>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b></td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <th valign="Middle" align="Center" bgcolor="#cccccc">frontR<br>
-         </th>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b></td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <th valign="Middle" align="Center" bgcolor="#cccccc">rearL<br>
-         </th>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b></td>
-        <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <th valign="Middle" align="Center" bgcolor="#cccccc">rearR<br>
-         </th>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center"><b>x</b></td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-       </tr>
-       <tr>
-         <th valign="Middle" rowspan="4" colspan="1" align="Center" bgcolor="#cccccc">
-circle<br>
-         </th>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b></td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center"><b>x</b></td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-       </tr>
-       <tr>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center"><b>x</b></td>
-        <td valign="Middle" align="Center">-<br>
-         </td>
-       </tr>
-       <tr>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-</td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center">-<br>
-         </td>
-         <td valign="Middle" align="Center"><b>x</b><br>
-         </td>
-       </tr>
-     
-    </tbody>   
-  </table>
+     This paper describes the outlines for a jMax 3 i/o configuration management.<br>
    <br>
-   </blockquote>
-  As mentioned above, the first line of this matrix is derived from the list
-of defined audio ports. Note that this line can be different for the input
-and output matrix, in the case that a defined audio port has a different
+   The basic idea is to provide a i/o configuration layer, which makes it 
+possible  to develop patches independent from a concrete machine configuration 
+(i.e.  the number and nature of available devices). While a patch uses abstract 
+input and output busses of a fixed type or semantic (audio, MIDI, etc.) the 
+mapping to concrete i/o devices or even internal busses and their parameterization 
+ (sample rate, etc.) should be defined independently.<br>
+   <br>
+   The jMax i/o configuration will handle first of all external audio and 
+MIDI  devices (extern of jMax, they can be anyway virtual devices for inter 
+process  communication). Nevertheless the needed configuration mechanisms 
+should be  thought as easily extensible to further i/o domains such as bytestreams, 
+connections  using the jMax communication protocol (between different instances 
+of jMax),  Open Sound Control, video, etc.<br>
+   <br>
+               
+<h2>audio and MIDI i/o configuration items</h2>
+   The following items are part of the jMax audio i/o configuration:<br>
+     
+<ul>
+           
+  <li>definition of used audio devices (audio ports)</li>
+           
+  <li>definition of input and output busses (or labels)</li>
+           
+  <li>routing of input and output busses to the defined audio ports</li>
+           
+  <li>binding of default audio input and output bus (stereo)<br>
+     </li>
+           
+  <li>sample rate</li>
+           
+  <li>buffer size</li>
+           
+  <li>tick size<br>
+     </li>
+     
+</ul>
+   The following items are part of the jMax MIDI i/o configuration:<br>
+     
+<ul>
+           
+  <li>definition of used MIDI devices (MIDI ports)</li>
+           
+  <li>definition of input and output busses (or labels)</li>
+                  
+  <li>routing of input and output busses to the defined MIDI ports</li>
+   
+  <li>binding of default MIDI input and output bus (single port)<br>
+   </li>
+     
+</ul>
+   The input and output busses are <i><b>defined</b></i> by the i/o configuration 
+ and used (referenced) in the patch by i/o objects objects such as the existing 
+ classes outlet and inlet (send and receive), out and in, or catch and throw.<br>
+   <br>
+     
+<h2>i/o port definition</h2>
+     
+<h2></h2>
+   The configuration defines for each type (audio, MIDI) a list of ports, 
+which  are associated to external devices. These definitions are independent 
+from  whether the external devices or input, output or bi-directional devices.<br>
+   <br>
+   It should be possible to generate automatically a list of audio and MIDI 
+ ports from the available devices of a concrete system by a platform dependent 
+ routine.<br>
+   <br>
+     
+<h2>routing matrices</h2>
+   A configuration matrix defines the input (or output) busses and the routing 
+ of these busses to the defined i/o ports. Independent matrices are defined 
+ for input and output. An input (output) matrix defines defines input busses 
+ (output busses) and the routing of each channel of each bus to a channel 
+of an available input port channel (output port channel). The list of available 
+ input and output port channels can be derived from the list of defined ports.<br>
+   <br>
+   The input and output matrices for audio and MIDI always (!) define default 
+ busses for audio (stereo) and MIDI. These default busses are used by i/o 
+objects which doesn't explicitly specify a reference to an input or output 
+bus.<br>
+   <br>
+   It should be possible to automatically generate a minimal routing for
+audio  and MIDI default input and output busses for a given platform. Help
+files and tutorials should generally use the default busses.<br>
+   <br>
+   The following table shows a draft of a graphical representation (editor) 
+ for an audio output matrix:<br>
+     
+<blockquote>      
+  <table cellpadding="2" cellspacing="0" border="1">
+      <tbody>
+        <tr>
+          <th valign="Middle" align="Center" bgcolor="#cccccc">&nbsp; &nbsp; 
+&nbsp;port<br>
+ bus &nbsp; &nbsp; <br>
+          </th>
+          <th valign="Middle" rowspan="1" colspan="2" width="40" align="Center" bgcolor="#cccccc">
+ Emu<br>
+          </th>
+          <th valign="Middle" rowspan="1" colspan="8" width="160" align="Center" bgcolor="#cccccc">
+ ADATDevice<br>
+          </th>
+        </tr>
+        <tr>
+          <th valign="Middle" rowspan="2" colspan="1" align="Center" bgcolor="#cccccc">
+ default<br>
+          </th>
+          <td valign="Middle" align="Center"><b>x</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>-</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <th valign="Middle" align="Center" bgcolor="#cccccc">center<br>
+          </th>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b><br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <th valign="Middle" align="Center" bgcolor="#cccccc">frontL<br>
+          </th>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b></td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <th valign="Middle" align="Center" bgcolor="#cccccc">frontR<br>
+          </th>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b></td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <th valign="Middle" align="Center" bgcolor="#cccccc">rearL<br>
+          </th>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b></td>
+         <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <th valign="Middle" align="Center" bgcolor="#cccccc">rearR<br>
+          </th>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center"><b>x</b></td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+        </tr>
+        <tr>
+          <th valign="Middle" rowspan="4" colspan="1" align="Center" bgcolor="#cccccc">
+ circle<br>
+          </th>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>-</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b></td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center"><b>-</b></td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+        </tr>
+        <tr>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center"><b>-</b></td>
+         <td valign="Middle" align="Center">-<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-</td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>x</b><br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center">-<br>
+          </td>
+          <td valign="Middle" align="Center"><b>-</b><br>
+          </td>
+        </tr>
+           
+    </tbody>      
+  </table>
+    <br>
+    </blockquote>
+   As mentioned above, the first line of this matrix is derived from the
+list of defined audio ports. Note that this line can be different for the
+input and output matrix, in the case that a defined audio port has a different 
 number of inputs and outputs.<br>
-The first column of the matrix consists of the definitions of output busses.
-While the first line should differ from one concrete system set-up to another
-the first column might differ from project (patch) to project. The user should
-be able to easily add new output bus definitions (giving a number of channels)
-to this column and assign its channels it to any output channels of the defined
+ The first column of the matrix consists of the definitions of output busses. 
+While the first line should differ from one concrete system set-up to another 
+the first column might differ from project (patch) to project. The user should 
+be able to easily add new output bus definitions (giving a number of channels) 
+to this column and assign its channels it to any output channels of the defined 
 audio ports.<br>
-  <br>
-A helpful feature of the i/o objects (in~, out~?) should be that an input
+   <br>
+ A helpful feature of the i/o objects (in~, out~?) should be that an input 
 or output bus can be chosen from the list of defined input or output busses.<br>
-  <br>
-The 4 matrices for audio and MIDI inputs and outputs (and probably further
-ones) should be grouped to a single tubbed pane. The list of defined MIDI
-and audio ports should be accessible directly from the two audio matrices
+   <br>
+ The 4 matrices for audio and MIDI inputs and outputs (and probably further 
+ones) should be grouped to a single tubbed pane. The list of defined MIDI 
+and audio ports should be accessible directly from the two audio matrices 
 for example by double-clicking to the first line.<br>
-  <br>
-  <br>
-                   
+   <br>
+   <br>
+                       
   </body>
   </html>

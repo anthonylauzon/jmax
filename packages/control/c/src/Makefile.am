@@ -5,7 +5,6 @@ control.c \
 count.c \
 demux.c \
 dispatch.c \
-fit.c \
 for.c \
 invoke.c \
 make.c \

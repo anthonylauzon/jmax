@@ -686,6 +686,18 @@ fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
   return fts_Success;
 }
 
+void 
+fts_package_get_metaclass_names(fts_package_t* pkg, fts_iterator_t* iter)
+{
+  if(pkg->classes == NULL)
+    {
+      pkg->classes = (fts_hashtable_t*) fts_malloc(sizeof(fts_hashtable_t));
+      fts_hashtable_init(pkg->classes, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+    }
+
+  fts_hashtable_get_keys(pkg->classes, iter);
+}
+
 /********************************************************************
  *
  *   - data files

@@ -140,10 +140,16 @@ UTILS_API fts_cubic_coefs_t *fts_cubic_table;
 #define fts_cubic_calc(x, p) \
   ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)
 
-#define fts_cubic_interpolate(p, i, y) \
+#define fts_cubic_interpolate_with_idefix(p, i, y) \
   do { \
     fts_cubic_coefs_t *ft = fts_cubic_table + fts_cubic_get_table_index(i); \
-    *(y) = fts_cubic_calc(p + (i).index, ft); \
+    *(y) = fts_cubic_calc((p) + (i).index, ft); \
+  } while(0)
+
+#define fts_cubic_interpolate(p, i, f, y) \
+  do { \
+    fts_cubic_coefs_t *ft = fts_cubic_table + ((unsigned int)((f) * (double)FTS_CUBIC_TABLE_SIZE) & (FTS_CUBIC_TABLE_SIZE - 1)); \
+    *(y) = fts_cubic_calc((p) + (i), ft); \
   } while(0)
 
 
@@ -354,24 +360,26 @@ UTILS_API complex CZERO;
  */
 
 #define FTS_FFT_MIN_SIZE 16
-
-#define FTS_FFT_MAX_SIZE_LOG2 16
-#define FTS_FFT_MAX_SIZE (1 << FTS_FFT_MAX_SIZE_LOG2)
+#define FTS_FFT_MIN_LOG2 4
 
 /* intitialize FFT/IFFT procedures for a specific size (returns non zero when successfull) */
-UTILS_API int fts_fft_declaresize(int size);
+UTILS_API int fts_fft_declaresize(unsigned int size);
+
 /* check FFT/IFFT size (returns non zero for valid fft size) */
-UTILS_API int fts_is_fft_size(int size);
+UTILS_API int fts_is_fft_size(unsigned int size);
 
-UTILS_API void fts_cfft_inplc(complex *buf, int size);
-UTILS_API void fts_cifft_inplc(complex *buf, int size);
-UTILS_API void fts_rfft_inplc(float *buf, int size); /* takes real buffer of size size */
-UTILS_API void fts_rifft_inplc(float *buf, int size); /* "returns" real buffer of size size */
+/* get next bigger power of two */
+UTILS_API unsigned int fts_get_fft_size(unsigned int size);
 
-UTILS_API void fts_cfft(complex *in, complex *out, int size);
-UTILS_API void fts_cifft(complex *in, complex *out, int size);
-UTILS_API void fts_rfft(float *in, complex *out, int size);
-UTILS_API void fts_rifft(complex *in, float *out, int size);
+UTILS_API void fts_cfft_inplc(complex *buf, unsigned int size);
+UTILS_API void fts_cifft_inplc(complex *buf, unsigned int size);
+UTILS_API void fts_rfft_inplc(float *buf, unsigned int size); /* takes real buffer of size size */
+UTILS_API void fts_rifft_inplc(float *buf, unsigned int size); /* "returns" real buffer of size size */
+
+UTILS_API void fts_cfft(complex *in, complex *out, unsigned int size);
+UTILS_API void fts_cifft(complex *in, complex *out, unsigned int size);
+UTILS_API void fts_rfft(float *in, complex *out, unsigned int size);
+UTILS_API void fts_rifft(complex *in, float *out, unsigned int size);
 
 
 /*********************************************************************************

@@ -32,6 +32,7 @@
 #include <fts/fts.h>
 
 static fts_symbol_t s_hw_0_0;
+static fts_symbol_t s_hw_1_0;
 
 /* MIDI status bytes */
 #define STATUS_BYTE_SYSEX 0xf0
@@ -150,7 +151,7 @@ alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   ac--;
   at++;
 
-  strcpy( name, fts_get_symbol_arg( ac, at, 0, s_hw_0_0) );
+  strcpy( name, fts_get_symbol_arg( ac, at, 0, s_hw_1_0) );
 
   if( (err = snd_rawmidi_open( &this->handle_in, &this->handle_out, name, O_RDWR | SND_RAWMIDI_NONBLOCK)) < 0)
     {
@@ -233,4 +234,5 @@ alsarawmidiport_config( void)
   fts_midiport_set_default_class(fts_new_symbol("alsarawmidiport"));
 
   s_hw_0_0 = fts_new_symbol("hw:0,0");
+  s_hw_1_0 = fts_new_symbol("hw:1,0");
 }

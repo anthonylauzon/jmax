@@ -30,22 +30,22 @@
  *
  */
 
-void cfft_inplc(complex * restrict buf, float *coef_re, float *coef_im, int size);
-void cifft_inplc(complex * restrict buf, float *coef_re, float *coef_im, int size);
+void cfft_inplc(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
+void cifft_inplc(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
 
 /* (I)FFT with double oversampled coefficient tables */
-void cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size);
-void cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size);
+void cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
+void cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
 
-void cfft_bitreversal_inplc(complex *buf, int *bitrev, int size);
-void cfft_bitreversal_outplc(complex *in, complex *out, int *bitrev, int size);
+void cfft_bitreversal_inplc(complex *buf, unsigned int *bitrev, unsigned int size);
+void cfft_bitreversal_outplc(complex *in, complex *out, unsigned int *bitrev, unsigned int size);
 
-int *cfft_make_bitreversed_table(int size);
+unsigned int *cfft_make_bitreversed_table(unsigned int size);
 
 /* declarations Added by MDC */
 
-void cfft_bitreversal_over_inplc(complex * restrict buf, int * restrict bitrev, int over, int size);
-void cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, int * restrict bitrev, int over, int size);
+void cfft_bitreversal_over_inplc(complex * restrict buf, unsigned int * restrict bitrev, unsigned int size);
+void cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, unsigned int * restrict bitrev, unsigned int size);
 
 #endif
 

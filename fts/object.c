@@ -711,12 +711,8 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
    */
   fts_object_move_properties(old, new);
 
-#if 0
-  if(do_client)
-    fts_oldclient_upload_object(new);
-#endif
   /* move the connections from the old to the new object, tell the client if needed */
-  fts_object_move_connections(old, new, do_client);
+  fts_object_move_connections(old, new);
 
   if(do_client)
     fts_object_unclient(old);

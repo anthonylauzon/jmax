@@ -24,7 +24,7 @@
 extern void fts_signal_bus_config(void);
 
 extern void dsp_config(void);
-/*  extern void arch_config(void); */
+extern void sysinfo_config(void);
 
 extern void const_config(void);
 extern void argument_config(void);
@@ -42,7 +42,7 @@ system_config(void)
   fts_signal_bus_config();
 
   dsp_config();
-/*    arch_config(); */
+  sysinfo_config();
 
   const_config();
   argument_config();

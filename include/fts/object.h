@@ -23,6 +23,7 @@
 
 
 #define FTS_NO_ID -1
+#define FTS_HIDDEN -2
 
 struct fts_simple_object
 {
@@ -106,7 +107,7 @@ FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
 FTS_API void fts_object_redefine_variable(fts_object_t *o);
 
-#define fts_object_has_id(o) ((o)->head.id != FTS_NO_ID)
+#define fts_object_has_id(o) ((o)->head.id > FTS_NO_ID)
 #define fts_object_get_id(o) ((o)->head.id)
 #define fts_object_get_class(o) ((o)->head.cl)
 #define fts_object_get_metaclass(o) ((o)->head.cl->mcl)

@@ -25,6 +25,7 @@ FTS_API fts_metaclass_t *fts_connection_type;
 
 typedef enum fts_connection_type
 {
+  fts_c_hidden = -1, /* hidden (order forcing) connection */
   fts_c_invalid = 0, /* from error object or type missmatch */
   fts_c_anything = 1, /* message which is not one of the following */
   fts_c_atom = 2, /* single atom (value) */

@@ -25,7 +25,6 @@
 
 #include <math.h>
 
-#define MAXIMUM(a, b) ((a)>=(b))?(a):(b)
 #define HALF_TONES(x) (17.312340491f * log(x))
 #define FREQ(ht) exp(0.057762265f * (ht))
 #define LD(x) (1.442695041f * log(x))
@@ -213,9 +212,7 @@ int pt_common_init(pt_common_obj_t *x, long n_points, long n_period)
       n_points > pt_common_MAX_n_points ||
       !fts_fft_declaresize(n_points)
    ){
-      post("%s: frame size must be a power of 2 between %d and %d\n",
-         CLASS_NAME, FTS_FFT_MIN_SIZE, MAXIMUM(pt_common_MAX_n_points, FTS_FFT_MAX_SIZE)
-      );
+      post("%s: frame size must be a power of 2 between %d and %d\n", CLASS_NAME, FTS_FFT_MIN_SIZE, pt_common_MAX_n_points);
       return(0);
    }      
    

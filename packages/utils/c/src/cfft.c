@@ -32,10 +32,10 @@
  */
 
 void 
-cfft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, int size)
+cfft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, unsigned int size)
 {
-  int m, n;
-  int i, j, k, up, down;
+  unsigned int m, n;
+  unsigned int i, j, k, up, down;
   
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {
@@ -43,7 +43,7 @@ cfft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict co
 	{
 	  float Wre = coef_re[k];
 	  float Wim = coef_im[k];
-	  int incr = 2 * up;
+	  unsigned int incr = 2 * up;
 	  
 	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
 	    {
@@ -63,10 +63,10 @@ cfft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict co
 }
 
 void 
-cifft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, int size)
+cifft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict coef_im, unsigned int size)
 {
-  int m, n;
-  int i, j, k, up, down;
+  unsigned int m, n;
+  unsigned int i, j, k, up, down;
   
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {
@@ -74,7 +74,7 @@ cifft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict c
 	{
 	  float Wre = coef_re[k];
 	  float Wim = coef_im[k];
-	  int incr = 2 * up;
+	  unsigned int incr = 2 * up;
 	  
 	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
 	    {
@@ -96,18 +96,18 @@ cifft_inplc(complex * restrict buf, float * restrict coef_re, float * restrict c
 /* (I)FFT with over-sampled coefficient tables */
 
 void 
-cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size)
+cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size)
 {
-  int m, n;
-  int i, j, k, up, down;
+  unsigned int m, n;
+  unsigned int i, j, k, up, down;
 
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {
-      for(j=0, k=0; j<up; j++, k+=(down * over))
+      for(j=0, k=0; j<up; j++, k+=2*down)
 	{
 	  float Wre = coef_re[k];
 	  float Wim = coef_im[k];
-	  int incr = 2 * up;
+	  unsigned int incr = 2 * up;
 	  
 	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
 	    {
@@ -127,18 +127,18 @@ cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int
 }
 
 void 
-cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size)
+cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size)
 {
-  int m, n;
-  int i, j, k, up, down;
+  unsigned int m, n;
+  unsigned int i, j, k, up, down;
 
   for(up=1, down=size>>1; up<size; up<<=1, down>>=1)
     {
-      for(j=0, k=0; j<up; j++, k+=(down * over))
+      for(j=0, k=0; j<up; j++, k+=2*down)
 	{
 	  float Wre = coef_re[k];
 	  float Wim = coef_im[k];
-	  int incr = 2 * up;
+	  unsigned int incr = 2 * up;
 	  
 	  for(m=j, n=j+up; m<size; m+=incr, n+=incr)
 	    {
@@ -164,14 +164,14 @@ cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, in
  */
 
 void 
-cfft_bitreversal_inplc(complex * restrict buf, int * restrict bitrev, int size)
+cfft_bitreversal_inplc(complex * restrict buf, unsigned int * restrict bitrev, unsigned int size)
 {
-  int idx;
+  unsigned int idx;
   complex z;
 
   for(idx=0; idx<size; idx++)
     {
-      int xdi = bitrev[idx];
+      unsigned int xdi = bitrev[idx];
       if(xdi > idx)
 	{
 	  z = buf[idx];    
@@ -182,13 +182,14 @@ cfft_bitreversal_inplc(complex * restrict buf, int * restrict bitrev, int size)
 }
 
 void 
-cfft_bitreversal_outplc(complex * restrict in, complex * restrict out, int * restrict bitrev, int size)
+cfft_bitreversal_outplc(complex * restrict in, complex * restrict out, unsigned int * restrict bitrev, unsigned int size)
 {
-  int idx;
+  unsigned int idx;
 
   for(idx=0; idx<size; idx++)
     {
-      int xdi = bitrev[idx];
+      unsigned int xdi = bitrev[idx];
+
       out[xdi] = in[idx];
     }
 }
@@ -196,14 +197,15 @@ cfft_bitreversal_outplc(complex * restrict in, complex * restrict out, int * res
 /* bitreversal with oversampled index table */
 
 void 
-cfft_bitreversal_over_inplc(complex * restrict buf, int * restrict bitrev, int over, int size)
+cfft_bitreversal_over_inplc(complex * restrict buf, unsigned int * restrict bitrev, unsigned int size)
 {
-  int idx;
+  unsigned int idx;
   complex z;
 
   for(idx=0; idx<size; idx++)
     {
-      int xdi = bitrev[over * idx];
+      unsigned int xdi = bitrev[2 * idx];
+
       if(xdi > idx)
 	{
 	  z = buf[idx];    
@@ -214,13 +216,14 @@ cfft_bitreversal_over_inplc(complex * restrict buf, int * restrict bitrev, int o
 }
 
 void 
-cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, int * restrict bitrev, int over, int size)
+cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, unsigned int * restrict bitrev, unsigned int size)
 {
-  int idx;
+  unsigned int idx;
 
   for(idx=0; idx<size; idx++)
     {
-      int xdi = bitrev[over * idx];
+      unsigned int xdi = bitrev[2 * idx];
+
       out[xdi] = in[idx];
     }
 }
@@ -231,29 +234,33 @@ cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, int 
  *
  */
 
-int *
-cfft_make_bitreversed_table(int size)
+unsigned int *
+cfft_make_bitreversed_table(unsigned int size)
 {
-  int log_size;
-  int *bitrev;
-  int idx, xdi;
-  int i, j;
+  unsigned int log_size;
+  unsigned int *bitrev;
+  unsigned int idx, xdi;
+  unsigned int i, j;
 
-  bitrev = (int *)fts_malloc(size * sizeof(int));
+  bitrev = (unsigned int *)fts_malloc(size * sizeof(unsigned int));
 
   for(log_size=-1, i=size; i; i>>=1, log_size++)
     ;
 
-  for(i=0; i<size; i++){
-    idx = i;
-    xdi = 0;
-    for(j=1; j<log_size; j++){
-      xdi += (idx & 1);
-      xdi <<= 1;
-      idx >>= 1;
-    }
-    bitrev[i] = xdi + (idx & 1);
-  }
+  for(i=0; i<size; i++)
+    {
+      idx = i;
+      xdi = 0;
 
+      for(j=1; j<log_size; j++)
+	{
+	  xdi += (idx & 1);
+	  xdi <<= 1;
+	  idx >>= 1;
+	}
+      
+      bitrev[i] = xdi + (idx & 1);
+    }
+  
   return bitrev;
 }

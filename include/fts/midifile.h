@@ -20,9 +20,12 @@
  *
  */
 
+#ifndef _FTS_MIDIFILE_H_
+#define _FTS_MIDIFILE_H_
 
 typedef struct _fts_midifile_ fts_midifile_t;
 
+/* table of user read functions */
 typedef struct _fts_midifile_read_functions_
 {
   void (*header) (struct _fts_midifile_ *file);
@@ -32,12 +35,22 @@ typedef struct _fts_midifile_read_functions_
   void (*sequence_number)(struct _fts_midifile_ *file, int number);
   void (*end_of_track)(struct _fts_midifile_ *file);
   void (*smpte)(struct _fts_midifile_ *file, int type, int hour, int minute, int second, int frame, int frac);
-  void (*tempo)(struct _fts_midifile_ *file);
+  void (*tempo)(struct _fts_midifile_ *file, int tempo);
   void (*time_signature)(struct _fts_midifile_ *file, int numerator, int denominator, int clocks_per_metronome_click, int heals_per_quarter_note);
   void (*key_signature)(struct _fts_midifile_ *file, int n_sharps_or_flats, int major_or_minor);
   void (*text)(struct _fts_midifile_ *file, int type, int n, char *string);
 }fts_midifile_read_functions_t;
 
+/* tempo map */
+typedef struct fts_midifile_tempo_map_entry
+{
+  int tick;
+  double time; /* time current time */
+  double conv; /* current factor of time/ticks so that time = te->time + te->conv * (<current tick> - te->tick) */
+  struct fts_midifile_tempo_map_entry *next; /* dynamic list */
+} fts_midifile_tempo_map_entry_t;
+
+/* the midi file */
 struct _fts_midifile_
 {
   FILE *fp;
@@ -48,8 +61,13 @@ struct _fts_midifile_
   int division;
   int tempo;
 
+  fts_midifile_tempo_map_entry_t *tempo_map; /* pointer to first tempo map entry */
+  fts_midifile_tempo_map_entry_t *tempo_map_pointer; /* read pointer to tempo map */
+
   fts_midifile_read_functions_t *read;
 
+  double time; /* current time in msec */
+  double time_conv; /* delta time / delta ticks */
   int ticks; /* current time in delta-time units */
   int bytes; /* writing: file offset at the beginning of the track, reading: bytes left to be read */
   int size; /* writing: file size in bytes */
@@ -69,6 +87,8 @@ struct _fts_midifile_
 #define fts_midifile_get_format(f) ((f)->format)
 #define fts_midifile_get_error(f) ((f)->error)
 
+#define fts_midifile_get_time(f) ((f)->time)
+
 #define fts_midifile_set_user_data(f, p) ((f)->user = (void *)(p))
 #define fts_midifile_get_user_data(f) ((f)->user)
 
@@ -77,10 +97,8 @@ struct _fts_midifile_
  *  time
  *
  */
-FTS_API int fts_midifile_time_to_ticks(fts_midifile_t *file, double msecs);
-
 #define fts_midifile_get_ticks(f) ((f)->ticks)
-FTS_API double fts_midifile_get_time(fts_midifile_t *file);
+FTS_API int fts_midifile_time_to_ticks(fts_midifile_t *file, double msecs);
 
 /*************************************************************
  *
@@ -111,3 +129,4 @@ FTS_API int fts_midifile_write_meta_event(fts_midifile_t *file, int ticks, int t
 FTS_API void fts_midifile_write_tempo(fts_midifile_t *file, int tempo);
 
 
+#endif

@@ -284,10 +284,14 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
       {
 	int wrap = ((FtsVectorDisplayObject)ftsObject).getWrap();
 
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+
 	if(wrap > 0)
 	  drawWrappedVector(g, orgX, orgY, values, n, wrap);
 	else
 	  drawVector(g, orgX, orgY, values, n);
+
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       }
   }
 
@@ -301,7 +305,11 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
        n = size;
 
     if(n > 1)
-      drawVector(g, getX() + 1, getY() + getHeight() - 2, values, n);
+      {
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	drawVector(g, getX() + 1, getY() + getHeight() - 2, values, n);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      }
   }
 
   public JPopupMenu getRunModePopUpMenu()
