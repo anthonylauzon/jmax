@@ -77,4 +77,8 @@ set jmaxDefaultArch "irix6.2"
 #}
 
   
+####################################
+## default "UseIcons" value for Swing File Box
+set jmaxDefaultFastFileBox "false"
+
 
