@@ -340,14 +340,15 @@ table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_object_release((fts_object_t *)this->vec);
 }
 
-extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
-
 static void
 table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   table_t *this = (table_t *)o;
+  fts_atom_t a;
 
-  fts_patcher_upload_object((fts_object_t *)fts_get_root_patcher(), (fts_object_t *)this->vec);
+  fts_set_object(&a, (fts_object_t *)this->vec);
+  fts_send_message( (fts_object_t *)fts_object_get_patcher(o), fts_s_upload_child, 1, &a);  
+
   fts_send_message((fts_object_t *)this->vec, fts_s_openEditor, 0, 0);
 }
 

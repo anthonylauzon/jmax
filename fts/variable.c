@@ -293,6 +293,8 @@ define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   define_t *this = (define_t *) o;  
 
+  fts_set_void(&this->value);
+
   if(ac > 1 && fts_is_symbol(at))
     {
       fts_patcher_t *patcher = fts_object_get_patcher(o);

@@ -733,8 +733,7 @@ send_instantiate(fts_class_t *cl)
 
   fts_class_set_default_handler(cl, send_input);
   fts_class_inlet_anything(cl, 0);
-  fts_dsp_declare_inlet(cl, 0);
-  }
+}
 
 /*************************************************************
  *
@@ -1147,25 +1146,28 @@ patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
-void 
-fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
+static void 
+patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_object_t *obj = fts_get_object(at);
+
   if(fts_object_get_class_name(obj) == fts_s_connection)
     {
       fts_connection_t *conn = (fts_connection_t *)obj;
-
+      
       /* don't upload hidden connections */
       if(fts_connection_get_type(conn) <= fts_c_hidden)
 	return;
       
-      fts_client_start_message( this, sym_addConnection);
-      fts_client_add_int( this, fts_get_object_id(obj));
-      fts_client_add_object( this, conn->src);
-      fts_client_add_int( this, conn->woutlet);
-      fts_client_add_object( this, conn->dst);
-      fts_client_add_int( this, conn->winlet);
-      fts_client_add_int( this, conn->type);
-      fts_client_done_message( this);
+      fts_client_start_message( o, sym_addConnection);
+      fts_client_add_int( o, fts_get_object_id(obj));
+      fts_client_add_object( o, conn->src);
+      fts_client_add_int( o, conn->woutlet);
+      fts_client_add_object( o, conn->dst);
+      fts_client_add_int( o, conn->winlet);
+      fts_client_add_int( o, conn->type);
+      fts_client_done_message( o);
     }
   else
     {
@@ -1182,37 +1184,37 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 
       fts_object_get_prop(obj, fts_s_layer, &a_layer);
 
-      fts_client_start_message( this, sym_addObject);
-      fts_client_add_int( this, fts_get_object_id(obj));
-      fts_client_add_int( this, fts_get_int(&a_x));
-      fts_client_add_int( this, fts_get_int(&a_y));
-      fts_client_add_int( this, fts_get_int(&a_w));      
-      fts_client_add_int( this, fts_get_int(&a_h));
-      fts_client_add_int( this, obj->n_inlets);
-      fts_client_add_int( this, obj->n_outlets);
-      fts_client_add_int( this, fts_get_int(&a_layer));
+      fts_client_start_message( o, sym_addObject);
+      fts_client_add_int( o, fts_get_object_id(obj));
+      fts_client_add_int( o, fts_get_int(&a_x));
+      fts_client_add_int( o, fts_get_int(&a_y));
+      fts_client_add_int( o, fts_get_int(&a_w));      
+      fts_client_add_int( o, fts_get_int(&a_h));
+      fts_client_add_int( o, obj->n_inlets);
+      fts_client_add_int( o, obj->n_outlets);
+      fts_client_add_int( o, fts_get_int(&a_layer));
 
       if(fts_object_is_error(obj))
 	{
-	  fts_client_add_symbol( this, fts_error_object_get_description((fts_error_object_t *)obj));
+	  fts_client_add_symbol( o, fts_error_object_get_description((fts_error_object_t *)obj));
 	  
 	  class = fts_error_object_get_class((fts_error_object_t *)obj);
 	  fts_class_instantiate(class);
 	}
       else
 	{
-	  fts_client_add_symbol( this, fts_s_no_error);
+	  fts_client_add_symbol( o, fts_s_no_error);
 
 	  class = fts_object_get_class(obj);
 	}
 
 
       if(fts_class_get_name(class) != NULL)
-	fts_client_add_symbol( this, fts_class_get_name(class));
+	fts_client_add_symbol( o, fts_class_get_name(class));
       else
-	fts_client_add_symbol( this, fts_s_error);	
+	fts_client_add_symbol( o, fts_s_error);	
 
-      fts_client_add_int( this, fts_object_is_template(obj));
+      fts_client_add_int( o, fts_object_is_template(obj));
       
       stream = patcher_get_memory_stream();
       fts_memorystream_reset( stream);
@@ -1227,9 +1229,9 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
 	fts_spost_object_description((fts_bytestream_t *)stream, obj);
 
       fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
-      fts_client_add_string( this, fts_memorystream_get_bytes( stream));
+      fts_client_add_string( o, fts_memorystream_get_bytes( stream));
       
-      fts_client_done_message( this);
+      fts_client_done_message( o);
       
       /* set name */
       if (fts_object_get_definition(obj) != NULL)
@@ -1256,12 +1258,6 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       if(fts_class_get_method( fts_object_get_class(obj), fts_s_update_real_time) != NULL)
 	fts_update_request(obj);
     }
-}
-
-static void 
-patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_patcher_upload_object( o, fts_get_object(&at[0]));
 }
 
 /***********************************************************************
@@ -1930,9 +1926,6 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_set_default_handler(cl, patcher_input);
   fts_class_inlet_anything(cl, 0);
   fts_class_outlet_anything(cl, 0);
-
-  fts_dsp_declare_inlet(cl, 0);
-  fts_dsp_declare_outlet(cl, 0);
 }
 
 /*************************************************************

@@ -159,8 +159,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
       if (ac == 1 && fts_is_object( at))
 	{
 	  eval_data->obj = fts_get_object( at);
-	  fts_object_refer( eval_data->obj);
-
+	  fts_patcher_add_object( eval_data->patcher, eval_data->obj);
 	  return fts_ok;
 	}
 
@@ -183,7 +182,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 	    }
 	}
 
-      fts_object_destroy(eval_data->obj);
+      fts_patcher_remove_object(eval_data->patcher, eval_data->obj);
       eval_data->obj = NULL;
 
       return class_instantiation_error;
@@ -252,10 +251,8 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
 
       fts_set_symbol(&a, fts_status_get_description( status));
       obj = fts_object_create(fts_error_object_class, patcher, 1, &a);
+      fts_patcher_add_object( patcher, obj);
     }
-
-  fts_patcher_add_object( patcher, obj);    
-  fts_object_release( obj);
 
   /* Add the newly created object as user of the expression's variables,
      even if it is an error object, because we may try to recompute, and recover,

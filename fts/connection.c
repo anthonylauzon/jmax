@@ -44,9 +44,10 @@ connection_check(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet)
       /* no declaration is always good */
       return 1;
     }
-  else if(n_types == 1 && fts_class_outlet_has_type(fts_object_get_class(src), woutlet, fts_dsp_signal_class))
+  else if(n_types == 1 && fts_class_outlet_has_type(fts_object_get_class(src), woutlet, fts_dsp_signal_class) &&
+	  fts_class_get_method(fts_object_get_class(dst), fts_s_propagate_input) == NULL)
     {
-      /* pur signal outlet connects to signal inlet only */
+      /* pur signal outlet connects to signal inlet or thru object (implements fts_s_propagate_input) only */
       return (fts_class_inlet_get_method(fts_object_get_class(dst), winlet, fts_dsp_signal_class) != NULL);
     }
   else 

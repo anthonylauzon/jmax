@@ -64,8 +64,6 @@ extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
 
-extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
-
 extern void fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this);
 
 #endif

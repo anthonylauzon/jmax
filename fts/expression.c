@@ -254,10 +254,7 @@ static void expression_stack_pop_frame( fts_expression_t *exp)
   ac = expression_stack_frame_count( exp);
   at = expression_stack_frame( exp);
   for ( i = 0; i < ac; i++, at++)
-    {
-      if (fts_is_object( at))
-	fts_object_release( fts_get_object( at));
-    }
+    fts_atom_release( at);
 
   old_fp = exp->fp;
   exp->fp = fts_get_int( (fts_atom_t *)fts_stack_base(&exp->stack) + exp->fp - FRAME_OFFSET);
@@ -392,9 +389,6 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
 
-    /* FIXME */
-    /* When creating an object (tuple or not tuple), when is this object released ? 
-       Should we go through the stack when popping a frame and release the objects ? */
     if (ac > 1 || toplevel)
       {
 	obj = fts_object_create( fts_tuple_class, NULL, ac, at);
@@ -402,7 +396,10 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	fts_set_object( ret, obj);
       }
     else
-      ret[0] = *at;
+      {
+	ret[0] = *at;
+	fts_atom_refer(at);
+      }
 
     expression_stack_pop_frame( exp);
     expression_stack_push( exp, ret);
@@ -529,6 +526,8 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	  expression_stack_push( exp, env_at + index);
 	else
 	  return invalid_environment_variable_error;
+
+	fts_atom_refer( env_at+index);
       }
     else if (fts_is_symbol( &tree->value))
       {
@@ -540,6 +539,8 @@ fts_status_t expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, 
 	  return undefined_variable_error;
 	else
 	  expression_stack_push( exp, value);
+
+	fts_atom_refer( value);
       }
     else
       return invalid_environment_variable_error;
