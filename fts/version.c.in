@@ -20,6 +20,8 @@
  * 
  */
 
+#include <fts/fts.h>
+
 static const char *version_string = "@VERSION@";
 static const char *full_version_string = "version @VERSION@";
 
