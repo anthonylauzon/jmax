@@ -197,7 +197,7 @@ public abstract class SchemeInterpreter implements Interpreter
 
     public String getProjectExtension()
     {
-	return ".env";
+	return ".scm";
     }
 }
 
