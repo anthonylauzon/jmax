@@ -415,22 +415,22 @@ asio_audioport_create_buffers(asio_audioport_t* port)
 	{
 	  if (port->channelInfos[i].isActive == ASIOTrue)
 	    {
-	      post("Input Channel %d is active\n", port->bufferInfos[i].channelNum);
+	      fts_post("Input Channel %d is active\n", port->bufferInfos[i].channelNum);
 	    }
 	  else
 	    {
-	      post("Input Channel %d is not active\n", port->bufferInfos[i].channelNum);
+	      fts_post("Input Channel %d is not active\n", port->bufferInfos[i].channelNum);
 	    }
 	}
       else
 	{
 	  if (port->channelInfos[i].isActive == ASIOTrue)
 	    {
-	      post("Output Channel %d is active\n", port->bufferInfos[i].channelNum);
+	      fts_post("Output Channel %d is active\n", port->bufferInfos[i].channelNum);
 	    }
 	  else
 	    {
-	      post("Output Channel %d is not active\n", port->bufferInfos[i].channelNum);
+	      fts_post("Output Channel %d is not active\n", port->bufferInfos[i].channelNum);
 	    }
 	}
 #endif // WANT_TO_DEBUG_ASIO_PACKAGES
@@ -461,7 +461,7 @@ asio_audioport_create_buffers(asio_audioport_t* port)
     int frame_shift = compute_frame_shift(port->asio_buffer_size, port->inout_buffer_size);
 
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
-    post("Frame shift : %d\n", frame_shift);
+    fts_post("Frame shift : %d\n", frame_shift);
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
     if (port->inout_buffer_size <= port->asio_buffer_size)
     {
@@ -577,7 +577,7 @@ static void asio_restart_fts_scheduler()
 {
   // write in named pipe
   int val = 0;
-  post("[asio] Restart FTS scheduler \n");
+  fts_post("[asio] Restart FTS scheduler \n");
   fts_log("[asio] Restart FTS scheduler \n");
   write(pipe_handles[1], &val, sizeof(int));
 }
@@ -588,15 +588,15 @@ static void asio_stop_fts_scheduler()
   if (0 != _pipe(pipe_handles, PIPE_DEFAULT_SIZE, O_BINARY))
     {
       fts_log("[asio] Cannot create a pipe for stopping FTS scheduler\n");
-      post("[asio] Cannot create pipe\n");
+      fts_post("[asio] Cannot create pipe\n");
     }
   else
     {
       int val;
-      post("[asio] FTS scheduler stopped \n");
+      fts_post("[asio] FTS scheduler stopped \n");
       fts_log("[asio] FTS scheduler stopped \n");
       read(pipe_handles[0], &val, sizeof(int));
-      post("[asio] FTS scheduler restarted \n");
+      fts_post("[asio] FTS scheduler restarted \n");
       fts_log("[asio] FTS scheduler restarted \n");
     }
   
@@ -617,7 +617,7 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
       // start ASIO callback
       if (!current_port->driver->isStarted)
 	{
-	  post("Start ASIO callback \n");
+	  fts_post("Start ASIO callback \n");
 	  current_port->driver->driver_interface->start();
 	  result = 1;
 	}
@@ -627,13 +627,13 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
     }
   else
     {
-      post("ASIO allows only to use one driver (%s)\n", current_port->driver->name);
+      fts_post("ASIO allows only to use one driver (%s)\n", current_port->driver->name);
       // set port open
       fts_audioport_set_open((fts_audioport_t*)port, input_or_output);
       nb_port_opened++;
     }
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
-  post("[asio] open (%d)\n", nb_port_opened);
+  fts_post("[asio] open (%d)\n", nb_port_opened);
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
   return result;
 }
@@ -646,10 +646,10 @@ asio_audioport_close()
     {
       // stop ASIO callback
       current_port->driver->driver_interface->stop();
-      post("ASIO Callback stop\n");
+      fts_post("ASIO Callback stop\n");
       // restart fts scheduler
       asio_restart_fts_scheduler();
-      post("FTS scheduler restarted\n");      
+      fts_post("FTS scheduler restarted\n");      
       nb_port_opened = 0;
     }
   else
@@ -657,7 +657,7 @@ asio_audioport_close()
       nb_port_opened--;
     }
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
-  post("[asio] close (%d)\n", nb_port_opened);
+  fts_post("[asio] close (%d)\n", nb_port_opened);
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
 }
 
@@ -734,7 +734,7 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
   /* set number of channels */
   driver->driver_interface->getChannels(&self->inputChannels, &self->outputChannels);
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
-  post("Inputs Channels: %d \n"
+  fts_post("Inputs Channels: %d \n"
        "Outputs Channels: %d \n"
        , self->inputChannels, self->outputChannels);
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
@@ -742,7 +742,7 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
   /* set buffer size */
   driver->driver_interface->getBufferSize(&self->minSize, &self->maxSize, &self->preferredSize, &self->granularity);
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
-  post("Min Buffer Size: %d\n"
+  fts_post("Min Buffer Size: %d\n"
        "Max Buffer Size: %d\n"
        "Preferred Buffer Size: %d\n"
        "Buffer Size Granularity: %d\n",
@@ -753,7 +753,7 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
   driver->driver_interface->getSampleRate(&sampleRate);
   self->sampleRate = (double)sampleRate;
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
-  post("Current SampleRate : %f\n", self->sampleRate);
+  fts_post("Current SampleRate : %f\n", self->sampleRate);
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
   if (ASE_OK == driver->driver_interface->outputReady())
   {
@@ -764,7 +764,7 @@ asio_audioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
     self->postOutput = false;
   }
 #ifdef WANT_TO_DEBUG_ASIO_PACKAGES
-  post("ASIOOuputReady() - %s \n", self->postOutput ? "Supported" : "Not Supported");
+  fts_post("ASIOOuputReady() - %s \n", self->postOutput ? "Supported" : "Not Supported");
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
   /* create buffers */
   asio_audioport_create_buffers(self);
