@@ -241,13 +241,13 @@ osc_ftl_signal_input_inplace_fvec(fts_word_t *argv)
 void
 osc_declare_functions(void)
 {
-  dsp_declare_function(osc_ftl_symbols_ptr.control_input, osc_ftl_control_input_ptr);
-  dsp_declare_function(osc_ftl_symbols_ptr.signal_input, osc_ftl_signal_input_ptr);
-  dsp_declare_function(osc_ftl_symbols_ptr.signal_input_inplace, osc_ftl_signal_input_inplace_ptr);
+  fts_dsp_declare_function(osc_ftl_symbols_ptr.control_input, osc_ftl_control_input_ptr);
+  fts_dsp_declare_function(osc_ftl_symbols_ptr.signal_input, osc_ftl_signal_input_ptr);
+  fts_dsp_declare_function(osc_ftl_symbols_ptr.signal_input_inplace, osc_ftl_signal_input_inplace_ptr);
 
-  dsp_declare_function(osc_ftl_symbols_fvec.control_input, osc_ftl_control_input_fvec);
-  dsp_declare_function(osc_ftl_symbols_fvec.signal_input, osc_ftl_signal_input_fvec);
-  dsp_declare_function(osc_ftl_symbols_fvec.signal_input_inplace, osc_ftl_signal_input_inplace_fvec);
+  fts_dsp_declare_function(osc_ftl_symbols_fvec.control_input, osc_ftl_control_input_fvec);
+  fts_dsp_declare_function(osc_ftl_symbols_fvec.signal_input, osc_ftl_signal_input_fvec);
+  fts_dsp_declare_function(osc_ftl_symbols_fvec.signal_input_inplace, osc_ftl_signal_input_inplace_fvec);
 }
 
 /***************************************************************************

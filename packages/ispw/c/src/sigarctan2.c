@@ -113,7 +113,7 @@ sigarctan2_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
   fts_set_int  (argv + 3, fts_dsp_get_input_size(dsp, 0));
 
-  dsp_add_funcall(sigarctan2_function, 4, argv);
+  fts_dsp_add_function(sigarctan2_function, 4, argv);
 }
 
 
@@ -133,14 +133,14 @@ sigarctan2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       atan_table[TABLE_SIZE+1] = atan(1.0f);	/* extra point for interp. */
     }
 
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 
 static void
 sigarctan2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -154,12 +154,12 @@ sigarctan2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigarctan2_put);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1);
+  fts_dsp_declare_outlet(cl, 0);
 
   sigarctan2_function = fts_new_symbol("arctan2");
-  dsp_declare_function(sigarctan2_function, ftl_arctan2);
+  fts_dsp_declare_function(sigarctan2_function, ftl_arctan2);
 
   return fts_Success;
 }

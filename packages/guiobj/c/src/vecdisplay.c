@@ -61,22 +61,27 @@ vecdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   vecdisplay_t * this = (vecdisplay_t *)o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
 
-  if(patcher && fts_patcher_is_open(patcher))
+  if(this->pending)
     {
+      /* there is something to deliver */
       this->gate = 0; /* close gate for period */
-      this->pending = 0; /* is delivered */
-      
-      if(this->scroll)
-	fts_client_send_message(o, sym_scroll, this->n, this->a);
-      else
-	fts_client_send_message(o, sym_display, this->n, this->a);
-      
-      this->n = 0;
-      
-      fts_timebase_add_call(fts_get_timebase(), o, vecdisplay_send, 0, this->period);
+      this->pending = 0; /* will be delivered */
+	  
+      /* send when patcher is open */
+      if(patcher && fts_patcher_is_open(patcher))
+	{
+	  if(this->scroll)
+	    fts_client_send_message(o, sym_scroll, this->n, this->a);
+	  else
+	    fts_client_send_message(o, sym_display, this->n, this->a);
+	  
+	  this->n = 0;
+	  
+	  fts_timebase_add_call(fts_get_timebase(), o, vecdisplay_send, 0, this->period);
+	}
     }
   else
-    this->gate = 1;
+    this->gate = 1; /* open gate */
 }
 
 static void
@@ -84,6 +89,7 @@ vecdisplay_deliver(vecdisplay_t *this)
 {
   this->pending = 1; /* there is something to deliver */
   
+  /* if gate is open send right away */
   if(this->gate)
     vecdisplay_send((fts_object_t *)this, 0, 0, 0, 0);
 }

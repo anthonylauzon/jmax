@@ -59,7 +59,7 @@ sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, b1, &zero);
   ftl_data_set(biquad_coefs_t, this->biquad_coefs, b2, &zero);
 
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 
@@ -71,7 +71,7 @@ sigapass3_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   ftl_data_free(this->biquad_coefs);
   ftl_data_free(this->biquad_state);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /****************************************
@@ -108,7 +108,7 @@ sigapass3_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_set_float(argv + 6, conv);
   fts_set_int(argv + 7, fts_dsp_get_input_size(dsp, 0));
 
-  dsp_add_funcall(sigapass3_function, 8, argv);
+  fts_dsp_add_function(sigapass3_function, 8, argv);
 }
 
 static void
@@ -183,13 +183,13 @@ sigapass3_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigapass3_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigapass3_put);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1);
-  dsp_sig_inlet(cl, 2);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1);
+  fts_dsp_declare_inlet(cl, 2);
+  fts_dsp_declare_outlet(cl, 0);
 
   sigapass3_function = fts_new_symbol("apass3");
-  dsp_declare_function(sigapass3_function, ftl_apass3);
+  fts_dsp_declare_function(sigapass3_function, ftl_apass3);
 
   return fts_Success;
 }

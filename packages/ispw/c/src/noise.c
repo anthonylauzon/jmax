@@ -48,7 +48,7 @@ noise_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   fts_set_symbol (argv,   fts_dsp_get_output_name(dsp, 0));
   fts_set_int   (argv+1, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(noise_dsp_symbol, 2, argv);
+  fts_dsp_add_function(noise_dsp_symbol, 2, argv);
 }
 
 static void
@@ -56,7 +56,7 @@ noise_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   noise_t *this = (noise_t *) o;
 
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 static void
@@ -64,7 +64,7 @@ noise_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   noise_t *this = (noise_t *) o;
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -76,8 +76,8 @@ noise_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, noise_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, noise_put);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   return fts_Success;
 }
@@ -86,7 +86,7 @@ void
 noise_config(void)
 {
   noise_dsp_symbol = fts_new_symbol("noise");
-  dsp_declare_function(noise_dsp_symbol, noise_dsp_function);
+  fts_dsp_declare_function(noise_dsp_symbol, noise_dsp_function);
 
   fts_class_install(fts_new_symbol("noise~"), noise_instantiate);
 }

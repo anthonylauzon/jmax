@@ -71,7 +71,7 @@ sigcatch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 	  fts_hashtable_put(&catch_table, &k, &a);
 	  
 	  this->name = name;
-	  dsp_list_insert(o);
+	  fts_dsp_add_object(o);
 	}
     }
   else
@@ -92,7 +92,7 @@ sigcatch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
   if ( this->name && fts_hashtable_get(&catch_table, &k, &a))
     {
       fts_hashtable_remove(&catch_table, &k); 
-      dsp_list_remove(o);
+      fts_dsp_remove_object(o);
     }
 }
 
@@ -160,7 +160,7 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_set_symbol(argv, fts_dsp_get_output_name(dsp, 0));
       fts_set_pointer(argv+1, this->buf);
 
-      dsp_add_funcall(sigcatch_64_function, 2, argv);
+      fts_dsp_add_function(sigcatch_64_function, 2, argv);
     }
   else
     {
@@ -168,7 +168,7 @@ sigcatch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_set_pointer(argv+1, this->buf);
       fts_set_int(argv+2, n_tick);
 
-      dsp_add_funcall(sigcatch_function, 3, argv);
+      fts_dsp_add_function(sigcatch_function, 3, argv);
     }
 }
 
@@ -187,14 +187,14 @@ sigcatch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigcatch_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigcatch_put);
  
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
  
   sigcatch_function = fts_new_symbol("sigcatch");
-  dsp_declare_function(sigcatch_function, sigcatch_dsp_fun);
+  fts_dsp_declare_function(sigcatch_function, sigcatch_dsp_fun);
 
   sigcatch_64_function = fts_new_symbol("sigcatch_64");
-  dsp_declare_function(sigcatch_64_function, sigcatch_64_dsp_fun);
+  fts_dsp_declare_function(sigcatch_64_function, sigcatch_64_dsp_fun);
  
   return fts_Success;
 }
@@ -226,7 +226,7 @@ sigthrow_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   this->bufp = ftl_data_new(float *);
   this->n_tick = 0;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -236,7 +236,7 @@ sigthrow_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
 
   ftl_data_free(this->bufp);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /*****************************************************************************
@@ -316,11 +316,11 @@ sigthrow_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_ftl_data (argv+1, this->bufp);
   
   if (fts_dsp_get_input_size(dsp, 0) == 64)
-    dsp_add_funcall(sigthrow_64_function, 2, argv);
+    fts_dsp_add_function(sigthrow_64_function, 2, argv);
   else
     {
       fts_set_int (argv+2, n_tick);
-      dsp_add_funcall(sigthrow_function, 3, argv);
+      fts_dsp_add_function(sigthrow_function, 3, argv);
     }
 }
 
@@ -387,14 +387,14 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, sigthrow_set);
   fts_method_define_varargs(cl, 0, fts_s_int, sigthrow_int);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   sigthrow_function = fts_new_symbol("xthrw");
-  dsp_declare_function(sigthrow_function, sigthrow_dsp_fun);
+  fts_dsp_declare_function(sigthrow_function, sigthrow_dsp_fun);
 
   sigthrow_64_function = fts_new_symbol("sigthrow_64");
-  dsp_declare_function(sigthrow_64_function, sigthrow_dsp_64_fun);
+  fts_dsp_declare_function(sigthrow_64_function, sigthrow_dsp_64_fun);
 
   return fts_Success;
 }

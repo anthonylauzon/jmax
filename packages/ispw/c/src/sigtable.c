@@ -104,7 +104,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   this->check_size = size;
   this->unit = unit;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -120,7 +120,7 @@ sigtable_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
 
   sampbuf_erase(&this->buf);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
  
 /******************************************************************

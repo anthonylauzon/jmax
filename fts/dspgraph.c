@@ -61,7 +61,7 @@ typedef struct stack_element stack_element_t;
 
 struct stack_element {
   fts_object_t *object;
-  fts_connection_t *remember;
+  fts_connection_t *connection_to_thru;
   fts_connection_t *connection;
   stack_element_t *next;
 };
@@ -119,7 +119,7 @@ graph_iterator_push(void *ptr, fts_object_t *object, int outlet)
     connection = 0;
 
   new->connection = connection;
-  new->remember = 0;
+  new->connection_to_thru = 0;
 
   new->next = iter->top;
 
@@ -166,7 +166,7 @@ graph_iterator_step( graph_iterator_t *iter)
       if(stat == fts_Success)
 	{
 	  /* skip "thru" object */
-	  oldtop->remember = oldtop->connection;
+	  oldtop->connection_to_thru = oldtop->connection;
 	  oldtop->connection = oldtop->connection->next_same_src;	  
 	  graph_iterator_step( iter);
 	}
@@ -214,12 +214,6 @@ graph_iterator_get_current( const graph_iterator_t *iter, fts_object_t **obj, in
     }
 }
 
-static int
-graph_iterator_has_connection_stack(const graph_iterator_t *iter)
-{
-  return (iter->top != 0);
-}
-
 static fts_connection_t *
 graph_iterator_get_current_connection(const graph_iterator_t *iter)
 {
@@ -233,8 +227,8 @@ graph_iterator_apply_to_connection_stack(const graph_iterator_t *iter, graph_ite
 
   while(elem)
     {
-      if(elem->remember)
-	fun(elem->remember, arg);
+      if(elem->connection_to_thru)
+	fun(elem->connection_to_thru, arg);
 
       elem = elem->next;
     }
@@ -1020,6 +1014,6 @@ void fts_kernel_dsp_graph_init(void)
   fts_s_dsp_outputsize = fts_new_symbol("DSP_OUTPUTSIZE");
 
   sym_builtin_add = fts_new_symbol( "__builtin_add");
-  dsp_declare_function( sym_builtin_add, dsp_graph_builtin_add);
+  fts_dsp_declare_function( sym_builtin_add, dsp_graph_builtin_add);
 }
 

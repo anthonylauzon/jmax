@@ -1302,14 +1302,16 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
   fts_atom_t a[9];
 
   if(fts_object_get_class_name(obj) == fts_s_connection)
-    {      
+    {
+      fts_connection_t *conn = (fts_connection_t *)obj;
+
       fts_client_start_message( this, sym_addConnection);
       fts_client_add_int( this, fts_get_object_id(obj));
-      fts_client_add_object( this, ((fts_connection_t *)obj)->src);
-      fts_client_add_int( this, ((fts_connection_t *)obj)->woutlet);
-      fts_client_add_object( this, ((fts_connection_t *)obj)->dst);
-      fts_client_add_int( this, ((fts_connection_t *)obj)->winlet);
-      fts_client_add_int( this, ((fts_connection_t *)obj)->type);
+      fts_client_add_object( this, conn->src);
+      fts_client_add_int( this, conn->woutlet);
+      fts_client_add_object( this, conn->dst);
+      fts_client_add_int( this, conn->winlet);
+      fts_client_add_int( this, conn->type);
       fts_client_done_message( this);
     }
   else

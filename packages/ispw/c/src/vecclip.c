@@ -171,8 +171,8 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 2, fts_s_int, sigclip_max);
   fts_method_define_varargs(cl, 2, fts_s_float, sigclip_max);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }

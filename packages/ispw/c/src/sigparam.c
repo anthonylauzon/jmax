@@ -69,7 +69,7 @@ sigsamplerate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   x->c_vecsize   = -1;
   x->c_isvecsize = 0;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -80,13 +80,13 @@ sigvectorsize_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   x->c_vecsize   = -1;
   x->c_isvecsize = 1;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
 sigparam_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -100,7 +100,7 @@ sigsamplerate_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_bang, sigparam_bang);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
   
   fts_outlet_type_define_varargs(cl, 0, fts_s_float);
 
@@ -118,7 +118,7 @@ sigvectorsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_bang, sigparam_bang);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
   
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
 

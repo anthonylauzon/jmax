@@ -144,7 +144,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   x->hop = hop;  
   x->phase = phase % hop;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 
@@ -159,7 +159,7 @@ fft_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(x->ctl.spec) 
     fts_free((void *)x->ctl.spec);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /************************************************
@@ -257,11 +257,11 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(dsp_arg + 3, fts_dsp_get_output_name(dsp, 0));
       fts_set_symbol(dsp_arg + 4, fts_dsp_get_output_name(dsp, 1));
       if(real_spec == sym_half)
-        dsp_add_funcall(dsp_sym_fft_real_half, 5, dsp_arg);
+        fts_dsp_add_function(dsp_sym_fft_real_half, 5, dsp_arg);
       else if(real_spec == sym_miller)
-        dsp_add_funcall(dsp_sym_fft_real_miller, 5, dsp_arg);
+        fts_dsp_add_function(dsp_sym_fft_real_miller, 5, dsp_arg);
       else
-        dsp_add_funcall(dsp_sym_fft_real, 5, dsp_arg);
+        fts_dsp_add_function(dsp_sym_fft_real, 5, dsp_arg);
     }
     else if(type == sym_tandem)
     {
@@ -272,11 +272,11 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(dsp_arg + 6, fts_dsp_get_output_name(dsp, 2));
       fts_set_symbol(dsp_arg + 7, fts_dsp_get_output_name(dsp, 3));
       if(real_spec == sym_half)
-        dsp_add_funcall(dsp_sym_fft_tandem_half, 8, dsp_arg);
+        fts_dsp_add_function(dsp_sym_fft_tandem_half, 8, dsp_arg);
       else if(real_spec == sym_miller)
-        dsp_add_funcall(dsp_sym_fft_tandem_miller, 8, dsp_arg);
+        fts_dsp_add_function(dsp_sym_fft_tandem_miller, 8, dsp_arg);
       else
-        dsp_add_funcall(dsp_sym_fft_tandem, 8, dsp_arg);
+        fts_dsp_add_function(dsp_sym_fft_tandem, 8, dsp_arg);
     }
     else /* complex */
     {
@@ -284,7 +284,7 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(dsp_arg + 3, fts_dsp_get_input_name(dsp, 1));
       fts_set_symbol(dsp_arg + 4, fts_dsp_get_output_name(dsp, 0));
       fts_set_symbol(dsp_arg + 5, fts_dsp_get_output_name(dsp, 1));
-      dsp_add_funcall(dsp_sym_fft_complex, 6, dsp_arg);
+      fts_dsp_add_function(dsp_sym_fft_complex, 6, dsp_arg);
     }
   }
   else if(class == sym_ifft)
@@ -297,11 +297,11 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(dsp_arg + 3, fts_dsp_get_input_name(dsp, 1));
       fts_set_symbol(dsp_arg + 4, fts_dsp_get_output_name(dsp, 0));
       if(real_spec == sym_half)
-        dsp_add_funcall(dsp_sym_ifft_real_half, 5, dsp_arg);
+        fts_dsp_add_function(dsp_sym_ifft_real_half, 5, dsp_arg);
       else if(real_spec == sym_miller)
-        dsp_add_funcall(dsp_sym_ifft_real_miller, 5, dsp_arg);
+        fts_dsp_add_function(dsp_sym_ifft_real_miller, 5, dsp_arg);
       else
-        dsp_add_funcall(dsp_sym_ifft_real, 5, dsp_arg);
+        fts_dsp_add_function(dsp_sym_ifft_real, 5, dsp_arg);
     }    
 
     else if(type == sym_tandem)
@@ -313,11 +313,11 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(dsp_arg + 6, fts_dsp_get_output_name(dsp, 0));
       fts_set_symbol(dsp_arg + 7, fts_dsp_get_output_name(dsp, 1));
       if(real_spec == sym_half)
-        dsp_add_funcall(dsp_sym_ifft_tandem_half, 8, dsp_arg);
+        fts_dsp_add_function(dsp_sym_ifft_tandem_half, 8, dsp_arg);
       else if(real_spec == sym_miller)
-        dsp_add_funcall(dsp_sym_ifft_tandem_miller, 8, dsp_arg);
+        fts_dsp_add_function(dsp_sym_ifft_tandem_miller, 8, dsp_arg);
       else
-        dsp_add_funcall(dsp_sym_ifft_tandem, 8, dsp_arg);
+        fts_dsp_add_function(dsp_sym_ifft_tandem, 8, dsp_arg);
     }    
     else /* complex */
     {
@@ -325,7 +325,7 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(dsp_arg + 3, fts_dsp_get_input_name(dsp, 1));
       fts_set_symbol(dsp_arg + 4, fts_dsp_get_output_name(dsp, 0));
       fts_set_symbol(dsp_arg + 5, fts_dsp_get_output_name(dsp, 1));
-      dsp_add_funcall(dsp_sym_ifft_complex, 6, dsp_arg);
+      fts_dsp_add_function(dsp_sym_ifft_complex, 6, dsp_arg);
     }
   }
 }
@@ -387,29 +387,29 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     if(type == sym_real)
     {
       fts_class_init(cl, sizeof(fft_t), 1, 2 + 1, (void *)fft_class); /* + 1: bang out */
-      dsp_sig_inlet(cl, 0); /* a real inlet */
-      dsp_sig_outlet(cl, 0); /* a pair of outlets */
-      dsp_sig_outlet(cl, 1);
+      fts_dsp_declare_inlet(cl, 0); /* a real inlet */
+      fts_dsp_declare_outlet(cl, 0); /* a pair of outlets */
+      fts_dsp_declare_outlet(cl, 1);
       bang_out = 2;
     }    
     else if(type == sym_tandem)
     {
       fts_class_init(cl, sizeof(fft_t), 2, 4 + 1, (void *)fft_class); /* + 1: bang out */
-      dsp_sig_inlet(cl, 0); /* a real inlet */
-      dsp_sig_inlet(cl, 1); /* another real inlet */
-      dsp_sig_outlet(cl, 0); /* a pair of outlets */
-      dsp_sig_outlet(cl, 1);
-      dsp_sig_outlet(cl, 2); /* another pair of outlets */
-      dsp_sig_outlet(cl, 3);
+      fts_dsp_declare_inlet(cl, 0); /* a real inlet */
+      fts_dsp_declare_inlet(cl, 1); /* another real inlet */
+      fts_dsp_declare_outlet(cl, 0); /* a pair of outlets */
+      fts_dsp_declare_outlet(cl, 1);
+      fts_dsp_declare_outlet(cl, 2); /* another pair of outlets */
+      fts_dsp_declare_outlet(cl, 3);
       bang_out = 4;
     }
     else /* complex */
     {
       fts_class_init(cl, sizeof(fft_t), 2, 2 + 1, (void *)fft_class); /* + 1: bang out */
-      dsp_sig_inlet(cl, 0); /* a pair of inlet s */
-      dsp_sig_inlet(cl, 1); 
-      dsp_sig_outlet(cl, 0); /* a pair of outlets */
-      dsp_sig_outlet(cl, 1);
+      fts_dsp_declare_inlet(cl, 0); /* a pair of inlet s */
+      fts_dsp_declare_inlet(cl, 1); 
+      fts_dsp_declare_outlet(cl, 0); /* a pair of outlets */
+      fts_dsp_declare_outlet(cl, 1);
       bang_out = 2;
     }
   }
@@ -427,29 +427,29 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     if(type == sym_real)
     {
       fts_class_init(cl, sizeof(fft_t), 2, 1 + 1, (void *)fft_class); /* + 1: bang out */
-      dsp_sig_inlet(cl, 0); /* a pair of inlets */
-      dsp_sig_inlet(cl, 1);
-      dsp_sig_outlet(cl, 0); /* just a real outlet */
+      fts_dsp_declare_inlet(cl, 0); /* a pair of inlets */
+      fts_dsp_declare_inlet(cl, 1);
+      fts_dsp_declare_outlet(cl, 0); /* just a real outlet */
       bang_out = 1;
     }
     else if(type == sym_tandem)
     {
       fts_class_init(cl, sizeof(fft_t), 4, 2 + 1, (void *)fft_class); /* + 1: bang out */
-      dsp_sig_inlet(cl, 0); /* a pair of inlets */
-      dsp_sig_inlet(cl, 1);
-      dsp_sig_inlet(cl, 2); /* another pair of inlets */
-      dsp_sig_inlet(cl, 3);
-      dsp_sig_outlet(cl, 0); /* a real outlet */
-      dsp_sig_outlet(cl, 1); /* another "real" outlet */
+      fts_dsp_declare_inlet(cl, 0); /* a pair of inlets */
+      fts_dsp_declare_inlet(cl, 1);
+      fts_dsp_declare_inlet(cl, 2); /* another pair of inlets */
+      fts_dsp_declare_inlet(cl, 3);
+      fts_dsp_declare_outlet(cl, 0); /* a real outlet */
+      fts_dsp_declare_outlet(cl, 1); /* another "real" outlet */
       bang_out = 2;
     }
     else /* complex */
     {
       fts_class_init(cl, sizeof(fft_t), 2, 2 + 1, (void *)fft_class); /* + 1: bang out */
-      dsp_sig_inlet(cl, 0); /* one pair of inlets */
-      dsp_sig_inlet(cl, 1);
-      dsp_sig_outlet(cl, 0); /* one pair of outlets */
-      dsp_sig_outlet(cl, 1);
+      fts_dsp_declare_inlet(cl, 0); /* one pair of inlets */
+      fts_dsp_declare_inlet(cl, 1);
+      fts_dsp_declare_outlet(cl, 0); /* one pair of outlets */
+      fts_dsp_declare_outlet(cl, 1);
       bang_out = 2;
     }
   }

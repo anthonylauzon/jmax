@@ -94,7 +94,7 @@ tilda_put_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
-  dsp_add_funcall(sym_tilda_const, 3, a);
+  fts_dsp_add_function(sym_tilda_const, 3, a);
 }
 
 void
@@ -114,7 +114,7 @@ tilda_put_ramp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
-  dsp_add_funcall(sym_tilda_ramp, 3, a);
+  fts_dsp_add_function(sym_tilda_ramp, 3, a);
 }
 
 static void
@@ -170,7 +170,7 @@ tilda_init_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 { 
   tilda_t *this = (tilda_t *)o;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 
   this->data = ftl_data_alloc(sizeof(float)); /* just a constant */
 
@@ -193,7 +193,7 @@ tilda_init_ramp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 { 
   tilda_t *this = (tilda_t *)o;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 
   this->data = ftl_data_alloc(sizeof(fts_ramp_t)); /* ramp */
 
@@ -209,7 +209,7 @@ tilda_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   tilda_t *this = (tilda_t *)o;
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 
   ftl_data_free(this->data);
 }
@@ -249,7 +249,7 @@ tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
 
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   return fts_Success;
 }
@@ -260,8 +260,8 @@ signal_tilda_config(void)
   fts_metaclass_install(fts_new_symbol("~"), tilda_instantiate, fts_arg_type_equiv);
 
   sym_tilda_const = fts_new_symbol("tilda_const");
-  dsp_declare_function(sym_tilda_const, tilda_ftl_const);
+  fts_dsp_declare_function(sym_tilda_const, tilda_ftl_const);
 
   sym_tilda_ramp = fts_new_symbol("tilda_ramp");
-  dsp_declare_function(sym_tilda_ramp, tilda_ftl_ramp);
+  fts_dsp_declare_function(sym_tilda_ramp, tilda_ftl_ramp);
 }

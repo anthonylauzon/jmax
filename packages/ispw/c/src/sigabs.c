@@ -64,21 +64,21 @@ sigabs_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int  (argv + 2, fts_dsp_get_input_size(dsp, 0));
 
-  dsp_add_funcall(sigabs_function, 3, argv);
+  fts_dsp_add_function(sigabs_function, 3, argv);
 }
 
 
 static void
 sigabs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_insert(o); 
+  fts_dsp_add_object(o); 
 }
 
 
 static void
 sigabs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -91,11 +91,11 @@ sigabs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigabs_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigabs_put);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   sigabs_function = fts_new_symbol("sigabs");
-  dsp_declare_function(sigabs_function, ftl_sigabs);
+  fts_dsp_declare_function(sigabs_function, ftl_sigabs);
 
   return fts_Success;
 }

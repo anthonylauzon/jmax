@@ -78,7 +78,7 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->rec_prot = 0;
 
   delay_table_add_delwrite(o, this->name, this->buf);
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 static void
@@ -90,7 +90,7 @@ delwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       delbuf_delete_delayline(this->buf);
       delay_table_remove_delwrite(o, this->name);
-      dsp_list_remove(o);
+      fts_dsp_remove_object(o);
     }
 }
 
@@ -131,7 +131,7 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
   fts_set_pointer(argv + 1, this->buf);
   fts_set_int(argv + 2, n_tick);
-  dsp_add_funcall(dsp_symbol, 3, argv);
+  fts_dsp_add_function(dsp_symbol, 3, argv);
 
   delay_table_delwrite_scheduled(this->name);
 }
@@ -180,11 +180,11 @@ delwrite_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_clear, delwrite_clear);
   fts_method_define_varargs(cl, 0, fts_new_symbol("realloc"), delwrite_realloc);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   dsp_symbol = fts_new_symbol("delwrite");
-  dsp_declare_function(dsp_symbol, ftl_delwrite);
+  fts_dsp_declare_function(dsp_symbol, ftl_delwrite);
 
   return fts_Success;
 }

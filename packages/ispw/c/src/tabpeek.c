@@ -67,7 +67,7 @@ tabpeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
       *data = 0;
 
-      dsp_list_insert(o); /* just put object in list */
+      fts_dsp_add_object(o); /* just put object in list */
     }
   else
     fts_object_set_error(o, "Argument (name of table~) required");
@@ -82,7 +82,7 @@ tabpeek_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if(this->ftl_data)
     {
       ftl_data_free(this->ftl_data);
-      dsp_list_remove(o);
+      fts_dsp_remove_object(o);
     }
 }
 
@@ -113,7 +113,7 @@ tabpeek_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
 	  fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
-	  dsp_add_funcall(dsp_symbol, 4, argv);
+	  fts_dsp_add_function(dsp_symbol, 4, argv);
 
 	  return;
 	}
@@ -227,11 +227,11 @@ tabpeek_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, tabpeek_set);
   fts_method_define_varargs(cl, 0, fts_s_int, tabpeek_set_by_int);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   dsp_symbol = fts_new_symbol("tabpeek");
-  dsp_declare_function(dsp_symbol, ftl_tabpeek);
+  fts_dsp_declare_function(dsp_symbol, ftl_tabpeek);
 
   return fts_Success;
 }

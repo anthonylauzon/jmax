@@ -434,7 +434,7 @@ pitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_set_pointer(a+1, analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(a+3, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(dsp_symbol, 4, a);
+  fts_dsp_add_function(dsp_symbol, 4, a);
 }
 
 static void 
@@ -489,7 +489,7 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   x->out.micro_pitch = 0.0f;
   x->out.time = 0.0;
   
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void 
@@ -502,7 +502,7 @@ pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(x->wind) 
     fts_free(x->wind);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t 
@@ -526,7 +526,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_print, pitch_print);
 
   /* classes signal inlets and outlets */
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   /* classes outlets */
   fts_outlet_type_define_varargs(cl, 0, fts_s_float);
@@ -535,7 +535,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 3, fts_s_float);
 
   dsp_symbol = fts_new_symbol(DSP_NAME);
-  dsp_declare_function(dsp_symbol, pt_common_dsp_function);
+  fts_dsp_declare_function(dsp_symbol, pt_common_dsp_function);
 
   return(fts_Success);
 }

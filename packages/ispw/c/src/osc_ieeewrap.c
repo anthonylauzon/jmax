@@ -77,14 +77,14 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 		  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 		  fts_set_ftl_data(argv + 1, ftl_data);
 
-		  dsp_add_funcall(osc_ftl_sym_phase_64_inplace, 2, argv);
+		  fts_dsp_add_function(osc_ftl_sym_phase_64_inplace, 2, argv);
 		}
 	      else
 		{
 		  fts_set_symbol (argv + 0, fts_dsp_get_input_name(dsp, 1));
 		  fts_set_ftl_data(argv+ 1, ftl_data);
 		  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
-		  dsp_add_funcall(osc_ftl_sym_phase_inplace, 3, argv);
+		  fts_dsp_add_function(osc_ftl_sym_phase_inplace, 3, argv);
 		}
 	    }
 	  else
@@ -96,7 +96,7 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 		  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 		  fts_set_ftl_data(argv+ 2, ftl_data);
 
-		  dsp_add_funcall(osc_ftl_sym_phase_64, 3, argv);
+		  fts_dsp_add_function(osc_ftl_sym_phase_64, 3, argv);
 		}
 	      else
 		{
@@ -104,7 +104,7 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 		  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 		  fts_set_ftl_data(argv+ 2, ftl_data);
 		  fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
-		  dsp_add_funcall(osc_ftl_sym_phase, 4, argv);
+		  fts_dsp_add_function(osc_ftl_sym_phase, 4, argv);
 		}
 
 	    }
@@ -122,7 +122,7 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 	      fts_set_ftl_data(argv+ 1, ftl_data);
 	      fts_set_int   (argv + 2, fts_dsp_get_input_size(dsp, 0));
 
-	      dsp_add_funcall(osc_ftl_sym_freq_inplace, 3, argv);
+	      fts_dsp_add_function(osc_ftl_sym_freq_inplace, 3, argv);
 	    }
 	  else
 	    {
@@ -132,7 +132,7 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 	      fts_set_ftl_data(argv+ 2, ftl_data);
 	      fts_set_int   (argv + 3, fts_dsp_get_input_size(dsp, 0));
 
-	      dsp_add_funcall(osc_ftl_sym_freq, 4, argv);
+	      fts_dsp_add_function(osc_ftl_sym_freq, 4, argv);
 	    }
 
 
@@ -146,7 +146,7 @@ osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data)
 	  fts_set_ftl_data(argv+ 3, ftl_data);
 	  fts_set_int   (argv + 4, fts_dsp_get_input_size(dsp, 0));
 
-	  dsp_add_funcall(osc_ftl_sym, 5, argv);
+	  fts_dsp_add_function(osc_ftl_sym, 5, argv);
 	}
     }
 }
@@ -381,25 +381,25 @@ void
 osc_ftl_declare_functions(void)
 {
   osc_ftl_sym_phase = fts_new_symbol("osc_phase");
-  dsp_declare_function(osc_ftl_sym_phase, osc_ftl_fun_phase);
+  fts_dsp_declare_function(osc_ftl_sym_phase, osc_ftl_fun_phase);
 
   osc_ftl_sym_phase_64 = fts_new_symbol("osc_phase_64");
-  dsp_declare_function(osc_ftl_sym_phase_64, osc_ftl_fun_phase_64);
+  fts_dsp_declare_function(osc_ftl_sym_phase_64, osc_ftl_fun_phase_64);
 
   osc_ftl_sym_phase_inplace = fts_new_symbol("osc_phase_inplace");
-  dsp_declare_function(osc_ftl_sym_phase_inplace, osc_ftl_fun_phase_inplace);
+  fts_dsp_declare_function(osc_ftl_sym_phase_inplace, osc_ftl_fun_phase_inplace);
 
   osc_ftl_sym_phase_64_inplace = fts_new_symbol("osc_phase_64_inplace");
-  dsp_declare_function(osc_ftl_sym_phase_64_inplace, osc_ftl_fun_phase_64_inplace);
+  fts_dsp_declare_function(osc_ftl_sym_phase_64_inplace, osc_ftl_fun_phase_64_inplace);
 
   osc_ftl_sym_freq = fts_new_symbol("osc_freq");
-  dsp_declare_function(osc_ftl_sym_freq, osc_ftl_fun_freq);
+  fts_dsp_declare_function(osc_ftl_sym_freq, osc_ftl_fun_freq);
 
   osc_ftl_sym_freq_inplace = fts_new_symbol("osc_freq_inplace");
-  dsp_declare_function(osc_ftl_sym_freq_inplace, osc_ftl_fun_freq_inplace);
+  fts_dsp_declare_function(osc_ftl_sym_freq_inplace, osc_ftl_fun_freq_inplace);
 
   osc_ftl_sym = fts_new_symbol("osc");
-  dsp_declare_function(osc_ftl_sym, osc_ftl_fun);
+  fts_dsp_declare_function(osc_ftl_sym, osc_ftl_fun);
 }
 
 /***************************************************************************

@@ -94,7 +94,7 @@ matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->cr = 1.0f; /* will be properly set in the put routine */
       this->n_tick = 0;
       
-      dsp_list_insert(o);
+      fts_dsp_add_object(o);
     }
   else
     fts_object_set_error(o, "Matrix dimension arguments required");
@@ -106,7 +106,7 @@ static void matrix_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   
   ftl_data_free((void *)this->ramps);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /**************************************************************
@@ -167,9 +167,9 @@ matrix_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_set_symbol(a + 5 + n_ins + out, fts_dsp_get_output_name(dsp, out));
 
   if(n_ins < n_outs)
-    dsp_add_funcall(matrix_copy_in_ftl_symbol, 5 + n_ins + n_outs, a);
+    fts_dsp_add_function(matrix_copy_in_ftl_symbol, 5 + n_ins + n_outs, a);
   else
-    dsp_add_funcall(matrix_copy_out_ftl_symbol, 5 + n_ins + n_outs, a);    
+    fts_dsp_add_function(matrix_copy_out_ftl_symbol, 5 + n_ins + n_outs, a);    
 }
 
 static void 
@@ -365,16 +365,16 @@ matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
     
   /* dsp in/outlets */
   for(i=0; i<n_ins; i++)
-    dsp_sig_inlet(cl, i);
+    fts_dsp_declare_inlet(cl, i);
 
   for(j=0; j<n_outs; j++)
-    dsp_sig_outlet(cl, j);
+    fts_dsp_declare_outlet(cl, j);
   
   matrix_copy_in_ftl_symbol = fts_new_symbol("matrix_in_copy");
   matrix_copy_out_ftl_symbol = fts_new_symbol("matrix_out_copy");
 
-  dsp_declare_function(matrix_copy_in_ftl_symbol, ftl_matrix_copy_in);
-  dsp_declare_function(matrix_copy_out_ftl_symbol, ftl_matrix_copy_out);
+  fts_dsp_declare_function(matrix_copy_in_ftl_symbol, ftl_matrix_copy_in);
+  fts_dsp_declare_function(matrix_copy_out_ftl_symbol, ftl_matrix_copy_out);
 
   return fts_Success;
 }

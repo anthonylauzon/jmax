@@ -85,7 +85,7 @@ sigsamphold_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_set_ftl_data(argv+3, this->samphold_ftl_data);
   fts_set_int  (argv+4, fts_dsp_get_input_size(dsp, 0));
 
-  dsp_add_funcall(sigsamphold_function, 5, argv);
+  fts_dsp_add_function(sigsamphold_function, 5, argv);
 }
 
 
@@ -123,7 +123,7 @@ sigsamphold_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   f = 0.0f;
   ftl_data_set(samphold_state_t, this->samphold_ftl_data, val, &f);
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -132,7 +132,7 @@ sigsamphold_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   sigsamphold_t *this = (sigsamphold_t *)o;
 
   ftl_data_free(this->samphold_ftl_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -148,12 +148,12 @@ sigsamphold_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, sigsamphold_number);
   fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), sigsamphold_reset);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1);
+  fts_dsp_declare_outlet(cl, 0);
   
   sigsamphold_function = fts_new_symbol("sigsamphold");
-  dsp_declare_function(sigsamphold_function, ftl_samphold);
+  fts_dsp_declare_function(sigsamphold_function, ftl_samphold);
   
   return fts_Success;
 }

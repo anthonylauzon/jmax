@@ -71,7 +71,7 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	    coefs[i] = 0.0;
 	}
   
-      dsp_list_insert(o);
+      fts_dsp_add_object(o);
     }
   else
     fts_object_set_error(o, "Wrong arguments");
@@ -89,7 +89,7 @@ iir_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       ftl_data_free(this->state);
     }
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void
@@ -124,7 +124,7 @@ iir_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   fts_set_ftl_data(argv + 3, this->coefs);
   fts_set_int(argv + 4, fts_dsp_get_input_size(dsp, 0));
 
-  dsp_add_funcall(iir_dsp_function[this->n_order], 5, argv);
+  fts_dsp_add_function(iir_dsp_function[this->n_order], 5, argv);
 }
 
 
@@ -168,8 +168,8 @@ iir_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_clear, iir_clear);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -182,10 +182,10 @@ iir_config(void)
   iir_dsp_function[3] = fts_new_symbol("iir_3");
   iir_dsp_function[4] = fts_new_symbol("iir_4");
 
-  dsp_declare_function(iir_dsp_function[1], ftl_iir_1);
-  dsp_declare_function(iir_dsp_function[2], ftl_iir_2);
-  dsp_declare_function(iir_dsp_function[3], ftl_iir_3);
-  dsp_declare_function(iir_dsp_function[4], ftl_iir_4);
+  fts_dsp_declare_function(iir_dsp_function[1], ftl_iir_1);
+  fts_dsp_declare_function(iir_dsp_function[2], ftl_iir_2);
+  fts_dsp_declare_function(iir_dsp_function[3], ftl_iir_3);
+  fts_dsp_declare_function(iir_dsp_function[4], ftl_iir_4);
 
   fts_metaclass_install(fts_new_symbol("iir~"), iir_instantiate, fts_narg_equiv);
 }

@@ -67,7 +67,7 @@ sigprint_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   x->size = 0;
   x->alloc = 0;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -77,7 +77,7 @@ sigprint_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(x->buf) fts_free(x->buf);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void
@@ -148,7 +148,7 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
   fts_set_pointer(argv + 1, o);
   fts_set_int(argv + 2, n_tick);
-  dsp_add_funcall(fts_s_print, 3, argv);
+  fts_dsp_add_function(fts_s_print, 3, argv);
 }
 
 static fts_status_t
@@ -164,9 +164,9 @@ sigprint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, sigprint_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, sigprint_int);
 
-  dsp_declare_function(fts_s_print, ftl_sigprint);
+  fts_dsp_declare_function(fts_s_print, ftl_sigprint);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   return fts_Success;
 }

@@ -141,7 +141,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->ftl_data = osc_ftl_data_new();
   this->sym = sym;
 
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 static void
@@ -151,7 +151,7 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   ftl_data_free(this->ftl_data);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -258,9 +258,9 @@ osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, osc_number);
   fts_method_define_varargs(cl, 0, fts_s_float, osc_number);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }

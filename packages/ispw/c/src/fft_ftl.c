@@ -92,21 +92,21 @@ ftl_fft_init(void)
   dsp_sym_fft_tandem_miller = fts_new_symbol("fft_tandem_miller");
   dsp_sym_ifft_tandem_miller = fts_new_symbol("ifft_tandem_miller");
 
-  dsp_declare_function(dsp_sym_fft_complex, ftl_fft_complex);
-  dsp_declare_function(dsp_sym_ifft_complex, ftl_ifft_complex);
-  dsp_declare_function(dsp_sym_fft_real, ftl_fft_real);
-  dsp_declare_function(dsp_sym_ifft_real, ftl_ifft_real);
-  dsp_declare_function(dsp_sym_fft_real_half, ftl_fft_real_half);
-  dsp_declare_function(dsp_sym_ifft_real_half, ftl_ifft_real_half);
-  dsp_declare_function(dsp_sym_fft_tandem, ftl_fft_tandem);
-  dsp_declare_function(dsp_sym_ifft_tandem, ftl_ifft_tandem);
-  dsp_declare_function(dsp_sym_fft_tandem_half, ftl_fft_tandem_half);
-  dsp_declare_function(dsp_sym_ifft_tandem_half, ftl_ifft_tandem_half);
+  fts_dsp_declare_function(dsp_sym_fft_complex, ftl_fft_complex);
+  fts_dsp_declare_function(dsp_sym_ifft_complex, ftl_ifft_complex);
+  fts_dsp_declare_function(dsp_sym_fft_real, ftl_fft_real);
+  fts_dsp_declare_function(dsp_sym_ifft_real, ftl_ifft_real);
+  fts_dsp_declare_function(dsp_sym_fft_real_half, ftl_fft_real_half);
+  fts_dsp_declare_function(dsp_sym_ifft_real_half, ftl_ifft_real_half);
+  fts_dsp_declare_function(dsp_sym_fft_tandem, ftl_fft_tandem);
+  fts_dsp_declare_function(dsp_sym_ifft_tandem, ftl_ifft_tandem);
+  fts_dsp_declare_function(dsp_sym_fft_tandem_half, ftl_fft_tandem_half);
+  fts_dsp_declare_function(dsp_sym_ifft_tandem_half, ftl_ifft_tandem_half);
 
-  dsp_declare_function(dsp_sym_fft_real_miller, ftl_fft_real_miller);
-  dsp_declare_function(dsp_sym_ifft_real_miller, ftl_ifft_real_miller);
-  dsp_declare_function(dsp_sym_fft_tandem_miller, ftl_fft_tandem_miller);
-  dsp_declare_function(dsp_sym_ifft_tandem_miller, ftl_ifft_tandem_miller);
+  fts_dsp_declare_function(dsp_sym_fft_real_miller, ftl_fft_real_miller);
+  fts_dsp_declare_function(dsp_sym_ifft_real_miller, ftl_ifft_real_miller);
+  fts_dsp_declare_function(dsp_sym_fft_tandem_miller, ftl_fft_tandem_miller);
+  fts_dsp_declare_function(dsp_sym_ifft_tandem_miller, ftl_ifft_tandem_miller);
 }
 
 

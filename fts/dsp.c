@@ -343,7 +343,7 @@ fts_dsp_add_function_zero(fts_symbol_t signal, int size)
 
   fts_set_symbol(a + 0, signal);
   fts_set_int(a + 1, size);
-  dsp_add_funcall(dsp_zero_fun_symbol, 2, a);
+  fts_dsp_add_function(dsp_zero_fun_symbol, 2, a);
 }
 
 void
@@ -354,7 +354,7 @@ fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int size)
   fts_set_symbol(a + 0, in);
   fts_set_symbol(a + 1, out);
   fts_set_int(a + 2, size);
-  dsp_add_funcall(dsp_copy_fun_symbol, 3, a);
+  fts_dsp_add_function(dsp_copy_fun_symbol, 3, a);
 }
 
 /**************************************************************************

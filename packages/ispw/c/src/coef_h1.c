@@ -131,7 +131,7 @@ sigcoef_hlshelf1_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_set_float(&a, f2);
   sigcoef_hlshelf1_in4(o, 4, s, 1, &a);
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -262,7 +262,7 @@ sigcoef_hlshelf1_in4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void
 sigcoef_hlshelf1_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -288,7 +288,7 @@ sigcoef_hlshelf1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 3, fts_s_int, sigcoef_hlshelf1_in3);
   fts_method_define_varargs(cl, 4, fts_s_int, sigcoef_hlshelf1_in4);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
   
   return fts_Success;
 }

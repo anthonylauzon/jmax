@@ -44,7 +44,7 @@ white_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_set_symbol(a + 0, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 1, fts_dsp_get_output_size(dsp, 0));
   
-  dsp_add_funcall(white_ftl_sym, 2, a);
+  fts_dsp_add_function(white_ftl_sym, 2, a);
 }
 
 static void
@@ -69,7 +69,7 @@ white_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 { 
   white_t *this = (white_t *)o;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -77,7 +77,7 @@ white_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   white_t *this = (white_t *)o;
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -91,9 +91,9 @@ white_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, white_put);
 
   white_ftl_sym = fts_new_symbol("white");
-  dsp_declare_function(white_ftl_sym, white_ftl);
+  fts_dsp_declare_function(white_ftl_sym, white_ftl);
 
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   return fts_Success;
 }

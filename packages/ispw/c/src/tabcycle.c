@@ -75,7 +75,7 @@ tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       
       this->tabcycle_data = ftl_data_alloc(sizeof(tabcycle_ctl_t));
       
-      dsp_list_insert(o);
+      fts_dsp_add_object(o);
     }
   else
     fts_object_set_error(o, "Wrong arguments");
@@ -88,7 +88,7 @@ tabcycle_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   tabcycle_t *this = (tabcycle_t *)o;
 
   ftl_data_free(this->tabcycle_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /******************************************************************
@@ -153,7 +153,7 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_set_symbol(argv + 0, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv + 1, this->tabcycle_data);
       fts_set_int(argv + 2, n_tick);
-      dsp_add_funcall(tabcycle_fun_symbol, 3, argv);
+      fts_dsp_add_function(tabcycle_fun_symbol, 3, argv);
     }
   else
     post("tabcycle~: %s: can't find table~\n", fts_symbol_name(this->tab_name));
@@ -215,11 +215,11 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, tabcycle_bang);
   fts_method_define_varargs(cl, 0, fts_s_set, tabcycle_set);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   tabcycle_fun_symbol = fts_new_symbol("tabcycle");
-  dsp_declare_function(tabcycle_fun_symbol, tabcycle_dsp_function);
+  fts_dsp_declare_function(tabcycle_fun_symbol, tabcycle_dsp_function);
 
   return fts_Success;
 }

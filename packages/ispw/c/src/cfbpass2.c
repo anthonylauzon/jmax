@@ -256,14 +256,14 @@ sigcoef_bpass2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   sigcoef_bpass2_verify_freq(this);
   sigcoef_bpass2_verify_bw(this);
 
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 
 static void
 sigcoef_bpass2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -288,7 +288,7 @@ sigcoef_bpass2_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_outlet_type_define_varargs(cl, 4,	fts_s_float);
   fts_outlet_type_define_varargs(cl, 5,	fts_s_float);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   return fts_Success;
 }

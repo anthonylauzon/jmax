@@ -116,7 +116,7 @@ veclog_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
   fts_set_symbol(argv + 0,   fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(name, 3, argv);
+  fts_dsp_add_function(name, 3, argv);
 }
 
 static void
@@ -129,7 +129,7 @@ veclog_put_scl(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
   fts_set_pointer(argv + 1, &this->scl);
   fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(argv + 3, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(name, 4, argv);
+  fts_dsp_add_function(name, 4, argv);
 }
 
 static void 
@@ -210,7 +210,7 @@ veclog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   else
     obj->scl = 1.0;
   
-  dsp_list_insert(o);  
+  fts_dsp_add_object(o);  
 }
 
 static void
@@ -230,7 +230,7 @@ siglog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 veclog_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -256,8 +256,8 @@ veclog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, exp_put);
     }
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -286,8 +286,8 @@ siglog_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, log_put);
     }
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -301,8 +301,8 @@ siglog10_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, veclog_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, log10_put);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }

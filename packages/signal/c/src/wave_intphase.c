@@ -115,9 +115,9 @@ wave_ftl_inplace_fvec(fts_word_t *argv)
 void
 wave_declare_functions(void)
 {
-  dsp_declare_function(wave_ftl_symbols_ptr.outplace, wave_ftl_outplace_ptr);
-  dsp_declare_function(wave_ftl_symbols_ptr.inplace, wave_ftl_inplace_ptr);
+  fts_dsp_declare_function(wave_ftl_symbols_ptr.outplace, wave_ftl_outplace_ptr);
+  fts_dsp_declare_function(wave_ftl_symbols_ptr.inplace, wave_ftl_inplace_ptr);
 
-  dsp_declare_function(wave_ftl_symbols_fvec.outplace, wave_ftl_outplace_fvec);
-  dsp_declare_function(wave_ftl_symbols_fvec.inplace, wave_ftl_inplace_fvec);
+  fts_dsp_declare_function(wave_ftl_symbols_fvec.outplace, wave_ftl_outplace_fvec);
+  fts_dsp_declare_function(wave_ftl_symbols_fvec.inplace, wave_ftl_inplace_fvec);
 }

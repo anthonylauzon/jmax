@@ -224,7 +224,7 @@ display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
       fts_set_int(a + 2, fts_dsp_get_input_size(dsp, 0));
       
-      dsp_add_funcall(sym_display, 3, a);
+      fts_dsp_add_function(sym_display, 3, a);
     }
 }
 
@@ -341,7 +341,7 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   display_t * this = (display_t *)o;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 
   fts_set_string(&this->a, this->string);
 
@@ -358,7 +358,7 @@ display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t 
@@ -377,7 +377,7 @@ display_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, display_list);
   fts_method_define_varargs(cl, 0, fts_s_anything, display_anything);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   return fts_Success;
 }
@@ -386,7 +386,7 @@ void
 display_config(void)
 {
   sym_display = fts_new_symbol("display");
-  dsp_declare_function(sym_display, display_ftl);
+  fts_dsp_declare_function(sym_display, display_ftl);
 
   fts_class_install(sym_display, display_instantiate);
 

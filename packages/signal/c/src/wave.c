@@ -110,7 +110,7 @@ wave_put(wave_t *this, fts_dsp_descr_t *dsp, struct wave_ftl_symbols *sym)
       fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
       fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
       fts_set_int(a + 3, n_tick);
-      dsp_add_funcall(sym->outplace, 4, a);
+      fts_dsp_add_function(sym->outplace, 4, a);
     }
   else /* inplace */
     {
@@ -119,7 +119,7 @@ wave_put(wave_t *this, fts_dsp_descr_t *dsp, struct wave_ftl_symbols *sym)
       fts_set_ftl_data(a + 0, this->data);
       fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
       fts_set_int(a + 2, n_tick);
-      dsp_add_funcall(sym->inplace, 3, a);
+      fts_dsp_add_function(sym->inplace, 3, a);
     }
 }
 
@@ -152,7 +152,7 @@ wave_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 { 
   wave_t *this = (wave_t *)o;
 
-  dsp_list_insert((fts_object_t *)this);
+  fts_dsp_add_object((fts_object_t *)this);
 
   this->data = wave_data_new();
 }
@@ -190,7 +190,7 @@ wave_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   ftl_data_free(this->data);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void
@@ -203,7 +203,7 @@ wave_delete_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   ftl_data_free(this->data);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /***************************************************************************************
@@ -222,8 +222,8 @@ wave_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
       
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), wave_put_cosine);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
     
   return fts_Success;
 }
@@ -240,8 +240,8 @@ wave_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 1, fvec_symbol, wave_set_fvec);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
     
   return fts_Success;
 }

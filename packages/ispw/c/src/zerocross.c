@@ -72,7 +72,7 @@ zerocross_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_set_pointer   (argv + 1, this);
   fts_set_int  (argv + 2, fts_dsp_get_input_size(dsp, 0));
 
-  dsp_add_funcall(zerocross_function, 3, argv);
+  fts_dsp_add_function(zerocross_function, 3, argv);
 }
 
 static void
@@ -96,14 +96,14 @@ zerocross_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* just put object in the dsp list */
 
-  dsp_list_insert(o); 
+  fts_dsp_add_object(o); 
 }
 
 
 static void
 zerocross_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -119,12 +119,12 @@ zerocross_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_bang, zerocross_bang);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
 
   zerocross_function = fts_new_symbol("zerocross");
-  dsp_declare_function(zerocross_function, ftl_zerocross);
+  fts_dsp_declare_function(zerocross_function, ftl_zerocross);
 
   return fts_Success;
 }

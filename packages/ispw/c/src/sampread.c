@@ -75,7 +75,7 @@ sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   ftl_data_set(sampread_ctl_t, this->sampread_data, last_in, &zero);
   ftl_data_set(sampread_ctl_t, this->sampread_data, conv,    &zero);
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -84,7 +84,7 @@ sampread_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   sampread_t *this = (sampread_t *)o;
 
   ftl_data_free(this->sampread_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /******************************************************************
@@ -125,7 +125,7 @@ sampread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv + 2, this->sampread_data);
       fts_set_int(argv + 3, n_tick);
-      dsp_add_funcall(dsp_symbol, 4, argv);
+      fts_dsp_add_function(dsp_symbol, 4, argv);
     }
   else
     post("sampread~: %s: can't find table~\n", fts_symbol_name(this->tab_name));
@@ -205,8 +205,8 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, sampread_set);
   fts_method_define_varargs(cl, 0, fts_s_jump, sampread_jump);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -219,7 +219,7 @@ sampread_config(void)
   fts_class_install(fts_new_symbol("sampread~"), class_instantiate);
   
   dsp_symbol = fts_new_symbol("sampread");
-  dsp_declare_function(dsp_symbol, ftl_sampread);
+  fts_dsp_declare_function(dsp_symbol, ftl_sampread);
 
 }
 

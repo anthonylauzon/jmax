@@ -48,7 +48,7 @@ wahwah_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->state = ftl_data_alloc(sizeof(float) * 2);
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -58,7 +58,7 @@ wahwah_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   ftl_data_free(this->state);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void
@@ -83,7 +83,7 @@ wahwah_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_set_float(argv + 5, conv);
   fts_set_int(argv + 6, n_tick);
 
-  dsp_add_funcall(wahwah_function, 7, argv);
+  fts_dsp_add_function(wahwah_function, 7, argv);
 }
 
 static void
@@ -167,13 +167,13 @@ wahwah_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, wahwah_put);
   
   /* signal inlets and outlets */
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1);
-  dsp_sig_inlet(cl, 2);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1);
+  fts_dsp_declare_inlet(cl, 2);
+  fts_dsp_declare_outlet(cl, 0);
   
   wahwah_function = fts_new_symbol("wahwah");
-  dsp_declare_function(wahwah_function, ftl_wahwah);
+  fts_dsp_declare_function(wahwah_function, ftl_wahwah);
 
   return fts_Success;
 }

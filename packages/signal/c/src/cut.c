@@ -195,7 +195,7 @@ cut_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     return &fts_CannotInstantiate;
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   return fts_Success;
 }
@@ -204,7 +204,7 @@ void
 signal_cut_config(void)
 {
   cut_symbol = fts_new_symbol("cut~");
-  dsp_declare_function(cut_symbol, cut_ftl);  
+  fts_dsp_declare_function(cut_symbol, cut_ftl);  
 
   fts_metaclass_install(cut_symbol, cut_instantiate, fts_arg_type_equiv);
 }

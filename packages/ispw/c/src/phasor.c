@@ -49,7 +49,7 @@ phasor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   this->state = phasor_ftl_data_new();
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -58,7 +58,7 @@ phasor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   phasor_t *this = (phasor_t *)o;
 
   ftl_data_free(this->state);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 void
@@ -90,7 +90,7 @@ phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_ftl_data(argv+1, this->state);
       fts_set_int(argv+2, fts_dsp_get_input_size(dsp, 0));
 
-      dsp_add_funcall(phasor_inplace_function, 3, argv);
+      fts_dsp_add_function(phasor_inplace_function, 3, argv);
     }
   else
     {
@@ -100,7 +100,7 @@ phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_ftl_data( argv+2, this->state);
       fts_set_int( argv+3, fts_dsp_get_input_size(dsp, 0));
 
-      dsp_add_funcall(phasor_function, 4, argv);
+      fts_dsp_add_function(phasor_function, 4, argv);
     }
 }
 
@@ -123,14 +123,14 @@ phasor_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, phasor_set);
   fts_method_define_varargs(cl, 0, fts_s_float, phasor_set);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   phasor_function = fts_new_symbol("phasor");
-  dsp_declare_function(phasor_function, phasor_ftl);
+  fts_dsp_declare_function(phasor_function, phasor_ftl);
 
   phasor_inplace_function = fts_new_symbol("phasor_inplace");
-  dsp_declare_function(phasor_inplace_function, phasor_ftl_inplace);
+  fts_dsp_declare_function(phasor_inplace_function, phasor_ftl_inplace);
 
   return fts_Success;
 }

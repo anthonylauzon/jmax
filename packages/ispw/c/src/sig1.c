@@ -63,7 +63,7 @@ sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       fts_object_put_prop(o, fts_s_dsp_downsampling, &a);
     }
 
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 
@@ -73,7 +73,7 @@ sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   sigobj_t *this = (sigobj_t *)o;
 
   ftl_data_free(this->sig_ftl_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /**********************************************************
@@ -116,14 +116,14 @@ sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     {
       fts_set_ftl_data(argv, this->sig_ftl_data);
       fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-      dsp_add_funcall(sig_64_dsp_function, 2, argv);
+      fts_dsp_add_function(sig_64_dsp_function, 2, argv);
     }
   else
     {
       fts_set_ftl_data(argv, this->sig_ftl_data);
       fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
       fts_set_int  (argv+2, fts_dsp_get_output_size(dsp, 0));
-      dsp_add_funcall(sig_dsp_function, 3, argv);
+      fts_dsp_add_function(sig_dsp_function, 3, argv);
     }
 
 }
@@ -168,14 +168,14 @@ sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, sig_number);
   fts_method_define_varargs(cl, 0, fts_s_bang, sig_bang);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   sig_dsp_function = fts_new_symbol("sig");
-  dsp_declare_function(sig_dsp_function, ftl_sig);
+  fts_dsp_declare_function(sig_dsp_function, ftl_sig);
 
   sig_64_dsp_function = fts_new_symbol("sig64");
-  dsp_declare_function(sig_64_dsp_function, ftl_sig_64);
+  fts_dsp_declare_function(sig_64_dsp_function, ftl_sig_64);
 
   return fts_Success;
 }

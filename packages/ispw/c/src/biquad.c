@@ -228,7 +228,7 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
 
       biquad_state_clear(o, 0, 0, 0, 0);
-      dsp_add_funcall(biquad_inplace_dsp_function, 4, argv);
+      fts_dsp_add_function(biquad_inplace_dsp_function, 4, argv);
     }
   else
     {
@@ -239,7 +239,7 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_int(argv+4, fts_dsp_get_input_size(dsp, 0));
 
       biquad_state_clear(o, 0, 0, 0, 0);
-      dsp_add_funcall(biquad_dsp_function, 5, argv);
+      fts_dsp_add_function(biquad_dsp_function, 5, argv);
     }
 }
 
@@ -263,7 +263,7 @@ biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   biquad_state_clear(o, 0, 0, 0, 0);
   biquad_set_coefs(o, 0, 0, ac, at);
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -274,7 +274,7 @@ biquad_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   ftl_data_free(this->biquad_coefs);
   ftl_data_free(this->biquad_state);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -304,8 +304,8 @@ biquad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, biquad_set_coefs);
   fts_method_define_varargs(cl, 0, fts_s_clear, biquad_state_clear);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -316,8 +316,8 @@ biquad_config(void)
   biquad_dsp_function = fts_new_symbol("biquad");
   biquad_inplace_dsp_function = fts_new_symbol("biquad_inplace");
 
-  dsp_declare_function(biquad_dsp_function, ftl_biquad);
-  dsp_declare_function(biquad_inplace_dsp_function, ftl_biquad_inplace);
+  fts_dsp_declare_function(biquad_dsp_function, ftl_biquad);
+  fts_dsp_declare_function(biquad_inplace_dsp_function, ftl_biquad_inplace);
 
   fts_class_install(fts_new_symbol("biquad~"), biquad_instantiate);
 }

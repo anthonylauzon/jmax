@@ -122,7 +122,7 @@ vd_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
 
   delay_table_add_delreader(o, this->name);
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 
@@ -138,7 +138,7 @@ vd_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       ftl_data_free(this->vd_data);
       
-      dsp_list_remove(o);
+      fts_dsp_remove_object(o);
     }
 }
 
@@ -186,7 +186,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 	      fts_set_pointer(argv + 1, buf);
 	      fts_set_ftl_data(argv + 2, this->vd_data);
 	      fts_set_int(argv + 3, n_tick);
-	      dsp_add_funcall(vd_inplace_dsp_symbol, 4, argv);
+	      fts_dsp_add_function(vd_inplace_dsp_symbol, 4, argv);
 	    }
 	  else
 	    {
@@ -197,7 +197,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 	      fts_set_pointer(argv + 2, buf);
 	      fts_set_ftl_data(argv + 3, this->vd_data);
 	      fts_set_int(argv + 4, n_tick);
-	      dsp_add_funcall(vd_dsp_symbol, 5, argv);
+	      fts_dsp_add_function(vd_dsp_symbol, 5, argv);
 	    }
 	}
       else
@@ -210,7 +210,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 	  fts_set_ftl_data(argv + 3, this->vd_data);
 	  fts_set_int(argv + 4, n_tick);
 	  fts_set_float(argv + 5, this->millers_fix_del * (float)n_tick); /* write tick size (hopefully) */
-	  dsp_add_funcall(vd_miller_dsp_symbol, 6, argv);
+	  fts_dsp_add_function(vd_miller_dsp_symbol, 6, argv);
 	}
 
       delay_table_delreader_scheduled(this->name);
@@ -232,18 +232,18 @@ vd_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vd_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, vd_put);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1); 
-  dsp_sig_outlet(cl, 0);        
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1); 
+  fts_dsp_declare_outlet(cl, 0);        
   
   vd_dsp_symbol = fts_new_symbol("ftl_vd");
-  dsp_declare_function(vd_dsp_symbol, ftl_vd);
+  fts_dsp_declare_function(vd_dsp_symbol, ftl_vd);
 
   vd_inplace_dsp_symbol = fts_new_symbol("ftl_vd_inplace");
-  dsp_declare_function(vd_inplace_dsp_symbol, ftl_vd_inplace);
+  fts_dsp_declare_function(vd_inplace_dsp_symbol, ftl_vd_inplace);
 
   vd_miller_dsp_symbol = fts_new_symbol("vd_miller");
-  dsp_declare_function(vd_miller_dsp_symbol, ftl_vd_miller);
+  fts_dsp_declare_function(vd_miller_dsp_symbol, ftl_vd_miller);
 
   return fts_Success;
 }

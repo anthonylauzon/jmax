@@ -24,46 +24,27 @@
  *
  */
 
-#include "signal.h"
-#include <utils.h>
+#ifndef _SIGNAL_DELAY_H_
+#define _SIGNAL_DELAY_H_
 
-extern void signal_tilda_config(void);
-extern void signal_binop_config(void);
-
-extern void signal_pink_config(void);
-extern void signal_white_config(void);
-extern void signal_osc_config(void);
-extern void signal_wave_config(void);
-
-extern void signal_matrix_config(void);
-extern void signal_delay_config(void);
-
-extern void signal_cut_config(void);
-
-extern void signal_play_fvec_config(void);
-extern void signal_rec_fvec_config(void);
-
-void
-signal_config(void)
+typedef struct 
 {
-  signal_tilda_config();
-  signal_binop_config();
+  fts_object_t o;
+  float *samples; /* pointer to delay line */
+  int phase; /* current ring buffer phase */
+  int ring_size; /* size of ring buffer in samples */
+  int size; /* virtual delay line size in samples */
+  int alloc_size; /* size of allocation (NOT real size) */
+  double length; /* delay line size given for delwrite~ in msec */
+  double sr;
+  int n_tick;
+} delayline_t;
 
-  signal_pink_config();
-  signal_white_config();
-  signal_osc_config();
-  signal_wave_config();
+#define delayline_get_size(d) ((d)->size)
+#define delayline_get_sr(d) ((d)->sr)
 
-  signal_matrix_config();
-  signal_delay_config();
+#endif
 
-  signal_cut_config();
 
-  signal_play_fvec_config();
-  signal_rec_fvec_config();
 
-  {
-    complex c;
-    c = CZERO;
-  }
-}
+

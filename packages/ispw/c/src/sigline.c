@@ -125,14 +125,14 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     {
       fts_set_symbol (argv, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv+1, this->ftl_data);
-      dsp_add_funcall(sigline_64_function, 2, argv);
+      fts_dsp_add_function(sigline_64_function, 2, argv);
     }
   else
     {
       fts_set_symbol (argv, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv+1, this->ftl_data);
       fts_set_int   (argv+2, fts_dsp_get_output_size(dsp, 0));
-      dsp_add_funcall(sigline_function, 3, argv);
+      fts_dsp_add_function(sigline_function, 3, argv);
     }
 }
 
@@ -170,7 +170,7 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       fts_object_put_prop(o, fts_s_dsp_downsampling, &a);
     }
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -232,7 +232,7 @@ sigline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sigline_t *this = (sigline_t *)o;
 
   ftl_data_free(this->ftl_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -253,14 +253,14 @@ sigline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 1, fts_s_float, sigline_number_1);
   fts_method_define_varargs(cl, 1, fts_s_int, sigline_number_1);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   sigline_function = fts_new_symbol("ftl_line");
-  dsp_declare_function(sigline_function, ftl_line);
+  fts_dsp_declare_function(sigline_function, ftl_line);
 
   sigline_64_function = fts_new_symbol("ftl_line64");
-  dsp_declare_function(sigline_64_function, ftl_line_64);
+  fts_dsp_declare_function(sigline_64_function, ftl_line_64);
 
   return fts_Success;
 }

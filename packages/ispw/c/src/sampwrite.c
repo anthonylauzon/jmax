@@ -64,7 +64,7 @@ sampwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       l = 0x7fffffff;
       ftl_data_set(sampwrite_ctl_t, this->sampwrite_data, onset, &l);
       
-      dsp_list_insert(o);
+      fts_dsp_add_object(o);
     }
   else
     fts_object_set_error(o, "Name argument required");
@@ -76,7 +76,7 @@ sampwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   sampwrite_t *this = (sampwrite_t *)o;
 
   ftl_data_free(this->sampwrite_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /******************************************************************
@@ -107,7 +107,7 @@ sampwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
       fts_set_ftl_data(argv + 1, this->sampwrite_data);
       fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(dsp_symbol, 3, argv);
+      fts_dsp_add_function(dsp_symbol, 3, argv);
     }
   else
     post("sampwrite~: %s: can't find table~\n", fts_symbol_name(this->tab_name));
@@ -196,7 +196,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, sampwrite_bang);
   fts_method_define_varargs(cl, 0, fts_s_int, sampwrite_set_by_int);
   
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   return fts_Success;
 }
@@ -207,5 +207,5 @@ sampwrite_config(void)
   fts_class_install(fts_new_symbol("sampwrite~"), class_instantiate);
   
   dsp_symbol = fts_new_symbol("sampwrite");
-  dsp_declare_function(dsp_symbol, ftl_sampwrite);
+  fts_dsp_declare_function(dsp_symbol, ftl_sampwrite);
 }

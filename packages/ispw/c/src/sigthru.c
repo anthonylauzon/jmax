@@ -42,13 +42,13 @@ sigthru_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts
 static void
 sigthru_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
 {
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
 sigthru_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static void
@@ -72,8 +72,8 @@ sigthru_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_anything, sigthru_anything);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   return fts_Success;
 }

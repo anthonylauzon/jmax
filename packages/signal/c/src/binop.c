@@ -611,7 +611,7 @@ binop_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym)
   fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
 
-  dsp_add_funcall(sym, 4, argv);
+  fts_dsp_add_function(sym, 4, argv);
 }
 
 static void
@@ -648,7 +648,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      /* all signals equal (for tick size of 64) */
 	  
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-	      dsp_add_funcall(sym_add_self_64, 1, argv);
+	      fts_dsp_add_function(sym_add_self_64, 1, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -656,7 +656,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      dsp_add_funcall(sym_add_inplace_64, 2, argv);
+	      fts_dsp_add_function(sym_add_inplace_64, 2, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -664,7 +664,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      dsp_add_funcall(sym_add_inplace_64, 2, argv);
+	      fts_dsp_add_function(sym_add_inplace_64, 2, argv);
 	    }
 	  else
 	    {
@@ -673,7 +673,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-	      dsp_add_funcall(sym_add_64, 3, argv);
+	      fts_dsp_add_function(sym_add_64, 3, argv);
 	    }
 	}
       else
@@ -685,7 +685,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_int(argv + 1, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_add_self, 2, argv);
+	      fts_dsp_add_function(sym_add_self, 2, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -694,7 +694,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_add_inplace, 3, argv);
+	      fts_dsp_add_function(sym_add_inplace, 3, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -703,7 +703,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_add_inplace, 3, argv);
+	      fts_dsp_add_function(sym_add_inplace, 3, argv);
 	    }
 	  else
 	    {
@@ -713,7 +713,7 @@ binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
 	      fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_add, 4, argv);
+	      fts_dsp_add_function(sym_add, 4, argv);
 	    }
 	}
     }
@@ -759,7 +759,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      /* all signals equal (for tick size of 64) */
 	  
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-	      dsp_add_funcall(sym_mul_self_64, 1, argv);
+	      fts_dsp_add_function(sym_mul_self_64, 1, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -767,7 +767,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      dsp_add_funcall(sym_mul_inplace_64, 2, argv);
+	      fts_dsp_add_function(sym_mul_inplace_64, 2, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -775,7 +775,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-	      dsp_add_funcall(sym_mul_inplace_64, 2, argv);
+	      fts_dsp_add_function(sym_mul_inplace_64, 2, argv);
 	    }
 	  else
 	    {
@@ -784,7 +784,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
-	      dsp_add_funcall(sym_mul_64, 3, argv);
+	      fts_dsp_add_function(sym_mul_64, 3, argv);
 	    }
 	}
       else
@@ -796,7 +796,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_int(argv + 1, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_mul_self, 2, argv);
+	      fts_dsp_add_function(sym_mul_self, 2, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 0) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -805,7 +805,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_mul_inplace, 3, argv);
+	      fts_dsp_add_function(sym_mul_inplace, 3, argv);
 	    }
 	  else if (fts_dsp_get_input_name(dsp, 1) == fts_dsp_get_output_name(dsp, 0))
 	    {
@@ -814,7 +814,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	      fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_mul_inplace, 3, argv);
+	      fts_dsp_add_function(sym_mul_inplace, 3, argv);
 	    }
 	  else
 	    {
@@ -824,7 +824,7 @@ binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 1));
 	      fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
 	      fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
-	      dsp_add_funcall(sym_mul, 4, argv);
+	      fts_dsp_add_function(sym_mul, 4, argv);
 	    }
 	}
     }
@@ -867,7 +867,7 @@ binop_const_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_sym
       fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
       fts_set_int(argv + 2, fts_dsp_get_output_size(dsp, 0));
       
-      dsp_add_funcall(sym_inplace, 3, argv);
+      fts_dsp_add_function(sym_inplace, 3, argv);
     }
   else
     {
@@ -876,7 +876,7 @@ binop_const_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t sym, fts_sym
       fts_set_symbol(argv + 2, fts_dsp_get_output_name(dsp, 0));
       fts_set_int(argv + 3, fts_dsp_get_output_size(dsp, 0));
       
-      dsp_add_funcall(sym, 4, argv);
+      fts_dsp_add_function(sym, 4, argv);
     }
 }
 
@@ -940,13 +940,13 @@ binop_set_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 binop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
 binop_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -959,9 +959,9 @@ binop_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, fts_met
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, mth);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_inlet(cl, 1);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 1);
+  fts_dsp_declare_outlet(cl, 0);
 
   return fts_Success;
 }
@@ -982,7 +982,7 @@ binop_const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   binop_set_const(o, 0, 0, 1, at + 1);
   
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -992,7 +992,7 @@ binop_const_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   ftl_data_free(this->data);
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -1009,8 +1009,8 @@ binop_const_instantiate_realize(fts_class_t *cl, int ac, const fts_atom_t *at, f
   fts_method_define_varargs(cl, 1, fts_s_int, binop_set_const);
   fts_method_define_varargs(cl, 1, fts_s_float, binop_set_const);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
     
   return fts_Success;
 }
@@ -1096,98 +1096,98 @@ signal_binop_config(void)
   /* signal x signal */
 
   sym_add = fts_new_symbol("add");
-  dsp_declare_function(sym_add, ftl_add);
+  fts_dsp_declare_function(sym_add, ftl_add);
 
   sym_sub = fts_new_symbol("sub");
-  dsp_declare_function(sym_sub, ftl_sub);
+  fts_dsp_declare_function(sym_sub, ftl_sub);
 
   sym_mul = fts_new_symbol("mul");
-  dsp_declare_function(sym_mul, ftl_mul);
+  fts_dsp_declare_function(sym_mul, ftl_mul);
 
   sym_div = fts_new_symbol("div");
-  dsp_declare_function(sym_div, ftl_div);
+  fts_dsp_declare_function(sym_div, ftl_div);
 
   sym_bus = fts_new_symbol("bus");
-  dsp_declare_function(sym_bus, ftl_bus);
+  fts_dsp_declare_function(sym_bus, ftl_bus);
 
   sym_vid = fts_new_symbol("vid");
-  dsp_declare_function(sym_vid, ftl_vid);
+  fts_dsp_declare_function(sym_vid, ftl_vid);
 
   /* signal x signal (tick size of 64) */
 
   sym_add_64 = fts_new_symbol("add_64");
-  dsp_declare_function(sym_add_64, ftl_add_64);
+  fts_dsp_declare_function(sym_add_64, ftl_add_64);
 
   sym_mul_64 = fts_new_symbol("mul_64");
-  dsp_declare_function(sym_mul_64, ftl_mul_64);
+  fts_dsp_declare_function(sym_mul_64, ftl_mul_64);
 
   /* inplace */
 
   sym_add_inplace = fts_new_symbol("add_inplace");
-  dsp_declare_function(sym_add_inplace, ftl_add_inplace);
+  fts_dsp_declare_function(sym_add_inplace, ftl_add_inplace);
 
   sym_mul_inplace = fts_new_symbol("mul_inplace");
-  dsp_declare_function(sym_mul_inplace, ftl_mul_inplace);
+  fts_dsp_declare_function(sym_mul_inplace, ftl_mul_inplace);
 
   sym_add_inplace_64 = fts_new_symbol("add_inplace_64");
-  dsp_declare_function(sym_add_inplace_64, ftl_add_inplace_64);
+  fts_dsp_declare_function(sym_add_inplace_64, ftl_add_inplace_64);
 
   sym_mul_inplace_64 = fts_new_symbol("mul_inplace_64");
-  dsp_declare_function(sym_mul_inplace_64, ftl_mul_inplace_64);
+  fts_dsp_declare_function(sym_mul_inplace_64, ftl_mul_inplace_64);
 
   /* v = v x v */
 
   sym_add_self = fts_new_symbol("add_self");
-  dsp_declare_function(sym_add_self, ftl_add_self);
+  fts_dsp_declare_function(sym_add_self, ftl_add_self);
 
   sym_mul_self = fts_new_symbol("mul_self");
-  dsp_declare_function(sym_mul_self, ftl_mul_self);
+  fts_dsp_declare_function(sym_mul_self, ftl_mul_self);
 
   sym_add_self_64 = fts_new_symbol("add_self_64");
-  dsp_declare_function(sym_add_self_64, ftl_add_self_64);
+  fts_dsp_declare_function(sym_add_self_64, ftl_add_self_64);
 
   sym_mul_self_64 = fts_new_symbol("mul_self_64");
-  dsp_declare_function(sym_mul_self_64, ftl_mul_self_64);
+  fts_dsp_declare_function(sym_mul_self_64, ftl_mul_self_64);
 
   /* signal x const */
 
   sym_add_const = fts_new_symbol("add_const");
-  dsp_declare_function(sym_add_const, ftl_add_const);
+  fts_dsp_declare_function(sym_add_const, ftl_add_const);
 
   sym_sub_const = fts_new_symbol("sub_const");
-  dsp_declare_function(sym_sub_const, ftl_sub_const);
+  fts_dsp_declare_function(sym_sub_const, ftl_sub_const);
 
   sym_mul_const = fts_new_symbol("mul_const");
-  dsp_declare_function(sym_mul_const, ftl_mul_const);
+  fts_dsp_declare_function(sym_mul_const, ftl_mul_const);
 
   sym_div_const = fts_new_symbol("div_const");
-  dsp_declare_function(sym_div_const, ftl_div_const);
+  fts_dsp_declare_function(sym_div_const, ftl_div_const);
 
   sym_bus_const = fts_new_symbol("bus_const");
-  dsp_declare_function(sym_bus_const, ftl_bus_const);
+  fts_dsp_declare_function(sym_bus_const, ftl_bus_const);
 
   sym_vid_const = fts_new_symbol("vid_const");
-  dsp_declare_function(sym_vid_const, ftl_vid_const);
+  fts_dsp_declare_function(sym_vid_const, ftl_vid_const);
 
   /* signal x const inplace */
 
   sym_add_const_inplace = fts_new_symbol("add_const_inplace");
-  dsp_declare_function(sym_add_const_inplace, ftl_add_const_inplace);
+  fts_dsp_declare_function(sym_add_const_inplace, ftl_add_const_inplace);
 
   sym_sub_const_inplace = fts_new_symbol("sub_const_inplace");
-  dsp_declare_function(sym_sub_const_inplace, ftl_sub_const_inplace);
+  fts_dsp_declare_function(sym_sub_const_inplace, ftl_sub_const_inplace);
 
   sym_mul_const_inplace = fts_new_symbol("mul_const_inplace");
-  dsp_declare_function(sym_mul_const_inplace, ftl_mul_const_inplace);
+  fts_dsp_declare_function(sym_mul_const_inplace, ftl_mul_const_inplace);
 
   sym_div_const_inplace = fts_new_symbol("div_const_inplace");
-  dsp_declare_function(sym_div_const_inplace, ftl_div_const_inplace);
+  fts_dsp_declare_function(sym_div_const_inplace, ftl_div_const_inplace);
 
   sym_bus_const_inplace = fts_new_symbol("bus_const_inplace");
-  dsp_declare_function(sym_bus_const_inplace, ftl_bus_const_inplace);
+  fts_dsp_declare_function(sym_bus_const_inplace, ftl_bus_const_inplace);
 
   sym_vid_const_inplace = fts_new_symbol("vid_const_inplace");
-  dsp_declare_function(sym_vid_const_inplace, ftl_vid_const_inplace);
+  fts_dsp_declare_function(sym_vid_const_inplace, ftl_vid_const_inplace);
 
   fts_metaclass_install(fts_new_symbol("+~"), binop_add_instantiate, fts_narg_equiv);
   fts_metaclass_install(fts_new_symbol("-~"), binop_sub_instantiate, fts_narg_equiv);

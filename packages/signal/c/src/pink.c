@@ -62,7 +62,7 @@ pink_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, fts_dsp_get_output_size(dsp, 0));
   
-  dsp_add_funcall(pink_ftl_sym, 3, a);
+  fts_dsp_add_function(pink_ftl_sym, 3, a);
 }
 
 static void
@@ -164,7 +164,7 @@ pink_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   pink_t *this = (pink_t *)o;
   pink_data_t *data;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 
   this->data = ftl_data_new(pink_data_t);
   data = (pink_data_t *)ftl_data_get_ptr(this->data);
@@ -184,7 +184,7 @@ pink_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   pink_t *this = (pink_t *)o;
 
   ftl_data_free(this->data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -198,9 +198,9 @@ pink_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, pink_put);
 
   pink_ftl_sym = fts_new_symbol("pink");
-  dsp_declare_function(pink_ftl_sym, pink_ftl);
+  fts_dsp_declare_function(pink_ftl_sym, pink_ftl);
 
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   return fts_Success;
 }

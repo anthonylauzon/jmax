@@ -675,16 +675,16 @@ bus_tilda_config(void)
   
   catch_tilda_symbol = fts_new_symbol("catch~");
   catch_tilda_channel_symbol = fts_new_symbol("catch~ channel");
-  dsp_declare_function(catch_tilda_symbol, catch_tilda_read_from_bus);
-  dsp_declare_function(catch_tilda_channel_symbol, catch_tilda_read_from_channel);
+  fts_dsp_declare_function(catch_tilda_symbol, catch_tilda_read_from_bus);
+  fts_dsp_declare_function(catch_tilda_channel_symbol, catch_tilda_read_from_channel);
 
   bus_tilda_symbol = fts_new_symbol("bus~");
   bus_tilda_write_symbol = fts_new_symbol("bus~ write");
   bus_tilda_read_symbol = fts_new_symbol("bus~ read");
   bus_tilda_write_read_symbol = fts_new_symbol("bus~ write&read");
-  dsp_declare_function(bus_tilda_write_symbol, bus_tilda_write);
-  dsp_declare_function(bus_tilda_read_symbol, bus_tilda_read);
-  dsp_declare_function(bus_tilda_write_read_symbol, bus_tilda_write_and_read);
+  fts_dsp_declare_function(bus_tilda_write_symbol, bus_tilda_write);
+  fts_dsp_declare_function(bus_tilda_read_symbol, bus_tilda_read);
+  fts_dsp_declare_function(bus_tilda_write_read_symbol, bus_tilda_write_and_read);
 
   fts_metaclass_install(bus_tilda_symbol, bus_tilda_instantiate, fts_first_arg_equiv);
   fts_metaclass_install(throw_tilda_symbol, throw_tilda_instantiate, fts_never_equiv);

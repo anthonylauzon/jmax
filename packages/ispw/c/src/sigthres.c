@@ -221,7 +221,7 @@ sigthres_put_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_set_pointer(argv + 0, &(this->ctl));
   fts_set_symbol(argv + 1, fts_dsp_get_input_name(dsp, 0));
   fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
-  dsp_add_funcall(sigthres_symbol, 3, argv);
+  fts_dsp_add_function(sigthres_symbol, 3, argv);
 }
 
 /************************************************
@@ -245,7 +245,7 @@ sigthres_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   sigthres_set(o, 0, 0, ac, at);
   
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -253,7 +253,7 @@ sigthres_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   sigthres_t *this = (sigthres_t *)o;
 
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -285,12 +285,12 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 4, fts_s_float, sigthres_lo_time);
   fts_method_define_varargs(cl, 4, fts_s_int, sigthres_lo_time);
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_bang);
   fts_outlet_type_define_varargs(cl, 1, fts_s_bang);
   
-  dsp_declare_function(sigthres_symbol, sigthres_dsp);
+  fts_dsp_declare_function(sigthres_symbol, sigthres_dsp);
     
   return fts_Success;
 }

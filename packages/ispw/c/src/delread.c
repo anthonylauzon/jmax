@@ -93,7 +93,7 @@ delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->ftl_deltime = ftl_data_new(long);
 
   delay_table_add_delreader(o, this->name);
-  dsp_list_insert(o); /* just put object in list */
+  fts_dsp_add_object(o); /* just put object in list */
 }
 
 
@@ -105,7 +105,7 @@ delread_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   ftl_data_free(this->ftl_deltime);
 
   delay_table_remove_delreader(o, this->name);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 
@@ -160,7 +160,7 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_set_pointer(argv + 1, buf);
   fts_set_int(argv + 2, n_tick);
   fts_set_ftl_data(argv + 3, this->ftl_deltime);
-  dsp_add_funcall(delread_function_symbol, 4, argv);
+  fts_dsp_add_function(delread_function_symbol, 4, argv);
 
   delay_table_delreader_scheduled(this->name);
 }
@@ -201,11 +201,11 @@ delread_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, delread_number);
   fts_method_define_varargs(cl, 0, fts_s_float, delread_number);
 
-  dsp_sig_inlet(cl, 0); /* for order forcing (shadock) */
-  dsp_sig_outlet(cl, 0);        
+  fts_dsp_declare_inlet(cl, 0); /* for order forcing (shadock) */
+  fts_dsp_declare_outlet(cl, 0);        
   
   delread_function_symbol = fts_new_symbol("delread");
-  dsp_declare_function(delread_function_symbol, ftl_delread);
+  fts_dsp_declare_function(delread_function_symbol, ftl_delread);
 
   return fts_Success;
 }

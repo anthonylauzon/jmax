@@ -172,14 +172,14 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	{
 	  fts_set_symbol(argv + 0,   fts_dsp_get_input_name(dsp, 0));
 	  fts_set_ftl_data(argv + 1, this->ftl_data);
-	  dsp_add_funcall(sig2p2z_64_1ops_function, 2, argv);
+	  fts_dsp_add_function(sig2p2z_64_1ops_function, 2, argv);
 	}
       else
 	{
 	  fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
 	  fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_ftl_data(argv+2, this->ftl_data);
-	  dsp_add_funcall(sig2p2z_64_function, 3, argv);
+	  fts_dsp_add_function(sig2p2z_64_function, 3, argv);
 	}
     }
   else
@@ -189,7 +189,7 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_ftl_data(argv+2, this->ftl_data);
 
       fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(sig2p2z_function, 4, argv);
+      fts_dsp_add_function(sig2p2z_function, 4, argv);
     }
 }
 
@@ -303,7 +303,7 @@ sig2p2z_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   sig2p2z_set(o, winlet, s, ac-1, at+1);
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -312,7 +312,7 @@ sig2p2z_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sig2p2z_t *this = (sig2p2z_t *)o;
 
   ftl_data_free(this->ftl_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 /*************************************
@@ -348,8 +348,8 @@ sig2p2z_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 5, fts_s_int, sig2p2z_ffcoef1_c4);
   fts_method_define_varargs(cl, 6, fts_s_int, sig2p2z_ffcoef2_c5);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   return fts_Success;
 }
@@ -357,13 +357,13 @@ sig2p2z_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void sig2p2z_config(void)
 {
   sig2p2z_function = fts_new_symbol("2p2z");
-  dsp_declare_function(sig2p2z_function, ftl_2p2z);
+  fts_dsp_declare_function(sig2p2z_function, ftl_2p2z);
 
   sig2p2z_64_function = fts_new_symbol("2p2z_64");
-  dsp_declare_function(sig2p2z_64_function, ftl_64_2p2z);
+  fts_dsp_declare_function(sig2p2z_64_function, ftl_64_2p2z);
 
   sig2p2z_64_1ops_function = fts_new_symbol("2p2z_64_1ops");
-  dsp_declare_function(sig2p2z_64_1ops_function, ftl_64_1ops_2p2z);
+  fts_dsp_declare_function(sig2p2z_64_1ops_function, ftl_64_1ops_2p2z);
 }
 
 

@@ -743,8 +743,8 @@ void fts_audio_config( void)
   s_outdispatcher = fts_new_symbol( "outdispatcher");
   s_audioport_guard = fts_new_symbol( "audioport_guard");
 
-  fts_class_install( s_indispatcher, indispatcher_instantiate);
-  fts_class_install( s_outdispatcher, outdispatcher_instantiate);
+  fts_metaclass_install( s_indispatcher, indispatcher_instantiate, fts_first_arg_equiv);
+  fts_metaclass_install( s_outdispatcher, outdispatcher_instantiate, fts_first_arg_equiv);
   fts_metaclass_install( s_audioportin, audioportin_instantiate, fts_never_equiv);
   fts_metaclass_install( s_audioportout, audioportout_instantiate, fts_never_equiv);
   fts_class_install( s_audioport_guard, audioport_guard_instantiate);

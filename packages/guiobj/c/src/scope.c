@@ -348,7 +348,7 @@ scope_ftl(fts_word_t *argv)
 	  if(count <= 0)
 	    {
 	      /* waiting for trigger */
-	      if(last < threshold && f >= threshold)
+	      if(last <= f && f >= threshold)
 		{
 		  /* trigger */
 		  data->start = index - pre;
@@ -365,6 +365,9 @@ scope_ftl(fts_word_t *argv)
 		    {
 		      /* end of period without triggered */
 		      count = 0;
+
+		      data->send = 0;
+		      fts_timebase_add_call(fts_get_timebase(), data->object, scope_send_to_client, 0, 0.0);
 
 		      /* reset threshold for auto trigger */
 		      if(data->trigger == scope_auto)
@@ -518,7 +521,7 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, scope_dump); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, scope_upload); 
 
-  dsp_sig_inlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
 
   return fts_Success;
 }
@@ -533,6 +536,7 @@ scope_config(void)
   sym_set_period = fts_new_symbol("setPeriod");
   sym_set_threshold = fts_new_symbol("setThreshold");
 
-  dsp_declare_function(scope_symbol, scope_ftl);  
+  fts_dsp_declare_function(scope_symbol, scope_ftl);  
   fts_class_install(scope_symbol, scope_instantiate);
+  fts_alias_install(fts_new_symbol("scope"), scope_instantiate);
 }

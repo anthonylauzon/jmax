@@ -181,6 +181,12 @@ fts_connection_new(int id, fts_object_t *out, int woutlet, fts_object_t *in, int
   return conn;
 }
 
+fts_connection_t *
+fts_connection_new_hidden(int id, fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
+{
+  return fts_connection_new(FTS_NO_ID, out, -woutlet, in, -winlet);
+}
+
 
 static void 
 fts_object_do_disconnect(fts_connection_t *conn, int do_client)

@@ -74,7 +74,7 @@ sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_set_ftl_data( argv, this->switch_ftl_data);
   fts_set_pointer( argv+1, dsp_get_current_dsp_chain());
   fts_set_pointer( argv+2, this->current);
-  dsp_add_funcall( switch_function, 3, argv);
+  fts_dsp_add_function( switch_function, 3, argv);
 
   this->previous = ftl_program_set_current_subroutine( dsp_get_current_dsp_chain(), this->current);
 
@@ -109,7 +109,7 @@ sigswitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->switch_ftl_data = ftl_data_new( int);
   ftl_data_copy( int, this->switch_ftl_data, &state);
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 }
 
 static void
@@ -118,7 +118,7 @@ sigswitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   sigswitch_t *this = (sigswitch_t *)o;
 
   ftl_data_free( this->switch_ftl_data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -135,11 +135,11 @@ sigswitch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, sigswitch_switch);
   fts_method_define_varargs(cl, 1, fts_s_int, sigswitch_switch);
   
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
   switch_function = fts_new_symbol("switch");
-  dsp_declare_function( switch_function, call_ftl_subr_cond);
+  fts_dsp_declare_function( switch_function, call_ftl_subr_cond);
 
   return fts_Success;
 }

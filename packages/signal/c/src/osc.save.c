@@ -71,7 +71,7 @@ osc_ctl_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 2, n_tick);
   
-  dsp_add_funcall(sym_osc_ctl, 3, a);
+  fts_dsp_add_function(sym_osc_ctl, 3, a);
 }
 
 static void
@@ -132,7 +132,7 @@ osc_ctl_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fvec_t *fvec = fvec_atom_get(at + 2);
   osc_ctl_data_t *data;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 
   this->data = ftl_data_new(osc_ctl_data_t);
   data = (osc_ctl_data_t *)ftl_data_get_ptr(this->data);
@@ -163,7 +163,7 @@ osc_ctl_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_object_release((fts_object_t *)data->fvec);
 
   ftl_data_free(this->data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -181,10 +181,10 @@ osc_ctl_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 1,fvec_symbol , osc_ctl_set_fvec);
 
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   sym_osc_ctl = fts_new_symbol("osc_ctl");
-  dsp_declare_function(sym_osc_ctl, osc_ctl_ftl);
+  fts_dsp_declare_function(sym_osc_ctl, osc_ctl_ftl);
     
   return fts_Success;
 }
@@ -230,7 +230,7 @@ osc_sig_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
   fts_set_int(a + 3, n_tick);
   
-  dsp_add_funcall(sym_osc_sig, 4, a);
+  fts_dsp_add_function(sym_osc_sig, 4, a);
 }
 
 static void
@@ -282,7 +282,7 @@ osc_sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fvec_t *fvec = fvec_atom_get(at + 1);  
   osc_sig_data_t *data;
 
-  dsp_list_insert(o);
+  fts_dsp_add_object(o);
 
   this->data = ftl_data_new(osc_sig_data_t);
   data = (osc_sig_data_t *)ftl_data_get_ptr(this->data);
@@ -310,7 +310,7 @@ osc_sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_object_release((fts_object_t *)data->fvec);
 
   ftl_data_free(this->data);
-  dsp_list_remove(o);
+  fts_dsp_remove_object(o);
 }
 
 static fts_status_t
@@ -325,11 +325,11 @@ osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 1, fvec_symbol, osc_sig_set_fvec);
 
-  dsp_sig_inlet(cl, 0);
-  dsp_sig_outlet(cl, 0);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
 
   sym_osc_sig = fts_new_symbol("osc_sig");
-  dsp_declare_function(sym_osc_sig, osc_sig_ftl);
+  fts_dsp_declare_function(sym_osc_sig, osc_sig_ftl);
     
   return fts_Success;
 }
