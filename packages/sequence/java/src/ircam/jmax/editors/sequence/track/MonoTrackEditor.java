@@ -27,7 +27,6 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
-import ircam.jmax.editors.sequence.PopupToolbarPanel;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
