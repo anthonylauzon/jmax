@@ -195,7 +195,6 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   Timer scrollTimer;
   ScrollDragAction scroller;
   boolean autoScroll = false;
-  boolean autoScrollOnMove = false;
   final private static int scrollMargin = 5;
 
   private void initAutoScroll()
@@ -211,19 +210,9 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     autoScroll = v;
   }
 
-  void setAutoScrollingOnMove(boolean v)
-  {
-    autoScrollOnMove = v;
-  }
-
   boolean isAutoScrolling()
   {
     return autoScroll;
-  }
-
-  boolean isAutoScrollingOnMove()
-  {
-    return autoScrollOnMove;
   }
 
   class ScrollDragAction implements ActionListener
@@ -285,8 +274,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   {
     // Handle the auto scrolling and autoresizing
 
-    if (((isAutoScrolling() && Squeack.isDrag(squeack)) || 
-	 (isAutoScrollingOnMove() && Squeack.isMove(squeack))) &&
+    if (isAutoScrolling() && Squeack.isDrag(squeack) &&
 	(! sketch.pointIsVisible(mouse, scrollMargin)))
       {
 	if (scrollTimer.isRunning())
@@ -323,7 +311,6 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingLocations(false);
     setFollowingInOutletLocations(false);
     setAutoScrolling(false);
-    setAutoScrollingOnMove(false);
 
     interaction.configureInputFilter(this);
     interaction.reset();
@@ -340,7 +327,6 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     setFollowingLocations(false);
     setFollowingInOutletLocations(false);
     setAutoScrolling(false);
-    setAutoScrollingOnMove(false);
 
     interaction.configureInputFilter(this);
     interaction.reset();

@@ -28,6 +28,7 @@ class MoveEditInteraction extends Interaction
       {
 	object = (ErmesObject) area.getTarget();
 	editor.getDisplayList().objectToFront(object);
+	object.redraw();
 	dragged = false;
       }
     else if (Squeack.isDrag(squeack))

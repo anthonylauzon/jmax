@@ -63,6 +63,11 @@ public class DisplayList
     displayObjects.addElement( object);
   }
 
+  private void addToBeginning(ErmesObject object)
+  {
+    displayObjects.insertElementAt( object, 0);
+  }
+
   public void remove( ErmesObject object)
   {
     displayObjects.removeElement( object);
@@ -113,6 +118,14 @@ public class DisplayList
   {
     remove(object);
     add(object);
+    reassignLayers();
+    sortDisplayList();
+  }
+
+  public void objectToBack(ErmesObject object)
+  {
+    remove(object);
+    addToBeginning(object);
     reassignLayers();
     sortDisplayList();
   }

@@ -27,6 +27,7 @@ class MoveInteraction extends Interaction
       {
 	object = (ErmesObject) area.getTarget();
 	editor.getDisplayList().objectToFront(object);
+	object.redraw();
 
 	if (! object.isSelected())
 	  {
@@ -37,7 +38,6 @@ class MoveInteraction extends Interaction
 	      }
 
 	    ErmesSelection.patcherSelection.select(object);
-	    object.redraw();
 	  }
 
 	editor.setCursor(Cursor.getDefaultCursor());

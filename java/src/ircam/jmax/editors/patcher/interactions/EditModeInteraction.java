@@ -88,6 +88,7 @@ class EditModeInteraction extends Interaction
 	    return Interactions.dragReverseConnectInteraction;
 
 	  case (Squeack.CTRL | Squeack.DOWN | Squeack.OBJECT):
+	  case (Squeack.CTRL | Squeack.DOWN | Squeack.TEXT):
 	    // Ctrl drag for controllers
 	    editor.resetHighlighted();
 	    return Interactions.editCtrlInteraction;

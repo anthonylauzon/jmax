@@ -17,6 +17,8 @@ class DragToggleSelectInteraction extends Interaction
 {
   Point dragStart = new Point();
   boolean dragged = false;
+  boolean bringToBack = false;
+  ErmesObject object;
 
   void configureInputFilter(InteractionEngine filter)
   {
@@ -40,11 +42,14 @@ class DragToggleSelectInteraction extends Interaction
 	dragStart.setLocation(mouse);
 	editor.getDisplayList().setDragRectangle(dragStart.x, dragStart.y, 1, 1);
 	editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
+	object = (ErmesObject) area.getTarget();
+	bringToBack = true;
       }
     else if (Squeack.isDown(squeack) && Squeack.isShift(squeack) && Squeack.onBackground(squeack))
       {
 	dragged = false;
 	dragStart.setLocation(mouse);
+	bringToBack = false;
       }
     else if (Squeack.isDrag(squeack))
       {
@@ -60,6 +65,7 @@ class DragToggleSelectInteraction extends Interaction
 	editor.getDisplayList().toggleSelect(editor.getDisplayList().getDragRectangle());
 	editor.getDisplayList().redrawDragRectangle();
 	dragged = true;
+	bringToBack = false;
       }
     else if (Squeack.isUp(squeack))
       {
@@ -67,6 +73,12 @@ class DragToggleSelectInteraction extends Interaction
 	  {
 	    editor.getDisplayList().noDrag();
 	    editor.getDisplayList().redrawDragRectangle();
+	  }
+
+	if (bringToBack)
+	  {
+	    editor.getDisplayList().objectToBack(object);
+	    object.redraw();
 	  }
 
 	editor.endInteraction();
