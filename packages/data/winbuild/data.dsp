@@ -94,10 +94,6 @@ SOURCE=..\c\src\bpf.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\bpf.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\col.c
 # End Source File
 # Begin Source File
@@ -114,10 +110,6 @@ SOURCE=..\c\src\data.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\data.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\dict.c
 # End Source File
 # Begin Source File
@@ -126,19 +118,15 @@ SOURCE=..\c\src\dumpfile.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\floatfuns.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\fmat.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\fmat.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\fvec.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\fvec.h
 # End Source File
 # Begin Source File
 
@@ -150,15 +138,7 @@ SOURCE=..\c\src\ivec.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\ivec.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\mat.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\mat.h
 # End Source File
 # Begin Source File
 
@@ -179,10 +159,6 @@ SOURCE=..\c\src\tabeditor.h
 # Begin Source File
 
 SOURCE=..\c\src\vec.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\vec.h
 # End Source File
 # End Target
 # End Project
