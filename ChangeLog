@@ -1,3 +1,10 @@
+2003-02-11  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* fixed template arguments in vm
+	* introduced scope flag in patcher (set to 1 for all toplevel patchers including templates)
+	* removed define object
+	* fixed sending tuple to param object
+
 2003-02-11  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
 
 	* add "Package Path" tab in Project Editor. User can now defines new package paths

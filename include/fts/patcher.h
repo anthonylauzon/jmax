@@ -47,6 +47,8 @@ struct fts_patcher
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_template} type;
 
+  int scope; /* scope flag: non-zero for top level patchers and templates */
+
   /* If this patcher is a template, point to the template definition */
   fts_template_t *template;
   fts_hashtable_t *definitions;

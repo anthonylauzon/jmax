@@ -46,6 +46,9 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 #define fts_patcher_is_abstraction(p)    ((p)->type == fts_p_abstraction)
 #define fts_patcher_is_template(p)       ((p)->type == fts_p_template)
 
+#define fts_patcher_set_scope(p) ((p)->scope = 1)
+#define fts_patcher_is_scope(p) ((p)->scope != 0)
+
 #define fts_patcher_get_env(p)           (&((p)->env))
 
 #define fts_patcher_set_save_id(p, i) ((p)->save_id = (i))

@@ -1847,12 +1847,12 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
     /* store definition in object */
     fts_object_set_definition((fts_object_t *)self->args, def);
-
-    fts_patcher_set_template(self, NULL);
   }
   else
     self->args = NULL;
-    
+
+  self->scope = 0; /* patcher isn't scope by default*/
+  
   /* init object list */
   self->objects = NULL;
 
@@ -2005,7 +2005,7 @@ fts_patcher_get_scope(fts_patcher_t *patcher)
   {
     fts_patcher_t *parent = fts_object_get_patcher((fts_object_t *)patcher);
 
-    while(parent != NULL && parent != fts_root_patcher && fts_patcher_is_template(patcher) == NULL)
+    while(parent != NULL && parent != fts_root_patcher && !fts_patcher_is_scope(patcher))
     {
       patcher = parent;
       parent = fts_object_get_patcher((fts_object_t *)patcher);
