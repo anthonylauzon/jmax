@@ -23,45 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR=../..
-include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
+JMAXDISTDIR = ../../../..
+PACKAGEROOT = ..
+PACKAGELIB=$(LIBDIR)/libispw.so
+MODULE_CFLAGS=-I../../../data/c/src
 
-all:
-	(cd java ; $(MAKE) all)	
-	(cd c; $(MAKE) -k all)
-.PHONY: all
-
-clean:
-	(cd java ; $(MAKE) clean)	
-	(cd c; $(MAKE) clean)
-.PHONY: clean
-
-all_c:
-	(cd c ; $(MAKE) all)
-.PHONY: all
-
-clean_c:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
-
-all_java:
-	(cd java ; $(MAKE) all)
-.PHONY: all
-
-clean_java:
-	(cd java ; $(MAKE) clean)
-.PHONY: clean
-
-install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
-	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw/ispw.jpk
-	$(INSTALL_DATA) ispw.scm $(lib_install_dir)/packages/ispw/ispw.scm
-	( cd images; $(MAKE) $@)
-	( cd abs ; $(MAKE) $@)
-	( cd help; $(MAKE) $@)
-	( cd sounds; $(MAKE) $@)
-	( cd templates; $(MAKE) $@)
-	( cd java; $(MAKE) $@)
-	( cd c; $(MAKE) $@)
-.PHONY: install
-
+include $(JMAXDISTDIR)/Makefiles/Makefile.package

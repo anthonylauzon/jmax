@@ -23,45 +23,21 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXDISTDIR=../..
+JMAXDISTDIR=../../..
 include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 all:
-	(cd java ; $(MAKE) all)	
-	(cd c; $(MAKE) -k all)
+	(cd src; $(MAKE) -k all)
 .PHONY: all
 
 clean:
-	(cd java ; $(MAKE) clean)	
-	(cd c; $(MAKE) clean)
-.PHONY: clean
-
-all_c:
-	(cd c ; $(MAKE) all)
-.PHONY: all
-
-clean_c:
-	(cd c ; $(MAKE) clean)
-.PHONY: clean
-
-all_java:
-	(cd java ; $(MAKE) all)
-.PHONY: all
-
-clean_java:
-	(cd java ; $(MAKE) clean)
+	(cd src; $(MAKE) clean)
 .PHONY: clean
 
 install:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
-	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw/ispw.jpk
-	$(INSTALL_DATA) ispw.scm $(lib_install_dir)/packages/ispw/ispw.scm
-	( cd images; $(MAKE) $@)
-	( cd abs ; $(MAKE) $@)
-	( cd help; $(MAKE) $@)
-	( cd sounds; $(MAKE) $@)
-	( cd templates; $(MAKE) $@)
-	( cd java; $(MAKE) $@)
-	( cd c; $(MAKE) $@)
+	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/c/lib/$(ARCH)/opt
+	( \
+		cd lib/$(ARCH)/opt ; \
+		$(INSTALL_LIB) libispw.so $(lib_install_dir)/packages/ispw/c/lib/$(ARCH)/opt/libispw.so ;\
+	)
 .PHONY: install
-
