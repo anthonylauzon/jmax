@@ -572,8 +572,13 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
       displayList.reassignLayers();
 
     object.updateInOutlets();
+    if( !multiAdd)
+      ErmesSelection.patcherSelection.deselectAll();
+    else multiAdd = false;
+
     ErmesSelection.patcherSelection.select( object);
-    object.redraw();
+    //object.redraw();
+    redraw();
 	
     if (doEdit && newObjectEdit && (object instanceof Editable))
       {
@@ -1060,8 +1065,10 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     engine.setTopInteraction(Interactions.addModeInteraction);    
   }
 
+  boolean multiAdd = false;
   public void makeAddModeObject(int x, int y, boolean edit)
   {
+    multiAdd = !edit;
     itsPatcher.requestAddObject(newObjectDescription, x, y, edit);
   }
 
