@@ -91,8 +91,6 @@ static void
 init_explode_register(void)
 {
   fts_hash_table_init(&explode_table);
-
-
 }
 
 /****************************************************************************/
