@@ -42,7 +42,6 @@
 
 /* forward declarations  */
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
-static void fts_object_unbind(fts_object_t *obj);
 
 static fts_status_description_t class_not_found_error_description = {
   "object or template not found"
@@ -109,7 +108,7 @@ fts_object_create( fts_class_t *cl, fts_patcher_t *patcher, int ac, const fts_at
   /* Is class instantiated ? We can test that with the 'size' member 
      because it is set by the instantiate function and cannot be set to 0 */
   if (!cl->size)
-    (*cl->instantiate_fun)(cl);
+    fts_class_instantiate(cl);
 
   obj = fts_object_new( cl);
 
@@ -157,14 +156,13 @@ static fts_status_t
 eval_object_description_expression_callback( int ac, const fts_atom_t *at, void *data)
 {
   struct eval_data *eval_data = (struct eval_data *)data;
-  fts_class_t *cl;
 
   if (eval_data->obj == NULL)
     {
       /* create the object */
       if (ac >= 1 && fts_get_class( at) == fts_class_class)
 	{
-	  cl = (fts_class_t *)fts_get_object( at);
+	  fts_class_t *cl = (fts_class_t *)fts_get_object( at);
 
 	  /* TEMPLATE: if (class is template, make a template instance) */
 
@@ -187,7 +185,8 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
 
       if (ac >= 1 && fts_is_symbol( at))
 	{
-	  cl = fts_class_get_by_name( NULL, fts_get_symbol( at));
+	  fts_class_t *cl = fts_class_get_by_name( NULL, fts_get_symbol( at));
+
 	  if (cl == NULL)
 	    return class_not_found_error;
 
@@ -203,7 +202,25 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
     }
   else
     {
-      /* send the message to the already created object */
+      if(ac > 0 && fts_is_symbol(at))
+	{
+	  fts_class_t *cl = fts_object_get_class(eval_data->obj);
+	  fts_symbol_t selector = fts_get_symbol(at);
+	  fts_method_t meth = fts_class_get_method(cl, selector);
+
+	  if(meth)
+	    {
+	      (*meth)(eval_data->obj, fts_system_inlet, selector, ac, at);
+
+	      if(fts_object_get_error(eval_data->obj) == NULL)
+		return fts_ok;
+	    }
+	}
+
+      fts_object_destroy(eval_data->obj);
+      eval_data->obj = NULL;
+
+      return class_instantiation_error;
     }
 
   return fts_ok;
@@ -324,6 +341,72 @@ fts_object_set_outlets_number(fts_object_t *o, int n)
     }
 }
 
+/*********************************************************************************
+ * 
+ *  set name
+ *
+ */
+
+void
+fts_object_set_name(fts_object_t *obj, fts_symbol_t sym)
+{
+  fts_patcher_t *patcher = fts_object_get_patcher(obj);
+
+  if(patcher != NULL)
+    {
+      /* reset current definition */
+      if(fts_object_get_definition(obj) != NULL)
+	fts_definition_update(fts_object_get_definition(obj), fts_null);
+      
+      if(sym != fts_s_empty_string)
+	{
+	  fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
+	  fts_symbol_t name = fts_name_get_unused(scope, sym);
+	  fts_definition_t *def = fts_definition_get(scope, name);
+	  fts_atom_t a;
+	  
+	  /* set new definiton */
+	  fts_set_object(&a, obj);
+	  fts_definition_update(def, &a);
+	  
+	  /* store definition in object */
+	  fts_object_set_definition(obj, def);
+	  
+	  /* set name of object */
+	  if(fts_object_has_id(obj))
+	    {
+	      fts_set_symbol(&a, name);
+	      fts_client_send_message(obj, fts_s_set_name, 1, &a);
+	    }
+	}
+      else if(fts_object_has_id(obj))
+	{
+	  fts_atom_t a;
+
+	  fts_set_symbol(&a, fts_s_empty_string);
+	  fts_client_send_message(obj, fts_s_set_name, 1, &a);	  
+	}
+    }
+}
+
+void
+fts_object_set_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if(ac > 0 && fts_is_symbol(at))
+    fts_object_set_name(o, fts_get_symbol(at));
+}
+
+fts_symbol_t 
+fts_object_get_name(fts_object_t *obj)
+{
+  fts_definition_t *def = fts_object_get_definition(obj);
+
+  if(def)
+    return fts_definition_get_name(def);
+
+  return NULL;
+}
+
 /****************************************************************
  *
  *  delete object
@@ -344,6 +427,7 @@ fts_object_unbind(fts_object_t *obj)
 {
   fts_list_t *list = obj->name_refs;
 
+  /* remove object as listener from the variables */
   while(list != NULL) 
     {
       fts_definition_t *def = (fts_definition_t *)fts_get_pointer(fts_list_get(list));
@@ -351,6 +435,13 @@ fts_object_unbind(fts_object_t *obj)
       fts_definition_remove_listener(def, obj);
       
       list = fts_list_next(list);
+    }
+
+  /* remove definition of named object */
+  if(obj->definition != NULL)
+    {
+      fts_definition_update(obj->definition, fts_null);
+      obj->definition = NULL;
     }
 }
 
@@ -540,7 +631,7 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 
 /*********************************************************************************
  * 
- * object description
+ *  object description
  *
  */
 

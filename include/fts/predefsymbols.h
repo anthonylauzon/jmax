@@ -126,6 +126,7 @@ PREDEF_SYMBOL( fts_s_add_listener, "add_listener")
 PREDEF_SYMBOL( fts_s_remove_listener, "remove_listener")
 PREDEF_SYMBOL( fts_s_empty_object, "empty object")
 PREDEF_SYMBOL( fts_s_get_element, "get_element")
+PREDEF_SYMBOL( fts_s_empty_string, "")
 
 /* client messages */
 PREDEF_SYMBOL( fts_s_openFileDialog, "openFileDialog")
@@ -178,6 +179,7 @@ PREDEF_SYMBOL( fts_s_patcher_type, "type")
 PREDEF_SYMBOL( fts_s_named_defaults, "named_defaults")
 PREDEF_SYMBOL( fts_s_spost_description, "spost_description")
 PREDEF_SYMBOL( fts_s_set_dirty, "setDirty")
+PREDEF_SYMBOL( fts_s_set_name, "set_name")
 PREDEF_SYMBOL( fts_s_midi_config, "midi_config")
 PREDEF_SYMBOL( fts_s_audio_config, "audio_config")
 

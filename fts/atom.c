@@ -76,8 +76,11 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
 	      fts_class_t *class = fts_object_get_class(obj);
 	      fts_method_t meth_compare = fts_class_get_method(class, fts_s_compare);
 	      
-	      meth_compare(obj, 0, 0, 1, p2);
-	      return(fts_get_int(fts_get_return_value()));
+	      if(meth_compare)
+		{
+		  meth_compare(obj, 0, 0, 1, p2);
+		  return(fts_get_int(fts_get_return_value()));
+		}
 	    }
 	}
     }

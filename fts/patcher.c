@@ -1065,7 +1065,7 @@ find_object_index_in_patcher( fts_object_t *object)
 }
 
 static void 
-fts_patcher_save_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_save_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int type = fts_get_int(at);
   fts_symbol_t filename = fts_get_symbol(at+1);
@@ -1318,16 +1318,11 @@ patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
 }
 
-static void 
-patcher_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  post("coucou!!!\n");
-}
-
 /*
  * The remote functions
  */
-static void fts_patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
   fts_object_t *p;
@@ -1341,7 +1336,8 @@ static void fts_patcher_start_updates( fts_object_t *o, int winlet, fts_symbol_t
     }
 }
 
-static void fts_patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
 
@@ -1352,7 +1348,8 @@ static void fts_patcher_stop_updates( fts_object_t *o, int winlet, fts_symbol_t 
  * This function send all the objects and connections in the patcher that have not
  * yet been uploaded; it is usefull after paste operations.
  */
-static void fts_patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *p;
@@ -1385,26 +1382,34 @@ static void fts_patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int
 }
 
 /* Handle geometric properties */
-static void fts_patcher_set_wx( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+patcher_set_wx( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_put_prop(o, fts_s_wx, at);
 }
-static void fts_patcher_set_wy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+
+static void 
+patcher_set_wy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_put_prop(o, fts_s_wy, at);
 }
-static void fts_patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_put_prop(o, fts_s_wh, at);
-  /*fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
-}
-static void fts_patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+
+static void 
+patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_put_prop(o, fts_s_ww, at);
   /*  fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
 }
 
-static fts_patcher_t * get_patcher_by_file_name( fts_symbol_t file_name)
+static void 
+patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_put_prop(o, fts_s_wh, at);
+  /*fts_patcher_set_dirty((fts_patcher_t *)o, 1);*/
+}
+
+static fts_patcher_t * 
+get_patcher_by_file_name( fts_symbol_t file_name)
 {
   fts_patcher_t *root = fts_get_root_patcher();  
   fts_object_t *p = 0;
@@ -1425,7 +1430,7 @@ static fts_patcher_t * get_patcher_by_file_name( fts_symbol_t file_name)
 }
 
 static void 
-fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj = fts_get_object(&at[0]);
@@ -1459,7 +1464,7 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 }
 
 static void 
-fts_patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)o, ac - 2, at + 2);
   fts_atom_t a[1];
@@ -1574,9 +1579,18 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       
       fts_client_done_message( this);
       
-      fts_object_get_prop(obj, fts_s_font, a_font);
+      /* set name */
+      if (fts_object_get_definition(obj) != NULL)
+	{
+	  fts_atom_t a_name;
+
+	  fts_set_symbol(&a_name, fts_object_get_name(obj));
+	  fts_client_send_message(obj, fts_s_set_name, 1, &a_name);
+	}
+
+      fts_object_get_prop(obj, fts_s_font, a_font + 0);
       
-      if( fts_get_symbol(a_font))
+      if(fts_get_symbol(a_font))
 	{
 	  fts_object_get_prop(obj, fts_s_fontSize, a_font + 1);
 	  fts_object_get_prop(obj, fts_s_fontStyle, a_font + 2);
@@ -1606,7 +1620,7 @@ fts_patcher_redefine_connection(fts_object_t *patcher, fts_connection_t *c)
 }
 
 static void 
-fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *old = fts_get_object(at);
@@ -1620,7 +1634,7 @@ fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol
 }
 
 static void 
-fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_memorystream_t *stream;  
@@ -1652,7 +1666,7 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
 }
 
 static void 
-fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if (ac > 0)
     {
@@ -1701,7 +1715,7 @@ fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_
 }
 
 static void 
-fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
   fts_object_t *obj;
@@ -1741,7 +1755,7 @@ fts_patcher_add_connection_from_client( fts_object_t *o, int winlet, fts_symbol_
 }
 
 static void 
-fts_patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_connection_t *connection = (fts_connection_t *)fts_get_object( at);
 
@@ -1755,21 +1769,20 @@ fts_patcher_delete_connection_from_client( fts_object_t *o, int winlet, fts_symb
     }
 }
 
-static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_object_t *p;
-  fts_atom_t a[2];
-
   fts_object_t *clipboard = fts_get_object( at);
   int dx = fts_get_int(at+1);
   int dy = fts_get_int(at+2);
+  fts_atom_t a[2];
+  fts_object_t *p;
 
   fts_set_object(a, o);
-  fts_send_message( clipboard, fts_s_paste, 1, a);   
+  fts_send_message(clipboard, fts_s_paste, 1, a);   
 
   /* upload all the not uploaded objects */
-
   fts_client_send_message((fts_object_t *)this, sym_startPaste, 0, 0);
 
   for (p = this->objects; p ; p = p->next_in_patcher)
@@ -1787,8 +1800,8 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
 	fts_client_upload_object( p, -1);
       }
-  /* For each object, for each outlet, upload all the not uploaded connections */
 
+  /* For each object, for each outlet, upload all the not uploaded connections */
   for (p = this->objects; p ; p = p->next_in_patcher)
     {
       int outlet;
@@ -1811,6 +1824,15 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_client_send_message((fts_object_t *)this, sym_endPaste, 0, 0);
 }
 
+static void
+patcher_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+
+  post("coucou!!!\n");
+}
+
+
 /***********************************************************************
  *
  * Class instantiation
@@ -1831,9 +1853,9 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_propagate_input, patcher_propagate_input);
 
   fts_class_message_varargs(cl, fts_new_symbol("load_init"), patcher_load_init); 
-  fts_class_message_varargs(cl, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
-  fts_class_message_varargs(cl, fts_s_save, fts_patcher_save_from_client); 
-  fts_class_message_varargs(cl, fts_s_paste, fts_patcher_paste); 
+  fts_class_message_varargs(cl, fts_new_symbol("open_help_patch"), patcher_open_help_patch); 
+  fts_class_message_varargs(cl, fts_s_save, patcher_save_from_client); 
+  fts_class_message_varargs(cl, fts_s_paste, patcher_paste); 
 
   fts_class_message_varargs(cl, fts_s_openEditor, patcher_open_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, patcher_destroy_editor);
@@ -1841,21 +1863,22 @@ patcher_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("show_object"), show_object);
   fts_class_message_varargs(cl, fts_new_symbol("stop_waiting"), stop_waiting);
 
-  fts_class_message_varargs(cl, fts_new_symbol("start_updates"), fts_patcher_start_updates);
-  fts_class_message_varargs(cl, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
-  fts_class_message_varargs(cl, fts_new_symbol("patcher_update"), fts_patcher_update);
-  fts_class_message_varargs(cl, fts_new_symbol("set_wx"), fts_patcher_set_wx);
-  fts_class_message_varargs(cl, fts_new_symbol("set_wy"), fts_patcher_set_wy);
-  fts_class_message_varargs(cl, fts_new_symbol("set_ww"), fts_patcher_set_ww);
-  fts_class_message_varargs(cl, fts_new_symbol("set_wh"), fts_patcher_set_wh);
+  fts_class_message_varargs(cl, fts_new_symbol("start_updates"), patcher_start_updates);
+  fts_class_message_varargs(cl, fts_new_symbol("stop_updates"), patcher_stop_updates);
+  fts_class_message_varargs(cl, fts_new_symbol("patcher_update"), patcher_update);
+  fts_class_message_varargs(cl, fts_new_symbol("set_wx"), patcher_set_wx);
+  fts_class_message_varargs(cl, fts_new_symbol("set_wy"), patcher_set_wy);
+  fts_class_message_varargs(cl, fts_new_symbol("set_ww"), patcher_set_ww);
+  fts_class_message_varargs(cl, fts_new_symbol("set_wh"), patcher_set_wh);
 
-  fts_class_message_varargs(cl, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("add_object"), patcher_add_object_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("delete_objects"), patcher_delete_objects_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("add_connection"), patcher_add_connection_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("delete_connection"), patcher_delete_connection_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("redefine_object"), patcher_redefine_object_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("redefine_patcher"), patcher_redefine_from_client);
 
-  fts_class_message_varargs(cl, fts_new_symbol("delete_objects"), fts_patcher_delete_objects_from_client);
-  fts_class_message_varargs(cl, fts_new_symbol("add_connection"), fts_patcher_add_connection_from_client);
-  fts_class_message_varargs(cl, fts_new_symbol("delete_connection"), fts_patcher_delete_connection_from_client);
-  fts_class_message_varargs(cl, fts_new_symbol("redefine_object"), fts_patcher_redefine_object_from_client);
-  fts_class_message_varargs(cl, fts_new_symbol("redefine_patcher"), fts_patcher_redefine_from_client);
+  fts_class_message_varargs(cl, fts_s_print, patcher_print);
 
   fts_class_message_varargs(cl, fts_s_spost_description, patcher_spost_description); 
 

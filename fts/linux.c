@@ -571,7 +571,7 @@ void* thread_manager_main(void* arg)
 
 	    worker = (fts_thread_worker_t*)fts_get_pointer(atom);
 	    
-	    success = pthread_create(&worker->id,
+	    success = pthread_create((pthread_t *)&worker->id,
 				     NULL,
 				     thread_manager_run_thread,
 				     (void*)worker->thread_function);

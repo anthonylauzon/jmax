@@ -97,7 +97,6 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
     String text = nameField.getText().trim();
     if( (this.name == null) || (( text != null) && !text.equals( this.name)))
       {
-	target.getFtsObject().setVariableName( text);//solo per debug!!!!!
 	target.getFtsObject().requestSetName( text);
 	name = text;
       }

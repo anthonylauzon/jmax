@@ -21,6 +21,9 @@
  */
 
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <fts/fts.h>
 
 #include <ftsprivate/object.h>
@@ -31,13 +34,13 @@ fts_heap_t *definition_heap = NULL;
 
 /****************************************************************************
  *
- *  names and definitions
+ *  definitions (low level interface)
  *
  */
 
 
 static fts_definition_t *
-fts_definition_new(void)
+fts_definition_new(fts_symbol_t name)
 {
   fts_definition_t *def = NULL;
 
@@ -46,6 +49,7 @@ fts_definition_new(void)
 
   def = (fts_definition_t *)fts_heap_zalloc(definition_heap);
   
+  def->name = name;
   fts_set_void(&def->value);
   fts_objectlist_init(&def->listeners);
 
@@ -80,7 +84,7 @@ fts_definition_get(fts_patcher_t *scope, fts_symbol_t name)
       fts_patcher_set_definitions(scope, hash);
     }
 
-  def = fts_definition_new();
+  def = fts_definition_new(name);
   
   fts_set_pointer(&a, def);
   fts_hashtable_put(hash, &k, &a);
@@ -100,6 +104,28 @@ fts_definition_remove_listener(fts_definition_t *def, fts_object_t *obj)
   fts_objectlist_remove(&def->listeners, obj);
 }
 
+void 
+fts_definition_recompute_listeners(fts_definition_t *def)
+{
+  fts_objectlist_cell_t *p;
+  
+  for(p = fts_objectlist_get_head( &def->listeners); p; p = fts_objectlist_get_next(p))
+    fts_object_recompute(fts_objectlist_get_object(p));
+}
+
+void
+fts_definition_update(fts_definition_t *def, const fts_atom_t *a)
+{
+  fts_definition_set_value(def, a);
+  fts_definition_recompute_listeners(def);  
+}
+
+/*************************************************************
+ *
+ *  names (high level API)
+ *
+ *
+ */
 void
 fts_name_define(fts_patcher_t *patcher, fts_symbol_t name, fts_atom_t *value)
 {
@@ -108,12 +134,8 @@ fts_name_define(fts_patcher_t *patcher, fts_symbol_t name, fts_atom_t *value)
 
   if(!fts_atom_equals(value, &def->value))
     {
-      fts_objectlist_cell_t *p;
-
-      fts_atom_assign(&def->value, value);      
-      
-      for(p = fts_objectlist_get_head( &def->listeners); p; p = fts_objectlist_get_next(p))
-	fts_object_recompute(fts_objectlist_get_object(p));
+      fts_definition_set_value(def, value);
+      fts_definition_recompute_listeners(def);
     }
 }
 
@@ -170,8 +192,54 @@ fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
 {
   fts_patcher_t *scope = fts_patcher_get_top_level(patcher);
   fts_hashtable_t *hash = fts_patcher_get_definitions(scope);
+  fts_atom_t a, k;
 
-  return fts_hashtable_get_unused_symbol(hash, name);
+  fts_set_symbol(&k, name);
+
+  if(fts_hashtable_get(hash, &k, &a))
+    {
+      fts_definition_t *def = fts_get_pointer(&a);
+	      
+      if(!fts_is_void(&def->value))
+	{
+	  const char *str = name;
+	  int len = strlen(str);
+	  char *new_str = alloca((len + 10) * sizeof(char));
+	  int num = 0;
+	  int dec = 1;
+	  int i;
+	  
+	  /* separate base name and index */
+	  for(i=len-1; i>=0; i--) 
+	    {
+	      if(len == (i + 1) && str[i] >= '0' && str[i] <= '9')
+		num += (str[len = i] - '0') * dec;
+	      else
+		new_str[i] = str[i];
+	      
+	      dec *= 10;
+	    }
+	  
+	  /* generate new name */
+	  sprintf(new_str + len, "%d", ++num);
+	  name = fts_new_symbol(new_str);
+	  fts_set_symbol(&k, name);
+	  
+	  while(fts_hashtable_get(hash, &k, &a)) 
+	    {
+	      fts_definition_t *def = fts_get_pointer(&a);
+	      
+	      if(fts_is_void(&def->value))
+		break;
+	      
+	      sprintf(new_str + len, "%d", ++num);
+	      name = fts_new_symbol(new_str);
+	      fts_set_symbol(&k, name);
+	    }
+	}
+    }
+
+  return name;
 }
 
 /****************************************************************************
@@ -247,7 +315,7 @@ args_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	this->arg = ptr + index;
       else if(ac > 1)
 	{
-	  fts_atom_assign(&this->def, at + 1);
+	  /*fts_atom_assign(&this->def, at + 1);*/
 	  
 	  this->arg = &this->def;
 	}
@@ -283,5 +351,5 @@ void
 fts_kernel_variable_init(void)
 {
   fts_class_install( fts_s_define, define_instantiate);
-  fts_class_install( fts_s_args, args_instantiate);
+  /*fts_class_install( fts_s_args, args_instantiate);*/
 }

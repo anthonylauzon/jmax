@@ -25,8 +25,13 @@
 
 #define fts_object_set_id(o, i) ((o)->client_id = (i))
 
+#define fts_object_set_definition(o, d) ((o)->definition = (d))
+#define fts_object_get_definition(o) ((o)->definition)
+
 /* support for redefinition */
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
+
+extern void fts_object_set_name_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 #endif

@@ -1640,6 +1640,14 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
       fts_set_object(&a, (fts_object_t *)saver_dumper);
       fts_send_message(obj, fts_s_dump, 1, &a);
     }
+
+  /* save name */
+  if (fts_object_get_definition(obj) != NULL)
+    {
+      fts_bmax_code_push_symbol(f, fts_object_get_name(obj));
+      fts_bmax_code_obj_mess(f, fts_s_set_name, 1);
+      fts_bmax_code_pop_args(f, 1);
+    }
 }
 
 
@@ -1655,7 +1663,6 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
    * The pop  of the arguments is done at the end, because we reuse
    * the top of the stack for properties (use set instead of push)
    */
-
   fts_set_symbol(&a, fts_s_patcher);
   fts_bmax_code_push_atoms(f, 1, &a);
 
@@ -1796,8 +1803,6 @@ fts_bmax_code_new_patcher(fts_bmax_file_t *f, fts_object_t *obj, int idx)
 
   /* Finally, pop the object table */
   fts_bmax_code_pop_obj_table(f);
-
-  /* save messages to patcher here (after the objets) */
 }
 
 void 

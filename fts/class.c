@@ -75,7 +75,11 @@ void
 fts_class_instantiate(fts_class_t *cl)
 {
   if (!cl->size)
-    (*cl->instantiate_fun)(cl);
+    {
+      (*cl->instantiate_fun)(cl);
+
+      fts_class_message_varargs(cl, fts_s_set_name, fts_object_set_name_method);
+    }
 }
 
 /* for now just recreate the same class and add it to the current package */
