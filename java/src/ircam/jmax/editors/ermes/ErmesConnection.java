@@ -15,255 +15,224 @@ import java.lang.Math;
 
 class ErmesConnection implements ErmesDrawable {
 
-  public ErmesObjInlet itsInlet;
-  public ErmesObjOutlet itsOutlet;
-
-  int itsInletNum;
+  ErmesObject itsFromObject;
   int itsOutletNum;
+
+  ErmesObject itsToObject;
+  int itsInletNum;
+
   ErmesSketchPad itsSketchPad;
   FtsConnection itsFtsConnection;
-  ErmesObject itsFromObject;
-  ErmesObject itsToObject;
   boolean itsSelected;
 
-  public Point getStartPoint() 
-  {
-    return itsOutlet.GetAnchorPoint();
-  }
+  ErmesSketchPad GetSketchPad() 
+    {
+      return itsSketchPad;
+    }
 
-  public Point getEndPoint() 
-  {
-    return itsInlet.GetAnchorPoint();
-  }
+  boolean GetSelected() 
+    {
+      return itsSelected;
+    }
 
-  public ErmesSketchPad GetSketchPad() 
-  {
-    return itsSketchPad;
-  }
+  ErmesObject getSourceObject() 
+    {
+      return itsFromObject;
+    }
 
-  public ErmesObjInlet GetInlet() 
-  {
-    return itsInlet;
-  }
+  ErmesObject getDestObject() 
+    {
+      return itsToObject;
+    }
 
-  public ErmesObjOutlet GetOutlet() 
-  {
-    return itsOutlet;
-  }
+  ErmesConnection( ErmesSketchPad theSketchPad, ErmesObject fromObj, int fromOutlet, ErmesObject toObj, int toInlet) throws FtsException
+    {
+      itsSketchPad = theSketchPad;
 
-  public boolean GetSelected() 
-  {
-    return itsSelected;
-  }
+      itsFromObject = fromObj;
+      itsOutletNum = fromOutlet;
 
-  public ErmesObject GetSourceObject() 
-  {
-    return itsOutlet.GetOwner();
-  }
+      itsToObject = toObj;
+      itsInletNum = toInlet;
 
-  public ErmesObject GetDestObject() 
-  {
-    return itsInlet.GetOwner();
-  }
+      try 
+	{
+	  itsFtsConnection = Fts.makeFtsConnection( itsFromObject.itsFtsObject, itsOutletNum, itsToObject.itsFtsObject, itsInletNum);
+	} 
+      catch ( FtsException e) 
+	{
+	  // ????????
+	  System.out.println( "Connection Error");
+	  throw e;
+	}
 
-  //--------------------------------------------------------
-  // CONSTRUCTOR
-  // NOTE this constructor builds also an instance of FtsConnection. It is intended
-  // to be used from user-driven connections, unlike the second constructor, which receives
-  // the FtsConnection. This is going to change in a middle-term (4/03/97)
-  //--------------------------------------------------------
-  public ErmesConnection( ErmesSketchPad theSketchPad, ErmesObjInlet theInlet, ErmesObjOutlet theOutlet) throws FtsException 
-  {
-    itsSketchPad = theSketchPad;
-    itsInlet = theInlet;
-    itsOutlet = theOutlet;
-    itsFromObject = itsOutlet.GetOwner();
-    itsToObject = itsInlet.GetOwner();
+      itsSelected = false;
 
-    try 
-      {
-	itsFtsConnection = Fts.makeFtsConnection( itsFromObject.itsFtsObject, theOutlet.getNum(), itsToObject.itsFtsObject, theInlet.getNum());
-      } 
-    catch ( FtsException e) 
-      {
-	// ????????
-	System.out.println( "Connection Error");
-	throw e;
-      }
-
-    itsSelected = false;
-  }
+      update( itsFtsConnection); // (fd) ???
+    }
 
 
-  public ErmesConnection( ErmesObject fromObj, ErmesObject toObj, ErmesSketchPad theSketchPad, int theOutlet, int theInlet, FtsConnection theFtsConnection) 
-  {
-    itsFtsConnection = theFtsConnection;
-    itsFromObject = fromObj;
-    itsToObject = toObj;
-    itsSketchPad = theSketchPad;
-    itsInletNum = theInlet;
-    itsOutletNum = theOutlet;
-    itsSelected = false;
-  }
+  ErmesConnection( ErmesSketchPad theSketchPad, ErmesObject fromObj, ErmesObject toObj, int theOutlet, int theInlet, FtsConnection theFtsConnection) 
+    {
+      itsFtsConnection = theFtsConnection;
+      itsFromObject = fromObj;
+      itsToObject = toObj;
+      itsSketchPad = theSketchPad;
+      itsInletNum = theInlet;
+      itsOutletNum = theOutlet;
+      itsSelected = false;
+    }
 
-  public void update( FtsConnection theFtsConnection) 
-  {
-    itsFtsConnection = theFtsConnection;
-    itsInlet = (ErmesObjInlet) itsToObject.itsInletList.elementAt( itsInletNum);
-    itsOutlet = (ErmesObjOutlet)itsFromObject.itsOutletList.elementAt( itsOutletNum);
-    itsOutlet.AddConnection( this);
-    itsOutlet.setSelected( false);
-    itsInlet.AddConnection( this);
-    itsInlet.setSelected( false);
-    itsSketchPad.itsConnections.addElement( this);
-  }
+  void update( FtsConnection theFtsConnection) 
+    {
+      itsFtsConnection = theFtsConnection;
+      itsSketchPad.itsConnections.addElement( this);
+    }
 
 
   //--------------------------------------------------------
   // Select
   // select a connection
   //--------------------------------------------------------
-  public void Select( boolean paintNow) 
-  {
-    if ( !itsSelected) 
-      {
-	itsSelected = true;
-	if ( paintNow)
-	  DoublePaint();
-	else
-	  itsSketchPad.addToDirtyConnections( this);
-      }
-  }
+  void Select( boolean paintNow) 
+    {
+      if ( !itsSelected) 
+	{
+	  itsSelected = true;
+	  if ( paintNow)
+	    DoublePaint();
+	  else
+	    itsSketchPad.addToDirtyConnections( this);
+	}
+    }
 
   //--------------------------------------------------------
   // Deselect
   // deselect a connection
   //--------------------------------------------------------
-  public void Deselect( boolean paintNow) 
-  {
-    if ( itsSelected) 
-      {
-	itsSelected = false;
-	itsSketchPad.markSketchAsDirty();
-	if ( paintNow)
-	  itsSketchPad.paintDirtyList();
-      }
-  }
+  void Deselect( boolean paintNow) 
+    {
+      if ( itsSelected) 
+	{
+	  itsSelected = false;
+	  itsSketchPad.markSketchAsDirty();
+	  if ( paintNow)
+	    itsSketchPad.paintDirtyList();
+	}
+    }
 
-  public void MouseDown( MouseEvent evt, int x, int y) 
-  {
-    if ( !itsSketchPad.itsRunMode) 
-      {
-	itsSketchPad.ClickOnConnection( this, evt, x, y);
-      }
-  }
+  void MouseDown( MouseEvent evt, int x, int y) 
+    {
+      if ( !itsSketchPad.itsRunMode) 
+	{
+	  itsSketchPad.ClickOnConnection( this, evt, x, y);
+	}
+    }
 
   boolean IsNearToPoint( int x, int y) 
-  {
+    {
+      int startX = itsFromObject.getConnectionStartX( itsOutletNum);
+      int startY = itsFromObject.getConnectionStartY( itsOutletNum);
+      int endX = itsToObject.getConnectionEndX( itsInletNum);
+      int endY = itsToObject.getConnectionEndY( itsInletNum);
 
-    Point start = getStartPoint();
-    Point end = getEndPoint();
+      int dx = java.lang.Math.abs( endX - startX);
+      int dy = java.lang.Math.abs( endY - startY);
 
-    int dx = java.lang.Math.abs( end.x - start.x);
-    int dy = java.lang.Math.abs( end.y - start.y);
-
-    if ( dx > dy)
-      return ( SegmentIntersect( x, y-3, x, y+3, start.x, start.y, end.x, end.y));
-    else
-      return ( SegmentIntersect( x-3, y, x+3, y, start.x, start.y, end.x, end.y));
-  }
+      if ( dx > dy)
+	return ( SegmentIntersect( x, y-3, x, y+3, startX, startY, endX, endY));
+      else
+	return ( SegmentIntersect( x-3, y, x+3, y, startX, startY, endX, endY));
+    }
 
 
   private boolean SegmentIntersect( int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) 
-  {
-    int dx21 = x2 - x1;
-    int dx31 = x3 - x1;
-    int dx41 = x4 - x1;
-    int dy21 = y2 - y1;
-    int dy31 = y3 - y1;
-    int dy41 = y4 - y1;
-    int det1 = dx31*dy21 - dy31*dx21;
-    int det2 = dx41*dy21 - dy41*dx21;
+    {
+      int dx21 = x2 - x1;
+      int dx31 = x3 - x1;
+      int dx41 = x4 - x1;
+      int dy21 = y2 - y1;
+      int dy31 = y3 - y1;
+      int dy41 = y4 - y1;
+      int det1 = dx31*dy21 - dy31*dx21;
+      int det2 = dx41*dy21 - dy41*dx21;
 
-    if ( ( det1 == 0)&&( det2 == 0)) 
-      {
-	if ( ( y1 == y2)&&( y1 == y3)&&( y1 == y4))
-	  return ( Scambio( x1, x2, x3, x4));
-	else
-	  return ( Scambio( y1, y2, y3, y4));
-      } 
-    else 
-      {
-	int dx32 = x3 - x2;
-	int dx34 = x3 - x4;
-	int dy32 = y3 - y2;
-	int dy34 = y3 - y4;
-	int det3 = dx34*dy31 - dy34*dx31;
-	int det4 = dx34*dy32 - dy34*dx32;
-	return ( ( ( ( det1<=0)&&( det2>=0))||( ( det1>=0)&&( det2<=0)))&&
-		 ( ( ( det3<=0)&&( det4>=0))||( ( det3>=0)&&( det4<=0))));
-      }
-  }
+      if ( ( det1 == 0)&&( det2 == 0)) 
+	{
+	  if ( ( y1 == y2)&&( y1 == y3)&&( y1 == y4))
+	    return ( Scambio( x1, x2, x3, x4));
+	  else
+	    return ( Scambio( y1, y2, y3, y4));
+	} 
+      else 
+	{
+	  int dx32 = x3 - x2;
+	  int dx34 = x3 - x4;
+	  int dy32 = y3 - y2;
+	  int dy34 = y3 - y4;
+	  int det3 = dx34*dy31 - dy34*dx31;
+	  int det4 = dx34*dy32 - dy34*dx32;
+	  return ( ( ( ( det1<=0)&&( det2>=0))||( ( det1>=0)&&( det2<=0)))&&
+		   ( ( ( det3<=0)&&( det4>=0))||( ( det3>=0)&&( det4<=0))));
+	}
+    }
 
   boolean Scambio( int x1, int x2, int x3, int x4) 
-  {
-    int temp;
-    if ( x2 < x1) 
-      {
-	temp = x2;
-	x2 = x1;
-	x1 = temp;
-      }
-    if ( x4 < x3) 
-      {
-	temp = x4;
-	x4 = x3;
-	x3 = temp;
-      }
+    {
+      int temp;
+      if ( x2 < x1) 
+	{
+	  temp = x2;
+	  x2 = x1;
+	  x1 = temp;
+	}
+      if ( x4 < x3) 
+	{
+	  temp = x4;
+	  x4 = x3;
+	  x3 = temp;
+	}
 
-    return ( ( x2 > x3)&&( x4 > x1));
-  }
+      return ( ( x2 > x3)&&( x4 > x1));
+    }
 
   void DoublePaint( ) 
-  {
-    //this double paint is usefull when an object schange its state in run mode
-    Graphics aGraphics = itsSketchPad.getGraphics();
+    {
+      //this double paint is usefull when an object schange its state in run mode
+      Graphics aGraphics = itsSketchPad.getGraphics();
 
-    if ( aGraphics != null) 
-      {
-	Paint( aGraphics);
-	aGraphics.dispose();
-      }
+      if ( aGraphics != null) 
+	{
+	  Paint( aGraphics);
+	  aGraphics.dispose();
+	}
 
-    if ( itsSketchPad.offScreenPresent)
-      Paint( itsSketchPad.GetOffGraphics());
-  }
+      if ( itsSketchPad.offScreenPresent)
+	Paint( itsSketchPad.GetOffGraphics());
+    }
 
   public void Paint( Graphics g) 
-  {
-    if ( !itsSketchPad.itsGraphicsOn)
-      return;
+    {
+      int startX = itsFromObject.getConnectionStartX( itsOutletNum);
+      int startY = itsFromObject.getConnectionStartY( itsOutletNum);
+      int endX = itsToObject.getConnectionEndX( itsInletNum);
+      int endY = itsToObject.getConnectionEndY( itsInletNum);
 
-    Point start = getStartPoint();
-    Point end = getEndPoint();
-
-    g.setColor( Color.black);
-    if ( itsSelected) 
-      {
-	if ( java.lang.Math.abs( start.x-end.x)>50) 
-	  {
-	    g.drawLine( start.x, start.y, end.x, end.y);
-	    g.drawLine( start.x, start.y+1, end.x, end.y+1);
-	  } 
-	else 
-	  {
-	    g.drawLine( start.x, start.y, end.x, end.y);
-	    g.drawLine( start.x-1, start.y, end.x-1, end.y);
-	  }
-      } 
-    else
-      g.drawLine( start.x, start.y, end.x, end.y);
-  }
+      g.setColor( Color.black);
+      if ( itsSelected) 
+	{
+	  if ( java.lang.Math.abs( startX-endX)>50) 
+	    {
+	      g.drawLine( startX, startY, endX, endY);
+	      g.drawLine( startX, startY+1, endX, endY+1);
+	    } 
+	  else 
+	    {
+	      g.drawLine( startX, startY, endX, endY);
+	      g.drawLine( startX-1, startY, endX-1, endY);
+	    }
+	} 
+      else
+	g.drawLine( startX, startY, endX, endY);
+    }
 }
-
-

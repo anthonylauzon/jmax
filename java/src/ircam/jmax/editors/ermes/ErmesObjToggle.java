@@ -39,22 +39,17 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
 
     super.setWidth( theWidth);
     super.setHeight( theWidth);
-
-    recomputeInOutletsPositions();
   }
 
   // redefined from base class
   protected void setHeight( int theHeight)
   {
-    setWidth( theHeight);
   }
 
   // redefined from base class
   void resizeBy( int theDeltaW, int theDeltaH) 
   {
     setWidth( getWidth() + theDeltaW);
-
-    recomputeInOutletsPositions();
   }
 
   public void MouseDown_specific( MouseEvent evt,int x, int y) 
@@ -91,36 +86,25 @@ class ErmesObjToggle extends ErmesObject implements FtsPropertyHandler {
     if (g == null)
       return;
 
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+
     if ( !itsSelected)
-      g.setColor( itsUINormalColor);
+      g.setColor( Settings.sharedInstance().getUIColor());
     else
-      g.setColor(itsUISelectedColor);
+      g.setColor( Settings.sharedInstance().getSelectedColor());
 
-    g.fillRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2);
-    g.fill3DRect( getX()+2, getY()+2, getWidth()-4, getHeight()-4, true);
-
-    g.setColor( Color.black);
-    g.drawRect( getX()+0, getY()+ 0, getWidth()-1, getHeight()-1);
+    g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
     if (itsToggled) 
       {
-	g.setColor(itsCrossColor);
-	g.drawLine( getX()+4, getY()+4, getX()+getWidth()-6, getY()+ getHeight()-6);
-	g.drawLine( getX()+getWidth()-6, getY()+4, getX()+ 4,getY()+ getHeight()-6);
+	g.setColor( itsCrossColor);
+	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
+	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
       }
 
-    g.setColor(Color.black);
-    if ( !itsSketchPad.itsRunMode)
-      g.fillRect( getX()+getWidth()-DRAG_DIMENSION, getY()+getHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-  }
-
-
-  // ----------------------------------------
-  // old stuff
-  // ----------------------------------------
-  public Dimension getMinimumSize() 
-  {
-    new Throwable( this.getClass().getName()).printStackTrace();
-    return new Dimension(  400, 400);
+    super.Paint_specific( g);
   }
 }

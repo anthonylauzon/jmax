@@ -9,7 +9,7 @@ import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
 //
-// The "patcher" graphic object. It knows the subpatchers it contains.
+// The "patcher" graphic object.
 //
 
 class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler {
@@ -19,7 +19,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
   // ----------------------------------------
   ErmesObjPatcher( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
-    super(theSketchPad, theFtsObject);
+    super( theSketchPad, theFtsObject);
 
     itsFtsObject.watch( "ins", this);
     itsFtsObject.watch( "outs", this);    
@@ -40,21 +40,9 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
     GetSketchWindow().itsPatcher.watch( "deletedConnection", GetSketchWindow());
 
     ( (FtsPatcherObject)itsFtsObject).redefinePatcher( text);
-    itsText.setText( text);
+    itsText.setText( getArgs());
   }
 	
-  public int MaxWidth( int uno, int due, int tre)
-  {
-    int MaxInt = uno;
-
-    if( due>MaxInt) 
-      MaxInt=due;
-    if( tre>MaxInt) 
-      MaxInt=tre;
-
-    return MaxInt;
-  }
-
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
@@ -71,15 +59,6 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
       }
     else
       itsSketchPad.ClickOnObject( this, evt, x, y);
-  }
-
-  public void RestoreDimensions()
-  {
-    int aMaxWidth = MaxWidth( itsFontMetrics.stringWidth( "ZOB")+(itsFontMetrics.getHeight()+10)/2+5+5,
-			      (itsInletList.size())*12,
-			      (itsOutletList.size())*12);
-
-    resizeBy( aMaxWidth - getWidth(), itsFontMetrics.getHeight() + 10 - getHeight());
   }
 
   // ----------------------------------------
@@ -101,8 +80,8 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
   // ----------------------------------------
   // Text area offset
   // ----------------------------------------
-  private static final int TEXT_X_OFFSET = 5;
-  private static final int TEXT_Y_OFFSET = 4;
+  private static final int TEXT_X_OFFSET = 4;
+  private static final int TEXT_Y_OFFSET = 2;
 
   protected final int getTextXOffset()
   {
@@ -128,9 +107,9 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
   public void Paint_specific( Graphics g) 
   {
     if( !itsSelected) 
-      g.setColor( itsLangNormalColor);
+      g.setColor( Settings.sharedInstance().getObjColor());
     else 
-      g.setColor( itsLangSelectedColor);
+      g.setColor( Settings.sharedInstance().getSelectedColor());
 
     int x = getX();
     int y = getY();
@@ -138,14 +117,12 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
     int h = getHeight();
 
     g.fill3DRect( x+1, y+1, w-2, h-2, true);
-    g.draw3DRect( x+3, y+3, w-7, h-7, false);
+    g.draw3DRect( x+2, y+2, w-5, h-5, false);
     
     g.setColor( Color.black);
-    g.drawRect( x,y, w-1, h-1);
-    if( !itsSketchPad.itsRunMode) 
-      g.fillRect( x + w - DRAG_DIMENSION, y + h - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-
     g.setFont( getFont());
     DrawParsedString( g);
+
+    super.Paint_specific( g);
   }
 }

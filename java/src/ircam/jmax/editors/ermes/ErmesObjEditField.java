@@ -77,12 +77,6 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       {
 	itsOwner.redefine( aTextString);
 
-	if ( itsOwner.itsOutletList.size() > 0)
-	  itsOwner.MoveOutlets();
-
-	// Probably called by redefine
-	itsOwner.updateInOutlets();
-
 	itsSketchPad.markSketchAsDirty();
 	itsSketchPad.paintDirtyList();
       } 
@@ -138,8 +132,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	    Dimension d2 = itsOwner.Size();
 	    itsOwner.resize( d2.width, d2.height + fm.getHeight());
 	    itsSketchPad.repaint();
-	    if (itsOwner.itsOutletList.size()>0)
-	      itsOwner.MoveOutlets();
+
 	    setSize( getSize().width, getSize().height + fm.getHeight());
 	    requestFocus();
 	    return;

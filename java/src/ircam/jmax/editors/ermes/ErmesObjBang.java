@@ -39,14 +39,11 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
 
     super.setWidth( theWidth);
     super.setHeight( theWidth);
-
-    recomputeInOutletsPositions();
   }
 
   // redefined from base class
   protected void setHeight( int theHeight)
   {
-    setWidth( theHeight);
   }
 
   public void MouseDown_specific(MouseEvent evt,int x, int y) 
@@ -101,15 +98,14 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     return true;
   }
 
-
   private void Paint_update( Graphics g) 
   {
     if (itsFlashing)
       g.setColor( itsFlashColor);
     else if ( itsSelected)
-      g.setColor( itsUISelectedColor);
+      g.setColor( Settings.sharedInstance().getSelectedColor());
     else
-      g.setColor( itsUINormalColor);
+      g.setColor( Settings.sharedInstance().getUIColor());
 
     g.fillOval( getX() + 5, getY() + 5, getWidth() - 10, getHeight() - 10);
   }
@@ -122,29 +118,17 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     int h = getHeight();
 
     if ( itsSelected)
-      g.setColor( itsUISelectedColor);
+      g.setColor( Settings.sharedInstance().getSelectedColor());
     else
-      g.setColor( itsUINormalColor);
+      g.setColor( Settings.sharedInstance().getUIColor());
 
-    g.fillRect( x + 1, y + 1, w - 2, h - 2);
-    g.fill3DRect( x + 2, y + 2, w - 4, h - 4, true);
+    g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
     Paint_update(g);
 
     g.setColor(Color.black);
-    g.drawRect( x, y, w - 1, h - 1);
-    g.drawOval( x + 4, y + 4, w - 8, h - 8);
+    g.drawOval( x + 4, y + 4, w - 9, h - 9);
 
-    if ( !itsSketchPad.itsRunMode)
-      g.fillRect( x + w - DRAG_DIMENSION, y + h - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-  }
-
-
-  //--------------------------------------------------------
-  // minimum and preferred sizes
-  //--------------------------------------------------------
-  public Dimension getMinimumSize() 
-  {
-    return null;
+    super.Paint_specific( g);
   }
 }

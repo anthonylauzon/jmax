@@ -38,14 +38,6 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   {
     itsText.setWidth( getWidth() - 2*getTextXOffset());
     super.setHeight( itsFontMetrics.getHeight()*itsText.getRows() + 2*getTextYOffset());
-
-    recomputeInOutletsPositions();
-  }
-
-  void cleanAll()
-  {
-    itsText = null;
-    super.cleanAll();
   }
 
   // redefined from base class
@@ -73,6 +65,25 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
     setWidth( getWidth() + theDeltaW);
   }
 
+  // redefined from base class
+  void setFont( Font theFont)
+  {
+    super.setFont( theFont);
+
+    if ( itsText != null)
+      {
+	itsText.setFontMetrics( itsFontMetrics);
+
+	super.setHeight( itsFontMetrics.getHeight()*itsText.getRows() + 2*getTextYOffset());
+      }
+  }
+
+
+  void cleanAll()
+  {
+    itsText = null;
+    super.cleanAll();
+  }
 
   // ----------------------------------------
   // White and text area offset
@@ -112,7 +123,8 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
   public void propertyChanged(FtsObject obj, String name, Object value) 
   {
     if ((name == "ins") || (name == "outs"))
-      updateInOutlets();
+      // (***fd) Should do something ??
+      ;
   
     itsSketchPad.repaint();
   }
@@ -167,86 +179,6 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 //     super.MouseUp(evt, x, y);
 //   }
 
-  void RestoreDimensions( boolean paintNow) 
-  {
-    int aMaxWidth = MaxWidth( itsFontMetrics.stringWidth( "ZOB") + 2*getTextXOffset(),
-			      itsInletList.size()*12,
-			      itsOutletList.size()*12);
-
-    int aHeightDiff = itsFontMetrics.getHeight() * itsText.getRows() + 2*getTextYOffset() - getHeight();
-    int aWidthDiff = aMaxWidth - getWidth();
-
-    if (aHeightDiff == 0 && aWidthDiff == 0)
-      return;
-
-    resizeBy( aWidthDiff, aHeightDiff);
-
-    if (paintNow) 
-      {
-	if (aHeightDiff < 0 || aWidthDiff < 0)
-	  itsSketchPad.repaint();
-	else
-	  DoublePaint();
-      }
-    else 
-	{
-	  if (aHeightDiff < 0 || aWidthDiff <0)
-	    itsSketchPad.markSketchAsDirty();
-	  else
-	    itsSketchPad.addToDirtyObjects( this);
-        }
-  }
-
-  int MaxWidth( int uno, int due, int tre) 
-  {
-    int MaxInt = uno;
-
-    if (due > MaxInt)
-      MaxInt = due;
-
-    if (tre > MaxInt)
-      MaxInt = tre;
-
-    return MaxInt;
-  }
-
-  void ResizeToNewFont(Font theFont) 
-  {
-    ResizeToText( 0,0);
-  }
-
-  void ResizeToText( int theDeltaX, int theDeltaY) 
-  {
-    int aWidth = getWidth() + theDeltaX;
-    int aHeight = getHeight() + theDeltaY;
-
-    int minWidth = itsFontMetrics.stringWidth( "m ") + 2*getTextXOffset();
-    if ( aWidth < minWidth)
-      aWidth = minWidth;
-
-    int minHeight = itsFontMetrics.getHeight() * itsText.getRows() + 2*getWhiteYOffset();
-    if ( aHeight < minHeight)
-      aHeight = minHeight;
-
-    resizeBy( aWidth - getWidth(), aHeight - getHeight());
-  }
-
-  boolean canResizeBy( int theDeltaX, int theDeltaY) 
-  {
-    return getWidth() + theDeltaX >= itsFontMetrics.stringWidth( "m ");
-  }
-
-  void MoveOutlets() 
-  {
-    for ( Enumeration e = itsOutletList.elements(); e.hasMoreElements(); )
-      {
-	ErmesObjOutlet aOutlet = (ErmesObjOutlet) e.nextElement();
-	aOutlet.MoveTo( aOutlet.itsX, getY() + getHeight());
-      }
-  }
-
-  abstract protected void Paint_specific( Graphics g);
-
   protected void DrawParsedString( Graphics theGraphics) 
   {
     int x = getX() + getTextXOffset();
@@ -258,15 +190,6 @@ abstract class ErmesObjEditableObject extends ErmesObject implements FtsProperty
 	theGraphics.drawString( (String)e.nextElement(), x, y);
 	y += height;
       }
-  }
-
-  // ----------------------------------------
-  // old stuff
-  // ----------------------------------------
-  Dimension getMinimumSize()
-  {
-    new Throwable( this.getClass().getName()).printStackTrace();
-    return new Dimension( 100, 17);
   }
 }
 

@@ -358,16 +358,16 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
   protected void Copy()
   {
-    Cursor temp = getCursor();
-
     Point tempPoint = itsSketchPad.selectionUpperLeft();
     itsSketchPad.pasteDelta.setLocation( tempPoint.x - itsSketchPad.itsCurrentScrollingX, 
 					 tempPoint.y - itsSketchPad.itsCurrentScrollingY);
     itsSketchPad.numberOfPaste = 0;
 
+    Cursor temp = getCursor();
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
     
     ftsClipboard.copy( Fts.getSelection());
+
     setCursor( temp);
   }
 
@@ -424,15 +424,15 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   // Methods to handle changes in the patcher data.
   //
   
-  void DeleteGraphicObject(FtsObject object)
+  void DeleteGraphicObject( FtsObject object)
   {
     itsSketchPad.DeleteGraphicObject(itsSketchPad.getErmesObjectFor(object), false);
     itsSketchPad.paintDirtyList(); // SHould be a repaint
   }
 
-  void DeleteGraphicConnection(FtsConnection c)
+  void DeleteGraphicConnection( FtsConnection c)
   {
-    itsSketchPad.DeleteGraphicConnection(itsSketchPad.getErmesConnectionFor(c), false);
+    itsSketchPad.DeleteGraphicConnection( itsSketchPad.getErmesConnectionFor(c), false);
     itsSketchPad.paintDirtyList(); // SHould be a repaint
   }
 
@@ -1087,10 +1087,11 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     MenuItem aRunEditItem = getRunModeMenuItem();
     MenuItem aSelectAllItem = getSelectAllMenuItem();
 
-    if (theRunMode)  
-      setBackground( Color.white);
-    else
-      setBackground( ErmesSketchPad.sketchColor);
+// (fd) probably useless
+//     if (theRunMode)  
+//       setBackground( Color.white);
+//     else
+//       setBackground( ErmesSketchPad.sketchColor);
     
     itsSketchPad.SetRunMode( theRunMode);
     

@@ -74,7 +74,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	System.out.println("Error in redefining object, action cancelled");
       }
 
-    itsText.setText( text);
+    itsText.setText( getArgs());
   }
 
   public void MouseDown_specific( MouseEvent evt,int x, int y) 
@@ -101,11 +101,11 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
   // White area offset
   // ----------------------------------------
   // Settings for 20 pixels height
-//   private static final int WHITE_X_OFFSET = 3;
-//   private static final int WHITE_Y_OFFSET = 3;
+  private static final int WHITE_X_OFFSET = 3;
+  private static final int WHITE_Y_OFFSET = 3;
   // Settings for 18 pixels height
-  private static final int WHITE_X_OFFSET = 2;
-  private static final int WHITE_Y_OFFSET = 2;
+//   private static final int WHITE_X_OFFSET = 2;
+//   private static final int WHITE_Y_OFFSET = 2;
 
   protected final int getWhiteXOffset()
   {
@@ -121,11 +121,11 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
   // Text area offset
   // ----------------------------------------
   // Settings for 20 pixels height
-//   private static final int TEXT_X_OFFSET = 4;
-//   private static final int TEXT_Y_OFFSET = 2;
+  private static final int TEXT_X_OFFSET = 4;
+  private static final int TEXT_Y_OFFSET = 2;
   // Settings for 18 pixels height
-  private static final int TEXT_X_OFFSET = 3;
-  private static final int TEXT_Y_OFFSET = 1;
+//   private static final int TEXT_X_OFFSET = 3;
+//   private static final int TEXT_Y_OFFSET = 1;
 
   protected final int getTextXOffset()
   {
@@ -147,13 +147,13 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 
     if (isError == 0) 
       {
-	if (! itsSelected)
-	  g.setColor( itsLangNormalColor);
+	if (itsSelected)
+	  g.setColor( Settings.sharedInstance().getSelectedColor());
 	else
-	  g.setColor( itsLangSelectedColor);
+	  g.setColor( Settings.sharedInstance().getObjColor());
       } 
     else
-      g.setColor(Color.red);
+      g.setColor( Color.red);
 
     int x = getX();
     int y = getY();
@@ -161,25 +161,23 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
     int h = getHeight();
 
     // For 20 pixels height
-    //g.fill3DRect( x+1, y+1, w-2, h-2, true);
+    g.fill3DRect( x+1, y+1, w-2, h-2, true);
     // For 18 pixels height
-    g.draw3DRect( x+1, y+1, w-3, h-3, true);
+//     g.draw3DRect( x+1, y+1, w-3, h-3, true);
 
     if (! itsSelected)
-      g.setColor(Color.white);
+      g.setColor( Color.white);
     else
-      g.setColor(itsLangNormalColor);
+      g.setColor( Settings.sharedInstance().getObjColor());
 
     int whiteXOffset = getWhiteXOffset();
     int whiteYOffset = getWhiteYOffset();
     g.fillRect( x + whiteXOffset, y + whiteYOffset, w - 2*whiteXOffset, h - 2*whiteYOffset);
 
-    g.setColor(Color.black);
-    g.drawRect( x, y, w-1, h-1);
-    if (!itsSketchPad.itsRunMode)
-      g.fillRect( x + w - DRAG_DIMENSION, y + h - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-
+    g.setColor( Color.black);
     g.setFont( getFont());
     DrawParsedString( g);
+
+    super.Paint_specific( g);
   }
 }

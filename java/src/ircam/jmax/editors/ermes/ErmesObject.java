@@ -20,30 +20,36 @@ import ircam.jmax.utils.*;
 // - handle the object with data and open the associated editor
 // (example: subpatchers, table, etc.)
 
+// A survivor...
+class ErmesObjInOutlet {
+  protected static final int VISIBLE_WIDTH = 5;
+  protected static final int VISIBLE_HEIGHT = 3;
+  protected static final int PAD = 2;
+}
+
 abstract class ErmesObject implements ErmesDrawable {
 
   ErmesSketchPad itsSketchPad;
 
   FtsObject itsFtsObject = null;
 
-  MaxVector itsInletList = new MaxVector();
-  MaxVector itsOutletList = new MaxVector();
-
   boolean itsSelected = false;
-  boolean updated = false;
 
   Font itsFont = null;
   FontMetrics itsFontMetrics = null;
 
-  static Color itsUINormalColor = new Color( 153, 204, 255);
-  static Color itsUISelectedColor = new Color( 51, 153, 204);
-  static Color itsLangNormalColor = new Color( 153, 204, 204);
-  static Color itsLangSelectedColor = new Color( 51, 153, 153);
-
-  final static int PADS_DISTANCE = 12;
+  static final int PADS_DISTANCE = 12;
   static final int DRAG_DIMENSION = 4;
 
   private Rectangle itsRectangle = new Rectangle();
+
+  // Sensibility areas
+  private static InletSensibilityArea inletArea= new InletSensibilityArea();
+  private static OutletSensibilityArea outletArea= new OutletSensibilityArea();
+  private static InletOutletSensibilityArea inletOutletArea= new InletOutletSensibilityArea();
+  private static ResizeSensibilityArea resizeArea = new ResizeSensibilityArea();
+  private static NothingSensibilityArea nothingArea = new NothingSensibilityArea();
+
 
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
@@ -114,8 +120,6 @@ abstract class ErmesObject implements ErmesDrawable {
       }
 
     itsRectangle = new Rectangle( theFtsObject.getX(), theFtsObject.getY(), theFtsObject.getWidth(), theFtsObject.getHeight());
-
-    updateInOutlets();
   }
 
   protected final int getX() 
@@ -172,20 +176,78 @@ abstract class ErmesObject implements ErmesDrawable {
     itsFont = theFont;
     itsFontMetrics = itsSketchPad.getFontMetrics( theFont);
 
-    //ResizeToNewFont( itsFont);
-
     itsFtsObject.put( "font", itsFont.getName());
     itsFtsObject.put( "fs", itsFont.getSize());
-  }
 
-  abstract Dimension getMinimumSize();
+    // (fd) Maurizio told me that it may be enough to tell
+    // that the patcher is changed if you changed only the fonts.
+    // So I believe him...
+    itsFtsObject.localPut( "font", itsFont.getName());
+    itsFtsObject.localPut( "fs", itsFont.getSize());
+  }
 
   final ErmesSketchWindow GetSketchWindow() 
   {
     return (ErmesSketchWindow)(itsSketchPad.itsSketchWindow);
   }
 
-  abstract protected void Paint_specific( Graphics g);
+  int getConnectionStartX( int outletNum) 
+    {
+      int n = itsFtsObject.getNumberOfOutlets();
+      int distance = 0;
+
+      if (n > 1)
+	distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1);
+      
+      return getX() + ErmesObjInOutlet.PAD + outletNum*distance + ErmesObjInOutlet.VISIBLE_WIDTH/2;
+    }
+
+  int getConnectionStartY( int outletNum) 
+    {
+      return getY() + getHeight();
+    }
+
+  int getConnectionEndX( int inletNum) 
+    {
+      int n = itsFtsObject.getNumberOfInlets();
+      int distance = 0;
+
+      if (n > 1)
+	distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1);
+      
+      return getX() + ErmesObjInOutlet.PAD + inletNum*distance + ErmesObjInOutlet.VISIBLE_WIDTH/2;
+    }
+
+  int getConnectionEndY( int inletNum)
+    {
+      return getY() - 1;
+    }
+
+  protected void paintInOutlets( Graphics g, int n, int y)
+  {
+    int x = getX() + ErmesObjInOutlet.PAD;
+    int distance = 0;
+
+    // Optimisation: distance could be recomputed when inlet/outlet number changes and stored in instance variable
+    if (n > 1)
+      distance = (getWidth() - 2*ErmesObjInOutlet.PAD - ErmesObjInOutlet.VISIBLE_WIDTH) / (n-1);
+
+    for ( int i = 0; i < n; i++)
+      {
+	g.fillRect( x, y, ErmesObjInOutlet.VISIBLE_WIDTH, ErmesObjInOutlet.VISIBLE_HEIGHT);
+	x += distance;
+      }
+  }
+
+  protected void Paint_specific( Graphics g)
+  {
+    g.setColor( Color.black);
+
+    paintInOutlets( g, itsFtsObject.getNumberOfInlets(), getY() - 1);
+    paintInOutlets( g, itsFtsObject.getNumberOfOutlets(), getY() + getHeight() - 2);
+
+    g.drawRect( getX(), getY(), getWidth()-1, getHeight()-1);
+  }
 
   void MouseDown_specific( MouseEvent e, int x, int y)
   {
@@ -195,24 +257,14 @@ abstract class ErmesObject implements ErmesDrawable {
   {
   }
 
-  void ResizeToNewFont( Font itsFont) 
-  {
-  }
-
   void UpdateOnly( Graphics g) 
   {
-    if ( !itsSketchPad.itsGraphicsOn)
-      return;
-
     g.setColor( itsSketchPad.getBackground());
     g.fillRect( itsRectangle.x, itsRectangle.y, itsRectangle.width, itsRectangle.height);
   }
 
   public void Paint( Graphics g)  // (fd) public, because public in ErmesDrawable...
   {
-    if ( ! itsSketchPad.itsGraphicsOn)
-      return;
-
     if ( itsSketchPad.isInGroup) 
       {
 	//emergency situation: ignore the Graphics and paint offScreen
@@ -237,131 +289,7 @@ abstract class ErmesObject implements ErmesDrawable {
       Paint( itsSketchPad.GetOffGraphics());
   }
 
-  void updateInOutlets()
-  {
-    int i;
-    ErmesObjInlet aErmesObjInlet;
-    ErmesObjOutlet aErmesObjOutlet;
-    int aHDist;
-
-    // retrieve the inlet, outlet informations
-    if ( itsFtsObject == null) 
-      return;
-
-    int n_inlts = itsFtsObject.getNumberOfInlets();
-    int n_outlts = itsFtsObject.getNumberOfOutlets();
-    int in_local_distance = PADS_DISTANCE;
-    int out_local_distance = PADS_DISTANCE;
-
-    int old_ninlts = itsInletList.size(); //used in case of redefines
-    int old_noutlts = itsOutletList.size(); //used in case of redefines
-
-    int maxPads = (n_outlts > n_inlts) ? n_outlts : n_inlts;
-
-//     if ( maxPads * PADS_DISTANCE > itsRectangle.width) 
-//       { //the pads are longer then the element
-// 	resize( maxPads*PADS_DISTANCE, itsRectangle.height);
-//       }
-
-    if (n_inlts > 1)
-      in_local_distance = ( itsRectangle.width-10)/(n_inlts-1) ;
-
-    if (n_outlts > 1)
-      out_local_distance = (itsRectangle.width-10)/(n_outlts-1) ;
-
-    if (n_inlts > old_ninlts) 
-      { //we added inlets...
-	for ( i=0; i< n_inlts; i++) 
-	  {
-	    if ( i<old_ninlts) 
-	      {
-		aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt( i);
-		aErmesObjInlet.MoveTo( itsRectangle.x + 2 + i*in_local_distance, aErmesObjInlet.itsY);
-		itsSketchPad.markSketchAsDirty();
-	      } 
-	    else 
-	      {
-		aErmesObjInlet = new ErmesObjInlet( i, this, itsRectangle.x + 2 + i*in_local_distance, itsRectangle.y);
-
-		itsInletList.addElement( aErmesObjInlet);
-		itsSketchPad.AddInlet( aErmesObjInlet);
-		itsSketchPad.addToDirtyInOutlets( aErmesObjInlet);
-	      }
-	  }
-      } 
-    else if ( n_inlts <= old_ninlts) 
-      { //we reduced the number of inlets...
-	if ( n_inlts>1)
-	  aHDist = ( itsRectangle.width-10)/(n_inlts-1);
-	else
-	  aHDist=0;
-
-	for ( i=0; i< old_ninlts; i++) 
-	  {
-	    if (i<n_inlts) 
-	      {
-		aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt( i);
-		aErmesObjInlet.MoveTo( itsRectangle.x + 2 + i*aHDist, aErmesObjInlet.itsY);
-		itsSketchPad.markSketchAsDirty();
-	      } else 
-		{
-		  //erase the inlet, and the associated connections
-		  aErmesObjInlet = (ErmesObjInlet)itsInletList.elementAt( itsInletList.size() - 1);
-		  itsInletList.removeElementAt( itsInletList.size() - 1);
-		  itsSketchPad.RemoveInlet( aErmesObjInlet);
-		  itsSketchPad.markSketchAsDirty();
-                }
-	  }
-      }
-
-    if (n_outlts>old_noutlts) 
-      { //we added outlets...
-	if (n_outlts>1)
-	  aHDist = (itsRectangle.width-10)/(n_outlts-1);
-	else
-	  aHDist=0;
-
-	for ( i = old_noutlts; i< n_outlts; i++) 
-	  {
-	    aErmesObjOutlet = new ErmesObjOutlet( i, this, itsRectangle.x, itsRectangle.y);
-	    itsOutletList.addElement( aErmesObjOutlet);
-	    itsSketchPad.AddOutlet( aErmesObjOutlet);
-	    itsSketchPad.addToDirtyInOutlets( aErmesObjOutlet);
-	  }
-
-	for ( i = 0; i < itsOutletList.size(); i++) 
-	  {
-	    aErmesObjOutlet = (ErmesObjOutlet)itsOutletList.elementAt( i);
-	    aErmesObjOutlet.MoveTo( itsRectangle.x + 2 + i*aHDist, aErmesObjOutlet.itsY);
-	    if (old_noutlts > 0 && old_noutlts != n_outlts)
-	      itsSketchPad.markSketchAsDirty();
-	  }
-      }
-    else if (n_outlts <= old_noutlts) 
-      { //we reduced the number of outlets
-	int size = itsOutletList.size()-1;
-	for ( i=n_outlts;i<old_noutlts;i++) 
-	  {
-	    aErmesObjOutlet = (ErmesObjOutlet)itsOutletList.elementAt( size);
-	    itsOutletList.removeElementAt( size);
-	    itsSketchPad.RemoveOutlet( aErmesObjOutlet);
-	    size--;
-	    itsSketchPad.markSketchAsDirty();
-	  }
-	if (n_outlts>1)
-	  aHDist = (itsRectangle.width-10)/(n_outlts-1);
-	else
-	  aHDist = 0;
-
-	for ( i = 0; i < n_outlts;i++) 
-	  {
-	    aErmesObjOutlet = (ErmesObjOutlet)itsOutletList.elementAt( i);
-	    aErmesObjOutlet.MoveTo( itsRectangle.x + 2 + i*aHDist, aErmesObjOutlet.itsY);
-	    itsSketchPad.markSketchAsDirty();
-	  }
-      }
-  }
-
+  // Should be move to an empty interface used as marker
   boolean isUIController() 
   {
     return false;
@@ -403,91 +331,115 @@ abstract class ErmesObject implements ErmesDrawable {
     return itsFtsObject;
   }
 
-  MaxVector GetOutletList() 
-  {
-    return itsOutletList;
-  }
-
-  MaxVector GetInletList() 
-  {
-    return itsInletList;
-  }
-
   ErmesSketchPad GetSketchPad() 
   {
     return itsSketchPad;
   }
 
-  void ConnectionRequested( ErmesObjInOutlet theRequester) 
+  private int findNearestInOutlet( int mouseX, int n)
   {
-    // HERE the checking: is the type of connection requested allowed?
-    if ( theRequester instanceof ErmesObjOutlet) //if is an outlet...
-      itsSketchPad.OutletConnect( this, theRequester);
-    else
-      itsSketchPad.InletConnect( this, theRequester); // then, is it's an inlet
-  }
+    if ( n == 0)
+      return -1;
 
-  boolean ConnectionAbort( ErmesObjInOutlet theRequester, boolean paintNow) 
-  {
-    // HERE the checking: is the type of connection abort allowed?
-    // ( for now always allowed)
-    theRequester.setSelected( false);
-    itsSketchPad.ResetConnect();
-    return true; //for now, everything is allowed
-  }
+    int w = getWidth();
 
-  boolean MouseMove( MouseEvent e, int x, int y) 
-  {
-    if ( itsSketchPad.itsRunMode)
-      return false;
-    else if ( e.isControlDown()) 
+    int x = mouseX - getX();
+    int distance = w / n;
+    int hole = distance/3;
+    int nearestLeft = x / (w / n);
+
+    int io = -1;
+
+    if (nearestLeft == 0)
       {
-	if ( isUIController()) 
-	  {
-	    if ( itsSketchPad.itsSketchWindow.getCursor() != Cursor.getPredefinedCursor( Cursor.HAND_CURSOR))
-	      itsSketchPad.itsSketchWindow.setCursor( Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-	  }
-	return true;
-      } 
-    else if ( IsInDragBox( x,y)) 
+	if ( x < distance - hole)
+	  io = 0;
+      }
+    else if (nearestLeft == n - 1)
       {
-	GetSketchWindow().setCursor( Cursor.getPredefinedCursor( Cursor.SE_RESIZE_CURSOR));
-	return true;
-      } 
+	if ( x > (n - 1)*distance + hole)
+	  io = n - 1;
+      }
     else
-      return false;
+      {
+	int nearestLeftX = nearestLeft * distance;
+	
+	if ( x > nearestLeftX + hole && x < nearestLeftX + distance - hole)
+	  io = nearestLeft;
+      }
+
+    return io;
   }
 
-  boolean MouseDrag( MouseEvent e,int x,int y) 
-  {
-    return MouseDrag_specific( e, x, y);
-  }
+  SensibilityArea findSensibilityArea( int mouseX, int mouseY)
+    {
+      int x = getX();
+      int y = getY();
+      int w = getWidth();
+      int h = getHeight();
 
-  boolean IsInDragBox( int x,int y) 
+      if ( mouseX >= x + w - ResizeSensibilityArea.width 
+	   && mouseY > y + InletOutletSensibilityArea.height
+	   && mouseY < y + h - InletOutletSensibilityArea.height)
+	return resizeArea;
+      else if ( mouseY < y + InletOutletSensibilityArea.height)
+	{
+	  int inlet = findNearestInOutlet( mouseX, itsFtsObject.getNumberOfInlets());
+
+	  if (inlet >= 0)
+	    {
+	      inletArea.setNumber( inlet);
+
+	      return inletArea;
+	    }
+
+	  return nothingArea;
+	}
+      else if (mouseY >= y + h - InletOutletSensibilityArea.height)
+	{
+	  int outlet = findNearestInOutlet( mouseX, itsFtsObject.getNumberOfOutlets());
+
+	  if ( outlet >= 0)
+	    {
+	      outletArea.setNumber( outlet);
+
+	      return outletArea;
+	    }
+
+	  return nothingArea;
+	}
+
+      return nothingArea;
+    }
+
+  SensibilityArea findConnectionSensibilityArea( int mouseX, int mouseY)
+    {
+      int inlet = findNearestInOutlet( mouseX, itsFtsObject.getNumberOfInlets());
+
+      if ( inlet >= 0)
+	{
+	  inletOutletArea.setNumber( inlet);
+	  return inletOutletArea;
+	}
+
+      return nothingArea;
+    }
+
+  void MouseDrag( MouseEvent e,int x,int y) 
   {
-    return x > (itsRectangle.x + itsRectangle.width - DRAG_DIMENSION)
-      && x < (itsRectangle.x + itsRectangle.width) 
-      && y > (itsRectangle.y + itsRectangle.height - DRAG_DIMENSION) 
-      && y < (itsRectangle.y + itsRectangle.height);
+    MouseDrag_specific( e, x, y);
   }
 
   void MouseDown( MouseEvent e,int x, int y) 
   {
     if ( !itsSketchPad.itsRunMode && !e.isControlDown())
       {
-	if ( (e.getClickCount() > 1) && e.isShiftDown() ) 
-	  {
-	    RestoreDimensions( true);
-	  } 
-	else if ( itsSelected)
+	if ( itsSelected)
 	  itsSketchPad.clickHappenedOnAnAlreadySelected = true;
 	else
 	  itsSketchPad.clickHappenedOnAnAlreadySelected = false;
 
-	if ( IsInDragBox( x,y)) 
-	  SetInitDrag();
-	else
-	  MouseDown_specific( e, x, y);
+	MouseDown_specific( e, x, y);
       } 
     else
       MouseDown_specific( e, x, y);
@@ -497,47 +449,14 @@ abstract class ErmesObject implements ErmesDrawable {
   {
   }
 
-  boolean MouseDrag_specific( MouseEvent e, int x, int y) 
+  void MouseDrag_specific( MouseEvent e, int x, int y) 
   {
-    return false;
   }
 
-  void MouseUp( MouseEvent e,int x,int y) 
+  void MouseUp( MouseEvent e, int x, int y)
   {
     if ( itsSketchPad.itsRunMode || e.isControlDown())
       MouseUp_specific( e, x, y);
-  }
-
-  void RestoreDimensions( boolean paintNow) 
-  {
-    //possible optimization: don't repaint if nothing changes
-    resizeBy( getMinimumSize().width - itsRectangle.width, getMinimumSize().height - itsRectangle.height);
-    if ( paintNow)
-      itsSketchPad.repaint();
-    else
-      itsSketchPad.addToDirtyObjects( this);
-  }
-
-  void ResizeToText( int theDeltaX, int theDeltaY) 
-  {
-    int aWidth = itsRectangle.width + theDeltaX;
-    int aHeight = itsRectangle.height + theDeltaY;
-    if ( aWidth < getMinimumSize().width)
-      aWidth = getMinimumSize().width;
-    if ( aHeight < getMinimumSize().height)
-      aHeight = getMinimumSize().height;
-    resizeBy( aWidth - itsRectangle.width, aHeight - itsRectangle.height);
-  };
-
-  boolean canResizeBy( int theDeltaX, int theDeltaY) 
-  {
-    return (getWidth() + theDeltaX >= getMinimumSize().width)
-      && (getHeight() + theDeltaY >= getMinimumSize().height);
-  }
-
-  void SetInitDrag() 
-  {
-    itsSketchPad.SetResizeState( this);
   }
 
   void MoveBy( int theDeltaH, int theDeltaV) 
@@ -549,46 +468,6 @@ abstract class ErmesObject implements ErmesDrawable {
     setY( itsRectangle.y + theDeltaV);
     itsRectangle.x = itsRectangle.x;
     itsRectangle.y = itsRectangle.y;
-
-    for ( Enumeration e1 = itsInletList.elements(); e1.hasMoreElements(); ) 
-      {
-	ErmesObjInlet aInlet = ( ErmesObjInlet) e1.nextElement();
-	aInlet.MoveBy( theDeltaH, theDeltaV);
-      }
-
-    for ( Enumeration e2 = itsOutletList.elements(); e2.hasMoreElements(); ) 
-      {
-	ErmesObjOutlet aOutlet = ( ErmesObjOutlet) e2.nextElement();
-	aOutlet.MoveBy( theDeltaH, theDeltaV);
-      }
-  }
-
-  protected void recomputeInOutletsPositions()
-  {
-    if ( itsInletList.size() > 1) 
-      {
-	int aInletDistance = (itsRectangle.width - 10) / (itsInletList.size() - 1);
-
-	for ( int i = 1; i < itsInletList.size(); i++)
-	  {
-	    ErmesObjInlet aInlet = (ErmesObjInlet) itsInletList.elementAt( i);
-	    aInlet.MoveTo( getX() + 2 + i*aInletDistance, aInlet.itsY);
-	  }
-      }
-
-    int aHDistance;
-
-    if ( itsOutletList.size() > 1)
-      aHDistance = (itsRectangle.width - 10) / (itsOutletList.size() - 1);
-    else
-      aHDistance = 0;
-
-    for ( int j = 0; j < itsOutletList.size(); j++) 
-      {
-	ErmesObjOutlet aOutlet = (ErmesObjOutlet) itsOutletList.elementAt( j);
-	// big shit...
-	aOutlet.MoveTo( getX() + 2 + j*aHDistance, getY() + getHeight() - 2);
-      }
   }
 
   void resizeBy( int theDeltaW, int theDeltaH) 
@@ -601,8 +480,6 @@ abstract class ErmesObject implements ErmesDrawable {
 
     setWidth( itsRectangle.width + theDeltaW);
     setHeight( itsRectangle.height + theDeltaH);
-
-    recomputeInOutletsPositions();
   }
 
   void resize( int w, int h) 
@@ -628,8 +505,6 @@ abstract class ErmesObject implements ErmesDrawable {
   {
     itsSketchPad = null;
     itsFtsObject = null;
-    itsInletList = null;
-    itsOutletList = null;
     itsFont = null;
     itsFontMetrics = null;
   }

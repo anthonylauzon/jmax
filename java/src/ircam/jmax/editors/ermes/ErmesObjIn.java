@@ -9,15 +9,11 @@ import ircam.jmax.fts.*;
 // The graphic inlet contained in subpatchers
 //
 
-class ErmesObjIn extends ErmesObject {
-  Dimension textDimensions = new Dimension();
-  int itsId;
+class ErmesObjIn extends ErmesObjInOut {
 
   public ErmesObjIn(ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    super(theSketchPad, theFtsObject);
-
-    itsId = ((FtsInletObject) itsFtsObject).getPosition();
+    super(theSketchPad, theFtsObject, ((FtsInletObject) theFtsObject).getPosition());
   }
 
   void redefine( String text) 
@@ -27,32 +23,47 @@ class ErmesObjIn extends ErmesObject {
 
   public void Paint_specific(Graphics g) 
   {
-    textDimensions.setSize( itsFontMetrics.stringWidth( "" + (itsId+1)), itsFontMetrics.getHeight());
-
     if (!itsSelected)
-      g.setColor(itsLangNormalColor);
+      g.setColor( Settings.sharedInstance().getObjColor());
     else
-      g.setColor(itsLangSelectedColor);
+      g.setColor( Settings.sharedInstance().getSelectedColor());
 
-    g.fillRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2);
-    g.fill3DRect(getX()+2, getY()+2, getWidth()-4, getHeight()-4, true);
-    g.setColor(Color.black);
-    //the box
-    g.drawRect( getX()+0, getY()+ 0, getWidth()-1, getHeight()-1);
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
+
+    g.fill3DRect( x + 1, y + 1, w - 2,  h - 2, true);
+
     //the triangle
-    g.drawLine( getX()+ 1, getY()+1, getX() + getWidth()/2, getY()+getHeight()/2);
-    g.drawLine( getX() + getWidth()/2, 
-		getY() + getHeight()/2, 
-		getX() + getWidth() - 1,
-		getY() + 1);
+    Color color = g.getColor();
 
-    g.setFont(getFont());
-    g.drawString( "" + (itsId+1), getX()+2, getY()-2);
-  }
+//    g.setColor( color.brighter());
+//     int xPoints[] = { x + 1, x + w/2, x + w - 2};
+//     int yPoints[] = { y + 1, y + h/2 - 1, y + 1};
+//     g.fillPolygon( xPoints, yPoints, 3);
+//
+//      g.setColor( color.darker());
+//      g.drawLine( x + 2, y + 2, x + w/2, y + h/2);
 
-  void ResizeToNewFont(Font theFont) 
-  {
-    itsSketchPad.repaint();
+    int xpwd2 = x + w/2;
+    int S = 4;
+
+    g.setColor( color.brighter());
+    g.drawLine( xpwd2, y + 2 + S, xpwd2 + S, y + 2);
+
+    g.setColor( color.darker());
+    g.drawLine( xpwd2 - S - 1, y + 2, xpwd2 - 1, y + 2 + S);
+
+    int ys = y + h - itsFontMetrics.getDescent() - 1;
+    String s = "" + itsId;
+    int xs = xpwd2 - itsFontMetrics.stringWidth( s)/2;
+
+    g.setFont( getFont());
+    g.setColor( Color.black);
+    g.drawString( s, xs, ys);
+
+    super.Paint_specific( g);
   }
 
   public void MouseDown_specific(MouseEvent evt, int x, int y) 
@@ -65,35 +76,5 @@ class ErmesObjIn extends ErmesObject {
 	  itsSketchPad.itsInPop.SetNewOwner(this);
 	  itsSketchPad.itsInPop.show(itsSketchPad, getX(), getY());
         }
-  }
-
-  void ChangeInletNo( int numberChoosen) 
-  {
-    if (itsId != numberChoosen) 
-      {
-	itsId = numberChoosen;
-	redefine( "");
-      }
-    itsSketchPad.repaint();
-  }
-
-  public void ResizeToText(int theDeltaX, int theDeltaY) 
-  {
-    int aWidth = getWidth()+theDeltaX;
-    int aHeight = getHeight()+theDeltaY;
-
-    if ( aWidth < getMinimumSize().width)
-      aWidth = getMinimumSize().width;
-    if ( aHeight < getMinimumSize().height)
-      aHeight = getMinimumSize().height;
-    resizeBy( aWidth - getWidth(), aHeight - getHeight());
-  }
-
-
-  static Dimension minimumSize = new Dimension(15, 15);
-
-  public Dimension getMinimumSize() 
-  {
-    return minimumSize;
   }
 }

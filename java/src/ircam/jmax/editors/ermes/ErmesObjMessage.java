@@ -17,13 +17,6 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     super(theSketchPad, theFtsObject);
 
     itsFtsObject.watch( "value", this);
-
-    itsText.setText( getArgs());
-    itsText.setWidth( getWidth());
-    itsText.setFontMetrics( itsFontMetrics);
-
-//     if( !canResizeBy( 0, 0)) 
-//       RestoreDimensions( false);
   }
 
   // ----------------------------------------
@@ -87,20 +80,8 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   {
     if (name == "value")
       {
-	// BUG: must clear the vector before.
-	//ParseText( getArgs());
-
-	if ( !canResizeBy( 0, 0)) 
-	  {
-	    ResizeToText( 0,0);
-	    itsSketchPad.repaint();
-	  }
-	else
-	  {
-	    Graphics g = itsSketchPad.getGraphics();
-	    Paint( g);
-	    g.dispose();
-	  }
+	// (fd) To be redone
+	// itsSketchPad.repaint();
       }
     else
       super.propertyChanged( obj, name, value);
@@ -148,48 +129,33 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
 
     if ( !itsSketchPad.itsRunMode) 
       {
-	if ( itsSelected || itsFlashing) 
-	  g.setColor( itsLangSelectedColor);
-	else 
-	  g.setColor(itsLangNormalColor);
-      }
-    else 
-      g.setColor(itsUINormalColor);
- 
-    g.fillRect( getX() + 1, getY() + 1, getWidth() - 2, getHeight() - 2);
-    
-    
-    if ( !itsSketchPad.itsRunMode) 
-      {
 	if( itsFlashing) 
-	  g.setColor(itsLangSelectedColor);
+	  g.setColor( Settings.sharedInstance().getSelectedColor());
 	else
 	  {
 	    if( !itsSelected) 
-	      g.setColor(Color.white);
+	      g.setColor( Color.white);
+	    //g.setColor( Settings.sharedInstance().getUIColor());
 	    else
-	      g.setColor(itsLangNormalColor);
+	      g.setColor( Settings.sharedInstance().getObjColor());
 	  }
       }
     else 
       {
 	if ( itsFlashing || itsSelected)
-	  g.setColor( itsUISelectedColor);
+	  g.setColor( Settings.sharedInstance().getSelectedColor());
 	else 
-	  g.setColor(Color.white);
+	  //g.setColor( Settings.sharedInstance().getUIColor());
+	  g.setColor( Color.white);
       }
   
-    g.fillRect( getX()+getWhiteXOffset(), getY()+1, getWidth()-(getWhiteXOffset()*2), getHeight());
+    g.fillRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2);
+    //g.fill3DRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2, true);
     
     g.setColor( Color.black);
-    g.drawRect( getX()+0, getY()+0, getWidth()-1, getHeight()-1);
-    
-    g.setColor( Color.black);
-
-    if( !itsSketchPad.itsRunMode) 
-      g.fillRect( getX()+getWidth()-DRAG_DIMENSION, getY()+getHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-    
     g.setFont( getFont());
     DrawParsedString( g);
+
+    super.Paint_specific( g);
   }
 }

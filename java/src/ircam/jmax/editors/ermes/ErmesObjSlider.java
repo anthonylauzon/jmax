@@ -65,8 +65,6 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
     if (getHeight() < h)
       setHeight( h);
 
-    recomputeInOutletsPositions();
-
     itsThrottle = new ErmesObjThrottle( this);
   }
 
@@ -197,7 +195,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
     itsFtsObject.put( "value", theValue);
   }
 
-  public boolean MouseDrag_specific( MouseEvent evt,int x, int y)
+  public void MouseDrag_specific( MouseEvent evt,int x, int y)
   {
     if( (itsSketchPad.itsRunMode || evt.isControlDown()) && itsMovingThrottle )
       {
@@ -205,7 +203,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 	  {
 	    //compute the value and send to FTS
 	    if ( itsInteger == (int)( ((getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep) )
-	      return false;
+	      return;
 	
 	    itsInteger = (int)(((getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep);
 
@@ -237,9 +235,7 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
 	    Paint_specific( g);
 	    g.dispose();
 	  }
-	return true;
       }
-    return false;
   }
 
   void MouseUp( MouseEvent evt,int x, int y)
@@ -259,10 +255,10 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
     return itsThrottle.getBounds().contains( theX,theY);
   }
   
-  public boolean NeedPropertyHandler()
-  {
-    return true;
-  }
+//   public boolean NeedPropertyHandler()
+//   {
+//     return true;
+//   }
 
   public boolean isUIController() 
   {
@@ -280,33 +276,20 @@ class ErmesObjSlider extends ErmesObject implements FtsPropertyHandler {
       return; 
 
     if( !itsSelected) 
-      g.setColor( itsUINormalColor);
+      g.setColor( Settings.sharedInstance().getUIColor());
     else
-      g.setColor( itsUISelectedColor);
+      g.setColor( Settings.sharedInstance().getSelectedColor());
 
     g.fill3DRect( getX()+1, getY()+1, getWidth()-2,  getHeight()-2, true);
 
-    g.setColor( Color.black);
-    g.drawRect( getX(), getY(), getWidth()-1, getHeight()-1);
-    
-    if( !itsSketchPad.itsRunMode) 
-      g.fillRect( getX()+getWidth()-DRAG_DIMENSION,getY()+getHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-
     itsThrottle.paintNoErase( g);
+
+    super.Paint_specific( g);
   }
 
   public void MoveBy( int theDeltaH, int theDeltaV) 
   {
     super.MoveBy( theDeltaH, theDeltaV);
     itsThrottle.MoveByAbsolute( theDeltaH, theDeltaV);
-  }
-
-  static Dimension minimumSize = new Dimension();
-
-  public Dimension getMinimumSize() 
-  {
-    minimumSize.setSize( 15, 30);
-
-    return minimumSize;
   }
 }

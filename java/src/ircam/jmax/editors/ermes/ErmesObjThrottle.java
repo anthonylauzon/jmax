@@ -113,19 +113,19 @@ class ErmesObjThrottle {
     else
       deltaY = itsPreviousY;
 
-    g.setColor( itsSlider.itsUISelectedColor);
+    g.setColor( Settings.sharedInstance().getSelectedColor());
 
     if ( !itsSlider.itsSelected) 
       {
 	if ( mode == XOR_MODE) 
-	  g.setXORMode( itsSlider.itsUINormalColor);
+	  g.setXORMode( Settings.sharedInstance().getUIColor());
 
 	g.fillRect( deltaX + 1, deltaY + 1, itsWidth - 2, itsHeight - 2);
       }
 
     g.setColor( Color.black);
     if ( mode == XOR_MODE)
-      g.setXORMode( itsSlider.itsSelected?itsSlider.itsUISelectedColor:itsSlider.itsUINormalColor);
+      g.setXORMode( itsSlider.itsSelected ? Settings.sharedInstance().getSelectedColor() : Settings.sharedInstance().getUIColor());
 
     g.drawRect( deltaX, deltaY, itsWidth - 1, itsHeight - 1);
     if ( mode == XOR_MODE) 

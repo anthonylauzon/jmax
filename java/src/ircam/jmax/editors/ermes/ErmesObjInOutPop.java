@@ -9,7 +9,7 @@ import ircam.jmax.*;
 //
 public class ErmesObjInOutPop extends PopupMenu
 {
-  public ErmesObject itsOwner;
+  ErmesObjInOut itsOwner;
   ErmesSketchWindow window;  
 
   class ErmesInOutPopActionListener implements ActionListener, MaxEditor.Disposable
@@ -17,45 +17,34 @@ public class ErmesObjInOutPop extends PopupMenu
     MenuItem item;
     int idx;
 
-    ErmesInOutPopActionListener(MenuItem item, int idx)
+    ErmesInOutPopActionListener( MenuItem item, int idx)
     {
-      window.disposeAtDestroy(this);
+      window.disposeAtDestroy( this);
       this.item = item;
       this.idx = idx;
     }
 
-    public  void actionPerformed(ActionEvent e)
+    public void actionPerformed( ActionEvent e)
     { 
-      CommunicateChoice( itsOwner, idx);
+      itsOwner.ChangeNo( idx);
     }
 
     public void dispose()
     {
-      item.removeActionListener(this);
+      item.removeActionListener( this);
     }
   };
     
-  void SetNewOwner(ErmesObject theObject) 
+  void SetNewOwner( ErmesObjInOut theObject) 
   {
     itsOwner = theObject;
     //setSize(itsOwner.currentRect.width, itsOwner.currentRect.height * 2);
   }
 		
-  public static void CommunicateChoice(ErmesObject target, int numberChoosen)
-  {
-    if (target instanceof ircam.jmax.editors.ermes.ErmesObjIn) 
-      {
-	((ErmesObjIn) target).ChangeInletNo(numberChoosen);
-      }
-    else if (target instanceof ircam.jmax.editors.ermes.ErmesObjOut) 
-      {
-	((ErmesObjOut) target).ChangeOutletNo(numberChoosen);
-      }  
-  }
-  
   public void Redefine( int numbers)
   {
     MenuItem aMenuItem;
+
     if ( numbers == getItemCount()) 
       return;
 
@@ -88,23 +77,22 @@ public class ErmesObjInOutPop extends PopupMenu
   //
   public ErmesObjInOutPop(ErmesSketchWindow window, int numbers) 
   {
-    super("choice:");
+    super( "Change:");
 
     this.window = window;
 
     itsOwner = null;
 
-    for (int i=0; i<numbers; i++) 
+    for (int i = 0; i < numbers; i++) 
       {
 	MenuItem aMenuItem;
 
 	aMenuItem = new MenuItem( Integer.toString( i+1 ));
 	add( aMenuItem);
 
-	aMenuItem.addActionListener(new ErmesInOutPopActionListener(aMenuItem, i));
+	aMenuItem.addActionListener( new ErmesInOutPopActionListener(aMenuItem, i));
       }
   }
-
 
   public void removeNotify()
   {
