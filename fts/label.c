@@ -433,7 +433,4 @@ void
 fts_label_config(void)
 {
   fts_label_type = fts_class_install( fts_s_label, label_instantiate);
-
-  fts_alias_install(fts_s_receive, fts_s_inlet);
-  fts_alias_install(fts_s_send, fts_s_outlet);
 }

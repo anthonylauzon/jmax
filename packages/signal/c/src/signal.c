@@ -37,6 +37,7 @@ extern void signal_wave_config(void);
 
 extern void signal_matrix_config(void);
 extern void signal_delay_config(void);
+extern void signal_harmtap_config(void);
 
 extern void signal_cut_config(void);
 
@@ -56,6 +57,7 @@ signal_config(void)
 
   signal_matrix_config();
   signal_delay_config();
+  signal_harmtap_config();
 
   signal_cut_config();
 

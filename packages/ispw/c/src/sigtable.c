@@ -70,41 +70,49 @@ static void
 sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   sigtable_t *this = (sigtable_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_symbol_t unit = samples_unit_get_arg(ac, at, 2);
-  float size = (unit ? fts_get_float_arg(ac, at, 3, 0.0f) : fts_get_float_arg(ac, at, 2, 0.0f));
-  int n_samps;
+  fts_symbol_t name;
+  fts_symbol_t unit;
+  float size;
   float *samp_buf;
+
+  ac--;
+  at++;
+
+  name = fts_get_symbol_arg(ac, at, 0, 0);
+  unit = samples_unit_get_arg(ac, at, 1);
+  size = (unit ? fts_get_float_arg(ac, at, 2, 0.0f) : fts_get_float_arg(ac, at, 1, 0.0f));
 
   this->name = 0;
 
-  if (!unit)
-    unit = samples_unit_get_default();
-  
-  if (sampbuf_name_already_registered(name))
+  if(name)
     {
-      post("table~: %s: multiply defined (last ignored)\n", name);
-      return;
+      if (!unit)
+	unit = samples_unit_get_default();
+      
+      if(sampbuf_name_already_registered(name))
+	{
+	  fts_object_set_error(o, "table~: %s: multiply defined\n", name);
+	  return;
+	}
+      
+      if(size < 0)
+	size = 0;
+      
+      sampbuf_add(name, (void *)&(this->buf));
+      sampbuf_init(&this->buf, samples_unit_convert(unit, size, fts_dsp_get_sample_rate()));
+      
+      this->name = name;
+      this->check_size = size;
+      this->unit = unit;
+      
+      ispw_register_named_object(o, this->name);
+      fts_dsp_add_object(o);
     }
   else
-    sampbuf_add(name, (void *)&(this->buf));
-  
-  if (size < 0)
-    size = 0;
-
-  n_samps = samples_unit_convert(unit, size, fts_dsp_get_sample_rate());
-  
-  sampbuf_init(&this->buf, n_samps);
-
-  this->name = name;
-
-  if (this->name)
-    ispw_register_named_object(o, this->name);
-
-  this->check_size = size;
-  this->unit = unit;
-
-  fts_dsp_add_object(o);
+    {
+      fts_object_set_error(o, "table~: %s: multiply defined\n", name);
+      return;
+    }
 }
 
 static void
@@ -112,15 +120,14 @@ sigtable_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
 {
   sigtable_t *this = (sigtable_t *)o;
 
-  if (this->name)
-    ispw_unregister_named_object(o, this->name);
-
-  if (this->name)
-    sampbuf_remove(this->name);
-
-  sampbuf_erase(&this->buf);
-
-  fts_dsp_remove_object(o);
+  if(this->name)
+    {
+      ispw_unregister_named_object(o, this->name);
+      sampbuf_remove(this->name);
+      sampbuf_erase(&this->buf);
+      
+      fts_dsp_remove_object(o);
+    }
 }
  
 /******************************************************************
@@ -135,15 +142,9 @@ static void
 put_dsp_check_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigtable_t *this = (sigtable_t *)o;
+  int n_samps = samples_unit_convert(this->unit, this->check_size, fts_dsp_get_sample_rate());
   
-  if (!this->name)
-    post("table~: dead object\n");
-  else
-    {
-      int n_samps = samples_unit_convert(this->unit, this->check_size, fts_dsp_get_sample_rate());
-
-      sampbuf_realloc(&this->buf, n_samps);
-    }
+  sampbuf_realloc(&this->buf, n_samps);
 }
 
 /**************************************************
@@ -163,9 +164,6 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   int samps_left, samps_to_read, samps_read;
   char tempbuf[TEMPBUFSIZE+320];
   FILE* fd;
-
-  if(!this->name)
-    return;
 
   if ((fd = fts_file_open(file_name, "r")) < 0){
     post("table~: %s: can't open\n", file_name);
@@ -221,9 +219,6 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   SNDSoundStruct header;
   float *buf_ptr;
   int bufno = 0;
-
-  if (!this->name)
-    return;
 
   if ((fd = fts_file_open(file_name, "w")) < 0){
     post("table~: can't create file: %s\n", file_name);
@@ -290,9 +285,6 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *buf = this->buf.samples;
   int n_onset;
 
-  if(!this->name)
-    return;
-
   if(onset > 0)
     n_onset = samples_unit_convert(this->unit, onset, fts_dsp_get_sample_rate());
   else
@@ -341,9 +333,6 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   float *buf = this->buf.samples;
   int n_save;
 
-  if(!this->name)
-    return;
-
   if(sr <= 0.0f)
     sr = fts_dsp_get_sample_rate();
 
@@ -378,9 +367,6 @@ sigtable_clear(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
   sigtable_t *this = (sigtable_t *)o;
   int i;
 
-  if(!this->name)
-    return;  
-
   sampbuf_zero(&this->buf);
 }
 
@@ -390,7 +376,7 @@ sigtable_realloc(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts
   sigtable_t *this = (sigtable_t *)o;
   float size = fts_get_float_arg(ac, at, 0, 0.0f);
 
-  if(this->name && size > 0)
+  if(size > 0)
     {
       int n_samps = samples_unit_convert(this->unit, size, fts_dsp_get_sample_rate());
       

@@ -4,6 +4,7 @@ libsignal_la_SOURCES= \
 binop.c \
 cut.c \
 delay.c \
+harmtap.c \
 matrix.c \
 osc.c \
 osc_ieeewrap.c \
@@ -17,7 +18,7 @@ wave.c \
 wave_ieeewrap.c \
 white.c
 
-INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
+INCLUDES=-I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src -I@top_srcdir@/packages/ispw/c/src
 
 noinst_HEADERS=  \
 delay.h \

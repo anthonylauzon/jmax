@@ -40,8 +40,14 @@ typedef struct
   int n_tick;
 } delayline_t;
 
+#define delayline_get_samples(d) ((d)->samples)
+#define delayline_get_phase(d) ((d)->phase)
 #define delayline_get_size(d) ((d)->size)
+#define delayline_get_ring_size(d) ((d)->ring_size)
 #define delayline_get_sr(d) ((d)->sr)
+#define delayline_get_n_tick(d) ((d)->n_tick)
+
+extern fts_metaclass_t *delayline_metaclass;
 
 #endif
 

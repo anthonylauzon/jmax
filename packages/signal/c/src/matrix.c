@@ -59,6 +59,12 @@ matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       float def_time = 0.0;
       fts_ramp_t *ramps;
       int n, in, out, i;
+
+      if(n_ins < 1)
+	n_ins = 1;
+      
+      if(n_outs < 1)
+	n_outs = 1;
       
       if(ac > 2 && fts_is_number(at + 2))
 	def_time = fts_get_number_float(at + 2);
@@ -349,9 +355,12 @@ matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
   int n_outs = fts_get_int_arg(ac, at, 1, 0);
   int i, j;
 
-  if(n_ins < 1 || n_outs < 1)
-    return &fts_CannotInstantiate;
+  if(n_ins < 1)
+    n_ins = 1;
 
+  if(n_outs < 1)
+    n_outs = 1;
+  
   fts_class_init(cl, sizeof(matrix_t), n_ins + 1, n_outs, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, matrix_init);

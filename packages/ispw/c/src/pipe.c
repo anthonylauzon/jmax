@@ -27,8 +27,6 @@
 #include <string.h>
 #include <fts/fts.h>
 
-static fts_symbol_t fts_s_clear, fts_s_flush;
-
 typedef struct _pipe_
 {
   fts_object_t o;
@@ -49,7 +47,7 @@ pipe_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   for(i=this->ac-1; i>=0; i--)
     {
       fts_outlet_atom(o, i, atoms + i);
-      fts_set_void(atoms + i);
+      fts_atom_void(atoms + i);
     }
 
   fts_heap_free(atoms, this->heap);
@@ -64,7 +62,7 @@ pipe_delay_list(pipe_t *this)
   
   for(i=0; i<this->ac; i++)
     {
-      fts_set_void(atoms + i);
+      fts_atom_void(atoms + i);
       fts_atom_assign(atoms + i, this->at + i);
     }
 
@@ -158,7 +156,6 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ac--; 
   at++;
 
-  /* fake default arguments */
   if(ac > 1)
     {
       int n = ac - 1;
@@ -203,7 +200,7 @@ pipe_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   pipe_clear(o, 0, 0, 0, 0);
   
   for(i=0; i<this->ac; i++)
-    fts_set_void(this->at + i);
+    fts_atom_void(this->at + i);
   
   fts_heap_free(this->at, this->heap);
 }
@@ -211,12 +208,15 @@ pipe_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
+  int n;
   int i;
 
-  if(ac <= 1)
-    ac = 2;
+  if(ac < 2)
+    n = 2;
+  else
+    n = ac;
 
-  fts_class_init(cl, sizeof(pipe_t), ac, ac - 1, 0);
+  fts_class_init(cl, sizeof(pipe_t), n, n - 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pipe_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pipe_delete);
@@ -230,15 +230,15 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, pipe_atom_trigger);
   fts_method_define_varargs(cl, 0, fts_s_symbol, pipe_atom_trigger);
   
-  for(i=1; i<ac-1; i++)
+  for(i=1; i<n-1; i++)
     {
       fts_method_define_varargs(cl, i, fts_s_int, pipe_atom_middle);
       fts_method_define_varargs(cl, i, fts_s_float, pipe_atom_middle);
       fts_method_define_varargs(cl, i, fts_s_symbol, pipe_atom_middle);
     }
 
-  fts_method_define_varargs(cl, ac, fts_s_int, pipe_atom_delay);
-  fts_method_define_varargs(cl, ac, fts_s_float, pipe_atom_delay);
+  fts_method_define_varargs(cl, n - 1, fts_s_int, pipe_atom_delay);
+  fts_method_define_varargs(cl, n - 1, fts_s_float, pipe_atom_delay);
 
   return fts_Success;
 }

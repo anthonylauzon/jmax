@@ -115,7 +115,13 @@ aflib_loader_open_read(fts_audiofile_t* audiofile)
 static int 
 aflib_loader_open_write(fts_audiofile_t* audiofile)
 {
+  const char *filename = fts_audiofile_get_filename(audiofile);
+  aflib_handle_t *handle = aflib_handle_alloc();
+
+  fts_audiofile_set_handle(audiofile, handle);
+
   /* not yet implemented */
+
   return -1;
 }
 

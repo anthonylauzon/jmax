@@ -72,11 +72,11 @@ exscale_compute_params(exscale_t *this)
   in_range = this->inhigh - this->inlow;
   out_range = this->outhigh - this->outlow;
 
-  if(in_range == 0. || out_range == 0.)
-    {
-      post("error: exscale: high and low value can't be the same\n");
-      return;
-    }
+  if(in_range == 0.0)
+    in_range = 1.0;
+  
+  if(out_range == 0.0)
+    out_range = 1.0;
 
   if(this->base == 1.)
     {

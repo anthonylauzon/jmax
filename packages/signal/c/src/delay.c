@@ -32,7 +32,7 @@ static fts_symbol_t sym_delay = 0;
 static fts_symbol_t sym_tap = 0;
 static fts_symbol_t sym_tap_signal = 0;
 
-static fts_metaclass_t *delayline_metaclass;
+fts_metaclass_t *delayline_metaclass;
 
 /************************************************************
  *
@@ -155,6 +155,8 @@ delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	fts_object_set_error(o, "First argument of number required");
     }
   
+  delayline_reset(this, fts_dsp_get_sample_rate(), fts_dsp_get_tick_size());  
+
   fts_dsp_add_object(o);
 }
 
@@ -342,6 +344,8 @@ tap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   ac--;
   at++;
 
+  fts_dsp_add_object(o);
+
   this->ftl_data = ftl_data;
 
   data->delayline = NULL;
@@ -359,12 +363,7 @@ tap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     }
   
   if(data->delayline == NULL)
-    {
-      fts_object_set_error(o, "First argument of delay required");
-      return;
-    }
-
-  fts_dsp_add_object(o);
+    fts_object_set_error(o, "First argument of delay~ required");
 }
 
 static void
@@ -373,7 +372,6 @@ tap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   tap_t *this = (tap_t *)o;
 
   ftl_data_free(this->ftl_data);
-
   fts_dsp_remove_object(o);
 }
 

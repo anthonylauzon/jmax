@@ -279,49 +279,46 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   table_t *this = (table_t *)o;
   fts_atom_t a;
-  fts_object_t *obj = 0;
-  fts_symbol_t name = 0;
   int size = FTS_TABLE_DEFAULT_SIZE;
 
   ac--;
   at++;
 
+  this->name = NULL;
+  this->vec = NULL;
+
   if(ac > 0 && fts_is_symbol(at))
     {
-      name = fts_get_symbol(at);
-
-      obj = ispw_get_object_by_name(name);
+      fts_symbol_t name = fts_get_symbol(at);
+      fts_object_t *obj = ispw_get_object_by_name(name);
 
       if(ac > 1 && fts_is_number(at + 1)) 
 	size = fts_get_number_int(at + 1);
+      
+      this->name = name;
 
-      if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
+      if(obj)
 	{
-	  /* refer to existing vector */
-	  fts_object_refer(obj);
-	  
-	  if(size > ivec_get_size((ivec_t *)obj))
-	    fts_send_message(obj, 0, fts_s_size, 1, at + 1);
+	  if(fts_object_get_class_name(obj) == ivec_symbol)
+	    {
+	      /* refer to existing vector */
+	      fts_object_refer(obj);
+	      
+	      if(size > ivec_get_size((ivec_t *)obj))
+		ivec_set_size(this->vec, size);
+	      
+	      this->vec = (ivec_t *)obj;
+	    }
+	  else
+	    fts_object_set_error(o, "Object %s is not a table", fts_symbol_name(name));
 
-	  this->vec = (ivec_t *)obj;
-	  this->name = name;
-  
-	  return;
-	}
-      else
-	{
-	  fts_object_set_error(o, "Object %s is not a table", fts_symbol_name(name));
 	  return;
 	}
     }
   else if(ac > 0 && fts_is_number(at))
     size = fts_get_number_int(at);
   
-  this->name = name;
-
-  if(this->name)
-    ispw_register_named_object(obj, this->name);
-
+  /* create and register new vector */
   this->vec = (ivec_t *)fts_object_create(ivec_type, 0, 0);
   fts_object_refer(this->vec);
 
@@ -329,6 +326,9 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   fts_set_symbol(&a, fts_s_yes);
   fts_object_put_prop((fts_object_t *)this->vec, fts_s_keep, &a);
+
+  if(this->name != NULL)
+    ispw_register_named_object((fts_object_t *)this->vec, this->name);
 }
 
 static void

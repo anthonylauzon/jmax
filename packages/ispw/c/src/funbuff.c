@@ -1087,11 +1087,6 @@ funbuff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->foot = 0;
   this->yvalid = 0;
   this->gotoDelta = -1L;
-
-  if(ac > 0 && fts_is_symbol(at))
-    this->sym = fts_get_symbol(at);
-  else
-    fts_object_set_error(o, "Name argument required");
 }
 
 
