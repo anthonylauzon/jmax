@@ -89,6 +89,11 @@ public class FtsUndoableObject extends FtsObject implements UndoableData{
     undoM.redo();
   }
 
+  public void clearAllUndoRedo()
+  {
+    undoM.discardAllEdits();
+  }
+
   //----- Fields
 
   UndoableEditSupport undo;

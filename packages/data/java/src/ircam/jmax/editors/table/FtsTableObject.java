@@ -311,12 +311,16 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	sendArgs[3].setInt(size); 
 	sendMessage(FtsObject.systemInlet, "cut_from_client", 4, sendArgs);
 	thereIsAcopy = true;
+	
+	clearAllUndoRedo();
     }
     public void requestPaste(int startIndex, int size)
     {
 	sendArgs[0].setInt(startIndex);
 	sendArgs[1].setInt(size);  
 	sendMessage(FtsObject.systemInlet, "paste_from_client", 2, sendArgs);
+		
+	clearAllUndoRedo();
     }
     public void requestInsert(int startIndex, int vsize, int pixsize)
     {
@@ -324,6 +328,8 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	sendArgs[1].setInt(pixsize); 
 	sendArgs[2].setInt(startIndex); 
 	sendMessage(FtsObject.systemInlet, "insert_from_client", 3, sendArgs);
+    	
+	clearAllUndoRedo();
     }
 
     private int[] visibles;
