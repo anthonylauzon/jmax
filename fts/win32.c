@@ -217,7 +217,7 @@ fts_get_string_from_registry(HKEY key, const char *name, char *buf, int bufsize)
   return 0;
 }
 
-static int 
+FTS_API int 
 fts_get_root_from_registry(char *buf, int bufsize)
 {
   HKEY key;
@@ -276,7 +276,7 @@ fts_get_default_root_directory( void)
     }
   }
 
-  fts_log("[win32]: Using '%s' as document root\n", root);
+ // fts_log("[win32]: Using '%s' as document root\n", root);
 
   return fts_new_symbol( root);
 }
@@ -341,7 +341,7 @@ fts_get_system_project( void)
 
   /* check the config file in the root directory */
   root = fts_get_default_root_directory();  
-  strcat(root, "\\config");
+  strcat((char*)root, "\\config");
   fts_make_absolute_path(root, fts_s_default_project, path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol(path);
@@ -430,7 +430,7 @@ win_close(int socket)
  * End:
  */
 
-void* WINAPI 
+unsigned long WINAPI 
 thread_manager_run_thread(void* arg)
 {
     fts_thread_function_t* thread_func = (fts_thread_function_t*)arg;
@@ -481,7 +481,7 @@ thread_manager_start(thread_manager_t * self)
  * 
  * @return 
  */
-void* WINAPI
+unsigned long WINAPI
 thread_manager_main(void* arg)
 {
     int work_done;
