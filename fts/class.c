@@ -30,6 +30,8 @@
 
 const int fts_SystemInlet = -1;
 
+
+
 /* Return Status declarations */
 
 fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
@@ -223,7 +225,12 @@ static void fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *
   store = (fts_atom_t *)cl->at;
 
   for(i=0; i<ac; i++)
-    store[i] = at[i];
+    {
+      store[i] = at[i];
+
+      if(fts_is_object(at + i))
+	fts_word_set_object(fts_atom_value(store + i), 0);
+    }
 
   cl->next = mcl->inst_list;
   mcl->inst_list = cl;
@@ -250,7 +257,7 @@ fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 {
   fts_class_t *cl;
   fts_status_t s;
-  
+
   cl = fts_zalloc(sizeof(fts_class_t));
   
   cl->properties  = 0;
