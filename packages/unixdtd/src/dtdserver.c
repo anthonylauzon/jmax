@@ -68,7 +68,7 @@ struct _dtdserver_t {
   int preload_frames;
   int loop_milliseconds;
 
-  const char *base_dir;
+  char *base_dir;
 
   int number_of_objects;
   int number_of_fifos;
@@ -241,51 +241,11 @@ void dtdserver_close( dtdserver_t *server, dtdfifo_t *fifo)
 /* Methods                                                                */
 /* ********************************************************************** */
 
-static int create_base_dir( const char *base_dir)
-{
-  struct stat buf;
-  char *p;
-
-  p = index( base_dir, '/') + 1;
-
-  do
-    {
-      p = index( p, '/');
-
-      if (!p)
-	break;
-
-      *p = '\0';
-      if ( stat( base_dir, &buf) < 0)
-	{
-	  if ( errno != ENOENT)
-	    {
-	      fprintf( stderr, "Cannot stat DTD fifo root directory %s (%s)\n", base_dir, strerror( errno));
-	      return -1;
-	    }
-
-	  if ( mkdir( base_dir, 0777) < 0)
-	    {
-	      fprintf( stderr, "Cannot create DTD fifo root directory %s (%s)\n", base_dir, strerror( errno));
-	      return -1;
-	    }
-	}
-      *p = '/';
-
-      p++;
-    }
-  while (*p);
-
-  return 1;
-}
-
-
 static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dtdserver_t *this = (dtdserver_t *)o;
   int from_child_pipe[2];
   const char *base_dir;
-  char *d;
   int len;
 
   this->block_frames = fts_get_int_arg( ac, at, 1, DEFAULT_BLOCK_FRAMES);
@@ -348,12 +308,14 @@ static void dtdserver_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
   base_dir = fts_symbol_name( fts_get_symbol_arg( ac, at, 3, fts_new_symbol( DEFAULT_BASE_DIR)));
 
   len = strlen( base_dir);
-  d = strcpy( malloc( len+32), base_dir);
-  sprintf( d + len, "/%d/", this->server_pid);
+  this->base_dir = strcpy( malloc( len+32), base_dir);
+  sprintf( this->base_dir + len, "-%d", this->server_pid);
 
-  this->base_dir = d;
-
-  create_base_dir( this->base_dir);
+  if ( mkdir( this->base_dir, 0777) < 0)
+    {
+      post( "Cannot create DTD fifo root directory %s (%s)\n", base_dir, strerror( errno));
+      return;
+    }
 
   this->number_of_objects = 0;
   this->number_of_fifos = 0;
@@ -376,7 +338,7 @@ static void dtdserver_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
     }
 
   if ( rmdir( this->base_dir) < 0)
-    fprintf( stderr, "Cannot remove directory %s (%d,%s)\n", this->base_dir, errno, strerror( errno));
+    post( "Cannot remove directory %s (%d,%s)\n", this->base_dir, errno, strerror( errno));
 }
 
 static fts_status_t dtdserver_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)

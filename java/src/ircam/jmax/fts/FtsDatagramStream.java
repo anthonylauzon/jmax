@@ -75,15 +75,13 @@ class FtsDatagramStream extends FtsStream
       {
 	if ( host.equals( "local") || host.equals( InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = "";
+	    command = ftsDir + "/" + ftsName + " udp 127.0.0.1:" + socket.getLocalPort();
 	  }
 	else
 	  {
-	    command = "rsh " + host + " ";
+	    command = "rsh " + host + " " + ftsDir + "/" + ftsName + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort();
 	  }
 
-	command +=  ftsDir + "/" + ftsName;
-	command += " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort();
 	command += " " + ftsOptions;
       }
     catch (UnknownHostException e)

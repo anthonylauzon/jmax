@@ -96,9 +96,9 @@ static void fts_binding_delete(fts_binding_t *var)
    */
   while (var->users)
     {
-      fts_object_list_t   *u;
+      fts_mess_obj_list_t   *u;
       fts_object_t *obj;
-      fts_object_list_t *tmp;
+      fts_mess_obj_list_t *tmp;
 
       u = var->users;
 
@@ -112,7 +112,7 @@ static void fts_binding_delete(fts_binding_t *var)
 /* recursively suspend all the variables defined by objects referring this binding */
 static void fts_binding_suspend(fts_binding_t *var)
 {
-  fts_object_list_t *user;
+  fts_mess_obj_list_t *user;
 
   var->suspended = 1;
 
@@ -132,7 +132,7 @@ static void fts_binding_suspend(fts_binding_t *var)
 /* assign a final value to it, and recompute all the objects referring to this binding */
 static void fts_binding_restore(fts_binding_t *var, fts_atom_t *value)
 {
-  fts_object_list_t *u;
+  fts_mess_obj_list_t *u;
 
   var->suspended = 0;
   var->value = *value;
@@ -150,7 +150,7 @@ static void fts_binding_restore(fts_binding_t *var, fts_atom_t *value)
 
   while (u)
     {
-      fts_object_list_t *freeme = u;
+      fts_mess_obj_list_t *freeme = u;
       fts_object_t *obj = u->obj;
 
       u = u->next;
@@ -170,7 +170,7 @@ static int fts_binding_is_suspended(fts_binding_t *var)
 /* add a user to a binding (i.e. an object that is referring the binding in its description) */
 static void fts_binding_add_user(fts_binding_t *var, fts_object_t *object)
 {
-  fts_object_list_t *u = var->users;
+  fts_mess_obj_list_t *u = var->users;
   fts_binding_list_t *b;
 
   /* return if object is already registered as user */
@@ -182,7 +182,7 @@ static void fts_binding_add_user(fts_binding_t *var, fts_object_t *object)
       u = u->next;
     }  
 
-  u = (fts_object_list_t *) fts_heap_alloc(objlist_heap);
+  u = (fts_mess_obj_list_t *) fts_heap_alloc(objlist_heap);
   u->obj  = object;
   u->next = var->users;
   var->users = u;
@@ -198,7 +198,7 @@ static void fts_binding_add_user(fts_binding_t *var, fts_object_t *object)
 /* remove  a user to a binding (i.e. an object that is referring the binding in its description) */
 void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 {
-  fts_object_list_t   **u;	/* indirect precursor */
+  fts_mess_obj_list_t   **u;	/* indirect precursor */
   fts_binding_list_t  **b;	/* indirect precursor */
 
 #ifdef TRACE_DEBUG
@@ -211,7 +211,7 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
   for (u = &(var->users); *u; u = &((*u)->next))
     if ((*u)->obj == object)
 	{
-	  fts_object_list_t   *p;
+	  fts_mess_obj_list_t   *p;
 
 	  p = *u;
 	  *u = (*u)->next;
@@ -237,7 +237,7 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 /* add all the users of a binding to the given object set (find friends) */
 static void fts_binding_add_users_to_set(fts_binding_t *var, fts_object_set_t *set)
 {
-  fts_object_list_t  *u;	
+  fts_mess_obj_list_t  *u;	
 
   for (u = var->users; u; u = u->next)
     fts_object_set_add(set, u->obj);
@@ -246,7 +246,7 @@ static void fts_binding_add_users_to_set(fts_binding_t *var, fts_object_set_t *s
 /* check if a binding is defined by a given object */
 static int fts_binding_defined_by(fts_binding_t *var, fts_object_t *object)
 {
-  fts_object_list_t  *d;	
+  fts_mess_obj_list_t  *d;	
 
   for (d = var->definitions; d; d = d->next)
     {
@@ -270,7 +270,7 @@ static int fts_binding_defined_only_by(fts_binding_t *var, fts_object_t *object)
 static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object)
 {
   fts_object_t *owner = 0;
-  fts_object_list_t *d;
+  fts_mess_obj_list_t *d;
 
   /* First, check if the owner is already in the definition  list,
      in this case just return  */
@@ -286,7 +286,7 @@ static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object)
   if (var->definitions && (! var->definitions->next))
     owner = var->definitions->obj;
 
-  d = (fts_object_list_t *) fts_heap_alloc(objlist_heap);
+  d = (fts_mess_obj_list_t *) fts_heap_alloc(objlist_heap);
 
   d->next = var->definitions;
   d->obj = object;
@@ -299,13 +299,13 @@ static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object)
 /* remove a definition from a binding */
 static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *object)
 {
-  fts_object_list_t  **d;	/* indirect precursor */
+  fts_mess_obj_list_t  **d;	/* indirect precursor */
 
   /* remove the definition from the binding */
   for (d = &(var->definitions); *d; d = &((*d)->next))
     if ((*d)->obj == object)
 	{
-	  fts_object_list_t   *p;
+	  fts_mess_obj_list_t   *p;
 
 	  p = *d;
 	  *d = (*d)->next;
@@ -333,7 +333,7 @@ static void fts_binding_remove_definition(fts_binding_t *var, fts_object_t *obje
 /* add all the definitions of a binding to the given object set (find friends) */
 static void fts_binding_add_definitions_to_set(fts_binding_t *var, fts_object_set_t *set)
 {
-  fts_object_list_t  *u;	
+  fts_mess_obj_list_t  *u;	
 
   for (u = var->definitions; u; u = u->next)
     fts_object_set_add(set, u->obj);
@@ -561,7 +561,7 @@ void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name)
       /* does the new variable (v) shadow a variable from the parent scope (up_v)! */
       if (up_v)
 	{
-	  fts_object_list_t   **u;	/* indirect precursor */
+	  fts_mess_obj_list_t   **u;	/* indirect precursor */
 	  
 	  /* steal all the references to the varable (users) from parent scope and suspend their references */
 	  u = &(up_v->users);
@@ -815,7 +815,7 @@ fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_clas
 void fts_variables_init(void)
 {
   bindings_heap = fts_heap_new(sizeof(fts_binding_t));
-  objlist_heap  = fts_heap_new(sizeof(fts_object_list_t));
+  objlist_heap  = fts_heap_new(sizeof(fts_mess_obj_list_t));
   var_refs_heap = fts_heap_new(sizeof(fts_binding_list_t));
 }
 

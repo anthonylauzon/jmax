@@ -143,7 +143,12 @@ serial_set_speed(serial_t *this, fts_symbol_t sym)
     speed = B230400;
 #endif
   else
-    return;
+    {
+      const char *name;
+
+      name = fts_symbol_name( sym);
+      sscanf( name+1, "%d", &speed);
+    }
 
   cfsetospeed(&this->termios, speed);
   cfsetispeed(&this->termios, 0);

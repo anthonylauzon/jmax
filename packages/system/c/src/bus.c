@@ -34,14 +34,14 @@ static fts_symbol_t catch_symbol = 0;
 
 typedef struct _bus_
 {
-  fts_access_t access; /* channel 0 for bus access */
+  fts_object_t head; /* channel 0 for bus access */
   fts_channel_t *channels; /* index 0: bus, channel n: bus  n-1 */
   int n_channels;
 } bus_t;
 
 typedef struct _access_
 {
-  fts_access_t access; /* bus listens to itself */
+  fts_object_t head; /* bus listens to itself */
   bus_t *bus;
   int channel;
   int n_channels;
@@ -100,13 +100,13 @@ throw_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   access_t *this = (access_t *)o;
 
-  fts_channel_remove_origin(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
+  fts_channel_remove_origin(bus_get_channel(this->bus, BUS_CHANNEL), this);
   fts_object_release((fts_object_t *)this->bus);
 
   this->bus = (bus_t *)fts_get_object(at + 0);
 
   fts_object_refer((fts_object_t *)this->bus);
-  fts_channel_add_origin(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
+  fts_channel_add_origin(bus_get_channel(this->bus, BUS_CHANNEL), this);
 }
 
 static void
@@ -121,10 +121,10 @@ throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if(channel != this->channel)
     {
       if(this->channel != BUS_NOWHERE)
-	fts_channel_remove_origin(bus_get_channel(this->bus, this->channel), (fts_access_t *)this);
+	fts_channel_remove_origin(bus_get_channel(this->bus, this->channel), this);
 
       if(channel != BUS_NOWHERE)
-	fts_channel_add_origin(bus_get_channel(this->bus, channel), (fts_access_t *)this);
+	fts_channel_add_origin(bus_get_channel(this->bus, channel), this);
 
       this->channel = channel;
     }
@@ -153,7 +153,7 @@ throw_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
     this->channel = BUS_CHANNEL;
 
   if(this->channel != BUS_NOWHERE)
-    fts_channel_add_origin(bus_get_channel(this->bus, this->channel), (fts_access_t *)this);
+    fts_channel_add_origin(bus_get_channel(this->bus, this->channel), this);
 }	
 
 static void
@@ -218,13 +218,13 @@ catch_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   access_t *this = (access_t *)o;
 
-  fts_channel_remove_target(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
+  fts_channel_remove_target(bus_get_channel(this->bus, BUS_CHANNEL), this);
   fts_object_release((fts_object_t *)this->bus);
 
   this->bus = (bus_t *)fts_get_object(at + 0);
 
   fts_object_refer((fts_object_t *)this->bus);
-  fts_channel_add_target(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
+  fts_channel_add_target(bus_get_channel(this->bus, BUS_CHANNEL), o);
 }
 
 static void
@@ -239,10 +239,10 @@ catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   if(channel != this->channel)
     {
       if(this->channel != BUS_NOWHERE)
-	fts_channel_remove_target(bus_get_channel(this->bus, this->channel), (fts_access_t *)this);
+	fts_channel_remove_target(bus_get_channel(this->bus, this->channel), this);
 
       if(channel != BUS_NOWHERE)
-	fts_channel_add_target(bus_get_channel(this->bus, channel), (fts_access_t *)this);
+	fts_channel_add_target(bus_get_channel(this->bus, channel), o);
 
       this->channel = channel;
     }
@@ -271,7 +271,7 @@ catch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_
     this->channel = BUS_CHANNEL;
 
   if(this->channel != BUS_NOWHERE)
-    fts_channel_add_target(bus_get_channel(this->bus, this->channel), (fts_access_t *)this);
+    fts_channel_add_target(bus_get_channel(this->bus, this->channel), o);
 }	
 
 static void
@@ -358,7 +358,7 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
 
   this->n_channels = n_channels;
 
-  fts_channel_add_target(bus_get_channel(this, BUS_CHANNEL), (fts_access_t *)this);  
+  fts_channel_add_target(bus_get_channel(this, BUS_CHANNEL), o);  
 }
 
 static void

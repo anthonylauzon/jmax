@@ -79,7 +79,10 @@ fts_dsp_signal_t *fts_dsp_signal_new( int vector_size, float sample_rate)
   for ( current = signal_list; current; current = current->next )
     {
       if ( current->signal->refcnt == 0 && current->signal->length == vector_size)
-	return current->signal;
+	{
+	  current->signal->refcnt = SIGNAL_PENDING;
+	  return current->signal;
+	}
     }
 
   sig = (fts_dsp_signal_t *)fts_zalloc( sizeof(fts_dsp_signal_t));

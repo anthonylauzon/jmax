@@ -89,7 +89,7 @@ typedef struct fts_outlet fts_outlet_t;
 typedef struct fts_selection fts_selection_t;
 
 typedef struct fts_binding_list fts_binding_list_t;
-typedef struct fts_object_list fts_object_list_t;
+typedef struct fts_mess_obj_list fts_mess_obj_list_t;
 typedef struct fts_binding fts_binding_t;
 typedef struct fts_env fts_env_t;
 
@@ -330,11 +330,11 @@ struct fts_object
 };
 
 /* Commodity structure to keep a list of objects */
-struct fts_object_list
+struct fts_mess_obj_list
 {
   fts_object_t *obj;
 
-  struct fts_object_list *next;
+  struct fts_mess_obj_list *next;
 };
 
 
@@ -353,8 +353,8 @@ struct fts_binding
   fts_symbol_t   name;
   int            suspended;
   fts_atom_t     value;
-  fts_object_list_t *users;	/* object that use this variables */
-  fts_object_list_t *definitions;/* object that want to redefine this variables locally, if any*/
+  fts_mess_obj_list_t *users;	/* object that use this variables */
+  fts_mess_obj_list_t *definitions;/* object that want to redefine this variables locally, if any*/
   struct fts_env  *env;		/* back pointer to the environment where the variable is stored */
   fts_binding_t *next;		/* next in the environent */
 };

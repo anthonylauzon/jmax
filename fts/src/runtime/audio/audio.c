@@ -27,11 +27,9 @@
 #include <fts/fts.h>
 
 extern void audioport_config( void);
-extern void nullaudioport_config( void);
 
 static void audio_init( void)
 {
-  nullaudioport_config();
   audioport_config();
 }
 

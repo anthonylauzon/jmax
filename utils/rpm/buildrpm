@@ -8,6 +8,10 @@
 # (i386, i686, ppc)
 #
 
+# Note: on Mandrake, rpm building directories are in /usr/src/RPM...
+# add an option to specify it
+
+
 if [ $# -ge 1 ]
 then
     ARCH=$1

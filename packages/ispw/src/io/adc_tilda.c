@@ -33,20 +33,19 @@
 
 typedef struct {
   fts_object_t head;
-  fts_object_t **dispatchers;
+  fts_audioport_t *port;
 } adc_tilda_t;
 
 static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   adc_tilda_t *this = (adc_tilda_t *)o;
-  fts_audioport_t *port;
   int i, outlets;
 
   ac--;
   at++;
 
-  port = fts_audioport_get_default(o);
-  if ( !port)
+  this->port = fts_audioport_get_default(o);
+  if ( !this->port)
     {
       fts_object_set_error( o, "Default audio port is not defined");
       return;    
@@ -54,23 +53,15 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   outlets = fts_object_get_outlets_number( o);
 
-  this->dispatchers = (fts_object_t **)fts_malloc( outlets * sizeof( fts_object_t *));
-
   if ( ac != 0)
     {
       for ( i = 0; i < outlets; i++)
-	{
-	  this->dispatchers[i] = fts_audioport_get_in_object( port, o, fts_get_long(at + i) - 1);
-	  fts_object_refer( this->dispatchers[i]);
-	}
+	fts_audioport_add_input_object( this->port, fts_get_long(at + i) - 1, (fts_object_t *)this);
     }
   else
     {
       for ( i = 0; i < 2; i++)
-	{
-	  this->dispatchers[i] = fts_audioport_get_in_object( port, o, i);
-	  fts_object_refer( this->dispatchers[i]);
-	}
+	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this);
     }
 }
 
@@ -80,10 +71,7 @@ static void adc_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
   int i;
 
   for ( i = 0; i < fts_object_get_outlets_number( o); i++)
-    {
-      fts_audioport_remove_in_object( this->dispatchers[ i]);
-      fts_object_release( this->dispatchers[ i]);
-    }
+    fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
 }
 
 static void adc_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

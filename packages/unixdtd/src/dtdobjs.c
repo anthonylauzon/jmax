@@ -262,6 +262,12 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   if (!this->server)
     this->server = dtdserver_get_default_instance();
 
+  if (!this->server)
+    {
+      fts_object_set_error( o, "Error starting Direct-To-Disk server");
+      return;
+    }
+
   dtdserver_add_object( this->server, this);
 
   this->state = readsf_closed;
@@ -644,6 +650,12 @@ static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
   this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 1, dtdserver_get_default_instance());
+
+  if (!this->server)
+    {
+      fts_object_set_error( o, "Error starting Direct-To-Disk server");
+      return;
+    }
 
   dtdserver_add_object( this->server, this);
 

@@ -284,8 +284,6 @@ static void watchdog_low( void)
       if (write( wdpipe[1], "\n", 1) < 1)
 	exit( 1);
 
-      fprintf( stderr, "written 1 char\n");
-
       sleep( 1);
     }
 }
@@ -317,8 +315,6 @@ static void watchdog_high( void)
 
 	  if ( read( wdpipe[0], &buffer, 100) <= 0)
 	    exit( 1);
-
-	  fprintf( stderr, "received %c\n", buffer[0]);
 
 	  armed = 0;
 	}

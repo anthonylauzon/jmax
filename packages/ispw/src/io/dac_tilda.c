@@ -18,35 +18,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
- *
- */
-
-/*
- * This file's authors:
- *  François Déchelle (dechelle@ircam.fr)
  */
 
 #include <fts/fts.h>
 
 typedef struct {
   fts_object_t head;
-  fts_object_t **dispatchers;
+  fts_audioport_t *port;
+  int *indexes;
 } dac_tilda_t;
 
 static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dac_tilda_t *this = (dac_tilda_t *)o;
-  fts_audioport_t *port;
   int i, inlets;
 
   ac--;
   at++;
 
-  port = fts_audioport_get_default( o);
-  if ( !port)
+  this->port = fts_audioport_get_default( o);
+  if ( !this->port)
     {
       fts_object_set_error( o, "Default audio port is not defined");
       return;    
@@ -54,36 +45,25 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   inlets = fts_object_get_inlets_number( o);
 
-  this->dispatchers = (fts_object_t **)fts_malloc( inlets * sizeof( fts_object_t *));
+  this->indexes = (int *)fts_malloc( inlets * sizeof( int));
 
   if ( ac != 0)
     {
       for ( i = 0; i < inlets; i++)
-	{
-	  this->dispatchers[i] = fts_audioport_get_out_object( port, fts_get_long(at + i) - 1);
-	  fts_object_refer( this->dispatchers[i]);
-	}
+	this->indexes[i] = fts_get_long(at + i) - 1;
     }
   else
     {
-      for ( i = 0; i < inlets; i++)
-	{
-	  this->dispatchers[i] = fts_audioport_get_out_object( port, i);
-	  fts_object_refer( this->dispatchers[i]);
-	}
+      this->indexes[0] = 0;
+      this->indexes[1] = 1;
     }
 }
 
 static void dac_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dac_tilda_t *this = (dac_tilda_t *)o;
-  int i;
 
-  for ( i = 0; i < fts_object_get_inlets_number( o); i++)
-    {
-      fts_audioport_remove_out_object( this->dispatchers[ i]);
-      fts_object_release( this->dispatchers[ i]);
-    }
+  fts_free( this->indexes);
 }
 
 static void dac_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -101,10 +81,15 @@ static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
   dac_tilda_t *this  = (dac_tilda_t *)o;
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
   void *propagate_context = fts_get_ptr(at + 1);
-  int n = fts_get_int(at + 2);
+  int inlet = fts_get_int(at + 2);
+  int i;
+  fts_object_t *outdispatcher;
 
-  if ( this->dispatchers[n])
-    (*propagate_fun)( propagate_context, this->dispatchers[n], 0);
+  outdispatcher = fts_audioport_get_output_dispatcher( this->port);
+  i = this->indexes[ inlet];
+
+  if ( outdispatcher && i >= 0 && i < fts_audioport_get_output_channels( this->port))
+    (*propagate_fun)( propagate_context, outdispatcher, i);
 }
 
 static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)

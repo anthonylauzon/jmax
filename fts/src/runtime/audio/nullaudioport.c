@@ -18,15 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
- */
-
-/*
- * This file's authors: 
- * François Déchelle (dechelle@ircam.fr)
  */
 
 /*
@@ -72,9 +63,11 @@ static void nullaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_audioport_init( &this->head);
 
   fts_audioport_set_idle_function( (fts_audioport_t *)this, 0);
-
   fts_audioport_set_output_function( (fts_audioport_t *)this, nullaudioport_output);
-  fts_audioport_set_output_channels( (fts_audioport_t *)this, 2);
+  /*
+   * The nullaudioport does not defines channels, in order to avoid creating
+   * its DSP objects which would be scheduled...
+   */
 
   fts_timer_init( &this->timer, 0);
   fts_timer_start( &this->timer);

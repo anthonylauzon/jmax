@@ -22,7 +22,7 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-PLATFORM := linux-ppc
+PLATFORM := linux
 
 CC := gcc
 LD := gcc

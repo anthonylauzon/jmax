@@ -60,15 +60,17 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_channel_init(&this->channel);
   
   /* add label as its own receive */
-  fts_channel_add_target(&this->channel, (fts_access_t *)this);
+  fts_channel_add_target(&this->channel, o);
 }
 
 static void
 label_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_label_t *this = (fts_label_t *)o;
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
+  void *propagate_context = fts_get_ptr(at + 1);
 
-  fts_channel_propagate_input(&this->channel, winlet, s, ac, at);
+  fts_channel_propagate_input( &this->channel, propagate_fun, propagate_context, 0);
 }
 
 static fts_status_t

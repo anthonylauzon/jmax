@@ -1,3 +1,8 @@
+2001-05-30  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* moved all platform specific code to one file per platform (instead of
+	one directory per platform)
+
 2001-04-27  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* added Wacom V (Intous) support to packages/io/c/src/wacom.c

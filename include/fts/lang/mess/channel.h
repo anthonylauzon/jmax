@@ -26,30 +26,28 @@
 #ifndef _FTS_CHANNEL_H_
 #define _FTS_CHANNEL_H_
 
-typedef struct _fts_access_
-{
-  fts_object_t  o; /* channel access must be an FTS object */
-  struct _fts_access_ *next; /* next in list of same channel */
-} fts_access_t;
+#include <fts/sys.h>
+#include <fts/lang/mess/classes.h>
+#include <fts/lang/utils.h>
 
 typedef struct _fts_channel_
 {
-  fts_access_t *targets; /* list of targets */
-  fts_access_t *origins; /* list of origins */
+  fts_object_list_t targets; /* list of targets */
+  fts_object_list_t origins; /* list of origins */
 } fts_channel_t;
 
-#define fts_channel_has_target(c) ((c)->targets != 0)
+#define fts_channel_has_target(c) (!fts_object_list_is_empty( &(c)->targets))
 
 extern void fts_channel_init(fts_channel_t *channel);
 
-extern void fts_channel_add_target(fts_channel_t *channel, fts_access_t *target);
-extern void fts_channel_remove_target(fts_channel_t *channel, fts_access_t *target);
+extern void fts_channel_add_target(fts_channel_t *channel, fts_object_t *target);
+extern void fts_channel_remove_target(fts_channel_t *channel, fts_object_t *target);
 
-extern void fts_channel_add_origin(fts_channel_t *channel, fts_access_t *origin);
-extern void fts_channel_remove_origin(fts_channel_t *channel, fts_access_t *origin);
+extern void fts_channel_add_origin(fts_channel_t *channel, fts_object_t *origin);
+extern void fts_channel_remove_origin(fts_channel_t *channel, fts_object_t *origin);
 
 extern void fts_channel_output_message_from_targets(fts_channel_t *channel, int outlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at);
-extern void fts_channel_propagate_input(fts_channel_t *channel, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t propagate_fun, void *propagate_context, int outlet);
 
 #endif

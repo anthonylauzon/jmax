@@ -43,13 +43,13 @@ extern void fts_patcher_outlet_reposition(fts_object_t *o, int pos);
 
 typedef struct _send_
 {
-  fts_access_t access;
+  fts_object_t head;
   fts_channel_t *channel;
 } send_t;
 
 typedef struct _receive_
 {
-  fts_access_t access;
+  fts_object_t head;
   fts_channel_t *channel;
 } receive_t;
 
@@ -88,7 +88,7 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       return;
     }
 
-  fts_channel_add_origin(fts_label_get_channel(label), (fts_access_t *)this);  
+  fts_channel_add_origin(fts_label_get_channel(label), (fts_object_t *)this);  
   this->channel = fts_label_get_channel(label);
 }
 
@@ -97,7 +97,7 @@ send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   send_t *this = (send_t *) o;
 
-  fts_channel_remove_origin(this->channel, (fts_access_t *)this);
+  fts_channel_remove_origin(this->channel, (fts_object_t *)this);
 }
 
 static void
@@ -112,8 +112,10 @@ static void
 send_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   send_t *this = (send_t *)o;
+  fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
+  void *propagate_context = fts_get_ptr(at + 1);
 
-  fts_channel_propagate_input(this->channel, winlet, s, ac, at);
+  fts_channel_propagate_input( this->channel, propagate_fun, propagate_context, 0);
 }
 
 static fts_status_t
@@ -158,7 +160,7 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       return;
     }
 
-  fts_channel_add_target(fts_label_get_channel(label), (fts_access_t *)this);
+  fts_channel_add_target(fts_label_get_channel(label), o);
   this->channel = fts_label_get_channel(label);
 }
   
@@ -167,7 +169,7 @@ receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   receive_t *this = (receive_t *)o;
 
-  fts_channel_remove_target(this->channel, (fts_access_t *)this);
+  fts_channel_remove_target(this->channel, (fts_object_t *)this);
 }
 
 static fts_status_t

@@ -26,8 +26,47 @@
 
 #include <fts/fts.h>
 
+static int in_out_class_check( int ac, const fts_atom_t *at, int *inoutlets)
+{
+  fts_audioport_t *port = 0;
+
+  if (ac == 1)
+    {
+      if (fts_is_int( at))
+	*inoutlets = 1;
+      else if ( fts_is_object( at))
+	port = (fts_audioport_t *)fts_get_object( at);
+      else
+	return 0;
+    }
+  else if ( ac == 2 && fts_is_object( at) && fts_is_int(at+1) )
+    {
+      *inoutlets = 1;
+      port = (fts_audioport_t *)fts_get_object( at);
+    }
+  else if (ac != 0)
+    return 0;
+
+  if (!*inoutlets)
+    {
+      if (!port)
+	port = fts_audioport_get_default( 0);
+
+      if (port && fts_object_is_audioport( (fts_object_t *)port))
+	*inoutlets = fts_audioport_get_output_channels( port);
+      else
+	*inoutlets = 2;
+    }
+
+  return 1;
+}
+
+
 static int in_out_check( fts_object_t *o, int ac, const fts_atom_t *at, fts_audioport_t **port, int *channel)
 {
+  *port = 0;
+  *channel = -1;
+
   if (ac == 1)
     {
       if (fts_is_int( at))
@@ -61,85 +100,62 @@ static int in_out_check( fts_object_t *o, int ac, const fts_atom_t *at, fts_audi
   return 1;
 }
 
+/* ********************************************************************** */
+/* in~ object                                                             */
+/* ********************************************************************** */
+
 typedef struct {
   fts_object_t head;
-  fts_object_t **dispatchers;
+  fts_audioport_t *port;
+  int channel;
 } in_tilda_t;
 
 static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   in_tilda_t *this = (in_tilda_t *)o;
-  fts_audioport_t *port;
-  int i, outlets, channel;
 
-  if ( !in_out_check( o, ac-1, at+1, &port, &channel))
+  if ( !in_out_check( o, ac-1, at+1, &this->port, &this->channel))
     return;
 
-  outlets = fts_object_get_outlets_number( o);
-
-  this->dispatchers = (fts_object_t **)fts_malloc( outlets * sizeof( fts_object_t *));
-
-  if (outlets > 1)
+  if (this->channel >= 0)
     {
-      for ( i = 0; i < outlets; i++)
-	{
-	  this->dispatchers[i] = fts_audioport_get_in_object( port, o, fts_get_long(at + i) - 1);
-	  fts_object_refer( this->dispatchers[i]);
-	}
+      int i;
+
+      for ( i = 0; i < fts_object_get_outlets_number( o); i++)
+	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this);
     }
   else
     {
-      this->dispatchers[0] = fts_audioport_get_in_object( port, o, channel);
-      fts_object_refer( this->dispatchers[0]);
+      fts_audioport_add_input_object( this->port, this->channel, (fts_object_t *)this);
     }
 }
 
 static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   in_tilda_t *this = (in_tilda_t *)o;
-  int i;
 
-  for ( i = 0; i < fts_object_get_outlets_number( o); i++)
+  if (this->channel >= 0)
     {
-      fts_audioport_remove_in_object( this->dispatchers[ i]);
-      fts_object_release( this->dispatchers[ i]);
+      int i;
+
+      for ( i = 0; i < fts_object_get_outlets_number( o); i++)
+	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this);
+    }
+  else
+    {
+      fts_audioport_remove_input_object( this->port, this->channel, (fts_object_t *)this);
     }
 }
 
 static fts_status_t in_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int outlets = 0, i;
-  fts_audioport_t *port = 0;
 
   ac--;
   at++;
 
-  if (ac == 1)
-    {
-      if (fts_is_int( at))
-	outlets = 1;
-      else if ( fts_is_object( at))
-	port = (fts_audioport_t *)fts_get_object( at);
-      else
-	return &fts_CannotInstantiate;
-    }
-  else if ( ac == 2 && fts_is_object( at) && fts_is_int(at+1) )
-    {
-      outlets = 1;
-      port = (fts_audioport_t *)fts_get_object( at);
-    }
-  else if (ac != 0)
+  if ( !in_out_class_check( ac, at, &outlets))
     return &fts_CannotInstantiate;
-
-  if (!outlets)
-    {
-      if (!port)
-	port = fts_audioport_get_default( 0);
-      if (port && fts_object_is_audioport( (fts_object_t *)port))
-	outlets = fts_audioport_get_output_channels( port);
-      else
-	outlets = 2;
-    }
 
   fts_class_init( cl, sizeof( fts_object_t), 0, outlets, 0);
 
@@ -152,49 +168,22 @@ static fts_status_t in_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom
   return fts_Success;
 }
 
+
+/* ********************************************************************** */
+/* out~ object                                                            */
+/* ********************************************************************** */
+
 typedef struct {
   fts_object_t head;
-  fts_object_t **dispatchers;
+  fts_audioport_t *port;
+  int channel;
 } out_tilda_t;
 
 static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_tilda_t *this = (out_tilda_t *)o;
-  fts_audioport_t *port = 0;
-  int i, inlets, channel;
 
-  if ( !in_out_check( o, ac-1, at+1, &port, &channel))
-    return;
-
-  inlets = fts_object_get_inlets_number( o);
-
-  this->dispatchers = (fts_object_t **)fts_malloc( inlets * sizeof( fts_object_t *));
-
-  if (inlets > 1)
-    {
-      for ( i = 0; i < inlets; i++)
-	{
-	  this->dispatchers[i] = fts_audioport_get_out_object( port, i);
-	  fts_object_refer( this->dispatchers[i]);
-	}
-    }
-  else
-    {
-      this->dispatchers[0] = fts_audioport_get_out_object( port, channel);
-      fts_object_refer( this->dispatchers[0]);
-    }
-}
-
-static void out_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  out_tilda_t *this = (out_tilda_t *)o;
-  int i;
-
-  for ( i = 0; i < fts_object_get_inlets_number( o); i++)
-    {
-      fts_audioport_remove_out_object( this->dispatchers[ i]);
-      fts_object_release( this->dispatchers[ i]);
-    }
+  in_out_check( o, ac-1, at+1, &this->port, &this->channel);
 }
 
 static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -202,52 +191,28 @@ static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
   out_tilda_t *this  = (out_tilda_t *)o;
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_fun(at + 0);
   void *propagate_context = fts_get_ptr(at + 1);
-  int n = fts_get_int(at + 2);
+  int inlet = fts_get_int(at + 2);
+  fts_object_t *outdispatcher;
 
-  if ( this->dispatchers[n])
-    (*propagate_fun)( propagate_context, this->dispatchers[n], 0);
+  outdispatcher = fts_audioport_get_output_dispatcher( this->port);
+
+  if ( outdispatcher)
+    (*propagate_fun)( propagate_context, outdispatcher, inlet);
 }
 
 static fts_status_t out_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int inlets = 0, i;
-  fts_audioport_t *port = 0;
 
   ac--;
   at++;
 
-  if (ac == 1)
-    {
-      if (fts_is_int( at))
-	inlets = 1;
-      else if ( fts_is_object( at))
-	port = (fts_audioport_t *)fts_get_object( at);
-      else
-	return &fts_CannotInstantiate;
-    }
-  else if ( ac == 2 && fts_is_object( at) && fts_is_int(at+1) )
-    {
-      inlets = 1;
-      port = (fts_audioport_t *)fts_get_object( at);
-    }
-  else if (ac != 0)
+  if ( !in_out_class_check( ac, at, &inlets))
     return &fts_CannotInstantiate;
-
-  if (!inlets)
-    {
-      if (!port)
-	port = fts_audioport_get_default( 0);
-
-      if (port && fts_object_is_audioport( (fts_object_t *)port))
-	inlets = fts_audioport_get_output_channels( port);
-      else
-	inlets = 2;
-    }
 
   fts_class_init( cl, sizeof( out_tilda_t), inlets, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, out_tilda_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, out_tilda_delete);
 
   for ( i = 0; i < inlets; i++)
     fts_dsp_declare_inlet( cl, i);

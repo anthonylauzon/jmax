@@ -64,8 +64,6 @@ static int dsp_is_running = 0;
 
 static fts_dsp_signal_t *sig_zero;
 
-static int verbose = 0;
-
 static fts_signal_connection_table_t signal_connection_table;
 
 static fts_symbol_t sym_builtin_add;
@@ -103,59 +101,23 @@ static void dsp_schedule_depth(dsp_node_t *src, int woutlet, dsp_node_t *dest, i
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
-/* Prints the objects with full patcher hierarchy                              */
-/* Used for verbose compilation and error signaling                            */
+/* debugging                                                                   */
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
-static void cat_sig_name( char *s, fts_dsp_signal_t *sig)
-{
-  char tmp[64];
-
-  if (sig)
-    {
-      strcat( s, fts_symbol_name( sig->name));
-      sprintf( tmp, "[%d]", sig->length);
-      strcat( s, tmp);
-    }
-  else
-    strcat( s, "nil");
-}
-
-static void append_sigs( char *s, fts_dsp_signal_t **sig, int n)
+#ifdef DSP_COMPILER_VERBOSE
+static void post_signals( fts_dsp_signal_t **sig, int n)
 {
   int i;
 
-  s[0] = '\0';
-
-  if (n > 0)
-    cat_sig_name( s, sig[0]);
-
-  for ( i = 1; i < n; i++)
+  for ( i = 0; i < n; i++)
     {
-      strcat( s, ",");
-      cat_sig_name( s, sig[i]);
+      post( "%s[%d]", fts_symbol_name( sig->name), sig->length);
+      if ( i != n-1)
+	post( ",");
     }
 }
-
-static char *inputs_name( fts_dsp_descr_t *descr)
-{
-  static char buffer[256];
-
-  append_sigs( buffer, descr->in, descr->ninputs);
-
-  return buffer;
-}
-
-static char *outputs_name( fts_dsp_descr_t *descr)
-{
-  static char buffer[256];
-
-  append_sigs( buffer, descr->out, descr->noutputs);
-
-  return buffer;
-}
-
+#endif
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
@@ -291,11 +253,13 @@ dsp_gen_outputs(fts_object_t *o, fts_dsp_descr_t *descr)
         }
     }
 
-  sr = fts_param_get_float(fts_s_sampling_rate, 44100.) * (double)size / fts_get_tick_size();
+  sr = fts_get_sample_rate() * (double)size / fts_get_tick_size();
 
   /* note that output signals are assigned only when the output have at least one connection to a dsp object */
   for (i=0, iop=descr->out; i< descr->noutputs; i++, iop++)
-    *iop = fts_dsp_signal_new(size, sr);
+    {
+      *iop = fts_dsp_signal_new(size, sr);
+    }
 
   sig_zero->length = invs;
   sig_zero->srate = sr;
@@ -341,12 +305,14 @@ dsp_object_schedule(dsp_node_t *node)
 
   if (dsp_gen_outputs(node->o, node->descr))
     {
-      if(verbose)
-	{
-	  post( "DSP: scheduling ");
-	  post_object( node->o);
-	  post( "%s->%s\n", inputs_name( node->descr), outputs_name( node->descr));
-	}
+#ifdef DSP_COMPILER_VERBOSE
+      post( "DSP: scheduling ");
+      post_object( node->o);
+      post_signals( node->descr->in, node->descr->ninputs);
+      post( "->");
+      post_signals( node->descr->out, node->descr->noutputs);
+      post( "\n");
+#endif
 
       /*
 	(fd) Hack to add debugging info to the FTL program.
@@ -421,14 +387,13 @@ mark_signal_connection(fts_connection_t* connection, void *arg)
   fts_object_t *destination = fts_connection_get_destination(connection);
   int inlet = fts_connection_get_inlet(connection);
 
-  if ( verbose)
-    {
-      post("  mark:  ");
-      post_object(source);
-      post(" (%d) --> ", outlet);
-      post_object(destination);
-      post(" (%d)\n", inlet);
-    }
+#ifdef DSP_COMPILER_VERBOSE
+  post("  mark:  ");
+  post_object(source);
+  post(" (%d) --> ", outlet);
+  post_object(destination);
+  post(" (%d)\n", inlet);
+#endif
 
   fts_signal_connection_add(table, connection);
 }
@@ -472,14 +437,13 @@ static void dsp_succ_realize( dsp_node_t *node, edge_fun_t fun, int mark_connect
 		    {
 		      fts_connection_t *conn = graph_iterator_get_current_connection( &iter);
 
-		      if (verbose)
-			{
-			  post("dsp connection:  ");
-			  post_object(node->o);
-			  post(" (%d) --> ", woutlet);
-			  post_object(succ_node->o);
-			  post(" (%d)\n", winlet);
-			}
+#ifdef DSP_COMPILER_VERBOSE
+		      post("dsp connection:  ");
+		      post_object(node->o);
+		      post(" (%d) --> ", woutlet);
+		      post_object(succ_node->o);
+		      post(" (%d)\n", winlet);
+#endif
 		      
 		      mark_signal_connection(conn, (void *)&signal_connection_table);
 		      graph_iterator_apply_to_connection_stack(&iter, mark_signal_connection, (void *)&signal_connection_table);
@@ -646,9 +610,6 @@ void dsp_chain_create(int vs)
 {
   if (dsp_is_running)
     dsp_chain_delete();
-
-  /* ask all audioports to create their input and output objects */
-  fts_audioport_add_input_output_objects();
 
   /* ask ftl to start memory relocation */
   ftl_mem_start_memory_relocation();/* should it be elsewhere ?? */

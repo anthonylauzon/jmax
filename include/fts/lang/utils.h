@@ -32,6 +32,7 @@ extern fts_module_t fts_utils_module;
 #include <fts/lang/utils/floatfuns.h>
 #include <fts/lang/utils/fourpoint.h>
 #include <fts/lang/utils/hashtab.h>
+#include <fts/lang/utils/objectlist.h>
 #include <fts/lang/utils/ieeewrap.h>
 #include <fts/lang/utils/intphase.h>
 #include <fts/lang/utils/ramp_vectors.h>

@@ -188,9 +188,9 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
 
-  if ( fts_get_symbol_arg( ac, at, 3, 0) == s_read_only)
+  if ( fts_get_symbol_arg( ac, at, 2, 0) == s_read_only)
     flags = O_RDONLY;
-  else if ( fts_get_symbol_arg( ac, at, 3, 0) == s_write_only)
+  else if ( fts_get_symbol_arg( ac, at, 2, 0) == s_write_only)
     flags = O_WRONLY;
   else
     flags = O_RDWR;

@@ -28,6 +28,7 @@ SOURCES = \
   floatfuns.c \
   fourpoint.c \
   hashtab.c \
+  objectlist.c \
   ramps.c \
   ramp_vectors.c \
   srconv.c \

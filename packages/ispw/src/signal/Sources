@@ -27,7 +27,7 @@ ifeq ($(PLATFORM),sgi)
   ARCH_SOURCES = osc_intphase.c phasor_intphase.c
 endif
 
-ifeq ($(PLATFORM),linux-intel)
+ifeq ($(PLATFORM),linux)
   ARCH_SOURCES = osc_ieeewrap.c phasor_ieeewrap.c
 endif
 
