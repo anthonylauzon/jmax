@@ -5,6 +5,102 @@
 	};
 	objectVersion = 39;
 	objects = {
+		3B5AB887061097D200412ACC = {
+			buildPhases = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = development;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+				3B5AB8900610983B00412ACC,
+				3B7ADDEA0611B5D00098F129,
+				3B5AB8920610984100412ACC,
+			);
+			isa = PBXAggregateTarget;
+			name = development;
+			productName = development;
+		};
+		3B5AB88F0610983B00412ACC = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C5427F905AB0B900042B7A2;
+			remoteInfo = libsequence.bundle;
+		};
+		3B5AB8900610983B00412ACC = {
+			isa = PBXTargetDependency;
+			target = 5C5427F905AB0B900042B7A2;
+			targetProxy = 3B5AB88F0610983B00412ACC;
+		};
+		3B5AB8910610984100412ACC = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C54253A05AB0B8A0042B7A2;
+			remoteInfo = jMax.app;
+		};
+		3B5AB8920610984100412ACC = {
+			isa = PBXTargetDependency;
+			target = 5C54253A05AB0B8A0042B7A2;
+			targetProxy = 3B5AB8910610984100412ACC;
+		};
+		3B5AB8950610995A00412ACC = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = trackeditor.c;
+			path = ../../packages/sequence/c/src/trackeditor.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B5AB8960610995A00412ACC = {
+			fileRef = 3B5AB8950610995A00412ACC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B7ADDE90611B5D00098F129 = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C542A4105AB0B9C0042B7A2;
+			remoteInfo = sequence.jar;
+		};
+		3B7ADDEA0611B5D00098F129 = {
+			isa = PBXTargetDependency;
+			target = 5C542A4105AB0B9C0042B7A2;
+			targetProxy = 3B7ADDE90611B5D00098F129;
+		};
+		3B7ADDF00611B6320098F129 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FtsTrackEditorObject.java;
+			path = /Users/borghesi/projects/jmax/packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackEditorObject.java;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		3B7ADDF10611B6320098F129 = {
+			fileRef = 3B7ADDF00611B6320098F129;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//3B0
+//3B1
+//3B2
+//3B3
+//3B4
+//5C0
+//5C1
+//5C2
+//5C3
+//5C4
 		5C02E93305AB204200173E77 = {
 			children = (
 				5C5426BB05AB0B8A0042B7A2,
@@ -5605,6 +5701,7 @@
 				5C54280705AB0B900042B7A2,
 				5C54280805AB0B900042B7A2,
 				5C54280905AB0B900042B7A2,
+				3B5AB8960610995A00412ACC,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9807,6 +9904,7 @@
 				5C542AD705AB0B9C0042B7A2,
 				5C542AD805AB0B9C0042B7A2,
 				5C542AD905AB0B9C0042B7A2,
+				3B7ADDF10611B6320098F129,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -17563,6 +17661,7 @@
 				F851237A028BE77C01664092,
 				F851237C028BE77C01664092,
 				F851237E028BE77C01664092,
+				3B5AB8950610995A00412ACC,
 			);
 			isa = PBXGroup;
 			name = c;
@@ -17714,6 +17813,7 @@
 				F85123E3028BEAB301664092,
 				F85123E4028BEAB301664092,
 				F85123E5028BEAB301664092,
+				3B7ADDF00611B6320098F129,
 				F85123E6028BEAB301664092,
 				F85123E7028BEAB301664092,
 				F85123E8028BEAB301664092,
@@ -20190,6 +20290,7 @@
 				5C54272F05AB0B8B0042B7A2,
 				5C5429C505AB0B990042B7A2,
 				5C542C3405AB15330042B7A2,
+				5C5427F905AB0B900042B7A2,
 				5C54274505AB0B8C0042B7A2,
 				5C54275405AB0B8C0042B7A2,
 				5C542A0705AB0B9A0042B7A2,
@@ -20198,7 +20299,6 @@
 				5C5427AC05AB0B8E0042B7A2,
 				5C5427D605AB0B8E0042B7A2,
 				5C5427E805AB0B8F0042B7A2,
-				5C5427F905AB0B900042B7A2,
 				5C542A4105AB0B9C0042B7A2,
 				5C54280F05AB0B910042B7A2,
 				5C542ADD05AB0B9E0042B7A2,
@@ -20206,6 +20306,7 @@
 				5C54287805AB0B930042B7A2,
 				5C54288505AB0B950042B7A2,
 				5C542B3105AB0BA00042B7A2,
+				3B5AB887061097D200412ACC,
 			);
 		};
 		F880FCEA0282F7CE01664092 = {
