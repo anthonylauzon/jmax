@@ -42,7 +42,12 @@
 #ifndef restrict
 #define restrict
 #endif
- 
+
+/* defines for language features */
+#ifndef __attribute__
+#define __attribute__(_x)   
+#endif
+
 #undef WORDS_BIGENDIAN 
 
 /* mapping posix names to win32 names */
