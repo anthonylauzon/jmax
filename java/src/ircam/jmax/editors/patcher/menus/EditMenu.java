@@ -2,6 +2,7 @@ package ircam.jmax.editors.patcher.menus;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -84,6 +85,8 @@ public class EditMenu extends PatcherMenu
 
   private void updateMenu()
   {
+    Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
+
     if (window.isLocked())
       {
 	lockItem.setText("Unlock");
@@ -92,28 +95,55 @@ public class EditMenu extends PatcherMenu
 	copyItem.setEnabled(false);
 	duplicateItem.setEnabled(false);
 	inspectItem.setEnabled(false);
+
+	pasteItem.setEnabled(clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
       }
     else
       {
 	lockItem.setText("Lock");
 
-	if (ErmesSelection.patcherSelection.isEmpty())
+	if (window.itsSketchPad.isTextEditingObject())
 	  {
-	    cutItem.setEnabled(false);
-	    copyItem.setEnabled(false);
+	    // Text editing, look at text selection
+
+	    if (window.itsSketchPad.getSelectedText() != null)
+	      {
+		cutItem.setEnabled(true);
+		copyItem.setEnabled(true);
+	      }
+	    else
+	      {
+		cutItem.setEnabled(false);
+		copyItem.setEnabled(false);
+	      }
+
 	    duplicateItem.setEnabled(false);
+	    pasteItem.setEnabled(clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
 	  }
-	else if (ErmesSelection.patcherSelection.getOwner() == window.itsSketchPad)
+	else
 	  {
-	    cutItem.setEnabled(true);
-	    copyItem.setEnabled(true);
-	    duplicateItem.setEnabled(true);
+	    if (ErmesSelection.patcherSelection.isEmpty())
+	      {
+		// Empty selection
+
+		cutItem.setEnabled(false);
+		copyItem.setEnabled(false);
+		duplicateItem.setEnabled(false);
+	      }
+	    else if (ErmesSelection.patcherSelection.getOwner() == window.itsSketchPad)
+	      {
+		// Object selection
+
+		cutItem.setEnabled(true);
+		copyItem.setEnabled(true);
+		duplicateItem.setEnabled(true);
+	      }
+	    pasteItem.setEnabled(clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
 	  }
 
 	inspectItem.setEnabled(true);
 	selectAllItem.setEnabled(true);
+	pasteItem.setEnabled(! ErmesSketchWindow.ftsClipboardIsEmpty());
       }
-
-    pasteItem.setEnabled(! ErmesSketchWindow.ftsClipboardIsEmpty());
   }
 }

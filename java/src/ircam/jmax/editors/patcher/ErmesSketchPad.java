@@ -663,10 +663,21 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
      support, and will be done when the patcher editor will be based on the toolkit.
      */
      
-  void pasteText(String text)
+  void pasteText()
   {
-    if (isTextEditingObject())
-      itsEditField.insert(text,  itsEditField.getCaretPosition());
+    itsEditField.paste();
+    itsEditField.resizeIfNeeded();
+  }
+
+  void copyText()
+  {
+    itsEditField.copy();
+  }
+
+  void cutText()
+  {
+    itsEditField.cut();
+    itsEditField.resizeIfNeeded();
   }
 
   boolean canCopyText()
@@ -679,7 +690,7 @@ public class ErmesSketchPad extends JComponent implements FtsUpdateGroupListener
     return isTextEditingObject();
   }
 
-  String getSelectedText()
+  public String getSelectedText()
   {
      if (isTextEditingObject())
        return itsEditField.getSelectedText();

@@ -257,8 +257,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     if (itsSketchPad.canCopyText())
       {
-	textClipboard = itsSketchPad.getSelectedText(); 
-	itsSketchPad.deleteSelectedText();
+	itsSketchPad.cutText();
       }
     else if (ErmesSelection.patcherSelection.ownedBy(itsSketchPad))
       {
@@ -280,8 +279,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     if (itsSketchPad.canCopyText())
       {
-	textClipboard = itsSketchPad.getSelectedText(); 
-	MaxApplication.systemClipboard.setContents(new StringSelection(textClipboard), this);
+	itsSketchPad.copyText();
       }
     else if (ErmesSelection.patcherSelection.ownedBy(itsSketchPad))
       {
@@ -322,8 +320,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	  {
 	    try
 	      {
-		textClipboard = (String) clipboardContent.getTransferData(DataFlavor.stringFlavor);
-		itsSketchPad.pasteText(textClipboard);
+		itsSketchPad.pasteText();
 	      }
 	    catch (Exception e)
 	      {
