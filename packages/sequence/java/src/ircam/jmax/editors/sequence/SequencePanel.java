@@ -112,7 +112,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     trackPanel.add(verticalGlue);
 
-    ftsSequenceObject.requestTrackCreation("noteevt");
+    //ftsSequenceObject.requestTrackCreation("noteevt");
 
     setLayout(new BorderLayout());
 
@@ -546,6 +546,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	itsTimeScrollbar.setValue(value);
     }
 }
+
 
 
 

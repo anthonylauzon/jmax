@@ -69,8 +69,6 @@ public class Sequence extends JFrame implements EditorContainer{
 	sequenceData = data;
 
 	initTrackEditorFactoryTable();
-
-	//initValueInfoTable();
 	
 	makeTitle(data);
 	
