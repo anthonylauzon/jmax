@@ -200,11 +200,8 @@ jmax_get_classpath()
     return NULL;
   }
 
-  sprintf(jmax_classpath, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s", 
-
-	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "jmax.jar", PATH_SEPARATOR,
-	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "jacl.jar", PATH_SEPARATOR,
-	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "tcljava.jar");
+  sprintf(jmax_classpath, "%s%c%s%c%s%c", 
+	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "jmax.jar", PATH_SEPARATOR);
 
   return jmax_classpath;
 }
@@ -621,9 +618,9 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   argv[argc++] = jmax_root;
   argv[argc++] = "-jmaxServerDir";
   argv[argc++] = server_dir;
-  argv[argc++] = "-jmaxInterp";
+ /* argv[argc++] = "-jmaxInterp";
   argv[argc++] = "silk";
-
+*/
   jmax_new_log();
 
   /* tokenize the command line and append them to the command line */
