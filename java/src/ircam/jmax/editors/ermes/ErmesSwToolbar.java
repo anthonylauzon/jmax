@@ -37,10 +37,10 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     setLayout( new BorderLayout());    
 
     String path = MaxApplication.getProperty( "root" ) + File.separator + "images" + File.separator;
-    lockEditButton = new JToggleButton( IconCache.getIcon( path + "tool_lock.gif"));
+    lockEditButton = new JToggleButton( IconCache.getIcon( path + "tool_lock_mode.gif"));
     lockEditButton.setDoubleBuffered( false);
     lockEditButton.setMargin( new Insets(0,0,0,0));
-    lockEditButton.setSelectedIcon( IconCache.getIcon( path + "tool_lock_open.gif"));
+    lockEditButton.setSelectedIcon( IconCache.getIcon( path + "tool_edit_mode.gif"));
     lockEditButton.setFocusPainted( false);
     lockEditButton.addItemListener( new ItemListener() {
       public void itemStateChanged(ItemEvent e)
@@ -207,16 +207,16 @@ public class ErmesSwToolbar extends JPanel implements MouseListener {
     String fs = File.separator;
     String path = MaxApplication.getProperty( "root" ) + fs + "images" + fs;
 
-    addButton( toolbar, "", path + "tool_ext.gif");
-    addButton( toolbar, "messbox", path + "tool_mess.gif");
-    addButton( toolbar, "jpatcher",  path + "tool_patcher.gif");
-    addButton( toolbar, "inlet -1", path + "tool_in.gif");
-    addButton( toolbar, "outlet -1", path + "tool_out.gif");
-    addButton( toolbar, "comment", path + "tool_text.gif");
-    addButton( toolbar, "button", path + "tool_bang.gif");
-    addButton( toolbar, "toggle", path + "tool_toggle.gif");
-    addButton( toolbar, "slider", path + "tool_slider.gif");
-    addButton( toolbar, "intbox", path + "tool_int.gif");
-    addButton( toolbar, "floatbox", path + "tool_float.gif");
+    addButton(toolbar, "", path + "tool_ext.gif");
+    addButton(toolbar, "jpatcher",  path + "tool_patcher.gif");
+    addButton(toolbar, "inlet -1", path + "tool_in.gif");
+    addButton(toolbar, "outlet -1", path + "tool_out.gif");
+    addButton(toolbar, "comment", path + "tool_text.gif");
+    addButton(toolbar, "messbox", path + "tool_mess.gif");
+    addButton(toolbar, "button", path + "tool_bang.gif");
+    addButton(toolbar, "toggle", path + "tool_toggle.gif");
+    addButton(toolbar, "slider", path + "tool_slider.gif");
+    addButton(toolbar, "intbox", path + "tool_int.gif");
+    addButton(toolbar, "floatbox", path + "tool_float.gif");
   }
 }
