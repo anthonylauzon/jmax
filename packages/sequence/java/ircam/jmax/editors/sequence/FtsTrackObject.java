@@ -193,6 +193,10 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
   public void setTrackProperties( int nArgs, FtsAtom args[])
   {
+    propertyNames.removeAllElements();
+    propertyTypes.removeAllElements();
+    propertyClasses.removeAllElements();
+
     for(int i = 0; i < nArgs-1 ; i+=2)
     {
       propertyNames.addElement( args[i].symbolValue.toString());
