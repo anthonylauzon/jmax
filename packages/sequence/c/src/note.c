@@ -71,6 +71,15 @@ scoob_array_function(fts_object_t *o, fts_array_t *array)
   propobj_append_properties((propobj_t *)self, array);
 }
 
+static void 
+scoob_description_function(fts_object_t *o, fts_array_t *array)
+{
+  scoob_t *self = (scoob_t *)o;
+  
+  fts_array_append_symbol(array, seqsym_scoob);
+  scoob_array_function(o, array);
+}
+
 static void
 _scoob_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -348,7 +357,7 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_set_copy_function(cl, scoob_copy_function);
   fts_class_set_equals_function(cl, scoob_equals_function);
   fts_class_set_array_function(cl, scoob_array_function);
-  fts_class_set_description_function(cl, scoob_array_function);
+  fts_class_set_description_function(cl, scoob_description_function);
   
   fts_class_message_varargs(cl, seqsym_get_property_list, scoob_get_property_list);
   fts_class_message_varargs(cl, seqsym_append_properties, scoob_append_properties);

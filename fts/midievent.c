@@ -614,6 +614,13 @@ midievent_array_function(fts_object_t *o, fts_array_t *array)
 }
 
 static void
+midievent_description_function(fts_object_t *o, fts_array_t *array)
+{
+  fts_array_append_symbol(array, fts_s_midi);
+  midievent_array_function(o, array);
+}
+
+static void
 midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(ac > 0)
@@ -636,7 +643,7 @@ midievent_instantiate(fts_class_t *cl)
 
   fts_class_set_copy_function(cl, midievent_copy_function);
   fts_class_set_array_function(cl, midievent_array_function);
-  fts_class_set_description_function(cl, midievent_array_function);
+  fts_class_set_description_function(cl, midievent_description_function);
   
   fts_class_message_void(cl, fts_s_type, _midievent_get_type);
   fts_class_message_void(cl, fts_new_symbol("first"), _midievent_get_first);

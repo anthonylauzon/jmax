@@ -83,6 +83,17 @@ tuple_array_function(fts_object_t *o, fts_array_t *array)
 }
 
 static void
+tuple_description_function(fts_object_t *o, fts_array_t *array)
+{
+  fts_tuple_t *self = (fts_tuple_t *)o;
+  int size = fts_tuple_get_size(self);
+  fts_atom_t *atoms = fts_tuple_get_atoms(self);
+  
+  fts_array_append_symbol(array, fts_s_tuple);
+  fts_array_append(array, size, atoms);
+}
+
+static void
 tuple_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *self = (fts_tuple_t *)o;
@@ -174,7 +185,7 @@ tuple_instantiate(fts_class_t *cl)
   fts_class_set_equals_function(cl, tuple_equals_function);
   fts_class_set_copy_function(cl, tuple_copy_function);
   fts_class_set_array_function(cl, tuple_array_function);
-  fts_class_set_description_function(cl, tuple_array_function);
+  fts_class_set_description_function(cl, tuple_description_function);
   
   fts_class_doc(cl, fts_s_tuple, "[<any: value> ...]", "immutable array of any values");
   fts_class_doc(cl, fts_new_symbol("first"), NULL, "get first value");

@@ -101,6 +101,7 @@ fslice_description_function(fts_object_t *o, fts_array_t *array)
 {
   fslice_t *self = (fslice_t *)o;
   
+  fts_array_append_symbol(array, fts_object_get_class_name(o));
   fts_array_append_object(array, (fts_object_t *)fslice_get_fmat(self));
   fts_array_append_int(array, fslice_get_index(self));
 }

@@ -60,6 +60,12 @@ default_array_function(fts_object_t *obj, fts_array_t *array)
 {
 }
 
+static void
+default_description_function(fts_object_t *obj, fts_array_t *array)
+{
+  fts_array_append_symbol(array, fts_object_get_class_name(obj));
+}
+
 fts_class_t *
 fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
@@ -73,7 +79,7 @@ fts_class_install (fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   fts_class_set_equals_function (cl, default_equals_function);
   fts_class_set_copy_function (cl, NULL);
   fts_class_set_array_function (cl, default_array_function);
-  fts_class_set_description_function (cl, NULL);
+  fts_class_set_description_function (cl, default_description_function);
 
   if (name != NULL)
   {

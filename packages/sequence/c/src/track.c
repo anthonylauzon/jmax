@@ -471,6 +471,7 @@ track_description_function(fts_object_t *o,  fts_array_t *array)
   track_t *self = (track_t *)o;
   fts_class_t *type = track_get_type(self);
   
+  fts_array_append_symbol(array, seqsym_track);
   fts_array_append_symbol(array, fts_class_get_name(type));
 }
 
