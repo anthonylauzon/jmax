@@ -179,6 +179,7 @@ rm -rf $RPM_BUILD_DIR/jmax-%{version}
 - removed obsolete files (LICENCE.fr, LICENSE).
 - added new licence file COPYING.
 - added ChangeLog and AUTHORS in doc directory.
+- reflected change of package installation directory.
 * Wed May 28 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - removed file list in %clean script
 - removed directory created when sources are extracted from tarball
