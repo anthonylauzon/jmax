@@ -27,10 +27,6 @@
 #include <fts/fts.h>
 #include "alsamidi.h"
 
-/* MIDI status bytes */
-#define STATUS_BYTE_SYSEX 0xf0
-#define STATUS_BYTE_SYSEX_END 0xf7
-
 fts_metaclass_t *alsarawmidiport_type = NULL;
 
 static void 
@@ -182,6 +178,7 @@ alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   
   fts_sched_remove(o);
   fts_midiparser_reset(parser);
+  fts_midiport_reset((fts_midiport_t *)this);
 
   if(this->handle_in)
     {

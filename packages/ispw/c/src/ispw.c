@@ -24,36 +24,22 @@
 /* control */
 extern void ispw_naming_init(void);
 extern void bangbang_config(void);
-extern void change_config(void);
-extern void delay_config(void);
-extern void drunk_config(void);
 extern void gate_config(void);
 extern void ispwcomp_config(void);
-extern void line_config(void);
 extern void loadbang_config(void);
 extern void atom_list_config(void);
 extern void messbox_config(void);
-extern void metro_config(void);
 extern void nbangs_config(void);
 extern void pack_config(void);
 extern void pipe_config(void);
 extern void poly_config(void);
 extern void prepend_config(void);
-extern void random_config(void);
 extern void route_config(void);
-extern void select_config(void);
-extern void speedlim_config(void);
 extern void split_config(void);
 extern void timer_config(void);
 extern void trigger_config(void);
 extern void unpack_config(void);
 extern void voxalloc_config(void);
-extern void abs_config(void);
-extern void clip_config(void);
-extern void exscale_config(void);
-extern void ftom_config(void);
-extern void logscale_config(void);
-extern void mtof_config(void);
 extern void scale_config(void);
 
 /* data */
@@ -74,12 +60,9 @@ extern void ispw_value_config(void);
 extern void expr_config(void);
 
 /* filters */
-extern void biquad_config(void);
 extern void sigcoef_bpass2_config(void);
 extern void sigcoef_hlshelf1_config(void);
-extern void iir_config(void);
 extern void sigapass3_config(void);
-extern void wahwah_config(void);
 
 /* io */
 extern void dac_tilda_config(void);
@@ -114,29 +97,21 @@ extern void pitch_config(void);
 extern void pt_config(void);
 
 /* signal */
-extern void zerocross_config(void);
 extern void sigthru_config(void);
-extern void sigthreshold_config(void);
 extern void sigswitch_config(void);
-extern void sigsnapshot_config(void);
 extern void sigline_config(void);
 extern void sig_config(void);
 extern void sigdown_config(void);
 extern void sigup_config(void);
-extern void phasor_config(void);
 extern void osc_config(void);
-extern void sigtab1_config(void);
 extern void noise_config(void);
 extern void sigparam_config(void);
 extern void sigprint_config(void);
 extern void vectrigon_config(void);
 extern void vecsqrt_config(void);
 extern void veclog_config(void);
-extern void vecclip_config(void);
 extern void sigarctan2_config(void);
-extern void sigabs_config(void);
 extern void fft_ispw_config(void);
-extern void sigsamphold_config(void);
 
 
 
@@ -146,36 +121,22 @@ ispw_config(void)
   /* control init */
   ispw_naming_init();
   bangbang_config();
-  change_config();
-  delay_config();
-  drunk_config();
   gate_config();
   ispwcomp_config();
-  line_config();
   loadbang_config();
   atom_list_config();
   messbox_config();
-  metro_config();
   nbangs_config();
   pack_config();
   pipe_config();
   poly_config();
   prepend_config();
-  random_config();
   route_config();
-  select_config();
-  speedlim_config();
   split_config();
   timer_config();
   trigger_config();
   unpack_config();
   voxalloc_config();
-  abs_config();
-  clip_config();
-  exscale_config();
-  ftom_config();
-  logscale_config();
-  mtof_config();
   scale_config();
 
   /* data init */
@@ -196,12 +157,9 @@ ispw_config(void)
   expr_config();
 
   /* filters */
-  biquad_config();
   sigcoef_bpass2_config();
   sigcoef_hlshelf1_config();
-  iir_config();
   sigapass3_config();
-  wahwah_config();
 
   /* io */
   dac_tilda_config();
@@ -236,30 +194,21 @@ ispw_config(void)
   pt_config();
 
   /* signal */
-  zerocross_config();
   sigthru_config();
-  sigthreshold_config();
   sigswitch_config();
-  sigsnapshot_config();
   sigline_config();
   sig_config();
   sigdown_config();
   sigup_config();
-  phasor_config();
   osc_config();
-  sigtab1_config();
   noise_config();
   sigparam_config();
   sigprint_config();
   vectrigon_config();
   vecsqrt_config();
   veclog_config();
-  vecclip_config();
   sigarctan2_config();
-  sigabs_config();
   fft_ispw_config();
-  sigsamphold_config();
-
 }
 
 

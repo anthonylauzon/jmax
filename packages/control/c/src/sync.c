@@ -104,7 +104,7 @@ sync_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
     }
   else if(fts_is_tuple(at))
     {
-      fts_tuple_t *l = fts_get_tuple(at);
+      fts_tuple_t *l = (fts_tuple_t *)fts_get_object(at);
       fts_atom_t *a = fts_tuple_get_atoms(l);
       int size = fts_tuple_get_size(l);
       int i;

@@ -20,17 +20,38 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
 
 #ifndef _FILTERS_H
 #define _FILTERS_H
 
+#include "ispw.h"
+
 #if defined(USE_FP_ONSET)
 #define FILTERS_FP_ONSET(c) (1e-37 + (c))
 #else
 #define FILTERS_FP_ONSET(c) (c)
 #endif
+
+typedef struct
+{
+  float a0;
+  float a1;
+  float a2;
+  float b1;
+  float b2;
+} biquad_coefs_t;
+
+typedef struct
+{
+  float ynm1; /* y(n-1) */
+  float ynm2; /* y(n-2) */
+  float xnm1; /* X(n-1) */
+  float xnm2; /* x(n-2) */
+} biquad_state_t;
+
+ISPW_API void compute_biquad(float *x, float *y, biquad_state_t *state, biquad_coefs_t *coefs, int n);
 
 #endif

@@ -31,13 +31,13 @@ typedef struct
 static void 
 monitor_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_set_int(fts_s_dsp_on, 1);
+  fts_dsp_activate();
 }
 
 static void 
 monitor_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_set_int(fts_s_dsp_on, 0);
+  fts_dsp_desactivate();
 }
 
 static void 
@@ -47,20 +47,21 @@ monitor_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void 
-monitor_listen_dsp_on(void *listener, fts_symbol_t name, const fts_atom_t *value)
+monitor_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  monitor_t *this = (monitor_t *)listener;
-  
-  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+  fts_object_ui_property_changed(o, fts_s_value);
 }
 
 static void 
 monitor_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   monitor_t *this = (monitor_t *) o;
-  int on = fts_param_get_int(fts_s_dsp_on, 0);
+  int active = fts_dsp_get_active();
 
-  fts_param_set_int(fts_s_dsp_on, !on);
+  if(active)
+    fts_dsp_desactivate();
+  else
+    fts_dsp_activate();
 
   fts_object_ui_property_changed(o, fts_s_value);
 }
@@ -69,9 +70,9 @@ static void
 monitor_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   monitor_t *this = (monitor_t *)obj;
-  int on = fts_param_get_int(fts_s_dsp_on, 0);
+  int active = fts_dsp_get_active();
 
-  fts_set_int(value, on);
+  fts_set_int(value, active);
 }
 
 static void 
@@ -105,13 +106,15 @@ monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       return;    
     }
 
-  fts_param_add_listener(fts_s_dsp_on, this, monitor_listen_dsp_on);
+  fts_dsp_active_add_listener(o, monitor_dsp_active);
 }
 
 static void 
 monitor_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   monitor_t *this = (monitor_t *)o;
+
+  fts_dsp_active_remove_listener(o);
 }
 
 static fts_status_t 

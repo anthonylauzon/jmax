@@ -30,8 +30,7 @@ typedef struct
 {
   fts_object_t ob;
   double period;
-  int run;
-  int pending;
+  int active;
 } metro_t;
 
 
@@ -52,11 +51,11 @@ metro_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   metro_t *this = (metro_t *)o;
 
-  if(this->run)
+  if(this->active)
     fts_timebase_remove_object(fts_get_timebase(), o);
 
   fts_timebase_add_call(fts_get_timebase(), o, metro_tick, 0, this->period);
-  this->run = 1;
+  this->active = 1;
 
   fts_outlet_bang((fts_object_t *)o, 0);
 }
@@ -66,19 +65,19 @@ metro_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   metro_t *this = (metro_t *)o;
 
-  if(this->run)
+  if(this->active)
     fts_timebase_remove_object(fts_get_timebase(), o);
 
-  this->run = 0;
+  this->active = 0;
 }
 
 static void
 metro_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   metro_t *this = (metro_t *)o;
-  int n = fts_get_number_int(at);
+  int active = fts_get_number_int(at);
 
-  if(n)
+  if(active)
     metro_start(o, 0, 0, 0, 0);
   else
     metro_stop(o, 0, 0, 0, 0);
@@ -88,12 +87,12 @@ static void
 metro_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   metro_t *this = (metro_t *)o;
-  double n = fts_get_number_float(at);
+  double period = fts_get_number_float(at);
 
-  if (n <= 0.0)
-    n = 5.0;
-
-  this->period = n;
+  if(period > 0.01)
+    this->period = period;
+  else
+    this->period = 0.01;
 }
 
 static void
@@ -101,10 +100,11 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   metro_t *this = (metro_t *)o;
 
-  if(fts_is_number(at))
+  this->period = 100.0;
+  this->active = 0;
+
+  if(ac > 0 && fts_is_number(at))
     metro_set_period(o, 0, 0, 1, at);
-  else
-    this->period = 100;
 }
 
 
@@ -134,5 +134,6 @@ metro_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 metro_config(void)
 {
-  fts_class_install(fts_new_symbol("metro"),metro_instantiate);
+  fts_class_install(fts_new_symbol("metronome"), metro_instantiate);
+  fts_alias_install(fts_new_symbol("metro"), fts_new_symbol("metronome"));
 }

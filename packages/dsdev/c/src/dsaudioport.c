@@ -322,7 +322,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   dev->buffer_sample_size = channels * frames;
   dev->buffer_byte_size = dev->buffer_sample_size * sizeof(short);
 
-  fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
+  fifo_size = DEFAULT_FIFO_SIZE;
 
   dev->num_buffers = fifo_size / frames;
   if (fifo_size % frames) {

@@ -131,13 +131,13 @@ notetrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
       int pitch = fts_midievent_channel_message_get_first(midievt);
       int velocity = fts_midievent_channel_message_get_second(midievt);
       
-      if(velocity == 0 && data->note_is_on[channel][pitch] != 0)
+      if(velocity == 0 && data->note_is_on[channel - 1][pitch] != 0)
 	{
-	  event_t *event = data->note_is_on[channel][pitch];
+	  event_t *event = data->note_is_on[channel - 1][pitch];
 	  note_t *note = (note_t *)event_get_object(event);
 	  
 	  note_set_duration(note, time - event_get_time(event));
-	  data->note_is_on[channel][pitch] = 0;
+	  data->note_is_on[channel - 1][pitch] = 0;
 	}
       else if(velocity != 0)
 	{
@@ -159,7 +159,7 @@ notetrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
 	  data->size++;
 	  
 	  /* register note as on */
-	  data->note_is_on[channel][pitch] = event;
+	  data->note_is_on[channel - 1][pitch] = event;
 	}
     }
 }
@@ -513,5 +513,3 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
   else
     return 0;
 }
-
-

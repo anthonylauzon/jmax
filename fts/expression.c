@@ -328,7 +328,7 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
 	 popping a frame and release the tuples ? */
       fts_object_refer( tuple);
       
-      fts_set_tuple( ret, tuple);
+      fts_set_object( ret, (fts_object_t *)tuple);
       
       expression_stack_push( expression, ret);
     }
@@ -357,7 +357,7 @@ void expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *expression, i
 	   popping a frame and release the tuples ? */
 	fts_object_refer( tuple);
 	
-	fts_set_tuple( ret, tuple);
+	fts_set_object( ret, (fts_object_t *)tuple);
 
 	expression_stack_push( expression, ret);
       }

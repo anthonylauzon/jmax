@@ -36,9 +36,6 @@
 
 fts_dsp_graph_t main_dsp_graph;
 
-fts_symbol_t fts_s_dsp_on = 0;
-fts_symbol_t fts_s_sample_rate = 0;
-
 /* main DSP graph parameters */
 static double dsp_sample_rate;
 static int dsp_tick_size;
@@ -51,6 +48,7 @@ static fts_symbol_t dsp_copy_fun_symbol = 0;
 
 static fts_symbol_t dsp_timebase_symbol = 0;
 static fts_timebase_t *dsp_timebase = 0;
+static fts_param_t *dsp_active_param = 0;
 
 /*********************************************************
  *
@@ -102,73 +100,9 @@ dsp_timebase_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fts_dsp_timebase_configure(void)
 {
-  fts_atom_t a;
-
-  /* create dsp timebase in root patcher (will be cleaned up with root patcher) */
-  fts_class_install(dsp_timebase_symbol, dsp_timebase_instantiate);
-  fts_set_symbol(&a, dsp_timebase_symbol);
-  fts_object_new_to_patcher( fts_get_root_patcher(), 1, &a, (fts_object_t **)&dsp_timebase);
-
-  /* set DSP time base as FTS master and add add it to the scheduler */  
+  /* set DSP time base as FTS master and add it to the scheduler */  
   fts_set_timebase(dsp_timebase);
   fts_sched_add((fts_object_t *)dsp_timebase, FTS_SCHED_ALWAYS);
-}
-
-/*********************************************************************
- *
- *  dsp parameter call backs
- *
- */
-
-static void
-dsp_reset(void)
-{
-  dsp_tick_duration = dsp_tick_size * 1000.0 / dsp_sample_rate;
-  
-  fts_dsp_graph_reset(&main_dsp_graph);
-  fts_dsp_graph_set_tick_size(&main_dsp_graph, dsp_tick_size);
-  fts_dsp_graph_set_sample_rate(&main_dsp_graph, dsp_sample_rate);  
-
-  /* reset audio ports !!! */
-  /* redefine global system variable $SampleRate (todo!) */
-}
-
-static void 
-dsp_set_tick_size(void *listener, fts_symbol_t name, const fts_atom_t *value)
-{
-  if (fts_is_number(value))
-    {
-      int n = fts_get_number_int(value);
-
-      dsp_tick_size = n;
-      dsp_reset();
-    }
-}
-
-static void 
-dsp_set_sample_rate(void *listener, fts_symbol_t name, const fts_atom_t *value)
-{
-  if (fts_is_number(value))
-    {
-      float sr = fts_get_number_float(value);
-
-      dsp_sample_rate = sr;
-      dsp_reset();
-    }
-}
-
-static void 
-dsp_set_on(void *listener, fts_symbol_t name, const fts_atom_t *value)
-{
-  if (fts_is_int(value))
-    {
-      int on = fts_get_int(value);
-
-      if(on)
-	fts_dsp_graph_compile(&main_dsp_graph);
-      else if(fts_dsp_graph_is_compiled(&main_dsp_graph))
-	fts_dsp_graph_reset(&main_dsp_graph);
-    }
 }
 
 /**************************************************************************
@@ -370,6 +304,101 @@ fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int size)
   fts_dsp_add_function(dsp_copy_fun_symbol, 3, a);
 }
 
+void
+fts_dsp_activate(void)
+{
+  fts_param_set_int(dsp_active_param, 1);
+}
+
+void
+fts_dsp_desactivate(void)
+{
+  fts_param_set_int(dsp_active_param, 0);
+}
+
+int
+fts_dsp_get_active(void)
+{
+  if(dsp_active_param != NULL)
+    {
+      fts_atom_t *value = fts_param_get_value(dsp_active_param);
+      
+      if(fts_is_number(value) && fts_get_number_int(value) != 0)
+	return 1;
+    }
+  
+  return 0;
+}
+
+void
+fts_dsp_active_add_listener(fts_object_t *object, fts_method_t method)
+{
+  fts_param_add_listener(dsp_active_param, object, method);
+}
+
+void
+fts_dsp_active_remove_listener(fts_object_t *object)
+{
+  fts_param_remove_listener(dsp_active_param, object);
+}
+
+/*********************************************************************
+ *
+ *  dsp parameter call backs
+ *
+ */
+
+static void
+dsp_reset(void)
+{
+  dsp_tick_duration = dsp_tick_size * 1000.0 / dsp_sample_rate;
+  
+  fts_dsp_graph_reset(&main_dsp_graph);
+  fts_dsp_graph_set_tick_size(&main_dsp_graph, dsp_tick_size);
+  fts_dsp_graph_set_sample_rate(&main_dsp_graph, dsp_sample_rate);  
+
+  /* reset audio ports !!! */
+  /* redefine global system variable $SampleRate (todo!) */
+}
+
+static void 
+dsp_set_tick_size(void *listener, fts_symbol_t name, const fts_atom_t *value)
+{
+  if (fts_is_number(value))
+    {
+      int n = fts_get_number_int(value);
+
+      dsp_tick_size = n;
+      dsp_reset();
+    }
+}
+
+static void 
+dsp_set_sample_rate(void *listener, fts_symbol_t name, const fts_atom_t *value)
+{
+  if (fts_is_number(value))
+    {
+      float sr = fts_get_number_float(value);
+
+      dsp_sample_rate = sr;
+      dsp_reset();
+    }
+}
+
+static void 
+dsp_active( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  int active = 0;
+
+  if(fts_is_number(at))
+    active = fts_get_number_int(at);
+
+  if(active)
+    fts_dsp_graph_compile(&main_dsp_graph);
+  else if(fts_dsp_graph_is_compiled(&main_dsp_graph))
+    fts_dsp_graph_reset(&main_dsp_graph);
+}
+
 /**************************************************************************
  *
  * Initialization and shutdown
@@ -378,18 +407,23 @@ fts_dsp_add_function_copy(fts_symbol_t in, fts_symbol_t out, int size)
 
 void fts_kernel_dsp_init(void)
 {
-  fts_s_dsp_on = fts_new_symbol("dsp_on");
-  fts_s_sample_rate = fts_new_symbol("sample_rate");
+  fts_atom_t a;
+
   dsp_timebase_symbol = fts_new_symbol("dsp_timebase");
   
   /* init sample rate */
   dsp_sample_rate = FTS_DSP_DEFAULT_SAMPLE_RATE;
   dsp_tick_size = FTS_DSP_DEFAULT_TICK_SIZE;
   dsp_tick_duration = 1000.0 * (double)FTS_DSP_DEFAULT_TICK_SIZE / FTS_DSP_DEFAULT_SAMPLE_RATE;
-    
-  /* init DSP parameters */
-  fts_param_add_listener(fts_s_sample_rate, 0, dsp_set_sample_rate);
-  fts_param_add_listener(fts_s_dsp_on, 0, dsp_set_on);
+
+  /* create dsp timebase in root patcher (will be cleaned up with root patcher) */
+  fts_class_install(dsp_timebase_symbol, dsp_timebase_instantiate);
+  fts_set_symbol(&a, dsp_timebase_symbol);
+  fts_object_new_to_patcher( fts_get_root_patcher(), 1, &a, (fts_object_t **)&dsp_timebase);
+
+  /* create DSP parameter */
+  dsp_active_param = (fts_param_t *)fts_object_create(fts_param_metaclass, 0, 0);
+  fts_param_add_listener(dsp_active_param, NULL, dsp_active);
 
   /* create main DSP graph */
   fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);

@@ -25,6 +25,33 @@
 fts_metaclass_t *fts_tuple_metaclass = 0;
 
 static void
+tuple_compare(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_tuple_t *this = (fts_tuple_t *)o;
+  fts_tuple_t *in = (fts_tuple_t *)fts_get_object(at);
+  int in_n = fts_tuple_get_size(in);
+  int n = fts_tuple_get_size(this);
+  fts_atom_t ret;
+
+  if(in_n == n)
+    {
+      fts_atom_t *in_a = fts_tuple_get_atoms(in);
+      fts_atom_t *a = fts_tuple_get_atoms(this);
+      int sum = 0;
+      int i;
+      
+      for(i=0; i<n; i++)
+	sum += fts_atom_compare(in_a + i, a + i);
+
+      fts_set_int(&ret, (sum == n));
+    }
+  else
+    fts_set_int(&ret, 0);
+
+  fts_return(&ret);
+}
+
+static void
 tuple_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
@@ -58,6 +85,8 @@ tuple_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, tuple_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, tuple_delete);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, tuple_print);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_compare, tuple_compare);
   
   return fts_Success;
 }
@@ -65,5 +94,5 @@ tuple_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fts_kernel_tuple_init(void)
 {
-  fts_tuple_metaclass = fts_class_install(fts_s_tuple, tuple_instantiate);
+  fts_tuple_metaclass = fts_class_install(NULL, tuple_instantiate);
 }

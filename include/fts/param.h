@@ -18,28 +18,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
+ * Based on Max/ISPW by Miller Puckette.
+ *
+ * Authors: Norbert Schnell.
+ *
  */
 
-typedef void (* fts_param_listener_fun_t) (void *listener, fts_symbol_t name,
-					   const fts_atom_t *value);
+typedef struct fts_param_listener
+{
+  fts_object_t *object;
+  fts_method_t callback;
+  struct fts_param_listener *next;
+} fts_param_listener_t;
 
-FTS_API void fts_param_set(fts_symbol_t name, const fts_atom_t *value);
-FTS_API void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *author);
+typedef struct fts_param
+{
+  fts_object_t o;
+  fts_atom_t value;
+  fts_param_listener_t *listeners;
+  fts_symbol_t keep;
+} fts_param_t;
 
-FTS_API const fts_atom_t *fts_param_get(fts_symbol_t name);
-FTS_API void fts_param_add_listener(fts_symbol_t name, void *listener, fts_param_listener_fun_t listener_fun);
-FTS_API void fts_param_remove_listener(void *listener);
+FTS_API void fts_param_add_listener(fts_param_t *param, fts_object_t *object, fts_method_t method);
+FTS_API void fts_param_remove_listener(fts_param_t *param, fts_object_t *object);
 
-/* Convenience function for getting/setting scalar parameter values */
+FTS_API void fts_param_set(fts_param_t *param, const fts_atom_t *value);
+FTS_API void fts_param_set_int(fts_param_t *param, int i);
+FTS_API void fts_param_set_float(fts_param_t *param, double f);
 
-FTS_API float fts_param_get_float(fts_symbol_t name, float default_value);
-FTS_API int fts_param_get_int(fts_symbol_t name, int default_value);
-FTS_API fts_symbol_t fts_param_get_symbol(fts_symbol_t name, fts_symbol_t default_value);
+#define fts_param_get_value(p) (&((p)->value))
 
-FTS_API void fts_param_set_float(fts_symbol_t name,  float value);
-FTS_API void fts_param_set_float_by(fts_symbol_t name,  float value, void *author);
-FTS_API void fts_param_set_int(fts_symbol_t name,    int value);
-FTS_API void fts_param_set_int_by(fts_symbol_t name,    int value, void *author);
-FTS_API void fts_param_set_symbol(fts_symbol_t name, fts_symbol_t value);
-FTS_API void fts_param_set_symbol_by(fts_symbol_t name, fts_symbol_t value, void *author);
+FTS_API fts_metaclass_t *fts_param_metaclass;
 

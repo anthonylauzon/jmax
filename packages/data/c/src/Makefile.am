@@ -8,13 +8,12 @@ data.c \
 fmat.c \
 fvec.c \
 getinter.c \
-getlist.c \
 getrange.c \
 getsize.c \
 getval.c \
 ivec.c \
 mat.c \
-messtab.c \
+dict.c \
 preset.c \
 row.c \
 value.c \
@@ -32,7 +31,7 @@ fmat.h \
 fvec.h \
 ivec.h \
 mat.h \
-messtab.h \
+dict.h \
 preset.h \
 row.h \
 value.h \

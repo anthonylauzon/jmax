@@ -26,84 +26,72 @@
 
 #include <fts/fts.h>
 
+static fts_symbol_t sym_abs_tilda = 0;
 
-
-typedef struct 
+static void
+abs_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t obj;
+  fts_atom_t argv[3];
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 
-} sigabs_t;
+  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
+  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
+  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
 
-static fts_symbol_t sigabs_function = 0;
+  fts_dsp_add_function(sym_abs_tilda, 3, argv);
+}
 
-static void ftl_sigabs(fts_word_t *argv)
+static void 
+ftl_abs(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_pointer(argv + 0);
   float *out = (float *)fts_word_get_pointer(argv + 1);
   long n = fts_word_get_int(argv + 2);
   int i;
 
-  for (i = 0; i < n; i ++)
+  for(i=0; i<n; i++)
     {
-      float f;
-
-      f = in[i];
+      float f = in[i];
 
       out[i] = (f >= 0 ? f : (- f));
     }
 }
 
-
 static void
-sigabs_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
-
-  fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_int  (argv + 2, fts_dsp_get_input_size(dsp, 0));
-
-  fts_dsp_add_function(sigabs_function, 3, argv);
-}
-
-
-static void
-sigabs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_dsp_add_object(o); 
 }
 
 
 static void
-sigabs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_dsp_remove_object(o);
 }
 
-
 static fts_status_t
-sigabs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+abs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(sigabs_t), 1, 1, 0); 
+  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigabs_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigabs_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigabs_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, abs_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, abs_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, abs_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
-
-  sigabs_function = fts_new_symbol("sigabs");
-  fts_dsp_declare_function(sigabs_function, ftl_sigabs);
 
   return fts_Success;
 }
 
 void
-sigabs_config(void)
+signal_abs_config(void)
 {
-  fts_class_install(fts_new_symbol("abs~"),sigabs_instantiate);
+  sym_abs_tilda = fts_new_symbol("abs~");
+  fts_dsp_declare_function(sym_abs_tilda, ftl_abs);
+
+  fts_class_install(sym_abs_tilda, abs_instantiate);
 }
 
 

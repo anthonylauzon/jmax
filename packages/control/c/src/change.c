@@ -26,25 +26,34 @@
 
 
 
+#include <limits.h>
 #include <fts/fts.h>
 
 typedef struct 
 {
   fts_object_t o;
-  int state;
+  fts_atom_t state;
 } change_t;
 
 static void
-change_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+change_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   change_t *this = (change_t *)o;
-  int n = fts_get_number_int(at);
 
-  if (n != this->state)
+  if(!fts_atom_equals(at, &this->state))
     {
-      this->state = n;
-      fts_outlet_int(o, 0, n);
+      fts_atom_assign(&this->state, at);
+      fts_outlet_atom(o, 0, at);
     }
+}
+
+static void
+change_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if(ac > 0 && s == fts_get_selector(at))
+    change_atom(o, 0, 0, ac, at);
+  else
+    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
 static void
@@ -52,8 +61,8 @@ change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   change_t *this = (change_t *)o;
 
-  if(ac > 0 && fts_is_number(at))
-     this->state = fts_get_number_int(at);
+  if(ac > 0)
+    fts_atom_assign(&this->state, at);
 }
 
 static void
@@ -61,9 +70,16 @@ change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   change_t *this = (change_t *)o;
 
-  this->state = 0;
-
+  fts_set_void(&this->state);
   change_set(o, 0, 0, 1, at);  
+}
+
+static void
+change_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  change_t *this = (change_t *)o;
+
+  fts_atom_void(&this->state);
 }
 
 static fts_status_t
@@ -72,9 +88,9 @@ change_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(change_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, change_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, change_delete);
 
-  fts_method_define_varargs(cl, 0, fts_s_int, change_int);
-  fts_method_define_varargs(cl, 0, fts_s_float, change_int);
+  fts_method_define_varargs(cl, 0, fts_s_anything, change_anything);
   fts_method_define_varargs(cl, 0, fts_s_set, change_set);
 
   fts_outlet_type_define_varargs(cl, 0, fts_s_int);
@@ -85,6 +101,6 @@ change_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 change_config(void)
 {
-  fts_class_install(fts_new_symbol("change"),change_instantiate);
+  fts_class_install(fts_new_symbol("change"), change_instantiate);
 }
 

@@ -173,19 +173,19 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     switch (msg_type(msg)) {
 
     case NOTEOFF:
-      event = fts_midievent_channel_message_new(midi_note, msg_chan(msg), msg_p1(msg), msg_p2(msg));
+      event = fts_midievent_channel_message_new(midi_note, msg_chan(msg) + 1, msg_p1(msg), msg_p2(msg));
       break;
 
     case NOTEON:
     case KEYPRESSURE:
     case CONTROLCHANGE:
     case PITCHBEND:
-      event = fts_midievent_channel_message_new(msg_type_enum(msg), msg_chan(msg), msg_p1(msg), msg_p2(msg));
+      event = fts_midievent_channel_message_new(msg_type_enum(msg), msg_chan(msg) + 1, msg_p1(msg), msg_p2(msg));
       break;
 
     case PROGRAMCHANGE:
     case CHANNELPRESSURE:
-      event = fts_midievent_channel_message_new(msg_type_enum(msg), msg_chan(msg), msg_p1(msg), MIDI_EMPTY_BYTE);
+      event = fts_midievent_channel_message_new(msg_type_enum(msg), msg_chan(msg) + 1, msg_p1(msg), MIDI_EMPTY_BYTE);
       break;
 
     case SYSEX:

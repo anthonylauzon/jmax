@@ -25,8 +25,8 @@
 
 typedef struct 
 {
-  fts_object_t ob;
-  double del;
+  fts_object_t o;
+  double time;
   int active;
 } delay_t;
 
@@ -36,7 +36,9 @@ delay_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   delay_t *this = (delay_t *)o;
 
   this->active = 0;
-  fts_outlet_bang(o, 0);
+
+  if(fts_object_outlet_is_connected(o, 0))
+    fts_outlet_bang(o, 0);
 }
 
 static void
@@ -46,10 +48,14 @@ delay_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if(this->active)
     fts_timebase_remove_object(fts_get_timebase(), o);
-  else
-    this->active = 1;
 
-  fts_timebase_add_call(fts_get_timebase(), o, delay_output, 0, this->del);
+  if(this->time > 0.0)
+    {
+      fts_timebase_add_call(fts_get_timebase(), o, delay_output, 0, this->time);
+      this->active = 1;
+    }
+  else
+    fts_outlet_bang(o, 0);
 }
 
 static void
@@ -64,18 +70,17 @@ delay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-delay_set_delay_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delay_t *this = (delay_t *)o;
-  double delay = fts_get_number_float(at);
+  double time = fts_get_number_float(at);
 
-  if (delay == (double) 0.0)
-    delay = 0.001;
-  
-  if (delay <= (double) 0.0)
-    delay = 0.001;
+  if(time > 0.0)
+    this->time = time;
+  else
+    this->time = 0.0;
 
-  this->del = delay;
+  this->time = time;
 }
 
 static void
@@ -83,11 +88,11 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   delay_t *this = (delay_t *)o;
   
-  this->del = 0.001;
+  this->time = 0.0;
   this->active = 0;
 
   if(fts_is_number(at))
-    delay_set_delay_time(o, 0, 0, 1, at);
+    delay_set_time(o, 0, 0, 1, at);
 }
 
 static fts_status_t
@@ -100,8 +105,8 @@ delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, delay_input);
   fts_method_define_varargs(cl, 0, fts_s_stop, delay_stop);
 
-  fts_method_define_varargs(cl, 1, fts_s_int, delay_set_delay_time);
-  fts_method_define_varargs(cl, 1, fts_s_float, delay_set_delay_time);
+  fts_method_define_varargs(cl, 1, fts_s_int, delay_set_time);
+  fts_method_define_varargs(cl, 1, fts_s_float, delay_set_time);
 
   fts_outlet_type_define(cl, 0,	fts_s_bang, 0, 0);
 

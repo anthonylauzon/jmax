@@ -535,7 +535,7 @@ static int fts_oldexpression_eval_one(fts_oldexpression_state_t *e)
 	      fts_object_refer(tuple);
 
 	      /* set result */
-	      fts_set_tuple(&result, tuple);
+	      fts_set_object(&result, (fts_object_t *)tuple);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -814,7 +814,7 @@ static int fts_oldexpression_eval_simple(fts_oldexpression_state_t *e)
 	      fts_object_refer(tuple);
 
 	      /* set result */
-	      fts_set_tuple(&result, tuple);
+	      fts_set_object(&result, (fts_object_t *)tuple);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -1378,7 +1378,7 @@ static int fts_op_eval(fts_oldexpression_state_t *e)
 	case FTS_OP_ARRAY_REF:
 	  if (fts_is_int(tos) && fts_is_tuple(ptos))
 	    {
-	      fts_tuple_t *tup = fts_get_tuple(ptos);
+	      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(ptos);
 	      int idx = fts_get_int(tos);
 	      
 	      if(idx >= 0 && fts_tuple_get_size(tup))
@@ -1588,7 +1588,7 @@ static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 {
   if ((ac == 4) && fts_is_int(at + 2) && fts_is_tuple(at + 1))
     {
-      fts_tuple_t *tuple = fts_get_tuple(at + 1);
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(at + 1);
       int idx = fts_get_int(&at[2]);
 
       if (idx > 0 && idx < fts_tuple_get_size(tuple))

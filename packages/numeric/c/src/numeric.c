@@ -24,15 +24,34 @@
 
 #include "numeric.h"
 
+extern void clip_config(void);
 extern void fit_config(void);
 extern void wrap_config(void);
 extern void rewrap_config(void);
 
+extern void exscale_config(void);
+extern void logscale_config(void);
+
+extern void range_config(void);
+
+extern void random_config(void);
+extern void drunk_config(void);
+
+
 void
 numeric_config(void)
 {
+  clip_config();
   fit_config();
   wrap_config();
   rewrap_config();
+
+  exscale_config();
+  logscale_config();
+
+  range_config();
+
+  random_config();
+  drunk_config();
 }
 

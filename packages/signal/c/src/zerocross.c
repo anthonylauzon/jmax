@@ -26,38 +26,42 @@
 
 #include <fts/fts.h>
 
-typedef struct S_zerocross
-{
-  fts_object_t obj;
-  int count;			/* zero crossing counter*/
-  float lastsample;		/* last stored samples */
-} zerocross_t;
+static fts_symbol_t sym_zerocross_tilda = 0;
 
-static fts_symbol_t zerocross_function = 0;
+typedef struct
+{
+  int count; /* zero crossing counter*/
+  float last; /* last stored samples */
+} zerocross_data_t;
+
+
+typedef struct
+{
+  fts_object_t o;
+  ftl_data_t data;
+} zerocross_t;
 
 static void
 ftl_zerocross(fts_word_t *argv)
 {
   float *in = (float *)fts_word_get_pointer(argv + 0);
-  zerocross_t *this = (zerocross_t *)fts_word_get_pointer(argv + 1);
-  long n = (long)fts_word_get_int(argv + 2);
-  float lastsample, current = 0.0;
-  unsigned int lastsamplesign, currentsign, count;
+  zerocross_t *data = (zerocross_t *)fts_word_get_pointer(argv + 1);
+  long n_tick = (long)fts_word_get_int(argv + 2);
+  float last = data->last
+  int count = data->count;
+  int last_sign = (last <= 0.0f);
   int i;
 
-  lastsample = this->lastsample;
-  lastsamplesign = (lastsample <= 0.0f);
-  count = this->count;
-
-  for (i = 0; i < n; i++)
+  for(i=0; i<n_tick; i++)
     {
-      current = in[i];
-      currentsign = (current <= 0.0f);
-      count += lastsamplesign ^ currentsign;
-      lastsamplesign = currentsign;
+      float current = in[i];
+      int current_sign = (current <= 0.0f);
+
+      count += last_sign ^ current_sign;
+      last_sign = current_sign;
     }
 
-  this->lastsample = current;
+  this->last = current;
   this->count = count;
 }
 
@@ -65,35 +69,38 @@ static void
 zerocross_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   zerocross_t *this = (zerocross_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
-  fts_set_pointer   (argv + 1, this);
-  fts_set_int  (argv + 2, fts_dsp_get_input_size(dsp, 0));
+  fts_set_ftl_data(argv + 3, this->data);
+  fts_set_int(argv + 2, fts_dsp_get_input_size(dsp, 0));
 
-  fts_dsp_add_function(zerocross_function, 3, argv);
+  fts_dsp_add_function(sym_zerocross_tilda, 3, argv);
 }
 
 static void
 zerocross_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   zerocross_t *this = (zerocross_t *)o;
+  zerocross_data_t *data = (zerocross_data_t *)ftl_data_get_ptr(this->data);
 
-  fts_outlet_int(o, 0, this->count);
-  this->count = 0;
+  fts_outlet_int(o, 0, data->count);
+  data->count = 0;
 }
 
 static void
 zerocross_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   zerocross_t *this = (zerocross_t *)o;
+  zerocross_data_t *data;
 
-  /* initialise control */
-  this->count = 0;
-  this->lastsample = 0.0f;
+  this->data = ftl_data_new(zerocross_data_t);
+  data = (zerocross_data_t *)ftl_data_get_ptr(this->data);
 
-  /* just put object in the dsp list */
+  data->count = 0;
+  data->last = 0.0;
+
   fts_dsp_add_object(o); 
 }
 
@@ -112,7 +119,6 @@ zerocross_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, zerocross_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, zerocross_delete);
-
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, zerocross_put);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, zerocross_bang);
@@ -121,15 +127,14 @@ zerocross_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
 
-  zerocross_function = fts_new_symbol("zerocross");
-  fts_dsp_declare_function(zerocross_function, ftl_zerocross);
-
   return fts_Success;
 }
 
 void
-zerocross_config(void)
+signal_zerocross_config(void)
 {
-  fts_class_install(fts_new_symbol("zerocross~"),zerocross_instantiate);
-  fts_alias_install(fts_new_symbol("zerocross"), fts_new_symbol("zerocross~"));
+  sym_zerocross_tilda = fts_new_symbol("zerocross~");
+  fts_dsp_declare_function(sym_zerocross_tilda, ftl_zerocross);
+
+  fts_class_install(sym_zerocross_tilda, zerocross_instantiate);
 }

@@ -1,3 +1,13 @@
+2002-08-08  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* removed class name from constructor (init method)
+	* transformed fts_param_t to an object (param.c)
+	* reimplemented dsp_on param based on the new fts_param_t as dsp_active_param in dsp.c
+	* converted messtab in data package to dict (now dict.c, dict.h)
+	* moved many classes from the ispw package into the packages control, numeric and signal
+	* implemented many new classes and generalized old ones (see summary patches)
+	* finalized new delayline (dline~, tapin~, tapout~)
+
 2002-07-31  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fixed message box w.r.t. tuple and messages. To summarize, start 1 2 3 is

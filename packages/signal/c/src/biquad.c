@@ -25,12 +25,16 @@
  */
 
 #include <fts/fts.h>
-
-#include "filters.h"
 #include "biquad.h"
 
-static fts_symbol_t biquad_dsp_function = 0;
-static fts_symbol_t biquad_inplace_dsp_function = 0;
+#if defined(USE_FP_ONSET)
+#define FILTERS_FP_ONSET(c) (1e-37 + (c))
+#else
+#define FILTERS_FP_ONSET(c) (c)
+#endif
+
+static fts_symbol_t sym_biquad = 0;
+static fts_symbol_t sym_biquad_inplace = 0;
 
 typedef struct
 {
@@ -228,7 +232,7 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
 
       biquad_state_clear(o, 0, 0, 0, 0);
-      fts_dsp_add_function(biquad_inplace_dsp_function, 4, argv);
+      fts_dsp_add_function(sym_biquad_inplace, 4, argv);
     }
   else
     {
@@ -239,7 +243,7 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_int(argv+4, fts_dsp_get_input_size(dsp, 0));
 
       biquad_state_clear(o, 0, 0, 0, 0);
-      fts_dsp_add_function(biquad_dsp_function, 5, argv);
+      fts_dsp_add_function(sym_biquad, 5, argv);
     }
 }
 
@@ -308,13 +312,13 @@ biquad_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 void
-biquad_config(void)
+signal_biquad_config(void)
 {
-  biquad_dsp_function = fts_new_symbol("biquad");
-  biquad_inplace_dsp_function = fts_new_symbol("biquad_inplace");
+  sym_biquad = fts_new_symbol("biquad~");
+  sym_biquad_inplace = fts_new_symbol("biquad~ (inplace)");
 
-  fts_dsp_declare_function(biquad_dsp_function, ftl_biquad);
-  fts_dsp_declare_function(biquad_inplace_dsp_function, ftl_biquad_inplace);
+  fts_dsp_declare_function(sym_biquad, ftl_biquad);
+  fts_dsp_declare_function(sym_biquad_inplace, ftl_biquad_inplace);
 
-  fts_class_install(fts_new_symbol("biquad~"), biquad_instantiate);
+  fts_class_install(sym_biquad, biquad_instantiate);
 }

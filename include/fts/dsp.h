@@ -94,10 +94,6 @@
  * @defgroup dsp DSP subsystem
  */
 
-/* Kernel Parameter names */ 
-FTS_API fts_symbol_t fts_s_dsp_on;
-FTS_API fts_symbol_t fts_s_sample_rate;
-
 /* Symbols used by the DSP compiler */
 /* Signal 0: always 0 */
 FTS_API fts_symbol_t fts_s_sig_zero;
@@ -260,6 +256,13 @@ FTS_API void fts_dsp_remove_object(fts_object_t *object);
 /* test inputs */
 FTS_API int fts_dsp_is_sig_inlet(fts_object_t *object, int number);
 FTS_API int fts_dsp_is_input_null(fts_dsp_descr_t *descriptor, int in);
+
+/* DSP active state (former dsp_on param) */
+FTS_API void fts_dsp_activate(void);
+FTS_API void fts_dsp_desactivate(void);
+FTS_API int fts_dsp_get_active(void);
+FTS_API void fts_dsp_active_add_listener(fts_object_t *object, fts_method_t method);
+FTS_API void fts_dsp_active_remove_listener(fts_object_t *object);
 
 /*@}*/ /* Object declarations */
 

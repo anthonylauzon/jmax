@@ -130,7 +130,7 @@ static int mempost_atoms( char **pp, int *psize, int offset, int ac, const fts_a
       else if ( fts_is_int( at))
 	n += mempost( pp, psize, offset+n, "%d", fts_get_int( at));
       else if ( fts_is_float( at))
-	n += mempost( pp, psize, offset+n, "%f", fts_get_float( at));
+	n += mempost( pp, psize, offset+n, "%g", fts_get_float( at));
       else if ( fts_is_symbol( at))
 	n += mempost( pp, psize, offset+n, "%s", fts_get_symbol( at));
       else if ( fts_is_object( at))
@@ -295,7 +295,15 @@ void fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_at
       if ( fts_is_int( value1))
 	fts_spost( stream, "%d", fts_get_int( value1));
       else if ( fts_is_float( value1))
-	fts_spost( stream, "%g", fts_get_float( value1));
+	{
+	  double f_num = fts_get_float( value1);
+	  long long int i_num = (long long int)f_num;
+
+	  if(i_num == f_num)
+	    fts_spost( stream, "%d.", i_num);
+	  else
+	    fts_spost( stream, "%g", f_num);
+	}
       else if ( fts_is_symbol( value1))
 	if( needs_quote( value1))
 	  fts_spost( stream, "%c%s%c", '"', fts_get_symbol( value1), '"');

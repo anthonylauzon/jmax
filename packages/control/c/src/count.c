@@ -208,7 +208,7 @@ count_int_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pro
 {
   if(fts_is_tuple(value))
     {
-      fts_tuple_t *list = fts_get_tuple(value);
+      fts_tuple_t *list = (fts_tuple_t *)fts_get_object(value);
 
       count_int_set(o, 0, 0, fts_tuple_get_size(list), fts_tuple_get_atoms(list));
     }
@@ -401,9 +401,9 @@ count_float_set_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t p
 {
   if(fts_is_tuple(value))
     {
-      fts_tuple_t *list = fts_get_tuple(value);
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(value);
 
-      count_float_set(o, 0, 0, fts_tuple_get_size(list), fts_tuple_get_atoms(list));
+      count_float_set(o, 0, 0, fts_tuple_get_size(tuple), fts_tuple_get_atoms(tuple));
     }
   else if(fts_is_number(value))
     count_float_set_value(o, 0, 0, 1, value);
@@ -501,13 +501,10 @@ count_is_int(int ac, const fts_atom_t *at)
 }
 
 static fts_status_t
-count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+count_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[3];
   int i;
-
-  ac--;
-  at++;
 
   for(i=0; i<ac; i++)
     if(!fts_is_number(at + i))
@@ -578,5 +575,5 @@ count_config(void)
   sym_wrap = fts_new_symbol("wrap");
   sym_reverse = fts_new_symbol("reverse");
 
-  fts_metaclass_install(fts_new_symbol("count"), count_float_instantiate, count_equiv);
+  fts_metaclass_install(fts_new_symbol("count"), count_instantiate, count_equiv);
 }

@@ -100,7 +100,7 @@ invoke_set_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if(ac == 1 && fts_get_selector(at) == s)
     invoke_set_arguments(o, 0, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "don't understand %s", s);
+    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
 /************************************************************

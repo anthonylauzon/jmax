@@ -22,7 +22,8 @@
 #include <stdlib.h>
 #include <fts/fts.h>
 
-typedef struct clip_t {
+typedef struct 
+{
   fts_object_t _o;
   int i_min;
   int i_max;
@@ -34,34 +35,34 @@ typedef struct clip_t {
 static void
 clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  clip_t *x = (clip_t *)o;
+  clip_t *this = (clip_t *)o;
 
   if(fts_is_int(at))
     {
-      x->i_min = fts_get_int(at);
-      x->f_min = (float)x->i_min;
+      this->i_min = fts_get_int(at);
+      this->f_min = (float)this->i_min;
     }
   else if(fts_is_float(at))
     {
-      x->f_min = fts_get_float(at);
-      x->i_min = (int)x->f_min;
+      this->f_min = fts_get_float(at);
+      this->i_min = (int)this->f_min;
     }
 }
 
 static void
 clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  clip_t *x = (clip_t *)o;
+  clip_t *this = (clip_t *)o;
 
   if(fts_is_int(at))
     {
-      x->i_max = fts_get_int(at);
-      x->f_max = (float)x->i_max;
+      this->i_max = fts_get_int(at);
+      this->f_max = (float)this->i_max;
     }
   else if(fts_is_float(at))
     {
-      x->f_max = fts_get_float(at);
-      x->i_max = (int)x->f_max;
+      this->f_max = fts_get_float(at);
+      this->i_max = (int)this->f_max;
     }
 }
 
@@ -77,12 +78,12 @@ clip_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 static void
 clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  clip_t *x = (clip_t *)o;
+  clip_t *this = (clip_t *)o;
   
-  x->i_min = 0;
-  x->i_max = 0;
-  x->f_min = 0.;
-  x->f_max = 0.;
+  this->i_min = 0;
+  this->i_max = 0;
+  this->f_min = 0.;
+  this->f_max = 0.;
 
   clip_set(o, winlet, s, ac, at);
 }
@@ -90,13 +91,13 @@ clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 clip_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  clip_t *x = (clip_t *)o;
+  clip_t *this = (clip_t *)o;
   float f = fts_get_float(at);
 
-  if (f > x->f_max)
-    f = x->f_max;
-  else if (f < x->f_min)
-    f = x->f_min;
+  if (f > this->f_max)
+    f = this->f_max;
+  else if (f < this->f_min)
+    f = this->f_min;
 
   fts_outlet_float(o, 0, f);
 }
@@ -105,54 +106,48 @@ static void
 clip_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int n = fts_get_int(at);
-  clip_t *x = (clip_t *)o;
+  clip_t *this = (clip_t *)o;
 
-  if (n > x->i_max)
-    n = x->i_max;
-  else if (n < x->i_min)
-    n = x->i_min;
+  if (n > this->i_max)
+    n = this->i_max;
+  else if (n < this->i_min)
+    n = this->i_min;
 
   fts_outlet_int(o, 0, n);
 }
 
 static void
-clip_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  clip_t *x = (clip_t *)o;
-  fts_atom_t *temp = alloca(ac * sizeof(fts_atom_t));
-  fts_atom_t *ap;
+  clip_t *this = (clip_t *)o;
+  fts_atom_t *out = alloca(ac * sizeof(fts_atom_t));
   int i;
 
-  if (ac > 256)
-    ac = 256;
-	
-  ap = temp;
-
-  for (i = 0; i < ac; i++, at++, ap++)
+  for(i=0; i<ac; i++)
     {
-      if (fts_is_int(at))
+      if (fts_is_int(at + i))
 	{
-	  if (fts_get_int(at) > x->i_max)
-	    fts_set_int(ap, x->i_max);
-	  else if (fts_get_int(at) < x->i_min)
-	    fts_set_int(ap, x->i_min);
+	  if (fts_get_int(at + i) > this->i_max)
+	    fts_set_int(out + i, this->i_max);
+	  else if (fts_get_int(at + i) < this->i_min)
+	    fts_set_int(out + i, this->i_min);
 	  else
-	    *ap = *at;
+	    out[i] = at[i];
 	}
-      else if (fts_is_float(at))
+      else if(fts_is_float(at + i))
 	{
-	  if (fts_get_float(at) > x->i_max)
-	    fts_set_float(ap, x->f_max);
-	  else if (fts_get_float(at) < x->i_min)
-	    fts_set_float(ap, x->f_min);
+	  if (fts_get_float(at + i) > this->i_max)
+	    fts_set_float(out + i, this->f_max);
+	  else if (fts_get_float(at + i) < this->i_min)
+	    fts_set_float(out + i, this->f_min);
 	  else
-	    *ap = *at;
+	    out[i] = at[i];
 	}
       else
-	fts_set_int(ap, 0);
+	out[i] = at[i];
     }
 
-  fts_outlet_atoms(o, 0, ac, temp);
+  fts_outlet_atoms(o, 0, ac, out);
 }
 
 static fts_status_t
@@ -166,7 +161,7 @@ clip_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, clip_float);
 
   fts_method_define_varargs(cl, 0, fts_s_set, clip_set);
-  fts_method_define_varargs(cl, 0, fts_s_list, clip_list);
+  fts_method_define_varargs(cl, 0, fts_s_list, clip_atoms);
 
   fts_method_define_varargs(cl, 1, fts_s_int, clip_set_min);
   fts_method_define_varargs(cl, 1, fts_s_float, clip_set_min);
@@ -180,5 +175,5 @@ clip_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 clip_config(void)
 {
-  fts_class_install(fts_new_symbol("clip"),clip_instantiate);
+  fts_class_install(fts_new_symbol("clip"), clip_instantiate);
 }

@@ -20,13 +20,20 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell
+ * Authors: Norbert Schnell
  *
  */
 
 
 #include <fts/fts.h>
+#include "utils.h"
 #include "osc.h"
+
+/***************************************************************************************
+ *
+ *  osc~
+ *
+ */
 
 typedef struct osc_data
 { 
@@ -49,11 +56,64 @@ typedef struct osc_data
 
 } osc_data_t;
 
-#define PHASE_FRAC_BITS 8
-#define PHASE_FRAC_SIZE (1 << PHASE_FRAC_BITS)
+ftl_data_t 
+osc_data_new(void)
+{
+  ftl_data_t ftl_data = ftl_data_new(osc_data_t);
+  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
 
-#define PHASE_BITS (WAVE_TAB_BITS + PHASE_FRAC_BITS)
-#define PHASE_RANGE (1 << PHASE_BITS)
+  data->table.ptr = 0;
+  data->phase = 0;
+  data->incr.factor = 0.0;
+
+  return ftl_data;
+}
+
+void
+osc_data_set_factor(ftl_data_t ftl_data, double sr)
+{
+  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
+
+  data->incr.factor = FTS_INTPHASE_RANGE / sr;
+}
+
+void
+osc_data_set_incr(ftl_data_t ftl_data, double incr)
+{
+  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
+  
+  data->incr.absolute = (fts_intphase_t)(incr * FTS_INTPHASE_RANGE);
+}
+
+void
+osc_data_set_phase(ftl_data_t ftl_data, double phase)
+{
+  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
+  
+  data->phase = (fts_intphase_t)(phase * FTS_INTPHASE_RANGE);
+}
+
+void
+osc_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec)
+{
+  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
+
+  if(data->table.fvec)
+    fts_object_release((fts_object_t *)data->table.fvec);
+  
+  data->table.fvec = fvec;
+  
+  if(fvec)
+    fts_object_refer((fts_object_t *)fvec);
+}
+
+void
+osc_data_set_ptr(ftl_data_t ftl_data, float *ptr)
+{
+  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
+
+  data->table.ptr = ptr;
+}
 
 static void
 osc_ftl_control_input_ptr(fts_word_t *argv)
@@ -205,6 +265,129 @@ osc_ftl_signal_input_inplace_fvec(fts_word_t *argv)
   data->phase = phi;  
 }
 
+/***************************************************************************************
+ *
+ *  phi~
+ *
+ */
+
+typedef struct 
+{
+  fts_intphase_t phase;
+
+  /* frequency controlled by signal or method */
+  union
+  {
+    fts_intphase_t absolute;
+    double factor;
+  } incr;
+} phi_data_t;
+
+ftl_data_t 
+phi_data_new(void)
+{
+  ftl_data_t ftl_data = ftl_data_new(phi_data_t);
+  phi_data_t *data = (phi_data_t *)ftl_data_get_ptr(ftl_data);
+
+  data->phase = 0;
+  data->incr.absolute = 0;
+  data->incr.factor = 0.0;
+
+  return ftl_data;
+}
+
+void
+phi_data_set_factor(ftl_data_t ftl_data, double sr)
+{
+  phi_data_t *data = (phi_data_t *)ftl_data_get_ptr(ftl_data);
+
+  data->incr.factor = (double)FTS_INTPHASE_RANGE / sr;
+}
+
+void
+phi_data_set_incr(ftl_data_t ftl_data, double incr)
+{
+  phi_data_t *data = (phi_data_t *)ftl_data_get_ptr(ftl_data);
+  
+  data->incr.absolute = (fts_intphase_t)((double)FTS_INTPHASE_RANGE * incr);
+}
+
+void
+phi_data_set_phase(ftl_data_t ftl_data, double phase)
+{
+  phi_data_t *data = (phi_data_t *)ftl_data_get_ptr(ftl_data);
+  
+  data->phase = (fts_intphase_t)((double)FTS_INTPHASE_RANGE * phase);
+}
+
+static void
+phi_ftl_control_input(fts_word_t *argv)
+{
+  phi_data_t *data = (phi_data_t *)fts_word_get_pointer(argv + 0);
+  float * restrict out = (float *) fts_word_get_pointer(argv + 1);
+  int n_tick = fts_word_get_int(argv + 2);
+  fts_intphase_t phi = data->phase;
+  fts_intphase_t incr = data->incr.absolute;
+  int i;
+
+  for(i=0; i<n_tick; i++)
+    {
+      phi = fts_intphase_wrap(phi + incr);
+      out[i] = fts_intphase_float(phi);
+    }
+
+  data->phase = phi;
+}
+
+static void
+phi_ftl_signal_input(fts_word_t *argv)
+{
+  phi_data_t *data = (phi_data_t *)fts_word_get_pointer(argv + 0);
+  float * restrict in = (float *) fts_word_get_pointer(argv + 1);
+  float * restrict out = (float *) fts_word_get_pointer(argv + 2);
+  int n_tick = fts_word_get_int(argv + 3);
+  fts_intphase_t phi = data->phase;
+  fts_intphase_t factor = data->incr.factor;
+  int i;
+
+  for(i=0; i<n_tick; i++)
+    {
+      fts_intphase_t incr = (fts_intphase_t)(factor * in[i]);
+
+      phi = fts_intphase_wrap(phi + incr);
+      out[i] = fts_intphase_float(phi);
+    }
+
+  data->phase = phi;
+}
+
+static void
+phi_ftl_signal_input_inplace(fts_word_t *argv)
+{
+  phi_data_t *data = (phi_data_t *)fts_word_get_pointer(argv + 0);
+  float * restrict sig = (float *) fts_word_get_pointer(argv + 1);
+  int n_tick = fts_word_get_int(argv + 2);
+  fts_intphase_t phi = data->phase;
+  fts_intphase_t factor = data->incr.factor;
+  int i;
+
+  for(i=0; i<n_tick; i++)
+    {
+      fts_intphase_t incr = (fts_intphase_t)(factor * sig[i]);
+
+      phi = fts_intphase_wrap(phi + incr);
+      sig[i] = fts_intphase_float(phi);
+    }
+
+  data->phase = phi;
+}
+
+/***************************************************************************************
+ *
+ *  delclare dsp functions
+ *
+ */
+
 void
 osc_declare_functions(void)
 {
@@ -215,69 +398,8 @@ osc_declare_functions(void)
   fts_dsp_declare_function(osc_ftl_symbols_fvec.control_input, osc_ftl_control_input_fvec);
   fts_dsp_declare_function(osc_ftl_symbols_fvec.signal_input, osc_ftl_signal_input_fvec);
   fts_dsp_declare_function(osc_ftl_symbols_fvec.signal_input_inplace, osc_ftl_signal_input_inplace_fvec);
-}
 
-/***************************************************************************
- *
- *  FTL data
- *
- */
-
-ftl_data_t 
-osc_data_new(void)
-{
-  ftl_data_t ftl_data = ftl_data_new(osc_data_t);
-  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
-
-  data->table.ptr = 0;
-  data->phase = 0;
-  data->incr.factor = 0.0;
-
-  return ftl_data;
-}
-
-void
-osc_data_set_factor(ftl_data_t ftl_data, double sr)
-{
-  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
-
-  data->incr.factor = FTS_INTPHASE_RANGE / sr;
-}
-
-void
-osc_data_set_incr(ftl_data_t ftl_data, double incr)
-{
-  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
-  
-  data->incr.absolute = (fts_intphase_t)(incr * FTS_INTPHASE_RANGE);
-}
-
-void
-osc_data_set_phase(ftl_data_t ftl_data, double phase)
-{
-  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
-  
-  data->phase = (fts_intphase_t)(phase * FTS_INTPHASE_RANGE);
-}
-
-void
-osc_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec)
-{
-  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
-
-  if(data->table.fvec)
-    fts_object_release((fts_object_t *)data->table.fvec);
-  
-  data->table.fvec = fvec;
-  
-  if(fvec)
-    fts_object_refer((fts_object_t *)fvec);
-}
-
-void
-osc_data_set_ptr(ftl_data_t ftl_data, float *ptr)
-{
-  osc_data_t *data = (osc_data_t *)ftl_data_get_ptr(ftl_data);
-
-  data->table.ptr = ptr;
+  fts_dsp_declare_function(phi_ftl_symbols.control_input, phi_ftl_control_input);
+  fts_dsp_declare_function(phi_ftl_symbols.signal_input, phi_ftl_signal_input);
+  fts_dsp_declare_function(phi_ftl_symbols.signal_input_inplace, phi_ftl_signal_input_inplace);
 }

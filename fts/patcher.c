@@ -824,7 +824,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_object_refer( this->args);
 
   fts_variable_define( this, fts_s_args);
-  fts_set_tuple( &va, this->args);
+  fts_set_object( &va, (fts_object_t *)this->args);
   fts_variable_restore(this, fts_s_args, &va, o);
 
   /* should use block allocation ?? */
@@ -1871,7 +1871,7 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
       /* set the new variables */
       fts_oldexpression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
 
-      fts_set_tuple(&a, this->args);
+      fts_set_object(&a, (fts_object_t *)this->args);
       fts_variable_restore(this, fts_s_args, &a, obj);
 
       /* register the patcher as user of the used variables */

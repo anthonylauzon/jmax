@@ -961,7 +961,7 @@ fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o)
   fts_dsp_node_t *node;
   fts_dsp_node_t *prev_node;
   
-  fts_param_set_int(fts_s_dsp_on, 0);
+  fts_dsp_desactivate();
 
   _fts_object_remove_prop(o, fts_s_dsp_descr);
   

@@ -29,7 +29,10 @@
 extern void midiin_config(void);
 extern void midiout_config(void);
 extern void sysex_config(void);
-extern void rawmidiport_config(void);
+
+extern void midiparse_config(void);
+extern void noteoff_config(void);
+extern void mtof_config(void);
 
 void
 midi_config(void)
@@ -37,5 +40,8 @@ midi_config(void)
   midiin_config();
   midiout_config();
   sysex_config();
-  rawmidiport_config();
+
+  midiparse_config();
+  noteoff_config();
+  mtof_config();
 }

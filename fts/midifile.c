@@ -411,7 +411,7 @@ midifile_read_track(fts_midifile_t *file)
 	{
 	  /* channel message status byte */
 	  status = byte & 0xf0;
-	  channel = byte & 0x0f;
+	  channel = (byte & 0x0f) + 1;
 	  
 	  /* read first data byte */
 	  data1 = readbyte(file);
@@ -837,7 +837,7 @@ fts_midifile_write_track_end(fts_midifile_t *file)
 void 
 fts_midifile_write_channel_message(fts_midifile_t *file, int ticks, enum midi_type type, int channel, int byte1, int byte2)
 {
-  int status = 144 + ((type & 0x0f) << 4) + (channel & 0x0f);
+  int status = 144 + ((type & 0x0f) << 4) + ((channel - 1) & 0x0f);
   int delta = ticks - file->ticks;
 
   if(delta < 0)

@@ -20,28 +20,43 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell.
  *
  */
 
-#ifndef _PHASOR_H_
-#define _PHASOR_H_
-
-extern fts_symbol_t phasor_function;
-extern fts_symbol_t phasor_inplace_function;
-
-typedef struct _phasor_ftl phasor_ftl_t;
-
-extern ftl_data_t phasor_ftl_data_new(void);
-extern void phasor_ftl_data_init(ftl_data_t ftl_data, float sr);
-extern void phasor_ftl_set_phase(ftl_data_t ftl_data, float phi);
-
-extern void phasor_ftl(fts_word_t *argv);
-extern void phasor_ftl_inplace(fts_word_t *argv);
-
-#endif
+#include <fts/fts.h>
 
 
+/****************************
+ *  
+ *  FTL nonrecursive filter functions
+ *
+ *    ftl_fir_1 ... 1st order
+ *      float *in
+ *      float *out
+ *      iir_1_state_t *state
+ *      iir_1_coefs_t *coefs
+ *      long n_tick
+ *
+ *    ftl_fir_2 ... 2nd order
+ *      float *in
+ *      float *out
+ *      iir_2_state_t *state
+ *      iir_2coefs_t *coefs
+ *      long n_tick
+ *
+ *    ftl_fir_n ... nth order
+ *      float *in
+ *      float *out
+ *      iir_n_state_t *state
+ *      iir_n_coefs_t *coefs
+ *      long n_order
+ *      long n_tick
+ *
+ *
+ */
 
-
+extern void ftl_fir_1(fts_word_t *argv);
+extern void ftl_fir_2(fts_word_t *argv);
+extern void ftl_fir_n(fts_word_t *argv);
 

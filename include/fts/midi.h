@@ -19,17 +19,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
-/****************************************************
+/************************************************************
  *
- *  MIDI events
+ *  MIDI constants
  *
- */
-
-/**
- * The MIDI event class.
- *
- * @defgroup midievent MIDI event
  */
 
 enum midi_type
@@ -43,9 +36,6 @@ enum midi_type
   midi_pitch_bend,
   midi_system_exclusive,
   midi_time_code,
-  midi_song_position_pointer,
-  midi_song_select,
-  midi_tune_request,
   midi_real_time,
   n_midi_types
 };
@@ -66,24 +56,8 @@ enum midi_real_time_event
 
 enum midi_channel 
 {
-  midi_channel_any = -1,
-  midi_channel_1 = 0,
-  midi_channel_2,
-  midi_channel_3,
-  midi_channel_4,
-  midi_channel_5,
-  midi_channel_6,
-  midi_channel_7,
-  midi_channel_8,
-  midi_channel_9,
-  midi_channel_10,
-  midi_channel_11,
-  midi_channel_12,
-  midi_channel_13,
-  midi_channel_14,
-  midi_channel_15,
-  midi_channel_16,
-  n_midi_channels
+  midi_channel_any = 0,
+  n_midi_channels = 16
 };
 
 enum midi_note_number 
@@ -180,6 +154,22 @@ enum midi_controller_number
   n_midi_controllers
 };
 
+FTS_API fts_symbol_t fts_midi_types[n_midi_types];
+FTS_API enum midi_type fts_midi_get_type(const fts_atom_t *at);
+FTS_API enum midi_type fts_midi_get_type_by_name(fts_symbol_t name);
+
+/****************************************************
+ *
+ *  MIDI events
+ *
+ */
+
+/**
+ * The MIDI event class.
+ *
+ * @defgroup midievent MIDI event
+ */
+
 #define MIDI_EMPTY_BYTE -1
 
 typedef struct fts_midievent
@@ -191,7 +181,7 @@ typedef struct fts_midievent
   union {
 
     struct {
-      int channel; /* channel */
+      int channel; /* channel (1...16) */
       int first; /* first byte */
       int second; /* second byte (optional) */
     } channel_message;
@@ -214,6 +204,9 @@ typedef struct fts_midievent
 
 } fts_midievent_t;
 
+FTS_API fts_metaclass_t *fts_midievent_type;
+FTS_API fts_symbol_t fts_s_midievent;
+
 #define fts_midievent_get_type(e) ((e)->type)
 #define fts_midievent_set_type(e, x) ((e)->type = (x))
 
@@ -235,7 +228,7 @@ typedef struct fts_midievent
 #define fts_midievent_channel_message_set_second(e, x) ((e)->data.channel_message.second = (x))
 
 #define fts_midievent_channel_message_has_second_byte(e)((e)->data.channel_message.second != MIDI_EMPTY_BYTE)
-#define fts_midievent_channel_message_get_status_byte(e) (144 + ((e)->type << 4) + (e)->data.channel_message.channel)
+#define fts_midievent_channel_message_get_status_byte(e) (144 + ((e)->type << 4) + (e)->data.channel_message.channel - 1)
 
 FTS_API fts_midievent_t *fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, int byte2);
 FTS_API fts_midievent_t *fts_midievent_note_new(int channel, int note, int velocity);
@@ -290,9 +283,6 @@ FTS_API fts_midievent_t *fts_midievent_real_time_new(enum midi_real_time_event t
 #define fts_midievent_song_position_pointer_set(e, x) ((e)->data.song_position_pointer = (x))
 #define fts_midievent_song_select_get(e) ((e)->data.song_select)
 #define fts_midievent_song_select_set(e, x) ((e)->data.song_select = (x))
-
-FTS_API fts_metaclass_t *fts_midievent_type;
-FTS_API fts_symbol_t fts_s_midievent;
 
 /*****************************************************
  *
@@ -735,7 +725,7 @@ typedef struct _fts_midiparser_
     midiparser_status_song_select
   } status;
 
-  int channel;	
+  int channel; /* MIDI channel (1...16) */
   int store;
   fts_array_t system_exclusive;
 

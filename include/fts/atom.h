@@ -388,7 +388,7 @@ FTS_API fts_metaclass_t *fts_t_string;
 #define fts_atom_same_type(p1, p2) ((p1)->type == (p2)->type)
 
 /**
- * Checks if atoms are equals
+ * Checks if atoms are strictly equals (type and value)
  *
  * @fn int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2))
  * @param p1 pointer to atom
@@ -397,6 +397,17 @@ FTS_API fts_metaclass_t *fts_t_string;
  * @ingroup atom
  */
 FTS_API int fts_atom_equals(const fts_atom_t *p1, const fts_atom_t *p2);
+
+/**
+ * Compares atoms of number, symbol, and objects (pointer!)
+ *
+ * @fn int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2))
+ * @param p1 pointer to atom
+ * @param p2 pointer to atom
+ * @return 1 if atoms are equal, 0 if not
+ * @ingroup atom
+ */
+FTS_API int fts_atom_compare(const fts_atom_t *p1, const fts_atom_t *p2);
 
 extern const fts_atom_t *fts_null;
 

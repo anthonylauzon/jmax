@@ -997,12 +997,11 @@ ivec_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int *values = ivec_get_ptr(this);
   int size = ivec_get_size(this);
   fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
-  int onset = fts_array_get_size(array);
   fts_atom_t *atoms;
   int i;
   
-  fts_array_set_size(array, onset + size);  
-  atoms = fts_array_get_atoms(array) + onset;
+  fts_array_set_size(array, size);  
+  atoms = fts_array_get_atoms(array);
 
   for(i=0; i<size; i++)
     fts_set_int(atoms + i, values[i]);
@@ -1056,7 +1055,7 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(ac == 1 && fts_is_tuple(at))
     {
-      fts_tuple_t *tup = fts_get_tuple(at);
+      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at);
       int size = fts_tuple_get_size(tup);
 
       ivec_set_size(this, size);

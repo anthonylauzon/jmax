@@ -4,7 +4,9 @@ libmidi_la_SOURCES= \
 midi.c \
 midiin.c \
 midiout.c \
-rawmidiport.c \
+midiparse.c \
+mtof.c \
+noteoff.c \
 sysex.c 
 
 noinst_HEADERS= \

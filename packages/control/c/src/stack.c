@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell.
  *
  */
 
@@ -50,14 +50,20 @@ stack_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-stack_input_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   stack_t *this = (stack_t *)o;
-  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
-  fts_atom_t a;
-  
-  fts_set_tuple(&a, tuple);
-  stack_input_atom(o, 0, 0, 1, &a);
+
+  if(ac == 1)
+    stack_input_atom(o, 0, 0, 1, at);
+  else if(ac > 1)
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, (fts_object_t *)tuple);
+      stack_input_atom(o, 0, 0, 1, &a);
+    }
 }
 
 static void
@@ -66,7 +72,7 @@ stack_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if(ac > 0 && s == fts_get_selector(at))
     stack_input_atom(o, 0, 0, ac, at);
   else
-    fts_object_signal_runtime_error(o, "Don't understand %s", s);
+    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
 static void
@@ -155,7 +161,10 @@ stack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, stack_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, stack_delete);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, stack_input_tuple);
+  fts_method_define_varargs(cl, 0, fts_s_int, stack_input_atom);
+  fts_method_define_varargs(cl, 0, fts_s_float, stack_input_atom);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, stack_input_atom);
+  fts_method_define_varargs(cl, 0, fts_s_list, stack_input_atoms);
   fts_method_define_varargs(cl, 0, fts_s_anything, stack_input_anything);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, stack_pop);

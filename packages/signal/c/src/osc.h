@@ -40,6 +40,11 @@ struct osc_ftl_symbols
   fts_symbol_t signal_input_inplace;
 };
 
+/***************************************
+ *
+ *  osc
+ *
+ */
 extern struct osc_ftl_symbols osc_ftl_symbols_ptr;
 extern struct osc_ftl_symbols osc_ftl_symbols_fvec;
 
@@ -53,18 +58,29 @@ typedef struct _osc_
 } osc_t;
 
 extern ftl_data_t osc_data_new(void);
-
-extern void osc_data_set_factor(ftl_data_t ftl_data, double factor);
+extern void osc_data_set_factor(ftl_data_t ftl_data, double sr);
 extern void osc_data_set_incr(ftl_data_t ftl_data, double freq);
 extern void osc_data_set_phase(ftl_data_t ftl_data, double phase);
-
 extern void osc_data_set_fvec(ftl_data_t ftl_data, fvec_t *fvec);
 extern void osc_data_set_ptr(ftl_data_t ftl_data, float *ptr);
 
 extern void osc_declare_functions(void);
 
+/***************************************
+ *
+ *  phi
+ *
+ */
+
+extern struct osc_ftl_symbols phi_ftl_symbols;
+
+extern ftl_data_t phi_data_new(void);
+extern void phi_data_set_factor(ftl_data_t ftl_data, double sr);
+extern void phi_data_set_incr(ftl_data_t ftl_data, double freq);
+extern void phi_data_set_phase(ftl_data_t ftl_data, double phase);
+
+extern void phi_declare_functions(fts_word_t *argv);
+
+
+
 #endif
-
-
-
-

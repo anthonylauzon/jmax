@@ -22,25 +22,28 @@
  *
  */
 
-#ifndef _MESS_MESSTAB_H_
-#define _MESS_MESSTAB_H_
+#ifndef _MESS_DICT_H_
+#define _MESS_DICT_H_
 
 #include "data.h"
 
-typedef struct messtab
+typedef struct dict
 {
   data_object_t o;
   fts_hashtable_t table_symbol;
   fts_hashtable_t table_int;
-} messtab_t;
+} dict_t;
 
-DATA_API fts_symbol_t messtab_symbol;
-DATA_API fts_metaclass_t *messtab_type;
+DATA_API fts_symbol_t dict_symbol;
+DATA_API fts_metaclass_t *dict_type;
 
-DATA_API void messtab_get_keys(messtab_t *messtab, fts_array_t *array);
+DATA_API void dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom);
+DATA_API void dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *at);
+DATA_API void dict_recall(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom);
+DATA_API void dict_get_keys(dict_t *dict, fts_array_t *array);
 
-/* messtab atoms */
-#define messtab_atom_get(ap) ((messtab_t *)fts_get_object(ap))
-#define messtab_atom_is(ap) (fts_is_a((ap), messtab_type))
+/* dict atoms */
+#define dict_atom_get(ap) ((dict_t *)fts_get_object(ap))
+#define dict_atom_is(ap) (fts_is_a((ap), dict_type))
 
 #endif

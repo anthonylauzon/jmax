@@ -24,8 +24,14 @@
  *
  */
 
-#ifndef _SIGNAL_OSC_H_
-#define _SIGNAL_OSC_H_
+#ifndef _ISPW_OSC_H_
+#define _ISPW_OSC_H_
+
+/************************************************************
+ *
+ *  osc~
+ *
+ */
 
 typedef struct _osc_ftl osc_ftl_t;
 
@@ -36,6 +42,24 @@ extern void osc_ftl_data_init(ftl_data_t ftl_data, float sr);
 
 extern void osc_ftl_dsp_put(fts_dsp_descr_t *dsp, ftl_data_t ftl_data);
 extern void osc_ftl_declare_functions(void);
+
+/************************************************************
+ *
+ *  phasor~
+ *
+ */
+
+extern fts_symbol_t phasor_function;
+extern fts_symbol_t phasor_inplace_function;
+
+typedef struct _phasor_ftl phasor_ftl_t;
+
+extern ftl_data_t phasor_ftl_data_new(void);
+extern void phasor_ftl_data_init(ftl_data_t ftl_data, float sr);
+extern void phasor_ftl_set_phase(ftl_data_t ftl_data, float phi);
+
+extern void phasor_ftl(fts_word_t *argv);
+extern void phasor_ftl_inplace(fts_word_t *argv);
 
 #endif
 

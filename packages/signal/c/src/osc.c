@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Francois Dechelle, Norbert Schnell
+ * Authors: Norbert Schnell
  *
  */
 
@@ -30,10 +30,11 @@
 
 struct osc_ftl_symbols osc_ftl_symbols_ptr = {0, 0, 0};
 struct osc_ftl_symbols osc_ftl_symbols_fvec = {0, 0, 0};
+struct osc_ftl_symbols phi_ftl_symbols = {0, 0, 0};
 
 /***************************************************************************************
  *
- *  user methods
+ *  osc~
  *
  */
 
@@ -94,18 +95,11 @@ osc_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   osc_data_set_fvec(this->data, fvec);
 }
 
-/***************************************************************************************
- *
- *  put
- *
- */
-
 static void
 osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
 {
   float sr = fts_dsp_get_output_srate(dsp, 0);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
-  fts_atom_t a[3];
   
   this->sr = sr;
 
@@ -114,6 +108,7 @@ osc_put(osc_t *this, fts_dsp_descr_t *dsp, struct osc_ftl_symbols *sym)
   if(!fts_dsp_is_sig_inlet((fts_object_t *)this, 0) || fts_dsp_is_input_null(dsp, 0))
     {
       /* no input connected */
+      fts_atom_t a[3];
 
       osc_data_set_incr(this->data, this->freq / sr);
       
@@ -167,23 +162,17 @@ osc_put_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   osc_put(this, dsp, &osc_ftl_symbols_fvec);
 }
 
-/***************************************************************************************
- *
- *  init
- *
- */
-
 static void
 osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   osc_t *this = (osc_t *)o;
 
-  fts_dsp_add_object((fts_object_t *)this);
+  fts_dsp_add_object(o);
 
   /* init osc */
   this->freq = 0.0;
   this->phase = 0.0;
-  this->sr = FTS_INTPHASE_RANGE;
+  this->sr = fts_dsp_get_sample_rate();
 
   this->data = osc_data_new();
 }
@@ -218,12 +207,6 @@ osc_init_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     osc_set_fvec(o, 0, 0, 1, at);
 }
 
-/***************************************************************************************
- *
- *  delete
- *
- */
-
 static void
 osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -247,12 +230,6 @@ osc_delete_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_dsp_remove_object(o);
 }
 
-/***************************************************************************************
- *
- *  instantiate
- *
- */
-
 static fts_status_t
 osc_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -260,8 +237,7 @@ osc_instantiate_cosine(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_init_cosine);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete);
-      
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), osc_put_cosine);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, osc_put_cosine);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
@@ -286,9 +262,8 @@ osc_instantiate_fvec(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_class_init(cl, sizeof(osc_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, osc_init_fvec);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete_fvec);
-      
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), osc_put_fvec);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete_fvec);      
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, osc_put_fvec);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), osc_set_phase);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), osc_set_phase_prop);
@@ -320,6 +295,151 @@ osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     return &fts_CannotInstantiate;
   }
 
+/***************************************************************************************
+ *
+ *  phi~
+ *
+ */
+
+static void 
+phi_set_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  osc_t *this = (osc_t *)o;
+  float freq = fts_get_number_float(at);
+  
+  phi_data_set_incr(this->data, freq / this->sr);
+
+  this->freq = freq;
+}
+
+static void
+phi_set_freq_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  osc_t *this = (osc_t *)o;
+  float freq = fts_get_number_float(value);
+  
+  phi_data_set_incr(this->data, freq / this->sr);
+
+  this->freq = freq;
+}
+
+static void 
+phi_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  osc_t *this = (osc_t *)o;
+  float phase = fts_get_number_float(at);
+  
+  phi_data_set_phase(this->data, phase);
+
+  this->phase = phase;
+}
+
+static void
+phi_set_phase_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+{
+  osc_t *this = (osc_t *)o;
+  float phase = fts_get_number_float(value);
+  
+  phi_data_set_phase(this->data, phase);
+
+  this->phase = phase;
+}
+
+static void 
+phi_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  osc_t *this = (osc_t *)o;
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
+  float sr = fts_dsp_get_output_srate(dsp, 0);
+  int n_tick = fts_dsp_get_output_size(dsp, 0);
+  
+  this->sr = sr;
+
+  phi_data_set_phase(this->data, this->phase);
+
+  if(!fts_dsp_is_sig_inlet((fts_object_t *)this, 0) || fts_dsp_is_input_null(dsp, 0))
+    {
+      /* no input connected */
+      fts_atom_t a[3];
+      
+      phi_data_set_incr(this->data, this->freq / sr);
+      
+      fts_set_ftl_data(a + 0, this->data);
+      fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
+      fts_set_int(a + 2, n_tick);
+      
+      fts_dsp_add_function(phi_ftl_symbols.control_input, 3, a);
+    }
+  else
+    {
+      phi_data_set_factor(this->data, sr);
+      
+      if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
+	{
+	  fts_atom_t a[4];
+	  
+	  fts_set_ftl_data(a + 0, this->data);
+	  fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
+	  fts_set_symbol(a + 2, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_int(a + 3, n_tick);
+	  fts_dsp_add_function(phi_ftl_symbols.signal_input, 4, a);
+	}
+      else /* inplace */
+	{
+	  fts_atom_t a[3];
+	  
+	  fts_set_ftl_data(a + 0, this->data);
+	  fts_set_symbol(a + 1, fts_dsp_get_output_name(dsp, 0));
+	  fts_set_int(a + 2, n_tick);
+	  fts_dsp_add_function(phi_ftl_symbols.signal_input_inplace, 3, a);
+	}
+    }
+}
+
+static void
+phi_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  osc_t *this = (osc_t *)o;
+
+  fts_dsp_add_object(o);
+
+  /* init osc */
+  this->freq = 0.0;
+  this->phase = 0.0;
+  this->sr = fts_dsp_get_sample_rate();
+
+  this->data = phi_data_new();
+
+  if(ac == 1)
+    phi_set_freq(o, 0, 0, 1, at);
+}
+
+static fts_status_t
+phi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(osc_t), 1, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, phi_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, osc_delete);      
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, phi_put);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("phase"), phi_set_phase);
+  fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("phase"), phi_set_phase_prop);
+  
+  if(ac == 1)
+    {
+      fts_method_define_varargs(cl, 0, fts_s_int, phi_set_freq);
+      fts_method_define_varargs(cl, 0, fts_s_float, phi_set_freq);
+      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("freq"), phi_set_freq_prop);      
+    }
+  else
+    fts_dsp_declare_inlet(cl, 0);
+
+  fts_dsp_declare_outlet(cl, 0);
+    
+  return fts_Success;
+}
+
 void
 signal_osc_config(void)
 {
@@ -333,8 +453,14 @@ signal_osc_config(void)
   osc_ftl_symbols_fvec.signal_input = fts_new_symbol("osc_fvec_signal_input");
   osc_ftl_symbols_fvec.signal_input_inplace = fts_new_symbol("osc_fvec_signal_input_inplace");
 
+  /* ftl functions using a float vector as wave table */
+  phi_ftl_symbols.control_input = fts_new_symbol("phi_control_input");
+  phi_ftl_symbols.signal_input = fts_new_symbol("phi_signal_input");
+  phi_ftl_symbols.signal_input_inplace = fts_new_symbol("phi_signal_input_inplace");
+
   /* declare the oscillator related FTL functions (platform dependent) */
   osc_declare_functions();
 
   fts_metaclass_install(fts_new_symbol("osc~"), osc_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("phi~"), phi_instantiate, fts_arg_type_equiv);
 }

@@ -27,6 +27,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
+#include <ftsprivate/message.h>
 
 static fts_atom_t __fts_null;
 const fts_atom_t *fts_null = &__fts_null;
@@ -50,6 +51,34 @@ int fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
     return fts_get_pointer( p1) == fts_get_pointer( p2);
   if ( fts_is_string( p1))
     return ! strcmp( fts_get_string( p1), fts_get_string( p2));
+
+  return 0;
+}
+
+int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
+{
+  if (fts_atom_same_type( p1, p2))
+    {
+      if (fts_is_number( p1))
+	return fts_get_number_float( p1) == fts_get_number_float( p2);
+      else if ( fts_is_symbol( p1))
+	return fts_get_symbol( p1) == fts_get_symbol( p2);
+      else if ( fts_is_object( p1))
+	{
+	  fts_object_t *obj = fts_get_object( p1);
+
+	  if(obj == fts_get_object( p2))
+	    return 1;
+	  else
+	    {
+	      fts_class_t *class = fts_object_get_class(obj);
+	      fts_method_t meth_compare = fts_class_get_method(class, fts_SystemInlet, fts_s_compare);
+	      
+	      meth_compare(obj, 0, 0, 1, p2);
+	      return(fts_get_int(fts_get_return_value()));
+	    }
+	}
+    }
 
   return 0;
 }

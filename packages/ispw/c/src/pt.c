@@ -257,7 +257,7 @@ static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pt_t *x = (pt_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t a[4];
 	
   pt_common_dsp_fun_put(&x->pt, dsp);

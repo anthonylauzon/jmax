@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell.
  *
  */
 
@@ -73,23 +73,29 @@ fifo_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-fifo_input_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fifo_t *this = (fifo_t *)o;
-  fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
-  fts_atom_t a;
   
-  fts_set_tuple(&a, tuple);
-  fifo_input_atom(o, 0, 0, 1, &a);
+  if(ac == 1)
+    fifo_input_atom(o, 0, 0, 1, at);
+  else if(ac > 1)
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, (fts_object_t *)tuple);
+      fifo_input_atom(o, 0, 0, 1, &a);
+    }
 }
 
 static void
 fifo_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && s == fts_get_selector(at))
+  if(ac == 1 && s == fts_get_selector(at))
     fifo_input_atom(o, 0, 0, ac, at);
   else
-    fts_object_signal_runtime_error(o, "Don't understand %s", s);
+    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
 static void
@@ -195,7 +201,10 @@ fifo_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fifo_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fifo_delete);
 
-  fts_method_define_varargs(cl, 0, fts_s_list, fifo_input_tuple);
+  fts_method_define_varargs(cl, 0, fts_s_int, fifo_input_atom);
+  fts_method_define_varargs(cl, 0, fts_s_float, fifo_input_atom);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, fifo_input_atom);
+  fts_method_define_varargs(cl, 0, fts_s_list, fifo_input_atoms);
   fts_method_define_varargs(cl, 0, fts_s_anything, fifo_input_anything);
 
   fts_method_define_varargs(cl, 0, fts_s_bang, fifo_next);

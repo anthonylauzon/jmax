@@ -25,18 +25,22 @@
 #include "fvec.h"
 #include "vec.h"
 #include "mat.h"
+#include "dict.h"
 
 /******************************************************
  *
  *  objects getval and setval
  *
  *    getval <value>
- *    getelem <i> <vec>
- *    getelem <i> <j> <mat>
+ *    getelem [<i>] <vec>
+ *    getelem [<i> <j>] <mat>
  *
  *    setval <value>
- *    setelem <i> <vec>
- *    setelem <i> <j> <mat>
+ *    setelem [<i>] <vec>
+ *    setelem [<i> <j>] <mat>
+ *
+ *    putmess <dict>
+ *    getmess <dict>
  *
  */
 
@@ -556,6 +560,157 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+/**********************************************************
+ *
+ *  getmess / putmess
+ *
+ */
+
+typedef struct getmess
+{
+  fts_object_t o;
+  dict_t *dict;
+  fts_atom_t key;
+} getmess_t;
+
+static void
+getmess_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  if(this->dict)
+    fts_object_release((fts_object_t *)this->dict);
+  
+  this->dict = (dict_t *)fts_get_object(at);
+  fts_object_refer((fts_object_t *)this->dict);
+}
+
+static void
+getmess_set_key(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  this->key = at[0];
+}
+
+static void
+getmess_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+  fts_atom_t a;
+  
+  dict_recall(this->dict, &this->key, &a);
+  fts_outlet_atom(o, 0, &a);
+}
+
+static void
+getmess_set_key_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_set_key(o, 0, 0, 1, at);
+  getmess_output(o, 0, 0, 0, 0);
+}
+
+static void
+putmess_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  dict_store_atoms(this->dict, &this->key, ac, at);
+}
+
+static void
+putmess_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  if(ac == 1 && s == fts_get_selector(at))
+    dict_store(this->dict, &this->key, at);
+  else
+    {
+      fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_metaclass, 0, 0);
+      fts_atom_t a;
+      
+      fts_message_set(mess, s, ac, at);
+      fts_set_object(&a, (fts_object_t *)mess);
+      dict_store(this->dict, &this->key, &a);
+    }
+}
+
+static void
+getmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  this->dict = 0;
+  fts_set_int(&this->key, 0);
+  
+  if(ac > 1)
+    {
+      if(fts_is_int(at) || fts_is_symbol(at))
+	{
+	  this->key = at[0];
+
+	  /* skip key */
+	  ac--;
+	  at++;
+	}
+      else
+	fts_object_set_error(o, "Wrong arguments");
+    }
+
+  if(ac > 0 && dict_atom_is( at))
+    getmess_set_reference(o, 0, 0, 1, at);
+  else
+    fts_object_set_error(o, "First argument of dict required");
+}
+
+static void
+getmess_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  getmess_t *this = (getmess_t *)o;
+
+  fts_object_release((fts_object_t *)this->dict);
+}
+
+static fts_status_t
+getmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(getmess_t), 2, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getmess_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getmess_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, getmess_output);
+  fts_method_define_varargs(cl, 0, fts_s_int, getmess_set_key_and_output);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, getmess_set_key_and_output);
+  
+  fts_method_define_varargs(cl, 1, dict_symbol, getmess_set_reference);
+
+  return fts_Success;
+}
+
+static fts_status_t
+putmess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(getmess_t), 3, 0, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getmess_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getmess_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_s_int, putmess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_float, putmess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, putmess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_list, putmess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_anything, putmess_anything);
+  
+  fts_method_define_varargs(cl, 1, fts_s_int, getmess_set_key);
+  fts_method_define_varargs(cl, 1, fts_s_symbol, getmess_set_key);
+
+  fts_method_define_varargs(cl, 2, dict_symbol, getmess_set_reference);
+
+  return fts_Success;
+}
+
 void
 getval_config(void)
 {
@@ -564,4 +719,7 @@ getval_config(void)
 
   fts_metaclass_install(fts_new_symbol("getelem"), getelem_instantiate, fts_arg_type_equiv);
   fts_metaclass_install(fts_new_symbol("setelem"), setelem_instantiate, fts_arg_type_equiv);
+
+  fts_class_install(fts_new_symbol("getmess"), getmess_instantiate);
+  fts_class_install(fts_new_symbol("putmess"), putmess_instantiate);
 }

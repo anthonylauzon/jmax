@@ -27,20 +27,23 @@
 typedef struct 
 {
   fts_object_t o;
-  fts_object_t *object;
   fts_symbol_t selector;
-  fts_method_t method;
 } mess_t;
 
 static void
-mess_args(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mess_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mess_t *this = (mess_t *)o;
 
-  if(this->method)
-    this->method(this->object, 0, 0, ac, at);
-  else
+  if(this->selector != NULL)
     fts_outlet_send(o, 0, this->selector, ac, at);
+  else 
+    {
+      if(fts_is_symbol(at))
+	fts_outlet_send(o, 0, fts_get_symbol(at), ac - 1, at + 1);
+      else
+	fts_object_signal_runtime_error(o, "Tuple doesn't start with a symbol");
+    }
 }
 
 static void
@@ -49,9 +52,9 @@ mess_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   mess_t *this = (mess_t *)o;
 
   if(ac == 1 && fts_get_selector(at) == s)
-    mess_args(o, 0, 0, 1, at);
+    mess_atoms(o, 0, 0, 1, at);
   else
-    fts_object_signal_runtime_error(o, "Doesn't understand '%s'", s);
+    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
 static void
@@ -59,113 +62,55 @@ mess_set_selector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   mess_t *this = (mess_t *)o;
   fts_symbol_t selector = fts_get_symbol(at);
-  fts_class_t *cl;
   
   this->selector = selector;
-  
-  if(this->object)
-    {
-      fts_object_release(this->object);
-      
-      this->object = 0;
-      this->method = 0;
-    }
 }
 
-static void
-mess_set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mess_t *this = (mess_t *)o;
-
-  if(ac == 1 && fts_is_symbol(at))
-    mess_set_selector(o, 0, 0, 1, at);
-  else if(ac >= 2 && fts_is_object(at) && fts_is_symbol(at + 1))
-    {
-      fts_object_t *object = fts_get_object(at);
-      fts_symbol_t selector = fts_get_symbol(at + 1);
-
-      if(object != this->object || selector != this->selector)
-	{
-	  fts_class_t *class = fts_object_get_class(object);
-	  fts_method_t method = fts_class_get_method(class, 0, selector);
-	  
-	  if(method)
-	    {
-	      if(this->object)
-		fts_object_release(this->object);
-	      
-	      this->object = object;
-	      
-	      fts_object_refer(object);
-	      
-	      this->selector = selector;
-	      this->method = method;
-	    }
-	  else
-	    {
-	      fts_symbol_t classname = fts_object_get_class_name(object);
-	      fts_object_signal_runtime_error(o, "class %s doesn't understand %s", 
-					      classname, selector);
-	    }
-	}
-    }
-  else
-    fts_object_signal_runtime_error(o, "wrong arguments");
-}
-
-/************************************************************
- *
- *  class
- *
- */
 static void
 mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   mess_t *this = (mess_t *)o;
   
-  this->selector = 0;
-  this->object = 0;
-  this->method = 0;
+  this->selector = NULL;
 
-  if(ac > 0)
-    mess_set_method(o, 0, 0, ac, at);
-  
-  if(this->selector == 0)
-    fts_object_set_error(o, "Wrong arguments");
+  if(ac > 0 && fts_is_symbol(at))
+    mess_set_selector(o, 0, 0, 1, at);
 }
 
-static void
-mess_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  mess_t *this = (mess_t *)o;
-
-  if(this->object)
-    fts_object_release(this->object);
-}
-  
 static fts_status_t
 mess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(mess_t), 2, 1, 0);
-
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mess_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, mess_delete);
-
-  fts_method_define_varargs(cl, 0, fts_s_bang, mess_args);
-  fts_method_define_varargs(cl, 0, fts_s_int, mess_args);
-  fts_method_define_varargs(cl, 0, fts_s_float, mess_args);
-  fts_method_define_varargs(cl, 0, fts_s_symbol, mess_args);
-  fts_method_define_varargs(cl, 0, fts_s_list, mess_args);
-  fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);
-
-  fts_method_define_varargs(cl, 1, fts_s_symbol, mess_set_selector);
-  fts_method_define_varargs(cl, 1, fts_s_list, mess_set_method);
-
+  if(ac > 0)
+    {
+      fts_class_init(cl, sizeof(mess_t), 2, 1, 0);
+  
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mess_init);
+      
+      fts_method_define_varargs(cl, 0, fts_s_bang, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_int, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_float, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_symbol, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_list, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);
+      
+      fts_method_define_varargs(cl, 1, fts_s_symbol, mess_set_selector);
+    }
+  else
+    {
+      fts_class_init(cl, sizeof(mess_t), 1, 1, 0);
+  
+      fts_method_define_varargs(cl, 0, fts_s_int, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_float, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_symbol, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_list, mess_atoms);
+      fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);      
+    }
+      
   return fts_Success;
 }
 
 void
 mess_config(void)
 {
-  fts_class_install(fts_new_symbol("mess"), mess_instantiate);
+  fts_metaclass_install(fts_new_symbol("mess"), mess_instantiate, fts_arg_equiv);
 }

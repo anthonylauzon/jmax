@@ -96,7 +96,15 @@ append_atom(char *str, const fts_atom_t *a)
   else if(fts_is_int(a))
     snprintf(s, STRING_SIZE - n, "%d", fts_get_int(a));
   else if(fts_is_float(a))
-    snprintf(s, STRING_SIZE - n, "%g", fts_get_float(a));
+    {
+      double f_num = fts_get_float(a);
+      long long int i_num = (long long int)f_num;
+      
+      if(i_num == f_num)
+	snprintf(s, STRING_SIZE - n, "%lld.", i_num);
+      else
+	snprintf(s, STRING_SIZE - n, "%g", f_num);
+    }
   else if(fts_is_symbol(a))
     {
       fts_symbol_t sym = fts_get_symbol(a);
@@ -108,7 +116,7 @@ append_atom(char *str, const fts_atom_t *a)
     }
   else if(fts_is_tuple(a))
     {
-      fts_tuple_t *t = fts_get_tuple(a);
+      fts_tuple_t *t = (fts_tuple_t *)fts_get_object(a);
       int size = fts_tuple_get_size(t);
       fts_atom_t *atoms = fts_tuple_get_atoms(t);
 
@@ -160,7 +168,7 @@ display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	    {
 	      if(this->absmax != this->last)
 		{
-		  sprintf(this->string, "~ %g", this->absmax);
+		  sprintf(this->string, "~ %#g", this->absmax);
 		  this->last = this->absmax;
 		  
 		  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
@@ -271,7 +279,7 @@ display_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   display_t * this = (display_t *)o;
 
-  sprintf(this->string, "%g", fts_get_float(at));
+  sprintf(this->string, "%#g", fts_get_float(at));
 
   display_deliver(this);
 }

@@ -18,272 +18,442 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- */
-
-
-/*
- * Parameter service for all FTS.
- * 
- * A parameter is a named atom value, that can be changed thru
- * an API and thru ucs/script commands; parameters can change dynamically
- * and the API implement the parameter listener concept, i.e. a callback
- * that will be called when the value is set of is changed.
+ * Based on Max/ISPW by Miller Puckette.
  *
- * The implementation is oriented toward simplicity against run time
- * performance; these parameters should be set by the UI, not changed
- * very fast :->
+ * Authors: Francois Dechelle, Norbert Schnell.
  *
- * Should be integrated with patch variables ? Don't know really,
- * this stuff is more dynamic ..
  */
 
 #include <fts/fts.h>
 
+static fts_symbol_t sym__remote_value = 0;
 
-typedef struct fts_param
+fts_metaclass_t *fts_param_metaclass = 0;
+
+void 
+fts_param_add_listener(fts_param_t *param, fts_object_t *object, fts_method_t callback)
 {
-  fts_symbol_t name;
-  fts_atom_t   value;
-  struct fts_param *next;
-} fts_param_t;
+  fts_param_listener_t *l = (fts_param_listener_t *)fts_malloc(sizeof(fts_param_listener_t));
 
-
-typedef struct fts_param_listener
-{
-  fts_symbol_t name;
-  fts_param_listener_fun_t listener_fun;
-  void *listener;
-  struct fts_param_listener *next;
-} fts_param_listener_t;
-
-
-static fts_heap_t *param_heap;
-static fts_heap_t *param_listener_heap;
-
-static fts_param_t *param_list = 0;
-static fts_param_listener_t *param_listener_list = 0;
-
-static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value, const void *author);
-
-/*
- * Note that a Parameter can't be removed.
- */
-
-void fts_param_set(fts_symbol_t name, const fts_atom_t *value)
-{
-  fts_param_set_by(name, value, 0);
+  l->callback = callback;
+  l->object = object;
+  l->next = param->listeners;
+  
+  param->listeners = l;  
 }
 
-void fts_param_set_by(fts_symbol_t name, const fts_atom_t *value, const void *author)
+void 
+fts_param_remove_listener(fts_param_t *param, fts_object_t *object)
 {
-  fts_param_t *p;
-  int value_not_changed = 0;
-
-  /* First, check if there, otherwise add it */
-  for (p = param_list; p ; p = p->next)
-    if (p->name == name)
-      {
-	value_not_changed = fts_atom_equals( &p->value, value);
-	p->value = *value;
-	break;
-      }
-
-  if (! p)
+  fts_param_listener_t **p = &param->listeners;
+  
+  while(*p)
     {
-      /* Not found, allocate a new one */
-      p = (fts_param_t *) fts_heap_alloc(param_heap);
-      p->name  = name;
-      p->value = *value;
-      p->next  = param_list;
-
-      param_list = p;
-    }
-
-  /* Second, run the listeners */
-  if ( !value_not_changed)
-    {
-      fts_param_run_listeners(name, value, author);
-    }
-}
-
-
-const fts_atom_t *fts_param_get(fts_symbol_t name)
-{
-  fts_param_t *p;
-
-  for (p = param_list; p ; p = p->next)
-    if (p->name == name)
-      return &(p->value);
-
-  return 0;
-}
-
-/* Note that is a parameter is already set, the listener is called
-   at "adding" time to tell him the current value; note also that a listener
-   can be added multiple times, also for the same couple value.
-   */
-
-
-void fts_param_add_listener(fts_symbol_t name, void *listener, fts_param_listener_fun_t listener_fun)
-{
-  fts_param_listener_t *p;
-  fts_param_t *pp;
-
-  /* Add the listener to the list */
-
-  p = (fts_param_listener_t *) fts_heap_alloc(param_listener_heap);
-  p->name         = name;
-  p->listener_fun = listener_fun;
-  p->listener     = listener;
-  p->next         = param_listener_list;
-
-  param_listener_list = p;
-
-  /* Run the listener if the value is already defined */
-
-  for (pp = param_list; pp ; pp = pp->next)
-    if (pp->name == name)
-      {
-	(* p->listener_fun)(p->listener, p->name, &(pp->value));
-	break;
-      }
-}
-
-
-static void fts_param_run_listeners(fts_symbol_t name, const fts_atom_t *value, const void *author)
-{
-  fts_param_listener_t *p;
-
-  for (p = param_listener_list; p ; p = p->next)
-    if ((p->name == name) && (author == 0 || p->listener != author))
-      {
-	(* p->listener_fun)(p->listener, name, value);
-      }
-}
-
-
-void fts_param_remove_listener(void *listener)
-{
-  fts_param_listener_t **pp;	/* indirect precursor */
-
-  pp = &(param_listener_list);
-
-  while (*pp)
-    {
-      if (listener == (*pp)->listener)
+      if ((*p)->object == object)
 	{
-	  fts_param_listener_t *p;
-
-	  p = (*pp);
-	  (*pp) = (*pp)->next;
-	  fts_heap_free((char *) p, param_listener_heap);
+	  fts_param_listener_t *freeme = *p;
+	  
+	  /* remove from list */
+	  *p = (*p)->next;
+	  
+	  /* free entry */
+	  fts_free(freeme);
+	  break;
 	}
       else
-	pp = &((*pp)->next);
+	p = &((*p)->next);
     }
 }
 
-
-float fts_param_get_float(fts_symbol_t name, float default_value)
+static void 
+param_call_listeners(fts_param_t *param)
 {
-  const fts_atom_t *v;
+  if(!fts_is_void(&param->value))
+    {
+      fts_param_listener_t *listener = param->listeners;
+      
+      /* call listeners */
+      while(listener)
+	{
+	  listener->callback(listener->object, 0, 0, 1, &param->value);
+	  listener = listener->next;
+	}
+      
+      /* send from outlet */
+      fts_outlet_atom((fts_object_t *)param, 0, &param->value);
+    }
+}
 
-  v = fts_param_get(name);
+void 
+fts_param_set(fts_param_t *param, const fts_atom_t *value)
+{
+  fts_atom_assign(&param->value, value);  
+  param_call_listeners(param);
+}
 
-  if (v && fts_is_number(v))
-    return fts_get_number_float(v);
+void 
+fts_param_set_int(fts_param_t *param, int i)
+{
+  fts_atom_release(&param->value);
+  fts_set_int(&param->value, i);
+  param_call_listeners(param);
+}
+
+void 
+fts_param_set_float(fts_param_t *param, double f)
+{
+  fts_atom_release(&param->value);
+  fts_set_float(&param->value, f);
+  param_call_listeners(param);
+}
+
+/********************************************************************
+ *
+ *  user methods
+ *
+ */
+
+static void
+param_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+
+  param_call_listeners(this);
+}
+  
+static void
+param_set_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+  
+  if(ac == 1)
+    fts_atom_assign(&this->value, at);
+  else if(ac > 1)
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
+      fts_atom_t a;
+      
+      fts_set_object(&a, (fts_object_t *)tuple);
+      fts_atom_assign(&this->value, at);
+    }
+}
+
+static void
+param_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+
+  param_set_atoms(o, 0, 0, ac, at);
+  param_call_listeners(this);
+}
+
+static void
+param_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if(ac == 1 && s == fts_get_selector(at))
+    param_input_atoms(o, 0, 0, ac, at);
   else
-    return default_value;
+    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 }
 
-
-int fts_param_get_int(fts_symbol_t name, int default_value)
+static void
+param_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  const fts_atom_t *v;
+  fts_param_t *this = (fts_param_t *)o;
 
-  v = fts_param_get(name);
+  fts_atom_void(&this->value);
+}
 
-  if (v && fts_is_int(v))
-    return fts_get_int(v);
+static void
+param_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_param_t *this = (fts_param_t *)o;
+
+  if(fts_is_void(&this->value))
+    post("{<empty param>\n");
   else
-    return default_value;
+    {
+      post("{<param> ");
+      post_atoms(1, &this->value);
+      post("}\n");
+    }
 }
 
-fts_symbol_t fts_param_get_symbol(fts_symbol_t name, fts_symbol_t default_value)
+static void
+param_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  const fts_atom_t *v;
+  fts_param_t *this = (fts_param_t *)o;
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
 
-  v = fts_param_get(name);
+  if(fts_is_tuple(&this->value))
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&this->value);
 
-  if (v && fts_is_symbol(v))
-    return fts_get_symbol(v);
+      fts_array_copy(array, fts_tuple_get_array(tuple));
+    }
   else
-    return default_value;
+    fts_array_append(array, 1, &this->value);
 }
 
-
-void fts_param_set_float(fts_symbol_t name,  float value)
+static void
+param_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
+  fts_param_t *this = (fts_param_t *)o;
+  fts_param_t *in = (fts_param_t *)fts_get_object(at);
 
-  fts_set_float(&a, value);
-  fts_param_set(name, &a);
+  fts_atom_assign(&this->value, &in->value);
+  param_call_listeners(this);
 }
 
-
-void fts_param_set_float_by(fts_symbol_t name,  float value, void *author)
+static void
+param_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
+  fts_param_t *this = (fts_param_t *)o;
+  fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
 
-  fts_set_float(&a, value);
-  fts_param_set_by(name, &a, author);
+  if(fts_is_tuple(&this->value))
+    {
+      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&this->value);
+      int n = fts_tuple_get_size(tuple);
+      const fts_atom_t *a = fts_tuple_get_atoms(tuple);
+
+      fts_dumper_send(dumper, fts_s_set, n, a);
+    }
+  else
+    fts_dumper_send(dumper, fts_s_set, 1, &this->value);    
 }
 
+/********************************************************************
+ *
+ *   class
+ *
+ */
 
-void fts_param_set_int(fts_symbol_t name,  int value)
+static void
+param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
+  fts_param_t *this = (fts_param_t *)o;
 
-  fts_set_int(&a, value);
-  fts_param_set(name, &a);
+  fts_set_void(&this->value);
+  this->keep = fts_s_no;
 }
 
-
-void fts_param_set_int_by(fts_symbol_t name,  int value, void *author)
+static void
+param_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_atom_t a;
+  fts_param_t *this = (fts_param_t *) o;
 
-  fts_set_int(&a, value);
-  fts_param_set_by(name, &a, author);
+  fts_atom_void(&this->value);
 }
 
-
-void fts_param_set_symbol(fts_symbol_t name,  fts_symbol_t value)
+static void
+param_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_atom_t a;
+  fts_param_t *this = (fts_param_t *)obj;
 
-  fts_set_symbol(&a, value);
-  fts_param_set(name, &a);
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
 }
 
-
-void fts_param_set_symbol_by(fts_symbol_t name,  fts_symbol_t value, void *author)
+static void
+param_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fts_atom_t a;
+  fts_param_t *this = (fts_param_t *)obj;
 
-  fts_set_symbol(&a, value);
-  fts_param_set_by(name, &a, author);
+  fts_set_symbol(value, this->keep);
+}
+
+static void
+param_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+{
+  fts_set_object(value, obj);
+}
+
+static fts_status_t
+param_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_param_t), 1, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, param_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, param_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, param_print);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_instance, param_set_from_instance);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, param_set_atoms);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, param_dump);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, param_get_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_from_array, param_set_atoms);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, sym__remote_value, param_input_atoms);
+  fts_method_define_varargs(cl,fts_SystemInlet, fts_new_symbol("load_init"), param_update);
+
+  fts_method_define_varargs(cl, 0, fts_s_bang, param_update);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, param_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_float, param_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, param_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_list, param_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_anything, param_input_anything);
+
+  fts_method_define_varargs(cl, 0, fts_s_clear, param_clear);
+  
+  fts_class_add_daemon(cl, obj_property_put, fts_s_keep, param_set_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_keep, param_get_keep);
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, param_get_state);
+  
+  return fts_Success;
+}
+
+/***************************************************************************
+ *
+ *  psend
+ *
+ */
+
+typedef struct _psend_
+{
+  fts_object_t head;
+  fts_param_t *param;
+} psend_t;
+
+typedef struct _preceive_
+{
+  fts_object_t head;
+  fts_param_t *param;
+} preceive_t;
+
+static void
+psend_input_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  psend_t *this = (psend_t *) o;
+
+  param_input_atoms((fts_object_t *)this->param, 0, 0, ac, at);
+}
+
+static void
+psend_input_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  psend_t *this = (psend_t *) o;
+
+  param_input_anything((fts_object_t *)this->param, 0, s, ac, at);
+}
+
+static void
+psend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  psend_t *this = (psend_t *) o;
+  fts_param_t *param = 0;
+
+  if(fts_is_a(at + 1, fts_param_metaclass))
+    param = (fts_param_t *)fts_get_object(at + 1);
+  else
+    {
+      fts_object_set_error(o, "Wrong argument");
+      return;
+    }
+
+  this->param = param;
+  fts_object_refer(param);
+}
+
+static void
+psend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  psend_t *this = (psend_t *) o;
+
+  fts_object_release(this->param);
+}
+
+fts_status_t
+psend_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(psend_t), 1, 0, 0); 
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, psend_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, psend_delete);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, psend_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_float, psend_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, psend_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_list, psend_input_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_anything, psend_input_anything);
+
+  return fts_Success;
+}
+
+/***************************************************************************
+ *
+ *  preceive
+ *
+ */
+
+static void
+preceive_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preceive_t *this = (preceive_t *)o;
+
+  switch(ac)
+    {
+    default:
+      fts_outlet_send(o, 0, fts_s_list, ac, at);
+    case 1:
+      fts_outlet_send(o, 0, fts_get_selector(at), 1, at);
+    case 0:
+      break;
+    }
+}
+
+static void
+preceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preceive_t *this = (preceive_t *)o;
+  fts_param_t *param = 0;
+
+  if(fts_is_a(at + 1, fts_param_metaclass))
+    param = (fts_param_t *)fts_get_object(at + 1);
+  else
+    {
+      fts_object_set_error(o, "Wrong argument");
+      return;
+    }
+
+  fts_param_add_listener(param, o, preceive_output);
+  this->param = param;
+}
+  
+static void
+preceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preceive_t *this = (preceive_t *)o;
+
+  fts_param_remove_listener(this->param, o);
+}
+
+fts_status_t
+preceive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(preceive_t), 0, 1, 0); 
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, preceive_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, preceive_delete);
+
+  return fts_Success;
 }
 
 
 /***********************************************************************
  *
- * Initialization
+ * Initialisation
  *
  */
 
-void fts_kernel_param_init()
+void
+fts_kernel_param_init(void)
 {
-  param_heap = fts_heap_new(sizeof(fts_param_t));
-  param_listener_heap = fts_heap_new(sizeof(fts_param_listener_t));
+  fts_s_param = fts_new_symbol("param");
+  sym__remote_value = fts_new_symbol("_remote_value");
+
+  fts_param_metaclass = fts_class_install(fts_s_param, param_instantiate);
 }

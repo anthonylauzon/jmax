@@ -26,15 +26,12 @@
 
 #include <math.h> 
 #include <fts/fts.h>
-#include "biquad.h"
+#include <filters.h>
+
+/* radian frequency clips to from 0 to 2/3.14159  */
+/* updates coefs twice per vector */
 
 static fts_symbol_t sigapass3_function = 0;
-
-/****************************************
- *
- *  object
- *
- */
 
 typedef struct 
 {
@@ -44,53 +41,11 @@ typedef struct
 } sigapass3_t;
 
 static void
-sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sigapass3_t *this = (sigapass3_t *)o;
-  biquad_coefs_t *data;
-  float zero = 0.0f;
-  float one = 1.0f;
-
-  this->biquad_state = ftl_data_new(biquad_state_t);
-  this->biquad_coefs = ftl_data_new(biquad_coefs_t);
-
-  data = ftl_data_get_ptr(this->biquad_coefs);
-  data->a0 = 0.0;
-  data->a1 = 0.0;
-  data->a2 = 1.0;
-  data->b1 = 0.0;
-  data->b2 = 0.0;
-
-  fts_dsp_add_object(o); /* just put object in list */
-}
-
-
-static void
-sigapass3_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sigapass3_t *this = (sigapass3_t *)o;
-
-  ftl_data_free(this->biquad_coefs);
-  ftl_data_free(this->biquad_state);
-
-  fts_dsp_remove_object(o);
-}
-
-/****************************************
- *
- *  dsp
- *
- */
-
-/* radian frequency clips to from 0 to 2/3.14159  */
-/* updates coefs twice per vector */
-
-static void
 sigapass3_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigapass3_t *this = (sigapass3_t *)o;
   fts_atom_t argv[8];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   float conv;
   float zero = 0.0;
 
@@ -144,14 +99,8 @@ ftl_apass3(fts_word_t *argv)
   biquad_coefs->a0 = biquad_coefs->b2 = exp_theta * exp_theta;
   biquad_coefs->a1 = biquad_coefs->b1 = -2.0f * cos_theta * exp_theta;
 	
-  /* compute first half of vector */
-  fts_word_set_pointer(biquad_args + 0, in_sig);
-  fts_word_set_pointer(biquad_args + 1, out_sig);
-  fts_word_set_pointer(biquad_args + 2, biquad_state);
-  fts_word_set_pointer(biquad_args + 3, biquad_coefs);
-  fts_word_set_int(biquad_args + 4, n_tick_half);
-  ftl_biquad(biquad_args);
- 
+  compute_biquad(in_sig, out_sig, biquad_state, biquad_coefs, n_tick_half);
+
   /* calculate values for second half of vector */
   theta = conv * in_freq[n_tick_half];
   if (theta > 2.0f) 
@@ -167,14 +116,40 @@ ftl_apass3(fts_word_t *argv)
   biquad_coefs->a0 = biquad_coefs->b2 = exp_theta * exp_theta;
   biquad_coefs->a1 = biquad_coefs->b1 = -2.0f * cos_theta * exp_theta;
 	
-  /* compute second half of vector */
-  fts_word_set_pointer(biquad_args + 0, in_sig + n_tick_half);
-  fts_word_set_pointer(biquad_args + 1, out_sig + n_tick_half);
-  /* fts_word_set_pointer(biquad_args + 2, biquad_state); */
-  /* fts_word_set_pointer(biquad_args + 3, biquad_coefs); */
-  /* fts_word_set_long(biquad_args + 4, n_tick_half); */
-  ftl_biquad(biquad_args);
+  compute_biquad(in_sig + n_tick_half, out_sig + n_tick_half, biquad_state, biquad_coefs, n_tick_half);
 }		
+
+static void
+sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sigapass3_t *this = (sigapass3_t *)o;
+  biquad_coefs_t *data;
+  float zero = 0.0f;
+  float one = 1.0f;
+
+  this->biquad_state = ftl_data_new(biquad_state_t);
+  this->biquad_coefs = ftl_data_new(biquad_coefs_t);
+
+  data = ftl_data_get_ptr(this->biquad_coefs);
+  data->a0 = 0.0;
+  data->a1 = 0.0;
+  data->a2 = 1.0;
+  data->b1 = 0.0;
+  data->b2 = 0.0;
+
+  fts_dsp_add_object(o); /* just put object in list */
+}
+
+static void
+sigapass3_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sigapass3_t *this = (sigapass3_t *)o;
+
+  ftl_data_free(this->biquad_coefs);
+  ftl_data_free(this->biquad_state);
+
+  fts_dsp_remove_object(o);
+}
 
 static fts_status_t
 sigapass3_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)

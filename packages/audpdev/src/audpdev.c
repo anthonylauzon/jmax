@@ -176,7 +176,7 @@ static fts_status_t audp_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   n_channels = fts_get_int_by_name(nargs, args, fts_new_symbol("channels"), DEFAULT_N_CHANNELS);
   port = fts_get_int_by_name( nargs, args, fts_new_symbol("port"), DEFAULT_OUT_PORT);
   dest = fts_get_symbol_by_name( nargs, args, fts_new_symbol("dest"), fts_new_symbol(DEFAULT_HOSTNAME));
-  packet_size = fts_get_int_by_name(nargs, args, fts_new_symbol("packetsize"), fts_param_get_int(fts_s_fifo_size, DEFAULT_PACKET_SIZE));
+  packet_size = DEFAULT_PACKET_SIZE;
   /*  mcast_addr_s = fts_get_symbol_by_name(nargs, args, fts_new_symbol("mcast_addr"), fts_new_symbol(DEFAULT_MCAST)); */
   ttl = fts_get_int_by_name(nargs, args, fts_new_symbol("ttl"), DEFAULT_TTL);
 

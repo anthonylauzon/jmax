@@ -27,15 +27,26 @@
 #include "signal.h"
 #include <utils.h>
 
-extern void signal_tilda_config(void);
 extern void signal_binop_config(void);
+extern void signal_abs_config(void);
+
+extern void signal_tilda_config(void);
+extern void signal_env_config(void);
 
 extern void signal_pink_config(void);
 extern void signal_white_config(void);
 extern void signal_osc_config(void);
 extern void signal_wave_config(void);
 
-extern void signal_env_config(void);
+extern void signal_fir_config(void);
+extern void signal_iir_config(void);
+extern void signal_biquad_config(void);
+extern void signal_wahwah_config(void);
+
+extern void signal_samphold_config(void);
+extern void signal_snapshot_config(void);
+extern void signal_threshold_config(void);
+extern void signal_zerocross_config(void);
 
 extern void signal_matrix_config(void);
 extern void signal_delay_config(void);
@@ -51,15 +62,26 @@ extern void signal_rec_fvec_config(void);
 void
 signal_config(void)
 {
-  signal_tilda_config();
   signal_binop_config();
+  signal_abs_config();
+
+  signal_tilda_config();
+  signal_env_config();
 
   signal_pink_config();
   signal_white_config();
   signal_osc_config();
   signal_wave_config();
 
-  signal_env_config();
+  signal_fir_config();
+  signal_iir_config();
+  signal_biquad_config();
+  signal_wahwah_config();
+
+  signal_samphold_config();
+  signal_snapshot_config();
+  signal_threshold_config();
+  signal_zerocross_config();
 
   signal_matrix_config();
   signal_delay_config();

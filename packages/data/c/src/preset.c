@@ -373,6 +373,15 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
+preset_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  preset_t *this = (preset_t *)o;
+  fts_array_t *array = (fts_array_t *)fts_get_pointer(at);
+
+  preset_get_keys(this, array);
+}
+
+static void
 preset_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, obj);
@@ -453,6 +462,7 @@ preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_dump, preset_dump); 
   fts_method_define_varargs(cl, fts_SystemInlet, sym_new_preset, preset_new_preset);
   fts_method_define_varargs(cl, fts_SystemInlet, sym_dump_mess, preset_dump_mess);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_get_array, preset_get_array);
 
   /* persistency */
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);

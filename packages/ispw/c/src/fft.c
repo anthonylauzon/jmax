@@ -193,7 +193,7 @@ static void
 fft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fft_t *x = (fft_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_symbol_t type = x->type;
   fts_symbol_t real_spec = x->real_spec;
   fts_atom_t dsp_arg[8]; /* maximum # of dsp args */
@@ -301,7 +301,7 @@ static void
 ifft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fft_t *x = (fft_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_symbol_t type = x->type;
   fts_symbol_t real_spec = x->real_spec;
   fts_atom_t dsp_arg[8]; /* maximum # of dsp args */

@@ -106,7 +106,7 @@ fmat_set_from_tuples(fmat_t *mat, int ac, const fts_atom_t *at)
     {
       if(fts_is_tuple(at + i))
 	{
-	  fts_tuple_t *tup = fts_get_tuple(at + i);
+	  fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
 	  int size = fts_tuple_get_size(tup);
 
 	  if(size > n)
@@ -1236,7 +1236,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	{
 	  if(fts_is_tuple(at + i))
 	    {
-	      fts_tuple_t *tup = fts_get_tuple(at + i);
+	      fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
 	      int size = fts_tuple_get_size(tup);
 	      
 	      if(size > n)

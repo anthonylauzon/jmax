@@ -31,14 +31,13 @@ extern void fmat_config(void);
 extern void col_config(void);
 extern void row_config(void);
 extern void bpf_config(void);
-extern void messtab_config(void);
+extern void dict_config(void);
 extern void preset_config(void);
 
 extern void getval_config(void);
 extern void getinter_config(void);
 extern void getsize_config(void);
 extern void getrange_config(void);
-extern void getlist_config(void);
 
 extern void dumpfile_config(void);
 
@@ -81,14 +80,13 @@ data_config(void)
   col_config();
   row_config();
   bpf_config();
-  messtab_config();
+  dict_config();
   preset_config();
 
   getval_config();  
   getinter_config();
   getsize_config();  
   getrange_config();  
-  getlist_config();  
 
   dumpfile_config();
 }

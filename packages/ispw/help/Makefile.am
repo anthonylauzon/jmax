@@ -2,30 +2,21 @@ helpdir=$(pkgdatadir)/packages/ispw/help
 help_DATA=\
 2p2z~.help.jmax \
 2pole~.help.jmax \
-abs~.help.jmax \
-abs.help.jmax \
 accum.help.jmax \
 adc~.help.jmax \
 arctan2~.help.jmax \
 arith~.help.jmax \
 bag.help.jmax \
 bangbang.help.jmax \
-biquad~.help.jmax \
 catch~.help.jmax \
-change.help.jmax \
-clip~.help.jmax \
-clip.help.jmax \
 comp~.help.jmax \
 delay~.help.jmax \
 delay.help.jmax \
 down~.help.jmax \
-drunk.help.jmax \
 exp~.help.jmax \
 expr.help.jmax \
-exscale.help.jmax \
 fft~.help.jmax \
 float.help.jmax \
-ftom.help.jmax \
 funbuff.help.jmax \
 gate.help.jmax \
 int.help.jmax \
@@ -36,8 +27,6 @@ line.help.jmax \
 loadbang.help.jmax \
 makenote.help.jmax \
 messbox.help.jmax \
-metro.help.jmax \
-mtof.help.jmax \
 noise~.help.jmax \
 osc1~.help.jmax \
 pack.help.jmax \
@@ -49,18 +38,13 @@ poly.help.jmax \
 prepend.help.jmax \
 print~.help.jmax \
 pt~.help.jmax \
-random.help.jmax \
 route.help.jmax \
 Rsend.help.jmax \
-samphold~.help.jmax \
 samplerate~.help.jmax \
 samppeek~.help.jmax \
 sampwrite~.help.jmax \
 scale.help.jmax \
-select.help.jmax \
 sig~.help.jmax \
-snapshot~.help.jmax \
-speedlim.help.jmax \
 split.help.jmax \
 sqrt~.help.jmax \
 stripnote.help.jmax \
@@ -72,15 +56,12 @@ table~.help.jmax \
 table.help.jmax \
 tabpeek~.help.jmax \
 tabpoke.help.jmax \
-threshold~.help.jmax \
 thru~.help.jmax \
 timer.help.jmax \
 trigger.help.jmax \
 trigon~.help.jmax \
 unpack.help.jmax \
 v.help.jmax \
-voxalloc.help.jmax \
-wahwah~.help.jmax \
-zerocross~.help.jmax
+voxalloc.help.jmax
 
 EXTRA_DIST= $(help_DATA)

@@ -27,44 +27,44 @@
 #include <fts/fts.h>
 
 
-typedef struct {
+typedef struct 
+{
   fts_object_t o;
 } dsp_t;
 
 
-/* Listener for the property changes */
-
-static void dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
+static void 
+dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dsp_t *this = (dsp_t *)listener;
+  int active = fts_get_int(at);
 
-  if (fts_is_int(value))
-    fts_outlet_int((fts_object_t *) this, 0, fts_get_int(value));
+  fts_outlet_int(o, 0, active);
 }
 
 static void
 dsp_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  /* Switch off if already on, before switching on again */
-  if (fts_param_get_int(fts_s_dsp_on, 0))
-    fts_param_set_int(fts_s_dsp_on, 0);
+  if(fts_dsp_get_active() != 0)
+    fts_dsp_desactivate();
 
-  fts_param_set_int(fts_s_dsp_on, 1);
+  fts_dsp_activate();
 }
 
 static void
 dsp_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_set_int(fts_s_dsp_on, 0);
+  fts_dsp_desactivate();
 }
 
 static void
 dsp_on_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(fts_get_int_arg(ac, at, 0, 0))
-    fts_param_set_int(fts_s_dsp_on, 1);
+  int active = fts_get_number_int(at);
+
+  if(active)
+    fts_dsp_activate();
   else
-    fts_param_set_int(fts_s_dsp_on, 0);
+    fts_dsp_desactivate();
 }
 
 static void
@@ -103,13 +103,13 @@ dsp_print_signals(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 static void
 dsp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_add_listener(fts_s_dsp_on, o, dsp_on_listener);
+  fts_dsp_active_add_listener(o, dsp_active);
 }
 
 static void
 dsp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_remove_listener(o);
+  fts_dsp_active_remove_listener(o);
 }
 
 
@@ -125,6 +125,7 @@ dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_stop, dsp_stop);
 
   fts_method_define_varargs(cl, 0, fts_s_int, dsp_on_off);
+  fts_method_define_varargs(cl, 0, fts_s_float, dsp_on_off);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, dsp_print);
   fts_method_define_varargs(cl, 0, fts_s_print, dsp_print);

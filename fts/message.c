@@ -22,6 +22,11 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsconfig.h>
+
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 #ifdef DEBUG 
 #define INIT_CHECK_STATUS 1
@@ -35,18 +40,6 @@
  *
  */
 fts_metaclass_t *fts_message_metaclass = 0;
-
-static int 
-is_token(fts_symbol_t s)
-{
-  return ((s == fts_s_dot) ||
-	  (s == fts_s_comma) ||
-	  (s == fts_s_semi) ||
-	  (s == fts_s_colon) ||
-	  (s == fts_s_double_colon) ||
-	  (s == fts_s_quote) ||
-	  (s == fts_s_comma));
-}
 
 void
 fts_message_clear(fts_message_t *mess)
@@ -63,6 +56,17 @@ fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *a
   fts_array_append(&mess->args, ac, at);
 }
 
+void
+fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at)
+{
+  if(fts_is_symbol(at))
+    {
+      fts_symbol_t selector = fts_get_symbol(at);
+      
+      fts_message_set(mess, selector, ac - 1, at + 1);
+    }
+}
+
 static void
 message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -74,35 +78,15 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   /* check arguments */
   if(ac > 0)
     {
-      int i;
-
-      /* check for separators and lists */
-      for(i=0; i<ac; i++)
-	{
-	  if(fts_is_symbol(at + i) && is_token(fts_get_symbol(at + i)))
-	    {
-	      fts_object_set_error(o, "Syntax error in message or constant");
-	      return;
-	    }
-	  else if(fts_is_tuple(at + i))
-	    {
-	      fts_object_set_error(o, "List cannot be argument of a message or constructor");
-	      return;
-	    }
-	}
-
       /* first arg is symbol */
       if(fts_is_symbol(at))
 	{
-	  fts_symbol_t name = fts_get_symbol(at);
-	  fts_class_t *cl;
+	  fts_symbol_t selector = fts_get_symbol(at);
 
-	  fts_message_set(this, name, ac - 1, at + 1); /* message format: <selector> [<value> ...] (any message) */
+	  fts_message_set(this, selector, ac - 1, at + 1);
 	}
-      else if(ac == 1)
-	fts_message_set(this, fts_get_selector(at), 1, at); /* value format: <non symbol value> (without type specifyer) */
       else
-	fts_message_set(this, fts_s_list, ac, at); /* implicit list format: <non symbol value> [<value> ...] */
+	fts_object_set_error(o, "First argument must be symbol");
     }
 }
 
@@ -128,7 +112,7 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fts_message_config(void)
 {
-  fts_message_metaclass = fts_class_install(fts_s_message, message_instantiate);
+  fts_message_metaclass = fts_class_install(NULL, message_instantiate);
 }
 
 /************************************************
@@ -438,8 +422,10 @@ void
 fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* a)
 {
   if(fts_is_tuple(a))
-    fts_tuple_output(o, woutlet, fts_get_tuple(a));
-  else
+    fts_tuple_output(o, woutlet, (fts_tuple_t *)fts_get_object(a));
+  else if(fts_is_message(a))
+    fts_message_output(o, woutlet, (fts_message_t *)fts_get_object(a));
+  else if(!fts_is_void(a))
     fts_outlet_send(o, woutlet, fts_get_selector(a), 1, a);
 }
 
@@ -448,8 +434,40 @@ fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
 {
   if(ac == 1)
     fts_outlet_atom(o, woutlet, at);
-  else if(ac > 0)
+  else if(ac > 1)
     fts_outlet_send(o, woutlet, fts_s_list, ac, at);
+}
+
+void
+fts_outlet_atoms_copy(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
+{
+  if(ac == 1)
+    {
+      fts_atom_t output;
+
+      output = *at;
+      fts_atom_refer(&output);
+
+      fts_outlet_atom(o, woutlet, &output);
+
+      fts_atom_release(&output);
+    }
+  else if(ac > 1)
+    {
+      fts_atom_t *output = alloca(sizeof(fts_atom_t) * ac);
+      int i;
+      
+      for(i=0; i<ac; i++)
+	{
+	  output[i] = at[i];
+	  fts_atom_refer(output + i);
+	}
+      
+      fts_outlet_send(o, woutlet, fts_s_list, ac, at);
+      
+      for(i=0; i<ac; i++)
+	fts_atom_release(output + i);
+    }
 }
 
 

@@ -678,7 +678,7 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   sr = fts_dsp_get_sample_rate();
   sampling_rate = (int)sr ;
-  fifo_size = fts_param_get_int(fts_s_fifo_size, DEFAULT_FIFO_SIZE);
+  fifo_size = DEFAULT_FIFO_SIZE;
 
     strcpy( pcm_name, fts_get_symbol_arg( ac, at, 0, DEFAULT_PCM_NAME) );
 

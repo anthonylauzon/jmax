@@ -19,14 +19,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#include <stdlib.h>
 #include <fts/fts.h>
-
-#define LO 0
-#define HI 1
-
-typedef struct abs_t {
-  fts_object_t _o;
-} abs_t;
+#include <ftsconfig.h>
 
 #define abs(x) ((x) > 0 ? (x) : -(x))
 
@@ -42,13 +37,33 @@ abs_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_outlet_float(o, 0, abs(fts_get_float(at)));
 }
 
+static void
+abs_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t *out = alloca(ac * sizeof(fts_atom_t));
+  int i;
+
+  for(i=0; i<ac; i++)
+    {
+      if (fts_is_int(at + i))
+	fts_set_int(out + i, abs(fts_get_int(at + i)));
+      else if(fts_is_float(at + i))
+	fts_set_float(out + i, abs(fts_get_float(at + i)));
+      else
+	out[i] = at[i];
+    }
+
+  fts_outlet_atoms(o, 0, ac, out);
+}
+
 static fts_status_t
 abs_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(abs_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0);
 
-  fts_method_define_varargs(cl, 0, fts_s_float, abs_float);
   fts_method_define_varargs(cl, 0, fts_s_int, abs_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, abs_float);
+  fts_method_define_varargs(cl, 0, fts_s_list, abs_atoms);
 
   return fts_Success;
 }

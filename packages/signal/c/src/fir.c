@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell.
  *
  */
 
@@ -150,5 +150,10 @@ ftl_fir_2(fts_word_t *argv)
 
 void
 ftl_fir_n(fts_word_t *argv)
+{
+}
+
+void
+signal_fir_config(void)
 {
 }

@@ -115,7 +115,7 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   sigline_t *this = (sigline_t *)o;
   line_control_t* ctl = ftl_data_get_ptr(this->ftl_data);
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
 
   this->srate = fts_dsp_get_output_srate(dsp, 0);

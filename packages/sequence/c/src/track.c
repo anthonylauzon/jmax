@@ -707,7 +707,7 @@ track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       event_t *next = event_get_next(event);
 
-      if(fts_atom_equals(event_get_value(event), at))
+      if(fts_atom_compare(event_get_value(event), at))
 	track_remove_event(this, event);
       
       event = next;

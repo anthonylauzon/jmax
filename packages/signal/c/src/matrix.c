@@ -122,7 +122,7 @@ static void
 matrix_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matrix_t *this = (matrix_t *)o;
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   float sr = fts_dsp_get_input_srate(dsp, 0);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);

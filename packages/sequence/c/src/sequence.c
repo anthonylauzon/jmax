@@ -529,7 +529,7 @@ sequence_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t pro
 {
   sequence_t *this = (sequence_t *)o;
 
-  fts_set_tuple(value, this->tuple);
+  fts_set_object(value, (fts_object_t *)this->tuple);
 }
 
 /******************************************************

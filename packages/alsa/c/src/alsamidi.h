@@ -39,6 +39,9 @@ typedef struct _alsamidi_
   fts_hashtable_t devices;
 } alsamidi_t;
 
+/* MIDI status bytes */
+#define STATUS_BYTE_SYSEX 0xf0
+#define STATUS_BYTE_SYSEX_END 0xf7
 #define ALSA_SYSEX_BUFFER_LENGTH 512
 
 typedef struct _alsarawmidiport_

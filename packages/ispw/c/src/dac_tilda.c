@@ -65,12 +65,12 @@ static void dac_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 static void dac_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_set_int(fts_s_dsp_on, 1);
+  fts_dsp_activate();
 }
 
 static void dac_tilda_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_param_set_int(fts_s_dsp_on, 0);
+  fts_dsp_desactivate();
 }
 
 static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

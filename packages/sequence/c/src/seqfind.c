@@ -56,7 +56,7 @@ seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       fts_atom_t *value = event_get_value(event);
 
-      if(fts_atom_equals(value, at))
+      if(fts_atom_compare(value, at))
 	{
 	  fts_outlet_float(o, 1, (float)event_get_time(event));
 	  fts_outlet_send(o, 0, fts_get_selector(value), 1, value);

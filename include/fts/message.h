@@ -55,12 +55,15 @@ FTS_API fts_metaclass_t *fts_message_metaclass;
 
 FTS_API void fts_message_clear(fts_message_t *mess);
 FTS_API void fts_message_set(fts_message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at);
+
+#define fts_is_message(p) (fts_is_a(p, fts_message_metaclass))
 
 #define fts_message_output(o, i, m) do { \
     fts_object_refer((fts_object_t *)(m)); \
     fts_outlet_send((o), (i), fts_message_get_selector(m), fts_message_get_ac(m), fts_message_get_at(m)); \
     fts_object_release((fts_object_t *)(m)); \
-  } while(0);
+  } while(0)
 
 
 /************************************************
@@ -249,6 +252,7 @@ FTS_API void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj);
 FTS_API void fts_outlet_primitive(fts_object_t *o, int woutlet, const fts_atom_t* a);
 FTS_API void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* a);
 FTS_API void fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at);
+FTS_API void fts_outlet_atoms_copy(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at);
 
 /**
  * Return a value from a method.

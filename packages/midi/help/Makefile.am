@@ -4,12 +4,12 @@ help_DATA=\
  bend.help.jmax \
  ctl.help.jmax \
  ctrl.help.jmax \
- midi.gif \
+ ftom.help.jmax \
  midi.summary.jmax \
+ mtof.help.jmax \
  note.help.jmax \
  pgm.help.jmax \
  poly.help.jmax \
- project.env \
  sysex.help.jmax \
  touch.help.jmax 
 

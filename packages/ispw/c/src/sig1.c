@@ -110,7 +110,7 @@ sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   sigobj_t *this = (sigobj_t *)o;
   fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer_arg(ac, at, 0, 0);
+  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 
   if (fts_dsp_get_output_size(dsp, 0) == 64)
     {

@@ -20,7 +20,7 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
 
@@ -32,7 +32,7 @@ typedef struct
 
   ftl_data_t ftl_data_min;
   ftl_data_t ftl_data_max;
-} sigclip_t;
+} clip_t;
 
 static fts_symbol_t sym_clip = 0;
 
@@ -66,9 +66,9 @@ ftl_clip(fts_word_t *argv)
 }
 
 static void
-sigclip_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sigclip_t *this = (sigclip_t *)o;
+  clip_t *this = (clip_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[5];
 
@@ -87,9 +87,9 @@ sigclip_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
  
 static void
-sigclip_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sigclip_t *this = (sigclip_t *)o;
+  clip_t *this = (clip_t *)o;
   float *min = ftl_data_get_ptr(this->ftl_data_min);
 
   *min = fts_get_number_float(at);
@@ -97,9 +97,9 @@ sigclip_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-sigclip_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sigclip_t *this = (sigclip_t *)o;
+  clip_t *this = (clip_t *)o;
   float *max = ftl_data_get_ptr(this->ftl_data_max);
 
   *max = fts_get_number_float(at);
@@ -112,9 +112,9 @@ sigclip_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-sigclip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sigclip_t *this = (sigclip_t *)o;
+  clip_t *this = (clip_t *)o;
   float *min;
   float *max;
 
@@ -124,16 +124,18 @@ sigclip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   min = (float *)ftl_data_get_ptr(this->ftl_data_min);
   max = (float *)ftl_data_get_ptr(this->ftl_data_max);
 
-  if(ac > 0)
+  if(ac > 1 && fts_is_number(at))
     {
       *min = fts_get_number_float(at);
+
+      /* skip min argument */
       ac--;
       at++;
     }
   else
     *min = -1.0;
 
-  if(ac > 0)
+  if(ac > 0 && fts_is_number(at))
     *max = fts_get_number_float(at);
   else
     *max = 1.0;
@@ -143,9 +145,9 @@ sigclip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 static void
-sigclip_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sigclip_t *this = (sigclip_t *)o;
+  clip_t *this = (clip_t *)o;
 
   ftl_data_free(this->ftl_data_min);
   ftl_data_free(this->ftl_data_max);
@@ -156,17 +158,17 @@ sigclip_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static fts_status_t
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(sigclip_t), 3, 1, 0);
+  fts_class_init(cl, sizeof(clip_t), 3, 1, 0);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigclip_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigclip_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigclip_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, clip_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, clip_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, clip_put);
   
-  fts_method_define_varargs(cl, 1, fts_s_int, sigclip_min);
-  fts_method_define_varargs(cl, 1, fts_s_float, sigclip_min);
+  fts_method_define_varargs(cl, 1, fts_s_int, clip_set_min);
+  fts_method_define_varargs(cl, 1, fts_s_float, clip_set_min);
 
-  fts_method_define_varargs(cl, 2, fts_s_int, sigclip_max);
-  fts_method_define_varargs(cl, 2, fts_s_float, sigclip_max);
+  fts_method_define_varargs(cl, 2, fts_s_int, clip_set_max);
+  fts_method_define_varargs(cl, 2, fts_s_float, clip_set_max);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -175,10 +177,10 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 void
-vecclip_config(void)
+signal_clip_config(void)
 {
   sym_clip = fts_new_symbol("clip~");
+  fts_dsp_declare_function(sym_clip, ftl_clip);
 
   fts_class_install(sym_clip, class_instantiate);
-  fts_dsp_declare_function(sym_clip, ftl_clip);
 }

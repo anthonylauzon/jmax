@@ -27,19 +27,6 @@
 #include <fts/fts.h>
 #include <ftsprivate/fpe.h>
 
-/*
- * An ftl_data_t object implementing a set of control functions for the DSP engine.
- * It provide access to dac slip and fpe monitoring.
- * Later, we may add sampling rate, vector size, and the pause factor (?).
- * dsp on/off functions.
- * 
- * Currently, it does not implement any remote calls, just send the result
- * of the poll; the poll interval is given at the creation of the object.
- *
- * Todo: install the dsp control instance as listener for param sampling rate, param fifo_size,
- * and DSP on/off (how ?).
- */
-
 fts_symbol_t dspcontrol_symbol = 0;
 fts_symbol_t sym_dsp_on = 0;
 fts_symbol_t sym_dsp_print = 0;
@@ -55,26 +42,22 @@ fts_symbol_t sym_stop_collect = 0;
 fts_symbol_t sym_clear_collect = 0;
 fts_symbol_t sym_check_nan = 0;
 
-typedef struct fts_dsp_control
+typedef struct dsp_control
 {
   fts_object_t o;
-
   int poll_interval;
-
-  /* Old state */
-
   int prev_dac_slip;
   int prev_invalid_fpe;
   int prev_divide0_fpe;
   int prev_overflow_fpe;
   int prev_denormalized_fpe;
-} fts_dsp_control_t;
+} dsp_control_t;
 
 
 static void 
-fts_dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_control_t *this = (fts_dsp_control_t *)o;
+  dsp_control_t *this = (dsp_control_t *)o;
   fts_atom_t a[1];
   int dac_slip;
   int invalid_fpe;
@@ -137,19 +120,21 @@ fts_dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 /*        fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_DENORMALIZED_FPE_STATE, 1, &a); */
 /*      } */
 
-  fts_timebase_add_call(fts_get_timebase(), o, fts_dsp_control_poll, 0, this->poll_interval);
+  fts_timebase_add_call(fts_get_timebase(), o, dsp_control_poll, 0, this->poll_interval);
 }
 
 
-static void fts_dsp_control_dsp_on_listener(void *listener, fts_symbol_t name,  const fts_atom_t *value)
+static void 
+dsp_control_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t *this = (fts_object_t *)listener;
-  fts_client_send_message(this, sym_client_dsp_on, 1, value);
+  fts_object_t *this = (fts_object_t *)o;
+  fts_client_send_message(this, sym_client_dsp_on, 1, at);
 }
 
-static void fts_dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_control_t *this = (fts_dsp_control_t *)o;
+  dsp_control_t *this = (dsp_control_t *)o;
 
   if (ac > 0 && fts_is_number(at))
     this->poll_interval = fts_get_number_int(at + 0);
@@ -162,18 +147,28 @@ static void fts_dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, in
   this->prev_overflow_fpe = 0;
   this->prev_denormalized_fpe = 0;
 
-  fts_timebase_add_call(fts_get_timebase(), o, fts_dsp_control_poll, 0, 0.0);
+  fts_timebase_add_call(fts_get_timebase(), o, dsp_control_poll, 0, 0.0);
 
-  fts_param_add_listener(fts_s_dsp_on, this, fts_dsp_control_dsp_on_listener);
+  /* listen to dsp active param */
+  fts_dsp_active_add_listener(o, dsp_control_dsp_active);
 }
 
-static void fts_dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dsp_control_t *this = (dsp_control_t *)o;
+
+  fts_dsp_active_remove_listener(o);
+}
+
+static void 
+dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t a[1];
-  fts_dsp_control_t *this = (fts_dsp_control_t *)o;
+  dsp_control_t *this = (dsp_control_t *)o;
   float sr;
 
-  fts_set_int(a, fts_param_get_int(fts_s_fifo_size, 0));
+  fts_set_int(a, 9999999);
   fts_client_send_message((fts_object_t *)this, sym_fifo_size, 1, a);
 
   sr = fts_dsp_get_sample_rate();
@@ -182,56 +177,66 @@ static void fts_dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_client_send_message((fts_object_t *)this, sym_sampling_rate, 1, a);
 }
 
-static void fts_dsp_control_fpe_start_collect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_fpe_start_collect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_objectset_t *set = (fts_objectset_t *) fts_get_object(at);      
   fts_fpe_start_collect(set);
 }
 
-static void fts_dsp_control_fpe_stop_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_fpe_stop_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_fpe_stop_collect();
 }
 
-static void fts_dsp_control_fpe_clear_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_fpe_clear_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_fpe_empty_collection();
 }
 
-static void fts_dsp_control_remote_dsp_on( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_remote_dsp_on( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ((ac == 1) && fts_is_int(at))
+  if (ac == 1 && fts_is_int(at))
     {
-      fts_dsp_control_t *this = (fts_dsp_control_t *)o;
-
-      fts_param_set(fts_s_dsp_on, at);
+      int active = fts_get_int(at);
+      
+      if(active)
+	fts_dsp_activate();
+      else
+	fts_dsp_desactivate();
     }
 }
 
-static void fts_dsp_control_remote_dsp_print( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_remote_dsp_print( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dsp_chain_post();
 }
 
-static void fts_dsp_control_remote_set_poll_interval( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_remote_set_poll_interval( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if ( (ac == 1) && fts_is_int( at))
     {
-      fts_dsp_control_t *this = (fts_dsp_control_t *)d;
+      dsp_control_t *this = (dsp_control_t *)d;
 
       this->poll_interval = fts_get_int(&at[0]);
     }
 }
 
-static void fts_dsp_control_set_check_nan( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_set_check_nan( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   /*if ( (ac == 1) && fts_is_int( at))
-    {
     ftl_program_set_check_nan( dsp_get_current_dsp_chain(), fts_get_int( at));
-    }*/
+  */
 }
 
-static void fts_dsp_control_restart( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+dsp_control_restart( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_dsp_restart();
 }
@@ -239,18 +244,18 @@ static void fts_dsp_control_restart( fts_object_t *d, int winlet, fts_symbol_t s
 static fts_status_t
 dsp_control_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fts_dsp_control_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(dsp_control_t), 0, 0, 0); 
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_dsp_control_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, fts_dsp_control_upload);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsp_control_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, dsp_control_upload);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_dsp_on, fts_dsp_control_remote_dsp_on);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_dsp_print, fts_dsp_control_remote_dsp_print);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_start_collect, fts_dsp_control_fpe_start_collect);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_stop_collect, fts_dsp_control_fpe_stop_collect);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_clear_collect, fts_dsp_control_fpe_clear_collect);
-  fts_method_define_varargs(cl, fts_SystemInlet, sym_check_nan, fts_dsp_control_set_check_nan);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("dsp_restart"), fts_dsp_control_restart);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_dsp_on, dsp_control_remote_dsp_on);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_dsp_print, dsp_control_remote_dsp_print);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_start_collect, dsp_control_fpe_start_collect);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_stop_collect, dsp_control_fpe_stop_collect);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_clear_collect, dsp_control_fpe_clear_collect);
+  fts_method_define_varargs(cl, fts_SystemInlet, sym_check_nan, dsp_control_set_check_nan);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("dsp_restart"), dsp_control_restart);
 
   return fts_Success;
 }

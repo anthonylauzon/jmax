@@ -205,7 +205,7 @@ messconst_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
   fts_atom_t a;
   
-  fts_set_tuple(&a, tuple);
+  fts_set_object(&a, (fts_object_t *)tuple);
   fts_atom_assign(this->at + winlet, at);
 
   if (winlet == 0)
@@ -225,7 +225,7 @@ messconst_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 	fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
     }
   else
-    fts_object_signal_runtime_error(o, "Don't understand %s", s);
+    fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 
 }
 
