@@ -1,5 +1,9 @@
 2003-07-17  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* packages/numeric/c/src/count.c (count_set_mode): fixed handling of message "mode wrap".
+
+	* fixed bug "[ 772378 ] Small error in help patch".
+	
 	* packages/ispw/c/src/pipe.c: fixed several crashes.
 
 	* fixed bug "[ 772299 ] pipe object"
