@@ -24,23 +24,28 @@
  *
  */
 
-#include "fts.h"
+#ifndef _REFTYPE_H_
+#define _REFTYPE_H_
 
-extern void ivec_config(void);
-extern void fvec_config(void);
-extern void nsplit_config(void);
-extern void wrap_config(void);
-extern void rewrap_config(void);
+typedef struct _refdata_ *(* reftype_constructor_t)(int ac, const fts_atom_t *at);
+typedef void (* reftype_destructor_t) (struct _refdata_ *ref);
+typedef reftype_constructor_t(* reftype_dispatcher_t)(int ac, const fts_atom_t *at);
 
-static void
-numeric_init(void)
+typedef struct _reftype_
 {
-  ivec_config();
-  fvec_config();
-  nsplit_config();
-  wrap_config();
-  rewrap_config();
-}
+  fts_symbol_t sym;
+  reftype_dispatcher_t dispatcher;
+  reftype_destructor_t destructor;
+} reftype_t;
 
-fts_module_t numeric_module = {"numeric", "numeric classes", numeric_init};
+extern reftype_t *reftype_declare(fts_symbol_t sym, reftype_dispatcher_t dispatcher, reftype_destructor_t destructor);
+
+#define reftype_get_dispatcher(t) ((t)->dispatcher)
+#define reftype_get_destructor(t) ((t)->destructor)
+
+#define reftype_get_constructor(t, ac, at) (((t)->dispatcher)((ac), (at)))
+
+#endif
+
+
 

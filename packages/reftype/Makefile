@@ -23,10 +23,19 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-numeric.c \
-ivec.c \
-fvec.c \
-nsplit.c \
-wrap.c \
-rewrap.c \
+all:
+	(cd c ; $(MAKE) all)
+.PHONY: all
+
+clean:
+	(cd c ; $(MAKE) clean)
+.PHONY: clean
+
+all_c:
+	(cd c ; $(MAKE) all)
+.PHONY: all_c
+
+clean_c:
+	(cd c ; $(MAKE) clean)
+.PHONY: clean_c
+

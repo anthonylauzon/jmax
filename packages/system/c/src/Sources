@@ -24,9 +24,9 @@
 #
 
 SOURCES = \
-	arch.c \
-	dsp1.c \
-	system.c \
-	ucsobj.c \
-	var.c \
-	argument.c
+arch.c \
+dsp1.c \
+system.c \
+ucsobj.c \
+const.c \
+argument.c

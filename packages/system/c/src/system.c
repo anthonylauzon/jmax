@@ -30,8 +30,8 @@ extern void ucs_config(void);
 extern void dsp_config(void);
 extern void arch_config(void);
 
-extern var_config(void);
-extern argument_init(void);
+extern void const_config(void);
+extern void argument_init(void);
 
 static void
 system_module_init(void)
@@ -40,7 +40,7 @@ system_module_init(void)
   dsp_config();
   arch_config();
 
-  var_config();
+  const_config();
   argument_init();
 }
 

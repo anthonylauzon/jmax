@@ -25,7 +25,7 @@
  */
 
 #include "fts.h"
-#include "atommx.h"
+#include "matrix.h"
 
 static fts_symbol_t sym_ascii = 0;
 
@@ -40,7 +40,7 @@ static fts_symbol_t sym_ascii = 0;
 typedef struct 
 {
   fts_object_t ob;
-  atom_matrix_t *mx; /* atom matrix */
+  matrix_t *mx; /* atom matrix */
   fts_atom_t buf;
 } mat_t;
 
@@ -49,7 +49,9 @@ mat_init_refer(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   mat_t *this = (mat_t *)o;
 
-  this->mx = (atom_matrix_t *)fts_get_ptr(at + 1);
+  this->mx = matrix_atom_get(at + 1);
+  matrix_refer(this->mx);
+
   fts_set_void(&this->buf);
 }
 
@@ -57,10 +59,10 @@ static void
 mat_init_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  int m = fts_get_int_arg(ac, at, 1, 0);
-  int n = fts_get_int_arg(ac, at, 2, 0);
 
-  this->mx = atom_matrix_new(m, n);
+  this->mx = matrix_create(ac - 1, at + 1);
+  matrix_refer(this->mx);
+
   fts_set_void(&this->buf);
 }
 
@@ -69,7 +71,15 @@ mat_delete_define(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   mat_t *this = (mat_t *)o;
 
-  atom_matrix_delete(this->mx);
+  matrix_release(this->mx);
+}
+
+static void
+mat_delete_refer(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t *this = (mat_t *)o;
+
+  matrix_release(this->mx);
 }
 
 /********************************************************************
@@ -90,20 +100,20 @@ static void
 mat_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  atom_matrix_t *mx = (atom_matrix_t *)this->mx;
+  matrix_t *mx = (matrix_t *)this->mx;
   int i = fts_get_int_arg(ac, at, 0, 0);
   int j = fts_get_int_arg(ac, at, 1, 0);
 
-  if(i >= 0 && i < atom_matrix_get_m(mx) && j >= 0 && j <atom_matrix_get_n(mx))
+  if(i >= 0 && i < matrix_get_m(mx) && j >= 0 && j <matrix_get_n(mx))
     {      
       if(!fts_is_void(&this->buf))
 	{
-	  atom_matrix_set_element(this->mx, i, j, this->buf);
+	  matrix_set_element(this->mx, i, j, this->buf);
 	  fts_set_void(&this->buf);
 	}
       else
 	{
-	  fts_atom_t *atom = &(atom_matrix_get_element(mx, i, j));
+	  fts_atom_t *atom = &(matrix_get_element(mx, i, j));
 	  if(!fts_is_void(atom))
 	    fts_outlet_send(o, 0, fts_type_get_selector(fts_get_type(atom)), 1, atom);
 	}
@@ -123,18 +133,18 @@ static void
 mat_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  atom_matrix_t *mx = (atom_matrix_t *)this->mx;
+  matrix_t *mx = (matrix_t *)this->mx;
   
   if(ac >= 2)
     {
       int i = fts_get_int_arg(ac, at, 0, 0);
       int j = fts_get_int_arg(ac, at, 1, 0);
 
-      if(i >= 0 && i < atom_matrix_get_m(mx) && j >= 0 && j < atom_matrix_get_n(mx))
-	fts_set_void(&atom_matrix_get_element(mx, i, j));
+      if(i >= 0 && i < matrix_get_m(mx) && j >= 0 && j < matrix_get_n(mx))
+	matrix_void_element(mx, i, j);
     }
   else
-    atom_matrix_void(mx);
+    matrix_void(mx);
 }
 
 static void
@@ -143,7 +153,7 @@ mat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   mat_t *this = (mat_t *)o;
 
   if(ac)
-    atom_matrix_fill(this->mx, at[0]);
+    matrix_fill(this->mx, at[0]);
 }
 
 static void
@@ -154,7 +164,7 @@ mat_resize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   int n = fts_get_int_arg(ac, at, 0, -1);
 
   if(m * n >= 0)
-    atom_matrix_set_size(this->mx, m, n);
+    matrix_set_size(this->mx, m, n);
 }
 
 static void
@@ -163,8 +173,8 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   mat_t *this = (mat_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t file_type = fts_get_symbol_arg(ac, at, 1, sym_ascii);
-  atom_matrix_t *mx = this->mx;
-  int size;
+  matrix_t *mx = this->mx;
+  int size = 0;
 
   if(!file_name)
     return;
@@ -174,9 +184,9 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
 
       if(separator)
-	size = atom_matrix_import_ascii_separator(mx, file_name, separator, ac - 3, at + 3);
+	size = matrix_import_ascii_separator(mx, file_name, separator, ac - 3, at + 3);
       else
-	size = atom_matrix_import_ascii_newline(mx, file_name);
+	size = matrix_import_ascii_newline(mx, file_name);
 
     }
 
@@ -184,8 +194,8 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       fts_atom_t a[2];
       
-      fts_set_int(a + 0, atom_matrix_get_m(mx));
-      fts_set_int(a + 1, atom_matrix_get_n(mx));
+      fts_set_int(a + 0, matrix_get_m(mx));
+      fts_set_int(a + 1, matrix_get_n(mx));
       fts_outlet_send(o, 1, fts_s_list, 2, a);
     }
 }
@@ -196,7 +206,7 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   mat_t *this = (mat_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t file_type = fts_get_symbol_arg(ac, at, 1, sym_ascii);
-  atom_matrix_t *mx = this->mx;
+  matrix_t *mx = this->mx;
 
   if(!file_name)
     return;
@@ -206,9 +216,9 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
 
       if(separator)
-	atom_matrix_export_ascii_separator(mx, file_name, separator);
+	matrix_export_ascii_separator(mx, file_name, separator);
       else
-	atom_matrix_export_ascii_newline(mx, file_name);
+	matrix_export_ascii_newline(mx, file_name);
     }
 }
 
@@ -254,12 +264,11 @@ mat_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-mat_get_atom_matrix(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+mat_get_matrix(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   mat_t *this = (mat_t *)obj;
 
-  fts_set_ptr(value, this->mx);
-  fts_set_type(value, sym_atom_matrix);
+  matrix_atom_set(value, this->mx);
 }
 
 static fts_status_t
@@ -269,12 +278,15 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_class_init(cl, sizeof(mat_t), 2, 2, 0);
   
-  if(ac >= 2 && fts_is_a(at + 1, sym_atom_matrix))
-    fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mat_init_refer);
-  else if(ac >= 3 && fts_is_int(at + 1) && fts_is_int(at + 1))
+  if(ac == 2 && matrix_atom_is(at + 1))
+    {
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, mat_init_refer);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, mat_delete_refer);
+    }
+  else if(matrix_get_constructor(ac - 1, at + 1))
     {
       /* define variable */
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_atom_matrix);
+      fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_matrix);
 
       /* .bmax load and save */
       /*fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, mat_set_from_atom_list);*/
@@ -306,10 +318,18 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+int
+mat_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
+{
+  return (
+	  matrix_get_constructor(ac0 - 1, at0 + 1) == matrix_get_constructor(ac1 - 1, at1 + 1) &&
+	  (ac0 == 2 && matrix_atom_is(at0 + 1)) == (ac1 == 2 && matrix_atom_is(at1 + 1)));
+}
+
 void
 mat_config(void)
 {
   sym_ascii = fts_new_symbol("ascii");
 
-  fts_metaclass_install(fts_new_symbol("mat"), mat_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("mat"), mat_instantiate, mat_equiv);
 }

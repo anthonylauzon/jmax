@@ -23,10 +23,22 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-SOURCES = \
-numeric.c \
-ivec.c \
-fvec.c \
-nsplit.c \
-wrap.c \
-rewrap.c \
+DISTDIR = ../../../../fts
+PACKAGEROOT = ..
+
+include $(DISTDIR)/Makefiles/Makefile.lib
+include Sources
+
+MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
+
+MORESOLIBS=
+
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libreftype.a $(LIBDIR)/libreftype.so
+
+$(LIBDIR)/libreftype.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/libreftype.a $(OBJECTS)
+
+TOCLEAN = $(LIBDIR)/libreftype.a $(LIBDIR)/libreftype.so
+
+include $(DISTDIR)/Makefiles/Makefile.lib.end
+

@@ -23,11 +23,13 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-DISTDIR = ../../../../fts/
+DISTDIR = ../../../../fts
 PACKAGEROOT = ..
 
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
+
+MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
 all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libsystem.a $(LIBDIR)/libsystem.so
 

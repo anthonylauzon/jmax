@@ -1,4 +1,4 @@
-# 
+#
 # jMax
 # Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 # 
@@ -24,9 +24,12 @@
 #
 
 SOURCES = \
-numeric.c \
-ivec.c \
-fvec.c \
-nsplit.c \
-wrap.c \
-rewrap.c \
+reftype.c \
+refdata.c \
+intvec.c \
+floatvec.c \
+vector.c \
+matrix.c \
+getelem.c \
+getsize.c \
+

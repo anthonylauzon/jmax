@@ -26,17 +26,14 @@
 
 #include "fts.h"
 
-void atom_matrix_config(void);
 void mat_config(void);
 void getlist_config(void);
 
 static void
 generic_init(void)
 {
-  atom_matrix_config();
   mat_config();
   getlist_config();
 }
 
 fts_module_t generic_module = {"generic", "generic classes", generic_init};
-

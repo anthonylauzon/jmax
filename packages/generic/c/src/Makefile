@@ -29,7 +29,7 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
+MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
 ## On Linux, the search patch of the linked .so must be given at link time, otherwise
 ## dynamic link fails.

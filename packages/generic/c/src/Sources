@@ -25,7 +25,6 @@
 
 SOURCES = \
 generic.c \
-atommx.c \
 mat.c \
 getlist.c \
 

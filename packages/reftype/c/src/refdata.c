@@ -25,22 +25,25 @@
  */
 
 #include "fts.h"
+#include "reftype.h"
+#include "refdata.h"
 
-extern void ivec_config(void);
-extern void fvec_config(void);
-extern void nsplit_config(void);
-extern void wrap_config(void);
-extern void rewrap_config(void);
-
-static void
-numeric_init(void)
+void
+refdata_init(refdata_t *data, reftype_t *type)
 {
-  ivec_config();
-  fvec_config();
-  nsplit_config();
-  wrap_config();
-  rewrap_config();
+  data->type = type;
+  data->cnt = 0;
+  data->creator = 0;
 }
 
-fts_module_t numeric_module = {"numeric", "numeric classes", numeric_init};
+refdata_t *
+refdata_create(reftype_t *type, int ac, const fts_atom_t* at)
+{
+  reftype_constructor_t constructor = (reftype_get_dispatcher(type))(ac, at);
+  
+  if(constructor)
+    return constructor(ac, at);
+  else
+    return 0;
+}
 
