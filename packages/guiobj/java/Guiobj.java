@@ -33,130 +33,210 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 public class Guiobj implements JMaxPackage {
-
+  
   public void load()
-  {    
+{    
     JMaxObjectCreator standardCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsGraphicObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsGraphicObject( server, parent, objId, className, args, offset, length));
+    }
+     public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsGraphicObject( server, parent, objId, className, args, offset, length);
+    }  
+    }; 
     JMaxObjectCreator patcherCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Patcher( new FtsPatcherObject( server, parent, objId,  className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Patcher( new FtsPatcherObject( server, parent, objId,  className, args, offset, length));
+    }
+     public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsPatcherObject( server, parent, objId, className, args, offset, length);
+    } 
+    }; 
     JMaxObjectCreator inletCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Inlet( new FtsInletObject( server, parent, objId,  className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Inlet( new FtsInletObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsInletObject( server, parent, objId, className, args, offset, length);
+    } 
+    }; 
     JMaxObjectCreator outletCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Outlet( new FtsOutletObject( server, parent, objId,  className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Outlet( new FtsOutletObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsOutletObject( server, parent, objId, className, args, offset, length);
+    } 
+    }; 
     JMaxObjectCreator forkCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Fork( new FtsForkObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Fork( new FtsForkObject( server, parent, objId,  className, args, offset, length));
+    }
+     public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsForkObject( server, parent, objId, className, args, offset, length);
+    } 
+    };
     JMaxObjectCreator jcommentCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Comment( new FtsCommentObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Comment( new FtsCommentObject( server, parent, objId,  className, args, offset, length));
+    }
+     public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsCommentObject( server, parent, objId, className, args, offset, length);
+    } 
+    };
     JMaxObjectCreator messconstCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new MessConst( new FtsMessConstObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new MessConst( new FtsMessConstObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsMessConstObject( server, parent, objId, className, args, offset, length);
+    } 
+    };
     JMaxObjectCreator buttonCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Bang( new FtsBangObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Bang( new FtsBangObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length)  
+    {
+        return new FtsBangObject( server, parent, objId, className, args, offset, length);
+    } 
+    };
     JMaxObjectCreator toggleCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Toggle( new FtsToggleObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Toggle( new FtsToggleObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsToggleObject( server, parent, objId, className, args, offset, length);
+    }       
+    };
     JMaxObjectCreator sliderCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Slider( new FtsSliderObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Slider( new FtsSliderObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsSliderObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator intboxCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new IntBox( new FtsIntValueObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new IntBox( new FtsIntValueObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsIntValueObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator floatboxCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new FloatBox( new FtsFloatValueObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FloatBox( new FtsFloatValueObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsFloatValueObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator displayCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Display( new FtsDisplayObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Display( new FtsDisplayObject( server, parent, objId,  className, args, offset, length));
+    }
+     public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsDisplayObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator vecdisplayCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new VectorDisplay( new FtsVectorDisplayObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new VectorDisplay( new FtsVectorDisplayObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsVectorDisplayObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator matdisplayCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new MatDisplay( new FtsMatDisplayObject( server, parent, objId,  className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new MatDisplay( new FtsMatDisplayObject( server, parent, objId,  className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsMatDisplayObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator scopeCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Scope( new FtsScopeObject( server, parent, objId, className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Scope( new FtsScopeObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsScopeObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator monitorCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Monitor( new FtsMonitorObject( server, parent, objId, className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Monitor( new FtsMonitorObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsMonitorObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator xyPadCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new XYPad( new FtsXYPadObject( server, parent, objId, className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new XYPad( new FtsXYPadObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsXYPadObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator defineCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Define( new FtsDefineObject( server, parent, objId, className, args, offset, length));
-	}
-      };
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Define( new FtsDefineObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsDefineObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
     JMaxObjectCreator inputCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Input( new FtsInputObject( server, parent, objId, className, args, offset, length));
-	}
-      };
-
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Input( new FtsInputObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsInputObject( server, parent, objId, className, args, offset, length);
+    }    
+    };
+    
     JMaxClassMap.put( "standard", standardCreator, "/icons/standard.gif", "/icons/standard_selected.gif", "/icons/standard_cursor.gif", "standard", this);
     JMaxClassMap.put( "jpatcher", patcherCreator, "/icons/jpatcher.gif", "/icons/jpatcher_selected.gif", "/icons/jpatcher_cursor.gif", "patcher", this);
     JMaxClassMap.put( "receive", inletCreator, "/icons/inlet.gif",  "/icons/inlet_selected.gif", "/icons/inlet_cursor.gif", "inlet label", this);
@@ -177,7 +257,7 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_selected.gif", "/icons/scope_cursor.gif", "oscilloscope", this);
     JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monitor_selected.gif", "/icons/monitor_cursor.gif", "monitor", this);
     JMaxClassMap.put( "input~", inputCreator, "/icons/input.gif", "/icons/input_selected.gif", "/icons/input_cursor.gif", "input", this);
-  }
+}
 }
 
 

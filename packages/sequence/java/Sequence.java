@@ -29,27 +29,35 @@ import java.awt.Font;
 import java.io.*;
 
 public class Sequence implements JMaxPackage {
-
+  
   public void load()
-  {    
+{    
     JMaxObjectCreator sequenceCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsSequenceObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsSequenceObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsSequenceObject( server, parent, objId, className, args, offset, length);
+    }   
+    }; 
     JMaxObjectCreator trackCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsTrackObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
-
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsTrackObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsTrackObject( server, parent, objId, className, args, offset, length);
+    }   
+    }; 
+    
     JMaxClassMap.put( "sequence", sequenceCreator, null, null, "sequence", this);
     JMaxClassMap.put( "track", trackCreator, null, null, "track", this);
-  
+    
 		/*SequenceImages.init();*/
     ircam.jmax.editors.sequence.renderers.SequenceFonts.init();
-  }
+}
 }
 

@@ -57,6 +57,7 @@ public static void init()
 	setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
 	setFactoryFor(IntegerValue.info, IntegerTrackEditorFactory.instance);
 	setFactoryFor(FloatValue.info, FloatTrackEditorFactory.instance);
+  setFactoryFor(FmatValue.info, FmatTrackEditorFactory.instance);
 	//setFactoryFor(MessageValue.info, MessageTrackEditorFactory.instance);
 	//setFactoryFor(MidiValue.info, IntegerTrackEditorFactory.instance);
 }

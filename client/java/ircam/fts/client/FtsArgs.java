@@ -149,8 +149,6 @@ public class FtsArgs implements java.io.Serializable
       addObject( (FtsObject)value);
   }
 
-
-
   public final boolean isInt( int index)
   {
     return array[index].isInt();

@@ -14,6 +14,9 @@ EventValue.java \
 FloatTrackEditor.java \
 FloatTrackEditorFactory.java \
 FloatValue.java \
+FmatTrackEditor.java \
+FmatTrackEditorFactory.java \
+FmatValue.java \
 IntegerTrackEditor.java \
 IntegerTrackEditorFactory.java \
 IntegerValue.java \

@@ -6,6 +6,7 @@ AnythingEventRenderer.java \
 AnythingTrackBackground.java \
 AnythingTrackForeground.java \
 AnythingTrackRenderer.java \
+FmatEventRenderer.java \
 IntegerEventRenderer.java \
 IntegerTrackRenderer.java \
 MarkerEventRenderer.java \

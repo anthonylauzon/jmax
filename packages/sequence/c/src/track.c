@@ -1026,20 +1026,31 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
       fts_method_t method_append_properties = fts_class_get_method_varargs(type, seqsym_append_properties);
       int size = 0;
       fts_atom_t *atoms = 0;
-      
+            
       fts_array_set_size(temp_array, 0);
       fts_array_append_int(temp_array, fts_object_get_id((fts_object_t *)event));
       fts_array_append_float(temp_array, event_get_time(event));
       fts_array_append_symbol(temp_array, fts_get_class_name(&event->value));
-      
+            
       /* get array of properties and types from class */
       if(method_append_properties)
       {
         fts_atom_t a;
-        
+                
         fts_set_pointer(&a, temp_array);
         
         (*method_append_properties)( fts_get_object( event_get_value( event)), 0, 0, 1, &a);
+      }
+      else /* not a score object but other object as fmat */ 
+      {
+        /* register value and send object id as value-property */
+        fts_object_t *valobj = fts_get_object( event_get_value( event));
+        
+        if(!fts_object_has_id(valobj))
+          fts_client_register_object(valobj, fts_object_get_client_id((fts_object_t *)this));	
+        
+        fts_array_append_symbol(temp_array, seqsym_objid);
+        fts_array_append_int(temp_array, fts_object_get_id(valobj));                  
       }
       
       size = fts_array_get_size(temp_array);

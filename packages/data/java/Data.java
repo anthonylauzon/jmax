@@ -40,39 +40,63 @@ public class Data implements JMaxPackage
 {    
     JMaxObjectCreator bpfCreator = new JMaxObjectCreator() {
       public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-    {
+      {
         return new Standard( new FtsBpfObject( server, parent, objId, className, args, offset, length));
-    }
+      }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+      {
+        return new FtsBpfObject( server, parent, objId, className, args, offset, length);
+      }
     }; 
     JMaxObjectCreator ivecCreator = new JMaxObjectCreator() {
       public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
     {
         return new Standard( new FtsIvecObject( server, parent, objId, className, args, offset, length));
     }
+     public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsIvecObject( server, parent, objId, className, args, offset, length);
+    }      
     }; 
     JMaxObjectCreator fvecCreator = new JMaxObjectCreator() {
       public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
     {
         return new Standard( new FtsFvecObject( server, parent, objId, className, args, offset, length));
     }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length)  
+    {
+        return new FtsFvecObject( server, parent, objId, className, args, offset, length);
+    }  
     }; 
     JMaxObjectCreator matCreator = new JMaxObjectCreator() {
       public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
     {
         return new Standard( new FtsMatObject( server, parent, objId, className, args, offset, length));
     }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsMatObject( server, parent, objId, className, args, offset, length);
+    }  
     };  
     JMaxObjectCreator dictCreator = new JMaxObjectCreator() {
       public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
     {
         return new Standard( new FtsDictObject( server, parent, objId, className, args, offset, length));
     }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsDictObject( server, parent, objId, className, args, offset, length);
+    }  
     }; 
     JMaxObjectCreator fmatCreator = new JMaxObjectCreator() {
       public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
     {
         return new Standard( new FtsFmatObject( server, parent, objId, className, args, offset, length));
     }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsFmatObject( server, parent, objId, className, args, offset, length);
+    }        
     };  
     
     JMaxClassMap.put( "bpf", bpfCreator, null, null, "bpf", this);

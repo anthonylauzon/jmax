@@ -19,14 +19,49 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.jmax;
 
-import ircam.fts.client.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.editors.patcher.objects.*;
+package ircam.jmax.editors.sequence;
 
-public interface JMaxObjectCreator
+import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.Event;
+import ircam.jmax.editors.sequence.renderers.*;
+
+import java.beans.*;
+
+/**
+* An adapter that treats the y parameter as a constant*/
+public class FmatAdapter extends MonoDimensionalAdapter{
+  
+  public FmatAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
+  {
+    super(geometry, gc, constant);
+  }
+
+public String getType( Event e)
 {
-  public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] at, int offset, int ac);
-  public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] at, int offset, int ac);
+  return "fmat";
 }
+
+public int getViewMode()
+{
+	return FmatTrackEditor.FMAT_VIEW;
+}
+public void setViewMode(int mode){}
+
+
+public void setType( Event e, String type){}
+public void setLenght(Event e, int l)
+{
+  LenghtMapper.set(e, (double)((double)l/geometry.getXZoom()) );
+}
+public boolean isEditable(Event evt)
+{
+  return true;
+}
+}
+
+
+
+
+

@@ -12,6 +12,8 @@ DurationMapper.java \
 FloatAdapter.java \
 FloatMapper.java \
 FloatValueDataFlavor.java \
+FmatAdapter.java \
+FmatValueDataFlavor.java \
 FtsSequenceObject.java \
 FtsTrackObject.java \
 FtsTrackEditorObject.java \

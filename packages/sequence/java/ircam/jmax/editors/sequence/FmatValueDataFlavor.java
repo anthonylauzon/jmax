@@ -19,44 +19,27 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence;
 
-import ircam.jmax.editors.sequence.*;
-import java.util.*;
+import java.awt.datatransfer.*;
+import ircam.jmax.editors.sequence.track.*;
 
-/**
- * A class used to register ValueInfo and acces it by name*/
-public class ValueInfoTable {
-
-  public static void registerInfo(ValueInfo info)
-  {
-    infos.put(info.getName(), info);
-  }
+public class FmatValueDataFlavor extends DataFlavor {
   
-  public static ValueInfo getValueInfo(String type)
+  FmatValueDataFlavor(Class representation, String name)
   {
-    ValueInfo info = (ValueInfo)(infos.get(type));
-    if(info == null)
-      info = AnythingValue.info;
-    
-    return info;
+    super(representation, name);
   }
 
-  public static Enumeration getTypeNames()
+  public static FmatValueDataFlavor getInstance()
   {
-    return infos.keys();
+    if (sharedInstance == null)
+      sharedInstance = new FmatValueDataFlavor(ircam.jmax.editors.sequence.track.FmatValue.class, "FmatValue"); 
+    return sharedInstance;
   }
 
-  public static void init()
-  {
-    ValueInfoTable.registerInfo(AmbitusValue.info);
-    ValueInfoTable.registerInfo(IntegerValue.info);
-    ValueInfoTable.registerInfo(MessageValue.info);
-    ValueInfoTable.registerInfo(FloatValue.info);
-		ValueInfoTable.registerInfo(MarkerValue.info);
-    ValueInfoTable.registerInfo(FmatValue.info);
-  }
-
-  //---
-  private static Hashtable infos = new Hashtable();
+  private static FmatValueDataFlavor sharedInstance;
 }
+
+
+

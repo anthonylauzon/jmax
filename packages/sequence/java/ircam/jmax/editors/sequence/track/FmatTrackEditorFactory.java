@@ -23,40 +23,23 @@ package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.editors.sequence.*;
 import java.util.*;
-
+import javax.swing.*;
+import ircam.jmax.toolkit.*;
 /**
- * A class used to register ValueInfo and acces it by name*/
-public class ValueInfoTable {
-
-  public static void registerInfo(ValueInfo info)
+* Creates new MidiTrack editors. */
+public class FmatTrackEditorFactory implements TrackEditorFactory {
+  
+  public TrackEditor newEditor(Track track, Geometry geometry, boolean isInsequence)
   {
-    infos.put(info.getName(), info);
+    return new FmatTrackEditor(geometry, track, isInsequence);
+  }
+
+  public int getWeight()
+  {
+    return MONODIMENSIONAL_EDITOR_WEIGHT;
   }
   
-  public static ValueInfo getValueInfo(String type)
-  {
-    ValueInfo info = (ValueInfo)(infos.get(type));
-    if(info == null)
-      info = AnythingValue.info;
-    
-    return info;
-  }
-
-  public static Enumeration getTypeNames()
-  {
-    return infos.keys();
-  }
-
-  public static void init()
-  {
-    ValueInfoTable.registerInfo(AmbitusValue.info);
-    ValueInfoTable.registerInfo(IntegerValue.info);
-    ValueInfoTable.registerInfo(MessageValue.info);
-    ValueInfoTable.registerInfo(FloatValue.info);
-		ValueInfoTable.registerInfo(MarkerValue.info);
-    ValueInfoTable.registerInfo(FmatValue.info);
-  }
-
-  //---
-  private static Hashtable infos = new Hashtable();
+  //-- Fields
+  static int MONODIMENSIONAL_EDITOR_WEIGHT = 4;
+  public static FmatTrackEditorFactory instance = new FmatTrackEditorFactory();
 }

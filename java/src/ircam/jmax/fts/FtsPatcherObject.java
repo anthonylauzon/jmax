@@ -99,7 +99,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
    * object in FTS
    */
 
-  static GraphicObject makeGraphicObjectFromServer(FtsServer server, FtsObject parent, int objId, String className, 
+  static public GraphicObject makeGraphicObjectFromServer(FtsServer server, FtsObject parent, int objId, String className, 
 						   FtsAtom args[], int offset, int nArgs)
   {
     JMaxObjectCreator creator = null;

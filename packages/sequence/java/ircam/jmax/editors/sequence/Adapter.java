@@ -202,6 +202,10 @@ abstract public class Adapter implements MappingListener{
   {
       return false;
   }
+  public boolean isEditable(Event evt)
+  {
+    return false;
+  }
   /**
    * MappingListener interface
    */

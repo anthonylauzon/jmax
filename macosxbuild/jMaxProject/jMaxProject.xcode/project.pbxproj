@@ -110,6 +110,96 @@
 			settings = {
 			};
 		};
+		3B5C4AC206B7C23A00CC2ECC = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FmatValue.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/FmatValue.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B5C4AC306B7C23A00CC2ECC = {
+			fileRef = 3B5C4AC206B7C23A00CC2ECC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B5C4AC406B7DFDE00CC2ECC = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FmatTrackEditor.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/FmatTrackEditor.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B5C4AC506B7DFDE00CC2ECC = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FmatTrackEditorFactory.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/FmatTrackEditorFactory.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B5C4AC606B7DFDE00CC2ECC = {
+			fileRef = 3B5C4AC406B7DFDE00CC2ECC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B5C4AC706B7DFDE00CC2ECC = {
+			fileRef = 3B5C4AC506B7DFDE00CC2ECC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B5C4AF806B7E39500CC2ECC = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FmatValueDataFlavor.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/FmatValueDataFlavor.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B5C4AF906B7E39500CC2ECC = {
+			fileRef = 3B5C4AF806B7E39500CC2ECC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B5C4AFA06B7E40100CC2ECC = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FmatEventRenderer.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/FmatEventRenderer.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B5C4AFB06B7E40100CC2ECC = {
+			fileRef = 3B5C4AFA06B7E40100CC2ECC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B5C4B1206B80DEF00CC2ECC = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = FmatAdapter.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/FmatAdapter.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B5C4B1306B80DEF00CC2ECC = {
+			fileRef = 3B5C4B1206B80DEF00CC2ECC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B6C0F200679CE5D00A89F54 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -10112,7 +10202,7 @@
 				INSTALL_PATH = "";
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
+				JAVA_CLASS_SEARCH_PATHS = "build/data.jar build/jmax.jar build/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
@@ -10296,6 +10386,12 @@
 				3BFBB6F8066E20EB00C7446F,
 				3BA5DEB706789BC90010BF0D,
 				3B6C0F210679CE5D00A89F54,
+				3B5C4AC306B7C23A00CC2ECC,
+				3B5C4AC606B7DFDE00CC2ECC,
+				3B5C4AC706B7DFDE00CC2ECC,
+				3B5C4AF906B7E39500CC2ECC,
+				3B5C4AFB06B7E40100CC2ECC,
+				3B5C4B1306B80DEF00CC2ECC,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18365,6 +18461,8 @@
 				F85123E2028BEAB301664092,
 				F85123E3028BEAB301664092,
 				F85123E4028BEAB301664092,
+				3B5C4B1206B80DEF00CC2ECC,
+				3B5C4AF806B7E39500CC2ECC,
 				F85123E5028BEAB301664092,
 				3B7ADDF00611B6320098F129,
 				F85123E6028BEAB301664092,
@@ -18615,6 +18713,7 @@
 				F85123C3028BEAB301664092,
 				F85123C4028BEAB301664092,
 				F85123C5028BEAB301664092,
+				3B5C4AFA06B7E40100CC2ECC,
 				F85123C6028BEAB301664092,
 				F85123C7028BEAB301664092,
 				3BFD0F5D066CC9C7009D9668,
@@ -18835,6 +18934,9 @@
 				F8512491028BEBB201664092,
 				F8512492028BEBB201664092,
 				F8512493028BEBB201664092,
+				3B5C4AC406B7DFDE00CC2ECC,
+				3B5C4AC506B7DFDE00CC2ECC,
+				3B5C4AC206B7C23A00CC2ECC,
 				F8512494028BEBB201664092,
 				F8512495028BEBB201664092,
 				F8512496028BEBB201664092,

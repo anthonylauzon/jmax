@@ -122,10 +122,13 @@ void addEvent(int x, int y, EventValue value)
 public void selectionPointDoubleClicked(int x, int y, int modifiers) 
 {
 	super.selectionPointDoubleClicked(x, y, modifiers);
-	if (gc.getRenderManager().firstObjectContaining(x, y) == null)
+  
+  TrackEvent evt = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+	if (evt == null)
 		((SequenceGraphicContext)gc).getTrackEditor().showListDialog(); //double click on backGround
-		else
-			((SequenceGraphicContext)gc).getTrackEditor().showListDialog();//double click on event
+		else 
+      if(!((SequenceGraphicContext)gc).getAdapter().isEditable(evt))
+        ((SequenceGraphicContext)gc).getTrackEditor().showListDialog();//double click on event
 }
 
 public void edit(int x, int y, int modifiers)

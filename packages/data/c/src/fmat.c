@@ -3894,7 +3894,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fmat_t *self = (fmat_t *)o;
   int m = 0;
   int n = 1;
-
+    
   fmat_initialize(self);
   
   if(ac > 0 && fts_is_number(at))
@@ -3979,8 +3979,6 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(self->values != NULL)
     fts_free(self->values - HEAD_POINTS);
 }
-
-
 
 
 /*********************************************************

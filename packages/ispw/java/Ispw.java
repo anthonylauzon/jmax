@@ -28,32 +28,44 @@ import ircam.jmax.editors.explode.*;
 import ircam.fts.client.*;
 
 public class Ispw implements JMaxPackage {
-
+  
   public void load()
-  {    
+{    
     JMaxObjectCreator messageCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Message( new FtsMessageObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
-
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Message( new FtsMessageObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsMessageObject( server, parent, objId, className, args, offset, length);
+    }      
+    }; 
+    
     JMaxObjectCreator qlistCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsQListObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsQListObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsQListObject( server, parent, objId, className, args, offset, length);
+    }      
+    }; 
     
     JMaxObjectCreator explodeCreator = new JMaxObjectCreator() {
-	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
-	{
-	  return new Standard( new FtsExplodeObject( server, parent, objId, className, args, offset, length));
-	}
-      }; 
-
+      public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new Standard( new FtsExplodeObject( server, parent, objId, className, args, offset, length));
+    }
+      public FtsGraphicObject createFtsObject( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+    {
+        return new FtsExplodeObject( server, parent, objId, className, args, offset, length);
+    }      
+    }; 
+    
     JMaxClassMap.put( "messbox", messageCreator, "/icons/messbox.gif", "/icons/messbox_selected.gif", "/icons/messbox_cursor.gif", "old message box", this);
     JMaxClassMap.put( "qlist", qlistCreator, null, null, "qlist", this);
     JMaxClassMap.put( "explode", explodeCreator, null, null, "explode", this);    
-  }
+}
 }

@@ -87,6 +87,12 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
     }
   }
 
+  public FtsFmatObject(FtsServer server, FtsObject parent, int objId)
+  {
+    super(server, parent, objId); 
+    listeners = new MaxVector();
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from the server
   //////////////////////////////////////////////////////////////////////////////////////
