@@ -64,6 +64,8 @@ typedef struct fts_sched
 /* the global scheduler */
 static fts_sched_t main_sched;
 
+/* running sched param */
+static fts_param_t* sched_running_param = 0;
 
 static fts_sched_t *
 fts_sched_get_current(void)
@@ -91,10 +93,10 @@ int fts_sched_add( fts_object_t *obj, int flags, ...)
 
   mth = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_sched_ready);
   if(!mth)
-    {
-      fprintf( stderr, "[sched] object %s does not define a method for \"sched_ready\"\n", fts_class_get_name(fts_object_get_class(obj)));
-      return -1;
-    }
+  {
+    fprintf( stderr, "[sched] object %s does not define a method for \"sched_ready\"\n", fts_class_get_name(fts_object_get_class(obj)));
+    return -1;
+  }
 
   callback = (sched_callback_t *)fts_malloc( sizeof( sched_callback_t));
   callback->object = obj;
@@ -119,19 +121,19 @@ int fts_sched_remove( fts_object_t *obj)
   p = &sched->callback_head;
 
   while (*p)
+  {
+    if ( (*p)->object == obj)
     {
-      if ( (*p)->object == obj)
-	{
-	  sched_callback_t *to_remove;
+      sched_callback_t *to_remove;
 
-	  to_remove = *p;
-	  *p = (*p)->next;
+      to_remove = *p;
+      *p = (*p)->next;
 
-	  fts_free( to_remove);
-	}
-      else
-	p = &(*p)->next;
+      fts_free( to_remove);
     }
+    else
+      p = &(*p)->next;
+  }
 
   return -1;
 }
@@ -147,20 +149,20 @@ static int compute_fds( fts_sched_t *sched, fd_set *readfds, fd_set *writefds, f
 
   n_fd = 0;
   for ( callback = sched->callback_head; callback; callback = callback->next)
-    {
-      if (callback->flags == FTS_SCHED_ALWAYS)
-	continue;
+  {
+    if (callback->flags == FTS_SCHED_ALWAYS)
+      continue;
 
-      if ( callback->fd > n_fd)
-	n_fd = callback->fd;
+    if ( callback->fd > n_fd)
+      n_fd = callback->fd;
 
-      if (callback->flags == FTS_SCHED_READ)
-	FD_SET( callback->fd, readfds);
-      else
-	FD_SET( callback->fd, writefds);
+    if (callback->flags == FTS_SCHED_READ)
+      FD_SET( callback->fd, readfds);
+    else
+      FD_SET( callback->fd, writefds);
 
-      FD_SET( callback->fd, exceptfds);
-    }
+    FD_SET( callback->fd, exceptfds);
+  }
 
   return n_fd;
 }
@@ -177,10 +179,10 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
   r = select( n_fd+1, readfds, writefds, exceptfds, &tv);
 
   if (r < 0)
-    {
-      fprintf( stderr, "[FTS] select error (%s)\n", strerror( errno));
-      return;
-    }
+  {
+    fprintf( stderr, "[FTS] select error (%s)\n", strerror( errno));
+    return;
+  }
   else if ( r == 0)
     return;
 
@@ -189,23 +191,23 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
      the entry in the scheduler callback list.
   */
   for ( callback = sched->callback_head; callback; callback = next)
+  {
+    int fd = callback->fd;
+    fts_atom_t a;
+
+    next = callback->next;
+
+    fts_set_int( &a, fd);
+
+    if ( callback->error_mth && FD_ISSET( fd, exceptfds))
+      (*callback->error_mth)( callback->object, fts_system_inlet, fts_s_sched_error, 1, &a);
+    else
     {
-      int fd = callback->fd;
-      fts_atom_t a;
-
-      next = callback->next;
-
-      fts_set_int( &a, fd);
-
-      if ( callback->error_mth && FD_ISSET( fd, exceptfds))
-	(*callback->error_mth)( callback->object, fts_system_inlet, fts_s_sched_error, 1, &a);
-      else
-	{
-	  if ( (callback->flags == FTS_SCHED_READ && FD_ISSET( fd, readfds))
-	       || (callback->flags == FTS_SCHED_WRITE && FD_ISSET( fd, writefds)) )
-	    (*callback->ready_mth)( callback->object, fts_system_inlet, fts_s_sched_ready, 1, &a);
-	}
+      if ( (callback->flags == FTS_SCHED_READ && FD_ISSET( fd, readfds))
+	   || (callback->flags == FTS_SCHED_WRITE && FD_ISSET( fd, writefds)) )
+	(*callback->ready_mth)( callback->object, fts_system_inlet, fts_s_sched_ready, 1, &a);
     }
+  }
 }
 
 static void run_always( fts_sched_t *sched)
@@ -217,12 +219,12 @@ static void run_always( fts_sched_t *sched)
      the entry in the scheduler callback list.
   */
   for ( callback = sched->callback_head; callback; callback = next)
-    {
-      next = callback->next;
+  {
+    next = callback->next;
 
-      if ( callback->flags == FTS_SCHED_ALWAYS)
-	(*callback->ready_mth)( callback->object, fts_system_inlet, fts_s_sched_ready, 0, 0);
-    }
+    if ( callback->flags == FTS_SCHED_ALWAYS)
+      (*callback->ready_mth)( callback->object, fts_system_inlet, fts_s_sched_ready, 0, 0);
+  }
 }
 
 static void fts_sched_do_select(fts_sched_t *sched)
@@ -240,19 +242,20 @@ static void fts_sched_do_select(fts_sched_t *sched)
 
 void fts_sched_run_one_tick(void)
 {
-    fts_sched_t* sched = fts_sched_get_current();
-    fts_sched_do_select(sched);
+  fts_sched_t* sched = fts_sched_get_current();
+  fts_sched_do_select(sched);
 }
 
 void fts_sched_run_one_tick_without_select(void)
 {
-    fts_sched_t* sched = fts_sched_get_current();
-    run_always(sched);
+  fts_sched_t* sched = fts_sched_get_current();
+  run_always(sched);
 }
 
 void
 fts_sched_init(fts_sched_t *sched)
 {
+  fts_param_set_int(sched_running_param, 1);
   sched->callback_head = 0;
   sched->status = sched_ready;
 }
@@ -269,9 +272,26 @@ fts_sched_run(void)
 void 
 fts_sched_halt(void)
 {
+  fts_param_set_int(sched_running_param, 0);
   main_sched.status = sched_halted;
 }
 
+int fts_sched_is_running(void)
+{
+  return main_sched.status != sched_halted;
+}
+
+void
+fts_sched_running_add_listener(fts_object_t* object, fts_method_t method)
+{
+  fts_param_add_listener(sched_running_param, object, method);
+}
+
+void 
+fts_sched_running_remove_listener(fts_object_t* object)
+{
+  fts_param_remove_listener(sched_running_param, object);
+}
 /************************************************************
  *
  *  platform dependent implementation of
@@ -300,21 +320,21 @@ void
 fts_sleep(void)
 {
   if ( ++sleeper.count == 5) 
-    {
-      double ftstime = fts_get_time() - sleeper.ftsstart;
-      double systime = GetTickCount() - sleeper.sysstart;
-      double delta = ftstime - systime;
+  {
+    double ftstime = fts_get_time() - sleeper.ftsstart;
+    double systime = GetTickCount() - sleeper.sysstart;
+    double delta = ftstime - systime;
       
 #if DEBUG_SLEEP
-      FILE* log = fopen("C:\\nullaudiolog.txt", "a");
-      fprintf(log, "fts time=%f, sys time=%f, delta=%f\n", ftstime, systime, delta);
-      fclose(log);
+    FILE* log = fopen("C:\\nullaudiolog.txt", "a");
+    fprintf(log, "fts time=%f, sys time=%f, delta=%f\n", ftstime, systime, delta);
+    fclose(log);
 #endif
       
-      sleeper.count = 0;
+    sleeper.count = 0;
       
-      if (delta > 0)
-	Sleep((DWORD) delta);
+    if (delta > 0)
+      Sleep((DWORD) delta);
   }
 }
 
@@ -337,16 +357,16 @@ fts_sleep(void)
   
 
   if (now - last_sleep >= (double)100.0)
-    {
-      struct timespec pause_time;
+  {
+    struct timespec pause_time;
 
-      pause_time.tv_sec = 0;
-      pause_time.tv_nsec = 100000000L;
+    pause_time.tv_sec = 0;
+    pause_time.tv_nsec = 100000000L;
 
-      nanosleep( &pause_time, 0);
+    nanosleep( &pause_time, 0);
 
-      last_sleep = now;
-    }
+    last_sleep = now;
+  }
 }
 #endif
 
@@ -361,5 +381,14 @@ void fts_kernel_sched_init(void)
 {
   sleep_init();
 
+  sched_running_param = (fts_param_t*)fts_object_create(fts_param_class, 0, 0);
   fts_sched_init(&main_sched);
 }
+
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
