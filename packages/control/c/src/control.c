@@ -32,6 +32,8 @@
 extern void switch_config(void);
 extern void oneshot_config(void);
 extern void demux_config(void);
+extern void for_config(void);
+extern void range_config(void);
 
 static void
 control_init(void)
@@ -42,6 +44,8 @@ control_init(void)
   switch_config();
   oneshot_config();
   demux_config();
+  for_config();
+  range_config();
 }
 
 fts_module_t control_module = {"control", "control classes", control_init, 0, 0};

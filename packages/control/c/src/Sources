@@ -31,3 +31,5 @@ catch.c \
 switch.c \
 oneshot.c \
 demux.c \
+for.c \
+range.c \
