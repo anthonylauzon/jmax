@@ -461,7 +461,7 @@ public void export()
 public void importMidiFile()
 {
   try{
-    send( FtsSymbol.get("import_midifile_dialog"));
+    send( FtsSymbol.get("import"));
   }
   catch(IOException e)
 {
