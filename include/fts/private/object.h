@@ -29,4 +29,7 @@ extern void fts_object_set_id(fts_object_t *obj, int id);
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at);
 
+/* thru objects */
+#define fts_object_is_thru(o) fts_class_is_thru((o)->head.cl)
+
 #endif

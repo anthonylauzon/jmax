@@ -69,6 +69,7 @@ extern "C" {
 #include <fts/symbol.h>
 
 #include <fts/array.h>
+#include <fts/buffer.h>
 #include <fts/iterator.h>
 #include <fts/hashtable.h>
 #include <fts/objectlist.h>
@@ -105,7 +106,10 @@ extern "C" {
 #include <fts/audio.h>
 
 
-  FTS_API void fts_init( void);
+/*
+ * FTS global initialization 
+ */
+FTS_API void fts_init( void);
 
 #ifdef __cplusplus
 }

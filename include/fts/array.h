@@ -136,7 +136,7 @@ FTS_API void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at)
 #define fts_array_get_atoms( array) ((array)->atoms)
 
 /**
- * Get the size of an array
+ * Get the number of elements in an array
  * 
  * @fn int fts_array_get_size( fts_array_t *array)
  * @param array the array
