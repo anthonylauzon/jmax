@@ -1,5 +1,6 @@
 package ircam.jmax.editors.patcher;
 
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -13,22 +14,54 @@ import ircam.jmax.toolkit.*;
 
 public class AddPopUp extends JPopupMenu
 {
-  private ErmesSketchPad sketch;  
+  static private AddPopUp popup = new AddPopUp();
+  static private Hashtable subMenus = new Hashtable();
+
   int x;
   int y;
 
-  class AddPopUpListener implements ActionListener
+  static class AddPopUpListener implements ActionListener
   {
     String descr;
+    AddPopUp popup;
 
-    AddPopUpListener(String descr)
+    AddPopUpListener(String descr, AddPopUp popup)
     {
       this.descr = descr;
+      this.popup = popup;
     }
 
     public void actionPerformed( ActionEvent e)
-    { 
-      sketch.makeObject(descr, x, y);
+    {
+      Component invoker;
+      
+      invoker = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
+      ((ErmesSketchPad) invoker).makeObject(descr, popup.x, popup.y);
+    }
+  };
+
+  static class AddPopUpSubMenuListener implements ActionListener
+  {
+
+    String descr;
+    AddPopUp popup;
+
+    AddPopUpSubMenuListener(String descr, AddPopUp popup)
+    {
+      this.descr = descr;
+      this.popup = popup;
+    }
+
+    public void actionPerformed( ActionEvent e)
+    {
+      Component menu;
+      Component invoker;
+      ErmesSketchPad editor;
+
+      menu    = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
+      invoker = ((JPopupMenu) menu.getParent()).getInvoker();
+
+      ((ErmesSketchPad) invoker).makeObject(descr, popup.x, popup.y);
     }
   };
 
@@ -36,43 +69,93 @@ public class AddPopUp extends JPopupMenu
   // Constructor accepting the number of in/out to show in the popup
   //
 
-  public AddPopUp(ErmesSketchPad sketch)
+  public AddPopUp()
   {
-    this.sketch = sketch;
-
     insertButtons();
   }
 
-
-  private void addButton( String descr, String iconName)
+  private void addButton(String descr, String iconName)
   {
     JMenuItem item;
 
     item = new JMenuItem(Icons.get(iconName));
-    item.addActionListener(new AddPopUpListener(descr));
+    item.addActionListener(new AddPopUpListener(descr, this));
     add(item);
   }
 
+
   private void insertButtons()
   {
-    addButton( "", "_object_");
-    addButton( "messbox", "_message_box_");
-    addButton( "jpatcher", "_patcher_");
-    addButton( "inlet -1", "_inlet_");
-    addButton( "outlet -1","_outlet_");
-    addButton( "comment", "_comment_");
-    addButton( "button",  "_button_");
-    addButton( "toggle",  "_toggle_");
-    addButton( "slider",  "_slider_");
-    addButton( "intbox",   "_intbox_");
-    addButton( "floatbox", "_floatbox_");
+    addButton("", "_object_");
+    addButton("messbox", "_message_box_");
+    addButton("jpatcher", "_patcher_");
+    addButton("inlet -1", "_inlet_");
+    addButton("outlet -1","_outlet_");
+    addButton("comment", "_comment_");
+    addButton("button",  "_button_");
+    addButton("toggle",  "_toggle_");
+    addButton("slider",  "_slider_");
+    addButton("intbox",   "_intbox_");
+    addButton("floatbox", "_floatbox_");
   }
 
-  public void show(Component invoker, int x, int y)
+  static public void popup(Component invoker, int x, int y)
   {
-    this.x = x;
-    this.y = y;
-    super.show(invoker, x, y);
+    popup.x = x;
+    popup.y = y;
+    popup.show(invoker, x - 2, y - 2);
+  }
+
+
+  static public void addAbbreviation(String cmd, String descr)
+  {
+    JMenuItem item;
+
+    if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
+      item = new JMenuItem(Icons.get(cmd));
+    else
+      item = new JMenuItem(cmd);
+
+    item.addActionListener(new AddPopUpListener(descr, popup));
+    popup.add(item);
+  }
+
+
+  static JMenu addAbbreviationMenu(String name)
+  {
+    JMenu menu;
+
+    if (name.charAt(0) == '%')
+      {
+	menu = new JMenu();
+	menu.setIcon(Icons.get(name));
+      }
+    else
+      menu = new JMenu(name);
+
+    popup.add(menu);
+    subMenus.put(name, menu);
+
+    return menu;
+  }
+
+  static public void addAbbreviation(String menuName, String cmd, String descr)
+  {
+    JMenuItem item;
+    JMenu menu;
+
+    menu = (JMenu) subMenus.get(menuName);
+
+    if (menu == null)
+      menu = addAbbreviationMenu(menuName);
+    
+    if ((cmd.charAt(0) == '%') || (cmd.charAt(0) == '_'))
+      item = new JMenuItem(Icons.get(cmd));
+    else
+      item = new JMenuItem(cmd);
+
+    item.addActionListener(new AddPopUpSubMenuListener(descr, popup));
+    menu.add(item);
   }
 }
 

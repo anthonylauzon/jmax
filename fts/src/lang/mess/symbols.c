@@ -95,6 +95,7 @@ fts_symbol_t fts_s_fontSize;
 fts_symbol_t fts_s_size;
 fts_symbol_t fts_s_comment;
 fts_symbol_t fts_s_layer;
+fts_symbol_t fts_s_color;
 fts_symbol_t fts_s_error;
 fts_symbol_t fts_s_error_description;
 fts_symbol_t fts_s_state;
@@ -222,6 +223,7 @@ fts_predefine_symbols(void)
   fts_s_size       = fts_new_symbol("size");
   fts_s_comment    = fts_new_symbol("comment");
   fts_s_layer      = fts_new_symbol("layer");
+  fts_s_color      = fts_new_symbol("color");
   fts_s_state      = fts_new_symbol("state");
   fts_s_abstraction = fts_new_symbol("abstraction");
   fts_s_template   = fts_new_symbol("template");

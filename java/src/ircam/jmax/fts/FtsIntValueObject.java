@@ -62,7 +62,7 @@ public class FtsIntValueObject extends FtsObject
     if (name == "value")
       {
 	value = newValue;
-	
+
 	if (listener instanceof FtsIntValueListener)
 	  ((FtsIntValueListener) listener).valueChanged(newValue);
       }

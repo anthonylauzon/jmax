@@ -33,7 +33,7 @@
    and send them to the client.
    */
 
-/*  #define UPDATE_TRACE */
+/* #define UPDATE_TRACE  */
 
 #include "sys.h"
 #include "lang.h"

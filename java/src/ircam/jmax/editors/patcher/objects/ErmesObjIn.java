@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
 
 //
@@ -72,7 +73,13 @@ public class ErmesObjIn extends ErmesObjInOut {
 
   public void popUpEdit(Point p)
   {
-    itsSketchPad.itsInPop.setOwner(this);
-    itsSketchPad.itsInPop.show(itsSketchPad, p.x, p.y);
+    ircam.jmax.utils.ChooseNumberPopUp.choose(itsSketchPad,
+			     new NumberChoosenListener()
+			     {
+			       public void numberChoosen(int v) { changeNo(v);}
+			     },
+			       0,
+			       itsSketchPad.getFtsPatcher().getNumberOfInlets() + 4,
+			       p);
   }
 }

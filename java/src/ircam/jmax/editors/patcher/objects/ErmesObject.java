@@ -384,7 +384,7 @@ abstract public class ErmesObject implements DisplayObject
     itsSketchPad.getDisplayList().redrawConnectionsFor(this);
   }
 
-  private void updateInOutlets()
+  protected void updateInOutlets()
   {
     if (ftsObject.getNumberOfInlets() > 1)
       inletDistance = (getWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfInlets() - 1);

@@ -27,7 +27,6 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class ErmesSketchPad extends JPanel
 {
-
   private DisplayList displayList;
 
   public DisplayList getDisplayList()
@@ -44,13 +43,17 @@ public class ErmesSketchPad extends JPanel
 
   ErmesSketchWindow itsSketchWindow;
   FtsObject itsPatcher;
+
+  public FtsObject getFtsPatcher()
+  {
+    return itsPatcher;
+  }
+
   FtsPatcherData itsPatcherData;
 
 
   // Shouldn't/Couldn't the popup being static, or created on the fly ?
 
-  public ErmesObjInOutPop itsInPop = null;
-  public ErmesObjInOutPop itsOutPop = null;
   private EditField itsEditField;
 
   // FONT HANDLING
@@ -252,7 +255,6 @@ public class ErmesSketchPad extends JPanel
 
     displayList = new DisplayList(this);
     engine      = new InteractionEngine(this);
-    addPopUp    = new AddPopUp(this);
     keyMap = new KeyMap(this, this.getSketchWindow());
 
     // Next two temporary (mdc)
@@ -277,12 +279,6 @@ public class ErmesSketchPad extends JPanel
     add( itsEditField);
 
     InitFromFtsContainer( itsPatcherData);
-
-    itsInPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfInlets() + 4);
-    add( itsInPop);
-
-    itsOutPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfOutlets() + 4);
-    add( itsOutPop);
 
     fixSize();
 
@@ -535,20 +531,8 @@ public class ErmesSketchPad extends JPanel
       }
   }
 
-  
-  final void RedefineInChoice()
-  {
-    itsInPop.Redefine(itsPatcher.getNumberOfInlets() + 4);
-  }
-
-  void RedefineOutChoice()
-  {
-    itsOutPop.Redefine( itsPatcher.getNumberOfOutlets() + 4);
-  }
-
   public void paintComponent( Graphics g)
   {
-
     displayList.paint(g);
   }		
 
@@ -585,8 +569,6 @@ public class ErmesSketchPad extends JPanel
 
     displayList.disposeAllObjects();
 
-    remove( itsInPop);
-    remove( itsOutPop);
     remove( itsEditField);
 
     // Clean up to help the gc, and found the bugs.
@@ -594,8 +576,6 @@ public class ErmesSketchPad extends JPanel
     itsSketchWindow = null;// should not be needed, here to get the grabber !!
 
     itsPatcher = null;
-    itsInPop = null;
-    itsOutPop = null;
     itsEditField = null;
     anOldPastedObject = null;
   }
@@ -739,11 +719,9 @@ public class ErmesSketchPad extends JPanel
 
   // Support for the new Interaction Model
 
-  private AddPopUp addPopUp;
-
   public void showAddPopUp(Point p)
   {
-    addPopUp.show(this, p.x, p.y);
+    AddPopUp.popup(this, p.x, p.y);
   }
 
   private InteractionEngine engine;

@@ -41,7 +41,6 @@ class EditCtrlInteraction extends Interaction
 	break;
 
       case Squeack.UP:
-	object = (ErmesObject) area.getTarget();
 	object.gotSqueack(squeack, mouse, oldMouse);
 	editor.endInteraction();
 	break;

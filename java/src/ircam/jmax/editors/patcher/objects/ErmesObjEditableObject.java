@@ -137,6 +137,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
   public void inletsChanged(int n)
   {
+    updateInOutlets();
     redraw();
     redrawConnections();
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
@@ -144,6 +145,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
   public void outletsChanged(int n)
   {
+    updateInOutlets();
     redraw();
     redrawConnections();
     itsSketchPad.getDisplayList().updateConnectionsFor(this);

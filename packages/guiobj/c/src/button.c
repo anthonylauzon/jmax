@@ -155,6 +155,28 @@ button_put_value(fts_daemon_action_t action, fts_object_t *obj,
   fts_alarm_arm(&(this->alarm));
 }
 
+/* Daemon for the color  propriety */
+
+static void
+button_get_color(fts_daemon_action_t action, fts_object_t *obj,
+		 fts_symbol_t property, fts_atom_t *value)
+{
+  button_t *this = (button_t *)obj;
+
+  fts_set_int(value, this->color);
+}
+
+
+static void
+button_put_color(fts_daemon_action_t action, fts_object_t *obj,
+		 fts_symbol_t property, fts_atom_t *value)
+{
+  button_t *this = (button_t *)obj;
+
+  this->color = fts_get_int(value);
+}
+
+
 /************************************************
  *
  *    class
@@ -185,8 +207,14 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, 0, fts_new_symbol("color"), button_color, 1, a);
 
   /* value daemons */
+
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, button_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, button_put_value);
+
+  /* color daemons  */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_color, button_get_color);
+  fts_class_add_daemon(cl, obj_property_put, fts_s_color, button_put_color);
 
   a[0] = fts_s_int;
   fts_outlet_type_define(cl, 0, fts_s_bang, 1, a);
@@ -200,3 +228,4 @@ button_config(void)
 {
   fts_metaclass_create(fts_new_symbol("button"),button_instantiate, fts_always_equiv);
 }
+

@@ -51,7 +51,7 @@ public class ErmesObjComment extends ErmesObjEditableObject
 
     // Change the renderer if needed
 
-    if (args.charAt(0) == '%')
+    if ((args != null) && (args.length() > 0)  && args.charAt(0) == '%')
       icon = Icons.get(args);
 
     if (icon != null)

@@ -12,6 +12,9 @@ include $(INCLUDE_PATH)/Sources2
 INCLUDE_PATH := $(LOCAL_PATH)/interactions
 include $(INCLUDE_PATH)/Sources2
 
+INCLUDE_PATH := $(LOCAL_PATH)/tcl
+include $(INCLUDE_PATH)/Sources2
+
 INCLUDE_PATH := $(LOCAL_PATH)
 
 SOURCES := $(SOURCES)\
@@ -25,7 +28,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/TextRenderer.java  \
 	$(INCLUDE_PATH)/IconRenderer.java  \
 	$(INCLUDE_PATH)/AddPopUp.java  \
-	$(INCLUDE_PATH)/ErmesObjInOutPop.java  \
 	$(INCLUDE_PATH)/ErmesPatcherFactory.java  \
 	$(INCLUDE_PATH)/ErmesPatcherListener.java  \
 	$(INCLUDE_PATH)/ErmesSelection.java  \

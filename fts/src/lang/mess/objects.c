@@ -980,6 +980,7 @@ fts_object_send_properties(fts_object_t *obj)
       
       fts_client_send_property(obj, fts_s_comment);
       fts_client_send_property(obj, fts_s_layer);
+      fts_client_send_property(obj, fts_s_color);
 
       /* Ask the object to send to the client object specific properties */
 

@@ -84,13 +84,11 @@ class ErmesPatcherListener implements FtsPatcherListener
 
   public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins)
   {
-    window.itsSketchPad.RedefineInChoice();
     window.itsSketchPad.redraw(); // ??? Why
   }
 
   public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts)
   {
-    window.itsSketchPad.RedefineOutChoice();
     window.itsSketchPad.redraw(); // ??? Why
   }
 

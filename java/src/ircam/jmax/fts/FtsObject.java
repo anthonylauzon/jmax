@@ -422,6 +422,15 @@ public class FtsObject
       }
   }
 
+  /* Colors are not stored, can only be set, and it is meaningfull only
+     for some object */
+
+  public final void setColor(int color)
+  {
+    Fts.getServer().putObjectProperty(this, "color", color);
+    setDirty();
+  }
+
   public MaxData getData()
   {
     return data;

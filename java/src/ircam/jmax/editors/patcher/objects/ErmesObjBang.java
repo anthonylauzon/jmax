@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
@@ -127,5 +128,15 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
 		h - 2*CIRCLE_ORIGIN - 1);
 
     super.paint( g);
+  }
+
+  public void popUpEdit(Point p)
+  {
+    ChooseColorIdPopUp.choose(itsSketchPad,
+			      (new NumberChoosenListener()
+			       {
+				 public void numberChoosen(int number) { ftsObject.setColor(number + 1);}
+			       }),
+			      p);
   }
 }

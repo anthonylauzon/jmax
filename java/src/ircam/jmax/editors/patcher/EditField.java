@@ -165,7 +165,7 @@ public class EditField extends JTextArea
 	  {
 	    int pos = viewToModel(location);
 
-	    if (pos >= 0)
+	    if ((pos >= 0) && (pos <= owner.getArgs().length()))
 	      setCaretPosition(pos);
 	    else
 	      setCaretPosition(owner.getArgs().length());
