@@ -216,7 +216,7 @@ sigline_float_realize(sigline_t *this, float f)
 {
   float steps;
 
-  if (!this->set || ((steps = this->vecsize * this->in1) <= 0))
+  if (!this->set || ((steps = (float)this->vecsize * this->in1) <= 0))
     {
       steps = 0;
       ftl_data_set(line_control_t, this->ftl_data, val, &f);
@@ -240,7 +240,7 @@ sigline_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   sigline_t *this = (sigline_t *)o;
 
-  this->in1 = fts_get_number_arg(ac, at, 0, 0.0f) * .001f * this->srate / this->vecsize;
+  this->in1 = fts_get_number_arg(ac, at, 0, 0.0f) * 0.001f * this->srate / this->vecsize;
 
   this->set = 1;
 }

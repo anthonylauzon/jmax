@@ -2,123 +2,102 @@
 #include <math.h>
 #include <string.h>
 
-#define SIN_BITS     9
-#define SIN_NPOINTS  (1 << SIN_BITS)
-#define SIN_FRACBITS 8
+#define TAB_BITS     9
+#define TAB_NPOINTS  (1 << TAB_BITS)
+#define TAB_FRACBITS 8
 
-#define SIN_FRAC     (1 << SIN_FRACBITS)
-#define SIN_K1       (SIN_NPOINTS * SIN_FRAC)
-#define SIN_K2       (SIN_NPOINTS * SIN_FRAC - 1)
-#define SIN_K3       (1.0f / (SIN_NPOINTS * SIN_FRAC))
-#define SIN_K4       (31 - SIN_BITS-SIN_FRACBITS)
+#define TAB_FRAC     (1 << TAB_FRACBITS)
+#define TAB_K1       (TAB_NPOINTS * TAB_FRAC)
+#define TAB_K2       (TAB_NPOINTS * TAB_FRAC - 1)
+#define TAB_K3       (1.0f / (TAB_NPOINTS * TAB_FRAC))
+#define TAB_K4       (31 - TAB_BITS-TAB_FRACBITS)
 
 typedef struct
 {
   float value;
   float slope;
-} sinsamp_t;
+} wavetab_samp_t;
 
-#define SINTABSIZE (SIN_NPOINTS * sizeof(sinsamp_t))
+/***************************************************************************************
+ *
+ *  wave table data
+ *
+ */
 
-/* ---------------------------- tab1 ----------------------------------- */
-
+static fts_symbol_t sym_nowrap;
 static fts_hash_table_t *sigtab1_ht;
 
 typedef struct {
-  sinsamp_t *samps;
+  wavetab_samp_t *samps;
   fts_symbol_t sym;
   int refcnt;
+  int nowrap;
 } wavetab_t;
-
-#define HEADERSIZE 28
-#define NINTERP    2
-#define TABLESIZE  0x1000
-
-#define NEEDBYTES (HEADERSIZE + TABLESIZE*sizeof(short)/sizeof(sinsamp_t))
 
 static void
 wavetable_load(wavetab_t *wavetab)
 {
-  const char *name = fts_symbol_name(wavetab->sym);
-  int fd = fts_file_open(name, "r");
-  const char *basename, *s2;
-  char *tempbuf, *rats;
-  long  n;
-  sinsamp_t *sptr;
+  const char *file_name = fts_symbol_name(wavetab->sym);
+  float buf[TAB_NPOINTS];
 
-  if (fd < 0)
+    if(file_name)
     {
-      post("tab1~ %s: can't open\n", name);
-      return;
-    }
+      fts_soundfile_t *sf = fts_soundfile_open_read_float(wavetab->sym, 0, 0.0f, 0);
+      int n_samples;
+      int i;
 
-  tempbuf = fts_malloc(NEEDBYTES);
+      if(!sf)
+	{
+	  post("tab1~: %s: can not open wave table file\n", file_name);
+	  return;
+	}
+      
+      n_samples = fts_soundfile_read_float(sf, buf, TAB_NPOINTS);
+      fts_soundfile_close(sf);
 
-  if (!tempbuf)
-    {
-      post("tab1: can't get buffer space for read\n");
-      fts_file_close(fd);
-      return;
-    }
+      if(n_samples < TAB_NPOINTS)
+	{
+	  post("tab1~: %s: can not read wave table\n", file_name);
+	  return;
+	}
+      
+      /* get value of first wavetable point */
+      wavetab->samps[0].value = buf[0];
 
-  n = read(fd, tempbuf, NEEDBYTES);
+      /* next values and slopes */
+      for(i=1; i<TAB_NPOINTS; i++)
+	{
+	  wavetab->samps[i].value = buf[i];
+	  wavetab->samps[i-1].slope = (wavetab->samps[i].value - wavetab->samps[i-1].value) / (float) TAB_FRAC;  
+	}
 
-  if (n < NEEDBYTES)
-    {
-      if (n < 0)
-	post("tab1~: %s: read failed\n", name);
+      /* get slope of last wavetable point in dependency of wrapping mode */
+      if(strstr(file_name, "nowrap") || wavetab->nowrap)
+	wavetab->samps[TAB_NPOINTS-1].slope = wavetab->samps[TAB_NPOINTS-2].slope;
       else
-	post("tab1~: %s: too short\n", name);
-
-      fts_file_close(fd);
-      fts_free(tempbuf);
-
-      return;
-    }
-
-  for (n = 0, rats = tempbuf + HEADERSIZE, sptr = wavetab->samps;
-       n < SIN_NPOINTS; rats += sizeof(short), sptr++, n++)
-    {
-      sptr->value = (1.0f/32767.0f) * *(short *)rats;
-
-      if (n)
-	(sptr-1)->slope = (sptr->value - (sptr-1)->value) / (float) SIN_FRAC; /* mdc: change the scaling */
-    }
-
-  for (s2 = basename = name; *s2; s2++) 
-    if (*s2 == '/')
-      basename = s2 + 1;
-
-  if (!strncmp(basename, "nowrap", 6))
-    {
-      /* post("tab1: reading %s (non-wraparound)\n", name);	*/
-      wavetab->samps[SIN_NPOINTS-1].slope = wavetab->samps[SIN_NPOINTS-2].slope;
-    }
-  else
-    {
-      /* post("tab1: reading %s\n", name);	*/
-      wavetab->samps[SIN_NPOINTS-1].slope = (wavetab->samps[0].value - wavetab->samps[SIN_NPOINTS-1].value) / (float) SIN_FRAC;
-    }
-
-/*  print_samples(wavetab->samps);*/
-  fts_file_close(fd);
-
-  fts_free(tempbuf);
+	wavetab->samps[TAB_NPOINTS-1].slope = (wavetab->samps[0].value - wavetab->samps[TAB_NPOINTS-1].value) / (float) TAB_FRAC;
+    }    
 }
 
 static wavetab_t *
-wavetable_new(fts_symbol_t s)
+wavetable_new(fts_symbol_t name, fts_symbol_t wrap_mode)
 {
-  sinsamp_t *samps = (sinsamp_t *) fts_malloc(SINTABSIZE);
+  wavetab_samp_t *samps = (wavetab_samp_t *) fts_malloc(TAB_NPOINTS * sizeof(wavetab_samp_t));
   wavetab_t *wavetab;
 
-  if (!samps)
+  if(!samps)
     return 0;
   
-  wavetab = (wavetab_t *)fts_zalloc(sizeof(wavetab_t));
-  wavetab->sym = s;
+  wavetab = (wavetab_t *)fts_malloc(sizeof(wavetab_t));
+  wavetab->sym = name;
   wavetab->refcnt = 1;
   wavetab->samps = samps;
+
+  if(wrap_mode == sym_nowrap)
+    wavetab->nowrap = 1;
+  else
+    wavetab->nowrap = 0;
+
   wavetable_load(wavetab);
   return wavetab;
 }
@@ -126,8 +105,6 @@ wavetable_new(fts_symbol_t s)
 static void
 wavetable_delete(wavetab_t *wavetab)
 {
-  fts_hash_table_remove(sigtab1_ht, wavetab->sym);
-
   fts_free((char *)wavetab->samps);
   fts_free(wavetab);
 }
@@ -156,22 +133,22 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 {
   fts_atom_t data;
   sigtab1_t *this = (sigtab1_t *)o;
-  fts_symbol_t s = fts_get_symbol_arg(ac, at, 1, 0);
-  int r;
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
+  fts_symbol_t wrap_mode = fts_get_symbol_arg(ac, at, 2, 0);
 
-  if (!s)
+  if(!name)
     return;
 
-  if (fts_hash_table_lookup(sigtab1_ht, s, &data))
+  if (fts_hash_table_lookup(sigtab1_ht, name, &data))
     {
       this->wavetab = (wavetab_t *)fts_get_ptr(&data);
       this->wavetab->refcnt++;
     }
   else
     {
-      this->wavetab = wavetable_new(s);
+      this->wavetab = wavetable_new(name, wrap_mode);
       fts_set_ptr(&data, this->wavetab);
-      r = fts_hash_table_insert(sigtab1_ht, s, &data);
+      fts_hash_table_insert(sigtab1_ht, name, &data);
     }
 }
 
@@ -181,19 +158,25 @@ sigtab1_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
   sigtab1_t *this = (sigtab1_t *)o;
 
   if (this->wavetab && !--this->wavetab->refcnt)
-    wavetable_delete(this->wavetab);
+    {
+      fts_hash_table_remove(sigtab1_ht, this->wavetab->sym);
+      wavetable_delete(this->wavetab);
+    }
 }
 
 static fts_status_t
 sigtab1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[2];
+  fts_symbol_t a[3];
 
   fts_class_init(cl, sizeof(sigtab1_t), 1, 0, 0);
 
+  sym_nowrap = fts_new_symbol("nowrap");
+
   a[0] = fts_s_symbol;
   a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigtab1_init, 2, a, 1);
+  a[2] = fts_s_symbol;
+  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigtab1_init, 3, a, 1);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigtab1_delete, 0, a);
 
@@ -214,7 +197,7 @@ sigtab1_config(void)
 
 /***************************************************************************************
  *
- *  osc1~
+ *  osc1~ obj
  *
  */
 
@@ -222,7 +205,7 @@ typedef struct
 {
   long phase;
   float fconv;
-  sinsamp_t *samps;
+  wavetab_samp_t *samps;
 } osc_control_t;
 
 typedef struct 
@@ -261,7 +244,7 @@ osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  *
  */
 
-static sinsamp_t *sin_tab;
+static wavetab_samp_t *sin_tab;
 static fts_symbol_t osc_function = 0;
 static fts_symbol_t osc_freq_function = 0;
 static fts_symbol_t osc_phase_function = 0;
@@ -405,7 +388,7 @@ osc_wrapper(fts_word_t *argv)
   long int n = fts_word_get_long(argv + 4);
   int     ophase;
   float   fconv;
-  sinsamp_t *tab;
+  wavetab_samp_t *tab;
 
   ophase = this->phase;
   fconv  = this->fconv * 0x7fffffffL;
@@ -416,9 +399,9 @@ osc_wrapper(fts_word_t *argv)
       int idx;
 
 
-      idx    = ((((long)(*phase * SIN_K1 + (ophase >> SIN_K4))) & SIN_K2) >> SIN_FRACBITS);
+      idx    = ((((long)(*phase * TAB_K1 + (ophase >> TAB_K4))) & TAB_K2) >> TAB_FRACBITS);
       *out   = (tab[idx].value +
-		tab[idx].slope * ((((long)(*phase * SIN_K1 + (ophase >> SIN_K4))) & (SIN_FRAC-1))));
+		tab[idx].slope * ((((long)(*phase * TAB_K1 + (ophase >> TAB_K4))) & (TAB_FRAC-1))));
       ophase = (ophase + (int)(fconv * *freq)) & 0x7fffffffL;
 
       freq++;
@@ -440,7 +423,7 @@ osc_phase_wrapper(fts_word_t *argv)
 
   int     ophase;
   float   fconv;
-  sinsamp_t *tab;
+  wavetab_samp_t *tab;
 
   /* This function is used when osc is used as a wave shaper; result,
      frequency and accumulated phase are always 0 */
@@ -452,9 +435,9 @@ osc_phase_wrapper(fts_word_t *argv)
     {
       int idx;
 
-      idx    = ((((long)(*phase * SIN_K1) & SIN_K2) >> SIN_FRACBITS);
+      idx    = ((((long)(*phase * TAB_K1) & TAB_K2) >> TAB_FRACBITS);
       *out   = (tab[idx].value +
-		tab[idx].slope * (((long)(*phase * SIN_K1 )) & (SIN_FRAC-1)));
+		tab[idx].slope * (((long)(*phase * TAB_K1 )) & (TAB_FRAC-1)));
 
       phase++;
       out++;
@@ -470,7 +453,7 @@ osc_freq_wrapper(fts_word_t *argv)
   long int n = fts_word_get_long(argv + 3);
   int     ophase;
   float   fconv;
-  sinsamp_t *tab;
+  wavetab_samp_t *tab;
 
   /* This version is used when there is no phase modulation */
 
@@ -483,9 +466,9 @@ osc_freq_wrapper(fts_word_t *argv)
       int idx;
 
 
-      idx    = (((ophase >> SIN_K4)) & SIN_K2) >> SIN_FRACBITS;
+      idx    = (((ophase >> TAB_K4)) & TAB_K2) >> TAB_FRACBITS;
       *out   = (tab[idx].value +
-		tab[idx].slope * ((ophase >> SIN_K4) & (SIN_FRAC - 1)))
+		tab[idx].slope * ((ophase >> TAB_K4) & (TAB_FRAC - 1)))
       ophase = (ophase + (int)(fconv * *freq)) & 0x7fffffffL;
 
       freq++;
@@ -510,7 +493,7 @@ osc_phase_wrapper(fts_word_t *argv)
   float *out   = (float *) fts_word_get_ptr(argv + 1);
   osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 2);
   long int n = fts_word_get_long(argv + 3);
-  sinsamp_t *tab;
+  wavetab_samp_t *tab;
   int i;
 
   /* This function is used when osc is used as a wave shaper; result,
@@ -524,22 +507,22 @@ osc_phase_wrapper(fts_word_t *argv)
       float o0, o1, o2, o3;
       float ph0, ph1, ph2, ph3;
 
-      ph0 = phase[i + 0] * SIN_K1;
-      ph1 = phase[i + 1] * SIN_K1;
-      ph2 = phase[i + 2] * SIN_K1;
-      ph3 = phase[i + 3] * SIN_K1;
+      ph0 = phase[i + 0] * TAB_K1;
+      ph1 = phase[i + 1] * TAB_K1;
+      ph2 = phase[i + 2] * TAB_K1;
+      ph3 = phase[i + 3] * TAB_K1;
 
-      idx0 = ((long)ph0 & SIN_K2) >> SIN_FRACBITS;
-      o0 = (float)((float) tab[idx0].value + (float) tab[idx0].slope * (float) ((long)ph0 & (SIN_FRAC - 1)));
+      idx0 = ((long)ph0 & TAB_K2) >> TAB_FRACBITS;
+      o0 = (float)((float) tab[idx0].value + (float) tab[idx0].slope * (float) ((long)ph0 & (TAB_FRAC - 1)));
 
-      idx1 = ((long)ph1 & SIN_K2) >> SIN_FRACBITS;
-      o1 = (float)((float)tab[idx1].value + (float)tab[idx1].slope * (float)((long)ph1 & (SIN_FRAC - 1)));
+      idx1 = ((long)ph1 & TAB_K2) >> TAB_FRACBITS;
+      o1 = (float)((float)tab[idx1].value + (float)tab[idx1].slope * (float)((long)ph1 & (TAB_FRAC - 1)));
 
-      idx2 = ((long)ph2 & SIN_K2) >> SIN_FRACBITS;
-      o2 = (float)((float)tab[idx2].value + (float)tab[idx2].slope * (float)((long)ph2 & (SIN_FRAC - 1)));
+      idx2 = ((long)ph2 & TAB_K2) >> TAB_FRACBITS;
+      o2 = (float)((float)tab[idx2].value + (float)tab[idx2].slope * (float)((long)ph2 & (TAB_FRAC - 1)));
 
-      idx3 = ((long)ph3 & SIN_K2) >> SIN_FRACBITS;
-      o3 = (float)((float)tab[idx3].value + (float)tab[idx3].slope * (float)((long)ph3 & (SIN_FRAC - 1)));
+      idx3 = ((long)ph3 & TAB_K2) >> TAB_FRACBITS;
+      o3 = (float)((float)tab[idx3].value + (float)tab[idx3].slope * (float)((long)ph3 & (TAB_FRAC - 1)));
 
       out[i + 0] = o0;
       out[i + 1] = o1;
@@ -557,7 +540,7 @@ osc_phase_64_wrapper(fts_word_t *argv)
   float *phase = (float *) fts_word_get_ptr(argv + 0);
   float *out   = (float *) fts_word_get_ptr(argv + 1);
   osc_control_t *this = (osc_control_t *)fts_word_get_ptr(argv + 2);
-  sinsamp_t *tab;
+  wavetab_samp_t *tab;
   int i;
 
   /* This function is used when osc is used as a wave shaper; result,
@@ -571,22 +554,22 @@ osc_phase_64_wrapper(fts_word_t *argv)
       float o0, o1, o2, o3;
       float ph0, ph1, ph2, ph3;
 
-      ph0 = phase[i + 0] * SIN_K1;
-      ph1 = phase[i + 1] * SIN_K1;
-      ph2 = phase[i + 2] * SIN_K1;
-      ph3 = phase[i + 3] * SIN_K1;
+      ph0 = phase[i + 0] * TAB_K1;
+      ph1 = phase[i + 1] * TAB_K1;
+      ph2 = phase[i + 2] * TAB_K1;
+      ph3 = phase[i + 3] * TAB_K1;
 
-      idx0 = ((long)ph0 & SIN_K2) >> SIN_FRACBITS;
-      o0 = (float)((float) tab[idx0].value + (float) tab[idx0].slope * (float) ((long)ph0 & (SIN_FRAC - 1)));
+      idx0 = ((long)ph0 & TAB_K2) >> TAB_FRACBITS;
+      o0 = (float)((float) tab[idx0].value + (float) tab[idx0].slope * (float) ((long)ph0 & (TAB_FRAC - 1)));
 
-      idx1 = ((long)ph1 & SIN_K2) >> SIN_FRACBITS;
-      o1 = (float)((float)tab[idx1].value + (float)tab[idx1].slope * (float)((long)ph1 & (SIN_FRAC - 1)));
+      idx1 = ((long)ph1 & TAB_K2) >> TAB_FRACBITS;
+      o1 = (float)((float)tab[idx1].value + (float)tab[idx1].slope * (float)((long)ph1 & (TAB_FRAC - 1)));
 
-      idx2 = ((long)ph2 & SIN_K2) >> SIN_FRACBITS;
-      o2 = (float)((float)tab[idx2].value + (float)tab[idx2].slope * (float)((long)ph2 & (SIN_FRAC - 1)));
+      idx2 = ((long)ph2 & TAB_K2) >> TAB_FRACBITS;
+      o2 = (float)((float)tab[idx2].value + (float)tab[idx2].slope * (float)((long)ph2 & (TAB_FRAC - 1)));
 
-      idx3 = ((long)ph3 & SIN_K2) >> SIN_FRACBITS;
-      o3 = (float)((float)tab[idx3].value + (float)tab[idx3].slope * (float)((long)ph3 & (SIN_FRAC - 1)));
+      idx3 = ((long)ph3 & TAB_K2) >> TAB_FRACBITS;
+      o3 = (float)((float)tab[idx3].value + (float)tab[idx3].slope * (float)((long)ph3 & (TAB_FRAC - 1)));
 
       out[i + 0] = o0;
       out[i + 1] = o1;
@@ -605,7 +588,7 @@ osc_freq_wrapper(fts_word_t *argv)
   long int n = fts_word_get_long(argv + 3);
   int     ophase;
   float   fconv;
-  sinsamp_t *tab;
+  wavetab_samp_t *tab;
   int i;
 
   ophase = this->phase;
@@ -625,25 +608,25 @@ osc_freq_wrapper(fts_word_t *argv)
       d3 = (int)(fconv * freq[i + 3]);
 
 
-      k = ophase >> SIN_K4;
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o0 = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (SIN_FRAC - 1)));
+      k = ophase >> TAB_K4;
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o0 = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (TAB_FRAC - 1)));
       ophase = (ophase + d0) & 0x7fffffffL;
 
 
-      k = ophase >> SIN_K4;
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o1 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (SIN_FRAC - 1)));
+      k = ophase >> TAB_K4;
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o1 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
       ophase = (ophase + d1) & 0x7fffffffL;
 
-      k = ophase >> SIN_K4;
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o2 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (SIN_FRAC - 1)));
+      k = ophase >> TAB_K4;
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o2 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
       ophase = (ophase + d2) & 0x7fffffffL;
 
-      k = ophase >> SIN_K4;
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o3 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (SIN_FRAC - 1)));
+      k = ophase >> TAB_K4;
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o3 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
       ophase = (ophase + d3) & 0x7fffffffL;
 
       out[i + 0] = o0;
@@ -666,7 +649,7 @@ osc_wrapper(fts_word_t *argv)
   long int n = fts_word_get_long(argv + 4);
   int     ophase;
   float   fconv;
-  sinsamp_t *tab;
+  wavetab_samp_t *tab;
   int i;
 
   ophase = this->phase;
@@ -686,33 +669,33 @@ osc_wrapper(fts_word_t *argv)
       d2 = (int)(fconv * freq[i + 2]);
       d3 = (int)(fconv * freq[i + 3]);
 
-      ph0 = phase[i + 0] * SIN_K1;
-      ph1 = phase[i + 1] * SIN_K1;
-      ph2 = phase[i + 2] * SIN_K1;
-      ph3 = phase[i + 3] * SIN_K1;
+      ph0 = phase[i + 0] * TAB_K1;
+      ph1 = phase[i + 1] * TAB_K1;
+      ph2 = phase[i + 2] * TAB_K1;
+      ph3 = phase[i + 3] * TAB_K1;
 
 
-      k = (long)(ph0 + (ophase >> SIN_K4));
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o0 = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (SIN_FRAC - 1)));
+      k = (long)(ph0 + (ophase >> TAB_K4));
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o0 = (float)((float) tab[idx].value + (float) tab[idx].slope * (float) (k & (TAB_FRAC - 1)));
       ophase = (ophase + d0) & 0x7fffffffL;
 
 
-      k = (long)(ph1 + (ophase >> SIN_K4));
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o1 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (SIN_FRAC - 1)));
+      k = (long)(ph1 + (ophase >> TAB_K4));
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o1 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
       ophase = (ophase + d1) & 0x7fffffffL;
 
 
-      k = (long)(ph2 + (ophase >> SIN_K4));
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o2 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (SIN_FRAC - 1)));
+      k = (long)(ph2 + (ophase >> TAB_K4));
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o2 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
       ophase = (ophase + d2) & 0x7fffffffL;
 
 
-      k = (long)(ph3 + (ophase >> SIN_K4));
-      idx = ((k & SIN_K2) >> SIN_FRACBITS);
-      o3 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (SIN_FRAC - 1)));
+      k = (long)(ph3 + (ophase >> TAB_K4));
+      idx = ((k & TAB_K2) >> TAB_FRACBITS);
+      o3 = (float)((float)tab[idx].value + (float)tab[idx].slope * (float)(k & (TAB_FRAC - 1)));
       ophase = (ophase + d3) & 0x7fffffffL;
 
       out[i + 0] = o0;
@@ -815,16 +798,16 @@ make_sin_tab(void)
 {
   int i;
 
-  sin_tab = (sinsamp_t *) fts_malloc(SINTABSIZE);
+  sin_tab = (wavetab_samp_t *) fts_malloc(TAB_NPOINTS * sizeof(wavetab_samp_t));
 
   if (! sin_tab)
     return (0);
 
-  for (i = 0; i < SIN_NPOINTS; i++)
-    sin_tab[i].value = cos(i * (2*3.141593f/SIN_NPOINTS));
+  for (i = 0; i < TAB_NPOINTS; i++)
+    sin_tab[i].value = cos(i * (2*3.141593f/TAB_NPOINTS));
 
-  for (i = 0; i < SIN_NPOINTS; i++)
-    sin_tab[i].slope = 	(sin_tab[(i + 1) & (SIN_NPOINTS - 1)].value - sin_tab[i].value)/ (float) SIN_FRAC;
+  for (i = 0; i < TAB_NPOINTS; i++)
+    sin_tab[i].slope = 	(sin_tab[(i + 1) & (TAB_NPOINTS - 1)].value - sin_tab[i].value) / (float) TAB_FRAC;
 
   return (1);
 }
