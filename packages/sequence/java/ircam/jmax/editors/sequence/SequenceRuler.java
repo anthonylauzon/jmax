@@ -78,9 +78,6 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
   
     marker = new RulerMarker( this);
     marker.setBounds( -10, -10, 4, RULER_HEIGHT-2);
-    add( marker);
-    marker.setVisible(false);
-    validate();
   }
 
   public void paintComponent(Graphics g)
@@ -169,6 +166,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
   {
     if(!hh)
     {
+      add( marker);
       marker.setVisible(true);
       //---------
       hh = true;
@@ -218,6 +216,8 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
           setLocation( timeX - 1, 1);
         }
       });
+      setPreferredSize(new Dimension( 4, RULER_HEIGHT-2));
+      setMaximumSize(new Dimension( 4, RULER_HEIGHT-2));
     }
     
     void setTime(double time)
