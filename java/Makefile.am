@@ -1,10 +1,11 @@
 SUBDIRS= src
 
 jardir=$(pkgdatadir)/java
-JAR=jmax.jar
-jar_DATA = $(JAR)
+JARFILE=jmax.jar
+jar_DATA = $(JARFILE)
 
 JAR_DEP=\
+	src/jmax.jar.root \
 	src/ircam/jmax/classpackage.stamp \
 	src/ircam/jmax/dialogs/classpackage.stamp \
 	src/ircam/jmax/editors/console/classpackage.stamp \
@@ -19,23 +20,12 @@ JAR_DEP=\
 	src/ircam/jmax/toolkit/menus/classpackage.stamp \
 	src/ircam/jmax/widgets/classpackage.stamp 
 
-CLEANFILES=${JAR}
+CLEANFILES=${JARFILE}
 
-$(JAR): $(JAR_DEP)	
-	-test -f $(JAR) || rm -f $(JAR)
-	@echo "root" > jmax.jar.root
-	jar -cvf $(JAR)	jmax.jar.root
-	@rm jmax.jar.root
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/dialogs/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/console/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/actions/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/interactions/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/menus/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/editors/patcher/objects/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/fts/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/actions/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/toolkit/menus/*.class )
-	( cd src ; jar -uvf ../$(JAR) ircam/jmax/widgets/*.class )
+$(JARFILE): $(JAR_DEP)
+	if test -f $(JARFILE); then \
+		cd src ; jar -uvf ../$(JARFILE) jmax.jar.root `find . -name "*.class" -newer ../$(JARFILE)` ; \
+	else \
+		cd src ; jar -cvf ../$(JARFILE) jmax.jar.root `find . -name "*.class"`; \
+	fi
+

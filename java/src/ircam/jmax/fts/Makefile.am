@@ -20,6 +20,7 @@ FtsObjectErrorListener.java\
 FtsObjectSet.java\
 FtsObjectWithEditor.java\
 FtsOutletsListener.java\
+FtsPackage.java\
 FtsPatcherListener.java\
 FtsPatcherObject.java\
 FtsTemplateObject.java\
